@@ -1,138 +1,106 @@
-Return-Path: <netdev+bounces-120409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 112B09592F0
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 04:36:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFB349592F2
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 04:39:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C151B229DD
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 02:36:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 956DC1F23E99
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 02:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3513C14BF90;
-	Wed, 21 Aug 2024 02:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B4F214BFB4;
+	Wed, 21 Aug 2024 02:39:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="UllWxUSS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eQxiZroj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01ED146D75;
-	Wed, 21 Aug 2024 02:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2858117F7;
+	Wed, 21 Aug 2024 02:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724207810; cv=none; b=t/L45qTslJTV9ucDOXaxTI3j35lp5XAKqx8An7I3y4bjz7A4E2N/hNpaqual8d8PCFCWDpch+URhyhNrCK8VUwW1C64uNnisB+XS7j35Hlp4/93qUap1rx91C3QI2lu5qk1v7fd3x77EqeRmrNoQ6OIhccMKbknrO9ADKfcnr48=
+	t=1724207940; cv=none; b=YR89zUcMuKtWZImzxsoYisBFpdtC6qrILc1NewLvKr0aVnelZz4PwXdMREr+iErQTfPNWKy+CyCW60laGsw9WFfTdRhhBgYQ1XOg4sGM9iSkbpg9SKzh8MeW/q1CJMtYqiFmgM1McwDdP0YpiEMGcf5cJdOkLpLOq1LfyBWqxyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724207810; c=relaxed/simple;
-	bh=HL9y2bHven80Acr7ptdtVe2NS9OfHeWdGcgm82QfLg0=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=cIiRK3AdS83zcf85jBHofhHyUBzDeRtWPKu6B11aWVYqb+hXSXJWl1VzEKmJqfKxtwHLpsNBGGpiPCUY858wFIO2q/rBSPzll0RcZGkaRuTncEzY7K9J80vwcElv4l4llZuncNujTIag3IZKRn2Q7H0nOS+GyJkT5PLpsUC8+n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=UllWxUSS; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1724207804; h=From:To:Subject:Date:Message-Id;
-	bh=/LtM0Vhj5juKXv4hadpMVC/PvoFiH6ytC4L9vRYgly8=;
-	b=UllWxUSShl4f5vKg27+v7orDNYF9qQcpENeXC4KlpH2F9rmBVbtHbt2jDNhOAb/NJ8pY/LdmtGuyOHYGPcDNRWy1E/6UBCN7OIncXw0CvIKsTuiS8Va4tDX+mYJT+Gd9W5QPU9m6shpuOtJg6RzbNKRaB/wd6uG8UHM/XMQKuSo=
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WDKIPAU_1724207797)
-          by smtp.aliyun-inc.com;
-          Wed, 21 Aug 2024 10:36:43 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	wintera@linux.ibm.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net-next v2] net/smc: add sysctl for smc_limit_hs
-Date: Wed, 21 Aug 2024 10:36:37 +0800
-Message-Id: <1724207797-79030-1-git-send-email-alibuda@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1724207940; c=relaxed/simple;
+	bh=pWLdDITN5G/Fs0+wkZkyaTeViR0s73pz19wdKfX4m2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iz5k16OSCfqaXoB5JS/FGMxKLHDxKvD6FI1stzu4hrWxjAOatyX6QEk7Wjy0FJz51C9tWi3UY7zNVqV3wFAn81LgQ69NLxsVk7opqK4we18twEtfS7FvCspalKjtcKVSyDbtQXrnD+H2qegIp0tYAh5DeOV+2u2zNWLKA0NQCAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eQxiZroj; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-70cb1b959a6so2378455a34.3;
+        Tue, 20 Aug 2024 19:38:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724207938; x=1724812738; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=o0aq5x+Ez6jYfq4GqzMr1ftLQ4aAL853CTIVt4Od+B4=;
+        b=eQxiZrojmuFN9/8ELs57p5ajW9gPG5o6tjIZmU/hyPqSyt51Wk5cxmUmyrwOkMsCwl
+         8spVygh+ke24CKHDC+AtTdiYUudMbIuuzGBSB/99gbjAQ2LmqOn3/oecT8x7ZANQeXmE
+         YzuCLX0KNRCz9BuvBeeu2XX1C4pPKOq88pGniTfuwFu/QjM2GYtUJQrup4YOv3iC29KH
+         7RU4wXXCz48LcCf4ZFoMc4VHNPJpNz42Tc/2InF/DwXFIxiN7MHBA5TVCYy/X+Nuoqdm
+         2LCmHXXc2kjmdQHJXCiLfw3lytMoLLAIlbXJCaf4VxctIS+j5MZv3YKEIdYYL0WVRVyT
+         a2rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724207938; x=1724812738;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o0aq5x+Ez6jYfq4GqzMr1ftLQ4aAL853CTIVt4Od+B4=;
+        b=RcGQscrpuVQTUR7gTp///tclB3Kqcog58E7mQJ1GHeBNXdQHStMg11L9OwrBUeSiQF
+         6otBjtY+nzX8wclgNZ1fMc1Q98xBqs20knQMMXDId4v0jJp3nO0g8CPCh5zJFt0Q0aw8
+         HDFqVrdibUkYbRKaZ2lfxFs9br5mdN48H1Zq8ZgplFKdZIxhtBDm1hKwnMTD5V62Tg+c
+         ltbdMmEKv5PtXxBXvaDSn5AnwjNYG7TPtXn3QvKkv8W+wMirI9Lotjr1FqMwjz/9HE55
+         kYo006UBAbe4siczRo/uxGM0hbbUbsuhOTgTD2bL6Y01UrJ8LNVwGMvyYIdRaPAqPWWS
+         Awvg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhnxxKKftDnH7oc7aFe82dJEF04hd05Y8Gpvud74gIGWw7rXzQkhraPm4nc/LumHllkpWry/z8@vger.kernel.org, AJvYcCXqY4wZhj3nXMwRnvCThK7I2rdD4b3UdjLsaYGW3ep7eNiTR/MpHNcXsbDrT7PFWYFVvS+7BwEP0TcgRYZT88g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxhx/wtPqTXVtw8DUmZHPDRHHzVEuu7HZn1zN8bzxwYkp6CvBi+
+	tGB2nk0ugx4ASNwpYnxWAoNujXcN3v5R4XbugwvPGXX8m/th5Cx2
+X-Google-Smtp-Source: AGHT+IGRypwpI/oJbphMhwLpfIL9IXGc2ZmuTeRdySk6ObmPlf5MLhxOaix74bJ7PGqWKyIoA7U87w==
+X-Received: by 2002:a05:6830:3490:b0:70d:f448:575a with SMTP id 46e09a7af769-70df85ef534mr1127675a34.1.1724207938017;
+        Tue, 20 Aug 2024 19:38:58 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127ae06a88sm8884478b3a.45.2024.08.20.19.38.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Aug 2024 19:38:57 -0700 (PDT)
+Date: Wed, 21 Aug 2024 10:38:51 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org, Ido Schimmel <idosch@idosch.org>
+Subject: Re: [PATCH net-next v2] selftests: net: add helper for checking if
+ nettest is available
+Message-ID: <ZsVTO7vjPRsbb4is@Laptop-X1>
+References: <20240820004217.1087392-1-kuba@kernel.org>
+ <ZsQLFwkNa-JnymGg@Laptop-X1>
+ <20240820084412.4aa6abfb@kernel.org>
+ <20240820182147.462226f2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240820182147.462226f2@kernel.org>
 
-From: "D. Wythe" <alibuda@linux.alibaba.com>
+On Tue, Aug 20, 2024 at 06:21:47PM -0700, Jakub Kicinski wrote:
+> On Tue, 20 Aug 2024 08:44:12 -0700 Jakub Kicinski wrote:
+> > On Tue, 20 Aug 2024 11:18:47 +0800 Hangbin Liu wrote:
+> > > Excuse me, what's profile used here? I can't find the definition in
+> > > Documentation/dev-tools/kselftest.rst.  
+> > 
+> > Ah, sorry, I added timestamping output as a local patch for NIPA.
+> 
+> To be clear the profile=1 enables the timestamps from my local patch
 
-In commit 48b6190a0042 ("net/smc: Limit SMC visits when handshake workqueue congested"),
-we introduce a mechanism to put constraint on SMC connections visit
-according to the pressure of SMC handshake process.
+I think it's a good feature, maybe you can put it in mainline :)
 
-At that time, we believed that controlling the feature through netlink
-was sufficient. However, most people have realized now that netlink is
-not convenient in container scenarios, and sysctl is a more suitable
-approach.
-
-In addition, since commit 462791bbfa35 ("net/smc: add sysctl interface for SMC")
-had introcuded smc_sysctl_net_init(), it is reasonable for us to
-initialize limit_smc_hs in it instead of initializing it in
-smc_pnet_net_int().
-
-Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
----
-v1 -> v2:
-
-Modified the description in the commit and removed the incorrect
-spelling.
-
- net/smc/smc_pnet.c   |  3 ---
- net/smc/smc_sysctl.c | 11 +++++++++++
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-index 2adb92b..1dd3623 100644
---- a/net/smc/smc_pnet.c
-+++ b/net/smc/smc_pnet.c
-@@ -887,9 +887,6 @@ int smc_pnet_net_init(struct net *net)
- 
- 	smc_pnet_create_pnetids_list(net);
- 
--	/* disable handshake limitation by default */
--	net->smc.limit_smc_hs = 0;
--
- 	return 0;
- }
- 
-diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
-index 13f2bc0..2fab645 100644
---- a/net/smc/smc_sysctl.c
-+++ b/net/smc/smc_sysctl.c
-@@ -90,6 +90,15 @@
- 		.extra1		= &conns_per_lgr_min,
- 		.extra2		= &conns_per_lgr_max,
- 	},
-+	{
-+		.procname	= "limit_smc_hs",
-+		.data		= &init_net.smc.limit_smc_hs,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ONE,
-+	},
- };
- 
- int __net_init smc_sysctl_net_init(struct net *net)
-@@ -121,6 +130,8 @@ int __net_init smc_sysctl_net_init(struct net *net)
- 	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
- 	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
- 	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
-+	/* disable handshake limitation by default */
-+	net->smc.limit_smc_hs = 0;
- 
- 	return 0;
- 
--- 
-1.8.3.1
-
+Thanks
+Hangbin
 
