@@ -1,203 +1,184 @@
-Return-Path: <netdev+bounces-120440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 524759595E8
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 09:22:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4468C9595F1
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 09:23:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0093EB2506B
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 07:22:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69E101C20B46
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 07:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB8FD1B654F;
-	Wed, 21 Aug 2024 07:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDD51B81CE;
+	Wed, 21 Aug 2024 07:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XmraETh4"
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="EWrgckZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2076.outbound.protection.outlook.com [40.107.215.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F021B6536
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 07:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724224792; cv=none; b=TuLnpYJkyIWupguiXcxKwYtNesxSGRom9mBtauWRReWR6HXGMt6qSJCuoE1yysNQkjHbgCov/j1IOjPMckr9Ozv5h1g3CWGN8T+gGQQp8D8r1dA7H1XYuZuadVM3GlmSeyJib8U7CGyiwdvQWpYyDG6G5hVSLVrQKdkL8+pKxCQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724224792; c=relaxed/simple;
-	bh=xzKTSbBUCxwnUpKs8six5ekb8eTkm5n7sI9qBsfTSxA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KPnbDUxu5sbeJdprQPTUsMpcPwSsj0QRDREH5kV2dU8nIKlm2Nk1Ze4hAXD7PRRXR2my4Y3Ki69SbI8lgBocXzKhjmrXK2/T25kHm42ZVTm7Ci33lr+yYUglYZUapg5Yx7vy1YBRL5xs9y1iGEmwrlPnq6qf3xGxOP6rLUFmbe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XmraETh4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724224790;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=stErXlsn4bG59ZiuP1S49NzWKfcbkIn79Ht3IKYskFI=;
-	b=XmraETh4x3xAdX4PDbfhaXxgfcLzttGz90OasGhW3/qcOAF47Cjs2ihXV+Kh6Ijp/bivBA
-	tT9cR/3bzmv5ywrD/QxCCFUbgaYvKLF7VLOARvmleKi8gXMkDncJX8JHn4WLlc0uuQBhEe
-	36EQjc69ieSIcfTZooCqC7FH4F9tsQA=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-675-XGKZzNi-PRyWMeH_t4eAeA-1; Wed, 21 Aug 2024 03:19:48 -0400
-X-MC-Unique: XGKZzNi-PRyWMeH_t4eAeA-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7a1d44099a3so699481885a.3
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 00:19:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724224788; x=1724829588;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=stErXlsn4bG59ZiuP1S49NzWKfcbkIn79Ht3IKYskFI=;
-        b=vfHk5eecSQ7U2fH9hMkt0m2igAGp2gUi6dbI6cSk6RZVTP9oHg0jh+MhMjE8td3F6o
-         BshTnTG0lc9xigIGK3OVw+g05i3Eyoowvbw287Zo/wz2xmCXgVgg7FJX8opgnE2uWEQS
-         81Ffi6h/r+pRkU/00HdVZey5kO1PxUvWLvmiCgyUgY0whnS1w37QAaKKSVjuimm8845x
-         eAfZRvG+tmAakKeAKR9oev6N4rvMBuyqKY+Ul4w5Cu3cQUmO217TeLARVeD0xHiZai1W
-         ckUCkcvM8eLK+FHe34/sSaO21wERxd8d1uQBz/52HhMzGB7CDhtMA1Mwum1wV3LY0zF9
-         PcJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX4CylUtgbVwhzFPT9vjKaBnLmknAKJnRS3r2YBgJF6VHNcqFZR6ZL7GaVypXm+NH7sAJY79Ao=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzp0xXDaZu1BuBTcuwG/PB+bc2pMIhZ7xGO9CnwR3Ca+9BCqIgc
-	tGmWEyrqJirc4qs0oQL240iB5g089VXeKHCz3bDbgMjZs+vWYQa+wAxdRX55zNdwr+Y0mXLh/id
-	nNxldCBTqVpumeb2qStZ+gColltV0J3OgMkSVrMlrfA6XEkIrFGIBLg==
-X-Received: by 2002:a05:620a:17a1:b0:7a1:ccfb:faf with SMTP id af79cd13be357-7a674048908mr211361285a.38.1724224788358;
-        Wed, 21 Aug 2024 00:19:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEUvUNVPoVPY0IqYI+9FyKN/j3iG1JNGhE8e2W6Pqxb+HWSkXXSyWApzCMJK3GHPcsNkvlKfQ==
-X-Received: by 2002:a05:620a:17a1:b0:7a1:ccfb:faf with SMTP id af79cd13be357-7a674048908mr211356885a.38.1724224787793;
-        Wed, 21 Aug 2024 00:19:47 -0700 (PDT)
-Received: from eisenberg.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff013ef2sm596207885a.11.2024.08.21.00.19.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 00:19:46 -0700 (PDT)
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jonathan Corbet <corbet@lwn.net>,
-	Jens Axboe <axboe@kernel.dk>,
-	Wu Hao <hao.wu@intel.com>,
-	Tom Rix <trix@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2930D1B81C7;
+	Wed, 21 Aug 2024 07:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.215.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724224829; cv=fail; b=XGI+EFfa5eafyH2GLrrjlcP5tZZ7vI3pzBI7jltB27TWIMDvoihM3ttVIqrzGJAyjH99qTwlbVftXETNzOE5AsPv7f93VQbRg9vbCgjy73yomoFl5lOPOhFP6v1kvpHehH3cU4iIpJs/c0dlCRYTEO14BzZHVIHwIF8d+oq9VSA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724224829; c=relaxed/simple;
+	bh=9v+hYoYRVS4xyp28qhtKyJLoFj8+LpEJvXOJEsXj3N8=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=eQHYAk4o0xcem9votGIEaYuWc1UDjNXpBxw4udnBqcGI9wfOIilu8eUn+4oLKMPIj+CBoi8r7u48O27Mc00UO18TIMd7GrQE0rre+p23vHi2XxH5P32DZutzcICmc1fyn+d5AVEefjbHw1RYB8m3aWBUy7wAlNOhX/YY+fsOuVI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=EWrgckZF; arc=fail smtp.client-ip=40.107.215.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=u3eVsZkP/0jSG0wOlSGKLG/THzxMfWKGBdOFZgla8h5SztH90hMTSRFS9E06IN7ZqtOWhCHcaMXuUVs5cNf45xvaWYwYi/q8Ju9P8nDs5ctUtUxceBdhjS6wPB29AltGLCnygru8XDMsXK3m1FjQS9oeSuZ0s47PNrfb7VOXaR86TWmjOQ3QjmTrpbP+KoTlx6dUtaKVIkClSVgauAapzNpQo5D8vzls0ds+ImYlr9HAkJONLyf/4fDd2OyjMHVyCNoVvpF3psvXohvDyhvhmwoeotN7Nu5bzRyEzj7GCWkbbtbJagIjzZxLn9Az0g7Y5RuO0D9Bei485A7cqn6UUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ulqjzYFlLH+7rVvl/XnVpLsrxmoiCeu38ldhvEAWznk=;
+ b=qrJRCt5uNYnPicurUKV1TeK1OJA6BhA0/LK/JitJj0rLTy8Fv34ZOetwIhZMHiX6MIYJijEdGKpkLwSFhhms40TYHSWulzPVJPOsMfs4glqmzRjRlzPaSu//C9l4x36RFQeMwJB2mTPK+8qBc6TWwy6a73x56kW/vwn/EU/Dx8W0lZpgFkb47UHrGy4zEpi2KSgPWFedOi+D0UuWGeBb1MCPg8vRw4qt0vU8XCSPferNhzGgQ7CQGlSW7yhK4awMQ6tITXm9h8HB7K7bSlF8VEcDwTgSJJSxg2n0H1t+Gbx4cGUjx9wCrYiQxzAk+PYuDZj89pC+/vKyFCRLNGMCgg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ulqjzYFlLH+7rVvl/XnVpLsrxmoiCeu38ldhvEAWznk=;
+ b=EWrgckZFIR2BeakoPYvVmLsq7e7zx39tGrQmfRDRc7lGZWZ0OJgtTJuo1AiUHPp/9rrjQVNJKk8UJiuM0yy4QW/goqFGriK8MUK/uTEZLpTEC19W89dV+BbIt277pbqgss9jhw1NPbdK33RT3Ocssm+HjKQWi0R0wIGey2jqcqftMljzen+uhBsgakgFPcMJ52CK0JUBCR+UnPWhs9Dy0nxGk2LpOnVQQuh7rC/gWRujYiETiwpFRhtIDZ1ESAQKtRj7G44yGKakn80ktio1RCVh8JlwgA3J0S/XqEtJpia6LHeXOZ0mps44dVQhDZpmLfw7iHl6QdsuELdKd1IWlQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from TYZPR06MB4461.apcprd06.prod.outlook.com (2603:1096:400:82::8)
+ by TY0PR06MB6883.apcprd06.prod.outlook.com (2603:1096:405:15::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.18; Wed, 21 Aug
+ 2024 07:20:23 +0000
+Received: from TYZPR06MB4461.apcprd06.prod.outlook.com
+ ([fe80::9c62:d1f5:ede3:1b70]) by TYZPR06MB4461.apcprd06.prod.outlook.com
+ ([fe80::9c62:d1f5:ede3:1b70%6]) with mapi id 15.20.7875.023; Wed, 21 Aug 2024
+ 07:20:23 +0000
+From: Yu Jiaoliang <yujiaoliang@vivo.com>
+To: Johannes Berg <johannes@sipsolutions.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Philipp Stanner <pstanner@redhat.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Keith Busch <kbusch@kernel.org>
-Cc: linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fpga@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: [PATCH v2 9/9] PCI: Remove pcim_iounmap_regions()
-Date: Wed, 21 Aug 2024 09:18:42 +0200
-Message-ID: <20240821071842.8591-11-pstanner@redhat.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240821071842.8591-2-pstanner@redhat.com>
-References: <20240821071842.8591-2-pstanner@redhat.com>
+	linux-kernel@vger.kernel.org
+Cc: opens^Crce.kernel@vivo.com
+Subject: [PATCH v1] net: wireless: Use kmemdup_array instead of kmemdup for multiple allocation
+Date: Wed, 21 Aug 2024 15:20:08 +0800
+Message-Id: <20240821072008.4065483-1-yujiaoliang@vivo.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYCPR01CA0117.jpnprd01.prod.outlook.com
+ (2603:1096:405:4::33) To TYZPR06MB4461.apcprd06.prod.outlook.com
+ (2603:1096:400:82::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TYZPR06MB4461:EE_|TY0PR06MB6883:EE_
+X-MS-Office365-Filtering-Correlation-Id: 01837e63-71be-46b0-aa40-08dcc1b1b87c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|52116014|376014|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?LjypNFV8AKUJ7soHyrV4mPe45QedJlsunH9LobSYd7LVk6rpafttQE3b4mcu?=
+ =?us-ascii?Q?7IUeghKh8iUDASEu6Oie98tHP6jdmB1J2HLGP5jn9n3l0Sd2ytFFcg1WDnD6?=
+ =?us-ascii?Q?JbbnZp9kHIiJ1B30G1H2gTw7ULyx3GzWWvX+hG6eRbknB9cd4hSQ/a5lmYj4?=
+ =?us-ascii?Q?RvKm3Q2hpVXnySncub9ZW3tHBF8x3ZI24USHhdrW/S5oDhrC1B4IQQgZUFAu?=
+ =?us-ascii?Q?RREum+wGqauF+pe7UMcYoBubUpUmAT8XrWRolTExSk6/g7l66fADspk3ymmR?=
+ =?us-ascii?Q?QGmI05riMPrhqCP5ymGRLbihSyIl871W6f+vL05Eh113gQmkRxmQT9MvQN/a?=
+ =?us-ascii?Q?kw13sglKyIcTTOkdnwwc9Nv1ZrmUWXodUgqv8oMwPGre4+49ihZi78kb2WIp?=
+ =?us-ascii?Q?HT+jfKnMvH2Qyo6Xtcfh0e3fGOfHZHTjB1yEa88dKQxkK2zrVlvyOYc2fmwU?=
+ =?us-ascii?Q?BPApcjay3n1gbAxJonD15J89AjRVGGyrKfFK844/G443n/4Z0MzuqWZMii9f?=
+ =?us-ascii?Q?75o7OAPgzmAsZ6YvM9ai+R2NrgH2F5ncgjm7uQOpJrCQjbSCzOvznb7jLpYU?=
+ =?us-ascii?Q?x2wwVhChImJEX08YlYTJHV658A3aIMvAMWEzxl0F7AAbn3abHdB3SrEy9AZ/?=
+ =?us-ascii?Q?XRLskmjd8EteIEWlXNHZ4xvF1njJYWUZfiqkzq8TvWslB6fOZz3E0SBP9V46?=
+ =?us-ascii?Q?2n4j7ZpNHJDlomX4ZqfNrzyT1Xpgl+LPfgSGw0E3R96NQCzaSwFC6oBrcruk?=
+ =?us-ascii?Q?Vu7Qzwyku0rBsXCkbikzsTe9Ix1DnnzQYN+ejHVbuYLEOIeQPds22vswP8M7?=
+ =?us-ascii?Q?cNBH1MEuJIAectEdRHww92opxoOdq838YlQHXcCUN7vjfsr+NO7axdCt65O+?=
+ =?us-ascii?Q?W9+OYFCoY86EqpAjqIDCLyDl59kiOcO3cxwGDp+d7ODXqftdE7DA/ENSAXSv?=
+ =?us-ascii?Q?Vk2byhHzIpD0v9oCpTW7s4lcBtKsvTTSWU19+kCePEYVZDN/8MvMNGkmLN1U?=
+ =?us-ascii?Q?IB8j89jfAAZZi5TA+3OXXLMJXzmt0on/ykZKH/5tntHPTeJTK7e9PudW+tnP?=
+ =?us-ascii?Q?Vmi+u0i7WPhO8gKn2gOrq4Ews/wuOBqqEq1+9Hk2+eYSaUaPkmUkdx0z8zZr?=
+ =?us-ascii?Q?jnEgnKfkeiFbLYuLYYPeu+V4Cp7xMdOGfynmHDuwqj59YuePwcIMD8ezaDIr?=
+ =?us-ascii?Q?hmQOZ8DgdVWPvgyspGxZ0DgyuQ+bWXniF4IyaK0P4ZlKtAVsH/3MSww2L0+b?=
+ =?us-ascii?Q?ZMK/R3Cl1SyS0HUqSyxP4sciGafEiwpP3nrUJOxxii9kipcR2pU1A1f1XwwI?=
+ =?us-ascii?Q?rJJaLYRc01244WKrCe0z2mIyX5bINIy30/+hjEcYFCvQ4nSMVl99nEtLED70?=
+ =?us-ascii?Q?5ouLvN76fGt+dMhujKx+spAmjYvB0Etlmoru/Omq6GkOHJ+FxA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR06MB4461.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(52116014)(376014)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?SKVCpa0T7McFXurYgiNoX6c4YzldeokTpVrj5wiE+iz7rPAXtGldiqToRe1r?=
+ =?us-ascii?Q?zE2EcUFtr/0j/fkn2TpDnRWpMhFXM+qOQjsaU5peclDeOwNTGTzh5yPTE8ca?=
+ =?us-ascii?Q?Ldjns510WNMPm6rS4Ooqa51C6TAEhg/Wj7a/eimfR4UoytCBsGqXAiVhod5P?=
+ =?us-ascii?Q?L5dQWy9XpM6rePKzL/tkhJXbQbSf4WT82yWNi9MpcusH8G89rcnl9rAkoLsu?=
+ =?us-ascii?Q?Sa5b3c6sVcdbGoXCRGOJlZXiHPTyvFtLfAnGMS4YsNRECL3lehfzHNQDzK00?=
+ =?us-ascii?Q?inP98a82HmQb03RkzCKRaIqZT8W+kwsFy9H0ugEuh6mowuPAqcQZIOQvB9Pz?=
+ =?us-ascii?Q?70CrekHANScnGzBTNrmWVLc9Z9355QvzClNYcJ4NBRrbQgFDQpsKXH0+HVnZ?=
+ =?us-ascii?Q?wHkwHjF0QYHMGkgvsmo9nKkbm0iaG9D3XzKmadU+laNdy/iBKO6fchA7ysnd?=
+ =?us-ascii?Q?sUJEwTyuuP0zqmOLapEAGI2V0vH8BJ+HPq5u9i28t9MHq8Mos5kbxL6zBcfA?=
+ =?us-ascii?Q?iPUj/nku4toUiBNRdkU4HT4/50wBYZQcbRC4L3Fl3vftbwqsGjxO98NH7nVI?=
+ =?us-ascii?Q?psiPf1G/pd4Ryw8uRyLd31vM6LaTLrNSwmS2qJQ6wEt+HNs79BWScPP93G2B?=
+ =?us-ascii?Q?A7fWgKkhgiRNqE5vWV8V0VGhXHU4fbk/oTEDkDM9qnt1osMpb7KhodhGUur8?=
+ =?us-ascii?Q?GFLZL7DE3OaXGIy9eawlMNiZVop4XnEr0D4cobLCzuRZI6uxpjEQz42L4ljh?=
+ =?us-ascii?Q?6ujK0ftnN5SABdufTRxxAWnSnxCXDui23vYGWcOk/LOvoEmM5O4rf0hWwPCc?=
+ =?us-ascii?Q?rq7NOIYYvACQ1euNxmPi8Mqtvx7mY9M63qsca76Lr3P/2/UFRTT2Mn+nMt9U?=
+ =?us-ascii?Q?Nhj/uR8ELqO7MBW/praCnPPRbzke8F/UivMV5e31bAeXjuczn2x3zhernPEI?=
+ =?us-ascii?Q?z5bjZku0my9G4tyH8ZTvEKe7Ea3vY1jFZQ626QYOhFaPlSX6dHNkOzc/UvRa?=
+ =?us-ascii?Q?RlePK/0ZqGxmnnS+Hi87MHEB0fho4C2uKp6oJREPGLMPXqQu+S+bKgxZYfUW?=
+ =?us-ascii?Q?1beGHI6AAPMnvHuKLoPn8QTTCs3l9oaqhrIVGo52/9zIhzUiNHmqzoQBbbfD?=
+ =?us-ascii?Q?iWdj9Z/XB3VZY6ZfMAhQFCZihJclDQg1Qa/qK7Z/KLCL8g5fT6yJHpZm0lSv?=
+ =?us-ascii?Q?//CrakYj2EAP5csmDVxX+pmtotoTXtur4vuLvD01fCduGZYY1FNIu8c7pcaQ?=
+ =?us-ascii?Q?lqaZaJRZMtjY3gjb64dgNz0mA7EvmF05SQv8ZZLVOqKtNAXYESH7cWYm3ypo?=
+ =?us-ascii?Q?W075Gw8L9m1fp5B92bQ76w0lTuQACnvJQEXGaj2twC1qZ+XDQIxB1IMTfExs?=
+ =?us-ascii?Q?v/j1RB0XwJKhCa7Lx3lnzGzIJGnMuGbfSvAGoCuYh+3iVMm7Vp9Fz7kYA6UR?=
+ =?us-ascii?Q?s12smv20RfF2AGm1xnzdikKoue4oWMgrCoOU+Zfq9damlUxGb9281dKMpgOo?=
+ =?us-ascii?Q?WFdadUWtLzbLb0FQiItwTaGH5mPT0MHpMWQhCW7ff4YOsDKIPOf7oWhMdqIN?=
+ =?us-ascii?Q?369ubFAouRT6ZOIGHVQyUxlRUa33T4dU1MnbBhSg?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01837e63-71be-46b0-aa40-08dcc1b1b87c
+X-MS-Exchange-CrossTenant-AuthSource: TYZPR06MB4461.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Aug 2024 07:20:23.0203
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8WTZQauRRY1q03365MlDL5WrG1VZ2R8veQ0U773+zJv1VNZyX4K2r4S3Q3xtYoNOV0PI8oS0vKulzJNIQOvzjA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY0PR06MB6883
 
-All users of pcim_iounmap_regions() have been removed by now.
+Let the kememdup_array() take care about multiplication and possible
+overflows.
 
-Remove pcim_iounmap_regions().
-
-Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-Reviewed-by: Andy Shevchenko <andy@kernel.org>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+Signed-off-by: Yu Jiaoliang <yujiaoliang@vivo.com>
 ---
- .../driver-api/driver-model/devres.rst        |  1 -
- drivers/pci/devres.c                          | 21 -------------------
- include/linux/pci.h                           |  1 -
- 3 files changed, 23 deletions(-)
+ net/wireless/util.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/driver-api/driver-model/devres.rst b/Documentation/driver-api/driver-model/devres.rst
-index ac9ee7441887..525f08694984 100644
---- a/Documentation/driver-api/driver-model/devres.rst
-+++ b/Documentation/driver-api/driver-model/devres.rst
-@@ -397,7 +397,6 @@ PCI
-   pcim_iomap_regions_request_all() : do request_region() on all and iomap() on multiple BARs
-   pcim_iomap_table()		: array of mapped addresses indexed by BAR
-   pcim_iounmap()		: do iounmap() on a single BAR
--  pcim_iounmap_regions()	: do iounmap() and release_region() on multiple BARs
-   pcim_pin_device()		: keep PCI device enabled after release
-   pcim_set_mwi()		: enable Memory-Write-Invalidate PCI transaction
+diff --git a/net/wireless/util.c b/net/wireless/util.c
+index 9a7c3adc8a3b..6cf19dda5d2a 100644
+--- a/net/wireless/util.c
++++ b/net/wireless/util.c
+@@ -2435,8 +2435,8 @@ int cfg80211_iter_combinations(struct wiphy *wiphy,
+ 		if (params->num_different_channels > c->num_different_channels)
+ 			continue;
  
-diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
-index 4dbba385e6b4..022c0bb243ad 100644
---- a/drivers/pci/devres.c
-+++ b/drivers/pci/devres.c
-@@ -1013,27 +1013,6 @@ int pcim_iomap_regions_request_all(struct pci_dev *pdev, int mask,
- }
- EXPORT_SYMBOL(pcim_iomap_regions_request_all);
- 
--/**
-- * pcim_iounmap_regions - Unmap and release PCI BARs
-- * @pdev: PCI device to map IO resources for
-- * @mask: Mask of BARs to unmap and release
-- *
-- * Unmap and release regions specified by @mask.
-- */
--void pcim_iounmap_regions(struct pci_dev *pdev, int mask)
--{
--	int i;
--
--	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
--		if (!mask_contains_bar(mask, i))
--			continue;
--
--		pcim_iounmap_region(pdev, i);
--		pcim_remove_bar_from_legacy_table(pdev, i);
--	}
--}
--EXPORT_SYMBOL(pcim_iounmap_regions);
--
- /**
-  * pcim_iomap_range - Create a ranged __iomap mapping within a PCI BAR
-  * @pdev: PCI device to map IO resources for
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 9625d8a7b655..6c60f063c672 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -2301,7 +2301,6 @@ void pcim_iounmap_region(struct pci_dev *pdev, int bar);
- int pcim_iomap_regions(struct pci_dev *pdev, int mask, const char *name);
- int pcim_iomap_regions_request_all(struct pci_dev *pdev, int mask,
- 				   const char *name);
--void pcim_iounmap_regions(struct pci_dev *pdev, int mask);
- void __iomem *pcim_iomap_range(struct pci_dev *pdev, int bar,
- 				unsigned long offset, unsigned long len);
+-		limits = kmemdup(c->limits, sizeof(limits[0]) * c->n_limits,
+-				 GFP_KERNEL);
++		limits = kmemdup_array(c->limits, c->n_limits, sizeof(limits[0]),
++				       GFP_KERNEL);
+ 		if (!limits)
+ 			return -ENOMEM;
  
 -- 
-2.46.0
+2.34.1
 
 
