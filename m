@@ -1,82 +1,77 @@
-Return-Path: <netdev+bounces-120682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35F6F95A335
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 18:52:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0809595A33D
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 18:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6891E1C2142E
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:52:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 803021F22E6E
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:55:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85681A7AC6;
-	Wed, 21 Aug 2024 16:52:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDD621AF4DF;
+	Wed, 21 Aug 2024 16:55:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lFGP+2ov"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UWI3DEoY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 249CE14E2EF
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 16:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8816A139597;
+	Wed, 21 Aug 2024 16:55:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724259175; cv=none; b=oY3XK/vQOGRnlsqrHCnzD5v4hBLTb8yYpZstZwWKn0SDx3G2ruX/JPm+Z54m/2cfx+FOyU8BsSbl6w/jyyXvjTh5Dqxpg2Vi2gygQYITaOiihVaZa4Co/MMWGt++6rMKidctTo5iSX76lPb0vLRSm0Tg+8vK/QFkzDbQSJ3Yu1s=
+	t=1724259343; cv=none; b=q/kozjv73DoFoERTAtmZA3ZfkI97oQP4000lym4G0Q+q2noj30Vcq8XLBc3vEBjL8VPUGkt1f89RtvBrWJ7LV8OxvhjpeiU2uBr0Q5j46Jdy6HUugHL138t00l2xk3XuhpG2ZIwQOFJusUcZT4SFRUrdSGdp2DjRjRBW0hDQ5L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724259175; c=relaxed/simple;
-	bh=Y/TI49HrIoqduIXBi9wKMVRCJUI6A0xpIOJpE8a7hpg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b8iXAbq8BrXEHuXidh2N5FcZQPGfgbckDg3Lrj3xOZvzRYzR3IQxExlikDIFPGuc2cSMMwELTIOGQwOXUn/zzQVquhK/GKk0LDz56nvsQKwrtr/lPnjnqPkyxkCGlrXO9LuZhEgKTnkQ9TZwLJSHtXA+zrCcLZWNNZu4qtne9Bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lFGP+2ov; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724259174; x=1755795174;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Y/TI49HrIoqduIXBi9wKMVRCJUI6A0xpIOJpE8a7hpg=;
-  b=lFGP+2ovAyG9AmutVs5Wef2CKrvv50zmXOgWfPfeyyCPr3as2i0d4pZt
-   vQzRz8pyNjHs/qQK6KP/q/ESO1To1+5bcN/heqwBrscpRObpWWz9sgwB8
-   d4mlir4bbT+JdZsW/6GDHoTNF3BxpP2lfYyMdQVsqwMzlKOlkStsdR/7i
-   EzCyRGscs5iHanMcm3PKmWYf15hTQeMyVS/s4OA4Bs/EOjfnFeuH03Xul
-   tNo7fDHyMaTA5n/AFWhr4wIk/4KzvJ8nKzSPelgLAYZ4H1fDVQVfb1YpA
-   UIGWWZBgrvXTx5magHYrs4UiKWtk5NiCi2wgESSTCX/BOq0GjSGKmUMrS
-   A==;
-X-CSE-ConnectionGUID: 0a+EPoSnQWaos4Xf6c3O5Q==
-X-CSE-MsgGUID: kkOQwh42TGGRHZ1AjHT4tg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="45157831"
-X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="45157831"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 09:52:53 -0700
-X-CSE-ConnectionGUID: +8lGa9ZyTDK1AhFAGgDOeA==
-X-CSE-MsgGUID: LtjGAxhITau560W6TWbwIQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="66036904"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 21 Aug 2024 09:52:51 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sgoZj-000BiK-31;
-	Wed, 21 Aug 2024 16:52:47 +0000
-Date: Thu, 22 Aug 2024 00:52:44 +0800
-From: kernel test robot <lkp@intel.com>
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: Re: [PATCH v4 net-next 09/12] testing: net-drv: add basic shaper test
-Message-ID: <202408220027.kA3pRF6J-lkp@intel.com>
-References: <4cf74f285fa5f07be546cb83ef96775f86aa0dbf.1724165948.git.pabeni@redhat.com>
+	s=arc-20240116; t=1724259343; c=relaxed/simple;
+	bh=8v5Y7+Bdr6Vrg6fg/jjVkWGIt4zD/dKPaTA7XMhn+n8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=DDzX0n+gBUyN6os7wqTGj43wtMx+q9CyBFXx4OkBgK+seH7L2ZPjkhqX3JYUKxfhP9MQJxrl8R0CvDnVncO1UaWuNLCdPDS0Mrl4lTElDmPJGSkPpKC+pdCZcvvDdWc1VmzehQrWqnp8t414wouWsgplg1acOO1frTk0PXKgQYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UWI3DEoY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10041C32786;
+	Wed, 21 Aug 2024 16:55:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724259343;
+	bh=8v5Y7+Bdr6Vrg6fg/jjVkWGIt4zD/dKPaTA7XMhn+n8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=UWI3DEoYXhlo5tEJ8+b6j2jglrtnyX7EMyzxBQALxCZIKK3Vv0INTGGsDg0AIv69+
+	 dgiGf1Ndqkr6QIBOzlmEBV2saM1kC/PTaM2XyM1owiQqsS3DmG5j7ptA+pt6yZn0rT
+	 bVQWFDEHzMQc/KqhtAKT+P2IYSaiwR3ritbtAxsLsU9KiSsFA479LcSG/bspzSQlnL
+	 bQ23dcB92e9qtISrNTjWVChljaVmucocnYAFGkViVKxHEVMhyT8L5xb7rPvVD2RPSC
+	 4Z+oJgI0Mzw41s+SeDEFxx3HsPTyi1kEsW+9eV/s4/h8WQV98g0lwy0pZxbI1dCYJg
+	 9Y92grUkNfw5w==
+Date: Wed, 21 Aug 2024 11:55:41 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
+Message-ID: <20240821165541.GA254124@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,62 +80,181 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4cf74f285fa5f07be546cb83ef96775f86aa0dbf.1724165948.git.pabeni@redhat.com>
+In-Reply-To: <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
 
-Hi Paolo,
+On Tue, Aug 20, 2024 at 04:36:10PM +0200, Andrea della Porta wrote:
+> The RaspberryPi RP1 is ia PCI multi function device containing
 
-kernel test robot noticed the following build warnings:
+s/ia/a/
 
-[auto build test WARNING on net-next/main]
+> peripherals ranging from Ethernet to USB controller, I2C, SPI
+> and others.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Abeni/tools-ynl-lift-an-assumption-about-spec-file-name/20240820-231626
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/4cf74f285fa5f07be546cb83ef96775f86aa0dbf.1724165948.git.pabeni%40redhat.com
-patch subject: [PATCH v4 net-next 09/12] testing: net-drv: add basic shaper test
-config: hexagon-randconfig-r112-20240821 (https://download.01.org/0day-ci/archive/20240822/202408220027.kA3pRF6J-lkp@intel.com/config)
-compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
-reproduce: (https://download.01.org/0day-ci/archive/20240822/202408220027.kA3pRF6J-lkp@intel.com/reproduce)
+Add blank lines between paragraphs.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408220027.kA3pRF6J-lkp@intel.com/
+> Implement a bare minimum driver to operate the RP1, leveraging
+> actual OF based driver implementations for the on-borad peripherals
 
-sparse warnings: (new ones prefixed by >>)
->> net/shaper/shaper.c:227:24: sparse: sparse: Using plain integer as NULL pointer
+s/on-borad/on-board/
 
-vim +227 net/shaper/shaper.c
+> by loading a devicetree overlay during driver probe.
+> The peripherals are accessed by mapping MMIO registers starting
+> from PCI BAR1 region.
+> As a minimum driver, the peripherals will not be added to the
+> dtbo here, but in following patches.
 
-d8a22f9bfdaade Paolo Abeni 2024-08-20  208  
-d8a22f9bfdaade Paolo Abeni 2024-08-20  209  /* Allocate on demand the per device shaper's cache. */
-d8a22f9bfdaade Paolo Abeni 2024-08-20  210  static struct mutex *net_shaper_cache_init(struct net_device *dev,
-d8a22f9bfdaade Paolo Abeni 2024-08-20  211  					   struct netlink_ext_ack *extack)
-d8a22f9bfdaade Paolo Abeni 2024-08-20  212  {
-d8a22f9bfdaade Paolo Abeni 2024-08-20  213  	struct net_shaper_data *new, *data = READ_ONCE(dev->net_shaper_data);
-d8a22f9bfdaade Paolo Abeni 2024-08-20  214  
-d8a22f9bfdaade Paolo Abeni 2024-08-20  215  	if (!data) {
-d8a22f9bfdaade Paolo Abeni 2024-08-20  216  		new = kmalloc(sizeof(*dev->net_shaper_data), GFP_KERNEL);
-d8a22f9bfdaade Paolo Abeni 2024-08-20  217  		if (!new) {
-d8a22f9bfdaade Paolo Abeni 2024-08-20  218  			NL_SET_ERR_MSG(extack, "Can't allocate memory for shaper data");
-d8a22f9bfdaade Paolo Abeni 2024-08-20  219  			return NULL;
-d8a22f9bfdaade Paolo Abeni 2024-08-20  220  		}
-d8a22f9bfdaade Paolo Abeni 2024-08-20  221  
-d8a22f9bfdaade Paolo Abeni 2024-08-20  222  		mutex_init(&new->lock);
-d8a22f9bfdaade Paolo Abeni 2024-08-20  223  		xa_init(&new->shapers);
-d8a22f9bfdaade Paolo Abeni 2024-08-20  224  		idr_init(&new->node_ids);
-d8a22f9bfdaade Paolo Abeni 2024-08-20  225  
-d8a22f9bfdaade Paolo Abeni 2024-08-20  226  		/* No lock acquired yet, we can race with other operations. */
-d8a22f9bfdaade Paolo Abeni 2024-08-20 @227  		data = cmpxchg(&dev->net_shaper_data, NULL, new);
-d8a22f9bfdaade Paolo Abeni 2024-08-20  228  		if (!data)
-d8a22f9bfdaade Paolo Abeni 2024-08-20  229  			data = new;
-d8a22f9bfdaade Paolo Abeni 2024-08-20  230  		else
-d8a22f9bfdaade Paolo Abeni 2024-08-20  231  			kfree(new);
-d8a22f9bfdaade Paolo Abeni 2024-08-20  232  	}
-d8a22f9bfdaade Paolo Abeni 2024-08-20  233  	return &data->lock;
-d8a22f9bfdaade Paolo Abeni 2024-08-20  234  }
-d8a22f9bfdaade Paolo Abeni 2024-08-20  235  
+> +config MISC_RP1
+> +        tristate "RaspberryPi RP1 PCIe support"
+> +        depends on PCI && PCI_QUIRKS
+> +        select OF
+> +        select OF_OVERLAY
+> +        select IRQ_DOMAIN
+> +        select PCI_DYNAMIC_OF_NODES
+> +        help
+> +          Support for the RP1 peripheral chip found on Raspberry Pi 5 board.
+> +          This device supports several sub-devices including e.g. Ethernet controller,
+> +          USB controller, I2C, SPI and UART.
+> +          The driver is responsible for enabling the DT node once the PCIe endpoint
+> +          has been configured, and handling interrupts.
+> +          This driver uses an overlay to load other drivers to support for RP1
+> +          internal sub-devices.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+s/support for/support/
+
+Add blank lines between paragraphs.  Consider wrapping to fit in 80
+columns.  Current width of 86 seems random.
+
+> diff --git a/drivers/misc/rp1/Makefile b/drivers/misc/rp1/Makefile
+> new file mode 100644
+> index 000000000000..e83854b4ed2c
+> --- /dev/null
+> +++ b/drivers/misc/rp1/Makefile
+> @@ -0,0 +1,3 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +rp1-pci-objs			:= rp1-pci.o rp1-pci.dtbo.o
+> +obj-$(CONFIG_MISC_RP1)		+= rp1-pci.o
+> diff --git a/drivers/misc/rp1/rp1-pci.c b/drivers/misc/rp1/rp1-pci.c
+> new file mode 100644
+> index 000000000000..a6093ba7e19a
+> --- /dev/null
+> +++ b/drivers/misc/rp1/rp1-pci.c
+> @@ -0,0 +1,333 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c) 2018-22 Raspberry Pi Ltd.
+
+s/22/24/ ?
+
+> +#define RP1_B0_CHIP_ID		0x10001927
+> +#define RP1_C0_CHIP_ID		0x20001927
+
+Drop; both unused.
+
+> +#define RP1_PLATFORM_ASIC	BIT(1)
+> +#define RP1_PLATFORM_FPGA	BIT(0)
+
+Drop; both unused.
+
+> +#define RP1_SYSCLK_RATE		200000000
+> +#define RP1_SYSCLK_FPGA_RATE	60000000
+
+Drop; both unused.
+
+> +enum {
+> +	SYSINFO_CHIP_ID_OFFSET	= 0,
+> +	SYSINFO_PLATFORM_OFFSET	= 4,
+> +};
+
+Drop; unused.
+
+> +/* MSIX CFG registers start at 0x8 */
+
+s/MSIX/MSI-X/
+
+> +#define MSIX_CFG_TEST           BIT(1)
+
+Unused.
+
+> +#define INTSTATL		0x108
+> +#define INTSTATH		0x10c
+
+Drop; both unused.
+
+> +static void dump_bar(struct pci_dev *pdev, unsigned int bar)
+> +{
+> +	dev_info(&pdev->dev,
+> +		 "bar%d len 0x%llx, start 0x%llx, end 0x%llx, flags, 0x%lx\n",
+
+%pR does most of this for you.
+
+> +static int rp1_irq_set_type(struct irq_data *irqd, unsigned int type)
+> +{
+> +	struct rp1_dev *rp1 = irqd->domain->host_data;
+> +	unsigned int hwirq = (unsigned int)irqd->hwirq;
+> +	int ret = 0;
+> +
+> +	switch (type) {
+> +	case IRQ_TYPE_LEVEL_HIGH:
+> +		dev_dbg(rp1->dev, "MSIX IACK EN for irq %d\n", hwirq);
+> +		msix_cfg_set(rp1, hwirq, MSIX_CFG_IACK_EN);
+> +		rp1->level_triggered_irq[hwirq] = true;
+> +	break;
+> +	case IRQ_TYPE_EDGE_RISING:
+> +		msix_cfg_clr(rp1, hwirq, MSIX_CFG_IACK_EN);
+> +		rp1->level_triggered_irq[hwirq] = false;
+> +		break;
+> +	default:
+> +		ret = -EINVAL;
+
+If you "return -EINVAL" directly here, I think you can drop "ret" and
+just "return 0" below.
+
+> +		break;
+> +	}
+> +
+> +	return ret;
+> +}
+
+> +static int rp1_irq_xlate(struct irq_domain *d, struct device_node *node,
+> +			 const u32 *intspec, unsigned int intsize,
+> +			 unsigned long *out_hwirq, unsigned int *out_type)
+> +{
+> +	struct rp1_dev *rp1 = d->host_data;
+> +	struct irq_data *pcie_irqd;
+> +	unsigned long hwirq;
+> +	int pcie_irq;
+> +	int ret;
+> +
+> +	ret = irq_domain_xlate_twocell(d, node, intspec, intsize,
+> +				       &hwirq, out_type);
+> +	if (!ret) {
+> +		pcie_irq = pci_irq_vector(rp1->pdev, hwirq);
+> +		pcie_irqd = irq_get_irq_data(pcie_irq);
+> +		rp1->pcie_irqds[hwirq] = pcie_irqd;
+> +		*out_hwirq = hwirq;
+> +	}
+> +
+> +	return ret;
+
+  if (ret)
+    return ret;
+
+  ...
+  return 0;
+
+would make this easier to read and unindent the normal path.
+
+> +	rp1->bar1 = pci_iomap(pdev, 1, 0);
+
+pcim_iomap()
+
+> +	if (!rp1->bar1) {
+> +		dev_err(&pdev->dev, "Cannot map PCI bar\n");
+
+s/bar/BAR/
+
+> +#define PCI_VENDOR_ID_RPI		0x1de4
+> +#define PCI_DEVICE_ID_RP1_C0		0x0001
+
+Device ID should include "RPI" as well.
 
