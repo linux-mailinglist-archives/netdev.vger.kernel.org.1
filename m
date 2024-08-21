@@ -1,262 +1,135 @@
-Return-Path: <netdev+bounces-120524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59FF9959B3E
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:06:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5655959B4C
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:09:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B13A71F2298D
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:06:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8C201C21856
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:09:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BACC14B971;
-	Wed, 21 Aug 2024 12:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC43317E00D;
+	Wed, 21 Aug 2024 12:09:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EjMZn57m"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="el4ac9Ch"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544C51D1312;
-	Wed, 21 Aug 2024 12:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C23A514B979
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 12:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724241999; cv=none; b=W3b04C5FCG7dEY6I5R7ZSF+uIkOlILw/oSp0DfI1946oxUiPJSaSWQByftux0KYLhS45tmlYhthE0xEKiDqTUh+fDMGKCDruRSCq6d6rAcC0klIreN7RCMPTUss2zbP2+CY6UUfGuKt5v1BnR52mCnCk8jEaJxFOtBRTigiygyk=
+	t=1724242141; cv=none; b=Zd8BUCGEkjcCcZov9WlK/xN2BgQZc7sXk3gWYuAGPFRkTpycKTwqs1NQ5SRTOyWBiu09m1Lu3ccpBAogUa3JPmoZ+d4JIXBWULMk9HNYD/IeqhzA6w+AnCGEX7zG27+tlWx5IevKqdcg7VgKrNgiSvQyXWAwAo0WDW1nRd/oYto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724241999; c=relaxed/simple;
-	bh=Kj8uuOcm4JlYZ678mI6tf+JnYFcP0xeBPYn2L2P0sNk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkeOHUxeAJFKQaQz7OKQ9mWHSxviZFPN50UqQdVwqBUzKsX+7Q/4F0+yE4Wd40fEmvxv2hSmy3sj4hcpQF3597pLFTOk44m/Wvi+xOSpO/P3mgS8PKfNJhqZfff++ETaU0Az08EoXvBRalmzMoH/QQDA09zkDbqzCYJxgnDBqEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EjMZn57m; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724241997; x=1755777997;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Kj8uuOcm4JlYZ678mI6tf+JnYFcP0xeBPYn2L2P0sNk=;
-  b=EjMZn57mqDXy0ANe3z82TFgsNtNb79VTYk+M61Qtg84eD2eO8nfXhyHu
-   Ir8JTKJBGbxFw2eSEYxkp4JG0aed/FbOPM6xe9m1SMcyxXXpwMcuxpPAW
-   YpF1/qSBhTevCi0IkOyCYOFSDg+f4sj1WhfNDO5cgyiNLiAkLtYpdjtrL
-   S08ArQ4zPeeUtO0d476zSsJ+VUlMA27HPdV2JCQord8te8p3vI2uMSwYF
-   JyWvBeQwzzTyuA3/tZAbm2d22jw0FPPPE4buwUb8HD+rgh0BklNbj+sBy
-   D4Wk8rlnL8QPrKog8mUzjLNOhowtK6mvVyohy5WzR/tdUYsCxbD/L72vb
-   g==;
-X-CSE-ConnectionGUID: dYPZxy1YQLeJNqL5k0trSA==
-X-CSE-MsgGUID: M76MaHF4Sr2DiU/97wDbPw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11170"; a="22759914"
-X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="22759914"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 05:06:36 -0700
-X-CSE-ConnectionGUID: 4EbM2F/MQ76zX1yOg/4iXg==
-X-CSE-MsgGUID: xKFjc2FlQsOqtXBuL8aw5A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="61825276"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 21 Aug 2024 05:06:30 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sgk6d-000BKM-08;
-	Wed, 21 Aug 2024 12:06:27 +0000
-Date: Wed, 21 Aug 2024 20:06:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <helgaas@kernel.org>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH 07/11] pinctrl: rp1: Implement RaspberryPi RP1 gpio
- support
-Message-ID: <202408211907.cUrf3RpN-lkp@intel.com>
-References: <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
+	s=arc-20240116; t=1724242141; c=relaxed/simple;
+	bh=DA1X9Ve0Vn6diqrYfPjFkkduWMPJiWV9pT4xIJEPvqY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T7l+a6nWBATCZoEy6CPcWbRXG8zMw51w/i/KbEvLC34I3fLcBhyu1iRvO//xR+Zsz/4Ludakq7Xbl8dZo1nBW7Xke00MFAw49Aap1LPk7mFTYu1puAJWSVedoCWdRtYHTuusDYk+kmK2RClKFqpVc+ky2gjXwMAiE4REPNL/40k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=el4ac9Ch; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-37182eee02dso432309f8f.1
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 05:08:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724242137; x=1724846937; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mDwqhRHhMBQJ/+TLyoRpyJFlfsxxIUrIdKu8FSn6JKQ=;
+        b=el4ac9ChIdU3dbBwOzt1Ipwcxb58MCdsiuKZO3aBWpLg7jNbUs066ybdpBPeCYXCTn
+         7gicQIB1zld37AXYhH5LqLi5QzYsaMWDfWln8mU8FGHaTmcwg4plNC7FxPOCOVr1WoeM
+         YJZOMOBMehuGPWIDYYukie6A1j0LoQbimC9sEqdsljqKu2F987/mcxABHlMHETQXW/6z
+         2PlpI3gKBbvHJPY3tna82klmpc1iFjRXYV7Gg3MfHccFrdUy+/skUWRs5xU34Y+v9IL/
+         xCOcuZhEAYb1Wk5NB3832Z2tKroexKQrUsZfhTf+V0Zy/o9NLuwfCAnn6Vdx9huXTllR
+         ODPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724242137; x=1724846937;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mDwqhRHhMBQJ/+TLyoRpyJFlfsxxIUrIdKu8FSn6JKQ=;
+        b=rJGcUq8Dkw0i0BDTDkPr7hhAYYWn51L+XaV5MMwfFW5ZZF+c7ejgInQG4kY0D6CisW
+         qVPgHycoP4pe8VIQdqIdlG5xVisFRsn2VpLIML+E/JV50Ff1Y8bp5tnB2gtWqI1YtTrF
+         6YyNhqOc9B8vTXUBMSCL1XenbN9wlKxVGOq2neiVlpMxV5PRIu8DLx2tfFqW8mRIEzvu
+         SY+2JatBJDTyB0a/Xy1h2/Ip7A/WFnE+EzHYbP2Wg169MM7cF/dpNApUSCCwtcdDgFzN
+         KrK7cMlO3LPA1yA1x/D8WBtneb8O2w7UW5QWxCM4xgFNfkLOjCik6ze85FRfp3d85Zn1
+         z99Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXnh9jC3agv2nXGDi6Gm2o5+InI3UjHwtGCtjxsqnALlj9XRbpKhxcn3lC+fB7F4uJOJ7FdjJY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaIUTK+j6KfhIyt2qTWO9RBi72yv5jH7JLmB/ojWcSlhM9V+QE
+	XCOsQfjRU1+XXYQLjQ45ABB/8IThmJyBMfenHAU3XpOvsDp0wKx8hdvhbbI345Bjg6MEwqzlh4z
+	AMs9kXlav0Jho9a2ceyykE9W65DKcjsKZGWPu
+X-Google-Smtp-Source: AGHT+IF/+B4e2rOwDucRvS4kWT6EeKo58j00U+Ub/62J14Eex9C5zjjnxt5zAjMaLCrIZo2JrYvwnhV20MJ6wjBJhW4=
+X-Received: by 2002:a05:6000:b01:b0:366:dfc4:3790 with SMTP id
+ ffacd0b85a97d-372fd98d681mr1189198f8f.0.1724242136775; Wed, 21 Aug 2024
+ 05:08:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
+References: <20240819153656.28807-2-vadorovsky@protonmail.com>
+In-Reply-To: <20240819153656.28807-2-vadorovsky@protonmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Wed, 21 Aug 2024 14:08:44 +0200
+Message-ID: <CAH5fLghOFYxwCOGrk8NYX0V9rgrJJ70YOa+dY1O0pbNB-CoK=w@mail.gmail.com>
+Subject: Re: [PATCH RESEND v5] rust: str: Use `core::CStr`, remove the custom
+ `CStr` implementation
+To: Michal Rostecki <vadorovsky@gmail.com>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	Brendan Higgins <brendan.higgins@linux.dev>, David Gow <davidgow@google.com>, 
+	Rae Moar <rmoar@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Trevor Gross <tmgross@umich.edu>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
+	Justin Stitt <justinstitt@google.com>, Martin Rodriguez Reboredo <yakoyoku@gmail.com>, 
+	Finn Behrens <me@kloenk.dev>, Manmohan Shukla <manmshuk@gmail.com>, 
+	Valentin Obst <kernel@valentinobst.de>, Yutaro Ohno <yutaro.ono.418@gmail.com>, 
+	Asahi Lina <lina@asahilina.net>, Danilo Krummrich <dakr@redhat.com>, Tiago Lam <tiagolam@gmail.com>, 
+	Charalampos Mitrodimas <charmitro@posteo.net>, Tejun Heo <tj@kernel.org>, Roland Xu <mu001999@outlook.com>, 
+	rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, 
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrea,
+On Mon, Aug 19, 2024 at 5:39=E2=80=AFPM Michal Rostecki <vadorovsky@gmail.c=
+om> wrote:
+>
+> From: Michal Rostecki <vadorovsky@gmail.com>
+>
+> `CStr` became a part of `core` library in Rust 1.75. This change replaces
+> the custom `CStr` implementation with the one from `core`.
+>
+> `core::CStr` behaves generally the same as the removed implementation,
+> with the following differences:
+>
+> - It does not implement `Display`.
+> - It does not provide `from_bytes_with_nul_unchecked_mut` method.
+> - It has `as_ptr()` method instead of `as_char_ptr()`, which also returns
+>   `*const c_char`.
+>
+> The first two differences are handled by providing the `CStrExt` trait,
+> with `display()` and `from_bytes_with_nul_unchecked_mut()` methods.
+> `display()` returns a `CStrDisplay` wrapper, with a custom `Display`
+> implementation.
+>
+> `DerefMut` implementation for `CString` is removed here, as it's not
+> being used anywhere.
+>
+> Signed-off-by: Michal Rostecki <vadorovsky@gmail.com>
 
-kernel test robot noticed the following build errors:
+A few comments:
 
-[auto build test ERROR on clk/clk-next]
-[also build test ERROR on robh/for-next char-misc/char-misc-testing char-misc/char-misc-next char-misc/char-misc-linus linus/master v6.11-rc4 next-20240821]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+* I would probably add CStrExt to the kernel prelude.
+* I would probably remove `from_bytes_with_nul_unchecked_mut` and keep
+`DerefMut for CString` instead of the other way around.
+* Perhaps we should remove the `c_str!` macro and use c"" instead?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Andrea-della-Porta/dt-bindings-clock-Add-RaspberryPi-RP1-clock-bindings/20240821-023901
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/clk/linux.git clk-next
-patch link:    https://lore.kernel.org/r/eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta%40suse.com
-patch subject: [PATCH 07/11] pinctrl: rp1: Implement RaspberryPi RP1 gpio support
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240821/202408211907.cUrf3RpN-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240821/202408211907.cUrf3RpN-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408211907.cUrf3RpN-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/pinctrl/pinctrl-rp1.c: In function 'rp1_get_fsel':
->> drivers/pinctrl/pinctrl-rp1.c:237:22: error: implicit declaration of function 'FIELD_GET'; did you mean 'FIELD_SET'? [-Werror=implicit-function-declaration]
-     237 |         u32 oeover = FIELD_GET(RP1_GPIO_CTRL_OEOVER_MASK, ctrl);
-         |                      ^~~~~~~~~
-         |                      FIELD_SET
-   drivers/pinctrl/pinctrl-rp1.c: In function 'rp1_set_fsel':
->> drivers/pinctrl/pinctrl-rp1.c:146:25: error: implicit declaration of function 'FIELD_PREP'; did you mean 'FIELD_SET'? [-Werror=implicit-function-declaration]
-     146 |                 _reg |= FIELD_PREP((_mask), (_val));    \
-         |                         ^~~~~~~~~~
-   drivers/pinctrl/pinctrl-rp1.c:257:17: note: in expansion of macro 'FIELD_SET'
-     257 |                 FIELD_SET(ctrl, RP1_GPIO_CTRL_OEOVER_MASK, RP1_OEOVER_DISABLE);
-         |                 ^~~~~~~~~
-   cc1: some warnings being treated as errors
-
-
-vim +237 drivers/pinctrl/pinctrl-rp1.c
-
-   136	
-   137	#define RP1_PAD_DRIVE_2MA		0x00000000
-   138	#define RP1_PAD_DRIVE_4MA		BIT(4)
-   139	#define RP1_PAD_DRIVE_8MA		BIT(5)
-   140	#define RP1_PAD_DRIVE_12MA		(RP1_PAD_DRIVE_4MA | \
-   141						RP1_PAD_DRIVE_8MA)
-   142	
-   143	#define FIELD_SET(_reg, _mask, _val)			\
-   144		({						\
-   145			_reg &= ~(_mask);				\
- > 146			_reg |= FIELD_PREP((_mask), (_val));	\
-   147		})
-   148	
-   149	#define FUNC(f) \
-   150		[func_##f] = #f
-   151	
-   152	struct rp1_iobank_desc {
-   153		int min_gpio;
-   154		int num_gpios;
-   155		int gpio_offset;
-   156		int inte_offset;
-   157		int ints_offset;
-   158		int rio_offset;
-   159		int pads_offset;
-   160	};
-   161	
-   162	struct rp1_pin_info {
-   163		u8 num;
-   164		u8 bank;
-   165		u8 offset;
-   166		u8 fsel;
-   167		u8 irq_type;
-   168	
-   169		void __iomem *gpio;
-   170		void __iomem *rio;
-   171		void __iomem *inte;
-   172		void __iomem *ints;
-   173		void __iomem *pad;
-   174	};
-   175	
-   176	struct rp1_pinctrl {
-   177		struct device *dev;
-   178		void __iomem *gpio_base;
-   179		void __iomem *rio_base;
-   180		void __iomem *pads_base;
-   181		int irq[RP1_NUM_BANKS];
-   182		struct rp1_pin_info pins[RP1_NUM_GPIOS];
-   183	
-   184		struct pinctrl_dev *pctl_dev;
-   185		struct gpio_chip gpio_chip;
-   186		struct pinctrl_gpio_range gpio_range;
-   187	
-   188		raw_spinlock_t irq_lock[RP1_NUM_BANKS];
-   189	};
-   190	
-   191	const struct rp1_iobank_desc rp1_iobanks[RP1_NUM_BANKS] = {
-   192		/*         gpio   inte    ints     rio    pads */
-   193		{  0, 28, 0x0000, 0x011c, 0x0124, 0x0000, 0x0004 },
-   194		{ 28,  6, 0x4000, 0x411c, 0x4124, 0x4000, 0x4004 },
-   195		{ 34, 20, 0x8000, 0x811c, 0x8124, 0x8000, 0x8004 },
-   196	};
-   197	
-   198	static int rp1_pinconf_set(struct rp1_pin_info *pin,
-   199				   unsigned int offset, unsigned long *configs,
-   200				   unsigned int num_configs);
-   201	
-   202	static struct rp1_pin_info *rp1_get_pin(struct gpio_chip *chip,
-   203						unsigned int offset)
-   204	{
-   205		struct rp1_pinctrl *pc = gpiochip_get_data(chip);
-   206	
-   207		if (pc && offset < RP1_NUM_GPIOS)
-   208			return &pc->pins[offset];
-   209		return NULL;
-   210	}
-   211	
-   212	static void rp1_pad_update(struct rp1_pin_info *pin, u32 clr, u32 set)
-   213	{
-   214		u32 padctrl = readl(pin->pad);
-   215	
-   216		padctrl &= ~clr;
-   217		padctrl |= set;
-   218	
-   219		writel(padctrl, pin->pad);
-   220	}
-   221	
-   222	static void rp1_input_enable(struct rp1_pin_info *pin, int value)
-   223	{
-   224		rp1_pad_update(pin, RP1_PAD_IN_ENABLE_MASK,
-   225			       value ? RP1_PAD_IN_ENABLE_MASK : 0);
-   226	}
-   227	
-   228	static void rp1_output_enable(struct rp1_pin_info *pin, int value)
-   229	{
-   230		rp1_pad_update(pin, RP1_PAD_OUT_DISABLE_MASK,
-   231			       value ? 0 : RP1_PAD_OUT_DISABLE_MASK);
-   232	}
-   233	
-   234	static u32 rp1_get_fsel(struct rp1_pin_info *pin)
-   235	{
-   236		u32 ctrl = readl(pin->gpio + RP1_GPIO_CTRL);
- > 237		u32 oeover = FIELD_GET(RP1_GPIO_CTRL_OEOVER_MASK, ctrl);
-   238		u32 fsel = FIELD_GET(RP1_GPIO_CTRL_FUNCSEL_MASK, ctrl);
-   239	
-   240		if (oeover != RP1_OEOVER_PERI || fsel >= RP1_FSEL_COUNT)
-   241			fsel = RP1_FSEL_NONE;
-   242	
-   243		return fsel;
-   244	}
-   245	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Alice
 
