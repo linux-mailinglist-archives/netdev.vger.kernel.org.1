@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-120561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E9E959C6A
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:54:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5558959C8C
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:56:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BDDCB20B65
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:54:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51BA11F22FD4
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:56:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1F0319047D;
-	Wed, 21 Aug 2024 12:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37A67199944;
+	Wed, 21 Aug 2024 12:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wq4SmHNR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HSZtHfRY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f194.google.com (mail-yb1-f194.google.com [209.85.219.194])
+Received: from mail-yb1-f196.google.com (mail-yb1-f196.google.com [209.85.219.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39279155307;
-	Wed, 21 Aug 2024 12:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E9B6199945;
+	Wed, 21 Aug 2024 12:55:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724244851; cv=none; b=S7YBVXjs85vZ9nBZBwIDbo3HU6ohP+AIALPzdJ36HWZcYsTLwMEwQQRklr3P7QpH10NMb2Ihfh/cZE2pAlhuzcktJ+4b+yiROPRo6LlB8Cyflu8fJi0gdNzOUAj/RQmaYEvdO2phmfaZetGQegvwg1MsV2RRAop5bd1ynP6fb5w=
+	t=1724244942; cv=none; b=VhIBlseI/pufUtgiy0bHMqAM/6KXK9ENke7pn0f7evx2IKgHygICxQ5gSb6Y5Rv+sxkOO6MSMQh5KYG1vfqjugREXBGwAjkLEDsHXtTimBcSBWVh7yasYQJV5g/tb8ev09uL3yikeFPq0zwjPXwynGT8NxpmgWVgAVpbX1l3rTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724244851; c=relaxed/simple;
-	bh=uag6oJKSLNc4EyiZyQBEDxAqh87/Vb4AfusOoq2BVZQ=;
+	s=arc-20240116; t=1724244942; c=relaxed/simple;
+	bh=JOKbt8xKR5Izj5ooNPCDHAGa5qvdb3wy3pAiSOqpSsA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IBgi1K4v9+wFGzp8igg5ePfyUk0uiCWUJ57sg4jcrR6VOGNssmewf7IwNiZhCGhk2Htgbbntlw3wJ0nb3TFU3WlU/FOkpYRzk1eUF1D/PsXeNHqvSFZHbqCxYxw9vvpaXkIFRcYedys7JJJFNn7PiAJN7pWul+kl2d2I2ih2hps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wq4SmHNR; arc=none smtp.client-ip=209.85.219.194
+	 To:Cc:Content-Type; b=XAP9cEzxvWhMRv4HvPoCVe0lIT8Nc8gSYLP7W+1BCFrV1qI413VRBLhlhnRg7u52hx9e82Hd7BzeNlo7BjKO2/BX9tPfMgFXcn1SgrSIBJ3aV2xpddu1bF7K0mpWCQ2bAHodoKNVcBR9nHUC4RnJso38Fxl1f/xoaJuSgcU5RBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HSZtHfRY; arc=none smtp.client-ip=209.85.219.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f194.google.com with SMTP id 3f1490d57ef6-e04196b7603so7206427276.0;
-        Wed, 21 Aug 2024 05:54:09 -0700 (PDT)
+Received: by mail-yb1-f196.google.com with SMTP id 3f1490d57ef6-e13c2ef0f6fso4967591276.3;
+        Wed, 21 Aug 2024 05:55:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724244849; x=1724849649; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724244936; x=1724849736; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+gwLIf+raghtd0edZ/Li2oik0sJVO4IXfSVabsLb2pQ=;
-        b=Wq4SmHNREKdK1/GB4Zu9OSO9NmZaivwpkrYpz0V2WVOzaTdtolkRKODb65F1txO9VI
-         WguZsov6/zLXY94lOgZU5rO/pDNffa8cXzuoYDz1avB7yiJ1NV9VJV7/ucYGTCh2t+Ed
-         luMnAz6V/1pmgIkg6g1Y/UREZQVE1rOB9zPmbu5t1F0+6rwdDg3bY8d7+N27ioNlXjLx
-         sEdCG5lzZ27yrkOQ/k2quBZZRW2H7fPx+H7oSJ5i1A3uXAAcjoOVX57lT6FE+/BLbrds
-         CLgonO2LZzkDqRpzeT34nDgGCrhXTHmie6mKOVtGXjFbt+wR9I7Xsm+L3rwt+hDjUGy9
-         xTZg==
+        bh=xMXs6xVmn8sixvLxYUQEmixapt75ZvWc1eWKXQGmuWM=;
+        b=HSZtHfRYx+wKMORTMH88QuHL/6ot0ftL/BG73gG0khWSUJSzB2pEUgg+I7kduCwyS0
+         h+WeRcuObMpqGTGq1HTZhgVDh4HNtYWK2Aeld3fIvaBA4VutXzcryFOdj5wPUYw/3QWA
+         rx7UPftH/RelkS/f5Yqbd4lZ6zx5NG90of/0ICpeNYgHqhZPWs2sIK2s51+9GnNCpD0I
+         /+fdFE4Jb9JwQa7Ts/FmsQq8rIv+eGU46s2r0MDyhnEhY3MCKr/mPgJQPim6n+92K9Ts
+         tV9RfsaanKwOT1pA2XunaSaj/a2NTUyeoEL2fOnrVJrHufruAPjCB5lLXv74eTNdQpOX
+         /F5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724244849; x=1724849649;
+        d=1e100.net; s=20230601; t=1724244936; x=1724849736;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+gwLIf+raghtd0edZ/Li2oik0sJVO4IXfSVabsLb2pQ=;
-        b=XhGwjxI4MqbcELWt2sHgqfxDeTXHdblNLd8qL7NZ5PuLCqCcRCJrBp3fL0Ysd6gazb
-         hN3jP1VLWL+OS7p1dxIk8x3ckK1Haai6fVqi1U7IKo272gfjlE0FvlHnoZwHOTgfJTGv
-         9FqIdh3tEDwf5FjIKwBEQfWiZbLCrzffVptRHA/MbEtTqE1rFtU64gVsunOT+eNh3Tdy
-         QdddJPSXtnZX+J2CMVc5YrWttD67nRur5esbxKH3FO2hdW1NbKqiW3DWF+XL8g1Gr/qQ
-         aIzrguLZnmS/P8eqoE2wWSxaPWxnnTmevsDFh4nh3PhO9WSdv/C0a/D0mibEog+DpmhA
-         xO1w==
-X-Forwarded-Encrypted: i=1; AJvYcCXTEtIetLg6oWlJljKng0cfT8dPrm3U3oADmIvEfni8v/OVXexwkXaJFFradXQL3IycVE28PWyFytIxZhc=@vger.kernel.org, AJvYcCXblG9KrjfgDXCJsnw+/HIXSU59aVh8GYwgKpsmZzJcNpe1Iom84dOcIX+cn7M/m718AeJVS+8q@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRWKgSbU2dHRAaF5x12JZFcb4H7wZXczZ3RbFMTTzyV9Rq57Y8
-	kcg51J/YITQmRB5uhnvnzTJR4sA+NhQinMHaM2q2K+b9xabuCwd0pQFZTydGK3DAtZRsW8hVVV0
-	ec/jP/OkuI55mhZB21GzDZT9jfOk=
-X-Google-Smtp-Source: AGHT+IED4ENiYUTdnfoXg7IWoAZlsrqRtK8Kyl6f0GghpjDYhQSB4986z40o+E5mjnaHeqjNodPxZOXIjOa7+mY4HCA=
-X-Received: by 2002:a05:6902:1005:b0:e0e:4171:aee6 with SMTP id
- 3f1490d57ef6-e1665539587mr2740330276.42.1724244848985; Wed, 21 Aug 2024
- 05:54:08 -0700 (PDT)
+        bh=xMXs6xVmn8sixvLxYUQEmixapt75ZvWc1eWKXQGmuWM=;
+        b=Fi229ock66Gqwvcdq0ebO4dCFjwVFkOOOb9tPmER3xNnxH6Pbro6cUiJcVIsNR7zv9
+         0SuwEv+1W8QAS92PF//BjbIavNr8dRb2XxJYj5qcOOcuQ9OrjMX7oKH49JnFaNw9F5uf
+         fEvL3cHhkXUtxcOKF2hVkOw51FAuXkX6BJb1ykyew7ZaXoEhJ2jUSfDlSGYuq+sa3PFN
+         NmTiIFGb4+klYgqph9cnU5S+YNI2pIzYwByygg4DVwn5iU34jF91sJqN2djFBMq2TM5l
+         WgGLIc8bZ8+TImyrwbiowxs0Kwjv08oGmSC7mMuJKZDH/nAjXou+QjDWy8xaIvSFzflP
+         f7cQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX3AtiBZz1BEFUEO4mzEiROZx+Lx2c4Nc32UB3hoj7fg1InFZ17ofwUzCVkR+fEytGmoCP6hug4CTW1Rcw=@vger.kernel.org, AJvYcCXxpyV8ViiK/KFPJUpFJ2o0oXyKvsp2tgrAHNCdSKMca7lsIzWyqqVxRKjM6juDKXI4WJIqFpcr@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJZX/0g+/je2rhR3dcJx9PC5rcNKR8MNWph828WUc9g1VKPNkw
+	7+5rUeOg4zZuSbWva80774osaphl/GbQ1FnuL1kNCVi6lG/nCKgB4hrlMWnQOc2L5nVOK5NPEue
+	shxshrM9ip1oi96mwyeYyFy+kiU4=
+X-Google-Smtp-Source: AGHT+IH3jeFbD6w5kk393jzgQ4ipfByENSz6uo1/HAt4AhKKSb8xj/8nULtdIaYchy0KPYrOkX+rgVzaZzvQnqSWKng=
+X-Received: by 2002:a05:6902:2191:b0:e13:c24f:5beb with SMTP id
+ 3f1490d57ef6-e166642e842mr2116012276.26.1724244935977; Wed, 21 Aug 2024
+ 05:55:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,12 +72,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240815124302.982711-1-dongml2@chinatelecom.cn>
- <20240815124302.982711-7-dongml2@chinatelecom.cn> <ZsSLj-fI5Hiy9aV-@shredder.mtl.com>
-In-Reply-To: <ZsSLj-fI5Hiy9aV-@shredder.mtl.com>
+ <20240815124302.982711-3-dongml2@chinatelecom.cn> <ZsSLB8pJInb7xbEc@shredder.mtl.com>
+In-Reply-To: <ZsSLB8pJInb7xbEc@shredder.mtl.com>
 From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Wed, 21 Aug 2024 20:54:05 +0800
-Message-ID: <CADxym3YK4_8VCYgzsW_o0Cc3CXZMV8tUVb1Mq2RhH4=VoecPLQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 06/10] net: vxlan: add skb drop reasons to vxlan_rcv()
+Date: Wed, 21 Aug 2024 20:55:32 +0800
+Message-ID: <CADxym3a4gSszZvJea-WikdquvCfVUMbMVsX_C+zdNqc2t=TGJA@mail.gmail.com>
+Subject: Re: [PATCH net-next 02/10] net: skb: add SKB_DR_RESET
 To: Ido Schimmel <idosch@nvidia.com>
 Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
 	pabeni@redhat.com, dsahern@kernel.org, dongml2@chinatelecom.cn, 
@@ -87,151 +87,46 @@ Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 20, 2024 at 8:27=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
+On Tue, Aug 20, 2024 at 8:24=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
 ote:
 >
-> On Thu, Aug 15, 2024 at 08:42:58PM +0800, Menglong Dong wrote:
-> > diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_c=
-ore.c
-> > index e971c4785962..9a61f04bb95d 100644
-> > --- a/drivers/net/vxlan/vxlan_core.c
-> > +++ b/drivers/net/vxlan/vxlan_core.c
-> > @@ -1668,6 +1668,7 @@ static bool vxlan_ecn_decapsulate(struct vxlan_so=
-ck *vs, void *oiph,
-> >  /* Callback from net/ipv4/udp.c to receive packets */
-> >  static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
-> >  {
-> > +     enum skb_drop_reason reason =3D pskb_may_pull_reason(skb, VXLAN_H=
-LEN);
-> >       struct vxlan_vni_node *vninode =3D NULL;
-> >       struct vxlan_dev *vxlan;
-> >       struct vxlan_sock *vs;
-> > @@ -1681,7 +1682,7 @@ static int vxlan_rcv(struct sock *sk, struct sk_b=
-uff *skb)
-> >       int nh;
-> >
-> >       /* Need UDP and VXLAN header to be present */
-> > -     if (!pskb_may_pull(skb, VXLAN_HLEN))
-> > +     if (reason !=3D SKB_NOT_DROPPED_YET)
-> >               goto drop;
-> >
-> >       unparsed =3D *vxlan_hdr(skb);
-> > @@ -1690,6 +1691,7 @@ static int vxlan_rcv(struct sock *sk, struct sk_b=
-uff *skb)
-> >               netdev_dbg(skb->dev, "invalid vxlan flags=3D%#x vni=3D%#x=
-\n",
-> >                          ntohl(vxlan_hdr(skb)->vx_flags),
-> >                          ntohl(vxlan_hdr(skb)->vx_vni));
-> > +             reason =3D (u32)VXLAN_DROP_FLAGS;
+> On Thu, Aug 15, 2024 at 08:42:54PM +0800, Menglong Dong wrote:
+> > For now, the skb drop reason can be SKB_NOT_DROPPED_YET, which makes th=
+e
+> > kfree_skb_reason call consume_skb.
 >
-> I don't find "FLAGS" very descriptive. AFAICT the reason is used in
-> these two cases:
->
-> 1. "I flag" is not set
-> 2. The reserved fields are not zero
->
-> Maybe call it VXLAN_DROP_INVALID_HDR ?
+> Maybe I'm missing something, but kfree_skb_reason() only calls
+> trace_consume_skb() if reason is SKB_CONSUMED. With SKB_NOT_DROPPED_YET
+> you will get a warning.
 >
 
-Yeah, that makes sense.
+Yeah, I use this macro to avoid such WARNING. And I'm not sure
+if we need this patch now :/
 
-> And I agree with the comment about documenting these drop reasons like
-> in include/net/dropreason-core.h
->
-
-Okay, I'm planning to do it this way.
-
-> >               /* Return non vxlan pkt */
-> >               goto drop;
-> >       }
-> > @@ -1703,8 +1705,10 @@ static int vxlan_rcv(struct sock *sk, struct sk_=
-buff *skb)
-> >       vni =3D vxlan_vni(vxlan_hdr(skb)->vx_vni);
+> > In some case, we need to make sure that
+> > kfree_skb is called, which means the reason can't be SKB_NOT_DROPPED_YE=
+T.
+> > Introduce SKB_DR_RESET() to reset the reason to NOT_SPECIFIED if it is
+> > SKB_NOT_DROPPED_YET.
 > >
-> >       vxlan =3D vxlan_vs_find_vni(vs, skb->dev->ifindex, vni, &vninode)=
-;
-> > -     if (!vxlan)
-> > +     if (!vxlan) {
-> > +             reason =3D (u32)VXLAN_DROP_VNI;
->
-> Same comment here. Maybe VXLAN_DROP_VNI_NOT_FOUND ?
->
-
-Yeah, sounds nice.
-
-> >               goto drop;
-> > +     }
+> > Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> > ---
+> >  include/net/dropreason-core.h | 1 +
+> >  1 file changed, 1 insertion(+)
 > >
-> >       /* For backwards compatibility, only allow reserved fields to be
-> >        * used by VXLAN extensions if explicitly requested.
-> > @@ -1717,12 +1721,16 @@ static int vxlan_rcv(struct sock *sk, struct sk=
-_buff *skb)
-> >       }
+> > diff --git a/include/net/dropreason-core.h b/include/net/dropreason-cor=
+e.h
+> > index 9707ab54fdd5..8da0129d1ed6 100644
+> > --- a/include/net/dropreason-core.h
+> > +++ b/include/net/dropreason-core.h
+> > @@ -445,5 +445,6 @@ enum skb_drop_reason {
+> >                   name =3D=3D SKB_NOT_DROPPED_YET)                \
+> >                       SKB_DR_SET(name, reason);               \
+> >       } while (0)
+> > +#define SKB_DR_RESET(name) SKB_DR_OR(name, NOT_SPECIFIED)
 > >
-> >       if (__iptunnel_pull_header(skb, VXLAN_HLEN, protocol, raw_proto,
-> > -                                !net_eq(vxlan->net, dev_net(vxlan->dev=
-))))
-> > +                                !net_eq(vxlan->net, dev_net(vxlan->dev=
-)))) {
-> > +             reason =3D SKB_DROP_REASON_NOMEM;
-> >               goto drop;
-> > +     }
+> >  #endif
+> > --
+> > 2.39.2
 > >
-> > -     if (vs->flags & VXLAN_F_REMCSUM_RX)
-> > -             if (unlikely(!vxlan_remcsum(&unparsed, skb, vs->flags)))
-> > +     if (vs->flags & VXLAN_F_REMCSUM_RX) {
-> > +             reason =3D vxlan_remcsum(&unparsed, skb, vs->flags);
-> > +             if (unlikely(reason !=3D SKB_NOT_DROPPED_YET))
-> >                       goto drop;
-> > +     }
-> >
-> >       if (vxlan_collect_metadata(vs)) {
-> >               IP_TUNNEL_DECLARE_FLAGS(flags) =3D { };
-> > @@ -1732,8 +1740,10 @@ static int vxlan_rcv(struct sock *sk, struct sk_=
-buff *skb)
-> >               tun_dst =3D udp_tun_rx_dst(skb, vxlan_get_sk_family(vs), =
-flags,
-> >                                        key32_to_tunnel_id(vni), sizeof(=
-*md));
-> >
-> > -             if (!tun_dst)
-> > +             if (!tun_dst) {
-> > +                     reason =3D SKB_DROP_REASON_NOMEM;
-> >                       goto drop;
-> > +             }
-> >
-> >               md =3D ip_tunnel_info_opts(&tun_dst->u.tun_info);
-> >
-> > @@ -1757,12 +1767,15 @@ static int vxlan_rcv(struct sock *sk, struct sk=
-_buff *skb)
-> >                * is more robust and provides a little more security in
-> >                * adding extensions to VXLAN.
-> >                */
-> > +             reason =3D (u32)VXLAN_DROP_FLAGS;
-> >               goto drop;
-> >       }
-> >
-> >       if (!raw_proto) {
-> > -             if (!vxlan_set_mac(vxlan, vs, skb, vni))
-> > +             if (!vxlan_set_mac(vxlan, vs, skb, vni)) {
-> > +                     reason =3D (u32)VXLAN_DROP_MAC;
->
-> The function drops the packet for various reasons:
->
-> 1. Source MAC is equal to the VXLAN device's MAC
-> 2. Source MAC is invalid (all zeroes or multicast)
-> 3. Trying to migrate a static entry or one pointing to a nexthop
->
-> They are all quite obscure so it might be fine to fold them under the
-> same reason, but I can't find a descriptive name.
->
-> If you split 1-2 to one reason and 3 to another, then they can become
-> VXLAN_DROP_INVALID_SMAC and VXLAN_DROP_ENTRY_EXISTS
->
-
-Sounds great! Thanks for creating these names for me,
-I'm really not good at naming :/
-
-> >                       goto drop;
-> > +             }
 
