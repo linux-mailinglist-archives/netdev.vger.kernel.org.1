@@ -1,135 +1,177 @@
-Return-Path: <netdev+bounces-120698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F2E95A442
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 19:58:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3FBD95A457
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 20:03:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23B751C22325
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:58:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A20F28348A
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 18:03:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772AB1B3B0A;
-	Wed, 21 Aug 2024 17:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE211B2ED6;
+	Wed, 21 Aug 2024 18:03:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nilsfuhler.de header.i=@nilsfuhler.de header.b="ljuD3SAV"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZRWY20wJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D1813E40F;
-	Wed, 21 Aug 2024 17:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0361B2EC8
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 18:03:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724263093; cv=none; b=MJ/YZ6BJ3D6da8WPix5l3ffWS6a4gYcU1IuVE3JlMjiE1yAWEhOyoxyh8saUHZkRctyhLabHjS4AEAen8OyAEaJxwAVOPBpqjBoj3wuA0doU+uDVW1s5dAxnx9JBvRf9QXHEAQfwLBgPMFnVVQ5r532imargVGXOpXbPuuabcpU=
+	t=1724263417; cv=none; b=DZXjvSc1p4CAjYw1+9nhUxAqa1CEYZJ9ZH5wEhexur4LFZsJcEdGp0ItGefRuv/JyFAnA+6kS6vwQS8FrLmYI4R3GiQufUCfIGTd2vN0pXnanmUvMPNVaksOu1VjOpAVQSssBe84j5Q7DBYFnnDSakZtGvwW89YPGlWqKyjOSOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724263093; c=relaxed/simple;
-	bh=Z9H1ZOw1PDu4npyWo4XjX8LokfU06nz18XJk55zwSi4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kg/ByBxxnPmuFyQe3kCy1gG582haThDkV3fT+xn4nKhaZuWXchP6ZWqtto2jJUnHSdW5mLoTBVrx2qlM0mJG0myY0BUVuazX7A1fau7ZWj2nlX/jwh+YwJvGDFEQzsJ2eOPuJpfJjCVORO8Tj9Q2sBPSMvXS0003c1Kyb5pxhT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nilsfuhler.de; spf=pass smtp.mailfrom=nilsfuhler.de; dkim=pass (2048-bit key) header.d=nilsfuhler.de header.i=@nilsfuhler.de header.b=ljuD3SAV; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nilsfuhler.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nilsfuhler.de
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4WpvFN3s4Jz9tSc;
-	Wed, 21 Aug 2024 19:58:00 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=nilsfuhler.de;
-	s=202311; t=1724263078;
-	bh=Z9H1ZOw1PDu4npyWo4XjX8LokfU06nz18XJk55zwSi4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ljuD3SAVAYG2RjIyRV+eCL+93gzML3HIP/VITlS7qgOvxHxmewQWnkwREamdif4h+
-	 HdUOUrpDUOeSdjft94OXTG7nITRr7u0rjgQCwZohqf4BWl6TqyLd3eGqTTmR8BNWp7
-	 vyiuCHwaC/gknjX784nJihkpUst19RsuG91qR4HzDtJ205Cnf3F43v2VK55rhLnhmx
-	 Zopi9ZEF4xroeR1lDrvG6LUDiY5lvet3gJFaGAg+FLDPxWgOFSFmYokUY3MLCb2564
-	 yr8VF/SB5SChqbmE1ucPxOonSWvznPTYq0Va2m9pUDoJQCG7X2l/Edxz4CTDAK/RJ5
-	 QvAjoIS9VwlRw==
-Message-ID: <fcb4b7d9-08e1-4a8b-8218-a7301e6930f5@nilsfuhler.de>
-Date: Wed, 21 Aug 2024 19:57:55 +0200
+	s=arc-20240116; t=1724263417; c=relaxed/simple;
+	bh=BDfRHq7rDy7s2TYl7OFK0DCOVkCIMnB7hMpGCZ1d0H0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jGT0q35D7Ii4uo7XyyIjdHaK4nzf8fCFJlTZS1UvLcLKBR19Z1TlxGI2o94+9r4wOPPLDD8yK7BKd2paJ+7E3x26jF+78FaAqE/IrPALNRmbpTuCeWvw61lUBAoXzIlhkiNMpm7xLT8enK1jccQvgrXcD3BP9P/7kgi3Dnya90s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZRWY20wJ; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1724263416; x=1755799416;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=BDfRHq7rDy7s2TYl7OFK0DCOVkCIMnB7hMpGCZ1d0H0=;
+  b=ZRWY20wJypgaiev3O9O76plViSddpGZrDW7Raw2GAWXyIBnAGw1ZoStR
+   O4OOXMZwiVAgKzEQixvrHweTpHZnb9LfLoTdYLgz/EK2nuWk2xsofprp8
+   DYCo1LuSQ7mSJv0i4uovPneElqnu4SeOz25Fk7hqQTu02NAzDazhc32wQ
+   M=;
+X-IronPort-AV: E=Sophos;i="6.10,164,1719878400"; 
+   d="scan'208";a="20402654"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 18:03:31 +0000
+Received: from EX19MTAEUB002.ant.amazon.com [10.0.17.79:33412]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.32.60:2525] with esmtp (Farcaster)
+ id 97ba5892-f684-44d8-a4d5-22a51ac8898e; Wed, 21 Aug 2024 18:03:28 +0000 (UTC)
+X-Farcaster-Flow-ID: 97ba5892-f684-44d8-a4d5-22a51ac8898e
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19MTAEUB002.ant.amazon.com (10.252.51.79) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 21 Aug 2024 18:03:28 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D005EUA002.ant.amazon.com (10.252.50.11) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 21 Aug 2024 18:03:27 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1258.034; Wed, 21 Aug 2024 18:03:27 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: "Arinzon, David" <darinzon@amazon.com>, Jakub Kicinski <kuba@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "Michael S. Tsirkin" <mst@redhat.com>
+CC: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, David Miller <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Woodhouse, David"
+	<dwmw@amazon.co.uk>, "Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky,
+ Alexander" <matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson,
+ Matt" <msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara,
+ Nafea" <nafea@amazon.com>, "Belgazal, Netanel" <netanel@amazon.com>, "Saidi,
+ Ali" <alisaidi@amazon.com>, "Herrenschmidt, Benjamin" <benh@amazon.com>,
+	"Kiyanovski, Arthur" <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>,
+	"Agroskin, Shay" <shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>,
+	"Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky, Evgeny"
+	<evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>, "Beider, Ron"
+	<rbeider@amazon.com>, "Chauskin, Igor" <igorch@amazon.com>, "Bernstein, Amit"
+	<amitbern@amazon.com>, Parav Pandit <parav@nvidia.com>, Cornelia Huck
+	<cohuck@redhat.com>
+Subject: RE: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics
+ reporting support
+Thread-Topic: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics
+ reporting support
+Thread-Index: AQHa8/RshWVir0gVjEGCWM9asSmDOA==
+Date: Wed, 21 Aug 2024 18:03:27 +0000
+Message-ID: <460b64a1f3e8405fb553fbc04cef2db3@amazon.com>
+References: <20240811100711.12921-1-darinzon@amazon.com>
+	<20240811100711.12921-3-darinzon@amazon.com>
+	<20240812185852.46940666@kernel.org>
+	<9ea916b482fb4eb3ace2ca2fe62abd64@amazon.com>
+	<20240813081010.02742f87@kernel.org>
+	<8aea0fda1e48485291312a4451aa5d7c@amazon.com>
+	<20240814121145.37202722@kernel.org>
+	<6236150118de4e499304ba9d0a426663@amazon.com>
+ <20240816190148.7e915604@kernel.org>
+ <0b222f4ddde14f9093d037db1a68d76a@amazon.com>
+In-Reply-To: <0b222f4ddde14f9093d037db1a68d76a@amazon.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] net: ip6: ndisc: fix incorrect forwarding of proxied
- ns packets
-To: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, nils@nilsfuhler.de
-References: <20240815151809.16820-2-nils@nilsfuhler.de>
- <a95f1211-0f1b-4957-8e31-1b53af888cb5@redhat.com>
-Content-Language: en-US
-From: Nils Fuhler <nils@nilsfuhler.de>
-In-Reply-To: <a95f1211-0f1b-4957-8e31-1b53af888cb5@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4WpvFN3s4Jz9tSc
 
+> > > > Xuan, Michael, the virtio spec calls out drops due to b/w limit
+> > > > being exceeded, but AWS people say their NICs also count packets
+> > > > buffered but not dropped towards a similar metric.
+> > > >
+> > > > I presume the virtio spec is supposed to cover the same use cases.
+> > > > Have the stats been approved? Is it reasonable to extend the
+> > > > definition of the "exceeded" stats in the virtio spec to cover
+> > > > what AWS
+> > specifies?
+> > > > Looks like PR is still open:
+> > > > https://github.com/oasis-tcs/virtio-spec/issues/180
+> > >
+> > > How do we move forward with this patchset?
+> > > Regarding the counter itself, even though we don't support this at
+> > > the moment, I would recommend to keep the queued and dropped as
+> > > split
+> > (for
+> > > example, add tx/rx-hw-queued-ratelimits, or something similar, if
+> > > that makes sense).
+> >
+> > Could you share some background for your recommendation?
+> > As you say, the advice contradicts your own code :S Let's iron this
+> > out for virtio's benefit.
+> >
+>=20
+> The links I've shared before are of public AWS documentation, therefore,
+> this is what AWS currently supports.
+> When looking at the definition of what queued and what dropped means,
+> having such a separation will benefit customers better as it will provide=
+ them
+> more detailed information about the limits that they're about to exceed o=
+r
+> are already exceeding. A queued packet will be received with a delay, whi=
+le a
+> dropped packet wouldn't arrive to the destination.
+> In both cases, customers need to look into their applications and network
+> loads and see what should be changed, but when I'm looking at a case wher=
+e
+> packets are dropped, it is more dire (in some use-cases) that when packet=
+s
+> are being delayed, which is possibly more transparent to some network loa=
+ds
+> that are not looking for cases like low latency.
+>=20
+> Even though the ENA driver can't support it at the moment, given that the
+> stats interface is aiming for other drivers to implement (based on their =
+level
+> of support), the level of granularity and separation will be more generic=
+ and
+> more beneficial to customers. In my opinion, the suggestion to virtio is =
+more
+> posing a limitation based on what AWS currently supports than creating
+> something generic that other drivers will hopefully implement based on th=
+eir
+> NICs.
+>=20
+> > You can resend the first patch separately in the meantime.
+>=20
+> I prefer them to be picked up together.
+>=20
 
+I see that there's no feedback from Xuan or Michael.
 
-On 20/08/2024 15:13, Paolo Abeni wrote:
-> 
-> 
-> On 8/15/24 17:18, Nils Fuhler wrote:
->> When enabling proxy_ndp per interface instead of globally, neighbor
->> solicitation packets sent to proxied global unicast addresses are
->> forwarded instead of generating a neighbor advertisement. When
->> proxy_ndp is enabled globally, these packets generate na responses as
->> expected.
->>
->> This patch fixes this behaviour. When an ns packet is sent to a
->> proxied unicast address, it generates an na response regardless
->> whether proxy_ndp is enabled per interface or globally.
->>
->> Signed-off-by: Nils Fuhler <nils@nilsfuhler.de>
-> 
-> I have mixed feeling WRT this patch. It looks like a fix, but it's changing an established behaviour that is there since a lot of time.
-> 
-> I think it could go via the net-next tree, without fixes
-> tag to avoid stable backports. As such I guess it deserves a self-test script validating the new behavior.
-> 
-That is probably the best option.
-Although I'm not sure whether it would really break something. The
-forwarded packets have a hoplimit of 254 and are therefore not valid
-ndisc packets anymore.
-
-
->> ---
->> v1 -> v2: ensure that idev is not NULL
->>
->>   net/ipv6/ip6_output.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
->> index ab504d31f0cd..0356c8189e21 100644
->> --- a/net/ipv6/ip6_output.c
->> +++ b/net/ipv6/ip6_output.c
->> @@ -551,8 +551,8 @@ int ip6_forward(struct sk_buff *skb)
->>           return -ETIMEDOUT;
->>       }
->>   -    /* XXX: idev->cnf.proxy_ndp? */
->> -    if (READ_ONCE(net->ipv6.devconf_all->proxy_ndp) &&
->> +    if ((READ_ONCE(net->ipv6.devconf_all->proxy_ndp) ||
->> +         (idev && READ_ONCE(idev->cnf.proxy_ndp))) &&
->>           pneigh_lookup(&nd_tbl, net, &hdr->daddr, skb->dev, 0)) {
->>           int proxied = ip6_forward_proxy_check(skb);
->>           if (proxied > 0) {
-> 
-> Note that there is similar chunk in ndisc_recv_na() that also ignores idev->cnf.proxy_ndp, why don't you need to such function, too?
-
-I have noticed the chunk in ndisc_recv_na() and did some quick testing
-but I was not able to get an obviously wrong behavior out of it.
-I have to admit, though, that I am not sure if I understand the
-condition correctly. At the start, it checks that the lladdr of the
-received na packet is equal to the lladdr of the reciving interface.
-That can only happen, when the interface receives its own packet, right?
-Is there a valid case where that can happen? Or am I missing something?
-
-Greetings,
-Nils
-
+Jakub, what are your thoughts about my suggestion?
 
