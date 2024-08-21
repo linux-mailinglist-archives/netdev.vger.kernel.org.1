@@ -1,70 +1,74 @@
-Return-Path: <netdev+bounces-120421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65985959447
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 07:59:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D3795944B
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 07:59:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FF3C1F24149
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 05:59:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5052C2854A6
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 05:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C371616A954;
-	Wed, 21 Aug 2024 05:59:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940AA16BE16;
+	Wed, 21 Aug 2024 05:59:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="SV+5W8qG"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="vUT6q02E"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9238248D;
-	Wed, 21 Aug 2024 05:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD19E8248D;
+	Wed, 21 Aug 2024 05:59:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724219942; cv=none; b=Zwx3ChVZCYMvtfXSgoIGFF6esTfmFcUNoPz/fUyE5fsnhgtjVEU5Gc7SVZXEBoaUUQKKTK4r6V4pX0RVBJomj1uxjLSSnUTdzVMwV56PZHd+HvQpHAU/FbY57v7gHu/K8NbWw21eqZ1E0i812d2pzkPZSPBAnls33XlBb2ZrEyA=
+	t=1724219973; cv=none; b=G3ZBKur19fIBRV7qvyOC4jTZ7RVZzCPqjkS6pnDK0iC/oCR3nAK2rdWY4Fn8CcFU7JhV57Co6O2EOZ1FhPfMveFuQw+KnpwJeNbjFwbR5QOyH9Tob/7QVEPhkf2lDBt1hufBP1rwbK0M6qokmGU7ZDXDFdHR2t/Q0H469B0tqSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724219942; c=relaxed/simple;
-	bh=AiczBgmYnpsHJsKxzKTQFCqblHyCq2/2FhExedQNxao=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KcoU7FO5yQbTuedUHMJ1K+g9S2/8rI4iMUrZ1l0FkRem/rx3Qa5iPYC96Dvq6rvEur9qBt9HIfSvspA4ndqurcMV7BaepbRR4GnZau6+PBd4IRBMOx4tLwDCvTayXt3bdoh0T6ZIRyAiiMxw0X6vKoS4OcxUJ+uJ5dAexfnV4wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=SV+5W8qG; arc=none smtp.client-ip=68.232.153.233
+	s=arc-20240116; t=1724219973; c=relaxed/simple;
+	bh=F4uSpGBjyqtODydI7+3cmvBUHxugdmb4gEUjWgBPkrY=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gIchu5QyaLz3gUOVePmMseuxXoFH7Nk1uHKQRcdI8EjZUqmRhwBWKZYG9qwGeQHSqIDab+Z2B91q/X4lkkicaKnOx201oTtC39GXLRldx4RgJmydywJlLmzSQ/HgbAA711NBnqj8AGVUynpwZXvLaI4dwX6QruiN4jBPgBToCWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vUT6q02E; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1724219941; x=1755755941;
-  h=from:to:subject:date:message-id:mime-version;
-  bh=AiczBgmYnpsHJsKxzKTQFCqblHyCq2/2FhExedQNxao=;
-  b=SV+5W8qGdTsV7i0FaJZQcQ2SIg6qBsII1abjKzQKIIzJcETAgffMcGlR
-   UCMjOs4Tn+dDI+POUXLZoJzAF6kIL9QBcw9QQfkfW4E8Xch9hH9D83Q/N
-   l7lMZsljFNXzDf9gU51XLiMbbehX5CGRbJiXJbJ4Ed5XRTV56CctQLG3S
-   7RbIqVapdekYIRXx1Ph3r1FvganqJDke0nCcC1UkFXDU9PO1dTx3EjsbN
-   Zw+hoGTVmwhOt6Q63XfjR3M++cWS5Y9OIWFwwz7zYPj4tig1sGpkMWK0x
-   XPmMFa45nlXP9cJAgI07FC64ZSHhPIo2WXsTTz/bFGNjX7riTqk7aPbdh
-   Q==;
-X-CSE-ConnectionGUID: 7ZFFNiTYQ8msV6joUfqTDQ==
-X-CSE-MsgGUID: KI+fd0+xTBGfDQhQ2NIerg==
+  t=1724219972; x=1755755972;
+  h=from:to:subject:date:message-id:in-reply-to:references:
+   mime-version;
+  bh=F4uSpGBjyqtODydI7+3cmvBUHxugdmb4gEUjWgBPkrY=;
+  b=vUT6q02EsmbKBJwPdv7AoD+w9QjjajhzD9CSxb6d0YLlu081K8++pYwC
+   KyfMhZ969qkBg8Zl0qGjZnUj6NjYEAIl3FnxNEzljVpEsDtj9t0uLdjmR
+   FsWvGlGIfIVyK5r3fa3pNBz5jzG0wiZ2sU+tzcn9f5USMArDgEYjvlAzd
+   XUxSBJEY1xpF2r3Mqw9PzkAIHoC52obG4qhooDHE66v3bbBZ6ZDjz9Cm3
+   gRJo6O6ucA6b8qfxzUara+AoFpowC4q3Y255rxK4U6uc7DkrmKVhuDqqq
+   HSCffYs7lLrKl8702nioy7JVeMHRaKIihGPsAtmT+51Q0NakZjYRiKmZ6
+   g==;
+X-CSE-ConnectionGUID: m4LuvgPcQx2UcMduyJ7hNQ==
+X-CSE-MsgGUID: d0+FTfpoSkCtkPQfushpSA==
 X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="261650675"
+   d="scan'208";a="261650688"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Aug 2024 22:58:54 -0700
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Aug 2024 22:59:31 -0700
 Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 20 Aug 2024 22:58:12 -0700
+ 15.1.2507.35; Tue, 20 Aug 2024 22:58:16 -0700
 Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
  chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 20 Aug 2024 22:58:08 -0700
+ 15.1.2507.35 via Frontend Transport; Tue, 20 Aug 2024 22:58:12 -0700
 From: Divya Koppera <Divya.Koppera@microchip.com>
 To: <arun.ramadoss@microchip.com>, <UNGLinuxDriver@microchip.com>,
 	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next v3 0/2] Adds support for lan887x phy
-Date: Wed, 21 Aug 2024 11:29:04 +0530
-Message-ID: <20240821055906.27717-1-Divya.Koppera@microchip.com>
+Subject: [PATCH net-next v3 1/2] net: phy: Add phy library support to check supported list when autoneg is enabled
+Date: Wed, 21 Aug 2024 11:29:05 +0530
+Message-ID: <20240821055906.27717-2-Divya.Koppera@microchip.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20240821055906.27717-1-Divya.Koppera@microchip.com>
+References: <20240821055906.27717-1-Divya.Koppera@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,31 +79,30 @@ Content-Type: text/plain
 
 From: Divya Koppera <divya.koppera@microchip.com>
 
-Adds support for lan887x phy and accept autoneg configuration in
-phy driver only when feature is enabled in supported list.
+Adds support in phy library to accept autoneg configuration only when
+feature is enabled in supported list.
 
-v2 -> v3
-https://lore.kernel.org/lkml/20240813181515.863208-1-divya.koppera@microchip.com
-Removed extra braces for linkmode_test_bit in phy library.
+Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
+---
+ drivers/net/phy/phy.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-v1 -> v2
-https://lore.kernel.org/lkml/20240808145916.26006-1-Divya.Koppera@microchip.com
-Addresed below review comments
-- Added phy library support to check supported list when autoneg is
-  enabled.
-- Removed autoneg enabled check in lan887x phy.
-- Removed of_mdio macro for LED initialization.
-- Removed clearing pause frames support from supported list.
-
-Divya Koppera (2):
-  net: phy: Add phy library support to check supported list when autoneg
-    is enabled
-  net: phy: microchip_t1: Adds support for lan887x phy
-
- drivers/net/phy/microchip_t1.c | 577 ++++++++++++++++++++++++++++++++-
- drivers/net/phy/phy.c          |   5 +-
- 2 files changed, 580 insertions(+), 2 deletions(-)
-
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index 785182fa5fe0..cba3af926429 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -1089,7 +1089,10 @@ int phy_ethtool_ksettings_set(struct phy_device *phydev,
+ 	if (autoneg != AUTONEG_ENABLE && autoneg != AUTONEG_DISABLE)
+ 		return -EINVAL;
+ 
+-	if (autoneg == AUTONEG_ENABLE && linkmode_empty(advertising))
++	if (autoneg == AUTONEG_ENABLE &&
++	    (linkmode_empty(advertising) ||
++	     !linkmode_test_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
++				phydev->supported)))
+ 		return -EINVAL;
+ 
+ 	if (autoneg == AUTONEG_DISABLE &&
 -- 
 2.17.1
 
