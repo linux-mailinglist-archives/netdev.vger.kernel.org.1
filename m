@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-120675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D736395A2CB
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 18:28:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37C0495A2D1
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 18:30:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FA4D1C20F54
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:28:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53BED1C21105
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BFB1514ED;
-	Wed, 21 Aug 2024 16:28:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9C3148828;
+	Wed, 21 Aug 2024 16:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A3uo23Xc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="abCL3cR+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC68614F9F3
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 16:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6AE23B1
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 16:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724257714; cv=none; b=EmmUUM96DVSMaVy0vjmhZIWKuQVnsXSavwEpB9woI6Or4fkRjdVkhbgTwsc9Mn4Wn/Q+6d/gDxPvRwinPLZi6xJqb4wcYHKlgKEK2al2TBSCVkCk6JyqdcYmkXCHVjV9VqK8gW8ejB04UujyxoBQvVW40ccUpW/XWoe8+s9sXGY=
+	t=1724257837; cv=none; b=ftCoELwL50d27le7Paik/DQtf12GKFTYLj60+rpBsP2gPktRiFWNxGdtzJ4QW9OoI6E/0Ma8dPD+AS5TsQFU1XSQCgosaCEDn9dNcal3hZrnKSsEeOKYdCkmNR4Fbe1xlYyujbGrG2T6IjNdEKU0bvI6WMrYm1D65cF5PXV8xCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724257714; c=relaxed/simple;
-	bh=INy/bAAJCjlbio1Ldw+aWgMzJBL0pym6HlFrkQVJuMc=;
+	s=arc-20240116; t=1724257837; c=relaxed/simple;
+	bh=eh2CaO7SLxneqTXJ0tkAYdS7T534jswugaRRjc4wKyU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TCZD0I/CF7WlHqhjW4WJ0Jbij2+khtKNFwQ8a1F9okmqIJuaOGqXM6IgdY2jj+13YG0jRAI4tqhkLkvT/E3XTthMOMyw+vmWMegB0LqREIXJIsbF4SMzxAhmbL57nSOvVheC291JOvLmMb4XBhHtvaJrGjWwY3d8dFGoHrnQTkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A3uo23Xc; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=jc5tduD2xCHy30B8F0uRddwmrnH98jckFqTukY5mdj46T1Dqt9KYKy8n6vfUt8sZwWtuImum9rtH6XtoHbgdAfd3c298C2SlpwyafLXTcbgIVsLR2l6Izd5y0eeAxObd5FBHFJO0mowNmcFGq8OQJ+pJ2yWhrsQxZwENBG8WkfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=abCL3cR+; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724257711;
+	s=mimecast20190719; t=1724257834;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=INy/bAAJCjlbio1Ldw+aWgMzJBL0pym6HlFrkQVJuMc=;
-	b=A3uo23XcGHfbnwJkIqbNH6Xb+FhoQhSygAGi5bEXg3QRK9yF5lE1FM08mQZjcL5z5Npmg4
-	UKXITPhqcc2Ru7jedjsUnwHtcpe4+kZNwIRSwnmAxst9nps1ySqOSfA/SYiWiyCBUl6Qxj
-	g3AFsAY4PN5+om9h1uf2PPtuKRFUzhA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=eh2CaO7SLxneqTXJ0tkAYdS7T534jswugaRRjc4wKyU=;
+	b=abCL3cR+6H/U8/nScNj6+ik+qEc9mBFkC6fMMDuX0NX0pl2qxoNmEmob5tqQukb2bXy/vu
+	9TDzdMw/kuUgwpjCjX6egjXkLxxCXUpHtlJopfqaWD8vgS5wxo2LKpNKrEKbjQsJYZ/9mH
+	O7eeBm4FJzxrBpVYvPz/9rHyroiF1s8=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-495-AXdSga8QMAqU-oNPY07ENw-1; Wed, 21 Aug 2024 12:28:30 -0400
-X-MC-Unique: AXdSga8QMAqU-oNPY07ENw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4280645e3e0so56623525e9.1
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 09:28:30 -0700 (PDT)
+ us-mta-496-boZ3tU2QOW-YQ4UBprkRpw-1; Wed, 21 Aug 2024 12:30:33 -0400
+X-MC-Unique: boZ3tU2QOW-YQ4UBprkRpw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-372fe1ba9a6so631938f8f.1
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 09:30:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724257709; x=1724862509;
+        d=1e100.net; s=20230601; t=1724257832; x=1724862632;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=INy/bAAJCjlbio1Ldw+aWgMzJBL0pym6HlFrkQVJuMc=;
-        b=FrXrB7rvOgtL1wP0t8+pgA9PzugfafNbnwwbi2xG8w41kQalJpN2W+bsWXD2AYdzNy
-         Rklp4lumF5Skl/NFiiNTootZi4vDbdh3u1EpPI1UVNSApZtIXg2B7kO2UpUms4rBPjiv
-         1CXUknaO+j8+aqSh+/TWItyf1TUEHxSvR6WbEcAOOR+oz+oGnm/OVVHW9cAzECBPiMDq
-         R90BGa4oXtkH1ph/gH3sY6g41DXG0R2aQmhBf2TOk+OQLTlrgEXFWwJCsXkTwqkYwS4z
-         yv2z4OSpGHOJ6d8F49zrN7rt0xeXLhk3aeMnb/HWv4IYwQny0VCBw19Rc8qnO6TggVAN
-         3vRQ==
-X-Gm-Message-State: AOJu0Yxva3EnFXH8q2qz121RyODEkzDpKHJfSDWSibmfupRSR+gNobmT
-	Du5wtanynkG59mQNrlVacXyjTB/owbVmDb200dNIkfsWzEdHTxTzsmYbIrtUe+UJeg3rhckeZ7E
-	TVEjoS6KcCZ1xEURXbCJWNMbPjUkJt7Tnf1ZBmka316ePHOFPDZLMkQ==
-X-Received: by 2002:a05:600c:46cb:b0:429:991:dd71 with SMTP id 5b1f17b1804b1-42abd22fecamr19431455e9.11.1724257708908;
-        Wed, 21 Aug 2024 09:28:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE5+n0Fv8HveCdgINXMy+eE22ChN3nWbNrpHxcY7XJtnEmbN/V8Dc0vDGGi9pP2zhZWlB17DQ==
-X-Received: by 2002:a05:600c:46cb:b0:429:991:dd71 with SMTP id 5b1f17b1804b1-42abd22fecamr19431195e9.11.1724257708039;
-        Wed, 21 Aug 2024 09:28:28 -0700 (PDT)
+        bh=eh2CaO7SLxneqTXJ0tkAYdS7T534jswugaRRjc4wKyU=;
+        b=W4MGdc9m/aNzt5vjsOXd0LLthlozc/NJYna7UGXIsXUWrMC5xNt6bWceKtWQHLNSck
+         YB+T8nFbho/1JEKGTnRL8f2M5cuJ9zfuuoUIACfDKzbBFfWWwrB8wg7qQScMUtGUUdjU
+         ksLMII5sv6PXl16swuhUPzTJlm7AAGcrcXmzB1sS9KVMaNa1SUEx/tBM4xW1p2Y5D0Up
+         Z4YT9Cx6R/hqBq8JWa0WFsiPfbAPaMlnrIKghl9sl9lSeysBLJmhuNzAImwhc10pwLB5
+         50CJMSKuGSbPCoCCSpWep5f7R88qessObEpz+5xfm6q3nXJ3KfdPgcbwrKX73Q9gY0V6
+         p1bQ==
+X-Gm-Message-State: AOJu0Yxy8Ue42LEu1RX467/u6cBdVRSL4KLTlQHbXWM3sEvffe1ZOcCq
+	reUkuEDaIQxOboR0OS65xnJS9Y0STxp582BEewVVLpiS3p/P3a+r7ZzmtqrGhEPsBq7sAVfWMKT
+	rMmH134wBk/aLTP+0bBzhu69JVNimf9ldbWSW+U5p610A8StIrsEo0g==
+X-Received: by 2002:a5d:4608:0:b0:368:71bc:2b0c with SMTP id ffacd0b85a97d-372fd5bbe67mr1762295f8f.10.1724257832015;
+        Wed, 21 Aug 2024 09:30:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHFHiwWQuwcb9FY723vZUjnvJiZ+wXV01CzfS27CAuf6/lQRnbvysDeH7IR7ggmior2kIS68w==
+X-Received: by 2002:a5d:4608:0:b0:368:71bc:2b0c with SMTP id ffacd0b85a97d-372fd5bbe67mr1762272f8f.10.1724257831193;
+        Wed, 21 Aug 2024 09:30:31 -0700 (PDT)
 Received: from debian (2a01cb058d23d60064c1847f55561cf4.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:64c1:847f:5556:1cf4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abee8bd36sm30069825e9.18.2024.08.21.09.28.27
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-371898aab44sm16105552f8f.91.2024.08.21.09.30.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 09:28:27 -0700 (PDT)
-Date: Wed, 21 Aug 2024 18:28:25 +0200
+        Wed, 21 Aug 2024 09:30:30 -0700 (PDT)
+Date: Wed, 21 Aug 2024 18:30:28 +0200
 From: Guillaume Nault <gnault@redhat.com>
 To: Ido Schimmel <idosch@nvidia.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
@@ -81,11 +81,11 @@ Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
 	kadlec@netfilter.org, willemdebruijn.kernel@gmail.com,
 	bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
 	coreteam@netfilter.org
-Subject: Re: [PATCH net-next 08/12] ipv4: Unmask upper DSCP bits in input
- route lookup
-Message-ID: <ZsYVqfPuyDiCyrO6@debian>
+Subject: Re: [PATCH net-next 09/12] ipv4: Unmask upper DSCP bits in
+ RTM_GETROUTE input route lookup
+Message-ID: <ZsYWJE7iTXu4jbN/@debian>
 References: <20240821125251.1571445-1-idosch@nvidia.com>
- <20240821125251.1571445-9-idosch@nvidia.com>
+ <20240821125251.1571445-10-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,11 +94,12 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240821125251.1571445-9-idosch@nvidia.com>
+In-Reply-To: <20240821125251.1571445-10-idosch@nvidia.com>
 
-On Wed, Aug 21, 2024 at 03:52:47PM +0300, Ido Schimmel wrote:
-> Unmask the upper DSCP bits in input route lookup so that in the future
-> the lookup could be performed according to the full DSCP value.
+On Wed, Aug 21, 2024 at 03:52:48PM +0300, Ido Schimmel wrote:
+> Unmask the upper DSCP bits when looking up an input route via the
+> RTM_GETROUTE netlink message so that in the future the lookup could be
+> performed according to the full DSCP value.
 
 Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
