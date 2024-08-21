@@ -1,174 +1,158 @@
-Return-Path: <netdev+bounces-120655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87B4795A137
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:19:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1F3795A155
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:25:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 367B0283A83
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:19:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F3D5285E74
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5581386DF;
-	Wed, 21 Aug 2024 15:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0287414D449;
+	Wed, 21 Aug 2024 15:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mM+trEPg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TtZjkQ1J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BF414884E
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 15:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFD014A4EA;
+	Wed, 21 Aug 2024 15:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724253584; cv=none; b=X4X0aP3NYf4bjmuc0ZriIZUoK1Jo0h2GhDS/s9+L0vqv2H3BpdqjHQ1KDnea5uVcIKNFMu/z8is6arpaM4n4IziWGE+arZjeG85YmJIj3Ep7FULyJsod9bJ42TaAo8ICfUmRjUZBSK2onHZXvWBRcREoVoRhvOYoPN5k7a0nGus=
+	t=1724253883; cv=none; b=CLOukCxOROp0r+CkMiyGqBAQIhMiGa8Q+ZUgCqOgRdOkMjAfT4qTtGQDaDLL2laxbKcQs2qfXDFSdT4Z9InjWJwoxzvZVa0s5bElxZum6tcbOmSQRuFbKOoIeykOL3IAP90szW/R2RKUY39/IGrtO9pK/249+BHoNNqqmMgZCQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724253584; c=relaxed/simple;
-	bh=DABmbJ5xr3+kPxzdPgH1KDbNkWt8A7gTW6ZNALitISM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nRO6zHvb1NuxDLDyhK3AyEdliNaKKrpHOgQHvANMnojDYFeUvD598m1IJrF2vSugwDlhDzdzkJZfiUXqkarOkoQtiwgRDqHriIibIJ9CNAEmiR8T7malioxMYripHTPbb51K+4BjtBh5bh3dDYkdprnbHaJKMmFEIvfgE2XQLaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mM+trEPg; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-39d29ba04f2so20472805ab.2
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:19:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724253582; x=1724858382; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dmAWRsQ+ClmFs3Y1VK+ml/3QqAeWk+oloMwXv5uGD8M=;
-        b=mM+trEPgNLdV6tmwz4Vcnnt6AaiwsMiRACzG3Exz3M13MVKstjHE09kmY+naa44h0L
-         lIeq7vMr8lCW+42tqlERg7byKOI4qf1dyiBRqC2Iohxs4i4Rv4R6EfhC23KxFWlsO8Bh
-         STJnLQlgsPDlcSv50dDQveWiMQI63u8uA0Z/JAPXDCTpIc/KLKDDyvXSvtbMUk7zzNVH
-         BvnY29Ya3N6bxBkd3MGOJXYu/EMMsv5ZtBKFe7m6feC0BWluvQeZF0/b2lFxgpB7zYVp
-         D3dns9LW5lz+XKE87NBgnqD+NMiOhoA5RzoFT4UeMmjaHlddjvYdwGMu1cAyLjajbfcV
-         gkGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724253582; x=1724858382;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dmAWRsQ+ClmFs3Y1VK+ml/3QqAeWk+oloMwXv5uGD8M=;
-        b=qr/boFrMlHbsZjK3GgCDU4TuWY0WgA2RL0xYhD5NO+Plc4ay8z5srVz3SFgWs/IQAV
-         JVGw9+ac7NM/E12culzd9rSo6IHmBBpN1a0Is5GvjIL+l9owDR2I6JvPUGmcm/4SLhbI
-         AYvNHxeRRc03GD9WJoL22Oiar8IlFn0No7i1zJYlfdSu5B5HQh2+baXZNsIbZ6VgZFuB
-         V+WeBPnHeiVAA9h/68C4sMOV0+nNyd3aCypNlkY1vWk5ZAbpN3wDX6TOqQFjh4/VZ37T
-         S1OCXxfXHaDbMu8xGdH615E7f8GVoJfaH+7F8lXCeReZmRYKd8W3lDcyEYfTwbqowcrQ
-         GsLg==
-X-Forwarded-Encrypted: i=1; AJvYcCXcsAPHWqxOVMLkMfrrgmXMN1p3wD6vFrh5NL4l6WOfbbnwUDBiYsspAl6MesivvOMt1PnPcng=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypWULKxlmHRt0xUVnQa562z8FowFSvKX0XGfLIP4AeektyWZg2
-	dIq3xig2YYawJ+4gtjyVQv9XEj5ZH7Cr2YaLDr92/93Dp/qcuRLBX/X00W6OZIjjGedXR7jpB7V
-	2arOFL8CZzP6lBq15ydGhCuTaJAc=
-X-Google-Smtp-Source: AGHT+IHaFVabeJSgtwoDJUzYGNnHMmfbyIMSlhOm9uNtiTk0L1JresCp77Agm2tEyGcO34K7dpKnak/OADLt+HNnqYw=
-X-Received: by 2002:a05:6e02:1a86:b0:39b:3a44:fe8a with SMTP id
- e9e14a558f8ab-39d6c353a36mr26132485ab.4.1724253582044; Wed, 21 Aug 2024
- 08:19:42 -0700 (PDT)
+	s=arc-20240116; t=1724253883; c=relaxed/simple;
+	bh=1ZjtB2qfgq/kDPmIlWye3dfIwc8C55gZjyVxcfwSetA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=A103vzlgwJlPw7BDmsJpRrrOpgTe8UdNr7sNemR23iJflgsLzjSt4Ho9kSX8alzayWBvSx9ptasOHmR9PwtgI4TfAKgSkFxqOmhyyfpM1aSSjNHjZXeXIAl+CNT3huGkfuW1FO69yXrNvr9005zye4XHhvOs0hbjnOKgHYQlw0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TtZjkQ1J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F6A2C32786;
+	Wed, 21 Aug 2024 15:24:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724253883;
+	bh=1ZjtB2qfgq/kDPmIlWye3dfIwc8C55gZjyVxcfwSetA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=TtZjkQ1JoqTb6Y/uUb/+73JdcHZH9WrH/IHzsTJfRG26ORrRRXSHBUa3Ueb/e9SOb
+	 k+YJ0KHOXTGtYG5oazohYwVwQQK3KDEf/71BUc7OXOdTJlVctngwIuzs1C7lde3MAJ
+	 pOkDSlsc+fkPkwpLUeIcPRhz8rIzG5YpUUSjE4eFZTv5Ru4EgJPTmgquBbi2iVyxUh
+	 C9U5Ua+xUG0hSc+Wj/prm44j9A3uSlbySmXCbjYORNrb9ll2z/NTmnAWCB0ivJqWDj
+	 SwHlMZ5c2nYJuioTX1efrHNcneRaN9R8CdTYDaqgpWaDSBzN320A/M3P/+osCa1kUz
+	 7lcpXCYz5QVmQ==
+Date: Wed, 21 Aug 2024 10:24:41 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 03/11] PCI: of_property: Sanitize 32 bit PCI address
+ parsed from DT
+Message-ID: <20240821152441.GA222583@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240815113745.6668-1-kerneljasonxing@gmail.com>
- <2ef5d790-5068-41f5-881f-5d2f1e6315e3@redhat.com> <CANn89iLn4=TnBE-0LNvT+ucXDQoUd=Ph+nEoLQOSz0pbdu3upw@mail.gmail.com>
- <CAL+tcoCxGMNrcuDW1VBqSCFtsrvCoAGiX+AjnuNkh8Ukyzfaaw@mail.gmail.com>
- <CAL+tcoAMJ+OwVp6NP4Nb0-ryij4dBC_c9O6ZiDsBWqa+iaHhmw@mail.gmail.com> <CANn89iKNQw9x388P45BtbTiGFjj6PCC6vwDF7M9DJFUPhtNWJw@mail.gmail.com>
-In-Reply-To: <CANn89iKNQw9x388P45BtbTiGFjj6PCC6vwDF7M9DJFUPhtNWJw@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 21 Aug 2024 23:19:05 +0800
-Message-ID: <CAL+tcoBcLRREwwrEsmzOD-OhzABEOQRqZc8Co_xK3UPXOSrnxA@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next] tcp: avoid reusing FIN_WAIT2 when trying to
- find port in connect() process
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, kuba@kernel.org, 
-	dsahern@kernel.org, ncardwell@google.com, kuniyu@amazon.com, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>, 
-	Jade Dong <jadedong@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8b4fa91380fc4754ea80f47330c613e4f6b6592c.1724159867.git.andrea.porta@suse.com>
 
-On Wed, Aug 21, 2024 at 8:39=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Wed, Aug 21, 2024 at 12:03=E2=80=AFPM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> >
-> > Hello Eric,
-> >
-> > On Tue, Aug 20, 2024 at 8:54=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> > >
-> > > Hello Eric,
-> > >
-> > > On Tue, Aug 20, 2024 at 8:39=E2=80=AFPM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > On Tue, Aug 20, 2024 at 1:04=E2=80=AFPM Paolo Abeni <pabeni@redhat.=
-com> wrote:
-> > > > >
-> > > > > On 8/15/24 13:37, Jason Xing wrote:
-> > > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > > >
-> > > > > > We found that one close-wait socket was reset by the other side
-> > > > > > which is beyond our expectation,
-> > > > >
-> > > > > I'm unsure if you should instead reconsider your expectation: wha=
-t if
-> > > > > the client application does:
-> > > > >
-> > > > > shutdown(fd, SHUT_WR)
-> > > > > close(fd); // with unread data
-> > > > >
-> > > >
-> > > > Also, I was hoping someone would mention IPv6 at some point.
-> > >
-> > > Thanks for reminding me. I'll dig into the IPv6 logic.
-> > >
-> > > >
-> > > > Jason, instead of a lengthy ChatGPT-style changelog, I would prefer=
- a
-> > >
-> > > LOL, but sorry, I manually control the length which makes it look
-> > > strange, I'll adjust it.
-> > >
-> > > > packetdrill test exactly showing the issue.
-> > >
-> > > I will try the packetdrill.
-> > >
-> >
-> > Sorry that I'm not that good at writing such a case, I failed to add
-> > TS option which will be used in tcp_twsk_unique. So I think I need
-> > more time.
->
-> The following patch looks better to me, it covers the case where twp =3D=
-=3D NULL,
-> and is family independent.
+On Tue, Aug 20, 2024 at 04:36:05PM +0200, Andrea della Porta wrote:
+> The of_pci_set_address() function parse devicetree PCI range specifier
 
-Right, thanks for your help!
+s/parse/parses/ ? 
 
-Thanks,
-Jason
+> assuming the address is 'sanitized' at the origin, i.e. without checking
+> whether the incoming address is 32 or 64 bit has specified in the flags.
+> In this way an address with no OF_PCI_ADDR_SPACE_MEM64 set in the flagss
 
-> It is also clear it will not impact DCCP without having to think about it=
-.
->
-> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> index fd17f25ff288a47fca3ec1881c87d56bd9989709..43a3362e746f331ac64b5e4e6=
-de6878ecd27e115
-> 100644
-> --- a/net/ipv4/tcp_ipv4.c
-> +++ b/net/ipv4/tcp_ipv4.c
-> @@ -144,6 +144,8 @@ int tcp_twsk_unique(struct sock *sk, struct sock
-> *sktw, void *twp)
->                         reuse =3D 0;
->         }
->
-> +       if (tw->tw_substate =3D=3D TCP_FIN_WAIT2)
-> +               reuse =3D 0;
->         /* With PAWS, it is safe from the viewpoint
->            of data integrity. Even without PAWS it is safe provided seque=
-nce
->            spaces do not overlap i.e. at data rates <=3D 80Mbit/sec.
+s/flagss/flags/
+
+> could leak through and the upper 32 bits of the address will be set too,
+> and this violates the PCI specs stating that ion 32 bit address the upper
+
+s/ion/in/
+
+> bit should be zero.
+
+I don't understand this code, so I'm probably missing something.  It
+looks like the interesting path here is:
+
+  of_pci_prop_ranges
+    res = &pdev->resource[...];
+    for (j = 0; j < num; j++) {
+      val64 = res[j].start;
+      of_pci_set_address(..., val64, 0, flags, false);
+ +      if (OF_PCI_ADDR_SPACE_MEM64)
+ +        prop[1] = upper_32_bits(val64);
+ +      else
+ +        prop[1] = 0;
+
+OF_PCI_ADDR_SPACE_MEM64 tells us about the size of the PCI bus
+address, but the address (val64) is a CPU physical address, not a PCI
+bus address, so I don't understand why of_pci_set_address() should use
+OF_PCI_ADDR_SPACE_MEM64 to clear part of the CPU address.
+
+Add blank lines between paragraphs.
+
+> This could cause mapping translation mismatch on PCI devices (e.g. RP1)
+> that are expected to be addressed with a 64 bit address while advertising
+> a 32 bit address in the PCI config region.
+> Add a check in of_pci_set_address() to set upper 32 bits to zero in case
+> the address has no 64 bit flag set.
+
+Is this an indication of a DT error?  Have you seen this cause a
+problem?  If so, what does it look like to a user?  I.e., how could a
+user find this patch if they saw a problem?
+
+> Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
+> ---
+>  drivers/pci/of_property.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/pci/of_property.c b/drivers/pci/of_property.c
+> index 5a0b98e69795..77865facdb4a 100644
+> --- a/drivers/pci/of_property.c
+> +++ b/drivers/pci/of_property.c
+> @@ -60,7 +60,10 @@ static void of_pci_set_address(struct pci_dev *pdev, u32 *prop, u64 addr,
+>  	prop[0] |= flags | reg_num;
+>  	if (!reloc) {
+>  		prop[0] |= OF_PCI_ADDR_FIELD_NONRELOC;
+> -		prop[1] = upper_32_bits(addr);
+> +		if (FIELD_GET(OF_PCI_ADDR_FIELD_SS, flags) == OF_PCI_ADDR_SPACE_MEM64)
+> +			prop[1] = upper_32_bits(addr);
+> +		else
+> +			prop[1] = 0;
+>  		prop[2] = lower_32_bits(addr);
+>  	}
+>  }
+> -- 
+> 2.35.3
+> 
 
