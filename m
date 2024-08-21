@@ -1,83 +1,88 @@
-Return-Path: <netdev+bounces-120499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5808295998E
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:21:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B4D9599B5
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:26:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A9B11C20FE9
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:21:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C62E41C20491
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 11:26:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F0120B32C;
-	Wed, 21 Aug 2024 10:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F9521B5EDF;
+	Wed, 21 Aug 2024 10:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pF5kJcJY"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="xWNhkNn6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-bc0f.mail.infomaniak.ch (smtp-bc0f.mail.infomaniak.ch [45.157.188.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE0620B326;
-	Wed, 21 Aug 2024 10:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BE42111D6
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 10:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724234728; cv=none; b=ZyaTL43/kNa+IIrPw+bxWZygIT3+pym11jFaDn9VRJDtC+i5d/2oa8X+FhusypjFU9tbHehuPFwmGkPcvZZNtkNjOcenzfPl8ZvTV2ISLA16VmHpJ2rIYHfwlRK7dO5GgJD+VgVoLG/7iZVeMpRWF7IHhPmzOTFA4jOSAWSli+U=
+	t=1724235225; cv=none; b=MNHF9uk2nElnEmgvWO7xVNG3YgqYAIRjld372EK+4lsptPj3n29dNQVEKtf5VjlV3mTsOqGyhGI3lYD46XXLevDqWjyn10PNbm8tOpYZ9jwSvZwDOdPHiDbsxpIp3R/HzWRbM95pfqSwyDEq/voJM+rWIYY0Aiw9Ffsdsdj0mHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724234728; c=relaxed/simple;
-	bh=Hqr8Mm8YpR3FTexCXxW6pfgLn7A4XKa4y4ZPd83+qXQ=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=dBdGirLKpxi1+7wvLz0eRQnsBU3CpOpqmwJKipVsiCyFJVdOXUag73j5iwE1eOFAz7Y3F3zK7qb2GewnVeUfkPhxg+dIP8QQf04zeiqbQJNeeNAIp+MAb7c5yUqhrfHI+YZoQuw0akJ5yvFWdbpfAevNToLwK1y90CSRRommpAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pF5kJcJY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D5C8C32782;
-	Wed, 21 Aug 2024 10:05:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724234727;
-	bh=Hqr8Mm8YpR3FTexCXxW6pfgLn7A4XKa4y4ZPd83+qXQ=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=pF5kJcJYqTsm/4MCgcdJqMGcuFcS1vZx7xdLXTevJW1h/dpDATmSmSuuIdDZEWdVH
-	 8H4wsmwGcFJgHr9meB907n3WPsbb/kxah+ipnAVMzaVv498PYXhW/gRRsUrPWbVAxi
-	 u7mb63tiwFLV72ea5Ak01cEFxzy+ltlrW+LXEAYEtQpRirY6fNE8OnrTghAlv2vLSE
-	 t5STre/3L0FapyGqrL8YkI2RaMTHM7UVAWocziPzAVJkIHWJDlUKchbV57nxObdJRl
-	 n5VxgSXOdXtYE/CDJMTRf4F8SOCeGyR5bk9ox+zbzolZq/pxXB05Z8jKKTNevk7s5O
-	 TOvncUlNeAA0A==
-From: Kalle Valo <kvalo@kernel.org>
-To: Yu Jiaoliang <yujiaoliang@vivo.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,  "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  opensource.kernel@vivo.com
-Subject: Re: [PATCH v1] net: wireless: Use kmemdup_array instead of kmemdup
- for multiple allocation
-References: <20240821072410.4065645-1-yujiaoliang@vivo.com>
-Date: Wed, 21 Aug 2024 13:05:23 +0300
-In-Reply-To: <20240821072410.4065645-1-yujiaoliang@vivo.com> (Yu Jiaoliang's
-	message of "Wed, 21 Aug 2024 15:24:10 +0800")
-Message-ID: <87ed6igpi4.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1724235225; c=relaxed/simple;
+	bh=FoTolnMxIcYfhIWfLyGYqLu9gydImlghdFwJAaptLvw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O2YCK8aHA8ZYGCcgIdVtPwkgjeeklRxpuuj7bdW/dpGtCrs9/6uWy4Dgsfd5hR1aNez2ngGn1W8AwfbQrkORO7fAGRTy24uOLMkFg+bDbNEuq0bEfC9LSfdz5zxI8mi4brjm56/3WVUxa+dPw+TaDyawF48PJiidQSarP2PTgeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=xWNhkNn6; arc=none smtp.client-ip=45.157.188.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WphxV1M4Vz6wt;
+	Wed, 21 Aug 2024 12:13:34 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1724235214;
+	bh=PIbYf2E6OPhrBU4LYZ5NlLv0ePo6bVAkYtdfPLo1FhI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=xWNhkNn6ovuKiW3U8C83BrwS0PTUyzVTuxPglAQOyRsNc7ZSch0dB/BCSAT/HAJ69
+	 j/lxa7hNNN1sfDNojR6UiQqNInBpVW2XtqMgc6orV0e7MiZWhABgliT/jEZz9m1zr1
+	 Ym98BOHgFnzOMUzI+dztKsYSQiceabnxuF39jEpo=
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4WphxT19jVzrPb;
+	Wed, 21 Aug 2024 12:13:33 +0200 (CEST)
+Date: Wed, 21 Aug 2024 12:13:28 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 2/6] Landlock: Adding file_send_sigiotask signal
+ scoping support
+Message-ID: <20240821.oBeepeel9ir1@digikod.net>
+References: <cover.1723680305.git.fahimitahera@gmail.com>
+ <d04bc943e8d275e8d00bb7742bcdbabc7913abbe.1723680305.git.fahimitahera@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d04bc943e8d275e8d00bb7742bcdbabc7913abbe.1723680305.git.fahimitahera@gmail.com>
+X-Infomaniak-Routing: alpha
 
-Yu Jiaoliang <yujiaoliang@vivo.com> writes:
-
-> Let the kememdup_array() take care about multiplication and possible
-> overflows.
->
-> Signed-off-by: Yu Jiaoliang <yujiaoliang@vivo.com>
+On Thu, Aug 15, 2024 at 12:29:21PM -0600, Tahera Fahimi wrote:
+> This patch adds two new hooks "hook_file_set_fowner" and
+> "hook_file_free_security" to set and release a pointer to the
+> domain of the file owner. This pointer "fown_domain" in
+> "landlock_file_security" will be used in "file_send_sigiotask"
+> to check if the process can send a signal.
+> 
+> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
 > ---
->  net/wireless/util.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  security/landlock/fs.c   | 18 ++++++++++++++++++
+>  security/landlock/fs.h   |  6 ++++++
+>  security/landlock/task.c | 27 +++++++++++++++++++++++++++
+>  3 files changed, 51 insertions(+)
 
-The title prefix should be "wifi: cfg80211:".
+Please squash this patch with the previous one, both are enforcing the
+signal scoping restriction with LANDLOCK_SCOPED_SIGNAL.
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+You'll also need to update the scoped_test.c file with
+LANDLOCK_SCOPED_SIGNAL (in this same squashed patch).
 
