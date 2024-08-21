@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-120685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEF1E95A35A
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 19:01:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D49995A36D
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 19:03:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9835728397F
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:01:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 413D01C22782
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1762D1B2503;
-	Wed, 21 Aug 2024 17:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5D71B2ED4;
+	Wed, 21 Aug 2024 17:02:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ey0bjA0s"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ggrxP9aL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CBDB192587
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 17:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA73D1B253C
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 17:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724259697; cv=none; b=ExCVvkltMGNSIZMO4COWbGPoAN8plrTH6xwxXM5s4OcJK77sFyscbrW3nsRnikyp/08VPCvdYzWMn1WnmAZkCLHCfUzfLmf0H4VpJXkqsdkgCgToQal6MmAWK5CZGssQX5Bka1hRhpdWGs9AH45rvKpogQ2AMzLxzMRF0P/yEXI=
+	t=1724259769; cv=none; b=KmcZmN+1dluNIVAPsQIq/uSG31pYS/XunfKkGZMxkRHd3skPl6H6G9xdMVXTezDxWZ/omPxqpzmdrqwVZJzyhiI7wEJ/YDcqd6hmHiaNzwtkzFivuenJJU7ApCirqdQ/YhoaBitaPBIJusuPEMFZ+YgWZtOVPO0ONu7JpP4Ew0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724259697; c=relaxed/simple;
-	bh=4dYtH4U31qHxoWZiCOzczVFUvv/JyGm+NnF5gYr0p1Y=;
+	s=arc-20240116; t=1724259769; c=relaxed/simple;
+	bh=cw9bJs+xqcXZNyScXsvQUU+pqCUtxyq+6IrvkmMyU6E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=ndNKVvfixCcqNW4yx/QJ3n/USYj16WxtwGn4Qm9FgKvp/2hlzlijgCmcgdImy3Pf5gLwLjaoqMqlvQvZQmaJJjhTyFFaZESKOw740AAZpvWNLO+X/RHpcFfQG0OVmrQP13pprIsThuSdERsY7XwaOkdhA5H+Kv24m8agbUFjjeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ey0bjA0s; arc=none smtp.client-ip=209.85.219.42
+	 In-Reply-To:Content-Type; b=nIpjzsJoes4TMFUXoa/97p604kTkXqsm7055K1NlG8iMGRWCgK5QSQqn1Yfau6eXkJ3wAdOWmNFVkz6fB7E3bMW+qDAIYa19wtF00bbQQ0vxD3IulDk6Kn8Ehi564ByfTPK7rDQytBJdQELUxhwc9w8M/PY5dnznJRQvgmzjiTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ggrxP9aL; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6bf84c3d043so27377556d6.3
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 10:01:34 -0700 (PDT)
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6bf7a2035d9so9817446d6.1
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 10:02:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1724259693; x=1724864493; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1724259765; x=1724864565; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:to:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=exJT+ZV4yPGmtBlC0PJbj8K2B4aeAUj4JcsLcu7ZSHg=;
-        b=ey0bjA0sRfbduofEwpU8qiyE9plWOyfAppQo/frEV1wYfbbe+/Jf5VuCBydcFm+M4q
-         uQKZWiOZrP4wu1VMTsRufGrfkprgGl3OryDuJMIqe4GC2JGxHZyxzqfw1WD1/cmhllww
-         6wMo8MVtOdR1u4cv2pWIwOW/1D+qTiNmKG5+I=
+        bh=Sq94Qm6ZPacZgTXtsJjDDEhseS8HiVRXtfMMRotZvfU=;
+        b=ggrxP9aLya+MJwLZs6ACvxgNh1Gt01v+KxYZoLSOdFDHL3PBUJBVS0MH0PDdjG4pvF
+         Qh5Wg8Go0HIOznRXa8bwris+kjebvpwzuV8SxUkQS1iBRxrfgJ0Rz/j9buID+oPJstUT
+         Jcq2KYmxSQCsBWMhD/cbfqplZa5vfe4rRr84w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724259693; x=1724864493;
+        d=1e100.net; s=20230601; t=1724259765; x=1724864565;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=exJT+ZV4yPGmtBlC0PJbj8K2B4aeAUj4JcsLcu7ZSHg=;
-        b=JUxl1+SQ4+BjGWVBh+LsaZ0/7chcdUNgLr4lKEza9LfkjKN71f7hb5GKu/N0ERkvcK
-         jThYsjghMmQc1/v40LMt+uUKF9hhzWgK9QYuYH5dmH0fRGd0qreQU1W7zd0zI7dsZQQ1
-         ORJAGLuHqu/LWvsyBwWKsitrxfH28O1dn2JTRm9RSy98odM73oN/dX7Q5m33ri/MsWEZ
-         fslsobS8TI6fbJTpHlU6E0G+vmwug919FOTekWca/w6RlEqoukeaYyz45sQIuVEGbIQS
-         abn/yz1UZ3A1E2S/WAcq1RwZSWzDLe+jfF5GMzviRwu4h1WGWwzo4Ycy6POua/5KWIdZ
-         Kwcg==
-X-Forwarded-Encrypted: i=1; AJvYcCX/t9f7cSuJTd7+eDOTyCtpDHGMmxRSGy2+UVZ83f+SSdThUgHWA5mk1HIDebtC9DCqrSmh8mk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKQ9xqmWcFFOPkRVwrPEjOLIWyE52jGZU3D8neTQkm/vEuR0wT
-	Q3k3PuX/MlJWNCgpOA+ipTneku/AteWKSKApAiY16GwIuPXTI7WehUNKF6qkBA==
-X-Google-Smtp-Source: AGHT+IEcf5j9ZU2KA/mfYlqLlBtTaasVuWTNEJvsSLdgOYVrSFlA0Ol5aqfVqe99xcRCOICKogXkvA==
-X-Received: by 2002:a05:6214:3c9d:b0:6bf:9aa5:c3b0 with SMTP id 6a1803df08f44-6c155dbb500mr36517976d6.33.1724259693005;
-        Wed, 21 Aug 2024 10:01:33 -0700 (PDT)
+        bh=Sq94Qm6ZPacZgTXtsJjDDEhseS8HiVRXtfMMRotZvfU=;
+        b=ujvtTGLZslOFEY1jQoqsrxdnlj8vuz0Z5nHjeILVPcCJLs9gWU+iObRmBMAEOp6RlX
+         cLijE+aBXyBo5Kka3ySHRJwR7bHoscAxt9LMkyqv/1L+KbHThL8BcT42aIy/5M5RDLYH
+         vE3c2aYiNATkg+Mhwd5VARRzIYpVnywgLVttyHFtt6AcU5vzra6QSZp7cqX6qTDAxnAT
+         DJkY8wA8qVT8vALVdzWnksG9thywue2sfJXEYcOj7zGvNZqcbRCu80jIJvOb3khg7eoD
+         h0lm2hqocjrS5RfkP7XpsFRe8uL1vTkne4C6Ueu3n4LtJzF/KBsPGfLTAI9SqAntaOyz
+         Su2A==
+X-Forwarded-Encrypted: i=1; AJvYcCVXJ4fF6bGAnh4Vb/k1kM9zL0/XOVMsa5KPSicidIi12t2v1GQ3sqMaTXQ5cqN4k+3vWnZ0OYA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9N8/2+E15bAfBEQP0ng2GXoB1B7YsZms71MtljxUtu51VXkAf
+	ykfUC+SvT4aBi+uxf/jWIDkuhs+wdqPOfeL+9p2pGdJJ5axauuL653wL8iKjvg==
+X-Google-Smtp-Source: AGHT+IEjxwxYxIEnylwCzeT1GUQ7/N5LveBGkYrCmL/PzJnTVxIVH/b8mImwCW+ynbJrXjzvA/Ti0Q==
+X-Received: by 2002:a05:6214:428e:b0:6b5:d95c:692d with SMTP id 6a1803df08f44-6c160c6de82mr5740656d6.13.1724259764561;
+        Wed, 21 Aug 2024 10:02:44 -0700 (PDT)
 Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fe1bb00sm63540126d6.55.2024.08.21.10.01.28
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fe4fc98sm63388126d6.71.2024.08.21.10.02.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Aug 2024 10:01:32 -0700 (PDT)
-Message-ID: <c0b904d8-073d-47ec-9466-28ae3a212dac@broadcom.com>
-Date: Wed, 21 Aug 2024 10:01:26 -0700
+        Wed, 21 Aug 2024 10:02:43 -0700 (PDT)
+Message-ID: <e442c254-6bd1-4724-83f7-e3690d756ac4@broadcom.com>
+Date: Wed, 21 Aug 2024 10:02:39 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,7 +74,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 10/11] net: macb: Add support for RP1's MACB variant
+Subject: Re: [PATCH 11/11] arm64: dts: rp1: Add support for MACB contained in
+ RP1
 To: Andrea della Porta <andrea.porta@suse.com>,
  Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
  <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -99,7 +100,7 @@ To: Andrea della Porta <andrea.porta@suse.com>,
  linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>,
  Andrew Lunn <andrew@lunn.ch>, Stefan Wahren <wahrenst@gmx.net>
 References: <cover.1724159867.git.andrea.porta@suse.com>
- <775000dfb3a35bc691010072942253cb022750e1.1724159867.git.andrea.porta@suse.com>
+ <a3fde99c2e522ef1fbf4e4bb125bc1d97a715eaf.1724159867.git.andrea.porta@suse.com>
 Content-Language: en-US
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -134,87 +135,52 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <775000dfb3a35bc691010072942253cb022750e1.1724159867.git.andrea.porta@suse.com>
+In-Reply-To: <a3fde99c2e522ef1fbf4e4bb125bc1d97a715eaf.1724159867.git.andrea.porta@suse.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 8/20/24 07:36, Andrea della Porta wrote:
-> RaspberryPi RP1 contains Cadence's MACB core. Implement the
-> changes to be able to operate the customization in the RP1.
+> RaspberryPi RP1 is multi function PCI endpoint device that
+> exposes several subperipherals via PCI BAR.
+> Add an ethernet node for Cadence MACB to the RP1 dtso
 > 
 > Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
-
-You are doing a lot of things, all at once, and you should consider 
-extracting your change into a smaller subset with bug fixes first:
-
-- one commit which writes to the RBQPH the upper 32-bits of the RX ring 
-DMA address, that looks like a bug fix
-
-- one commit which retriggers a buffer read, even though that appears to 
-be RP1 specific maybe, if not, then this is also a bug fix
-
-- one commit that adds support for macb_shutdown() to kill DMA operations
-
-- one commit which adds support for a configurable PHY reset line + 
-delay specified in milli seconds
-
-- one commit which adds support for controling the interrupt coalescing 
-settings
-
-And then you can add all of the RP1 specific bits like the AXI bridge 
-configuration.
-
-[snip]
-
-> @@ -1228,6 +1246,7 @@ struct macb_queue {
->   	dma_addr_t		tx_ring_dma;
->   	struct work_struct	tx_error_task;
->   	bool			txubr_pending;
-> +	bool			tx_pending;
->   	struct napi_struct	napi_tx;
+> ---
+>   arch/arm64/boot/dts/broadcom/rp1.dtso | 23 +++++++++++++++++++++++
+>   1 file changed, 23 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/broadcom/rp1.dtso b/arch/arm64/boot/dts/broadcom/rp1.dtso
+> index d80178a278ee..b40e203c28d5 100644
+> --- a/arch/arm64/boot/dts/broadcom/rp1.dtso
+> +++ b/arch/arm64/boot/dts/broadcom/rp1.dtso
+> @@ -78,6 +78,29 @@ rp1_clocks: clocks@c040018000 {
+>   							       <50000000>;   // RP1_CLK_ETH_TSU
+>   				};
 >   
->   	dma_addr_t		rx_ring_dma;
-> @@ -1293,9 +1312,15 @@ struct macb {
->   
->   	u32			caps;
->   	unsigned int		dma_burst_length;
-> +	u8			aw2w_max_pipe;
-> +	u8			ar2r_max_pipe;
-> +	bool			use_aw2b_fill;
->   
->   	phy_interface_t		phy_interface;
->   
-> +	struct gpio_desc	*phy_reset_gpio;
-> +	int			phy_reset_ms;
-
-The delay cannot be negative, so this needs to be unsigned int.
-
+> +				rp1_eth: ethernet@c040100000 {
+> +					reg = <0xc0 0x40100000  0x0 0x4000>;
+> +					compatible = "cdns,macb";
+> +					#address-cells = <1>;
+> +					#size-cells = <0>;
+> +					interrupts = <RP1_INT_ETH IRQ_TYPE_LEVEL_HIGH>;
+> +					clocks = <&macb_pclk &macb_hclk &rp1_clocks RP1_CLK_ETH_TSU>;
+> +					clock-names = "pclk", "hclk", "tsu_clk";
+> +					phy-mode = "rgmii-id";
+> +					cdns,aw2w-max-pipe = /bits/ 8 <8>;
+> +					cdns,ar2r-max-pipe = /bits/ 8 <8>;
+> +					cdns,use-aw2b-fill;
+> +					local-mac-address = [00 00 00 00 00 00];
+> +					phy-handle = <&phy1>;
+> +					phy-reset-gpios = <&rp1_gpio 32 GPIO_ACTIVE_LOW>;
+> +					phy-reset-duration = <5>;
 > +
->   	/* AT91RM9200 transmit queue (1 on wire + 1 queued) */
->   	struct macb_tx_skb	rm9200_txq[2];
->   	unsigned int		max_tx_length;
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 11665be3a22c..5eb5be6c96fc 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -41,6 +41,9 @@
->   #include <linux/inetdevice.h>
->   #include "macb.h"
->   
-> +static unsigned int txdelay = 35;
-> +module_param(txdelay, uint, 0644);
-> +
->   /* This structure is only used for MACB on SiFive FU540 devices */
->   struct sifive_fu540_macb_mgmt {
->   	void __iomem *reg;
-> @@ -334,7 +337,7 @@ static int macb_mdio_wait_for_idle(struct macb *bp)
->   	u32 val;
->   
->   	return readx_poll_timeout(MACB_READ_NSR, bp, val, val & MACB_BIT(IDLE),
-> -				  1, MACB_MDIO_TIMEOUT);
-> +				  100, MACB_MDIO_TIMEOUT);
+> +					phy1: ethernet-phy@1 {
+> +						reg = <0x1>;
+> +						brcm,powerdown-enable;
 
-Why do we need to increase how frequently we poll?
+Undocumented property, and I would like to understand why this needs to 
+be specified in the Device Tree? What model of Broadcom Ethernet PHY is 
+being used here?
 -- 
 Florian
 
