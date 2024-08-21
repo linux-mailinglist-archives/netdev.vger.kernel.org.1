@@ -1,137 +1,76 @@
-Return-Path: <netdev+bounces-120639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41C4195A0F6
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:08:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A59ED95A0FB
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:09:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADAD3B22B0F
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:08:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 045ACB238A6
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7811509BF;
-	Wed, 21 Aug 2024 15:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C97A137745;
+	Wed, 21 Aug 2024 15:08:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nivJkfJR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jaQ9bkDk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4003C14F9F3;
-	Wed, 21 Aug 2024 15:07:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2179184E1C;
+	Wed, 21 Aug 2024 15:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724252845; cv=none; b=qkSQ8Al3dCC+25MKuw7dXfXPYQEep9+UFTFKyi8WKssRrQ3e7rBZ6hnLCVoc5H3nwdAi9FTWEAULmWNLCgaocPnGfD+ZFUWvaxH+RJjwbA56LpzRQrlFH2jAJ4h+7DtBcyd106emafvHeKq4fCDYvbij7q0UdqBS84z9jqj/fk0=
+	t=1724252892; cv=none; b=juXCUM6kIXwt59o5f+HRTPj0ODsB0LD8OTk58MA0ng8LQjtg+YRMZqYiQGN2SOUYlPXLjzEaekHHTuZ2YLQT945fsKNw4FOrjFMklHiKZ+JyGjzti9CDNGpLlINJ4gGA6jgzhhHRMN4MG1O08BZbSIoOpQ/RySbZDG75Ok6JUZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724252845; c=relaxed/simple;
-	bh=RoRCl78B5Ks92FPLjbrr4f1STYis5azWa+kZVz2AHyQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j/7y4m0mBh/wBpjVwSIabJU+bK/PbOrHONLBnbce+JuIBrgl4S50eXuqFPXexLXRBWV1Et8vY04x5VoJKnZC2G7/zxeka+koahmbUtDACXZxsbposMp8tO7Whye4yuvws26LzaZMu6XetqENFIH8p1PwXctR4Ejaif+GW6tsGvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nivJkfJR; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724252844; x=1755788844;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=RoRCl78B5Ks92FPLjbrr4f1STYis5azWa+kZVz2AHyQ=;
-  b=nivJkfJRwKxvOpBNeJciEte10F6tXECzw6wHiu94Fh2BpciokbO7/tou
-   2E3veDiJ1WF3yBdBnyZvdDYYNhKQI0zNwcEGbxVzHO2WwauWO+PlrseKI
-   fHSjd44PMsZTZ9PpUmO5T0zq6Mj19QszOb3bH44jlngWJBWhxjBRUIGSh
-   QAjfz5dGXqza+EbhKReJnPuUcIYyOCZm+7lZjGcwyIXvNA5I27sbRhcay
-   UUwKU9nql59kn08Ma30F1TRPE5n5Psxchz7l3h5iUZj70jHrxxzpRmyVB
-   /1bdgb07Kj+Zb8/wiEIx08IW6QyjdbZTxbuG2BlIiyApwj4hV8bASyAc7
-   g==;
-X-CSE-ConnectionGUID: guTCYLZlS+q4WKGL4O9Oww==
-X-CSE-MsgGUID: 1v9HumtmT2iPo3Q3AvpsYg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="22769286"
-X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="22769286"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 08:07:24 -0700
-X-CSE-ConnectionGUID: E2x1m2CUTxyWF0MvSS4K8Q==
-X-CSE-MsgGUID: 19n4qB/FQ7+A2mSJrZFEfg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="84291280"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa002.fm.intel.com with ESMTP; 21 Aug 2024 08:07:21 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 6/6] netdev_features: remove NETIF_F_ALL_FCOE
-Date: Wed, 21 Aug 2024 17:07:00 +0200
-Message-ID: <20240821150700.1760518-7-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240821150700.1760518-1-aleksander.lobakin@intel.com>
-References: <20240821150700.1760518-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1724252892; c=relaxed/simple;
+	bh=2leKkclemGUqO8l2N7G3iOV1WlTVVLsk21MWQfXZYhE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KLu7OxJm7SVxIIDr6iG8Nk1Of3fI9lqKUJ2aPxQxab34eScJLfE8zMaR3K6thmNimwZN7aA2SU1JtWV0EdYMFafxM75GWtoQdv/gd2PT+lCOq2y5KILhQFDSQfInqFIIBtYqXVI1BNHkd9CxdOGNmu7UfE5V9BTYs43gxUaAXRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jaQ9bkDk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B4EAC32781;
+	Wed, 21 Aug 2024 15:08:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724252891;
+	bh=2leKkclemGUqO8l2N7G3iOV1WlTVVLsk21MWQfXZYhE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jaQ9bkDkh9Fc1XzcIKpgF2fSVfdm6/DR5s5aZTDvipkQcdb7wvYRyJnfOUrd+JlB5
+	 vB2di9aPicz5yEqTGx04JEgbAoV/mmnXjG1qsPnPlGC3ji2CxGVDrXQZ1HBgW0/+/b
+	 TYCIpWlWX4JHrksLCRZjdaqN7CezkxHWH9wvJz9znm38yebGj/RmfRG4KhtvaUUAVk
+	 A9fWUvV+vBUg6uT6fwztf31FlvmaPrUqjzl+WQOIg/BPM+OuqzX9vYJgposDii0eje
+	 gXyV9keiGvzd6LyfbW5Xvwdzk/3al1g0VlC8d+MNJDcWpbhVH6SwfgoypitkLqOqGk
+	 nQGtDjNaAM5bQ==
+Date: Wed, 21 Aug 2024 16:08:07 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yu Jiaoliang <yujiaoliang@vivo.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Louis Peens <louis.peens@corigine.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	bpf@vger.kernel.org, oss-drivers@corigine.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	opensource.kernel@vivo.com
+Subject: Re: [PATCH v1] nfp: bpf: Use kmemdup_array instead of kmemdup for
+ multiple allocation
+Message-ID: <20240821150807.GC2164@kernel.org>
+References: <20240821081447.12430-1-yujiaoliang@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240821081447.12430-1-yujiaoliang@vivo.com>
 
-NETIF_F_ALL_FCOE is used only in vlan_dev.c, 2 times. Now that it's only
-2 bits, open-code it and remove the definition from netdev_features.h.
+On Wed, Aug 21, 2024 at 04:14:45PM +0800, Yu Jiaoliang wrote:
+> Let the kememdup_array() take care about multiplication and possible
+> overflows.
+> 
+> Signed-off-by: Yu Jiaoliang <yujiaoliang@vivo.com>
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/linux/netdev_features.h | 2 --
- net/8021q/vlan_dev.c            | 5 +++--
- 2 files changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/include/linux/netdev_features.h b/include/linux/netdev_features.h
-index 1e9c4da181af..e41cd8af2a72 100644
---- a/include/linux/netdev_features.h
-+++ b/include/linux/netdev_features.h
-@@ -205,8 +205,6 @@ static inline int find_next_netdev_feature(u64 feature, unsigned long start)
- #define NETIF_F_ALL_TSO 	(NETIF_F_TSO | NETIF_F_TSO6 | \
- 				 NETIF_F_TSO_ECN | NETIF_F_TSO_MANGLEID)
- 
--#define NETIF_F_ALL_FCOE	(NETIF_F_FCOE_CRC | NETIF_F_FSO)
--
- /* List of features with software fallbacks. */
- #define NETIF_F_GSO_SOFTWARE	(NETIF_F_ALL_TSO | NETIF_F_GSO_SCTP |	     \
- 				 NETIF_F_GSO_UDP_L4 | NETIF_F_GSO_FRAGLIST)
-diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
-index 09b46b057ab2..458040e8a0e0 100644
---- a/net/8021q/vlan_dev.c
-+++ b/net/8021q/vlan_dev.c
-@@ -564,7 +564,7 @@ static int vlan_dev_init(struct net_device *dev)
- 			   NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE |
- 			   NETIF_F_GSO_ENCAP_ALL |
- 			   NETIF_F_HIGHDMA | NETIF_F_SCTP_CRC |
--			   NETIF_F_ALL_FCOE;
-+			   NETIF_F_FCOE_CRC | NETIF_F_FSO;
- 
- 	if (real_dev->vlan_features & NETIF_F_HW_MACSEC)
- 		dev->hw_features |= NETIF_F_HW_MACSEC;
-@@ -576,7 +576,8 @@ static int vlan_dev_init(struct net_device *dev)
- 	if (dev->features & NETIF_F_VLAN_FEATURES)
- 		netdev_warn(real_dev, "VLAN features are set incorrectly.  Q-in-Q configurations may not work correctly.\n");
- 
--	dev->vlan_features = real_dev->vlan_features & ~NETIF_F_ALL_FCOE;
-+	dev->vlan_features = real_dev->vlan_features &
-+			     ~(NETIF_F_FCOE_CRC | NETIF_F_FSO);
- 	dev->hw_enc_features = vlan_tnl_features(real_dev);
- 	dev->mpls_features = real_dev->mpls_features;
- 
--- 
-2.46.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
