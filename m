@@ -1,150 +1,201 @@
-Return-Path: <netdev+bounces-120414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E63D9593AC
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 06:39:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2F3A9593B4
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 06:45:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A89E11C214E3
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 04:39:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D79371C213CE
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 04:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127EC15C155;
-	Wed, 21 Aug 2024 04:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SFlLuMoI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4BB05588F;
+	Wed, 21 Aug 2024 04:45:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395352595;
-	Wed, 21 Aug 2024 04:39:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8E72B9B7
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 04:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724215186; cv=none; b=fRXEwcrTGhL/ycm6n0pVb1CCZnrYOcoh1deq2+QJ7XYMcuRxC6kecc3ypMshLUwLMKbyAiYuLdxw++ZKyb+wOagpcxDlUYBGmxOWCReeWJO0USyq/QvUc6PXGSpkLon7pMtMZeo08tKsiqJIqVWqfZQra32s6afxDN4Z2sFJHZU=
+	t=1724215554; cv=none; b=I3tXbwq8mrbriQE+wFpn6EmPOWbKichdZ00XAP5tHTYTNBzHfdtQT/Jj4+g/wNKskj0pzTYRTOI/dKrrVUSPmb6JCxEk30HhcD/tX6wuQLCtOwsoAF5yYROgkFlj+C6E7kkUNZGF/tpIO9mlmDptP4NKTqUw+JVZXvB8JOTFHrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724215186; c=relaxed/simple;
-	bh=iblUkJxanWGILUKaRtQu5idozKXjAqVYHifOo13K5MQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=gn783G+XGo+L7z5e3OIwY14AVzVOlNn9P0gBzV74IbT7b6tYhpLPAHJOfSvzl6e0bvcTzWpNcPaUtDR321ZeQClA/go3I8pAy3I9dfFO+eC/GmPF+2zQBz4lS1a2YxqQqYqgy1T0/DJdkzWG3voNBRWQQBn/pVO9JpQ9brdPNIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SFlLuMoI; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47KCq6FM012303;
-	Wed, 21 Aug 2024 04:39:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	XhTx2fIZlXWfUT9RtsgapcfXkgnD78yN9Y4uwLvc6LY=; b=SFlLuMoIcMrN0B3+
-	akbPCFU0vYc2TbEl69ZYJtoneCjrEWMM4IJkKZ2Ypcy3Mgw77JW0fG6elmpI22aa
-	rF21luPBpps+ywo9mUeweJv7eKCG6ceOqIaFWywBUyqOrBMPviR5iq15+OMEIeld
-	gw90UbCcX+gTNziAZ7ON8N5MqDY06JDIBOpelEw9tHwaR2Vl7/QrIk1VqRaNczsg
-	GTrDpy4Mrvxd4sDmYJYFps+qQhBIfd6tR/5S8IgkWmH3bNW6o14A0W/FeMXCXfr0
-	O97dV1QSI8od/+07aefqEDnw7K/upr4JTGvhii+NW8nzqfj5MxgjHz3hcqMTqjqF
-	byoOvg==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 414uh8svm7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 04:39:39 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47L4dcQo022094
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 04:39:38 GMT
-Received: from [10.216.8.12] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 20 Aug
- 2024 21:39:33 -0700
-Message-ID: <7ca8aec5-b330-4ece-a0b3-895f3a1f6ba2@quicinc.com>
-Date: Wed, 21 Aug 2024 10:09:30 +0530
+	s=arc-20240116; t=1724215554; c=relaxed/simple;
+	bh=jZz3LWN68RnPgIUqgxrVPxpg+fdNLalxNbimRc3RCE0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cRAvhxId4WGOu8uCO5ZpuTq6p4wg4pokyL9kSS+C9J5aP0I4hGvINmdQ+8zvNiC6SI7gTRWWgHIN7lOUh2a7zwUDoq86yJJrF8D/E120xnwb7tEcvYXXMHm+B3v04di8LPV0jo0Veg9dWSLeWmlUQcbScw8o8molGb/B3i2KClw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sgdDu-00077x-HS; Wed, 21 Aug 2024 06:45:30 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sgdDs-001vi2-ME; Wed, 21 Aug 2024 06:45:28 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sgdDs-00FNkZ-1l;
+	Wed, 21 Aug 2024 06:45:28 +0200
+Date: Wed, 21 Aug 2024 06:45:28 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kyle Swenson <kyle.swenson@est.tech>
+Cc: "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/2] net: pse-pd: tps23881: support reset-gpios
+Message-ID: <ZsVw6NkVGNEfS-4R@pengutronix.de>
+References: <20240819190151.93253-1-kyle.swenson@est.tech>
+ <20240819190151.93253-3-kyle.swenson@est.tech>
+ <ZsQ2fuqWkMYwq_kh@pengutronix.de>
+ <ZsUFLDaMdVPQQ98I@p620>
+ <ZsUGbsnkvCr_tyqS@p620>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] clk: qcom: Add support for GCC on QCS8300
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Michael Turquette
-	<mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        "Ajit
- Pandey" <quic_ajipan@quicinc.com>,
-        Taniya Das <quic_tdas@quicinc.com>,
-        Jagadeesh Kona <quic_jkona@quicinc.com>,
-        Satya Priya Kakitapalli
-	<quic_skakitap@quicinc.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-References: <20240820-qcs8300-gcc-v1-0-d81720517a82@quicinc.com>
- <c1dd239f-7b07-4a98-a346-2b6b525dafc4@kernel.org>
- <5011eeb2-61e3-495a-85b3-e7c608340a82@quicinc.com>
- <c6t35o5pnqw25x6gho725qvpgyr6bl2xkpsurq4jtjgii2v5mq@mvdl64azwpz4>
-Content-Language: en-US
-From: Imran Shaik <quic_imrashai@quicinc.com>
-In-Reply-To: <c6t35o5pnqw25x6gho725qvpgyr6bl2xkpsurq4jtjgii2v5mq@mvdl64azwpz4>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: oyLPIS4XooWMu4DNQKunDuYvxqga7tQC
-X-Proofpoint-ORIG-GUID: oyLPIS4XooWMu4DNQKunDuYvxqga7tQC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-21_04,2024-08-19_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 impostorscore=0 mlxscore=0 spamscore=0 phishscore=0
- mlxlogscore=999 bulkscore=0 malwarescore=0 priorityscore=1501
- clxscore=1015 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408210031
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZsUGbsnkvCr_tyqS@p620>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+Hi Kyle,
 
-
-On 8/20/2024 4:32 PM, Krzysztof Kozlowski wrote:
-> On Tue, Aug 20, 2024 at 03:38:39PM +0530, Imran Shaik wrote:
->>
->>
->> On 8/20/2024 3:27 PM, Krzysztof Kozlowski wrote:
->>> On 20/08/2024 11:36, Imran Shaik wrote:
->>>> This series adds the dt-bindings and driver support for GCC on QCS8300 platform.
->>>>
->>>> Please note that this series is dependent on [1] which adds support
->>>> for QCS8275/QCS8300 SoC ID.
->>>>
->>>> [1] https://lore.kernel.org/all/20240814072806.4107079-1-quic_jingyw@quicinc.com/
->>>
->>> How do the depend? What is exactly the dependency?
->>>
->>> If so this cannot be merged...
->>>
->>
->> They are not functionally dependent, but we want to ensure the base QCS8300
->> changes to merge first and then our GCC changes. Hence added the dependency.
+On Tue, Aug 20, 2024 at 09:11:22PM +0000, Kyle Swenson wrote:
+> On Tue, Aug 20, 2024 at 03:06:19PM -0600, Kyle Swenson wrote:
+> > Hi Oleksij,
+> > 
+> > On Tue, Aug 20, 2024 at 08:23:58AM +0200, Oleksij Rempel wrote:
+> > > Hi Kyle,
+> > > 
+> > > thank you for you patch.
+> > Thanks for the review!
+> > > 
+> > > On Mon, Aug 19, 2024 at 07:02:14PM +0000, Kyle Swenson wrote:
+> > > > The TPS23880/1 has an active-low reset pin that some boards connect to
+> > > > the SoC to control when the TPS23880 is pulled out of reset.
+> > > > 
+> > > > Add support for this via a reset-gpios property in the DTS.
+> > > > 
+> > > > Signed-off-by: Kyle Swenson <kyle.swenson@est.tech>
+> > > > ---
+> > > >  drivers/net/pse-pd/tps23881.c | 13 ++++++++++++-
+> > > >  1 file changed, 12 insertions(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
+> > > > index 2ea75686a319..837e1a2119ee 100644
+> > > > --- a/drivers/net/pse-pd/tps23881.c
+> > > > +++ b/drivers/net/pse-pd/tps23881.c
+> > > > @@ -6,16 +6,16 @@
+> > > >   */
+> > > >  
+> > > >  #include <linux/bitfield.h>
+> > > >  #include <linux/delay.h>
+> > > >  #include <linux/firmware.h>
+> > > > +#include <linux/gpio/consumer.h>
+> > > >  #include <linux/i2c.h>
+> > > >  #include <linux/module.h>
+> > > >  #include <linux/of.h>
+> > > >  #include <linux/platform_device.h>
+> > > >  #include <linux/pse-pd/pse.h>
+> > > > -
+> > > 
+> > > No need to remove space here.
+> > 
+> > Sorry about this, somehow I missed this gratuitous diff
+> > 
+> > > 
+> > > >  #define TPS23881_MAX_CHANS 8
+> > > >  
+> > > >  #define TPS23881_REG_PW_STATUS	0x10
+> > > >  #define TPS23881_REG_OP_MODE	0x12
+> > > >  #define TPS23881_OP_MODE_SEMIAUTO	0xaaaa
+> > > > @@ -735,10 +735,11 @@ static int tps23881_flash_sram_fw(struct i2c_client *client)
+> > > >  
+> > > >  static int tps23881_i2c_probe(struct i2c_client *client)
+> > > >  {
+> > > >  	struct device *dev = &client->dev;
+> > > >  	struct tps23881_priv *priv;
+> > > > +	struct gpio_desc *reset;
+> > > >  	int ret;
+> > > >  	u8 val;
+> > > >  
+> > > >  	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
+> > > >  		dev_err(dev, "i2c check functionality failed\n");
+> > > > @@ -747,10 +748,20 @@ static int tps23881_i2c_probe(struct i2c_client *client)
+> > > >  
+> > > >  	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+> > > >  	if (!priv)
+> > > >  		return -ENOMEM;
+> > > >  
+> > > > +	reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_HIGH);
+> > > > +	if (IS_ERR(reset))
+> > > > +		return dev_err_probe(&client->dev, PTR_ERR(reset), "Failed to get reset GPIO\n");
+> > > > +
+> > > > +	if (reset) {
+> > > > +		usleep_range(1000, 10000);
+> > > > +		gpiod_set_value_cansleep(reset, 0); /* De-assert reset */
+> > > > +		usleep_range(1000, 10000);
+> > > 
+> > > According to the datasheet, page 13:
+> > > https://www.ti.com/lit/ds/symlink/tps23880.pdf
+> > > 
+> > > Minimal reset time is 5 microseconds and the delay after power on reset should
+> > > be at least 20 milliseconds. Both sleep values should be corrected.
+> > 
+> > Sounds reasonable, I'll change the first delay to be closer to the 5us
+> > minimum reset time.  I need to review the docs around delays to pick the
+> > correct one for this case.
+> > 
+> > For the 2nd delay, I (now) see the 20ms you're referring to in the datasheet.
+> > 
+> > I was looking at the SRAM programming document
+> > (https://www.ti.com/lit/pdf/SLVAE1) and it indicates we should delay the
 > 
-> This does not work like that, these are different trees, even if they go
-> via Bjorn.
+> Sorry, this is the wrong link.  Let me try again:
 > 
-> Why do you insist on some specific workflow, different than every
-> upstreaming process? What is so special here?
+> https://www.ti.com/lit/pdf/slvae12
 > 
-> If you keep insisting, I will keep disagreeing, because it is not
-> justified and just complicates things unnecessarily.
+> 
+> > SRAM and parity programming by at least 50ms after initial power on.
+> > 
+> > Should we guarantee we meet that 50ms requirement with the 2nd delay or
+> > would you prefer I just meet the 20ms requirement in the datasheet?
 
-My bad, there is no dependency for clock tree actually, just wanted to 
-provide the info that these GCC changes are for the newly defined SoC in 
-the given series link. I will drop the dependency tag in the next series.
+Ah, I see. The easiest way would be to wait 50ms, otherwise we will need
+to do some more code to get this 50ms requirement.
+Please add comments to the code describing the reason for one or another
+delay. And, please use name and revision of documentation you used for this
+choice.
 
-Thanks,
-Imran
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
