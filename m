@@ -1,48 +1,72 @@
-Return-Path: <netdev+bounces-120684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA7C595A355
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 19:00:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEF1E95A35A
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 19:01:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89DDBB20793
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:00:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9835728397F
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865EB16A95A;
-	Wed, 21 Aug 2024 17:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1762D1B2503;
+	Wed, 21 Aug 2024 17:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HPjKreLb"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ey0bjA0s"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EBE13635B;
-	Wed, 21 Aug 2024 17:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CBDB192587
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 17:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724259653; cv=none; b=NhJZoXTrx6GqfqavdF6Go5n4H2Ciiu1Hn11//t57dFbFnC8SAqJjYO9PLH/LEkC8jtJ0YxkZ5cmhSR/loATNHWEndjDhlcODZK+ayNQXqyl4z3HSzvJeM+YEA89Czq1MKJWlUu0CSUFUmKhmBex8xd838r3LJ/Rp7/rKKJ2OQnY=
+	t=1724259697; cv=none; b=ExCVvkltMGNSIZMO4COWbGPoAN8plrTH6xwxXM5s4OcJK77sFyscbrW3nsRnikyp/08VPCvdYzWMn1WnmAZkCLHCfUzfLmf0H4VpJXkqsdkgCgToQal6MmAWK5CZGssQX5Bka1hRhpdWGs9AH45rvKpogQ2AMzLxzMRF0P/yEXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724259653; c=relaxed/simple;
-	bh=XcL10eQguhL9xnQXS2iZsuiQuvqlgs2UmruxJW2VK3g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ig9xMLBHbxawepwgIXHAJsI+qpPK/FnBySvYQLN/zFZjFIXR676XbNkVggUQaeEm8AWLTp4qD8cwRloGeS64KoGxlgp+z+zKkpAM/9UrQ0EHhd0s5XNK2AvRNSccOMCvyeymHf+2aiAtdSLUHVwvfn0uRrmGlPCCDy+//kmOhSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HPjKreLb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4094DC32781;
-	Wed, 21 Aug 2024 17:00:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724259653;
-	bh=XcL10eQguhL9xnQXS2iZsuiQuvqlgs2UmruxJW2VK3g=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HPjKreLbUV7X9kkF0RnKnBnMitV3oZ1WVrfOPXeSMlLwuCbjytOcXyCA9k5Wq45qM
-	 3nrA6NvAJ5TJT8i/3Zn6z8+LamkJc5xmzk/plnOrER8TZdLRHLOOs54AmbK8U/fcrp
-	 LwXBrY0jpMSydC6HoRgacKJ2rOAg8nd0HEzuQQkvLNttGXgCl4zOCtPitA7ShbNM+7
-	 KffRSPVRe4FAwzJwhSg5IqP8+fofn1Enbpta/PSWZIcGjNxKTn9b+qQTJZnu0HPmRI
-	 a5IRqMQ6A+9FURqxXKKYit0Ob298gg5ihxHH/HnMNgaQh+bZNXi1HGX20Kx9KkwJV8
-	 jmWnW4q+Dnpwg==
-Message-ID: <2a382dbb-0f90-4e6b-b8b9-844d93af5edc@kernel.org>
-Date: Wed, 21 Aug 2024 11:00:51 -0600
+	s=arc-20240116; t=1724259697; c=relaxed/simple;
+	bh=4dYtH4U31qHxoWZiCOzczVFUvv/JyGm+NnF5gYr0p1Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ndNKVvfixCcqNW4yx/QJ3n/USYj16WxtwGn4Qm9FgKvp/2hlzlijgCmcgdImy3Pf5gLwLjaoqMqlvQvZQmaJJjhTyFFaZESKOw740AAZpvWNLO+X/RHpcFfQG0OVmrQP13pprIsThuSdERsY7XwaOkdhA5H+Kv24m8agbUFjjeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ey0bjA0s; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6bf84c3d043so27377556d6.3
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 10:01:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1724259693; x=1724864493; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=exJT+ZV4yPGmtBlC0PJbj8K2B4aeAUj4JcsLcu7ZSHg=;
+        b=ey0bjA0sRfbduofEwpU8qiyE9plWOyfAppQo/frEV1wYfbbe+/Jf5VuCBydcFm+M4q
+         uQKZWiOZrP4wu1VMTsRufGrfkprgGl3OryDuJMIqe4GC2JGxHZyxzqfw1WD1/cmhllww
+         6wMo8MVtOdR1u4cv2pWIwOW/1D+qTiNmKG5+I=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724259693; x=1724864493;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=exJT+ZV4yPGmtBlC0PJbj8K2B4aeAUj4JcsLcu7ZSHg=;
+        b=JUxl1+SQ4+BjGWVBh+LsaZ0/7chcdUNgLr4lKEza9LfkjKN71f7hb5GKu/N0ERkvcK
+         jThYsjghMmQc1/v40LMt+uUKF9hhzWgK9QYuYH5dmH0fRGd0qreQU1W7zd0zI7dsZQQ1
+         ORJAGLuHqu/LWvsyBwWKsitrxfH28O1dn2JTRm9RSy98odM73oN/dX7Q5m33ri/MsWEZ
+         fslsobS8TI6fbJTpHlU6E0G+vmwug919FOTekWca/w6RlEqoukeaYyz45sQIuVEGbIQS
+         abn/yz1UZ3A1E2S/WAcq1RwZSWzDLe+jfF5GMzviRwu4h1WGWwzo4Ycy6POua/5KWIdZ
+         Kwcg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/t9f7cSuJTd7+eDOTyCtpDHGMmxRSGy2+UVZ83f+SSdThUgHWA5mk1HIDebtC9DCqrSmh8mk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKQ9xqmWcFFOPkRVwrPEjOLIWyE52jGZU3D8neTQkm/vEuR0wT
+	Q3k3PuX/MlJWNCgpOA+ipTneku/AteWKSKApAiY16GwIuPXTI7WehUNKF6qkBA==
+X-Google-Smtp-Source: AGHT+IEcf5j9ZU2KA/mfYlqLlBtTaasVuWTNEJvsSLdgOYVrSFlA0Ol5aqfVqe99xcRCOICKogXkvA==
+X-Received: by 2002:a05:6214:3c9d:b0:6bf:9aa5:c3b0 with SMTP id 6a1803df08f44-6c155dbb500mr36517976d6.33.1724259693005;
+        Wed, 21 Aug 2024 10:01:33 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6fe1bb00sm63540126d6.55.2024.08.21.10.01.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Aug 2024 10:01:32 -0700 (PDT)
+Message-ID: <c0b904d8-073d-47ec-9466-28ae3a212dac@broadcom.com>
+Date: Wed, 21 Aug 2024 10:01:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,47 +74,148 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/12] Unmask upper DSCP bits - part 1
+Subject: Re: [PATCH 10/11] net: macb: Add support for RP1's MACB variant
+To: Andrea della Porta <andrea.porta@suse.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+ <dragan.cvetic@amd.com>, Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Stefan Wahren <wahrenst@gmx.net>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <775000dfb3a35bc691010072942253cb022750e1.1724159867.git.andrea.porta@suse.com>
 Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, gnault@redhat.com, fw@strlen.de, martin.lau@linux.dev,
- daniel@iogearbox.net, john.fastabend@gmail.com, ast@kernel.org,
- pablo@netfilter.org, kadlec@netfilter.org, willemdebruijn.kernel@gmail.com,
- bpf@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-References: <20240821125251.1571445-1-idosch@nvidia.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240821125251.1571445-1-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <775000dfb3a35bc691010072942253cb022750e1.1724159867.git.andrea.porta@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 8/21/24 6:52 AM, Ido Schimmel wrote:
-> tl;dr - This patchset starts to unmask the upper DSCP bits in the IPv4
-> flow key in preparation for allowing IPv4 FIB rules to match on DSCP. No
-> functional changes are expected.
+On 8/20/24 07:36, Andrea della Porta wrote:
+> RaspberryPi RP1 contains Cadence's MACB core. Implement the
+> changes to be able to operate the customization in the RP1.
 > 
-> The TOS field in the IPv4 flow key ('flowi4_tos') is used during FIB
-> lookup to match against the TOS selector in FIB rules and routes.
-> 
-> It is currently impossible for user space to configure FIB rules that
-> match on the DSCP value as the upper DSCP bits are either masked in the
-> various call sites that initialize the IPv4 flow key or along the path
-> to the FIB core.
-> 
-> In preparation for adding a DSCP selector to IPv4 and IPv6 FIB rules, we
-> need to make sure the entire DSCP value is present in the IPv4 flow key.
-> This patchset starts to unmask the upper DSCP bits in the various places
-> that invoke the core FIB lookup functions directly (patches #1-#7) and
-> in the input route path (patches #8-#12). Future patchsets will do the
-> same in the output route path.
-> 
-> No functional changes are expected as commit 1fa3314c14c6 ("ipv4:
-> Centralize TOS matching") moved the masking of the upper DSCP bits to
-> the core where 'flowi4_tos' is matched against the TOS selector.
-> 
+> Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
 
-for the set:
-Reviewed-by: David Ahern <dsahern@kernel.org>
+You are doing a lot of things, all at once, and you should consider 
+extracting your change into a smaller subset with bug fixes first:
 
+- one commit which writes to the RBQPH the upper 32-bits of the RX ring 
+DMA address, that looks like a bug fix
+
+- one commit which retriggers a buffer read, even though that appears to 
+be RP1 specific maybe, if not, then this is also a bug fix
+
+- one commit that adds support for macb_shutdown() to kill DMA operations
+
+- one commit which adds support for a configurable PHY reset line + 
+delay specified in milli seconds
+
+- one commit which adds support for controling the interrupt coalescing 
+settings
+
+And then you can add all of the RP1 specific bits like the AXI bridge 
+configuration.
+
+[snip]
+
+> @@ -1228,6 +1246,7 @@ struct macb_queue {
+>   	dma_addr_t		tx_ring_dma;
+>   	struct work_struct	tx_error_task;
+>   	bool			txubr_pending;
+> +	bool			tx_pending;
+>   	struct napi_struct	napi_tx;
+>   
+>   	dma_addr_t		rx_ring_dma;
+> @@ -1293,9 +1312,15 @@ struct macb {
+>   
+>   	u32			caps;
+>   	unsigned int		dma_burst_length;
+> +	u8			aw2w_max_pipe;
+> +	u8			ar2r_max_pipe;
+> +	bool			use_aw2b_fill;
+>   
+>   	phy_interface_t		phy_interface;
+>   
+> +	struct gpio_desc	*phy_reset_gpio;
+> +	int			phy_reset_ms;
+
+The delay cannot be negative, so this needs to be unsigned int.
+
+> +
+>   	/* AT91RM9200 transmit queue (1 on wire + 1 queued) */
+>   	struct macb_tx_skb	rm9200_txq[2];
+>   	unsigned int		max_tx_length;
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 11665be3a22c..5eb5be6c96fc 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -41,6 +41,9 @@
+>   #include <linux/inetdevice.h>
+>   #include "macb.h"
+>   
+> +static unsigned int txdelay = 35;
+> +module_param(txdelay, uint, 0644);
+> +
+>   /* This structure is only used for MACB on SiFive FU540 devices */
+>   struct sifive_fu540_macb_mgmt {
+>   	void __iomem *reg;
+> @@ -334,7 +337,7 @@ static int macb_mdio_wait_for_idle(struct macb *bp)
+>   	u32 val;
+>   
+>   	return readx_poll_timeout(MACB_READ_NSR, bp, val, val & MACB_BIT(IDLE),
+> -				  1, MACB_MDIO_TIMEOUT);
+> +				  100, MACB_MDIO_TIMEOUT);
+
+Why do we need to increase how frequently we poll?
+-- 
+Florian
 
 
