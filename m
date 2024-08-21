@@ -1,55 +1,48 @@
-Return-Path: <netdev+bounces-120525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F366959B47
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:08:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3414959B4F
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:10:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F6951F226B6
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:08:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5124B1F22899
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D9C1514E2;
-	Wed, 21 Aug 2024 12:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7C61514E2;
+	Wed, 21 Aug 2024 12:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="lL7c/10f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dEq/z59Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-26.smtpout.orange.fr [80.12.242.26])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7621D1305;
-	Wed, 21 Aug 2024 12:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.26
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15FF31D1305;
+	Wed, 21 Aug 2024 12:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724242132; cv=none; b=WQJUyVPbN4VcaYl458gjEypZtmzyEQAKtdC+maaW7zOHiX//prvMiUwHb+S+4nce/LsC8ar/QjmV+dci1fgYES3dOzkHr7RB1h9XGgHjnV/OHPrpueuU4O3OTRWtyLJzv6CVrA1oWmO5SVxc7KEEUa3vBmSCKCinVrGhObw7WHU=
+	t=1724242249; cv=none; b=a8odLPhoaT35b1ypu10CfpdjxR8iE5KlAv6p85ZS8LXldwAv2Uw301+Whc8B+aNNuMxc2qfqD8uYtmDv/eEfCgzInwm5cIlye1Q0MVI2Dvh5uxJEjfKTC5dxEktr6Xh0NP+O8CFWCMSzVWJr7FY+As1NGLLt4pJYOVxknYuXn/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724242132; c=relaxed/simple;
-	bh=dbe4R2RH0+1sKJgg7eyP6A1jmv60YMmn98/QNoWzjVA=;
+	s=arc-20240116; t=1724242249; c=relaxed/simple;
+	bh=nDrJHJu+gWDRrjhS6369DIMG9kViRlo3DMiwhc79e1Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uEn45CizjVQJURp2RAemy7j/J/nfHrfMXL46LKYDleMHolFfF8EtvNcPjQkjonNnXInVPTxLRAmw9Wuv+wFzr7hKZu8z/1FTv025C9vGkrbDsLgANlNEJHeGilwwsVSTFyzKwlHde86zFzwER8DlxDKMD7RpJvGwk7yV0D+glT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=lL7c/10f; arc=none smtp.client-ip=80.12.242.26
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id gk8rsJdOxbNNsgk8rslcHN; Wed, 21 Aug 2024 14:08:48 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1724242128;
-	bh=8d0PHFEsYGqdYcAk4Zd+FDA5jBt+ta/EhSh+bgONbM4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=lL7c/10fbRpVHzqiq3ccePD1+sBQ+u0AjUfgzfq+XD11F0fKwDwKnuoX9Xwmd4vIS
-	 hiUEg725rc6Dgb1xlGcpCjHFDbfP0MzkZt4L7AZNnKurA2ZKpPDuwUIyJ1k4G/oRTE
-	 OZiwDFrvoXywlTpKs9hngJa+hgwMkcRue+1Hv2+vJsYiTJsqWAR1r7ZxMrDxNUuZ4+
-	 TVwS7t8HhkVPcwp2hcuqNd6OOr43YrQMEnC+rQehK2DSktBvQ60QZ7Dg+x+iP6/Hkj
-	 yQAJpL3RmkyRpJFPqBUQaJkhvgLv0Rrea/KNCHU4CyHsUreFHvSW2RQDM/WIzzbNPD
-	 pGkJ4Ov0RvILg==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Wed, 21 Aug 2024 14:08:48 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <9a5de847-0913-420d-8cb0-35d95376ae5b@wanadoo.fr>
-Date: Wed, 21 Aug 2024 14:08:45 +0200
+	 In-Reply-To:Content-Type; b=b5mHpaunSOnVBAZ5GKuCrXjbWv7wB5gl6O9YBJ9FnApi9G2p1L3CHf1R0Tgv2alDKOjxrFCuM66YRU5cMofv7ucUuwSCRYtlKALrRJVrv03d6YtFcypRwYffvHgQ1Foser74wC4lDRW592lt0lNBNDARqHC59Pu3hSUcl3dioWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dEq/z59Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C08FAC32782;
+	Wed, 21 Aug 2024 12:10:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724242248;
+	bh=nDrJHJu+gWDRrjhS6369DIMG9kViRlo3DMiwhc79e1Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dEq/z59YAORG5PxknZdx4N8Cqs5VqWj4TpHflRigc30LMuWj81P1QZB1COTZ8FOaV
+	 Z4TknFgdk4N/oxlyXNYs58734LLu6DiE+LNHgK4CQ0YvxFd3PHnk2ibjjLQBCwJ3RS
+	 mPOpBUG9VLiwUNknPY37K5+Uu4GACT6XzSOjWHVi6b79sqiPj5Rhm8g7+w+s8APjhe
+	 iafpHUpMsJGCWBBTXHvxnGHgiKDORymOUjm0cgY7meyXc/bsZYjTZJcs2C0CLuxgv4
+	 rQZNRcSGPXphlDFD4L6bfuuPCXJZhk39rH6+loyM6E7UtNdwSe1fmkRLXQzIfW7GmW
+	 TxQIsfUOrmcYQ==
+Message-ID: <aa3d740f-403e-4bd3-a74a-d077b163dbdd@kernel.org>
+Date: Wed, 21 Aug 2024 15:10:42 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,66 +50,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] wifi: cfg80211: Use kmemdup_array instead of kmemdup
- for multiple allocation
-To: Yu Jiaoliang <yujiaoliang@vivo.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: opensource.kernel@vivo.com
-References: <20240821111250.591558-1-yujiaoliang@vivo.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20240821111250.591558-1-yujiaoliang@vivo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 6/7] net: ti: icssg-prueth: Add multicast
+ filtering support in HSR mode
+To: MD Danish Anwar <danishanwar@ti.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
+ Jan Kiszka <jan.kiszka@siemens.com>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Diogo Ivo <diogo.ivo@siemens.com>,
+ Simon Horman <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, srk@ti.com
+References: <20240813074233.2473876-1-danishanwar@ti.com>
+ <20240813074233.2473876-7-danishanwar@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20240813074233.2473876-7-danishanwar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Le 21/08/2024 à 13:12, Yu Jiaoliang a écrit :
-> Let the kememdup_array() take care about multiplication and possible
-> overflows.
+
+
+On 13/08/2024 10:42, MD Danish Anwar wrote:
+> Add support for multicast filtering in HSR mode
 > 
-> v2:
-> -Change sizeof(limits[0]) to sizeof(*limits)
-> -Fix title prefix
-
-Hi,
-
-this kind of information about differences between versions is usually 
-below the ---.
-
-> 
-> Signed-off-by: Yu Jiaoliang <yujiaoliang@vivo.com>
-> Reviewed-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-
-It is not because someone makes a comment on a patch that you should 
-automatically add a R-b tag.
-
-> Reviewed-by: Kalle Valo <kvalo@kernel.org>
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 > ---
->   net/wireless/util.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 38 +++++++++++++++++++-
+>  1 file changed, 37 insertions(+), 1 deletion(-)
 > 
-> diff --git a/net/wireless/util.c b/net/wireless/util.c
-> index 9a7c3adc8a3b..e7c1ac2a0f2d 100644
-> --- a/net/wireless/util.c
-> +++ b/net/wireless/util.c
-> @@ -2435,8 +2435,8 @@ int cfg80211_iter_combinations(struct wiphy *wiphy,
->   		if (params->num_different_channels > c->num_different_channels)
->   			continue;
->   
-> -		limits = kmemdup(c->limits, sizeof(limits[0]) * c->n_limits,
-> -				 GFP_KERNEL);
-> +		limits = kmemdup_array(c->limits, c->n_limits, sizeof(*limits),
-> +				       GFP_KERNEL);
->   		if (!limits)
->   			return -ENOMEM;
->   
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> index b32a2bff34dc..521e9f914459 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -490,6 +490,36 @@ static int icssg_prueth_del_mcast(struct net_device *ndev, const u8 *addr)
+>  	return 0;
+>  }
+>  
+> +static int icssg_prueth_hsr_add_mcast(struct net_device *ndev, const u8 *addr)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct prueth *prueth = emac->prueth;
+> +
+> +	icssg_fdb_add_del(emac, addr, prueth->default_vlan,
+> +			  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
+> +			  ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
+> +			  ICSSG_FDB_ENTRY_P2_MEMBERSHIP |
+> +			  ICSSG_FDB_ENTRY_BLOCK, true);
+> +
+> +	icssg_vtbl_modify(emac, emac->port_vlan, BIT(emac->port_id),
+> +			  BIT(emac->port_id), true);
+> +	return 0;
+> +}
+> +
+> +static int icssg_prueth_hsr_del_mcast(struct net_device *ndev, const u8 *addr)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct prueth *prueth = emac->prueth;
+> +
+> +	icssg_fdb_add_del(emac, addr, prueth->default_vlan,
+> +			  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
+> +			  ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
+> +			  ICSSG_FDB_ENTRY_P2_MEMBERSHIP |
+> +			  ICSSG_FDB_ENTRY_BLOCK, false);
+> +
+> +	return 0;
+> +}
+> +
+>  /**
+>   * emac_ndo_open - EMAC device open
+>   * @ndev: network adapter device
+> @@ -651,6 +681,7 @@ static int emac_ndo_stop(struct net_device *ndev)
+>  	icssg_class_disable(prueth->miig_rt, prueth_emac_slice(emac));
+>  
+>  	__dev_mc_unsync(ndev, icssg_prueth_del_mcast);
 
-Reviewed-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Above unsync call will already remove all MC addresses so nothing
+is left to unsync in the below unsync call.
+> +	__dev_mc_unsync(ndev, icssg_prueth_hsr_del_mcast);
 
-Now you can add my R-b :).
+Do you have to use an if/else like you do while calling __dev_mc_sync?
 
-CJ
+>  
+>  	atomic_set(&emac->tdown_cnt, emac->tx_ch_num);
+>  	/* ensure new tdown_cnt value is visible */
+> @@ -728,7 +759,12 @@ static void emac_ndo_set_rx_mode_work(struct work_struct *work)
+>  		return;
+>  	}
+>  
+> -	__dev_mc_sync(ndev, icssg_prueth_add_mcast, icssg_prueth_del_mcast);
+> +	if (emac->prueth->is_hsr_offload_mode)
+> +		__dev_mc_sync(ndev, icssg_prueth_hsr_add_mcast,
+> +			      icssg_prueth_hsr_del_mcast);
+> +	else
+> +		__dev_mc_sync(ndev, icssg_prueth_add_mcast,
+> +			      icssg_prueth_del_mcast);
+>  }
+>  
+>  /**
+
+-- 
+cheers,
+-roger
 
