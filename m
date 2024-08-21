@@ -1,94 +1,127 @@
-Return-Path: <netdev+bounces-120486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA7D959886
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:54:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4455959888
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 12:54:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACFD12819FA
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:54:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67D12281FE9
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 10:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D03B1E46BA;
-	Wed, 21 Aug 2024 09:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8991CC145;
+	Wed, 21 Aug 2024 09:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="dhrMCT3T"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fF3ShFS9"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39CEC1E3899;
-	Wed, 21 Aug 2024 09:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AB71CC144;
+	Wed, 21 Aug 2024 09:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724231527; cv=none; b=rQ83jJlZjwjUCQo+/7qC1AE7R+KORtTWObVULhKTmAcCFYMGlu4qriskv+HycgU/472NBKm39QqPZ4ihEskqWP58jka7jFO+WOQ6ei2FDhKO8jctXbJ4YpnKvsJ3Abti2tIBOVE2cLIjWxUI/cY+jf3cvK7gE1aPBFcYoiSuEhY=
+	t=1724231594; cv=none; b=j32JMaQ+t0oP72lXBOskCp89ue8WW+b3kKp4V6AyKHTlCKet4s7EMS9ya3gQXWamCsBeVQ5bqEb8CRzIihKVX86Gmn0NHyfVlOsW0jqdmtxCU1bzUzgWi0DW3vf2qM4+N2hSBX7jw83fRT7yMVIUI9bBxiOZUOfmpkhYhzkMA6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724231527; c=relaxed/simple;
-	bh=Ynw4Gbum5nKlrqSeuif2kCZleeSEUWKHxDtAXiKIyRY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dvOPjqEDbZ92sJR7FmxWJtehKwXdFHRi6TZwQreAT+RXiq24H/mtOFS5idbVusgtcMc4QKboLRSHJMwfASVvSwFycC0iCdLZ7NS3X89OVUW+7fftA/WyJBmBM0q97/HjrtVxlXn96PN7VTkm9kvOpB2NJe1Mml9fn0peaJw24/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=dhrMCT3T; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=Ynw4Gbum5nKlrqSeuif2kCZleeSEUWKHxDtAXiKIyRY=;
-	t=1724231479; x=1725441079; b=dhrMCT3TuHy2TDLoVjSnImkwpC6PwY4EFibPyVE7WMuCXBw
-	WiD/rdLY5AKgmfah2UKZtPjjmLpLXlch3TWLZwUA345GZvvSCKm0Nc5bx87E6TXjNl72nR08JLf1W
-	jyELFzZ0co0nah+xqUmULS+Nha1sto89geUU0yoJMcsXXpQQfnbALMudjTpj+a7C2qT/vYwWyemoI
-	62Y03DUW6nfbj/EOJeYDyDBlUtosPZFwQGytzORYdn8ze48If9YAkYKFZS3SuD4N70kpuC9vcDM4Q
-	qBVYkcnlLbhA/SvSbyYfaH6BJFfEvnVAj2OQUWUZBhM1BCPa9wj3L5OxrAxwHrzQ==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1sghMJ-0000000AdXP-1pqe;
-	Wed, 21 Aug 2024 11:10:27 +0200
-Message-ID: <9a757e2c6766b85e8cc4c59a58521c4d3e6afadd.camel@sipsolutions.net>
-Subject: Re: [PATCH wireless-next v2] wifi: cfg80211: fix bug of mapping
- AF3x to  incorrect User Priority
-From: Johannes Berg <johannes@sipsolutions.net>
-To: hhorace <hhoracehsu@gmail.com>, gnault@redhat.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com,  linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org, kvalo@kernel.org, horms@kernel.org, 
- idosch@nvidia.com
-Date: Wed, 21 Aug 2024 11:10:26 +0200
-In-Reply-To: <20240807082205.1369-1-hhoracehsu@gmail.com>
-References: <20240805071743.2112-1-hhoracehsu@gmail.com>
-	 <20240807082205.1369-1-hhoracehsu@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1724231594; c=relaxed/simple;
+	bh=pf8Og0SoBfFPyXgKmaXCMd0VN85JJoVJguEUbRuQGQo=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=O+xU6AOiHnKlAFNv/x7A1JpNiPYjqFtpQLV+MrweVBimYz/do46fPt9Wzi239H0w2pXAnVv9VQPk/5/pA8J8aw4x2XLCq/fDoR2iiM7NnWE7YQ0u5wIOZxwNhpe1md+vyKC4Fj0pFO+cT6DRhjrKjXytOsxoRpjIpdLdn+R3DPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fF3ShFS9; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47L3NJ1u001697;
+	Wed, 21 Aug 2024 09:13:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:subject:from:to:cc:references:in-reply-to
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	pf8Og0SoBfFPyXgKmaXCMd0VN85JJoVJguEUbRuQGQo=; b=fF3ShFS9Cy0CTrUC
+	oRx942KTcRJh8udEKM2+DzNbKHm1Na4aHUXFJ1hlyTeEGzzXVoV7BO+z6DKkYhZG
+	aE0HTQ7qyFOt6T9TvoUtBxVDRRHC+0tf12pzRBCYZolFNgQEK1MJTcxOy3OVKeWP
+	lJfkZmhRpeTijocV79GDBLiVBQngBLvg+ps+Y7HgS7vQv1gEYzeRcCpVtJILvP7h
+	MkzPUXqHOtISVX8jL2SONb9BsqN055aO3VlgWpALtaNcyAQlOBPuVkjOFD4O/jDa
+	38mAcKBNjWVvuqfVVTe/87uaqck4s1dcnU/s4lRdyK+F6BmjHg6H2IaZS6D2c5Gq
+	7mv2IA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mbg17ew-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 09:13:03 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47L9D3X8027913;
+	Wed, 21 Aug 2024 09:13:03 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 412mbg17ep-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 09:13:03 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47L8fTaK002207;
+	Wed, 21 Aug 2024 09:13:02 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4136k0q4q4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 09:13:02 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47L9Cu0w54526386
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 21 Aug 2024 09:12:58 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 460CE2004D;
+	Wed, 21 Aug 2024 09:12:56 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E8F202004B;
+	Wed, 21 Aug 2024 09:12:55 +0000 (GMT)
+Received: from [9.152.224.208] (unknown [9.152.224.208])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 21 Aug 2024 09:12:55 +0000 (GMT)
+Message-ID: <2516fbda-3f6b-4b9c-b499-701f4f922cc5@linux.ibm.com>
+Date: Wed, 21 Aug 2024 11:12:55 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] s390/iucv: Fix vargs handling in
+ iucv_alloc_device()
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        kernel test robot <lkp@intel.com>
+References: <20240820152911.3701814-1-wintera@linux.ibm.com>
+In-Reply-To: <20240820152911.3701814-1-wintera@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4HEkUCMmYNSp8brqdJRqN_3nOytY_41o
+X-Proofpoint-ORIG-GUID: GqJ6N0QcCzlhrlzilZTtVpYXBaktJEBT
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-21_07,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 bulkscore=0 mlxlogscore=785 adultscore=0 malwarescore=0
+ phishscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408210065
 
-On Wed, 2024-08-07 at 16:22 +0800, hhorace wrote:
-> According to RFC8325 4.3, Multimedia Streaming: AF31(011010, 26),
-> AF32(011100, 28), AF33(011110, 30) maps to User Priority =3D 4
-> and AC_VI (Video).
->=20
-> However, the original code remain the default three Most Significant
-> Bits (MSBs) of the DSCP, which makes AF3x map to User Priority =3D 3
-> and AC_BE (Best Effort).
->=20
-> Fixes: 6fdb8b8781d5 ("wifi: cfg80211: Update the default DSCP-to-UP mappi=
-ng")
-> Signed-off-by: hhorace <hhoracehsu@gmail.com>
 
-^^^ looks more like a username, is that really your name/"known
-identity"?
 
-https://www.kernel.org/doc/html/latest/process/submitting-patches.html#sign=
--your-work-the-developer-s-certificate-of-origin
+On 20.08.24 17:29, Alexandra Winter wrote:
+> Reference-ID: https://bugzilla.linux.ibm.com/show_bug.cgi?id=208008
 
-johannes
 
+Argh, I forgot to remove our internal Reference-ID from the commit message.
+Will send a v4
 
