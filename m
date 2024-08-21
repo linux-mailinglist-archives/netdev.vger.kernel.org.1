@@ -1,200 +1,105 @@
-Return-Path: <netdev+bounces-120623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC02195A03D
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:44:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDBDC95A047
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 16:46:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77893285369
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:44:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 193F91C21CB9
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 14:46:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435611B1D71;
-	Wed, 21 Aug 2024 14:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE861531ED;
+	Wed, 21 Aug 2024 14:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="VgnJ6WaC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C0DrJowW"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-zteg10011401.me.com (pv50p00im-zteg10011401.me.com [17.58.6.41])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C80F1189908
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 14:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8733779B84
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 14:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724251482; cv=none; b=bqAR61mt0oahg5odENK7P9AdbS0Sd32DC/XmLDndFJcAzT8vpljDXGuEFhdDTaBVWJUpsXw8HbKnkaI0am3cInJBwpnLrQC6Ri3PzFavaM/DWQWu99c8+599qoi7yLxDxBDN9PBanLA8gqQiif1EWNKJtxHJi7UGT0WhlAVaJyM=
+	t=1724251601; cv=none; b=QJdjpX75m1WzcdoT49F0FtepMqOya8zQ+3Odq/rMI5jl3Hz7pfcapyoIDZ8smlSeFNLLqHHR1YbbSM3YdYpb4wKTMldSLUgoaDozp+w5/diTiUpZZ30h71rT57+W7U1PCjpe7jlQCBzrcGTv1T1cQN3m131qnJVSDOt4ot8r3YE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724251482; c=relaxed/simple;
-	bh=2tKIiKfoZ8VghTQB5t1Hh7d6soUoOkPtHP3FiyiTcw8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pMsJjlMzzWvv8xeH9I+8nYjaYLJy2UUDUrv6zzJOV5vcdwhk8UB2W5myeKtwRkLnFstB7d1FP2qkTY2BFNbVtZIjX7Mr2yTj1D2QE4YW+Txjdv/9PDOMb0HltMgZVW7Od3iDuYNuAru9UiebkMeFDgpioHedHV62d6LZChvnxvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=VgnJ6WaC; arc=none smtp.client-ip=17.58.6.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1724251480;
-	bh=+IlZOsCHpIR8J4pUdNx8yhJpA5oS3nbEe6dWBspH5WU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	b=VgnJ6WaCejYFIQC+3I04YUhkx2CcHjHu2Xgj98WH/gX1l5O4d3yfi58k92jahNYtP
-	 bCoauqLc2L4EeUbJEdMOWSTa1Odf2Z/rz7UjSh1jIFWiZnOD0bGRtpjTLHCjUr7Fgv
-	 sAPXiKP7ayI8vLeomELKx2FgHtHRQ0ofS2ZE/tsPCejaiXnfIR8+APTFtuqBdi3mnI
-	 YDwNYd/BRxzdi44/3Y/y52i0xF5KitAFa2WIoloNQP9VXi9UuYA7luFCL+whHPb8Dd
-	 uzMbEc8eibco46DHABY8R5NONBpP2P7eFOjpgI9YnFgf/fO9oHMYITtefe8snxgHko
-	 kzVVph21UqY7Q==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-zteg10011401.me.com (Postfix) with ESMTPSA id 9CFC7DC00C0;
-	Wed, 21 Aug 2024 14:44:31 +0000 (UTC)
-Message-ID: <e30eac3b-4244-460d-ab0b-baaa659999fe@icloud.com>
-Date: Wed, 21 Aug 2024 22:44:27 +0800
+	s=arc-20240116; t=1724251601; c=relaxed/simple;
+	bh=6xdt2jDZXSBwFTljtG80OL2SpBvSmFFJQpZtCWyxgIo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DJRFhc9RrjFA+72PpJAlLLl22pT4wrTrqwOGUCAVR5MpoctoMGvzanDjW5Y0JxNNrobVi+q7xgK28iwYrAzQGAMSktWMl6T0zGRWmAZpc9KeygnTSi3s/OqftINWwjqWOpCA/zM3eCMv83F1kops+mtXHWKNsuiaAX2AK0ijRcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C0DrJowW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724251598;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6xdt2jDZXSBwFTljtG80OL2SpBvSmFFJQpZtCWyxgIo=;
+	b=C0DrJowW8dJoOMuDeS0W6fSNdAug8yj003k2Ia8PhIdios4AOpyek+is4l6cgfBA3y26KT
+	Hu75yjH/TUq/gdg5XROvY0wCxBF88Jt0TcCs0df6DsTDkKZCSAsw5VF7cT7sXFkPYy52dd
+	Y6uuMqQ6MyoiTaDe//V09iGKZQYbDKU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-189-pWVAi_DpOT6sf83m5ipVjg-1; Wed, 21 Aug 2024 10:46:36 -0400
+X-MC-Unique: pWVAi_DpOT6sf83m5ipVjg-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3718c1637caso3641176f8f.0
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 07:46:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724251595; x=1724856395;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6xdt2jDZXSBwFTljtG80OL2SpBvSmFFJQpZtCWyxgIo=;
+        b=Im12KV3ohhB7l5GKnFWIsk4suSy90BGTl2vvuKjlqw46VNytNLY4vgSDJ6U8CuXAkG
+         NgOC8dW3A+b3DolZnL5ZxT/4w841R2FvC8qdb5cV95BTOfCB9vWCVwava0qd9YZgJO1h
+         ytA7QkTziegXkz2gAGXMp5piDdtLUnhw0F+8HKHVQDF3pi7XtgcWm0AdiEq7fILnzygL
+         PMUaIO71Cuw+FD/oO54fFw7Z1Gx4ASVPan2kKl0xePabjtX/sOyQlXHoxlB4KR4rbVHz
+         mspVOZh3FSRlU+XqFXZwawnE0WXIP1tAfSzkLYJXiH1h3RM+W8wt0L28Sa9UZxZJpE6V
+         K82Q==
+X-Gm-Message-State: AOJu0YxDSmNNAZSF82Qxcrv95Ta7udAXV09Yf2r3CuODt8YbJXnCb6S+
+	n1KpdXyUszEO6luw6HpDXdQWhS2iURf40OCNfw83jeKcQ+kRWM4OMHOtcuwD+EmYMeEBdc9Xyvn
+	kZcnXxSwxPmenrbpkYCOBGi+s5Zql19p7HtEFOQORsGf1l5WGq8hZ2A==
+X-Received: by 2002:adf:e9cb:0:b0:366:e64f:b787 with SMTP id ffacd0b85a97d-372fd57c8f9mr1579788f8f.8.1724251594803;
+        Wed, 21 Aug 2024 07:46:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFbLPnszvW1b2ldVOkF9ZIUwdca7WTLBwLo/0pq1z+jsL2swELRra5Q+Ml//UK9bmMhggFv3g==
+X-Received: by 2002:adf:e9cb:0:b0:366:e64f:b787 with SMTP id ffacd0b85a97d-372fd57c8f9mr1579748f8f.8.1724251593939;
+        Wed, 21 Aug 2024 07:46:33 -0700 (PDT)
+Received: from debian (2a01cb058d23d60064c1847f55561cf4.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:64c1:847f:5556:1cf4])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abee8bce1sm28211825e9.16.2024.08.21.07.46.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Aug 2024 07:46:33 -0700 (PDT)
+Date: Wed, 21 Aug 2024 16:46:31 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
+	fw@strlen.de, martin.lau@linux.dev, daniel@iogearbox.net,
+	john.fastabend@gmail.com, ast@kernel.org, pablo@netfilter.org,
+	kadlec@netfilter.org, willemdebruijn.kernel@gmail.com,
+	bpf@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: Re: [PATCH net-next 03/12] ipv4: Unmask upper DSCP bits when
+ constructing the Record Route option
+Message-ID: <ZsX9xyKUa8pYEXVo@debian>
+References: <20240821125251.1571445-1-idosch@nvidia.com>
+ <20240821125251.1571445-4-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] driver core: Make parameter check consistent for
- API cluster device_(for_each|find)_child()
-To: Ira Weiny <ira.weiny@intel.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Davidlohr Bueso
- <dave@stgolabs.net>, Jonathan Cameron <jonathan.cameron@huawei.com>,
- Dave Jiang <dave.jiang@intel.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Takashi Sakamoto <o-takashi@sakamocchi.jp>, Timur Tabi <timur@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org,
- Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20240815-const_dfc_prepare-v2-0-8316b87b8ff9@quicinc.com>
- <20240815-const_dfc_prepare-v2-1-8316b87b8ff9@quicinc.com>
- <66c491c32091d_2ddc24294e8@iweiny-mobl.notmuch>
- <2b9fc661-e061-4699-861b-39af8bf84359@icloud.com>
- <66c4a4e15302b_2f02452943@iweiny-mobl.notmuch>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <66c4a4e15302b_2f02452943@iweiny-mobl.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: 2ijc-wPiu7wQ-kCijDGnu9IB_Y5Izig2
-X-Proofpoint-GUID: 2ijc-wPiu7wQ-kCijDGnu9IB_Y5Izig2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-21_11,2024-08-19_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 clxscore=1015
- suspectscore=0 mlxlogscore=999 mlxscore=0 adultscore=0 malwarescore=0
- phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2408210107
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240821125251.1571445-4-idosch@nvidia.com>
 
-On 2024/8/20 22:14, Ira Weiny wrote:
-> Zijun Hu wrote:
->> On 2024/8/20 20:53, Ira Weiny wrote:
->>> Zijun Hu wrote:
->>>> From: Zijun Hu <quic_zijuhu@quicinc.com>
->>>>
->>>> The following API cluster takes the same type parameter list, but do not
->>>> have consistent parameter check as shown below.
->>>>
->>>> device_for_each_child(struct device *parent, ...)  // check (!parent->p)
->>>> device_for_each_child_reverse(struct device *parent, ...) // same as above
->>>> device_find_child(struct device *parent, ...)      // check (!parent)
->>>>
->>>
->>> Seems reasonable.
->>>
->>> What about device_find_child_by_name()?
->>>
->>
->> Plan to simplify this API implementation by * atomic * API
->> device_find_child() as following:
->>
->> https://lore.kernel.org/all/20240811-simply_api_dfcbn-v2-1-d0398acdc366@quicinc.com
->> struct device *device_find_child_by_name(struct device *parent,
->>  					 const char *name)
->> {
->> 	return device_find_child(parent, name, device_match_name);
->> }
-> 
-> Ok.  Thanks.
-> 
->>
->>>> Fixed by using consistent check (!parent || !parent->p) for the cluster.
->>>>
->>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->>>> ---
->>>>  drivers/base/core.c | 6 +++---
->>>>  1 file changed, 3 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/drivers/base/core.c b/drivers/base/core.c
->>>> index 1688e76cb64b..b1dd8c5590dc 100644
->>>> --- a/drivers/base/core.c
->>>> +++ b/drivers/base/core.c
->>>> @@ -4004,7 +4004,7 @@ int device_for_each_child(struct device *parent, void *data,
->>>>  	struct device *child;
->>>>  	int error = 0;
->>>>  
->>>> -	if (!parent->p)
->>>> +	if (!parent || !parent->p)
->>>>  		return 0;
->>>>  
->>>>  	klist_iter_init(&parent->p->klist_children, &i);
->>>> @@ -4034,7 +4034,7 @@ int device_for_each_child_reverse(struct device *parent, void *data,
->>>>  	struct device *child;
->>>>  	int error = 0;
->>>>  
->>>> -	if (!parent->p)
->>>> +	if (!parent || !parent->p)
->>>>  		return 0;
->>>>  
->>>>  	klist_iter_init(&parent->p->klist_children, &i);
->>>> @@ -4068,7 +4068,7 @@ struct device *device_find_child(struct device *parent, void *data,
->>>>  	struct klist_iter i;
->>>>  	struct device *child;
->>>>  
->>>> -	if (!parent)
->>>> +	if (!parent || !parent->p)
->>>
->>> Perhaps this was just a typo which should have been.
->>>
->>> 	if (!parent->p)
->>> ?
->>>
->> maybe, but the following device_find_child_by_name() also use (!parent).
->>
->>> I think there is an expectation that none of these are called with a NULL
->>> parent.
->>>
->>
->> this patch aim is to make these atomic APIs have consistent checks as
->> far as possible, that will make other patches within this series more
->> acceptable.
->>
->> i combine two checks to (!parent || !parent->p) since i did not know
->> which is better.
-> 
-> I'm not entirely clear either.  But checking the member p makes more sense
-> to me than the parent parameter.  I would expect that iterating the
-> children of a device must be done only when the parent device is not NULL.
-> 
-> parent->p is more subtle.  I'm unclear why the API would need to allow
-> that to run without error.
-> 
-i prefer (!parent || !parent->p) with below reasons:
+On Wed, Aug 21, 2024 at 03:52:42PM +0300, Ido Schimmel wrote:
+> Unmask the upper DSCP bits when performing the lookup so that in the
+> future the lookup could be performed according to the full DSCP value.
 
-1)
-original API authors have such concern that either (!parent) or
-(!parent->p) maybe happen since they are checked, all their concerns
-can be covered by (!parent || !parent->p).
-
-2)
-It is the more robust than either (!parent) or (!parent->p)
-
-3)
-it also does not have any negative effect.
-
-> Ira
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
 
