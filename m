@@ -1,168 +1,245 @@
-Return-Path: <netdev+bounces-120658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4A5195A16D
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:33:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91AA495A17A
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 17:37:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B33A2817C9
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:33:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6C681C224A5
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:37:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC0C1474C3;
-	Wed, 21 Aug 2024 15:33:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FBAE14E2E9;
+	Wed, 21 Aug 2024 15:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e4cOdlE3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VawqCO9A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1985E13A243
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 15:33:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CC8A14D28E
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 15:36:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724254426; cv=none; b=Nqizd/uhNkhrq9G/fwznpq+SNgc3C9L9cY2p1kHIotOEgfBTpuUWbz6PoBib232BmeNDOj2//u/bFuBME2ud+km9XIr2AQkxojpQt6fGmVsMVD12+tATyv5PnlKktth28He9N711L+BzIz6dEPohJ9lhVVh7yrFEPLO0zyZFft0=
+	t=1724254609; cv=none; b=G+DI9V1B4Ch+v1IvpbWh4wfhG0+3AjtY/OIyLZWwwiN+4Zh/L22IJ9am79oVoxhoHC9fx3wU1+dr0cAvkaMD9UelHNvQfjOEHBW9FwrgnXH6BVWvs8huuOVmrSFi71nJIC4W5bfnySKBrJ4tjRMxJS9xIcHCwKz3e5USjRKbNEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724254426; c=relaxed/simple;
-	bh=XnIajjxuq/4PN5Y4meyL99PBkbSxbvvxCuWcamwhKpU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tHAVHWw5CEmYrKzagpnIOcLhii4gGH0vqIclvCPbeY/Pg2as11R5MCG/Te0ff9Gk/15oN4i1ebifClhX3+7na4wMBCYOMww32T2sm2WaASrq7zL1Cuc1N6GHDoIGVCqzT2x6LgCFd9hpDI156vQDbNoMz17TBDvsxdGETyYbSTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e4cOdlE3; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-202508cb8ebso26135415ad.3
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:33:44 -0700 (PDT)
+	s=arc-20240116; t=1724254609; c=relaxed/simple;
+	bh=lRtlmbjL10N9pND329duqEBS2XO74LAzcfVhekR0HYk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TOZYebgErHJ9fdu2BJt5QgxHkezN/yJOC+suibdx62KuE409AbisYapv5K6jYv0pvE+Shd1BvaPiSpuuwrMqUHZv10A7v8Tbb5P17dBLZGLMRWmRoFTPEtqNI9EAiqte8aiziVKzpl0SD1raWW5I3XywtE87gpES6qIE6oBibSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VawqCO9A; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-44fee2bfd28so325171cf.1
+        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 08:36:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724254424; x=1724859224; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cBRR5rqTzmvw+BCgE74ahVmicZdmUn6HCl2MYGGdS44=;
-        b=e4cOdlE3QVnPU/BoVQEEreyW60wJRjTdk10R7TV1GwCRS3qlnZZ7j0MkcN7Zl0DtV0
-         n/z4mOCIgmf7r2bjaSUDulH4jM6tteEZ8aGnBpusGDQu2rTGNn0MwEGfjTmKkjTDxP1N
-         ljmQEb92ZqU4zsorSaQRDDyTznnklRaTlcBA1JnZLII1lwqRw5uPlVQLV5loU4EAXOki
-         D4iF3H5VsBR39rJZ7EQ62x/gPHCAfH1d/DV2hS443h66Axtey67+5BGJiQqeg8k7JH97
-         5sXK0EEUhOq9krsWJ4PbWTI0BehxqxD+51G6pjdxBzzPL1bAytwmR+DVa9f6Glnu6Y+T
-         SRqA==
+        d=google.com; s=20230601; t=1724254605; x=1724859405; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XUZoeSiNO641pI3EuPxhZcOUo6QCsmcEaLeGMupG+Zk=;
+        b=VawqCO9Ap+dfG9m5J2m0lw/Kt22zqA+IUqPCZmZb15ns7NM1w7XhIHRfB0KFAyxY8W
+         vFYidURPYefAUs0AoQdCss4vjJs0hRhqr43gVHbsFiw1B9ldI0kIQS0dPYFs4nkxhRBO
+         VWr9iHG8WuLjsD5se9v2lReEV4/I+6inz0ZPbW5M9F4umNk5sbLVejBxxOMS+TUrfZEO
+         CONEh2i35AR7tfgTyzMzRYcMqBG/TbKMsxIKZneIW745qgGVc/CHc/VkwvNYZ3ELJxSH
+         Dr/c81HgwIJYlN3IKpB4dL58faG9ZHOBRQcc1OoHLmOX2F1tfDbzZOV877FLg9cCkcPw
+         8cPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724254424; x=1724859224;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cBRR5rqTzmvw+BCgE74ahVmicZdmUn6HCl2MYGGdS44=;
-        b=rIUWqMDyOD9O3Tl2frOXccqN3jwOu+ZE1g8kMJWZkHj6TliNUBn4NKP7E9gVRYER6/
-         0jaY/1Gkm42o38yvZTp9OYpdteYxOHAF/AIr50+/gLra+qv9R4VVFD4+krZYlrrMorbq
-         G+7Vkqu4nvWpuu4ROKXGeRHoL0FJtT8L00L6MP/tDMBUR2GZbVguh6FBXH5ibDNVKAy1
-         58xex7AySSmQIVh3Qc6VubdJ0vWUsFlsXzO2eTYKnMnrIiIKtfzPzhS6AI9DZ4Tm5e/H
-         WejrP5/B5mgd4aHcYnkDc8Kyb0Sw7APCtziIRNTG7Tqz9jJ8ThjIl/wHkkKM5hnoxEbN
-         MnVA==
-X-Gm-Message-State: AOJu0YzfWsS6BLZ9o771S09uZFwGRIacjwrL6LOwveScGFz/6ki+JW9g
-	icNj2i7XKRQGFulyhcbozIYK4yoQN6wEgZKYunDyKvoSSahwH4pS
-X-Google-Smtp-Source: AGHT+IE2R1U6yBZk6ViWHf8F2Q+p2EoZjjC/q4i/tqFnI+tjSZSTCT2wl9fy2uhjzFYUo9brDIDGHA==
-X-Received: by 2002:a17:902:ecc5:b0:202:e83:eb12 with SMTP id d9443c01a7336-20367d14bf5mr34716325ad.22.1724254424251;
-        Wed, 21 Aug 2024 08:33:44 -0700 (PDT)
-Received: from KERNELXING-MC1.tencent.com ([114.253.36.103])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f038b303sm95155675ad.192.2024.08.21.08.33.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Aug 2024 08:33:43 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	kuniyu@amazon.com
-Cc: netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>,
-	Jade Dong <jadedong@tencent.com>
-Subject: [PATCH v3 net-next] tcp: avoid reusing FIN_WAIT2 when trying to find port in connect() process
-Date: Wed, 21 Aug 2024 23:33:25 +0800
-Message-Id: <20240821153325.3204-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+        d=1e100.net; s=20230601; t=1724254605; x=1724859405;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XUZoeSiNO641pI3EuPxhZcOUo6QCsmcEaLeGMupG+Zk=;
+        b=lWVjqi4EW5NlL87HrP8cF+xWEwSW0pM3w/nf5yBVnWHQice5H9M4a67IOmqeop9mRD
+         3rw7ZvcNvq8ASbZZN3z2+4mY5kZQLDSD/qp0pBnuskRSvjcHMwaVb861Nz4GOGYDT2FN
+         UclSjMRd66JiQ9DiXoZZR8Gecn5YcnZNQIPzbr/7t+SGTFFKfIq7CxUvxtKZuUZfAryo
+         bYhSOR+aKCCNGWnffVbJAq44tafMVjTmKuP+u1K5Lbxyq1ulpXVMGdUgLHqH8yV65wuF
+         ko1Mw3/DAlGiv8RzLgEYkzeLy81KlWTAeBEXXa17K17NBaa7KD+SIBvg7dInJZMIaRT3
+         GL8g==
+X-Forwarded-Encrypted: i=1; AJvYcCVcNTddV2ZRvJUbFNDQi3n4odztCqCdZvF21rfD8tvHrjgOSCVsHiOx5o1pqZx9n7K9a9ykTgw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyyJiTNVCUCiG6dVLGy/8dNP8x6xIKajmnuzWrvfx4aOiEInxLD
+	e/703586nRTaK4FTvlEmpaSWZYXe6U7bIf3nqlwsbBQFTmx5VykoHV2RfaySPBJifDcFIBHSjel
+	nYC1WqWCCpr3KSABo+eKTAIRQxSfT5gDgn1o7
+X-Google-Smtp-Source: AGHT+IGfHATnjXtnGmfmB/4D15ItV4+y4fk90XQNkiarco8smx060mhOYYV6TW3lde4cXDjE7q2OcPZA07rGH+zC+AM=
+X-Received: by 2002:a05:622a:1816:b0:447:d555:7035 with SMTP id
+ d75a77b69052e-454e86e342amr6626771cf.13.1724254604541; Wed, 21 Aug 2024
+ 08:36:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240813211317.3381180-4-almasrymina@google.com>
+ <CAMArcTWWxjsg_zwS6waWkLpyHhwdXDm_NJeVGm_dr+eT5QDZiA@mail.gmail.com>
+ <20240819155257.1148e869@kernel.org> <CAHS8izPL4YdqFjkTpYavdxQn816=kkUv0xravQJF4Uno7Bn3ZQ@mail.gmail.com>
+ <CAMArcTXvccYBPZTEuW-z=uTK7W67utd9-xjPzfxEOvUWhPS7bg@mail.gmail.com>
+In-Reply-To: <CAMArcTXvccYBPZTEuW-z=uTK7W67utd9-xjPzfxEOvUWhPS7bg@mail.gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 21 Aug 2024 11:36:31 -0400
+Message-ID: <CAHS8izPZ9Jiu9Gj+Kk3cQ_+t22M4n4-mbPLhx+fti_HiWzL57Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v19 03/13] netdev: support binding dma-buf to netdevice
+To: Taehee Yoo <ap420073@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
+	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
+	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
+	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
+	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	John Fastabend <john.fastabend@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Daniel Vetter <daniel.vetter@ffwll.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Xing <kernelxing@tencent.com>
+On Wed, Aug 21, 2024 at 5:15=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wro=
+te:
+>
+> On Tue, Aug 20, 2024 at 1:01=E2=80=AFPM Mina Almasry <almasrymina@google.=
+com> wrote:
+> >
+> > On Mon, Aug 19, 2024 at 6:53=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> > >
+> > > On Mon, 19 Aug 2024 00:44:27 +0900 Taehee Yoo wrote:
+> > > > > @@ -9537,6 +9540,10 @@ static int dev_xdp_attach(struct net_devic=
+e *dev, struct netlink_ext_ack *extack
+> > > > >                         NL_SET_ERR_MSG(extack, "Native and generi=
+c XDP can't be active at the same time");
+> > > > >                         return -EEXIST;
+> > > > >                 }
+> > > > > +               if (dev_get_max_mp_channel(dev) !=3D -1) {
+> > > > > +                       NL_SET_ERR_MSG(extack, "XDP can't be inst=
+alled on a netdev using memory providers");
+> > > > > +                       return -EINVAL;
+> > > > > +               }
+> > > >
+> > > > Should we consider virtual interfaces like bonding, bridge, etc?
+> > > > Virtual interfaces as an upper interface of physical interfaces can
+> > > > still install XDP prog.
+> > > >
+> > > > # ip link add bond0 type bond
+> > > > # ip link set eth0 master bond0
+> > > > # ip link set bond0 xdp pin /sys/fs/bpf/x/y
+> > > > and
+> > > > # ip link set bond0 xdpgeneric pin /sys/fs/bpf/x/y
+> > > >
+> > > > All virtual interfaces can install generic XDP prog.
+> > > > The bonding interface can install native XDP prog.
+> > >
+> > > Good point. We may need some common helpers to place the checks for X=
+DP.
+> > > They are spread all over the place now.
+> >
+> > Took a bit of a look here. Forgive me, I'm not that familiar with XDP
+> > and virtual interfaces, so I'm a bit unsure what to do here.
+> >
+> > For veth, it seems, the device behind the veth is stored in
+> > veth_priv->peer, so it seems maybe a dev_get_max_mp_channel() check on
+> > veth_priv->peer is the way to go to disable this for veth? I think we
+> > need to do this check on creation of the veth and on the ndo_bpf of
+> > veth.
+> >
+> > For bonding, it seems we need to add mp channel check in bond_xdp_set,
+> > and bond_enslave?
+> >
+> > There are a few other drivers that define ndo_add_slave, seems a check
+> > in br_add_slave is needed as well.
+> >
+> > This seems like a potentially deep rabbit hole with a few checks to
+> > add all of the place. Is this blocking the series? AFAICT if XDP fails
+> > with mp-bound queues with a benign error, that seems fine to me; I
+> > don't have a use case for memory providers + xdp yet. This should only
+> > be blocking if someone can repro a very serious error (kernel crash)
+> > or something with this combination.
+> >
+> > I can try to add these checks locally and propose as a follow up
+> > series. Let me know if I'm on the right track with figuring out how to
+> > implement this, and, if you feel like it's blocking.
+> >
+> > --
+> > Thanks,
+> > Mina
+>
+> I agree with the current approach, which uses the
+> dev_get_min_mp_channel_count() in the dev_xdp_attach().
+> The only problem that I am concerned about is the
+> dev_get_min_mp_channel_count() can't check lower interfaces.
+> So, how about just making the current code to be able to check lower
+> interfaces?
 
-We found that one close-wait socket was reset by the other side
-due to a new connection reusing the same port which is beyond our
-expectation, so we have to investigate the underlying reason.
+Thank you for the code snippet! It's very useful! I have been
+wondering how to walk lower/upper devices!
 
-The following experiment is conducted in the test environment. We
-limit the port range from 40000 to 40010 and delay the time to close()
-after receiving a fin from the active close side, which can help us
-easily reproduce like what happened in production.
+To be honest, I think maybe Jakub's suggestion to refactor all the
+->ndo_bpf calls needs to happen anyway. The reason is that there are
+->ndo_bpf calls in the core net stack, like net/xdp/xsk_buff_pool.c
+and kernel/bpf/offload.c. AFAICT we need to add checks in these places
+as well, so refactoring them into one place is nice?
 
-Here are three connections captured by tcpdump:
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965525191
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 2769915070
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [F.], seq 1, ack 1
-// a few seconds later, within 60 seconds
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [.], ack 2
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [R], seq 2965525193
-// later, very quickly
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 3120990805
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
+Note I sent the refactor for review. Sorry, I forgot to CC Taehee:
+https://patchwork.kernel.org/project/netdevbpf/patch/20240821045629.2856641=
+-1-almasrymina@google.com/
 
-As we can see, the first flow is reset because:
-1) client starts a new connection, I mean, the second one
-2) client tries to find a suitable port which is a timewait socket
-   (its state is timewait, substate is fin_wait2)
-3) client occupies that timewait port to send a SYN
-4) server finds a corresponding close-wait socket in ehash table,
-   then replies with a challenge ack
-5) client sends an RST to terminate this old close-wait socket.
+Additionally I'm wondering if we should disable adding mp-bound
+devices as slaves completely, regardless of xdp. My concern is that if
+the lower device is using unreadable memory, then the upper device may
+see unreadable memory in its code paths, and will not be expecting
+that, so it may break. From the look at the code, it looks like
+net/batman-adv calls ndo_add_slave, and a bunch of code that touches
+skb_frags:
 
-I don't think the port selection algo can choose a FIN_WAIT2 socket
-when we turn on tcp_tw_reuse because on the server side there
-remain unread data. In some cases, if one side haven't call close() yet,
-we should not consider it as expendable and treat it at will.
+$ ackc -i ndo_add_slave
+soft-interface.c
+889:    .ndo_add_slave =3D batadv_softif_slave_add,
 
-Even though, sometimes, the server isn't able to call close() as soon
-as possible like what we expect, it can not be terminated easily,
-especially due to a second unrelated connection happening.
+$ ackc -i skb_frag
+fragmentation.c
+403:    struct sk_buff *skb_fragment;
+407:    skb_fragment =3D dev_alloc_skb(ll_reserved + mtu + tailroom);
+408:    if (!skb_fragment)
+411:    skb_fragment->priority =3D skb->priority;
+414:    skb_reserve(skb_fragment, ll_reserved + header_size);
+415:    skb_split(skb, skb_fragment, skb->len - fragment_size);
+418:    skb_push(skb_fragment, header_size);
+419:    memcpy(skb_fragment->data, frag_head, header_size);
+422:    return skb_fragment;
+441:    struct sk_buff *skb_fragment;
+513:            skb_fragment =3D batadv_frag_create(net_dev, skb, &frag_hea=
+der,
+515:            if (!skb_fragment) {
+522:                               skb_fragment->len + ETH_HLEN);
+523:            ret =3D batadv_send_unicast_skb(skb_fragment, neigh_node);
 
-After this patch, we can see the expected failure if we start a
-connection when all the ports are occupied in fin_wait2 state:
-"Ncat: Cannot assign requested address."
+If we disable ndo_add_slave on mp devices, then we don't need to walk
+lower or upper devices. What do you think? If we don't disable mp
+lower devices entirely, then yes, we can make
+dev_get_min_mp_channel_count() do a recursive check.
 
-Reported-by: Jade Dong <jadedong@tencent.com>
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-v3
-Link: https://lore.kernel.org/all/20240815113745.6668-1-kerneljasonxing@gmail.com/
-1. take the ipv6 case into consideration. (Eric)
+Note that we can add support for mp bound devices as slaves in the
+future if we have a use case for it, and it's well tested to be safe
+with selftests added.
 
-v2
-Link: https://lore.kernel.org/all/20240814035136.60796-1-kerneljasonxing@gmail.com/
-1. change from fin_wait2 to timewait test statement, no functional
-change (Kuniyuki)
----
- net/ipv4/tcp_ipv4.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index fd17f25ff288..b37c70d292bc 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -144,6 +144,9 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
- 			reuse = 0;
- 	}
- 
-+	if (tw->tw_substate == TCP_FIN_WAIT2)
-+		reuse = 0;
-+
- 	/* With PAWS, it is safe from the viewpoint
- 	   of data integrity. Even without PAWS it is safe provided sequence
- 	   spaces do not overlap i.e. at data rates <= 80Mbit/sec.
--- 
-2.37.3
-
+If we disable adding mp devices as lower devices, then during the mp
+binding we should also check if the device has upper devices.
 
