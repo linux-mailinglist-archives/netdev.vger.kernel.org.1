@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-120597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E8CA959ED9
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:39:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5B21959EDA
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 15:39:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99B4D1C227D3
-	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:39:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E987B26A7C
+	for <lists+netdev@lfdr.de>; Wed, 21 Aug 2024 13:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300701A7AFF;
-	Wed, 21 Aug 2024 13:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BCDD1AF4E8;
+	Wed, 21 Aug 2024 13:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YtMAH+1a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PG/vLyr0"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8CC1A7AD5
-	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 13:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A083C1A7AFA
+	for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 13:37:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724247457; cv=none; b=i1bLisaOmW/5N/+zITTIpGt+LigLlKWb0ba9kz7OFj4glTfDrXGlzx0mLWaLmd3UDbtNZ+h9PA1kL0XgGJugnIncCRkV30iEwPMX3HCdp5zBW2hEKo8Q8wd63c8pbJ+MbnVGueJR9VvSjAtz6wqjs2JYqKFUr2TUCG2pkIe7TXs=
+	t=1724247458; cv=none; b=YuBSVU4wRl+TsX5ueCR8p63NbTxc9m+eUp/ukOLOz0mDP4J2ehQrWYYsL0XgvGcjtOjA0tNrv3MZ4O+laq8Uttxhjyj3jpaDD/W+AkiTGgN1BXFASz6K0IhyIIi7GAdlupvu17XQQrpEbpnjU8LAoFkHCs5+pRDCZmsOzu5Sp5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724247457; c=relaxed/simple;
-	bh=C8ttAvSNO0SlJh14VqyZzsFEn/LBgTrhy1JJwP90Xqw=;
+	s=arc-20240116; t=1724247458; c=relaxed/simple;
+	bh=qitX9JQl+WyawhjAqWcOOFfcGblZAsoaspxmb9DYPOA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V7AMDUEpbsTJCeTr7Dd1kp8wvSQxmKig9PVhAFTw1MrcH2AUW3AcMlqhiJTFggRCnIMNCQPXp90EWRzUvUGnsa+aQACOdZ42SrfBztAmQ1sgGnt4nTz3siuksrI1SEzuhWmednkOaKRIwW7ZfnIZH5sWAihQ1cqF4nsYk6McSVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YtMAH+1a; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=AOtawW7lHAwxfq5uB/z3P29nGZ6wDuJPALrp4VtTKse0IUvYSlxNLFSlZJ3yGzXi1rSProSOCIsxk3dHtA1uv8cfqAWM3TGbF8t84FmjNbtl+q0+WJ2pYcDfFglRzwH33/eANb+8jRS74OuXixcNVV3fbCGjYH9TWZh27OG3Kxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PG/vLyr0; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724247456; x=1755783456;
+  t=1724247457; x=1755783457;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=C8ttAvSNO0SlJh14VqyZzsFEn/LBgTrhy1JJwP90Xqw=;
-  b=YtMAH+1aQoJxw9FDl+kNrP6slZpO8i/NiQeCEwcjUYfr1KJZfoAD5kyo
-   72FP2U+X/KWrljW34aM+rab1UHQYRJPnGHf3UqwJTx7dUmtblKs7LDK69
-   Agjhog+X97pcp8qnw0ZtnnKG4F++C2aMZI6QGNggxxPxJrIBWp5TxFnNA
-   VYJjrDEBC5oicnnF6cGwV78iH5CaRhIaAnxqGcERmlzhNWb3aJ9S6EXrs
-   CKEWbVco7lA0MaqBIk4Rbq1R0hVwwL/EqTDC/5E1nR/vqDgO/wYKn73Hr
-   7QguvH2fAKIRmr3RNHsesNAvATCvUefmhIt2SU2afyfRvyE4G3nlbAyGE
-   g==;
-X-CSE-ConnectionGUID: qsy6KPSxS4eLafA7WsGrJg==
-X-CSE-MsgGUID: KMDIyS4/QpGAbS0H9a0INg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="45131421"
+  bh=qitX9JQl+WyawhjAqWcOOFfcGblZAsoaspxmb9DYPOA=;
+  b=PG/vLyr0yNOShCMMQxUMufkH9Vqu+WlHpx1mXJaENLnEBVNxRrdUMBLl
+   3MY7+3v7vUnUTZWGLEj3O9vilx9iFy2TAOXNd8cZjhXU+oGOiLlrJPng0
+   KUnT5+SB53LSCxOeyLZ7J/mfqnIANc93JTSkh/wPHjdpVIfwDssGxgiV6
+   6/H26BF4BuZp5Ip6P1kjZsqpCT/S4/S6sOumHVxQMI1zm/u1pA/CtlFfd
+   L0jyb+pNXC60EPRQ7f/nHzVJ2aty0N03cU5ce7gmPj985TEi3Z2+nXNgr
+   I784eECEsuGWkvyq9J9f9ohsLwWVUqXUOTuz01YO8+jYzEsdSzazG8uot
+   A==;
+X-CSE-ConnectionGUID: ClyRoDFVTNm6C2IC91UIsg==
+X-CSE-MsgGUID: tyTtdQ8eQx+mszQ6caExEw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="45131438"
 X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="45131421"
+   d="scan'208";a="45131438"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 06:37:35 -0700
-X-CSE-ConnectionGUID: fNRBsvOzQiqaDIwWjW+qyg==
-X-CSE-MsgGUID: yBz4ED8wSNyTjDDGjTxQQQ==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 06:37:36 -0700
+X-CSE-ConnectionGUID: uTDmp3cfQ0iRcc1xjKBj9w==
+X-CSE-MsgGUID: n51exEYgQSmLUuP2ZUxS+w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,164,1719903600"; 
-   d="scan'208";a="61071255"
+   d="scan'208";a="61071268"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa008.fm.intel.com with ESMTP; 21 Aug 2024 06:37:31 -0700
+  by fmviesa008.fm.intel.com with ESMTP; 21 Aug 2024 06:37:32 -0700
 Received: from vecna.igk.intel.com (vecna.igk.intel.com [10.123.220.17])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id F2B782878D;
-	Wed, 21 Aug 2024 14:37:28 +0100 (IST)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 2A1D628793;
+	Wed, 21 Aug 2024 14:37:30 +0100 (IST)
 From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 To: intel-wired-lan@lists.osuosl.org,
 	Jiri Pirko <jiri@resnulli.us>,
@@ -81,9 +81,9 @@ Cc: netdev@vger.kernel.org,
 	Wojciech Drewek <wojciech.drewek@intel.com>,
 	Simon Horman <horms@kernel.org>,
 	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [PATCH iwl-next v3 1/6] checkpatch: don't complain on _Generic() use
-Date: Wed, 21 Aug 2024 15:37:09 +0200
-Message-Id: <20240821133714.61417-2-przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next v3 2/6] devlink: add devlink_fmsg_put() macro
+Date: Wed, 21 Aug 2024 15:37:10 +0200
+Message-Id: <20240821133714.61417-3-przemyslaw.kitszel@intel.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20240821133714.61417-1-przemyslaw.kitszel@intel.com>
 References: <20240821133714.61417-1-przemyslaw.kitszel@intel.com>
@@ -95,33 +95,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Improve CamelCase recognition logic to avoid reporting on
-_Generic() use.
-
-Other C keywords, such as _Bool, are intentionally omitted, as those
-should be rather avoided in new source code.
+Add devlink_fmsg_put() that dispatches based on the type
+of the value to put, example: bool -> devlink_fmsg_bool_pair_put().
 
 Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- scripts/checkpatch.pl | 2 ++
- 1 file changed, 2 insertions(+)
+ include/net/devlink.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
-index 39032224d504..d609d47144ff 100755
---- a/scripts/checkpatch.pl
-+++ b/scripts/checkpatch.pl
-@@ -5858,6 +5858,8 @@ sub process {
- #CamelCase
- 			if ($var !~ /^$Constant$/ &&
- 			    $var =~ /[A-Z][a-z]|[a-z][A-Z]/ &&
-+#Ignore C keywords
-+			    $var !~ /^_Generic$/ &&
- #Ignore some autogenerated defines and enum values
- 			    $var !~ /^(?:[A-Z]+_){1,5}[A-Z]{1,3}[a-z]/ &&
- #Ignore Page<foo> variants
+diff --git a/include/net/devlink.h b/include/net/devlink.h
+index db5eff6cb60f..85739bb731c1 100644
+--- a/include/net/devlink.h
++++ b/include/net/devlink.h
+@@ -1261,6 +1261,17 @@ enum devlink_trap_group_generic_id {
+ 		.min_burst = _min_burst,				      \
+ 	}
+ 
++#define devlink_fmsg_put(fmsg, name, value) (			\
++	_Generic((value),					\
++		bool :		devlink_fmsg_bool_pair_put,	\
++		u8 :		devlink_fmsg_u8_pair_put,	\
++		u16 :		devlink_fmsg_u32_pair_put,	\
++		u32 :		devlink_fmsg_u32_pair_put,	\
++		u64 :		devlink_fmsg_u64_pair_put,	\
++		char * :	devlink_fmsg_string_pair_put,	\
++		const char * :	devlink_fmsg_string_pair_put)	\
++	(fmsg, name, (value)))
++
+ enum {
+ 	/* device supports reload operations */
+ 	DEVLINK_F_RELOAD = 1UL << 0,
 -- 
 2.39.3
 
