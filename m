@@ -1,181 +1,100 @@
-Return-Path: <netdev+bounces-120937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C077795B3D1
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:29:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9522795B3DA
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 761811F2223A
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:29:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14D44B20C1C
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5821C93B9;
-	Thu, 22 Aug 2024 11:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC00C1C93BB;
+	Thu, 22 Aug 2024 11:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o3yDF96F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XOvG0IcW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C0E1C6F7B;
-	Thu, 22 Aug 2024 11:29:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E75184554
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 11:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724326183; cv=none; b=QN2rZUEiF5UzBiHKwC3drJTzTh5z7785PEYVYA7BBSVmlmmgG9j0lCscaHh9Q4ORMGzLKP7q6eG/4diz/X9gU1z4U0I8gubG/d9CB+OtCvVDp5T4F5TzG7Yg2P5JaiLmeOnp+IfdLPpgIm/yBM2IcXFk1lBV9yMjJoAOjXFei44=
+	t=1724326230; cv=none; b=oaSlvdfoMQZYp+dWQDtpPRWes/ESwM9Yg7255YfzehqmWGraatwIy6oLvsI6Vcfix05KFw8ytn4p/luCAgZCy2MFDzmx4O3iJiewjN58UzPa22LX0NnVIBthSUEDF5uGgU9RNu33QdJ1e3tdBrcskXPmgQ5n4FGZ9mEiRtbrkQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724326183; c=relaxed/simple;
-	bh=q6UIfNHozIo9lEeHbj8R4JHekY2b0yfbW64o+5TUkZY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LRLCU487KkThMXpEOFfNSFjUItrywoowvenhFacnTbEaZ5QPn60fhRHwClXEerMjJVt5nbXOooHVy4rZo9JF1yOi0dg+aalGRzl/tHOBfo/7FR2dpzQUAYTST3bIJyXDhEo/uneZYvegb6zzOX6UI5GWLHFJSGYyKNb61dIVf7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o3yDF96F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F0DEC32782;
-	Thu, 22 Aug 2024 11:29:36 +0000 (UTC)
+	s=arc-20240116; t=1724326230; c=relaxed/simple;
+	bh=732TUHJsVCkB+VsewfPuoLbr/UQnDzzjBPzT+7YBOvc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SwwtRwqZ/xOOCCZn+wszQYFWrwBG6tcCrEOC0CWEajE8KESXcV4fZKFjx45TnM2OprLTxLThofnF7DNOwjkU1Mkwj2QxJxfNzAKQw7d1C21uWfixBUFLNXQtczs7WCrKmG9JlwYV/iuAUXaWRHRe8RKgLKd0wZkgSENiZHz6JPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XOvG0IcW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F7CAC32782;
+	Thu, 22 Aug 2024 11:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724326183;
-	bh=q6UIfNHozIo9lEeHbj8R4JHekY2b0yfbW64o+5TUkZY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o3yDF96FpD5ELAgrOaIwPW62mW7Ko6AaQmsBoJrGSOZHoAhaIvQf89uV1PloObtX9
-	 2trP5mpwciCzyhyQpwds6H/TG5FKOhpaKsBqRA9C9JrXv9sEH9Y51Aem5uDirebuK5
-	 764pEesFS5FDgJpO4XuyuQUpivDHT57xfNykDRK1OJPFwG3Zgouuwx2c0dnF4KzwbP
-	 kZvtHy55Fb4k7Q/2VyC5cEq0Ggj/gwDVQYRo1/mmqJKQHjV3+DQHOqwBeolCF5c3YS
-	 xk06cSHF8IhY1XylqaU7SJR3PRW80lNP2PH8aI0TfcWiBI/inRF35B5IHRIUoF8CYK
-	 H0kylfDl8mUEg==
-Message-ID: <42f29ba8-e341-474e-9e2a-59f55850803a@kernel.org>
-Date: Thu, 22 Aug 2024 14:29:34 +0300
+	s=k20201202; t=1724326230;
+	bh=732TUHJsVCkB+VsewfPuoLbr/UQnDzzjBPzT+7YBOvc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XOvG0IcWK2OLjQKhi7Akhp6uS93EqMf210IFl8tGyG3xXaMIQg+vQb+bkdlzp2VKi
+	 J9mxVjRR1wcxeSNIBuoq7DXA8bYuLCTBa4ofNguztJ0+pspo66aud5l3YzyvFZKiTM
+	 BNl+skEmVf4evFSLM6a2B0pZz90ugfhkvxf0CJuqDXPkfArS7IqnJ1bJlzACOqGQ56
+	 if6zC0LeFKowOnvUhsYW1+yFzlrf0s/P4cKDd80QmoVeXPZ2NvwVSCCw6kbVx+vC6N
+	 8tn88ETRHmCpO5Yb3jOITml0vqeYLVi7FlBeIw1lC7aHtKjVohI5fabl9v55w3V7Do
+	 PzI+Fsc1avsuw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE3D3809A80;
+	Thu, 22 Aug 2024 11:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 2/2] net: ti: icssg-prueth: Add support for PA
- Stats
-To: MD Danish Anwar <danishanwar@ti.com>, Suman Anna <s-anna@ti.com>,
- Sai Krishna <saikrishnag@marvell.com>, Jan Kiszka <jan.kiszka@siemens.com>,
- Dan Carpenter <dan.carpenter@linaro.org>, Diogo Ivo <diogo.ivo@siemens.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>, Conor Dooley <conor+dt@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Santosh Shilimkar <ssantosh@kernel.org>, Nishanth Menon <nm@ti.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- srk@ti.com, Vignesh Raghavendra <vigneshr@ti.com>
-References: <20240820091657.4068304-1-danishanwar@ti.com>
- <20240820091657.4068304-3-danishanwar@ti.com>
- <03172556-8661-4804-8a3b-0252d91fdf46@kernel.org>
- <79dfc7d2-d738-4899-aadf-a6b4df338c23@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <79dfc7d2-d738-4899-aadf-a6b4df338c23@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: airoha: configure hw mac address
+ according to the port id
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172432622976.2293429.5896662227992279102.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Aug 2024 11:30:29 +0000
+References: <20240821-airoha-eth-wan-mac-addr-v2-1-8706d0cd6cd5@kernel.org>
+In-Reply-To: <20240821-airoha-eth-wan-mac-addr-v2-1-8706d0cd6cd5@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org, lorenzo.bianconi83@gmail.com
 
+Hello:
 
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 22/08/2024 08:28, MD Danish Anwar wrote:
+On Wed, 21 Aug 2024 09:30:14 +0200 you wrote:
+> GDM1 port on EN7581 SoC is connected to the lan dsa switch.
+> GDM{2,3,4} can be used as wan port connected to an external
+> phy module. Configure hw mac address registers according to the port id.
 > 
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+> Changes in v2:
+> - improve code readability adding reg offset for {LAN,WAN}_LMIN and
+>   {LAN,WAN}_LMAX regs
+> - fix signed-off-by tag
+> - Link to v1: https://lore.kernel.org/r/20240819-airoha-eth-wan-mac-addr-v1-1-e8d7c13b3182@kernel.org
 > 
-> On 21/08/24 6:05 pm, Roger Quadros wrote:
->>
->>
->> On 20/08/2024 12:16, MD Danish Anwar wrote:
->>> Add support for dumping PA stats registers via ethtool.
->>> Firmware maintained stats are stored at PA Stats registers.
->>> Also modify emac_get_strings() API to use ethtool_puts().
->>>
->>> This commit also renames the array icssg_all_stats to icssg_mii_g_rt_stats
->>> and creates a new array named icssg_all_pa_stats for PA Stats.
->>>
->>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
->>> ---
-> 
-> [ ... ]
-> 
->>> +
->>>  #define ICSSG_STATS(field, stats_type)			\
->>>  {							\
->>>  	#field,						\
->>> @@ -84,13 +98,24 @@ struct miig_stats_regs {
->>>  	stats_type					\
->>>  }
->>>  
->>> +#define ICSSG_PA_STATS(field)			\
->>> +{						\
->>> +	#field,					\
->>> +	offsetof(struct pa_stats_regs, field),	\
->>> +}
->>> +
->>>  struct icssg_stats {
->>
->> icssg_mii_stats?
->>
-> 
-> Sure Roger. I will name it icssg_miig_stats to be consistent with
-> 'struct miig_stats_regs'
-> 
->>>  	char name[ETH_GSTRING_LEN];
->>>  	u32 offset;
->>>  	bool standard_stats;
->>>  };
->>>  
->>> -static const struct icssg_stats icssg_all_stats[] = {
->>> +struct icssg_pa_stats {
->>> +	char name[ETH_GSTRING_LEN];
->>> +	u32 offset;
->>> +};
->>> +
->>> +static const struct icssg_stats icssg_mii_g_rt_stats[] = {
->>
->> icssg_all_mii_stats? to be consistend with the newly added
->> icssg_pa_stats and icssg_all_pa_stats.
->>
->> Could you please group all mii_stats data strucutres and arrays together
->> followed by pa_stats data structures and arrays?
->>
-> 
-> Sure Roger, I will group all mii stats related data structures and
-> pa_stats related data structures together.
-> 
-> The sequence and naming will be something like this,
-> 
-> struct miig_stats_regs
-> #define ICSSG_MIIG_STATS(field, stats_type)
-> struct icssg_miig_stats
-> static const struct icssg_miig_stats icssg_all_miig_stats[]
-> 
-> struct pa_stats_regs
-> #define ICSSG_PA_STATS(field)
-> struct icssg_pa_stats
-> static const struct icssg_pa_stats icssg_all_pa_stats[]
-> 
-> Let me know if this looks ok to you.
+> [...]
 
-This is good. Thanks!
+Here is the summary with links:
+  - [net-next,v2] net: airoha: configure hw mac address according to the port id
+    https://git.kernel.org/netdev/net-next/c/812a2751e827
 
-> 
->>>  	/* Rx */
->>>  	ICSSG_STATS(rx_packets, true),
->>>  	ICSSG_STATS(rx_broadcast_frames, false),
->>> @@ -155,4 +180,11 @@ static const struct icssg_stats icssg_all_stats[] = {
->>>  	ICSSG_STATS(tx_bytes, true),t
->>>  };
->>>  
->>> +static const struct icssg_pa_stats icssg_all_pa_stats[] = > +	ICSSG_PA_STATS(fw_rx_cnt),
->>> +	ICSSG_PA_STATS(fw_tx_cnt),
->>> +	ICSSG_PA_STATS(fw_tx_pre_overflow),
->>> +	ICSSG_PA_STATS(fw_tx_exp_overflow),
->>> +};
->>> +
->>>  #endif /* __NET_TI_ICSSG_STATS_H */
->>
-> 
-
+You are awesome, thank you!
 -- 
-cheers,
--roger
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
