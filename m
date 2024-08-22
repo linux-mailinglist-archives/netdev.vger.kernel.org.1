@@ -1,464 +1,201 @@
-Return-Path: <netdev+bounces-120910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE5C695B2D0
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:22:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18A9695B2D4
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:23:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DCB81C21223
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 10:22:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5175B216C6
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 10:23:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D23117E00E;
-	Thu, 22 Aug 2024 10:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0A3179206;
+	Thu, 22 Aug 2024 10:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="DNO+yn7H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pyjfrqpz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3852E4F881
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 10:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD69364A4
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 10:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724322131; cv=none; b=RFYgB1tvtjjpTSscP/XF5oei7mAJ1E2w9ejK70baY2Ce3iAV7fNmIKwj56y2ZWimWcSNE0BhwEXesWombrKy2cXznLgZKUqe32eaYEVUcydDvdAlhVo/ZH28/g6AZEPPyU56JFtYueVF1Z31MpZPmYH0hfT8r+zOOouYzkVqzR8=
+	t=1724322182; cv=none; b=QOhpA/SRNaQ+2TtpQGr+81w1QAWBYZqGLCzLvVl7KbDupqhtaAKy5H8lBIPyRAaE+YSMqDVlCQ+nTFS8OkeCTFkXNZgitOC8OnoyMoCq76kMxpIr1ayOzFNGl91XzmATgrbrL0cF1DxFlmM7r90tll3reXqvx+2GOl+0eWyqy30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724322131; c=relaxed/simple;
-	bh=6BgcG/qsN2UK0IXNa+QQKqRPkY6VVHrPMNL2ktjEJ70=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SFWUt1EagGV4vgSxxGB3aFGKYE0meyF26eH84YacjEoVhy6Ogh+riz8Uegf5Fbtb5jSo1NcO3LFxdNpAAzj71VjZSPEYC35wvvUJllR0/JyHT/VlfeUsqet+0bGyoWiGlLrFrZ8TDbuACY83uC7FB7WT+cabZSfiZqWuv6tlrto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=DNO+yn7H; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5bf006f37daso1057341a12.1
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 03:22:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724322126; x=1724926926; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3pOBZ7Whc9pH5INV6IqLXuAkz+SPdxv7znSmmHW29ow=;
-        b=DNO+yn7HbbTuxqjWLio1X6R8zvxd3pHEcqd26qdyRgZgRJC+4Q185iGHnYqvYPwcnQ
-         MmSDtEZQKF1+V+2t/JJw+gud8dJesafsYYT2WBWo7UpWDsvftonBHY8pXDkSKduvh+Px
-         thU68mYSUnMsUXT7OtcqyUjIljgV3o82A7TMv/az0Q7idn/4EMXKItA5J+3iEwzH120D
-         Bvaa7YprrcH3EmId71JH2GAbN+t/34gmb/f3sA+5JLrMpFDDaOAos/gEhuGzQ0h0CC0S
-         f2KDgyda04WsLTlruXMs8FAN+sg5qFpNOiVofGzIaiPGw2s2gcdrwLfytN9FtrWURTh9
-         2UvA==
+	s=arc-20240116; t=1724322182; c=relaxed/simple;
+	bh=6qQLrdt4izcz2V+I8k7k1v2aOMi/FJ1gQoWP0TsSJ0k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QrhceHn+SZ11Hkol97bIH7Bfj+Thj6ku//B9qWavi9a7sbbTqH2a3U45/uXL7qgb6PWcw0oBixv7iFMqfI+ubZT2zNPaUg/Q5JfPUAxEsxo5Z4I74N+7Qky5jMxhpexr/t0tP+q8mHjbwrnwQBQ2PmhdMESuli9V2T+RUeVlcbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pyjfrqpz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724322179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PM6Bwg2hvkvZKxGLuYJbLZsSu5PxkdBrsa5wx234vH0=;
+	b=PyjfrqpzCge1I3IJSfLblOMxi/hK5GXrVo6Sv1KvnSflAMDQ3QJdoh4zDa2+FmQ7Mg9clQ
+	Rt0KWUqX3ytGRJI94eKNb+cRR3T62frvCo0ELomoAkxiQwvABWpHR407kPqCIgfGaPBST+
+	9+jSOuZWvm15Q3AA4o58vxt24VNCqT0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-135-GdvLznBcOgy2jG6bvungJg-1; Thu, 22 Aug 2024 06:22:58 -0400
+X-MC-Unique: GdvLznBcOgy2jG6bvungJg-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4280b119a74so4396915e9.3
+        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 03:22:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724322126; x=1724926926;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3pOBZ7Whc9pH5INV6IqLXuAkz+SPdxv7znSmmHW29ow=;
-        b=Tce8voSOFzMzgHDzgTDyPO/hDZHkHDTCGbe/v8lWjhmj0nTvitc9XdOGkduWxjwY1/
-         It5ss5SLbuqBXt7gQ0KjEArnY5245QSRisoBseWCC+gj0fFyYSm3CfzBN0KGdN1z1TcY
-         J7dBXnLzws2iXKadgAIpX8mZg2RizfYw0kqW8uhZjji/twcuYvkI6GKlrz2UzYQZejdv
-         midFro4iM2KGsTmYlTVaE7+u5ADqfqvU7v5WNvC02QYZHgTl/0sK5pOtgz+bMxwL/vV6
-         f64+2kHZvqyBsFhcb6AoiX1dRyDq28i/jOpWnu+BfT4d88ObOAbAKD+TxCDuC3rjLy9o
-         lvbQ==
-X-Gm-Message-State: AOJu0YzhCAQ78WQCdMR1CqfABr7wRWfQfJN+EPUiFqBmQWv9fH6aHlAT
-	KeWuRzq1c5GthyfTnmeuSD5qB6EfBEke2CS3nhO0U6gFPNBOmhGbrbOqtAhHo3Q=
-X-Google-Smtp-Source: AGHT+IEqdkIkuFDE3mb84fFjSU+15UXG/VRiWdlvxJLEvaNuZV0B0OnxVkzES+RQ7+iQihhj+4CRRg==
-X-Received: by 2002:a05:6402:5255:b0:5be:fb2e:d334 with SMTP id 4fb4d7f45d1cf-5bf2c04bbcdmr2542310a12.12.1724322126143;
-        Thu, 22 Aug 2024 03:22:06 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c04a3c8615sm746406a12.23.2024.08.22.03.22.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2024 03:22:05 -0700 (PDT)
-Date: Thu, 22 Aug 2024 12:22:04 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, donald.hunter@gmail.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next v2 1/2] dpll: add Embedded SYNC feature for a pin
-Message-ID: <ZscRTKu6bFMm0VkQ@nanopsycho.orion>
-References: <20240821213218.232900-1-arkadiusz.kubalewski@intel.com>
- <20240821213218.232900-2-arkadiusz.kubalewski@intel.com>
+        d=1e100.net; s=20230601; t=1724322177; x=1724926977;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PM6Bwg2hvkvZKxGLuYJbLZsSu5PxkdBrsa5wx234vH0=;
+        b=NZHk/hkTf+BwR+qc7eMPMcIVQPvT7A3KqPrBmPFXGvlf0MKNEu+IU/hvzvw1+LqHSs
+         xq/hxL8VSSzV7Q1ss5x9l/4UcXjrEDyRVHt1ebEwUOvmZSlkszmjwiENNVxWHAOwx/yi
+         I0IorEO7hm5maS8rsFhRXi7yxvgVvkuJFRgNv/Lwo84ZoudLcyjzfUVVfm2oDA6KiY2V
+         U0dMmtaXagVZ/PtiwWxXykXIbfYfns+6YhnZ61UG5JcDlnAUMFWjYdmDYMiv5kVsVuET
+         O1WyddcQ8xbIlnlxECrdOHDw3qMbWsfsM8rr676GuboCvOuIioqWLCG0tdADINMv20UL
+         3+Dw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzR6Zbh5eF0U046farSObzINCNXODhfAYq4a0Pu7HvlVGozcZRtNFF/Ism+jFfj3u5VwmmaXg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbrNzVkZDx8TQKCI4+qGymkk1Q4h4AqRCK5NfZCpI7Z0kOWR/+
+	VHTUiQbJg3dE/6nbCLI2h2fghefUFmdyRuTpaipzfoH+l99sFZ91bBPclrFK3zVOcPyWNVlvAaS
+	PVQANgWWhwxoPMhtzNWSu8N44oN7RJi/C5Ay64G00i4PWEezDQAyySQ==
+X-Received: by 2002:a05:600c:3583:b0:426:6edf:6597 with SMTP id 5b1f17b1804b1-42ac55e440cmr8803105e9.19.1724322177108;
+        Thu, 22 Aug 2024 03:22:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHpsGJd5PZXf0Z4sTIzlfw6vDZM3Vr503lNrd8QYAl+YyFwrPZqaNrHyTqZllkRT39KrE6bcQ==
+X-Received: by 2002:a05:600c:3583:b0:426:6edf:6597 with SMTP id 5b1f17b1804b1-42ac55e440cmr8802925e9.19.1724322176584;
+        Thu, 22 Aug 2024 03:22:56 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b51:3b10:b0e7:ba61:49af:e2d5? ([2a0d:3344:1b51:3b10:b0e7:ba61:49af:e2d5])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730817a076sm1319222f8f.60.2024.08.22.03.22.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Aug 2024 03:22:56 -0700 (PDT)
+Message-ID: <cc6601a3-6657-4659-9f2b-6dd7856fe8e0@redhat.com>
+Date: Thu, 22 Aug 2024 12:22:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240821213218.232900-2-arkadiusz.kubalewski@intel.com>
-
-Wed, Aug 21, 2024 at 11:32:17PM CEST, arkadiusz.kubalewski@intel.com wrote:
->Implement and document new pin attributes for providing Embedded SYNC
->capabilities to the DPLL subsystem users through a netlink pin-get
->do/dump messages. Allow the user to set Embedded SYNC frequency with
->pin-set do netlink message.
->
->Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->---
->v2:
->- remove enum for pulse-ratio, instead use plain u32 value,
->- provide e-sync-frequency attribute and value only if esync was
->  enabled,
->- rename: e_sync/E_SYNC -> esync/ESYNC,
->- refactor .esync_get to allow multiple esync range values,
->- define and use struct dpll_pin_esync for getting esync related info,
->- rename esync -> freq to better align with existiong code,
->- remove unneeded line break,
->- respect 80 chars per line rule,
->- fix typos,
->
-> Documentation/driver-api/dpll.rst     |  21 +++++
-> Documentation/netlink/specs/dpll.yaml |  24 +++++
-> drivers/dpll/dpll_netlink.c           | 130 ++++++++++++++++++++++++++
-> drivers/dpll/dpll_nl.c                |   5 +-
-> include/linux/dpll.h                  |  15 +++
-> include/uapi/linux/dpll.h             |   3 +
-> 6 files changed, 196 insertions(+), 2 deletions(-)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] l2tp: avoid using drain_workqueue in
+ l2tp_pre_exit_net
+To: James Chapman <jchapman@katalix.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ dsahern@kernel.org, tparkin@katalix.com, xiyou.wangcong@gmail.com
+References: <20240819145208.3209296-1-jchapman@katalix.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240819145208.3209296-1-jchapman@katalix.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-Looks fine. 2 nitpicks below:
 
+On 8/19/24 16:52, James Chapman wrote:
+> Recent commit c1b2e36b8776 ("l2tp: flush workqueue before draining
+> it") incorrectly uses drain_workqueue. 
 
->
->diff --git a/Documentation/driver-api/dpll.rst b/Documentation/driver-api/dpll.rst
->index ea8d16600e16..a212b94ad52c 100644
->--- a/Documentation/driver-api/dpll.rst
->+++ b/Documentation/driver-api/dpll.rst
->@@ -214,6 +214,27 @@ offset values are fractional with 3-digit decimal places and shell be
-> divided with ``DPLL_PIN_PHASE_OFFSET_DIVIDER`` to get integer part and
-> modulo divided to get fractional part.
-> 
->+Embedded SYNC
->+=============
->+
->+Device may provide ability to use Embedded SYNC feature. It allows
->+to embed additional SYNC signal into the base frequency of a pin - a one
->+special pulse of base frequency signal every time SYNC signal pulse
->+happens. The user can configure the frequency of Embedded SYNC.
->+The Embedded SYNC capability is always related to a given base frequency
->+and HW capabilities. The user is provided a range of Embedded SYNC
->+frequencies supported, depending on current base frequency configured for
->+the pin.
->+
->+  ========================================= =================================
->+  ``DPLL_A_PIN_ESYNC_FREQUENCY``            current Embedded SYNC frequency
->+  ``DPLL_A_PIN_ESYNC_FREQUENCY_SUPPORTED``  nest available Embedded SYNC
->+                                            frequency ranges
->+    ``DPLL_A_PIN_FREQUENCY_MIN``            attr minimum value of frequency
->+    ``DPLL_A_PIN_FREQUENCY_MAX``            attr maximum value of frequency
->+  ``DPLL_A_PIN_ESYNC_PULSE``                pulse type of Embedded SYNC
->+  ========================================= =================================
->+
-> Configuration commands group
-> ============================
-> 
->diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
->index 94132d30e0e0..f2894ca35de8 100644
->--- a/Documentation/netlink/specs/dpll.yaml
->+++ b/Documentation/netlink/specs/dpll.yaml
->@@ -345,6 +345,26 @@ attribute-sets:
->           Value is in PPM (parts per million).
->           This may be implemented for example for pin of type
->           PIN_TYPE_SYNCE_ETH_PORT.
->+      -
->+        name: esync-frequency
->+        type: u64
->+        doc: |
->+          Frequency of Embedded SYNC signal. If provided, the pin is configured
->+          with a SYNC signal embedded into its base clock frequency.
->+      -
->+        name: esync-frequency-supported
->+        type: nest
->+        multi-attr: true
->+        nested-attributes: frequency-range
->+        doc: |
->+          If provided a pin is capable of embedding a SYNC signal (within given
->+          range) into its base frequency signal.
->+      -
->+        name: esync-pulse
->+        type: u32
->+        doc: |
->+          A ratio of high to low state of a SYNC signal pulse embedded
->+          into base clock frequency. Value is in percents.
->   -
->     name: pin-parent-device
->     subset-of: pin
->@@ -510,6 +530,9 @@ operations:
->             - phase-adjust-max
->             - phase-adjust
->             - fractional-frequency-offset
->+            - esync-frequency
->+            - esync-frequency-supported
->+            - esync-pulse
-> 
->       dump:
->         request:
->@@ -536,6 +559,7 @@ operations:
->             - parent-device
->             - parent-pin
->             - phase-adjust
->+            - esync-frequency
->     -
->       name: pin-create-ntf
->       doc: Notification about pin appearing
->diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
->index 98e6ad8528d3..fe1a00ad84d1 100644
->--- a/drivers/dpll/dpll_netlink.c
->+++ b/drivers/dpll/dpll_netlink.c
->@@ -342,6 +342,51 @@ dpll_msg_add_pin_freq(struct sk_buff *msg, struct dpll_pin *pin,
-> 	return 0;
-> }
-> 
->+static int
->+dpll_msg_add_pin_esync(struct sk_buff *msg, struct dpll_pin *pin,
->+		       struct dpll_pin_ref *ref, struct netlink_ext_ack *extack)
->+{
->+	const struct dpll_pin_ops *ops = dpll_pin_ops(ref);
->+	struct dpll_device *dpll = ref->dpll;
->+	struct dpll_pin_esync esync;
->+	struct nlattr *nest;
->+	int ret, i;
->+
->+	if (!ops->esync_get)
->+		return 0;
->+	ret = ops->esync_get(pin, dpll_pin_on_dpll_priv(dpll, pin), dpll,
->+			     dpll_priv(dpll), &esync, extack);
->+	if (ret == -EOPNOTSUPP)
->+		return 0;
->+	else if (ret)
->+		return ret;
->+	if (nla_put_64bit(msg, DPLL_A_PIN_ESYNC_FREQUENCY, sizeof(esync.freq),
->+			  &esync.freq, DPLL_A_PIN_PAD))
->+		return -EMSGSIZE;
->+	if (nla_put_u32(msg, DPLL_A_PIN_ESYNC_PULSE, esync.pulse))
->+		return -EMSGSIZE;
->+	for (i = 0; i < esync.range_num; i++) {
->+		nest = nla_nest_start(msg,
->+				      DPLL_A_PIN_ESYNC_FREQUENCY_SUPPORTED);
->+		if (!nest)
->+			return -EMSGSIZE;
->+		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MIN,
->+				  sizeof(esync.range[i].min),
->+				  &esync.range[i].min, DPLL_A_PIN_PAD))
->+			goto nest_cancel;
->+		if (nla_put_64bit(msg, DPLL_A_PIN_FREQUENCY_MAX,
->+				  sizeof(esync.range[i].max),
->+				  &esync.range[i].max, DPLL_A_PIN_PAD))
->+			goto nest_cancel;
->+		nla_nest_end(msg, nest);
->+	}
->+	return 0;
->+
->+nest_cancel:
->+	nla_nest_cancel(msg, nest);
->+	return -EMSGSIZE;
->+}
->+
-> static bool dpll_pin_is_freq_supported(struct dpll_pin *pin, u32 freq)
-> {
-> 	int fs;
->@@ -481,6 +526,9 @@ dpll_cmd_pin_get_one(struct sk_buff *msg, struct dpll_pin *pin,
-> 	if (ret)
-> 		return ret;
-> 	ret = dpll_msg_add_ffo(msg, pin, ref, extack);
->+	if (ret)
->+		return ret;
->+	ret = dpll_msg_add_pin_esync(msg, pin, ref, extack);
-> 	if (ret)
-> 		return ret;
-> 	if (xa_empty(&pin->parent_refs))
->@@ -738,6 +786,83 @@ dpll_pin_freq_set(struct dpll_pin *pin, struct nlattr *a,
-> 	return ret;
-> }
-> 
->+static int
->+dpll_pin_esync_set(struct dpll_pin *pin, struct nlattr *a,
->+		    struct netlink_ext_ack *extack)
->+{
->+	struct dpll_pin_ref *ref, *failed;
->+	const struct dpll_pin_ops *ops;
->+	struct dpll_pin_esync esync;
->+	u64 freq = nla_get_u64(a);
->+	struct dpll_device *dpll;
->+	bool supported = false;
->+	unsigned long i;
->+	int ret;
->+
->+	xa_for_each(&pin->dpll_refs, i, ref) {
->+		ops = dpll_pin_ops(ref);
->+		if (!ops->esync_set || !ops->esync_get) {
->+			NL_SET_ERR_MSG(extack,
->+				       "embedded sync feature is not supported by this device");
->+			return -EOPNOTSUPP;
->+		}
->+	}
->+	ref = dpll_xa_ref_dpll_first(&pin->dpll_refs);
->+	ops = dpll_pin_ops(ref);
->+	dpll = ref->dpll;
->+	ret = ops->esync_get(pin, dpll_pin_on_dpll_priv(dpll, pin), dpll,
->+			     dpll_priv(dpll), &esync, extack);
->+	if (ret) {
->+		NL_SET_ERR_MSG(extack, "unable to get current embedded sync frequency value");
->+		return ret;
->+	}
->+	if (freq == esync.freq)
->+		return 0;
->+	for (i = 0; i < esync.range_num; i++)
->+		if (freq <= esync.range[i].max && freq >= esync.range[i].min)
->+			supported = true;
->+	if (!supported) {
->+		NL_SET_ERR_MSG_ATTR(extack, a,
->+				    "requested embedded sync frequency value is not supported by this device");
->+		return -EINVAL;
->+	}
->+
->+	xa_for_each(&pin->dpll_refs, i, ref) {
->+		void *pin_dpll_priv;
->+
->+		ops = dpll_pin_ops(ref);
->+		dpll = ref->dpll;
->+		pin_dpll_priv = dpll_pin_on_dpll_priv(dpll, pin);
->+		ret = ops->esync_set(pin, pin_dpll_priv, dpll, dpll_priv(dpll),
->+				      freq, extack);
->+		if (ret) {
->+			failed = ref;
->+			NL_SET_ERR_MSG_FMT(extack,
->+					   "embedded sync frequency set failed for dpll_id:%u",
+isn't the relevant commit fc7ec7f554d7d0a27ba339fcf48df11d14413329?
 
-Missing space after ":".
+> The use of drain_workqueue in
+> l2tp_pre_exit_net is flawed because the workqueue is shared by all
+> nets and it is therefore possible for new work items to be queued
+> while drain_workqueue runs.
+> 
+> Instead of using drain_workqueue, use a loop to delete all tunnels and
+> __flush_workqueue until all tunnel/session lists of the net are
+> empty. Add a per-net flag to ensure that no new tunnel can be created
+> in the net once l2tp_pre_exit_net starts.
 
+We need a fixes tag even for net-next fixes :)
 
->+					   dpll->id);
->+			goto rollback;
->+		}
->+	}
->+	__dpll_pin_change_ntf(pin);
->+
->+	return 0;
->+
->+rollback:
->+	xa_for_each(&pin->dpll_refs, i, ref) {
->+		void *pin_dpll_priv;
->+
->+		if (ref == failed)
->+			break;
->+		ops = dpll_pin_ops(ref);
->+		dpll = ref->dpll;
->+		pin_dpll_priv = dpll_pin_on_dpll_priv(dpll, pin);
->+		if (ops->esync_set(pin, pin_dpll_priv, dpll, dpll_priv(dpll),
->+				   esync.freq, extack))
->+			NL_SET_ERR_MSG(extack, "set embedded sync frequency rollback failed");
->+	}
->+	return ret;
->+}
->+
-> static int
-> dpll_pin_on_pin_state_set(struct dpll_pin *pin, u32 parent_idx,
-> 			  enum dpll_pin_state state,
->@@ -1039,6 +1164,11 @@ dpll_pin_set_from_nlattr(struct dpll_pin *pin, struct genl_info *info)
-> 			if (ret)
-> 				return ret;
-> 			break;
->+		case DPLL_A_PIN_ESYNC_FREQUENCY:
->+			ret = dpll_pin_esync_set(pin, a, info->extack);
->+			if (ret)
->+				return ret;
->+			break;
-> 		}
-> 	}
+> Signed-off-by: James Chapman <jchapman@katalix.com>
+> Signed-off-by: Tom Parkin <tparkin@katalix.com>
+> ---
+>   net/l2tp/l2tp_core.c    | 38 +++++++++++++++++++++++++++++---------
+>   net/l2tp/l2tp_core.h    |  2 +-
+>   net/l2tp/l2tp_netlink.c |  2 +-
+>   net/l2tp/l2tp_ppp.c     |  3 ++-
+>   4 files changed, 33 insertions(+), 12 deletions(-)
 > 
->diff --git a/drivers/dpll/dpll_nl.c b/drivers/dpll/dpll_nl.c
->index 1e95f5397cfc..fe9b6893d261 100644
->--- a/drivers/dpll/dpll_nl.c
->+++ b/drivers/dpll/dpll_nl.c
->@@ -62,7 +62,7 @@ static const struct nla_policy dpll_pin_get_dump_nl_policy[DPLL_A_PIN_ID + 1] =
-> };
-> 
-> /* DPLL_CMD_PIN_SET - do */
->-static const struct nla_policy dpll_pin_set_nl_policy[DPLL_A_PIN_PHASE_ADJUST + 1] = {
->+static const struct nla_policy dpll_pin_set_nl_policy[DPLL_A_PIN_ESYNC_FREQUENCY + 1] = {
-> 	[DPLL_A_PIN_ID] = { .type = NLA_U32, },
-> 	[DPLL_A_PIN_FREQUENCY] = { .type = NLA_U64, },
-> 	[DPLL_A_PIN_DIRECTION] = NLA_POLICY_RANGE(NLA_U32, 1, 2),
->@@ -71,6 +71,7 @@ static const struct nla_policy dpll_pin_set_nl_policy[DPLL_A_PIN_PHASE_ADJUST +
-> 	[DPLL_A_PIN_PARENT_DEVICE] = NLA_POLICY_NESTED(dpll_pin_parent_device_nl_policy),
-> 	[DPLL_A_PIN_PARENT_PIN] = NLA_POLICY_NESTED(dpll_pin_parent_pin_nl_policy),
-> 	[DPLL_A_PIN_PHASE_ADJUST] = { .type = NLA_S32, },
->+	[DPLL_A_PIN_ESYNC_FREQUENCY] = { .type = NLA_U64, },
-> };
-> 
-> /* Ops table for dpll */
->@@ -138,7 +139,7 @@ static const struct genl_split_ops dpll_nl_ops[] = {
-> 		.doit		= dpll_nl_pin_set_doit,
-> 		.post_doit	= dpll_pin_post_doit,
-> 		.policy		= dpll_pin_set_nl_policy,
->-		.maxattr	= DPLL_A_PIN_PHASE_ADJUST,
->+		.maxattr	= DPLL_A_PIN_ESYNC_FREQUENCY,
-> 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-> 	},
-> };
->diff --git a/include/linux/dpll.h b/include/linux/dpll.h
->index d275736230b3..3baa196d7000 100644
->--- a/include/linux/dpll.h
->+++ b/include/linux/dpll.h
->@@ -15,6 +15,7 @@
-> 
-> struct dpll_device;
-> struct dpll_pin;
->+struct dpll_pin_esync;
-> 
-> struct dpll_device_ops {
-> 	int (*mode_get)(const struct dpll_device *dpll, void *dpll_priv,
->@@ -83,6 +84,13 @@ struct dpll_pin_ops {
-> 	int (*ffo_get)(const struct dpll_pin *pin, void *pin_priv,
-> 		       const struct dpll_device *dpll, void *dpll_priv,
-> 		       s64 *ffo, struct netlink_ext_ack *extack);
->+	int (*esync_set)(const struct dpll_pin *pin, void *pin_priv,
->+			  const struct dpll_device *dpll, void *dpll_priv,
->+			  u64 esync_freq, struct netlink_ext_ack *extack);
+> diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
+> index af87c781d6a6..246b07342b86 100644
+> --- a/net/l2tp/l2tp_core.c
+> +++ b/net/l2tp/l2tp_core.c
+> @@ -107,6 +107,7 @@ static struct workqueue_struct *l2tp_wq;
+>   /* per-net private data for this module */
+>   static unsigned int l2tp_net_id;
+>   struct l2tp_net {
+> +	bool net_closing;
+>   	/* Lock for write access to l2tp_tunnel_idr */
+>   	spinlock_t l2tp_tunnel_idr_lock;
+>   	struct idr l2tp_tunnel_idr;
+> @@ -1560,13 +1561,19 @@ static int l2tp_tunnel_sock_create(struct net *net,
+>   	return err;
+>   }
+>   
+> -int l2tp_tunnel_create(int fd, int version, u32 tunnel_id, u32 peer_tunnel_id,
+> +int l2tp_tunnel_create(struct net *net, int fd, int version,
+> +		       u32 tunnel_id, u32 peer_tunnel_id,
+>   		       struct l2tp_tunnel_cfg *cfg, struct l2tp_tunnel **tunnelp)
+>   {
+> +	struct l2tp_net *pn = l2tp_pernet(net);
+>   	struct l2tp_tunnel *tunnel = NULL;
+>   	int err;
+>   	enum l2tp_encap_type encap = L2TP_ENCAPTYPE_UDP;
+>   
+> +	/* This pairs with WRITE_ONCE() in l2tp_pre_exit_net(). */
+> +	if (READ_ONCE(pn->net_closing))
+> +		return -ENETDOWN;
 
-s/esync_freq/freq/
+Is this necessary? the netns is going away, no user space process should 
+be able to touch it.
 
+> +
+>   	if (cfg)
+>   		encap = cfg->encap;
+>   
+> @@ -1855,16 +1870,21 @@ static __net_exit void l2tp_pre_exit_net(struct net *net)
+>   	}
+>   	rcu_read_unlock_bh();
+>   
+> -	if (l2tp_wq) {
+> -		/* ensure that all TUNNEL_DELETE work items are run before
+> -		 * draining the work queue since TUNNEL_DELETE requests may
+> -		 * queue SESSION_DELETE work items for each session in the
+> -		 * tunnel. drain_workqueue may otherwise warn if SESSION_DELETE
+> -		 * requests are queued while the work queue is being drained.
+> -		 */
+> +	if (l2tp_wq)
+>   		__flush_workqueue(l2tp_wq);
+> -		drain_workqueue(l2tp_wq);
+> +
+> +	/* repeat until all of the net's IDR lists are empty, in case tunnels
+> +	 * or sessions were being created just before l2tp_pre_exit_net was
+> +	 * called.
+> +	 */
+> +	rcu_read_lock_bh();
+> +	if (!idr_is_empty(&pn->l2tp_tunnel_idr) ||
+> +	    !idr_is_empty(&pn->l2tp_v2_session_idr) ||
+> +	    !idr_is_empty(&pn->l2tp_v3_session_idr)) {
+> +		rcu_read_unlock_bh();
+> +		goto again;
 
->+	int (*esync_get)(const struct dpll_pin *pin, void *pin_priv,
->+			  const struct dpll_device *dpll, void *dpll_priv,
->+			  struct dpll_pin_esync *esync,
->+			  struct netlink_ext_ack *extack);
-> };
-> 
-> struct dpll_pin_frequency {
->@@ -111,6 +119,13 @@ struct dpll_pin_phase_adjust_range {
-> 	s32 max;
-> };
-> 
->+struct dpll_pin_esync {
->+	u64 freq;
->+	const struct dpll_pin_frequency *range;
->+	u8 range_num;
->+	u8 pulse;
->+};
->+
-> struct dpll_pin_properties {
-> 	const char *board_label;
-> 	const char *panel_label;
->diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
->index 0c13d7f1a1bc..b0654ade7b7e 100644
->--- a/include/uapi/linux/dpll.h
->+++ b/include/uapi/linux/dpll.h
->@@ -210,6 +210,9 @@ enum dpll_a_pin {
-> 	DPLL_A_PIN_PHASE_ADJUST,
-> 	DPLL_A_PIN_PHASE_OFFSET,
-> 	DPLL_A_PIN_FRACTIONAL_FREQUENCY_OFFSET,
->+	DPLL_A_PIN_ESYNC_FREQUENCY,
->+	DPLL_A_PIN_ESYNC_FREQUENCY_SUPPORTED,
->+	DPLL_A_PIN_ESYNC_PULSE,
-> 
-> 	__DPLL_A_PIN_MAX,
-> 	DPLL_A_PIN_MAX = (__DPLL_A_PIN_MAX - 1)
->-- 
->2.38.1
->
+This looks not nice, it could keep the kernel spinning for a while.
+
+What about i.e. queue a 'dummy' work on l2tp_wq after 
+__flush_workqueue() and explicitly wait for such work to complete?
+
+when such work completes are other l2tp related one in the same netns 
+should also be completed.
+
+Cheers,
+
+Paolo
+
 
