@@ -1,123 +1,154 @@
-Return-Path: <netdev+bounces-120829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E50B595AF38
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:25:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 746A595AF51
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:31:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60B701F24854
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:25:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F21711F225DE
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:31:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DED216F0F0;
-	Thu, 22 Aug 2024 07:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254FC12AAFD;
+	Thu, 22 Aug 2024 07:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZCbjqUeX"
+	dkim=pass (3072-bit key) header.d=octiron.net header.i=@octiron.net header.b="sGv6qGIC";
+	dkim=permerror (0-bit key) header.d=octiron.net header.i=@octiron.net header.b="1mKDYHgL";
+	dkim=pass (3072-bit key) header.d=octiron.net header.i=@octiron.net header.b="slgtsiSd";
+	dkim=permerror (0-bit key) header.d=octiron.net header.i=@octiron.net header.b="nDlqTNVr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ymitury.uuid.uk (ymitury.uuid.uk [95.179.232.160])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE39216DEB2;
-	Thu, 22 Aug 2024 07:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9975F125AC;
+	Thu, 22 Aug 2024 07:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.179.232.160
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724311317; cv=none; b=QxRN3DQJ5wRXEJ3FyeD9GF2VRUn3PrR5Jhtk1dIYMNVDgLW0kTlQibnZ2LLIikustmy9Zr/ZZ7tTgcZO4L5GCuI0YXns5lnybIIxz2nfx0kMfa9ZH+l4D0SCezeT/Xd5OIy6fhZjcRvEBNBRl5bQifE+Z+BJj+tkReLYzIyXjDo=
+	t=1724311892; cv=none; b=gtq5Wnotg8PGKpwUT87nW0/PHdQ/U6weLJAY/JbkYxLY5fYi0WRt8WNm0jRUuHI1nsCM0hiYcMMylJW231556I0LLrtG5zGUAt4dKuLPpmrd6vFFk7YYB1DL19HLezvhr3IcSNtCJO7ruMksPBC2LG1NuBDy8iIxPVWQAeFUC/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724311317; c=relaxed/simple;
-	bh=nNDexdTioCTGGo+1m6GnqCfGEK2qQlnbf0CpCXYmhUk=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version; b=gwrHJRiqyCfdbC8vmjAW4+keZtxqNT2paE0/Ba0/K4d9t1xVKYTPjSIwj1iverzlWrsOhWzeeoVPm8uon9l1Qb4gvYd8opfo03lxAF2jDfWyA1TTxOmwvhMPlhCAXMl5PyrfFFNVzcs2EiL3jjN8BCTtX2VnFlS8D9jxt70lLiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZCbjqUeX; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-714302e7285so403752b3a.2;
-        Thu, 22 Aug 2024 00:21:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724311315; x=1724916115; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JkB/d8ErHMSWFnxE7P9bAPdATeEZPVv3G/phURvLmPo=;
-        b=ZCbjqUeX4Bsyfdykdc4ycXSBNxxQSuDtkkLwNVe537m6kK4ncJ+cABJmLkcfdXFsyt
-         VlVPs9dITPUfCU7pFksM6oXuEfXZikDBeuZOLRcX7Mg1jS64P6dCJOSA8FF+LTIvzlYS
-         TMYHfZgF+if4QWv4POGi3Xeqcte0KJvE8GbPTefawI6Ykg+WjyWfuj04CNtjaIuQ30+6
-         rXNERSXat4vk31dsAIDSe0u1exBKZOyFydTCvtESOwtCDdj7+CoOoUKWgqoTieOdIdax
-         c/G2mQcQ03Otk0HK+44WY9zXgZN9JqbRTykyqIVosokCIu4xAD33ADPOz5NcFx6Itpx/
-         XANQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724311315; x=1724916115;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JkB/d8ErHMSWFnxE7P9bAPdATeEZPVv3G/phURvLmPo=;
-        b=rEqCRoZuGW3N2vLvLEdwDqQciM/aldxxcq5Iqa18aBOZQdxDxRb/Z1JLaM7fn7s/GC
-         0pIQdizHag+OMHWEKcl0fJQ6DJJqSN0TAMZ83ZksUO6IeyrdWeEKO1nou+1mSzUssOcl
-         +1yFTTZG/D6zjCogh3Gpk9K4Np3KEq3SL1WFKJ3FPyG12vGeHofPnRAVXV2izGkfz5tr
-         DLxAHJMjqJ1pSicdJsa8AoXiBXjXVciSs09dt6vuFrLRmO27HVzRZReleFTmdjbeUink
-         IaGoVuPidFW9OTbRyzpDmNbN4zqT6ur7vBSYR1qRE9XooQDl2FAbXeSB14rdcItmtrIo
-         C2yg==
-X-Forwarded-Encrypted: i=1; AJvYcCVwLZ1I7Bfn4zhxizjp5tr/zuVKTIFoYW9fM9GcAzQ4AlrZfsuMxbNRiERNsQlyLA3Tn73FO8QS@vger.kernel.org, AJvYcCWWTRzh4zr5NIHDElza/Ovr4rqPWrJ4swEK0qIrFTe3QF/esoh+1n/QIT+TPKIA3/HFgW+9Oe2sja6sD0Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySrDTzahTQJNJ6U0r1zw0RskLYOMjdaFJ8F+asFSbNcRDq6BiH
-	q2MbF93iJZgQsJV+BoPJmNxFVtwMsc5Xd9+DOQpuPLbEXnYr87ay
-X-Google-Smtp-Source: AGHT+IEZWm66FyTBPnaCOSfXUHPjXm+fcp7gqEt7jBcOoAjWP5aAD8200DmMaWV1xVpLL1BxGgZwRA==
-X-Received: by 2002:a05:6a00:2342:b0:70b:cf1:8dc9 with SMTP id d2e1a72fcca58-714239600afmr6201644b3a.25.1724311314901;
-        Thu, 22 Aug 2024 00:21:54 -0700 (PDT)
-Received: from localhost.localdomain ([58.18.89.126])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71434335e5dsm754330b3a.204.2024.08.22.00.21.50
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 22 Aug 2024 00:21:54 -0700 (PDT)
-From: Xi Huang <xuiagnh@gmail.com>
-To: madalin.bucur@nxp.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	xuiagnh@gmail.com
-Subject: [PATCHv2] net: dpaa:reduce number of synchronize_net() calls
-Date: Thu, 22 Aug 2024 15:20:42 +0800
-Message-Id: <20240822072042.42750-1-xuiagnh@gmail.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1724311892; c=relaxed/simple;
+	bh=y5HJCLYriM2drLCjIHIBOA4aA48H7AbqkZYc0RWYEd0=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=FI6xhsZJJkexKmlIXcTHLkO4ZVuAtwmQ0pJaQLXEvSZafxPftzmvLLgggPvN5PiXMCSlEGssNsSFhPqAop6apHlh3tG04CYEQyA1pbgtWFDI7dXUBxcECKSDC+nnPy21VGXSk/HfLMq/jdx95ahDZ+pMxa6nkNDW8lSarZJigZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=octiron.net; spf=pass smtp.mailfrom=octiron.net; dkim=pass (3072-bit key) header.d=octiron.net header.i=@octiron.net header.b=sGv6qGIC; dkim=permerror (0-bit key) header.d=octiron.net header.i=@octiron.net header.b=1mKDYHgL; dkim=pass (3072-bit key) header.d=octiron.net header.i=@octiron.net header.b=slgtsiSd; dkim=permerror (0-bit key) header.d=octiron.net header.i=@octiron.net header.b=nDlqTNVr; arc=none smtp.client-ip=95.179.232.160
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=octiron.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=octiron.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=octiron.net
+	; s=20230424-rsa3072; h=Content-Transfer-Encoding:Content-Type:Cc:To:Subject:
+	From:MIME-Version:Date:Message-ID:From:Sender:Reply-To:Subject:Date:
+	Message-ID:To:Cc:Bcc:MIME-Version:Content-Type:Content-Disposition:
+	Content-Transfer-Encoding:In-Reply-To:References:Organization;
+	bh=5EdaLcB016+00N+TOyi+k7VGW7m1HvknxhrUff810zY=; t=1724311886; b=sGv6qGIC9Ji9
+	Faoz6B7xBga6Cw9A/0WGXqes0496EtfU8oAuwhp9uYd3O8wwFKJiQRVTc19HPn4IBQd1rF8iI5Rkh
+	uBL4VfiMiYSmcne15sJSChDJpecC4iF5xWyz4+w+wDo8G4ewOuIVrJnBDcOzm/cx/7e/eA9uqVhwv
+	VyHMPba8FOjZpamR5TYPxH5kavtL2RdqqxUOFnilKlPHBW8oFkdKPGIDZN3R4KZ943OE1BHbLrOl1
+	Km5sqnr/oiahi6k/Vb5hStt698muXuEv1ljYUo8b3VeM/FRBI8PsqRyifueFgy+adscpiynkcxxCa
+	1HfImrCLUXqUZJwPEPdtpYtwrx9rCplkdrzswdE//cCgsiRJSaiwZTorQGoCPTwMOBSNmHjkauByH
+	/yBci+2Tj6u99jzfhGcBPWPUy1lsCsylwzJszuyB/23GrChcWsm5XxivdO2KK2BnIodc3m2voHny8
+	ixqh8Qs25epDg2wx+W8fZ/Srfj8Q0pTxDWMZ7q;
+DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=octiron.net; s=20230410-ed25519; h=Content-Transfer-Encoding:Content-Type:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:Bcc:MIME-Version:Content-Type:Content-Disposition:
+	Content-Transfer-Encoding:In-Reply-To:References:Organization;
+	bh=5EdaLcB016+00N+TOyi+k7VGW7m1HvknxhrUff810zY=; t=1724311886; b=1mKDYHgLXpWA
+	Qy3Fq7ehiz7gWI8CkrpTKr1WziHegqc9dDZ8aJQZSj+DhJqtOB0mRrO0BIxRPl0XRrZJ+7QpDw==;
+Received: by ymitury.uuid.uk with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	(envelope-from <simon@octiron.net>)
+	id 1sh2C0-000zGS-3a; Thu, 22 Aug 2024 08:25:13 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=octiron.net
+	; s=20230424-rsa3072; h=Content-Transfer-Encoding:Content-Type:Cc:To:Subject:
+	From:MIME-Version:Date:Message-ID:From:Sender:Reply-To:Subject:Date:
+	Message-ID:To:Cc:Bcc:MIME-Version:Content-Type:Content-Disposition:
+	Content-Transfer-Encoding:In-Reply-To:References:Organization;
+	bh=5EdaLcB016+00N+TOyi+k7VGW7m1HvknxhrUff810zY=; t=1724311512; b=slgtsiSdnqE+
+	Mqyxg206+L0FHUQd43rxDPQxGoWsmz4oBpUfQRtVD4MXQheBO56HHKJWFVdZWRtTn6mbA2LDBarCT
+	PwhOdoGM2QIWz3xjoEWQPLP3rdpW51JpWFpcGi/R0TdGcoipjshuWDJvUDDeZgiPP2bHdJR1tkpL0
+	f95/7e3yOWK+Z/YDSk8Fn+iZ+v0wDDzJ6e3CeSzvx2ccqYLJJcEEbHnpXcqdvAq1oa4EA4V9NJrmi
+	BoE+3CRDMTv5uB53W3c0fXD86S8r6uwnFMspJzgq+qla1T8CjKsSkD/k0Om+aiUgJsg/XGUHXvER6
+	Fu6OhTQSJPM7GzcMkXHhxjvn33ZaHIcuWecUQwbNmGpf6qEp2Jix/YqGUPYF0LyF5VIY3/aZLUmpx
+	Qf/xw0jByM6oeR/YlrMXo7gwO3Heiv6LX/cNpw1MmtIvgAI5d+8PrM3gQmWMbiXuv6gE/pMl/ltQy
+	CazVE0WQTmfF2dNU2UyYYYrXHp0ZpXBA0Yu76F;
+DKIM-Signature: v=1; a=ed25519-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=octiron.net; s=20230410-ed25519; h=Content-Transfer-Encoding:Content-Type:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:Bcc:MIME-Version:Content-Type:Content-Disposition:
+	Content-Transfer-Encoding:In-Reply-To:References:Organization;
+	bh=5EdaLcB016+00N+TOyi+k7VGW7m1HvknxhrUff810zY=; t=1724311512; b=nDlqTNVry6HL
+	zsH32HB+1mZEESeAR5MGG+ACh928dy7PY11OW07dMIXRsgoQLwwA8dC+X33/E2KzrmL3ooxHBA==;
+Received: by tsort.uuid.uk with esmtps (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
+	(Exim 4.93)
+	(envelope-from <simon@octiron.net>)
+	id 1sh2Bw-000Px2-CH; Thu, 22 Aug 2024 08:25:09 +0100
+Message-ID: <4fc08687-1d80-43fe-9f0d-8ef8475e75f6@0882a8b5-c6c3-11e9-b005-00805fc181fe.uuid.home.arpa>
+Date: Thu, 22 Aug 2024 08:25:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Simon Arlott <simon@octiron.net>
+Subject: [PATCH net] can: mcp251x: fix deadlock if an interrupt occurs during
+ mcp251x_open
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: linux-kernel@vger.kernel.org
+Content-Language: en-GB
+X-Face: -|Y&Xues/.'(7\@`_\lFE/)pw"7..-Ur1^@pRL`Nad5a()6r+Y)18-pi'!`GI/zGn>6a6ik
+ mcW-%sg_wM:4PXDw:(;Uu,n&!8=;A<P|QG`;AMu5ypJkN-Sa<eyt,Ap3q`5Z{D0BN3G`OmX^8x^++R
+ Gr9G'%+PNM/w+w1+vB*a($wYgA%*cm3Hds`a7k)CQ7'"[\C|g2k]FQ-f*DDi{pU]v%5JZm
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-In the function dpaa_napi_del(), we execute the netif_napi_del()
-for each cpu, which is actually a high overhead operation
-because each call to netif_napi_del() contains a synchronize_net(),
-i.e. an RCU operation. In fact, it is only necessary to call
- __netif_napi_del and use synchronize_net() once outside of the loop.
-This change is similar to commit 2543a6000e593a ("gro_cells: reduce
-number of synchronize_net() calls") and commit 5198d545dba8ad (" net:
-remove napi_hash_del() from driver-facing API") 5198d545db.
+The mcp251x_hw_wake() function is called with the mpc_lock mutex held and
+disables the interrupt handler so that no interrupts can be processed while
+waking the device. If an interrupt has already occurred then waiting for
+the interrupt handler to complete will deadlock because it will be trying
+to acquire the same mutex.
 
-Signed-off-by: Xi Huang <xuiagnh@gmail.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+CPU0                           CPU1
+----                           ----
+mcp251x_open()
+ mutex_lock(&priv->mcp_lock)
+  request_threaded_irq()
+                               <interrupt>
+                               mcp251x_can_ist()
+                                mutex_lock(&priv->mcp_lock)
+  mcp251x_hw_wake()
+   disable_irq() <-- deadlock
+
+Use disable_irq_nosync() instead because the interrupt handler does
+everything while holding the mutex so it doesn't matter if it's still
+running.
+
+Fixes: 8ce8c0abcba3 ("can: mcp251x: only reset hardware as required")
+Signed-off-by: Simon Arlott <simon@octiron.net>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: stable@vger.kernel.org
 ---
-V1 -> V2: Modify the cited commit format and remove useless information
+ drivers/net/can/spi/mcp251x.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-index cfe6b57b1..5d99cfb4e 100644
---- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-@@ -3156,8 +3156,9 @@ static void dpaa_napi_del(struct net_device *net_dev)
- 	for_each_possible_cpu(cpu) {
- 		percpu_priv = per_cpu_ptr(priv->percpu_priv, cpu);
+diff --git a/drivers/net/can/spi/mcp251x.c b/drivers/net/can/spi/mcp251x.c
+index 3b8736ff0345..ec5c64006a16 100644
+--- a/drivers/net/can/spi/mcp251x.c
++++ b/drivers/net/can/spi/mcp251x.c
+@@ -752,7 +752,7 @@ static int mcp251x_hw_wake(struct spi_device *spi)
+ 	int ret;
  
--		netif_napi_del(&percpu_priv->np.napi);
-+		__netif_napi_del(&percpu_priv->np.napi);
- 	}
-+	synchronize_net();
- }
+ 	/* Force wakeup interrupt to wake device, but don't execute IST */
+-	disable_irq(spi->irq);
++	disable_irq_nosync(spi->irq);
+ 	mcp251x_write_2regs(spi, CANINTE, CANINTE_WAKIE, CANINTF_WAKIF);
  
- static inline void dpaa_bp_free_pf(const struct dpaa_bp *bp,
+ 	/* Wait for oscillator startup timer after wake up */
 -- 
-2.34.1
+2.44.0
 
+-- 
+Simon Arlott
 
