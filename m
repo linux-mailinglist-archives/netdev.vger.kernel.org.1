@@ -1,96 +1,135 @@
-Return-Path: <netdev+bounces-120931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7CFF95B3A9
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:20:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CD6295B3BE
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:28:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A5A61F220E2
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:20:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A89301F23732
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104491C93A6;
-	Thu, 22 Aug 2024 11:20:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 966321C93D1;
+	Thu, 22 Aug 2024 11:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HpyzUIT+"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="bu9iDcP4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DBB183CC7;
-	Thu, 22 Aug 2024 11:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06EB81C93CD;
+	Thu, 22 Aug 2024 11:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724325633; cv=none; b=hicOs7VMqe37JMj5O6UGsjq2a8ePq9LkSM51WxSnrRgrQUorn5knsgSpj7YCSDYALOMVG5nyABVpHNlY6Mm1VNnEllL7NDK9nudv9aHJHjgz/T2Mcpjfd2skf888+QBGI7Ae3afl2kBfkselGIHJxWq2bUIFFYWIxmeRrRrGeNc=
+	t=1724326062; cv=none; b=hs6nKyZpZ7yzVqexYzxwxH0NWIbS8R6i5ZlwKyDAGnHObyVHpEQb0tBQZQ2KR0pBPPRr2226b0Zj2b2h9vRUuiERI3LrhP7p0KSVdE6bo5ol5xV/UWH6s2UI+UYmlPrl/dVv5T29GihduQZNHDwkYLgI1GLTeDVPfHVYCUIgVMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724325633; c=relaxed/simple;
-	bh=W9zzyC79Di5ouv9UwCv0oBYTSnRehCS2jEyLnu2TMLc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ci5iZpfvC7CNFuvABS3kPwThqjaR5hNw4gxWQTgHz7731eIqQqiXkb6OFqrFZ1i9wNiHl1nxd6atmK/AUVVK2WDCKtCaso30gF3SrwO7k1pDr6iy6Ev3pymr1m//xQD3U//yReUqcMy0sn3HVNiDhDLa+pyTdjyHtvOFInLK2Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HpyzUIT+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BCCDC4AF09;
-	Thu, 22 Aug 2024 11:20:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724325633;
-	bh=W9zzyC79Di5ouv9UwCv0oBYTSnRehCS2jEyLnu2TMLc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HpyzUIT+Q8tZjC66wxIUsObAn4JkSDNIZ0V6CzPy8KyHBO88YcQoStPTe/boflyUn
-	 IGnnyi8FhcEFGC8iPz+cy9xDVPsaSEvYRFjCK49PenMUL38P0et622+KNl88SD3raD
-	 85XftUsGN/YtlLBI8pSSvNtKLBvJ5ev2E4d6giirjg8kdAy35FL/5k669Oumsa8YP1
-	 kfYgn8YC7/wav71eLn5JsCG/yBEur0ILm2vIiz6NAGGwPYSIXA9u3oUo5nQi3oviwO
-	 QoJRjL/kdZFoK3phB02txovHWFSAlZ2KGDHWy32gqUQDdAeeBpT8pZnG2PKtHB+TGU
-	 5vS7Krtp8XKew==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B763809A80;
-	Thu, 22 Aug 2024 11:20:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1724326062; c=relaxed/simple;
+	bh=YTQZD840jQL6WynsalQ6I85hUQYCV8bw2+SJCazhrTU=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=gD1cgSE8hBkouYh53xfIOBIOPgDfWNieHol9z0W5ikW/a9noKXVg5YNXJXrVUULN6G8U4PVPSvzrIdpwDaniWZS6HQXEe0SFSkPbuLfD1kOtgE8JuruciGJipBFrW26/1P4woNP+Bw41pN0eQ2irV888YJyJco0g+vsBI/rvK9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=bu9iDcP4; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47M9jcwn027854;
+	Thu, 22 Aug 2024 11:27:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=3bKTSGxjKcVpBXNiDJqNTK
+	9YW8F+5ML9zXx8QFGj2SU=; b=bu9iDcP49BPkoROUHale0GL7Kn7mECT5+KwUDU
+	szFP5tjg77Ogpc2MggRGyDQj+rQNu+GTCk8RV8xo8N3IbLaHkTfRNZx7CqYvnyd2
+	R2iMotwjbfOm8Lmep+c2COwF9LhQcLpnjylfNiM5p8MPq5gYIUhbv2b5CPK6MhsC
+	3snnXXlH6EfKm4PyWcuHbLMg9u6p6iYOJXXYk79pLhPtmQC5To+dOv/sqCtZq1+l
+	cWprY64zbzpHdzhlQXNxyt2W66NoWv7zqy4vycosdcsCo/gOHxuD3ErVmuXDQFAx
+	Q27yk/nZp6Mpj8ujXyinGXdkBsY6lOEt9ytk5EcRslS7Utbg==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 414v5cem3b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Aug 2024 11:27:34 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47MBRYOL010209
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Aug 2024 11:27:34 GMT
+Received: from hu-imrashai-hyd.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 22 Aug 2024 04:27:29 -0700
+From: Imran Shaik <quic_imrashai@quicinc.com>
+Subject: [PATCH v2 0/2] clk: qcom: Add support for GCC on QCS8300
+Date: Thu, 22 Aug 2024 16:57:17 +0530
+Message-ID: <20240822-qcs8300-gcc-v2-0-b310dfa70ad8@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net PATCH v3] octeontx2-af: Fix CPT AF register offset calculation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172432563290.2291309.15266043095086207002.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Aug 2024 11:20:32 +0000
-References: <20240821070558.1020101-1-bbhushan2@marvell.com>
-In-Reply-To: <20240821070558.1020101-1-bbhushan2@marvell.com>
-To: Bharat Bhushan <bbhushan2@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
- hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jerinj@marvell.com, lcherian@marvell.com,
- ndabilpuram@marvell.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJUgx2YC/23MQQ6CMBCF4auQWVsznSJUV97DsMChwixspdVGQ
+ 7i7lbXL/yXvWyC5KC7BqVoguixJgi9Buwp46v3olAylgZBqtIRq5mQNohqZVW0MkqHmeDUNlMc
+ jupu8N+3SlZ4kPUP8bHjWv/W/k7VCNVjdEh5021s6zy9h8bzncIduXdcv8VP8oagAAAA=
+To: Bjorn Andersson <andersson@kernel.org>,
+        Michael Turquette
+	<mturquette@baylibre.com>,
+        Stephen Boyd <sboyd@kernel.org>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>
+CC: Ajit Pandey <quic_ajipan@quicinc.com>, Taniya Das <quic_tdas@quicinc.com>,
+        Jagadeesh Kona <quic_jkona@quicinc.com>,
+        Satya Priya Kakitapalli
+	<quic_skakitap@quicinc.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, Imran Shaik
+	<quic_imrashai@quicinc.com>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.14.1
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: wIBscJtR56Be3xJyPg8V4iUACJZOCyzF
+X-Proofpoint-ORIG-GUID: wIBscJtR56Be3xJyPg8V4iUACJZOCyzF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-22_03,2024-08-22_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ spamscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0
+ phishscore=0 priorityscore=1501 clxscore=1011 malwarescore=0
+ mlxlogscore=876 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408220085
 
-Hello:
+This series adds the dt-bindings and driver support for GCC on QCS8300 platform.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Signed-off-by: Imran Shaik <quic_imrashai@quicinc.com>
+---
+Changes in v2:
+- Removed the QCS8300 SoC info series dependency in cover letter as per the review
+comments from Krzysztof.
+- Link to v1: https://lore.kernel.org/r/20240820-qcs8300-gcc-v1-0-d81720517a82@quicinc.com
 
-On Wed, 21 Aug 2024 12:35:58 +0530 you wrote:
-> Some CPT AF registers are per LF and others are global. Translation
-> of PF/VF local LF slot number to actual LF slot number is required
-> only for accessing perf LF registers. CPT AF global registers access
-> do not require any LF slot number. Also, there is no reason CPT
-> PF/VF to know actual lf's register offset.
-> 
-> Without this fix microcode loading will fail, VFs cannot be created
-> and hardware is not usable.
-> 
-> [...]
+---
+Imran Shaik (2):
+      dt-bindings: clock: qcom: Add GCC clocks for QCS8300
+      clk: qcom: Add support for Global Clock Controller on QCS8300
 
-Here is the summary with links:
-  - [net,v3] octeontx2-af: Fix CPT AF register offset calculation
-    https://git.kernel.org/netdev/net/c/af688a99eb1f
+ .../bindings/clock/qcom,qcs8300-gcc.yaml           |   66 +
+ drivers/clk/qcom/Kconfig                           |   10 +
+ drivers/clk/qcom/Makefile                          |    1 +
+ drivers/clk/qcom/gcc-qcs8300.c                     | 3640 ++++++++++++++++++++
+ include/dt-bindings/clock/qcom,qcs8300-gcc.h       |  234 ++
+ 5 files changed, 3951 insertions(+)
+---
+base-commit: bb1b0acdcd66e0d8eedee3570d249e076b89ab32
+change-id: 20240820-qcs8300-gcc-433023269b36
 
-You are awesome, thank you!
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Imran Shaik <quic_imrashai@quicinc.com>
 
 
