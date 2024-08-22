@@ -1,167 +1,419 @@
-Return-Path: <netdev+bounces-120897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF2595B272
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:56:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9FD695B275
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:57:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 63B241C22F58
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:56:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 180FD1C20C5A
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:57:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96DDB175D3F;
-	Thu, 22 Aug 2024 09:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="QUdztwlz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E181A175D5F;
+	Thu, 22 Aug 2024 09:57:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 583D313A3F2
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 09:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724320564; cv=none; b=uCZWtfT8NOB+2G0SiFqa1TcD4I5CRvQ4u3BuUUoX5YPuHiUKoLdg5enzd/qCVyabrMgewtHVgb70e9MTTFOMaE6mOyUlwI/ZbaZYecXU4TaGl1giTDYoy69qc+j+mxMGVIn9h33ErPjtUYb9nLJTuv6+4q4DviqpC1zoIlU8yvk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724320564; c=relaxed/simple;
-	bh=noEl+y+iaAUIg85RYvbLh5N1gcDN74kg/JD3kwCOeLE=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KLQbI6tmTwtB8WWGVRNqr6SqGarc/B3JPR5c1PhPs6k8g7cYO7qtyGm5AuMDsAOysxj72vGwDZdj5VwuAlohlg7suEHEWE8y4eOV1SRQECsnFIl+07BU1O3jEK2ywmL6oMQIGGZDoU3sEMEfUY1mvifh1cLLXPkk7UyIX4CcTF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=QUdztwlz; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 1440B208A9;
-	Thu, 22 Aug 2024 11:55:59 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id Flxjht2gCB-g; Thu, 22 Aug 2024 11:55:58 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 6588220764;
-	Thu, 22 Aug 2024 11:55:58 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 6588220764
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1724320558;
-	bh=MQFzYTAFjwPp0uLvDTBrYJRx3vlQlv7HSKv8+NLtK0Q=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=QUdztwlznawbYvF1xG7LSCysYhyiGKl/yNHyO6LXtOxtW2EiAnEqee1mIWZncSgfD
-	 sIlDq4Zr1gt7vSoNflUsiaIdwAFPGzih9WRDuj5yw/FuxDqMatNglwOb7Z0HxkuBu4
-	 pFNPl0A0BaRJBpu10zO70iqfWZBpkF6QZVKxl2Hp4t7OaMPgmWHEWNs1jlv1bCcRPV
-	 KpcxhJuD1/5zAHlPbFnANXZHidmRxdIBSReTmMiSKjnQ87Q/LI1Cr8L6AgXeXn/PpC
-	 f9z+EbS5HHvOzCpiEpPmgKWJ/vcH1hcMfedPZKspn+L6zTMSw+Rl6VYFmLgTs5vx3D
-	 7v9s80Z3bbJLw==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 22 Aug 2024 11:55:58 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 22 Aug
- 2024 11:55:58 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id A86CB31818F6; Thu, 22 Aug 2024 11:55:57 +0200 (CEST)
-Date: Thu, 22 Aug 2024 11:55:57 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: Hangbin Liu <liuhangbin@gmail.com>, <netdev@vger.kernel.org>, Jay Vosburgh
-	<j.vosburgh@gmail.com>, "David S . Miller" <davem@davemloft.net>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
-	<edumazet@google.com>, Nikolay Aleksandrov <razor@blackwall.org>, "Tariq
- Toukan" <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Simon Horman
-	<horms@kernel.org>
-Subject: Re: [PATCHv3 net-next 2/3] bonding: Add ESN support to IPSec HW
- offload
-Message-ID: <ZscLLbkZnJmiYViM@gauss3.secunet.de>
-References: <20240820004840.510412-1-liuhangbin@gmail.com>
- <20240820004840.510412-3-liuhangbin@gmail.com>
- <ZsS3Zh8bT-qc46s7@hog>
- <ZsXd8adxUtip773L@gauss3.secunet.de>
- <ZsXq6BAxdkVQmsID@Laptop-X1>
- <ZsXuJD4PEnakVA-W@hog>
- <ZsaHTbcZPH0O3RBJ@Laptop-X1>
- <ZsbkdzvjVf3GiYHa@gauss3.secunet.de>
- <Zsb5L-2srQLUpMmn@hog>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1FB81CF8B;
+	Thu, 22 Aug 2024 09:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724320626; cv=none; b=qcFSuuk7F9+MhNzcas4mfWHO7Em1zFo0i3Yh5w3nze44qzSxDSDGB8E+fSdQ/A452EAmLDma41M4JNxwDrf7FZyLdSpKO3fVr1yiY1mdixqAjI6vhZm+3I6Fbyyo6PseOgGJ3P5rFlEHNYbO36dnE8U+kwh4kK3VeC49Qf8TBfI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724320626; c=relaxed/simple;
+	bh=gMYvnozQM5vVHK/eHLFIldRLE3zy3lpmtmvcvuTCUI0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lNxnNyv0KmlUZ62hx8B6c7X2LHaIvbDyFSLfLzjp/DLkNm06M6+zLTEFZOJ4GYZlJC3kaiBAUXR+74QpOChTMAri2c/Lc7p/7iSa6hej8mk8jZ1mQPckiVjR7cCG3XRfQFxfQfAld7nWN6o76O412jbwLWiL6CCkNbwPUBppcT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a868831216cso84477066b.3;
+        Thu, 22 Aug 2024 02:57:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724320623; x=1724925423;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V9Hzm+F1jgbNfqptbTuv+Dkx8QEy1/v3zb7pzO0JQOQ=;
+        b=kyypTZbM9T2bSb/4J+6IstJucSMverX23uLIQi2uDQ5z0arTVgix1bUuuflCWtPDsw
+         +Vz9dukQ/5XJHi8m6HWSDeAfALjzmObMQESU3tgL/XgiESjzPSJphBKLpsKDjs1wB3aJ
+         JYms+nPtwjwYrLJskq2QYkcaDjF4CZ5nPLBxYoq1dazdJ5XT5lls/ktknZKbKcq4EEk+
+         ehNEDbXEHlnrjtJqBY5Qf2Wj6Q6LVCdO9fu9BhRDkfGOV7y8A/p0UtgqsUa7uQSJM0CD
+         jRtBRDC60vUg+JQchLcLSviZNIcvnZyd5ApavBg/KYTYhJxWnOZcpbHOaC5z24Y94uea
+         FwvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUli5/IIatO5qzygIEPV2iXDRzc46K51RFVQ/ePKS33XglUvg5KljX9qz+J/+48Tcbibh+NJ9g+QGlFPFA=@vger.kernel.org, AJvYcCXVUKvkJkIAyA7fQ8/fgphuul3QDn1mDftEdsgQUG9R0hxVSBAHWmG8EqNe2DTDiP0kYb4IZPVQ2QySrGyLbUsR@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywq26h+7vpjyKpldf9pezOHsiho4WRQ4Q0TWrvrxDhyKgq5OSjp
+	3e4EKytygUg9gJrKx/a779OvImZdFjgBaapzYuvmT6s2RhqqCA+p
+X-Google-Smtp-Source: AGHT+IF9aDVSFGvS1drOxCeGiRfxscyrXP6oTRsaA4uaBhrB0av12+yAtPuR8Mnsmpj31HP3v26XfQ==
+X-Received: by 2002:a17:907:1c29:b0:a86:9058:c01b with SMTP id a640c23a62f3a-a869058c14bmr116328266b.65.1724320622305;
+        Thu, 22 Aug 2024 02:57:02 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f4f46a2sm94102166b.208.2024.08.22.02.57.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Aug 2024 02:57:01 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	liuhangbin@gmail.com,
+	petrm@nvidia.com,
+	matttbe@kernel.org,
+	Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org,
+	David Wei <dw@davidwei.uk>,
+	Willem de Bruijn <willemb@google.com>,
+	linux-kernel@vger.kernel.org (open list),
+	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
+Subject: [PATCH net-next v7] net: netconsole: selftests: Create a new netconsole selftest
+Date: Thu, 22 Aug 2024 02:56:39 -0700
+Message-ID: <20240822095652.3806208-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Zsb5L-2srQLUpMmn@hog>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 22, 2024 at 10:39:11AM +0200, Sabrina Dubroca wrote:
-> 2024-08-22, 09:10:47 +0200, Steffen Klassert wrote:
-> > On Thu, Aug 22, 2024 at 08:33:17AM +0800, Hangbin Liu wrote:
-> > > On Wed, Aug 21, 2024 at 03:39:48PM +0200, Sabrina Dubroca wrote:
-> > > > > > > > +	if (!real_dev->xfrmdev_ops ||
-> > > > > > > > +	    !real_dev->xfrmdev_ops->xdo_dev_state_advance_esn) {
-> > > > > > > > +		pr_warn("%s: %s doesn't support xdo_dev_state_advance_esn\n", __func__, real_dev->name);
-> > > > > > > 
-> > > > > > > xdo_dev_state_advance_esn is called on the receive path for every
-> > > > > > > packet when ESN is enabled (xfrm_input -> xfrm_replay_advance ->
-> > > > > > > xfrm_replay_advance_esn -> xfrm_dev_state_advance_esn), this needs to
-> > > > > > > be ratelimited.
-> > > > > > 
-> > > > > > How does xfrm_state offload work on bonding?
-> > > > > > Does every slave have its own negotiated SA?
-> > > > > 
-> > > > > Yes and no. Bonding only supports xfrm offload with active-backup mode. So only
-> > > > > current active slave keep the SA. When active slave changes, the sa on
-> > > > > previous slave is deleted and re-added on new active slave.
-> > > > 
-> > > > It's the same SA, there's no DELSA+NEWSA when we change the active
-> > > > slave (but we call xdo_dev_state_delete/xdo_dev_state_add to inform
-> > > > the driver/HW), and only a single NEWSA to install the offloaded SA on
-> > > > the bond device (which calls the active slave's xdo_dev_state_add).
-> > > 
-> > > Yes, thanks for the clarification. The SA is not changed, we just delete it
-> > > on old active slave
-> > > 
-> > > slave->dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
-> > > 
-> > > And add to now one.
-> > > 
-> > > ipsec->xs->xso.real_dev = slave->dev;
-> > > slave->dev->xfrmdev_ops->xdo_dev_state_add(ipsec->xs, NULL)
-> > 
-> > Using the same key on two different devices is very dangerous.
-> 
-> It's only used by one device at a time, we only support offload with
-> "active-backup" mode, where only the current active slave can send
-> packets.
-> 
-> > Counter mode algorithms have the requirement that the IV
-> > must not repeat. If you use the same key on two devices,
-> > you can't guarantee that. If both devices use an internal
-> > counter (initialized to one) to generate the IV, then the
-> > IV repeats for the mumber of packets that were already
-> > sent on the old device. The algorithm is cryptographically
-> > broken in that case.
-> 
-> Aren't they basing the IV on the sequence number filled in the header?
-> If not, then I guess this stuff has been broken since 2020 :(
-> (18cb261afd7b ("bonding: support hardware encryption offload to slaves"))
+Adds a selftest that creates two virtual interfaces, assigns one to a
+new namespace, and assigns IP addresses to both.
 
-Linux does that, but it is not guaranteed that other devices do that
-too. It is perfectly Ok to use some internal counter (or anything
-elase that does not repeat) to generate the IV.
+It listens on the destination interface using socat and configures a
+dynamic target on netconsole, pointing to the destination IP address.
 
-> 
-> > Instead of moving the existing state, it is better to
-> > request a rekey. Maybe by setting the old state to
-> > 'expired' and then send a km_state_expired() message.
-> 
-> But then you're going to drop packets during the whole rekey?
+The test then checks if the message was received properly on the
+destination interface.
 
-Yes, I know. That would be the downside of that.
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Changelog:
+
+v7:
+ * Fixed a typo (s/Skippig/Skipping) (Matthieu Baerts)
+
+v6:
+ * Check for SRC and DST ip before starting the test (Jakub)
+ * Revert the printk configuration at the end of the test (Jakub)
+ * Fix the modprobe stderr redirection (Jakub)
+ * https://lore.kernel.org/all/20240821080826.3753521-1-leitao@debian.org/
+
+v5:
+ * Replace check_file_size() by "test -s" (Matthieu)
+ * https://lore.kernel.org/all/20240819090406.1441297-1-leitao@debian.org/#t
+
+v4:
+ * Avoid sleeping in waiting for sockets and files (Matthieu Baerts)
+ * Some other improvements (Matthieu Baerts)
+ * Add configfs as a dependency (Jakub)
+ * https://lore.kernel.org/all/20240816132450.346744-1-leitao@debian.org/
+
+v3:
+ * Defined CONFIGs in config file (Jakub)
+ * Identention fixes (Petr Machata)
+ * Use setup_ns in a better way (Matthieu Baerts)
+ * Add dependencies in TEST_INCLUDES (Hangbin Liu)
+ * https://lore.kernel.org/all/20240815095157.3064722-1-leitao@debian.org/
+
+v2:
+ * Change the location of the path (Jakub)
+ * Move from veth to netdevsim
+ * Other small changes in dependency checks and cleanup
+ * https://lore.kernel.org/all/20240813183825.837091-1-leitao@debian.org/
+
+v1:
+ * https://lore.kernel.org/all/ZqyUHN770pjSofTC@gmail.com/
+
+ MAINTAINERS                                   |   1 +
+ tools/testing/selftests/drivers/net/Makefile  |   5 +-
+ tools/testing/selftests/drivers/net/config    |   4 +
+ .../selftests/drivers/net/netcons_basic.sh    | 234 ++++++++++++++++++
+ 4 files changed, 243 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/drivers/net/netcons_basic.sh
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5dbf23cf11c8..9a371ddd8719 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -15772,6 +15772,7 @@ M:	Breno Leitao <leitao@debian.org>
+ S:	Maintained
+ F:	Documentation/networking/netconsole.rst
+ F:	drivers/net/netconsole.c
++F:	tools/testing/selftests/drivers/net/netcons_basic.sh
+ 
+ NETDEVSIM
+ M:	Jakub Kicinski <kuba@kernel.org>
+diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+index e54f382bcb02..39fb97a8c1df 100644
+--- a/tools/testing/selftests/drivers/net/Makefile
++++ b/tools/testing/selftests/drivers/net/Makefile
+@@ -1,8 +1,11 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-TEST_INCLUDES := $(wildcard lib/py/*.py)
++TEST_INCLUDES := $(wildcard lib/py/*.py) \
++		 ../../net/net_helper.sh \
++		 ../../net/lib.sh \
+ 
+ TEST_PROGS := \
++	netcons_basic.sh \
+ 	ping.py \
+ 	queues.py \
+ 	stats.py \
+diff --git a/tools/testing/selftests/drivers/net/config b/tools/testing/selftests/drivers/net/config
+index f6a58ce8a230..a2d8af60876d 100644
+--- a/tools/testing/selftests/drivers/net/config
++++ b/tools/testing/selftests/drivers/net/config
+@@ -1,2 +1,6 @@
+ CONFIG_IPV6=y
+ CONFIG_NETDEVSIM=m
++CONFIG_CONFIGFS_FS=y
++CONFIG_NETCONSOLE=m
++CONFIG_NETCONSOLE_DYNAMIC=y
++CONFIG_NETCONSOLE_EXTENDED_LOG=y
+diff --git a/tools/testing/selftests/drivers/net/netcons_basic.sh b/tools/testing/selftests/drivers/net/netcons_basic.sh
+new file mode 100755
+index 000000000000..06021b2059b7
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/netcons_basic.sh
+@@ -0,0 +1,234 @@
++#!/usr/bin/env bash
++# SPDX-License-Identifier: GPL-2.0
++
++# This test creates two netdevsim virtual interfaces, assigns one of them (the
++# "destination interface") to a new namespace, and assigns IP addresses to both
++# interfaces.
++#
++# It listens on the destination interface using socat and configures a dynamic
++# target on netconsole, pointing to the destination IP address.
++#
++# Finally, it checks whether the message was received properly on the
++# destination interface.  Note that this test may pollute the kernel log buffer
++# (dmesg) and relies on dynamic configuration and namespaces being configured.
++#
++# Author: Breno Leitao <leitao@debian.org>
++
++set -euo pipefail
++
++SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
++
++# Simple script to test dynamic targets in netconsole
++SRCIF="" # to be populated later
++SRCIP=192.168.1.1
++DSTIF="" # to be populated later
++DSTIP=192.168.1.2
++
++PORT="6666"
++MSG="netconsole selftest"
++TARGET=$(mktemp -u netcons_XXXXX)
++DEFAULT_PRINTK_VALUES=$(cat /proc/sys/kernel/printk)
++NETCONS_CONFIGFS="/sys/kernel/config/netconsole"
++NETCONS_PATH="${NETCONS_CONFIGFS}"/"${TARGET}"
++# NAMESPACE will be populated by setup_ns with a random value
++NAMESPACE=""
++
++# IDs for netdevsim
++NSIM_DEV_1_ID=$((256 + RANDOM % 256))
++NSIM_DEV_2_ID=$((512 + RANDOM % 256))
++
++# Used to create and delete namespaces
++source "${SCRIPTDIR}"/../../net/lib.sh
++source "${SCRIPTDIR}"/../../net/net_helper.sh
++
++# Create netdevsim interfaces
++create_ifaces() {
++	local NSIM_DEV_SYS_NEW=/sys/bus/netdevsim/new_device
++
++	echo "$NSIM_DEV_2_ID" > "$NSIM_DEV_SYS_NEW"
++	echo "$NSIM_DEV_1_ID" > "$NSIM_DEV_SYS_NEW"
++	udevadm settle 2> /dev/null || true
++
++	local NSIM1=/sys/bus/netdevsim/devices/netdevsim"$NSIM_DEV_1_ID"
++	local NSIM2=/sys/bus/netdevsim/devices/netdevsim"$NSIM_DEV_2_ID"
++
++	# These are global variables
++	SRCIF=$(find "$NSIM1"/net -maxdepth 1 -type d ! \
++		-path "$NSIM1"/net -exec basename {} \;)
++	DSTIF=$(find "$NSIM2"/net -maxdepth 1 -type d ! \
++		-path "$NSIM2"/net -exec basename {} \;)
++}
++
++link_ifaces() {
++	local NSIM_DEV_SYS_LINK="/sys/bus/netdevsim/link_device"
++	local SRCIF_IFIDX=$(cat /sys/class/net/"$SRCIF"/ifindex)
++	local DSTIF_IFIDX=$(cat /sys/class/net/"$DSTIF"/ifindex)
++
++	exec {NAMESPACE_FD}</var/run/netns/"${NAMESPACE}"
++	exec {INITNS_FD}</proc/self/ns/net
++
++	# Bind the dst interface to namespace
++	ip link set "${DSTIF}" netns "${NAMESPACE}"
++
++	# Linking one device to the other one (on the other namespace}
++	if ! echo "${INITNS_FD}:$SRCIF_IFIDX $NAMESPACE_FD:$DSTIF_IFIDX"  > $NSIM_DEV_SYS_LINK
++	then
++		echo "linking netdevsim1 with netdevsim2 should succeed"
++		cleanup
++		exit "${ksft_skip}"
++	fi
++}
++
++function configure_ip() {
++	# Configure the IPs for both interfaces
++	ip netns exec "${NAMESPACE}" ip addr add "${DSTIP}"/24 dev "${DSTIF}"
++	ip netns exec "${NAMESPACE}" ip link set "${DSTIF}" up
++
++	ip addr add "${SRCIP}"/24 dev "${SRCIF}"
++	ip link set "${SRCIF}" up
++}
++
++function set_network() {
++	# setup_ns function is coming from lib.sh
++	setup_ns NAMESPACE
++
++	# Create both interfaces, and assign the destination to a different
++	# namespace
++	create_ifaces
++
++	# Link both interfaces back to back
++	link_ifaces
++
++	configure_ip
++}
++
++function create_dynamic_target() {
++	DSTMAC=$(ip netns exec "${NAMESPACE}" \
++		 ip link show "${DSTIF}" | awk '/ether/ {print $2}')
++
++	# Create a dynamic target
++	mkdir "${NETCONS_PATH}"
++
++	echo "${DSTIP}" > "${NETCONS_PATH}"/remote_ip
++	echo "${SRCIP}" > "${NETCONS_PATH}"/local_ip
++	echo "${DSTMAC}" > "${NETCONS_PATH}"/remote_mac
++	echo "${SRCIF}" > "${NETCONS_PATH}"/dev_name
++
++	echo 1 > "${NETCONS_PATH}"/enabled
++}
++
++function cleanup() {
++	local NSIM_DEV_SYS_DEL="/sys/bus/netdevsim/del_device"
++
++	# delete netconsole dynamic reconfiguration
++	echo 0 > "${NETCONS_PATH}"/enabled
++	# Remove the configfs entry
++	rmdir "${NETCONS_PATH}"
++
++	# Delete netdevsim devices
++	echo "$NSIM_DEV_2_ID" > "$NSIM_DEV_SYS_DEL"
++	echo "$NSIM_DEV_1_ID" > "$NSIM_DEV_SYS_DEL"
++
++	# this is coming from lib.sh
++	cleanup_all_ns
++
++	# Restoring printk configurations
++	echo "${DEFAULT_PRINTK_VALUES}" > /proc/sys/kernel/printk
++}
++
++function listen_port_and_save_to() {
++	local OUTPUT=${1}
++	# Just wait for 2 seconds
++	timeout 2 ip netns exec "${NAMESPACE}" \
++		socat UDP-LISTEN:"${PORT}",fork "${OUTPUT}"
++}
++
++function validate_result() {
++	local TMPFILENAME="$1"
++
++	# Check if the file exists
++	if [ ! -f "$TMPFILENAME" ]; then
++		echo "FAIL: File was not generated." >&2
++		exit "${ksft_fail}"
++	fi
++
++	if ! grep -q "${MSG}" "${TMPFILENAME}"; then
++		echo "FAIL: ${MSG} not found in ${TMPFILENAME}" >&2
++		cat "${TMPFILENAME}" >&2
++		exit "${ksft_fail}"
++	fi
++
++	# Delete the file once it is validated, otherwise keep it
++	# for debugging purposes
++	rm "${TMPFILENAME}"
++	exit "${ksft_pass}"
++}
++
++function check_for_dependencies() {
++	if [ "$(id -u)" -ne 0 ]; then
++		echo "This test must be run as root" >&2
++		exit "${ksft_skip}"
++	fi
++
++	if ! which socat > /dev/null ; then
++		echo "SKIP: socat(1) is not available" >&2
++		exit "${ksft_skip}"
++	fi
++
++	if ! which ip > /dev/null ; then
++		echo "SKIP: ip(1) is not available" >&2
++		exit "${ksft_skip}"
++	fi
++
++	if ! which udevadm > /dev/null ; then
++		echo "SKIP: udevadm(1) is not available" >&2
++		exit "${ksft_skip}"
++	fi
++
++	if [ ! -d "${NETCONS_CONFIGFS}" ]; then
++		echo "SKIP: directory ${NETCONS_CONFIGFS} does not exist. Check if NETCONSOLE_DYNAMIC is enabled" >&2
++		exit "${ksft_skip}"
++	fi
++
++	if ip link show "${DSTIF}" 2> /dev/null; then
++		echo "SKIP: interface ${DSTIF} exists in the system. Not overwriting it." >&2
++		exit "${ksft_skip}"
++	fi
++
++	if ip addr list | grep -E "inet.*(${SRCIP}|${DSTIP})" 2> /dev/null; then
++		echo "SKIP: IPs already in use. Skipping it" >&2
++		exit "${ksft_skip}"
++	fi
++}
++
++# ========== #
++# Start here #
++# ========== #
++modprobe netdevsim 2> /dev/null || true
++modprobe netconsole 2> /dev/null || true
++
++# The content of kmsg will be save to the following file
++OUTPUT_FILE="/tmp/${TARGET}"
++
++# Check for basic system dependency and exit if not found
++check_for_dependencies
++# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
++echo "6 5" > /proc/sys/kernel/printk
++# Remove the namespace, interfaces and netconsole target on exit
++trap cleanup EXIT
++# Create one namespace and two interfaces
++set_network
++# Create a dynamic target for netconsole
++create_dynamic_target
++# Listed for netconsole port inside the namespace and destination interface
++listen_port_and_save_to "${OUTPUT_FILE}" &
++# Wait for socat to start and listen to the port.
++wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
++# Send the message
++echo "${MSG}: ${TARGET}" > /dev/kmsg
++# Wait until socat saves the file to disk
++busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
++
++# Make sure the message was received in the dst part
++# and exit
++validate_result "${OUTPUT_FILE}"
+-- 
+2.43.5
 
 
