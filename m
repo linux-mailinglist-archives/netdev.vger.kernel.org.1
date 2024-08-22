@@ -1,134 +1,94 @@
-Return-Path: <netdev+bounces-121074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E586595B8F3
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:49:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB71A95B8EE
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:48:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CDDA2863A5
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:49:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64DEC1F219AA
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A7A1CC170;
-	Thu, 22 Aug 2024 14:49:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1A11CBE89;
+	Thu, 22 Aug 2024 14:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fbWtXZBg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DAB71CB329;
-	Thu, 22 Aug 2024 14:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64AB81C8FC9;
+	Thu, 22 Aug 2024 14:48:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724338157; cv=none; b=FLTvfjunWzeuKw+2Q/aFXCDMxcK3BgRRMq6gD7wewKSBN/x3jKZG5t76TqcaTDCZpayAr6KP4dkSxHP6Gd551LilJ4VSqlUZ56wI9wmSw1/q2KoxaSU3LCJKILlqm8qFy6rtYxN7yLkVLmoqkmkJ58aRHZ6AAH8XvYHxVmehgto=
+	t=1724338127; cv=none; b=QE4+7PDpJJFUuHu+DwwGXyEF93wD7tOHgPYfIn8purV8xDJH5qo580P6s1OPA6UKI+2NfBGpQVcHW3vpbvnUwBwAEKwDfGVK4W67R7z++xiqSEYZHCMAZvXiZRXzqZgE8n0Z19+EQLkWlQPlUWLGuM8rSh/8KjuxCj0KFqL66YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724338157; c=relaxed/simple;
-	bh=nVK+LNj/wLjL3hrAoZDtwBy0ZOqxtsuaS1tXN9NmzRI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lYLuQk/2Vc6pKB1QoIQIp9DPbSrLv+euZ3PQFfIOKmjPRM7uJSz14nhCipeq19SPJ7xPg5tNDDqkap05qdDRE/6Z10Fol0CP3n+9ggSUpYn30F2/2OmbrwVL/6E0xx3ZMwyukG3x2b1AJahmJ3t52MWFQ5WgUYdjRxQFrIyeghU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
-X-CSE-ConnectionGUID: pzV1vKq4Qr6rtl1LW4fXSg==
-X-CSE-MsgGUID: aKPHNV+BRgeiJY8t1f0JqQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="40221801"
-X-IronPort-AV: E=Sophos;i="6.10,167,1719903600"; 
-   d="scan'208";a="40221801"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 07:48:23 -0700
-X-CSE-ConnectionGUID: UdIrjZhCSFGc6ouMiWWcLQ==
-X-CSE-MsgGUID: FsVdg77kTMeRpXd6tbM6Zw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,167,1719903600"; 
-   d="scan'208";a="61793671"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 07:48:14 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andy@kernel.org>)
-	id 1sh96C-00000000U7b-2aUU;
-	Thu, 22 Aug 2024 17:47:40 +0300
-Date: Thu, 22 Aug 2024 17:47:40 +0300
-From: Andy Shevchenko <andy@kernel.org>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	virtualization@lists.linux.dev, stable@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH v3 7/9] vdpa: solidrun: Fix UB bug with devres
-Message-ID: <ZsdPjHAkF4i_DN3V@smile.fi.intel.com>
-References: <20240822134744.44919-1-pstanner@redhat.com>
- <20240822134744.44919-8-pstanner@redhat.com>
+	s=arc-20240116; t=1724338127; c=relaxed/simple;
+	bh=i7GOlKNXxs8vjXkkE8U7/f9oHLQWaMMv5jIyvsOPIf4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aCPyyHlqmRQDBI7Gy+GCHgnBxyJBTIaoL+H7jTtjLxTO/gP2CmpJgwiNJLQp3R/m/uSfkRkknun48O0wKv3o8txJOyXSAdltBy+uH7LVmqbvp6Lfy3Fx1R00HhQoByiM52nKIE4M8vKYiLA8IY0k/TL0MFWD+mxcydTPSyJgWIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fbWtXZBg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7708DC4AF0B;
+	Thu, 22 Aug 2024 14:48:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724338127;
+	bh=i7GOlKNXxs8vjXkkE8U7/f9oHLQWaMMv5jIyvsOPIf4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fbWtXZBgWPhFJGaPQ0jvDplYBadVg3Fm1KeUk3x1phafoXhfJNEtDbGgYTgtcC5gM
+	 jMcY72coxCbLCUyhTW9oFmDgUiaPSRKDOlw+wdcMFUPI/suyZrrp9M8e7mKfmIp7Ql
+	 Y9TfSIGHhfxaO5NAg39Os9A4vxym0tGSPI3wcp8cf8Q7o1DDpnAvQXb7Oie6eWkZJu
+	 0wjucczBkFPnF8ERolHBhUMIDN8mJ9JUZ6U4XVwCFy7JG2Y2rEQk79pGe3LiFZyPUw
+	 GE2R19z4epAKowwXht9ZbLDiSXOd1zP2MA3pjkUFekGYC2/iPIpXooOSN44f+Td/dZ
+	 mQ+pjTsInsPkw==
+Date: Thu, 22 Aug 2024 07:48:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Bharat Bhushan <bharatb.linux@gmail.com>
+Cc: Bharat Bhushan <bbhushan2@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, sgoutham@marvell.com, gakula@marvell.com,
+ sbhatta@marvell.com, hkelam@marvell.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, jerinj@marvell.com,
+ lcherian@marvell.com, richardcochran@gmail.com,
+ b@mx0a-0016f401.pphosted.com
+Subject: Re: [net-next,v6 1/8] octeontx2-pf: map skb data as device
+ writeable
+Message-ID: <20240822074845.5f932d6d@kernel.org>
+In-Reply-To: <CAAeCc_=Nmh25RDaY4SA2CHsu2mqgdtKEo62b4QKSV4V8icHMMw@mail.gmail.com>
+References: <20240819122348.490445-1-bbhushan2@marvell.com>
+	<20240819122348.490445-2-bbhushan2@marvell.com>
+	<20240820153549.732594b2@kernel.org>
+	<CAAeCc_=Nmh25RDaY4SA2CHsu2mqgdtKEo62b4QKSV4V8icHMMw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822134744.44919-8-pstanner@redhat.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 22, 2024 at 03:47:39PM +0200, Philipp Stanner wrote:
-> In psnet_open_pf_bar() and snet_open_vf_bar() a string later passed to
-> pcim_iomap_regions() is placed on the stack. Neither
-> pcim_iomap_regions() nor the functions it calls copy that string.
-> 
-> Should the string later ever be used, this, consequently, causes
-> undefined behavior since the stack frame will by then have disappeared.
-> 
-> Fix the bug by allocating the strings on the heap through
-> devm_kasprintf().
+On Thu, 22 Aug 2024 09:15:43 +0530 Bharat Bhushan wrote:
+> On Wed, Aug 21, 2024 at 4:06=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> > On Mon, 19 Aug 2024 17:53:41 +0530 Bharat Bhushan wrote: =20
+> > > Crypto hardware need write permission for in-place encrypt
+> > > or decrypt operation on skb-data to support IPsec crypto
+> > > offload. So map this memory as device read-write. =20
+> >
+> > How do you know the fragments are not read only? =20
+>=20
+> IOMMU permission faults will be reported if the DMA_TO_DEVICE direction f=
+lag
+> is used in dma_map_page_attrs(). This is because iommu creates read only =
+mapping
+> if the DMA_TO_DEVICE direction flag is used.  If the direction flag used =
+in
+> dma_map_pages() is DMA_BIDIRECTIONAL then iommu creates mapping with
+> both read and write permission.
 
-...
-
-> -	snprintf(name, sizeof(name), "psnet[%s]-bars", pci_name(pdev));
-> +	name = devm_kasprintf(&pdev->dev, GFP_KERNEL, "psnet[%s]-bars", pci_name(pdev));
-> +	if (!name)
-> +		return -ENOMEM;
-> +
->  	ret = pcim_iomap_regions(pdev, mask, name);
-
-...
-
-> -	snprintf(name, sizeof(name), "snet[%s]-bar", pci_name(pdev));
-> +	name = devm_kasprintf(&pdev->dev, GFP_KERNEL, "psnet[%s]-bars", pci_name(pdev));
-> +	if (!name)
-> +		return -ENOMEM;
-
-+ Blank line as in the above snippet?
-
->  	/* Request and map BAR */
->  	ret = pcim_iomap_regions(pdev, BIT(snet->psnet->cfg.vf_bar), name);
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+The other way around, I understand that your code makes the pages
+writable for the device. What I'm concerned about is that if this
+code path is fed Tx skbs you will corrupt them. Are these not Tx
+skbs that you're mapping? Have you fully CoW'd them to make sure
+they are writable?
 
