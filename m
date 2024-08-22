@@ -1,300 +1,187 @@
-Return-Path: <netdev+bounces-120861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5382B95B121
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:05:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9874A95B13D
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:14:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E01AF1F23CA1
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:05:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4138B2169F
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:14:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86DB117C213;
-	Thu, 22 Aug 2024 09:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE9717C9E8;
+	Thu, 22 Aug 2024 09:14:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="frr5c5aB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qV1OBTU7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f67.google.com (mail-ed1-f67.google.com [209.85.208.67])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 299AA17B4E2
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 09:05:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256E01C6B5;
+	Thu, 22 Aug 2024 09:14:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724317540; cv=none; b=rWaYJBqrH3IV8n01SbC5MupRwyL3j+kKuaejSj78ZBVediY47yiXK9hYl7S1bBUk00WIl9/oDYnbP6GZx1yopb+EURRJZogYNQ0RJpODviXrTzCGnvqKbfmsS1ZQdFv3PD7RBOhSFDtLqlOJtoy1YeEet1QZ2mIGTETUkTWmmf0=
+	t=1724318045; cv=none; b=TqdbAezVBoezdtye6TTAGcu+UlkaW3unrxwMutl/NXOP+Ky1BXkgNUvFWqAmJlyeUKqKcdyGVgpE84eU3QkWZwHI2sJX2vwRZ+5N5XYZncYJw50QsLmfzLOKWyn31Siiy37NsiqxN13BN3UzTN1td2YDoSko1OYAK0zwtlUKPTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724317540; c=relaxed/simple;
-	bh=iW8L90qW73Zksm1242gGF6/N3NxsJTz9FHLGPMnz1xc=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e/32WuXZlh1cmPYBlcXPHLR8v5m3moIPkKbmbWT9mFJqm76Y1y9meMwFmSj1qimi/Czt0c9/pS0B/tKpNKFe/NExFi5lTO/2ZZia94dIlWzsAry7TqS0tnzhMtvt4vdlIQPRG3HIxofneC4Vc0sK1EwuwQMIcz4RtBmBwlM0N8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=frr5c5aB; arc=none smtp.client-ip=209.85.208.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f67.google.com with SMTP id 4fb4d7f45d1cf-5bed83488b3so917357a12.0
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 02:05:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724317536; x=1724922336; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8oblCwReJRzdkWpeyjSuzACUpr6vesaxftcVWxVJUhw=;
-        b=frr5c5aBI9sy2ew0/b43XWpraPs7EBe1sYCXKpWKrWEaAdjEQMwVvA3dzAqkb4Hdgy
-         n9ueclanmhqM8EyQSXLYpYtQofTUQDi5FLqeIAZNqrXM2uAvCv5bZ6Lv8vnRzG/+oKEU
-         B0bWbkYDHI/Tja9vXHUhBdcRtQHVRKfGXLoA5Y2EPW96S5z21xp+VXGAR654CYIG9aQ1
-         9LLXvB/yQ1plLTTlrYitaEdEVytHl7FVqKZC15ml9hEIyaU/iHn2zYeJpYn0lpRoPfiO
-         tOWjSFbG0iz6dn4qWpc7n/XLgMpULGkO3TXHPWbHu4SZ1ISVhwz5niSzPeuUbXSZTn+G
-         Is2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724317536; x=1724922336;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8oblCwReJRzdkWpeyjSuzACUpr6vesaxftcVWxVJUhw=;
-        b=r/E+xH4zUD2r/fUN3d+/QzZruVZlDbQXZlhSKz3myCfnjliGaPMDVq/E2yZiEAlc/Z
-         HX64GfqKsQCoeWSxOwz2xpFk54W9cDbWYugIVklMbJnFjItboojqARj5dtDKEaD5c50a
-         GpsX99kAIj3KhACrbYf8Xvl7us5c9FgEIdGR+06j5hSw5K59XO5Ig3eqMFihqStD4raQ
-         FeANtRuc5/vw9ZIOee1TBfVkUVe3Zft0jolYvU+3X4sX3UHh6shrPiT1qalNMwFQ1zqz
-         j564nUvKzAxtNWXeUa0qFLpBIw/uKNZOwsozCTYmd+4msrrwzYTZDfxTEDTd8AcVfq9I
-         hg6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVUie8MvNmqDB9Jj27I5NMf8bXxVG21zyGpXv6JfOdoCuoO2ZgUsiLHVWPn/lo1ObWDwMNdO7w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyX4ESTTvwRi5WWbIFiK3MXddA1jQtC3ATGCYdGmQ21Zd0xlkmW
-	VMYDjb4RgHd27t/SOvDDRVJ736ZNpgRHnk0nG4TtK2VMcLDzdUaACeZ8JWpMerQ=
-X-Google-Smtp-Source: AGHT+IEDA43nqM23aA/1yK3IamBiUXMJrrIWIEhSqX0acpw/Zxi+tAITW+WPbPymdPgb8Cc2UqJi4g==
-X-Received: by 2002:a17:907:e65b:b0:a77:c6c4:2bb7 with SMTP id a640c23a62f3a-a866f0fd40cmr439215466b.1.1724317535872;
-        Thu, 22 Aug 2024 02:05:35 -0700 (PDT)
-Received: from localhost ([87.13.33.30])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f47d17bsm89109166b.148.2024.08.22.02.05.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2024 02:05:35 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Thu, 22 Aug 2024 11:05:41 +0200
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 00/11] Add support for RaspberryPi RP1 PCI device using a
- DT overlay
-Message-ID: <Zsb_ZeczWd-gQ5po@apocalypse>
-Mail-Followup-To: Krzysztof Kozlowski <krzk@kernel.org>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <14990d25-40a2-46c0-bf94-25800f379a30@kernel.org>
+	s=arc-20240116; t=1724318045; c=relaxed/simple;
+	bh=3pePhm2enxScNpWzI2H1OmyMtOOZNL1UYS5tRffuIWs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kgh3RRBmwWJUTY8Kd67ZITjx5jBwVu7vbC2pEwnzDQiClAxCoB9PMDdZhKl/XS3pWS8SbdXImshSXrwljFTPkoivND+nmMDFEuGph0lXJXGyTRSDa17eZDHLYIg3ollYAmhb6hFKNsG4rNdEFybZ3mF8lD3De3hCTfqX8syqWwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qV1OBTU7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07C71C4AF0C;
+	Thu, 22 Aug 2024 09:13:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724318044;
+	bh=3pePhm2enxScNpWzI2H1OmyMtOOZNL1UYS5tRffuIWs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=qV1OBTU79pM2Hpfxa6ebghJmrVPv1R3kKngrwaBlLdJXdsuJNcUBjck35GNRjfWdn
+	 h5EeXt8+pIH99N80YPTdafro723rFXxaKkq66Aznh6XC0/xp+2qDEK1W1weN83H5U5
+	 U68lM5a2NRyB+dp5QoV2mLcEVZ1ZHyKNqFxrZP5dLnS/aQb3FvKq3L96hfyqjYM6KC
+	 CtjZZ7uGtH1cYc6GX2W/bp4bEhmbJspEQiVe8ZvVrT0mAuimVlKoWF1NHTnWBfL+Ic
+	 skKTHEGqkjU7wfhi6sqDIsZdL7afBB+rZaYrgfgJRrNK8s/yl+a9x48LAaUl0FYbMN
+	 Pr1JFRb+0cvLA==
+Message-ID: <0201ab87-5f65-4287-bda2-d170a90ae458@kernel.org>
+Date: Thu, 22 Aug 2024 11:13:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <14990d25-40a2-46c0-bf94-25800f379a30@kernel.org>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH bpf-next v4 2/2] selftests/bpf: Add mptcp subflow subtest
+Content-Language: en-GB
+To: Manu Bretelle <chantra@meta.com>, Martin KaFai Lau <martin.lau@linux.dev>
+Cc: "mptcp@lists.linux.dev" <mptcp@lists.linux.dev>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Mykola Lysenko <mykolal@meta.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ "sdf@fomichev.me" <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ Daniel Xu <dxu@dxuuu.xyz>
+References: <20240805-upstream-bpf-next-20240506-mptcp-subflow-test-v4-0-2b4ca6994993@kernel.org>
+ <20240805-upstream-bpf-next-20240506-mptcp-subflow-test-v4-2-2b4ca6994993@kernel.org>
+ <2136317a-3e95-4993-b2fc-1f3b2c28dbdc@linux.dev>
+ <364C4C5B-27A0-4210-84E2-8CA9867E4127@meta.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <364C4C5B-27A0-4210-84E2-8CA9867E4127@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Krzysztof,
+Hi Manu,
 
-On 15:42 Wed 21 Aug     , Krzysztof Kozlowski wrote:
-> On 20/08/2024 16:36, Andrea della Porta wrote:
-> > RP1 is an MFD chipset that acts as a south-bridge PCIe endpoint sporting
-> > a pletora of subdevices (i.e.  Ethernet, USB host controller, I2C, PWM, 
-> > etc.) whose registers are all reachable starting from an offset from the
-> > BAR address.  The main point here is that while the RP1 as an endpoint
-> > itself is discoverable via usual PCI enumeraiton, the devices it contains
-> > are not discoverable and must be declared e.g. via the devicetree.
-> > 
-> > This patchset is an attempt to provide a minimum infrastructure to allow
-> > the RP1 chipset to be discovered and perpherals it contains to be added
-> > from a devictree overlay loaded during RP1 PCI endpoint enumeration.
-> > Followup patches should add support for the several peripherals contained
-> > in RP1.
-> > 
-> > This work is based upon dowstream drivers code and the proposal from RH
-> > et al. (see [1] and [2]). A similar approach is also pursued in [3].
+On 21/08/2024 22:32, Manu Bretelle wrote:
 > 
-> Looking briefly at findings it seems this was not really tested by
-> automation and you expect reviewers to find issues which are pointed out
-> by tools. That's not nice approach. Reviewer's time is limited, while
-> tools do it for free. And the tools are free - you can use them without
-> any effort.
-
-Sorry if I gave you that impression, but this is not obviously the case.
-I've spent quite a bit of time in trying to deliver a patchset that ease
-your and others work, at least to the best I can. In fact, I've used many
-of the checking facilities you mentioned before sending it, solving all
-of the reported issues, except the ones for which there are strong reasons
-to leave untouched, as explained below.
-
 > 
-> It does not look like you tested the DTS against bindings. Please run
-> `make dtbs_check W=1` (see
-> Documentation/devicetree/bindings/writing-schema.rst or
-> https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
-> for instructions).
-
-#> make W=1 dt_binding_check DT_SCHEMA_FILES=raspberrypi,rp1-gpio.yaml
-   CHKDT   Documentation/devicetree/bindings
-   LINT    Documentation/devicetree/bindings
-   DTEX    Documentation/devicetree/bindings/pinctrl/raspberrypi,rp1-gpio.example.dts
-   DTC_CHK Documentation/devicetree/bindings/pinctrl/raspberrypi,rp1-gpio.example.dtb
-
-#> make W=1 dt_binding_check DT_SCHEMA_FILES=raspberrypi,rp1-clocks.yaml
-   CHKDT   Documentation/devicetree/bindings
-   LINT    Documentation/devicetree/bindings
-   DTEX    Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.example.dts
-   DTC_CHK Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.example.dtb
-
-I see no issues here, in case you've found something different, I kindly ask you to post
-the results.
-
-#> make W=1 CHECK_DTBS=y broadcom/rp1.dtbo
-   DTC     arch/arm64/boot/dts/broadcom/rp1.dtbo
-   arch/arm64/boot/dts/broadcom/rp1.dtso:37.24-42.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/clk_xosc: missing or empty reg/ranges property
-   arch/arm64/boot/dts/broadcom/rp1.dtso:44.26-49.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/macb_pclk: missing or empty reg/ranges property
-   arch/arm64/boot/dts/broadcom/rp1.dtso:51.26-56.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/macb_hclk: missing or empty reg/ranges property
-   arch/arm64/boot/dts/broadcom/rp1.dtso:14.15-173.5: Warning (avoid_unnecessary_addr_size): /fragment@0/__overlay__: unnecessary #address-cells/#size-cells without "ranges", "dma-ranges" or child "reg" property 
-
-I believe that These warnings are unavoidable, and stem from the fact that this
-is quite a peculiar setup (PCI endpoint which dynamically loads platform driver
-addressable via BAR).
-The missing reg/ranges in the threee clocks are due to the simple-bus of the
-containing node to which I believe they should belong: I did a test to place
-those clocks in the same dtso under root or /clocks node but AFAIK it doesn't
-seems to work. I could move them in a separate dtso to be loaded before the main
-one but this is IMHO even more cumbersome than having a couple of warnings in
-CHECK_DTBS.
-Of course, if you have any suggestion on how to improve it I would be glad to
-discuss.
-About the last warning about the address/size-cells, if I drop those two lines
-in the _overlay_ node it generates even more warning, so again it's a "don't fix"
-one.
-
+>> On Aug 13, 2024, at 6:12 PM, Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>>>
+>> On 8/5/24 2:52 AM, Matthieu Baerts (NGI0) wrote:
+>>> +static int endpoint_init(char *flags)
+>>> +{
+>>> + SYS(fail, "ip -net %s link add veth1 type veth peer name veth2", NS_TEST);
+>>> + SYS(fail, "ip -net %s addr add %s/24 dev veth1", NS_TEST, ADDR_1);
+>>> + SYS(fail, "ip -net %s link set dev veth1 up", NS_TEST);
+>>> + SYS(fail, "ip -net %s addr add %s/24 dev veth2", NS_TEST, ADDR_2);
+>>> + SYS(fail, "ip -net %s link set dev veth2 up", NS_TEST);
+>>> + if (SYS_NOFAIL("ip -net %s mptcp endpoint add %s %s", NS_TEST, ADDR_2, flags)) {
+>>> + printf("'ip mptcp' not supported, skip this test.\n");
+>>> + test__skip();
+>>
+>> It is always a skip now in bpf CI:
+>>
+>> #171/3   mptcp/subflow:SKIP
+>>
+>> This test is a useful addition for the bpf CI selftest.
+>>
+>> It can't catch regression if it is always a skip in bpf CI though.
+>>
+>> iproute2 needs to be updated (cc: Daniel Xu and Manu, the outdated iproute2 is something that came up multiple times).
+>>
+>> Not sure when the iproute2 can be updated. In the mean time, your v3 is pretty close to getting pm_nl_ctl compiled. Is there other blocker on this?
 > 
-> Please run standard kernel tools for static analysis, like coccinelle,
-> smatch and sparse, and fix reported warnings. Also please check for
-> warnings when building with W=1. Most of these commands (checks or W=1
-> build) can build specific targets, like some directory, to narrow the
-> scope to only your code. The code here looks like it needs a fix. Feel
-> free to get in touch if the warning is not clear.
-
-I didn't run those static analyzers since I've preferred a more "manual" aproach
-by carfeully checking the code, but I agree that something can escape even the
-more carefully executed code inspection so I will add them to my arsenal from
-now on. Thanks for the heads up.
-
+> I have updated runners to Ubuntu 24.04 which comes with:
+> root@1fdd5d75581b:/actions-runner# ip --json -V
+> ip utility, iproute2-6.1.0, libbpf 1.3.0
+> root@1fdd5d75581b:/actions-runner# ip mptcp help
+> Usage:  ip mptcp endpoint add ADDRESS [ dev NAME ] [ id ID ]
+>                                       [ port NR ] [ FLAG-LIST ]
+>         ip mptcp endpoint delete id ID [ ADDRESS ]
+>         ip mptcp endpoint change [ id ID ] [ ADDRESS ] [ port NR ] CHANGE-OPT
+>         ip mptcp endpoint show [ id ID ]
+>         ip mptcp endpoint flush
+>         ip mptcp limits set [ subflows NR ] [ add_addr_accepted NR ]
+>         ip mptcp limits show
+>         ip mptcp monitor
+> FLAG-LIST := [ FLAG-LIST ] FLAG
+> FLAG  := [ signal | subflow | backup | fullmesh ]
+> CHANGE-OPT := [ backup | nobackup | fullmesh | nofullmesh ]
 > 
-> Please run scripts/checkpatch.pl and fix reported warnings. Then please
-> run `scripts/checkpatch.pl --strict` and (probably) fix more warnings.
-> Some warnings can be ignored, especially from --strict run, but the code
-> here looks like it needs a fix. Feel free to get in touch if the warning
-> is not clear.
->
+> Assuming I don’t need to revert back to old runners due to unrelated issue, you should now have `ip mptcp` available.
 
-Again, most of checkpatch's complaints have been addressed, the remaining
-ones I deemed as not worth fixing, for example:
+Great, thank you for this update, that will ease the inclusion of this
+series!
 
-#> scripts/checkpatch.pl --strict --codespell tmp/*.patch
+(That's a shame Ubuntu 24.04 didn't come with IPRoute 6.8, same version
+as their default kernel [1]... but that's not blocking us here)
 
-WARNING: please write a help paragraph that fully describes the config symbol
-#42: FILE: drivers/clk/Kconfig:91:
-+config COMMON_CLK_RP1
-+       tristate "Raspberry Pi RP1-based clock support"
-+       depends on PCI || COMPILE_TEST
-+       depends on COMMON_CLK
-+       help
-+         Enable common clock framework support for Raspberry Pi RP1.
-+         This mutli-function device has 3 main PLLs and several clock
-+         generators to drive the internal sub-peripherals.
-+
+[1] https://bugs.launchpad.net/ubuntu/+source/iproute2/+bug/2051672
 
-I don't understand this warning, the paragraph is there and is more or less similar
-to many in the same file that are already upstream. Checkpatch bug?
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
-
-CHECK: Alignment should match open parenthesis
-#1541: FILE: drivers/clk/clk-rp1.c:1470:
-+       if (WARN_ON_ONCE(clock_data->num_std_parents > AUX_SEL &&
-+           strcmp("-", clock_data->parents[AUX_SEL])))
-
-This would have worsen the code readability.
-
-
-WARNING: ENOTSUPP is not a SUSV4 error code, prefer EOPNOTSUPP
-#673: FILE: drivers/pinctrl/pinctrl-rp1.c:600:
-+                               return -ENOTSUPP;
-
-This I must investigate: I've already tried to fix it before sending the patchset
-but for some reason it wouldn't work, so I planned to fix it in the upcoming 
-releases.
-
-
-WARNING: externs should be avoided in .c files
-#331: FILE: drivers/misc/rp1/rp1-pci.c:58:
-+extern char __dtbo_rp1_pci_begin[];
-
-True, but in this case we don't have a symbol that should be exported to other
-translation units, it just needs to be referenced inside the driver and
-consumed locally. Hence it would be better to place the extern in .c file.
-
-
-Apologies for a couple of other warnings that I could have seen in the first
-place, but honestly they don't seems to be a big deal (one typo and on over
-100 chars comment, that will be fixed in next patch version). 
- 
-> 
-> Best regards,
-> Krzysztof
->
-
-Many thanks,
-Andrea 
 
