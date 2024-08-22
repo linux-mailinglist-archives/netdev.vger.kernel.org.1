@@ -1,80 +1,81 @@
-Return-Path: <netdev+bounces-121186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F6C595C12F
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 00:59:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C880B95C13D
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 01:05:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB5581F2489F
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 22:59:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 070441C20FBB
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 23:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 701D31D174A;
-	Thu, 22 Aug 2024 22:59:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXnSt7Ai"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B0C1D1753;
+	Thu, 22 Aug 2024 23:05:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fgw20-7.mail.saunalahti.fi (fgw20-7.mail.saunalahti.fi [62.142.5.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C47912B72
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 22:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEE518AEA
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 23:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.142.5.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724367588; cv=none; b=I3+N4WD+qeJN3rlbPuxDc9NMH0EeAF7qzJ87omKsjIPt4/REwi5JuCtyvSlf0BBxERF+J2lfwyEAAsTQLnRigrJ4UoOTy4B1c7H/306fxBFtbEXlIhgfRKVQ26QXQq+f0ddaJLgwn5nEbj1Qo4QQhVsuNyftPoy3+/1Q7ui5K8M=
+	t=1724367956; cv=none; b=Hq7LmEDC3/rH4joygzh8tVGuB+PeiuxSQKeY1v2rJutD0wijSPY+lJp7XrQuOqXomIPBCJ+QTVn/v+JmHcadwNIXwn3I36IRpHzE6ZSNDZeZV8CGssetnOwdzfuejREQs5/+3FaxzJ3ss6RW0HahsBzn1Yfr9RosFYP3fXKRYHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724367588; c=relaxed/simple;
-	bh=1JlqvRYSGheVn15kmOfjs/1KwuznpRsGbcr1m4DIxRA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b0PygDSpP60CRWzL74ItHu/jvO/WyQ2IAfwYpBMRxnSI9ZcILiXn3VzQy52rRJn2icaWaRDLEFmUSuNNhflMK/OWQJtoe/63IDoYGz3Vw24KJjsksHv97HiR9zq4dCRmXQoIeGYbkq9W8t2Nnl3/2mT6KILcdoE3Cco1P2Kvrp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXnSt7Ai; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58A78C32782;
-	Thu, 22 Aug 2024 22:59:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724367587;
-	bh=1JlqvRYSGheVn15kmOfjs/1KwuznpRsGbcr1m4DIxRA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pXnSt7AiL/a0yvB7lGg9V+RpNxshP7Lw+czObsYi2aC9pRDUfgGFzSTDLGJHJKptI
-	 1AjdvIKX9tNbMmDHmQKjwGvBN0cjeN13bClaYbBErry3mgM4ZJdn0mXTftymE7Ejnd
-	 7KtZApGvKexi28I+Oy9fIxjLesJwNYSPfbQvQKEPSiQql7oq7Pd0/5WpDP62pPy75C
-	 gDsrdJAORMlCEsLM9yzrfWY5tp6j0XP6dKenH4gGavncUpUHyt9Wr9BGyxjhEtdYfd
-	 0NRLSaiDhd67me9qZ0k5AIJ8n0mg6D30LdrO3FZel69WEPLg0uKF4LCssi7QUMNuav
-	 xwvRa8DXPMeYA==
-Date: Thu, 22 Aug 2024 15:59:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
- <przemyslaw.kitszel@intel.com>, <joshua.a.hay@intel.com>,
- <michal.kubiak@intel.com>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>,
- "Jose E . Marchesi" <jose.marchesi@oracle.com>
-Subject: Re: [PATCH net-next v2 1/9] unroll: add generic loop unroll helpers
-Message-ID: <20240822155946.6e90fed7@kernel.org>
-In-Reply-To: <66b571dc-19de-43ab-a10d-13cffdd82822@intel.com>
-References: <20240819223442.48013-1-anthony.l.nguyen@intel.com>
-	<20240819223442.48013-2-anthony.l.nguyen@intel.com>
-	<20240820175539.6b1cec2b@kernel.org>
-	<66b571dc-19de-43ab-a10d-13cffdd82822@intel.com>
+	s=arc-20240116; t=1724367956; c=relaxed/simple;
+	bh=0UwZyyLar1BwsnyIRRFg05dZZczkW5Zi6NVmIIa4Q+I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V37DbyI0Jtklk6NeFWGrMohxv0VgzysArsw47r/Sx5PgyWktSaLkKJrEZ1CUANvsrukM2aXxRYyajJDAXbePc/hpgIh2/lnnuSeF2V8/m06YA3KhPpgIbmQRjAxjnuVZMkMgUPp8lNOnX3vKMYANuq+tiJ30EKbt0JdBVBvVIo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com; spf=fail smtp.mailfrom=gmail.com; arc=none smtp.client-ip=62.142.5.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=gmail.com
+Received: from localhost (88-113-25-87.elisa-laajakaista.fi [88.113.25.87])
+	by fgw20.mail.saunalahti.fi (Halon) with ESMTP
+	id 140caedf-60db-11ef-8e3a-005056bd6ce9;
+	Fri, 23 Aug 2024 02:05:52 +0300 (EEST)
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+To: Julien Panis <jpanis@baylibre.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Andy Shevchenko <andy.shevchenko@gmail.com>
+Subject: [PATCH net-next v1 1/1] net: ethernet: ti: am65-cpsw-nuss: Replace of_node_to_fwnode() with more suitable API
+Date: Fri, 23 Aug 2024 02:05:50 +0300
+Message-ID: <20240822230550.708112-1-andy.shevchenko@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 22 Aug 2024 17:15:25 +0200 Alexander Lobakin wrote:
-> > Please run the submissions thru get_maintainers  
-> 
-> I always do that. get_maintainers.pl gives nobody for linux/unroll.h.
+of_node_to_fwnode() is a IRQ domain specific implementation of
+of_fwnode_handle(). Replace the former with more suitable API.
 
-You gotta feed it the *patch*, not the path. For keyword matching on the
-contents. I wanted to print a warning when people use get_maintainer
-with a path but Linus blocked it. I'm convinced 99% of such uses are
-misguided.
+Signed-off-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+---
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-But TBH I was directing the message at Tony as well. Please just feed
-the patches to get_maintainer when posting.
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index 81d9f21086ec..555aca4ffa24 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -2761,7 +2761,7 @@ am65_cpsw_nuss_init_port_ndev(struct am65_cpsw_common *common, u32 port_idx)
+ 	}
+ 
+ 	phylink = phylink_create(&port->slave.phylink_config,
+-				 of_node_to_fwnode(port->slave.port_np),
++				 of_fwnode_handle(port->slave.port_np),
+ 				 port->slave.phy_if,
+ 				 &am65_cpsw_phylink_mac_ops);
+ 	if (IS_ERR(phylink))
+-- 
+2.46.0
+
 
