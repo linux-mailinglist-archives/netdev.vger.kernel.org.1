@@ -1,122 +1,149 @@
-Return-Path: <netdev+bounces-120776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D41995A94C
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 03:02:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11EF395A951
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 03:04:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BFDD1C22CE9
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 01:02:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EF04B203E3
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 01:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3128B6FB6;
-	Thu, 22 Aug 2024 01:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 692BD79C8;
+	Thu, 22 Aug 2024 01:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qzpPP7Vi"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="hgEFdKyA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050E1101F2;
-	Thu, 22 Aug 2024 01:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDCE6FB6;
+	Thu, 22 Aug 2024 01:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724288524; cv=none; b=GETW1RvpTryscy9jfSDbNBU7JVLb1DSjvjwCnm/3K2PBo9FI4AAFjMR2kPZoev7e8kIbWkusXa2ixQRjjBHnpDwvV/WQ8xIkNBXsQ+eSuY3n2hT/uXkhGewxtiT6/fkPML5rCSztI1bY+vdvbKtij4YzI0mwm3QXBuFZ2DNcOiE=
+	t=1724288686; cv=none; b=f2HR/aYY4D1CkhghNizNNjXUNM+yfZqICWM5UTffek5Lj9NpyiHLP7r5qWJq1W3b/MB+7DUV15KFNdT0oSv21dt2VlE2Jka20yJ4Q+CoJqRjanHf0er2jPoftzqtnKYDIHn+Sc2sqbUOEjQtKDPmnWHlM2k7g8okNWnOO8HDtvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724288524; c=relaxed/simple;
-	bh=fho7yigoNJT7U1KQajZC0LtAUCpxXnxEcxYMwYgaq1g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ICHFYLlQTy8zhRT03QQQdoHfh8/Z5dB7K5+JJY+4yA+XFTY6L+5kzQcU4BZVzBdf2pb7vDfZY/ldLvJuoIT9yJEzgQUNNdKt8KXfu9YziNOIsjRzysmnHMSF887iho/Of0DtOFX96mT+dbOeRaqwPZdvzS8bTh95QI4uCzTM/jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qzpPP7Vi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19BA9C32781;
-	Thu, 22 Aug 2024 01:02:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724288523;
-	bh=fho7yigoNJT7U1KQajZC0LtAUCpxXnxEcxYMwYgaq1g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qzpPP7VirvMAvrOA8Zj2gUNpG7/QauO+WenfkO+EUuRKRaQITLogtQQ2I46au9rRn
-	 NvgKPQO0tNJzdFEpn5xchwRRr8bS8usX2x60NjLi6Zmu6GxSTQCM3QXoOxcrfIMzZC
-	 47Fo3yW9QVkxyi+sjPvC7k0p5mmmJ7yGnyG/NxS6JOz6S64SoV0akCILHZIESyxK4v
-	 a1s098AdD/bDDPSWu4NuUKa5HtuKr/0QcQbhFEAilbTJuZd8+39Zw0PoGH4Sx+k5YW
-	 rU9tFxtB6LFh3f+z9HtPnSIpwQGyMPkRfVFrfIV3iWZ/kvUi/TZgm2o06Gp6JYkQla
-	 B7xiKdFU088IQ==
-Date: Wed, 21 Aug 2024 18:02:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Hunter <david.hunter.linux@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, javier.carrasco.cruz@gmail.com
-Subject: Re: [PATCH 1/1] Improve missing mods error message and make shell
- script executable
-Message-ID: <20240821180202.6da48f29@kernel.org>
-In-Reply-To: <20240820202116.6124-1-david.hunter.linux@gmail.com>
-References: <20240820202116.6124-1-david.hunter.linux@gmail.com>
+	s=arc-20240116; t=1724288686; c=relaxed/simple;
+	bh=AeKay7+vF2IjbP5yvEpOYTK1WKff6VqqnR4t+ssa4CE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=u4+Fdl1YEc5br6CHd9yatRa5sZ7RDa6drXN8VG43kDRWnypCtfIxik+DC2Sdyj7AEiSyoACZvGwKWS/rp5+1nkt9WU/7iraFUvBB5BRm6vObqjHx40mwgw7/WE+WfbhPHgv5PRqtJpRbzDwJJHEQisQSFxGChsQioYVMm1M6OPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=hgEFdKyA; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1724288673;
+	bh=IiEkrzRFj2+Y25pkO0PTxjkfssFPYLYZdbTA6zjJwfM=;
+	h=Date:From:To:Cc:Subject:From;
+	b=hgEFdKyAGDmDuH2lAjsNp8Lzj+gp9PwwLNOIzK6+di04IrCuv68Ty94jCeqO/f9bk
+	 bzkFJge3nXmmgxaVweVYLGeuJ4G6YhTOTNcMx284+/lwds+MV1K2NWR95bq1XJ5nFd
+	 xGIQSxjAv/lw6L1CmbFb8Hr99ZnQdjzNSnkw+A9W8GHdLduzlGjmuMTv4N1+lnNXyd
+	 Fd5ZDZVxpiJAwwtqtVQTwUys8eZST1R500tUikHH3yWwWrF7ScCy5fPVB9r5DrBo+w
+	 xYYlwC4fyAmPPAoe9VScR+UptPY4AxQXWYxPd3tKKznUnvpE0WAJmxvgK/OQVA/uY3
+	 yzNZ3vzwsbOFQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Wq4jX1k30z4wbp;
+	Thu, 22 Aug 2024 11:04:30 +1000 (AEST)
+Date: Thu, 22 Aug 2024 11:04:30 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>,
+ "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Cc: Ido Schimmel <idosch@nvidia.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Petr Machata <petrm@nvidia.com>, "Rafael J.
+ Wysocki" <rafael.j.wysocki@intel.com>
+Subject: linux-next: manual merge of the net-next tree with the pm tree
+Message-ID: <20240822110430.08a98b0d@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/pqNQbOzY1C__6DwWVedZgZO";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/pqNQbOzY1C__6DwWVedZgZO
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 20 Aug 2024 16:21:16 -0400 David Hunter wrote:
-> Subject: [PATCH 1/1] Improve missing mods error message and make shell script executable
+Hi all,
 
-Would be good to add a prefix to the subject:
+Today's linux-next merge of the net-next tree got a conflict in:
 
-selftests: net:
+  drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
 
-> Make the test executable. Currently, tests in this shell script are not
-> executable, so the scipt file is skipped entirely.
+between commit:
 
-Could you clarify how it gets skipped? We use make [...] run_tests
-in our CI and it does seem to run.
+  019c393b17cb ("mlxsw: core_thermal: Use the .should_bind() thermal zone c=
+allback")
 
-> Also, 
+from the pm tree and commit:
 
-If you say "also" there's a good chance the commit should be split into
-two..
+  fb76ea1d4b12 ("mlxsw: core_thermal: Make mlxsw_thermal_module_{init, fini=
+} symmetric")
 
-> the error message descirbing the required modules is inaccurate.
-> Currently, only  "SKIP: Need act_mirred module" is shown. As a result,
-> users might only that module; however, three modules are actually
-> required and if any of them are missing, the build will fail with the
-> same message.
-> 
-> Fix the error message to show any/all modules needed for the script file
-> upon failure.
-> 
-> Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
-> ---
->  .../testing/selftests/net/test_ingress_egress_chaining.sh | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->  mode change 100644 => 100755 tools/testing/selftests/net/test_ingress_egress_chaining.sh
-> 
-> diff --git a/tools/testing/selftests/net/test_ingress_egress_chaining.sh b/tools/testing/selftests/net/test_ingress_egress_chaining.sh
-> old mode 100644
-> new mode 100755
-> index 08adff6bb3b6..b1a3d68e0ec2
-> --- a/tools/testing/selftests/net/test_ingress_egress_chaining.sh
-> +++ b/tools/testing/selftests/net/test_ingress_egress_chaining.sh
-> @@ -13,8 +13,14 @@ if [ "$(id -u)" -ne 0 ];then
->  fi
->  
->  needed_mods="act_mirred cls_flower sch_ingress"
-> +mods_missing=""
-> +
-> +for mod in $needed_mods; do 
-> +	modinfo $mod &>/dev/null || mods_missing="$mods_missing$mod "
-> +done
-> +
->  for mod in $needed_mods; do
+from the net-next tree.
 
-Do you have to loop again? Maybe just check if mods_missing is empty?
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
 
-> -	modinfo $mod &>/dev/null || { echo "SKIP: Need act_mirred module"; exit $ksft_skip; }
-> +	modinfo $mod &>/dev/null || { echo "SKIP: modules needed: $mods_missing"; exit $ksft_skip; }
->  done
--- 
-pw-bot: cr
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+index 0c50a0cc316d,303d2ce4dc1e..000000000000
+--- a/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/core_thermal.c
+@@@ -389,12 -450,8 +388,9 @@@ mlxsw_thermal_module_init(struct mlxsw_
+  			  struct mlxsw_thermal_area *area, u8 module)
+  {
+  	struct mlxsw_thermal_module *module_tz;
+ +	int i;
+ =20
+  	module_tz =3D &area->tz_module_arr[module];
+- 	/* Skip if parent is already set (case of port split). */
+- 	if (module_tz->parent)
+- 		return;
+  	module_tz->module =3D module;
+  	module_tz->slot_index =3D area->slot_index;
+  	module_tz->parent =3D thermal;
+@@@ -404,8 -461,8 +400,10 @@@
+  	       sizeof(thermal->trips));
+  	memcpy(module_tz->cooling_states, default_cooling_states,
+  	       sizeof(thermal->cooling_states));
+ +	for (i =3D 0; i < MLXSW_THERMAL_NUM_TRIPS; i++)
+ +		module_tz->trips[i].priv =3D &module_tz->cooling_states[i];
++=20
++ 	return mlxsw_thermal_module_tz_init(module_tz);
+  }
+ =20
+  static void mlxsw_thermal_module_fini(struct mlxsw_thermal_module *module=
+_tz)
+
+--Sig_/pqNQbOzY1C__6DwWVedZgZO
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbGjp4ACgkQAVBC80lX
+0GwHNAf+Iy3T0p/3cMdZTXi6t0jw9b1P4kYg7XtHi46A9ehRr1Vd7L34rNWoLSvk
+hbHnBHGzrBM4owRw+/RuRRmIbWNl5uz6wVA04aKHqX1vhjY3x+jMWRRzNXyTn3xi
+8E1u4OgsqRX/X89q4QZz41/UZUMtBefRLrSH1jIGVt60u730Ellqiz2AJFJu8Q0U
+h4RdYe1EhOb13mupVTs9ZPUX2yaKEwCAnoIVWrJ89vnzMZjASD4s/zj8we45huNz
+pZtEcKCwKj8bz2dZAZFwpxaYSBbXsnjo+lpSgkRFF3G4mfvGIIesXUUFWm20jH5e
+lNbTmu00dPwMXW7x8KjDDaLHt1B73w==
+=iOz1
+-----END PGP SIGNATURE-----
+
+--Sig_/pqNQbOzY1C__6DwWVedZgZO--
 
