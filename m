@@ -1,98 +1,191 @@
-Return-Path: <netdev+bounces-121030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52AFD95B6D3
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 15:33:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3153F95B716
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 15:48:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1087C286469
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:33:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4E101F23842
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 790FF1CCB3A;
-	Thu, 22 Aug 2024 13:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8011CB333;
+	Thu, 22 Aug 2024 13:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a4raivxH"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11721CC8B8;
-	Thu, 22 Aug 2024 13:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A54D21CB318
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 13:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724333503; cv=none; b=PxKHHJtOVmdAcCD4TOQdQ2R2j9j3BZQFMe9A9YFSat/AsnBv2h6LiRwIC3UUfXGxOWpQqLnztR7guOQQxIyM4Dk5G1+RULeZ8M4xOIZ7iC98Kw1xWpdg4bgGu0EatuzI6Oc+V3f/KDpTaWnEkMwj3SP8Snat+UVrsx72Dz1hh+g=
+	t=1724334483; cv=none; b=tXSexz/b/0wXREjNOYc8LsUh+9++kn+oLf28S70vnSbcGcn09ML3puMvg65bjuaaZb8dabZBuRMyq9jy5TVdozqTSlZNmyyXajzxPthfolk1OyQqK6lwVVqr+qO3B+UO85H5UaoHpN4xOPA3iVEj+nFW56YcAtDmN4KKPPTRvOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724333503; c=relaxed/simple;
-	bh=MsepUvgicJgEAXMFRoMiH1n5u/4ICpNE6DF8goEDdWE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n02eHzQhyqGz+Nca+2DCv7By9lJwD0cyz6Bkn/JeAfsqdr6jee2GNBSInEYoe0fDyCezhlLWF73mBts6ilo8yNEZHh7Q4bZ6aZhhCeiadfqiu3XgqUQLk64jyB+fHm1u3JCR4jl5VrEK5y5DCuz7mQanLJNLUTPhDul3xCDArTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WqPGp71xmzyQPx;
-	Thu, 22 Aug 2024 21:30:58 +0800 (CST)
-Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id A6F98180087;
-	Thu, 22 Aug 2024 21:31:39 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemd500012.china.huawei.com
- (7.221.188.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Thu, 22 Aug
- 2024 21:31:38 +0800
-From: Li Zetao <lizetao1@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-	<luiz.dentz@gmail.com>, <idryomov@gmail.com>, <xiubli@redhat.com>,
-	<dsahern@kernel.org>, <trondmy@kernel.org>, <anna@kernel.org>,
-	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
-	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
-	<jmaloy@redhat.com>, <ying.xue@windriver.com>, <lizetao1@huawei.com>,
-	<linux@treblig.org>, <jacob.e.keller@intel.com>, <willemb@google.com>,
-	<kuniyu@amazon.com>, <wuyun.abel@bytedance.com>, <quic_abchauha@quicinc.com>,
-	<gouhao@uniontech.com>
-CC: <netdev@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-	<ceph-devel@vger.kernel.org>, <linux-nfs@vger.kernel.org>,
-	<tipc-discussion@lists.sourceforge.net>
-Subject: [PATCH net-next 8/8] SUNRPC: use min() to simplify the code
-Date: Thu, 22 Aug 2024 21:39:08 +0800
-Message-ID: <20240822133908.1042240-9-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240822133908.1042240-1-lizetao1@huawei.com>
-References: <20240822133908.1042240-1-lizetao1@huawei.com>
+	s=arc-20240116; t=1724334483; c=relaxed/simple;
+	bh=TveaYkEbx2doRY7IcRS2QWPC/9cfsUPF8paUrSreb6o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Q2OIiF2JzX6i2US979gh1IQ54Emm58zItFsKeH6o0ACKBJbZJ9+6hFnly3AVj5UgdBQDiMomSb/RwVmy32d8ac2TaOFDM0huPd0Z7Ue8sNP72otJjv2O2qKdUKtbyPOGYPxLidEBrvoGt7JeAmsdn8AIwyUiO/Aqv3aX1xPWyw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a4raivxH; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724334480;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FjYBhspv7tRST0pSqSmRh821Mv70zB5zctMwrlaK9DI=;
+	b=a4raivxHIOCxlHd4d7UGKAv+ITrdQsuCSp4uNXTiz4Lp2QVBHJY8f0G9CdKakUb9jg0HbG
+	wxCxfxFytZWZA6KpMoKTxtB24WKY82OEmF3q8tOEeY5Bsd38ru33IFkzGf67IwkFtxm8aP
+	c4QoQqmD0OkZV7D4a4UIagWnjPG3qdA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-475-NvBSUxK8MxqMcw3nluNcmQ-1; Thu, 22 Aug 2024 09:47:59 -0400
+X-MC-Unique: NvBSUxK8MxqMcw3nluNcmQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-428ea5b1479so6323405e9.0
+        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 06:47:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724334478; x=1724939278;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FjYBhspv7tRST0pSqSmRh821Mv70zB5zctMwrlaK9DI=;
+        b=LC+0ZXLHjmteeyKkDbq7FMrMnfTmqqD6QvUWinibP6VkrEZA0YkCAj+NsjPc0MmDtv
+         20Flep6SW45cvZIXUK0B4eNzZcGnX7YzIhYkJ/FuhDsevBBY3FYQE9E1ED2io+WStsF3
+         xw3mo4EQBqLF+qTaq1t0R5enF2FOQkyVdfAKyXZG4TTm1jqqdM6Ji9HJi+HzVtjGmvOR
+         u+RoC1zsIgnFqxYtJakmdTAvTQw02Q/5l+LymI00mPS/yDg2xKaMvhgJmJq/hiQbwHwJ
+         xFj9xMddlV2WLT8fDT5+F8gikTXw83yLQcf8TzEqKruFo2sayB8IuPKbV5+5qTr4b3rf
+         aTXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUjBfJNB8QdFtr6VAbLIVDt3rer7SPQoAY6T9cvqvR7omFkk/+IGw3fVxbcIV/mzx34WudRqqw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznoQzR28qoST0LUEAzwtEw6CL5gfY6gUXcOmdPF/cRjLi1o4Rw
+	NCmz0fuiWfyqvs3yQ9E5HfARtdN5C/YmJ9UHydGhffwgDcsael58uIsIaGBXBo7Kg6kJbShycHk
+	gCVI8+nt7RvT21aC368wDlVBCprIQnlPMwJru1st+u0+HJfdOe81QNQ==
+X-Received: by 2002:a05:600c:5014:b0:426:6e95:78d6 with SMTP id 5b1f17b1804b1-42ac55babf8mr14882715e9.4.1724334478047;
+        Thu, 22 Aug 2024 06:47:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH9pgATN30e2cGvgnx/4ylawVQ+wC24Vnwz41hd/vPVumxXeQFsraVN5ewZN1S7fwv2HF76Rg==
+X-Received: by 2002:a05:600c:5014:b0:426:6e95:78d6 with SMTP id 5b1f17b1804b1-42ac55babf8mr14882365e9.4.1724334477513;
+        Thu, 22 Aug 2024 06:47:57 -0700 (PDT)
+Received: from eisenberg.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ac5162322sm25057215e9.24.2024.08.22.06.47.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Aug 2024 06:47:57 -0700 (PDT)
+From: Philipp Stanner <pstanner@redhat.com>
+To: Jonathan Corbet <corbet@lwn.net>,
+	Jens Axboe <axboe@kernel.dk>,
+	Wu Hao <hao.wu@intel.com>,
+	Tom Rix <trix@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
+	Chaitanya Kulkarni <kch@nvidia.com>
+Cc: linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-block@vger.kernel.org,
+	linux-fpga@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: [PATCH v3 0/9] PCI: Remove pcim_iounmap_regions()
+Date: Thu, 22 Aug 2024 15:47:32 +0200
+Message-ID: <20240822134744.44919-1-pstanner@redhat.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemd500012.china.huawei.com (7.221.188.25)
 
-When reading pages in xdr_read_pages, the number of XDR encoded bytes
-should be less than the len of aligned pages, so using min() here is
-very semantic.
+Changes in v3:
+  - fpga/dfl-pci.c: remove now surplus wrapper around
+    pcim_iomap_region(). (Andy)
+  - block: mtip32xx: remove now surplus label. (Andy)
+  - vdpa: solidrun: Bugfix: Include forgotten place where stack UB
+    occurs. (Andy, Christophe)
+  - Some minor wording improvements in commit messages. (Me)
 
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
- net/sunrpc/xdr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v2:
+  - Add a fix for the UB stack usage bug in vdap/solidrun. Separate
+    patch, put stable kernel on CC. (Christophe, Andy).
+  - Drop unnecessary pcim_release_region() in mtip32xx (Andy)
+  - Consequently, drop patch "PCI: Make pcim_release_region() a public
+    function", since there's no user anymore. (obsoletes the squash
+    requested by Damien).
+  - vdap/solidrun:
+    • make 'i' an 'unsigned short' (Andy, me)
+    • Use 'continue' to simplify loop (Andy)
+    • Remove leftover blank line
+  - Apply given Reviewed- / acked-bys (Andy, Damien, Bartosz)
 
-diff --git a/net/sunrpc/xdr.c b/net/sunrpc/xdr.c
-index 62e07c330a66..6746e920dbbb 100644
---- a/net/sunrpc/xdr.c
-+++ b/net/sunrpc/xdr.c
-@@ -1602,7 +1602,7 @@ unsigned int xdr_read_pages(struct xdr_stream *xdr, unsigned int len)
- 	end = xdr_stream_remaining(xdr) - pglen;
- 
- 	xdr_set_tail_base(xdr, base, end);
--	return len <= pglen ? len : pglen;
-+	return min(len, pglen);
- }
- EXPORT_SYMBOL_GPL(xdr_read_pages);
- 
+
+Important things first:
+This series is based on [1] and [2] which Bjorn Helgaas has currently
+queued for v6.12 in the PCI tree.
+
+This series shall remove pcim_iounmap_regions() in order to make way to
+remove its brother, pcim_iomap_regions().
+
+@Bjorn: Feel free to squash the PCI commits.
+
+Regards,
+P.
+
+[1] https://lore.kernel.org/all/20240729093625.17561-4-pstanner@redhat.com/
+[2] https://lore.kernel.org/all/20240807083018.8734-2-pstanner@redhat.com/
+
+Philipp Stanner (9):
+  PCI: Make pcim_iounmap_region() a public function
+  fpga/dfl-pci.c: Replace deprecated PCI functions
+  block: mtip32xx: Replace deprecated PCI functions
+  gpio: Replace deprecated PCI functions
+  ethernet: cavium: Replace deprecated PCI functions
+  ethernet: stmicro: Simplify PCI devres usage
+  vdpa: solidrun: Fix UB bug with devres
+  vdap: solidrun: Replace deprecated PCI functions
+  PCI: Remove pcim_iounmap_regions()
+
+ .../driver-api/driver-model/devres.rst        |  1 -
+ drivers/block/mtip32xx/mtip32xx.c             | 16 +++---
+ drivers/fpga/dfl-pci.c                        | 16 ++----
+ drivers/gpio/gpio-merrifield.c                | 14 ++---
+ .../net/ethernet/cavium/common/cavium_ptp.c   | 10 ++--
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 25 ++------
+ .../net/ethernet/stmicro/stmmac/stmmac_pci.c  | 18 ++----
+ drivers/pci/devres.c                          | 24 +-------
+ drivers/vdpa/solidrun/snet_main.c             | 57 ++++++++-----------
+ include/linux/pci.h                           |  2 +-
+ 10 files changed, 61 insertions(+), 122 deletions(-)
+
 -- 
-2.34.1
+2.46.0
 
 
