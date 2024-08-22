@@ -1,137 +1,90 @@
-Return-Path: <netdev+bounces-121107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED71E95BB72
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 18:12:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96F1995BB82
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 18:15:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A681A282B18
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:12:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28156B28509
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 104941CCEC9;
-	Thu, 22 Aug 2024 16:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9201D1CCEC9;
+	Thu, 22 Aug 2024 16:13:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ordt0V0+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="160SO6eO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D20182DF
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 16:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7D81487F9;
+	Thu, 22 Aug 2024 16:13:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724343154; cv=none; b=ni7gh5+Xf0FkBLx5ojLYP5y/IeQxMi6JJU4rw5O8nE9Px8YbV9Ojmvf4eW5JaHq/png5ohZfWsSVLwKPVqW4z+cj//bFCcym83G6vPgFgxbBWRhSubS0yLQ6KzjXd15x046xewIIYcFnNZy449JIDaR1OMG0ohPTeGQwmqYngEA=
+	t=1724343194; cv=none; b=D1jKWts8OcAbWrh2t9x3L+m1jP/v/c5tfETMCU/v/4VTsZ5Aa+GXWhY7dexrLSlXQ4HtBD509j1rK83GltYsP0mHD3hAbUcX8E8huI4uPOrMi5BaMTiYkqQpDmghql+VgVLOychR6kmDJRzj+NxPsUjG0tyBeOT671TKqSUUXrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724343154; c=relaxed/simple;
-	bh=Ba1IvEzIg0HqH4m0Pj00DWclSyzLhBeuHHgLKg8p/xY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XU7GCFoDSemGisGJ1vUBlc6GOsN4eNSs27vwEWr6lhPFe51l5vPMQIgsYEhoxR7t8sdMho1XhawE33hC7N2p1WMU4UrHFXH/YtEU5eDdgLAWDE/wp8XzUhQh1oe1tt//VAYoQjUqRYV2RcWWoAXUv6CECf6KL6H99yDPRG1b50I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ordt0V0+; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-81fda7d7a48so38007539f.3
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 09:12:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724343151; x=1724947951; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ba1IvEzIg0HqH4m0Pj00DWclSyzLhBeuHHgLKg8p/xY=;
-        b=ordt0V0+cwQXMnCf4PcUWG585Fz4sQ+YkT5TcCyYVUxlLeKx0zBkXXWWWl2cwxGgmP
-         shGpbiVEbw3y2jK6c552rkBYHw4qwdl9uuVkbS8LfbmbeStkyu2LDdKi/YgkTCziXCTQ
-         dSBXQJiU04OHKaulw9Yn/3IrVtSCPpiN5LM3KCRBv8Rm1NeL4tk9k0zMk63I2IRICifC
-         ZMLZtico886KOeiyFbtdp0xrs3Fd7zQacugPxuYVGnRZP4aofRSoebyW308H9T49njkH
-         nqQcghVNpFMCzmPSPI8jYNBw0T7wUwYgQPeIKkL9KqMiROd8ZcXr7nwWT8VC03ZLzzRo
-         cCTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724343151; x=1724947951;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ba1IvEzIg0HqH4m0Pj00DWclSyzLhBeuHHgLKg8p/xY=;
-        b=Nl3vc1oKGVgHpHFnK7OcHEsAANGrsu2kAXOy1n1vGNQDI8H3QDNEcm2ER5vB6nRd4J
-         8m17qzBiD3pvHY2+2R18ORl4cG01V3tf2pL7m5/846KEgyQDXxuR5526R6CQYS/HVCyD
-         nxhjzwryylSLVD0ahOHdtODMV1C1WqNP0WfuwudtYdHXO0Wu8itAXi0Qq7l0EpFHRKeE
-         xn+vfgrZ43uVlIaJlhcaVzyrKHxo18g0F7Xr31Bb6a2Hj7GJYcaNtay/d18f7EJKV1ut
-         H00ArJCtnsej6SZbV/y/yNeMF5pBQHPnZI3EH1e498fC57X1g+4uFu8QDm1m4FlX0/S8
-         fiFA==
-X-Forwarded-Encrypted: i=1; AJvYcCUgLzAvf5MpWklKL2gpjPwK+d0Lo6doWA2PZebegp5bbl1YHSts0Jf8xUfG6F4fLxpfgYA0Zlk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7FKDTtPLQ44P3jmyDBhCHLLe/xk/JXluzmqgLJDe8h1KBqdi/
-	I3yo9uwOxIWdqgkpWLeqH1aEPDHqG1CuvH2Ph0XakRJbocH+45JdE05b1H8IPw89MZWpHk+MxlT
-	X17CetkgHfQQyV1Li8XcDCZ0n4pKmIDIzjlJn
-X-Google-Smtp-Source: AGHT+IEGLPuEsDAvSUvkTG3B+q34v5yszocQDhualPE03uRvgkr+IilDM2gHqzh5kOtJRZV+mqs9gHW0ku1hkX58aGo=
-X-Received: by 2002:a05:6602:1483:b0:803:f97f:59d8 with SMTP id
- ca18e2360f4ac-8252f1344d8mr807386939f.0.1724343151288; Thu, 22 Aug 2024
- 09:12:31 -0700 (PDT)
+	s=arc-20240116; t=1724343194; c=relaxed/simple;
+	bh=gQWNOb//RYrpQZlZ1I4cKZSM/D/A6UaSyk7VBdey7LI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EFHpYRMBBMPR2FgqI2EK3GgLGf1qSAyZ5VinsFz3K+bjHEgzVNCUDc4TqheGL+D7ZXz0hlALVHUn71DK/5Q7Z8XZMJ4Z4B1SrpbJZaMyDm6pAwqc2lbGCu+qKjJJTY6wHWJ8w2k3QkZXkeA2Y7TspQc1e9cSoZklgdylmjmmuiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=160SO6eO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=LzqzqZPgFTc0ft8eu5I+nzlZRP0VfxE+JMNsWuvF/WE=; b=160SO6eONh0We/lArSumkynIk+
+	v43dobgxIkR7syktd9QhKRBbVpWvJVfDlxrm3KzV/Yfe4lyO59TqYO8dvoqu5lZ8B1WBwTfRYtReP
+	yJv30YGDXHMTJ/K+XAuKFXG4FvcpCeu6r+Gby4iYRuF/V0pbvnq9xTPriAFH1Eeq3g/4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1shAQo-005RwN-Pt; Thu, 22 Aug 2024 18:13:02 +0200
+Date: Thu, 22 Aug 2024 18:13:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, sudongming1@huawei.com,
+	xujunsheng@huawei.com, shiyongbang@huawei.com, libaihan@huawei.com,
+	jdamato@fastly.com, horms@kernel.org, jonathan.cameron@huawei.com,
+	shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V3 net-next 03/11] net: hibmcge: Add mdio and hardware
+ configuration supported in this module
+Message-ID: <7f8679f7-5450-438c-98d7-06ca09cebbcd@lunn.ch>
+References: <20240822093334.1687011-1-shaojijie@huawei.com>
+ <20240822093334.1687011-4-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240821150700.1760518-1-aleksander.lobakin@intel.com>
- <20240821150700.1760518-3-aleksander.lobakin@intel.com> <CANn89iL+VTJ6tEe-PZ24h+0U9BYs0t4gZDndiy7j1DwuKMBEFg@mail.gmail.com>
- <fc659137-c6f0-42bf-8af3-56f4f0deae1b@intel.com>
-In-Reply-To: <fc659137-c6f0-42bf-8af3-56f4f0deae1b@intel.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 22 Aug 2024 18:12:18 +0200
-Message-ID: <CANn89i+qJa8FSwdxkK76NSz2Wi4OxP56edFmJ14Zok8BpYQFjQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 2/6] netdev_features: remove unused __UNUSED_NETIF_F_1
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240822093334.1687011-4-shaojijie@huawei.com>
 
-On Thu, Aug 22, 2024 at 5:24=E2=80=AFPM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Eric Dumazet <edumazet@google.com>
-> Date: Wed, 21 Aug 2024 17:43:16 +0200
->
-> > On Wed, Aug 21, 2024 at 5:07=E2=80=AFPM Alexander Lobakin
-> > <aleksander.lobakin@intel.com> wrote:
-> >>
-> >> NETIF_F_NO_CSUM was removed in 3.2-rc2 by commit 34324dc2bf27
-> >> ("net: remove NETIF_F_NO_CSUM feature bit") and became
-> >> __UNUSED_NETIF_F_1. It's not used anywhere in the code.
-> >> Remove this bit waste.
-> >>
-> >> It wasn't needed to rename the flag instead of removing it as
-> >> netdev features are not uAPI/ABI. Ethtool passes their names
-> >> and values separately with no fixed positions and the userspace
-> >> Ethtool code doesn't have any hardcoded feature names/bits, so
-> >> that new Ethtool will work on older kernels and vice versa.
-> >
-> > This is only true for recent enough ethtool (>=3D 3.4)
-> >
-> > You might refine the changelog to not claim this "was not needed".
-> >
-> > Back in 2011 (and linux-2.6.39) , this was needed for sure.
-> >
-> > I am not sure we have a documented requirement about ethtool versions.
->
-> But how then Ethtool < 3.4 works with the latest kernels? I believe we
-> already moved some bits and/or removed some features or it's not true?
->
+> +void hbg_phy_start(struct hbg_priv *priv)
+> +{
+> +	if (!priv->mac.phydev)
+> +		return;
+> +
+> +	phy_start(priv->mac.phydev);
+> +}
+> +
+> +void hbg_phy_stop(struct hbg_priv *priv)
+> +{
+> +	if (!priv->mac.phydev)
+> +		return;
+> +
+> +	phy_stop(priv->mac.phydev);
 
-Presumably most of the 'old and useful' bits are at the same location,
-or ethtool has been updated by distros.
+Can this condition priv->mac.phydev not be true? The mdio bus setup
+and connecting to the PHY seems to be unconditional. If it fails, the
+driver fails to probe.
 
-> I could try building it, not sure it would build though. How do you
-> think then we should approach this? Maybe document the requirement?
-> I don't think we should leave the features as they are and sit with no
-> bits available only to support ancient Ethtool versions.
-
-I was simply suggesting to correct the changelog, and make clear we
-need a recent enough ethtool.
-
-We can not simply say that ethtool always supported the modern way
-(ETH_SS_FEATURES)
+	Andrew
 
