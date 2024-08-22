@@ -1,121 +1,96 @@
-Return-Path: <netdev+bounces-120949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7734795B433
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:50:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E82BB95B442
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:51:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 226521F242C6
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:50:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B485284C89
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80071C93DC;
-	Thu, 22 Aug 2024 11:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 495431C9433;
+	Thu, 22 Aug 2024 11:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iOffhufb"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nocUyjkI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE0E17A584;
-	Thu, 22 Aug 2024 11:49:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624801C942D;
+	Thu, 22 Aug 2024 11:50:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724327395; cv=none; b=NSEUyLf06HP6bGx7TY9tPAjfCsejnNx1YPOJ09d54o+WsTIYM8TH6hqpqKJaRCCZ36bKKTyEXApIplK/N7fjAOw8LXsWY4pPc/emclbVfADXMXitT4bCKFA4w01kRWnaB4CJgTYk16bRdOZ5tbT2txUIAKatjDSnHOGC2fr1t+w=
+	t=1724327453; cv=none; b=KIKOV/T0Sc3REoEu/dVLunCtGt03ivuYvAYp5ikuzh9MVbS3IYzc/6kBfG+RZYsGmuc1sTPAf3fO88bJWClmwDkn5jp0+yrNUgnIk6n2cxYSLiG58DxhCNjhgpTrLfpXHqOT1HTjE80H685zjW0mj427NVa6+325pEHPvTl28uk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724327395; c=relaxed/simple;
-	bh=Dt4LFrbNnXt5IZdzzmCGwGIQswW/M/ytO2I8SZAYO2k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g8tncesC7B1Ayf45GPyLFNBhgGOuSkgOwPgTecu3ogs/o4FbzG7gjuEO4jr/NGMm66uy0oTY1w0nlUDnCsVa1GZSjjDDVX1WwPrrGc77Lsx5HGJpU+CFQjgZI++8IfxV+JAraxYSGJ3EnsIW0Rp6/FP7/zVjPjGm0621kp1TroQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iOffhufb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C597C32782;
-	Thu, 22 Aug 2024 11:49:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724327395;
-	bh=Dt4LFrbNnXt5IZdzzmCGwGIQswW/M/ytO2I8SZAYO2k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iOffhufbh+OB6mKyaAl/rLeZHOr1Z1boFD8T3qeWC6ZAHyUeZoJInBFPSHpnKDphg
-	 wHbxTpD1Py+lmvdiCRHhssuSYRZic5RSnq6IIY8u3fRxAu9emOdnV1q1HuT1cNeXZb
-	 vswlvoDOWx2TqKmcBQT0q0GNYdq5KlfQIcUE4s0ib5ZzJGuxK5sUAsciKHp52yuFqY
-	 WQxNRWKMTjleOk9KbFlmU444hnywblUsCrHBHuVTce0IMwkVvnH0FF4KO+MTnzSJCu
-	 B+Qr4TFYcZZl8GWr/Cmkw5WyeIUwQMOvIoMrVEHspAtORoIyqFlI82+0xfokZK3+dE
-	 N6rckoG/TIEmg==
-Date: Thu, 22 Aug 2024 12:49:48 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Peter Hilber <peter.hilber@opensynergy.com>,
-	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
-	"Ridoux, Julien" <ridouxj@amazon.com>, virtio-dev@lists.linux.dev,
-	"Luu, Ryan" <rluu@amazon.com>,
-	"Chashper, David" <chashper@amazon.com>,
-	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>,
-	"Christopher S . Hall" <christopher.s.hall@intel.com>,
-	Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-	Stephen Boyd <sboyd@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Alessandro Zummo <a.zummo@towertech.it>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	qemu-devel <qemu-devel@nongnu.org>
-Subject: Re: [PATCH v4] ptp: Add vDSO-style vmclock support
-Message-ID: <20240822114948.GM2164@kernel.org>
-References: <410bbef9771ef8aa51704994a70d5965e367e2ce.camel@infradead.org>
+	s=arc-20240116; t=1724327453; c=relaxed/simple;
+	bh=QP80vyJUL9GPG1OF/i9qoFoyxhTTVxUn4we/0W4A3mM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VirhsdWGBppraU4zAFdbm2VZYOIY+u+SfuNOZB9MosaAN+zj87qBfxo8+LOhMsRZIdZDUtgfhUQr8z2EGU6ssk4qW2/nAfXNL2kU8P3gwkdtFzPmuRoa0D+3pU4FlncYEpV3BbvLYduBkse4XnkX/xGdceq4E0xuSAD/So9E8Ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nocUyjkI; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 36406240003;
+	Thu, 22 Aug 2024 11:50:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1724327448;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lZibZ0qrTPs+PVhLdaTn4kLI8ejArBOQjFC05CeDtoo=;
+	b=nocUyjkIFiU3ty+eXRVhysJcTb4mF2etsONDIlL7SIhWMnrCKvcNx9eTxbd+st8EmDc/bf
+	V1yYWEFwhzh01fMkkpbexj+GP3z75RzjQUUNt/m5Hw3DYVPUU7HIwKSo9gINu8zBBcuTrQ
+	NloWx6778T7HES7oeVv9TdTeafpuZpRcPhpaak7NU4iOVBVgoAab6gBsy0teuWgXOLR/Gx
+	5JWzieWwpczt8JB5Z6TWA7bkJmU0iSy8X6Sly11S3xCrxYxYwfrv5h7/BGNeo/9bbhClj/
+	1ns7+Huj7w0/ITN94mn3I8XCzYGjZi0kct+vAgk2v2M1Kxwws0qzaLKIhxiv0g==
+Date: Thu, 22 Aug 2024 13:50:44 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Yangtao Li <frank.li@vivo.com>
+Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, ulli.kroll@googlemail.com,
+ linus.walleij@linaro.org, marcin.s.wojtas@gmail.com, linux@armlinux.org.uk,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, hkallweit1@gmail.com, justinstitt@google.com,
+ kees@kernel.org, u.kleine-koenig@pengutronix.de, jacob.e.keller@intel.com,
+ horms@kernel.org, shannon.nelson@amd.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+Subject: Re: [Linux-stm32] [net-next 1/9] net: stmmac: dwmac-intel-plat:
+ Convert to devm_clk_get_enabled()
+Message-ID: <20240822135044.28d0017e@fedora-3.home>
+In-Reply-To: <20240822084733.1599295-2-frank.li@vivo.com>
+References: <20240822084733.1599295-1-frank.li@vivo.com>
+	<20240822084733.1599295-2-frank.li@vivo.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <410bbef9771ef8aa51704994a70d5965e367e2ce.camel@infradead.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Wed, Aug 21, 2024 at 10:50:47PM +0100, David Woodhouse wrote:
+Hello,
 
-...
+On Thu, 22 Aug 2024 02:47:25 -0600
+Yangtao Li <frank.li@vivo.com> wrote:
 
-> diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c
+> Convert devm_clk_get(), clk_prepare_enable() to a single
+> call to devm_clk_get_enabled(), as this is exactly
+> what this function does.
+> 
+> Signed-off-by: Yangtao Li <frank.li@vivo.com>
 
-...
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-> +#define VMCLOCK_FIELD_PRESENT(_c, _f)			  \
-> +	(_c)->size >= (offsetof(struct vmclock_abi, _f) + \
-> +		       sizeof((_c)->_f))
-> +
+Thanks,
 
-...
-
-> +static int vmclock_probe(struct platform_device *pdev)
-
-...
-
-> +	/* If there is valid clock information, register a PTP clock */
-> +	if (VMCLOCK_FIELD_PRESENT(st->clk, time_frac_sec)) {
-
-Hi David,
-
-Sorry to be always the one with the nit-pick.
-Sparse complains about the line above, I believe because the
-type of st->clk->size is __le32.
-
-.../ptp_vmclock.c:562:13: warning: restricted __le32 degrades to integer
-
-> +		/* Can return a silent NULL, or an error. */
-> +		st->ptp_clock = vmclock_ptp_register(dev, st);
-> +		if (IS_ERR(st->ptp_clock)) {
-> +			ret = PTR_ERR(st->ptp_clock);
-> +			st->ptp_clock = NULL;
-> +			vmclock_remove(pdev);
-> +			goto out;
-> +		}
-> +	}
-
-...
-
+Maxime
 
