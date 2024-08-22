@@ -1,36 +1,37 @@
-Return-Path: <netdev+bounces-120946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C88C495B425
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:47:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A56E95B426
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:47:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06DB91C21A2C
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:47:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 085BFB216CF
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:47:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05D41C93CE;
-	Thu, 22 Aug 2024 11:47:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C6C41C9421;
+	Thu, 22 Aug 2024 11:47:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-220.mail.aliyun.com (out28-220.mail.aliyun.com [115.124.28.220])
+Received: from out28-101.mail.aliyun.com (out28-101.mail.aliyun.com [115.124.28.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC64117A584;
-	Thu, 22 Aug 2024 11:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFC817B4E2;
+	Thu, 22 Aug 2024 11:47:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724327254; cv=none; b=APCz9srk8Mm61w+2N2VyFVLwtZ2C/uTUQlNjAX5M9u+aRcmKHxgehvv+hSJu1aYRXM4jWL5f3PtaLTUCKfap+acM26V4cgvN7+o8FD8howEKxKuhxT4WjGBG1EE111wJ+fknK9SU+7J9GSaRNbd//hdXMGAE4y2TX+xLdt1ygvE=
+	t=1724327255; cv=none; b=GLqsSbJlZ6bROpPkonCa87Ls+LCCOM9fQemxZGRzo5lId2TjjxAI+/aT8kt0Xa1epfW0eFOzeA5jHbclNhvS95gpPvQq92gFBxzo8vgKMRWLKX26CvBFxpeZhNCrGauL4AsUXdZp0+wWmBzHngNkFMLXAQH7zgMfiKyCBnRIUR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724327254; c=relaxed/simple;
-	bh=OddzTRJ6KYhMHOsFtdHhKMp1e60oA1jkYdLPFeuLcyw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=c4uNPqSizUpQwD8mam9muDD+0hneQFx3NHocvy3fZbjouu5wp+0Egai6idSEuzYa7eQF8MBSJojLuFr847K7dGvZ2aoUWuqH6j/dJ8TBnpddvSb6d7mGcOl4oxNejuNKTt39VoTjDplWJOkqoSx1/rOUeK/sGNgonXyw3LmrNyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.220
+	s=arc-20240116; t=1724327255; c=relaxed/simple;
+	bh=d+TqVCIhda5XihCS75OMSE+WdIxrYA1zfGIrkCCMLOs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=DPn7jiH0KZiZR0LS8RkuEsaVPdpB5zx9rXkYEVTssHXN+EZlSm4MjKz2HQ59ZzWOGyzsZmjzTKNKWpueIwnd8dWABLmc/vy1mBsHuPuM15cX8uGJgI2A4sgjJeV/wNPmTrlfobif5JJZ7uF9sim/gz3ovhJj0JHZpLpj66KPwMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com; spf=pass smtp.mailfrom=motor-comm.com; arc=none smtp.client-ip=115.124.28.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=motor-comm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=motor-comm.com
-Received: from ubuntu.localdomain(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.Z-MS8cd_1724327227)
+Received: from ubuntu.localdomain(mailfrom:Frank.Sae@motor-comm.com fp:SMTPD_---.Z-MS8va_1724327239)
           by smtp.aliyun-inc.com;
-          Thu, 22 Aug 2024 19:47:18 +0800
+          Thu, 22 Aug 2024 19:47:22 +0800
 From: Frank Sae <Frank.Sae@motor-comm.com>
 To: Frank.Sae@motor-comm.com,
 	andrew@lunn.ch,
@@ -47,10 +48,12 @@ Cc: netdev@vger.kernel.org,
 	xiaoyong.li@motor-comm.com,
 	suting.hu@motor-comm.com,
 	jie.han@motor-comm.com
-Subject: [PATCH net-next v3 0/2] Add driver for Motorcomm yt8821 2.5G ethernet phy
-Date: Thu, 22 Aug 2024 04:46:59 -0700
-Message-Id: <20240822114701.61967-1-Frank.Sae@motor-comm.com>
+Subject: [PATCH net-next v3 1/2] net: phy: Optimize phy speed mask to be compatible to yt8821
+Date: Thu, 22 Aug 2024 04:47:00 -0700
+Message-Id: <20240822114701.61967-2-Frank.Sae@motor-comm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240822114701.61967-1-Frank.Sae@motor-comm.com>
+References: <20240822114701.61967-1-Frank.Sae@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,15 +68,43 @@ as phy speed mask.
 
 Be compatible to yt8821, reform phy speed mask and phy speed macro.
 
-Based on update above, add yt8821 2.5G phy driver.
+Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+ drivers/net/phy/motorcomm.c | 13 +++++--------
+ 1 file changed, 5 insertions(+), 8 deletions(-)
 
-Frank Sae (2):
-  net: phy: Optimize phy speed mask to be compatible to yt8821
-  net: phy: Add driver for Motorcomm yt8821 2.5G ethernet phy
-
- drivers/net/phy/motorcomm.c | 681 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 669 insertions(+), 12 deletions(-)
-
+diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
+index 7a11fdb687cc..fe0aabe12622 100644
+--- a/drivers/net/phy/motorcomm.c
++++ b/drivers/net/phy/motorcomm.c
+@@ -46,12 +46,10 @@
+ 
+ /* Specific Status Register */
+ #define YTPHY_SPECIFIC_STATUS_REG		0x11
+-#define YTPHY_SSR_SPEED_MODE_OFFSET		14
+-
+-#define YTPHY_SSR_SPEED_MODE_MASK		(BIT(15) | BIT(14))
+-#define YTPHY_SSR_SPEED_10M			0x0
+-#define YTPHY_SSR_SPEED_100M			0x1
+-#define YTPHY_SSR_SPEED_1000M			0x2
++#define YTPHY_SSR_SPEED_MASK			((0x3 << 14) | BIT(9))
++#define YTPHY_SSR_SPEED_10M			((0x0 << 14))
++#define YTPHY_SSR_SPEED_100M			((0x1 << 14))
++#define YTPHY_SSR_SPEED_1000M			((0x2 << 14))
+ #define YTPHY_SSR_DUPLEX_OFFSET			13
+ #define YTPHY_SSR_DUPLEX			BIT(13)
+ #define YTPHY_SSR_PAGE_RECEIVED			BIT(12)
+@@ -1187,8 +1185,7 @@ static int yt8521_adjust_status(struct phy_device *phydev, int status,
+ 	else
+ 		duplex = DUPLEX_FULL;	/* for fiber, it always DUPLEX_FULL */
+ 
+-	speed_mode = (status & YTPHY_SSR_SPEED_MODE_MASK) >>
+-		     YTPHY_SSR_SPEED_MODE_OFFSET;
++	speed_mode = status & YTPHY_SSR_SPEED_MASK;
+ 
+ 	switch (speed_mode) {
+ 	case YTPHY_SSR_SPEED_10M:
 -- 
 2.25.1
 
