@@ -1,92 +1,102 @@
-Return-Path: <netdev+bounces-120904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2968995B2A9
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:14:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0AFC95B2BD
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:19:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D288A1F224BC
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 10:14:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AE34283520
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 10:19:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9D817E004;
-	Thu, 22 Aug 2024 10:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gst5Os8m"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267D7180032;
+	Thu, 22 Aug 2024 10:18:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C123115C13A;
-	Thu, 22 Aug 2024 10:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A0D16EB54;
+	Thu, 22 Aug 2024 10:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724321675; cv=none; b=bcZyuZzp6ArKwbq3GVEzBb+9pcfTqX4UWvjuYu6q2sw6EZWXfF5kz6+OKnioF2jwE0B+snCom7SEMEQocPXIq9/CjUv4bftP2QXa1ONLocOsGe3Ee8Xl0lxAZdBvxZPKG/RRwyMBi+35B/2YKne/WH3cQaEQ+cqlIX+vTFRrKto=
+	t=1724321932; cv=none; b=jRDHCWj0e4rf38SWqUzvnyVJrwXU5w+rlGtxt4phjq+pfzpXC66cQ8LcllF/WCaOI9SR5PHSgaX/ovcTbh356M/81pf7PXOdcEOuUObJX/7ZIk0bXbukG+GcuqIVRFim216s+yGAw0Ks0DSXdxfAOP8Jhj75SWIehjr26wN8rBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724321675; c=relaxed/simple;
-	bh=lFwC47VuSVk5zb05nD3Q9n5viwBQLOrGGxMDSpCSlYM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qfYjLfazGFp0X9xZhHkm2IfTnUBpgGGXXzAAmZo4txfhU8YfoMR/ubcFbTpGmpGUgrHTko0YI0jKktvFZQr64ogZgCZlejGw+1XZpz0HWd8mhOLnAdUArVSa+dBuAMeh7ehJbc0rJb32jq8cVZc9+IPAdPeOxE8aZCuFRjzqUsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gst5Os8m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4978AC32782;
-	Thu, 22 Aug 2024 10:14:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724321675;
-	bh=lFwC47VuSVk5zb05nD3Q9n5viwBQLOrGGxMDSpCSlYM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gst5Os8m+BeXtNJzb4+XKS6whOZfPgQchtuvF8o80edWfbLMcERwB/cYWHv7HbHdh
-	 2rrxNUzb5zV4zpzZO3yyZmJ1zJYSPsNzdrIJwyPDahD3o1B3bFAkNPgWQAgxvYgp7t
-	 PnKxNpECQnKqxcfQTc8t2tnrdSZmeTqZch7aLCbWh14El2JXgWjdTMisHoNdSoT9Mc
-	 dzO/z560BnSDKAS5Z01ApEcG3TXbY66U4p+6DeWnekqpX/fnrSFrGdEtPxx5xWM0wx
-	 8S7bvSGJr9ZaUTfK1u2gTjyTJuEds5heOR5zzlTrn89Qg3R3SWUKcuAWO3B7lN8rjl
-	 t2gHf2VDF0NSA==
-Date: Thu, 22 Aug 2024 11:14:30 +0100
-From: Simon Horman <horms@kernel.org>
-To: Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 4/8] selftests/net: Open /proc/thread-self in
- open_netns()
-Message-ID: <20240822101430.GJ2164@kernel.org>
-References: <20240815-tcp-ao-selftests-upd-6-12-v3-0-7bd2e22bb81c@gmail.com>
- <20240815-tcp-ao-selftests-upd-6-12-v3-4-7bd2e22bb81c@gmail.com>
- <20240821191133.GG2164@kernel.org>
- <CAJwJo6Yj_Zqwg9Z7sJvj8UZE6z7gAq+Y0p0K5Oz8s+CYMwzFow@mail.gmail.com>
+	s=arc-20240116; t=1724321932; c=relaxed/simple;
+	bh=IVTuXysU78MLZKwd8/TLm8jZlEvjvqK9x+LTyFpBZfw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Kavxz7Rr/r0jSq16uXWFuNfYOSwwm+PbXtLqLmHju0BTNhh4RQa2q41sNQ/qQyheNybqT5Qz10vdPCovOL8Fznbrp24l+7mqCK4Tk5duxnUpQMfznN3ejvvZ3Abtdu1McHEAoXRXBhbXhAAp8HX1i+V0fZdugA2wyUnwd1AqmGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net,v2 0/3] Netfilter fixes for net
+Date: Thu, 22 Aug 2024 12:18:39 +0200
+Message-Id: <20240822101842.4234-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJwJo6Yj_Zqwg9Z7sJvj8UZE6z7gAq+Y0p0K5Oz8s+CYMwzFow@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Aug 21, 2024 at 10:44:30PM +0100, Dmitry Safonov wrote:
-> On Wed, 21 Aug 2024 at 20:11, Simon Horman <horms@kernel.org> wrote:
-> >
-> > On Thu, Aug 15, 2024 at 10:32:29PM +0100, Dmitry Safonov via B4 Relay wrote:
-> > > From: Dmitry Safonov <0x7f454c46@gmail.com>
-> > >
-> > > It turns to be that open_netns() is called rarely from the child-thread
-> > > and more often from parent-thread. Yet, on initialization of kconfig
-> > > checks, either of threads may reach kconfig_lock mutex first.
-> > > VRF-related checks do create a temprary ksft-check VRF in
-> >
-> > nit: temporary
-> >
-> >      Flagged by checkpatch.pl --codespell
-> 
-> A-ha, b4 has this b4.prep-perpatch-check-cmd git setting:
-> https://github.com/mricon/b4/blob/37811c93f50e70f325e45107a9a20ffc69f2f6dc/src/b4/ez.py#L1667C20-L1667C43
-> 
-> Going to set it and hopefully, it will help avoid spellings/typos in
-> future, thanks!
+v2: including suggestion from Eric Dumazet on patch #3.
 
---codespell is very handy for that :)
+-o-
+
+Hi,
+
+The following patchset contains Netfilter fixes for net:
+
+Patch #1 disable BH when collecting stats via hardware offload to ensure
+         concurrent updates from packet path do not result in losing stats.
+         From Sebastian Andrzej Siewior.
+
+Patch #2 uses write seqcount to reset counters serialize against reader.
+         Also from Sebastian Andrzej Siewior.
+
+Patch #3 ensures vlan header is in place before accessing its fields,
+         according to KMSAN splat triggered by syzbot.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-08-22
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 807067bf014d4a3ae2cc55bd3de16f22a01eb580:
+
+  kcm: Serialise kcm_sendmsg() for the same socket. (2024-08-19 18:36:12 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-08-22
+
+for you to fetch changes up to 6ea14ccb60c8ab829349979b22b58a941ec4a3ee:
+
+  netfilter: flowtable: validate vlan header (2024-08-22 12:14:18 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 24-08-22
+
+----------------------------------------------------------------
+Pablo Neira Ayuso (1):
+      netfilter: flowtable: validate vlan header
+
+Sebastian Andrzej Siewior (2):
+      netfilter: nft_counter: Disable BH in nft_counter_offload_stats().
+      netfilter: nft_counter: Synchronize nft_counter_reset() against reader.
+
+ net/netfilter/nf_flow_table_inet.c | 3 +++
+ net/netfilter/nf_flow_table_ip.c   | 3 +++
+ net/netfilter/nft_counter.c        | 9 +++++++--
+ 3 files changed, 13 insertions(+), 2 deletions(-)
 
