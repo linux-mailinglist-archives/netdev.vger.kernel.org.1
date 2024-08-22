@@ -1,293 +1,319 @@
-Return-Path: <netdev+bounces-120992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08EC495B5C7
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:59:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CF7495B5D4
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 15:01:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABCCA283819
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:59:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E341AB250F8
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B1A1C9EAE;
-	Thu, 22 Aug 2024 12:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 108D715F41F;
+	Thu, 22 Aug 2024 13:01:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IVZIRYC1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kVdpistj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4CDF1C9EAC;
-	Thu, 22 Aug 2024 12:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027C51E87B
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 13:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724331521; cv=none; b=C0PqwQcdSTYP3JD8yADiQbSaFXllv70FpJy8vETdkNixaSocrHVE/pPfRUBhYBJn0sQaze4hvjUAB7sduCjO2eOIABwdYJev1koeBUhTVGbUC82WVRdGAgCRRn7+1YzdkuLP76YIIuAPK85m2w9fkWa0dA0XpILSNIoB0GdhM5M=
+	t=1724331688; cv=none; b=imQeVs/tXQ4nuwxHPGuRsvRRPLmbwEL59Auzxst44KZdD/lEO0Yb/sfIAthg29jj/SARgyHD47t4G+HU1i39+6YEtqzKBHxGtNlcqx82U7PbIxd31SttebrcqgTeNY/f2urFOZQASJu3xOhvHoaohmklyfT8ThSPR8ursE2Lm4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724331521; c=relaxed/simple;
-	bh=qqHphxwn2qWHWhPAByHe6TETHqJld8jq2S4guezpHtY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JzJy2EhlTeYUuRaIovwzkcTnNd4YsVUfcNDXSqy+Kswkir2Jz5xuNf8gXUI9HK7m5IAqs1ClOftP+AQhEg5lVKWYsYjuDLhBh7iccRgseo3Uj1EfZJB2ky2L02GNbPH0gBtn7gvpap0qiXa78Xwy5aMDS6PuqikIcQ7NguUHmpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IVZIRYC1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C705C4AF10;
-	Thu, 22 Aug 2024 12:58:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724331521;
-	bh=qqHphxwn2qWHWhPAByHe6TETHqJld8jq2S4guezpHtY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=IVZIRYC1SXikCt6YX9RXFUr40kg1Ow9GbNopwC+COZy44oJhREgi+E0gE8ESH07w+
-	 FVlKU27sXkg//XfKvMWWHdLG1nfSpjP4BCg5GvqZviH8oR2tJoSuG6yihG8j+uQTKn
-	 v6R8HIHZuehlqxUhyzc/rKNWTYjpQC7ZisZ/skfbmERmsSJvvtLqnLDPC1hN6bTTly
-	 QSrvV5owdJxsS3FYP57WO+VXLmY6of94Tu4ulUWgyf9I7CK/65odm63P44lwrS1nJy
-	 W/SGzOSFB5QM+pOApcPdnQ/MH5izgqQbVmC3AOZCA7XCUBY4rE3vgbPpfL+CZgcXCD
-	 aXt+63HXdWxIw==
-From: Simon Horman <horms@kernel.org>
-Date: Thu, 22 Aug 2024 13:57:34 +0100
-Subject: [PATCH net-next 13/13] net: Correct spelling in net/core
+	s=arc-20240116; t=1724331688; c=relaxed/simple;
+	bh=owZmZ7SsMzo6HvJw3pjeT1sL82SMFrYVE8Xm+FXng3A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZFUbIqWsu+kbRUCuxSCe3+rrcJF2bXPSphMCwYj7hpsTA7WZPtPnAFAc8CouMnYr2Zk9IES+Kvtmu9n67jN999gyfcxVGyL9ojS9QWo2MPlAXt1CBq42sdHB6BKEbTj9zwQlXXRxRzrKIwfWbBGIPSKrnxgagLOGkPTlFdt4dBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kVdpistj; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a8677ae5a35so96169866b.0
+        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 06:01:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724331684; x=1724936484; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VKrLJYBCeSt+5JS6KiSrzcIQGoXQRdGQJhvseDyr6cc=;
+        b=kVdpistjh0byld6bvVEbeIcHN7iWxseZLhYH9ws5+i6Um+s3jziA8Gvhza7uVJVjz5
+         f5rmRpNKml6CqSwOv55Uvf1W7iQJU3vST5NdeuXjPi/pR056tUn5pTBE39E2kc8EOm+G
+         Z8xYvR2s1w62AmNKpbma1RgYYxUJs5O6W+snYhB+ZBBOasPgMvuqGapp4lQLaRFi+oHc
+         EX2IrTFa/mTzc2MN7qqHt02f3f7WvaR/pU3wZWWtMbk2V7Gl+lqjLejIXfmJ8v3jzy1V
+         rBbT/6ShR2fXOxDpMwlJq8o1tL7qU/Mcro2ajnoM5fi00ssceWFmjkWzn3s5lm20150f
+         a6RQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724331684; x=1724936484;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VKrLJYBCeSt+5JS6KiSrzcIQGoXQRdGQJhvseDyr6cc=;
+        b=qc3cJZIIUVEIFc9NetN6qagcA4vM4j0Rg0+wvsML29G0HrWedqCXPzcsBy5j+3Mm1D
+         tZUC8yu3zzL4mEF39JsmuklAKRIuNCTY+gFN++QYMaI8mMZTMkfDE5CHr2MMXPHCgSuV
+         ipcLQ4r7CNu6b16DEIVehgN6vdQiyyjGguEA2hTXWAQyZrkWRiPT5dO2u2UCumNDB4KY
+         CzvAYH6hNnghE5f9rtfX5/BNunHCfwST8gOcR6IwdsuQTH0rdblWpSclVLwjOCtUT7HS
+         VjGYDqXxCEn72ucKBPNOQyhIHk3Z87r2au3eivjB7FC/erFS9nsWL1OpCPRLjPAAcj+z
+         VVLA==
+X-Forwarded-Encrypted: i=1; AJvYcCWS7Ed0yabBSiJVnmxdlpyh/zn2tzQhHVZPOz6H4pbEZwt7SWmKhuawim/l/8koKWK57x44O8U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpTISivgQAAZwcNhWnrykTOg4uuEnJ2ztMNolx3KTwIAzKADoj
+	633+umrFI6iIF8U753aUA0Mvamw566T2onBGonhNoYhToVMPemwhlUg0Ihd2dObLMWi53KoQD51
+	ku0+HkKsdGSxJpPWzRGxgXlNFW/q2MPqVZHZiwdKrP2msvLPaNQEq
+X-Google-Smtp-Source: AGHT+IEjHXq/ezJxdmtpF0kqpvK1c0szuFu3H/nYnMaoLhZ6aQB145dUjxf788a65z5zTwBUQOsdW8Dw9BypPl0NCCo=
+X-Received: by 2002:a17:907:d88:b0:a86:9cff:6798 with SMTP id
+ a640c23a62f3a-a869cff6865mr7091366b.30.1724331681764; Thu, 22 Aug 2024
+ 06:01:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240822-net-spell-v1-13-3a98971ce2d2@kernel.org>
-References: <20240822-net-spell-v1-0-3a98971ce2d2@kernel.org>
-In-Reply-To: <20240822-net-spell-v1-0-3a98971ce2d2@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Alexandra Winter <wintera@linux.ibm.com>, 
- Thorsten Winkler <twinkler@linux.ibm.com>, David Ahern <dsahern@kernel.org>, 
- Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>, 
- Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>, 
- Sean Tranchetti <quic_stranche@quicinc.com>, 
- Paul Moore <paul@paul-moore.com>, Krzysztof Kozlowski <krzk@kernel.org>, 
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
- Jiri Pirko <jiri@resnulli.us>, 
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
- Xin Long <lucien.xin@gmail.com>, Martin Schiller <ms@dev.tdt.de>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org, 
- linux-security-module@vger.kernel.org, linux-sctp@vger.kernel.org, 
- linux-x25@vger.kernel.org
-X-Mailer: b4 0.14.0
+References: <0000000000006bc6d20620023a14@google.com> <00000000000090974a0620398254@google.com>
+ <CANn89iKkFB3iLbqq=a0RXEygKq8wYY1uiSWpWQu7zaYUEQeJYQ@mail.gmail.com> <20240822110942.990-1-hdanton@sina.com>
+In-Reply-To: <20240822110942.990-1-hdanton@sina.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 22 Aug 2024 15:01:07 +0200
+Message-ID: <CANn89iK7gLjcnMOAvFnz2zpnEHgk_v-b65ExpL8ayHmP68HP=g@mail.gmail.com>
+Subject: Re: [syzbot] [ppp?] inconsistent lock state in valid_state (4)
+To: Hillf Danton <hdanton@sina.com>
+Cc: syzbot <syzbot+d43eb079c2addf2439c3@syzkaller.appspotmail.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Boqun Feng <boqun.feng@gmail.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Correct spelling in net/core.
-As reported by codespell.
+On Thu, Aug 22, 2024 at 1:10=E2=80=AFPM Hillf Danton <hdanton@sina.com> wro=
+te:
+>
+> On Thu, 22 Aug 2024 08:29:35 +0200 Eric Dumazet <edumazet@google.com>
+> > On Thu, Aug 22, 2024 at 1:00=3DE2=3D80=3DAFAM syzbot
+> > <syzbot+d43eb079c2addf2439c3@syzkaller.appspotmail.com> wrote:
+> > >
+> > > syzbot has found a reproducer for the following issue on:
+> > >
+> > > HEAD commit:    b311c1b497e5 Merge tag '6.11-rc4-server-fixes' of git=
+://g=3D
+> > i..
+> > > git tree:       upstream
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=3D3D12dccc7=
+b98000=3D
+> > 0
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D3Ddf2f0ed=
+7e30a6=3D
+> > 39d
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=3D3Dd43eb079c=
+2addf2=3D
+> > 439c3
+> > > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for=
+ Deb=3D
+> > ian) 2.40
+> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D3D17cf9=
+3d5980=3D
+> > 000
+> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D3D101bb69=
+398000=3D
+> > 0
+> > >
+> > > Downloadable assets:
+> > > disk image (non-bootable): https://storage.googleapis.com/syzbot-asse=
+ts/7=3D
+> > bc7510fe41f/non_bootable_disk-b311c1b4.raw.xz
+> > > vmlinux: https://storage.googleapis.com/syzbot-assets/1c99fa48192f/vm=
+linu=3D
+> > x-b311c1b4.xz
+> > > kernel image: https://storage.googleapis.com/syzbot-assets/16d5710a01=
+2a/b=3D
+> > zImage-b311c1b4.xz
+> > >
+> > > IMPORTANT: if you fix the issue, please add the following tag to the =
+comm=3D
+> > it:
+> > > Reported-by: syzbot+d43eb079c2addf2439c3@syzkaller.appspotmail.com
+> > >
+> > > =3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3=
+D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D
+> > =3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D=3D3D
+> > > WARNING: inconsistent lock state
+> > > 6.11.0-rc4-syzkaller-00019-gb311c1b497e5 #0 Not tainted
+> > > --------------------------------
+> > > inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
+> > > ksoftirqd/0/16 [HC0[0]:SC1[1]:HE1:SE0] takes:
+> > > ffff888039c531e0 (&pch->downl){+.?.}-{2:2}, at: spin_lock include/lin=
+ux/s=3D
+> > pinlock.h:351 [inline]
+> > > ffff888039c531e0 (&pch->downl){+.?.}-{2:2}, at: ppp_channel_bridge_in=
+put =3D
+> > drivers/net/ppp/ppp_generic.c:2272 [inline]
+> > > ffff888039c531e0 (&pch->downl){+.?.}-{2:2}, at: ppp_input+0x18b/0xa10=
+ dri=3D
+> > vers/net/ppp/ppp_generic.c:2304
+> > > {SOFTIRQ-ON-W} state was registered at:
+> > >   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
+> > >   __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+> > >   _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+> > >   spin_lock include/linux/spinlock.h:351 [inline]
+> > >   ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2272 [inline=
+]
+> > >   ppp_input+0x18b/0xa10 drivers/net/ppp/ppp_generic.c:2304
+> > >   pppoe_rcv_core+0x117/0x310 drivers/net/ppp/pppoe.c:379
+> > >   sk_backlog_rcv include/net/sock.h:1111 [inline]
+> > >   __release_sock+0x243/0x350 net/core/sock.c:3004
+> > >   release_sock+0x61/0x1f0 net/core/sock.c:3558
+> > >   pppoe_sendmsg+0xd5/0x750 drivers/net/ppp/pppoe.c:903
+> > >   sock_sendmsg_nosec net/socket.c:730 [inline]
+> > >   __sock_sendmsg+0x221/0x270 net/socket.c:745
+> > >   ____sys_sendmsg+0x525/0x7d0 net/socket.c:2597
+> > >   ___sys_sendmsg net/socket.c:2651 [inline]
+> > >   __sys_sendmmsg+0x3b2/0x740 net/socket.c:2737
+> > >   __do_sys_sendmmsg net/socket.c:2766 [inline]
+> > >   __se_sys_sendmmsg net/socket.c:2763 [inline]
+> > >   __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2763
+> > >   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> > >   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+> > >   entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> > > irq event stamp: 1309336
+> > > hardirqs last  enabled at (1309336): [<ffffffff8bc0d5ff>] __raw_spin_=
+unlo=3D
+> > ck_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+> > > hardirqs last  enabled at (1309336): [<ffffffff8bc0d5ff>] _raw_spin_u=
+nloc=3D
+> > k_irqrestore+0x8f/0x140 kernel/locking/spinlock.c:194
+> > > hardirqs last disabled at (1309335): [<ffffffff8bc0d300>] __raw_spin_=
+lock=3D
+> > _irqsave include/linux/spinlock_api_smp.h:108 [inline]
+> > > hardirqs last disabled at (1309335): [<ffffffff8bc0d300>] _raw_spin_l=
+ock_=3D
+> > irqsave+0xb0/0x120 kernel/locking/spinlock.c:162
+> > > softirqs last  enabled at (1309326): [<ffffffff81578ffa>] run_ksoftir=
+qd+0=3D
+> > xca/0x130 kernel/softirq.c:928
+> > > softirqs last disabled at (1309331): [<ffffffff81578ffa>] run_ksoftir=
+qd+0=3D
+> > xca/0x130 kernel/softirq.c:928
+> > >
+> > > other info that might help us debug this:
+> > >  Possible unsafe locking scenario:
+> > >
+> > >        CPU0
+> > >        ----
+> > >   lock(&pch->downl);
+> > >   <Interrupt>
+> > >     lock(&pch->downl);
+> > >
+> > >  *** DEADLOCK ***
+> > >
+> > > 1 lock held by ksoftirqd/0/16:
+> > >  #0: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acqui=
+re i=3D
+> > nclude/linux/rcupdate.h:326 [inline]
+> > >  #0: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock =
+incl=3D
+> > ude/linux/rcupdate.h:838 [inline]
+> > >  #0: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: ppp_channel_br=
+idge=3D
+> > _input drivers/net/ppp/ppp_generic.c:2267 [inline]
+> > >  #0: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: ppp_input+0x55=
+/0xa=3D
+> > 10 drivers/net/ppp/ppp_generic.c:2304
+> > >
+> > > stack backtrace:
+> > > CPU: 0 UID: 0 PID: 16 Comm: ksoftirqd/0 Not tainted 6.11.0-rc4-syzkal=
+ler-=3D
+> > 00019-gb311c1b497e5 #0
+>
+> This report looks bogus to me given that kthread is unable to preempt a
+> userspace task with spinlock held.
 
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- net/core/dev.c            |  6 +++---
- net/core/dev_addr_lists.c |  6 +++---
- net/core/fib_rules.c      |  2 +-
- net/core/gro.c            |  2 +-
- net/core/netpoll.c        |  2 +-
- net/core/pktgen.c         | 10 +++++-----
- net/core/skbuff.c         |  4 ++--
- net/core/sock.c           |  6 +++---
- net/core/utils.c          |  2 +-
- 9 files changed, 20 insertions(+), 20 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index e7260889d4cb..2a7381e5cf88 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -3705,7 +3705,7 @@ struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *d
- 		next = skb->next;
- 		skb_mark_not_on_list(skb);
- 
--		/* in case skb wont be segmented, point to itself */
-+		/* in case skb won't be segmented, point to itself */
- 		skb->prev = skb;
- 
- 		skb = validate_xmit_skb(skb, dev, again);
-@@ -11407,7 +11407,7 @@ void unregister_netdevice_many_notify(struct list_head *head,
-  *	@head: list of devices
-  *
-  *  Note: As most callers use a stack allocated list_head,
-- *  we force a list_del() to make sure stack wont be corrupted later.
-+ *  we force a list_del() to make sure stack won't be corrupted later.
-  */
- void unregister_netdevice_many(struct list_head *head)
- {
-@@ -11465,7 +11465,7 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 	if (dev->features & NETIF_F_NETNS_LOCAL)
- 		goto out;
- 
--	/* Ensure the device has been registrered */
-+	/* Ensure the device has been registered */
- 	if (dev->reg_state != NETREG_REGISTERED)
- 		goto out;
- 
-diff --git a/net/core/dev_addr_lists.c b/net/core/dev_addr_lists.c
-index baa63dee2829..166e404f7c03 100644
---- a/net/core/dev_addr_lists.c
-+++ b/net/core/dev_addr_lists.c
-@@ -262,7 +262,7 @@ static int __hw_addr_sync_multiple(struct netdev_hw_addr_list *to_list,
- }
- 
- /* This function only works where there is a strict 1-1 relationship
-- * between source and destionation of they synch. If you ever need to
-+ * between source and destination of they synch. If you ever need to
-  * sync addresses to more then 1 destination, you need to use
-  * __hw_addr_sync_multiple().
-  */
-@@ -299,8 +299,8 @@ void __hw_addr_unsync(struct netdev_hw_addr_list *to_list,
- EXPORT_SYMBOL(__hw_addr_unsync);
- 
- /**
-- *  __hw_addr_sync_dev - Synchonize device's multicast list
-- *  @list: address list to syncronize
-+ *  __hw_addr_sync_dev - Synchronize device's multicast list
-+ *  @list: address list to synchronize
-  *  @dev:  device to sync
-  *  @sync: function to call if address should be added
-  *  @unsync: function to call if address should be removed
-diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-index 6ebffbc63236..644c49079bb1 100644
---- a/net/core/fib_rules.c
-+++ b/net/core/fib_rules.c
-@@ -72,7 +72,7 @@ int fib_default_rule_add(struct fib_rules_ops *ops,
- 	r->suppress_prefixlen = -1;
- 	r->suppress_ifgroup = -1;
- 
--	/* The lock is not required here, the list in unreacheable
-+	/* The lock is not required here, the list in unreachable
- 	 * at the moment this function is called */
- 	list_add_tail(&r->list, &ops->rules_list);
- 	return 0;
-diff --git a/net/core/gro.c b/net/core/gro.c
-index b3b43de1a650..3abad1b567dd 100644
---- a/net/core/gro.c
-+++ b/net/core/gro.c
-@@ -374,7 +374,7 @@ static void gro_list_prepare(const struct list_head *head,
- 				       skb_mac_header(skb),
- 				       maclen);
- 
--		/* in most common scenarions 'slow_gro' is 0
-+		/* in most common scenarios 'slow_gro' is 0
- 		 * otherwise we are already on some slower paths
- 		 * either skip all the infrequent tests altogether or
- 		 * avoid trying too hard to skip each of them individually
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index a58ea724790c..8debf27f383b 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -162,7 +162,7 @@ static void poll_one_napi(struct napi_struct *napi)
- 	if (test_and_set_bit(NAPI_STATE_NPSVC, &napi->state))
- 		return;
- 
--	/* We explicilty pass the polling call a budget of 0 to
-+	/* We explicitly pass the polling call a budget of 0 to
- 	 * indicate that we are clearing the Tx path only.
- 	 */
- 	work = napi->poll(napi, 0);
-diff --git a/net/core/pktgen.c b/net/core/pktgen.c
-index ea55a758a475..4baf02db1f6a 100644
---- a/net/core/pktgen.c
-+++ b/net/core/pktgen.c
-@@ -69,7 +69,7 @@
-  *
-  * By design there should only be *one* "controlling" process. In practice
-  * multiple write accesses gives unpredictable result. Understood by "write"
-- * to /proc gives result code thats should be read be the "writer".
-+ * to /proc gives result code that should be read be the "writer".
-  * For practical use this should be no problem.
-  *
-  * Note when adding devices to a specific CPU there good idea to also assign
-@@ -2371,11 +2371,11 @@ static void get_ipsec_sa(struct pktgen_dev *pkt_dev, int flow)
- 
- 		if (pkt_dev->spi) {
- 			/* We need as quick as possible to find the right SA
--			 * Searching with minimum criteria to archieve this.
-+			 * Searching with minimum criteria to achieve, this.
- 			 */
- 			x = xfrm_state_lookup_byspi(pn->net, htonl(pkt_dev->spi), AF_INET);
- 		} else {
--			/* slow path: we dont already have xfrm_state */
-+			/* slow path: we don't already have xfrm_state */
- 			x = xfrm_stateonly_find(pn->net, DUMMY_MARK, 0,
- 						(xfrm_address_t *)&pkt_dev->cur_daddr,
- 						(xfrm_address_t *)&pkt_dev->cur_saddr,
-@@ -3838,8 +3838,8 @@ static int pktgen_add_device(struct pktgen_thread *t, const char *ifname)
- 	pkt_dev->ipsmode = XFRM_MODE_TRANSPORT;
- 	pkt_dev->ipsproto = IPPROTO_ESP;
- 
--	/* xfrm tunnel mode needs additional dst to extract outter
--	 * ip header protocol/ttl/id field, here creat a phony one.
-+	/* xfrm tunnel mode needs additional dst to extract outer
-+	 * ip header protocol/ttl/id field, here create a phony one.
- 	 * instead of looking for a valid rt, which definitely hurting
- 	 * performance under such circumstance.
- 	 */
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 1748673e1fe0..6022c7359385 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -5163,7 +5163,7 @@ EXPORT_SYMBOL_GPL(skb_to_sgvec);
-  * 3. sg_unmark_end
-  * 4. skb_to_sgvec(payload2)
-  *
-- * When mapping mutilple payload conditionally, skb_to_sgvec_nomark
-+ * When mapping multiple payload conditionally, skb_to_sgvec_nomark
-  * is more preferable.
-  */
- int skb_to_sgvec_nomark(struct sk_buff *skb, struct scatterlist *sg,
-@@ -6021,7 +6021,7 @@ EXPORT_SYMBOL(skb_try_coalesce);
-  * @skb: buffer to clean
-  * @xnet: packet is crossing netns
-  *
-- * skb_scrub_packet can be used after encapsulating or decapsulting a packet
-+ * skb_scrub_packet can be used after encapsulating or decapsulating a packet
-  * into/from a tunnel. Some information have to be cleared during these
-  * operations.
-  * skb_scrub_packet can also be used to clean a skb before injecting it in
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 9abc4fe25953..468b1239606c 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2048,7 +2048,7 @@ static inline void sock_lock_init(struct sock *sk)
- 
- /*
-  * Copy all fields from osk to nsk but nsk->sk_refcnt must not change yet,
-- * even temporarly, because of RCU lookups. sk_node should also be left as is.
-+ * even temporarily, because of RCU lookups. sk_node should also be left as is.
-  * We must not copy fields between sk_dontcopy_begin and sk_dontcopy_end
-  */
- static void sock_copy(struct sock *nsk, const struct sock *osk)
-@@ -2538,7 +2538,7 @@ void skb_set_owner_w(struct sk_buff *skb, struct sock *sk)
- 	skb_set_hash_from_sk(skb, sk);
- 	/*
- 	 * We used to take a refcount on sk, but following operation
--	 * is enough to guarantee sk_free() wont free this sock until
-+	 * is enough to guarantee sk_free() won't free this sock until
- 	 * all in-flight packets are completed
- 	 */
- 	refcount_add(skb->truesize, &sk->sk_wmem_alloc);
-@@ -3697,7 +3697,7 @@ EXPORT_SYMBOL(sock_recv_errqueue);
-  *
-  *	FIX: POSIX 1003.1g is very ambiguous here. It states that
-  *	asynchronous errors should be reported by getsockopt. We assume
-- *	this means if you specify SO_ERROR (otherwise whats the point of it).
-+ *	this means if you specify SO_ERROR (otherwise what is the point of it).
-  */
- int sock_common_getsockopt(struct socket *sock, int level, int optname,
- 			   char __user *optval, int __user *optlen)
-diff --git a/net/core/utils.c b/net/core/utils.c
-index c994e95172ac..27f4cffaae05 100644
---- a/net/core/utils.c
-+++ b/net/core/utils.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-or-later
- /*
-- *	Generic address resultion entity
-+ *	Generic address resolution entity
-  *
-  *	Authors:
-  *	net_random Alan Cox
+This report is absolutely legit.
 
--- 
-2.43.0
+User space might be interrupted by a softirq.
 
+Issue here is that ppp_channel_bridge_input() can either be run
+directly from BH context, or process context.
+
+Therefore it needs to make sure BH are blocked. I will submit the
+patch formally.
+
+>
+> > > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debia=
+n-1.=3D
+> > 16.3-2~bpo12+1 04/01/2014
+> > > Call Trace:
+> > >  <TASK>
+> > >  __dump_stack lib/dump_stack.c:93 [inline]
+> > >  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
+> > >  valid_state+0x13a/0x1c0 kernel/locking/lockdep.c:4012
+> > >  mark_lock_irq+0xbb/0xc20 kernel/locking/lockdep.c:4215
+> > >  mark_lock+0x223/0x350 kernel/locking/lockdep.c:4677
+> > >  __lock_acquire+0xbf9/0x2040 kernel/locking/lockdep.c:5096
+> > >  lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
+> > >  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+> > >  _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+> > >  spin_lock include/linux/spinlock.h:351 [inline]
+> > >  ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2272 [inline]
+> > >  ppp_input+0x18b/0xa10 drivers/net/ppp/ppp_generic.c:2304
+> > >  ppp_sync_process+0x71/0x160 drivers/net/ppp/ppp_synctty.c:490
+> > >  tasklet_action_common+0x321/0x4d0 kernel/softirq.c:785
+> > >  handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
+> > >  run_ksoftirqd+0xca/0x130 kernel/softirq.c:928
+> > >  smpboot_thread_fn+0x544/0xa30 kernel/smpboot.c:164
+> > >  kthread+0x2f0/0x390 kernel/kthread.c:389
+> > >  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+> > >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> > >  </TASK>
+> > >
+> > >
+> > > ---
+> > > If you want syzbot to run the reproducer, reply with:
+> > > #syz test: git://repo/address.git branch-or-commit-hash
+> > > If you attach or paste a git patch, syzbot will apply it before testi=
+ng.
+> >
+> > Bug probably added in
+> >
+> > commit 4cf476ced45d7f12df30a68e833b263e7a2202d1
+> > Author: Tom Parkin <tparkin@katalix.com>
+> > Date:   Thu Dec 10 15:50:57 2020 +0000
+> >
+> >     ppp: add PPPIOCBRIDGECHAN and PPPIOCUNBRIDGECHAN ioctls
+> >
+> >
+> >
+> > sk_backlog_rcv() is called without BH being blocked.
+> >
+> > Fx would be :
+> >
+> > diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generi=
+c.c
+> > index eb9acfcaeb097496b5e28c87af13f5b4091a9bed..9d2656afba660a1a0eda5a5=
+3903=3D
+> > b0f668a11abc9
+> > 100644
+> > --- a/drivers/net/ppp/ppp_generic.c
+> > +++ b/drivers/net/ppp/ppp_generic.c
+> > @@ -2269,7 +2269,7 @@ static bool ppp_channel_bridge_input(struct
+> > channel *pch, struct sk_buff *skb)
+> >         if (!pchb)
+> >                 goto out_rcu;
+> >
+> > -       spin_lock(&pchb->downl);
+> > +       spin_lock_bh(&pchb->downl);
+> >         if (!pchb->chan) {
+> >                 /* channel got unregistered */
+> >                 kfree_skb(skb);
+> > @@ -2281,7 +2281,7 @@ static bool ppp_channel_bridge_input(struct
+> > channel *pch, struct sk_buff *skb)
+> >                 kfree_skb(skb);
+> >
+> >  outl:
+> > -       spin_unlock(&pchb->downl);
+> > +       spin_unlock_bh(&pchb->downl);
+> >  out_rcu:
+> >         rcu_read_unlock();
+> >
 
