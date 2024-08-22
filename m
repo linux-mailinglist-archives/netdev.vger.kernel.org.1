@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-120921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 186AD95B35E
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:01:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C25EE95B360
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:01:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6F881F23FD0
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:01:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E834283823
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:01:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7045E183CAB;
-	Thu, 22 Aug 2024 11:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9DB18453A;
+	Thu, 22 Aug 2024 11:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tdXUALGq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OeiVOE6u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B04166F3D;
-	Thu, 22 Aug 2024 11:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E47184534;
+	Thu, 22 Aug 2024 11:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724324431; cv=none; b=iK/3wGyEGPZGh+UBQs2wMd4V5O4fEWSsdbr9jG4gVRp9G26hdlLv5cJU+ZosJVwdkg7LWWDfxO3fckBH25nV0EudLJtKRYWDX6/of+FTrHlL/kN7KvvFKs3hWw5CI1uqgGUnFn0p8jXqb5GLVpiYIlI+UwX00CX2tqtavRwvjao=
+	t=1724324433; cv=none; b=X6hI6BO1GBfXDWPZAxdEiSX2Np3qi1OSf4sBDcdD6CCoLjjSWg24K15WKSmHVl1/1Xi6tYBWDtV/liXRkQ/D/775uwR/X4jH+0P/cwo/A0Ul8S0vCVm0AyZD5EiEcbuXLpI8z4kbvl8mhwKYsfU0nuzAgHx2Rr6cfKEB9fmPyl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724324431; c=relaxed/simple;
-	bh=b44f+n9+/KKyzs0nbQ9RHOtxwmDZrSkDmFzOIJVNffQ=;
+	s=arc-20240116; t=1724324433; c=relaxed/simple;
+	bh=tawUxnnfGvlZBXVHMTt9xU7aBxMLocLfro7ohLRskQA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tAQj37QS55pH8UaJvkyM0uiQUBri26PdpgyeqcUD867QwQsrAX5KMgYVodYeDhHswmwrRghgLH0fiICthJxXbc+ceF+RJjCc7nemD+I0PWSuG7Kb55PQzRX5+fLJ2HA5zqnBLkwk7jOtfRWZImTejCLSM6SBURJrbQOZRhRd8ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tdXUALGq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD50BC4AF0B;
-	Thu, 22 Aug 2024 11:00:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ZptfFSbUtGZFrKbuBR353wA49AHeqc/55gLkfUZJFQh3NBohgytfjQh+DT6h1+LWCuw/onnT6THvP/3RUWwp3hNUjDnyUEqsyhHA/m2QqPvkJgjm1tszjibWU88X3VXVf8AaWyF88YQj+Ed2tAAtQj53LDed/nRT5yR/7bi9Yes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OeiVOE6u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BE1CC32782;
+	Thu, 22 Aug 2024 11:00:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724324430;
-	bh=b44f+n9+/KKyzs0nbQ9RHOtxwmDZrSkDmFzOIJVNffQ=;
+	s=k20201202; t=1724324433;
+	bh=tawUxnnfGvlZBXVHMTt9xU7aBxMLocLfro7ohLRskQA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tdXUALGq4Kac2VU0m9YNORjHD7EzPdkVBrd8wV9Pls5wyKBWjmO8rzn3id2OdD89G
-	 MALAzQDaEfaxxvh3wCPfhxzfkiWJY1TzMNZt2PoDX11tqwZKLX7GiAGe0OgH4NXx1n
-	 xnPnZGC7vagiND4fs4C4a8jW+gJS5G8TVGxsBsU7uCoCPCpzxRQm8cC3hcfxkT0RFq
-	 XUcEyOMcFc2YW+Vsu1ZARe89Pj6XrjFed4jhO83r4r1FZCkbEiPRE7Kal+N+0zuVHQ
-	 VfYcy8+zYPiYeIbDu4zyZmzrLOHxISkVnfq4zYQx/AtBH1zywcbnd9NVqT1KVIiLCJ
-	 Euc35KLhqMmTw==
+	b=OeiVOE6upeGE5hfbbEkx51IN8V/tdLXcKpwIKMkLxC4JsWpJ5VrZGF6I1sbCgIqAn
+	 IUF8Dxfxn/waqS+lffDrg4vHUchAQGSjnWowIzbsdEfBBnLZdoQbBxy9rfnR2NfPwG
+	 bsTYr8GOYwjYIXsx0NBmj8N4YzD7Bb+dWbHAvhTc5NComlT+u0S+SWoQot0rU16UXd
+	 WnwoWuAQCbiqvU7P9C745RRTTDWCpiEqVRUQQX93OtbgxVkM+L4EAgAALuYtWa8T6k
+	 KPipp7TxTheavRz1GzLKHevz7z47nZaKTzbR0K7E5YZpa6JUS5U9uhZ4zR3TZJakMt
+	 6Rk3fjHu6MU3Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFCF3809A80;
-	Thu, 22 Aug 2024 11:00:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB35D3809A80;
+	Thu, 22 Aug 2024 11:00:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: ngbe: Fix phy mode set to external phy
+Subject: Re: [PATCH net-next v3] selftests: net: add helper for checking if
+ nettest is available
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172432442951.2287138.5190663016144821900.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Aug 2024 11:00:29 +0000
-References: <E6759CF1387CF84C+20240820030425.93003-1-mengyuanlou@net-swift.com>
-In-Reply-To: <E6759CF1387CF84C+20240820030425.93003-1-mengyuanlou@net-swift.com>
-To: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
- przemyslaw.kitszel@intel.com, andrew@lunn.ch, jiawenwu@trustnetic.com,
- duanqiangwen@net-swift.com, stable@vger.kernel.org
+ <172432443248.2287138.10064000046224257189.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Aug 2024 11:00:32 +0000
+References: <20240821012227.1398769-1-kuba@kernel.org>
+In-Reply-To: <20240821012227.1398769-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, idosch@idosch.org, liuhangbin@gmail.com,
+ idosch@nvidia.com, shuah@kernel.org, linux-kselftest@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Tue, 20 Aug 2024 11:04:25 +0800 you wrote:
-> The MAC only has add the TX delay and it can not be modified.
-> MAC and PHY are both set the TX delay cause transmission problems.
-> So just disable TX delay in PHY, when use rgmii to attach to
-> external phy, set PHY_INTERFACE_MODE_RGMII_RXID to phy drivers.
-> And it is does not matter to internal phy.
+On Tue, 20 Aug 2024 18:22:27 -0700 you wrote:
+> A few tests check if nettest exists in the $PATH before adding
+> $PWD to $PATH and re-checking. They don't discard stderr on
+> the first check (and nettest is built as part of selftests,
+> so it's pretty normal for it to not be available in system $PATH).
+> This leads to output noise:
 > 
-> Fixes: bc2426d74aa3 ("net: ngbe: convert phylib to phylink")
-> Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
-> Cc: stable@vger.kernel.org # 6.3+
+>   which: no nettest in (/home/virtme/tools/fs/bin:/home/virtme/tools/fs/sbin:/home/virtme/tools/fs/usr/bin:/home/virtme/tools/fs/usr/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] net: ngbe: Fix phy mode set to external phy
-    https://git.kernel.org/netdev/net/c/f2916c83d746
+  - [net-next,v3] selftests: net: add helper for checking if nettest is available
+    https://git.kernel.org/netdev/net-next/c/bcc3773c49af
 
 You are awesome, thank you!
 -- 
