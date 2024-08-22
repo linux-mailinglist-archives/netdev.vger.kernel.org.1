@@ -1,141 +1,155 @@
-Return-Path: <netdev+bounces-120836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B4695AFA8
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:53:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D674195AFB1
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:55:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B483B1F226D6
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:53:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84C08283F9B
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4880A157A6B;
-	Thu, 22 Aug 2024 07:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70F5B15F3F0;
+	Thu, 22 Aug 2024 07:55:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UcZ+z7Af"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AB3I+5+R"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B613A139D1A
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 07:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8248F1581FC;
+	Thu, 22 Aug 2024 07:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724313213; cv=none; b=CzeVrGNzNzE/qbW5X5NGUAan6M0Y5yUyBj2stUD1uGz1dMZxHTy6T86qkMvIgM2m4lHoTWsGf8IEJQ5KffWzBTUkEK3zGHInMbkRrYyuu62zPLC66WsbtWwW0/Xd5ZOF8CWN7NqGXdSPoPbfoVnsg0tbNypNlBRRnIV32jboPyw=
+	t=1724313304; cv=none; b=UYl3KstgdHZuGOt3LI7ShtvAnbiM2XITqPxQMKV1CYWPBCqiJcnDjzrq2OtvUQADxMlQv0jC998sHsEirnl7rQEeVkjk3T2VN9nkpj11X+IuDsriJu5X/ovKOOPPnFt5r8dl3sKVbwGHS5fW8Tc0VXKRCHkoWazljEJnnNnbB9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724313213; c=relaxed/simple;
-	bh=RaIhx5O9tmpQeHwum71OiEOeHZKulJB0JQw36n+bhk4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=swG3FJReTg/tk229OIsiY/QUvNTSIfTLiPyz7BLy5Xdx8/atrOwBVETWOQDxa6p8ag7X3hk/MKYOiEpzzSv4NnMRWyA6YkVeqsBAlAWdlYrDjQNF92K3Fi7ZwNkf0aWA5xIfuUk1zQ1Xy5cym7xUEmmGxB11gwHfndzLiScg8YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UcZ+z7Af; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724313210;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=qz/tdls6cnOOu3JOwA/hHCLBawPXMSyqfmoIOx3PN+I=;
-	b=UcZ+z7AfFIgxoi6a4GhitWDZGd1b7eCdJseyf5VdKrhYtgsZsOxw0pHVqnjwYm86RDdXnh
-	vv5SHGzwyz/RO9b8UO6v26hDPoKOHWnXdDhvYBIeLvdx7ANJiR1Qahen/pqA3G60qm/dp9
-	w8b7aqOUJdll9NcwcQLMxZGgYB39fJI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-19-l_n4hpTFN3CfpAqm9b129g-1; Thu, 22 Aug 2024 03:53:26 -0400
-X-MC-Unique: l_n4hpTFN3CfpAqm9b129g-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42817980766so3693235e9.3
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 00:53:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724313205; x=1724918005;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qz/tdls6cnOOu3JOwA/hHCLBawPXMSyqfmoIOx3PN+I=;
-        b=qtfb5h/5NtlSppJcxrRuHTuy7EKJbAvHtG65vVyD2Un4wVC8mS5jRM1sU+bzn8aF5K
-         Nnjq0YCqeuVX5uJRM0kxaOUz29n3El85zxmuZqbjzrrWDy+rAlfqmb4uneCHnrN+sI/g
-         WATDALjXPAi7wp+OH0F9RdOerdIXUgM49bqIId0JPbNMKQDbXqGlxMDPXKbc3VRduL+9
-         Yx1eMnghW1bbVH/a+j4Q8cifUtOah5n6K9jKkc+9QXWNWw9KvL7FQhvXifbEQ4QoGl1q
-         nE8fatyQbyH/gYEAfW9Yt70MkPM37XF2zulNuJLxUd4XV3QXR0Zi56G8RTh4ArBBu36K
-         6EXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXKc/OHgYdIayEIr06ZJy6/uGKKCNhdioMbBWzSx+kmSBQx7DCoWAPxdQ3dAJiiNewzYOdnWwE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIQf/yNJp6Ap82j+AHpJgzi0Ykqoe8kdNmT2A4sMWgJylpTChM
-	ULuM5UlevOPwDPO39N6rjAKvxqV6iEwaQKTLY1AMjJSW/zjdxR0n/Unn+1idUTRFGlEWlD+fLBg
-	3lyFCZR/OFH8AQyZCERGEXUymxRG3xjVzciMaIxBfHtsAJiTkZR4cCg==
-X-Received: by 2002:a05:600c:5844:b0:426:67f0:b4fa with SMTP id 5b1f17b1804b1-42ac8805ff1mr607155e9.1.1724313205253;
-        Thu, 22 Aug 2024 00:53:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG9hrOYs2q4f+fjvNcWUy1j3HYdgAupUMULtmjUPxzO2bk4MeOzgLCUihit5Wg+JUg3IrLESg==
-X-Received: by 2002:a05:600c:5844:b0:426:67f0:b4fa with SMTP id 5b1f17b1804b1-42ac8805ff1mr606945e9.1.1724313204747;
-        Thu, 22 Aug 2024 00:53:24 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b51:3b10:b0e7:ba61:49af:e2d5? ([2a0d:3344:1b51:3b10:b0e7:ba61:49af:e2d5])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abee86e9fsm52044295e9.13.2024.08.22.00.53.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Aug 2024 00:53:24 -0700 (PDT)
-Message-ID: <3b1ca110-d1e7-47c5-af31-360a233cb4aa@redhat.com>
-Date: Thu, 22 Aug 2024 09:53:22 +0200
+	s=arc-20240116; t=1724313304; c=relaxed/simple;
+	bh=ViUfJqkCgiSdclTAphoY6s/d6BvM+78Ag9hyB9sZj7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZFGRebs6jPj4NJTgMrykhnKycPtopZGMhdgKs7PV4YYlk4vgQ89L+kdBx+mPI6twXxdmOyTH6lLRlZkCDGYl1Nv+YuEGFESFtcOfrNS438JAZRrhEI+cqR1WEtM8NO1v705K4HimoA2BI2DZhDFz/sQV/eLc3yrbM+PD/N8Qr+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AB3I+5+R; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724313302; x=1755849302;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ViUfJqkCgiSdclTAphoY6s/d6BvM+78Ag9hyB9sZj7w=;
+  b=AB3I+5+R2uOZCxuH9MoW1Rc8gRtRol2nH7PGJPpwFV4iiLylRnkL5VUJ
+   b79kG3gPaj3KE/jB75Oh3uUF2NrDm8ZRh9QcC27+nw+tQejL5GxANkouz
+   FTPCj9gI12rrvcNwWmp53JKZK227kRRyjWhM+UdEDn/QUsGPhGe+jgqIs
+   lj6ABfbTJwwYeQZVsq9j7hIUnBfvLsjxmoNSJo/LnwCfClJK+36JLKV7g
+   xyIbaqRaVzq20a7fsUxUjkalOZiPT8hjl54TOXqO0Zxwm+CIDIejT2uoW
+   GEvIV/Fvyuxy+/MlJoS9PrUYQhkXl2CdigvWCm2ZSinlqwiJXmf2nOoVT
+   Q==;
+X-CSE-ConnectionGUID: /7stmtSyTzqNpAjpzg+3KA==
+X-CSE-MsgGUID: FHMJhBxURqy8y/PK7UYPGw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="26578722"
+X-IronPort-AV: E=Sophos;i="6.10,166,1719903600"; 
+   d="scan'208";a="26578722"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 00:55:00 -0700
+X-CSE-ConnectionGUID: doF4OM9ERTyaDprtUtBxJg==
+X-CSE-MsgGUID: 44kQgOCfRYOHC3KNUiZtiA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,166,1719903600"; 
+   d="scan'208";a="61028250"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 22 Aug 2024 00:54:56 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sh2ek-000CYS-2L;
+	Thu, 22 Aug 2024 07:54:54 +0000
+Date: Thu, 22 Aug 2024 15:54:05 +0800
+From: kernel test robot <lkp@intel.com>
+To: Daniel Golle <daniel@makrotopia.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Robert Marko <robimarko@gmail.com>,
+	Chad Monroe <chad.monroe@adtran.com>,
+	John Crispin <john@phrozen.org>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/2] net: phy: aquantia: allow forcing order of
+ MDI pairs
+Message-ID: <202408221537.gmrL3l3n-lkp@intel.com>
+References: <ed46220cc4c52d630fc481c8148fc749242c368d.1724244281.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 09/12] testing: net-drv: add basic shaper test
-To: kernel test robot <lkp@intel.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>, Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>
-References: <4cf74f285fa5f07be546cb83ef96775f86aa0dbf.1724165948.git.pabeni@redhat.com>
- <202408220027.kA3pRF6J-lkp@intel.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <202408220027.kA3pRF6J-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ed46220cc4c52d630fc481c8148fc749242c368d.1724244281.git.daniel@makrotopia.org>
+
+Hi Daniel,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/net-phy-aquantia-allow-forcing-order-of-MDI-pairs/20240821-210717
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/ed46220cc4c52d630fc481c8148fc749242c368d.1724244281.git.daniel%40makrotopia.org
+patch subject: [PATCH net-next 2/2] net: phy: aquantia: allow forcing order of MDI pairs
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240822/202408221537.gmrL3l3n-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240822/202408221537.gmrL3l3n-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408221537.gmrL3l3n-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/phy/aquantia/aquantia_main.c:483:5: warning: no previous prototype for 'aqr107_config_mdi' [-Wmissing-prototypes]
+     483 | int aqr107_config_mdi(struct phy_device *phydev)
+         |     ^~~~~~~~~~~~~~~~~
 
 
+vim +/aqr107_config_mdi +483 drivers/net/phy/aquantia/aquantia_main.c
 
-On 8/21/24 18:52, kernel test robot wrote:
-> Hi Paolo,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on net-next/main]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Abeni/tools-ynl-lift-an-assumption-about-spec-file-name/20240820-231626
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/4cf74f285fa5f07be546cb83ef96775f86aa0dbf.1724165948.git.pabeni%40redhat.com
-> patch subject: [PATCH v4 net-next 09/12] testing: net-drv: add basic shaper test
-> config: hexagon-randconfig-r112-20240821 (https://download.01.org/0day-ci/archive/20240822/202408220027.kA3pRF6J-lkp@intel.com/config)
-> compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
-> reproduce: (https://download.01.org/0day-ci/archive/20240822/202408220027.kA3pRF6J-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202408220027.kA3pRF6J-lkp@intel.com/
-> 
-> sparse warnings: (new ones prefixed by >>)
->>> net/shaper/shaper.c:227:24: sparse: sparse: Using plain integer as NULL pointer
+   482	
+ > 483	int aqr107_config_mdi(struct phy_device *phydev)
+   484	{
+   485		struct device_node *np = phydev->mdio.dev.of_node;
+   486		bool force_normal, force_reverse;
+   487	
+   488		force_normal = of_property_read_bool(np, "marvell,force-mdi-order-normal");
+   489		force_reverse = of_property_read_bool(np, "marvell,force-mdi-order-reverse");
+   490	
+   491		if (force_normal && force_reverse)
+   492			return -EINVAL;
+   493	
+   494		if (force_normal)
+   495			return phy_modify_mmd(phydev, MDIO_MMD_PMAPMD, PMAPMD_RSVD_VEND_PROV,
+   496					      PMAPMD_RSVD_VEND_PROV_MDI_CONF,
+   497					      PMAPMD_RSVD_VEND_PROV_MDI_FORCE);
+   498	
+   499		if (force_reverse)
+   500			return phy_modify_mmd(phydev, MDIO_MMD_PMAPMD, PMAPMD_RSVD_VEND_PROV,
+   501					      PMAPMD_RSVD_VEND_PROV_MDI_CONF,
+   502					      PMAPMD_RSVD_VEND_PROV_MDI_REVERSE |
+   503					      PMAPMD_RSVD_VEND_PROV_MDI_FORCE);
+   504	
+   505		return 0;
+   506	}
+   507	
 
-AFAICS this warning comes directly from/is due to the hexgon cmpxchg 
-implementation:
-
-#define arch_cmpxchg(ptr, old, new)                             \
-({                                                              \
-         __typeof__(ptr) __ptr = (ptr);                          \
-         __typeof__(*(ptr)) __old = (old);                       \
-         __typeof__(*(ptr)) __new = (new);                       \
-         __typeof__(*(ptr)) __oldval = 0;                        \
-				^^^^^^^ here.
-
-Cheers,
-
-Paolo
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
