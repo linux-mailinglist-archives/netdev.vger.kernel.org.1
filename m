@@ -1,242 +1,272 @@
-Return-Path: <netdev+bounces-120865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FF2E95B1CC
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:37:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA44B95B1DB
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:38:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53D911C21815
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:37:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10E3CB24063
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483CC1741FA;
-	Thu, 22 Aug 2024 09:37:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB7E179206;
+	Thu, 22 Aug 2024 09:38:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="nQ5D2zUB"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="RB2V7lLj"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2051.outbound.protection.outlook.com [40.107.20.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40ADA15572C;
-	Thu, 22 Aug 2024 09:37:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724319436; cv=fail; b=L0mFkGS9N4i1QjzGwrl4nWIPjMDnnXtkrnjCz1k33ZZOoGsQu6qEx1JQqUtW31AdoyPumAvJCO1ySduxp3MAGhPt1tO0kR7j3gTERxzd53D9Yi39Ze/fSVEeFdTZxiRSBKGtzfJtuOVg+lMYWRPx1FmByHqpQME9efPBVfuMblU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724319436; c=relaxed/simple;
-	bh=pf9+vC1ows4q1/tF/v39dmUzKbkofOAkLW5t/CEPnBw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XAKeS0HcRp07ucheSQs2vsiGfc8eQ7fFQWucx4LLoFb94/akg5GElmLr34maiioz07DLW4STIs+MTVDYNJdxMmeJfpBmFLsCMfgaAivpPYUJDO68covJqnsT1LMB2EIJUuuq4MYltMIY2Zweo88M0MQNl9G0spTDeO3OSwiVErw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=nQ5D2zUB; arc=fail smtp.client-ip=40.107.20.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gBOEUXZas0OT+XUjQKc7r5S5PIKC8XkUzI31yILQVQ7GkuBqiROhmC4MEdVSjy2lscjokTmhm3iQnZFXZ1WTOHLpctstzU3SMoRp35qT3K9Srpi5PmH/SWTSNw/syYoQX1RXiLfL4Hy7m97qqy8eRIg9paulN+uSi2x/+SvYiXoYrvmkisCnyhQjZcgX4wKPrnyMR80LWqDPdv0GdM0ncjEVTXGqJcRKwtyFWgqypEvzSeNu4eZv3zDhnp5lrseyZ4OpuV/GiKA7bbcQrccUtuDFT8tl4en0now6KUcFdBFAVI1IGzT9kO2OurZyE6Uu1KZ/F2CX78BHtuOI0ELg4Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pf9+vC1ows4q1/tF/v39dmUzKbkofOAkLW5t/CEPnBw=;
- b=mBwbm7G006wPEiBbpfg1l1N7NHsmPdrLudvRt7/xMWC9S3YTWycmVOfW62OpFyBnlDk43Qw6N9ChZrCgot0DJ707wduB8hpzirBj/8e7X9YAWPYnsDVDrSE8U3irKfsDlgQcLT/i09XHmAjjSfJOmvfN5mdKi8yh+CUaucRXfvKWblBSb41OqkmdLxBkZKtAloObVLDJcA1CElsPkOo7Ws3cX4NeQXBdTZ+gCfl+hBvdrPMWdZib18zrkJlprl4+ReC7b0q7LNB2CcAZegcu4jFiHFaM6nx60S3nak5Khk64DFcmJrLTnv+uk89LF/cP0csb8f+jKR0jHt26m9Frvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pf9+vC1ows4q1/tF/v39dmUzKbkofOAkLW5t/CEPnBw=;
- b=nQ5D2zUBJpO6ZeVZHRU9C40kTmd798tMd+xTCnPesOr9O//X5TExx8GJojj3ekxzpYiHI/MY+cr/0H6wxi2QB/+CPlP+W465fDeYhgEfVOodFxiQWLNMEc0cu1Ion+mQrnmnNTSxH7tZXct9n917Mu/LQkctWGhjXRg8Ybzy42MsW3Y/WoH9JYXmgKjc3HlVJ4To5vEI4tyDwvoEKi41zQr8dGSLGMc9NMtSQYgUMRofu7fHu2fY0Ezq+yInd9pnSVakHum8r5spCQ4NUn4A4IJDn4S/fqSBZFerytU99goG+qGXwqyMWDMY3pa8dcxXm8SvH4/b6z6bGswKPxrMjw==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by DU2PR04MB8696.eurprd04.prod.outlook.com (2603:10a6:10:2df::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Thu, 22 Aug
- 2024 09:37:11 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%6]) with mapi id 15.20.7897.014; Thu, 22 Aug 2024
- 09:37:11 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Conor Dooley <conor@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, "andrew@lunn.ch" <andrew@lunn.ch>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, "hkallweit1@gmail.com"
-	<hkallweit1@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"Andrei Botila (OSS)" <andrei.botila@oss.nxp.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v2 net-next 2/3] net: phy: tja11xx: replace
- "nxp,rmii-refclk-in" with "nxp,phy-output-refclk"
-Thread-Topic: [PATCH v2 net-next 2/3] net: phy: tja11xx: replace
- "nxp,rmii-refclk-in" with "nxp,phy-output-refclk"
-Thread-Index: AQHa9DXVYWkEv9kTy0yrZnxZHkT8jLIy90mAgAAJVVA=
-Date: Thu, 22 Aug 2024 09:37:11 +0000
-Message-ID:
- <PAXPR04MB85107F19C846ABDB74849086888F2@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20240822013721.203161-1-wei.fang@nxp.com>
- <20240822013721.203161-3-wei.fang@nxp.com>
- <20240822-headed-sworn-877211c3931f@spud>
-In-Reply-To: <20240822-headed-sworn-877211c3931f@spud>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|DU2PR04MB8696:EE_
-x-ms-office365-filtering-correlation-id: 8c6391c8-6d8c-4ba4-896b-08dcc28dffb8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?gb2312?B?cWNGWTV2MjlwdjFpcGpicnQvYlZoMTlzUFBEMlVubmdKd3BzMlJLa1pTWkNx?=
- =?gb2312?B?TXVCaXZUTzRTWE5UUVdUc3pnQ2xRNXd4UzNYMXJhQjZoZzFvZUg1RjBScE0y?=
- =?gb2312?B?aVlNRDlwd2VON1pHZlAxWWpseklWckM2cGZabTcxYnNka2Nwc2FBZ2cwdFZR?=
- =?gb2312?B?U25jRHAwZjZSZzlqTVo1c08yaDZOeTZUVlZ4d1Q0VUREcjdWV3lQbkM3WVhC?=
- =?gb2312?B?em1Lckl3QlpVTzRyVUxRdGNnRGlhL3JDb0xwWDJDRHlKTTJyemJuZ2FFK3ov?=
- =?gb2312?B?akFxczN6UlhSamhZOE1XRmI1cjJwYnJIbnhLRFFXbW9KS051b1dWWXRwTUhm?=
- =?gb2312?B?eDRSYTl2QlAwY0M4L3ErOXJjd0s5Zy9sSi9NYy9wbFQvY3FCK3JRdURLcjZk?=
- =?gb2312?B?SUF0Y1I2Rk9WUFZpUUJRN0ZZSSs2YlVMc05yS0d1WmZYNHVvVHIweXg1emNv?=
- =?gb2312?B?SXFmMStIM3pFT3hISVhKeGNNWm9ESWR0V2pZYjd0T0ZYVkM0cG5Cd1VSaGlX?=
- =?gb2312?B?K1FCNzFsSmJNblBnUitQSGJ1VTdwbG05b24renRycEoyZXpCbDhFUWNGTk40?=
- =?gb2312?B?V3IwaVZudXhxOWZYL1d1RWhKdTJHLytZYjl2TUdrYTBzdkdQbEs1ajZHblhN?=
- =?gb2312?B?blVieGs5cHVJd1MydjYrQ2pQT09UNTVNZDRUalBuaDJGSEJIRUZyRkM1Q1JS?=
- =?gb2312?B?R3E4Z0Z6S040a0gyczBzclN5WTd6RlM3ZjlpWHRYRTlaYmZrWDl4OXNZSFNa?=
- =?gb2312?B?TUJEOUlxYUg2dDk0b1ZLMVp6NGFTc1FsWDhpZmZLT0JlMlYrZTlSRGttRUVI?=
- =?gb2312?B?V0F2WkhPeW56OFM4RG1ROWJTQkhDdCt0VnFXaG5MQWFUQnpGaDR6Vk56anh5?=
- =?gb2312?B?eklMSFNRS1pVNERNTm4yVVVqWW5VeXQwalN2TVdlVnZlN1VrVnpiZGhianpC?=
- =?gb2312?B?LzF2MWNWcFNYaFJUZnNSd1dFaEp6QXpIcTRVaTlnY0p4K1ZhVUtQL0hoa3hI?=
- =?gb2312?B?NmNnalVhczV2TG1jRmhpUXRFKzhJRnU1TzZNc1BLRVQwWGFUMjA4NGN5aGs3?=
- =?gb2312?B?cmhzTWk1b0dZbkhWc2JKNVQvSmJ1WUVVcGdvcEs1VW1uc3ZkeEM2WEVRaHRJ?=
- =?gb2312?B?Q0lORTBKNng5ZkxSVitJekJ2VzU4bTBqR3g5L0l5UDNsOVZmWjVFaWU2SDRs?=
- =?gb2312?B?d2lJYmZCNjRvT0V5UDRMNzVMVi94VHp5VlNBVnF6NkROc1F6SHgvUEQ3cDBj?=
- =?gb2312?B?VWxtOHREZjJSa2h6VWFQUjFKdjUrdjIxd0lGTCtQZStpeU1DS1lHVlRoR2NO?=
- =?gb2312?B?MUkwUTIwKzFRUllRVyt6TGNpZ1FzUm5SUW5jUkdkUDRVNU1JbmF1aU9UQUEz?=
- =?gb2312?B?cXYyYjlVYmpQSVo5VU5icnFaRjdINnVlUzdtRG5JRkJXWlg2ano4U1ljMUZE?=
- =?gb2312?B?aldEbjl3NWF4aUFlNjRXbWtkcXNzRnkybzZtSkRwUjgwQkc1V2xJbnVod0xU?=
- =?gb2312?B?bDhPZUFvTUxLYkFpV1NpTldGZW5qOEtscVM4bm1kcU5Fbko5UkJaS1c4dHk3?=
- =?gb2312?B?MUdkN2thWVRMbWZrbmgwdVVHN2E4N0lQOE5lRGdueUp0Y1RWUkFJOFBDMzdN?=
- =?gb2312?B?L1BYTDZPTjdSUzNVVDJMZkMvZWl2RG9YYUFlekt2ZkRIUERoZ1l2eUhmWVQx?=
- =?gb2312?B?YWFySHF3S0l0bkZZRmg3VHZRTkZGVUlzcUdSZTZuZmwwQW15U1ZrMWdvUWZ3?=
- =?gb2312?B?eGJVMFM3K2RLL3BEVGtYMEhVWUtwT2pFWEhkdVRPbEpOVUlMcnNNMDNBallM?=
- =?gb2312?B?YTdXeEt1NGFXc3Zyd0tCSXllK0Q2VzFFMzlRUmxEL3hXS0s1SzQ3V210R09u?=
- =?gb2312?B?UVMwblBBTW9VUi9EMVcrTjhSeG44bkhyV0lNOTNJblIvNXc9PQ==?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:zh-cn;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?gb2312?B?SGEydU1YTXNDRFBIQktIT21KSi9iaFdWOWxHWENwOHpBd0txeDlOeEtUclRr?=
- =?gb2312?B?UHlkRzZ6SElESXJ1blptUndQRkRmNjJlcXdHenFDWitoK1prTS9CbGdHdDFm?=
- =?gb2312?B?Y0Z6Y0l3SlNtaTdEMWYwQ3JzRmNxM3pvRC83bmFXajJZMmJwMUI4RG5pNnR2?=
- =?gb2312?B?QWJCN1FOL2VsbnozcVhXVllFU1I4Q1M2TzhHLzNBak9wejhwd3NEZHlFZDJH?=
- =?gb2312?B?NE5hdVFFQ284ODB6S1h4cUowK2o1SnVnSGJqUjFiMWFjZjN1bHd4WG54Mkxa?=
- =?gb2312?B?anhxU3A1enRRSHFOcGJKVkpqUFkwZWdWWVlVS0ZvdDRyRkhBSzZUNzZrU2ly?=
- =?gb2312?B?Z2tYOUFvVDhUWmR3UFRsT3RlSEx6b2hORmdJb0NtdmptOHdkaWxMdzRlTUxq?=
- =?gb2312?B?VXh5Wm1qTEtWbHFpUGpiZUdpWXZMZ3NmRlliM2hWL0tmZ00rTmkyRFd5d2x4?=
- =?gb2312?B?YjBoUGxJL1pOQjJ4c3pSYnlSak5CR1gyR3N2eUFqZWZYVUdGTk5BejhxdU03?=
- =?gb2312?B?YnRjSVU2QmRzLzdnbzRIUHhUeTB6ZmVhSW5SVmxxTFNEclhoZSs0MlhlaS8x?=
- =?gb2312?B?TVBGRVkrOHFuZ3ZwenBPZnhaT08wcWxhdE91OEJ6ZmVXOW9VSDBXNXpqUHpz?=
- =?gb2312?B?ZVFGaG9LOTFjcTlaSlhqRXhqaFRtMUNTb0xuR1BocWZpQnpCSnJPb21iT2ti?=
- =?gb2312?B?ZnJLUXQ4QU02NTJ2MXpMOERxRHVmUFVkVnI3OE9NajVpZENoeUk1ZHd6VWRl?=
- =?gb2312?B?R3ZDcjFHdzVRbHliWS9WZHZaNnJaSyt4MC9YbXVIK2prY1ZDS3Y0QUhGTWI1?=
- =?gb2312?B?aUNBVFY4MG1oNWdWb1VZWVEwcXBOUUUzYjhoMXpXZFo5NDZWMUppMnk4OUpJ?=
- =?gb2312?B?WjM5cWRtV2t6aHR2Qy8xZG81N25kM09Gbjg3em9QWlFxNlNVdFd2ekJpUzFU?=
- =?gb2312?B?dGVCSVg4TjVRcVVuQ0NwZ2NseUdQeWtVc1ZCL2l0Rkh0OWhEWTdpSVdGV2dP?=
- =?gb2312?B?akRSckxBcUtTTmt5Ri9mTFdnd0JtY1ZzaGFtMFdjNzJGMDR3alNKTmQ1WnZC?=
- =?gb2312?B?eTFrKzJuTVBtZTQwL05hT2lGYi9nOFc5c1BxNGFjcmoxRnNQNnlRV0NTK3NL?=
- =?gb2312?B?RU96VmZiWitLOCtBTCtVcXRwY3gzdnZ6Um1rZ09DRnQvT21LUGJRak9YeDlW?=
- =?gb2312?B?UEhTR0xTVDllU0oyOWJyNTNZbmg2emUrZmJVTFVibkswTFdvYnlkZTRuODRJ?=
- =?gb2312?B?UVpHSkF3Q04yR3NWdUNCY25oUXplcXliZ1IvL05yL1c0RENnRndmbGNiVkZI?=
- =?gb2312?B?U05wRHRERDR5RGgzWDVuY1NWdnlyNmpGcWFRNHk4MjZTZnFvNmtIVTVQSlBr?=
- =?gb2312?B?eUpJd2ZEL1lTNTlNT0wzSVZ2T1JrNFdGZlhvZjVHano2SFprUXRwZnFTMmNW?=
- =?gb2312?B?OWxmQkJBVGhWNXBDTEpEMzdHSis2MFlmRWxLeGVkZHFMQ2RXYmUrSDVKTVV0?=
- =?gb2312?B?dTZxZFc1U3gwSGtEOXdnTHBmVXZIV0FYZWhTbUxLK21lRW5wNnRRZmsrbnh1?=
- =?gb2312?B?Z1Nzeit4OXI1cmtCUTNJU1FyTWgvRVgrRWtFTm1MTjZXUzRSb3RHaWhLZTl6?=
- =?gb2312?B?dVZ0Q21tb3B6YmlyZlBreHlpZFBRdXV0TTUzNi8zNUt4cHQ2R2R0VjRuQkVz?=
- =?gb2312?B?S3N1bjhMWnhoZUc1TnhHWkZhSm5MZXZ5Smt2ZWVvQzAyUHZMUXFsVzdyREI0?=
- =?gb2312?B?a2pQUTA2Y2JZUWdSMUpaSXhNTTQzQ0JmL296NkUyalgxV1hLemV2Z3BLeEQr?=
- =?gb2312?B?Z1ZNU3BBRzk3YTg2Y0dFYkFYcFFZS0hxRFdtT3JVamVaL2tyUjlmZ1dXUEU2?=
- =?gb2312?B?WjdBYW1GdmFOMlkrbndBdUVtMUVKKzlDbi9HR3g1QkhWNlpWZitib2dtVWhk?=
- =?gb2312?B?T2k1bzNvMk1GSXB2RHlWYkx2ZjQrTkVuenRqZjhkeU1tcTJCcEV2ejk3b1gy?=
- =?gb2312?B?T2RteEZZd1QxQ0p4bE9WREloRnV4aUNOUXYxR3hXN2U5L0Q2NWN4TkgzSE9H?=
- =?gb2312?B?ZnJidFk2VURDMHFRRFFUVHNkYTdhMVB5VHRzR09FNHJZMWtpNHYydEJEMjlq?=
- =?gb2312?Q?vD+0=3D?=
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0B8175D2D;
+	Thu, 22 Aug 2024 09:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724319531; cv=none; b=tTn1u0J6vWd9SG0c8n59txopf2Sar+gWyNcj4gxV3tzY7DG0tYSO8pNLFyS9H+nDxLnD5j5A2wBm8D5m8qOdsEJ5MrwqEIb2b5fEviWkudpRYXeifAu8eZ4QqIlzadJi1vnNW3L+uNVtrKDwZ5VU5DWUYM0eU2yqCf9B2SPqw54=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724319531; c=relaxed/simple;
+	bh=weZ/vdXL2IMUr74lx6nHs6gEsvyjW8Ja7OKomJ30cEE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EAeeIBrH9dH5ehbhIiRFc/wO8D4D65JWuNtP1Aazi3kDDMjZajmq9V7v06C5vUyJ4GBODn/0D4y2Gs4y5e0zcJpZp18zPA7nitSMiUUJco73dtD4tI2wc+EVTCSkBxSn38I7wn9qTyRe/8FEUELbcsk3GuWwcMy02cjnuZZ53MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=RB2V7lLj; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 47M9c2giD3802503, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1724319482; bh=weZ/vdXL2IMUr74lx6nHs6gEsvyjW8Ja7OKomJ30cEE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:
+	 Content-Transfer-Encoding:Content-Type;
+	b=RB2V7lLj4S/urkTX4+aCJQis+j72oORG1w0giv0l/TkOWqbPtSuoAHNn3QPZtUanL
+	 cmP/XDOaYWA8kVQWks52ep3XPotXg0zMWWuivjE0uNcIjxlhl16denDgLmirnPdJmx
+	 IxkOeRwIPubVn4awkp/OXiTbCEubiF9gbR9FwhHa0BvS9lwdcuWY5DnAKI2M71AtGN
+	 n99k45NybFyT+4bLKYQjMGtHCdecqD9IznjR4QsJESgb0ocF8/1z40mhFheryGcEgb
+	 nxOvR/J4jAw+JMt7SXnnWZJ/4tqonEZd0G7OpG5xjT6mBb0veLFQ6+ctIjn6ifJMrO
+	 6C6zsLgwRTG5g==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 47M9c2giD3802503
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 22 Aug 2024 17:38:02 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 22 Aug 2024 17:38:03 +0800
+Received: from RTDOMAIN (172.21.210.74) by RTEXMBS04.realtek.com.tw
+ (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 22 Aug
+ 2024 17:38:02 +0800
+From: Justin Lai <justinlai0215@realtek.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <andrew@lunn.ch>, <jiri@resnulli.us>, <horms@kernel.org>,
+        <rkannoth@marvell.com>, <jdamato@fastly.com>, <pkshih@realtek.com>,
+        <larry.chiu@realtek.com>, "Justin
+ Lai" <justinlai0215@realtek.com>
+Subject: [PATCH net-next v28 00/13] Add Realtek automotive PCIe driver
+Date: Thu, 22 Aug 2024 17:37:41 +0800
+Message-ID: <20240822093754.17117-1-justinlai0215@realtek.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c6391c8-6d8c-4ba4-896b-08dcc28dffb8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Aug 2024 09:37:11.5944
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: AuJr9RwXTKkEosY4L/L48o6e7GDT8Tj3KTXDlGnDki7fe4lkv1N257yo3rJIAYjClqhtFaUQJsvY7/w1oFrGFA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8696
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBDb25vciBEb29sZXkgPGNvbm9y
-QGtlcm5lbC5vcmc+DQo+IFNlbnQ6IDIwMjTE6jjUwjIyyNUgMTY6NDcNCj4gVG86IFdlaSBGYW5n
-IDx3ZWkuZmFuZ0BueHAuY29tPg0KPiBDYzogZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1bWF6ZXRA
-Z29vZ2xlLmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiBwYWJlbmlAcmVkaGF0LmNvbTsgcm9iaEBr
-ZXJuZWwub3JnOyBrcnprK2R0QGtlcm5lbC5vcmc7DQo+IGNvbm9yK2R0QGtlcm5lbC5vcmc7IGFu
-ZHJld0BsdW5uLmNoOyBmLmZhaW5lbGxpQGdtYWlsLmNvbTsNCj4gaGthbGx3ZWl0MUBnbWFpbC5j
-b207IGxpbnV4QGFybWxpbnV4Lm9yZy51azsgQW5kcmVpIEJvdGlsYSAoT1NTKQ0KPiA8YW5kcmVp
-LmJvdGlsYUBvc3MubnhwLmNvbT47IG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc7DQo+IGRldmljZXRy
-ZWVAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnDQo+IFN1Ympl
-Y3Q6IFJlOiBbUEFUQ0ggdjIgbmV0LW5leHQgMi8zXSBuZXQ6IHBoeTogdGphMTF4eDogcmVwbGFj
-ZQ0KPiAibnhwLHJtaWktcmVmY2xrLWluIiB3aXRoICJueHAscGh5LW91dHB1dC1yZWZjbGsiDQo+
-IA0KPiBPbiBUaHUsIEF1ZyAyMiwgMjAyNCBhdCAwOTozNzoyMEFNICswODAwLCBXZWkgRmFuZyB3
-cm90ZToNCj4gPiBBcyB0aGUgbmV3IHByb3BlcnR5ICJueHAscGh5LW91dHB1dC1yZWZjbGsiIGlz
-IGFkZGVkIHRvIGluc3RlYWQgb2YgdGhlDQo+ID4gIm54cCxybWlpLXJlZmNsay1pbiIgcHJvcGVy
-dHksIHNvIHJlcGxhY2UgdGhlICJueHAscm1paS1yZWZjbGstaW4iDQo+ID4gcHJvcGVydHkgdXNl
-ZCBpbiB0aGUgZHJpdmVyIHdpdGggdGhlICJueHAscmV2ZXJzZS1tb2RlIiBwcm9wZXJ0eSBhbmQN
-Cj4gPiBtYWtlIHNsaWdodCBtb2RpZmljYXRpb25zLg0KPiANCj4gQ2FuIHlvdSBleHBsYWluIHdo
-YXQgbWFrZXMgdGhpcyBiYWNrd2FyZHMgY29tcGF0aWJsZSBwbGVhc2U/DQo+IA0KSXQgZG9lcyBu
-b3QgYmFja3dhcmQgY29tcGF0aWJsZSwgdGhlIHJlbGF0ZWQgUEhZIG5vZGVzIGluIERUUyBhbHNv
-DQpuZWVkIHRvIGJlIHVwZGF0ZWQuIEkgaGF2ZSBub3Qgc2VlbiAibnhwLHJtaWktcmVmY2xrLWlu
-IiB1c2VkIGluIHRoZQ0KdXBzdHJlYW0uIEZvciBub2RlcyB0aGF0IGRvIG5vdCB1c2UgIiBueHAs
-cm1paS1yZWZjbGstaW4iLCB0aGV5IG5lZWQNCnRvIGJlIHVwZGF0ZWQsIGJ1dCB1bmZvcnR1bmF0
-ZWx5IEkgY2Fubm90IGNvbmZpcm0gd2hpY2ggRFRTIHVzZQ0KVEpBMTFYWCBQSFksIGFuZCB0aGVy
-ZSBtYXkgYmUgbm8gcmVsZXZhbnQgbm9kZXMgaW4gdXBzdHJlYW0gRFRTLg0KDQo+ID4NCj4gPiBT
-aWduZWQtb2ZmLWJ5OiBXZWkgRmFuZyA8d2VpLmZhbmdAbnhwLmNvbT4NCj4gPiAtLS0NCj4gPiBW
-MiBjaGFuZ2VzOg0KPiA+IDEuIENoYW5nZWQgdGhlIHByb3BlcnR5IG5hbWUuDQo+ID4gLS0tDQo+
-ID4gIGRyaXZlcnMvbmV0L3BoeS9ueHAtdGphMTF4eC5jIHwgMTMgKysrKysrLS0tLS0tLQ0KPiA+
-ICAxIGZpbGUgY2hhbmdlZCwgNiBpbnNlcnRpb25zKCspLCA3IGRlbGV0aW9ucygtKQ0KPiA+DQo+
-ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3BoeS9ueHAtdGphMTF4eC5jDQo+ID4gYi9kcml2
-ZXJzL25ldC9waHkvbnhwLXRqYTExeHguYyBpbmRleCAyYzI2M2FlNDRiNGYuLjdhYTA1OTljMzhj
-Mw0KPiA+IDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvbmV0L3BoeS9ueHAtdGphMTF4eC5jDQo+
-ID4gKysrIGIvZHJpdmVycy9uZXQvcGh5L254cC10amExMXh4LmMNCj4gPiBAQCAtNzgsOCArNzgs
-NyBAQA0KPiA+ICAjZGVmaW5lIE1JSV9DT01NQ0ZHCQkJMjcNCj4gPiAgI2RlZmluZSBNSUlfQ09N
-TUNGR19BVVRPX09QCQlCSVQoMTUpDQo+ID4NCj4gPiAtLyogQ29uZmlndXJlIFJFRl9DTEsgYXMg
-aW5wdXQgaW4gUk1JSSBtb2RlICovDQo+ID4gLSNkZWZpbmUgVEpBMTEwWF9STUlJX01PREVfUkVG
-Q0xLX0lOICAgICAgIEJJVCgwKQ0KPiA+ICsjZGVmaW5lIFRKQTExWFhfUkVWRVJTRV9NT0RFCQlC
-SVQoMCkNCj4gPg0KPiA+ICBzdHJ1Y3QgdGphMTF4eF9wcml2IHsNCj4gPiAgCWNoYXIJCSpod21v
-bl9uYW1lOw0KPiA+IEBAIC0yNzQsMTAgKzI3MywxMCBAQCBzdGF0aWMgaW50IHRqYTExeHhfZ2V0
-X2ludGVyZmFjZV9tb2RlKHN0cnVjdA0KPiBwaHlfZGV2aWNlICpwaHlkZXYpDQo+ID4gIAkJbWlp
-X21vZGUgPSBNSUlfQ0ZHMV9SRVZNSUlfTU9ERTsNCj4gPiAgCQlicmVhazsNCj4gPiAgCWNhc2Ug
-UEhZX0lOVEVSRkFDRV9NT0RFX1JNSUk6DQo+ID4gLQkJaWYgKHByaXYtPmZsYWdzICYgVEpBMTEw
-WF9STUlJX01PREVfUkVGQ0xLX0lOKQ0KPiA+IC0JCQltaWlfbW9kZSA9IE1JSV9DRkcxX1JNSUlf
-TU9ERV9SRUZDTEtfSU47DQo+ID4gLQkJZWxzZQ0KPiA+ICsJCWlmIChwcml2LT5mbGFncyAmIFRK
-QTExWFhfUkVWRVJTRV9NT0RFKQ0KPiA+ICAJCQltaWlfbW9kZSA9IE1JSV9DRkcxX1JNSUlfTU9E
-RV9SRUZDTEtfT1VUOw0KPiA+ICsJCWVsc2UNCj4gPiArCQkJbWlpX21vZGUgPSBNSUlfQ0ZHMV9S
-TUlJX01PREVfUkVGQ0xLX0lOOw0KPiA+ICAJCWJyZWFrOw0KPiA+ICAJZGVmYXVsdDoNCj4gPiAg
-CQlyZXR1cm4gLUVJTlZBTDsNCj4gPiBAQCAtNTE3LDggKzUxNiw4IEBAIHN0YXRpYyBpbnQgdGph
-MTF4eF9wYXJzZV9kdChzdHJ1Y3QgcGh5X2RldmljZQ0KPiAqcGh5ZGV2KQ0KPiA+ICAJaWYgKCFJ
-U19FTkFCTEVEKENPTkZJR19PRl9NRElPKSkNCj4gPiAgCQlyZXR1cm4gMDsNCj4gPg0KPiA+IC0J
-aWYgKG9mX3Byb3BlcnR5X3JlYWRfYm9vbChub2RlLCAibnhwLHJtaWktcmVmY2xrLWluIikpDQo+
-ID4gLQkJcHJpdi0+ZmxhZ3MgfD0gVEpBMTEwWF9STUlJX01PREVfUkVGQ0xLX0lOOw0KPiA+ICsJ
-aWYgKG9mX3Byb3BlcnR5X3JlYWRfYm9vbChub2RlLCAibnhwLHBoeS1vdXRwdXQtcmVmY2xrIikp
-DQo+ID4gKwkJcHJpdi0+ZmxhZ3MgfD0gVEpBMTFYWF9SRVZFUlNFX01PREU7DQo+ID4NCj4gPiAg
-CXJldHVybiAwOw0KPiA+ICB9DQo+ID4gLS0NCj4gPiAyLjM0LjENCj4gPg0K
+This series includes adding realtek automotive ethernet driver
+and adding rtase ethernet driver entry in MAINTAINERS file.
+
+This ethernet device driver for the PCIe interface of
+Realtek Automotive Ethernet Switch,applicable to
+RTL9054, RTL9068, RTL9072, RTL9075, RTL9068, RTL9071.
+
+v1 -> v2:
+- Remove redundent debug message.
+- Modify coding rule.
+- Remove other function codes not related to netdev.
+
+v2 -> v3:
+- Remove SR-IOV function - We will add the SR-IOV function together when
+uploading the vf driver in the future.
+- Remove other unnecessary code and macro.
+
+v3 -> v4:
+- Remove function prototype - Our driver does not use recursion, so we
+have reordered the code and removed the function prototypes.
+- Define macro precisely - Improve macro code readability to make the
+source code cleaner.
+
+v4 -> v5:
+- Modify ethtool function - Remove some unnecessary code.
+- Don't use inline function - Let the compiler decide.
+
+v5 -> v6:
+- Some old macro definitions have been removed and replaced with the
+lastest usage.
+- Replace s32 with int to ensure consistency.
+- Clearly point out the objects of the service and remove unnecessary
+struct.
+
+v6 -> v7:
+- Split this driver into multiple patches.
+- Reorganize this driver code and remove redundant code to make this
+driver more concise.
+
+v7 -> v8:
+- Add the function to calculate time mitigation and the function to
+calculate packet number mitigation. Users can use these two functions
+to calculate the reg value that needs to be set for the mitigation value
+they want to set.
+- This device is usually used in automotive embedded systems. The page
+pool api will use more memory in receiving packets and requires more
+verification, so we currently do not plan to use it in this patch.
+
+v8 -> v9:
+- Declare functions that are not extern as static functions and increase
+the size of the character array named name in the rtase_int_vector struct
+to correct the build warning noticed by the kernel test robot.
+
+v9 -> v10:
+- Currently we change to use the page pool api. However, when we allocate
+more than one page to an rx buffer, it will cause system errors
+in some cases. Therefore, we set the rx buffer to fixed size with 3776
+(PAGE_SIZE - SKB_DATA_ALIGN(sizeof(skb_shared_info) )), and the maximum
+value of mtu is set to 3754(rx buffer size - VLAN_ETH_HLEN - ETH_FCS_LEN).
+- When ndo_tx_timeout is called, it will dump some device information,
+which can be used for debugging.
+- When the mtu is greater than 1500, the device supports checksums
+but not TSO.
+- Fix compiler warnning.
+
+v10 -> v11:
+- Added error handling of rtase_init_ring().
+- Modify the error related to asymmetric pause in rtase_get_settings.
+- Fix compiler error.
+
+v11 -> v12:
+- Use pm_sleep_ptr and related macros.
+- Remove multicast filter limit.
+- Remove VLAN support and CBS offload functions.
+- Remove redundent code.
+- Fix compiler warnning.
+
+v12 -> v13:
+- Fixed the compiler warning of unuse rtase_suspend() and rtase_resume()
+when there is no define CONFIG_PM_SLEEP.
+
+v13 -> v14:
+- Remove unuse include.
+- call eth_hw_addr_random() to generate random MAC and set device flag
+- use pci_enable_msix_exact() instead of pci_enable_msix_range()
+- If dev->dma_mask is non-NULL, dma_set_mask_and_coherent with a 64-bit
+mask will never fail, so remove the part that determines the 32-bit mask.
+- set dev->pcpu_stat_type before register_netdev() and core will allocate
+stats.
+- call NAPI instance at the right location
+
+v14 -> v15:
+- In rtase_open, when the request interrupt fails, all request interrupts
+are freed.
+- When calling netif_device_detach, there is no need to call
+netif_stop_queue.
+- Call netif_tx_disable() instead of stop_queue(), it takes the tx lock so
+there is no need to worry about the packets being transmitted.
+- In rtase_tx_handler, napi budget is no longer used, but a customized
+tx budget is used.
+- Use the start / stop macros from include/net/netdev_queues.h.
+- Remove redundent code.
+
+v15 -> v16:
+- Re-upload v15 patch set
+
+v16 -> v17:
+- Prefix the names of some rtase-specific macros, structs, and enums.
+- Fix the abnormal problem when returning page_pool resources.
+
+v17 -> v18:
+- Limit the width of each line to 80 colums.
+- Use reverse xmas tree order.
+- Modify the error handling of rtase_alloc_msix and rtase_alloc_interrupt.
+
+v18 -> v19:
+- Use dma_wmb() instead of wmb() to ensure the order of access
+instructions for a memory shared by DMA and CPU.
+- Add error message when allocate dma memory fails.
+- Add .get_eth_mac_stats function to report hardware information.
+- Remove .get_ethtool_stats function.
+- In rtase_tx_csum, when the packet is not ipv6 or ipv4, a warning will
+no longer be issued.
+
+v19 -> v20:
+- Modify the description of switch architecture.
+
+v20 -> v21:
+- Remove the 16b packet statistics and 32b byte statistics report.
+- Remove all parts that use struct net_device_stats stats, and instead
+store the necessary counter fields in struct rtase_private.
+- Modify the handling method of allocation failure in rtase_alloc_desc().
+- Remove redundant conditionals and parentheses.
+- Keep the message in the single line.
+- Assign the required feature to dev->feature and dev->hw_feature at once.
+- Single statement does not need to use braces.
+
+v21 -> v22:
+- Fix the warning when building the driver.
+
+v22 -> v23:
+- Remove the execute bit setting.
+
+v23 -> v24:
+- Remove netpoll handler.
+
+v24 -> v25:
+- Re-upload v24 patch set
+
+v25 -> v26:
+- rtase_start_xmit(): don't increment tx_dropped in case of
+NETDEV_TX_BUSY.
+- Modify the rx allocate flow, build_skb() should be rx_handler().
+- Remove leading underscores in the macro name.
+
+v26 -> v27:
+- Modify the placement of dma_rmb().
+
+v27 -> v28:
+- Remove rtase_get_drvinfo().
+- Simplify the setup of rx_pause and tx_pause in rtase_get_pauseparam().
+- Add alloc_fail to count the memory allocation failed.
+- Remove the messages about rx memory allocation failed.
+
+Justin Lai (13):
+  rtase: Add support for a pci table in this module
+  rtase: Implement the .ndo_open function
+  rtase: Implement the rtase_down function
+  rtase: Implement the interrupt routine and rtase_poll
+  rtase: Implement hardware configuration function
+  rtase: Implement .ndo_start_xmit function
+  rtase: Implement a function to receive packets
+  rtase: Implement net_device_ops
+  rtase: Implement pci_driver suspend and resume function
+  rtase: Implement ethtool function
+  rtase: Add a Makefile in the rtase folder
+  realtek: Update the Makefile and Kconfig in the realtek folder
+  MAINTAINERS: Add the rtase ethernet driver entry
+
+ MAINTAINERS                                   |    7 +
+ drivers/net/ethernet/realtek/Kconfig          |   19 +
+ drivers/net/ethernet/realtek/Makefile         |    1 +
+ drivers/net/ethernet/realtek/rtase/Makefile   |   10 +
+ drivers/net/ethernet/realtek/rtase/rtase.h    |  340 +++
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 2289 +++++++++++++++++
+ 6 files changed, 2666 insertions(+)
+ create mode 100644 drivers/net/ethernet/realtek/rtase/Makefile
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase.h
+ create mode 100644 drivers/net/ethernet/realtek/rtase/rtase_main.c
+
+-- 
+2.34.1
+
 
