@@ -1,125 +1,90 @@
-Return-Path: <netdev+bounces-121041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A0C595B76B
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 15:52:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB61795B7B0
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 15:57:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0B461F220EB
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:52:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 916551F25A09
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 838041CE714;
-	Thu, 22 Aug 2024 13:48:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302BD1CDFCF;
+	Thu, 22 Aug 2024 13:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JnWCqsbT"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rjrxwmG5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2077.outbound.protection.outlook.com [40.107.220.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5261CE6E7
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 13:48:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724334500; cv=none; b=QxoMgNoiWPZqzRwojFWhIjipqlGnTdggHhgL9DMu2/I6G54S0LQsfZ0MG28kRfEwp4+niUZznGxnB9JySXR9FiMVTNu8z/z8pvxhMAeZK7pPVEb05R8o+dx1WOvVCCEXRGjTH8kW3p13rD3HQbExk6H0uX825cICsk7QfEb1xdU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724334500; c=relaxed/simple;
-	bh=xzKTSbBUCxwnUpKs8six5ekb8eTkm5n7sI9qBsfTSxA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ug3dg7Q3ybrnrhj8jgXBW8jnEXJT8Vv1O/oHEPPZjN0cNvQMzLeL1gXQabL9CK9V/bEE3IdKc+7eMt3Wkw36tM9SHxXe+jkPo2ZZCKbSRJ+JlQIij/B0X8oJTqBKlrE8GDVX3JYd/a2Toh6UIlv6XqZuSaMQW0i9o/Je0SUo1rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JnWCqsbT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724334497;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=stErXlsn4bG59ZiuP1S49NzWKfcbkIn79Ht3IKYskFI=;
-	b=JnWCqsbTlT1ORfU31uri7J2wBKEP52lnFOkLVFBRjYyVFUwxYYeGxsCtT9pcKjjfxFwVft
-	uqcWlsBBmx0NMqWd5s2NAOPxi2U3d+txS0y0CEeSHgyQHqugYUU2SkbEHUT2Fe853lhOx/
-	6Ct2pibxXax0oB5/Bs/tsOrV+OsXJQY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-467-qdg_mpSfM6aiOGYQtbnv3A-1; Thu, 22 Aug 2024 09:48:15 -0400
-X-MC-Unique: qdg_mpSfM6aiOGYQtbnv3A-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4280cf2be19so6214945e9.3
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 06:48:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724334494; x=1724939294;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=stErXlsn4bG59ZiuP1S49NzWKfcbkIn79Ht3IKYskFI=;
-        b=r60qHIJ3mJvUSanZ453ffY9DIOFRVXRT+X7NYFsur3AcTCFqj4GzCcXJIxLvtdKjqB
-         F4gZkjx9NdY5zNNjkx1JkV+NLL9WLsdcXzioUdCa/1MqY/n08S4gXzO5s7IdWtTzFEPa
-         UluGYHjEy9zlmR4cQMi3UQ5CMYmKRB37ytrE4hEdWolw0uCLv8QifZvgR1GeOEgUdYPX
-         8bVC7qrN6Wt6AZ0N4V4z+SEotVvmT4F3xr/DcxXGBkzmuRgT4g0ZyJBXJ/qoDuG2G/Gf
-         oPlIqZ8QojdKY+NpaCmvkQVuJlZzTHZ8f266sw1bu4USdHwb0b7s168wOcsWen36lqMa
-         AnRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVt8uMjLD8AFsDB0UUwCZMVzKh14vYvrCxZcYrbuxBMGS0tbvdNjIyF0SaEvlTG9Bvslet2ktA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyH0yPNkNc4HyJo+UPZQHrlIT0xsQj8f1XqEcnioGLcdukDiTei
-	qRvcEZ4TtLYaCOq673p+7A+gTw9FTyLmdtHcgGHZpnjkuLSq+GM/aFpasWm8o1P1BW+1HtRp+e1
-	LIaVXjdfBHnBkomklcJ4/FXSJGwS7Qk9IoIklwwVgx/c0Ej5tB7XkVg==
-X-Received: by 2002:a05:600c:470d:b0:426:5cee:4abc with SMTP id 5b1f17b1804b1-42abd23c42fmr42834415e9.20.1724334494011;
-        Thu, 22 Aug 2024 06:48:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE+ml6suAX3eG1pz2LPHUrAJqRTfncLpMSUbPA+Ci3dUa++3KF20e/68btOdPMgiZkBffw5eg==
-X-Received: by 2002:a05:600c:470d:b0:426:5cee:4abc with SMTP id 5b1f17b1804b1-42abd23c42fmr42833985e9.20.1724334493539;
-        Thu, 22 Aug 2024 06:48:13 -0700 (PDT)
-Received: from eisenberg.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ac5162322sm25057215e9.24.2024.08.22.06.48.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2024 06:48:11 -0700 (PDT)
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jonathan Corbet <corbet@lwn.net>,
-	Jens Axboe <axboe@kernel.dk>,
-	Wu Hao <hao.wu@intel.com>,
-	Tom Rix <trix@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>,
-	Xu Yilun <yilun.xu@intel.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Philipp Stanner <pstanner@redhat.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Hannes Reinecke <hare@suse.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>
-Cc: linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-block@vger.kernel.org,
-	linux-fpga@vger.kernel.org,
-	linux-gpio@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: [PATCH v3 9/9] PCI: Remove pcim_iounmap_regions()
-Date: Thu, 22 Aug 2024 15:47:41 +0200
-Message-ID: <20240822134744.44919-10-pstanner@redhat.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240822134744.44919-1-pstanner@redhat.com>
-References: <20240822134744.44919-1-pstanner@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859261CDFB8;
+	Thu, 22 Aug 2024 13:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724334745; cv=fail; b=SI4Rc8y8/H1BtOEAuIU7mOU87XtauKAKKQ4oLOEI01Ey64slMhT98U41YcoiC8flxN35+eCFi1c68nn3d9BetSVQUXmnJ5UDcQwi5A/gGLaS1JgsV1pUogRPkV/tP5NupwQEh1eivYHQgqzvudhil5Wipmc143p1Vux0SjmO98A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724334745; c=relaxed/simple;
+	bh=6MUtMYHgYF7sLzXxK0ECWht9de2P0ZQp47bfZKISJVk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VfAMrh16AVUZPol8OcJZ9KGzz4ZnTpQuGosX4E8EXWKrcmDn64IgUIlbS8Mfqog6QEo8r3ojcpy8B2fWOmNpNwPfRtRPu2Wro2Oev4RKqPHVWzA6iKsUjaJrzIlpMocP4pxx/Zw9L8mQ463uQTKLaD6MSXYSRpHEFbrvF4eqgd0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rjrxwmG5; arc=fail smtp.client-ip=40.107.220.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wv0aBMuQRlHQt6QfnCGAm7Z7g4LzKzTwtPQMooF9M/val8NhKILPWSZ2EvjeB4fhhKRg5Sf3ttEJI39z5y5InKhZBIwsdwNRmhkHCz8N0e3cePqMKEsIMKqTkMwfjr2CEH3KGThAX81hFcRzZjc+oQeOe7b55fa7gTsU0W0sdpZiDzVR32HtmjsWxyNxnXZWecxolSJ1zcy3hEmNWJS+7SvvDLwdLo4RdzKAZPTwzHNgcy7VCUadmJEN5LJFs/gOoh1Mm6Yxfgb/Ci5jaubU3DjmOKC1VVtvBJFKauhW0j9ddgGcVxDCkmfm05NEHfzmj99kc/3A5PISQR8mGkooMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fPyylWHiVNB1QLLjaS6PtIsSWzJw/Q0qu8oTlzRpg6E=;
+ b=kxU4Gt0zHF8wW3gglC5H4c4WudX9GODWmCiWb1bJD0H7bwP7lbF6ktqdHXZ1a2BRaGwSe3uxhEluKD7J+SY6SjhdSnQHZaxXb84DWdfIyHv49UebgBA/sQJkSK+JYY6ZmO2lG07QcMKBnoIMbIgNv5NFP8+uX8CKKrbuSPL/zJFXRDoIMk+bKPnwvry4gt9lT9fk1xBNjEum/GF1LFCfBFMHlm3u+q05QeJI8AlC8Ku28lcwYiJvdzLKZ0BA9XSENnB1mOJYkDPreCTQbVOUIqb7ZfKnBbDdm6dCOLxUqYZZYkPp4zUK1pOeDRxD03nD1cZ+omr4WtiyyHG2ostkYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fPyylWHiVNB1QLLjaS6PtIsSWzJw/Q0qu8oTlzRpg6E=;
+ b=rjrxwmG5xIYGwmOE4bL82CLAHXQu0WYOaslK8lb4DATEnvhmhahgxcg27Gx8fy+ZvdFEyOMvAsGjZGxT0QF743Dbpg0xcKqtzNPv0ZEqXNRJ/SV615BxQtqdD28s185lL4cTZwY5HR3Qja1AbFeoQM7BFEBSkYU6P0fnpK1gopOiU+RHrqG9CeFYZpdRHg0Mota+P0RnWS5UWq4QbImSJBWUvU+GaS8meJ5qnQtoAwzO5mRJVxYDqp3MAit+Er/T7V4ZOgm+ONTDN6Z3awAoj8CfUyOW8ajVnCgMsL8MDJVuGyUe2F+nAxpzpnI47Wh+nhn3ub8/KeB71ib1gxccZQ==
+Received: from CYZPR14CA0003.namprd14.prod.outlook.com (2603:10b6:930:8f::16)
+ by SA0PR12MB4381.namprd12.prod.outlook.com (2603:10b6:806:70::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.18; Thu, 22 Aug
+ 2024 13:52:20 +0000
+Received: from CY4PEPF0000FCC5.namprd03.prod.outlook.com
+ (2603:10b6:930:8f:cafe::33) by CYZPR14CA0003.outlook.office365.com
+ (2603:10b6:930:8f::16) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21 via Frontend
+ Transport; Thu, 22 Aug 2024 13:52:20 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000FCC5.mail.protection.outlook.com (10.167.242.107) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7897.11 via Frontend Transport; Thu, 22 Aug 2024 13:52:19 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 22 Aug
+ 2024 06:52:08 -0700
+Received: from localhost.localdomain (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 22 Aug
+ 2024 06:52:03 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: Shuah Khan <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+CC: Jakub Kicinski <kuba@kernel.org>, Ido Schimmel <idosch@nvidia.com>, "Petr
+ Machata" <petrm@nvidia.com>, Amit Cohen <amcohen@nvidia.com>, Benjamin
+ Poirier <bpoirier@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>, Vladimir
+ Oltean <vladimir.oltean@nxp.com>, <mlxsw@nvidia.com>
+Subject: [RFC PATCH net-next 0/5] selftests: forwarding: Introduce deferred commands
+Date: Thu, 22 Aug 2024 15:49:39 +0200
+Message-ID: <cover.1724324945.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -127,77 +92,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCC5:EE_|SA0PR12MB4381:EE_
+X-MS-Office365-Filtering-Correlation-Id: b991bb46-f2af-4787-ed73-08dcc2b1a42f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?Sc1bxC22W+PJDCEFbBycCSE8ZJHzNwPQCJ8KTjpBbNK9wXvbHL4VmYxXOKTc?=
+ =?us-ascii?Q?ZY/ayj+WwqDNM+K5VBhQqlWpLOuzfqOMJTqa37SUH8v8+n+6ed5OZnQ0sEIC?=
+ =?us-ascii?Q?TUd7oBqYxuZZwe0xX77vWACK+DcxmQOVhtfUMLHqIPXr/oCuiOOTKvtF024M?=
+ =?us-ascii?Q?jRqDgA3XQZnMGZMkw2DdreivLVw2/aiMo6OAEy3g2Hlyi3FN3L+R1ymm5I6i?=
+ =?us-ascii?Q?0igvG/F6xYuLWfJANHK0NmTG0tRQhnqdI3smoqgduPLrWcACKojXj0dYLJiD?=
+ =?us-ascii?Q?nL7FvJwKNpWnKYf0Y6+ajA9nD0jQholHm5phiEwnF71+Xra68pgb4KnMJVtm?=
+ =?us-ascii?Q?Qu+Yzjej3+kaFzMKB0j95M1KwpGDOkHrLc7/zHQx+4t+j54r2P7GDAWXMUiW?=
+ =?us-ascii?Q?qEnaKP8+qlmSm21pHx2aSPUQtLZ09srSLtgBevVuBuNmlAgysaqoRcZ5AqlS?=
+ =?us-ascii?Q?TftLYvhxQcRQ/Y1LxZsxNh3AWEHoBffT9kxrHDC29C7QfIKma2668Hv7QwfF?=
+ =?us-ascii?Q?bbwqbOXbDl3S8igjxN6x65UNOc3RFVm0MR5FLIvENrFDgV6DXzYqqbVYgbfG?=
+ =?us-ascii?Q?7wn1tW0CJJAT+qacVqdyVCpbo5VWTIWpNbgbmZwxwQzIR0ndKdm/yp2sj+2M?=
+ =?us-ascii?Q?fJBQZW95aCp6paQ4R0TfJkTq0iwKfO7N8ASNl4UY8MNbi5pPib9gXEZY8Wv5?=
+ =?us-ascii?Q?TwQypJcBJ8zWNji3uf4sspy/m86332UHV8NQ4CFTmf13+n7sdXcDCl743bt1?=
+ =?us-ascii?Q?UBD6emYu+1z9KgCd4vYeEf319Ms0d6rmZUo9hynXbrdhU3kp7Bg3UWY52tYW?=
+ =?us-ascii?Q?00LpyLwrSFyLIJRW1yzyomZ1OPJMdLfajXYropTGMqEr0IFZyghk5ScSaE4q?=
+ =?us-ascii?Q?+czlmegrGin3ujOrSmY+x3kBYO8U5O5iXrwAwjjNB9vZll2RzGJXBu0fWTN3?=
+ =?us-ascii?Q?7xx2RsoNeBYZc3Fmk7sAiaQRQWqcfdo9WiOfL9RpGESVbfRInvo9d0l/7zbo?=
+ =?us-ascii?Q?7WYM8Ll1dS1nZqRpKWPpv40hZBxnJJiGoFUhEGB+t4W35u9+03KQXe3vNfmp?=
+ =?us-ascii?Q?AwkRq9MoNwdZOJPmMJTh8BEKZCeqMjz3Gzfbj9LcHOpFQvBEnV3jWuFZqUhi?=
+ =?us-ascii?Q?XOUgTLjh0pJqZ5ttUD8G3VxlXmlN7iYy+R4Od7PtdpKp0O5437eaavtmKO1t?=
+ =?us-ascii?Q?UK0cj8PgUgUja5CiT+Eg5OlSofIFGYfc9tJahMOGKCCSxgC+Tsz83/m3n7x/?=
+ =?us-ascii?Q?PnwCc6LAqjqGIlPz9vgNk1PDqzfUI13kdLJ8+j60Qzr5kvK7oObUFnusywQM?=
+ =?us-ascii?Q?x2zasO3dGwJffnAtmxCtq8MzIHe9y5BbamvD0Tz5syTHZDyWcugAvZ17e3RS?=
+ =?us-ascii?Q?ZhTxNKrA9az08qm/Ynm4hto2Ews63MO+2+yhi+BPpcvx8NCa530P+P+Wla4Z?=
+ =?us-ascii?Q?n0234VCHT3pBHcFZOImkOXw0XSYjvvK/?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2024 13:52:19.8278
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b991bb46-f2af-4787-ed73-08dcc2b1a42f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000FCC5.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4381
 
-All users of pcim_iounmap_regions() have been removed by now.
+Recently, a defer helper was added to Python selftests. The idea is to keep
+cleanup commands close to their dirtying counterparts, thereby making it
+more transparent what is cleaning up what, making it harder to miss a
+cleanup, and make the whole cleanup business exception safe. All these
+benefits are applicable to bash as well, exception safety can be
+interpreted in terms of safety vs. a SIGINT.
 
-Remove pcim_iounmap_regions().
+This patchset therefore introduces a framework of several helpers that
+serve to schedule cleanups in bash selftests.
 
-Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-Reviewed-by: Andy Shevchenko <andy@kernel.org>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
----
- .../driver-api/driver-model/devres.rst        |  1 -
- drivers/pci/devres.c                          | 21 -------------------
- include/linux/pci.h                           |  1 -
- 3 files changed, 23 deletions(-)
 
-diff --git a/Documentation/driver-api/driver-model/devres.rst b/Documentation/driver-api/driver-model/devres.rst
-index ac9ee7441887..525f08694984 100644
---- a/Documentation/driver-api/driver-model/devres.rst
-+++ b/Documentation/driver-api/driver-model/devres.rst
-@@ -397,7 +397,6 @@ PCI
-   pcim_iomap_regions_request_all() : do request_region() on all and iomap() on multiple BARs
-   pcim_iomap_table()		: array of mapped addresses indexed by BAR
-   pcim_iounmap()		: do iounmap() on a single BAR
--  pcim_iounmap_regions()	: do iounmap() and release_region() on multiple BARs
-   pcim_pin_device()		: keep PCI device enabled after release
-   pcim_set_mwi()		: enable Memory-Write-Invalidate PCI transaction
- 
-diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
-index 4dbba385e6b4..022c0bb243ad 100644
---- a/drivers/pci/devres.c
-+++ b/drivers/pci/devres.c
-@@ -1013,27 +1013,6 @@ int pcim_iomap_regions_request_all(struct pci_dev *pdev, int mask,
- }
- EXPORT_SYMBOL(pcim_iomap_regions_request_all);
- 
--/**
-- * pcim_iounmap_regions - Unmap and release PCI BARs
-- * @pdev: PCI device to map IO resources for
-- * @mask: Mask of BARs to unmap and release
-- *
-- * Unmap and release regions specified by @mask.
-- */
--void pcim_iounmap_regions(struct pci_dev *pdev, int mask)
--{
--	int i;
--
--	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
--		if (!mask_contains_bar(mask, i))
--			continue;
--
--		pcim_iounmap_region(pdev, i);
--		pcim_remove_bar_from_legacy_table(pdev, i);
--	}
--}
--EXPORT_SYMBOL(pcim_iounmap_regions);
--
- /**
-  * pcim_iomap_range - Create a ranged __iomap mapping within a PCI BAR
-  * @pdev: PCI device to map IO resources for
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 9625d8a7b655..6c60f063c672 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -2301,7 +2301,6 @@ void pcim_iounmap_region(struct pci_dev *pdev, int bar);
- int pcim_iomap_regions(struct pci_dev *pdev, int mask, const char *name);
- int pcim_iomap_regions_request_all(struct pci_dev *pdev, int mask,
- 				   const char *name);
--void pcim_iounmap_regions(struct pci_dev *pdev, int mask);
- void __iomem *pcim_iomap_range(struct pci_dev *pdev, int bar,
- 				unsigned long offset, unsigned long len);
- 
+As a personal remark. More than once was I bit by stop_traffic not getting
+invoked because I C-c'd a traffic scheduler selftest at the wrong time.
+This would leave behind a running mausezahn that would break follow-up runs
+of the script that I was just debugging, making me question my sanity.
+("How did this one extra debug print break the full script? And when I
+remove it again, _why is it still broken_?") This is an attempt at
+squashing this whole class of problems.
+
+
+Patch #1 has more details about the primitives being introduced.
+
+Patches #2 to #5 the convert several selftests to give an idea of how it
+looks in practice.
+
+Petr Machata (5):
+  selftests: forwarding: Introduce deferred commands
+  selftests: mlxsw: sch_red_core: Use defer for test cleanup
+  selftests: mlxsw: sch_red_core: Use defer for stopping traffic
+  selftests: mlxsw: sch_red_*: Use defer for qdisc management
+  selftests: sch_tbf_core: Use defer for stopping traffic
+
+ .../drivers/net/mlxsw/sch_red_core.sh         | 131 +++++++-----------
+ .../drivers/net/mlxsw/sch_red_ets.sh          |  32 ++---
+ .../drivers/net/mlxsw/sch_red_root.sh         |  24 +++-
+ tools/testing/selftests/net/forwarding/lib.sh |  83 +++++++++++
+ .../selftests/net/forwarding/sch_tbf_core.sh  |   3 +-
+ 5 files changed, 170 insertions(+), 103 deletions(-)
+
 -- 
-2.46.0
+2.45.0
 
 
