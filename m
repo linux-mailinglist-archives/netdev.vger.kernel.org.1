@@ -1,46 +1,49 @@
-Return-Path: <netdev+bounces-120859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0070C95B104
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 10:59:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4FD295B109
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3181282570
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 08:59:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B38B1F22B85
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C0C170A0C;
-	Thu, 22 Aug 2024 08:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AD0C15C156;
+	Thu, 22 Aug 2024 09:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mtGcUdh3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OWGaTTIt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2AC16DEDF;
-	Thu, 22 Aug 2024 08:59:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C8A1CFB9;
+	Thu, 22 Aug 2024 09:00:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724317190; cv=none; b=k9qvAHrr11U238p9CdBXg+TEc7Ad0Hi2ba4XA3vW4wBqBBFnp4Qph60/Uw2uwegyyzyIV3CUYHY15iHvzr2VIJAguxGT/TIPd60XfL0zrXe3/qr294yff0EX1fIw/DkZhR3KarruszcwBkGVUSgnLI+tWByTdvCsF3gh/8UoNxU=
+	t=1724317228; cv=none; b=qK4IzeBg6Q+2PZFxU97h/8o4z7TPpyubVW/zs5r5Qw0YUxRBODYxHUvoym9vkkC1t9E258Kb2mijcAQV0eXZdwHDOkPfx6zfvsH4wL1XjiyGOg4LbfK4JLLxoTV7hs8snx0Mr/RkTflOppouMkjaZ3t2Vi5e6VDodJ28Ya4VSQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724317190; c=relaxed/simple;
-	bh=6fPHVZW9Wl5MBlZ31WLLPB+2/SdWlcpVd1n5Ao7R3D0=;
-	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
-	 Cc:Message-ID:Date; b=ShsQ2CP2/vfGVZFamh6mSq3EAZFghh9Vkze30c6R36cgemeTANZcOhQslVWS1uB2dhuwph2LKCjM3col4Rg3hNO52RjcXEY36C/OEssF2HSAVm9BMJwMzn11eCSuyQ/nmreFupKMnhZ8zHiV5//bTASmCQY6+d73YvmOnU89l0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mtGcUdh3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F545C4AF09;
-	Thu, 22 Aug 2024 08:59:44 +0000 (UTC)
+	s=arc-20240116; t=1724317228; c=relaxed/simple;
+	bh=atPSiCFdfkMcesNUaH6RuZASJxuNsj/f1YGmoqPIWgo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=paLS2Q7WtC+mNGH6VWqFFof7TShh4uAIc1oIbsvFelKiOsim4c35sBj8lG5h6n0iS5nGcxDjlSTRMnTDTkDdM/EBOMRyF2D8i39ID6oqIXyy7Y7/M1ISuOlEGDJgDza5zw4FiXCuG+24Jhbce8ZxXcfHHYJWMmUPoI83Hgtv3vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OWGaTTIt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AC00C4AF09;
+	Thu, 22 Aug 2024 09:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724317189;
-	bh=6fPHVZW9Wl5MBlZ31WLLPB+2/SdWlcpVd1n5Ao7R3D0=;
-	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
-	b=mtGcUdh3FeNAFmY6+9OYrE0l+cei2CTF7LHHhtjK2eR6jjh7Vcdi8g8MlRpb41CN7
-	 cZrtrKMsces6P865auobuLLB3sKlPdnGtM7MOcRWOGVfLwJjN+utXCOyNTNfbzjDb5
-	 HWm2fSHa7xy8YTOzNp9gqJPYplbc1Qcv7lgbPTAIeH+lZVZZ9LcWspbpXFl0jocSM6
-	 XzGQzkhMEGUTaB69+6zKn8aqtNdqSy3vGgQrxSgymZtGRB+vBWynMxJ8JyF2rtIz9w
-	 OU7up2fvbfWC5aXFYoFdUaNEpTtsMZWmNK6SE0fE7jzdwoM1bduonK8/l7Xle/7/ka
-	 Rj13DObKI6uAQ==
+	s=k20201202; t=1724317227;
+	bh=atPSiCFdfkMcesNUaH6RuZASJxuNsj/f1YGmoqPIWgo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OWGaTTItiO+GC3W9uvk1QaPFeC9waDb3ltn95nb36adI8/I2eUGkyNvhu6iL8VtLz
+	 TMsxCWbW5fDCvn2Y+DBNgoCZo4aZSi9E40Sicvm+t+ylUVEcebm/I2P91YbPDK9Mz/
+	 PLLqq+oRtJeNg+Y+1zHVSzH7tM7kUm3SeXQ0WEDmQqqFqoQJ3Qn7jz43NzcKsfSqjx
+	 uSraPRmxdHsHz3sEOzpvZQm7bCWJZYqPRnaGFhK0R0QPJ4i3FoWBQVpD7frUylxwB9
+	 EyE8cBwxenYfbGTazNdL0xky5FvPfYiiaHCUqXeOtjDOL745ftYGMI8q0jraASnwMk
+	 Po02GmrzjxS4g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 341F03809A80;
+	Thu, 22 Aug 2024 09:00:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -48,70 +51,47 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v11 1/4] dt-bindings: net: wireless: brcm4329-fmac: add
- pci14e4,449d
-From: Kalle Valo <kvalo@kernel.org>
-In-Reply-To: <20240816020635.1273911-2-jacobe.zang@wesion.com>
-References: <20240816020635.1273911-2-jacobe.zang@wesion.com>
-To: Jacobe Zang <jacobe.zang@wesion.com>
-Cc: arend.vanspriel@broadcom.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
- conor+dt@kernel.org, saikrishnag@marvell.com, megi@xff.cz,
- bhelgaas@google.com, duoming@zju.edu.cn, minipli@grsecurity.net,
- yajun.deng@linux.dev, stern@rowland.harvard.edu, gregkh@linuxfoundation.org,
- christophe.jaillet@wanadoo.fr, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, brcm80211@lists.linux.dev,
- brcm80211-dev-list.pdl@broadcom.com, Jacobe Zang <jacobe.zang@wesion.com>,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
-Message-ID: <172431718274.2217900.9766315386587933045.kvalo@kernel.org>
-Date: Thu, 22 Aug 2024 08:59:44 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/2] net: ipv6: ioam6: introduce tunsrc
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172431722701.2256827.13061551625019118054.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Aug 2024 09:00:27 +0000
+References: <20240817131818.11834-1-justin.iurman@uliege.be>
+In-Reply-To: <20240817131818.11834-1-justin.iurman@uliege.be>
+To: Justin Iurman <justin.iurman@uliege.be>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org
 
-Jacobe Zang <jacobe.zang@wesion.com> wrote:
+Hello:
 
-> It's the device id used by AP6275P which is the Wi-Fi module
-> used by Rockchip's RK3588 evaluation board and also used in
-> some other RK3588 boards.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sat, 17 Aug 2024 15:18:16 +0200 you wrote:
+> This series introduces a new feature called "tunsrc" (just like seg6
+> already does).
 > 
-> Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
+> v3:
+> - address Jakub's comments
+> 
+> v2:
+> - add links to performance result figures (see patch#2 description)
+> - move the ipv6_addr_any() check out of the datapath
+> 
+> [...]
 
-Fails to apply, please rebase on top of wireless-next.
+Here is the summary with links:
+  - [net-next,v3,1/2] net: ipv6: ioam6: code alignment
+    https://git.kernel.org/netdev/net-next/c/924b8bea870b
+  - [net-next,v3,2/2] net: ipv6: ioam6: new feature tunsrc
+    https://git.kernel.org/netdev/net-next/c/273f8c142003
 
-Recorded preimage for 'drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c'
-Recorded preimage for 'drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c'
-error: Failed to merge in the changes.
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-Applying: wifi: brcmfmac: Add optional lpo clock enable support
-Using index info to reconstruct a base tree...
-M	drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c
-M	drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-M	drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
-M	drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
-M	drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
-Falling back to patching base and 3-way merge...
-Auto-merging drivers/net/wireless/broadcom/brcm80211/brcmfmac/usb.c
-Auto-merging drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
-CONFLICT (content): Merge conflict in drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
-Auto-merging drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
-Auto-merging drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-CONFLICT (content): Merge conflict in drivers/net/wireless/broadcom/brcm80211/brcmfmac/of.c
-Auto-merging drivers/net/wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c
-Patch failed at 0001 wifi: brcmfmac: Add optional lpo clock enable support
-
-4 patches set to Changes Requested.
-
-13765357 [v11,1/4] dt-bindings: net: wireless: brcm4329-fmac: add pci14e4,449d
-13765358 [v11,2/4] dt-bindings: net: wireless: brcm4329-fmac: add clock description for AP6275P
-13765359 [v11,3/4] wifi: brcmfmac: Add optional lpo clock enable support
-13765360 [v11,4/4] wifi: brcmfmac: add flag for random seed during firmware download
-
+You are awesome, thank you!
 -- 
-https://patchwork.kernel.org/project/linux-wireless/patch/20240816020635.1273911-2-jacobe.zang@wesion.com/
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
 
