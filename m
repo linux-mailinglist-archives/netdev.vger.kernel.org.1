@@ -1,100 +1,151 @@
-Return-Path: <netdev+bounces-121021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9781F95B688
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 15:26:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4283395B6F6
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 15:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56DBC2862D2
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:26:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB5AF1F219A7
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4BC1C9EC6;
-	Thu, 22 Aug 2024 13:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49CE61CB305;
+	Thu, 22 Aug 2024 13:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XXmJAaH0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="au7VCRew"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0603139D05;
-	Thu, 22 Aug 2024 13:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DBD1C9440
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 13:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724333146; cv=none; b=deDMNIr1qvArHi1VKRIuvdgeSIINdemBPj8BTwqPL5RwYAcmGbqQJNdNF1rcku+lI1bYul8VpzgHku31XvqNiCAJ/0g9JyexYzEmu6dZwMuOax/f/IGJw2FAqxldw/nOsbTAJZm3CnXuEbPIXUQvQWPovKzgcAfDrmk7l2C1Mt8=
+	t=1724333835; cv=none; b=Ze+Daki0iUHitgMearOuJyM+mF/JhF1099bKh+qginEFCYlxpaFs9sF/bCKEsN6R4LZrvPspjuejSNqp1alDb4n6utyqK7W5WwGF7cYnLLqfc0y2ps3k7ZFPzIfAjNy8Udr9H++Yf5eYOs5hfvhFhvUydoFnnX6e+C+FsotsUrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724333146; c=relaxed/simple;
-	bh=G4MWnl1LTsJIZXk3+Kb2HykN4Id8Tei1TL23UkRqcMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MU0VEX8ldmX6pPjt2gBQamUb4K85AQUTMBcEsYZ5J/ifPMoLCQS2HFGY8SMZcqRl27Q71gdPhYIFRPeok4zccHlxs7jqSSqPWQgau0KjxKdK9pjGpF87gggKHZZ5RNlyNg3PaGjvxIkkSUN7vlCcADp9cwRUH3So7WXgHkOwDWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XXmJAaH0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DCDCC32782;
-	Thu, 22 Aug 2024 13:25:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724333146;
-	bh=G4MWnl1LTsJIZXk3+Kb2HykN4Id8Tei1TL23UkRqcMI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XXmJAaH0/b90nuscjjjO+6BYNF1wjBNpFCIHF/X0h/+kG3d/0gQ2f87QTr0pyiBw6
-	 KCaHDz3DdvzQKuRf7x/RlxmxU+aZTujW9THvY1MHY46Qv6UlJfAEYarr+yyq7YJvSH
-	 IaxiRgorIEr3ur7qVvTa4MwifgedC47oAJr1eVAR+qpcsLd4t1skoo73nOcEqf309+
-	 u7hRlzyuluanDngBe6Xengc/LzfXDlWkSZE+gIfn5rchfu/QEULlL2vVAKzeHlalBe
-	 uRmpYjaYV+H3Kx4Sp6UO0Tg4a06bOVRx6UAT+GQYiE/kO7RZS580My+pqFjLaFDCAj
-	 zYHmjEnEJTnUA==
-Date: Thu, 22 Aug 2024 14:25:39 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yangtao Li <frank.li@vivo.com>
-Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com,
-	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, ulli.kroll@googlemail.com,
-	linus.walleij@linaro.org, marcin.s.wojtas@gmail.com,
-	linux@armlinux.org.uk, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
-	hkallweit1@gmail.com, justinstitt@google.com, kees@kernel.org,
-	u.kleine-koenig@pengutronix.de, jacob.e.keller@intel.com,
-	shannon.nelson@amd.com, linux-renesas-soc@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [net-next 2/9] net: stmmac: platform: Convert to
- devm_clk_get_enabled() and devm_clk_get_optional_enabled()
-Message-ID: <20240822132539.GQ2164@kernel.org>
-References: <20240822084733.1599295-1-frank.li@vivo.com>
- <20240822084733.1599295-3-frank.li@vivo.com>
+	s=arc-20240116; t=1724333835; c=relaxed/simple;
+	bh=JTcnPH8h/y86OxqQ8tp1tuFGbkmPCjuZ1se8KSv8hUM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a2emo4bmD2QPXOQae8NHWQT84PMgixO+A8z7Nj3hhN2zugGKAHNRd0OI2xF4BLxkaDY0BmygEoTLWlHCknyYpMka7wjvqs4CaW0S/cZkOXQowo9sjYssdvBXISqoLT7WH13nSg7pFBlBClt7wa1W4hcLN8w6N94vrlbderDhNoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=au7VCRew; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724333832;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7mHZh7szVej/hsK5F5p5xTaLifBsrzkDP5jrqsan0ro=;
+	b=au7VCRewEWWQYMDRzbuHhhtYVD901RyXmvNeBZ1ldSwJeYIKqoVITMt7/dLxxf4RkCvfCC
+	GbNDYPyjpJpKGl2PWh3qScvR7kRCPUfmIC03yN0ilDJE6dZ6TmA4xRbjgOxaC9ay8ikoRt
+	J66h5Nur5TYUew2YjEEkix8TEhkwd4E=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-260-wVn52d75P3eEjwhy_tAHqQ-1; Thu, 22 Aug 2024 09:37:11 -0400
+X-MC-Unique: wVn52d75P3eEjwhy_tAHqQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-371b28fc739so430879f8f.1
+        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 06:37:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724333829; x=1724938629;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7mHZh7szVej/hsK5F5p5xTaLifBsrzkDP5jrqsan0ro=;
+        b=ORexTs1Q6kAoTs6lOOWn8pAqluA3xeakY1EDawIhFVtXm1rI//0sRFqYy/g+Pl31ha
+         yB7+1SSr4a2aI4gUdk0vRSGtwwgaK3KS3Ck1wbpt18W7e0DU/EJdxQ5rhAEZLxZZQN+6
+         d32gMl09nl+FU4HetCkFk61tIPz+an3Z/YyylAZodo2fLHP75kzL2j8qcQgg2jv9qGU5
+         tE8N835xoI/YTmmRLidE1Hbr8Mi/EC/6N9uGKsE6rWTCJGXv62JVvG2OstjDfx+uX55O
+         pnA3P6DuEr5iECZZW34fN8Yc1qqEWKJ8XH2w1EJCY+IFSv+z0Ll1bTYby9iEezQimCk+
+         72sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW5GGhtZyZiEe5cXWdRLCNZCdjOhxMG0pYzqVGMFuu1OG9bWsR5T9rEhDEO5q0goNjoXRcVltw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzq6uVSTgPwsscfkovVh2AmcluVRQixULGtHUdmBYIdEHABZDck
+	tVaxNta9sUJJbYejSBIftArA2bEau7hCtD/qU/gcTj9XaLuOF7c/buIQa20NF5kJrjIneuG5EJP
+	xbApDhg+PAt41SXxoOcLregBhg6q08a/yURIoInIWsfPM+dBsqVGjmA==
+X-Received: by 2002:adf:e7cd:0:b0:371:8451:5a82 with SMTP id ffacd0b85a97d-37305269526mr2039497f8f.15.1724333829272;
+        Thu, 22 Aug 2024 06:37:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFhIxKzuKPTTYg2n56kKrmgvykfM06se91O06WD423OCxSFA50ut0ca7cwPXhlgqIT5XZA3fg==
+X-Received: by 2002:adf:e7cd:0:b0:371:8451:5a82 with SMTP id ffacd0b85a97d-37305269526mr2039477f8f.15.1724333828797;
+        Thu, 22 Aug 2024 06:37:08 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b51:3b10::f71? ([2a0d:3344:1b51:3b10::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37308161042sm1724244f8f.59.2024.08.22.06.37.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Aug 2024 06:37:08 -0700 (PDT)
+Message-ID: <5ecac29d-251a-4db8-abf4-e73c4e1eca55@redhat.com>
+Date: Thu, 22 Aug 2024 15:37:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822084733.1599295-3-frank.li@vivo.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 3/5] MAINTAINERS: Add limited globs for Networking
+ headers
+To: Simon Horman <horms@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, Chas Williams <3chas3@gmail.com>,
+ Guo-Fu Tseng <cooldavid@cooldavid.org>, Moon Yeounsu <yyyynoom@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org
+References: <20240821-net-mnt-v2-0-59a5af38e69d@kernel.org>
+ <20240821-net-mnt-v2-3-59a5af38e69d@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240821-net-mnt-v2-3-59a5af38e69d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 22, 2024 at 02:47:26AM -0600, Yangtao Li wrote:
-> Use devm_clk_get_enabled() and devm_clk_get_optional_enabled()
-> to simplify code.
+On 8/21/24 10:46, Simon Horman wrote:
+> This aims to add limited globs to improve the coverage of header files
+> in the NETWORKING DRIVERS and NETWORKING [GENERAL] sections.
 > 
-> Signed-off-by: Yangtao Li <frank.li@vivo.com>
+> It is done so in a minimal way to exclude overlap with other sections.
+> And so as not to require "X" entries to exclude files otherwise
+> matched by these new globs.
+> 
+> While imperfect, due to it's limited nature, this does extend coverage
+> of header files by these sections. And aims to automatically cover
+> new files that seem very likely belong to these sections.
+> 
+> The include/linux/netdev* glob (both sections)
+> + Subsumes the entries for:
+>    - include/linux/netdevice.h
+> + Extends the sections to cover
+>    - include/linux/netdevice_xmit.h
+>    - include/linux/netdev_features.h
+> 
+> The include/uapi/linux/netdev* globs: (both sections)
+> + Subsumes the entries for:
+>    - include/linux/netdevice.h
+> + Extends the sections to cover
+>    - include/linux/netdev.h
+> 
+> The include/linux/skbuff* glob (NETWORKING [GENERAL] section only):
+> + Subsumes the entry for:
+>    - include/linux/skbuff.h
+> + Extends the section to cover
+>    - include/linux/skbuff_ref.h
+> 
+> A include/uapi/linux/net_* glob was not added to the NETWORKING [GENERAL]
+> section. Although it would subsume the entry for
+> include/uapi/linux/net_namespace.h, which is fine, it would also extend
+> coverage to:
+> - include/uapi/linux/net_dropmon.h, which belongs to the
+>     NETWORK DROP MONITOR section
+> - include/uapi/linux/net_tstamp.h which, as per an earlier patch in this
+>    series, belongs to the SOCKET TIMESTAMPING section
 
-Hi Yangtao Li,
+I think both the above files should belong also to the generic 
+networking section. If there is agreement, I think can be adjusted with 
+an incremental patch, instead of re-spinning the whole series - that I'm 
+applying now.
 
-I feel that I am missing something obvious here,
-but this patch fails to build when applied to net-next.
+Thanks,
 
-clang-18 for an x86_64 allmodconfig W=1 build says:
-
-drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:625:10: error: incompatible pointer types returning 'struct clk *' from a function with result type 'struct plat_stmmacenet_data *' [-Werror,-Wincompatible-pointer-types]
-  625 |                 return plat->pclk;
-      |                        ^~~~~~~~~~
-drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:641:10: error: incompatible pointer types returning 'struct reset_control *' from a function with result type 'struct plat_stmmacenet_data *' [-Werror,-Wincompatible-pointer-types]
-  641 |                 return plat->stmmac_rst;
-      |                        ^~~~~~~~~~~~~~~~
-drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:646:10: error: incompatible pointer types returning 'struct reset_control *' from a function with result type 'struct plat_stmmacenet_data *' [-Werror,-Wincompatible-pointer-types]
-  646 |                 return plat->stmmac_ahb_rst;
-      |                        ^~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c:437:8: warning: unused variable 'ret' [-Wunused-variable]
-  437 |         void *ret;
-      |               ^~~
+Paolo
 
 
