@@ -1,112 +1,192 @@
-Return-Path: <netdev+bounces-120832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE57995AF5E
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:34:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B05895AF83
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91CCA1F22313
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:34:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEBC9283586
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:42:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F221531D2;
-	Thu, 22 Aug 2024 07:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73901537D7;
+	Thu, 22 Aug 2024 07:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wLYW/7X3";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="liKH38/V"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB04AA933;
-	Thu, 22 Aug 2024 07:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9293C33EA;
+	Thu, 22 Aug 2024 07:42:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724312043; cv=none; b=KSxg7SxUOWK1M273J7Ou8jexObbRXFhbv8N9T0wbzfbvdHOM7ZdOnOUe0G1aK3EskwahmJoxhQYwVTulPurqXKDYanwPRDsQYe+YGirxv3GJj8oUbblXeVnvZyNSBAItTL7JnhVYr3m0vJG8Ta/odmQ+0/qy1uI0SLNwbI4nb94=
+	t=1724312537; cv=none; b=dJTO6UpXl8+aRFe0arqQAybXtJIg1XEJzspGAh/0s0PQOZHf8c23gtOipq3jZq6tASIN5ziMhtiFARu3BbXksr/pzxR9bgiFDDfn9bXwRbbJ/AjnZsepHmwhi8Uu93jx8nNBRxJHvUxM9+EK9l8IWA2o1WOvX0NfsiTJCRIWwn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724312043; c=relaxed/simple;
-	bh=L30NV2AcPLbkhFmH0b3ez67bhMd6a1pynzfPCQXulrg=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=I9nTB2BH/fCeg26w4AS9H7HPh/rDofCwUeb8984gySOoc9Xw9HGn3KiKcP4jCe4QqK1ILMfRFVYkdckX8KWKqm8C9P8ZmCmnIlc4jw9SILOJTtP6xOXTdGtiybF952W2judCbBWaqWDJgJiWRxHWMhPPk5x9rKjdENpjiCflIHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WqFLq4Cz0z2Cc9Z;
-	Thu, 22 Aug 2024 15:33:55 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 047EA140447;
-	Thu, 22 Aug 2024 15:33:59 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 22 Aug 2024 15:33:57 +0800
-Message-ID: <2a809cfe-c64c-4fbe-96e5-179d5cd27779@huawei.com>
-Date: Thu, 22 Aug 2024 15:33:57 +0800
+	s=arc-20240116; t=1724312537; c=relaxed/simple;
+	bh=TWl4p5NqVlxYi0lrO7S+HVnzgWouCN4XXHTdJY582GY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=T7iHTWG9BFNNQAFAncGSAvJyCORP6Lu1M5EN/2zuSEcBmf2D6+yKAunEQCTseVZ9ohVEvNfqIy0tD5rLF7GhRQ1sKkDL/aG5gCW9ZBK0BQG0fntPU90631W+9hA/J9bTvdCn8GldJ2LsLeXVu+dx72LOp0Z9hY+xvautqpsWpeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wLYW/7X3; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=liKH38/V; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1724312533;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=M7j9L59GoB4WO48ZSttcnFNGmhQsi1TdLvFuvMN+Xzg=;
+	b=wLYW/7X3/tgdaHKfBzb53GeHGvrexN8Z3qDaZqNziPSieZwZsR5fnXnFbRwI4syeqob4MS
+	IEjdmIBAsvhBQHUZfL5fAMEK8QtV2poP0+Oo0RNDu2OJLcce99n1RP/qMQhZBQ8CM2/MTS
+	Ky15Qn0Jpuy72op9edA9JXFcwvN47y7UWIW3pZQKiZKLGhOOw4erF4qSbyEBSLidzjSK1v
+	7iVcl7yzEVHLBZZOCTv1iAn1sJqVyOqtGBKQKjO5ppeK1UNASM+4rRf2VCQ8y0HuMJThTM
+	ksF3ZiOIgTTTXR555ox9dSTCB8Ckl04lShuxaqQdlyuyjv/oLXgmTd7eDPzImA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1724312533;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=M7j9L59GoB4WO48ZSttcnFNGmhQsi1TdLvFuvMN+Xzg=;
+	b=liKH38/Vxwo7zuN47LsxtYil8YUiuYHkfgTVZjo4dgXPvEJcqXJVkclcijShTZzzBqj0UY
+	lVobnFQ2LOlzdwBQ==
+Date: Thu, 22 Aug 2024 09:42:07 +0200
+Subject: [PATCH iwl-net] igb: Always call igb_xdp_ring_update_tail() under
+ Tx lock
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, Jakub Kicinski <kuba@kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
-	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
-	<libaihan@huawei.com>, <jdamato@fastly.com>, <horms@kernel.org>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V2 net-next 11/11] net: add is_valid_ether_addr check in
- dev_set_mac_address
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20240820140154.137876-1-shaojijie@huawei.com>
- <20240820140154.137876-12-shaojijie@huawei.com>
- <20240820185507.4ee83dcc@kernel.org>
- <7bc7a054-f180-444a-aac0-61997b43e5d6@huawei.com>
- <5948f3f7-a43c-4238-82ff-2806a5ef5975@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <5948f3f7-a43c-4238-82ff-2806a5ef5975@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240822-igb_xdp_tx_lock-v1-1-718aecc753da@linutronix.de>
+X-B4-Tracking: v=1; b=H4sIAM7rxmYC/x3MTQqAIBBA4avErBNK+pGuEiGpUw2FhUoJ4d2Tl
+ t/ivRc8OkIPQ/GCw5s8nTajLgvQ22xXZGSygVe8qQTnjFYlo7lkiPI49c5UJ5puMUb3rYBcXQ4
+ Xiv9xBHoOZjHAlNIHS0iOmWoAAAA=
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Sven Auhagen <sven.auhagen@voleatech.de>, 
+ Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, 
+ Benjamin Steinke <benjamin.steinke@woks-audio.com>, 
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, Sriram Yagnaraman <sriram.yagnaraman@est.tech>, 
+ Kurt Kanzenbach <kurt@linutronix.de>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2916; i=kurt@linutronix.de;
+ h=from:subject:message-id; bh=IVVS9HlZbTPv/6DwViQSU27m2irFcmQgtNlpAYr8SOM=;
+ b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBmxuvUZ9c5esw25f4mqk2o0qQTm320poXw8CsGg
+ 8XEJ8vaBX2JAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZsbr1AAKCRDBk9HyqkZz
+ gkTCD/9PN3By/GanTcZE8G9EYmZ1onOWBw6K0jL/Ik59CpMNryrBD9TGsuAyldTeOG6AmMg6oof
+ Qmcx0tbB/zkNNOb38f2S/HheSOseT61ewtAU8xu7RgQGMvqrWi9OCCH9xPzzHtnG2XRl5I41oW7
+ NxObM8SxxLAByhcuVrochegurC8VHquuQcctSDKlym+svEpiTes5ixs9zVQBUDQTmBNPRMZxbMl
+ s48rytPCukcPKyR8jtXuyowHpW/O1oXtCVLHu/tb7ZQPyRP6+0kSuSKlV2DyfNoz9PNqGBgaNCC
+ Y6Q575jqbjz/Wm+0M4ZVKbEMEd5B95sM+lU1dVRbPNHeK1sDK3YlKpl3tzXks7EGVzmzWzKfRi+
+ bSVqwBOdIBtYnzqTepBL+jeGLwMKGJiDCgdmEsBdaVMHBnUmR9ox87JGGqvuudYJXHydAsyB/JL
+ anxfsqpdaQkLPk0xEVmahH3lP1DlH7Esw0a8kYhn85fTk+vgxDsdvd1+XIHRYMiNveGZnR4bFou
+ +1vs0VghDhOFCIrleiAy3HGoQURxaY8QCWkxRFN7n9vwCBwQbHC6c5MlIPg+GAZ1cGhhMt6sgHM
+ BYnyA1ZNt/Wf745ez8zKuUnoh8n9SBiOFEre6Iqnee7YagokVckL6eAGEQUYBZxfloMgzmNZMhm
+ oQhDxHt+97grDVg==
+X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
+ fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
 
+From: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
 
-on 2024/8/21 20:15, Andrew Lunn wrote:
-> On Wed, Aug 21, 2024 at 02:04:01PM +0800, Jijie Shao wrote:
->> on 2024/8/21 9:55, Jakub Kicinski wrote:
->>> On Tue, 20 Aug 2024 22:01:54 +0800 Jijie Shao wrote:
->>>> core need test the mac_addr not every driver need to do.
->>>>
->>>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->>>> ---
->>>>    net/core/dev.c | 2 ++
->>>>    1 file changed, 2 insertions(+)
->>>>
->>>> diff --git a/net/core/dev.c b/net/core/dev.c
->>>> index e7260889d4cb..2e19712184bc 100644
->>>> --- a/net/core/dev.c
->>>> +++ b/net/core/dev.c
->>>> @@ -9087,6 +9087,8 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
->>>>    		return -EOPNOTSUPP;
->>>>    	if (sa->sa_family != dev->type)
->>>>    		return -EINVAL;
->>>> +	if (!is_valid_ether_addr(sa->sa_data))
->>>> +		return -EADDRNOTAVAIL;
->>> not every netdev is for an Ethernet device
->> ok， this patch will be removed in v3.
->> and the check will move to hibmcge driver.
-> No, you just need to use the correct function to perform the check.
->
-> __dev_open() does:
->
->          if (ops->ndo_validate_addr)
->                  ret = ops->ndo_validate_addr(dev);
->
-> 	Andrew
+Always call igb_xdp_ring_update_tail() under __netif_tx_lock, add a comment
+and lockdep assert to indicate that. This is needed to share the same TX
+ring between XDP, XSK and slow paths. Furthermore, the current XDP
+implementation is racy on tail updates.
 
-okay, it looks perfect!
-	
-	Jijie Shao
+Fixes: 9cbc948b5a20 ("igb: add XDP support")
+Signed-off-by: Sriram Yagnaraman <sriram.yagnaraman@est.tech>
+[Kurt: Add lockdep assert and fixes tag]
+Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+---
+ drivers/net/ethernet/intel/igb/igb_main.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 33a42b4c21e0..c71eb2bbb23d 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -33,6 +33,7 @@
+ #include <linux/bpf_trace.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/etherdevice.h>
++#include <linux/lockdep.h>
+ #ifdef CONFIG_IGB_DCA
+ #include <linux/dca.h>
+ #endif
+@@ -2914,8 +2915,11 @@ static int igb_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ 	}
+ }
+ 
++/* This function assumes __netif_tx_lock is held by the caller. */
+ static void igb_xdp_ring_update_tail(struct igb_ring *ring)
+ {
++	lockdep_assert_held(&txring_txq(ring)->_xmit_lock);
++
+ 	/* Force memory writes to complete before letting h/w know there
+ 	 * are new descriptors to fetch.
+ 	 */
+@@ -3000,11 +3004,11 @@ static int igb_xdp_xmit(struct net_device *dev, int n,
+ 		nxmit++;
+ 	}
+ 
+-	__netif_tx_unlock(nq);
+-
+ 	if (unlikely(flags & XDP_XMIT_FLUSH))
+ 		igb_xdp_ring_update_tail(tx_ring);
+ 
++	__netif_tx_unlock(nq);
++
+ 	return nxmit;
+ }
+ 
+@@ -8854,12 +8858,14 @@ static void igb_put_rx_buffer(struct igb_ring *rx_ring,
+ 
+ static int igb_clean_rx_irq(struct igb_q_vector *q_vector, const int budget)
+ {
++	unsigned int total_bytes = 0, total_packets = 0;
+ 	struct igb_adapter *adapter = q_vector->adapter;
+ 	struct igb_ring *rx_ring = q_vector->rx.ring;
+-	struct sk_buff *skb = rx_ring->skb;
+-	unsigned int total_bytes = 0, total_packets = 0;
+ 	u16 cleaned_count = igb_desc_unused(rx_ring);
++	struct sk_buff *skb = rx_ring->skb;
++	int cpu = smp_processor_id();
+ 	unsigned int xdp_xmit = 0;
++	struct netdev_queue *nq;
+ 	struct xdp_buff xdp;
+ 	u32 frame_sz = 0;
+ 	int rx_buf_pgcnt;
+@@ -8987,7 +8993,10 @@ static int igb_clean_rx_irq(struct igb_q_vector *q_vector, const int budget)
+ 	if (xdp_xmit & IGB_XDP_TX) {
+ 		struct igb_ring *tx_ring = igb_xdp_tx_queue_mapping(adapter);
+ 
++		nq = txring_txq(tx_ring);
++		__netif_tx_lock(nq, cpu);
+ 		igb_xdp_ring_update_tail(tx_ring);
++		__netif_tx_unlock(nq);
+ 	}
+ 
+ 	u64_stats_update_begin(&rx_ring->rx_syncp);
+
+---
+base-commit: a0b4a80ed6ce2cf8140fe926303ba609884b5d9b
+change-id: 20240822-igb_xdp_tx_lock-b6846fddc758
+
+Best regards,
+-- 
+Kurt Kanzenbach <kurt@linutronix.de>
 
 
