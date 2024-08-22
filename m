@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-120893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E3AC95B22E
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:49:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3F2A95B235
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:49:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28D2A1F21752
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:49:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8777228663F
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3378118952E;
-	Thu, 22 Aug 2024 09:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF31B186E40;
+	Thu, 22 Aug 2024 09:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="r9WqLZCz"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="wcHRVP5r"
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F7818951B;
-	Thu, 22 Aug 2024 09:42:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7D5186E30;
+	Thu, 22 Aug 2024 09:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724319778; cv=none; b=UzD/11YiQIJHNeGATtqqVrmWhanhyOBIgjkLklvOESbMDMXLdA7WALRyesDDKqb/jKD5tH8EUWIktQBEHiSG/o7e0xiHfh2ujGXWCQVhCHlwUd6j/RIMve3s7F6eiQ0ePHQmZfRWshSBLLeWO7LiSYB6KgZ1ybhWzJ//GM/vJQE=
+	t=1724319808; cv=none; b=L/zuEWtcC1L/nQTzk064XAfrwxLWBfI6CMPQQmv2pK8CxQvNkbKznwODg8GbGYScqELqJ1ROgT0TwfukrxRmX4dfG16pT3iM5f0KBjOMrn3OpDIVc9K10ZnRrhJIlXY1Su2MJZP8aWafuv0KEHfduemgrzryILEJRe9G99nME0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724319778; c=relaxed/simple;
-	bh=lL6XwdZJ4/NSnyTZr5wjeCiLPkV47JPaGNNKpbRUVio=;
+	s=arc-20240116; t=1724319808; c=relaxed/simple;
+	bh=y2/kcadb3S8A62lL0Sh1F6IC/6vmv+LQMeVO5YYko0I=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JJNghHFd+73iUBQbkuXDWEvPo/og3matyqIwAYmUcIskVSojakV7ob50GWBvgJfyJPDDiFCMdqH9S2DmuwHQEaeImEbdD01q0O3QmUwMKYTxUFuMjiEKlso+3bXRTn9/vOeq8dG6zGPgBiwnner6+U4Bvse9hIGG9UPdOBqsWmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=r9WqLZCz; arc=none smtp.client-ip=211.75.126.72
+	 MIME-Version:Content-Type; b=d4TN5LpzXNRVhut2w59tosS8IzbUUeQH6UQEkNlRu0Xr8JqIZ2+YVY7GlSXJcFzCKQeh7u5QHMgZBhcFIzvE/wP4Kp+9jMA9vIyC+S3ZTqzP+JHgq09HAkuAbNRdGtFePzYQ1+9XtQkiR4422C+gTiDV3k+QgxcaBuz46r+xPaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=wcHRVP5r; arc=none smtp.client-ip=211.75.126.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 47M9gTQF13805356, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 47M9h0O013805580, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1724319749; bh=lL6XwdZJ4/NSnyTZr5wjeCiLPkV47JPaGNNKpbRUVio=;
+	t=1724319780; bh=y2/kcadb3S8A62lL0Sh1F6IC/6vmv+LQMeVO5YYko0I=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=r9WqLZCzWhFVddO8jOZGXVYGJzSVxGAo/bhZrFD1Dg3YOK65948caWSmwEHzf+iTq
-	 zixs0tHe7p10S0pbMJ/Guuqn2DMmKzOac18u93w8hEhXv87kDC7CgiZ9x3TbvPyh+E
-	 rB+lyU+BMT0vw9ZGCf8xQcZS4u6i8ljmIuGfrJnWdSEUgbmc8bwtd2HQqTjmX4JFr/
-	 n/lLCcasjwQCJi+OTq6XgU5V85VhFyB7psV4B2WA84oUpAH0KgtqPNQZwYSQzsTrbW
-	 E4kxyXorZ3x9Mu09xkPC4YX7beVSTlebMoMDzdnbkTXx6Dbfwkfjt17I4A2LPeEY7l
-	 ZxxpYEqLuWrkQ==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 47M9gTQF13805356
+	b=wcHRVP5rjfGVXEinBnuntktBTo9YE/SjjdeAWurUMvWg8mJMfPWp+3v6gKb46ZHxi
+	 6l8n7r860mRpIWKXpKrueYRC7q3Ooq+zlheR12wACOYI3mPpMwKBaDBYN7n5xJgd9C
+	 gAXgbpYLTil0J+oauP4naCrOAyvu2RQlHshJ3Wqil0AIP/31ZLgfwhXOACNHLw8DPN
+	 jf8ua5vLOBgBp/65lv9XrxQcERrDq3bWd6u+ipBo1fBBaygKxHvgFvneFRFfd1zjzB
+	 uR3j9+YgfVc22zX/Ixu8FxBTBNfdLZCLStLSSCHB80phdLZ2vx1iyROTnEmhz01QX4
+	 TM/1wVbwctbUQ==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 47M9h0O013805580
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 Aug 2024 17:42:29 +0800
+	Thu, 22 Aug 2024 17:43:00 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 22 Aug 2024 17:42:30 +0800
+ 15.1.2507.39; Thu, 22 Aug 2024 17:43:01 +0800
 Received: from RTDOMAIN (172.21.210.74) by RTEXMBS04.realtek.com.tw
  (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Thu, 22 Aug
- 2024 17:42:29 +0800
+ 2024 17:43:00 +0800
 From: Justin Lai <justinlai0215@realtek.com>
 To: <kuba@kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
@@ -62,9 +62,9 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
         <rkannoth@marvell.com>, <jdamato@fastly.com>, <pkshih@realtek.com>,
         <larry.chiu@realtek.com>, "Justin
  Lai" <justinlai0215@realtek.com>
-Subject: [PATCH net-next v28 12/13] realtek: Update the Makefile and Kconfig in the realtek folder
-Date: Thu, 22 Aug 2024 17:37:53 +0800
-Message-ID: <20240822093754.17117-13-justinlai0215@realtek.com>
+Subject: [PATCH net-next v28 13/13] MAINTAINERS: Add the rtase ethernet driver entry
+Date: Thu, 22 Aug 2024 17:37:54 +0800
+Message-ID: <20240822093754.17117-14-justinlai0215@realtek.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240822093754.17117-1-justinlai0215@realtek.com>
 References: <20240822093754.17117-1-justinlai0215@realtek.com>
@@ -76,55 +76,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
  RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-1. Add the RTASE entry in the Kconfig.
-2. Add the CONFIG_RTASE entry in the Makefile.
+Add myself and Larry Chiu as the maintainer for the rtase ethernet driver.
 
 Signed-off-by: Justin Lai <justinlai0215@realtek.com>
 ---
- drivers/net/ethernet/realtek/Kconfig  | 19 +++++++++++++++++++
- drivers/net/ethernet/realtek/Makefile |  1 +
- 2 files changed, 20 insertions(+)
+ MAINTAINERS | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/ethernet/realtek/Kconfig b/drivers/net/ethernet/realtek/Kconfig
-index 03015b665f4e..8a8ea51c639e 100644
---- a/drivers/net/ethernet/realtek/Kconfig
-+++ b/drivers/net/ethernet/realtek/Kconfig
-@@ -120,4 +120,23 @@ config R8169_LEDS
- 	  Optional support for controlling the NIC LED's with the netdev
- 	  LED trigger.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5dbf23cf11c8..7d6d3c7dd526 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -19848,6 +19848,13 @@ L:	linux-remoteproc@vger.kernel.org
+ S:	Maintained
+ F:	drivers/tty/rpmsg_tty.c
  
-+config RTASE
-+	tristate "Realtek Automotive Switch 9054/9068/9072/9075/9068/9071 PCIe Interface support"
-+	depends on PCI
-+	select CRC32
-+	select PAGE_POOL
-+	help
-+	  Say Y here and it will be compiled and linked with the kernel
-+	  if you have a Realtek Ethernet adapter belonging to the
-+	  following families:
-+	  RTL9054 5GBit Ethernet
-+	  RTL9068 5GBit Ethernet
-+	  RTL9072 5GBit Ethernet
-+	  RTL9075 5GBit Ethernet
-+	  RTL9068 5GBit Ethernet
-+	  RTL9071 5GBit Ethernet
++RTASE ETHERNET DRIVER
++M:	Justin Lai <justinlai0215@realtek.com>
++M:	Larry Chiu <larry.chiu@realtek.com>
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	drivers/net/ethernet/realtek/rtase/
 +
-+	  To compile this driver as a module, choose M here: the module
-+	  will be called rtase. This is recommended.
-+
- endif # NET_VENDOR_REALTEK
-diff --git a/drivers/net/ethernet/realtek/Makefile b/drivers/net/ethernet/realtek/Makefile
-index 635491d8826e..046adf503ff4 100644
---- a/drivers/net/ethernet/realtek/Makefile
-+++ b/drivers/net/ethernet/realtek/Makefile
-@@ -9,3 +9,4 @@ obj-$(CONFIG_ATP) += atp.o
- r8169-y += r8169_main.o r8169_firmware.o r8169_phy_config.o
- r8169-$(CONFIG_R8169_LEDS) += r8169_leds.o
- obj-$(CONFIG_R8169) += r8169.o
-+obj-$(CONFIG_RTASE) += rtase/
+ RTL2830 MEDIA DRIVER
+ L:	linux-media@vger.kernel.org
+ S:	Orphan
 -- 
 2.34.1
 
