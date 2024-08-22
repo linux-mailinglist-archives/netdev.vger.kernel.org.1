@@ -1,43 +1,44 @@
-Return-Path: <netdev+bounces-120796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6974195AC83
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 06:25:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5470395AC82
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 06:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25FD52824C1
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 04:25:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E9031C22290
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 04:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78E8B3B79C;
-	Thu, 22 Aug 2024 04:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6636639AFD;
+	Thu, 22 Aug 2024 04:25:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D8B364A4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D4F25779
 	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 04:25:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724300723; cv=none; b=nDynRBLspjVpzjhtYJBMgbDpQcvSBeebW39OiokwKcLgirXzsKhh+m5lhWub6ogFY2ivIiOElsEGkIqm2tbvTCXVN5nLxdsbNazAZFK8HWECnGJ39fN8XQYsEn+tWKECv/4AT5XAuFnOFE79ATQ8ja0wUBxw1zC6i0GcOozb6o0=
+	t=1724300722; cv=none; b=A90EzwhNQNBFfIUFyZCpeOIIXSsg850Bax08b3LmkI3xWt+lAKWmrnG8oU6xBdS2fVBMgqgQmuUII+LjVwc0K7fYD4gHsCtG46uxzhyt5SBsV0m5Nz0XiEWe4Suc3qw7F9VQDctJ0wStIHeiL8FdZNyeWAVQ138UdWuJVLrFXNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724300723; c=relaxed/simple;
-	bh=fk3HI2c3sBAsaEwEg/cSRpFvKIAoHs0iBFgoXAi75Cg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pLKdR3hW6qFH5wr+TNeWdIzqEU9g0QcO2YmwQIno5XOE8XSDNMfF9L8nu4b8XxO1cYCkqcQwMVS9qt049f6WXS+16GXqe3/j0YQ5MyDIHKnzREoOr+tx90dzzOLzRKuPcTsezUPX7pb+LhdodnfIe+AFefZiCgJSdtBBCGqaaMU=
+	s=arc-20240116; t=1724300722; c=relaxed/simple;
+	bh=ea0y8yWVi43P0vkxaiRf1+gteNi0hb+tnfAaMPtD1Co=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rc7VM105YKLHvaorCWkqFd12E5145ETGJUqnmFRQRcyZlEufD5OxzFaXU7S1ywwsQuIFJO3uXvfzYd+9qde1Zx1Kgd4E5NDHJTGYCdS18hrTETsJUHmSSTw45X6YHD9VsqBoRZ6nJpnB7Lvu5E3cxjATdSBj9ydoN45qo/0NhBw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Wq95R3CNWz1HFpc;
-	Thu, 22 Aug 2024 12:22:03 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Wq95S0ztXz1HH4V;
+	Thu, 22 Aug 2024 12:22:04 +0800 (CST)
 Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4D7CE180019;
-	Thu, 22 Aug 2024 12:25:16 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 02F621401E9;
+	Thu, 22 Aug 2024 12:25:17 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemd500012.china.huawei.com
  (7.221.188.25) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Thu, 22 Aug
- 2024 12:25:15 +0800
+ 2024 12:25:16 +0800
 From: Li Zetao <lizetao1@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <dsahern@kernel.org>, <idosch@nvidia.com>,
@@ -46,10 +47,12 @@ To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<horms@kernel.org>, <lizetao1@huawei.com>, <j.granados@samsung.com>,
 	<linux@weissschuh.net>, <judyhsiao@chromium.org>, <jiri@resnulli.us>
 CC: <netdev@vger.kernel.org>
-Subject: [PATCH net-next 00/10] net: Delete some redundant judgments
-Date: Thu, 22 Aug 2024 12:32:42 +0800
-Message-ID: <20240822043252.3488749-1-lizetao1@huawei.com>
+Subject: [PATCH net-next 01/10] net: vxlan: delete redundant judgment statements
+Date: Thu, 22 Aug 2024 12:32:43 +0800
+Message-ID: <20240822043252.3488749-2-lizetao1@huawei.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240822043252.3488749-1-lizetao1@huawei.com>
+References: <20240822043252.3488749-1-lizetao1@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,38 +64,30 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemd500012.china.huawei.com (7.221.188.25)
 
-This patchset aims to remove some unnecessary judgments and make the
-code more concise. In some network modules, rtnl_set_sk_err is used to
-record error information, but the err is repeatedly judged to be less
-than 0 on the error path. Deleted these redundant judgments.
+The initial value of err is -ENOBUFS, and err is guaranteed to be
+less than 0 before all goto errout. Therefore, on the error path
+of errout, there is no need to repeatedly judge that err is less than 0,
+and delete redundant judgments to make the code more concise.
 
-No functional change intended.
-
-Li Zetao (10):
-  net: vxlan: delete redundant judgment statements
-  fib: rules: delete redundant judgment statements
-  neighbour: delete redundant judgment statements
-  rtnetlink: delete redundant judgment statements
-  ipv4: delete redundant judgment statements
-  ipmr: delete redundant judgment statements
-  net: nexthop: delete redundant judgment statements
-  ip6mr: delete redundant judgment statements
-  net/ipv6: delete redundant judgment statements
-  net: mpls: delete redundant judgment statements
-
+Signed-off-by: Li Zetao <lizetao1@huawei.com>
+---
  drivers/net/vxlan/vxlan_core.c | 3 +--
- net/core/fib_rules.c           | 3 +--
- net/core/neighbour.c           | 3 +--
- net/core/rtnetlink.c           | 3 +--
- net/ipv4/devinet.c             | 6 ++----
- net/ipv4/fib_semantics.c       | 3 +--
- net/ipv4/ipmr.c                | 3 +--
- net/ipv4/nexthop.c             | 6 ++----
- net/ipv6/ip6mr.c               | 3 +--
- net/ipv6/route.c               | 6 ++----
- net/mpls/af_mpls.c             | 6 ++----
- 11 files changed, 15 insertions(+), 30 deletions(-)
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 8983e75e9881..34391c18bba7 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -277,8 +277,7 @@ static void __vxlan_fdb_notify(struct vxlan_dev *vxlan, struct vxlan_fdb *fdb,
+ 	rtnl_notify(skb, net, 0, RTNLGRP_NEIGH, NULL, GFP_ATOMIC);
+ 	return;
+ errout:
+-	if (err < 0)
+-		rtnl_set_sk_err(net, RTNLGRP_NEIGH, err);
++	rtnl_set_sk_err(net, RTNLGRP_NEIGH, err);
+ }
+ 
+ static void vxlan_fdb_switchdev_notifier_info(const struct vxlan_dev *vxlan,
 -- 
 2.34.1
 
