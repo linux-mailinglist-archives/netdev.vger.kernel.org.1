@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-120878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C5395B1F0
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:41:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F39995B1F3
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 11:42:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4112528233F
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:41:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 825CE1C22F0E
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E977418595F;
-	Thu, 22 Aug 2024 09:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8990B185B6C;
+	Thu, 22 Aug 2024 09:39:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9BB183CC9;
-	Thu, 22 Aug 2024 09:39:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4427018453F;
+	Thu, 22 Aug 2024 09:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724319583; cv=none; b=FFf+5QOlTm3xc2vZsH8PbtADn8/AqCgpn0jVF7mLev/ybOUGXfF3OW8IJ4pGr/8wcJ5ytADThAMlEhiq0IOKehHQTSI9GySNWn850MJ0xAQu6Da+AWrHvIczQsy6olcQaSDRXDGLwXDazpC16PZp4qs6k67aBL6deZ04IGBa+L0=
+	t=1724319584; cv=none; b=iHp1ruHgcmrFL1hsgJ0otauvepdMrwTX07i3646xosieAYPk6PuRMLI6CIZOrpqOuY5pO4SEqOxFqnuUNHFld9HIoxDor2Pn4kJQPC3M0di8/UGRt1p3QsL3bPhXOXTcnx8jsv5oTALeGTB0ktJnc/qrglIrCV+8uYyQqv67YkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724319583; c=relaxed/simple;
-	bh=WushfD6vdnXkxgpb/FoW0A7gtMJRdBCa629d7wgPqZs=;
+	s=arc-20240116; t=1724319584; c=relaxed/simple;
+	bh=ATVyEJlwbZPimhIz3q6w8QdVcn/4THkYOQtwFB5X738=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PIK5P4GAumCbPMPUs+S/opEgAW8lT5gaUiaAven6X9r55AINIvrxmdvTJdrHSFDjR73j6sJBuah0jU64FiT1HZA8GgZWOMgRmb7Ez1th8uvXrYZbOsVzT2QCoRy0PmmF+dSsitKIbWga7FGzMtMX7UNDhwRgHs4BXxTMJ+kFWYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	 MIME-Version:Content-Type; b=HOMyURxyfGc+HF+TM4rom/swFkwboWIZ+5BQFzaCMtMNLxehnJyQfB2bR5MTp+QtoAWO82YToppOBNz4OmIM6lqh66s4bvF7SV554pwCNzjd9rkO4FyeIKlxz+wqwdQ4burpo1IaaC3weoDiwAd5H+OCayE5fY6ae0XZlwyAL0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WqJ662YdgzVkrZ;
-	Thu, 22 Aug 2024 17:38:06 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WqJ774WRSz13pJk;
+	Thu, 22 Aug 2024 17:38:59 +0800 (CST)
 Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2D044140134;
+	by mail.maildlp.com (Postfix) with ESMTPS id CF1B214037B;
 	Thu, 22 Aug 2024 17:39:39 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
@@ -49,9 +49,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
 	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: [PATCH V3 net-next 09/11] net: hibmcge: Add a Makefile and update Kconfig for hibmcge
-Date: Thu, 22 Aug 2024 17:33:32 +0800
-Message-ID: <20240822093334.1687011-10-shaojijie@huawei.com>
+Subject: [PATCH V3 net-next 10/11] net: hibmcge: Add maintainer for hibmcge
+Date: Thu, 22 Aug 2024 17:33:33 +0800
+Message-ID: <20240822093334.1687011-11-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20240822093334.1687011-1-shaojijie@huawei.com>
 References: <20240822093334.1687011-1-shaojijie@huawei.com>
@@ -66,80 +66,31 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemm000007.china.huawei.com (7.193.23.189)
 
-Add a Makefile and update Kconfig to build hibmcge driver.
+Add myself as the maintainer for the hibmcge ethernet driver.
 
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
- drivers/net/ethernet/hisilicon/Kconfig          | 16 +++++++++++++++-
- drivers/net/ethernet/hisilicon/Makefile         |  1 +
- drivers/net/ethernet/hisilicon/hibmcge/Makefile | 10 ++++++++++
- 3 files changed, 26 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/Makefile
+ MAINTAINERS | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/ethernet/hisilicon/Kconfig b/drivers/net/ethernet/hisilicon/Kconfig
-index 3312e1d93c3b..66444794ce86 100644
---- a/drivers/net/ethernet/hisilicon/Kconfig
-+++ b/drivers/net/ethernet/hisilicon/Kconfig
-@@ -7,7 +7,6 @@ config NET_VENDOR_HISILICON
- 	bool "Hisilicon devices"
- 	default y
- 	depends on OF || ACPI
--	depends on ARM || ARM64 || COMPILE_TEST
- 	help
- 	  If you have a network (Ethernet) card belonging to this class, say Y.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5dbf23cf11c8..2691a08e16db 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -10123,6 +10123,13 @@ S:	Maintained
+ W:	http://www.hisilicon.com
+ F:	drivers/net/ethernet/hisilicon/hns3/
  
-@@ -18,6 +17,8 @@ config NET_VENDOR_HISILICON
- 
- if NET_VENDOR_HISILICON
- 
-+if ARM || ARM64 || COMPILE_TEST
++HISILICON NETWORK HIBMCGE DRIVER
++M:	Jijie Shao <shaojijie@huawei.com>
++L:	netdev@vger.kernel.org
++S:	Maintained
++W:	http://www.hisilicon.com
++F:	drivers/net/ethernet/hisilicon/hibmcge/
 +
- config HIX5HD2_GMAC
- 	tristate "Hisilicon HIX5HD2 Family Network Device Support"
- 	select PHYLIB
-@@ -141,4 +142,17 @@ config HNS3_ENET
- 
- endif #HNS3
- 
-+endif # ARM || ARM64 || COMPILE_TEST
-+
-+config HIBMCGE
-+	tristate "Hisilicon BMC Gigabit Ethernet Device Support"
-+	depends on PCI && PCI_MSI
-+	select PHYLIB
-+	help
-+	  If you wish to compile a kernel for a BMC with HIBMC-xx_gmac
-+	  then you should answer Y to this. This makes this driver suitable for use
-+	  on certain boards such as the HIBMC-210.
-+
-+	  If you are unsure, say N.
-+
- endif # NET_VENDOR_HISILICON
-diff --git a/drivers/net/ethernet/hisilicon/Makefile b/drivers/net/ethernet/hisilicon/Makefile
-index 7f76d412047a..0e2cadfea8ff 100644
---- a/drivers/net/ethernet/hisilicon/Makefile
-+++ b/drivers/net/ethernet/hisilicon/Makefile
-@@ -9,3 +9,4 @@ obj-$(CONFIG_HNS_MDIO) += hns_mdio.o
- obj-$(CONFIG_HNS) += hns/
- obj-$(CONFIG_HNS3) += hns3/
- obj-$(CONFIG_HISI_FEMAC) += hisi_femac.o
-+obj-$(CONFIG_HIBMCGE) += hibmcge/
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/Makefile b/drivers/net/ethernet/hisilicon/hibmcge/Makefile
-new file mode 100644
-index 000000000000..ea223b7207af
---- /dev/null
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/Makefile
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0+
-+#
-+# Makefile for the HISILICON BMC GE network device drivers.
-+#
-+
-+ccflags-y += -I$(src)
-+
-+obj-$(CONFIG_HIBMCGE) += hibmcge.o
-+
-+hibmcge-objs = hbg_main.o hbg_hw.o hbg_mdio.o hbg_irq.o hbg_txrx.o hbg_ethtool.o
+ HISILICON NETWORK SUBSYSTEM DRIVER
+ M:	Yisen Zhuang <yisen.zhuang@huawei.com>
+ M:	Salil Mehta <salil.mehta@huawei.com>
 -- 
 2.33.0
 
