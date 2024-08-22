@@ -1,176 +1,277 @@
-Return-Path: <netdev+bounces-121006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F1095B649
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 15:19:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F96F95B653
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 15:20:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26D5428149D
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:19:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D84DB284572
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 13:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B879426AC1;
-	Thu, 22 Aug 2024 13:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B35511CB136;
+	Thu, 22 Aug 2024 13:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="W+4XIpD+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from msa.smtpout.orange.fr (msa-213.smtpout.orange.fr [193.252.23.213])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183771C9EC4
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 13:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746D01C9453;
+	Thu, 22 Aug 2024 13:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.23.213
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724332769; cv=none; b=hnITTM8jhTi+BJeiMB/pI2Z69fcFeI6jiN8jEBwI5TO6eqZhvijmkWLAdSd06NvagH2gyc6W4YNSVc3bOAxx8fl8aw51fs4ecUVt9BgVXSSG3jpHgm5q+YCsiwFM6vNCwvOKmsYolNQ/ZH/L67vFUT+WWEAut16YYH+MbUJfd6s=
+	t=1724332829; cv=none; b=P8JzG2S4kUyS1Vf3yl7et1LRacrESEyDlnXtHsDpmA0aBi8qzEab2jdY41Mz4hvihhgfrMWkm+LPNAx49q5ynzH2j1XtCaeUGKbPJOG74d6V8T7eAuX5LOhl+KfNw0+1Qb99sMBA9cgW5WiuUrvOEK78MwMcMthvb1saf1kx64s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724332769; c=relaxed/simple;
-	bh=D9cK9uxNc2DTmMy1nRI557QSzFuh3VCn2aBMNFQhG2s=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=beVGXdrFWfMWbwqARxzR5nSxu0TxwxDRYgWjINy0vOSC6IXDq6llJ4MjD90RSo2yb9SoWqUzQN8lrzv+70sYqhOSFHfv0jn3tvCZlVqeA0KGbrDvNbPuWaDtJcky+ge3HDZKFb4P7bGazRiyewxFqYeVNPTbJlVIsx6s6U040uM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-39d2ceca837so9303165ab.2
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 06:19:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724332767; x=1724937567;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OiweJPU3v8cK3ex6a+klsO0dVK70QTWG1SHf6umFjdQ=;
-        b=RfGHG0QqCns3hkTtw/0xAhiS3Rg1SS4TlQBKqfxTcDvPMvXqC0wGW12D/9/YoPs0Am
-         FWmjdIVBjVOKvLCMw2mP6THktAHFQSlOcoG2yAQ4rXw+R3mPDiuYe648nVH25yqWIOdq
-         Wb2uYVmbWKmxE1VvwyZViwVJK/dm9yRf3CQWo94OC3Wz/WZZebpoPNnMw6eIEykW+vJg
-         Vud3KNez9KLY1OvlstGpTqvmWc9NswnpC47+0wsz3mTEAVr6CaQQHk6GVHrXt1BbnBM4
-         79S872NxNN/S/4ebiwDEheSBx60JdGgXYYF4qJbk7ocKy1thtdgU5XML8aueC2ylmLNH
-         dJZA==
-X-Forwarded-Encrypted: i=1; AJvYcCUjugO3a7KcfwhA4Ajt7Xhex0JLyBTfqH0RZaPNntCbI2SNAp5bgh3blDod64h/jMRUJaVrN74=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdXVONt4opCvhdgi9pyJCl8u5uZ9gWrX6FjJsl8IgbWBP2Rw7E
-	x+hqJwzaBbnzqJs/Nx8TSGr1UpeBRDhhmMF62YysxsGTq3ebHvZFlW4Tcob8lLEPFuoyzQsN9TS
-	K8CKTlrSU7e6OG1EKT3t88G76Y8pf6JV1B1lRsBCc0vgEJYsrS9DRPl0=
-X-Google-Smtp-Source: AGHT+IE3lFUcUO93ZsOVuNmmaL3DvmvZ4QiZ6RcvZDG7fyA03QgA475t8D+4JtyKFOVE3KZkO/7fktBrZ7PfvAJNtVkGtfZQMxzr
+	s=arc-20240116; t=1724332829; c=relaxed/simple;
+	bh=R3MgZulENDqdRbIellqr75I/ViIa9URQw996p0CUctQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Dr4xAcXTGOJbm9fQ+p3y4tarVnGNuBXkwa0sNAdSoh6caaxA1SCc++F+ELNym1I+2HXuLI2URSW6mm3glKu/fIhLY9Npx2MC4Sy+IPL+uKyrugrWEIyuHBArCMmv4Je17VD9+qgWf8fBZLe3R2Ihz7D4F9WTsoNmWfzNpqgAkBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=W+4XIpD+; arc=none smtp.client-ip=193.252.23.213
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id h7jWsmJZhS3tRh7jXsZQYa; Thu, 22 Aug 2024 15:20:18 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1724332818;
+	bh=7o9kJ8LE12X5cmoi/urYscWziJB8NGZ/vwHTmpS6Onc=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To;
+	b=W+4XIpD+BKMw9oCv2HAHZXJJZHYqQGx35HJuoYPDcB0ldecA9YFMMXLHDCrIWIbIT
+	 HHzuK1GZXDqaaKkd4J7orgh3RsXYLjbtqE4vCTxSnj5hLketVJGkzf6DVX0afS2sCP
+	 3x2vJwq0ZAYLhcc4D6ZHzFjc6CQ7GvxhdbdieTxAUGNL9zkHtO5EU9uLnf57E13hoo
+	 ffk/uMpXQ2ySXG7WMLj2WKfCoQD2HJUhhd2zJs9NBi5nYYX9XbEnguYvRXhV04Tzt2
+	 pbOfRayGuGpnzZp6/gs88zlcI3fS3mYumE98eyAmvdRrSj6mfYzRrf7vfTzSkmWO8y
+	 4Qz+TWNHzxA+A==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Thu, 22 Aug 2024 15:20:18 +0200
+X-ME-IP: 90.11.132.44
+Message-ID: <15ba8f05-8909-4ade-b0f3-c98cad0bd9f0@wanadoo.fr>
+Date: Thu, 22 Aug 2024 15:20:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2196:b0:396:ec3b:df63 with SMTP id
- e9e14a558f8ab-39d6c3c7f86mr3171705ab.4.1724332767278; Thu, 22 Aug 2024
- 06:19:27 -0700 (PDT)
-Date: Thu, 22 Aug 2024 06:19:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001187a706204582bb@google.com>
-Subject: [syzbot] [bpf?] [net?] WARNING in sock_map_close (2)
-From: syzbot <syzbot+8dbe3133b840c470da0e@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	jakub@cloudflare.com, jchapman@katalix.com, john.fastabend@gmail.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, tparkin@katalix.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [net-next 8/9] net: mvpp2: Convert to devm_clk_get_enabled() and
+ devm_clk_get_optional_enabled()
+To: Yangtao Li <frank.li@vivo.com>, clement.leger@bootlin.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ulli.kroll@googlemail.com, linus.walleij@linaro.org,
+ marcin.s.wojtas@gmail.com, linux@armlinux.org.uk,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, hkallweit1@gmail.com,
+ justinstitt@google.com, kees@kernel.org, u.kleine-koenig@pengutronix.de,
+ jacob.e.keller@intel.com, horms@kernel.org, shannon.nelson@amd.com
+Cc: linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com
+References: <20240822084733.1599295-1-frank.li@vivo.com>
+ <20240822084733.1599295-9-frank.li@vivo.com>
+Content-Language: en-US, fr-FR
+In-Reply-To: <20240822084733.1599295-9-frank.li@vivo.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Le 22/08/2024 à 10:47, Yangtao Li a écrit :
+> Use devm_clk_get_enabled() and devm_clk_get_optional_enabled()
+> to simplify code.
+> 
+> Signed-off-by: Yangtao Li <frank.li@vivo.com>
+> ---
+>   drivers/net/ethernet/marvell/mvpp2/mvpp2.h    |  7 --
+>   .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 86 +++++--------------
+>   2 files changed, 22 insertions(+), 71 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
+> index 9e02e4367bec..643a645e8097 100644
+> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
+> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
+> @@ -1044,13 +1044,6 @@ struct mvpp2 {
+>   	 */
+>   	struct regmap *sysctrl_base;
+>   
+> -	/* Common clocks */
+> -	struct clk *pp_clk;
+> -	struct clk *gop_clk;
+> -	struct clk *mg_clk;
+> -	struct clk *mg_core_clk;
+> -	struct clk *axi_clk;
+> -
+>   	/* List of pointers to port structures */
+>   	int port_count;
+>   	struct mvpp2_port *port_list[MVPP2_MAX_PORTS];
+> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> index 2fe8bae4eb3c..0075499de29f 100644
+> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> @@ -7462,6 +7462,7 @@ static int mvpp2_get_sram(struct platform_device *pdev,
+>   
+>   static int mvpp2_probe(struct platform_device *pdev)
+>   {
+> +	struct clk *pp_clk, *gop_clk, *mg_clk, *mg_core_clk, *axi_clk;
 
-syzbot found the following issue on:
+Hi,
 
-HEAD commit:    d785ed945de6 net: wwan: t7xx: PCIe reset rescan
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=15d43b05980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7229118d88b4a71b
-dashboard link: https://syzkaller.appspot.com/bug?extid=8dbe3133b840c470da0e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13621239980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12378c33980000
+Nitpick: you could also define just struct clk *pp_clk, *clk; and reuse 
+clk for most calls.
+*Maybe* clk_get_rate() could be moved in order to only need 1 clk.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9b04b4f2471c/disk-d785ed94.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2db64580639d/vmlinux-d785ed94.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/04e43f8b9f9b/bzImage-d785ed94.xz
+CJ
 
-The issue was bisected to:
+>   	struct mvpp2 *priv;
+>   	struct resource *res;
+>   	void __iomem *base;
+> @@ -7561,56 +7562,30 @@ static int mvpp2_probe(struct platform_device *pdev)
+>   		priv->max_port_rxqs = 32;
+>   
+>   	if (dev_of_node(&pdev->dev)) {
+> -		priv->pp_clk = devm_clk_get(&pdev->dev, "pp_clk");
+> -		if (IS_ERR(priv->pp_clk))
+> -			return PTR_ERR(priv->pp_clk);
+> -		err = clk_prepare_enable(priv->pp_clk);
+> -		if (err < 0)
+> -			return err;
+> +		pp_clk = devm_clk_get_enabled(&pdev->dev, "pp_clk");
+> +		if (IS_ERR(pp_clk))
+> +			return PTR_ERR(pp_clk);
+>   
+> -		priv->gop_clk = devm_clk_get(&pdev->dev, "gop_clk");
+> -		if (IS_ERR(priv->gop_clk)) {
+> -			err = PTR_ERR(priv->gop_clk);
+> -			goto err_pp_clk;
+> -		}
+> -		err = clk_prepare_enable(priv->gop_clk);
+> -		if (err < 0)
+> -			goto err_pp_clk;
+> +		gop_clk = devm_clk_get_enabled(&pdev->dev, "gop_clk");
+> +		if (IS_ERR(gop_clk))
+> +			return PTR_ERR(gop_clk);
+>   
+>   		if (priv->hw_version >= MVPP22) {
+> -			priv->mg_clk = devm_clk_get(&pdev->dev, "mg_clk");
+> -			if (IS_ERR(priv->mg_clk)) {
+> -				err = PTR_ERR(priv->mg_clk);
+> -				goto err_gop_clk;
+> -			}
+> -
+> -			err = clk_prepare_enable(priv->mg_clk);
+> -			if (err < 0)
+> -				goto err_gop_clk;
+> -
+> -			priv->mg_core_clk = devm_clk_get_optional(&pdev->dev, "mg_core_clk");
+> -			if (IS_ERR(priv->mg_core_clk)) {
+> -				err = PTR_ERR(priv->mg_core_clk);
+> -				goto err_mg_clk;
+> -			}
+> +			mg_clk = devm_clk_get_enabled(&pdev->dev, "mg_clk");
+> +			if (IS_ERR(mg_clk))
+> +				return PTR_ERR(mg_clk);
+>   
+> -			err = clk_prepare_enable(priv->mg_core_clk);
+> -			if (err < 0)
+> -				goto err_mg_clk;
+> +			mg_core_clk = devm_clk_get_optional_enabled(&pdev->dev, "mg_core_clk");
+> +			if (IS_ERR(mg_core_clk))
+> +				return PTR_ERR(mg_core_clk);
+>   		}
+>   
+> -		priv->axi_clk = devm_clk_get_optional(&pdev->dev, "axi_clk");
+> -		if (IS_ERR(priv->axi_clk)) {
+> -			err = PTR_ERR(priv->axi_clk);
+> -			goto err_mg_core_clk;
+> -		}
+> -
+> -		err = clk_prepare_enable(priv->axi_clk);
+> -		if (err < 0)
+> -			goto err_mg_core_clk;
+> +		axi_clk = devm_clk_get_optional_enabled(&pdev->dev, "axi_clk");
+> +		if (IS_ERR(axi_clk))
+> +			return PTR_ERR(axi_clk);
+>   
+>   		/* Get system's tclk rate */
+> -		priv->tclk = clk_get_rate(priv->pp_clk);
+> +		priv->tclk = clk_get_rate(pp_clk);
+>   	} else {
+>   		err = device_property_read_u32(&pdev->dev, "clock-frequency", &priv->tclk);
+>   		if (err) {
+> @@ -7622,7 +7597,7 @@ static int mvpp2_probe(struct platform_device *pdev)
+>   	if (priv->hw_version >= MVPP22) {
+>   		err = dma_set_mask(&pdev->dev, MVPP2_DESC_DMA_MASK);
+>   		if (err)
+> -			goto err_axi_clk;
+> +			return err;
+>   		/* Sadly, the BM pools all share the same register to
+>   		 * store the high 32 bits of their address. So they
+>   		 * must all have the same high 32 bits, which forces
+> @@ -7630,7 +7605,7 @@ static int mvpp2_probe(struct platform_device *pdev)
+>   		 */
+>   		err = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32));
+>   		if (err)
+> -			goto err_axi_clk;
+> +			return err;
+>   	}
+>   
+>   	/* Map DTS-active ports. Should be done before FIFO mvpp2_init */
+> @@ -7649,12 +7624,12 @@ static int mvpp2_probe(struct platform_device *pdev)
+>   	err = mvpp2_init(pdev, priv);
+>   	if (err < 0) {
+>   		dev_err(&pdev->dev, "failed to initialize controller\n");
+> -		goto err_axi_clk;
+> +		return err;
+>   	}
+>   
+>   	err = mvpp22_tai_probe(&pdev->dev, priv);
+>   	if (err < 0)
+> -		goto err_axi_clk;
+> +		return err;
+>   
+>   	/* Initialize ports */
+>   	device_for_each_child_node_scoped(&pdev->dev, port_fwnode) {
+> @@ -7665,8 +7640,7 @@ static int mvpp2_probe(struct platform_device *pdev)
+>   
+>   	if (priv->port_count == 0) {
+>   		dev_err(&pdev->dev, "no ports enabled\n");
+> -		err = -ENODEV;
+> -		goto err_axi_clk;
+> +		return -ENODEV;
+>   	}
+>   
+>   	/* Statistics must be gathered regularly because some of them (like
+> @@ -7698,16 +7672,6 @@ static int mvpp2_probe(struct platform_device *pdev)
+>   err_port_probe:
+>   	for (i = 0; i < priv->port_count; i++)
+>   		mvpp2_port_remove(priv->port_list[i]);
+> -err_axi_clk:
+> -	clk_disable_unprepare(priv->axi_clk);
+> -err_mg_core_clk:
+> -	clk_disable_unprepare(priv->mg_core_clk);
+> -err_mg_clk:
+> -	clk_disable_unprepare(priv->mg_clk);
+> -err_gop_clk:
+> -	clk_disable_unprepare(priv->gop_clk);
+> -err_pp_clk:
+> -	clk_disable_unprepare(priv->pp_clk);
+>   	return err;
+>   }
+>   
+> @@ -7745,12 +7709,6 @@ static void mvpp2_remove(struct platform_device *pdev)
+>   
+>   	if (!dev_of_node(&pdev->dev))
+>   		return;
+> -
+> -	clk_disable_unprepare(priv->axi_clk);
+> -	clk_disable_unprepare(priv->mg_core_clk);
+> -	clk_disable_unprepare(priv->mg_clk);
+> -	clk_disable_unprepare(priv->pp_clk);
+> -	clk_disable_unprepare(priv->gop_clk);
+>   }
+>   
+>   static const struct of_device_id mvpp2_match[] = {
 
-commit 4a4cd70369f162f819b7855b0eabcb2db21f01f4
-Author: James Chapman <jchapman@katalix.com>
-Date:   Mon Jul 29 15:38:04 2024 +0000
-
-    l2tp: don't set sk_user_data in tunnel socket
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=157a0791980000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=177a0791980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=137a0791980000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8dbe3133b840c470da0e@syzkaller.appspotmail.com
-Fixes: 4a4cd70369f1 ("l2tp: don't set sk_user_data in tunnel socket")
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5225 at net/core/sock_map.c:1699 sock_map_close+0x399/0x3d0 net/core/sock_map.c:1699
-Modules linked in:
-CPU: 0 UID: 0 PID: 5225 Comm: syz-executor110 Not tainted 6.11.0-rc3-syzkaller-00508-gd785ed945de6 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-RIP: 0010:sock_map_close+0x399/0x3d0 net/core/sock_map.c:1699
-Code: 48 89 df e8 e9 a3 5a f8 4c 8b 23 eb 05 e8 8f 5e f3 f7 e8 ba ea ff ff 4c 89 ef e8 82 e1 da ff e9 47 ff ff ff e8 78 5e f3 f7 90 <0f> 0b 90 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc
-RSP: 0018:ffffc900035b7b10 EFLAGS: 00010293
-RAX: ffffffff89a02af8 RBX: ffffffff95312d30 RCX: ffff88802424da00
-RDX: 0000000000000000 RSI: ffffffff8c0ad560 RDI: ffffffff8c606900
-RBP: 0000000000000000 R08: ffffffff937328e7 R09: 1ffffffff26e651c
-R10: dffffc0000000000 R11: fffffbfff26e651d R12: ffffffff89a02760
-R13: ffff88802fc0a800 R14: dffffc0000000000 R15: ffffffff89a02791
-FS:  0000000000000000(0000) GS:ffff8880b9200000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ff975386110 CR3: 000000000e734000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- inet_release+0x17d/0x200 net/ipv4/af_inet.c:437
- __sock_release net/socket.c:659 [inline]
- sock_close+0xbc/0x240 net/socket.c:1421
- __fput+0x24a/0x8a0 fs/file_table.c:422
- task_work_run+0x24f/0x310 kernel/task_work.c:228
- exit_task_work include/linux/task_work.h:40 [inline]
- do_exit+0xa2f/0x27f0 kernel/exit.c:882
- do_group_exit+0x207/0x2c0 kernel/exit.c:1031
- __do_sys_exit_group kernel/exit.c:1042 [inline]
- __se_sys_exit_group kernel/exit.c:1040 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1040
- x64_sys_call+0x2634/0x2640 arch/x86/include/generated/asm/syscalls_64.h:232
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7ff97530ad09
-Code: Unable to access opcode bytes at 0x7ff97530acdf.
-RSP: 002b:00007ffc8457e748 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ff97530ad09
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
-RBP: 00007ff9753852b0 R08: ffffffffffffffb8 R09: 0000000000000006
-R10: 0000000000000006 R11: 0000000000000246 R12: 00007ff9753852b0
-R13: 0000000000000000 R14: 00007ff975385d00 R15: 00007ff9752dbf60
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
