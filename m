@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-120770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 497FE95A8FF
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 02:40:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3616695A901
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 02:41:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F284D284163
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 00:40:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3C761F247D9
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 00:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD2D05684;
-	Thu, 22 Aug 2024 00:40:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE706FB6;
+	Thu, 22 Aug 2024 00:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JLncRyUE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fJOYzkF6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951B1101E2;
-	Thu, 22 Aug 2024 00:40:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215EA125DE;
+	Thu, 22 Aug 2024 00:40:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724287238; cv=none; b=LdkGcFNF2HU+7M1Ee7BPnpvye3ion4/VN0Jy16KxhkcYiBxWKE7RAAG2XPp4Z+iMGh4Ik75Jpy7bDrvRsggFWUkQ5+PeOkGhswbINKI9T1ri9HvX8SfdavBCxWTAL1sqeEnQVsSjNmIywG0TyrkB+8Vu6KrikKkB685ryn8CV9o=
+	t=1724287240; cv=none; b=md6kNCpjOuIhIC+R5xIl4477YGSZxAXRn67wET9af7Dc7bJt89OfSyDJvhgQbKOmsPe5VfB0duyVN72K63BzK85dDsn5fNap4OvYxdbxOgvx8JrLSeKn0pxTrzOuUI2/FyD0HFBqlp2vBHjyp/z9RbHFT2j0cGRAh+IJU9/MpuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724287238; c=relaxed/simple;
-	bh=22s5hdA760B1zZTA4ie8B6ytn3zDxLtniGVKvxzPjZc=;
+	s=arc-20240116; t=1724287240; c=relaxed/simple;
+	bh=b7nUoUlvVoGjFMH8+Uiil1I9wpRRS3dQOPm1lZtrews=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rpkprNAnwEL3aVLJK0FZyzdHNmUshCTSJQ7G8oyCSUr0pl6uwWZi7P21f7YBNIDFeOwoVjo4mPE3TMgMFqHc7/OphZm6545LbUsyEk6j7yXhlinDmAYzVLn5oEMB0x+/JA/kJLxDpw+hxDPnuuGj7C7lE46D22uB0Npl6J2bShE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JLncRyUE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21508C32781;
-	Thu, 22 Aug 2024 00:40:38 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=KwJ2n7XVMhaW4IrScwaqdKqenBLGNqwNcKJyhA54nyxv4z7/K7L1rZrrTYsBVg28CR+FhbGx9KCwKpo41uMERxWVh/QqnJU7urCU3D475rtFGD3RSJlcjSAQisZYGQa2fCJLKT+7ZmWhynhbhgN3r07P9rqtsyg95tAy8Gfuih8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fJOYzkF6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 977F6C32782;
+	Thu, 22 Aug 2024 00:40:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724287238;
-	bh=22s5hdA760B1zZTA4ie8B6ytn3zDxLtniGVKvxzPjZc=;
+	s=k20201202; t=1724287239;
+	bh=b7nUoUlvVoGjFMH8+Uiil1I9wpRRS3dQOPm1lZtrews=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JLncRyUEAgPwse+n4HkdvUkrkx6zu5IdIbYAAdPdm26jvG3FudmgMXmc15+1ic3ln
-	 dytjTTLbGVRW+9C9DUUOYmtxED5Hv86y/7NiEl2v+CU5RWqSMxUvkuQMKNOASupOnQ
-	 mGBy/3ADuz5mDpPbXjUy8IcF1or6pp6zFytiBd++pe9WBuX1tqLmPvx+QllMoPHJgX
-	 69j7XHSl50l4k+Z0dtkK6/Cx7UO3SCYNkTj1K/CFah9OUZNYw+H/K+679OS8ytjj+P
-	 Tzvih5aWw598E94QQ/YTImKjtOF3sxVQX81SZB39afd0zinEDVDihlWIH1TaGTtRnA
-	 KbxIGmHfHErDw==
+	b=fJOYzkF6UhEYzPqWyAMtc92qi8xEjU+8pzsZ23VfzMA/zIxAoErM7QgGS4NJYBAVZ
+	 FrTOmW4cwabqjemEQ4UtlrF3pPG7oT/FqYqkDBefRkatByooVhl5ZAtkKkLgAEGL30
+	 sfDvpE5qlr1G2IQ6k/b80G3Ekyse523RHmjo2yH0VxiDEpNF8kvLX3k42qXlq//F3y
+	 yisPzPfFr6/+wklKW8RddBw9+EHVj2q9bauyJYV4DgqmtWdcvkU3J8a4p/tmG0CSwd
+	 zW/K9etD5ud9+66uYd2SmH2CM7QOzQj0Q60SbwuYJQ/GMk9JGQkx2lKhVZJxsZuGzS
+	 RbxysRyc2RoBw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD8F3804CAB;
-	Thu, 22 Aug 2024 00:40:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E303804CAB;
+	Thu, 22 Aug 2024 00:40:40 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ipv6: remove redundant check
+Subject: Re: [PATCH net-next] ice: Fix a 32bit bug
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172428723773.1872412.3417555253186546832.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Aug 2024 00:40:37 +0000
-References: <20240820115442.49366-1-xuiagnh@gmail.com>
-In-Reply-To: <20240820115442.49366-1-xuiagnh@gmail.com>
-To: Xi Huang <xuiagnh@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <172428723899.1872412.15704401811722513523.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Aug 2024 00:40:38 +0000
+References: <ddc231a8-89c1-4ff4-8704-9198bcb41f8d@stanley.mountain>
+In-Reply-To: <ddc231a8-89c1-4ff4-8704-9198bcb41f8d@stanley.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: junfeng.guo@intel.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, qi.z.zhang@intel.com,
+ marcin.szycik@linux.intel.com, ahmed.zaki@intel.com,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 20 Aug 2024 19:54:42 +0800 you wrote:
-> err varibale will be set everytime,like -ENOBUFS and in if (err < 0),
->  when code gets into this path. This check will just slowdown
-> the execution and that's all.
+On Tue, 20 Aug 2024 16:43:46 +0300 you wrote:
+> BIT() is unsigned long but ->pu.flg_msk and ->pu.flg_val are u64 type.
+> On 32 bit systems, unsigned long is a u32 and the mismatch between u32
+> and u64 will break things for the high 32 bits.
 > 
-> Signed-off-by: Xi Huang <xuiagnh@gmail.com>
-> ---
->  net/ipv6/addrconf.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
+> Fixes: 9a4c07aaa0f5 ("ice: add parser execution main loop")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> 
+> [...]
 
 Here is the summary with links:
-  - ipv6: remove redundant check
-    https://git.kernel.org/netdev/net-next/c/d35a3a8f1b7f
+  - [net-next] ice: Fix a 32bit bug
+    https://git.kernel.org/netdev/net-next/c/0ce054f2b891
 
 You are awesome, thank you!
 -- 
