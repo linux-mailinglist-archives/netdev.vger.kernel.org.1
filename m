@@ -1,430 +1,302 @@
-Return-Path: <netdev+bounces-120913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBF3B95B2EB
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:29:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACFD95B2FC
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:35:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49FAE1F23BF6
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 10:29:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68E2FB21D8D
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 10:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A0D17F4F6;
-	Thu, 22 Aug 2024 10:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971D9183CA5;
+	Thu, 22 Aug 2024 10:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="emwYfT76"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ObA5RvOM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B61D17A588
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 10:28:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94AA181334
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 10:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724322540; cv=none; b=J9NAWCZRLtKETCvBrBhpkB9nK2eyFYA9Pea2sEogsMNm5Wz8TL0aIoP34riHRGhzTuSXZkSXnSQ37qKpt9l/YQ67xj32YEG+ozJ4ZPDCT+VSJsUHUjLxq69ekZNPywYrr0MPHF6l3KbxJO3DlGYaps9wBRgtV8v7dazy9fFvMRk=
+	t=1724322931; cv=none; b=pTnNKhBOqHUH7eOK+Le/0df4acJdT8HnFbRoeI+ZYrrubEhAJT2AoGBExdmt2anQhZ4RFb5XyvN1iGmo34ddJQqgppP76/WqV1TKFPvu49WXi2Zb/+7aekW5G3pUvkiLohlOKpfKXGUGgjo0vMv9mei+GvZ1F47o6ucBvGfT7g4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724322540; c=relaxed/simple;
-	bh=wEjMmwOu28itu+IEmB5qjqFWdVnlnVf3h410WqYtorY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T8JMXeQY8NNdOAC5Pe+2VZaedPKlVX/gL1XaJCSzm9e346ZtDjzIiYtbpgIxXeeSkP8pWRDEGzG6u6n509Roa8kon+tDUf/Ja+mtU9Vq+QjrHzMJsvuSMHvnZQ+Lbtnh2uzzOe33421XOXoqccG/ri/jkpYIpq/YxFGADU0C6Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=emwYfT76; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a8684c31c60so83095766b.3
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 03:28:58 -0700 (PDT)
+	s=arc-20240116; t=1724322931; c=relaxed/simple;
+	bh=twAOZ3u+vWDjrLsrJhX3ZPPGiqTlz6ngvMNw5u6Q+Mk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kmEaF1UVz3UzYNV9SzBp95EL9W5F1JHkba129c12ZZ66B1Zt6CZBD6EnWiVdgNaVwqN3QJOD93uPPHIZTm8GuOPevO34723b9MW1NGnrxuLk/cj869jLaDDtd1e4tkZcqmPmC9jwv4IHk5fkHv4ItvJCmVxG0cgHBjZZfHzZkF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ObA5RvOM; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71423704ef3so541198b3a.3
+        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 03:35:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724322537; x=1724927337; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ldFaxJii5YgjVOkhMMsi2YnK0rlIl544cfD59JqvCtg=;
-        b=emwYfT76lX+9vNinUrSceUzq7GoM6EmalER8Czyv+QUoab++j0WLgVqP5yvaqG8TdO
-         rltc8ustTk0qEBFb2e4XRbtBS+ub28fhmhsHV569MaIWYtmGI5ZI7+0/7xdIWyPGhJW2
-         eLUFC7dWUhwI2WGXMk1qGfY+9EJ+cvcdSQklfz1mjMKnZHziC+F9cjd/jgt30WrmaUx1
-         aWkFVQ+YsRmVdbBDGO4VtIKD9az7YwREjc+fTg3pMGwFQv++sS4qYeCnx2H0YF1k7x3W
-         YqcWM4cVQMFyAJ7sIZAv3RTs7FUgqbXwh0R3ZYB+pHwcYbUTYaZNox70VdDFy2lX00r0
-         QEyQ==
+        d=broadcom.com; s=google; t=1724322929; x=1724927729; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sbq+yLenr8Y7ZavyBd5ufSbriAzixSYEeVnLf/6Orjk=;
+        b=ObA5RvOMoJQHe+FplHtK5eghMygf/KM0QWtCi8EWhoTccQ5CSd62SlJoYEyvD3ek9Q
+         H4Gf0O90zxl53uUp0oEp1bn/PwuAIsH64gurP5xEpKmAXQ4BBQXI0KADP1rU932xsXgf
+         3+nh76im0+6LfJyOdeiJRWqDHbMa86tJZLJmA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724322537; x=1724927337;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ldFaxJii5YgjVOkhMMsi2YnK0rlIl544cfD59JqvCtg=;
-        b=MK2goufEMVm+R1OpAGTXlFYOuc1AsuNuU9zzE0bRtD/3+wgIKHsI9v8zBbqLHK1xGY
-         lR6mIFJgMY7Nv1Ylhpq9JHxCOH1H2n1q/OwaVWAzxrFZuEKDbbYNhiOswnQh4LinZglK
-         Ko2lt9TzJ3Ub1r5cgCF3dw0IqgCgODKKBDJnyV+UyglzXcU+ESRnKSUWrdcVOjQGVmRh
-         wgOQZ+2xsx8y2O2rKeHYRkmThh9J6ucE1Tlh+uXBq25V4QK68BUfSw8pl6XqYvRmZ2ZE
-         NHjMkFQ4aN0z6NqyNasX2JDrLhk/4eVpEUZcveUBYVklgSH+yeUGeKiiKJDeO7ArKLbF
-         JEMg==
-X-Gm-Message-State: AOJu0YzDh125OKBckfgAXtz/AJ+bbl+hXuWjWsnsVLxh1H4je3iV4yOw
-	1XItSF23q+ibxyprvDh+/nsVltQ4ppTAwDGsNOqhD18yfVsWstJ2qdPFfXxjBSk=
-X-Google-Smtp-Source: AGHT+IF1Of3MmQo0oMg/u9DL80JvCjQ/vh7alpChOi20zfBTX+muqLD0BEKjFzKCqhJcG7GpJ913Ig==
-X-Received: by 2002:a17:907:96ac:b0:a86:43c0:4270 with SMTP id a640c23a62f3a-a8691abab27mr108579366b.13.1724322536612;
-        Thu, 22 Aug 2024 03:28:56 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f2a58ddsm98949566b.80.2024.08.22.03.28.55
+        d=1e100.net; s=20230601; t=1724322929; x=1724927729;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Sbq+yLenr8Y7ZavyBd5ufSbriAzixSYEeVnLf/6Orjk=;
+        b=ft1D0MhR7cpfsUyoHAPVgrxvpd0kHU9/iiO0h+pSIwlIAbGbVLefna3LRwK2GEI6+T
+         ubD5jXq85sce6gV3IHgnQ3JbzD3wZzUrrTanoHlFK1h+0uEZFdIGKSRVvYHhN6pAXNqc
+         61exxdxlJ35JZzwavx7IFNrmhUHJTymooDd1AjDo7MEqjbifwu7H6LoxsPD8qnhKoIUl
+         tCwn/R5tOGkhGNgPInq97A9FJ+bYedA4UJ13BaU40tfEn7nhWPneUN9WN5bNIwb6FNTx
+         glIqe6LVo+CpFAH5I33Tj1/+KDcvAplg55zawfpFnAfC/QqcHc+bANSCAkHWFz5gDWfr
+         f/xA==
+X-Gm-Message-State: AOJu0YwhqTJAVtJQFdltA6J6TnI6EUBEco5wlzZNOvX5fO6rmncPCe2N
+	r/5yI38enhAWuZrK9VTAEGm6YGhtBJBquLX3GzPvJ7d42dfwlVQRMWdDuUmRp+rqV/TkEnPafcg
+	B7SVgUgugxa7gRi+3eVlYDgnLmKYC1ZBHpnBgSFnb6B8MmgSm+hyUDqcL3r8F5MSdhtT5hrL/6h
+	SjLGMipCGCtgMYUY/swwqMG4sPxZhp9wV/6XvyAXXhfoYQLp25
+X-Google-Smtp-Source: AGHT+IG1mjvCpTclyEyHK39KPWcMvtDgRXpnNiT6Zd9XMOhkrieFWibYVgN4dnUjtVOrYt7RkaTpeA==
+X-Received: by 2002:a05:6a00:10c4:b0:706:29e6:2ed2 with SMTP id d2e1a72fcca58-71436488fd8mr1476865b3a.5.1724322928315;
+        Thu, 22 Aug 2024 03:35:28 -0700 (PDT)
+Received: from localhost.localdomain ([192.19.250.250])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7cda0ada9adsm495546a12.26.2024.08.22.03.35.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2024 03:28:56 -0700 (PDT)
-Date: Thu, 22 Aug 2024 12:28:54 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, donald.hunter@gmail.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next v2 2/2] ice: add callbacks for Embedded SYNC
- enablement on dpll pins
-Message-ID: <ZscS5jL_Uk0cqiga@nanopsycho.orion>
-References: <20240821213218.232900-1-arkadiusz.kubalewski@intel.com>
- <20240821213218.232900-3-arkadiusz.kubalewski@intel.com>
+        Thu, 22 Aug 2024 03:35:27 -0700 (PDT)
+From: Boris Sukholitko <boris.sukholitko@broadcom.com>
+To: netdev@vger.kernel.org,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Shuah Khan <shuah@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Mina Almasry <almasrymina@google.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	David Howells <dhowells@redhat.com>,
+	Liang Chen <liangchen.linux@gmail.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	Ido Schimmel <idosch@idosch.org>
+Cc: Ilya Lifshits <ilya.lifshits@broadcom.com>
+Subject: [PATCH net-next v4 0/3] tc: adjust network header after 2nd vlan push
+Date: Thu, 22 Aug 2024 13:35:07 +0300
+Message-ID: <20240822103510.468293-1-boris.sukholitko@broadcom.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240821213218.232900-3-arkadiusz.kubalewski@intel.com>
+Content-Transfer-Encoding: 8bit
 
-Wed, Aug 21, 2024 at 11:32:18PM CEST, arkadiusz.kubalewski@intel.com wrote:
->Allow the user to get and set configuration of Embedded SYNC feature
->on the ice driver dpll pins.
->
->Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
->Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->---
->v2:
->- align to v2 changes of "dpll: add Embedded SYNC feature for a pin"
->
-> drivers/net/ethernet/intel/ice/ice_dpll.c | 230 +++++++++++++++++++++-
-> drivers/net/ethernet/intel/ice/ice_dpll.h |   1 +
-> 2 files changed, 228 insertions(+), 3 deletions(-)
+<tldr>
+skb network header of the single-tagged vlan packet continues to point the
+vlan payload (e.g. IP) after second vlan tag is pushed by tc act_vlan. This
+causes problem at the dissector which expects double-tagged packet network
+header to point to the inner vlan.
 
-Looks ok, couple of nitpicks below:
+The fix is to adjust network header in tcf_act_vlan.c but requires
+refactoring of skb_vlan_push function.
+</tldr>
 
+Consider the following shell script snippet configuring TC rules on the
+veth interface:
 
+ip link add veth0 type veth peer veth1
+ip link set veth0 up
+ip link set veth1 up
 
->
->diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
->index e92be6f130a3..aa6b87281ea6 100644
->--- a/drivers/net/ethernet/intel/ice/ice_dpll.c
->+++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
->@@ -9,6 +9,7 @@
-> #define ICE_CGU_STATE_ACQ_ERR_THRESHOLD		50
-> #define ICE_DPLL_PIN_IDX_INVALID		0xff
-> #define ICE_DPLL_RCLK_NUM_PER_PF		1
->+#define ICE_DPLL_PIN_ESYNC_PULSE_HIGH_PERCENT	25
-> 
-> /**
->  * enum ice_dpll_pin_type - enumerate ice pin types:
->@@ -30,6 +31,10 @@ static const char * const pin_type_name[] = {
-> 	[ICE_DPLL_PIN_TYPE_RCLK_INPUT] = "rclk-input",
-> };
-> 
->+static const struct dpll_pin_frequency ice_esync_range[] = {
->+	DPLL_PIN_FREQUENCY_RANGE(0, DPLL_PIN_FREQUENCY_1_HZ),
->+};
->+
-> /**
->  * ice_dpll_is_reset - check if reset is in progress
->  * @pf: private board structure
->@@ -394,8 +399,8 @@ ice_dpll_pin_state_update(struct ice_pf *pf, struct ice_dpll_pin *pin,
-> 
-> 	switch (pin_type) {
-> 	case ICE_DPLL_PIN_TYPE_INPUT:
->-		ret = ice_aq_get_input_pin_cfg(&pf->hw, pin->idx, NULL, NULL,
->-					       NULL, &pin->flags[0],
->+		ret = ice_aq_get_input_pin_cfg(&pf->hw, pin->idx, &pin->status,
->+					       NULL, NULL, &pin->flags[0],
-> 					       &pin->freq, &pin->phase_adjust);
-> 		if (ret)
-> 			goto err;
->@@ -430,7 +435,7 @@ ice_dpll_pin_state_update(struct ice_pf *pf, struct ice_dpll_pin *pin,
-> 			goto err;
-> 
-> 		parent &= ICE_AQC_GET_CGU_OUT_CFG_DPLL_SRC_SEL;
->-		if (ICE_AQC_SET_CGU_OUT_CFG_OUT_EN & pin->flags[0]) {
->+		if (ICE_AQC_GET_CGU_OUT_CFG_OUT_EN & pin->flags[0]) {
-> 			pin->state[pf->dplls.eec.dpll_idx] =
-> 				parent == pf->dplls.eec.dpll_idx ?
-> 				DPLL_PIN_STATE_CONNECTED :
->@@ -1098,6 +1103,221 @@ ice_dpll_phase_offset_get(const struct dpll_pin *pin, void *pin_priv,
-> 	return 0;
-> }
-> 
->+/**
->+ * ice_dpll_output_esync_set - callback for setting embedded sync
->+ * @pin: pointer to a pin
->+ * @pin_priv: private data pointer passed on pin registration
->+ * @dpll: registered dpll pointer
->+ * @dpll_priv: private data pointer passed on dpll registration
->+ * @esync_freq: requested embedded sync frequency
->+ * @extack: error reporting
->+ *
->+ * Dpll subsystem callback. Handler for setting embedded sync frequency value
->+ * on output pin.
->+ *
->+ * Context: Acquires pf->dplls.lock
->+ * Return:
->+ * * 0 - success
->+ * * negative - error
->+ */
->+static int
->+ice_dpll_output_esync_set(const struct dpll_pin *pin, void *pin_priv,
->+			  const struct dpll_device *dpll, void *dpll_priv,
->+			  u64 esync_freq, struct netlink_ext_ack *extack)
+tc qdisc add dev veth0 clsact
 
-s/esync_freq/freq/
+tc filter add dev veth0 ingress pref 10 chain 0 flower \
+	num_of_vlans 2 cvlan_ethtype 0x800 action goto chain 5
+tc filter add dev veth0 ingress pref 20 chain 0 flower \
+	num_of_vlans 1 action vlan push id 100 \
+	protocol 0x8100 action goto chain 5
+tc filter add dev veth0 ingress pref 30 chain 5 flower \
+	num_of_vlans 2 cvlan_ethtype 0x800 action simple sdata "success"
 
+Sending double-tagged vlan packet with the IP payload inside:
 
->+{
->+	struct ice_dpll_pin *p = pin_priv;
->+	struct ice_dpll *d = dpll_priv;
->+	struct ice_pf *pf = d->pf;
->+	u8 flags = 0;
->+	int ret;
->+
->+	if (ice_dpll_is_reset(pf, extack))
->+		return -EBUSY;
->+	mutex_lock(&pf->dplls.lock);
->+	if (p->flags[0] & ICE_AQC_GET_CGU_OUT_CFG_OUT_EN)
->+		flags = ICE_AQC_SET_CGU_OUT_CFG_OUT_EN;
->+	if (esync_freq == DPLL_PIN_FREQUENCY_1_HZ) {
->+		if (p->flags[0] & ICE_AQC_GET_CGU_OUT_CFG_ESYNC_EN) {
->+			ret = 0;
->+		} else {
->+			flags |= ICE_AQC_SET_CGU_OUT_CFG_ESYNC_EN;
->+			ret = ice_aq_set_output_pin_cfg(&pf->hw, p->idx, flags,
->+							0, 0, 0);
->+		}
->+	} else {
->+		if (!(p->flags[0] & ICE_AQC_GET_CGU_OUT_CFG_ESYNC_EN)) {
->+			ret = 0;
->+		} else {
->+			flags &= ~ICE_AQC_SET_CGU_OUT_CFG_ESYNC_EN;
->+			ret = ice_aq_set_output_pin_cfg(&pf->hw, p->idx, flags,
->+							0, 0, 0);
->+		}
->+	}
->+	mutex_unlock(&pf->dplls.lock);
->+	if (ret)
->+		NL_SET_ERR_MSG_FMT(extack,
->+				   "err:%d %s failed to set e-sync freq\n",
->+				   ret,
->+				   ice_aq_str(pf->hw.adminq.sq_last_status));
+cat <<ENDS | text2pcap - - | tcpreplay -i veth1 -
+0000  00 00 00 00 00 11 00 00 00 00 00 22 81 00 00 64   ..........."...d
+0010  81 00 00 14 08 00 45 04 00 26 04 d2 00 00 7f 11   ......E..&......
+0020  18 ef 0a 00 00 01 14 00 00 02 00 00 00 00 00 12   ................
+0030  e1 c7 00 00 00 00 00 00 00 00 00 00               ............
+ENDS
 
+will match rule 10, goto rule 30 in chain 5 and correctly emit "success" to
+the dmesg.
 
-See my comment to ice_dpll_input_esync_set(), same applies here.
+OTOH, sending single-tagged vlan packet:
 
+cat <<ENDS | text2pcap - - | tcpreplay -i veth1 -
+0000  00 00 00 00 00 11 00 00 00 00 00 22 81 00 00 14   ..........."....
+0010  08 00 45 04 00 2a 04 d2 00 00 7f 11 18 eb 0a 00   ..E..*..........
+0020  00 01 14 00 00 02 00 00 00 00 00 16 e1 bf 00 00   ................
+0030  00 00 00 00 00 00 00 00 00 00 00 00               ............
+ENDS
 
->+	return ret;
->+}
->+
->+/**
->+ * ice_dpll_output_esync_get - callback for getting embedded sync config
->+ * @pin: pointer to a pin
->+ * @pin_priv: private data pointer passed on pin registration
->+ * @dpll: registered dpll pointer
->+ * @dpll_priv: private data pointer passed on dpll registration
->+ * @esync: on success holds embedded sync pin properties
->+ * @extack: error reporting
->+ *
->+ * Dpll subsystem callback. Handler for getting embedded sync frequency value
->+ * and capabilities on output pin.
->+ *
->+ * Context: Acquires pf->dplls.lock
->+ * Return:
->+ * * 0 - success
->+ * * negative - error
->+ */
->+static int
->+ice_dpll_output_esync_get(const struct dpll_pin *pin, void *pin_priv,
->+			  const struct dpll_device *dpll, void *dpll_priv,
->+			  struct dpll_pin_esync *esync,
->+			  struct netlink_ext_ack *extack)
->+{
->+	struct ice_dpll_pin *p = pin_priv;
->+	struct ice_dpll *d = dpll_priv;
->+	struct ice_pf *pf = d->pf;
->+
->+	if (ice_dpll_is_reset(pf, extack))
->+		return -EBUSY;
->+	mutex_lock(&pf->dplls.lock);
->+	if (!(p->flags[0] & ICE_AQC_GET_CGU_OUT_CFG_ESYNC_ABILITY) ||
->+	    p->freq != DPLL_PIN_FREQUENCY_10_MHZ) {
->+		mutex_unlock(&pf->dplls.lock);
->+		return -EOPNOTSUPP;
->+	}
->+	esync->range = ice_esync_range;
->+	esync->range_num = ARRAY_SIZE(ice_esync_range);
->+	if (p->flags[0] & ICE_AQC_GET_CGU_OUT_CFG_ESYNC_EN) {
->+		esync->freq = DPLL_PIN_FREQUENCY_1_HZ;
->+		esync->pulse = ICE_DPLL_PIN_ESYNC_PULSE_HIGH_PERCENT;
->+	} else {
->+		esync->freq = 0;
->+		esync->pulse = 0;
->+	}
->+	mutex_unlock(&pf->dplls.lock);
->+	return 0;
->+}
->+
->+/**
->+ * ice_dpll_input_esync_set - callback for setting embedded sync
->+ * @pin: pointer to a pin
->+ * @pin_priv: private data pointer passed on pin registration
->+ * @dpll: registered dpll pointer
->+ * @dpll_priv: private data pointer passed on dpll registration
->+ * @esync_freq: requested embedded sync frequency
->+ * @extack: error reporting
->+ *
->+ * Dpll subsystem callback. Handler for setting embedded sync frequency value
->+ * on input pin.
->+ *
->+ * Context: Acquires pf->dplls.lock
->+ * Return:
->+ * * 0 - success
->+ * * negative - error
->+ */
->+static int
->+ice_dpll_input_esync_set(const struct dpll_pin *pin, void *pin_priv,
->+			 const struct dpll_device *dpll, void *dpll_priv,
->+			 u64 esync_freq, struct netlink_ext_ack *extack)
->+{
->+	struct ice_dpll_pin *p = pin_priv;
->+	struct ice_dpll *d = dpll_priv;
->+	struct ice_pf *pf = d->pf;
->+	u8 flags_en = 0;
->+	int ret;
->+
->+	if (ice_dpll_is_reset(pf, extack))
->+		return -EBUSY;
->+	mutex_lock(&pf->dplls.lock);
->+	if (p->flags[0] & ICE_AQC_GET_CGU_IN_CFG_FLG2_INPUT_EN)
->+		flags_en = ICE_AQC_SET_CGU_IN_CFG_FLG2_INPUT_EN;
->+	if (esync_freq == DPLL_PIN_FREQUENCY_1_HZ) {
->+		if (p->flags[0] & ICE_AQC_GET_CGU_IN_CFG_FLG2_ESYNC_EN) {
->+			ret = 0;
->+		} else {
->+			flags_en |= ICE_AQC_SET_CGU_IN_CFG_FLG2_ESYNC_EN;
->+			ret = ice_aq_set_input_pin_cfg(&pf->hw, p->idx, 0,
->+						       flags_en, 0, 0);
->+		}
->+	} else {
->+		if (!(p->flags[0] & ICE_AQC_GET_CGU_IN_CFG_FLG2_ESYNC_EN)) {
->+			ret = 0;
->+		} else {
->+			flags_en &= ~ICE_AQC_SET_CGU_IN_CFG_FLG2_ESYNC_EN;
->+			ret = ice_aq_set_input_pin_cfg(&pf->hw, p->idx, 0,
->+						       flags_en, 0, 0);
->+		}
->+	}
->+	mutex_unlock(&pf->dplls.lock);
->+	if (ret)
->+		NL_SET_ERR_MSG_FMT(extack,
->+				   "err:%d %s failed to set e-sync freq\n",
+will match rule 20, will push the second vlan tag but will *not* match
+rule 30. IOW, the match at rule 30 fails if the second vlan was freshly
+pushed by the kernel.
 
-Not sure how you do that in ice, but there should be a space after ":".
-But, in this case, print ret value in the message is redundant as you
-return ret value to the user. Remove.
+Lets look at  __skb_flow_dissect working on the double-tagged vlan packet.
+Here is the relevant code from around net/core/flow_dissector.c:1277
+copy-pasted here for convenience:
 
-Moreover, this extack message has no value, as you basically say, that
-the command user executed failed, which he already knows by non-0 return
-value :) Either provide some useful details or avoid the extack message
-completely.
+	if (dissector_vlan == FLOW_DISSECTOR_KEY_MAX &&
+	    skb && skb_vlan_tag_present(skb)) {
+		proto = skb->protocol;
+	} else {
+		vlan = __skb_header_pointer(skb, nhoff, sizeof(_vlan),
+					    data, hlen, &_vlan);
+		if (!vlan) {
+			fdret = FLOW_DISSECT_RET_OUT_BAD;
+			break;
+		}
 
+		proto = vlan->h_vlan_encapsulated_proto;
+		nhoff += sizeof(*vlan);
+	}
 
->+				   ret,
->+				   ice_aq_str(pf->hw.adminq.sq_last_status));
->+
->+	return ret;
->+}
->+
->+/**
->+ * ice_dpll_input_esync_get - callback for getting embedded sync config
->+ * @pin: pointer to a pin
->+ * @pin_priv: private data pointer passed on pin registration
->+ * @dpll: registered dpll pointer
->+ * @dpll_priv: private data pointer passed on dpll registration
->+ * @esync: on success holds embedded sync pin properties
->+ * @extack: error reporting
->+ *
->+ * Dpll subsystem callback. Handler for getting embedded sync frequency value
->+ * and capabilities on input pin.
->+ *
->+ * Context: Acquires pf->dplls.lock
->+ * Return:
->+ * * 0 - success
->+ * * negative - error
->+ */
->+static int
->+ice_dpll_input_esync_get(const struct dpll_pin *pin, void *pin_priv,
->+			 const struct dpll_device *dpll, void *dpll_priv,
->+			 struct dpll_pin_esync *esync,
->+			 struct netlink_ext_ack *extack)
->+{
->+	struct ice_dpll_pin *p = pin_priv;
->+	struct ice_dpll *d = dpll_priv;
->+	struct ice_pf *pf = d->pf;
->+
->+	if (ice_dpll_is_reset(pf, extack))
->+		return -EBUSY;
->+	mutex_lock(&pf->dplls.lock);
->+	if (!(p->status & ICE_AQC_GET_CGU_IN_CFG_STATUS_ESYNC_CAP) ||
->+	    p->freq != DPLL_PIN_FREQUENCY_10_MHZ) {
->+		mutex_unlock(&pf->dplls.lock);
->+		return -EOPNOTSUPP;
->+	}
->+	esync->range = ice_esync_range;
->+	esync->range_num = ARRAY_SIZE(ice_esync_range);
->+	if (p->flags[0] & ICE_AQC_GET_CGU_IN_CFG_FLG2_ESYNC_EN) {
->+		esync->freq = DPLL_PIN_FREQUENCY_1_HZ;
->+		esync->pulse = ICE_DPLL_PIN_ESYNC_PULSE_HIGH_PERCENT;
->+	} else {
->+		esync->freq = 0;
->+		esync->pulse = 0;
->+	}
->+	mutex_unlock(&pf->dplls.lock);
->+	return 0;
->+}
->+
-> /**
->  * ice_dpll_rclk_state_on_pin_set - set a state on rclk pin
->  * @pin: pointer to a pin
->@@ -1222,6 +1442,8 @@ static const struct dpll_pin_ops ice_dpll_input_ops = {
-> 	.phase_adjust_get = ice_dpll_pin_phase_adjust_get,
-> 	.phase_adjust_set = ice_dpll_input_phase_adjust_set,
-> 	.phase_offset_get = ice_dpll_phase_offset_get,
->+	.esync_set = ice_dpll_input_esync_set,
->+	.esync_get = ice_dpll_input_esync_get,
-> };
-> 
-> static const struct dpll_pin_ops ice_dpll_output_ops = {
->@@ -1232,6 +1454,8 @@ static const struct dpll_pin_ops ice_dpll_output_ops = {
-> 	.direction_get = ice_dpll_output_direction,
-> 	.phase_adjust_get = ice_dpll_pin_phase_adjust_get,
-> 	.phase_adjust_set = ice_dpll_output_phase_adjust_set,
->+	.esync_set = ice_dpll_output_esync_set,
->+	.esync_get = ice_dpll_output_esync_get,
-> };
-> 
-> static const struct dpll_device_ops ice_dpll_ops = {
->diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.h b/drivers/net/ethernet/intel/ice/ice_dpll.h
->index 93172e93995b..c320f1bf7d6d 100644
->--- a/drivers/net/ethernet/intel/ice/ice_dpll.h
->+++ b/drivers/net/ethernet/intel/ice/ice_dpll.h
->@@ -31,6 +31,7 @@ struct ice_dpll_pin {
-> 	struct dpll_pin_properties prop;
-> 	u32 freq;
-> 	s32 phase_adjust;
->+	u8 status;
-> };
-> 
-> /** ice_dpll - store info required for DPLL control
->-- 
->2.38.1
->
+The "else" clause above gets the protocol of the encapsulated packet from
+the skb data at the network header location. printk debugging has showed
+that in the good double-tagged packet case proto is
+htons(0x800 == ETH_P_IP) as expected. However in the single-tagged packet
+case proto is garbage leading to the failure to match tc filter 30.
+
+proto is being set from the skb header pointed by nhoff parameter which is
+defined at the beginning of __skb_flow_dissect
+(net/core/flow_dissector.c:1055 in the current version):
+
+		nhoff = skb_network_offset(skb);
+
+Therefore the culprit seems to be that the skb network offset is different
+between double-tagged packet received from the interface and single-tagged
+packet having its vlan tag pushed by TC.
+
+Lets look at the interesting points of the lifetime of the single/double
+tagged packets as they traverse our packet flow.
+
+Both of them will start at __netif_receive_skb_core where the first vlan
+tag will be stripped:
+
+	if (eth_type_vlan(skb->protocol)) {
+		skb = skb_vlan_untag(skb);
+		if (unlikely(!skb))
+			goto out;
+	}
+
+At this stage in double-tagged case skb->data points to the second vlan tag
+while in single-tagged case skb->data points to the network (eg. IP)
+header.
+
+Looking at TC vlan push action (net/sched/act_vlan.c) we have the following
+code at tcf_vlan_act (interesting points are in square brackets):
+
+	if (skb_at_tc_ingress(skb))
+[1]		skb_push_rcsum(skb, skb->mac_len);
+
+	....
+
+	case TCA_VLAN_ACT_PUSH:
+		err = skb_vlan_push(skb, p->tcfv_push_proto, p->tcfv_push_vid |
+				    (p->tcfv_push_prio << VLAN_PRIO_SHIFT),
+				    0);
+		if (err)
+			goto drop;
+		break;
+
+	....
+
+out:
+	if (skb_at_tc_ingress(skb))
+[3]		skb_pull_rcsum(skb, skb->mac_len);
+
+And skb_vlan_push (net/core/skbuff.c:6204) function does:
+
+		err = __vlan_insert_tag(skb, skb->vlan_proto,
+					skb_vlan_tag_get(skb));
+		if (err)
+			return err;
+
+		skb->protocol = skb->vlan_proto;
+[2]		skb->mac_len += VLAN_HLEN;
+
+in the case of pushing the second tag. Lets look at what happens with
+skb->data of the single-tagged packet at each of the above points:
+
+1. As a result of the skb_push_rcsum, skb->data is moved back to the start
+   of the packet.
+
+2. First VLAN tag is moved from the skb into packet buffer, skb->mac_len is
+   incremented, skb->data still points to the start of the packet.
+
+3. As a result of the skb_pull_rcsum, skb->data is moved forward by the
+   modified skb->mac_len, thus pointing to the network header again.
+
+Then __skb_flow_dissect will get confused by having double-tagged vlan
+packet with the skb->data at the network header.
+
+The solution for the bug is to preserve "skb->data at second vlan header"
+semantics in the skb_vlan_push function. We do this by manipulating
+skb->network_header rather than skb->mac_len. skb_vlan_push callers are
+updated to do skb_reset_mac_len.
+
+More about the patch series:
+
+* patch 1 fixes skb_vlan_push and the callers
+* patch 2 adds ingress tc_actions test
+* patch 3 adds egress tc_actions test
+
+Thanks,
+Boris.
+
+v4:
+    - s/skb_reset_mac_header/skb_reset_mac_len/ typo in act_vlan.c
+
+v3:
+    - rewrite to fix skb_vlan_push amending the callers
+    - fix ingress tc_actions test as suggested by Ido
+    - add egress tc_actions test
+
+v2:
+    - add test to tc_actions.sh
+
+Boris Sukholitko (3):
+  tc: adjust network header after 2nd vlan push
+  selftests: tc_actions: test ingress 2nd vlan push
+  selftests: tc_actions: test egress 2nd vlan push
+
+ net/core/filter.c                             |  1 +
+ net/core/skbuff.c                             |  2 +-
+ net/openvswitch/actions.c                     |  8 +++-
+ net/sched/act_vlan.c                          |  1 +
+ .../selftests/net/forwarding/tc_actions.sh    | 46 ++++++++++++++++++-
+ 5 files changed, 54 insertions(+), 4 deletions(-)
+
+-- 
+2.42.0
+
 
