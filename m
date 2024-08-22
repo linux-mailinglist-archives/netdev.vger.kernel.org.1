@@ -1,303 +1,153 @@
-Return-Path: <netdev+bounces-121063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1A5995B8A7
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:37:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507FF95B8B0
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:39:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E35D81C20F5D
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:37:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 062071F2147F
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:39:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 863E11CC14E;
-	Thu, 22 Aug 2024 14:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85A2F1CC149;
+	Thu, 22 Aug 2024 14:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Dc6p/5Kw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R+86kZaD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7641C943E
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 14:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8A21CBEB5;
+	Thu, 22 Aug 2024 14:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724337473; cv=none; b=kOKLZT6RGXPqkLdM39HP9lOriuPFZD52BGfaC7GJzndZ3uruJST4KOFFF5BSUxdHO1Xbr8LjRZXo6JEycj5aRZjiRbo5dy/7mI/+op486M1HvvmdiBAdrVqSd+E/K4LRSaJGO8DSYKbTdnF443wJfUQPidsIHbUoyzdRfCFCCC8=
+	t=1724337583; cv=none; b=OprI8RFmRO+KWciN9TZsBOzJiGBRNiw5ub8gHrHBP9Of0ppZRAhJZrtj9Qu4aBk4koe/Ls2D/Y/RqK2OTfE6gMAG2pPN3dlwD93dXFawo2H+FU+kwmIYvX2omhn3y1fr1oaTLtRb7F79mwIz61K8ey1GItKmEIFQPQAKhgxLAYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724337473; c=relaxed/simple;
-	bh=K/iU/g6l0igkow1JOZaDsLnHrDU+uC6StsWRBQp+jTQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rrm2EhbrhbaHHh4GBWBIy+fOweQ6wRaKaff5GhpxJWbIwH3MoNeL3/OEXpHnsPI5j/2RF4nbhPjxQLmO0e7c0QRLsXJgic/iyRp2zvY9ARd1dtVf0NONSqhx7GK2rBGoERDhRrMdA07KDefjfqsCUsTSxj3o0/yvaae9N1JaXeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Dc6p/5Kw; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2f3f163e379so13972171fa.3
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 07:37:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724337470; x=1724942270; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K6rRlivbA70V6yYRpa9fO76GA/Vkt/ypOIx6egRXZvw=;
-        b=Dc6p/5KwAXwD7JzsMNExkCX8JWmPGTX8wMfDzZ3I/pR5hAa81R+dIAkQSQEaJGfHQ8
-         83vIqaARLZ4I6CslpapzVWcYANHum58r3dyXux1Tg9INOk3GZ69Wp4bAIsksrQ0RrQ9M
-         x/Kvu2hRxrmopvVXVxlWBQjBH3tloJPUcpvsu4tgsrfYaUNMqALJYGNFJbOJ2RYo8wUb
-         POtLEv7aMxCtBoeG2HLoa4UWhGJIjwsE0A5HYqZVnJIQVjm5OlPeSju1/SQ9uDqMxvXn
-         ajF+vh1rv7ks7qrHl6aYABwDZWoeboa58eYG0h8ucWo62yllYs31gMANTz5FhKSAaQLq
-         I/aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724337470; x=1724942270;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K6rRlivbA70V6yYRpa9fO76GA/Vkt/ypOIx6egRXZvw=;
-        b=g/iNMkfo1venxMFVNeki8GAC/4vZQ8JYpCEyfdlVzYokHXriSeL6Qk5eJ8wPAh4A6R
-         VCkHCmRChW8zymdXdfTMEJWN1S8gfvkUTpaWYkSNQtbu0BERV4gaE9a4WMbqmuanw5Rq
-         Gv5Yc8fDr96VvDJa4niGpee86xNr2hznHkRIWKeU2OujyaVYGvkkL97q5bQWipZr00uU
-         vJC2FbxI06tatPB2/eV8qqs684+DUHEZ1VD9loyWn7sWMYGz+wnC+RMuKPEOT86wTBTi
-         32a7iY+MFRut6YxFW2FZrXwskQnjKlIxffsE+OYABNN5bhxltnJHfnTWjytSe5eN5Y8i
-         FhjA==
-X-Gm-Message-State: AOJu0YxsCXWZz6lIT/SxQv1H6r+vBdMIJBVUGhBMKYtn4RmgT5j/rv0N
-	MGA+bWLaXOk9zXfoBBtcIEdYsV5afIH7qr2LJGkhZG8YOORHtB4dS+Clc51YO54=
-X-Google-Smtp-Source: AGHT+IFj3aSYNP0nLcrfL9brV2tn65QQ1ilt1g5IPhiw6/OOitRwTB+Sde2sEPYqnmhuJ5kegpaAdw==
-X-Received: by 2002:a2e:7c13:0:b0:2f1:67de:b536 with SMTP id 38308e7fff4ca-2f405da95c7mr16767431fa.24.1724337469419;
-        Thu, 22 Aug 2024 07:37:49 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f2adc55sm127276066b.71.2024.08.22.07.37.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2024 07:37:48 -0700 (PDT)
-Date: Thu, 22 Aug 2024 16:37:47 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
-Subject: Re: [net-next PATCH v11 10/11] octeontx2-pf: Add devlink port support
-Message-ID: <ZsdNO2_Q9jTHLBEH@nanopsycho.orion>
-References: <20240822132031.29494-1-gakula@marvell.com>
- <20240822132031.29494-11-gakula@marvell.com>
+	s=arc-20240116; t=1724337583; c=relaxed/simple;
+	bh=wmFtbOTnt4AlHC8GjMEbHtWkPKNFq/oRHL+liev7MPw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IRs5oeJ1x3LPov7FiIT3VrvDFZcBBRIlBM+Y9ZhWh5R4o2g/IXycolYrG/APEppwCJHjB1Bp05Dp+ubtPAAKQbfUe8uChLoDcMzHZ2RZkNKnj488HHj9chiUUwEfF5Z8AGsJl/jag/5s0SSF6VilKARwYpsxPp3q+el5aDuvODI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R+86kZaD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BA81C32782;
+	Thu, 22 Aug 2024 14:39:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724337582;
+	bh=wmFtbOTnt4AlHC8GjMEbHtWkPKNFq/oRHL+liev7MPw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=R+86kZaDpeawGQ5YDqenKtTSXbo6f71Wf4IKNcqq8LGmGWqMuQ+G10KerjfRqcT+q
+	 8yMnxL0V3dG9HMpVZQ/RpwpHW/iSxndV70OTwLHJ55BEhy9SQ3l6rVn48jHUqGnxG3
+	 gFa9sMsHB2TsIK5Y/6DWPngacw+hjlsqDeJumDEZwBBWzaG2URf1wikqX3Ow6mtsTq
+	 ijgPNOTYlZBHgejL7FBC1YIAbBeIBtQpk1CUMijaO6cL7ce+9dlm8otSNJweJ1n4vg
+	 fORTPJ9qWCUPrkRI+l7TClC93vlFy9rPMa4vfW2+tFzomEwF2dG85qe1GUdIFmeOjK
+	 3pem4L6RmCoOQ==
+Message-ID: <d44d2e53-6684-4fe5-bcc3-60d387044b63@kernel.org>
+Date: Thu, 22 Aug 2024 16:39:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822132031.29494-11-gakula@marvell.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH -next] net: dsa: Simplify with scoped for each OF child
+ loop
+To: Jinjie Ruan <ruanjinjie@huawei.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240820065804.560603-1-ruanjinjie@huawei.com>
+ <20240821171817.3b935a9d@kernel.org>
+ <2d67e112-75a0-3111-3f3a-91e6a982652f@huawei.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <2d67e112-75a0-3111-3f3a-91e6a982652f@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Thu, Aug 22, 2024 at 03:20:30PM CEST, gakula@marvell.com wrote:
->Register devlink port for the rvu representors.
->
->Signed-off-by: Geetha sowjanya <gakula@marvell.com>
->Reviewed-by: Simon Horman <horms@kernel.org>
->---
-> .../ethernet/marvell/octeontx2.rst            | 39 ++++++++
-> .../net/ethernet/marvell/octeontx2/nic/rep.c  | 91 +++++++++++++++++++
-> .../net/ethernet/marvell/octeontx2/nic/rep.h  |  2 +
-> 3 files changed, 132 insertions(+)
->
->diff --git a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
->index 1132ae2d007c..33258cc18f45 100644
->--- a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
->+++ b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
->@@ -393,3 +393,42 @@ To remove the representors devices from the system. Change the device to legacy
->  - Change device to legacy mode::
+On 22/08/2024 04:07, Jinjie Ruan wrote:
 > 
-> 	# devlink dev eswitch set pci/0002:1c:00.0 mode legacy
->+
->+
->+RVU representors can be managed using devlink ports
->+(see :ref:`Documentation/networking/devlink/devlink-port.rst <devlink_port>`) interface.
->+
->+ - Show devlink ports of representors::
->+
->+	# devlink port
->+
->+Sample output::
->+
->+	# devlink port
->+	pci/0002:1c:00.0/0: type eth netdev pf1vf0rep flavour physical port 1 splittable false
->+	pci/0002:1c:00.0/1: type eth netdev pf1vf1rep flavour pcivf controller 0 pfnum 1 vfnum 1 external false splittable false
->+	pci/0002:1c:00.0/2: type eth netdev pf1vf2rep flavour pcivf controller 0 pfnum 1 vfnum 2 external false splittable false
->+	pci/0002:1c:00.0/3: type eth netdev pf1vf3rep flavour pcivf controller 0 pfnum 1 vfnum 3 external false splittable false
->+
->+Function attributes
->+===================
->+
->+The RVU representor support function attributes for representors.
->+Port function configuration of the representors are supported through devlink eswitch port.
->+
->+MAC address setup
->+-----------------
->+
->+RVU representor driver support devlink port function attr mechanism to setup MAC
->+address. (refer to Documentation/networking/devlink/devlink-port.rst)
->+
->+ - To setup MAC address for port 2::
->+
->+	# devlink port function set pci/0002:1c:00.0/2 hw_addr 5c:a1:1b:5e:43:11
->+
->+Sample output::
->+
->+	# devlink port show pci/0002:1c:00.0/2
->+	pci/0002:1c:00.0/2: type eth netdev pf1vf2rep flavour pcivf controller 0 pfnum 1 vfnum 2 external false splittable false
->+	function:
->+		hw_addr 5c:a1:1b:5e:43:11
->diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
->index 5f767b6e79c3..aab1784b5134 100644
->--- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
->+++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.c
->@@ -28,6 +28,90 @@ MODULE_DESCRIPTION(DRV_STRING);
-> MODULE_LICENSE("GPL");
-> MODULE_DEVICE_TABLE(pci, rvu_rep_id_table);
 > 
->+static int rvu_rep_dl_port_fn_hw_addr_get(struct devlink_port *port,
->+					  u8 *hw_addr, int *hw_addr_len,
->+					  struct netlink_ext_ack *extack)
->+{
->+	struct otx2_devlink *otx2_dl = devlink_priv(port->devlink);
->+	int rep_id = port->index;
->+	struct otx2_nic *priv;
->+	struct rep_dev *rep;
->+
->+	priv = otx2_dl->pfvf;
->+	rep = priv->reps[rep_id];
-
-struct rep_dev contains struct devlink_port. Use container_of to get it
-from port pointer.
-
-
->+	ether_addr_copy(hw_addr, rep->mac);
->+	*hw_addr_len = ETH_ALEN;
->+	return 0;
->+}
->+
->+static int rvu_rep_dl_port_fn_hw_addr_set(struct devlink_port *port,
->+					  const u8 *hw_addr, int hw_addr_len,
->+					  struct netlink_ext_ack *extack)
->+{
->+	struct otx2_devlink *otx2_dl = devlink_priv(port->devlink);
->+	int rep_id = port->index;
->+	struct otx2_nic *priv;
->+	struct rep_dev *rep;
->+
->+	priv = otx2_dl->pfvf;
->+	rep = priv->reps[rep_id];
->+	eth_hw_addr_set(rep->netdev, hw_addr);
->+	ether_addr_copy(rep->mac, hw_addr);
-
-You save the mac, yet you never use it. To be clear, this mac should be
-used for the actual VF. I believe you are missing that code.
-
-
->+	return 0;
->+}
->+
->+static const struct devlink_port_ops rvu_rep_dl_port_ops = {
->+	.port_fn_hw_addr_get = rvu_rep_dl_port_fn_hw_addr_get,
->+	.port_fn_hw_addr_set = rvu_rep_dl_port_fn_hw_addr_set,
->+};
->+
->+static void
->+rvu_rep_devlink_set_switch_id(struct otx2_nic *priv,
->+			      struct netdev_phys_item_id *ppid)
->+{
->+	struct pci_dev *pdev = priv->pdev;
->+	u64 id;
->+
->+	id = pci_get_dsn(pdev);
-
-Is physical port using this switch_id as well? If not, it should.
-
-
->+
->+	ppid->id_len = sizeof(id);
->+	put_unaligned_be64(id, &ppid->id);
->+}
->+
->+static void rvu_rep_devlink_port_unregister(struct rep_dev *rep)
->+{
->+	devlink_port_unregister(&rep->dl_port);
->+}
->+
->+static int rvu_rep_devlink_port_register(struct rep_dev *rep)
->+{
->+	struct devlink_port_attrs attrs = {};
->+	struct otx2_nic *priv = rep->mdev;
->+	struct devlink *dl = priv->dl->dl;
->+	int err;
->+
->+	if (!(rep->pcifunc & RVU_PFVF_FUNC_MASK)) {
->+		attrs.flavour = DEVLINK_PORT_FLAVOUR_PHYSICAL;
->+		attrs.phys.port_number = rvu_get_pf(rep->pcifunc);
->+	} else {
->+		attrs.flavour = DEVLINK_PORT_FLAVOUR_PCI_VF;
->+		attrs.pci_vf.pf = rvu_get_pf(rep->pcifunc);
->+		attrs.pci_vf.vf = rep->pcifunc & RVU_PFVF_FUNC_MASK;
->+	}
->+
->+	rvu_rep_devlink_set_switch_id(priv, &attrs.switch_id);
->+	devlink_port_attrs_set(&rep->dl_port, &attrs);
->+
->+	err = devl_port_register_with_ops(dl, &rep->dl_port, rep->rep_id,
->+					  &rvu_rep_dl_port_ops);
->+	if (err) {
->+		dev_err(rep->mdev->dev, "devlink_port_register failed: %d\n",
->+			err);
->+		return err;
->+	}
->+	return 0;
->+}
->+
-> static int rvu_rep_get_repid(struct otx2_nic *priv, u16 pcifunc)
-> {
-> 	int rep_id;
->@@ -339,6 +423,7 @@ void rvu_rep_destroy(struct otx2_nic *priv)
-> 	for (rep_id = 0; rep_id < priv->rep_cnt; rep_id++) {
-> 		rep = priv->reps[rep_id];
-> 		unregister_netdev(rep->netdev);
->+		rvu_rep_devlink_port_unregister(rep);
-> 		free_netdev(rep->netdev);
-> 	}
-> 	kfree(priv->reps);
->@@ -381,6 +466,11 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
-> 		snprintf(ndev->name, sizeof(ndev->name), "p%dv%drep",
-> 			 rvu_get_pf(pcifunc), (pcifunc & RVU_PFVF_FUNC_MASK));
+> On 2024/8/22 8:18, Jakub Kicinski wrote:
+>> On Tue, 20 Aug 2024 14:58:04 +0800 Jinjie Ruan wrote:
+>>> Use scoped for_each_available_child_of_node_scoped() when iterating over
+>>> device nodes to make code a bit simpler.
+>>
+>> Could you add more info here that confirms this works with gotos?
+>> I don't recall the details but I thought sometimes the scoped
+>> constructs don't do well with gotos. I checked 5 random uses
+>> of this loop and 4 of them didn't have gotos.
 > 
->+		err = rvu_rep_devlink_port_register(rep);
->+		if (err)
->+			goto exit;
->+
->+		SET_NETDEV_DEVLINK_PORT(ndev, &rep->dl_port);
-> 		eth_hw_addr_random(ndev);
-> 		err = register_netdev(ndev);
-> 		if (err) {
->@@ -402,6 +492,7 @@ int rvu_rep_create(struct otx2_nic *priv, struct netlink_ext_ack *extack)
-> 	while (--rep_id >= 0) {
-> 		rep = priv->reps[rep_id];
-> 		unregister_netdev(rep->netdev);
->+		rvu_rep_devlink_port_unregister(rep);
-> 		free_netdev(rep->netdev);
-> 	}
-> 	kfree(priv->reps);
->diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/rep.h b/drivers/net/ethernet/marvell/octeontx2/nic/rep.h
->index 0cefa482f83c..d81af376bf50 100644
->--- a/drivers/net/ethernet/marvell/octeontx2/nic/rep.h
->+++ b/drivers/net/ethernet/marvell/octeontx2/nic/rep.h
->@@ -34,10 +34,12 @@ struct rep_dev {
-> 	struct net_device *netdev;
-> 	struct rep_stats stats;
-> 	struct delayed_work stats_wrk;
->+	struct devlink_port dl_port;
-> 	u16 rep_id;
-> 	u16 pcifunc;
-> #define RVU_REP_VF_INITIALIZED		BIT_ULL(0)
-> 	u8 flags;
->+	u8	mac[ETH_ALEN];
-> };
+> Hi, Jakub
 > 
-> static inline bool otx2_rep_dev(struct pci_dev *pdev)
->-- 
->2.25.1
->
+>>From what I understand, for_each_available_child_of_node_scoped() is not
+> related to gotos, it only let the iterating child node self-declared and
+> automatic release, so the of_node_put(iterating_child_node) can be removed.
+> 
+> For example, the following use case has goto and use this macro:
+> 
+> Link:
+> https://lore.kernel.org/all/20240813-b4-cleanup-h-of-node-put-other-v1-6-cfb67323a95c@linaro.org/
+
+Jinjie,
+You started this after me, shortly after my series, taking the commit
+msgs and subjects, and even using my work as reference or explanation of
+your patches. Basically you just copy-paste. That's ok, thouogh, but you
+could at least Cc me to tell me that you are doing it to avoid
+duplication. That would be nice... And you could *try to* understand
+what you are doing, so you can answer to such concerns as Jakub raised.
+Otherwise how can we know that your code is correct?
+
+Jakub,
+Scoped uses in-place variable declarations, thus earlier jumps over it
+are not allowed. The code I was converting did not have such jumps, so
+was fine. Not sure if this is the case here, because Jinjie Ruan should
+have checked it and explained that it is safe.
+
+Best regards,
+Krzysztof
+
 
