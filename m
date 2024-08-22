@@ -1,154 +1,112 @@
-Return-Path: <netdev+bounces-120830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE80595AF4A
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:30:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE57995AF5E
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B55528178B
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:30:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91CCA1F22313
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:34:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA13146556;
-	Thu, 22 Aug 2024 07:30:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F221531D2;
+	Thu, 22 Aug 2024 07:34:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2C145674E;
-	Thu, 22 Aug 2024 07:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB04AA933;
+	Thu, 22 Aug 2024 07:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724311816; cv=none; b=dXVEmjC3VgaeY34MRtctEgbuIUclBsuiAYTUYEbsQpGiJFpDp7GqI5K46hrFMvxgAA5OaFQloPTttdRY8sZoW5TWj+uxJ7xNZfgq046adOvDWPpKs2XRGKNYjFtEHppG05H0lp+rD97WQw+FQaYoS7wXlvlUr42GW5/PdsUkrXA=
+	t=1724312043; cv=none; b=KSxg7SxUOWK1M273J7Ou8jexObbRXFhbv8N9T0wbzfbvdHOM7ZdOnOUe0G1aK3EskwahmJoxhQYwVTulPurqXKDYanwPRDsQYe+YGirxv3GJj8oUbblXeVnvZyNSBAItTL7JnhVYr3m0vJG8Ta/odmQ+0/qy1uI0SLNwbI4nb94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724311816; c=relaxed/simple;
-	bh=4CjlSWyxA7tku1VEoNRPy8MZ1JCP/xODpZZeLeKr+Fg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hw2FeSy0uh0T7ySxKYIkPPeIOoN4ggaIdoq6WZF5GdmNuDqRVD+lQxWqaAJtXmzYN/4b0GCQM22bCPGe1V7IGVA4dQd4g5d5tD1o/OIM3BqrwhCZkIkrjwct35ubQE120EKsJphAjFK7mCfSVTNtVChnkUJqXLxDCn9kSDI5n8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
-Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Thu, 22 Aug
- 2024 15:30:06 +0800
-Received: from mail.aspeedtech.com (192.168.10.10) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Thu, 22 Aug 2024 15:30:06 +0800
-From: Jacky Chou <jacky_chou@aspeedtech.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <jacky_chou@aspeedtech.com>,
-	<u.kleine-koenig@pengutronix.de>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH] net: ftgmac100: Ensure tx descriptor updates are visible
-Date: Thu, 22 Aug 2024 15:30:06 +0800
-Message-ID: <20240822073006.817173-1-jacky_chou@aspeedtech.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1724312043; c=relaxed/simple;
+	bh=L30NV2AcPLbkhFmH0b3ez67bhMd6a1pynzfPCQXulrg=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=I9nTB2BH/fCeg26w4AS9H7HPh/rDofCwUeb8984gySOoc9Xw9HGn3KiKcP4jCe4QqK1ILMfRFVYkdckX8KWKqm8C9P8ZmCmnIlc4jw9SILOJTtP6xOXTdGtiybF952W2judCbBWaqWDJgJiWRxHWMhPPk5x9rKjdENpjiCflIHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WqFLq4Cz0z2Cc9Z;
+	Thu, 22 Aug 2024 15:33:55 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 047EA140447;
+	Thu, 22 Aug 2024 15:33:59 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 22 Aug 2024 15:33:57 +0800
+Message-ID: <2a809cfe-c64c-4fbe-96e5-179d5cd27779@huawei.com>
+Date: Thu, 22 Aug 2024 15:33:57 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, Jakub Kicinski <kuba@kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
+	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
+	<libaihan@huawei.com>, <jdamato@fastly.com>, <horms@kernel.org>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V2 net-next 11/11] net: add is_valid_ether_addr check in
+ dev_set_mac_address
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20240820140154.137876-1-shaojijie@huawei.com>
+ <20240820140154.137876-12-shaojijie@huawei.com>
+ <20240820185507.4ee83dcc@kernel.org>
+ <7bc7a054-f180-444a-aac0-61997b43e5d6@huawei.com>
+ <5948f3f7-a43c-4238-82ff-2806a5ef5975@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <5948f3f7-a43c-4238-82ff-2806a5ef5975@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-The driver must ensure TX descriptor updates are visible
-before updating TX pointer and TX clear pointer.
 
-This resolves TX hangs observed on AST2600 when running
-iperf3.
+on 2024/8/21 20:15, Andrew Lunn wrote:
+> On Wed, Aug 21, 2024 at 02:04:01PM +0800, Jijie Shao wrote:
+>> on 2024/8/21 9:55, Jakub Kicinski wrote:
+>>> On Tue, 20 Aug 2024 22:01:54 +0800 Jijie Shao wrote:
+>>>> core need test the mac_addr not every driver need to do.
+>>>>
+>>>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>>>> ---
+>>>>    net/core/dev.c | 2 ++
+>>>>    1 file changed, 2 insertions(+)
+>>>>
+>>>> diff --git a/net/core/dev.c b/net/core/dev.c
+>>>> index e7260889d4cb..2e19712184bc 100644
+>>>> --- a/net/core/dev.c
+>>>> +++ b/net/core/dev.c
+>>>> @@ -9087,6 +9087,8 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+>>>>    		return -EOPNOTSUPP;
+>>>>    	if (sa->sa_family != dev->type)
+>>>>    		return -EINVAL;
+>>>> +	if (!is_valid_ether_addr(sa->sa_data))
+>>>> +		return -EADDRNOTAVAIL;
+>>> not every netdev is for an Ethernet device
+>> ok， this patch will be removed in v3.
+>> and the check will move to hibmcge driver.
+> No, you just need to use the correct function to perform the check.
+>
+> __dev_open() does:
+>
+>          if (ops->ndo_validate_addr)
+>                  ret = ops->ndo_validate_addr(dev);
+>
+> 	Andrew
 
-Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
----
- drivers/net/ethernet/faraday/ftgmac100.c | 26 ++++++++++++++++--------
- 1 file changed, 18 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 93862b027be0..9c521d0af7ac 100644
---- a/drivers/net/ethernet/faraday/ftgmac100.c
-+++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -582,7 +582,7 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
- 	(*processed)++;
- 	return true;
- 
-- drop:
-+drop:
- 	/* Clean rxdes0 (which resets own bit) */
- 	rxdes->rxdes0 = cpu_to_le32(status & priv->rxdes0_edorr_mask);
- 	priv->rx_pointer = ftgmac100_next_rx_pointer(priv, pointer);
-@@ -666,6 +666,11 @@ static bool ftgmac100_tx_complete_packet(struct ftgmac100 *priv)
- 	ftgmac100_free_tx_packet(priv, pointer, skb, txdes, ctl_stat);
- 	txdes->txdes0 = cpu_to_le32(ctl_stat & priv->txdes0_edotr_mask);
- 
-+	/* Ensure the descriptor config is visible before setting the tx
-+	 * pointer.
-+	 */
-+	smp_wmb();
-+
- 	priv->tx_clean_pointer = ftgmac100_next_tx_pointer(priv, pointer);
- 
- 	return true;
-@@ -819,6 +824,11 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
- 	dma_wmb();
- 	first->txdes0 = cpu_to_le32(f_ctl_stat);
- 
-+	/* Ensure the descriptor config is visible before setting the tx
-+	 * pointer.
-+	 */
-+	smp_wmb();
-+
- 	/* Update next TX pointer */
- 	priv->tx_pointer = pointer;
- 
-@@ -839,7 +849,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
- 
- 	return NETDEV_TX_OK;
- 
-- dma_err:
-+dma_err:
- 	if (net_ratelimit())
- 		netdev_err(netdev, "map tx fragment failed\n");
- 
-@@ -861,7 +871,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
- 	 * last fragment, so we know ftgmac100_free_tx_packet()
- 	 * hasn't freed the skb yet.
- 	 */
-- drop:
-+drop:
- 	/* Drop the packet */
- 	dev_kfree_skb_any(skb);
- 	netdev->stats.tx_dropped++;
-@@ -1354,7 +1364,7 @@ static void ftgmac100_reset(struct ftgmac100 *priv)
- 	ftgmac100_init_all(priv, true);
- 
- 	netdev_dbg(netdev, "Reset done !\n");
-- bail:
-+bail:
- 	if (priv->mii_bus)
- 		mutex_unlock(&priv->mii_bus->mdio_lock);
- 	if (netdev->phydev)
-@@ -1554,15 +1564,15 @@ static int ftgmac100_open(struct net_device *netdev)
- 
- 	return 0;
- 
-- err_ncsi:
-+err_ncsi:
- 	napi_disable(&priv->napi);
- 	netif_stop_queue(netdev);
-- err_alloc:
-+err_alloc:
- 	ftgmac100_free_buffers(priv);
- 	free_irq(netdev->irq, netdev);
-- err_irq:
-+err_irq:
- 	netif_napi_del(&priv->napi);
-- err_hw:
-+err_hw:
- 	iowrite32(0, priv->base + FTGMAC100_OFFSET_IER);
- 	ftgmac100_free_rings(priv);
- 	return err;
--- 
-2.25.1
+okay, it looks perfect!
+	
+	Jijie Shao
 
 
