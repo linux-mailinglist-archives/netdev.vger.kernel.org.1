@@ -1,154 +1,91 @@
-Return-Path: <netdev+bounces-120821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EA7695AE0A
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 08:52:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B44B95AE53
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 08:59:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF7C328184A
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 06:52:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28B85286047
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 06:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7DD1152790;
-	Thu, 22 Aug 2024 06:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60951139D05;
+	Thu, 22 Aug 2024 06:59:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JcZQelw1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iMh67uhm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43DC514E2D4;
-	Thu, 22 Aug 2024 06:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8F2433C0;
+	Thu, 22 Aug 2024 06:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724309521; cv=none; b=EfPJ5dfGrFb02qwDkBmjqtnMDln6Bptnm8hQi6JaW7ezrZrRetWf5+Xa+pbbPrgM1wY+RtwXNjdpQVeKuU8Xd+Dz2C0zQjFrxtWUcs+XykQOlcrJzD93ehlcnpqTn895goFymBj6cGa3CbCiZAq6R/gypv3ngNrPTa2/zM53rrw=
+	t=1724309979; cv=none; b=BMwauaxyGilNQOoWa0H+TKRiDOFZCP20JN7xCYUddELEnY9IQksaAlMX9tXSqOBcc1fqfXLb9Qr3+zUzJIsZK8eEXRtkzDQ8fSSG6mYRI7pKSDCEPGRuUaU9I7XHMyeyvtM9Kz1RA2Fe57+A3vqY2r8JXjC5Nl2BIkrCkWpWszY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724309521; c=relaxed/simple;
-	bh=e501kEiNqiZZzJQ3GqU/FHgxQXDWv6I7kR2Zf+I0Iuo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DHiUOixRSI7l0YmMqHrquSXqct6feyqpwOLcDwHOy4YMEcgkCXnwnD8WSxQGMtDStDGmjfJe+Rgp0SXju1IYkXxdlmcbJS2XvsgYbXrSMgx5bscfZbGCLwSgAcDHusEalXp7QjqJqpNwZueZv/FddKIUCZDsMppRfkPBsyLKg3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JcZQelw1; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724309520; x=1755845520;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=e501kEiNqiZZzJQ3GqU/FHgxQXDWv6I7kR2Zf+I0Iuo=;
-  b=JcZQelw1CtSvjouAr5P80Y7SB1r2krUM1GKfn2oYz6z71hDQG3nk5V3P
-   fnz7clHDRmZVOFDRDndmmbvaUVjT3ncR8WbEAMK05B61JGPtoCNi2UAbH
-   hRlD3naMMyD0iBMErjmijZScLcy+Tucyn1Bqy85O3RzoNJWDzmx9p5qm0
-   36C0RZLd6x053rkZGKf5zgOGdDSm4eKO5KfQPbhi3uRZNzKstgRvVWdQn
-   a+m1KuVs+PPlb9jLhKX+XfJ8WHMDpbnaIzPIgk9UobumeTc+aeV88K33G
-   1VwE3uJqJ1XJoZ8OfVkND3iMuGlXrGaMHjjf79EbOPMjYhC5g0KCRQIt5
-   A==;
-X-CSE-ConnectionGUID: GHn7RPzkSOWi606/XEf+bw==
-X-CSE-MsgGUID: oc16rxKxQmWGrevBOn+uiA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11171"; a="34087997"
-X-IronPort-AV: E=Sophos;i="6.10,166,1719903600"; 
-   d="scan'208";a="34087997"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Aug 2024 23:51:58 -0700
-X-CSE-ConnectionGUID: ZDUJXdY4R/6A2T/GAN1RVg==
-X-CSE-MsgGUID: KNPutsCyS5KvnBYqRnqL7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,166,1719903600"; 
-   d="scan'208";a="66227345"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 21 Aug 2024 23:51:55 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sh1fj-000CUG-1W;
-	Thu, 22 Aug 2024 06:51:51 +0000
-Date: Thu, 22 Aug 2024 14:51:32 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Golle <daniel@makrotopia.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Robert Marko <robimarko@gmail.com>,
-	Chad Monroe <chad.monroe@adtran.com>,
-	John Crispin <john@phrozen.org>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: phy: aquantia: allow forcing order of
- MDI pairs
-Message-ID: <202408221406.WtGcNGxX-lkp@intel.com>
-References: <ed46220cc4c52d630fc481c8148fc749242c368d.1724244281.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1724309979; c=relaxed/simple;
+	bh=2qZ/xyt22ragi8wSuwhm2UcSOKI5NzMeXCDrpL6eQzk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=WCnnwAUpKgopoqDW/wKrL5E4cJzvC18XWbQDP9D5J6vtz/dFlDHzFyuyjGGm3qJ34pS0OtfVA+1081r83sR2LA8MDWwe7pi0VOyeDViS8y3AcSbYlpOqua/Y0qtcYAYzqJLv/no0pukbZzVx3HdFoEQLQw9qu6KCaBKO4XppCBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iMh67uhm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F87FC4AF09;
+	Thu, 22 Aug 2024 06:59:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724309979;
+	bh=2qZ/xyt22ragi8wSuwhm2UcSOKI5NzMeXCDrpL6eQzk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=iMh67uhmlpaxip8cyftA1iQu6RPl2Olb8RZpWNLJdLaBvntZ8a8H4KjZ8q967Rsnw
+	 CdzHGAZfJLP/azhbB22yMStrbcD44xuaKUcLOrxHI0/+S1oSyjGz4ZAkp0nREq+l+j
+	 TFBKhurOfYNaA/7cWGJeEtJ2eeTJ+ASkzaFHY5GuINWVEx0RuK9EaJQlfY7YyQtKV1
+	 Jdzdu3Pvq+0dqPDePDshOFOaEmcfVENimeBsPLcbtHP3D64UXG6jM7a3VlYxilXEpL
+	 CmLtZypcBJxC51/T0TaL8DsJDeuH+eZniQp0YvLBZwajWi0nTzQf9YvKiLOqaohj7o
+	 Kt1jm49IV7qtA==
+From: Kalle Valo <kvalo@kernel.org>
+To: Yu Jiaoliang <yujiaoliang@vivo.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,  "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  opensource.kernel@vivo.com
+Subject: Re: [PATCH v3] wifi: cfg80211: Use kmemdup_array instead of kmemdup
+ for multiple allocation
+References: <20240822024242.1203161-1-yujiaoliang@vivo.com>
+Date: Thu, 22 Aug 2024 09:59:35 +0300
+In-Reply-To: <20240822024242.1203161-1-yujiaoliang@vivo.com> (Yu Jiaoliang's
+	message of "Thu, 22 Aug 2024 10:42:42 +0800")
+Message-ID: <871q2hgi08.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed46220cc4c52d630fc481c8148fc749242c368d.1724244281.git.daniel@makrotopia.org>
+Content-Type: text/plain
 
-Hi Daniel,
+Yu Jiaoliang <yujiaoliang@vivo.com> writes:
 
-kernel test robot noticed the following build warnings:
+> Let the kememdup_array() take care about multiplication and possible
+> overflows.
+>
+> ---
+> v2:
+> -Change sizeof(limits[0]) to sizeof(*limits)
+> -Fix title prefix
+>
+> v3:
+> -Fix R-b tag
+> -Leave --- above this information
+>
+> Signed-off-by: Yu Jiaoliang <yujiaoliang@vivo.com>
+> Reviewed-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/net-phy-aquantia-allow-forcing-order-of-MDI-pairs/20240821-210717
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/ed46220cc4c52d630fc481c8148fc749242c368d.1724244281.git.daniel%40makrotopia.org
-patch subject: [PATCH net-next 2/2] net: phy: aquantia: allow forcing order of MDI pairs
-config: x86_64-randconfig-123-20240822 (https://download.01.org/0day-ci/archive/20240822/202408221406.WtGcNGxX-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240822/202408221406.WtGcNGxX-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408221406.WtGcNGxX-lkp@intel.com/
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/net/phy/aquantia/aquantia_main.c:483:5: sparse: sparse: symbol 'aqr107_config_mdi' was not declared. Should it be static?
-   drivers/net/phy/aquantia/aquantia_main.c: note: in included file (through include/linux/mmzone.h, include/linux/gfp.h, include/linux/umh.h, include/linux/kmod.h, ...):
-   include/linux/page-flags.h:235:46: sparse: sparse: self-comparison always evaluates to false
-   include/linux/page-flags.h:235:46: sparse: sparse: self-comparison always evaluates to false
-
-vim +/aqr107_config_mdi +483 drivers/net/phy/aquantia/aquantia_main.c
-
-   482	
- > 483	int aqr107_config_mdi(struct phy_device *phydev)
-   484	{
-   485		struct device_node *np = phydev->mdio.dev.of_node;
-   486		bool force_normal, force_reverse;
-   487	
-   488		force_normal = of_property_read_bool(np, "marvell,force-mdi-order-normal");
-   489		force_reverse = of_property_read_bool(np, "marvell,force-mdi-order-reverse");
-   490	
-   491		if (force_normal && force_reverse)
-   492			return -EINVAL;
-   493	
-   494		if (force_normal)
-   495			return phy_modify_mmd(phydev, MDIO_MMD_PMAPMD, PMAPMD_RSVD_VEND_PROV,
-   496					      PMAPMD_RSVD_VEND_PROV_MDI_CONF,
-   497					      PMAPMD_RSVD_VEND_PROV_MDI_FORCE);
-   498	
-   499		if (force_reverse)
-   500			return phy_modify_mmd(phydev, MDIO_MMD_PMAPMD, PMAPMD_RSVD_VEND_PROV,
-   501					      PMAPMD_RSVD_VEND_PROV_MDI_CONF,
-   502					      PMAPMD_RSVD_VEND_PROV_MDI_REVERSE |
-   503					      PMAPMD_RSVD_VEND_PROV_MDI_FORCE);
-   504	
-   505		return 0;
-   506	}
-   507	
+Now Signed-off-by and Reviewed-by are in the wrong location. Please
+carefully read the wiki page below how to submit patches.
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
