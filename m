@@ -1,129 +1,153 @@
-Return-Path: <netdev+bounces-121127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 211A895BE09
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 20:11:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2869595BE2A
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 20:22:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCEAE1F25C98
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 18:11:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5AD2285BBD
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 18:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846951CFEA0;
-	Thu, 22 Aug 2024 18:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F4B1D1725;
+	Thu, 22 Aug 2024 18:21:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jp6t6cTU"
+	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="BjZgmJnz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2443A1CF286;
-	Thu, 22 Aug 2024 18:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3133C1D0DCD
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 18:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724350301; cv=none; b=q3tssSQmVjmcNPU6TSxEnyxgWkBwo7hj0ceCynWiCmWFImJrde835wD4/msDMcDA5C+FZm7kf4UMc+r+aFrgQfq2OxwECAd3jHJG24Rt2EZQPXYcXkOth3ZdzEea1sf4FM/2kL+x9xiAhcxQMf1zX4unhrTwgWqTjYQva/QC1gg=
+	t=1724350878; cv=none; b=hMO4+zqNarPEF7NCKCBMQtQztPIz2wdtuOzhtZx2gMJSmLmSukhvDibAmGG9e6A1JQFwKtFaZ80llL20FEm/fb67uvZdbqB27zWzP901N258kzecK3fHRbsgZt7nptsTQy89X5tKSdHQG02oiTICorLhls5Nu0Y8RSZuTvFUDow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724350301; c=relaxed/simple;
-	bh=A05D2Gc05qT4V1eccDLiffdblAb+LV32m8sUgyon084=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KJpx5F/ceEqV8Q3pEpAqlXeVjhTNp2uZklinT4HbJC6eIYD7/ATuMTPeNz35xCzEEYpzoCMYs5HkOgoyvwVoYKJvnQmh25TqNte1XKRL6BfswMvM50Mf7TUJUx/h+M+XqiHR3zCh2igTUTN0J122DGzKCc+y+0n9cvBgYwXr680=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jp6t6cTU; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20223b5c1c0so10381545ad.2;
-        Thu, 22 Aug 2024 11:11:39 -0700 (PDT)
+	s=arc-20240116; t=1724350878; c=relaxed/simple;
+	bh=RLs+TgOeDB9U+OeJ5ILJJE/1qQupOxoL4NtsHLcUl2s=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=Cz3lpDS3EgRqWEUSBNxWxyT4BOab7kOAQwhYVfV1WerUV303e+fjxAImZxBR8w1sJDBTTU6swlvrlGq2rv/d5tBfsgJjoEevIz65X0cvx1PG9G0w1qdF2R1umeqHPLm5IgvQeFqt8WjktH9ZMaE6xiHhdt02by+OC0pvVjVVgiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com; spf=pass smtp.mailfrom=digitalocean.com; dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b=BjZgmJnz; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digitalocean.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6aab656687cso9442657b3.1
+        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 11:21:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724350299; x=1724955099; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DNG67etRpmbFoR543m1YIG0LZE60EP8XIWtrKthQBgo=;
-        b=jp6t6cTUWDBwJjWLHy7RH41/ia/5k8KcxOk9el4fLVUPz9WKQE0p1Vi2AUv/UShwUc
-         iq/EG/yQIU0XCtBuQbOSLcMdHboDq+3xgLH9kKcz4PVuYB+JCgbvSOsSP7PUPFP5EC+L
-         q1peqak/zqVRT6GD0+7kLHF8HBeEszd3+1NRb2tVR0g0rwL9Lnu53D6womT5ipfrH/B5
-         SokhKdDCdJis8PRw6mk3WqA0UMXQAwautFT0y4gI48tGF84MUc0e6cA0vZ7R8+PqoDk6
-         zBgoxnho3YEu/0dG0IDPs5RJMzJ2oQ8xlDA/IEHdEaMrCw65JYuVrdWO5HCg/X5oL5tx
-         8Xmg==
+        d=digitalocean.com; s=google; t=1724350876; x=1724955676; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RLs+TgOeDB9U+OeJ5ILJJE/1qQupOxoL4NtsHLcUl2s=;
+        b=BjZgmJnzgKmTy9uPpQxTpyyohGj/7FztpcBZoNI+XvVk1sYuQnCNZ/jtDlz8wGECdB
+         9yeSLdZWvtkStppTav2cv1269PQ8dvT42o+OUC/zlQ4TruNwNMxgrSlYrFoN7lPeQYwC
+         +s0SmlGzwisHwmaEDV62XgPl4hedgsKL5Xaz8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724350299; x=1724955099;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DNG67etRpmbFoR543m1YIG0LZE60EP8XIWtrKthQBgo=;
-        b=jVOxkWKg9ShH/+9F6yWoJErrvJ9if+2kI+TuCTkPg2ahJwcy2GGdl9ioqRSnr4uQlX
-         0GpYMlW77S15U0TfatTGez3q5SfUHTsxR5Mn5DKr4zXwY1yq/wZhrXa+0VnMOCx6jiB5
-         QNX7OqgO4S1sGFNLrl31jEsvrLq5hmgwR9u56Q0ARPe180G1vyLK5qeVqWKhWZyCtUi+
-         TThpdMh1kPvPSdM407PK5fBxlIcVjKw4GKpVwGgVEVx7IIR8Dg8oss7Agb0HWCVkWXBh
-         wCdugwv9D6gfS/9qGI+USqVp5crbWf5FbTPqByUvqP2OZ0woufSANSYMTa85s5/xLTRI
-         tX2g==
-X-Forwarded-Encrypted: i=1; AJvYcCU5ZXMZg6tErNwtrO2bCqoAREYd4D/nXt/FW9NTM5CM3+3dGqLz6vFkAYGFl8k/erEpWp+KXayP/Ny20FA=@vger.kernel.org, AJvYcCVFyXQGlCxYrEBgDnAtPpXPZU+K/j+i6A/W02i3uW1wk8D+cV0KQ115zN9k4Dymk4PBC19mEMR9@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoAf1MkaJEcWrgbTwtX4MoX2U7VaHGEWDIqmSjWLlvQ8uRpTdL
-	iBdvgRjRsJGJlUOj/740O6aQcZ2uNjQ57pTDI4cWBSFvhQV7Dm3m
-X-Google-Smtp-Source: AGHT+IEsv5bpxwIHa8vqXEhWiIUlfLxE0wILbUZew8Lm3s6hLcp/D+7eE72ll9aRakt9he4VallMUg==
-X-Received: by 2002:a17:902:f98b:b0:1fd:9105:7dd3 with SMTP id d9443c01a7336-203681d8e0emr53955695ad.64.1724350299146;
-        Thu, 22 Aug 2024 11:11:39 -0700 (PDT)
-Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385580831sm15450765ad.76.2024.08.22.11.11.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2024 11:11:38 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: wei.liu@kernel.org,
-	paul@xen.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	madhuparnabhowmik04@gmail.com,
-	xen-devel@lists.xenproject.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH net] net/xen-netback: prevent UAF in xenvif_flush_hash()
-Date: Fri, 23 Aug 2024 03:11:09 +0900
-Message-Id: <20240822181109.2577354-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1724350876; x=1724955676;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RLs+TgOeDB9U+OeJ5ILJJE/1qQupOxoL4NtsHLcUl2s=;
+        b=CgIZOk7Xsor11hPyohsv51uEgILQi+E/zFdTkqoJZ+7iaN0hUu9qvy1+5xz3TyhTti
+         5RA6dlkToEc2zdYjnBANgu8VGnbb/68/J4S59PUwr2SABAG/Z4Su3H4mMfVfRLCvCoza
+         ERko37e2hjIfI37G69M73bRxdxfpsb0fEVhDjbnNsWQ8XTa3ilcYs6mwl8GzefCqzbAi
+         bgBhNGakxddeU+8+4QexkQQ7LtuN/Rv03bHGZDlUhkcmamuOY4wPzjCiBRX1gtVePRno
+         fWG7/WIchQzZmcLsXGDhj+luLDPEsVFVcdvPXVjURkaPg1enUo6Zpp7f/eRUl3SLQONH
+         seaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXB03n0ZmyUQVYOhqcdQwxeMhiRmAtdYzVVDAnp5HCdhfzezdg0V/XcxQUppQk+gt0Cxw4lZEE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXsJThzb/NxU5ZriISU9wJWQMeI3lHe2e8yxdThhHbs1TlwVVO
+	TmGvzKuUZvVVfpo/X4mDlEh80UkRLVYSFt7CN6s5yZIGk+rv6Bsa296EuiAF5GJvlC75+L9o4P0
+	Xw8hvYg==
+X-Google-Smtp-Source: AGHT+IHtXIMIiSwuBpmYLdcwUNBMd26Nuu8pfXN1VwE1UCqgTVayCXIzfx3aHHiMJ03T6ZoVnLerIw==
+X-Received: by 2002:a05:690c:6d8c:b0:665:71a4:21ac with SMTP id 00721157ae682-6c303cf699fmr39887947b3.10.1724350876111;
+        Thu, 22 Aug 2024 11:21:16 -0700 (PDT)
+Received: from ?IPV6:2603:8080:7400:36da:45f:f211:3a7c:9377? ([2603:8080:7400:36da:45f:f211:3a7c:9377])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6c39a7525bdsm2992047b3.31.2024.08.22.11.21.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Aug 2024 11:21:15 -0700 (PDT)
+Message-ID: <4f4572c8-1d8c-4ec6-96a1-fb74848475af@digitalocean.com>
+Date: Thu, 22 Aug 2024 13:21:13 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: virtualization@lists.linux-foundation.org, mst@redhat.com,
+ jasowang@redhat.com
+From: Carlos Bilbao <cbilbao@digitalocean.com>
+Subject: [RFC] vDPA: Trying to make sense of config data
+Cc: kvm@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-During the list_for_each_entry_rcu iteration call of xenvif_flush_hash, 
-kfree_rcu does not exist inside the rcu read critical section, so if 
-kfree_rcu is called when the rcu grace period ends during the iteration, 
-UAF occurs when accessing head->next after the entry becomes free.
+Hello folks,
 
-Therefore, to solve this, you need to change it to list_for_each_entry_safe.
+I'm using the code below to retrieve configuration data for my vDPA file
+via ioctl. I get as output:
 
-Fixes: f3265971ded9 ("net: xen-netback: hash.c: Use built-in RCU list checking")
-Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+Configuration data (24 bytes):
+5a c3 5f 68 48 a9 01 00 08 00 dc 05 00 00 00 00
+00 00 00 00 00 00 00 00
+ASCII representation:
+Z._hH...................
+
+Could a good Samaritan point me in the right direction for the docs I need
+to understand these values and convert them to a human-readable format?
+hank you in advance!
+
+Regards,
+Carlos
+
 ---
- drivers/net/xen-netback/hash.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/xen-netback/hash.c b/drivers/net/xen-netback/hash.c
-index ff96f22648ef..45ddce35f6d2 100644
---- a/drivers/net/xen-netback/hash.c
-+++ b/drivers/net/xen-netback/hash.c
-@@ -95,7 +95,7 @@ static u32 xenvif_new_hash(struct xenvif *vif, const u8 *data,
- 
- static void xenvif_flush_hash(struct xenvif *vif)
- {
--	struct xenvif_hash_cache_entry *entry;
-+	struct xenvif_hash_cache_entry *entry, *n;
- 	unsigned long flags;
- 
- 	if (xenvif_hash_cache_size == 0)
-@@ -103,8 +103,7 @@ static void xenvif_flush_hash(struct xenvif *vif)
- 
- 	spin_lock_irqsave(&vif->hash.cache.lock, flags);
- 
--	list_for_each_entry_rcu(entry, &vif->hash.cache.list, link,
--				lockdep_is_held(&vif->hash.cache.lock)) {
-+	list_for_each_entry_safe(entry, n, &vif->hash.cache.list, link) {
- 		list_del_rcu(&entry->link);
- 		vif->hash.cache.count--;
- 		kfree_rcu(entry, rcu);
---
+void check_config(int fd) {
+
+    uint32_t size;
+    struct vhost_vdpa_config *config;
+    uint8_t *buf;
+
+    if (ioctl(fd, VHOST_VDPA_GET_CONFIG_SIZE, &size) < 0) {
+        perror("ioctl failed");
+        return;
+    }
+
+    config = malloc(sizeof(struct vhost_vdpa_config) + size);
+    if (!config) {
+        perror("malloc failed");
+        return;
+    }
+
+    memset(config, 0, sizeof(struct vhost_vdpa_config) + size);
+    config->len = size;
+    config->off = 0;
+
+    buf = config->buf;
+
+    if (ioctl(fd, VHOST_VDPA_GET_CONFIG, config) < 0) {
+        perror("ioctl failed");
+    } else {
+        printf("Configuration data (%u bytes):\n", size);
+
+        /* Print the data in a human-readable format */
+        for (unsigned int i = 0; i < size; i++) {
+            if (i % 16 == 0 && i != 0) printf("\n");
+            printf("%02x ", buf[i]);
+        }
+        printf("\n");
+
+        printf("ASCII representation:\n");
+        for (unsigned int i = 0; i < size; i++) {
+            if (buf[i] >= 32 && buf[i] <= 126) {
+                printf("%c", buf[i]);
+            } else {
+                printf(".");
+            }
+        }
+        printf("\n");
+    }
+
+    free(config);
+}
 
