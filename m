@@ -1,199 +1,208 @@
-Return-Path: <netdev+bounces-121162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C381F95BFDF
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 22:46:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0EFB95BFE7
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 22:46:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 539A81F249B5
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 20:46:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53E2DB233EC
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 20:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 470821D1734;
-	Thu, 22 Aug 2024 20:44:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1A61D1756;
+	Thu, 22 Aug 2024 20:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="gU67GFC1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IuJY+LBR"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2055.outbound.protection.outlook.com [40.107.237.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22E91D1728;
-	Thu, 22 Aug 2024 20:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.55
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724359441; cv=fail; b=FhVpVsJhcLBv6GCQN2NID+zcpkrVVS01vr1OgelSO/G+i8U8BdJusUspqwzYeN0zFxpuMx6l8GTinlz1jzDsuOWBgA9j2OOL2F7po8LS7q2nf/Ip8wAHx8nZyynjzsQB2/n6i4SnVVScwsW6cqoNH18JsiC5JVhnxqwbs+Rj+Mw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724359441; c=relaxed/simple;
-	bh=k0CMdfeVPacNL41VrFyrAgKKGSdNVISUtHCOPmVvLdw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oCPHaxEs3I+5lChOWo1T2ktF3MDeAsFihkkzQU/xDnBnBb/MO9BOQl7PY2f6a7iMXsENwsdten41R7le2y8JtLRhpddw4M5Z2uxiBMVoUtbd699kdFGZKUEg+PC8yxKCA66VdOY8KnFI3uumdexE+rP5+3VQvsWK3sSncqEPPVQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=gU67GFC1; arc=fail smtp.client-ip=40.107.237.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LhP7owSuIfZDV7QrBsqTRPsbiC88QunJOinF0qPBkSEQJyhxOSMNYs/nRjJrzULb8eYcKR/hr63nOh9pjPUMh4DdbAg2WVS0iXFx7YD5R3EBD9swrSCrNUp6ZO9GR5IHWk41naZB91rhrtPS3W46Vyt/Ag9HZjTWR3q25qH1Jz2tQIFldZLE1hg1h4vkdCGMCyHEWMzkzgM0ejlca5+WNX3Ri75IueH96RI/Y+J2XkD9u9jmQQmnNRH8wVo0rgH0TUMSFTzxveWSlbpP8JySpJKZECmw9qi/6CtUtmOna+NFHsqUWFLvWGSuMgeByGLczS27zLaQGO5bY6IAo4o8LQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EwHk0OBuSEKgHsoLxc5/ykm35uLmgtEAzk4cXg1Kyv4=;
- b=EkUWe2BnfA02emWJoLEfTPPPEqRL0SlCUUp406yVEk+ZX3v6Dc1Fw2l9jBITy0BeXbQs0t9hBBQCAWvBlxh6MnNxmyuD4h86VSksQr6YFm+z1veTBIZJRPizMU6nhQ2ovKYwKjZhyRe16yCalALtxwrUnBv1SKm59JhLgcMJqvOjZ8B0A0YEFwuxHhcj/sQRACJQOKkxaHRw9RzM7ar5kjCKQV8aJvmIvY9MEMj50/R0nJrt2ehr2nZ0UE95LEFY3ON5cf8CIaXtjY5ccpC4fCliqM+FGmLcKZBHuhw8LUe1VXObMGD3TtQbfjwcgFIIWBqGqnazhfgAvfEowi00iQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EwHk0OBuSEKgHsoLxc5/ykm35uLmgtEAzk4cXg1Kyv4=;
- b=gU67GFC1YuJAaqhLvSF7ar0f+lnUsMTbCMSBp6RQzDjLLrC8uwNJcZaZMPzXbqD7w/JsEiLjdbl1gOzPnAcV8VnLTdV0w7GEWEPoDQhCCA0Xya6vec8taLHEGZkgDIs/nPYlSjE/wrj5Wh0BSnCeLDCPfATMWagvxZNyJ81DrQY=
-Received: from BYAPR03CA0024.namprd03.prod.outlook.com (2603:10b6:a02:a8::37)
- by PH7PR12MB9101.namprd12.prod.outlook.com (2603:10b6:510:2f9::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.19; Thu, 22 Aug
- 2024 20:43:47 +0000
-Received: from CO1PEPF000075F4.namprd03.prod.outlook.com
- (2603:10b6:a02:a8:cafe::2e) by BYAPR03CA0024.outlook.office365.com
- (2603:10b6:a02:a8::37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.19 via Frontend
- Transport; Thu, 22 Aug 2024 20:43:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000075F4.mail.protection.outlook.com (10.167.249.43) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7897.11 via Frontend Transport; Thu, 22 Aug 2024 20:43:46 +0000
-Received: from weiserver.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 22 Aug
- 2024 15:43:44 -0500
-From: Wei Huang <wei.huang2@amd.com>
-To: <linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <Jonathan.Cameron@Huawei.com>, <helgaas@kernel.org>, <corbet@lwn.net>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <alex.williamson@redhat.com>, <gospo@broadcom.com>,
-	<michael.chan@broadcom.com>, <ajit.khaparde@broadcom.com>,
-	<somnath.kotur@broadcom.com>, <andrew.gospodarek@broadcom.com>,
-	<manoj.panicker2@amd.com>, <Eric.VanTassell@amd.com>, <wei.huang2@amd.com>,
-	<vadim.fedorenko@linux.dev>, <horms@kernel.org>, <bagasdotme@gmail.com>,
-	<bhelgaas@google.com>, <lukas@wunner.de>, <paul.e.luse@intel.com>,
-	<jing2.liu@intel.com>
-Subject: [PATCH V4 12/12] bnxt_en: Pass NQ ID to the FW when allocating RX/RX AGG rings
-Date: Thu, 22 Aug 2024 15:41:20 -0500
-Message-ID: <20240822204120.3634-13-wei.huang2@amd.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240822204120.3634-1-wei.huang2@amd.com>
-References: <20240822204120.3634-1-wei.huang2@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3E713AA2E;
+	Thu, 22 Aug 2024 20:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724359556; cv=none; b=WuvMT/GURQuusj5k/Tnk6ajdmZmZAhDqbwxxGi71TDGKieo1KRuWE219xiTIO/zN+5r6rfjyYS9dQ4JXgxGNcwEwMWzW3UVP3fSpahytzxj6wW6PbrTQfDq4GuLpTnNAhFB2RGn/jrJ36Imay6cNF0ryGEbf43zNvo3gcP2MMSI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724359556; c=relaxed/simple;
+	bh=4X4eXD1J6KuR99w3hqgsl01Ywx/0FiL8cRJGyD1iOto=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=paMp6UAFeTwFc/ZFJ+urtNN6Nk9Opq3QL0HcuQcgLyJICyCLb5J4kL7HedkpeQyuPT9s6BfAtLOqhiF9hYpyC1vYd2vqi/qNG3typrN5/uDiFM3ivsmVElL5DH1HjMKxb/mTwls1LUxfYp2ScplhK9azC2w/L8xTlQCHTxqVsiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IuJY+LBR; arc=none smtp.client-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-709428a9469so1071199a34.3;
+        Thu, 22 Aug 2024 13:45:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724359553; x=1724964353; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3KalSChFzh47JfE4JuYlfPUsBnlMCnoElRFYPYzng2A=;
+        b=IuJY+LBRhjPfy7zc0njrclPx2pWlHZBqANV8mDLDw8RAt7LWQJQYTvzISUh2i+zJ/u
+         BZEyre7q1FM6V7xcng7hFOG7Dzlp1BaZVXjE/qljOCfRGeE07mmCqH+mz+8mS8+QXVhP
+         z7TkKXZAJocdAZZuPBlrgdlj5r0+Qe3rhxlFmhrxDvj51MB9vKmhd36QQuOU271z4CwA
+         NPSxbIzNwtdy8OsA0BeaQ174IywBRPsmXdIUeOlK7L9txQeTf4evo0H8QJtD5uMSZ/a8
+         YMEB1eKMs9D65qwNtTPM30Fxac/SUY6y1PybiE1X+bJb9SncPyeeDKqMZkwIC+0pJ96L
+         KFfQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724359553; x=1724964353;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3KalSChFzh47JfE4JuYlfPUsBnlMCnoElRFYPYzng2A=;
+        b=Er2rS6n/2i0SL8BJlw+VfX1qCBAQAs8bkZ8vgu7o2UaAxbia6sStitqN9ZFXWEZ+lb
+         /Mu7tayQ+S0lmyO1xUKBM09hEX1SMrgihu7VEIzvj0J4e+mIoCXXwra7fXxD8SDj5viy
+         wN3G+EqY55ShCgvj3jFgVvmkEd/C2UovubI2+dZICAV6+JLTTNsEMjC81hvXoMZidrYw
+         5mTjTk+/MaPDtc6zAbnpxBWFxLxOpscWZ3t5pqMc6fAAsNyNwZV1s71unz/+A/mq1G7C
+         VzQTrFn+0tfi1F8dH3b4vpEmy3S7mlNewBcz8yY7yUKLuGQdjUPZoQ1VQx8oLhCJyrhw
+         42cg==
+X-Forwarded-Encrypted: i=1; AJvYcCWdE/XQOfMXM9/OhGZuaxqM6Vcu3Mlzh4FB7Vk5mDZNtQYLaAb8XhdK5V15HvrVH4AFvuE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx063rVbIk3jsRApmyYTUJr5wh60zX3aDDYsmbLBD/Y3SEGhDiG
+	oX7YHnjvpNR5IotG5xXnmFeWswWuUmm3iNFu10g8uW5+CW5gLfMd
+X-Google-Smtp-Source: AGHT+IEWUVdkYJ0EQvahLyXPTA9UN2T2iNqB7mW6aA1xfXsnhpC7Ic/1nteElNRMMtuaS5SSe96EYg==
+X-Received: by 2002:a05:6808:1990:b0:3d9:b33e:d3ef with SMTP id 5614622812f47-3de2a87135emr82165b6e.3.1724359553318;
+        Thu, 22 Aug 2024 13:45:53 -0700 (PDT)
+Received: from localhost ([98.97.38.69])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7cd9ad55fe9sm1760015a12.60.2024.08.22.13.45.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Aug 2024 13:45:52 -0700 (PDT)
+Date: Thu, 22 Aug 2024 13:45:51 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ Cong Wang <cong.wang@bytedance.com>, 
+ syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Jakub Sitnicki <jakub@cloudflare.com>
+Message-ID: <66c7a37fd0270_1b1420837@john.notmuch>
+In-Reply-To: <ZsaLFVB0HyQfXBXy@pop-os.localdomain>
+References: <20240821030744.320934-1-xiyou.wangcong@gmail.com>
+ <20240821145533.GA2164@kernel.org>
+ <ZsaLFVB0HyQfXBXy@pop-os.localdomain>
+Subject: Re: [Patch bpf] tcp_bpf: fix return value of tcp_bpf_sendmsg()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075F4:EE_|PH7PR12MB9101:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5f30e823-22fc-42f8-2ebf-08dcc2eb1ed2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Jc0/Ca1j0zxQoyJXHrVMgqC8vv7Mw/7kLqHlnAKhHvYyX0HyagBeCM50x5b2?=
- =?us-ascii?Q?AfmIl58js+3iI00V1owMyPm+CPMye1R6X10dhWS3LDJVc/IKZeS2yVGVNVbZ?=
- =?us-ascii?Q?hP0O4dFtXgJGVX/mZMPz4iIDXD10vu/VJYbIaq3OmYvQBEhDywhHxJsH8npi?=
- =?us-ascii?Q?LSpbAHyEm8PD7M1ONLLK1rZb3xInygQ+83kNMAXbmphHOywo6ngA+wrxmYb2?=
- =?us-ascii?Q?toZWzvmcVEMcAvKgfaPIeUmWy3gUhr22OsKlvoh4v5KXV+aft3YfwaUzy+v6?=
- =?us-ascii?Q?29y4h4cbzIDxZlL0Zixz3kuEnn0dwBhEknLd8/z/CfqQuFZZx9LgzbbCi0Pg?=
- =?us-ascii?Q?EXNSC4qMdFsNIij5YDCXuNUY29GbSLbde95iUnKU5mDbtt3nFxAti0gWE1qT?=
- =?us-ascii?Q?Rq/IK0yX5t5VuPRMWHdMA30HTw0vcDdcV7D5Am/KZh92uYY2oMGfEyvnu4in?=
- =?us-ascii?Q?Zb8Ji6gHQ8lmcuxIBUw77tbpZ711C0M+Vos+o4/pBYByi50TailyAYH1ERAC?=
- =?us-ascii?Q?8P0NgMqvMYf/piCf5nAl2lPuk7aksFoc0LJtaHUkWx7nBzKt2UjJJhlKLtY2?=
- =?us-ascii?Q?SIRUZd5cHK2CQvIPpDjuES/Hfd3gLqEjU7K/1bzNS1QNQvJ7UyQQVkELbaux?=
- =?us-ascii?Q?ODg4U0OmwxyARqPHsymm/RQ11boMN1D94Kw0UjIe3OsAJS3J8G0aUtrfKEBD?=
- =?us-ascii?Q?K5Wxn3QBe0vNF+mXaFfsksilvnZ3lLM96ndz7T9paa69+hBbR5lBSqaNySm0?=
- =?us-ascii?Q?EZ1PWPuKyiAmyHL5Uh+aBgWSxkULinTCmb2XqQ+6tVuMc/Um7WB+N7kkPhbQ?=
- =?us-ascii?Q?Q+eWzhNhfpBu5vSS1HYpKUXd35YAEa6Yl5t1KHX6W8f/z6X/VlFL3/pwwKry?=
- =?us-ascii?Q?tnnXFR66QnFA3oLbRZB/Kj47rA7oyTEoEmw06nLkzd/lcfApcvKW5wTB2ECU?=
- =?us-ascii?Q?EyYxWGIgFbWoLngN0B0nIhxjXeK6VPnINwytR+sPHD1dcdMEEYpOIcMOMPs8?=
- =?us-ascii?Q?ZJCkXyih2DN2X7LjWN93Z7hzZgGv87HZmyichZjUYm6kwKcXrIEQQi76AWEr?=
- =?us-ascii?Q?3Wvfc4dzb972AwiKnCIgxTlKXPjqtXARsK1a5v8cFZjrmQEX7pv5GfSrvxbE?=
- =?us-ascii?Q?SUez8958Uf/MnQEhbA8pgmCQti9aL/6Iqb+5YtbiouB8zBe8FEGIjrkaunyy?=
- =?us-ascii?Q?qO3z9v5CvA842HaNaGpwUxv3C2J/BWjuQCFK6M6ZWQ1+duLfO/hj5gjwPBAW?=
- =?us-ascii?Q?wBkt+0cgVQOIReDUdCgNkKy30dxb/st5iJkSDyhHG+zXXq32oVF/41bxqdve?=
- =?us-ascii?Q?6+zSI4P+s7lVfKOnOpyH+E/24fkwcNXAPdKb8hHXzq2BgpkIltrMFGQ9dIaZ?=
- =?us-ascii?Q?Ua/Nk8CrQHBXw8kt5yX414LU34ut8IbyaYrnLUFrJfgRwipTXXI+0xuy3zYA?=
- =?us-ascii?Q?Xhyucd7rY/GUeg5d+TFYOaS1GIiizFgA?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2024 20:43:46.8399
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5f30e823-22fc-42f8-2ebf-08dcc2eb1ed2
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075F4.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9101
 
-From: Michael Chan <michael.chan@broadcom.com>
+Cong Wang wrote:
+> On Wed, Aug 21, 2024 at 03:55:33PM +0100, Simon Horman wrote:
+> > On Tue, Aug 20, 2024 at 08:07:44PM -0700, Cong Wang wrote:
+> > > From: Cong Wang <cong.wang@bytedance.com>
+> > > 
+> > > When we cork messages in psock->cork, the last message triggers the
+> > > flushing will result in sending a sk_msg larger than the current
+> > > message size. In this case, in tcp_bpf_send_verdict(), 'copied' becomes
+> > > negative at least in the following case:
+> > > 
+> > > 468         case __SK_DROP:
+> > > 469         default:
+> > > 470                 sk_msg_free_partial(sk, msg, tosend);
+> > > 471                 sk_msg_apply_bytes(psock, tosend);
+> > > 472                 *copied -= (tosend + delta); // <==== HERE
+> > > 473                 return -EACCES;
+> > > 
+> > > Therefore, it could lead to the following BUG with a proper value of
+> > > 'copied' (thanks to syzbot). We should not use negative 'copied' as a
+> > > return value here.
+> > > 
+> > >   ------------[ cut here ]------------
+> > >   kernel BUG at net/socket.c:733!
+> > >   Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+> > >   Modules linked in:
+> > >   CPU: 0 UID: 0 PID: 3265 Comm: syz-executor510 Not tainted 6.11.0-rc3-syzkaller-00060-gd07b43284ab3 #0
+> > >   Hardware name: linux,dummy-virt (DT)
+> > >   pstate: 61400009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+> > >   pc : sock_sendmsg_nosec net/socket.c:733 [inline]
+> > >   pc : sock_sendmsg_nosec net/socket.c:728 [inline]
+> > >   pc : __sock_sendmsg+0x5c/0x60 net/socket.c:745
+> > >   lr : sock_sendmsg_nosec net/socket.c:730 [inline]
+> > >   lr : __sock_sendmsg+0x54/0x60 net/socket.c:745
+> > >   sp : ffff800088ea3b30
+> > >   x29: ffff800088ea3b30 x28: fbf00000062bc900 x27: 0000000000000000
+> > >   x26: ffff800088ea3bc0 x25: ffff800088ea3bc0 x24: 0000000000000000
+> > >   x23: f9f00000048dc000 x22: 0000000000000000 x21: ffff800088ea3d90
+> > >   x20: f9f00000048dc000 x19: ffff800088ea3d90 x18: 0000000000000001
+> > >   x17: 0000000000000000 x16: 0000000000000000 x15: 000000002002ffaf
+> > >   x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
+> > >   x11: 0000000000000000 x10: ffff8000815849c0 x9 : ffff8000815b49c0
+> > >   x8 : 0000000000000000 x7 : 000000000000003f x6 : 0000000000000000
+> > >   x5 : 00000000000007e0 x4 : fff07ffffd239000 x3 : fbf00000062bc900
+> > >   x2 : 0000000000000000 x1 : 0000000000000000 x0 : 00000000fffffdef
+> > >   Call trace:
+> > >    sock_sendmsg_nosec net/socket.c:733 [inline]
+> > >    __sock_sendmsg+0x5c/0x60 net/socket.c:745
+> > >    ____sys_sendmsg+0x274/0x2ac net/socket.c:2597
+> > >    ___sys_sendmsg+0xac/0x100 net/socket.c:2651
+> > >    __sys_sendmsg+0x84/0xe0 net/socket.c:2680
+> > >    __do_sys_sendmsg net/socket.c:2689 [inline]
+> > >    __se_sys_sendmsg net/socket.c:2687 [inline]
+> > >    __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2687
+> > >    __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+> > >    invoke_syscall+0x48/0x110 arch/arm64/kernel/syscall.c:49
+> > >    el0_svc_common.constprop.0+0x40/0xe0 arch/arm64/kernel/syscall.c:132
+> > >    do_el0_svc+0x1c/0x28 arch/arm64/kernel/syscall.c:151
+> > >    el0_svc+0x34/0xec arch/arm64/kernel/entry-common.c:712
+> > >    el0t_64_sync_handler+0x100/0x12c arch/arm64/kernel/entry-common.c:730
+> > >    el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:598
+> > >   Code: f9404463 d63f0060 3108441f 54fffe81 (d4210000)
+> > >   ---[ end trace 0000000000000000 ]---
+> > > 
+> > > Fixes: 4f738adba30a ("bpf: create tcp_bpf_ulp allowing BPF to monitor socket TX/RX data")
+> > > Reported-by: syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com
+> > > Cc: John Fastabend <john.fastabend@gmail.com>
+> > > Cc: Jakub Sitnicki <jakub@cloudflare.com>
+> > > Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> > > ---
+> > >  net/ipv4/tcp_bpf.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > 
+> > > diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+> > > index 53b0d62fd2c2..fe6178715ba0 100644
+> > > --- a/net/ipv4/tcp_bpf.c
+> > > +++ b/net/ipv4/tcp_bpf.c
+> > > @@ -577,7 +577,7 @@ static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+> > >  		err = sk_stream_error(sk, msg->msg_flags, err);
+> > >  	release_sock(sk);
+> > >  	sk_psock_put(sk, psock);
+> > > -	return copied ? copied : err;
+> > > +	return copied > 0 ? copied : err;
+> > 
+> > Does it make more sense to make the condition err:
+> > is err 0 iif everything is ok? (completely untested!)
+> 
+> Mind to elaborate?
+> 
+> From my point of view, 'copied' is to handle partial transmission, for
+> example:
+> 
+> 0. User wants to send 2 * 1K bytes with sendmsg()
+> 1. Kernel already sent the first 1K successfully
+> 2. Kernel got some error when sending the 2nd 1K
+> 
+> In this scenario, we should return 1K instead of the error to the caller to
+> indicate this partial transmission situation, otherwise we could not
+> distinguish it with a compete failure (that is, 0 byte sent).
 
-Newer firmware can use the NQ ring ID associated with each RX/RX AGG
-ring to enable PCIe steering tag.  Older firmware will just ignore the
-information.
+Yep, if we don't return the positive value on partial send we will confuse
+apps and they will probably resent data.
 
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-Signed-off-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
-Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+From my side this looks good.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 5903cd36b54d..5fb46aaa16e3 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -6838,10 +6838,12 @@ static int hwrm_ring_alloc_send_msg(struct bnxt *bp,
- 
- 			/* Association of rx ring with stats context */
- 			grp_info = &bp->grp_info[ring->grp_idx];
-+			req->nq_ring_id = cpu_to_le16(grp_info->cp_fw_ring_id);
- 			req->rx_buf_size = cpu_to_le16(bp->rx_buf_use_size);
- 			req->stat_ctx_id = cpu_to_le32(grp_info->fw_stats_ctx);
- 			req->enables |= cpu_to_le32(
--				RING_ALLOC_REQ_ENABLES_RX_BUF_SIZE_VALID);
-+				RING_ALLOC_REQ_ENABLES_RX_BUF_SIZE_VALID |
-+				RING_ALLOC_REQ_ENABLES_NQ_RING_ID_VALID);
- 			if (NET_IP_ALIGN == 2)
- 				flags = RING_ALLOC_REQ_FLAGS_RX_SOP_PAD;
- 			req->flags = cpu_to_le16(flags);
-@@ -6853,11 +6855,13 @@ static int hwrm_ring_alloc_send_msg(struct bnxt *bp,
- 			/* Association of agg ring with rx ring */
- 			grp_info = &bp->grp_info[ring->grp_idx];
- 			req->rx_ring_id = cpu_to_le16(grp_info->rx_fw_ring_id);
-+			req->nq_ring_id = cpu_to_le16(grp_info->cp_fw_ring_id);
- 			req->rx_buf_size = cpu_to_le16(BNXT_RX_PAGE_SIZE);
- 			req->stat_ctx_id = cpu_to_le32(grp_info->fw_stats_ctx);
- 			req->enables |= cpu_to_le32(
- 				RING_ALLOC_REQ_ENABLES_RX_RING_ID_VALID |
--				RING_ALLOC_REQ_ENABLES_RX_BUF_SIZE_VALID);
-+				RING_ALLOC_REQ_ENABLES_RX_BUF_SIZE_VALID |
-+				RING_ALLOC_REQ_ENABLES_NQ_RING_ID_VALID);
- 		} else {
- 			req->ring_type = RING_ALLOC_REQ_RING_TYPE_RX;
- 		}
--- 
-2.45.1
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
+
+> 
+> Do I miss anything?
+> 
+> Thanks.
+
 
 
