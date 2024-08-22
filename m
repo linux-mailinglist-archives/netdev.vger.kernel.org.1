@@ -1,473 +1,216 @@
-Return-Path: <netdev+bounces-120972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EED195B4FD
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:27:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DB9995B507
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:32:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAB77B22661
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:27:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40AC028799E
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B51341C9EA5;
-	Thu, 22 Aug 2024 12:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FD11E517;
+	Thu, 22 Aug 2024 12:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="gNXmSee+"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="YxKG9fCE"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3FE1C9DCD;
-	Thu, 22 Aug 2024 12:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF431DFD1;
+	Thu, 22 Aug 2024 12:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724329641; cv=none; b=S0d5rL0xD1DTuOU7VfusmBtheL56KcmKpn2g+YjBtbE1BRAv6TCZzCf0UPA1Oms1DmFnX3Oh0r8yANrkDMJgQDusXhAWlSSg8MZt/WrIJ+99VYsrFhKoRJAYW/uA6LzxdaCxCVoKkkADmb3mrkzvopnDmAWLiRWYYvyzGy3Iphc=
+	t=1724329924; cv=none; b=h3j3gNhhcuVXFaGjcEB8pvTafyavbtImyh2adDuYfONWmcKI+IxoEuULS6FzEPPNcAKY7yNRVtsvfEre8H0GF/vpr7NJjL04PnD0k1VLfxLKdwAdR07GChuzmC2N4cLbx0o8wVirtLHBP5AwYD0XAVNpHy9wWs7Imd3VOJuXDbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724329641; c=relaxed/simple;
-	bh=QWa9CYm1Tvpc76kl4GmUq9oDb6O7fDDoC1EXVo8x888=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dcu68ov4OAZto7V/8og9q4TycxfknN7MJQiTIVB1dPI4TQcPXPAqc23iyoVh+JKO5oC8N4VKK1tPVUwCAjlzXmYVw/vCKYUfu/Cg+VwHaQuyMlqraa2aMrUgd0Tic4wAThVOq64qxnZhooBh0zHFAypY6MiUPZxguafHFdvifkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=gNXmSee+; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47MCR0td085903;
-	Thu, 22 Aug 2024 07:27:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1724329620;
-	bh=6PAkTaIH0mPWUPAX3HSggY7yWwox5RBjrozFFmq0Tt0=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=gNXmSee+p50UyjDEmcy5eGmQfyd1lL0arYwXES3SHl1C1GqlEWgEL1RqfDDy4jQ3B
-	 iSQo9A5KA6i9gRUeof8UFeLOcbvOixFX9u7U+a8VcDh5W6tvatQNt6nytVs6lur28J
-	 cG2cVd0OSx0p0bXph7sGILT2zlkE2MxtceFkBRzk=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47MCR0ut037079
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 22 Aug 2024 07:27:00 -0500
-Received: from DFLE103.ent.ti.com (10.64.6.24) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 22
- Aug 2024 07:26:59 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 22 Aug 2024 07:26:59 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47MCQxSW116993;
-	Thu, 22 Aug 2024 07:26:59 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 47MCQwr0015181;
-	Thu, 22 Aug 2024 07:26:59 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Suman Anna <s-anna@ti.com>, Sai Krishna <saikrishnag@marvell.com>,
-        Jan
- Kiszka <jan.kiszka@siemens.com>,
-        Dan Carpenter <dan.carpenter@linaro.org>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Diogo Ivo <diogo.ivo@siemens.com>,
-        Kory Maincent <kory.maincent@bootlin.com>,
-        Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Roger
- Quadros <rogerq@kernel.org>,
-        MD Danish Anwar <danishanwar@ti.com>,
-        Conor
- Dooley <conor+dt@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Rob
- Herring <robh@kernel.org>,
-        Santosh Shilimkar <ssantosh@kernel.org>, Nishanth
- Menon <nm@ti.com>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <srk@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>
-Subject: [PATCH net-next v7 2/2] net: ti: icssg-prueth: Add support for PA Stats
-Date: Thu, 22 Aug 2024 17:56:52 +0530
-Message-ID: <20240822122652.1071801-3-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240822122652.1071801-1-danishanwar@ti.com>
-References: <20240822122652.1071801-1-danishanwar@ti.com>
+	s=arc-20240116; t=1724329924; c=relaxed/simple;
+	bh=4uxiuLTKLHawT7wDqEVlFKtVPFfcxrN5u48M9OUoVaE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Z+92GUD5KllJCNgTqzVg6XkbRMkYgHFLbqEBBo5a/SgnISlF2LErWKeaPkfiXhCHDK2lR18k/+LAfqh1cA/0aidO7268d5CNkAq80Deywx4k+v9odaa6Wkez5fU/7jqutVxL/GcesFNK6gACV1RvT9oEuJjgpiegGIAZ12kFFT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=YxKG9fCE; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=4uxiuLTKLHawT7wDqEVlFKtVPFfcxrN5u48M9OUoVaE=; b=YxKG9fCEbBq0X7msuYnRzHnJm3
+	Gux43yJfY1hhffL5OThtvqMD5tkGX0V0jwmDgGfyY7dLJWO9o81LX8X2WIRvJDmdgxoeymoOuhUvY
+	XwXrOxFcrKG5fUhX3ouyacL/Lr/kBKIXSJOq8nKojpRbCj5VxSwUbYLjs4IvIDg81rJIkB2Ubpx40
+	7z1kDCX3OR8UUAiNIHoSFlRBtWoLQBBIQxbtBesTUrU+fH/k/7msQ8eejYa/dqbJKbf46Z6cKYLgc
+	9Fh+NBya8CofYWK9XU3lowmCoZSbEhp5cxtRZIAaZ3iq2+gtNBhRTDFyYcKxh5XtRvDJ+QZu68fv9
+	KRXYJHlw==;
+Received: from [2001:8b0:10b:5:bebd:4b39:e979:6fb2] (helo=u3832b3a9db3152.ant.amazon.com)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sh6yn-0000000AV83-3NMo;
+	Thu, 22 Aug 2024 12:31:53 +0000
+Message-ID: <f60d1102726643a176fca8ffbc9f2f49408c6d78.camel@infradead.org>
+Subject: Re: [PATCH v4] ptp: Add vDSO-style vmclock support
+From: David Woodhouse <dwmw2@infradead.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Richard Cochran <richardcochran@gmail.com>, Peter Hilber
+ <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org, 
+ virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
+ linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>, 
+ virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>, "Chashper,
+ David" <chashper@amazon.com>, "Mohamed Abuelfotoh, Hazem"
+ <abuehaze@amazon.com>,  "Christopher S . Hall"
+ <christopher.s.hall@intel.com>, Jason Wang <jasowang@redhat.com>, John
+ Stultz <jstultz@google.com>,  "Michael S . Tsirkin" <mst@redhat.com>,
+ netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>,  Thomas Gleixner
+ <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc Zyngier
+ <maz@kernel.org>,  Mark Rutland <mark.rutland@arm.com>, Daniel Lezcano
+ <daniel.lezcano@linaro.org>, Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,  qemu-devel
+ <qemu-devel@nongnu.org>
+Date: Thu, 22 Aug 2024 13:31:52 +0100
+In-Reply-To: <20240822114948.GM2164@kernel.org>
+References: <410bbef9771ef8aa51704994a70d5965e367e2ce.camel@infradead.org>
+	 <20240822114948.GM2164@kernel.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+	boundary="=-2BKhMcDSuFYoWBpZ5zC+"
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
-Add support for dumping PA stats registers via ethtool.
-Firmware maintained stats are stored at PA Stats registers.
-Also modify emac_get_strings() API to use ethtool_puts().
 
-This commit also maintains consistency between miig_stats and pa_stats by
-- renaming the array icssg_all_stats to icssg_all_miig_stats
-- renaming the structure icssg_stats to icssg_miig_stats
-- renaming ICSSG_STATS() to ICSSG_MIIG_STATS()
-- changing order of stats related data structures and arrays so that data
-  structures of a certain stats type is clubbed together.
+--=-2BKhMcDSuFYoWBpZ5zC+
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/icssg/icssg_ethtool.c |  19 ++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.c  |   6 +
- drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   9 +-
- drivers/net/ethernet/ti/icssg/icssg_stats.c   |  31 +++-
- drivers/net/ethernet/ti/icssg/icssg_stats.h   | 158 +++++++++++-------
- 5 files changed, 140 insertions(+), 83 deletions(-)
+On Thu, 2024-08-22 at 12:49 +0100, Simon Horman wrote:
+> Hi David,
+>=20
+> Sorry to be always the one with the nit-pick.
+> Sparse complains about the line above, I believe because the
+> type of st->clk->size is __le32.
+>=20
+> .../ptp_vmclock.c:562:13: warning: restricted __le32 degrades to integer
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-index 5688f054cec5..5073ec195854 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
-@@ -83,13 +83,11 @@ static void emac_get_strings(struct net_device *ndev, u32 stringset, u8 *data)
- 
- 	switch (stringset) {
- 	case ETH_SS_STATS:
--		for (i = 0; i < ARRAY_SIZE(icssg_all_stats); i++) {
--			if (!icssg_all_stats[i].standard_stats) {
--				memcpy(p, icssg_all_stats[i].name,
--				       ETH_GSTRING_LEN);
--				p += ETH_GSTRING_LEN;
--			}
--		}
-+		for (i = 0; i < ARRAY_SIZE(icssg_all_miig_stats); i++)
-+			if (!icssg_all_miig_stats[i].standard_stats)
-+				ethtool_puts(&p, icssg_all_miig_stats[i].name);
-+		for (i = 0; i < ARRAY_SIZE(icssg_all_pa_stats); i++)
-+			ethtool_puts(&p, icssg_all_pa_stats[i].name);
- 		break;
- 	default:
- 		break;
-@@ -104,9 +102,12 @@ static void emac_get_ethtool_stats(struct net_device *ndev,
- 
- 	emac_update_hardware_stats(emac);
- 
--	for (i = 0; i < ARRAY_SIZE(icssg_all_stats); i++)
--		if (!icssg_all_stats[i].standard_stats)
-+	for (i = 0; i < ARRAY_SIZE(icssg_all_miig_stats); i++)
-+		if (!icssg_all_miig_stats[i].standard_stats)
- 			*(data++) = emac->stats[i];
-+
-+	for (i = 0; i < ARRAY_SIZE(icssg_all_pa_stats); i++)
-+		*(data++) = emac->pa_stats[i];
- }
- 
- static int emac_get_ts_info(struct net_device *ndev,
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 53a3e44b99a2..f623a0f603fc 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1182,6 +1182,12 @@ static int prueth_probe(struct platform_device *pdev)
- 		return -ENODEV;
- 	}
- 
-+	prueth->pa_stats = syscon_regmap_lookup_by_phandle(np, "ti,pa-stats");
-+	if (IS_ERR(prueth->pa_stats)) {
-+		dev_err(dev, "couldn't get ti,pa-stats syscon regmap\n");
-+		return -ENODEV;
-+	}
-+
- 	if (eth0_node) {
- 		ret = prueth_get_cores(prueth, ICSS_SLICE0, false);
- 		if (ret)
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index f678d656a3ed..786bd1ba34ab 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -50,8 +50,10 @@
- 
- #define ICSSG_MAX_RFLOWS	8	/* per slice */
- 
-+#define ICSSG_NUM_PA_STATS	4
-+#define ICSSG_NUM_MIIG_STATS	60
- /* Number of ICSSG related stats */
--#define ICSSG_NUM_STATS 60
-+#define ICSSG_NUM_STATS (ICSSG_NUM_MIIG_STATS + ICSSG_NUM_PA_STATS)
- #define ICSSG_NUM_STANDARD_STATS 31
- #define ICSSG_NUM_ETHTOOL_STATS (ICSSG_NUM_STATS - ICSSG_NUM_STANDARD_STATS)
- 
-@@ -190,7 +192,8 @@ struct prueth_emac {
- 	int port_vlan;
- 
- 	struct delayed_work stats_work;
--	u64 stats[ICSSG_NUM_STATS];
-+	u64 stats[ICSSG_NUM_MIIG_STATS];
-+	u64 pa_stats[ICSSG_NUM_PA_STATS];
- 
- 	/* RX IRQ Coalescing Related */
- 	struct hrtimer rx_hrtimer;
-@@ -230,6 +233,7 @@ struct icssg_firmwares {
-  * @registered_netdevs: list of registered netdevs
-  * @miig_rt: regmap to mii_g_rt block
-  * @mii_rt: regmap to mii_rt block
-+ * @pa_stats: regmap to pa_stats block
-  * @pru_id: ID for each of the PRUs
-  * @pdev: pointer to ICSSG platform device
-  * @pdata: pointer to platform data for ICSSG driver
-@@ -263,6 +267,7 @@ struct prueth {
- 	struct net_device *registered_netdevs[PRUETH_NUM_MACS];
- 	struct regmap *miig_rt;
- 	struct regmap *mii_rt;
-+	struct regmap *pa_stats;
- 
- 	enum pruss_pru_id pru_id[PRUSS_NUM_PRUS];
- 	struct platform_device *pdev;
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.c b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-index 2fb150c13078..06a15c0b2acc 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.c
-@@ -11,6 +11,7 @@
- 
- #define ICSSG_TX_PACKET_OFFSET	0xA0
- #define ICSSG_TX_BYTE_OFFSET	0xEC
-+#define ICSSG_FW_STATS_BASE	0x0248
- 
- static u32 stats_base[] = {	0x54c,	/* Slice 0 stats start */
- 				0xb18,	/* Slice 1 stats start */
-@@ -22,24 +23,31 @@ void emac_update_hardware_stats(struct prueth_emac *emac)
- 	int slice = prueth_emac_slice(emac);
- 	u32 base = stats_base[slice];
- 	u32 tx_pkt_cnt = 0;
--	u32 val;
-+	u32 val, reg;
- 	int i;
- 
--	for (i = 0; i < ARRAY_SIZE(icssg_all_stats); i++) {
-+	for (i = 0; i < ARRAY_SIZE(icssg_all_miig_stats); i++) {
- 		regmap_read(prueth->miig_rt,
--			    base + icssg_all_stats[i].offset,
-+			    base + icssg_all_miig_stats[i].offset,
- 			    &val);
- 		regmap_write(prueth->miig_rt,
--			     base + icssg_all_stats[i].offset,
-+			     base + icssg_all_miig_stats[i].offset,
- 			     val);
- 
--		if (icssg_all_stats[i].offset == ICSSG_TX_PACKET_OFFSET)
-+		if (icssg_all_miig_stats[i].offset == ICSSG_TX_PACKET_OFFSET)
- 			tx_pkt_cnt = val;
- 
- 		emac->stats[i] += val;
--		if (icssg_all_stats[i].offset == ICSSG_TX_BYTE_OFFSET)
-+		if (icssg_all_miig_stats[i].offset == ICSSG_TX_BYTE_OFFSET)
- 			emac->stats[i] -= tx_pkt_cnt * 8;
- 	}
-+
-+	for (i = 0; i < ARRAY_SIZE(icssg_all_pa_stats); i++) {
-+		reg = ICSSG_FW_STATS_BASE + icssg_all_pa_stats[i].offset *
-+		      PRUETH_NUM_MACS + slice * sizeof(u32);
-+		regmap_read(prueth->pa_stats, reg, &val);
-+		emac->pa_stats[i] += val;
-+	}
- }
- 
- void icssg_stats_work_handler(struct work_struct *work)
-@@ -57,9 +65,14 @@ int emac_get_stat_by_name(struct prueth_emac *emac, char *stat_name)
- {
- 	int i;
- 
--	for (i = 0; i < ARRAY_SIZE(icssg_all_stats); i++) {
--		if (!strcmp(icssg_all_stats[i].name, stat_name))
--			return emac->stats[icssg_all_stats[i].offset / sizeof(u32)];
-+	for (i = 0; i < ARRAY_SIZE(icssg_all_miig_stats); i++) {
-+		if (!strcmp(icssg_all_miig_stats[i].name, stat_name))
-+			return emac->stats[icssg_all_miig_stats[i].offset / sizeof(u32)];
-+	}
-+
-+	for (i = 0; i < ARRAY_SIZE(icssg_all_pa_stats); i++) {
-+		if (!strcmp(icssg_all_pa_stats[i].name, stat_name))
-+			return emac->pa_stats[icssg_all_pa_stats[i].offset / sizeof(u32)];
- 	}
- 
- 	netdev_err(emac->ndev, "Invalid stats %s\n", stat_name);
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_stats.h b/drivers/net/ethernet/ti/icssg/icssg_stats.h
-index 999a4a91276c..e88b919f532c 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_stats.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_stats.h
-@@ -77,82 +77,114 @@ struct miig_stats_regs {
- 	u32 tx_bytes;
- };
- 
--#define ICSSG_STATS(field, stats_type)			\
-+#define ICSSG_MIIG_STATS(field, stats_type)			\
- {							\
- 	#field,						\
- 	offsetof(struct miig_stats_regs, field),	\
- 	stats_type					\
- }
- 
--struct icssg_stats {
-+struct icssg_miig_stats {
- 	char name[ETH_GSTRING_LEN];
- 	u32 offset;
- 	bool standard_stats;
- };
- 
--static const struct icssg_stats icssg_all_stats[] = {
-+static const struct icssg_miig_stats icssg_all_miig_stats[] = {
- 	/* Rx */
--	ICSSG_STATS(rx_packets, true),
--	ICSSG_STATS(rx_broadcast_frames, false),
--	ICSSG_STATS(rx_multicast_frames, true),
--	ICSSG_STATS(rx_crc_errors, true),
--	ICSSG_STATS(rx_mii_error_frames, false),
--	ICSSG_STATS(rx_odd_nibble_frames, false),
--	ICSSG_STATS(rx_frame_max_size, true),
--	ICSSG_STATS(rx_max_size_error_frames, false),
--	ICSSG_STATS(rx_frame_min_size, true),
--	ICSSG_STATS(rx_min_size_error_frames, false),
--	ICSSG_STATS(rx_over_errors, true),
--	ICSSG_STATS(rx_class0_hits, false),
--	ICSSG_STATS(rx_class1_hits, false),
--	ICSSG_STATS(rx_class2_hits, false),
--	ICSSG_STATS(rx_class3_hits, false),
--	ICSSG_STATS(rx_class4_hits, false),
--	ICSSG_STATS(rx_class5_hits, false),
--	ICSSG_STATS(rx_class6_hits, false),
--	ICSSG_STATS(rx_class7_hits, false),
--	ICSSG_STATS(rx_class8_hits, false),
--	ICSSG_STATS(rx_class9_hits, false),
--	ICSSG_STATS(rx_class10_hits, false),
--	ICSSG_STATS(rx_class11_hits, false),
--	ICSSG_STATS(rx_class12_hits, false),
--	ICSSG_STATS(rx_class13_hits, false),
--	ICSSG_STATS(rx_class14_hits, false),
--	ICSSG_STATS(rx_class15_hits, false),
--	ICSSG_STATS(rx_smd_frags, false),
--	ICSSG_STATS(rx_bucket1_size, true),
--	ICSSG_STATS(rx_bucket2_size, true),
--	ICSSG_STATS(rx_bucket3_size, true),
--	ICSSG_STATS(rx_bucket4_size, true),
--	ICSSG_STATS(rx_64B_frames, true),
--	ICSSG_STATS(rx_bucket1_frames, true),
--	ICSSG_STATS(rx_bucket2_frames, true),
--	ICSSG_STATS(rx_bucket3_frames, true),
--	ICSSG_STATS(rx_bucket4_frames, true),
--	ICSSG_STATS(rx_bucket5_frames, true),
--	ICSSG_STATS(rx_bytes, true),
--	ICSSG_STATS(rx_tx_total_bytes, false),
-+	ICSSG_MIIG_STATS(rx_packets, true),
-+	ICSSG_MIIG_STATS(rx_broadcast_frames, false),
-+	ICSSG_MIIG_STATS(rx_multicast_frames, true),
-+	ICSSG_MIIG_STATS(rx_crc_errors, true),
-+	ICSSG_MIIG_STATS(rx_mii_error_frames, false),
-+	ICSSG_MIIG_STATS(rx_odd_nibble_frames, false),
-+	ICSSG_MIIG_STATS(rx_frame_max_size, true),
-+	ICSSG_MIIG_STATS(rx_max_size_error_frames, false),
-+	ICSSG_MIIG_STATS(rx_frame_min_size, true),
-+	ICSSG_MIIG_STATS(rx_min_size_error_frames, false),
-+	ICSSG_MIIG_STATS(rx_over_errors, true),
-+	ICSSG_MIIG_STATS(rx_class0_hits, false),
-+	ICSSG_MIIG_STATS(rx_class1_hits, false),
-+	ICSSG_MIIG_STATS(rx_class2_hits, false),
-+	ICSSG_MIIG_STATS(rx_class3_hits, false),
-+	ICSSG_MIIG_STATS(rx_class4_hits, false),
-+	ICSSG_MIIG_STATS(rx_class5_hits, false),
-+	ICSSG_MIIG_STATS(rx_class6_hits, false),
-+	ICSSG_MIIG_STATS(rx_class7_hits, false),
-+	ICSSG_MIIG_STATS(rx_class8_hits, false),
-+	ICSSG_MIIG_STATS(rx_class9_hits, false),
-+	ICSSG_MIIG_STATS(rx_class10_hits, false),
-+	ICSSG_MIIG_STATS(rx_class11_hits, false),
-+	ICSSG_MIIG_STATS(rx_class12_hits, false),
-+	ICSSG_MIIG_STATS(rx_class13_hits, false),
-+	ICSSG_MIIG_STATS(rx_class14_hits, false),
-+	ICSSG_MIIG_STATS(rx_class15_hits, false),
-+	ICSSG_MIIG_STATS(rx_smd_frags, false),
-+	ICSSG_MIIG_STATS(rx_bucket1_size, true),
-+	ICSSG_MIIG_STATS(rx_bucket2_size, true),
-+	ICSSG_MIIG_STATS(rx_bucket3_size, true),
-+	ICSSG_MIIG_STATS(rx_bucket4_size, true),
-+	ICSSG_MIIG_STATS(rx_64B_frames, true),
-+	ICSSG_MIIG_STATS(rx_bucket1_frames, true),
-+	ICSSG_MIIG_STATS(rx_bucket2_frames, true),
-+	ICSSG_MIIG_STATS(rx_bucket3_frames, true),
-+	ICSSG_MIIG_STATS(rx_bucket4_frames, true),
-+	ICSSG_MIIG_STATS(rx_bucket5_frames, true),
-+	ICSSG_MIIG_STATS(rx_bytes, true),
-+	ICSSG_MIIG_STATS(rx_tx_total_bytes, false),
- 	/* Tx */
--	ICSSG_STATS(tx_packets, true),
--	ICSSG_STATS(tx_broadcast_frames, false),
--	ICSSG_STATS(tx_multicast_frames, false),
--	ICSSG_STATS(tx_odd_nibble_frames, false),
--	ICSSG_STATS(tx_underflow_errors, false),
--	ICSSG_STATS(tx_frame_max_size, true),
--	ICSSG_STATS(tx_max_size_error_frames, false),
--	ICSSG_STATS(tx_frame_min_size, true),
--	ICSSG_STATS(tx_min_size_error_frames, false),
--	ICSSG_STATS(tx_bucket1_size, true),
--	ICSSG_STATS(tx_bucket2_size, true),
--	ICSSG_STATS(tx_bucket3_size, true),
--	ICSSG_STATS(tx_bucket4_size, true),
--	ICSSG_STATS(tx_64B_frames, true),
--	ICSSG_STATS(tx_bucket1_frames, true),
--	ICSSG_STATS(tx_bucket2_frames, true),
--	ICSSG_STATS(tx_bucket3_frames, true),
--	ICSSG_STATS(tx_bucket4_frames, true),
--	ICSSG_STATS(tx_bucket5_frames, true),
--	ICSSG_STATS(tx_bytes, true),
-+	ICSSG_MIIG_STATS(tx_packets, true),
-+	ICSSG_MIIG_STATS(tx_broadcast_frames, false),
-+	ICSSG_MIIG_STATS(tx_multicast_frames, false),
-+	ICSSG_MIIG_STATS(tx_odd_nibble_frames, false),
-+	ICSSG_MIIG_STATS(tx_underflow_errors, false),
-+	ICSSG_MIIG_STATS(tx_frame_max_size, true),
-+	ICSSG_MIIG_STATS(tx_max_size_error_frames, false),
-+	ICSSG_MIIG_STATS(tx_frame_min_size, true),
-+	ICSSG_MIIG_STATS(tx_min_size_error_frames, false),
-+	ICSSG_MIIG_STATS(tx_bucket1_size, true),
-+	ICSSG_MIIG_STATS(tx_bucket2_size, true),
-+	ICSSG_MIIG_STATS(tx_bucket3_size, true),
-+	ICSSG_MIIG_STATS(tx_bucket4_size, true),
-+	ICSSG_MIIG_STATS(tx_64B_frames, true),
-+	ICSSG_MIIG_STATS(tx_bucket1_frames, true),
-+	ICSSG_MIIG_STATS(tx_bucket2_frames, true),
-+	ICSSG_MIIG_STATS(tx_bucket3_frames, true),
-+	ICSSG_MIIG_STATS(tx_bucket4_frames, true),
-+	ICSSG_MIIG_STATS(tx_bucket5_frames, true),
-+	ICSSG_MIIG_STATS(tx_bytes, true),
-+};
-+
-+/**
-+ * struct pa_stats_regs - ICSSG Firmware maintained PA Stats register
-+ * @fw_rx_cnt: Number of valid packets sent by Rx PRU to Host on PSI
-+ * @fw_tx_cnt: Number of valid packets copied by RTU0 to Tx queues
-+ * @fw_tx_pre_overflow: Host Egress Q (Pre-emptible) Overflow Counter
-+ * @fw_tx_exp_overflow: Host Egress Q (Express) Overflow Counter
-+ */
-+struct pa_stats_regs {
-+	u32 fw_rx_cnt;
-+	u32 fw_tx_cnt;
-+	u32 fw_tx_pre_overflow;
-+	u32 fw_tx_exp_overflow;
-+};
-+
-+#define ICSSG_PA_STATS(field)			\
-+{						\
-+	#field,					\
-+	offsetof(struct pa_stats_regs, field),	\
-+}
-+
-+struct icssg_pa_stats {
-+	char name[ETH_GSTRING_LEN];
-+	u32 offset;
-+};
-+
-+static const struct icssg_pa_stats icssg_all_pa_stats[] = {
-+	ICSSG_PA_STATS(fw_rx_cnt),
-+	ICSSG_PA_STATS(fw_tx_cnt),
-+	ICSSG_PA_STATS(fw_tx_pre_overflow),
-+	ICSSG_PA_STATS(fw_tx_exp_overflow),
- };
- 
- #endif /* __NET_TI_ICSSG_STATS_H */
--- 
-2.34.1
+Oops, thanks for catching that!
 
+Fixed in
+https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/vmclock
+
+I'll wait a little while before sending a new version.
+
+--=-2BKhMcDSuFYoWBpZ5zC+
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwODIyMTIzMTUyWjAvBgkqhkiG9w0BCQQxIgQgMjKkUYnl
+Qb9xNOYCH2wbdkhUi+JX/WAuLZlNM1EI0MAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBbBymRDUyO4+wM5JKBrNvoQHIx5vkxJB+O
+IRHCBBYp3hc9OaEBHuSch2sQJMCTJ6mA76o5XuMYVlquLsjtPGifgmk+yzTzKTI5EMkEf2UvlM9H
+a2Z1QBNmjlj1xDXdyPW+aX0FGVQt7KP4ovfSaLZNnV3LtwATdAXvf6ZXco5afkN13vsrjtDe275v
+FbNN/5m9/GWercY0H/kaYuavsrayz/tH6BqkIOBdcj5dFJhMRE5kNvO9h3qHlMDd2+2mjXn1KzSQ
+nduf4qICu9jTkYI1car4VHegyPHSCLfwTdTLi+ber/pB1XoFsc/Ftd/1CuOQajNNsQX92IsSA5La
+PCwcpQw75yce22fgVOBoNg8VftVKsGKKu0tzl/ZiuUloeHBjcMqiPYoylhis2Mcv4Rvkfg3iQIy2
+TwbIBSxj4qiRv9JJ1L8SjxBzQswSFk3tGqpMXMCqaOJ87HV/TtvYMtU2Oo+CEp+yd1f6Psmw4Bmb
+sedQZ6sPR/VYW2m0lfhfKdxSLxajzMqUr2N/iJkBP2cT9Z/3CyoI40XttjhypksMsWKtmMY+ilpn
+fTcHTLds3JswsbVdv3SmAqqxoP8lQjp14b0DW5NbsieHwzjJmEsabvhpC64g0soXR+0O+UpxMv9Q
+3uHhuMIzGKXVuhD4St4h/MOGtnijKrat4gLpCHh6AgAAAAAAAA==
+
+
+--=-2BKhMcDSuFYoWBpZ5zC+--
 
