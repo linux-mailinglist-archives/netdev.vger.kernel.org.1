@@ -1,281 +1,224 @@
-Return-Path: <netdev+bounces-120838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A52F95AFBE
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 09:58:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EE0295AFD4
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 10:04:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E43B3281D7B
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:58:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92EEA1C21917
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 08:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD9E16A94F;
-	Thu, 22 Aug 2024 07:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE1215853F;
+	Thu, 22 Aug 2024 08:04:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="h7KKx90P"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="xD6S2x5K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F269C14F9DA
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 07:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BCCE502BE;
+	Thu, 22 Aug 2024 08:04:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724313505; cv=none; b=tCSr27MjCKPOrpeKukInyKymxoq7x9HiwYDZbpkye3Kqv/k7l8uPn3UflClw7KjG6mDRevlnEzniiv+gQrPxQmKL4LuW9bmTuC5Cqgci8JdRw4GI6I2KznKYrLV8GHHR0fSDmeWn5mgbPCiMCv5IxZoi3zqMuYVzmsojN5fvUGU=
+	t=1724313846; cv=none; b=dUHFVQIgWlbtQ68Shh+NDlkZoaM4abgSKMhkEw0HI8yDgYsY+OJjTzCZ3o3CxTTV9iC3xlo4Hmbp8DUZ8+kqnxEK9CfB6YexxV5uivYI0rc6EpsI/bE7JY0LZETjjZCYRBvEOs95quKS1/jN9AHJolqbyRAzj4peWJYjWgL8IqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724313505; c=relaxed/simple;
-	bh=M78dDH2Lv5gAbPiL85tJxK3F4eYd70NNmNQ2oSscdOQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i+HW5wUdVX6JKjaej5F+Paoc02sY3AhJts4DpZkl2NvuXO6XO5AbNVGvv183Ctd7pP+OvxdPqyb7oNuQdgTz8mlDH7NYLa/S1iYLwbyVk+O4DpQcd3KIBgoDOaAYTwGla+SlBRWgqI85e2WeR87VP3hbx1yd1mGa/7n8RMu7Iyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=h7KKx90P; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-533463f6b16so652762e87.1
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 00:58:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1724313500; x=1724918300; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TnX6FjUIWpzD8kqC9V27AIE0s5MyIjBt5cBluqxEzzc=;
-        b=h7KKx90PMOHrw1zNIvIq4GpHPH7ns+gTrfp65M2qNTHq5luesWNkG+aG9HfZUFEBB7
-         65041tLcwTvvYy2GyvGkWV8xNP+uvY0b5saBiiaVTPQwnS7q5p7oKO4vzEE8vBpBCwb+
-         SjTyKmBJPctB2IgGktpv+HdFTAxU8b2n4Xv09uBjOFuBlOnkVBmmnx5+McoBXEa/LbQi
-         0Q0YbZaRYyW0OyeoiuustcL6mvvdbzSB2kBqxDkIiM/8QViaDZnE5Za1Yz/0ZwOlVR66
-         ltGuTwx1670a7Die1fRfXaZfytn4Co4C7NaTm6pEK+q/Qrcelx+ZwVcqd+rBC/RXURxu
-         IADA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724313500; x=1724918300;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TnX6FjUIWpzD8kqC9V27AIE0s5MyIjBt5cBluqxEzzc=;
-        b=P6njoUy9XQy6JA1Lp8GhEGDz1DlI7KZ1//+NedE01cZiETDLJ7V5vaUvOROQfHw35E
-         fj7fyph0iuakSbAnMRYl/obY2lz/h1gYAFyJ6k/gb4LRw6n28P651FXzRuTsGVMTDFjk
-         EZSlHGY8vrtp1Mqe7IY6E9Xf6vCR2PHJ24noLxjOERjW6ATAYw8QGkKYoLyDBhD38e7O
-         6VfB5Rn/qNAo1H7m/lavD+ucPeOfhPjmae2FKd3brk4ekpiYlYNdLcTMdbD95tbsTzQv
-         qOYXcwTk1SeCmC9Wc9AUeDOWpHYxuTdzXi1K5SWaF14kLOEq5TCeA8ZlwfAzgzTs92Fj
-         esXA==
-X-Forwarded-Encrypted: i=1; AJvYcCW6akIUGRw7vGqsMEojri6bQs02EP0DYI7GtN4FS77Dcx8NssfMou6hSLc9NX2Dw138WOQcaco=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9mSAtuj9896rmiIzNg7VzLRv+pMaZ2zWkbzB4d6uv6z1vQsh/
-	kpYB+sq3m+8TGnzEj0cxralFnSBL8FLICYK1sR4Yl7a7Lko+OOFLa4bLRZe3ihxOtIwOxEZJw6h
-	k4VeJBUfBhMfwD9jpIxBhAgf1LLeayF6WW+xXMw==
-X-Google-Smtp-Source: AGHT+IHqRxXYm+H2Y+i5xzzY2IR+Nh6H8VShsmzm7UrXJCf65rsBntbXTU1CGj0TiGUJ3jrIhNx6F4PixK+Mw98vPfI=
-X-Received: by 2002:a05:6512:3f05:b0:52f:c27b:d572 with SMTP id
- 2adb3069b0e04-533485c0526mr2735846e87.59.1724313499001; Thu, 22 Aug 2024
- 00:58:19 -0700 (PDT)
+	s=arc-20240116; t=1724313846; c=relaxed/simple;
+	bh=jQXIUQU8oclfpT8g2UQUV9SwNeOego7paHr0Y2n4O8U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Sb6ykd0TxcZtHQx8TGtnSPtJ/bu9BUKPSdzu4XQPTPkQ1KzXyCedjm0HOR37aoe0DtNWWbkLkVehd3QtAQWiOVi6LyjlcwiI+LqJpRU1edeo50SWLbUI2N+VEddnRju6YdKZZOZvbdl/ZiqVncMuMs41HeBDPoQw6qJlWsMkLrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=xD6S2x5K; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47M83hf7059704;
+	Thu, 22 Aug 2024 03:03:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1724313823;
+	bh=Sp+YdniZlKsd4wjck3WQS1rqiKWW/smYletrrpcJoD8=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=xD6S2x5Ky5YKx7eVBlKlC/4KFP0M61ON0y+F3gyqC86ssp/5Cxdv+PbpydeO/gfkB
+	 kLTrfi2cdwQXo7oqb08iGoBrj8bXA4lEEtsBro79zyVvqVpeloQlJB5NysevSoybx2
+	 sWro1aDEthshmFufXu+Ch1wZhLkcXlfCOfF/YtFQ=
+Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47M83hIp082630
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 22 Aug 2024 03:03:43 -0500
+Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE101.ent.ti.com
+ (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 22
+ Aug 2024 03:03:40 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE108.ent.ti.com
+ (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 22 Aug 2024 03:03:41 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47M83ZPn076512;
+	Thu, 22 Aug 2024 03:03:36 -0500
+Message-ID: <cfb025a4-41a4-448f-a7a8-7ce14f8532f5@ti.com>
+Date: Thu, 22 Aug 2024 13:33:34 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240620113527.7789-1-changliang.wu@smartx.com>
- <CALHBjYFn_qB=Oo3TTg0znOnNz9rX5jP+eYSZbatAN94ys8Tzmw@mail.gmail.com> <ZsOTMHeMPgtjU6ZZ@calendula>
-In-Reply-To: <ZsOTMHeMPgtjU6ZZ@calendula>
-From: Changliang Wu <changliang.wu@smartx.com>
-Date: Thu, 22 Aug 2024 15:58:07 +0800
-Message-ID: <CALHBjYH-=fHYzx8Qd=ae_Q1Qtsnt6hiVOxbW-rfPkbQAUCak+w@mail.gmail.com>
-Subject: Re: [PATCH] netfilter: ctnetlink: support CTA_FILTER for flush
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: kadlec@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 7/7] net: ti: icssg-prueth: Enable HSR Tx Tag
+ and Rx Tag offload
+To: Roger Quadros <rogerq@kernel.org>,
+        Dan Carpenter
+	<dan.carpenter@linaro.org>,
+        Andrew Lunn <andrew@lunn.ch>, Jan Kiszka
+	<jan.kiszka@siemens.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Javier
+ Carrasco <javier.carrasco.cruz@gmail.com>,
+        Jacob Keller
+	<jacob.e.keller@intel.com>,
+        Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman
+	<horms@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>
+References: <20240813074233.2473876-1-danishanwar@ti.com>
+ <20240813074233.2473876-8-danishanwar@ti.com>
+ <9f8beb62-42db-47d9-bba6-f942a655217d@kernel.org>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <9f8beb62-42db-47d9-bba6-f942a655217d@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-diff --git a/src/conntrack/filter_dump.c b/src/conntrack/filter_dump.c
-index fd2d002..18d941b 100644
---- a/src/conntrack/filter_dump.c
-+++ b/src/conntrack/filter_dump.c
-@@ -68,9 +68,5 @@ int __build_filter_dump(struct nfnlhdr *req, size_t size,
- int __build_filter_flush(struct nfnlhdr *req, size_t size,
-                        const struct nfct_filter_dump *filter_dump)
- {
--       if (filter_dump->set & (1 << NFCT_FILTER_DUMP_TUPLE)) {
--               errno =3D ENOTSUP;
--               return -1;
--       }
-        return nfct_nlmsg_build_filter(&req->nlh, filter_dump);
- }
-diff --git a/utils/Makefile.am b/utils/Makefile.am
-index 7e7aef4..50a1c7c 100644
---- a/utils/Makefile.am
-+++ b/utils/Makefile.am
-@@ -11,6 +11,7 @@ check_PROGRAMS =3D expect_dump expect_create
-expect_get expect_delete \
-               conntrack_dump_filter \
-               conntrack_dump_filter_tuple \
-               conntrack_flush_filter \
-+              conntrack_flush_filter_tuple \
-               ctexp_events
 
- conntrack_grp_create_SOURCES =3D conntrack_grp_create.c
-@@ -46,6 +47,9 @@ conntrack_flush_LDADD =3D ../src/libnetfilter_conntrack.l=
-a
- conntrack_flush_filter_SOURCES =3D conntrack_flush_filter.c
- conntrack_flush_filter_LDADD =3D ../src/libnetfilter_conntrack.la
 
-+conntrack_flush_filter_tuple_SOURCES =3D conntrack_flush_filter_tuple.c
-+conntrack_flush_filter_tuple_LDADD =3D ../src/libnetfilter_conntrack.la
-+
- conntrack_events_SOURCES =3D conntrack_events.c
- conntrack_events_LDADD =3D ../src/libnetfilter_conntrack.la
+On 21/08/24 5:45 pm, Roger Quadros wrote:
+> 
+> 
+> On 13/08/2024 10:42, MD Danish Anwar wrote:
+>> From: Ravi Gunasekaran <r-gunasekaran@ti.com>
+>>
+>> Add support to offload HSR Tx Tag Insertion and Rx Tag Removal
+>> and duplicate discard.
+> 
+> I can see code for Tx Tag insertion and RX tag removal.
+> Where are you doing duplicate discard in this patch?
+> 
 
-diff --git a/utils/conntrack_flush_filter_tuple.c
-b/utils/conntrack_flush_filter_tuple.c
-new file mode 100644
-index 0000000..f2bf558
---- /dev/null
-+++ b/utils/conntrack_flush_filter_tuple.c
-@@ -0,0 +1,61 @@
-+#include <arpa/inet.h>
-+#include <errno.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+
-+#include <libnetfilter_conntrack/libnetfilter_conntrack.h>
-+
-+static int cb(enum nf_conntrack_msg_type type, struct nf_conntrack *ct,
-+              void *data) {
-+  char buf[1024];
-+
-+  nfct_snprintf(buf, sizeof(buf), ct, NFCT_T_UNKNOWN, NFCT_O_DEFAULT,
-+                NFCT_OF_SHOW_LAYER3 | NFCT_OF_TIMESTAMP);
-+  printf("%s\n", buf);
-+
-+  return NFCT_CB_CONTINUE;
-+}
-+
-+int main(void) {
-+  int ret;
-+  struct nfct_handle *h;
-+
-+  h =3D nfct_open(CONNTRACK, 0);
-+  if (!h) {
-+    perror("nfct_open");
-+    return -1;
-+  }
-+  struct nfct_filter_dump *filter_dump =3D nfct_filter_dump_create();
-+  if (filter_dump =3D=3D NULL) {
-+    perror("nfct_filter_dump_alloc");
-+    return -1;
-+  }
-+
-+  struct nf_conntrack *ct;
-+  ct =3D nfct_new();
-+  if (!ct) {
-+    perror("nfct_new");
-+    return 0;
-+  }
-+
-+  nfct_set_attr_u8(ct, ATTR_ORIG_L3PROTO, AF_INET);
-+  nfct_set_attr_u8(ct, ATTR_L4PROTO, IPPROTO_ICMP);
-+  nfct_set_attr_u32(ct, ATTR_ORIG_IPV4_DST, inet_addr("192.168.1.1"));
-+  nfct_filter_dump_set_attr(filter_dump, NFCT_FILTER_DUMP_TUPLE, ct);
-+
-+  nfct_callback_register(h, NFCT_T_ALL, cb, NULL);
-+  ret =3D nfct_query(h, NFCT_Q_FLUSH_FILTER, filter_dump);
-+
-+  nfct_filter_dump_destroy(filter_dump);
-+
-+  printf("TEST: get conntrack ");
-+  if (ret =3D=3D -1)
-+    printf("(%d)(%s)\n", ret, strerror(errno));
-+  else
-+    printf("(OK)\n");
-+
-+  nfct_close(h);
-+
-+  ret =3D=3D -1 ? exit(EXIT_FAILURE) : exit(EXIT_SUCCESS);
-+}
+Roger, duplicate discard is done as part of RX tag removal and it is
+done by firmware.
+When driver sends the command ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE, firmware
+does RX tag removal as well as duplicate discard.
 
-Thank you for your reply.
+Maybe I can modify the commit message to stated that duplicate discard
+is done as part of rx tag removal?
 
-Here is an example patch for conntrack_flush_filter_tuple above.
+>>
+>> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+>> ---
+>>  drivers/net/ethernet/ti/icssg/icssg_common.c |  3 +++
+>>  drivers/net/ethernet/ti/icssg/icssg_config.c |  4 +++-
+>>  drivers/net/ethernet/ti/icssg/icssg_config.h |  2 ++
+>>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 11 ++++++++++-
+>>  drivers/net/ethernet/ti/icssg/icssg_prueth.h |  1 +
+>>  5 files changed, 19 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> index 2d6d8648f5a9..4eae4f9250c0 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+>> @@ -721,6 +721,9 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
+>>  	if (prueth->is_hsr_offload_mode && (ndev->features & NETIF_F_HW_HSR_DUP))
+>>  		dst_tag_id = PRUETH_UNDIRECTED_PKT_DST_TAG;
+>>  
+>> +	if (prueth->is_hsr_offload_mode && (ndev->features & NETIF_F_HW_HSR_TAG_INS))
+>> +		epib[1] |= PRUETH_UNDIRECTED_PKT_TAG_INS;
+>> +
+>>  	cppi5_desc_set_tags_ids(&first_desc->hdr, 0, dst_tag_id);
+>>  	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+>>  	cppi5_hdesc_attach_buf(first_desc, buf_dma, pkt_len, buf_dma, pkt_len);
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> index 2f485318c940..f061fa97a377 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+>> @@ -531,7 +531,9 @@ static const struct icssg_r30_cmd emac_r32_bitmask[] = {
+>>  	{{EMAC_NONE,  0xffff4000, EMAC_NONE, EMAC_NONE}},	/* Preemption on Tx ENABLE*/
+>>  	{{EMAC_NONE,  0xbfff0000, EMAC_NONE, EMAC_NONE}},	/* Preemption on Tx DISABLE*/
+>>  	{{0xffff0010,  EMAC_NONE, 0xffff0010, EMAC_NONE}},	/* VLAN AWARE*/
+>> -	{{0xffef0000,  EMAC_NONE, 0xffef0000, EMAC_NONE}}	/* VLAN UNWARE*/
+>> +	{{0xffef0000,  EMAC_NONE, 0xffef0000, EMAC_NONE}},	/* VLAN UNWARE*/
+>> +	{{0xffff2000, EMAC_NONE, EMAC_NONE, EMAC_NONE}},	/* HSR_RX_OFFLOAD_ENABLE */
+>> +	{{0xdfff0000, EMAC_NONE, EMAC_NONE, EMAC_NONE}}		/* HSR_RX_OFFLOAD_DISABLE */
+>>  };
+>>  
+>>  int icssg_set_port_state(struct prueth_emac *emac,
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
+>> index 1ac60283923b..92c2deaa3068 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_config.h
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
+>> @@ -80,6 +80,8 @@ enum icssg_port_state_cmd {
+>>  	ICSSG_EMAC_PORT_PREMPT_TX_DISABLE,
+>>  	ICSSG_EMAC_PORT_VLAN_AWARE_ENABLE,
+>>  	ICSSG_EMAC_PORT_VLAN_AWARE_DISABLE,
+>> +	ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE,
+>> +	ICSSG_EMAC_HSR_RX_OFFLOAD_DISABLE,
+>>  	ICSSG_EMAC_PORT_MAX_COMMANDS
+>>  };
+>>  
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> index 521e9f914459..582e72dd8f3f 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+>> @@ -42,7 +42,9 @@
+>>  #define DEFAULT_UNTAG_MASK	1
+>>  
+>>  #define NETIF_PRUETH_HSR_OFFLOAD	(NETIF_F_HW_HSR_FWD | \
+>> -					 NETIF_F_HW_HSR_DUP)
+>> +					 NETIF_F_HW_HSR_DUP | \
+>> +					 NETIF_F_HW_HSR_TAG_INS | \
+>> +					 NETIF_F_HW_HSR_TAG_RM)
+>>  
+>>  /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
+>>  #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
+>> @@ -1032,6 +1034,13 @@ static void icssg_change_mode(struct prueth *prueth)
+>>  
+>>  	for (mac = PRUETH_MAC0; mac < PRUETH_NUM_MACS; mac++) {
+>>  		emac = prueth->emac[mac];
+>> +		if (prueth->is_hsr_offload_mode) {
+>> +			if (emac->ndev->features & NETIF_F_HW_HSR_TAG_RM)
+>> +				icssg_set_port_state(emac, ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE);
 
-Pablo Neira Ayuso <pablo@netfilter.org> =E4=BA=8E2024=E5=B9=B48=E6=9C=8820=
-=E6=97=A5=E5=91=A8=E4=BA=8C 02:47=E5=86=99=E9=81=93=EF=BC=9A
->
-> Please, provide an example program for libnetfilter_conntrack.
->
-> See:
->
-> commit 27f09380ebb0fc21c4cd20070b828a27430b5de1
-> Author: Felix Huettner <felix.huettner@mail.schwarz>
-> Date:   Tue Dec 5 09:35:16 2023 +0000
->
->     conntrack: support flush filtering
->
-> for instance.
->
-> thanks
->
-> On Thu, Jul 11, 2024 at 01:40:02PM +0800, Changliang Wu wrote:
-> > PING
-> >
-> >
-> > Changliang Wu <changliang.wu@smartx.com> =E4=BA=8E2024=E5=B9=B46=E6=9C=
-=8820=E6=97=A5=E5=91=A8=E5=9B=9B 19:35=E5=86=99=E9=81=93=EF=BC=9A
-> > >
-> > > From cb8aa9a, we can use kernel side filtering for dump, but
-> > > this capability is not available for flush.
-> > >
-> > > This Patch allows advanced filter with CTA_FILTER for flush
-> > >
-> > > Performace
-> > > 1048576 ct flows in total, delete 50,000 flows by origin src ip
-> > > 3.06s -> dump all, compare and delete
-> > > 584ms -> directly flush with filter
-> > >
-> > > Signed-off-by: Changliang Wu <changliang.wu@smartx.com>
-> > > ---
-> > >  net/netfilter/nf_conntrack_netlink.c | 9 +++------
-> > >  1 file changed, 3 insertions(+), 6 deletions(-)
-> > >
-> > > diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_=
-conntrack_netlink.c
-> > > index 3b846cbdc..93afe57d9 100644
-> > > --- a/net/netfilter/nf_conntrack_netlink.c
-> > > +++ b/net/netfilter/nf_conntrack_netlink.c
-> > > @@ -1579,9 +1579,6 @@ static int ctnetlink_flush_conntrack(struct net=
- *net,
-> > >         };
-> > >
-> > >         if (ctnetlink_needs_filter(family, cda)) {
-> > > -               if (cda[CTA_FILTER])
-> > > -                       return -EOPNOTSUPP;
-> > > -
-> > >                 filter =3D ctnetlink_alloc_filter(cda, family);
-> > >                 if (IS_ERR(filter))
-> > >                         return PTR_ERR(filter);
-> > > @@ -1610,14 +1607,14 @@ static int ctnetlink_del_conntrack(struct sk_=
-buff *skb,
-> > >         if (err < 0)
-> > >                 return err;
-> > >
-> > > -       if (cda[CTA_TUPLE_ORIG])
-> > > +       if (cda[CTA_TUPLE_ORIG] && !cda[CTA_FILTER])
-> > >                 err =3D ctnetlink_parse_tuple(cda, &tuple, CTA_TUPLE_=
-ORIG,
-> > >                                             family, &zone);
-> > > -       else if (cda[CTA_TUPLE_REPLY])
-> > > +       else if (cda[CTA_TUPLE_REPLY] && !cda[CTA_FILTER])
-> > >                 err =3D ctnetlink_parse_tuple(cda, &tuple, CTA_TUPLE_=
-REPLY,
-> > >                                             family, &zone);
-> > >         else {
-> > > -               u_int8_t u3 =3D info->nfmsg->version ? family : AF_UN=
-SPEC;
-> > > +               u8 u3 =3D info->nfmsg->version || cda[CTA_FILTER] ? f=
-amily : AF_UNSPEC;
-> > >
-> > >                 return ctnetlink_flush_conntrack(info->net, cda,
-> > >                                                  NETLINK_CB(skb).port=
-id,
-> > > --
-> > > 2.43.0
-> > >
+Duplicate discard is done here ^^^^
+
+>> +			else
+>> +				icssg_set_port_state(emac, ICSSG_EMAC_HSR_RX_OFFLOAD_DISABLE);
+>> +		}
+>> +
+>>  		if (netif_running(emac->ndev)) {
+>>  			icssg_fdb_add_del(emac, eth_stp_addr, prueth->default_vlan,
+>>  					  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
+>> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> index 6cb1dce8b309..246f1e41c13a 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+>> @@ -58,6 +58,7 @@
+>>  #define IEP_DEFAULT_CYCLE_TIME_NS	1000000	/* 1 ms */
+>>  
+>>  #define PRUETH_UNDIRECTED_PKT_DST_TAG	0
+>> +#define PRUETH_UNDIRECTED_PKT_TAG_INS	BIT(30)
+>>  
+>>  /* Firmware status codes */
+>>  #define ICSS_HS_FW_READY 0x55555555
+> 
+
+-- 
+Thanks and Regards,
+Danish
 
