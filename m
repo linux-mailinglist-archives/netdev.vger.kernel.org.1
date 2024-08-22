@@ -1,337 +1,321 @@
-Return-Path: <netdev+bounces-121120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C2FF95BC82
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 18:54:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2A8995BCDD
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 19:11:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1B221F217C1
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:54:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07B1AB2712C
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 17:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B94C1CDFA7;
-	Thu, 22 Aug 2024 16:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F04631CF293;
+	Thu, 22 Aug 2024 17:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cb+CEePp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MwYytXG3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F17D1CC88F
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 16:54:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724345687; cv=fail; b=lWB9MfBjwiWlRdgsAbuJLXX7XWX4lhmTJ7zb+X+Mmz7cxNy+G40eUPBo/HSrTOxY2qY66Rath3C7Icb3U1JpTOUPlI5GsH+LYvtKOjzJQ9istA3rQTNgh9luCr99IQiJY9hORaOVQWR977F+AtYmtsWxqv/V0bqBot1JGbDEmM0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724345687; c=relaxed/simple;
-	bh=Q2Kht4oYXb+do0Jn1oxKRDGy94lvg0rJ951tFeV9HN4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=cCGoSBuG0dvwFyTwcKHj+6VPv/fO4W4Rd8E5qKUKSTh4cEANNc9dtIeUCHkaPSMzq9Z//Nwh1zbacZuxn4GHa2iIy6kw9vNd6KGO3Cxjd9AtVi3H4GrmKC80Zz5EyGBi8lvy5hABvFqcg9hiEGrLOypBM5K3BPPHDXre2hUQQAc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cb+CEePp; arc=fail smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724345686; x=1755881686;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Q2Kht4oYXb+do0Jn1oxKRDGy94lvg0rJ951tFeV9HN4=;
-  b=Cb+CEePp1ttY4NRumFOj4CeANbQWVIOahQBZ3GBglO07mXa3PXiaEQZ4
-   +AiqCcIzaXDSgOHecGC/TdDYEmjjBJ0JaIXwPaQhvsy3qMpYuxzCZE799
-   jPSL+OnY9GSqZYzStDiTUm+RoBqkBLkFGoRP7ld6C1MX0uZn86YxXsj4i
-   1saAcxwPR8yeAFM2ad+NKuWwx9b73U4t7ci20kf21NQgL+xhL9ek0tLHt
-   tWlaFjdKQh/rE6xubEuOggzr/lGo6AK21DSN3puFcLPs/SVFnzHxXxdoN
-   S+mzW51MdQu3IwvyAYz8nhpKoybgsf+CPR88RAYk7MQNdlWs6YOAxeeZK
-   g==;
-X-CSE-ConnectionGUID: jS8zIaciTGuIZe35316Oow==
-X-CSE-MsgGUID: 8isEjgxORaec3nvHh+slxw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="22940577"
-X-IronPort-AV: E=Sophos;i="6.10,167,1719903600"; 
-   d="scan'208";a="22940577"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 09:54:45 -0700
-X-CSE-ConnectionGUID: lZF1x85KQAejt7Jc1qDK0A==
-X-CSE-MsgGUID: zSzjbMJbRH+C4oVsTNGJOw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,167,1719903600"; 
-   d="scan'208";a="61220126"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Aug 2024 09:54:45 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 22 Aug 2024 09:54:44 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 22 Aug 2024 09:54:44 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 22 Aug 2024 09:54:44 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.40) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 22 Aug 2024 09:54:43 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bevLKR4WkYh8d7GsanESgETFF+LL7CgOICBxcG5OEvUZHtvGzCIeA2Z9Q5DBCE0PfFNYg/qRhhKRNL+8aXr2hzzQY7pl7O5/k3765Wn9McljkNyUNLB6WpRFxMw9O2mQd4aylpYdeDedMuVDZVt/En5F8pdzaA2u6q3m5TeZq7AhulruMacNelHGptF8GKufYIDIv1BDx4tOOUC3dDIfsideAvFCqZbWy7MmVgQtbK2Lr32O/PmRVZepjnhIY+xQoOA9gsppfxSRr1GXmWIm0FUdwyQjynDNeTsQNi0iFU9tfSiu2QhWDx3V293AtvC77UQZHMIiPAJJqgUIfGMQAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8KUkhtCXfW4Aj1GO/iXqtlgqlxzKsiN4xrHOyyaPgUY=;
- b=Wtb06AbNXEIxczH1KauwIiAkxfYlVOtTgUvDmxof3dL1hItSJqufuirIfwr4nBCdtAL9vXf/LWCK3AWHpEtrAE/90vHFf2rz5amvPvl14/eluMvklHNiXue58giEWkD1l+mRe94EDDk6eL0y3KUhfQTDhsj01gpU2Sfk5ozpqEs0/t68vTNS9ihDrUdqTa2j4SgMrz+4zFKuplbH4CYJuZCwoEYrlXE9MCoOler5W86DWskY+BMduoh7fe7MHq9ipwEV8699mU1iTyjEBPmCLjTjy3FYkY6IfuRB1HQ0BL+x0q1MC2BY3oeA43JcBWyIJPeuS7yNQU0dhwKpghJAWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by BL1PR11MB5270.namprd11.prod.outlook.com (2603:10b6:208:313::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.25; Thu, 22 Aug
- 2024 16:54:41 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.7875.019; Thu, 22 Aug 2024
- 16:54:41 +0000
-Message-ID: <8903a794-a740-405a-86bd-d97fb611e058@intel.com>
-Date: Thu, 22 Aug 2024 18:54:36 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v10 14/14] iavf: add support for Rx timestamps to
- hotpath
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<horms@kernel.org>, <anthony.l.nguyen@intel.com>, <kuba@kernel.org>,
-	<alexandr.lobakin@intel.com>
-References: <20240821121539.374343-1-wojciech.drewek@intel.com>
- <20240821121539.374343-15-wojciech.drewek@intel.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240821121539.374343-15-wojciech.drewek@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR0P278CA0105.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:23::20) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20E71CF288;
+	Thu, 22 Aug 2024 17:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724346186; cv=none; b=F9mYOxl76B6wr2pUKT6ZEUpavuD2Nk7ExC8KPPv8bcDc8Gu8o/HUfSSyjOUv5HAVJWp5P+ua+GlwYiy3Kc0YZhRZKjK3ZjUMQF1Ek35oDs0M755dPrJ/0wlAQvDeJuj58+T3er7eF0YCv8O0lhIdtrdbR1aYq70SJyXeEOtM5O8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724346186; c=relaxed/simple;
+	bh=qkIjjiVogjjvnuxGsaniqp8BUrrCLWdw7P3LDfPm/Yw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FYSVAqFeL3zTt5pxOIPqGWDlQWVQHBu+Z+g7fxyIXqNowo9ZYe5AcCXitBPh8Ym6I6QqoV4IsqXrbZnFGCgq/h0Dx/jR8xj0pPkADtMnVw7SXYLi53IXGQlQzY7UdV18vDiG6hyZgoQHVv7lFCm1U1NQsi/PctejMOblZG4NgWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MwYytXG3; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5334adf7249so1457418e87.3;
+        Thu, 22 Aug 2024 10:03:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724346183; x=1724950983; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DIj/n8EH0F4bk0Ees7Y37+6sgIgt4AQemsJzINsa4Sk=;
+        b=MwYytXG3Dol5SheXkLW2VODbAcpA1hv8A5EfqQd0HlrKMF1cAMIeubT0ivHxDS8Htn
+         8CKf3pp/vO3FinAoGvbdyhFqY8bBus2FlAD7uKimUiLcZoInkq2LfQvJI9JAkxkCs/5y
+         CcpbfGQMYQVV07WYCRsi1mrWnPZOw2OBDUFcZGrhAw6rShJjAMH0ziuuSpESZEvdFmUJ
+         yN6muCRO31sViVPwQLABPKBysG0vhr/UoE/k8no57+kkr36WcTobYr+NuI18hGUkCTN/
+         TlIGKikk05RcPEIFASQZeWloRiMElN70wJ5Xl3AHOIBRyOUaSDT715HHHIKEU/rbwIuw
+         rHwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724346183; x=1724950983;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DIj/n8EH0F4bk0Ees7Y37+6sgIgt4AQemsJzINsa4Sk=;
+        b=jf/Wd0osFQa4jGyrU02SGMVEDlKwWyVbwIWhKVFf92/H9+7+KzNU+iRzqHDx0OlZSl
+         RKUl1ncr+/vlGBJCGfeuCw5yJaiuJ6mRoWxNN8OjpWr/6DXXUdV+7AHy8Fe/YQzuoA5v
+         HE8NLhdXykYVL7Qy31vpM6qsCtibtPzCJfVMEJ21+FZ/9OmxRdYaPR0Fn0LIPtAA5USo
+         Qj05TRQeXK3gIcBNHPPrHiH/XDf5DfwfU0+wdvFvVLXBhO1BzkyiihQfwtMntIkkbEtI
+         fWeAWs5eRrTufEHDdOnpBS5UPh8f+cDzIMpxoZWdTcH0fk31ATeT/pngEjl3CA0b4VsR
+         YFMw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTull26zBcqlvmgS7tXn9wSlYhg4ByII4zzYW2Q0euLfcsfa/48/J2nQ2IgnXswPvDVeyFP/3B0WEzrin12ko8zic=@vger.kernel.org, AJvYcCXeknbAFzeEdEmUUjp1XXufe9ZKCl/cP25xdF0SE5aPkGybAjGLDzXPA+CXzBjuJ8DH0kds21bo@vger.kernel.org, AJvYcCXpYu/Ge1BDBenuBTo8eaD+zC54rnN1KlfFMLkWPJWZg6CKwJkf+ta3FOniWNtkOgaIzZqgARnS1vfktpM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyK3wtG3qgA+tcQ9MlMYcnyrDn1qOd19EFJfWAJkg3cHOi6d0eg
+	CJ1krq6yueUP0dzsbty+8dnyH899rH1H/0Bfo2yXWQQ1mAvFjUIUPUBXSYd+OlGV3AO5tg6u/Pi
+	5/MGpqh4BahlvIfihnMGdtuWvbjA=
+X-Google-Smtp-Source: AGHT+IFAxofPqnflODhvDlBtQ1z7sw6PKXYf1b65/dZtDIdsYSI9mkJ9/6dbkLecgibvSfpX8V/qQTeRgjB86ZrsvxA=
+X-Received: by 2002:a2e:f1a:0:b0:2ef:20ae:d111 with SMTP id
+ 38308e7fff4ca-2f3f87e0c64mr45111601fa.6.1724346182420; Thu, 22 Aug 2024
+ 10:03:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|BL1PR11MB5270:EE_
-X-MS-Office365-Filtering-Correlation-Id: c3b67882-b007-4dba-7952-08dcc2cb1db3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?MVF5ajRwT2k2SG96TzVRN1VsR2ZtemhCY2NYbENZY1VZeWxjZGYwTDdSNllY?=
- =?utf-8?B?em1TSkdmc1FHQXNUZWdEbTRRNkhwKzlCaFB3VWtZTTNjM0JNZ0pHaEcwVmtz?=
- =?utf-8?B?ditBSkhSMVZXTEhtdUJSazBGb0lCZ1E3eFZ2YUxlKy81dDhSa0tuWDQyN3FV?=
- =?utf-8?B?QVd0Tk9BZzU1bWxnQm1nUWNNaTVYK2lXa0lOcjhaZHp0S1h4Z2NmakVMLys5?=
- =?utf-8?B?b3hsUHNCTkRyaGNlR0VrSHV2Q3A1c2MwazBOY1hjSGlWMEplKy9sL0NBcW9E?=
- =?utf-8?B?eHRudExyZHJWRkc3L3RzVjdPQStSRHZhanQwQTJGajFHR2ltQUpST2d4a3Va?=
- =?utf-8?B?VGkra2pWUEoxN3c2SHh5dmVVRWZxWDZKak40elc5T1FWeWFZSXUyamFrcUhK?=
- =?utf-8?B?TTMyMFdEak1zamhabEQrZ3U5bGdEaE05VG93K2xFcStSOXowV0l0MzZpSHlN?=
- =?utf-8?B?WW1GQ2Q2aXFla3hLeUFHazRZMmpGTnJvMFA5WTUveWxmYW43WUQrS05wL0NE?=
- =?utf-8?B?cmRwRUJ3MjIrMjYyZE5lTGZaWHFDcVRtQWxmeEtZRnU5YkFPZHd0SXZ3OU80?=
- =?utf-8?B?NG5NdC9xRkxuVysxc1YrOXBYbWVMREFYM1JwdThkL280OFdjZHVpOFRUQ21F?=
- =?utf-8?B?Z0NhbjFJOGF5QjhxNGRhMThHZHlqanVBS2VWbU1BcDI4TzI5MVVBbVNRY2lk?=
- =?utf-8?B?QWwvSGtFZHRsRndtTFRuK3MvUnlRRFNldTAyUGN2d0ZWM25RbGVwY1Q5RW5S?=
- =?utf-8?B?b1Vqam5FMmNFU1FYVHlDZWZ5Q3JGU3JHQTMzSVpJc2ZXbzloVUE1Sm5oYXJM?=
- =?utf-8?B?ZDBleE5kMUhiMDVuMlFuVWNTaGJ5NTg1bU5tdGttR2VpaGp0N29ua2RhdzVk?=
- =?utf-8?B?VzRUYWVlUWx0clpldWJvbzBqRmFoYkQxZE1iVW9QRzZIN0t1SlQ4UkoyTkFJ?=
- =?utf-8?B?dW9qY3piNHY1anlubUZYOXZyVk8zc3hpYlZNcktVYldYZzI1d0d6Q3crYkJo?=
- =?utf-8?B?WVF3eXloeHFlaUJXbHVoN3VQc3lieXNyUjJncjFDeTRxS3hEQUhiUkN4SEJ0?=
- =?utf-8?B?SC9mallLLzc5aStDOERoZE5UK0krcEhDU1hXelEvTVIxalFGMlNiNm1WOEp3?=
- =?utf-8?B?bzdCSkhtT0JWdDJ1U0Zra1oyZUlVcDFGTmJWYmM2aE5KVWludG9ZVTJkMjN3?=
- =?utf-8?B?bkRkWEt2YW9XaGFjYzRpNjhpSnFFUUtlVFZ5MWxqVW9IenFESTdBTlJxbEo2?=
- =?utf-8?B?bmlaWHYzazE5ajNaL2wvcHRZckc1MGdkdkFia3BEU2drZmV5cS9Qa1h1ZUhK?=
- =?utf-8?B?UHhNbTY3dENuNXRlV1ZSSitQbWdXck1HTkFLaFRFWE44NGhBekhKSG15ZmpU?=
- =?utf-8?B?RmlveUw5ME0rV2pYalpLSjI3RWsvWXFZQjYyZVA1Qll3MzBqaTRHTHI3VlhB?=
- =?utf-8?B?Tlg1YUIvS0dmczFrNExiSVBVOVdLK1FMSGphQXpYWGZzR1IvcVA2UzRuOXkv?=
- =?utf-8?B?MVlnR1pwTWN6cDMzMGg1QUE2allUbWZ0aHBFTk1Cbm1qVVFXRXpCRXFNVFZ0?=
- =?utf-8?B?OGc1RGZiOE8vSzUwVWx6SStDQUhYemxVSVpzdlpoSXgyU2JPUTN0OTZJNzBK?=
- =?utf-8?B?K3ZiMlRHOTQvRk1mdEZud2FnRUpVaTN4YjlZd3ZTTmxHanBnVHBQZHQ5T0JE?=
- =?utf-8?B?V1ZlTXZjZ202OExNdy9ZeWlmcjAybWlLcUt2UDArZmxrUk9UWmhlTi8vMHFO?=
- =?utf-8?B?S0xjT204TzJDTjZpYmcwcjBVNno1b3FNdHl6dm5rTys0VWx0NTcvVng5OTJG?=
- =?utf-8?B?eEE1MGp2dmF5QWk2eVh5dz09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L1dzbldaeHhraVNoeGNYd1RtSTRLQkVvUWNlZFNiTnp6RmJ3aFA3aWh4dE05?=
- =?utf-8?B?cXkwWFM0UUdiOVozbUFFQUFacEtaV1J1VHd5MEdsQXFSTFQ5enp6UGpEZ000?=
- =?utf-8?B?clFDMDkvb2ROOHRqdGk3SVE2N0pUVkt1NG9rVExzRFFiUmxKWEhRU29oRjFk?=
- =?utf-8?B?K3Rwd1VsT3QzdXJOU0FGRkhYWGM5L3p1RGU1U0tUSmd4NDdUdVJDcHl4Tnps?=
- =?utf-8?B?L2RxZjdWb3R4TmhMOCtVd3J1bFpreTJROGg5YVJCblVISGVnd0M1K1BYL0M4?=
- =?utf-8?B?dS9DZElRTjB2aEYwclRHK1BoWlNZTlFldUpVdk1VVDlJMEJEdHZCcUJ0QjM0?=
- =?utf-8?B?ZFJmbWpmK2FDRG5LWGd4d0lRajlZY0xzS2dWVHIvamIyMjNtWDZmVmVPOTZ2?=
- =?utf-8?B?STZFSDlyUC9uRDFwTVlJQkcxZ1ZWUnUvdVdEVzNYdW9mYTJvVXBsUXQxV0w2?=
- =?utf-8?B?cW5ZQ0RMeEdkYkFlYXVsbWFsWDVBeTF5RHNUK3hQUzJ1SVZiTFg2bnVYNWV1?=
- =?utf-8?B?R1REbUhjY3Rib2JtNFZDWGJyUXdqNkRPajQvOFB2T3d2dVRXUFNzYlZtVEpj?=
- =?utf-8?B?aG1zNHJOb3hoSWFwZ2RjbjB0eVVFY0tYMFVycTd6cXZZMFowWlBBRnJURTlG?=
- =?utf-8?B?bWttenEzTEtGWUFPR2ZrbERDMWtOcEhubGI0N2p4V0FoeTZMUTJOMHZSak52?=
- =?utf-8?B?dHBFNEtpTlZNdmYwdVowMDkvM1VLQ3laR2tvL0NmeFVhVlVlRm9jNkhNeWFp?=
- =?utf-8?B?TGhLclMzOElBNWtDQlp5ZkhkU3c4eHR0WHdXS2FIRGNISjVqNFFlcDVOQ3Rn?=
- =?utf-8?B?YjYxVkRQQTJxZDdtVUgvclZSblBxdlRzQXNhamxmRTBOWWJDcmpjdFNZTkE0?=
- =?utf-8?B?THdwRy9SQzM5ODV6YjZITTJQOG1QR2kxNUU0Z2pjYTFQY1cyWVFsY3hONVZ2?=
- =?utf-8?B?SjBrNmQ0elk2QU53VWJWbExBRWdFY0lSL0JtL05ub3hxQ2RGRTVvL0lxKy9w?=
- =?utf-8?B?d1RPcTdvQlRPZXRCSjZ4NFlhcXIrdjcvMXZ5TkNBeFFBOVB6Y0pxOWtyL2p5?=
- =?utf-8?B?enk3S28yTGlwaW9DQ1FDZlNGWGlEOGYwSSsxd2NwWUJPUjRBbWlYWGZNemU0?=
- =?utf-8?B?VkdpYkRKT21kcFFZRmRmTlNseVBmcWcrejQyWXdPcEFuSnNxR0ZyTGpzbmRO?=
- =?utf-8?B?UTU1Y3djcXh0RFJJOEJRa3lKRGFJU0M4OUFTbEJMMGlIRmlCeW1yeTMyUXli?=
- =?utf-8?B?WmtWakRFd3lxTVgzeGZsL25mM3ZUZjl1S1M5enh0SCt5d1NmY2RKVlZOS25q?=
- =?utf-8?B?RFVadlIwZGMyM0dSRWhDSGF4UDZMc3NXSml6Zy9hR2pkRllNSTg2QjNuNDc2?=
- =?utf-8?B?SFhnNmRJMHV5MFRoVHk5U283c2VvOE1YVEJZTkNtRjhod0dJKytFV1lpWWJN?=
- =?utf-8?B?KzlMalhjVlRCOEd6UmdDbXZjT25mRktMaUQ1Z2xsd0xicjdhcExpdU8rNUc2?=
- =?utf-8?B?TWNiWHR0SnZsVDYyOE5GeGNkTTBWUm5MMVQvVXdOK0dtUnNrUDM1MjJCMmgz?=
- =?utf-8?B?VzhhTmw3NDFjTnozL2h5U1g0VWc2L0l6UnNVZE5jTDltL3dwR296dVArWURH?=
- =?utf-8?B?L1d2Rm84a2ZmQ3JIUHRjZnJWY3cvSGdtdlVGUncyL2dLOHl6RXJXWW1SMDZE?=
- =?utf-8?B?UDVwVFI5NzlQR2N4Qm5qcW00VDBBQ2Urdm15cExFZ0FNd1Izdmp5OFduek5l?=
- =?utf-8?B?eXR1TGZ6MUJlL3duWnJJZEJ3M2xtTXJGTWszTHZYTDAxZ1g4K3lLMVoyanBZ?=
- =?utf-8?B?VDBrR0JxQjUzTUhaaHFVWG52SStrM3h0RFd3WFdEcjgwdGVjOUZscCtnUGZh?=
- =?utf-8?B?OXdtYzMwcFVIa1ZKcjNxZzdrYmhkZ1FDY2EvYVBud2NjVWcwQUh3Rm1KL0NG?=
- =?utf-8?B?a0ZvS2ppakJMUzMxSVRsUmIydEpwK0dBR2ZGVmZjNGs0R08yK21tWkg3N0Jj?=
- =?utf-8?B?aXI0VzRMaUdGaXFhMFRXMmxyUXZOTkVQVnRXcUhwRXpydXJ2bW5YWFBvV1Iz?=
- =?utf-8?B?NVJFUW5tcGhxWEdFM0lCbHRuSVFWQ3NvdnVlNUhHNzhIejRZZGQ5MCtpOGNS?=
- =?utf-8?B?ak8rdjZ2ajBiMDBxUEpxU1lyVVIyQUdHVmhsYVUxVjhsdzZKOHppMjFZOEpw?=
- =?utf-8?B?N3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3b67882-b007-4dba-7952-08dcc2cb1db3
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Aug 2024 16:54:41.3180
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 75H1Tt4mAQbTmtVFHG7L+JPu6PwkJ6Pj+48ww1icOBmfaFzeAXVUdV4fbMcPn0j5BYUQSSJvn62PA2Eoqlboapuv0ir/AcFhOl2IzMHhAJI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB5270
-X-OriginatorOrg: intel.com
+References: <20240822084733.1599295-1-frank.li@vivo.com> <20240822084733.1599295-9-frank.li@vivo.com>
+ <15ba8f05-8909-4ade-b0f3-c98cad0bd9f0@wanadoo.fr>
+In-Reply-To: <15ba8f05-8909-4ade-b0f3-c98cad0bd9f0@wanadoo.fr>
+From: Marcin Wojtas <marcin.s.wojtas@gmail.com>
+Date: Thu, 22 Aug 2024 19:02:49 +0200
+Message-ID: <CAHzn2R2To1pQ+RSWMS+fdKpMzvXLoORRva0MOTpUrYnsQQEy+g@mail.gmail.com>
+Subject: Re: [net-next 8/9] net: mvpp2: Convert to devm_clk_get_enabled() and devm_clk_get_optional_enabled()
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Yangtao Li <frank.li@vivo.com>, clement.leger@bootlin.com, andrew@lunn.ch, 
+	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	ulli.kroll@googlemail.com, linus.walleij@linaro.org, linux@armlinux.org.uk, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, hkallweit1@gmail.com, 
+	justinstitt@google.com, kees@kernel.org, u.kleine-koenig@pengutronix.de, 
+	jacob.e.keller@intel.com, horms@kernel.org, shannon.nelson@amd.com, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-Date: Wed, 21 Aug 2024 14:15:39 +0200
+czw., 22 sie 2024 o 15:20 Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> napisa=C5=82(a):
+>
+> Le 22/08/2024 =C3=A0 10:47, Yangtao Li a =C3=A9crit :
+> > Use devm_clk_get_enabled() and devm_clk_get_optional_enabled()
+> > to simplify code.
+> >
+> > Signed-off-by: Yangtao Li <frank.li@vivo.com>
+> > ---
+> >   drivers/net/ethernet/marvell/mvpp2/mvpp2.h    |  7 --
+> >   .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 86 +++++-------------=
+-
+> >   2 files changed, 22 insertions(+), 71 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h b/drivers/net/e=
+thernet/marvell/mvpp2/mvpp2.h
+> > index 9e02e4367bec..643a645e8097 100644
+> > --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
+> > +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
+> > @@ -1044,13 +1044,6 @@ struct mvpp2 {
+> >        */
+> >       struct regmap *sysctrl_base;
+> >
+> > -     /* Common clocks */
+> > -     struct clk *pp_clk;
+> > -     struct clk *gop_clk;
+> > -     struct clk *mg_clk;
+> > -     struct clk *mg_core_clk;
+> > -     struct clk *axi_clk;
+> > -
+> >       /* List of pointers to port structures */
+> >       int port_count;
+> >       struct mvpp2_port *port_list[MVPP2_MAX_PORTS];
+> > diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/=
+net/ethernet/marvell/mvpp2/mvpp2_main.c
+> > index 2fe8bae4eb3c..0075499de29f 100644
+> > --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> > +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> > @@ -7462,6 +7462,7 @@ static int mvpp2_get_sram(struct platform_device =
+*pdev,
+> >
+> >   static int mvpp2_probe(struct platform_device *pdev)
+> >   {
+> > +     struct clk *pp_clk, *gop_clk, *mg_clk, *mg_core_clk, *axi_clk;
+>
+> Hi,
+>
+> Nitpick: you could also define just struct clk *pp_clk, *clk; and reuse
+> clk for most calls.
+> *Maybe* clk_get_rate() could be moved in order to only need 1 clk.
+>
 
-> From: Jacob Keller <jacob.e.keller@intel.com>
-> 
-> Add support for receive timestamps to the Rx hotpath. This support only
-> works when using the flexible descriptor format, so make sure that we
-> request this format by default if we have receive timestamp support
-> available in the PTP capabilities.
-> 
-> In order to report the timestamps to userspace, we need to perform
-> timestamp extension. The Rx descriptor does actually contain the "40
-> bit" timestamp. However, upper 32 bits which contain nanoseconds are
-> conveniently stored separately in the descriptor. We could extract the
-> 32bits and lower 8 bits, then perform a bitwise OR to calculate the
-> 40bit value. This makes no sense, because the timestamp extension
-> algorithm would simply discard the lower 8 bits anyways.
-> 
-> Thus, implement timestamp extension as iavf_ptp_extend_32b_timestamp(),
-> and extract and forward only the 32bits of nominal nanoseconds.
-> 
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> ---
->  drivers/net/ethernet/intel/iavf/iavf_main.c | 11 +++-
->  drivers/net/ethernet/intel/iavf/iavf_ptp.c  | 61 +++++++++++++++++++++
->  drivers/net/ethernet/intel/iavf/iavf_ptp.h  |  4 ++
->  drivers/net/ethernet/intel/iavf/iavf_txrx.c | 45 +++++++++++++++
->  drivers/net/ethernet/intel/iavf/iavf_type.h |  1 +
->  5 files changed, 121 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> index 1458410ca560..ebc01a8d1ac6 100644
-> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> @@ -730,6 +730,15 @@ static u8 iavf_select_rx_desc_format(const struct iavf_adapter *adapter)
->  	if (!IAVF_RXDID_ALLOWED(adapter))
->  		return VIRTCHNL_RXDID_1_32B_BASE;
->  
-> +	/* Rx timestamping requires the use of flexible NIC descriptors */
-> +	if (iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_RX_TSTAMP)) {
-> +		if (rxdids & BIT(VIRTCHNL_RXDID_2_FLEX_SQ_NIC))
-> +			return VIRTCHNL_RXDID_2_FLEX_SQ_NIC;
-> +
-> +		pci_warn(adapter->pdev,
-> +			 "Unable to negotiate flexible descriptor format\n");
-> +	}
-> +
->  	/* Warn if the PF does not list support for the default legacy
->  	 * descriptor format. This shouldn't happen, as this is the format
->  	 * used if VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC is not supported. It is
-> @@ -737,7 +746,7 @@ static u8 iavf_select_rx_desc_format(const struct iavf_adapter *adapter)
->  	 * support for the format.
->  	 */
->  	if (!(rxdids & VIRTCHNL_RXDID_1_32B_BASE_M))
-> -		dev_warn(&adapter->pdev->dev, "PF does not list support for default Rx descriptor format\n");
-> +		pci_warn(adapter->pdev, "PF does not list support for default Rx descriptor format\n");
+I'm also supportive to optimizing for amount of variables used, as
+they are all local now.
 
-Unrelated (addresses my earlier comments, but not related to this patch).
+Best regards,
+Marcin
 
-[...]
-
-> @@ -1085,6 +1086,49 @@ static void iavf_flex_rx_hash(const struct iavf_ring *ring,
->  	}
->  }
->  
-> +/**
-> + * iavf_flex_rx_tstamp - Capture Rx timestamp from the descriptor
-> + * @rx_ring: descriptor ring
-> + * @rx_desc: specific descriptor
-> + * @skb: skb currently being received
-> + *
-> + * Read the Rx timestamp value from the descriptor and pass it to the stack.
-> + *
-> + * This function only operates on the VIRTCHNL_RXDID_2_FLEX_SQ_NIC flexible
-> + * descriptor writeback format.
-> + */
-> +static void iavf_flex_rx_tstamp(const struct iavf_ring *rx_ring,
-> +				const struct iavf_rx_desc *rx_desc,
-> +				struct sk_buff *skb)
-> +{
-> +	struct iavf_adapter *adapter;
-> +	__le64 qw2 = rx_desc->qw2;
-> +	__le64 qw3 = rx_desc->qw3;
-
-You only need both @qw2 and @qw3 once, so I'd avoid creating these
-variables.
-But given that these qwords are used in other functions, I'd just pass
-both qwords as function arguments instead of @rx_desc.
-
-> +	u32 tstamp;
-> +	u64 ns;
-> +
-> +	/* Skip processing if timestamps aren't enabled */
-> +	if (!(rx_ring->flags & IAVF_TXRX_FLAGS_HW_TSTAMP))
-> +		return;
-> +
-> +	/* Check if this Rx descriptor has a valid timestamp */
-> +	if (!le64_get_bits(qw2, IAVF_PTP_40B_TSTAMP_VALID))
-> +		return;
-> +
-> +	/* the ts_low field only contains the valid bit and sub-nanosecond
-> +	 * precision, so we don't need to extract it.
-> +	 */
-> +	tstamp = le64_get_bits(qw3, IAVF_RXD_FLEX_QW3_TSTAMP_HIGH_M);
-> +
-> +	adapter = netdev_priv(rx_ring->netdev);
-> +	ns = iavf_ptp_extend_32b_timestamp(adapter->ptp.cached_phc_time,
-> +					   tstamp);
-
-Hmm, this netdev_priv() + adapter access etc. doesn't look good on
-hotpath. I think it would be better to cache a pointer to adapter->ptp
-in each ring structure and update them when it gets changed.
-
-> +
-> +	*skb_hwtstamps(skb) = (struct skb_shared_hwtstamps) {
-> +		.hwtstamp = ns_to_ktime(ns),
-> +	};
-
-Thanks,
-Olek
+> CJ
+>
+> >       struct mvpp2 *priv;
+> >       struct resource *res;
+> >       void __iomem *base;
+> > @@ -7561,56 +7562,30 @@ static int mvpp2_probe(struct platform_device *=
+pdev)
+> >               priv->max_port_rxqs =3D 32;
+> >
+> >       if (dev_of_node(&pdev->dev)) {
+> > -             priv->pp_clk =3D devm_clk_get(&pdev->dev, "pp_clk");
+> > -             if (IS_ERR(priv->pp_clk))
+> > -                     return PTR_ERR(priv->pp_clk);
+> > -             err =3D clk_prepare_enable(priv->pp_clk);
+> > -             if (err < 0)
+> > -                     return err;
+> > +             pp_clk =3D devm_clk_get_enabled(&pdev->dev, "pp_clk");
+> > +             if (IS_ERR(pp_clk))
+> > +                     return PTR_ERR(pp_clk);
+> >
+> > -             priv->gop_clk =3D devm_clk_get(&pdev->dev, "gop_clk");
+> > -             if (IS_ERR(priv->gop_clk)) {
+> > -                     err =3D PTR_ERR(priv->gop_clk);
+> > -                     goto err_pp_clk;
+> > -             }
+> > -             err =3D clk_prepare_enable(priv->gop_clk);
+> > -             if (err < 0)
+> > -                     goto err_pp_clk;
+> > +             gop_clk =3D devm_clk_get_enabled(&pdev->dev, "gop_clk");
+> > +             if (IS_ERR(gop_clk))
+> > +                     return PTR_ERR(gop_clk);
+> >
+> >               if (priv->hw_version >=3D MVPP22) {
+> > -                     priv->mg_clk =3D devm_clk_get(&pdev->dev, "mg_clk=
+");
+> > -                     if (IS_ERR(priv->mg_clk)) {
+> > -                             err =3D PTR_ERR(priv->mg_clk);
+> > -                             goto err_gop_clk;
+> > -                     }
+> > -
+> > -                     err =3D clk_prepare_enable(priv->mg_clk);
+> > -                     if (err < 0)
+> > -                             goto err_gop_clk;
+> > -
+> > -                     priv->mg_core_clk =3D devm_clk_get_optional(&pdev=
+->dev, "mg_core_clk");
+> > -                     if (IS_ERR(priv->mg_core_clk)) {
+> > -                             err =3D PTR_ERR(priv->mg_core_clk);
+> > -                             goto err_mg_clk;
+> > -                     }
+> > +                     mg_clk =3D devm_clk_get_enabled(&pdev->dev, "mg_c=
+lk");
+> > +                     if (IS_ERR(mg_clk))
+> > +                             return PTR_ERR(mg_clk);
+> >
+> > -                     err =3D clk_prepare_enable(priv->mg_core_clk);
+> > -                     if (err < 0)
+> > -                             goto err_mg_clk;
+> > +                     mg_core_clk =3D devm_clk_get_optional_enabled(&pd=
+ev->dev, "mg_core_clk");
+> > +                     if (IS_ERR(mg_core_clk))
+> > +                             return PTR_ERR(mg_core_clk);
+> >               }
+> >
+> > -             priv->axi_clk =3D devm_clk_get_optional(&pdev->dev, "axi_=
+clk");
+> > -             if (IS_ERR(priv->axi_clk)) {
+> > -                     err =3D PTR_ERR(priv->axi_clk);
+> > -                     goto err_mg_core_clk;
+> > -             }
+> > -
+> > -             err =3D clk_prepare_enable(priv->axi_clk);
+> > -             if (err < 0)
+> > -                     goto err_mg_core_clk;
+> > +             axi_clk =3D devm_clk_get_optional_enabled(&pdev->dev, "ax=
+i_clk");
+> > +             if (IS_ERR(axi_clk))
+> > +                     return PTR_ERR(axi_clk);
+> >
+> >               /* Get system's tclk rate */
+> > -             priv->tclk =3D clk_get_rate(priv->pp_clk);
+> > +             priv->tclk =3D clk_get_rate(pp_clk);
+> >       } else {
+> >               err =3D device_property_read_u32(&pdev->dev, "clock-frequ=
+ency", &priv->tclk);
+> >               if (err) {
+> > @@ -7622,7 +7597,7 @@ static int mvpp2_probe(struct platform_device *pd=
+ev)
+> >       if (priv->hw_version >=3D MVPP22) {
+> >               err =3D dma_set_mask(&pdev->dev, MVPP2_DESC_DMA_MASK);
+> >               if (err)
+> > -                     goto err_axi_clk;
+> > +                     return err;
+> >               /* Sadly, the BM pools all share the same register to
+> >                * store the high 32 bits of their address. So they
+> >                * must all have the same high 32 bits, which forces
+> > @@ -7630,7 +7605,7 @@ static int mvpp2_probe(struct platform_device *pd=
+ev)
+> >                */
+> >               err =3D dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32=
+));
+> >               if (err)
+> > -                     goto err_axi_clk;
+> > +                     return err;
+> >       }
+> >
+> >       /* Map DTS-active ports. Should be done before FIFO mvpp2_init */
+> > @@ -7649,12 +7624,12 @@ static int mvpp2_probe(struct platform_device *=
+pdev)
+> >       err =3D mvpp2_init(pdev, priv);
+> >       if (err < 0) {
+> >               dev_err(&pdev->dev, "failed to initialize controller\n");
+> > -             goto err_axi_clk;
+> > +             return err;
+> >       }
+> >
+> >       err =3D mvpp22_tai_probe(&pdev->dev, priv);
+> >       if (err < 0)
+> > -             goto err_axi_clk;
+> > +             return err;
+> >
+> >       /* Initialize ports */
+> >       device_for_each_child_node_scoped(&pdev->dev, port_fwnode) {
+> > @@ -7665,8 +7640,7 @@ static int mvpp2_probe(struct platform_device *pd=
+ev)
+> >
+> >       if (priv->port_count =3D=3D 0) {
+> >               dev_err(&pdev->dev, "no ports enabled\n");
+> > -             err =3D -ENODEV;
+> > -             goto err_axi_clk;
+> > +             return -ENODEV;
+> >       }
+> >
+> >       /* Statistics must be gathered regularly because some of them (li=
+ke
+> > @@ -7698,16 +7672,6 @@ static int mvpp2_probe(struct platform_device *p=
+dev)
+> >   err_port_probe:
+> >       for (i =3D 0; i < priv->port_count; i++)
+> >               mvpp2_port_remove(priv->port_list[i]);
+> > -err_axi_clk:
+> > -     clk_disable_unprepare(priv->axi_clk);
+> > -err_mg_core_clk:
+> > -     clk_disable_unprepare(priv->mg_core_clk);
+> > -err_mg_clk:
+> > -     clk_disable_unprepare(priv->mg_clk);
+> > -err_gop_clk:
+> > -     clk_disable_unprepare(priv->gop_clk);
+> > -err_pp_clk:
+> > -     clk_disable_unprepare(priv->pp_clk);
+> >       return err;
+> >   }
+> >
+> > @@ -7745,12 +7709,6 @@ static void mvpp2_remove(struct platform_device =
+*pdev)
+> >
+> >       if (!dev_of_node(&pdev->dev))
+> >               return;
+> > -
+> > -     clk_disable_unprepare(priv->axi_clk);
+> > -     clk_disable_unprepare(priv->mg_core_clk);
+> > -     clk_disable_unprepare(priv->mg_clk);
+> > -     clk_disable_unprepare(priv->pp_clk);
+> > -     clk_disable_unprepare(priv->gop_clk);
+> >   }
+> >
+> >   static const struct of_device_id mvpp2_match[] =3D {
+>
 
