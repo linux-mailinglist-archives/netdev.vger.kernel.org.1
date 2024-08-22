@@ -1,244 +1,581 @@
-Return-Path: <netdev+bounces-121051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4762E95B811
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:13:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68C8195B82A
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:19:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3709283395
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:13:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E68CF281648
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:19:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA321CB319;
-	Thu, 22 Aug 2024 14:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF38F1C93DF;
+	Thu, 22 Aug 2024 14:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ZSV0lHCa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CyICycbx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA431C9EA9
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 14:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76951EB5B;
+	Thu, 22 Aug 2024 14:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724336031; cv=none; b=rb7XyHBWCvkQNsBsDaDrNltJ7zI/yFuN1Y0RrjTkiHRTKX7olCA8al1pqU0yByduAilffC6AMTIYq0t1ZVN4bmjuI9YaVbC2xhT+vPeeTz5d9KRp82gKMv/el/o75l+CU1EkRiiLP0CL2CLXf37Ch/TYkumnFbZBAI9VGiMvgbI=
+	t=1724336392; cv=none; b=YGBZ9Yst5I6b5J9x5HVr68qSbi1oCIt6EUY/6BVKwZAV1sNciQ+eFiN+mi79x8ni1LqiwvlpuixZPKdYrZ0X62S21LONZM1UaIqBfWSoaNgbplxQAdoOkewmXN+xx7A4uichSwprJr6JfeD64+aMt02WwL1CSh1mnp684mqJv1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724336031; c=relaxed/simple;
-	bh=GYaq+MxG8yhcxgoZ1kl+qP/dBkspH7s/mmAwHM4UZNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hHNrezghdvAuhBw2SaEVkUrthAP0aIA6RmzO91lG8EIiMlPz+86BglFvwVwqh6nLuJdxsblQHvFrW4ZPtRgUYY6xDkD0TgZoZgqhGZZAuC0Qwn2WT+wZV6aAuEE8kQkaQ7XD+bLnGQCbwZb93+cJxFMQVAPKzgt/gM2iyb8dJjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ZSV0lHCa; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a86910caf9cso127190366b.1
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 07:13:47 -0700 (PDT)
+	s=arc-20240116; t=1724336392; c=relaxed/simple;
+	bh=nu70M4Tk8dgT7/n3RmX83JpbuBVn5SHffxATT8oiPRA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nLIjdq7IcOVn3MeM4Wo+sg3aEL1SWee+KbXaFnFP7qDrKQ+I1TfhQiuTa9qaLBnhAY3I4dHGF1fasZ7b4WxnG/ZWISGUwwGL4MYY4PkXba4spoSpJi4B2e1TZf6X/9wEX63ivhhXFuwR2LY2ieAGX0sUk8zAwSlWwekTG7iIrJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CyICycbx; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e13c23dbabdso840726276.3;
+        Thu, 22 Aug 2024 07:19:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724336026; x=1724940826; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NJnN3A3xo85nVe01BVIiv2LcPxZdBfiNlZcKruPVwls=;
-        b=ZSV0lHCaIrcHuoiW1sqOFGm1BQ7VuYKdbkt4k7JndLZh4NW7KscRf3isSWzV7vaggE
-         QzI+1l5X+dY6dHPMup0xYRP+W7dVOZLehOnOQif3LiwXsmgqNASDIhlpVxuGZTXoULaW
-         DUdI0NIN2sk1bTfJHEY9MUqNfdItpnMyZHLkOEBBF2B6JWX0sfP/uSbiJwXwezxPL0Rn
-         +f+ezw5WTMFP6mhHhqvkDesKWXyjgch5UhKb/7t3KNQYTSh3KwbpUAONKL0UCAIlPo1J
-         zSn5tkD4BCMUZXHGR1Ykw4MLrLrS7F2xK0FRsdi3pUystUxvhtGr0scS3jkaEyq+rdWw
-         aqYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724336026; x=1724940826;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1724336389; x=1724941189; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NJnN3A3xo85nVe01BVIiv2LcPxZdBfiNlZcKruPVwls=;
-        b=BIskdC0+SmEmWGrqciFzCD9HX3g8/BRbUyadCPWljAZ1nAfoSnA1JWEj6yyMWwyQSw
-         I6JsdPNe6PUyA79G4KrG6WK1PRtlH6gigwrV9cdxSctxoSsyB9X/riTodDLhKiNM6eWF
-         NbitY62+CwYkksMAwvxbHFQBGaA7dMrExGA+2dLfK6erb0jdIwq18gfjXgXAh3+lV1Oe
-         ka3g50hkTuNL3GqoLVdtiQzapgHsKtPIoKSHVwBPfen8+PrMrY+TyugLqGdVzY37lJtQ
-         6Mow1jNew4u6oeU180d631+ySauC0HG0Gmc8D32HiGCYQxCo5bP7xPnmgL59aB8IBj52
-         73Og==
-X-Gm-Message-State: AOJu0YxisAeSfKG2nC/g1BxXOPVq3raFGhw8hlpjFjbtebjWEEXvFI46
-	18PUPhvktIv23jBqHWSKE7TJQz9ubrfSyLNvrT4J2OYpEX22IngsVcwfMp7V0vk=
-X-Google-Smtp-Source: AGHT+IGj/XlqDCQK8puMTtLkkNZtL+0lMaXAygNVS1fY0ac52D3TBvA1TbWtFFq7XPu/ONazyumUdA==
-X-Received: by 2002:a17:907:72d4:b0:a77:cdae:6a59 with SMTP id a640c23a62f3a-a868a84f205mr327697066b.21.1724336025287;
-        Thu, 22 Aug 2024 07:13:45 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f4f38c4sm125073866b.191.2024.08.22.07.13.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2024 07:13:44 -0700 (PDT)
-Date: Thu, 22 Aug 2024 16:13:43 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
-Subject: Re: [net-next PATCH v11 00/11] Introduce RVU representors
-Message-ID: <ZsdHl487u9jHmz-z@nanopsycho.orion>
-References: <20240822132031.29494-1-gakula@marvell.com>
+        bh=JDqczWv8dyK1hQrKrgW75fShWZ03/vp6rp/2WR6QUIY=;
+        b=CyICycbxXfptEOJ1nmFy73gxzHi67f4DQ9CS4z5GNJPBDy5nNOZky+Wz7iT2UT2d7P
+         nolHZr8gr54mvF08mX0bicqXnuUv1CpQGr0Lyv3LzLMpYc85PWdm9CHE5nvwRz0wClfJ
+         97HePnJeYTHr4yAbIj9z/CSY1dZLMEASPaLkS546kA/0Id2+5zZuVsEv+xdG5RY6RKZa
+         tiaIYbxXoLj5ub62lnUet8l3xiLcmGfrvCjUaWkbUN+D/JHLXxnsr9IsBMNT1EFQTU+E
+         cEJFW2br70h1NnnzFzuITdgbzvBypQK+bIqWTPlztHme8H6ecPGbZmb/fSC/ZVQJIwVX
+         aklQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724336389; x=1724941189;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JDqczWv8dyK1hQrKrgW75fShWZ03/vp6rp/2WR6QUIY=;
+        b=cJY3vg5HiQC91NTSwAbU+CVXGUGPRmk1ZjhjpN8gMFf5kiINykpS2GHBxbnpjmP7rr
+         4UiuJaUNMnyM084kM/jFW9h2I1kN92wtfJ/HVyzV3aFXGAilxX5Lto00i0KkFIIH9eLi
+         PoLQ3N5Tc5hvJ3OwbTZrkdZ4uK3bO5ud1pAAyfQJfBeyaMWuInWcALDiXkjWjWlRqOGO
+         Zt7oDGAMBVG0tJEUOv7Zv/qa4wzKqL6PHXJH3ayeKS/c0QhSWaBK3HMjH0joLfjJP0Wj
+         xqdm42xC05QMpy0JMfLq6+hcAHbCfEBnMwj9PT7UhYuWWLpospn4lwnM/f2LX/b7Ok0z
+         3Ojw==
+X-Forwarded-Encrypted: i=1; AJvYcCXkknSxjxU49owWP/r7p1YCWkG6l0fjmby6EKL4UKtfAXPfhhkfyrxEy1xPgGH30w/OreZaI6CeFF1fDLs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyta6yUsqP/+YOHvoyEKB8i3POKi1o1xso1pJXvyifpunTzuLBv
+	YN6X/sRw4CTBUb58VlDUJXaVrNo6HcjZKSFdLTHmS1KfGSo4+U18RypguK/FX0/i0zndT4TofxO
+	0yaGT8sE5Y+S5d2znDvgmIfoWSVo=
+X-Google-Smtp-Source: AGHT+IHznSytjbXKT/MSZ7NJW+NvtFNa5LRir3CMydeVa4XdmGj4ET806XF6O1yxW1duKsxMaT+PUR9JLbwK2uLGhTY=
+X-Received: by 2002:a05:6902:993:b0:e0b:cc1d:3731 with SMTP id
+ 3f1490d57ef6-e17902b1e46mr2811186276.2.1724336389339; Thu, 22 Aug 2024
+ 07:19:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822132031.29494-1-gakula@marvell.com>
+References: <20240811195649.2360966-1-paweldembicki@gmail.com> <20240813113405.a65caznayd2tsx2v@skbuf>
+In-Reply-To: <20240813113405.a65caznayd2tsx2v@skbuf>
+From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
+Date: Thu, 22 Aug 2024 16:19:38 +0200
+Message-ID: <CAJN1Kkw=fnYpqL79cEPOYG9_zQVE+HDvYP1GoK4UkprmJ5qy7w@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: dsa: vsc73xx: implement FDB operations
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thu, Aug 22, 2024 at 03:20:20PM CEST, gakula@marvell.com wrote:
->This series adds representor support for each rvu devices.
->When switchdev mode is enabled, representor netdev is registered
->for each rvu device. In implementation of representor model, 
->one NIX HW LF with multiple SQ and RQ is reserved, where each
->RQ and SQ of the LF are mapped to a representor. A loopback channel
->is reserved to support packet path between representors and VFs.
->CN10K silicon supports 2 types of MACs, RPM and SDP. This
->patch set adds representor support for both RPM and SDP MAC
->interfaces.
+wt., 13 sie 2024 o 13:34 Vladimir Oltean <olteanv@gmail.com> napisa=C5=82(a=
+):
 >
->- Patch 1: Refactors and exports the shared service functions.
->- Patch 2: Implements basic representor driver.
->- Patch 3: Add devlink support to create representor netdevs that
->  can be used to manage VFs.
->- Patch 4: Implements basec netdev_ndo_ops.
->- Patch 5: Installs tcam rules to route packets between representor and
->	   VFs.
->- Patch 6: Enables fetching VF stats via representor interface
->- Patch 7: Adds support to sync link state between representors and VFs .
->- Patch 8: Enables configuring VF MTU via representor netdevs.
->- Patch 9: Add representors for sdp MAC.
->- Patch 10: Add devlink port support.
+> On Sun, Aug 11, 2024 at 09:56:49PM +0200, Pawel Dembicki wrote:
+> > This commit introduces implementations of three functions:
+> > .port_fdb_dump
+> > .port_fdb_add
+> > .port_fdb_del
+> >
+> > The FDB database organization is the same as in other old Vitesse chips=
+:
+> > It has 2048 rows and 4 columns (buckets). The row index is calculated b=
+y
+> > the hash function 'vsc73xx_calc_hash' and the FDB entry must be placed
+> > exactly into row[hash]. The chip selects the row number by itself.
 >
+> You mean "selects the bucket" maybe?
 >
->Command to create PF/VF representor
->#devlink dev eswitch set pci/0002:1c:00.0 mode switchdev
+> >
+> > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> > ---
+> >  drivers/net/dsa/vitesse-vsc73xx-core.c | 302 +++++++++++++++++++++++++
+> >  drivers/net/dsa/vitesse-vsc73xx.h      |   2 +
+> >  2 files changed, 304 insertions(+)
+> >
+> > diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/v=
+itesse-vsc73xx-core.c
+> > index a82b550a9e40..7da1641b8bab 100644
+> > --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
+> > +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> > @@ -46,6 +46,8 @@
+> >  #define VSC73XX_BLOCK_MII_EXTERNAL   0x1 /* External MDIO subblock */
+> >
+> >  #define CPU_PORT     6 /* CPU port */
+> > +#define VSC73XX_NUM_FDB_RECORDS      2048
 >
->VF representors are created for each VF when switch mode is set switchdev on
->representor PCI device. Each PF support upto 3VFs. Representor can be created
->before or after the VFs creation. 
+> Terminology issue perhaps, but do you call a "record" as something that
+> holds 1 FDB entry, or 4? There should be 2048 * 4 records, and 2048 "rows=
+"?
+>
+> There's also vsc73xx_port_read_mac_table_entry(), which calls an FDB
+> "entry" an array of 4 addresses. Do you have a consistent name for a
+> switch data structure that holds a single address?
+>
+> > +#define VSC73XX_NUM_BUCKETS  4
+> >
+> >  /* MAC Block registers */
+> >  #define VSC73XX_MAC_CFG              0x00
+> > @@ -197,6 +199,21 @@
+> >  #define VSC73XX_SRCMASKS_MIRROR                      BIT(26)
+> >  #define VSC73XX_SRCMASKS_PORTS_MASK          GENMASK(7, 0)
+> >
+> > +#define VSC73XX_MACHDATA_VID                 GENMASK(27, 16)
+> > +#define VSC73XX_MACHDATA_VID_SHIFT           16
+> > +#define VSC73XX_MACHDATA_MAC0_SHIFT          8
+> > +#define VSC73XX_MACHDATA_MAC1_SHIFT          0
+> > +#define VSC73XX_MACLDATA_MAC2_SHIFT          24
+> > +#define VSC73XX_MACLDATA_MAC3_SHIFT          16
+> > +#define VSC73XX_MACLDATA_MAC4_SHIFT          8
+> > +#define VSC73XX_MACLDATA_MAC5_SHIFT          0
+> > +#define VSC73XX_MAC_BYTE_MASK                        GENMASK(7, 0)
+> > +
+> > +#define VSC73XX_MACTINDX_SHADOW                      BIT(13)
+> > +#define VSC73XX_MACTINDX_BUCKET_MASK         GENMASK(12, 11)
+> > +#define VSC73XX_MACTINDX_BUCKET_MASK_SHIFT   11
+> > +#define VSC73XX_MACTINDX_INDEX_MASK          GENMASK(10, 0)
+> > +
+> >  #define VSC73XX_MACACCESS_CPU_COPY           BIT(14)
+> >  #define VSC73XX_MACACCESS_FWD_KILL           BIT(13)
+> >  #define VSC73XX_MACACCESS_IGNORE_VLAN                BIT(12)
+> > @@ -204,6 +221,7 @@
+> >  #define VSC73XX_MACACCESS_VALID                      BIT(10)
+> >  #define VSC73XX_MACACCESS_LOCKED             BIT(9)
+> >  #define VSC73XX_MACACCESS_DEST_IDX_MASK              GENMASK(8, 3)
+> > +#define VSC73XX_MACACCESS_DEST_IDX_MASK_SHIFT        3
+> >  #define VSC73XX_MACACCESS_CMD_MASK           GENMASK(2, 0)
+> >  #define VSC73XX_MACACCESS_CMD_IDLE           0
+> >  #define VSC73XX_MACACCESS_CMD_LEARN          1
+> > @@ -329,6 +347,13 @@ struct vsc73xx_counter {
+> >       const char *name;
+> >  };
+> >
+> > +struct vsc73xx_fdb {
+> > +     u16 vid;
+> > +     u8 port;
+> > +     u8 mac[6];
+>
+> u8 mac[ETH_ALEN]
+>
+> > +     bool valid;
+> > +};
+> > +
+> >  /* Counters are named according to the MIB standards where applicable.
+> >   * Some counters are custom, non-standard. The standard counters are
+> >   * named in accordance with RFC2819, RFC2021 and IEEE Std 802.3-2002 A=
+nnex
+> > @@ -1829,6 +1854,278 @@ static void vsc73xx_port_stp_state_set(struct d=
+sa_switch *ds, int port,
+> >               vsc73xx_refresh_fwd_map(ds, port, state);
+> >  }
+> >
+> > +static u16 vsc73xx_calc_hash(const unsigned char *addr, u16 vid)
+> > +{
+> > +     /* VID 5-0, MAC 47-44 */
+> > +     u16 hash =3D ((vid & GENMASK(5, 0)) << 4) | (addr[0] >> 4);
+> > +
+> > +     /* MAC 43-33 */
+> > +     hash ^=3D ((addr[0] & GENMASK(3, 0)) << 7) | (addr[1] >> 1);
+> > +     /* MAC 32-22 */
+> > +     hash ^=3D ((addr[1] & BIT(0)) << 10) | (addr[2] << 2) | (addr[3] =
+>> 6);
+> > +     /* MAC 21-11 */
+> > +     hash ^=3D ((addr[3] & GENMASK(5, 0)) << 5) | (addr[4] >> 3);
+> > +     /* MAC 10-0 */
+> > +     hash ^=3D ((addr[4] & GENMASK(2, 0)) << 8) | addr[5];
+> > +
+> > +     return hash;
+> > +}
+> > +
+> > +static int
+> > +vsc73xx_port_wait_for_mac_table_cmd(struct vsc73xx *vsc)
+> > +{
+> > +     int ret, err;
+> > +     u32 val;
+> > +
+> > +     ret =3D read_poll_timeout(vsc73xx_read, err,
+> > +                             err < 0 ||
+> > +                             ((val & VSC73XX_MACACCESS_CMD_MASK) =3D=
+=3D
+> > +                              VSC73XX_MACACCESS_CMD_IDLE),
+> > +                             VSC73XX_POLL_SLEEP_US, VSC73XX_POLL_TIMEO=
+UT_US,
+> > +                             false, vsc, VSC73XX_BLOCK_ANALYZER,
+> > +                             0, VSC73XX_MACACCESS, &val);
+> > +     if (ret)
+> > +             return ret;
+> > +     return err;
+> > +}
+> > +
+> > +static int vsc73xx_port_read_mac_table_entry(struct vsc73xx *vsc, u16 =
+index,
+> > +                                          struct vsc73xx_fdb *fdb)
+> > +{
+> > +     int ret, i;
+> > +     u32 val;
+> > +
+> > +     if (!fdb)
+> > +             return -EINVAL;
+> > +     if (index >=3D VSC73XX_NUM_FDB_RECORDS)
+> > +             return -EINVAL;
+> > +
+> > +     for (i =3D 0; i < VSC73XX_NUM_BUCKETS; i++) {
+> > +             vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_MAC=
+TINDX,
+> > +                           (i ? 0 : VSC73XX_MACTINDX_SHADOW) |
+> > +                           i << VSC73XX_MACTINDX_BUCKET_MASK_SHIFT |
+> > +                           index);
+>
+> Could you check for error codes from vsc73xx_read() and vsc73xx_write()
+> as well? This is applicable to the entire patch.
+>
+> > +             ret =3D vsc73xx_port_wait_for_mac_table_cmd(vsc);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> > +                                 VSC73XX_MACACCESS,
+> > +                                 VSC73XX_MACACCESS_CMD_MASK,
+> > +                                 VSC73XX_MACACCESS_CMD_READ_ENTRY);
+> > +             ret =3D vsc73xx_port_wait_for_mac_table_cmd(vsc);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             vsc73xx_read(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_MACA=
+CCESS,
+> > +                          &val);
+> > +             fdb[i].valid =3D val & VSC73XX_MACACCESS_VALID;
+> > +             if (!fdb[i].valid)
+> > +                     continue;
+> > +
+> > +             fdb[i].port =3D (val & VSC73XX_MACACCESS_DEST_IDX_MASK) >=
+>
+> > +                           VSC73XX_MACACCESS_DEST_IDX_MASK_SHIFT;
+> > +
+> > +             vsc73xx_read(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_MACH=
+DATA,
+> > +                          &val);
+> > +             fdb[i].vid =3D (val & VSC73XX_MACHDATA_VID) >>
+> > +                          VSC73XX_MACHDATA_VID_SHIFT;
+> > +             fdb[i].mac[0] =3D (val >> VSC73XX_MACHDATA_MAC0_SHIFT) &
+> > +                             VSC73XX_MAC_BYTE_MASK;
+> > +             fdb[i].mac[1] =3D (val >> VSC73XX_MACHDATA_MAC1_SHIFT) &
+> > +                             VSC73XX_MAC_BYTE_MASK;
+> > +
+> > +             vsc73xx_read(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_MACL=
+DATA,
+> > +                          &val);
+> > +             fdb[i].mac[2] =3D (val >> VSC73XX_MACLDATA_MAC2_SHIFT) &
+> > +                             VSC73XX_MAC_BYTE_MASK;
+> > +             fdb[i].mac[3] =3D (val >> VSC73XX_MACLDATA_MAC3_SHIFT) &
+> > +                             VSC73XX_MAC_BYTE_MASK;
+> > +             fdb[i].mac[4] =3D (val >> VSC73XX_MACLDATA_MAC4_SHIFT) &
+> > +                             VSC73XX_MAC_BYTE_MASK;
+> > +             fdb[i].mac[5] =3D (val >> VSC73XX_MACLDATA_MAC5_SHIFT) &
+> > +                             VSC73XX_MAC_BYTE_MASK;
+> > +     }
+> > +
+> > +     return ret;
+> > +}
+> > +
+> > +static void
+> > +vsc73xx_fdb_insert_mac(struct vsc73xx *vsc, const unsigned char *addr,=
+ u16 vid)
+> > +{
+> > +     u32 val;
+> > +
+> > +     val =3D (vid << VSC73XX_MACHDATA_VID_SHIFT) & VSC73XX_MACHDATA_VI=
+D;
+> > +     val |=3D (addr[0] << VSC73XX_MACHDATA_MAC0_SHIFT);
+> > +     val |=3D (addr[1] << VSC73XX_MACHDATA_MAC1_SHIFT);
+> > +     vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_MACHDATA, v=
+al);
+> > +
+> > +     val =3D (addr[2] << VSC73XX_MACLDATA_MAC2_SHIFT);
+> > +     val |=3D (addr[3] << VSC73XX_MACLDATA_MAC3_SHIFT);
+> > +     val |=3D (addr[4] << VSC73XX_MACLDATA_MAC4_SHIFT);
+> > +     val |=3D (addr[5] << VSC73XX_MACLDATA_MAC5_SHIFT);
+> > +     vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_MACLDATA, v=
+al);
+> > +}
+> > +
+> > +static int vsc73xx_fdb_del_entry(struct vsc73xx *vsc, int port,
+> > +                              const unsigned char *addr, u16 vid)
+> > +{
+> > +     struct vsc73xx_fdb fdb[VSC73XX_NUM_BUCKETS];
+> > +     u16 hash =3D vsc73xx_calc_hash(addr, vid);
+> > +     int bucket, ret;
+> > +
+> > +     mutex_lock(&vsc->fdb_lock);
+> > +
+> > +     ret =3D vsc73xx_port_read_mac_table_entry(vsc, hash, fdb);
+> > +     if (ret)
+> > +             goto err;
+> > +
+> > +     for (bucket =3D 0; bucket < VSC73XX_NUM_BUCKETS; bucket++) {
+> > +             if (fdb[bucket].valid && fdb[bucket].port =3D=3D port &&
+> > +                 !memcmp(addr, fdb[bucket].mac, ETH_ALEN))
+>
+> ether_addr_equal()
+>
+> > +                     break;
+> > +     }
+> > +
+> > +     if (bucket =3D=3D VSC73XX_NUM_BUCKETS) {
+> > +             /* Can't find MAC in MAC table */
+> > +             ret =3D -ENODATA;
+> > +             goto err;
+> > +     }
+> > +
+> > +     vsc73xx_fdb_insert_mac(vsc, addr, vid);
+> > +     vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_MACTINDX, h=
+ash);
+> > +
+> > +     ret =3D vsc73xx_port_wait_for_mac_table_cmd(vsc);
+> > +     if (ret)
+> > +             goto err;
+> > +
+> > +     vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_MACAC=
+CESS,
+> > +                         VSC73XX_MACACCESS_CMD_MASK,
+> > +                         VSC73XX_MACACCESS_CMD_FORGET);
+> > +     ret =3D  vsc73xx_port_wait_for_mac_table_cmd(vsc);
+> > +err:
+> > +     mutex_unlock(&vsc->fdb_lock);
+> > +     return ret;
+> > +}
+> > +
+> > +static int vsc73xx_fdb_add_entry(struct vsc73xx *vsc, int port,
+> > +                              const unsigned char *addr, u16 vid)
+> > +{
+> > +     struct vsc73xx_fdb fdb[VSC73XX_NUM_BUCKETS];
+> > +     u16 hash =3D vsc73xx_calc_hash(addr, vid);
+> > +     int bucket, ret;
+> > +     u32 val;
+> > +
+> > +     mutex_lock(&vsc->fdb_lock);
+> > +
+> > +     vsc73xx_port_read_mac_table_entry(vsc, hash, fdb);
+> > +
+> > +     for (bucket =3D 0; bucket < VSC73XX_NUM_BUCKETS; bucket++) {
+> > +             if (!fdb[bucket].valid)
+> > +                     break;
+> > +     }
+> > +
+> > +     if (bucket =3D=3D VSC73XX_NUM_BUCKETS) {
+> > +             /* Bucket is full */
+> > +             ret =3D -EOVERFLOW;
+> > +             goto err;
+> > +     }
+> > +
+> > +     vsc73xx_fdb_insert_mac(vsc, addr, vid);
+> > +
+> > +     vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_MACTINDX, h=
+ash);
+> > +     ret =3D vsc73xx_port_wait_for_mac_table_cmd(vsc);
+> > +     if (ret)
+> > +             goto err;
+> > +
+> > +     val =3D (port << VSC73XX_MACACCESS_DEST_IDX_MASK_SHIFT) &
+> > +           VSC73XX_MACACCESS_DEST_IDX_MASK;
+> > +
+> > +     vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> > +                         VSC73XX_MACACCESS,
+> > +                         VSC73XX_MACACCESS_VALID |
+> > +                         VSC73XX_MACACCESS_CMD_MASK |
+> > +                         VSC73XX_MACACCESS_DEST_IDX_MASK |
+> > +                         VSC73XX_MACACCESS_LOCKED,
+> > +                         VSC73XX_MACACCESS_VALID |
+> > +                         VSC73XX_MACACCESS_CMD_LEARN |
+> > +                         VSC73XX_MACACCESS_LOCKED | val);
+> > +     ret =3D vsc73xx_port_wait_for_mac_table_cmd(vsc);
+> > +
+> > +err:
+> > +     mutex_unlock(&vsc->fdb_lock);
+> > +     return ret;
+> > +}
+> > +
+> > +static int vsc73xx_fdb_add(struct dsa_switch *ds, int port,
+> > +                        const unsigned char *addr, u16 vid, struct dsa=
+_db db)
+> > +{
+> > +     struct vsc73xx *vsc =3D ds->priv;
+> > +
+> > +     if (!vid) {
+> > +             switch (db.type) {
+> > +             case DSA_DB_PORT:
+> > +                     vid =3D dsa_tag_8021q_standalone_vid(db.dp);
+> > +                     break;
+> > +             case DSA_DB_BRIDGE:
+> > +                     vid =3D dsa_tag_8021q_bridge_vid(db.bridge.num);
+>
+> I appreciate the intention, but if you don't set ds->fdb_isolation
+> (which you don't, although I believe the driver satisfies the documented
+> requirements), db.bridge.num will always be passed as 0 in the
+> .port_fdb_add() and .port_fdb_del() methods. Thus, dsa_tag_8021q_bridge_v=
+id(0)
+> will always be different than what dsa_tag_8021q_bridge_join() selects
+> as VLAN-unaware bridge PVID for your ports. The FDB entry will be in a
+> different VLAN than what your switch classifies the packets to. This
+> means it won't match.
+>
+> Assuming this went through a reasonable round of testing (add bridge FDB
+> entry towards expected port, make sure it isn't sent to others) and this
+> issue was not noticed, then maybe the switch performs shared VLAN learnin=
+g?
+> Case in which, if you can't configure it to independent VLAN learning,
+> it does not pass the ds->fdb_isolation requirements, plus the entire
+> dance of picking a proper VID is pointless, as any chosen VID would have
+> the same behavior.
+>
 
-What do you mean by the last sentence? I don't understand it.
+ds->fdb_isolation was missed in this patch accidentally. Vsc73xx has
+enabled independent learning by default.
 
+> > +                     break;
+> > +             default:
+> > +                     return -EOPNOTSUPP;
+> > +             }
+> > +     }
+> > +
+> > +     return vsc73xx_fdb_add_entry(vsc, port, addr, vid);
+> > +}
+> > +
+> > +static int vsc73xx_fdb_del(struct dsa_switch *ds, int port,
+> > +                        const unsigned char *addr, u16 vid, struct dsa=
+_db db)
+> > +{
+> > +     struct vsc73xx *vsc =3D ds->priv;
+> > +
+> > +     if (!vid) {
+> > +             switch (db.type) {
+> > +             case DSA_DB_PORT:
+> > +                     vid =3D dsa_tag_8021q_standalone_vid(db.dp);
+> > +                     break;
+> > +             case DSA_DB_BRIDGE:
+> > +                     vid =3D dsa_tag_8021q_bridge_vid(db.bridge.num);
+> > +                     break;
+> > +             default:
+> > +                     return -EOPNOTSUPP;
+> > +             }
+> > +     }
+> > +
+> > +     return vsc73xx_fdb_del_entry(vsc, port, addr, vid);
+> > +}
+> > +
+> > +static int vsc73xx_port_fdb_dump(struct dsa_switch *ds,
+> > +                              int port, dsa_fdb_dump_cb_t *cb, void *d=
+ata)
+> > +{
+> > +     struct vsc73xx_fdb fdb[VSC73XX_NUM_BUCKETS];
+> > +     struct vsc73xx *vsc =3D ds->priv;
+> > +     u16 i, bucket;
+> > +
+> > +     mutex_lock(&vsc->fdb_lock);
+> > +
+> > +     for (i =3D 0; i < VSC73XX_NUM_FDB_RECORDS; i++) {
+> > +             vsc73xx_port_read_mac_table_entry(vsc, i, fdb);
+> > +
+> > +             for (bucket =3D 0; bucket < VSC73XX_NUM_BUCKETS; bucket++=
+) {
+> > +                     if (!fdb[bucket].valid || fdb[bucket].port !=3D p=
+ort)
+> > +                             continue;
+> > +
+> > +                     /* We need to hide dsa_8021q VLANs from the user =
+*/
+> > +                     if (vid_is_dsa_8021q(fdb[bucket].vid))
+> > +                             fdb[bucket].vid =3D 0;
+> > +                     cb(fdb[bucket].mac, fdb[bucket].vid, false, data)=
+;
 >
->#devlink dev
->pci/0002:1c:00.0
+> "cb" is actually dsa_user_port_fdb_do_dump(). It can return -EMSGSIZE
+> when the netlink skb is full, and it is very important that you
+> propagate that to the caller:
 >
->#devlink dev eswitch set pci/0002:1c:00.0 mode switchdev
+>         err =3D cb();
+>         if (err)
+>                 goto unlock;
 >
-># ip link show
->	pf1vf0rep: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000 link/ether 7e:5a:66:ea:fe:d6 brd ff:ff:ff:ff:ff:ff
->	pf1vf1rep: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000 link/ether de:29:be:10:9e:bf brd ff:ff:ff:ff:ff:ff
->	pf1vf2rep: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000 link/ether 4a:12:c7:a2:66:ad brd ff:ff:ff:ff:ff:ff
->	pf1vf3rep: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000 link/ether c2:b8:a8:0e:73:fd brd ff:ff:ff:ff:ff:ff
-
-Where do you have physical port netdev? Looks like all macs are made up.
-I would expect the phisical port netdev to have some fixed vendor-based
-mac.
-
-
+> otherwise, you might notice that large FDB dumps will have missing FDB en=
+tries.
 >
+> > +             }
+> > +     }
+> > +
+> > +     mutex_unlock(&vsc->fdb_lock);
+> > +     return 0;
+> > +}
+> > +
+> >  static const struct phylink_mac_ops vsc73xx_phylink_mac_ops =3D {
+> >       .mac_config =3D vsc73xx_mac_config,
+> >       .mac_link_down =3D vsc73xx_mac_link_down,
+> > @@ -1851,6 +2148,9 @@ static const struct dsa_switch_ops vsc73xx_ds_ops=
+ =3D {
+> >       .port_bridge_join =3D dsa_tag_8021q_bridge_join,
+> >       .port_bridge_leave =3D dsa_tag_8021q_bridge_leave,
+> >       .port_change_mtu =3D vsc73xx_change_mtu,
+> > +     .port_fdb_add =3D vsc73xx_fdb_add,
+> > +     .port_fdb_del =3D vsc73xx_fdb_del,
+> > +     .port_fdb_dump =3D vsc73xx_port_fdb_dump,
+> >       .port_max_mtu =3D vsc73xx_get_max_mtu,
+> >       .port_stp_state_set =3D vsc73xx_port_stp_state_set,
+> >       .port_vlan_filtering =3D vsc73xx_port_vlan_filtering,
+> > @@ -1981,6 +2281,8 @@ int vsc73xx_probe(struct vsc73xx *vsc)
+> >               return -ENODEV;
+> >       }
+> >
+> > +     mutex_init(&vsc->fdb_lock);
+> > +
+> >       eth_random_addr(vsc->addr);
+> >       dev_info(vsc->dev,
+> >                "MAC for control frames: %02X:%02X:%02X:%02X:%02X:%02X\n=
+",
+> > diff --git a/drivers/net/dsa/vitesse-vsc73xx.h b/drivers/net/dsa/vitess=
+e-vsc73xx.h
+> > index 3ca579acc798..a36ca607671e 100644
+> > --- a/drivers/net/dsa/vitesse-vsc73xx.h
+> > +++ b/drivers/net/dsa/vitesse-vsc73xx.h
+> > @@ -45,6 +45,7 @@ struct vsc73xx_portinfo {
+> >   * @vlans: List of configured vlans. Contains port mask and untagged s=
+tatus of
+> >   *   every vlan configured in port vlan operation. It doesn't cover ta=
+g_8021q
+> >   *   vlans.
+> > + * @fdb_lock: Mutex protects fdb access
+> >   */
+> >  struct vsc73xx {
+> >       struct device                   *dev;
+> > @@ -57,6 +58,7 @@ struct vsc73xx {
+> >       void                            *priv;
+> >       struct vsc73xx_portinfo         portinfo[VSC73XX_MAX_NUM_PORTS];
+> >       struct list_head                vlans;
+> > +     struct mutex                    fdb_lock; /* protects fdb access =
+*/
 >
->~# devlink port
->pci/0002:1c:00.0/0: type eth netdev pf1vf0rep flavour physical port 1 splittable false
-
-vf0? What does it mean? Could you please let udev do it's work and let
-it rename netdevices properly?
-
-
->pci/0002:1c:00.0/1: type eth netdev pf1vf1rep flavour pcivf controller 0 pfnum 1 vfnum 1 external false splittable false
-
-Do you have pf 0 or you start with 1? If yes, why?
-
-
->pci/0002:1c:00.0/2: type eth netdev pf1vf2rep flavour pcivf controller 0 pfnum 1 vfnum 2 external false splittable false
->pci/0002:1c:00.0/3: type eth netdev pf1vf3rep flavour pcivf controller 0 pfnum 1 vfnum 3 external false splittable false
+> Redundant comment since it's already in the kernel-doc?
 >
->-----------
->v1-v2:
-> -Fixed build warnings.
-> -Address review comments provided by "Kalesh Anakkur Purayil".
->
->v2-v3:
-> - Used extack for error messages.
-> - As suggested reworked commit messages.
-> - Fixed sparse warning.
->
->v3-v4: 
-> - Patch 2 & 3: Fixed coccinelle reported warnings.
-> - Patch 10: Added devlink port support.
->
->v4-v5:
->  - Patch 3: Removed devm_* usage in rvu_rep_create()
->  - Patch 3: Fixed build warnings.
->
->v5-v6:
->  - Addressed review comments provided by "Simon Horman".
->  - Added review tag. 
->
->v6-v7:
->  - Rebased on top net-next branch.
->
->v7-v8:
->   - Implemented offload stats ndo.
->   - Added documentation.
->
->v8-v9:
->   - Updated the documentation.
->
->v9-v10:
->  - Fixed build warning w.r.t documentation.
->
->v10-v11:
->  - As suggested by "Jiri Pirko" adjusted the documentation.
->  - Added more commit description to patch1. 
->
->Geetha sowjanya (11):
->  octeontx2-pf: Refactoring RVU driver
->  octeontx2-pf: RVU representor driver
->  octeontx2-pf: Create representor netdev
->  octeontx2-pf: Add basic net_device_ops
->  octeontx2-af: Add packet path between representor and VF
->  octeontx2-pf: Get VF stats via representor
->  octeontx2-pf: Add support to sync link state between representor and
->    VFs
->  octeontx2-pf: Configure VF mtu via representor
->  octeontx2-pf: Add representors for sdp MAC
->  octeontx2-pf: Add devlink port support
->  octeontx2-pf: Implement offload stats ndo for representors
->
-> .../ethernet/marvell/octeontx2.rst            |  85 ++
-> .../net/ethernet/marvell/octeontx2/Kconfig    |   8 +
-> .../ethernet/marvell/octeontx2/af/Makefile    |   3 +-
-> .../ethernet/marvell/octeontx2/af/common.h    |   2 +
-> .../net/ethernet/marvell/octeontx2/af/mbox.h  |  74 ++
-> .../net/ethernet/marvell/octeontx2/af/npc.h   |   1 +
-> .../net/ethernet/marvell/octeontx2/af/rvu.c   |  11 +
-> .../net/ethernet/marvell/octeontx2/af/rvu.h   |  30 +-
-> .../marvell/octeontx2/af/rvu_debugfs.c        |  27 -
-> .../marvell/octeontx2/af/rvu_devlink.c        |   6 +
-> .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  81 +-
-> .../marvell/octeontx2/af/rvu_npc_fs.c         |   5 +
-> .../ethernet/marvell/octeontx2/af/rvu_reg.h   |   4 +
-> .../ethernet/marvell/octeontx2/af/rvu_rep.c   | 464 +++++++++++
-> .../marvell/octeontx2/af/rvu_struct.h         |  26 +
-> .../marvell/octeontx2/af/rvu_switch.c         |  20 +-
-> .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +
-> .../ethernet/marvell/octeontx2/nic/cn10k.c    |   4 +-
-> .../ethernet/marvell/octeontx2/nic/cn10k.h    |   2 +-
-> .../marvell/octeontx2/nic/otx2_common.c       |  58 +-
-> .../marvell/octeontx2/nic/otx2_common.h       |  84 +-
-> .../marvell/octeontx2/nic/otx2_devlink.c      |  49 ++
-> .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 305 ++++---
-> .../marvell/octeontx2/nic/otx2_txrx.c         |  38 +-
-> .../marvell/octeontx2/nic/otx2_txrx.h         |   3 +-
-> .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  19 +-
-> .../net/ethernet/marvell/octeontx2/nic/rep.c  | 744 ++++++++++++++++++
-> .../net/ethernet/marvell/octeontx2/nic/rep.h  |  53 ++
-> 28 files changed, 1981 insertions(+), 227 deletions(-)
-> create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
-> create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.c
-> create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.h
->
->-- 
->2.25.1
->
+> >  };
+> >
+> >  /**
+> > --
+> > 2.34.1
+> >
 
