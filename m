@@ -1,120 +1,187 @@
-Return-Path: <netdev+bounces-121129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71D2895BE37
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 20:27:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64DB795BE38
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 20:29:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A076C1C21833
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 18:27:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDAF62857F4
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 18:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19791CFEC1;
-	Thu, 22 Aug 2024 18:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6A81CFED9;
+	Thu, 22 Aug 2024 18:29:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NbmkLIqm"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="AngS+qT/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F6642AE77
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 18:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1366F2AE77
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 18:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724351227; cv=none; b=u1PLBUwk13kNB7FVCudv9BS0CyA7eZG5ALsgK00j1U2O43DZ+Bc4F+GJpy2k+ZFHCCfpOzK4+xH6UWWb9Fl53VqxG0jUj4H/vtFKzajEy/fEoRwA8RAMFjHBwz3GG3T4Z6fjKUjFNWR0tboNofTfmWmS3BslClqRt9+nVLLpSqc=
+	t=1724351349; cv=none; b=csGx/QHz1ZFaDxwQH7gobFY8pzoE6L4wD5MCkGcDnSP7lO12EDTSdmZR06j4rahIMzHdk2R1ylPhU98L9UWvf+fo8tyRtSs0/9Nd++tuUsQaklaHjOuv4vTi+ks9gaQYI2EVQ13oh4pkGZtcN587U53Jp99PKQ0zvnXRAJWRDgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724351227; c=relaxed/simple;
-	bh=wSEt6aoqsiHLCmJDqStNLqDoFQ8sZrq+QBvcCjT9iXQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=h3omtstRAsnPaHca9znfVdu4IhnbDuJjMkEN6fejGmkqdEbs+ETqekqEd6qZaOvczZazeiekJYG2H7oPRtIuBqRO2PJFfPspbcOiwLHqLD+5dK3DekEfQsmB8Gtqqydug34+vf7gvqZdSHNcOZaceNhv31liyJIBGMLCAprj5O8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NbmkLIqm; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7cd8d2731d1so802101a12.3
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 11:27:06 -0700 (PDT)
+	s=arc-20240116; t=1724351349; c=relaxed/simple;
+	bh=0xSBnCaiK+sgvELTZ33saa66jXfCr2pDcRjlRoiwJvY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Hm1d/CxgidW9wWew3SQKkULObp+HSzrmloln+XwsasPEhqqGtQIFi0rykdE5Mis6lbRlPECwY1ZtzrEoW3HHrb0ojQ3Tcedf1ve2ZsanfHPytyQH0HpM/NMw7i5sAHUfJRj/zQYlH+e2jED5OID190kE7WJYEqArtRHElKclWU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=AngS+qT/; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ef2c56da6cso9782061fa.1
+        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 11:29:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724351225; x=1724956025; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8fbAa2ZY+SgjHZnEhb/DyXvRt8ctJacA+3fJKY5T4nw=;
-        b=NbmkLIqmXxG2zclcj7RUd2bv9nN3JmCpvVwW00l8JPsK5hjrE3juGF2Yqh/7VcwCnl
-         QBxICPXHrPZvhDS92i8p/6MMuPkaOM06DHW4A7WKoo/Ic3xt8umpWu6qtjRBI7mZMqpa
-         3y3TR/2iikhozrnC7MHlSxEjzNjtEHb1JXFoR8Yj4Gk//Ax8A+hVA4i1dfrxo/NnHw0R
-         esJdfSfeqcD2vV6uDb14nxluBmrXdFE4f2dnUNQVg9XG+F+mCpinDHch+I9MgYgb//La
-         qLypJba3hlHjHcWeMwadqy4k1IIqKyibdBx0M6LsANKAMhKIQVenUiSVeRs1Ww6Rl5Or
-         zw7Q==
+        d=cloudflare.com; s=google09082023; t=1724351346; x=1724956146; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ro9G47jXocjBA17VCL84GH/kDMRcUp7XzQ0BEcZD3aw=;
+        b=AngS+qT/CYxdlsqMLFqQBvrT6bZ/tlj+Sv2BoOUBtpmeLFnIl1wuawCcs5qCznAo6Z
+         MaIZkiYFsRy9aH+hzQFqq41vHbbsaoKKLD9iMrmFXroE2q91A5dczFFKvO1fzUVb8xaG
+         lp6bACy0pCxburSUdqrxYUag4PX5WpMkZw6lDnbK9H5nbn3UweubxEgsFmVHQOUmUUHO
+         WpnQQaNfOXw24BrIU1C5Im2tVJ9dvDiq52XbHYF0GeE6YYrM+E8fPC2kC0nEZ1Jee3zr
+         OkIv4ey36SWPJ9YQIq03I858JjvCQayXbJsUcXzqyWKU7Db4NStTadXeqj0HXJ5+I3rT
+         IEBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724351225; x=1724956025;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8fbAa2ZY+SgjHZnEhb/DyXvRt8ctJacA+3fJKY5T4nw=;
-        b=CSGPlH92oRHGMXXaiS3VEh9YV1l2WcXzGTTrbNktloD4sHMLX8e6MIWmkBg913WCDE
-         x2jYVgab+tuVeJ22FmP4/WwdBa0GN/FfkQa6mYwMA8yGGPeEKDaUZWDt2SY4r5BiTQ3w
-         gJ9YGO79lgeTd3I8MnI7RVLnH1QX6Hp14s7iHGVBpRDZPflep1nqMkNgRRtPS1Bzx9hZ
-         v0txydaNj/doAy7aMp1/55x85ynOkwDKhveISgBUlsHd+2KWwYOlBLfVjpThBaZoeHSD
-         n/U5jEY7lMXqnQG31Sr6A1gKMQFPEsJrYEBdmrYD/aMbV7WIhonFWDcPGszlkrMlJxi2
-         GKCw==
-X-Gm-Message-State: AOJu0Ywni3PX64FYiPpv6Bv1oFef3TfN6V+lCzNWDvOPE2RUAwOfUIIS
-	5GSIDrfTkdpsmB1gaOgcOGbdKGxq/TC2xoaN5tJdPVzc8TjfwkOa5UtPCA==
-X-Google-Smtp-Source: AGHT+IFOM+HMkcWgurvjSbA+z02pf9pgcRTrwjIPK+X4xr2uZ3qvG6akosoVqVRIlhB/T1krZb65kQ==
-X-Received: by 2002:a05:6a21:710a:b0:1c0:eba5:e192 with SMTP id adf61e73a8af0-1caeb2364fdmr3313283637.27.1724351225455;
-        Thu, 22 Aug 2024 11:27:05 -0700 (PDT)
-Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:f613:5225:65c2:5d89])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-714343060e1sm1741697b3a.149.2024.08.22.11.27.04
+        d=1e100.net; s=20230601; t=1724351346; x=1724956146;
+        h=content-transfer-encoding:mime-version:message-id:date:user-agent
+         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=ro9G47jXocjBA17VCL84GH/kDMRcUp7XzQ0BEcZD3aw=;
+        b=waUj9G9brBHnblhlh3Az75IGFsi8MzKt7hOwDn0oJCEydxhmnv/3hqF6o5RkaaSmSk
+         jvt0Zn0cHbvCsAEz50534qGOo4GrolF+vjN5yXMJSj39s4Rb8CkjJE7ujyGQCKdi1aED
+         1Sf3mSBi6rMm4qLZLXZ4Uo2I2FZb6iV8qvCKWJlFhbRuBqhQK3ZmqpZFRW27WKSoPWmE
+         y4tGOjN3JDF+d4zr5BEVq1FleIyNZRJyFo9+uMtSe0z9hT7+aRcLiACHspAuP4O0jpC2
+         SL7c+w+h6CTA606u25TtQ3SyFztGwhC4691b0c8OwnaCF1x7RNXzyhC9Fc2grXXcR4iP
+         eeTA==
+X-Forwarded-Encrypted: i=1; AJvYcCWkQY/kv/ByqEYIXdbcVUGrUEqW3xw8RluMhvG1yfMpNYmQNjHXRaZ2C4cpJngmbEs3Fdt8wYQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNcNMYFUj87QYP9FLU/2X/q3w4SBZ/ebMajmvQIHH2FvKwaoun
+	rY8+p1W8mzVEMCY/SX+wyK6OOEXL7FtUZ7/QkUGHJy8ONDNbdu33K9LXPd5K4hM=
+X-Google-Smtp-Source: AGHT+IEynJ311KaMtMpqEK6qwRdubbYs/xH5VXLHLv0evaXhSKFEWsuvNaH0mSpIVOuE61bht76e/Q==
+X-Received: by 2002:a2e:809:0:b0:2f3:af4b:1fc with SMTP id 38308e7fff4ca-2f3f87f1503mr41995251fa.3.1724351345876;
+        Thu, 22 Aug 2024 11:29:05 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2dc::49:199])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c04a3cb0b2sm1235226a12.22.2024.08.22.11.29.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2024 11:27:04 -0700 (PDT)
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Cong Wang <cong.wang@bytedance.com>,
-	syzbot+8dbe3133b840c470da0e@syzkaller.appspotmail.com,
-	James Chapman <jchapman@katalix.com>,
-	Tom Parkin <tparkin@katalix.com>
-Subject: [Patch net-next] l2tp: avoid overriding sk->sk_user_data
-Date: Thu, 22 Aug 2024 11:25:44 -0700
-Message-Id: <20240822182544.378169-1-xiyou.wangcong@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 22 Aug 2024 11:29:05 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Philo Lu <lulie@linux.alibaba.com>
+Cc: bpf <bpf@vger.kernel.org>,  netdev@vger.kernel.org,  ast@kernel.org,
+  daniel@iogearbox.net,  andrii@kernel.org,  Eric Dumazet
+ <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  kernel-team
+ <kernel-team@cloudflare.com>
+Subject: Re: Question: Move BPF_SK_LOOKUP ahead of connected UDP sk lookup?
+In-Reply-To: <2fd14650-2294-4285-b3a5-88b443367a79@linux.alibaba.com> (Philo
+	Lu's message of "Wed, 21 Aug 2024 19:44:27 +0800")
+References: <6e239bb7-b7f9-4a40-bd1d-a522d4b9529c@linux.alibaba.com>
+	<87bk1mdybf.fsf@cloudflare.com>
+	<2fd14650-2294-4285-b3a5-88b443367a79@linux.alibaba.com>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Thu, 22 Aug 2024 20:29:03 +0200
+Message-ID: <877cc8e7io.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Cong Wang <cong.wang@bytedance.com>
+On Wed, Aug 21, 2024 at 07:44 PM +08, Philo Lu wrote:
+> On 2024/8/21 17:23, Jakub Sitnicki wrote:
+>> Hi Philo,
+>> [CC Eric and Paolo who have more context than me here.]
+>> On Tue, Aug 20, 2024 at 08:31 PM +08, Philo Lu wrote:
+>>> Hi all, I wonder if it is feasible to move BPF_SK_LOOKUP ahead of conne=
+cted UDP
+>>> sk lookup?
+>>>
+> ...
+>>>
+>>> So is there any other problem on it=EF=BC=9FOr I'll try to work on it a=
+nd commit
+>>> patches later.
+>>>
+>>> [0]https://lore.kernel.org/bpf/20190618130050.8344-1-jakub@cloudflare.c=
+om/
+>>>
+>>> Thank you for your time.
+>> It was done like that to maintain the connected UDP socket guarantees.
+>> Similarly to the established TCP sockets. The contract is that if you
+>> are bound to a 4-tuple, you will receive the packets destined to it.
+>>=20
+>
+> Thanks for your explaination. IIUC, bpf_sk_lookup was designed to skip co=
+nnected
+> socket lookup (established for TCP and connected for UDP), so it is not s=
+upposed
+> to run before connected UDP lookup.
+> (though it seems so close to solve our problem...)
 
-Although commit 4a4cd70369f1 ("l2tp: don't set sk_user_data in tunnel socket")
-removed sk->sk_user_data usage, setup_udp_tunnel_sock() still touches
-sk->sk_user_data, this conflicts with sockmap which also leverages
-sk->sk_user_data to save psock.
+Yes, correct. Motivation behind bpf_sk_lookup was to steer TCP
+connections & UDP flows to listening / unconnected sockets, like you can
+do with TPROXY [1].
 
-Restore this sk->sk_user_data check to avoid such conflicts.
+Since it had nothing to do with established / connected sockets, we
+added the BPF hook in such a way that they are unaffected by it.
 
-Fixes: 4a4cd70369f1 ("l2tp: don't set sk_user_data in tunnel socket")
-Reported-by: syzbot+8dbe3133b840c470da0e@syzkaller.appspotmail.com
-Cc: James Chapman <jchapman@katalix.com>
-Cc: Tom Parkin <tparkin@katalix.com>
-Signed-off-by: Cong Wang <cong.wang@bytedance.com>
----
- net/l2tp/l2tp_core.c | 3 +++
- 1 file changed, 3 insertions(+)
+>> It sounds like you are looking for an efficient way to lookup a
+>> connected UDP socket. We would be interested in that as well. We use> co=
+nnected UDP/QUIC on egress where we don't expect the peer to roam and
+>> change its address. There's a memory cost on the kernel side to using
+>> them, but they make it easier to structure your application, because you
+>> can have roughly the same design for TCP and UDP transport.
+>>=20
+> Yes, we have exactly the same problem.
 
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index af87c781d6a6..df73c35363cb 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -1620,6 +1620,9 @@ static int l2tp_validate_socket(const struct sock *sk, const struct net *net,
- 	    (encap == L2TP_ENCAPTYPE_IP && sk->sk_protocol != IPPROTO_L2TP))
- 		return -EPROTONOSUPPORT;
- 
-+	if (encap == L2TP_ENCAPTYPE_UDP && sk->sk_user_data)
-+		return -EBUSY;
-+
- 	tunnel = l2tp_sk_to_tunnel(sk);
- 	if (tunnel) {
- 		l2tp_tunnel_put(tunnel);
--- 
-2.34.1
+Good to know that there are other users of connected UDP out there.
 
+Loosely related - I'm planning to raise the question if using connected
+UDP sockets on ingress makes sense for QUIC at Plumbers [2].  Connected
+UDP lookup performance is one of the aspects, here.
+
+>> So what if instead of doing it in BPF, we make it better for everyone
+>> and introduce a hash table keyed by 4-tuple for connected sockets in the
+>> udp stack itself (counterpart of ehash in tcp)?
+>
+> This solution is also ok to me. But I'm not sure are there previous attem=
+pts or
+> technical problems on it?
+>
+> In fact, I have done a simple test with 4-tuple UDP lookup, and it does m=
+ake a
+> difference:
+> (kernel-5.10, 1000 connected UDP socket on server, use sockperf to send m=
+sg to
+> one of them, and take average for 5s)
+>
+> Without 4-tuple lookup:
+>
+> %Cpu0: 0.0 us, 0.0 sy, 0.0 ni,  0.0 id, 0.0 wa, 0.0 hi, 100.0 si, 0.0 st
+> %Cpu1: 0.2 us, 0.2 sy, 0.0 ni, 99.4 id, 0.0 wa, 0.2 hi,   0.0 si, 0.0 st
+> MiB Mem :7625.1 total,   6761.5 free,    210.2 used,    653.4 buff/cache
+> MiB Swap:   0.0 total,      0.0 free,      0.0 used.   7176.2 avail Mem
+>
+> ---
+> With 4-tuple lookup:
+>
+> %Cpu0: 0.2 us, 0.4 sy, 0.0 ni, 48.1 id, 0.0 wa, 1.2 hi, 50.1 si,  0.0 st
+> %Cpu1: 0.6 us, 0.4 sy, 0.0 ni, 98.8 id, 0.0 wa, 0.2 hi,  0.0 si,  0.0 st
+> MiB Mem :7625.1 total,   6759.9 free,    211.9 used,    653.3 buff/cache
+> MiB Swap:   0.0 total,      0.0 free,      0.0 used.   7174.6 avail Mem
+
+Right. The overhead is expected. All server's connected sockets end up
+in one hash bucket and we need to walk a long chain on lookup.
+
+The workaround is not "pretty". You have configure your server to
+receive on IP addresses and/or ports :-/
+
+[1] Which also respects established / connected sockets, as long as they
+    have_TRANSPARENT flag set.  Users need to set it "manually" for UDP.
+
+[2] https://lpc.events/event/18/abstracts/2134/
 
