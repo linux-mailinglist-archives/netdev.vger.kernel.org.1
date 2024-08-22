@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-120797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B2295AC84
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 06:25:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACEA895AC8A
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 06:26:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAE881F22300
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 04:25:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6883928273B
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 04:26:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72173F9F9;
-	Thu, 22 Aug 2024 04:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF27A61FC5;
+	Thu, 22 Aug 2024 04:25:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DBD381B8
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 04:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70A225779
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 04:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724300723; cv=none; b=bWnd1KnizhgRppLK7P2YyX0VrDYbQeXrsDa2/g1cd6qZUbDrIcdC9gEkElxVCpz8UNa/BVBW+Qkc6j72H3UO8pZrdDdX6cLQHyi6PG/X+YT15Rw2tBMfRvLyCa2h1MZ56f4ji/Xp7hOcPopNN8JSKmUHB0k1sMMs026sxJypjHM=
+	t=1724300728; cv=none; b=NO1aEeS453pnr+Bzc1sd8Td7ECQXs40QkTERROhs1SYkxlPD3CSYHeyLphIReu4/Z8377TBycBuznlDqpL3KcMwO+0bbSRHe2+20CpaUbXMFM666f9Cxjh60dOPROZjr0lGqFIl2iQGoJjPks8Swml46yeGCr8WOmmjxdImfswM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724300723; c=relaxed/simple;
-	bh=P8kyva4Coy5jhYkR+YUBJlGGMR7KXbJ9fBg8YpHLPnc=;
+	s=arc-20240116; t=1724300728; c=relaxed/simple;
+	bh=c+aiDkG5K9O38mRIHTq0MT6frypsrKgZPpCWDP4OHbI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gvI4BeOICYFh3oSN0rsUqJVXCAbKOH7Xm7UuGAZY1JKTvY8FIIvk37OqKSfNoJajeHJpj+TQNfxQxIJIBV+0h9P6b5OOhMHfj8JDqg2OnapnC8fNcXO+RgaNQeiU9EplwrQVxWMKu4hRnyKfUu4rCk96yVNMYFyRcUz0vtI1ot8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	 MIME-Version:Content-Type; b=ucQulw62RogUNXw30Ymoa0To75ZvLATY0mUSYv7pd4RIwS2RGuvzrzkDzufdKB2AcCrvoQcqZo0SnUw5HVXLkxNT0v5mJ2APlk2LQmY9WiXJ1jmdbG9eRyyuwHCmf4F4blAN2zrR/zG2brXbbFEDxWjZ6Fx3ozfcm6EVCqzZQJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Wq95S6D4vz1HH4b;
-	Thu, 22 Aug 2024 12:22:04 +0800 (CST)
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Wq96z4cRLz1xvGH;
+	Thu, 22 Aug 2024 12:23:23 +0800 (CST)
 Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id B61031A0188;
-	Thu, 22 Aug 2024 12:25:17 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 7B4B91A0188;
+	Thu, 22 Aug 2024 12:25:18 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemd500012.china.huawei.com
  (7.221.188.25) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Thu, 22 Aug
- 2024 12:25:16 +0800
+ 2024 12:25:17 +0800
 From: Li Zetao <lizetao1@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <dsahern@kernel.org>, <idosch@nvidia.com>,
@@ -47,9 +47,9 @@ To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<horms@kernel.org>, <lizetao1@huawei.com>, <j.granados@samsung.com>,
 	<linux@weissschuh.net>, <judyhsiao@chromium.org>, <jiri@resnulli.us>
 CC: <netdev@vger.kernel.org>
-Subject: [PATCH net-next 02/10] fib: rules: delete redundant judgment statements
-Date: Thu, 22 Aug 2024 12:32:44 +0800
-Message-ID: <20240822043252.3488749-3-lizetao1@huawei.com>
+Subject: [PATCH net-next 03/10] neighbour: delete redundant judgment statements
+Date: Thu, 22 Aug 2024 12:32:45 +0800
+Message-ID: <20240822043252.3488749-4-lizetao1@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240822043252.3488749-1-lizetao1@huawei.com>
 References: <20240822043252.3488749-1-lizetao1@huawei.com>
@@ -64,30 +64,30 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemd500012.china.huawei.com (7.221.188.25)
 
-The initial value of err is -ENOMEM, and err is guaranteed to be
+The initial value of err is -ENOBUFS, and err is guaranteed to be
 less than 0 before all goto errout. Therefore, on the error path
 of errout, there is no need to repeatedly judge that err is less than 0,
 and delete redundant judgments to make the code more concise.
 
 Signed-off-by: Li Zetao <lizetao1@huawei.com>
 ---
- net/core/fib_rules.c | 3 +--
+ net/core/neighbour.c | 3 +--
  1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-index 6ebffbc63236..3c76b835493d 100644
---- a/net/core/fib_rules.c
-+++ b/net/core/fib_rules.c
-@@ -1205,8 +1205,7 @@ static void notify_rule_change(int event, struct fib_rule *rule,
- 	rtnl_notify(skb, net, pid, ops->nlgroup, nlh, GFP_KERNEL);
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index a6fe88eca939..77b819cd995b 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -3530,8 +3530,7 @@ static void __neigh_notify(struct neighbour *n, int type, int flags,
+ 	rtnl_notify(skb, net, 0, RTNLGRP_NEIGH, NULL, GFP_ATOMIC);
  	return;
  errout:
 -	if (err < 0)
--		rtnl_set_sk_err(net, ops->nlgroup, err);
-+	rtnl_set_sk_err(net, ops->nlgroup, err);
+-		rtnl_set_sk_err(net, RTNLGRP_NEIGH, err);
++	rtnl_set_sk_err(net, RTNLGRP_NEIGH, err);
  }
  
- static void attach_rules(struct list_head *rules, struct net_device *dev)
+ void neigh_app_ns(struct neighbour *n)
 -- 
 2.34.1
 
