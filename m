@@ -1,217 +1,122 @@
-Return-Path: <netdev+bounces-121140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D426E95BF31
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 21:55:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCE0395BF2E
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 21:54:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64F03285369
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 19:55:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C6532853DA
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 19:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F28F1D0DCF;
-	Thu, 22 Aug 2024 19:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771241D0DD4;
+	Thu, 22 Aug 2024 19:54:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W9JHh28t"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0R9kOd0K"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55ED717588;
-	Thu, 22 Aug 2024 19:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6912B17588;
+	Thu, 22 Aug 2024 19:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724356543; cv=none; b=JMtFhKgE1OPR8VLqDinW2jVSTVcRJ1711ocMhHaUUrc1ZiMH+uiMhum6xqZK9UNn7UuMhOdympWZ9B8hjsnh97kSVaE9/j1NjLeHlGjfq2e5FH2K+LxwjfaRuDDwQi1Xt+tVayDf97Exsy4uS+7E8YGQM+QZ/u9RBwZ30aQu2VE=
+	t=1724356448; cv=none; b=tUeim9wexRNXCAtyC01xHIR7wCJdLyJuV4t/3xq2Zwfna+MM80dSq9glPboNHFtet9oMGQf+0sxp0zJ2f2alRrGYsAQeLn7N57+ra3G/rGYqyLRKTuFVcDb/ykzQNJWbQaqHGfEJKZQ1WpcC6iCA38zfvEdb2hXYgmnfilCqjto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724356543; c=relaxed/simple;
-	bh=pSfdLikYFFhh6s/EwQ1xbTLt/0Vve2xGqQsUIjLrnxs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=K0WWhps+9iteOyUcEn0iZN9KpPvpWID54D5Ed1BfAGJotaOQPnt57OT8jtnZzxY5DxF6VbzlF/BpoL/igEB2aGX3POvU5jtFQJwSGMwRkeZOtpBQElqPC+3TgRa+jOWsfNYLsXTDAi3F+QoII/ABMqOKobH1n9u7wJXgqY1+ALQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W9JHh28t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28805C32782;
-	Thu, 22 Aug 2024 19:55:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724356542;
-	bh=pSfdLikYFFhh6s/EwQ1xbTLt/0Vve2xGqQsUIjLrnxs=;
-	h=From:Date:Subject:To:Cc:From;
-	b=W9JHh28t0uOMfhpqE+LrzAA7MZm7yXvT+vdxdSwAOeMpBLV+0lK6+pywQUPcOS5e5
-	 s/qv/7+tRZShMXHPSflE1Dfy3fSH3hJf+187iey9YKmkQFgwNWt9X9h2L+jl8hIXgl
-	 EnME7wYuePbwlqWnQ7O/CzSPzsBYTKo9qL2zI6uKIWq/H6/JquudiCrRpx5/znQCpg
-	 BKHnQL/iGppIfgWBBEs0e2RAY4ocWfgyrs9suLs+UBn3QKFQ2HgldhQ/eXXdFwHGOd
-	 K82jfzD2wPb+X62JoM98+/MijhICT+qERp7Xg+T+sT/3RG1M5LibfZbov/us7tgDvO
-	 hk2+h6C97oimg==
-From: Mark Brown <broonie@kernel.org>
-Date: Thu, 22 Aug 2024 20:53:04 +0100
-Subject: [PATCH] net: dsa: microchip: Use standard regmap locking
+	s=arc-20240116; t=1724356448; c=relaxed/simple;
+	bh=mInMAy/j0ihN/lveGbrOf6zwgiZEBJG9H0AnsxAaIAk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fxg4Ob8KMD8hnB9qilRUkSZAIiRHmWkHI/zHnOrZpeJkM8mdvnQSiZ3oHfGzaYBeG4/IfX3D3sxajk8JIZHuqd/O02Ki9h7HnF3M/uewfsVrr8e8J/tKXdwtT3O0Og/8POdVgGHrk0CQ5BP2kP6NRBqRqt98oiwe3fK3N8uF6II=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0R9kOd0K; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=SW7pCV4C6zuecNbSbYljhWhCjQHrYV8I/vosHF4OpvQ=; b=0R9kOd0KyAC+iXvHHY41LfQ6KB
+	zM4mtxeN1aQdlyS/4mLzDJRpi9awnGq6JAnnQRhEiLrNWQcamiPNRl7fau80uKtaRxZT5pO1+aWio
+	MohHWFtuig4rq7RMDfqG4tWEPH7Om9rP9u/LlJJWcy8wz86+4w8DBUlleC74EO2ju/+Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1shDsc-005Stk-LE; Thu, 22 Aug 2024 21:53:58 +0200
+Date: Thu, 22 Aug 2024 21:53:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Imran Shaik <quic_imrashai@quicinc.com>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Ajit Pandey <quic_ajipan@quicinc.com>,
+	Taniya Das <quic_tdas@quicinc.com>,
+	Jagadeesh Kona <quic_jkona@quicinc.com>,
+	Satya Priya Kakitapalli <quic_skakitap@quicinc.com>,
+	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] clk: qcom: Add support for Global Clock Controller
+ on QCS8300
+Message-ID: <13b66efe-ed51-4e62-a0ea-f2f97b4144e8@lunn.ch>
+References: <20240820-qcs8300-gcc-v1-0-d81720517a82@quicinc.com>
+ <20240820-qcs8300-gcc-v1-2-d81720517a82@quicinc.com>
+ <a7afdd6d-47a1-41c7-8a0d-27919cf5af90@lunn.ch>
+ <6016f2ec-6918-471c-a8dc-0aa98fc2b824@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240822-net-dsa-microchip-regmap-locking-v1-1-d557073b883c@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAB+Xx2YC/x3NQQrCMBBG4auUWTvQxILGq4iLkPxNB20SJiJC6
- d0buvw2723UoIJGj2EjxU+alNxhLgOFxecElthNdrTTeLeWM74cm+dVgpawSGVFWn3lTwlvyYk
- dbi66q5lgZuqZqpjlfy6er30/ALAjb2ZyAAAA
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-37811
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5095; i=broonie@kernel.org;
- h=from:subject:message-id; bh=pSfdLikYFFhh6s/EwQ1xbTLt/0Vve2xGqQsUIjLrnxs=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmx5ez7kSzbLyNUTstFv5jVd8bR+9qkbHhFw0UB
- zxEAhiQBauJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZseXswAKCRAk1otyXVSH
- 0BARB/4nrNnqUCZt7+Dm7TEqnF/rNGXgGSSplnGEG0snm4D6Jef7Iwz8NMskWSRiVvr9vt4Z0jo
- OyIRkSiAMRYj20lS1url5vG/wsE2s+56aqE5zXnDtDv9yJEmH326u47PMelAlGwgUS5pyiTJDuh
- RNojUgiP6e1EEt8hqdd0xKV18KK7dhSbdlbcUWSyPtJ0CvDwHWpQA2heFiC8ADKDkeFlF1ds1/e
- czuVoZ9JpssH7q3YS71PcBaAObuLxy0BPx3Eq/u2+vXqsrtMv2m4TU1Z4YxQVJazVhN45k1TOLU
- z+oAE6sLMIQ6CYB61kWIKFqnBZ5/OETFMhPqHHphfeguz5hX
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6016f2ec-6918-471c-a8dc-0aa98fc2b824@quicinc.com>
 
-For unclear reasons the ksz drivers use custom regmap locking which is
-simply a wrapper around a standard mutex. This mutex is not used outside
-of the regmap operations so the result is simply to replicate the standard
-mutex based locking provided by the regmap core. Remove the redundant code
-and rely on the regmap core instead.
+On Wed, Aug 21, 2024 at 01:54:57PM +0530, Imran Shaik wrote:
+> 
+> 
+> On 8/20/2024 7:36 PM, Andrew Lunn wrote:
+> > > +static int gcc_qcs8300_probe(struct platform_device *pdev)
+> > > +{
+> > > +	struct regmap *regmap;
+> > > +	int ret;
+> > > +
+> > > +	regmap = qcom_cc_map(pdev, &gcc_qcs8300_desc);
+> > > +	if (IS_ERR(regmap))
+> > > +		return PTR_ERR(regmap);
+> > > +
+> > > +	ret = qcom_cc_register_rcg_dfs(regmap, gcc_dfs_clocks,
+> > > +				       ARRAY_SIZE(gcc_dfs_clocks));
+> > > +	if (ret)
+> > > +		return ret;
+> > > +
+> > > +	/* Keep some clocks always enabled */
+> > > +	qcom_branch_set_clk_en(regmap, 0x32004); /* GCC_CAMERA_AHB_CLK */
+> > > +	qcom_branch_set_clk_en(regmap, 0x32020); /* GCC_CAMERA_XO_CLK */
+> > 
+> > It would be good to document why. Why does the camera driver not
+> > enable the clock when it loads?
+> > 
+> > > +	qcom_branch_set_clk_en(regmap, 0x33004); /* GCC_DISP_AHB_CLK */
+> > > +	qcom_branch_set_clk_en(regmap, 0x33018); /* GCC_DISP_XO_CLK */
+> > > +	qcom_branch_set_clk_en(regmap, 0x7d004); /* GCC_GPU_CFG_AHB_CLK */
+> > > +	qcom_branch_set_clk_en(regmap, 0x34004); /* GCC_VIDEO_AHB_CLK */
+> > > +	qcom_branch_set_clk_en(regmap, 0x34024); /* GCC_VIDEO_XO_CLK */
+> > 
+> > Why cannot the display driver enable the clock when it loads?
+> > 
+> 
+> These clocks require for DISPCC and CAMCC drivers for register access, hence
+> kept enabled at GCC driver probe. The same approach is followed for all the
+> targets.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- drivers/net/dsa/microchip/ksz8863_smi.c |  7 -------
- drivers/net/dsa/microchip/ksz9477_i2c.c |  1 -
- drivers/net/dsa/microchip/ksz_common.c  |  1 -
- drivers/net/dsa/microchip/ksz_common.h  | 15 ---------------
- drivers/net/dsa/microchip/ksz_spi.c     |  1 -
- 5 files changed, 25 deletions(-)
+No, the DISPCC and CAMCC driver should get and enable these clocks
+before accessing the hardware. They should be turned off until then,
+and maybe they will never be used if it is a headless box without a
+camera.
 
-diff --git a/drivers/net/dsa/microchip/ksz8863_smi.c b/drivers/net/dsa/microchip/ksz8863_smi.c
-index 5711a59e2ac9..582e744f7b68 100644
---- a/drivers/net/dsa/microchip/ksz8863_smi.c
-+++ b/drivers/net/dsa/microchip/ksz8863_smi.c
-@@ -105,8 +105,6 @@ static const struct regmap_config ksz8863_regmap_config[] = {
- 		.pad_bits = 24,
- 		.val_bits = 8,
- 		.cache_type = REGCACHE_NONE,
--		.lock = ksz_regmap_lock,
--		.unlock = ksz_regmap_unlock,
- 		.max_register = U8_MAX,
- 	},
- 	{
-@@ -115,8 +113,6 @@ static const struct regmap_config ksz8863_regmap_config[] = {
- 		.pad_bits = 24,
- 		.val_bits = 16,
- 		.cache_type = REGCACHE_NONE,
--		.lock = ksz_regmap_lock,
--		.unlock = ksz_regmap_unlock,
- 		.max_register = U8_MAX,
- 	},
- 	{
-@@ -125,8 +121,6 @@ static const struct regmap_config ksz8863_regmap_config[] = {
- 		.pad_bits = 24,
- 		.val_bits = 32,
- 		.cache_type = REGCACHE_NONE,
--		.lock = ksz_regmap_lock,
--		.unlock = ksz_regmap_unlock,
- 		.max_register = U8_MAX,
- 	}
- };
-@@ -150,7 +144,6 @@ static int ksz8863_smi_probe(struct mdio_device *mdiodev)
- 
- 	for (i = 0; i < __KSZ_NUM_REGMAPS; i++) {
- 		rc = ksz8863_regmap_config[i];
--		rc.lock_arg = &dev->regmap_mutex;
- 		rc.wr_table = chip->wr_table;
- 		rc.rd_table = chip->rd_table;
- 		dev->regmap[i] = devm_regmap_init(&mdiodev->dev,
-diff --git a/drivers/net/dsa/microchip/ksz9477_i2c.c b/drivers/net/dsa/microchip/ksz9477_i2c.c
-index 7d7560f23a73..59deb390e605 100644
---- a/drivers/net/dsa/microchip/ksz9477_i2c.c
-+++ b/drivers/net/dsa/microchip/ksz9477_i2c.c
-@@ -26,7 +26,6 @@ static int ksz9477_i2c_probe(struct i2c_client *i2c)
- 
- 	for (i = 0; i < __KSZ_NUM_REGMAPS; i++) {
- 		rc = ksz9477_regmap_config[i];
--		rc.lock_arg = &dev->regmap_mutex;
- 		dev->regmap[i] = devm_regmap_init_i2c(i2c, &rc);
- 		if (IS_ERR(dev->regmap[i])) {
- 			return dev_err_probe(&i2c->dev, PTR_ERR(dev->regmap[i]),
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 1491099528be..4a383c87acf8 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -4381,7 +4381,6 @@ int ksz_switch_register(struct ksz_device *dev)
- 	}
- 
- 	mutex_init(&dev->dev_mutex);
--	mutex_init(&dev->regmap_mutex);
- 	mutex_init(&dev->alu_mutex);
- 	mutex_init(&dev->vlan_mutex);
- 
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 5f0a628b9849..b9d4e0e9460d 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -152,7 +152,6 @@ struct ksz_device {
- 	const struct ksz_chip_data *info;
- 
- 	struct mutex dev_mutex;		/* device access */
--	struct mutex regmap_mutex;	/* regmap access */
- 	struct mutex alu_mutex;		/* ALU access */
- 	struct mutex vlan_mutex;	/* vlan access */
- 	const struct ksz_dev_ops *dev_ops;
-@@ -600,18 +599,6 @@ static inline int ksz_prmw32(struct ksz_device *dev, int port, int offset,
- 			 mask, val);
- }
- 
--static inline void ksz_regmap_lock(void *__mtx)
--{
--	struct mutex *mtx = __mtx;
--	mutex_lock(mtx);
--}
--
--static inline void ksz_regmap_unlock(void *__mtx)
--{
--	struct mutex *mtx = __mtx;
--	mutex_unlock(mtx);
--}
--
- static inline bool ksz_is_ksz87xx(struct ksz_device *dev)
- {
- 	return dev->chip_id == KSZ8795_CHIP_ID ||
-@@ -781,8 +768,6 @@ static inline bool is_lan937x_tx_phy(struct ksz_device *dev, int port)
- 		.write_flag_mask =					\
- 			KSZ_SPI_OP_FLAG_MASK(KSZ_SPI_OP_WR, swp,	\
- 					     regbits, regpad),		\
--		.lock = ksz_regmap_lock,				\
--		.unlock = ksz_regmap_unlock,				\
- 		.reg_format_endian = REGMAP_ENDIAN_BIG,			\
- 		.val_format_endian = REGMAP_ENDIAN_BIG			\
- 	}
-diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-index 8e8d83213b04..06a9e648df0c 100644
---- a/drivers/net/dsa/microchip/ksz_spi.c
-+++ b/drivers/net/dsa/microchip/ksz_spi.c
-@@ -65,7 +65,6 @@ static int ksz_spi_probe(struct spi_device *spi)
- 
- 	for (i = 0; i < __KSZ_NUM_REGMAPS; i++) {
- 		rc = regmap_config[i];
--		rc.lock_arg = &dev->regmap_mutex;
- 		rc.wr_table = chip->wr_table;
- 		rc.rd_table = chip->rd_table;
- 		dev->regmap[i] = devm_regmap_init_spi(spi, &rc);
-
----
-base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
-change-id: 20240822-net-dsa-microchip-regmap-locking-9e79d9314e1f
-
-Best regards,
--- 
-Mark Brown <broonie@kernel.org>
-
+	Andrew
 
