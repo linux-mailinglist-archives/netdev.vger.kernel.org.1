@@ -1,58 +1,63 @@
-Return-Path: <netdev+bounces-120801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E68A95AC88
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 06:25:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42CA295AC9C
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 06:36:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDEE01F22254
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 04:25:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFA321F22428
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 04:36:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A57D55E48;
-	Thu, 22 Aug 2024 04:25:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A9A3AC0D;
+	Thu, 22 Aug 2024 04:36:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mail.valinux.co.jp (mail.valinux.co.jp [210.128.90.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6542B4D8B0
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 04:25:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B251BF2A;
+	Thu, 22 Aug 2024 04:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.128.90.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724300727; cv=none; b=gmeBn8hK48Gsh5NIU1alsgGrpavoOTRmTZKC1NUG9gMH5E7gZK2GaPjSo2TMZt6ZYzXZZJhg1FTko4onVYtjob70uVNm4uiwaAUBXWFrutnWMMm+RHmYquhN/XGrFbN1XsmtHCy6bMbaBtUx72Ixb+0vCK1pzGvgmD1pzmIENNA=
+	t=1724301392; cv=none; b=uNsBvHn7aPHqPUGaJMjG28qddyFzVxF562W/seSixxDgl4TWYKTl2GwRYbEr0jd272HtXEWMdQii0pLpmmJFJSdtbrVLjqizadH9z9Q7b7Yfnmrt6QJeCy9Z/kAR+ItK8SNFI9sI2dNxz56wOfJpx6SE7mwlWtGP4BntWJcqXcs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724300727; c=relaxed/simple;
-	bh=zqJJwBVf5HwFBlIb1NLKcxKl9NGpt1mtdfa2ITi1SHk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EyAj/RPpcBBwrKxWBr7Qbx1m4yqIKrruEmrUDnRjVu6/VsanrwPlHynRRgt2NZF0jghwr3KsB8YnTa8+JnpB9X0bEzTcpp/WCnpRb51IsX31FEV5LeT1q16Rii/YgLuKdervL0sNh/23ocHcVzGqQBNFdbHZ9yUCWfyjZ8d7IKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Wq95Z4Q2jz1HH3v;
-	Thu, 22 Aug 2024 12:22:10 +0800 (CST)
-Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7786D180019;
-	Thu, 22 Aug 2024 12:25:23 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemd500012.china.huawei.com
- (7.221.188.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Thu, 22 Aug
- 2024 12:25:22 +0800
-From: Li Zetao <lizetao1@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <dsahern@kernel.org>, <idosch@nvidia.com>,
-	<amcohen@nvidia.com>, <petrm@nvidia.com>, <gnault@redhat.com>,
-	<b.galvani@gmail.com>, <alce@lafranque.net>, <shaozhengchao@huawei.com>,
-	<horms@kernel.org>, <lizetao1@huawei.com>, <j.granados@samsung.com>,
-	<linux@weissschuh.net>, <judyhsiao@chromium.org>, <jiri@resnulli.us>
-CC: <netdev@vger.kernel.org>
-Subject: [PATCH net-next 10/10] net: mpls: delete redundant judgment statements
-Date: Thu, 22 Aug 2024 12:32:52 +0800
-Message-ID: <20240822043252.3488749-11-lizetao1@huawei.com>
+	s=arc-20240116; t=1724301392; c=relaxed/simple;
+	bh=rGhOD38GjPd2YCkgM1QGnWfa7sS2RIeAm2BRL6NL45I=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J7ugdsblc5/qINGJGH6yFLUOHNZuzTwI3aAUEef0ZqB/6izLa0941LhlL4HwF8p38D+HYFDcuMqBku+oVfiG0jdoeH6o772PLdT3NuEJxYLnDXFAkVwfVSCTAa6YqDqGu1+uw+1ppiswtOHCj3brZ7qbwxzfGNWgmqAzQM36bzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=valinux.co.jp; spf=pass smtp.mailfrom=valinux.co.jp; arc=none smtp.client-ip=210.128.90.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=valinux.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=valinux.co.jp
+Received: from localhost (localhost [127.0.0.1])
+	by mail.valinux.co.jp (Postfix) with ESMTP id BA818A9EBD;
+	Thu, 22 Aug 2024 13:36:27 +0900 (JST)
+X-Virus-Scanned: Debian amavisd-new at valinux.co.jp
+Received: from mail.valinux.co.jp ([127.0.0.1])
+	by localhost (mail.valinux.co.jp [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id G7ptISx-GhRg; Thu, 22 Aug 2024 13:36:27 +0900 (JST)
+Received: from DESKTOP-NBGHJ1C.local.valinux.co.jp (vagw.valinux.co.jp [210.128.90.14])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.valinux.co.jp (Postfix) with ESMTPSA id 8B39EA9B76;
+	Thu, 22 Aug 2024 13:36:27 +0900 (JST)
+From: takakura@valinux.co.jp
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	fw@strlen.de
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ryo Takakura <takakura@valinux.co.jp>
+Subject: [PATCH] netfilter: Don't track counter updates of do_add_counters()
+Date: Thu, 22 Aug 2024 13:36:09 +0900
+Message-Id: <20240822043609.141992-1-takakura@valinux.co.jp>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240822043252.3488749-1-lizetao1@huawei.com>
-References: <20240822043252.3488749-1-lizetao1@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,44 +65,117 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemd500012.china.huawei.com (7.221.188.25)
 
-The initial value of err is -ENOBUFS, and err is guaranteed to be
-less than 0 before all goto errout. Therefore, on the error path
-of errout, there is no need to repeatedly judge that err is less than 0,
-and delete redundant judgments to make the code more concise.
+From: Ryo Takakura <takakura@valinux.co.jp>
 
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
+While adding counters in do_add_counters(), we call
+xt_write_recseq_begin/end to indicate that counters are being updated.
+Updates are being tracked so that the counters retrieved by get_counters()
+will reflect concurrent updates.
+
+However, there is no need to track the updates done by do_add_counters() as
+both do_add_counters() and get_counters() acquire per ipv4,ipv6,arp mutex
+beforehand which prevents concurrent update and retrieval between the two.
+
+Moreover, as the xt_write_recseq_begin/end is shared among ipv4,ipv6,arp,
+do_add_counters() called by one of ipv4,ipv6,arp can falsely delay the 
+synchronization of concurrent get_counters() or xt_replace_table() called 
+by any other than the one calling do_add_counters().
+
+So remove xt_write_recseq_begin/end from do_add_counters() for ipv4,ipv6,arp.
+
+Signed-off-by: Ryo Takakura <takakura@valinux.co.jp>
 ---
- net/mpls/af_mpls.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ net/ipv4/netfilter/arp_tables.c | 4 ----
+ net/ipv4/netfilter/ip_tables.c  | 3 ---
+ net/ipv6/netfilter/ip6_tables.c | 3 ---
+ 3 files changed, 10 deletions(-)
 
-diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-index 0e6c94a8c2bc..aba983531ed3 100644
---- a/net/mpls/af_mpls.c
-+++ b/net/mpls/af_mpls.c
-@@ -1201,8 +1201,7 @@ static void mpls_netconf_notify_devconf(struct net *net, int event,
- 	rtnl_notify(skb, net, 0, RTNLGRP_MPLS_NETCONF, NULL, GFP_KERNEL);
- 	return;
- errout:
--	if (err < 0)
--		rtnl_set_sk_err(net, RTNLGRP_MPLS_NETCONF, err);
-+	rtnl_set_sk_err(net, RTNLGRP_MPLS_NETCONF, err);
- }
+diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
+index 14365b20f1c5..20de048d3e0c 100644
+--- a/net/ipv4/netfilter/arp_tables.c
++++ b/net/ipv4/netfilter/arp_tables.c
+@@ -1009,7 +1009,6 @@ static int do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
+ 	const struct xt_table_info *private;
+ 	int ret = 0;
+ 	struct arpt_entry *iter;
+-	unsigned int addend;
  
- static const struct nla_policy devconf_mpls_policy[NETCONFA_MAX + 1] = {
-@@ -2278,8 +2277,7 @@ static void rtmsg_lfib(int event, u32 label, struct mpls_route *rt,
+ 	paddc = xt_copy_counters(arg, len, &tmp);
+ 	if (IS_ERR(paddc))
+@@ -1029,8 +1028,6 @@ static int do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
+ 	}
  
- 	return;
- errout:
--	if (err < 0)
--		rtnl_set_sk_err(net, RTNLGRP_MPLS_ROUTE, err);
-+	rtnl_set_sk_err(net, RTNLGRP_MPLS_ROUTE, err);
- }
+ 	i = 0;
+-
+-	addend = xt_write_recseq_begin();
+ 	xt_entry_foreach(iter,  private->entries, private->size) {
+ 		struct xt_counters *tmp;
  
- static int mpls_valid_getroute_req(struct sk_buff *skb,
+@@ -1038,7 +1035,6 @@ static int do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
+ 		ADD_COUNTER(*tmp, paddc[i].bcnt, paddc[i].pcnt);
+ 		++i;
+ 	}
+-	xt_write_recseq_end(addend);
+  unlock_up_free:
+ 	local_bh_enable();
+ 	xt_table_unlock(t);
+diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
+index fe89a056eb06..f54dea2a8fcd 100644
+--- a/net/ipv4/netfilter/ip_tables.c
++++ b/net/ipv4/netfilter/ip_tables.c
+@@ -1162,7 +1162,6 @@ do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
+ 	const struct xt_table_info *private;
+ 	int ret = 0;
+ 	struct ipt_entry *iter;
+-	unsigned int addend;
+ 
+ 	paddc = xt_copy_counters(arg, len, &tmp);
+ 	if (IS_ERR(paddc))
+@@ -1182,7 +1181,6 @@ do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
+ 	}
+ 
+ 	i = 0;
+-	addend = xt_write_recseq_begin();
+ 	xt_entry_foreach(iter, private->entries, private->size) {
+ 		struct xt_counters *tmp;
+ 
+@@ -1190,7 +1188,6 @@ do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
+ 		ADD_COUNTER(*tmp, paddc[i].bcnt, paddc[i].pcnt);
+ 		++i;
+ 	}
+-	xt_write_recseq_end(addend);
+  unlock_up_free:
+ 	local_bh_enable();
+ 	xt_table_unlock(t);
+diff --git a/net/ipv6/netfilter/ip6_tables.c b/net/ipv6/netfilter/ip6_tables.c
+index 131f7bb2110d..f1d3bb74eb16 100644
+--- a/net/ipv6/netfilter/ip6_tables.c
++++ b/net/ipv6/netfilter/ip6_tables.c
+@@ -1179,7 +1179,6 @@ do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
+ 	const struct xt_table_info *private;
+ 	int ret = 0;
+ 	struct ip6t_entry *iter;
+-	unsigned int addend;
+ 
+ 	paddc = xt_copy_counters(arg, len, &tmp);
+ 	if (IS_ERR(paddc))
+@@ -1198,7 +1197,6 @@ do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
+ 	}
+ 
+ 	i = 0;
+-	addend = xt_write_recseq_begin();
+ 	xt_entry_foreach(iter, private->entries, private->size) {
+ 		struct xt_counters *tmp;
+ 
+@@ -1206,7 +1204,6 @@ do_add_counters(struct net *net, sockptr_t arg, unsigned int len)
+ 		ADD_COUNTER(*tmp, paddc[i].bcnt, paddc[i].pcnt);
+ 		++i;
+ 	}
+-	xt_write_recseq_end(addend);
+  unlock_up_free:
+ 	local_bh_enable();
+ 	xt_table_unlock(t);
 -- 
 2.34.1
 
