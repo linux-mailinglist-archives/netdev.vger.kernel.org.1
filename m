@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-120778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79B195A959
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 03:10:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 408C395A95A
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 03:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34BD628380E
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 01:10:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9E9A1C22D80
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 01:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDEF79F2;
-	Thu, 22 Aug 2024 01:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4FBD79C8;
+	Thu, 22 Aug 2024 01:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LRHoQjI/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHM+AdoT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B0C39461
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 01:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD056FB6
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 01:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724289029; cv=none; b=e3n4Ll+RZCvUujnLEs0Fx7Qy+PhQSio3kJ2bLCAqtPZV+AoGiCu4vJ0Wy1T32F5IR4wT1q+Ocw7Z3GIQf96O8gLTMTlyHD8Joi0HfQNS5P6bNMEo3Zf21Gr69RMXe8z6vS9EJav+cqEvhZrD8z9EXbVYK5mx3S7OSFkP8/ckvik=
+	t=1724289033; cv=none; b=bIs27g7hF4cCypXAMkT3H/gBQBKwg4L6g7WUQAWMJGjptpQogwFMZbpO7Cphal7RT3Jz/0TZF9ZmNC3HBugLrWD5dhJ9WsRFTInGzYi5AV9iDANdrqcSwBYYvdc2TK1Yj7P2aN3boaH6RG8Alb4vxoI39ZJ5Qqwmx9nc4yl8AqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724289029; c=relaxed/simple;
-	bh=2im7gXt6wSPk8zhI0OASBVqhgQGgPsT9u4EEUYijHjA=;
+	s=arc-20240116; t=1724289033; c=relaxed/simple;
+	bh=8kncyYZaCexd72MxE30iwRSzaBgr+nVPlrPNMAr9YhU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ru30pLu5Ywgv+ysC9ktNY0ZKShA3YPrFWlWMbf6QqoksFEv16mGmLqMZUntNIAZANalRZXvOd0ab86wTIerDXtaQro/3Rm4oHbGQfK+Z6HGMfGSW4j13lvm5Bb7NyPT3Jx6dKY25DlnMOxLaZxL9h140jHs5ysRATI2UxZ15D68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LRHoQjI/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D33D4C32781;
-	Thu, 22 Aug 2024 01:10:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gV/x1NhjkZdfnzG1yWFqCJcW23BEiVPzPWics38gc6vA8+5/E//HkyahSNA/oVHNL/42Z4injJSnyO2Gn5yVO4hfbaNj9w7sYtqHRwATVE96ZpgZARDR7oMco0HhWX8fOGuCpvrcRpNPuGNkAiYxQl1R8zog7E/nMKGT2RzVuew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHM+AdoT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9E25C32781;
+	Thu, 22 Aug 2024 01:10:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724289028;
-	bh=2im7gXt6wSPk8zhI0OASBVqhgQGgPsT9u4EEUYijHjA=;
+	s=k20201202; t=1724289032;
+	bh=8kncyYZaCexd72MxE30iwRSzaBgr+nVPlrPNMAr9YhU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LRHoQjI/aCnFg4sgiu4Oiv8qhuqPL+9hvgcXgpGHtY7o0W4jO/et50b4cOeM+nDtX
-	 WWze8S05+Eo/pajCaSlKXOwGy+E6kjQxuPkbSJD1yuFw3ca8pBrdgAeglYGS3v/sFr
-	 jj+GdrhMr3w9NN4pmQ5R5e0ODF+aaT0/KfwVxSfaNE8670iatB0KuPqaf0502L3pSE
-	 8dKlo0uv53lc9Neu8BzzhDKmkZpDO5Y5SB02aoNb+193wpZzGs+a6qFkr14oRwdXkc
-	 2Tleq0oB4h8voFe43KDLoGdZ/4m+AXlGNkaRqxkRyAX0VXOpb4I0yQ4+7WMTFIJbz0
-	 NwRhzqp7rTKHw==
+	b=nHM+AdoTRGi9SUC0KOaMJ7YvN5qeps7W/yY+MoH6T3zDwGfy1RKaS+Cj4fYyKlamN
+	 4YAbgQ6x1pp/xla9sU6fX9g4Jrdw2K1IoCIHSvKg42QbryWC9iFcS4958UqRfXX9LN
+	 Jwwcag2j2V2urUjyq5w2a+HcQRtIVMkv+Ch8LgCzHnfwRDwJz87rDN3EmQA4bbrxS5
+	 QNgKsVR/EPvIx1S8838BnRHSP+5Gj2aTKHwmCKhL8V/3aS2K2eJeX8VeZ5dN4+z3m4
+	 NyzIhCY9hwMOAVWbbuSRUQhdiUCuDJfC40mWxncc+eJrqPQ1Hm080UEtfMe15JuH63
+	 O6KhV2Bt1IV/w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD383804CAB;
-	Thu, 22 Aug 2024 01:10:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEFC3804CAB;
+	Thu, 22 Aug 2024 01:10:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,62 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates
- 2024-08-20 (ice)
+Subject: Re: [PATCH v4 net-next 00/12] net: introduce TX H/W shaping API
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172428902849.1877102.12384594563801386182.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Aug 2024 01:10:28 +0000
-References: <20240820215620.1245310-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240820215620.1245310-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org
+ <172428903223.1877102.10634302904510875141.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Aug 2024 01:10:32 +0000
+References: <cover.1724165948.git.pabeni@redhat.com>
+In-Reply-To: <cover.1724165948.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, jiri@resnulli.us,
+ madhu.chittim@intel.com, sridhar.samudrala@intel.com, horms@kernel.org,
+ john.fastabend@gmail.com, sgoutham@marvell.com, jhs@mojatatu.com,
+ donald.hunter@gmail.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 20 Aug 2024 14:56:14 -0700 you wrote:
-> This series contains updates to ice driver only.
+On Tue, 20 Aug 2024 17:12:21 +0200 you wrote:
+> We have a plurality of shaping-related drivers API, but none flexible
+> enough to meet existing demand from vendors[1].
 > 
-> Maciej fixes issues with Rx data path on architectures with
-> PAGE_SIZE >= 8192; correcting page reuse usage and calculations for
-> last offset and truesize.
-> 
-> Michal corrects assignment of devlink port number to use PF id.
+> This series introduces new device APIs to configure in a flexible way
+> TX H/W shaping. The new functionalities are exposed via a newly
+> defined generic netlink interface and include introspection
+> capabilities. Some self-tests are included, on top of a dummy
+> netdevsim implementation, and a basic implementation for the iavf
+> driver.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/4] ice: fix page reuse when PAGE_SIZE is over 8k
-    https://git.kernel.org/netdev/net/c/50b2143356e8
-  - [net,2/4] ice: fix ICE_LAST_OFFSET formula
-    https://git.kernel.org/netdev/net/c/b966ad832942
-  - [net,3/4] ice: fix truesize operations for PAGE_SIZE >= 8192
-    https://git.kernel.org/netdev/net/c/d53d4dcce69b
-  - [net,4/4] ice: use internal pf id instead of function number
-    https://git.kernel.org/netdev/net/c/503ab6ee40fc
+  - [v4,net-next,01/12] tools: ynl: lift an assumption about spec file name
+    https://git.kernel.org/netdev/net-next/c/f32c821ae019
+  - [v4,net-next,02/12] netlink: spec: add shaper YAML spec
+    (no matching commit)
+  - [v4,net-next,03/12] net-shapers: implement NL get operation
+    (no matching commit)
+  - [v4,net-next,04/12] net-shapers: implement NL set and delete operations
+    (no matching commit)
+  - [v4,net-next,05/12] net-shapers: implement NL group operation
+    (no matching commit)
+  - [v4,net-next,06/12] net-shapers: implement delete support for NODE scope shaper
+    (no matching commit)
+  - [v4,net-next,07/12] netlink: spec: add shaper introspection support
+    (no matching commit)
+  - [v4,net-next,08/12] net: shaper: implement introspection support
+    (no matching commit)
+  - [v4,net-next,09/12] testing: net-drv: add basic shaper test
+    (no matching commit)
+  - [v4,net-next,10/12] virtchnl: support queue rate limit and quanta size configuration
+    (no matching commit)
+  - [v4,net-next,11/12] ice: Support VF queue rate limit and quanta size configuration
+    (no matching commit)
+  - [v4,net-next,12/12] iavf: Add net_shaper_ops support
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
