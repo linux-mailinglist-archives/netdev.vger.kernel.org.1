@@ -1,79 +1,242 @@
-Return-Path: <netdev+bounces-120968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B0CF95B4E1
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:20:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 031CF95B4F3
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:26:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECCA1287C72
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:20:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84FA11F22ADE
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 12:26:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7488517E00F;
-	Thu, 22 Aug 2024 12:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52AC1C9442;
+	Thu, 22 Aug 2024 12:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OrYz7ko5"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CcCjyrNe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4482116A940;
-	Thu, 22 Aug 2024 12:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFCA826AF6
+	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 12:26:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724329230; cv=none; b=QkUc+3ro7MePwZalvznWP9l0xNHkZtw71DDp46pZI1Bj/Cksv3VddEM4rvNVa5mqlBUE41oB4lOqH6dldYo2BO+ysfHkYdYvWqOiepQIqLf7aDaR/zKmr6knIVf5Wb4hsMwMa1Yv1dYWXxfNDc9C/dcyAwwtVldBwayvYEl2fqw=
+	t=1724329595; cv=none; b=LKSYFF8PCDJKDglHBuWa91pZ8q2/VF7/32zU8NQJBWs5nffE99eI60nj+GTZ/osvJcPAWLpqfIs0DorNB3Ivr9FPaHzFX/NRslPDSDGEvpGQu2YcL5Wgav9MWy1s45QTl7L/s3TKwyc5Qw+Tebb8lauJcdQD8YD8xWjJrcgzsTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724329230; c=relaxed/simple;
-	bh=stMLxFv66OkFuObD6fVYFuyIPTsazrqfFXFvEAHOF3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O3lnihXCZfeT7XfqTu/FZ6kuoMO2fZLwrwdcCfCrHFYlbPX4lFJ0poSsDlak4oWMovLYnDLIbXdQkfBdYfZghYqNZLYkvfrpRlIZJMm+qscs52KozlcY7qvJkyQE48guCisnfEcU7p6R2Cqt+ZEnH/J64qRBj2pQhuuUHmpvs2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OrYz7ko5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D811C32782;
-	Thu, 22 Aug 2024 12:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724329230;
-	bh=stMLxFv66OkFuObD6fVYFuyIPTsazrqfFXFvEAHOF3s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OrYz7ko56CTvUx56VYqHQecOjKEIpjE9/UFtZHt9JuWSTEiKLEAdVTcePGmwT3rQ/
-	 eQm3/XQLWiccxxmk7mBJqQfIX1Q/CQL/gjIkf2sWWjd3D78m00m2JnYLYFMlxcHnJv
-	 pkNGZMkIU71FGjiCnOAoGKHapbMEJ2k715dk8kDSoEyeiQeOJmzBiRXnceg4tTwus1
-	 YE+92S8LrOQZi65J0AHVi/B+SlQEt7vWhSAPvQJnPWj8uAazWqnxneo8TYlh7Z1Eh7
-	 D5Lyt0SwEVLJyp6IWxDVbW81eXsUF65GtpAkHjTpuVewgAltDHu9l1EwEC9GhcYd/3
-	 jGek+Yd0G/8xg==
-Date: Thu, 22 Aug 2024 13:20:26 +0100
-From: Simon Horman <horms@kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: netlink: Remove the dump_cb_mutex field
- from struct netlink_sock
-Message-ID: <20240822122026.GO2164@kernel.org>
-References: <c15ce0846e0aed6f342d85f36092c386c6148d00.1724309198.git.christophe.jaillet@wanadoo.fr>
+	s=arc-20240116; t=1724329595; c=relaxed/simple;
+	bh=yCofhk26zNr0CiMvoa5jNXSc3echK0+zENroz+9C06k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hkIrxNm6gICp0eZanHpZgzZ9Y1hXsh4W0lN5PQucyEmmbudWsvdC2JAjEcKSArqRvrgxt/wBNwrG3M3j25GqSLZCuHPkfubKmvuuy9BqwH6ikvEotfgOjZwAWWSgDPpiACUwiCDrQW7hL3010GcbpDB4SAOLzAeEM7aoB/uZvXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CcCjyrNe; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e56a994e-e329-4cac-9fff-e57139408769@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724329590;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M27iPWR3iZcTLdtud7RQ3yMmoJkMhwbkdWVwJzPNaoc=;
+	b=CcCjyrNezTzh6nx2eqhvyML4XzlHlg6LsQzYjwQFeDSuT0dDx0PJbJw+9jPseMzs0mV6ee
+	dYLQ5st249jOS6h7FDzEJTPvJA42R/1jxBi5C7p9r9vnXVFcpTnkfbZCFvISDfndMdKU/X
+	E5u0PTmh9MiEuuN/hULvmMw972kIBUY=
+Date: Thu, 22 Aug 2024 13:26:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c15ce0846e0aed6f342d85f36092c386c6148d00.1724309198.git.christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCHv4 net-next] ptp/ioctl: support MONOTONIC_RAW timestamps
+ for PTP_SYS_OFFSET_EXTENDED
+To: Mahesh Bandewar <maheshb@google.com>, Netdev <netdev@vger.kernel.org>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Richard Cochran <richardcochran@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+ Sagi Maimon <maimon.sagi@gmail.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>,
+ Mahesh Bandewar <mahesh@bandewar.net>
+References: <20240502211047.2240237-1-maheshb@google.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240502211047.2240237-1-maheshb@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Aug 22, 2024 at 09:03:20AM +0200, Christophe JAILLET wrote:
-> Commit 5fbf57a937f4 ("net: netlink: remove the cb_mutex "injection" from
-> netlink core") has removed the usage of the 'dump_cb_mutex' field from the
-> struct netlink_sock.
+On 02/05/2024 22:10, Mahesh Bandewar wrote:
+> The ability to read the PHC (Physical Hardware Clock) alongside
+> multiple system clocks is currently dependent on the specific
+> hardware architecture. This limitation restricts the use of
+> PTP_SYS_OFFSET_PRECISE to certain hardware configurations.
 > 
-> Remove the field itself now. It saves a few bytes in the structure.
+> The generic soultion which would work across all architectures
+> is to read the PHC along with the latency to perform PHC-read as
+> offered by PTP_SYS_OFFSET_EXTENDED which provides pre and post
+> timestamps.  However, these timestamps are currently limited
+> to the CLOCK_REALTIME timebase. Since CLOCK_REALTIME is affected
+> by NTP (or similar time synchronization services), it can
+> experience significant jumps forward or backward. This hinders
+> the precise latency measurements that PTP_SYS_OFFSET_EXTENDED
+> is designed to provide.
 > 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> This problem could be addressed by supporting MONOTONIC_RAW
+> timestamps within PTP_SYS_OFFSET_EXTENDED. Unlike CLOCK_REALTIME
+> or CLOCK_MONOTONIC, the MONOTONIC_RAW timebase is unaffected
+> by NTP adjustments.
+> 
+> This enhancement can be implemented by utilizing one of the three
+> reserved words within the PTP_SYS_OFFSET_EXTENDED struct to pass
+> the clock-id for timestamps.  The current behavior aligns with
+> clock-id for CLOCK_REALTIME timebase (value of 0), ensuring
+> backward compatibility of the UAPI.
+> 
+> Signed-off-by: Mahesh Bandewar <maheshb@google.com>
+
+Hi Manesh!
+
+Any chance there will be v5 soon with the comments addressed?
+I don't see any strong objections to the patch, and it looks
+like we can benefit from having MONOTONIC_RAW clock for our
+project too.
+
+Thanks,
+Vadim
+
 > ---
-> Compile tested only
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+> v1 -> v2
+>     * Code-style fixes.
+> v2 -> v3
+>     * Reword commit log
+>     * Fix the compilation issue by using __kernel_clockid instead of clockid_t
+>       which has kernel only scope.
+> v3 -> v4
+>     * Typo/comment fixes.
+> 
+>   drivers/ptp/ptp_chardev.c        |  7 +++++--
+>   include/linux/ptp_clock_kernel.h | 30 ++++++++++++++++++++++++++----
+>   include/uapi/linux/ptp_clock.h   | 27 +++++++++++++++++++++------
+>   3 files changed, 52 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+> index 7513018c9f9a..c109109c9e8e 100644
+> --- a/drivers/ptp/ptp_chardev.c
+> +++ b/drivers/ptp/ptp_chardev.c
+> @@ -358,11 +358,14 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+>   			extoff = NULL;
+>   			break;
+>   		}
+> -		if (extoff->n_samples > PTP_MAX_SAMPLES
+> -		    || extoff->rsv[0] || extoff->rsv[1] || extoff->rsv[2]) {
+> +		if (extoff->n_samples > PTP_MAX_SAMPLES ||
+> +		    extoff->rsv[0] || extoff->rsv[1] ||
+> +		    (extoff->clockid != CLOCK_REALTIME &&
+> +		     extoff->clockid != CLOCK_MONOTONIC_RAW)) {
+>   			err = -EINVAL;
+>   			break;
+>   		}
+> +		sts.clockid = extoff->clockid;
+>   		for (i = 0; i < extoff->n_samples; i++) {
+>   			err = ptp->info->gettimex64(ptp->info, &ts, &sts);
+>   			if (err)
+> diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
+> index 6e4b8206c7d0..74ded5f95d95 100644
+> --- a/include/linux/ptp_clock_kernel.h
+> +++ b/include/linux/ptp_clock_kernel.h
+> @@ -47,10 +47,12 @@ struct system_device_crosststamp;
+>    * struct ptp_system_timestamp - system time corresponding to a PHC timestamp
+>    * @pre_ts: system timestamp before capturing PHC
+>    * @post_ts: system timestamp after capturing PHC
+> + * @clockid: clock-base used for capturing the system timestamps
+>    */
+>   struct ptp_system_timestamp {
+>   	struct timespec64 pre_ts;
+>   	struct timespec64 post_ts;
+> +	clockid_t clockid;
+>   };
+>   
+>   /**
+> @@ -457,14 +459,34 @@ static inline ktime_t ptp_convert_timestamp(const ktime_t *hwtstamp,
+>   
+>   static inline void ptp_read_system_prets(struct ptp_system_timestamp *sts)
+>   {
+> -	if (sts)
+> -		ktime_get_real_ts64(&sts->pre_ts);
+> +	if (sts) {
+> +		switch (sts->clockid) {
+> +		case CLOCK_REALTIME:
+> +			ktime_get_real_ts64(&sts->pre_ts);
+> +			break;
+> +		case CLOCK_MONOTONIC_RAW:
+> +			ktime_get_raw_ts64(&sts->pre_ts);
+> +			break;
+> +		default:
+> +			break;
+> +		}
+> +	}
+>   }
+>   
+>   static inline void ptp_read_system_postts(struct ptp_system_timestamp *sts)
+>   {
+> -	if (sts)
+> -		ktime_get_real_ts64(&sts->post_ts);
+> +	if (sts) {
+> +		switch (sts->clockid) {
+> +		case CLOCK_REALTIME:
+> +			ktime_get_real_ts64(&sts->post_ts);
+> +			break;
+> +		case CLOCK_MONOTONIC_RAW:
+> +			ktime_get_raw_ts64(&sts->post_ts);
+> +			break;
+> +		default:
+> +			break;
+> +		}
+> +	}
+>   }
+>   
+>   #endif
+> diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
+> index 053b40d642de..5e3d70fbc499 100644
+> --- a/include/uapi/linux/ptp_clock.h
+> +++ b/include/uapi/linux/ptp_clock.h
+> @@ -155,13 +155,28 @@ struct ptp_sys_offset {
+>   	struct ptp_clock_time ts[2 * PTP_MAX_SAMPLES + 1];
+>   };
+>   
+> +/*
+> + * ptp_sys_offset_extended - data structure for IOCTL operation
+> + *			     PTP_SYS_OFFSET_EXTENDED
+> + *
+> + * @n_samples:	Desired number of measurements.
+> + * @clockid:	clockid of a clock-base used for pre/post timestamps.
+> + * @rsv:	Reserved for future use.
+> + * @ts:		Array of samples in the form [pre-TS, PHC, post-TS]. The
+> + *		kernel provides @n_samples.
+> + *
+> + * History:
+> + * v1: Initial implementation.
+> + *
+> + * v2: Use the first word of the reserved-field for @clockid. That's
+> + *     backward compatible since v1 expects all three reserved words
+> + *     (@rsv[3]) to be 0 while the clockid (first word in v2) for
+> + *     CLOCK_REALTIME is '0'.
+> + */
+>   struct ptp_sys_offset_extended {
+> -	unsigned int n_samples; /* Desired number of measurements. */
+> -	unsigned int rsv[3];    /* Reserved for future use. */
+> -	/*
+> -	 * Array of [system, phc, system] time stamps. The kernel will provide
+> -	 * 3*n_samples time stamps.
+> -	 */
+> +	unsigned int n_samples;
+> +	__kernel_clockid_t clockid;
+> +	unsigned int rsv[2];
+>   	struct ptp_clock_time ts[PTP_MAX_SAMPLES][3];
+>   };
+>   
 
 
