@@ -1,112 +1,84 @@
-Return-Path: <netdev+bounces-121076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 739E795B914
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:51:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F67795B911
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 16:51:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1CE7B266B6
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:50:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DD501C20CC9
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 14:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569AA1CC172;
-	Thu, 22 Aug 2024 14:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D7A1CC170;
+	Thu, 22 Aug 2024 14:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VO7Xqsqt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B90B81C8FC9;
-	Thu, 22 Aug 2024 14:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E509F1CC151;
+	Thu, 22 Aug 2024 14:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724338241; cv=none; b=j/CAOQi2nAFoZ6jSy57iIPu4gBQu7Z8Fk3C+52NfwJp3eoXnS2M9k2d/QsqxCs6ZOjBVzQZVWmdODqNZbY/VMO5lit8pn/ngKMC7fAVxcI+BRDLs+evbuwZCQQ8xNmBl2ydhSbKO/DLm54/eaf+yzi4ioZ09hGd9DOtyZuaXFug=
+	t=1724338285; cv=none; b=Dof4wgXrLuJJ8NAmB91lBL5qn/pDwAQEQfjsAX/2dat9hkB8UoKwlNGbfANpncJEhZDJ/oD9N7QXD/UdXmrbvLZAj0vn1z4M0lMie3/a5GOwkAArll4Bg/YeQ8RBsW31drGA802gMbnDzsFAcBnrI2/FzZzrACzReK99oVkg3Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724338241; c=relaxed/simple;
-	bh=dl3kb68HcduOqK5lkZHdmPl+lK4j2kU52a/fqW62vRU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QFly1iJbSofTFnBEggT1ZSM4sEjuGikXQrklYbVU3hA1wjlgelZA8SnjOY5hjEkfvKQzGDDKFF/OG2LmjfPPjrlb/ohIrBHg96EppNgSUU1F8QnTJoPLpzePRptB+YK7daqvhQKAf0pdBdEzNrdMZhhXzgwrkKphL5YAiOND0g0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
-X-CSE-ConnectionGUID: 2WjSmbAMTE2WMIvFHMedDg==
-X-CSE-MsgGUID: lYjJJJqkT5mRy1ndIfkf6w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="22886625"
-X-IronPort-AV: E=Sophos;i="6.10,167,1719903600"; 
-   d="scan'208";a="22886625"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 07:50:36 -0700
-X-CSE-ConnectionGUID: gRGZt8Q+TzmbySdyJ/62Vw==
-X-CSE-MsgGUID: R5o12bjCSma3zXw3NSRBWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,167,1719903600"; 
-   d="scan'208";a="92270919"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 07:50:24 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andy@kernel.org>)
-	id 1sh98X-00000000U9R-0pzE;
-	Thu, 22 Aug 2024 17:50:05 +0300
-Date: Thu, 22 Aug 2024 17:50:04 +0300
-From: Andy Shevchenko <andy@kernel.org>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH v3 0/9] PCI: Remove pcim_iounmap_regions()
-Message-ID: <ZsdQHMXRJOQkEN4-@smile.fi.intel.com>
-References: <20240822134744.44919-1-pstanner@redhat.com>
+	s=arc-20240116; t=1724338285; c=relaxed/simple;
+	bh=V/moUsRuy3JJd+W77sFUhI4M89+kJ/jiiPJtireX0+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j2nxH72+Gf0LyYR+pscjf+KTfisRzCUSmf78RMZmjfb/YP6E0BBr3o0wauRIRB6N0hWTXGF+SU9B082bNvWTzEEji5qDJqyrtBk72ewgMwOYd4l8u4mIsLDpaMnYsQVFoVRgW50M3HIhoJ7/j7sCtfOAxuxFTRJqNX9JPs1DXsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VO7Xqsqt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4324BC32782;
+	Thu, 22 Aug 2024 14:51:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724338284;
+	bh=V/moUsRuy3JJd+W77sFUhI4M89+kJ/jiiPJtireX0+Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VO7Xqsqts9vFHvENWLbtOzNWf3bcQGtgCoyan4QxHNfB1ekHLlZWbVXKpHsowj6s8
+	 6t/3bUW+s8MzVK52lfv1panRM8NZ7R5DUZ25xytbqUPpg5dtK7SBwaGRSz+WEfSOPs
+	 gbvLAfABlKuUneUBsTKVOwhEIaNPtUrBsdA3GqSB9JSD3VYE6p86ofbJB1Bu/Qb/yr
+	 r85DIej3VravXi1we62SFnPsl7u+VXwfofKjwr5Ueje7vIx91Reho55Qape0SQm6KS
+	 XmseuHaOjJQYbAvMJfUxRZSNXZS3wwvXFGcH1Wx1c0N1e38goBHEnLrmCJE3E/hirc
+	 VtI/lXbPLVyzA==
+Date: Thu, 22 Aug 2024 07:51:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: <andrew@lunn.ch>, <f.fainelli@gmail.com>, <olteanv@gmail.com>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH -next] net: dsa: Simplify with scoped for each OF child
+ loop
+Message-ID: <20240822075123.55da5a5a@kernel.org>
+In-Reply-To: <2d67e112-75a0-3111-3f3a-91e6a982652f@huawei.com>
+References: <20240820065804.560603-1-ruanjinjie@huawei.com>
+	<20240821171817.3b935a9d@kernel.org>
+	<2d67e112-75a0-3111-3f3a-91e6a982652f@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822134744.44919-1-pstanner@redhat.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 22, 2024 at 03:47:32PM +0200, Philipp Stanner wrote:
-
-> Important things first:
-> This series is based on [1] and [2] which Bjorn Helgaas has currently
-> queued for v6.12 in the PCI tree.
+On Thu, 22 Aug 2024 10:07:25 +0800 Jinjie Ruan wrote:
+> On 2024/8/22 8:18, Jakub Kicinski wrote:
+> > On Tue, 20 Aug 2024 14:58:04 +0800 Jinjie Ruan wrote:  
+> >> Use scoped for_each_available_child_of_node_scoped() when iterating over
+> >> device nodes to make code a bit simpler.  
+> > 
+> > Could you add more info here that confirms this works with gotos?
+> > I don't recall the details but I thought sometimes the scoped
+> > constructs don't do well with gotos. I checked 5 random uses
+> > of this loop and 4 of them didn't have gotos.  
 > 
-> This series shall remove pcim_iounmap_regions() in order to make way to
-> remove its brother, pcim_iomap_regions().
+> Hi, Jakub
+> 
+> From what I understand, for_each_available_child_of_node_scoped() is not
+> related to gotos, it only let the iterating child node self-declared and
+> automatic release, so the of_node_put(iterating_child_node) can be removed.
 
-For the non-commented ones (by me or by others)
-Reviewed-by: Andy Shevchenko <andy@kernel.org>
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Could you either test it or disasm the code to double check, please?
 
