@@ -1,201 +1,150 @@
-Return-Path: <netdev+bounces-120810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-120811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F224A95AD11
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:52:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4594E95AD13
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 07:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C6D9B21D2E
-	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 05:52:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6999F1C22790
+	for <lists+netdev@lfdr.de>; Thu, 22 Aug 2024 05:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B2527347D;
-	Thu, 22 Aug 2024 05:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010B656B7C;
+	Thu, 22 Aug 2024 05:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U3pMlWgg"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="pR+/chO3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95EE75589C
-	for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 05:52:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B13923CB;
+	Thu, 22 Aug 2024 05:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724305944; cv=none; b=hBzFVW7AIt/TLlLAMKYhqlNXd5FPPiSwzRPFqaFgMZPojBYaQ1gS+xEKyw6FnSHvIdpS3fwL2n+F2/W+r34KD6IipVJ52vQO9/NsXEQ8Cs6z/ejzYxts8FuNhf+2YXOGwxsCItw+l+rxBKPxKyzmcXe5MoT6e/aEshkMC/hMAmc=
+	t=1724305992; cv=none; b=l/MFb9YMpRAHqY3gzMondAd4DxO/wA5qbetG/nFDpIJysGjrt0Lx/O5uc5ltt20SKqUFr5CnIWj50vOP4+/P+E2xQAam1rVwWAT8V6wt2cMYA8bl7h5SBOlOmC75FcdHFYTV99PHNC/F1K0OI3fPXVcV/j3XyVm7C9a7iI65fMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724305944; c=relaxed/simple;
-	bh=ZDPRDTlLhRB8Ca5AowgVDx3jfAvGtbwAcPsMhXtWWrw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=TDzaeKOONxc1lmHcCqhtdLo9wXsVHZ3SQm127pPCnOci1l02lyWElVsQ3ewFrxwz+9VidNrfb4iUihM7URQr5LIPI7tHc5qB3Io4gi1R4m8vgQpitRHqmiq2P9Qu7T3unalkAfwlx/R8P+8fwe4kaX2ez+kpFDDlwcp+ekWnM8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U3pMlWgg; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0b8fa94718so847554276.0
-        for <netdev@vger.kernel.org>; Wed, 21 Aug 2024 22:52:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724305941; x=1724910741; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=04JaEmUuzFfbKL4CGnL5ZC4xtx6kxsSTreaHJ5A6DDg=;
-        b=U3pMlWggtRE4AjLO2WvUhyfWMSX5BadmYCADPoZ+t9FX5BK8DN0xwd5sttY3g+qv3G
-         MKTa+AtPxSELwZoNkLCHPXkyD5lWaCcxcfcGVKKBNXz9pSj8OsybUBSafOOPy+/YF4iR
-         rJ7m3tUC2aSS0qsLJ3NckU1H8n1Fr07piNgysdxbQlP5al5vCvu+Uws6lCbn1OZvWmfz
-         Gx3xLDI+2Mmlvb41JpiT/MAoH73tkNuv+LGxC0o3KYEVqFQJPIF+9U9M3P4gUWRl4lLs
-         BvQ5Bjv7RHrROUh9MoF27RlsFdMp4voQCIkjQIG9D3Iv0E+asD9c1MwbAHsOLcyYpBqP
-         IQ6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724305941; x=1724910741;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=04JaEmUuzFfbKL4CGnL5ZC4xtx6kxsSTreaHJ5A6DDg=;
-        b=mhbzqUbs0toWTaigLBx+lavOcVHUtdr4HNdEUGcHsce9eNabSSnysGig+SF523ndkI
-         PMC1GdaTPvY3vxYveLro8fBT3mQHwizshFqp/30fRqGhSYK3hjfZ+epeSmyZLoVbg51m
-         ANo3evxYzP6HRsn7QEVxrwdT3Ss9QxzD+Xf1eS+RPRNatAjRHk5i+OPU+K8M1gjlRf2L
-         68bCSDhOEvGl+w0kJL7H9eI0glphyTjeYkbryAzuLOe9Vp5xC/5l1Gc5Gn+W53Kp1E5/
-         KsLZ6cbw403xmyrAK2LKuBpbbxEOtsKFy5/onEdYe6qgCF7biYEoAGyLlCj9BgQ+LN0h
-         NHUg==
-X-Gm-Message-State: AOJu0YxLap41Lr3Qgpm2OFPQtI5SWlZNogv7CDRvQutJeTAeSEXTNUeQ
-	/h+Kubw9LM+1IoPwb/Hu+VJzH9wu3mwcoqcTOKHZv+t+zS7DLlfVVOCXEEteNfsFkD499H9+JT2
-	5Shn4YS+So0Iqc6vM6qGF8qQg3QjCeNa+3ZdplrkN0U6piKdckWOPC6IBmk+C81XjsLATdZrhuj
-	NfB7LAxwXTqxVpCKzkQUJsUDiZTolhTC0hLOETS4w5kjwPu8VyM4mgsJwH7as=
-X-Google-Smtp-Source: AGHT+IETrPBlj0Tv3ojSIAQFzaGbRbQ3B+XAZxSguR7Lp9ncSuSBoJfqKynKHzdekC+vdVaJRzY63BBhLOJMi+USHg==
-X-Received: from almasrymina.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:4bc5])
- (user=almasrymina job=sendgmr) by 2002:a05:6902:1370:b0:e16:5303:7bcc with
- SMTP id 3f1490d57ef6-e166553ae90mr12157276.10.1724305940891; Wed, 21 Aug 2024
- 22:52:20 -0700 (PDT)
-Date: Thu, 22 Aug 2024 05:51:54 +0000
+	s=arc-20240116; t=1724305992; c=relaxed/simple;
+	bh=z9FV8p4TOVD9tra39TZJf+T6In97vrkN5wwzoLlmmRI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tFWlh8fUWAJrOjd9zx/P64AwXjeBSlJyVKDSzC6scsvg4VD/i61hd4UWwvTleCFWscnIgaXqPyiGx/R66k7neqN0hIrg6Mnk5O1buLY6Xhhk2EUEqWaYOSpmHvpozSr93HVChXiheh5Uhj1iVG90AbmBBb0QW+I94ucXfTA+8pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=pR+/chO3; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47M5qpa5073319;
+	Thu, 22 Aug 2024 00:52:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1724305971;
+	bh=30i5OYDTCRCCEhF7zyorf95MkfQz3VtQxsm+cm9IOt8=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=pR+/chO3F4yZjYEOMa3eH9uJ3bYd3eEJ5VnAWCmLMWc3L3/noW5d7dGFRgojPEB/z
+	 qKkAx4b3TQSqpv+tRxBXjeo410pDmSDCPaAUS5xUHeD3lVVRivoY62o4x+m5+BgJ7v
+	 ezsAl/BvKbzVIUrWrHAPSjXCdRJGvw9nmsSms0Rk=
+Received: from DFLE106.ent.ti.com (dfle106.ent.ti.com [10.64.6.27])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47M5qpAD076041
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 22 Aug 2024 00:52:51 -0500
+Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE106.ent.ti.com
+ (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 22
+ Aug 2024 00:52:50 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 22 Aug 2024 00:52:50 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47M5qiRu059176;
+	Thu, 22 Aug 2024 00:52:45 -0500
+Message-ID: <070a6aea-bebe-42c8-85be-56eb5f2f3ace@ti.com>
+Date: Thu, 22 Aug 2024 11:22:44 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
-Message-ID: <20240822055154.4176338-1-almasrymina@google.com>
-Subject: [PATCH net-next v2] net: refactor ->ndo_bpf calls into dev_xdp_propagate
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, bpf@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, Jay Vosburgh <jv@jvosburgh.net>, 
-	Andy Gospodarek <andy@greyhouse.net>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
-	Dexuan Cui <decui@microsoft.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/7] net: ti: icssg-prueth: Enable IEP1
+To: Roger Quadros <rogerq@kernel.org>, "Anwar, Md Danish" <a0501179@ti.com>,
+        Dan Carpenter <dan.carpenter@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
+        Jan
+ Kiszka <jan.kiszka@siemens.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+        Jacob Keller
+	<jacob.e.keller@intel.com>,
+        Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman
+	<horms@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>
+References: <20240813074233.2473876-1-danishanwar@ti.com>
+ <20240813074233.2473876-2-danishanwar@ti.com>
+ <aee5b633-31ce-4db0-9014-90f877a33cf4@kernel.org>
+ <9766c4f6-b687-49d6-8476-8414928a3a0e@ti.com>
+ <ae36c591-3b26-44a7-98a4-a498ee507e27@kernel.org>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <ae36c591-3b26-44a7-98a4-a498ee507e27@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-When net devices propagate xdp configurations to slave devices,
-we will need to perform a memory provider check to ensure we're
-not binding xdp to a device using unreadable netmem.
 
-Currently the ->ndo_bpf calls in a few places. Adding checks to all
-these places would not be ideal.
 
-Refactor all the ->ndo_bpf calls into one place where we can add this
-check in the future.
+On 21/08/24 5:23 pm, Roger Quadros wrote:
+> 
+> 
+> On 21/08/2024 14:33, Anwar, Md Danish wrote:
+>> Hi Roger,
+>>
+>> On 8/21/2024 4:57 PM, Roger Quadros wrote:
+>>> Hi,
+>>>
+>>> On 13/08/2024 10:42, MD Danish Anwar wrote:
+>>>> IEP1 is needed by firmware to enable FDB learning and FDB ageing.
+>>>
+>>> Required by which firmware?
+>>>
+>>
+>> IEP1 is needed by all ICSSG firmwares (Dual EMAC / Switch / HSR)
+>>
+>>> Does dual-emac firmware need this?
+>>>
+>>
+>> Yes, Dual EMAC firmware needs IEP1 to enabled.
+> 
+> Then this need to be a bug fix?
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mina Almasry <almasrymina@google.com>
+Correct, this is in fact a bug. But IEP1 is also needed by HSR firmware
+so I thought of keeping this patch with HSR series. As HSR will be
+completely broken if IEP1 is not enabled.
 
----
+I didn't want to post two patches one as bug fix to net and one part of
+HSR to net-next thus I thought of keeping this patch in this series only.
 
-v2:
-- Don't refactor the calls in net/xdp/xsk_buff_pool.c and
-  kernel/bpf/offload.c (Jakub)
----
- drivers/net/bonding/bond_main.c | 8 ++++----
- drivers/net/hyperv/netvsc_bpf.c | 2 +-
- include/linux/netdevice.h       | 1 +
- net/core/dev.c                  | 9 +++++++++
- 4 files changed, 15 insertions(+), 5 deletions(-)
+> What is the impact if IEP1 is not enabled for dual emac.
+> 
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index f9633a6f8571..73f9416c6c1b 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -2258,7 +2258,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
- 			goto err_sysfs_del;
- 		}
- 
--		res = slave_dev->netdev_ops->ndo_bpf(slave_dev, &xdp);
-+		res = dev_xdp_propagate(slave_dev, &xdp);
- 		if (res < 0) {
- 			/* ndo_bpf() sets extack error message */
- 			slave_dbg(bond_dev, slave_dev, "Error %d calling ndo_bpf\n", res);
-@@ -2394,7 +2394,7 @@ static int __bond_release_one(struct net_device *bond_dev,
- 			.prog	 = NULL,
- 			.extack  = NULL,
- 		};
--		if (slave_dev->netdev_ops->ndo_bpf(slave_dev, &xdp))
-+		if (dev_xdp_propagate(slave_dev, &xdp))
- 			slave_warn(bond_dev, slave_dev, "failed to unload XDP program\n");
- 	}
- 
-@@ -5584,7 +5584,7 @@ static int bond_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 			goto err;
- 		}
- 
--		err = slave_dev->netdev_ops->ndo_bpf(slave_dev, &xdp);
-+		err = dev_xdp_propagate(slave_dev, &xdp);
- 		if (err < 0) {
- 			/* ndo_bpf() sets extack error message */
- 			slave_err(dev, slave_dev, "Error %d calling ndo_bpf\n", err);
-@@ -5616,7 +5616,7 @@ static int bond_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 		if (slave == rollback_slave)
- 			break;
- 
--		err_unwind = slave_dev->netdev_ops->ndo_bpf(slave_dev, &xdp);
-+		err_unwind = dev_xdp_propagate(slave_dev, &xdp);
- 		if (err_unwind < 0)
- 			slave_err(dev, slave_dev,
- 				  "Error %d when unwinding XDP program change\n", err_unwind);
-diff --git a/drivers/net/hyperv/netvsc_bpf.c b/drivers/net/hyperv/netvsc_bpf.c
-index 4a9522689fa4..e01c5997a551 100644
---- a/drivers/net/hyperv/netvsc_bpf.c
-+++ b/drivers/net/hyperv/netvsc_bpf.c
-@@ -183,7 +183,7 @@ int netvsc_vf_setxdp(struct net_device *vf_netdev, struct bpf_prog *prog)
- 	xdp.command = XDP_SETUP_PROG;
- 	xdp.prog = prog;
- 
--	ret = vf_netdev->netdev_ops->ndo_bpf(vf_netdev, &xdp);
-+	ret = dev_xdp_propagate(vf_netdev, &xdp);
- 
- 	if (ret && prog)
- 		bpf_prog_put(prog);
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 614ec5d3d75b..f0ff269ce262 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3923,6 +3923,7 @@ struct sk_buff *dev_hard_start_xmit(struct sk_buff *skb, struct net_device *dev,
- 
- int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog);
- u8 dev_xdp_prog_count(struct net_device *dev);
-+int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf);
- u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode);
- 
- int __dev_forward_skb(struct net_device *dev, struct sk_buff *skb);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index e7260889d4cb..165e9778d422 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -9369,6 +9369,15 @@ u8 dev_xdp_prog_count(struct net_device *dev)
- }
- EXPORT_SYMBOL_GPL(dev_xdp_prog_count);
- 
-+int dev_xdp_propagate(struct net_device *dev, struct netdev_bpf *bpf)
-+{
-+	if (!dev->netdev_ops->ndo_bpf)
-+		return -EOPNOTSUPP;
-+
-+	return dev->netdev_ops->ndo_bpf(dev, bpf);
-+}
-+EXPORT_SYMBOL_GPL(dev_xdp_propagate);
-+
- u32 dev_xdp_prog_id(struct net_device *dev, enum bpf_xdp_mode mode)
- {
- 	struct bpf_prog *prog = dev_xdp_prog(dev, mode);
+Without IEP1 enabled, Crash is seen on AM64x 10M link when connecting /
+disconnecting multiple times. On AM65x IEP1 was always enabled because
+`prueth->pdata.quirk_10m_link_issue` was true. FDB learning and FDB
+ageing will also get impacted if IEP1 is not enabled.
+
+>>
+>>>> Always enable IEP1
+>>>>
+>>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>>> ---
+> 
+
 -- 
-2.46.0.295.g3b9ea8a38a-goog
-
+Thanks and Regards,
+Danish
 
