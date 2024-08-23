@@ -1,60 +1,48 @@
-Return-Path: <netdev+bounces-121243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DCA295C529
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:10:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D52395C530
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:11:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D38681F21A5A
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 06:10:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 188171C21C70
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 06:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CCF953E15;
-	Fri, 23 Aug 2024 06:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266F57345B;
+	Fri, 23 Aug 2024 06:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="URLhT2TU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11508493
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 06:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA00357CA6;
+	Fri, 23 Aug 2024 06:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724393430; cv=none; b=jFfptj0jblsgIkvlA6JtzHgpoI93i40m/3/DpOSKvMRpyh1A3zjpRjMJG0KorD8zhY6mfjZbTIRxQBcZhIvaOUuYlG6MHgCFadtsvqtOODvq8sP7yKj+ohvoifRggHskx6Wbz1ZftKn5EVwOpzgpAwASK3eXeOguNP0WsrJ0auE=
+	t=1724393457; cv=none; b=lM0M/bW+UuC5n0Wg0rOBHKkTkfaOQaop3RoJOyIyRn1lRjmoolJ/2B6K7imVNPGHk6jx1H6QNNDYKLPvcRTyz2db4EYNuw+LP4RbBlKPsQHg8Qz7RufgIeWyrgYhDNRsB92m9lgp9WxT8vByNxrHbVOqUcaqxLJf2jsgbRKVx/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724393430; c=relaxed/simple;
-	bh=p6WN2wxhm4JZUM8zS/QnqFxGjeQ7u+yr4VwshLsvDXY=;
+	s=arc-20240116; t=1724393457; c=relaxed/simple;
+	bh=GgTRe1j1dYYnmWj0lPD0688gdnIvxvqvWXPfj37La2Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H+ixKbm069OmfxQQYRC3ujOIPAps7bNzKBP+sp8A6TcvgDMiOmzllgtl71U/of8mPduMU8c9f6GLkbZlhqjTG8NOtrWf5mef/x/0Mtm4T8QWw+OyhClTrWVO87e7IUZCRyFqu58pfw+WIM66JzZvve8GGk134Z9SU1eRsh9FbWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a86abbd68ffso8307766b.0
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 23:10:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724393427; x=1724998227;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hc05uLmLkZ/DyJrTfQADQa6scqFGBtNP6igFqnxwt1E=;
-        b=SUrZHYACeRHloPPw4d1FLESZSyy3tWd9eocgNYEun1Qc28rcvd+jRovGqh2a2HFSSR
-         1Tpoh2yeHI6PhY0EXpm0eqYh/ZhwtGeOL5j21OMqHE52vP0XNWg5mSHNmbDbqDmk4fJE
-         vMAi3YWyoPgeuSYPo+oM/INJiq9q8tbmvD+aIXAYAO0kb7INMddpVDs0ggg3zYB23cSz
-         OIARAlLhd9QskMMvpFuxGsQX8t/75GpPjra4n0hIoCF8fQhOAmAED/cBZA7c42TBvyiO
-         N11UX/lbHbWzSgkntDy9/M2fcnrqxLd4febYNSwh+olmJ03AvRaBOESM4kzPAt5fMtPB
-         h+eg==
-X-Gm-Message-State: AOJu0YyxomqUb1J3ttONE7usLAqYwVsZAXs/fwNfdFBCvhBeqel4OHzz
-	Ns7ZnGzH5oCRvzjf3NqmzxWg1jE8QVq7ITFxoKCn+NMA/cvlNagEVm2WZV16
-X-Google-Smtp-Source: AGHT+IFi4INqgdMVBWXjyjRcR0aUbEK4QUONExqPlruJ+ErpaHopr8xnprMmKCvIcw1lBW6aSOpZwg==
-X-Received: by 2002:a17:907:1c92:b0:a86:a6ee:7d92 with SMTP id a640c23a62f3a-a86a6ee9ee7mr86895566b.18.1724393426716;
-        Thu, 22 Aug 2024 23:10:26 -0700 (PDT)
-Received: from ?IPV6:2a0b:e7c0:0:107::aaaa:69? ([2a0b:e7c0:0:107::aaaa:69])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f4378e4sm208724866b.109.2024.08.22.23.10.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Aug 2024 23:10:25 -0700 (PDT)
-Message-ID: <c1c821f2-fac9-4b8b-a90f-585f7153810c@kernel.org>
-Date: Fri, 23 Aug 2024 08:10:25 +0200
+	 In-Reply-To:Content-Type; b=MTFiXiTSU0ESrAEyuXnY5j/jkmw9tK1UYOmZBQl9Jm00z/e2dXaeu7WMcrXKTKlkClHO20Uner62k2DJWKRx43bbw8yMQ0VhlCVjN0yimUfwq/PjKb0GAQMaENlNr1j/e1G0YHkKfzkrdYMNIEql3k0NwP8tk2Gc94mDxvwz79g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URLhT2TU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 983EDC32786;
+	Fri, 23 Aug 2024 06:10:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724393456;
+	bh=GgTRe1j1dYYnmWj0lPD0688gdnIvxvqvWXPfj37La2Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=URLhT2TUPUuRqTmcvLV4NMkbknqbMg2IZ6eZhzUQAr0ZD4jA05rYkOIV95e8tssro
+	 7fUOJKuJ9aq/ZvDvDyXfglaGJ85gIoFsOyGWMjSglI6Oxnw8Ig4RIu256GbucXx0vb
+	 mpIcumyIiqERaBsASFfkmSCcfmI7tFeIujp0ii8kG69Iwrqh3l1tPkdJP89MUGh4s0
+	 Y+wJALlIfxyt2RnLiXkJkfAK6gcCHFjkIfUWyfBuIvk6OyB5L4/I4bKQGkGx1emPfX
+	 mrUK0WPlSw920vrARz0BbP6Awk0RmH2c9CmwQsW+aEBoOoa5+kqWQgzxi7MCW7ywzw
+	 EmMaa+TdHIaOw==
+Message-ID: <bfd89207-5dd5-4b89-bd54-aa490d34c590@kernel.org>
+Date: Fri, 23 Aug 2024 08:10:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,98 +50,105 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v5 1/2] ptp: ocp: adjust sysfs entries to expose tty
- information
-To: Vadim Fedorenko <vadfed@meta.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski
- <kuba@kernel.org>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org
-References: <20240822154422.1703972-1-vadfed@meta.com>
+Subject: Re: [PATCH 1/2] dt-bindings: wireless: wilc1000: Document WILC3000
+ compatible string
+To: Marek Vasut <marex@denx.de>
+Cc: linux-wireless@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Adham Abozaeid <adham.abozaeid@microchip.com>,
+ Ajay Singh <ajay.kathat@microchip.com>,
+ =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
+ <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240821184356.163816-1-marex@denx.de>
+ <ztc4h7rgsli2jltrdgu5twnma6dbbt3kbbbo3i4eevb3whkqkv@oabtuskiz7km>
+ <8031c3ef-3b16-4200-83aa-0776bdfa8b45@denx.de>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20240822154422.1703972-1-vadfed@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <8031c3ef-3b16-4200-83aa-0776bdfa8b45@denx.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 22. 08. 24, 17:44, Vadim Fedorenko wrote:
-> Starting v6.8 the serial port subsystem changed the hierarchy of devices
-> and symlinks are not working anymore. Previous discussion made it clear
-> that the idea of symlinks for tty devices was wrong by design [1].
-> Implement additional attributes to expose the information. Fixes tag
-> points to the commit which introduced the change.
+On 23/08/2024 03:38, Marek Vasut wrote:
+> On 8/22/24 10:07 AM, Krzysztof Kozlowski wrote:
 > 
-> [1] https://lore.kernel.org/netdev/2024060503-subsonic-pupil-bbee@gregkh/
+> Hi,
 > 
-> Fixes: b286f4e87e32 ("serial: core: Move tty and serdev to be children of serial core port device")
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
-
-Looks good to me. Except I still think it should be 2 patches:
-
->> The conversion to the array needs to go to a separate patch, apparently.
+>>> diff --git a/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml b/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
+>>> index 2460ccc082371..1bf3496c21e64 100644
+>>> --- a/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
+>>> +++ b/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
+>>> @@ -16,7 +16,9 @@ description:
+>>>   
+>>>   properties:
+>>>     compatible:
+>>> -    const: microchip,wilc1000
+>>> +    enum:
+>>> +      - microchip,wilc1000
+>>> +      - microchip,wilc3000
+>>
+>> Your driver change suggests device type is fully auto-detectable
 > 
-> I'm not sure here. I'm trying to fix the regression introduced back in
-> 6.8. The conversion to the array itself doesn't solve the issue, it's
-> pure net-next material.
+> It seems that way, yes.
+> 
+>> , thus
+>> they are compatible.
+> 
+> I _think_ the hardware is internally somewhat different, the WILC1000 is 
+> WiFi-only device and the WILC3000 has some extra Bluetooth part (which 
+> is currently not supported).
+> 
+> Maybe a fallback compatible string would be better here ?
 
-It doesn't matter...
+Yes, that's what I meant by compatibility. 3000 followed by 1000.
 
-> But the simple fix was NACKed previously, that's
-> why I had to introduce such a big change. I would like to keep these
-> changes all together in one patch. 
-
-No problem, if you plan on stable to pick this up, mark them both for Cc 
-stable.
-
-It's much easier to process in brain and review smaller changes, than a 
-large single patch. And especially: it is less error-prone.
-
-thanks,
--- 
--- 
-js
-suse labs
+Best regards,
+Krzysztof
 
 
