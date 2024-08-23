@@ -1,154 +1,76 @@
-Return-Path: <netdev+bounces-121244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D52395C530
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:11:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E178E95C592
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:36:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 188171C21C70
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 06:11:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EBF8283CDF
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 06:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266F57345B;
-	Fri, 23 Aug 2024 06:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="URLhT2TU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB2E770E9;
+	Fri, 23 Aug 2024 06:36:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA00357CA6;
-	Fri, 23 Aug 2024 06:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from njjs-sys-mailin01.njjs.baidu.com (mx312.baidu.com [180.101.52.108])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250036F2F4;
+	Fri, 23 Aug 2024 06:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.101.52.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724393457; cv=none; b=lM0M/bW+UuC5n0Wg0rOBHKkTkfaOQaop3RoJOyIyRn1lRjmoolJ/2B6K7imVNPGHk6jx1H6QNNDYKLPvcRTyz2db4EYNuw+LP4RbBlKPsQHg8Qz7RufgIeWyrgYhDNRsB92m9lgp9WxT8vByNxrHbVOqUcaqxLJf2jsgbRKVx/4=
+	t=1724394961; cv=none; b=U4Wbj1+zaKIQvuYf+N/GVAW2cNM63ybq919vFUIKj0/ZeOIIt0faCMYK7udWAPREthLJfk21mzwOPvGSFJJOgqBDBj9r7wrE+PfO2CRgtktpwoRXfnmnrrhXUOc/aNK9NVSYhIDFLRiPzj4XJJuOIc9HvJ1pLxDNy+/kcz9k7fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724393457; c=relaxed/simple;
-	bh=GgTRe1j1dYYnmWj0lPD0688gdnIvxvqvWXPfj37La2Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MTFiXiTSU0ESrAEyuXnY5j/jkmw9tK1UYOmZBQl9Jm00z/e2dXaeu7WMcrXKTKlkClHO20Uner62k2DJWKRx43bbw8yMQ0VhlCVjN0yimUfwq/PjKb0GAQMaENlNr1j/e1G0YHkKfzkrdYMNIEql3k0NwP8tk2Gc94mDxvwz79g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=URLhT2TU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 983EDC32786;
-	Fri, 23 Aug 2024 06:10:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724393456;
-	bh=GgTRe1j1dYYnmWj0lPD0688gdnIvxvqvWXPfj37La2Y=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=URLhT2TUPUuRqTmcvLV4NMkbknqbMg2IZ6eZhzUQAr0ZD4jA05rYkOIV95e8tssro
-	 7fUOJKuJ9aq/ZvDvDyXfglaGJ85gIoFsOyGWMjSglI6Oxnw8Ig4RIu256GbucXx0vb
-	 mpIcumyIiqERaBsASFfkmSCcfmI7tFeIujp0ii8kG69Iwrqh3l1tPkdJP89MUGh4s0
-	 Y+wJALlIfxyt2RnLiXkJkfAK6gcCHFjkIfUWyfBuIvk6OyB5L4/I4bKQGkGx1emPfX
-	 mrUK0WPlSw920vrARz0BbP6Awk0RmH2c9CmwQsW+aEBoOoa5+kqWQgzxi7MCW7ywzw
-	 EmMaa+TdHIaOw==
-Message-ID: <bfd89207-5dd5-4b89-bd54-aa490d34c590@kernel.org>
-Date: Fri, 23 Aug 2024 08:10:49 +0200
+	s=arc-20240116; t=1724394961; c=relaxed/simple;
+	bh=g0zsEWP2Hvlgl3aUUkO6PzcfFjYmAeF7CXO8Lsau0C8=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=n4C5bFr5V6u6heLteeN+fJmySyfP4ZGwoyJNVzHNB9vngEklG5QgYdZX+S3LwFF2XToc/A332IYgFvF144cdBPS1sosz6JQvTwHFVJtVhEJjhDFPkXWIehMWB2pCpb77ncNF6/+RUWOX6WTQukiWq6NC65G5yj1r1EM2KL25XAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=180.101.52.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
+Received: from localhost (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
+	by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id 381EC7F0003D;
+	Fri, 23 Aug 2024 14:16:50 +0800 (CST)
+From: Li RongQing <lirongqing@baidu.com>
+To: saeedm@nvidia.com,
+	leon@kernel.org,
+	tariqt@nvidia.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Li RongQing <lirongqing@baidu.com>
+Subject: [PATCH][net-next] net/mlx5: Pick the first matched node of priv.free_list in alloc_4k
+Date: Fri, 23 Aug 2024 14:16:48 +0800
+Message-Id: <20240823061648.17862-1-lirongqing@baidu.com>
+X-Mailer: git-send-email 2.9.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: wireless: wilc1000: Document WILC3000
- compatible string
-To: Marek Vasut <marex@denx.de>
-Cc: linux-wireless@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Adham Abozaeid <adham.abozaeid@microchip.com>,
- Ajay Singh <ajay.kathat@microchip.com>,
- =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
- <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240821184356.163816-1-marex@denx.de>
- <ztc4h7rgsli2jltrdgu5twnma6dbbt3kbbbo3i4eevb3whkqkv@oabtuskiz7km>
- <8031c3ef-3b16-4200-83aa-0776bdfa8b45@denx.de>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <8031c3ef-3b16-4200-83aa-0776bdfa8b45@denx.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 23/08/2024 03:38, Marek Vasut wrote:
-> On 8/22/24 10:07 AM, Krzysztof Kozlowski wrote:
-> 
-> Hi,
-> 
->>> diff --git a/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml b/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
->>> index 2460ccc082371..1bf3496c21e64 100644
->>> --- a/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
->>> +++ b/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
->>> @@ -16,7 +16,9 @@ description:
->>>   
->>>   properties:
->>>     compatible:
->>> -    const: microchip,wilc1000
->>> +    enum:
->>> +      - microchip,wilc1000
->>> +      - microchip,wilc3000
->>
->> Your driver change suggests device type is fully auto-detectable
-> 
-> It seems that way, yes.
-> 
->> , thus
->> they are compatible.
-> 
-> I _think_ the hardware is internally somewhat different, the WILC1000 is 
-> WiFi-only device and the WILC3000 has some extra Bluetooth part (which 
-> is currently not supported).
-> 
-> Maybe a fallback compatible string would be better here ?
+Pick the first node instead of last, to avoid unnecessary iterating
+over whole free list
 
-Yes, that's what I meant by compatibility. 3000 followed by 1000.
+Signed-off-by: Li RongQing <lirongqing@baidu.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Best regards,
-Krzysztof
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
+index 972e8e9..cd20f11 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/pagealloc.c
+@@ -228,6 +228,7 @@ static int alloc_4k(struct mlx5_core_dev *dev, u64 *addr, u32 function)
+ 		if (iter->function != function)
+ 			continue;
+ 		fp = iter;
++		break;
+ 	}
+ 
+ 	if (list_empty(&dev->priv.free_list) || !fp)
+-- 
+2.9.4
 
 
