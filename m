@@ -1,172 +1,163 @@
-Return-Path: <netdev+bounces-121198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F9695C20F
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 02:12:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3D1795C236
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 02:18:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0697B1C20B65
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 00:12:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DA791F23707
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 00:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7533E197;
-	Fri, 23 Aug 2024 00:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638604A08;
+	Fri, 23 Aug 2024 00:18:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OIFs0Qm5"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="XJmK5dWC";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="B7lYokOY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh4-smtp.messagingengine.com (fhigh4-smtp.messagingengine.com [103.168.172.155])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006CC195
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 00:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45891B653
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 00:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724371921; cv=none; b=XG8JGs1Iu0/uXCltCRozjN9yBqKbq6eblseEB+F95dH4uFNAKigsSTVQ9GKVyuMZkuqMp/oJj9VTnhHRf+sByqezsZJN3wAR4iHveq1t7gMYNwRG1T+5uUjzQ7k7iDbYKJA8gVgflb+58/G7CzO41HORrk9o9xpn/8UeTbH5Wjs=
+	t=1724372282; cv=none; b=qim3u56OUu/54W7PFcX7lJgS34OmoVnAFw1DgXQ4RNEMAdXOyMY/uLdAQeRNRlhdpzoR4YT+e9r069z6rYaJz2Hbc87hdv1QHRMTsIj4L/AZNPTngzS3GRU22hpvic8uFkfr0dtvIRcu8AQ9elTEySz0KMCmN8QR5vSvkHzuq6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724371921; c=relaxed/simple;
-	bh=izQfwDwmclVeioioQytX25oOgXOzw1V60HyQdf1k160=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FUWo+Q/J1pOdTnyvkoPitkJG8sQ9Mi/f/4G2MZbIB0VyCrjO5Vl+rFYWZ/ytjR7tLxgkXqXmSmdPEWO617Sgkp/z3G1R31qw+mVoJVPoVkmZ2pUXhRZjovm/tt7HUniwLLJS5WtKpbIPSgs5d0ru6ifGXTQNgO7d02EndbT0dys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OIFs0Qm5; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1fc611a0f8cso12278745ad.2
-        for <netdev@vger.kernel.org>; Thu, 22 Aug 2024 17:11:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724371919; x=1724976719; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=p81mFTAA+R5GPGnAAOllBhjqjVmMRGMQ8xNCPxQB7ss=;
-        b=OIFs0Qm5fssP1Gc852/BnfAPdxNOE0CpWhI7wgPfXGcoVFMP+2nXhejg9DTkvUjR2R
-         lwgobIPMPC0gG5WAlvvkvMNczLmMkWk/bRubAGBZ9ertwk8D6ay+HgrToue9ldESeKur
-         qAaioib03rkzgsOpO4c5WQxiyjJzewj+6RwZk0vUYFYr+fpOLs3pPKh2FdaeGAZ/0VIE
-         wEA6pjunqBW1wb0vnj9rZPaxjm2qnOfmhD2K8YeHugX33zcuEdOvj4O9BAet/HuOr1kG
-         OLYw16VIEejDXKoBF0z0T2iTsGW4yXS2y+q/GYBQP+UDRmFRei4xKt0FuCqRB2dEHeSk
-         +psQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724371919; x=1724976719;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=p81mFTAA+R5GPGnAAOllBhjqjVmMRGMQ8xNCPxQB7ss=;
-        b=F8b9xXTFuMwVouztEB2iDof8dKYJwtm9YlBaQIl55Xyc/Q6ntJdV81tVT1Tl78PsGs
-         aZ+vyZCJeyGab15X8als0a7l+AQ18eeXE2O/HOUSvS7HwJGB6/Rw66iSpCHcbH7XmeOZ
-         D3tGkSUqLn6aw7qvjKVgEljBPCCU102EelFpFStTDnNcdnU32vDIZkD8uVajD44q/HUn
-         7pvjeOnGw/dfG/nIysuXEDdeli2xMr0reYh4MsUtE1XghcFAnm7hus4yrkhfInlyZddz
-         NHD24KqobYYPbSA+eupI1xs6r7jcAGTtuTNzfwBENJsGLdHDb91/0/uh+p0buHd/eZgF
-         /WUA==
-X-Gm-Message-State: AOJu0Yy6RpPj2uMhsj5FbHFFj0KY/jcRZSJDAYveXMOWsOTvlkbYJMs1
-	Eo9KI7Gdd2iGtPkOXBG6Cq2vc60DPf5ZvH6EHM0aVZIelZ5cstYT
-X-Google-Smtp-Source: AGHT+IGiTYLZDdfOstjdqnrHuliiVTHq8Fi0mLwYRdjNkSsEggr77K2KqA4F+CABUB92T1n0j5uOgA==
-X-Received: by 2002:a17:902:ec8c:b0:202:2e81:27c7 with SMTP id d9443c01a7336-2039e4e7d19mr5279495ad.35.1724371919129;
-        Thu, 22 Aug 2024 17:11:59 -0700 (PDT)
-Received: from KERNELXING-MC1.tencent.com ([114.253.36.103])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385589225sm17988785ad.115.2024.08.22.17.11.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2024 17:11:58 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	kuniyu@amazon.com
-Cc: netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>,
-	Jade Dong <jadedong@tencent.com>
-Subject: [PATCH v4 net-next] tcp: avoid reusing FIN_WAIT2 when trying to find port in connect() process
-Date: Fri, 23 Aug 2024 08:11:52 +0800
-Message-Id: <20240823001152.31004-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1724372282; c=relaxed/simple;
+	bh=zydv4H1agCQYAbA2bY5F8skc6y3QLACPCM2OrXjX2sg=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=Kc9e95ALTxX56HuLM/37iVk8t2opM78iZIj5cXzl4lHiJhrxIW3gqbnrLbm1gfu2YywXpjHPHeqIFmNGZmTHd/IAbjO1Xoku5A9upSrL3EujAmBrz7VPQ4th2IQT5r/1+MC6cu5JNSAVDg7svN9GppP1OGBh4S36lOZe28dBgLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=XJmK5dWC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=B7lYokOY; arc=none smtp.client-ip=103.168.172.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-08.internal (phl-compute-08.nyi.internal [10.202.2.48])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id 3276E114AB33;
+	Thu, 22 Aug 2024 20:17:59 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Thu, 22 Aug 2024 20:17:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-type:content-type:date:date:from
+	:from:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1724372279; x=
+	1724458679; bh=z8NnpkHEjKStt+d806yRog8/0B+2alYelUCXntVupUE=; b=X
+	JmK5dWC2xL1eEPW8dQ7dAo6ATP7V/uxolzz9DDh2nI09y72eXgegAKQ1xtE36B7p
+	xIGSJQTTbkdUFngIcenD4e+vr6QwbY/GxI0/VuN9S2hR9EJimuYk9N4kUm83F4sB
+	evts8Ma7QQnSkdfetzhtofc5Cb0TEiBSRc+mX9e/anLW56VmDQQzMzhx4gdD9rMr
+	oaPeiFYr3XAq2bPV+dqksgpHTXKK0YMLtxP8ATSR1XR0074jCsHxauoYTojipWGV
+	gU+DbiS7eXVehxQlV3jeJ0ccX6O6m/ItZxc34qGLqrZZiOqtBVKRP3CuOW+xP9cD
+	7yWTueLC3RqJfKfWVkCBQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id:content-type
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1724372279; x=
+	1724458679; bh=z8NnpkHEjKStt+d806yRog8/0B+2alYelUCXntVupUE=; b=B
+	7lYokOY39mGVFBRkxPWWjpvvLvCpXOac9aZeGWA97kk7cQVydB5RVosmPo60534w
+	bZMK1+AUcUupaQZ5r7XGy1vdhLlQUtXxEfBw/vp395gzfrjRvs2ZqEqbqzjEYjTa
+	pYk+xkrrwEIpT6CFtENhIpSgHD82NRID/AFb+PrL3LlYBaSFge7ZAWKCAxjNTusX
+	9VHcTp7QV/zKhpwVFWC2PITRctzrJ9H48H8lRnigUnOIZOiSiHwg6woHXPY0Nqcz
+	btKSL/SPw5yFgVDzOOk5flH6Y0Yq8Cs4Zudqi5tYcQcGPUBWEyA1HDCmXt8xtT6R
+	M7Xv92fLc8Ks/qShSw2yw==
+X-ME-Sender: <xms:NtXHZrEGCcgamZdt2bz8z0317kestqn18ZYPm1iGSzFc6fzsSdtqWg>
+    <xme:NtXHZoX7_DigdYExfHfL6DYfWHBGxlGKcaRLIJzxg3d-6yXQSJrE2wyDr2502UiRz
+    vRBTfw9ROBYnGLb-P0>
+X-ME-Received: <xmr:NtXHZtLtrLlsSXHZLFJ-zPQl4Qkf4lqAscyt1-9l4zKl58nwV2StV1X3N0ASfn0VK3BBhQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddvuddgfeefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhephffvvefujghfofggtgffkfesthdtredtredtvden
+    ucfhrhhomheplfgrhicugghoshgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvg
+    htqeenucggtffrrghtthgvrhhnpeejvdfghfetvedvudefvdejgeelteevkeevgedthfdu
+    keevieejueehkeegffejudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohep
+    uddvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlh
+    hofhhtrdhnvghtpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhm
+    pdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhope
+    grnhguhiesghhrvgihhhhouhhsvgdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtohepghgrlhesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
+    epjhhirghnsgholhesnhhvihguihgrrdgtohhmpdhrtghpthhtoheplhgvohhnrhhosehn
+    vhhiughirgdrtghomhdprhgtphhtthhopehsrggvvggumhesnhhvihguihgrrdgtohhm
+X-ME-Proxy: <xmx:NtXHZpFaxwp-Q9LZKzAfJwkDlpCP8Z4SmvjSyjGBOTal-TkqfxrM6g>
+    <xmx:NtXHZhWaLyrLKwvQ5Au5DSuvViR7B4pJ4rrQd3LJgc_sBdJ1IWFLTA>
+    <xmx:NtXHZkMV9nyI8rDlrhqnfjN6R8Zb088zU6nO0blFGZaCMMCoOH-kbQ>
+    <xmx:NtXHZg3RQnI4N3XKQ29umdT0ah2Vvxuba2q5zX-ua_WXfBPnHut-jQ>
+    <xmx:N9XHZqsuKckun6BT9rOr_6bxkgN101x3mEBzrm-af4lKyTolZnLeLJq8>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 22 Aug 2024 20:17:58 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 1101A9FBF6; Thu, 22 Aug 2024 17:17:57 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 0DEF79FBF5;
+	Thu, 22 Aug 2024 17:17:57 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Jianbo Liu <jianbol@nvidia.com>
+cc: "liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+    "davem@davemloft.net" <davem@davemloft.net>,
+    Leon Romanovsky <leonro@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+    "andy@greyhouse.net" <andy@greyhouse.net>,
+    Tariq Toukan <tariqt@nvidia.com>,
+    "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+    "pabeni@redhat.com" <pabeni@redhat.com>,
+    "edumazet@google.com" <edumazet@google.com>,
+    Saeed Mahameed <saeedm@nvidia.com>,
+    "kuba@kernel.org" <kuba@kernel.org>
+Subject: Re: [PATCH net V5 3/3] bonding: change ipsec_lock from spin lock to
+ mutex
+In-reply-to: <02d8277b-e6fc-44d4-8c88-2eb42813cd22@nvidia.com>
+References: <20240821090458.10813-1-jianbol@nvidia.com>
+ <20240821090458.10813-4-jianbol@nvidia.com> <120654.1724256030@famine>
+ <2fb7d110fd9d210e12a61ebb28af6faf330d6421.camel@nvidia.com>
+ <139066.1724306729@famine> <02d8277b-e6fc-44d4-8c88-2eb42813cd22@nvidia.com>
+Comments: In-reply-to Jianbo Liu <jianbol@nvidia.com>
+   message dated "Thu, 22 Aug 2024 19:15:24 +0800."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <165729.1724372277.1@famine>
+Date: Thu, 22 Aug 2024 17:17:57 -0700
+Message-ID: <165730.1724372277@famine>
 
-From: Jason Xing <kernelxing@tencent.com>
+Jianbo Liu <jianbol@nvidia.com> wrote:
 
-We found that one close-wait socket was reset by the other side
-due to a new connection reusing the same port which is beyond our
-expectation, so we have to investigate the underlying reason.
+[...]
+>I think it's good solution.
+>So I need to add the dev_hold/dev_put as following, for example, for
+>bond_ipsec_del_sa, right?
+>
+>@@ -526,6 +534,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+>        bond = netdev_priv(bond_dev);
+>        slave = rcu_dereference(bond->curr_active_slave);
+>        real_dev = slave ? slave->dev : NULL;
+>+       dev_hold(real_dev);
+>        rcu_read_unlock();
+>
+>        if (!slave)
+>@@ -545,6 +554,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
+>
+>        real_dev->xfrmdev_ops->xdo_dev_state_delete(xs);
+> out:
+>+       dev_put(real_dev);
+>        mutex_lock(&bond->ipsec_lock);
+>        list_for_each_entry(ipsec, &bond->ipsec_list, list) {
+>                if (ipsec->xs == xs) {
+>
+>If you are ok with that, I will add the same for
+>bond_ipsec_add_sa/bond_ipsec_free_sa, and send new version.
 
-The following experiment is conducted in the test environment. We
-limit the port range from 40000 to 40010 and delay the time to close()
-after receiving a fin from the active close side, which can help us
-easily reproduce like what happened in production.
+	Yes, I think that will work, but please use netdev_hold() as
+Jakub requested.
 
-Here are three connections captured by tcpdump:
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965525191
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 2769915070
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [F.], seq 1, ack 1
-// a few seconds later, within 60 seconds
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [.], ack 2
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [R], seq 2965525193
-// later, very quickly
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [S], seq 2965590730
-127.0.0.1.9999 > 127.0.0.1.40002: Flags [S.], seq 3120990805
-127.0.0.1.40002 > 127.0.0.1.9999: Flags [.], ack 1
+	-J
 
-As we can see, the first flow is reset because:
-1) client starts a new connection, I mean, the second one
-2) client tries to find a suitable port which is a timewait socket
-   (its state is timewait, substate is fin_wait2)
-3) client occupies that timewait port to send a SYN
-4) server finds a corresponding close-wait socket in ehash table,
-   then replies with a challenge ack
-5) client sends an RST to terminate this old close-wait socket.
-
-I don't think the port selection algo can choose a FIN_WAIT2 socket
-when we turn on tcp_tw_reuse because on the server side there
-remain unread data. In some cases, if one side haven't call close() yet,
-we should not consider it as expendable and treat it at will.
-
-Even though, sometimes, the server isn't able to call close() as soon
-as possible like what we expect, it can not be terminated easily,
-especially due to a second unrelated connection happening.
-
-After this patch, we can see the expected failure if we start a
-connection when all the ports are occupied in fin_wait2 state:
-"Ncat: Cannot assign requested address."
-
-Reported-by: Jade Dong <jadedong@tencent.com>
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
 ---
-v4
-Link: https://lore.kernel.org/all/20240821153325.3204-1-kerneljasonxing@gmail.com/
-1. Move the test statement earlier. (Eric)
-
-v3
-Link: https://lore.kernel.org/all/20240815113745.6668-1-kerneljasonxing@gmail.com/
-1. take the ipv6 case into consideration. (Eric)
-
-v2
-Link: https://lore.kernel.org/all/20240814035136.60796-1-kerneljasonxing@gmail.com/
-1. change from fin_wait2 to timewait test statement, no functional
-change (Kuniyuki)
----
- net/ipv4/tcp_ipv4.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index fd17f25ff288..9cdf6e7c44d9 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -118,6 +118,9 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	int ts_recent_stamp;
- 
-+	if (tw->tw_substate == TCP_FIN_WAIT2)
-+		reuse = 0;
-+
- 	if (reuse == 2) {
- 		/* Still does not detect *everything* that goes through
- 		 * lo, since we require a loopback src or dst address
--- 
-2.37.3
-
+	-Jay Vosburgh, jv@jvosburgh.net
 
