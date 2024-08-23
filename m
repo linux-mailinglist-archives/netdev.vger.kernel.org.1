@@ -1,76 +1,64 @@
-Return-Path: <netdev+bounces-121470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7F395D4A0
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 19:46:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2864495D4A4
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 19:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 208951F22CEF
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 17:46:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1F071F22B87
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 17:46:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9E3D18E04C;
-	Fri, 23 Aug 2024 17:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6050319047C;
+	Fri, 23 Aug 2024 17:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jGCBiOZL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30148746E;
-	Fri, 23 Aug 2024 17:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EE0746E;
+	Fri, 23 Aug 2024 17:46:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724435154; cv=none; b=l9kKGrYSW4TMkFV9caj6rFIDztirMlb+pYfw0PDPWgHyf1yw/2eCtkAxKWhjNW5yT9IJmZZw5ih2Y1Ihf+BPHYKjiR8u7Y2Z7S7G1VSKIUUtiP2GTXeZpwt5kW0swZyOYZSdJwoew6BtROjS+MVwygdbQx4vZE739zrkz1+HMBQ=
+	t=1724435196; cv=none; b=pVetbcQqlPW9zIoIBTau9sVFoCKVAjO9+wN2gfLZuu29HEVvHgamQchJRs3sGfuHUmeYuA37meU/aGCnJ1up/7tOmmAKBpqo3ivq1SsfbtR7881c4pxIOfshLUc+Yk4da6U3zKnlfIFseGI6SLJGhXPceDvhM77lbdXbXrl+Flo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724435154; c=relaxed/simple;
-	bh=GhdIXIa2iFBz0ObCH3R+GDVX+8jNuSe1xiAsWtGQrWo=;
+	s=arc-20240116; t=1724435196; c=relaxed/simple;
+	bh=twydL7XL81AtKkNsurQ3vsSKjYtEfts6TqUfnqixz08=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dl4GZQJQMgm8EQss+3GRLz+LgPwKVt6fu+FEE/dWAeSIAAMYGPxKAWA9Q73jF5c2+Mne8X1VKzHDqH4QIsz03/ReC1ZerHhV/mzMT5R/qu43ZjEOffMs0nGhuIXM0MvYHEh8iZvEmvFPM1riA8FAePt+2/RhWShb3nZWNVVd//A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5bed72ff2f2so2838131a12.2;
-        Fri, 23 Aug 2024 10:45:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724435151; x=1725039951;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TDVkIQsG7ReEAwuaOoTp5Z2jTqt/qPXpRDuJxygFJmc=;
-        b=f53i34oxiki3Hx2gB2Rhk+e+iz+HA04tLV0MBN8stnErMrix7Nsl6ViQ4kZXPZZVNY
-         g+qitTeQ6yYgegT5KgAUjhCMTf3xjCwupjggaMSO++A4LISiD+SAD9wFfr4wuozlIu6n
-         /Zoi7zJot1kh+A2ZT3lqBPx6+C5ASWJNGTxocs2fqAzN9hq71SK009bExkuj7hjx4iZA
-         4UpwN/nQKnNCnqL2h5Aa7BAc1plfa6mLTzTBl3LCE4i03HFqFBbF9UuR3xQtc/xtbB9S
-         ClD/YYUbBoWJmt9CQRYZdqUE4pdumSO0wgHNPTs+l2cfPMi9Sp/DFvFMVplDUnoUrzv9
-         gemw==
-X-Forwarded-Encrypted: i=1; AJvYcCXE6bxf46OQhBDeuoDd7okssG8Vr1sn/4ynC3MQwhtYXDQUVbg+T3Q6FNvZGZwXpV/9scwyjM6G@vger.kernel.org, AJvYcCXo1FnGjxuIdH18Pd2ZZW2cNow33g2OOBk6TawMHOkGrvgq4SGuBEnw9vpFrQ5SaPyhH9zlBTksBRH5GmJiQGw+@vger.kernel.org, AJvYcCXvF6f6XRcg3hJfiAr+zM+/dgxcYKON717clD6zcUM3t1pCd/MX+T1yHwMqJdAn860U3RIF6TJj92LGVSA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzvchjuc0pPGcY444gYePCYXVcmoxYbdofW91bi/FA3kzbmKehm
-	w9zU895nWMnXh1QgMkb4deUXxQK1ILldbbX6fBwIPrdQsDQhJVQe
-X-Google-Smtp-Source: AGHT+IH7djN+JVRUeLR9+jisrbq0RFvo8Ky4eTod2kWJoNlKjO407qXZ9Vb23bx9eG2roP6CZ3iCuQ==
-X-Received: by 2002:a05:6402:5187:b0:5a3:3cfd:26f7 with SMTP id 4fb4d7f45d1cf-5c0891abad5mr2275476a12.32.1724435150670;
-        Fri, 23 Aug 2024 10:45:50 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-012.fbsv.net. [2a03:2880:30ff:c::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c0515a91afsm2341200a12.93.2024.08.23.10.45.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 10:45:50 -0700 (PDT)
-Date: Fri, 23 Aug 2024 10:45:47 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: fw@strlen.de, Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	leit@meta.com,
-	"open list:NETFILTER" <netfilter-devel@vger.kernel.org>,
-	"open list:NETFILTER" <coreteam@netfilter.org>,
-	"open list:NETWORKING [IPv4/IPv6]" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH nf-next 1/2] netfilter: Make IP_NF_IPTABLES_LEGACY
- selectable
-Message-ID: <ZsjKy1YBAzh96DBn@gmail.com>
-References: <20240822175537.3626036-1-leitao@debian.org>
- <20240823074444.7de6a99f@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CvR6mAHfBZbQyP/PV4sGdXPmKyx5YblYXZ7CwmUsAJUQvSly6skz7VDNXJwjyzGKKWFtPAS6bd1n3khDlCBFyF5BtkPC6d1lp1L+Laiglsp5hAoRfLC25dFJF4O+fgq7TJZ+aRRUqwZkyZ4r2VNUm/EoNdQSnUeYg18R8JP2iDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGCBiOZL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB245C32786;
+	Fri, 23 Aug 2024 17:46:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724435195;
+	bh=twydL7XL81AtKkNsurQ3vsSKjYtEfts6TqUfnqixz08=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jGCBiOZLSAyRCwcyKsEQ5fmPLde51GnLuomXbdwviy00GL6RwGC/NYmUcoYeNsKa/
+	 mYV/cZIT5ZchFcbK06H6X0vvcuZ8c8gog8/xkikxk6AkQxm66PO7xNfNVNlT1N6cw4
+	 4Fv6Bbqh3eB5d7xCaLGM+wy8cM7HXuTj/ZWIKDcLHdJMioR/Gy9+g8/yv/AEAWEZ7Y
+	 4+xaAVn1X4G/Yari+aG0OnLmsbN//BntM5OLgu0ZeBl6I24cpjy+ahfd7U/jWnu4Xi
+	 WW/JZrX6BN13g6aXmUjRVw5h2sCpHrIXpL948YRCi2/wuMjMp8RmPaOWiITFhYEXYb
+	 Y9Fj4WyaYGYRA==
+Date: Fri, 23 Aug 2024 18:46:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Marek Vasut <marex@denx.de>
+Cc: linux-wireless@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Adham Abozaeid <adham.abozaeid@microchip.com>,
+	Ajay Singh <ajay.kathat@microchip.com>,
+	Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 2/4] wifi: wilc1000: Fold wilc_get_chipid() into wlan.c
+Message-ID: <20240823174630.GD2164@kernel.org>
+References: <20240823161131.94305-1-marex@denx.de>
+ <20240823161131.94305-2-marex@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,26 +67,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240823074444.7de6a99f@kernel.org>
+In-Reply-To: <20240823161131.94305-2-marex@denx.de>
 
-Hello Jakub,
-
-On Fri, Aug 23, 2024 at 07:44:44AM -0700, Jakub Kicinski wrote:
-> On Thu, 22 Aug 2024 10:55:35 -0700 Breno Leitao wrote:
-> > This option makes IP_NF_IPTABLES_LEGACY user selectable, giving
-> > users the option to configure iptables without enabling any other
-> > config.
+On Fri, Aug 23, 2024 at 06:08:57PM +0200, Marek Vasut wrote:
+> Do not use wilc_get_chipid() outside of wlan.c . Instead, call
+> wilc_get_chipid() right after the SDIO/SPI interface has been
+> initialized to cache the device chipid, and then use the cached
+> chipid throughout the driver. Make wilc_get_chipid() static and
+> remove its prototype from wlan.h .
 > 
-> Some tests seem to be missing options entries from their configs after
-> this change: amt.sh, udpgro.sh, udpgro_fwd.sh
+> Signed-off-by: Marek Vasut <marex@denx.de>
 
-I realized that IP6_NF_IPTABLES_LEGACY and CONFIG_IP6_NF_IPTABLES_LEGACY
-were configured in the selftest suite before due to a dependency
-"selecting" them, and they are not anymore.
+...
 
-I will send a v2 which adds them to tools/testing/selftests/net/config
-config file.
+> diff --git a/drivers/net/wireless/microchip/wilc1000/wlan.c b/drivers/net/wireless/microchip/wilc1000/wlan.c
 
-Thanks
---breno
+...
+
+> @@ -1535,9 +1537,18 @@ int wilc_wlan_init(struct net_device *dev)
+>  	if (!wilc->hif_func->hif_is_init(wilc)) {
+>  		acquire_bus(wilc, WILC_BUS_ACQUIRE_ONLY);
+>  		ret = wilc->hif_func->hif_init(wilc, false);
+> +		if (!ret)
+> +			chipid = wilc_get_chipid(wilc);
+>  		release_bus(wilc, WILC_BUS_RELEASE_ONLY);
+>  		if (ret)
+>  			goto fail;
+> +
+> +		if (!is_wilc1000(chipid)) {
+> +			netdev_err(dev, "Unsupported chipid: %x\n", chipid);
+> +			return -EINVAL;
+
+Hi Marek,
+
+Should this unwind as is the case elsewhere in this function?
+
+			ret = -EINVAL;
+			goto fail;
+
+Flagged by Smatch.
+
+> +		}
+> +
+> +		netdev_dbg(dev, "chipid (%08x)\n", chipid);
+>  	}
+>  
+>  	if (!wilc->vmm_table)
+
+...
 
