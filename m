@@ -1,80 +1,171 @@
-Return-Path: <netdev+bounces-121446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EEFF95D32A
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:23:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12F7195D35A
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:28:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1363283615
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:23:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3846E1C23760
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA70189B8F;
-	Fri, 23 Aug 2024 16:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B58718A6C0;
+	Fri, 23 Aug 2024 16:28:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NHC52a9i"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Xd7I1hHB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2054.outbound.protection.outlook.com [40.107.244.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDF312B6C
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 16:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724430194; cv=none; b=BOt6wEgVOaLxnkubv300u3fUXMOTQ5FfI368j7FdmYe4slYXoPwdMkwtLEp73akXn2XULFLommxx86lOYKhIAUXicxwvr50gLIV1wvK5Aslp55wnW2xsGNiXG8o6L9ZjitUN7Zh4ubW5FO9xsFqFs3wkhQ0NvTFX9SFaNpp0PkQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724430194; c=relaxed/simple;
-	bh=3qlTn5svBoAvXKAQbnkbUztek9UbTGJUUeDAhqfPFpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D9KuAjgwx7tRF7XJHICXfaqVVJtLN1o57/mcX98pn8v/zc7uHP6IgLptZRNbNxlT2UQRIlRFbaDoKfBN8e72p9jKsO0U9s8qr5HcQj1LAdP6iEuku+uGibhqKFSyvYjSQt+0SUkdFvfpHulcti+ofDwySQ998CN/yjEeCDlPZeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NHC52a9i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C64AC32786;
-	Fri, 23 Aug 2024 16:23:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724430194;
-	bh=3qlTn5svBoAvXKAQbnkbUztek9UbTGJUUeDAhqfPFpE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NHC52a9iOLEyNaQJd8G4PZ/taDstUadbz5gv3+FrcDrxsg2bjtc/J115v/DPBgqiu
-	 xIESORcTCJlas1SopUGKC5vilBh7gJ+q1nVwoTHWWX0crIiXDjVAyRS3QOmNQczOSD
-	 XablHddKeADVt63/V0SCCrUy0sMJFa79r1wSYgGhSj6YfprNAh2nOqusOXrTgXjr1E
-	 cpJINkpj6yv8D7jFMtaoC3lTN1uf86FLuCfuXSlLwpBD8NFzM652beZ9nIyfoIKubK
-	 zxBErDQKIGlnEpXGzZlzb9VIldMECR2Sh/mlw6Kw2P8reijGtp3+D3FnAt5I258pzR
-	 OfRQiQrkOaTSg==
-Date: Fri, 23 Aug 2024 17:23:10 +0100
-From: Simon Horman <horms@kernel.org>
-To: Mohsin Bashir <mohsin.bashr@gmail.com>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
-	andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, kernel-team@meta.com, sanmanpradhan@meta.com
-Subject: Re: [PATCH net-next 1/2] eth: fbnic: Add ethtool support for fbnic
-Message-ID: <20240823162310.GX2164@kernel.org>
-References: <20240822184944.3882360-1-mohsin.bashr@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 972D5187335;
+	Fri, 23 Aug 2024 16:28:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724430500; cv=fail; b=eJ/5U3NrzU4W5nUdF1aiPkFbbw+UP6jSC/AAYP/Ebm3dfMHRuSDzSzYW3LC0XaEBy36Lm8OIoL0dYNIeEsbqIm8C+bDWbo/GKlV/bbkGIZkCnusaByFdwt0ohuPr/K0Duc6eZ0sHZvz2ZwXE2Otzu653kiY7Nroi9ADBKaNm35U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724430500; c=relaxed/simple;
+	bh=89zFtlGNqR1Nd87CrTMvvXBjUT1EXPgBGCNpO9/MVk0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iGIcziJki4JiNUO/y9LxxvCpbpqTUaQlw4hrsKQsUXRbYum7S1b252Nyzy/0p4AfTb82vWMEIeKPbhXvlanNTnM3zHUehZI6PPrL4ewoC2YGmfEzkLL9YPFCRgrwOSGRYx01OeztOCJno45Do4FLqx8aGJrnzTgXQDNUhStE1sc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Xd7I1hHB; arc=fail smtp.client-ip=40.107.244.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BMF/U9cDbH6ihNlMP+CaL8wuZelMPilDDsrpX6PdysTNMb7hpyPL9S7UNcxIATXMQkWA2P/f8/VjH0/brSsKT2ovTC139OWC1WCR3x+re3ivDRy/4CRkj9fbx2oviR6DlQpZxGMuT5TdMdx49RMDTdnxQCuJ8VZoTJySnJXOXv/lK+1MpK5FAt5ZSIy2U6xgVbA7Y46XHI/CIfJxGRjnobUpQGzbwBPS9w4dw0rwR84zU52x/ARyN1F3jR6+dZ0xHs20w2i/tFPF3QDRq4GGiwnx6nXJIdJ9ekR/aGDnuAaNacXjyxJst3zz6g8wH/8UE1YAm8Ozp5LgRyZq17dYkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GJ3njMP4UpWBSUMV4TUDZw1dNpCdLh8dKWyGF/WaT+Y=;
+ b=CiezpFdXuRaTpJhF0OvSQIVkyFBz2S7vgxDTzmNbCxXoUmcffk7zbMjg7wmq6PMIqM5vkpusuoUrP4JRrcK90CgN1SC2gK0B4pfdVvRHA0VEk8myazmCDEqnPZfAE8YcKQE93Up5LrJPIcS7n7QQ68He+m6AOatKNbd8Et4twBHrzZQH6wLq+7pW9U0lr+w1AMXB55k1H8E6HTyNpQN5otVEkY9/7zX7MXk0r3c21DF2n8qFghtm5kZE/hxo8ADwUGYeIN6XsOkOsNDu9TLfjwmo+t8kbqeKM731N0/QJkTz+X7ZPgX7BVtLIYGY8ysRk71pMVym+XDkgByfNDmW+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GJ3njMP4UpWBSUMV4TUDZw1dNpCdLh8dKWyGF/WaT+Y=;
+ b=Xd7I1hHBXQUGAxKSiIKlhJ/b9fPObO19CGMPh+CA4pmfDnMhdVNcGj2aQWZWQmMHCuI+3iahD3phzBYhein+SsbLF5oRMUHMCLo6fcGf3FRpvfPXaN1ulM0pfps5admX6L5GRkdPi6Teb9SvGujNZJQAqCwurlDzPwc1NiHcyiej5ModqdO0FpJdmsQYF1zFx48m438Zvm78tsACpmqSwv67fxZAje3JGsXuJJAgKsLNgU6b41vMe7RL7El56eKAyhEGUh4xQp8escwz3PkgIRqVuY9GWvzrvktrdNrdw51690xFGBbHl46Hbw25JRmB2EfjiyVrpAmUbEpvMmAnHA==
+Received: from CH5PR02CA0005.namprd02.prod.outlook.com (2603:10b6:610:1ed::7)
+ by DM6PR12MB4251.namprd12.prod.outlook.com (2603:10b6:5:21e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.19; Fri, 23 Aug
+ 2024 16:28:14 +0000
+Received: from CH2PEPF00000147.namprd02.prod.outlook.com
+ (2603:10b6:610:1ed:cafe::16) by CH5PR02CA0005.outlook.office365.com
+ (2603:10b6:610:1ed::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.19 via Frontend
+ Transport; Fri, 23 Aug 2024 16:28:14 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH2PEPF00000147.mail.protection.outlook.com (10.167.244.104) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7897.11 via Frontend Transport; Fri, 23 Aug 2024 16:28:14 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 23 Aug
+ 2024 09:28:02 -0700
+Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 23 Aug
+ 2024 09:27:58 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: Vladimir Oltean <vladimir.oltean@nxp.com>,
+	<linux-kselftest@vger.kernel.org>, Shuah Khan <shuah@kernel.org>, "Petr
+ Machata" <petrm@nvidia.com>
+Subject: [PATCH net-next] selftests: forwarding: no_forwarding: Down ports on cleanup
+Date: Fri, 23 Aug 2024 18:25:37 +0200
+Message-ID: <0baf91dc24b95ae0cadfdf5db05b74888e6a228a.1724430120.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822184944.3882360-1-mohsin.bashr@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000147:EE_|DM6PR12MB4251:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8bb93a7d-63d6-4bfe-3657-08dcc390963f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?+jOVkg5uzYL2gM+/9RhJEquhgqONKG/NyRRk+J2dWz++hr9MN8GVJNyUcHbX?=
+ =?us-ascii?Q?aLwYLTMKYdWejAbK+EN8VlKEx0QUEQxAJIhu0pVYJlP6i2PejG/OqopV6FoL?=
+ =?us-ascii?Q?nzKjY04ZufFUg02L9yzfc2RMW+PuR/xsEMC/YXlNZQK/KfF8G0pLGdHpT5b6?=
+ =?us-ascii?Q?j8KajWCv7NAwNn+Z+XUHOKLJRBXPAHtlQlKjr4idqbOgjr4NnH03yS3o5ewA?=
+ =?us-ascii?Q?KBjAXkSDCpAcNWjrq+tJ+oT76vAuvW9XjDR+rbS1j7xY3PTYDU4hTBEk0VsA?=
+ =?us-ascii?Q?VUlI89o/rDeDVyppdMIVuEFRwZSlIfgpH7JODvrYsyF3bsLZoOf23Ja1yHG3?=
+ =?us-ascii?Q?LZX6Gr/MTmGAdDH7Rt65JV+A+1qjn2QItqxzWdoOgp4POOtP9fCfOLvVgeu/?=
+ =?us-ascii?Q?6oFq14c+5bKE8DRieD6G018nyUuQAkWO5ZDlRnwJm2uJO/d0NMOWJK4Yauxv?=
+ =?us-ascii?Q?dRmpfLcoVFDxVcrP01WxvU5fya5dYv+WbnVt8rlWyIkn6EoD6FyXWJHKiR9Y?=
+ =?us-ascii?Q?EhWJpUeSgm1qfBgGC2c383DcWVnKpOGp7o6TepcpS1qisXQkg3X8+7DZZlSA?=
+ =?us-ascii?Q?IaYlfrp4/lyu0mpqn7DXbc4ZiiKFXm8XwhMUGAPoeiYCeZ/IhnTJ3pXqKGjn?=
+ =?us-ascii?Q?u/3i2Y5uPNC+yDCXcjfDZ13TRMiKlf3C+TJsQT4uR6xbI9kJo4dzmKZ/Pq+h?=
+ =?us-ascii?Q?atnCp46hDbl6aMVdlwArtYicOMKRfCr987I3vlGHCIjLYVrRhYnzUKyjR6WU?=
+ =?us-ascii?Q?qrEDygniTfYGqdeS5JD9Ra+krPwSj0XHCaw1oGNLuM8swaLgHg7LXh+wYVhg?=
+ =?us-ascii?Q?RZFQ6aJHn36Am76cSklzC1N34EVcfnCJYaIFHEZ7EiG0Ysnua2v0H+Eompq2?=
+ =?us-ascii?Q?1tpNnjOWmdiL5P3cTPxNUJ6K9kLwtt+xgZatpUwGIujOqmt7hjOWsYM8eywC?=
+ =?us-ascii?Q?BW8FuNfki2+1AYV4g47deavoHHhAyzl6Ikxm1J2ezVBQBqCix/zT7ZuruqA/?=
+ =?us-ascii?Q?w76BqC2OTPs/EeJjRbUJlPcGXGO04P4lWevIUu7reZtRg0gTxfxite4CpcOH?=
+ =?us-ascii?Q?ZsvuNgHZf1XwjOeJQipILaobilUhKiUvtnNB41UU+fK/lSpqq+skTRDDNAaP?=
+ =?us-ascii?Q?0+mWDY466MsAUQdFgPlAOYZomyIf4ZFgEt4Efuzf5+2VcQD1yDcCpEb921kZ?=
+ =?us-ascii?Q?GNTiI0xqbj4dpJ8InKj4xZWYHEkq0rDSPGHxMHTddV6jujnltBKLl9j9xnlV?=
+ =?us-ascii?Q?uhdfh2BD2D6thFvtRmuj8XX54u7zF3xy1dTVu5zsFbTJ3MW+Oj/dPqfAAjSK?=
+ =?us-ascii?Q?MLT03DMNuh3yMSSZSs9nqLJwXQdinbibcilb5ijxyUv/dWhKa02C5Q7iX2w9?=
+ =?us-ascii?Q?fnTHB4VqJNZdxziP5l1UovqCuyZkfmCWQsIveHC2dWuG2PQw//7PgfcMh3+Y?=
+ =?us-ascii?Q?pzpmTi0M8kIzK0P1VV54+P09QfIPp5AJ?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 16:28:14.1481
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8bb93a7d-63d6-4bfe-3657-08dcc390963f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF00000147.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4251
 
-On Thu, Aug 22, 2024 at 11:49:43AM -0700, Mohsin Bashir wrote:
-> Add ethtool ops support and enable 'get_drvinfo' for fbnic. The driver
-> provides firmware version information while the driver name and bus
-> information is provided by ethtool_get_drvinfo().
-> 
-> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+This test neglects to put ports down on cleanup. Fix it.
 
-Unfortunately this patchset doesn't apply cleanly to net-next.
-So I think it will need to be rebased and reposted.
+Fixes: 476a4f05d9b8 ("selftests: forwarding: add a no_forwarding.sh test")
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+---
+ tools/testing/selftests/net/forwarding/no_forwarding.sh | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Also, please consider a cover letter for patch-sets with two or more
-patches.
-
-Thanks!
-
+diff --git a/tools/testing/selftests/net/forwarding/no_forwarding.sh b/tools/testing/selftests/net/forwarding/no_forwarding.sh
+index af3b398d13f0..9e677aa64a06 100755
+--- a/tools/testing/selftests/net/forwarding/no_forwarding.sh
++++ b/tools/testing/selftests/net/forwarding/no_forwarding.sh
+@@ -233,6 +233,9 @@ cleanup()
+ {
+ 	pre_cleanup
+ 
++	ip link set dev $swp2 down
++	ip link set dev $swp1 down
++
+ 	h2_destroy
+ 	h1_destroy
+ 
 -- 
-pw-bot: cr
+2.45.0
+
 
