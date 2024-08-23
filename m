@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-121492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E8AB95D64B
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 21:58:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F2ED95D64C
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 21:58:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCCC21F2283A
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 19:58:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCB731F22837
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 19:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BC4193064;
-	Fri, 23 Aug 2024 19:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D6F192B86;
+	Fri, 23 Aug 2024 19:57:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="PcEePCe9"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="binYaUHr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0E4192B68
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 19:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E07192B6D
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 19:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724443073; cv=none; b=Nk1YgXn7T+HTXmKibKNbXVvGft/DAGK16Mu504l4oB18lZNUj1TLk7NKHUb1+g5+N1sHD+O3M4eijnq0qwd8AFD8JLIYpwUgh3vMDPgL0Fyz6AFwZ+8f5Qs7UcOBUhs6pTxWoYyHjDYWkcv/51QqMmwBcw2WzVBtW6R/kf9iShg=
+	t=1724443075; cv=none; b=VHt/BCAWordx7aXqAoCA1wr7lpt1y5C5IEM+Z/W6nkLAK3ulWfBU5ugWKoulMM0Lnnyimj1tVpEDH65x6yXmeorIJLjP5RhKjxi3UD417UVscPWT5JlPR+D8MjrcvaDaulpdJQDL4n4hWARnQb2siQwIuYN7WUM/U5JK7wbKtt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724443073; c=relaxed/simple;
-	bh=+Quhs+GcmcvCNJ67S9TdSosAPU6p9yKFBTy6cg3ykgc=;
+	s=arc-20240116; t=1724443075; c=relaxed/simple;
+	bh=9HHibu9dmHUzfYWGObAYufSKDig2J9G5O1A+PVFH6Go=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q6YNW7EXzaGW0IwKD9B0vxRfWNZX/YpAR8gjMTvP0NX6ReI4fohJ9lGzplHX4T/M4rWSLJWz4wst/reF3G6NOhk5vGUV7BOF8cXvIc+9+Biq//dACDbAa3YBect7umNnZQrT7HNo9jbvvgQ7H9Gxe41j8F6qx6ZwOlw1TxQ5xk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=PcEePCe9; arc=none smtp.client-ip=209.85.215.171
+	 MIME-Version; b=iJMLv68qZISnYHSt8DDKoSfdhjJC7tG9MqD7vyJTNXWcqDLlhT+UFpEInK1LwitIf69dtqk9hVpHp6VkgsnitZk7F2gxQHG5evkgu3VXEvPFFySitgjX1FzXjDYR3kZMr4IaVpgo1DdxNuNMD+L3ZTG+bIQmZEYlfHB1hgVBKHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=binYaUHr; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-6c5bcb8e8edso1769320a12.2
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 12:57:52 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7142014d8dfso2025301b3a.3
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 12:57:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1724443071; x=1725047871; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1724443073; x=1725047873; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ICqtqN+lT+gy/ZNlwHRQ7RE0sHXMmNuHqivUFb84cy8=;
-        b=PcEePCe9ypWR8q1knovYEastgcvCOOea/mhM4/M8zp9xLgWO8GVN1rwJ6u51jCEcZs
-         7U9SEPSsMSjPg3xnLNuN17vkP9Buwpzr1iy+NNzML41E4t/7uKkZIVPpzHKQGt8jPa6d
-         Si6F2PZ0DtOPAAGFVHP6oi4Mjl0oYg6bJOYi8=
+        bh=UOR12VouuMtqBOBdTtiTEX8qrbvpXj6gt5a2tTIdmDo=;
+        b=binYaUHrTqi9tMeM2axLKWP0gGcE2295AEBhO+iGuG1lV6ADQBLtS1AlWV5Thq6X/g
+         TGM1MzFgq0wI3wFdcT2y4eLRMTIsfEgfHSUsvZSbob/4NTTCSzmYVo5HuAWeUjpI2/wI
+         0+GFTL77HQ9RKPW4n1C6wslUjgwEDSsZntMaI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724443071; x=1725047871;
+        d=1e100.net; s=20230601; t=1724443073; x=1725047873;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ICqtqN+lT+gy/ZNlwHRQ7RE0sHXMmNuHqivUFb84cy8=;
-        b=Jl7X0ZHniAH2QVnQCge6vowE3g9eDRJ+8Y5a/JeMyWXGYWnC2TYU5oXNlQGUG2pvXO
-         JhzS3Hq2lDDw4N7FYamxJiTxY36u+IXr6YN/57wM9lukE4LEGeWXZOLy9WTbU3IVzkbH
-         iEzr1V7HCnKALHN0qxGiBhwU5QP9yyXXwp7uO2JqeJMl76HkaMZW/3UhBEVZMR60RC4h
-         Io3nI4t/H65F6QOpoTD6WCdncEE06z59lUqj+6A4XiRcK/EYu8f0IA/i4I4xXEPyu75P
-         qy8HhOwm3FlcrmGFp38FtoH5ZNV/sP3BKHF46Y2HzosiLE5OZMkKQxuW0+e/0ME2Huhe
-         bgyg==
-X-Gm-Message-State: AOJu0Ywlk8Xmw+XIuA/2C6nFsBs9yL3P0DNNMLHHtJIwCiMKS+cQu4tG
-	jnAB0+suDx2IWaar4emaWfwm58Gr4y+kK/8Hlld+SoMjEcx2BLX/ltwInhHcuQ==
-X-Google-Smtp-Source: AGHT+IEXaHNGlflwrKsX1VJzqem6DvxTx1w1uq4l99I7cppivF3E7zcEOV2wx3YO2kyzw+OIbde2tw==
-X-Received: by 2002:a05:6a20:c78f:b0:1c0:ede4:9a73 with SMTP id adf61e73a8af0-1cc8b4290ebmr4433231637.7.1724443071231;
-        Fri, 23 Aug 2024 12:57:51 -0700 (PDT)
+        bh=UOR12VouuMtqBOBdTtiTEX8qrbvpXj6gt5a2tTIdmDo=;
+        b=DRBA5dykfpcCyOLmSSY9+aUiUsCIuD6I3VWDCJn76REqfFHUGkePHq56KgYZa4Lh9f
+         q3AzzmT6/7JSGPIcbimez3XJ0tlTA+CjMWoCoidlFcpTnDMsTx6z7CpqP3r9PdJJjPER
+         /lus44uuIpvLLV+h/004eFeBasreATk8WZjaSbzenYq8ok+qFutN3QZOo+FrQJ7us+D+
+         NW5bRQP9mL871gTkWLo1EFTZU5izHwJbAoQ4DcmX2GbduND/j7ZqKfM3rzcjxD53TE7s
+         35EV8WyoYDis1vvLwcQN1PIHFfpKDbsoZaz2HmE8Kx5bMkHJdnwaILPUh3YrhpTW4p+K
+         Wocg==
+X-Gm-Message-State: AOJu0Yy1/V2Z+IKyDwUiUV2NPczWt8jOnPZrebjbtWp7R2ZN9T49kCdk
+	pKmBkg5qqPpXsgD5shNuaOj97AVgaGe2fdkAP1DnxBP+wxBylRUWgwFLqwtQRg==
+X-Google-Smtp-Source: AGHT+IE0/A1r4mf8npni4QJ7Fc/ofu7HThntrlJ3UV0gACy3ftWBCATej0sgInZ7HkNv1UxpFQszCg==
+X-Received: by 2002:a05:6a00:2789:b0:704:2b6e:f10b with SMTP id d2e1a72fcca58-71445d5b19fmr3749494b3a.15.1724443072701;
+        Fri, 23 Aug 2024 12:57:52 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71434253dbesm3417424b3a.76.2024.08.23.12.57.49
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71434253dbesm3417424b3a.76.2024.08.23.12.57.51
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 23 Aug 2024 12:57:50 -0700 (PDT)
+        Fri, 23 Aug 2024 12:57:52 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -74,12 +74,12 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	helgaas@kernel.org,
 	przemyslaw.kitszel@intel.com,
-	Hongguang Gao <hongguang.gao@broadcom.com>,
 	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: [PATCH net-next v3 4/9] bnxt_en: Deprecate support for legacy INTX mode
-Date: Fri, 23 Aug 2024 12:56:52 -0700
-Message-ID: <20240823195657.31588-5-michael.chan@broadcom.com>
+	Somnath Kotur <somnath.kotur@broadcom.com>,
+	Hongguang Gao <hongguang.gao@broadcom.com>
+Subject: [PATCH net-next v3 5/9] bnxt_en: Remove BNXT_FLAG_USING_MSIX flag
+Date: Fri, 23 Aug 2024 12:56:53 -0700
+Message-ID: <20240823195657.31588-6-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20240823195657.31588-1-michael.chan@broadcom.com>
 References: <20240823195657.31588-1-michael.chan@broadcom.com>
@@ -91,124 +91,227 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Firmware has deprecated support for legacy INTX in 2022 (since v2.27)
-and INTX hasn't been tested for many years before that.  INTX was
-only used as a fallback mechansim in case MSIX wasn't available.  MSIX
-is always supported by all firmware.  If MSIX capability in PCI config
-space is not found during probe, abort.
+Now that we only support MSIX, the BNXT_FLAG_USING_MSIX is always true.
+Remove it and any if conditions checking for it.  Remove the INTX
+handler and associated logic.
 
-Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
-v2: Fix memory leak, update changelog
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 43 +++++------------------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |  1 -
- 2 files changed, 8 insertions(+), 36 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 99 ++++---------------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  1 -
+ .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |  5 -
+ 3 files changed, 17 insertions(+), 88 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index b236a76c0188..b5a5c4911143 100644
+index b5a5c4911143..67f09e22a25c 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10770,7 +10770,7 @@ static int bnxt_get_num_msix(struct bnxt *bp)
- 	return bnxt_nq_rings_in_use(bp);
+@@ -2854,34 +2854,6 @@ static inline int bnxt_has_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr)
+ 	return TX_CMP_VALID(txcmp, raw_cons);
  }
  
--static int bnxt_init_msix(struct bnxt *bp)
-+static int bnxt_init_int_mode(struct bnxt *bp)
+-static irqreturn_t bnxt_inta(int irq, void *dev_instance)
+-{
+-	struct bnxt_napi *bnapi = dev_instance;
+-	struct bnxt *bp = bnapi->bp;
+-	struct bnxt_cp_ring_info *cpr = &bnapi->cp_ring;
+-	u32 cons = RING_CMP(cpr->cp_raw_cons);
+-	u32 int_status;
+-
+-	prefetch(&cpr->cp_desc_ring[CP_RING(cons)][CP_IDX(cons)]);
+-
+-	if (!bnxt_has_work(bp, cpr)) {
+-		int_status = readl(bp->bar0 + BNXT_CAG_REG_LEGACY_INT_STATUS);
+-		/* return if erroneous interrupt */
+-		if (!(int_status & (0x10000 << cpr->cp_ring_struct.fw_ring_id)))
+-			return IRQ_NONE;
+-	}
+-
+-	/* disable ring IRQ */
+-	BNXT_CP_DB_IRQ_DIS(cpr->cp_db.doorbell);
+-
+-	/* Return here if interrupt is shared and is disabled. */
+-	if (unlikely(atomic_read(&bp->intr_sem) != 0))
+-		return IRQ_HANDLED;
+-
+-	napi_schedule(&bnapi->napi);
+-	return IRQ_HANDLED;
+-}
+-
+ static int __bnxt_poll_work(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 			    int budget)
  {
- 	int i, total_vecs, max, rc = 0, min = 1, ulp_msix, tx_cp;
- 	struct msix_entry *msix_ent;
-@@ -10828,7 +10828,7 @@ static int bnxt_init_msix(struct bnxt *bp)
+@@ -6876,15 +6848,14 @@ static int hwrm_ring_alloc_send_msg(struct bnxt *bp,
+ 			req->cq_handle = cpu_to_le64(ring->handle);
+ 			req->enables |= cpu_to_le32(
+ 				RING_ALLOC_REQ_ENABLES_NQ_RING_ID_VALID);
+-		} else if (bp->flags & BNXT_FLAG_USING_MSIX) {
++		} else {
+ 			req->int_mode = RING_ALLOC_REQ_INT_MODE_MSIX;
+ 		}
+ 		break;
+ 	case HWRM_RING_ALLOC_NQ:
+ 		req->ring_type = RING_ALLOC_REQ_RING_TYPE_NQ;
+ 		req->length = cpu_to_le32(bp->cp_ring_mask + 1);
+-		if (bp->flags & BNXT_FLAG_USING_MSIX)
+-			req->int_mode = RING_ALLOC_REQ_INT_MODE_MSIX;
++		req->int_mode = RING_ALLOC_REQ_INT_MODE_MSIX;
+ 		break;
+ 	default:
+ 		netdev_err(bp->dev, "hwrm alloc invalid ring type %d\n",
+@@ -10653,20 +10624,6 @@ static void bnxt_setup_msix(struct bnxt *bp)
+ 	}
+ }
+ 
+-static void bnxt_setup_inta(struct bnxt *bp)
+-{
+-	const int len = sizeof(bp->irq_tbl[0].name);
+-
+-	if (bp->num_tc) {
+-		netdev_reset_tc(bp->dev);
+-		bp->num_tc = 0;
+-	}
+-
+-	snprintf(bp->irq_tbl[0].name, len, "%s-%s-%d", bp->dev->name, "TxRx",
+-		 0);
+-	bp->irq_tbl[0].handler = bnxt_inta;
+-}
+-
+ static int bnxt_init_int_mode(struct bnxt *bp);
+ 
+ static int bnxt_setup_int_mode(struct bnxt *bp)
+@@ -10679,10 +10636,7 @@ static int bnxt_setup_int_mode(struct bnxt *bp)
+ 			return rc ?: -ENODEV;
+ 	}
+ 
+-	if (bp->flags & BNXT_FLAG_USING_MSIX)
+-		bnxt_setup_msix(bp);
+-	else
+-		bnxt_setup_inta(bp);
++	bnxt_setup_msix(bp);
+ 
+ 	rc = bnxt_set_real_num_queues(bp);
+ 	return rc;
+@@ -10823,7 +10777,6 @@ static int bnxt_init_int_mode(struct bnxt *bp)
+ 		rc = -ENOMEM;
+ 		goto msix_setup_exit;
+ 	}
+-	bp->flags |= BNXT_FLAG_USING_MSIX;
+ 	kfree(msix_ent);
  	return 0;
  
- msix_setup_exit:
--	netdev_err(bp->dev, "bnxt_init_msix err: %x\n", rc);
-+	netdev_err(bp->dev, "bnxt_init_int_mode err: %x\n", rc);
- 	kfree(bp->irq_tbl);
- 	bp->irq_tbl = NULL;
- 	pci_disable_msix(bp->pdev);
-@@ -10836,35 +10836,6 @@ static int bnxt_init_msix(struct bnxt *bp)
- 	return rc;
- }
+@@ -10838,12 +10791,10 @@ static int bnxt_init_int_mode(struct bnxt *bp)
  
--static int bnxt_init_inta(struct bnxt *bp)
--{
--	bp->irq_tbl = kzalloc(sizeof(struct bnxt_irq), GFP_KERNEL);
--	if (!bp->irq_tbl)
--		return -ENOMEM;
--
--	bp->total_irqs = 1;
--	bp->rx_nr_rings = 1;
--	bp->tx_nr_rings = 1;
--	bp->cp_nr_rings = 1;
--	bp->flags |= BNXT_FLAG_SHARED_RINGS;
--	bp->irq_tbl[0].vector = bp->pdev->irq;
--	return 0;
--}
--
--static int bnxt_init_int_mode(struct bnxt *bp)
--{
--	int rc = -ENODEV;
--
--	if (bp->flags & BNXT_FLAG_MSIX_CAP)
--		rc = bnxt_init_msix(bp);
--
--	if (!(bp->flags & BNXT_FLAG_USING_MSIX) && BNXT_PF(bp)) {
--		/* fallback to INTA */
--		rc = bnxt_init_inta(bp);
--	}
--	return rc;
--}
--
  static void bnxt_clear_int_mode(struct bnxt *bp)
  {
- 	if (bp->flags & BNXT_FLAG_USING_MSIX)
-@@ -12910,7 +12881,7 @@ bool bnxt_rfs_capable(struct bnxt *bp, bool new_rss_ctx)
- 	    !BNXT_SUPPORTS_NTUPLE_VNIC(bp))
- 		return bnxt_rfs_supported(bp);
+-	if (bp->flags & BNXT_FLAG_USING_MSIX)
+-		pci_disable_msix(bp->pdev);
++	pci_disable_msix(bp->pdev);
  
--	if (!(bp->flags & BNXT_FLAG_MSIX_CAP) || !bnxt_can_reserve_rings(bp) || !bp->rx_nr_rings)
-+	if (!bnxt_can_reserve_rings(bp) || !bp->rx_nr_rings)
- 		return false;
+ 	kfree(bp->irq_tbl);
+ 	bp->irq_tbl = NULL;
+-	bp->flags &= ~BNXT_FLAG_USING_MSIX;
+ }
  
- 	hwr.grp = bp->rx_nr_rings;
-@@ -15772,6 +15743,11 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (pci_is_bridge(pdev))
- 		return -ENODEV;
- 
-+	if (!pdev->msix_cap) {
-+		dev_err(&pdev->dev, "MSIX capability not found, aborting\n");
-+		return -ENODEV;
-+	}
-+
- 	/* Clear any pending DMA transactions from crash kernel
- 	 * while loading driver in capture kernel.
- 	 */
-@@ -15798,9 +15774,6 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (BNXT_PF(bp))
- 		SET_NETDEV_DEVLINK_PORT(dev, &bp->dl_port);
- 
--	if (pdev->msix_cap)
--		bp->flags |= BNXT_FLAG_MSIX_CAP;
+ int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
+@@ -10941,9 +10892,6 @@ static int bnxt_request_irq(struct bnxt *bp)
+ #ifdef CONFIG_RFS_ACCEL
+ 	rmap = bp->dev->rx_cpu_rmap;
+ #endif
+-	if (!(bp->flags & BNXT_FLAG_USING_MSIX))
+-		flags = IRQF_SHARED;
 -
- 	rc = bnxt_init_board(pdev, dev);
- 	if (rc < 0)
- 		goto init_err_free;
+ 	for (i = 0, j = 0; i < bp->cp_nr_rings; i++) {
+ 		int map_idx = bnxt_cp_num_to_irq_num(bp, i);
+ 		struct bnxt_irq *irq = &bp->irq_tbl[map_idx];
+@@ -11008,29 +10956,22 @@ static void bnxt_del_napi(struct bnxt *bp)
+ 
+ static void bnxt_init_napi(struct bnxt *bp)
+ {
+-	int i;
++	int (*poll_fn)(struct napi_struct *, int) = bnxt_poll;
+ 	unsigned int cp_nr_rings = bp->cp_nr_rings;
+ 	struct bnxt_napi *bnapi;
++	int i;
+ 
+-	if (bp->flags & BNXT_FLAG_USING_MSIX) {
+-		int (*poll_fn)(struct napi_struct *, int) = bnxt_poll;
+-
+-		if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
+-			poll_fn = bnxt_poll_p5;
+-		else if (BNXT_CHIP_TYPE_NITRO_A0(bp))
+-			cp_nr_rings--;
+-		for (i = 0; i < cp_nr_rings; i++) {
+-			bnapi = bp->bnapi[i];
+-			netif_napi_add(bp->dev, &bnapi->napi, poll_fn);
+-		}
+-		if (BNXT_CHIP_TYPE_NITRO_A0(bp)) {
+-			bnapi = bp->bnapi[cp_nr_rings];
+-			netif_napi_add(bp->dev, &bnapi->napi,
+-				       bnxt_poll_nitroa0);
+-		}
+-	} else {
+-		bnapi = bp->bnapi[0];
+-		netif_napi_add(bp->dev, &bnapi->napi, bnxt_poll);
++	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
++		poll_fn = bnxt_poll_p5;
++	else if (BNXT_CHIP_TYPE_NITRO_A0(bp))
++		cp_nr_rings--;
++	for (i = 0; i < cp_nr_rings; i++) {
++		bnapi = bp->bnapi[i];
++		netif_napi_add(bp->dev, &bnapi->napi, poll_fn);
++	}
++	if (BNXT_CHIP_TYPE_NITRO_A0(bp)) {
++		bnapi = bp->bnapi[cp_nr_rings];
++		netif_napi_add(bp->dev, &bnapi->napi, bnxt_poll_nitroa0);
+ 	}
+ }
+ 
+@@ -12149,12 +12090,6 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
+ 	rc = bnxt_reserve_rings(bp, irq_re_init);
+ 	if (rc)
+ 		return rc;
+-	if ((bp->flags & BNXT_FLAG_RFS) &&
+-	    !(bp->flags & BNXT_FLAG_USING_MSIX)) {
+-		/* disable RFS if falling back to INTA */
+-		bp->dev->hw_features &= ~NETIF_F_NTUPLE;
+-		bp->flags &= ~BNXT_FLAG_RFS;
+-	}
+ 
+ 	rc = bnxt_alloc_mem(bp, irq_re_init);
+ 	if (rc) {
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index da6fad403f52..9192cf26c871 100644
+index 9192cf26c871..b1903a1617f1 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -2200,7 +2200,6 @@ struct bnxt {
+@@ -2199,7 +2199,6 @@ struct bnxt {
+ 	#define BNXT_FLAG_STRIP_VLAN	0x20
  	#define BNXT_FLAG_AGG_RINGS	(BNXT_FLAG_JUMBO | BNXT_FLAG_GRO | \
  					 BNXT_FLAG_LRO)
- 	#define BNXT_FLAG_USING_MSIX	0x40
--	#define BNXT_FLAG_MSIX_CAP	0x80
+-	#define BNXT_FLAG_USING_MSIX	0x40
  	#define BNXT_FLAG_RFS		0x100
  	#define BNXT_FLAG_SHARED_RINGS	0x200
  	#define BNXT_FLAG_PORT_STATS	0x400
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+index 58bd84b59f0e..7bb8a5d74430 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c
+@@ -902,11 +902,6 @@ int bnxt_sriov_configure(struct pci_dev *pdev, int num_vfs)
+ 	struct net_device *dev = pci_get_drvdata(pdev);
+ 	struct bnxt *bp = netdev_priv(dev);
+ 
+-	if (!(bp->flags & BNXT_FLAG_USING_MSIX)) {
+-		netdev_warn(dev, "Not allow SRIOV if the irq mode is not MSIX\n");
+-		return 0;
+-	}
+-
+ 	rtnl_lock();
+ 	if (!netif_running(dev)) {
+ 		netdev_warn(dev, "Reject SRIOV config request since if is down!\n");
 -- 
 2.30.1
 
