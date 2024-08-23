@@ -1,583 +1,236 @@
-Return-Path: <netdev+bounces-121449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B6595D384
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:32:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7921595D39D
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:37:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1866D1C2374E
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:32:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C257283F2E
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:37:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1442718BC14;
-	Fri, 23 Aug 2024 16:31:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D710B18951C;
+	Fri, 23 Aug 2024 16:37:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="H+2PSxoC"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="ouJYmfLI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f66.google.com (mail-ej1-f66.google.com [209.85.218.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazolkn19010019.outbound.protection.outlook.com [52.103.2.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B089B18CC0B
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 16:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.66
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724430716; cv=none; b=jmk/wwPa3blKsjKWwDnwmi01ZC/s48EVbhWpsRVSUWOQD9P++yymxfaPdO0aYpy14tEiDB2xgEkIvwlKaYOSWId6KaS0rOYeoXj3K0F1fhFFz70lMCwST3dkMWqZVhRJ4GDpTKMjWwy6zyRcq7QFBbAEIWy4h2FDEqyPc20q9HQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724430716; c=relaxed/simple;
-	bh=F6DrVBqmr8DZ7/qOT985RFRfip+ZlTTG7uWTZ30JuhY=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rqEqK8Oz2qUs8h+6kqqeCMnB9czPOMvcHuOjx9OkfYlqh5W7TC8ORJe49tecKWTW+o/ZDXnaCQmUXdzMFGt9tO+FCc/icu2tddvW0PfX1eGvcH7Kedx1El+dbj9sK+lds2dJMMPmPL8qno5AG34CbWMa3WGMA/ez40VoTnVZEpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=H+2PSxoC; arc=none smtp.client-ip=209.85.218.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f66.google.com with SMTP id a640c23a62f3a-a8677ae5a35so254935166b.0
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 09:31:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724430711; x=1725035511; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6ZaGyMHt/Y75dEv/4xjnO+Th51UKr4la400Nkts6FuE=;
-        b=H+2PSxoCplMqFimtYzJ3Lxa/ExF6KZHQEMoMjdCAFdDmv1SBdEwrGIAILJtSUUCVQ0
-         GNUoiD/JRekA9t9ntFaQZSp0rtCr52/8dRNygo5Bt5MpEVxc8xsUxm7YwWU8jA/WMziB
-         MjlVceZEOFY13BGEogOVpYgGAD3HbLpv80mN8/UpIvgIs+Lwf+ByN4fKuMxrQwxTA2D1
-         uCc+Xbv08vzOvMTP9imIvjnBc5m9eJE0ELqoO6El7JYpzNLTaXU611BqZGFY49JDOfpV
-         6/p3/CuCjvNKWGXwQtuXq3d9rCobWxOU8ADCX+Jp6T+MU+1kyCTYth1OyLj3NScrX6Vh
-         2NEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724430711; x=1725035511;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6ZaGyMHt/Y75dEv/4xjnO+Th51UKr4la400Nkts6FuE=;
-        b=mm1DCWG3/M/3Zf6i/oCyTbpaNFc4gx3IzVjNgEksoYzYv7DxU+48+iyFMPKz1rr1nq
-         fcS3sqAxz6KwVO0pAXz3QAZ1Ft8xZ58CIqXjv+4NJWX75whVEg7jbl2C4Kfw+o/kWEyB
-         ujXFDUJYZhEywK1pMKq4b562axVAoRvkea0NlMNwlw1ifG6mczjEILgsd+k+h1+FkXWY
-         HD2T5qqvS88Wd+HUbqVKGpxa9UmWYsaFcGYf8YxLvSpD/iL55HT4PtQAzpY1XTAjhTMh
-         wnk4Pobntklu+tkH02yRVtdNVm0H3IiLas2WNpPdlNCY6pz3vgsAClA1yPCqJhOci2yB
-         haig==
-X-Forwarded-Encrypted: i=1; AJvYcCWmJ2Pa1xC73yznnXvO4kkNtrkuriqIcIgkduPmxDzTGxuGKFYFWgDP4Iv1cD741ppaPLgf9fM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx92tV8snTv9KPVnM4BGyLRItF0LQDe9POEaku/WnklHoThUdIr
-	kDz313FeundW8JsMVtFaRT2pE3RYjVjgptT5FUfaHUyVREasvhUTwYRM7/893IY=
-X-Google-Smtp-Source: AGHT+IFBtzXsEdrt771hD3ebM3CWatKP6Y2IMI1S39d3WBOdGKb6/FwUn3n8mhJy59kZRavNaKp06w==
-X-Received: by 2002:a17:907:1c2a:b0:a86:8e3d:86e2 with SMTP id a640c23a62f3a-a86a518ef4fmr189485966b.11.1724430710516;
-        Fri, 23 Aug 2024 09:31:50 -0700 (PDT)
-Received: from localhost ([87.13.33.30])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f48aac4sm276582266b.185.2024.08.23.09.31.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 09:31:49 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Fri, 23 Aug 2024 18:31:56 +0200
-To: Stefan Wahren <wahrenst@gmx.net>
-Cc: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
-Message-ID: <Zsi5fNftL21vqJ3w@apocalypse>
-Mail-Followup-To: Stefan Wahren <wahrenst@gmx.net>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
- <98c570cb-c2ca-4816-9ca4-94033f7fb3fb@gmx.net>
- <ZshZ6yAmyFoiF5qu@apocalypse>
- <015a0dd9-7a13-45b7-971a-19775a6bdd04@gmx.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1497A185E7B;
+	Fri, 23 Aug 2024 16:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.2.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724431048; cv=fail; b=qH+6r0CWFuF97vB/vgkyv0eSkACVcmpGZv9rwd2Wbjcm7qcbcd4i7K6vqwCMtSrhcOBtahm11/8b5cUnT4MbmanDVV7CvP1/XZuKDZiM/892xhmQtG4E1LFIPMApuLYEAqakZFMN5BdtquJMjmHisk77PCcYPUWQ0MUl6YC7cwg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724431048; c=relaxed/simple;
+	bh=MWP0yqaxyhGLyquekPHDjDrgqmtJjbwa1LURlAUPB2U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=MGxGu4IAjdRtUydDax6oJ64syzOILm+0c9WrHGkyMJOA+iwVLDeXnBQU+o3G5Almuc4AxljcH/xpjOHGCG2aYruV3/lrvuFJseULpHjpW+gXM+XqzZZMg0Nj4lyJjSS6habN8rq2l+XeZ9mwHxAWDu1V2gBkw7/ICa9Kb+Pm8KE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=ouJYmfLI; arc=fail smtp.client-ip=52.103.2.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=o4EDbxD/j+ObV4LMz8FJekJrN9zkvOLMY40yWARpx1zs5tF+4APMsjLQgVDPyGcFPqzN6u5C7DQiGs3mEkOdHpXRdt+MLWMaFSm1Pwsf3oRRjDYQHAwDRG5FNoF/lmL02c6aMurrjyXKAVhZ5JNfNCGvGOtBBhd0dauy5PvFwOV5fO3a3psIbEJp90Ei+4+3beJAxWlsPzmdITztBTsPiu0VfmNBg3GDAFuQgn0OZAGcAmjJOCUMAuv+zWzDWUO64pjVOxYwqE7YF17UQZ8kyvCGtfSlhwb9VqRwJ/Qk2bGZQF/EKr6rYcVTpknve1rs/pL383bkiwGJbouhRpI++w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=5H5JkeEdkSvrLVnJmaY4Mb4lnHiIlv3GW5kHz2W/moY=;
+ b=Qq4H7bJrah9JyqUYsAN3ve/k/ly9q1qxVwmTs0DJu36Yiafv5BVbxc/lgQa80PhPS2IYauUQJMlDhOIFgcaf8rzRpnRHuzFLU+xA9c2p4JK+oHCVAkbFvQBAeo3SexyxPNQonS5gWzURQIw2EGzvUkk0VCrqTbRrO3IpbQEJrEHaKiNt+xQckI8ouH+y/9e7gJSUZ4Wu00BY2rpFiENGgkMFGaX/6WzG/HTJgITwxq9kFO63K4CbCd+xvDVszFRMnfVPQMvvGOrbK3P245Sk4tUDSb838xBshPHb8/UsS0M/utOPyWbXKbZHCIw/s3K+/ImJE12yvmagoABxjLnyaA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5H5JkeEdkSvrLVnJmaY4Mb4lnHiIlv3GW5kHz2W/moY=;
+ b=ouJYmfLIC0U5nEb+ajiigxkSQHNNVWpgVnJptSEcSgZSOxK5b+WDnCOOJjLNH2ozpPkIO0AETtn7JSAhtz/yToduEetYipyTMiXUUYdiZ2zA5zKgPg/o+HJvc3hJGpFVTWcyH56c0MsJSLWfilxnP8W+w6lVJmyDYSbzNz+4XgyWDaJOSP4alY84RYmgIm8qi3Y+AatqkAipxmuXNBNI6XHsRRia9WXRhBRb1mQfwq9N9qq/4Bo2JGd4auqIGfRqWNCqap8pMqQ1fULGH1vyQW7V3nVuE02n1MrcyKwT+8JPB7KPKbC39EywhW50k1tCk1agtg98NZlzvyHvPttwOw==
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
+ by CO6PR02MB7747.namprd02.prod.outlook.com (2603:10b6:303:a1::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.19; Fri, 23 Aug
+ 2024 16:37:23 +0000
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df%6]) with mapi id 15.20.7875.018; Fri, 23 Aug 2024
+ 16:37:17 +0000
+From: Michael Kelley <mhklinux@outlook.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>, "kys@microsoft.com"
+	<kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, "decui@microsoft.com"
+	<decui@microsoft.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC: "ernis@microsoft.com" <ernis@microsoft.com>
+Subject: RE: [PATCH v3] net: netvsc: Update default VMBus channels
+Thread-Topic: [PATCH v3] net: netvsc: Update default VMBus channels
+Thread-Index: AQHa9KTvo39C2dg7aUWe6oSNngL4P7I1BxSg
+Date: Fri, 23 Aug 2024 16:37:17 +0000
+Message-ID:
+ <SN6PR02MB415769AD9CC9B1C9398DCC6CD4882@SN6PR02MB4157.namprd02.prod.outlook.com>
+References: <1724339168-20913-1-git-send-email-ernis@linux.microsoft.com>
+In-Reply-To: <1724339168-20913-1-git-send-email-ernis@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-tmn: [wKntug/duKgSvzr14Xw5b+boN2MyBdU8]
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|CO6PR02MB7747:EE_
+x-ms-office365-filtering-correlation-id: e3044b23-5d5a-43c2-2a7e-08dcc391d9e8
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|19110799003|8060799006|15080799003|461199028|3412199025|440099028|102099032;
+x-microsoft-antispam-message-info:
+ +FR33NXlQdRVKOSEI1kbrEsnLabukklCm7gUSCd6RrcnUS6cGFMONH7TOgnxpeI5T7YMT+Q9O4ws+CYNFX7AQU0ZR0/Xbm7hdmT6DGOa+lwtZMG6h59BA5nzuotCyuQrD4nsqZxKZFZBGpTgQlT0i0qPe9oQydbCssE9WrPst8z+TrFIr2vOLMH7DhyMUf275Sr6dSQZMFqyNCPrILn/SedDzhzsxs08hXJ/R/RBaNv6J/U6fLamKfR7bjQBwnRoL16vMGUui/KDoEAzsmfwsj7MuKPorrdqNb9p0wgebNZyl2bAwBh9zG1TAibNTHRlOWmkrKAeTzWFBgpNU6TEvqFYsZgLbPhb3bVU3/Yin5cDJCi29nmsazH2QViYOKN1IhIOGUQqPF5yuarEwb+aaMBEvJRlTjSStcd9oIvBXTjD3H6zsK12EN/A15P2hQHAP6cUSRrdCPloWDPyBJ9EnCdHoX9h4hjqUuClFc3W9GfEpJKBikE6AHaK+ceJwl9Y0Ct+KY7CmccL1SWjYJ0GaxnWCP81Ds/9vrXOf+qU8AuGlbYq80K2fhK0CawdV1qZWAuJswuI0SnjLaL1EJnGfWKVgLvqlk4fVfi6FINDgn2av3znwO/XS7oK/yTCsXm4E07fpK5lOGEUjI3/THdJPBiqIZ/rayxXqC6y8pzCGFBBAM4E6TD/+i3vH8hbRLN2
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ZGSqwtjxrFnU1cVvGFwFq0bN0uRriCUXbBpgujaToBSCvL9wjVIeQuYTtASW?=
+ =?us-ascii?Q?9QM2ZtDU0lPRWTdq+wiWxlM/q5EKBlhhzck1M5tet/X1cpVbftiqZ6s8cItt?=
+ =?us-ascii?Q?FgFxHbIuWm7rTxPTwo/BIXOUq/Vjs07Jlopbd26nkBDroakjBXwcetX4fnwV?=
+ =?us-ascii?Q?vpaFdo8TUtF+ltZxONXetkbnmfF+vPSZcUwU9ZV7UqWtGsiIiaYK/SWiXfsX?=
+ =?us-ascii?Q?ODV8i1hTTOZV/k4/Wa91lJlZ+RflgiJHV6aXN+QdQtB+K2fU67kYlG7qOCAr?=
+ =?us-ascii?Q?PIGcLt7w7MFugotLjT4aF1o7T0VPo+Z+AEZlRQoK0Qr8S658800CqkaSZ4Qh?=
+ =?us-ascii?Q?t2HNZW6kDnKOm+GDARHKGG4BMzBhok+ZzhQ1cSfAyoWzDV4ZWO5q9auDToXx?=
+ =?us-ascii?Q?SZqOSLp6EwTbSCPwqv3lRQCMpnNKwVWrOjUq7DoSUKZhA9S1KTVsEnyGXtZ6?=
+ =?us-ascii?Q?mz3REjIr+JIZHZvkZeekFtYRx+6mQYOBHqH+YSCMa975jDSYZUspz1oZiBtj?=
+ =?us-ascii?Q?QNvzaAawKmLj6x/6i17k4+DQ5jE7U4ANstWqxHwyQ+6G1cDJbe5pT/OkJ8zU?=
+ =?us-ascii?Q?8Ld8dX2/aOV3NM6JJ7CGPgHI8w3zmXNXwUTerHCadqemc8VO1+Mv6U8uQz+8?=
+ =?us-ascii?Q?p7wY76QOqT8ZPMc1gKsrAQk3Xf7zx/NrxjvGZVy0Y1y658j2tYtBixZ6RMnp?=
+ =?us-ascii?Q?mEh1I5LUv+lOBFIApTF/WgKZ5tHRYJhchoZaTwxYp5whjO1zNGYeQE7ZKv13?=
+ =?us-ascii?Q?NgWs5bA72j+X1eiz/OELFY/dVsA2I/lFRPHsMzaI41i7f/wqZuZDhmOaFxdb?=
+ =?us-ascii?Q?9yGDwv/OgLky6v1b7D/0TuPHczXtbVQ+qozNC2zVyLqff+R2zYjA+/fAfnvY?=
+ =?us-ascii?Q?L7jO06mRXPFm8bFLHxmr/RMHxHzYNT3IVrxZryuQ1o/O6cjPeXhiTocVw4oy?=
+ =?us-ascii?Q?ohlTtE/02gBc04Mf2SgKClnoCs0XEdvO4J2o7BDVOadvkpyw6xqbOBxILRmP?=
+ =?us-ascii?Q?s8p9tNjKLrHTwTY1E4FC3us0bBKN/0dHKzWuU5aJ8QxjVEmzAznA1aNWCN5d?=
+ =?us-ascii?Q?KXwb6//fwVaNJfsTTJyJQ+R3kmNhG5te/+mCXCaaRMIQC/UNJwUTGSt/B+3x?=
+ =?us-ascii?Q?97lfFMoYQJ4fyjTYTk+7SI7hrrzF4v8BGEnybQURdi5LZ0jS3xHYZub34pF8?=
+ =?us-ascii?Q?3kfpO20ZjNiDWwIlkgI91dICbPwuVgPFUDQ00nkbBhfeJiDcVOreG0vqwmE?=
+ =?us-ascii?Q?=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <015a0dd9-7a13-45b7-971a-19775a6bdd04@gmx.net>
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: e3044b23-5d5a-43c2-2a7e-08dcc391d9e8
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Aug 2024 16:37:17.2700
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR02MB7747
 
-Hi Stefan,
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com> Sent: Thursday, Au=
+gust 22, 2024 8:06 AM
+>=20
+> Change VMBus channels macro (VRSS_CHANNEL_DEFAULT) in
+> Linux netvsc from 8 to 16 to align with Azure Windows VM
+> and improve networking throughput.
+>=20
+> For VMs having less than 16 vCPUS, the channels depend
+> on number of vCPUs. Between 16 to 64 vCPUs, the channels
+> default to VRSS_CHANNEL_DEFAULT. For greater than 64 vCPUs,
+> set the channels to number of physical cores / 2 returned by
+> netif_get_num_default_rss_queues() as a way to optimize CPU
+> resource utilization and scale for high-end processors with
+> many cores. Due to hyper-threading, the number of
+> physical cores =3D vCPUs/2.
 
-On 12:23 Fri 23 Aug     , Stefan Wahren wrote:
-> Hi Andrea,
-> 
-> Am 23.08.24 um 11:44 schrieb Andrea della Porta:
-> > Hi Stefan,
-> > 
-> > On 18:20 Wed 21 Aug     , Stefan Wahren wrote:
-> > > Hi Andrea,
-> > > 
-> > > Am 20.08.24 um 16:36 schrieb Andrea della Porta:
-> > > > The RaspberryPi RP1 is ia PCI multi function device containing
-> > > > peripherals ranging from Ethernet to USB controller, I2C, SPI
-> > > > and others.
-> > > sorry, i cannot provide you a code review, but just some comments. multi
-> > > function device suggests "mfd" subsystem or at least "soc" . I won't
-> > > recommend misc driver here.
-> > It's true that RP1 can be called an MFD but the reason for not placing
-> > it in mfd subsystem are twofold:
-> > 
-> > - these discussions are quite clear about this matter: please see [1]
-> >    and [2]
-> > - the current driver use no mfd API at all
-> > 
-> > This RP1 driver is not currently addressing any aspect of ARM core in the
-> > SoC so I would say it should not stay in drivers/soc / either, as also
-> > condifirmed by [2] again and [3] (note that Microchip LAN966x is a very
-> > close fit to what we have here on RP1).
-> thanks i was aware of these discussions. A pointer to them or at least a
-> short statement in the cover letter would be great.
+But note that a given physical processor may or may not support
+hyper-threading. For example, the physical processor used for
+ARM64 VMs in Azure does not have hyper-threading. And even
+if the physical processor supports hyper-threading, the VM might
+not see hyper-threading as enabled. Many Azure GPU-based VM
+sizes see only full cores, with no hyper-threading. It's also possible
+to boot Linux with hyper-threading disabled even if the VM sees
+hyper-threaded cores (the "nosmt" or "smt=3D1" kernel boot option).
 
-Sure, consider it done.
+Your code below probably isn't affected when hyper-threading
+isn't present. But in the interest of accuracy, the discussion here
+in the commit message should qualify the use of "vCPU/4" as
+the number of channels. It might be "vCPU/2" when
+hyper-threading isn't present or is disabled, and for vCPU
+counts between 16 and 64, you'll get more than 16 channels.
 
-> > 
-> > > > Implement a bare minimum driver to operate the RP1, leveraging
-> > > > actual OF based driver implementations for the on-borad peripherals
-> > > > by loading a devicetree overlay during driver probe.
-> > > Can you please explain why this should be a DT overlay? The RP1 is
-> > > assembled on the Raspberry Pi 5 PCB. DT overlays are typically for loose
-> > > connections like displays or HATs. I think a DTSI just for the RP1 would
-> > > fit better and is easier to read.
-> > The dtsi solution you proposed is the one adopted downstream. It has its
-> > benefits of course, but there's more.
-> > With the overlay approach we can achieve more generic and agnostic approach
-> > to managing this chipset, being that it is a PCI endpoint and could be
-> > possibly be reused in other hw implementations. I believe a similar
-> > reasoning could be applied to Bootlin's Microchip LAN966x patchset as
-> > well, and they also choose to approach the dtb overlay.
-> Could please add this point in the commit message. Doesn't introduce
+> Maximum number of channels are by default set to 64.
+>=20
+> Based on this change the channel creation would change as follows:
+>=20
+> -------------------------------------------------------------
+> | No. of vCPU	|  dev_info->num_chn	| channels created  |
+> -------------------------------------------------------------
+> |  0-16		|       16		|       vCPU        |
 
-Ack.
+Nit: Presumably we won't ever have 0 vCPUs.  :-)
 
-> (maintainence) issues in case U-Boot needs a RP1 driver, too?
+> | >16 & <=3D64	|       16		|       16          |
+> | >64 & <=3D256	|       vCPU/4		|       vCPU/4      |
+> | >256		|       vCPU/4		|       64          |
+> -------------------------------------------------------------
+>=20
+> Performance tests showed significant improvement in throughput:
+> - 0.54% for 16 vCPUs
+> - 0.83% for 32 vCPUs
+> - 0.86% for 48 vCPUs
+> - 9.72% for 64 vCPUs
+> - 13.57% for 96 vCPUs
+>=20
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> ---
+> Changes in v3:
+> * Use netif_get_num_default_rss_queues() to set channels
+> * Change terminology for channels in commit message
+> ---
+> Changes in v2:
+> * Set dev_info->num_chn based on vCPU count.
+> ---
+>  drivers/net/hyperv/hyperv_net.h | 2 +-
+>  drivers/net/hyperv/netvsc_drv.c | 3 ++-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/net/hyperv/hyperv_net.h b/drivers/net/hyperv/hyperv_=
+net.h
+> index 810977952f95..e690b95b1bbb 100644
+> --- a/drivers/net/hyperv/hyperv_net.h
+> +++ b/drivers/net/hyperv/hyperv_net.h
+> @@ -882,7 +882,7 @@ struct nvsp_message {
+>=20
+>  #define VRSS_SEND_TAB_SIZE 16  /* must be power of 2 */
+>  #define VRSS_CHANNEL_MAX 64
+> -#define VRSS_CHANNEL_DEFAULT 8
+> +#define VRSS_CHANNEL_DEFAULT 16
+>=20
+>  #define RNDIS_MAX_PKT_DEFAULT 8
+>  #define RNDIS_PKT_ALIGN_DEFAULT 8
+> diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_=
+drv.c
+> index 44142245343d..a6482afe4217 100644
+> --- a/drivers/net/hyperv/netvsc_drv.c
+> +++ b/drivers/net/hyperv/netvsc_drv.c
+> @@ -987,7 +987,8 @@ struct netvsc_device_info *netvsc_devinfo_get(struct =
+netvsc_device *nvdev)
+>  			dev_info->bprog =3D prog;
+>  		}
+>  	} else {
+> -		dev_info->num_chn =3D VRSS_CHANNEL_DEFAULT;
+> +		dev_info->num_chn =3D max(VRSS_CHANNEL_DEFAULT,
+> +					netif_get_num_default_rss_queues());
+>  		dev_info->send_sections =3D NETVSC_DEFAULT_TX;
+>  		dev_info->send_section_size =3D NETVSC_SEND_SECTION_SIZE;
+>  		dev_info->recv_sections =3D NETVSC_DEFAULT_RX;
+> --
+> 2.34.1
+>=20
 
-Good point. Right now u-boot does not support RP1 nor PCIe (which is a
-prerequisite for RP1 to work) on Rpi5 and I'm quite sure that it will be
-so in the near future. Of course I cannot guarantee this will be the case
-far away in time.
-
-Since u-boot is lacking support for RP1 we cannot really produce some test
-results to check the compatibility versus kernel dtb overlay but we can
-speculate a little bit about it. AFAIK u-boot would probably place the rp1
-node directly under its pcie@12000 node in DT while the dtb overlay will use
-dynamically created PCI endpoint node (dev@0) as parent for rp1 node.
-
-I would say it should work out of the box, the only minor drawback here should
-be the redundant rp1 node left from u-boot. And maybe some added checks to
-make sure the driver will be loaded only once from the dtb overlay and not
-from the u-boot node, but this change is locally to the RP1 linux driver code
-so it should not impact u-boot in any way.  I'm inclined to consider the last
-one a minor issue. 
-Please do keep in mind that, of course, this is just brainstorming and I cannot
-give 100% guarantee about that.
-
-> > Plus, a solution that can (althoguh proabbly in teh long run) cope
-> > with both DT or ACPI based system has been kindly requested, plase see [4]
-> > for details.
-> > IMHO the approach proposed from RH et al. of using dtbo for this 'special'
-> > kind of drivers makes a lot of sense (see [5]).
-> > 
-> > > > The peripherals are accessed by mapping MMIO registers starting
-> > > > from PCI BAR1 region.
-> > > > As a minimum driver, the peripherals will not be added to the
-> > > > dtbo here, but in following patches.
-> > > > 
-> > > > Link: https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf
-> > > > Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
-> > > > ---
-> > > >    MAINTAINERS                           |   2 +
-> > > >    arch/arm64/boot/dts/broadcom/rp1.dtso | 152 ++++++++++++
-> > > >    drivers/misc/Kconfig                  |   1 +
-> > > >    drivers/misc/Makefile                 |   1 +
-> > > >    drivers/misc/rp1/Kconfig              |  20 ++
-> > > >    drivers/misc/rp1/Makefile             |   3 +
-> > > >    drivers/misc/rp1/rp1-pci.c            | 333 ++++++++++++++++++++++++++
-> > > >    drivers/misc/rp1/rp1-pci.dtso         |   8 +
-> > > >    drivers/pci/quirks.c                  |   1 +
-> > > >    include/linux/pci_ids.h               |   3 +
-> > > >    10 files changed, 524 insertions(+)
-> > > >    create mode 100644 arch/arm64/boot/dts/broadcom/rp1.dtso
-> > > >    create mode 100644 drivers/misc/rp1/Kconfig
-> > > >    create mode 100644 drivers/misc/rp1/Makefile
-> > > >    create mode 100644 drivers/misc/rp1/rp1-pci.c
-> > > >    create mode 100644 drivers/misc/rp1/rp1-pci.dtso
-> > > > 
-> > > ...
-> > > > +
-> > > > +				rp1_clocks: clocks@c040018000 {
-> > > > +					compatible = "raspberrypi,rp1-clocks";
-> > > > +					#clock-cells = <1>;
-> > > > +					reg = <0xc0 0x40018000 0x0 0x10038>;
-> > > > +					clocks = <&clk_xosc>;
-> > > > +					clock-names = "xosc";
-> > > > +
-> > > > +					assigned-clocks = <&rp1_clocks RP1_PLL_SYS_CORE>,
-> > > > +							  <&rp1_clocks RP1_PLL_AUDIO_CORE>,
-> > > > +							  // RP1_PLL_VIDEO_CORE and dividers are now managed by VEC,DPI drivers
-> > > > +							  <&rp1_clocks RP1_PLL_SYS>,
-> > > > +							  <&rp1_clocks RP1_PLL_SYS_SEC>,
-> > > > +							  <&rp1_clocks RP1_PLL_SYS_PRI_PH>,
-> > > > +							  <&rp1_clocks RP1_CLK_ETH_TSU>;
-> > > > +
-> > > > +					assigned-clock-rates = <1000000000>, // RP1_PLL_SYS_CORE
-> > > > +							       <1536000000>, // RP1_PLL_AUDIO_CORE
-> > > > +							       <200000000>,  // RP1_PLL_SYS
-> > > > +							       <125000000>,  // RP1_PLL_SYS_SEC
-> > > > +							       <100000000>,  // RP1_PLL_SYS_PRI_PH
-> > > > +							       <50000000>;   // RP1_CLK_ETH_TSU
-> > > > +				};
-> > > > +
-> > > > +				rp1_gpio: pinctrl@c0400d0000 {
-> > > > +					reg = <0xc0 0x400d0000  0x0 0xc000>,
-> > > > +					      <0xc0 0x400e0000  0x0 0xc000>,
-> > > > +					      <0xc0 0x400f0000  0x0 0xc000>;
-> > > > +					compatible = "raspberrypi,rp1-gpio";
-> > > > +					gpio-controller;
-> > > > +					#gpio-cells = <2>;
-> > > > +					interrupt-controller;
-> > > > +					#interrupt-cells = <2>;
-> > > > +					interrupts = <RP1_INT_IO_BANK0 IRQ_TYPE_LEVEL_HIGH>,
-> > > > +						     <RP1_INT_IO_BANK1 IRQ_TYPE_LEVEL_HIGH>,
-> > > > +						     <RP1_INT_IO_BANK2 IRQ_TYPE_LEVEL_HIGH>;
-> > > > +					gpio-line-names =
-> > > > +						"ID_SDA", // GPIO0
-> > > > +						"ID_SCL", // GPIO1
-> > > > +						"GPIO2", // GPIO2
-> > > > +						"GPIO3", // GPIO3
-> > > > +						"GPIO4", // GPIO4
-> > > > +						"GPIO5", // GPIO5
-> > > > +						"GPIO6", // GPIO6
-> > > > +						"GPIO7", // GPIO7
-> > > > +						"GPIO8", // GPIO8
-> > > > +						"GPIO9", // GPIO9
-> > > > +						"GPIO10", // GPIO10
-> > > > +						"GPIO11", // GPIO11
-> > > > +						"GPIO12", // GPIO12
-> > > > +						"GPIO13", // GPIO13
-> > > > +						"GPIO14", // GPIO14
-> > > > +						"GPIO15", // GPIO15
-> > > > +						"GPIO16", // GPIO16
-> > > > +						"GPIO17", // GPIO17
-> > > > +						"GPIO18", // GPIO18
-> > > > +						"GPIO19", // GPIO19
-> > > > +						"GPIO20", // GPIO20
-> > > > +						"GPIO21", // GPIO21
-> > > > +						"GPIO22", // GPIO22
-> > > > +						"GPIO23", // GPIO23
-> > > > +						"GPIO24", // GPIO24
-> > > > +						"GPIO25", // GPIO25
-> > > > +						"GPIO26", // GPIO26
-> > > > +						"GPIO27", // GPIO27
-> > > > +						"PCIE_RP1_WAKE", // GPIO28
-> > > > +						"FAN_TACH", // GPIO29
-> > > > +						"HOST_SDA", // GPIO30
-> > > > +						"HOST_SCL", // GPIO31
-> > > > +						"ETH_RST_N", // GPIO32
-> > > > +						"", // GPIO33
-> > > > +						"CD0_IO0_MICCLK", // GPIO34
-> > > > +						"CD0_IO0_MICDAT0", // GPIO35
-> > > > +						"RP1_PCIE_CLKREQ_N", // GPIO36
-> > > > +						"", // GPIO37
-> > > > +						"CD0_SDA", // GPIO38
-> > > > +						"CD0_SCL", // GPIO39
-> > > > +						"CD1_SDA", // GPIO40
-> > > > +						"CD1_SCL", // GPIO41
-> > > > +						"USB_VBUS_EN", // GPIO42
-> > > > +						"USB_OC_N", // GPIO43
-> > > > +						"RP1_STAT_LED", // GPIO44
-> > > > +						"FAN_PWM", // GPIO45
-> > > > +						"CD1_IO0_MICCLK", // GPIO46
-> > > > +						"2712_WAKE", // GPIO47
-> > > > +						"CD1_IO1_MICDAT1", // GPIO48
-> > > > +						"EN_MAX_USB_CUR", // GPIO49
-> > > > +						"", // GPIO50
-> > > > +						"", // GPIO51
-> > > > +						"", // GPIO52
-> > > > +						""; // GPIO53
-> > > GPIO line names are board specific, so this should go to the Raspberry
-> > > Pi 5 file.
-> > Could we instead just name them with generic GPIO'N' where N is the number
-> > of the gpio? Much like many of that pins already are... in this way we
-> > don't add a dependency in the board dts to the rp1_gpio node, which is not
-> > even there when the main dts is parsed at boot, since the dtbo will be
-> > added only on PCI enumeration of the RP1 device.
-> I think we should avoid user space incompatibilities with the vendor tree.
-> > Or even better: since we don't explicitly use the gpio names to address
-> > them (e.g. phy-reset-gpios in rp1_eth node is addressing the ETH_RST_N
-> > gpio by number), can we just get rid of the gpio-line-names property?
-> > Also Bootlin's Microchip gpio node seems to avoid naming them...
-> As i said above the gpio lines are for user space, honestly nobody likes
-> to go to cryptic interfaces of gpiochips and gpio numbers.
->
-
-You're right.
- 
-> Maybe ETH_RST_N isn't good example because this not interesting from
-> user space. For example RP1_STAT_LED is a better one. Nobody can predict
-> the future use cases of the RP1 and its pins. So i think we should have
-> the flexibilty to specify the GPIOs on the board level for user
-> friendliness.
->
-
-Agreed.
- 
-> Isn't it possible to specify almost empty rp1 node with the gpio line
-> names for the RPi 5 and apply the rp1 overlay on top?
-
-Uhm, we can think of something like that, i.e. a secondary dtbo (populated
-with the gpio-line-names property only) to be added after the PCI enumeration
-has added the primary dtbo (i.e. the proposed rp1.dtso with gpio-line-names
-dropped) into devicetree. This implies loading this second dtbo from either:
-
-- the RP1 driver itself, since it's the one that is dynamically adding
-the RP1 node. I would say this is not the cleanest way unless we provide
-an elegant way to fed the customized dtbo to teh driver itself, but has
-the advantage that it would surely work and has no side effects that
-come to mind.
-
-- late at boot, directly from userspace. I see 2 problems here:
-1) the gpio driver is already probed by the first dtbo so we should have
-   a way to just add teh gpio names to the alredy existing one. Not sure
-   how to accomplish that right now.
-2) not sure whether how to prepare the dtbo, it should probably have an
-   empty target-path since the dt parent tree is created dynamically and
-   can be different for each system.
-
-This could be also helpful to customize things like the phy, that is
-external to teh ethernet MAC.
-I need to do some investigation, but would be helpful if you or others
-have some preference/objection on the two approaches above.
-
-> > 
-> > > > +				};
-> > > > +			};
-> > > > +		};
-> > > > +	};
-> > > > +};
-> > > > diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
-> > > > index 41c3d2821a78..02405209e6c4 100644
-> > > > --- a/drivers/misc/Kconfig
-> > > > +++ b/drivers/misc/Kconfig
-> > > > @@ -618,4 +618,5 @@ source "drivers/misc/uacce/Kconfig"
-> > > >    source "drivers/misc/pvpanic/Kconfig"
-> > > >    source "drivers/misc/mchp_pci1xxxx/Kconfig"
-> > > >    source "drivers/misc/keba/Kconfig"
-> > > > +source "drivers/misc/rp1/Kconfig"
-> > > >    endmenu
-> > > > diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
-> > > > index c2f990862d2b..84bfa866fbee 100644
-> > > > --- a/drivers/misc/Makefile
-> > > > +++ b/drivers/misc/Makefile
-> > > > @@ -71,3 +71,4 @@ obj-$(CONFIG_TPS6594_PFSM)	+= tps6594-pfsm.o
-> > > >    obj-$(CONFIG_NSM)		+= nsm.o
-> > > >    obj-$(CONFIG_MARVELL_CN10K_DPI)	+= mrvl_cn10k_dpi.o
-> > > >    obj-y				+= keba/
-> > > > +obj-$(CONFIG_MISC_RP1)		+= rp1/
-> > > > diff --git a/drivers/misc/rp1/Kconfig b/drivers/misc/rp1/Kconfig
-> > > > new file mode 100644
-> > > > index 000000000000..050417ee09ae
-> > > > --- /dev/null
-> > > > +++ b/drivers/misc/rp1/Kconfig
-> > > > @@ -0,0 +1,20 @@
-> > > > +# SPDX-License-Identifier: GPL-2.0-only
-> > > > +#
-> > > > +# RaspberryPi RP1 misc device
-> > > > +#
-> > > > +
-> > > > +config MISC_RP1
-> > > > +        tristate "RaspberryPi RP1 PCIe support"
-> > > > +        depends on PCI && PCI_QUIRKS
-> > > > +        select OF
-> > > > +        select OF_OVERLAY
-> > > > +        select IRQ_DOMAIN
-> > > > +        select PCI_DYNAMIC_OF_NODES
-> > > > +        help
-> > > > +          Support for the RP1 peripheral chip found on Raspberry Pi 5 board.
-> > > > +          This device supports several sub-devices including e.g. Ethernet controller,
-> > > > +          USB controller, I2C, SPI and UART.
-> > > > +          The driver is responsible for enabling the DT node once the PCIe endpoint
-> > > > +          has been configured, and handling interrupts.
-> > > > +          This driver uses an overlay to load other drivers to support for RP1
-> > > > +          internal sub-devices.
-> > > > diff --git a/drivers/misc/rp1/Makefile b/drivers/misc/rp1/Makefile
-> > > > new file mode 100644
-> > > > index 000000000000..e83854b4ed2c
-> > > > --- /dev/null
-> > > > +++ b/drivers/misc/rp1/Makefile
-> > > > @@ -0,0 +1,3 @@
-> > > > +# SPDX-License-Identifier: GPL-2.0-only
-> > > > +rp1-pci-objs			:= rp1-pci.o rp1-pci.dtbo.o
-> > > > +obj-$(CONFIG_MISC_RP1)		+= rp1-pci.o
-> > > > diff --git a/drivers/misc/rp1/rp1-pci.c b/drivers/misc/rp1/rp1-pci.c
-> > > > new file mode 100644
-> > > > index 000000000000..a6093ba7e19a
-> > > > --- /dev/null
-> > > > +++ b/drivers/misc/rp1/rp1-pci.c
-> > > > @@ -0,0 +1,333 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0
-> > > > +/*
-> > > > + * Copyright (c) 2018-22 Raspberry Pi Ltd.
-> > > > + * All rights reserved.
-> > > > + */
-> > > > +
-> > > > +#include <linux/clk.h>
-> > > > +#include <linux/clkdev.h>
-> > > > +#include <linux/clk-provider.h>
-> > > > +#include <linux/err.h>
-> > > > +#include <linux/interrupt.h>
-> > > > +#include <linux/irq.h>
-> > > > +#include <linux/irqchip/chained_irq.h>
-> > > > +#include <linux/irqdomain.h>
-> > > > +#include <linux/module.h>
-> > > > +#include <linux/msi.h>
-> > > > +#include <linux/of_platform.h>
-> > > > +#include <linux/pci.h>
-> > > > +#include <linux/platform_device.h>
-> > > > +#include <linux/reset.h>
-> > > > +
-> > > > +#include <dt-bindings/misc/rp1.h>
-> > > > +
-> > > > +#define RP1_B0_CHIP_ID		0x10001927
-> > > > +#define RP1_C0_CHIP_ID		0x20001927
-> > > > +
-> > > > +#define RP1_PLATFORM_ASIC	BIT(1)
-> > > > +#define RP1_PLATFORM_FPGA	BIT(0)
-> > > > +
-> > > > +#define RP1_DRIVER_NAME		"rp1"
-> > > > +
-> > > > +#define RP1_ACTUAL_IRQS		RP1_INT_END
-> > > > +#define RP1_IRQS		RP1_ACTUAL_IRQS
-> > > > +#define RP1_HW_IRQ_MASK		GENMASK(5, 0)
-> > > > +
-> > > > +#define RP1_SYSCLK_RATE		200000000
-> > > > +#define RP1_SYSCLK_FPGA_RATE	60000000
-> > > > +
-> > > > +enum {
-> > > > +	SYSINFO_CHIP_ID_OFFSET	= 0,
-> > > > +	SYSINFO_PLATFORM_OFFSET	= 4,
-> > > > +};
-> > > > +
-> > > > +#define REG_SET			0x800
-> > > > +#define REG_CLR			0xc00
-> > > > +
-> > > > +/* MSIX CFG registers start at 0x8 */
-> > > > +#define MSIX_CFG(x) (0x8 + (4 * (x)))
-> > > > +
-> > > > +#define MSIX_CFG_IACK_EN        BIT(3)
-> > > > +#define MSIX_CFG_IACK           BIT(2)
-> > > > +#define MSIX_CFG_TEST           BIT(1)
-> > > > +#define MSIX_CFG_ENABLE         BIT(0)
-> > > > +
-> > > > +#define INTSTATL		0x108
-> > > > +#define INTSTATH		0x10c
-> > > > +
-> > > > +extern char __dtbo_rp1_pci_begin[];
-> > > > +extern char __dtbo_rp1_pci_end[];
-> > > > +
-> > > > +struct rp1_dev {
-> > > > +	struct pci_dev *pdev;
-> > > > +	struct device *dev;
-> > > > +	struct clk *sys_clk;
-> > > > +	struct irq_domain *domain;
-> > > > +	struct irq_data *pcie_irqds[64];
-> > > > +	void __iomem *bar1;
-> > > > +	int ovcs_id;
-> > > > +	bool level_triggered_irq[RP1_ACTUAL_IRQS];
-> > > > +};
-> > > > +
-> > > > +
-> > > ...
-> > > > +
-> > > > +static const struct pci_device_id dev_id_table[] = {
-> > > > +	{ PCI_DEVICE(PCI_VENDOR_ID_RPI, PCI_DEVICE_ID_RP1_C0), },
-> > > > +	{ 0, }
-> > > > +};
-> > > > +
-> > > > +static struct pci_driver rp1_driver = {
-> > > > +	.name		= RP1_DRIVER_NAME,
-> > > > +	.id_table	= dev_id_table,
-> > > > +	.probe		= rp1_probe,
-> > > > +	.remove		= rp1_remove,
-> > > > +};
-> > > > +
-> > > > +module_pci_driver(rp1_driver);
-> > > > +
-> > > > +MODULE_AUTHOR("Phil Elwell <phil@raspberrypi.com>");
-> > > Module author & Copyright doesn't seem to match with this patch author.
-> > > Please clarify/fix
-> > My intention here is that, even if the code has been heavily modified by me,
-> > the core original code is still there so I just wanted to tribute it to the
-> > original author.
-> > I'll synchronize this with RaspberryPi guys and coem up with a unified solution.
-> That would be nice to mention in the commit message and add your copyright.
-
-Ack.
-
-> > Just in case: would multiple MODULE_AUTHOR entries (one with my name and one
-> > with original authors name) be accepetd?
-> Sure
-
-Many thanks,
-
-Andrea
-
-> 
-> Best regards
-> > 
-> > Many thanks,
-> > Andrea
-> > 
-> > References:
-> > 
-> > - [1]: https://lore.kernel.org/all/20240612140208.GC1504919@google.com/
-> > - [2]: https://lore.kernel.org/all/83f7fa09-d0e6-4f36-a27d-cee08979be2a@app.fastmail.com/
-> > - [3]: https://lore.kernel.org/all/2024081356-mutable-everyday-6f9d@gregkh/
-> > - [4]: https://lore.kernel.org/all/ba8cdf39-3ba3-4abc-98f5-d394d6867f95@gmx.net/
-> > - [5]: https://lpc.events/event/17/contributions/1421/attachments/1337/2680/LPC2023%20Non-discoverable%20devices%20in%20PCI.pdf
-> 
 
