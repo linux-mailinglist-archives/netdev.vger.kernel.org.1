@@ -1,291 +1,251 @@
-Return-Path: <netdev+bounces-121358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 119B195CE0E
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 15:36:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D1A95CE10
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 15:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 823AD1F21294
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 13:36:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6372FB20DF6
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 13:37:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0188D1586D3;
-	Fri, 23 Aug 2024 13:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 487B118660D;
+	Fri, 23 Aug 2024 13:37:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="LHi85ZRZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKwtBtxz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF42186E48
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 13:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25321586D3;
+	Fri, 23 Aug 2024 13:37:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724420175; cv=none; b=nEQnyGI4fOyGZ0de6+6k764ixmIg4Wq0wghAbvStCZzuk7QOyCc80SHaUZjJM0dMIVthMXyxiL2Y631vSerpUo0GilAA9N3xRqWPk7DvyX+zXFrrW4Bu/O8hAS7UVuipn4PWJusBM0PfHxVlr1Tr80P52Fp8OOjck0dq4UrbViU=
+	t=1724420233; cv=none; b=luAIjtR7F5fxbejhohjpdd/PBXXdHvAlrzv0OVZ+oJsmxJK3Ru5+StjG3oHk5BPQ4jW0ZDPD3IfolkldMC/OwpucgBjSA+Fpry0D5b+IS0BCRAGKEBxTtL7PwdELWuJ6kfhAVQRo6TVCy/uNK4L3M9hvO5XaRao4hWuNkPD7Vhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724420175; c=relaxed/simple;
-	bh=h0fW1E/Hqi0rjeZuHpN3QMRPfvncFkvOv9xD5myWszc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MEWald3m697EWSPqIIxy2l12g4osQz/0Xlugzcfp2G9MpsMos5cx22C3Mn1I+DTWVzEMqL43IDv4WXlf77KNyVwu9rrMTpmHxV7cBspc4fh70saMO+rKvr4Xt/b4i5jU1S3xe2bOMv2+xwJPxNEb1eh3qgWAc/CNeaiZ6uW1ypQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=LHi85ZRZ; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2f4f24263acso21998421fa.0
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 06:36:13 -0700 (PDT)
+	s=arc-20240116; t=1724420233; c=relaxed/simple;
+	bh=rzXXMRsErWVxfzN+j5PzQAtXSoeDahhRFhgcyTrD8HY=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=ojdDfCqb1vABimbMnqIkE6aQicYJ5BjKPg5m52V9pgJt0faloKfNTub+8ERa7briR9+AGXKUmlE5HuQQgro98ti/prhIqq/AFr8vsCRY72jQRSnwJH7ni5RT9t47AZay7l7sMyuTdT9Nv3wXKx6OKq/rsIxKkq7CabdMyEmfk4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mKwtBtxz; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7141285db14so1807498b3a.1;
+        Fri, 23 Aug 2024 06:37:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724420172; x=1725024972; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=i/hrlcBOw7taIRVHdg+uznRFul59Cbdga+xEVQ7cyr4=;
-        b=LHi85ZRZzX5fiacwJq0B4mkftCdmdHDiUp2y+zbSv7GqKemd+IGkkpR9IIA3LWHfQa
-         JttSpDykWQQCaov8tEDJLDKClnRyCMX+2UYNxjNs4ZI2e71dX9fJk1BLoaqKbcoFcZ7Y
-         lUeVmFKaDSvz87dDMEWa+dNpeH/n0HT6JbDQqja2bPVebmfo9h4F6ssKiOAsdkFyseqL
-         8AWxwBca4DZVPiq5IvwK/kKZB6g5R51WlqANiChv5HaM1JAINCPxsK+xF4B3i1c2VlR9
-         Kcn1qnjoxo3CS3ip5RWDWxg6e7ETH6IVaWpOSaeM7VdFPOQQpgatrpFE1wjNs42+d3XY
-         irFQ==
+        d=gmail.com; s=20230601; t=1724420231; x=1725025031; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rNe4ZAbU5AS+FCm6doJQ9rVkaiu45RM9gTfhZkxaWBc=;
+        b=mKwtBtxzlztYy/wNkmv2mKf28fGxDyI8j7oFCm2Su6L36c+l2BA8Tu81SlDjwCAYkj
+         qAWCw60tfrptizCTHdl7NFzl5+FVnMs+x5zIrYygSQYeGiAkgJX+T88BlZxep7Eeo51t
+         Xn633YbA6LhuCfUvoAmooBSyOfo0dI8pXP6FRlu3EvnE31FlAqX8E3nzLJKEBRe6MjI0
+         fG/97ORvFMJ2p56R6Msx2qs1RwjblDahmjiaM+EOorQknxFpO3Jb6dNfWakS/AASCWXl
+         vYS8vjoWzgk2rFF5/3u2ulGDgl4m3MniQ7UbmFMFKalTUxbtcfDt3C/SG4slvM2J8Y7P
+         r0UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724420172; x=1725024972;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i/hrlcBOw7taIRVHdg+uznRFul59Cbdga+xEVQ7cyr4=;
-        b=dOKiLnUO3gJr8Go2hJGSntKDmZZvuRMoz5UB/H0SUUO/YYKiTuv9ZPsRmU6ztqjp1t
-         tYjoGbQR69N6XxX6mrXqftaDSPSSIrtER8NhLZ0Wr2jDbGMGG+TqUeSYpfSts1vIF5Js
-         NZ/6/DIcWHtEdpcZYQZAQBoz3BdGYXhSfKfx/wQrEfsSKxThkA6Y0XGhiqX3GgLhZ7Tn
-         MC4/K66SPYvFPeiqarHq2JZe5xJh18vo0ttF6L3QD4ke0ZtykClm3wZRWv1tSKdz0YF1
-         6CJ6Y8fHdzyhveGSHrGAnxww++SmtbvlAzLyN4/suQkl4tE+kg8zHwEKwKa394gevChN
-         I0CQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWC1Yi0evFvsedV2G6+c8vCUPOvyvhvoaBT8J1FoKfjgKiLx/CuXfBDQX6S9wBK5ZG2ugueZFM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyoqnx++7CJD2yncBup0SSzXTTd2IfI7diKtPciFuAtKvsQ74jP
-	WrZonDRC6PtJ/4nnh2V03QiWKTB+3YXQKfYhpiM4Yhjr94kr5ln8pPvxo95W7ss=
-X-Google-Smtp-Source: AGHT+IFeKxNev3jHp2LtyOqB5QeH9inrXLuK7HpJosiKT+KPtRN5PJnwk+f1XZsWnq2Px5OysLTxhA==
-X-Received: by 2002:a05:651c:199f:b0:2f4:f253:ec7 with SMTP id 38308e7fff4ca-2f4f569add3mr22983301fa.0.1724420171794;
-        Fri, 23 Aug 2024 06:36:11 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f484b29sm259247366b.162.2024.08.23.06.36.10
+        d=1e100.net; s=20230601; t=1724420231; x=1725025031;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rNe4ZAbU5AS+FCm6doJQ9rVkaiu45RM9gTfhZkxaWBc=;
+        b=o2lGVme0PWFIMAi6/vH2my0Op7DJaLmqFr6rnErZ4Ooff6GTWJ09wNZnv+QTsx11X/
+         jCqdXYZxdHxgVsdxgZRbpUrB65Sofn1oomw9s2K4pY5G9lspgiGFbXg3FgArNe1YwSGE
+         vqtzQHq5s+KL8D4Aod+cU0sZtzWYiyWVu3OoVxotk+TeC5Mb7COHF1Wddl32yVLojvrS
+         882dx3Jpof8Y0DnqLCBFj1f1schXw9pp16cSsokTswa2x6GJxnJ6+9LZEzSWdGMbO0H/
+         d13fR2TQt40SrAtvI+zuuMrqdDaJ0FwJBrhbQnFa6u6Ar44BYmna816itVtx6Tmi+gIC
+         o6Xg==
+X-Forwarded-Encrypted: i=1; AJvYcCUGF8OYhHWi1xilWZqwyViL/vSHCS19gd+IDGNkmPq4ZcRj9+jtrgO9hTIo4YMlbp9WtWYXF13Mq75hLz0jxK8=@vger.kernel.org, AJvYcCUUjEY4oiG0XK4uYJE4/HzCUiklaNFQW4MRHzXlyMJul9qe508vzSK1PUE59mc2VDbBIalTp9A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqx7lHQQg+98EAST/ukVWaqZUPMkGPieIxY5trmPkgS7nMD/HK
+	NqTJ/N4N96rH8qywanLiu3WLY592iFmW8WiKNt7NBPwBPoRiD0g8
+X-Google-Smtp-Source: AGHT+IGVb2Go8aR/xvpd2/e6b2oG3nInDgOtynbCZMxtHjMoX/2+/L3C8fFV3KS/lglxQoCBG0eszA==
+X-Received: by 2002:a05:6a21:670d:b0:1c4:c449:41e6 with SMTP id adf61e73a8af0-1cc8b51f3ddmr2349411637.31.1724420230436;
+        Fri, 23 Aug 2024 06:37:10 -0700 (PDT)
+Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-714342e0a03sm3018065b3a.118.2024.08.23.06.37.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 06:36:10 -0700 (PDT)
-Date: Fri, 23 Aug 2024 15:36:09 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 03/12] net-shapers: implement NL get operation
-Message-ID: <ZsiQSfTNr5G0MA58@nanopsycho.orion>
-References: <Zr8Y1rcXVdYhsp9q@nanopsycho.orion>
- <4cb6fe12-a561-47a4-9046-bb54ad1f4d4e@redhat.com>
- <ZsMyI0UOn4o7OfBj@nanopsycho.orion>
- <47b4ab84-2910-4501-bbc8-c6a9b251d7a5@redhat.com>
- <Zsco7hs_XWTb3htS@nanopsycho.orion>
- <20240822074112.709f769e@kernel.org>
- <cc41bdf9-f7b6-4b5c-81ad-53230206aa57@redhat.com>
- <20240822155608.3034af6c@kernel.org>
- <Zsh3ecwUICabLyHV@nanopsycho.orion>
- <c7e0547b-a1e4-4e47-b7ec-010aa92fbc3a@redhat.com>
+        Fri, 23 Aug 2024 06:37:10 -0700 (PDT)
+Date: Fri, 23 Aug 2024 13:36:56 +0000 (UTC)
+Message-Id: <20240823.133656.1425422314833390920.fujita.tomonori@gmail.com>
+To: tmgross@umich.edu
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
+ aliceryhl@google.com
+Subject: Re: [PATCH net-next v6 6/6] net: phy: add Applied Micro QT2025 PHY
+ driver
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CALNs47uvG_yjzX7Ewszb6M__jMZFtPu1rtw8DqvL5CceqCw4Zg@mail.gmail.com>
+References: <20240820225719.91410-1-fujita.tomonori@gmail.com>
+	<20240820225719.91410-7-fujita.tomonori@gmail.com>
+	<CALNs47uvG_yjzX7Ewszb6M__jMZFtPu1rtw8DqvL5CceqCw4Zg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c7e0547b-a1e4-4e47-b7ec-010aa92fbc3a@redhat.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Fri, Aug 23, 2024 at 02:58:27PM CEST, pabeni@redhat.com wrote:
->On 8/23/24 13:50, Jiri Pirko wrote:
->> Fri, Aug 23, 2024 at 12:56:08AM CEST, kuba@kernel.org wrote:
->> > On Thu, 22 Aug 2024 22:30:35 +0200 Paolo Abeni wrote:
->> > > > > I'm not saying this is deal breaker for me. I just think that if the api
->> > > > > is designed to be independent of the object shaper is bound to
->> > > > > (netdev/devlink_port/etc), it would be much much easier to extend in the
->> > > > > future. If you do everything netdev-centric from start, I'm sure no
->> > > > > shaper consolidation will ever happen. And that I thought was one of the
->> > > > > goals.
->> > > > > 
->> > > > > Perhaps Jakub has opinion.
->> > > > 
->> > > > I think you and I are on the same page :) Other than the "reference
->> > > > object" (netdev / devlink port) the driver facing API should be
->> > > > identical. Making it possible for the same driver code to handle
->> > > > translating the parameters into HW config / FW requests, whether
->> > > > they shape at the device (devlink) or port (netdev) level.
->> > > > 
->> > > > Shaper NL for netdevs is separate from internal representation and
->> > > > driver API in my mind. My initial ask was to create the internal
->> > > > representation first, make sure it can express devlink and handful of
->> > > > exiting netdev APIs, and only once that's merged worry about exposing
->> > > > it via a new NL.
->> > > > 
->> > > > I'm not opposed to showing devlink shapers in netdev NL (RO as you say)
->> > > > but talking about it now strikes me as cart before the horse.
->> > > 
->> > > FTR, I don't see both of you on the same page ?!?
->> > > 
->> > > I read the above as Jiri's preference is a single ndo set to control
->> 
->> "Ndo" stands for netdev op and they are all tightly coupled with
->> netdevices. So, "single ndo set to control both devlink and netdev
->> shapers" sounds like nonsense to me.
->
->In this context, "NDOs" == set of function pointers operating on the same
->object.
->
->> > > Or to phrase the above differently, Jiri is focusing on the shaper
->> > > "binding" (how to locate/access it) while Jakub is focusing on the
->> > > shaper "info" (content/definition/attributes). Please correct me If I
->> > > misread something.
->> 
->> Two(or more) similar ops structs looks odd to me. I think that the ops
->> should should be shared and just the "binding point" should be somehow
->> abstracted out. Code speaks, let me draft how it could be done:
->> 
->> enum net_shaper_binding_type {
->>          NET_SHAPER_BINDING_TYPE_NETDEV,
->>          NET_SHAPER_BINDING_TYPE_DEVLINK_PORT,
->> };
->> 
->> struct net_shaper_binding {
->>          enum net_shaper_binding_type type;
->>          union {
->>                  struct net_device *netdev;
->>                  struct devlink_port *devlink_port;
->>          };
->> };
->> 
->> struct net_shaper_ops {
->> +       /**
->> +        * @group: create the specified shapers scheduling group
->> +        *
->> +        * Nest the @leaves shapers identified by @leaves_handles under the
->> +        * @root shaper identified by @root_handle. All the shapers belong
->> +        * to the network device @dev. The @leaves and @leaves_handles shaper
->> +        * arrays size is specified by @leaves_count.
->> +        * Create either the @leaves and the @root shaper; or if they already
->> +        * exists, links them together in the desired way.
->> +        * @leaves scope must be NET_SHAPER_SCOPE_QUEUE.
->> +        *
->> +        * Returns 0 on group successfully created, otherwise an negative
->> +        * error value and set @extack to describe the failure's reason.
->> +        */
->> +       int (*group)(const struct net_shaper_binding *binding, int leaves_count,
->> +                    const struct net_shaper_handle *leaves_handles,
->> +                    const struct net_shaper_info *leaves,
->> +                    const struct net_shaper_handle *root_handle,
->> +                    const struct net_shaper_info *root,
->> +                    struct netlink_ext_ack *extack);
+On Fri, 23 Aug 2024 00:25:23 -0500
+Trevor Gross <tmgross@umich.edu> wrote:
+
+>> +//! Applied Micro Circuits Corporation QT2025 PHY driver
+>> +//!
+>> +//! This driver is based on the vendor driver `QT2025_phy.c`. This source
+>> +//! and firmware can be downloaded on the EN-9320SFP+ support site.
+>> +use kernel::c_str;
+> 
+> Nit: line between module docs and the first import.
+
+Oops, will fix.
+
+> Could you add another note to the doc comment that the phy contains an
+> embedded Intel 8051 microcontroller? I was getting confused by the
+> below comments mentioning the 8051 until I realized this.
+
+Sure, will add.
+
+>> +#[vtable]
+>> +impl Driver for PhyQT2025 {
+>> +    const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
+>> +    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043A400);
 >> +
->> +       /**
->> +        * @set: Updates the specified shaper
->> +        *
->> +        * Updates or creates the @shaper identified by the provided @handle
->> +        * on the given device @dev.
->> +        *
->> +        * Returns 0 on success, otherwise an negative
->> +        * error value and set @extack to describe the failure's reason.
->> +        */
->> +       int (*set)(const struct net_shaper_binding *binding,
->> +                  const struct net_shaper_handle *handle,
->> +                  const struct net_shaper_info *shaper,
->> +                  struct netlink_ext_ack *extack);
+>> +    fn probe(dev: &mut phy::Device) -> Result<()> {
+>> +        // The vendor driver does the following checking but we have no idea why.
+>> +        let hw_id = dev.read(C45::new(Mmd::PMAPMD, 0xd001))?;
+>> +        if (hw_id >> 8) & 0xff != 0xb3 {
+>> +            return Err(code::ENODEV);
+>> +        }
+> 
+> I actually found this described in the datasheet for the QT2022:
+> 1.D000h is a two-byte "product code", "1.D001h" is a one byte revision
+> code followed by one byte reserved. So 0xb3 is presumably something
+> like the major silicon revision number.
+
+Thanks! I've not checked the QT2022 datasheet. Looks like both
+registers are compatible with QT2025.
+
+> Based on how the vendor code is written, it seems like they are
+> expecting different phy revs to need different firmware. It might be
+> worth making a note that our firmware only works with 0xb3, whatever
+> exactly that means.
+
+I'll update the comment.
+
+> The `& 0xff` shouldn't be needed since `dev.read` returns an unsigned number.
+
+Yeah, looks like unnecessary. We need the upper 8 bits of u16
+here. I'll drop it.
+
+> I went through the datasheet and found some register names, listed
+> them below. Maybe it is worth putting the names in the comments if
+> they exist? Just to make things a bit more searchable if somebody
+> pulls up a datasheet.
+
+Sure, I'll add them. 
+
+>> +        // The Intel 8051 will remain in the reset state.
+>> +        dev.write(C45::new(Mmd::PMAPMD, 0xC300), 0x0000)?;
+> 
+> This sets `MICRO_RESETN` to hold the embedded micro in reset while configuring.
+> 
+>> +        // Configure the 8051 clock frequency.
+>> +        dev.write(C45::new(Mmd::PMAPMD, 0xC302), 0x0004)?;
+> 
+> This one is `SREFCLK_FREQ`, embedded micro clock frequency. I couldn't
+> figure out what the meaning of the value is.
+> 
+>> +        // Non loopback mode.
+>> +        dev.write(C45::new(Mmd::PMAPMD, 0xC319), 0x0038)?;
+>> +        // Global control bit to select between LAN and WAN (WIS) mode.
+>> +        dev.write(C45::new(Mmd::PMAPMD, 0xC31A), 0x0098)?;
+> 
+> This LAN/WAN select is called  `CUS_LAN_WAN_CONFIG`
+> 
+>> +        // The following writes use standardized registers (3.38 through
+>> +        // 3.41 5/10/25GBASE-R PCS test pattern seed B) for something else.
+>> +        // We don't know what.
+>> +        dev.write(C45::new(Mmd::PCS, 0x0026), 0x0E00)?;
+>> +        dev.write(C45::new(Mmd::PCS, 0x0027), 0x0893)?;
+>> +        dev.write(C45::new(Mmd::PCS, 0x0028), 0xA528)?;
+>> +        dev.write(C45::new(Mmd::PCS, 0x0029), 0x0003)?;
+>> +        // Configure transmit and recovered clock.
+>> +        dev.write(C45::new(Mmd::PMAPMD, 0xC30A), 0x06E1)?;
+>> +        // The 8051 will finish the reset state.
+>> +        dev.write(C45::new(Mmd::PMAPMD, 0xC300), 0x0002)?;
+> 
+> `MICRO_RESETN` again, this time to start the embedded micro.
+> 
+>> +        // The 8051 will start running from the boot ROM.
+>> +        dev.write(C45::new(Mmd::PCS, 0xE854), 0x00C0)?;
 >> +
->> +       /**
->> +        * @delete: Removes the specified shaper from the NIC
->> +        *
->> +        * Removes the shaper configuration as identified by the given @handle
->> +        * on the specified device @dev, restoring the default behavior.
->> +        *
->> +        * Returns 0 on success, otherwise an negative
->> +        * error value and set @extack to describe the failure's reason.
->> +        */
->> +       int (*delete)(const struct net_shaper_binding *binding,
->> +                     const struct net_shaper_handle *handle,
->> +                     struct netlink_ext_ack *extack);
->> +};
+>> +        let fw = Firmware::request(c_str!("qt2025-2.0.3.3.fw"), dev.as_ref())?;
+>> +        if fw.data().len() > SZ_16K + SZ_8K {
+>> +            return Err(code::EFBIG);
+>> +        }
+>> +
+>> +        // The 24kB of program memory space is accessible by MDIO.
+>> +        // The first 16kB of memory is located in the address range 3.8000h - 3.BFFFh.
+>> +        // The next 8kB of memory is located at 4.8000h - 4.9FFFh.
+>> +        let mut dst_offset = 0;
+>> +        let mut dst_mmd = Mmd::PCS;
+>> +        for (src_idx, val) in fw.data().iter().enumerate() {
+>> +            if src_idx == SZ_16K {
+>> +                // Start writing to the next register with no offset
+>> +                dst_offset = 0;
+>> +                dst_mmd = Mmd::PHYXS;
+>> +            }
+>> +
+>> +            dev.write(C45::new(dst_mmd, 0x8000 + dst_offset), (*val).into())?;
+>> +
+>> +            dst_offset += 1;
+>> +        }
+>> +        // The Intel 8051 will start running from SRAM.
+>> +        dev.write(C45::new(Mmd::PCS, 0xE854), 0x0040)?;
+> 
+> 
+> At this point the vendor driver looks like it does some verification:
+> it attempts to read 3.d7fd until it returns something other than 0x10
+> or 0, or times out. Could that be done here?
+
+Yeah, we better to wait here until the hw becomes ready (since the
+8051 has just started) and check if it works correctly. A new Rust
+abstraction for msleep() is necessary.
+
+Even without the logic, the driver starts to work eventually (if the
+hw isn't broken) so I didn't include it in the patchset. I'll work on
+the abstraction and update the driver after this is merged.
+
+>> +
+>> +        Ok(())
+>> +    }
+>> +
+>> +    fn read_status(dev: &mut phy::Device) -> Result<u16> {
+>> +        dev.genphy_read_status::<C45>()
+>> +    }
+>> +}
+>> --
+>> 2.34.1
 >>
->> 
->> static inline struct net_device *
->> net_shaper_binding_netdev(struct net_shaper_binding *binding)
->> {
->>          WARN_ON(binding->type != NET_SHAPER_BINDING_TYPE_NETDEV)
->>          return binding->netdev;
->> }
->> 
->> static inline struct devlink_port *
->> net_shaper_binding_devlink_port(struct net_shaper_binding *binding)
->> {
->>          WARN_ON(binding->type != NET_SHAPER_BINDING_TYPE_DEVLINK_PORT)
->>          return binding->devlink_port;
->> }
->> 
->> Then whoever calls the op fills-up the binding structure accordingly.
->> 
->> 
->> drivers can implement ops, for netdev-bound shaper like this:
->> 
->> static int driverx_shaper_set(const struct net_shaper_binding *binding,
->>                                const struct net_shaper_handle *handle,
->>                                const struct net_shaper_info *shaper,
->>                                struct netlink_ext_ack *extack);
->> {
->>          struct net_device *netdev = net_shaper_binding_netdev(binding);
->>          ......
->> }
->> 
->> struct net_shaper_ops driverx_shaper_ops {
->>          .set = driverx_shaper_set;
->>          ......
->> };
->> 
->> static const struct net_device_ops driverx_netdev_ops = {
->>          .net_shaper_ops = &driverx_shaper_ops,
->>          ......
->> };
->
->If I read correctly, the net_shaper_ops caller will have to discriminate
->between net_device and devlink, do the object-type-specific lookup to get the
->relevant net_device (or devlink) object and then pass to such net_device (or
->devlink) a "generic" binding. Did I misread something? If so I must admit I
->really dislike such interface.
+> 
+> Consistency nit: this file uses a mix of upper and lowercase hex
+> (mostly uppercase here) - we should probably be consistent. A quick
+> regex search looks like lowercase hex is about twice as common in the
+> kernel as uppercase so I think this may as well be updated.
 
-You are right. For example devlink rate set command handler will call
-the op with devlink_port binding set.
+Ah, I'll use lowercase for all the hex in the driver.
 
->
->I personally think it would be much cleaner to have 2 separate set of
->operations, with exactly the same semantic and argument list, except for the
->first argument (struct net_device or struct devlink).
+It will be a new coding rule for rust code in kernel? If so, can a
+checker tool warn this?
 
-I think it is totally subjective. You like something, I like something
-else. Both works. The amount of duplicity and need to change same
-things on multiple places in case of bugfixes and extensions is what I
-dislike on the 2 separate sets. Plus, there might be another binding in
-the future, will you copy the ops struct again then?
+> Overall this looks pretty good to me, checking against both the
+> datasheet and the vendor driver we have. Mostly small suggestions
+> here, I'm happy to add a RB with my verification question addressed
+> and some rewording of the 0xd001 (phy revision) comment.
 
-
->
->The driver implementation could still de-duplicate a lot of code, as far as
->the shaper-related arguments are the same.
->
->Side note, if the intention is to allow the user to touch/modify the
->queue-level and queue-group-level shapers via the devlink object? if that is
->the intention, we will need to drop the shaper cache and (re-)introduce a
->get() callback, as the same shaper could be reached via multiple
->binding/handle pairs and the core will not know all of such pairs for a given
->shaper.
-
-That is a good question, I don't know. But gut feeling is "no".
-
-
->
->Thanks,
->
->Paolo
->
+Thanks a lot! I'll send v7 soon.
 
