@@ -1,118 +1,102 @@
-Return-Path: <netdev+bounces-121471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2864495D4A4
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 19:46:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4C7A95D4AA
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 19:49:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1F071F22B87
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 17:46:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93441283EA4
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 17:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6050319047C;
-	Fri, 23 Aug 2024 17:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jGCBiOZL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBFC018F2F6;
+	Fri, 23 Aug 2024 17:49:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EE0746E;
-	Fri, 23 Aug 2024 17:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5289E12B6C;
+	Fri, 23 Aug 2024 17:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724435196; cv=none; b=pVetbcQqlPW9zIoIBTau9sVFoCKVAjO9+wN2gfLZuu29HEVvHgamQchJRs3sGfuHUmeYuA37meU/aGCnJ1up/7tOmmAKBpqo3ivq1SsfbtR7881c4pxIOfshLUc+Yk4da6U3zKnlfIFseGI6SLJGhXPceDvhM77lbdXbXrl+Flo=
+	t=1724435347; cv=none; b=QbtbIvSam10He55vpxnHydzJLurtINcqcUASN1PDKzriqY2NIuO3zG2E8lrlGeP6KEBmealq8EA1sjsU9aSU/PI2Mdbt95f0wpXWJUj+hTkQ0WfFMebze7vFliRg6laZRdlQ8Qvr1smGVYBIX8qhRh0bshSQGikrX8GhnsGFKIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724435196; c=relaxed/simple;
-	bh=twydL7XL81AtKkNsurQ3vsSKjYtEfts6TqUfnqixz08=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CvR6mAHfBZbQyP/PV4sGdXPmKyx5YblYXZ7CwmUsAJUQvSly6skz7VDNXJwjyzGKKWFtPAS6bd1n3khDlCBFyF5BtkPC6d1lp1L+Laiglsp5hAoRfLC25dFJF4O+fgq7TJZ+aRRUqwZkyZ4r2VNUm/EoNdQSnUeYg18R8JP2iDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGCBiOZL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB245C32786;
-	Fri, 23 Aug 2024 17:46:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724435195;
-	bh=twydL7XL81AtKkNsurQ3vsSKjYtEfts6TqUfnqixz08=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jGCBiOZLSAyRCwcyKsEQ5fmPLde51GnLuomXbdwviy00GL6RwGC/NYmUcoYeNsKa/
-	 mYV/cZIT5ZchFcbK06H6X0vvcuZ8c8gog8/xkikxk6AkQxm66PO7xNfNVNlT1N6cw4
-	 4Fv6Bbqh3eB5d7xCaLGM+wy8cM7HXuTj/ZWIKDcLHdJMioR/Gy9+g8/yv/AEAWEZ7Y
-	 4+xaAVn1X4G/Yari+aG0OnLmsbN//BntM5OLgu0ZeBl6I24cpjy+ahfd7U/jWnu4Xi
-	 WW/JZrX6BN13g6aXmUjRVw5h2sCpHrIXpL948YRCi2/wuMjMp8RmPaOWiITFhYEXYb
-	 Y9Fj4WyaYGYRA==
-Date: Fri, 23 Aug 2024 18:46:30 +0100
-From: Simon Horman <horms@kernel.org>
-To: Marek Vasut <marex@denx.de>
-Cc: linux-wireless@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Adham Abozaeid <adham.abozaeid@microchip.com>,
-	Ajay Singh <ajay.kathat@microchip.com>,
-	Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 2/4] wifi: wilc1000: Fold wilc_get_chipid() into wlan.c
-Message-ID: <20240823174630.GD2164@kernel.org>
-References: <20240823161131.94305-1-marex@denx.de>
- <20240823161131.94305-2-marex@denx.de>
+	s=arc-20240116; t=1724435347; c=relaxed/simple;
+	bh=TiTV6Z7PO+TvZyWsW1aXXnX404Jc6SJmddMZrxT2bRU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sp5SLcBPolSpY1Q9N4MF6WxdCdEQjMDQPyYqzaJ9B8LBIpT7Sp/ZdMhemc42dSulDqlwRqQolGL+zpFPrA4Ee2ci0DtM90X95Id/q2YnQhrrj4UHH6aNnO/GeVwKw8B0jCvhC4UeVM3hqWDPjKgZQXotErdyPX90uF3Vj9mjKcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5bf006f37daso3791898a12.1;
+        Fri, 23 Aug 2024 10:49:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724435344; x=1725040144;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vzlRu6XA4P0Ykkn49pX+TEYVI+Bp8ho7EJhrlcdBqr0=;
+        b=JvKdnxA/aaeOEsqOD3croLp1+V4aTElBZ8qka/m19Ytraz2u+19va+Xv0xVawmn20g
+         T10LMSZlJeSiXYtLKkcLRUrOADLbqi/a0o4ihUutpVHtstvkF2U7DWPcG+2yEN6IIqxW
+         3bhVQar//wwewy/QZzFlzTBpXqt4oz3LXEzm8ItLns0wu5jvqco/qqdsSlNCE/pLfJT1
+         5/p2XNHusnjzI3P7O1ddwSKFtmSD/W3VMf1TtKimVZgVBg0k30h4GoJYvCwHRgnhTV/f
+         h0gwAdWH3aA6Hk95IZcCFOHB0cE1u4SCMnxgkHJeCWOzZ5AuyC0Cpe9iwmQezwLpPzaP
+         19SQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9v6V/kMmfULv1VbFsPdGGriVGRbwxXth27TlCVWY8XIWBqt/ndH2luC3bw3Etc/gRPRgNbx42@vger.kernel.org, AJvYcCVtaR90ubxv9gghJ0RZ2F7iwEO1MRot7NdjxoD4iuvic2OU6vXPURYP0u/LMhbYOZ48dcqZkMzhaMev8dk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5aiPGQKRBFbxhBpYEl1nLL8zpqFifD61YqV0jU88DO5EBJVvu
+	86lIDU1UJArUkB1zVOVIFKaAARwTV8KQ7hP3SwwQecM/W5Ya7cQP
+X-Google-Smtp-Source: AGHT+IGXQdS4CTXd8JthiIkhSz3X3eKgmcWzRaHwV3M1x+rW42fLZA+4esf5LcjetYy8YVns9+oFdg==
+X-Received: by 2002:a05:6402:234f:b0:5bf:256a:a19e with SMTP id 4fb4d7f45d1cf-5bf2bdbe1f2mr8096152a12.4.1724435344019;
+        Fri, 23 Aug 2024 10:49:04 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-005.fbsv.net. [2a03:2880:30ff:5::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c0515a896dsm2320185a12.81.2024.08.23.10.49.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2024 10:49:03 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: fw@strlen.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: rbc@meta.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH nf-next v2 0/2] netfilter: Make IP_NF_IPTABLES_LEGACY selectable
+Date: Fri, 23 Aug 2024 10:48:51 -0700
+Message-ID: <20240823174855.3052334-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240823161131.94305-2-marex@denx.de>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 23, 2024 at 06:08:57PM +0200, Marek Vasut wrote:
-> Do not use wilc_get_chipid() outside of wlan.c . Instead, call
-> wilc_get_chipid() right after the SDIO/SPI interface has been
-> initialized to cache the device chipid, and then use the cached
-> chipid throughout the driver. Make wilc_get_chipid() static and
-> remove its prototype from wlan.h .
-> 
-> Signed-off-by: Marek Vasut <marex@denx.de>
+These two patches make IP_NF_IPTABLES_LEGACY and IP6_NF_IPTABLES_LEGACY
+Kconfigs user selectable, avoiding creating an extra dependency by
+enabling some other config that would select IP{6}_NF_IPTABLES_LEGACY.
 
-...
+Changelog:
 
-> diff --git a/drivers/net/wireless/microchip/wilc1000/wlan.c b/drivers/net/wireless/microchip/wilc1000/wlan.c
+v2:
+ * Added the new configuration in the selftest configs (Jakub)
+ * Added this simple cover letter
 
-...
+v1:
+ * https://lore.kernel.org/all/20240822175537.3626036-1-leitao@debian.org/
 
-> @@ -1535,9 +1537,18 @@ int wilc_wlan_init(struct net_device *dev)
->  	if (!wilc->hif_func->hif_is_init(wilc)) {
->  		acquire_bus(wilc, WILC_BUS_ACQUIRE_ONLY);
->  		ret = wilc->hif_func->hif_init(wilc, false);
-> +		if (!ret)
-> +			chipid = wilc_get_chipid(wilc);
->  		release_bus(wilc, WILC_BUS_RELEASE_ONLY);
->  		if (ret)
->  			goto fail;
-> +
-> +		if (!is_wilc1000(chipid)) {
-> +			netdev_err(dev, "Unsupported chipid: %x\n", chipid);
-> +			return -EINVAL;
 
-Hi Marek,
+Breno Leitao (2):
+  netfilter: Make IP_NF_IPTABLES_LEGACY selectable
+  netfilter: Make IP6_NF_IPTABLES_LEGACY selectable
 
-Should this unwind as is the case elsewhere in this function?
+ net/ipv4/netfilter/Kconfig         | 19 +++++++++++--------
+ net/ipv6/netfilter/Kconfig         | 22 ++++++++++++----------
+ tools/testing/selftests/net/config |  2 ++
+ 3 files changed, 25 insertions(+), 18 deletions(-)
 
-			ret = -EINVAL;
-			goto fail;
+-- 
+2.43.5
 
-Flagged by Smatch.
-
-> +		}
-> +
-> +		netdev_dbg(dev, "chipid (%08x)\n", chipid);
->  	}
->  
->  	if (!wilc->vmm_table)
-
-...
 
