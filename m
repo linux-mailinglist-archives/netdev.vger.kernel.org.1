@@ -1,63 +1,82 @@
-Return-Path: <netdev+bounces-121238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5D8295C49F
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 07:08:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FF9E95C4BC
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 07:17:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97B5F1F24436
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 05:08:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68A58B23C53
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 05:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EBF84CDE0;
-	Fri, 23 Aug 2024 05:08:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 696E14D8BA;
+	Fri, 23 Aug 2024 05:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Z4ztqpq2"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="H8QrP9cR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2084.outbound.protection.outlook.com [40.107.93.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C378493;
-	Fri, 23 Aug 2024 05:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724389710; cv=none; b=Mzx6qGN1EDW2yFmxngv8GM9XGFl9IBcKsXZZU1jMnqkVdflsxH1IUQn8x+9QwDjWSdjT3wYPeSZSlDWXsk0g9QDcnVVfjqRl4Pi+mZ2BqjNKJ6JM52jqheJ5VswHudvcKSYRmeNj5d+7v3k4bwLFW4uQ419dwCtOE4Kbtj644/Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724389710; c=relaxed/simple;
-	bh=u41TN4fWsUuqEu+S8B7BBgs1qEp2OAxQEOHmP2i5vow=;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4728748A;
+	Fri, 23 Aug 2024 05:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.84
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724390219; cv=fail; b=IJ+MpbUGPC4+pqeI4E0a9UzKXhfQngnrzXKydOQ4t6wLxsKnmfCIunQj5F4F0mga6u/lGxHj9fao2BEjE76Ix9WKcwrI9Ih856xxbxXX0rPxkoVyYhRBjAC5vMtFWlRUcZfncuoOXnOpfmBLqveqB9iGCeW6fpKFFyrRdaCQMLk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724390219; c=relaxed/simple;
+	bh=QaVRwuI5/oeL76rpkVIdkNlqQfjbiknUvDPor72FuO8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QEa916GkqHN6PnD93LAaorCeQvCVGVLYsv/yQBB0tnz4vvMTWQ9ePqUIBJgxMa4t95YMvlZq+4DvDHF1nMV80XKxnSBNrvy2xKEFemy4xZLU6JQJekMehzy4z4/bjd5XzGcrEilLAbvvck20l6scStxNFgDRqQHcoEIpKUmZFAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Z4ztqpq2; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47N0UYgP030649;
-	Fri, 23 Aug 2024 05:08:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	WdGvVpsXCRq9JxOvfcDfeqqfX4yOBVQw2SCwliCTMWE=; b=Z4ztqpq2w89F4Xz7
-	kt7MuI4buGpyHxF7RxrvF6TplDYIPbPTXtbc45gtc9eGQEKAsYhrmH0XFGjY+O2e
-	zqz19mp6YR70z9GeR0/1lzlATnLA+uIg+QVZnAkCehK020f01vXZjqje9dHK5ar0
-	k1cNiOSNa7PRK3UavclX+ae+n4Hl68S1MkvpbkxWmnCBlzIzSTtLNrr1kUlo5FxT
-	ta/CaPdBXEIp03IYj9E3u+3M1xUsT5l0KjnuoDPh/z47u30gG45P83Ls+4zb60w5
-	UyA3BhTy9qOCSOuxGvpWNU16GzhIBZs9v8wudj4IwaDoCUrTYFGum1kHfxwp3/be
-	xJolhQ==
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 414pdmj2tk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Aug 2024 05:08:09 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47N5871i026948
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 23 Aug 2024 05:08:07 GMT
-Received: from [10.111.171.60] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 22 Aug
- 2024 22:08:02 -0700
-Message-ID: <7c977de1-fdfd-47c8-a117-5dd510849f57@quicinc.com>
-Date: Thu, 22 Aug 2024 23:07:59 -0600
+	 In-Reply-To:Content-Type; b=m4WkLB+hhQU/GTIEj4FKCsRPAOOVNk0KNK3uRsPZFKuctAMZRs49ecEd+lZN3jnto4ADNged0T27XfT5DoAgD6+g5TXyJMO1DBCs4J0CO9brmh0r1DDhfFvLk4TOd4pI3MnAVOJWau1MNrAkNEbrW1+DNNLa6XIiufMnZObbq2w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=H8QrP9cR; arc=fail smtp.client-ip=40.107.93.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vjQ59wJq0iWPGM28pg1xCsOfz2nHTzVs2XvGQzASOWeSFL9pXnZpHZ+kv8Gs0UCe5npedcltdB7WCHJNTzodYg7vUzU+T7dZNUS2m46LQQMi0MzEoZG2E+PHh9BeoK0UzFI8x5YZcgh5tz1lHFyGfH7QdlLlP5kqm9VT/a3QeBOxhIgXMuS1YRcI2l5Ysjdx11fbeLbBVgz6Eba/n49SMUJspPgnHZ3F0YnAVhRWsi+X71/XlSkSSmiRPmtxmrtH/02XerTz4AMgYaSrZo/0tzspN7UpdtiU721mQP8T6ILf5rpRip2r5iGBhE7JKZmWqgB7Ws/57V1nCNoODYLBUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=L5sHbN5/IIitBLcpJyxBo4G/2kLMrvoOcfYuZkUlQTE=;
+ b=W7PRqL86V4F5ebcKGHjY+lubQerDxmqs5mM+J6WbANYNqiDbD/V9vtUH228GXBLZGrRzKgxzHh6Py39wzPrf4aO1HoCa9A60/ZjHfnNBcxGWrebXnzEqEcRYUveo2fO6qaMG+9oMcpST+WGKaARsOsJIatPEf+SaeCn0pSr3gX912b7Huesp+Q8iTKBDBVlB4997GECNiAPv3s33H+/t+4IB5bQRLU44OuGx1YvVNv5cUnKjo1bkjhvyxTdPF40zVtOBfwna3bxQTQL5lR8MMhUE5aE5vIDOQZdamxTI/mtSX91EzPqshtl6AfSzmcKaRWWKuxXJiuweo6Z/Bfz5LA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L5sHbN5/IIitBLcpJyxBo4G/2kLMrvoOcfYuZkUlQTE=;
+ b=H8QrP9cRDIe28jRlv2+939wwWI3sAPR83lZB32b/Zvir6a5wT2Le9Bn7eVtzcVcVf7mh96a5/mU0G0pLa46xG6A2xuItBCPB/NEpThVZooaoOjvmcA+s76wTtI2PTqz9N4zmoxgtBJEfEHWPKQKlwP4TzyRd4X0ks2ERt6t2bKnQgZNcKiD8hIty5Wbhhy2SA++goD5wJPsHTVIH3X4MkamC1XInsZWUXZF8i24S2VxWLwp8K/xJzRkDAskYdVpV+rc9FtJ0jsD6fdqPYzk670LmdhZS3yaLyEuCJrWgDPlhRrevuw4NpuzKJJlZ98Zq0fo3u9zclhgBzu6mIyIvnw==
+Received: from BL1PR13CA0222.namprd13.prod.outlook.com (2603:10b6:208:2bf::17)
+ by IA1PR12MB7591.namprd12.prod.outlook.com (2603:10b6:208:429::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.25; Fri, 23 Aug
+ 2024 05:16:53 +0000
+Received: from BL6PEPF0001AB73.namprd02.prod.outlook.com
+ (2603:10b6:208:2bf:cafe::f2) by BL1PR13CA0222.outlook.office365.com
+ (2603:10b6:208:2bf::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.13 via Frontend
+ Transport; Fri, 23 Aug 2024 05:16:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BL6PEPF0001AB73.mail.protection.outlook.com (10.167.242.166) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7897.11 via Frontend Transport; Fri, 23 Aug 2024 05:16:52 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 22 Aug
+ 2024 22:16:38 -0700
+Received: from [172.27.33.61] (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 22 Aug
+ 2024 22:16:34 -0700
+Message-ID: <5fc5d450-b77f-40eb-b15d-33939719a124@nvidia.com>
+Date: Fri, 23 Aug 2024 08:16:32 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,84 +84,125 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 06/13] net: qualcomm: rmnet: Correct spelling in
- if_rmnet.h
-To: Simon Horman <horms@kernel.org>,
-        Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        "Paolo
- Abeni" <pabeni@redhat.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        "Thorsten Winkler" <twinkler@linux.ibm.com>,
-        David Ahern
-	<dsahern@kernel.org>, "Jay Vosburgh" <jv@jvosburgh.net>,
-        Andy Gospodarek
-	<andy@greyhouse.net>,
-        "Sean Tranchetti" <quic_stranche@quicinc.com>,
-        Paul
- Moore <paul@paul-moore.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Jamal
- Hadi Salim <jhs@mojatatu.com>,
-        Cong Wang <xiyou.wangcong@gmail.com>, Jiri
- Pirko <jiri@resnulli.us>,
-        "Marcelo Ricardo Leitner"
-	<marcelo.leitner@gmail.com>,
-        Xin Long <lucien.xin@gmail.com>, Martin Schiller
-	<ms@dev.tdt.de>
-CC: <netdev@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-        <linux-security-module@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
-        <linux-x25@vger.kernel.org>
-References: <20240822-net-spell-v1-0-3a98971ce2d2@kernel.org>
- <20240822-net-spell-v1-6-3a98971ce2d2@kernel.org>
+Subject: Re: [PATCH] net/mlx5: Added cond_resched() to crdump collection
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Mohamed Khalfella
+	<mkhalfella@purestorage.com>
+CC: Yuanyuan Zhong <yzhong@purestorage.com>, Saeed Mahameed
+	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
+	<tariqt@nvidia.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Shay Drori <shayd@nvidia.com>, <netdev@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240819214259.38259-1-mkhalfella@purestorage.com>
+ <ea1c88ea-7583-4cfe-b0ef-a224806c96b1@intel.com>
+ <ZsUYRRaKLmM5S5K9@apollo.purestorage.com>
+ <ea86913b-8fbd-4134-9ee1-c8754aac0218@nvidia.com>
+ <Zsdwe0lAl9xldLHK@apollo.purestorage.com>
+ <1d9d555f-33b7-4d95-8fbd-87709386583c@intel.com>
 Content-Language: en-US
-From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
-In-Reply-To: <20240822-net-spell-v1-6-3a98971ce2d2@kernel.org>
+From: Moshe Shemesh <moshe@nvidia.com>
+In-Reply-To: <1d9d555f-33b7-4d95-8fbd-87709386583c@intel.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: nxn1AxiIUR23V32pf7IK2RKtu1Ne5L5l
-X-Proofpoint-ORIG-GUID: nxn1AxiIUR23V32pf7IK2RKtu1Ne5L5l
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-23_02,2024-08-22_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- suspectscore=0 malwarescore=0 phishscore=0 priorityscore=1501 mlxscore=0
- impostorscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408230034
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB73:EE_|IA1PR12MB7591:EE_
+X-MS-Office365-Filtering-Correlation-Id: 533d0476-1eba-4f4a-5659-08dcc332ccc3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|7416014|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?SkdSOE9Bb2sxaTJ2aW9IWHlUT05CMXZsTTlJOUFHZk5kQ2kwZ1BpNXNLV3NW?=
+ =?utf-8?B?KzZFZlNyNkdGNzNWQkJYZHFVTCtUZ3NVdGdkMjFoc3FlL2dtVi9CeVh4bUlh?=
+ =?utf-8?B?cFUvdzNzSFdYMlFiYkg1cTg5LzcySGZUc2NKNUhDVzk1SE9OWlh3NHI1UElZ?=
+ =?utf-8?B?cHVEdFNmMnAxeW1WNmtVZm44YU9SL0RYMWt2MTRTYjlHYnU3NitTTWhtWTBl?=
+ =?utf-8?B?WjIrTzlQOXVBakJNdDdlSmp5dTc5MjE0ZExldnBGL2gvY3NmbkN2NjdteEpT?=
+ =?utf-8?B?ZW1zNEsrRzByc2diNHIrU2RjaHhJL3ZCRmxzczRtdGdVRVNodHN0TDEwamt4?=
+ =?utf-8?B?ZWlHeDdvYUp5UHRxc0VLZE5nWDJsaHFVK1FCWjUxT1lzSXdrZURseDlGOXgr?=
+ =?utf-8?B?RGVMM0R6VmxtdWttc2ZHdDFDRk1XR0hXVm5hNFgwWEZWZzgrbndjL3VXWStW?=
+ =?utf-8?B?VnlpRnNTMGprUUd0NHV4ZVdVSklHUEhwdEJ6YXByVmorTWZFQjhBSXd4TzJv?=
+ =?utf-8?B?bjF6TzY2Tisxc3h6VERwVDd5TGI3WHZMNFhDVGxBYzZ4aUxFdFdEUEhaenlt?=
+ =?utf-8?B?T2hCb2syMVppZ3pVeU9Fa2k4cnphKzhENFJ4Z3FCOStBOExDM1habE9OTGVL?=
+ =?utf-8?B?V29pTVZJTnVzcGNQTUlBTHlTR09qVkp4UUQzTFdIc2crbXBxaGRORnFhZEFV?=
+ =?utf-8?B?OGVVdEZvVkl6VEtLR3FPSHVlRUdVMURkc3pzSm5IUkoyN2c1b3lEc1hqclJD?=
+ =?utf-8?B?UFBTUngreEI4Z2ErOE9sSWZpV0Q1TGFIVDg0QjZRM0c4UkdsMUhEZTl1Z3Qx?=
+ =?utf-8?B?OGUxTlA4eWdDZDlJVzVVMitWQjlPd0NLUWY2L0pXMWRxUkNaNVJpU0M5aEF2?=
+ =?utf-8?B?b1dsYTlBamZEQUJkbVhRV1hraXhqN29wZTdOTXZzdE44eUpDWWJaWmNUajgz?=
+ =?utf-8?B?dTZUNGFEU0RPQndhVEkzL2NGVG9rbHVnQm9oZm9PeGl0STBKaFExQnZ3UVk4?=
+ =?utf-8?B?TW40OTdackphMHZUMjdYbk9LcjBNWWFrbWxQdWVhZmU5YUFad1IwemtYNEs2?=
+ =?utf-8?B?T0J2d3BpVGcyMjBhT3hYUkJQbXlzK0V0OFhzNWpQZ29ITGdFRFEveUdFWnBZ?=
+ =?utf-8?B?NVJISm1IOWlGczdIdk1MS0ppTE42Z2pERGpZdEZGQWd0MWk0NE1FSG9DaVEv?=
+ =?utf-8?B?UlNFTlMzL0RtZk1wek92c09OSjVKL3M0NGdWZWdqUHMwdWJPSW1Nd0h3QUgx?=
+ =?utf-8?B?c1RjTVpaNmU2a05wMUdkQ0dLK0hUaEFHK3huL3luYXkzZ2p6MTFadHNtaCtK?=
+ =?utf-8?B?MEVycUwwS0tyU2hpN0pOOVo1ejYyRHJJd2R5NnlqUXJXVUlhOGU0TUU2alA2?=
+ =?utf-8?B?dGhEV3RBVzU0MFFUQ0JhR3dWMnNuYUdJS3VHK0xnejlZMVVqUnBpUnpLWjQ0?=
+ =?utf-8?B?WUdoK21Fc3h0RmpOQjVRZmJYM3VZazhxbXYzZzh3ckt4bThuN04vSTdXVUVZ?=
+ =?utf-8?B?ME5HcEFucTRuSEVySTBQK2drMnFhbVIxYzVBdnUyNjJaQzNNRmR6UFczTWk1?=
+ =?utf-8?B?eUxrUERUb3ZTcEN5T1NyK0RBdmFKQTRsWFVGVVBtdEYxMEdSV2U5TDUzaEQ2?=
+ =?utf-8?B?T3BRT1NHVXo3eG9nUVhvZW1MOGdUMzdhUjNJcDZBUFFQT1ovWmFwQTh1K1Rn?=
+ =?utf-8?B?MVlEdWtSMldSM3BmNHJZVW93dHNDQjdCSEdoaE9mZUdRbUQ5UGNWU29WMkQz?=
+ =?utf-8?B?Q0dCdVdkVld3Yk5rc2p4SUFSSldEOXRjZzVOZDZIRE5KZ2NHTU1qRlp3anQy?=
+ =?utf-8?B?RVl3bTh2a2tCMVhEalRvNnFFTFhwSlM0VTgrUTgrSVIvVC9SZUsxY1Z2SXdr?=
+ =?utf-8?B?alk0VnNYbjlMeUVaSkgxaDJRVEtwRStKeGQ4SUEzY0U4V0NUenBNRmlwdDRZ?=
+ =?utf-8?Q?4d0DPWcPUBAnGOojG8+QMq6br0eZxz0T?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(7416014)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 05:16:52.8871
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 533d0476-1eba-4f4a-5659-08dcc332ccc3
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB73.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7591
 
 
-On 8/22/2024 6:57 AM, Simon Horman wrote:
-> Correct spelling in if_rmnet.h
-> As reported by codespell.
-> 
-> Cc: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
-> Cc: Sean Tranchetti <quic_stranche@quicinc.com>
-> Signed-off-by: Simon Horman <horms@kernel.org>
-> ---
->   include/linux/if_rmnet.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/if_rmnet.h b/include/linux/if_rmnet.h
-> index 839d1e48b85e..c44bf6e80ecb 100644
-> --- a/include/linux/if_rmnet.h
-> +++ b/include/linux/if_rmnet.h
-> @@ -42,7 +42,7 @@ struct rmnet_map_ul_csum_header {
->   
->   /* csum_info field:
->    *  OFFSET:	where (offset in bytes) to insert computed checksum
-> - *  UDP:	1 = UDP checksum (zero checkum means no checksum)
-> + *  UDP:	1 = UDP checksum (zero checksum means no checksum)
->    *  ENABLED:	1 = checksum computation requested
->    */
->   #define MAP_CSUM_UL_OFFSET_MASK		GENMASK(13, 0)
-> 
 
-Reviewed-by: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+On 8/23/2024 7:08 AM, Przemek Kitszel wrote:
+> 
+> On 8/22/24 19:08, Mohamed Khalfella wrote:
+>> On 2024-08-22 09:40:21 +0300, Moshe Shemesh wrote:
+>>>
+>>>
+>>> On 8/21/2024 1:27 AM, Mohamed Khalfella wrote:
+>>>>
+>>>> On 2024-08-20 12:09:37 +0200, Przemek Kitszel wrote:
+>>>>> On 8/19/24 23:42, Mohamed Khalfella wrote:
+> 
+> 
+>>>>
+>>>> Putting a cond_resched() every 16 register reads, similar to
+>>>> mlx5_vsc_wait_on_flag(), should be okay. With the numbers above, this
+>>>> will result in cond_resched() every ~0.56ms, which is okay IMO.
+>>>
+>>> Sorry for the late response, I just got back from vacation.
+>>> All your measures looks right.
+>>> crdump is the devlink health dump of mlx5 FW fatal health reporter.
+>>> In the common case since auto-dump and auto-recover are default for this
+>>> health reporter, the crdump will be collected on fatal error of the mlx5
+>>> device and the recovery flow waits for it and run right after crdump
+>>> finished.
+>>> I agree with adding cond_resched(), but I would reduce the frequency,
+>>> like once in 1024 iterations of register read.
+>>> mlx5_vsc_wait_on_flag() is a bit different case as the usleep there is
+>>> after 16 retries waiting for the value to change.
+>>> Thanks.
+>>
+>> Thanks for taking a look. Once in every 1024 iterations approximately
+>> translates to 35284.4ns * 1024 ~= 36.1ms, which is relatively long time
+>> IMO. How about any power-of-two <= 128 (~4.51ms)?
+
+OK
+> 
+> Such tune-up would matter for interactive use of the machine with very
+> little cores, is that the case? Otherwise I see no point [to make it
+> overall a little slower, as that is the tradeoff].
+
+Yes, as I see it, the point here is host with very few cores.
 
