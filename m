@@ -1,358 +1,205 @@
-Return-Path: <netdev+bounces-121327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9A5695CBCB
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 13:57:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C01895CC27
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:12:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A20F1F25015
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 11:57:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CE3C1F214CF
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 12:12:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF12187568;
-	Fri, 23 Aug 2024 11:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD1B16DEA7;
+	Fri, 23 Aug 2024 12:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hVJ6usbv"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="E21CgUwi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2074.outbound.protection.outlook.com [40.107.93.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25081186298;
-	Fri, 23 Aug 2024 11:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724414216; cv=none; b=mYEy9yTJQi5QUt4m8DA/kYOLuz273V3U4sEHIMRq5WsP1JCdOe3uXUf9fxcjoGj28ZsNOebW1GyHEazzZU9TEFmtLuBfQlVjuuZ4y6isCb5N4QkDikP0aH3RBLbJOkYEKdpgUpBDlMBaWMtBTumVu23Cd0jZZ+LjSbTu01/CS2I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724414216; c=relaxed/simple;
-	bh=WDg99TsPmFuwg03XPMsu7QBSjftuxiBjFonlSiKHfio=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vsf/J6le8sziJWIvukYLBLXzJtAEZ2ExZq8VdezifPjaBlwyLtHImjeZVs8kvZ3j7rseoOJ86p7SP4wMerwyhSmmbdMtBpIKKuVBaKzJNpP+wEnOMHZEbOTcqtTdkitghJo8KootLFV+p4B7g4abT0e41ib+TjmMzSz4ExX38+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hVJ6usbv; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-533496017f8so2525227e87.0;
-        Fri, 23 Aug 2024 04:56:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724414212; x=1725019012; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qgZV4tyks6GAMQWfK4L38P65yZL2kRRfBpNWa0hJOFY=;
-        b=hVJ6usbv6dwS3tim2cGVdsbins/D62Wnql4rsi+gEenYz4m/P093jRCNUF/Sz3ut4L
-         g5D0o2c3MVjOs5e2KIoX8naW/5EsxQiTvEa9359tcCviyw0+try80rcOvl3X8cIzyKGg
-         jHKN6oUkwNxbbKLyUfpmsl4Sg9HXhTyxqP2rFeCUdSd6eDa25hvdKSD4/Wss/DDPPyND
-         gZ6QyouRAXr4R9hbi+uQoaWC+t/Nbncp68YvhFOn8hhb5lz+vvTC4GPfk8JAEAAgy4WL
-         VE/Ob8r++f+bDpIvPN2nbjH7wtHNl7lTlwaDnUFi5aq8ak8SOLpffcXNES8IFZcnGkmB
-         bgVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724414212; x=1725019012;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qgZV4tyks6GAMQWfK4L38P65yZL2kRRfBpNWa0hJOFY=;
-        b=Q02R2hZoIUfjwC0+dlWdZbg/WvSWd9hresWAConu/ZfMVCg1RtSI/a1UyOjL6lCvU0
-         IWhgPwLX6YQy0IR+LBGXRW8kMuRO32kTCyVKSMWS2txNmOEf6+l817FxXNTRUxkREF5Y
-         6pC9eNyiUC6VDtGoDXC4pwMzF+uHiTSIzOzhZxI+qCrL/i/pPvFx+wKxr0ljVr+TDbmd
-         1FNBDK40ZCvRfES67t117rv+OhBSMpBijiWJFFZoMEcXA+P2/KZQa/RHQONXNziExtCr
-         YumLoa958WTxEFKSfNFsdCw5YlmA0d+aLEVCH05V8tbnhx5MLwvW3U8R/FMbYMExqKn2
-         +oVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUT1Exf8oNYp1hEFbW1HOxnbLL4ToaFr73JKgOc8yVOCg8ST6Ofa4LxR3QzKc0Yvxibk20ZTb2KNN0MNcA=@vger.kernel.org, AJvYcCVZ8u6JB1fjE7yrtL4VDe0Bj0YhGQtFJ4uUBYpf0vNSVHdZEbC4iFkK17NIwINJCv3Z+pANtT4U@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIUIiZhhnB7Xzi+G9MLIeejyEyvXHqqFOvDgEj1QPFx9C6yA18
-	cVHwql9rZQ5ukYWS5grWl4WqDWY0zUTEwv5FYXR9sKMkgOQdU21O
-X-Google-Smtp-Source: AGHT+IHdAqAk6DpZd9sGZOVHkcPaqutovShJdwo7b99VJ/xrWNo1e0HoCkmY7ZKsjoXcxQ0Oe8N1rg==
-X-Received: by 2002:a05:6512:ad1:b0:533:4b76:cb59 with SMTP id 2adb3069b0e04-53438869c7fmr1528825e87.57.1724414211306;
-        Fri, 23 Aug 2024 04:56:51 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5334ea5d8b8sm532166e87.216.2024.08.23.04.56.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 04:56:50 -0700 (PDT)
-Date: Fri, 23 Aug 2024 14:56:46 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller" <davem@davemloft.net>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, xfr@outlook.com
-Subject: Re: [PATCH net-next v6 1/7] net: stmmac: move stmmac_fpe_cfg to
- stmmac_priv data
-Message-ID: <ekzmq7y5is7em2zlsmf4bzne4z346dkyvynynmd45m7iqulamq@sle2yzzx7o4t>
-References: <cover.1724409007.git.0x1207@gmail.com>
- <8c6e74ee569d33ee5c7db78e3964c60001b3fb48.1724409007.git.0x1207@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC7561FFC
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 12:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724415134; cv=fail; b=CtS8/0XDS1aW2uY9aqw7yJvmpB06dWgCsuKpvmQSXdF+YKxIczvZl7LDVYwIfiA/d1m3QkB7kkDicNvNAX0uFREfxhexvdVrVc6arJfWBkoy0uqZiC/3cOiofwHr2PAYkt5tj2bwX7k59XsEMO2IKWT9A+gm/YtJA2OUuCpfiqU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724415134; c=relaxed/simple;
+	bh=shOXX59lM8YizFva0MjWE0eLze3mxrIH4PoCd3yrYF0=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=dT+GSWWkorTFihCrU49UU0KX4nUby9PO4M5gdDL6LTW+kOtCO6DuJEPl5VwPTAhB8rOocue3apH1f2EshIdkfclbZYfhaGGsmP/CJz1+wwWaOja2TN2xdec65d/O6/+JGcrZcammPvCV1qrQVLKEZy77o2oCo7pJA5txJkY6muU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=E21CgUwi; arc=fail smtp.client-ip=40.107.93.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eltNycIz2Ad8xybHKZvcOfEVtGQskdj8ieE7Wav49Gu/3PQVZ0ckxoUTcpVQeu8N13xLlRS7olGNL0SDMiYfp5py7LkGfK4rlASBCzdrk5pXqrzkT/c2waatXzMLolp6RaVDZ7JlERR+rFlsxZ7QqRqkcZHfms19797DD6hHkCqcPDSLxzCdOV9qN7XlgxSfiL/te4PEH7p8/XP1yAf7ngIoNh4Deue/6jaHo5D3sNxz1ulfsEvCb11NQv2Sax88jlD79GuMp2v7wEIhlwUpTcGrsFHrBrIxdWkpybs+JSVVog/YnnFtCM329bDhoVQIiKcbyfDCSYUwY6z1vFS4Tg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rWiK1koBhGz6RVm56/fsR6ptb6Ys1dqAxJxrhnpTzX0=;
+ b=UTCg0e7hJt8koYXEw0yciFryOb5iFPaJsQPXBWWrEkt8Uz6ZJP0iyLqRtNw8P7IGmI4bWzldIM7a6CpSODQJJ9eqs2840IyvU9UdSXbPtueJJ9atXA/GBkcnqJ9TUZ1E6DXGS9VQZa/CEullnF5y2jwivAcU9fM2DOu5/V8//bFOkwozOqKnPtYyYm/2d2Vh2toCyrh+Wem5qMW9J18JhkfRttAd9BkQi/o0QTvFr23jkhm/JjGV+Wb+C9pWkLFV3V2jePBZa3aO+nMIFmj50A8P4FGV1efXLTlgw4UOQeMUugPwGPwAPUitnMfc1odT5VPv5ZMV2y7c2CUg16phag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rWiK1koBhGz6RVm56/fsR6ptb6Ys1dqAxJxrhnpTzX0=;
+ b=E21CgUwiE/iaRJgirs4+x4wD0VmJ752qy2UUv9RZEfiioR97i4MA91YKzXnDj6iX53tNGSyUX0iSrHZats3HXrPPX4rL6ZfTwHRY7M7W0GnkaJsUpdQ4sg0K6+lad9JbJg64AeaxJINY0gg8QpbPjaN82QkSSiQYB1i/LrUQxGfLN9sJrwiQFVkwR0oi0Pl9orHP5n31T1ddcsEZiHN2UgGDbZRFWS16AWCUzxX9ZXs5o5NRDlTS6pM/kdndZjY2OaxCVm/lVZ+9i+NGSn7hsVsmLNU66aDM+0Trm9XVBjVTSj+m8knDVaJ+foL1qvY4IcXK0Cs/xzMqbTG3/uCdCA==
+Received: from BYAPR05CA0034.namprd05.prod.outlook.com (2603:10b6:a03:c0::47)
+ by SJ0PR12MB5611.namprd12.prod.outlook.com (2603:10b6:a03:426::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.16; Fri, 23 Aug
+ 2024 12:12:08 +0000
+Received: from CO1PEPF000075F1.namprd03.prod.outlook.com
+ (2603:10b6:a03:c0:cafe::ed) by BYAPR05CA0034.outlook.office365.com
+ (2603:10b6:a03:c0::47) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.13 via Frontend
+ Transport; Fri, 23 Aug 2024 12:12:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CO1PEPF000075F1.mail.protection.outlook.com (10.167.249.40) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7897.11 via Frontend Transport; Fri, 23 Aug 2024 12:12:08 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 23 Aug
+ 2024 05:11:56 -0700
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 23 Aug
+ 2024 05:11:54 -0700
+References: <20240822083718.140e9e65@kernel.org>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Petr Machata <petrm@nvidia.com>, Nikolay Aleksandrov
+	<razor@blackwall.org>, Hangbin Liu <liuhangbin@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [TEST] forwarding/router_bridge_lag.sh started to flake on Monday
+Date: Fri, 23 Aug 2024 13:28:11 +0200
+In-Reply-To: <20240822083718.140e9e65@kernel.org>
+Message-ID: <87a5h3l9q1.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8c6e74ee569d33ee5c7db78e3964c60001b3fb48.1724409007.git.0x1207@gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000075F1:EE_|SJ0PR12MB5611:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7ca2897b-08c9-4c3f-1a34-08dcc36ccf83
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?xlD6Gbh+u9g3NUr73nNg/exYAiFXhRV486txbBzKZz163IT5OHBOayIA4VGR?=
+ =?us-ascii?Q?PEMcYFaNvglrOfYQzQ1uhpFcPsMBTdeghhtYWBLDTjNlAm6ZagbBUp4Yycvt?=
+ =?us-ascii?Q?rS5BzeCRKOM8LxRbB/bwltCERUa04YQPiK/VY1ihqOX84yNEejkIvcmdDtkY?=
+ =?us-ascii?Q?yiM0zrCJaSWEAT6nTQDGgA43CpC09AO89JtiAENJqKzVxxZb/BAgZvVDFC6j?=
+ =?us-ascii?Q?YLT+mpltOUNiapku/PhN6NfhXHkjxYtXsF8mHNLMiZK8OGuUXnGXqKAQMO4D?=
+ =?us-ascii?Q?AQugJCnUiw0jH8TIlpysGvz0BTW5sg/JZqxFuwiEY5zndYxDLM8TdjNj83N2?=
+ =?us-ascii?Q?joc68GPGnE4GiBX8GMHeJr+WHvUWWxbamuwwIdRS34JoAReFHFZjkRJe9zr+?=
+ =?us-ascii?Q?NItpMn552rnXl/CH5pTnyRt6lJEontGLRkpvQktoFKm2RpcjnIBFSUfAU8Fw?=
+ =?us-ascii?Q?q+vi8caxr0rgAkd9SPCn0WO/4614ntTxKH4rJDzU73/JMU5RAc3TKy+I53B7?=
+ =?us-ascii?Q?5UvQu/tDPrf8zL/LrLDwaNwa8zbO5rFwyDZu8AaZRE0KQrg+UH6+Ph5ytA6k?=
+ =?us-ascii?Q?2sSRNUjZj5w890/IwHRWpSAqRy3nWf3ls5kkmGdvRtseNksQFodPVu+GhpG9?=
+ =?us-ascii?Q?RWPHfhJpYX9HZKGpc5pZ6MuHAOazuydUbxSpnFksdtR/ZSBcAU53jnklHXNZ?=
+ =?us-ascii?Q?6k1UgAyA+qsmx6L6KPx7DDnDoRpZ6Vo7aefTBg//eBcdHOaJ+7EIe17NzSCR?=
+ =?us-ascii?Q?d+07pf6If+zxHexrkPUuOpyJe7yHVxMIMx2nWQjSfNuMWR/O+bw4xSU+Nnc2?=
+ =?us-ascii?Q?KmyJKI7FpLGQEJkTRx+dqYHMnBDe7L8U/OmWJHFu7UuZDhL+3hqBofhoVfjQ?=
+ =?us-ascii?Q?biQ2A2CUrRcHda02RD5Qe/EcNKlLeKihQZZdNLK2HH35xQwW3I9x2Arog/Nc?=
+ =?us-ascii?Q?iJraLRVox1Jil60Re7QKl1FrSWJFT6eo60jvPXiISuNuTA+dyGGCBwxeFyfE?=
+ =?us-ascii?Q?vwtDImXLGyrx6GSvgHYTNAKYChTAu2tGnRfOLVi2fJKnFobuY3GboBnftm6a?=
+ =?us-ascii?Q?DvCNZMlgwj6nY9RqdHoWFYxeXnTkkNeK0zWWN8oCc5gR/sGrWegM17nP8wpS?=
+ =?us-ascii?Q?LoN9HavSzZOdi1SIOYu1426YOYMx2EVUGa46tshtnupb7Av1GwFQcONmFmbD?=
+ =?us-ascii?Q?KISB5gcPEhkFXvEdKSwvFxDZ31UQV+nmy/BWaPSom5oOqi4bh60BXe75ElVn?=
+ =?us-ascii?Q?JYc+4VsK7tfFKdOozWY/LXzTcSH9tKU3KxEd9/7qUJR7xvSHn2mogG6SacRI?=
+ =?us-ascii?Q?WelOlS2QcHcG9vT7boHuQQv5RQq948Cp3FfxhousbEeIlz8Fv31NrmXnqxWo?=
+ =?us-ascii?Q?J9aDyxcTmAIy2F2jYOd88J55z64m9PtfAxfeZRk7m4IbVGAWz3WRitEftjZq?=
+ =?us-ascii?Q?h1XxSxzbib6WoOmCqN38F5bM1thkjYF9?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 12:12:08.3566
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ca2897b-08c9-4c3f-1a34-08dcc36ccf83
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000075F1.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5611
 
-On Fri, Aug 23, 2024 at 06:50:08PM +0800, Furong Xu wrote:
-> By moving the fpe_cfg field to the stmmac_priv data, stmmac_fpe_cfg
-> becomes platform-data eventually, instead of a run-time config.
-> 
-> Suggested-by: Serge Semin <fancer.lancer@gmail.com>
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/hwif.h    |  2 ++
->  drivers/net/ethernet/stmicro/stmmac/stmmac.h  | 30 ++++++++++++++++++-
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 20 ++++++-------
->  .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 16 ++--------
->  include/linux/stmmac.h                        | 28 -----------------
->  5 files changed, 44 insertions(+), 52 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> index 7e90f34b8c88..d3da82982012 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
-> @@ -26,6 +26,8 @@
->  })
->  
 
->  struct stmmac_extra_stats;
-> +struct stmmac_fpe_cfg;
-> +enum   stmmac_mpacket_type;
->  struct stmmac_priv;
->  struct stmmac_safety_stats;
->  struct dma_desc;
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Not sure whether it's supposed to be alphabetically ordered, but using
-additional spaces to align the names seems an abnormal approach. I
-failed to find any similar sample in kernel. So seeing the driver
-doesn't implement the forward declarations as you suggest I'd convert
-this to just:
+> Looks like forwarding/router_bridge_lag.sh has gotten a lot more flaky
+> this week. It flaked very occasionally (and in a different way) before:
+>
+> https://netdev.bots.linux.dev/contest.html?executor=vmksft-forwarding&test=router-bridge-lag-sh&ld_cnt=250
+>
+> There doesn't seem to be any obvious commit that could have caused this.
 
- struct stmmac_extra_stats;
- struct stmmac_priv;
- struct stmmac_safety_stats;
-+struct stmmac_fpe_cfg;
-+enum stmmac_mpacket_type;
- struct dma_desc;
+Hmm:
+    # 3.37 [+0.11] Error: Device is up. Set it down before adding it as a team port.
 
-Other than that the patch looks good:
-Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+How are the tests isolated, are they each run in their own vng, or are
+instances shared? Could it be that the test that runs befor this one
+neglects to take a port down?
 
-Thanks
--Serge(y)
+In one failure case (I don't see further back or my browser would
+apparently catch fire) the predecessor was no_forwarding.sh, and indeed
+it looks like it raises the ports, but I don't see where it sets them
+back down.
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> index b23b920eedb1..458d6b16ce21 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
-> @@ -146,6 +146,33 @@ struct stmmac_channel {
->  	u32 index;
->  };
->  
-> +/* FPE link state */
-> +enum stmmac_fpe_state {
-> +	FPE_STATE_OFF = 0,
-> +	FPE_STATE_CAPABLE = 1,
-> +	FPE_STATE_ENTERING_ON = 2,
-> +	FPE_STATE_ON = 3,
-> +};
-> +
-> +/* FPE link-partner hand-shaking mPacket type */
-> +enum stmmac_mpacket_type {
-> +	MPACKET_VERIFY = 0,
-> +	MPACKET_RESPONSE = 1,
-> +};
-> +
-> +enum stmmac_fpe_task_state_t {
-> +	__FPE_REMOVING,
-> +	__FPE_TASK_SCHED,
-> +};
-> +
-> +struct stmmac_fpe_cfg {
-> +	bool enable;				/* FPE enable */
-> +	bool hs_enable;				/* FPE handshake enable */
-> +	enum stmmac_fpe_state lp_fpe_state;	/* Link Partner FPE state */
-> +	enum stmmac_fpe_state lo_fpe_state;	/* Local station FPE state */
-> +	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
-> +};
-> +
->  struct stmmac_tc_entry {
->  	bool in_use;
->  	bool in_hw;
-> @@ -339,11 +366,12 @@ struct stmmac_priv {
->  	struct workqueue_struct *wq;
->  	struct work_struct service_task;
->  
-> -	/* Workqueue for handling FPE hand-shaking */
-> +	/* Frame Preemption feature (FPE) */
->  	unsigned long fpe_task_state;
->  	struct workqueue_struct *fpe_wq;
->  	struct work_struct fpe_task;
->  	char wq_name[IFNAMSIZ + 4];
-> +	struct stmmac_fpe_cfg fpe_cfg;
->  
->  	/* TC Handling */
->  	unsigned int tc_entries_max;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index d9fca8d1227c..529fe31f8b04 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -968,7 +968,7 @@ static void stmmac_mac_config(struct phylink_config *config, unsigned int mode,
->  
->  static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
->  {
-> -	struct stmmac_fpe_cfg *fpe_cfg = priv->plat->fpe_cfg;
-> +	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
->  	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
->  	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
->  	bool *hs_enable = &fpe_cfg->hs_enable;
-> @@ -3536,7 +3536,7 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
->  	if (priv->dma_cap.fpesel) {
->  		stmmac_fpe_start_wq(priv);
->  
-> -		if (priv->plat->fpe_cfg->enable)
-> +		if (priv->fpe_cfg.enable)
->  			stmmac_fpe_handshake(priv, true);
->  	}
->  
-> @@ -5982,7 +5982,7 @@ static int stmmac_set_features(struct net_device *netdev,
->  
->  static void stmmac_fpe_event_status(struct stmmac_priv *priv, int status)
->  {
-> -	struct stmmac_fpe_cfg *fpe_cfg = priv->plat->fpe_cfg;
-> +	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
->  	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
->  	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
->  	bool *hs_enable = &fpe_cfg->hs_enable;
-> @@ -7381,7 +7381,7 @@ static void stmmac_fpe_lp_task(struct work_struct *work)
->  {
->  	struct stmmac_priv *priv = container_of(work, struct stmmac_priv,
->  						fpe_task);
-> -	struct stmmac_fpe_cfg *fpe_cfg = priv->plat->fpe_cfg;
-> +	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
->  	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
->  	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
->  	bool *hs_enable = &fpe_cfg->hs_enable;
-> @@ -7427,17 +7427,17 @@ static void stmmac_fpe_lp_task(struct work_struct *work)
->  
->  void stmmac_fpe_handshake(struct stmmac_priv *priv, bool enable)
->  {
-> -	if (priv->plat->fpe_cfg->hs_enable != enable) {
-> +	if (priv->fpe_cfg.hs_enable != enable) {
->  		if (enable) {
->  			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
-> -						priv->plat->fpe_cfg,
-> +						&priv->fpe_cfg,
->  						MPACKET_VERIFY);
->  		} else {
-> -			priv->plat->fpe_cfg->lo_fpe_state = FPE_STATE_OFF;
-> -			priv->plat->fpe_cfg->lp_fpe_state = FPE_STATE_OFF;
-> +			priv->fpe_cfg.lo_fpe_state = FPE_STATE_OFF;
-> +			priv->fpe_cfg.lp_fpe_state = FPE_STATE_OFF;
->  		}
->  
-> -		priv->plat->fpe_cfg->hs_enable = enable;
-> +		priv->fpe_cfg.hs_enable = enable;
->  	}
->  }
->  
-> @@ -7898,7 +7898,7 @@ int stmmac_suspend(struct device *dev)
->  	if (priv->dma_cap.fpesel) {
->  		/* Disable FPE */
->  		stmmac_fpe_configure(priv, priv->ioaddr,
-> -				     priv->plat->fpe_cfg,
-> +				     &priv->fpe_cfg,
->  				     priv->plat->tx_queues_to_use,
->  				     priv->plat->rx_queues_to_use, false);
->  
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-> index 996f2bcd07a2..9cc41ed01882 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
-> @@ -282,16 +282,6 @@ static int tc_init(struct stmmac_priv *priv)
->  	if (ret)
->  		return -ENOMEM;
->  
-> -	if (!priv->plat->fpe_cfg) {
-> -		priv->plat->fpe_cfg = devm_kzalloc(priv->device,
-> -						   sizeof(*priv->plat->fpe_cfg),
-> -						   GFP_KERNEL);
-> -		if (!priv->plat->fpe_cfg)
-> -			return -ENOMEM;
-> -	} else {
-> -		memset(priv->plat->fpe_cfg, 0, sizeof(*priv->plat->fpe_cfg));
-> -	}
-> -
->  	/* Fail silently as we can still use remaining features, e.g. CBS */
->  	if (!dma_cap->frpsel)
->  		return 0;
-> @@ -1076,7 +1066,7 @@ static int tc_taprio_configure(struct stmmac_priv *priv,
->  	/* Actual FPE register configuration will be done after FPE handshake
->  	 * is success.
->  	 */
-> -	priv->plat->fpe_cfg->enable = fpe;
-> +	priv->fpe_cfg.enable = fpe;
->  
->  	ret = stmmac_est_configure(priv, priv, priv->est,
->  				   priv->plat->clk_ptp_rate);
-> @@ -1109,9 +1099,9 @@ static int tc_taprio_configure(struct stmmac_priv *priv,
->  		mutex_unlock(&priv->est_lock);
->  	}
->  
-> -	priv->plat->fpe_cfg->enable = false;
-> +	priv->fpe_cfg.enable = false;
->  	stmmac_fpe_configure(priv, priv->ioaddr,
-> -			     priv->plat->fpe_cfg,
-> +			     &priv->fpe_cfg,
->  			     priv->plat->tx_queues_to_use,
->  			     priv->plat->rx_queues_to_use,
->  			     false);
-> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> index 338991c08f00..d79ff252cfdc 100644
-> --- a/include/linux/stmmac.h
-> +++ b/include/linux/stmmac.h
-> @@ -138,33 +138,6 @@ struct stmmac_txq_cfg {
->  	int tbs_en;
->  };
->  
-> -/* FPE link state */
-> -enum stmmac_fpe_state {
-> -	FPE_STATE_OFF = 0,
-> -	FPE_STATE_CAPABLE = 1,
-> -	FPE_STATE_ENTERING_ON = 2,
-> -	FPE_STATE_ON = 3,
-> -};
-> -
-> -/* FPE link-partner hand-shaking mPacket type */
-> -enum stmmac_mpacket_type {
-> -	MPACKET_VERIFY = 0,
-> -	MPACKET_RESPONSE = 1,
-> -};
-> -
-> -enum stmmac_fpe_task_state_t {
-> -	__FPE_REMOVING,
-> -	__FPE_TASK_SCHED,
-> -};
-> -
-> -struct stmmac_fpe_cfg {
-> -	bool enable;				/* FPE enable */
-> -	bool hs_enable;				/* FPE handshake enable */
-> -	enum stmmac_fpe_state lp_fpe_state;	/* Link Partner FPE state */
-> -	enum stmmac_fpe_state lo_fpe_state;	/* Local station FPE state */
-> -	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
-> -};
-> -
->  struct stmmac_safety_feature_cfg {
->  	u32 tsoee;
->  	u32 mrxpee;
-> @@ -232,7 +205,6 @@ struct plat_stmmacenet_data {
->  	struct fwnode_handle *port_node;
->  	struct device_node *mdio_node;
->  	struct stmmac_dma_cfg *dma_cfg;
-> -	struct stmmac_fpe_cfg *fpe_cfg;
->  	struct stmmac_safety_feature_cfg *safety_feat_cfg;
->  	int clk_csr;
->  	int has_gmac;
-> -- 
-> 2.34.1
-> 
+Then router-bridge-lag's cleanup downs the ports, and on rerun it
+succeeds. The issue would be probabilistic, because no_forwarding does
+not always run before this test, and some tests do not care that the
+ports are up. If that's the root cause, this should fix it:
+
+From 0baf91dc24b95ae0cadfdf5db05b74888e6a228a Mon Sep 17 00:00:00 2001
+Message-ID: <0baf91dc24b95ae0cadfdf5db05b74888e6a228a.1724413545.git.petrm@nvidia.com>
+From: Petr Machata <petrm@nvidia.com>
+Date: Fri, 23 Aug 2024 14:42:48 +0300
+Subject: [PATCH net-next mlxsw] selftests: forwarding: no_forwarding: Down
+ ports on cleanup
+To: <nbu-linux-internal@nvidia.com>
+
+This test neglects to put ports down on cleanup. Fix it.
+
+Fixes: 476a4f05d9b8 ("selftests: forwarding: add a no_forwarding.sh test")
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+---
+ tools/testing/selftests/net/forwarding/no_forwarding.sh | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tools/testing/selftests/net/forwarding/no_forwarding.sh b/tools/testing/selftests/net/forwarding/no_forwarding.sh
+index af3b398d13f0..9e677aa64a06 100755
+--- a/tools/testing/selftests/net/forwarding/no_forwarding.sh
++++ b/tools/testing/selftests/net/forwarding/no_forwarding.sh
+@@ -233,6 +233,9 @@ cleanup()
+ {
+ 	pre_cleanup
+ 
++	ip link set dev $swp2 down
++	ip link set dev $swp1 down
++
+ 	h2_destroy
+ 	h1_destroy
+ 
+-- 
+2.45.0
 
