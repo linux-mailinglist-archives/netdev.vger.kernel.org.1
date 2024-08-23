@@ -1,246 +1,207 @@
-Return-Path: <netdev+bounces-121532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA69795D8A2
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 23:45:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 572BB95D8FB
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 00:05:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78B4AB216ED
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 21:45:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78BA31C217C4
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 22:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88410191493;
-	Fri, 23 Aug 2024 21:45:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AAB71C870A;
+	Fri, 23 Aug 2024 22:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="hAq6NSUF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lgzenTY5"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-ztdg10012101.me.com (pv50p00im-ztdg10012101.me.com [17.58.6.49])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192EF383BF
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 21:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E568B1925A9;
+	Fri, 23 Aug 2024 22:05:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724449551; cv=none; b=cNw5ngvtfjRCdF6irr2Gbkd3wKW6aVnw6/ulM1anr0oT73GwfYxpTyFn8ZRRNt/AWvKf4x4rDuic5Up6iKsmxMLQOJl4zhKqyQ3sTIIVEJYmLwSkVtQqGtcR+22rCd1vIaZzDNolGXhbSJ3f7ZGiodT8Hw0U3zFYc6etqh3ReNs=
+	t=1724450719; cv=none; b=G8tUdn2YzNIdunywRuf/Fx1I8VMDJiDsOKAAk3VAlv6RfC57f1jFjTzRHhGhNPZUCWRCNatz5n4wMUJAV6CfxVpx41csiiepWl5iJWdvZlqyqLCgKWBFB9tMRmBceiFR8uafMPlg3cpxlI3rgZ+HYXyHDmxonVGvMAPoiXiVGJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724449551; c=relaxed/simple;
-	bh=E2PfdCUWQrf2uDP/LGPSZ+Tax04937a7xG2LwQ2/Qt4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lb7ClVC3dAQi61JEmpNYVNZsSg0C2du0QIwFknieBtoW6AYkArmG0O5Bm2ZuwIeCayJqnjAfvtgzRnZiSnFHhRAds1Dkchb/tQzm5D7H3JyBPOjU4CFScRUrdX1SopKJyt9E64RdqTM7MbprnfXQANTucMG34Oe1T1pPsGVB+50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=hAq6NSUF; arc=none smtp.client-ip=17.58.6.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1724449549;
-	bh=DZT9D0YL+MfAjwfIKWBNhTFYdAQCL09UUBbtbCTuoh4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	b=hAq6NSUF5jOF4WXIIC1s1EIKI8wgKLkEYvh7umYCdZ/XRzo2b93E8q86oKqzvF5sd
-	 DQTNxPNHnAbmLfzk33IzhGgrapIqe/fZjn0fh/LRiD2Vg/Ff5v5VzRQdGy4hI59INn
-	 MP3iXSL56f+96Bv48hP+RoLtHyAnJH2r/7ELdZZnXBTbsE/nmq+Rqo2+nbxLD8+Uxt
-	 gJru1GCaaJMa5gyvk7XU7whC58FvNzd0muIIvzLWgQ+XQnMAyY7SbEINgtlus22GVa
-	 MtD4sCegmgH8Tp1bdEcOVo/onBiL8mCt79modaONriIr9mslBbj2EQ/X2jhci5mY8d
-	 UnB5qkME5FEhQ==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10012101.me.com (Postfix) with ESMTPSA id CE61B740123;
-	Fri, 23 Aug 2024 21:45:42 +0000 (UTC)
-Message-ID: <dcddaabd-8a8a-4ccc-ba38-02088a4134a4@icloud.com>
-Date: Sat, 24 Aug 2024 05:45:39 +0800
+	s=arc-20240116; t=1724450719; c=relaxed/simple;
+	bh=00/hRY2St6smjH+qPVtGASwckV3jdDCNNYiKkVoISUk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ewSxwxE+olYaTTQN8l6d+QvIkMXsuWXIBjA1UdpdLJYkUwF03j8LbNVMrT5UFS/IXN0vIDlpR/qrWO5Gf76bKpCtiOiCll+OBT0UmeHLsrJjrxmdZ/OY0z9cAcGXByfIv6VCFSRm0GMRWjqQG/3xfv5P3fVqLZsjrjRQD5SJ6QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lgzenTY5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7CBB4C32786;
+	Fri, 23 Aug 2024 22:05:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724450718;
+	bh=00/hRY2St6smjH+qPVtGASwckV3jdDCNNYiKkVoISUk=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=lgzenTY5Du/X1qW5MrIiT4w3AtGh+a/ACeaT5ClSAthaAoxdd8EgfsGvmrwLiYq3x
+	 wgaX8RVG0908drMVMNextDq999fiEF3nhiAM2pL5FcJ9KU3UrFsSeV/JOawYqOY3M5
+	 4EYw3QS61g0VBjlTPyFY/7MxbhvaFM8XEuAI+aZOyxLR7B0sVcvcYhFTzHzVF04XMY
+	 0Y3RlNWs8Lkl+gHdwFCNApuPUcKXpRyqkoXRw+mj3jiMYiIxEGCK6wXMb59akcleLZ
+	 69O7Wt/0P6oIzxTWED1laQYx0JjuP+D6b4ArofFEqgmvR1Q4s4nlU+tES0NiXTpvk4
+	 xymKEk+RejlMA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C3F5C5321E;
+	Fri, 23 Aug 2024 22:05:18 +0000 (UTC)
+From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Subject: [PATCH net-next v4 0/8] net/selftests: TCP-AO selftests updates
+Date: Fri, 23 Aug 2024 23:04:50 +0100
+Message-Id: <20240823-tcp-ao-selftests-upd-6-12-v4-0-05623636fe8c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] driver core: Make parameter check consistent for
- API cluster device_(for_each|find)_child()
-To: Ira Weiny <ira.weiny@intel.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Davidlohr Bueso
- <dave@stgolabs.net>, Jonathan Cameron <jonathan.cameron@huawei.com>,
- Dave Jiang <dave.jiang@intel.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Takashi Sakamoto <o-takashi@sakamocchi.jp>, Timur Tabi <timur@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org,
- Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20240815-const_dfc_prepare-v2-0-8316b87b8ff9@quicinc.com>
- <20240815-const_dfc_prepare-v2-1-8316b87b8ff9@quicinc.com>
- <66c491c32091d_2ddc24294e8@iweiny-mobl.notmuch>
- <2b9fc661-e061-4699-861b-39af8bf84359@icloud.com>
- <66c4a4e15302b_2f02452943@iweiny-mobl.notmuch>
- <e30eac3b-4244-460d-ab0b-baaa659999fe@icloud.com>
- <66c8c4a0633e9_a87cd294f6@iweiny-mobl.notmuch>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <66c8c4a0633e9_a87cd294f6@iweiny-mobl.notmuch>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: f32q2jKvmmVMqFEqfpaAeRCwDZQtvNnD
-X-Proofpoint-GUID: f32q2jKvmmVMqFEqfpaAeRCwDZQtvNnD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-23_16,2024-08-23_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 malwarescore=0
- adultscore=0 suspectscore=0 spamscore=0 mlxlogscore=999 phishscore=0
- mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2408230162
+X-B4-Tracking: v=1; b=H4sIAIIHyWYC/43Oy27CMBAF0F9BXjNgj50HXfU/UBd+jIklcCLbR
+ FQo/46JVBV1gbocXd1z584ypUCZfWzuLNEcchhjPdR2w+yg44kguHoz5Kh4JzkUO4EeIdPZF8o
+ lw3Vy0IJAUE5SI3WnvPSs9qdEPtxW+8giFYh0K+yrJkZnApN0tMPT/sn2Fx3iszmEXMb0vT41i
+ 7X/j/1ZAAfvnTJeNK6V/eepguedHS/r6oy/Us/xnYRVkh23h4NsetGKv5J8kUTzTpJV6oxDQjS
+ mF/ZVWpblARSPz9iAAQAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Dmitry Safonov <0x7f454c46@gmail.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1724450716; l=6128;
+ i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
+ bh=00/hRY2St6smjH+qPVtGASwckV3jdDCNNYiKkVoISUk=;
+ b=LLdsbvwe7QMcV2qL4+slz/DajRlCb/NNbHH5+us/V6Hsf+ppwqS7RmHLVH++3C01rlMXNshLm
+ 6NQYPo+IfQuBHCSn4LW0MzS/rs7ulah/k3CzPoFEk9OJ2GS8xlzRbfK
+X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
+ pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
+X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
+ auth_id=152
+X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
+Reply-To: 0x7f454c46@gmail.com
 
-On 2024/8/24 01:19, Ira Weiny wrote:
-> Zijun Hu wrote:
->> On 2024/8/20 22:14, Ira Weiny wrote:
->>> Zijun Hu wrote:
->>>> On 2024/8/20 20:53, Ira Weiny wrote:
->>>>> Zijun Hu wrote:
->>>>>> From: Zijun Hu <quic_zijuhu@quicinc.com>
->>>>>>
->>>>>> The following API cluster takes the same type parameter list, but do not
->>>>>> have consistent parameter check as shown below.
->>>>>>
->>>>>> device_for_each_child(struct device *parent, ...)  // check (!parent->p)
->>>>>> device_for_each_child_reverse(struct device *parent, ...) // same as above
->>>>>> device_find_child(struct device *parent, ...)      // check (!parent)
->>>>>>
->>>>>
->>>>> Seems reasonable.
->>>>>
->>>>> What about device_find_child_by_name()?
->>>>>
->>>>
->>>> Plan to simplify this API implementation by * atomic * API
->>>> device_find_child() as following:
->>>>
->>>> https://lore.kernel.org/all/20240811-simply_api_dfcbn-v2-1-d0398acdc366@quicinc.com
->>>> struct device *device_find_child_by_name(struct device *parent,
->>>>  					 const char *name)
->>>> {
->>>> 	return device_find_child(parent, name, device_match_name);
->>>> }
->>>
->>> Ok.  Thanks.
->>>
->>>>
->>>>>> Fixed by using consistent check (!parent || !parent->p) for the cluster.
->>>>>>
->>>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->>>>>> ---
->>>>>>  drivers/base/core.c | 6 +++---
->>>>>>  1 file changed, 3 insertions(+), 3 deletions(-)
->>>>>>
->>>>>> diff --git a/drivers/base/core.c b/drivers/base/core.c
->>>>>> index 1688e76cb64b..b1dd8c5590dc 100644
->>>>>> --- a/drivers/base/core.c
->>>>>> +++ b/drivers/base/core.c
->>>>>> @@ -4004,7 +4004,7 @@ int device_for_each_child(struct device *parent, void *data,
->>>>>>  	struct device *child;
->>>>>>  	int error = 0;
->>>>>>  
->>>>>> -	if (!parent->p)
->>>>>> +	if (!parent || !parent->p)
->>>>>>  		return 0;
->>>>>>  
->>>>>>  	klist_iter_init(&parent->p->klist_children, &i);
->>>>>> @@ -4034,7 +4034,7 @@ int device_for_each_child_reverse(struct device *parent, void *data,
->>>>>>  	struct device *child;
->>>>>>  	int error = 0;
->>>>>>  
->>>>>> -	if (!parent->p)
->>>>>> +	if (!parent || !parent->p)
->>>>>>  		return 0;
->>>>>>  
->>>>>>  	klist_iter_init(&parent->p->klist_children, &i);
->>>>>> @@ -4068,7 +4068,7 @@ struct device *device_find_child(struct device *parent, void *data,
->>>>>>  	struct klist_iter i;
->>>>>>  	struct device *child;
->>>>>>  
->>>>>> -	if (!parent)
->>>>>> +	if (!parent || !parent->p)
->>>>>
->>>>> Perhaps this was just a typo which should have been.
->>>>>
->>>>> 	if (!parent->p)
->>>>> ?
->>>>>
->>>> maybe, but the following device_find_child_by_name() also use (!parent).
->>>>
->>>>> I think there is an expectation that none of these are called with a NULL
->>>>> parent.
->>>>>
->>>>
->>>> this patch aim is to make these atomic APIs have consistent checks as
->>>> far as possible, that will make other patches within this series more
->>>> acceptable.
->>>>
->>>> i combine two checks to (!parent || !parent->p) since i did not know
->>>> which is better.
->>>
->>> I'm not entirely clear either.  But checking the member p makes more sense
->>> to me than the parent parameter.  I would expect that iterating the
->>> children of a device must be done only when the parent device is not NULL.
->>>
->>> parent->p is more subtle.  I'm unclear why the API would need to allow
->>> that to run without error.
->>>
->> i prefer (!parent || !parent->p) with below reasons:
->>
->> 1)
->> original API authors have such concern that either (!parent) or
->> (!parent->p) maybe happen since they are checked, all their concerns
->> can be covered by (!parent || !parent->p).
->>
->> 2)
->> It is the more robust than either (!parent) or (!parent->p)
->>
->> 3)
->> it also does not have any negative effect.
-> 
-> It adds code and instructions to all paths calling these functions.
-> 
-such slight impacts can be ignored if a machine run linux OS.
+First 3 patches are more-or-less cleanups/preparations.
 
-right?
+Patches 4/5 are fixes for netns file descriptors leaks/open.
 
-> What is the reason to allow?
-> 
-1)
-it allow to use device_for_each_child() without misgiving.
+Patch 6 was sent to me/contributed off-list by Mohammad, who wants 32-bit
+kernels to run TCP-AO.
 
-2)
-there are many many existing APIs which have similar checks such as
-get_device(), kfree()...
+Patch 7 is a workaround/fix for slow VMs. Albeit, I can't reproduce
+the issue, but I hope it will fix netdev flakes for connect-deny-*
+tests.
 
-> void foo() {
-> ...
-> 	device_for_each_child(NULL, ...);
-> ...
-> }
-> 
-> What are we finding the child of in that case?
->
-similar usage as device_find_child(NULL, ...) which have check (!parent).
+And the biggest change is adding TCP-AO tracepoints to selftests.
+I think it's a good addition by the following reasons:
+- The related tracepoints are now tested;
+- It allows tcp-ao selftests to raise expectations on the kernel
+  behavior - up from the syscalls exit statuses + net counters.
+- Provides tracepoints usage samples.
 
-both device_for_each_child() and device_find_child() iterates over its
-child.
+As tracepoints are not a stable ABI, any kernel changes done to them
+will be reflected to the selftests, which also will allow users
+to see how to change their code. It's quite better than parsing dmesg
+(what BGP was doing pre-tracepoints, ugh).
 
-original author's concern (!parent->p) for device_for_each_child() is
-applicable for the other.
+Somewhat arguably, the code parses trace_pipe, rather than uses
+libtraceevent (which any sane user should do). The reason behind that is
+the same as for rt-netlink macros instead of libmnl: I'm trying
+to minimize the library dependencies of the selftests. And the
+performance of formatting text in kernel and parsing it again in a test
+is not critical.
 
-original author's concern (!parent) for device_find_child() is
-applicable for the other as well.
+Current output sample:
+> ok 73 Trace events matched expectations: 13 tcp_hash_md5_required[2] tcp_hash_md5_unexpected[4] tcp_hash_ao_required[3] tcp_ao_key_not_found[4]
 
-so i use (!parent || !parent->p).
+Previously, tracepoints selftests were part of kernel tcp tracepoints
+submission [1], but since then the code was quite changed:
+- Now generic tracing setup is in lib/ftrace.c, separate from
+  lib/ftrace-tcp.c which utilizes TCP trace points. This separation
+  allows future selftests to trace non-TCP events, i.e. to find out
+  an skb's drop reason, which was useful in the creation of TCP-CLOSE
+  stress-test (not in this patch set, but used in attempt to reproduce
+  the issue from [2]).
+- Another change is that in the previous submission the trace events
+  where used only to detect unexpected TCP-AO/TCP-MD5 events. In this
+  version the selftests will fail if an expected trace event didn't
+  appear.
+  Let's see how reliable this is on the netdev bot - it obviously passes
+  on my testing, but potentially may require a temporary XFAIL patch
+  if it misbehaves on a slow VM.
 
-> Ira
-> 
->>
->>> Ira
->>
-> 
-> 
+[1] https://lore.kernel.org/lkml/20240224-tcp-ao-tracepoints-v1-0-15f31b7f30a7@arista.com/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=33700a0c9b56
+
+Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
+---
+In v4 mostly worked on non-appearing events on netdev test VM.
+- Set up x86 VM with the config from netdev & run stress-ng didn't
+  reproduce the isssue.
+- Spread more error messages if tracing pthread fails to start
+- Added conditional wait for tracer thread, just before destruction, in
+  case it didn't had a time slice to run and parse trace events.
+- Addressed some of checkpatch.pl --strict warnings (with
+  nits from Simon Horman)
+- Link to v3: https://lore.kernel.org/r/20240815-tcp-ao-selftests-upd-6-12-v3-0-7bd2e22bb81c@gmail.com
+
+Changes in v3:
+- Corrected the selftests printing of tcp header flags, parsed from
+  trace points
+- Fixed an issue with VRF kconfig checks (and tests)
+- Made check for unexpected trace events XFAIL, yet looking into the
+  reason behind the fail
+- Link to v2: https://lore.kernel.org/r/20240802-tcp-ao-selftests-upd-6-12-v2-0-370c99358161@gmail.com
+
+Changes in v2:
+- Fixed two issues with parsing TCP-AO events: the socket state and TCP
+  segment flags. Hopefully, won't fail on netdev.
+- Reword patch 1 & 2 messages to be more informative and at some degree
+  formal (Paolo)
+- Since commit e33a02ed6a4f ("selftests: Add printf attribute to
+  kselftest prints") it's possible to use __printf instead of "raw" gcc
+  attribute - switch using that, as checkpatch suggests.
+- Link to v1: https://lore.kernel.org/r/20240730-tcp-ao-selftests-upd-6-12-v1-0-ffd4bf15d638@gmail.com
+
+---
+Dmitry Safonov (7):
+      selftests/net: Clean-up double assignment
+      selftests/net: Provide test_snprintf() helper
+      selftests/net: Be consistent in kconfig checks
+      selftests/net: Open /proc/thread-self in open_netns()
+      selftests/net: Don't forget to close nsfd after switch_save_ns()
+      selftests/net: Synchronize client/server before counters checks
+      selftests/net: Add trace events matching to tcp_ao
+
+Mohammad Nassiri (1):
+      selftests/tcp_ao: Fix printing format for uint64_t
+
+ tools/testing/selftests/net/tcp_ao/Makefile        |   3 +-
+ tools/testing/selftests/net/tcp_ao/bench-lookups.c |   2 +-
+ tools/testing/selftests/net/tcp_ao/config          |   1 +
+ tools/testing/selftests/net/tcp_ao/connect-deny.c  |  25 +-
+ tools/testing/selftests/net/tcp_ao/connect.c       |   6 +-
+ tools/testing/selftests/net/tcp_ao/icmps-discard.c |   2 +-
+ .../testing/selftests/net/tcp_ao/key-management.c  |  18 +-
+ tools/testing/selftests/net/tcp_ao/lib/aolib.h     | 178 ++++++-
+ .../testing/selftests/net/tcp_ao/lib/ftrace-tcp.c  | 559 +++++++++++++++++++++
+ tools/testing/selftests/net/tcp_ao/lib/ftrace.c    | 543 ++++++++++++++++++++
+ tools/testing/selftests/net/tcp_ao/lib/kconfig.c   |  31 +-
+ tools/testing/selftests/net/tcp_ao/lib/setup.c     |  17 +-
+ tools/testing/selftests/net/tcp_ao/lib/sock.c      |   1 -
+ tools/testing/selftests/net/tcp_ao/lib/utils.c     |  26 +
+ tools/testing/selftests/net/tcp_ao/restore.c       |  30 +-
+ tools/testing/selftests/net/tcp_ao/rst.c           |   2 +-
+ tools/testing/selftests/net/tcp_ao/self-connect.c  |  19 +-
+ tools/testing/selftests/net/tcp_ao/seq-ext.c       |  28 +-
+ .../selftests/net/tcp_ao/setsockopt-closed.c       |   6 +-
+ tools/testing/selftests/net/tcp_ao/unsigned-md5.c  |  35 +-
+ 20 files changed, 1465 insertions(+), 67 deletions(-)
+---
+base-commit: f9db28bb09f46087580f2a8da54bb0aab59a8024
+change-id: 20240730-tcp-ao-selftests-upd-6-12-4d3e53a74f3f
+
+Best regards,
+-- 
+Dmitry Safonov <0x7f454c46@gmail.com>
+
 
 
