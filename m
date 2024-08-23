@@ -1,159 +1,122 @@
-Return-Path: <netdev+bounces-121362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8940E95CE62
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 15:50:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B25995CE8E
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:00:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14966B264EA
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 13:50:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C6691C21562
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440D21885B4;
-	Fri, 23 Aug 2024 13:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33F21865F3;
+	Fri, 23 Aug 2024 14:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="UHQYuAzz"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OSAR5ClH"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E29188599;
-	Fri, 23 Aug 2024 13:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57B4B1E517
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 14:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724421006; cv=none; b=u5244Lq2e25LOS80yuOCHapY4Y6tTI8OImbJ/Hv1fLHAukmvEBMWEhFiUae51yYNzPAXKnrdEKKYfAW6go89i81vqblLakMfHW9asY/N5wpSSbpOO/lXQAyvBU2Oe/MZNgjMH+3naKAHFKF02CRemExVWc3JrreFMX6h4jllzSk=
+	t=1724421625; cv=none; b=iTJMH/JeRnXoRnzBVssj612ZhqyLz/8BdMo58E4sKSxB8JkqQeBT47w44piV9I/j45BUOoaXOYmhc4lirZJDngxSZovILjb80Qo9csCZ+D1Q334ZoFrkD0dVKiLYafVfgZDXT0wXqEcRcmonpzW6eoI4KKuOMfKOuNhnJOMWgvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724421006; c=relaxed/simple;
-	bh=5GiXg5grCKH9UPEePNehPEjM6L22MBcJ1OYY6wZfU0M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=fT9fR0soz4G4ZniTkVClAnk8Bfn4epPC40cHZICSAYnxrnPjB9o/e/p8OrlWWFljC8v7WBQSYhQT22MvjlzBXMnIPH20qaZNZMdngQK8fmlgzC8u7AYD3Mi+zIahz8s2kRh6kkTqw0mYvTrfnts7r7xgFxhh669BvCDa8u6ZL+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=UHQYuAzz; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=a11LqUG0kCMn8QJAx5ciVGhtCbw78YNzvmbklFMT4gY=; b=UHQYuAzz35IHjhxifroeb5jgMZ
-	vs3twGsitlTHT9LfAP4B46FZ3Ho345LcTcBHGylJZpea51LRuFc1rcfQBjatJpcKDEmyPXKsWUzc0
-	XJgk7OyIy2RgQPRyzAZ9InaO4Ew8mrzmIkKD6zRiLNtvQ1Ox6kRpHrQb1Knk1jVN7q6J0EzL1dHAP
-	dCpstnz+nIc3S3IK8P01GXEpwaaXAqvedpjl7HdCaBmUnoa99tkuqHPGwIg9MJnRwfZDAT5wDGP7b
-	DJedIPgeHiJVlHtQ93Ixewj3CfdZnf7ljseoLYz7br4wLZCIHb8kvBusU6EdoXdnxUWTZExwQSWHB
-	kVSg106w==;
-Received: from 23.248.197.178.dynamic.cust.swisscom.net ([178.197.248.23] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1shUfw-000AAK-7p; Fri, 23 Aug 2024 15:50:00 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2024-08-23
-Date: Fri, 23 Aug 2024 15:49:59 +0200
-Message-Id: <20240823134959.1091-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	s=arc-20240116; t=1724421625; c=relaxed/simple;
+	bh=KoTo7tkDVCGK4Lb5h4r+KBhDY4OEBLVB8Xe/013JH+I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=W1+67N8Els6nOmTlramJYGy1bR3PbvG6BpVX/WTj5EjVJq+/obWXdtC1nQx5J6ipxbEdgYcnqK6xtz9CdysNgk7znCs67licio9N1UDOsxfLElV6IizZoSbVL+A3OUfqhlFcoRYaN7jshIkS8O9EafcD/MSLUoOlfZQRfKQ7ORk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OSAR5ClH; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e1653c8a32eso3256328276.3
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 07:00:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724421623; x=1725026423; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=k7/Qg5edfLxz2T+fJDvO1cG2rX0jtJRneQUPIq7Lxd8=;
+        b=OSAR5ClHJ06ct8Y/bjRVfDmgcwRtBuvws0lgoj5MSzdCHzH7CDea+UD1DUU+r3K7BG
+         rHDMHOCFJBrOhXHWqmnkC9+j7aMau44Pnj4zibhR8m1qZBmM3qJlgy7gNXl6p+UJAaU6
+         PMD5aB62yBk/tjWiNpNberrRSIlPdNgIv8VSrcXds4EuxRJgw5SWamKIKG6Zoic4t1KW
+         y94EkBD9uOhg1ZwXQxf2154GGtUEBV2AcZx55Au8vUCdccyEOD06VzlbtqN2cnbKyIMr
+         Tfng0OuKSnXclY7PqO1eUM3zxSnrfkg+5juF4xLg+011f2yVemMazAxpO6Sc+UiXmthZ
+         uKaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724421623; x=1725026423;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k7/Qg5edfLxz2T+fJDvO1cG2rX0jtJRneQUPIq7Lxd8=;
+        b=PBllWD76PgHbgMjxFoSkLJMjEx0NTJ/qy6pFm/7zJ8wvvGN9PO6iX06S6prQrPfWxL
+         F4Rd6HtrO9j8OUuxPbhzpIU0UU4o+rBBNYeB31+OAm1rIJ/1pP+ka4fGlC1/VPRNbbW8
+         aIqDpbPE6PGhm+8TB5+o70WzcW2+qW2hw5pDvulo/7H6O84JDJc35JXnhPrV+K0i/h4E
+         4C5tactCBmHLYWXJdzZwlflSt7TN//OyhJ1VqdWla3cO1DPH42OcBxuHuxFDwKAX0sCw
+         a7fn2Tt8JysZAjeAN+Oxxk2PVYuu35JqSMwNLM4P6xq3cT64cckLGFOWkb55+/SxcsQ4
+         fywA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWMcxJdqyZRRHMceAiOk6albPfGDllndZu2Nc9gir/ECLYwij/tImTKjLVXjl1Pe7cwk1XaJc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+QUYpWqapkZf4xHe/OLpcHg4wJ0Fb7fv9t62NxsZ07PXqd54V
+	lqO5mKlk/py1Jcbva7qYPiwUElBSkkiI/ERPxSi4iueHbpGYX5OhNL5+fzk6yiOhzQuHjGYdTCq
+	2f+AGpZ9xcg==
+X-Google-Smtp-Source: AGHT+IGiVFrf/80vOTqKwNHGIXhunqTT8nXPu6IKs+3zmI8XZ4xK0S+Nuqc97yBZrXBXmy4sfSNmPdLPlT3OcQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:86cd:0:b0:e0b:ab63:b9c8 with SMTP id
+ 3f1490d57ef6-e17a865a104mr3929276.11.1724421623047; Fri, 23 Aug 2024 07:00:23
+ -0700 (PDT)
+Date: Fri, 23 Aug 2024 14:00:19 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27376/Fri Aug 23 10:47:45 2024)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
+Message-ID: <20240823140019.3727643-1-edumazet@google.com>
+Subject: [PATCH net] ipv6: avoid indirect calls for SOL_IP socket options
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+ipv6_setsockopt() can directly call ip_setsockopt()
+instead of going through udp_prot.setsockopt()
 
-The following pull-request contains BPF updates for your *net-next* tree.
+ipv6_getsockopt() can directly call ip_getsockopt()
+instead of going through udp_prot.getsockopt()
 
-We've added 10 non-merge commits during the last 15 day(s) which contain
-a total of 10 files changed, 222 insertions(+), 190 deletions(-).
+These indirections predate git history, not sure why they
+were there.
 
-The main changes are:
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv6/ipv6_sockglue.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-1) Add TCP_BPF_SOCK_OPS_CB_FLAGS to bpf_*sockopt() to address the case when
-   long-lived sockets miss a chance to set additional callbacks if a sockops
-   program was not attached early in their lifetime, from Alan Maguire.
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index cd342d5015c6fb36bd03d4f3fcae4a3995ff6097..1e225e6489ea150c641ed0757083591def08dfc1 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -985,7 +985,7 @@ int ipv6_setsockopt(struct sock *sk, int level, int optname, sockptr_t optval,
+ 	int err;
+ 
+ 	if (level == SOL_IP && sk->sk_type != SOCK_RAW)
+-		return udp_prot.setsockopt(sk, level, optname, optval, optlen);
++		return ip_setsockopt(sk, level, optname, optval, optlen);
+ 
+ 	if (level != SOL_IPV6)
+ 		return -ENOPROTOOPT;
+@@ -1475,7 +1475,7 @@ int ipv6_getsockopt(struct sock *sk, int level, int optname,
+ 	int err;
+ 
+ 	if (level == SOL_IP && sk->sk_type != SOCK_RAW)
+-		return udp_prot.getsockopt(sk, level, optname, optval, optlen);
++		return ip_getsockopt(sk, level, optname, optval, optlen);
+ 
+ 	if (level != SOL_IPV6)
+ 		return -ENOPROTOOPT;
+-- 
+2.46.0.295.g3b9ea8a38a-goog
 
-2) Add a batch of BPF selftest improvements which fix a few bugs and add missing
-   features to improve the test coverage of sockmap/sockhash, from Michal Luczaj.
-
-3) Fix a false-positive Smatch-reported off-by-one in tcp_validate_cookie() which
-   is part of the test_tcp_custom_syncookie BPF selftest, from Kuniyuki Iwashima.
-
-4) Fix the flow_dissector BPF selftest which had a bug in IP header's tot_len
-   calculation doing subtraction after htons() instead of inside htons(), from
-   Asbjørn Sloth Tønnesen.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Dan Carpenter, Jakub Sitnicki, Toke Høiland-Jørgensen, Yonghong Song
-
-----------------------------------------------------------------
-
-The following changes since commit 91d516d4de48532d967a77967834e00c8c53dfe6:
-
-  net: mvpp2: Increase size of queue_name buffer (2024-08-07 20:21:05 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to af8a066f1c473261881a6d8e2b55cca8eda9ce80:
-
-  selftest: bpf: Remove mssind boundary check in test_tcp_custom_syncookie.c. (2024-08-21 23:19:33 -0700)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Alan Maguire (2):
-      bpf/bpf_get,set_sockopt: add option to set TCP-BPF sock ops flags
-      selftests/bpf: add sockopt tests for TCP_BPF_SOCK_OPS_CB_FLAGS
-
-Asbjørn Sloth Tønnesen (1):
-      selftests/bpf: Avoid subtraction after htons() in ipip tests
-
-Kuniyuki Iwashima (1):
-      selftest: bpf: Remove mssind boundary check in test_tcp_custom_syncookie.c.
-
-Martin KaFai Lau (2):
-      Merge branch 'add TCP_BPF_SOCK_OPS_CB_FLAGS to bpf_*sockopt()'
-      Merge branch 'selftests/bpf: Various sockmap-related fixes'
-
-Michal Luczaj (6):
-      selftests/bpf: Support more socket types in create_pair()
-      selftests/bpf: Socket pair creation, cleanups
-      selftests/bpf: Simplify inet_socketpair() and vsock_socketpair_connectible()
-      selftests/bpf: Honour the sotype of af_unix redir tests
-      selftests/bpf: Exercise SOCK_STREAM unix_inet_redir_to_connected()
-      selftests/bpf: Introduce __attribute__((cleanup)) in create_pair()
-
- include/uapi/linux/bpf.h                           |   3 +-
- net/core/filter.c                                  |  16 +++
- tools/include/uapi/linux/bpf.h                     |   3 +-
- .../selftests/bpf/prog_tests/flow_dissector.c      |  12 +-
- .../selftests/bpf/prog_tests/setget_sockopt.c      |  47 +++++++
- .../selftests/bpf/prog_tests/sockmap_basic.c       |  28 ++--
- .../selftests/bpf/prog_tests/sockmap_helpers.h     | 149 ++++++++++++++-------
- .../selftests/bpf/prog_tests/sockmap_listen.c      | 117 ++--------------
- tools/testing/selftests/bpf/progs/setget_sockopt.c |  26 +++-
- .../bpf/progs/test_tcp_custom_syncookie.c          |  11 +-
- 10 files changed, 222 insertions(+), 190 deletions(-)
 
