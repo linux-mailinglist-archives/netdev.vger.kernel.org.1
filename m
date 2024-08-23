@@ -1,141 +1,125 @@
-Return-Path: <netdev+bounces-121329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CE4195CC11
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:08:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C47DD95CC25
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:10:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B0082818B1
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 12:08:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6318A1F21AA5
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 12:10:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D631718455C;
-	Fri, 23 Aug 2024 12:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7466C184527;
+	Fri, 23 Aug 2024 12:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="iPI+BYN3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lrPOfWxv"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF677469D;
-	Fri, 23 Aug 2024 12:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA8C61FFC;
+	Fri, 23 Aug 2024 12:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724414888; cv=none; b=uiptCs8D7BjkXcj4HJGkc99Ee8HQOH2db5TeSG1M/mnpHeCLVbgHPGdiZaoPZWkfEC18OcU3CGFXzB5Lj3wAkykV3BuNSwqDm9rBAe7agO5la/w2eLvriC8Cx0qiACiPkzsLKgOWQl6pT55wD+IBNLTi08cXA+K2BMvA7LzUWts=
+	t=1724415036; cv=none; b=NKz5WnW4Oq6kDXHLZMwT9zY07LUUfLjqiGcmmOeP3tm2BuNINV8bUx+PRpzqLtOOEOmHwqYWkKoWEv7hj5sW0O7HSWqbacJ/jEbe5voUeXVDpH5q34P82yMdzNyOGhsxW8QcAcQcQeC9HY23amoWxdjYaEGRwBhVoRLMBRaAtHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724414888; c=relaxed/simple;
-	bh=ZLHQc0IpZLg9q4x1Zu/43JVc/lyLKGgnVMcNtBKYDlo=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Ze0/gHYZNZpXqnQ+6vReoAwhDYCjWNrj5rYQYw0gpo/b93DLQqwVyfyM9R/8gxq/q5SJCiuUoFC+ybzMmy+oueP6Lstf6fUM3Mqn45wRl0wCx5HFDOqyGfUW+mMrBaeqsoUIzQsWsXYCBu8qhj0iWI++GN//jDNXcU84vZ2wA94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=iPI+BYN3; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=qOpiN0yfFcQklO8pw7LWA14dBrUyLAlm9Cq1gHMDPM4=; b=iPI+BYN3dTx2KXVDY5zCqRYwKi
-	ruvtzsvl5jZ+sxjO5pm6nqqHUBZWvm5ArFalVZJnov788BxZ8EkpuL9eBrRPUBIyvPE0kxqWvEzuB
-	QgGLgDNYHNjW8a/+h4eR+D9mPD6+QIJuSLR+BHj4JnOCuSOaa/k3rBrMvpJAv/CN6ncZaSEnmv8lH
-	L8qkawPDP9yukC19xy4oG6OuB0Jmo/DcRMgBlmrLkSGFK0hrYHGRw6RyOKUXOWBfXwv6hD65M1UuE
-	ryOaerXlKBOL422+wR1fmWaqLbnKLgYCjo+KfWMPANzPAjfSKiMss3kMhOaOAsMaoXIyw8DLm/DcT
-	HvBVESQw==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1shT51-000N3H-GY; Fri, 23 Aug 2024 14:07:47 +0200
-Received: from [178.197.248.23] (helo=linux-2.home)
-	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1shT4z-00076m-3C;
-	Fri, 23 Aug 2024 14:07:46 +0200
-Subject: Re: [PATCH bpf-next v2] net: Don't allow to attach xdp if bond slave
- device's upper already has a program
-To: Jiri Pirko <jiri@resnulli.us>, Feng zhou <zhoufeng.zf@bytedance.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ast@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, bigeasy@linutronix.de, lorenzo@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com,
- =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>
-References: <20240823084204.67812-1-zhoufeng.zf@bytedance.com>
- <Zsh4vPAPBKdRUq8H@nanopsycho.orion>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <6d38eaf5-0a13-9f85-3a5d-0ca354bc45d5@iogearbox.net>
-Date: Fri, 23 Aug 2024 14:07:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1724415036; c=relaxed/simple;
+	bh=pKfHgATmqSK7seazo5mDVuSTEke8rFJFn5HddZgvvO0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HdLgxV9JdPunONoH1LKcA8s68yVSObwdiMoSdz1rzb1v5YhJ0I85raGhleBwjMRlFpx1PgZ6sVtRDvoic2qIUANytmvrGFb8a+6+LjqooHmHsIifffDRS+UYPV8h4eMSK+odvSH/EhQT4492KgHpvYCbYke0Quwfe48pClybWQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrPOfWxv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE5F1C4AF09;
+	Fri, 23 Aug 2024 12:10:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724415035;
+	bh=pKfHgATmqSK7seazo5mDVuSTEke8rFJFn5HddZgvvO0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lrPOfWxvYJn89G8sixWzWn/bUQdiEKtMGgFoKGr4jgFtsw/mkEKxaWsnqhd1yuvG4
+	 AiH3unq8t6tq1c6LHgPXCs9SBBcF69SbdgEUm3MF6x8AW/vp1794CmfWTBsqjTJyox
+	 G9/a6E0V0Qtjjl3HbkWKEsP8ovixDCfbAQs/tkY82hO4eKUFA0WCPIlYgpNUuDxzpS
+	 mgDHbfnhHg6dWotNdPxtBWBSwfRYPmNWSJ+4uFICG5dyoy0sIom77g1tUpmCquKjAX
+	 GMN9ZMuW6NZt/C/WNNyg7Ov7QC/C0cCGmaciymzBz7Y22q3rHgJolT/W1hOYrnkqWz
+	 66H20BuYHRySA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFC93804CB0;
+	Fri, 23 Aug 2024 12:10:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Zsh4vPAPBKdRUq8H@nanopsycho.orion>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27376/Fri Aug 23 10:47:45 2024)
+Subject: Re: [PATCH net-next v18 00/13] Introduce PHY listing and link_topology
+ tracking
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172441503552.2944490.10143291093709397459.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Aug 2024 12:10:35 +0000
+References: <20240821151009.1681151-1-maxime.chevallier@bootlin.com>
+In-Reply-To: <20240821151009.1681151-1-maxime.chevallier@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, andrew@lunn.ch, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, linux@armlinux.org.uk,
+ linux-arm-kernel@lists.infradead.org, christophe.leroy@csgroup.eu,
+ herve.codina@bootlin.com, f.fainelli@gmail.com, hkallweit1@gmail.com,
+ vladimir.oltean@nxp.com, kory.maincent@bootlin.com,
+ jesse.brandeburg@intel.com, kabel@kernel.org, piergiorgio.beruto@gmail.com,
+ o.rempel@pengutronix.de, nicveronese@gmail.com, horms@kernel.org,
+ mwojtas@chromium.org, nathan@kernel.org, atenart@kernel.org,
+ mkl@pengutronix.de, dan.carpenter@linaro.org, romain.gantois@bootlin.com
 
-On 8/23/24 1:55 PM, Jiri Pirko wrote:
-> Fri, Aug 23, 2024 at 10:42:04AM CEST, zhoufeng.zf@bytedance.com wrote:
->> From: Feng Zhou <zhoufeng.zf@bytedance.com>
->>
->> Cannot attach when an upper device already has a program, This
->> restriction is only for bond's slave devices or team port, and
->> should not be accidentally injured for devices like eth0 and vxlan0.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Wed, 21 Aug 2024 17:09:54 +0200 you wrote:
+> Hello everyone,
 > 
-> What if I attach xdp program to solo netdev and then I enslave it
-> to bond/team netdev that already has xdp program attached?
-> What prevents me from doing that?
-
-In that case the enslaving of the device to bond(/team) must fail as
-otherwise the latter won't be able to propagate the XDP prog downwards.
-
-Feng, did you double check if we have net or BPF selftest coverage for
-that? If not might be good to add.
-
->> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
->> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
->> ---
->> Changelog:
->> v1->v2: Addressed comments from Paolo Abeni, Jiri Pirko
->> - Use "netif_is_lag_port" relace of "netif_is_bond_slave"
->> Details in here:
->> https://lore.kernel.org/netdev/3bf84d23-a561-47ae-84a4-e99488fc762b@bytedance.com/T/
->>
->> net/core/dev.c | 10 ++++++----
->> 1 file changed, 6 insertions(+), 4 deletions(-)
->>
->> diff --git a/net/core/dev.c b/net/core/dev.c
->> index f66e61407883..49144e62172e 100644
->> --- a/net/core/dev.c
->> +++ b/net/core/dev.c
->> @@ -9502,10 +9502,12 @@ static int dev_xdp_attach(struct net_device *dev, struct netlink_ext_ack *extack
->> 	}
->>
->> 	/* don't allow if an upper device already has a program */
->> -	netdev_for_each_upper_dev_rcu(dev, upper, iter) {
->> -		if (dev_xdp_prog_count(upper) > 0) {
->> -			NL_SET_ERR_MSG(extack, "Cannot attach when an upper device already has a program");
->> -			return -EEXIST;
->> +	if (netif_is_lag_port(dev)) {
->> +		netdev_for_each_upper_dev_rcu(dev, upper, iter) {
->> +			if (dev_xdp_prog_count(upper) > 0) {
->> +				NL_SET_ERR_MSG(extack, "Cannot attach when an upper device already has a program");
->> +				return -EEXIST;
->> +			}
->> 		}
->> 	}
->>
->> -- 
->> 2.30.2
->>
+> This is V18 of the phy_link_topology series, aiming at improving support
+> for multiple PHYs being attached to the same MAC.
 > 
+> V18 is a simple rebase of the V17 on top of net-next, gathering the
+> tested-by and reviewed-by tags from Christophe (thanks !).
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v18,01/13] net: phy: Introduce ethernet link topology representation
+    https://git.kernel.org/netdev/net-next/c/384968786909
+  - [net-next,v18,02/13] net: sfp: pass the phy_device when disconnecting an sfp module's PHY
+    https://git.kernel.org/netdev/net-next/c/4d76f115ab91
+  - [net-next,v18,03/13] net: phy: add helpers to handle sfp phy connect/disconnect
+    https://git.kernel.org/netdev/net-next/c/b2db6f4ace72
+  - [net-next,v18,04/13] net: sfp: Add helper to return the SFP bus name
+    https://git.kernel.org/netdev/net-next/c/0a2f7de0f3b9
+  - [net-next,v18,05/13] net: ethtool: Allow passing a phy index for some commands
+    https://git.kernel.org/netdev/net-next/c/c15e065b46dc
+  - [net-next,v18,06/13] netlink: specs: add phy-index as a header parameter
+    https://git.kernel.org/netdev/net-next/c/9af0e89d6c24
+  - [net-next,v18,07/13] net: ethtool: Introduce a command to list PHYs on an interface
+    https://git.kernel.org/netdev/net-next/c/17194be4c8e1
+  - [net-next,v18,08/13] netlink: specs: add ethnl PHY_GET command set
+    https://git.kernel.org/netdev/net-next/c/d3d9a3e48a63
+  - [net-next,v18,09/13] net: ethtool: plca: Target the command to the requested PHY
+    https://git.kernel.org/netdev/net-next/c/02180fb525ba
+  - [net-next,v18,10/13] net: ethtool: pse-pd: Target the command to the requested PHY
+    https://git.kernel.org/netdev/net-next/c/31748765bed3
+  - [net-next,v18,11/13] net: ethtool: cable-test: Target the command to the requested PHY
+    https://git.kernel.org/netdev/net-next/c/3688ff3077d3
+  - [net-next,v18,12/13] net: ethtool: strset: Allow querying phy stats by index
+    https://git.kernel.org/netdev/net-next/c/e96c93aa4be9
+  - [net-next,v18,13/13] Documentation: networking: document phy_link_topology
+    https://git.kernel.org/netdev/net-next/c/db31e09d517b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
