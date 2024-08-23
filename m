@@ -1,115 +1,206 @@
-Return-Path: <netdev+bounces-121549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80EF895D9E3
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 01:51:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15B1F95D9F5
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 01:55:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A55951C20F75
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 23:51:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0B0A1F22E26
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 23:55:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACB918F2E1;
-	Fri, 23 Aug 2024 23:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9740F1C871E;
+	Fri, 23 Aug 2024 23:55:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jlVnhqFC"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="JHs52yay"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from rcdn-iport-9.cisco.com (rcdn-iport-9.cisco.com [173.37.86.80])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D60718595D;
-	Fri, 23 Aug 2024 23:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7244F1C8FB0
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 23:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724457103; cv=none; b=YHyFGIODYfXCf1Yqzbs679SQpk5e+IZ+8aNO06euNN2gOrQ4GWzTgRd4fpwypX/Uh2YkHAOzyxN8cGh9zIP2ECKNjAgqccIHNrH1YR1Hqh1DXjVLtCitD/Sd4OVV+FfMTSQ1Q8HBmGjZNfTG42+EGECbfryjpKxX6aSisi+qwFE=
+	t=1724457340; cv=none; b=pFdqiEV0z+hVK5a5qfGQIEZ6azpEH5N3c2h0ucwKWXSDZMVhGP4S4WUJoTKRRZAuxdGVQQCennA+sXTO9O/0Fu2Irl7WREdDMxs4WfyQfjVLtBihWGtUMNwxxkr7JnpgPdsUGoHdNWw8iZAu0WBlTnlHq/p9RuqviJ9ccgo7Y2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724457103; c=relaxed/simple;
-	bh=t5HUwo6cdVCM2XIrnsKrCMxJG7bNZEl/+y37rKj1YDw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EUCQIezrpxCM4RoJ9T9+X2Gel2UGIJDY1pP23EvPemQ9/huMx9AH/z099jwgOUchyfIDIemetkzdkspaJlTdWxCkHxKpp8jRBFKg/qKEUhHVkr4zh35XbAbZhmeLzhdM0DSmUttioqTzPGJ8gjBJuHUKpwuEaI8whtz4Is0bsBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jlVnhqFC; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-81f85130660so117046739f.1;
-        Fri, 23 Aug 2024 16:51:41 -0700 (PDT)
+	s=arc-20240116; t=1724457340; c=relaxed/simple;
+	bh=K/rjaVAb4bx0RjNU54IejR3b1eDm5mMKVS8t4eJuQ8w=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ai2AcSHp05OkHVC/Z15Aoi1ppTplCHEtIfOYBeWp6c5oZHU8t7Lngx+IJqDB72zp7XXBhsuLmys7WVPwoGEr3LsP69pEFjbs8VhE2yTBjW6yEC6QNyQeQjCwbqWIe02vq98ek1zhrVB6s2ERP7PcKPwZ9rsyIm9YO7DSCVZw3zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=JHs52yay; arc=none smtp.client-ip=173.37.86.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724457101; x=1725061901; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t5HUwo6cdVCM2XIrnsKrCMxJG7bNZEl/+y37rKj1YDw=;
-        b=jlVnhqFC1A0ohsMdaRmM4aDBDNKzPtv1wIuS4gbBfnGfMhAZlCuMfLuI5sBflH6IqA
-         P0NJ41QmdMalP5xiAIjXKrXSgJtOL1C08j3hABypZRQNLSmXsU2miX23N1cYbFIHplxc
-         zoE66wkIU8DA/uVZuilbwRUdF7kkVpIhCYYnfq0TQ8CEo8gwjc+Y4atJUtkqAjNKQGuq
-         scId1lfb0glfAGK90FjdTadQy8wQngEjlg75Ta30A9yunKybXoIRa5k49jXnVL32j/u2
-         0ChWGrLd6f83GEaulAPZ6yygfDE9fsl85bYsZMCcVCv3zo5r72Yej7yVfYuj7VTKAAE4
-         X/AA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724457101; x=1725061901;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t5HUwo6cdVCM2XIrnsKrCMxJG7bNZEl/+y37rKj1YDw=;
-        b=V8scETzOT4MsYJtyFBXvVibNriPT14jqwnHhVdrRa3LrYWJYcLSpZfdF6nFwGMUtzk
-         ToiTuol56O+q36NhxBXzOWYQjEVLbDhnITVhD/82EYCfNApMTDecF1SIKIXKddEJfEQO
-         u5D8EEg1VTlaYzN401Bfxs1nEZHS8Dkx5E0Dmk+EoitLuC/xR1bnuT/zanFn2kW7hqAn
-         eG1Fz3NqlFfporkbUk+tkX5e+vPynUUpfZTRhTdRaxHSEGNvhHL8osdUWyIfA2UIKY0b
-         /4WejrY6dYD2YPn9VQwUwbUgw6xxlnEmYtfHGV05iXfqFoPjFXfGkNDovKeCJsZH3iGl
-         /YBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZ7n+gWfQTxn6exzHBp/00CxDQDE/AMCgUjIY+OWCR5sEExBXWGJg4VsvKoplBKaNfIu2ccVG927VjUL3Iqr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYnYFvwjnWequ+EmRWPWoluHIjBKZeSwIfY+zcqHb6vACSimu0
-	LMPgRTCr7MUT7BXDQP4IDMGYGZryhvDXoci7RKYdGa6HSSi1OxrS+q8jGtzR4Pw6T70L++B1fDv
-	cltiUb1iylOrz1sw4RZXCmLlCLibGcb016uQ=
-X-Google-Smtp-Source: AGHT+IEOp0Aze6/p+aJG8xuawPHV4qNnF8TwSxUbO1nxw7/XjufAV+sUiSwOhvlkvDUlLkk4nl3yRB7B3Wx+neeKxkw=
-X-Received: by 2002:a05:6e02:1d1b:b0:37a:76af:3fca with SMTP id
- e9e14a558f8ab-39e3bdee4edmr45457335ab.3.1724457101113; Fri, 23 Aug 2024
- 16:51:41 -0700 (PDT)
+  d=cisco.com; i=@cisco.com; l=3494; q=dns/txt; s=iport;
+  t=1724457338; x=1725666938;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cJ6hrh2gCf/HJiABNYtYKMxufMtVhFbvYzdXi3Dcg3U=;
+  b=JHs52yaykz4qoGEJvhZJOeODP74bAGEpRICA/o22Dhsr8tC2DPgxRUit
+   GDKLG7fF20ZEXjeOBuMGVZwraA4GS2jMvEtCPkyZGjtWOKncE7A1MSgxw
+   MT8A/pUUnPTGm2siK9ouL3VEMwvyY6GN0IQTWVgt/d3X8JnU0R0QfZ15c
+   Y=;
+X-CSE-ConnectionGUID: dtD3GCZWQ0i5KkBZdT6Xzg==
+X-CSE-MsgGUID: LmGTlLQSTaSy4VDu1Q/cSw==
+X-IronPort-AV: E=Sophos;i="6.10,171,1719878400"; 
+   d="scan'208";a="249387281"
+Received: from rcdn-core-8.cisco.com ([173.37.93.144])
+  by rcdn-iport-9.cisco.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 23:54:30 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by rcdn-core-8.cisco.com (8.15.2/8.15.2) with ESMTP id 47NNsU5t008610;
+	Fri, 23 Aug 2024 23:54:30 GMT
+Received: by cisco.com (Postfix, from userid 412739)
+	id 3A83420F2003; Fri, 23 Aug 2024 16:54:30 -0700 (PDT)
+From: Nelson Escobar <neescoba@cisco.com>
+To: netdev@vger.kernel.org
+Cc: satishkh@cisco.com, johndale@cisco.com,
+        Nelson Escobar <neescoba@cisco.com>
+Subject: [PATCH net-next 0/2] Expand statistics reported in ethtool
+Date: Fri, 23 Aug 2024 16:53:59 -0700
+Message-Id: <20240823235401.29996-1-neescoba@cisco.com>
+X-Mailer: git-send-email 2.35.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240823211902.143210-1-jmaloy@redhat.com> <20240823211902.143210-2-jmaloy@redhat.com>
-In-Reply-To: <20240823211902.143210-2-jmaloy@redhat.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 24 Aug 2024 07:51:05 +0800
-Message-ID: <CAL+tcoDgq+MmNz6Eo_61eBJ2fduyxL1j+kbo_9AYtB4o3tJO5w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] tcp: add SO_PEEK_OFF socket option tor TCPv6
-To: jmaloy@redhat.com
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	davem@davemloft.net, kuba@kernel.org, passt-dev@passt.top, sbrivio@redhat.com, 
-	lvivier@redhat.com, dgibson@redhat.com, eric.dumazet@gmail.com, 
-	edumazet@google.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: rcdn-core-8.cisco.com
 
-On Sat, Aug 24, 2024 at 5:19=E2=80=AFAM <jmaloy@redhat.com> wrote:
->
-> From: Jon Maloy <jmaloy@redhat.com>
->
-> When we added the SO_PEEK_OFF socket option to TCP we forgot
-> to add it even for TCP on IPv6.
+Hi,
 
-Even though you said "we forgot", I'm not sure if this patch series
-belongs to net-next material...
+The following patches expand the statistics reported in ethtool for the enic
+driver:
 
->
-> We do that here.
->
-> Fixes: 05ea491641d3 ("tcp: add support for SO_PEEK_OFF socket option")
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
-> Tested-by: Stefano Brivio <sbrivio@redhat.com>
-> Signed-off-by: Jon Maloy <jmaloy@redhat.com>
+Patch #1: Use a macro instead of static const variables for array sizes.  I
+          didn't want to add more static const variables in the next patch
+          so clean up the existing ones first.
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+Patch #2: Expand the statistics to include per wq and per rq statistics in the
+          ethtool output.
 
-You seem to forget to carry Eric's Reviewed-by tag, please see the link :)
-https://lore.kernel.org/all/CANn89iJmdGdAN1OZEfoM2LNVOewkYDuPXObRoNWhGyn93P=
-=3D8OQ@mail.gmail.com/
+Example output after these patches:
+
+# ethtool -S enp1s0
+NIC statistics:
+     tx_frames_ok: 23093667316
+     tx_unicast_frames_ok: 23093667263
+     tx_multicast_frames_ok: 47
+     tx_broadcast_frames_ok: 6
+     tx_bytes_ok: 34011338518116
+     tx_unicast_bytes_ok: 34011338512894
+     tx_multicast_bytes_ok: 4970
+     tx_broadcast_bytes_ok: 252
+     tx_drops: 0
+     tx_errors: 0
+     tx_tso: 22435852597
+     rx_frames_ok: 36167593711
+     rx_frames_total: 36178256385
+     rx_unicast_frames_ok: 36178256384
+     rx_multicast_frames_ok: 0
+     rx_broadcast_frames_ok: 1
+     rx_bytes_ok: 54176088602603
+     rx_unicast_bytes_ok: 54192231882399
+     rx_multicast_bytes_ok: 0
+     rx_broadcast_bytes_ok: 56
+     rx_drop: 0
+     rx_no_bufs: 10662674
+     rx_errors: 0
+     rx_rss: 36178256124
+     rx_crc_errors: 0
+     rx_frames_64: 262
+     rx_frames_127: 401677158
+     rx_frames_255: 3113
+     rx_frames_511: 6153
+     rx_frames_1023: 12325
+     rx_frames_1518: 35776557376
+     rx_frames_to_max: 34359738368
+     dma_map_error: 0
+     rq[0]_packets: 15203911650
+     rq[0]_bytes: 23018700775410
+     rq[0]_l4_rss_hash: 15203911388
+     rq[0]_l3_rss_hash: 0
+     rq[0]_csum_unnecessary: 15203911388
+     rq[0]_csum_unnecessary_encap: 0
+     rq[0]_vlan_stripped: 15203911650
+     rq[0]_napi_complete: 32258306
+     rq[0]_napi_repoll: 218149461
+     rq[0]_bad_fcs: 0
+     rq[0]_pkt_truncated: 0
+     rq[0]_no_skb: 0
+     rq[0]_desc_skip: 0
+     rq[1]_packets: 401675700
+     rq[1]_bytes: 26514408889
+     rq[1]_l4_rss_hash: 401675700
+     rq[1]_l3_rss_hash: 0
+     rq[1]_csum_unnecessary: 401675700
+     rq[1]_csum_unnecessary_encap: 0
+     rq[1]_vlan_stripped: 401675700
+     rq[1]_napi_complete: 180387886
+     rq[1]_napi_repoll: 0
+     rq[1]_bad_fcs: 0
+     rq[1]_pkt_truncated: 0
+     rq[1]_no_skb: 0
+     rq[1]_desc_skip: 0
+     rq[2]_packets: 20562006510
+     rq[2]_bytes: 31130873649489
+     rq[2]_l4_rss_hash: 20562006510
+     rq[2]_l3_rss_hash: 0
+     rq[2]_csum_unnecessary: 20562006510
+     rq[2]_csum_unnecessary_encap: 0
+     rq[2]_vlan_stripped: 20562006510
+     rq[2]_napi_complete: 35277758
+     rq[2]_napi_repoll: 301947558
+     rq[2]_bad_fcs: 0
+     rq[2]_pkt_truncated: 0
+     rq[2]_no_skb: 0
+     rq[2]_desc_skip: 0
+     rq[3]_packets: 7
+     rq[3]_bytes: 655
+     rq[3]_l4_rss_hash: 7
+     rq[3]_l3_rss_hash: 0
+     rq[3]_csum_unnecessary: 7
+     rq[3]_csum_unnecessary_encap: 0
+     rq[3]_vlan_stripped: 7
+     rq[3]_napi_complete: 6
+     rq[3]_napi_repoll: 0
+     rq[3]_bad_fcs: 0
+     rq[3]_pkt_truncated: 0
+     rq[3]_no_skb: 0
+     rq[3]_desc_skip: 0
+     wq[0]_packets: 1156987579
+     wq[0]_stopped: 0
+     wq[0]_wake: 0
+     wq[0]_tso: 499172850
+     wq[0]_encap_tso: 0
+     wq[0]_encap_csum: 0
+     wq[0]_csum_partial: 657814425
+     wq[0]_csum: 304
+     wq[0]_bytes: 32563518059466
+     wq[0]_add_vlan: 0
+     wq[0]_cq_work: 3638574289
+     wq[0]_cq_bytes: 32563517667582
+     wq[0]_null_pkt: 0
+     wq[0]_skb_linear_fail: 0
+     wq[0]_desc_full_awake: 0
+
+
 
 Thanks,
-Jason
+Nelson.
+
+Nelson Escobar (2):
+  enic: Use macro instead of static const variables for array sizes
+  enic: Expand statistics gathering and reporting
+
+ drivers/net/ethernet/cisco/enic/enic.h        |  38 +++++-
+ .../net/ethernet/cisco/enic/enic_ethtool.c    | 114 ++++++++++++++++--
+ drivers/net/ethernet/cisco/enic/enic_main.c   |  89 +++++++++++---
+ 3 files changed, 211 insertions(+), 30 deletions(-)
+
+-- 
+2.35.2
+
 
