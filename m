@@ -1,170 +1,129 @@
-Return-Path: <netdev+bounces-121435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A558C95D22C
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 17:57:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5879695D2BB
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:13:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FBBC1F22230
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 15:57:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E2B8B2A22F
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:12:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE1418BBB1;
-	Fri, 23 Aug 2024 15:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4965E18C334;
+	Fri, 23 Aug 2024 16:12:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L++hseRD"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="T0A7yk/5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DAA71885BE;
-	Fri, 23 Aug 2024 15:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839CF18BC10;
+	Fri, 23 Aug 2024 16:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724428578; cv=none; b=BP6wWuc2lbkyV3mt2OTDL5V/N8FwSvgw4S7gzxmQ3Q+iOPAjyswTizHt0GO0UEwMjFagPR+I03PL3d3+BcBaxUF1Bo9DrVrdgGr8Wrcyh3elutQNzYA2nbxvRbgmzxq/Ts5/063Y2lWBtfPY+XRmAknZwuJH63lM+zeUf2rltsg=
+	t=1724429537; cv=none; b=FQ2OAcbNva5/bMU0iYEuAoA3u2zaOUiLoZXpO1dZQ6CKjbS9ZV2vNM4tXoP3D60MF5blEQyXgAHbjnhofScOsVuEY21YNEO6B13T1P+fnq3N7B0TBJc9mh3t5HTzCQXpH6e809KsAOWHoGkfLFR1czKpnXOYASAc5XoW0MM+BQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724428578; c=relaxed/simple;
-	bh=1DkFpRNUuvVbzXLS5nkNQsNUzpujVqKCccs30oDKFrc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Uc44QoY7+kP9R5FSJ3oGTVieT2c84voqPbHvaSkVPQJaivl6wGuCaMQilwNxi0QSFL6fcmHwocTjA/PXePEUaDZH2K4ewJ44bZUFCdabtAoYncypeNI3q4byKWQluDrUlLouuK1viUXQoKWjxAUVEhkVlFuqZm475+Wt+4DeUWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L++hseRD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAE18C32786;
-	Fri, 23 Aug 2024 15:56:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724428578;
-	bh=1DkFpRNUuvVbzXLS5nkNQsNUzpujVqKCccs30oDKFrc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=L++hseRDfFgMHYM7kN/OSwY2n/VFOY9WAkhxVgygTfLGjpOn3h9ikwZWu6iOkZQGU
-	 paEtjPZC8USZsoLM8HldgNs1hFg4l3bsZR842s9jveupLAvAf0AbWHmUrXLMwUzYTj
-	 s+gf4fWCYhMtQBxyJE7LR69snXLXQ7N7OXKlncHaE2BtDP4yo/YnhH+fy2vH6zkex6
-	 Eg0jcSlFsu3gBH/qd5Qj6B9mCrsJY67di2SC5NtR9RtbWId9Ab8iRS7JsDOYEUoHVt
-	 8DwZ4/5XnW+W2mRIP8DIEulSgH4I5lWQMI0H7VaJbljNG3zNmjy5j5McPTN+GMpQ4V
-	 kG8XvsO7wvizA==
-Date: Fri, 23 Aug 2024 16:56:12 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"andrew@lunn.ch" <andrew@lunn.ch>,
-	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"Andrei Botila (OSS)" <andrei.botila@oss.nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 net-next 2/3] net: phy: tja11xx: replace
- "nxp,rmii-refclk-in" with "nxp,phy-output-refclk"
-Message-ID: <20240823-jersey-conducive-70863dd6fd27@spud>
-References: <20240822013721.203161-1-wei.fang@nxp.com>
- <20240822013721.203161-3-wei.fang@nxp.com>
- <20240822-headed-sworn-877211c3931f@spud>
- <PAXPR04MB85107F19C846ABDB74849086888F2@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <20240822-passerby-cupcake-a8d43f391820@spud>
- <PAXPR04MB85109CB5538707701F52246E88882@PAXPR04MB8510.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1724429537; c=relaxed/simple;
+	bh=gK4TZBvWuPjmilbvWLlSoWRxmOVT1Vj+tmogyixsK0o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pv/B2bEQL5aA7rkWVEVAEpR+g8hvreidv1Y+h1G4rcF9zsA9dlvUG0i2FAuMbaszqfdXAfWOiK6YQH1SOd4v0zV0BJTuk0un9/BKIfsoaG67W1I8nzs8Ac4VAK6V7t1HnmyhTz2s2uPAn3V054tVeyCf4PzGfir/1dMo+CMA4Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=T0A7yk/5; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id BE56388850;
+	Fri, 23 Aug 2024 18:12:07 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1724429528;
+	bh=H21kCQs9TQ24efjEOpx9s+TtvXRN6/64soQvxrpKVbU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=T0A7yk/5KQrdK2PPDj6fq4k1tgQ+16pqqwkJC8ig13QLx14+z5lsVUwNmyagjsdFO
+	 pCMAx8XB0avGppfBA9ZY2gkA2T/0R78pdJcq0LyAtCRwy8Y31e1nP4C0kmj30MjBl3
+	 E2iuHJjsJ8Fz6g60P/Ah/o63HcwvWIf6xZWdOsuMGbOmjOvVPUGaG4nz1a9prjPSzj
+	 M9/6GMymc8LAbJHU3NigVd5JP3x/eihRV13eN3xpv8GPvt+XH873cf/TukEQzSBKai
+	 w/+5RWv97QJGV8zGiQv1gKXF5AtM8qJvhUC5fqQLOpo4VIKnoKD3CZUKytV59mtPbK
+	 dga/VMTzVSGMg==
+From: Marek Vasut <marex@denx.de>
+To: linux-wireless@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Adham Abozaeid <adham.abozaeid@microchip.com>,
+	Ajay Singh <ajay.kathat@microchip.com>,
+	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 1/4] dt-bindings: wireless: wilc1000: Document WILC3000 compatible string
+Date: Fri, 23 Aug 2024 18:08:56 +0200
+Message-ID: <20240823161131.94305-1-marex@denx.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ANYxDycCsQyo/fXE"
-Content-Disposition: inline
-In-Reply-To: <PAXPR04MB85109CB5538707701F52246E88882@PAXPR04MB8510.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
+Document compatible string for the WILC3000 chip. The chip is similar
+to WILC1000, except that the register layout is slightly different and
+it does not support WPA3/SAE.
 
---ANYxDycCsQyo/fXE
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Adham Abozaeid <adham.abozaeid@microchip.com>
+Cc: Ajay Singh <ajay.kathat@microchip.com>
+Cc: Alexis Lothoré <alexis.lothore@bootlin.com>
+Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Conor Dooley <conor+dt@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Kalle Valo <kvalo@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+Cc: Marek Vasut <marex@denx.de>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: devicetree@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org
+---
+V2: - Use WILC1000 as fallback compatible string for WILC3000
+---
+ .../bindings/net/wireless/microchip,wilc1000.yaml           | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-On Fri, Aug 23, 2024 at 01:31:02AM +0000, Wei Fang wrote:
-> > -----Original Message-----
-> > From: Conor Dooley <conor@kernel.org>
-> > Sent: 2024=E5=B9=B48=E6=9C=8823=E6=97=A5 0:14
-> > To: Wei Fang <wei.fang@nxp.com>
-> > Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > pabeni@redhat.com; robh@kernel.org; krzk+dt@kernel.org;
-> > conor+dt@kernel.org; andrew@lunn.ch; f.fainelli@gmail.com;
-> > hkallweit1@gmail.com; linux@armlinux.org.uk; Andrei Botila (OSS)
-> > <andrei.botila@oss.nxp.com>; netdev@vger.kernel.org;
-> > devicetree@vger.kernel.org; linux-kernel@vger.kernel.org
-> > Subject: Re: [PATCH v2 net-next 2/3] net: phy: tja11xx: replace
-> > "nxp,rmii-refclk-in" with "nxp,phy-output-refclk"
-> >=20
-> > On Thu, Aug 22, 2024 at 09:37:11AM +0000, Wei Fang wrote:
-> > > > -----Original Message-----
-> > > > From: Conor Dooley <conor@kernel.org>
-> > > > Sent: 2024=E5=B9=B48=E6=9C=8822=E6=97=A5 16:47
-> > > > To: Wei Fang <wei.fang@nxp.com>
-> > > > Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > > > pabeni@redhat.com; robh@kernel.org; krzk+dt@kernel.org;
-> > > > conor+dt@kernel.org; andrew@lunn.ch; f.fainelli@gmail.com;
-> > > > hkallweit1@gmail.com; linux@armlinux.org.uk; Andrei Botila (OSS)
-> > > > <andrei.botila@oss.nxp.com>; netdev@vger.kernel.org;
-> > > > devicetree@vger.kernel.org; linux-kernel@vger.kernel.org
-> > > > Subject: Re: [PATCH v2 net-next 2/3] net: phy: tja11xx: replace
-> > > > "nxp,rmii-refclk-in" with "nxp,phy-output-refclk"
-> > > >
-> > > > On Thu, Aug 22, 2024 at 09:37:20AM +0800, Wei Fang wrote:
-> > > > > As the new property "nxp,phy-output-refclk" is added to instead of
-> > > > > the "nxp,rmii-refclk-in" property, so replace the "nxp,rmii-refcl=
-k-in"
-> > > > > property used in the driver with the "nxp,reverse-mode" property
-> > > > > and make slight modifications.
-> > > >
-> > > > Can you explain what makes this backwards compatible please?
-> > > >
-> > > It does not backward compatible, the related PHY nodes in DTS also
-> > > need to be updated. I have not seen "nxp,rmii-refclk-in" used in the
-> > > upstream.
-> >=20
-> > Since you have switched the polarity, devicestrees that contain
-> > "nxp,rmii-refclk-in" would actually not need an update to preserve
-> > functionality. However...
-> >=20
-> > > For nodes that do not use " nxp,rmii-refclk-in", they need to be
-> > > updated, but unfortunately I cannot confirm which DTS use TJA11XX PHY,
-> > > and there may be no relevant nodes in upstream DTS.
-> >=20
-> > ...as you say here, all tja11xx phy nodes that do not have the property=
- would
-> > need to be updated to retain functionality. Given you can't even determ=
-ine
-> > which devicetrees would need to be updated, I'm going to have to NAK th=
-is
-> > change as an unnecessary ABI break.
-> >=20
->=20
-> Okay, that make sense, "nxp,rmii-refclk-in" was added only for TJA1100 and
-> TJA1101, although it does not seem to be a suitable property now, it cann=
-ot
-> be changed at present. :(
-> Since TJA1103/TJA1104/TJA1120/TJA1121 use different driver than TJA1100
-> and TJA1101, which is nxp-c4-tja11xx. I think it's fine to add " nxp,phy-=
-output-refclk "
-> for these PHYs, so I will remove this patch from the patch set.
+diff --git a/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml b/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
+index 2460ccc082371..b8ee6cdab3c25 100644
+--- a/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
++++ b/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
+@@ -16,7 +16,11 @@ description:
+ 
+ properties:
+   compatible:
+-    const: microchip,wilc1000
++    oneOf:
++      - items:
++          - const: microchip,wilc1000
++          - const: microchip,wilc3000
++      - const: microchip,wilc1000
+ 
+   reg: true
+ 
+-- 
+2.43.0
 
-If they use a different binding, then yeah, you can add use the new
-name/polarity for those devices.
-
---ANYxDycCsQyo/fXE
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZsixHAAKCRB4tDGHoIJi
-0nW9AP4vV2xl618F6KsrE008fW2eV6kz0eQzNzhu8RDFinWI3AD/ZypQb+ffi0tz
-aNX9IUGBoNG3hT1ntEDsKLnvSfZIKgw=
-=iFaS
------END PGP SIGNATURE-----
-
---ANYxDycCsQyo/fXE--
 
