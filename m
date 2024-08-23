@@ -1,123 +1,132 @@
-Return-Path: <netdev+bounces-121483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49E5595D5DB
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 21:08:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BE1895D5E5
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 21:13:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 061B5283F07
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 19:08:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D82991F2331E
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 19:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFA11922C9;
-	Fri, 23 Aug 2024 19:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C6D191499;
+	Fri, 23 Aug 2024 19:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DlwpFcoS"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="ITpRKxEU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0348F6B;
-	Fri, 23 Aug 2024 19:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86B277F11
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 19:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724440115; cv=none; b=hHV+6vfTbz9GO9jzN1+KRB1eKbLWCyuL3/9tLXywoMHejfC9TwqiyrLkzaurdk9d+k8BTdaUxE5dPq83YgGT+Ay9mZokLFCkMW/K4yzkVEimDwF5WYKmyGY4AKlX9AVVEPytIhP8dVZPb+HyYZntmxoO9rh9Tj7rKbc4rXuGbb4=
+	t=1724440419; cv=none; b=mzbAhbKe+8Eo4oIp9gi/E8lDkD/EApc2gNiXTQRX2yVrCPsGJBo43SHBIZSEeCzR0pca81Z82sK3bhOyDmsoSksWTB0pIwfyMWnn0cAiWDXndC5Lmma5v0P6wMWD1Hw2OcscriQXRy/z0v4xHXwJZ/7lZV0MRXqpqsuIr1s2p30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724440115; c=relaxed/simple;
-	bh=Qxh0CtKyZd1DnK/0dchijwa1sKES+yUOrUYLIZr/5DU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lXhB5+5Kt61p80yXqq0ZxOleLTmO13/HQW1KV4HYC8SoEWv3MDN4Ul/zIZXHdx7hjok2w394o8PbbmZ2YzUqXQtNQtNqHoBmZvwvjDQaan4kMpiR3Lz1RCOYPpaJ9NT1AGhoAGI/5TMxkoSPvuKeK0jvqRhcpzDeYArAMR+Zoxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DlwpFcoS; arc=none smtp.client-ip=209.85.217.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-498d7a1f734so744530137.0;
-        Fri, 23 Aug 2024 12:08:33 -0700 (PDT)
+	s=arc-20240116; t=1724440419; c=relaxed/simple;
+	bh=7aUFx8cxFOwF0WID6eSNxZMzobzkEuWFC5EGYifrKn8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M13D1S841+s191uq6+8op2/pbHlbg/A7JGQdl2VpW/bcStL2lotACKXEH0A6Ifi+MybXmNtFi0J0pU+95o3odBn9Frwl1Lx4pxNG4DOIEHBi1YUsPMseRp7XBQT5cXj9hxl0Yff10dK8FTMGhxeQPfCB2dG8IcVVOuaZc/nd1ZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=ITpRKxEU; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6c3f1939d12so18336357b3.2
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 12:13:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724440112; x=1725044912; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=umich.edu; s=google-2016-06-03; t=1724440416; x=1725045216; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+QQf35c5Pp7+9zpkvOPWiJekHVDOIOVDBwe/+zf2lto=;
-        b=DlwpFcoS4rQ/INZ4T7W6UY8Cc8GCr6L6eaHCHPV8qodvYWMrUdgHt0vOvJ+Ched0m8
-         tPg0TXCCoJZmzjpL77iLlpPnl+X+Pne3ivXumANVMn0ysX48HSdVmiRkMC14f8uLZgwq
-         lEkAhwnUhmKgGzf0Obk05+FnoEemw7J5v1PiBj9Hx/ZKdtbVPXRmVmJokVS8Z0LFx+Bx
-         hMtK8qIPqq58vLohSXzhBVXvAlkKNlninWxQCT/wefr/2jkOQ0W6vv6NzY6DUSg/bSwy
-         q9b5H4oaDuDVJjXsjba0gLQlvMwLM1uMf5U+WhLr8AvYp9Y0cur3ySBWIcUJcQZa7n0O
-         Td7w==
+        bh=7aUFx8cxFOwF0WID6eSNxZMzobzkEuWFC5EGYifrKn8=;
+        b=ITpRKxEUpv/7up7O0+nXBQpyzxOTY/4itFhTTZz5NFlZaPTUeSgEewGAFj3ySVKkZF
+         S04YCnHhp8PJrPdbjSYeRTe0oq+Q91lTYfPPw75UgnmbE396pnqBmopBjuXWmz3ymFVi
+         QlrDGAWwAqGZ8cP93i/Djev++iEQa5n29rUbDkdeWMGk4jtwrthKVOmq0/WeJphWDzLU
+         xm49teUi4QJD4OWNRFX6SG2myBfbK96DZIJ3TmUEyqcKlpvxqROAEBL0+Hby5XKl6f0t
+         XQDP+jpcrZ0frKr6eFY2PTWYfoxncG29Rl3kjM9OC0Q/go56K4F4uew1WBJdAaKRGhve
+         xW2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724440112; x=1725044912;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1724440416; x=1725045216;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+QQf35c5Pp7+9zpkvOPWiJekHVDOIOVDBwe/+zf2lto=;
-        b=dKlraffE+DmQmMkr1a4puz3YCDx2x/NpVTDTzBxnkKEXcHzmoXv3HIqqYsOEldWsmP
-         Dnr0j2WDUz0qaISeq+nbBhzmi/I4MPkXqO1XAZudj5VmbDa5gsEY2PZksGT3lzan3nvL
-         0h0NFowiDwSibe2eu2I3s0r+9bb8YCxN6Y3Sj2tzNvo4n21VXTodYsPFTlI6HYshT2tR
-         IeiD2I3t/vic2y6oAOm2xwEni99BJQxz2DgaB/rfOCLGs+oywNmBxZy43fmtj/ljjRO8
-         jwf+aToO2JQW8/qD1KDzV6obQzZ9X7Q0bP4BMz1PvryumNKlphpLgKIOUp18YSS2/KsN
-         xdvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVIVq+FXYXXGo3KyyAtDJl2wMn2wI9BBMTZBFF9WkB6gAKemtZb1OBwg1bWQogP3qYj1YD5Nv4UO+utCPiYZHV/@vger.kernel.org, AJvYcCVlcM9NtFHl79A037WGEmFljAvI8A8VWeSKN2iXf0Rei8T56+BajTGDqYSZtUiZbhnf6Dxa8sKy@vger.kernel.org, AJvYcCXAxtIHxHDvaCDYmkMuxdr06roMxSb5YIRVOWIl/DWVZTRZcyH/4NweASBObNDfIRxNuXgRCqDHHeEH02I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzK/+xLLPeZVQLjyFsxqfLUyLAMHQWjyf1AsVRomXUPpyVD9AHn
-	ztDwcJ/UhD1i+ZjjONfeplHPRnShfUJysLn0nk4REvGihkCDy6p+
-X-Google-Smtp-Source: AGHT+IFjLnNiw+FcM23xAbBAxKFeWJFoyLiZ7Kzp9eZ5gVg2H+B+bqEJGz0Jks6EBCP8LNPc91nFEw==
-X-Received: by 2002:a05:6102:6c9:b0:492:9ef9:9d1b with SMTP id ada2fe7eead31-498f46ea98fmr3960629137.22.1724440112406;
-        Fri, 23 Aug 2024 12:08:32 -0700 (PDT)
-Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-498e47c5d53sm623968137.13.2024.08.23.12.08.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 12:08:32 -0700 (PDT)
-From: David Hunter <david.hunter.linux@gmail.com>
-To: kuba@kernel.org
-Cc: davem@davemloft.net,
-	david.hunter.linux@gmail.com,
-	edumazet@google.com,
-	javier.carrasco.cruz@gmail.com,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org
-Subject: Re: Re: [PATCH 1/1] Improve missing mods error message and make shell script executable
-Date: Fri, 23 Aug 2024 15:08:28 -0400
-Message-ID: <20240823190828.214443-1-david.hunter.linux@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240821180202.6da48f29@kernel.org>
-References: <20240821180202.6da48f29@kernel.org>
+        bh=7aUFx8cxFOwF0WID6eSNxZMzobzkEuWFC5EGYifrKn8=;
+        b=nHSu1m4HxVkl/zK2pYPYlShT7XYpmcaGGX13TGVBVf8hV2Xn+9C//n2cT+Ua98PMPL
+         Ka94JTmBRJHC21ZpX3g0bGFkYooUomAkt2dLPUCCP274wF+1LnVQsu3Styh5QMaSR3eg
+         xlctfujkpkIYRJrhuUZkCCxeHFiuEEWmge6BqU/kQJlcXUFbYWeZoZ/1Fephb0Km3uiW
+         3kMai/b2ZoFkw8ga19v8EaiYnEC1/bd4LvfgQ+VIgqSILGCqydUgMS8ZLkMsHLYPZgPw
+         0TgWz7b/gmPWJEbQ6d2h8BByjtIDh0mc0EL0Q5E538dPLhTu+IH6gdD7J58jj8WIjlfL
+         2YfQ==
+X-Gm-Message-State: AOJu0Yzi+8khFlYS1D9y3XdUoxMS8V9BUGbT7N0Om1j0E9086IzyAKtn
+	x6vEPL2t+VQZ84gPJlnuPUhGiwcG7elzbDriJC6JvC0uF2rKDK3XRQqzqthNuub+I4Z9zynvb5M
+	34wYL11RDzzCdw97pOgeNyio6vbmls5wKxpXQX+jSZDlnmWTYcIsXFw==
+X-Google-Smtp-Source: AGHT+IFcMDW0basToGMWwrN6IlEZFwXsVJ7kJ4mtTeeL1VAh1oM7BhbMtKw6zEmyfR0/Tgad6SIdughuT745+IOGF4U=
+X-Received: by 2002:a05:690c:f94:b0:6b7:a7b3:8d94 with SMTP id
+ 00721157ae682-6c6247f0eb9mr38028247b3.6.1724440416643; Fri, 23 Aug 2024
+ 12:13:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240820225719.91410-1-fujita.tomonori@gmail.com>
+ <20240820225719.91410-7-fujita.tomonori@gmail.com> <CALNs47uvG_yjzX7Ewszb6M__jMZFtPu1rtw8DqvL5CceqCw4Zg@mail.gmail.com>
+ <20240823.133656.1425422314833390920.fujita.tomonori@gmail.com>
+In-Reply-To: <20240823.133656.1425422314833390920.fujita.tomonori@gmail.com>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Fri, 23 Aug 2024 14:13:25 -0500
+Message-ID: <CALNs47u6+EFYkvpyHZD5zLcjQeb2CuZNTOjPuZ4MKewoKZYPMg@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 6/6] net: phy: add Applied Micro QT2025 PHY driver
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, andrew@lunn.ch, 
+	miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me, aliceryhl@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> If you say "also" there's a good chance the commit should be split into two..
+On Fri, Aug 23, 2024 at 8:37=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+> > At this point the vendor driver looks like it does some verification:
+> > it attempts to read 3.d7fd until it returns something other than 0x10
+> > or 0, or times out. Could that be done here?
+>
+> Yeah, we better to wait here until the hw becomes ready (since the
+> 8051 has just started) and check if it works correctly. A new Rust
+> abstraction for msleep() is necessary.
+>
+> Even without the logic, the driver starts to work eventually (if the
+> hw isn't broken) so I didn't include it in the patchset. I'll work on
+> the abstraction and update the driver after this is merged.
 
-I am splitting original patch into 2 separate patches. I forgot to do the reply all command on kernel lore.  Here is the link to version 2 for the improving the missing modules error message:
+It sounds okay to me to not block on this as long as it isn't glitchy
+- It should probably be a FIXME?
 
-https://lore.kernel.org/all/20240823054833.144612-1-david.hunter.linux@gmail.com/
-Subject: [PATCH 1/1 V2] Selftests: net: Improve missing modules error message
+> > Consistency nit: this file uses a mix of upper and lowercase hex
+> > (mostly uppercase here) - we should probably be consistent. A quick
+> > regex search looks like lowercase hex is about twice as common in the
+> > kernel as uppercase so I think this may as well be updated.
+>
+> Ah, I'll use lowercase for all the hex in the driver.
+>
+> It will be a new coding rule for rust code in kernel? If so, can a
+> checker tool warn this?
 
-> Could you clarify how it gets skipped? We use make [...] run_tests in our CI and it does seem to run.
+I don't know of any rule for this, I just noticed that the patch had
+both and it made me take a look at what is used elsewhere. rustfmt has
+an option to just commonize it for you, `hex_literal_case` [1], but it
+is unstable. That would probably be nice at some point.
 
-Here is my set up:
+> > Overall this looks pretty good to me, checking against both the
+> > datasheet and the vendor driver we have. Mostly small suggestions
+> > here, I'm happy to add a RB with my verification question addressed
+> > and some rewording of the 0xd001 (phy revision) comment.
+>
+> Thanks a lot! I'll send v7 soon.
 
-$ uname -a 
+Thanks!
 
-- Linux dshunter-HP-Laptop-15-dy5xxx 6.11.0-rc2+ #2 SMP PREEMPT_DYNAMIC Tue Aug 20 14:31:34 EDT 2024 x86_64 x86_64 x86_64 GNU/Linux
+- Trevor
 
-Steps I took to produce the error:
-	- use git clone to get the mainline source
-	- run make -C tools/testing/selftests
-	- make summary=1 -C tools/testing/selftests TARGETS=net run_tests
-
-Output: 
-# selftests: net: test_ingress_egress_chaining.sh
-# Warning: file test_ingress_egress_chaining.sh is not executable
-
-After running chmod +x on the shell script. The tests were able to be run.
-
-Thanks, 
-David 
+[1]: https://rust-lang.github.io/rustfmt/?version=3Dv1.6.0&search=3D#hex_li=
+teral_case
 
