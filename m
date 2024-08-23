@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-121254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70A0295C5DA
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:53:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EFD495C5E8
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:57:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 195F91F238C4
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 06:53:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC6321F23521
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 06:57:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CDC55894;
-	Fri, 23 Aug 2024 06:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AB582486;
+	Fri, 23 Aug 2024 06:57:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C925B53E15
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 06:53:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5E34204B
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 06:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724395987; cv=none; b=mKxAuMT6IhSG44KpVfJs3dvhw275gyRBEEmWmNRiekqNJZVkbEOX+gZyAB6hY5WrzeXoN0i9EacvmQ8YAC2a/pfnM1mazlgu2qMtd9V58PEQZsghf0M8yR0XY+EBuwnMl5rEPHATIayJBZKPdCzEObAB2jzUylaHKNyFnpe8tPo=
+	t=1724396247; cv=none; b=keSCPBIm8xvT8HYV7LgBJoJnIOJ6mnnoWxIStWqOe5zJEVKeJeP/hiSi9Cekm44zDVZJpsXB0oTLEMw1XwKDAYKrhgS6D6sqJkeDftlAihNX5RAf7vKS3IEZ4q8SwN0V9sUdbywGbeLAN14dFJl7KyYi3tGgfYywUsEexey0fSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724395987; c=relaxed/simple;
+	s=arc-20240116; t=1724396247; c=relaxed/simple;
 	bh=Li9jLLVGztu7s9HpsH4coq2z+6yS49pZW3lyxASzD2Y=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HMTNGuIjFBQBuEngfiFQzlOaW9q2O9cnzR/j6hTMcKgtPSSFyjQI1YRyL6JCGdxixL0ZoEflOsQqRCR21IvVflyLIgMu0496PWAhaLGSghXQmFnbqGgKG5DqDafXpXMHUDFutV9eR42V8NSDzErR70UgFwIblFmqIPW7sTzjYw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=R8Z+XLGLA595Cufaz8zXv0wtIrNmuUGVFTqFrp1eBOB8uMIaVN3qiPPS4DkKp+ng8ihA8gvDU4YqQXuywPpUVPzmV4cJMJDKesBvJMsNzLScFSTnWexIFDTZixf5kUKNtKxNt7cXuupG1KIW7fI6on9lBKY4K2NSH+NQQVEVI+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WqrP703ldz1j71T;
-	Fri, 23 Aug 2024 14:52:59 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WqrTL46gjzyQQk;
+	Fri, 23 Aug 2024 14:56:38 +0800 (CST)
 Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7E87E1A0188;
-	Fri, 23 Aug 2024 14:53:03 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 409651800D4;
+	Fri, 23 Aug 2024 14:57:20 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by dggpeml500022.china.huawei.com
  (7.185.36.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 23 Aug
- 2024 14:53:03 +0800
+ 2024 14:57:20 +0800
 From: Hongbo Li <lihongbo22@huawei.com>
 To: <edumazet@google.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
 	<kuba@kernel.org>, <pabeni@redhat.com>
 CC: <lihongbo22@huawei.com>, <netdev@vger.kernel.org>
-Subject: [PATCH -next 1/2] net/ipv4: fix macro definition sk_for_each_bound_bhash
-Date: Fri, 23 Aug 2024 15:00:42 +0800
-Message-ID: <20240823070042.3327342-1-lihongbo22@huawei.com>
+Subject: [PATCH net-next] net/ipv4: fix macro definition sk_for_each_bound_bhash
+Date: Fri, 23 Aug 2024 15:04:53 +0800
+Message-ID: <20240823070453.3327832-1-lihongbo22@huawei.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -54,7 +54,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
  dggpeml500022.china.huawei.com (7.185.36.66)
 
 The macro sk_for_each_bound_bhash accepts a parameter
