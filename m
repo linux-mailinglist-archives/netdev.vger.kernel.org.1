@@ -1,98 +1,148 @@
-Return-Path: <netdev+bounces-121237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13A4F95C497
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 07:04:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5D8295C49F
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 07:08:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C365F284D04
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 05:04:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97B5F1F24436
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 05:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28BAB47A5C;
-	Fri, 23 Aug 2024 05:04:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EBF84CDE0;
+	Fri, 23 Aug 2024 05:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Z4ztqpq2"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE2E8493
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 05:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56C378493;
+	Fri, 23 Aug 2024 05:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724389493; cv=none; b=d9yPcsLx2E9PDqDjLmI2idyk3uD1jcwHa1xttCfFFd/hSX5nXEFVDRie3QVqKPUU7tuACg3pYiyw+PtT3VNJ6e0pfIohq1svThwBMtz6DP86PX/IqY8BnhKTbIvosY2PGPnxIjAFyoIL7jgpP87C6YzOag7ipue2JZJwJ/O5auY=
+	t=1724389710; cv=none; b=Mzx6qGN1EDW2yFmxngv8GM9XGFl9IBcKsXZZU1jMnqkVdflsxH1IUQn8x+9QwDjWSdjT3wYPeSZSlDWXsk0g9QDcnVVfjqRl4Pi+mZ2BqjNKJ6JM52jqheJ5VswHudvcKSYRmeNj5d+7v3k4bwLFW4uQ419dwCtOE4Kbtj644/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724389493; c=relaxed/simple;
-	bh=NMRorqFpGgszKZPWZ050yNAARazEJPE6OyLCOQiCOZ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D+f+bhF3ABQ39VB+TFRcidpEdylg+vApe78QoJKQ25dDsGdFyhk71lYnLwOnOpz95nZ2dDKWBalpYXCPA755CzueYDMKItd+c/2ya9D8NXEx9/rBt5gMcwUKnWPTvyh7Z6NIqA3gEBTEtg8QVWF1z5sjnVr3TTZveZJra6lwKrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1shMTV-0001hN-A0; Fri, 23 Aug 2024 07:04:37 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1shMTU-002PQ7-CM; Fri, 23 Aug 2024 07:04:36 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1shMTU-001Whk-0s;
-	Fri, 23 Aug 2024 07:04:36 +0200
-Date: Fri, 23 Aug 2024 07:04:36 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kyle Swenson <kyle.swenson@est.tech>
-Cc: "kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH net-next v2 1/2] dt-bindings: pse: tps23881: add
- reset-gpios
-Message-ID: <ZsgYZLubeMZLuWpV@pengutronix.de>
-References: <20240822220100.3030184-1-kyle.swenson@est.tech>
- <20240822220100.3030184-2-kyle.swenson@est.tech>
+	s=arc-20240116; t=1724389710; c=relaxed/simple;
+	bh=u41TN4fWsUuqEu+S8B7BBgs1qEp2OAxQEOHmP2i5vow=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=QEa916GkqHN6PnD93LAaorCeQvCVGVLYsv/yQBB0tnz4vvMTWQ9ePqUIBJgxMa4t95YMvlZq+4DvDHF1nMV80XKxnSBNrvy2xKEFemy4xZLU6JQJekMehzy4z4/bjd5XzGcrEilLAbvvck20l6scStxNFgDRqQHcoEIpKUmZFAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Z4ztqpq2; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47N0UYgP030649;
+	Fri, 23 Aug 2024 05:08:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	WdGvVpsXCRq9JxOvfcDfeqqfX4yOBVQw2SCwliCTMWE=; b=Z4ztqpq2w89F4Xz7
+	kt7MuI4buGpyHxF7RxrvF6TplDYIPbPTXtbc45gtc9eGQEKAsYhrmH0XFGjY+O2e
+	zqz19mp6YR70z9GeR0/1lzlATnLA+uIg+QVZnAkCehK020f01vXZjqje9dHK5ar0
+	k1cNiOSNa7PRK3UavclX+ae+n4Hl68S1MkvpbkxWmnCBlzIzSTtLNrr1kUlo5FxT
+	ta/CaPdBXEIp03IYj9E3u+3M1xUsT5l0KjnuoDPh/z47u30gG45P83Ls+4zb60w5
+	UyA3BhTy9qOCSOuxGvpWNU16GzhIBZs9v8wudj4IwaDoCUrTYFGum1kHfxwp3/be
+	xJolhQ==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 414pdmj2tk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Aug 2024 05:08:09 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47N5871i026948
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Aug 2024 05:08:07 GMT
+Received: from [10.111.171.60] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 22 Aug
+ 2024 22:08:02 -0700
+Message-ID: <7c977de1-fdfd-47c8-a117-5dd510849f57@quicinc.com>
+Date: Thu, 22 Aug 2024 23:07:59 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240822220100.3030184-2-kyle.swenson@est.tech>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 06/13] net: qualcomm: rmnet: Correct spelling in
+ if_rmnet.h
+To: Simon Horman <horms@kernel.org>,
+        Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        "Paolo
+ Abeni" <pabeni@redhat.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        "Thorsten Winkler" <twinkler@linux.ibm.com>,
+        David Ahern
+	<dsahern@kernel.org>, "Jay Vosburgh" <jv@jvosburgh.net>,
+        Andy Gospodarek
+	<andy@greyhouse.net>,
+        "Sean Tranchetti" <quic_stranche@quicinc.com>,
+        Paul
+ Moore <paul@paul-moore.com>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Jamal
+ Hadi Salim <jhs@mojatatu.com>,
+        Cong Wang <xiyou.wangcong@gmail.com>, Jiri
+ Pirko <jiri@resnulli.us>,
+        "Marcelo Ricardo Leitner"
+	<marcelo.leitner@gmail.com>,
+        Xin Long <lucien.xin@gmail.com>, Martin Schiller
+	<ms@dev.tdt.de>
+CC: <netdev@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+        <linux-security-module@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
+        <linux-x25@vger.kernel.org>
+References: <20240822-net-spell-v1-0-3a98971ce2d2@kernel.org>
+ <20240822-net-spell-v1-6-3a98971ce2d2@kernel.org>
+Content-Language: en-US
+From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
+In-Reply-To: <20240822-net-spell-v1-6-3a98971ce2d2@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: nxn1AxiIUR23V32pf7IK2RKtu1Ne5L5l
+X-Proofpoint-ORIG-GUID: nxn1AxiIUR23V32pf7IK2RKtu1Ne5L5l
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-23_02,2024-08-22_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ suspectscore=0 malwarescore=0 phishscore=0 priorityscore=1501 mlxscore=0
+ impostorscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408230034
 
-On Thu, Aug 22, 2024 at 10:01:21PM +0000, Kyle Swenson wrote:
-> The TPS23881 has an active-low reset pin that can be connected to an
-> SoC.  Document this with the device-tree binding.
+
+On 8/22/2024 6:57 AM, Simon Horman wrote:
+> Correct spelling in if_rmnet.h
+> As reported by codespell.
 > 
-> Signed-off-by: Kyle Swenson <kyle.swenson@est.tech>
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Cc: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+> Cc: Sean Tranchetti <quic_stranche@quicinc.com>
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
+>   include/linux/if_rmnet.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/if_rmnet.h b/include/linux/if_rmnet.h
+> index 839d1e48b85e..c44bf6e80ecb 100644
+> --- a/include/linux/if_rmnet.h
+> +++ b/include/linux/if_rmnet.h
+> @@ -42,7 +42,7 @@ struct rmnet_map_ul_csum_header {
+>   
+>   /* csum_info field:
+>    *  OFFSET:	where (offset in bytes) to insert computed checksum
+> - *  UDP:	1 = UDP checksum (zero checkum means no checksum)
+> + *  UDP:	1 = UDP checksum (zero checksum means no checksum)
+>    *  ENABLED:	1 = checksum computation requested
+>    */
+>   #define MAP_CSUM_UL_OFFSET_MASK		GENMASK(13, 0)
+> 
 
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Reviewed-by: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
 
