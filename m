@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-121377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC9E95CF00
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:10:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52F7195CF08
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 888F8B289EF
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:10:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EB7F2874A4
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0442B197A77;
-	Fri, 23 Aug 2024 14:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B959F198E86;
+	Fri, 23 Aug 2024 14:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DvTzzdmr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vk+54zgU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFCD18A6A3;
-	Fri, 23 Aug 2024 14:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84DF718990B;
+	Fri, 23 Aug 2024 14:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724421810; cv=none; b=XIMPpb2PkdS1reUOVwLuGED1RVdArsvrTQvanC3TAIPWM6WXULkbkUYP7ZHt8cUM+0ojy78wmPmSuuljI7ee0pJ64j4QX371pGmI81Xn82wNnxuBkYr7pm5IcWtcI4jcHV4ph6K/CA7kL7YtfsVmPEFkDH0jrr6wBgxukH+iFZU=
+	t=1724421818; cv=none; b=WsSXnwM8tS+y6wFZ86B4Dh+lNN9AgMUQz8k7tY7BdyqU2IUal+niqA6+5O7axIK3663bC9EcPfzBXQWINfPX619l1DI/MiErfoc3uG8Fr2P+DyQoZ5K6xkPpCRtyvItCG62LjbAsTKhOQO2X72+L5wAKNwHReNu5zB3+TUv+ra8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724421810; c=relaxed/simple;
-	bh=jWxdGS6Ho7i95RPFxbGoVcjSq9BXFV6jYEQsxzcxvv0=;
+	s=arc-20240116; t=1724421818; c=relaxed/simple;
+	bh=uBw5mKaYmKbMmM6SA7OhEUEYjzca53Hg2mGyI3POvZA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T+O3ueL5lEv6kK9CmYSLDsJ9d7xNQMbjmWTvWgDzIJRJ7RED+3M7WpwZBsgkykxJKjPZz7VDkf1gm/V8PdiVhQvFCiDzQgtByGZ4TJ7rNpjNzhImWLy0e8nn7KF/iCsHj8LpBdGSyf9D09gT/Y+c/rSJfmbBuKCy7jNQY28wt1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DvTzzdmr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60D3EC4AF09;
-	Fri, 23 Aug 2024 14:03:29 +0000 (UTC)
+	 MIME-Version; b=W4Y1BQBGKCPP/dliiV2F8VoSb+bd1v4cckq3g0ggImvXl6aOWQZa8vEe8NCSLV43NBMLmjV3tRjsPMn3Gv7SFluUAwz7WavDoao1iI7hdSFycbSdMOJ1p6t938fjNxl07WeVVTjwTGQINoER96liRC9ft2I/qOj8x00QDuAyBJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vk+54zgU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91F11C32786;
+	Fri, 23 Aug 2024 14:03:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724421810;
-	bh=jWxdGS6Ho7i95RPFxbGoVcjSq9BXFV6jYEQsxzcxvv0=;
+	s=k20201202; t=1724421818;
+	bh=uBw5mKaYmKbMmM6SA7OhEUEYjzca53Hg2mGyI3POvZA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DvTzzdmrX3OACfK0iq/FzL2p1vLn3qzdmBMDfxf8Y6XBDeCViwWfTjNs5Pk6cX6yV
-	 lSsaJXIt2gYRuCYJLhM8pIcL31KABOYFnS8NvlVjstAt5bao57Zm0M8B1okCFNj79Y
-	 2heXol2JtDhRTnnGW1oWpMzMXuIUXPoPmOj6tfcI49omrWSFgmWph5uzOEbqYhWdP2
-	 zLvzYRCkEM92Ka3RuOAcAo3EJcJdIVxoqTuT0UFhiZ6Dfkxtt9+c60HHdec1TuzzFE
-	 bvQ8wclp0Dw3VWTZooL3rFNmu+NdyumdZukQKNTZfrHw8TMEkWeeFh6Un4h/HDEXmo
-	 2X3m4FNK0J7lA==
+	b=Vk+54zgUccvYFZV6ZLLg0XytXNFHySlLDXjoijclZcmCJH8fHf9CEPoKYUnsOYoRu
+	 u9I8xt94gbT1FQzKI0Jx6yeUPLukX0p3/pv9rweEy/WUxnIEHphedsUckkh6QU6JcC
+	 2L/RQGqxQtO//QM981D+D+Y+cl8ccF+2QlOxrDzeYVNZ7PyH7oPMM5rzA7T8xmqSnf
+	 5yX2xvJ7nKj68qyRf5LNQunS4pds4UXdKwMH6AXbt3logoAQkUjW+dmU3uE4bbPqaQ
+	 NDy78YDa6xTNq2X6GXL6ZX71RrqOJ7yb8LnqbonNzPN/gE2l+nzgdp7RMntFsJGvlM
+	 iVE/xJnY5TTKw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Foster Snowhill <forst@pen.gy>,
-	Georgi Valkov <gvalkov@gmail.com>,
+Cc: Moon Yeounsu <yyyynoom@gmail.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
+	cooldavid@cooldavid.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	oneukum@suse.com,
-	linux-usb@vger.kernel.org,
+	sd@queasysnail.net,
+	jacob.e.keller@intel.com,
+	shannon.nelson@amd.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 07/20] usbnet: ipheth: fix carrier detection in modes 1 and 4
-Date: Fri, 23 Aug 2024 10:02:21 -0400
-Message-ID: <20240823140309.1974696-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 10/20] net: ethernet: use ip_hdrlen() instead of bit shift
+Date: Fri, 23 Aug 2024 10:02:24 -0400
+Message-ID: <20240823140309.1974696-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240823140309.1974696-1-sashal@kernel.org>
 References: <20240823140309.1974696-1-sashal@kernel.org>
@@ -71,78 +73,48 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.47
 Content-Transfer-Encoding: 8bit
 
-From: Foster Snowhill <forst@pen.gy>
+From: Moon Yeounsu <yyyynoom@gmail.com>
 
-[ Upstream commit 67927a1b255d883881be9467508e0af9a5e0be9d ]
+[ Upstream commit 9a039eeb71a42c8b13408a1976e300f3898e1be0 ]
 
-Apart from the standard "configurations", "interfaces" and "alternate
-interface settings" in USB, iOS devices also have a notion of
-"modes". In different modes, the device exposes a different set of
-available configurations.
+`ip_hdr(skb)->ihl << 2` is the same as `ip_hdrlen(skb)`
+Therefore, we should use a well-defined function not a bit shift
+to find the header length.
 
-Depending on the iOS version, and depending on the current mode, the
-length and contents of the carrier state control message differs:
+It also compresses two lines to a single line.
 
-* 1 byte (seen on iOS 4.2.1, 8.4):
-    * 03: carrier off (mode 0)
-    * 04: carrier on (mode 0)
-* 3 bytes (seen on iOS 10.3.4, 15.7.6):
-    * 03 03 03: carrier off (mode 0)
-    * 04 04 03: carrier on (mode 0)
-* 4 bytes (seen on iOS 16.5, 17.6):
-    * 03 03 03 00: carrier off (mode 0)
-    * 04 03 03 00: carrier off (mode 1)
-    * 06 03 03 00: carrier off (mode 4)
-    * 04 04 03 04: carrier on (mode 0 and 1)
-    * 06 04 03 04: carrier on (mode 4)
-
-Before this change, the driver always used the first byte of the
-response to determine carrier state.
-
-From this larger sample, the first byte seems to indicate the number of
-available USB configurations in the current mode (with the exception of
-the default mode 0), and in some cases (namely mode 1 and 4) does not
-correlate with the carrier state.
-
-Previous logic erroneously counted `04 03 03 00` as "carrier on" and
-`06 04 03 04` as "carrier off" on iOS versions that support mode 1 and
-mode 4 respectively.
-
-Only modes 0, 1 and 4 expose the USB Ethernet interfaces necessary for
-the ipheth driver.
-
-Check the second byte of the control message where possible, and fall
-back to checking the first byte on older iOS versions.
-
-Signed-off-by: Foster Snowhill <forst@pen.gy>
-Tested-by: Georgi Valkov <gvalkov@gmail.com>
+Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+Reviewed-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/usb/ipheth.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/jme.c | 10 ++++------
+ 1 file changed, 4 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/net/usb/ipheth.c b/drivers/net/usb/ipheth.c
-index cdc72559790a6..46afb95ffabe3 100644
---- a/drivers/net/usb/ipheth.c
-+++ b/drivers/net/usb/ipheth.c
-@@ -355,13 +355,14 @@ static int ipheth_carrier_set(struct ipheth_device *dev)
- 			0x02, /* index */
- 			dev->ctrl_buf, IPHETH_CTRL_BUF_SIZE,
- 			IPHETH_CTRL_TIMEOUT);
--	if (retval < 0) {
-+	if (retval <= 0) {
- 		dev_err(&dev->intf->dev, "%s: usb_control_msg: %d\n",
- 			__func__, retval);
- 		return retval;
+diff --git a/drivers/net/ethernet/jme.c b/drivers/net/ethernet/jme.c
+index 1732ec3c3dbdc..a718207988f2c 100644
+--- a/drivers/net/ethernet/jme.c
++++ b/drivers/net/ethernet/jme.c
+@@ -946,15 +946,13 @@ jme_udpsum(struct sk_buff *skb)
+ 	if (skb->protocol != htons(ETH_P_IP))
+ 		return csum;
+ 	skb_set_network_header(skb, ETH_HLEN);
+-	if ((ip_hdr(skb)->protocol != IPPROTO_UDP) ||
+-	    (skb->len < (ETH_HLEN +
+-			(ip_hdr(skb)->ihl << 2) +
+-			sizeof(struct udphdr)))) {
++
++	if (ip_hdr(skb)->protocol != IPPROTO_UDP ||
++	    skb->len < (ETH_HLEN + ip_hdrlen(skb) + sizeof(struct udphdr))) {
+ 		skb_reset_network_header(skb);
+ 		return csum;
  	}
- 
--	if (dev->ctrl_buf[0] == IPHETH_CARRIER_ON) {
-+	if ((retval == 1 && dev->ctrl_buf[0] == IPHETH_CARRIER_ON) ||
-+	    (retval >= 2 && dev->ctrl_buf[1] == IPHETH_CARRIER_ON)) {
- 		netif_carrier_on(dev->net);
- 		if (dev->tx_urb->status != -EINPROGRESS)
- 			netif_wake_queue(dev->net);
+-	skb_set_transport_header(skb,
+-			ETH_HLEN + (ip_hdr(skb)->ihl << 2));
++	skb_set_transport_header(skb, ETH_HLEN + ip_hdrlen(skb));
+ 	csum = udp_hdr(skb)->check;
+ 	skb_reset_transport_header(skb);
+ 	skb_reset_network_header(skb);
 -- 
 2.43.0
 
