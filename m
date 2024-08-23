@@ -1,105 +1,125 @@
-Return-Path: <netdev+bounces-121414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B92395D008
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:35:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A154595D00C
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:36:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17E28286781
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:35:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D49BC1C23A27
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:36:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D435F191F60;
-	Fri, 23 Aug 2024 14:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F04188A04;
+	Fri, 23 Aug 2024 14:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gB5/gceK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AyXscExh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A140618892B;
-	Fri, 23 Aug 2024 14:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769981885B4;
+	Fri, 23 Aug 2024 14:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724423133; cv=none; b=J5JmiNbRBOc0bYRlQ0QKr6YHs3o/FQ5sKWVcKE/Vds09R+wYiDzowvxanuujYcpNqkVw/pLVyjWl7lgX9zZTD6VeNmx9xpJBDJ4WPGf2w5wrku2IHA75DQR7YIOd5ZYAaOkC7csnwd35WJO8EMtrn1MWKwabTyUgTegiiuTTkEU=
+	t=1724423250; cv=none; b=XPFbY30fwh2nqJsHq/UrhSX4zeNhI+okbNV8VxzyqQyKvDDve8i2xbt1YHrDsmT09UqedeV959GeTUmope4b/89w/dnJioQl4WR5a2wd2YPJU8tPMQCl/8GplylaS7WzifMGxL1uSccEEZK/YiQuVuf/sPJZV8HfQbd17L3Qdqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724423133; c=relaxed/simple;
-	bh=E6HhVC49fWMIbCrNdxjo9QdjxU/ksztYw7Z1Vc2pjb4=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=b9C3ipNvNNvwlT+WXhU+pHSksDpRhSOHXYFtNswTu3JselT2yzUdSCc4pp8jP/4JB7LncZmOFCa9WmFgZp4vKffBrMI4FpIIczVqWbe6BoOcQWp3Etlyp4cRCk8WSFCwgXk4iTcTAg/5KkumAK1LBqnywKkdDXBJt6FsCHzCE6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gB5/gceK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E75EDC32786;
-	Fri, 23 Aug 2024 14:25:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724423133;
-	bh=E6HhVC49fWMIbCrNdxjo9QdjxU/ksztYw7Z1Vc2pjb4=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=gB5/gceKTeiP7nMDM4TqTZO+1Ez6JQlQ08UcyjKutT6JKeYAanxt/c+rFtgXiI1TC
-	 1y8pK1DH2AGrgMqY+d8+QprezKygf9ejPEfDWoVcBhtFOh8TmodTnZfqo/EkF6Gx7l
-	 nMCGfqXdPEAfwQxBbtQuz4wnRw5O30/yjSZ7hG+QgcnLxMe3G421NP+ObNFs/2kTVU
-	 15/Che5vrE3+/1MEZV54mys3V/BY1z0ZOjY6vPaItKHqyMf8XTVGrtLxi4aITfkfvQ
-	 lgo2mZaH8GA4gnjUxNqiWrB+ieiAHqjbMelq4ILQOsnJISriOZ7UOYd2Mz4RqTaw5f
-	 jiYOI3KhmdQlg==
-Date: Fri, 23 Aug 2024 09:25:30 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1724423250; c=relaxed/simple;
+	bh=vrHfFAtyTYU/vEWV4sr7xgTlF9qhuKM0/WKOzmuISPA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KSfA0HgMmzuKZnTEoigP5i5B2n3XjT9sNDtMJG3x7E4TOYc3CninlRtZQZdVJ80m5wKJfbVOr1Xr11JAdqtcwaAeS5XsXQ8HsUxcPDNMosPTpArpgZ07Yzo5dLlbjuC4DD6ffsz81re5KOc5rAOQEB+KmrT/ore5F9HuVNRqLF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AyXscExh; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-714262f1bb4so1708808b3a.3;
+        Fri, 23 Aug 2024 07:27:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724423249; x=1725028049; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=KacMsRbnjBEszE7BgUys9UOYH47mgd4u1o+yN5SyyKc=;
+        b=AyXscExhzfWQgSV0vEMKGw31svUVHYguCE6Ax408d5gfFoyVRPr5t4flNpNzfqlFG5
+         3qkeeut142vhNuOBdEaCelYulj/BH0/n498mzTGWxj9cEh1nXcgpUx43F5X2H+uIqkbj
+         xoonqEo8vgZ/2qMo+yVWzGQBgjMCs9+zp8wk9rBc+i0jidbJqdnyvgp5Vr5IGWHpk9py
+         yFGkuQHHfi+fozDbCdVgkgLHNB3czB5udye1AXXPQO8+Hu3kz0hVkcSiavJPDt0qL1Z0
+         jBQOQLTVuUpa4quzfXcU/lpTSg7xV0XKie1mI1X7WQFncVqJtfiTPNH5yHt13scNkguR
+         9isg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724423249; x=1725028049;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KacMsRbnjBEszE7BgUys9UOYH47mgd4u1o+yN5SyyKc=;
+        b=rhbTKeindflSGZYwnMlJ0vMdaW8drISWGalRdh0Fs9+T68i8nVvFuUSXSIBI0VL3tt
+         ganeIF+uUUtxaKFYkFkQU8Xx0ivd8Jl0KK735hiRbyHiBkHsUdbhRd0T7IP7WnV+L0CV
+         yAS55d56ndAQrfOb/gF76FagEkrqUQTxShCsolT6lAVe/6BB4Plhwr6e02bgc1gG/bax
+         ZXWmsf8qmY+lvoZ4I0Wa2geBDs9TJzThF1AztjB5BkKBCiRp3rN9KOVf9gOwe17c3VDl
+         lCciFKA2ZC6+c8j3nlzs2gDW42nwetHXcEJRlfQlOjG0mblx1QQHdw1eOlyLf2Jkx1fX
+         kuJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUCdHa2PePUWZKDuEuyeBxfm2pmSZ4/qynzVn7U1s+RtxKAK+3d5xFh1MayEX+ytrLcC1cgOsf5TEcs83A=@vger.kernel.org, AJvYcCUeUcCSbMqPtCns2o+R1FQgIcq3XJDKhgkdU892ny96xYKEotl//AEKYRQt+VHsBUlTZbTPHm9u@vger.kernel.org, AJvYcCVthmPYpMzhUW9kMXO/1MIwZoTvyZPrtfKMubh2LUbKbZ7WoWbBUxmVVxeTUC2A7PC1ncyK5ZOks3PlZ/RsJsyF@vger.kernel.org
+X-Gm-Message-State: AOJu0YwiROmbn4IEaTwR9knqOCgNlBKsWnu4vXZOfGpKlmBg1+KYAWLE
+	G8Qe880yRFvzjaonr3Ehh29gRJXC7DVFbypHtWZEHhuigys0WvIOwltaRURyr3cjmnZSAro+ys/
+	5ALC6jALaOcvYYYSocHnySu39ITw=
+X-Google-Smtp-Source: AGHT+IHXq68Af02NOud52gJvvYvsRbnAv54cUYzs+7St2Zt30iiL39jJ9aR7NzlzY2ozsTN/507wCWIs2TdibOUTvs0=
+X-Received: by 2002:a05:6a00:10c1:b0:714:1a74:9953 with SMTP id
+ d2e1a72fcca58-71445d5b1acmr2630636b3a.16.1724423248623; Fri, 23 Aug 2024
+ 07:27:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Cc: linux-kernel@vger.kernel.org, marcel@holtmann.org, edumazet@google.com, 
- neeraj.sanjaykale@nxp.com, davem@davemloft.net, netdev@vger.kernel.org, 
- conor+dt@kernel.org, devicetree@vger.kernel.org, 
- bsp-development.geo@leica-geosystems.com, linux-bluetooth@vger.kernel.org, 
- kuba@kernel.org, amitkumar.karwar@nxp.com, luiz.dentz@gmail.com, 
- krzk+dt@kernel.org, customers.leicageo@pengutronix.de, pabeni@redhat.com
-In-Reply-To: <20240823124239.2263107-1-catalin.popescu@leica-geosystems.com>
-References: <20240823124239.2263107-1-catalin.popescu@leica-geosystems.com>
-Message-Id: <172442313089.1474016.13312263665925055519.robh@kernel.org>
-Subject: Re: [PATCH next 1/2] dt-bindings: net: bluetooth: nxp: support
- multiple init baudrates
+References: <20240815-tcp-ao-selftests-upd-6-12-v3-0-7bd2e22bb81c@gmail.com>
+ <20240815-tcp-ao-selftests-upd-6-12-v3-2-7bd2e22bb81c@gmail.com>
+ <20240821191004.GF2164@kernel.org> <CAJwJo6Zix_bkE38RmDW6ywojvmzeOuPVtwH+Jqqz6AT=6jmh5A@mail.gmail.com>
+ <20240822101339.GI2164@kernel.org>
+In-Reply-To: <20240822101339.GI2164@kernel.org>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Fri, 23 Aug 2024 15:27:17 +0100
+Message-ID: <CAJwJo6YFqhS6KS2fArzg8ovDbWgysDvwvB8KmO-gJoPdWOBw9w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/8] selftests/net: Provide test_snprintf() helper
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+On Thu, 22 Aug 2024 at 11:13, Simon Horman <horms@kernel.org> wrote:
+>
+> On Wed, Aug 21, 2024 at 10:35:10PM +0100, Dmitry Safonov wrote:
+> > Hi Simon,
+> >
+> > On Wed, 21 Aug 2024 at 20:10, Simon Horman <horms@kernel.org> wrote:
+> > >
+[..]
+> > > Hi Dmitry,
+> > >
+> > > Some minor nits, as it looks like there will be a v4.
+> >
+> > Thanks, both seem reasonable.
+> > Did you get them with checkpatch.pl or with your trained eyes? :)
+> >
+> > These days I run b4 prep --check and on latest version it just gave a
+> > bunch of fmt-strings with columns > 100.
+>
+> Hi Dimitry,
+>
+> For networking code I usually run:
+>
+> checkpatch.pl --strict --codespell --min-conf-desc-length=80
+>
+> Where 80 is, I believe, still in line with preferences for Networking code.
+> Although I'm not entirely sure it is applicable to this patch.
+>
+> As to your question, in this case I think it is the --strict that causes
+> checkpatch to flag the issues I raised. Sorry for not mentioning that in my
+> previous email.
 
-On Fri, 23 Aug 2024 14:42:38 +0200, Catalin Popescu wrote:
-> Make "fw-init-baudrate" a list of baudrates in order to support chips
-> using different baudrates assuming that we could not detect the
-> supported baudrate otherwise.
-> 
-> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-> ---
->  .../devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml  | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
+Good, thanks!
+Now I can see/fix them :-)
 
-My bot found errors running 'make dt_binding_check' on your patch:
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/bluetooth/nxp,88w8987-bt.yaml: properties:fw-init-baudrate:maxItems: False schema does not allow 8
-	hint: Scalar properties should not have array keywords
-	from schema $id: http://devicetree.org/meta-schemas/keywords.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240823124239.2263107-1-catalin.popescu@leica-geosystems.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Cheers,
+             Dmitry
 
