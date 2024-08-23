@@ -1,133 +1,140 @@
-Return-Path: <netdev+bounces-121476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7572995D4CE
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 20:00:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21FA295D4D1
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 20:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E2FD1F24D9F
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:00:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 505F81C21922
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:02:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D711819149E;
-	Fri, 23 Aug 2024 18:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846C4191477;
+	Fri, 23 Aug 2024 18:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K96QQ8l5"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="l27QRTqJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5588518BC3A;
-	Fri, 23 Aug 2024 18:00:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA3D318FDD6
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 18:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724436042; cv=none; b=JX0s7cGWOLbD5t2/6OzxGM4+kSSl9mOnHBPWF6+2889zD1SsPzx3wBlZ7dXLHIQlSp3NJPxnL+ok5uX6JQr1il7kOlu1nGRpBSuiWURTlS7orgZ52bCjFoR98j0W5supznIMlYyQ4hgRP2fCtyDUmXm4+FsMFOxmXhK8ajo34Ag=
+	t=1724436134; cv=none; b=AL4HJ58UXyZW9mKrye4LsDPp7/xr6SUy2xKAu4VZS5f8DEBSor3pepdlUlKPTtFZ24TShavjwafDrgb7O7Gbo/gxcZu9xmDvC9OkqWAN6/uu56eUrrGWKPNuBpv2pdPpPKud0zvF9ZkDc7iTo3MsrNxk9bfKiEA4/pLUo2iGdbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724436042; c=relaxed/simple;
-	bh=v9b8ku+jaIyD4fFRQI5X0MarrR1Ax2rFNTA+C2B5iK0=;
+	s=arc-20240116; t=1724436134; c=relaxed/simple;
+	bh=KFzisPDMHJo7Ln/wIh4AWQVO8V7I807m5GrKhyN8ij8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VLTRhvwZ2AkP4zXdIN1i4lr9ZnY1qlt94eHCHdMV7K5hAQfrVFigI9G5e+Yic9iE4kS6Y183wye+y1yIMZFG2Qzw5Uffcrwc7ow6OgV1ONiZqhKBXt4UciHF83J58mTq4j469Mc5AAvfQT2GwLUfWNJWMxx1HnYK818roXZUI/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K96QQ8l5; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724436041; x=1755972041;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=v9b8ku+jaIyD4fFRQI5X0MarrR1Ax2rFNTA+C2B5iK0=;
-  b=K96QQ8l5w6ERK2lJDaNwREnHIC9MfUGu1WjVwzegYq7Cs7Ls9mogbOmH
-   cw4/WUuBjOv1wpuTOwkoDk2tG99X78wp6a5PYF8nq6pFyqBW+oefLQhcZ
-   SJFT3CMP/EXZA3TtYKaG9G4t4yxUPPfaYR+j8H6Edwz920x0urdK1y7ii
-   J2oX6g8uM7SdWtYU45QfP6cQazr+qSlcg6YJ95AbhGlVSU6pTCkb2ddOg
-   gnwfOTjbbarj2laF7NaqcWeApDYscHrvgaybemeCsayGDHSOVQJ+hIKFz
-   sy2OpHcPYl+EDGQvI75jQewdJUp0OekNFef3rGchEyaCI9Yap20jNxjFF
-   w==;
-X-CSE-ConnectionGUID: vQ3s6ha6T7GmFTma09aUyg==
-X-CSE-MsgGUID: ML4ql6Q1QsW3om6t2HIYrw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="22442057"
-X-IronPort-AV: E=Sophos;i="6.10,171,1719903600"; 
-   d="scan'208";a="22442057"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 11:00:40 -0700
-X-CSE-ConnectionGUID: Krn4UcabSkKYPMgYk8oWRA==
-X-CSE-MsgGUID: 85gS8c3wRYCX4KpbpuU53A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,171,1719903600"; 
-   d="scan'208";a="61885197"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 23 Aug 2024 11:00:36 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1shYaQ-000Dvo-01;
-	Fri, 23 Aug 2024 18:00:34 +0000
-Date: Sat, 24 Aug 2024 02:00:08 +0800
-From: kernel test robot <lkp@intel.com>
-To: Marek Vasut <marex@denx.de>, linux-wireless@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Ajay Singh <ajay.kathat@microchip.com>,
-	Marek Vasut <marex@denx.de>,
-	Adham Abozaeid <adham.abozaeid@microchip.com>,
-	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-	devicetree@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] wifi: wilc1000: Add WILC3000 support
-Message-ID: <202408240116.5VwA6jhI-lkp@intel.com>
-References: <20240821184356.163816-2-marex@denx.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qlFci61ScO0DR2TlRZFUsqTtmaIMtVmHektrBZIrZNhNq1lgMh8HKjVWi4QoG6N6F6ojOm0wDcCxKVbQzv4v2ZaRkI5iYW79Q9LqyrWc6HYDbUijszuwZoI0ry9cip1pGuYgCOeyfOK0fuRmc6IHd842g5/ffXaxus4fQ3MqVIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=l27QRTqJ; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5bed83488b6so2926498a12.2
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 11:02:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1724436131; x=1725040931; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=chz6WNcKqUHubBnvxXzbFav7NB3CIhhztw7hfQz7I5k=;
+        b=l27QRTqJRTTUaiTKpACtd8J3FUkDUDPzEGPK4pPrp44NcNINlNuoSBJoVWAcjg1cDM
+         SM7DaqTr3jnKTQKM1PhtrnTcJ4eeqEC15ltlplRiHgPlS5bgd2zr3VWkLeGanWDVJxK0
+         tSc/kuFODF7dlcZr67az1SAlHNOklIMOlgfoI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724436131; x=1725040931;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=chz6WNcKqUHubBnvxXzbFav7NB3CIhhztw7hfQz7I5k=;
+        b=BihPQcM19r3v+mtR2QWL0gdsgHgo66DJuoDlswPiRL7Luw8pq2HcJU6tTJhbHvPQSX
+         zP2/Vbof5MKAT8L0rvLdkEP7GVaMSKl6zZspCvHWZr2gIBsIoEdR/iydoY+zinigDjCN
+         Wr8MkRrHb/1CzaLuiUl+6236ls5mAXLE+TrKp3HPK5mnjcMzM3IDtzT8M42/Y219ktnP
+         gVowLqd7JTq/fQP/BXms9zTyYlklFihiBMbFm71+cxI+llxRNyeVydAjuPzQ56K2ZUVT
+         TORA1GdgCXYawSr+JhVrDfA24pqO1q5+eRKRMJohEoU52kiNaOmde/jTx/80chffEq6N
+         QJQA==
+X-Gm-Message-State: AOJu0YxPC5gi4ow8hdxT8kIZOloNAz3by3FoGowEkJvdUir2LeiS3hzn
+	H0uwG7sBVxCbbCgD4ox2vrFrnPI95jH6gpFqVon299N0KRJ2wAWkpSw+3N+xJs8=
+X-Google-Smtp-Source: AGHT+IHLmogsSLL4RG6OHQXTCvoGTD7y9oeQstqmNv9alfhru+JJ/kqYHZ2RPkrU6o+dIL+xFV2BAw==
+X-Received: by 2002:a05:6402:2743:b0:5c0:88fe:261b with SMTP id 4fb4d7f45d1cf-5c0891637dbmr1859486a12.11.1724436130569;
+        Fri, 23 Aug 2024 11:02:10 -0700 (PDT)
+Received: from LQ3V64L9R2 ([185.226.39.209])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c04a4c43e7sm2387276a12.70.2024.08.23.11.02.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2024 11:02:10 -0700 (PDT)
+Date: Fri, 23 Aug 2024 19:02:08 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
+	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com, kuba@kernel.org,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 3/6] net: Add control functions for irq
+ suspension
+Message-ID: <ZsjOoJBQBls7dl8o@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
+	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	kuba@kernel.org, Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20240823173103.94978-1-jdamato@fastly.com>
+ <20240823173103.94978-4-jdamato@fastly.com>
+ <CANn89iJmp2yviC=Z-n7-=suw8N=SJ7uoy0xy5LMQRKDhubNBZg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240821184356.163816-2-marex@denx.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iJmp2yviC=Z-n7-=suw8N=SJ7uoy0xy5LMQRKDhubNBZg@mail.gmail.com>
 
-Hi Marek,
+On Fri, Aug 23, 2024 at 07:56:32PM +0200, Eric Dumazet wrote:
+> On Fri, Aug 23, 2024 at 7:31 PM Joe Damato <jdamato@fastly.com> wrote:
+> >
+> > From: Martin Karsten <mkarsten@uwaterloo.ca>
+> >
+> > The napi_suspend_irqs routine bootstraps irq suspension by elongating
+> > the defer timeout to irq_suspend_timeout.
+> >
+> > The napi_resume_irqs routine effectly cancels irq suspension by forcing
+> > the napi to be scheduled immediately.
+> >
+> > Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> > Co-developed-by: Joe Damato <jdamato@fastly.com>
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > Tested-by: Joe Damato <jdamato@fastly.com>
+> > Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> > ---
+> 
+> You have not CC me on all the patches in the series, making the review
+> harder then necessary.
 
-kernel test robot noticed the following build errors:
+My sincere apologies, Eric, and thank you for your time reviewing
+this.
 
-[auto build test ERROR on wireless-next/main]
-[also build test ERROR on wireless/main net-next/main net/main linus/master v6.11-rc4 next-20240823]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I used a script I'd been using for a while to generate the CC list,
+but it clearly has a bug.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Marek-Vasut/wifi-wilc1000-Add-WILC3000-support/20240822-024553
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git main
-patch link:    https://lore.kernel.org/r/20240821184356.163816-2-marex%40denx.de
-patch subject: [PATCH 2/2] wifi: wilc1000: Add WILC3000 support
-config: i386-randconfig-054-20240823 (https://download.01.org/0day-ci/archive/20240824/202408240116.5VwA6jhI-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240824/202408240116.5VwA6jhI-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408240116.5VwA6jhI-lkp@intel.com/
-
-All errors (new ones prefixed by >>, old ones prefixed by <<):
-
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/devfreq/governor_powersave.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-core.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-aspeed.o
->> ERROR: modpost: "wilc_get_chipid" [drivers/net/wireless/microchip/wilc1000/wilc1000-sdio.ko] undefined!
-ERROR: modpost: "usb_alloc_urb" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_free_urb" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_anchor_urb" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_submit_urb" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_unanchor_urb" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_kill_anchored_urbs" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_control_msg" [drivers/bluetooth/btmtk.ko] undefined!
-ERROR: modpost: "usb_set_interface" [drivers/bluetooth/btmtk.ko] undefined!
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+For any future revisions I will be sure to explicitly include you.
 
