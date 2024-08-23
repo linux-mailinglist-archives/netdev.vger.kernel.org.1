@@ -1,79 +1,137 @@
-Return-Path: <netdev+bounces-121454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2272795D3D6
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:58:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF07995D419
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 19:16:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C54ED2844C1
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:58:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FE3C1C214E3
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 17:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4FB188A1A;
-	Fri, 23 Aug 2024 16:58:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C75518E03F;
+	Fri, 23 Aug 2024 17:15:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EMq9rtbw"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fXIE0q43"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C828941C69
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 16:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4104F18BC0F
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 17:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724432321; cv=none; b=hWd6NCXk05wlg1T2wS12d/a5YtMm6oO3pGyUKl6lOYTqt8Rw6MI6IvYY5bhekk2R3V9JTEGRnOoAwbOLsOLkC0AUPr6b9VZJ4oZ9wT8x25Rlgz6u7IlQFMqjVTlqgNjTVVQASutRb0/5SEIJBpFYzFac/HkvNdC+YprwfgWkKn8=
+	t=1724433358; cv=none; b=BHJs5QmRVUPXFlUDYH850mPXvF3qqeLlbgBwcfC6cQkxJkkS3NozEMck5folM+6wlQsf0mcp1rC50pvYN7QgjcnNCBt+uaMfiJYYWreu7pv1VhY6YdhraFsH5q5FUZ+2UzaLEWeU7S3Mg9/UO5ZOtxBMna0DhH4d3iBBu1SbCsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724432321; c=relaxed/simple;
-	bh=O8/A8YiBwZQtMblwjv9iC3POYBgzLhh9zWSBNVEdZmk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l4OVjAEz+4SNo9zk/AIWvRroSh1pKzWnNvyaTLCCOqJB/MY3ZpFmOMcQ9WSoJ1MFX/xTZRrG5mIkiyhC26oKXvALsc3LK7jjYF3V7nBz9IzwoS3Lvie13Tf2VhdhS1e8Hbb2z7W8u4jfRgEZpwTZyQpoS+jduH8JAQ+u3VDhH4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EMq9rtbw; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5bed0a2ae0fso2791060a12.1
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 09:58:39 -0700 (PDT)
+	s=arc-20240116; t=1724433358; c=relaxed/simple;
+	bh=VPZAtg08Wy5/FG+Kj/wTZuQQZpFnItvR2PIwTa5Vc/I=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YxdDQO4RTVBBVxwNodgUXlQSKJcaRtWtdtzN8Vq3OEaboI6hlE6/CsUIhu4o40CraSSmFmMnCxGGGy+VjOyECcVFy0CFfVHY51ReOyPk1r1aGAytvBau8KB+5ObCY5e7gGxSTn2FsH6V50TnPBkPOIaLN2kOTEeN/mktBmlZycs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fXIE0q43; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a8679f534c3so268786166b.0
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 10:15:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724432318; x=1725037118; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Eno3+7waxBHUc2l2Zyr0fzWW/5VQcedIuO58791HC0o=;
-        b=EMq9rtbw1BmSUiVG+kfk/cIIIwcYSai4wWDdLtDg9lZ+fQAuPUnUX+QS1lZlyypgvI
-         GuqvMOsJr4Foe4FAAyPeU8DoCHrh/UMm8/DXhPnokwxoQBAZobkEbuoUdLVOScGJqUMN
-         unP4GukiZG2hbK41ivCuU/LOhP7gxyL+gWn8TQ4RQ8An8VIcANidjpoMV2uB+AWx8GO3
-         Vnb8RzDfa5umTkapnGQP3C3difCDzSZ3rGlOgmstX7ZKKfjwjbPO3vxuQ015lASVc39b
-         0zlD1ilhpmyQ5CL4ONpbIJTLlW3xUUBk0U6G7xvYfpiLqnjRxdEoyIZIzVcjPNh0yfJJ
-         9kdA==
+        d=suse.com; s=google; t=1724433355; x=1725038155; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:date:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Q5kboO0j45Is859BAgD4iFoFAta2hgxS6Xgur8E+680=;
+        b=fXIE0q43JG/afuGoJEo+1ZFmAZyWLPTmqGuQgqMJ/4lFrRm0qZuHBzQqU5pb+FghpW
+         h9I+J8sE1cbOerZ1XocD/Dsjwv0sbkDb32VVtnF1twJKGQ21qxpF9uoorvT2sCcHwf+f
+         E68DXoobn8xvzK4zt9C+WC6FwLmWrhsoMdKaO9jWeCLyYa4VSPEBQifovEROjvrizcCJ
+         zdYaEmq2IsAmQ6sS1DHygrF7Deu/CD1RCjMmo5B0fHQbG3J5ndKE/SQDnbvlvUfpdMbU
+         1mEq6JtTvaicqO++blC68QVaO4O2PyziwJPlE3P24TJ8Dfy6CkEplcuE68KAAQANAHAi
+         nrMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724432318; x=1725037118;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Eno3+7waxBHUc2l2Zyr0fzWW/5VQcedIuO58791HC0o=;
-        b=uGNNo8Bp52EIjdiFO/nbJUSTwwU3obhHZiX8B0Ocv/Nw1j+vAxqAj1AyPb3ZbvFIc5
-         0yTN0J2bNrmc8ch6TzQ4jAUb4MbZ3s8foaUetrDVbgAybAg/bCCn+E6/PbHgNoeDupbW
-         SjFMsodOTKZglGWdTM8swTgnKQK0VQn86KA0014y4ScxqNtabNYdzTnfkWU+8ObAT3IY
-         F7kDtBl52hJq8W026bCSVz/J+G6ZT8AlgFJQUrFE5Noe5uDYt4CEZbaxBMtJNPEFbyVG
-         PO6+u0WS5FCFGse0Z2y6uAEjd7vsZ8SrN3Yh/T739TBfg/K9mIafBkFUAsPAB1Wuk/wk
-         kmTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9YbdKNNHYoJcEEmBeu15rz2t2f1WPnv/zz73eLKMEkVO7C40GymEHbIU1pQV3YYLLEnTPHLI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFPblMTLCjeFHQSE5YBJSlihYUR72/O0QKyrKVqY9SFdhWizz4
-	qZ1cEdKQZHsRXFK1xekZGLYiCWInOvEMeL6kTLK31DqQV2PQhkU84g5Mpti2yzI=
-X-Google-Smtp-Source: AGHT+IHEltDQwnhXn5D4FlTupYbZCZW7vujaJ5jEQDRI6cMq4aP8wqDrngnyhXFNSTqCvWFTsPxwwQ==
-X-Received: by 2002:a17:907:2d8e:b0:a86:83f9:bc1f with SMTP id a640c23a62f3a-a86a54de2cdmr172374066b.61.1724432317881;
-        Fri, 23 Aug 2024 09:58:37 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f4f4090sm280693266b.196.2024.08.23.09.58.35
+        d=1e100.net; s=20230601; t=1724433355; x=1725038155;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:date:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q5kboO0j45Is859BAgD4iFoFAta2hgxS6Xgur8E+680=;
+        b=dUy+KdITbWHawaB2cjwU8cPL07djLeNh3qwmo0z4Nx5YCGrP9edOJALZM36w1xTjvd
+         s9gkGTiijncNb3sK7bJgo+jsL0XcxV2P83T41W3F58U50RC32940nnFkcJwtoxYzBW1J
+         Vq5AwrNF3uxFc8rtH0QdxQRUFZRQasN2gRrGAij+M1j4OwGz9KQuaUhNMkhjaM8ZfwoD
+         PTxZ9u8r/rW9TEo1rl+NjIvcrLNbz6J1bmssDhgg71gx5JtKhQDo0hhxLOwU2Fbll2DO
+         spNjgDDVSAJM3EXpcwBwgwnvFPCriEsio3ZfDGDoAIgSV+3iZcsGQSIxBQXgelHfVjxy
+         FESA==
+X-Forwarded-Encrypted: i=1; AJvYcCX0VnJS/q7btC1wDpTaTxqKz+6uHChfrlidrm1iJNQsohomQFSCkTd73GyIZtF1M0oDNAA+pbs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzerygtnq6fdbZhp3sD3NmZV7dFQOrFRtHMS4xx7s0rJDHpEizA
+	2cyqgYaVubLnqoSmJF8Vb07N67f/Xu+bVAwy9Recvq+UJlvTiFdKyoTzZTYeCw0=
+X-Google-Smtp-Source: AGHT+IGi+ju94qIZV+5dh+FC4edd1LJS/Rb5jnDSsIsgwxHk/+itiIP1aidxM/8be626D3wcbLPt/A==
+X-Received: by 2002:a17:907:2d0a:b0:a86:7199:af37 with SMTP id a640c23a62f3a-a86a54f142dmr198119466b.58.1724433354052;
+        Fri, 23 Aug 2024 10:15:54 -0700 (PDT)
+Received: from localhost ([87.13.33.30])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f4862e8sm287339466b.173.2024.08.23.10.15.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 09:58:37 -0700 (PDT)
-Date: Fri, 23 Aug 2024 19:58:30 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Joseph Huang <joseph.huang.2024@gmail.com>
-Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
-Subject: Re: [bug report] net: dsa: mv88e6xxx: Fix out-of-bound access
-Message-ID: <4b004e58-60ca-4042-8f42-3e36e1c493e5@stanley.mountain>
-References: <d9d8c03e-a3d9-4480-af99-c509ed9b8d8d@stanley.mountain>
- <0b6376c2-bd04-4090-a3bf-b58587bbe307@gmail.com>
+        Fri, 23 Aug 2024 10:15:53 -0700 (PDT)
+From: Andrea della Porta <andrea.porta@suse.com>
+X-Google-Original-From: Andrea della Porta <aporta@suse.de>
+Date: Fri, 23 Aug 2024 19:16:00 +0200
+To: Simon Horman <horms@kernel.org>
+Cc: Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 07/11] pinctrl: rp1: Implement RaspberryPi RP1 gpio
+ support
+Message-ID: <ZsjD0C8oYmUi5I7n@apocalypse>
+Mail-Followup-To: Simon Horman <horms@kernel.org>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
+ <20240821132754.GC6387@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,46 +140,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0b6376c2-bd04-4090-a3bf-b58587bbe307@gmail.com>
+In-Reply-To: <20240821132754.GC6387@kernel.org>
 
-On Fri, Aug 23, 2024 at 10:40:52AM -0400, Joseph Huang wrote:
+On 14:27 Wed 21 Aug     , Simon Horman wrote:
+> On Tue, Aug 20, 2024 at 04:36:09PM +0200, Andrea della Porta wrote:
+> > The RP1 is an MFD supporting a gpio controller and /pinmux/pinctrl.
+> > Add minimum support for the gpio only portion. The driver is in
+> > pinctrl folder since upcoming patches will add the pinmux/pinctrl
+> > support where the gpio part can be seen as an addition.
+> > 
+> > Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
 > 
-> Hi Dan,
+> ...
 > 
-> I had a similar discussion with Simon on this issue (see https://lore.kernel.org/lkml/5da4cc4d-2e68-424c-8d91-299d3ccb6dc8@gmail.com/).
-> The spid in question here should point to a physical port to indicate which
-> port caused the exception (DSA_MAX_PORTS is defined to cover the maximum
-> number of physical ports any DSA device can possibly have). Only when the
-> exception is caused by a CPU Load operation will the spid be a hardcoded
-> value which is greater than the array size. The ATU Full exception is the
-> only one (that I know of) that could be caused by a CPU Load operation,
-> that's why the check is only added/needed for that particular exception
-> case.
+> > diff --git a/drivers/pinctrl/pinctrl-rp1.c b/drivers/pinctrl/pinctrl-rp1.c
 > 
+> ...
+> 
+> > +const struct rp1_iobank_desc rp1_iobanks[RP1_NUM_BANKS] = {
+> > +	/*         gpio   inte    ints     rio    pads */
+> > +	{  0, 28, 0x0000, 0x011c, 0x0124, 0x0000, 0x0004 },
+> > +	{ 28,  6, 0x4000, 0x411c, 0x4124, 0x4000, 0x4004 },
+> > +	{ 34, 20, 0x8000, 0x811c, 0x8124, 0x8000, 0x8004 },
+> > +};
+> 
+> rp1_iobanks seems to only be used in this file.
+> If so, it should be static.
 
-That doesn't really answer the question if multiple flags can be set at once
-but presumably not.  The ->ports array has DSA_MAX_PORTS (12) elements.
-I used Smatch to see where ->state is set to see where it can be out of bounds.
+Fixed, thanks.
 
-$ smdb.py where mv88e6xxx_atu_entry state
-drivers/net/dsa/mv88e6xxx/devlink.c | mv88e6xxx_region_atu_snapshot_fid | (struct mv88e6xxx_atu_entry)->state | 0
-drivers/net/dsa/mv88e6xxx/global1_atu.c | mv88e6xxx_g1_atu_data_read     | (struct mv88e6xxx_atu_entry)->state | 0-15
-drivers/net/dsa/mv88e6xxx/global1_atu.c | mv88e6xxx_g1_atu_flush         | (struct mv88e6xxx_atu_entry)->state | 0
-drivers/net/dsa/mv88e6xxx/global1_atu.c | mv88e6xxx_g1_atu_move          | (struct mv88e6xxx_atu_entry)->state | 0,15
-drivers/net/dsa/mv88e6xxx/chip.c | mv88e6xxx_port_db_load_purge   | (struct mv88e6xxx_atu_entry)->state | 0,4,7-8,14
-drivers/net/dsa/mv88e6xxx/chip.c | mv88e6xxx_port_db_dump_fid     | (struct mv88e6xxx_atu_entry)->state | 0
-
-mv88e6xxx_g1_atu_move() is what you fixed:
-	entry.state = 0xf; /* Full EntryState means Move */
-
-mv88e6xxx_g1_atu_data_read() does "entry->state = val & 0xf;" so that's why
-Smatch says it's 0-15.  The actual "val" comes from mv88e6xxx_g1_atu_data_write()
-and is complicated.
-
-mv88e6xxx_port_db_load_purge() sets ->state to MV88E6XXX_G1_ATU_DATA_STATE_UC_STATIC (14).
-I would still be concerned about that.
-
-regards,
-dan carpenter
-
+> 
+> Flagged by Sparse.
+> 
+> ...
 
