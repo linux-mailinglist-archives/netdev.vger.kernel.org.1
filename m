@@ -1,71 +1,72 @@
-Return-Path: <netdev+bounces-121276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A05995C835
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 10:39:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BC5F95C83E
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 10:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3384C2821D9
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:39:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0521F1F22617
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967D413D8A0;
-	Fri, 23 Aug 2024 08:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B437145A0B;
+	Fri, 23 Aug 2024 08:40:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="a6nUT2O5"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="pgQv9t36"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F12E56E
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 08:39:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99531144D21
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 08:40:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724402391; cv=none; b=KpTBJmPN5n0CXe+cj8kEDHG7qZvgJzCDMUk7PzTXSNFEUgou83gY2/6aHE+tpZMFEtdGf5LakT19JfPEV5L17c9g1xaYXWcsAH7yWlu1DF2TkVh7daHGkCcCqGnzVOHChFtu1qiPPxDvj+AzYbltq0z/DQzVdnIM6ZWDRpHPj34=
+	t=1724402418; cv=none; b=KhQSeLl9KTYKA5LhvsovhuH6xagNpOPF3iTyu3FPbXuXZlhOAU6R9vd1yXPpaNbatuA7MprlWaje4UtZxyZunNfZ/DuI5cd0g5lJ7EcpNDe4L8uO5AplyKpQSd38+GPnUzOj7ZwZ8CGeju4WwC7QEpZZosdgEzJOgEshfj+Gf+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724402391; c=relaxed/simple;
-	bh=+e7QJLLu5Urr6Z2iktLhxsbbPJOrAtGSxxMTBcyUzm0=;
+	s=arc-20240116; t=1724402418; c=relaxed/simple;
+	bh=/gkKdkn1kch9YHgvbfB4pJh7hu8uTpCucVk4jPgCW2M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ox5jnWR+U32wGVqs8YheuxRDeocBV+gGjRFYinVCdipDottUN2Crdkx/TslPaDN4KyLvVIpQtebHvhw4ZxNPPHG1VIMopfvL6kocfg2x1GFJk4pJftCu3h7s+aGq99u+yd4RynRAu4wAXyNdKorEIqELGKJRC5V/PoRt+LXEuDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=a6nUT2O5; arc=none smtp.client-ip=209.85.167.45
+	 Content-Type:Content-Disposition:In-Reply-To; b=J5XG3fsEJ7b1C+fyWQqWZlFuOYAJBX5SkBhpzhYKVJQjxgxd+xA3Qm162ntqRtPHIhPVjkJatIElp5GfQhBErTJe17YRd1X1Lk8Nm3IFidHN7ZN1od3rZ6lVU/nr/ah2ycaZbxQGTabSaRXrudltEmpOzMXxoTtTz/Dhl+uNo64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=pgQv9t36; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-530e062217eso1994590e87.1
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 01:39:48 -0700 (PDT)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5bed83487aeso1954143a12.2
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 01:40:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724402387; x=1725007187; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724402415; x=1725007215; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+e7QJLLu5Urr6Z2iktLhxsbbPJOrAtGSxxMTBcyUzm0=;
-        b=a6nUT2O5Wv1b6v0f5rctqZSTgXqAcy5WyocgXpqWvY3BIntPGFxCQ8ooA9jmmK2EyJ
-         /yVu6S+lQnDdVZNvElUhROBQIxTGUpCPrn3VYdMo3SIX34zRIZjZNZe9/c90MCYC2zuf
-         7oRxBa+lDbW0HZ5ZAmD0uuq72S6oJj3nU+VqCUacsF9Ujy/8zb01zIpvgvK/i4sOEt4V
-         u9vPoOnlqQfQKXNjHEtNdDlh8Xc5IGDSyRRsJYJemLnFqkOBc0GHjwX5IGbweAZKR84K
-         qUzAQ4E0/uFX86UXn7rqiYNrV5c7qYbwcKY8Hc5T4OJKqeKU+OtIe7InSk59RPZhe2Cp
-         SdfA==
+        bh=/gkKdkn1kch9YHgvbfB4pJh7hu8uTpCucVk4jPgCW2M=;
+        b=pgQv9t36FhrDOoXSd3BMXJ756sNDTzu3RHAkuG+hrV4EQCc9z5mglilHHvBzDHRvf1
+         Q3oiN8RIWYuSmS6w+Ji/ntWe6AYVlWHU+oM5z2rOWixjV/1PhylKbD7eSwU1acbfxtuJ
+         SHLsaNYUqe46Id/A4TLcKp8gpL9ET6Kg08NzFs0o8jDQzTd4zU/fIjdiOWG0G2Fapi+b
+         q59NnLQEYbKCLCjoHmN8HU/lLRXUg9ckjdqW5Gx0ZPhJkYAQXcRwJfQyh0C136TyLu70
+         6XbsA21pe5aLWcrOdm+C74skr9bu1gz61ro1ypkYhqyiBvlJq8+lxOXv+GktIMOwExDd
+         6b9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724402387; x=1725007187;
+        d=1e100.net; s=20230601; t=1724402415; x=1725007215;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+e7QJLLu5Urr6Z2iktLhxsbbPJOrAtGSxxMTBcyUzm0=;
-        b=OzUBTlGR4/NKZ8pmk1SdIJ2hBE8iX3EzpEq2JFt0Gdg787Y8FDJMyP+2WG0Cz7yuZC
-         QsxpSfyPHF+qdb7I41z9rtJkzIOPsxqMQw3QGzD5zW+7d8Pb5gzRakvxFIREvyLc9tG8
-         ShKZPQmxCBBXBHqpNPIgUznlst9kfZzBct2bOSk8OXdx53Igyh97fSYp/YpwNvHJcMaS
-         zzsi5z/YFCC1mHIr8dAP1xCYgisIt7SJEFNHRgIrTXyrU7HbLWXwnAcN1PanQSubzNhG
-         TwMRMgKtptWuruoSiv3KtJfsuxZsVP0zarM625D5KFTxL6AvqSIwqZwjwrVXozUR7uTf
-         o/QA==
-X-Gm-Message-State: AOJu0YzY9TeJQqyQzvSE52oF4JNpxJlylJXIuMtmnVdf8TiPgWoldRxJ
-	UzwirrIXXvdaValwEmM2L/Fc/uU5rTtogYt8V5QBTAu7bbwkKmj0IgeSM+YNHSI=
-X-Google-Smtp-Source: AGHT+IGOWVuOC9yeeKp5mZ4UlpcTLScCESsqL86DkbvcGyGbBm1D6i4r/hzXl4SKazXPEZkY4narSw==
-X-Received: by 2002:a05:6512:ba2:b0:533:3223:df91 with SMTP id 2adb3069b0e04-53438773a9emr1136975e87.24.1724402386504;
-        Fri, 23 Aug 2024 01:39:46 -0700 (PDT)
+        bh=/gkKdkn1kch9YHgvbfB4pJh7hu8uTpCucVk4jPgCW2M=;
+        b=jmdj1ZZr3Bk3TMx68eMjn18Lx4clgeElA3hgKaQSyBkQ29ihwziC3dY67VxDJa5E35
+         UBe0xV4ODKHMZxvI53gLb7ZD0SNzwbT9I3lDsFTf1L/xqzEkXVz2LmWSdRbfoksMRPsZ
+         SmaZT+nODZ1upYYN9tbpJFBnBWr+PDPXOfpHF81+E+yOV1Hmi8ycs212WbCkfafHARfw
+         +TtpL8cRZeLjhi8nV9idvBCxa05X0i1RJmTZSJV07gIazAn2gsDESksvgYfcHYi9qa1G
+         RLRshMD0aaFG83fP09hLaUv+KWSQcAtuwEqtzYknhR883hvv7b9Gcyngn6aX+cklm6ee
+         1www==
+X-Gm-Message-State: AOJu0YzXUROSokqIRYCitbowF6OSvF0o9yr5S0uaoFLGLzpBzTaKRls0
+	B1RP5+IkeJ74SwNR8MlWCgSJypUeMxta2IvJIr1ofiOAc0cxP9nNP5MfQujK3MZ0ff+6sKjcKJL
+	6
+X-Google-Smtp-Source: AGHT+IGaPZGfsEcdpD0z2HooWb5CW/e+RVLq6gXdB73IpyHPSTkCKbWsNG2C5VF/YTe9NZwWRUVqtg==
+X-Received: by 2002:a17:907:7e95:b0:a86:668d:c0b2 with SMTP id a640c23a62f3a-a86a5189298mr133154366b.7.1724402414734;
+        Fri, 23 Aug 2024 01:40:14 -0700 (PDT)
 Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f2e74bbsm229799366b.95.2024.08.23.01.39.45
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f220324sm229420666b.44.2024.08.23.01.40.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 01:39:45 -0700 (PDT)
-Date: Fri, 23 Aug 2024 10:39:44 +0200
+        Fri, 23 Aug 2024 01:40:14 -0700 (PDT)
+Date: Fri, 23 Aug 2024 10:40:13 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
@@ -75,10 +76,11 @@ Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev, corbet@lwn.net,
 	intel-wired-lan@lists.osuosl.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next v3 1/2] dpll: add Embedded SYNC feature for a pin
-Message-ID: <ZshK0IEblXbjNKMh@nanopsycho.orion>
+Subject: Re: [PATCH net-next v3 2/2] ice: add callbacks for Embedded SYNC
+ enablement on dpll pins
+Message-ID: <ZshK7RwzHO_vZtdN@nanopsycho.orion>
 References: <20240822222513.255179-1-arkadiusz.kubalewski@intel.com>
- <20240822222513.255179-2-arkadiusz.kubalewski@intel.com>
+ <20240822222513.255179-3-arkadiusz.kubalewski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,13 +89,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240822222513.255179-2-arkadiusz.kubalewski@intel.com>
+In-Reply-To: <20240822222513.255179-3-arkadiusz.kubalewski@intel.com>
 
-Fri, Aug 23, 2024 at 12:25:12AM CEST, arkadiusz.kubalewski@intel.com wrote:
->Implement and document new pin attributes for providing Embedded SYNC
->capabilities to the DPLL subsystem users through a netlink pin-get
->do/dump messages. Allow the user to set Embedded SYNC frequency with
->pin-set do netlink message.
+Fri, Aug 23, 2024 at 12:25:13AM CEST, arkadiusz.kubalewski@intel.com wrote:
+>Allow the user to get and set configuration of Embedded SYNC feature
+>on the ice driver dpll pins.
 >
 >Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 >Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
