@@ -1,214 +1,178 @@
-Return-Path: <netdev+bounces-121281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7634B95C864
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 10:52:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20E7295C86C
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 10:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CFBC2818DE
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:52:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84D39B24092
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CCD146D78;
-	Fri, 23 Aug 2024 08:52:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81AD41494A2;
+	Fri, 23 Aug 2024 08:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GpIHJxn4"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="SUMuf+H/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E3B744C76
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 08:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C393013E04C
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 08:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724403133; cv=none; b=u8m+lflbSoZJixJDBwf+tuo4TFHPUWtZah6CH332Te0AUu9D9rJnJWXSoFJAAhQaUB3rPcI03goIxGEYs9qR99im8kKiNI2l94pu4w62Ijms2MFgOFOIq2sman/99yKoTWF8ELbPICcvKEesTd6vOnRf6NHQFwtCx0BO6Pc+KEY=
+	t=1724403208; cv=none; b=AR4H2OMt5CeZkCws3uRXyiLq8WXIRnhGNf9VmHDATbAi5tWWDXIdylquQbi0aRm2fATp0tvQr1LvABKW3nQDRuq+nuFWubndVpvGwp8uvwkjhSl1V476rjMz0o9dGdb5siyaMYOrfD1hlImqrpErjiCPE2yKjhm7ZLMElKcfWH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724403133; c=relaxed/simple;
-	bh=9mm9LIKQPf1tpxPInZjd8lTdWPk3mYTFpuBygy9nxOo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UIOHNmbIuCBXj+Zoi34EKkTuPbx8J83GRW8AdZE0NQVfBUzqPJFIpMsXSVlMlUSZqvWfBSK20DsKMRkxZlSrKJ7CycSsJ/vdscOJ6YT5iePypC2xbKVjrkJLY80y+Bs4FPlNVGz7tqjmunJ5Mn8mfBBO/I6QhlkE3WbbXrPAH7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GpIHJxn4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724403130;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oCIlWRAQNbUskKmxEfRTC1/T7ZuQpdkZ3ksWA+VFm+0=;
-	b=GpIHJxn4gU1fzxLoMB2ADCQNH1KInSdZge7pZNV2gsimAL9T6CnAbQ515R1cpfByGIemea
-	1rkruIBHRSyxVTuIdQs3QAEZlRFdKQmIuYVU7pDVN4qa6Ixi+WcckX5XFPgK/kAxaT0JSx
-	Fwvn8OFxNTu4BoWj24Hdir6FO/SO76g=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-0bbNU2rtOQaS-HNP6TgBOQ-1; Fri, 23 Aug 2024 04:52:08 -0400
-X-MC-Unique: 0bbNU2rtOQaS-HNP6TgBOQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42809eb7b99so9902965e9.0
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 01:52:07 -0700 (PDT)
+	s=arc-20240116; t=1724403208; c=relaxed/simple;
+	bh=Czg/K8OYgGDUZKZ32LDsFwF1lH6BFPUIGzT9yRSBDJo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OufILy5hq4rTw8RpodRvTUCW1m56UhihPpFbFHiLCMDe0wWDFD1RTn68IsD/FcjZLK1/5YfPlySi1ReGpqwt9V0U4GowjJdbkvC3335U5NtNpK0gVSELo6v0tcGIJAnXtBcI25BW9Doe6Kst5kqgHNQrwNx10Vvnn0RkFBqB0Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=SUMuf+H/; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2d3ce556df9so1274082a91.0
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 01:53:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1724403206; x=1725008006; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ezFQroxpGkaUsSdMcah57ZHaQ9w5KjbUOSox/PwRH50=;
+        b=SUMuf+H/LY7unKIiQ3uFyTTubrpi0/t7bx/ytZuaDRyZFqkf9E2tiBMh31X9H5NYZ0
+         qBnee29k7Th69WqQKu5Ev9nKraQ0BInB/QZJIMpR9WZwRuPfC24DL+1ge8NJdyN/SdhK
+         UtXZIO8KH579RCdKWOstRNNb9+XqB+5Oep+TRFeC78cOeDbMzBCB34DL63DB7ETrv4fw
+         aG6AD3/c6/a5QH5ZrHF4S+tkdTEkO14B1MkDJ7ngCyIiy6ZjA1Vf9eOkMi8GomOlPV15
+         pXlBu2yArknbGKrZAinhdyfLU0bjEPPJwNEZzWjGkCw4rKujChMVT60eSYEEPQ6rGWPW
+         ZYkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724403127; x=1725007927;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oCIlWRAQNbUskKmxEfRTC1/T7ZuQpdkZ3ksWA+VFm+0=;
-        b=oaUngylIssSkcwrU9RNRnyWFCAcqig/1HWPnbg06CcQBv/uCClTSMniNuusJN0if1H
-         wYwzpXh+AcOMmTQ/ZBkdoTra2GWKpqGwpZOcdYgYWYKMiY9e/fMrrA3+Gi5E8AW+WDCR
-         jvyDSDmmqT5R+6mKdB40A8N/u2/PbVGNBmp3GigCwfvINXCqETlIz3DDwPI2a1D22qRs
-         VJ44esA0AZVeVy5n6bmhnJc/K17mLhWHpWR0gIOs66xXuM2iSdX6XyFG0GIwryotQbV7
-         /DLv81y4/ZvCbvl2CZ7V3vvZFXxRVj6JwCBPJAw82YilhQ++FEMSk136E6Oevi0DI7Vf
-         Awdw==
-X-Gm-Message-State: AOJu0YwhnUDie3kZsMUcasob0MVbANoIsqAX3Ep3DNc2IhrVmL1WUSVD
-	h9S9/upINiAh/On4YoHkWa7TL5V/hi4FfT0q61G6JCREkTLFyYWQJGCij3vcWHi13Fz9sMGfbCJ
-	qWqUPYXvg+wQQ5IicxpoGmz/w2Yxe/2fH/yJIbmgNlaEdZ7D0VopWvQ==
-X-Received: by 2002:a05:600c:1ca9:b0:428:e820:37dc with SMTP id 5b1f17b1804b1-42acc8dd67amr8789475e9.7.1724403126765;
-        Fri, 23 Aug 2024 01:52:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGHJUaD1t9jnfLSHLF9dXbe+FuaBC77bxfrNMciN4ximu2X5OSJ9VQXU0ICGNklwSmrjl7MXw==
-X-Received: by 2002:a05:600c:1ca9:b0:428:e820:37dc with SMTP id 5b1f17b1804b1-42acc8dd67amr8789295e9.7.1724403126247;
-        Fri, 23 Aug 2024 01:52:06 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b51:3b10::f71? ([2a0d:3344:1b51:3b10::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730811001fsm3640069f8f.20.2024.08.23.01.52.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Aug 2024 01:52:05 -0700 (PDT)
-Message-ID: <0e5c2178-22e2-409e-8cbd-9aaa66594fdc@redhat.com>
-Date: Fri, 23 Aug 2024 10:52:04 +0200
+        d=1e100.net; s=20230601; t=1724403206; x=1725008006;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ezFQroxpGkaUsSdMcah57ZHaQ9w5KjbUOSox/PwRH50=;
+        b=m+Vb8EK9OBSSuHX9zM7Y5ersOe9oZTPxQW1hBsQSlPRxcSBSwwvt7Nd19TwPks6YeF
+         hGg4RxYVwk+fh3rdSSDKAIEmo19Aa3umk6z1w6RzTsMoklyYRuos1CSkeMQlmsoCHE9K
+         pdRxZKdkGftVZRQfIzV2nX+y4pBmCLgENGIiR0SoAJFuA5w/WzKp8Eii549NhFmZwbmd
+         NnjfgAdLhSnfS359GIPO7rrtLWCj3gWF79GeX56JGOt6aA/l5r3HmS0k36xQ6psgj3f3
+         /DG8nf8XrqcTpjM/w1hEy2ZjVDLCvYhkTcG0nE1ufQEM54zsMW/GFP9nAfW/5DABQxj5
+         AnhA==
+X-Gm-Message-State: AOJu0YyV6QdvTWwwLKvlINi7izV9M88ZDHP9CCKg1Vb8LAqTquSpq3kC
+	3gfvcvsxhsFL0PIIWmi86Si2U9/uJ88nsF30Ayqt0T1NQzHAYvxrMSAa1K+X82k=
+X-Google-Smtp-Source: AGHT+IFaylOAd/toGYXIX2p8c9dCa2PThSma27XXT7LPRvz9cAudRL9wgkqY+ZW7DLfNiPVNny90yw==
+X-Received: by 2002:a17:90a:2ce2:b0:2cb:4b88:2aaf with SMTP id 98e67ed59e1d1-2d646bb512amr1410015a91.12.1724403205819;
+        Fri, 23 Aug 2024 01:53:25 -0700 (PDT)
+Received: from C02F52LSML85.bytedance.net ([63.216.146.178])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d613b2048fsm3430129a91.54.2024.08.23.01.53.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2024 01:53:25 -0700 (PDT)
+From: Feng zhou <zhoufeng.zf@bytedance.com>
+To: edumazet@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	dsahern@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com,
+	zhoufeng.zf@bytedance.com
+Subject: [PATCH bpf-next v2] bpf: Fix bpf_get/setsockopt to tos not take effect when TCP over IPv4 via INET6 API
+Date: Fri, 23 Aug 2024 16:53:13 +0800
+Message-Id: <20240823085313.75419-1-zhoufeng.zf@bytedance.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 03/12] net-shapers: implement NL get operation
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
- Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>
-References: <cover.1724165948.git.pabeni@redhat.com>
- <c5ad129f46b98d899fde3f0352f5cb54c2aa915b.1724165948.git.pabeni@redhat.com>
- <20240822191042.71a19582@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240822191042.71a19582@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 8/23/24 04:10, Jakub Kicinski wrote:
-> On Tue, 20 Aug 2024 17:12:24 +0200 Paolo Abeni wrote:
->> --- a/include/linux/netdevice.h
->> +++ b/include/linux/netdevice.h
->> @@ -81,6 +81,8 @@ struct xdp_frame;
->>   struct xdp_metadata_ops;
->>   struct xdp_md;
->>   struct ethtool_netdev_state;
->> +struct net_shaper_ops;
->> +struct net_shaper_data;
-> 
-> no need, forward declarations are only needed for function declarations
-> 
->> + * struct net_shaper_ops - Operations on device H/W shapers
->> + *
->> + * The initial shaping configuration at device initialization is empty:
->> + * does not constraint the rate in any way.
->> + * The network core keeps track of the applied user-configuration in
->> + * the net_device structure.
->> + * The operations are serialized via a per network device lock.
->> + *
->> + * Each shaper is uniquely identified within the device with an 'handle'
-> 
-> a handle
-> 
->> + * comprising the shaper scope and a scope-specific id.
->> + */
->> +struct net_shaper_ops {
->> +	/**
->> +	 * @group: create the specified shapers scheduling group
->> +	 *
->> +	 * Nest the @leaves shapers identified by @leaves_handles under the
->> +	 * @root shaper identified by @root_handle. All the shapers belong
->> +	 * to the network device @dev. The @leaves and @leaves_handles shaper
->> +	 * arrays size is specified by @leaves_count.
->> +	 * Create either the @leaves and the @root shaper; or if they already
->> +	 * exists, links them together in the desired way.
->> +	 * @leaves scope must be NET_SHAPER_SCOPE_QUEUE.
-> 
-> Or SCOPE_NODE, no?
+From: Feng Zhou <zhoufeng.zf@bytedance.com>
 
-I had a few back-and-forth between the two options, enforcing only QUEUE 
-leaves or allowing even NODE.
+when TCP over IPv4 via INET6 API, bpf_get/setsockopt with ipv4 will
+fail, because sk->sk_family is AF_INET6. With ipv6 will success, not
+take effect, because inet_csk(sk)->icsk_af_ops is ipv6_mapped and
+use ip_queue_xmit, inet_sk(sk)->tos.
 
-I think the first option is general enough - can create arbitrary 
-topologies with the same amount of operations - and leads to slightly 
-simpler code, but no objections for allow both.
+So bpf_get/setsockopt needs add the judgment of this case. Just check
+"inet_csk(sk)->icsk_af_ops == &ipv6_mapped".
 
-> 
->> +	 * Returns 0 on group successfully created, otherwise an negative
->> +	 * error value and set @extack to describe the failure's reason.
-> 
-> the return and extack lines are pretty obvious, you can drop
-> 
->> +	 */
->> +	int (*group)(struct net_device *dev, int leaves_count,
->> +		     const struct net_shaper_handle *leaves_handles,
->> +		     const struct net_shaper_info *leaves,
->> +		     const struct net_shaper_handle *root_handle,
->> +		     const struct net_shaper_info *root,
->> +		     struct netlink_ext_ack *extack);
-> 
->> +#endif
->> +
-> 
-> ooh, here's one of the trailing whitespace git was mentioning :)
-> 
->>   #include <linux/kernel.h>
->> +#include <linux/bits.h>
->> +#include <linux/bitfield.h>
->> +#include <linux/idr.h>
->> +#include <linux/netdevice.h>
->> +#include <linux/netlink.h>
->>   #include <linux/skbuff.h>
->> +#include <linux/xarray.h>
->> +#include <net/net_shaper.h>
-> 
-> kernel.h between idr.h and netdevice.h
-> 
->> +static int net_shaper_fill_handle(struct sk_buff *msg,
->> +				  const struct net_shaper_handle *handle,
->> +				  u32 type, const struct genl_info *info)
->> +{
->> +	struct nlattr *handle_attr;
->> +
->> +	if (handle->scope == NET_SHAPER_SCOPE_UNSPEC)
->> +		return 0;
-> 
-> In what context can we try to fill handle with scope unspec?
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408152034.lw9Ilsj6-lkp@intel.com/
+Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
+---
+Changelog:
+v1->v2: Addressed comments from kernel test robot
+- Fix compilation error
+Details in here:
+https://lore.kernel.org/bpf/202408152058.YXAnhLgZ-lkp@intel.com/T/
 
-Uhmm... should happen only in buggy situation. What about adding adding 
-WARN_ON_ONCE() ?
+ include/net/tcp.h   | 2 ++
+ net/core/filter.c   | 6 +++++-
+ net/ipv6/tcp_ipv6.c | 6 ++++++
+ 3 files changed, 13 insertions(+), 1 deletion(-)
 
->> +	handle_attr = nla_nest_start_noflag(msg, type);
->> +	if (!handle_attr)
->> +		return -EMSGSIZE;
->> +
->> +	if (nla_put_u32(msg, NET_SHAPER_A_SCOPE, handle->scope) ||
->> +	    (handle->scope >= NET_SHAPER_SCOPE_QUEUE &&
->> +	     nla_put_u32(msg, NET_SHAPER_A_ID, handle->id)))
->> +		goto handle_nest_cancel;
-> 
-> So netdev root has no id and no scope?
-
-I don't understand the question.
-
-The root handle has scope NETDEV and id 0, the id will not printed out 
-as redundant: there is only a scope NETDEV shaper per struct net_device.
-
-Thanks,
-
-Paolo
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 2aac11e7e1cc..ea673f88c900 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -493,6 +493,8 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
+ 					    struct tcp_options_received *tcp_opt,
+ 					    int mss, u32 tsoff);
+ 
++bool is_tcp_sock_ipv6_mapped(struct sock *sk);
++
+ #if IS_ENABLED(CONFIG_BPF)
+ struct bpf_tcp_req_attrs {
+ 	u32 rcv_tsval;
+diff --git a/net/core/filter.c b/net/core/filter.c
+index ecf2ddf633bf..02a825e35c4d 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -5399,7 +5399,11 @@ static int sol_ip_sockopt(struct sock *sk, int optname,
+ 			  char *optval, int *optlen,
+ 			  bool getopt)
+ {
+-	if (sk->sk_family != AF_INET)
++	if (sk->sk_family != AF_INET
++#if IS_BUILTIN(CONFIG_IPV6)
++	    && !is_tcp_sock_ipv6_mapped(sk)
++#endif
++	    )
+ 		return -EINVAL;
+ 
+ 	switch (optname) {
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 200fea92f12f..125c69f1d085 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -92,6 +92,12 @@ static const struct tcp_sock_af_ops tcp_sock_ipv6_mapped_specific;
+ #define tcp_inet6_sk(sk) (&container_of_const(tcp_sk(sk), \
+ 					      struct tcp6_sock, tcp)->inet6)
+ 
++bool is_tcp_sock_ipv6_mapped(struct sock *sk)
++{
++	return (inet_csk(sk)->icsk_af_ops == &ipv6_mapped);
++}
++EXPORT_SYMBOL_GPL(is_tcp_sock_ipv6_mapped);
++
+ static void inet6_sk_rx_dst_set(struct sock *sk, const struct sk_buff *skb)
+ {
+ 	struct dst_entry *dst = skb_dst(skb);
+-- 
+2.30.2
 
 
