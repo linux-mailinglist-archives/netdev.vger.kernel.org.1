@@ -1,190 +1,127 @@
-Return-Path: <netdev+bounces-121453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C84C795D3CE
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:55:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2272795D3D6
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:58:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E40D1F23C42
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:55:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C54ED2844C1
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223911898EE;
-	Fri, 23 Aug 2024 16:54:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4FB188A1A;
+	Fri, 23 Aug 2024 16:58:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iag1mVuO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EMq9rtbw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6985818594C;
-	Fri, 23 Aug 2024 16:54:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C828941C69
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 16:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724432079; cv=none; b=YMeCGPWyVKIBnHrBmepN/dXhjWokljYHQRtD9ijCuEF9NuJcUw4Bc3GeXKHvVrlfB1qRXC4t3bjC6IvkQoliXypgWXpZGZPXq1YNJHu5u0iEPz3+V94rLGty8xFAMTv6gKUAWT8B1jSvAsWkoUm4UltwAISW0agDytARkWtD+E0=
+	t=1724432321; cv=none; b=hWd6NCXk05wlg1T2wS12d/a5YtMm6oO3pGyUKl6lOYTqt8Rw6MI6IvYY5bhekk2R3V9JTEGRnOoAwbOLsOLkC0AUPr6b9VZJ4oZ9wT8x25Rlgz6u7IlQFMqjVTlqgNjTVVQASutRb0/5SEIJBpFYzFac/HkvNdC+YprwfgWkKn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724432079; c=relaxed/simple;
-	bh=5VhG0B8dTv3e3c3BO1l1k7Sja5Ij0EPbr7H3pKg3dZw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EkN1QUJyemzS0XhFi/yUiQOyHgU4ElGDSRInk1EIDKkAyorXoB47tVvBi4U/tmdZmBhI/1AK7ALDhtlJUFkPL0BAPjMhO77DSPYLbMZu+LGZ6BvjjlAhFu43jALvJPDs0n+bjraiDExSj0/P+ClR6fmMJ9jFmzo7riw5HxPTxlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iag1mVuO; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f3f07ac2dcso25226441fa.2;
-        Fri, 23 Aug 2024 09:54:37 -0700 (PDT)
+	s=arc-20240116; t=1724432321; c=relaxed/simple;
+	bh=O8/A8YiBwZQtMblwjv9iC3POYBgzLhh9zWSBNVEdZmk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l4OVjAEz+4SNo9zk/AIWvRroSh1pKzWnNvyaTLCCOqJB/MY3ZpFmOMcQ9WSoJ1MFX/xTZRrG5mIkiyhC26oKXvALsc3LK7jjYF3V7nBz9IzwoS3Lvie13Tf2VhdhS1e8Hbb2z7W8u4jfRgEZpwTZyQpoS+jduH8JAQ+u3VDhH4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EMq9rtbw; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5bed0a2ae0fso2791060a12.1
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 09:58:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724432075; x=1725036875; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zon1U6XI7RDgoBlJOOvO1r9gIw8jdWpzCbK+CHqcbzY=;
-        b=Iag1mVuOlAK02O89s8ItagdB7KxFb/l0VtZOm8QwRTDcwq44pmumRwJepDOZ4P7Fzh
-         4iNwbkT+1Wcn49sQZ8RXBdH2uAzcFNq1fAp9YE8Fh8khq75Ql+FIMVpQNgnnHrTVU5ET
-         LTGADfJqgJZYWShl6ev6eMCcv3Ul9WQakW0MJsOhayQ1iJ3CcFozVPp+tplzK3HtzluY
-         ejClO0qBIPU9yy0Z13IT9uNBcLWx9kRT8ZfpXnSeQvBe8zBivgRjixMJfuLSI79NxL7q
-         en+uo+dH0ga0prp4K+Y81joqv1uwsRoOT5LlYbp0VtlnkacE+PjUkDGqLa4VSA8JdK97
-         1R4A==
+        d=linaro.org; s=google; t=1724432318; x=1725037118; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Eno3+7waxBHUc2l2Zyr0fzWW/5VQcedIuO58791HC0o=;
+        b=EMq9rtbw1BmSUiVG+kfk/cIIIwcYSai4wWDdLtDg9lZ+fQAuPUnUX+QS1lZlyypgvI
+         GuqvMOsJr4Foe4FAAyPeU8DoCHrh/UMm8/DXhPnokwxoQBAZobkEbuoUdLVOScGJqUMN
+         unP4GukiZG2hbK41ivCuU/LOhP7gxyL+gWn8TQ4RQ8An8VIcANidjpoMV2uB+AWx8GO3
+         Vnb8RzDfa5umTkapnGQP3C3difCDzSZ3rGlOgmstX7ZKKfjwjbPO3vxuQ015lASVc39b
+         0zlD1ilhpmyQ5CL4ONpbIJTLlW3xUUBk0U6G7xvYfpiLqnjRxdEoyIZIzVcjPNh0yfJJ
+         9kdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724432075; x=1725036875;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zon1U6XI7RDgoBlJOOvO1r9gIw8jdWpzCbK+CHqcbzY=;
-        b=sqkBlh/uhvV2iTukQAO00mQjon+W8ytsW6MaAe9pce8bSaAo1f1FsVt+GoMMyF122T
-         eMgcCeSRZMKQcTPQEGLFEuUeTvC5NWkO+tr5+mX0gx8bKWudHi7VxuszmoDGagvMrwmj
-         aFxtk87ScExLLBReMFEH3Lo6lIkrbioYEID2uereMgfweB1tL5i3KBxYQ2JhhYsQ8Vn8
-         /tXV4VVLgSfFCq///E+eZ/jaYFTKwXa3F2D3WRzFdG2w3UX2J3+9uL/RMllVfeXOW7tv
-         DMHYlWnfh9W4dbr0lbBx3+wteHJcVe2PzoKOGfMJTb8CElD0yZMYwpCk+vxXtVGHvlW+
-         +O8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX6ydRtiBvzYpU4C8SAk+3Ny4FazqYB2zlQ2/9OnOf7Qm1OF3O86yjO3IkCXHz9Y3JgpS3yIoAT@vger.kernel.org, AJvYcCX87qUH4nxV8xcbbgRkyGOwzEpSBhttpretXi47lu8IxpnxJpbgypo60sAMQIeupMYA5AJFsTjkTcxFPj0cWwIJeSU=@vger.kernel.org, AJvYcCXkZZQZZ3I33aYQPDPHW4rH4EZ16AETMhRjBPI7AEi1Sbqikc715O4G3vam62UKt6Tc9rs23ibXt+FVdKM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXQ0YSyeDubJ31X62fKThoAHAuFKQcyPd15+PI5UczLX24jCOa
-	j6UNEtNeS3J1xOAovfEe2gSQQ4xRMJ7aI7g8mrYJwp41COGGTQgJ8gZpKTJltftCY38iVsszB8M
-	g8L7x5cM9vSYcwDdCnWjDNadh9lI=
-X-Google-Smtp-Source: AGHT+IFEzl8US1Mj3j70Ag46lDtaK4hvgcjCEPbcQtWo5rRj98mh3iglrl7HOszxszM05TikzwLuQPgOV0GYu+wm+ic=
-X-Received: by 2002:a2e:9d07:0:b0:2f3:f794:b18 with SMTP id
- 38308e7fff4ca-2f4f57357bcmr15390471fa.11.1724432075088; Fri, 23 Aug 2024
- 09:54:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724432318; x=1725037118;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Eno3+7waxBHUc2l2Zyr0fzWW/5VQcedIuO58791HC0o=;
+        b=uGNNo8Bp52EIjdiFO/nbJUSTwwU3obhHZiX8B0Ocv/Nw1j+vAxqAj1AyPb3ZbvFIc5
+         0yTN0J2bNrmc8ch6TzQ4jAUb4MbZ3s8foaUetrDVbgAybAg/bCCn+E6/PbHgNoeDupbW
+         SjFMsodOTKZglGWdTM8swTgnKQK0VQn86KA0014y4ScxqNtabNYdzTnfkWU+8ObAT3IY
+         F7kDtBl52hJq8W026bCSVz/J+G6ZT8AlgFJQUrFE5Noe5uDYt4CEZbaxBMtJNPEFbyVG
+         PO6+u0WS5FCFGse0Z2y6uAEjd7vsZ8SrN3Yh/T739TBfg/K9mIafBkFUAsPAB1Wuk/wk
+         kmTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9YbdKNNHYoJcEEmBeu15rz2t2f1WPnv/zz73eLKMEkVO7C40GymEHbIU1pQV3YYLLEnTPHLI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFPblMTLCjeFHQSE5YBJSlihYUR72/O0QKyrKVqY9SFdhWizz4
+	qZ1cEdKQZHsRXFK1xekZGLYiCWInOvEMeL6kTLK31DqQV2PQhkU84g5Mpti2yzI=
+X-Google-Smtp-Source: AGHT+IHEltDQwnhXn5D4FlTupYbZCZW7vujaJ5jEQDRI6cMq4aP8wqDrngnyhXFNSTqCvWFTsPxwwQ==
+X-Received: by 2002:a17:907:2d8e:b0:a86:83f9:bc1f with SMTP id a640c23a62f3a-a86a54de2cdmr172374066b.61.1724432317881;
+        Fri, 23 Aug 2024 09:58:37 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f4f4090sm280693266b.196.2024.08.23.09.58.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2024 09:58:37 -0700 (PDT)
+Date: Fri, 23 Aug 2024 19:58:30 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Joseph Huang <joseph.huang.2024@gmail.com>
+Cc: Joseph Huang <Joseph.Huang@garmin.com>, netdev@vger.kernel.org
+Subject: Re: [bug report] net: dsa: mv88e6xxx: Fix out-of-bound access
+Message-ID: <4b004e58-60ca-4042-8f42-3e36e1c493e5@stanley.mountain>
+References: <d9d8c03e-a3d9-4480-af99-c509ed9b8d8d@stanley.mountain>
+ <0b6376c2-bd04-4090-a3bf-b58587bbe307@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240823072122.2053401-1-frank.li@vivo.com> <20240823072122.2053401-8-frank.li@vivo.com>
-In-Reply-To: <20240823072122.2053401-8-frank.li@vivo.com>
-From: Marcin Wojtas <marcin.s.wojtas@gmail.com>
-Date: Fri, 23 Aug 2024 18:54:23 +0200
-Message-ID: <CAHzn2R39CuQS3WJYs7=2jeg8LvhTrYC8xKmOiTDZKLhmbsLqig@mail.gmail.com>
-Subject: Re: [net-next v2 7/9] net: ethernet: marvell: mvneta: Convert to devm_clk_get_enabled()
-To: Yangtao Li <frank.li@vivo.com>
-Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com, 
-	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, ulli.kroll@googlemail.com, linus.walleij@linaro.org, 
-	linux@armlinux.org.uk, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	mcoquelin.stm32@gmail.com, hkallweit1@gmail.com, kees@kernel.org, 
-	justinstitt@google.com, u.kleine-koenig@pengutronix.de, horms@kernel.org, 
-	sd@queasysnail.net, linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0b6376c2-bd04-4090-a3bf-b58587bbe307@gmail.com>
 
-pt., 23 sie 2024 o 09:07 Yangtao Li <frank.li@vivo.com> napisa=C5=82(a):
->
-> Convert devm_clk_get(), clk_prepare_enable() to a single
-> call to devm_clk_get_enabled(), as this is exactly
-> what this function does.
->
-> Signed-off-by: Yangtao Li <frank.li@vivo.com>
-> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
+On Fri, Aug 23, 2024 at 10:40:52AM -0400, Joseph Huang wrote:
+> 
+> Hi Dan,
+> 
+> I had a similar discussion with Simon on this issue (see https://lore.kernel.org/lkml/5da4cc4d-2e68-424c-8d91-299d3ccb6dc8@gmail.com/).
+> The spid in question here should point to a physical port to indicate which
+> port caused the exception (DSA_MAX_PORTS is defined to cover the maximum
+> number of physical ports any DSA device can possibly have). Only when the
+> exception is caused by a CPU Load operation will the spid be a hardcoded
+> value which is greater than the array size. The ATU Full exception is the
+> only one (that I know of) that could be caused by a CPU Load operation,
+> that's why the check is only added/needed for that particular exception
+> case.
+> 
 
-Reviewed-by: Marcin Wojtas <marcin.s.wojtas@gmail.com>
+That doesn't really answer the question if multiple flags can be set at once
+but presumably not.  The ->ports array has DSA_MAX_PORTS (12) elements.
+I used Smatch to see where ->state is set to see where it can be out of bounds.
 
-Thanks!
-Marcin
+$ smdb.py where mv88e6xxx_atu_entry state
+drivers/net/dsa/mv88e6xxx/devlink.c | mv88e6xxx_region_atu_snapshot_fid | (struct mv88e6xxx_atu_entry)->state | 0
+drivers/net/dsa/mv88e6xxx/global1_atu.c | mv88e6xxx_g1_atu_data_read     | (struct mv88e6xxx_atu_entry)->state | 0-15
+drivers/net/dsa/mv88e6xxx/global1_atu.c | mv88e6xxx_g1_atu_flush         | (struct mv88e6xxx_atu_entry)->state | 0
+drivers/net/dsa/mv88e6xxx/global1_atu.c | mv88e6xxx_g1_atu_move          | (struct mv88e6xxx_atu_entry)->state | 0,15
+drivers/net/dsa/mv88e6xxx/chip.c | mv88e6xxx_port_db_load_purge   | (struct mv88e6xxx_atu_entry)->state | 0,4,7-8,14
+drivers/net/dsa/mv88e6xxx/chip.c | mv88e6xxx_port_db_dump_fid     | (struct mv88e6xxx_atu_entry)->state | 0
 
+mv88e6xxx_g1_atu_move() is what you fixed:
+	entry.state = 0xf; /* Full EntryState means Move */
 
->  drivers/net/ethernet/marvell/mvneta_bm.c | 16 +++++-----------
->  drivers/net/ethernet/marvell/mvneta_bm.h |  1 -
->  2 files changed, 5 insertions(+), 12 deletions(-)
->
-> diff --git a/drivers/net/ethernet/marvell/mvneta_bm.c b/drivers/net/ether=
-net/marvell/mvneta_bm.c
-> index 3f46a0fed048..bfd1ed12d98c 100644
-> --- a/drivers/net/ethernet/marvell/mvneta_bm.c
-> +++ b/drivers/net/ethernet/marvell/mvneta_bm.c
-> @@ -411,6 +411,7 @@ static int mvneta_bm_probe(struct platform_device *pd=
-ev)
->  {
->         struct device_node *dn =3D pdev->dev.of_node;
->         struct mvneta_bm *priv;
-> +       struct clk *clk;
->         int err;
->
->         priv =3D devm_kzalloc(&pdev->dev, sizeof(struct mvneta_bm), GFP_K=
-ERNEL);
-> @@ -421,17 +422,14 @@ static int mvneta_bm_probe(struct platform_device *=
-pdev)
->         if (IS_ERR(priv->reg_base))
->                 return PTR_ERR(priv->reg_base);
->
-> -       priv->clk =3D devm_clk_get(&pdev->dev, NULL);
-> -       if (IS_ERR(priv->clk))
-> -               return PTR_ERR(priv->clk);
-> -       err =3D clk_prepare_enable(priv->clk);
-> -       if (err < 0)
-> -               return err;
-> +       clk =3D devm_clk_get_enabled(&pdev->dev, NULL);
-> +       if (IS_ERR(clk))
-> +               return PTR_ERR(clk);
->
->         err =3D mvneta_bm_get_sram(dn, priv);
->         if (err < 0) {
->                 dev_err(&pdev->dev, "failed to allocate internal memory\n=
-");
-> -               goto err_clk;
-> +               return err;
->         }
->
->         priv->pdev =3D pdev;
-> @@ -452,8 +450,6 @@ static int mvneta_bm_probe(struct platform_device *pd=
-ev)
->
->  err_sram:
->         mvneta_bm_put_sram(priv);
-> -err_clk:
-> -       clk_disable_unprepare(priv->clk);
->         return err;
->  }
->
-> @@ -473,8 +469,6 @@ static void mvneta_bm_remove(struct platform_device *=
-pdev)
->
->         /* Dectivate BM unit */
->         mvneta_bm_write(priv, MVNETA_BM_COMMAND_REG, MVNETA_BM_STOP_MASK)=
-;
-> -
-> -       clk_disable_unprepare(priv->clk);
->  }
->
->  static const struct of_device_id mvneta_bm_match[] =3D {
-> diff --git a/drivers/net/ethernet/marvell/mvneta_bm.h b/drivers/net/ether=
-net/marvell/mvneta_bm.h
-> index e47783ce77e0..396dced914aa 100644
-> --- a/drivers/net/ethernet/marvell/mvneta_bm.h
-> +++ b/drivers/net/ethernet/marvell/mvneta_bm.h
-> @@ -94,7 +94,6 @@ enum mvneta_bm_type {
->
->  struct mvneta_bm {
->         void __iomem *reg_base;
-> -       struct clk *clk;
->         struct platform_device *pdev;
->
->         struct gen_pool *bppi_pool;
-> --
-> 2.39.0
->
+mv88e6xxx_g1_atu_data_read() does "entry->state = val & 0xf;" so that's why
+Smatch says it's 0-15.  The actual "val" comes from mv88e6xxx_g1_atu_data_write()
+and is complicated.
+
+mv88e6xxx_port_db_load_purge() sets ->state to MV88E6XXX_G1_ATU_DATA_STATE_UC_STATIC (14).
+I would still be concerned about that.
+
+regards,
+dan carpenter
+
 
