@@ -1,308 +1,234 @@
-Return-Path: <netdev+bounces-121542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAE4995D92E
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 00:19:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 38B0295D946
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 00:28:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A387C284AB7
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 22:19:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3D9B286494
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 22:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6DB11C8713;
-	Fri, 23 Aug 2024 22:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9353B1C8FBB;
+	Fri, 23 Aug 2024 22:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="mUN+84QF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eoGt3Lk5"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-zteg10011401.me.com (pv50p00im-zteg10011401.me.com [17.58.6.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AB11925AF
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 22:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F88B191F6B;
+	Fri, 23 Aug 2024 22:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724451555; cv=none; b=rfEb2E0OqitZ6F9T/jdZyNjrfFoXFYvnA6A+nnC7hQwI0T3QlrwdwnET/p5cmsth7w4ffsuss/2dOHknlqXu4tDPH99Zm596SY0ZArvuaoKaRasURQtuVI5K/OlInvsfiTxqawwDGp/OlvG/r+whTCUifJYWK/t+4JJQFW2pX1g=
+	t=1724452135; cv=none; b=koUNy5jQTW93sKvFkjBz1ohC746nA+v3a/zH2xes70BenaDMhbM+oX/A7iGA9quYr1E5mJD3jNbHVdRwh8LQC3MK+LZDCZ33jrjKLPEjnLZrYHxk5QQPw2lqBY5thmQGxfsllkO8XgAroyyGrn6oGOOoPE/Zoordu0h/S/9yea0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724451555; c=relaxed/simple;
-	bh=wE5MeZ/TfiicdYafgD6Teglz+CEKSXVRhEU2cDL5wL8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mFu0HNUfLllppRtlubiffJRWk1efBa016k4Cq8kXR5EZ4JsjLOYR9EC2i1Dl0eLptQUAgzTjcQKBwI2OG+QPNLABGMFAhnFGIglrSNX4GRnYsx2v4oaKDy/HFEuDGGhA21YC+oKGWJoL1X74yAO0MdNICx8yQZ9nDzQfzKrVmqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=mUN+84QF; arc=none smtp.client-ip=17.58.6.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1724451552;
-	bh=hK2bUFwzHVU9grr2BqVFrLx3aTZWAKPQfP4qaJ8H2Fg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	b=mUN+84QFaZuSrBcDE9KTp4A3/ubk9jWcEov5iVmtmM6h6xBwf15zvolDvSXWWLtrQ
-	 86vqzxGJBjJw5uh5FD1QaLq7tSgHIot/gj/g1gw4r0w9OTHDHjvsN5l8zCG+ZptDla
-	 sqVSCNZ6AAsBFy7e+qsxnYI4QWtra5UUK53dKpKOIb4in98eSAzWfSCuMyhWJ+O12i
-	 N2ky9emoOvUF9PnJG/PK6FWe9KSxfQts+Tm+bqrOFuZREKUSE4kOw1hS17SH595Bqw
-	 /KuoC9kaJYtAnQc5nZtgFeerd64r96WvjibGPj99vGbm0YSBRZ4ALz2BDHyiseci2a
-	 VQO8sYNphLOHw==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-zteg10011401.me.com (Postfix) with ESMTPSA id E7E2BDC024C;
-	Fri, 23 Aug 2024 22:19:01 +0000 (UTC)
-Message-ID: <9030e7e9-7255-497e-be4c-5bba3a373a54@icloud.com>
-Date: Sat, 24 Aug 2024 06:18:56 +0800
+	s=arc-20240116; t=1724452135; c=relaxed/simple;
+	bh=lhFa9C+TdLA9AgtlhB86iziIxZ2TXHCWtZB1vVjHBhU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MpZ7qluwTEViuy/zzRbplw7W0h1C7jpzxAYFMl2HVtRfjOw8ce8JC3vnw81/brflFY/biecbvtZRHZiaFblY+XTbx09xwmw0Va+XztxIApXlIGhEckFTee1bE6E+Sjgoc02Wto56yzG2Uz1U0M5hG+TnXxhl43OAJWU7C4AzApM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eoGt3Lk5; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-429da8b5feaso25471125e9.2;
+        Fri, 23 Aug 2024 15:28:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724452132; x=1725056932; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WWtV3/DOt8P4Xpd14+mqShRwy4l1Z4jup7YrAn/As/k=;
+        b=eoGt3Lk5h8fuUauRSQT+ylePqwjJdA+2xEonafeov1/xrb4ndZB6yKzdENgmmqeYcs
+         +vm/Gi3MJ1ppaJMOzN6MwFbdo2r1/oxV0VMQks6DeYPnuU84yiDxYJUqO68/fB8l+A//
+         dTwMypuos5AJFhEqQaL1D0njyJ6nSnDITUg7IPISvH5m8lqSmnxq7HCYOj07aTwnnPdv
+         bP8HYSP+jtOXNQDzzMcbAVaSWFBX/8Bf++rgGhqf1EsYnF1/Fh9d4W42FI5YsdVX9FnC
+         ifG1eUQ/lE2I2sb9NrjXEDu8jDd6g0sUnkKQ134hfB+k1qezDY9ojEzBINHIrKivkAi0
+         9G9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724452132; x=1725056932;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WWtV3/DOt8P4Xpd14+mqShRwy4l1Z4jup7YrAn/As/k=;
+        b=fsoK6IpuVs5gzMm7b5PkTzdHnrMZxZHoxfPJMo3Yt8YSKiDSx+WpuGPYGP4V1yXQqd
+         Od/gtqMMiP8NGeJlt75tAICtWGugkGcabACJxXqA/fT0k+xOXSSpf3EIupz5O1oHw7r1
+         RqnNyi1GBL8f/WGLPewkH36dMPcLK0ic39nzgh9x+wKvKixtiX4yLvI288xOv5zu7jL7
+         mA4ceArKDvAYHsCw6MSHdZ7bir7C1zWhOB1SQ+7yAKjivRZXaSqHDfLkTIatRzKyKfBb
+         nfw5WAepYf0ZgMqA0mFdA/1bsv+KXU6MFwwT+XW0jowpn5JidoTRvc6XY5ihfULFtBMu
+         w/tw==
+X-Forwarded-Encrypted: i=1; AJvYcCVhMvsOMqSjTuFd31iKjUkrCr0xOtVeIbqqlUVbSomQ5WV3vFXCSk+EL2roMAU4JWT0k2uT91NQw0fP6fpE@vger.kernel.org, AJvYcCVj1TAi3gXfhzJGJNvXavmGnPBKnzqxpnJpTkNmCXrQtmTKJYbER7zcP2DUG88OMUee1x9KMP2q@vger.kernel.org, AJvYcCVsdSxxdf1rv5zC2tjQRkNRmVx2BmeZxHaIvdzhHDgZ5bMu/pcVXXECS9GJJ++cURjgtIg=@vger.kernel.org, AJvYcCXkHSMMn5SvPCrV+ovSjnVy0AWWWwTvEWXaphz0kBCRthhdTfHRxMd23OLmmdRWpN8wcot/2nDC4bR5bXhEXzZD@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIPFtcow+VgEnziaHUeNoPzFGIw50r/wzXlBokEepHsQscaEQn
+	EaFL+4JsR3iEpXjlR52o89LVrVSJtsAQ+evAimL/f2eZtRumikCC8SCrh+vdGbsIutJxdEAm4je
+	3cv3T9M6LpiraGMBWB7lgyLX6L+k=
+X-Google-Smtp-Source: AGHT+IHC28T0OxdS5xfWVXMn6jPEmfd/fTwBRe4M2YVY0z1mCKUZOIrmxvOKGo0k/glS1YBPx9wJCuP9gjWxOW50vjk=
+X-Received: by 2002:a5d:58d9:0:b0:368:6564:751b with SMTP id
+ ffacd0b85a97d-37311864454mr2589305f8f.32.1724452131607; Fri, 23 Aug 2024
+ 15:28:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/4] cxl/region: Prevent device_find_child() from
- modifying caller's match data
-To: Ira Weiny <ira.weiny@intel.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Davidlohr Bueso
- <dave@stgolabs.net>, Jonathan Cameron <jonathan.cameron@huawei.com>,
- Dave Jiang <dave.jiang@intel.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Takashi Sakamoto <o-takashi@sakamocchi.jp>, Timur Tabi <timur@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org,
- Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20240815-const_dfc_prepare-v2-0-8316b87b8ff9@quicinc.com>
- <20240815-const_dfc_prepare-v2-2-8316b87b8ff9@quicinc.com>
- <66c4a136d9764_2ddc2429435@iweiny-mobl.notmuch>
- <dec374a6-073d-4b7f-9e83-adcfcf672852@icloud.com>
- <66c8d0a7eddc5_a87cd294e1@iweiny-mobl.notmuch>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <66c8d0a7eddc5_a87cd294e1@iweiny-mobl.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: OEcYKCeKl2lrSiKKOvGo38JYgj9Rul2W
-X-Proofpoint-GUID: OEcYKCeKl2lrSiKKOvGo38JYgj9Rul2W
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-23_16,2024-08-23_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 clxscore=1015 spamscore=0
- mlxlogscore=999 bulkscore=0 suspectscore=0 malwarescore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2408230165
+References: <20240816-ups-bpf-next-selftests-use-khdr-v1-0-1e19f3d5b17a@kernel.org>
+ <20240816-ups-bpf-next-selftests-use-khdr-v1-1-1e19f3d5b17a@kernel.org>
+ <CAADnVQ+JBq8-6Rhi_LHX470uj2_2xxJAhgdUfg_abUxEDqpdJQ@mail.gmail.com> <6a693ad6-f145-48c1-b3a7-d441d3764e73@kernel.org>
+In-Reply-To: <6a693ad6-f145-48c1-b3a7-d441d3764e73@kernel.org>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 23 Aug 2024 15:28:40 -0700
+Message-ID: <CAADnVQKnEuQ4XZROLWH47mEZNwnJ9TuyTrauOnuobcLgVMrimw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/2] selftests: bpf: use KHDR_INCLUDES for the
+ UAPI headers
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: MPTCP Upstream <mptcp@lists.linux.dev>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/8/24 02:10, Ira Weiny wrote:
-> Zijun Hu wrote:
->> On 2024/8/20 21:59, Ira Weiny wrote:
->>> Zijun Hu wrote:
->>>> From: Zijun Hu <quic_zijuhu@quicinc.com>
->>>>
->>>> To prepare for constifying the following old driver core API:
->>>>
->>>> struct device *device_find_child(struct device *dev, void *data,
->>>> 		int (*match)(struct device *dev, void *data));
->>>> to new:
->>>> struct device *device_find_child(struct device *dev, const void *data,
->>>> 		int (*match)(struct device *dev, const void *data));
->>>>
->>>> The new API does not allow its match function (*match)() to modify
->>>> caller's match data @*data, but match_free_decoder() as the old API's
->>>> match function indeed modifies relevant match data, so it is not
->>>> suitable for the new API any more, fixed by implementing a equivalent
->>>> cxl_device_find_child() instead of the old API usage.
->>>
->>> Generally it seems ok but I think some name changes will make this more
->>> clear.  See below.
->>>
->>
->> okay.
->>
->>> Also for those working on CXL I'm questioning the use of ID here and the
->>> dependence on the id's being added to the parent in order.  Is that a
->>> guarantee?
->>>
->>>>
->>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->>>> ---
->>>>  drivers/cxl/core/region.c | 36 +++++++++++++++++++++++++++++++++++-
->>>>  1 file changed, 35 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
->>>> index 21ad5f242875..8d8f0637f7ac 100644
->>>> --- a/drivers/cxl/core/region.c
->>>> +++ b/drivers/cxl/core/region.c
->>>> @@ -134,6 +134,39 @@ static const struct attribute_group *get_cxl_region_access1_group(void)
->>>>  	return &cxl_region_access1_coordinate_group;
->>>>  }
->>>>  
->>>> +struct cxl_dfc_data {
->>>
->>> struct cxld_match_data
->>>
->>> 'cxld' == cxl decoder in our world.
->>>
->>
->> make sense.
->>
->>>> +	int (*match)(struct device *dev, void *data);
->>>> +	void *data;
->>>> +	struct device *target_device;
->>>> +};
->>>> +
->>>> +static int cxl_dfc_match_modify(struct device *dev, void *data)
->>>
->>> Why not just put this logic into match_free_decoder?
->>>
->>
->> Actually, i ever considered solution B as you suggested in the end.
->>
->> For this change, namely, solution A:
->> 1) this change is clearer and easier to understand.
->> 2) this change does not touch any existing cxld logic
->>
->> For solution B:
->> it is more reasonable
->>
->> i finally select A since it can express my concern and relevant solution
->> clearly.
-> 
-> Understood.
-> 
->>
->>>> +{
->>>> +	struct cxl_dfc_data *dfc_data = data;
->>>> +	int res;
->>>> +
->>>> +	res = dfc_data->match(dev, dfc_data->data);
->>>> +	if (res && get_device(dev)) {
->>>> +		dfc_data->target_device = dev;
->>>> +		return res;
->>>> +	}
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>> +/*
->>>> + * I have the same function as device_find_child() but allow to modify
->>>> + * caller's match data @*data.
->>>> + */
->>>
->>> No need for this comment after the new API is established.
->>>
->>
->> i have given up the idea within v1 to introduce a new API which *should
->> ONLY* be used by this patch series, so it is not worthy of a new API
->> even if it can bring convenient for this patch series.
-> 
-> I'm not clear on this.  Are you still proposing to change the parameter to
-> const?
-> 
-yes.
->>
->>>> +static struct device *cxl_device_find_child(struct device *parent, void *data,
->>>> +					    int (*match)(struct device *dev, void *data))
->>>> +{
->>>> +	struct cxl_dfc_data dfc_data = {match, data, NULL};
->>>> +
->>>> +	device_for_each_child(parent, &dfc_data, cxl_dfc_match_modify);
->>>> +	return dfc_data.target_device;
->>>> +}
->>>> +
->>>>  static ssize_t uuid_show(struct device *dev, struct device_attribute *attr,
->>>>  			 char *buf)
->>>>  {
->>>> @@ -849,7 +882,8 @@ cxl_region_find_decoder(struct cxl_port *port,
->>>>  		dev = device_find_child(&port->dev, &cxlr->params,
->>>>  					match_auto_decoder);
->>>>  	else
->>>> -		dev = device_find_child(&port->dev, &id, match_free_decoder);
->>>> +		dev = cxl_device_find_child(&port->dev, &id,
->>>> +					    match_free_decoder);
->>>
->>> This is too literal.  How about the following (passes basic cxl-tests).
->>>
->>
->> it is reasonable.
->>
->> do you need me to submit that you suggest in the end and add you as
->> co-developer ?
-> 
-> You can submit it with Suggested-by:
-> 
-okay.
->>
->> OR
->>
->> you submit it by yourself ?
->>
->> either is okay for me.
->>
->>> Ira
->>>
->>> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c              
->>> index 21ad5f242875..c1e46254efb8 100644                                         
->>> --- a/drivers/cxl/core/region.c                                                 
->>> +++ b/drivers/cxl/core/region.c                                                 
->>> @@ -794,10 +794,15 @@ static size_t show_targetN(struct cxl_region *cxlr, char *buf, int pos)
->>>         return rc;                                                              
->>>  }                                                                              
->>>                                                                                 
->>> +struct cxld_match_data {                                                       
->>> +       int id;                                                                 
->>> +       struct device *target_device;                                           
->>> +};                                                                             
->>> +                                                                               
->>>  static int match_free_decoder(struct device *dev, void *data)                  
->>>  {                                                                              
->>> +       struct cxld_match_data *match_data = data;                              
->>>         struct cxl_decoder *cxld;                                               
->>> -       int *id = data;                                                         
->>>                                                                                 
->>>         if (!is_switch_decoder(dev))                                            
->>>                 return 0;                                                       
->>> @@ -805,17 +810,30 @@ static int match_free_decoder(struct device *dev, void *data)
->>>         cxld = to_cxl_decoder(dev);                                             
->>>                                                                                 
->>>         /* enforce ordered allocation */                                        
->>> -       if (cxld->id != *id)                                                    
->>> +       if (cxld->id != match_data->id)                                         
->>>                 return 0;                                                       
->>>                                                                                 
->>> -       if (!cxld->region)                                                      
->>> +       if (!cxld->region && get_device(dev)) {                                 
->>
->> get_device(dev) failure may cause different logic against existing
->> but i think it should be impossible to happen normally.
-> 
-> Indeed this is slightly different.  :-/
-> 
-> Move the get_device() to find_free_decoder()?
-> 
-i think we can keep your change. so ignore this slight difference.
-i also notice that you have done some verification for this change.
-> Ira
-> 
->>
->>> +               match_data->target_device = dev;                                
->>>                 return 1;                                                       
->>> +       }                                                                       
->>>                                                                                 
->>> -       (*id)++;                                                                
->>> +       match_data->id++;                                                       
->>>                                                                                 
->>>         return 0;                                                               
->>>  }                                                                              
->>>                                                                                 
->>> +static struct device *find_free_decoder(struct device *parent)                 
->>> +{                                                                              
->>> +       struct cxld_match_data match_data = {                                   
->>> +               .id = 0,                                                        
->>> +               .target_device = NULL,                                          
->>> +       };                                                                      
->>> +                                                                               
->>> +       device_for_each_child(parent, &match_data, match_free_decoder);         
->>> +       return match_data.target_device;                                        
->>> +}                                                                              
->>> +                                                                               
-> 
-> [snip]
+On Sat, Aug 17, 2024 at 7:51=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org=
+> wrote:
+>
+> Hi Alexei,
+>
+> Thank you for the review.
+>
+> On 17/08/2024 09:22, Alexei Starovoitov wrote:
+> > On Fri, Aug 16, 2024 at 7:56=E2=80=AFPM Matthieu Baerts (NGI0)
+> > <matttbe@kernel.org> wrote:
+> >>
+> >> Instead of duplicating UAPI header files in 'tools/include/uapi', the
+> >> BPF selftests can also look at the header files inside the kernel
+> >> source.
+> >>
+> >> To do that, the kernel selftests infrastructure provides the
+> >> 'KHDR_INCLUDES' variable. This is what is being used in most selftests=
+,
+> >> because it is what is recommended in the documentation [1]. If the
+> >> selftests are not executed from the kernel sources, it is possible to
+> >> override the variable, e.g.
+> >>
+> >>   make KHDR_INCLUDES=3D"-I${HDR_DIR}/include" -C "${KSFT_DIR}"
+> >>
+> >> ... where ${HDR_DIR} has been generated by this command:
+> >>
+> >>   make headers_install INSTALL_HDR_PATH=3D"${HDR_DIR}"
+> >>
+> >> Thanks to 'KHDR_INCLUDES', it is no longer needed to duplicate header
+> >> files for userspace test programs, and these programs can include UAPI
+> >> header files without the 'uapi' prefix.
+> >>
+> >> Note that it is still required to use 'tools/include/uapi' -- APIDIR,
+> >> which corresponds to TOOLS_INCLUDES from lib.mk -- for the BPF program=
+s,
+> >> not to conflict with what is already defined in vmlinux.h.
+> >>
+> >> Link: https://docs.kernel.org/dev-tools/kselftest.html#contributing-ne=
+w-tests-details [1]
+> >> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> >> ---
+> >>  tools/testing/selftests/bpf/Makefile                       | 2 +-
+> >>  tools/testing/selftests/bpf/prog_tests/assign_reuse.c      | 2 +-
+> >>  tools/testing/selftests/bpf/prog_tests/tc_links.c          | 4 ++--
+> >>  tools/testing/selftests/bpf/prog_tests/tc_netkit.c         | 2 +-
+> >>  tools/testing/selftests/bpf/prog_tests/tc_opts.c           | 2 +-
+> >>  tools/testing/selftests/bpf/prog_tests/user_ringbuf.c      | 2 +-
+> >>  tools/testing/selftests/bpf/prog_tests/xdp_bonding.c       | 2 +-
+> >>  tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c | 2 +-
+> >>  tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c | 2 +-
+> >>  tools/testing/selftests/bpf/prog_tests/xdp_do_redirect.c   | 2 +-
+> >>  tools/testing/selftests/bpf/prog_tests/xdp_link.c          | 2 +-
+> >>  tools/testing/selftests/bpf/xdp_features.c                 | 4 ++--
+> >>  12 files changed, 14 insertions(+), 14 deletions(-)
+> >>
+> >> diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/self=
+tests/bpf/Makefile
+> >> index 4eceb491a8ae..6a7aeae7e206 100644
+> >> --- a/tools/testing/selftests/bpf/Makefile
+> >> +++ b/tools/testing/selftests/bpf/Makefile
+> >> @@ -37,7 +37,7 @@ CFLAGS +=3D -g $(OPT_FLAGS) -rdynamic               =
+                    \
+> >>           -Wall -Werror -fno-omit-frame-pointer                       =
+  \
+> >>           $(GENFLAGS) $(SAN_CFLAGS) $(LIBELF_CFLAGS)                  =
+  \
+> >>           -I$(CURDIR) -I$(INCLUDE_DIR) -I$(GENDIR) -I$(LIBDIR)        =
+  \
+> >> -         -I$(TOOLSINCDIR) -I$(APIDIR) -I$(OUTPUT)
+> >> +         -I$(TOOLSINCDIR) $(KHDR_INCLUDES) -I$(OUTPUT)
+> >>  LDFLAGS +=3D $(SAN_LDFLAGS)
+> >>  LDLIBS +=3D $(LIBELF_LIBS) -lz -lrt -lpthread
+> >>
+> >> diff --git a/tools/testing/selftests/bpf/prog_tests/assign_reuse.c b/t=
+ools/testing/selftests/bpf/prog_tests/assign_reuse.c
+> >> index 989ee4d9785b..3d06bf5a1ba4 100644
+> >> --- a/tools/testing/selftests/bpf/prog_tests/assign_reuse.c
+> >> +++ b/tools/testing/selftests/bpf/prog_tests/assign_reuse.c
+> >> @@ -1,6 +1,6 @@
+> >>  // SPDX-License-Identifier: GPL-2.0
+> >>  /* Copyright (c) 2023 Isovalent */
+> >> -#include <uapi/linux/if_link.h>
+> >> +#include <linux/if_link.h>
+> >
+> > No. This is not an option.
+> > User space shouldn't include kernel headers like this.
+> > Long ago tools/include directory was specifically
+> > created to break such dependency.
+> > Back then it was done for perf.
+>
+> I'm sorry, but I think we are not talking about the same thing here:
+> here, I'm only modifying the "normal" userspace programs, not the ones
+> used to generate the BPF objects. Perf is a special case I suppose, it
+> needs to know the kernel internals. It is the same with BPF programs
+> requiring vmlinux.h. But I think "normal" userspace programs in the
+> sefltests can use the UAPI headers, no?
 
+Not really. perf is a normal user space that doesn't look into
+kernel internals.
+It's used to rely on a few .h from kernel src tree for convenience,
+since they're not present in what's installed after 'make headers'.
+Hence the tools/include dir was created.
+
+Using KHDR_INCLUDES is fine, but it's not ok to search replace
+s/uapi\/linux/linux/ everywhere.
+Like the example I quoted above.
+tools/.../if_link.h is much older than include/uapi/linux/if_link.h
+and it's ok.
+We're not planning to update it.
+It's like building selftests on the system with older glibc.
+There is no requirement to have every .h in the tools/ dir
+up-to-date with the latest in include/.
+We're doing it for bpf.h because new selftests typically need
+something from bpf.h that was just added in the previous patch.
+
+> I understand that I could indeed fix my initial problem by duplicating
+> mptcp.h in tools/include/uapi/linux/, but this doesn't look to be
+> allowed any more by the Netdev maintainers, e.g. recently, 'ethtool.h'
+> has been duplicated there in commit 7effe3fdc049 ("tools: Add ethtool.h
+> header to tooling infra"), but removed quickly after in commit
+> bbe91a9f6889 ("tools: remove redundant ethtool.h from tooling infra").
+> In this case, it was fine to simply drop it, because the linked test
+> doesn't require a recent version. Jakub mentioned [4] that these
+> duplicated headers should be avoided, and the ones generated by 'make
+> headers' should be used instead: what is being suggested here.
+
+This is a different issue. There are very few .h in tools/ that
+needs a sync.
+bpf.h is one of them. ethtool.h is certainly not.
+
+you need something for mpctp.h. Let's talk about it,
+but switching everything to KHDR_INCLUDES is not ok,
+since there are a bunch of things in play.
+Sometimes selftests are built standalone and with non-glibc-s.
+
+Also realize that bpf selftests are not really kselftests.
+We use a few common .mk for convenience. That's about it.
 
