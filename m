@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-121441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0CCF95D2CC
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:14:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9C8A95D2E5
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:16:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BB37284045
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:14:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 192BE1C21857
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF79192586;
-	Fri, 23 Aug 2024 16:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B957B194A75;
+	Fri, 23 Aug 2024 16:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q7lF8JQx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sdeqLSoS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DB0191F8F
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 16:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0921946B5
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 16:13:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724429558; cv=none; b=Fy4DHUck4GLOXCKTwqR/7UTAUSBkI+fYpOzsGZUyCIGaOMHqgDN/wU7s1bRB2kwm3tX8yyhy7vV05lKbSkFQYTt5oGzsGxmElAZwu2jRjT98pnosJaWYDWkL42HWdDstKCJ2zH7wsc+kAk2NSylRP5WNVFi8pgywgLFCaBpdVDg=
+	t=1724429582; cv=none; b=oiOh+q+Xm0TJJPt8eFmknB97mnmMiHamRsx4lL/sYGUiHea3Ptz3JN1sPbtLdhPa0W64O8Q0h0YCLysbxrEvYkTietYNHy8SNmtYs6k0lfmJVqZCaymGyV0PlBLDFUjnTjjdnuWmpHMRr3kFFlOtSLzFWmOa8BTHFMW9s/CPxYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724429558; c=relaxed/simple;
-	bh=foDX8nSpdBE7Stl1C+tjFDYcGaddTLXx38TRzjSaijg=;
+	s=arc-20240116; t=1724429582; c=relaxed/simple;
+	bh=v3tl121UFcqjaRW1cQWXFFukEED+sZyQ1Hsg/FKSyTw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iISdx5cdjcgE58SvdaryRdZDI87Wcj5sWSptZOCZOHQpBz0Ed76TheQoQNCpLGkC7YMfT6rCG96opAUrdoo+SNNEyY2V4mpidoOqPBWvt9QmIB0qFjYoENZOsn/AIpN2v/gA4Gm3zHNZmZOZ6MuREQ7vy9Jj7DAQjYqdk/iqWSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q7lF8JQx; arc=none smtp.client-ip=209.85.167.48
+	 To:Cc:Content-Type; b=SaWoXbyoSqDJJ+AM7lAa4qWb75NbjlgIgYDum5BJWY3VCKDe4KjXfvve1btlcL5qOA4Qqp2VspB8zwI8sWQrDggtvfgvw15GWkLqVIfZWDO8ghth4PnUlDR1Ww1gj/s75h8p9kwjFoPj++kfUoVL9w+rFUJ/GbJcNVuXTEfIxos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=sdeqLSoS; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-533462b9428so3756044e87.3
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 09:12:36 -0700 (PDT)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5334e41c30bso2311449e87.0
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 09:13:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724429555; x=1725034355; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1724429579; x=1725034379; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k1jmXMGgCEe3vyECBk95vJ+hBk5w1rZzr4yvt3CADUo=;
-        b=q7lF8JQx9kaMQYqIConQky3t+HpxtW3GmsnxciWj2X5f+e6FAQhKUEiPASxiYC9Ubs
-         ly45/guzT1gcKdyizYSAT+I/IgQ8qvv+Q8RZoow/GEAbxjdfeCaEZ7gS7eBzMA4O7icu
-         P2XGLCnVA4NBCsGjP7FkdPwtZvf0mS6bi8/A5U4k5qhOdqahRHDLuPa7aoHV1orSzX3w
-         m+OmPjQXNtDI70BapCyWG4wfxhl8/5n9YgOB2r5dTI/iCsvrqEFcapPRVpe6H2ZrmloI
-         kAmtTAUpoooM4By7rNfB21Lfd3kD/B4vBd+7fkUcTWvtZ3c0tgPd03mBXCXFCRfRi0j2
-         pClQ==
+        bh=v3tl121UFcqjaRW1cQWXFFukEED+sZyQ1Hsg/FKSyTw=;
+        b=sdeqLSoS+cceR6ApQSN6cimmYONbktn16U4f0nXIbhbinKuLz03woTI8WuAR2goGow
+         QVm0m/9uiYxGwUhQHbyekpGFcwzPJhEMqrE6G8d6oHVY/a+Cl5Pfr6reG2t/3oahIjfu
+         dRGTR+3velXi48dsyPAgWclGpqRbnySvY/bxdxBkZW1cyIM/lEIK9Lt+pI06uf9hrxhT
+         QhpW9N6fB5+xwh5qF6P4ht86uVQmw9Snxb0Damnty9Cxhms/6Xr3nIfFtcoSHCwf2d8R
+         b7rDlIskAQUJwLEwNTukRKmtyfH7Ek2tX7fi1eLyFJERo5C6uHp9NGd6pzazFnjAu2It
+         IoRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724429555; x=1725034355;
+        d=1e100.net; s=20230601; t=1724429579; x=1725034379;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=k1jmXMGgCEe3vyECBk95vJ+hBk5w1rZzr4yvt3CADUo=;
-        b=DvpSp1PZHT8YXV+vgd6nu83zHWvZ6Xfcn7uEFV4rtWV34xkzyf4cAvKsKDFt+NBcWu
-         M8BFfYeEndz6pObkxAAzkUONHt48eS0pKu+MobAvbfTzfpKj/yHC602219Gpdk68qDur
-         Jy/qx/O5QuUJomjMAZrNNVxQCGkOSCiRhFepvYzITsMwoDUl+AkxA6BBbcPAsB+2kz47
-         TVu8AIW2jp6hTXTjE5NUnVCJor0sHTFa7KwH+SskID4OKDaEiGT3B4DvZYeanMufhVnb
-         a5j/UqQQo1bsSuO3Y/1Odfvn/l7VO7O3XeoAIzvcDzRnRtPLcPu5jI1IFxXZq2H3tSqL
-         Ic/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUzk59TMCAxYLwMdQYQx3xJOPgK3v17OV9QwLvVOG+ZpS+mnF+aFk0YK3wKmr41h8JMIclhQ3U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYABTxERPi24bWwrMhRWLsUEGYJ7HFD/Rg5v6TTPPEOInuMnPy
-	/pDYSNKVebLMsUTNwpFth6RTkoaH2MJvFTzYsETO0ozBH3EFSRbTQXuL4iyuThP/9YcbsJqjrPk
-	o6y2U2GeXh+ySJTZBPZc9GML8FYgxEDWbb7QDNQ==
-X-Google-Smtp-Source: AGHT+IG7mSCIWYZ8bpH8IAQGda1ENwR9WbQciD7o/G7QbH41YO9wcFnvMe+Pbl1EVS7OeQRr0SFN9rrPBxhDD4ALEaE=
-X-Received: by 2002:a05:6512:b22:b0:52c:ddef:4eb7 with SMTP id
- 2adb3069b0e04-53438846f4cmr2471437e87.20.1724429554337; Fri, 23 Aug 2024
- 09:12:34 -0700 (PDT)
+        bh=v3tl121UFcqjaRW1cQWXFFukEED+sZyQ1Hsg/FKSyTw=;
+        b=X25mJnTBVLeUmvlC9QVuV4RZCFubfk7NTQb71cbaWCS9MnAJNWtevxF256+ETc2dOr
+         BZB+KyDQJYG6OKLALq5+V/WEKfxz1eLI1e12UC/eGm9mX+ixRovnSx8Nwq2sMEk2aVK6
+         r1C6uFEdvQDA9rbQupE9NsbEMtLLGYAlsNzBeC8REzwPiE3zKrGu55dnnqLVq3MfBD1P
+         khM5OAxEOQ7UTeG8aSU8HT/hA/3LNfzvDAh1hkKHvfC7zgu58XtRmDqps2ap3TsTjvhU
+         tk9BrRhqmIO8fW3DsLaaId9Edxzj0IRPgcb78LV6Om25CD4vK7AP9N/+tGc4d+kF7WPB
+         cipw==
+X-Forwarded-Encrypted: i=1; AJvYcCVsO7gl/d/QCiFRbV6FIXqXE+ZFcWqQCWymLZ7nawPPD7ZDEo4cPPG8HQwENy2+h0Vmt5pd4GY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzwFcwRFWjIOqsjZsfgu4tgw3IW+o6qkvjTYOJlM4bhRjrfaviI
+	+9HYPBW8hZXyXDXapEVi+i6/0KMQJOmFKk2RqyNPS8lsw7Un2U2SyO09dJjhjpJNB8ewPFpsxjh
+	in0cTkjv2IcUZWm+K7OoCsgl+OUMbswebQwzUfA==
+X-Google-Smtp-Source: AGHT+IH1hynyymLz1ZuEZUhvfWZZ/Hkkj2g0Tl04dlGTeLjC9tjjJISAp+o+SHgwFRjXGoZ1puRhp7iBRORVJcZyH3Q=
+X-Received: by 2002:a05:6512:6cf:b0:52f:c14e:2533 with SMTP id
+ 2adb3069b0e04-534387be6d8mr1996904e87.48.1724429578471; Fri, 23 Aug 2024
+ 09:12:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,12 +72,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240811-dt-bindings-serial-peripheral-props-v1-0-1dba258b7492@linaro.org>
- <20240811-dt-bindings-serial-peripheral-props-v1-4-1dba258b7492@linaro.org>
-In-Reply-To: <20240811-dt-bindings-serial-peripheral-props-v1-4-1dba258b7492@linaro.org>
+ <20240811-dt-bindings-serial-peripheral-props-v1-5-1dba258b7492@linaro.org>
+In-Reply-To: <20240811-dt-bindings-serial-peripheral-props-v1-5-1dba258b7492@linaro.org>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 23 Aug 2024 18:12:23 +0200
-Message-ID: <CACRpkdbaHqJfK7989rx8OaS9mpmdYO2Hpna6dUty_fDgYa3chA@mail.gmail.com>
-Subject: Re: [PATCH 4/6] dt-bindings: gnss: reference serial-peripheral-props.yaml
+Date: Fri, 23 Aug 2024 18:12:47 +0200
+Message-ID: <CACRpkdagjGv79pJy8Ry2+OM8ShCE8sWNafQtzrPM_-2MJYNzLQ@mail.gmail.com>
+Subject: Re: [PATCH 5/6] dt-bindings: bluetooth: reference serial-peripheral-props.yaml
 To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Cc: Rob Herring <robh@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
 	Jiri Slaby <jirislaby@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
@@ -98,10 +98,9 @@ Content-Transfer-Encoding: quoted-printable
 On Sun, Aug 11, 2024 at 8:17=E2=80=AFPM Krzysztof Kozlowski
 <krzysztof.kozlowski@linaro.org> wrote:
 
-> The "current-speed" property is not a common property for all GNSS
-> devices, but only to these connected with serial.  Drop the property
-> from the common GNSS properties schema and instead reference common
-> serial properties schema (for children of UART controllers).
+> Reference common serial properties schema (for children of UART
+> controllers) to bring common definition of "current-speed" and
+> "max-speed" properties.
 >
 > Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
