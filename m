@@ -1,256 +1,248 @@
-Return-Path: <netdev+bounces-121332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5267895CC28
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:12:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B9195CC6A
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:34:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76A69281517
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 12:12:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AE1728320E
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 12:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC951849CB;
-	Fri, 23 Aug 2024 12:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E09818562A;
+	Fri, 23 Aug 2024 12:34:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j62U1aGt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="izw9lctb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29D461FFC;
-	Fri, 23 Aug 2024 12:12:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724415163; cv=none; b=jnix2EoBBTM1MC4HyNavxixjdF7Rg4B6wLD7EwLHKaqjpv9R4x7BsKH1faayZdS0uddF3kbANkrBr3J22ZqM9JPRECl7vegfAJFAicm0y/dA2wYIRgu1H4jy+uj2uTarf2bYAQ1FYuaO/++GPeb1mlgQEEm93GPWeEdkGfLxKN4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724415163; c=relaxed/simple;
-	bh=A5QVX7km38nRwv6KqoYsXrhmUmTxpCA+0suYvYmI4cY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z4TvVQSXxiVzH48nsxb+5xOZVxYWBS2fgWXZuWHnKZP5QDkmhAWuNRFdoshUnWHOBP2L64YgYin+Hg31Pgxe0J0yrBWSI1mO+uBw/MsPboW3x+IsD/0t65HNvmAdA3iGuW8M4deAzhLlVrQWxkdcazEVkkko7ePIU/nMs2K/f5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j62U1aGt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD327C32786;
-	Fri, 23 Aug 2024 12:12:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724415163;
-	bh=A5QVX7km38nRwv6KqoYsXrhmUmTxpCA+0suYvYmI4cY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=j62U1aGtWvoiRdZ8n071nAOv0BzDl4T62UArEtn4carL7SuuO93e0IVoUgBJJT8CI
-	 nr2559FNsK200UqCICK2pQkKiONDn5DsMvXi9zHWLUwHK5ctwEeLy8UrXbD5ltJETC
-	 d6Ea67j9zn3Bdul+CK3JE/eYAhXEvyapR8rJibIRwyLAdhEQl0qLhs1V1TKhXIDELt
-	 Ro1UBBXWfRCJXjrXErPEGMm8OWaDt38taRIwpDjpXLvMfaYkDziu9td2kya9Kl7i0A
-	 e4WfojTfoF8+V3Go2Ep/67WkA8rmUywZlrT302TT6rmrmugQXkhANqfFb06kfnsxVL
-	 9qPsp8/R0l++w==
-Message-ID: <d2e00269-23b8-4a92-84df-959b3c3ae6f1@kernel.org>
-Date: Fri, 23 Aug 2024 15:12:35 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7349A4430;
+	Fri, 23 Aug 2024 12:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724416465; cv=fail; b=GpsGpAX0d8Ck4Es5XlLy9Dh03f2yyWbigI62/Z858aJn1XgUysmZ0H8DBv5OJZDw6ivA3P1HNiLZi+WhZpvY+sfZW3FRGT9Ty7TEQ45PudKeEyde/bWxzb3FIFlbdgFYJX8rVeMGMN7PMn60vQkik4q/PJP60PRr62PGIlDCFOQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724416465; c=relaxed/simple;
+	bh=/m8e75jKQwIbwXTtsXNCDhkc4c0ZvmMTfstuX0i4i9w=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=XU9IGTVd7Vd0aPhwC13Q+Rj9FwvwXseM9920FEphVyTNeyecfKHj14NAcnbAo2ijG2HiIyaY+/ubFwT+mxPKqB2982hkUd47SNhRQKAMviSY48vqMAsQFm8ws2d9SgeiQpL4Y66Qy9tdVSvEYcYO1ADjTPnOnNlOgrQuUClFM8M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=izw9lctb; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724416464; x=1755952464;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/m8e75jKQwIbwXTtsXNCDhkc4c0ZvmMTfstuX0i4i9w=;
+  b=izw9lctbeTuxP2idbVaDnquzlzO1D98UVT1Al91tVSWXxeX2gc+LiIKc
+   Zd4/Hxa861HgWQHvXXqMKhQeaC1fxYfn1NLNU6U0ahFeotfkGoGvXeO5+
+   eU75ftTNfGuESOoNKcYkDLdJHki5wyVuY0rPjkisW0rIi0xWcR7YKzEtf
+   1I9eAaVbQTOccvZ1FlhFHlyNhefT968m8o8Am/3Zg7ZSUYG19PzYh8WBl
+   QFEs+cUGy62GBVnJhlUBc/B1nOkVmlWSAcqKEAASQ4HFBUTuI6Oz4ruCU
+   C64Llfstr3zUkq5o/X3347m1a7dz3lAk3kKoS3nOXgAcfsVfj1FhojFmm
+   w==;
+X-CSE-ConnectionGUID: DG4qfdycR+O708JZv2QS6g==
+X-CSE-MsgGUID: 2pFXTbVLRWi7T5LgVJDF7A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="34298417"
+X-IronPort-AV: E=Sophos;i="6.10,170,1719903600"; 
+   d="scan'208";a="34298417"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 05:34:22 -0700
+X-CSE-ConnectionGUID: JniJ7iewQqie8CWW18lOzQ==
+X-CSE-MsgGUID: PCQs3FVGQRiKUfVKEEUHsg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,170,1719903600"; 
+   d="scan'208";a="61761653"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Aug 2024 05:34:22 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 23 Aug 2024 05:34:21 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 23 Aug 2024 05:34:21 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 23 Aug 2024 05:34:21 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.172)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 23 Aug 2024 05:34:21 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=d6KpTlKF6Kahu9xBapI0+E9iibT6RPjhjuHzHEiqVfQQFR01rLiyHiM+FRVkiSGdtFpCdnWNl44UdW+HQLiXgToEU0UOCfWuaAAksCBS8W+Hm72xc/ax5hfezfP5gCC9EvXJf+E9WraEKWpuqM897XG1UqzePY0+H4T9YThTpaaUoq8on9XyWQsHARcYVA5NZ797CLnCDsC/oxMvflruUB2B/xpqF7EL/F7JjM8oU/ed2DoFN3VnnTqNUkLmrmT8Ftc50ErJMOz/jgYp8JHbQ0Eo1yux53s4PUP8tITwaodzvggo5rP7ibMJ3zcUp7QL3V0yGOqviHcJ6GAr4yG/hQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=B2bgBmV4jMOIFz04CWZ51SIeAYjTWPrG/pTNb86+LhQ=;
+ b=QRbhyXq6hl/2mvYCXt8C7JnTWbiHok/WPGMegpinnsD+YqSpMpFOViszUXUSrf/EfmorGRDUp5YR6Cvc5/F8ySahgN9PI8fkEscP3d28V8rJQ8jvuR+M3pyiTyJlgBWmkEX6q7wmT4ja95RpQVPX+7A+hPD+UaHy1WPbJyLVjXTlzyvaJ1gQOEUMsoNvAjDeGbmrCFuwmNoGQGtAPR87357oqwWfj8lAKlLPzmVrGFLiNY6P19iLwbKq+RVzHK7Y3murdEbtP535ALwlX7EH5fXjZ6n6/n8WjrhONO9nRy8t5GFs2fM0EDCPlI88j1tRoHsqV2jRtc9UuErNa5OeVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by DS7PR11MB5965.namprd11.prod.outlook.com (2603:10b6:8:70::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.19; Fri, 23 Aug
+ 2024 12:34:18 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.7875.019; Fri, 23 Aug 2024
+ 12:34:18 +0000
+Message-ID: <6c72dbc6-98a1-4682-97ca-e2f76c81a178@intel.com>
+Date: Fri, 23 Aug 2024 14:34:13 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 2/6] netdev_features: remove unused
+ __UNUSED_NETIF_F_1
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Eric Dumazet <edumazet@google.com>, "David S. Miller"
+	<davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, David Ahern
+	<dsahern@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn
+	<andrew@lunn.ch>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20240821150700.1760518-1-aleksander.lobakin@intel.com>
+ <20240821150700.1760518-3-aleksander.lobakin@intel.com>
+ <CANn89iL+VTJ6tEe-PZ24h+0U9BYs0t4gZDndiy7j1DwuKMBEFg@mail.gmail.com>
+ <fc659137-c6f0-42bf-8af3-56f4f0deae1b@intel.com>
+ <CANn89i+qJa8FSwdxkK76NSz2Wi4OxP56edFmJ14Zok8BpYQFjQ@mail.gmail.com>
+ <d080d3a6-3fdd-4edc-ae66-a576243ab3f0@intel.com>
+ <20240822163129.0982128f@kernel.org>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240822163129.0982128f@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR0P278CA0138.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:40::17) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 0/3] Add minimal XDP support to TI AM65 CPSW
- Ethernet driver
-To: Julien Panis <jpanis@baylibre.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Ratheesh Kannoth <rkannoth@marvell.com>,
- Naveen Mamindlapalli <naveenm@marvell.com>,
- Jacob Keller <jacob.e.keller@intel.com>
-Cc: danishanwar@ti.com, yuehaibing@huawei.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org, "Govindarajan, Sriramakrishnan" <srk@ti.com>
-References: <20240223-am65-cpsw-xdp-basic-v9-0-2c194217e325@baylibre.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20240223-am65-cpsw-xdp-basic-v9-0-2c194217e325@baylibre.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|DS7PR11MB5965:EE_
+X-MS-Office365-Filtering-Correlation-Id: bac2b202-e70c-4525-6fa3-08dcc36fe83e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?YXg0Ni9RdlZhSHcvRENKRHZyQngvcVoycWpWUTdJd3huNy9SRDRhbDF3NTRQ?=
+ =?utf-8?B?UisxWlByUE9MTWc5SEhiS3JBZXZuTGQ1QkEyNjVTV2htYW0vQ0IvZm5kT1pE?=
+ =?utf-8?B?MFRMNFowYzZ1NFlwL0RlNTdqaE4vZDExZjcwdTdTcUJrbUJPS2pBVCtEdFJU?=
+ =?utf-8?B?d0ZmOE00NE54YSs3ZzFEWS8wamk0dXFZMjdSZit2eHBTcXNNc3FSa1R6Sjdj?=
+ =?utf-8?B?by9WenBhUVNrUElrMmlPTHY4K3U4ZG0weFNXcTNpSlJQRzhuYUp4bGQ2VXNE?=
+ =?utf-8?B?NzFKbUh5LzhiSHkyL0hKVFRvV0JuMTlTYkM3VGRsdWJoR2Q3REg1elZkVnBq?=
+ =?utf-8?B?Wjd2SFJwQVgyRzNzMm5SMm0wRnk4bGRndXJ6UkRrWlRyN25QWDNiU0RxNitu?=
+ =?utf-8?B?Sk5VWGx3RXEzV0NJOHY4cStEK25HVGNUYnMvdjZaOFgzWGJqOXE5WHBXcTlM?=
+ =?utf-8?B?RXovMUV6UXNmelp6QXNZaXRKUDE0akJIMTdNSEFKUytNeXp1bmpiVURJRW45?=
+ =?utf-8?B?Sm81azFHNFc4NFRHMDNOK2lSbTM3Q0VWNUN5eDlGWUFUdmh1REx4UHl2VGhT?=
+ =?utf-8?B?VDV6bWRVK0lRNnFaY1MvVTRNTTNsQ2g1RnFaYkh6RnBKSXFiblZwVmxWWlNo?=
+ =?utf-8?B?c0NsbFZ3UGZBWTFUdUduU0o0c2JId3JZMzhyQ29rcGRvK3J2WUdKL29Dbm5N?=
+ =?utf-8?B?b1lIT01MNnhwV2NmSkQ4R2N2emd2bWJ2ZHQvVkROVlJDYUtWV1hNVFFVMUQ1?=
+ =?utf-8?B?NVlnbC82OUNUeG1PVGZoTTYxcnJML0tIRFNUWE5FUVRsRU5rbUd2OG5nSGl1?=
+ =?utf-8?B?YmFKWmhaQXBOeXhrM3ZqZzZrOFliZE1KTTU1SXVRbEpwNVNEM0tScGdZMFVq?=
+ =?utf-8?B?VzFQNEJYVEIvSHg4OVhCQlBRVGhoOW1tNFJiWkxhTm5xQ1FjcXByMjhkRnV2?=
+ =?utf-8?B?Vys0M2lmZ0ZBYll1UFdwbkY3THBKRFg2QUg4ZDMwYnkzeWZkOHdrV29wSkF0?=
+ =?utf-8?B?T1Eybm84S0NsUStxTGZWQlJ5aFFaWi9IMGVFRXZOV2dkSDh1d3NIUC9CL1N4?=
+ =?utf-8?B?eGpYeEpqR3EzeEdkTno3MjN2bndMdE9JNGxxOUF2cXdNSU4reEhORmRtdFBK?=
+ =?utf-8?B?WFNSQ2lqUkhwU1ZjWkU1MlFSVEZNdDNidTV6MWtoZ0E1UENudkVnTkljanRB?=
+ =?utf-8?B?UzNPR3Y4aWdSWWN3UHV2NEE0bklPYXpEeHh4R2kxNnVaRS9VRjJmZ0ZGTDVN?=
+ =?utf-8?B?SWRQZXl5V0pxK3FXQy9BNXdMSkNFTVNlQkZRRGY4TVdjcWFEUk9xcy8za251?=
+ =?utf-8?B?eWJqK24xMFA5OWdrUzQ5T0kvNEs2MXN0NmNDb1g1SEVMTnZvKzhGWkxYUVpN?=
+ =?utf-8?B?U1FjVUJsS3BJQ0R3djM1aThQR0F6enJvVk9sa3RzRWFkT2R3QUpJeFI3cDZi?=
+ =?utf-8?B?UEpGdXFpUEV3S0RxSjlmUXgwL25vci9YNUhVZ2dTTjBadmJlNG41QkdoWW1r?=
+ =?utf-8?B?T3phNkdtWUsrcTZVVFVVVk95THRRVEVqaHFPMjZ5SnMyUG9yWE1OaDJJejBo?=
+ =?utf-8?B?Z3BFdDNJRDltblB3QjdpWlNCV0VqYUVJQTUzOTBlTkNxcHlBb29DQ0ZMYTJp?=
+ =?utf-8?B?dVhyMGI3QzZkNnZtK2RGRFRKKzFmOVdYS2ludHUrN2hGNHlKYVpHUGRWYlM0?=
+ =?utf-8?B?ZG1Qd3o4d1lrSzVsZVRYb3dKTitSK0dBR01taEtGNWpVZjlxNkpiWUFNUUd6?=
+ =?utf-8?B?aXNSVktFa3Q3ZFBaVTV0blVueXlxQnM0SDBTejFpUUd3V200M0NZODNmbkVh?=
+ =?utf-8?B?cVF4blBuaTJTM3lDblhZdz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RUhYTjV1dWQ1MkxIcmM5MHJkUG95MmhWUFdsNlNuZnhXNFI3eFVpTXRpWFJX?=
+ =?utf-8?B?azRYSlFybnU3RlhpR3k5bEtQYnZpMlo3SDFuZjB5VDVTY01jQTQwd2l1L1FF?=
+ =?utf-8?B?R0pxMWZiZFpjbkNIbW4zV0k1cXBHeXNRZEk5T0FhRFplcGttQkxRc0wxVEtR?=
+ =?utf-8?B?RjZxaXp3TWF3MW5xVmp1SmZ4VnpjNDNBQ0xKeGY4cFlVL2IrSjhreDIzQWpI?=
+ =?utf-8?B?eVRhS1JqWFBNRTd4YTQzRFRBcEIxWUZSaXFwYzlXcTQwZ3Z5VUM1azlPSWVM?=
+ =?utf-8?B?cnorcFU2dDkvKzVnZ2ZSNmpSZXhPTU04YjRweExpUktxbVAyQzdQaGVOUEdw?=
+ =?utf-8?B?aUxsTk51SmhQZFR2T2tBRnpDSDR0UUJTUzk3R3lxQjl4TENLUk1GeEhrVnNt?=
+ =?utf-8?B?eXpKSExLM1FOT2tZWTRWaUpjRVU3QmN3ZCtTV2l0a2lyNU9CVWdpdHNUc0ti?=
+ =?utf-8?B?L25hVzlqOUVDVDJsN0dpSk9WSWZkaVh2S21Yc25xU245ZEVtU2o4eXF1YTdF?=
+ =?utf-8?B?bDJEZ1kxSVVDRnJQRC9GWHFkYllpTDAwM1gyRExuMXRUcCtCclkyNXI4dWdX?=
+ =?utf-8?B?bUhnRVNSMkliZXVraTN4WktxYmFXZ0RCSmlKY3lYRE82YnR1NWFmdVRxV2dk?=
+ =?utf-8?B?dnhCbThibno5eWV3c1BuN3drTzN6K3RhNXdtZE9URzBKUDVTSlF1MDFOZXl0?=
+ =?utf-8?B?c1BQVy9ZR0FqVHY0VklhWGhPNjJEc2JRdGlIL3FKck1iNVBNSnVXb0lJVHBT?=
+ =?utf-8?B?Qm5GeVc1QjRHVXdmTUc4Z2hFZk5oUld1WDJ1cFNYWG5LK3FHSUFWQ3lIaHEx?=
+ =?utf-8?B?QU9icm9OdkJucXJKNjNWbVB4VURJclh0NmdlTWdnL0ZGMTlnM2t6bFZPSTdN?=
+ =?utf-8?B?a2Q2Q2UzRnhOSDYzZEljRCt2dnFNdzVvVWhmbVhpRS9JdTk1bFFGUHVzS1M4?=
+ =?utf-8?B?d3NXR2R2SHZlU0J5TFRzNi80NkgwK0RsMUFDRU1pdEVRdFFTRGdLay9hbUt3?=
+ =?utf-8?B?aFpoVHpwTHlnWVA1aHo5dmhmSjRWT3J6UUF2TEtpVlpzR2NYeC84eU1xTkZZ?=
+ =?utf-8?B?MUN3UUU1ZU5oZkZpTGJrdzdTR3c5endKOGFyRmcweXNDZFhjaGhWN1pTRVlV?=
+ =?utf-8?B?OFB5MENpS2hsTDF6Vlp4VDMxOUtpL0w4MTNmQXRQNVZmcUxSY2VQYjkwaE5p?=
+ =?utf-8?B?Z2NvVVl5bmwxNEhiVk9UQTJ2NGV4M0ppL2ZxaEFpa0Uwa0hza05oNEhYMHZR?=
+ =?utf-8?B?N2tiMHZPZkpDbFlLTVp0YW5oR3I2QVVSbU5CViswV1ZzVTVMMWNPNGVKdG1s?=
+ =?utf-8?B?YTlSaHEvZC9pcERNcllrYkR0TjZKc0wxTGdQdmUva0dabCttMGZiNXRuREQv?=
+ =?utf-8?B?WUlzbVJVRndPdENpVjg1V2R4TXl3T3d6QnVCRTNqbno4eWdrdmFubG5lT3lh?=
+ =?utf-8?B?ZDdjK202aEZiZTR6cm82RmR6dVNvZzhPN1gvUzlScSs4dStSclVTV01LdGoy?=
+ =?utf-8?B?ZnI0cHl3alNiYVhYMm00d1hmZFI3ZUw2K1J3dlUyM0RsclE0Zm1Ib1NONmZn?=
+ =?utf-8?B?MDlFT3Mzazh0MUFZZEhYNUlwdHI3bkwzM01PK20yWDl1eUlqVE5yNE9HZGxZ?=
+ =?utf-8?B?SnhCa1BMQy82SUhYbGFpeE9UbExHVUlDZkFGTk9kU2JsNVhEc2VDSHpSWURp?=
+ =?utf-8?B?TjdHdCttOTkrTTYyV3NkcFhQSnhMSXpROTdUSkpIU05YUEYrRk9QQVF2TlFv?=
+ =?utf-8?B?U1o2NjBWZHU1bm9RRGV4c3g3Wnk5blFGOUxyUlZES2hwNzVqVDg1d2VWNG9s?=
+ =?utf-8?B?bzEvbjhnV2Y5T0llVG80M1dVcnRkejRXdmFsKys0MzhXVnB5UG0vQjhNZUJQ?=
+ =?utf-8?B?UEZaNCszWnpDZlRwWldxM1F3S2RHek5tV2crV0pnQ3lnS2JhbjNtZkxMckJN?=
+ =?utf-8?B?citkcDdFR3p0TWR1RzQ1dmpjV0RyWTc3bGROT0h2TUJlUHMrZ3Q5bFI3OGFT?=
+ =?utf-8?B?Y3pTNTJGcXB0dHZvQzRFTHluZkEzMWQwb0k2ZVR6WGQvNGdrTUE4L2lZelJk?=
+ =?utf-8?B?ZXdlT09aQ1l5amM0ZERqVEVBYUtKZTJIeU0zVmF5dWVGRVlDRFh1Tk5MR29O?=
+ =?utf-8?B?RmpWTXhJNVdRK2tMTEtQc0hRZER6V1JpQldWSHIvTkxIa0JtazlYWFF3bVdw?=
+ =?utf-8?B?M2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: bac2b202-e70c-4525-6fa3-08dcc36fe83e
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 12:34:18.7442
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TFZ8eWVstEFiLqv6yYYzH9ASHbi4XD0AllwySV99OwaY/9as0OQgX8nfmS9QmuoO2ZzBbETvvw3ogufkWSpIVtK7kMqoFuyoEjKKcvfEBLY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB5965
+X-OriginatorOrg: intel.com
 
-Hello Julien,
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Thu, 22 Aug 2024 16:31:29 -0700
 
-On 12/04/2024 18:38, Julien Panis wrote:
-> This patch adds XDP support to TI AM65 CPSW Ethernet driver.
+> On Thu, 22 Aug 2024 18:19:24 +0200 Alexander Lobakin wrote:
+>>> I was simply suggesting to correct the changelog, and make clear we
+>>> need a recent enough ethtool.  
+>>
+>> Yeah I got it, thanks. Will reword.
+>>
+>>> We can not simply say that ethtool always supported the modern way
+>>> (ETH_SS_FEATURES)  
+>>
+>> I didn't work with Linux at all back in 2011, so I didn't even know
+>> there were older ways of handling this :D Always something to learn, nice.
 > 
-> The following features are implemented: NETDEV_XDP_ACT_BASIC,
-> NETDEV_XDP_ACT_REDIRECT, and NETDEV_XDP_ACT_NDO_XMIT.
-> 
-> Zero-copy and non-linear XDP buffer supports are NOT implemented.
-> 
-> Besides, the page pool memory model is used to get better performance.
-> 
-> Signed-off-by: Julien Panis <jpanis@baylibre.com>
+> Are we removing the bit definitions just for code cleanliness?
 
-I've been trying to test this since I don't want my RX multi queue series [1]
-to break AF_XDP feature. However, with 6.10 I don't see AF_XDP working at all
-and even breaking basic networking on am65-cpsw.
+Uhm, no, to free more bits to be able to add new features.
 
-The in kernel XDP tests have been dropped so I've been using xdp-tools [2]
+> On one hand it may be good to make any potential breakage obvious,
+> on the other we could avoid regressions if we stick to reserving 
+> the bits, and reusing them, but the bits we don't delete could remain
+> at their current position?
 
-My test is to try XDP_DROP with xdp-bench using skb mode first and then
-native XDP mode.
+Hmm, sounds fine. IOW just rename all the bits I remove to
+__UNUSED_NETIF_F_xx?
 
-Below is the test log. You can see that skb mode works fine. The moment I try
-native XDP mode the interface seems to go down and up and then just locks up.
-
-I can no longer ping to the remote host.
-
-----test log starts-----
-
-root@am64xx-evm:~/xdp-tools/xdp-bench# ping 192.168.1.36
-PING 192.168.1.36 (192.168.1.36) 56(84) bytes of data.
-64 bytes from 192.168.1.36: icmp_seq=1 ttl=64 time=0.801 ms
-64 bytes from 192.168.1.36: icmp_seq=2 ttl=64 time=0.967 ms
-64 bytes from 192.168.1.36: icmp_seq=3 ttl=64 time=0.876 ms
-^C
---- 192.168.1.36 ping statistics ---
-3 packets transmitted, 3 received, 0% packet loss, time 2003ms
-rtt min/avg/max/mdev = 0.801/0.881/0.967/0.067 ms
-
-
-root@am64xx-evm:~/xdp-tools/xdp-bench# ./xdp-bench drop -m skb eth0
-Dropping packets on eth0 (ifindex 2; driver am65-cpsw-nuss)
-Summary                     81127 rx/s                  0 err/s        
-Summary                     81088 rx/s                  0 err/s        
-Summary                     81089 rx/s                  0 err/s        
-Summary                     53065 rx/s                  0 err/s        
-^C
-  Packets received    : 296369    
-  Average packets/s   : 74092     
-  Rx dropped          : 296369    
-
-root@am64xx-evm:~/xdp-tools/xdp-bench# ping 192.168.1.36
-PING 192.168.1.36 (192.168.1.36) 56(84) bytes of data.
-64 bytes from 192.168.1.36: icmp_seq=1 ttl=64 time=1.02 ms
-64 bytes from 192.168.1.36: icmp_seq=2 ttl=64 time=0.756 ms
-64 bytes from 192.168.1.36: icmp_seq=3 ttl=64 time=0.963 ms
-^C
---- 192.168.1.36 ping statistics ---
-3 packets transmitted, 3 received, 0% packet loss, time 2003ms
-rtt min/avg/max/mdev = 0.756/0.914/1.024/0.114 ms
-
-
-root@am64xx-evm:~/xdp-tools/xdp-bench# ./xdp-bench drop -m native eth0
-[  889.096851] am65-cpsw-nuss 8000000.ethernet eth0: Link is Down
-[  889.110889] am65-cpsw-nuss 8000000.ethernet eth0: PHY [8000f00.mdio:00] driver [TI DP83867] (irq=POLL)
-[  889.120377] am65-cpsw-nuss 8000000.ethernet eth0: configuring for phy/rgmii-rxid link mode
-Dropping packets on eth0 (ifindex 2; driver am65-cpsw-nuss)
-Summary                         0 rx/s                  0 err/s        
-Summary                         0 rx/s                  0 err/s        
-[  893.218318] am65-cpsw-nuss 8000000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
-Summary                       250 rx/s                  0 err/s        
-Summary                         0 rx/s                  0 err/s        
-Summary                         0 rx/s                  0 err/s        
-Summary                         0 rx/s                  0 err/s        
-^C
-[  901.898170] am65-cpsw-nuss 8000000.ethernet eth0: Link is Down
-[  901.910292] am65-cpsw-nuss 8000000.ethernet eth0: PHY [8000f00.mdio:00] driver [TI DP83867] (irq=POLL)
-[  901.919661] am65-cpsw-nuss 8000000.ethernet eth0: configuring for phy/rgmii-rxid link mode
-  Packets received    : 250       
-  Average packets/s   : 42        
-  Rx dropped          : 250       
-root@am64xx-evm:~/xdp-tools/xdp-bench# [  906.018296] am65-cpsw-nuss 8000000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
-
-root@am64xx-evm:~/xdp-tools/xdp-bench# ping 192.168.1.36
-PING 192.168.1.36 (192.168.1.36) 56(84) bytes of data.
-From 192.168.1.100 icmp_seq=1 Destination Host Unreachable
-From 192.168.1.100 icmp_seq=2 Destination Host Unreachable
-From 192.168.1.100 icmp_seq=3 Destination Host Unreachable
-^C
-
---- 192.168.1.36 ping statistics ---
-5 packets transmitted, 0 received, +3 errors, 100% packet loss, time 4079ms
-pipe 4
-
-
----test log ends---
-
-I will try to test with commit 8acacc40f733 ("net: ethernet: ti: am65-cpsw: Add minimal XDP support")
-to see if it works there. If it does then I can do a bisect.
-
-If you have better ideas please let me know. Thanks!
-
-[1] https://lore.kernel.org/all/20240703-am65-cpsw-multi-rx-v3-0-f11cd860fd72@kernel.org/
-[2] https://github.com/xdp-project/xdp-tools
-
-> ---
-> Changes in v9:
-> - In k3_cppi_desc_pool_destroy(), free memory allocated for pool.
-> - In k3_cppi_desc_pool_create_name() function, remove unnecessary
-> error messages on mem alloc failures.
-> - In k3_cppi_desc_pool_create_name() function, move desc_infos alloc
-> forward to leverage pool_name freeing in gen_pool_destroy().
-> - In k3_cppi_desc_pool_create_name() function, remove unnecessary
-> 'ret = -ENOMEM' since ret is already initialized with -ENOMEM value.
-> - For rx, do not build the skb upfront any more, Instead, give the page
-> to the HW then build the skb once HW sends a completion.
-> - Link to v8: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v8-0-f3421b58da09@baylibre.com
-> 
-> Changes in v8:
-> - Fix some warnings reported by patchwork.
-> - Link to v7: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v7-0-c3857c82dadb@baylibre.com
-> 
-> Changes in v7:
-> - Move xdp_do_flush() function call in am65_cpsw_nuss_rx_poll().
-> - Link to v6: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v6-0-212eeff5bd5f@baylibre.com
-> 
-> Changes in v6:
-> - In k3_cppi_*() functions, use const qualifier when the content of
-> pool is not modified.
-> - Add allow_direct bool parameter to am65_cpsw_alloc_skb() function
-> for direct use by page_pool_put_full_page().
-> - Link to v5: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v5-0-bc1739170bc6@baylibre.com
-> 
-> Changes in v5:
-> - In k3_cppi_desc_pool_destroy(), free memory allocated for desc_infos.
-> - Link to v4: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v4-0-2e45e5dec048@baylibre.com
-> 
-> Changes in v4:
-> - Add skb_mark_for_recycle() in am65_cpsw_nuss_rx_packets() function.
-> - Specify napi page pool parameter in am65_cpsw_create_xdp_rxqs() function.
-> - Add benchmark numbers (with VS without page pool) in the commit description.
-> - Add xdp_do_flush() in am65_cpsw_run_xdp() function for XDP_REDIRECT case.
-> - Link to v3: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v3-0-5d944a9d84a0@baylibre.com
-> 
-> Changes in v3:
-> - Fix a potential issue with TX buffer type, which is now set for each buffer.
-> - Link to v2: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v2-0-01c6caacabb6@baylibre.com
-> 
-> Changes in v2:
-> - Use page pool memory model instead of MEM_TYPE_PAGE_ORDER0.
-> - In am65_cpsw_alloc_skb(), release reference on the page pool page
-> in case of error returned by build_skb().
-> - [nit] Cleanup am65_cpsw_nuss_common_open/stop() functions.
-> - [nit] Arrange local variables in reverse xmas tree order.
-> - Link to v1: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v1-1-9f0b6cbda310@baylibre.com
-> 
-> ---
-> Julien Panis (3):
->       net: ethernet: ti: Add accessors for struct k3_cppi_desc_pool members
->       net: ethernet: ti: Add desc_infos member to struct k3_cppi_desc_pool
->       net: ethernet: ti: am65-cpsw: Add minimal XDP support
-> 
->  drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 659 ++++++++++++++++++++++++----
->  drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  13 +
->  drivers/net/ethernet/ti/k3-cppi-desc-pool.c |  46 +-
->  drivers/net/ethernet/ti/k3-cppi-desc-pool.h |   6 +
->  4 files changed, 623 insertions(+), 101 deletions(-)
-> ---
-> base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
-> change-id: 20240223-am65-cpsw-xdp-basic-4db828508b48
-> 
-> Best regards,
-
--- 
-cheers,
--roger
+Thanks,
+Olek
 
