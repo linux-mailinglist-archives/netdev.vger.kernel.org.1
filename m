@@ -1,141 +1,204 @@
-Return-Path: <netdev+bounces-121320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF2DC95CB55
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 13:25:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7A1195CB60
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 13:31:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A24DD1C224E0
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 11:25:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61D2F1F246DD
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 11:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5059187323;
-	Fri, 23 Aug 2024 11:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9D015382E;
+	Fri, 23 Aug 2024 11:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NclLPKMw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I3FZitDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2413A1E89C;
-	Fri, 23 Aug 2024 11:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D39149019;
+	Fri, 23 Aug 2024 11:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724412335; cv=none; b=VMG6mWs7SeuipcNpB4gytyU8cb70nUnqFEkeIHF5BBJ6jSMYbsA+qi+T2h5YoBlGKKWx6KUmjCkAbKTRYHWJ4aJyp69AEmwl7h1JGVlS5NejhpBBlYZ3C6ks7rZaKQFCUH91+fHAdIN6LRHnETRByd7Ht197G74B/PKSMnOrvn0=
+	t=1724412666; cv=none; b=ZzM8Uoy/KXvWXR2jl6H+bgt7w/QnqY1+QY4j67fAPXqmwFj8gxuMrDzAYg9QuhuqQj8JjhKWBWXffkNEGtyDchgqTsINSlrGJ7IW7sXZrM7BZd4us6GtMSf7KgKxerwoi7B4PO5Gy3XBNMPXHhbn8Jo6j9wmK0Wi2qDheJsBEUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724412335; c=relaxed/simple;
-	bh=6uGqft5RWsJ4fj6CsF3sr3+D2VV0YYpJf7EJFcWj0Bw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Girf4vKfWxt8ECvkCfqTdiyuyzl1nhQZQ7awDPG5abIQAGOmwtSNZixtF2llgI2UV3MZIIrdD1LQAfodNsz4G9HIeuO7/znRhRsM8et81svZyiEltp7VHCAIzJFHas/0HU66P/Jf5Ekmy4sVYRUamEQFz7EZxwFyAh+vZMb0zhU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NclLPKMw; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6b4412fac76so17303157b3.1;
-        Fri, 23 Aug 2024 04:25:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724412333; x=1725017133; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LgLcsDJ1rGtU1f7pbspf9pH0cVjS36T3natW/Fq7ym8=;
-        b=NclLPKMw9c5Ezh834lvhv4uDsbbTXmqLZkGw7crCEMpPGEqI/QKqNxy891r8WxF2cv
-         GrDx4TNUxZWiCQodYktN8oDv31LbR+e+mCiaQUH8TpXykh4eUBKOcCXxTWwmqHYdqP/f
-         G0DhqOxBmzkHKu0dHD3cirRf6Qhb9D5lzj5tjopgt2WcU8s/zUR6oCoRaWDXGA/F0EU3
-         wkYO67NGUl9NIg60jwI5FXQHiSp7VTTJjd8Z8Uaje6lGra+N3fw2bFKtThjjYax5TTHB
-         ljuAc9KeJOQnTAJOvDl1UXMnwytZsLPmS7erW0Zf9bLGmSorBdfCvYqKxVZ5ygVj7C60
-         J+6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724412333; x=1725017133;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LgLcsDJ1rGtU1f7pbspf9pH0cVjS36T3natW/Fq7ym8=;
-        b=SjlZIikVRyt17EqJKexwZHe27Q/smeAqNQGx+QyANYDPGO69daHP5kwIsMFLoQHxKB
-         cDAz8OVlwiMeeNEQ5tD/4sh9ifzCNYF1+iwwUdE8KXOeViCrjYsYsQ4aRR8IHzpwlZ/d
-         ba4U9yLunzRSPP5oDM9od8L0nT4m3IU9rgN3WtTTgU8iarTDLIoi2gS9uC5gsFIcu4WN
-         ZWpOz987BGov7+3XN5ltzKoMKtpf9ub4tsv2jIBlxqYKeFW8T1pHyNHzvMPjllYfBZB8
-         q13tWT1vOOg6BmRuFmXPoO3i2UiALtlRWzkQnVSfV9uqQq/+cYR8Qmi7EaRyfddFb0KW
-         zwIA==
-X-Forwarded-Encrypted: i=1; AJvYcCVaRLVpM+wwBMI2bT8gcMF/5kiPTXfrPPOUHkXZ/nrdJ6nLVeaTLea73Pi/CGCThrxx7e7KeMj5@vger.kernel.org, AJvYcCXgF3OMWwJZath43t6SAjEQfQ0Q7Arjpw3m7Ya3A3pYQQmLBhcPIWe3S6+w0TkoPdimI8VsMa9zSW9EJBw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvgTHSDb8on1cPwecSyCTXFVKaPZsDn8aNJcReJcH67wR9NiRm
-	Cq5HA/jpPmWScXXcW2OeOUo9Bh8eiMnBdecgZ6zilCw+ggs5orFTiT4vDrA2hgGTr8/zjF0e7k/
-	KDu8RlJYJUlWRI08EzVPZmePTz9Y1fOu3
-X-Google-Smtp-Source: AGHT+IEYORL0mYqtQdjUXfYBdnRmYhaE6Ni6wnFvlJu03g3aq5V4LTkfCW6DXd/1pB3hupQZuzSYCSl1QJVm/BTloVk=
-X-Received: by 2002:a05:690c:3241:b0:6be:92c7:a27e with SMTP id
- 00721157ae682-6c6286b8f29mr18795587b3.28.1724412332929; Fri, 23 Aug 2024
- 04:25:32 -0700 (PDT)
+	s=arc-20240116; t=1724412666; c=relaxed/simple;
+	bh=u56sx2dT+ozOd5zmWGNmvgk3ks2U0lu3dCC0gWdRB2M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=epuwiulQz7SfFizZY3fdWNJ+jAsdE8V561ziYe4o+Q0GNZp/TiiR+nJY5+rp02uEPyzn7JH2Qd2kNpWv5kWSy/hxedzmHFjN5q8bj72nzVBa/yl/6ROYnEMwc8ShfSM1FsxlRaPufGFYfVk/LzjcqILDRRaH47/u9gHSIjXLlYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I3FZitDI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3705CC32786;
+	Fri, 23 Aug 2024 11:31:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724412665;
+	bh=u56sx2dT+ozOd5zmWGNmvgk3ks2U0lu3dCC0gWdRB2M=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=I3FZitDIkFJ+rN4gKq5bPxU3w/eZ201rvuN92pHNZoOJZpbxkR5Tht38ha1Eu2Xqj
+	 IDFhodXbf6UVomb8l/+GdaK/Gr8/yH2OcrNQxoOldMlwNUSBu4fu0MYzpx6ZNC9a9B
+	 UsRzxTf7k5ey03+e3YhH3FaIWqL7DcLXa4RwIgoYRb1hkiUU9FwM8GhC2rUc/ffrsx
+	 yd0JfJT/0u6ik7gK/GXm5HUcMIU8LizU+jysmJnnCsy6NB1Sldnr60ZDod3WTlupg+
+	 kY/9rVTRwU5+MNx7jImGPh93rbhwEBhCYNj6Atm3HUV2I75McfGGm27nD6ZxmCiY1m
+	 RpWcEQzIXLxlw==
+Message-ID: <cde0064d-83dd-4a7f-8921-053c25aae08b@kernel.org>
+Date: Fri, 23 Aug 2024 14:30:58 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240819122348.490445-1-bbhushan2@marvell.com>
- <20240819122348.490445-2-bbhushan2@marvell.com> <20240820153549.732594b2@kernel.org>
- <CAAeCc_=Nmh25RDaY4SA2CHsu2mqgdtKEo62b4QKSV4V8icHMMw@mail.gmail.com> <20240822074845.5f932d6d@kernel.org>
-In-Reply-To: <20240822074845.5f932d6d@kernel.org>
-From: Bharat Bhushan <bharatb.linux@gmail.com>
-Date: Fri, 23 Aug 2024 16:55:21 +0530
-Message-ID: <CAAeCc_mOjgWbftER2VmzK747D2gqqGqXrX29WeD+eRWkd-hqdw@mail.gmail.com>
-Subject: Re: [net-next,v6 1/8] octeontx2-pf: map skb data as device writeable
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Bharat Bhushan <bbhushan2@marvell.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, sgoutham@marvell.com, gakula@marvell.com, 
-	sbhatta@marvell.com, hkelam@marvell.com, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, jerinj@marvell.com, 
-	lcherian@marvell.com, richardcochran@gmail.com, b@mx0a-0016f401.pphosted.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/7] net: ti: icssg-prueth: Enable IEP1
+To: "Anwar, Md Danish" <a0501179@ti.com>, MD Danish Anwar
+ <danishanwar@ti.com>, Dan Carpenter <dan.carpenter@linaro.org>,
+ Andrew Lunn <andrew@lunn.ch>, Jan Kiszka <jan.kiszka@siemens.com>,
+ Vignesh Raghavendra <vigneshr@ti.com>,
+ Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Diogo Ivo <diogo.ivo@siemens.com>,
+ Simon Horman <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, srk@ti.com
+References: <20240813074233.2473876-1-danishanwar@ti.com>
+ <20240813074233.2473876-2-danishanwar@ti.com>
+ <aee5b633-31ce-4db0-9014-90f877a33cf4@kernel.org>
+ <9766c4f6-b687-49d6-8476-8414928a3a0e@ti.com>
+ <ae36c591-3b26-44a7-98a4-a498ee507e27@kernel.org>
+ <070a6aea-bebe-42c8-85be-56eb5f2f3ace@ti.com>
+ <8ab571a7-6441-4616-b456-a0677b2520c7@kernel.org>
+ <c26c0761-def7-48a1-973d-2c918689902d@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <c26c0761-def7-48a1-973d-2c918689902d@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 22, 2024 at 8:18=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu, 22 Aug 2024 09:15:43 +0530 Bharat Bhushan wrote:
-> > On Wed, Aug 21, 2024 at 4:06=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > > On Mon, 19 Aug 2024 17:53:41 +0530 Bharat Bhushan wrote:
-> > > > Crypto hardware need write permission for in-place encrypt
-> > > > or decrypt operation on skb-data to support IPsec crypto
-> > > > offload. So map this memory as device read-write.
-> > >
-> > > How do you know the fragments are not read only?
-> >
-> > IOMMU permission faults will be reported if the DMA_TO_DEVICE direction=
- flag
-> > is used in dma_map_page_attrs(). This is because iommu creates read onl=
-y mapping
-> > if the DMA_TO_DEVICE direction flag is used.  If the direction flag use=
-d in
-> > dma_map_pages() is DMA_BIDIRECTIONAL then iommu creates mapping with
-> > both read and write permission.
->
-> The other way around, I understand that your code makes the pages
-> writable for the device. What I'm concerned about is that if this
-> code path is fed Tx skbs you will corrupt them. Are these not Tx
-> skbs that you're mapping? Have you fully CoW'd them to make sure
-> they are writable?
+Hi,
 
-This code is mapping skb data for hardware to over-write plain-text with
-cypher-text and update authentication data (in-place encap/auth).
-This patch series doesn't take care of CoWing for skb data. Actually I was
-not aware of that before your comment.
+On 22/08/2024 15:12, Anwar, Md Danish wrote:
+> 
+> 
+> On 8/22/2024 4:57 PM, Roger Quadros wrote:
+>>
+>>
+>> On 22/08/2024 08:52, MD Danish Anwar wrote:
+>>>
+>>>
+>>> On 21/08/24 5:23 pm, Roger Quadros wrote:
+>>>>
+>>>>
+>>>> On 21/08/2024 14:33, Anwar, Md Danish wrote:
+>>>>> Hi Roger,
+>>>>>
+>>>>> On 8/21/2024 4:57 PM, Roger Quadros wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> On 13/08/2024 10:42, MD Danish Anwar wrote:
+>>>>>>> IEP1 is needed by firmware to enable FDB learning and FDB ageing.
+>>>>>>
+>>>>>> Required by which firmware?
+>>>>>>
+>>>>>
+>>>>> IEP1 is needed by all ICSSG firmwares (Dual EMAC / Switch / HSR)
+>>>>>
+>>>>>> Does dual-emac firmware need this?
+>>>>>>
+>>>>>
+>>>>> Yes, Dual EMAC firmware needs IEP1 to enabled.
+>>>>
+>>>> Then this need to be a bug fix?
+>>>
+>>> Correct, this is in fact a bug. But IEP1 is also needed by HSR firmware
+>>> so I thought of keeping this patch with HSR series. As HSR will be
+>>> completely broken if IEP1 is not enabled.
+>>>
+>>> I didn't want to post two patches one as bug fix to net and one part of
+>>> HSR to net-next thus I thought of keeping this patch in this series only.
+>>
+>> Bug fixes need to be posted earlier as they can get accepted sooner and
+>> even back-ported to stable. You also need to add the Fixes tag.
+>>
+> 
+> Yes I understand that. The problem was I will need to send the patch
+> twice once as bug fix to net/main, once as part of this series to
+> net-next/main and drop it from this series once the patch gets merged to
+> net and is synced to net-next. Since I cannot post this series without
+> this patch as the HSR feature will get broken.
 
-To understand your comment better, If the device writes to shared skb data
-without CoWing then we have an issue. Is that correct?
+HSR feature is not yet there so nothing will be broken. You can mention
+in cover letter that a separate patch is required for functionality.
 
-I do not see any other driver supporting IPsec crypto offload ensuring
-skb data CoWing,
-but there is a possibility that those devices are not doing in-place
-encap and auth (encap
-and auth data written to separate buffer). I do not have clarity about
-this, This skb is set for
-IPSEC crypto offload, Is this the driver which has to ensure that the
-skb is writeable or the
-network stack (xfrm layer) will ensure the same. If it is former then
-add code to call skb_unshare().
-Please suggest.
+> 
+> Or I need to post this to net/main and wait for it to be part of
+> net-next and then only I can re-post this series. So to avoid all these
+> I thought of only posting it as part of this series. This is not a major
+> bug and it will be okay from feature perspective if this bug gets merged
+> via net-next.
+> 
 
-Thanks
--Bharat
+If there is no build dependency I don't see why you need to wait.
+
+> What do you suggest now? Should I post the bug fix to net/main and post
+> this seires without this patch or wait for the bug fix to sync then only
+> post this series?
+> 
+
+please see below.
+
+>>>
+>>>> What is the impact if IEP1 is not enabled for dual emac.
+>>>>
+>>>
+>>> Without IEP1 enabled, Crash is seen on AM64x 10M link when connecting /
+>>> disconnecting multiple times. On AM65x IEP1 was always enabled because
+>>
+>> In that ase you need to enable quirk_10m_link_issue for AM64x platform.
+> 
+> Correct. But since for all ICSSG supported platform quirk_10m_link_issue
+>  needs to be enabled. Which in turn will enable IEP1. I think it's
+> better enable IEP1 directly without any condition.
+> 
+> IEP1 is also needed for Switch and HSR firmwares so I thought directly
+> enabling it instead of enabling it inside the if check
+> `prueth->pdata.quirk_10m_link_issue` would be better idea.
+> 
+> What do you suggest here? Will setting `quirk_10m_link_issue` as true
+> for AM64x will be a better approach or always enabling IEP1 without any
+> if check will be better approach for this?
+
+I would suggest that you first send a bug fix patch for AM64x which sets
+quirk_10m_link_issue for AM64x. This should make it into the next -rc
+and eventually stable.
+
+Then in your HSR series, you can decide if you want to conditionally
+enable it for HSR/switch mode or permanently enable it regardless.
+
+> 
+>> I understand that IEP1 is not required for 100M/1G.
+>>
+>>> `prueth->pdata.quirk_10m_link_issue` was true. FDB learning and FDB
+>>> ageing will also get impacted if IEP1 is not enabled.
+>>
+>> Is FDB learning and ageing involved in dual Emac mode?
+>>
+> 
+> Yes FDB learning and ageing is involved in dual EMAC mode as well.
+> 
+>>>
+>>>>>
+>>>>>>> Always enable IEP1
+>>>>>>>
+>>>>>>> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+>>>>>>> ---
+>>>>
+>>>
+>>
+> 
+
+-- 
+cheers,
+-roger
 
