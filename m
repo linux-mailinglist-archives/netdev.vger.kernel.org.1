@@ -1,175 +1,180 @@
-Return-Path: <netdev+bounces-121272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 778AB95C7FF
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 10:25:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 744E095C803
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 10:25:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D4971C21D60
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:25:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99FFB1C21398
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 08:25:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382481442EA;
-	Fri, 23 Aug 2024 08:24:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 405C614387B;
+	Fri, 23 Aug 2024 08:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="C4gz7A9u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EOC7GR17"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6A93D552
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 08:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 197F5143736;
+	Fri, 23 Aug 2024 08:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724401499; cv=none; b=GqFgJQ3CIne7/L0VfkAX1jQMF3g3RzFiMMZw1Tbu8P0l/qyjjmbUmIDsRUptnr+gV7YgG42Sk/WMnjVouMcMRfu+koXS+6m9fNddkpF81aqtWMGC6bPCj0mJ9ILfqa6otjWg9TGzvxpDk/R1O48JsDuRXvZ5VR5NQnGlkfav5G0=
+	t=1724401527; cv=none; b=Wmm5Mb3VtlcMqVsi1dginN3fjZNvG5JLetLUVfneFU4bGMM5BP4m5UNNhbYEVe2asGXKXYcqcI09qARWJZqFPHAvbwdR0x+x0TOM50h8kGiQ3rGZ01W5Yi4GCNLnvQQ1+TAUYXmq6pTJWwIYwaeJikEbB6rT2VTZDuCL9qFOkMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724401499; c=relaxed/simple;
-	bh=X/LZYP81K2LZaFEZe4ZyB0s/LHkjdzjWUL/41g4Be6c=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PKnc8DHi8HAlxuzjEesy3NlHTSP8LvFTV6o6Rbu6HXY3Gflr1/R7pb/p/K6WqtGY3Fga2IfA3hqGNGC4QI94qeYsGgur67h4H3fJv+TtQG/qSOxD74kxsK8Z0mT6Wm36N3YoHcUjsmHGIwomMkZc4S841OGhcbw5umKHNuXuxr8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=C4gz7A9u; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 2877F208AB;
-	Fri, 23 Aug 2024 10:24:48 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id R_MVa2PWKIWH; Fri, 23 Aug 2024 10:24:47 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 877B0207D8;
-	Fri, 23 Aug 2024 10:24:47 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 877B0207D8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1724401487;
-	bh=fME3CfSoZsYRHqqE9lJKqVoD13BcYf4yLe50SqulWTA=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=C4gz7A9ugdQ13Q4K1ENE6CFdtB8TuvQNhCgzMymb8JxpbQIEb4GNpHAcRB3PrzIjL
-	 vcpLmKe/5g2PI+iBsiwdtXcFNP5EcP9uj4inmfe8EHIkIXyI7fg8LDpkGrn4aEr3YT
-	 Tja415zJwdDVcS2F7sFM0xbNWOg8gy0bkPsLFJytvYGnBQCo8I6GJ645FGxUTFJSU2
-	 8l82oIBk0878vjVhrdGbQHfYK+L/HCMENlJVJvUcBkGPmjhLS5HFtji2zwjRxc6oz8
-	 oYHms0ZrnxjoTn4q9WCx1WerJbjYp56nKD9QBIv3qVylhIyXCb0mrA27pZDLPpygl0
-	 gcvksRT1Wnzfg==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 23 Aug 2024 10:24:47 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 23 Aug
- 2024 10:24:46 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 7CEEE3181477; Fri, 23 Aug 2024 10:24:46 +0200 (CEST)
-Date: Fri, 23 Aug 2024 10:24:46 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-CC: Sabrina Dubroca <sd@queasysnail.net>, <netdev@vger.kernel.org>, "Jay
- Vosburgh" <j.vosburgh@gmail.com>, "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Eric
- Dumazet" <edumazet@google.com>, Nikolay Aleksandrov <razor@blackwall.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, "Simon
- Horman" <horms@kernel.org>
-Subject: Re: [PATCHv3 net-next 2/3] bonding: Add ESN support to IPSec HW
- offload
-Message-ID: <ZshHTlUb/BCtvCT0@gauss3.secunet.de>
-References: <20240820004840.510412-1-liuhangbin@gmail.com>
- <20240820004840.510412-3-liuhangbin@gmail.com>
- <ZsS3Zh8bT-qc46s7@hog>
- <ZsXd8adxUtip773L@gauss3.secunet.de>
- <ZsXq6BAxdkVQmsID@Laptop-X1>
- <ZsXuJD4PEnakVA-W@hog>
- <ZsaHTbcZPH0O3RBJ@Laptop-X1>
- <ZsbkdzvjVf3GiYHa@gauss3.secunet.de>
- <Zsb34DsLwVrDI-w5@Laptop-X1>
+	s=arc-20240116; t=1724401527; c=relaxed/simple;
+	bh=BHLpzt7Dtjn8m5qYRc3cu8T6nysZSnMVb3D3BT0zxgE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YpZ54ryr12KGNzG1U382XQ7fSwvkJYmpingpWox8bQkb4xeyDiMWzU2uuqXp7M8sHZewjy2IMPgVSLvASCP/+GA8xd0WtAEdEPvOGkk3k/Z7GL+kM3E0uAFLRvb9jxAGGlN1MuQaihyg3ZG5mhotoY2ib99t58AzHiOlqW1gcHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EOC7GR17; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16C6EC32786;
+	Fri, 23 Aug 2024 08:25:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724401526;
+	bh=BHLpzt7Dtjn8m5qYRc3cu8T6nysZSnMVb3D3BT0zxgE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EOC7GR17b6q0+eIL7+qodYXvZFuHW7zLU7DE9si/AJdiIY3EskirzXlR3wTxAUNCn
+	 jqfQ37LgoKdlHLFr3QLMyM5Z/1k/ZlGHeF/hm+1+p0AP5KBPJ7bEE+gLUc3DKK3hrJ
+	 HgbkOswszxanj4Vepy6HGt/V0xSQSm76KY8FdY8CZvvV2jsZfQF8cdpMYEq0FsOtXY
+	 81LmQjhy2A72QJXDlk9aC7bOxmqcTgEvJ+emOB5kIMWZm4oZwUn85OBoxdrdBduXCY
+	 q0Z+S9ClP3LCDq7nKNa8JOba6bNVNG/OpyIHM7RWcVEga9RAVH2huZ7Sw7n+TxmPlQ
+	 lhgISgzdXrl9g==
+Date: Fri, 23 Aug 2024 09:25:22 +0100
+From: Simon Horman <horms@kernel.org>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
+	syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com,
+	Jakub Sitnicki <jakub@cloudflare.com>
+Subject: Re: [Patch bpf] tcp_bpf: fix return value of tcp_bpf_sendmsg()
+Message-ID: <20240823082522.GS2164@kernel.org>
+References: <20240821030744.320934-1-xiyou.wangcong@gmail.com>
+ <20240821145533.GA2164@kernel.org>
+ <ZsaLFVB0HyQfXBXy@pop-os.localdomain>
+ <66c7a37fd0270_1b1420837@john.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zsb34DsLwVrDI-w5@Laptop-X1>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <66c7a37fd0270_1b1420837@john.notmuch>
 
-On Thu, Aug 22, 2024 at 04:33:36PM +0800, Hangbin Liu wrote:
-> Hi Steffen,
-> On Thu, Aug 22, 2024 at 09:10:47AM +0200, Steffen Klassert wrote:
-> > > Yes, thanks for the clarification. The SA is not changed, we just delete it
-> > > on old active slave
+On Thu, Aug 22, 2024 at 01:45:51PM -0700, John Fastabend wrote:
+> Cong Wang wrote:
+> > On Wed, Aug 21, 2024 at 03:55:33PM +0100, Simon Horman wrote:
+> > > On Tue, Aug 20, 2024 at 08:07:44PM -0700, Cong Wang wrote:
+> > > > From: Cong Wang <cong.wang@bytedance.com>
+> > > > 
+> > > > When we cork messages in psock->cork, the last message triggers the
+> > > > flushing will result in sending a sk_msg larger than the current
+> > > > message size. In this case, in tcp_bpf_send_verdict(), 'copied' becomes
+> > > > negative at least in the following case:
+> > > > 
+> > > > 468         case __SK_DROP:
+> > > > 469         default:
+> > > > 470                 sk_msg_free_partial(sk, msg, tosend);
+> > > > 471                 sk_msg_apply_bytes(psock, tosend);
+> > > > 472                 *copied -= (tosend + delta); // <==== HERE
+> > > > 473                 return -EACCES;
+> > > > 
+> > > > Therefore, it could lead to the following BUG with a proper value of
+> > > > 'copied' (thanks to syzbot). We should not use negative 'copied' as a
+> > > > return value here.
+> > > > 
+> > > >   ------------[ cut here ]------------
+> > > >   kernel BUG at net/socket.c:733!
+> > > >   Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+> > > >   Modules linked in:
+> > > >   CPU: 0 UID: 0 PID: 3265 Comm: syz-executor510 Not tainted 6.11.0-rc3-syzkaller-00060-gd07b43284ab3 #0
+> > > >   Hardware name: linux,dummy-virt (DT)
+> > > >   pstate: 61400009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+> > > >   pc : sock_sendmsg_nosec net/socket.c:733 [inline]
+> > > >   pc : sock_sendmsg_nosec net/socket.c:728 [inline]
+> > > >   pc : __sock_sendmsg+0x5c/0x60 net/socket.c:745
+> > > >   lr : sock_sendmsg_nosec net/socket.c:730 [inline]
+> > > >   lr : __sock_sendmsg+0x54/0x60 net/socket.c:745
+> > > >   sp : ffff800088ea3b30
+> > > >   x29: ffff800088ea3b30 x28: fbf00000062bc900 x27: 0000000000000000
+> > > >   x26: ffff800088ea3bc0 x25: ffff800088ea3bc0 x24: 0000000000000000
+> > > >   x23: f9f00000048dc000 x22: 0000000000000000 x21: ffff800088ea3d90
+> > > >   x20: f9f00000048dc000 x19: ffff800088ea3d90 x18: 0000000000000001
+> > > >   x17: 0000000000000000 x16: 0000000000000000 x15: 000000002002ffaf
+> > > >   x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
+> > > >   x11: 0000000000000000 x10: ffff8000815849c0 x9 : ffff8000815b49c0
+> > > >   x8 : 0000000000000000 x7 : 000000000000003f x6 : 0000000000000000
+> > > >   x5 : 00000000000007e0 x4 : fff07ffffd239000 x3 : fbf00000062bc900
+> > > >   x2 : 0000000000000000 x1 : 0000000000000000 x0 : 00000000fffffdef
+> > > >   Call trace:
+> > > >    sock_sendmsg_nosec net/socket.c:733 [inline]
+> > > >    __sock_sendmsg+0x5c/0x60 net/socket.c:745
+> > > >    ____sys_sendmsg+0x274/0x2ac net/socket.c:2597
+> > > >    ___sys_sendmsg+0xac/0x100 net/socket.c:2651
+> > > >    __sys_sendmsg+0x84/0xe0 net/socket.c:2680
+> > > >    __do_sys_sendmsg net/socket.c:2689 [inline]
+> > > >    __se_sys_sendmsg net/socket.c:2687 [inline]
+> > > >    __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2687
+> > > >    __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+> > > >    invoke_syscall+0x48/0x110 arch/arm64/kernel/syscall.c:49
+> > > >    el0_svc_common.constprop.0+0x40/0xe0 arch/arm64/kernel/syscall.c:132
+> > > >    do_el0_svc+0x1c/0x28 arch/arm64/kernel/syscall.c:151
+> > > >    el0_svc+0x34/0xec arch/arm64/kernel/entry-common.c:712
+> > > >    el0t_64_sync_handler+0x100/0x12c arch/arm64/kernel/entry-common.c:730
+> > > >    el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:598
+> > > >   Code: f9404463 d63f0060 3108441f 54fffe81 (d4210000)
+> > > >   ---[ end trace 0000000000000000 ]---
+> > > > 
+> > > > Fixes: 4f738adba30a ("bpf: create tcp_bpf_ulp allowing BPF to monitor socket TX/RX data")
+> > > > Reported-by: syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com
+> > > > Cc: John Fastabend <john.fastabend@gmail.com>
+> > > > Cc: Jakub Sitnicki <jakub@cloudflare.com>
+> > > > Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> > > > ---
+> > > >  net/ipv4/tcp_bpf.c | 2 +-
+> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > 
+> > > > diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+> > > > index 53b0d62fd2c2..fe6178715ba0 100644
+> > > > --- a/net/ipv4/tcp_bpf.c
+> > > > +++ b/net/ipv4/tcp_bpf.c
+> > > > @@ -577,7 +577,7 @@ static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+> > > >  		err = sk_stream_error(sk, msg->msg_flags, err);
+> > > >  	release_sock(sk);
+> > > >  	sk_psock_put(sk, psock);
+> > > > -	return copied ? copied : err;
+> > > > +	return copied > 0 ? copied : err;
 > > > 
-> > > slave->dev->xfrmdev_ops->xdo_dev_state_delete(ipsec->xs);
-> > > 
-> > > And add to now one.
-> > > 
-> > > ipsec->xs->xso.real_dev = slave->dev;
-> > > slave->dev->xfrmdev_ops->xdo_dev_state_add(ipsec->xs, NULL)
+> > > Does it make more sense to make the condition err:
+> > > is err 0 iif everything is ok? (completely untested!)
 > > 
-> > Using the same key on two different devices is very dangerous.
-> > Counter mode algorithms have the requirement that the IV
-> > must not repeat. If you use the same key on two devices,
-> > you can't guarantee that. If both devices use an internal
-> > counter (initialized to one) to generate the IV, then the
-> > IV repeats for the mumber of packets that were already
-> > sent on the old device. The algorithm is cryptographically
-> > broken in that case.
+> > Mind to elaborate?
+
+I was thinking that a valid test for for being in an error state is that
+err is non-zero. Although given the below, it seems that I was mistaken.
+
 > > 
-> > Instead of moving the existing state, it is better to
-> > request a rekey. Maybe by setting the old state to
-> > 'expired' and then send a km_state_expired() message.
+> > From my point of view, 'copied' is to handle partial transmission, for
+> > example:
+> > 
+> > 0. User wants to send 2 * 1K bytes with sendmsg()
+> > 1. Kernel already sent the first 1K successfully
+> > 2. Kernel got some error when sending the 2nd 1K
+> > 
+> > In this scenario, we should return 1K instead of the error to the caller to
+> > indicate this partial transmission situation, otherwise we could not
+> > distinguish it with a compete failure (that is, 0 byte sent).
 > 
-> Thanks for your comments. I'm not familiar with IPsec state.
-> Do you mean something like
+> Yep, if we don't return the positive value on partial send we will confuse
+> apps and they will probably resent data.
 > 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index f74bacf071fc..8a51d0812564 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -477,6 +477,7 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
->  	struct net_device *bond_dev = bond->dev;
->  	struct bond_ipsec *ipsec;
->  	struct slave *slave;
-> +	struct km_event c;
->  
->  	rcu_read_lock();
->  	slave = rcu_dereference(bond->curr_active_slave);
-> @@ -498,6 +499,13 @@ static void bond_ipsec_add_sa_all(struct bonding *bond)
->  	spin_lock_bh(&bond->ipsec_lock);
->  	list_for_each_entry(ipsec, &bond->ipsec_list, list) {
->  		ipsec->xs->xso.real_dev = slave->dev;
-> +
-> +		ipsec->xs->km.state = XFRM_STATE_VALID;
-> +		c.data.hard = 1;
-> +		c.portid = 0;
-> +		c.event = XFRM_MSG_NEWSA;
-> +		km_state_notify(x, &c);
+> >From my side this looks good.
+> 
+> Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
-The xfrm stack does that already when inserting the state.
-
-> +
->  		if (slave->dev->xfrmdev_ops->xdo_dev_state_add(ipsec->xs, NULL)) {
->  			slave_warn(bond_dev, slave->dev, "%s: failed to add SA\n", __func__);
->  			ipsec->xs->xso.real_dev = NULL;
-> @@ -580,6 +588,8 @@ static void bond_ipsec_del_sa_all(struct bonding *bond)
->  				   "%s: no slave xdo_dev_state_delete\n",
->  				   __func__);
->  		} else {
-> +			ipsec->xs->km.state = XFRM_STATE_EXPIRED;
-
-I think you also need to set 'x->km.dying = 1'.
-
-> +			km_state_expired(ipsec->xs, 1, 0);
-
-Please test this at least with libreswan and strongswan. The state is
-actually not expired, so not sure if the IKE daemons behave as we want
-in that case.
-
-Downside of this approach is that you loose some packets until the new
-SA is negotiated, as Sabrina mentioned.
+Thanks for responding to my query.
+FWIIW, I am now happy with this patch.
 
