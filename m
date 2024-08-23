@@ -1,145 +1,110 @@
-Return-Path: <netdev+bounces-121400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43BDD95CFB3
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:27:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E6DCD95CFBB
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:28:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 769EA1C21570
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:27:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 258FC1C2236B
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD691B14ED;
-	Fri, 23 Aug 2024 14:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59C2188A16;
+	Fri, 23 Aug 2024 14:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tH0RdDh9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Of0FALvd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7D81B14E7;
-	Fri, 23 Aug 2024 14:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E868A188A0C;
+	Fri, 23 Aug 2024 14:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724422009; cv=none; b=HhLzOf/PyzMyzhEEl5u4t/T+o4vlDb38YQKTV1Kf1Is6xBO3ugpBUBRV4WSsNW1zt71QAOnOGjj7GPge1VrF4yAxt0rCdBH5Pky4laAH1zwmJYoxa3+0LfOVdIZAtz6qMzpTlKWlARArbjcEbRkf4Y3uOnN3DIU50YV+2IDWNSc=
+	t=1724422056; cv=none; b=MFY6Dpcd/3gt4tVvnQCqOCDW6qmeGtFl2HdSUTOemAurpN/qoJ2QZhl0W9tHhIeSdcYDphX+5EUxla+fySm018P2SXn52/BbU6OSkrYFwr9N1QKnfrVmj08X8F2z9GZE9rupe1+01zJx+NIrn8ifGZTHBbRKYXKxIKjPMu9kw04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724422009; c=relaxed/simple;
-	bh=ewWdFYs6EezhQAgp5OSuv91igPdOBaRQyHwPqn+SdnA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Dm/9CPyDA/f9/gZfmJPzowqihUHvIJeqL4VtrLLj0D+8pNfuFzmrw1TUp/aHw2+lZm1bgn4OOTeuyC4pv9eaAk+UA45/eM78QhoLZ2IOaRfiZjBJKLit7UCBX64Ac4LnPsxjsiQCPcsRQGixcQRwscl2kGc3BC/0myHrD2WxN20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tH0RdDh9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35F1CC4AF09;
-	Fri, 23 Aug 2024 14:06:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724422008;
-	bh=ewWdFYs6EezhQAgp5OSuv91igPdOBaRQyHwPqn+SdnA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tH0RdDh9cqUw7ory/1ckNg4XAGp8YngMyx/NdCBRtW/R6ofbA2RMUjKQfK5OnIvY3
-	 4k6Yhu0KcLlUjumX0ZXvtvMSrd02BhQFXXIqrcIj0e0VkPqVA3xggfxIBarXzL69Rg
-	 5+dxb/FHJt/fjiqXpQk9VTTJYvaTgNhNuZ452EQHRT1XytyrIc2S/2oCV6Sio1Cilc
-	 ZKx3clrXjeZ/ZExxhZWM4PUNq5zOof9zOFg/4VZcQB3RnOcxQD4yLhau98vadoKctr
-	 1J9QM9TsFs0Jq5/8IW6/MnAfg+/of+mNdwCQaoCkEAMe0FU3SismkEySlvhl+M9iHZ
-	 kYBXtgQrE93XA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1724422056; c=relaxed/simple;
+	bh=EKFfVkwn77LEDFmisaebUcU/6+IOgNRft2gXZEe0Z3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X33Zc3v918kCFe6HUyVfFN5RiQMS3RX7wSib5/V5p1dlBRgxJ4W1t1QJoLhz34ICSjnESy7xs80N166gqNhxCiBuBX+15kRgvUvOj5qGa1YuYTdSNac3EAlZbH/QvmkpkfxOY1Jk2dh+M4x0prIaNJoWTMRthROd7B02uIzLSXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Of0FALvd; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724422055; x=1755958055;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EKFfVkwn77LEDFmisaebUcU/6+IOgNRft2gXZEe0Z3Y=;
+  b=Of0FALvdDUDjC36XIIt9TN8xRvz1Wec0OMu1Hl83QyIUeXkQqUAI10Lm
+   ZuOiqNeFp+nP25MftlPZ6bVLK+6qn9k/O9H/lx9+L/+lyqhUiM/+7ZJnj
+   svmRKY4KWyeLSQgtC4TPZF5PYKK2/FGj58iOpv8sk/kFW7bV/5SMseJbB
+   EvM8/qLdK1t4trrur+1MJlgp2MNpldDOp22El+VzVg6RU5P8YdZIVvKN6
+   gCs7BG4bJ+fC0cs1bSffZn/KgSMW+XcuXgKi+o7+xFzBryIGOZC1quYak
+   eQFTtVQBYYQBbQdlPEq1QhdDznMLRA/sC0tObxNAQ0qW5pnjXecYgECLO
+   w==;
+X-CSE-ConnectionGUID: EHT8SooIRBuKQrcNp6DlcA==
+X-CSE-MsgGUID: OH2jIAhbRBmovE3TwYhSOw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="22488907"
+X-IronPort-AV: E=Sophos;i="6.10,170,1719903600"; 
+   d="scan'208";a="22488907"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 07:07:34 -0700
+X-CSE-ConnectionGUID: Etlo/9RQRVqD3PMmpI7iIw==
+X-CSE-MsgGUID: dp2F2OqHR7mWtEylenYbfA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,170,1719903600"; 
+   d="scan'208";a="92531216"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 07:07:30 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1shUwK-00000000oZw-2QCI;
+	Fri, 23 Aug 2024 17:06:56 +0300
+Date: Fri, 23 Aug 2024 17:06:56 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: andi.shyti@kernel.org, jarkko.nikula@linux.intel.com,
+	mika.westerberg@linux.intel.com, jsd@semihalf.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, rmk+kernel@armlinux.org.uk,
+	piotr.raczynski@intel.com, andrew@lunn.ch,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	mengyuanlou@net-swift.com, duanqiangwen@net-swift.com,
 	stable@vger.kernel.org
-Cc: Pawel Dembicki <paweldembicki@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 4/6] net: phy: vitesse: repair vsc73xx autonegotiation
-Date: Fri, 23 Aug 2024 10:06:25 -0400
-Message-ID: <20240823140636.1976114-4-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240823140636.1976114-1-sashal@kernel.org>
-References: <20240823140636.1976114-1-sashal@kernel.org>
+Subject: Re: [PATCH net 2/3] i2c: designware: add device private data passing
+ to lock functions
+Message-ID: <ZsiXgHDZi8DpgOWs@smile.fi.intel.com>
+References: <20240823030242.3083528-1-jiawenwu@trustnetic.com>
+ <20240823030242.3083528-3-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.320
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240823030242.3083528-3-jiawenwu@trustnetic.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-From: Pawel Dembicki <paweldembicki@gmail.com>
+On Fri, Aug 23, 2024 at 11:02:41AM +0800, Jiawen Wu wrote:
+> In order to add the hardware lock for Wangxun devices with minimal
+> modification, pass struct dw_i2c_dev to the acquire and release lock
+> functions.
 
-[ Upstream commit de7a670f8defe4ed2115552ad23dea0f432f7be4 ]
+...
 
-When the vsc73xx mdio bus work properly, the generic autonegotiation
-configuration works well.
+> +static int iosf_mbi_block_punit_i2c_access_dev(struct dw_i2c_dev *dev)
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/phy/vitesse.c | 14 --------------
- 1 file changed, 14 deletions(-)
+> +static void iosf_mbi_unblock_punit_i2c_access_dev(struct dw_i2c_dev *dev)
 
-diff --git a/drivers/net/phy/vitesse.c b/drivers/net/phy/vitesse.c
-index fbf9ad429593c..697b07fdf3ec7 100644
---- a/drivers/net/phy/vitesse.c
-+++ b/drivers/net/phy/vitesse.c
-@@ -241,16 +241,6 @@ static int vsc739x_config_init(struct phy_device *phydev)
- 	return genphy_config_init(phydev);
- }
- 
--static int vsc73xx_config_aneg(struct phy_device *phydev)
--{
--	/* The VSC73xx switches does not like to be instructed to
--	 * do autonegotiation in any way, it prefers that you just go
--	 * with the power-on/reset defaults. Writing some registers will
--	 * just make autonegotiation permanently fail.
--	 */
--	return 0;
--}
--
- /* This adds a skew for both TX and RX clocks, so the skew should only be
-  * applied to "rgmii-id" interfaces. It may not work as expected
-  * on "rgmii-txid", "rgmii-rxid" or "rgmii" interfaces. */
-@@ -459,7 +449,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	.features       = PHY_GBIT_FEATURES,
- 	.config_init    = vsc738x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
-@@ -468,7 +457,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	.features       = PHY_GBIT_FEATURES,
- 	.config_init    = vsc738x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
-@@ -477,7 +465,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	.features       = PHY_GBIT_FEATURES,
- 	.config_init    = vsc739x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
-@@ -486,7 +473,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	.features       = PHY_GBIT_FEATURES,
- 	.config_init    = vsc739x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
+Rather name them in accordance with the namespace of this module.
+
 -- 
-2.43.0
+With Best Regards,
+Andy Shevchenko
+
 
 
