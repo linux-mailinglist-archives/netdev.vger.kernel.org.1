@@ -1,204 +1,408 @@
-Return-Path: <netdev+bounces-121209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3800695C31E
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 04:10:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 16F1E95C3A1
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 05:14:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 450451C224E8
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 02:10:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AC871C21BAC
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 03:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E6D61CA96;
-	Fri, 23 Aug 2024 02:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 899C235894;
+	Fri, 23 Aug 2024 03:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g83MeRdU"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="otLACXCi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00190b01.pphosted.com (mx0b-00190b01.pphosted.com [67.231.157.127])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A4C79C2
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 02:10:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4B12AEF5;
+	Fri, 23 Aug 2024 03:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.157.127
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724379044; cv=none; b=DR+fXH0ku9kQvZ12bDZcjr7yFiFGnGJLhW3oZBzykP9NVsDaftcG4XSokk6jWOi9Mo5EeGddks/8K18XHnwea0XEpOdTMUIKYk6MIdbY93iR7F6isW38r10XD3EAUgmr4R6F+ErIYhzwwbh2of/GEe2kZG/GtdOttw/6uUqE8Ic=
+	t=1724382836; cv=none; b=QhauPHGfkzKSgqYKfCzIT9uXW+AM3Dx8MhcwVond3vNcZ5IaUYjGhg2rG2Rn9DrqKO8/XgCysY6APotH6XA8IRfgag/Na8+fFKH88+Fgb4hh/H1Q2lF/zU+ttKuKbQMr17cF4yyIcK07XctkgvRgvJmSnmXSfZmy6Y5fysiZjdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724379044; c=relaxed/simple;
-	bh=1Vnw4BxoYy6vOmUUeeZDqgC/igIarcd5B2kwf0aZOLk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WGQel5iV0izBENgFzhVPL8TbOX7f52sO5tWXCCD20nqaDxaaz0y4It+S53Z9tcn0qkQvhRhTzVvcZ2wSqiPzjbdJrTu/NsH+8HCWVSsg7ZqFxO2B4g0hdBCW3ZuZKk5EfaHWyhMNh8zBXj11TotJ8O0a5Y48YGFwVyuzhVaj1IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g83MeRdU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC69C32782;
-	Fri, 23 Aug 2024 02:10:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724379043;
-	bh=1Vnw4BxoYy6vOmUUeeZDqgC/igIarcd5B2kwf0aZOLk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=g83MeRdUpzlzxk11bncQhQgiDj+WSrXaK4Jqbsisxu8ih+xiqlfR8mx4aue1aE7yA
-	 9ulzwAT3VI/p3UtCbmmePp7MYZstgCojlXFSKMz0He0sBPXthLrRQnJWIwf2n7P48S
-	 NqImWX5xe0O2l+NPzQnBtT0dPb+uBli6RdOKhiTzrOQPGzpv+WGZCTPcLLRM2muLt/
-	 FSm7Xgv3UrQleak7XwjW9rDsCe7g92SuNi0ux936pqlmHF60gZQM/iQKJ55thY98Fp
-	 j0OyXwuHuwK0CKP3KQRHf/N4nZiivGnSksx06Ca+iJvDqd4Hy8jsRixW9UuNMT4piY
-	 ylUPgeqwA4ehg==
-Date: Thu, 22 Aug 2024 19:10:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>
-Subject: Re: [PATCH v4 net-next 03/12] net-shapers: implement NL get
- operation
-Message-ID: <20240822191042.71a19582@kernel.org>
-In-Reply-To: <c5ad129f46b98d899fde3f0352f5cb54c2aa915b.1724165948.git.pabeni@redhat.com>
-References: <cover.1724165948.git.pabeni@redhat.com>
-	<c5ad129f46b98d899fde3f0352f5cb54c2aa915b.1724165948.git.pabeni@redhat.com>
+	s=arc-20240116; t=1724382836; c=relaxed/simple;
+	bh=+zMGFbvKd0u5ic2kBKmw5XizHgCCLELdRyBocxwFRgA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GI+lVzir9NO2V8QNRf2KAGyp2FDB1PhsV8ydJ84QBMdJVgrgVAGrOyhQCskcqeYnRMLtQrSwzrJTeeBzk4y+ftZzBU7GKOTsJlGGO4uV2ERyt7jBZtfYFw5zIIGyrHmuOwZcyiNQJxl/av+TeULzdY+eChVhQnhXmIfD2KRFQmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=otLACXCi; arc=none smtp.client-ip=67.231.157.127
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
+Received: from pps.filterd (m0050096.ppops.net [127.0.0.1])
+	by m0050096.ppops.net-00190b01. (8.18.1.2/8.18.1.2) with ESMTP id 47MLa5fa018022;
+	Fri, 23 Aug 2024 03:15:01 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=jan2016.eng; bh=81xWxtrsYF9UOQXV3aiq
+	qk5OpnUg+5fAM7GMZpkqcMg=; b=otLACXCi1ti7xC8xFqZKHmFRB7lggb+9l+rM
+	9VP4aGb5WFVpz4rHTtaEvYHhqiiHBOG5vG0KLw3Dd19YyBRxpnen30dw6FVj7fLc
+	GtGnnXSJlARs8AhnLRTDjDkKlE2Gjlun/LnEa26k3rrndxFil/tN9WAvvFUSoF3u
+	ashvAfCO5D9qKUCouqhrSEorYbrMCkxtPPOtt5VzT7KHYmGmhC53XHwShXpO1j+G
+	hVtGy8e30R5eSetyepuIrO5cVqoZ2CRh16hVllnpVnDRD4yh8mFO1ql3F29VJ4ut
+	cdsU3SE+Rl30adWEoqFBVhL+A7/qViwjZuBd78Xl5F/Yze7chg==
+Received: from prod-mail-ppoint4 (a72-247-45-32.deploy.static.akamaitechnologies.com [72.247.45.32] (may be forged))
+	by m0050096.ppops.net-00190b01. (PPS) with ESMTPS id 4149pg7p4x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 23 Aug 2024 03:15:00 +0100 (BST)
+Received: from pps.filterd (prod-mail-ppoint4.akamai.com [127.0.0.1])
+	by prod-mail-ppoint4.akamai.com (8.18.1.2/8.18.1.2) with ESMTP id 47MMoK4l023015;
+	Thu, 22 Aug 2024 22:15:00 -0400
+Received: from email.msg.corp.akamai.com ([172.27.91.21])
+	by prod-mail-ppoint4.akamai.com (PPS) with ESMTPS id 412q6yhv3n-10
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Aug 2024 22:14:59 -0400
+Received: from usma1ex-dag4mb7.msg.corp.akamai.com (172.27.91.26) by
+ usma1ex-dag4mb2.msg.corp.akamai.com (172.27.91.21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 22 Aug 2024 22:14:45 -0400
+Received: from bos-lhvx56.bos01.corp.akamai.com (172.28.41.223) by
+ usma1ex-dag4mb7.msg.corp.akamai.com (172.27.91.26) with Microsoft SMTP Server
+ id 15.2.1544.11 via Frontend Transport; Thu, 22 Aug 2024 22:14:45 -0400
+Received: by bos-lhvx56.bos01.corp.akamai.com (Postfix, from userid 30754)
+	id 2021515F534; Thu, 22 Aug 2024 22:14:45 -0400 (EDT)
+From: Josh Hunt <johunt@akamai.com>
+To: <edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <johunt@akamai.com>
+Subject: [PATCH net 0/1] NULL ptr dereference in tcp_rearm_rto
+Date: Thu, 22 Aug 2024 22:13:32 -0400
+Message-ID: <20240823021333.1252272-1-johunt@akamai.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-23_01,2024-08-22_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
+ suspectscore=0 spamscore=0 adultscore=0 bulkscore=0 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2407110000 definitions=main-2408230011
+X-Proofpoint-ORIG-GUID: alAV5b8NsfQaJcJeiT6qAhJR8Zd2-RDN
+X-Proofpoint-GUID: alAV5b8NsfQaJcJeiT6qAhJR8Zd2-RDN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-23_01,2024-08-22_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0 mlxscore=0
+ spamscore=0 clxscore=1015 impostorscore=0 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 mlxlogscore=999 malwarescore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408230013
 
-On Tue, 20 Aug 2024 17:12:24 +0200 Paolo Abeni wrote:
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -81,6 +81,8 @@ struct xdp_frame;
->  struct xdp_metadata_ops;
->  struct xdp_md;
->  struct ethtool_netdev_state;
-> +struct net_shaper_ops;
-> +struct net_shaper_data;
+We have some machines running stock Ubuntu 20.04.6 which is their 5.4.0-174-generic
+kernel that are running ceph and recently hit a null ptr dereference in
+tcp_rearm_rto(). Initially hitting it from the TLP path, but then later we also
+saw it getting hit from the RACK case as well. Here are examples of the oops
+messages we saw in each of those cases:
 
-no need, forward declarations are only needed for function declarations
+Jul 26 15:05:02 rx [11061395.780353] BUG: kernel NULL pointer dereference, address: 0000000000000020
+Jul 26 15:05:02 rx [11061395.787572] #PF: supervisor read access in kernel mode
+Jul 26 15:05:02 rx [11061395.792971] #PF: error_code(0x0000) - not-present page
+Jul 26 15:05:02 rx [11061395.798362] PGD 0 P4D 0
+Jul 26 15:05:02 rx [11061395.801164] Oops: 0000 [#1] SMP NOPTI
+Jul 26 15:05:02 rx [11061395.805091] CPU: 0 PID: 9180 Comm: msgr-worker-1 Tainted: G W 5.4.0-174-generic #193-Ubuntu
+Jul 26 15:05:02 rx [11061395.814996] Hardware name: Supermicro SMC 2x26 os-gen8 64C NVME-Y 256G/H12SSW-NTR, BIOS 2.5.V1.2U.NVMe.UEFI 05/09/2023
+Jul 26 15:05:02 rx [11061395.825952] RIP: 0010:tcp_rearm_rto+0xe4/0x160
+Jul 26 15:05:02 rx [11061395.830656] Code: 87 ca 04 00 00 00 5b 41 5c 41 5d 5d c3 c3 49 8b bc 24 40 06 00 00 eb 8d 48 bb cf f7 53 e3 a5 9b c4 20 4c 89 ef e8 0c fe 0e 00 <48> 8b 78 20 48 c1 ef 03 48 89 f8 41 8b bc 24 80 04 00 00 48 f7 e3
+Jul 26 15:05:02 rx [11061395.849665] RSP: 0018:ffffb75d40003e08 EFLAGS: 00010246
+Jul 26 15:05:02 rx [11061395.855149] RAX: 0000000000000000 RBX: 20c49ba5e353f7cf RCX: 0000000000000000
+Jul 26 15:05:02 rx [11061395.862542] RDX: 0000000062177c30 RSI: 000000000000231c RDI: ffff9874ad283a60
+Jul 26 15:05:02 rx [11061395.869933] RBP: ffffb75d40003e20 R08: 0000000000000000 R09: ffff987605e20aa8
+Jul 26 15:05:02 rx [11061395.877318] R10: ffffb75d40003f00 R11: ffffb75d4460f740 R12: ffff9874ad283900
+Jul 26 15:05:02 rx [11061395.884710] R13: ffff9874ad283a60 R14: ffff9874ad283980 R15: ffff9874ad283d30
+Jul 26 15:05:02 rx [11061395.892095] FS: 00007f1ef4a2e700(0000) GS:ffff987605e00000(0000) knlGS:0000000000000000
+Jul 26 15:05:02 rx [11061395.900438] CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Jul 26 15:05:02 rx [11061395.906435] CR2: 0000000000000020 CR3: 0000003e450ba003 CR4: 0000000000760ef0
+Jul 26 15:05:02 rx [11061395.913822] PKRU: 55555554
+Jul 26 15:05:02 rx [11061395.916786] Call Trace:
+Jul 26 15:05:02 rx [11061395.919488]
+Jul 26 15:05:02 rx [11061395.921765] ? show_regs.cold+0x1a/0x1f
+Jul 26 15:05:02 rx [11061395.925859] ? __die+0x90/0xd9
+Jul 26 15:05:02 rx [11061395.929169] ? no_context+0x196/0x380
+Jul 26 15:05:02 rx [11061395.933088] ? ip6_protocol_deliver_rcu+0x4e0/0x4e0
+Jul 26 15:05:02 rx [11061395.938216] ? ip6_sublist_rcv_finish+0x3d/0x50
+Jul 26 15:05:02 rx [11061395.943000] ? __bad_area_nosemaphore+0x50/0x1a0
+Jul 26 15:05:02 rx [11061395.947873] ? bad_area_nosemaphore+0x16/0x20
+Jul 26 15:05:02 rx [11061395.952486] ? do_user_addr_fault+0x267/0x450
+Jul 26 15:05:02 rx [11061395.957104] ? ipv6_list_rcv+0x112/0x140
+Jul 26 15:05:02 rx [11061395.961279] ? __do_page_fault+0x58/0x90
+Jul 26 15:05:02 rx [11061395.965458] ? do_page_fault+0x2c/0xe0
+Jul 26 15:05:02 rx [11061395.969465] ? page_fault+0x34/0x40
+Jul 26 15:05:02 rx [11061395.973217] ? tcp_rearm_rto+0xe4/0x160
+Jul 26 15:05:02 rx [11061395.977313] ? tcp_rearm_rto+0xe4/0x160
+Jul 26 15:05:02 rx [11061395.981408] tcp_send_loss_probe+0x10b/0x220
+Jul 26 15:05:02 rx [11061395.985937] tcp_write_timer_handler+0x1b4/0x240
+Jul 26 15:05:02 rx [11061395.990809] tcp_write_timer+0x9e/0xe0
+Jul 26 15:05:02 rx [11061395.994814] ? tcp_write_timer_handler+0x240/0x240
+Jul 26 15:05:02 rx [11061395.999866] call_timer_fn+0x32/0x130
+Jul 26 15:05:02 rx [11061396.003782] __run_timers.part.0+0x180/0x280
+Jul 26 15:05:02 rx [11061396.008309] ? recalibrate_cpu_khz+0x10/0x10
+Jul 26 15:05:02 rx [11061396.012841] ? native_x2apic_icr_write+0x30/0x30
+Jul 26 15:05:02 rx [11061396.017718] ? lapic_next_event+0x21/0x30
+Jul 26 15:05:02 rx [11061396.021984] ? clockevents_program_event+0x8f/0xe0
+Jul 26 15:05:02 rx [11061396.027035] run_timer_softirq+0x2a/0x50
+Jul 26 15:05:02 rx [11061396.031212] __do_softirq+0xd1/0x2c1
+Jul 26 15:05:02 rx [11061396.035044] do_softirq_own_stack+0x2a/0x40
+Jul 26 15:05:02 rx [11061396.039480]
+Jul 26 15:05:02 rx [11061396.041840] do_softirq.part.0+0x46/0x50
+Jul 26 15:05:02 rx [11061396.046022] __local_bh_enable_ip+0x50/0x60
+Jul 26 15:05:02 rx [11061396.050460] _raw_spin_unlock_bh+0x1e/0x20
+Jul 26 15:05:02 rx [11061396.054817] nf_conntrack_tcp_packet+0x29e/0xbe0 [nf_conntrack]
+Jul 26 15:05:02 rx [11061396.060994] ? get_l4proto+0xe7/0x190 [nf_conntrack]
+Jul 26 15:05:02 rx [11061396.066220] nf_conntrack_in+0xe9/0x670 [nf_conntrack]
+Jul 26 15:05:02 rx [11061396.071618] ipv6_conntrack_local+0x14/0x20 [nf_conntrack]
+Jul 26 15:05:02 rx [11061396.077356] nf_hook_slow+0x45/0xb0
+Jul 26 15:05:02 rx [11061396.081098] ip6_xmit+0x3f0/0x5d0
+Jul 26 15:05:02 rx [11061396.084670] ? ipv6_anycast_cleanup+0x50/0x50
+Jul 26 15:05:02 rx [11061396.089282] ? __sk_dst_check+0x38/0x70
+Jul 26 15:05:02 rx [11061396.093381] ? inet6_csk_route_socket+0x13b/0x200
+Jul 26 15:05:02 rx [11061396.098346] inet6_csk_xmit+0xa7/0xf0
+Jul 26 15:05:02 rx [11061396.102263] __tcp_transmit_skb+0x550/0xb30
+Jul 26 15:05:02 rx [11061396.106701] tcp_write_xmit+0x3c6/0xc20
+Jul 26 15:05:02 rx [11061396.110792] ? __alloc_skb+0x98/0x1d0
+Jul 26 15:05:02 rx [11061396.114708] __tcp_push_pending_frames+0x37/0x100
+Jul 26 15:05:02 rx [11061396.119667] tcp_push+0xfd/0x100
+Jul 26 15:05:02 rx [11061396.123150] tcp_sendmsg_locked+0xc70/0xdd0
+Jul 26 15:05:02 rx [11061396.127588] tcp_sendmsg+0x2d/0x50
+Jul 26 15:05:02 rx [11061396.131245] inet6_sendmsg+0x43/0x70
+Jul 26 15:05:02 rx [11061396.135075] __sock_sendmsg+0x48/0x70
+Jul 26 15:05:02 rx [11061396.138994] ____sys_sendmsg+0x212/0x280
+Jul 26 15:05:02 rx [11061396.143172] ___sys_sendmsg+0x88/0xd0
+Jul 26 15:05:02 rx [11061396.147098] ? __seccomp_filter+0x7e/0x6b0
+Jul 26 15:05:02 rx [11061396.151446] ? __switch_to+0x39c/0x460
+Jul 26 15:05:02 rx [11061396.155453] ? __switch_to_asm+0x42/0x80
+Jul 26 15:05:02 rx [11061396.159636] ? __switch_to_asm+0x5a/0x80
+Jul 26 15:05:02 rx [11061396.163816] __sys_sendmsg+0x5c/0xa0
+Jul 26 15:05:02 rx [11061396.167647] __x64_sys_sendmsg+0x1f/0x30
+Jul 26 15:05:02 rx [11061396.171832] do_syscall_64+0x57/0x190
+Jul 26 15:05:02 rx [11061396.175748] entry_SYSCALL_64_after_hwframe+0x5c/0xc1
+Jul 26 15:05:02 rx [11061396.181055] RIP: 0033:0x7f1ef692618d
+Jul 26 15:05:02 rx [11061396.184893] Code: 28 89 54 24 1c 48 89 74 24 10 89 7c 24 08 e8 ca ee ff ff 8b 54 24 1c 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 2e 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 2f 44 89 c7 48 89 44 24 08 e8 fe ee ff ff 48
+Jul 26 15:05:02 rx [11061396.203889] RSP: 002b:00007f1ef4a26aa0 EFLAGS: 00000293 ORIG_RAX: 000000000000002e
+Jul 26 15:05:02 rx [11061396.211708] RAX: ffffffffffffffda RBX: 000000000000084b RCX: 00007f1ef692618d
+Jul 26 15:05:02 rx [11061396.219091] RDX: 0000000000004000 RSI: 00007f1ef4a26b10 RDI: 0000000000000275
+Jul 26 15:05:02 rx [11061396.226475] RBP: 0000000000004000 R08: 0000000000000000 R09: 0000000000000020
+Jul 26 15:05:02 rx [11061396.233859] R10: 0000000000000000 R11: 0000000000000293 R12: 000000000000084b
+Jul 26 15:05:02 rx [11061396.241243] R13: 00007f1ef4a26b10 R14: 0000000000000275 R15: 000055592030f1e8
+Jul 26 15:05:02 rx [11061396.248628] Modules linked in: vrf bridge stp llc vxlan ip6_udp_tunnel udp_tunnel nls_iso8859_1 amd64_edac_mod edac_mce_amd kvm_amd kvm crct10dif_pclmul ghash_clmulni_intel aesni_intel crypto_simd cryptd glue_helper wmi_bmof ipmi_ssif input_leds joydev rndis_host cdc_ether usbnet mii ast drm_vram_helper ttm drm_kms_helper i2c_algo_bit fb_sys_fops syscopyarea sysfillrect sysimgblt ccp mac_hid ipmi_si ipmi_devintf ipmi_msghandler nft_ct sch_fq_codel nf_tables_set nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink ramoops reed_solomon efi_pstore drm ip_tables x_tables autofs4 raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq libcrc32c raid0 multipath linear mlx5_ib ib_uverbs ib_core raid1 mlx5_core hid_generic pci_hyperv_intf crc32_pclmul tls usbhid ahci mlxfw bnxt_en libahci hid nvme i2c_piix4 nvme_core wmi
+Jul 26 15:05:02 rx [11061396.324334] CR2: 0000000000000020
+Jul 26 15:05:02 rx [11061396.327944] ---[ end trace 68a2b679d1cfb4f1 ]---
+Jul 26 15:05:02 rx [11061396.433435] RIP: 0010:tcp_rearm_rto+0xe4/0x160
+Jul 26 15:05:02 rx [11061396.438137] Code: 87 ca 04 00 00 00 5b 41 5c 41 5d 5d c3 c3 49 8b bc 24 40 06 00 00 eb 8d 48 bb cf f7 53 e3 a5 9b c4 20 4c 89 ef e8 0c fe 0e 00 <48> 8b 78 20 48 c1 ef 03 48 89 f8 41 8b bc 24 80 04 00 00 48 f7 e3
+Jul 26 15:05:02 rx [11061396.457144] RSP: 0018:ffffb75d40003e08 EFLAGS: 00010246
+Jul 26 15:05:02 rx [11061396.462629] RAX: 0000000000000000 RBX: 20c49ba5e353f7cf RCX: 0000000000000000
+Jul 26 15:05:02 rx [11061396.470012] RDX: 0000000062177c30 RSI: 000000000000231c RDI: ffff9874ad283a60
+Jul 26 15:05:02 rx [11061396.477396] RBP: ffffb75d40003e20 R08: 0000000000000000 R09: ffff987605e20aa8
+Jul 26 15:05:02 rx [11061396.484779] R10: ffffb75d40003f00 R11: ffffb75d4460f740 R12: ffff9874ad283900
+Jul 26 15:05:02 rx [11061396.492164] R13: ffff9874ad283a60 R14: ffff9874ad283980 R15: ffff9874ad283d30
+Jul 26 15:05:02 rx [11061396.499547] FS: 00007f1ef4a2e700(0000) GS:ffff987605e00000(0000) knlGS:0000000000000000
+Jul 26 15:05:02 rx [11061396.507886] CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Jul 26 15:05:02 rx [11061396.513884] CR2: 0000000000000020 CR3: 0000003e450ba003 CR4: 0000000000760ef0
+Jul 26 15:05:02 rx [11061396.521267] PKRU: 55555554
+Jul 26 15:05:02 rx [11061396.524230] Kernel panic - not syncing: Fatal exception in interrupt
+Jul 26 15:05:02 rx [11061396.530885] Kernel Offset: 0x1b200000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+Jul 26 15:05:03 rx [11061396.660181] ---[ end Kernel panic - not syncing: Fatal
+ exception in interrupt ]---
 
-> + * struct net_shaper_ops - Operations on device H/W shapers
-> + *
-> + * The initial shaping configuration at device initialization is empty:
-> + * does not constraint the rate in any way.
-> + * The network core keeps track of the applied user-configuration in
-> + * the net_device structure.
-> + * The operations are serialized via a per network device lock.
-> + *
-> + * Each shaper is uniquely identified within the device with an 'handle'
+After we saw this we disabled TLP by setting tcp_early_retrans to 0 and then hit the crash in the RACK case:
 
-a handle
+Aug 7 07:26:16 rx [1006006.265582] BUG: kernel NULL pointer dereference, address: 0000000000000020
+Aug 7 07:26:16 rx [1006006.272719] #PF: supervisor read access in kernel mode
+Aug 7 07:26:16 rx [1006006.278030] #PF: error_code(0x0000) - not-present page
+Aug 7 07:26:16 rx [1006006.283343] PGD 0 P4D 0
+Aug 7 07:26:16 rx [1006006.286057] Oops: 0000 [#1] SMP NOPTI
+Aug 7 07:26:16 rx [1006006.289896] CPU: 5 PID: 0 Comm: swapper/5 Tainted: G W 5.4.0-174-generic #193-Ubuntu
+Aug 7 07:26:16 rx [1006006.299107] Hardware name: Supermicro SMC 2x26 os-gen8 64C NVME-Y 256G/H12SSW-NTR, BIOS 2.5.V1.2U.NVMe.UEFI 05/09/2023
+Aug 7 07:26:16 rx [1006006.309970] RIP: 0010:tcp_rearm_rto+0xe4/0x160
+Aug 7 07:26:16 rx [1006006.314584] Code: 87 ca 04 00 00 00 5b 41 5c 41 5d 5d c3 c3 49 8b bc 24 40 06 00 00 eb 8d 48 bb cf f7 53 e3 a5 9b c4 20 4c 89 ef e8 0c fe 0e 00 <48> 8b 78 20 48 c1 ef 03 48 89 f8 41 8b bc 24 80 04 00 00 48 f7 e3
+Aug 7 07:26:16 rx [1006006.333499] RSP: 0018:ffffb42600a50960 EFLAGS: 00010246
+Aug 7 07:26:16 rx [1006006.338895] RAX: 0000000000000000 RBX: 20c49ba5e353f7cf RCX: 0000000000000000
+Aug 7 07:26:16 rx [1006006.346193] RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffff92d687ed8160
+Aug 7 07:26:16 rx [1006006.353489] RBP: ffffb42600a50978 R08: 0000000000000000 R09: 00000000cd896dcc
+Aug 7 07:26:16 rx [1006006.360786] R10: ffff92dc3404f400 R11: 0000000000000001 R12: ffff92d687ed8000
+Aug 7 07:26:16 rx [1006006.368084] R13: ffff92d687ed8160 R14: 00000000cd896dcc R15: 00000000cd8fca81
+Aug 7 07:26:16 rx [1006006.375381] FS: 0000000000000000(0000) GS:ffff93158ad40000(0000) knlGS:0000000000000000
+Aug 7 07:26:16 rx [1006006.383632] CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Aug 7 07:26:16 rx [1006006.389544] CR2: 0000000000000020 CR3: 0000003e775ce006 CR4: 0000000000760ee0
+Aug 7 07:26:16 rx [1006006.396839] PKRU: 55555554
+Aug 7 07:26:16 rx [1006006.399717] Call Trace:
+Aug 7 07:26:16 rx [1006006.402335]
+Aug 7 07:26:16 rx [1006006.404525] ? show_regs.cold+0x1a/0x1f
+Aug 7 07:26:16 rx [1006006.408532] ? __die+0x90/0xd9
+Aug 7 07:26:16 rx [1006006.411760] ? no_context+0x196/0x380
+Aug 7 07:26:16 rx [1006006.415599] ? __bad_area_nosemaphore+0x50/0x1a0
+Aug 7 07:26:16 rx [1006006.420392] ? _raw_spin_lock+0x1e/0x30
+Aug 7 07:26:16 rx [1006006.424401] ? bad_area_nosemaphore+0x16/0x20
+Aug 7 07:26:16 rx [1006006.428927] ? do_user_addr_fault+0x267/0x450
+Aug 7 07:26:16 rx [1006006.433450] ? __do_page_fault+0x58/0x90
+Aug 7 07:26:16 rx [1006006.437542] ? do_page_fault+0x2c/0xe0
+Aug 7 07:26:16 rx [1006006.441470] ? page_fault+0x34/0x40
+Aug 7 07:26:16 rx [1006006.445134] ? tcp_rearm_rto+0xe4/0x160
+Aug 7 07:26:16 rx [1006006.449145] tcp_ack+0xa32/0xb30
+Aug 7 07:26:16 rx [1006006.452542] tcp_rcv_established+0x13c/0x670
+Aug 7 07:26:16 rx [1006006.456981] ? sk_filter_trim_cap+0x48/0x220
+Aug 7 07:26:16 rx [1006006.461419] tcp_v6_do_rcv+0xdb/0x450
+Aug 7 07:26:16 rx [1006006.465257] tcp_v6_rcv+0xc2b/0xd10
+Aug 7 07:26:16 rx [1006006.468918] ip6_protocol_deliver_rcu+0xd3/0x4e0
+Aug 7 07:26:16 rx [1006006.473706] ip6_input_finish+0x15/0x20
+Aug 7 07:26:16 rx [1006006.477710] ip6_input+0xa2/0xb0
+Aug 7 07:26:16 rx [1006006.481109] ? ip6_protocol_deliver_rcu+0x4e0/0x4e0
+Aug 7 07:26:16 rx [1006006.486151] ip6_sublist_rcv_finish+0x3d/0x50
+Aug 7 07:26:16 rx [1006006.490679] ip6_sublist_rcv+0x1aa/0x250
+Aug 7 07:26:16 rx [1006006.494779] ? ip6_rcv_finish_core.isra.0+0xa0/0xa0
+Aug 7 07:26:16 rx [1006006.499828] ipv6_list_rcv+0x112/0x140
+Aug 7 07:26:16 rx [1006006.503748] __netif_receive_skb_list_core+0x1a4/0x250
+Aug 7 07:26:16 rx [1006006.509057] netif_receive_skb_list_internal+0x1a1/0x2b0
+Aug 7 07:26:16 rx [1006006.514538] gro_normal_list.part.0+0x1e/0x40
+Aug 7 07:26:16 rx [1006006.519068] napi_complete_done+0x91/0x130
+Aug 7 07:26:16 rx [1006006.523352] mlx5e_napi_poll+0x18e/0x610 [mlx5_core]
+Aug 7 07:26:16 rx [1006006.528481] net_rx_action+0x142/0x390
+Aug 7 07:26:16 rx [1006006.532398] __do_softirq+0xd1/0x2c1
+Aug 7 07:26:16 rx [1006006.536142] irq_exit+0xae/0xb0
+Aug 7 07:26:16 rx [1006006.539452] do_IRQ+0x5a/0xf0
+Aug 7 07:26:16 rx [1006006.542590] common_interrupt+0xf/0xf
+Aug 7 07:26:16 rx [1006006.546421]
+Aug 7 07:26:16 rx [1006006.548695] RIP: 0010:native_safe_halt+0xe/0x10
+Aug 7 07:26:16 rx [1006006.553399] Code: 7b ff ff ff eb bd 90 90 90 90 90 90 e9 07 00 00 00 0f 00 2d 36 2c 50 00 f4 c3 66 90 e9 07 00 00 00 0f 00 2d 26 2c 50 00 fb f4 90 0f 1f 44 00 00 55 48 89 e5 41 55 41 54 53 e8 dd 5e 61 ff 65
+Aug 7 07:26:16 rx [1006006.572309] RSP: 0018:ffffb42600177e70 EFLAGS: 00000246 ORIG_RAX: ffffffffffffffc2
+Aug 7 07:26:16 rx [1006006.580040] RAX: ffffffff8ed08b20 RBX: 0000000000000005 RCX: 0000000000000001
+Aug 7 07:26:16 rx [1006006.587337] RDX: 00000000f48eeca2 RSI: 0000000000000082 RDI: 0000000000000082
+Aug 7 07:26:16 rx [1006006.594635] RBP: ffffb42600177e90 R08: 0000000000000000 R09: 000000000000020f
+Aug 7 07:26:16 rx [1006006.601931] R10: 0000000000100000 R11: 0000000000000000 R12: 0000000000000005
+Aug 7 07:26:16 rx [1006006.609229] R13: ffff93157deb5f00 R14: 0000000000000000 R15: 0000000000000000
+Aug 7 07:26:16 rx [1006006.616530] ? __cpuidle_text_start+0x8/0x8
+Aug 7 07:26:16 rx [1006006.620886] ? default_idle+0x20/0x140
+Aug 7 07:26:16 rx [1006006.624804] arch_cpu_idle+0x15/0x20
+Aug 7 07:26:16 rx [1006006.628545] default_idle_call+0x23/0x30
+Aug 7 07:26:16 rx [1006006.632640] do_idle+0x1fb/0x270
+Aug 7 07:26:16 rx [1006006.636035] cpu_startup_entry+0x20/0x30
+Aug 7 07:26:16 rx [1006006.640126] start_secondary+0x178/0x1d0
+Aug 7 07:26:16 rx [1006006.644218] secondary_startup_64+0xa4/0xb0
+Aug 7 07:26:17 rx [1006006.648568] Modules linked in: vrf bridge stp llc vxlan ip6_udp_tunnel udp_tunnel nls_iso8859_1 nft_ct amd64_edac_mod edac_mce_amd kvm_amd kvm crct10dif_pclmul ghash_clmulni_intel aesni_intel crypto_simd cryptd glue_helper wmi_bmof ipmi_ssif input_leds joydev rndis_host cdc_ether usbnet ast mii drm_vram_helper ttm drm_kms_helper i2c_algo_bit fb_sys_fops syscopyarea sysfillrect sysimgblt ccp mac_hid ipmi_si ipmi_devintf ipmi_msghandler sch_fq_codel nf_tables_set nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nf_tables nfnetlink ramoops reed_solomon efi_pstore drm ip_tables x_tables autofs4 raid10 raid456 async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq libcrc32c raid0 multipath linear mlx5_ib ib_uverbs ib_core raid1 hid_generic mlx5_core pci_hyperv_intf crc32_pclmul usbhid ahci tls mlxfw bnxt_en hid libahci nvme i2c_piix4 nvme_core wmi [last unloaded: cpuid]
+Aug 7 07:26:17 rx [1006006.726180] CR2: 0000000000000020
+Aug 7 07:26:17 rx [1006006.729718] ---[ end trace e0e2e37e4e612984 ]---
 
-> + * comprising the shaper scope and a scope-specific id.
-> + */
-> +struct net_shaper_ops {
-> +	/**
-> +	 * @group: create the specified shapers scheduling group
-> +	 *
-> +	 * Nest the @leaves shapers identified by @leaves_handles under the
-> +	 * @root shaper identified by @root_handle. All the shapers belong
-> +	 * to the network device @dev. The @leaves and @leaves_handles shaper
-> +	 * arrays size is specified by @leaves_count.
-> +	 * Create either the @leaves and the @root shaper; or if they already
-> +	 * exists, links them together in the desired way.
-> +	 * @leaves scope must be NET_SHAPER_SCOPE_QUEUE.
+Prior to seeing the first crash and on other machines we also see the warning in
+tcp_send_loss_probe() where packets_out is non-zero, but both transmit and retrans
+queues are empty so we know the box is seeing some accounting issue in this area:
 
-Or SCOPE_NODE, no?
+Jul 26 09:15:27 kernel: ------------[ cut here ]------------
+Jul 26 09:15:27 kernel: invalid inflight: 2 state 1 cwnd 68 mss 8988
+Jul 26 09:15:27 kernel: WARNING: CPU: 16 PID: 0 at net/ipv4/tcp_output.c:2605 tcp_send_loss_probe+0x214/0x220
+Jul 26 09:15:27 kernel: Modules linked in: vrf bridge stp llc vxlan ip6_udp_tunnel udp_tunnel nls_iso8859_1 nft_ct amd64_edac_mod edac_mce_amd kvm_amd kvm crct10dif_pclmul ghash_clmulni_intel aesni_intel crypto_simd cryptd glue_helper wmi_bmof ipmi_ssif joydev input_leds rndis_host cdc_ether usbnet mii ast drm_vram_helper ttm drm_kms_he>
+Jul 26 09:15:27 kernel: CPU: 16 PID: 0 Comm: swapper/16 Not tainted 5.4.0-174-generic #193-Ubuntu
+Jul 26 09:15:27 kernel: Hardware name: Supermicro SMC 2x26 os-gen8 64C NVME-Y 256G/H12SSW-NTR, BIOS 2.5.V1.2U.NVMe.UEFI 05/09/2023
+Jul 26 09:15:27 kernel: RIP: 0010:tcp_send_loss_probe+0x214/0x220
+Jul 26 09:15:27 kernel: Code: 08 26 01 00 75 e2 41 0f b6 54 24 12 41 8b 8c 24 c0 06 00 00 45 89 f0 48 c7 c7 e0 b4 20 a7 c6 05 8d 08 26 01 01 e8 4a c0 0f 00 <0f> 0b eb ba 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 55 48 89 e5 41
+Jul 26 09:15:27 kernel: RSP: 0018:ffffb7838088ce00 EFLAGS: 00010286
+Jul 26 09:15:27 kernel: RAX: 0000000000000000 RBX: ffff9b84b5630430 RCX: 0000000000000006
+Jul 26 09:15:27 kernel: RDX: 0000000000000007 RSI: 0000000000000096 RDI: ffff9b8e4621c8c0
+Jul 26 09:15:27 kernel: RBP: ffffb7838088ce18 R08: 0000000000000927 R09: 0000000000000004
+Jul 26 09:15:27 kernel: R10: 0000000000000000 R11: 0000000000000001 R12: ffff9b84b5630000
+Jul 26 09:15:27 kernel: R13: 0000000000000000 R14: 000000000000231c R15: ffff9b84b5630430
+Jul 26 09:15:27 kernel: FS: 0000000000000000(0000) GS:ffff9b8e46200000(0000) knlGS:0000000000000000
+Jul 26 09:15:27 kernel: CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+Jul 26 09:15:27 kernel: CR2: 000056238cec2380 CR3: 0000003e49ede005 CR4: 0000000000760ee0
+Jul 26 09:15:27 kernel: PKRU: 55555554
+Jul 26 09:15:27 kernel: Call Trace:
+Jul 26 09:15:27 kernel: <IRQ>
+Jul 26 09:15:27 kernel: ? show_regs.cold+0x1a/0x1f
+Jul 26 09:15:27 kernel: ? __warn+0x98/0xe0
+Jul 26 09:15:27 kernel: ? tcp_send_loss_probe+0x214/0x220
+Jul 26 09:15:27 kernel: ? report_bug+0xd1/0x100
+Jul 26 09:15:27 kernel: ? do_error_trap+0x9b/0xc0
+Jul 26 09:15:27 kernel: ? do_invalid_op+0x3c/0x50
+Jul 26 09:15:27 kernel: ? tcp_send_loss_probe+0x214/0x220
+Jul 26 09:15:27 kernel: ? invalid_op+0x1e/0x30
+Jul 26 09:15:27 kernel: ? tcp_send_loss_probe+0x214/0x220
+Jul 26 09:15:27 kernel: tcp_write_timer_handler+0x1b4/0x240
+Jul 26 09:15:27 kernel: tcp_write_timer+0x9e/0xe0
+Jul 26 09:15:27 kernel: ? tcp_write_timer_handler+0x240/0x240
+Jul 26 09:15:27 kernel: call_timer_fn+0x32/0x130
+Jul 26 09:15:27 kernel: __run_timers.part.0+0x180/0x280
+Jul 26 09:15:27 kernel: ? timerqueue_add+0x9b/0xb0
+Jul 26 09:15:27 kernel: ? enqueue_hrtimer+0x3d/0x90
+Jul 26 09:15:27 kernel: ? do_error_trap+0x9b/0xc0
+Jul 26 09:15:27 kernel: ? do_invalid_op+0x3c/0x50
+Jul 26 09:15:27 kernel: ? tcp_send_loss_probe+0x214/0x220
+Jul 26 09:15:27 kernel: ? invalid_op+0x1e/0x30
+Jul 26 09:15:27 kernel: ? tcp_send_loss_probe+0x214/0x220
+Jul 26 09:15:27 kernel: tcp_write_timer_handler+0x1b4/0x240
+Jul 26 09:15:27 kernel: tcp_write_timer+0x9e/0xe0
+Jul 26 09:15:27 kernel: ? tcp_write_timer_handler+0x240/0x240
+Jul 26 09:15:27 kernel: call_timer_fn+0x32/0x130
+Jul 26 09:15:27 kernel: __run_timers.part.0+0x180/0x280
+Jul 26 09:15:27 kernel: ? timerqueue_add+0x9b/0xb0
+Jul 26 09:15:27 kernel: ? enqueue_hrtimer+0x3d/0x90
+Jul 26 09:15:27 kernel: ? recalibrate_cpu_khz+0x10/0x10
+Jul 26 09:15:27 kernel: ? ktime_get+0x3e/0xa0
+Jul 26 09:15:27 kernel: ? native_x2apic_icr_write+0x30/0x30
+Jul 26 09:15:27 kernel: run_timer_softirq+0x2a/0x50
+Jul 26 09:15:27 kernel: __do_softirq+0xd1/0x2c1
+Jul 26 09:15:27 kernel: irq_exit+0xae/0xb0
+Jul 26 09:15:27 kernel: smp_apic_timer_interrupt+0x7b/0x140
+Jul 26 09:15:27 kernel: apic_timer_interrupt+0xf/0x20
+Jul 26 09:15:27 kernel: </IRQ>
+Jul 26 09:15:27 kernel: RIP: 0010:native_safe_halt+0xe/0x10
+Jul 26 09:15:27 kernel: Code: 7b ff ff ff eb bd 90 90 90 90 90 90 e9 07 00 00 00 0f 00 2d 36 2c 50 00 f4 c3 66 90 e9 07 00 00 00 0f 00 2d 26 2c 50 00 fb f4 <c3> 90 0f 1f 44 00 00 55 48 89 e5 41 55 41 54 53 e8 dd 5e 61 ff 65
+Jul 26 09:15:27 kernel: RSP: 0018:ffffb783801cfe70 EFLAGS: 00000246 ORIG_RAX: ffffffffffffff13
+Jul 26 09:15:27 kernel: RAX: ffffffffa6908b20 RBX: 0000000000000010 RCX: 0000000000000001
+Jul 26 09:15:27 kernel: RDX: 000000006fc0c97e RSI: 0000000000000082 RDI: 0000000000000082
+Jul 26 09:15:27 kernel: RBP: ffffb783801cfe90 R08: 0000000000000000 R09: 0000000000000225
+Jul 26 09:15:27 kernel: R10: 0000000000100000 R11: 0000000000000000 R12: 0000000000000010
+Jul 26 09:15:27 kernel: R13: ffff9b8e390b0000 R14: 0000000000000000 R15: 0000000000000000
+Jul 26 09:15:27 kernel: ? __cpuidle_text_start+0x8/0x8
+Jul 26 09:15:27 kernel: ? default_idle+0x20/0x140
+Jul 26 09:15:27 kernel: arch_cpu_idle+0x15/0x20
+Jul 26 09:15:27 kernel: default_idle_call+0x23/0x30
+Jul 26 09:15:27 kernel: do_idle+0x1fb/0x270
+Jul 26 09:15:27 kernel: cpu_startup_entry+0x20/0x30
+Jul 26 09:15:27 kernel: start_secondary+0x178/0x1d0
+Jul 26 09:15:27 kernel: secondary_startup_64+0xa4/0xb0
+Jul 26 09:15:27 kernel: ---[ end trace e7ac822987e33be1 ]---
 
-> +	 * Returns 0 on group successfully created, otherwise an negative
-> +	 * error value and set @extack to describe the failure's reason.
+The NULL ptr deref is coming from tcp_rto_delta_us() attempting to pull an skb
+off the head of the retransmit queue and then dereferencing that skb to get the
+skb_mstamp_ns value via tcp_skb_timestamp_us(skb).
 
-the return and extack lines are pretty obvious, you can drop
+The crash is the same one that was reported a # of years ago here:
+https://lore.kernel.org/netdev/86c0f836-9a7c-438b-d81a-839be45f1f58@gmail.com/T/#t
 
-> +	 */
-> +	int (*group)(struct net_device *dev, int leaves_count,
-> +		     const struct net_shaper_handle *leaves_handles,
-> +		     const struct net_shaper_info *leaves,
-> +		     const struct net_shaper_handle *root_handle,
-> +		     const struct net_shaper_info *root,
-> +		     struct netlink_ext_ack *extack);
+and the kernel we're running has the fix which was added to resolve this issue.
 
-> +#endif
-> +
+Unfortunately we've been unsuccessful so far in reproducing this problem in the
+lab and do not have the luxury of pushing out a new kernel to try and test if
+newer kernels resolve this issue at the moment. I realize this is a report
+against both an Ubuntu kernel and also an older 5.4 kernel. I have reported this
+issue to Ubuntu here: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/2077657
+however I feel like since this issue has possibly cropped up again it makes
+sense to build in some protection in this path (even on the latest kernel
+versions) since the code in question just blindly assumes there's a valid skb
+without testing if it's NULL b/f it looks at the timestamp. The patch I've sent
+attempts to catch this problem and also dump some information when we hit the
+case to help us debug the issue.
 
-ooh, here's one of the trailing whitespace git was mentioning :)
+I've not seen anyone else report this problem and so wanted to solicit feedback
+from the list to see if there are any thoughts as to what could have possibly
+been introduced (maybe through a stable update?) that could be causing this to
+resurface.
 
->  #include <linux/kernel.h>
-> +#include <linux/bits.h>
-> +#include <linux/bitfield.h>
-> +#include <linux/idr.h>
-> +#include <linux/netdevice.h>
-> +#include <linux/netlink.h>
->  #include <linux/skbuff.h>
-> +#include <linux/xarray.h>
-> +#include <net/net_shaper.h>
+Josh
 
-kernel.h between idr.h and netdevice.h
+Josh Hunt (1):
+  tcp: check skb is non-NULL in tcp_rto_delta_us()
 
-> +static int net_shaper_fill_handle(struct sk_buff *msg,
-> +				  const struct net_shaper_handle *handle,
-> +				  u32 type, const struct genl_info *info)
-> +{
-> +	struct nlattr *handle_attr;
-> +
-> +	if (handle->scope =3D=3D NET_SHAPER_SCOPE_UNSPEC)
-> +		return 0;
+ include/net/tcp.h | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-In what context can we try to fill handle with scope unspec?
+-- 
+2.34.1
 
-> +	handle_attr =3D nla_nest_start_noflag(msg, type);
-> +	if (!handle_attr)
-> +		return -EMSGSIZE;
-> +
-> +	if (nla_put_u32(msg, NET_SHAPER_A_SCOPE, handle->scope) ||
-> +	    (handle->scope >=3D NET_SHAPER_SCOPE_QUEUE &&
-> +	     nla_put_u32(msg, NET_SHAPER_A_ID, handle->id)))
-> +		goto handle_nest_cancel;
-
-So netdev root has no id and no scope?
-
-> +	nla_nest_end(msg, handle_attr);
-> +	return 0;
-> +
-> +handle_nest_cancel:
-> +	nla_nest_cancel(msg, handle_attr);
-> +	return -EMSGSIZE;
-> +}
-
-> +/* On success sets pdev to the relevant device and acquires a reference
-> + * to it.
-> + */
-> +static int net_shaper_fetch_dev(const struct genl_info *info,
-> +				struct net_device **pdev)
-> +{
-> +	struct net *ns =3D genl_info_net(info);
-> +	struct net_device *dev;
-> +	int ifindex;
-> +
-> +	if (GENL_REQ_ATTR_CHECK(info, NET_SHAPER_A_IFINDEX))
-> +		return -EINVAL;
-> +
-> +	ifindex =3D nla_get_u32(info->attrs[NET_SHAPER_A_IFINDEX]);
-> +	dev =3D dev_get_by_index(ns, ifindex);
-
-netdev_get_by_index()
-
-> +	if (!dev) {
-> +		GENL_SET_ERR_MSG_FMT(info, "device %d not found", ifindex);
-
-Point to the IFINDEX attribute, return -ENOENT.
-Please only use string errors when there's no way of expressing=20
-the error with machine readable attrs.
-
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!dev->netdev_ops->net_shaper_ops) {
-> +		GENL_SET_ERR_MSG_FMT(info, "device %s does not support H/W shaper",
-> +				     dev->name);
-
-same as a above, point at device, -EOPNOTSUPP
-
-> +		netdev_put(dev, NULL);
-
-I appears someone is coding to patchwork checks =F0=9F=A7=90=EF=B8=8F
 
