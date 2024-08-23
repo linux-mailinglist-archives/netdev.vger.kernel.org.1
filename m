@@ -1,65 +1,62 @@
-Return-Path: <netdev+bounces-121396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8584695CFC9
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:29:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AA7695CFAB
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:26:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D67FB21C56
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:26:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26A0F281424
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22241AE055;
-	Fri, 23 Aug 2024 14:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C07192583;
+	Fri, 23 Aug 2024 14:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YjhBNUBf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MMmxyKGW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD5D61AE052;
-	Fri, 23 Aug 2024 14:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A45E188A0E;
+	Fri, 23 Aug 2024 14:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724421983; cv=none; b=JhY3nZJiBdXr8C4FZ0jcEbHrHv2c5+MMrCpuaYyVXhdwPzSNWfverhjA4Mu1EiT0yHo6vjvjQs9F+Jghwdszx56N+sX8M5ZqW0mHFLAbrx5OdUBvjsRGLB2UNXFYJrbDZzD0cO9ztSLfbhLPD8j/olE5jKz3eIp+QN8woe8xMPU=
+	t=1724421999; cv=none; b=AATQxHfw4H8DMHbc2a/z7O9WWd1S8jDm6/DC3M11aqEHt7gmrD5YSXhGoCBRc2keGJLAuFSKMcIhtySYXxwjitlZbL6wIHFzjFemUD4K5m74mvPiXS8wqqy5gUx7XepZ+6mo8TY3UABh/6NKJtj/AzXqcHXq6tbxHX4fr7L1Mxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724421983; c=relaxed/simple;
-	bh=PNoNd7ySCCKZSMeht91COu5h8hrIkKAZ4nWz2IT5jlo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tpzLPyDKEogNAkq3gb/GolCLJze80a4FwBz4A8tjJ/bu0le+2WDtgZOGW5BTidUpnIiQxvBweCzDQQw2Oy8E+zVz5O6aYebjuF/YDMTFKACfBEV4wgccFT31QmJp7bxaYo7B1Tht7BFDZsc0ShXNHRqCX8q/Gn/uMwllHUx6bpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YjhBNUBf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55F9DC4AF0B;
-	Fri, 23 Aug 2024 14:06:22 +0000 (UTC)
+	s=arc-20240116; t=1724421999; c=relaxed/simple;
+	bh=8OBu2cqnDAzLu4KPvPWmve/cJux7/7IAaJOlRV8JjV8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=M2SvLc7taWxe5SaN8WtVWsQhhmux0ZnzXun3oiHtbx/ShY7bJ6C3qZyv0fBGlobp29QNDjgLhb3yUDL3Ip96QhbaTDkBPPo5sTN3Emuel4Ou4HrhH1dnRQmpHUGBNWu1N0h8GueoIZxltTa91Sj24wwwIBw6xUXX80i5YFgOteo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MMmxyKGW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF200C32786;
+	Fri, 23 Aug 2024 14:06:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724421983;
-	bh=PNoNd7ySCCKZSMeht91COu5h8hrIkKAZ4nWz2IT5jlo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YjhBNUBfp8oY9Pxi/dzuHw20ATReVpYbzgPictbpdqNpzmnmrs2JAf8R1BjgMEq8g
-	 xI5MYVeveNCZssmx5QQnAjPBqqgMYLEMWt3s++UjolOgPcf57IkfjwCLw2Ys0yv5yi
-	 8wNc8gf1aLPtYn9X65Ul9LJJccNnEm7sybRxcxRqP+byT6tGZoxVVaIJIn7oyGo5Yi
-	 Gyke6bNsR9F8xKWOIA1erY5rMTmLsmLyqIgWPv1OTJ4lPRR1hZpPxH4Xt/Q9aqLgjC
-	 FnQlpmHG4cvysu3lC4Z7SsfrYQZDoimrQkYxnRN4k5x2ixzjOzzNx5U46JlLEe/r9W
-	 ayGpREAGhKc0g==
+	s=k20201202; t=1724421999;
+	bh=8OBu2cqnDAzLu4KPvPWmve/cJux7/7IAaJOlRV8JjV8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MMmxyKGWBiXblkPAihC6vbdUEXNZJCdad57uhNHk6qJ483CV8tNcrymiPTB9TgTSB
+	 3bkTBpELhHWWOfgkMadrDXZuIDYVL4TTyJWRjRKfdEjSCi2ASkNO6uSW36p1/nYVR3
+	 WC0IioC08NntCGaJfRHm2zZNBQ7WtR6BHpH4Bcnk5p8lbdK8brZl+12mBzpnL5P9lc
+	 ezk9IcxhYHekZldBeakNHbcHAi58GFvLlAh1i0gs70kl9nbdGZBwY9KviLRAeWbyZ1
+	 absgNDy5y6osg9DeFzxCu47Mo61Yj/GORG0zg6+hhZjOHBN5P96njxBCHW56cwOt5H
+	 v5TPz2mqJIJEA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Pawel Dembicki <paweldembicki@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
+Cc: Oliver Neukum <oneukum@suse.com>,
+	Foster Snowhill <forst@pen.gy>,
+	Georgi Valkov <gvalkov@gmail.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 4/7] net: phy: vitesse: repair vsc73xx autonegotiation
-Date: Fri, 23 Aug 2024 10:05:59 -0400
-Message-ID: <20240823140611.1975950-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 1/6] usbnet: ipheth: race between ipheth_close and error handling
+Date: Fri, 23 Aug 2024 10:06:22 -0400
+Message-ID: <20240823140636.1976114-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240823140611.1975950-1-sashal@kernel.org>
-References: <20240823140611.1975950-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,77 +65,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.282
+X-stable-base: Linux 4.19.320
 Content-Transfer-Encoding: 8bit
 
-From: Pawel Dembicki <paweldembicki@gmail.com>
+From: Oliver Neukum <oneukum@suse.com>
 
-[ Upstream commit de7a670f8defe4ed2115552ad23dea0f432f7be4 ]
+[ Upstream commit e5876b088ba03a62124266fa20d00e65533c7269 ]
 
-When the vsc73xx mdio bus work properly, the generic autonegotiation
-configuration works well.
+ipheth_sndbulk_callback() can submit carrier_work
+as a part of its error handling. That means that
+the driver must make sure that the work is cancelled
+after it has made sure that no more URB can terminate
+with an error condition.
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+Hence the order of actions in ipheth_close() needs
+to be inverted.
+
+Signed-off-by: Oliver Neukum <oneukum@suse.com>
+Signed-off-by: Foster Snowhill <forst@pen.gy>
+Tested-by: Georgi Valkov <gvalkov@gmail.com>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/phy/vitesse.c | 14 --------------
- 1 file changed, 14 deletions(-)
+ drivers/net/usb/ipheth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/vitesse.c b/drivers/net/phy/vitesse.c
-index bb680352708a6..3f594c8784e20 100644
---- a/drivers/net/phy/vitesse.c
-+++ b/drivers/net/phy/vitesse.c
-@@ -232,16 +232,6 @@ static int vsc739x_config_init(struct phy_device *phydev)
+diff --git a/drivers/net/usb/ipheth.c b/drivers/net/usb/ipheth.c
+index cea005cc7b2ab..c762335587a43 100644
+--- a/drivers/net/usb/ipheth.c
++++ b/drivers/net/usb/ipheth.c
+@@ -407,8 +407,8 @@ static int ipheth_close(struct net_device *net)
+ {
+ 	struct ipheth_device *dev = netdev_priv(net);
+ 
+-	cancel_delayed_work_sync(&dev->carrier_work);
+ 	netif_stop_queue(net);
++	cancel_delayed_work_sync(&dev->carrier_work);
  	return 0;
  }
  
--static int vsc73xx_config_aneg(struct phy_device *phydev)
--{
--	/* The VSC73xx switches does not like to be instructed to
--	 * do autonegotiation in any way, it prefers that you just go
--	 * with the power-on/reset defaults. Writing some registers will
--	 * just make autonegotiation permanently fail.
--	 */
--	return 0;
--}
--
- /* This adds a skew for both TX and RX clocks, so the skew should only be
-  * applied to "rgmii-id" interfaces. It may not work as expected
-  * on "rgmii-txid", "rgmii-rxid" or "rgmii" interfaces. */
-@@ -424,7 +414,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	/* PHY_GBIT_FEATURES */
- 	.config_init    = vsc738x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
-@@ -433,7 +422,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	/* PHY_GBIT_FEATURES */
- 	.config_init    = vsc738x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
-@@ -442,7 +430,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	/* PHY_GBIT_FEATURES */
- 	.config_init    = vsc739x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
-@@ -451,7 +438,6 @@ static struct phy_driver vsc82xx_driver[] = {
- 	.phy_id_mask    = 0x000ffff0,
- 	/* PHY_GBIT_FEATURES */
- 	.config_init    = vsc739x_config_init,
--	.config_aneg    = vsc73xx_config_aneg,
- 	.read_page      = vsc73xx_read_page,
- 	.write_page     = vsc73xx_write_page,
- }, {
 -- 
 2.43.0
 
