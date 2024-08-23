@@ -1,281 +1,214 @@
-Return-Path: <netdev+bounces-121407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 901BA95CFF1
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:33:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F02D95CFD1
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:30:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D2D6B29538
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:31:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25FCA1C2095C
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FBE918BBB3;
-	Fri, 23 Aug 2024 14:16:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76BA18BB90;
+	Fri, 23 Aug 2024 14:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=detlev.casanova@collabora.com header.b="LR1WYfNr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GldC4y8Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8693418891A;
-	Fri, 23 Aug 2024 14:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724422593; cv=pass; b=NWpBb8K0QqJNVX6N1URkr5gbK7WwNM5kN0cyurnGHfEJRysWkfRFsWGLVDYzs+vBOGLCJQIsb/8+XtiraAADJt4Kw2fPybzkN+Sd+DdEzO3M9I4+qHLrBvGCB6kQG917XwN9gvbVqnOMYT6EDq2eQqhmQ8xDKe15/kejmX+WX8w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724422593; c=relaxed/simple;
-	bh=HZO4Fn7uT0+3ywae+WrJ5/p6zcFAjT38AMp9rlfMrME=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CW91vB6uRu3cyahZJQRpCszKOxSFCN+FUzk5Y+a584l4NhQ9Dj91g1t/3eb/8I5IMxC9kQx+dPVO1cshwLATjJxY779/X2OWe65qiXAW52i4eQ6nEOuRKZrSA2kfOy3aJ6eUHgMA9PYwUlLPPqk/3Hxe+IwqNTRSXL73sIzuIIY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=detlev.casanova@collabora.com header.b=LR1WYfNr; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-Delivered-To: kernel@collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1724422318; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=QO4vDxNQm7lECtSsEuPb/nP1bVxT1hOZWN9kZehI75pLEhwTcl7WFu0watvxPY9+pRK9h7LHudtcsDe5SxE0QqGYmStPL89nRTeSJ7PJctp+67uwMnR9B0LW5zSbqT9DbHG02gZCCNpCehHWdQhATjhvh8GdQxxBUCWcghPintQ=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1724422318; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=0I/gOe2olB2UJ8EXulUVw+DiKLiQD2/3PagiaG7Djyc=; 
-	b=LyQkRS9XSvSSX/ft8kqebeE43p65UC2tJl3vCU5zC6lFxYojrP1pLnJAX04Eybx/IrlgSWklCs38ylUt2f1I3hbu8eQsGc24JQcjxEGZmdUN8nAe2ox5Ijx1l3L6MKAwAwx75p6cnXZAF1kK/3m20bSdzx7jTBpizbXdr5e/a9k=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=detlev.casanova@collabora.com;
-	dmarc=pass header.from=<detlev.casanova@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1724422318;
-	s=zohomail; d=collabora.com; i=detlev.casanova@collabora.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=0I/gOe2olB2UJ8EXulUVw+DiKLiQD2/3PagiaG7Djyc=;
-	b=LR1WYfNrFOuYElnKXcypmhyAUhqJMEe3kiAubM//xU3MSSxdycL9Sv6f2k20/P6Q
-	dKUQMyoKhJK+WGjgYQZVTTi29DzQWORcdnCLmfPG8CK/TOne7CN9LS9jlnH3Jp/nO56
-	Yr0ult09I4xfJS1APBJAOmRZCzYt92IETh8zNTJA=
-Received: by mx.zohomail.com with SMTPS id 1724422316723254.568031036727;
-	Fri, 23 Aug 2024 07:11:56 -0700 (PDT)
-From: Detlev Casanova <detlev.casanova@collabora.com>
-To: linux-kernel@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	David Wu <david.wu@rock-chips.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	kernel@collabora.com,
-	Detlev Casanova <detlev.casanova@collabora.com>
-Subject: [PATCH v3 3/3] ethernet: stmmac: dwmac-rk: Add GMAC support for RK3576
-Date: Fri, 23 Aug 2024 10:11:15 -0400
-Message-ID: <20240823141318.51201-4-detlev.casanova@collabora.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240823141318.51201-1-detlev.casanova@collabora.com>
-References: <20240823141318.51201-1-detlev.casanova@collabora.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C0EB18BB9A;
+	Fri, 23 Aug 2024 14:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724422410; cv=none; b=Ll+hTG4cyt91FhxXUUOT1G4XKBBupGTmZjVMBcuGyd54CU6BNelqmiMLCA2h/gTNgcaLBpY9DLgeXG6m+Zfhy96pCUVe5clLkfojEur2/tjTQY/bOwrpyQH7iAnjDKc56v35/GOqF2gRYJTLFO8mtNe6zXuEauugkl2AH/NxGRM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724422410; c=relaxed/simple;
+	bh=a+VW+8QoBbMiCVC5Oj2GpnDDg+LAHSi55S3BmDqtBL0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XhQPd/eP4ehTRe5ogp4F0rr2wpe6chpPZvehCuLF2KL28N2v/8OAXgsY3G486Lrilro/EaYPk7h3R17Mz6ZVZFZTGnWjRHAHujm7RAA64GAMA7N6pQ8PuX8bExixs+iIcaB+rGJoNu1DWcUFOvykeqcyAeW5nynMz5Ho3IOr9C8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GldC4y8Y; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724422409; x=1755958409;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=a+VW+8QoBbMiCVC5Oj2GpnDDg+LAHSi55S3BmDqtBL0=;
+  b=GldC4y8YuK6dhllfZI1vKqtf8id27g5+FM+xV/XlJJ6WyTSsfkM1E2fm
+   lH+PJ49OIFjjPJFErg79aBwNDplU4lYSZ9Uc/VxAcyqnni8yGQj5IFHFG
+   ZXByn05VfS2zhfK5hoc0EIc69Oq6olPNqvhV1hQqZQz0Cf579xDuoMsLy
+   yZZOy1vJqReU6DH0kvd9/gt+7TSt02Bf5AdumUBF9cy7b8TpL4mWgOL4U
+   RwNRQA23bMBmptWLDJJXGRozpbhwzKqF2MxxM+OHzlffy+kH74OWJrprG
+   ix56YVvDbBdbp+RwITAV6vFdxgPT8iVqsJpgFhs8mQzdOdooc+YiQlbc6
+   Q==;
+X-CSE-ConnectionGUID: /Bl3bjs4TqWmWkoPOuK+zw==
+X-CSE-MsgGUID: Gh5ZojHkQBmWs867nHPUow==
+X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="33460159"
+X-IronPort-AV: E=Sophos;i="6.10,170,1719903600"; 
+   d="scan'208";a="33460159"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 07:13:29 -0700
+X-CSE-ConnectionGUID: j/Gc6aD8Sk+oDC9kHpgLkw==
+X-CSE-MsgGUID: MdynuL4qTbqCTas1Zy2gPQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,170,1719903600"; 
+   d="scan'208";a="61779274"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 07:13:25 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1shV2X-00000000ofo-1dm9;
+	Fri, 23 Aug 2024 17:13:21 +0300
+Date: Fri, 23 Aug 2024 17:13:20 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: andi.shyti@kernel.org, jarkko.nikula@linux.intel.com,
+	mika.westerberg@linux.intel.com, jsd@semihalf.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, rmk+kernel@armlinux.org.uk,
+	piotr.raczynski@intel.com, andrew@lunn.ch,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	mengyuanlou@net-swift.com, duanqiangwen@net-swift.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net 3/3] i2c: designware: support hardware lock for
+ Wangxun 10Gb NIC
+Message-ID: <ZsiZALjnoUpb0H_I@smile.fi.intel.com>
+References: <20240823030242.3083528-1-jiawenwu@trustnetic.com>
+ <20240823030242.3083528-4-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240823030242.3083528-4-jiawenwu@trustnetic.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-From: David Wu <david.wu@rock-chips.com>
+On Fri, Aug 23, 2024 at 11:02:42AM +0800, Jiawen Wu wrote:
+> Support acquire_lock() and release_lock() for Wangxun 10Gb NIC. Since the
+> firmware needs to access I2C all the time for some features, the semaphore
+> is used between software and firmware. The driver should set software
+> semaphore before accessing I2C bus and release it when it is finished.
+> Otherwise, there is probability that the correct information on I2C bus
+> will not be obtained.
 
-Add constants and callback functions for the dwmac on RK3576 soc.
+...
 
-Signed-off-by: David Wu <david.wu@rock-chips.com>
-[rebase, extracted bindings]
-Signed-off-by: Detlev Casanova <detlev.casanova@collabora.com>
-Reviewed-by: Heiko Stuebner <heiko@sntech.de>
----
- .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 156 ++++++++++++++++++
- 1 file changed, 156 insertions(+)
+>  i2c-designware-core-$(CONFIG_I2C_DESIGNWARE_SLAVE) 	+= i2c-designware-slave.o
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 9cf0aa58d13bf..50073bdade46e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -1116,6 +1116,161 @@ static const struct rk_gmac_ops rk3568_ops = {
- 	},
- };
- 
-+/* VCCIO0_1_3_IOC */
-+#define RK3576_VCCIO0_1_3_IOC_CON2		0X6408
-+#define RK3576_VCCIO0_1_3_IOC_CON3		0X640c
-+#define RK3576_VCCIO0_1_3_IOC_CON4		0X6410
-+#define RK3576_VCCIO0_1_3_IOC_CON5		0X6414
-+
-+#define RK3576_GMAC_RXCLK_DLY_ENABLE		GRF_BIT(15)
-+#define RK3576_GMAC_RXCLK_DLY_DISABLE		GRF_CLR_BIT(15)
-+#define RK3576_GMAC_TXCLK_DLY_ENABLE		GRF_BIT(7)
-+#define RK3576_GMAC_TXCLK_DLY_DISABLE		GRF_CLR_BIT(7)
-+
-+#define RK3576_GMAC_CLK_RX_DL_CFG(val)		HIWORD_UPDATE(val, 0x7F, 8)
-+#define RK3576_GMAC_CLK_TX_DL_CFG(val)		HIWORD_UPDATE(val, 0x7F, 0)
-+
-+/* SDGMAC_GRF */
-+#define RK3576_GRF_GMAC_CON0			0X0020
-+#define RK3576_GRF_GMAC_CON1			0X0024
-+
-+#define RK3576_GMAC_RMII_MODE			GRF_BIT(3)
-+#define RK3576_GMAC_RGMII_MODE			GRF_CLR_BIT(3)
-+
-+#define RK3576_GMAC_CLK_SELECT_IO		GRF_BIT(7)
-+#define RK3576_GMAC_CLK_SELECT_CRU		GRF_CLR_BIT(7)
-+
-+#define RK3576_GMAC_CLK_RMII_DIV2		GRF_BIT(5)
-+#define RK3576_GMAC_CLK_RMII_DIV20		GRF_CLR_BIT(5)
-+
-+#define RK3576_GMAC_CLK_RGMII_DIV1		\
-+			(GRF_CLR_BIT(6) | GRF_CLR_BIT(5))
-+#define RK3576_GMAC_CLK_RGMII_DIV5		\
-+			(GRF_BIT(6) | GRF_BIT(5))
-+#define RK3576_GMAC_CLK_RGMII_DIV50		\
-+			(GRF_BIT(6) | GRF_CLR_BIT(5))
-+
-+#define RK3576_GMAC_CLK_RMII_GATE		GRF_BIT(4)
-+#define RK3576_GMAC_CLK_RMII_NOGATE		GRF_CLR_BIT(4)
-+
-+static void rk3576_set_to_rgmii(struct rk_priv_data *bsp_priv,
-+				int tx_delay, int rx_delay)
-+{
-+	struct device *dev = &bsp_priv->pdev->dev;
-+	unsigned int offset_con;
-+
-+	if (IS_ERR(bsp_priv->grf) || IS_ERR(bsp_priv->php_grf)) {
-+		dev_err(dev, "Missing rockchip,grf or rockchip,php-grf property\n");
-+		return;
-+	}
-+
-+	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
-+					 RK3576_GRF_GMAC_CON0;
-+
-+	regmap_write(bsp_priv->grf, offset_con, RK3576_GMAC_RGMII_MODE);
-+
-+	offset_con = bsp_priv->id == 1 ? RK3576_VCCIO0_1_3_IOC_CON4 :
-+					 RK3576_VCCIO0_1_3_IOC_CON2;
-+
-+	/* m0 && m1 delay enabled */
-+	regmap_write(bsp_priv->php_grf, offset_con,
-+		     DELAY_ENABLE(RK3576, tx_delay, rx_delay));
-+	regmap_write(bsp_priv->php_grf, offset_con + 0x4,
-+		     DELAY_ENABLE(RK3576, tx_delay, rx_delay));
-+
-+	/* m0 && m1 delay value */
-+	regmap_write(bsp_priv->php_grf, offset_con,
-+		     RK3576_GMAC_CLK_TX_DL_CFG(tx_delay) |
-+		     RK3576_GMAC_CLK_RX_DL_CFG(rx_delay));
-+	regmap_write(bsp_priv->php_grf, offset_con + 0x4,
-+		     RK3576_GMAC_CLK_TX_DL_CFG(tx_delay) |
-+		     RK3576_GMAC_CLK_RX_DL_CFG(rx_delay));
-+}
-+
-+static void rk3576_set_to_rmii(struct rk_priv_data *bsp_priv)
-+{
-+	struct device *dev = &bsp_priv->pdev->dev;
-+	unsigned int offset_con;
-+
-+	if (IS_ERR(bsp_priv->grf)) {
-+		dev_err(dev, "%s: Missing rockchip,grf property\n", __func__);
-+		return;
-+	}
-+
-+	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
-+					 RK3576_GRF_GMAC_CON0;
-+
-+	regmap_write(bsp_priv->grf, offset_con, RK3576_GMAC_RMII_MODE);
-+}
-+
-+static void rk3576_set_gmac_speed(struct rk_priv_data *bsp_priv, int speed)
-+{
-+	struct device *dev = &bsp_priv->pdev->dev;
-+	unsigned int val = 0, offset_con;
-+
-+	switch (speed) {
-+	case 10:
-+		if (bsp_priv->phy_iface == PHY_INTERFACE_MODE_RMII)
-+			val = RK3576_GMAC_CLK_RMII_DIV20;
-+		else
-+			val = RK3576_GMAC_CLK_RGMII_DIV50;
-+		break;
-+	case 100:
-+		if (bsp_priv->phy_iface == PHY_INTERFACE_MODE_RMII)
-+			val = RK3576_GMAC_CLK_RMII_DIV2;
-+		else
-+			val = RK3576_GMAC_CLK_RGMII_DIV5;
-+		break;
-+	case 1000:
-+		if (bsp_priv->phy_iface != PHY_INTERFACE_MODE_RMII)
-+			val = RK3576_GMAC_CLK_RGMII_DIV1;
-+		else
-+			goto err;
-+		break;
-+	default:
-+		goto err;
-+	}
-+
-+	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
-+					 RK3576_GRF_GMAC_CON0;
-+
-+	regmap_write(bsp_priv->grf, offset_con, val);
-+
-+	return;
-+err:
-+	dev_err(dev, "unknown speed value for GMAC speed=%d", speed);
-+}
-+
-+static void rk3576_set_clock_selection(struct rk_priv_data *bsp_priv, bool input,
-+				       bool enable)
-+{
-+	unsigned int val = input ? RK3576_GMAC_CLK_SELECT_IO :
-+				   RK3576_GMAC_CLK_SELECT_CRU;
-+	unsigned int offset_con;
-+
-+	val |= enable ? RK3576_GMAC_CLK_RMII_NOGATE :
-+			RK3576_GMAC_CLK_RMII_GATE;
-+
-+	offset_con = bsp_priv->id == 1 ? RK3576_GRF_GMAC_CON1 :
-+					 RK3576_GRF_GMAC_CON0;
-+
-+	regmap_write(bsp_priv->grf, offset_con, val);
-+}
-+
-+static const struct rk_gmac_ops rk3576_ops = {
-+	.set_to_rgmii = rk3576_set_to_rgmii,
-+	.set_to_rmii = rk3576_set_to_rmii,
-+	.set_rgmii_speed = rk3576_set_gmac_speed,
-+	.set_rmii_speed = rk3576_set_gmac_speed,
-+	.set_clock_selection = rk3576_set_clock_selection,
-+	.regs_valid = true,
-+	.regs = {
-+		0x2a220000, /* gmac0 */
-+		0x2a230000, /* gmac1 */
-+		0x0, /* sentinel */
-+	},
-+};
-+
- /* sys_grf */
- #define RK3588_GRF_GMAC_CON7			0X031c
- #define RK3588_GRF_GMAC_CON8			0X0320
-@@ -1908,6 +2063,7 @@ static const struct of_device_id rk_gmac_dwmac_match[] = {
- 	{ .compatible = "rockchip,rk3368-gmac", .data = &rk3368_ops },
- 	{ .compatible = "rockchip,rk3399-gmac", .data = &rk3399_ops },
- 	{ .compatible = "rockchip,rk3568-gmac", .data = &rk3568_ops },
-+	{ .compatible = "rockchip,rk3576-gmac", .data = &rk3576_ops },
- 	{ .compatible = "rockchip,rk3588-gmac", .data = &rk3588_ops },
- 	{ .compatible = "rockchip,rv1108-gmac", .data = &rv1108_ops },
- 	{ .compatible = "rockchip,rv1126-gmac", .data = &rv1126_ops },
+>  i2c-designware-platform-y 				:= i2c-designware-platdrv.o
+> +i2c-designware-platform-y 				+= i2c-designware-wx.o
+
+These lines have TABs/spaces mixture. Please fix at least your entry to avoid
+this from happening.
+
+
+...
+
+>  int i2c_dw_amdpsp_probe_lock_support(struct dw_i2c_dev *dev);
+>  #endif
+
+^^^
+
+> +int i2c_dw_txgbe_probe_lock_support(struct dw_i2c_dev *dev);
+
+See below.
+
+...
+
+>  		.probe = i2c_dw_amdpsp_probe_lock_support,
+>  	},
+>  #endif
+
+^^^
+
+> +	{
+> +		.probe = i2c_dw_txgbe_probe_lock_support,
+> +	},
+
+Do we all need this support? Even if the driver is not compiled? Why?
+
+...
+
+> +#include <linux/platform_data/i2c-wx.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/i2c.h>
+> +#include <linux/pci.h>
+
+This is a semi-random list. Please, take your time to understand the core you
+wrote. Follow IWYU principle.
+
+...
+
+> +static int i2c_dw_txgbe_acquire_lock(struct dw_i2c_dev *dev)
+> +{
+> +	void __iomem *req_addr;
+> +	u32 swsm;
+> +	int i;
+> +
+> +	req_addr = dev->ext + I2C_DW_TXGBE_MNG_SW;
+> +
+> +	for (i = 0; i < I2C_DW_TXGBE_REQ_RETRY_CNT; i++) {
+
+Retry loops much better in a form of
+
+	unsigned int retries = ...;
+	...
+	do {
+		...
+	} while (--retries);
+
+BUT... see below.
+
+> +		writel(I2C_DW_TXGBE_MNG_SW_SM, req_addr);
+> +
+> +		/* If we set the bit successfully then we got semaphore. */
+> +		swsm = readl(req_addr);
+> +		if (swsm & I2C_DW_TXGBE_MNG_SW_SM)
+> +			break;
+> +
+> +		udelay(50);
+
+So, can a macro from iopoll.h be utilised here? Why not?
+
+> +	}
+> +
+> +	if (i == I2C_DW_TXGBE_REQ_RETRY_CNT)
+> +		return -ETIMEDOUT;
+> +
+> +	return 0;
+> +}
+
+> +int i2c_dw_txgbe_probe_lock_support(struct dw_i2c_dev *dev)
+> +{
+> +	struct platform_device *pdev = to_platform_device(dev->dev);
+
+Why do you need this dance? I.o.w. how pdev is being used here?
+
+> +	struct txgbe_i2c_platform_data *pdata;
+> +
+> +	pdata = dev_get_platdata(&pdev->dev);
+> +	if (!pdata)
+> +		return -ENXIO;
+> +
+> +	dev->ext = pdata->hw_addr;
+> +	if (!dev->ext)
+> +		return -ENXIO;
+> +
+> +	dev->acquire_lock = i2c_dw_txgbe_acquire_lock;
+> +	dev->release_lock = i2c_dw_txgbe_release_lock;
+> +
+> +	return 0;
+> +}
+
 -- 
-2.46.0
+With Best Regards,
+Andy Shevchenko
+
 
 
