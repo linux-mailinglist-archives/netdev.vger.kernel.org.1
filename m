@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-121529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A60595D893
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 23:34:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D59A95D895
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 23:35:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B6431C21A2D
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 21:34:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE7B11C21B2C
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 21:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4531925BF;
-	Fri, 23 Aug 2024 21:34:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20651940B7;
+	Fri, 23 Aug 2024 21:35:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oNywLXGy"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="QfUy3u6n"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA7E142E9D;
-	Fri, 23 Aug 2024 21:34:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89EA71BA296;
+	Fri, 23 Aug 2024 21:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724448894; cv=none; b=lSf3MA3HAwgPyZfNmFkkHstPo/zU5wgDf3Z/W8SA9pvE/q/cJ5E6mMl5NSUhBvvkHGBNUveKHvO7yHMPtibStIxSRh0NOT/nlkqmbaoiWlXu1pcUZe5UlsSnkiWMJ6/x1jskT2ym8s/UI/5D+JThRL1WkBcPHiRQZbrJUmaYgEg=
+	t=1724448909; cv=none; b=Pqrl4lWBRW/rVz+vNmx58f6TTJD3Lwrk2jygVfrMfgQgsqfiOyJNpWxO6VlSh46R3mm2PxyYAj3sAT7GewsPO4K2QoYv5ZdD6tmnpY8EBWdrZpr4zSu85ohzV5mS4Ca3fYAACEHr7+gEI8IfCM7PXgYxUr9nuT11Qq/8UiE4eSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724448894; c=relaxed/simple;
-	bh=Hultl50UUJbQCUdgUDsM+qhzR2FfPnUO6mE5AxXdbDw=;
+	s=arc-20240116; t=1724448909; c=relaxed/simple;
+	bh=d8CffSi+4SJNfqPnYWLq4ef6TH0Ej/uoHFg+U9+n9KI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jhriYBdE5bYwru4G/wrQzAxT9cks9Q9NGZwQ3/JlTEnu5AoVuOO9N6M5XKv8v6tcm1p2V0F+UC5AoZbFdRkKj4nWPE6cE2canPbkQGU3HqmE6tBEC8Poe3IWD0zgAMjI8w02aE/hegCFr65im4xRhy9XNOKju+2Hs+Hr8vRZQVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oNywLXGy; arc=none smtp.client-ip=217.70.183.196
+	 MIME-Version:Content-Type; b=CRHjGdAmxwYXDwCU41J6kLgD8IHl2oXeDoN4kJPpvGVZhbInFBl+tTPXi1vp28JYGFfpocHn4YH94QACiPxlDy1A9j7SZWdfFMc4+blQ5c/Ab3kJrblI36zA3N3ZmXVtE76cDwFophlxTEwUMRn/xec2GCn3UL0GBp0kNX8Ep58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=QfUy3u6n; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E15BCE0003;
-	Fri, 23 Aug 2024 21:34:47 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C159B1C0007;
+	Fri, 23 Aug 2024 21:35:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1724448889;
+	t=1724448905;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Hultl50UUJbQCUdgUDsM+qhzR2FfPnUO6mE5AxXdbDw=;
-	b=oNywLXGygpLucMoNcbVonNkG2twll/a/dc3LVBVnK4WnPxnWaLL7OUw/M1UuMH35sa4VMn
-	jHMtf9iThTL+P3Dpapazq+p6hwYN+iriDfRkTMcoYAa673+owBNoo4Zg1VKTBuPLYbTbRQ
-	rl0rOVuH1PPdKK72YzBx0CPSWJY0PbBEDnaknsJ2sdXqhXObBdcwNA6HR33yx1fKveTxKc
-	z0dpSaxe3ROcHbxuZ5jpvO+/Fe4kTx4LC/3F8aF7dy57wm3Bv62Rm86RzM6HBL9vu0pOB8
-	JK5Lc0/aUtZ7/9++jGljYlragZP8tUOc82aEXQpZ55zkhu5vHETG2R3UrVHewQ==
-Date: Fri, 23 Aug 2024 23:34:46 +0200
+	bh=YQ64TiOpt76SWpWJuyOFeKHuAqg5Gc6IoqAAgchMM8w=;
+	b=QfUy3u6nmI0PI58Kwg/EFCLkBgkH8f6Wv6tSNYUY2Dz2j566pzXO8bQsGrBRgMLjxhT2FO
+	XBaQgpIPro3NKgUQQUxCVQhG09ooaDpetMdzr13gMvKGwcN9K17xIC6ADAcYHwoNw+gorF
+	BNAOdrJ5qmE1wuGqnMWmnjnZD1w+FWhXchdmmhHGY0oNSiG8uobcO/01WLtnrGluBpQuZx
+	hmut+dM+QvUqAQaOjkRK6evwFuUrAYh8yrSM+89nOd/FFBkXppn5U2mhg5kln2j2qXQoD6
+	tazSJwf0hEIpi8l3MGQgdJGetxigaC7wZo06kip0yDrREHrpQYWKaTDMU1jhag==
+Date: Fri, 23 Aug 2024 23:35:01 +0200
 From: Kory Maincent <kory.maincent@bootlin.com>
 To: Kyle Swenson <kyle.swenson@est.tech>
 Cc: "o.rempel@pengutronix.de" <o.rempel@pengutronix.de>,
@@ -56,13 +56,14 @@ Cc: "o.rempel@pengutronix.de" <o.rempel@pengutronix.de>,
  "conor+dt@kernel.org" <conor+dt@kernel.org>, "thomas.petazzoni@bootlin.com"
  <thomas.petazzoni@bootlin.com>, "netdev@vger.kernel.org"
  <netdev@vger.kernel.org>, "devicetree@vger.kernel.org"
- <devicetree@vger.kernel.org>
-Subject: Re: [PATCH net-next v2 2/2] net: pse-pd: tps23881: Support
+ <devicetree@vger.kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: pse: tps23881: add
  reset-gpios
-Message-ID: <20240823233446.6a3662a1@kmaincent-XPS-13-7390>
-In-Reply-To: <20240822220100.3030184-3-kyle.swenson@est.tech>
+Message-ID: <20240823233501.17d61f0e@kmaincent-XPS-13-7390>
+In-Reply-To: <20240822220100.3030184-2-kyle.swenson@est.tech>
 References: <20240822220100.3030184-1-kyle.swenson@est.tech>
-	<20240822220100.3030184-3-kyle.swenson@est.tech>
+	<20240822220100.3030184-2-kyle.swenson@est.tech>
 Organization: bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -75,18 +76,15 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, 22 Aug 2024 22:01:22 +0000
+On Thu, 22 Aug 2024 22:01:21 +0000
 Kyle Swenson <kyle.swenson@est.tech> wrote:
 
-> The TPS23880/1 has an active-low reset pin that some boards connect to
-> the SoC to control when the TPS23880 is pulled out of reset.
->=20
-> Add support for this via a reset-gpios property in the DTS.
+> The TPS23881 has an active-low reset pin that can be connected to an
+> SoC.  Document this with the device-tree binding.
 
 Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 
 Thank you!
-
 --=20
 K=C3=B6ry Maincent, Bootlin
 Embedded Linux and kernel engineering
