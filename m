@@ -1,71 +1,65 @@
-Return-Path: <netdev+bounces-121380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 544F695CF27
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:13:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 267DF95CF3A
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:15:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02DC51F2860A
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:13:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AAE68B2B091
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:15:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC84619ABC3;
-	Fri, 23 Aug 2024 14:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B68E19D064;
+	Fri, 23 Aug 2024 14:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JRAPjnsr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="swriNiFn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B568A18BBA1;
-	Fri, 23 Aug 2024 14:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B5D19D062;
+	Fri, 23 Aug 2024 14:04:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724421840; cv=none; b=ED/wb1WEluSTZ2FyxTb2WFMGDxy157qk/nmomsW0g57IWVMrHFXhQSBEoPZ0XysTp3jJxX4xvhJe4O1aFgJYcU0l6hruR+wlMaSTm6yf2hi1z/a6F9lURJX0QEK5bMjMvT7PWrKcUbmTk3U9yEB8FyfWFw2lkz6a6QCFlNUDUeE=
+	t=1724421873; cv=none; b=dUCvFg3rwhr+WoLV+12dEhohokMjGVTX2nc61EN0DSYpwGRVl78DHqUcxP4B73cdpSz/Cwov2hhjZvGdwL2PbhZoQLpXtREneez6trZhw+q3Vfjkjb9KXI5Z67qq9Bh7FGNMXGH1Tx5HtPpImMMbDBFsD8zAVIeFHgCzzhLEh0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724421840; c=relaxed/simple;
-	bh=puTmv4xsqmpJFI+PMGcQwnS9bPy4XtIzMU074nWDteA=;
+	s=arc-20240116; t=1724421873; c=relaxed/simple;
+	bh=B01UTgvIToN2TIawqIAKwTVipLzfV4bmoRHB/+7kaHY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JXVf/BbxVAUaegKZERAdf56bKVQcwSVOARlztCwcdTQdJKulihGxv2DWQPagrMeYHiHDY+gZpv9pc2cPNtoQ/F6gjCTYnOsmEUDE/D46DL0F/H9J27u0fhtHwn8ENpCVXqsqHLmRtOjlF22dlCi+7dSjgSBP1nMlEoO9s9KgtFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JRAPjnsr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C54BC32786;
-	Fri, 23 Aug 2024 14:03:58 +0000 (UTC)
+	 MIME-Version; b=s113/Q2cvDvL7DtUuEIOvarCWaeGyTvgc7tbUBCEDItKPiy6jaGum2zUNDzAm1e2B5T8GILQVITFO0AxOAmfOZviGUC9c1QjsB3eZQtd8SWdSlOiU4G8LwsUAjpKUJghKsoxJL9cUobMgIE1iSvWunmK54vOU9Gt1f9pAYAclFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=swriNiFn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3D98C4AF0B;
+	Fri, 23 Aug 2024 14:04:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724421840;
-	bh=puTmv4xsqmpJFI+PMGcQwnS9bPy4XtIzMU074nWDteA=;
+	s=k20201202; t=1724421873;
+	bh=B01UTgvIToN2TIawqIAKwTVipLzfV4bmoRHB/+7kaHY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JRAPjnsrSTFvecKaV3ofBEL46BU65EFtD+eV+ApK2alL14gJrGuxTVKMNScZeIbA0
-	 gI7L+l2VGEivDkT5sOb0l6FXcy451Iou/EdGDMMSBizEFvTgROxFgPF10f73/u7KS9
-	 JfI1f+u13taoUC3OyznlycRYg4XMuYZiMstkXsj6SBrZYBn9l/pXmQBExrJ11VkYmZ
-	 9VrgDaMYYQzYi4Pd1aIZaVVDcuCXGBKy2Vc6vexVN+yi0JBNIhNtaRvqlcY/S278SV
-	 F0r4d8BfVHVgqRvIM08kxtR44rjOWbTGBRuK36IpZYU1S0Gj1Msyjpx20fs/Ea2LCJ
-	 7Wp49G7yC7+TA==
+	b=swriNiFnqyXpWBWI3Li3Fc/a4TPPZWdiABc0QSHPvUppZnb/QZ32RwJ+6I/YOZWNn
+	 F8zqKcz6TZunmXUl69QygTwABiNrdvbOvB1GqS5aHa1a5LO2CGalWEU59iaIs9fCVP
+	 mDtQfDP2eHeqHy26qOmX0Pu0F88eOTu1PZmMshGTbdRgchPzGGX1mpZ2S1jcdkP2RM
+	 0mgAiAUVAgpAN4KshPnSMYUhK2aMCcil7QPUYJYfi0r3VBim0doMyE9CZ58ncZCkB8
+	 JwLnCB8UIC7hn1q1+Uzz9tfmdccVT2cJnF8leedJKfmbGOYyMMgnEYjj17TxhW3tBm
+	 eT1WNNXvM4DHA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Peiyang Wang <wangpeiyang1@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Oliver Neukum <oneukum@suse.com>,
+	Foster Snowhill <forst@pen.gy>,
+	Georgi Valkov <gvalkov@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	yisen.zhuang@huawei.com,
-	salil.mehta@huawei.com,
-	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	horms@kernel.org,
-	wangjie125@huawei.com,
-	liuyonglong@huawei.com,
-	lanhao@huawei.com,
-	chenhao418@huawei.com,
-	shenjian15@huawei.com,
+	pabeni@redhat.com,
+	linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 19/20] net: hns3: use correct release function during uninitialization
-Date: Fri, 23 Aug 2024 10:02:33 -0400
-Message-ID: <20240823140309.1974696-19-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 03/13] usbnet: ipheth: race between ipheth_close and error handling
+Date: Fri, 23 Aug 2024 10:03:52 -0400
+Message-ID: <20240823140425.1975208-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240823140309.1974696-1-sashal@kernel.org>
-References: <20240823140309.1974696-1-sashal@kernel.org>
+In-Reply-To: <20240823140425.1975208-1-sashal@kernel.org>
+References: <20240823140425.1975208-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,38 +68,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.47
+X-stable-base: Linux 6.1.106
 Content-Transfer-Encoding: 8bit
 
-From: Peiyang Wang <wangpeiyang1@huawei.com>
+From: Oliver Neukum <oneukum@suse.com>
 
-[ Upstream commit 7660833d217528c8f2385528951ab820a031e4e3 ]
+[ Upstream commit e5876b088ba03a62124266fa20d00e65533c7269 ]
 
-pci_request_regions is called to apply for PCI I/O and memory resources
-when the driver is initialized, Therefore, when the driver is uninstalled,
-pci_release_regions should be used to release PCI I/O and memory resources
-instead of pci_release_mem_regions is used to release memory reasouces
-only.
+ipheth_sndbulk_callback() can submit carrier_work
+as a part of its error handling. That means that
+the driver must make sure that the work is cancelled
+after it has made sure that no more URB can terminate
+with an error condition.
 
-Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Hence the order of actions in ipheth_close() needs
+to be inverted.
+
+Signed-off-by: Oliver Neukum <oneukum@suse.com>
+Signed-off-by: Foster Snowhill <forst@pen.gy>
+Tested-by: Georgi Valkov <gvalkov@gmail.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c | 2 +-
+ drivers/net/usb/ipheth.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index c8059d96f64be..3b01447478159 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -11358,7 +11358,7 @@ static void hclge_pci_uninit(struct hclge_dev *hdev)
+diff --git a/drivers/net/usb/ipheth.c b/drivers/net/usb/ipheth.c
+index 6a769df0b4213..13381d87eeb09 100644
+--- a/drivers/net/usb/ipheth.c
++++ b/drivers/net/usb/ipheth.c
+@@ -353,8 +353,8 @@ static int ipheth_close(struct net_device *net)
+ {
+ 	struct ipheth_device *dev = netdev_priv(net);
  
- 	pcim_iounmap(pdev, hdev->hw.hw.io_base);
- 	pci_free_irq_vectors(pdev);
--	pci_release_mem_regions(pdev);
-+	pci_release_regions(pdev);
- 	pci_disable_device(pdev);
+-	cancel_delayed_work_sync(&dev->carrier_work);
+ 	netif_stop_queue(net);
++	cancel_delayed_work_sync(&dev->carrier_work);
+ 	return 0;
  }
  
 -- 
