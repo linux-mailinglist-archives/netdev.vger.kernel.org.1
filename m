@@ -1,124 +1,141 @@
-Return-Path: <netdev+bounces-121328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98DA895CBFB
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:04:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CE4195CC11
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:08:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB88C1C2124A
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 12:04:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B0082818B1
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 12:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71ADD18452A;
-	Fri, 23 Aug 2024 12:04:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D631718455C;
+	Fri, 23 Aug 2024 12:08:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Ko2ANyWU"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="iPI+BYN3"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DD2469D;
-	Fri, 23 Aug 2024 12:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF677469D;
+	Fri, 23 Aug 2024 12:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724414675; cv=none; b=MVblu1MdLFGNZmnnHEbaYu2JeoxMATt+jL4gHNuQOM/EYDKv19vV2Iii6WnAPMHFLY3pnijpdVTEqBxTww8XseEStN3q6Gr6+ZZTaYVCLhY5pmZiMYBVcdiLMDinJutC2GKY8zQFR/8f0BJkP35GtRwVP4BCPN5wW1QsByKPSdQ=
+	t=1724414888; cv=none; b=uiptCs8D7BjkXcj4HJGkc99Ee8HQOH2db5TeSG1M/mnpHeCLVbgHPGdiZaoPZWkfEC18OcU3CGFXzB5Lj3wAkykV3BuNSwqDm9rBAe7agO5la/w2eLvriC8Cx0qiACiPkzsLKgOWQl6pT55wD+IBNLTi08cXA+K2BMvA7LzUWts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724414675; c=relaxed/simple;
-	bh=uOYF9IBbjq6Df6OslTPVFxo8b9jkQGoqj13knP5UrIk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Nis9QVR7N8UGNO34fvkWYChWXJGGT2Vm7dZQshTPAajp0SmqDBDhjaHwqN4zFlq/xh6Ft/M/NEHA2o+qt/YKiUr8Yqr44z/SOUb2h15iz/1desf0fdgMam1kQXQoG6o/MOQEujtd/AXazucaa1UvtXiR+yRoSpGZPres6vvvmxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Ko2ANyWU; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47NC4FtF077941;
-	Fri, 23 Aug 2024 07:04:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1724414655;
-	bh=de03RW750H29gr36+zzX9jDRdtr7DE8b+i4kfXYLC4g=;
-	h=From:To:CC:Subject:Date;
-	b=Ko2ANyWUcWPSdcUqNKlPcVZ/3wZohcI7Er4DNpb3ZCfP5cv/uCz53P6ICkcwrjCtj
-	 EQFInw9+FqPfBpvvJeXC1fAie+I0/yfUiAZt+AZ0szOe3Hdhdsjw7j7GYnWbNgdImi
-	 BWqq69mckiQs3SOZK0aAJqtmwcii6naL1uImyABE=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47NC4FnV058122
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 23 Aug 2024 07:04:15 -0500
-Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 23
- Aug 2024 07:04:15 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 23 Aug 2024 07:04:15 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47NC4FsB023971;
-	Fri, 23 Aug 2024 07:04:15 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 47NC4ETt021895;
-	Fri, 23 Aug 2024 07:04:15 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: Andrew Lunn <andrew@lunn.ch>, Dan Carpenter <dan.carpenter@linaro.org>,
-        Diogo Ivo <diogo.ivo@siemens.com>, Jan Kiszka <jan.kiszka@siemens.com>,
-        Paolo
- Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net] net: ti: icssg-prueth: Fix 10M Link issue on AM64x
-Date: Fri, 23 Aug 2024 17:34:12 +0530
-Message-ID: <20240823120412.1262536-1-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1724414888; c=relaxed/simple;
+	bh=ZLHQc0IpZLg9q4x1Zu/43JVc/lyLKGgnVMcNtBKYDlo=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Ze0/gHYZNZpXqnQ+6vReoAwhDYCjWNrj5rYQYw0gpo/b93DLQqwVyfyM9R/8gxq/q5SJCiuUoFC+ybzMmy+oueP6Lstf6fUM3Mqn45wRl0wCx5HFDOqyGfUW+mMrBaeqsoUIzQsWsXYCBu8qhj0iWI++GN//jDNXcU84vZ2wA94=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=iPI+BYN3; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=qOpiN0yfFcQklO8pw7LWA14dBrUyLAlm9Cq1gHMDPM4=; b=iPI+BYN3dTx2KXVDY5zCqRYwKi
+	ruvtzsvl5jZ+sxjO5pm6nqqHUBZWvm5ArFalVZJnov788BxZ8EkpuL9eBrRPUBIyvPE0kxqWvEzuB
+	QgGLgDNYHNjW8a/+h4eR+D9mPD6+QIJuSLR+BHj4JnOCuSOaa/k3rBrMvpJAv/CN6ncZaSEnmv8lH
+	L8qkawPDP9yukC19xy4oG6OuB0Jmo/DcRMgBlmrLkSGFK0hrYHGRw6RyOKUXOWBfXwv6hD65M1UuE
+	ryOaerXlKBOL422+wR1fmWaqLbnKLgYCjo+KfWMPANzPAjfSKiMss3kMhOaOAsMaoXIyw8DLm/DcT
+	HvBVESQw==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1shT51-000N3H-GY; Fri, 23 Aug 2024 14:07:47 +0200
+Received: from [178.197.248.23] (helo=linux-2.home)
+	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1shT4z-00076m-3C;
+	Fri, 23 Aug 2024 14:07:46 +0200
+Subject: Re: [PATCH bpf-next v2] net: Don't allow to attach xdp if bond slave
+ device's upper already has a program
+To: Jiri Pirko <jiri@resnulli.us>, Feng zhou <zhoufeng.zf@bytedance.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org, hawk@kernel.org,
+ john.fastabend@gmail.com, bigeasy@linutronix.de, lorenzo@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com,
+ =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>
+References: <20240823084204.67812-1-zhoufeng.zf@bytedance.com>
+ <Zsh4vPAPBKdRUq8H@nanopsycho.orion>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <6d38eaf5-0a13-9f85-3a5d-0ca354bc45d5@iogearbox.net>
+Date: Fri, 23 Aug 2024 14:07:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <Zsh4vPAPBKdRUq8H@nanopsycho.orion>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27376/Fri Aug 23 10:47:45 2024)
 
-Crash is seen on AM64x 10M link when connecting / disconnecting multiple
-times.
+On 8/23/24 1:55 PM, Jiri Pirko wrote:
+> Fri, Aug 23, 2024 at 10:42:04AM CEST, zhoufeng.zf@bytedance.com wrote:
+>> From: Feng Zhou <zhoufeng.zf@bytedance.com>
+>>
+>> Cannot attach when an upper device already has a program, This
+>> restriction is only for bond's slave devices or team port, and
+>> should not be accidentally injured for devices like eth0 and vxlan0.
+> 
+> What if I attach xdp program to solo netdev and then I enslave it
+> to bond/team netdev that already has xdp program attached?
+> What prevents me from doing that?
 
-The fix for this is to enable quirk_10m_link_issue for AM64x.
+In that case the enslaving of the device to bond(/team) must fail as
+otherwise the latter won't be able to propagate the XDP prog downwards.
 
-Fixes: b256e13378a9 ("net: ti: icssg-prueth: Add AM64x icssg support")
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
-NOTE: If quirk_10m_link_issue is set, the ICSSG driver enables IEP1 which
-fixes the 10M link issue.
+Feng, did you double check if we have net or BPF selftest coverage for
+that? If not might be good to add.
 
-As per Roger Quadros <rogerq@kernel.org> 's suggestion [1], posting this
-as a separate patch.
-
-[1] https://lore.kernel.org/all/cde0064d-83dd-4a7f-8921-053c25aae08b@kernel.org/
-
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 3e51b3a9b0a5..e3451beed323 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1452,6 +1452,7 @@ static const struct prueth_pdata am654_icssg_pdata = {
- 
- static const struct prueth_pdata am64x_icssg_pdata = {
- 	.fdqring_mode = K3_RINGACC_RING_MODE_RING,
-+	.quirk_10m_link_issue = 1,
- 	.switch_mode = 1,
- };
- 
-
-base-commit: 82b8000c28b56b014ce52a1f1581bef4af148681
--- 
-2.34.1
+>> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+>> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
+>> ---
+>> Changelog:
+>> v1->v2: Addressed comments from Paolo Abeni, Jiri Pirko
+>> - Use "netif_is_lag_port" relace of "netif_is_bond_slave"
+>> Details in here:
+>> https://lore.kernel.org/netdev/3bf84d23-a561-47ae-84a4-e99488fc762b@bytedance.com/T/
+>>
+>> net/core/dev.c | 10 ++++++----
+>> 1 file changed, 6 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/net/core/dev.c b/net/core/dev.c
+>> index f66e61407883..49144e62172e 100644
+>> --- a/net/core/dev.c
+>> +++ b/net/core/dev.c
+>> @@ -9502,10 +9502,12 @@ static int dev_xdp_attach(struct net_device *dev, struct netlink_ext_ack *extack
+>> 	}
+>>
+>> 	/* don't allow if an upper device already has a program */
+>> -	netdev_for_each_upper_dev_rcu(dev, upper, iter) {
+>> -		if (dev_xdp_prog_count(upper) > 0) {
+>> -			NL_SET_ERR_MSG(extack, "Cannot attach when an upper device already has a program");
+>> -			return -EEXIST;
+>> +	if (netif_is_lag_port(dev)) {
+>> +		netdev_for_each_upper_dev_rcu(dev, upper, iter) {
+>> +			if (dev_xdp_prog_count(upper) > 0) {
+>> +				NL_SET_ERR_MSG(extack, "Cannot attach when an upper device already has a program");
+>> +				return -EEXIST;
+>> +			}
+>> 		}
+>> 	}
+>>
+>> -- 
+>> 2.30.2
+>>
+> 
 
 
