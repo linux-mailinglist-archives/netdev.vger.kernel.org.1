@@ -1,163 +1,129 @@
-Return-Path: <netdev+bounces-121199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3D1795C236
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 02:18:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DFF295C260
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 02:24:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DA791F23707
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 00:18:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C11BF1C23028
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 00:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 638604A08;
-	Fri, 23 Aug 2024 00:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF73AD49;
+	Fri, 23 Aug 2024 00:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="XJmK5dWC";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="B7lYokOY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mp0Ug81o"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh4-smtp.messagingengine.com (fhigh4-smtp.messagingengine.com [103.168.172.155])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45891B653
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 00:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B9EBA46;
+	Fri, 23 Aug 2024 00:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724372282; cv=none; b=qim3u56OUu/54W7PFcX7lJgS34OmoVnAFw1DgXQ4RNEMAdXOyMY/uLdAQeRNRlhdpzoR4YT+e9r069z6rYaJz2Hbc87hdv1QHRMTsIj4L/AZNPTngzS3GRU22hpvic8uFkfr0dtvIRcu8AQ9elTEySz0KMCmN8QR5vSvkHzuq6o=
+	t=1724372643; cv=none; b=KqKVHUhAFAXTPFVxzT+Asz2EAw0rOuBsnyWjK09gUZIKtnnlmoClTNaX9tgMe1adoAUjtR6+FwCE2DJqcDAwaJkfsCzsZv2g062gZyUQTzkA0KPJrPOeTCvB84B0Mhys9FZOU7R4YPpuqaecMM2NiCPijIVnyv699lNEyRSe1UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724372282; c=relaxed/simple;
-	bh=zydv4H1agCQYAbA2bY5F8skc6y3QLACPCM2OrXjX2sg=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=Kc9e95ALTxX56HuLM/37iVk8t2opM78iZIj5cXzl4lHiJhrxIW3gqbnrLbm1gfu2YywXpjHPHeqIFmNGZmTHd/IAbjO1Xoku5A9upSrL3EujAmBrz7VPQ4th2IQT5r/1+MC6cu5JNSAVDg7svN9GppP1OGBh4S36lOZe28dBgLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=XJmK5dWC; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=B7lYokOY; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-08.internal (phl-compute-08.nyi.internal [10.202.2.48])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id 3276E114AB33;
-	Thu, 22 Aug 2024 20:17:59 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Thu, 22 Aug 2024 20:17:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-type:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1724372279; x=
-	1724458679; bh=z8NnpkHEjKStt+d806yRog8/0B+2alYelUCXntVupUE=; b=X
-	JmK5dWC2xL1eEPW8dQ7dAo6ATP7V/uxolzz9DDh2nI09y72eXgegAKQ1xtE36B7p
-	xIGSJQTTbkdUFngIcenD4e+vr6QwbY/GxI0/VuN9S2hR9EJimuYk9N4kUm83F4sB
-	evts8Ma7QQnSkdfetzhtofc5Cb0TEiBSRc+mX9e/anLW56VmDQQzMzhx4gdD9rMr
-	oaPeiFYr3XAq2bPV+dqksgpHTXKK0YMLtxP8ATSR1XR0074jCsHxauoYTojipWGV
-	gU+DbiS7eXVehxQlV3jeJ0ccX6O6m/ItZxc34qGLqrZZiOqtBVKRP3CuOW+xP9cD
-	7yWTueLC3RqJfKfWVkCBQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id:content-type
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1724372279; x=
-	1724458679; bh=z8NnpkHEjKStt+d806yRog8/0B+2alYelUCXntVupUE=; b=B
-	7lYokOY39mGVFBRkxPWWjpvvLvCpXOac9aZeGWA97kk7cQVydB5RVosmPo60534w
-	bZMK1+AUcUupaQZ5r7XGy1vdhLlQUtXxEfBw/vp395gzfrjRvs2ZqEqbqzjEYjTa
-	pYk+xkrrwEIpT6CFtENhIpSgHD82NRID/AFb+PrL3LlYBaSFge7ZAWKCAxjNTusX
-	9VHcTp7QV/zKhpwVFWC2PITRctzrJ9H48H8lRnigUnOIZOiSiHwg6woHXPY0Nqcz
-	btKSL/SPw5yFgVDzOOk5flH6Y0Yq8Cs4Zudqi5tYcQcGPUBWEyA1HDCmXt8xtT6R
-	M7Xv92fLc8Ks/qShSw2yw==
-X-ME-Sender: <xms:NtXHZrEGCcgamZdt2bz8z0317kestqn18ZYPm1iGSzFc6fzsSdtqWg>
-    <xme:NtXHZoX7_DigdYExfHfL6DYfWHBGxlGKcaRLIJzxg3d-6yXQSJrE2wyDr2502UiRz
-    vRBTfw9ROBYnGLb-P0>
-X-ME-Received: <xmr:NtXHZtLtrLlsSXHZLFJ-zPQl4Qkf4lqAscyt1-9l4zKl58nwV2StV1X3N0ASfn0VK3BBhQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddruddvuddgfeefucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhephffvvefujghfofggtgffkfesthdtredtredtvden
-    ucfhrhhomheplfgrhicugghoshgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrdhnvg
-    htqeenucggtffrrghtthgvrhhnpeejvdfghfetvedvudefvdejgeelteevkeevgedthfdu
-    keevieejueehkeegffejudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgspghrtghpthhtohep
-    uddvpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegurghvvghmsegurghvvghmlh
-    hofhhtrdhnvghtpdhrtghpthhtoheplhhiuhhhrghnghgsihhnsehgmhgrihhlrdgtohhm
-    pdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhope
-    grnhguhiesghhrvgihhhhouhhsvgdrnhgvthdprhgtphhtthhopehkuhgsrgeskhgvrhhn
-    vghlrdhorhhgpdhrtghpthhtohepghgrlhesnhhvihguihgrrdgtohhmpdhrtghpthhtoh
-    epjhhirghnsgholhesnhhvihguihgrrdgtohhmpdhrtghpthhtoheplhgvohhnrhhosehn
-    vhhiughirgdrtghomhdprhgtphhtthhopehsrggvvggumhesnhhvihguihgrrdgtohhm
-X-ME-Proxy: <xmx:NtXHZpFaxwp-Q9LZKzAfJwkDlpCP8Z4SmvjSyjGBOTal-TkqfxrM6g>
-    <xmx:NtXHZhWaLyrLKwvQ5Au5DSuvViR7B4pJ4rrQd3LJgc_sBdJ1IWFLTA>
-    <xmx:NtXHZkMV9nyI8rDlrhqnfjN6R8Zb088zU6nO0blFGZaCMMCoOH-kbQ>
-    <xmx:NtXHZg3RQnI4N3XKQ29umdT0ah2Vvxuba2q5zX-ua_WXfBPnHut-jQ>
-    <xmx:N9XHZqsuKckun6BT9rOr_6bxkgN101x3mEBzrm-af4lKyTolZnLeLJq8>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 22 Aug 2024 20:17:58 -0400 (EDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 1101A9FBF6; Thu, 22 Aug 2024 17:17:57 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 0DEF79FBF5;
-	Thu, 22 Aug 2024 17:17:57 -0700 (PDT)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Jianbo Liu <jianbol@nvidia.com>
-cc: "liuhangbin@gmail.com" <liuhangbin@gmail.com>,
-    "davem@davemloft.net" <davem@davemloft.net>,
-    Leon Romanovsky <leonro@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-    "andy@greyhouse.net" <andy@greyhouse.net>,
-    Tariq Toukan <tariqt@nvidia.com>,
-    "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-    "pabeni@redhat.com" <pabeni@redhat.com>,
-    "edumazet@google.com" <edumazet@google.com>,
-    Saeed Mahameed <saeedm@nvidia.com>,
-    "kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [PATCH net V5 3/3] bonding: change ipsec_lock from spin lock to
- mutex
-In-reply-to: <02d8277b-e6fc-44d4-8c88-2eb42813cd22@nvidia.com>
-References: <20240821090458.10813-1-jianbol@nvidia.com>
- <20240821090458.10813-4-jianbol@nvidia.com> <120654.1724256030@famine>
- <2fb7d110fd9d210e12a61ebb28af6faf330d6421.camel@nvidia.com>
- <139066.1724306729@famine> <02d8277b-e6fc-44d4-8c88-2eb42813cd22@nvidia.com>
-Comments: In-reply-to Jianbo Liu <jianbol@nvidia.com>
-   message dated "Thu, 22 Aug 2024 19:15:24 +0800."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1724372643; c=relaxed/simple;
+	bh=Lfa+jEqCITXRWgdOmQ2JKwJx+fGjGw9EOWy2Nx4XtAs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Qww9r8vFr1KuMqgeYcYtANcGnjxhJafSn4q4mxaHEk+VMTXKKsXbLR4B6nm3kZVAzBMgKYkjLofti1En7jvk6AmiolC2FlwZx5KInOPCSYY7hbIsfZN0Ptc7+XacC+POgW1ilEfC4XUboUdaVzQDdI+1i+zd5Q0N/lTbKpLGsdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mp0Ug81o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22EB7C32782;
+	Fri, 23 Aug 2024 00:24:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724372642;
+	bh=Lfa+jEqCITXRWgdOmQ2JKwJx+fGjGw9EOWy2Nx4XtAs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mp0Ug81olGx7mmEtbFl9yK+S1CFx5NRHHTFNy0ZYG7SgpUN2boOQS3kR9XujUbTMF
+	 dAProY9V/ZsjM4qYW8HngPrxInFmiQpvR+gmrYRwRsV3+TC7+mGQcbZizR6pQUHC08
+	 aHt4ANmEbGdylCT/u3gwYLMTjXas7TOz7MYa/6Rr53BWM8Xsqc8LIQMKx5F1ja0EED
+	 pb+vBezbOhBAgy3RIq//Wj93VWLaZvjcMrWV9Jvq1lA4JactWrue4RJIrSNM3v97t7
+	 Gp4BvveeARn+Tlqo67B1mhP3+tgD2rzIFX5wQz6GuPnYvG5BPSFa86s5JdsMwCyCOZ
+	 URDGbm1eUEQAQ==
+Date: Thu, 22 Aug 2024 17:24:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <u.kleine-koenig@pengutronix.de>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] net: ftgmac100: Get link speed and duplex for NC-SI
+Message-ID: <20240822172401.43fe8dd2@kernel.org>
+In-Reply-To: <20240822031945.3102130-1-jacky_chou@aspeedtech.com>
+References: <20240822031945.3102130-1-jacky_chou@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <165729.1724372277.1@famine>
-Date: Thu, 22 Aug 2024 17:17:57 -0700
-Message-ID: <165730.1724372277@famine>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Jianbo Liu <jianbol@nvidia.com> wrote:
+On Thu, 22 Aug 2024 11:19:45 +0800 Jacky Chou wrote:
+> The ethtool of this driver uses the phy API of ethtool
+> to get the link information from PHY driver.
+> Because the NC-SI is forced on 100Mbps and full duplex,
+> the driver connects a fixed-link phy driver for NC-SI.
 
-[...]
->I think it's good solution.
->So I need to add the dev_hold/dev_put as following, for example, for
->bond_ipsec_del_sa, right?
->
->@@ -526,6 +534,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
->        bond = netdev_priv(bond_dev);
->        slave = rcu_dereference(bond->curr_active_slave);
->        real_dev = slave ? slave->dev : NULL;
->+       dev_hold(real_dev);
->        rcu_read_unlock();
->
->        if (!slave)
->@@ -545,6 +554,7 @@ static void bond_ipsec_del_sa(struct xfrm_state *xs)
->
->        real_dev->xfrmdev_ops->xdo_dev_state_delete(xs);
-> out:
->+       dev_put(real_dev);
->        mutex_lock(&bond->ipsec_lock);
->        list_for_each_entry(ipsec, &bond->ipsec_list, list) {
->                if (ipsec->xs == xs) {
->
->If you are ok with that, I will add the same for
->bond_ipsec_add_sa/bond_ipsec_free_sa, and send new version.
+replace: the driver connects -> connect
 
-	Yes, I think that will work, but please use netdev_hold() as
-Jakub requested.
+> The ethtool will get the link information from the
+> fixed-link phy driver.
 
-	-J
+Hm. I defer to the PHY experts on the merits.
 
----
-	-Jay Vosburgh, jv@jvosburgh.net
+> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> ---
+> v2:
+>   - use static for struct fixed_phy_status ncsi_phy_status
+>   - Stop phy device at net_device stop when using NC-SI.
+>   - Start phy device at net_device start when using NC-SI.
+> ---
+>  drivers/net/ethernet/faraday/ftgmac100.c | 24 ++++++++++++++++++++++--
+>  1 file changed, 22 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+> index fddfd1dd5070..93862b027be0 100644
+> --- a/drivers/net/ethernet/faraday/ftgmac100.c
+> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
+> @@ -26,6 +26,7 @@
+>  #include <linux/of_net.h>
+>  #include <net/ip.h>
+>  #include <net/ncsi.h>
+> +#include <linux/phy_fixed.h>
+
+Keep the headers sorted, put the new one after of_net.h
+
+>  #include "ftgmac100.h"
+>  
+
+> @@ -1794,6 +1805,7 @@ static int ftgmac100_probe(struct platform_device *pdev)
+>  	struct net_device *netdev;
+>  	struct ftgmac100 *priv;
+>  	struct device_node *np;
+> +	struct phy_device *phydev;
+
+keep the variable declarations sorted longest to shortest if possible
+
+>  	int err = 0;
+>  
+>  	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+> @@ -1879,6 +1891,14 @@ static int ftgmac100_probe(struct platform_device *pdev)
+>  			err = -EINVAL;
+>  			goto err_phy_connect;
+>  		}
+> +
+> +		phydev = fixed_phy_register(PHY_POLL, &ncsi_phy_status, NULL);
+> +		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
+> +					 PHY_INTERFACE_MODE_MII);
+> +		if (err) {
+> +			dev_err(&pdev->dev, "Connecting PHY failed\n");
+> +			goto err_phy_connect;
+> +		}
+
+Very suspicious that you register it but you never unregister it.
+Are you sure the error path and .remove don't need to be changed?
+-- 
+pw-bot: cr
 
