@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-121525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DB6A95D864
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 23:19:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C78D95D867
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 23:19:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB076B21867
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 21:19:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76782B21844
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 21:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52CE4194C84;
-	Fri, 23 Aug 2024 21:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8EF1C823C;
+	Fri, 23 Aug 2024 21:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5pkNIHZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M+Vr4Ni5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976C81917D0
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 21:19:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE2A1C8235
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 21:19:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724447955; cv=none; b=CS0fHKrkQEBkR3IaSZ3SFWK33CdjWVzAz8/9rcSUn7hohOtRxKgtfxK2UQoCsrAWqKjdEMscEgSDccAv8b3alKPzf0Jzu2yUiRXWBeF3FALIWdUgGv4dt1zWRY511mdtf4hAkkgJV23coQSnQzoNi43D4kK5tdaXVA5FvSNFHic=
+	t=1724447959; cv=none; b=j3Ow5jhYhhwuvQj+xc9fVpSNi8RcTyszmDA7u8xDZaF9Lo5ctXZF1/xNpgNdQtBmxLWfVYcPUnx3PYd3ZxlI5rWtveaf0TV433eY2k93McWmJn/XmJp/3L+ghLKTMgcLDqvKNnKdJkGoYz14kffIdWvDvBg//JYlB8MSz2ew0qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724447955; c=relaxed/simple;
-	bh=XyCgw5UF4hvpNNbAF9WuDKiYF+S+ElScv26HhGg89EY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gdt6129MGFpFdmqO4PBZE0uFcJB9Ts023m0MVmOZfeA6wFCR7fS88qzSI6I6OBMiidAcrjtWNN4KxYQdxMIeVUqyBVmIbWAt10NiVs8Yl7c+EXcm/gZpCYyQ+NchxzWpL0V/XOK0a+wtb6YhJ7B3Pk53Dya6NeLU7fXntqK1xMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y5pkNIHZ; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1724447959; c=relaxed/simple;
+	bh=ra8d8mvAcL8zhdIyJ5ZY8A8nQDUJTO7T4BHUPzwU9ds=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LcgbaKUn/u38zzQsisUbRXxyuDpjywIfmxhxwd29D3GM4QmSpkRXwvpVQLZ20YkVMFlrL44jwT6Zf7VDvQWiRLsO5R8rR/Vqhm432Z+ZWL7TSTaezvqp3AKkip2zzBaCu802Tme9A8kLFS5vUj/XOx2WiWkaodLaByhJW7yKIbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M+Vr4Ni5; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724447952;
+	s=mimecast20190719; t=1724447955;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=7HfPS57VnLyk5BvUkJOD00Gk+0YtbDpDFzzh3Mg+yAE=;
-	b=Y5pkNIHZIuktEQd3OyIbZUZUkPx9kEM+JoaGhi9+N2qMg7Uy1qEfpA/YbT6dAQZG3Enc/N
-	PbZREFmoSPlZIWw5tXKehe5pztVq77M7W6v5BgycVJIAHkivXn+jpaoUXHMg74/d9gNArt
-	ZZbSMPhu3l+9AKoMIosICQV9hvHCYsg=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kDg8aTq0+IRJ2YG0WKlzlK9QrxdK9WrqE2P+1a17Yps=;
+	b=M+Vr4Ni5qAowcoCfuTvPfoNi2G/K4rrAccKPrZ/5G0ngxZ8yRL5DWszAu2RqLdCJol4FUw
+	flXSjtxwcR+daYtROFiQh1xlyxUgrGnspqvzY9Mgrw24ug+DTsU5yRW8YAXoRl/98KpIkj
+	/UgIngUt+AMnIp5fWYsETzywj+ieTF4=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-608-EtL3xGJ_P1mOYTfmHgnMOw-1; Fri,
- 23 Aug 2024 17:19:09 -0400
-X-MC-Unique: EtL3xGJ_P1mOYTfmHgnMOw-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-111-ZecDWR2RMYamaS2s9CdeFg-1; Fri,
+ 23 Aug 2024 17:19:12 -0400
+X-MC-Unique: ZecDWR2RMYamaS2s9CdeFg-1
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DFF39195608A;
-	Fri, 23 Aug 2024 21:19:07 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 089C419560A2;
+	Fri, 23 Aug 2024 21:19:11 +0000 (UTC)
 Received: from jmaloy-thinkpadp16vgen1.rmtcaqc.csb (unknown [10.22.8.17])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 84E41300019C;
-	Fri, 23 Aug 2024 21:19:04 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 089B33002246;
+	Fri, 23 Aug 2024 21:19:07 +0000 (UTC)
 From: jmaloy@redhat.com
 To: netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
@@ -66,9 +68,11 @@ Cc: kuba@kernel.org,
 	dgibson@redhat.com,
 	eric.dumazet@gmail.com,
 	edumazet@google.com
-Subject: [PATCH  0/2] Adding SO_PEEK_OFF for TCPv6
-Date: Fri, 23 Aug 2024 17:19:00 -0400
-Message-ID: <20240823211902.143210-1-jmaloy@redhat.com>
+Subject: [PATCH  1/2] tcp: add SO_PEEK_OFF socket option tor TCPv6
+Date: Fri, 23 Aug 2024 17:19:01 -0400
+Message-ID: <20240823211902.143210-2-jmaloy@redhat.com>
+In-Reply-To: <20240823211902.143210-1-jmaloy@redhat.com>
+References: <20240823211902.143210-1-jmaloy@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,18 +84,32 @@ X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
 From: Jon Maloy <jmaloy@redhat.com>
 
-Adding SO_PEEK_OFF for TCPv6 and selftest for both TCPv4 and TCPv6.
+When we added the SO_PEEK_OFF socket option to TCP we forgot
+to add it even for TCP on IPv6.
 
-Jon Maloy (2):
-  tcp: add SO_PEEK_OFF socket option tor TCPv6
-  selftests: add selftest for tcp SO_PEEK_OFF support
+We do that here.
 
- net/ipv6/af_inet6.c                           |   1 +
- tools/testing/selftests/net/Makefile          |   1 +
- tools/testing/selftests/net/tcp_so_peek_off.c | 181 ++++++++++++++++++
- 3 files changed, 183 insertions(+)
- create mode 100644 tools/testing/selftests/net/tcp_so_peek_off.c
+Fixes: 05ea491641d3 ("tcp: add support for SO_PEEK_OFF socket option")
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+Tested-by: Stefano Brivio <sbrivio@redhat.com>
+Signed-off-by: Jon Maloy <jmaloy@redhat.com>
+---
+ net/ipv6/af_inet6.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
+index 90d2c7e3f5e9..ba69b86f1c7d 100644
+--- a/net/ipv6/af_inet6.c
++++ b/net/ipv6/af_inet6.c
+@@ -708,6 +708,7 @@ const struct proto_ops inet6_stream_ops = {
+ 	.splice_eof	   = inet_splice_eof,
+ 	.sendmsg_locked    = tcp_sendmsg_locked,
+ 	.splice_read	   = tcp_splice_read,
++	.set_peek_off      = sk_set_peek_off,
+ 	.read_sock	   = tcp_read_sock,
+ 	.read_skb	   = tcp_read_skb,
+ 	.peek_len	   = tcp_peek_len,
 -- 
 2.45.2
 
