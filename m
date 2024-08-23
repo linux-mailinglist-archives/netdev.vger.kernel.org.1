@@ -1,110 +1,116 @@
-Return-Path: <netdev+bounces-121401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6DCD95CFBB
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:28:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A02E495CFD0
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 258FC1C2236B
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:28:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF282B26B4A
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 14:29:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59C2188A16;
-	Fri, 23 Aug 2024 14:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02495189501;
+	Fri, 23 Aug 2024 14:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Of0FALvd"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=detlev.casanova@collabora.com header.b="j16wgxcS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E868A188A0C;
-	Fri, 23 Aug 2024 14:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724422056; cv=none; b=MFY6Dpcd/3gt4tVvnQCqOCDW6qmeGtFl2HdSUTOemAurpN/qoJ2QZhl0W9tHhIeSdcYDphX+5EUxla+fySm018P2SXn52/BbU6OSkrYFwr9N1QKnfrVmj08X8F2z9GZE9rupe1+01zJx+NIrn8ifGZTHBbRKYXKxIKjPMu9kw04=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724422056; c=relaxed/simple;
-	bh=EKFfVkwn77LEDFmisaebUcU/6+IOgNRft2gXZEe0Z3Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X33Zc3v918kCFe6HUyVfFN5RiQMS3RX7wSib5/V5p1dlBRgxJ4W1t1QJoLhz34ICSjnESy7xs80N166gqNhxCiBuBX+15kRgvUvOj5qGa1YuYTdSNac3EAlZbH/QvmkpkfxOY1Jk2dh+M4x0prIaNJoWTMRthROd7B02uIzLSXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Of0FALvd; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724422055; x=1755958055;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EKFfVkwn77LEDFmisaebUcU/6+IOgNRft2gXZEe0Z3Y=;
-  b=Of0FALvdDUDjC36XIIt9TN8xRvz1Wec0OMu1Hl83QyIUeXkQqUAI10Lm
-   ZuOiqNeFp+nP25MftlPZ6bVLK+6qn9k/O9H/lx9+L/+lyqhUiM/+7ZJnj
-   svmRKY4KWyeLSQgtC4TPZF5PYKK2/FGj58iOpv8sk/kFW7bV/5SMseJbB
-   EvM8/qLdK1t4trrur+1MJlgp2MNpldDOp22El+VzVg6RU5P8YdZIVvKN6
-   gCs7BG4bJ+fC0cs1bSffZn/KgSMW+XcuXgKi+o7+xFzBryIGOZC1quYak
-   eQFTtVQBYYQBbQdlPEq1QhdDznMLRA/sC0tObxNAQ0qW5pnjXecYgECLO
-   w==;
-X-CSE-ConnectionGUID: EHT8SooIRBuKQrcNp6DlcA==
-X-CSE-MsgGUID: OH2jIAhbRBmovE3TwYhSOw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="22488907"
-X-IronPort-AV: E=Sophos;i="6.10,170,1719903600"; 
-   d="scan'208";a="22488907"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 07:07:34 -0700
-X-CSE-ConnectionGUID: Etlo/9RQRVqD3PMmpI7iIw==
-X-CSE-MsgGUID: dp2F2OqHR7mWtEylenYbfA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,170,1719903600"; 
-   d="scan'208";a="92531216"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 07:07:30 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1shUwK-00000000oZw-2QCI;
-	Fri, 23 Aug 2024 17:06:56 +0300
-Date: Fri, 23 Aug 2024 17:06:56 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: andi.shyti@kernel.org, jarkko.nikula@linux.intel.com,
-	mika.westerberg@linux.intel.com, jsd@semihalf.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, rmk+kernel@armlinux.org.uk,
-	piotr.raczynski@intel.com, andrew@lunn.ch,
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
-	mengyuanlou@net-swift.com, duanqiangwen@net-swift.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net 2/3] i2c: designware: add device private data passing
- to lock functions
-Message-ID: <ZsiXgHDZi8DpgOWs@smile.fi.intel.com>
-References: <20240823030242.3083528-1-jiawenwu@trustnetic.com>
- <20240823030242.3083528-3-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6041F16B391;
+	Fri, 23 Aug 2024 14:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724422354; cv=pass; b=LO4oZdeQOez6mc8ebMF/5o5DFMn1GiwdQTbCASHvIUCtzhDKdWJDsvVcwP2xXRgDnNZWS4+0JPOP6fQSygZ+opj73bLAtvyemR1txqll01l1JWNLjxMnZO4dATVdWw5+PDsVNSXb+xfn4IJFGiIbndB1PeW/v7vL1htjCcmRwwk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724422354; c=relaxed/simple;
+	bh=SeCRgX61JmozfhfSQUkYku6wrmQzGTNTLZ8b8QvcxX0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P6xE4UC4rnNvaIQHg6Mp7+WxkKnQtIWh5TPgG8AOJGd/4N9edKeRGo4bmW96ahqO9KBOcTDOPIhw6Xk3uAiJs7fauS2RCVkCwSCX7UC8z2JBH+eZ2aO+0KW7EvWzhAL1EG/W3I+Xws+mR2vTa1aPtwmP9qXoj1wLIbObQKweDKA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=detlev.casanova@collabora.com header.b=j16wgxcS; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Delivered-To: kernel@collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1724422312; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=CrToZ2LTI//Gtte2hJPQcZ5QDN3uDirJqmj6R94r4N99Rbo4pAcHJ6JNdarmMzkEBpZSaLOFNlq/oDGKAg5gN+qfHGE6GEM+YUFWn8xcca65Cf2glLacy4w6ntuR8tof5ZtEPftnF+E8nrsAQUdmGRdd+eP3plHpLgnxRUEk7I8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1724422312; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=lNp4RfIxi4nUXP7c0Aub3ROaeoojv7EDzsSfORBjjkE=; 
+	b=kbuhsOTJ3xVK/tDGbTBlwkX0UY7Mpu8vkInysRClwom94FqXCu4HH10B1eLl66Zmfa5q3S3FD1evCvg+7Al53IfPtVT0FmikSPANKwRaMHDKdxBik8YMuPwYhwxEC66EgheFyBIeV7B7CcsIFEo/bEPGFCdQTf53XjmGnIxqDB8=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=detlev.casanova@collabora.com;
+	dmarc=pass header.from=<detlev.casanova@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1724422312;
+	s=zohomail; d=collabora.com; i=detlev.casanova@collabora.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:MIME-Version:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=lNp4RfIxi4nUXP7c0Aub3ROaeoojv7EDzsSfORBjjkE=;
+	b=j16wgxcSJxUO1zGqi/UroUioB6/Ww52ql5liESPdnZOVqwk/aSTsYxSFeoCFmyXz
+	uN0O/2Ecu09IUH3arc/q0HKIHzbK3g3bVe7mXFdhPF9TH4cpaFsp0+UJprejLqRdEBH
+	oMXB7agPk6YwuXuePWrRV2JFeGJQWCfBWWnMVAbo=
+Received: by mx.zohomail.com with SMTPS id 1724422310105193.1328447504353;
+	Fri, 23 Aug 2024 07:11:50 -0700 (PDT)
+From: Detlev Casanova <detlev.casanova@collabora.com>
+To: linux-kernel@vger.kernel.org
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	David Wu <david.wu@rock-chips.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	kernel@collabora.com,
+	Detlev Casanova <detlev.casanova@collabora.com>
+Subject: [PATCH v3 0/3] Add GMAC support for rk3576
+Date: Fri, 23 Aug 2024 10:11:12 -0400
+Message-ID: <20240823141318.51201-1-detlev.casanova@collabora.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240823030242.3083528-3-jiawenwu@trustnetic.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On Fri, Aug 23, 2024 at 11:02:41AM +0800, Jiawen Wu wrote:
-> In order to add the hardware lock for Wangxun devices with minimal
-> modification, pass struct dw_i2c_dev to the acquire and release lock
-> functions.
+Add the necessary constants and functions to support the GMAC devices on
+the rk3576.
 
-...
+Changes since v2:
+- Fix typos in RK3576_GMAC_CLK_SELET_*
+- Also fix typo for RK3588_GMAC_CLK_SELET_*
 
-> +static int iosf_mbi_block_punit_i2c_access_dev(struct dw_i2c_dev *dev)
+Changes since v1:
+- Add binding in net/snps,dwmac.yaml too
 
-> +static void iosf_mbi_unblock_punit_i2c_access_dev(struct dw_i2c_dev *dev)
+Detlev.
 
-Rather name them in accordance with the namespace of this module.
+David Wu (1):
+  ethernet: stmmac: dwmac-rk: Add GMAC support for RK3576
+
+Detlev Casanova (2):
+  ethernet: stmmac: dwmac-rk: Fix typo for RK3588 code
+  dt-bindings: net: Add support for rk3576 dwmac
+
+ .../bindings/net/rockchip-dwmac.yaml          |   2 +
+ .../devicetree/bindings/net/snps,dwmac.yaml   |   1 +
+ .../net/ethernet/stmicro/stmmac/dwmac-rk.c    | 164 +++++++++++++++++-
+ 3 files changed, 163 insertions(+), 4 deletions(-)
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.46.0
 
 
