@@ -1,238 +1,357 @@
-Return-Path: <netdev+bounces-121232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BA8395C3D5
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 05:47:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A0B995C3FF
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 06:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13231284C34
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 03:46:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79E88B21531
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 04:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A122BAE1;
-	Fri, 23 Aug 2024 03:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E7471CD32;
+	Fri, 23 Aug 2024 04:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b="NpPM6ryu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TJiMCwV9"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2095.outbound.protection.outlook.com [40.107.117.95])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE98620DF4;
-	Fri, 23 Aug 2024 03:46:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.117.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C708B849C
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 04:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724384816; cv=fail; b=iyBuZVofdHYa0zpGNK9786QeISxFKiWgcaUywi2oynHi/P0NVCMm/NrsY0DNFQDgPVW/XmnqlANUro4KdStHSTRjqgTGcmWynxvGheRA2Uwm51EUDmMhlIV+HdcOl6YLV6fYCl2xKax+Hix6gJI+YeODqBX8yb3+/YuvG5C8Z7c=
+	t=1724385631; cv=fail; b=Z0q+jSK+0XY3W5GBIASRJjjwQZEDP2yor2uRscKY2SvwQ51J7/EsK1elob2lhGwabCAVeG58vL7SeqN7Miv7ICeUXR1fs8avbOXNKWRmIYGFDwXoZLCVc2Hi1oZxoX8/nG4SMWCDe7/h+7fLi1kD4m54aFDNHepqcRtKQXMpyLo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724384816; c=relaxed/simple;
-	bh=gFzF1FYgP5nxQij9xRlPg8wkD1p0wYTdseacKX6OTY8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=SGtHkAuRGLYStKSP9d4s86Jcf7MfldIw517vIgpWECjoyueBrRRhuSX/pAdkG0XxbeOAXlgXfX8e+PmxIeMhan7tT8wtlxei5pTZJx+CkmHc1Kp7rNMRtvlrX2uJPmlCB2akkYY5eR9IqvDtXeBP2o9M7yNKmMcEuTqdAGjV/eU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b=NpPM6ryu; arc=fail smtp.client-ip=40.107.117.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+	s=arc-20240116; t=1724385631; c=relaxed/simple;
+	bh=J+q5m8Z+Tt4Rtu3+rCO4LxmphKqQlf7F1lBZFQaDaTQ=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=nW7mwK0enyHSz0pgVElkv3HgfstKS4ywy+mh2VOz8ouCimQ68IdsOVnyXQL6J6P0ostr7/YvbNDLpPNGtlRYwL5Q9dDqPEqUF5f1/KMSs6zGyS6dZlRaV1DeTCPE8YHtqKGRAmTSm7S9iWTi/PoLRrFXozm+P1lGWESfM1B9RbE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TJiMCwV9; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724385629; x=1755921629;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=J+q5m8Z+Tt4Rtu3+rCO4LxmphKqQlf7F1lBZFQaDaTQ=;
+  b=TJiMCwV9rFZtMu76sFpvuVrHZpLpi8YM5aKCJyaaoYt773GOdtZ+ki+G
+   IEO9c85RkQF0FUcTSE8zdAWR6idcTrqU60qqlMnnS2zpE2wfyGhpVRXGz
+   AJQbe9ercRqcmTHFJ3lK0YEB8jGBjEZgkbpIAh+ixJOGMvPNiDh62ZT1r
+   Snvi3auYO8u8M+nU0OcN6DgdZPC44J8uCJi+xND8hIikxGntyBSodU5Be
+   g5WfjxJjzGA1+fdhxbUZCevspsVnmy36utCk3fMZisAk6gcOGTTCz/wbO
+   IpiH2rN9lMCi60Enawed8muX8nMoi8DSb2bcUDSA/V+owPwogc1Yk6GKJ
+   w==;
+X-CSE-ConnectionGUID: ez7OP568T0ydkGfapOpKxA==
+X-CSE-MsgGUID: f3d7z8RsRryux2Pyt1aysg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="26705409"
+X-IronPort-AV: E=Sophos;i="6.10,169,1719903600"; 
+   d="scan'208";a="26705409"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2024 21:00:27 -0700
+X-CSE-ConnectionGUID: B5xHqko6Qgqez2Kbbfya4Q==
+X-CSE-MsgGUID: 06DghE4iT0K7NOoWBVhUNw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,169,1719903600"; 
+   d="scan'208";a="66598655"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 22 Aug 2024 21:00:27 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 22 Aug 2024 21:00:26 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 22 Aug 2024 21:00:26 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.45) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 22 Aug 2024 21:00:26 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SFXfNGAbHeGiU82Oo7cRiwP+TERUmveWnEWurOqDUGLMlZ9R0+s/6JUOXjqA1oIQ2iYxh6BkCj0M+aSqjdl3prDiX5tAFB+8QYG8pYeFjP/326klxeM5zREXgh0Q3jgIF75jmcfn6fmwJEjzDyZf7s+qUxAjd2iEvi8dY7P5t1ONJ8Tb1lnYkur2QrYr0yW00ZDSwBe8NDpsZXgBth7ID3q16IREYFQoYF5MjqMHnahmsItLPOqgoTmhsKGjxoHmmtFTg+vFBZlqj/AZyR3d1NKfs/IlxHD34IBUFBCscprvT6UxqtF4d3EF0kaF50HsPdm5ZNy2q0k5yYtcyLnb2g==
+ b=IXbAgOzlSVU2k7wMBpuOzk0wIg/i2y99XndnVwvVzPhiN7do5PTVj14sT9xSf4H59OokI1YpBPskjqcrNjP0qTZApEk7FJNuciW+rYXZ/0z/jpY5y9uDVHnmaP3WFh2rjk/o/Tm2X7K+hduYWUl4VBkmwNoPi4//8ocZeFzB77xbO/PwTGuAw+XUhXsB3TP5xeAdre5q/rG+1bqaGvMqpJ2CHW1bmwG4FgZ88Zj83zWD4ymGN7/vy/T0g1N9ZG+9xPN2gnHWFPFonws3PwXPcy7ccs73Qyjdiy9xK/oherWTe9Vy4A1xGD28quRlbyAGU4vh5sEMUCjBhziaJOWGug==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yCOr+XMgtZ0zJcfoWo5RRmaTyhktuVgi3RNQ0HBGMSs=;
- b=Fp9cpITJZLBiK1FrIiVwQ4AKo98rIxfVzaRLGPuSSqz7EESJyA/PhsA8Ez7du5ci2bD2UqWF8/lqvZd8VFDOrMPQWwBDNeHtC/hDO/9RO8M8uGMW1+EHDAYV/68Bpe0dxjihNtykUJy6EeZXZkWkLvdO46+FM9QEHsiJKk7qPzZRcq0zEpTO/+AgvtBjt9Hfa4pqxsEFoe5RY9s8lotVSW7PGzNdSVCEKV4oqSC9sQWVCxh7wKzVlll7bsvj54+WGXPqOlM3gO0v5Tc5pXMZOtG8cWW6ck2bEWTDWy6y+GrGb4nTSCEgk+SLo5lYECVzd9SEjq5Xhq3vfbTsHkkwkg==
+ bh=e4KshqATvujBaPngjNNx3jiy9oOgWQizn2R9qb1SYjU=;
+ b=kxfDcADZxztvUtdp44SgWaSatwMSNSf2kREYrSfRL5DpSFKhp0rcIMZ8CphR0NRzdloA8a/fUwuN+rJu5Sedp6E2uzXjAJyRBQYFMQhMuU63yPz8H437Mewlk+ExmA5nKpT5NThB5AxBQHFH7GIQff5xvepL1mQpkZArZjIWTthNr0w7k8eBSspxMqhK5/4IqZG+z3pgF3lIA6LC9O1UEx7yG2KLexuCQ5YbKkC+7SDVrrL4E07sWmL5KId7Px0B3eLXx1s4MGizgrgCKsc4vVeTm+3qX1xZqB7iWZ6HjfOIseqFfoG98pGxhwE2HgtjPWJw2B9wBqhlWy++/OI+Mg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
- header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yCOr+XMgtZ0zJcfoWo5RRmaTyhktuVgi3RNQ0HBGMSs=;
- b=NpPM6ryuW/YLSS+4NsBhnSlyzcAgtbgFQm+MZiiny9WnhNPTbqIV2GdVo0FbvKtIHVudYlXt8N+jKN4z4VSFS5eEinPIDKVsXvdsOmNfKcCxXZH9QbmkZlxvzI0VSHMBm7FCowNTJPSMSilrYpOab7YS2JIOfFlV1byjvQfrlcy6T7rrnMX0juXaOzj6XNNPVhdYu5hxqY9NiGOZubFEsdoKkJJ9csg1J54dX/2Y5E8FjS+xvhu4ylMayro2RKJaFBPH2yTTd4bsGb604yaLWoxN4qg360Jib/wuWKhRrun1wgzBSoC7ZShvHLJZbiG9abBAdvlFxoELr/QDFMrNUw==
-Received: from SEYPR06MB5134.apcprd06.prod.outlook.com (2603:1096:101:5a::12)
- by TYZPR06MB6637.apcprd06.prod.outlook.com (2603:1096:400:451::7) with
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH0PR11MB8086.namprd11.prod.outlook.com (2603:10b6:610:190::8)
+ by DS0PR11MB8115.namprd11.prod.outlook.com (2603:10b6:8:12a::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Fri, 23 Aug
- 2024 03:46:42 +0000
-Received: from SEYPR06MB5134.apcprd06.prod.outlook.com
- ([fe80::6b58:6014:be6e:2f28]) by SEYPR06MB5134.apcprd06.prod.outlook.com
- ([fe80::6b58:6014:be6e:2f28%3]) with mapi id 15.20.7875.023; Fri, 23 Aug 2024
- 03:46:42 +0000
-From: Jacky Chou <jacky_chou@aspeedtech.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"u.kleine-koenig@pengutronix.de" <u.kleine-koenig@pengutronix.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v2] net: ftgmac100: Get link speed and duplex for NC-SI
-Thread-Topic: [PATCH v2] net: ftgmac100: Get link speed and duplex for NC-SI
-Thread-Index: AQHa9EIn1/7xh9LyY0ufG0shBDmnNbIz/PyAgAA0P8A=
-Date: Fri, 23 Aug 2024 03:46:41 +0000
-Message-ID:
- <SEYPR06MB5134C3B5487B03BB25D807B89D882@SEYPR06MB5134.apcprd06.prod.outlook.com>
-References: <20240822031945.3102130-1-jacky_chou@aspeedtech.com>
- <20240822172401.43fe8dd2@kernel.org>
-In-Reply-To: <20240822172401.43fe8dd2@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=aspeedtech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SEYPR06MB5134:EE_|TYZPR06MB6637:EE_
-x-ms-office365-filtering-correlation-id: c2738354-37ca-42a5-2b1a-08dcc3263366
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?D9YeUSyUafwIGT0GcKDdpT7OJzSWLsylBeAd04MCLvl/jaHhXNE6G80iQPcg?=
- =?us-ascii?Q?KxD+2kcp9wIssnIcfY3IpsRAAzQIasOqfvvuVeyXXjTe3HXQuoryI5OKFdL9?=
- =?us-ascii?Q?9HDZDQpzBZ9qLEsnHUFHI1R323jKr14T1DOvMrosUpuoysxnsIi5GBwuHhpo?=
- =?us-ascii?Q?4gSsNsARPWsp02NHC8VocxgRz10Og294f/lOqWVTJeAz8Tz754ZWyVosAdDw?=
- =?us-ascii?Q?BZ/Pa/Ent0zb4/L6dlEvf4sXCfaRMKYQX0AU6PSX4FYfvMP0QE4ktrAxpGlh?=
- =?us-ascii?Q?69rs/Bssp94Pp8Aonzt7WGokxeZtuztrFbUXouFUYoe5OKjjcFsC3FcGzVVk?=
- =?us-ascii?Q?rxOFLN/93LQqiQHsNfq0jREU8wtQsBoCt24Mnnha6UuF1COImO/Ko/AEzqsy?=
- =?us-ascii?Q?UFlpAuMiTVj29Jv2mny8M/ukcwqG1t7OKW6s2+4SZsEOheDXUYYC3lxvZYmW?=
- =?us-ascii?Q?n/KgyAPumvmu5etKZQMtJq705kzz6MpQbSHToakt8AZHg9cUAPYZngeuq9e5?=
- =?us-ascii?Q?H2fps8G+JP4APOezqV6DitCt+ir4OGot4ftd/r9xITFd//vidXCOS4fibpCU?=
- =?us-ascii?Q?NzssBwZQB/7lWw5CozqGgkqq1xItrW5opMG4fNnQRqZrYL7+lFybky415Ymi?=
- =?us-ascii?Q?DIwT+BeQISMEk5y0+AchTRPmXiC5pOga8dtfCGRCuBoseanHwH/wEp/sx7wu?=
- =?us-ascii?Q?gT3gq1y7w2nxLCh95aynQ9yk9gRI+c0wdxznx/xV71Ws9YBGm4olOU0Ha6EK?=
- =?us-ascii?Q?FgY6sg4t4/aPAhGp6Tzk5wVllfZnGeXYhvLVybZBUvpTN03PYAvAaqPvwb2K?=
- =?us-ascii?Q?m2yr5V+sHHNiuCW+GGQizD/VFzDMPOsRrN3uZdD07I7hlFJkLaoi5x2cG1ZC?=
- =?us-ascii?Q?+qdA6ZFPoEdS5ksclLYLXGCqBmMM1szGplOctv5t15TqweENy5RdKc8zIGtz?=
- =?us-ascii?Q?B1mcHe7pWz+muPJX0VtoRN49rT+w7g/Fbq3nK86QGac7NR6FgMNhRkkrTlxc?=
- =?us-ascii?Q?2yx4p414jT3w6DcOWBTNWX8vMcxsawDln0+wX3K2Il2IwFvFir/6IXHa1Btf?=
- =?us-ascii?Q?2VArjla4sqxl/C1kb7wnQVQPFR+DW4AiyUedDfT0LMAq/D79LPNKfYbjlrCw?=
- =?us-ascii?Q?GAViZCH8SSj3YyhVMXGU2wQ5Asi3142y9laM3CUN1bWgl7kPAZ40Qt96swgq?=
- =?us-ascii?Q?FWhMJ6nC/9Ck2aftmtbG8yXGWOsN5xVsYi6E9CPQLMMEBPAo8Of7SNDoYqRe?=
- =?us-ascii?Q?XsZUzYh2t06bCI+9IhmFGJloLdsWcqTl1Ar03xScXdvyD7f2hSvnxP3drujq?=
- =?us-ascii?Q?k7YnWKzq7DZjORcEhI5TvpKt0vKT8rLXJDGoz3ACLR3mIYRRqONGek9gjGvi?=
- =?us-ascii?Q?SYsm1AtNZNrXalpalN7u5k45Gml1f/16uSqeZfJqAUvjHruEOw=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEYPR06MB5134.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?VfDlgpD4fQCs7WAlPCpS5B6c9HjU3lvETfkZ1iilNucj/62p5RodEPFirLvt?=
- =?us-ascii?Q?4PDp4Zsqd3c8/ZxIFqL91hWsnhvJjvCZfy+N1JtmFXt4gPK3/MwTD//yVH1K?=
- =?us-ascii?Q?+bM6lBYt9NvL0AQ2dV+O5LDm3NkIiaIA75K/s9yTbtPsnnRaiOGzwt3Ff/jN?=
- =?us-ascii?Q?zsbSKtChc7rYh4l9DHGY7K3T0kHZPMxKpv146j1caBd2gtCO8bcJvJTswItr?=
- =?us-ascii?Q?cu4mdIz72nboZs/IKfhcYqA1ZM7YduKMRmRMrcv3LtsDCPQJ+Y+Zxk+oZ5rB?=
- =?us-ascii?Q?vrFmV2+7u81A3GRsbwAPz84oz+MCzt4aoLtpHHQak6UBP7+XdgfvHu/ygxHk?=
- =?us-ascii?Q?a//5FCU1T3Bzp20iEPEaZnch5wccSZDvq0GhQlvE11/xyqkIO+Ds/uybNcCf?=
- =?us-ascii?Q?f4NqRSABlq03O4+86rvW762uw+SHi1MuRhNNVmQKX7Yq7X+lYb/h6vfYjOzM?=
- =?us-ascii?Q?Efjk3co4m/lmPaah8KTI7AVRC6I9xN2ng31w6XO0ky38SNx1Gb/dHKxpcZar?=
- =?us-ascii?Q?tEZE2gg2P2tuFrRhcQ6FMr28nfyaUEhADjGTrm5OPgQy97DI1alpsT2kGjW/?=
- =?us-ascii?Q?RTAju/hz6cqNa++pWGndyr03mzII56SXqv+8Tpzrnx6+j30S3GSzC2CfLKJw?=
- =?us-ascii?Q?igD6kx9UGdG5RezumKlC1fJdw7/RyposkjZSrauWJZm1D1uot5Qykpp1gwtF?=
- =?us-ascii?Q?A+FgGwR2BghqmtSEWFfFH+nJpwnbvBVMVdY/QRNgfqHL8Fd5GBW9or3gAsi+?=
- =?us-ascii?Q?SCXYPDf5nqCgHwmrjYZbywB3sj3ezPsCXmp/BDnlzRzzTjDytB9EJjEV1lRm?=
- =?us-ascii?Q?9TdUV6vn+kggCYlX/7EiIM8AK999efydroS2iNkDxQQ1gIqHnPU3VhbaRec0?=
- =?us-ascii?Q?snR7rj82ol1wbueFrSOfMRS/UpQss7HTjVM3HqRkmOqpEnKhhIbSCI2n3JsY?=
- =?us-ascii?Q?PDfl7kmvRWib21pY/YNK6Sw83ALXe4PqWgdaQ0g+9AoXXrZuPKa/m8BpYYgB?=
- =?us-ascii?Q?lmUQ6PEMlN0z7ChuU0bTU8fb3JT+JxLTbHC2LMqoB9dn9eF1kmeg6mXImzwV?=
- =?us-ascii?Q?sTl92txv+dCc70kV6HfviCI3+GsZWCwCP6EQiafpyGzI2hGSuRXngQauj380?=
- =?us-ascii?Q?beO41dbIQySkc4mugGzytzuwOKYbpXkUcYLtelNpdowj0jx37nSsLap+FxNj?=
- =?us-ascii?Q?vBxvwRjGwIfA+2oW9t9YhDzRkExVAdE3Y4knsL2UK3aIPxDGme4Ik96mFr1U?=
- =?us-ascii?Q?AXBhAFPJY8VoKZhrbot1BPtxo3oo62gB/EubJnuiKxDO76o+nhmPr1nm2b9G?=
- =?us-ascii?Q?6zDNA7n56yWflR13Mc/NhrJ/ef5A4wHYuVs1yGBRkKHMIjA0x/I+y5A6ijpu?=
- =?us-ascii?Q?t/yp7sppjqTGLvwyw/9kPcJ2rmDUF/jiftJvKZCD5S+zwE75xsEtSggNIqky?=
- =?us-ascii?Q?bQ+0swj2+CTBtQE0E0U4Xh0H6HY63matoII0kQ6mcdWNz6V1QQocd5Is3vNY?=
- =?us-ascii?Q?smE8qmlaNROpUpdAcv8t2uQ2blXjHGOws+emsCASmc3C4m63Hjx0lqjqEmsO?=
- =?us-ascii?Q?uaPn/oGpAhHrZ7OETeaV0d6gHmtZEJqAgBBvr+Gt?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.26; Fri, 23 Aug
+ 2024 04:00:19 +0000
+Received: from CH0PR11MB8086.namprd11.prod.outlook.com
+ ([fe80::984b:141d:2923:8ae3]) by CH0PR11MB8086.namprd11.prod.outlook.com
+ ([fe80::984b:141d:2923:8ae3%7]) with mapi id 15.20.7897.014; Fri, 23 Aug 2024
+ 04:00:19 +0000
+Message-ID: <8c14cc3d-5da0-4649-add1-ea3e9f010677@intel.com>
+Date: Fri, 23 Aug 2024 06:00:13 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] eth: fbnic: Add ethtool support for fbnic
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+CC: <alexanderduyck@fb.com>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
+	<andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <kernel-team@meta.com>, <sanmanpradhan@meta.com>
+References: <20240822184944.3882360-1-mohsin.bashr@gmail.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20240822184944.3882360-1-mohsin.bashr@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BE1P281CA0186.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:8d::10) To CH0PR11MB8086.namprd11.prod.outlook.com
+ (2603:10b6:610:190::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: aspeedtech.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR11MB8086:EE_|DS0PR11MB8115:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3768162d-016d-49fd-2f0f-08dcc3281ac3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?bGFRTXhuZkQ3OGFFemtwYWtHSkdqQlJjeksxc0g4Vlh5U3BjNGx3T2RCQ3FZ?=
+ =?utf-8?B?emR6UnVaWjdHa2RVNjFtSUhHQlVUbWhSUVNoRmFXMGh1NjUyRit3Q3dwYUx3?=
+ =?utf-8?B?b3RlcGc5cndmNUZ4K1FSaENCVWxyZkJlUFBqM1V5TnBNS1ZsSU00QzBUemc4?=
+ =?utf-8?B?T0EwdVZWaXhHTDJ5Yis3Z3VDTm9GRXBYNU52bGVqYTE4eEViNTFxbjY5NnVv?=
+ =?utf-8?B?ZHNYZGYxOThIQjZVVEkwdFBGU2VoM2x3ZlV0SkgzblRPY0hBV2R0dmIxZHdz?=
+ =?utf-8?B?eDMrUGErc2ZoUDdyMDRxTEMreTVLQ2FXUWI3M2F6TnpvRjF4UGVIak5QWVpM?=
+ =?utf-8?B?SlE5bkdnUVZ1Zk9TblJNeUpTVU5pTTNEYkFVN29BS081ZFM1aEVpVHVQSDdk?=
+ =?utf-8?B?TFEvc2V0WWhQckVXNjF0U3ZERE9QM3lGeW1USGdjem10QkdiRTVTRGdDV3k4?=
+ =?utf-8?B?N3ZTNnh0KzhWRm9YMXJEK3F5L1NHTnc1b0JjTDdjbWxwY1RuMFVDRjcveFFO?=
+ =?utf-8?B?NmE1TzU0L20vdmhYT3FNcTk4YUIrSUZkekRtb3FuUXBxSzY1NGNlci92Sk9P?=
+ =?utf-8?B?YVp6TXQxWEFBa0l1MEJ5WVVlV01UYTBaNnBlRlFBS3NkOEhmaHo1ZVJJWWdC?=
+ =?utf-8?B?MkF5RnBpem9KcXV4dEQ4RXluMVdpNWh0bUJjUm9KVWFjZHdoVlArTk1iRWx3?=
+ =?utf-8?B?WFM3eUpmS2NuTmZlRXRnRXp2WXBjclNsM2JTSzFURG5SMnZYRXYrdG54OU9w?=
+ =?utf-8?B?M2hJMFB5dXlRUFV4bmJZL29SMWpuSkdhZzVHRDQ4cjFseHloR3RPS2ZLdStj?=
+ =?utf-8?B?bFcrU2NsMitvZ0V4a0M3T2t6VmlFYUtVUzJmUzI2cXJkdHVzeFh1SHNKY3k4?=
+ =?utf-8?B?RUhGNlQxb0tjVnR0bmIwUjhjTmFqOHJtenI0UEtkRkdsamRwU0VrN2Zkcmw2?=
+ =?utf-8?B?eWhobTJjTUxYN2VNQ0c0RGVpaWxicjBwM2xSbFduQm94Q0VNWUN3Z2JFT01M?=
+ =?utf-8?B?Q0kxWXhvSWl5UDRWNDdYVmF0R1lSc3hNeW4rNHNJTzcycFNSM29HZVpFUjM5?=
+ =?utf-8?B?UXM4VzZ2NE1sUTcwMGFIcGxPSVhHRWF5VWFuVHNvMDV2cmhUZno1RUhsN3B1?=
+ =?utf-8?B?aTVaLytmc1FuOWZKdjFsS3RsY2tLVzlrWjc4R3R2OWNINlE0VUJOQU56QzQw?=
+ =?utf-8?B?V1JxR3hzQThmZlM0YW80bGVraDJnUStnMm44Q0JvOEEvVi9HRHpFa0xBN0Ez?=
+ =?utf-8?B?Ykp3MXdyLzdsWHhqTE5jUFBBdkMwOTgzbjNzdC93bWdUejNsVEpUWWNkcjFJ?=
+ =?utf-8?B?eGtiV1g0bk5leWlrVy9CcVB5ZEpKbHNqRHZram5FZDg1U0R2b1V2VXRteEQ4?=
+ =?utf-8?B?aGRNa1RLMmttcHFRTDN0eVM0VW13KzRWbk43NmJ5WnQyNm5pdUtLVVYzd05W?=
+ =?utf-8?B?ZmNGb2tCc0FSNnlhWmVrY1RkWTExeGZtQ2NNbzlDMWkrSnVpaUNheXZFMkVq?=
+ =?utf-8?B?bTIyTDJYNzVPNm5DTndYQ3B1eVY4QXg3SW9jNjdFQkVCS0FrN2k5L3dob0J3?=
+ =?utf-8?B?UWdkclQzVE1PSWNJSTVOZUFQeWpkZWhuWDVHY1dEV3FMQ25EY0diUzkzcVpX?=
+ =?utf-8?B?cWhJNU8xNlFTZXRRTGNhSHhTUE5oRVpwcnhLU2RjcUtWQTBUcUpFNVluOEVs?=
+ =?utf-8?B?ejRUZEt5ZE43OGdrMW1PVExsQVdZbHM1TVJsQncyVTBCNUwrVHVHc2RRK1dJ?=
+ =?utf-8?B?WXAwVEZHS24yQnZnUVlyOUNob3doMXBVaW5icnZvQk1jZWp5OGVYVFU3b1VU?=
+ =?utf-8?B?MldOM0JycmFWK0VRZDJVQT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB8086.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QjNCNGJzV2JrYVhSRVNzV05PZFhzSlk4Q3cwcHdqUDh1VWZVRVdKOHI3c0pI?=
+ =?utf-8?B?SjZlejJQZ0c5dUgrWVcxQkJDVDQxbm16RDh6RC9GZHdHemduVjVwQ3pSSVhZ?=
+ =?utf-8?B?YjRxd1ZDaUR3MFg5Y09JdVpaa0Q3U1B3QTRHbVdEaEM2ZkVUcTQxWUNjNm1r?=
+ =?utf-8?B?dWEyMGhVZU84Z0NwVFJqaUdqdVVidU1ydTRjVXVJMW43bjA2b0xkT1RnVWla?=
+ =?utf-8?B?ckZ3cXYrdUV5dWcxK3YxS1Q2elVUQWwrOFVLWGdQNXJaUXhaa0RaWDAzNUVh?=
+ =?utf-8?B?ZWRjUnlNYksycUFaM2hLOU5mS1FIdVlIWVllY1UxVHFGZzJBNjZkM2c3WTRK?=
+ =?utf-8?B?c3ZiT29kdkdPTzdpNDZIaU5wVnUwakxpcjVxRDVBOFNkMFljRXM3RTRJQzky?=
+ =?utf-8?B?ZDJzYU94ZHFTZUFXTlFBeEVwV3BqbHdZT3JKbFJyZk42QmhDQkNDUjVhaUxl?=
+ =?utf-8?B?YTRjU2w1eVo3SUdsMU9pQ3dPQjhxWUdmcnJnMTkzS3NvTE9DZCtQZUowcHpD?=
+ =?utf-8?B?d1Q2MUJlZXQ4Y3pFSGpxWE5Ua3NIVW5JdllKd2dBUFpwVUkwaWk5UmtEYkho?=
+ =?utf-8?B?eWwyVldDclZNdGpxZ2JpMWlKN0ZFRmpYOGNST28ySEErSHI0aXlTTTFWTDIx?=
+ =?utf-8?B?Z0E5dHNnTWRrdGJRaWVuaVBSYjRMbkliSTNCdm8yQ2pES2dQNnZDUnJnLzQ4?=
+ =?utf-8?B?WnRScVY4VkEvcmdJdkpHSmpqZTJ0bDBnLzZZeHhDdnQ1MkViSDBPMk8wQ2F4?=
+ =?utf-8?B?amlaQVJPbU90QnpMbi9vcHpYQW9XKzJ5RGtPMk5vY05jWmxTZll6ZXpqVlli?=
+ =?utf-8?B?UUtNNDZDNThUeFUrUkJYcVFXZDNuMEorS1B5M29SYTJNaUNzWGo3ZE8rS0hT?=
+ =?utf-8?B?M1AzY0VqUDJnYlN6eDBERDhHQ05NaXFUbXlJNUM1UkhGMDZvRUM4MmJLUnNE?=
+ =?utf-8?B?aXcydFJyTkEyMXF1djJFang4ZzVTVEdaRld3VTNuQUlTaUxKOUtpNEdRUTJT?=
+ =?utf-8?B?UG04QnFGbmRUMWhQQ0VvL24vVVg3bi9CUDBPU0RxQmJYMy9kTUU5SFQyVVcv?=
+ =?utf-8?B?QzROQmJLdnVSaG9rNkszcmluTFNKNGhXMUt6WU1xMnVzZXVOOExLWGlrZi96?=
+ =?utf-8?B?bXhuOWtHRE16NlFEZnMxOFYxQlNrY21YQ0lCdmNqeElhSHU0MEk0TGpsVFha?=
+ =?utf-8?B?OVRGYlhOaGxGRDZ1bkpNZUpXLzVzbGc2T3BId0FtNnA1MTJUcmRMcUplZ0Rn?=
+ =?utf-8?B?ZDVBWnFHY3YxeDlibDNZVGlVNmxxaXN2SEhpT2RXMmZSaWswVDV1emxoRWg1?=
+ =?utf-8?B?Yk5JUVlZaFFEdFBCenVaNTNsdldXRUEycG9UMkovZDIzUm9OZWtUYU9NN1c2?=
+ =?utf-8?B?S2t0aUJLanV3QmdsS3lyaW5VcEI4em8wNlE3U3FLUTN3Z1BWTWxnMjdxcExR?=
+ =?utf-8?B?OXh3cGN1dXdXRHNQV0RHbFUxMFQ0WkM3MnJybG95OU91Sk9XY0R3ekcxM3dh?=
+ =?utf-8?B?S056ZVkyYmxHOHlyNkRxK3puWVNBdE9VQmQ4aHhJdURyT2ZJMkdxQXVodnFv?=
+ =?utf-8?B?ZTV1R3RwYWN2dkZiaHhjMUs4ZmxCMnhCNjV2S3lyRjVVbU1FaEdEbC9Bcm8v?=
+ =?utf-8?B?Q1JnNThEVGkvOC8zZUUyWUJxa3BsNWJIb3lmZGViblE2aUd1V2FXcXBPZGZJ?=
+ =?utf-8?B?ZmVmcDFWUHIyUVdxOWdBR0FzcE01VjRWRy9pUW1SdzFveFpvTVJLcHhRdXVG?=
+ =?utf-8?B?SnFJSFJGOU1paWVxSjJNanpCejY3SFpzOHUyNjNUeDdqdDhoekFiaVVyby9V?=
+ =?utf-8?B?aHRGbGNXV2hydlYzNG45UGRKcmNFMlppT1BhYjY4Ny9FMWRJdEdPaXNBUHFB?=
+ =?utf-8?B?WEpKWmFBVE1DMFFTcXRpd2twRFQ3WXByNG83QnVMaUo3TDJTVGRrWUE5L2Mz?=
+ =?utf-8?B?VW9lUXRCKzFJeHg2MWtaU2NOdDlQZ3dWeXdORlJXNUpJRlVqUWxuU0hGOGZO?=
+ =?utf-8?B?dFBQaExTa2x2SklMOC93YllRL1VaN0wrMkxhUWg1U0ttT1FlTmwycHZ5M3Vn?=
+ =?utf-8?B?ajRGZDYxY2tWWGdWUCtOci9mSWxUZ0E2YkxuR1FnMmI4T28zak4xeHZRRzhZ?=
+ =?utf-8?B?NGZ6bVUwRWhzRVgrTXd4ZVVOVzJMY0xiVzlPQ21ENFlUUXZRUEZlUTlrcklw?=
+ =?utf-8?B?aVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3768162d-016d-49fd-2f0f-08dcc3281ac3
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB8086.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SEYPR06MB5134.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c2738354-37ca-42a5-2b1a-08dcc3263366
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Aug 2024 03:46:41.7882
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 04:00:19.6007
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FbLXiev8+TD8FtBh2YzVk+Ir1lS5KR/g13KBfVttwJsxAo6DZT2lYyK1xIgY0MbvvcE4vxFW5gj5OomUH+NeP38ztGdPHt7zUkBFNNJHDdQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB6637
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SefmHsW0hWyePbRC003/H1EYoPUejSGW0HiVoaRBrNhNFbakLBkJ2OtlEuF9eyVVYlQfqZVnbD0i9hNw3smrK5QSe+r9pKzCIg7kNYie4Gs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8115
+X-OriginatorOrg: intel.com
 
-> > The ethtool of this driver uses the phy API of ethtool to get the link
-> > information from PHY driver.
-> > Because the NC-SI is forced on 100Mbps and full duplex, the driver
-> > connects a fixed-link phy driver for NC-SI.
->=20
-> replace: the driver connects -> connect
-I will refine the commit message.
+On 8/22/24 20:49, Mohsin Bashir wrote:
+> Add ethtool ops support and enable 'get_drvinfo' for fbnic. The driver
+> provides firmware version information while the driver name and bus
+> information is provided by ethtool_get_drvinfo().
+> 
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+> ---
+>   drivers/net/ethernet/meta/fbnic/Makefile      |  1 +
+>   drivers/net/ethernet/meta/fbnic/fbnic.h       |  3 +++
+>   .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 26 +++++++++++++++++++
+>   drivers/net/ethernet/meta/fbnic/fbnic_fw.c    | 13 ++++++++++
+>   drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  6 ++---
+>   .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  2 ++
+>   .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  1 +
+>   7 files changed, 49 insertions(+), 3 deletions(-)
+>   create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+> 
+> diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ethernet/meta/fbnic/Makefile
+> index 9373b558fdc9..37cfc34a5118 100644
+> --- a/drivers/net/ethernet/meta/fbnic/Makefile
+> +++ b/drivers/net/ethernet/meta/fbnic/Makefile
+> @@ -8,6 +8,7 @@
+>   obj-$(CONFIG_FBNIC) += fbnic.o
+>   
+>   fbnic-y := fbnic_devlink.o \
+> +	   fbnic_ethtool.o \
+>   	   fbnic_fw.o \
+>   	   fbnic_irq.o \
+>   	   fbnic_mac.o \
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+> index ad2689bfd6cb..28d970f81bfc 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic.h
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+> @@ -132,6 +132,9 @@ void fbnic_free_irq(struct fbnic_dev *dev, int nr, void *data);
+>   void fbnic_free_irqs(struct fbnic_dev *fbd);
+>   int fbnic_alloc_irqs(struct fbnic_dev *fbd);
+>   
+> +void fbnic_get_fw_ver_commit_str(struct fbnic_dev *fbd, char *fw_version,
+> +				 const size_t str_sz);
+> +
+>   enum fbnic_boards {
+>   	fbnic_board_asic
+>   };
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+> new file mode 100644
+> index 000000000000..0dc083fd1878
+> --- /dev/null
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+> @@ -0,0 +1,26 @@
+> +#include <linux/ethtool.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/pci.h>
+> +
+> +#include "fbnic.h"
+> +#include "fbnic_netdev.h"
+> +#include "fbnic_tlv.h"
+> +
+> +static void
+> +fbnic_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
+> +{
+> +	struct fbnic_net *fbn = netdev_priv(netdev);
+> +	struct fbnic_dev *fbd = fbn->fbd;
+> +
+> +	fbnic_get_fw_ver_commit_str(fbd, drvinfo->fw_version,
+> +				    sizeof(drvinfo->fw_version));
+> +}
+> +
+> +static const struct ethtool_ops fbnic_ethtool_ops = {
+> +	.get_drvinfo		= fbnic_get_drvinfo,
+> +};
+> +
+> +void fbnic_set_ethtool_ops(struct net_device *dev)
+> +{
+> +	dev->ethtool_ops = &fbnic_ethtool_ops;
+> +}
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> index 0c6e1b4c119b..5825b69f4638 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.c
+> @@ -789,3 +789,16 @@ void fbnic_mbx_flush_tx(struct fbnic_dev *fbd)
+>   		count += (tx_mbx->head - head) % FBNIC_IPC_MBX_DESC_LEN;
+>   	} while (count < FBNIC_IPC_MBX_DESC_LEN && --attempts);
+>   }
+> +
+> +void fbnic_get_fw_ver_commit_str(struct fbnic_dev *fbd, char *fw_version,
+> +				 const size_t str_sz)
+> +{
+> +	struct fbnic_fw_ver *mgmt = &fbd->fw_cap.running.mgmt;
+> +	const char *delim = "";
+> +
+> +	if (strlen(mgmt->commit) > 0)
 
->=20
-> > The ethtool will get the link information from the fixed-link phy
-> > driver.
->=20
-> Hm. I defer to the PHY experts on the merits.
->=20
-> > Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> > ---
-> > v2:
-> >   - use static for struct fixed_phy_status ncsi_phy_status
-> >   - Stop phy device at net_device stop when using NC-SI.
-> >   - Start phy device at net_device start when using NC-SI.
-> > ---
-> >  drivers/net/ethernet/faraday/ftgmac100.c | 24
-> > ++++++++++++++++++++++--
-> >  1 file changed, 22 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/faraday/ftgmac100.c
-> > b/drivers/net/ethernet/faraday/ftgmac100.c
-> > index fddfd1dd5070..93862b027be0 100644
-> > --- a/drivers/net/ethernet/faraday/ftgmac100.c
-> > +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-> > @@ -26,6 +26,7 @@
-> >  #include <linux/of_net.h>
-> >  #include <net/ip.h>
-> >  #include <net/ncsi.h>
-> > +#include <linux/phy_fixed.h>
->=20
-> Keep the headers sorted, put the new one after of_net.h
-Agree. I will adjust the <linux/phy_fixed.h> header.
+isn't @str_sz holding the size already?
+anyway, non-emptiness check should be just mgmt->commit[0]
 
->=20
-> >  #include "ftgmac100.h"
-> >
->=20
-> > @@ -1794,6 +1805,7 @@ static int ftgmac100_probe(struct platform_device
-> *pdev)
-> >  	struct net_device *netdev;
-> >  	struct ftgmac100 *priv;
-> >  	struct device_node *np;
-> > +	struct phy_device *phydev;
->=20
-> keep the variable declarations sorted longest to shortest if possible
-Agree. I will change the variable next version.
+> +		delim = "_";
+> +
+> +	fbnic_mk_full_fw_ver_str(mgmt->version, delim, mgmt->commit,
+> +				 fw_version, str_sz);
+> +}
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> index c65bca613665..221faf8c6756 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_fw.h
+> @@ -53,10 +53,10 @@ int fbnic_fw_xmit_ownership_msg(struct fbnic_dev *fbd, bool take_ownership);
+>   int fbnic_fw_init_heartbeat(struct fbnic_dev *fbd, bool poll);
+>   void fbnic_fw_check_heartbeat(struct fbnic_dev *fbd);
+>   
+> -#define fbnic_mk_full_fw_ver_str(_rev_id, _delim, _commit, _str)	\
+> +#define fbnic_mk_full_fw_ver_str(_rev_id, _delim, _commit, _str, _str_sz) \
+>   do {									\
+>   	const u32 __rev_id = _rev_id;					\
+> -	snprintf(_str, sizeof(_str), "%02lu.%02lu.%02lu-%03lu%s%s",	\
+> +	snprintf(_str, _str_sz, "%02lu.%02lu.%02lu-%03lu%s%s",	\
+>   		 FIELD_GET(FBNIC_FW_CAP_RESP_VERSION_MAJOR, __rev_id),	\
+>   		 FIELD_GET(FBNIC_FW_CAP_RESP_VERSION_MINOR, __rev_id),	\
+>   		 FIELD_GET(FBNIC_FW_CAP_RESP_VERSION_PATCH, __rev_id),	\
+> @@ -65,7 +65,7 @@ do {									\
+>   } while (0)
+>   
+>   #define fbnic_mk_fw_ver_str(_rev_id, _str) \
+> -	fbnic_mk_full_fw_ver_str(_rev_id, "", "", _str)
+> +	fbnic_mk_full_fw_ver_str(_rev_id, "", "", _str, sizeof(_str))
+>   
+>   #define FW_HEARTBEAT_PERIOD		(10 * HZ)
+>   
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> index b7ce6da68543..921325de8d8a 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+> @@ -385,6 +385,8 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
+>   
+>   	netdev->netdev_ops = &fbnic_netdev_ops;
+>   
+> +	fbnic_set_ethtool_ops(netdev);
+> +
+>   	fbn = netdev_priv(netdev);
+>   
+>   	fbn->netdev = netdev;
+> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+> index 6bc0ebeb8182..d1abc67f340d 100644
+> --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+> @@ -55,6 +55,7 @@ int fbnic_netdev_register(struct net_device *netdev);
+>   void fbnic_netdev_unregister(struct net_device *netdev);
+>   void fbnic_reset_queues(struct fbnic_net *fbn,
+>   			unsigned int tx, unsigned int rx);
+> +void fbnic_set_ethtool_ops(struct net_device *dev);
+>   
+>   void __fbnic_set_rx_mode(struct net_device *netdev);
+>   void fbnic_clear_rx_mode(struct net_device *netdev);
 
->=20
-> >  	int err =3D 0;
-> >
-> >  	res =3D platform_get_resource(pdev, IORESOURCE_MEM, 0); @@ -1879,6
-> > +1891,14 @@ static int ftgmac100_probe(struct platform_device *pdev)
-> >  			err =3D -EINVAL;
-> >  			goto err_phy_connect;
-> >  		}
-> > +
-> > +		phydev =3D fixed_phy_register(PHY_POLL, &ncsi_phy_status, NULL);
-> > +		err =3D phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
-> > +					 PHY_INTERFACE_MODE_MII);
-> > +		if (err) {
-> > +			dev_err(&pdev->dev, "Connecting PHY failed\n");
-> > +			goto err_phy_connect;
-> > +		}
->=20
-> Very suspicious that you register it but you never unregister it.
-> Are you sure the error path and .remove don't need to be changed?
-Agree. It needs the unregister for the PHY device.
-When using NC-SI to register fixed-link PHY device, I wiil add the=20
-unregister function in ftgmac100_phy_disconnect().
-Thanks.
 
