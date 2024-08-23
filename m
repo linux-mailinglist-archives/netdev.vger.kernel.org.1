@@ -1,259 +1,145 @@
-Return-Path: <netdev+bounces-121480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEF8095D540
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 20:21:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F342495D57E
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 20:49:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E3A91C21770
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:21:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 246CA1C21C06
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7097D191F8E;
-	Fri, 23 Aug 2024 18:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1132191F69;
+	Fri, 23 Aug 2024 18:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fwyGoh1x"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="F2yFm2Qv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A296190682
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 18:21:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9500C136982
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 18:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724437293; cv=none; b=Zanmv/7GlWzYoQWeswJo/3EdzKZzwamys5njF49URgPPWehyFfj8T9lh3LHcsOF9b7/r69NueTEeQuzqYY46q4c/ckLq1Ylxq6UHeb6ZcgOmeshwzm2dbv5p4Su//tBtbVTsQSoRjUBBbv/RYOWODZkBeJFY/pZr3Ua/oP9QanI=
+	t=1724438942; cv=none; b=EeSaKuj/w+MV607XWhkQhWAauvrJvyu8OyMUkx0PqXcQ88elf9kopffy0O65FyNWMjWs6TEdi3eSqnRoq3X5ah/4NJxa2n4aQ8BhlA8yjUaKFj5eJX/4dDzw1yKztrn0wkogG1MxOzEdPXXG1USj3lr7Dg6TlWq322UOMX2sLiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724437293; c=relaxed/simple;
-	bh=jVB1jWsmi+mWuFfri64okGdk5rpVup7RQiSy6BxP4uY=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B3t92Fpu6FdMqXxi0RzFdKZUYlQtXZkAwfKlrynZrUV9t1/K3mUtVR6VxgI/FeRoZI53dm+rNY+bt5XbgLezoXuLZj+NWtePoTweR/YD2iYRveQ5aBCBN/God80mAIvoStwZiB9XVgdqnkljZeLBDJzf6Smwpj02VSCEyPtQm+s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fwyGoh1x; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-53349d3071eso2837165e87.2
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 11:21:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724437289; x=1725042089; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FICRI5lzPDPrWMcBNEaOg3XU9oTCEC3UNpnHrqnVnWY=;
-        b=fwyGoh1xgS7/u0NwaRSthfO/EDwxdbr8jJYUDp9TiJnvOXZFnuMnzGyYOnXDfvulxM
-         N1+FjERM3zeeOk7OTap4fCA/3HTuQB2O8HdrU+JA1UxhGl+erkyEFP2UL+Iv83vuijWI
-         ukEXgKMHPlAW3hsW3hGx/40+kqVKuBEeVc8umevlA7BcTG1yyxHAhuEXhtYmdqvfxo1X
-         9TiCmG7cbU0FotFuh9pJDtWINLvNP3+0QfBZmgapLPNB886brSFgyiX1GwfhtIXkpa3s
-         ehbDNIbm/ZGsoZga8H0AOMgOZR+vWd+ZFGoKZorqdp5luEP/3uLEDfqbtUHXqiHtV5EO
-         bBaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724437289; x=1725042089;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FICRI5lzPDPrWMcBNEaOg3XU9oTCEC3UNpnHrqnVnWY=;
-        b=LYOAkSg8sAmrk9DOvifMAdNo8LxInLW78L1jX3ZtDX92hEZAvQxut1OoikA/Z9g7Lm
-         xGaqGg/DI/ipxxVzJOFd1asZ28todJ3ZGAVsZnT4aVkvsCeghvQLRp5D2WbwZ9fuZ17H
-         FM2+UIyUMocXLET1kcIosfuFEM5XmJsDN/TvBABf8koLlYXKzMDFhjS4wGzj6/cgbgQZ
-         bX42kZV4Az9SmbUfTQjJSrOM45FEtBs93CuZleJpUuSnsD9eVbKwzXfO4mCUtl2VbFaa
-         5xnIHxgDCsOP6OWlWKZkWClR4QPQb6pBdHMfw95/BzhcPwPsUpKh76EyJ776lk6ACuJ0
-         F3NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUcFSXrIGvlhQ8j74UWLPu9p92ySpEir47UNW6t1VsIaUYTyDA6Ct1gZ/CC0pl/BVqaigCb6aQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk0Q/WC6dLaRwiU1CcEwxu02TdXeAv/A63etmsN+JnRnV9AxVO
-	jD42eLpsX/Pwlz4wEAdCyM5mypue+VwNuMAZgi6zfWtBaZeYWbs2EEbsq1z0ZNA=
-X-Google-Smtp-Source: AGHT+IHGMmpORef4vYjLxEDkG4MSJEX/JfR9cTLIAj6QepyUfSPuFPKAHVyeeB5MysQZc4aa4suv7g==
-X-Received: by 2002:a05:6512:3e1b:b0:533:d3e:16e6 with SMTP id 2adb3069b0e04-53438784950mr2355588e87.25.1724437288497;
-        Fri, 23 Aug 2024 11:21:28 -0700 (PDT)
-Received: from localhost ([87.13.33.30])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f299d9asm292716766b.60.2024.08.23.11.21.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 11:21:28 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Fri, 23 Aug 2024 20:21:34 +0200
-To: Conor Dooley <conor@kernel.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 01/11] dt-bindings: clock: Add RaspberryPi RP1 clock
- bindings
-Message-ID: <ZsjTLhgubiMN5BXm@apocalypse>
-Mail-Followup-To: Conor Dooley <conor@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <8d7dd7ca5da41f2a96e3ef4e2e3f29fd0d71906a.1724159867.git.andrea.porta@suse.com>
- <20240820-baritone-delegate-5711f7a0bc76@spud>
- <ZsTfoC3aKLdmFPCL@apocalypse>
- <20240821-exception-nearby-5adeaaf0178b@spud>
- <ZscGdxgoNJrifSgk@apocalypse>
- <399ff156-ffc9-4d50-8e5f-a86dc82da2fa@kernel.org>
- <20240822-refutable-railroad-a3f111ab1e3f@spud>
+	s=arc-20240116; t=1724438942; c=relaxed/simple;
+	bh=TWL2MIVefQ12GZaOVVcxANHWJfwsKZKQd+xYbDghpiY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qtBgSOLxnhndHqbsNWUowWLE8wSvqZxVa4nyard63/7+6uNbms2EUUaJXqbAhgu6MUTmOvqxsWAppF7VMiUWFev5iYmYjZE1vpRedylHLsb5SojJmYdqv2AxBpddO9r4LPJ6XfEIr+BvrmQQFYq/uvRDVQvrX7qIlYKSo6u4byM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=F2yFm2Qv; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <173d3b06-57ed-4e2e-9034-91b99f41512b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724438937;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kby6+9RbR1DnjNM7kKUPdGTyp1MYuWl6dZurQYumurk=;
+	b=F2yFm2QvU5rc+5438dpysGUn5wuWo5E6kpKequitYiGHDDAdJf6n3IMxeof1Xb7/zufXQ9
+	U4dvfko5NgzPYBaeVLGPJzjS0ZKaaEjOHRKWWyrHBGEKfxJujlUTxrbMy8JaFNzOAbLASG
+	WaxOrtb0paeYf6nHQR60qaGU/1B/wEc=
+Date: Fri, 23 Aug 2024 11:48:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822-refutable-railroad-a3f111ab1e3f@spud>
+Subject: Re: [PATCH bpf-next v2] bpf: Fix bpf_get/setsockopt to tos not take
+ effect when TCP over IPv4 via INET6 API
+To: Eric Dumazet <edumazet@google.com>, Feng zhou <zhoufeng.zf@bytedance.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, dsahern@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20240823085313.75419-1-zhoufeng.zf@bytedance.com>
+ <CANn89i+ZsktuirATK0nhUmJu+TiqB9Kbozh+HhmCiP3qdnW3Ew@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CANn89i+ZsktuirATK0nhUmJu+TiqB9Kbozh+HhmCiP3qdnW3Ew@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Conor and Krzysztof,
+On 8/23/24 6:35 AM, Eric Dumazet wrote:
+> On Fri, Aug 23, 2024 at 10:53 AM Feng zhou <zhoufeng.zf@bytedance.com> wrote:
+>>
+>> From: Feng Zhou <zhoufeng.zf@bytedance.com>
+>>
+>> when TCP over IPv4 via INET6 API, bpf_get/setsockopt with ipv4 will
+>> fail, because sk->sk_family is AF_INET6. With ipv6 will success, not
+>> take effect, because inet_csk(sk)->icsk_af_ops is ipv6_mapped and
+>> use ip_queue_xmit, inet_sk(sk)->tos.
+>>
+>> So bpf_get/setsockopt needs add the judgment of this case. Just check
+>> "inet_csk(sk)->icsk_af_ops == &ipv6_mapped".
+>>
+>> | Reported-by: kernel test robot <lkp@intel.com>
+>> | Closes: https://lore.kernel.org/oe-kbuild-all/202408152034.lw9Ilsj6-lkp@intel.com/
+>> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
+>> ---
+>> Changelog:
+>> v1->v2: Addressed comments from kernel test robot
+>> - Fix compilation error
+>> Details in here:
+>> https://lore.kernel.org/bpf/202408152058.YXAnhLgZ-lkp@intel.com/T/
+>>
+>>   include/net/tcp.h   | 2 ++
+>>   net/core/filter.c   | 6 +++++-
+>>   net/ipv6/tcp_ipv6.c | 6 ++++++
+>>   3 files changed, 13 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/net/tcp.h b/include/net/tcp.h
+>> index 2aac11e7e1cc..ea673f88c900 100644
+>> --- a/include/net/tcp.h
+>> +++ b/include/net/tcp.h
+>> @@ -493,6 +493,8 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
+>>                                              struct tcp_options_received *tcp_opt,
+>>                                              int mss, u32 tsoff);
+>>
+>> +bool is_tcp_sock_ipv6_mapped(struct sock *sk);
+>> +
+>>   #if IS_ENABLED(CONFIG_BPF)
+>>   struct bpf_tcp_req_attrs {
+>>          u32 rcv_tsval;
+>> diff --git a/net/core/filter.c b/net/core/filter.c
+>> index ecf2ddf633bf..02a825e35c4d 100644
+>> --- a/net/core/filter.c
+>> +++ b/net/core/filter.c
+>> @@ -5399,7 +5399,11 @@ static int sol_ip_sockopt(struct sock *sk, int optname,
+>>                            char *optval, int *optlen,
+>>                            bool getopt)
+>>   {
+>> -       if (sk->sk_family != AF_INET)
+>> +       if (sk->sk_family != AF_INET
+>> +#if IS_BUILTIN(CONFIG_IPV6)
+>> +           && !is_tcp_sock_ipv6_mapped(sk)
+>> +#endif
+>> +           )
+>>                  return -EINVAL;
+> 
+> This does not look right to me.
+> 
+> I would remove the test completely.
+> 
+> SOL_IP socket options are available on AF_INET6 sockets just fine.
 
-On 17:23 Thu 22 Aug     , Conor Dooley wrote:
-> On Thu, Aug 22, 2024 at 11:52:27AM +0200, Krzysztof Kozlowski wrote:
-> 
-> > >>>>> +examples:
-> > >>>>> +  - |
-> > >>>>> +    #include <dt-bindings/clock/rp1.h>
-> > >>>>> +
-> > >>>>> +    rp1 {
-> > >>>>> +        #address-cells = <2>;
-> > >>>>> +        #size-cells = <2>;
-> > >>>>> +
-> > >>>>> +        rp1_clocks: clocks@18000 {
-> > >>>>
-> > >>>> The unit address does not match the reg property. I'm surprised that
-> > >>>> dtc doesn't complain about that.
-> > >>>
-> > >>> Agreed. I'll update the address with the reg value in the next release
-> > >>>
-> > >>>>
-> > >>>>> +            compatible = "raspberrypi,rp1-clocks";
-> > >>>>> +            reg = <0xc0 0x40018000 0x0 0x10038>;
-> > >>>>
-> > >>>> This is a rather oddly specific size. It leads me to wonder if this
-> > >>>> region is inside some sort of syscon area?
-> > >>>
-> > >>> >From downstream source code and RP1 datasheet it seems that the last addressable
-> > >>> register is at 0xc040028014 while the range exposed through teh devicetree ends
-> > >>> up at 0xc040028038, so it seems more of a little safe margin. I wouldn't say it
-> > >>> is a syscon area since those register are quite specific for video clock
-> > >>> generation and not to be intended to be shared among different peripherals.
-> > >>> Anyway, the next register aperture is at 0xc040030000 so I would say we can 
-> > >>> extend the clock mapped register like the following:
-> > >>>
-> > >>> reg = <0xc0 0x40018000 0x0 0x18000>;
-> > >>>
-> > >>> if you think it is more readable.
-> > >>
-> > >> I don't care
-> > > 
-> > > Ack.
-> > > 
-> > >>>>> +            #clock-cells = <1>;
-> > >>>>> +            clocks = <&clk_xosc>;
-> > >>>>> +
-> > >>>>> +            assigned-clocks = <&rp1_clocks RP1_PLL_SYS_CORE>,
-> > >>>
-> > >>>> FWIW, I don't think any of these assigned clocks are helpful for the
-> > >>>> example. That said, why do you need to configure all of these assigned
-> > >>>> clocks via devicetree when this node is the provider of them?
-> > >>>
-> > >>> Not sure to understand what you mean here, the example is there just to
-> > >>> show how to compile the dt node, maybe you're referring to the fact that
-> > >>> the consumer should setup the clock freq?
-> > >>
-> > >> I suppose, yeah. I don't think a particular configuration is relevant
-> > >> for the example binding, but simultaneously don't get why you are
-> > >> assigning the rate for clocks used by audio devices or ethernet in the
-> > >> clock provider node.
-> > >>
-> > > 
-> > > Honestly I don't have a strong preference here, I can manage to do some tests
-> > > moving the clock rate settings inside the consumer nodes but I kinda like
-> > > the curernt idea of a centralized node where clocks are setup beforehand.
-> > > In RP1 the clock generator and peripherals such as ethernet are all on-board
-> > > and cannot be rewired in any other way so the devices are not standalone
-> > > consumer in their own right (such it would be an ethernet chip wired to an
-> > > external CPU). But of course this is debatable, on the other hand the current
-> > > approach of provider/consumer is of course very clean. I'm just wondering
-> > > wthether you think I should take action on this or we can leave it as it is.
-> > > Please see also below.
-> > > 
-> > >>> Consider that the rp1-clocks
-> > >>> is coupled to the peripherals contained in the same RP1 chip so there is
-> > >>> not much point in letting the peripherals set the clock to their leisure.
-> > >>
-> > >> How is that any different to the many other SoCs in the kernel?
-> > > 
-> > > In fact, it isn't. Please take a look at:
-> > >  
-> > > arch/arm/boot/dts/st/stm32mp15xx-dhcom-som.dtsi
-> > > arch/arm/boot/dts/ti/omap/omap44xx-clocks.dtsi
-> > > arch/arm/boot/dts/ti/omap/dra7xx-clocks.dtsi
-> > > arch/arm/boot/dts/nxp/imx/imx7d-zii-rpu2.dts
-> > > 
-> > > and probably many others... they use the same approach, so I assumed it is at
-> > > least reasonable to assign the clock rate this way.
-> > 
-> > Please do not bring some ancient DTS, not really worked on, as example.
-> > stm32 could is moderately recent but dra and omap are not.
-> 
-> Right, there may be some examples like this, but there are many many
-> other SoCs where clocks are also not re-wireable, that do not. To me
-> this line of argument is akin to the clock driver calling enable on all
-> of the clocks because "all of the peripherals are always on the SoC".
-> The peripheral is the actual consumer of the clock that quote-unquote
-> wants the particular rate, not the clock provider, so having the rate
-> assignments in the consumers is the only thing that makes sense to me.
-> 
-> 
+Good point on the SOL_IP options.
 
-I'll try to cook something that move the rate definition to the consumer
-side, then.
+The sk could be neither AF_INET nor AF_INET6. e.g. the bpf_get/setsockopt 
+calling from the bpf_lsm's socket_post_create). so the AF_INET test is still needed.
 
-Many thanks,
-Andrea
+Adding "&& sk->sk_family != AF_INET6" should do. From ipv6_setsockopt, I think 
+it also needs to consider the "sk->sk_type != SOCK_RAW".
+
+Please add a test in the next re-spin.
+
+pw-bot: cr
 
