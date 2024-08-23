@@ -1,260 +1,231 @@
-Return-Path: <netdev+bounces-121287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88D3295C93B
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 11:29:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB58695C943
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 11:31:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E96AEB21BCD
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 09:29:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BF251C22056
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 09:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93E114B97B;
-	Fri, 23 Aug 2024 09:29:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF89913B5A9;
+	Fri, 23 Aug 2024 09:31:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HgFo/qYo"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="vGHKNUtb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2066.outbound.protection.outlook.com [40.107.223.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5EF139D00;
-	Fri, 23 Aug 2024 09:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724405357; cv=none; b=kcTl9XptH1LSFbDRfC9CJDJgdDXy/MXSRIzxZ7IcJSxmgmDvzO+W9cesD2ibN6nM+yp3/UxWgLngTu7vTGiy8JGhhIg6Pj0DKfKQ+e6fW2Y0LbCTmpLsBZfCG+9TDAJgk2cd0P6qjMcfBE30YXVPJ4OIQNwxdw1y4Oki5vapM/8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724405357; c=relaxed/simple;
-	bh=2Yb/HipWs9Hwj3qIpBvkIqiRNPZPBVsVKcsw8IFvcmc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BrUjU5/wA9ZrgA5yuaODjj9of18kORp7ykQlMfuFpL7FQFz1zuhI6CLWqyQ544tbz/U8XZna2OyGpdifqH8D4fiv77iXZcaTsDoNyBZJCx4Cr7GCCmF3XBtMm6Q21N6WnuCJfoqna71NgV53vQigj7anR2gpOsBhFZKVBg0OWi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HgFo/qYo; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5334c4cc17fso2380700e87.2;
-        Fri, 23 Aug 2024 02:29:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724405354; x=1725010154; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HJZgnLkJ3O5ij2lr4uMh4xPM1CMCZfKHy3jKVr/xmOI=;
-        b=HgFo/qYoLzAoq+HpYvLgMdKJgQseuoxiGMdFRoxkUrAr+h4nkJ/tvseYg8Bf+6qp66
-         BUYMbgIWqpxXbXjeCNzB7KTJq3DjXG9CMjMYZr2pUkAptE7PCeEmY5lzVszQOWNHQnSs
-         XU/nDnkuIiI262KkE2jc9XDZS3ERHMw85cjD1AeKtrJVJrlxeptmnwt0l/Jnhm8k01h2
-         XmxfveTfmMSK1+tA3Yrofar0rhg7jsG4ExD0Y2Gvn12Zt4/ng1IXMT1pt+2eFmH4Wjky
-         PEr/za14HsQe6J+MNwNPG5KlWWq4w9I+zbtXmStxZGAouCxg/Tzijg1DvrMHmblievQQ
-         IKtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724405354; x=1725010154;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HJZgnLkJ3O5ij2lr4uMh4xPM1CMCZfKHy3jKVr/xmOI=;
-        b=hfuzfQ+uVm72kM7QLOdpG15cAef0nqSCq0auCkKgSSCG3o8JUx9nHLXW++d0pTxETE
-         eKAq5BaHYXNE7o//r7OaGJC8UAbfP1OboyZr29gVb1wmO5JeWFg8rW9oVicKR8tfUHf+
-         4J16HPY6gD3w59q08p/tPUjDz6gMXfZ68D805jBWayvfDDgUgg4UKPVqBNkkJ4imZxY8
-         4YL8Mti917ZsoVjSybDT1kKqTkBKTV0hgTn7M9FjkXOQIfbt692b65oUM0Sjzg65BX9O
-         pQtJxo2kdPzcmNoAMC7FZosqRraUhBHbK172oemK+lfGLCLWO6Ek/Kab1/FrOtHTWbwe
-         lIEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUC+TbkvymhQNrcuaXQXMZ8mIX1MjKEcR1PPU7pHTqSjyDGXig4uW3Bhcms3XbcQPh5xLPtbn2HmMDZhQ==@vger.kernel.org, AJvYcCUjknvbAg39I6oolWZ/KULjtdgdYzBTOrldy5sdMqUqU1s/HArPhECLa6MH3okdfr2YmdGeTtPwZ7HI4g==@vger.kernel.org, AJvYcCUld2lrUIfjCTi9grwDWOHiAG0W8d567XvcKoWZx8u7KEQxbuQToXjq9Cn9KwWCiT0XVy+FydAAsdR9WdMy@vger.kernel.org, AJvYcCVI/Q8xs5fq2pJWa3v3ucT/Dpdm2gexu+vED+/mV9Y2a3JiiCiIiwSVFJRjwbqrFOr5xuIyQi7fcLLM@vger.kernel.org, AJvYcCW/EBBDf2OzNrU+ulJFaWyNpo5Cw8hFoLc6Wk15H+gl7Hmsbc5MHXSQ/+0lvfEGFbHVKDKXBGzH@vger.kernel.org, AJvYcCW2W1+MJGJaJNCq+mcAcZ6Vi5cVjJoFqOj6bN9ALkYWjRrHColFREkjE/E/bTzv3epC5LoIrQ9w8ErX@vger.kernel.org, AJvYcCXRwrHxOQ4JCPLIJB9JMWcSYTP5ysrqXxzkmNfdkm8mKEjeVhDwLWhDKzyIjjOgHAHEkUVeFtJE9UvXSg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzkWgATOzuYMwoaGPu4Kx0WNIxb0JHWq3p1ZBpHBLCjyGWDule
-	LEnIa9f94lyRdMRSLjGSfK9/x+WZRdJ1s1T5UDDae2zyd/UyA6YM
-X-Google-Smtp-Source: AGHT+IHqOXJOWHb79RTihzE3on1iV74tjWvNfm3tTmK51dxtJorj4SeUP8Xl+KghIyqpPSU2ZAidYw==
-X-Received: by 2002:a05:6512:ba2:b0:533:3223:df91 with SMTP id 2adb3069b0e04-53438773a9emr1245520e87.24.1724405353307;
-        Fri, 23 Aug 2024 02:29:13 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5334ea5d9e6sm494618e87.226.2024.08.23.02.29.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 02:29:12 -0700 (PDT)
-Date: Fri, 23 Aug 2024 12:29:09 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, 
-	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, 
-	Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Alvaro Karsz <alvaro.karsz@solid-run.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, David Lechner <dlechner@baylibre.com>, 
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, Damien Le Moal <dlemoal@kernel.org>, 
-	Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-fpga@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re: [PATCH v3 6/9] ethernet: stmicro: Simplify PCI devres usage
-Message-ID: <6q4pcpyqqt6mhj422pfkgggvwu7jhweu5446y6prcjgjql6xeq@jztt7z4fr6rg>
-References: <20240822134744.44919-1-pstanner@redhat.com>
- <20240822134744.44919-7-pstanner@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A7220DF4;
+	Fri, 23 Aug 2024 09:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.66
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724405474; cv=fail; b=q/MF3/G1Yo0MHXJNeHkKZ+r92x4OBCQ4+AJeSHmblIHrP+uCPtYl6qSb5ycmY0SFxqL5pdZE+kK712o0yUiw829tZttG5N5Ar4OS7fGd0uTF02WvnI3Rr9XK3M527G4NZzt2S0rSPYZbqMRx1hX+WP+IOWO0+AmHugs+K/ROTOI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724405474; c=relaxed/simple;
+	bh=JW227/nCcBU6WtcMe4InjFOwXY56H3XxF8HWQGLqmgc=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=bvr31aIzTaNeca7+apsYJmYghZedJXPUNbt7hx1ZUkWcj2YQg+UQqbgps25th+frSsb69zth4fMV77v2PJQSntaj2xWi+a0QKdTyqp5geZAn593lbh/1WxNlTObO5WdqWHNQBlPWRLsRDpdGb/UQE/uWPzwnmc32DYmyckrvTIk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=vGHKNUtb; arc=fail smtp.client-ip=40.107.223.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=S5SnhXvOnLZ3zlNY6f91eJJc4Iy4418Fddx3pA0E8iulrOUcA+Z90dIScAsVcrLCwwQvrngDemeeY7ojNcOuxh0peZ0KcZhS0zuEmB5OaOqpLW0dIEpE80zzGUxKvA/vjQB9hMteFGwvse26If5qoHwNbCjX47tkhXGbvjQkKfYhNFMHZaaDu6EUHGNemuopGWOyF5zVsy9t17FDJm9uIXMuiT9pNVwn3gR24cO+UmzeAuqiNpssUUmzwKuU6JdcAj94Gh4rAsHakdngcjpAO9cAQ5K9ECAemll5HTXa6RXR/jUF1rNRMrzmlPX1RrVJPTpB65Vm4LqElEWLL016IQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4xovwCXOuNM1zR1wnb0VZcqQFrHTYfMVYWLVl7u2AZk=;
+ b=ilgc45GlOFe1EltNlb9Wx2o5wNpqJYnWl+uf2b+Y0ei6tzQnwxIFRZ6l1sPQGoJ43WIgf4amYUXL9DV7w26kRg5+vfRSy7zfojakSaNQ+Q/Db7FMYboXzbpy9cpX7JWyeTuUoBz4Qe6CC7dnddGYbRuXGEmAwhjY5AKY14uQIyUkxZtgMN7C7U/hnAPl/8/XYdpExhZ4iA6Iv6gdO+4WoJ9ZLXexTE5ZvHwpITAedI5EyC0+18aOFCRmRHRhcvCTqeqsTVbv68F+bAZvp6tTqMmhK9yUDl4bQ5lnip85HjucO+71i24TFntf0vrOhKaKjAjzqbKziJYs1SWMjLK33A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4xovwCXOuNM1zR1wnb0VZcqQFrHTYfMVYWLVl7u2AZk=;
+ b=vGHKNUtbLwpFHNGQFzHw3v5YaOQ/SkTW01JayGOXYUZoZqutkYM7+8HDMdZKO2zRCFToWCp/3sa/SwxpU/B6kF3Yu5H6Gve1vL2NuSQX7ymLwaCQColEdE59VeriMCEjFOgzyPLQosHIg63kt1oeWaVj/WQDbmpBc9OXH+w2w3M=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by PH7PR12MB7966.namprd12.prod.outlook.com (2603:10b6:510:274::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.19; Fri, 23 Aug
+ 2024 09:31:08 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7897.014; Fri, 23 Aug 2024
+ 09:31:08 +0000
+Message-ID: <3165b1e7-c66f-163b-5101-34293453cc32@amd.com>
+Date: Fri, 23 Aug 2024 10:30:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2 03/15] cxl: add function for type2 resource request
+Content-Language: en-US
+To: Zhi Wang <zhiw@nvidia.com>, alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, richard.hughes@amd.com, targupta@nvidia.com,
+ zhiwang@kernel.org
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+ <20240715172835.24757-4-alejandro.lucero-palau@amd.com>
+ <20240822160730.00002102.zhiw@nvidia.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20240822160730.00002102.zhiw@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P265CA0204.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:318::14) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822134744.44919-7-pstanner@redhat.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|PH7PR12MB7966:EE_
+X-MS-Office365-Filtering-Correlation-Id: f92574a0-9fe2-4b89-3b7c-08dcc35651a9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aWh0Yld6ZFY0cWRKOWc4YURTbHBQYTVNY2pIT0FZVkg5UDlyNUNxdHpNN2py?=
+ =?utf-8?B?c0NLN2lYWThKNG52clNHY25hZzZxVmY5bGgveVd3Z1k3V2lTd1oxazdwTjBP?=
+ =?utf-8?B?Q1RDZy96VmlFOWtoVGtOMDRCUWd4SVBDS2JsdzZmeFl3QWF0cFY0RFJBRXR3?=
+ =?utf-8?B?Tll2anJOSno2WEhHRlZ4V1h3RlJFQWxWV0svbUlmSFMrT1h5RC9OanFqckJJ?=
+ =?utf-8?B?bzRhR2pzdmY4eml2SkpDNHE3dll4cXcyMDdMd1lNNGlrV1lkZFZGZHNkSnRj?=
+ =?utf-8?B?bHBWRzlkeTc2VHdHZDRuUFRwYzRMSWNhbFpGZTQ4cENmelk2VElWdDVKOFBT?=
+ =?utf-8?B?dVUwaXpCUU5hbWpSQUVENWJPS3Y4M1dYOTUyYnY2VWM2Y3BnaDc5QW5uOWxy?=
+ =?utf-8?B?RStZRVJPRzIxaEZ6T3V0ZUpmcGFBTzNSaDMxcjhLSGhGUGlKRENiZkVxZ0Y4?=
+ =?utf-8?B?RGt1bXVQTk9zODVDTWlGMVROUTh1a2RqR29SZHNGN3llU3hPdTRPSVc2WEFu?=
+ =?utf-8?B?WW94ZCtLdm1PSE03Yk5LbkY3MjhMK2Q3bExpY3dONW56VE44NmVYNjB6UGVR?=
+ =?utf-8?B?ekVVRFYyaE1mcDcrOC8ycU0yTGd6RkRTMVdPb1BlVWw3YlhEZUMzRGFmOTRw?=
+ =?utf-8?B?VC9ocWkrUmhpN25nVWdZNlV4YXNtRGJEZStZbVF4bkk1L3cwNUFVaCtTTG9P?=
+ =?utf-8?B?Q0J0ME1GamV5MjZ1V3VxUUxJM2lVWlExaUdiOEFIT2hFdjFlUlJsdjFrRGgw?=
+ =?utf-8?B?RTNVNVRMRmR6VnBWZ2ZuVmFlN1k4N3pIYkpvQWhrOEwvei9MTnYwaUsvZ25F?=
+ =?utf-8?B?d0dXTDB2VXBwNTAxcUlmT1ovR2VSZ1FjMkVGQXJpRjhlUmkwRzdlbHMxR2FU?=
+ =?utf-8?B?ZHRkZ0RVSkE3Q28wZlZMM29zSXhwTVpUTmJEZm9US0hoMUwzRmNnQ1NHZW9t?=
+ =?utf-8?B?b0lGQ1BqV3Z2aGpNeFJCOGo3RlBpTDJDM0dqY1RGTG5xS29FZkQ1cnlpOWpK?=
+ =?utf-8?B?V1ZVZENualNXZGkySEFzb2FsS0RnWitIcHgxc1hjS1RXQlZnZHArb0NQbmhh?=
+ =?utf-8?B?aUNxaEtYcFdTd1JqVzNwdzAyOVdSN21tRG1iejE2dkR2b3ova0d3aW5odkl2?=
+ =?utf-8?B?S1NTUTdkTm5SeHlKd1BBd0RLZ3p6d1ZWNVhCNVM3aktkUEI2a1NnYmlPMm1m?=
+ =?utf-8?B?RnBueGU0alJ3Q0N2ODl0dGpQQk1BRHpsWjJGTy8wVWM1bDVaSkN2SFN6dDVT?=
+ =?utf-8?B?UW93cnRXQkptV3RmdWpiRUNJbHVVSWE4RFZZYmQ3Y1Z0SUFidEp6dE5VZ21I?=
+ =?utf-8?B?SW9nQTNoN3htSlRBcDVJT1BvSTgraGdISGtNakVwWEtlcGdTSEo5b2puMEsz?=
+ =?utf-8?B?WHpuVkZmQ2Z4d3RSQlFacGxuenBDaUp5WjUwM3dOL0tTVTBaSEVzOWVWbjNV?=
+ =?utf-8?B?NDR5K0tOVjJIdjZEOGozaFRKSDZxSDVhVkhrajVzbEdGdnNQdmZYeFF2b212?=
+ =?utf-8?B?Wm9vTEsyQ1psM2psNTRqU0psemhXb2hWR2NwTUpUS2RnL1pHa1FDbXp4WVQr?=
+ =?utf-8?B?ekZBUmh2TmJlaHErZXpKS214V1RoMis2UDY1K0ZzeU5keDM4WWNaUXdxdkxO?=
+ =?utf-8?B?dlVhVmlYdDlNYXAwc0pyTThXeVI5K0NSUlIxVit6dDRFRWRYNzFSbHZtVm5M?=
+ =?utf-8?B?V0w3Z2lGVVllZ3YvZUpaYkRic1V3SVA3ckJuRmxtWWdkNVJwNi9CZXMrdStQ?=
+ =?utf-8?B?V3dzNXpTWXBRdllJMUpiMlNsRHpSaEhvWjkvQVB1M1NSM0ZqY1o0alc3OVd2?=
+ =?utf-8?B?a0NwQmNPZXVkZ21Oc3h6Zz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?QkxnRGl0cy8rT2tZa29jN2xYYVh4a25leVY3OE5uM1pmVld6YTBlMWExTnVr?=
+ =?utf-8?B?azRnaDFnRkhVS2lQNEpDNHgvWWs5S2h2S1pJWTZiaklWVDBEaXdDc3Uxa0Jl?=
+ =?utf-8?B?U3FoT3BXd09EbUhuaWh4WTN6Qmp5WDB2VVc4NEVlVUplU3Y1Z3p6NjA3TmlQ?=
+ =?utf-8?B?YXcrT2ZuV2d3SVBhNXI3aktWUkZ4VWZCYzE3eldtTC9Rem83ekxIMHd4c3BW?=
+ =?utf-8?B?STR3UnVPUndaa0J1cVpVSXZuR0w4VVZZclRsUndZeUVMeFNaL0U1bndqN0Rw?=
+ =?utf-8?B?Qkg2SzU3SFZaRWtWNHhyanByQ3IxME11aElVbzM4RlQ2NGhVeE95aGQvR2hR?=
+ =?utf-8?B?Ny8wcHFPRmpjWWRRdkJYa0Nxa2hud0U5QVhHcnBZdmF3QTRuY1RkRGdSQkxx?=
+ =?utf-8?B?SFdQNDRoMklHL1YwZlp1bHN0YngrRTBCOS9LUnh6VjBsSDVISFYvei9kdndW?=
+ =?utf-8?B?OXgreldIR3d4cDVwT2M0YjRCOTAvMVIwN2gxd1JIR0pJMThsdEFEK1BnbFRD?=
+ =?utf-8?B?M0VzMmhmdkpjWElyU3RuaHFRY1BhVGlZNFRNM1dueHZoVjVVYm5VelhPMkVh?=
+ =?utf-8?B?emhNMEZReklKU3o5VTF3ZTBLRHdDbDJHZzhhc05DWW5Ed2c4V2VKRHZ3Q0Jz?=
+ =?utf-8?B?STJyVFZFWDZpS0V5Q0c3ZmEwVEsybjExWWNjV3I0ejNSUkpoSE1waWRUdWNB?=
+ =?utf-8?B?dHJ3a0JrMEFjSWNRWVNhSjNuYnVVQ24xRm5Xemp4ZTg0czlqdzUwdERSaWkx?=
+ =?utf-8?B?Vnc5WDhVckllRTlya29KYUNPRU53cnVxVDVjMVRQdEdZN0NSaEtHcWQrbjNt?=
+ =?utf-8?B?OVJIc2lyK3ladVRNc0ZKZm5mVTFCSmg2SWs1UkxGWXlFdTg5eE5aQVlqZ2xs?=
+ =?utf-8?B?cDdMaDJ1SWpnTUd0d2FTUnMyN1hLb2RDM2pSa1VzRWtYcUxYWFhvVFhLb3c1?=
+ =?utf-8?B?WE41K3BSa21yNHVRV0I1UW14YmVobWFVb0tFS2c3Umd5SWh6cGpVUGJ6WmdM?=
+ =?utf-8?B?cE1qZnJQMWMvNWVCdDI2elpqK2lIUERsN0NUOUova2FPNEIxdGw4WjVlRzMz?=
+ =?utf-8?B?a1N4UDJacVdBQXVINm9raGcrMjJrOFBLMER2TFpTMzhYa1d5VGJhbkxHT2VL?=
+ =?utf-8?B?cml2T3RicXpGWTlMYjcwdnRiZ1AraGF6WGkvZ0dYeEs1bGVXdkNrWFBQSnQ4?=
+ =?utf-8?B?SUhhQ1JxWExqRE5vcTBJZGs5bklhNXNXZmZ5MldQMnZtcWxRaE5BUThaREhH?=
+ =?utf-8?B?d0Z2SGZFVWdWa2V6bEh6NnI2Nkh6Z1J1bGx6S3VyMmJ2a0ZISkdMVWI2TDdV?=
+ =?utf-8?B?bGN0M3NLZkxFNTE1Tm5jY3JNZjFNcmhwckdISVlJZkhaOWFxcFB3a000VTBt?=
+ =?utf-8?B?eGtNeUd5MjFmd2t6UlJtYlkvT2JISXdseWJTYjJmZ2Y3V1ExTWJxR3pPNE5o?=
+ =?utf-8?B?YkVvYzV2cW5PMDhqOG9maFJCWXc5N01aR3JzaTd0SHhITE5FYkwyc0xaM0hR?=
+ =?utf-8?B?bXpZSEExbGRyVU5ha2ZBT0E1Y3hQWElHRU8wZFl0ZTkvTitYOStGbTFPMGJL?=
+ =?utf-8?B?UWs1RDg0R09mUUoxd2s5QVBGd01xQkpranowVFVHQ0hmUFRGWWlaZEU3eEVN?=
+ =?utf-8?B?c2RMNi8ydUM5MFlBNE81TEZUdWs4M1RYWGJ0SU40a0pQK3JIOG5NYlVleGVN?=
+ =?utf-8?B?WktqSUJLVHUyenFvL2E2MHhUZmNXb1dtc21tZE80RitqNXRQM0ErQXdLQU5v?=
+ =?utf-8?B?aWpIR1BXVTMzQVRQSjlpU3BsTllUUEkxTFd2cmVuR3pYWVhKN2JoNDJCdUha?=
+ =?utf-8?B?RFlSUGcxTjJWOTNPU1dKcUFaeGtSNlBlbGF2a3J4T2hBSjFwQTZoRVhKSTZz?=
+ =?utf-8?B?TzdkckxuYmlPNlpSM2poVjVBTHUzeG5JamwzSXZTbDQ4a2drNjh5bTlDcldJ?=
+ =?utf-8?B?V2tWUWdxLzN0cEd0bldUeDRnTE5uQ2NwLzlEMXRJRzNKZjdqdUU2ckxheGd5?=
+ =?utf-8?B?SFJLdVplRzNva3pzMkNjaWlZOVcyZzBPZlpzMEN0elJ5Uy9tdktKSExYaWdH?=
+ =?utf-8?B?ZXpsL1MxRHV0eFBYa3NQQ2M2cTYrVjF3MnU5ZFhnNGJZb1RPUlQrTS8xTlVp?=
+ =?utf-8?Q?Zf/juE2+7AkbwPRBC/M4pYAu5?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f92574a0-9fe2-4b89-3b7c-08dcc35651a9
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 09:31:08.7049
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: E50ZosfW7keCj7U9/jpsRKfa6jAJFayQI55vLX9I6zzvVniIgsP7zvbVYlxFMo73XUdlqjKmOvRAGlQ3Jq1cvA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7966
 
-Hi Philipp
 
-On Thu, Aug 22, 2024 at 03:47:38PM +0200, Philipp Stanner wrote:
-> stmicro uses PCI devres in the wrong way. Resources requested
-> through pcim_* functions don't need to be cleaned up manually in the
-> remove() callback or in the error unwind path of a probe() function.
-> 
-> Moreover, there is an unnecessary loop which only requests and ioremaps
-> BAR 0, but iterates over all BARs nevertheless.
-> 
-> Furthermore, pcim_iomap_regions() and pcim_iomap_table() have been
-> deprecated by the PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-> pcim_iomap_table(), pcim_iomap_regions_request_all()").
-> 
-> Replace these functions with pcim_iomap_region().
-> 
-> Remove the unnecessary manual pcim_* cleanup calls.
-> 
-> Remove the unnecessary loop over all BARs.
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+On 8/22/24 14:07, Zhi Wang wrote:
+> On Mon, 15 Jul 2024 18:28:23 +0100
+> <alejandro.lucero-palau@amd.com> wrote:
+>
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Create a new function for a type2 device requesting a resource
+>> passing the opaque struct to work with.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> ---
+>>   drivers/cxl/core/memdev.c          | 13 +++++++++++++
+>>   drivers/net/ethernet/sfc/efx_cxl.c |  7 ++++++-
+>>   include/linux/cxl_accel_mem.h      |  1 +
+>>   3 files changed, 20 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+>> index 61b5d35b49e7..04c3a0f8bc2e 100644
+>> --- a/drivers/cxl/core/memdev.c
+>> +++ b/drivers/cxl/core/memdev.c
+>> @@ -744,6 +744,19 @@ void cxl_accel_set_resource(struct cxl_dev_state
+>> *cxlds, struct resource res, }
+>>   EXPORT_SYMBOL_NS_GPL(cxl_accel_set_resource, CXL);
+>>   
+>> +int cxl_accel_request_resource(struct cxl_dev_state *cxlds, bool
+>> is_ram) +{
+>> +	int rc;
+>> +
+>> +	if (is_ram)
+>> +		rc = request_resource(&cxlds->dpa_res,
+>> &cxlds->ram_res);
+>> +	else
+>> +		rc = request_resource(&cxlds->dpa_res,
+>> &cxlds->pmem_res); +
+>> +	return rc;
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_accel_request_resource, CXL);
+>> +
+> Hi Alejandro:
+>
+> Since we only have cxl_accel_request_resource() here, how is
+> the resource going to be released? e.g. in an error handling path.
+>
+> Thanks,
+> Zhi.
+>
 
-Thanks for the series. But please note the network subsystem
-dev-process requires to submit the cleanup/feature changes on top of
-the net-next tree:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/
-
-Just recently a Yanteng' (+cc) series
-https://lore.kernel.org/netdev/cover.1723014611.git.siyanteng@loongson.cn/
-was merged in which significantly refactored the Loongson MAC driver.
-Seeing your patch isn't based on these changes, there is a high
-probability that the patch won't get cleanly applied onto the
-net-next tree. So please either rebase your patch onto the net-next
-tree, or at least merge in the Yanteng' series in your tree and
-rebase the patch onto it and let's hope there have been no other
-conflicting patches merged in into the net-next tree.
-
--Serge(y)
+Right. I will use devm_request_resource in v3 using cxlds->dev and the 
+owner.
 
 
-> ---
->  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 25 +++++--------------
->  .../net/ethernet/stmicro/stmmac/stmmac_pci.c  | 18 +++++--------
->  2 files changed, 12 insertions(+), 31 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index 9e40c28d453a..5d42a9fad672 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -50,7 +50,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->  	struct plat_stmmacenet_data *plat;
->  	struct stmmac_resources res;
->  	struct device_node *np;
-> -	int ret, i, phy_mode;
-> +	int ret, phy_mode;
->  
->  	np = dev_of_node(&pdev->dev);
->  
-> @@ -88,14 +88,11 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->  		goto err_put_node;
->  	}
->  
-> -	/* Get the base address of device */
-> -	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
-> -		if (pci_resource_len(pdev, i) == 0)
-> -			continue;
-> -		ret = pcim_iomap_regions(pdev, BIT(0), pci_name(pdev));
-> -		if (ret)
-> -			goto err_disable_device;
-> -		break;
-> +	memset(&res, 0, sizeof(res));
-> +	res.addr = pcim_iomap_region(pdev, 0, pci_name(pdev));
-> +	if (IS_ERR(res.addr)) {
-> +		ret = PTR_ERR(res.addr);
-> +		goto err_disable_device;
->  	}
->  
->  	plat->bus_id = of_alias_get_id(np, "ethernet");
-> @@ -116,8 +113,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->  
->  	loongson_default_data(plat);
->  	pci_enable_msi(pdev);
-> -	memset(&res, 0, sizeof(res));
-> -	res.addr = pcim_iomap_table(pdev)[0];
->  
->  	res.irq = of_irq_get_byname(np, "macirq");
->  	if (res.irq < 0) {
-> @@ -158,18 +153,10 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
->  {
->  	struct net_device *ndev = dev_get_drvdata(&pdev->dev);
->  	struct stmmac_priv *priv = netdev_priv(ndev);
-> -	int i;
->  
->  	of_node_put(priv->plat->mdio_node);
->  	stmmac_dvr_remove(&pdev->dev);
->  
-> -	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
-> -		if (pci_resource_len(pdev, i) == 0)
-> -			continue;
-> -		pcim_iounmap_regions(pdev, BIT(i));
-> -		break;
-> -	}
-> -
->  	pci_disable_msi(pdev);
->  	pci_disable_device(pdev);
->  }
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-> index 352b01678c22..f89a8a54c4e8 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-> @@ -188,11 +188,11 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
->  		return ret;
->  	}
->  
-> -	/* Get the base address of device */
-> +	/* Request the base address BAR of device */
->  	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
->  		if (pci_resource_len(pdev, i) == 0)
->  			continue;
-> -		ret = pcim_iomap_regions(pdev, BIT(i), pci_name(pdev));
-> +		ret = pcim_request_region(pdev, i, pci_name(pdev));
->  		if (ret)
->  			return ret;
->  		break;
-> @@ -205,7 +205,10 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
->  		return ret;
->  
->  	memset(&res, 0, sizeof(res));
-> -	res.addr = pcim_iomap_table(pdev)[i];
-> +	/* Get the base address of device */
-> +	res.addr = pcim_iomap(pdev, i, 0);
-> +	if (!res.addr)
-> +		return -ENOMEM;
->  	res.wol_irq = pdev->irq;
->  	res.irq = pdev->irq;
->  
-> @@ -231,16 +234,7 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
->   */
->  static void stmmac_pci_remove(struct pci_dev *pdev)
->  {
-> -	int i;
-> -
->  	stmmac_dvr_remove(&pdev->dev);
-> -
-> -	for (i = 0; i < PCI_STD_NUM_BARS; i++) {
-> -		if (pci_resource_len(pdev, i) == 0)
-> -			continue;
-> -		pcim_iounmap_regions(pdev, BIT(i));
-> -		break;
-> -	}
->  }
->  
->  static int __maybe_unused stmmac_pci_suspend(struct device *dev)
-> -- 
-> 2.46.0
-> 
-> 
+Thanks
+
 
