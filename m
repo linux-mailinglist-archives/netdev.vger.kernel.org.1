@@ -1,72 +1,73 @@
-Return-Path: <netdev+bounces-121504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2239695D7B6
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 22:23:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 720C895D7B7
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 22:23:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C14751F24DD6
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 20:23:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28BFA282165
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 20:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 677581946B5;
-	Fri, 23 Aug 2024 20:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12EEC194A4C;
+	Fri, 23 Aug 2024 20:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="bVgPThgc"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="WYVBuoBb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB57194147
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 20:16:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73B27194A49
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 20:16:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724444170; cv=none; b=TSI0ZeLjtny0CUu+3/SxYezH0LBH9hHc31LDUYaG2bKYcuLs5Bp+/sfUFKlQG/6LHL0pE5WZVXMZVnyYdU5eGJc3yYZsnVWgG5lMqFhDZWWZ7DEzhK+REXzms6TXiKcv6OmtM8E5wlXKbEcyP7VGhGZY/MS1lSoaVI/N6P9+A2o=
+	t=1724444173; cv=none; b=Y+GjkmGxO5d9b103s99PJnbQ/CbfqoIYv7g9ObxqS44T1/LO87m72s3/VGUuRG/WlF8yRxC3IPSsG0gVkhGuvEnUP2hf62NZf9upt6TJIUi8w+sHXvhlG6+iMiQGIOXHkudMh0YhqUbeA4oiopwpjY1mB69EhSXppfP0HqZZbAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724444170; c=relaxed/simple;
-	bh=eU0j3/8rJg2aPvh4RwRcGS6M4omz/kWqfL82UJkQcUI=;
+	s=arc-20240116; t=1724444173; c=relaxed/simple;
+	bh=CCZmy3roTcoldWMY3Np2LMkMsQ2dOSmXCqOYrD/u33c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EpUijhuBzGT6ImqQcBMnibNmqnTtFt325U1xoMrxwefqjTBD9kNi6uW1zIRnQrKi2HflnJbil5B/qrbE5JkQxaWS8ZYfBqae2PAHFhwVg4XTWlNVh+rWJTzYQcLI3P8yR/NvYadt0hPvfW1Zq3y3A2ZZ2GGKn5IR1xbTe1et7GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=bVgPThgc; arc=none smtp.client-ip=209.85.210.170
+	 MIME-Version; b=mqCIcWUMatMFc3IVNTJrIhVTjX+nLcsa486Y4gaTAOv7NY+0WGsgRmKL0gtjanNxQ5WMPotkEwiLd7fMu5sZkr3Ofm9ejjkOKi8DlLIW5TC8GsUG5BzF5G8/ls3iakHh3wC7NRXsDVzwgD0dnw/7FGtOpQlXUi9DWDvsnIyVXg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=WYVBuoBb; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-713edc53429so1953516b3a.2
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 13:16:08 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-71439adca73so1824398b3a.0
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 13:16:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1724444168; x=1725048968; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1724444170; x=1725048970; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZxoeXzU4BY+HKSmSR4ce1eIiQfaMzrOqErp0TccUqeA=;
-        b=bVgPThgc2NRHZyeLkBsv55D/WY8a6h7uGTGL4SKhxH3Jvf1RtddQtMopTHZKcCOdur
-         wucxP05gwyXKFaRCs5VX4oLERivCy0FE8hy3aK7dK5HCLENe3l1nbMmHPYQG+nVlyxyC
-         6H1OUXMH6urIjLtjx7xKuAefPTFELfg5YDIRNhFRnehq6HPVvk8GWVV2yPx4Y/aAhONO
-         u3LCqY3/u/1yYl4AY0P/8FMT5B/tTcrbyQZfLSS57q2eDt7YGz+3VBeGVv8LXuZd/Uxd
-         gtZNBRCDOBDTkpFuW0drFEcrq5Fb8nPQkdXLGdXC1rYRKqltc3x3whrVxIr7XFVS44dD
-         BM2Q==
+        bh=KDdOXUn/9snQ1wK5LCIPPus5mF2WWgGtaZstma1ySpU=;
+        b=WYVBuoBbZzSfyOiruH+SQRtGBoOApbraD2F9i1RitSP1N5tIMYng9WptH+KfGppb5J
+         +WIB4dOr/X8gExlyfbUmCQAdjKedn6y6pSfB8O+lqId9JapCz/YlMy+PFRJoH5UP8dfG
+         A+C3O8Fe5THFrLYKTHIHpLA4Bbd6fnJvuIDSdhpHJTE81UGprx0NKYK3GbPCqdNcQuHO
+         e0ByWvpNodEN5ab6/UPbPU99851lF5e+yoj7AbjeK1VS4MM8iKO3FNHfia4VvCSbERNJ
+         yj6PhiQ2FTBewxVyWkfgMG4L32uApYTYv4N7kkW9UAxeX3oJVuNuCG9OP02eUssbYYgy
+         NxhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724444168; x=1725048968;
+        d=1e100.net; s=20230601; t=1724444170; x=1725048970;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZxoeXzU4BY+HKSmSR4ce1eIiQfaMzrOqErp0TccUqeA=;
-        b=bpnKFKXIqbrGBYF39mF69gOZBK8S2jjc8/75Ewf6VwRLlBNZgVfwz5ynIe/4M94NsZ
-         2VYtlrtlxisOPInBTfAYA6nMV6oNnrDjEwZrgWoR+FPLyffN/86rXbcCJCRtt7oA+Pct
-         NVMjtIAvVbJuIed0B6Xp6I4cQb44PXPeGbPeHK2GWR37aQ2NXhauUHF/3CpDqsSJlSkm
-         EI3vXcPl0514EarSXZhFcDuVucYztyU9DCAgtyh6mDWQz9uaBnDrFqZTU+P+xWCQef+D
-         hbBtb0EE6Q2ruWB73E/8tsk09JNu15a00r8sEjdtjME6YC2WKIN7RTnjzgIkV9M3tM0J
-         ZFsg==
-X-Forwarded-Encrypted: i=1; AJvYcCW22mx3rm1GEzAbSdvfg87aUDK6XHa/zX744syIQs6sFzguZ9pNlfGv+vHxZgA793UNMkK4T7A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw11uTGN0Lh5Nc+ZYUpA55POArKkF04bdjs1ajCUPuWEajakdgD
-	H9xWzwoUcMd4Z3doZebrQ5oNaFc7w/Ktg7LO9v61ahGlJQ32cFPOk9RBPS8xfg==
-X-Google-Smtp-Source: AGHT+IGikXl2xCudNl0p/N806W2b5LcalpbKN7512RPrrAy+lWYw/SeeRngQWhHDV1nL754nOQY59w==
-X-Received: by 2002:a05:6a00:2383:b0:706:3329:5533 with SMTP id d2e1a72fcca58-7144587f44fmr4665115b3a.24.1724444167996;
-        Fri, 23 Aug 2024 13:16:07 -0700 (PDT)
+        bh=KDdOXUn/9snQ1wK5LCIPPus5mF2WWgGtaZstma1ySpU=;
+        b=eZTZVCzWJS46iBTEolRTkEjn11oRqP1+riGTWyyDZkm6CfEKdF2w71FNDkbe8T3BWx
+         m4hAZoKahiOO8fn1ICbC0Mn3b3F3yOlRqBoOQ37GhBxq6Jxa2mCgDGdqt9EtdDal8ANk
+         jmV7CiA7/w4wlzb1ev/jxpB8QTPGXSsF5f/bzmTBF1+eVYMl1AVNARMkjfyet7yCr1kh
+         PkSA+bR6fgYzsvaDHpSaxo929MUX0uc+v3eMdbEnKuDa2fAnJNYfb0lBPi4COWFElohE
+         H+eYKRLR7dsEO+4+LXxsfisvjQEKiFg9apSDqIw0L/+OYMmDJUL7MZXPhTDtVu8Ci58A
+         y1nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUioYOtjnWw8yJxQ1kDncyQmr5ys7TBsVPppMtO/n+YbjvgrDzKsJiZC0/bqsbukbnB3gXlIek=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxxq/zT7S0LYgOAJIffesjDRgB+gK49Al5Bd1VTOdFqMq4ht85S
+	lgHDbV9LjLzF2vFrL+OyOgE83i5Qdyf1Gan3f5ux1Rqejg/YisG/s5gNwSi3s4+JsZld/Dvd+9w
+	=
+X-Google-Smtp-Source: AGHT+IEwpSNa8jZ4oZu0FAZzUZAVdglotwRbJWzNRi7TDjGNRdqHyZ8eKNeURjkByM3iNp4+7RqDUQ==
+X-Received: by 2002:a05:6a00:944f:b0:714:2198:26b9 with SMTP id d2e1a72fcca58-714457d6995mr3959260b3a.13.1724444169524;
+        Fri, 23 Aug 2024 13:16:09 -0700 (PDT)
 Received: from TomsPC.home ([2601:646:8300:55f0:9169:3766:b678:8be3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7143422ec1csm3428525b3a.39.2024.08.23.13.16.06
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7143422ec1csm3428525b3a.39.2024.08.23.13.16.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 13:16:06 -0700 (PDT)
+        Fri, 23 Aug 2024 13:16:09 -0700 (PDT)
 From: Tom Herbert <tom@herbertland.com>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -77,10 +78,11 @@ To: davem@davemloft.net,
 	pablo@netfilter.org,
 	laforge@gnumonks.org,
 	xeb@mail.ru
-Cc: Tom Herbert <tom@herbertland.com>
-Subject: [PATCH net-next v4 01/13] ipv6: Add udp6_lib_lookup to IPv6 stubs
-Date: Fri, 23 Aug 2024 13:15:45 -0700
-Message-Id: <20240823201557.1794985-2-tom@herbertland.com>
+Cc: Tom Herbert <tom@herbertland.com>,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next v4 02/13] flow_dissector: Parse ETH_P_TEB and move out of GRE
+Date: Fri, 23 Aug 2024 13:15:46 -0700
+Message-Id: <20240823201557.1794985-3-tom@herbertland.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240823201557.1794985-1-tom@herbertland.com>
 References: <20240823201557.1794985-1-tom@herbertland.com>
@@ -92,43 +94,143 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Want to do a UDP socket lookup from flow dissector so create a
-stub for udp6_lib_lookup
+ETH_P_TEB (Trans Ether Bridging) is the EtherType to carry
+a plain Etherent frame. Add case in skb_flow_dissect to parse
+packets of this type
 
+If the GRE protocol is ETH_P_TEB then just process that as any
+another EtherType since it's now supported in the main loop
+
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Tom Herbert <tom@herbertland.com>
 ---
- include/net/ipv6_stubs.h | 5 +++++
- net/ipv6/af_inet6.c      | 1 +
- 2 files changed, 6 insertions(+)
+ net/core/flow_dissector.c | 71 +++++++++++++++++++++++++--------------
+ 1 file changed, 45 insertions(+), 26 deletions(-)
 
-diff --git a/include/net/ipv6_stubs.h b/include/net/ipv6_stubs.h
-index 8a3465c8c2c5..fc6111fe820a 100644
---- a/include/net/ipv6_stubs.h
-+++ b/include/net/ipv6_stubs.h
-@@ -75,6 +75,11 @@ struct ipv6_stub {
- 					    struct net_device *dev);
- 	int (*ip6_xmit)(const struct sock *sk, struct sk_buff *skb, struct flowi6 *fl6,
- 			__u32 mark, struct ipv6_txoptions *opt, int tclass, u32 priority);
-+	struct sock *(*udp6_lib_lookup)(const struct net *net,
-+				     const struct in6_addr *saddr, __be16 sport,
-+				     const struct in6_addr *daddr, __be16 dport,
-+				     int dif, int sdif, struct udp_table *tbl,
-+				     struct sk_buff *skb);
- };
- extern const struct ipv6_stub *ipv6_stub __read_mostly;
+diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+index 0e638a37aa09..5170676a224c 100644
+--- a/net/core/flow_dissector.c
++++ b/net/core/flow_dissector.c
+@@ -654,7 +654,7 @@ __skb_flow_dissect_gre(const struct sk_buff *skb,
+ 		       struct flow_dissector_key_control *key_control,
+ 		       struct flow_dissector *flow_dissector,
+ 		       void *target_container, const void *data,
+-		       __be16 *p_proto, int *p_nhoff, int *p_hlen,
++		       __be16 *p_proto, int *p_nhoff, int hlen,
+ 		       unsigned int flags)
+ {
+ 	struct flow_dissector_key_keyid *key_keyid;
+@@ -663,7 +663,7 @@ __skb_flow_dissect_gre(const struct sk_buff *skb,
+ 	u16 gre_ver;
  
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 90d2c7e3f5e9..699f1e3efb91 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -1061,6 +1061,7 @@ static const struct ipv6_stub ipv6_stub_impl = {
- 	.ipv6_fragment = ip6_fragment,
- 	.ipv6_dev_find = ipv6_dev_find,
- 	.ip6_xmit = ip6_xmit,
-+	.udp6_lib_lookup = __udp6_lib_lookup,
- };
+ 	hdr = __skb_header_pointer(skb, *p_nhoff, sizeof(_hdr),
+-				   data, *p_hlen, &_hdr);
++				   data, hlen, &_hdr);
+ 	if (!hdr)
+ 		return FLOW_DISSECT_RET_OUT_BAD;
  
- static const struct ipv6_bpf_stub ipv6_bpf_stub_impl = {
+@@ -695,7 +695,7 @@ __skb_flow_dissect_gre(const struct sk_buff *skb,
+ 
+ 		keyid = __skb_header_pointer(skb, *p_nhoff + offset,
+ 					     sizeof(_keyid),
+-					     data, *p_hlen, &_keyid);
++					     data, hlen, &_keyid);
+ 		if (!keyid)
+ 			return FLOW_DISSECT_RET_OUT_BAD;
+ 
+@@ -715,27 +715,11 @@ __skb_flow_dissect_gre(const struct sk_buff *skb,
+ 	if (hdr->flags & GRE_SEQ)
+ 		offset += sizeof_field(struct pptp_gre_header, seq);
+ 
+-	if (gre_ver == 0) {
+-		if (*p_proto == htons(ETH_P_TEB)) {
+-			const struct ethhdr *eth;
+-			struct ethhdr _eth;
+-
+-			eth = __skb_header_pointer(skb, *p_nhoff + offset,
+-						   sizeof(_eth),
+-						   data, *p_hlen, &_eth);
+-			if (!eth)
+-				return FLOW_DISSECT_RET_OUT_BAD;
+-			*p_proto = eth->h_proto;
+-			offset += sizeof(*eth);
+-
+-			/* Cap headers that we access via pointers at the
+-			 * end of the Ethernet header as our maximum alignment
+-			 * at that point is only 2 bytes.
+-			 */
+-			if (NET_IP_ALIGN)
+-				*p_hlen = *p_nhoff + offset;
+-		}
+-	} else { /* version 1, must be PPTP */
++	/* For GRE version 0 p_proto is already correctly set (including if
++	 * it is ETH_P_TEB)
++	 */
++
++	if (gre_ver == 1) { /* Version 1 is PPP */
+ 		u8 _ppp_hdr[PPP_HDRLEN];
+ 		u8 *ppp_hdr;
+ 
+@@ -744,7 +728,7 @@ __skb_flow_dissect_gre(const struct sk_buff *skb,
+ 
+ 		ppp_hdr = __skb_header_pointer(skb, *p_nhoff + offset,
+ 					       sizeof(_ppp_hdr),
+-					       data, *p_hlen, _ppp_hdr);
++					       data, hlen, _ppp_hdr);
+ 		if (!ppp_hdr)
+ 			return FLOW_DISSECT_RET_OUT_BAD;
+ 
+@@ -1284,6 +1268,41 @@ bool __skb_flow_dissect(const struct net *net,
+ 
+ 		break;
+ 	}
++	case htons(ETH_P_TEB): {
++		const struct ethhdr *eth;
++		struct ethhdr _eth;
++
++		eth = __skb_header_pointer(skb, nhoff, sizeof(_eth),
++					   data, hlen, &_eth);
++		if (!eth)
++			goto out_bad;
++
++		proto = eth->h_proto;
++		nhoff += sizeof(*eth);
++
++		/* Cap headers that we access via pointers at the end of the
++		 * Ethernet header as our maximum alignment at that point is
++		 * only 2 bytes.
++		 *
++		 * For the real Ethernet header the receive skbuf is offset by
++		 * two so that device places the packet such that the Ethernet
++		 * payload, i.e. IP header, is aligned to four bytes (14+2=16
++		 * which will be offset of IP header). When a packet contains
++		 * an encapsulated Ethernet header, the offset of the header is
++		 * aligned to four bytes which means the payload of that
++		 * Ethernet header, i.e. an encapsulated IP header, is not four
++		 * byte aligned and neither are any subsequent headers (TCP,
++		 * UDP, etc.). On some architectures, performing unaligned
++		 * loads is expensive compared to aligned loads, so hlen is
++		 * being capped here to avoid having flow dissector do unaligned
++		 * loads on unaligned headers after the Ethernet header.
++		 */
++		if (NET_IP_ALIGN)
++			hlen = nhoff;
++
++		fdret = FLOW_DISSECT_RET_PROTO_AGAIN;
++		break;
++	}
+ 	case htons(ETH_P_8021AD):
+ 	case htons(ETH_P_8021Q): {
+ 		const struct vlan_hdr *vlan = NULL;
+@@ -1531,7 +1550,7 @@ bool __skb_flow_dissect(const struct net *net,
+ 
+ 		fdret = __skb_flow_dissect_gre(skb, key_control, flow_dissector,
+ 					       target_container, data,
+-					       &proto, &nhoff, &hlen, flags);
++					       &proto, &nhoff, hlen, flags);
+ 		break;
+ 
+ 	case NEXTHDR_HOP:
 -- 
 2.34.1
 
