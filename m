@@ -1,180 +1,123 @@
-Return-Path: <netdev+bounces-121482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F97495D59D
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 20:55:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 49E5595D5DB
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 21:08:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16438285F23
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:55:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 061B5283F07
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 19:08:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF87E1925AB;
-	Fri, 23 Aug 2024 18:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CFA11922C9;
+	Fri, 23 Aug 2024 19:08:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VyIDTSfV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DlwpFcoS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32451925A6
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 18:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0348F6B;
+	Fri, 23 Aug 2024 19:08:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724439252; cv=none; b=KoKRCnrhamRUKiyd4x+374dHsO/a8R9wIyD4C1FawELqT82HfPHwg9otuWKOMF+i+ZH1b2GKd+EWRWWpOTXfnf2xoYHLCplJvYgqpin8lIx/LXg8jRISihpCi/9Gi0Ms0B+/YqPCoy1khsdtoFiCcfcv+VziqqAVpTuBmpdJ7ho=
+	t=1724440115; cv=none; b=hHV+6vfTbz9GO9jzN1+KRB1eKbLWCyuL3/9tLXywoMHejfC9TwqiyrLkzaurdk9d+k8BTdaUxE5dPq83YgGT+Ay9mZokLFCkMW/K4yzkVEimDwF5WYKmyGY4AKlX9AVVEPytIhP8dVZPb+HyYZntmxoO9rh9Tj7rKbc4rXuGbb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724439252; c=relaxed/simple;
-	bh=Q4vJwaUK8X2ZZMRlnStM040Xb4vDEc/DlTU+8BrJyTU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XY8XywA6qp98eJr6+NDyw57zaoTQIyPcfA/siDnNcOfe4IqQsYXp9s/0+JGaiFHi5WTTmyoSjJ5JTh6WsFfvROdtP8tBSeGghEme1BDUnaaW1g3Rc7fIytduhPEQQsxF64rIQnnbuhKoyjcSMVjd03I4GcVf1g6ecPS7mx6Fo4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VyIDTSfV; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5334879ba28so2828872e87.3
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 11:54:10 -0700 (PDT)
+	s=arc-20240116; t=1724440115; c=relaxed/simple;
+	bh=Qxh0CtKyZd1DnK/0dchijwa1sKES+yUOrUYLIZr/5DU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lXhB5+5Kt61p80yXqq0ZxOleLTmO13/HQW1KV4HYC8SoEWv3MDN4Ul/zIZXHdx7hjok2w394o8PbbmZ2YzUqXQtNQtNqHoBmZvwvjDQaan4kMpiR3Lz1RCOYPpaJ9NT1AGhoAGI/5TMxkoSPvuKeK0jvqRhcpzDeYArAMR+Zoxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DlwpFcoS; arc=none smtp.client-ip=209.85.217.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-498d7a1f734so744530137.0;
+        Fri, 23 Aug 2024 12:08:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724439249; x=1725044049; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1724440112; x=1725044912; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0x3ntAitNepK+aZerXk+zKiD6yfO8PQEuPkCGO4jDLY=;
-        b=VyIDTSfV6taE2svIB09H4b9Ifa7jz1hoOXITNkOMXg+kVq3+XDJvoEHjI0yEiHdhWo
-         rvkokjCEElxOahPaaq5bYfnUbRC3PNkqLUiuEF7ytAuDZMsHGgqHRKYIpHihXt3Yxc4C
-         5H4VzqPPgvDV2xdiyK1KghAc5cyrRb2vEpU6UF90R2bnj7QINRtNj/xziAXc+E+G4yQX
-         Z+KYMNfwxqQhuoAWHaS/w+h9cNsa58R8X59F4ObMxP8z7p2jW75ASet9j49FqNEyzL2j
-         Z75v+k/OX9uYdCDy1JBpGA37qQU9Mv7crURnQ7EvJEDsWG3kS4Cti3NvaDq9TYnwy1nP
-         zKAQ==
+        bh=+QQf35c5Pp7+9zpkvOPWiJekHVDOIOVDBwe/+zf2lto=;
+        b=DlwpFcoS4rQ/INZ4T7W6UY8Cc8GCr6L6eaHCHPV8qodvYWMrUdgHt0vOvJ+Ched0m8
+         tPg0TXCCoJZmzjpL77iLlpPnl+X+Pne3ivXumANVMn0ysX48HSdVmiRkMC14f8uLZgwq
+         lEkAhwnUhmKgGzf0Obk05+FnoEemw7J5v1PiBj9Hx/ZKdtbVPXRmVmJokVS8Z0LFx+Bx
+         hMtK8qIPqq58vLohSXzhBVXvAlkKNlninWxQCT/wefr/2jkOQ0W6vv6NzY6DUSg/bSwy
+         q9b5H4oaDuDVJjXsjba0gLQlvMwLM1uMf5U+WhLr8AvYp9Y0cur3ySBWIcUJcQZa7n0O
+         Td7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724439249; x=1725044049;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1724440112; x=1725044912;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0x3ntAitNepK+aZerXk+zKiD6yfO8PQEuPkCGO4jDLY=;
-        b=tYM5Yxa43O0YTbBka0VdDYHvWmkMqy1wmwwOAU7fs8xIENRuHLHSTpfpRUrcP+6a1e
-         G7NfYlYVmi0ed5ucg3AUaNVFwi1Nj9PaJgg9jkci2xLjq+iZCcGctuIqbhrCG2UITytM
-         eKuZdQDVlxldwABVlJaYcq2E4XVdjn1T34EWxX9UbW3d2fVhH4Oxnk/fBubNMMyOjqnL
-         HVWMnMXFu6hhBXiqYt6CgYQUMrXfDn46vOpfrdMRnRB32VDy9epAjs5Z2O8xW7cn/Thy
-         8DnTsNPm0wRkmGoj2im7WjU3tsa+9fFUOx3RvksgxPD1phMGtiUEUW+NdX53nJInWlge
-         4liQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXfk6dxE2JHvyhXUQ9RetXeMxp3SOl4ocXJ8oT0LFc1Toz8amTHcoIS6bBfdREGi4G6SYc6ejU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/Jnhr4r/YkUFjng5hRSerqjRKhiWBRLsLih4y8DcWIc1RighF
-	DvFIlwcbfTBXn+CnsRg4BnN32zjT3xn7FgWx4MYj2HLqTok8eyikReKrsly1lJOJLxOX63Db+28
-	vMUxb5BjcHtUvdbTS6Nz6/S+wL6PPjZkoYc85
-X-Google-Smtp-Source: AGHT+IG1zw8hURfp0LR7lZDsyuPcmRr5h5qutscfgF+gusOIWKvBV+uK4kVgtgYRCXnQ4TyCtGp1Mgvzdd/hx1T/5PA=
-X-Received: by 2002:a05:6512:308c:b0:52c:dac3:392b with SMTP id
- 2adb3069b0e04-53438785436mr2520694e87.33.1724439248277; Fri, 23 Aug 2024
- 11:54:08 -0700 (PDT)
+        bh=+QQf35c5Pp7+9zpkvOPWiJekHVDOIOVDBwe/+zf2lto=;
+        b=dKlraffE+DmQmMkr1a4puz3YCDx2x/NpVTDTzBxnkKEXcHzmoXv3HIqqYsOEldWsmP
+         Dnr0j2WDUz0qaISeq+nbBhzmi/I4MPkXqO1XAZudj5VmbDa5gsEY2PZksGT3lzan3nvL
+         0h0NFowiDwSibe2eu2I3s0r+9bb8YCxN6Y3Sj2tzNvo4n21VXTodYsPFTlI6HYshT2tR
+         IeiD2I3t/vic2y6oAOm2xwEni99BJQxz2DgaB/rfOCLGs+oywNmBxZy43fmtj/ljjRO8
+         jwf+aToO2JQW8/qD1KDzV6obQzZ9X7Q0bP4BMz1PvryumNKlphpLgKIOUp18YSS2/KsN
+         xdvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVIVq+FXYXXGo3KyyAtDJl2wMn2wI9BBMTZBFF9WkB6gAKemtZb1OBwg1bWQogP3qYj1YD5Nv4UO+utCPiYZHV/@vger.kernel.org, AJvYcCVlcM9NtFHl79A037WGEmFljAvI8A8VWeSKN2iXf0Rei8T56+BajTGDqYSZtUiZbhnf6Dxa8sKy@vger.kernel.org, AJvYcCXAxtIHxHDvaCDYmkMuxdr06roMxSb5YIRVOWIl/DWVZTRZcyH/4NweASBObNDfIRxNuXgRCqDHHeEH02I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK/+xLLPeZVQLjyFsxqfLUyLAMHQWjyf1AsVRomXUPpyVD9AHn
+	ztDwcJ/UhD1i+ZjjONfeplHPRnShfUJysLn0nk4REvGihkCDy6p+
+X-Google-Smtp-Source: AGHT+IFjLnNiw+FcM23xAbBAxKFeWJFoyLiZ7Kzp9eZ5gVg2H+B+bqEJGz0Jks6EBCP8LNPc91nFEw==
+X-Received: by 2002:a05:6102:6c9:b0:492:9ef9:9d1b with SMTP id ada2fe7eead31-498f46ea98fmr3960629137.22.1724440112406;
+        Fri, 23 Aug 2024 12:08:32 -0700 (PDT)
+Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-498e47c5d53sm623968137.13.2024.08.23.12.08.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2024 12:08:32 -0700 (PDT)
+From: David Hunter <david.hunter.linux@gmail.com>
+To: kuba@kernel.org
+Cc: davem@davemloft.net,
+	david.hunter.linux@gmail.com,
+	edumazet@google.com,
+	javier.carrasco.cruz@gmail.com,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org
+Subject: Re: Re: [PATCH 1/1] Improve missing mods error message and make shell script executable
+Date: Fri, 23 Aug 2024 15:08:28 -0400
+Message-ID: <20240823190828.214443-1-david.hunter.linux@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240821180202.6da48f29@kernel.org>
+References: <20240821180202.6da48f29@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240823085313.75419-1-zhoufeng.zf@bytedance.com>
- <CANn89i+ZsktuirATK0nhUmJu+TiqB9Kbozh+HhmCiP3qdnW3Ew@mail.gmail.com> <173d3b06-57ed-4e2e-9034-91b99f41512b@linux.dev>
-In-Reply-To: <173d3b06-57ed-4e2e-9034-91b99f41512b@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 23 Aug 2024 20:53:54 +0200
-Message-ID: <CANn89iLKcOBBHXMSduV-DXYZfDCKAZyySggKFnQMpKH3p_Ureg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2] bpf: Fix bpf_get/setsockopt to tos not take
- effect when TCP over IPv4 via INET6 API
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Feng zhou <zhoufeng.zf@bytedance.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, dsahern@kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Aug 23, 2024 at 8:49=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 8/23/24 6:35 AM, Eric Dumazet wrote:
-> > On Fri, Aug 23, 2024 at 10:53=E2=80=AFAM Feng zhou <zhoufeng.zf@bytedan=
-ce.com> wrote:
-> >>
-> >> From: Feng Zhou <zhoufeng.zf@bytedance.com>
-> >>
-> >> when TCP over IPv4 via INET6 API, bpf_get/setsockopt with ipv4 will
-> >> fail, because sk->sk_family is AF_INET6. With ipv6 will success, not
-> >> take effect, because inet_csk(sk)->icsk_af_ops is ipv6_mapped and
-> >> use ip_queue_xmit, inet_sk(sk)->tos.
-> >>
-> >> So bpf_get/setsockopt needs add the judgment of this case. Just check
-> >> "inet_csk(sk)->icsk_af_ops =3D=3D &ipv6_mapped".
-> >>
-> >> | Reported-by: kernel test robot <lkp@intel.com>
-> >> | Closes: https://lore.kernel.org/oe-kbuild-all/202408152034.lw9Ilsj6-=
-lkp@intel.com/
-> >> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
-> >> ---
-> >> Changelog:
-> >> v1->v2: Addressed comments from kernel test robot
-> >> - Fix compilation error
-> >> Details in here:
-> >> https://lore.kernel.org/bpf/202408152058.YXAnhLgZ-lkp@intel.com/T/
-> >>
-> >>   include/net/tcp.h   | 2 ++
-> >>   net/core/filter.c   | 6 +++++-
-> >>   net/ipv6/tcp_ipv6.c | 6 ++++++
-> >>   3 files changed, 13 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> >> index 2aac11e7e1cc..ea673f88c900 100644
-> >> --- a/include/net/tcp.h
-> >> +++ b/include/net/tcp.h
-> >> @@ -493,6 +493,8 @@ struct request_sock *cookie_tcp_reqsk_alloc(const =
-struct request_sock_ops *ops,
-> >>                                              struct tcp_options_receiv=
-ed *tcp_opt,
-> >>                                              int mss, u32 tsoff);
-> >>
-> >> +bool is_tcp_sock_ipv6_mapped(struct sock *sk);
-> >> +
-> >>   #if IS_ENABLED(CONFIG_BPF)
-> >>   struct bpf_tcp_req_attrs {
-> >>          u32 rcv_tsval;
-> >> diff --git a/net/core/filter.c b/net/core/filter.c
-> >> index ecf2ddf633bf..02a825e35c4d 100644
-> >> --- a/net/core/filter.c
-> >> +++ b/net/core/filter.c
-> >> @@ -5399,7 +5399,11 @@ static int sol_ip_sockopt(struct sock *sk, int =
-optname,
-> >>                            char *optval, int *optlen,
-> >>                            bool getopt)
-> >>   {
-> >> -       if (sk->sk_family !=3D AF_INET)
-> >> +       if (sk->sk_family !=3D AF_INET
-> >> +#if IS_BUILTIN(CONFIG_IPV6)
-> >> +           && !is_tcp_sock_ipv6_mapped(sk)
-> >> +#endif
-> >> +           )
-> >>                  return -EINVAL;
-> >
-> > This does not look right to me.
-> >
-> > I would remove the test completely.
-> >
-> > SOL_IP socket options are available on AF_INET6 sockets just fine.
->
-> Good point on the SOL_IP options.
->
-> The sk could be neither AF_INET nor AF_INET6. e.g. the bpf_get/setsockopt
-> calling from the bpf_lsm's socket_post_create). so the AF_INET test is st=
-ill needed.
->
+> If you say "also" there's a good chance the commit should be split into two..
 
-OK, then I suggest using sk_is_inet() helper.
+I am splitting original patch into 2 separate patches. I forgot to do the reply all command on kernel lore.  Here is the link to version 2 for the improving the missing modules error message:
 
-> Adding "&& sk->sk_family !=3D AF_INET6" should do. From ipv6_setsockopt, =
-I think
-> it also needs to consider the "sk->sk_type !=3D SOCK_RAW".
->
-> Please add a test in the next re-spin.
->
-> pw-bot: cr
+https://lore.kernel.org/all/20240823054833.144612-1-david.hunter.linux@gmail.com/
+Subject: [PATCH 1/1 V2] Selftests: net: Improve missing modules error message
+
+> Could you clarify how it gets skipped? We use make [...] run_tests in our CI and it does seem to run.
+
+Here is my set up:
+
+$ uname -a 
+
+- Linux dshunter-HP-Laptop-15-dy5xxx 6.11.0-rc2+ #2 SMP PREEMPT_DYNAMIC Tue Aug 20 14:31:34 EDT 2024 x86_64 x86_64 x86_64 GNU/Linux
+
+Steps I took to produce the error:
+	- use git clone to get the mainline source
+	- run make -C tools/testing/selftests
+	- make summary=1 -C tools/testing/selftests TARGETS=net run_tests
+
+Output: 
+# selftests: net: test_ingress_egress_chaining.sh
+# Warning: file test_ingress_egress_chaining.sh is not executable
+
+After running chmod +x on the shell script. The tests were able to be run.
+
+Thanks, 
+David 
 
