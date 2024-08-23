@@ -1,267 +1,317 @@
-Return-Path: <netdev+bounces-121502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BBE995D7B4
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 22:23:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E63B295D7BA
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 22:23:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60E741C2313C
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 20:23:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39F08B235C8
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 20:23:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD6919408C;
-	Fri, 23 Aug 2024 20:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94740194AF4;
+	Fri, 23 Aug 2024 20:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="sjxe3Usi"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="H/iz6p9w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93BE2149C7E
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 20:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA4B1940B5
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 20:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724444156; cv=none; b=W9ZTfc+6aK8PXj6VBjDOF8o08+2Y6HpDYUNLcCSCx8Avk5xRKmbGwfqw2LmftEbyGXapKrzDPD1uwAb7ea2gjrk5kjSeUvUKDQ5OFSnleLVtQPFM/HE6Lag/1ORa9dmNEV89aLJCjGdetEtXeBiiGLORayhpTQPYGqqqBeSUULY=
+	t=1724444176; cv=none; b=PNAcrc7i+eLw8kkX4fjnX/WijG9OgBvoE/yYEy7DJCfg58Y1WmzzESjDfFuBdTKstifgzuXxJ7gys9QNbVhzXaRrqOM1ZtAywJlhoXZ38oOEqTiUHqy+gwHMwpkiRktChV8PXEf3xF4U2/6iMZk7F9AJy00UKZqkR3MvjJCy9P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724444156; c=relaxed/simple;
-	bh=nc8WEFOsdWUuzawTIRKrp1AuH0gA1orr36E/e+nLHhk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nUFDYm8PniiILzlcI1H/EiV1Y3oNjbrlGV7hxTbSihM/AK2/R9e6mbG6c5kzYiFpQWsVJC+3Bl5LYJmAMhKVNlW7J72WsWoLSg5flLGyE7yHkmsJW+5NClQb3p2sGkSzA9kfeU5ZN3SZu6J9TK+FaJJJA8usYr8GITYzzwUpV98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=sjxe3Usi; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a86933829dcso273551666b.3
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 13:15:53 -0700 (PDT)
+	s=arc-20240116; t=1724444176; c=relaxed/simple;
+	bh=op1twAxSHU3hRk6SpGinbT6uqFzUumefX7loJ2CE2y8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=CHZ4vnsdoYxEbUXydmKqpvB9sHiAbomZHBE5YKNXAwiQGxpdW09LtaLtBG/2LEJRitUHd4AfI2z6VPXYjkoDa7o6n8NN9BPdPMzhbLDuwOHvIYhgCD+uo5EPmQUYUrCDvauGVsPFSbR18oLOkqQTbfC0erzxztjtO4paaem9NLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=H/iz6p9w; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-714287e4083so2142799b3a.2
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 13:16:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1724444152; x=1725048952; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TvepJA4PZWA959Ft+rZeK+/JSerRWD/WGD1+NbMgnLs=;
-        b=sjxe3UsipnfDUe/BhSJ582HWh6TTXvX4E5s91F72juTLUaLxUVCQGOqf7m8xvsamqj
-         tkj0fwCWRU/ejCnQSLWey0BTPy5ZOUZ69QmKGqWWX4VrXRk/9ErgHULIw4ORuW8e2JEA
-         Bz8YqNz3tiwPZ45VuKA37/Jzf5hVhimIBa61k=
+        d=herbertland.com; s=google; t=1724444174; x=1725048974; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nv0jy74cDRROYRqyx5fpkhp9fmqxEfPxq11gk0t/z6Q=;
+        b=H/iz6p9wlP1gdGbC/3T/4NMMkdhN8THyYdvUyUksf/NNEcwE4gfpCXjTQOBzNu44yx
+         Ik4IYVu0gpfBxKJsQyTz7eJ93LyKxPCsmN6JWzeHbj5rbJZRwklQVGq3J1bW4wAhtVyx
+         LFVwY9adoWALeUXT2UERm9zQhKFB9HbwbFV2ET492P1ei+/3fRxfqO+IXeeNW+otPWtr
+         hPjWOySPOnEsdT5W0JK3KB/Uhc2l73LLx3MZIc36mW3OO6PekIBMwdQuMCf9FvkxDHkf
+         612HuA2BUTiQy54YtB5wCeJKKH/+lHgtQt3RhO5mCmwn9TtpvIi4zzqv5LD1cWPPui8u
+         sdHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724444152; x=1725048952;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TvepJA4PZWA959Ft+rZeK+/JSerRWD/WGD1+NbMgnLs=;
-        b=uSTKNwT9udgbojOvDf7+iquF5beAW6wyyWxVdCKc50tHMPwsx7FoSU7z5kMVn8NOnD
-         gfMIbcFNgjsou5PQJIjtQgggNvUrstYi/A9SooKZyk72ef/MNyyhcZufUiiQNyh0Xwib
-         vpqU8X3IkO2kBSeS2/RHRqpVmHkOac4flURB7Ngwohh0n9clAhyWEzyV1MIMgXU5S4WG
-         457hIB8UkDA0PTmjhrQFXx/2W90yet9eYBPZFQCZVVMyEUS6rgZ+sOmOJ80C6gFK5J4m
-         AnfK1vqO+UnJPK7dQa/C/fHEerraLtA7sRMzgNqq87StkuFpD94IC49PfoMftKG/u5sk
-         JWeg==
-X-Gm-Message-State: AOJu0YyD8DNlAzdoqaUCQ18uO2+ssS6E1i50wVjRywAsumQVluDXuV1B
-	hKRogYWvOIwqWmV7uQp4WIl9aHEm8FBbfP3PIKkTsi+svKwlds9Sx/T65K4M1Pg=
-X-Google-Smtp-Source: AGHT+IFdDxBzJQY3oD6t/LoSsgJYuNnoWg3jkhc/eSKhhrbO26MmxuFE6Wy7/Rcq2eO3fyR28pSd6Q==
-X-Received: by 2002:a17:907:7203:b0:a83:8591:7505 with SMTP id a640c23a62f3a-a86a54de3c3mr204032566b.59.1724444151417;
-        Fri, 23 Aug 2024 13:15:51 -0700 (PDT)
-Received: from LQ3V64L9R2 ([185.226.39.209])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f436be2sm303374266b.138.2024.08.23.13.15.50
+        d=1e100.net; s=20230601; t=1724444174; x=1725048974;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nv0jy74cDRROYRqyx5fpkhp9fmqxEfPxq11gk0t/z6Q=;
+        b=sY7vDypyFO3F4V1xGCYhVZY8t+0A9A/g5R/qNBhiyC3HO+kmBmN3lbYFxOAhuqPgI4
+         57UOxBqV2fH3x1KQGrAS/t8o7DPrl76zyvsmLmXl+jy7FROjyE+0nhRezPXkc+Z+OXtI
+         UK7fUkIvea7I/UbN8oJgqcyYk1Eq791fOQBVs7AjQAyXb5jAkNRCiCllhO1aLOe4CV8u
+         1m+jRhUHgBWreba4qpPQC6O3AEDcI4cM/H5tzSEVEIQ/VsUbaw4lgHn9HV2RIlbXLzvy
+         8yKWxMqI9KtJrpjHtXMzU326E2/YqZ0mhQ38JXBJVusJ0/9DYVDtHiOd9IG4399IW74f
+         15xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXCNa+Izyvnp6uTlxb2Z5EyK+2FQSZDRF7Jd2dTg2mO8ZDnpdGEn+3qpSbbL6KgAnmIVEO0Jqg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxnp10eCYtc9IYtjVtf5skfvq3953+Qqh6O1y9XFgNRH/np0atI
+	y1ASEfLgMgfn8GDVE6NYEXrb7w4x6UMlHCibo6pjyJ569Tf9AuYaRdrXwGW+xA==
+X-Google-Smtp-Source: AGHT+IHOoibAEa0IvBwdYWnlq6KnZD6zWRJfAlagjFiipdD1/ynzgnielHQrvxFCf9vMfEG6mZHhNA==
+X-Received: by 2002:a05:6a21:e89:b0:1ca:cccd:4a1c with SMTP id adf61e73a8af0-1cc8b5d898amr3002156637.43.1724444174052;
+        Fri, 23 Aug 2024 13:16:14 -0700 (PDT)
+Received: from TomsPC.home ([2601:646:8300:55f0:9169:3766:b678:8be3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7143422ec1csm3428525b3a.39.2024.08.23.13.16.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Aug 2024 13:15:51 -0700 (PDT)
-Date: Fri, 23 Aug 2024 21:15:49 +0100
-From: Joe Damato <jdamato@fastly.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
-	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
-	willy@infradead.org, willemdebruijn.kernel@gmail.com,
-	skhawaja@google.com, kuba@kernel.org,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Breno Leitao <leitao@debian.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/6] net: Add sysfs parameter irq_suspend_timeout
-Message-ID: <Zsjt9XwIiqAVk0Et@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
-	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
-	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
-	kuba@kernel.org, Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Breno Leitao <leitao@debian.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240823173103.94978-1-jdamato@fastly.com>
- <20240823173103.94978-2-jdamato@fastly.com>
- <CANn89iJE01V4TBCXg=w=M8=75TXypuYMJ_pXBUrN9NdRRAtAZg@mail.gmail.com>
+        Fri, 23 Aug 2024 13:16:13 -0700 (PDT)
+From: Tom Herbert <tom@herbertland.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	netdev@vger.kernel.org,
+	felipe@sipanda.io,
+	willemdebruijn.kernel@gmail.com,
+	pablo@netfilter.org,
+	laforge@gnumonks.org,
+	xeb@mail.ru
+Cc: Tom Herbert <tom@herbertland.com>
+Subject: [PATCH net-next v4 05/13] flow_dissector: UDP encap infrastructure
+Date: Fri, 23 Aug 2024 13:15:49 -0700
+Message-Id: <20240823201557.1794985-6-tom@herbertland.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240823201557.1794985-1-tom@herbertland.com>
+References: <20240823201557.1794985-1-tom@herbertland.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJE01V4TBCXg=w=M8=75TXypuYMJ_pXBUrN9NdRRAtAZg@mail.gmail.com>
 
-On Fri, Aug 23, 2024 at 07:39:56PM +0200, Eric Dumazet wrote:
-> On Fri, Aug 23, 2024 at 7:31 PM Joe Damato <jdamato@fastly.com> wrote:
-> >
-> > From: Martin Karsten <mkarsten@uwaterloo.ca>
-> >
-> > This patch doesn't change any behavior but prepares the code for other
-> > changes in the following commits which use irq_suspend_timeout as a
-> > timeout for IRQ suspension.
-> >
-> > Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> > Co-developed-by: Joe Damato <jdamato@fastly.com>
-> > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > Tested-by: Joe Damato <jdamato@fastly.com>
-> > Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> > ---
-> >  rfc -> v1:
-> >    - Removed napi.rst documentation from this patch; added to patch 6.
-> >
-> >  include/linux/netdevice.h |  2 ++
-> >  net/core/dev.c            |  3 ++-
-> >  net/core/net-sysfs.c      | 18 ++++++++++++++++++
-> >  3 files changed, 22 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index 0ef3eaa23f4b..31867bb2ff65 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -1857,6 +1857,7 @@ enum netdev_reg_state {
-> >   *     @gro_flush_timeout:     timeout for GRO layer in NAPI
-> >   *     @napi_defer_hard_irqs:  If not zero, provides a counter that would
-> >   *                             allow to avoid NIC hard IRQ, on busy queues.
-> > + *     @irq_suspend_timeout:   IRQ suspension timeout
-> >   *
-> >   *     @rx_handler:            handler for received packets
-> >   *     @rx_handler_data:       XXX: need comments on this one
-> > @@ -2060,6 +2061,7 @@ struct net_device {
-> >         struct netdev_rx_queue  *_rx;
-> >         unsigned long           gro_flush_timeout;
-> >         int                     napi_defer_hard_irqs;
-> > +       unsigned long           irq_suspend_timeout;
-> >         unsigned int            gro_max_size;
-> >         unsigned int            gro_ipv4_max_size;
-> >         rx_handler_func_t __rcu *rx_handler;
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index e7260889d4cb..3bf325ec25a3 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -11945,6 +11945,7 @@ static void __init net_dev_struct_check(void)
-> >         CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, _rx);
-> >         CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_flush_timeout);
-> >         CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, napi_defer_hard_irqs);
-> > +       CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, irq_suspend_timeout);
-> >         CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_max_size);
-> >         CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, gro_ipv4_max_size);
-> >         CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, rx_handler);
-> > @@ -11956,7 +11957,7 @@ static void __init net_dev_struct_check(void)
-> >  #ifdef CONFIG_NET_XGRESS
-> >         CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, tcx_ingress);
-> >  #endif
-> > -       CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_rx, 104);
-> > +       CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_rx, 112);
-> >  }
-> >
-> >  /*
-> > diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-> > index 0e2084ce7b75..fb6f3327310f 100644
-> > --- a/net/core/net-sysfs.c
-> > +++ b/net/core/net-sysfs.c
-> > @@ -440,6 +440,23 @@ static ssize_t napi_defer_hard_irqs_store(struct device *dev,
-> >  }
-> >  NETDEVICE_SHOW_RW(napi_defer_hard_irqs, fmt_dec);
-> >
-> > +static int change_irq_suspend_timeout(struct net_device *dev, unsigned long val)
-> > +{
-> > +       WRITE_ONCE(dev->irq_suspend_timeout, val);
-> > +       return 0;
-> > +}
-> > +
-> > +static ssize_t irq_suspend_timeout_store(struct device *dev,
-> > +                                        struct device_attribute *attr,
-> > +                                        const char *buf, size_t len)
-> > +{
-> > +       if (!capable(CAP_NET_ADMIN))
-> > +               return -EPERM;
-> > +
-> > +       return netdev_store(dev, attr, buf, len, change_irq_suspend_timeout);
-> > +}
-> > +NETDEVICE_SHOW_RW(irq_suspend_timeout, fmt_ulong);
-> > +
-> >  static ssize_t ifalias_store(struct device *dev, struct device_attribute *attr,
-> >                              const char *buf, size_t len)
-> >  {
-> > @@ -664,6 +681,7 @@ static struct attribute *net_class_attrs[] __ro_after_init = {
-> >         &dev_attr_tx_queue_len.attr,
-> >         &dev_attr_gro_flush_timeout.attr,
-> >         &dev_attr_napi_defer_hard_irqs.attr,
-> > +       &dev_attr_irq_suspend_timeout.attr,
-> >         &dev_attr_phys_port_id.attr,
-> >         &dev_attr_phys_port_name.attr,
-> >         &dev_attr_phys_switch_id.attr,
-> > --
-> > 2.25.1
-> 
-> 
-> Please no more per-device sysfs entry, shared by all the users of the device.
-> 
-> Let's not repeat past mistakes.
-> 
-> Nowadays, we need/want per receive-queue tuning, preferably set with netlink.
+Add infrastructure for parsing into UDP encapsulations
 
-Thanks for the feedback, Eric. We appreciate your consideration
-and guidance.
+Add function __skb_flow_dissect_udp that is called for IPPROTO_UDP.
+The flag FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS enables parsing of UDP
+encapsulations. If the flag is set when parsing a UDP packet then
+a socket lookup is performed. The offset of the base network header,
+either an IPv4 or IPv6 header, is tracked and passed to
+__skb_flow_dissect_udp so that it can perform the socket lookup
 
-May we ask what your thoughts are, overall, about getting a
-mechanism like this accepted?
+If a socket is found and it's for a UDP encapsulation (encap_type is
+set in the UDP socket) then a switch is performed on the encap_type
+value (cases are UDP_ENCAP_* values)
 
-We want to make sure that this, in principle, is acceptable before
-iterating further and going down the path of netlink, if required.
+An encapsulated packet in UDP can either be indicated by an
+EtherType or IP protocol. The processing for dissecting a UDP encap
+protocol returns a flow dissector return code. If
+FLOW_DISSECT_RET_PROTO_AGAIN or FLOW_DISSECT_RET_IPPROTO_AGAIN is
+returned then the corresponding  encapsulated protocol is dissected.
+The nhoff is set to point to the header to process.  In the case
+FLOW_DISSECT_RET_PROTO_AGAIN the EtherType protocol is returned and
+the IP protocol is set to zero. In the case of
+FLOW_DISSECT_RET_IPPROTO_AGAIN, the IP protocol is returned and
+the EtherType protocol is returned unchanged
 
-On the specific netlink bit in your comment, we agree in principle,
-however:
+Signed-off-by: Tom Herbert <tom@herbertland.com>
+---
+ include/net/flow_dissector.h |   1 +
+ net/core/flow_dissector.c    | 138 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 139 insertions(+)
 
-  1. Our code integrates directly with existing sysfs parameters.
-     If we make our parameter settable via netlink, but the others
-     remain as sysfs parameters then the interface for users
-     becomes a bit cumbersome.
+diff --git a/include/net/flow_dissector.h b/include/net/flow_dissector.h
+index ced79dc8e856..8a868a88a6f1 100644
+--- a/include/net/flow_dissector.h
++++ b/include/net/flow_dissector.h
+@@ -384,6 +384,7 @@ enum flow_dissector_key_id {
+ #define FLOW_DISSECTOR_F_STOP_AT_FLOW_LABEL	BIT(1)
+ #define FLOW_DISSECTOR_F_STOP_AT_ENCAP		BIT(2)
+ #define FLOW_DISSECTOR_F_STOP_BEFORE_ENCAP	BIT(3)
++#define FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS	BIT(4)
+ 
+ struct flow_dissector_key {
+ 	enum flow_dissector_key_id key_id;
+diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+index 5170676a224c..f3134804a1db 100644
+--- a/net/core/flow_dissector.c
++++ b/net/core/flow_dissector.c
+@@ -13,6 +13,7 @@
+ #include <net/gre.h>
+ #include <net/pptp.h>
+ #include <net/tipc.h>
++#include <net/udp.h>
+ #include <linux/igmp.h>
+ #include <linux/icmp.h>
+ #include <linux/sctp.h>
+@@ -806,6 +807,134 @@ __skb_flow_dissect_batadv(const struct sk_buff *skb,
+ 	return FLOW_DISSECT_RET_PROTO_AGAIN;
+ }
+ 
++static enum flow_dissect_ret
++__skb_flow_dissect_udp(const struct sk_buff *skb, const struct net *net,
++		       struct flow_dissector *flow_dissector,
++		       void *target_container, const void *data,
++		       int *p_nhoff, int hlen, __be16 *p_proto,
++		       u8 *p_ip_proto, int base_nhoff, unsigned int flags,
++		       unsigned int num_hdrs)
++{
++	enum flow_dissect_ret ret;
++	struct udphdr _udph;
++	int nhoff;
++
++	if (!(flags & FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS))
++		return FLOW_DISSECT_RET_OUT_GOOD;
++
++	/* Check that the netns for the skb device is the same as the caller's,
++	 * and only dissect UDP if we haven't yet encountered any encapsulation.
++	 * The goal is to ensure that the socket lookup is being done in the
++	 * right netns. Encapsulations may push packets into different name
++	 * spaces, so this scheme is restricting UDP dissection to cases where
++	 * they are in the same name spaces or at least the original name space.
++	 * This should capture the majority of use cases for UDP encaps, and
++	 * if we do encounter a UDP encapsulation within a different namespace
++	 * then the only effect is we don't attempt UDP dissection
++	 */
++	if (dev_net(skb->dev) != net || num_hdrs > 0)
++		return FLOW_DISSECT_RET_OUT_GOOD;
++
++	switch (*p_proto) {
++#ifdef CONFIG_INET
++	case htons(ETH_P_IP): {
++		const struct udphdr *udph;
++		const struct iphdr *iph;
++		struct iphdr _iph;
++		struct sock *sk;
++
++		iph = __skb_header_pointer(skb, base_nhoff, sizeof(_iph), data,
++					   hlen, &_iph);
++		if (!iph)
++			return FLOW_DISSECT_RET_OUT_BAD;
++
++		udph = __skb_header_pointer(skb, *p_nhoff, sizeof(_udph), data,
++					    hlen, &_udph);
++		if (!udph)
++			return FLOW_DISSECT_RET_OUT_BAD;
++
++		rcu_read_lock();
++		/* Look up the UDPv4 socket and get the encap_type */
++		sk = __udp4_lib_lookup(net, iph->saddr, udph->source,
++				       iph->daddr, udph->dest,
++				       inet_iif(skb), inet_sdif(skb),
++				       net->ipv4.udp_table, NULL);
++		if (!sk || !udp_sk(sk)->encap_type) {
++			rcu_read_unlock();
++			return FLOW_DISSECT_RET_OUT_GOOD;
++		}
++
++		encap_type = udp_sk(sk)->encap_type;
++		rcu_read_unlock();
++
++		break;
++	}
++#if IS_ENABLED(CONFIG_IPV6)
++	case htons(ETH_P_IPV6): {
++		const struct ipv6hdr *iph;
++		const struct udphdr *udph;
++		struct ipv6hdr _iph;
++		struct sock *sk;
++
++		if (!likely(ipv6_stub))
++			return FLOW_DISSECT_RET_OUT_GOOD;
++
++		iph = __skb_header_pointer(skb, base_nhoff, sizeof(_iph), data,
++					   hlen, &_iph);
++		if (!iph)
++			return FLOW_DISSECT_RET_OUT_BAD;
++
++		udph = __skb_header_pointer(skb, *p_nhoff, sizeof(_udph), data,
++					    hlen, &_udph);
++		if (!udph)
++			return FLOW_DISSECT_RET_OUT_BAD;
++
++		rcu_read_lock();
++		/* Look up the UDPv6 socket and get the encap_type */
++		sk = ipv6_stub->udp6_lib_lookup(net,
++				&iph->saddr, udph->source,
++				&iph->daddr, udph->dest,
++				inet_iif(skb), inet_sdif(skb),
++				net->ipv4.udp_table, NULL);
++
++		if (!sk || !udp_sk(sk)->encap_type) {
++			rcu_read_unlock();
++			return FLOW_DISSECT_RET_OUT_GOOD;
++		}
++
++		encap_type = udp_sk(sk)->encap_type;
++		rcu_read_unlock();
++
++		break;
++	}
++#endif /* CONFIG_IPV6 */
++#endif /* CONFIG_INET */
++	default:
++		return FLOW_DISSECT_RET_OUT_GOOD;
++	}
++
++	nhoff = *p_nhoff + sizeof(_udph);
++	ret = FLOW_DISSECT_RET_OUT_GOOD;
++
++	switch (encap_type) {
++	default:
++		break;
++	}
++
++	switch (ret) {
++	case FLOW_DISSECT_RET_PROTO_AGAIN:
++		*p_ip_proto = 0;
++		fallthrough;
++	case FLOW_DISSECT_RET_IPPROTO_AGAIN:
++		*p_nhoff = nhoff;
++		break;
++	default:
++		break;
++	}
++
++	return ret;
++}
++
+ static void
+ __skb_flow_dissect_tcp(const struct sk_buff *skb,
+ 		       struct flow_dissector *flow_dissector,
+@@ -1046,6 +1175,7 @@ bool __skb_flow_dissect(const struct net *net,
+ 	int mpls_lse = 0;
+ 	int num_hdrs = 0;
+ 	u8 ip_proto = 0;
++	int base_nhoff;
+ 	bool ret;
+ 
+ 	if (!data) {
+@@ -1168,6 +1298,7 @@ bool __skb_flow_dissect(const struct net *net,
+ 
+ proto_again:
+ 	fdret = FLOW_DISSECT_RET_CONTINUE;
++	base_nhoff = nhoff;
+ 
+ 	switch (proto) {
+ 	case htons(ETH_P_IP): {
+@@ -1649,6 +1780,13 @@ bool __skb_flow_dissect(const struct net *net,
+ 				       data, nhoff, hlen);
+ 		break;
+ 
++	case IPPROTO_UDP:
++		fdret = __skb_flow_dissect_udp(skb, net, flow_dissector,
++					       target_container, data, &nhoff,
++					       hlen, &proto, &ip_proto,
++					       base_nhoff, flags, num_hdrs);
++		break;
++
+ 	case IPPROTO_ICMP:
+ 	case IPPROTO_ICMPV6:
+ 		__skb_flow_dissect_icmp(skb, flow_dissector, target_container,
+-- 
+2.34.1
 
-     And, so the urge will be to move all parameters to netlink
-     for ease of use for the user.
-
-     As we mentioned in our cover letter: we agree that doing so is
-     a good idea, but we hope to convince you (and the other
-     maintainers) that the netlink work can come later as a separate
-     change which affects the existing parameters we integrate with
-     as well as the parameter we are introducing, at the same time.
-
-  2. The proposed mechanism yields a substantial performance and
-     efficiency improvement which would be valuable to users. It would
-     be unfortunate to block until all of this could be moved to
-     netlink, first.
-
-  3. While adding a new sysfs parameter does affect the ABI
-     permanently, it doesn't prevent us from making these parameters
-     per-NAPI in the future. This series adds strength to the argument
-     that these parameters should be per-NAPI because our results show
-     the impact these parameters can have on network processing very
-     clearly in a range of scenarios.
-
-We appreciate your thoughts on the above as we want to ensure we
-are moving in the right direction.
 
