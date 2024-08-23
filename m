@@ -1,119 +1,190 @@
-Return-Path: <netdev+bounces-121452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18AF495D3CA
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:54:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C84C795D3CE
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 18:55:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C1B31C21C3F
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:54:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E40D1F23C42
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 16:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D2F18C346;
-	Fri, 23 Aug 2024 16:54:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 223911898EE;
+	Fri, 23 Aug 2024 16:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="CTh6LX8v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Iag1mVuO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94F218E059
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 16:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6985818594C;
+	Fri, 23 Aug 2024 16:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724432059; cv=none; b=ADhZ1j7n6mI7Vrx31/cCdhzfYREtUZjG5XoNhKpy4ZkqxcOkRDF5TeO7uo7v4dQ0ABWs4lxM7gjZvUNN2tRj/IZnVIiAR3fubbtkTjkF+SlF5cWruFxxegqS6zhyQrcVoGt88DLnuRuBJPCvIihSomjrTTdyU2mLhPaz/VdO9uQ=
+	t=1724432079; cv=none; b=YMeCGPWyVKIBnHrBmepN/dXhjWokljYHQRtD9ijCuEF9NuJcUw4Bc3GeXKHvVrlfB1qRXC4t3bjC6IvkQoliXypgWXpZGZPXq1YNJHu5u0iEPz3+V94rLGty8xFAMTv6gKUAWT8B1jSvAsWkoUm4UltwAISW0agDytARkWtD+E0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724432059; c=relaxed/simple;
-	bh=yLM8J7H2DsgRDxPVtS0CcqhN2nJId985NbMPevWwKAk=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=NzBMoZlVBjmy2CPI97XZgVJGlSJfFP/pOs3Oa4xjFfAhAd08qo40pOolAOoSPjVnLFxErrlnzHq5lWl1JyLlI+9nZmk2t1HizlQKrox/CzEWG50Vcx1nyqcMyBAH+Opyjea9LhPoFuE4Di62zvET4hJGQG2qxGgxR28yfCxaQhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com; spf=pass smtp.mailfrom=digitalocean.com; dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b=CTh6LX8v; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digitalocean.com
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e1161ee54f7so2437667276.2
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 09:54:17 -0700 (PDT)
+	s=arc-20240116; t=1724432079; c=relaxed/simple;
+	bh=5VhG0B8dTv3e3c3BO1l1k7Sja5Ij0EPbr7H3pKg3dZw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EkN1QUJyemzS0XhFi/yUiQOyHgU4ElGDSRInk1EIDKkAyorXoB47tVvBi4U/tmdZmBhI/1AK7ALDhtlJUFkPL0BAPjMhO77DSPYLbMZu+LGZ6BvjjlAhFu43jALvJPDs0n+bjraiDExSj0/P+ClR6fmMJ9jFmzo7riw5HxPTxlM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Iag1mVuO; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f3f07ac2dcso25226441fa.2;
+        Fri, 23 Aug 2024 09:54:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=digitalocean.com; s=google; t=1724432057; x=1725036857; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1724432075; x=1725036875; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yLM8J7H2DsgRDxPVtS0CcqhN2nJId985NbMPevWwKAk=;
-        b=CTh6LX8vfmq70xS2bf5iF08XblWbEXQl1P/S89D6K28fHKuGHn3tYHVHfxW+Y0Vqu3
-         zgyxaPXJTRDPhEm0I6gaBqjhUOYzCR8u3sdAbnK2d9C2lYwTan+Ng1iHyGUUJZR6+0Tl
-         QAP8nck6XZ2DHbb1R2UaSf7GlTkr8DNpa0qvQ=
+        bh=zon1U6XI7RDgoBlJOOvO1r9gIw8jdWpzCbK+CHqcbzY=;
+        b=Iag1mVuOlAK02O89s8ItagdB7KxFb/l0VtZOm8QwRTDcwq44pmumRwJepDOZ4P7Fzh
+         4iNwbkT+1Wcn49sQZ8RXBdH2uAzcFNq1fAp9YE8Fh8khq75Ql+FIMVpQNgnnHrTVU5ET
+         LTGADfJqgJZYWShl6ev6eMCcv3Ul9WQakW0MJsOhayQ1iJ3CcFozVPp+tplzK3HtzluY
+         ejClO0qBIPU9yy0Z13IT9uNBcLWx9kRT8ZfpXnSeQvBe8zBivgRjixMJfuLSI79NxL7q
+         en+uo+dH0ga0prp4K+Y81joqv1uwsRoOT5LlYbp0VtlnkacE+PjUkDGqLa4VSA8JdK97
+         1R4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724432057; x=1725036857;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yLM8J7H2DsgRDxPVtS0CcqhN2nJId985NbMPevWwKAk=;
-        b=FxohzeMeQJTdDjA2HVOlwWCL2nEzwtVM+XP63QaQiN3JYH1MrFM7ENhbn1Ptl+NSo0
-         WeWFqcfeSAWCVQs3w3bPPakdAx7WcbxxqCRoSjbUolwFSWfFoCTc2hqmEaMAtf6WgZgp
-         kxczGD+uz3VonEC+T1AJATXniIj7kfYMgVSzEgS4a4Feo2P+/zVkDJ+krwHnkRCnCW8X
-         cQypUDYiGcvD0kFD4YOpw0MowSwyeiiOmeQ0xMW8CXYXckLF8TOc0pGbHwFjTQqokLVu
-         2uVlf1sYE8jFhxVz5zZip9EO7WPJRunFZlZ9vik0luStwEq1OoEPEtXXtzZtlu/X30gb
-         Y8DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOzqkoQBFnvukl5BKhcxKgrNww3l/hrzxLJTp/qImqivbtO3DFRPAbu6dNEYsU8fj1ofRxdiU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJvHDqljgrby67Y5Ias9pULLmTkB9DhZkWo4PqfdTBM7uSkD/f
-	v8Is4K+SVR/k06VRXtESv8LGWaZK+3R/k5h3mlH3CzPW4SXnPA0gxdohHGiYkrs=
-X-Google-Smtp-Source: AGHT+IH+lZIalG0ZppdDUStKyMfxmA2xRM0YnXPLiu2xPW0X1PX57ufunWwRCXTvVh1qWh0OpYdpBw==
-X-Received: by 2002:a05:6902:2383:b0:e0b:e4ce:9047 with SMTP id 3f1490d57ef6-e17a83de244mr3495755276.18.1724432055984;
-        Fri, 23 Aug 2024 09:54:15 -0700 (PDT)
-Received: from ?IPV6:2603:8080:7400:36da:45f:f211:3a7c:9377? ([2603:8080:7400:36da:45f:f211:3a7c:9377])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e178e4406b0sm720032276.12.2024.08.23.09.54.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Aug 2024 09:54:15 -0700 (PDT)
-Message-ID: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
-Date: Fri, 23 Aug 2024 11:54:13 -0500
+        d=1e100.net; s=20230601; t=1724432075; x=1725036875;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zon1U6XI7RDgoBlJOOvO1r9gIw8jdWpzCbK+CHqcbzY=;
+        b=sqkBlh/uhvV2iTukQAO00mQjon+W8ytsW6MaAe9pce8bSaAo1f1FsVt+GoMMyF122T
+         eMgcCeSRZMKQcTPQEGLFEuUeTvC5NWkO+tr5+mX0gx8bKWudHi7VxuszmoDGagvMrwmj
+         aFxtk87ScExLLBReMFEH3Lo6lIkrbioYEID2uereMgfweB1tL5i3KBxYQ2JhhYsQ8Vn8
+         /tXV4VVLgSfFCq///E+eZ/jaYFTKwXa3F2D3WRzFdG2w3UX2J3+9uL/RMllVfeXOW7tv
+         DMHYlWnfh9W4dbr0lbBx3+wteHJcVe2PzoKOGfMJTb8CElD0yZMYwpCk+vxXtVGHvlW+
+         +O8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX6ydRtiBvzYpU4C8SAk+3Ny4FazqYB2zlQ2/9OnOf7Qm1OF3O86yjO3IkCXHz9Y3JgpS3yIoAT@vger.kernel.org, AJvYcCX87qUH4nxV8xcbbgRkyGOwzEpSBhttpretXi47lu8IxpnxJpbgypo60sAMQIeupMYA5AJFsTjkTcxFPj0cWwIJeSU=@vger.kernel.org, AJvYcCXkZZQZZ3I33aYQPDPHW4rH4EZ16AETMhRjBPI7AEi1Sbqikc715O4G3vam62UKt6Tc9rs23ibXt+FVdKM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXQ0YSyeDubJ31X62fKThoAHAuFKQcyPd15+PI5UczLX24jCOa
+	j6UNEtNeS3J1xOAovfEe2gSQQ4xRMJ7aI7g8mrYJwp41COGGTQgJ8gZpKTJltftCY38iVsszB8M
+	g8L7x5cM9vSYcwDdCnWjDNadh9lI=
+X-Google-Smtp-Source: AGHT+IFEzl8US1Mj3j70Ag46lDtaK4hvgcjCEPbcQtWo5rRj98mh3iglrl7HOszxszM05TikzwLuQPgOV0GYu+wm+ic=
+X-Received: by 2002:a2e:9d07:0:b0:2f3:f794:b18 with SMTP id
+ 38308e7fff4ca-2f4f57357bcmr15390471fa.11.1724432075088; Fri, 23 Aug 2024
+ 09:54:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: eli@mellanox.com, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, dtatulea@nvidia.com
-Cc: virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, mst@redhat.com, kvm@vger.kernel.org,
- eperezma@redhat.com, sashal@kernel.org, yuehaibing@huawei.com,
- steven.sistare@oracle.com
-From: Carlos Bilbao <cbilbao@digitalocean.com>
-Subject: [RFC] Why is set_config not supported in mlx5_vnet?
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240823072122.2053401-1-frank.li@vivo.com> <20240823072122.2053401-8-frank.li@vivo.com>
+In-Reply-To: <20240823072122.2053401-8-frank.li@vivo.com>
+From: Marcin Wojtas <marcin.s.wojtas@gmail.com>
+Date: Fri, 23 Aug 2024 18:54:23 +0200
+Message-ID: <CAHzn2R39CuQS3WJYs7=2jeg8LvhTrYC8xKmOiTDZKLhmbsLqig@mail.gmail.com>
+Subject: Re: [net-next v2 7/9] net: ethernet: marvell: mvneta: Convert to devm_clk_get_enabled()
+To: Yangtao Li <frank.li@vivo.com>
+Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com, 
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, ulli.kroll@googlemail.com, linus.walleij@linaro.org, 
+	linux@armlinux.org.uk, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	mcoquelin.stm32@gmail.com, hkallweit1@gmail.com, kees@kernel.org, 
+	justinstitt@google.com, u.kleine-koenig@pengutronix.de, horms@kernel.org, 
+	sd@queasysnail.net, linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+pt., 23 sie 2024 o 09:07 Yangtao Li <frank.li@vivo.com> napisa=C5=82(a):
+>
+> Convert devm_clk_get(), clk_prepare_enable() to a single
+> call to devm_clk_get_enabled(), as this is exactly
+> what this function does.
+>
+> Signed-off-by: Yangtao Li <frank.li@vivo.com>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
 
-I'm debugging my vDPA setup, and when using ioctl to retrieve the
-configuration, I noticed that it's running in half duplex mode:
+Reviewed-by: Marcin Wojtas <marcin.s.wojtas@gmail.com>
 
-Configuration data (24 bytes):
-  MAC address: (Mac address)
-  Status: 0x0001
-  Max virtqueue pairs: 8
-  MTU: 1500
-  Speed: 0 Mb
-  Duplex: Half Duplex
-  RSS max key size: 0
-  RSS max indirection table length: 0
-  Supported hash types: 0x00000000
+Thanks!
+Marcin
 
-I believe this might be contributing to the underperformance of vDPA. While
-looking into how to change this option for Mellanox, I read the following
-kernel code in mlx5_vnet.c:
 
-static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
-                 unsigned int len)
-{
-    /* not supported */
-}
-
-I was wondering why this is the case. Is there another way for me to change
-these configuration settings?
-
-Thank you in advance,
-Carlos
-
+>  drivers/net/ethernet/marvell/mvneta_bm.c | 16 +++++-----------
+>  drivers/net/ethernet/marvell/mvneta_bm.h |  1 -
+>  2 files changed, 5 insertions(+), 12 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/marvell/mvneta_bm.c b/drivers/net/ether=
+net/marvell/mvneta_bm.c
+> index 3f46a0fed048..bfd1ed12d98c 100644
+> --- a/drivers/net/ethernet/marvell/mvneta_bm.c
+> +++ b/drivers/net/ethernet/marvell/mvneta_bm.c
+> @@ -411,6 +411,7 @@ static int mvneta_bm_probe(struct platform_device *pd=
+ev)
+>  {
+>         struct device_node *dn =3D pdev->dev.of_node;
+>         struct mvneta_bm *priv;
+> +       struct clk *clk;
+>         int err;
+>
+>         priv =3D devm_kzalloc(&pdev->dev, sizeof(struct mvneta_bm), GFP_K=
+ERNEL);
+> @@ -421,17 +422,14 @@ static int mvneta_bm_probe(struct platform_device *=
+pdev)
+>         if (IS_ERR(priv->reg_base))
+>                 return PTR_ERR(priv->reg_base);
+>
+> -       priv->clk =3D devm_clk_get(&pdev->dev, NULL);
+> -       if (IS_ERR(priv->clk))
+> -               return PTR_ERR(priv->clk);
+> -       err =3D clk_prepare_enable(priv->clk);
+> -       if (err < 0)
+> -               return err;
+> +       clk =3D devm_clk_get_enabled(&pdev->dev, NULL);
+> +       if (IS_ERR(clk))
+> +               return PTR_ERR(clk);
+>
+>         err =3D mvneta_bm_get_sram(dn, priv);
+>         if (err < 0) {
+>                 dev_err(&pdev->dev, "failed to allocate internal memory\n=
+");
+> -               goto err_clk;
+> +               return err;
+>         }
+>
+>         priv->pdev =3D pdev;
+> @@ -452,8 +450,6 @@ static int mvneta_bm_probe(struct platform_device *pd=
+ev)
+>
+>  err_sram:
+>         mvneta_bm_put_sram(priv);
+> -err_clk:
+> -       clk_disable_unprepare(priv->clk);
+>         return err;
+>  }
+>
+> @@ -473,8 +469,6 @@ static void mvneta_bm_remove(struct platform_device *=
+pdev)
+>
+>         /* Dectivate BM unit */
+>         mvneta_bm_write(priv, MVNETA_BM_COMMAND_REG, MVNETA_BM_STOP_MASK)=
+;
+> -
+> -       clk_disable_unprepare(priv->clk);
+>  }
+>
+>  static const struct of_device_id mvneta_bm_match[] =3D {
+> diff --git a/drivers/net/ethernet/marvell/mvneta_bm.h b/drivers/net/ether=
+net/marvell/mvneta_bm.h
+> index e47783ce77e0..396dced914aa 100644
+> --- a/drivers/net/ethernet/marvell/mvneta_bm.h
+> +++ b/drivers/net/ethernet/marvell/mvneta_bm.h
+> @@ -94,7 +94,6 @@ enum mvneta_bm_type {
+>
+>  struct mvneta_bm {
+>         void __iomem *reg_base;
+> -       struct clk *clk;
+>         struct platform_device *pdev;
+>
+>         struct gen_pool *bppi_pool;
+> --
+> 2.39.0
+>
 
