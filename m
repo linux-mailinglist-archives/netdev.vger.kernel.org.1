@@ -1,151 +1,300 @@
-Return-Path: <netdev+bounces-121294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A66595C97F
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 11:45:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AA9F95C9BB
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 11:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E87EE285F4C
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 09:44:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67C51B26D02
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 09:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB8C167DB7;
-	Fri, 23 Aug 2024 09:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A258156C69;
+	Fri, 23 Aug 2024 09:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="GT5QENx8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QUNEsgZp"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9453A15CD78;
-	Fri, 23 Aug 2024 09:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724406281; cv=none; b=MbELyy/KAzT/QtpJtKvUhmbcGHJXlRh8f2O0RVUxAlzcQ2rRUecSDWTBASVadX9wD13XyYdS0shF5qqOXsaznJ/Fb84mvQZDAO9A9uz1GW3biRXvzzyieDXKFD9o8bnjmZHm25ylCtA31vNq3wZ1dOaB7qYu7IyIfd7CqwgnY6c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724406281; c=relaxed/simple;
-	bh=72JCPyisVpo5s1wZI1A8vxFMtjQIauLjeFAGQ3ihPn4=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=JpUBXfTgKQJRwpVd3bGBlxSKvVE0Aw69y1pHDHUO+pSFHSEs1gr0nqDDbs82jOnYVMAiDh2aHGC3oGRT3JHoTp6yuioorBhgucNctvBXo9clAZsDjy7VXCgto0d352v3IdznKtRzBEKj+nzqUp2niNR0RGcfNA6l4wkEWdNhT9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=GT5QENx8; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id 1E6C020B7165; Fri, 23 Aug 2024 02:44:39 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1E6C020B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1724406279;
-	bh=oFZxcgjEt2RtouAMlSr6QhcGpux36C3Is+QtFB1p5pI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=GT5QENx857qaOCHsCluER2skIQMAj2h9ZZx0QF3ACKtDBd7Th5YKoFhgXNeKTLNfR
-	 dRlZL6jv4p6dVwyn2R/v9VM9g2qHXsoSFr6Wu0PkhwezpcqIsTHsEed66BFL/xrvf1
-	 WqR0ILZ80RD3enceO7YTfjEYr9/gQdumNBjOdXJ4=
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	yury.norov@gmail.com,
-	leon@kernel.org,
-	cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com,
-	vkuznets@redhat.com,
-	tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: schakrabarti@microsoft.com,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: [PATCH V2 net] net: mana: Fix error handling in mana_create_txq/rxq's NAPI cleanup
-Date: Fri, 23 Aug 2024 02:44:29 -0700
-Message-Id: <1724406269-10868-1-git-send-email-schakrabarti@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4046517C9FC
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 09:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724406795; cv=fail; b=PjTjFqrcHA9GUq0Y4yu+eIxt3V1WR+dUAjUwv/dAEIZ/EmCUbFd4nCB3+2hfugojdOVcZrZ26Ihll3eBbWeWBS6hjaC9/E4E4S7DrIOHmfh4wQETybMB7wZ3VH75htaixph9OC3XKqswxKEP5UtoA2RPyRxRDCDMjz3k5RUVNqM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724406795; c=relaxed/simple;
+	bh=4xPSbD3CSlOKsAw7ZRfSaulMmdnxVVbeKIZlMP3iXpg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Wv1gCuboXH05FKvwdF6oqoJ34FcnAoFWsHqM2sCjaC75xEdeAtKmpifxJEX/+54s01jCvOQul3IdhyCcs8kamnyQ8P+vpT0aRmHVk5q1hSptMX1mOUvPLCZ8aXKNaw82xDZzR7rq4Uf5T7JFX0Z1k6rZf98hGkwPYcRJemSAxAY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QUNEsgZp; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724406793; x=1755942793;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=4xPSbD3CSlOKsAw7ZRfSaulMmdnxVVbeKIZlMP3iXpg=;
+  b=QUNEsgZpBIBQ078Rj60+Y2DnYUxIUOEJI+NsqXxLJMug1BTIURmTynh8
+   cER4HtV9PnZqx01xYYT9SJ4xuQfvQ6j6fLvwM1QIRJOfuwYS0HQCaTCNv
+   Ay2m/w+S1DiJV2cJhWEhkj6wTF5zMnFc1uypgIhQE7UDtzjbyo8fv40Kt
+   TKx6J78CKLIT7QBFTg75a5OgAvNX9PbFfNpNKEQlEN+hk0CWZRXVHzrUs
+   oCG/GHKPX8dzzLCXkmNBDB4ZhkkBjHS5s9d4BOB7s9jt6LAswVdmum5QW
+   RfVeT71ZUzWKiH2Qfu/v9z/JUGex/bRZG2UrOwHBGn/wWLP3PwgV6jJmi
+   w==;
+X-CSE-ConnectionGUID: S+VQxydESzOmOKlLwgQRhA==
+X-CSE-MsgGUID: VloJMpD6TU6SNl/ml6IBuQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11172"; a="45386949"
+X-IronPort-AV: E=Sophos;i="6.10,170,1719903600"; 
+   d="scan'208";a="45386949"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 02:53:13 -0700
+X-CSE-ConnectionGUID: ypgBpULpQgK4mgd4ZTmgwQ==
+X-CSE-MsgGUID: XmibJ7IbQjuDR8MfDU9ugQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,170,1719903600"; 
+   d="scan'208";a="66576013"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Aug 2024 02:53:13 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 23 Aug 2024 02:53:12 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 23 Aug 2024 02:53:12 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 23 Aug 2024 02:53:12 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.175)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 23 Aug 2024 02:53:11 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Dsc31jB2GBr4PMQIYtMixOSfrBAsj9Cb41TDOSrixIu6e8Gi6xur+uLkuOzKBRYnuS2FObTmxdWG9/3MbYay/AfS4daR6uTwCGymKU6KOCZKpU1/npBv3GeF3xX4Ef3hLu89N6Mx/DNodV9eBtrU1CEC/VDKr4GzP7PYPX9uK/IdVx82KG+c9VuzqZE4Qo9JRVRCpiBNFSZfF6Oms4MLYoDBuOnVbHtvj1kH4jC/ZgFbIREE6C6JLoIbwPahUh2F3CAS6MUyNyX2RDaPGpCNAyk1rOvO6MoU82LlKzZH3gMTNMqiqdbDUyvs9I2lg9c1VneIPzykugPn/aFKRXxhMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pxxEyzVGI/gz/PBxRpWDFN2rAmba4u0i1eID6uTk3dI=;
+ b=xuX8EsUvKVOyEFoW/JC9Etz9Z+Dpa2m/I4JOHdm+fITnHrANUTsysovNuiXLzgXSo9jYIEbhncV8agEpDlmM+j6eMnddPqutCKt5V2HBErtdCeJqa0BIdwFbn7TRCGWGiXifXUA0buJStcvuEeC/Fd3Q1LswBKPMVOAODzKBZ44nmh1xebF782zDZgc7z93k4t2Uq2VoinWkYWkd4uy/b5gLM6SY1AONzaU5Y0l+Rp/Am95UpDcGwK1Br9eNl6Zlrl26jYkB0TEJRyVHOrOrYtY0BxK7doeojYgkTrWIAkBwI+wdqRh0Y+I/fa8od6wYN9Bv+e/O3bGsu4drtCW9Tg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by MW4PR11MB6959.namprd11.prod.outlook.com (2603:10b6:303:228::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.16; Fri, 23 Aug
+ 2024 09:53:08 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::4bea:b8f6:b86f:6942]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::4bea:b8f6:b86f:6942%6]) with mapi id 15.20.7828.023; Fri, 23 Aug 2024
+ 09:53:02 +0000
+Message-ID: <675c1a1b-49c9-4893-8f8c-92d33e2f6dd7@intel.com>
+Date: Fri, 23 Aug 2024 11:52:56 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v10 02/14] ice: support Rx timestamp on flex
+ descriptor
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<horms@kernel.org>, <anthony.l.nguyen@intel.com>, <kuba@kernel.org>,
+	<alexandr.lobakin@intel.com>
+References: <20240821121539.374343-1-wojciech.drewek@intel.com>
+ <20240821121539.374343-3-wojciech.drewek@intel.com>
+ <10175186-abff-42a9-aebe-d8d0d1daaf5c@intel.com>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <10175186-abff-42a9-aebe-d8d0d1daaf5c@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR2P278CA0034.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:47::15) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|MW4PR11MB6959:EE_
+X-MS-Office365-Filtering-Correlation-Id: d1d13c73-e28f-4ddd-966b-08dcc35960f6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?dEtGTytQVEtRWFlJZzVjakJqbGxGZHZWWWptTUloaDR4N2ZtVEk0dUV5SjA4?=
+ =?utf-8?B?Ty80VU5ScEZwdmNtT0Z3L2dDQXNWcThRcWVBZHloQ2R0MGQ1aXp1SmhmWFRX?=
+ =?utf-8?B?UnI1bHRhdkFJNnZuQ0djaS8wazMzSjkyV014MGRCTTRqMlZWNEhMUEpqaFly?=
+ =?utf-8?B?RVBiZ2tsSTJrNkgweEtGT21WMEpic3VTdy9CN3g2UHBLMHM4SkVSeUFITHR5?=
+ =?utf-8?B?UnQ1MDRGV0UxQzRNQmVSWUZrS29jbHRhMXJZM213QlFqa2FGU0xrK3hQaC85?=
+ =?utf-8?B?RlpGRlBKcnVtUXBscHVUeE55WE5TblBJUzZNcFNTQ1hPYXlIWUxoejhzbHNJ?=
+ =?utf-8?B?S21LRHYvQjQxY1kyT2ZTdDZWdXZGTkVVVTA4UVM1Mlh0VmUwNzhyNUhzUTVj?=
+ =?utf-8?B?cDVhUjd3MXp5MlNJeXgzbGxUaU9wUWJWMk5iblBRZXA3RitHU0VtZTc2R0dv?=
+ =?utf-8?B?bjNRelNEZjBqemc0TnZZVU9Kbk1qK3E1TFRlZnA3alYxOU9ZcDhSN3ZSVmdR?=
+ =?utf-8?B?SEs5ZXZML1pxcW1BR2FzeVF3a1NLaTdlekdhOVR5cE9aeVhWL0FUWTM2UHRq?=
+ =?utf-8?B?UmpoTU8wV3Z5em1YRGt6elZvWmdHWjlIUVhGUmxwS2lsQzU4V3hLVElZZ2Rz?=
+ =?utf-8?B?NFlmelc4N1VOS3B4N1o5N0pTTk45cWwyLzYrWVNPUis4NlArTE90TlBlSnVD?=
+ =?utf-8?B?NkROcCtxMU1UWEc3YTkzZkF4ZzFQcFA5MjltcGcxbnY0VW1vbEs1ay9SMWl3?=
+ =?utf-8?B?WWJvemFWVXFnT1Zib1htSWR2TzVpbUpKU1N4Q0hKOG5wVEtGNEIrSDVYaWxm?=
+ =?utf-8?B?cXZheHorTk9IVkRKVlZ3S3NRcFZtNDV0TktHQ01xOUI1VmxYb3pYclk0WCtp?=
+ =?utf-8?B?b3hKS0VwVkxQNTdkbmEyd2J2V2lTN0pUaFg0b0tub2pLV25EMy81b1VBZHIr?=
+ =?utf-8?B?ZDFNK3RTZ2sxZGFDQnByUXh5RkVBOTFoOUNwMXZ0Ri85U0NZTDB1LzVRTmtr?=
+ =?utf-8?B?dDlwOEwzeG4zOFpqU0xuSnpFMlVwUVZUV2htKzBKR2FYZWRlUXBaWUd5WDN4?=
+ =?utf-8?B?dDNicW1DL3VuZTJoZ2xSWFA3amIzcC84Mk54T1RGL1FOYTcwMi9vcUZlcW0r?=
+ =?utf-8?B?RE5TMVJrbUJIcFBjZ29LbEdrVytBNWprZ0FTOWtYbjRHSHhrM0tRUUV2Q1BH?=
+ =?utf-8?B?VjZkRWx5SFVPeSs0Ym9IRFZ6VVVEeHB1TVdJWE02a1FET3FNUjJVa2l2dm9j?=
+ =?utf-8?B?TEZDT3NzSURtNkNZNmZkQm5Eand2djRuN0JibkV2TUk4T0VQZG93RHY1bEFI?=
+ =?utf-8?B?VCtueC9UWGNlblJFaG5qckxhcjl5TlJ0VHl0ZTFaUytGejJ1bDl4N1lsN1ZT?=
+ =?utf-8?B?eG52bjBkNndvdnJaRk45Ym1OY1Z6d2VFUUhOQW1zYldEWTFRTjJVS3hDOVJE?=
+ =?utf-8?B?SU1zanBRWGxnejFDemNIQUhVSmFucFNkazZ6YWVVNHM0QzRKKzVnWDNXUEhX?=
+ =?utf-8?B?ZmxsMmgrZkVGM1RNaTRHUmRKbDBlUjJYcGZnTnRpUFVlZkZDdFZ2RGtUV1Bu?=
+ =?utf-8?B?OXlrNW1EUitYSDJnVmNqQXlGQ1ZCWGdWY0t1TWFsUGlZMWIxN0J3ZHlKOVBl?=
+ =?utf-8?B?cXJCWWpmZVNsd2tCVi9JamdlZkRQRDhsMThxVUVxT0hwOFd0ZGE2N0RmUnVQ?=
+ =?utf-8?B?QnNuSHZFQkpubFJtVnNId3pnaVpCdU10bkc3aFZSOFNMRStSc0sxT2lwS3Uy?=
+ =?utf-8?B?MkJ2bDB1QncvVlIrVnRzS2RNWWdrZDl1NXdWSTRwYlNKcnAvVCtLNnFKSEVq?=
+ =?utf-8?B?cVNPWDArUHNPT1FsVE1jdz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N0JJd3hIeVZvTTIxVlEvWHpIV2ZBajdvdzVWZGx6MnNoalF5YUp4T3U5b1VQ?=
+ =?utf-8?B?eEE2WlJ6MTMxVjN3YU9ZRlNhLzBOejVFRDV3ZnUvWVhkT1VLVDBHVHB4RlhH?=
+ =?utf-8?B?QWJvWXdpVE1Hc3NReDVqRlhiZnJYMVlOWXlKRlBaTlBwd3VWNWlvOHY1cTQz?=
+ =?utf-8?B?aE9Za3ZrbU1ldnozdnd1RnpCRnM0QU1hd21SVHBsdzIyRVZrV2hzODc2ZG4w?=
+ =?utf-8?B?NmxLSXVQZDB2SndZS3lMMFhzcVFQb0wzUGhSQmFIRURTMjJmR3p5Um10SFpm?=
+ =?utf-8?B?YmcyelJSWTJVTTlPVWg5UjJxeGx5cmY2VDFVYVVFa0V5Y09kbVkwSlp6THhu?=
+ =?utf-8?B?dEFpd2o1L29MWXlVdHlVQUdzcEJEUGVQMm1ZOE4wK2QrNlBUSGpzam0xQ3ZT?=
+ =?utf-8?B?bndQM2UyZU52SEFQZWg3Um5KNUk1SGhwNTFlQVdaRjFHNVROdmZyLzArVG9z?=
+ =?utf-8?B?RUM5eDVieUd5L3RBM3IxRXdPR3lPSnhkVjVYMTdXN1pwK3BncE9PdkVsQTVW?=
+ =?utf-8?B?cldJV01Cb0w0UmtkeVJya2VpdXlFR0RWV0NCUFloUmpycEY2disxbU9GUWht?=
+ =?utf-8?B?NU8xb0JEdzdPcHNyS3VwVzZTZHRyTy9Pek83RXZiS2FvWWtxOGVmT3RWbzUv?=
+ =?utf-8?B?aE5KcTlUcGZUOWVMWUR0aUNaVllYMU1ORDJibnA1RzFvWlBPbEQ0MWd2Y09P?=
+ =?utf-8?B?MmVaNW85dXZGR0p4ZEZHY1JibmNqbHQ5Yjl6YmE5UjEvZVN5WkdGVXdTT2Iv?=
+ =?utf-8?B?M3dHalh1S2dFbmlyRnlGY1ZKRlBLMnQ1UEVPaS85Z0xYeE1oUmdqb3F1Z2g5?=
+ =?utf-8?B?WkdVcUtLTE1lUnpFU2l2ZmNDNm5VL0VINHoyQzF0WWxBUXBYN0tQTi9rV1ZU?=
+ =?utf-8?B?aTNFNFFpRzJzc2MxeE5HYlVHT1ZxS01JV3Y4a0Y2RUZaZGxiaDU0VGt5NVhM?=
+ =?utf-8?B?NWVLYmdhdTlmeC9IWkpRU3VYQVhkWUdSbjBSS01qcXJZZ2hTZ3JsWUpJNW9F?=
+ =?utf-8?B?eFRWYzNLWVdoYVFDNFdtRnRTVU1qcGhUbGNEejZRRFA0UTVacnJEdWJSRWl3?=
+ =?utf-8?B?UDNCTVV1a0ZrUS9SOTFra1k3Mjl3MDZKSDNZQ0J1YmNkL2gvdG9JRTBHaHlx?=
+ =?utf-8?B?YVNTbnNJbCtvQWdaLzlsZi9idW4ydXltZEFuYlVYclhjbGQybHFNUGF3MU8x?=
+ =?utf-8?B?N09BWHAvS1kvSUM1aVd3SStMWkphWDNQekIzMWxvbWJoMCtkbDZTYk4wcFpq?=
+ =?utf-8?B?ZlhLbXBreGFzQXBtMENVNVV5NG1wMXdrRjJObVBtTytvN1ZGRUN3eFVZTW5Y?=
+ =?utf-8?B?eTRFeGNMdWlMK1VnbVptSm1LMWs4TnMvSUNCSGR4Wm1rZHdnYXQ1RWc0b1ZD?=
+ =?utf-8?B?cU9rRnFRVDdPNzcwdjdsbmdPclJycC9QQlM3UFg3TlIwWnljQkhMeTI1Z21M?=
+ =?utf-8?B?UUYrb0N6RDZlTnJpZlBDVzM5M0xXUEgveEZVT1pwV1k0Y3ZLQWxJeGpwcC9x?=
+ =?utf-8?B?dDlYS2l6a2lUdW9zbjVQaDJHM0xjRXROWE5YYkFFVGN6b00rWjhEdUl3cUtV?=
+ =?utf-8?B?UE5qT2Npb0d1Nzh4L2JLS1haWHRXRjNHSitjSDl5TGIydllrWmxsMW1ySWk4?=
+ =?utf-8?B?UkRPMnF5ZWhDMkcwa01UNERHb1hGRDhJbmltUlJQQkJZYjFvdGdTL2ZFT25h?=
+ =?utf-8?B?bS91ODJlOVBqN2Y2ajA0YkpZVllMT0IyQXlCSzlJNDhUVW5PVERCZVVoTGR2?=
+ =?utf-8?B?eDhhN3Q1NFVtU3ZzUTBVWE9EYnVHV2dKWCtmUGlDNWtOQUFXVHB6dlZRWk1x?=
+ =?utf-8?B?YUN0YjNvSHpKSkczUW1XRG9MU1J3ZCs0ZC9JaDdRWmlMSTBvbWI0WXIvWGd0?=
+ =?utf-8?B?V1A0cnFhaWltMEFyNnE2aWhtanNWUGFFVUpQSzVJY3hTTDBtZWVZTTNqVXhq?=
+ =?utf-8?B?Q2Y2dmNiVU1YTS9rbElIR05VZ2MyakpNTjc1VEpDN252Tjd2QmZPLzYrblpH?=
+ =?utf-8?B?TlJZRUdXMGRWTHovY240ZVI0MVZURWdBcXJma2xwVGVUL1RFcEpYK05XVkw5?=
+ =?utf-8?B?LzJkRHZFdVV4b2F0N3krNHpkUmE3RXROaFhOOGlVSnZ6b0lpMFhLaStaSlJl?=
+ =?utf-8?B?bENGcFFsNXZPYXV2QUYyRW8weE12ZWo2aVpub1lhZG5NV0d1Nnp4Qy8va3dt?=
+ =?utf-8?B?MFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d1d13c73-e28f-4ddd-966b-08dcc35960f6
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 09:53:02.8772
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KjvQapUyno4c/tpX0vEmCitBjzGTxjsuxgpb4xKkIizX3nSmMkZfbPsZXdQWFvKnq47lcnYQLH2L3SpAvyUrOI6GcFYOVP39FJjWofnSzPg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6959
+X-OriginatorOrg: intel.com
 
-Currently napi_disable() gets called during rxq and txq cleanup,
-even before napi is enabled and hrtimer is initialized. It causes
-kernel panic.
 
-? page_fault_oops+0x136/0x2b0
-  ? page_counter_cancel+0x2e/0x80
-  ? do_user_addr_fault+0x2f2/0x640
-  ? refill_obj_stock+0xc4/0x110
-  ? exc_page_fault+0x71/0x160
-  ? asm_exc_page_fault+0x27/0x30
-  ? __mmdrop+0x10/0x180
-  ? __mmdrop+0xec/0x180
-  ? hrtimer_active+0xd/0x50
-  hrtimer_try_to_cancel+0x2c/0xf0
-  hrtimer_cancel+0x15/0x30
-  napi_disable+0x65/0x90
-  mana_destroy_rxq+0x4c/0x2f0
-  mana_create_rxq.isra.0+0x56c/0x6d0
-  ? mana_uncfg_vport+0x50/0x50
-  mana_alloc_queues+0x21b/0x320
-  ? skb_dequeue+0x5f/0x80
 
-Fixes: e1b5683ff62e ("net: mana: Move NAPI from EQ to CQ")
-Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
----
-V2 -> V1:
-Addressed the comment on cleaning up napi for the queues,
-where queue creation was successful.
----
- drivers/net/ethernet/microsoft/mana/mana_en.c | 22 +++++++++++--------
- 1 file changed, 13 insertions(+), 9 deletions(-)
+On 21.08.2024 15:29, Alexander Lobakin wrote:
+> From: Wojciech Drewek <wojciech.drewek@intel.com>
+> Date: Wed, 21 Aug 2024 14:15:27 +0200
+> 
+>> From: Simei Su <simei.su@intel.com>
+>>
+>> To support Rx timestamp offload, VIRTCHNL_OP_1588_PTP_CAPS is sent by
+>> the VF to request PTP capability and responded by the PF what capability
+>> is enabled for that VF.
+>>
+>> Hardware captures timestamps which contain only 32 bits of nominal
+>> nanoseconds, as opposed to the 64bit timestamps that the stack expects.
+>> To convert 32b to 64b, we need a current PHC time.
+>> VIRTCHNL_OP_1588_PTP_GET_TIME is sent by the VF and responded by the
+>> PF with the current PHC time.
+> 
+> [...]
+> 
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.h b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+>> index be4266899690..b7c340bb7aa7 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+>> +++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.h
+>> @@ -136,6 +136,8 @@ struct ice_vf {
+>>  	const struct ice_virtchnl_ops *virtchnl_ops;
+>>  	const struct ice_vf_ops *vf_ops;
+>>  
+>> +	u32 ptp_caps;
+> 
+> Hmm, there'll be a 4-byte hole here now.
+> If you put this new field either after ::mbx_info or after ::link_up,
+> the struct size won't change at all.
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 39f56973746d..7448085fd49e 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1872,10 +1872,11 @@ static void mana_destroy_txq(struct mana_port_context *apc)
- 
- 	for (i = 0; i < apc->num_queues; i++) {
- 		napi = &apc->tx_qp[i].tx_cq.napi;
--		napi_synchronize(napi);
--		napi_disable(napi);
--		netif_napi_del(napi);
--
-+		if (napi->dev == apc->ndev) {
-+			napi_synchronize(napi);
-+			napi_disable(napi);
-+			netif_napi_del(napi);
-+		}
- 		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
- 
- 		mana_deinit_cq(apc, &apc->tx_qp[i].tx_cq);
-@@ -2023,14 +2024,17 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
- 
- 	napi = &rxq->rx_cq.napi;
- 
--	if (validate_state)
--		napi_synchronize(napi);
-+	if (napi->dev == apc->ndev) {
- 
--	napi_disable(napi);
-+		if (validate_state)
-+			napi_synchronize(napi);
- 
--	xdp_rxq_info_unreg(&rxq->xdp_rxq);
-+		napi_disable(napi);
- 
--	netif_napi_del(napi);
-+		netif_napi_del(napi);
-+	}
-+
-+	xdp_rxq_info_unreg(&rxq->xdp_rxq);
- 
- 	mana_destroy_wq_obj(apc, GDMA_RQ, rxq->rxobj);
- 
--- 
-2.34.1
+Sure thing
 
+> 
+>> +
+>>  	/* devlink port data */
+>>  	struct devlink_port devlink_port;
+>>  
+> 
+> [...]
+> 
+>> diff --git a/include/linux/avf/virtchnl.h b/include/linux/avf/virtchnl.h
+>> index 252fad21b04a..012ed2f5f9d0 100644
+>> --- a/include/linux/avf/virtchnl.h
+>> +++ b/include/linux/avf/virtchnl.h
+>> @@ -304,6 +304,18 @@ struct virtchnl_txq_info {
+>>  
+>>  VIRTCHNL_CHECK_STRUCT_LEN(24, virtchnl_txq_info);
+>>  
+>> +/* virtchnl_rxq_info_flags - definition of bits in the flags field of the
+>> + *			     virtchnl_rxq_info structure.
+>> + *
+>> + * @VIRTCHNL_PTP_RX_TSTAMP: request to enable Rx timestamping
+>> + *
+>> + * Other flag bits are currently * reserved and they may be extended in the
+> 
+>                                     ^
+> 
+> Just curious, what is this?
+
+No idea :), will be removed
+
+> 
+>> + * future.
+>> + */
+>> +enum virtchnl_rxq_info_flags {
+>> +	VIRTCHNL_PTP_RX_TSTAMP = BIT(0),
+>> +};
+>> +
+>>  /* VIRTCHNL_OP_CONFIG_RX_QUEUE
+>>   * VF sends this message to set up parameters for one RX queue.
+>>   * External data buffer contains one instance of virtchnl_rxq_info.
+>> @@ -327,7 +339,8 @@ struct virtchnl_rxq_info {
+>>  	u32 max_pkt_size;
+>>  	u8 crc_disable;
+>>  	u8 rxdid;
+>> -	u8 pad1[2];
+>> +	enum virtchnl_rxq_info_flags flags:8; /* see virtchnl_rxq_info_flags */
+>> +	u8 pad1;
+>>  	u64 dma_ring_addr;
+>>  
+>>  	/* see enum virtchnl_rx_hsplit; deprecated with AVF 1.0 */
+> 
+> Thanks,
+> Olek
 
