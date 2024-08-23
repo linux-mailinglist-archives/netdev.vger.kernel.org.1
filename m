@@ -1,139 +1,142 @@
-Return-Path: <netdev+bounces-121283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EE1795C8C6
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 11:04:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F62095C8DF
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 11:10:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C25511C2148C
-	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 09:04:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 175BE1F23056
+	for <lists+netdev@lfdr.de>; Fri, 23 Aug 2024 09:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DFC143880;
-	Fri, 23 Aug 2024 09:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795DA14A087;
+	Fri, 23 Aug 2024 09:10:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a8XcB9fs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nXTDR0Q/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A9A4C62B
-	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 09:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E03149C46
+	for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 09:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724403872; cv=none; b=gUY54vItqlAB4dsVCMDg25zcvYB4HMHJW4k/jIE0HF9xxTna0DQYchwZWeJLp9xRA+Z+CLWBReZQkZ/YE48qyLDs6PvFg9GvhEQ2LVOMnNrRAxP6ZlcedEfSJtF1+G15pAWX1VHpJMdExft4NM0/6ZZdAqKZ7NZFBFv2ucWcTWc=
+	t=1724404248; cv=none; b=LlQT93CWVl31WbAbqz6AXJyUN7XaE3tM4XrT8Xp1JDUQ+gfBeoMdpdgppN+hJlvALyjM/RWLW4M8jCtgUyhFFj2jT9PXLDx6ulEI2cMwlO7goqSbi5zS90/UcXid7XVkQ/Gy8/HDl6Kgdiz31Ko+pc56mh1B2Zm1CA8BsJZy+Uc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724403872; c=relaxed/simple;
-	bh=RkIJ/E9QGJTROEj98LkdMcZolAX/l5rVOw4rz6mmL5w=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=YdLlTe2nsAG/0fHZ5A/Ab4c0mSKldAeAFXubDUJBnQkzrJrltJhG/uDyeCEuUwO0yXVCTCSazJLMCK0hr/8awgdoo3QPCODL94hzJpS02EOqGB7YVKiERa3dnk5xtWQQYbxwjk0n5idM431myvFwiVKl0mYjkJaOxpeRpzf9Oho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a8XcB9fs; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724403868;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ynTEdmfticGZ/m8N5XuffetH4d14Sd8C5DRc3+iynN0=;
-	b=a8XcB9fs8bZGAJS0A3RoMk5kLv8DANaOML+NbAHAuQCisnnna46GHeRwCYEdvMb3wI9htU
-	7iywEfD9k6XIMxmrXCVAm01GCkSIOYHb23BRhTVbIIUifGKVs/MTRayKUiv+JH80QAkoA3
-	UwKNh3ec14uUtXbiwi0JXURmqt74Gtg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-681-XD6ypbPOO_-1RUGM045hbA-1; Fri, 23 Aug 2024 05:04:27 -0400
-X-MC-Unique: XD6ypbPOO_-1RUGM045hbA-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3730b54347cso800386f8f.1
-        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 02:04:27 -0700 (PDT)
+	s=arc-20240116; t=1724404248; c=relaxed/simple;
+	bh=Jg5ia3aHONUUadtyXlIgwVR+JddSADOSM/MNOrpTPos=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bc7jzR0Ea+TfHjpROs4r1duOkfItI9r6cx0Dj92HY9WTI8hgnGtfsnXUQdKRjrT2ik9aPNSeo+Bx27FtBEyHeGwRVh6vg5TkbEVuCLm36vi8jj4pr77ZbL52MmaBm9mV8ab8GtWKE2o48174ppEr+FCj17s8zOIZQYnC14ME910=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nXTDR0Q/; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a7a843bef98so200645866b.2
+        for <netdev@vger.kernel.org>; Fri, 23 Aug 2024 02:10:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1724404245; x=1725009045; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6AhXsDMlvtQOFjb81q++WnGuzMYwKiixG4cCIOvamkc=;
+        b=nXTDR0Q/zKG7a371r/C+Qox3UpjNVYReGEAUlEQ+v32xynpD+ysfyJG7JkwkdamYl/
+         WmhE7SJppdQmw+AB4HDaObMKIYibeyKqS9Ga1VDXaD2Z0e5C2iGg1mg+ff6NEge1Rf9V
+         rC6XBVYqqvKiwQ9TiHub19DcpVpB0gXRCycVj2Hg3soA0gyYT7Ltqt8jib65SwGGnUne
+         KFvFR9S6gKUm2nCTmk173+3OFsnNFtbZ0RN4khUSqahmgjpmGZvgsVsdfEJcvLvrmnN5
+         VdBs36Cqj57IRBqEldujJabIbRqBDzJyU11nyJD3dOvGA0bLeKurv6DxB8qcm/9FbRXm
+         julA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724403866; x=1725008666;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ynTEdmfticGZ/m8N5XuffetH4d14Sd8C5DRc3+iynN0=;
-        b=uU9e5QfE9hqVoO5FA3SGtLEWmxVnDhSYMXXS9Im5AYC/wdAB63CnjbT+K1zDmXBqkE
-         Zq00EP+sPmEV1N3aZhmq4SNRJxX53Ba9V4KuywgpTvqVP3ORHnyT9GbW8TivVBjY9t+O
-         HfpnvRFV68YLhBCbTa1quowuRKEPORlDa8FSMk53S7X7wOvheFKmXtkyZGsd/yxrltlk
-         AD4d/Zu0KhXdufXn36lhDICFwhK4KIrg0gUPuuzc6+mzsGQ4nyUuoWpZ3WQt58Wexz9O
-         DrRQDdXi1Gbvpb8Tjss0BQOe37lJSC5LYxiPOkX+rZ9lLZNpLJthJHHc0nUBUMOSJAZO
-         iHEQ==
-X-Gm-Message-State: AOJu0YxGNidqHl3gfY67jsmvBsOuOIT6WqFVzWuvmRUA9apLxDXd5HoM
-	xmAtjEL30VAJvBVmn3aCGxlo2tYOUSgAsBUdOaKGt/iJf0Tt5eyeHmOhec8OkPTOZHlQ1x/J6GK
-	cAeFiispGLEHdq+/xMFz5xEiHtNN506SbmW4E6PBQ/gpC1QFVhmApEA==
-X-Received: by 2002:a05:6000:c47:b0:36b:555a:e966 with SMTP id ffacd0b85a97d-373118ba01fmr1078841f8f.35.1724403866062;
-        Fri, 23 Aug 2024 02:04:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEKABLCOZsdLJ7r30wQpsKQ4+VNi/BvAKwRBRpvwWPJqjHKv5nQSr7cKvMEdISDqicZf/HU5w==
-X-Received: by 2002:a05:6000:c47:b0:36b:555a:e966 with SMTP id ffacd0b85a97d-373118ba01fmr1078815f8f.35.1724403865557;
-        Fri, 23 Aug 2024 02:04:25 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b51:3b10::f71? ([2a0d:3344:1b51:3b10::f71])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abefd9cd1sm90171765e9.38.2024.08.23.02.04.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Aug 2024 02:04:25 -0700 (PDT)
-Message-ID: <8259922e-7a97-4b71-9127-0a403c3d4c9c@redhat.com>
-Date: Fri, 23 Aug 2024 11:04:23 +0200
+        d=1e100.net; s=20230601; t=1724404245; x=1725009045;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6AhXsDMlvtQOFjb81q++WnGuzMYwKiixG4cCIOvamkc=;
+        b=EH8HEvEEs6fCg1GCHWWlgtoBM1G+ikVmX/JERpys35Q3xppu8DB6rq9x4cRof9M4Ji
+         zHjT/6mXCFYLW7dg98fYxToN7i5KF5+In6TIgkHQIA0VD2zSmx9SWbHlJCLZXKWoYVs0
+         Y+F1uiT+M/w+pGpAloJVMvrpWSTLa5zfVDRg6oh0gHaKfEFO93L4qocfJQFpTNfCqvAw
+         m9lEHcQxSGdBFe99u19x+slc9mjYQM75NSzTWJVQJwuJgkJsJQySS2pC+TJX5rJOo/Du
+         UOlqHMRt5Vxc1OLDSEEtsSUoIWVMBs/rXf5eVKYAfXDD6U7luYdAF1gGaDJDvTXLdGbg
+         anUg==
+X-Forwarded-Encrypted: i=1; AJvYcCU8qS6GEBsquh/W8YokDFPCRYrlZqwc7RHJn5Tax8tq8XDTsKH5FVyMIkOox00jGpZ9aItOTas=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyefhRf1sGK6BfGPhJPHudzBCm2mqmIT+Q7bAZGK+92rDgtc6hM
+	TJHYu+cQAy8uidY8fL6WFWU+IcOHe2YgIZZcggHa+6VBVvf5tsZGoVXzCH45ZPg=
+X-Google-Smtp-Source: AGHT+IG6BzmUUMzpD/+Pr+Wo1DEsgeyuZhet4hGF2/3wMnlt4qwkqUwDqWOnA0zjSrMvDtOD42xikQ==
+X-Received: by 2002:a17:906:6a14:b0:a86:6a26:fec7 with SMTP id a640c23a62f3a-a86a52c70ecmr110389066b.30.1724404244722;
+        Fri, 23 Aug 2024 02:10:44 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f2202fdsm232702266b.13.2024.08.23.02.10.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2024 02:10:44 -0700 (PDT)
+Date: Fri, 23 Aug 2024 12:10:40 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] idpf: Slightly simplify memory management in
+ idpf_add_del_mac_filters()
+Message-ID: <c786a345-9ec4-4e41-8e69-506239db291c@stanley.mountain>
+References: <fa4f19064be084d5e740e625dcf05805c0d71ad0.1724394169.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 02/12] netlink: spec: add shaper YAML spec
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
- Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>
-References: <cover.1724165948.git.pabeni@redhat.com>
- <dac4964232855be1444971d260dab0c106c86c26.1724165948.git.pabeni@redhat.com>
- <20240822184824.3f0c5a28@kernel.org>
- <ad5be943-2aa6-4f60-be90-929f889e6057@redhat.com>
-Content-Language: en-US
-In-Reply-To: <ad5be943-2aa6-4f60-be90-929f889e6057@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fa4f19064be084d5e740e625dcf05805c0d71ad0.1724394169.git.christophe.jaillet@wanadoo.fr>
 
-On 8/23/24 10:35, Paolo Abeni wrote:
-> On 8/23/24 03:48, Jakub Kicinski wrote:
->> On Tue, 20 Aug 2024 17:12:23 +0200 Paolo Abeni wrote:
->>> +    render-max: true
->>> +    entries:
->>> +      - name: unspec
->>> +        doc: The scope is not specified.
->>> +      -
->>> +        name: netdev
->>> +        doc: The main shaper for the given network device.
->>> +      -
->>> +        name: queue
->>> +        doc: The shaper is attached to the given device queue.
->>> +      -
->>> +        name: node
->>> +        doc: |
->>> +             The shaper allows grouping of queues or others
->>> +             node shapers, is not attached to any user-visible
->>
->> Saying it's not attached is confusing. Makes it sound like it exists
->> outside of the scope of a struct net_device.
+On Fri, Aug 23, 2024 at 08:23:29AM +0200, Christophe JAILLET wrote:
+> In idpf_add_del_mac_filters(), filters are chunked up into multiple
+> messages to avoid sending a control queue message buffer that is too large.
 > 
-> What about:
+> Each chunk has up to IDPF_NUM_FILTERS_PER_MSG entries. So except for the
+> last iteration which can be smaller, space for exactly
+> IDPF_NUM_FILTERS_PER_MSG entries is allocated.
 > 
->     Can be placed in any arbitrary location of
->     the scheduling tree, except leaves and root.
+> There is no need to free and reallocate a smaller array just for the last
+> iteration.
+> 
+> This slightly simplifies the code and avoid an (unlikely) memory allocation
+> failure.
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+>  drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> index 70986e12da28..b6f4b58e1094 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> @@ -3669,12 +3669,15 @@ int idpf_add_del_mac_filters(struct idpf_vport *vport,
+>  		entries_size = sizeof(struct virtchnl2_mac_addr) * num_entries;
+>  		buf_size = struct_size(ma_list, mac_addr_list, num_entries);
+>  
+> -		if (!ma_list || num_entries != IDPF_NUM_FILTERS_PER_MSG) {
+> -			kfree(ma_list);
+> +		if (!ma_list) {
+>  			ma_list = kzalloc(buf_size, GFP_ATOMIC);
+>  			if (!ma_list)
+>  				return -ENOMEM;
+>  		} else {
+> +			/* ma_list was allocated in the first iteration
+> +			 * so IDPF_NUM_FILTERS_PER_MSG entries are
+> +			 * available
+> +			 */
+>  			memset(ma_list, 0, buf_size);
+>  		}
 
-To rephrase the whole doc:
+It would be even nicer to move the ma_list allocation outside the loop:
 
-	     The shaper allows grouping of queues or others
-              node shapers; can be nested to either @netdev
-              shapers or other @node shapers, allowing placement
-              in any arbitrary location of the scheduling tree,
-              except leaves and root.
+        buf_size = struct_size(ma_list, mac_addr_list, IDPF_NUM_FILTERS_PER_MSG);
+        ma_list = kmalloc(buf_size, GFP_ATOMIC);
 
-/P
+regards,
+dan carpenter
 
 
