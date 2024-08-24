@@ -1,76 +1,70 @@
-Return-Path: <netdev+bounces-121606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAE1295DB03
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 05:24:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D2BB95DB2B
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 05:49:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 680112821BB
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 03:24:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51D24283D05
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 03:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B7E13D510;
-	Sat, 24 Aug 2024 03:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C01376E9;
+	Sat, 24 Aug 2024 03:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hbWEvmo5"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="ici0RPIL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769C613E881;
-	Sat, 24 Aug 2024 03:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5A23214;
+	Sat, 24 Aug 2024 03:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724469659; cv=none; b=Pbq6Zx8gAjimsLjdgGAy0PbX4i2niAuMChvP7zQdzZum73dH82ktXqYDCu+gGrBp51xhYUxez81D/lqOtwDLhmyz3Ni0fDGoIGO5u/vLpwwfxyWW36lPQQb8+DgIqlz9oAV5e1Po2+fhcLhRvuk9KqQ9QsW9VyoMbJ3Op3xBkQQ=
+	t=1724471371; cv=none; b=ByR4oxGRLeuoy1jNEGlb0vhxCpNoxOm2+DqZIixkdIffcWdrq/3lMc7B+jiadpXrqXFM277DZ18jV0WHnezogyfBZMIITlzoCe2Ds538KYRVSjaZmywlOILxJ42n5/Xx0p1wYHseQEdSwUnUmhrk5T5BsqzUw0aAFfyz4mHvFns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724469659; c=relaxed/simple;
-	bh=p4YYPWWfeOTmFb2XDs2EfNnALNAekuVD4k4hsW0uCiM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZwUWRYLfxvJ6f/v35/g6omGjElqVWNlKj8OYvGx9Jp5lp9QaXWrXJIhMJpG6NWLnu0Z+zrhmRiPOiSew7/y7BcDGPQm2zOopKpxa7/l2HrRJWi57YVHthVV9d9yoDwNhU/QHM0X8k5+n9qxb3I4W5VFEOnKT7D97qPIPHZyzjkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hbWEvmo5; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724469658; x=1756005658;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=p4YYPWWfeOTmFb2XDs2EfNnALNAekuVD4k4hsW0uCiM=;
-  b=hbWEvmo5yoMKN99VJMPuu9VA1IL/DdALjONrQEnSxW+lA2zPvD0LKgEL
-   8lhLHRXnen9aHKfF3BiI+zml1we/jBU9E2UErue2M/EELMBMcebRR77sJ
-   93pYAJsRlVZPFyj1hTeB8I413obPeiMmAjbsuSnuTCZTYvRnTi3bsEgU2
-   b9pACnYRMMRkbP/zvVMntmpJuD4aqP5h1ggifr78hGkkgMs4pm07eCdJU
-   t25+tCqvQdjtPKmRFOGRsQkalPlaFEaoNdcl0tXb0siu8JVf3MVE8vx9D
-   syw5WoQdlF32opf5s4ogWgK2VBArfEU/+z9534mZIhSPdrrEKhtNr9fQd
-   A==;
-X-CSE-ConnectionGUID: KypEm6wNQPeBvnnIur8jBw==
-X-CSE-MsgGUID: 8rgFG4rSSHq46763jXCjog==
-X-IronPort-AV: E=McAfee;i="6700,10204,11173"; a="13187840"
-X-IronPort-AV: E=Sophos;i="6.10,172,1719903600"; 
-   d="scan'208";a="13187840"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 20:20:53 -0700
-X-CSE-ConnectionGUID: /B202zQ5RUqwbDqp79MtpA==
-X-CSE-MsgGUID: 3sYwZGIdTJKeP82Y2SiHjg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,172,1719903600"; 
-   d="scan'208";a="99492152"
-Received: from tenikolo-mobl1.amr.corp.intel.com ([10.124.36.66])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2024 20:20:52 -0700
-From: Tatyana Nikolova <tatyana.e.nikolova@intel.com>
-To: jgg@nvidia.com,
-	leon@kernel.org
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Shiraz Saleem <shiraz.saleem@intel.com>,
-	Tatyana Nikolova <tatyana.e.nikolova@intel.com>
-Subject: [RFC v2 25/25] RDMA/irdma: Update Kconfig
-Date: Fri, 23 Aug 2024 22:19:24 -0500
-Message-Id: <20240824031924.421-26-tatyana.e.nikolova@intel.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20240824031924.421-1-tatyana.e.nikolova@intel.com>
-References: <20240824031924.421-1-tatyana.e.nikolova@intel.com>
+	s=arc-20240116; t=1724471371; c=relaxed/simple;
+	bh=oUiQbPGEIGbA8nli/SmRi3mzqzziuakoXIzOXtb+xpE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZKKGAq+RXw6d5KuKWwmNlxYIYrBLWJsV8C0Kj1UXoMHZRkP1YTDs8D4FBhkZ7GhkhE7lGk2XIfgKLuiBmLFvf+ItNxHwuhG411SYQkemZm/YEpznemRvdrQkCVaXNI401prHE6zmjv42Hq2cNoFbQRupHl3ThZm7R+GBBkfwQwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=ici0RPIL; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=lT8Q7lVbYLqAyc8sacwXTnlCDNIWPRROT3qiMFaqTZk=; b=ici0RPIL/M2nHmgpbOTzIczhfy
+	Xf064nAGTpp3wblOY3ztqrmNg4G/oRrsm5TKwa4zywRcNwzYu1Rf08QJQ65m5S/L2Jx3eV+UQGsf7
+	Mff+VAf+rr/L13sUmvF8WDOG+nvWHJYug58RxXvej6IIhW42tl98VqftFcYlm4cOdm5oA9+3nebE8
+	5wFm2Mr7RYRQ+elxXzSZwHxZgjr9NAWBba6mtZDB6PDwBmc/tqvLVQB7URXCL2TWBxLx7QqSC3E5g
+	vah03tQD4MtZdIu0x0BotBzYDJN+KnTgC3ow+x5Hd71rRPBnzVus8CdHINbN7Me70ym6TfyJiPRsl
+	dh9ksCqA==;
+Received: from 2a02-8389-2341-5b80-7457-864c-9b77-b751.cable.dynamic.v6.surfer.at ([2a02:8389:2341:5b80:7457:864c:9b77:b751] helo=localhost)
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1shhmJ-00000001Mzu-3l73;
+	Sat, 24 Aug 2024 03:49:28 +0000
+From: Christoph Hellwig <hch@lst.de>
+To: iommu@lists.linux.dev
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	linux-scsi@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	dmaengine@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	linux-media@vger.kernel.org,
+	linux-mmc@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: remove the dma_set_{max_seg_size,seg_boundary,min_align_mask} return value v2
+Date: Sat, 24 Aug 2024 05:49:11 +0200
+Message-ID: <20240824034925.1163244-1-hch@lst.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,37 +72,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: Shiraz Saleem <shiraz.saleem@intel.com>
+Hi all,
 
-Update Kconfig to add dependency on idpf module. Additionally, add
-IPU E2000 to list of devices supported.
+the above three functions can only return errors if the bus code failed
+to allocate the dma_parms structure, which is a grave error that won't
+get us far.  Thus remove the pointless return values, that so far have
+fortunately been mostly ignored, but which the cleanup brigade now wants
+to check for for no good reason.
 
-Signed-off-by: Shiraz Saleem <shiraz.saleem@intel.com>
-Signed-off-by: Tatyana Nikolova <tatyana.e.nikolova@intel.com>
----
- drivers/infiniband/hw/irdma/Kconfig | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Changes since v1:
+ - fix SCSI to not call dma_set_max_seg_size and dma_set_seg_boundary
+   unconditionally
 
-diff --git a/drivers/infiniband/hw/irdma/Kconfig b/drivers/infiniband/hw/irdma/Kconfig
-index b6f9c41bca51..f6b39f3a726e 100644
---- a/drivers/infiniband/hw/irdma/Kconfig
-+++ b/drivers/infiniband/hw/irdma/Kconfig
-@@ -4,9 +4,10 @@ config INFINIBAND_IRDMA
- 	depends on INET
- 	depends on IPV6 || !IPV6
- 	depends on PCI
--	depends on ICE && I40E
-+	depends on (IDPF || ICE) && I40E
- 	select GENERIC_ALLOCATOR
- 	select AUXILIARY_BUS
- 	help
--	  This is an Intel(R) Ethernet Protocol Driver for RDMA driver
--	  that support E810 (iWARP/RoCE) and X722 (iWARP) network devices.
-+	  This is an Intel(R) Ethernet Protocol Driver for RDMA that
-+	  support IPU E2000 (RoCEv2), E810 (iWARP/RoCE) and X722 (iWARP)
-+	  network devices.
--- 
-2.42.0
-
+Diffstat:
+ drivers/accel/qaic/qaic_drv.c                         |    4 --
+ drivers/dma/idma64.c                                  |    4 --
+ drivers/dma/pl330.c                                   |    5 ---
+ drivers/dma/qcom/bam_dma.c                            |    6 ----
+ drivers/dma/sh/rcar-dmac.c                            |    4 --
+ drivers/dma/ste_dma40.c                               |    6 ----
+ drivers/gpu/drm/mediatek/mtk_drm_drv.c                |    6 ----
+ drivers/media/common/videobuf2/videobuf2-dma-contig.c |    3 --
+ drivers/media/pci/intel/ipu6/ipu6.c                   |    4 --
+ drivers/mmc/host/mmci_stm32_sdmmc.c                   |    3 +-
+ drivers/net/ethernet/microsoft/mana/gdma_main.c       |    6 ----
+ drivers/scsi/lpfc/lpfc_init.c                         |    7 -----
+ drivers/scsi/scsi_lib.c                               |   11 ++++++-
+ include/linux/dma-mapping.h                           |   25 +++++++-----------
+ 14 files changed, 32 insertions(+), 62 deletions(-)
 
