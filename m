@@ -1,189 +1,162 @@
-Return-Path: <netdev+bounces-121553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 134B795DA49
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 03:02:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30B9395DA76
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 04:04:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEF29285156
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 01:02:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D92811F22A59
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 02:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E86A47;
-	Sat, 24 Aug 2024 01:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ppXTsg3u"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1114FEAD2;
+	Sat, 24 Aug 2024 02:04:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D545EB660
-	for <netdev@vger.kernel.org>; Sat, 24 Aug 2024 01:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0038F6C;
+	Sat, 24 Aug 2024 02:04:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724461329; cv=none; b=WsXyWz59p7nUREpyMuaoBgxUwsicXJa8HuGTBJmSqeafxpyLTthBvL6IPrbiSvrn2M9UJeTz+5Ux+4Vyt6J/Jw24xsRABq8jxQv3JEYV61NYQvRxcun91t9j24lfbqt0weZf15K4WfzIyyv09goDPOlpgRnpxC91AKH2aeT3d1Q=
+	t=1724465049; cv=none; b=TEos2uEk5SAdaVMl4EkL58vr2i7DZjc+CvwbFsvpQQjmA1B+hSR3Rj6dyYCSunqHsf2BHjI3opGns4h/WkKbF3CgwO3AQy79/J4XTbNpRXOlvaPfEjcmCYHpJkteiOiqzIaEwf96EGIHTFTSyB3dZt9a3ddQEaAQTQbcnwC1fIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724461329; c=relaxed/simple;
-	bh=4zpodBSrNzAnVUnjBrp32XwT62vScfoQv3qIeibPkHY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=e8WoIJqvSO608NuweKeAiWN23tKj8kEEXnc5sNHp3gS8CalYc/i9QQU5TifHB2FCxUlAniD0Mse80dfnETGpHCClCeSypMfJkrkUlAfPVKsGHA13O9Cc0/OrkkctvWa500u3QF4S6daIJW3cCmC/2BKF3tdgXsY/akPbBMlyHY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ppXTsg3u; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724461324;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=IdmQ24b94RdpMyCBQcOJAS4hG/aT8izdm4+zDJSbsVk=;
-	b=ppXTsg3uulZ98MlT47olN013yCs3uRMV1PF616oQDPMWz8q/TebfIsoJbYcc2zaB7qZRxx
-	nGY84tJYogENAU3CzE2/OlM6rDWu+b7E/AzIGegRMRuBvC0IQ5Vlj4OnOcDQMCY7kDuqVI
-	kCm+V/t6jedHrr1SOJwFTf2TxIoHbFo=
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	David Rientjes <rientjes@google.com>,
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	Meta kernel team <kernel-team@meta.com>,
-	cgroups@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [RFC PATCH] memcg: add charging of already allocated slab objects
-Date: Fri, 23 Aug 2024 18:01:39 -0700
-Message-ID: <20240824010139.1293051-1-shakeel.butt@linux.dev>
+	s=arc-20240116; t=1724465049; c=relaxed/simple;
+	bh=hQUNzjSY7i3l4ldL5C3hNfqZ/vaZV6AK/8n/d+E3nsg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fVpUc9J1dzOMCn4A1EWLUg3vTMKm7TVw5H28/xhiL3UcTCs034P4JXi093+LJTr+N/mNGuu593v26B/IQXjHj4EuXU/P+xoqTqwuMM+FaGs1galfIjo9awdTWefkmRYqAMJqR2mM7LNPgfOGVdg8DIR+CnvW4jdvaWebALmyVog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71456acebe8so212933b3a.3;
+        Fri, 23 Aug 2024 19:04:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724465046; x=1725069846;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1m+RyyeVq2vKKoA8+4isEUsNBf+vWhzfSvt6LSdw9/k=;
+        b=HSgmx+SZTBd4FFdLXAIhMwndSLYTvug/S5T7XZN5A++XqvGD9s78gDUPwZ+Zi8bfpn
+         OdTiqVaz6IX9lZc+9bE9WI3ern3h+5NekQAJoaSOWI/thVSsg7LBXMB4bjgYlFO4dMWl
+         ne/uPPpoNStsqxVrWNUcQfB2LuySvaDZ8AZaeJ1VgumBkeUXyABP8nf+DnG47KiNFcLL
+         gdpOlGtWNLdlStvkwTKi1vWcRnaPIskUk8PtzTwXXJpjFEQbkdgLa0XGOT9kM7YToRug
+         54UuBOB9bBRWtdz/oDnNn7nLeswX8o2uRu9pI+la10oCSbvK7StTyxR4ZSrHKslptpnl
+         SVlw==
+X-Forwarded-Encrypted: i=1; AJvYcCU74MvjrhFfOFm+anFHtkLzogG2PRJZ5ytYVMvU55my3AUyI1BmUfFCZR9pqg/Bj1AG4zk=@vger.kernel.org, AJvYcCUZ5u8LXP3Aihg0WWCKF4pwaSjaw9Bv1sM96VRQEDQKAmBSfTyNWiZ5RFxz8BVd6ogHG7jxFiC9@vger.kernel.org, AJvYcCXOZSnWISKJXIx0GVPT1WOwafgJXcmL+PMJvQJTEA3E4MaZrUJJs2kmU4xi+ENThkWjtsp9dn7PvT7dPvA2@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQMFrYFmSc7fVjjJS+rwLaty2d8sbbBKWqCkieWIi9aiipadDD
+	NLSIBOuBDBT4Be3hFhmdkX74nj5zFFzBUKZJqdYDq0gsUqOgqmIE79oMW3Y=
+X-Google-Smtp-Source: AGHT+IHIZyeBM3Hl85jWwMdJX+SUb22b92N+zGjq37DFSit0JMCfEm3aWfiRw4k5sOQm4Tu/80NwxQ==
+X-Received: by 2002:a05:6a00:124c:b0:706:61d5:2792 with SMTP id d2e1a72fcca58-7144579d85amr5466242b3a.8.1724465046198;
+        Fri, 23 Aug 2024 19:04:06 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7cd9acdcf7dsm3351501a12.50.2024.08.23.19.04.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Aug 2024 19:04:05 -0700 (PDT)
+Date: Fri, 23 Aug 2024 19:04:04 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Tze-nan Wu =?utf-8?B?KOWQs+a+pOWNlyk=?= <Tze-nan.Wu@mediatek.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"kuniyu@amazon.com" <kuniyu@amazon.com>,
+	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
+	"ast@kernel.org" <ast@kernel.org>,
+	Cheng-Jui Wang =?utf-8?B?KOeOi+ato+edvyk=?= <Cheng-Jui.Wang@mediatek.com>,
+	wsd_upstream <wsd_upstream@mediatek.com>,
+	"andrii@kernel.org" <andrii@kernel.org>,
+	Bobule Chang =?utf-8?B?KOW8teW8mOe+qSk=?= <bobule.chang@mediatek.com>,
+	"jolsa@kernel.org" <jolsa@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	"song@kernel.org" <song@kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	Yanghui Li =?utf-8?B?KOadjumYs+i+iSk=?= <Yanghui.Li@mediatek.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"eddyz87@gmail.com" <eddyz87@gmail.com>,
+	"martin.lau@linux.dev" <martin.lau@linux.dev>,
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"kpsingh@kernel.org" <kpsingh@kernel.org>,
+	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>,
+	"yonghong.song@linux.dev" <yonghong.song@linux.dev>,
+	"haoluo@google.com" <haoluo@google.com>
+Subject: Re: [PATCH net v4] bpf, net: Check cgroup_bpf_enabled() only once in
+ do_sock_getsockopt()
+Message-ID: <Zsk_lGsZBBqbesqS@mini-arch>
+References: <20240821093016.2533-1-Tze-nan.Wu@mediatek.com>
+ <CAADnVQLLN9hbQ8FQnX_uWFAVBd7L9HhsQpQymLOmB-dHFR4VRw@mail.gmail.com>
+ <3a7864f69b8c1d45a3fe8cda1b1e7a7c85ac9aee.camel@mediatek.com>
+ <49d74e2c74e0e1786b976c0b12cb1cdd680c5f58.camel@mediatek.com>
+ <CAADnVQLvbMRvCg2disV+_AR-154BwRpeB8Zg_8YpO=7gzL=Trg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <CAADnVQLvbMRvCg2disV+_AR-154BwRpeB8Zg_8YpO=7gzL=Trg@mail.gmail.com>
 
-At the moment, the slab objects are charged to the memcg at the
-allocation time. However there are cases where slab objects are
-allocated at the time where the right target memcg to charge it to is
-not known. One such case is the network sockets for the incoming
-connection which are allocated in the softirq context.
+On 08/22, Alexei Starovoitov wrote:
+> On Thu, Aug 22, 2024 at 12:02 AM Tze-nan Wu (吳澤南)
+> <Tze-nan.Wu@mediatek.com> wrote:
+> >
+> >
+> > BTW, If this should be handled in kernel, modification shown below
+> > could fix the issue without breaking the "static_branch" usage in both
+> > macros:
+> >
+> >
+> > +++ /include/linux/bpf-cgroup.h:
+> >     -#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen)
+> >     +#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen, compat)
+> >      ({
+> >             int __ret = 0;
+> >             if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT))
+> >                 copy_from_sockptr(&__ret, optlen, sizeof(int));
+> >      +      else
+> >      +          *compat = true;
+> >             __ret;
+> >      })
+> >
+> >     #define BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock, level, optname,
+> > optval, optlen, max_optlen, retval)
+> >      ({
+> >          int __ret = retval;
+> >     -    if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT) &&
+> >     -        cgroup_bpf_sock_enabled(sock, CGROUP_GETSOCKOPT))
+> >     +    if (cgroup_bpf_sock_enabled(sock, CGROUP_GETSOCKOPT))
+> >              if (!(sock)->sk_prot->bpf_bypass_getsockopt ||
+> >                ...
+> >
+> >   +++ /net/socket.c:
+> >     int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+> >      {
+> >         ...
+> >         ...
+> >     +     /* The meaning of `compat` variable could be changed here
+> >     +      * to indicate if cgroup_bpf_enabled(CGROUP_SOCK_OPS) is
+> > false.
+> >     +      */
+> >         if (!compat)
+> >     -       max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
+> >     +       max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen,
+> > &compat);
+> 
+> This is better, but it's still quite a hack. Let's not override it.
+> We can have another bool, but the question:
+> do we really need BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN  ?
+> copy_from_sockptr(&__ret, optlen, sizeof(int));
+> should be fast enough to do it unconditionally.
+> What are we saving here?
+> 
+> Stan ?
 
-Couple hundred thousand connections are very normal on large loaded
-server and almost all of those sockets underlying those connections get
-allocated in the softirq context and thus not charged to any memcg.
-However later at the accept() time we know the right target memcg to
-charge. Let's add new API to charge already allocated objects, so we can
-have better accounting of the memory usage.
-
-Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
----
-
-This is RFC to get early comments and I still have to measure the
-performance impact of this charging. Particularly I am planning to test
-neper's tcp_crr with this patch.
-
- include/linux/slab.h            |  1 +
- mm/slub.c                       | 39 +++++++++++++++++++++++++++++++++
- net/ipv4/inet_connection_sock.c |  1 +
- 3 files changed, 41 insertions(+)
-
-diff --git a/include/linux/slab.h b/include/linux/slab.h
-index 512e7c844b7f..a8b09b0ca066 100644
---- a/include/linux/slab.h
-+++ b/include/linux/slab.h
-@@ -547,6 +547,7 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
- 			    gfp_t gfpflags) __assume_slab_alignment __malloc;
- #define kmem_cache_alloc_lru(...)	alloc_hooks(kmem_cache_alloc_lru_noprof(__VA_ARGS__))
- 
-+bool kmem_cache_post_charge(void *objp, gfp_t gfpflags);
- void kmem_cache_free(struct kmem_cache *s, void *objp);
- 
- kmem_buckets *kmem_buckets_create(const char *name, slab_flags_t flags,
-diff --git a/mm/slub.c b/mm/slub.c
-index b6b947596e26..574122ad89b8 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -2189,6 +2189,16 @@ void memcg_slab_free_hook(struct kmem_cache *s, struct slab *slab, void **p,
- 
- 	__memcg_slab_free_hook(s, slab, p, objects, obj_exts);
- }
-+
-+static __fastpath_inline
-+bool memcg_slab_post_charge(struct kmem_cache *s, void *p, gfp_t flags)
-+{
-+	if (likely(!memcg_kmem_online()))
-+		return true;
-+
-+	return __memcg_slab_post_alloc_hook(s, NULL, flags, 1, &p);
-+}
-+
- #else /* CONFIG_MEMCG */
- static inline bool memcg_slab_post_alloc_hook(struct kmem_cache *s,
- 					      struct list_lru *lru,
-@@ -2202,6 +2212,13 @@ static inline void memcg_slab_free_hook(struct kmem_cache *s, struct slab *slab,
- 					void **p, int objects)
- {
- }
-+
-+static inline bool memcg_slab_post_charge(struct kmem_cache *s,
-+					  void *p,
-+					  gfp_t flags)
-+{
-+	return true;
-+}
- #endif /* CONFIG_MEMCG */
- 
- #ifdef CONFIG_SLUB_RCU_DEBUG
-@@ -4110,6 +4127,28 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
- }
- EXPORT_SYMBOL(kmem_cache_alloc_lru_noprof);
- 
-+bool kmem_cache_post_charge(void *objp, gfp_t gfpflags)
-+{
-+	struct folio *folio;
-+	struct slab *slab;
-+	struct kmem_cache *s;
-+
-+	folio = virt_to_folio(objp);
-+	if (unlikely(!folio_test_slab(folio)))
-+		return false;
-+
-+	slab = folio_slab(folio);
-+	s = slab->slab_cache;
-+
-+	/* Ignore KMALLOC_NORMAL cache */
-+	if (s->flags & SLAB_KMALLOC &&
-+	    !(s->flags & (SLAB_CACHE_DMA|SLAB_ACCOUNT|SLAB_RECLAIM_ACCOUNT)))
-+		return true;
-+
-+	return memcg_slab_post_charge(s, objp, gfpflags);
-+}
-+EXPORT_SYMBOL(kmem_cache_post_charge);
-+
- /**
-  * kmem_cache_alloc_node - Allocate an object on the specified node
-  * @s: The cache to allocate from.
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 64d07b842e73..f707bb76e24d 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -733,6 +733,7 @@ struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
- 		if (amt)
- 			mem_cgroup_charge_skmem(newsk->sk_memcg, amt,
- 						GFP_KERNEL | __GFP_NOFAIL);
-+		kmem_cache_post_charge(newsk, GFP_KERNEL | __GFP_NOFAIL);
- 
- 		release_sock(newsk);
- 	}
--- 
-2.43.5
-
+Agreed, most likely nobody would notice :-)
 
