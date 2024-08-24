@@ -1,104 +1,96 @@
-Return-Path: <netdev+bounces-121679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21FD895E00D
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 23:35:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 299CB95E007
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 23:27:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77E21B20DDE
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 21:35:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34C53282857
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 21:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32312143C50;
-	Sat, 24 Aug 2024 21:35:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23EE47F490;
+	Sat, 24 Aug 2024 21:27:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="TlVDoP9k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SdYMnj4i"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8042328E0F;
-	Sat, 24 Aug 2024 21:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28D529A1
+	for <netdev@vger.kernel.org>; Sat, 24 Aug 2024 21:27:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724535304; cv=none; b=pZfmQvLwj5AL8xBX7jA2wUIHHt7CNouypECbdJg7l1+EENPeAgGcv5te3yWy+EYA+bOss5ARnDREh5zUhmqmhZ17Ditlcv4WE0BDMigZI/hw7g7baLS+/O8WonbC6szkMIW9kRWqmkPlJSHWlSixdRa4mY91e71q1O4fBtei9Vc=
+	t=1724534843; cv=none; b=avt1pOF1be40yD2Z4QG4OPyJPnMeh7qvm6Fas3lGjy5fQjdUwiYBV6+/J0miFCgSXY54Ir9zm8DHLvbUObi518pzjXWAHemBl9j2+aQd7OPNWkcocZvWdkPLGv6UNuSaS4cvrLK7l4iXWkUxNfDXMAlDYTzi3vfvvsZBp+pNviE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724535304; c=relaxed/simple;
-	bh=o38WZi9pkl2m6WJPJmjqzjb3BYUPjWfOhmDpRPhAa7M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IHDfMH/eVCmFCicTiT56VEntA178dJMF9oVTEf0W2gjJgffrpGRLBtSVUv3XqAyCiwXOuaEoMpytOva8VdnehWyeWP8nmZmUKniosrm3KJW1x225op62sn8/ASz6A2lKO/DNSiVm7PMPM20PMky/ZbXZlovcw9FhCHPR/vnq3pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=TlVDoP9k; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 3ECD58888F;
-	Sat, 24 Aug 2024 23:34:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1724535295;
-	bh=e4zyjZJf6xqCKXroarDmr4dscjZVxpZsdflBz5n9XvI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TlVDoP9kQZz3G2/RSNk7ws0p1y9yQT+jjsa1TJjcM9zO0qSjUJAnjgSFxWwqEEW59
-	 r1AS0//0wgG2054uiJWkAQkxaoX8SfOjjhGcjKAADIESFJM+00/4joLZnxB0tquARu
-	 /S0QELZtpIOssu+oMaBbfeEklKrGHoQs9iW6nk27rqlwH4x6TlSbtZl/e7q9NdnUXG
-	 C8YjOvaUK5OjuvT0gQ+gxdJ2PyIp9fQ5kRd424Bc/BkrXGC+SAKm2HyafDaMt7SeDe
-	 q9F8gCEm1IojlvKi+fVo9FYH2SM17MQR7vdz06qmkUn9d0tEscCfCu5bOxhw1l00ig
-	 eWUGaK6RXeWHA==
-Message-ID: <6a3d9171-3d5b-413d-bc48-cbc6ca10c48a@denx.de>
-Date: Sat, 24 Aug 2024 23:21:31 +0200
+	s=arc-20240116; t=1724534843; c=relaxed/simple;
+	bh=/z5llz51kyrimXVLsEJENL05nSG70TvBsdWSQghjCVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RVlfOKnfszA0ity5dW/tvmgtDljqZDc1lz5XXzRHGDDZLwqG2PZ9BsWWJhWLG8E/vQJa2KvHXxltmEG9iATlvBvVKELq7FXPLoyOK1rDdqKnQKVOB/7lzlek64H2mUmOqEdGcpxXr+6NGMcvZRMxbOWMVaBYkJRDfPaibu6UsV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SdYMnj4i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 430E1C32781;
+	Sat, 24 Aug 2024 21:27:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724534842;
+	bh=/z5llz51kyrimXVLsEJENL05nSG70TvBsdWSQghjCVE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SdYMnj4iovYCI6cE9sTIi7bURO6gSGMil12ohNeahevspNRYX2nNew6hpWbjN0/AE
+	 XxMformZPCC5I+lRGFjZxDzlLEHKKrz0QxMq42Ku3wHm3ggvOreire8eGAP65Yyn89
+	 U7gP673QQm7o/4jjO9QCoVEsNRTdYFP0t34EpYMeCgN7d4nOVfcHA7PhKkZ1iqawnu
+	 IFbs8+AH6/FKaMdBJf5hRJ/kQ+6GMQ/hulwrry5szWTtqczAbcE7Kpb/yy37UFHvqv
+	 jBsyIAyziLJEaqInqhCRAMzYQMH9DALM7uoPc/8HxTabCK532io24RxVqh0H0ClnDz
+	 6QSf/ZtJislAA==
+Date: Sat, 24 Aug 2024 14:27:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>, Hangbin Liu
+ <liuhangbin@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [TEST] forwarding/router_bridge_lag.sh started to flake on
+ Monday
+Message-ID: <20240824142721.416b2bd0@kernel.org>
+In-Reply-To: <87ttfbi5ce.fsf@nvidia.com>
+References: <20240822083718.140e9e65@kernel.org>
+	<87a5h3l9q1.fsf@nvidia.com>
+	<20240823080253.1c11c028@kernel.org>
+	<87ttfbi5ce.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] dt-bindings: wireless: wilc1000: Document WILC3000
- compatible string
-To: Krzysztof Kozlowski <krzk@kernel.org>, linux-wireless@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Adham Abozaeid <adham.abozaeid@microchip.com>,
- Ajay Singh <ajay.kathat@microchip.com>,
- =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
- <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240823161131.94305-1-marex@denx.de>
- <facfaca2-e26e-4cab-9240-fdb0eac5c5fd@kernel.org>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <facfaca2-e26e-4cab-9240-fdb0eac5c5fd@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
 
-On 8/24/24 8:22 AM, Krzysztof Kozlowski wrote:
-
-Hi,
-
->> diff --git a/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml b/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
->> index 2460ccc082371..b8ee6cdab3c25 100644
->> --- a/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
->> +++ b/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
->> @@ -16,7 +16,11 @@ description:
->>   
->>   properties:
->>     compatible:
->> -    const: microchip,wilc1000
->> +    oneOf:
->> +      - items:
->> +          - const: microchip,wilc1000
->> +          - const: microchip,wilc3000
+On Fri, 23 Aug 2024 18:13:01 +0200 Petr Machata wrote:
+> >> +	ip link set dev $swp2 down
+> >> +	ip link set dev $swp1 down
+> >> +
+> >>  	h2_destroy
+> >>  	h1_destroy
+> >>    
+> >
+> > no_forwarding always runs in thread 0 because it's the slowest tests
+> > and we try to run from the slowest as a basic bin packing heuristic.
+> > Clicking thru the failures I don't see them on thread 0.  
 > 
-> That's wrong order of compatibles. Fallback is wilc1000, so should be
-> the last item.
+> Is there a way to see what ran before?
 
-Right, fixed, thanks.
+The data is with the outputs in the "info" file, not in the DB :(
+I hacked up a bash script to fetch those:
+https://github.com/linux-netdev/nipa/blob/main/contest/cithreadmap
+
+Looks like for the failed cases local_termination.sh always runs 
+before router-bridge, and whatever runs next flakes:
+
+Thread4-VM0
+	 5-local-termination-sh/
+	 20-router-bridge-lag-sh/
+	 20-router-bridge-lag-sh-retry/
+
+Thread4-VM0
+	 5-local-termination-sh/
+	 16-router-bridge-1d-lag-sh/
+	 16-router-bridge-1d-lag-sh-retry/
 
