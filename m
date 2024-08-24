@@ -1,136 +1,113 @@
-Return-Path: <netdev+bounces-121662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D67B95DF3A
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 19:38:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEFE595DF3C
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 19:38:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F08F1C20F22
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 17:38:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B5541F21C5C
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 17:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48E6664C6;
-	Sat, 24 Aug 2024 17:37:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5816481D5;
+	Sat, 24 Aug 2024 17:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5/fjCIC"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="AEm7Wytf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B4AA39AEB;
-	Sat, 24 Aug 2024 17:37:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EDF39AEB
+	for <netdev@vger.kernel.org>; Sat, 24 Aug 2024 17:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724521078; cv=none; b=Kc+ChygKDYy6D8aUk2rHelOusLslQT1eE1SVEZ8FlWmd6XtStGO1/1uJWQWG4i/Zp3eSD+MIn/8z42DsETYenSQwg+wXG6J+/IDcDYtmgD7DA/0LLx4oqqDbI7WGSRT+u0FoU8Mfx2n8hDmb6mGvl4+vlNxWnbqcmgnLvgEqngw=
+	t=1724521086; cv=none; b=nNHtpimaZIYttRdk8xcOHGTZfewPBAq1TghgScau3/eZHCVVbSng+KnNswDJi+GG1hc5mNB/zqV7KreWp+ARJ6l0Hewv6bQXLOtwzaoOKx6bUpf5i768ZoZao9PYKZpx+GUfk9M2PxF4ipFIZLIFJfWyQTegpCZ7FFwgyAPcuV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724521078; c=relaxed/simple;
-	bh=ziytpaA+ne4kHZ6KdqHkQiK5JWCNoE4lmpIjTaiXqjY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PRbKGfP/3ufDDQRVTzndiqo9HKoTK/+QLRg/hov0ShS/T6kancOcN2BH/RcwHzdWtZnu7xhGg9UFcVCubTqLhNLxn2wwikHv06Id0Bq1s4NQ/QRGP7cJ+jG/bjBka9jGYIeCoAPOib6AazcfPoD9Yc0I3ODvbqhFr2fw1vicfOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k5/fjCIC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C22F2C32781;
-	Sat, 24 Aug 2024 17:37:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724521078;
-	bh=ziytpaA+ne4kHZ6KdqHkQiK5JWCNoE4lmpIjTaiXqjY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k5/fjCIC+aZExRL+7y9ZDFmgMKRBeR8ShnmAzT+NRqI7tTgvb2QoJH+uRR/zysg6c
-	 eN1f3cptFff3MSF9OXBPhVJFwWUXi9dUBZo2EZtXT6k3UtNnvsf4XY7oQQ9NBi7DFk
-	 ZRFVl35/pYUQlSHZZk4K6jWjVtPV2P3hjBlfE+OulQvkFQPPSA0ilwtmSNYvfyoA+b
-	 cKxiI0H3hXOHOn0TwWRv86UgnB6thkdvQGXbnrIbUsOqQ+fXrJJxWkxppb2PCxYbtc
-	 lcFSciOHx9wLyKNz4kAMA0Nf+4RSAJwVYumWfSXST1ACEyqwv31kYK3QDGrx4HFA+c
-	 2V+XPe5SxUDVQ==
-Date: Sat, 24 Aug 2024 10:37:56 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, rbc@meta.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH nf-next v2 0/2] netfilter: Make IP_NF_IPTABLES_LEGACY
- selectable
-Message-ID: <20240824103756.4fb39abc@kernel.org>
-In-Reply-To: <20240823174855.3052334-1-leitao@debian.org>
-References: <20240823174855.3052334-1-leitao@debian.org>
+	s=arc-20240116; t=1724521086; c=relaxed/simple;
+	bh=f7FHHRTZ4zwv1LgTjd1+jt/RT5dZtwt+Kxf6wHZd9cQ=;
+	h=MIME-Version:Message-ID:From:To:Cc:Subject:Content-Type:Date; b=t1Pd5KBG8ee0oRP8dfwipaMzj7Jh/VimsBhM8VJjUtzWAV91qRVPVEhcitWvgfucFaQGRECUXwcVUVnYhaXIOqPNZWUiwKZjpn1LLbT94sazB7R+2yUYD6SWxSU7Ppwfl2eZFvRTCUOxRrtjNpWeUF8h4uudsqlGj6eGJeBtTE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=AEm7Wytf; arc=none smtp.client-ip=212.227.15.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1724521078; x=1725125878; i=hfdevel@gmx.net;
+	bh=Y6D4+sv9o7e44cH2BmPufRy2U7/cY2RW4Sd1P03MQ/c=;
+	h=X-UI-Sender-Class:MIME-Version:Message-ID:From:To:Cc:Subject:
+	 Content-Type:Date:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=AEm7WytfSPG6vbz0I3RxV/mf8/RFjEtadMYXr/qgP3jIDHqWzUyVH5+jKLJUVTf5
+	 AgJzFowYkyk4G7oHi29GSWtGrbvaAgGLwRqMRDUgOzMkVoHTjjfXpe/tSowaTDDXb
+	 9ALyd3CZHz1SEN+HqeCaKfFIw32XorZA/ucUqPZVMgQuh6NClJdJPL4ks3vMvuD8g
+	 YD0ftW8a5DfZltH6g8TbCbBW/pjQx6dsdvGIDUBbEpaH/yEQuMnpTrGr28d8xYmOx
+	 8omNOGpvpHJvWl0pcuWJ483CKB/BBhCwRrgeB1lRhhXoClEGE5UnDjexIsuqVHVqC
+	 +8AQ9/XfI72AOplksA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [77.33.175.99] ([77.33.175.99]) by web-mail.gmx.net
+ (3c-app-gmx-bs42.server.lan [172.19.170.94]) (via HTTP); Sat, 24 Aug 2024
+ 19:37:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Message-ID: <trinity-c751adf4-fbd2-4741-95a7-c920061d3233-1724521078637@3c-app-gmx-bs42>
+From: Hans-Frieder Vogt <hfdevel@gmx.net>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Bartosz Golaszewski
+ <brgl@bgdev.pl>
+Subject: [PATCH net-next 2/2] net: phy: aquantia: add firmware loading for
+ aqr105
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 24 Aug 2024 19:37:58 +0200
+Importance: normal
+Sensitivity: Normal
+X-Priority: 3
+X-Provags-ID: V03:K1:J+7TKQCLNlVVpIiPpG4acNhYpo0dEkabg+05rdV98zEmjWt3aJodvt8o935UkkC0ngtK1
+ vhowJuvpXsvMHSOk65M435CC5l8IpyKjHhTUHqSMqEoeBnGbLvAYcfueyYBk/he1q9VgGqL0RzUC
+ T0rljD8zLxx+EiCJRtU6a/h9wT+QNDqFFSC7Sec2nwgvD5TpW77cH5Ui+bxP/1TAY1ElUVS/z25q
+ 3mBxJD06JVrvgNJolFXpbUFWs7tsqiV+wZUU+wFMNGBu7C3avSmVWtzauvcMIqwGH1SCVQpTpAOk
+ LA=
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:cfa8Oxdbu0c=;Gas5HLLZ3dB8mLUWpzuZwAMjLX8
+ ftbwECgKsxQNn0X32Mp6fbbP25//PW/4l0PfNUZa2Y+zdO0qEfozdJ5PiZ3UeyF2CIUidPgoc
+ YyibMbYB9BaLo2EtSGwyo+el2Wu5JA9VdcakPRat2UHQsq3ugjxFM4IN8aUOS2XakBbav7Z3B
+ kmG2Sz1/K4jeimDk0zDBoEVv/CnnOfsCirUl/A5bIGf99fGPewRKtV0l0wQZKOM3vIIzgGnWe
+ /bQLEQJkv1q4QqTWBKm462zuvd5ZR56ZaUu1sYn8DZ+oSZb07msZQH27pQ6P22tS6dB032Oz4
+ NwXQ28h+hXTDRp1eSm2BCqeUWfwCjzAdQD0FgFlKM9z03i/kwr8CwjwYJaUypUuFKO17YwFRU
+ Fs6UV4Ig19zx+aXoLl2obFsoRLFMcg/GQSyjizNfuY2JGvqY4eyngy0t4pEPN2ydWKvI6hSXa
+ xcvom03Qcb1A8MSs7BL6lQ2ddgadwlkI7NsSjAiUo50ODgh6iyyeMwc9LnHR1D3e2NnLaJ331
+ COrJrgdczS3e+B0QCwqYTvLDw/M+DQ/La2Sf8FO/t6nzGQiOo6BDmivJ396261iqUcskef4Ed
+ iLwX3h71L89w56j4QtbJTxcNMXueJufRPGsNGJcLixpKwOuhXri1FM7s0doU16JotWpWN4BCA
+ HNLkxm5XVoehykbY4LJQ3qwzXuW+es/t4eTNv9BwVw==
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 23 Aug 2024 10:48:51 -0700 Breno Leitao wrote:
-> These two patches make IP_NF_IPTABLES_LEGACY and IP6_NF_IPTABLES_LEGACY
-> Kconfigs user selectable, avoiding creating an extra dependency by
-> enabling some other config that would select IP{6}_NF_IPTABLES_LEGACY.
+Re-use the AQR107 probe function to load the firmware on the AQR105 (and t=
+o probe
+the HWMON).
 
-Resulting config in CI still differs quite a bit:
+Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
+=2D--
+ drivers/net/phy/aquantia/aquantia_main.c | 1 +
+ 1 file changed, 1 insertion(+)
 
---- config.1	2024-08-23 14:19:10.000000000 -0700
-+++ config	2024-08-24 05:18:52.000000000 -0700
-@@ -1246,7 +1246,7 @@ CONFIG_NETFILTER_XT_MARK=m
- CONFIG_NETFILTER_XT_TARGET_CONNSECMARK=m
- # CONFIG_NETFILTER_XT_TARGET_CT is not set
- # CONFIG_NETFILTER_XT_TARGET_DSCP is not set
--CONFIG_NETFILTER_XT_TARGET_HL=m
-+# CONFIG_NETFILTER_XT_TARGET_HL is not set
- # CONFIG_NETFILTER_XT_TARGET_HMARK is not set
- # CONFIG_NETFILTER_XT_TARGET_IDLETIMER is not set
- # CONFIG_NETFILTER_XT_TARGET_LED is not set
-@@ -1333,22 +1333,21 @@ CONFIG_NF_TABLES_IPV4=y
- # CONFIG_NF_DUP_IPV4 is not set
- CONFIG_NF_LOG_ARP=m
- CONFIG_NF_LOG_IPV4=m
--CONFIG_NF_REJECT_IPV4=y
-+CONFIG_NF_REJECT_IPV4=m
- CONFIG_IP_NF_IPTABLES=m
- # CONFIG_IP_NF_MATCH_AH is not set
- # CONFIG_IP_NF_MATCH_ECN is not set
- CONFIG_IP_NF_MATCH_RPFILTER=m
- # CONFIG_IP_NF_MATCH_TTL is not set
--CONFIG_IP_NF_FILTER=m
--CONFIG_IP_NF_TARGET_REJECT=m
-+# CONFIG_IP_NF_FILTER is not set
-+# CONFIG_IP_NF_TARGET_REJECT is not set
- # CONFIG_IP_NF_TARGET_SYNPROXY is not set
- CONFIG_IP_NF_NAT=m
--CONFIG_IP_NF_TARGET_MASQUERADE=m
-+# CONFIG_IP_NF_TARGET_MASQUERADE is not set
- # CONFIG_IP_NF_TARGET_NETMAP is not set
- # CONFIG_IP_NF_TARGET_REDIRECT is not set
--CONFIG_IP_NF_MANGLE=m
-+# CONFIG_IP_NF_MANGLE is not set
- # CONFIG_IP_NF_TARGET_ECN is not set
--CONFIG_IP_NF_TARGET_TTL=m
- CONFIG_IP_NF_RAW=m
- # CONFIG_IP_NF_ARPFILTER is not set
- # end of IP: Netfilter Configuration
-@@ -1363,7 +1362,7 @@ CONFIG_NF_TABLES_IPV6=y
- # CONFIG_NFT_DUP_IPV6 is not set
- # CONFIG_NFT_FIB_IPV6 is not set
- # CONFIG_NF_DUP_IPV6 is not set
--CONFIG_NF_REJECT_IPV6=y
-+CONFIG_NF_REJECT_IPV6=m
- CONFIG_NF_LOG_IPV6=m
- CONFIG_IP6_NF_IPTABLES=m
- # CONFIG_IP6_NF_MATCH_AH is not set
-@@ -1376,11 +1375,10 @@ CONFIG_IP6_NF_MATCH_IPV6HEADER=m
- CONFIG_IP6_NF_MATCH_RPFILTER=m
- # CONFIG_IP6_NF_MATCH_RT is not set
- # CONFIG_IP6_NF_MATCH_SRH is not set
--# CONFIG_IP6_NF_TARGET_HL is not set
--CONFIG_IP6_NF_FILTER=m
--CONFIG_IP6_NF_TARGET_REJECT=m
-+# CONFIG_IP6_NF_FILTER is not set
-+# CONFIG_IP6_NF_TARGET_REJECT is not set
- # CONFIG_IP6_NF_TARGET_SYNPROXY is not set
--CONFIG_IP6_NF_MANGLE=m
-+# CONFIG_IP6_NF_MANGLE is not set
- CONFIG_IP6_NF_RAW=m
- CONFIG_IP6_NF_NAT=m
- # CONFIG_IP6_NF_TARGET_MASQUERADE is not set
--- 
-pw-bot: cr
+diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aq=
+uantia/aquantia_main.c
+index e982e9ce44a5..54dab6db85f2 100644
+=2D-- a/drivers/net/phy/aquantia/aquantia_main.c
++++ b/drivers/net/phy/aquantia/aquantia_main.c
+@@ -787,6 +787,7 @@ static struct phy_driver aqr_driver[] =3D {
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR105),
+ 	.name		=3D "Aquantia AQR105",
++	.probe		=3D aqr107_probe,
+ 	.config_aneg    =3D aqr_config_aneg,
+ 	.config_intr	=3D aqr_config_intr,
+ 	.handle_interrupt =3D aqr_handle_interrupt,
+=2D-
+2.43.0
+
 
