@@ -1,124 +1,243 @@
-Return-Path: <netdev+bounces-121659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3A3595DF33
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 19:33:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 390CC95DF34
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 19:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FA4E2826C3
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 17:33:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0C9E1F21C3E
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 17:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D3FD41C65;
-	Sat, 24 Aug 2024 17:33:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF95C42A97;
+	Sat, 24 Aug 2024 17:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="uEll73jb"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="cryBrt0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA3315D1
-	for <netdev@vger.kernel.org>; Sat, 24 Aug 2024 17:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C4C115D1
+	for <netdev@vger.kernel.org>; Sat, 24 Aug 2024 17:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724520818; cv=none; b=aOCPErTQizFsxyePUney/7tYkZCHe60j6hbrXmcfFnJBHy01a87dPqWxvqCLr8XZS9i8aZJM8f6KkkVjgWULyGZQo4Rgl1mRv5snyCraWoG/Av58cRoHxp3v6YMnZ8oNkl7No3XkMgvKd2pV40Jut0Api2WO+H+OwudBsthklfc=
+	t=1724520854; cv=none; b=ggQQlp96yslBE3HUJW2ffyGVfF6aRoQ5wcNF7b7/rl0AMG1jipH7Jv6flsR1+3cu+R6viRAsmW9ElkIGb8HpLrpdHuotD1dPcCvVB8Z7xgwWdIWJU+orNl4jJMq8lEdZH1GLDhTtm9WTVIpcA3HJxC/Qi6haruykYk4cDdeplWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724520818; c=relaxed/simple;
-	bh=c5zVhsXkbhy3Og2SGHowcQstLOQWHRbw8MH2D5smdXY=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=baWNC9lOz2kK8X5cIL0ia/FFJ139WdTW58ggiGQUWhOt1XofP+nmaFqAFU3pZSlrwqw3gBzn5q2Af9sWpdcGyjx3bmCSBxCkG5tzIQqnRvt+9jkJviIwss4zppJcFasKtBGWus5n+s3Rn3SRaodrv9+OW2XL4yFGujH1bBmyF/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=uEll73jb; arc=none smtp.client-ip=212.227.15.15
+	s=arc-20240116; t=1724520854; c=relaxed/simple;
+	bh=Yq8vnnRZX4EWZ9Z9TEN0rJZtGbaAVElrOGGinFf+KgM=;
+	h=MIME-Version:Message-ID:From:To:Cc:Subject:Content-Type:Date; b=jsI9wJTgfyLBl+8Hu+s2Wrijphb1OGV74iDDBKyLMwfjsEJXiWgKbB/xCSnFLJZR97ythDrEgOwMzPcOiqBA5XlS6iGmjHebIAH/PqeJyUXdAs/F9Vgvl4ydn8EpUZFmaYSTLeDm5FgH79wQQNqHMmEdvCZrXDSWLc8UZJBkyPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=cryBrt0n; arc=none smtp.client-ip=212.227.15.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1724520810; x=1725125610; i=hfdevel@gmx.net;
-	bh=c5zVhsXkbhy3Og2SGHowcQstLOQWHRbw8MH2D5smdXY=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:From:Subject:
-	 Cc:Content-Type:Content-Transfer-Encoding:cc:
+	s=s31663417; t=1724520847; x=1725125647; i=hfdevel@gmx.net;
+	bh=0Z7e06DdqqIGekxojd0wsGu5JxdIYqwlacDcUFyZmzw=;
+	h=X-UI-Sender-Class:MIME-Version:Message-ID:From:To:Cc:Subject:
+	 Content-Type:Date:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=uEll73jbvpIzENplAnKBPMa/fWOXyVC4Q/RzzlerV+0+G7oDOM5vNe9DaX+eXcYY
-	 +LovfM/o9pZoeO2pU/9Bhd45XV+HwqZGzE67UYsshK9A5beTSND2Np8Ndyz14FLjY
-	 q/BT/eFzuIdxXyUn4ZcT6rwf9i9h5f64u/VJvLrrfCP1o1eCX0r166VWnm/Khr4EE
-	 U1p2AkDvseUc0qgLZfygMXzI9BgyJNe8s+VMHUAnx5rQuR3rsEdRaqW6kybd2TqXp
-	 R2c1n64WbMQcbs3gnd9oDAST6vkbbBFGms+Xivd6lrJSVKlbNKEvJE/fEbbOEZDBI
-	 YaGolrmknl3W1a5+zA==
+	b=cryBrt0neJ63lhWHP6mWJk5YEqGpSZsXoQjzEP3k+X3uTLl5YCEBbXFSwdkXwGzR
+	 Z5rMFPNbPDO8ai7zVChtMHEhL1b84ATyceExJ6T+oGt7aZNO8GRbKo/whwN/M5DPo
+	 X1zmtzeKab7PRHx1LoVlxPL5+I4FisXtY4uCFG6zKtxBw4KoXqPb6gc7aK6L90//N
+	 fPF1qqyL0FfPyzb80U3uDx9kuaXG/FTuKiKbuKuEz2mvhgfZfn6CAPMBLIPN7HSGk
+	 K/nSx0M7hB1jj8npKf83cHd0hhI5wBVZ7wxmjhrgDI2rFzG1nJVZDl66OoR/f2iTh
+	 C44Fil36GD3Iip64GA==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MGQjH-1suIZL1PK9-00AQ79; Sat, 24
- Aug 2024 19:33:30 +0200
-Message-ID: <c7c1a3ae-be97-4929-8d89-04c8aa870209@gmx.net>
-Date: Sat, 24 Aug 2024 19:33:26 +0200
+Received: from [77.33.175.99] ([77.33.175.99]) by web-mail.gmx.net
+ (3c-app-gmx-bs42.server.lan [172.19.170.94]) (via HTTP); Sat, 24 Aug 2024
+ 19:34:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
+Message-ID: <trinity-916ed524-e8a5-4534-b059-3ed707ec3881-1724520847823@3c-app-gmx-bs42>
+From: Hans-Frieder Vogt <hfdevel@gmx.net>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
  Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org
-From: Hans-Frieder Vogt <hfdevel@gmx.net>
-Subject: [PATCH net-next 0/2] net: phy: aquantia: enable firmware loading for
- aqr105 on PCIe cards
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
- Bartosz Golaszewski <brgl@bgdev.pl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Yj9/P03bEoIRzmIdQ8RxwZ0JMyYH9c704j7Qsr5AGlM9nUB02Ne
- 17eOD9fYdkp3ok+WfPxSVoawiHZqihy0v6hJk/BQqIcPOO+9sfvM2U6gqWkqHDeK6pTFbYk
- c5hYVjQFRSov8uUmEOKaseTStXneQqaKOD9F0UeEjmaTetUecgDJdfd5IVN63Un7iPWkUpv
- D0ORHokAPutVxD+2Xaz9A==
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Bartosz Golaszewski
+ <brgl@bgdev.pl>
+Subject: [PATCH net-next 1/2] net: phy: aquantia: create firmware name for
+ aqr PHYs at runtime
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 24 Aug 2024 19:34:07 +0200
+Importance: normal
+Sensitivity: Normal
+X-Priority: 3
+X-Provags-ID: V03:K1:dbYOwg7sPrzCQgUz0OwZwhAaAwnVZY4uPbNqIAejCizgvsVsjZg4vFTzl42xpZESm15df
+ /TTzjO/u88kkcvthB5F47A15nINmssIquavilkO/BsbWuDo0s3qt1eoA/Beh7NZSHC+Wc58nJ+sq
+ QM6afpx/rbSxxOc5nCQj7+AB9nzuYT3+2bZIu/nqZCGf3oYLyCJdOlEQ8Q/Zcw7C78YElPTRzGHK
+ rht0Mlqhba27l4/eDKGlULMokZQGRgNJofBdSagnRf0Vv15k892MSdDe3WLiZTjs15ibHQ+gYzkW
+ N8=
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:o+Fso0chxmM=;rPrqsd7JboH3X8bcsEGbsOizUv1
- a897k5EjXp7Y3olESQ5qB222eAqcBpugavUHlskGSOAJNe3CJXByQUvyMG0wsvE+/wd9L5651
- IDNZVR9LFu11x9Xaw9dSBveQdpSW1kRofScW7SyzP95Jzk/hqRIhAhov6uBMATa0lpVB6mlyq
- sX9ybyM28MQfBiccQp+4T2rsc6UyrV5rSJL3r0kP1eDZ5w9HWKBZS0+lih/OTsFgUgK8KXQY6
- dSgmxJj88H7uEoqX+3b1IcS1H4+OzR6F3yhVcHL5/3AdfXdzcrx0/V2HdxB7kEMJ7Vc/veUuH
- bkcOydni6b9mXNTj/255sX1FlbopZmBJFOvAMqAFypzoXUKxhskLDsX2JJaQE04tvt9l7hJt8
- bPT8032A698983MDSsPvU7vHR+kZaeyXmhZMv1RxfVz199UNc92oEZCFSvdbGLy+IzwdZgvWR
- d805tB0lbYJKT3tCc0Dl+XjGuLrGzS7FYJD2IvXoscXc7t8SCWdNhuhij5WOMFb/gKToUFbym
- 7cd6CLtTy7hGv5TVrNuVx5DKIwM3B3kc6G0pmXwqcpKE/pf8TCNvi0cYngKq0PFH3jHr/YciC
- hnvCaRBBoAYf0iCsT4OpA8VRaFN2ZY2ZyTbss5lEYmvSehX0TOQK5qY7LdEeoXIgeG+ngviMp
- bNEsJyOfEPnK0t1b63jneyN6+rgh416tfbWPnfwcYC6zRkKr9RVuliNeFCSyISFk9EtlrELl1
- XdJ6iSZwo0kHPgjeBKxneKjpBet7/5vZ0sYez+9yQ2NeFswrsWh+STxllTnzKn36qddoh9bYN
- h2mEh/HSvEEvBCayZoq6B2OA==
+UI-OutboundReport: notjunk:1;M01:P0:FUVwZm5QxF0=;rFcE066qC9XOeqUhQjI8EjNWiH/
+ y1s72fxXXGMZh1zrl1F1sQyWqmC8A1Xn8l/OHII4d2mn8583bEOVPonnDLazsRRqr6JTtHiy1
+ Tgcl8Bf8MB/C2rLudREw25B8ZLtK66LBqmjtt6Fapo1y9QjX7MqxyerFbh0sOPiiliKvsyLJk
+ zYBRp2Vx3/GQOiXA3VvEg2mDTeyY0v2lCTnlhz07YN4cKfmYd8j2/yGqdDmEM5gQGbe7iHA/8
+ 8PqY9De3kz94JdgK+z13Lgr3062hzA4Xv4SqsdaKaSYOnhLCG9V9XP7VR2MQgWSIC2j93TvyX
+ S+imD3I1d/haBmHQHPI8jFRTfwagbbIPXpvIvv5CO/3igQypJ6oBW13e7wFDISbODPfyYivhC
+ OAkXlMkI6q9kVvUhJDeNKAZkvdOk5h09qvdYdVmC+poUqauyo1Iwim1C4lF4J4d19LPYEke3I
+ 04aNmVJnP9B9Cg45VGwhXIX457Vj9NkvkYbqkUghn8v7pv2Q133AGCfTGqoVXgQsHm7zYUMiI
+ pa5TUVMgvjs3kmgL932gCvJNYojJudvmOu36tqaeMnRjtglHf3ZDYGD1WfBlXXAXwRtLlOCwD
+ EE2fHxI2eDNeE5IHBbZUwIE1kYOhzcn280cdwAmWQNlNfGtm9yHcYu4wYOdFglDdrYz7UP66s
+ kYc5KUJgOun1IdTv9VzFgJoncDk/ayojv+pSf70ETw==
+Content-Transfer-Encoding: quoted-printable
 
-This patch series adds support for firmware loading from the filesystem fo=
-r
-Aquantia PHYs in a non-device-tree environment and activates firmware
-loading
-for the AQR105 PHY.
+Aquantia PHYs without EEPROM have to load the firmware via the file system=
+ and
+upload it to the PHY via MDIO.
+Because the Aquantia PHY firmware is different for the same PHY depending =
+on the
+MAC it is connected to, it is not possible to statically define the firmwa=
+re name.
+When in an embedded environment, the device-tree can provide the file name=
+. But when the PHY is on a PCIe card, the file name needs to be provided i=
+n a different
+way.
 
-Firmware loading for the Aquantia PHYs cannot use a static file name,
-because
-the firmware differs depending on the MAC it is connected to.
-Therefore, the firmware name is created using the PHY and MAC (rather: MDI=
-O)
-names at runtime.
+This patch creates a firmware file name at run time, based on the Aquantia=
+ PHY
+name and the MDIO name. By this, firmware files for ths same PHY, but comb=
+ined
+with different MACs are distinguishable.
 
-Activating firmware loading on the AQR105 is achieved by using the probe
-function which is already used for the AQR107 and later PHY families.
+The proposed naming uses the scheme:
+	mdio/phy-mdio_suffix
+Or, in the case of the Tehuti TN9510 card (TN4010 MAC and AQR105 PHY), the=
+ firmware
+file name will be
+	tn40xx/aqr105-tn40xx_fw.cld
 
-The patch was tested on a Tehuti TN9510 card, with the improved
-aqr_wait_reset_complete handling suggested by Vladimir Oltean
-(discussion of patch by
-Bartosz Golaszewski)
-https://lore.kernel.org/netdev/20240806112747.soclko5vex2f2c64@skbuf/
-(without these changes, the driver would timeout in
-aqr_wait_reset_complete and
-would return an error instead of loading firmware)
+This naming style has been chosen in order to make the filename unique, bu=
+t also
+to place the firmware in a directory named after the MAC, where different =
+firmwares
+could be collected.
 
-Hans-Frieder Vogt (2):
- =C2=A0=C2=A0 net: phy: aquantia: create firmware name for aqr PHYs at run=
-time
- =C2=A0=C2=A0 net: phy: aquantia: add firmware loading for aqr105
+Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
+=2D--
+ drivers/net/phy/aquantia/aquantia_firmware.c | 78 ++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
- =C2=A0drivers/net/phy/aquantia/aquantia_firmware.c | 78 +++++++++++++++++=
-+++
- =C2=A0drivers/net/phy/aquantia/aquantia_main.c=C2=A0=C2=A0=C2=A0=C2=A0 |=
-=C2=A0 1 +
- =C2=A02 file changed, 79 insertions(+)
+diff --git a/drivers/net/phy/aquantia/aquantia_firmware.c b/drivers/net/ph=
+y/aquantia/aquantia_firmware.c
+index 524627a36c6f..265bd6ee21da 100644
+=2D-- a/drivers/net/phy/aquantia/aquantia_firmware.c
++++ b/drivers/net/phy/aquantia/aquantia_firmware.c
+@@ -5,6 +5,7 @@
+ #include <linux/firmware.h>
+ #include <linux/crc-itu-t.h>
+ #include <linux/nvmem-consumer.h>
++#include <linux/ctype.h>	/* for tolower() */
+
+ #include <asm/unaligned.h>
+
+@@ -321,6 +322,81 @@ static int aqr_firmware_load_nvmem(struct phy_device =
+*phydev)
+ 	return ret;
+ }
+
++/* derive the filename of the firmware file from the PHY and the MDIO nam=
+es
++ * Parts of filename:
++ *   mdio/phy-mdio_suffix
++ *    1    2   3    4
++ * allow name components 1 (=3D 3) and 2 to have same maximum length
++ */
++static int aqr_firmware_name(struct phy_device *phydev, const char **name=
+)
++{
++#define AQUANTIA_FW_SUFFIX "_fw.cld"
++#define AQUANTIA_NAME "Aquantia "
++/* including the trailing zero */
++#define FIRMWARE_NAME_SIZE 64
++/* length of the name components 1, 2, 3 without the trailing zero */
++#define NAME_PART_SIZE ((FIRMWARE_NAME_SIZE - sizeof(AQUANTIA_FW_SUFFIX) =
+- 2) / 3)
++	ssize_t len, mac_len;
++	char *fw_name;
++	int i, j;
++
++	/* sanity check: the phydev drv name needs to start with AQUANTIA_NAME *=
+/
++	if (strncmp(AQUANTIA_NAME, phydev->drv->name, strlen(AQUANTIA_NAME)))
++		return -EINVAL;
++
++	/* sanity check: the phydev drv name may not be longer than NAME_PART_SI=
+ZE */
++	if (strlen(phydev->drv->name) - strlen(AQUANTIA_NAME) > NAME_PART_SIZE)
++		return -E2BIG;
++
++	/* sanity check: the MDIO name must not be empty */
++	if (!phydev->mdio.bus->id[0])
++		return -EINVAL;
++
++	fw_name =3D devm_kzalloc(&phydev->mdio.dev, FIRMWARE_NAME_SIZE, GFP_KERN=
+EL);
++	if (!fw_name)
++		return -ENOMEM;
++
++	/* first the directory name =3D MDIO bus name
++	 * (only name component, firmware name part 1; remove busids and the lik=
+es)
++	 * ignore the return value of strscpy: if the MAC/MDIO name is too long,
++	 * it will just be truncated
++	 */
++	strscpy(fw_name, phydev->mdio.bus->id, NAME_PART_SIZE + 1);
++	for (i =3D 0; fw_name[i]; i++) {
++		if (fw_name[i] =3D=3D '-' || fw_name[i] =3D=3D '_' || fw_name[i] =3D=3D=
+ ':')
++			break;
++	}
++	mac_len =3D i;	/* without trailing zero */
++
++	fw_name[i++] =3D '/';
++
++	/* copy name part beyond AQUANTIA_NAME into our name buffer - name part =
+2 */
++	len =3D strscpy(&fw_name[i], phydev->drv->name + strlen(AQUANTIA_NAME),
++		      FIRMWARE_NAME_SIZE - i);
++	if (len < 0)
++		return len;	/* should never happen */
++
++	/* convert the name to lower case */
++	for (j =3D i; j < i + len; j++)
++		fw_name[j] =3D tolower(fw_name[j]);
++	i +=3D len;
++
++	/* split the phy and mdio components with a dash */
++	fw_name[i++] =3D '-';
++
++	/* copy again the mac_name into fw_name - name part 3 */
++	memcpy(&fw_name[i], fw_name, mac_len);
++
++	/* copy file suffix (name part 4 - don't forget the trailing '\0') */
++	len =3D strscpy(&fw_name[i + mac_len], AQUANTIA_FW_SUFFIX, FIRMWARE_NAME=
+_SIZE - i - mac_len);
++	if (len < 0)
++		return len;	/* should never happen */
++
++	if (name)
++		*name =3D fw_name;
++	return 0;
++}
++
+ static int aqr_firmware_load_fs(struct phy_device *phydev)
+ {
+ 	struct device *dev =3D &phydev->mdio.dev;
+@@ -330,6 +406,8 @@ static int aqr_firmware_load_fs(struct phy_device *phy=
+dev)
+
+ 	ret =3D of_property_read_string(dev->of_node, "firmware-name",
+ 				      &fw_name);
++	if (ret)
++		ret =3D aqr_firmware_name(phydev, &fw_name);
+ 	if (ret)
+ 		return ret;
+
+=2D-
+2.43.0
 
 
