@@ -1,84 +1,123 @@
-Return-Path: <netdev+bounces-121664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43D5695DF3E
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 19:43:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A0D595DF4A
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 19:58:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 697851C20DE3
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 17:43:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 032FD1F21BDB
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 17:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51EFF42A97;
-	Sat, 24 Aug 2024 17:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 244F16F2E6;
+	Sat, 24 Aug 2024 17:57:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BTzxkUqM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WBEB53IM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2989B4F8A0;
-	Sat, 24 Aug 2024 17:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED623987D;
+	Sat, 24 Aug 2024 17:57:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724521427; cv=none; b=h2RxwIU+NYerraQzBx3OeA17rCmWhRwh+tPL3Mc3ioMeszGSDxjfjItdDOrA9PajgbOt+DmB90I5hPxhvGQMVWlTR4eCuUbM/nJ7X/nVaPDvFVGmAzFlsn4tq+CYmFskEF7l+QLDKhmO76u/rrsU+LQTlzRyOYMsTFsfF4N31E8=
+	t=1724522268; cv=none; b=sLOARKFArHt3VC7N07hEgEZN3HJWSXLogXAzbvuG+saE6gQ8hl45P8jiYEtudPfyGzwcAjloiVzkAI2VoEEAXRWKlqGsoPiUvnNxieIHgeW+sA5I312JhbJSdjO/ntntGo+OCTd7rUI0ELseM4p2bdL0i02E/M6p0YZKmjuqSgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724521427; c=relaxed/simple;
-	bh=3jN+tm6TRIeXJQ6l99NSaIsAt6ky6FvajSCWbwlyKyw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZQ32CqOeyETYrxdmPJUZ/7+fp1zfaTBXpY+nHhWQZR5Bxrhre7/mfI95SIUsMug8VKIrXW1zUpNnY4r5xgo6HzWJI6/EI8vTtnm5bT9OLYizjv76joJ4H3Kh0BXRK+/F/Lsfi7vZNPfXmIEYNKfcy2dMjezcKE4SPT2vr4UtBOo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BTzxkUqM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A35BC32781;
-	Sat, 24 Aug 2024 17:43:46 +0000 (UTC)
+	s=arc-20240116; t=1724522268; c=relaxed/simple;
+	bh=oEC/+m38S2q+OT1r6TMT+9zd4AY0AHroz+LufgpqoRk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RIZCAyLbuVlEj9w/ODbo5Ths8Ee1Qy99OqMO8pHjUhyYIx6gHhe2FQTuEN+NlwdsieaddqYM3MUMiwXc6ZeuAiX31A/I+RijDb0R1Nlh7jkewfjkaDtiIY7Cz8/NUuUmwqojIntPCDLRu64/XUmLObsHXnxO2lz1QiqWRt1F4MI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WBEB53IM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65B60C32781;
+	Sat, 24 Aug 2024 17:57:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724521426;
-	bh=3jN+tm6TRIeXJQ6l99NSaIsAt6ky6FvajSCWbwlyKyw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BTzxkUqM34F1jFTGs+EPepSd2f5bf5OvXP/TxXSH8r7jJJ7fEfgNaIR0iy/7U0Oea
-	 +HzbEfgHwgc7hdec+mlNDV1mDS6BptKK5/zHIZo1S1vcle8yKSYQgcbFHape9XNMY7
-	 Zt//cpyZECrZhOSpCBkhXfaydfdPkff1qsx8vBXRmyu2XcQDEHt+kXk4M+Sbt5z9xI
-	 Ro9DaHZTIh6pGy2NSrVGUXXcrzkcW3uuDoWt+QmVbZpDfgNLJFoiXfFxzCVy/0V4zp
-	 QuoT4D53qNfsIg3c1FeVurLpkijuSJu44sDR9OTM6ynVTwstnOaqoA9Eb2/UQVZa/+
-	 NVpSL+StvVGrw==
-Date: Sat, 24 Aug 2024 10:43:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Eric Dumazet <edumazet@google.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, David Ahern
- <dsahern@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn
- <andrew@lunn.ch>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- <nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 2/6] netdev_features: remove unused
- __UNUSED_NETIF_F_1
-Message-ID: <20240824104345.196d6564@kernel.org>
-In-Reply-To: <6c72dbc6-98a1-4682-97ca-e2f76c81a178@intel.com>
-References: <20240821150700.1760518-1-aleksander.lobakin@intel.com>
-	<20240821150700.1760518-3-aleksander.lobakin@intel.com>
-	<CANn89iL+VTJ6tEe-PZ24h+0U9BYs0t4gZDndiy7j1DwuKMBEFg@mail.gmail.com>
-	<fc659137-c6f0-42bf-8af3-56f4f0deae1b@intel.com>
-	<CANn89i+qJa8FSwdxkK76NSz2Wi4OxP56edFmJ14Zok8BpYQFjQ@mail.gmail.com>
-	<d080d3a6-3fdd-4edc-ae66-a576243ab3f0@intel.com>
-	<20240822163129.0982128f@kernel.org>
-	<6c72dbc6-98a1-4682-97ca-e2f76c81a178@intel.com>
+	s=k20201202; t=1724522266;
+	bh=oEC/+m38S2q+OT1r6TMT+9zd4AY0AHroz+LufgpqoRk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WBEB53IMMPhu5BFX2LFOtSS/4/xz74sUdoNKC123AzEvkHVKNBfmVgWOVrdxYPCB9
+	 Gq0AL9akqos52Azw6lMxapx1S02zSYYi4jelYFq6bQehr+on3WDhAKMaoEmbwKBPcW
+	 OzqqMe1XGgamgJql/Txf2Q/jlbQNgFCfjpbFEn4zAcm/VFD2FnDI0k1Ul2a7gM5UCO
+	 990Nzqy5E29jDPdesnuoH/XlOcmMdnqTLnyQfPvTiA/Lpx0JC69yepnpYhs/5p+oGd
+	 +8VM6AKg8pb/MYCyvCIWCP0w/0NSHL4LBM/bV3m0JnF2BFt1AXPbE6RVyUC8q233Hh
+	 o2C/OTMNVPCXw==
+Date: Sat, 24 Aug 2024 18:57:38 +0100
+From: Simon Horman <horms@kernel.org>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, marcel@holtmann.org, johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com, idryomov@gmail.com, xiubli@redhat.com,
+	dsahern@kernel.org, trondmy@kernel.org, anna@kernel.org,
+	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de,
+	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
+	jmaloy@redhat.com, ying.xue@windriver.com, linux@treblig.org,
+	jacob.e.keller@intel.com, willemb@google.com, kuniyu@amazon.com,
+	wuyun.abel@bytedance.com, quic_abchauha@quicinc.com,
+	gouhao@uniontech.com, netdev@vger.kernel.org,
+	linux-bluetooth@vger.kernel.org, ceph-devel@vger.kernel.org,
+	linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net
+Subject: Re: [PATCH net-next 6/8] ipv6: mcast: use min() to simplify the code
+Message-ID: <20240824175738.GO2164@kernel.org>
+References: <20240822133908.1042240-1-lizetao1@huawei.com>
+ <20240822133908.1042240-7-lizetao1@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240822133908.1042240-7-lizetao1@huawei.com>
 
-On Fri, 23 Aug 2024 14:34:13 +0200 Alexander Lobakin wrote:
-> > On one hand it may be good to make any potential breakage obvious,
-> > on the other we could avoid regressions if we stick to reserving 
-> > the bits, and reusing them, but the bits we don't delete could remain
-> > at their current position?  
+On Thu, Aug 22, 2024 at 09:39:06PM +0800, Li Zetao wrote:
+> When coping sockaddr in ip6_mc_msfget(), the time of copies
+> depends on the minimum value between sl_count and gf_numsrc.
+> Using min() here is very semantic.
 > 
-> Hmm, sounds fine. IOW just rename all the bits I remove to
-> __UNUSED_NETIF_F_xx?
+> Signed-off-by: Li Zetao <lizetao1@huawei.com>
+> ---
+>  net/ipv6/mcast.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+> index 7ba01d8cfbae..b244dbf61d5f 100644
+> --- a/net/ipv6/mcast.c
+> +++ b/net/ipv6/mcast.c
+> @@ -586,7 +586,8 @@ int ip6_mc_msfget(struct sock *sk, struct group_filter *gsf,
+>  	const struct in6_addr *group;
+>  	struct ipv6_mc_socklist *pmc;
+>  	struct ip6_sf_socklist *psl;
+> -	int i, count, copycount;
+> +	unsigned int count;
+> +	int i, copycount;
+>  
+>  	group = &((struct sockaddr_in6 *)&gsf->gf_group)->sin6_addr;
+>  
+> @@ -610,7 +611,7 @@ int ip6_mc_msfget(struct sock *sk, struct group_filter *gsf,
+>  	psl = sock_dereference(pmc->sflist, sk);
+>  	count = psl ? psl->sl_count : 0;
 
-Yup!
+Both count and psl->sl_count are unsigned int,
+so this looks safe (and more correct than what it replaces, IMHO).
+
+>  
+> -	copycount = count < gsf->gf_numsrc ? count : gsf->gf_numsrc;
+> +	copycount = min(count, gsf->gf_numsrc);
+
+And gsf->gf_numsrc is a __u32, so min operating on it and
+count looks safe to me.
+
+Further, the code it replaces seems to be a max() operation in
+both intent and function.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+>  	gsf->gf_numsrc = count;
+>  	for (i = 0; i < copycount; i++) {
+>  		struct sockaddr_in6 *psin6;
+> -- 
+> 2.34.1
+> 
+> 
 
