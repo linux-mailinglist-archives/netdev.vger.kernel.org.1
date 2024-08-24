@@ -1,245 +1,176 @@
-Return-Path: <netdev+bounces-121674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C14995DF99
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 20:33:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED5B095DFC7
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 21:18:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E3065B218A2
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 18:33:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23C511C20CBD
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 19:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF61053365;
-	Sat, 24 Aug 2024 18:33:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E782E61FFC;
+	Sat, 24 Aug 2024 19:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b="PtorMR/9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gUHUB2W/"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2095.outbound.protection.outlook.com [40.107.223.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98B04A07;
-	Sat, 24 Aug 2024 18:33:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.95
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724524415; cv=fail; b=moRbJ+zxIegQZ5yQ4vPKftb06EhL1SaEjygsYg8GIWtYfS+MijhxsJbEXXWTl9+jsvqlh7DmFLDdhtwtFjWAr/MkkC1VG/TvVy3zCe+My5MzLPffGv/RD+vPWCh2S9ntfQXcOt3LcgWC6PNq6NxtPRYch0EFdHksfNpfTZ0npe8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724524415; c=relaxed/simple;
-	bh=o/G78MjSVaVJID+PTShW2CkrDzRPDM7oNBfyXHPDEhE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Jyh6eR2O9GDeHSQNVdwSAs9/dKKcUUi+mWnNhuOBUIgFk7wYH6PjchmI04GNX5b9yypEad9lJHcPYTvRHC6rkG92zODKT9pRJcRCda+NrOxDIU2QvKV6vzLISypydPxdz6e4eGeaOQwfmwfIRswaEyzuezwLscCeItuQuAKLI4c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com; spf=pass smtp.mailfrom=hammerspace.com; dkim=pass (1024-bit key) header.d=hammerspace.com header.i=@hammerspace.com header.b=PtorMR/9; arc=fail smtp.client-ip=40.107.223.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hammerspace.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hammerspace.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Ay2AtWDia2vzhtj4aChVcTeActHQsCzDpH+Tfck9DU2BZziNKcCoVef3x3MJhKaDFDrLSybyfv9D8P3WefgqMzP1RcxvwN0S5RZ2liK7TRwp7MwCu7OdjPg3ZtzPio4vwriElpgtPZNBs+HN/RVQPpBOd9KSvazzXn0YvnzB2rkU8+8yaMGyfPlHyIyOtctiCdPyprZFsE6qmg/fXUQppbSKXOO6czGpMUJnyDwENhcZRxfekx9MzzlH2NlKic1yUVzOwirZOf/92aoRYf7p8H47qYbmjRh53VfN04Hwl6EPBIU/b/VnD0JTgOuJhAUGRaSDu1ahN7Q/oXc8N9o+Lg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o/G78MjSVaVJID+PTShW2CkrDzRPDM7oNBfyXHPDEhE=;
- b=xiJGf+hBaNeSqupbjJfKnX8bgGCDryY13/mgw6lzVbp4XDICjg8qt2K7getdL3fVYGcXD5l/e5dcjfA2VVUAdhpd5k4soOJaOu6ha9IX/XKNp8MjPhbmmSFs84LX+f/wyyGUI4vIL+rkEdCqNN6ganCu9tpzd0IWyAW0Zz4TmllUySjuPrinE8Nqvpg6PAzchACz3aSRSfQOw2l1b/abL5aRQbZUK0EFBgpyMMYOHEoG0vWXCOrHAPh4vYep3nDk8q0PyDTizcMfGRDQSmVPNIaflYN8qP9HxjQrcVa/wq5M0KfvFoUkn7IUWgOz2iA8ydMmCG1s4gSFYL5HOyIinA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=hammerspace.com; dmarc=pass action=none
- header.from=hammerspace.com; dkim=pass header.d=hammerspace.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hammerspace.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o/G78MjSVaVJID+PTShW2CkrDzRPDM7oNBfyXHPDEhE=;
- b=PtorMR/9d3qgvB7Ni9YbpM1KhAzpgBVc+x/WOOslNeJkDMiFNzjJ4yNBwaEuARbHjOMFbLzkTsXqM5zqt0RIEfzGmihM5Fufvi7jbkMyaqIRgGEn3Oe+rE7J3WPHmNJOt64AVrtot1/CMiKCHng8bfU97O/P0wahcXCrpvRfMoo=
-Received: from CH0PR13MB5084.namprd13.prod.outlook.com (2603:10b6:610:111::7)
- by BY5PR13MB3892.namprd13.prod.outlook.com (2603:10b6:a03:226::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.23; Sat, 24 Aug
- 2024 18:33:30 +0000
-Received: from CH0PR13MB5084.namprd13.prod.outlook.com
- ([fe80::67bb:bacd:2321:1ecb]) by CH0PR13MB5084.namprd13.prod.outlook.com
- ([fe80::67bb:bacd:2321:1ecb%4]) with mapi id 15.20.7897.021; Sat, 24 Aug 2024
- 18:33:29 +0000
-From: Trond Myklebust <trondmy@hammerspace.com>
-To: "horms@kernel.org" <horms@kernel.org>, "chuck.lever@oracle.com"
-	<chuck.lever@oracle.com>
-CC: "dsahern@kernel.org" <dsahern@kernel.org>, "wuyun.abel@bytedance.com"
-	<wuyun.abel@bytedance.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"kuniyu@amazon.com" <kuniyu@amazon.com>, "luiz.dentz@gmail.com"
-	<luiz.dentz@gmail.com>, "anna@kernel.org" <anna@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "ying.xue@windriver.com"
-	<ying.xue@windriver.com>, "willemb@google.com" <willemb@google.com>,
-	"jmaloy@redhat.com" <jmaloy@redhat.com>, "tom@talpey.com" <tom@talpey.com>,
-	"Dai.Ngo@oracle.com" <Dai.Ngo@oracle.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "marcel@holtmann.org" <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"lizetao1@huawei.com" <lizetao1@huawei.com>, "ceph-devel@vger.kernel.org"
-	<ceph-devel@vger.kernel.org>, "linux@treblig.org" <linux@treblig.org>,
-	"tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "okorniev@redhat.com"
-	<okorniev@redhat.com>, "jacob.e.keller@intel.com" <jacob.e.keller@intel.com>,
-	"quic_abchauha@quicinc.com" <quic_abchauha@quicinc.com>,
-	"edumazet@google.com" <edumazet@google.com>, "neilb@suse.de" <neilb@suse.de>,
-	"jlayton@kernel.org" <jlayton@kernel.org>, "idryomov@gmail.com"
-	<idryomov@gmail.com>, "linux-nfs@vger.kernel.org"
-	<linux-nfs@vger.kernel.org>, "xiubli@redhat.com" <xiubli@redhat.com>,
-	"gouhao@uniontech.com" <gouhao@uniontech.com>, "johan.hedberg@gmail.com"
-	<johan.hedberg@gmail.com>
-Subject: Re: [PATCH net-next 8/8] SUNRPC: use min() to simplify the code
-Thread-Topic: [PATCH net-next 8/8] SUNRPC: use min() to simplify the code
-Thread-Index: AQHa9lCYLhmuvJeHK0i4dLJCBHV3x7I2uFmAgAADPoA=
-Date: Sat, 24 Aug 2024 18:33:29 +0000
-Message-ID: <a44fbac0012c7f552867777dac41f85a554d6f73.camel@hammerspace.com>
-References: <20240822133908.1042240-1-lizetao1@huawei.com>
-	 <20240822133908.1042240-9-lizetao1@huawei.com>
-	 <20240824180750.GQ2164@kernel.org>
-	 <Zsokv8+9aDoR4uOu@tissot.1015granger.net>
-In-Reply-To: <Zsokv8+9aDoR4uOu@tissot.1015granger.net>
-Accept-Language: en-US, en-GB
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=hammerspace.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH0PR13MB5084:EE_|BY5PR13MB3892:EE_
-x-ms-office365-filtering-correlation-id: 6c51d9e1-9e35-48bc-90d7-08dcc46b4016
-x-ms-exchange-atpmessageproperties: SA
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|7416014|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?ZSt3NTJINUM5S1dOT0lFaG9TTERTaFUzbEE4K004NkRvL3U1Tmh3S3F0RDJi?=
- =?utf-8?B?czNEUzVXaFlRVHFVMkJPNzJjZVlEMjA1UDVWRHljVGhCTWZPZThRTEFvamRH?=
- =?utf-8?B?dDhweEc0V1kzd29QQnVuLzJ6MlpkOFAzTk5JQjVMVktiSStmTXRsTFBzU0pG?=
- =?utf-8?B?RU14ZWY1SS9HOHpWRTl2MkJ2L1IzYnU0VTRqWFY3a1RHZHdwcjRCbXlYTERr?=
- =?utf-8?B?aVZTeGNXcGIwRVh3NHVwZ0lrL0NZYTlLTHc3L3MrUW9RckZzNUQzR2V0MDBH?=
- =?utf-8?B?OEY0SDMyS1JkRGhnRzkwUzdLZXc2YjAwQVdwWHpGVVFzbmpUMTNYSzdzN0wy?=
- =?utf-8?B?THE4VG50UksxODRCU2pzb3pOMGtOREdGVHlSYkJSRUgzUzNTV0xNNVEyVjc2?=
- =?utf-8?B?YWN5RlhnbGYyOW0rajRrZjlsNm5zNUUzZXI2UkwvTVlUWWZ1Z3NDTGwxd3hH?=
- =?utf-8?B?cXhmdTZkUEJuanhMOFJrVFpXYWJPTUVqKzd1V3RLcW4yQ080eVFycndLaU84?=
- =?utf-8?B?UXdYK3d2MGR3ajhjdnEwTExKcnp3MmQ2aVQ3RnBzZCt1SkpaUzNZQkJpSkdp?=
- =?utf-8?B?eTlxZTVBU2hzdndjNGdEeUdaa2YxenRPemlhb29NWFZCaHJ6WXd0Tnk4MDBE?=
- =?utf-8?B?Z2dTTnBwWGRveStYcktTRm5xenpIQnNvcC9TVWRmc2dkNi93ZlVvU2FQSHJs?=
- =?utf-8?B?OUduSHM2WU5wakZKYUVlODB1ZmdFbWkvZEs2b0lrYTU5N0xyeVVOSFNUajlT?=
- =?utf-8?B?S3ExYWRtWUJDb1dSbEdRblB5QXNEamw1c0VZeGdWYVZqZ0VDZzB5b2RvNnZv?=
- =?utf-8?B?NEJ1N2tsUFJ1Wk1QNGk0dENZeC9RZDAxeGJmVkc0d3BuWTU3Z3lBM2g1alo1?=
- =?utf-8?B?aWhqY0ZnMll2Q1M3b29QNzZNc3BNVU55ajdBTmJtbE1HcVN5QXFOaVRLM0t0?=
- =?utf-8?B?c1A1YkVXNE1pL2xVd0FGdjR0WEc4dVRCL2xvbHdaYXE1Z2NqYTlGZWNOM3VZ?=
- =?utf-8?B?QVBseDJ1dUZ5ajU2a2t3NXRPYmd1amgwTkhvK3VSMkE0c1UzVmc0Tm5HRUFP?=
- =?utf-8?B?SGV1YUp2ZGVOV0dnUU9hNGczZFRudUIza3lEcWEwUzVscDE1WkM1dXoxTFdD?=
- =?utf-8?B?WW54cGk0Q3UxWmwxUHpUUGhWazFHWk9LWUR2VjYxNnpEdlg0dUNxNDAzZmt4?=
- =?utf-8?B?Qnl0Z3ZiZnFibGhBWlBqclllNkM4RStuUVpHSWU0elAycjBHa1R1RXVLbWNY?=
- =?utf-8?B?U0VHRmtlbCtVekRvY0JyUTZTbHhtcjZSR1lyU0ovaWtZWFBRd3BLcm9sNnNt?=
- =?utf-8?B?ZmxyOTFacTEzd2pPYzdKMHB6a05RaFc2aGt4cnVwYzI5RkdjbGpsN0hiclM1?=
- =?utf-8?B?alZ1eWlzVmxncWFTSXVOWC9nUGx5VkVXbS84OEFjdGNkTlVaY0hURS8wRktH?=
- =?utf-8?B?bTRnZHNYUVJ6d1VsTEJ1NDkxN1FBeHBxaTVjRUdQSHBuVEJHVGlQRDYxZTlj?=
- =?utf-8?B?aGRaWFhFNThycXlwU2pyTUFKaDZ1WVpBNlJQQ2VOR2M3MjdmRUdoWSt3Ymo3?=
- =?utf-8?B?cytxMVpFc09UdWtNRTRwL3F3NTNFdVZhMGZXZ2M0dm5DZWgvV0pYK1pmU0ps?=
- =?utf-8?B?VVBsSFE4bVdYRzJHbzRPTUlkL0tXSlU1eFp3TnA4bFRlcGxTQldSQ0dwVmZD?=
- =?utf-8?B?bTh4cGlmTFh4aXMxd3NRcGdzZGptd3A2NjRxcE5sYlNDMUVCUVU3My9adkhy?=
- =?utf-8?B?V2Foc3hIRi9RbWhhU2xlb3pHa1YvOFlELzBqa2JFcUJWWGJlSzRJR3FWaVpq?=
- =?utf-8?B?bWhNVS9MdkRqK2xHZGJSZU5XbHNqZVdjb1ExZVpBQWlHNDNKeDQwMlE3OHRy?=
- =?utf-8?B?VlBkTTUzV3B5SDhiOGNLQ3kxcUNBVlg1Q3UrL05PU1lzV3c9PQ==?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR13MB5084.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?bXhTbGYzZXlXMUFZMHJSakJBUDJES09pU0QzakxNT3hFK1dTaW91d2I0UXpm?=
- =?utf-8?B?dm0wWDNIZE81ZnZ4QzQ1T1l0OGZpQVl5aWJEQXJ5eENBajFHNnNmaGpzR2F0?=
- =?utf-8?B?a2lxU0tLMGt1MGJDL0lCWWVqY1lLVjQwVlNVdFBYOVc2emhYUUNCY1YvY1Zx?=
- =?utf-8?B?Y2NtcnI5Vm1PWUVISzY4Nmc5WGJFUGk3WklydFZKbE5hNm5LcmlqMXpkcHZs?=
- =?utf-8?B?QVJqS1k1N1JQNytmdjVTckhDb3lZMWtvVFkwTTlrZElvQ0J1TmVsWGZ2bHFm?=
- =?utf-8?B?SXFMZUhhVjhndFJML2lZb3dQampycmJ5eWxZVTRxTnBCeTlvakVMU2J3dFQv?=
- =?utf-8?B?blNrd1RBR0NDaUkzcUtCcXJzUTJ3Ukt1T29mNlJDQmFPbWdKQkxTeS9hMngz?=
- =?utf-8?B?T0RvTGE1a2s2SzlGREFNK01sd3huOEV2NnNVZ29FNkNONlBqQ0NvSUZIK1lq?=
- =?utf-8?B?L1JUSjAyVldpUnpQenFaV093MmhmYVA0YndvSTIyUUVZclpHR25SNDdvbFRH?=
- =?utf-8?B?bFVyMXR2TmViZ29lUENtcmJER1N6eDNERXNJMWxFU0N0bnFyMWJtTjZncXZp?=
- =?utf-8?B?MFRsL2pxM1FkL2J6aFl5VWVrTEw4SUhiUU11QWE1VkcxT0V5MTFqT1hLOXFD?=
- =?utf-8?B?eTB6Vm9ITU1MRVVtOWVWODE5Ry9tbFZjaHg0WnZBSThmWXhJUHdabVdtNDRj?=
- =?utf-8?B?NEN4SG9BT0xManUxUWZ0LzdZOFRyK3kxZ1k3aGpMSVBVaFc0ZXp2cmZja0Rh?=
- =?utf-8?B?TThrSys2NUk1akd3Uk5sT0UydU5aajR1eURyblVCdXFYYjlKenN2ZzgvMHlG?=
- =?utf-8?B?Y0NoZzl0Z2NhRm43MEVIWjA2RE1iUUxJN3NHdnRkcjJSSTQ1eitXQ0FoUEhJ?=
- =?utf-8?B?cWpCRmFsWWFYMVROVmRkUGd3Wk45elZkMHQrTndSNkRrSHNHVWF2VGhhUThE?=
- =?utf-8?B?SnQ5bE5CeGJCaEdtZGFjSHk3dnF1RDdpSzFNaUdaT1NaRDVOZmZISlJnTk1J?=
- =?utf-8?B?OHE5WjlhV2dGcXNqSlhIbUIvUy9IVWJwcnF6RUcvVEoyYUNUdjMxempPN0lS?=
- =?utf-8?B?Qm9hTHdNYkNjSnhjaGM3SmtETHBJOTVRUkJaOVdGVUh0cWpwMkF1ZmdTbCtw?=
- =?utf-8?B?VktOMmUzYXZuWGlDZ3ZneXQ0NGhWUjViY205RGc1cnlKTlA5RmJ6aDF5UmF1?=
- =?utf-8?B?ZitrQnJHS1RaMWx2RmtOWUd4ZFowMjR5cGdBd0poaStySlhCN0hobzBJcS9R?=
- =?utf-8?B?WEJYUUcyUFM2SVdoOTUvSzFpL0Vjamh6R0FGd3I5L0dTckxLaHpqRWEybXFo?=
- =?utf-8?B?NmlDWEJBK0JyS0tYRnFTUVZRZHVBa3M2NFV4UTRJYXBtSGYyUUtRejZHdmUz?=
- =?utf-8?B?enZmeWhHZkNtZ0VrVTV2anIwaGErcVRMZFoyVFdBOFBSdDI5R3BLcHc4eG93?=
- =?utf-8?B?VGZaNDNxQ3NuU3pDeWJsSS9oYVo0ZHJCcFF4dnZRVi9OQllLNzNEYlhUZ3Rr?=
- =?utf-8?B?U0NYaWRGVUlXYUdPM0toUzNrcUhVcFFjOXZHY1VwK2YrQy8vSDkrK2VkQTZK?=
- =?utf-8?B?TEdJV09BYjAvVEpKR2dFakRqRHp1UDVZVU4rUWdoMmRYa0RyUVJqSlIvdEpE?=
- =?utf-8?B?YVkrZlo0QU5OWld4UVBod0hIeW1XU3lQRXB5dXRWWEU2eDhUWXJBVitRakdp?=
- =?utf-8?B?V3ZKY0VFSmNTWjJIaFBUdXFHcmU2d3dVWkNKWVZXcE95TUtvNStWR3hSNTFZ?=
- =?utf-8?B?eFA0bThFc2FhdUoyNU5uYUFoWUdKVlBsT1NRaFJheCtXRDhsT3dGRmd4QVpU?=
- =?utf-8?B?eFB5cEk5eU9VTis3TFk5dzJIVklleW8xb1VIVUczOFhvSmVTZEIreVpWWXJh?=
- =?utf-8?B?ZERiYUI1elNITHBQNko3cW85SnNPN01WRlNESGlyU0FDMGl3MXN5d3RyM3g2?=
- =?utf-8?B?dkIzcGVsdW5nb2xzaE1PWnRFVjVzcmduZkppNEdtdjhFWWx6WXl2YnNSMTFZ?=
- =?utf-8?B?WWNnVDhvV1FpRUxEcnM1V1dNVklQR2hpcS9XNm8raXlzZlE1R1Zmb093dGdp?=
- =?utf-8?B?dlJ6YkM3eXY5SmxHU1c0M2FWQjczdWJpUTNReVlGV1pGWjZ6S1dXd051bVFp?=
- =?utf-8?B?THpZNDFLSVQ5U3F2LzhXbkYyTGo0UnJxTmVjSWprTlEzOFZTbitKamNVSE81?=
- =?utf-8?B?UGc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <A96D541354D1C1419845E1F5A8E446B2@namprd13.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2F1514A85
+	for <netdev@vger.kernel.org>; Sat, 24 Aug 2024 19:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724527105; cv=none; b=Cz1xe9pl5obn3/7ApKcRaANT7GR3NFaT95KjJacFcfv2juKP9Ddk9HCGaE4zfgxt2fqhVmNpC3LykyQLm2WUPCqUQORS762zNpzZwfXYDKGSSnlBJHpwr3rotGhcKW7nhvKg6K8MJqVIhitG6+k2v7fmdVs1qHQOtMNdqoUsQQU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724527105; c=relaxed/simple;
+	bh=n10LorMpuZGif2oWfQKhADEBHVwWm78vredTi659Jeo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oIkJTXZKt24vXXJVG0H3mZ+ncxSkq8uH+McZCluzPKTcsMHOUxRoomS6p6niInNuEHAXP/jKvbd12PA5lVH6MkC85QLEO5nVp4fJiF1eO8OPBJBWEoFPXGB6nvs543fU6PbNx1Ietc5TnkE0KRD/DaGOiniV2f6dvkkDazyGgxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gUHUB2W/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 294B1C32781;
+	Sat, 24 Aug 2024 19:18:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724527104;
+	bh=n10LorMpuZGif2oWfQKhADEBHVwWm78vredTi659Jeo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gUHUB2W/yiilKyDOZEwv8fvtfvaPhtdnWuM0i3+LajieCPmPfhCroYGyH4wz2opMk
+	 3colkM1g6u+HXSJycoPf5zshV9HY1uzSbUHzpZd3NHyp04l2SJJNCi2i1dP0Gq4QUV
+	 pQ2SNGqzPoyAuIwlKR0JXkDn7dCwGwNl2FlRd7kEMl6uPDcBnCUhcV99HoxD9FOFAZ
+	 qBdFzgQnRnVKVdRUYILrGPzdoU14cUdIohSMsGkgoKIqapYxjbvrs5aexmwMnEWYDc
+	 Mapr1PFcGvyYPRdRYc2nY5d82qy+DoSpzz2jU+ZLO6W824ddFD3RxGz2Rh+hwsMC7x
+	 69cQE8XLKl4Nw==
+Date: Sat, 24 Aug 2024 20:18:19 +0100
+From: Simon Horman <horms@kernel.org>
+To: Tom Herbert <tom@herbertland.com>
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+	netdev@vger.kernel.org, felipe@sipanda.io,
+	willemdebruijn.kernel@gmail.com, pablo@netfilter.org,
+	laforge@gnumonks.org, xeb@mail.ru
+Subject: Re: [PATCH net-next v4 05/13] flow_dissector: UDP encap
+ infrastructure
+Message-ID: <20240824191819.GU2164@kernel.org>
+References: <20240823201557.1794985-1-tom@herbertland.com>
+ <20240823201557.1794985-6-tom@herbertland.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: hammerspace.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR13MB5084.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c51d9e1-9e35-48bc-90d7-08dcc46b4016
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Aug 2024 18:33:29.5188
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 0d4fed5c-3a70-46fe-9430-ece41741f59e
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jMd3+UdVYHfPNZTE2oSozmsdriTtiaM0oO379yah9nqZ3VaB5h8dYbt8trfsGKxFXxk3iLH0kWFlF042HeDr1Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR13MB3892
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240823201557.1794985-6-tom@herbertland.com>
 
-T24gU2F0LCAyMDI0LTA4LTI0IGF0IDE0OjIxIC0wNDAwLCBDaHVjayBMZXZlciB3cm90ZToNCj4g
-T24gU2F0LCBBdWcgMjQsIDIwMjQgYXQgMDc6MDc6NTBQTSArMDEwMCwgU2ltb24gSG9ybWFuIHdy
-b3RlOg0KPiA+IE9uIFRodSwgQXVnIDIyLCAyMDI0IGF0IDA5OjM5OjA4UE0gKzA4MDAsIExpIFpl
-dGFvIHdyb3RlOg0KPiA+ID4gV2hlbiByZWFkaW5nIHBhZ2VzIGluIHhkcl9yZWFkX3BhZ2VzLCB0
-aGUgbnVtYmVyIG9mIFhEUiBlbmNvZGVkDQo+ID4gPiBieXRlcw0KPiA+ID4gc2hvdWxkIGJlIGxl
-c3MgdGhhbiB0aGUgbGVuIG9mIGFsaWduZWQgcGFnZXMsIHNvIHVzaW5nIG1pbigpIGhlcmUNCj4g
-PiA+IGlzDQo+ID4gPiB2ZXJ5IHNlbWFudGljLg0KPiA+ID4gDQo+ID4gPiBTaWduZWQtb2ZmLWJ5
-OiBMaSBaZXRhbyA8bGl6ZXRhbzFAaHVhd2VpLmNvbT4NCj4gPiA+IC0tLQ0KPiA+ID4gwqBuZXQv
-c3VucnBjL3hkci5jIHwgMiArLQ0KPiA+ID4gwqAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24o
-KyksIDEgZGVsZXRpb24oLSkNCj4gPiA+IA0KPiA+ID4gZGlmZiAtLWdpdCBhL25ldC9zdW5ycGMv
-eGRyLmMgYi9uZXQvc3VucnBjL3hkci5jDQo+ID4gPiBpbmRleCA2MmUwN2MzMzBhNjYuLjY3NDZl
-OTIwZGJiYiAxMDA2NDQNCj4gPiA+IC0tLSBhL25ldC9zdW5ycGMveGRyLmMNCj4gPiA+ICsrKyBi
-L25ldC9zdW5ycGMveGRyLmMNCj4gPiA+IEBAIC0xNjAyLDcgKzE2MDIsNyBAQCB1bnNpZ25lZCBp
-bnQgeGRyX3JlYWRfcGFnZXMoc3RydWN0DQo+ID4gPiB4ZHJfc3RyZWFtICp4ZHIsIHVuc2lnbmVk
-IGludCBsZW4pDQo+ID4gPiDCoAllbmQgPSB4ZHJfc3RyZWFtX3JlbWFpbmluZyh4ZHIpIC0gcGds
-ZW47DQo+ID4gPiDCoA0KPiA+ID4gwqAJeGRyX3NldF90YWlsX2Jhc2UoeGRyLCBiYXNlLCBlbmQp
-Ow0KPiA+ID4gLQlyZXR1cm4gbGVuIDw9IHBnbGVuID8gbGVuIDogcGdsZW47DQo+ID4gPiArCXJl
-dHVybiBtaW4obGVuLCBwZ2xlbik7DQo+ID4gDQo+ID4gQm90aCBsZW4gYW5kIHBnbGVuIGFyZSB1
-bnNpZ25lZCBpbnQsIHNvIHRoaXMgc2VlbXMgY29ycmVjdCB0byBtZS4NCj4gPiANCj4gPiBBbmQg
-dGhlIGNvZGUgYmVpbmcgcmVwbGFjZWQgZG9lcyBhcHBlYXIgdG8gYmUgYSBtaW4oKSBvcGVyYXRp
-b24gaW4NCj4gPiBib3RoIGZvcm0gYW5kIGZ1bmN0aW9uLg0KPiA+IA0KPiA+IFJldmlld2VkLWJ5
-OiBTaW1vbiBIb3JtYW4gPGhvcm1zQGtlcm5lbC5vcmc+DQo+ID4gDQo+ID4gSG93ZXZlciwgSSBk
-b24ndCBiZWxpZXZlIFNVTlJQQyBjaGFuZ2VzIHVzdWFsbHkgZG9uJ3QgZ28gdGhyb3VnaA0KPiA+
-IG5leHQtbmV4dC4NCj4gPiBTbyBJIHRoaW5rIHRoaXMgZWl0aGVyIG5lZWRzIHRvIGJlIHJlcG9z
-dGVkIG9yIGdldCBzb21lIGFja3MgZnJvbQ0KPiA+IENodWNrIExldmVyIChhbHJlYWR5IENDZWQp
-Lg0KPiA+IA0KPiA+IENodWNrLCBwZXJoYXBzIHlvdSBjYW4gb2ZmZXIgc29tZSBndWlkYW5jZSBo
-ZXJlPw0KPiA+IA0KPiA+ID4gwqB9DQo+ID4gPiDCoEVYUE9SVF9TWU1CT0xfR1BMKHhkcl9yZWFk
-X3BhZ2VzKTsNCj4gPiA+IMKgDQo+ID4gPiAtLSANCj4gPiA+IDIuMzQuMQ0KPiA+ID4gDQo+ID4g
-PiANCj4gDQo+IENoYW5nZXMgdG8gbmV0L3N1bnJwYy8gY2FuIGdvIHRocm91Z2ggQW5uYSBhbmQg
-VHJvbmQncyBORlMgY2xpZW50DQo+IHRyZWVzLCB0aHJvdWdoIHRoZSBORlNEIHRyZWUsIG9yIHZp
-YSBuZXRkZXYsIGJ1dCB0aGV5IGFyZSB0eXBpY2FsbHkNCj4gdGFrZW4gdGhyb3VnaCB0aGUgTkZT
-LXJlbGF0ZWQgdHJlZXMuDQo+IA0KPiBVbmxlc3MgdGhlIHN1Ym1pdHRlciBvciB0aGUgcmVsZXZh
-bnQgbWFpbnRhaW5lcnMgcHJlZmVyIG90aGVyd2lzZSwNCj4gSSBkb24ndCBzZWUgYSBwcm9ibGVt
-IHdpdGggdGhpcyBvbmUgZ29pbmcgdGhyb3VnaCBuZXRkZXYuIExldCBtZQ0KPiBrbm93IG90aGVy
-d2lzZS4NCj4gDQo+IEFja2VkLWJ5OiBDaHVjayBMZXZlciA8Y2h1Y2subGV2ZXJAb3JhY2xlLmNv
-bT4NCj4gDQo+IA0KDQpXaGF0IGlzIHRoZSB2YWx1ZSBvZiB0aGlzIGNoYW5nZT8gVW5sZXNzIHRo
-ZSBjdXJyZW50IGNvZGUgaXMgYWN0dWFsbHkNCmJyb2tlbiBvciBzb21laG93IGRpZmZpY3VsdCB0
-byByZWFkLCB0aGVuIEkgbXVjaCBwcmVmZXIgdG8gbGVhdmUgaXQNCnVudG91Y2hlZCBzbyB0aGF0
-IGFueSBmdXR1cmUgYmFjayBwb3J0cyBvZiBmaXhlcyB0byBjb2RlIGFyb3VuZCB0aGF0DQpsaW5l
-IHJlbWFpbiB0cml2aWFsLg0KDQpTbyBOQUNLIHRvIHRoaXMgY2hhbmdlIGZvciBub3cuDQoNCi0t
-IA0KVHJvbmQgTXlrbGVidXN0DQpMaW51eCBORlMgY2xpZW50IG1haW50YWluZXIsIEhhbW1lcnNw
-YWNlDQp0cm9uZC5teWtsZWJ1c3RAaGFtbWVyc3BhY2UuY29tDQoNCg0K
+On Fri, Aug 23, 2024 at 01:15:49PM -0700, Tom Herbert wrote:
+> Add infrastructure for parsing into UDP encapsulations
+> 
+> Add function __skb_flow_dissect_udp that is called for IPPROTO_UDP.
+> The flag FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS enables parsing of UDP
+> encapsulations. If the flag is set when parsing a UDP packet then
+> a socket lookup is performed. The offset of the base network header,
+> either an IPv4 or IPv6 header, is tracked and passed to
+> __skb_flow_dissect_udp so that it can perform the socket lookup
+> 
+> If a socket is found and it's for a UDP encapsulation (encap_type is
+> set in the UDP socket) then a switch is performed on the encap_type
+> value (cases are UDP_ENCAP_* values)
+> 
+> An encapsulated packet in UDP can either be indicated by an
+> EtherType or IP protocol. The processing for dissecting a UDP encap
+> protocol returns a flow dissector return code. If
+> FLOW_DISSECT_RET_PROTO_AGAIN or FLOW_DISSECT_RET_IPPROTO_AGAIN is
+> returned then the corresponding  encapsulated protocol is dissected.
+> The nhoff is set to point to the header to process.  In the case
+> FLOW_DISSECT_RET_PROTO_AGAIN the EtherType protocol is returned and
+> the IP protocol is set to zero. In the case of
+> FLOW_DISSECT_RET_IPPROTO_AGAIN, the IP protocol is returned and
+> the EtherType protocol is returned unchanged
+> 
+> Signed-off-by: Tom Herbert <tom@herbertland.com>
+
+...
+
+> diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+
+...
+
+> @@ -806,6 +807,134 @@ __skb_flow_dissect_batadv(const struct sk_buff *skb,
+>  	return FLOW_DISSECT_RET_PROTO_AGAIN;
+>  }
+>  
+> +static enum flow_dissect_ret
+> +__skb_flow_dissect_udp(const struct sk_buff *skb, const struct net *net,
+> +		       struct flow_dissector *flow_dissector,
+> +		       void *target_container, const void *data,
+> +		       int *p_nhoff, int hlen, __be16 *p_proto,
+> +		       u8 *p_ip_proto, int base_nhoff, unsigned int flags,
+> +		       unsigned int num_hdrs)
+> +{
+> +	enum flow_dissect_ret ret;
+> +	struct udphdr _udph;
+> +	int nhoff;
+> +
+> +	if (!(flags & FLOW_DISSECTOR_F_PARSE_UDP_ENCAPS))
+> +		return FLOW_DISSECT_RET_OUT_GOOD;
+> +
+> +	/* Check that the netns for the skb device is the same as the caller's,
+> +	 * and only dissect UDP if we haven't yet encountered any encapsulation.
+> +	 * The goal is to ensure that the socket lookup is being done in the
+> +	 * right netns. Encapsulations may push packets into different name
+> +	 * spaces, so this scheme is restricting UDP dissection to cases where
+> +	 * they are in the same name spaces or at least the original name space.
+> +	 * This should capture the majority of use cases for UDP encaps, and
+> +	 * if we do encounter a UDP encapsulation within a different namespace
+> +	 * then the only effect is we don't attempt UDP dissection
+> +	 */
+> +	if (dev_net(skb->dev) != net || num_hdrs > 0)
+> +		return FLOW_DISSECT_RET_OUT_GOOD;
+> +
+> +	switch (*p_proto) {
+> +#ifdef CONFIG_INET
+> +	case htons(ETH_P_IP): {
+> +		const struct udphdr *udph;
+> +		const struct iphdr *iph;
+> +		struct iphdr _iph;
+> +		struct sock *sk;
+> +
+> +		iph = __skb_header_pointer(skb, base_nhoff, sizeof(_iph), data,
+> +					   hlen, &_iph);
+> +		if (!iph)
+> +			return FLOW_DISSECT_RET_OUT_BAD;
+> +
+> +		udph = __skb_header_pointer(skb, *p_nhoff, sizeof(_udph), data,
+> +					    hlen, &_udph);
+> +		if (!udph)
+> +			return FLOW_DISSECT_RET_OUT_BAD;
+> +
+> +		rcu_read_lock();
+> +		/* Look up the UDPv4 socket and get the encap_type */
+> +		sk = __udp4_lib_lookup(net, iph->saddr, udph->source,
+> +				       iph->daddr, udph->dest,
+> +				       inet_iif(skb), inet_sdif(skb),
+> +				       net->ipv4.udp_table, NULL);
+> +		if (!sk || !udp_sk(sk)->encap_type) {
+> +			rcu_read_unlock();
+> +			return FLOW_DISSECT_RET_OUT_GOOD;
+> +		}
+> +
+> +		encap_type = udp_sk(sk)->encap_type;
+
+Hi Tom,
+
+I guess a local change went astray, or something like that,
+because encap_type isn't declared in this scope.
+
+> +		rcu_read_unlock();
+> +
+> +		break;
+> +	}
+
+...
+
+-- 
+pw-bot: cr
 
