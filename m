@@ -1,75 +1,60 @@
-Return-Path: <netdev+bounces-121615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82E995DBCB
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 07:17:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9249795DBDE
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 07:19:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61B6D282E34
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 05:17:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EF082820D0
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 05:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AA4814AD20;
-	Sat, 24 Aug 2024 05:17:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6D314A60E;
+	Sat, 24 Aug 2024 05:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="pZqnuwYs"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="l0BqcMWG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35425DF71;
-	Sat, 24 Aug 2024 05:17:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C79155C93;
+	Sat, 24 Aug 2024 05:18:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724476651; cv=none; b=fCCOk7EEXxga7AlY0Psb6zmvTbKWVY68+V1fle3uRykNB+sSSdqJnW3llZxZCtwsYCPRw1/348dXr2BxnwfzbOX/zUqyNkypNXK9GmTYQ8T706Ys+yk+6Ja8GeX2v7Ej9YNzis+i3L7y3GxocNSAjS7AUcCSrNwYXtnpVOphUCA=
+	t=1724476703; cv=none; b=nYiFJlVmdw19dTcYGhds7L+oHr7YvUo4yaqzN03IG0m/B82vXrUfXZ4J75qQs5/RzhLM+9m3pGj0XemGyc+Pc+MgJtijNP30KlcfDGTMO59IuIOKfbvOFxQ50dGTuMRWXeeTRgILHkOCrcbxWmYBbw16XncAdRczfv1ArtUReZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724476651; c=relaxed/simple;
-	bh=EKYIrWqwELDuWb3+1xndQubTjiUIzzsdrYkz/a+9peg=;
+	s=arc-20240116; t=1724476703; c=relaxed/simple;
+	bh=kgyBdXsye1a/6QCni1L67UlqcPRlRzcDozumv00gwHQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UbHVeSqJuATJ+UIOQm7VBr90zlKp0ToZYwtPoCdcFB1UC3Eght2p63T8Hpb65kHRAQ3Sk8p46CGMSJGscgseC7SKa3ol28nD8v/XRunIllJkeQzmrMCUhjcJFyuq+FZ5Nseazz8RtaHvzl9ddlThkckerDwI3ooQQMXYtdcXqJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=pZqnuwYs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F32AC32781;
-	Sat, 24 Aug 2024 05:17:30 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=LbCPflAPXvB0T569XfEc8lfQhDxdLSY9EAW0qxzCqM5J3i1FaIKebVfWPhr/Js65PH6gr5NYsWUO6GcrdPiZ5yonbFi2v+Eu46Wedu8hSRRHeWHSTJg5l6IlX9BheCzph6oDRqKAXv7YU7GUKPTazPV0+dBmZn11SxkqPDZkct0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=l0BqcMWG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2BC4C4AF10;
+	Sat, 24 Aug 2024 05:18:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1724476650;
-	bh=EKYIrWqwELDuWb3+1xndQubTjiUIzzsdrYkz/a+9peg=;
+	s=korg; t=1724476703;
+	bh=kgyBdXsye1a/6QCni1L67UlqcPRlRzcDozumv00gwHQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pZqnuwYsOzkoT3F9shGWLvGPerTWUfF0y4EdZ8YS9ToqCEk6X5+bleX9MUuRgeyH4
-	 5Wd2IjUbdRYlpBJetz7loeGfYFQm0Z33Iqt2DBks4qGptCbzJtrFjDq1+uIzDbEjRs
-	 o4Czi84+1cftdJ6971GCbffFbs0pIQqLAAkXwiGk=
-Date: Sat, 24 Aug 2024 09:53:18 +0800
+	b=l0BqcMWGSsjpM+EUOhZSbc4ukSXDFYJUwVf3CfRY1TfJi7OQIYlSyfSS4qYRQ2SUL
+	 Sy5OPcGcqJJ5naU87u+pEv6lWsqsYxUX2qu4Sx2g+Z7jkgGuXngi+0yxIXFn8M9w4g
+	 adelqVwbS08L8XjkLtAw7rYO/4kPNiem7QqBqpbw=
+Date: Sat, 24 Aug 2024 11:12:15 +0800
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Andrea della Porta <andrea.porta@suse.com>
-Cc: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
-Message-ID: <2024082420-secluding-rearrange-fcfd@gregkh>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH net v2] s390/iucv: Fix vargs handling in
+ iucv_alloc_device()
+Message-ID: <2024082405-dislocate-snowbound-3232@gregkh>
+References: <20240820084528.2396537-1-wintera@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,23 +63,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
+In-Reply-To: <20240820084528.2396537-1-wintera@linux.ibm.com>
 
-On Tue, Aug 20, 2024 at 04:36:10PM +0200, Andrea della Porta wrote:
-> --- a/include/linux/pci_ids.h
-> +++ b/include/linux/pci_ids.h
-> @@ -2610,6 +2610,9 @@
->  #define PCI_VENDOR_ID_TEKRAM		0x1de1
->  #define PCI_DEVICE_ID_TEKRAM_DC290	0xdc29
->  
-> +#define PCI_VENDOR_ID_RPI		0x1de4
-> +#define PCI_DEVICE_ID_RP1_C0		0x0001
+On Tue, Aug 20, 2024 at 10:45:28AM +0200, Alexandra Winter wrote:
+> iucv_alloc_device() gets a format string and a varying number of
+> arguments. This is incorrectly forwarded by calling dev_set_name() with
+> the format string and a va_list, while dev_set_name() expects also a
+> varying number of arguments.
+> 
+> Symptoms:
+> Corrupted iucv device names, which can result in log messages like:
+> sysfs: cannot create duplicate filename '/devices/iucv/hvc_iucv1827699952'
+> 
+> Fixes: 4452e8ef8c36 ("s390/iucv: Provide iucv_alloc_device() / iucv_release_device()")
+> Link: https://bugzilla.suse.com/show_bug.cgi?id=1228425
+> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+> Reviewed-by: Thorsten Winkler <twinkler@linux.ibm.com>
+> ---
 
-Minor thing, but please read the top of this file.  As you aren't using
-these values anywhere outside of this one driver, there's no need to add
-these values to pci_ids.h.  Just keep them local to the .c file itself.
+Hi,
+
+This is the friendly patch-bot of Greg Kroah-Hartman.  You have sent him
+a patch that has triggered this response.  He used to manually respond
+to these common problems, but in order to save his sanity (he kept
+writing the same thing over and over, yet to different people), I was
+created.  Hopefully you will not take offence and will fix the problem
+in your patch and resubmit it so that it can be accepted into the Linux
+kernel tree.
+
+You are receiving this message because of the following common error(s)
+as indicated below:
+
+- You have marked a patch with a "Fixes:" tag for a commit that is in an
+  older released kernel, yet you do not have a cc: stable line in the
+  signed-off-by area at all, which means that the patch will not be
+  applied to any older kernel releases.  To properly fix this, please
+  follow the documented rules in the
+  Documentation/process/stable-kernel-rules.rst file for how to resolve
+  this.
+
+If you wish to discuss this problem further, or you have questions about
+how to resolve this issue, please feel free to respond to this email and
+Greg will reply once he has dug out from the pending patches received
+from other developers.
 
 thanks,
 
-greg k-h
+greg k-h's patch email bot
 
