@@ -1,96 +1,106 @@
-Return-Path: <netdev+bounces-121639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8F6895DCC0
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 09:54:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD6195DCEE
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 10:31:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11D881C21796
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 07:54:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07186B222E5
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 08:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC851547F3;
-	Sat, 24 Aug 2024 07:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="qSSxB34U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DED641C72;
+	Sat, 24 Aug 2024 08:31:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6859257D
-	for <netdev@vger.kernel.org>; Sat, 24 Aug 2024 07:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A5E55680;
+	Sat, 24 Aug 2024 08:31:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724486075; cv=none; b=t3fkQQY0XX3SKKbs8yDsm+83xWPOmv1q1TyZH2LQ598v7BIi1AuzhMYdeU74fQAZ0GtuDgBdl0qZpjsg0haDQ/xmlV9JiTs3CcL5TU+KSkLXX9XCij9mSsC8EQknyZ/m+l2fPw6O79u+HDflW7R2CZWOCfm4te+utqZ6JcSmCyk=
+	t=1724488269; cv=none; b=p4Tx1JZL31oxwjSG5TV+PcTM2xy3Fee3qi6pv5ryorHw8Q10bc6fCm+tWYnnaXVUXpmGrxsn+5yMDvkFhHYrjnAwEYIOq0OsJTFr5CaFGv9hnlpjEN+AY2JqOR2XscspoeVcgSumGCm1huUjVl9IJBWpfn38PVt+BApH1bF5WLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724486075; c=relaxed/simple;
-	bh=C3tSvrtxAKGxA+nryF/nRBCnD3WeWbEro7/gwQiYeoI=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=odThe51UwXvkuBUW7A+Vf78B6jxWWlI0GRqTnpnkvSXPiQ7Ej6wDv0aBWNGwTCg2Wu4nrWqZJ1FLGWYxw5c4u+YEHMpsH+zyWO2L9+2EZjsCVLumClyh5AC1fL0uwSS6txAYVhGAC19RObULg7ZxXy+i5N8/UvSN+goczun/bJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=qSSxB34U; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id A071A207F4;
-	Sat, 24 Aug 2024 09:54:30 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id f45vs5dhCzey; Sat, 24 Aug 2024 09:54:30 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 2EA1B2074F;
-	Sat, 24 Aug 2024 09:54:30 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2EA1B2074F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1724486070;
-	bh=P2og+YU9Wvg1ro3qMAawafPqDioZpuX2eAjW2rAisOo=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=qSSxB34UilVo9K2Q0Rs0r91KTbbvICHO2KHPdK4l0q7Xk1150GuIM3TywZVzwQ4Tm
-	 Z6MvkYLGGBqXMp88oWwL7DtrPoKpyTYbujbVVkqCUs3GmDTEjdBptCeT8Q/gRoI+IR
-	 Ogmz9KxddMggzqYsLE9i61qn4iAeai7voauCshL1kYxTasqcJiOGumEfKPzPYlaKRJ
-	 q5YHC+BG1glqhzeRnex8gmrk+wtNbGbZAckAzuostOcILf7YowgJd4vNCPO8ryMpw2
-	 IgAswzSUakU+vcR8FgcjC7NbwD9LQYB2QPP8/bk4O7Ts7hbVcfZv43rZYJEExiVeOD
-	 bSxUjbeXq6cWg==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sat, 24 Aug 2024 09:54:29 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sat, 24 Aug
- 2024 09:54:29 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 2F85D3182A7D; Sat, 24 Aug 2024 09:54:29 +0200 (CEST)
-Date: Sat, 24 Aug 2024 09:54:29 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Simon Horman <horms@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH ipsec-next] xfrm: Correct spelling in xfrm.h
-Message-ID: <ZsmRtRLE+WxKM7N2@gauss3.secunet.de>
-References: <20240821-xfrm-spell-v1-1-b97e181f419d@kernel.org>
+	s=arc-20240116; t=1724488269; c=relaxed/simple;
+	bh=LrqFDkUmIvFFNaapSpHMCwzY7Fe3ubWkf37HbR3qqrM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YLAIl1PzAK7mFPmXMS6/7oCzq0vhQCa5jR2Qa57UxpOtBm8OhOa+o3z2hqp2CzHzqBf0Yf/NoXxGN9UagFcFdtIWgRGB9PqNiaGQro4SQJJ+ILlUSOBnrxXTy3230esvNQmCIA4s7I9LP4HaEkrt1xyQ22sP0k38tjpDP9EHw7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WrVVv3GLbz13RfZ;
+	Sat, 24 Aug 2024 16:30:15 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3D7181800D2;
+	Sat, 24 Aug 2024 16:30:58 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Sat, 24 Aug
+ 2024 16:30:57 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <yuehaibing@huawei.com>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] net: thunderx: Remove unused declarations
+Date: Sat, 24 Aug 2024 16:27:54 +0800
+Message-ID: <20240824082754.3637963-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240821-xfrm-spell-v1-1-b97e181f419d@kernel.org>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-On Wed, Aug 21, 2024 at 04:30:13PM +0100, Simon Horman wrote:
-> Correct spelling in xfrm.h.
-> As reported by codespell.
-> 
-> Signed-off-by: Simon Horman <horms@kernel.org>
+Commit 4863dea3fab0 ("net: Adding support for Cavium ThunderX network
+controller") declared nicvf_qset_reg_{write,read}() but never implemented.
 
-Applied, thanks Simon!
+Commit 4863dea3fab0 ("net: Adding support for Cavium ThunderX network
+controller") declared bgx_add_dmac_addr() but no implementation.
+
+After commit 5fc7cf179449 ("net: thunderx: Cleanup PHY probing code.")
+octeon_mdiobus_force_mod_depencency() is not used any more.
+
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+---
+ drivers/net/ethernet/cavium/thunder/nicvf_queues.h | 2 --
+ drivers/net/ethernet/cavium/thunder/thunder_bgx.h  | 2 --
+ 2 files changed, 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/cavium/thunder/nicvf_queues.h b/drivers/net/ethernet/cavium/thunder/nicvf_queues.h
+index 8453defc296c..b7531041c56d 100644
+--- a/drivers/net/ethernet/cavium/thunder/nicvf_queues.h
++++ b/drivers/net/ethernet/cavium/thunder/nicvf_queues.h
+@@ -359,8 +359,6 @@ int nicvf_is_intr_enabled(struct nicvf *nic, int int_type, int q_idx);
+ /* Register access APIs */
+ void nicvf_reg_write(struct nicvf *nic, u64 offset, u64 val);
+ u64  nicvf_reg_read(struct nicvf *nic, u64 offset);
+-void nicvf_qset_reg_write(struct nicvf *nic, u64 offset, u64 val);
+-u64 nicvf_qset_reg_read(struct nicvf *nic, u64 offset);
+ void nicvf_queue_reg_write(struct nicvf *nic, u64 offset,
+ 			   u64 qidx, u64 val);
+ u64  nicvf_queue_reg_read(struct nicvf *nic,
+diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.h b/drivers/net/ethernet/cavium/thunder/thunder_bgx.h
+index cdea49392185..84f16ababaee 100644
+--- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.h
++++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.h
+@@ -219,9 +219,7 @@
+ void bgx_set_dmac_cam_filter(int node, int bgx_idx, int lmacid, u64 mac, u8 vf);
+ void bgx_reset_xcast_mode(int node, int bgx_idx, int lmacid, u8 vf);
+ void bgx_set_xcast_mode(int node, int bgx_idx, int lmacid, u8 mode);
+-void octeon_mdiobus_force_mod_depencency(void);
+ void bgx_lmac_rx_tx_enable(int node, int bgx_idx, int lmacid, bool enable);
+-void bgx_add_dmac_addr(u64 dmac, int node, int bgx_idx, int lmac);
+ unsigned bgx_get_map(int node);
+ int bgx_get_lmac_count(int node, int bgx);
+ const u8 *bgx_get_lmac_mac(int node, int bgx_idx, int lmacid);
+-- 
+2.34.1
+
 
