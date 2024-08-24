@@ -1,88 +1,209 @@
-Return-Path: <netdev+bounces-121563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5AB295DA88
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 04:16:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD87C95DAAB
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 04:32:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53D4C1F22B74
-	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 02:16:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F2F51F2230A
+	for <lists+netdev@lfdr.de>; Sat, 24 Aug 2024 02:32:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B90847C;
-	Sat, 24 Aug 2024 02:16:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CD4E56E;
+	Sat, 24 Aug 2024 02:31:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C498460
-	for <netdev@vger.kernel.org>; Sat, 24 Aug 2024 02:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E7F2A1A4
+	for <netdev@vger.kernel.org>; Sat, 24 Aug 2024 02:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724465802; cv=none; b=qdwkLOqwYtvNuhKRpy+wRfcEAK4ib7O8hyA6cqJob91HwQ22Rz7KSUUf3+Xq9dKBOdYgVrj4riIOfkgqOM1hrr9nyyQ528/Me5y65pUiHnPVbi9khwPsXgze/H1+bEmLu3DLttMrthtHQF4ipm1LFn3iRNjYANoZbrdZHy07Sow=
+	t=1724466715; cv=none; b=CaWvmFhNVBIR5XP1dTtfUUHjMmrO6BZWf/nR6owMdm9qLOo/zjGt+X2vvxM1fd1abfvPnq9tRIypq6PrEFLA7/KLdw35kId59LWFX4ybUcESvHiCDTDv/o18rVr9bR857lhyVwFEClU/GKoPKKg/lVPvJWxqp4RpmfijJw/AqHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724465802; c=relaxed/simple;
-	bh=yRE/A/acsPIUR4+3Q99T/xggfooaG9SvfzD/gmNUVWc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=bRqRO/6wcUjOO7kJZHeqtp3Ob54KbMLdc0eoFSBAVcZG9gpFDAEeS2RTpNrUlbb8Lwsgx+dtN4CHd0XolVqDVgjOzIKa9khXF2qCpzCpnMOjwC7JYMoy0OdHp9smVTcSfUYcTbrGG/dS9XwHfJWbzlPP6pu5xEuOjExDkzf4Az0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WrL9R0lJwzhXtv;
-	Sat, 24 Aug 2024 10:14:35 +0800 (CST)
-Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id E124F18007C;
-	Sat, 24 Aug 2024 10:16:36 +0800 (CST)
-Received: from [10.67.111.176] (10.67.111.176) by
- kwepemd500012.china.huawei.com (7.221.188.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Sat, 24 Aug 2024 10:16:36 +0800
-Message-ID: <0e6320d8-937f-41f2-8302-cf573aa2a273@huawei.com>
-Date: Sat, 24 Aug 2024 10:16:35 +0800
+	s=arc-20240116; t=1724466715; c=relaxed/simple;
+	bh=Bn5nezw3s7w3OnfMzPbQDbBseFANVnPoyITw1BoSFC4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HRqwGmutp5zp41TkLdnVyvJYOFWdzK3FwLrCCwaoHSAe+SYJ4eq9uCIfWHw/xI1fQ+rG2U0Pl/WUQPpzeAeXUAtAGiS50T17MTHXrgV/cEZqj/tgO3JCD5LlBecWt3KtG2bDyzbg6FxMOAnvlkfRI8p8IB9Ba+ognJXCoJw2YdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from labnh.int.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 5C9B57D06C;
+	Sat, 24 Aug 2024 02:21:47 +0000 (UTC)
+From: Christian Hopps <chopps@chopps.org>
+To: devel@linux-ipsec.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org,
+	Florian Westphal <fw@strlen.de>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>,
+	Antony Antony <antony@phenome.org>,
+	Christian Hopps <chopps@chopps.org>
+Subject: [PATCH ipsec-next v10 00/16] Add IP-TFS mode to xfrm
+Date: Fri, 23 Aug 2024 22:20:38 -0400
+Message-ID: <20240824022054.3788149-1-chopps@chopps.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/10] net: Delete some redundant judgments
-To: Petr Machata <petrm@nvidia.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <dsahern@kernel.org>, <idosch@nvidia.com>,
-	<amcohen@nvidia.com>, <gnault@redhat.com>, <b.galvani@gmail.com>,
-	<alce@lafranque.net>, <shaozhengchao@huawei.com>, <horms@kernel.org>,
-	<j.granados@samsung.com>, <linux@weissschuh.net>, <judyhsiao@chromium.org>,
-	<jiri@resnulli.us>, <netdev@vger.kernel.org>
-References: <20240822043252.3488749-1-lizetao1@huawei.com>
- <87y14nidbs.fsf@nvidia.com>
-From: Li Zetao <lizetao1@huawei.com>
-In-Reply-To: <87y14nidbs.fsf@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggpeml500016.china.huawei.com (7.185.36.70) To
- kwepemd500012.china.huawei.com (7.221.188.25)
 
+* Summary of Changes:
 
-Hi,
-在 2024/8/23 21:16, Petr Machata 写道:
-> 
-> Li Zetao <lizetao1@huawei.com> writes:
-> 
->> This patchset aims to remove some unnecessary judgments and make the
->> code more concise. In some network modules, rtnl_set_sk_err is used to
->> record error information, but the err is repeatedly judged to be less
->> than 0 on the error path. Deleted these redundant judgments.
-> 
-> What you call "judgments" would be usually called "conditionals" or
-> "conditional statements", "judged less than zero" would be probably
-> "compared to zero". I think the commit messages are reasonably clear
-> despite this, so I'd leave it be unless others push back. But it's worth
-> keeping in mind for future contributions.
-Thanks you, I will take your advice.
+This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
+(AggFrag encapsulation) has been standardized in RFC9347.
 
-Thanks,
-Li Zetao.
+  Link: https://www.rfc-editor.org/rfc/rfc9347.txt
+
+This feature supports demand driven (i.e., non-constant send rate)
+IP-TFS to take advantage of the AGGFRAG ESP payload encapsulation. This
+payload type supports aggregation and fragmentation of the inner IP
+packet stream which in turn yields higher small-packet bandwidth as well
+as reducing MTU/PMTU issues. Congestion control is unimplementated as
+the send rate is demand driven rather than constant.
+
+In order to allow loading this fucntionality as a module a set of
+callbacks xfrm_mode_cbs has been added to xfrm as well.
+
+Patchset Structure:
+-------------------
+
+The first 6 commits are changes to the net and xfrm infrastructure to
+support the callbacks as well as more generic IP-TFS additions that
+may be used outside the actual IP-TFS implementation.
+
+  - xfrm: config: add CONFIG_XFRM_IPTFS
+  - include: uapi: add ip_tfs_*_hdr packet formats
+  - include: uapi: add IPPROTO_AGGFRAG for AGGFRAG in ESP
+  - xfrm: netlink: add config (netlink) options
+  - xfrm: add mode_cbs module functionality
+  - xfrm: add generic iptfs defines and functionality
+
+The last 10 commits constitute the IP-TFS implementation constructed in
+layers to make review easier. The first 9 commits all apply to a single
+file `net/xfrm/xfrm_iptfs.c`, the last commit adds a new tracepoint
+header file along with the use of these new tracepoint calls.
+
+  - xfrm: iptfs: add new iptfs xfrm mode impl
+  - xfrm: iptfs: add user packet (tunnel ingress) handling
+  - xfrm: iptfs: share page fragments of inner packets
+  - xfrm: iptfs: add fragmenting of larger than MTU user packets
+  - xfrm: iptfs: add basic receive packet (tunnel egress) handling
+  - xfrm: iptfs: handle received fragmented inner packets
+  - xfrm: iptfs: add reusing received skb for the tunnel egress packet
+  - xfrm: iptfs: add skb-fragment sharing code
+  - xfrm: iptfs: handle reordering of received packets
+  - xfrm: iptfs: add tracepoint functionality
+
+Patchset History:
+-----------------
+
+v9->v10 (8/23/2024)
+  - use relocated skb_copy_seq_read now in skbuff.[ch]
+  - be thoughtful about skb reserve space in new skbs, use existing #defines and
+    skb meta-data to calculate new skb reserve and alignment.
+  - only copy dst (on in/out) and dev, ext (on resume input) values from
+    existing skb header to new skb's -- drop use of rejected new
+    ___copy_skb_header() function.
+  - update other iptfs specific skb function names
+
+v8->v9 (8/7/2024)
+  - factor common code from skbuff.c:__copy_skb_header into
+    ___copy_skb_header and use in iptfs rather that copying any code.
+  - change all BUG_ON to WARN_ON_ONCE
+  - remove unwanted new NOSKB xfrm MIB error counter
+  - remove unneeded copy or share choice function
+  - ifdef CONFIG_IPV6 around IPv6 function
+
+v7->v8 (8/4/2024)
+  - Use lock and rcu to load iptfs module -- copy existing use pattern
+  - fix 2 warnings from the kernel bot
+
+v6->v7 (8/1/2024)
+  - Rebased on latest ipsec-next
+
+v5->v6 (7/31/2024)
+  * sysctl: removed IPTFS sysctl additions
+  - xfrm: use array of pointers vs structs for mode callbacks
+  - iptfs: eliminate a memleak during state alloc failure
+  - iptfs: free send queue content on SA delete
+  - add some kdoc and comments
+  - cleanup a couple formatting choices per Steffen
+
+v4->v5 (7/14/2024)
+  - uapi: add units to doc comments
+  - iptfs: add MODULE_DESCRIPTION()
+  - squash nl-direction-update commit
+
+v2->v4 (6/17/2024)
+
+  - iptfs: copy only the netlink attributes to user based on the
+    direction of the SA.
+
+  - xfrm: stats: in the output path check for skb->dev == NULL prior to
+    setting xfrm statistics on dev_net(skb->dev) as skb->dev may be NULL
+    for locally generated packets.
+
+  - xfrm: stats: fix an input use case where dev_net(skb->dev) is used
+    to inc stats after skb is possibly NULL'd earlier. Switch to using
+    existing saved `net` pointer.
+
+v2->v3
+  - Git User Glitch
+
+v1 -> v2 (5/19/2024)
+
+  Updates based on feedback from Sabrina Dubroca, Simon Horman, Antony.
+
+  o Add handling of new netlink SA direction attribute (Antony).
+  o Split single patch/commit of xfrm_iptfs.c (the actual IP-TFS impl)
+    into 9+1 distinct layered functionality commits for aiding review.
+  - xfrm: fix return check on clone() callback
+  - xfrm: add sa_len() callback in xfrm_mode_cbs for copy to user
+  - iptfs: remove unneeded skb free count variable
+  - iptfs: remove unused variable and "breadcrumb" for future code.
+  - iptfs: use do_div() to avoid "__udivd13 missing" link failure.
+  - iptfs: remove some BUG_ON() assertions questioned in review.
+
+RFCv2 -> v1 (2/19/2024)
+
+  Updates based on feedback from Sabrina Dubroca, kernel test robot
+
+RFCv1 -> RFCv2 (11/12/2023)
+
+  Updates based on feedback from Simon Horman, Antony,
+  Michael Richardson, and kernel test robot.
+
+RFCv1 (11/10/2023)
+
+Patchset Changes:
+-----------------
+
+  include/net/xfrm.h         |   44 +
+  include/uapi/linux/in.h    |    2 +
+  include/uapi/linux/ip.h    |   16 +
+  include/uapi/linux/ipsec.h |    3 +-
+  include/uapi/linux/snmp.h  |    2 +
+  include/uapi/linux/xfrm.h  |    9 +-
+  net/ipv4/esp4.c            |    3 +-
+  net/ipv6/esp6.c            |    3 +-
+  net/netfilter/nft_xfrm.c   |    3 +-
+  net/xfrm/Kconfig           |   16 +
+  net/xfrm/Makefile          |    1 +
+  net/xfrm/trace_iptfs.h     |  218 ++++
+  net/xfrm/xfrm_compat.c     |   10 +-
+  net/xfrm/xfrm_device.c     |    4 +-
+  net/xfrm/xfrm_input.c      |   18 +-
+  net/xfrm/xfrm_iptfs.c      | 2805 ++++++++++++++++++++++++++++++++++++++++++++
+  net/xfrm/xfrm_output.c     |    6 +
+  net/xfrm/xfrm_policy.c     |   26 +-
+  net/xfrm/xfrm_proc.c       |    2 +
+  net/xfrm/xfrm_state.c      |   84 ++
+  net/xfrm/xfrm_user.c       |   77 ++
+  21 files changed, 3333 insertions(+), 19 deletions(-)
 
