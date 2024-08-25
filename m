@@ -1,143 +1,163 @@
-Return-Path: <netdev+bounces-121721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C464595E30B
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 13:26:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A5E395E34A
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 14:26:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 518A91F21828
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 11:26:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCBD328123E
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 12:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 604D413DDA7;
-	Sun, 25 Aug 2024 11:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F0754645;
+	Sun, 25 Aug 2024 12:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="IFBP60fv"
+	dkim=pass (2048-bit key) header.d=orange.com header.i=@orange.com header.b="DR54mGWa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-out.orange.com (smtp-out.orange.com [80.12.210.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07730801;
-	Sun, 25 Aug 2024 11:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180D14A2C
+	for <netdev@vger.kernel.org>; Sun, 25 Aug 2024 12:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.210.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724585160; cv=none; b=CbSWd0esTatnnMXm0+LkWxu/DnCRifDMtszjkNrRWob0uQa5k/zFznldNcKDd7f5xzXBQXUPmt/GaS0t0C9F71FcT2AMTjvUDGzZ46zBN9sK8Tyet/6aju0D0G84ge+HM1r0Aayf29UQ+bju9o5MoQ4il/2UVJIPUooPP/fMy3U=
+	t=1724588772; cv=none; b=iyqR5Pm3h2NIMkbS7l2fux/luxg8guc8oGl5B3o641mZZbvWPMPC9mRIKmRqJG8ktotsldpURuPv2FVtcvpw0D1jgsOSX/MnE+Fzh36XSdn4LT9I9Ig3xJ1Lwikr0CII61C6CMldZ01nsZD5rpJ1MLIyEIDOMMsCGt9KOt89FkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724585160; c=relaxed/simple;
-	bh=mfY+835+6x4vd1sUirZL47mKpUKMMBG2vJ2EWL/D5Es=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZYGJ89aiwPfMlNcOB7ApjLXZiOKt28gcN9e9g318m5ky/cOHNoM2B/yO25Tr3JMBeVMnR5R3k66gTdW4j+G+tPxBPE0RtfaRxbKU9RgEDLbFVLt9rSkr2Wldoylq3pGnO6ACP8zSTsP/kDaYEGp93TbRlpJhVJXhnllxSlgJObg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=IFBP60fv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38F6EC32782;
-	Sun, 25 Aug 2024 11:25:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1724585159;
-	bh=mfY+835+6x4vd1sUirZL47mKpUKMMBG2vJ2EWL/D5Es=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IFBP60fvvTM0yH3/4f8Zpvpw2+W6JEY5ZhEr/8378rri9RxzMpV1PrfN+sL7z95/4
-	 +KfRL8smkGwuirbzYisJQrOA63FxZkv69hE8LFM9S8fLyO14Qy3RiCgxxOB9QfCdjd
-	 NGlE46m2oBN5MOzrDHcxCjYmX6TgDxMLZWbuktJk=
-Date: Sun, 25 Aug 2024 13:25:56 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: kvalo@kernel.org, linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] wifi: ath6kl: Check that the read operation returns a
- data length of 0
-Message-ID: <2024082501-tiling-prelaw-38d7@gregkh>
-References: <2024082554-manatee-ashamed-12d5@gregkh>
- <tencent_89BAE8BB0933D89E1D1BD94B891BBD257208@qq.com>
+	s=arc-20240116; t=1724588772; c=relaxed/simple;
+	bh=m9jjAY2iBnETtSqdYv+5YOf9Ivtpa0vT/HHW96mcQE0=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=qpYJbJO3mi2NLYJvpck7CUm7X5qGLUKHm3w57x/4095+jqeUh0fYSNR8U5DsLRcli9J827Kx3r6mb8ru7oPT67MgXDq9cL3/3XMjtIKhTaM53Dchw31eCHQNmAQoSdkg+46/2XWk+Bw8peuB+KD51l9gPO0tVYVsqhKdbpXO8jA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=orange.com; spf=pass smtp.mailfrom=orange.com; dkim=pass (2048-bit key) header.d=orange.com header.i=@orange.com header.b=DR54mGWa; arc=none smtp.client-ip=80.12.210.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=orange.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=orange.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=orange.com; i=@orange.com; q=dns/txt; s=orange002;
+  t=1724588768; x=1756124768;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   in-reply-to:content-transfer-encoding:from;
+  bh=m9jjAY2iBnETtSqdYv+5YOf9Ivtpa0vT/HHW96mcQE0=;
+  b=DR54mGWaVQUrM96Od0Rl5dCNALZQvC2GvPTZhLwgrMRSjVY8wJDsmV2y
+   Gi0NrUOR45ue8UClsDYDnw/WYRiq15NL6N8APnvSdyUaFg3+6B0oezYRW
+   ygLuWxsIiqdgRCPsy/4SnZizidRxTIF/FJe4q4Cn+VyhLB9ellwWMhDvP
+   wodHsdyzFY0BlkLOkYtkylMjys55MN/abYICC0WpcRRNh+OwDybyCqJB1
+   x26ZD829UGiZemSlraCk7om13PhWOxBqggSvcYyqJiwfhgBwvp5RhIB3h
+   S615vOSEylbjwv3uTm/9M9/PrnIwfgJR8olvzNRYwzGNi8MGuwt4EYAX0
+   A==;
+Received: from unknown (HELO opfedv1rlp0h.nor.fr.ftgroup) ([x.x.x.x]) by
+ smtp-out.orange.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 25 Aug 2024 14:24:57 +0200
+Received: from unknown (HELO OPE16NORMBX104.corporate.adroot.infra.ftgroup)
+ ([x.x.x.x]) by opfedv1rlp0h.nor.fr.ftgroup with
+ ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Aug 2024 14:24:57 +0200
+Received: from [x.x.x.x] [x.x.x.x] by OPE16NORMBX104.corporate.adroot.infra.ftgroup
+ [x.x.x.x] with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39;
+ Sun, 25 Aug 2024 14:24:57 +0200
+From: alexandre.ferrieux@orange.com
+X-IronPort-AV: E=Sophos;i="6.10,175,1719871200"; 
+   d="scan'208";a="182570433"
+Message-ID: <0f970f70-abea-4b79-bf62-852853b0137e@orange.com>
+Date: Sun, 25 Aug 2024 14:24:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_89BAE8BB0933D89E1D1BD94B891BBD257208@qq.com>
+User-Agent: Betterbird (Linux)
+Subject: Re: [PATCH net v2] Fix race for duplicate reqsk on identical SYN
+To: luoxuanqiang <luoxuanqiang@kylinos.cn>, <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <fw@strlen.de>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<kuniyu@amazon.com>
+References: <20240614102628.446642-1-luoxuanqiang@kylinos.cn>
+ <1718586352627144.1.seg@mailgw.kylinos.cn>
+ <7b700f6e-3ad7-a358-8dd3-c5120a115344@kylinos.cn>
+ <e3e34c63-d44b-4329-acef-a7adc7024b92@orange.com>
+Content-Language: fr, en-US
+In-Reply-To: <e3e34c63-d44b-4329-acef-a7adc7024b92@orange.com>
+X-ClientProxiedBy: OPE16NORMBX104.corporate.adroot.infra.ftgroup (10.115.26.5)
+ To OPE16NORMBX104.corporate.adroot.infra.ftgroup (10.115.26.5)
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
 
-On Sun, Aug 25, 2024 at 06:09:45PM +0800, Edward Adam Davis wrote:
-> On Sun, 25 Aug 2024 10:34:00 +0200, Greg KH wrote:
-> > On Sun, Aug 25, 2024 at 04:14:17PM +0800, Edward Adam Davis wrote:
-> > > On Sun, 25 Aug 2024 09:25:37 +0200, Greg KH wrote:
-> > > > > If the data length returned by the device is 0, the read operation
-> > > > > should be considered a failure.
-> > > > >
-> > > > > Reported-and-tested-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
-> > > > > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> > > > > ---
-> > > > >  drivers/net/wireless/ath/ath6kl/usb.c | 3 +++
-> > > > >  1 file changed, 3 insertions(+)
-> > > > >
-> > > > > diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
-> > > > > index 5220809841a6..2a89bab81b24 100644
-> > > > > --- a/drivers/net/wireless/ath/ath6kl/usb.c
-> > > > > +++ b/drivers/net/wireless/ath/ath6kl/usb.c
-> > > > > @@ -1034,6 +1034,9 @@ static int ath6kl_usb_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
-> > > > >  		ath6kl_err("Unable to read the bmi data from the device: %d\n",
-> > > > >  			   ret);
-> > > > >  		return ret;
-> > > > > +	} else {
-> > > > > +		ath6kl_err("Actual read the bmi data length is 0 from the device\n");
-> > > > > +		return -EIO;
-> > > >
-> > > > Close, but not quite there.  ath6kl_usb_submit_ctrl_in() needs to verify
-> > > > that the actual amount of data was read that was asked for.  If a short
-> > > > read happens (or a long one), then an error needs to propagate out, not
-> > > > just 0.  See the "note:" line in that function for what needs to be
-> > > > properly checked.
-> > > >
-> > > > hope this helps,
-> > > Thanks for your analysis.
-> > > I have carefully read your analysis and I am not sure if the following
-> > > understanding is appropriate:
-> > > diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
-> > > index 2a89bab81b24..35884316a8c8 100644
-> > > --- a/drivers/net/wireless/ath/ath6kl/usb.c
-> > > +++ b/drivers/net/wireless/ath/ath6kl/usb.c
-> > > @@ -932,6 +932,15 @@ static int ath6kl_usb_submit_ctrl_in(struct ath6kl_usb *ar_usb,
-> > >
-> > >         kfree(buf);
-> > 
-> > First off, this should be using usb_control_msg_send() instead of having
-> > to roll their own buffer handling, right?
-> I couldn't figure it out with what you said. 
+T24gMTcvMDYvMjAyNCAxNjo0NCwgQWxleGFuZHJlIEZlcnJpZXV4IHdyb3RlOg0KPiBPbiAxNy8w
+Ni8yMDI0IDA0OjUzLCBsdW94dWFucWlhbmcgd3JvdGU6DQo+Pg0KPj4g5ZyoIDIwMjQvNi8xNyAw
+Nzo0NSwgYWxleGFuZHJlLmZlcnJpZXV4QG9yYW5nZS5jb20g5YaZ6YGTOg0KPj4+IE9uIDE0LzA2
+LzIwMjQgMTI6MjYsIGx1b3h1YW5xaWFuZyB3cm90ZToNCj4+Pj4gV2hlbiBib25kaW5nIGlzIGNv
+bmZpZ3VyZWQgaW4gQk9ORF9NT0RFX0JST0FEQ0FTVCBtb2RlLCBpZiB0d28gaWRlbnRpY2FsDQo+
+Pj4+IFNZTiBwYWNrZXRzIGFyZSByZWNlaXZlZCBhdCB0aGUgc2FtZSB0aW1lIGFuZCBwcm9jZXNz
+ZWQgb24gZGlmZmVyZW50IENQVXMsDQo+Pj4+IGl0IGNhbiBwb3RlbnRpYWxseSBjcmVhdGUgdGhl
+IHNhbWUgc2sgKHNvY2spIGJ1dCB0d28gZGlmZmVyZW50IHJlcXNrDQo+Pj4+IChyZXF1ZXN0X3Nv
+Y2spIGluIHRjcF9jb25uX3JlcXVlc3QoKS4NCj4+Pj4NCj4+Pj4gVGhlc2UgdHdvIGRpZmZlcmVu
+dCByZXFzayB3aWxsIHJlc3BvbmQgd2l0aCB0d28gU1lOQUNLIHBhY2tldHMsIGFuZCBzaW5jZQ0K
+Pj4+PiB0aGUgZ2VuZXJhdGlvbiBvZiB0aGUgc2VxIChJU04pIGluY29ycG9yYXRlcyBhIHRpbWVz
+dGFtcCwgdGhlIGZpbmFsIHR3bw0KPj4+PiBTWU5BQ0sgcGFja2V0cyB3aWxsIGhhdmUgZGlmZmVy
+ZW50IHNlcSB2YWx1ZXMuDQo+Pj4+DQo+Pj4+IFRoZSBjb25zZXF1ZW5jZSBpcyB0aGF0IHdoZW4g
+dGhlIENsaWVudCByZWNlaXZlcyBhbmQgcmVwbGllcyB3aXRoIGFuIEFDSw0KPj4+PiB0byB0aGUg
+ZWFybGllciBTWU5BQ0sgcGFja2V0LCB3ZSB3aWxsIHJlc2V0KFJTVCkgaXQuDQo+Pj4+DQo+Pj4+
+ID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PQ0KPj4+IFRoaXMgaXMgY2xvc2UsIGJ1dCBub3QgaWRlbnRpY2FsLCB0
+byBhIHJhY2Ugd2Ugb2JzZXJ2ZWQgb24gYSAqc2luZ2xlKiBDUFUgd2l0aA0KPj4+IHRoZSBUUFJP
+WFkgaXB0YWJsZXMgdGFyZ2V0LCBpbiB0aGUgZm9sbG93aW5nIHNpdHVhdGlvbjoNCj4+Pg0KPj4+
+IMKgLSB0d28gaWRlbnRpY2FsIFNZTnMsIHNlbnQgb25lIHNlY29uZCBhcGFydCBmcm9tIHRoZSBz
+YW1lIGNsaWVudCBzb2NrZXQsDQo+Pj4gwqDCoCBhcnJpdmUgYmFjay10by1iYWNrIG9uIHRoZSBp
+bnRlcmZhY2UgKGR1ZSB0byBuZXR3b3JrIGppdHRlcikNCj4+Pg0KPj4+IMKgLSB0aGV5IGhhcHBl
+biB0byBiZSBoYW5kbGVkIGluIHRoZSBzYW1lIGJhdGNoIG9mIHBhY2tldCBmcm9tIG9uZSBzb2Z0
+aXJxDQo+Pj4gwqDCoCBuYW1lX3lvdXJfbmljX3BvbGwoKQ0KPj4+DQo+Pj4gwqAtIHRoZXJlLCB0
+d28gbG9vcHMgcnVuIHNlcXVlbnRpYWxseTogb25lIGZvciBuZXRmaWx0ZXIgKGRvaW5nIFRQUk9Y
+WSksIG9uZQ0KPj4+IMKgwqAgZm9yIHRoZSBuZXR3b3JrIHN0YWNrIChkb2luZyBUQ1AgcHJvY2Vz
+c2luZykNCj4+Pg0KPj4+IMKgLSB0aGUgZmlyc3QgZ2VuZXJhdGVzIHR3byBkaXN0aW5jdCBjb250
+ZXh0cyBmb3IgdGhlIHR3byBTWU5zDQo+Pj4NCj4+PiDCoC0gdGhlIHNlY29uZCByZXNwZWN0cyB0
+aGVzZSBjb250ZXh0cyBhbmQgbmV2ZXIgZ2V0cyBhIGNoYW5jZSB0byBtZXJnZSB0aGVtDQo+Pj4N
+Cj4+PiBUaGUgcmVzdWx0IGlzIGV4YWN0bHkgYXMgeW91IGRlc2NyaWJlLCBidXQgaW4gdGhpcyBj
+YXNlIHRoZXJlIGlzIG5vIG5lZWQgZm9yIA0KPj4+IGJvbmRpbmcsDQo+Pj4gYW5kIGV2ZXJ5dGhp
+bmcgaGFwcGVucyBpbiBvbmUgc2luZ2xlIENQVSwgd2hpY2ggaXMgcHJldHR5IGlyb25pYyBmb3Ig
+YSByYWNlLg0KPj4+IE15IHVuZWR1Y2F0ZWQgZmVlbGluZyBpcyB0aGF0IHRoZSB0d28gbG9vcHMg
+YXJlIHRoZSBjYXVzZSBvZiBhIHNpbXVsYXRlZA0KPj4+IHBhcmFsbGVsaXNtLCB5aWVsZGluZyB0
+aGUgcmFjZS4gSWYgZWFjaCBwYWNrZXQgb2YgdGhlIGJhdGNoIHdhcyBoYW5kbGVkDQo+Pj4gInRv
+IGNvbXBsZXRpb24iIChmdWxsIG5ldGZpbHRlciBoYW5kbGluZyBmb2xsb3dlZCBpbW1lZGlhdGVs
+eSBieSBmdWxsIG5ldHdvcmsNCj4+PiBzdGFjayBpbmdlc3Rpb24pLCB0aGUgcHJvYmxlbSB3b3Vs
+ZCBub3QgZXhpc3QuDQo+Pg0KPj4gQmFzZWQgb24geW91ciBleHBsYW5hdGlvbiwgSSBiZWxpZXZl
+IGENCj4+IHNpbWlsYXIgaXNzdWUgY2FuIG9jY3VyIG9uIGEgc2luZ2xlIENQVSBpZiB0d28gU1lO
+IHBhY2tldHMgYXJlIHByb2Nlc3NlZA0KPj4gwqDCoGNsb3NlbHkgZW5vdWdoLiBIb3dldmVyLCBh
+cGFydCBmcm9tIHVzaW5nIGJvbmQzIG1vZGUgYW5kIGhhdmluZyB0aGVtDQo+PiBwcm9jZXNzZWQg
+b24gZGlmZmVyZW50IENQVXMgdG8gZmFjaWxpdGF0ZSByZXByb2R1Y2liaWxpdHksIEkgaGF2ZW4n
+dA0KPj4gZm91bmQgYSBnb29kIHdheSB0byByZXBsaWNhdGUgaXQuDQo+Pg0KPj4gQ291bGQgeW91
+IHBsZWFzZSBwcm92aWRlIGEgbW9yZSBwcmFjdGljYWwgZXhhbXBsZSBvciBkZXRhaWxlZCB0ZXN0
+DQo+PiBzdGVwcyB0byBoZWxwIG1lIHVuZGVyc3RhbmQgdGhlIHJlcHJvZHVjdGlvbiBzY2VuYXJp
+byB5b3UgbWVudGlvbmVkPw0KPj4gVGhhbmsgeW91IHZlcnkgbXVjaCENCj4gDQo+IFRvIHJlcHJv
+ZHVjZSBpbiBteSBjYXNlLCBJIGp1c3QgbmVlZCB0aGUgdHdvIFNZTnMgdG8gYXJyaXZlIGJhY2st
+dG8tYmFjayBpbiB0aGUgDQo+IGluZ3Jlc3MgYnVmZmVyIGFuZCBnZXQgaW4gdGhlIHNhbWUgc29m
+dGlycSBydW4uIFRvIHJlYWNoIHRoaXMgZ29hbCBlYXNpbHksIHlvdSANCj4gY2FuIHNldCB0aGUg
+aW50ZXJydXB0IGNvYWxlc2NlbmNlIHRvIGEgbGFyZ2UgdmFsdWUgKGxpa2Ugc2V2ZXJhbCBtaWxs
+aXNlY29uZHMpLCANCj4gYW5kIG9uIHRoZSBlbWl0dGVyIHNpZGUsIHNlbmQgdGhlbSBpbiByYXBp
+ZCBzZXF1ZW5jZSBmcm9tIHVzZXJsYW5kLiBJZiB0aGF0J3MgDQo+IG5vdCBlbm91Z2gsIHlvdSBj
+YW4ganVzdCBzZW5kIG9uZSBhbmQgZHVwbGljYXRlIGl0IHdpdGggVEVFLg0KDQpHb29kIG5ld3M6
+IGFzIEkgc3VzcGVjdGVkLCB5b3VyIGZpeCAoZmY0NmUzYjQ0MjE5IHNoaXBwZWQgaW4gNi4xMCkg
+RE9FUyBzb2x2ZSBteSANCnByb2JsZW0gdG9vICENCg0KQXMgYSBjb25zZXF1ZW5jZSwgdGhpcyBt
+ZWFucyB0aGUgc2luZ2xlLUNQVSBzY2VuYXJpbyB3YXMgZXhwb3NlZCB0b28sIHRocm91Z2ggDQpu
+ZXRmaWx0ZXIncyBwZWN1bGlhciAiYnJlYWR0aC1maXJzdCIgaXRlcmF0aW9uIGFwcHJvYWNoLiBU
+aGlzIGdpdmVzIGV4dHJhIHdlaWdodCANCnRvIHRoZSBpbXBvcnRhbmNlIG9mIHlvdXIgd29yay4N
+Cg0KVEw7RFI6IHRoYW5rcywga3Vkb3MsIGNvbmdyYXRzLCBhbmQgdGhhbmtzICEhIQ0KX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fDQpDZSBtZXNzYWdl
+IGV0IHNlcyBwaWVjZXMgam9pbnRlcyBwZXV2ZW50IGNvbnRlbmlyIGRlcyBpbmZvcm1hdGlvbnMg
+Y29uZmlkZW50aWVsbGVzIG91IHByaXZpbGVnaWVlcyBldCBuZSBkb2l2ZW50IGRvbmMNCnBhcyBl
+dHJlIGRpZmZ1c2VzLCBleHBsb2l0ZXMgb3UgY29waWVzIHNhbnMgYXV0b3Jpc2F0aW9uLiBTaSB2
+b3VzIGF2ZXogcmVjdSBjZSBtZXNzYWdlIHBhciBlcnJldXIsIHZldWlsbGV6IGxlIHNpZ25hbGVy
+DQphIGwnZXhwZWRpdGV1ciBldCBsZSBkZXRydWlyZSBhaW5zaSBxdWUgbGVzIHBpZWNlcyBqb2lu
+dGVzLiBMZXMgbWVzc2FnZXMgZWxlY3Ryb25pcXVlcyBldGFudCBzdXNjZXB0aWJsZXMgZCdhbHRl
+cmF0aW9uLA0KT3JhbmdlIGRlY2xpbmUgdG91dGUgcmVzcG9uc2FiaWxpdGUgc2kgY2UgbWVzc2Fn
+ZSBhIGV0ZSBhbHRlcmUsIGRlZm9ybWUgb3UgZmFsc2lmaWUuIE1lcmNpLg0KDQpUaGlzIG1lc3Nh
+Z2UgYW5kIGl0cyBhdHRhY2htZW50cyBtYXkgY29udGFpbiBjb25maWRlbnRpYWwgb3IgcHJpdmls
+ZWdlZCBpbmZvcm1hdGlvbiB0aGF0IG1heSBiZSBwcm90ZWN0ZWQgYnkgbGF3Ow0KdGhleSBzaG91
+bGQgbm90IGJlIGRpc3RyaWJ1dGVkLCB1c2VkIG9yIGNvcGllZCB3aXRob3V0IGF1dGhvcmlzYXRp
+b24uDQpJZiB5b3UgaGF2ZSByZWNlaXZlZCB0aGlzIGVtYWlsIGluIGVycm9yLCBwbGVhc2Ugbm90
+aWZ5IHRoZSBzZW5kZXIgYW5kIGRlbGV0ZSB0aGlzIG1lc3NhZ2UgYW5kIGl0cyBhdHRhY2htZW50
+cy4NCkFzIGVtYWlscyBtYXkgYmUgYWx0ZXJlZCwgT3JhbmdlIGlzIG5vdCBsaWFibGUgZm9yIG1l
+c3NhZ2VzIHRoYXQgaGF2ZSBiZWVuIG1vZGlmaWVkLCBjaGFuZ2VkIG9yIGZhbHNpZmllZC4NClRo
+YW5rIHlvdS4K
 
-Meaning this kfree() should not be needed if you use
-usb_control_msg_send() (nor the allocation above it.)
-
-> ath6kl_usb_submit_ctrl_in() is similar to usb_control_msg_send(),
-> both calling usb_control_msg() to communicate with USB devices.
-
-Yes, it's close, but not quite the same.
-
-> In the current issue, when executing an ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP
-> read request, the length of the data returned from the device is 0, which
-> is different from the expected length of the data to be read, resulting in
-> a warning.
-> 
-> ath6kl_usb_submit_ctrl_in()--->
-> 	usb_control_msg()--->
-> 		usb_internal_control_msg()
-> 
-> usb_internal_control_msg() will return the length of the data returned from
-> the device, usb_control_msg() return the length too, so in ath6kl_usb_submit_ctrl_in(),
-> we can filter out incorrect data lengths by judging the value of ret, such
-> as ret != Size situation.
-
-Then just do that type of check for that type of read request in the
-code that does that call, not 2-3 layers deeper, no need for making this
-more complex than needed.
-
-Try removing both of these functions and just call usb functions
-directly.
-
-thanks,
-
-greg k-h
 
