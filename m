@@ -1,296 +1,204 @@
-Return-Path: <netdev+bounces-121682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0692E95E0BD
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 04:25:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B68395E0C0
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 04:44:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E57E8B21258
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 02:25:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C4B01C20CD5
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 02:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7113A1C3D;
-	Sun, 25 Aug 2024 02:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B97DA7462;
+	Sun, 25 Aug 2024 02:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k2npzm2p"
+	dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="X4G1sZ4t";
+	dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="urXw0AhU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mx6.ucr.edu (mx6.ucr.edu [138.23.62.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D2E370
-	for <netdev@vger.kernel.org>; Sun, 25 Aug 2024 02:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724552735; cv=fail; b=hPreLQNyt9D11R/5iHcKM0AT6k5NzFDV6rCGuJCPdgyt6dJxw2aAJVeYe6YJsXRMEy0UXgd5iIkMEPnhWCr1KJgSGagFPmXo4p2fDlh9NKU+JfJ5mHw8vvfukGkR1b5pe2gpkzJqWbrNDecZUzYo5niFNK/SnD6aD0gOqcL/MXk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724552735; c=relaxed/simple;
-	bh=KZhzOW/8ESMxEhd9qu1NytYqL94fQGSIqGJh/A+fzTA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=CKJkpMgxJkcdAwBXpLWq4X37BvDFnP2Mgl5nmizIgxBLrgJpMCCFSWtor9wiuJ0dREcHNnPM6RxxyycilvxIlI7AXJjbJPsTVYLDJDAAYq9ZmvdU82QQ5OHN1BucDCW2bRUgQrey1SzO6E0PXvnmyfSgqGrF//uAdID8Xu/DC6o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k2npzm2p; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724552733; x=1756088733;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=KZhzOW/8ESMxEhd9qu1NytYqL94fQGSIqGJh/A+fzTA=;
-  b=k2npzm2pJIyTLQkpKGkZvcxXZKUHWfKhz2l5xRZ5s2GlCbXh2lYpUmfa
-   BKf0fpweXflUswmmT3qF3t3qYx7RMnq24fQZLxKHM/hB2I6Xhf/DyryqU
-   UDKWjCx7D1WHLng+3BN1cIfj9Muf+6UbWEcwhjW1n0eV9NILYMtHCuKLj
-   TOQ5hUm3jHLdqQIchHq5cZFnJ4IleVv/5SNraajJ8Twv4BlC9onFRR7jv
-   lowGgfjJB81aArbr3U43cWHf5s+7CZY1N35JBbDW5zPq5D1EwxoE3rGVO
-   7huBTtn43gTx9XU9Tab9bO9E0zWKOvEVTSIjWVJ2w+/EyZHJFuZ18kMWe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D4EBE49
+	for <netdev@vger.kernel.org>; Sun, 25 Aug 2024 02:43:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=138.23.62.71
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724553833; cv=none; b=BfTkToQPQD8RTgBTXaBoSxeNnamyrrAWNS3NfdlMtHKWkzmw796YJYPm8P+cywLvwlNFNdVYYyizZ27IBOhQwfegMGbIj7URvNZeVBhgin1oRbEpL6nxlNRJczlS6zOSX4I3SFdWiUYPsZvFydfd2uD6cye83h9KT/XfdlvmGNA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724553833; c=relaxed/simple;
+	bh=xYwht60nwukBIB8VvdyNWQ1W6v8FzgDLlaemLk8iqvs=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=c8pfhvxwZYP9vQLJFP/VClpwzV+aA3zwzLp8hlW0sKQGuAMaLjvJRzyUsMhL4gxKTggyxfF1FEtYBka9BD7fiSSe70Bs+V/CpVXZcOONECN6ufoCreHCHDoJyohJ/pN0hv3McP5KyQVRkv5utDS1CIbTp6QHlLP7UQL0j5XCHoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=email.ucr.edu; spf=pass smtp.mailfrom=ucr.edu; dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b=X4G1sZ4t; dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b=urXw0AhU; arc=none smtp.client-ip=138.23.62.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=email.ucr.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ucr.edu
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=ucr.edu; i=@ucr.edu; q=dns/txt; s=selector3;
+  t=1724553832; x=1756089832;
+  h=dkim-signature:x-google-dkim-signature:
+   x-forwarded-encrypted:x-gm-message-state:
+   x-google-smtp-source:mime-version:from:date:message-id:
+   subject:to:content-type:x-cse-connectionguid:
+   x-cse-msgguid;
+  bh=xYwht60nwukBIB8VvdyNWQ1W6v8FzgDLlaemLk8iqvs=;
+  b=X4G1sZ4tFFZ5yAs/z6aW7ibuJfhccXNpSQ06Z8Zt2xleh8U2vXGr0fU5
+   s1NqhE0fvsd9R5FG15S2R1AKj78V73pgicgGYS/wJcfCS5mF/LyIhIwij
+   PXnhLU9KVAOZ0TzaZ9yR3FY+pXYIq2ep/8z4RbcTK1rlDo6YslP4ZYqrp
+   JEf8/WC1W1vfTlYDbsiSntfOtqF521AhoBXOv9J65YMD8pPw2LGEwuBOv
+   ZSFtlX1W7VNjIUqd7TFk0G9HG9qFBGXUfvVJDyCcdPJVAv97mdH0SBp1F
+   f2Cf8/2wQVziIg6fLvPbyjzSLclTR96YrcLMiAP3kj587E2R+x1lf80D3
    w==;
-X-CSE-ConnectionGUID: bSS2saF1R6CHn+UL8haygQ==
-X-CSE-MsgGUID: GYTRRHSwREyywP04wklcGg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11173"; a="48388521"
-X-IronPort-AV: E=Sophos;i="6.10,174,1719903600"; 
-   d="scan'208";a="48388521"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Aug 2024 19:25:33 -0700
-X-CSE-ConnectionGUID: 47D9ubVyRAiybh0mA77/pA==
-X-CSE-MsgGUID: u14kfU5XQyajLgCmiU6oFA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,174,1719903600"; 
-   d="scan'208";a="85363110"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Aug 2024 19:25:33 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sat, 24 Aug 2024 19:25:32 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sat, 24 Aug 2024 19:25:32 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Sat, 24 Aug 2024 19:25:32 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sat, 24 Aug 2024 19:25:31 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=pStRWUjDRjRtI+aPoWT5DAFe2TkfgL7ry7TMHxwkYqkFzJXtdxBQt2EwRYQu8vtXsqHwANCFKUM+8exTifu0vMSu1pBLM/RyyEtRY6zXTRQUaC+n/glGTi11qXWMeKjro4vAgzDBE4GC1o4QusKmzgjgSbgTGDKSmAwEajc9HhIYzloYC2g7OgqCQmtqv5fAfbVuz0sQ5SARHoeQ6G4rKCE2S/P+sSO41zFbRRepN8yui4AUaf6NLQBpInxlqq3C0/m8/UwfsLyePR1WDwg3j5JuU+oqKjWQVeLY83eTfw5Z/O9DgdI9gZj+NSKhGmn/W6n/UQnrta33qElph5Rj2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2VcyR0MZQniPFrbTw/hceAEBVV+FVEDMGF6kaA0mFao=;
- b=jTz4GKWpwUK0vtD4pswTh4AGEjH0WMlGPbLto5oeSfUAkgmhouEG7jiyRd8p11pKUz+uIGgZoAVXNMEewgCP1Qu/I7xnmN78vn7PzJaCrqSyewDxDhZHH3joFWPsHK2/7xIHad8QQgsbU2YyG6KqPVfFvToL6MpOuF2dYenw4rbHw7+l2bn/ZE2XBDu+iTVOyhLxiTBu0bMoS+dGT/ZJDj0paPQefTqTNbcs+ixYV94qSzCKJyPJKyo4iQv9nx6H38Yrzcc9oYWtDCSmhclYG5AauiBH33sZ5DksDHtdJ5cdRwPLG2S9D/5JLpBsgB9bVIJih6C4E4bujfOWdgaMUQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
- by MW3PR11MB4729.namprd11.prod.outlook.com (2603:10b6:303:5d::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.23; Sun, 25 Aug
- 2024 02:25:24 +0000
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4f97:ad9d:79a9:899f%4]) with mapi id 15.20.7897.021; Sun, 25 Aug 2024
- 02:25:24 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, "Zaremba, Larysa"
-	<larysa.zaremba@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "kalesh-anakkur.purayil@broadcom.com"
-	<kalesh-anakkur.purayil@broadcom.com>, "Bagnucki, Igor"
-	<igor.bagnucki@intel.com>, Jakub Kicinski <kuba@kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v5] ice: Add
- netif_device_attach/detach into PF reset flow
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v5] ice: Add
- netif_device_attach/detach into PF reset flow
-Thread-Index: AQHa8+Q+ATTqL3k0pESORKmrQgYrs7I3Q2DQ
-Date: Sun, 25 Aug 2024 02:25:24 +0000
-Message-ID: <CYYPR11MB84297526A35B62111A98FB75BD8A2@CYYPR11MB8429.namprd11.prod.outlook.com>
-References: <20240821160640.115552-1-dawid.osuchowski@linux.intel.com>
-In-Reply-To: <20240821160640.115552-1-dawid.osuchowski@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|MW3PR11MB4729:EE_
-x-ms-office365-filtering-correlation-id: 96855717-75e2-4ae3-ef2c-08dcc4ad2d0a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?sSrFLpQh1tKNARmrKTIiot8AlVZ7gBLCpvtUaf3Tt0FR5aD5zKtDSdi7Y6mQ?=
- =?us-ascii?Q?HMsNzSjpVicZ2TMMIr6il30eu5avb15Ugx3ilwhzPM+OV1TI07gBCAxN1mqg?=
- =?us-ascii?Q?3m4dClmcdGWQotiDA+CKfoUu40yajLGWlU81NBTteIaiR8w9KSv+462wK4nS?=
- =?us-ascii?Q?y5twrMmSsieN6/wLoId75iaWC62jU6hfuswe1PqcZfbEksHqXwA1zBC1Ny8p?=
- =?us-ascii?Q?aaHNrGrfb1FyMRpQwysRahj0B3C4hVtqeaa3XWkg242RUQKoxH7IlQqedkxm?=
- =?us-ascii?Q?bE10TvFd9x6fUNlJcZnO8/7wjl8B3wQHuuxP3yQUpniuSELKn9w/ouhcw9HH?=
- =?us-ascii?Q?yAxg3cQuiLkQCbk+Pb7wnm41m6IcT//5lKCbKpbW11q8OCEeeg91CWGrZ5QB?=
- =?us-ascii?Q?Kq2uguvBc7RoV2HcjCV/jbeUSNTpQrv0e0J9pCydeGb9gIr1tLBUrSnOw3Mg?=
- =?us-ascii?Q?aMv38Jx7Q31ZQHN+Gib6iRf57UoSSU+Efbo8av5GSqhDCe23fQgRscpOHVu/?=
- =?us-ascii?Q?5p/aoyuKoPXAjQ+zw7yWTQ4IMb+Ao4GSVlqgqqdWXjuZj90tZc/nUdBI5JaG?=
- =?us-ascii?Q?kBXInXbCS0X0M9yEaehVqWSyMfUhrRf5Lg+J2QF5lc8P/MCNmB8c9bbrB3ym?=
- =?us-ascii?Q?0uSQIk4nx/g+ar5kVL2f40aoW8ypoh0e4Xw8QppWyLrydnFzX62oti2n4Oyq?=
- =?us-ascii?Q?hOfsIYxeByo75Gqdg8Ir9fRtkJ8hHE4Jk0/Ku+R7XHnxEqOi0UuCqXiKg2B5?=
- =?us-ascii?Q?p5dV4eSZrjKcF2NHR4wtMk9j0bQXINusyvt8Me+dy1BieT//3h/FTJdM2OG1?=
- =?us-ascii?Q?3cnb+9gcTIwN9x+DloRK6XJyNbmyJHW17QNUi9qxIfTMCGGS/+dPtzvMXb1m?=
- =?us-ascii?Q?xrC42aEGxOQBw0vwglLzc+sakUipVuVL2bb1atC2FJTvPKt1j1GxxBKpF2H+?=
- =?us-ascii?Q?im6SfzmYrZl2oycrRT5VS7k5+W6vEJxU4k/7DT2b8gqGZ5sJ3VGF3ZBQA9uC?=
- =?us-ascii?Q?PWwUzXnSqagmfUstX3m9vJQUcafNTVpUVouwYGzXi92eeWm/BhvS6+ZH171A?=
- =?us-ascii?Q?hQCMZ0ai5gH2fL3TNMK8pyBWxxYYVz5x1wMXc2+/DfkPys6Wt5UvZqixF6PU?=
- =?us-ascii?Q?HBgkkS1Z8wVHcLoeSggVGAMdBY3QOBwO+wfxOdpu14D7ZbEZZRuKeNqy3DWt?=
- =?us-ascii?Q?xzqrTD4Yi4tL32WT4vJdVuaPzX0ZfA3/xeKggEQJ481FD9f50ossTCSHeI8i?=
- =?us-ascii?Q?KuYW8OFAdovaz16R5sEynyY7hxcMvktM/hi3YB4yLDO0ZTRNk8grAteDjIrG?=
- =?us-ascii?Q?E3idcD9klUQ87wj+xfkhi1qY6yfMmgoyAPEph4fBpP/xgITmZW1Zp9JUo0vd?=
- =?us-ascii?Q?BaAKaZ8=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?MtRMDi1/rEcnHAZlXhqczu5eIR+q8+85gyvh1Ts7VdrTbMM6Hugxi+mhJOIa?=
- =?us-ascii?Q?KJQ7CSztnRQwfCAA+Qwz99LXChoDsL71rhVCx/wik7obYOiTMVAHmAOWX2BH?=
- =?us-ascii?Q?ZJEtE2pZD3wRfjDdlvyH2U136Tc3g+M7guGyBx7E8smVYUnR6H4iNcsEc3Bg?=
- =?us-ascii?Q?JRnvicj0CVr3yjEhRARfoXfAsnogJ+Y5G1ARTI/dVrZKXEEPCVHOxxb0opUG?=
- =?us-ascii?Q?emL5WMq7vL1RIMAPZEzyZBR8yAr4tB36T4LCgK8ZmUe5BA/fBRfaNPDeMw2n?=
- =?us-ascii?Q?CvsPaGOQDkpW+h75JtydO94lffKQaCK+P44dlajv3JmXgrusVwCUMwusCeuq?=
- =?us-ascii?Q?fxIldkbS4MqCtrJ3MZlreVpgVng7D6kiYbF4TR1NT1PUu26emFTJtAqLBLju?=
- =?us-ascii?Q?ETMEQMk3gopVLURlB4QkMzoJNwaglnqG9DWNknTHWBsztTM7OnXhEjcrrdWJ?=
- =?us-ascii?Q?z2OtnJJCjOSkOyxMFEjkcRXWsaUlxo+ubNPcAucv4dnRFoNVGVQMNdVpIUc9?=
- =?us-ascii?Q?LZSc2iQoa73AUHK9mJLS/TGIeGCyZwEboh7Eb6ZdcUVOPB98MAqdPcKq89Z1?=
- =?us-ascii?Q?HgbkpgXojZEaRlzF+l9BFhI1CrEJOf58gZ/wkLAk7d0gSoIWkEra47HpF+xn?=
- =?us-ascii?Q?m71uT0AJ9NXXnMOScE/sseYvVwqqe/FuvIHZYZxt19EHfAFZ+VH9tk6r6FFN?=
- =?us-ascii?Q?PCVE9PHN4pZY7yUeE6kIkgb3Jl2t4SAHiqD5wYvhagRwbiCgWR6ZHhx3+b+s?=
- =?us-ascii?Q?0AZdrCtCfbqs1wNz6TtIq7b7sE7uJgKY4b2tAZgTbUxBaTAXNrG12+81zYKi?=
- =?us-ascii?Q?xbON1FCTSwOI7bdNWqmOe2MzjSF4FIVJiykZEdy6yLazxqc/gq1cks2eLSUk?=
- =?us-ascii?Q?uFVx7wmIs4nqJPiTmXUkRKkVHAYnKRyyLoHSWqFDRGUkpbEAc1NeLDS5en/s?=
- =?us-ascii?Q?o6D+2oigELBiFwAw8nZIbDQOIc9t/9JH9SUUHIQkOXrWKGFRiHxAqh8PokN0?=
- =?us-ascii?Q?vJU6CbfAwXyQ2SXcmwc/beNDatDXGP8mI13FnyFr8XlZkiDzL+OKxCicKylf?=
- =?us-ascii?Q?l7bUVrYu4cMLZ/1ziq+QN+TENWYhqK5TOibpL59O5dbe0rNozhYJxNY7zfVM?=
- =?us-ascii?Q?p1JpadMHWvD1BnG4/JpUizaO/spQQsFFehA41G5UHYNNZ2Ko3VwIAujKRRI8?=
- =?us-ascii?Q?KE5b3T4b06hkCLrapM2jJVofDyCXA9HkC8wyzImok2XG+eqDFk4cxhnrm6/L?=
- =?us-ascii?Q?2Sd/fUqyDReI0yGdXhEOsXSrtxOXr2XFa6hoNfqYT8iBH3UNsULZQue6qNwB?=
- =?us-ascii?Q?NAdBHTF7sA/AoZtd8xOHJR6DsIgG9vk9s7NOwkDltnlymSEZZ2ntXQGPQoIo?=
- =?us-ascii?Q?ZChqwrN62Rc1z7C8kbzWKydXiwP0XN2neK5OoR0aZQ4DY+XEUgWLAILTwQhM?=
- =?us-ascii?Q?3ULkRSVdg0fwmrNO1hoQBlBovPlPclrioF4qfP+V2WKD9JyXsAyg24sZxw1v?=
- =?us-ascii?Q?8nfS3zyqlVSFI6jgyt1j4/657RFZSAMcoLpEBwZbU4Azjd+o5c1H9C2f1wZJ?=
- =?us-ascii?Q?DOp5Yjj7yWO//dqm3JWHwtGo3jaGsxqH1xk6FFoIo8U+wF8rbsfe9bv9/p67?=
- =?us-ascii?Q?H/JXMyhBCZk3nO4zt3xciHY=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+X-CSE-ConnectionGUID: 5TC4YaayQVq7Zvb8FXFGbg==
+X-CSE-MsgGUID: MS0/kP+1TJOG2DhPZ5l1bw==
+Received: from mail-il1-f198.google.com ([209.85.166.198])
+  by smtpmx6.ucr.edu with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 24 Aug 2024 19:43:43 -0700
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-39d5537a62dso39489115ab.2
+        for <netdev@vger.kernel.org>; Sat, 24 Aug 2024 19:43:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ucr.edu; s=rmail; t=1724553822; x=1725158622; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4MNH+fMGdP9JHLT+281L3G2ZahxWv0gRwwGG3Pw9Mrw=;
+        b=urXw0AhUEaSFCqW1NBeuVHtsyQkk111oNXqnAJgSF4uLSvz036Z4wLvkyMtq+MCbts
+         G49V3/MYYUmGGDniPqlpB/QjSwm+jIK8w6UlhDAXX1a1BQcR0N7yDIzIlZW7kjNAOT9n
+         DnKe1cCwCTSSvtKMaga4/YoqtFYhhwhkme+/M=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724553822; x=1725158622;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4MNH+fMGdP9JHLT+281L3G2ZahxWv0gRwwGG3Pw9Mrw=;
+        b=uSfaxs2MjT7WAh2o3lLebewvO4w45eHv8wCEnSnrEBQKYJRp2JGLgX34SH3xy0Cjoc
+         oXONLpars2qN23P185xnUrSg2kZSFI1iQtzyXRjUx+TyK9fzERUFR8NdALP1xULmQm6O
+         VuwqFDc/kWqgFaWbdqe/mm4xCVZ6sBG3RB2HaZxzNyqY29bDVWI8c0fgOsmKHQsf8z56
+         DoqejDYc5zR117UyI2gbG13Bw2jXA8XCla01rbDwwNjvsf7yDAbMuMcs8fqECdCyKya5
+         fqVSWRTif+nI01XtLiLK1eLxbQbxu8DJZ/YAxezZd0lFBP4Jq7WkFwfBBPXR1Z5KNTZg
+         58qQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVb9LlwJaAZ5wZHGDpS+IRQQjktgDWkkuZhzHmEhuTgQYe7PcogKux3p3IqlozdFSeNBoONG/M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxi4kPosRzJy1zOU5MIx/njSskCW5wRMgXyOy/PfLqlqMnS4K2P
+	jl6KoiACBJuhvM0pqQjoPEHMp2n/MwW8UySpM4zXPiMekAl9SlUqchvVJyyJwTrEF3N7NDdZZlg
+	1R5bN1VzxsavQe5yk0eFFJXaeqIw9SWFXgAeeZmhkuxGNCMRRBOvWD7KzfdLlcjDUtGpVJQ3NZZ
+	jLgJu0hB5nQ1/E6fe/hc59lOYghmy1sA==
+X-Received: by 2002:a05:6e02:188a:b0:396:f026:b0ac with SMTP id e9e14a558f8ab-39e3c989ecfmr81369905ab.14.1724553822544;
+        Sat, 24 Aug 2024 19:43:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHr8z+YHMldSfKdzax7ksxhfCeggpAybAldZfkpvfBau9UN11Sq+ooUijQjlihTL6LPNcWCm6zdS6A/CIPsSIU=
+X-Received: by 2002:a05:6e02:188a:b0:396:f026:b0ac with SMTP id
+ e9e14a558f8ab-39e3c989ecfmr81369785ab.14.1724553822239; Sat, 24 Aug 2024
+ 19:43:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96855717-75e2-4ae3-ef2c-08dcc4ad2d0a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Aug 2024 02:25:24.3236
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Ci4tqhccTHeAgEuXu9PPZL4OGM+Ml9iILbFxMVOf/jTfvMmgoe+l7hUExDDSf44RWipjpk9hTPsLUi10Em6L/0zo3CwH5Jdtw9fA9rIfrHIntpd5E5q7JLL4hsiGOkPy
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4729
-X-OriginatorOrg: intel.com
+From: Juefei Pu <juefei.pu@email.ucr.edu>
+Date: Sat, 24 Aug 2024 19:43:30 -0700
+Message-ID: <CANikGpfm_DbtXV9+omVrZhGiFA3iVEb=JeE1OQwvB3cXXDPoag@mail.gmail.com>
+Subject: BUG: general protection fault in sctp_inet6addr_event
+To: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-sctp@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-> ----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of D=
-awid Osuchowski
-> Sent: Wednesday, August 21, 2024 9:37 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Fijalkowski, Maciej <maciej.fijalkowski@intel.com>; Zaremba, Larysa <=
-larysa.zaremba@intel.com>; netdev@vger.kernel.org; kalesh-anakkur.purayil@b=
-roadcom.com; Bagnucki, Igor <igor.bagnucki@intel.com>; Jakub Kicinski <kuba=
-@kernel.org>; Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net v5] ice: Add netif_device_attac=
-h/detach into PF reset flow
->
-> Ethtool callbacks can be executed while reset is in progress and try to a=
-ccess deleted resources, e.g. getting coalesce settings can result in a NUL=
-L pointer dereference seen below.
->
-> Reproduction steps:
-> Once the driver is fully initialized, trigger reset:
->	# echo 1 > /sys/class/net/<interface>/device/reset
-> when reset is in progress try to get coalesce settings using ethtool:
->	# ethtool -c <interface>
->
-> BUG: kernel NULL pointer dereference, address: 0000000000000020 PGD 0 P4D=
- 0
-> Oops: Oops: 0000 [#1] PREEMPT SMP PTI
-> CPU: 11 PID: 19713 Comm: ethtool Tainted: G S                 6.10.0-rc7+=
- #7
-> RIP: 0010:ice_get_q_coalesce+0x2e/0xa0 [ice]
-> RSP: 0018:ffffbab1e9bcf6a8 EFLAGS: 00010206
-> RAX: 000000000000000c RBX: ffff94512305b028 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: ffff9451c3f2e588 RDI: ffff9451c3f2e588
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: ffff9451c3f2e580 R11: 000000000000001f R12: ffff945121fa9000
-> R13: ffffbab1e9bcf760 R14: 0000000000000013 R15: ffffffff9e65dd40
-> FS:  00007faee5fbe740(0000) GS:ffff94546fd80000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000020 CR3: 0000000106c2e005 CR4: 00000000001706f0 Call Tr=
-ace:
-> <TASK>
-> ice_get_coalesce+0x17/0x30 [ice]
-> coalesce_prepare_data+0x61/0x80
-> ethnl_default_doit+0xde/0x340
-> genl_family_rcv_msg_doit+0xf2/0x150
-> genl_rcv_msg+0x1b3/0x2c0
-> netlink_rcv_skb+0x5b/0x110
-> genl_rcv+0x28/0x40
-> netlink_unicast+0x19c/0x290
-> netlink_sendmsg+0x222/0x490
-> __sys_sendto+0x1df/0x1f0
-> __x64_sys_sendto+0x24/0x30
-> do_syscall_64+0x82/0x160
-> entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> RIP: 0033:0x7faee60d8e27
->
-> Calling netif_device_detach() before reset makes the net core not call th=
-e driver when ethtool command is issued, the attempt to execute an ethtool =
-command during reset will result in the following message:
->
->    netlink error: No such device
->
-> instead of NULL pointer dereference. Once reset is done and
-> ice_rebuild() is executing, the netif_device_attach() is called to allow =
-for ethtool operations to occur again in a safe manner.
->
-> Fixes: fcea6f3da546 ("ice: Add stats and ethtool support")
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
-> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> ---
-> Changes since v1:
-> * Changed Fixes tag to point to another commit
-> * Minified the stacktrace
->
-> Changes since v2:
-> * Moved netif_device_attach() directly into ice_rebuild() and perform it
->   only on main vsi
->
-> Changes since v3:
-> * Style changes requested by Przemek Kitszel
->
-> Changes since v4:
-> * Applied reverse xmas tree rule to declaration of ice_vsi *vsi variable
->
-> Suggestion from Kuba: https://lore.kernel.org/netdev/20240610194756.5be5b=
-e90@kernel.org/
-> Previous attempt (dropped because it introduced regression with link up):=
- https://lore.kernel.org/netdev/20240722122839.51342-1-dawid.osuchowski@lin=
-ux.intel.com/
-> ---
->  drivers/net/ethernet/intel/ice/ice_main.c | 7 +++++++
->  1 file changed, 7 insertions(+)
->
+Hello,
+We found the following issue using syzkaller on Linux v6.10.
+In `sctp_inet6addr_event`, a general protection fault error is
+triggered when trying to execute `list_for_each_entry_safe(addr, temp,
+&net->sctp.local_addr_list, list) { ...`
+According to the report, it looks like the register $rax (propagated
+from $r15) is unexpectedly set to null, causing an null-pointer
+dereference issue.
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
 
+Unfortunately, the syzkaller failed to generate a reproducer.
+But at least we have the report:
+
+bond0 (unregistering): (slave bond_slave_0): Releasing backup interface
+bond0 (unregistering): (slave bond_slave_1): Releasing backup interface
+bond0 (unregistering): Released all slaves
+Oops: general protection fault, probably for non-canonical address
+0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 0 PID: 16764 Comm: kworker/u4:10 Not tainted 6.10.0 #13
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: netns cleanup_net
+RIP: 0010:sctp_inet6addr_event+0x118/0x6e0
+Code: 44 24 08 48 89 44 24 40 4c 89 e0 48 c1 e8 03 48 89 44 24 38 4c
+89 64 24 28 4c 89 74 24 30 4c 89 f8 48 c1 e8 03 48 89 44 24 48 <42> 80
+3c 28 00 74 08 4c 89 ff e8 89 25 b3 f7 49 8b 07 48 89 44 24
+RSP: 0018:ffffc9000a037340 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888024170000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000000000000000a
+RBP: ffff88802e8ed520 R08: ffffffff8a413727 R09: fffff52001406e58
+R10: dffffc0000000000 R11: fffff52001406e58 R12: ffff88801856d000
+R13: dffffc0000000000 R14: ffff88802cd22b88 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff888063a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f10a8812088 CR3: 0000000028e84000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ notifier_call_chain kernel/notifier.c:93 [inline]
+ atomic_notifier_call_chain+0x195/0x2d0 kernel/notifier.c:231
+ addrconf_ifdown+0xedb/0x1b50 net/ipv6/addrconf.c:3980
+ addrconf_notify+0x3c4/0x1000
+ notifier_call_chain kernel/notifier.c:93 [inline]
+ raw_notifier_call_chain+0xe0/0x180 kernel/notifier.c:461
+ call_netdevice_notifiers_extack net/core/dev.c:2030 [inline]
+ call_netdevice_notifiers net/core/dev.c:2044 [inline]
+ dev_close_many+0x352/0x4e0 net/core/dev.c:1585
+ dev_close+0x1bb/0x2c0 net/core/dev.c:1607
+ cfg80211_shutdown_all_interfaces+0xbc/0x1d0 net/wireless/core.c:280
+ ieee80211_remove_interfaces+0x111/0x690 net/mac80211/iface.c:2278
+ ieee80211_unregister_hw+0x59/0x2d0 net/mac80211/main.c:1659
+ mac80211_hwsim_del_radio+0x2ba/0x4b0
+drivers/net/wireless/virtual/mac80211_hwsim.c:5576
+ hwsim_exit_net+0x5bd/0x660 drivers/net/wireless/virtual/mac80211_hwsim.c:6453
+ ops_exit_list net/core/net_namespace.c:173 [inline]
+ cleanup_net+0x810/0xcd0 net/core/net_namespace.c:640
+ process_one_work kernel/workqueue.c:3248 [inline]
+ process_scheduled_works+0x977/0x1410 kernel/workqueue.c:3329
+ worker_thread+0xaa0/0x1020 kernel/workqueue.c:3409
+ kthread+0x2eb/0x380 kernel/kthread.c:389
+ ret_from_fork+0x49/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:244
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:sctp_inet6addr_event+0x118/0x6e0
+Code: 44 24 08 48 89 44 24 40 4c 89 e0 48 c1 e8 03 48 89 44 24 38 4c
+89 64 24 28 4c 89 74 24 30 4c 89 f8 48 c1 e8 03 48 89 44 24 48 <42> 80
+3c 28 00 74 08 4c 89 ff e8 89 25 b3 f7 49 8b 07 48 89 44 24
+RSP: 0018:ffffc9000a037340 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888024170000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 000000000000000a
+RBP: ffff88802e8ed520 R08: ffffffff8a413727 R09: fffff52001406e58
+R10: dffffc0000000000 R11: fffff52001406e58 R12: ffff88801856d000
+R13: dffffc0000000000 R14: ffff88802cd22b88 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff888063a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f10a8812088 CR3: 0000000028e84000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0: 44 24 08             rex.R and $0x8,%al
+   3: 48 89 44 24 40       mov    %rax,0x40(%rsp)
+   8: 4c 89 e0             mov    %r12,%rax
+   b: 48 c1 e8 03           shr    $0x3,%rax
+   f: 48 89 44 24 38       mov    %rax,0x38(%rsp)
+  14: 4c 89 64 24 28       mov    %r12,0x28(%rsp)
+  19: 4c 89 74 24 30       mov    %r14,0x30(%rsp)
+  1e: 4c 89 f8             mov    %r15,%rax
+  21: 48 c1 e8 03           shr    $0x3,%rax
+  25: 48 89 44 24 48       mov    %rax,0x48(%rsp)
+* 2a: 42 80 3c 28 00       cmpb   $0x0,(%rax,%r13,1) <-- trapping instruction
+  2f: 74 08                 je     0x39
+  31: 4c 89 ff             mov    %r15,%rdi
+  34: e8 89 25 b3 f7       call   0xf7b325c2
+  39: 49 8b 07             mov    (%r15),%rax
+  3c: 48                   rex.W
+  3d: 89                   .byte 0x89
+  3e: 44                   rex.R
+  3f: 24                   .byte 0x24
 
