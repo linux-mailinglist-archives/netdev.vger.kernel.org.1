@@ -1,109 +1,169 @@
-Return-Path: <netdev+bounces-121719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EA7895E2DB
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 11:14:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94B8795E2F3
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 12:21:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41E461F216B1
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 09:14:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFB411C20C8B
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 10:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23AD5FB95;
-	Sun, 25 Aug 2024 09:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FC6A13C9CF;
+	Sun, 25 Aug 2024 10:21:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=pmachata.org header.i=@pmachata.org header.b="bGiDj8La"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="fd7pTfrx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C512F2BCFF
-	for <netdev@vger.kernel.org>; Sun, 25 Aug 2024 09:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358A7179A3;
+	Sun, 25 Aug 2024 10:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724577275; cv=none; b=hxxfEoLveM0b5atGmt6rQjWph/l+jLg5lD40GzcSycMcdtMmgSkXxDYzysHQOouhWIvs9V9sxreg2sDdoNieT0yqBaHhbIYiTrme6jv9Fh5iXSg3Pqc9bssufePYS8FYtPcYvbgxxvEyxDEyFCsRBlpLUHkfwrxk+4Vo1f+xSFQ=
+	t=1724581271; cv=none; b=a5sDDF/ywAsEUz3hbsEmmq8efk2QmfVhn5635iSOiKdVbYM4yEvxHdMq7uDpGAuB187lXVCSqiE7HolrArkNVUbMQXekoZX58HIZYHMy+2aI4EvTZezx/YWso8Xzqf4AFYAunxvx2nptLqmImucyG9EVewANq23crWniny9qhQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724577275; c=relaxed/simple;
-	bh=GblxphSxXRGRGIdO0WIEz4bcHVj26/iS2i9XBPIKSA0=;
-	h=References:From:To:Cc:Cc:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=Nm6UduRqrNp1qntnwcCzx4nDz4jboZcrV3oM3YRQLtpIHIIkcn1CNFhH1J7A4epxZbgXsJsfz3THkng3Hr0Dbg/fkPfHawsxaqgPCTLwpNmjzYAh6uYBAHIkwSqRMGPdumkI5Y7xAsexu0dm6tQmZ3nkkRuDCeg2Mh+q7r1FCOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pmachata.org; spf=pass smtp.mailfrom=pmachata.org; dkim=fail (2048-bit key) header.d=pmachata.org header.i=@pmachata.org header.b=bGiDj8La reason="signature verification failed"; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pmachata.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pmachata.org
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4Ws7RQ5RJGz9t4l;
-	Sun, 25 Aug 2024 11:14:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pmachata.org;
-	s=MBO0001; t=1724577266;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LrJMIIJq8sP4MURbOTfwgCS6tQlBtETuka7Ox1+JIIY=;
-	b=bGiDj8LaIOJ+mqhPWY1qqDy2rCoQvYADDp6fez1wAJnLyUUPY3J/lKGYRk9BXl4lXumd6N
-	IPtq7gKuiLKre10szISO2WGb871P039PTAERhbsmGPkWi+u8n1/8TzbJO8daVx4Z4iigHB
-	q4ofEm/cu4mtwcEqKBYJdwSUf/+uc2rh3SqqVobcO+sqNE8WU1H38ibZBljC7V/OttPiE7
-	fmzsbz2zd5LRWcdgbmk2aZcSFfCXroLB3w/ryy12u3S9YYmKuA7f8Q30hb+bD/2McB8tfR
-	XOLILbnH0+zdu6lizgfE9sMQzHwVlCogVu+bOBBhwHkeQk4OZmTCFuJV+1hm5w==
-References: <20240822083718.140e9e65@kernel.org> <87a5h3l9q1.fsf@nvidia.com>
- <20240823080253.1c11c028@kernel.org> <87ttfbi5ce.fsf@nvidia.com>
- <20240824142721.416b2bd0@kernel.org>
-From: Petr Machata <me@pmachata.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Petr Machata <petrm@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Petr Machata <petrm@nvidia.com>
-Subject: Re: [TEST] forwarding/router_bridge_lag.sh started to flake on Monday
-Date: Sun, 25 Aug 2024 11:01:26 +0200
-In-reply-to: <20240824142721.416b2bd0@kernel.org>
-Message-ID: <871q2d9d74.fsf@nvidia.com>
+	s=arc-20240116; t=1724581271; c=relaxed/simple;
+	bh=UgnzpKPOXVRPoV4o3k9+mCHEc+u+lKjXZyWUCMUjM/c=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=rUcy4nLS439sBhoPs90ZZuIr+8Pjpc9LlQ0lHAbCo8FgPxcdKPliTOXo892FS9NXhNE4PiaWYEtnI42ePOeRRbFbYAwG2AnJh1bw00gfMXsEUC7gAh5bK39erg689j5uUkx80Sjmhd1a8uYsZBUWlso5Up8CjXjl/7A9MRK2yaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=fd7pTfrx; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1724580962; bh=JZNt9zJQ6CogOHVsBFz/Z7yNPW5r1uXeVyfB6MiRgz4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=fd7pTfrxQSFYenjkmFkIyyzjtP45o75kRH9d9G1wBcwLZqKPpr4TKmG7VwongcU6p
+	 qg+meOQOQs7Nqvy0Frn3BIXVNkdXP6roVEoE7NCAndb7cPpS5P2ckteSy4cQe+P98a
+	 446vhx1Si249I4hU7QXYJAkh2w8QSuzN0ZV5Cvzk=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
+	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
+	id 26CA3666; Sun, 25 Aug 2024 18:09:44 +0800
+X-QQ-mid: xmsmtpt1724580584t1u4fpqlw
+Message-ID: <tencent_89BAE8BB0933D89E1D1BD94B891BBD257208@qq.com>
+X-QQ-XMAILINFO: NDgMZBR9sMmaCzYfCGXnbxUaCPgQ8YecgBtTTjNOgQnPaaoFs0LTEL2XYq8N9b
+	 wmgV0CpyISXsUk/o00WvueezscGsrAEEuy0IGhjNd79MF5tfjAMY4ZAk0D5A+kkgJAQt95O/TkGE
+	 8BPgIlZOdtQN9gxX4u5T6l+9cC7ek1JoIjP078NkFIX+4a2uN67K+yrJg3pknXuhhJVRGtkVFjVN
+	 oBSznZ8n4g5P50NlLrwNW62p1pjk0HBbqb2qYkOHWNd2muZx/gbkPS26tTxnnEoPi1vN7aqP62kO
+	 EBDZHLupjEPqk+Zfp+UAD4fQjwo3u/lOOCGBR6UMyKT58rkCHxaMXXgbU6C6lLUjb8KW6Tfzhz6R
+	 sBcFXH6Eb+IkrhpiEStVBofL5WH73/9WmtkuICaNOC9zSZc9XuGib3qVA1NZHsDGHe4k9KD0UCG2
+	 LbWLTKv2R5y76ZF6h5d4hmiFJZW+c8EFB5AHSsUcxLW9EOm3IOpPcddl7X1QQ3JcMXyjeBG1DAeS
+	 wwbzC6/BzV9yT6LjWiNPW5ic44ngw7OA09qiRjXIXRMWT3a+1sJR9EhEl6aNv8duEmCSIdd19WmI
+	 +vcwsmzPuEMlHHgGRWsLEj1pXSgkRGw+rdlfYCZqObTuYZVyHBrnUwLGCie6qO6uBbFkKvP42Lm2
+	 Z0p1PhIXtN8Ikvun6AbsOy22CYCmfgdrPRaHYOZw2AaVAmHnZOHVmmy9wLpYkFVm8LUXMKvtUB9D
+	 4teFAP0qfazUiuVi2qPxPbuHofsxFV/yGtfpXsL1ESFCR0dPdytBCO09H1lHgnRuqah2BMeQ41HJ
+	 67pFlfD2ZrdyIU2kBF8oTjQHnbcYmpqn4XKHhsKK8qU2uNSUpiT4FXlTFTTF26eM2L8a1VX2649A
+	 h15xA/xG89ExfQekQCsDj9O4Y2JA/08upFhP2APvJ+LwpH+xXM3yzkIIO0ZiWLO6gn43+FFpUQDb
+	 uXmCew1PSzePeAHERiy2DtzRxU6Me6fswHOeqdO97f25XfEgGWDw==
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+From: Edward Adam Davis <eadavis@qq.com>
+To: gregkh@linuxfoundation.org
+Cc: eadavis@qq.com,
+	kvalo@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] wifi: ath6kl: Check that the read operation returns a data length of 0
+Date: Sun, 25 Aug 2024 18:09:45 +0800
+X-OQ-MSGID: <20240825100944.2343702-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <2024082554-manatee-ashamed-12d5@gregkh>
+References: <2024082554-manatee-ashamed-12d5@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
+On Sun, 25 Aug 2024 10:34:00 +0200, Greg KH wrote:
+> On Sun, Aug 25, 2024 at 04:14:17PM +0800, Edward Adam Davis wrote:
+> > On Sun, 25 Aug 2024 09:25:37 +0200, Greg KH wrote:
+> > > > If the data length returned by the device is 0, the read operation
+> > > > should be considered a failure.
+> > > >
+> > > > Reported-and-tested-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
+> > > > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> > > > ---
+> > > >  drivers/net/wireless/ath/ath6kl/usb.c | 3 +++
+> > > >  1 file changed, 3 insertions(+)
+> > > >
+> > > > diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
+> > > > index 5220809841a6..2a89bab81b24 100644
+> > > > --- a/drivers/net/wireless/ath/ath6kl/usb.c
+> > > > +++ b/drivers/net/wireless/ath/ath6kl/usb.c
+> > > > @@ -1034,6 +1034,9 @@ static int ath6kl_usb_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
+> > > >  		ath6kl_err("Unable to read the bmi data from the device: %d\n",
+> > > >  			   ret);
+> > > >  		return ret;
+> > > > +	} else {
+> > > > +		ath6kl_err("Actual read the bmi data length is 0 from the device\n");
+> > > > +		return -EIO;
+> > >
+> > > Close, but not quite there.  ath6kl_usb_submit_ctrl_in() needs to verify
+> > > that the actual amount of data was read that was asked for.  If a short
+> > > read happens (or a long one), then an error needs to propagate out, not
+> > > just 0.  See the "note:" line in that function for what needs to be
+> > > properly checked.
+> > >
+> > > hope this helps,
+> > Thanks for your analysis.
+> > I have carefully read your analysis and I am not sure if the following
+> > understanding is appropriate:
+> > diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
+> > index 2a89bab81b24..35884316a8c8 100644
+> > --- a/drivers/net/wireless/ath/ath6kl/usb.c
+> > +++ b/drivers/net/wireless/ath/ath6kl/usb.c
+> > @@ -932,6 +932,15 @@ static int ath6kl_usb_submit_ctrl_in(struct ath6kl_usb *ar_usb,
+> >
+> >         kfree(buf);
+> 
+> First off, this should be using usb_control_msg_send() instead of having
+> to roll their own buffer handling, right?
+I couldn't figure it out with what you said. 
 
-Jakub Kicinski <kuba@kernel.org> writes:
+ath6kl_usb_submit_ctrl_in() is similar to usb_control_msg_send(),
+both calling usb_control_msg() to communicate with USB devices.
 
-> On Fri, 23 Aug 2024 18:13:01 +0200 Petr Machata wrote:
->> >> +	ip link set dev $swp2 down
->> >> +	ip link set dev $swp1 down
->> >> +
->> >>  	h2_destroy
->> >>  	h1_destroy
->> >>    
->> >
->> > no_forwarding always runs in thread 0 because it's the slowest tests
->> > and we try to run from the slowest as a basic bin packing heuristic.
->> > Clicking thru the failures I don't see them on thread 0.  
->> 
->> Is there a way to see what ran before?
->
-> The data is with the outputs in the "info" file, not in the DB :(
-> I hacked up a bash script to fetch those:
-> https://github.com/linux-netdev/nipa/blob/main/contest/cithreadmap
+In the current issue, when executing an ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP
+read request, the length of the data returned from the device is 0, which
+is different from the expected length of the data to be read, resulting in
+a warning.
 
-Nice.
+ath6kl_usb_submit_ctrl_in()--->
+	usb_control_msg()--->
+		usb_internal_control_msg()
 
-> Looks like for the failed cases local_termination.sh always runs 
-> before router-bridge, and whatever runs next flakes:
->
-> Thread4-VM0
-> 	 5-local-termination-sh/
-> 	 20-router-bridge-lag-sh/
-> 	 20-router-bridge-lag-sh-retry/
->
-> Thread4-VM0
-> 	 5-local-termination-sh/
-> 	 16-router-bridge-1d-lag-sh/
-> 	 16-router-bridge-1d-lag-sh-retry/
+usb_internal_control_msg() will return the length of the data returned from
+the device, usb_control_msg() return the length too, so in ath6kl_usb_submit_ctrl_in(),
+we can filter out incorrect data lengths by judging the value of ret, such
+as ret != Size situation.
+> 
+> > +       /* There are two types of read failure situations that need to be captured:
+> > +        * 1. short read: ret < size && ret >= 0
+> > +        * 2. long read: ret > size
+> > +        * */
+> > +       if (req == ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP && ret != size) {
+> > +               ath6kl_warn("Actual read the data length is: %d, but input size is %d\n", ret, size);
+> > +               return -EIO;
+> > +       }
+> 
+> If you switch to usb_control_msg_send() this logic gets a lot simpler.
+> Perhaps do that instead?
+> 
+> If not, then you need to check for "short writes" or zero writes, see
+> the documentation for usb_control_msg() for what it returns.  Your
+> comment is not correct here, there are 3 different return "states" that
+> you need to handle.
+> 
+> And why are you caring about what the req type is?
 
-Looks like a no_forwarding cut'n'paste issue. I'll send a fix on Monday.
+BR,
+Edward
+
 
