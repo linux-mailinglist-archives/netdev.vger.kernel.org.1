@@ -1,139 +1,80 @@
-Return-Path: <netdev+bounces-121715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B59CD95E2AC
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 10:28:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C0A995E2A3
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 10:19:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69DC028206C
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 08:27:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CBDCAB217E6
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 08:19:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4956F2E0;
-	Sun, 25 Aug 2024 08:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7471E78283;
+	Sun, 25 Aug 2024 08:18:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="J51wO6Gf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IKaKM3FY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F67364AE;
-	Sun, 25 Aug 2024 08:27:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CF9D77F13;
+	Sun, 25 Aug 2024 08:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724574475; cv=none; b=Z3pD6uTYAoQKLz1yF4fo63Og56O8A84ewDiMIrs9b/+gIcSF1Z/UrR9XRJSo7madVQI/mtYpNmDpTKxxUkL7iUWGcBJosu5rNHHVQ746IgyLi7O1LrKwTLIP38/E3fOQh0KM1UwozkEJBifkE8O1Xi1EpQiwzfE3y4yELCAyYok=
+	t=1724573905; cv=none; b=NwfFmEu4e6vi+Y+lkHajF3UT8rEGut1WanOk5tVY+Mi1WQL6e2ncdcm/kWvgDrWN4SiiuQuAELV78P+vOgG6iWz2ZjltAY8RwE9ZsF6ntyMa6RHpJ1DoPNKn5qkUHU/OfJcIcthrCHmOWnfAsoJef1q8rudL0sAmhWg8jTJOmM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724574475; c=relaxed/simple;
-	bh=EzfTqwP5++54n0emJ1pPOQ13RC+y/TmNzsNT7yCk4w8=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=Fbq+/ZzuECtYoimEeM1URPduRFAAirLJjpI1FTXIF0+ME/XvVSkxSysJFf75lWhSP90jaM/7GELYKrtDBLia68GUbm9ajC+C8Wg5w5xqypuElrVpC4bN0VyYia/HPyDaMlq4woNd1LYKNyDrMHaULwMHj1uNLhQzYOf3M7xgc8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=J51wO6Gf; arc=none smtp.client-ip=162.62.58.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1724574467; bh=K9JDy1HTUTK/42il7BrDFNhHYqZjLglr18rgG3OYqpM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=J51wO6GfOlfNi+SMz/EkMgPANGOY5jYCCAuRP/eI3uJZXQ8ujKVRxN2TxgpJ/amQG
-	 lFMwgUdAOQ65adkY42+ql2tfQKpwuG9v4vLylRahlM8ndTFrnPHgtOiu+TyM3pTIUo
-	 Evo/lRboPZekN7uvxjIXNJPRJYyiesNi2aqOTeHI=
-Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
-	by newxmesmtplogicsvrszc13-0.qq.com (NewEsmtp) with SMTP
-	id 3913681C; Sun, 25 Aug 2024 16:14:17 +0800
-X-QQ-mid: xmsmtpt1724573657tk9vp3f2y
-Message-ID: <tencent_F3E6370A4B6C7467779367AE3CB3363E9609@qq.com>
-X-QQ-XMAILINFO: MR/iVh5QLeieHUBSR0h8MKSzOutAdv4xELzxcoToh2vQs2nEQx+Z/dqlYhLW7y
-	 0K0Q3YA1Z4aq6Ij1E5NdvdYiNT2pGXcMNRLbLkzgGIEnCY1rx69xZsWbPZTlFvIWZpa6jfj6x0Lb
-	 T9AWamZ8ayhfd62BkCKeWdLqwC/iKRVsfEYHL1QL3N0v8md+Z5A3N7QMa6Px7NlmVa3+wAjSj5Is
-	 ZtsbJvH4J7icQotwafAyVHgjJV3IHf2ka0+pPsIgC/nuz7qKUEefBuLk2mKO0LF90TU41qV09ZI0
-	 iP9D4Fj+uigCpyFDdW7z0HjeCgG3MvvyJFvY7mms6ttgBHuZMLcajDHeK9CY43WvY5+BvciwJePm
-	 WOHreJj6DuVjF6PZ34B5HC8Iwa1SvnxabfTqnM168rYdjZScHvE82Dxeg7sRVkAEOtOK8dBGYZQ9
-	 L9VO5RKwYq93rfHnF8xw9do3lXnhf9Aaa85JNjioMMb90FiwqLHOwLFRXAdtlVahtUWjLc9g2SS8
-	 UI3a6LHNgXDDdQwZSVRSWgFr+FFBFkVjbyaHEYV1xsY+AflgLibPnR5NevCAXgKu2bTdVIliA5J7
-	 fTSizQiO1/j+/v6dnBHri09UY5UpA/zfIat2vj0v5vN56fLEv/GscMnuPFpx16/efVT7jmw8TfK4
-	 hZvjeJjZasxULv8SFAYXqzZGYu/rrQ0l5WiCCG17Qyk8TgdC0N9p5Q+R5mUw0MgNWNyLeMOIiqD9
-	 u9cYdm9DIMKchIM6x2b7p4YvEf/dqTj0ToDvjoZHfT4nWEPDvzs8j5N1ytOBrV3D9zRXsZQxnCoJ
-	 sL/p97pR9YvtKmp+g8uQJSSAwCDurFwfVzPHyJignA/4VkfIvWoXmE6Ud6Kaj6E2NZm28jTq7x5X
-	 McOb4WNrFmYKuzyv0Wnu9NTplRMe09fDpHxx6C0HXcdngfVKarhL2nuMwPCncO0PIo6/9xPgyK8a
-	 jp6BlzYrmVKGej1qXJHwcUfkGBpZHg
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-From: Edward Adam Davis <eadavis@qq.com>
-To: gregkh@linuxfoundation.org
-Cc: eadavis@qq.com,
-	kvalo@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH] wifi: ath6kl: Check that the read operation returns a data length of 0
-Date: Sun, 25 Aug 2024 16:14:17 +0800
-X-OQ-MSGID: <20240825081416.2242421-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <2024082507-clay-riveting-16f3@gregkh>
-References: <2024082507-clay-riveting-16f3@gregkh>
+	s=arc-20240116; t=1724573905; c=relaxed/simple;
+	bh=aqz2VzjRBEP658PtcVmevB9Fzlw5r+BFBMq62WEp0mY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJliHS/eNi9ic4znuyYwFoUWfjom8E1zQpJwkyP/cg31TSUU/cMmT5Ci/nTGHg8DnD4ixlS521EiGopk3RE9/kH2IFGlhRamsn7EIOKTgwBMvMCFLd+xRpbndciMEjmLxe9fjcg98PXhXwkODb6OmaGGZeqcT7LESt8F6q3pI+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IKaKM3FY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F58BC4AF0E;
+	Sun, 25 Aug 2024 08:18:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724573903;
+	bh=aqz2VzjRBEP658PtcVmevB9Fzlw5r+BFBMq62WEp0mY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IKaKM3FYTntOGynyrpvPrsCvozeawOw/grOpS/u9UwAcN5aR5NY6VHz6uhkID6yq3
+	 0QsHlB8sccRE2w38+tQaWTj7vPMhKJRn85qvZeSr/3iQHw6c7tZsAfsFL6rt5k2kJd
+	 T1CYBcEA3Xrbq6Pa9Ckaioec8zo80XIPyHB6WmZoT/wWAq749KQiWEBLMqoXoFz3HG
+	 ySCjKwus4kSmK9C5tU4uSBeE/Ft2eLOPUu3zLJZRXjctWgEtgV2tPE6zN+qbTlUpQe
+	 iQjRmkjlZMpwh5xT7dpEb/z1Jwxw7N3IzxJc3g/xvyVf8QrLvXMVRbrnaTbx7UqGHv
+	 W/hYeYZ3PfuVg==
+Date: Sun, 25 Aug 2024 09:18:20 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: liquidio: Remove unused declarations
+Message-ID: <20240825081820.GW2164@kernel.org>
+References: <20240824083107.3639602-1-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240824083107.3639602-1-yuehaibing@huawei.com>
 
-On Sun, 25 Aug 2024 09:25:37 +0200, Greg KH wrote:
-> > If the data length returned by the device is 0, the read operation
-> > should be considered a failure.
-> >
-> > Reported-and-tested-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
-> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> > ---
-> >  drivers/net/wireless/ath/ath6kl/usb.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
-> > index 5220809841a6..2a89bab81b24 100644
-> > --- a/drivers/net/wireless/ath/ath6kl/usb.c
-> > +++ b/drivers/net/wireless/ath/ath6kl/usb.c
-> > @@ -1034,6 +1034,9 @@ static int ath6kl_usb_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
-> >  		ath6kl_err("Unable to read the bmi data from the device: %d\n",
-> >  			   ret);
-> >  		return ret;
-> > +	} else {
-> > +		ath6kl_err("Actual read the bmi data length is 0 from the device\n");
-> > +		return -EIO;
+On Sat, Aug 24, 2024 at 04:31:07PM +0800, Yue Haibing wrote:
+> Commit da15c78b5664 ("liquidio CN23XX: VF register access") declared
+> cn23xx_dump_vf_initialized_regs() but never implemented it.
 > 
-> Close, but not quite there.  ath6kl_usb_submit_ctrl_in() needs to verify
-> that the actual amount of data was read that was asked for.  If a short
-> read happens (or a long one), then an error needs to propagate out, not
-> just 0.  See the "note:" line in that function for what needs to be
-> properly checked.
+> octeon_dump_soft_command() is never implemented and used since introduction in
+> commit 35878618c92d ("liquidio: Added delayed work for periodically updating
+> the link statistics.").
 > 
-> hope this helps,
-Thanks for your analysis.
-I have carefully read your analysis and I am not sure if the following
-understanding is appropriate:
-diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
-index 2a89bab81b24..35884316a8c8 100644
---- a/drivers/net/wireless/ath/ath6kl/usb.c
-+++ b/drivers/net/wireless/ath/ath6kl/usb.c
-@@ -932,6 +932,15 @@ static int ath6kl_usb_submit_ctrl_in(struct ath6kl_usb *ar_usb,
+> And finally, a few other declarations were never implenmented since introduction
+> in commit f21fb3ed364b ("Add support of Cavium Liquidio ethernet adapters").
+> 
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
-        kfree(buf);
+Thanks, I looked over the git history of this driver
+and agree with the analysis above.
 
-+       /* There are two types of read failure situations that need to be captured:
-+        * 1. short read: ret < size && ret >= 0
-+        * 2. long read: ret > size
-+        * */
-+       if (req == ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP && ret != size) {
-+               ath6kl_warn("Actual read the data length is: %d, but input size is %d\n", ret, size);
-+               return -EIO;
-+       }
-+
-        return 0;
- }
-
-BR,
-Edward
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
