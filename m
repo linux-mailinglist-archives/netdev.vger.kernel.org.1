@@ -1,145 +1,117 @@
-Return-Path: <netdev+bounces-121731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83F4795E450
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 18:21:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2543595E45D
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 18:31:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 159221F214A0
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 16:21:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF406281793
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 16:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A334A22EE5;
-	Sun, 25 Aug 2024 16:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86AA3153BD9;
+	Sun, 25 Aug 2024 16:31:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C/Vgo3/S"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="U5tvvkGl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12719B640;
-	Sun, 25 Aug 2024 16:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29E92E636;
+	Sun, 25 Aug 2024 16:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724602913; cv=none; b=uEN5FA0fslB7bYvuKK0+uWoQwEfRRR8+YKMF9rPZlDRkzGqhFIhSKopeCCsO3qPxq+kKMD6EcZrHS7IpYjlPvUsIn/8KNx5L3UqvmrgkWJiOdJFhNMKGyniBWWpHpxQdJO5aY/OZmRv4Zyc7LuUrnpmGbdJwTOQh/6xANgbhZTo=
+	t=1724603484; cv=none; b=MCuMBbOHgP+61AOtNmZeuNje0cjK4QJWcQJyEsrGgc+uxpfVviuWQQ8stQC2SpN1MXllZCkc263lXmflRvFXkiQ0Yd5Ohbc2xxJHr9brU7m3BBiJaFNrrnIBudKccS+0svk5d6C8W8H2bGlA/RmNjuR6AOmRTuD07XkO+hnLYoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724602913; c=relaxed/simple;
-	bh=dWB2f/oL7+pEVHKGY7Tsr/C7Wkcs7H5vxCPM5F9D6JI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=icDPJwKSUogm0MH1cEqu7tWw0+hfoQUJeQkV0lWaJGvaXWCG9C2PJd4/VN/FJcCBWXeG1ukWvtE+Z8XUDvFiBGGP4ZaakJBclBP1Q2VrGi0vrayJVFi9mV157Vn7KyANDXQwyPXRBY0YT37NAJzOUxCyQF57K0a/rVIcxkCYNIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C/Vgo3/S; arc=none smtp.client-ip=209.85.160.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-2705d31a35cso3253992fac.0;
-        Sun, 25 Aug 2024 09:21:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724602911; x=1725207711; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e3MYbKUNBkklBtjfHinAe6ZFvBjUzpMm2egDh20Y7Rk=;
-        b=C/Vgo3/SXGmII+NH6kaNHIUuDuT3MHWEY7lTxIPuQTX80wDS1BDo4IbMIs+x1F24pW
-         906GNQeC8qmJkWyNi7g+K1olJTj06GcU6wDGwcPQtrH/udj5ApIyMWiuFrN/TCWr3tMK
-         2sVAl503r/DQAPh1H/AgtsrYoYVZu3uoAOg206QYhioHvtZs2LzgJeQuk8UkEdD7168/
-         uYxzqiQczbrQyhPDQ1rVjoqlOUPaBoKh7xZcUStyMDeLyd36O1sUjgFlW0RBB7BMDuiN
-         yKTqfjI0FJ4wUKd+LiLm26nvTYuRAFfCfi2IOS3ktDgk9Qxvlz32Q8svEU6+z4sgbNgo
-         k91Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724602911; x=1725207711;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e3MYbKUNBkklBtjfHinAe6ZFvBjUzpMm2egDh20Y7Rk=;
-        b=ZKkMddgzliOtD36LqAry6ftcHwOIdZvLp5Xdcrsvrx0SDnJcUItx/4yYHMYxenNls7
-         BpmlEYDkEpzoiqPJPZgxZziz5KFH7ccLleCDgOe0f8pM6KnKl9i+rGhaK56Sp+IWEWln
-         saFhcwZ++ewDQlyFl3AjkzOO8eu7O9eLm4HP172GhFXrOiRgb7Eoter6FJ6wUQxqHiY+
-         zhcCcXQiciJ3XJjR/ZwBAwYzWu46IJ6kwuiGxNz45ndPYJyVb9a8BlzHGNOlEkX3hCzn
-         uQsebZeMFCT2lEBocKopTqp54p8gCsWxbkjzee0LvUr8qxryKoIwzjDsrwxqqddNADTu
-         n+6A==
-X-Forwarded-Encrypted: i=1; AJvYcCUDtz9OOlM8gHCen5P6yp701QTG2v1L9/rpPnuQOIfmFbSw4nMQ5/45xnbURQLzkTE4dwrViQgP1Egm@vger.kernel.org, AJvYcCVuucZHoNIqUQk/ZAFKGEg+YbLOI/QQ0I0naHKMSl//Cb8sCjTCL5PH0Frc/fYF21h2C3N653NP3p1kof9GnHo3@vger.kernel.org, AJvYcCW6AnHZboEjMHEA3d66icpGaz7ruMu9Zth8lojWssHqorkCrTqxpTjpaVvmbSgDNos3R9D6XWsnO1rM@vger.kernel.org, AJvYcCWsHONvmnvrlrDKUstssb5RT20+aQbU8dklto4mrRAtBLKC7WBDkP9CS4DFg7WAA641bF+QO1Kx@vger.kernel.org
-X-Gm-Message-State: AOJu0YzF4/dHmYByGbQ0YZZmWpD+KLr3nrf50Uf56Ts2NjatuA0mkFvc
-	rpR2Ur0o1HnWPjYksUFc04UwIdFG36iITNVFo8ov07Qy0gvr8xgO8irzErPTehPVumiwZpeYE4/
-	N/QArfO8dQfkRtnfRHFqzozv2+eQ=
-X-Google-Smtp-Source: AGHT+IFJ1RD5dDjMQQRiar8HJ7qdHi6IpI1gPYQoCTKg0oJn7Cj2gFNVkJIC9ojaLBUStkUleMxty6SOP948bmoHP9A=
-X-Received: by 2002:a05:6870:2051:b0:270:1884:9db1 with SMTP id
- 586e51a60fabf-273e63f0a0bmr8312619fac.7.1724602910950; Sun, 25 Aug 2024
- 09:21:50 -0700 (PDT)
+	s=arc-20240116; t=1724603484; c=relaxed/simple;
+	bh=92Dz1fkXnRnMEXcn58jZfdW2YkKTdEzFSQY128vy7KE=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ipkPDUIvgga4S6QZCSF0teJ7zblrtKmniERIyoQ1D03CfPlZhve9GTGsdq8z4eLABuudvYnK4+hPjFKIT/5H1dVVd/J4GwK6yWCJ85YSaK+0VAHH5Vl65S8yw22Zuwtixpv7gEGgTWDULH8cc8RNAToBqTePtQwhZnPtgUGkbmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=U5tvvkGl; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1724603042;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O/0CVHEKDJQyYWXwIbOQUlthvfXsND9N1ahK4smTqQ0=;
+	b=U5tvvkGlfI6OBAY8Wz4LUP+Z8uR5hNZyzLXiS7vFNvvx31EUjMDofXUubr8axmBJBtZFPT
+	wl1Ehve6XMHlC7A48DB2zyufLuREtd2O5e5zM5uV/yFCDtkciQhXXyKyMAjJZujAFSFl0m
+	YZv/gixXtw5t8M5TCyFGIOudVjwA33A=
+From: Sven Eckelmann <sven@narfation.org>
+To: mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ b.a.t.m.a.n@lists.open-mesh.org, Xingyu Li <xli399@ucr.edu>
+Subject: Re: BUG: general protection fault in batadv_bla_del_backbone_claims
+Date: Sun, 25 Aug 2024 18:23:54 +0200
+Message-ID: <13617673.uLZWGnKmhe@bentobox>
+In-Reply-To:
+ <CALAgD-7C3t=vRTvpnVvsZ_1YhgiiynDaX_ud0O6pxSBn3suADQ@mail.gmail.com>
+References:
+ <CALAgD-7C3t=vRTvpnVvsZ_1YhgiiynDaX_ud0O6pxSBn3suADQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822133908.1042240-1-lizetao1@huawei.com> <20240822133908.1042240-5-lizetao1@huawei.com>
- <20240824181209.GR2164@kernel.org>
-In-Reply-To: <20240824181209.GR2164@kernel.org>
-From: Ilya Dryomov <idryomov@gmail.com>
-Date: Sun, 25 Aug 2024 18:21:38 +0200
-Message-ID: <CAOi1vP98rmMKKH-ik4dshO1A9chrfsPqiWDY6Wk4EfQNTeNe8Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/8] libceph: use min() to simplify the code
-To: Simon Horman <horms@kernel.org>
-Cc: Li Zetao <lizetao1@huawei.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, marcel@holtmann.org, 
-	johan.hedberg@gmail.com, luiz.dentz@gmail.com, xiubli@redhat.com, 
-	dsahern@kernel.org, trondmy@kernel.org, anna@kernel.org, 
-	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de, 
-	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, jmaloy@redhat.com, 
-	ying.xue@windriver.com, linux@treblig.org, jacob.e.keller@intel.com, 
-	willemb@google.com, kuniyu@amazon.com, wuyun.abel@bytedance.com, 
-	quic_abchauha@quicinc.com, gouhao@uniontech.com, netdev@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, ceph-devel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="nextPart2986161.e9J7NaK4W3";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
 
-On Sat, Aug 24, 2024 at 8:12=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Thu, Aug 22, 2024 at 09:39:04PM +0800, Li Zetao wrote:
-> > When resolving name in ceph_dns_resolve_name(), the end address of name
-> > is determined by the minimum value of delim_p and colon_p. So using min=
-()
-> > here is more in line with the context.
-> >
-> > Signed-off-by: Li Zetao <lizetao1@huawei.com>
-> > ---
-> >  net/ceph/messenger.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
-> > index 3c8b78d9c4d1..d1b5705dc0c6 100644
-> > --- a/net/ceph/messenger.c
-> > +++ b/net/ceph/messenger.c
-> > @@ -1254,7 +1254,7 @@ static int ceph_dns_resolve_name(const char *name=
-, size_t namelen,
-> >       colon_p =3D memchr(name, ':', namelen);
-> >
-> >       if (delim_p && colon_p)
-> > -             end =3D delim_p < colon_p ? delim_p : colon_p;
-> > +             end =3D min(delim_p, colon_p);
->
-> Both delim_p, and colon_p are char *, so this seems correct to me.
->
-> And the code being replaced does appear to be a min() operation in
-> both form and function.
->
-> Reviewed-by: Simon Horman <horms@kernel.org>
->
-> However, I don't believe libceph changes usually don't go through next-ne=
-xt.
-> So I think this either needs to be reposted or get some acks from
-> one of the maintainers.
->
-> Ilya, Xiubo, perhaps you can offer some guidance here?
+--nextPart2986161.e9J7NaK4W3
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+Date: Sun, 25 Aug 2024 18:23:54 +0200
+Message-ID: <13617673.uLZWGnKmhe@bentobox>
+MIME-Version: 1.0
 
-Hi Simon,
+On Sunday, 25 August 2024 06:14:48 CEST Xingyu Li wrote:
+> In line 307 of net/batman-adv/bridge_loop_avoidance, when executing
+> "hash = backbone_gw->bat_priv->bla.claim_hash;", it does not check if
+> "backbone_gw->bat_priv==NULL".
 
-I'm OK with this being taken through net-next.
+Because it cannot be NULL unless something really, really, really bad 
+happened. bat_priv will only be set when the gateway gets created using 
+batadv_bla_get_backbone_gw(). It never gets unset during the lifetime on the 
+backbone gateway.
 
-Acked-by: Ilya Dryomov <idryomov@gmail.com>
+Maybe Simon has more to say about that.
 
-Thanks,
+On Sunday, 25 August 2024 06:14:48 CEST Xingyu Li wrote:
+> RIP: 0010:batadv_bla_del_backbone_claims+0x4e/0x360
 
-                Ilya
+Which line would that be in your build?
+
+On Sunday, 25 August 2024 06:14:48 CEST Xingyu Li wrote:
+> Syzkaller reproducer:
+
+At the moment, I am unable to reproduce this crash with the provided 
+reproducer.
+
+Can you reproduce it with it? If you can, did you try to perform a bisect 
+using the reproducer?
+
+Kind regards,
+	Sven
+--nextPart2986161.e9J7NaK4W3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCZstamgAKCRBND3cr0xT1
+y9x3AQCI8h/Dcc3iVqqa0XiVgpP7ecJxHatYGydBR1RH46HCcwEA997cKeW4kX8v
+myVNLA90kDo9mmb3MHmOmn0BjgJhrQM=
+=Z8g1
+-----END PGP SIGNATURE-----
+
+--nextPart2986161.e9J7NaK4W3--
+
+
+
 
