@@ -1,108 +1,90 @@
-Return-Path: <netdev+bounces-121705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFC7795E256
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 09:10:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC2795E260
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 09:23:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BAAA2826F5
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 07:10:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 389E71F21102
+	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 07:23:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B190F55886;
-	Sun, 25 Aug 2024 07:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="rCQdQiKq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8C95487A5;
+	Sun, 25 Aug 2024 07:23:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20AEA54BD8;
-	Sun, 25 Aug 2024 07:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D945848E
+	for <netdev@vger.kernel.org>; Sun, 25 Aug 2024 07:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724569814; cv=none; b=IOQYoq1WyosMAvQ1wIrsgn1VwsJGhscwjnb5eWItH8MLMJdp+dwXIxjz9qNIchk4M324zGnK5HjKzY0uJpS8RgtrFAMyGmz/oH5W8A1e+Emj0mOZNUfz+qhVQf3QCtEWt5xssF1NmNmM5qubxmoiOj72EjW4R74IVJOYRIifqOU=
+	t=1724570622; cv=none; b=tSxZd2WlyLaGGGhgCSo89nhCj3SSFFjBQAaPzUTDjBRqMgYlS9st21/A9SWYPyZp/8QUx6wdf9Xr4jUvMYfb/aY8AcvJw93bWfLRSaknHl6EWlXrRG218fNdCqNAN5glnhYWBu8HqaEuvGaAEJpL5AI2awHPvP/RorA6G4cwCqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724569814; c=relaxed/simple;
-	bh=Fj/EmX7ib+Lfvn/AxCnJP32ADVfuI4FzB2LfAg7KANc=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=tYLirvwmdk4KgF99ASAG0ZkfKyzOAyipnJC6ERaIfXJ6SM4NFW60gxK2oXgbr2j+zznuYHoYXP10Jp7U2dgmKv02G9o4t5zbRxDKc3zGupILAbPcQdrTs+bm8gp0K9luiDUGBeh7dlm6xXkrtpoLr78Azp4tbhx6PoCplwUkIrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=rCQdQiKq; arc=none smtp.client-ip=162.62.58.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1724569805; bh=/semDDU5zsCaTr6xGw92C8FIyWfsAShZ+BMdvutBH7E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=rCQdQiKqdwBpZo0lLWp/KeDov4Lmng+Nrl4p0iIuXV4UwluS0jLjo925APk7JrquH
-	 X4uGT7aL1tFpFk9VH6hSJknXoobn4ydij8Ogyh9lR5SUlAmt12DpRJJSjaVmnsIGcM
-	 WPdPyuMfJEVqCfGC90y5+iXLxDqllTjWgenMM5iE=
-Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
-	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
-	id 282166DE; Sun, 25 Aug 2024 15:10:02 +0800
-X-QQ-mid: xmsmtpt1724569802tzo9ofaex
-Message-ID: <tencent_8D19734F828DA6A5938DF1122F5DDC5DBC07@qq.com>
-X-QQ-XMAILINFO: OdIVOfqOaVcri8+zm2SchNSIlQI0PU8lRV3EsHnwgGb1XrYFR/S8hz4dSIvMx9
-	 xXqqhxW7elDd5E44hOZSxQiaMbhnmYSTz3CvwSYxiFodjRj5nYkLylGLpkUztXyaJy+ElKFbl8AE
-	 tZ0yVV2R+YhZa9mSmbUKbmYNXV3sqry0x5oTPa+DbvMP1pWzywfDCgMMrXdF/sapBAGBmJsx6WDN
-	 QIa/9DdZhgzxSz99JZE1HTb5KVar88esE5LUttT/8ba5gGnCffUr2ncargrCEpht3IDBKWoPpbh4
-	 ls3arvy2tS7lXgA0eA0AljB/FNKiQJ1ilqRUfzNbe1HgYdWNMSsA5YNHqbgGsr3LkDZTxlWCzZFE
-	 +KuqyhdTUStiU7ccIrUOYgN0peKkiw2cClVKGhkhOJIQUsCd1xG0vRZ1n03fAETw8KeaH59eVBiq
-	 JdU5Y+z0qcvKiUYuXdGGxTQH4fni+YW0gJXri3h1caacj0imKTZOJvem/gmTiJh5U/aAYuWVT2az
-	 uJwUYadWcG6c86CD8ET6Chc9T2vYUjj8PW4yLirwwdrXlJCY2ZVDB5UUkuxH93iD3a9V2rMO0TmA
-	 QWsdzj02hGpENA8Z0WEbA0q6n6wcWVBOE2iDf/7/vBdib2H0Lo5Rq8l3GvMJ/th+0Q8FKUs9CLRK
-	 FiVFVpUCykP+MLX3o1Ny4zGA7vnccoeSK33x+3qppNswFtGaHKXG1Ta8/djhH8VM9vNXXROAxLz7
-	 oAZkG7ueftWinU2fYhyNaUk7ri6NJ/U8yueFC0AJzndn3ooBzAQcK4SpGwVMO3wvbbx5fo1nZCP0
-	 BEHkID9eEZWEObjwzp1maB1SoCW8NcgOtJzQadpB9Dr1GKYQCQ/iyjBcKMtCnOfLSX/z5xAAjMIM
-	 LpMb2baDKJ9fPhWBtGt4j5r032tD/9MOb9EczCA8PWsa1Dmfqyfl3RlngUMUayZAxYICtJE7u6Bw
-	 HbJFSdhLI=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-From: Edward Adam Davis <eadavis@qq.com>
-To: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
-Cc: kvalo@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] wifi: ath6kl: Check that the read operation returns a data length of 0
-Date: Sun, 25 Aug 2024 15:10:03 +0800
-X-OQ-MSGID: <20240825071002.2186643-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <00000000000096ee8f061e991433@google.com>
-References: <00000000000096ee8f061e991433@google.com>
+	s=arc-20240116; t=1724570622; c=relaxed/simple;
+	bh=ez/J/WQv1YTW5i/up15opC2jNgAa92z+qoZdR7sPpSU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jw9fgLwKPzv9U7aZ3ytebwY+qRpfr5+g0YPa4SJOYL0t0TeMjkYhj/2/TAHxhwdObhKrA9hSU00M2F9eaI9O9kDPNCw3A0Tl3wTPlPfyhO6ggcUVFARsHJN1mVNwz0OTtn5RruOrLw7ixdo3waDExPqqaYlIBKmlbW5BpAOoZno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1si7ak-0002oM-V4; Sun, 25 Aug 2024 09:23:14 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1si7ai-002tiR-OT; Sun, 25 Aug 2024 09:23:12 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1si7ai-005AmU-1t;
+	Sun, 25 Aug 2024 09:23:12 +0200
+Date: Sun, 25 Aug 2024 09:23:12 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv3 net-next] net: ag71xx: get reset control using devm api
+Message-ID: <Zsrb4K0XQ2DaotcA@pengutronix.de>
+References: <20240824181908.122369-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240824181908.122369-1-rosenp@gmail.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-If the data length returned by the device is 0, the read operation
-should be considered a failure.
-
-Reported-and-tested-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- drivers/net/wireless/ath/ath6kl/usb.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
-index 5220809841a6..2a89bab81b24 100644
---- a/drivers/net/wireless/ath/ath6kl/usb.c
-+++ b/drivers/net/wireless/ath/ath6kl/usb.c
-@@ -1034,6 +1034,9 @@ static int ath6kl_usb_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
- 		ath6kl_err("Unable to read the bmi data from the device: %d\n",
- 			   ret);
- 		return ret;
-+	} else {
-+		ath6kl_err("Actual read the bmi data length is 0 from the device\n");
-+		return -EIO;
- 	}
+On Sat, Aug 24, 2024 at 11:18:56AM -0700, Rosen Penev wrote:
+> Currently, the of variant is missing reset_control_put in error paths.
+> The devm variant does not require it.
+> 
+> Allows removing mdio_reset from the struct as it is not used outside the
+> function.
+> 
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
  
- 	return 0;
--- 
-2.43.0
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
+Thank you!
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
