@@ -1,168 +1,112 @@
-Return-Path: <netdev+bounces-122002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6CE395F889
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:50:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24DFC95F8B2
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:58:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 424351F23949
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:50:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5AB3282780
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:58:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 111D6197A96;
-	Mon, 26 Aug 2024 17:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 497CD1990CD;
+	Mon, 26 Aug 2024 17:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b="hEBFgyZY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g6FnA9XK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861C419580A
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 17:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90BB719580A
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 17:58:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724694600; cv=none; b=anpBRyCmhV6WbISfYOiSv5aMje1BrRRxMg3DwIl1+M2W99U5OLgY1viy1SfAbTuyJP2Grk5+3wCka5Tys4KAaWIw3ESgzmNSb/bgsvxhHjt3inTiY2XQ+oYu/SYsuwUMXtFaVrDOetCQum8YKvGVsWbiOO1lCVszMr6wbtwyqTg=
+	t=1724695115; cv=none; b=SoCkgw37ZE6V1pVBq/sxh297iXGTnJWtOjhJQFJ2n1rquiQnyMhgU8EMpnLYv3GmZKdZf4YsEiRXj53XlTQUI0NMhQZJM+wLTvzD7MZgXKwsFq6uUkBFyLRJrsi/mCRCBDB2rzGtYqFqEn9Yh5BBvP4l3mA2rxdlTmgDdaJACYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724694600; c=relaxed/simple;
-	bh=jHExYjSVMZZOn0ZA4DecqjGkw9lzA2XXCxBk9eTvffI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G7P9kugF8VBRVQdP2/+3uZxpp5BWWuKnBnKNarbcAxSe2G8TYM5JR5PfVuzOE4eLVEB9Stb35dICxl25kjFLGU/FIHZYT89tsv5UWvJEEomM6cnCJhjNWfWYEY2oNUthCj+mWKTxHE5Hy+4vdAPVrSNaPKTbJ3T5zF0Tz7BifTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=hfdevel@gmx.net header.b=hEBFgyZY; arc=none smtp.client-ip=212.227.15.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1724694590; x=1725299390; i=hfdevel@gmx.net;
-	bh=WRtgPDZy0BtdRPFP1Kx3UFHt0ISmkmGxz1Uvbne5owc=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=hEBFgyZYobg7aY415DYc/qYXJmAvz8uL8LiNtWE2rk2X5R0ipjjA2EAV98xDGI5C
-	 Osbo3EOG8LGQVlhq8aMd7dk7TSGrRPOlxVf7EJdDpUJcpVPG052AoEqD/jwPMC7zQ
-	 zvXQdKBZS4gTTAXQntoegLliGMDL3HEDOpFy7kiSd7UPzmZnpXv4CKZEmmcAI9un+
-	 hXj2y2iZexIbdT2qKV190OdVQKHwRr7kXUlyWI+zPxy29fshExncNlKF/DdvFPAPo
-	 QEDsRU9vEFj6Q7+hsmnvMs3iQi1xfyFT81Ngxac6OeigV6YTOpgoSXbZFP0IhxiWY
-	 ZgITpU8gBFNhmCRWPw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [10.0.0.23] ([77.33.175.99]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MLiCo-1sQyTO1zou-00OMVP; Mon, 26
- Aug 2024 19:49:50 +0200
-Message-ID: <58560556-c288-4ea7-bea9-7e9083628dbf@gmx.net>
-Date: Mon, 26 Aug 2024 19:49:49 +0200
+	s=arc-20240116; t=1724695115; c=relaxed/simple;
+	bh=m1vUJTxnbLYPFWSRrsUTILzyGkkzYoBIFbULE6uwxGg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=op3kViVezTvki9xg5/vXFlYNlIqtWeCRH16fri4sPTA7i6Cs875dd340OrP+Rb8+2iAarptMARgB8WNMTHG7fLnL1L1SoQTgvXh2G7S+MwszKEd20xehZJXDv1o/Z+Ly9d9jXN7evUWVf/3fuU+Nr+CtMEUjpbjA3LA7d3TOkBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g6FnA9XK; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724695112;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PBgRdIE0fHsznPVlKpBGuT212MrBY8tRlvifAXJEjaA=;
+	b=g6FnA9XKyt0xoAuE+1u4+q5zU9pFyT/1kvaMYAVpQJu2eeaetbIqyS91VO7L593zjSNoEU
+	TJIiGHVoJxCL4Uz3j75PLl9E44DMX1P8wRwKSI4rZCQjoS4O/PqFw+k3E6/IZ+SfQdkKkM
+	Ki/WHLo6tOwPJrvU9Oq6QwUC198ztIo=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-378-yQ2ZEuefOtCKeeNswtEoWw-1; Mon,
+ 26 Aug 2024 13:58:29 -0400
+X-MC-Unique: yQ2ZEuefOtCKeeNswtEoWw-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4B8A91953956;
+	Mon, 26 Aug 2024 17:58:26 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.8.86])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C1181955F40;
+	Mon, 26 Aug 2024 17:58:21 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Hongbo Li via dev <ovs-dev@openvswitch.org>
+Cc: <johannes@sipsolutions.net>,  <davem@davemloft.net>,
+  <edumazet@google.com>,  <kuba@kernel.org>,  <pabeni@redhat.com>,
+  <allison.henderson@oracle.com>,  <dsahern@kernel.org>,
+  <pshelar@ovn.org>,  Hongbo Li <lihongbo22@huawei.com>,
+  <linux-wireless@vger.kernel.org>,  <netdev@vger.kernel.org>,
+  <rds-devel@oss.oracle.com>,  <dccp@vger.kernel.org>,
+  <dev@openvswitch.org>,  <linux-afs@lists.infradead.org>
+Subject: Re: [ovs-dev] [PATCH net-next 6/8] net/openvswitch: Use max() to
+ simplify the code
+In-Reply-To: <20240824074033.2134514-7-lihongbo22@huawei.com> (Hongbo Li via
+	dev's message of "Sat, 24 Aug 2024 15:40:31 +0800")
+References: <20240824074033.2134514-1-lihongbo22@huawei.com>
+	<20240824074033.2134514-7-lihongbo22@huawei.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
+Date: Mon, 26 Aug 2024 13:58:19 -0400
+Message-ID: <f7t4j7788uc.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: phy: aquantia: create firmware name for
- aqr PHYs at runtime
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Bartosz Golaszewski <brgl@bgdev.pl>
-References: <trinity-916ed524-e8a5-4534-b059-3ed707ec3881-1724520847823@3c-app-gmx-bs42>
- <d0a46a2a-af5c-4616-a092-a9b65a1e15e2@lunn.ch>
-Content-Language: en-US
-From: Hans-Frieder Vogt <hfdevel@gmx.net>
-In-Reply-To: <d0a46a2a-af5c-4616-a092-a9b65a1e15e2@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:sBBr1yLPnf68SBKfgH/aSWSpvTB1L4vmnKqiHSlfMZAuByKvJNM
- TWJo+GElRfqzAeTolyLPh7rq0deTzxqAzAOJmE8o9G7xagEWgDnQLdlzJXbf4kpqH5VRSM7
- pJZUdj3sOsJp7mCAQmIWujNNx+YxOyqwcKesp74Tw3jjB447pZKLwOAJovbFMTFJBEe/PGH
- TQA6w85pZcy4fev6tm5AQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:bzbMXa0yCD4=;n0uJFBZBPsdKmfG7oU3ocd03EF+
- 89OqsCsIdo5suereNfTrXQ3k8oS4EVIZlanB7mDSGc8Kj+4RKGBObutXRZMi+gjZmqWFH0S/m
- JEFUtd4Ebr6YItlDtjzr4BTyGYE5CY2BCgk+eJzpy2QNc9wdcnoB3qGzIpXeMX7oTU+EgfLcU
- fdlrBwnvjQuKch+LotubQhIQIQmB339WtWayfa6MrNbI4cgj6IU3vXKMR2sK45jHzxu39MBHK
- 59VXNmaKEhOMVh/C9KM0ZSqdQrulTiGKF9LAeMiuVYPilUpTkk39K7fkTjFNbZEaennMJIFmD
- pF3ku8xgcEATG7Ccry3XcCmXEExNFihUOrgo7rMkFP1BmM3pLI9Lk2wYx5F0Mu8dT4OUSOoNW
- nWhxM9jJfiwhkPcpKBLCIqzATqM7nFpqLdr8kp2rFMrHgq7BL1uqox35xJ+UOVDCYi+LHusb6
- cN8iQ4DJGSY8ZsW0tGcgW2hwgP3mzpcGmVkHN861u6Yk+pBosQ70ylbWlQmtfdRKp6WJCQA4H
- OSy/US+8MHdUPndUo16fx01a/1abvZQz+SQm/lFD3SQ5FC7K1zY7yyc5IOw9prnDf+dE6e4XU
- ZcBPZE5K74WA0/gKpx2rM/sgwyy1WEFCCI3xZueH/gm1njoAT83bi+ZUxwichH+Y1eUjAaNKe
- VefsBBe4TFUMO0qZEEVE/YNIU+78W7pCUaB3vs2fR8JRAqmkD4qMguFlPzRf/1eBy2wghjGJ9
- ehZBFLj0MxWQvxkPdKcDYo9dU2Sw2p4z/mvW8/8AizxHN8LXclqWoRvLl+dPfEV24/sW1oC/S
- 3wMIh2VaI9x56UFaBbOJowQg==
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On 26.08.2024 03.17, Andrew Lunn wrote:
->> +/* derive the filename of the firmware file from the PHY and the MDIO =
-names
->> + * Parts of filename:
->> + *   mdio/phy-mdio_suffix
->> + *    1    2   3    4
->> + * allow name components 1 (=3D 3) and 2 to have same maximum length
->> + */
->> +static int aqr_firmware_name(struct phy_device *phydev, const char **n=
-ame)
->> +{
->> +#define AQUANTIA_FW_SUFFIX "_fw.cld"
->> +#define AQUANTIA_NAME "Aquantia "
->> +/* including the trailing zero */
->> +#define FIRMWARE_NAME_SIZE 64
->> +/* length of the name components 1, 2, 3 without the trailing zero */
->> +#define NAME_PART_SIZE ((FIRMWARE_NAME_SIZE - sizeof(AQUANTIA_FW_SUFFI=
-X) - 2) / 3)
->> +	ssize_t len, mac_len;
->> +	char *fw_name;
->> +	int i, j;
->> +
->> +	/* sanity check: the phydev drv name needs to start with AQUANTIA_NAM=
-E */
->> +	if (strncmp(AQUANTIA_NAME, phydev->drv->name, strlen(AQUANTIA_NAME)))
->> +		return -EINVAL;
->> +
->> +	/* sanity check: the phydev drv name may not be longer than NAME_PART=
-_SIZE */
->> +	if (strlen(phydev->drv->name) - strlen(AQUANTIA_NAME) > NAME_PART_SIZ=
-E)
->> +		return -E2BIG;
->> +
->> +	/* sanity check: the MDIO name must not be empty */
->> +	if (!phydev->mdio.bus->id[0])
->> +		return -EINVAL;
-> I'm not sure how well that is going to work. It was never intended to
-> be used like this, so the names are not going to be as nice as your
-> example.
->
-> apm/xgene-v2/mdio.c:	snprintf(mdio_bus->id, MII_BUS_ID_SIZE, "%s-mii", d=
-ev_name(dev));
-> apm/xgene/xgene_enet_hw.c:	snprintf(mdio_bus->id, MII_BUS_ID_SIZE, "%s-%=
-s", "xgene-mii",
-> hisilicon/hix5hd2_gmac.c:	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-mii", d=
-ev_name(&pdev->dev));
-> intel/ixgbe/ixgbe_phy.c:	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-mdio-%s"=
-, ixgbe_driver_name,
->
-> I expect some of these IDs contain more than the MAC, eg. include the
-> PCI slot information, or physical address of the device. Some might
-> indicate the name of the MDIO controller, not the MAC.
->
-> Aquantia PHYs firmware is not nice. It contains more than firmware. I
-> think it has SERDES eye information. It also contain a section which
-> sets the reset values of various registers. It could well be, if you
-> have a board with two MACs and two PHYs, each needs it own firmware,
-> because it needs different eye information. So what you propose works
-> for your limited use case, but i don't think it is a general solution.
->
-> Device tree works, because you can specific a specific filename per
-> PHY. I think you need a similar solution. Please look at how txgbe
-> uses swnodes. See if you can populate the firmware-name node from the
-> MAC driver. That should be a generic solution.
->
-> 	Andrew
-Thanks Andrew!
-I have checked many cases, but obviously haven't considered enough the
-multiplicity of network device topologies.
-Thanks very much for the hint with the txgbe driver. I will study it and
-come
-back with hopefully a generic approach.
+Hongbo Li via dev <ovs-dev@openvswitch.org> writes:
 
- =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 Hans
+> Let's use max() to simplify the code and fix the
+> Coccinelle/coccicheck warning reported by minmax.cocci.
+>
+> Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
+> ---
+
+Reviewed-by: Aaron Conole <aconole@redhat.com>
+
+>  net/openvswitch/vport.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/openvswitch/vport.c b/net/openvswitch/vport.c
+> index 8732f6e51ae5..859208df65ea 100644
+> --- a/net/openvswitch/vport.c
+> +++ b/net/openvswitch/vport.c
+> @@ -534,7 +534,7 @@ static int packet_length(const struct sk_buff *skb,
+>  	 * account for 802.1ad. e.g. is_skb_forwardable().
+>  	 */
+>  
+> -	return length > 0 ? length : 0;
+> +	return max(length, 0);
+>  }
+>  
+>  void ovs_vport_send(struct vport *vport, struct sk_buff *skb, u8 mac_proto)
+
 
