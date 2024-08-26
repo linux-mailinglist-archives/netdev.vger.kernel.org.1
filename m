@@ -1,88 +1,96 @@
-Return-Path: <netdev+bounces-121967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C1DD95F6A1
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:32:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0305B95F6E8
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:41:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE2EF1C21A2A
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:32:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D1561F22567
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09E31194131;
-	Mon, 26 Aug 2024 16:32:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CA119755A;
+	Mon, 26 Aug 2024 16:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eN6AzQiu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ja+vYV3W"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7C3C1865E7;
-	Mon, 26 Aug 2024 16:32:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53EC5191F78;
+	Mon, 26 Aug 2024 16:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724689938; cv=none; b=Q1Vivi+SI8QPTFPIgee0Yp2VwJQZtRhFYI+PuGJwRXL0ruVoBC+cpAAmQ2CWcDw6+uPCwFntWKBL6fEgSr6sag42AMAKbAMJpw9xTMSpKZ3My4YUywmQD4Wp9cNoSkrcYwhNQWR09lC5jsb+ymprnufcdOPZNteu+HjdCtJMw4Y=
+	t=1724690430; cv=none; b=GMA61q6T3x5Dt+cCY5vb+k8jyt0NMEAJmIgI0FzDxLrEvzRP4B4rr5RPwBzCe9reAYMT7a/GiTWTZXnLymRRGKxXb8cscTBMJqyAGooVAv3q0Wy3TeQET4CSgl59f76DbwPboNAQDHdiztzV7jxWFtd4yHz+UQrZjeFStMfGaTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724689938; c=relaxed/simple;
-	bh=CuRZPNcAg/KhTuJ7w3AXF0CuthcPOrzqmzpzn6hzOYE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V/VLFYXBZpw8R6NwYB94qP+M5FO7cXUCG0zQVxVQjWmOYjxRw2oVDfnJajRbKbVITNua5yTPvzCNSxugv50uVxHzEP+z3DBeZ6qoSmkQRdCFLwmZ9sfvGjJHK73/eQULDlJtWOLLVidI7+nhMsXolsbOjxa1d+ba5pRMVUIryGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eN6AzQiu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17D78C52FC1;
-	Mon, 26 Aug 2024 16:32:18 +0000 (UTC)
+	s=arc-20240116; t=1724690430; c=relaxed/simple;
+	bh=xoa5ywEc9w1JYj0npRfXyoOWYRdAqKl7kJePs+MAwfQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ufVpRLRHqQpM4V8B4MG3ORC1TGubmfQikUJPjJ8fUpxVaNxeE4HpkwOQAnC3TDIxpVZHONPzSHj9BQTiIgY0zFH3o3Z6qAMpNkTzdk6I3aYhDZhttw5Bm8eNQ2/QnY6uW6LSWz9GJ3QvmWWaBdZbnD0MN4LvgtYpjKcgn7TSl2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ja+vYV3W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E335AC52FD1;
+	Mon, 26 Aug 2024 16:40:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724689938;
-	bh=CuRZPNcAg/KhTuJ7w3AXF0CuthcPOrzqmzpzn6hzOYE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eN6AzQiuMdLSoW/3F9+Kzt5KSH89VVoAwGX8FyZ0s9dQfScSoCdW3p0Xn/z8dpAVH
-	 3zTCHs0lY+KUT9ieqQ+V5lVCTwZNHuE87P+5RQTD1qXNI7ckI0ERu3Ytkgy0GD5tYh
-	 4W5ITXd3z+qbQ4B32jqfAQTouEfv9iPddJR1PgwIuoiw3hZ4PACH4yyn0a5JtxA3Ge
-	 VnlOro3CtNRo5cVHH+mUcPPU/fyHyc7+vAWEv21ZXFl3zG5uWnoYsVszOoCluHNlHM
-	 +Uw7QDpT7EQefBEYOqmU0inTJmdwtZ3aJfIFHV63ui9cxUDQ4KIm9A2iPfzO3baTGQ
-	 2MLkypeCd6nuQ==
-Date: Mon, 26 Aug 2024 09:32:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/3] phy: open_alliance_helpers: Add defines
- for link quality metrics
-Message-ID: <20240826093217.3e076b5c@kernel.org>
-In-Reply-To: <20240822115939.1387015-2-o.rempel@pengutronix.de>
-References: <20240822115939.1387015-1-o.rempel@pengutronix.de>
-	<20240822115939.1387015-2-o.rempel@pengutronix.de>
+	s=k20201202; t=1724690430;
+	bh=xoa5ywEc9w1JYj0npRfXyoOWYRdAqKl7kJePs+MAwfQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Ja+vYV3W6P6EKTNHzj+YUxI0jAYr0wNyplSdVDkAQip3DIRbUduxe+3OyiktQc/Y3
+	 BbPQZcRk8CEabbooDhFXbctQhOPPsqkN8kGT0hGjj1oCE5c/7PTfBRWtwa2blQpA1K
+	 mkjOuK7KsdQoPQDgNQ2caQ21ltBpOtrJqqlfV1W7WhLz0QIQmaM1pkOujSC7Dar3Hk
+	 G0UiZvYQT5mzmqJy8eSrmGWDMG1UDIL6NyruE3A7crRpwhHH9UK1sEcnZZ4wskJzL/
+	 mS5rlSkqX7TXg/oXdNds6lC/4a948jbFQ5anRCS0t+SAskIKEzvX5yA1bLHPH6AYSN
+	 td5WGF89eTARg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E733822D6D;
+	Mon, 26 Aug 2024 16:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v7] net: netconsole: selftests: Create a new
+ netconsole selftest
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172469043002.64426.14117097195096331772.git-patchwork-notify@kernel.org>
+Date: Mon, 26 Aug 2024 16:40:30 +0000
+References: <20240822095652.3806208-1-leitao@debian.org>
+In-Reply-To: <20240822095652.3806208-1-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ liuhangbin@gmail.com, petrm@nvidia.com, matttbe@kernel.org, shuah@kernel.org,
+ netdev@vger.kernel.org, dw@davidwei.uk, willemb@google.com,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
 
-On Thu, 22 Aug 2024 13:59:37 +0200 Oleksij Rempel wrote:
-> Introduce a set of defines for link quality (LQ) related metrics in the
-> Open Alliance helpers. These metrics include:
-> 
-> - `oa_lq_lfl_esd_event_count`: Number of ESD events detected by the Link
->   Failures and Losses (LFL).
-> - `oa_lq_link_training_time`: Time required to establish a link.
-> - `oa_lq_remote_receiver_time`: Time required until the remote receiver
->   signals that it is locked.
-> - `oa_lq_local_receiver_time`: Time required until the local receiver is
->   locked.
-> - `oa_lq_lfl_link_loss_count`: Number of link losses.
-> - `oa_lq_lfl_link_failure_count`: Number of link failures that do not
->   cause a link loss.
-> 
-> These standardized defines will be used by PHY drivers to report these
-> statistics.
+Hello:
 
-If these are defined by a standard why not report them as structured
-data? Like we report ethtool_eth_mac_stats, ethtool_eth_ctrl_stats,
-ethtool_rmon_stats etc.?
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 22 Aug 2024 02:56:39 -0700 you wrote:
+> Adds a selftest that creates two virtual interfaces, assigns one to a
+> new namespace, and assigns IP addresses to both.
+> 
+> It listens on the destination interface using socat and configures a
+> dynamic target on netconsole, pointing to the destination IP address.
+> 
+> The test then checks if the message was received properly on the
+> destination interface.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v7] net: netconsole: selftests: Create a new netconsole selftest
+    https://git.kernel.org/netdev/net-next/c/b494b1673889
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
