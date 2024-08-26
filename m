@@ -1,118 +1,107 @@
-Return-Path: <netdev+bounces-121802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E0CA95EC08
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:33:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B98695EC32
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:41:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14D4BB2622E
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:33:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAC03B209AF
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:41:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0591422DD;
-	Mon, 26 Aug 2024 08:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2731A13AD32;
+	Mon, 26 Aug 2024 08:41:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0Tw7hK1p"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QXJ5PEXi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950A614375D
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 08:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6166D73478
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 08:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724661065; cv=none; b=HDzQHxl9fcbD6DRkRUpxiiXOJjCJGq7sAkEi04+48u5mm4PFDGGtt503nXvptjZzSUGhUL920Vyf8oIxBYWNQgfoykDi6meTUnswWH6y8CW0Afdfy6Q6foagXoUn69/sNyiFMQ7ATuFuzLmwYFJo/c5U8MgTSqspGhrDMpTVpVY=
+	t=1724661676; cv=none; b=FMYnF4Xp28L0wp6hKvCT9kF3MvOj85XRjZHSdX1cwi1DlCxW52AnskCkdS3Vg+Fq0wtPqqCM4HYyZthhxsg6WQxBXXapa3/Ogyc1iFPrVzzgjVKNUSIBIa5vUBr+D40Z/YwtSKJx+mJaHB1Fs2Ctws/lsMmPoJ9AAGBVzMnvMKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724661065; c=relaxed/simple;
-	bh=FmO/rQ8nslR+oKdgtMfAsby3owAA7q7MTjhjMcsASk4=;
+	s=arc-20240116; t=1724661676; c=relaxed/simple;
+	bh=ZJqPV+M2ayctdGZHxpg+AofznRAfzm17VKe00rGKdUU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YnoTMIUoDFWlVMoh1arEMNWb2uPxYhKhJIS3UODZn6spExiwRPwxIzpwqAkjO3wUFYXUnpowlkFnzfvUCmezcWPEQSKpVunHJBLZKbdBPTknLlBOBkm6pqT5VFAZgi1ZMJuXqm4018n1ZDvr91/zuthM7TW6sqUM3x18JmotMCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0Tw7hK1p; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2f3f163e379so63785351fa.3
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 01:31:03 -0700 (PDT)
+	 To:Cc:Content-Type; b=oQaYPTUQI6HRBM5swwkjwZPiodT69Gbz1leZYOq1JCe7xgNGI8P+6DPqFEohaLIGpnfOcdKvlXHkrmIEOCzi8slXhQAj2LlC8pj2W3sKVpJLil08Y7p1e+7lgDi5vBmnDBMT0kixVpm3+TpeBxvRIaLpXySFyFUXmL+Of+JmhG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QXJ5PEXi; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2f3f07ac2dcso45666431fa.2
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 01:41:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724661062; x=1725265862; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1724661672; x=1725266472; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Qy8xc2n1NiOjlg7WCsliCKVK+AeuZUdbXfZJkxDQ/Fk=;
-        b=0Tw7hK1pPWQFWdY+BB7/zK459EQ8BcRNbssRLkCXdZnzlaiKHT11ydOHKwiIWf2Aw+
-         NmB80RQ/SY7Z7oFKIpaTOHwldjLajIoiT4X/zv4bSoNkWFzOzV63kBxMMdzArkFSfsAe
-         YCTeqqXSm/peRZ+JfJTQo2bpQ8EmSobdp+sKI1uQxot9naHyJqA2Rkd4HUvOlszT3Zg1
-         Uol0u+5zZTefFcf5hhXeTawsfV4h9NshjeeXyBl2PPq8l8HgavmJuJkRPq0IhYqoxMTc
-         l0Vs8aWmUsr01pKMHaQayudiF3DbHUvup1rQAmDNFT/VM0R7cXvJt6c+d1z4nq4aScN+
-         UL1A==
+        bh=ZJqPV+M2ayctdGZHxpg+AofznRAfzm17VKe00rGKdUU=;
+        b=QXJ5PEXimOZ13K98cB1Y/XAMdYH4RaTmfS5py/vw/c1EpBP3vuWDSuZ/nMvnJIw3mC
+         th9iepXjNaYdXhdsoQTIRbFQPeTnWJ9w0gSc8+bypMPrFqIAYgt8xPbHZ/Zx6A4xn/rn
+         Qa2oJ6jtE/GyZ/2LG+If+pNK+0yw1B4kGIf27Eu15WBiHnoggZ0s1DG8vbzIAXHzTDCC
+         koN3voYr7wc997LIDXTOCa7wNhdEuIDByWc53MdoE7VNja8oCF3mZoieIvmFO/jm+PrC
+         +Hu86PSoFs9hxZu1OZPqurQkKDezFdJkn6tfbYzd45OJKUSX7yaea0Vs8ejhvAOqepA7
+         WukQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724661062; x=1725265862;
+        d=1e100.net; s=20230601; t=1724661672; x=1725266472;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Qy8xc2n1NiOjlg7WCsliCKVK+AeuZUdbXfZJkxDQ/Fk=;
-        b=YDMeUUnX+QzK1NQ4ViBE852O0qzqtkESqH8ypfuBnm39BdXqR2UaJR1FjQC/UvVodf
-         Y7dD/g2KTjP9bZypeoUzZDIpy63pfYmb8Qin/HHaZFtehPG/WQiXpaIqWM+ggL8K0AC4
-         IR6qF7xMiytYtOBhUPDcCZC/QO7j4gQJCzhrhdCnFJnRetih+h1UYlNq71VUgaIJQEnr
-         Rt44t6b8gIe0FReCA7swTXBm8kEV4g3tBpqmVS+MCqD2gUBnoco6oQUh7q5YdjuY9JD5
-         qkO3kFh4+57D8H2PhxMZIyamedu4dcLleZpynoP881D/4kY1udptYuYcnCctm3GoKWN1
-         H+oQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUuJZjzmLMnUoQcXbP4EqZzuin8fD2dH9SK1sSsL/Y4tjHnPh0rrmXy3VMkSuQO9+3ENz1nWcM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrLNcitQTWcLzndnkz0I3hEHdAjtqHiXoLqJs/TDI+Ezt6izKJ
-	SjXq9TiPmSOqTtp/QDk/nQ73eaK6dOVgb56SrVZFcsbn8B1NH2iWU82ApTxeULPPokHt7LnovsX
-	VzwTaxxB2Qx67QhHySF7dHC/Y9byi47BNvM1A
-X-Google-Smtp-Source: AGHT+IGmZksM6iQAi5YQXg9R5d38fvbtn38gX6iCvgAv/dGfJPVgkwD8f4bi3UPxC4a0k4iidLShjs/3BEpMJs5lAp0=
-X-Received: by 2002:a2e:b704:0:b0:2ef:2905:f36d with SMTP id
- 38308e7fff4ca-2f4f5750715mr63986461fa.16.1724661061021; Mon, 26 Aug 2024
- 01:31:01 -0700 (PDT)
+        bh=ZJqPV+M2ayctdGZHxpg+AofznRAfzm17VKe00rGKdUU=;
+        b=qA+JKgzwKc3xsatjAdG9BymGPdG0a23FPBJ1VyqZijKqJmybuQRF/3JmS7244O+LUG
+         K5cFZB1Y1PaGB1OdHnFDBIhfa/ANkuzfu1qCdIdPKzN0NE9OxUk9/nSaTyzd2fhrFLHt
+         4ty6hxMNPRi32+rK77zklIOHDMjxSiJSWkVU/xOw8g2QJo776DFAAV+DD8OlJ3yc3Tya
+         1saiaL5XtpeLKjD1XxDR2ipD6OTAFzZAMOSfJWmLHU5j7xSYP1V/5cY+lj7naPE0v9nN
+         g0FdjsxEPEX60LapHv6VmVYfqllWomtL4HV37dp8Uk/K8r2rkznffBVI4UwTs74wFagM
+         O6Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCVT2X7YVlXO/7+jaxPo8+x0MvIdJOIKag4pX8HczZrTotZaqkOp3qDf29zdk+LCQrLRtrHhTZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8ZAt6b586yzHffgY1Pg0bJKFXUZLXCC8fipMHzGxf98AawnIX
+	tA8S0jEguaXc0E3gTptYemWCIJSIzVa7S3BCQvtXz2VKbOQ6UWoaSh3UNd+n7TsC2fOjzpa6tDG
+	VNKdBdmghv2KdFnzvcxjpPSNk0PjaBCRUe7lajA==
+X-Google-Smtp-Source: AGHT+IF1xip2LZYxVRH8VpdWfcRa9uK7A6loLJRPHfWQskmDHQEUYxjPeikly02OaJhz/cUtMMvnXB3y1yNyya30do4=
+X-Received: by 2002:a05:6512:3c85:b0:533:966:72cb with SMTP id
+ 2adb3069b0e04-5343885f659mr6807476e87.48.1724661671918; Mon, 26 Aug 2024
+ 01:41:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <tencent_155F5603C098FE823F48F8918122C3783107@qq.com>
-In-Reply-To: <tencent_155F5603C098FE823F48F8918122C3783107@qq.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 26 Aug 2024 10:30:50 +0200
-Message-ID: <CANn89iKWsCTYPzB4wuEWbU5sjABThsTBPtpoEcE4h=AfPQm40w@mail.gmail.com>
-Subject: Re: [PATCH] net: Remove a local variable with the same name as the parameter.
-To: jiping huang <huangjiping95@qq.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240822084733.1599295-1-frank.li@vivo.com> <20240822084733.1599295-4-frank.li@vivo.com>
+In-Reply-To: <20240822084733.1599295-4-frank.li@vivo.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 26 Aug 2024 10:41:00 +0200
+Message-ID: <CACRpkdb-MKYAcWA5KUDZ=oeREs86S68WjqzS9XRTrUbBhLbBtQ@mail.gmail.com>
+Subject: Re: [net-next 3/9] net: ethernet: cortina: Convert to devm_clk_get_enabled()
+To: Yangtao Li <frank.li@vivo.com>
+Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com, 
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, ulli.kroll@googlemail.com, marcin.s.wojtas@gmail.com, 
+	linux@armlinux.org.uk, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	mcoquelin.stm32@gmail.com, hkallweit1@gmail.com, justinstitt@google.com, 
+	kees@kernel.org, u.kleine-koenig@pengutronix.de, jacob.e.keller@intel.com, 
+	horms@kernel.org, shannon.nelson@amd.com, linux-renesas-soc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 26, 2024 at 9:42=E2=80=AFAM jiping huang <huangjiping95@qq.com>=
- wrote:
->
-> There is no need to use an additional local avariable to get rtmsg.flags,
-> and this variable has the same name as the function argument.
->
-> Signed-off-by: jiping huang <huangjiping95@qq.com>
->
-> diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-> index f669da98d11d..0d69267c9971 100644
-> --- a/net/ipv4/fib_semantics.c
-> +++ b/net/ipv4/fib_semantics.c
-> @@ -1830,12 +1830,10 @@ int fib_dump_info(struct sk_buff *skb, u32 portid=
-, u32 seq, int event,
->
->         if (nhs =3D=3D 1) {
->                 const struct fib_nh_common *nhc =3D fib_info_nhc(fi, 0);
-> -               unsigned char flags =3D 0;
->
-> -               if (fib_nexthop_info(skb, nhc, AF_INET, &flags, false) < =
-0)
-> +               if (fib_nexthop_info(skb, nhc, AF_INET, &rtm->rtm_flags, =
-false) < 0)
->                         goto nla_put_failure;
->
-> -               rtm->rtm_flags =3D flags;
->  #ifdef CONFIG_IP_ROUTE_CLASSID
->                 if (nhc->nhc_family =3D=3D AF_INET) {
->                         struct fib_nh *nh;
+On Thu, Aug 22, 2024 at 10:32=E2=80=AFAM Yangtao Li <frank.li@vivo.com> wro=
+te:
 
-Wrong patch, please read fib_nexthop_info(), it does not clear *flags at en=
-try.
+> Convert devm_clk_get(), clk_prepare_enable() to a single
+> call to devm_clk_get_enabled(), as this is exactly
+> what this function does.
+>
+> Signed-off-by: Yangtao Li <frank.li@vivo.com>
+
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
 
