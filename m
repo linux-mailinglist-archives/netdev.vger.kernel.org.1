@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-121757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E7695E652
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:33:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 433E395E65E
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:39:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9775A1C208D3
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 01:33:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2356B20A8D
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 01:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3816E321D;
-	Mon, 26 Aug 2024 01:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F134A33;
+	Mon, 26 Aug 2024 01:39:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zpG3rq55"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="39JaQrrj"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C658479;
-	Mon, 26 Aug 2024 01:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0142579DE;
+	Mon, 26 Aug 2024 01:39:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724635977; cv=none; b=CPrM1BvPi0ug+gNm04DNoRhQMg1hCYaUzRU3GPGvnSaXRgCmehi9aZBxiGfu7NqpiPgNZRB3TYBuG/maG3qBMQX5MRde+kUjtYvlUB9rPxPaXzk8BALD5z3mCMqQPnigKGSGD4Sbusv6jKUST69nQvVUk06BfgJVEAPoPv1UqB0=
+	t=1724636367; cv=none; b=I+81WJV4b+K9gUvpN4IamRiqnpdcqqdIAX+8gpPgOGyA7OWNX016whB+M8IFTf2pcft10R7u1nOehcRiWWZbepAD+eQKQJmAF6F+mDBC26W5p6IABtId8izCkaH3/xlzOJGzxywdB9HjOzSMOY13bFGm1myXn9JO68+Sovitny4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724635977; c=relaxed/simple;
-	bh=t8hRP68zdxXnXm09FgZ7FOl2XrKJUXBEPmuPYRNHkIk=;
+	s=arc-20240116; t=1724636367; c=relaxed/simple;
+	bh=DDQ2LNUmjSwJeicc7GRFEpLUweO6ZSNXBJdV7ZtL1fA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tv9Pnb3Bqk7kizFHkQeOD3RvNaeWOxC/Nc00CDggzyFS7K9Y0q0kFMsDkhd8EZ5vp/7e3nQF+vUhSV+cw+MzillwJH5gMBHvVTU1grPw1IdoEtqgd8d3Nd7m0CaFscdAWpFowK1iDRPiKah4S+2dc8zTbxP9jhZGKuBhTF4m/qM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zpG3rq55; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=DObcyU+ZDcKLIPjFG2J0qYqFWBp8IRh5zytrvvnpffhYXD+1QeMo/AITOw5HJdx4maYzYynBG4CRfZpidieXFDRUSTwOyGK2LWLUnCIhvFwaT2NJ21ioz/11Xvr/FVFzDgdWTpdZ8eAYPaOO+mggzfhSwbc61/MFgQh8FLjBpA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=39JaQrrj; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,25 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=iRPPPGtfVs0dJvN9gXSb9zXS+OUUNcHsGhUAGPwaDQk=; b=zpG3rq55OLuVUrDh/GWPCJKAyE
-	wYTUo6xl4G+ks5VoqN46M4fP757ENmmWGMhJWpLUXx0DQKGhRkLM/cfO2aa4UoLXemtA2W2xka3yG
-	F2mlnfk504T24ZXmLOStZOIda7IUcqPCajMC7Gitnj4sKXUmeXtxJbYJ3FlitpLC+S7E=;
+	bh=TAqqfpChX+rpsFH7rbwBifApMliSEsLD2ZHYJcTWevI=; b=39JaQrrjz2LgJk7/zCkRIkc5HO
+	LG8U4qq2GLjQNX6t2gXcNufqSbQOYkfIYYhx6ph4G79xtyKbXTEAc16dmQRz6jkDSWfQe++uWVCvb
+	je6LPJmLUdApRLwTZzo6pv1w0z2ilfQWgpJvsSng+mrl7Q2PEqhOTuc72S5jQ+VH7YHE=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1siOaw-005fBD-Oa; Mon, 26 Aug 2024 03:32:34 +0200
-Date: Mon, 26 Aug 2024 03:32:34 +0200
+	id 1siOhN-005fCl-C0; Mon, 26 Aug 2024 03:39:13 +0200
+Date: Mon, 26 Aug 2024 03:39:13 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: andi.shyti@kernel.org, jarkko.nikula@linux.intel.com,
-	andriy.shevchenko@linux.intel.com, mika.westerberg@linux.intel.com,
-	jsd@semihalf.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, rmk+kernel@armlinux.org.uk,
-	piotr.raczynski@intel.com, linux-i2c@vger.kernel.org,
-	netdev@vger.kernel.org, mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com
-Subject: Re: [PATCH net 0/3] Add I2C bus lock for Wangxun
-Message-ID: <888f78a9-dea9-4f66-a4d0-00a57039733d@lunn.ch>
-References: <20240823030242.3083528-1-jiawenwu@trustnetic.com>
+To: Divya Koppera <Divya.Koppera@microchip.com>
+Cc: arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
+	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/2] net: phy: Add phy library support to
+ check supported list when autoneg is enabled
+Message-ID: <72392868-2811-4726-ae48-cede62f9b45e@lunn.ch>
+References: <20240821055906.27717-1-Divya.Koppera@microchip.com>
+ <20240821055906.27717-2-Divya.Koppera@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,16 +62,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240823030242.3083528-1-jiawenwu@trustnetic.com>
+In-Reply-To: <20240821055906.27717-2-Divya.Koppera@microchip.com>
 
-On Fri, Aug 23, 2024 at 11:02:39AM +0800, Jiawen Wu wrote:
-> Sometimes the driver can not get the SFP information because the I2C bus
-> is accessed by the firmware at the same time.
+On Wed, Aug 21, 2024 at 11:29:05AM +0530, Divya Koppera wrote:
+> From: Divya Koppera <divya.koppera@microchip.com>
+> 
+> Adds support in phy library to accept autoneg configuration only when
+> feature is enabled in supported list.
+> 
+> Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
 
-Please could you explain this some more. What firmware?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-There some registers which are clear on read. They don't work when you
-have multiple entities reading them.
-
-	Andrew
+    Andrew
 
