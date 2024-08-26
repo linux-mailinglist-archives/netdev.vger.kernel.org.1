@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-121749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD2A495E5B5
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 01:29:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 829D595E633
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:17:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EB002812A8
-	for <lists+netdev@lfdr.de>; Sun, 25 Aug 2024 23:29:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4097B208FB
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 01:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAAC16BFC7;
-	Sun, 25 Aug 2024 23:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F084A7F9;
+	Mon, 26 Aug 2024 01:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="isy9xSiw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="oMOxCCUU"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD203987D;
-	Sun, 25 Aug 2024 23:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9315A7E6
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 01:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724628555; cv=none; b=W2vBzdlLn1KldltdoCNJ6zJyZVdVCNynETFiATdABMCCTo6qnA+7hDikVK1zTWGRJ7OFP2ftuf17pEaX6EQ/lun+yHdvj9B6rQ6H0CmOo6tFnRpPN0bcmNBjE6LWUiUVLU7xaySrHnp/MlItbOrM3JPnCtuN7hlVfzfCu0BpYMI=
+	t=1724635053; cv=none; b=f0gPA9c2x2iwqoGkPTB2429VwZElQi9h6Z6IwrsTyIWcMI9BPvFI+Sz2AOs7W3HG2dS+Rg8YVHgCWnDwkbPVglele4ccR2wyOLzWWqIyYzgJ4fKl1OceUfCYVEvbsYGMa3hvik4lm3HcDw3PB54n+UbCJWPMGZLlf/aZr9Z6Nyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724628555; c=relaxed/simple;
-	bh=/0kV2KvRQj7gYmrQ25xC5+gQ1yI8WEI2KA7WLBk2tcI=;
+	s=arc-20240116; t=1724635053; c=relaxed/simple;
+	bh=p7Tee/Ji5ijAKdKtrzAw1OUDlgCq2Ci4Ig5q/wbpdtM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Is+vx/TZksaUTww4MnFb4gSU5/3H0dTZKuI+nmb7omyVx9Twv7ktagTqgvE6YK/GKBe5nH/q6fyIZpWDIEXPBhjpcuDq04DCLJix8R/tg78n7DTSqc5pSfSQCBTO4XzR8bkjZJexE8aZPcCE9DXVPj20UoQAQg4wPsG4Pb72fCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=isy9xSiw; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=CTLmLD+b7pHAl1qfHY0VeO5B+1llDWScHjws22m3AQHqxjyFgvEfjqpS6gnef0fVkcKwxIM/9h+V47A03CtnxZGrOjmHZ9A1u+2Y6sCoVy6hgmg4RLnIxClq1STtYzoMT2nRHh0oxDf8fvD+1Vbh/wXgwFkVkgyx2NZaYre1a1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=oMOxCCUU; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,27 +36,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=/VNzMLPggM5KWfh9zESfXylqyB6nhMdOi1C2TagrgtU=; b=isy9xSiwcOu8VCkugyBCT0BL0n
-	wnd844Nd2la+kYnglinmGQlG+JlKtFxGwrrLxJJLb97SWRcYkQsYMcGJaj77XWvNkkxM6BeAanVN8
-	00BR3p+KMYErj4BRmvfv8UqEb4/QYnqs9+8Y93U5+ZYFCCSAmoS9DnlkiH311LY3Sim8=;
+	bh=UVFoj9iWs2Nz14Ij9zLSbgrtVKStFKulZZW9jVhdQiE=; b=oMOxCCUU2Zk/wzQBLhUCgOzgau
+	EoP+kvyP/DAy5W7F5gqhNmtXhYQW3yZLw3g5HhdaIoytMoiL+OyZh7KyA+/i8vfG+MhU8Yc9h6wGo
+	P6LAreOIa7ezavJOlXrzQR5Nm/i7X3g+FQgdBR8fqrrYg/MBr0/0QNpvVvRFV15hqzNA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1siMf8-005evj-U6; Mon, 26 Aug 2024 01:28:46 +0200
-Date: Mon, 26 Aug 2024 01:28:46 +0200
+	id 1siOMF-005f6H-2c; Mon, 26 Aug 2024 03:17:23 +0200
+Date: Mon, 26 Aug 2024 03:17:23 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, f.fainelli@gmail.com,
-	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next] net: dsa: Simplify with scoped for each OF child
- loop
-Message-ID: <af8c128a-ff6c-4441-9ab5-c0401900db76@lunn.ch>
-References: <20240820065804.560603-1-ruanjinjie@huawei.com>
- <20240821171817.3b935a9d@kernel.org>
- <2d67e112-75a0-3111-3f3a-91e6a982652f@huawei.com>
- <20240822075123.55da5a5a@kernel.org>
- <0d2ac86a-dc01-362a-e444-e72359d1f0b7@huawei.com>
+To: Hans-Frieder Vogt <hfdevel@gmx.net>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>
+Subject: Re: [PATCH net-next 1/2] net: phy: aquantia: create firmware name
+ for aqr PHYs at runtime
+Message-ID: <d0a46a2a-af5c-4616-a092-a9b65a1e15e2@lunn.ch>
+References: <trinity-916ed524-e8a5-4534-b059-3ed707ec3881-1724520847823@3c-app-gmx-bs42>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,41 +61,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0d2ac86a-dc01-362a-e444-e72359d1f0b7@huawei.com>
+In-Reply-To: <trinity-916ed524-e8a5-4534-b059-3ed707ec3881-1724520847823@3c-app-gmx-bs42>
 
-On Fri, Aug 23, 2024 at 02:35:04PM +0800, Jinjie Ruan wrote:
-> 
-> 
-> On 2024/8/22 22:51, Jakub Kicinski wrote:
-> > On Thu, 22 Aug 2024 10:07:25 +0800 Jinjie Ruan wrote:
-> >> On 2024/8/22 8:18, Jakub Kicinski wrote:
-> >>> On Tue, 20 Aug 2024 14:58:04 +0800 Jinjie Ruan wrote:  
-> >>>> Use scoped for_each_available_child_of_node_scoped() when iterating over
-> >>>> device nodes to make code a bit simpler.  
-> >>>
-> >>> Could you add more info here that confirms this works with gotos?
-> >>> I don't recall the details but I thought sometimes the scoped
-> >>> constructs don't do well with gotos. I checked 5 random uses
-> >>> of this loop and 4 of them didn't have gotos.  
-> >>
-> >> Hi, Jakub
-> >>
-> >> From what I understand, for_each_available_child_of_node_scoped() is not
-> >> related to gotos, it only let the iterating child node self-declared and
-> >> automatic release, so the of_node_put(iterating_child_node) can be removed.
-> > 
-> > Could you either test it or disasm the code to double check, please?
-> 
-> Hi, Jakub, I test it with a fake device node on QEMU with a simple
-> example using for_each_available_child_of_node_scoped() and goto out of
-> the scope of for_each_available_child_of_node_scoped(), the
-> of_node_put(child) has been called successfully.
+> +/* derive the filename of the firmware file from the PHY and the MDIO names
+> + * Parts of filename:
+> + *   mdio/phy-mdio_suffix
+> + *    1    2   3    4
+> + * allow name components 1 (= 3) and 2 to have same maximum length
+> + */
+> +static int aqr_firmware_name(struct phy_device *phydev, const char **name)
+> +{
+> +#define AQUANTIA_FW_SUFFIX "_fw.cld"
+> +#define AQUANTIA_NAME "Aquantia "
+> +/* including the trailing zero */
+> +#define FIRMWARE_NAME_SIZE 64
+> +/* length of the name components 1, 2, 3 without the trailing zero */
+> +#define NAME_PART_SIZE ((FIRMWARE_NAME_SIZE - sizeof(AQUANTIA_FW_SUFFIX) - 2) / 3)
+> +	ssize_t len, mac_len;
+> +	char *fw_name;
+> +	int i, j;
+> +
+> +	/* sanity check: the phydev drv name needs to start with AQUANTIA_NAME */
+> +	if (strncmp(AQUANTIA_NAME, phydev->drv->name, strlen(AQUANTIA_NAME)))
+> +		return -EINVAL;
+> +
+> +	/* sanity check: the phydev drv name may not be longer than NAME_PART_SIZE */
+> +	if (strlen(phydev->drv->name) - strlen(AQUANTIA_NAME) > NAME_PART_SIZE)
+> +		return -E2BIG;
+> +
+> +	/* sanity check: the MDIO name must not be empty */
+> +	if (!phydev->mdio.bus->id[0])
+> +		return -EINVAL;
 
-What compiler version?
+I'm not sure how well that is going to work. It was never intended to
+be used like this, so the names are not going to be as nice as your
+example.
 
-Please test with 5.1
+apm/xgene-v2/mdio.c:	snprintf(mdio_bus->id, MII_BUS_ID_SIZE, "%s-mii", dev_name(dev));
+apm/xgene/xgene_enet_hw.c:	snprintf(mdio_bus->id, MII_BUS_ID_SIZE, "%s-%s", "xgene-mii",
+hisilicon/hix5hd2_gmac.c:	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-mii", dev_name(&pdev->dev));
+intel/ixgbe/ixgbe_phy.c:	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-mdio-%s", ixgbe_driver_name,
 
-https://www.kernel.org/doc/html/next/process/changes.html
+I expect some of these IDs contain more than the MAC, eg. include the
+PCI slot information, or physical address of the device. Some might
+indicate the name of the MDIO controller, not the MAC.
+
+Aquantia PHYs firmware is not nice. It contains more than firmware. I
+think it has SERDES eye information. It also contain a section which
+sets the reset values of various registers. It could well be, if you
+have a board with two MACs and two PHYs, each needs it own firmware,
+because it needs different eye information. So what you propose works
+for your limited use case, but i don't think it is a general solution.
+
+Device tree works, because you can specific a specific filename per
+PHY. I think you need a similar solution. Please look at how txgbe
+uses swnodes. See if you can populate the firmware-name node from the
+MAC driver. That should be a generic solution.
 
 	Andrew
 
