@@ -1,88 +1,86 @@
-Return-Path: <netdev+bounces-121759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7D9495E666
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:41:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D49895E670
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:48:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 858E5281165
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 01:41:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10EDA281318
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 01:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 824EB5C96;
-	Mon, 26 Aug 2024 01:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 173074C96;
+	Mon, 26 Aug 2024 01:48:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mXdr6Rlm"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29256944E;
-	Mon, 26 Aug 2024 01:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7329E23C9;
+	Mon, 26 Aug 2024 01:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724636483; cv=none; b=RcBYvMETJH3FyFiX6DM3CaZ/w6HeZgcWlo4qdYXiyWJQJWoKX+Aec+BwXgVY5D/3J9S0dEwGK2Hm5D6gsBA5/H2ZZ6OnvbsSc9roIb2bv1m0pVchFruqlitm/sr5t9aZMjb40EO+Aszrz17oduUGUeLJWqTwuWD1F1aQiZgBOIg=
+	t=1724636925; cv=none; b=GxBdIHEYttr5QdyMzvsbeSaNfrq9mRL+TdKYyWXwgXP+Xd1Ck1UEBUHichiXS4Ooa9LZO8itawEizgAopKuxpYEDqdETZe30Rlx0b9Z23nD51Nx7jr49I9sJXKAmzCM4SCzvpQTANN5+759t727BnSdo0J3sgInDRjbYohRUTgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724636483; c=relaxed/simple;
-	bh=8zbjCEgdV6fhEoaaYvHPaRiZ+yjWio9aoO+Kg7FTDyU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=NmpFijVN8t4RVWccxkKErfd5lyiugBOcUglQqU6YrlrQZWujzPkHiXtmvJ4iMqfW3KMfauFoLDGGOZRtOSMcH7+FiJN2GUAZ0NN70xPByWk3HEmAPTQmjE7VDhnG8LWACsz1acenlQsLspXqJm3ZPAX1e7WEwqIzfckgQPPumps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WsYGK1DcQz1HHJn;
-	Mon, 26 Aug 2024 09:38:01 +0800 (CST)
-Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4FB1A140135;
-	Mon, 26 Aug 2024 09:41:18 +0800 (CST)
-Received: from [10.67.111.104] (10.67.111.104) by
- dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 26 Aug 2024 09:41:18 +0800
-Message-ID: <e81473b2-174a-4ca1-ad66-2da98a513fcf@huawei.com>
-Date: Mon, 26 Aug 2024 09:41:17 +0800
+	s=arc-20240116; t=1724636925; c=relaxed/simple;
+	bh=IFpIjq7M4Q8HeW5xUDg2Mnv7OtXsD56oTLv+w/F+s04=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A6HTE0yQAfT2s49PRL1T/zVV1j1qABJ8Tlaz2nkFnmPBmyodEo5yHrlY7x2FS/KOHHn6aTpYr9x4DlghxvX2kz55y8MJAIo0RJKEL5+y/0vHEShh9h2bWFf1uJuWWPsc1IY01/JFcw/I0jCw7ANDSYWUqTJI7ImBexC0Qeykb3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mXdr6Rlm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=iv6ZEUuPPqeOj8zp4uUVvcR1G/kNOJR6TPjSTE0A0Eg=; b=mX
+	dr6RlmAgSezIxhXPY1aayBO0uRGpArjLeF6sACQPASjHPD8v4kQLI3PbIlXtOJ3fSBSAwgDAtApa/
+	0yHr8iHZI/XuKlK65/scrLyh4ksw8AUNjt8kwIqQBquFqJfoQbxl5pxZgTee+j6mP2LB3lKEF5cht
+	2NPQFr6ggugHuw4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1siOqK-005fFg-NM; Mon, 26 Aug 2024 03:48:28 +0200
+Date: Mon, 26 Aug 2024 03:48:28 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Carlos Bilbao <cbilbao@digitalocean.com>
+Cc: eli@mellanox.com, mst@redhat.com, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, dtatulea@nvidia.com,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	eperezma@redhat.com, sashal@kernel.org, yuehaibing@huawei.com,
+	steven.sistare@oracle.com
+Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
+Message-ID: <d9695755-c0e6-4bbd-af5a-9fc78fac4512@lunn.ch>
+References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 7/8] net/rxrpc: Use min() to simplify the code
-To: David Howells <dhowells@redhat.com>
-CC: <johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <allison.henderson@oracle.com>,
-	<dsahern@kernel.org>, <pshelar@ovn.org>, <linux-wireless@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <rds-devel@oss.oracle.com>, <dccp@vger.kernel.org>,
-	<dev@openvswitch.org>, <linux-afs@lists.infradead.org>
-References: <20240824074033.2134514-8-lihongbo22@huawei.com>
- <20240824074033.2134514-1-lihongbo22@huawei.com>
- <563923.1724501215@warthog.procyon.org.uk>
-Content-Language: en-US
-From: Hongbo Li <lihongbo22@huawei.com>
-In-Reply-To: <563923.1724501215@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpeml500022.china.huawei.com (7.185.36.66)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
 
-
-
-On 2024/8/24 20:06, David Howells wrote:
-> Hongbo Li <lihongbo22@huawei.com> wrote:
+On Fri, Aug 23, 2024 at 11:54:13AM -0500, Carlos Bilbao wrote:
+> Hello,
 > 
->> -	summary.ack_reason = (sp->ack.reason < RXRPC_ACK__INVALID ?
->> -			      sp->ack.reason : RXRPC_ACK__INVALID);
->> +	summary.ack_reason = min(sp->ack.reason, RXRPC_ACK__INVALID);
+> I'm debugging my vDPA setup, and when using ioctl to retrieve the
+> configuration, I noticed that it's running in half duplex mode:
 > 
-> Can you use umin() rather than min(), please?
-> I see reason is u8, may I use min_t(u8, sp->ack.reason, RXRPC_ACK__INVALID);
+> Configuration data (24 bytes):
+>   MAC address: (Mac address)
+>   Status: 0x0001
+>   Max virtqueue pairs: 8
+>   MTU: 1500
+>   Speed: 0 Mb
+>   Duplex: Half Duplex
 
-Thanks,
-Hongbo
+If the speed is 0, does duplex even matter?
 
-> Thanks,
-> David
-> 
-> 
+	Andrew
 
