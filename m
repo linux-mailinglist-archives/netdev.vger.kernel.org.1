@@ -1,89 +1,118 @@
-Return-Path: <netdev+bounces-122034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B40295FA03
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 21:54:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8119295FA19
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 21:56:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 101F8283543
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:54:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD8E51C22355
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:56:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA73A137747;
-	Mon, 26 Aug 2024 19:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E76E19922D;
+	Mon, 26 Aug 2024 19:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rKRZgEPC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HXaV5LWE"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D133B54648;
-	Mon, 26 Aug 2024 19:54:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F47E54648;
+	Mon, 26 Aug 2024 19:56:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724702061; cv=none; b=cstMxva6WSPl0rPKFo3b/UiiCdGCAh5x1L0aVbEn/WIJC9wFHLLF/89620OjNK6xuzCKKp5TIWrtVLn7A8qJ24/vfhn+b13zou3vbvNsbaO96W1ekK+Mrb9LckVKcapzuu94J9oBXgX7P1cP6ML+jPfMT9oaG/oEQZpLM6tAso0=
+	t=1724702161; cv=none; b=TpTKgn3BxD5JIFevZLTFfEUrYZWg/hoKOnE7+T0I0nnx43Gt/EZMbwPrf/dMJ8yYvlR8sRu+Hy59KZvHuZ6Rr2qNaYQN20W13dDRWUaOitUB/GTJEP5lyxtUuc71GXl/AJUsvbRAYB1s386x9CK1XBRCH5tROOGJLiL1SVA98Jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724702061; c=relaxed/simple;
-	bh=gI6Ai6tK6P2zKG+d+WGllCJ/go1LWJsX4G1SD0aWtmo=;
+	s=arc-20240116; t=1724702161; c=relaxed/simple;
+	bh=wGxjIAFTwaejtggHWXZuDgCwxLBZTkCB+uUES7gFwb8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jcRz4vdy2LBK9AyOJm/6cC8rcbocjag629RmL2l289iQW+s29gRWYS7j7jLV5zyhKyW42puW4ALKc4vybf5nY8KORRv6NF2gsYEXqPDV8PjR4h/tLTMMEs7SJcHsAQM/qq1IOfxWLgLL8woc8rIsp4x1MiYgXjBVeTEgEUChPZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rKRZgEPC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=/QiKW2jfX5LgbNLp/PHj7gfqW4+wB7HG58cvQMcO79A=; b=rK
-	RZgEPChUylo0rhPv37bae2GP5Dy5zImY63Dua9rETMNkAp57QBGCSi05XsospOXEFy3LHryOJjaDC
-	ZymqrVMFTcUCXYRluzQ0vnqUvMnYK4Corpl3c7YRL8I1nuq337NwhBulF7V0RbDH79N6wwfuHP5HY
-	MN/yz587x85XB1o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sifmz-005kAm-0f; Mon, 26 Aug 2024 21:54:09 +0200
-Date: Mon, 26 Aug 2024 21:54:09 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	linux@armlinux.org.uk, linux-kernel@vger.kernel.org,
-	o.rempel@pengutronix.de
-Subject: Re: [PATCHv3 net-next] net: ag71xx: get reset control using devm api
-Message-ID: <19b708fa-b0e0-4124-8f3b-51a9f50eb2a9@lunn.ch>
-References: <20240824181908.122369-1-rosenp@gmail.com>
- <20240826095900.0f8f8c89@kernel.org>
- <CAKxU2N8wJkw2zZXkvAF1SOt+La5Kcqyk7f2s+S-JhgMdfNLjQA@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MQaDNyKY2/KVdUgNu4RDJIi1QTmzGADTdmymP0kQwU2fcX2EFVQmrlGXrgjgGd4T4ITwow+IZzxTiDADiiwBvfvy1ZQSIpXDTkYE460fTS0QF7sb5NEpr+A3CY6g7ghViZPT/+6wKTH9QTLwxP12iFYKqCQayitDjgkrOjwr3Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HXaV5LWE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC7F3C4FE89;
+	Mon, 26 Aug 2024 19:56:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724702161;
+	bh=wGxjIAFTwaejtggHWXZuDgCwxLBZTkCB+uUES7gFwb8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HXaV5LWEmT/LQFxPV7jriO64KkTHVHIDB+Kh84aqyOUbOqdBKinLhWxW7v30qsDfi
+	 T1XDZPsseN1rThL7/E6jaosenWAA941LR77fR1KqQSBL7C6sy9olEfqnDDVUBND/Xu
+	 qbtrUfkB/B0RVU5r96622EogXGyMd6kHDIdGGPCWKXmiK3hz8J83yXiG+m+CLsF0IO
+	 fHMMNJUru2Lzj0DGZKkW71Pt0K+Z4XHFz1qG079OoRWkmU2EzpPlbQnUR2g+nB2mnX
+	 sYPXL7gCe9ZdWxuDBNve0okHBMc7z9hIGnFaPMOXnULU1tNDg1eMBG5GM4mZ24K9jZ
+	 P/ZDbLRuoCqQw==
+Date: Mon, 26 Aug 2024 12:56:00 -0700
+From: Kees Cook <kees@kernel.org>
+To: Kaixiong Yu <yukaixiong@huawei.com>
+Cc: akpm@linux-foundation.org, mcgrof@kernel.org,
+	ysato@users.sourceforge.jp, dalias@libc.org,
+	glaubitz@physik.fu-berlin.de, luto@kernel.org, tglx@linutronix.de,
+	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+	viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz,
+	j.granados@samsung.com, willy@infradead.org,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, lorenzo.stoakes@oracle.com,
+	trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
+	jlayton@kernel.org, neilb@suse.de, okorniev@redhat.com,
+	Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	paul@paul-moore.com, jmorris@namei.org, linux-sh@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org, linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org, linux-security-module@vger.kernel.org,
+	wangkefeng.wang@huawei.com
+Subject: Re: [PATCH -next 12/15] fs: dcache: move the sysctl into its own file
+Message-ID: <202408261253.D155EA0@keescook>
+References: <20240826120449.1666461-1-yukaixiong@huawei.com>
+ <20240826120449.1666461-13-yukaixiong@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKxU2N8wJkw2zZXkvAF1SOt+La5Kcqyk7f2s+S-JhgMdfNLjQA@mail.gmail.com>
+In-Reply-To: <20240826120449.1666461-13-yukaixiong@huawei.com>
 
-On Mon, Aug 26, 2024 at 12:26:30PM -0700, Rosen Penev wrote:
-> On Mon, Aug 26, 2024 at 9:59 AM Jakub Kicinski <kuba@kernel.org> wrote:
-> >
-> > On Sat, 24 Aug 2024 11:18:56 -0700 Rosen Penev wrote:
-> > > -     struct reset_control *mdio_reset;
-> > >       struct clk *clk_mdio;
-> > >  };
-> >
-> > If you send multiple patches which depend on each other they must be
-> > part of one series. I'll apply the clk_eth patch shortly but you gotta
-> > resend this one, our CI couldn't apply and test it.
-> Isn't the CI x86 only?
+On Mon, Aug 26, 2024 at 08:04:46PM +0800, Kaixiong Yu wrote:
+> The sysctl_vfs_cache_pressure belongs to fs/dcache.c, move it to
+> its own file from kernel/sysctl.c. As a part of fs/dcache.c cleaning,
+> sysctl_vfs_cache_pressure is changed to a static variable, and export
+> vfs_pressure_ratio with EXPORT_SYMBOL_GPL to be used by other files.
+> And move the unneeded include(linux/dcache.h).
+> 
+> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
+> ---
+>  fs/dcache.c            | 21 +++++++++++++++++++--
+>  include/linux/dcache.h |  7 +------
+>  kernel/sysctl.c        |  9 ---------
+>  3 files changed, 20 insertions(+), 17 deletions(-)
+> 
+> diff --git a/fs/dcache.c b/fs/dcache.c
+> index 1af75fa68638..8717d5026cda 100644
+> --- a/fs/dcache.c
+> +++ b/fs/dcache.c
+> @@ -73,8 +73,13 @@
+>   * If no ancestor relationship:
+>   * arbitrary, since it's serialized on rename_lock
+>   */
+> -int sysctl_vfs_cache_pressure __read_mostly = 100;
+> -EXPORT_SYMBOL_GPL(sysctl_vfs_cache_pressure);
+> +static int sysctl_vfs_cache_pressure __read_mostly = 100;
+> +
+> +unsigned long vfs_pressure_ratio(unsigned long val)
+> +{
+> +	return mult_frac(val, sysctl_vfs_cache_pressure, 100);
+> +}
+> +EXPORT_SYMBOL_GPL(vfs_pressure_ratio);
 
-The CI also does more than X86 builds. It checks if you have Cc: all
-the needed maintainer, is the patch checkpatch clean, if it is for
-stable, have you Cc: stable etc. We want all these things which are
-architecture independent to run, but they failed at the very first
-step, applying the patch.
+This was a static inline, but AFAICT it's only called through
+alloc_super() which is hardly "fast path". If this series gets another
+version it may be worth calling out this inline->out-of-line change in
+the commit log.
 
-	Andrew
+I don't think it's a blocker, but I'm not a VFS maintainer. :)
+
+-- 
+Kees Cook
 
