@@ -1,139 +1,89 @@
-Return-Path: <netdev+bounces-122081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 541A595FD6C
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 00:50:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4AF195FD7B
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 00:51:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B3211F2268C
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 22:50:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 713AA281642
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 22:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9251A0703;
-	Mon, 26 Aug 2024 22:47:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4944C19CD0F;
+	Mon, 26 Aug 2024 22:49:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lNEfls+1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="twrNSgRR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0521C1A01B4
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 22:47:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14AA319AA75;
+	Mon, 26 Aug 2024 22:49:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724712428; cv=none; b=neba5KHLUdxB9Z+R9rQtwR1jpo1Wj5o6AintgZ7mxQ3KlNHqKwh/OOCPrU2V+KOROs+yCCe+wrQwvftM0Haj4VFE3jJT9m1K5/CT4tM1meHMhkgcRVPMq7ifYsTP/bqhcqcrxm+byDReykPgma4WH3DHmGNoiQ7VpJCS4CXhEk0=
+	t=1724712555; cv=none; b=amGxA8KQz6u56p1hhuVi3Lf4FFKCdWgIo8XMqiHs6OEt14VNId+rCI74etlt08LD5c/qGqEw3Vrm6P9HwDShnbyCfouv+f4Q3nRn0BjKdiT0xYyuAJV0FX++u4oyMZ4pKm5Rqq5Ts6zaH0FDOP6tLuceL+Z4kAokiEzhK398KcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724712428; c=relaxed/simple;
-	bh=rhMFAdYMYtCndSg/6IQRdAdJBHzcPOSYR3Dlb672MHw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aAWrnEUH51E8Sh9oV7GgtoB0SmH/5QpkMryrHwJgPu4KiE6ZBEYsihPahReW6EqECXGH3hhGxqBdKinyX8FnrTRlvPyQyJilKvgIuaDEfnSSGQAN+kyKzcL40vB1jij5n9adMaBGnKx/Klof8umUaFPWCZhA+I/rx+pZuH9ETog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lNEfls+1; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724712427; x=1756248427;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rhMFAdYMYtCndSg/6IQRdAdJBHzcPOSYR3Dlb672MHw=;
-  b=lNEfls+1tJ7OShZnI2rQ6MfjT6hOhIzOBOhYBCaq3Wp+GO6P3vns/BJv
-   vdwfWP4ahf8N8LQZ+G/pCYNcP0A9Yvd14MSUn4GW7rLu4BvjzDteWT9/D
-   fpj5u/OmkU1wjsYWAqTY6qT5jyYDCTzMvJW6EYxxwoux1HvPkSryU5k8y
-   6OZ1zTEoi26azg1oRo9KMCwfw0koP/oO77+/tSiimbHCi4jFsmvF5qvDB
-   08G4lfvMZJJ2GgRmJID27PS0on/4BNNrFrT/pbYdF/mQghM09551iEFpt
-   B8ryQLDaO/eZikg7Pz7ntMgK3c+6AY+/FATX8ANUIFHjGNO85sJWOAgde
-   w==;
-X-CSE-ConnectionGUID: iej02nqhQuqbb3kw7C6now==
-X-CSE-MsgGUID: t2xjwlp0S7Wwl3KTv5l98g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="23030990"
-X-IronPort-AV: E=Sophos;i="6.10,178,1719903600"; 
-   d="scan'208";a="23030990"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 15:47:02 -0700
-X-CSE-ConnectionGUID: WdWCmYUEQHK1p/YT985XVQ==
-X-CSE-MsgGUID: nNCugksfTgivqrTPQUbA0Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,178,1719903600"; 
-   d="scan'208";a="62822488"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa010.fm.intel.com with ESMTP; 26 Aug 2024 15:47:01 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Aleksandr Mishin <amishin@t-argos.ru>,
-	anthony.l.nguyen@intel.com,
-	lvc-project@linuxtesting.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Subject: [PATCH net-next 8/8] ice: Adjust over allocation of memory in ice_sched_add_root_node() and ice_sched_add_node()
-Date: Mon, 26 Aug 2024 15:46:48 -0700
-Message-ID: <20240826224655.133847-9-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240826224655.133847-1-anthony.l.nguyen@intel.com>
-References: <20240826224655.133847-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1724712555; c=relaxed/simple;
+	bh=grnn+0X0Pv3NMfzAZs3RQzlylVqbv+q8SRYJqfAZiq8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qa+JUpxLw0kl3fBmVNrVM+Ky3kuQ0CYDW4TdCrjVKLQgSFqPauKp6Vfh9NjKBF19y2JR/4nhB/8RDd2fNcymWCz+dAx10O5lLa1T/nloRnp4sMM6DfxthI3UqhsyPCGcDRK4MQGVnrZ5yksboAWLLD5wvpN7CzsnXxJfmOTJ7CI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=twrNSgRR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACBA3C8B7A4;
+	Mon, 26 Aug 2024 22:49:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724712554;
+	bh=grnn+0X0Pv3NMfzAZs3RQzlylVqbv+q8SRYJqfAZiq8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=twrNSgRRSQB0VBfhAlkkOthBteBjUdBTZO1/6b5u3dWnNEtqub1ex/Tf7WnyRXjnN
+	 kZTfGhQn4fWAQq/dGM0irikvWrrSLx7yloXFbm0pcAS8AGeOfQse4Z/4W4Nxb+hhvJ
+	 b0Tar1VRHH/Hyg/Ts61+r4n/u+WsSZiqO8Xv72lLYJiUd7Yy7xxB7WgfcuIhPPmRqi
+	 LJrjgu9YAd6es2vYadWXZGtgx+5NDYkw0Rn+GEDJlvYLSL35LUhaVnsQuPW/MDkv1s
+	 71KxiTy15zh7RY+lv3x7EwJmlAi9aCx1Nln7ch7gYWmiMri0gMggq3GLT30WDpI1TJ
+	 yDJfdn48+7o7Q==
+Date: Mon, 26 Aug 2024 15:49:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Cc: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, Jonathan.Cameron@huawei.com, helgaas@kernel.org,
+ corbet@lwn.net, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, alex.williamson@redhat.com, michael.chan@broadcom.com,
+ ajit.khaparde@broadcom.com, somnath.kotur@broadcom.com,
+ manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+ vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+ bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
+ jing2.liu@intel.com
+Subject: Re: [PATCH V4 11/12] bnxt_en: Add TPH support in BNXT driver
+Message-ID: <20240826154912.6a85e654@kernel.org>
+In-Reply-To: <ZszsBNC8HhCfFnhL@C02YVCJELVCG>
+References: <20240822204120.3634-1-wei.huang2@amd.com>
+	<20240822204120.3634-12-wei.huang2@amd.com>
+	<20240826132213.4c8039c0@kernel.org>
+	<ZszsBNC8HhCfFnhL@C02YVCJELVCG>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Aleksandr Mishin <amishin@t-argos.ru>
+On Mon, 26 Aug 2024 16:56:36 -0400 Andy Gospodarek wrote:
+> We plan to replace these calls with calls to stop and start only that
+> ring via netdev_rx_queue_restart as soon as these calls all land in
+> the same tree.  Since this set is [presumably] coming through
+> linux-pci we didn't think we could do that yet.
+> 
+> Thoughts?
 
-In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
-devm_kcalloc() in order to allocate memory for array of pointers to
-'ice_sched_node' structure. But incorrect types are used as sizeof()
-arguments in these calls (structures instead of pointers) which leads to
-over allocation of memory.
+The merge window is in 3 weeks or so, so this can wait.
+I'm worried we'll find out later that the current queue reset
+implementation in bnxt turns out to be insufficient. And we'll
+be stuck with yet another close/open in this driver.
 
-Adjust over allocation of memory by correcting types in devm_kcalloc()
-sizeof() arguments.
-
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_sched.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
-index ecf8f5d60292..6ca13c5dcb14 100644
---- a/drivers/net/ethernet/intel/ice/ice_sched.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sched.c
-@@ -28,9 +28,8 @@ ice_sched_add_root_node(struct ice_port_info *pi,
- 	if (!root)
- 		return -ENOMEM;
- 
--	/* coverity[suspicious_sizeof] */
- 	root->children = devm_kcalloc(ice_hw_to_dev(hw), hw->max_children[0],
--				      sizeof(*root), GFP_KERNEL);
-+				      sizeof(*root->children), GFP_KERNEL);
- 	if (!root->children) {
- 		devm_kfree(ice_hw_to_dev(hw), root);
- 		return -ENOMEM;
-@@ -186,10 +185,9 @@ ice_sched_add_node(struct ice_port_info *pi, u8 layer,
- 	if (!node)
- 		return -ENOMEM;
- 	if (hw->max_children[layer]) {
--		/* coverity[suspicious_sizeof] */
- 		node->children = devm_kcalloc(ice_hw_to_dev(hw),
- 					      hw->max_children[layer],
--					      sizeof(*node), GFP_KERNEL);
-+					      sizeof(*node->children), GFP_KERNEL);
- 		if (!node->children) {
- 			devm_kfree(ice_hw_to_dev(hw), node);
- 			return -ENOMEM;
--- 
-2.42.0
-
+While we talk about affinity settings in bnxt -- it'd be great
+if it maintained the mapping and XPS settings across reconfiguration 
+(like queue count changes or attaching XDP).
 
