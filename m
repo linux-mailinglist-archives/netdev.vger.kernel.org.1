@@ -1,297 +1,229 @@
-Return-Path: <netdev+bounces-121815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D373295ECFF
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:20:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39D3895ED0B
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:26:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9191B282069
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 09:20:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B97F51F219CE
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 09:26:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4700A145B07;
-	Mon, 26 Aug 2024 09:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BFE13D63E;
+	Mon, 26 Aug 2024 09:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iBKObYzu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h48WR/xa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8FC14375D;
-	Mon, 26 Aug 2024 09:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B32A13A88D
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 09:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724664033; cv=none; b=PWzF0hE9TwBQq6//IHE84onOZcarVS8iMhQ6s7yTOfokW9DZa4wHHO0vY/F5orsNW5vtJFUATpg5SRaThFHZRf2NZBpFrSwhKcJ64y3kcqgt1i5pnWXKQrmUVlzd/qs5i8Mobzcgi7iD8nWb9XQF24URuY1H+ggR/QPmlorhDNs=
+	t=1724664375; cv=none; b=kwDLWDQcHTdwt/ZJ4jS7I/AAUeC/6jMMF3SoQLW6jh99sZwqO1QTW6Qp8Kb6rEeDrgRwSHT31nA17hKrbfg98uWLu49JduykVvbJ4U6YD8Fxo8V8Xy1KY7kwq/uE4BWEcJHcL0Gfp5OAGGkk2Y0S6vKiws+pHErRsD2JXV/W4l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724664033; c=relaxed/simple;
-	bh=rwXP+5eSF7J7wNGs6IQQcMn0Z+ZA7RlktZ3B5d40Kzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pnof7Wrt6UtCq/2+bmv6CSc7GfsKyi0hrzegnUxuRR9SJzhXnu19jST+ViS/87DCuhbgMp98e8CLQY0GNYId7gJeNuADGOAJFXNWZcsdTD5xJAapUHm76+ZKS/hFHxZwRIT0fm2oHFYZPjjcWKzn5uEwP2DDvTYKGW+JjiCMVrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iBKObYzu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D866AC567F3;
-	Mon, 26 Aug 2024 09:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724664032;
-	bh=rwXP+5eSF7J7wNGs6IQQcMn0Z+ZA7RlktZ3B5d40Kzs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iBKObYzuSp3BAhGOIaeeqPeyFwX6izp/CzVO7M8RvdNK3JPks06o2TiJ+t8CcU1m3
-	 XC2jxvvLE+LrcQsgITEHaeINvLSs3UupG1w1zm7DJVCemGYK8PyENOjRP+4VWyK4rW
-	 6+96F9UQ66WtJDHBUhXDroLekZ1v9QlaDlSf7WyqIV33fYeV/H/LAj2gZ4XB5nQq9g
-	 0csBKvjOUBdCLOE8XGNGPoYI2Q5lXCvZd0ZkB+xpUwXtoitcg0Cap60IRO4xzF+pY2
-	 zKBYqCf+TuOJOF9hFXPAXseDtApOVbZA4ykbdbiPOrERygoEXm94IYMk4f1Ml1OAvd
-	 ou7qaxJH4vXgg==
-Date: Mon, 26 Aug 2024 11:20:26 +0200
-From: Alejandro Colomar <alx@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
-	justinstitt@google.com, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
-	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Simon Horman <horms@kernel.org>, 
-	Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v7 6/8] mm/util: Deduplicate code in
- {kstrdup,kstrndup,kmemdup_nul}
-Message-ID: <ep44ahlsa2krmpjcqrsvoi5vfoesvnvly44icavup7dsfolewm@flnm5rl23diz>
-References: <20240817025624.13157-1-laoar.shao@gmail.com>
- <20240817025624.13157-7-laoar.shao@gmail.com>
- <nmhexn3mkwhgu5e6o3i7gvipboisbuwdoloshf64ulgzdxr5nv@3gwujx2y5jre>
+	s=arc-20240116; t=1724664375; c=relaxed/simple;
+	bh=Y+SCpwLCjMQIT/9/ruceV9kGAxqkFRg3bdbv+qg2fe4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DQhXdhDWfgRqsKwG/vT6YwqL/7/tM0WejTVDmxvVV5Pe0uPHA54zjUWSvfBT8T/X5DwuuakRy7Tu02iAyHg7oDKKmlMQ4b9tSohf6Id+YsV1QANx0fnFqwsICrTkwi254/Hk0zh9ykfShKBx2EfJgHFqo85P6IRUWopdkrcTuCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h48WR/xa; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a86883231b4so522455066b.3
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 02:26:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724664371; x=1725269171; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wvjHfLtkcdDqOOMH6gy28+rAw+JW40FMUdLrnoLzmi0=;
+        b=h48WR/xauOsionhWwepJ29DyPOV3QB1JOcBaeXJaNBAoJnzC1oHK7hswHp86RpMo56
+         diVG3maWab4Bc6570y451J/ThQJKUNHoSpbeLJYZM/A2NUXRLyfdqpO7wzfwwhDxHTf8
+         TGtB22X4viI2j226K/KL0GcLz/L14vCDAKGSGeXb0AzbX2TVnCqkz/Hh6+OEnXBR7IU3
+         J1Sg98ZzsPoATl+nlUbHsGIb4WZ3JQSh27DoC8Kwqtxbroq3deWv2wDUrSWK3XONzZZL
+         XONlSJKp4OY1KLi71csoYIxUmm6mHzrvJs8TUFulrProbeFbsQeh01gxhjZLFeuP7uAJ
+         ySSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724664371; x=1725269171;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wvjHfLtkcdDqOOMH6gy28+rAw+JW40FMUdLrnoLzmi0=;
+        b=vyEYchFRowq6Y07ur49Xlf8QsZudd4kF4n0rt4ccOYdi4EowohXC+N/80BiXCgCYeq
+         h3i8q5uVNStGdauVmfKFKszZ7poped0BuWh9nBcdB6NPuHAlH5wwKLrLgyoAFkJbLkcr
+         ob2DagN2zB1//sOFiS6FV/HT/pnYpQGsCseyN+lAPgjpdysXNzYvM5u6Aqie7HwZBQuX
+         GBybajLT8+xKAK6XNBIvyX8HJKaWEoohK0nc4v0dSDDvJllSQ0DTIYzRdxSUJgFQ+oud
+         fVyQc9qZoFkmt8gcRivFyk/jGHmahvstBGRDgjVtHuiWb2I/Fx4eApT1Gq3d7fVKXxcE
+         j4gA==
+X-Forwarded-Encrypted: i=1; AJvYcCV0dzRH8HSuH5e243UNKIzykymgq6Gn4kC8hKaN5qxJ3qPH9UMvxaZp3+yfbzTJ4uXoCHAihJk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZAY1wubRCJmmoTE9cPc69zttbn1Bv8s65vkrIX51D0KyLzmlR
+	qKs5mNfIV9j+6B+GBB3Erfaq9sfi91HJVWfkZwj0zHJvnDtUl43D2e7Qal/d9KR2L0fLwMBALC1
+	9wkBGf9MWdISpyurmmbCnDshnk06slC7TJBP6
+X-Google-Smtp-Source: AGHT+IGHKcGcrdvzRqsGId1F7jVfZZU7cxDU5VPxrcPGbB90f48DL8pCoo1eX9y3XgOzD8Yn0IbgAny2IkSSu0h2/QE=
+X-Received: by 2002:a17:907:3ea2:b0:a7a:9144:e242 with SMTP id
+ a640c23a62f3a-a86a52b5ccfmr597495966b.27.1724664370630; Mon, 26 Aug 2024
+ 02:26:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fr6yymnvpqcqqdt5"
-Content-Disposition: inline
-In-Reply-To: <nmhexn3mkwhgu5e6o3i7gvipboisbuwdoloshf64ulgzdxr5nv@3gwujx2y5jre>
-
-
---fr6yymnvpqcqqdt5
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
+References: <20240817163400.2616134-1-mrzhang97@gmail.com> <20240817163400.2616134-2-mrzhang97@gmail.com>
+ <CANn89iKwN8vCH4Dx0mYvLJexWEmz5TWkfvCFnxmqKGgTTzeraQ@mail.gmail.com>
+ <573e24dc-81c7-471f-bdbf-2c6eb2dd488d@gmail.com> <CANn89i+yoe=GJXUO57V84WM3FHqQBOKsvEN3+9cdp_UKKbT4Mw@mail.gmail.com>
+ <cf64e6ab-7a2b-4436-8fe2-1f381ead2862@gmail.com>
+In-Reply-To: <cf64e6ab-7a2b-4436-8fe2-1f381ead2862@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 26 Aug 2024 11:25:59 +0200
+Message-ID: <CANn89iL1g3VQHDfru2yZrHD8EDgKCKGL7-AjYNw+oCdeBQLfow@mail.gmail.com>
+Subject: Re: [PATCH net v4 1/3] tcp_cubic: fix to run bictcp_update() at least
+ once per RTT
+To: Mingrui Zhang <mrzhang97@gmail.com>
+Cc: davem@davemloft.net, ncardwell@google.com, netdev@vger.kernel.org, 
+	Lisong Xu <xu@unl.edu>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
-	justinstitt@google.com, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
-	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Simon Horman <horms@kernel.org>, 
-	Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v7 6/8] mm/util: Deduplicate code in
- {kstrdup,kstrndup,kmemdup_nul}
-References: <20240817025624.13157-1-laoar.shao@gmail.com>
- <20240817025624.13157-7-laoar.shao@gmail.com>
- <nmhexn3mkwhgu5e6o3i7gvipboisbuwdoloshf64ulgzdxr5nv@3gwujx2y5jre>
-MIME-Version: 1.0
-In-Reply-To: <nmhexn3mkwhgu5e6o3i7gvipboisbuwdoloshf64ulgzdxr5nv@3gwujx2y5jre>
 
-Hi Yafang,
+On Sun, Aug 25, 2024 at 7:47=E2=80=AFPM Mingrui Zhang <mrzhang97@gmail.com>=
+ wrote:
+>
+> On 8/20/24 07:53, Eric Dumazet wrote:
+> > On Mon, Aug 19, 2024 at 10:36=E2=80=AFPM Mingrui Zhang <mrzhang97@gmail=
+.com> wrote:
+> >> On 8/19/24 04:00, Eric Dumazet wrote:
+> >>> On Sat, Aug 17, 2024 at 6:35=E2=80=AFPM Mingrui Zhang <mrzhang97@gmai=
+l.com> wrote:
+> >>>> The original code bypasses bictcp_update() under certain conditions
+> >>>> to reduce the CPU overhead. Intuitively, when last_cwnd=3D=3Dcwnd,
+> >>>> bictcp_update() is executed 32 times per second. As a result,
+> >>>> it is possible that bictcp_update() is not executed for several
+> >>>> RTTs when RTT is short (specifically < 1/32 second =3D 31 ms and
+> >>>> last_cwnd=3D=3Dcwnd which may happen in small-BDP networks),
+> >>>> thus leading to low throughput in these RTTs.
+> >>>>
+> >>>> The patched code executes bictcp_update() 32 times per second
+> >>>> if RTT > 31 ms or every RTT if RTT < 31 ms, when last_cwnd=3D=3Dcwnd=
+.
+> >>>>
+> >>>> Fixes: df3271f3361b ("[TCP] BIC: CUBIC window growth (2.0)")
+> >>>> Fixes: ac35f562203a ("tcp: bic, cubic: use tcp_jiffies32 instead of =
+tcp_time_stamp")
+> >>> I do not understand this Fixes: tag ?
+> >>>
+> >>> Commit  ac35f562203a was essentially a nop at that time...
+> >>>
+> >> I may misunderstood the use of Fixes tag and choose the latest commit =
+of that line.
+> >>
+> >> Shall it supposed to be the very first commit with that behavior?
+> >> That is, the very first commit (df3271f3361b ("[TCP] BIC: CUBIC window=
+ growth (2.0)")) when the code was first introduced?
+> > I was referring to this line : Fixes: ac35f562203a ("tcp: bic, cubic:
+> > use tcp_jiffies32 instead of tcp_time_stamp")
+> >
+> > Commit ac35f562203a did not change the behavior at all.
+> >
+> > I see no particular reason to mention it, this is confusing.
+> >
+> >
+> >>>> Signed-off-by: Mingrui Zhang <mrzhang97@gmail.com>
+> >>>> Signed-off-by: Lisong Xu <xu@unl.edu>
+> >>>> ---
+> >>>> v3->v4: Replace min() with min_t()
+> >>>> v2->v3: Correct the "Fixes:" footer content
+> >>>> v1->v2: Separate patches
+> >>>>
+> >>>>  net/ipv4/tcp_cubic.c | 6 +++++-
+> >>>>  1 file changed, 5 insertions(+), 1 deletion(-)
+> >>>>
+> >>>> diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+> >>>> index 5dbed91c6178..00da7d592032 100644
+> >>>> --- a/net/ipv4/tcp_cubic.c
+> >>>> +++ b/net/ipv4/tcp_cubic.c
+> >>>> @@ -218,8 +218,12 @@ static inline void bictcp_update(struct bictcp =
+*ca, u32 cwnd, u32 acked)
+> >>>>
+> >>>>         ca->ack_cnt +=3D acked;   /* count the number of ACKed packe=
+ts */
+> >>>>
+> >>>> +       /* Update 32 times per second if RTT > 1/32 second,
+> >>>> +        * or every RTT if RTT < 1/32 second even when last_cwnd =3D=
+=3D cwnd
+> >>>> +        */
+> >>>>         if (ca->last_cwnd =3D=3D cwnd &&
+> >>>> -           (s32)(tcp_jiffies32 - ca->last_time) <=3D HZ / 32)
+> >>>> +           (s32)(tcp_jiffies32 - ca->last_time) <=3D
+> >>>> +           min_t(s32, HZ / 32, usecs_to_jiffies(ca->delay_min)))
+> >>> This looks convoluted to me and still limited if HZ=3D250 (some distr=
+os
+> >>> still use 250 jiffies per second :/ )
+> >>>
+> >>> I would suggest switching to usec right away.
+> >> Thank you for the suggestion, however, I may need more time to discuss=
+ with another author for this revision. :)
+> >> Thank you
+> > No problem, there is no hurry.
+>
+> Thank you, Eric, for your suggestion (switching ca->last_time from jiffie=
+s to usec)!
+> We thought about it and feel that it is more complicated and beyond the s=
+cope of this patch.
+>
+> There are two blocks of code in bictcp_update().
+> * Block 1: cubic calculation, which is computationally intensive.
+> * Block 2: tcp friendliness, which emulates RENO.
+>
+> There are two if statements to control how often these two blocks are cal=
+led to reduce CPU overhead.
+>  * If statement 1:  if the condition is true, none of the two blocks are =
+called.
+> if (ca->last_cwnd =3D=3D cwnd &&
+>                     (s32)(tcp_jiffies32 - ca->last_time) <=3D HZ / 32)
+>                                 return;
+>
+> * If statement 2: If the condition is true, block 1 is not called. Intuit=
+ively, block 1 is called at most once per jiffy.
+> if (ca->epoch_start && tcp_jiffies32 =3D=3D ca->last_time)
+>                                 goto tcp_friendliness;
+>
+>
+> This patch changes only the first if statement. If we switch ca->last_tim=
+e from jiffies to usec,
+> we need to change not only the first if statement but also the second if =
+statement, as well as block 1.
+> * change the first if statement from jiffies to usec.
+> * change the second if statement from jiffies to usec. Need to determine =
+how often (in usec) block 1 is called
+> * change block 1 from jiffies to usec. Should be fine, but need to make s=
+ure no calculation overflow.
 
-On Sat, Aug 17, 2024 at 10:58:02AM GMT, Alejandro Colomar wrote:
-> Hi Yafang,
->=20
-> On Sat, Aug 17, 2024 at 10:56:22AM GMT, Yafang Shao wrote:
-> > These three functions follow the same pattern. To deduplicate the code,
-> > let's introduce a common helper __kmemdup_nul().
-> >=20
-> > Suggested-by: Andrew Morton <akpm@linux-foundation.org>
-> > Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> > Cc: Simon Horman <horms@kernel.org>
-> > Cc: Matthew Wilcox <willy@infradead.org>
-> > ---
-> >  mm/util.c | 67 +++++++++++++++++++++----------------------------------
-> >  1 file changed, 26 insertions(+), 41 deletions(-)
-> >=20
-> > diff --git a/mm/util.c b/mm/util.c
-> > index 4542d8a800d9..310c7735c617 100644
-> > --- a/mm/util.c
-> > +++ b/mm/util.c
-> > @@ -45,33 +45,40 @@ void kfree_const(const void *x)
-> >  EXPORT_SYMBOL(kfree_const);
-> > =20
-> >  /**
-> > - * kstrdup - allocate space for and copy an existing string
-> > - * @s: the string to duplicate
-> > + * __kmemdup_nul - Create a NUL-terminated string from @s, which might=
- be unterminated.
-> > + * @s: The data to copy
-> > + * @len: The size of the data, including the null terminator
-> >   * @gfp: the GFP mask used in the kmalloc() call when allocating memory
-> >   *
-> > - * Return: newly allocated copy of @s or %NULL in case of error
-> > + * Return: newly allocated copy of @s with NUL-termination or %NULL in
-> > + * case of error
-> >   */
-> > -noinline
-> > -char *kstrdup(const char *s, gfp_t gfp)
-> > +static __always_inline char *__kmemdup_nul(const char *s, size_t len, =
-gfp_t gfp)
-> >  {
-> > -	size_t len;
-> >  	char *buf;
-> > =20
-> > -	if (!s)
-> > +	buf =3D kmalloc_track_caller(len, gfp);
-> > +	if (!buf)
-> >  		return NULL;
-> > =20
-> > -	len =3D strlen(s) + 1;
-> > -	buf =3D kmalloc_track_caller(len, gfp);
-> > -	if (buf) {
-> > -		memcpy(buf, s, len);
-> > -		/* During memcpy(), the string might be updated to a new value,
-> > -		 * which could be longer than the string when strlen() is
-> > -		 * called. Therefore, we need to add a null termimator.
-> > -		 */
-> > -		buf[len - 1] =3D '\0';
-> > -	}
-> > +	memcpy(buf, s, len);
-> > +	/* Ensure the buf is always NUL-terminated, regardless of @s. */
-> > +	buf[len - 1] =3D '\0';
-> >  	return buf;
-> >  }
-> > +
-> > +/**
-> > + * kstrdup - allocate space for and copy an existing string
-> > + * @s: the string to duplicate
-> > + * @gfp: the GFP mask used in the kmalloc() call when allocating memory
-> > + *
-> > + * Return: newly allocated copy of @s or %NULL in case of error
-> > + */
-> > +noinline
-> > +char *kstrdup(const char *s, gfp_t gfp)
-> > +{
-> > +	return s ? __kmemdup_nul(s, strlen(s) + 1, gfp) : NULL;
-> > +}
-> >  EXPORT_SYMBOL(kstrdup);
-> > =20
-> >  /**
-> > @@ -106,19 +113,7 @@ EXPORT_SYMBOL(kstrdup_const);
-> >   */
-> >  char *kstrndup(const char *s, size_t max, gfp_t gfp)
-> >  {
-> > -	size_t len;
-> > -	char *buf;
-> > -
-> > -	if (!s)
-> > -		return NULL;
-> > -
-> > -	len =3D strnlen(s, max);
-> > -	buf =3D kmalloc_track_caller(len+1, gfp);
-> > -	if (buf) {
-> > -		memcpy(buf, s, len);
-> > -		buf[len] =3D '\0';
-> > -	}
-> > -	return buf;
-> > +	return s ? __kmemdup_nul(s, strnlen(s, max) + 1, gfp) : NULL;
-> >  }
-> >  EXPORT_SYMBOL(kstrndup);
-> > =20
-> > @@ -192,17 +187,7 @@ EXPORT_SYMBOL(kvmemdup);
-> >   */
-> >  char *kmemdup_nul(const char *s, size_t len, gfp_t gfp)
-> >  {
-> > -	char *buf;
-> > -
-> > -	if (!s)
-> > -		return NULL;
-> > -
-> > -	buf =3D kmalloc_track_caller(len + 1, gfp);
-> > -	if (buf) {
-> > -		memcpy(buf, s, len);
-> > -		buf[len] =3D '\0';
-> > -	}
-> > -	return buf;
-> > +	return s ? __kmemdup_nul(s, len + 1, gfp) : NULL;
-> >  }
-> >  EXPORT_SYMBOL(kmemdup_nul);
->=20
-> I like the idea of the patch, but it's plagued with all those +1 and -1.
-> I think that's due to a bad choice of value being passed by.  If you
-> pass the actual length of the string (as suggested in my reply to the
-> previous patch) you should end up with a cleaner set of APIs.
->=20
-> The only remaining +1 is for kmalloc_track_caller(), which I ignore what
-> it does.
->=20
-> 	char *
-> 	__kmemdup_nul(const char *s, size_t len, gfp_t gfp)
-> 	{
-> 		char *buf;
->=20
-> 		buf =3D kmalloc_track_caller(len + 1, gfp);
-> 		if (!buf)
-> 			return NULL;
->=20
-> 		strcpy(mempcpy(buf, s, len), "");
+No problem, I can take care of the jiffies -> usec conversion, you can
+then send your patch on top of it.
 
-Changing these strcpy(, "") to the usual; =3D'\0' or =3D0, but I'd still
-recommend the rest of the changes, that is, changing the value passed in
-len, to remove several +1 and -1s.
+>
+> Therefore, it might be better to keep the current patch as it is, and add=
+ress the switch from jiffies to usec in future patches.
 
-What do you think?
+I prefer you rebase your patch after mine is merged.
 
-Have a lovely day!
-Alex
+There is a common misconception with jiffies.
+It can change in less than 20 nsec.
+Assuming that delta(jiffies) =3D=3D 1 means that 1ms has elapsed is plain w=
+rong.
+In the old days, linux TCP only could rely on jiffies and we had to
+accept its limits.
+We now can switch to high resolution clocks, without extra costs,
+because we already cache in tcp->tcp_mstamp
+the usec timestamp for the current time.
 
-> 		return buf;
-> 	}
->=20
-> 	char *
-> 	kstrdup(const char *s, gfp_t gfp)
-> 	{
-> 		return s ? __kmemdup_nul(s, strlen(s), gfp) : NULL;
-> 	}
->=20
-> 	char *
-> 	kstrndup(const char *s, size_t n, gfp_t gfp)
-> 	{
-> 		return s ? __kmemdup_nul(s, strnlen(s, n), gfp) : NULL;
-> 	}
->=20
-> 	char *
-> 	kmemdup_nul(const char *s, size_t len, gfp_t gfp)
-> 	{
-> 		return s ? __kmemdup_nul(s, len, gfp) : NULL;
-> 	}
->=20
-> Have a lovely day!
-> Alex
->=20
-> --=20
-> <https://www.alejandro-colomar.es/>
+Some distros are using CONFIG_HZ_250=3Dy or CONFIG_HZ_100=3Dy, this means
+current logic in cubic is more fuzzy for them.
 
-
-
---=20
-<https://www.alejandro-colomar.es/>
-
---fr6yymnvpqcqqdt5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmbMSNoACgkQnowa+77/
-2zLIExAAowwDvn4fGttE88cvxlhQwOy8jHj4erHbWDOLMcKFNLpWhwWRqOaVZyMN
-dseuMqjKxp0vlIjA+QRvwtCSfMPrfGFrF+hSal8nEVG5YPp02IJFeKPVs2UIMirG
-WQfz7OkEGY6BN61CHuNhXQL+WLCzEuP/jqqh6bZ5/l9elU7H+CAEGJgWMq5QeyRo
-eVljlfkFRxJkdzcKPJJFc/wK95vSKXFPe5mE7UGfJx1oO3m6q3j5i2aaBFQcIjm3
-QiBGQ8aXepDV7L3XLJaRPa/Tkm7Cc5fdL6B9KEN4SvxOXn7V5VDRVOlrT8Du9YQ1
-G77o8rFyZ9MNFsPcZh5g6DgqQyK7RWTZLm/Xq8GjfB5/iQ8FeZ7gaLye6d52vDub
-vsvIk9D/L3iWDeGTahM9+5bHe8AHr3sI9eCnKbLayJrZ0TA03KgCEKhj8Sp1kkdu
-hai6+ym4Wc9aAYAGEHdJFI/8Gu93uqXT35bT270ov2E77VMyhVltprOCW6qbziTr
-ebt5iKyJ6f2e/rXOCOlqP4CTLSTtRfo2padaLlAJCSEJLs4Q1YsqZMIyLbn7PYuD
-MpkrWxeysR2d3KsKcb1MYCZoKqsQ+hWtkEHZWqHgygI3fbBPE5tkmCS/ustkAk1s
-15ry+Az65a6wiEv5w38JrVCJnzZ/x0aPwOCDNdgYwS/amQEQP10=
-=I3ve
------END PGP SIGNATURE-----
-
---fr6yymnvpqcqqdt5--
+Without ca->last_time conversion to jiffies, your patch would still be
+limited to jiffies resolution:
+usecs_to_jiffies(ca->delay_min) would round up to much bigger values
+for DC communications.
 
