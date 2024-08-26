@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-121969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B4DA95F6EA
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:42:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DB9395F6EB
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:42:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3C62B2245C
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:41:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD5731F22C0A
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B1719882F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D766C198A34;
 	Mon, 26 Aug 2024 16:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A4f8MMCs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q0ED872j"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A7E198A19;
-	Mon, 26 Aug 2024 16:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE386198A2F;
+	Mon, 26 Aug 2024 16:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724690433; cv=none; b=BkjeLO14nXC9Eopu2S+dWu83iOGkHb01rHR80sQVFjjtstH/FCoGAG+LMvOau40U5kj1+gKcpl02LqCgBaG/X/4nokNiFLNRXLFILg6r5xZn5m2EmvIMetFb6nUxNdEJyBh2sHJdG/ycx2m2/57OvaCNOxRfF/2K3FxmvoDHC/E=
+	t=1724690433; cv=none; b=ePNS+V5xh84BPN/yjkaov23YOLXjIQ76P5NT4ASie/AWvg36WiJUY/fNt1JtJtfjzoDXyBc8aciRR8d84dIkVK3DviNEnIDxl4GBW/jMjC6b/bLrpf4xDpNVcNc44JSFyKq+D7MKR4Zw6byGc3HpYJpXWCftf7bWAlgcHXU35vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724690433; c=relaxed/simple;
-	bh=/16y4MbvBWx7AmX9u2rF9LhJgyijTDXEyB/EasBtFvQ=;
+	bh=k2m9iYAIvlkB7vXvKp4rjVwvEeXCjGF7PnGuU+rayxY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LZCVQO7iKeBiH6SkzB0v+f73M5Z3PfNcmI2FSf4oktjTm77OJCDXSqkWqykdCwFGbvGhw7+rCYIzSnSgFkAeTbY133cC2e2hhDuz6ilmB/msbhS/UquBvkBCGL6T4HNf06QuEIDLNSV9/AfD04YGPqgx5ybp3Ffa/QioCnXCgMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A4f8MMCs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2284C52FD8;
-	Mon, 26 Aug 2024 16:40:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=kqExHPClnqXDe1H/J9OtuscQV8yghnqe3SqxFxl+UQzFvb5SwOML8GaAw72gt0DIQf2BbEAPLCSYJ/JLRqP+TS/0Q01mciOgmwFP5jbiOpLq8PTJPcvO87m47SqPauLg/P05ftnmqndIdvg7q/ywTS0YEVv76ayOEtsO2uC4mMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q0ED872j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32B32C52FDD;
+	Mon, 26 Aug 2024 16:40:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724690431;
-	bh=/16y4MbvBWx7AmX9u2rF9LhJgyijTDXEyB/EasBtFvQ=;
+	s=k20201202; t=1724690433;
+	bh=k2m9iYAIvlkB7vXvKp4rjVwvEeXCjGF7PnGuU+rayxY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=A4f8MMCs4gdiuxmv9K0GalAvkSLXQvfKPGR53bS1lz7NdVqk+YYB7D16o188jxorc
-	 YyjWaanIqFoCgn1VW0qnU5ljFbZeqNSgBthmpavhc5nW51cfXnHpR86s9b1jmAtUiy
-	 zMzG80eN4dG5mm9i1ljHqxJ9IYe9x5omRcpVFXtCGWvjrtY2UOWC9iUk3r4FzR0jm4
-	 4qMFmEtXr9e5px86xDZLwN5hrKjXIF7lRBM4w5LMDjURCVC6v3BZdRLCOlSx8KUBxO
-	 1G3u4snEl7yhNvDRzOsNYcXcCTNOzAYsErSkbzcHM9tjQuz8YQBjkHSnwGWuy/iFBV
-	 gHhogHboZLxKg==
+	b=q0ED872jzRGghQp3s7dLm9vnqHhqlPR/lEMDCnkFZp7YMJeIX1fjFs64tMuH0ofhf
+	 CrQMQeLTBeuhLZu6c5PhaMRr6dOYmftnIPUPQJUBBVT6OFWTfH+Pm3lIXr3wvHB3Da
+	 i+U2RXDB1E71P5q/u3ExGJDrKzxcI76wPX+w5vpJZrlFjQfWIQJ6MBtwb1fDlw/sj9
+	 o5m1nHuBXB7gHEJ9xjoHypur0fEigImY2pOqYIvH9FDhhCB4HgnFKOtpDWZRc9cZ8x
+	 E88btR9U+VjFp8pggofJvSajHJa9Niz7HOCkB2XwN32EyRYXoBftA2v00awMFEkd+3
+	 SOH7R/wCuAu7Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD083822D6D;
-	Mon, 26 Aug 2024 16:40:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C4D3822D6D;
+	Mon, 26 Aug 2024 16:40:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/2] netconsole: Populate dynamic entry even if
- netpoll fails
+Subject: Re: [PATCH net-next v3 0/3] Add ALCD Support to Cable Testing Interface
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172469043158.64426.9370838137438660997.git-patchwork-notify@kernel.org>
-Date: Mon, 26 Aug 2024 16:40:31 +0000
-References: <20240822111051.179850-1-leitao@debian.org>
-In-Reply-To: <20240822111051.179850-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <172469043299.64426.5670112366033990783.git-patchwork-notify@kernel.org>
+Date: Mon, 26 Aug 2024 16:40:32 +0000
+References: <20240822120703.1393130-1-o.rempel@pengutronix.de>
+In-Reply-To: <20240822120703.1393130-1-o.rempel@pengutronix.de>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux@armlinux.org.uk
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 22 Aug 2024 04:10:46 -0700 you wrote:
-> The current implementation of netconsole removes the entry and fails
-> entirely if netpoll fails to initialize. This approach is suboptimal, as
-> it prevents reconfiguration or re-enabling of the target through
-> configfs.
+On Thu, 22 Aug 2024 14:07:00 +0200 you wrote:
+> Hi all,
 > 
-> While this issue might seem minor if it were rare, it actually occurs
-> frequently when the network module is configured as a loadable module.
+> This patch series introduces support for Active Link Cable Diagnostics
+> (ALCD) in the ethtool cable testing interface and the DP83TD510 PHY
+> driver.
+> 
+> Why ALCD?
+> On a 10BaseT1L interface, TDR (Time Domain Reflectometry) is not
+> possible if the link partner is active - TDR will fail in these cases
+> because it requires interrupting the link. Since the link is active, we
+> already know the cable is functioning, so instead of using TDR, we can
+> use ALCD.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/2] netpoll: Ensure clean state on setup failures
-    https://git.kernel.org/netdev/net-next/c/ae5a0456e0b4
-  - [net-next,v3,2/2] net: netconsole: Populate dynamic entry even if netpoll fails
-    https://git.kernel.org/netdev/net-next/c/908ee298c8fb
+  - [net-next,v3,1/3] ethtool: Extend cable testing interface with result source information
+    https://git.kernel.org/netdev/net-next/c/abcd3026dd63
+  - [net-next,v3,2/3] ethtool: Add support for specifying information source in cable test results
+    https://git.kernel.org/netdev/net-next/c/4715d87e11ac
+  - [net-next,v3,3/3] phy: dp83td510: Utilize ALCD for cable length measurement when link is active
+    https://git.kernel.org/netdev/net-next/c/986a7fa4b454
 
 You are awesome, thank you!
 -- 
