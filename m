@@ -1,155 +1,141 @@
-Return-Path: <netdev+bounces-122051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AD0295FB92
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 23:22:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55C3395FB9C
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 23:24:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9976F1C2104D
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 21:22:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8BC1B20FF2
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 21:24:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F274213D53F;
-	Mon, 26 Aug 2024 21:22:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7A81993AE;
+	Mon, 26 Aug 2024 21:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WBNdXHoF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iAtXZjz3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DC8881E;
-	Mon, 26 Aug 2024 21:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE85E13C8EA;
+	Mon, 26 Aug 2024 21:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724707329; cv=none; b=ZZfyHP9ASJ+nUc6J1c4z6N+EtjypNPpHyf27YJH6p5jx7Uu3x/KRiC2mNwOdPnL1qXFwSLL42fke9d28P8pC/5jETQt7ig+tHM4EiPI6IFyUEpaXVaImwfsHyv3qWESUPMnAk3czlTVe5QBT8EZqy4XZ6uaFwFXJULZYf2ByYxI=
+	t=1724707477; cv=none; b=WS9Kzm+cDsUqWhmjafrMj2zYn6wWqzvlyTUtSgJUQQBzgOkbNtlj+9XVAnp33ppro2lq0GUAO9UH3jXFn7vrtykDSHRZe5sTYrADAzBOgW/X1Aw7W+SnK5fAWN+e1l+i3+bN6beDGNHWYo6ax/wCfCGuEXi7X/vWTzIsgU1fuOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724707329; c=relaxed/simple;
-	bh=TC37VVPniD0xcpWs6hA8hpK2vJeJlfhXQ1u24MF7o+s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DseJ2o1iRnIPBhoroqIlRrgTS42eDusw+Ia1DaJ1wAErXFY6HYouaZcIAktRWB87EdykdN9gbPxdxAjxxrvhkcpZ88KN0yI87jxdizlCh7HojNyENQchqzXXgjZLvCPC4VsAP2Ohdi43X6tPNJIFO58Y4RTwpRMLyOPXkHDqgB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WBNdXHoF; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20203988f37so46890405ad.1;
-        Mon, 26 Aug 2024 14:22:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724707328; x=1725312128; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JkjIiL1O9FFHI4xlYtzFY2W3gVPxww5X2yTtZ8zdV0U=;
-        b=WBNdXHoFDkdEOYFhsqku5YWs2wTWEFP6NcrP6bZBIFv5sS7MCx7j7fG4F2wC1rKb0h
-         StOtZeNtzrMiET7CRmZ7CFQKHOlLrlYgF6nzT9vV8XGjRzGcoToHtuW4rdNvo4Pm+Mnj
-         APNzYwOAE65Ac3ztmtFP8e+JCeaVfNYn1/lN+XiBcaxgGPjsfYFcb6L3UegbXAsks2ua
-         JNG9x/D3IZ5I80Y7wj/Lgr4UNRZOb9jZ+r5VGo0sJHQgTD+Y3uiLwkd0d1+EhPQrPyh2
-         ZPl6Yw80mBFEjZfLYp1H8QSZXB3WbBOu8PooF/nGv3W2r5kj0KGZMNK5+jc4W4Aqavou
-         9qNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724707328; x=1725312128;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JkjIiL1O9FFHI4xlYtzFY2W3gVPxww5X2yTtZ8zdV0U=;
-        b=d54/O3de/0FzMRwV4av/3JS3WMiQqp+e49xN7FVegiORiH6fYk2sElR5ofgAV6o1yF
-         pr/X0Xz3O+f1+zc/vbMepG/T1GWT++A9DRsJ4oXWLgYpAM8/AknyPCN5MSgP3qnoitph
-         7Q5Lf1SkK5HB8CrcP3wEco3iR1Pb0bLjX1wwTCy6rTzgbfGyAMNbD3crDktLSLM+Bjw1
-         D9jmOkZFs9RvqTQmUCjjxS68zIB2JyPuA//P4ckizYYbWooVYUnAyiyyXwBnW+d8il90
-         OWkbZHxVXLGREW3o4JTzzK5RBMOql5JRK5zkpJi0+yBUGjh2vemd/BOu8FrEYOxd4X10
-         HmFg==
-X-Forwarded-Encrypted: i=1; AJvYcCWC0KhOUjyVBby8OGjdAhcYz+/+8XG8XT1Vi7FHHTaUpLGhWSMqgRa/AH7aDULPoLpacOeEJg2A0x4tXYQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX81r82r80lX1noWh+y661wj5OP6GTxpdhEMahlD73z8dYou5R
-	H9XtcIxJ3Wxcjd2Vbec2eU/3CDejtCO/2JBIi7C1uL1ahgGF1z6NgyN1zg==
-X-Google-Smtp-Source: AGHT+IGoI1aVeSjYIz+6dfRdFdoQRbYTEWMYc3ql1Rhe2gOK8ZPbSNLhKuDC0v0weJvg9aIvf1sg2g==
-X-Received: by 2002:a17:902:d492:b0:201:fd3c:a321 with SMTP id d9443c01a7336-2039e54c1afmr103993975ad.62.1724707327483;
-        Mon, 26 Aug 2024 14:22:07 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d613703c94sm10400331a91.10.2024.08.26.14.22.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 14:22:07 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	linux-kernel@vger.kernel.org,
-	o.rempel@pengutronix.de,
-	p.zabel@pengutronix.de
-Subject: [PATCHv4 net-next] net: ag71xx: get reset control using devm api
-Date: Mon, 26 Aug 2024 14:21:57 -0700
-Message-ID: <20240826212205.187073-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1724707477; c=relaxed/simple;
+	bh=J1sh0JGMwBFt+RuTIyEsiQH6h/297F/9Mo1VkS8wDQ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oUi5NVPf7TTosHn5NPA86BwgrjyFntLFyov5yII/r+M6WOdmLouqKsT5x4Ut0bAxqGTP/Evgabo6ZTA05uH3LYXKEtP9A96h7sT6j3sLtgD1KOmbB9lQ8PYQCejB+HDEyC1dCCo6jSOMT3BHixrffF/EflHISZX74RnIxsQUtmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iAtXZjz3; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724707476; x=1756243476;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=J1sh0JGMwBFt+RuTIyEsiQH6h/297F/9Mo1VkS8wDQ0=;
+  b=iAtXZjz3EOd1S6HLYg6PCD4zCWiYtDtpuLzYG0mTCDgAB8cwljRQTQvx
+   hi3hdqrUEsMNZhMplRoSEsor6FJsnBmCetgJlj65ljmbEYJCi3PUpmYkR
+   cMzYI1G+j8X7GgVLIGWSTYXEpLYLldOS28/8oEO53if59fbhCpVb4ZNd8
+   0ob2TQozPNkPhM3XBsW07/O1Y+3Zh5h9urwko/Od8b6nRxdFksmZnzgbp
+   R0D47GfxDZ0fbfvzlgYXlSLzRrNnhsfG66sBvgH0o08TY9pBOhH0yz01w
+   VcicIbliM2bEorcy3sVLEuXU/Hyk2DX1zJv7Wy9Bk0wn6EmgImbIO1yLV
+   w==;
+X-CSE-ConnectionGUID: g6QesiqmSvynN0KJifAGMg==
+X-CSE-MsgGUID: yEwqeXOoTQOmmtV7XmKPoA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="23337144"
+X-IronPort-AV: E=Sophos;i="6.10,178,1719903600"; 
+   d="scan'208";a="23337144"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 14:24:35 -0700
+X-CSE-ConnectionGUID: /Epz5TVJRmKWkjh2VxUsjg==
+X-CSE-MsgGUID: Dct1gWmaT0eV6Pz1/y1SBw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,178,1719903600"; 
+   d="scan'208";a="93369759"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 26 Aug 2024 14:24:31 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sihCO-000Hc2-0L;
+	Mon, 26 Aug 2024 21:24:28 +0000
+Date: Tue, 27 Aug 2024 05:24:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: Casey Schaufler <casey@schaufler-ca.com>, paul@paul-moore.com,
+	linux-security-module@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, jmorris@namei.org, serge@hallyn.com,
+	keescook@chromium.org, john.johansen@canonical.com,
+	penguin-kernel@i-love.sakura.ne.jp, stephen.smalley.work@gmail.com,
+	linux-kernel@vger.kernel.org, mic@digikod.net,
+	linux-integrity@vger.kernel.org, linux-audit@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 07/13] LSM: Use lsmblob in security_current_getsecid
+Message-ID: <202408270512.9cZ78Eog-lkp@intel.com>
+References: <20240825190048.13289-8-casey@schaufler-ca.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240825190048.13289-8-casey@schaufler-ca.com>
 
-Currently, the of variant is missing reset_control_put in error paths.
-The devm variant does not require it.
+Hi Casey,
 
-Allows removing mdio_reset from the struct as it is not used outside the
-function.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- v2: don't call after ag71xx_mdio_probe. Already done.
- v3: use devm instead.
- v4: resend to bump the CI
- drivers/net/ethernet/atheros/ag71xx.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+[auto build test WARNING on pcmoore-selinux/next]
+[also build test WARNING on zohar-integrity/next-integrity linus/master pcmoore-audit/next v6.11-rc5 next-20240826]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index 89cd001b385f..d81aa0ccd572 100644
---- a/drivers/net/ethernet/atheros/ag71xx.c
-+++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -379,7 +379,6 @@ struct ag71xx {
- 	u32 fifodata[3];
- 	int mac_idx;
- 
--	struct reset_control *mdio_reset;
- 	struct clk *clk_mdio;
- };
- 
-@@ -683,6 +682,7 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
- 	struct device *dev = &ag->pdev->dev;
- 	struct net_device *ndev = ag->ndev;
- 	static struct mii_bus *mii_bus;
-+	struct reset_control *mdio_reset;
- 	struct device_node *np, *mnp;
- 	int err;
- 
-@@ -698,10 +698,10 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
- 	if (!mii_bus)
- 		return -ENOMEM;
- 
--	ag->mdio_reset = of_reset_control_get_exclusive(np, "mdio");
--	if (IS_ERR(ag->mdio_reset)) {
-+	mdio_reset = devm_reset_control_get_exclusive(dev, "mdio");
-+	if (IS_ERR(mdio_reset)) {
- 		netif_err(ag, probe, ndev, "Failed to get reset mdio.\n");
--		return PTR_ERR(ag->mdio_reset);
-+		return PTR_ERR(mdio_reset);
- 	}
- 
- 	mii_bus->name = "ag71xx_mdio";
-@@ -712,10 +712,10 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
- 	mii_bus->parent = dev;
- 	snprintf(mii_bus->id, MII_BUS_ID_SIZE, "%s.%d", np->name, ag->mac_idx);
- 
--	if (!IS_ERR(ag->mdio_reset)) {
--		reset_control_assert(ag->mdio_reset);
-+	if (!IS_ERR(mdio_reset)) {
-+		reset_control_assert(mdio_reset);
- 		msleep(100);
--		reset_control_deassert(ag->mdio_reset);
-+		reset_control_deassert(mdio_reset);
- 		msleep(200);
- 	}
- 
+url:    https://github.com/intel-lab-lkp/linux/commits/Casey-Schaufler/LSM-Add-the-lsmblob-data-structure/20240826-170520
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/pcmoore/selinux.git next
+patch link:    https://lore.kernel.org/r/20240825190048.13289-8-casey%40schaufler-ca.com
+patch subject: [PATCH 07/13] LSM: Use lsmblob in security_current_getsecid
+config: arc-randconfig-001-20240827 (https://download.01.org/0day-ci/archive/20240827/202408270512.9cZ78Eog-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240827/202408270512.9cZ78Eog-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408270512.9cZ78Eog-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> security/smack/smack_lsm.c:2265: warning: Function parameter or struct member 'blob' not described in 'smack_task_getlsmblob_obj'
+>> security/smack/smack_lsm.c:2265: warning: Excess function parameter 'secid' description in 'smack_task_getlsmblob_obj'
+
+
+vim +2265 security/smack/smack_lsm.c
+
+1fb057dcde11b35 Paul Moore      2021-02-19  2255  
+1fb057dcde11b35 Paul Moore      2021-02-19  2256  /**
+fd64f9693f6c226 Casey Schaufler 2024-08-25  2257   * smack_task_getlsmblob_obj - get the objective data of the task
+1fb057dcde11b35 Paul Moore      2021-02-19  2258   * @p: the task
+1fb057dcde11b35 Paul Moore      2021-02-19  2259   * @secid: where to put the result
+1fb057dcde11b35 Paul Moore      2021-02-19  2260   *
+1fb057dcde11b35 Paul Moore      2021-02-19  2261   * Sets the secid to contain a u32 version of the task's objective smack label.
+e114e473771c848 Casey Schaufler 2008-02-04  2262   */
+fd64f9693f6c226 Casey Schaufler 2024-08-25  2263  static void smack_task_getlsmblob_obj(struct task_struct *p,
+fd64f9693f6c226 Casey Schaufler 2024-08-25  2264  				      struct lsmblob *blob)
+e114e473771c848 Casey Schaufler 2008-02-04 @2265  {
+1fb057dcde11b35 Paul Moore      2021-02-19  2266  	struct smack_known *skp = smk_of_task_struct_obj(p);
+2f823ff8bec03a1 Casey Schaufler 2013-05-22  2267  
+fd64f9693f6c226 Casey Schaufler 2024-08-25  2268  	blob->smack.skp = skp;
+fd64f9693f6c226 Casey Schaufler 2024-08-25  2269  	/* scaffolding */
+fd64f9693f6c226 Casey Schaufler 2024-08-25  2270  	blob->scaffold.secid = skp->smk_secid;
+e114e473771c848 Casey Schaufler 2008-02-04  2271  }
+e114e473771c848 Casey Schaufler 2008-02-04  2272  
+
 -- 
-2.46.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
