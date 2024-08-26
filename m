@@ -1,134 +1,135 @@
-Return-Path: <netdev+bounces-122068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4052395FCB2
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 00:26:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26FDC95FCC4
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 00:29:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7DD8283204
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 22:25:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B117B218D0
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 22:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7539319D094;
-	Mon, 26 Aug 2024 22:25:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E7919D88B;
+	Mon, 26 Aug 2024 22:29:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZVbODkgG"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="WJZ3qFsE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6108313FD66
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 22:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E421919D094
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 22:29:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724711156; cv=none; b=A9frqkyJE5S71oAo/IiseJl1DYNsUrRir/uWqBK6xCEdwpIWYntIKYBDzzWBYM1Qvo4epTD7uaAZKqZX6eg1ruighodSbD+4+4/BpH0AXv264gg8lh3KT9U1U65toW4HzJR01tzbajSaDK01e7GszkbPiuihMcdq9nPYAm8tWoM=
+	t=1724711358; cv=none; b=O5RqmrDGf6AK6aHdYy8FiUlvPdZ3qIn2unjisOb6AElSZeV+jrOMVyN6oh0mjEDqP0iom1HdOU9WpQyJvxXblsLivERnpyVNsLDj72sK6fLMFYikSbF/urijL98vv9GnUs4ppkT1lmwGRsZCTjsuliOxItGK9DO2Nl+sWKuxMRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724711156; c=relaxed/simple;
-	bh=+YzYiUddl7WzqiuD3XFxFcsM07ACtx70EA9yzXEAw9g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C9Rp0c+inOAEQ33cGg+9Jl1TAsM+X4qALQU+2YjWMpoPrgZa44UuCxHKSFODQoF1i/Zb6E0qeYzxpwHPR5Q8yI/k0Wu+0UUn/poEefMhi8ayPPsdfl0BskVzw1lwkaTF+YVpR24nhHz7B6JP4LKyQ+C7S1pdyl89j4wfVRDe8zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZVbODkgG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724711153;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fp/iLwSeDYxo+zs4Eu6WkmBXMKfgOlub9d3k+RLst98=;
-	b=ZVbODkgGMVUXt80GTync2m+DFbsNjMTQN6iN1t37g1SrVBfrO6T54M1tRPknxTddFLT2J6
-	+MwZTJxB9dR/Du4eF3JvCPyc7cADVIJs1sF5Z7VNU+KFsAFvbr9uQlhrWbRFn5KBPV7RAT
-	692F9j4O370M6DhnsTHShpdmL/vXCRs=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-100-402v6yAAMO2Y_24ZM-RYXA-1; Mon, 26 Aug 2024 18:25:52 -0400
-X-MC-Unique: 402v6yAAMO2Y_24ZM-RYXA-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6bf6a974541so59440416d6.2
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 15:25:52 -0700 (PDT)
+	s=arc-20240116; t=1724711358; c=relaxed/simple;
+	bh=NSc4Okt+VC5KhhcI4GjwMNyiCG8ff6DKOAXyZDKWKwg=;
+	h=Date:Message-ID:MIME-Version:Content-Type:Content-Disposition:
+	 From:To:Cc:Subject:References:In-Reply-To; b=kMiXJGRRRzXBK05SknC11kk8lFw7UlMF/f+i89/ryvlVLsg0aLwQ8uzQX6SQeSzre6Hftdu7fQXiixmG1YyLz8VTLh++am30YtW/NCySmFTirI1RIWL9/bJE4BsHjRk9Cny9YuYt4jwgoBeCIbJw9XlVExnJ8O5vTM2PGVr+Vq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=WJZ3qFsE; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7a1d6f47112so330285785a.0
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 15:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1724711356; x=1725316156; darn=vger.kernel.org;
+        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
+         :content-disposition:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3N09dlUeLDWnGTOZ4n6d5/3QJlaJZT1Youw+FJ2C4po=;
+        b=WJZ3qFsEJlCOjjVv70lDYOGCojujLiMZFHAc55qUEIpvOwN6zAUz/oyCLv6nTn2gva
+         v9I8lO2w20KUj6tsgMpBIWCggmiswdcrYqhr0RNXSoVFhvtiWmf0IjZk1JMAjhVBVShK
+         4E4FUzp1y9VGo6ylEKDpsUIQEntHQuD8OBsKgg5fCDnlr2nm4YZH8TK19Pk7owAwU3GY
+         6prh89062RpF4CDYIyQ1T92O15fGO1y0A8/mf5aDeGHYyV81+FHGrdRHHrRg+9gNa6Km
+         gFZc/+NKvrIqRf2wOewBb6uIDACZnnDD7O3bKHBEhqJMQgAFWRUFxqEvBGl+a5PrSlRa
+         JaJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724711151; x=1725315951;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fp/iLwSeDYxo+zs4Eu6WkmBXMKfgOlub9d3k+RLst98=;
-        b=QqBsnTeKph//JkpwCDj6PDxUZ5//9crsTqaCULyldNjk7lPVVJGtVt8sb/njgeDO1h
-         7JBEInUCNa6UWIY0Pj/tEq+JnG0hmwNw/OfEGMeJhoue+3L9HU0hnCoiWHuxOxInLcsW
-         790QOXbGG7h134GZRP3hr0i9gMv4bOQLnYMUvWXCu8gItNLHrMwm8Eej5RViEBT8WXrM
-         1y5LhbjjRojJPJ0rhF06cRbdklkG3no7iSYuaXCzcVzcnRNCjEOzvJMH9EaEyQqOmoBC
-         b9LI7EfZLvv64hd4DBHXA907DZDxqR5k8CX9XHeWK8tmjWetOEM+rEjEt0TeMJ875LMZ
-         023Q==
-X-Gm-Message-State: AOJu0YzXjvIzsqYUhqf6hDNfXqsHfhBs43T+FbcUqIfmomJZReTh5rrA
-	VrkXRy6DhZLOKiLEsyDuIMXPbE+YeIVC+68+19/2A2P2PRVviFIm1ud0DZkUTWIA5B6KXF7xJMd
-	ORmgJGGaRb6uzg/jzBUWyjT73IWfpaDw/SvJLLhl56sxGps1P2/+KYA==
-X-Received: by 2002:a0c:f209:0:b0:6bf:7c43:c390 with SMTP id 6a1803df08f44-6c16df28accmr165362966d6.48.1724711151586;
-        Mon, 26 Aug 2024 15:25:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6E8/uu5HzgtnUmuh1ISv3bLFbUm6t6E8SWIRIVwEfIumByBeTj9AeGtbyeQ3BXh72tLa8tw==
-X-Received: by 2002:a0c:f209:0:b0:6bf:7c43:c390 with SMTP id 6a1803df08f44-6c16df28accmr165362626d6.48.1724711151090;
-        Mon, 26 Aug 2024 15:25:51 -0700 (PDT)
-Received: from [10.0.0.174] ([24.225.235.209])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c162dcc904sm50182266d6.104.2024.08.26.15.25.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Aug 2024 15:25:50 -0700 (PDT)
-Message-ID: <c9567ddd-cc84-4fbc-bb6d-b719b2cb723c@redhat.com>
-Date: Mon, 26 Aug 2024 18:25:49 -0400
+        d=1e100.net; s=20230601; t=1724711356; x=1725316156;
+        h=in-reply-to:references:subject:cc:to:from:content-transfer-encoding
+         :content-disposition:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3N09dlUeLDWnGTOZ4n6d5/3QJlaJZT1Youw+FJ2C4po=;
+        b=t6x8UAVJlxmqFPtAlITJu+O7YwbCXHu9BE1eqAORSuwcbPzjsh5qpGKuTsYJPWwzZc
+         +YXx9GonTIVN+l9wBkHAYxmCapCO5BB0mx8vKZV57Bnws6cZSGE9emOzu1JyzEF3iuQw
+         49DabHY3gh+nhCQUDSFoPGVEki6lYRJNfRHy8oZdtfuL/lh05nztEgbf9Msp7nloHmvw
+         R3JpcjkiZiEtdzhDAJE2j+XkOmJkyoOdap0ErFFgvGxm1nA20ljqo4Jg9p70zzCrZAk3
+         MK+fYPxkl+4c6m59TFhime9PcCcf/Q4FKvhOLEoFqsd49Pc2vCiobgDU9rMCwe+rgSxr
+         rmuA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUVULubztKT9Hduk5+F/kp/t6DkDx6BPNoDWPEd1mMfT9bm9qiRT6RMrK7Q2XTsSVcmKpbELE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy89YF1hwnAEcxWwBRt7ihikCKJGusxX/5q5k2B6iHE2djmFrq
+	g54DfooRG6VdExXl8LhsFao68gZvDq+f2LhifUp+rhzVihN5cQeND72L+iQ9vDm1kKKkLuzaYII
+	=
+X-Google-Smtp-Source: AGHT+IFQn+z4i4PvF96htJxu0pzdb+NNPCs7QRfIEw0WlBnCJXtMyEadU8DR0+0TjKzAkjXI62fJtA==
+X-Received: by 2002:a05:6214:3c98:b0:6bf:95a7:e230 with SMTP id 6a1803df08f44-6c32b8094b0mr11868556d6.36.1724711355689;
+        Mon, 26 Aug 2024 15:29:15 -0700 (PDT)
+Received: from localhost ([70.22.175.108])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c162d1d27bsm50635416d6.7.2024.08.26.15.29.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Aug 2024 15:29:15 -0700 (PDT)
+Date: Mon, 26 Aug 2024 18:29:14 -0400
+Message-ID: <a769ce9fc949c03f91a4ee1d1cc6ebf6@paul-moore.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] tcp: add SO_PEEK_OFF socket option tor TCPv6
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, passt-dev@passt.top,
- sbrivio@redhat.com, lvivier@redhat.com, dgibson@redhat.com,
- eric.dumazet@gmail.com, edumazet@google.com
-References: <20240823211902.143210-1-jmaloy@redhat.com>
- <20240823211902.143210-2-jmaloy@redhat.com>
- <CAL+tcoDgq+MmNz6Eo_61eBJ2fduyxL1j+kbo_9AYtB4o3tJO5w@mail.gmail.com>
-Content-Language: en-US
-From: Jon Maloy <jmaloy@redhat.com>
-In-Reply-To: <CAL+tcoDgq+MmNz6Eo_61eBJ2fduyxL1j+kbo_9AYtB4o3tJO5w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+MIME-Version: 1.0 
+Content-Type: text/plain; charset=utf-8 
+Content-Disposition: inline 
 Content-Transfer-Encoding: 8bit
+From: Paul Moore <paul@paul-moore.com>
+To: Ondrej Mosnacek <omosnace@redhat.com>, netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org
+Cc: Xin Long <lucien.xin@gmail.com>, Vlad Yasevich <vyasevich@gmail.com>, Neil Horman <nhorman@tuxdriver.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Stephen Smalley <stephen.smalley.work@gmail.com>, linux-sctp@vger.kernel.org, selinux@vger.kernel.org, linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] sctp: fix association labeling in the duplicate  COOKIE-ECHO case
+References: <20240826130711.141271-1-omosnace@redhat.com>
+In-Reply-To: <20240826130711.141271-1-omosnace@redhat.com>
 
+On Aug 26, 2024 Ondrej Mosnacek <omosnace@redhat.com> wrote:
+> 
+> sctp_sf_do_5_2_4_dupcook() currently calls security_sctp_assoc_request()
+> on new_asoc, but as it turns out, this association is always discarded
+> and the LSM labels never get into the final association (asoc).
+> 
+> This can be reproduced by having two SCTP endpoints try to initiate an
+> association with each other at approximately the same time and then peel
+> off the association into a new socket, which exposes the unitialized
+> labels and triggers SELinux denials.
+> 
+> Fix it by calling security_sctp_assoc_request() on asoc instead of
+> new_asoc. Xin Long also suggested limit calling the hook only to cases
+> A, B, and D, since in cases C and E the COOKIE ECHO chunk is discarded
+> and the association doesn't enter the ESTABLISHED state, so rectify that
+> as well.
+> 
+> One related caveat with SELinux and peer labeling: When an SCTP
+> connection is set up simultaneously in this way, we will end up with an
+> association that is initialized with security_sctp_assoc_request() on
+> both sides, so the MLS component of the security context of the
+> association will get swapped between the peers, instead of just one side
+> setting it to the other's MLS component. However, at that point
+> security_sctp_assoc_request() had already been called on both sides in
+> sctp_sf_do_unexpected_init() (on a temporary association) and thus if
+> the exchange didn't fail before due to MLS, it won't fail now either
+> (most likely both endpoints have the same MLS range).
+> 
+> Tested by:
+>  - reproducer from https://src.fedoraproject.org/tests/selinux/pull-request/530
+>  - selinux-testsuite (https://github.com/SELinuxProject/selinux-testsuite/)
+>  - sctp-tests (https://github.com/sctp/sctp-tests) - no tests failed
+>    that wouldn't fail also without the patch applied
+> 
+> Fixes: c081d53f97a1 ("security: pass asoc to sctp_assoc_request and sctp_sk_clone")
+> Suggested-by: Xin Long <lucien.xin@gmail.com>
+> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
+> Acked-by: Xin Long <lucien.xin@gmail.com>
+> ---
+>  net/sctp/sm_statefuns.c | 22 ++++++++++++++++------
+>  1 file changed, 16 insertions(+), 6 deletions(-)
 
+Acked-by: Paul Moore <paul@paul-moore.com> (LSM/SELinux)
 
-On 2024-08-23 19:51, Jason Xing wrote:
-> On Sat, Aug 24, 2024 at 5:19 AM <jmaloy@redhat.com> wrote:
->> From: Jon Maloy <jmaloy@redhat.com>
->>
->> When we added the SO_PEEK_OFF socket option to TCP we forgot
->> to add it even for TCP on IPv6.
-> Even though you said "we forgot", I'm not sure if this patch series
-> belongs to net-next material...
-I agree regarding the fix.
-The selftest is new however, and belongs in net-next because of that.
-Since I made it one series I decided for net-next, but I leave it to the 
-discretion of Jakub and the maintainer of the linux-kselftest system to 
-decide where they go.
-
-///jon
-
->
->> We do that here.
->>
->> Fixes: 05ea491641d3 ("tcp: add support for SO_PEEK_OFF socket option")
->> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
->> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
->> Tested-by: Stefano Brivio <sbrivio@redhat.com>
->> Signed-off-by: Jon Maloy <jmaloy@redhat.com>
-> Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
->
-> You seem to forget to carry Eric's Reviewed-by tag, please see the link :)
-> https://lore.kernel.org/all/CANn89iJmdGdAN1OZEfoM2LNVOewkYDuPXObRoNWhGyn93P=8OQ@mail.gmail.com/
->
-> Thanks,
-> Jason
->
-
+--
+paul-moore.com
 
