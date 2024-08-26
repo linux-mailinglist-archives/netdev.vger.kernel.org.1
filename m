@@ -1,164 +1,159 @@
-Return-Path: <netdev+bounces-121922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7142795F43E
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:45:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AB8195F460
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:51:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28584283054
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 14:45:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 905D71F223AC
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 14:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9E11940B1;
-	Mon, 26 Aug 2024 14:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA5F18D65B;
+	Mon, 26 Aug 2024 14:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Bu0W8ZzG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bA4lXiLw"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2084.outbound.protection.outlook.com [40.107.237.84])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8BF189904;
-	Mon, 26 Aug 2024 14:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724683505; cv=fail; b=TNbBnabO1N3gGE3Ohbh0jwwxj8SdOazCXIT4i8Por1XCDLiXj/rVl16EKCXBfRgVd7zOQdqVdBkQmNuojvNNIBV97L0bom524waBCgKwzjUJKQRV11z8oNC+F8799rL3ClTiPFGBvBSdVbCSnS/HUDvjReSzcmnuUQjqvxjtWeU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724683505; c=relaxed/simple;
-	bh=0/1gCZTnCcIFICDdw5x67kkYqwWcyfnTaxefJeW8E4M=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=RFBlGDUbKp1wfZCZ86vJ/G5NkKrLUEUm/OM6v2HWw53cLf1ImMiAvjPkGEFLz7NAx50l0Q5xmETf6tVhc7WeIWW0he7ryjxnbc/a06JhhFUkWBGivmClBjBfEyVo7Vt6/qF+RO1c5WtSbcbaERZOa01R6goElwZY0hcFDVM5Ggc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Bu0W8ZzG; arc=fail smtp.client-ip=40.107.237.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mDGT6cywaIpnI2Dt1aZZ4CiD243oaiZ+n40r39HkY5Q4/FvrMSZV8eE1wUNCQYll41zjtHLAwoF8kUuOf7YoRNYoeW7DQwRIF0wl5IiB/o+fsKYCB9pyj1qXwEOCmRfVN3Yxo7c5il/1tAeJnx7fzJQds/hGQSGfrmFMrT1Lt5nxbHXaPMGrbc4CIEizIF4m5HS5dOK08iQOFtTD3xzbTnc3BqCQqiuLk87ucDxp9cpYtYCGA/g5Sd4v60JlcpnDxKMtotiiC1ky/Vit+0ZKIc0QdvOJ9H+jT8CGm+dZjhB/LH6yG5FNXlx30PXkeI67VTZcSHCQzA3eYqrP+dkMvQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0/1gCZTnCcIFICDdw5x67kkYqwWcyfnTaxefJeW8E4M=;
- b=uuG++CzNBAHD0pcVtbRkAMLBmumvh2G7M3X0L9h6kKjZLYWVMIMg+6IqW1KLIJlqVQkFWq/J3BysB7kyVKShVCLHrLoSUCITMkAuPy7dSwf9O1WPiUPscuub0m4c0fwIEaVvMQJrF6sd6fGj9w1l3M0HMsKVVZnfaefKN+l1EKqQCZrprQmlBxjVaatTA1HKmqCQNL5DhvoiTMO6RIA29Dd9lRo5mqa7b79j0ezQ8DHoLwkGWkpjTKRSMQ4IERMZuE2YwarbgBomh3IqzQN6c/OqsdaBI6faYb8LcP03A+0wvAf+D3SOqHR7UgUJmfOVFk+iGKOf1YrgMOu2RCUjqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=nxp.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0/1gCZTnCcIFICDdw5x67kkYqwWcyfnTaxefJeW8E4M=;
- b=Bu0W8ZzGDVrQgv4HnUMgHCpJ9wGU3OUtWqap3wy94PR0aya3oi8g/ZjlZejSQoB3hF+NKso304PCHinIrtwBgO7w40e8bNMYGjlOjt7W8O/1AHK2S9OG5um10jePHVjFacd/mgO1prXEddxQudHGExvSDa/oeNsjFWl3yKKHSP/Bi0U/hZajJ/+gnLbUztPH7kVOsG1t6HO0wiR/PHMv58yuPzL/oSMioQnEOZScEuB5iNQC2nGW70KeZ2e3sDC86ZoPuI7j/oKCAYbzNLspUuF1o/jRBVPmO1ho3DsMG22Vzqdczs+C67nL2jRrnKh8GflgL6lyT/W0+dXhcQ/s7w==
-Received: from BN7PR06CA0057.namprd06.prod.outlook.com (2603:10b6:408:34::34)
- by MW6PR12MB8661.namprd12.prod.outlook.com (2603:10b6:303:23f::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.24; Mon, 26 Aug
- 2024 14:45:00 +0000
-Received: from BL02EPF00021F6F.namprd02.prod.outlook.com
- (2603:10b6:408:34:cafe::cd) by BN7PR06CA0057.outlook.office365.com
- (2603:10b6:408:34::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25 via Frontend
- Transport; Mon, 26 Aug 2024 14:45:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL02EPF00021F6F.mail.protection.outlook.com (10.167.249.11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.13 via Frontend Transport; Mon, 26 Aug 2024 14:44:59 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 26 Aug
- 2024 07:44:45 -0700
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 26 Aug
- 2024 07:44:39 -0700
-References: <cover.1724324945.git.petrm@nvidia.com>
- <7dac3bd8f776741a9816efb03c672c4887765ad4.1724324945.git.petrm@nvidia.com>
- <ZsxwHFMY4WMjbDee@shredder.mtl.com>
-User-agent: mu4e 1.8.14; emacs 29.4
-From: Petr Machata <petrm@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-CC: Petr Machata <petrm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <netdev@vger.kernel.org>, Jakub Kicinski
-	<kuba@kernel.org>, Amit Cohen <amcohen@nvidia.com>, Benjamin Poirier
-	<bpoirier@nvidia.com>, Hangbin Liu <liuhangbin@gmail.com>, Vladimir Oltean
-	<vladimir.oltean@nxp.com>, <mlxsw@nvidia.com>
-Subject: Re: [RFC PATCH net-next 5/5] selftests: sch_tbf_core: Use defer for
- stopping traffic
-Date: Mon, 26 Aug 2024 16:31:59 +0200
-In-Reply-To: <ZsxwHFMY4WMjbDee@shredder.mtl.com>
-Message-ID: <87seur8ht8.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C76A1553A3
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 14:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724683874; cv=none; b=B8Eyalfc3VpAD9KnoKIS2sKFbQEMf88WmNj8nBFeKRFG4FVT5y1Xe36oGlKLalfiB1iQEGTLiM8DqtgTAVo1qCo/DwfcUaAEjD+z9aCl9aBohL9nU0p3EJLrxSTgYPNlteYMhOVOaAIRQa1eVSpThX80T6f/HNCVbzr5bu4qTfs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724683874; c=relaxed/simple;
+	bh=gejqF3lxPDzVKaKWaPqTWU5CZhdrvtg8FR6CXRKXq10=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OZTOhFM6niFVUb8gndkySFQ7mHAdTH8acRsKHwb1fdwPlVkfu4bYbwzw8s29dt21sX55rv4w1ZoM13as8GsQj1sjR0fnYhV2Xi79wuNu2CrA86l3jsKi+nibbOx7SQ7IOQBkdkIMnWpXsOtXelRiiAnC9UtXNUT0frBi5Qe4Pok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bA4lXiLw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724683872;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ygoQZIsbD2qBAAmAvknxBdRGvmvE0QFAtlIfXcqGyiA=;
+	b=bA4lXiLwLbxXH+chWnqogx2r3zeNyU2BAG7EXKp0TAbr+VgsMWZrBFK2X/vjyQYNAordpb
+	CTrrECbjWibCTvnGfb9rOHN71bKIAo0heafCSIVLe3Rv8fGO0xWQ0+w+7D28s7wqXVj62g
+	mQeEYjSsXNqTmBUSuwenOPOEb5sO+zE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-543-RTu9e3YBPOq9OfVLi56qtg-1; Mon, 26 Aug 2024 10:51:11 -0400
+X-MC-Unique: RTu9e3YBPOq9OfVLi56qtg-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-371ab0c02e0so3683071f8f.3
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 07:51:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724683870; x=1725288670;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ygoQZIsbD2qBAAmAvknxBdRGvmvE0QFAtlIfXcqGyiA=;
+        b=KGVn/UmOo3wi+Xcb9TrjBzKryet9B3jc5SfGFOXcDpgSGj/vj52v6xV+8pvSE/ZDkX
+         gksF55zDGZJQeRebFPNxRLBAcrC17M5As3dWPwBMXNgGpbmRriM8Gzn7CJQ7nxkLb4qp
+         EQVSNQ0MPrvUQPBrNYhhHZvjOhgLusqDe5+LDqsX6ave7BfN5CbTxpb1EVMT3k3ykKeQ
+         GN09on7Rp5rsXLKutNrcgUWaWejKzk2ihCnH11/x56i1zyDkPsDHGpDmvsrjEVqwR/uX
+         Zr/RtbEy554aFZdX8SpBf+zD7vEp+a2RRYwyrm0DmWJI+NmxrZznb0KNG3vW15LLZJ+l
+         WTiA==
+X-Forwarded-Encrypted: i=1; AJvYcCUv5cefmmbMQZviHUGq2s7En0kBCTxKeHiRVRYfNAsmGxTNH5VPScS35HgnILVAausv8aTWsg0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeKY02O/+UbxWPHkatXWK2igJF6kPLelNNCrGH0gNrGYR3ojaF
+	eY50OeRTopI4VEaoFJWLFnurxcmSPDANQTeQFs+VjJvdOWiIscUOjEwRWUFAk8GcPeBFpPKU23H
+	z4HNGV0SqeVoey6OELQw84wPgwCsFNRcJ4rLuw5TW0SrThx6Xtmxqdg==
+X-Received: by 2002:a05:6000:18a4:b0:369:b842:5065 with SMTP id ffacd0b85a97d-373118c853bmr9315241f8f.41.1724683869833;
+        Mon, 26 Aug 2024 07:51:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGzcbeZGAiG9pR7gwgPFjZ9tQkwyQH6hKqQkC/ZviQjFl3Zuqsn+yKqro2WkBtRVRH4FkIJWQ==
+X-Received: by 2002:a05:6000:18a4:b0:369:b842:5065 with SMTP id ffacd0b85a97d-373118c853bmr9315196f8f.41.1724683869319;
+        Mon, 26 Aug 2024 07:51:09 -0700 (PDT)
+Received: from dhcp-64-164.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-373082096bbsm10889215f8f.89.2024.08.26.07.51.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Aug 2024 07:51:08 -0700 (PDT)
+Message-ID: <ad6af1c4194873e803df65dc4d595f8e4b26cb33.camel@redhat.com>
+Subject: Re: [PATCH v3 5/9] ethernet: cavium: Replace deprecated PCI
+ functions
+From: Philipp Stanner <pstanner@redhat.com>
+To: Andy Shevchenko <andy@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, Wu Hao
+ <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, Moritz Fischer
+ <mdf@kernel.org>,  Xu Yilun <yilun.xu@intel.com>, Linus Walleij
+ <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Alvaro Karsz <alvaro.karsz@solid-run.com>, "Michael
+ S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>,  Eugenio =?ISO-8859-1?Q?P=E9rez?=
+ <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Mark
+ Brown <broonie@kernel.org>, David Lechner <dlechner@baylibre.com>, Uwe
+ =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Damien Le
+ Moal <dlemoal@kernel.org>,  Hannes Reinecke <hare@suse.de>, Chaitanya
+ Kulkarni <kch@nvidia.com>, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, 
+ linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+ netdev@vger.kernel.org,  linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
+ virtualization@lists.linux.dev
+Date: Mon, 26 Aug 2024 16:51:07 +0200
+In-Reply-To: <ZsdO2q8uD829hP-X@smile.fi.intel.com>
+References: <20240822134744.44919-1-pstanner@redhat.com>
+	 <20240822134744.44919-6-pstanner@redhat.com>
+	 <ZsdO2q8uD829hP-X@smile.fi.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00021F6F:EE_|MW6PR12MB8661:EE_
-X-MS-Office365-Filtering-Correlation-Id: ba949b0e-d944-431f-4e38-08dcc5dda94b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?uZtpJYNERAc26BVQEV5h+CgRz0fTwgTGTH4WhbR9DTeR1AoUtuO3E7rePUg1?=
- =?us-ascii?Q?cVebZbk//LtY6VIi73WX9UMIP5OMo0Tm45+o8l8XSuWS1wVGtH1+kdM+jW4C?=
- =?us-ascii?Q?vBNOWhj78sHbZvud7sqht8f5ZV2I9f/dcpNGYl3pTk8ZYW4ArMGaWCuufNmC?=
- =?us-ascii?Q?J57Z5CyHfsqCeUgSLlsL1JplT2idzeDjSnR56jaAdHSgmIBAPdBeSgOQamlX?=
- =?us-ascii?Q?c8EpYNWlO0Q9wVQkDYlYVCJXXXERnNRwqiURiMF9yQtl4t7wgHbEdC6R0KKX?=
- =?us-ascii?Q?02ZxTTWox2d3zzoek9AKUTHdkUDEZR5p1EIoW0hq8lSvLKH0X4rxjeo95xRS?=
- =?us-ascii?Q?ZxvaAtlvv++TELtKBkO/gjb8zwG530cBq/hMn+ORkTeZsRULW+n9MHeg0Z+e?=
- =?us-ascii?Q?EoOMCzFptva/oJHeengcrPmDeRilHQuKrOQZdZXhRzEvmLOyriguw0ZOM3T/?=
- =?us-ascii?Q?X9fC0WwHEtZXQA6VSblOXcyTv0vjUzsoj0UHSDh/L8feJPyrel6P9XOqhxhk?=
- =?us-ascii?Q?UDqH7IAm07EcEbv9ozA8q6/XD/YiNCc5i1HZvlryX90GHSAUtT3PChe7/qhi?=
- =?us-ascii?Q?guop+/1Aspu9f2KlkiFsEj9yh+ARUxSp9S3y3Xp1IhKcGtxslqUdaHdzgLCf?=
- =?us-ascii?Q?d87xZf80OtcGsWPtLFyRxRC41rV6o31grLVYkkUmAHavAUS93rk2pZ7eYk8V?=
- =?us-ascii?Q?sgWncdC0ZlL0X2dPPi05RsaycljCnTH7Rd7w9hZRBkdWzVTwb18VKfDlSB5C?=
- =?us-ascii?Q?kB8kwZcqBcLKrOsuYoiTVeoi2KW8A1gvaNBMbnaAbDIXHJWF84xV2NsuGi+g?=
- =?us-ascii?Q?Du2EipdsGu3uJ8Euk60F9bK9xwgqVRFlzc4zcYJx9IvLSEABT9Qp1AM19I8J?=
- =?us-ascii?Q?K6F1aXaKVoTXRd79bsHP0idBqev6MFonhoBEiOHcoFBP62DPFLxfSf6S7Qon?=
- =?us-ascii?Q?2uFhExN0u+Ocgaf1A2sqRGITKjgulugwYAcE5oY8a3BZ5tSWrAV+obW50uvD?=
- =?us-ascii?Q?RYXb5i8IPoRqdRwUyrM2HIU70JHUbngMDqwIFuBRjwuaR3HhRPjxw8cZyikd?=
- =?us-ascii?Q?tw2U7i8LTFYqCt4aAyjQmOL93cJoQB4Nqq6RcwDsvcueWi4+ErBQfPD+KCoV?=
- =?us-ascii?Q?EODFhQMt38u+FOD68ECencToMMug1wUaHLMOeoWuPn+2Dz8bFit0YCmCcjH/?=
- =?us-ascii?Q?ONQM4Q6lL8OJjDolRFaqIlAdZ7TPECXWk/LYWpTIhqVE9/cq9ej44Wu2vEPY?=
- =?us-ascii?Q?f1cqXn3/iwLaCKRs1fsVsgXwiz1uzTgGeLwAf7My6Lot8MZLlK9roc0yYyJP?=
- =?us-ascii?Q?a6xXsJGL/JXZMLYKlk7XlkjTDJtsv1TQ1G1BMeF9xkJyI1inSYJgI+Tgr9CL?=
- =?us-ascii?Q?G6CLDFioS2ADluAt4pX9IJXQXTdNCglbgZ+oebM7j9nFTU/8n7vZngXN2b8Q?=
- =?us-ascii?Q?Vka0F3phLbYkTxOcL3tiXWFXI235pu1T?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2024 14:44:59.6465
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba949b0e-d944-431f-4e38-08dcc5dda94b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00021F6F.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8661
+
+On Thu, 2024-08-22 at 17:44 +0300, Andy Shevchenko wrote:
+> On Thu, Aug 22, 2024 at 03:47:37PM +0200, Philipp Stanner wrote:
+> > pcim_iomap_regions() and pcim_iomap_table() have been deprecated by
+> > the PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> > pcim_iomap_table(), pcim_iomap_regions_request_all()").
+> >=20
+> > Replace these functions with the function pcim_iomap_region().
+>=20
+> ...
+>=20
+> > -	err =3D pcim_iomap_regions(pdev, 1 << PCI_PTP_BAR_NO,
+> > pci_name(pdev));
+> > -	if (err)
+> > +	clock->reg_base =3D pcim_iomap_region(pdev, PCI_PTP_BAR_NO,
+> > pci_name(pdev));
+> > +	if (IS_ERR(clock->reg_base)) {
+> > +		err =3D PTR_ERR(clock->reg_base);
+> > =C2=A0		goto error_free;
+> > -
+> > -	clock->reg_base =3D pcim_iomap_table(pdev)[PCI_PTP_BAR_NO];
+> > +	}
+>=20
+> Perhaps
+>=20
+> 	clock->reg_base =3D pcim_iomap_region(pdev, PCI_PTP_BAR_NO,
+> pci_name(pdev));
+> 	err =3D PTR_ERR_OR_ZERO(clock->reg_base);
+> 	if (err)
+> 		goto error_free;
+>=20
+> This will make your patch smaller and neater.
+>=20
+> P.S. Do you use --histogram diff algo when preparing patches?
+
+So far not.
+Should one do that?
+
+P.
 
 
-Ido Schimmel <idosch@nvidia.com> writes:
+>=20
 
-> On Thu, Aug 22, 2024 at 03:49:44PM +0200, Petr Machata wrote:
->> Tests interrupted part-way through leave behind a running mausezahn. Use
->> defer to schedule a traffic stop after traffic is started.
->
-> Any reason not to convert the setup part to the defer mechanism as well?
-
-No. I wanted to see if it makes sense to have an entire test use the
-defer mechanism, in addition to cleanups specific to individual tests.
-But I wasn't sure what people would think, so just converted the RED
-tests as a sort of a demo.
 
