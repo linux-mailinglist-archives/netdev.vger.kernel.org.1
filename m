@@ -1,81 +1,97 @@
-Return-Path: <netdev+bounces-122029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8EB495F9DC
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 21:42:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9ADE95F9F2
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 21:49:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41865B22130
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:42:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD5A1F232A0
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F7A61991AD;
-	Mon, 26 Aug 2024 19:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 427AB130ADA;
+	Mon, 26 Aug 2024 19:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lJEifTbQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RHNOJGGu"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F16811E2;
-	Mon, 26 Aug 2024 19:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1A578C93
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 19:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724701366; cv=none; b=pfdkTlgB1z8CHMGz2W46tjEWdZ9tZYMAUfbqvE7d/6cPDFcQfe2PaWIveCNrrkDu55KXWX3h8iOczTxV8+RZ6X67dgskuvgY8/dxhBJ9vaTPmZ6lcA3kJ03+30EAN+wDhgz0GAphHDloKCmhOaZay1yN+6vKmcmrIfJAIUvrrGw=
+	t=1724701784; cv=none; b=LEcBPq2G46SAvguMq7QsD7hTzzlnlqUFwqUSEuW+0mYrTEgDXlQ9YMrWCPCPU8L1d/hfLK4QcC7lan+5YRfuWPADAOwv0uLNS8L6vLVbhmJkq/8oGta6hAbifE83Ncbt6vr08ffAN6wTf7FiDlb3gv0wICEPm3en2TmGiFWhcbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724701366; c=relaxed/simple;
-	bh=WQWPUbLddyPe0qsg3KbXP8PH4EXTPOjQrbyOXfFL5R0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KvPm9k0w3mciegNtavGzMPQxnBNM8a5LNZuKm8MPG0CcGvyVS/qy5YjZoNLyu4R2ToO3ydu6aKT13z1ZZfxXms9DD5BUaKI7Sw8oczEGsrRTFJqJyZTdHGQQaT9aPzJuOehbf9Ug6yqadQQHMTeAHwGyBCAYl/D4qKir/S7g/kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lJEifTbQ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Fo5uv/jFeo7McSlP1paAD+jiMJiqhe1QrEoGer2O2yc=; b=lJEifTbQ3lhv1pDlR+QnEoZ3bh
-	jo9xlWFInb8CS7D+3XUzx8QBjQWl7RIbwU/kLG0A1o8CFHk0y6s7K6HAtRsmEWmaoe3MkTisxawhb
-	io5tIlpPjGgx06hqGAz+NuKhyLXegJL3WsSWd+J20Y0q8LhEej+0kgxCWiYGXjLx4y4E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sifbi-005k7C-Ne; Mon, 26 Aug 2024 21:42:30 +0200
-Date: Mon, 26 Aug 2024 21:42:30 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: phy: vitesse: implement MDI-X
- configuration in vsc73xx
-Message-ID: <1f025063-5c21-457d-8596-633c7adfd294@lunn.ch>
-References: <20240826093710.511837-1-paweldembicki@gmail.com>
+	s=arc-20240116; t=1724701784; c=relaxed/simple;
+	bh=upmIj4iHs1oz/RTNFDujiq18Ts1JOuIWbpA2ZtO2IoM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cC/XkVN532lP5NbqXUGmI8yegbDN2bOP8PKI1FYiVp3LD55N2SLhWl/yKXX2zU/X82WrVj1T0jTCQXO4T+3h+9oA4NF6ePzDpqlZ1EytKLXwmOuBWUnP2lGubDzW8JBQhV/gDMNqC2viNzzGlc3AMxT4aN01HbcI/lvJC/+s0CM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RHNOJGGu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724701781;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=YYe2pwW4VxuxSk/smNvvbWzaedo3jmVmKOyaCpUpHEY=;
+	b=RHNOJGGuSzaCPX5o2WDC/jVv5oyimURCCPn01bcQ3vSEG1CDliYy57Y2xAwKB3fW1cjT3J
+	925ta+J0LjS9y6rmP2n/8XGgkr01QkIEVjVNBRjTZUcTw/CXyDUB5G6Qjl4p8TITFTacAB
+	UD5aVQLLGWTfN592g0/yBjJr7HlG9Tw=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-375-odcqeoLuOQSagcInKSMbFQ-1; Mon,
+ 26 Aug 2024 15:49:38 -0400
+X-MC-Unique: odcqeoLuOQSagcInKSMbFQ-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AA4D01955D4E;
+	Mon, 26 Aug 2024 19:49:36 +0000 (UTC)
+Received: from jmaloy-thinkpadp16vgen1.rmtcaqc.csb (unknown [10.22.8.17])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0A03E19560AA;
+	Mon, 26 Aug 2024 19:49:33 +0000 (UTC)
+From: jmaloy@redhat.com
+To: netdev@vger.kernel.org,
+	davem@davemloft.net
+Cc: kuba@kernel.org,
+	passt-dev@passt.top,
+	jmaloy@redhat.com,
+	sbrivio@redhat.com,
+	lvivier@redhat.com,
+	dgibson@redhat.com,
+	eric.dumazet@gmail.com,
+	edumazet@google.com
+Subject: [net-next, v2 0/2] Adding SO_PEEK_OFF for TCPv6
+Date: Mon, 26 Aug 2024 15:49:30 -0400
+Message-ID: <20240826194932.420992-1-jmaloy@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240826093710.511837-1-paweldembicki@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Aug 26, 2024 at 11:37:10AM +0200, Pawel Dembicki wrote:
-> This commit introduces MDI-X configuration support in vsc73xx phys.
-> 
-> Vsc73xx supports only auto mode or forced MDI.
-> 
-> Vsc73xx have auto MDI-X disabled by default in forced speed mode.
-> This commit enables it.
-> 
-> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+From: Jon Maloy <jmaloy@redhat.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Adding SO_PEEK_OFF for TCPv6 and selftest for it.
 
-    Andrew
+Jon Maloy (2):
+  tcp: add SO_PEEK_OFF socket option tor TCPv6
+  selftests: add selftest for tcp SO_PEEK_OFF support
+
+ net/ipv6/af_inet6.c                           |   1 +
+ tools/testing/selftests/net/Makefile          |   1 +
+ tools/testing/selftests/net/tcp_so_peek_off.c | 184 ++++++++++++++++++
+ 3 files changed, 186 insertions(+)
+ create mode 100644 tools/testing/selftests/net/tcp_so_peek_off.c
+
+-- 
+2.45.2
+
 
