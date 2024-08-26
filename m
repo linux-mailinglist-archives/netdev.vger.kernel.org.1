@@ -1,151 +1,182 @@
-Return-Path: <netdev+bounces-121809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D02B395EC8A
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:58:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54C3095EC95
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:59:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CCE81F23D6A
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:58:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D0C9281517
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:59:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598181422C8;
-	Mon, 26 Aug 2024 08:58:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43821422B8;
+	Mon, 26 Aug 2024 08:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="frkfBPTH";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NmSjRlJV";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="frkfBPTH";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NmSjRlJV"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WAZsMFyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318A113D63D;
-	Mon, 26 Aug 2024 08:58:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C22D82D7F
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 08:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724662717; cv=none; b=Mo6tPuozXl4d4krZFSpivemiQNqz5efjh3hgDVFdWnTv5rQdVXOKlZkaZaUVdv+Sn763VVuDOBljLKshB4b/h6ExZeDPtNPxVil9Ri4QSMyP1SE970KamWS5H+ZwjGljqL4PhXG/tD8W1PNwnkcuIASdio8KABSzroUO25iS6eY=
+	t=1724662768; cv=none; b=hg0Qw8PPsLLxxwQ35NiVfs9Q+CiTCsnbKx0yBr8RH/1tsA137fgJFOshClCDo/VhO8WNTM2ra0/FbvybwMrVYXTKxOH43s2oK7MCXmRsVx7uY+1j/xOrsweVoClEeuf3CvWsVkglIA1dFOEZLQFvCTL3lasVY5xs3bRmffc+jO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724662717; c=relaxed/simple;
-	bh=Aenp2rgBj9WT97ObxXQqYib3Tjz4Qu5J2vkfyDlds8w=;
-	h=From:To:Subject:Date:Message-Id:MIME-Version; b=nJ4Jz/RRU/E3Da+5uXStbJ5RwRjPWflafwQBan38gne5gTaFhgtq642q9BftBiyIh5Ad9jlkegiokmjkJIjznP25oREozvXEZCsEM5cYgmHMT7wVOdbbSgju3uhw5nIBaFyQE0OyBsbFs5Gd6idn/J6C/yW9+Q6EO/TCAxBWDYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=frkfBPTH; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NmSjRlJV; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=frkfBPTH; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NmSjRlJV; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 42FC221A35;
-	Mon, 26 Aug 2024 08:58:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1724662713; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=LFldDIQ++8jqXOksKbyxggI0tviGzCPH46mPtl/Vd3g=;
-	b=frkfBPTHZsCyiejxSourA01rRgmszp5221pEDKXuqtJVw0UQD66z25mbUIIQ554f7zjYes
-	lr7mSvfa/JHAOrpS/R71Wzr3fkvsYpdDd3h6Aehk5AMuLgupEP6OUwOVgtcx+NWGVwG6NJ
-	Duhb+LQneTkMN5nazc3crWkSlB9ieyk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1724662713;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=LFldDIQ++8jqXOksKbyxggI0tviGzCPH46mPtl/Vd3g=;
-	b=NmSjRlJVH5I4tQ4N0vPSwJtZ4Xc9oYMpPzNijvLM6981De2bsnHp9mnVXlCzwdRu4qG9sY
-	nP5e+DFhGLNsO8Aw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1724662713; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=LFldDIQ++8jqXOksKbyxggI0tviGzCPH46mPtl/Vd3g=;
-	b=frkfBPTHZsCyiejxSourA01rRgmszp5221pEDKXuqtJVw0UQD66z25mbUIIQ554f7zjYes
-	lr7mSvfa/JHAOrpS/R71Wzr3fkvsYpdDd3h6Aehk5AMuLgupEP6OUwOVgtcx+NWGVwG6NJ
-	Duhb+LQneTkMN5nazc3crWkSlB9ieyk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1724662713;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=LFldDIQ++8jqXOksKbyxggI0tviGzCPH46mPtl/Vd3g=;
-	b=NmSjRlJVH5I4tQ4N0vPSwJtZ4Xc9oYMpPzNijvLM6981De2bsnHp9mnVXlCzwdRu4qG9sY
-	nP5e+DFhGLNsO8Aw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2D5DF13724;
-	Mon, 26 Aug 2024 08:58:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id bq/rCrlDzGa4ZQAAD6G6ig
-	(envelope-from <tbogendoerfer@suse.de>); Mon, 26 Aug 2024 08:58:33 +0000
-From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] ice: Fix NULL pointer access, if PF doesn't support SRIOV_LAG
-Date: Mon, 26 Aug 2024 10:58:30 +0200
-Message-Id: <20240826085830.28136-1-tbogendoerfer@suse.de>
-X-Mailer: git-send-email 2.35.3
+	s=arc-20240116; t=1724662768; c=relaxed/simple;
+	bh=pGUaHSOJJkMQt5BZYoMf0dGNN2Fjcxw7k0FILJR0kAw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ofpv/NIaHsdPWjowTrIBJGOT6uvyIGfgj/EybEvFtbZW6CS6PUCC2YRScmw1n7uKyxCexIhUhtH3X/3iqvzmRSSeuc8RDqOKoi5AuAQBz9qxG5ZA8o5St0Ny1ce0C+hZY7drzgIsF5DsNf1CnoOCe/vOtdqLTa/NudL5l05eJsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WAZsMFyC; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-533462b9428so6863018e87.3
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 01:59:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1724662763; x=1725267563; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Bd9B44Nl7+g1cM9bkfkjJX8JzbY1PgI3kG+ulDiEMdQ=;
+        b=WAZsMFyCcWnUtEY1WTevuZMkQvO289Xp6hho0yFIuZvq22aBTGlJ0cXibBS2i9/puF
+         aWcQO4atlofDUbpKsOAJ17jlWk/ukeQee2TpJuVb2b5cNJ2aLeL9Rf2KGd/gajVIbetJ
+         1C+qOxiaKX0/93kmgLd+T9tyzE3MQVnQm+T2H5Fs4bjrUL6BGuIyddPsSfwTAK+m6iI6
+         iCvTtRqabi0AkM4bjGQYHa0MhTmY3HBY/IEUAU5qwzrZsbIen7wsRTc8I2uTOTLW6gAS
+         A3mGHILVyHmxJlcwJohm61gaC0FSMcs+waTa1BNendWXcy5Hx8Jw+C8fC7C5h4tD3Svx
+         uS6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724662763; x=1725267563;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Bd9B44Nl7+g1cM9bkfkjJX8JzbY1PgI3kG+ulDiEMdQ=;
+        b=PH9mA7cYsdkwV85RP5+Qb0zc62ADDG9KjXi0p2O2MogqBkCAPkG5bfqzNoACsFQX0l
+         KnAe/VkFjimrSpnjxydoRZkzhoCHW/ys4YsEWcJsAX6JfysIOqBM+cgEx1p7mMuVpKTm
+         o02giI4JNgtjrXoxr28ASdvHdQvpGdnDcyWgtLqsKr2jhm2VyQ3HSdKoN+26hWyiz6Es
+         eUi35KkH8N1bpfj/pvAlBYNGynKkWFgn/MgE3dYhDJHlErkemqAyTCTrswONOW1IQj3m
+         4q7Jx1ZBC5pY4o1Z25xC4smBzwOHz6ktJF2+jQiZ8ZPgX+8RZjBY/Kg+/YQt3dev+TbS
+         4ouA==
+X-Forwarded-Encrypted: i=1; AJvYcCVp8kFD0AgQmPhAc/UdJ6rZTDoB6y8csl+x9vp2Xj0CCt1jPCtnwzDXYTgU8jD674GpynJWMd4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1yW/XrkGb5e9VVcs5L9bx1C1qdkBym92q1gkY7LyofNedg/Jn
+	tLUcNTTynBFlkGZHJazffEO+XCOknz2CDaQ93ekT26w43QN0YdEgXwY5f/8m9Jn2dkXMlvTn+Et
+	CphWfAGEAev8u1lHxuzGzykV2EQOSkGAvEIP9Aw==
+X-Google-Smtp-Source: AGHT+IGEft27gKfF8OCWFoAOuMh4QtyEh1Yp7uSkPeDiRCrZ0WKZup/kL/7F8F5+yru68H0HLntVGNBq/OYlJBg9wOw=
+X-Received: by 2002:ac2:4e07:0:b0:530:dfab:9315 with SMTP id
+ 2adb3069b0e04-5343883d65emr7564335e87.10.1724662763017; Mon, 26 Aug 2024
+ 01:59:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -2.80
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	RCPT_COUNT_SEVEN(0.00)[9];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:helo];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Level: 
+References: <cover.1724159867.git.andrea.porta@suse.com> <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
+In-Reply-To: <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 26 Aug 2024 10:59:12 +0200
+Message-ID: <CACRpkdbdXNeL6B43uV-2evCfr6iv8fUsSVtAND+2U0H5mSL2rw@mail.gmail.com>
+Subject: Re: [PATCH 07/11] pinctrl: rp1: Implement RaspberryPi RP1 gpio support
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic <dragan.cvetic@amd.com>, 
+	Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	Stefan Wahren <wahrenst@gmx.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-For PFs, which don't support SRIOV_LAG, there is no pf->lag struct
-allocated. So before accessing pf->lag a NULL pointer check is needed.
+Hi Andrea,
 
-Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
----
- drivers/net/ethernet/intel/ice/ice_lag.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+thanks for your patch!
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
-index 1ccb572ce285..916a16a379a8 100644
---- a/drivers/net/ethernet/intel/ice/ice_lag.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lag.c
-@@ -704,7 +704,7 @@ void ice_lag_move_new_vf_nodes(struct ice_vf *vf)
- 	lag = pf->lag;
- 
- 	mutex_lock(&pf->lag_mutex);
--	if (!lag->bonded)
-+	if (!lag || !lag->bonded)
- 		goto new_vf_unlock;
- 
- 	pri_port = pf->hw.port_info->lport;
--- 
-2.35.3
+On Tue, Aug 20, 2024 at 4:36=E2=80=AFPM Andrea della Porta
+<andrea.porta@suse.com> wrote:
 
+> The RP1 is an MFD supporting a gpio controller and /pinmux/pinctrl.
+> Add minimum support for the gpio only portion. The driver is in
+> pinctrl folder since upcoming patches will add the pinmux/pinctrl
+> support where the gpio part can be seen as an addition.
+>
+> Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
+(...)
+
+> +#include <linux/bitmap.h>
+> +#include <linux/bitops.h>
+(...)
+
+> +static void rp1_pad_update(struct rp1_pin_info *pin, u32 clr, u32 set)
+> +{
+> +       u32 padctrl =3D readl(pin->pad);
+> +
+> +       padctrl &=3D ~clr;
+> +       padctrl |=3D set;
+> +
+> +       writel(padctrl, pin->pad);
+> +}
+
+Looks a bit like a reimplementation of regmap-mmio? If you want to do
+this why not use regmap-mmio?
+
+> +static void rp1_set_dir(struct rp1_pin_info *pin, bool is_input)
+> +{
+> +       int offset =3D is_input ? RP1_CLR_OFFSET : RP1_SET_OFFSET;
+> +
+> +       writel(1 << pin->offset, pin->rio + RP1_RIO_OE + offset);
+
+If you include bitops.h what about:
+
+writel(BIT(pin->offset), pin->rio + RP1_RIO_OE + offset);
+
+> +static int rp1_get_value(struct rp1_pin_info *pin)
+> +{
+> +       return !!(readl(pin->rio + RP1_RIO_IN) & (1 << pin->offset));
+> +}
+
+Also here
+
+> +
+> +static void rp1_set_value(struct rp1_pin_info *pin, int value)
+> +{
+> +       /* Assume the pin is already an output */
+> +       writel(1 << pin->offset,
+> +              pin->rio + RP1_RIO_OUT + (value ? RP1_SET_OFFSET : RP1_CLR=
+_OFFSET));
+> +}
+
+And here
+
+> +static int rp1_gpio_set_config(struct gpio_chip *chip, unsigned int offs=
+et,
+> +                              unsigned long config)
+> +{
+> +       struct rp1_pin_info *pin =3D rp1_get_pin(chip, offset);
+> +       unsigned long configs[] =3D { config };
+> +
+> +       return rp1_pinconf_set(pin, offset, configs,
+> +                              ARRAY_SIZE(configs));
+> +}
+
+Nice that you implement this!
+
+> +static void rp1_gpio_irq_config(struct rp1_pin_info *pin, bool enable)
+> +{
+> +       writel(1 << pin->offset,
+> +              pin->inte + (enable ? RP1_SET_OFFSET : RP1_CLR_OFFSET));
+
+BIT()
+
+Yours,
+Linus Walleij
 
