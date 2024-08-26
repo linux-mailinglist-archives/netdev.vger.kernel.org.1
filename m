@@ -1,82 +1,125 @@
-Return-Path: <netdev+bounces-121771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8E7C95E745
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 05:23:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BECE95E74D
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 05:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71719B20D77
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:23:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58BA42813F4
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD081DFDE;
-	Mon, 26 Aug 2024 03:23:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949CA29402;
+	Mon, 26 Aug 2024 03:30:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="k2QtItAY"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD15320C
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 03:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A164BE6F;
+	Mon, 26 Aug 2024 03:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724642630; cv=none; b=Ha9ja3oAFN/i8qVxHELxVCWnUjh2/D5860e4FEnc5sBoDcLjf1l0bnfT608BloLqeehENLBsqicpPRcz2cy7kgbIGQn8lye9+1FUz3AcNJg562tyxE81ziUPLiVbiC9QdEm3xzypEEZm0Q2boaKBHpWo3fXQ1pbSn380TdNdLrs=
+	t=1724643001; cv=none; b=fa9nAYVsnPhUDIHgT/PeqBuDXZ4AQ5uBBheiumBewbYMyiPlzOBOhmKboqP0shEfp9GNzzZuNnFrh/57XtlHDsbxdwxaIkDs728tkgDvsYMVs882hHMk4QgbZvd7Uhp7ONKcLy1yjRaUF44oF/z0pmbIQRMUxtV5W/6jSu89YNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724642630; c=relaxed/simple;
-	bh=AeeWU13P858SIDf9jSvlJrjhbljtDRUChGmj0NvobMQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=flpDDqy2nCodS8O4cVxIPHgQZ4A1xnncLEmrFLf/6FLxMbWligsfp10zG6scKwU6eFQr9VLdrgbKhBE4tjDofebGN51qHvP+vMBmRl8Ur0Qg8u+MfPNOS/QkN1zI8VXcwg9PakS0X2pCMXMx8z1oWfx9R24oRBZsdX8n3cbDCq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4WsbZ50knqz1xvNd
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 11:21:49 +0800 (CST)
-Received: from kwepemd200011.china.huawei.com (unknown [7.221.188.251])
-	by mail.maildlp.com (Postfix) with ESMTPS id B180714022F
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 11:23:45 +0800 (CST)
-Received: from cgs.huawei.com (10.244.148.83) by
- kwepemd200011.china.huawei.com (7.221.188.251) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Mon, 26 Aug 2024 11:23:45 +0800
-From: Gaosheng Cui <cuigaosheng1@huawei.com>
-To: <sebastian.hesselbarth@gmail.com>, <cuigaosheng1@huawei.com>
-CC: <netdev@vger.kernel.org>
-Subject: [PATCH -next] MIPS: Remove obsoleted declaration for mv64340_irq_init
-Date: Mon, 26 Aug 2024 11:23:44 +0800
-Message-ID: <20240826032344.4012452-1-cuigaosheng1@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1724643001; c=relaxed/simple;
+	bh=M4KMCyQsiCR7R5r1mHLGg0HM7/ZwFUGzj3Ob9FSsQeg=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qME9hLpopy0AUM2tTNaKUUwBmHDg424Ub+GhS8O0IP8GsJzG650xqg78AMW4EGHjj9SS8vmoL9uSzBX7pmKvJ4pLVG+3J3uuaJqL66hi2SOKd/xOsNt9RrRkpF0BGxBvMCWyvqf/jVwgp2anD/O3TlDKNXveDjEr66bzX/mcW6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=k2QtItAY; arc=none smtp.client-ip=162.62.58.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1724642988;
+	bh=/vjvGYarx8NbrGjDYDUIldEzqX5UWX8m8pZ3iDls3ec=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To;
+	b=k2QtItAYn51FPRDneriE0CnNtFDKRbLrsLGKg1l6YQ5dbJ3MCqXSEWztbzB0UjrX3
+	 mLzvaJ4FTYvMvBEg4Njk9x39c0GVD1nzrsCHbgyWASHhpoaztViE2MCjE9tpmOAffV
+	 SIxoi7DuDNbYgGAOD7cT91ztGM/MC8MMnIj/PiOw=
+Received: from localhost ([39.156.73.13])
+	by newxmesmtplogicsvrszc19-0.qq.com (NewEsmtp) with SMTP
+	id 76F2E8C0; Mon, 26 Aug 2024 11:29:47 +0800
+X-QQ-mid: xmsmtpt1724642987t73clno9p
+Message-ID: <tencent_EB51CDCA4E189E271032DFEC7E042B752008@qq.com>
+X-QQ-XMAILINFO: NiDupExshEc7csfxVbjAgBIlLQaPO+YPGCTa2poKcBWsMOUB4QszjpIOhWEIjM
+	 YHrefu2k+vZzz8hoP6Yd0o/kJ2ngph1YcqihZ8LMalCLe5Ro4UuHoHVorv574wVHXn1d6e68koZU
+	 ruNg6E2TsrmbsnMtT78EHvG8zVWF2S5+JzE7ayz7jYCRXHV+aBguOZj98i59yLpfYyKolch2r5HP
+	 0dc/u/gkZUGSKAoXL/uPjOljKxzyRvrJRAel4m4pPl8BVa4ZhGWoaiTPq0xyJLZFazLU7B+P+XM+
+	 vbnDsYLiD0aFwlQpPFNTRCjICfLg2vXPyu0pthRRP8IO410WTs9XtO9GGORI0KHccKVPFwxN8ng7
+	 uOixhPupF36b06Hlug9r7DL1fv5rs9Q4iDsza+bK9zKk+wHyONja+QNzJJs8ur16RU+PxXLGaFHe
+	 0+iert2hycPc5gqzfjahtehylbl7LqC1UEDf0EznhDiF8hN9FqZzGhErJKYu4ASpi6ZgWHld6UIR
+	 FOquvhZBWDg6mr1z8NZWnBs7aaKVkuZrS7iY1oidqvUz8/aIjcIjHN19Sesl0tIFgitJf/o50Tzu
+	 rJOfducwCbFdgE8EkWUySvBnxO5hpKm/bHzLZwCjOEOSq3sdn6MpbcNVKi1+DeWGluOeS4LozsaN
+	 DbVFyKmml7NvNky9VNTz+y4QjienFUJArcinXopP4VzQqG+EkVCnRRm0r3J+IojJen3AjTumZRwu
+	 odm3JBq8RGT9ZwQUmjETxZWth+jk6atwgs5vYGDmTsK5+WISzfvyr/cdAm1O52wmL4kdKkQ9IBJ+
+	 i4w6ao7bkIZqO2vvEMPkdWzeNsyohGh2wEn93tPJIFtE5KwsH5SpqJZ47zGhsPSKzDkU3PKxNuXR
+	 FMcGnHOyQwMNUtSOy+50icmBv/lzpylbs3tqjg1+7gXE289y+C0H2AE7SriTK3dGEjPnEhkoSz4C
+	 tUKeMSl1c7TBrZ10A8agd0lHlGvBEsBh12ntPW6QmhJaOpxZRpuQ==
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+Date: Mon, 26 Aug 2024 11:29:47 +0800
+From: Gang Yan <gang_yan@foxmail.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: Re: [PATCH bpf-next] bpf: Allow error injection for
+ update_socket_protocol
+X-OQ-MSGID: <Zsv2q8C7QmPTcyVa@yangang-TM1701>
+References: <tmcxv429u9-tmgrokbfbm@nsmail7.0.0--kylin--1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemd200011.china.huawei.com (7.221.188.251)
+In-Reply-To: <tmcxv429u9-tmgrokbfbm@nsmail7.0.0--kylin--1>
 
-The mv64340_irq_init() have been removed since
-commit 688b3d720820 ("[MIPS] Delete Ocelot 3 support."), and now
-it is useless, so remove it.
+Hi Alexei:
+It's my honor to recieve your reply. The response to your concerns is attached below 
+for your review.
+On Mon, Aug 26, 2024 at 10:57:12AM +0800, Gang Yan wrote:
+> On Thu, Aug 22, 2024 at 8:33 AM Jakub Kicinski wrote:
+> >
+> > On Thu, 22 Aug 2024 14:08:57 +0800 Gang Yan wrote:
+> > > diff --git a/net/socket.c b/net/socket.c
+> > > index fcbdd5bc47ac..63ce1caf75eb 100644
+> > > --- a/net/socket.c
+> > > +++ b/net/socket.c
+> > > @@ -1695,6 +1695,7 @@ __weak noinline int update_socket_protocol(int family, int type, int protocol)
+> > > {
+> > > return protocol;
+> > > }
+> > > +ALLOW_ERROR_INJECTION(update_socket_protocol, ERRNO);
+> >
+> > IDK if this falls under BPF or directly net, but could you explain
+> > what test will use this? I'd prefer not to add test hooks into the
+> > kernel unless they are exercised by in-tree tests.
 
-Signed-off-by: Gaosheng Cui <cuigaosheng1@huawei.com>
----
- include/linux/mv643xx.h | 2 --
- 1 file changed, 2 deletions(-)
+> This looks unnecessary.
+> update_socket_protocol is already registered as fmodret.
+> There is even selftest that excises this feature:
+> tools/testing/selftests/bpf/progs/mptcpify.c
+> 
+> It doesn't need to be part of the error-inject.
 
-diff --git a/include/linux/mv643xx.h b/include/linux/mv643xx.h
-index 000b126acfb6..a7975c16d13f 100644
---- a/include/linux/mv643xx.h
-+++ b/include/linux/mv643xx.h
-@@ -916,6 +916,4 @@
- #define MV64340_SERIAL_INIT_CONTROL                                 0xf328
- #define MV64340_SERIAL_INIT_STATUS                                  0xf32c
- 
--extern void mv64340_irq_init(unsigned int base);
--
- #endif /* __ASM_MV643XX_H */
--- 
-2.25.1
+The 'update_socket_protocol' is a BPF interface designed primarily to
+fix the socket protocol from TCP protocol to MPTCP protocol without
+requiring modifications to user-space application codes. However,
+when attempting to achieve this using the BCC tool in user-space,
+the BCC tool doesn't support 'fmod_ret'. Therefore, this patch aims to 
+further expand capabilities, enabling the 'kprobe' method can overriding 
+the update_socket_protocol interface.
+
+As a Python developer, the BCC tool is a commonly utilized instrument for 
+interacting with the kernel. If the kernel could permit the use of an 
+error-inject method to modify the `update_socket_protocol`, it would significantly 
+benefit the subsequent promotion and development of MPTCP applications. 
+Thank you for considering this enhancement.
+
+Best wishes!
+Gang Yan
 
 
