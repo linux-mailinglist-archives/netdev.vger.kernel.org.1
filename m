@@ -1,147 +1,134 @@
-Return-Path: <netdev+bounces-121929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F27FC95F560
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:42:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2710B95F585
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:50:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A89CD1F221D9
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 15:42:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6AAB1F223F5
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 15:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E81194131;
-	Mon, 26 Aug 2024 15:42:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A431925A1;
+	Mon, 26 Aug 2024 15:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EdjS9CZa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CJow60lk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A94D19306C;
-	Mon, 26 Aug 2024 15:42:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6393249631;
+	Mon, 26 Aug 2024 15:50:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724686937; cv=none; b=PqiENNsrCI/Iquu4kbfC43dz8sSqIa9utJmK+lagtaYx1aitKLsL5MoXRufpJfn+XAFn3a+8wNLSnCmV9qBYl3WPHufgCS6oW5o42ElV/wReHo92t+3lDNfkRACc+xrRi1HhvU7LVfTDEzmbptAH7XXq23plaJLBZpHuqerFXqo=
+	t=1724687400; cv=none; b=g6SzxMyynRfSfXxe5TgV68HPI4ZZM2HeqhH/exz1UjMN/WNB570QVNT2VG8nkVWtuM45FrCK/LduD+tQP5hgAwxNXB1eoRqgTMOiV6lAt99rpb/w0EfpXE0WrKYf0Ob8ibFLwjAqRHW4DZdXDRGBcytdGiKYXVzIm7+uexJYcmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724686937; c=relaxed/simple;
-	bh=xM8pXW+HgjT0erxnOsIGtoopuFkOjZ2IcKxNFrbxs24=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WCZrOFK+2hXKBDQAUS40EMbewcaWyu1MUrgWV9+P2/V97lwdYGNOXpxnHNiz3bBBVCgwueURk6fFsIesudDF8A4Dnm4eXzr4rbv9SSHowIobN34NKL8NziYwtDqQV/DZtB1olu5D6kaLZvX0L2MfePcVoYtM/oBMJHNy8l0ajI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EdjS9CZa; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5343eeb4973so3703342e87.2;
-        Mon, 26 Aug 2024 08:42:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724686933; x=1725291733; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FH/rM9r8vy15gTO0SvqG09ShUwI8MYLfcApXi3x19VU=;
-        b=EdjS9CZavbm/qHjdqAVWAMe51uCR7TIdmv8bxidfh6CYSFEDINpoD9bnNZw/44NEd2
-         bwBi7FKlKtyMt0aRH9pV5PVxbBLin9ef5NWVI29BzbN/ecmH7ybQvBjssgCuZxe2N6ZU
-         7ix90zpw2jETILZoFi3jgRNr5r8Uc+0KPKg8uDr8uTXolk0iCXovdJcMfQ0COUo0Fagf
-         aIVHXK2pNYoUTKjnCizNHQ2GnNb3Ssg1jeZQVF2hHit1AtRoMmTpfyj80pjyAYaVa3SL
-         190xbe2zVRO5EoXJuoymLYZLXgIt0VN5KzhSc99Ki7QVuE4o/Lg4evW1RfKxHAV1p1jZ
-         VsIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724686933; x=1725291733;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FH/rM9r8vy15gTO0SvqG09ShUwI8MYLfcApXi3x19VU=;
-        b=OfchqeexupTnQ70b/gPvTSp4ysO6+DSuBIzlVLqODF84aw3sTALHkfvT3hvcmmbuya
-         4jdOLh7DNXR6+k7hm2oNSxBm3H2CQfRZWZE7bWobKs/vPIxCsAiGqTpka2JtNw8h2h0M
-         tLhJHtB0tHKzsPT7/FU1qvbvg98315bSVMfOzetEC15qRrr+WnJnPLR0X0Qx86CwU+1a
-         W1BdoruNDwHJ5zgXUzCjAEG24whjNZKyBfHfG2yX5yi9AmR1n50/Kk21b1qiiqUgkNGh
-         ezOuRQyCdPURdLohfIk8677CHVQAbELVp3rFyzRr92YeTlx2ZbCKOX1+2Zknuk9VpwNe
-         Nbgw==
-X-Forwarded-Encrypted: i=1; AJvYcCV82Yc0GfBiVscdpNiH8Cn1HQ0lYpvuSjt7qaJLOwA7h3aPdyAHtosYXKiZvRpibbuebyhAPTvn4CLKbA==@vger.kernel.org, AJvYcCVI/piB7xYhp2AHSPIQF5Hk0tDk577LglGcyylXlTgtoaXrXEq5Or9FY6RXK39IQ1kDpOadZyZA@vger.kernel.org, AJvYcCVl833agkMpi5UadWwaCyPL5YHvENsRbuJ13BnzKYdY2hoDUHJWqcFtyzBCVD09LtQY5JO3vrYhJ4kWxoLx@vger.kernel.org, AJvYcCWGRmTCqwn/PSfdfXgT1AAVmlZnnskaFi6uXQdehnW9n2MQpRoJ309ZJ8OyGu9Xxrunu3Q4JthwcARz@vger.kernel.org, AJvYcCWKN89Y418s69KCCpnQbddorcfo/8aSC5MMwvtKd6cH2ZMrUFAzAQZLEcFa+Vyj8fI0w/GCaDawDRsC@vger.kernel.org, AJvYcCWWlpsZ8jctj9IxWb8rtQvxQs1vqqrexaHjZ7YNhuNAIvLxnZVw1sDiWp0IDgkBYvY5QtQkIyzyf/6dsQ==@vger.kernel.org, AJvYcCXuzaFrSIuR/W/rSaj86l3u9rw6GOtN9wKq/KJS32EAWj8zas0gTCJXrxwiKUVmX53q8dLcX/97D4pXXg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkmXMIVUA9sKDzyL8jEy9n3kr4Qxovw8z1bM2cGDcWxbyAG//6
-	AFqhaHBjbrFkL/rqOTtRTb203J3BDnzRje5y1MGPsPxrMEN9PSxU7766//v/ZH7mr11JzDSMnh3
-	AME9aKOsRvcxxnkE4TnqlG5qJnig=
-X-Google-Smtp-Source: AGHT+IEO+gUPPoFWhnVIZyFPIRMKkPjZZ1g7sFSpxYSDeKMazFoujBp34K9I3yoSDp0PEZ365NhxrirOyyk84oqJOVc=
-X-Received: by 2002:ac2:4e06:0:b0:52e:936e:a237 with SMTP id
- 2adb3069b0e04-53438846debmr7930724e87.16.1724686932982; Mon, 26 Aug 2024
- 08:42:12 -0700 (PDT)
+	s=arc-20240116; t=1724687400; c=relaxed/simple;
+	bh=Ix7gG+0vm0lVLIBVJQKChz8QDT/cbVX6+rxLO0aJ+Ic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hEKTekpcItQvq3z81jp0m1vX6J05Om4jdKKoZQS8BPPr0o8ZFx9kq7+7j59O1mJlKIJF+EN+eT6AGhOHzcJDABbg8sViKddlNLCanc52ABwgjo/gV1jOp5S6HWTMYLNwgUjIrLwlPRUWkFnC8dKtFZyY+dH6w+Dl3TTBpBzTqHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CJow60lk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBCDFC4FEE4;
+	Mon, 26 Aug 2024 15:49:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724687400;
+	bh=Ix7gG+0vm0lVLIBVJQKChz8QDT/cbVX6+rxLO0aJ+Ic=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CJow60lkASvRmQi4+EoOIL2KjoiqrTDGlKthDN7/dwFQXWvG1n9R2mfTjFw5xrD38
+	 syEmNpnoXlIRUu3acvC1jq/Q+PYCE/WODMxXftDuPZBMYRuYNk8e94dn3xozaFkXJ3
+	 I9wRbw+6yfqWLCEllY1l1EULNclQzrYaoeoHpdTwg2xFs+YF3dSXpTz185FoTbAzRK
+	 QbBoFF2HwtNEuIGRfElqSMvtTqEhAHINVqVIC7v4utHfvKZ2CH+HbAP5pHGk4cK3y+
+	 EtgeuwFhUlUj1UaCgKvcwotsTO2CQj919FSan581A2RlVZChVAguzzlZLWGG6UHDcD
+	 oIpQgqAi1BlrQ==
+Date: Mon, 26 Aug 2024 10:49:58 -0500
+From: Rob Herring <robh@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, krzk+dt@kernel.org, conor+dt@kernel.org,
+	andrew@lunn.ch, f.fainelli@gmail.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, andrei.botila@oss.nxp.com,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH v3 net-next 1/2] dt-bindings: net: tja11xx: add
+ "nxp,phy-output-refclk" property
+Message-ID: <20240826154958.GA316598-robh@kernel.org>
+References: <20240826052700.232453-1-wei.fang@nxp.com>
+ <20240826052700.232453-2-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822134744.44919-1-pstanner@redhat.com> <20240822134744.44919-6-pstanner@redhat.com>
- <ZsdO2q8uD829hP-X@smile.fi.intel.com> <ad6af1c4194873e803df65dc4d595f8e4b26cb33.camel@redhat.com>
-In-Reply-To: <ad6af1c4194873e803df65dc4d595f8e4b26cb33.camel@redhat.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Mon, 26 Aug 2024 18:41:36 +0300
-Message-ID: <CAHp75VfKS_PWer2hEH8x0qgBUEPx05p8BA=c0UirAWjg0SaLeA@mail.gmail.com>
-Subject: Re: [PATCH v3 5/9] ethernet: cavium: Replace deprecated PCI functions
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Andy Shevchenko <andy@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>, 
-	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, 
-	Xu Yilun <yilun.xu@intel.com>, Linus Walleij <linus.walleij@linaro.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Alvaro Karsz <alvaro.karsz@solid-run.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	David Lechner <dlechner@baylibre.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
-	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-block@vger.kernel.org, linux-fpga@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240826052700.232453-2-wei.fang@nxp.com>
 
-On Mon, Aug 26, 2024 at 5:51=E2=80=AFPM Philipp Stanner <pstanner@redhat.co=
-m> wrote:
-> On Thu, 2024-08-22 at 17:44 +0300, Andy Shevchenko wrote:
-> > On Thu, Aug 22, 2024 at 03:47:37PM +0200, Philipp Stanner wrote:
+On Mon, Aug 26, 2024 at 01:26:59PM +0800, Wei Fang wrote:
+> Per the RMII specification, the REF_CLK is sourced from MAC to PHY
+> or from an external source. But for TJA11xx PHYs, they support to
+> output a 50MHz RMII reference clock on REF_CLK pin. Previously the
+> "nxp,rmii-refclk-in" was added to indicate that in RMII mode, if
+> this property present, REF_CLK is input to the PHY, otherwise it
+> is output. This seems inappropriate now. Because according to the
+> RMII specification, the REF_CLK is originally input, so there is
+> no need to add an additional "nxp,rmii-refclk-in" property to
+> declare that REF_CLK is input.
+> Unfortunately, because the "nxp,rmii-refclk-in" property has been
+> added for a while, and we cannot confirm which DTS use the TJA1100
+> and TJA1101 PHYs, changing it to switch polarity will cause an ABI
+> break. But fortunately, this property is only valid for TJA1100 and
+> TJA1101. For TJA1103/TJA1104/TJA1120/TJA1121 PHYs, this property is
+> invalid because they use the nxp-c45-tja11xx driver, which is a
+> different driver from TJA1100/TJA1101. Therefore, for PHYs using
+> nxp-c45-tja11xx driver, add "nxp,phy-output-refclk" property to
+> support outputting RMII reference clock on REF_CLK pin.
+> 
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
+> V2 changes:
+> 1. Change the property name from "nxp,reverse-mode" to
+> "nxp,phy-output-refclk".
+> 2. Simplify the description of the property.
+> 3. Modify the subject and commit message.
+> V3 changes:
+> 1. Keep the "nxp,rmii-refclk-in" property for TJA1100 and TJA1101.
+> 2. Rephrase the commit message and subject.
+> ---
+>  Documentation/devicetree/bindings/net/nxp,tja11xx.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
 
-...
+This binding is completely broken. I challenge you to make it report any 
+errors. Those issues need to be addressed before you add more 
+properties.
 
-> > > -   err =3D pcim_iomap_regions(pdev, 1 << PCI_PTP_BAR_NO,
-> > > pci_name(pdev));
-> > > -   if (err)
-> > > +   clock->reg_base =3D pcim_iomap_region(pdev, PCI_PTP_BAR_NO,
-> > > pci_name(pdev));
-> > > +   if (IS_ERR(clock->reg_base)) {
-> > > +           err =3D PTR_ERR(clock->reg_base);
-> > >             goto error_free;
-> > > -
-> > > -   clock->reg_base =3D pcim_iomap_table(pdev)[PCI_PTP_BAR_NO];
-> > > +   }
-> >
-> > Perhaps
-> >
-> >       clock->reg_base =3D pcim_iomap_region(pdev, PCI_PTP_BAR_NO,
-> > pci_name(pdev));
-> >       err =3D PTR_ERR_OR_ZERO(clock->reg_base);
-> >       if (err)
-> >               goto error_free;
-> >
-> > This will make your patch smaller and neater.
-> >
-> > P.S. Do you use --histogram diff algo when preparing patches?
->
-> So far not.
-> Should one do that?
+If you want/need custom properties, then you must have a compatible 
+string.
 
-Id doesn't alter your code, it's in addition to what I suggested, but
-as Linus shared that there is no reason to avoid using --histogram not
-only in Linux kernel, but in general as it produces more
-human-readable diff:s.
+> 
+> diff --git a/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml b/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml
+> index 85bfa45f5122..f775036a7521 100644
+> --- a/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml
+> +++ b/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml
+> @@ -48,6 +48,12 @@ patternProperties:
+>            reference clock output when RMII mode enabled.
+>            Only supported on TJA1100 and TJA1101.
+>  
+> +      nxp,phy-output-refclk:
 
---=20
-With Best Regards,
-Andy Shevchenko
+Why not "nxp,rmii-refclk-out" if this is just the reverse of the 
+existing property.
+
+> +        type: boolean
+> +        description: |
+> +          Enable 50MHz RMII reference clock output on REF_CLK pin. This
+> +          property is only applicable to nxp-c45-tja11xx driver.
+> +
+>      required:
+>        - reg
+>  
+> -- 
+> 2.34.1
+> 
 
