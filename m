@@ -1,111 +1,83 @@
-Return-Path: <netdev+bounces-121814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1220195ECF1
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:18:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69C4595ED0F
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C7331C2185F
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 09:18:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2666C282098
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 09:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D4C142E67;
-	Mon, 26 Aug 2024 09:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="gs5VIHMv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57915145A1B;
+	Mon, 26 Aug 2024 09:27:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC14813FD66;
-	Mon, 26 Aug 2024 09:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B5614375D;
+	Mon, 26 Aug 2024 09:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724663929; cv=none; b=lZCQbtFXyLmFUWDg5yMeFeq+HI3sPH6flIahkNt20CDJNK7A92410BEDCiWjeoouh23xABTLQTzL9MvPNvl280xcVWN+rvXK5kkhACBgZs5f9xjTPgJwEsfo2NnNbzKVwznGBawhDG5t00DKdq4dc4koMdazcPeFDH8ZEBu5GC8=
+	t=1724664434; cv=none; b=KJaHW/s/2YY1BU4cjFc7N4i8FlahBW983a+P7ZwiARn+xXBKlQl1hSa2IPRo3dpw5b+ggV4r9PhOZp0hmVPMnebB6rFhH11FkLWDIe94I/wKw91dso6apD27DUE252ggSVt4IPS7eUFogXPH0PeCF4rDntfyjbXHbCM+fYwY4vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724663929; c=relaxed/simple;
-	bh=8siODDACXT+fimTC/2UB/6V4VeORso2YfO6qi6K2GWM=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=afs6z3McbWuimXB49jR/TQfR39D/UKvZ2Tr5Jh3DltWkUeAK1RuppSSsw/FiqvGsyUgjxR6DdN3xBQZVSGOT/7edunrCiarxJymc0P6LJtJVQU0nDO6LX3cCjtXYbTTbhMQv9O3LPplnS187QPlmCsZqLQmQUBwFGcU6NlUCE2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=gs5VIHMv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6E4DC4FF01;
-	Mon, 26 Aug 2024 09:18:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1724663928;
-	bh=8siODDACXT+fimTC/2UB/6V4VeORso2YfO6qi6K2GWM=;
-	h=Date:From:To:Subject:References:In-Reply-To:From;
-	b=gs5VIHMv8spP85k6bkA+JhcXCek1/3703narVXeBPqZtMt1jtyHyoWE9679L411Oz
-	 I8+vkPjwCkJ+oqW7JJHDZ7adTeUNO9w9ZYY9tY7LeQpb7zmz3D3F9NXS7oBHJGmBc0
-	 0tF0LtV6MOGtqaXVly3GK+32b34WVP5kT4BwLhcw=
-Date: Mon, 26 Aug 2024 11:18:45 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
-Message-ID: <2024082635-demeanor-yanking-dfc5@gregkh>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
- <2024082420-secluding-rearrange-fcfd@gregkh>
- <ZsxF1ZvsrJbmWzQH@apocalypse>
+	s=arc-20240116; t=1724664434; c=relaxed/simple;
+	bh=ERzW8bZOxF/dXM11qKbsPhYrKDtfXLGenLrG8Kj0Y3M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=NTt3b/GnVPM7yF/tU1TqcwLLPtvqyCKYnf+++mF+6mnaQ2FqNIORSj8yrvNJVVY+fhyU8+Zoqr3+4Z8XIlpRtu3cclxgIRdVSUujprjTvRz2DATtcIZZMQCN4INf/Bs9/hQHWB7uPo2brED3w1KBvFr8K5LbHWWcHibOmUvOyyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WslZ60Qb2z69M7;
+	Mon, 26 Aug 2024 17:22:22 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id 906BE1800A7;
+	Mon, 26 Aug 2024 17:27:09 +0800 (CST)
+Received: from huawei.com (10.67.174.77) by dggpemm500020.china.huawei.com
+ (7.185.36.49) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 26 Aug
+ 2024 17:27:09 +0800
+From: Liao Chen <liaochen4@huawei.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>
+CC: <chris.snook@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <lorenzo@kernel.org>, <nbd@nbd.name>,
+	<sean.wang@mediatek.com>, <Mark-MC.Lee@mediatek.com>,
+	<matthias.bgg@gmail.com>, <angelogioacchino.delregno@collabora.com>,
+	<liaochen4@huawei.com>
+Subject: [PATCH -next 0/3] net: fix module autoloading
+Date: Mon, 26 Aug 2024 09:18:55 +0000
+Message-ID: <20240826091858.369910-1-liaochen4@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZsxF1ZvsrJbmWzQH@apocalypse>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-On Mon, Aug 26, 2024 at 11:07:33AM +0200, Andrea della Porta wrote:
-> Hi Greg,
-> 
-> On 09:53 Sat 24 Aug     , Greg Kroah-Hartman wrote:
-> > On Tue, Aug 20, 2024 at 04:36:10PM +0200, Andrea della Porta wrote:
-> > > --- a/include/linux/pci_ids.h
-> > > +++ b/include/linux/pci_ids.h
-> > > @@ -2610,6 +2610,9 @@
-> > >  #define PCI_VENDOR_ID_TEKRAM		0x1de1
-> > >  #define PCI_DEVICE_ID_TEKRAM_DC290	0xdc29
-> > >  
-> > > +#define PCI_VENDOR_ID_RPI		0x1de4
-> > > +#define PCI_DEVICE_ID_RP1_C0		0x0001
-> > 
-> > Minor thing, but please read the top of this file.  As you aren't using
-> > these values anywhere outside of this one driver, there's no need to add
-> > these values to pci_ids.h.  Just keep them local to the .c file itself.
-> >
-> 
-> Thanks, I've read the top part of that file. The reason I've declared those
-> two macroes in pci_ids.h is that I'm using them both in the
-> main driver (rp1-pci.c) and in drivers/pci/quirks.c.
+Hi all,
 
-Ah, missed that, sorry, nevermind.
+This patchset aims to enable autoloading of some net modules.
+By registering MDT, the kernel is allowed to automatically bind 
+modules to devices that match the specified compatible strings.
 
-greg k-h
+Liao Chen (3):
+  net: dm9051: fix module autoloading
+  net: ag71xx: fix module autoloading
+  net: airoha: fix module autoloading
+
+ drivers/net/ethernet/atheros/ag71xx.c      | 1 +
+ drivers/net/ethernet/davicom/dm9051.c      | 1 +
+ drivers/net/ethernet/mediatek/airoha_eth.c | 1 +
+ 3 files changed, 3 insertions(+)
+
+-- 
+2.34.1
+
 
