@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-122061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CB3695FC0C
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 23:49:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A79A395FC11
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 23:49:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC3E6282A50
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 21:49:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB63B1C22A6A
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 21:49:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4C419B59C;
-	Mon, 26 Aug 2024 21:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 146D719B5B8;
+	Mon, 26 Aug 2024 21:49:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqMAP0AR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KgRByLon"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE0119CD12
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 21:48:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B3913B58F;
+	Mon, 26 Aug 2024 21:49:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724708903; cv=none; b=IaTB56WQ4iuohb57oyuLk3QRaEFpLJWwuwL3RSu0iLDqCGyIHCayplHPPhv+cPqrB0RC/JKdgXJJ/DidPFdq/WLsPoVO7sa3xnG2o3KYzo7U6cuj/XRnk7JywK7dpMhaIuSW/YTKNZRnM347HG0IW1JQV7Hp+qTSHJ631+7mJdQ=
+	t=1724708983; cv=none; b=DwvXsPODsEriWJv/F/aSCtIzR0zj8eKiTXNEB0CsyiVBvlmLhYSXAO8Wxla3rKWxAkYR8IVQCoUI5WhF4fvdJE4H0ojQSssGnWv0zQzXJFwGj4H5ftNIcXBmJev91L5J1mUB6KX5Q1WsdOfe0OvJa07YRZDq+okhO8XKR9kvqkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724708903; c=relaxed/simple;
-	bh=KwLdG2Rxvc64NlZqugmBRF+kFOLmaZ8PPbnaoncixYk=;
+	s=arc-20240116; t=1724708983; c=relaxed/simple;
+	bh=VhiAYFWKYyBDz6sZ2NVP0Pj7YB6rqRESmEHJbAoKG2w=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p6MciBsCRSf6Yr1P3WS3zgMNfHCy/Bih9VhBwp1ogA+5rt0HU6efig233cFn0A4Ab6vjaL2V7rHcVaui5J/dMQ05XSNdNnsMofkzTAIiVt5oOn4YOpGu2lUCIFwQjhavQdWJZY3N+wUcfL3TtJ7Tx28wvSSes8SMCC0WMzK500s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqMAP0AR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 546C1C52FD0;
-	Mon, 26 Aug 2024 21:48:22 +0000 (UTC)
+	 MIME-Version:Content-Type; b=F0qA6FIzvRgMka03IfdD8zHHd5y+xfniLL2MkaZQqjwwfB3KULIGTptnLqdljCgboJFR3ZuaRFQFT34OdqQbcpbG/+/kbDQ4QF9E3S49ogC80B8lkTf82nnkQdPdoqGuf3esu1W7xkA8YXldMBYO61zpmypMSWCNXtVC7CN+IOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KgRByLon; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 253DBC52FD2;
+	Mon, 26 Aug 2024 21:49:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724708902;
-	bh=KwLdG2Rxvc64NlZqugmBRF+kFOLmaZ8PPbnaoncixYk=;
+	s=k20201202; t=1724708982;
+	bh=VhiAYFWKYyBDz6sZ2NVP0Pj7YB6rqRESmEHJbAoKG2w=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sqMAP0ARUhPYl2WLb1VR6Izd3dDLrrdqpMvghCsgYj8mu8bAQvPft01BX2csrXuSR
-	 CWagAXiA9aXDnt8F6N9vnVE/LjtFMGAR5EBqyMH3I0p6s/tbxGgyQPIjb1vChGnbbM
-	 0DKGEpVdetF30h5Zevk3zmQ8xWi+N5iz1QYdKv7B51ySplHLIl5zddxJpiV5qPSZ2l
-	 is2hyknnlKBUDDZLokk90MDm7KHdmpMbQOhm+oFokPfaU+hXhgCtFcgxJa0TNjn3Ot
-	 GZlBAkHvCFSufC83YMT8lBadjazcn726uepSDMIP0bXCfmvP/KjeBFBlVv5yGpVfv2
-	 HOozsvOhIYASw==
-Date: Mon, 26 Aug 2024 14:48:21 -0700
+	b=KgRByLonCRFOa2/LQ2R8+LDyAyCpSzXJXYvwYgeQ79M4A4nx0AKSwCPPf3eddGD2F
+	 WaafYmsIrG+vkBEa40hFcUyJeQIKUWRCtq+cbmt2uOASRKje4fKGBUgUtJkQNs5P9d
+	 7PgN6P/ZSGX9vrjaRYn7pUy82u7mH+aWXCq+TqX6j4rpF3obmWGgkCkKP85/rzwBOG
+	 xyNPAlcpbc4xn23F+6HH4t2hKYhNdqH2Zv1/wGLZnYRfHHhZhEIWvaVXJt/FusxE8Z
+	 yluFq+P4m3oNLL4rsthudgOfd/fuOWobPzuYOnHRmpWgSlSamBXkt58KEY3ehAlzGG
+	 r8Oh57icO8OYQ==
+Date: Mon, 26 Aug 2024 14:49:41 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Nelson Escobar <neescoba@cisco.com>
-Cc: netdev@vger.kernel.org, satishkh@cisco.com, johndale@cisco.com
-Subject: Re: [PATCH net-next 2/2] enic: Expand statistics gathering and
- reporting
-Message-ID: <20240826144821.170f6019@kernel.org>
-In-Reply-To: <20240823235401.29996-3-neescoba@cisco.com>
-References: <20240823235401.29996-1-neescoba@cisco.com>
-	<20240823235401.29996-3-neescoba@cisco.com>
+To: Yaxin Chen <yaxin.chen1@bytedance.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, Cong Wang
+ <cong.wang@bytedance.com>, John Fastabend <john.fastabend@gmail.com>, Jakub
+ Sitnicki <jakub@cloudflare.com>
+Subject: Re: [Patch net-next] tcp_bpf: remove an unused parameter for
+ bpf_tcp_ingress()
+Message-ID: <20240826144941.17f9f85c@kernel.org>
+In-Reply-To: <20240823224843.1985277-1-yaxin.chen1@bytedance.com>
+References: <20240823224843.1985277-1-yaxin.chen1@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,15 +61,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 23 Aug 2024 16:54:01 -0700 Nelson Escobar wrote:
-> Collect and report per rq/wq statistics in ethtool.
+On Fri, 23 Aug 2024 15:48:43 -0700 Yaxin Chen wrote:
+> Parameter flags is not used in bpf_tcp_ingress().
 
-Take a look at:
-
-https://docs.kernel.org/next/networking/netlink_spec/netdev.html#qstats
-
-A lot of the stats you're trying to report should be reported via queue
-stats. See struct netdev_stat_ops for more info.
--- 
-pw-bot: cr
+LGTM, but reassigning to bpf-next.
 
