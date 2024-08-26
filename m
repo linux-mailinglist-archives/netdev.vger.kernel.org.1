@@ -1,124 +1,74 @@
-Return-Path: <netdev+bounces-121975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9AF995F723
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:50:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 823F795F742
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:59:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75D05282E1C
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:50:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E4F5282D6F
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:59:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 081D819755A;
-	Mon, 26 Aug 2024 16:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FFD7197A95;
+	Mon, 26 Aug 2024 16:59:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q45WC5lK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CQJPxk9V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDA2E1946BB;
-	Mon, 26 Aug 2024 16:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07881194AEB;
+	Mon, 26 Aug 2024 16:59:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724691028; cv=none; b=KaeFelZOoaD3Rh0ehgBozAXpxG7jgTko/gYpA1pi2mXz/tJmMyTdg8jBOjN/tCV7hMg1dYAwa2xLA6eV+E7low3oC9+lFmSjWB0AUPHX25wQlyj/CWa05jvhvVDRmjllMPiUN4iiZHqJPIdgX5UtSnta8x6uf8rDrexfZRfypYo=
+	t=1724691542; cv=none; b=ZdlsSd8LqP6v/YifNsmgB7bd7Wq/7zZCCfBiCTQmXKQgqyrR+wQ2VdzN1bnC5U+SGaGen8ml9EdeZReREtpJryMDOjiM8lsZ6yHSr0kkj2x3OSF90yWfMQL7cscRZb4RYzeS3U/xhF9yRzv7DmO/EQRde+8wZKuw5opTT9iTtEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724691028; c=relaxed/simple;
-	bh=Z+nM13pnLmDsTBNfVDKA+YqeuZzbs5Ifw349S3oky7Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=h8rhIWOvvSZcZ5xXYK85NAkzeX76TsWS9GdkQH0N6KWZtj93ZMHgLpbr1kjS3aGjQtC5EIcIx8GzSI+vsHLAZaa2Lx8hEqDKmgKFd74SoOWVaKEVAjs9dm/NDujFsA0B+vp+GqnzHs1IGmwA3+mduJwsd+6qLf5K3fFcyQp2TW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q45WC5lK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 397DAC52FC5;
-	Mon, 26 Aug 2024 16:50:28 +0000 (UTC)
+	s=arc-20240116; t=1724691542; c=relaxed/simple;
+	bh=MsRmBzsqatymuoxmA8JB9Szhb0A1DgmeDXe2YwQ+ECc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mqtFbRPPE+x1Kbcs6iT71b46azipVWOD3L90SIDJQK47HNlCOq8dXfqY7YnJXk3a9qvSAheixcSquvxWoT9+21XkBbS2jOtv+TldEBhXknqTav2pr1IN5PB4EEX68iL6pjkM/VWa38uDO+2R9HCPXAhdRNdlQOPADk4mAW1xaOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CQJPxk9V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4878FC4FF1A;
+	Mon, 26 Aug 2024 16:59:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724691028;
-	bh=Z+nM13pnLmDsTBNfVDKA+YqeuZzbs5Ifw349S3oky7Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Q45WC5lKg/LkyteFnRbpI1iVwrc9eTD/Da68nGGe2YlnxLncY/jJgOsVR9s3Titvd
-	 dBgkZNU1Rqw4anGmADeZa5HXJuVBAfr6oMEf6Xt5OhVrePmo3B8G4k53Sk2NiRloQB
-	 ISL+3I8b6r3AGuf2gw+HmJnL4NgRx4YOmnrQ4ywPT+JczgW+zKi53lxtvc0ysLApRZ
-	 upSfKB+5eyy9Wnxntr1Ryfs4oCeUgPQ5+BjVVBpb9cbnBU2kFiULsTV5g+aKNM0RR7
-	 PYQ0zCLA1X0W9EQOIn5lgEOi/Lg9lDUfBldl120A973U/vmbbqnWAYmKVA63ccJr9J
-	 KQg6V3VRGYL7w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 710CA3822D6D;
-	Mon, 26 Aug 2024 16:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1724691541;
+	bh=MsRmBzsqatymuoxmA8JB9Szhb0A1DgmeDXe2YwQ+ECc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CQJPxk9VuIxeG5ijvAZHounJqXhKvpDb9c3IrRAI3NM0f1cAII8XSb+U/FubWfTjf
+	 GSqkgimFSy1pzEq/S57Ghh0qVBKdpeCBJR7gaV/qtCuHDaApAAEziYygmnZupRygO+
+	 1QCSzAF5OOoFFsCcGityuqt5+3puUw9Acpq2+67VzOdJ2aCOxzheHM/HoezPiv6z8M
+	 YzyAJKGYyzMPjCHj8wmpk2NpJGl7TJCGi07mZjKP2gSoYJK/YE4QjfWqBK8Pc7XGUX
+	 01sdTnBBD2qtRJHIgiOmaaalBsoQzZRW0aeFcJ5IM7NiZNcPQfbbRYMlgFMMa4G+MY
+	 fRllQkvgqUcWw==
+Date: Mon, 26 Aug 2024 09:59:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org,
+ o.rempel@pengutronix.de
+Subject: Re: [PATCHv3 net-next] net: ag71xx: get reset control using devm
+ api
+Message-ID: <20240826095900.0f8f8c89@kernel.org>
+In-Reply-To: <20240824181908.122369-1-rosenp@gmail.com>
+References: <20240824181908.122369-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/13] net: header and core spelling corrections
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172469102801.67399.18155018116632832948.git-patchwork-notify@kernel.org>
-Date: Mon, 26 Aug 2024 16:50:28 +0000
-References: <20240822-net-spell-v1-0-3a98971ce2d2@kernel.org>
-In-Reply-To: <20240822-net-spell-v1-0-3a98971ce2d2@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, dsahern@kernel.org, jv@jvosburgh.net,
- andy@greyhouse.net, quic_subashab@quicinc.com, quic_stranche@quicinc.com,
- paul@paul-moore.com, krzk@kernel.org, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, marcelo.leitner@gmail.com,
- lucien.xin@gmail.com, ms@dev.tdt.de, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-security-module@vger.kernel.org,
- linux-sctp@vger.kernel.org, linux-x25@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Sat, 24 Aug 2024 11:18:56 -0700 Rosen Penev wrote:
+> -	struct reset_control *mdio_reset;
+>  	struct clk *clk_mdio;
+>  };
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 22 Aug 2024 13:57:21 +0100 you wrote:
-> This patchset addresses a number of spelling errors in comments in
-> Networking files under include/, and files in net/core/. Spelling
-> problems are as flagged by codespell.
-> 
-> It aims to provide patches that can be accepted directly into net-next.
-> And splits patches up based on maintainer boundaries: many things
-> feed directly into net-next. This is a complex process and I apologise
-> for any errors.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,01/13] packet: Correct spelling in if_packet.h
-    https://git.kernel.org/netdev/net-next/c/d24dac8eb811
-  - [net-next,02/13] s390/iucv: Correct spelling in iucv.h
-    https://git.kernel.org/netdev/net-next/c/c34944603248
-  - [net-next,03/13] ip_tunnel: Correct spelling in ip_tunnels.h
-    https://git.kernel.org/netdev/net-next/c/d0193b167f27
-  - [net-next,04/13] ipv6: Correct spelling in ipv6.h
-    https://git.kernel.org/netdev/net-next/c/507285b7f9b2
-  - [net-next,05/13] bonding: Correct spelling in headers
-    https://git.kernel.org/netdev/net-next/c/e8ac2dba93ea
-  - [net-next,06/13] net: qualcomm: rmnet: Correct spelling in if_rmnet.h
-    https://git.kernel.org/netdev/net-next/c/19f1f11c9a8e
-  - [net-next,07/13] netlabel: Correct spelling in netlabel.h
-    https://git.kernel.org/netdev/net-next/c/6899c2549cf7
-  - [net-next,08/13] NFC: Correct spelling in headers
-    https://git.kernel.org/netdev/net-next/c/10d0749a38c3
-  - [net-next,09/13] net: sched: Correct spelling in headers
-    https://git.kernel.org/netdev/net-next/c/a7a45f02a093
-  - [net-next,10/13] sctp: Correct spelling in headers
-    https://git.kernel.org/netdev/net-next/c/7f47fcea8c6b
-  - [net-next,11/13] x25: Correct spelling in x25.h
-    https://git.kernel.org/netdev/net-next/c/01d86846a5a5
-  - [net-next,12/13] net: Correct spelling in headers
-    https://git.kernel.org/netdev/net-next/c/70d0bb45fae8
-  - [net-next,13/13] net: Correct spelling in net/core
-    https://git.kernel.org/netdev/net-next/c/a8c924e98738
-
-You are awesome, thank you!
+If you send multiple patches which depend on each other they must be
+part of one series. I'll apply the clk_eth patch shortly but you gotta
+resend this one, our CI couldn't apply and test it.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
