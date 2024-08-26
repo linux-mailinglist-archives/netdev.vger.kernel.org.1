@@ -1,133 +1,94 @@
-Return-Path: <netdev+bounces-121824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA51795ED80
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:39:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC69695ED84
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:40:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 731A3B21EAB
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 09:39:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8320D1F2107E
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 09:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4B914430E;
-	Mon, 26 Aug 2024 09:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D81C14375D;
+	Mon, 26 Aug 2024 09:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="1D6h97nm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BAnXSIUW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2946914375D
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 09:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0020C29A2;
+	Mon, 26 Aug 2024 09:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724665148; cv=none; b=Rf43FW+nEkAT55bydXxG0Xie1Napcksz9OHuS72a+2ggHCQfVPqq4CrZPKddJNhG0JBzg5faZ/0imo1SWNxPF7JYfULHVvIkXADoMg6Aiegu8mG5uye54unfrFf/CzhfhFjYpI06yNH0tSUaLyFkF1n01ImOtTUwCLFgfXVM3vk=
+	t=1724665229; cv=none; b=hgv/YqC7VwlC2POQNTuIhd/IiPP0SH+qnptzLEY6T004b9Uxt9UWNJZMJVBLzFWT1wvaHRh8fe5MfR7HcWtEfQ6gFTTdWXvjTHkmirnoqcBpGhtMeYMqiggaeqRqcvtyJq+H5bkR/soHIpHxFbA0TjYt0O8zgHZw50QytcBmnGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724665148; c=relaxed/simple;
-	bh=q5NKpvpQmHFhkVuhB1yf1UaD8tdgXAOJImWQRQKU2yU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iRGFOL20BU2DifwXLc0FgX58SRi/Qk7NVSK9Oga4Gf2Ra5N4YYZm7dfLuY4mJYL7yR38FrKwSx8vcfUwEC54XoSvCOjKvQLDN5P+JqaOq8wjdNYnwS4TzDH2pzyxTY0dxUU4dUuR4p3lBOyycDBs8X7hRpGV6Knt/1Ye+Cf6Hi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=1D6h97nm; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5bf068aebe5so5302842a12.0
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 02:39:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724665145; x=1725269945; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7x/Iy4WGMT/angdlokuIQnh2/Lh8TylG6czBnlIKoXY=;
-        b=1D6h97nm5Ehb4XrmamqBRFsGGI4VTACwW5KzkGYoWzxvaeUmHozj6BtajzISbxCpgz
-         H/jAgTB0nuveezaz3/Sh6KKHXNHRYhvb94OnDQadgsTBjs8C2kWJE+Nejv8qx38cTBhb
-         CF9/ZFB8m8xW8JgXOBtr6jkmu3F/6M1R/gksdDEts1F8jTA+8FHfZ9OkAkfegQmJ3Nja
-         ct75JrG6DKKUm1OonPHCoztYMZrlciw85g5ycWeqWUJFAdm69WTyk/woPlV/zXGh5YE9
-         IQek1fNvIOsjQbqoGK0nArOw88D27kagz3L7LXzRo4wslz8QBgEKzfP0hI7q7JVAA0DJ
-         Y2QA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724665145; x=1725269945;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7x/Iy4WGMT/angdlokuIQnh2/Lh8TylG6czBnlIKoXY=;
-        b=QkeALC9i7KN6i/CFUWLzce374ajBvPvvAqOJb2KFVtpG0JQNBjxZbCrUOc0P0Xbn0w
-         a7ZoInBs+zjT2KHPO/dXIa0X3+Yt1XvMyCtJLj4KnoHkEl7EFxmol6KjbCXwVXofDpeA
-         Hkvd3fbtKPvb5UepuKAFoyWvxzKSSK9DfQv73rdxoYwCWRMF5qn3l5mGVLYabYoDE8Vj
-         UjyVgKkAPwONXCeACQUZz2KEJ1XUEVW4HpYmxVk8FDNlBXNaqhQ4hnG3ayIa1aHNaM8k
-         vlBinAlW1NiagIhDOrZKRsaSf14tuZIs/XVRcfHev4h2zNEUDWM/KUGzTdKPLyzIVhuP
-         /S8g==
-X-Forwarded-Encrypted: i=1; AJvYcCV7gSWsqrC1qCkQl0Ur3cqAQ18KfN+ohdgXYdidXJ7E7BdYhpCYaVc5QKXq60P864O1eVvkOYU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDDus7JaZQZfxtgl8Jky8ipbJ1IBmk2MW81PdYTC/DAfl5xCDy
-	q2jehtTeffga9M/ghYd18xF2gSeJrpu3h88CzMhToai5vbcbOaUBmWtR5dnLBwQ=
-X-Google-Smtp-Source: AGHT+IFpRjFOKt+B50Fc+4D5fJb5MlFKXArq0SrGZwNTFTrYVvRDghIi0mHC4rGnYSH+FWm20Km7cg==
-X-Received: by 2002:a17:907:f702:b0:a86:a3a6:c143 with SMTP id a640c23a62f3a-a86a52c1b29mr619779866b.31.1724665145123;
-        Mon, 26 Aug 2024 02:39:05 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f4360c0sm640406166b.108.2024.08.26.02.39.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 02:39:04 -0700 (PDT)
-Date: Mon, 26 Aug 2024 11:39:03 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Yan Zhen <yanzhen@vivo.com>
-Cc: chuck.lever@oracle.com, jlayton@kernel.org, trondmy@kernel.org,
-	anna@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, neilb@suse.de,
-	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
-	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
-Subject: Re: [PATCH v1] net: sunrpc: Fix error checking for
- d_hash_and_lookup()
-Message-ID: <ZsxNN-CmxarJi9ns@nanopsycho.orion>
-References: <20240826070659.2287801-1-yanzhen@vivo.com>
+	s=arc-20240116; t=1724665229; c=relaxed/simple;
+	bh=zoQTpjZ/kfoCrrvulN+2vY+bZNbMRmN/zamfZeSFnjg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bdlWH4iQJflxCb0HPuoslmEanFL6kT29jq3Hnv5xmnolzhvLgPkjA8m10naKGtFO1YjDGYvsgf6yaiNppcRAgF9mfGrEw6u8YGUvzD/Oez0LSOR0lX48KRtrnUJtzpuW588zovPo/Xv1W8ZumtDdYw9eY5xM2ReliS2JiQqqmr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BAnXSIUW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79849C51410;
+	Mon, 26 Aug 2024 09:40:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724665228;
+	bh=zoQTpjZ/kfoCrrvulN+2vY+bZNbMRmN/zamfZeSFnjg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BAnXSIUWQK9Qk4r6ZsQ3HxssN+/CgJrPiqfTBh0Job8Im/bidDZjKe6SM4q+L7EJ6
+	 96FoXK4D1irDvOL5AA5dKEH4M0xzzaXEHWSHUfWg102yIWts7c5PsUxchUG/8/T3cm
+	 x5WAmJrUAg908tR+ZFd4HcSxSqeLL0DOFb3xxE+UHs+QyLXjGEUpaSx6hmZfbBeHO+
+	 qEu8VeC/KCFpG/39t+sAgut+XHS54sI5h+r+L7PE+vz0lQ3J/9JOtunMN3vnZ/S+dg
+	 T8fHJRH45E8grpp0AKH93MiATfv0RD/BJaqcetx/oTjN1t+QWK6LeQQBbYKhsOIWD5
+	 r6T1owep0ZvBQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE124383BAC1;
+	Mon, 26 Aug 2024 09:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240826070659.2287801-1-yanzhen@vivo.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: netlink: Remove the dump_cb_mutex field from
+ struct netlink_sock
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172466522733.3853017.7184168867429321948.git-patchwork-notify@kernel.org>
+Date: Mon, 26 Aug 2024 09:40:27 +0000
+References: <c15ce0846e0aed6f342d85f36092c386c6148d00.1724309198.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <c15ce0846e0aed6f342d85f36092c386c6148d00.1724309198.git.christophe.jaillet@wanadoo.fr>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, netdev@vger.kernel.org
 
-Mon, Aug 26, 2024 at 09:06:59AM CEST, yanzhen@vivo.com wrote:
->The d_hash_and_lookup() function returns either an error pointer or NULL.
->
->It might be more appropriate to check error using IS_ERR_OR_NULL().
->
->Signed-off-by: Yan Zhen <yanzhen@vivo.com>
+Hello:
 
-You need to provide a "fixes" tag blaming the commit that introduced the
-bug.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-
->---
-> net/sunrpc/rpc_pipe.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->
->diff --git a/net/sunrpc/rpc_pipe.c b/net/sunrpc/rpc_pipe.c
->index 910a5d850d04..fd03dd46b1f2 100644
->--- a/net/sunrpc/rpc_pipe.c
->+++ b/net/sunrpc/rpc_pipe.c
->@@ -1306,7 +1306,7 @@ rpc_gssd_dummy_populate(struct dentry *root, struct rpc_pipe *pipe_data)
+On Thu, 22 Aug 2024 09:03:20 +0200 you wrote:
+> Commit 5fbf57a937f4 ("net: netlink: remove the cb_mutex "injection" from
+> netlink core") has removed the usage of the 'dump_cb_mutex' field from the
+> struct netlink_sock.
 > 
-> 	/* We should never get this far if "gssd" doesn't exist */
-> 	gssd_dentry = d_hash_and_lookup(root, &q);
->-	if (!gssd_dentry)
->+	if (IS_ERR_OR_NULL(gssd_dentry))
-> 		return ERR_PTR(-ENOENT);
+> Remove the field itself now. It saves a few bytes in the structure.
 > 
-> 	ret = rpc_populate(gssd_dentry, gssd_dummy_clnt_dir, 0, 1, NULL);
->@@ -1318,7 +1318,7 @@ rpc_gssd_dummy_populate(struct dentry *root, struct rpc_pipe *pipe_data)
-> 	q.name = gssd_dummy_clnt_dir[0].name;
-> 	q.len = strlen(gssd_dummy_clnt_dir[0].name);
-> 	clnt_dentry = d_hash_and_lookup(gssd_dentry, &q);
->-	if (!clnt_dentry) {
->+	if (IS_ERR_OR_NULL(clnt_dentry)) {
-> 		__rpc_depopulate(gssd_dentry, gssd_dummy_clnt_dir, 0, 1);
-> 		pipe_dentry = ERR_PTR(-ENOENT);
-> 		goto out;
->-- 
->2.34.1
->
->
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: netlink: Remove the dump_cb_mutex field from struct netlink_sock
+    https://git.kernel.org/netdev/net-next/c/18aaa82bd36a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
