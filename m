@@ -1,215 +1,127 @@
-Return-Path: <netdev+bounces-121907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 360FC95F326
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 15:41:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D65ED95F35F
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 15:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B71001F2590C
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 13:41:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9511F28200B
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 13:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37221862B9;
-	Mon, 26 Aug 2024 13:41:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777B2188583;
+	Mon, 26 Aug 2024 13:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PGeqF47X"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="ejKdB4G1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39053139D
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 13:41:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA1D17C989;
+	Mon, 26 Aug 2024 13:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724679672; cv=none; b=V//ga2A8CRLhR/Scs5kjh3qgo4b+8XzHZZu7dssp8qO/08rnzZ+2ICohAwgtK2V9lC4/MV65e3Eurb0spfjilA8TnMq+Fgj3nklyJKMv0346c+oyidrouWUcDKr9wXr2jxWbH/YZ4bS6MhDujosTL3uQDaHN206syHCo1LOzY9c=
+	t=1724680671; cv=none; b=lmOTAVBGcRJXmIqUm5UTYK7B/jMpRnX/EQ2gTnf/mI9LKS7iNlypHDsdVqXkT0zOShRL+Z08rQ1zB+hG0zZdezYmXFY12AfuNeNFcAXMGKrnN+SZ9+WvNHOAs+SW8KhMGuNrkzL3mUgAihmRL6H1fFMx7kFyuVenZLyq0yEqNhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724679672; c=relaxed/simple;
-	bh=Cpyfv7VUbOU93ueHV9tf4U76Ou561Alp9RzNgNiaM98=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gUq/cjcgV5H58J2S+gKtb3JuAATSe9aBJxm8HsTFFSmE7aP+s26yl8wJzx9MRKGszfsTRHlyTsTb6itPQgrJKm/Dlx1RPVRmiarwy/n7U9ouiIcUyqnHca6BsVuyCB30DPDsffWOivtyIpczJC+jg0oyPBcYNyH0A58fNzwDPvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PGeqF47X; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-39d37218c5cso14704465ab.1
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 06:41:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724679670; x=1725284470; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iiEeLYwXBIi31Mb8p+jGA/neq3F8LiEqk22jeOGVsgU=;
-        b=PGeqF47X/qxxsyahiPlNBE3o8yM5nv05tqLMs19nKei7KOxatsN9jxf35T7SV2g+N4
-         OfrznSMye76incWzPb4gaopV05H1wA9kM4eEiYgnKrvuQzfosx0hCl4StgDxIG/RUfi/
-         nfygCsvNxb4S1R8t0qVGWEGOfKl8iz5bjfydAsofEWCodTe71yTjmRSKutUciQsJTMIr
-         pHW2hmi/RCLXcOz/dbmaPBBfJKusr0HRNf2bcTPXC8BGv+rOR3QC80cC2rDlZxrivcBu
-         9/G7xuR6ExE/PiOjDty0Pn4H/h6aUTmWS2Od+MzvtV2u++ZUiWLaJ6s3W+gSolQ7IpSy
-         rg3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724679670; x=1725284470;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iiEeLYwXBIi31Mb8p+jGA/neq3F8LiEqk22jeOGVsgU=;
-        b=LgkW6++nSh1/OZDGyl48w4PPvXLfENottphcNsnEzlZpvxwZGTrviXV0eBM/G4MT7M
-         3sKqz2gcMYLntp7r7VnHey1/djPa8VkskmbcOrVe41j7W5rx3DRo+4VvalxTXR7UVam8
-         1OxB2jSV72IBE0Kn03uCWreb+nY8e9Gl1N7qRhZWFCe99ucwrSZRhrfnam8uk5/n4JqZ
-         Sq2i7d4eg9b0prTklKVE4orFpBtkAs7mp+P6v1Wf3eZu/henhygzNKIFKe35zASpOWAK
-         Gt8ubLfCQ3hNa0Zt7RDsJJMQbxl10va+9AemfD/P8CY43z3UhvlbX4Ofm17P5cA/l0gW
-         m5OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX2qwF5+9kyZsMUooYFUeEj0kZGfk4JwiugLAKMcg/EQGGRq+d/cuBcqu6U5AiYyJBwWLFVVsw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeLehPrWVQ0jkZsFWkLXV4hzPDNjEcsXRRut7EvHg3j9RALnYk
-	hYnSTZnOJaUnuirRynx3LgpLEuAxEhVONE5ZaBZOtMIenwdULkeirm3C+lIdndQsIovQidCpDNC
-	13OqVZVfpvnMfJfJ9HuFbuNgUgeE=
-X-Google-Smtp-Source: AGHT+IH5FYVxvJJ1b4g9ahiCAQXhE7T7H0eEXCHFBFXwwI2ZBY8fPbrwZYX6A7VUqCpz+L3oluS9Cbobc9A7beYwCHo=
-X-Received: by 2002:a05:6e02:1c48:b0:39d:2124:d6d5 with SMTP id
- e9e14a558f8ab-39e3c9851a7mr119314655ab.10.1724679670161; Mon, 26 Aug 2024
- 06:41:10 -0700 (PDT)
+	s=arc-20240116; t=1724680671; c=relaxed/simple;
+	bh=vr7oofwZgZfct6HqlKWNzT6ycYxBI0n+s7zmMjcpi4M=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=hU85ou+HtI5Ge9fIU/jIuBsIBuw3uZcnAC5oVqiWRIv8D9LQ1EbDJ3MxXkgEp5xL8cvX0Ta7UyjMR6iIpcfvPZajT3eCkDTjQtWfzHcny5bxRqsIRoVb19ma2313i5XR2ODwKNMi/Tq+NBlcP0RM2IJgqin+LNKowH8en+zvKmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=ejKdB4G1; arc=none smtp.client-ip=162.62.57.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1724680663; bh=OHgRLzSenWLbC5JQpgLz4xtY6cHLHbUrK3U66N3AWaM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=ejKdB4G13RzIjs6bAOrBphKmkZ7gSfgleilYyM6Gb+gbeKk3YcrbUApIQ0MJb2EMm
+	 DFWsL+Ra5pCravZJVExP85JwZRqForjuNl99DVmved16gW3H/bseB4+I2yvMf6+lOi
+	 8Q5FYS19zd+iVr2Cy3fYABm+2I3mBCZ6NDVSZcwM=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
+	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
+	id B12B340A; Mon, 26 Aug 2024 21:44:18 +0800
+X-QQ-mid: xmsmtpt1724679858tld28qu36
+Message-ID: <tencent_A2DE92DC864D89B92ECBAEF2CC8FE7F4C606@qq.com>
+X-QQ-XMAILINFO: MW5hkHoBpWXyI09Aq4gwR2uQtgcCQR4idHhfNGBGz3Iiy0PEFTPLCT8Ve7kUlB
+	 J3emttFsrfj7eSzFRWc8gbM+fXuFNF1fRgMwh+qRAysAxuLsLDgJl2XSsRxhA5UreLLdPTujQtXV
+	 nQijk9n1Jv8PFDio6NTz7dS15so4EvTpfB9HOryeWKqx+n0hmx7HjOh7FP1vz+M1n7gDFZ8HC7B4
+	 M4eyRY9Bu9PZggcntTYT4+Vo/3IfUYgxfsZ+n4h2ue+ZYhR5LyNH8/il0QMdGXbmd9cXc8F5DY0a
+	 MR/dHTGlYL/qqlAful5Z9j4XNaPglB/nNJQrXbtaGxYA1j4mLY4UMpfVa5i90q8YtYUE3S5kta7D
+	 VCWCaZFdgMkHYfJaCNXQ4pQnP4LlAs9zAUxvSaDflmbFpkPeuZPmCG3Akj1LXVKwtFWNiEmVfmBY
+	 4GjVepYFiXcaAXrRFtGxmldhUzETVALTZIonuq20fDXEQxVqWF9L07uETBjWLjg21PF/6huGeovl
+	 AgXxxl6h5NwQcCbRZUZJIFMNC01Ui/p+BX2AKBZzEnoGmoQezqE/fPsPJGecRmSNyzPDzWywwKwM
+	 VmEzy8rPWvlSw3Hp4USDlJ7MOh03emUzN0uLVlbje52AqBNNLnzW5S/SDnz71OCf0ndC4C1YdRK/
+	 0Ll8vtcCrMniWesPuNnikOAJtLmxn89PABDzGL6PimrsZCQSx0wwvS4nnxefIyzt0EH++pipNtwa
+	 CL0CjK2Qploo6tLYinew63Es0FP8uYpIeVyuI2dn99KYr3H+SPzQneDQxQKe2txtSGga3XpSachX
+	 GBC/5dMqWcj8ip+wnWh3oVB0j2JQl92HM8oDjWvFRFE75eTPJ7AzUoUXMFHTpm4pM30+tNvppjdS
+	 VyPmT4TutSaXMNKynOz5lb3YdfNFL3MVUc4a6Tf6mar17Yy5GsCOdS0jqJQPeENF2s5+eFKfnMz8
+	 DAXPWcalud/1iyQESt4Xk6DiDEoY3pIjHZBdywSmEbAJnlKDeHMecTubXR+ePo
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+From: Edward Adam Davis <eadavis@qq.com>
+To: gregkh@linuxfoundation.org
+Cc: eadavis@qq.com,
+	kvalo@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	sergei.shtylyov@gmail.com,
+	syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH V5 1/2] wifi: ath6kl: Replace ath6kl_usb_submit_ctrl_in with usb_control_msg_recv
+Date: Mon, 26 Aug 2024 21:44:19 +0800
+X-OQ-MSGID: <20240826134418.2744882-3-eadavis@qq.com>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <2024082607-foothold-boss-c693@gregkh>
+References: <2024082607-foothold-boss-c693@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240825152440.93054-1-kerneljasonxing@gmail.com>
- <20240825152440.93054-2-kerneljasonxing@gmail.com> <66cc82229bea2_261e53294fd@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66cc82229bea2_261e53294fd@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 26 Aug 2024 21:40:34 +0800
-Message-ID: <CAL+tcoBWHqVzjesJqmmgUrX5cvKtLp_L9PZz+d+-b0FBXpatVg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: make SOF_TIMESTAMPING_RX_SOFTWARE
- feature per socket
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hello Willem,
+ath6kl_usb_submit_ctrl_in() did not take into account the situation where
+the length of the data read from the device is not equal to the len, and
+such missing judgments will result in subsequent code using incorrect data.
 
-On Mon, Aug 26, 2024 at 9:24=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Normally, if we want to record and print the rx timestamp after
-> > tcp_recvmsg_locked(), we must enable both SOF_TIMESTAMPING_SOFTWARE
-> > and SOF_TIMESTAMPING_RX_SOFTWARE flags, from which we also can notice
-> > through running rxtimestamp binary in selftests (see testcase 7).
-> >
-> > However, there is one particular case that fails the selftests with
-> > "./rxtimestamp: Expected swtstamp to not be set." error printing in
-> > testcase 6.
-> >
-> > How does it happen? When we keep running a thread starting a socket
-> > and set SOF_TIMESTAMPING_RX_HARDWARE option first, then running
-> > ./rxtimestamp, it will fail. The reason is the former thread
-> > switching on netstamp_needed_key that makes the feature global,
-> > every skb going through netif_receive_skb_list_internal() function
-> > will get a current timestamp in net_timestamp_check(). So the skb
-> > will have timestamp regardless of whether its socket option has
-> > SOF_TIMESTAMPING_RX_SOFTWARE or not.
-> >
-> > After this patch, we can pass the selftest and control each socket
-> > as we want when using rx timestamp feature.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  net/ipv4/tcp.c | 10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index 8514257f4ecd..49e73d66c57d 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -2235,6 +2235,7 @@ void tcp_recv_timestamp(struct msghdr *msg, const=
- struct sock *sk,
-> >                       struct scm_timestamping_internal *tss)
-> >  {
-> >       int new_tstamp =3D sock_flag(sk, SOCK_TSTAMP_NEW);
-> > +     u32 tsflags =3D READ_ONCE(sk->sk_tsflags);
-> >       bool has_timestamping =3D false;
-> >
-> >       if (tss->ts[0].tv_sec || tss->ts[0].tv_nsec) {
-> > @@ -2274,14 +2275,19 @@ void tcp_recv_timestamp(struct msghdr *msg, con=
-st struct sock *sk,
-> >                       }
-> >               }
-> >
-> > -             if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_SOFTWARE=
-)
-> > +             /* skb may contain timestamp because another socket
-> > +              * turned on netstamp_needed_key which allows generate
-> > +              * the timestamp. So we need to check the current socket.
-> > +              */
-> > +             if (tsflags & SOF_TIMESTAMPING_SOFTWARE &&
-> > +                 tsflags & SOF_TIMESTAMPING_RX_SOFTWARE)
-> >                       has_timestamping =3D true;
-> >               else
-> >                       tss->ts[0] =3D (struct timespec64) {0};
-> >       }
->
-> The current behavior is as described in
-> Documentation/networking/timestamping.rst:
->
-> "The socket option configures timestamp generation for individual
-> sk_buffs (1.3.1), timestamp reporting to the socket's error
-> queue (1.3.2)"
->
-> SOF_TIMESTAMPING_RX_SOFTWARE is a timestamp generation option.
-> SOF_TIMESTAMPING_SOFTWARE is a timestamp reporting option.
+usb_control_msg_recv() handles the abnormal length of the returned data,
+so using it directly can fix "target's targ_info doesn't match the host's
+targ_info" warning in ath6kl_bmi_get_target_info.
 
-Thanks for your review.
+Reported-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+V1: If the data length returned by the device is 0 return failure
+V2: Directly using USB functions
+V3: Adjust indentation style
+V4: Adjust indentation style
+V5: Update comments, add warning info
 
-Yes, it's true.
+ drivers/net/wireless/ath/ath6kl/usb.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
->
-> This patch changes that clearly defined behavior.
+diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
+index 5220809841a6..0458b5a078e1 100644
+--- a/drivers/net/wireless/ath/ath6kl/usb.c
++++ b/drivers/net/wireless/ath/ath6kl/usb.c
+@@ -1027,9 +1027,10 @@ static int ath6kl_usb_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
+ 	int ret;
+ 
+ 	/* get response */
+-	ret = ath6kl_usb_submit_ctrl_in(ar_usb,
+-					ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
+-					0, 0, buf, len);
++	ret = usb_control_msg_recv(ar_usb->udev, 0,
++				   ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
++				   USB_DIR_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
++				   0, 0, buf, len, 2000, GFP_KERNEL);
+ 	if (ret) {
+ 		ath6kl_err("Unable to read the bmi data from the device: %d\n",
+ 			   ret);
+-- 
+2.43.0
 
-Why? I don't get it. Please see those testcase in
-tools/testing/selftests/net/rxtimestamp.c.
 
->
-> On Tx the separation between generation and reporting has value, as it
-> allows setting the generation on a per packet basis with SCM_TSTAMP_*.
-
-I didn't break the logic on the tx path. tcp_recv_timestamp() is only
-related to the rx path.
-
-Regarding the tx path, I carefully take care of this logic in
-patch[2/2], so now the series only handles the issue happening in the
-rx path.
-
->
-> On Rx it is more subtle, but the two are still tested at different
-> points in the path, and can be updated by setsockopt in between a
-> packet arrival and a recvmsg().
->
-> The interaction between sockets on software timestamping is a
-> longstanding issue. I don't think there is any urgency to change this
-
-Oh, now I see.
-
-> now. This proposed change makes the API less consistent, and may
-> also affect applications that depend on the current behavior.
->
-
-Maybe. But, it's not the original design which we expect, right?
-
-I can make sure this series can fix the issue. This series is trying
-to ask users to use/set both flags to receive an expected timestamp.
-The purpose of using setsockopt is to control the socket itself
-insteading of interfering with others.
-
-About the breakage issue, let me assume, if the user only sets the
-SOF_TIMESTAMPING_SOFTWARE flag, he cannot expect the socket will
-receive a timestamp, right? So what might happen if we fix the issue?
-I think the logics in the rxtimestamp.c selftest are very clear :)
-
-Besides, test case 6 will fail under this circumstance.
-
-Thanks,
-Jason
 
