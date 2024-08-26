@@ -1,119 +1,102 @@
-Return-Path: <netdev+bounces-121995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAED595F821
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:31:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2D0595F822
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:31:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63E6D1F23726
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:31:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F852B20521
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB891990AB;
-	Mon, 26 Aug 2024 17:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28285198830;
+	Mon, 26 Aug 2024 17:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="e+pjeuj4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IWLt4rII"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEEB710E9
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 17:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEA824D8BB;
+	Mon, 26 Aug 2024 17:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724693465; cv=none; b=CRAU+iGifezpYHPAAK0pvC1f/SnhMIp8YI5lJ36u6iK8mhcZDPHhRFr51Q/5QBtHYfPjJS2qdKuVrdwPOQAlPT1B8loOZex2BHmoDyf9sCdypSpcrw9o77BUW12Zwwxn6Joog2A0hEDskl9pgIumrTT7CvGcOSMyqqwXCFB3Luo=
+	t=1724693475; cv=none; b=hNmalxEbGHHSG5XJF3ca3AnehE4V4hi+AXPkPPWheZZcgwlSOnlI3pB5O6QqIi+6+Uy5AeKswCD+zgDt8RzlG1wMbaX5bfJboYToibnUhDW057gASVBXKLweMQI/7GoWLZytv6reN9mFVHE2HLaQdAF3Up+QB+CKwzsKFFZszpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724693465; c=relaxed/simple;
-	bh=ai93OtOQrbR4S3AT314DLeiH8KJPW3YI556gX8jIasE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BGqM45ZzKg1/aqkcZKmjJAua7JpUhNC6gJYBhQ2bevlMIcMyuNlp+gKaDK3bTqvasxK2BN6VR8VNJFHEZKY2ZzWaiPO3XxUr9B28p5SHuc6lpSnMTAN5fIzCXjuvdB3VIVvmsfEsWQimbHS3+6HXaCtbQle0g3/J4b9JyddOXbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=e+pjeuj4; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2d3e46ba5bcso3265798a91.0
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 10:31:01 -0700 (PDT)
+	s=arc-20240116; t=1724693475; c=relaxed/simple;
+	bh=+8a9naazCZDm22LSLmOmiaFoRZvfwasS9DI2aQyKk7s=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=D2KI0hAGaIHkfrXfcTPul/dAtA0PStsO2Dsd75vb0MeWQJ8ryY0z5cTRo8ZeTMVKO8h0hdPEdwjoMymc4dekzYp+JGqL3ApRckEK1qfXSGKLNk6Fi410CEXnb1AASalHML/pFn5sb7+f/tzXD866SeuDCV+jFl0chkP8QtP0C4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IWLt4rII; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1fec34f94abso44315665ad.2;
+        Mon, 26 Aug 2024 10:31:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1724693461; x=1725298261; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1724693473; x=1725298273; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iClgDrknyT0dEay6TLsYqV+rELzO0m3jwG6/VjVsKOY=;
-        b=e+pjeuj4mPrtiacsgQal52McaGxDOWl6JKcDmgYDtfpRpu5x5rZ94dZ9bQmeQS6INY
-         md7PNXfBKZ55/+GpJo+gI0ARPrS134axbAVbJGBGTYZph5L9E14QYmD4/Ov/S+MjtVaw
-         Swy5SiFwqLgFpqTAwpaAEwue4ZdbRAg7kKbjo=
+        bh=cqlUt7gGSpHehh2MHipdQIiey6iWi6VCFKaC87yAJDo=;
+        b=IWLt4rIIn8/MThWevEIhgSFos8bVXKCpScCWgkclw/4TmGJr+Iv6TZudhg+LjWJqrY
+         JL38qcCyYiI2Zw+DuZHMVl6OA3uAsHqbx7vMPZd34ZTIUWRR9KsQAw4cvdPSIP82hExA
+         EGcMRNl4Wxu5p56vlrYEnYY9wyug3f7i0xk/N4AmB3aeTjoO+pMpoy8UDisPa3BeYo+W
+         HAoBcVILMwxYkCQ9qUAlCtPcIk1b9ajQpoUTIP5fbtOrwlW1XFUZNZ/TOooxm/onvE+8
+         ngUybjWFxB8uLFJvExJOgsxcTXovS+kvRxIwKI8Z0GuQaq4wIT7MYdxJp+Ph6INZfCdE
+         KapQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724693461; x=1725298261;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1724693473; x=1725298273;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iClgDrknyT0dEay6TLsYqV+rELzO0m3jwG6/VjVsKOY=;
-        b=JgocUqwL9CMHFCM2BhPJRVcoB6sXGrXc1LEnTULcrvfbf+4tjBGj2LdzzDAbLS39jn
-         UVkjMwytYdCNEyn7KlyROrvQWYqr7oiaHLe5NwglQV/A365oT8uHgeA6oSGUmGrjlXa4
-         RgI4EGxRjU9uc/QT5Yc8/PsPUV0vZ4t2KW5Hb1qbsKnraIaJhYtrqpvcD3z0kkg2yI1C
-         uGmxFvPlG38hA1eV+nEAxEY80bPH4+f1ajCYqVSgCs4rPXjuLujUJHL/WQ7gxuZqjmUT
-         JzxY+IRZU4Nzmsrs+oOeRLNABymC559v57wURLs+1B30LjTilUlB/UHqfpAf2BylFq6/
-         IJYQ==
-X-Gm-Message-State: AOJu0YxHyqM8mv2GTnX27R7WZwwSNayEL7CpSh/RyMKNTBClmGrAjlHA
-	iYhs/IrscxjKc5dpO/o4cle0BXQwFsmVkldHC/VPDXNSTJEIuAI18A/NP7yqygsrJ5+AhiU0Ztv
-	aUIzO0BTYQWuKaG5rgxo9dSEmfFUjxOkcxJ2A
-X-Google-Smtp-Source: AGHT+IGOiC9l+tylzHyvTlxh5R323gDD1FRUx3Z+bfPXVWn9FyrfJSQssxkfETmOUkVELarY+SrTHbJFJ2oK/08oDGc=
-X-Received: by 2002:a17:90b:4a43:b0:2d4:924:8891 with SMTP id
- 98e67ed59e1d1-2d8259f79a4mr319895a91.38.1724693460840; Mon, 26 Aug 2024
- 10:31:00 -0700 (PDT)
+        bh=cqlUt7gGSpHehh2MHipdQIiey6iWi6VCFKaC87yAJDo=;
+        b=Jw+XCsoVZSD3Rt8ucsbbJjnyu2TaG+cQmCSAQV+ipPafBtMEU8DvlpygjDgv+1sBE6
+         Hx8Z9lz1JZTJ2fX5962GhR+JLg5rYQC6W7U8cfBw8CqsDPyfR/kMqO6bjOS/7K3eepsL
+         AtS5UjvGXCqYZzaoYcy8N9ew9gpyi7qYqs2/fQ8z+tUzkVKR7YinmiHlujVrd9rlxn3K
+         6XJaiL9lYM3LJjZFv7KpWJENK8QYUSciIdDQmS752+3vHIjIMReey6Q+KFSfVb7K2Gkt
+         oUZTPQDPk0tN8DEcflLjvFiXahpDuOSrxtNCFyTtZvo3g0LrkSBYsXLjk7EJqrZifTuA
+         mdTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXfd8ZeKszQ0Zg3icDSl1tX5h5viH/yfqHfaY6vxKcpsm1BRlWdWXn3p2t41R9mRValLQM2MuuqjbZyNdQ=@vger.kernel.org, AJvYcCXy9EHt0MXl7VaslhaYQHfykxCxbKGDkraVCKVh5126/cbF5G+MtPMPlk/CmEITJCuqVOi2dSL1@vger.kernel.org
+X-Gm-Message-State: AOJu0YythD7BiZey1jy970dBXIlj23TsE/YJ+oKs8pkvdbnkuppfs5el
+	Iwstv5YyrVnkNbYXCHzMGYvHrn/OxhKSh+pvsXdSH6fgcEcKdten
+X-Google-Smtp-Source: AGHT+IFX3Uu2OtBgEj55T4avcTD9RQFlpAXuoYEL2eDm6MWCyQmNpaNn2UcMF/C8VklyKEdAWs8+Rg==
+X-Received: by 2002:a17:902:d2c9:b0:202:f8e:7749 with SMTP id d9443c01a7336-2039e4b7201mr94287425ad.34.1724693472808;
+        Mon, 26 Aug 2024 10:31:12 -0700 (PDT)
+Received: from diogo-jahchan-ASUS-TUF-Gaming-A15-FA507RM-FA507RM.. ([200.4.98.43])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-203855dbf41sm69447515ad.134.2024.08.26.10.31.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Aug 2024 10:31:12 -0700 (PDT)
+From: Diogo Jahchan Koike <djahchankoike@gmail.com>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Diogo Jahchan Koike <djahchankoike@gmail.com>,
+	"David S . Miller " <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [patch net-next v2] net: ethtool: fix unheld rtnl lock
+Date: Mon, 26 Aug 2024 14:30:55 -0300
+Message-ID: <20240826173105.6705-1-djahchankoike@gmail.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <c14bc7fa-5692-4952-ac83-ed14c65ed821@csgroup.eu>
+References: <c14bc7fa-5692-4952-ac83-ed14c65ed821@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240814221818.2612484-1-jitendra.vegiraju@broadcom.com>
- <20240814221818.2612484-5-jitendra.vegiraju@broadcom.com> <5f7a617e-a8a2-40ca-a54a-19e58d69ab33@marvell.com>
-In-Reply-To: <5f7a617e-a8a2-40ca-a54a-19e58d69ab33@marvell.com>
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Mon, 26 Aug 2024 10:30:49 -0700
-Message-ID: <CAMdnO-+ZKyoPY=ZDO8cir5T8hcF-nLRhkasfykF8EFbbedqXFg@mail.gmail.com>
-Subject: Re: [net-next v4 4/5] net: stmmac: Add PCI driver support for BCM8958x
-To: Amit Singh Tomar <amitsinght@marvell.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
-	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, fancer.lancer@gmail.com, 
-	rmk+kernel@armlinux.org.uk, ahalaney@redhat.com, xiaolei.wang@windriver.com, 
-	rohan.g.thomas@intel.com, Jianheng.Zhang@synopsys.com, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
-	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Amit,
-Thanks for the review comments.
+Hi Cristophe
 
-On Thu, Aug 22, 2024 at 9:35=E2=80=AFAM Amit Singh Tomar <amitsinght@marvel=
-l.com> wrote:
->
-> Hi,
->
->
-> > +{
-> > +     int ret;
-> > +     int i;
-> nit: This can be merged into single line.
+Yes, thanks for reviewing, I will just resend my first patch that used the out
+label now that I am aware that the lock has to be held during all interactions
+with the device.
 
-Thanks, I will fix it.
-
-> > +err_disable_msi:
-> > +     pci_free_irq_vectors(pdev);
-> > +err_disable_device:
-> > +     pci_disable_device(pdev);
-> Shouldn't pcim_iounmap_region be called here to unmap and release PCI BAR=
-s?
-
-My understanding is that for managed API calls pcim_iomap_regions(),
-we don't need to do explicit clean up.
-Please let me know if that's not the case.
-Just realized that pci_disable_device() in cleanup is not required
-since the driver is using pcim_enable_device().
+Thanks,
+	Diogo Jahchan Koike
 
