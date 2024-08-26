@@ -1,94 +1,181 @@
-Return-Path: <netdev+bounces-121992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A442F95F7F2
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:24:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3BD395F805
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:26:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4512AB218EF
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:24:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7D0F1C22360
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B3D19412F;
-	Mon, 26 Aug 2024 17:23:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15151990D8;
+	Mon, 26 Aug 2024 17:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rde1H0oN"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8A5192D64;
-	Mon, 26 Aug 2024 17:23:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC851990A7
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 17:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724692986; cv=none; b=TX960K2r74PtTgqq9Pu5YVGC64mO71n9cH8AnnGQT+ExeqVB9eaiDiiYxyc/Jj3FCCzM83sfX6kDVnPgBYKVcJGt6UJhsVzSWN56Mge9trMe5RPqUY1IkFXwXn6qwVqbD9JlhN4gXjkBi3jxubgDnER99BRMNe6InYO79fUZM74=
+	t=1724693128; cv=none; b=VpsvnpJT/pFoJlvXeaJEDgQlSmf1+d8x2IEDE/eSQQZeHUuIfGb30a8P0y5cUF+Q22Qo1erg2jtE6rvVAl7wd+ehp2VkaRyOdVfA5trDBP2KbBV1mw1rA49W9wlWs54ryyhbNhS+22sRG0lrgj5rZRA0Kw7su9ns+eUnNmTIjNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724692986; c=relaxed/simple;
-	bh=Tbwceg4mBncecvIJb60omwuuf82G3YGTK9IQSWftNsQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fiRfTlrfOAFXEVtlwhc9nTYQNJI1ygfAQ4Xi5571mhIxNMNrRWF5KB8kDyPNE+D+Dz7JYuRoLxBqM77e8e1RYyyKl7UbpOBVQgzlvaxAMQOAxwbyJB/V6pU9RlXK61Hn5Aykuyn47Qkg54X9Un6Py1TS0YeRb+jQBXIBJ2GTfls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4WsyDk0RTZz9sPd;
-	Mon, 26 Aug 2024 19:23:02 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id uY71CR5DqUTz; Mon, 26 Aug 2024 19:23:01 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4WsyDj6XDDz9rvV;
-	Mon, 26 Aug 2024 19:23:01 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id CF4C28B77B;
-	Mon, 26 Aug 2024 19:23:01 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id hSYrx2GAOvwj; Mon, 26 Aug 2024 19:23:01 +0200 (CEST)
-Received: from [192.168.233.119] (unknown [192.168.233.119])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 6A01C8B763;
-	Mon, 26 Aug 2024 19:23:01 +0200 (CEST)
-Message-ID: <c14bc7fa-5692-4952-ac83-ed14c65ed821@csgroup.eu>
-Date: Mon, 26 Aug 2024 19:23:00 +0200
+	s=arc-20240116; t=1724693128; c=relaxed/simple;
+	bh=W2PyMWGeYMt5mFrtf2WUppfjyANqe3Y8QOGyt+ELaEY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nznZaGDHJPMkqqoJdKjGrK2ymy+yMxYOlggQNXMR/UCSwrnBdsA4kRfKYSseXhBdJzZMzYDTUuAa28aaQOlwp8tfGrRJf1eOsMI8ICvS+bECdXSGz8200Kkrp4OPm85v/gFWfp7dle552pRGqSInj8crki6RLmxNff6nWMgc3DE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rde1H0oN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724693125;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vXB9I1RDogYdka/7ESImEOew6DkiGl3Ct/MkOkP43JA=;
+	b=Rde1H0oNgl+03xwCxWKT5oTFe9AwwPqxInuXzWBqysjlVI2XBxZ+McdllxwqLG4H8Ehe/2
+	60Ia8fcpghw4kfedWyZLdt9Ed//f/T8olh6jYgti5IoQWR+kbK5rKyvGwt8oxo/rutj3yl
+	k851djUFTOWmWgPcgABTwf+WGsHxovo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-271-2oUSde6qMP2wPGEjLW28MQ-1; Mon, 26 Aug 2024 13:25:24 -0400
+X-MC-Unique: 2oUSde6qMP2wPGEjLW28MQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-427feed9c71so7193235e9.0
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 10:25:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724693123; x=1725297923;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vXB9I1RDogYdka/7ESImEOew6DkiGl3Ct/MkOkP43JA=;
+        b=bHsXKY2/qNe+9zf0gZ5ALfjFfAlzAyYew5MTQT7yThmxwaHnVGFCQipiWLvRBmLS68
+         XTtRCoOvixiD5TPJxYjcpmyYiyqZyzvgriSrm7HFRcvRk2znW+yIrnlR1x1L97rlNOKG
+         YCiX/aNO5r3YtTNXz3enGqVN2QvXmR+WtDF+6nxf3Xy8taWWhQOBhikCa7ZI3h+/FNEZ
+         PBv48KtVTbP1kdZ3eiX5VwF6iDJBitpkHePcRwJA0yk0Rn1zeF00EEgyfiS/FCHRyk++
+         Ig0kg8CSHR8AGjpABxxylBIqcRVKvBjobNK+pI6ncg31uhseZV2wkm4J8P/AcZn5AYOw
+         /g9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUi3uVoMi7JOhldDAhdqK9RsjwTmi/qPJPwmrRyvSWfIxaNWPkmFo+Fbrd6dkNffmVO1CSSqTc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKTjZsGMt9y1xZm27Kl0ysjmbhjN4RO7DA/oUD2kmE1a/MPRov
+	8JhqyA+B17v7AxJxzZCsYD54rc1w5T1r13lwuwpLPEUVIk81JqGmlaoI1OkDMB1XNcm9LZdOEj2
+	XCXE0Zf90pXBCCNPKcYkX28hnRV99mhZtdyTzxChxgD3vamtvek65BEQMMiuy2sUFUoPcj6RHU1
+	QHXZr7OaovaP7hyVqsQ+FRCve2qn2g
+X-Received: by 2002:a05:600c:3ca3:b0:426:6358:7c5d with SMTP id 5b1f17b1804b1-42acca0c1c8mr45894755e9.4.1724693123149;
+        Mon, 26 Aug 2024 10:25:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHyo+gPmcRRqLioaJdl4QFYbOq6EHctF1LM1UYeexkm0D8aNQrr/L+i8vEQVt4zZEV1IJ4ZrHk0TmltECafqh8=
+X-Received: by 2002:a05:600c:3ca3:b0:426:6358:7c5d with SMTP id
+ 5b1f17b1804b1-42acca0c1c8mr45894475e9.4.1724693122031; Mon, 26 Aug 2024
+ 10:25:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [patch net-next v2] net: ethtool: fix unheld rtnl lock
-To: Diogo Jahchan Koike <djahchankoike@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240826180922.730a19ea@fedora-3.home>
- <20240826170105.5544-1-djahchankoike@gmail.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20240826170105.5544-1-djahchankoike@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240821160640.115552-1-dawid.osuchowski@linux.intel.com>
+In-Reply-To: <20240821160640.115552-1-dawid.osuchowski@linux.intel.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Mon, 26 Aug 2024 19:25:10 +0200
+Message-ID: <CADEbmW3kk6bfn0BFz6g5FPEPg3gOnSXW42r53K27RsKF53pi9A@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net v5] ice: Add netif_device_attach/detach
+ into PF reset flow
+To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, maciej.fijalkowski@intel.com, 
+	larysa.zaremba@intel.com, netdev@vger.kernel.org, 
+	kalesh-anakkur.purayil@broadcom.com, Igor Bagnucki <igor.bagnucki@intel.com>, 
+	Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Diogo,
+On Wed, Aug 21, 2024 at 6:07=E2=80=AFPM Dawid Osuchowski
+<dawid.osuchowski@linux.intel.com> wrote:
+>
+> Ethtool callbacks can be executed while reset is in progress and try to
+> access deleted resources, e.g. getting coalesce settings can result in a
+> NULL pointer dereference seen below.
+>
+> Reproduction steps:
+> Once the driver is fully initialized, trigger reset:
+>         # echo 1 > /sys/class/net/<interface>/device/reset
+> when reset is in progress try to get coalesce settings using ethtool:
+>         # ethtool -c <interface>
+>
+> BUG: kernel NULL pointer dereference, address: 0000000000000020
+> PGD 0 P4D 0
+> Oops: Oops: 0000 [#1] PREEMPT SMP PTI
+> CPU: 11 PID: 19713 Comm: ethtool Tainted: G S                 6.10.0-rc7+=
+ #7
+> RIP: 0010:ice_get_q_coalesce+0x2e/0xa0 [ice]
+> RSP: 0018:ffffbab1e9bcf6a8 EFLAGS: 00010206
+> RAX: 000000000000000c RBX: ffff94512305b028 RCX: 0000000000000000
+> RDX: 0000000000000000 RSI: ffff9451c3f2e588 RDI: ffff9451c3f2e588
+> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+> R10: ffff9451c3f2e580 R11: 000000000000001f R12: ffff945121fa9000
+> R13: ffffbab1e9bcf760 R14: 0000000000000013 R15: ffffffff9e65dd40
+> FS:  00007faee5fbe740(0000) GS:ffff94546fd80000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000020 CR3: 0000000106c2e005 CR4: 00000000001706f0
+> Call Trace:
+> <TASK>
+> ice_get_coalesce+0x17/0x30 [ice]
+> coalesce_prepare_data+0x61/0x80
+> ethnl_default_doit+0xde/0x340
+> genl_family_rcv_msg_doit+0xf2/0x150
+> genl_rcv_msg+0x1b3/0x2c0
+> netlink_rcv_skb+0x5b/0x110
+> genl_rcv+0x28/0x40
+> netlink_unicast+0x19c/0x290
+> netlink_sendmsg+0x222/0x490
+> __sys_sendto+0x1df/0x1f0
+> __x64_sys_sendto+0x24/0x30
+> do_syscall_64+0x82/0x160
+> entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x7faee60d8e27
+>
+> Calling netif_device_detach() before reset makes the net core not call
+> the driver when ethtool command is issued, the attempt to execute an
+> ethtool command during reset will result in the following message:
+>
+>     netlink error: No such device
+>
+> instead of NULL pointer dereference. Once reset is done and
+> ice_rebuild() is executing, the netif_device_attach() is called to allow
+> for ethtool operations to occur again in a safe manner.
+>
+> Fixes: fcea6f3da546 ("ice: Add stats and ethtool support")
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
+> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+> ---
+> Changes since v1:
+> * Changed Fixes tag to point to another commit
+> * Minified the stacktrace
+>
+> Changes since v2:
+> * Moved netif_device_attach() directly into ice_rebuild() and perform it
+>   only on main vsi
+>
+> Changes since v3:
+> * Style changes requested by Przemek Kitszel
+>
+> Changes since v4:
+> * Applied reverse xmas tree rule to declaration of ice_vsi *vsi variable
+>
+> Suggestion from Kuba: https://lore.kernel.org/netdev/20240610194756.5be5b=
+e90@kernel.org/
+> Previous attempt (dropped because it introduced regression with link up):=
+ https://lore.kernel.org/netdev/20240722122839.51342-1-dawid.osuchowski@lin=
+ux.intel.com/
 
-Le 26/08/2024 à 19:00, Diogo Jahchan Koike a écrit :
-> [Vous ne recevez pas souvent de courriers de djahchankoike@gmail.com. Découvrez pourquoi ceci est important à https://aka.ms/LearnAboutSenderIdentification ]
-> 
-> Hi Maxime
-> 
-> Thanks for the clarification, I missed that. Should I resend my first patch
-> or should I release the lock before every return (tbh, I feel like that may
-> lead to a lot of repeated code) and send a new patch?
-> 
+This v5 passes the tests that the previous attempt referenced above failed.
+The patch looks sane.
 
-Do not duplicate release lock before every return.
+Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
 
-See 
-https://docs.kernel.org/process/coding-style.html#centralized-exiting-of-functions
-
-Christophe
 
