@@ -1,196 +1,106 @@
-Return-Path: <netdev+bounces-121766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBF6695E6B4
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 04:31:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D643995E6BB
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 04:34:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C2591F21720
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 02:31:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BBFC1F21741
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 02:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9D4BA3F;
-	Mon, 26 Aug 2024 02:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D246C4C6C;
+	Mon, 26 Aug 2024 02:34:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J33EkjvU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uZ4ud1B+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB6418E1A;
-	Mon, 26 Aug 2024 02:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC2A266A7;
+	Mon, 26 Aug 2024 02:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724639493; cv=none; b=ASXRj0F4TSHTpH1pE7pSrMBprV8wohUbQGbB0PvadvoHfgylawM+x4GfIldnNfmwURmifvG7tmyWNnJMd6FC2hc75vyd1ofjNzMzU6E6qAiOSK1qiUIrMOdFwXG7QN4uyyM8+5Vleuuq3MZzy+rslJvV8Zoha1GTxOE0Hn5XVMk=
+	t=1724639653; cv=none; b=shzR82yVtg7WpWB0Lgs4LSHkFmaIpGp5un9geQr6mP3134J/Fj8seAwqvTwAd22Rj7tp+oZ9XBs87wsLURtRhkOAXjgTR+pZUPfL5JSL1K7I/2+ufItv0Z1ZR1HYr3fl+RTWRNHOVEhz+wich2wyABO3cPzqFd7fSAYn9+FFG6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724639493; c=relaxed/simple;
-	bh=auvGWweHPionxG3Y2RIot08h1IaHqLUTT7XYr7Bux+w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HkeGYKGCx+dCczcVMOOGo9ZWrNrzAf4lejUBYG1qD9BDQ1HtR6ESdgX4cp+LEGrJCGg3Rg45EGWz1AD3gMyXRr9s9t5c43HNJ3sIMZEyCGvvW7H/bYgsD4vnyXimllRwta5FHlXUOAlt5wf+5Bl3p6pDXMHJgHbjQxEjjPLu978=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J33EkjvU; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6bf784346b9so18220586d6.2;
-        Sun, 25 Aug 2024 19:31:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724639490; x=1725244290; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0XScue1slDHBjUXVjmPax26pz/WL1rKHeatxMpCgrfI=;
-        b=J33EkjvUneEAQ7IrY04ueDnx8p5tDlmKPlIa+IxlvcpTc214iqMgSCbNDrmrZgBNSG
-         kKBTk7P6USq53BZHqkiu+KskQV4Jqv4MaUp17DkydRStK2+/rF7Mq7EihpRJc3768RUr
-         cBCioSfjcZdqGiyb2rakf1LvaHUR2yIeWeAMpvZ/elEwBTtboSDip6PPWHyoj6QtEyBI
-         LY4VoNXkoRrHwT/Da1/ojp7nFS6GfX3jrhKUKOnMIE6tdw96/679XDwHId07EBD0SbvO
-         P9OyjS+dBdw9sYk6XP3NisNBeRL8JgNkJAGPFuNPq7Vma8caACa6VlBJFGhvH0tm/JVA
-         FSdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724639490; x=1725244290;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0XScue1slDHBjUXVjmPax26pz/WL1rKHeatxMpCgrfI=;
-        b=RBOQNrVHQubUIRt/FxaVdir15QuETP9+0S5K7df+kpK+VUbXaBtG+nDzcqoeRwadif
-         NMkn55Fe2zZOa6mXlCxQtaBn5ZM3n1YFyOC8D7xtu6fEfOJB9R1xrRuhRWZILxQCV+uy
-         XZ/vBS5Uiwfk0bR4S6tAGSKEWIHOC2mKpJlQYjy+spuv9mTLzqMFbrW6w+L4gRDP2KwQ
-         Ef6T/x/8++1hzpgAVv71zW9gL5zTYZcFuG2VH+EG7ToWLOfR4g/q/fDzI6oQo0ZfKyNo
-         KIaDEcx5JHwg47TP0AJK+BQgUfBbjcZ1Pir3QgQGIxpRTQalnDhs2st7lAcGLQgxgzQh
-         RmPg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+LLwmWF7SwxB4dhtHT73RfdD8s0GmnOkZ93FZNn7CYTInwiCupLKtiFwut6NsrmmX9kt+fSHT/A==@vger.kernel.org, AJvYcCU+Q2/qpK+CC3onhcQ7BwDX8R7kJCWIvu+enJ5zaRKoNJMWXX8lssgglf4CdzynpVesq+3okUkf0sbYibIO5r7fH9jo@vger.kernel.org, AJvYcCUfTuanryljPhtyo7jpioBGWFTefyUWB13kAqnHyFmFkHLpFPMmdabVjly+879hzf2+uSS9BvltB7w9EUd59A==@vger.kernel.org, AJvYcCVGs+GZ97iiVWrJbXD0ixBPqz30a5cBEefL8rgWKg/nlWF6+rRLy8Pd4ZoF7J7/wGSKNnBrcD8+s7SFlTPP1zHVbV8fxHdu@vger.kernel.org, AJvYcCVVgQWRNuPmfbgquVfn7PfcPR/1YFtC3SoPpM+4LTxn+fAvQR7b4Zu/LlsWj+HoWsHo48DheA==@vger.kernel.org, AJvYcCVwKBQ8X/SKwIzbn4/0wrGIsDmu20yZjWMKsKb09eyMQQt9IL5+o82XYenMVg1LFub5T3iw@vger.kernel.org, AJvYcCX72G27jpTwaedK8xNmFKpTSImxtiOn82cpZOjNhqzLfYYFSdqncKzFjl3vowXhoGJTdaRK529N@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNkPg/QJ2Usa76CXkYTozsNnc2VoxrIDmBk1Qj0N6H+C2u674W
-	TYyfzLSd0rJ+xxQdJ9iSt5jA/wrt/cFTnqMj7OwXUnVQk14etHnJgd4W8HPOE1yC5XFuUTPDSfo
-	bxqSC79ZxycwGNhaisyufaQMgYNU=
-X-Google-Smtp-Source: AGHT+IGarR35eqB+ZCiektfid3NknQ5udphouR14HCsBw/jqFbYUFfZCBajx/1hzRrP8EuX3DNE+IOmZVcAYGIL4Z2k=
-X-Received: by 2002:a05:6214:318d:b0:6bb:84d9:8f91 with SMTP id
- 6a1803df08f44-6c16dc2615cmr95291406d6.6.1724639490512; Sun, 25 Aug 2024
- 19:31:30 -0700 (PDT)
+	s=arc-20240116; t=1724639653; c=relaxed/simple;
+	bh=XFwCdiRqD8KbMHhOnUn5gZn/z1fT216PI43Mv0zZByY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fk9ipTETyrkJUFV/dr3Q/eqWIftYqqm1C8w4oerBym8GzIyW3xjdvzDYKdU6F8TTgJAboo5saYH8fKsXNn4ODBwewCgd7Bdqt3lWqlgEfjHyx5/U1mVHt2XHTmlsDKLDMn2P0o1y3s/NspN5wYMSTL2RpNYCyNP785TBAn1dnF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uZ4ud1B+; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=adFmv7fY6JyWCpgyvzJgNvSpo9ewuSk0pkwBsnmVVd4=; b=uZ4ud1B+yutGNlv1nD0CPgXKOF
+	6mQLu4bb94TOoyBVK9OVA0FVa8hALIfigVV2ZmgqFvIw2Swhxvs95sNM6X3tKk0v2M7Iab/ke1tfF
+	4HAiCV1rBNv2WIkdvUbWb+uMb2t/UC397dGsLF/WWrkU0gZaBqk7yWIdjtTkKBKSfrHQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1siPYF-005fNc-2d; Mon, 26 Aug 2024 04:33:51 +0200
+Date: Mon, 26 Aug 2024 04:33:51 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: andi.shyti@kernel.org, jarkko.nikula@linux.intel.com,
+	andriy.shevchenko@linux.intel.com, mika.westerberg@linux.intel.com,
+	jsd@semihalf.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, rmk+kernel@armlinux.org.uk,
+	piotr.raczynski@intel.com, linux-i2c@vger.kernel.org,
+	netdev@vger.kernel.org, mengyuanlou@net-swift.com,
+	duanqiangwen@net-swift.com
+Subject: Re: [PATCH net 0/3] Add I2C bus lock for Wangxun
+Message-ID: <55ff5570-5398-48e9-bf56-d34da197d175@lunn.ch>
+References: <20240823030242.3083528-1-jiawenwu@trustnetic.com>
+ <888f78a9-dea9-4f66-a4d0-00a57039733d@lunn.ch>
+ <01d701daf75c$50db4450$f291ccf0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240817025624.13157-1-laoar.shao@gmail.com>
-In-Reply-To: <20240817025624.13157-1-laoar.shao@gmail.com>
-From: Yafang Shao <laoar.shao@gmail.com>
-Date: Mon, 26 Aug 2024 10:30:54 +0800
-Message-ID: <CALOAHbA7VW3_gYzqzb+Pp2T3BqWb5x2sWPmUj2N+SzbYchEBBA@mail.gmail.com>
-Subject: Re: [PATCH v7 0/8] Improve the copy of task comm
-To: akpm@linux-foundation.org
-Cc: torvalds@linux-foundation.org, alx@kernel.org, justinstitt@google.com, 
-	ebiederm@xmission.com, alexei.starovoitov@gmail.com, rostedt@goodmis.org, 
-	catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, selinux@vger.kernel.org, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <01d701daf75c$50db4450$f291ccf0$@trustnetic.com>
 
-On Sat, Aug 17, 2024 at 10:56=E2=80=AFAM Yafang Shao <laoar.shao@gmail.com>=
- wrote:
->
-> Using {memcpy,strncpy,strcpy,kstrdup} to copy the task comm relies on the
-> length of task comm. Changes in the task comm could result in a destinati=
-on
-> string that is overflow. Therefore, we should explicitly ensure the
-> destination string is always NUL-terminated, regardless of the task comm.
-> This approach will facilitate future extensions to the task comm.
->
-> As suggested by Linus [0], we can identify all relevant code with the
-> following git grep command:
->
->   git grep 'memcpy.*->comm\>'
->   git grep 'kstrdup.*->comm\>'
->   git grep 'strncpy.*->comm\>'
->   git grep 'strcpy.*->comm\>'
->
-> PATCH #2~#4:   memcpy
-> PATCH #5~#6:   kstrdup
-> PATCH #7~#8:   strcpy
->
-> Please note that strncpy() is not included in this series as it is being
-> tracked by another effort. [1]
->
-> In this series, we have removed __get_task_comm() because the task_lock()
-> and BUILD_BUG_ON() within it are unnecessary.
->
-> Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-> Link: https://lore.kernel.org/all/CAHk-=3DwjAmmHUg6vho1KjzQi2=3DpsR30+Cog=
-Fd4aXrThr2gsiS4g@mail.gmail.com/ [0]
->
-> Changes:
-> v6->v7:
-> - Improve the comment (Alejandro)
-> - Drop strncpy as it is being tracked by another effort (Justin)
->   https://github.com/KSPP/linux/issues/90 [1]
->
-> v5->v6: https://lore.kernel.org/linux-mm/20240812022933.69850-1-laoar.sha=
-o@gmail.com/
-> - Get rid of __get_task_comm() (Linus)
-> - Use ARRAY_SIZE() in get_task_comm() (Alejandro)
->
-> v4->v5: https://lore.kernel.org/all/20240804075619.20804-1-laoar.shao@gma=
-il.com/
-> - Drop changes in the mm/kmemleak.c as it was fixed by
->   commit 0b84780134fb ("mm/kmemleak: replace strncpy() with strscpy()")
-> - Drop changes in kernel/tsacct.c as it was fixed by
->   commmit 0fe2356434e ("tsacct: replace strncpy() with strscpy()")
->
-> v3->v4: https://lore.kernel.org/linux-mm/20240729023719.1933-1-laoar.shao=
-@gmail.com/
-> - Rename __kstrndup() to __kmemdup_nul() and define it inside mm/util.c
->   (Matthew)
-> - Remove unused local varaible (Simon)
->
-> v2->v3: https://lore.kernel.org/all/20240621022959.9124-1-laoar.shao@gmai=
-l.com/
-> - Deduplicate code around kstrdup (Andrew)
-> - Add commit log for dropping task_lock (Catalin)
->
-> v1->v2: https://lore.kernel.org/bpf/20240613023044.45873-1-laoar.shao@gma=
-il.com/
-> - Add comment for dropping task_lock() in __get_task_comm() (Alexei)
-> - Drop changes in trace event (Steven)
-> - Fix comment on task comm (Matus)
->
-> v1: https://lore.kernel.org/all/20240602023754.25443-1-laoar.shao@gmail.c=
-om/
->
-> Yafang Shao (8):
->   Get rid of __get_task_comm()
->   auditsc: Replace memcpy() with strscpy()
->   security: Replace memcpy() with get_task_comm()
->   bpftool: Ensure task comm is always NUL-terminated
->   mm/util: Fix possible race condition in kstrdup()
->   mm/util: Deduplicate code in {kstrdup,kstrndup,kmemdup_nul}
->   net: Replace strcpy() with strscpy()
->   drm: Replace strcpy() with strscpy()
->
->  drivers/gpu/drm/drm_framebuffer.c     |  2 +-
->  drivers/gpu/drm/i915/i915_gpu_error.c |  2 +-
->  fs/exec.c                             | 10 -----
->  fs/proc/array.c                       |  2 +-
->  include/linux/sched.h                 | 32 +++++++++++---
->  kernel/auditsc.c                      |  6 +--
->  kernel/kthread.c                      |  2 +-
->  mm/util.c                             | 61 ++++++++++++---------------
->  net/ipv6/ndisc.c                      |  2 +-
->  security/lsm_audit.c                  |  4 +-
->  security/selinux/selinuxfs.c          |  2 +-
->  tools/bpf/bpftool/pids.c              |  2 +
->  12 files changed, 65 insertions(+), 62 deletions(-)
->
-> --
-> 2.43.5
->
+On Mon, Aug 26, 2024 at 10:04:42AM +0800, Jiawen Wu wrote:
+> On Mon, Aug 26, 2024 9:33 AM, Andrew Lunn wrote:
+> > On Fri, Aug 23, 2024 at 11:02:39AM +0800, Jiawen Wu wrote:
+> > > Sometimes the driver can not get the SFP information because the I2C bus
+> > > is accessed by the firmware at the same time.
+> > 
+> > Please could you explain this some more. What firmware?
+> 
+> It's the firmware of our ethernet devices.
+> 
+> > There some registers which are clear on read. They don't work when you
+> > have multiple entities reading them.
+> 
+> I'm not trying to multiple access the I2C registers, but these registers cannot
+> be accessed by other interfaces in the process of reading complete information
+> each time. So there is a semaphore needed that locks up the entire read process.
 
-Hello Andrew,
+More details please.
 
-Could you please apply this series to the mm tree ?
+Linux assume it is driving the hardware. Your firmware cannot be
+touching any registers which will clear on read. QSFP states that
+registers 3-31 of page 0 are all clear on read, for example. The
+firmware should also not be setting any registers, otherwise you can
+confuse Linux which assumes registers it set stay set, because it is
+controlling the hardware.
 
---=20
-Regards
-Yafang
+Your firmware also needs to handle that Linux can change the page. If
+the firmware changes the page, it must restore it back to whatever
+page Linux selected, etc.
+
+The fact you are submitting this for net suggests you have seen real
+issues. Please describe what those issues are.
+
+	Andrew
+
+
 
