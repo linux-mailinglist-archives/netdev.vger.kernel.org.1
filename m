@@ -1,78 +1,87 @@
-Return-Path: <netdev+bounces-121752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 846F395E637
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:20:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7571795E63F
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:24:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22133B20C5D
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 01:20:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A92851C2093B
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 01:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4553F7E6;
-	Mon, 26 Aug 2024 01:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sn7E+38/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9FD184E;
+	Mon, 26 Aug 2024 01:24:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 841CF635
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 01:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B80607F9
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 01:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724635253; cv=none; b=ulQy+0ZYxZ7mAatZYzTmQWv8FI7S/rcyzSfXwONYBy3Nf9+H8teUiOfKd1Or67UiIpV0tOFsa5XNK2k02GyBQlH+dnfTidvUw8FBALj1cPyXP3UUMnZejK/R5hIXWqxveL4bAbGE60ruM8E8pI2W+X0UkSaBA15VEkC3dZVGYPM=
+	t=1724635471; cv=none; b=qbnZ53zSk1dyOjwF/CuqPP8otB6ALv0lvbvu+T+5q+dl1YlpnZ+Hr7MWvt9Pedhw06HeFxsuFtHlEY0Vz/6PwEt4PZsEwFGqEON8R1++RYfQQ6DflTeugH0Bj+QK8sA+cIHgO1dEsMvFlNx9UL6PgmF+JUkK4492BIoaU/QOyLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724635253; c=relaxed/simple;
-	bh=UO0SUXMMuZ93dFCryf69uucorHab5bJPVZpYZb8eCA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uXV6bxepjJgyf4VGH879pLqF9W8rR9SnoT5hiHtJe96AK9hklhl0tn/aUq2sVQF31EEXAX4T4YIFe5Qm/TtRBVojHQgBDDu5WUowYax+mz7OPAXde2nl+os7k7ZWnyTahd25N1TXL3cZUqdyGfFA5kgQwyMQTCXCiYyjpAdZ5Jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sn7E+38/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6qSmSYaGt/xB4obm0dEsS5EQV0s0GiG18pIOsNletNc=; b=sn7E+38/FLde6JZhWRQc3vn+yH
-	bPVDRImSegY2ySKegxk3xtBs2KCr8F7UfELdBQ82ocmQd86D34BZ7jX7bUSL5DdZlOusUjTu/5gHZ
-	PxcWqAxyfxja/zX+TT/rJ9EdW5ELLwSQnoKzt4Pq2Ku1qppcwFEqDHLewPr+Lv6wGAp0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1siOPY-005f86-G0; Mon, 26 Aug 2024 03:20:48 +0200
-Date: Mon, 26 Aug 2024 03:20:48 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Hans-Frieder Vogt <hfdevel@gmx.net>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Bartosz Golaszewski <brgl@bgdev.pl>
-Subject: Re: [PATCH net-next 0/2] net: phy: aquantia: enable firmware loading
- for aqr105 on PCIe cards
-Message-ID: <d34a992c-e8a1-43b8-9e2e-21bcd154ab87@lunn.ch>
-References: <c7c1a3ae-be97-4929-8d89-04c8aa870209@gmx.net>
+	s=arc-20240116; t=1724635471; c=relaxed/simple;
+	bh=dx7MCdWwBjb6iQNmVwWw0CMaPLZjvM+ynH4U1GuLqtY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=qmCUz57PTNkcLn6YIw5FEanHo2UDrWqEy0YgGgTToCijxG7DUgxJrLd6BUc7dbI6KiK9PM/cxyyktxpT+khBMzpjiyHXW1qkIjlK05/aodxaTo93BeK7cwAMFB4xFdttSyNCGwrwnMx2YKdq99aJDPskMHP1vyTz/trcoxC1tXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WsXs61Qfbz69HH;
+	Mon, 26 Aug 2024 09:19:38 +0800 (CST)
+Received: from dggpeml500003.china.huawei.com (unknown [7.185.36.200])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5A6351800F2;
+	Mon, 26 Aug 2024 09:24:25 +0800 (CST)
+Received: from huawei.com (10.44.142.84) by dggpeml500003.china.huawei.com
+ (7.185.36.200) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 26 Aug
+ 2024 09:24:25 +0800
+From: Yu Liao <liaoyu15@huawei.com>
+To: <jiawenwu@trustnetic.com>, <mengyuanlou@net-swift.com>
+CC: <liaoyu15@huawei.com>, <liwei391@huawei.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>
+Subject: [PATCH -next] net: txgbe: use pci_dev_id() helper
+Date: Mon, 26 Aug 2024 09:21:00 +0800
+Message-ID: <20240826012100.3975175-1-liaoyu15@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c7c1a3ae-be97-4929-8d89-04c8aa870209@gmx.net>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpeml500003.china.huawei.com (7.185.36.200)
 
-On Sat, Aug 24, 2024 at 07:33:26PM +0200, Hans-Frieder Vogt wrote:
-> This patch series adds support for firmware loading from the filesystem for
-> Aquantia PHYs in a non-device-tree environment and activates firmware
-> loading
-> for the AQR105 PHY.
+PCI core API pci_dev_id() can be used to get the BDF number for a PCI
+device. We don't need to compose it manually. Use pci_dev_id() to
+simplify the code a little bit.
 
+Signed-off-by: Yu Liao <liaoyu15@huawei.com>
+---
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-These patches are not threaded correctly. git format-patch/git
-send-email should get that correct, so i wounder what you did to break
-it?
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 5f502265f0a6..67b61afdde96 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -688,8 +688,7 @@ static int txgbe_ext_phy_init(struct txgbe *txgbe)
+ 	mii_bus->parent = &pdev->dev;
+ 	mii_bus->phy_mask = GENMASK(31, 1);
+ 	mii_bus->priv = wx;
+-	snprintf(mii_bus->id, MII_BUS_ID_SIZE, "txgbe-%x",
+-		 (pdev->bus->number << 8) | pdev->devfn);
++	snprintf(mii_bus->id, MII_BUS_ID_SIZE, "txgbe-%x", pci_dev_id(pdev));
+ 
+ 	ret = devm_mdiobus_register(&pdev->dev, mii_bus);
+ 	if (ret) {
+-- 
+2.33.0
 
-	Andrew
 
