@@ -1,121 +1,121 @@
-Return-Path: <netdev+bounces-121872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FC5895F17C
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 14:39:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F29D95F196
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 14:42:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0B09B22AA5
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 12:39:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 247221F228B7
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 12:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68AC184526;
-	Mon, 26 Aug 2024 12:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 468FF17C989;
+	Mon, 26 Aug 2024 12:39:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="AKa1LhDu"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BFQbKoTR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4639F171E76;
-	Mon, 26 Aug 2024 12:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7E817BED8;
+	Mon, 26 Aug 2024 12:39:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724675913; cv=none; b=hVrx5+KYscRYhrncF1M9w70V4ndrRnKxXRSm1XkKfkJu9ofqqw/M85VGpIRVjhiHcPujWfw0Yx3thKKJfjHZArgz0tnOd4EvK7d5UYMZy8GvIWc8A2QESxmVCu/RtCk0aHwzhjvWpUd2j3dl2+SXN1tvoy5gqp89FeRgMqPBcJI=
+	t=1724675947; cv=none; b=BM93FcgaOo52yy2qjZIqTUQdfEts6ys7Ck4jy2gWZPZ3+bNne9nczPD5qRiSELIUkEsbQM8+XN2+osbxwsZbnkd/OaGdCGRpiKs6sKvxNIs6uGVcHHAezZOpl5k1o89v4MzNbFd8m0p6UbHnY11YTSJ/N+KJhDRkg8qP/Qs/n9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724675913; c=relaxed/simple;
-	bh=ccZU3a24KVP9awOdU/7n6f47/VRFRXbCEIAY3d6o7uM=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=ET1ItSPjN0kpV1b6U5Y0XjkfLouMjJ7s2lZGthgb7/ktbxj1D2CNJGICSLtP5IPy5Uik/zO071g4WPdl51FGLuKANNKF23I9kgyySL/G78lecNi3cVZ4+WZ2oDlYysXnPow20kSlxnZglWA0TAMJE2RQA/QOZd8BNU0H7vpjiEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=AKa1LhDu; arc=none smtp.client-ip=162.62.58.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1724675901; bh=bYvkknN4lY/PzXuYKt7WBFdDB1eWxCqDPPaUzeINxOc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=AKa1LhDuu94LHVfbg0hR+EgLYjj+FSJ0yLKSd8dYrrLgp6BkPtsTdbqavgK1cujh+
-	 Zu7fXp3/VW73oXsJ5NXr6R6HSHzgXA1Y+GGmHHXF9W4igJgqJpcPTE3Ol+k62WbD/H
-	 PViyEtI1Z9J32JfnhlXqMdt76A2s5G8vFT9cbnNQ=
-Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
-	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
-	id 778048C4; Mon, 26 Aug 2024 20:29:56 +0800
-X-QQ-mid: xmsmtpt1724675396tfbb2x19n
-Message-ID: <tencent_A037749680365C4BCC750776D566183C4509@qq.com>
-X-QQ-XMAILINFO: Nt+cTZuZCMyifgW/cBI/x1hPaZW8fHRofdlp7vzxjxMSaBHKfGA2U52/pNBcXt
-	 c0gNrQEiHAU2/aOjUWyOzz+eEEEH8OqV9aVTj5AmQJv0XC2g4tEZKs6D7bVI1tkjrq3mUDVL3OBf
-	 vQ7MUcMclu0fhkMJ1caJXTv0aEQ1jtF4Gt+PFTfsg2BtVdXZXsCM7JDhfHi9u5aavNu2Chs4uzdZ
-	 dlbqzycDFN0IPxHxtomRRSoUyBMEqTdlHDdqGtUzGLXM7gmuFzcwlfEcKtjNY7u50Va9lrwidTub
-	 MenScq2pjM990xwkK/YTFOdKTnLSJry4FBR7OMa1g1CGPvBk/fye4gGs3GDN4jtWRpf9gn8wOumz
-	 aBPL3QIB37l/BFiKWGAtjDcLD1I+bRqziz1Z5u52rxIY/ImrY1WDCNipVZ4WJXnPbHBtD12NMp4p
-	 ASmUPxao7NYt7eVbpp7uiPO1oz9CultHFG1grFL/I2KTKmg5vfO2+6O3HQfmgG+2ZiUS297KSn4j
-	 3wml4bBrxHX2Ue25tOJWL4hm6r6H90acny79hvG+lZuYNSr4B98PCImj64ROwZJbWHgvqvdqy71B
-	 h4PDgwlJ7mqcaWc5BMAOIFHCOOUunBdt0qI6TrM8eKynN7+koYz4c5a7bXd0yEkXstF2uPs9YISg
-	 fP2SHBAxqpb9FmQ3B22gu71moyM+ZCnrAt5tF+lamf4uV1nwt433RKhwdgG+daANnrNSh0Zy3XWK
-	 WKXfBCvppnluQmrZhff5D8j4bOczt6PJKyQqs9LVRLM3+4wlNfap2ueB8kam+ZuN/qyMEohgGkUO
-	 D6hisb7ZSMXNguNYfayUPFZ4EDu9Z210S3TgeW6YvhtgK8MKl8mQlO8SGZLPNEqprCIrRxAnkkGy
-	 7ylgkh/v45Z7hCe6ag60srK972gnz48AK55tO8iZrbULNpjh2FNi3RDR4H7H7do2qESU79SXsjhn
-	 2wYrSAZsmoMMLFSg0O4+m29/deROYVnplL2HFp9Cidp+CR3Y0xFw==
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: gregkh@linuxfoundation.org
-Cc: eadavis@qq.com,
-	kvalo@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	sergei.shtylyov@gmail.com,
-	syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH V4 1/2] wifi: ath6kl: Replace ath6kl_usb_submit_ctrl_in with usb_control_msg_recv
-Date: Mon, 26 Aug 2024 20:29:56 +0800
-X-OQ-MSGID: <20240826122955.2674569-3-eadavis@qq.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <2024082631-upward-zips-f7b8@gregkh>
-References: <2024082631-upward-zips-f7b8@gregkh>
+	s=arc-20240116; t=1724675947; c=relaxed/simple;
+	bh=i9e0WEfEfs5VoygZ6ew0o68vtXB5PFsl1XYNpLUgsGg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MX8sBq4iHxJGNNv9uX7+z+oex+q8pWRx6dXpCgAO950zBXuqQYxc+JEKQOydgHAi4+bdP16RzFPoAQqfNe4mVATWU8+juAfhZr6+xHPhb2h+Vi6MKAsKv5KGB3Et2/w9s2VzxXcptlA4aPOLXYJCU1VPckFPIf7Rl/qAVFL65Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BFQbKoTR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0Gnf5Qk6YjuCabvYuN2ZYFYbV25fmkxlioNdLFYEIww=; b=BFQbKoTRdvps0lHE8anzoORlPE
+	98XMl1SZys7/8nfhpDJ7HNW03PVe2HjRm/qyRDZ+qexAwasOuTbyPy9GGbfhLqTdgAQQa4xRI+kVe
+	JNxnTpw8P8aS8us60hVDOhP6ye+rF4jVYEhPgOWfU4OQuBnCjBkDUQhyEfHQF8VyApi4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1siYzi-005hqz-Vv; Mon, 26 Aug 2024 14:38:50 +0200
+Date: Mon, 26 Aug 2024 14:38:50 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Frank.Sae" <Frank.Sae@motor-comm.com>
+Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yuanlai.cui@motor-comm.com, hua.sun@motor-comm.com,
+	xiaoyong.li@motor-comm.com, suting.hu@motor-comm.com,
+	jie.han@motor-comm.com
+Subject: Re: [PATCH net-next v3 1/2] net: phy: Optimize phy speed mask to be
+ compatible to yt8821
+Message-ID: <ec362c1c-0722-4e50-a695-b271348272ab@lunn.ch>
+References: <20240822114701.61967-1-Frank.Sae@motor-comm.com>
+ <20240822114701.61967-2-Frank.Sae@motor-comm.com>
+ <a4fbc34b-5d87-449a-83df-db0cfc1bf3cf@lunn.ch>
+ <cf3193b6-589f-41b7-b89a-a94ba3b751d8@motor-comm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cf3193b6-589f-41b7-b89a-a94ba3b751d8@motor-comm.com>
 
-ath6kl_usb_submit_ctrl_in() did not take into account the situation where
-the length of the data read from the device is not equal to the len, and
-such missing judgments will result in subsequent code using incorrect data.
+On Sun, Aug 25, 2024 at 10:56:54PM -0700, Frank.Sae wrote:
+> 
+> On 8/25/24 18:59, Andrew Lunn wrote:
+> > On Thu, Aug 22, 2024 at 04:47:00AM -0700, Frank Sae wrote:
+> > > yt8521 and yt8531s as Gigabit transceiver use bit15:14(bit9 reserved
+> > > default 0) as phy speed mask, yt8821 as 2.5G transceiver uses bit9 bit15:14
+> > > as phy speed mask.
+> > > 
+> > > Be compatible to yt8821, reform phy speed mask and phy speed macro.
+> > > 
+> > > Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
+> > > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > Ideally, your Signed-off-by: should be last. No need to repost because
+> > of this.
+> > 
+> > 	Andrew
+> 
+> Andrew, please help to confirm that the Reviewed-by: should be followed by
+> Signed-off-by:?
+> 
+> it should be like below:
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
 
-usb_control_msg_recv() handles the abnormal length of the returned data,
-so using it directly can fix this warning.
+It is a cosmetic thing. Each Maintainer handling the patch on it way
+towards mainline will add their own Signed-off-by: to the end. By
+having yours last, it keeps them all together.
 
-Reported-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
-V4: Adjust indentation style
+Just picking a random example:
 
- drivers/net/wireless/ath/ath6kl/usb.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+commit 5b9eebc2c7a5f0cc7950d918c1e8a4ad4bed5010
+Author: Pawel Dembicki <paweldembicki@gmail.com>
+Date:   Fri Aug 9 21:38:03 2024 +0200
 
-diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
-index 5220809841a6..0458b5a078e1 100644
---- a/drivers/net/wireless/ath/ath6kl/usb.c
-+++ b/drivers/net/wireless/ath/ath6kl/usb.c
-@@ -1027,9 +1027,10 @@ static int ath6kl_usb_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
- 	int ret;
- 
- 	/* get response */
--	ret = ath6kl_usb_submit_ctrl_in(ar_usb,
--					ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
--					0, 0, buf, len);
-+	ret = usb_control_msg_recv(ar_usb->udev, 0,
-+				ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
-+				USB_DIR_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
-+				0, 0, buf, len, 2000, GFP_KERNEL);
- 	if (ret) {
- 		ath6kl_err("Unable to read the bmi data from the device: %d\n",
- 			   ret);
--- 
-2.43.0
+    net: dsa: vsc73xx: pass value in phy_write operation
+    
+    In the 'vsc73xx_phy_write' function, the register value is missing,
+    and the phy write operation always sends zeros.
+    
+    This commit passes the value variable into the proper register.
+    
+    Fixes: 05bd97fc559d ("net: dsa: Add Vitesse VSC73xx DSA router driver")
+    Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+    Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+    Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
 
+David added his signed-of-by. But as i said, it is purely cosmetic.
+
+	Andrew
 
