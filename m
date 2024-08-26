@@ -1,104 +1,105 @@
-Return-Path: <netdev+bounces-121803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B98695EC32
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:41:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB4795EC4C
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAC03B209AF
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:41:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 084EDB207DC
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:46:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2731A13AD32;
-	Mon, 26 Aug 2024 08:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D5C12D773;
+	Mon, 26 Aug 2024 08:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QXJ5PEXi"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="akfXGzOA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6166D73478
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 08:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC331EB39
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 08:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724661676; cv=none; b=FMYnF4Xp28L0wp6hKvCT9kF3MvOj85XRjZHSdX1cwi1DlCxW52AnskCkdS3Vg+Fq0wtPqqCM4HYyZthhxsg6WQxBXXapa3/Ogyc1iFPrVzzgjVKNUSIBIa5vUBr+D40Z/YwtSKJx+mJaHB1Fs2Ctws/lsMmPoJ9AAGBVzMnvMKA=
+	t=1724661993; cv=none; b=rp/wFQPs08n4yoMw1KufREFuvjRjW77W5H9KQb5lyu7YzZv0UPspKxUcXyZklAKSf3fk4H/9Jo4Qs2z2dfpWyAZDcucCivCKSAaTqj1a0EKo7YtkbkiuoP9b2VdB7ORTsZnoFs6Iw5+9QE7yHrpWRiAjtiTYTN/WABU7wgwz5xI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724661676; c=relaxed/simple;
-	bh=ZJqPV+M2ayctdGZHxpg+AofznRAfzm17VKe00rGKdUU=;
+	s=arc-20240116; t=1724661993; c=relaxed/simple;
+	bh=jRoGc8zZH4oC05abOb5eEX0kRMeyafNXbYdYJflymmE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oQaYPTUQI6HRBM5swwkjwZPiodT69Gbz1leZYOq1JCe7xgNGI8P+6DPqFEohaLIGpnfOcdKvlXHkrmIEOCzi8slXhQAj2LlC8pj2W3sKVpJLil08Y7p1e+7lgDi5vBmnDBMT0kixVpm3+TpeBxvRIaLpXySFyFUXmL+Of+JmhG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QXJ5PEXi; arc=none smtp.client-ip=209.85.208.169
+	 To:Cc:Content-Type; b=aNjn0F+KE9crWYtmQhGnP5s9hC6Xnaj0AIkoWJomo5/8BJMelA05C5tbCEksEhW5jYlh8frq/4SRYtnUIAMKAy0+IH3E7OEb065n8Qw3XfeJ/GCK1vf3xqw0606ceLjGVdpPyvu+0E1pleWCGDKtJZhPz1NeJYxkXzTpfS0sDBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=akfXGzOA; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2f3f07ac2dcso45666431fa.2
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 01:41:14 -0700 (PDT)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5334c018913so3937857e87.0
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 01:46:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724661672; x=1725266472; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1724661989; x=1725266789; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZJqPV+M2ayctdGZHxpg+AofznRAfzm17VKe00rGKdUU=;
-        b=QXJ5PEXimOZ13K98cB1Y/XAMdYH4RaTmfS5py/vw/c1EpBP3vuWDSuZ/nMvnJIw3mC
-         th9iepXjNaYdXhdsoQTIRbFQPeTnWJ9w0gSc8+bypMPrFqIAYgt8xPbHZ/Zx6A4xn/rn
-         Qa2oJ6jtE/GyZ/2LG+If+pNK+0yw1B4kGIf27Eu15WBiHnoggZ0s1DG8vbzIAXHzTDCC
-         koN3voYr7wc997LIDXTOCa7wNhdEuIDByWc53MdoE7VNja8oCF3mZoieIvmFO/jm+PrC
-         +Hu86PSoFs9hxZu1OZPqurQkKDezFdJkn6tfbYzd45OJKUSX7yaea0Vs8ejhvAOqepA7
-         WukQ==
+        bh=jRoGc8zZH4oC05abOb5eEX0kRMeyafNXbYdYJflymmE=;
+        b=akfXGzOACYv1vaXfxF9H4LBBq05lTfO384/4Rgu678ZMsDHKAzcYMtfD3WvTt/fCWG
+         UXEsg/HQ4iqw0MPuuUnM1MFu5BE8PpcgKsc1CyzYEULseNRrvQwqJdDtAbZUDLPXGD6u
+         G2wrTlS5kQpVoh1ygWsIF68u6S6ZO3oVkiJFXrLpdsAXXb27JkNVTFseJKvaci/k6zTA
+         WwCdWEIQX6f2a2+uBxrTZYOcelRA740+vQ2pdmH+WdWpuNQiixYDYuOmuhfUJTjNc2rK
+         duc1gSbRJY/C9bhAjViG+yIHZDH3ZaU+LUGDSggNbBzPF2ZWp9WHzGclUWKrJf89ZFi/
+         adoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724661672; x=1725266472;
+        d=1e100.net; s=20230601; t=1724661989; x=1725266789;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZJqPV+M2ayctdGZHxpg+AofznRAfzm17VKe00rGKdUU=;
-        b=qA+JKgzwKc3xsatjAdG9BymGPdG0a23FPBJ1VyqZijKqJmybuQRF/3JmS7244O+LUG
-         K5cFZB1Y1PaGB1OdHnFDBIhfa/ANkuzfu1qCdIdPKzN0NE9OxUk9/nSaTyzd2fhrFLHt
-         4ty6hxMNPRi32+rK77zklIOHDMjxSiJSWkVU/xOw8g2QJo776DFAAV+DD8OlJ3yc3Tya
-         1saiaL5XtpeLKjD1XxDR2ipD6OTAFzZAMOSfJWmLHU5j7xSYP1V/5cY+lj7naPE0v9nN
-         g0FdjsxEPEX60LapHv6VmVYfqllWomtL4HV37dp8Uk/K8r2rkznffBVI4UwTs74wFagM
-         O6Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCVT2X7YVlXO/7+jaxPo8+x0MvIdJOIKag4pX8HczZrTotZaqkOp3qDf29zdk+LCQrLRtrHhTZ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8ZAt6b586yzHffgY1Pg0bJKFXUZLXCC8fipMHzGxf98AawnIX
-	tA8S0jEguaXc0E3gTptYemWCIJSIzVa7S3BCQvtXz2VKbOQ6UWoaSh3UNd+n7TsC2fOjzpa6tDG
-	VNKdBdmghv2KdFnzvcxjpPSNk0PjaBCRUe7lajA==
-X-Google-Smtp-Source: AGHT+IF1xip2LZYxVRH8VpdWfcRa9uK7A6loLJRPHfWQskmDHQEUYxjPeikly02OaJhz/cUtMMvnXB3y1yNyya30do4=
-X-Received: by 2002:a05:6512:3c85:b0:533:966:72cb with SMTP id
- 2adb3069b0e04-5343885f659mr6807476e87.48.1724661671918; Mon, 26 Aug 2024
- 01:41:11 -0700 (PDT)
+        bh=jRoGc8zZH4oC05abOb5eEX0kRMeyafNXbYdYJflymmE=;
+        b=ZZVcpLujemqe7Ex8e+b8E0626u2FUWNNQZ2r96NVWov3oWdsDCfII1DN/Wgz/zJJyn
+         Vf8bhN9KuhUB9jfJcAfXKKn1fPjWhQiDklbUkToJxhmOnRtzJz8iYioFYl68+lOibvQf
+         otf0rgcCnTn2D+shEguIB/kfnXVgFt3xtcgSAFiIFtDTkSqDtu/ojYU4+Q/NzCsVvCHT
+         DCZhuG1q8kqyKn98OvKOGIf61bIPCJAfhkaAHGfjQ9g2/wDU36jfPeOfutvXTbktjZ2Q
+         noJOIzCBkN+698jos6uvz7GN3bnwC8gsHB+cVl3/u0wGnGtJxfWlLd3q+xbHcyG0Kfcd
+         TT1A==
+X-Forwarded-Encrypted: i=1; AJvYcCW3NTMIylrDx4vNWJz63MDrEaH/CPfuetJ4s6QwNS/n+AD5gK57E5VO/J5IisAz/U3EUVpVWC0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmvE9BMHzh7538Be6X9OpFr3wXyQoX0nFf4jy/0MyH7NOjLq1a
+	JtJivEuHrs5m0chWIYiXZSxHXroKoX8arhSJ+G49871ejzAhAiDtSBv2EqCo6Q19oxCRkv9jMlg
+	1T0gOogQicM4OcmHV2zFVBqyGSaO156NmyvPyog==
+X-Google-Smtp-Source: AGHT+IEAKix9avOZKhj3gUarttYPt1B5mxGGiNfGvZNqelGRoDbFczqf/+RGYgGgaLwvWmb22Hq7c+MIRiChzBxFm/8=
+X-Received: by 2002:a05:6512:280c:b0:530:ab68:25e6 with SMTP id
+ 2adb3069b0e04-53438861474mr7188396e87.48.1724661989086; Mon, 26 Aug 2024
+ 01:46:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822084733.1599295-1-frank.li@vivo.com> <20240822084733.1599295-4-frank.li@vivo.com>
-In-Reply-To: <20240822084733.1599295-4-frank.li@vivo.com>
+References: <20240823072122.2053401-1-frank.li@vivo.com> <20240823072122.2053401-4-frank.li@vivo.com>
+In-Reply-To: <20240823072122.2053401-4-frank.li@vivo.com>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Mon, 26 Aug 2024 10:41:00 +0200
-Message-ID: <CACRpkdb-MKYAcWA5KUDZ=oeREs86S68WjqzS9XRTrUbBhLbBtQ@mail.gmail.com>
-Subject: Re: [net-next 3/9] net: ethernet: cortina: Convert to devm_clk_get_enabled()
+Date: Mon, 26 Aug 2024 10:46:17 +0200
+Message-ID: <CACRpkdb0rwN1YxF10MQDkVX1QoYTWot+heOJp4RodAtniCOdsA@mail.gmail.com>
+Subject: Re: [net-next v2 3/9] net: ethernet: cortina: Convert to devm_clk_get_enabled()
 To: Yangtao Li <frank.li@vivo.com>
 Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com, 
 	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
 	pabeni@redhat.com, ulli.kroll@googlemail.com, marcin.s.wojtas@gmail.com, 
 	linux@armlinux.org.uk, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	mcoquelin.stm32@gmail.com, hkallweit1@gmail.com, justinstitt@google.com, 
-	kees@kernel.org, u.kleine-koenig@pengutronix.de, jacob.e.keller@intel.com, 
-	horms@kernel.org, shannon.nelson@amd.com, linux-renesas-soc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com
+	mcoquelin.stm32@gmail.com, hkallweit1@gmail.com, kees@kernel.org, 
+	justinstitt@google.com, u.kleine-koenig@pengutronix.de, horms@kernel.org, 
+	sd@queasysnail.net, linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 22, 2024 at 10:32=E2=80=AFAM Yangtao Li <frank.li@vivo.com> wro=
-te:
+On Fri, Aug 23, 2024 at 9:06=E2=80=AFAM Yangtao Li <frank.li@vivo.com> wrot=
+e:
 
 > Convert devm_clk_get(), clk_prepare_enable() to a single
 > call to devm_clk_get_enabled(), as this is exactly
 > what this function does.
 >
 > Signed-off-by: Yangtao Li <frank.li@vivo.com>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
