@@ -1,239 +1,360 @@
-Return-Path: <netdev+bounces-122087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C55A95FDC6
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 01:29:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DFFC95FDD5
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 01:43:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 541492831F5
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 23:29:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B34001C21283
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 23:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD2719CCE8;
-	Mon, 26 Aug 2024 23:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B9519A29A;
+	Mon, 26 Aug 2024 23:43:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rTYE7Zqv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N7N67WVU"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4234199392
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 23:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A510E1482E6
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 23:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724714970; cv=none; b=F14mvkEaEjGa3VPFvulDLuyZGbNtWx78v1w/N29hkfgGeOz5MPEhA1eSBcbe09Qz1aCLzaBq+vnWLAQKEgRU+S0j2/vZfXxfh8yQZbOWv0oJv6WAzN5YfjcM/rYP7YoeX/LROUj0tEkJcTG7JkSRFdv2YXnLw9ZWEQ7JDdTv8+s=
+	t=1724715816; cv=none; b=AiJL/PRQepeh5HFYD9ax135D8+bNAiWMKobb0CMTEzf+qO6SRtRNcBPmUURgrox+GKe6bqAaZ1vHYh28iHGnG2YarsROSTsPNeMTcY6ODoPMIGsAw31aLBMViKLs15IRo1bHe3rUVYDjb/Uo/TuR7K4HE/5gt1ftkPCBa3UgFHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724714970; c=relaxed/simple;
-	bh=b+OnWvaM5mAUfIHEp73rjbRARRW+hBWHaiy/8SntOOM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=agckRBWgNQGbMd/3+MQm5r/12pou1A8QAO3DupfGjFgMLmHcT2ndkvyF7ITTUPsrbdCV0Ti+xUstTcbDY93vjFxc/tW5bOhMLIfQCoy6bRBMt50/KVQ30W8qriufZioEwSxS51prz0Yd83A20i84nQX/DJcmAxsjBeWXPtu0tcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rTYE7Zqv; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724714966;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MuChY2rLsaLG7Ru19DVvVTp3mYPf/6WrV6IB7Wjk9P8=;
-	b=rTYE7ZqvmmfLseZfj6zFKiBTrdCvEreY1ReWOBF01UpApr6rmkdCecmgyExt1Fgjo61nnF
-	c+pXChcn8XC50zdRluEn1wZ8+EWrLK94m+B1uQ3nSp45AFU4J5oi3Q7Uep6iKvZrSWqcc+
-	nfaQXsRJyGcjVI78KSEgm9aNJv9pnfE=
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Muchun Song <muchun.song@linux.dev>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	David Rientjes <rientjes@google.com>,
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	Meta kernel team <kernel-team@meta.com>,
-	cgroups@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v1] memcg: add charging of already allocated slab objects
-Date: Mon, 26 Aug 2024 16:29:08 -0700
-Message-ID: <20240826232908.4076417-1-shakeel.butt@linux.dev>
+	s=arc-20240116; t=1724715816; c=relaxed/simple;
+	bh=4wHG+K3SVP4w4p7ot6d01eQ2cEKoya/vx3kPzRXSnok=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c3BcamCOzd2jKQzPMzWD2Co9s6enhwZqJJkmUXCH6ZWZPM7YR/gZL4unKq89aoSXnPsuOpEI10buDQ+xN/4OP6Jwy7BolKEfrUaqOowLWHP7l3ZXxizpiv51Qary14NPIXmGrW9+eCprnw1p5yImKj1fCJHUj0LJbCtD4d7eCEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N7N67WVU; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-39b0826298cso17497455ab.2
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 16:43:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724715814; x=1725320614; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HksOvUhHlI0cxrFpm/t22AsMLY7Fq5yH3teu3SxRN28=;
+        b=N7N67WVUmrAsRfPweXSuIoGhXK+or9Ro60z/evkXOEeNckeyROV59OxB2B0aSFFiig
+         Bt6lttvdUFeZMzp3V5oc73YjJ84UDirxyzmec/DRSzUdKeFiueRwhdunXtv5ldiZvC/A
+         mMAl9/KPg6o4PQnHlk0P7nVrhqRrRkW+mTvbqzymM/OxcWv/7lLXWEnM7BNdYoHXDOPs
+         265nUjx7fUW66JzVVkhTYchdF5/m+eVTEKg2NiOQRsahxdgqhzeS+ihFHWJ9Kc/wvEID
+         heQTM7HyjO6P3KShqgBASVhDplYGqTKYpYsbNo7/pWgRrAeHp+fxdAYyMCL4MroNibAB
+         RH2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724715814; x=1725320614;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HksOvUhHlI0cxrFpm/t22AsMLY7Fq5yH3teu3SxRN28=;
+        b=bwf14e5bbsrm8wPR8+4j2Rx74Eqy6TV+6HKKxEQZpUnwwdYzM5ac/HAUddfzj4t5VC
+         s2zfAk9GXh28ffzWTYLMFtMD11jbOmTzFeL7Sgx+hDsgUb8kfUS49CPVT7ho0KwlZl7o
+         +PK6yzPrOldBKPlx7th+cqVgnBTyp9P5OmuI+93EggyXCUz1FPvwsLboUp5m0Lft5uyh
+         ZaCMpw0lnpL3RbBOyCIA0y/7JiOzTRInr9YRV16NPwoPmzEWaUij9lnrYl8E1BGR444m
+         ldE2QtBgoWnc8wgdj5OeIJwbCqvxW/xoOWATHyBNgEaEmVypzV3EX3irDAnvStjdqlal
+         FSeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXGZDJJZ4DE5e3eEDUgfS5yV6Pn0VDdaQuTCGIop5Hk2a8ZjvURyvvlHUJwqO+/mh71G/NiHBc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZZYoR/0BMKk6KZZR8zAQM9/9E23xCsAENOixPbkh36o9//3DI
+	nu+vkS9M1ZXCgwzMxbbuI4ZbwiPKOqHwV69dViD7u3U8kIvmZv7wj9pceMyYmJ3RqkDpkJ4PirJ
+	QB+sY27hqiwLt1RFOmi1cRgp+AVeLVw==
+X-Google-Smtp-Source: AGHT+IFUgpuGTIxNMrUrTtBxvedhh3qUaa+4aGX4rqYuFJtrKWzC6YTLK7qXMSMcH0/TR0vd2nSOS5Sm8vyalD7WLlE=
+X-Received: by 2002:a05:6e02:1c85:b0:37a:a9f0:f263 with SMTP id
+ e9e14a558f8ab-39e3c9c0732mr142388225ab.20.1724715813553; Mon, 26 Aug 2024
+ 16:43:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240825152440.93054-1-kerneljasonxing@gmail.com>
+ <20240825152440.93054-2-kerneljasonxing@gmail.com> <66cc82229bea2_261e53294fd@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBWHqVzjesJqmmgUrX5cvKtLp_L9PZz+d+-b0FBXpatVg@mail.gmail.com>
+ <66cca76683fbd_266e63294d1@willemb.c.googlers.com.notmuch>
+ <CAL+tcoCbCWGMEUD7nZ0e89mxPS-DjKCRGa3XwOWRHq_1PPeQUw@mail.gmail.com> <66ccccbf9eccb_26d83529486@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66ccccbf9eccb_26d83529486@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 27 Aug 2024 07:42:57 +0800
+Message-ID: <CAL+tcoDrQ4e7G2605ZdigchmgQ4YexK+co9G=AvW4Dug84k-bA@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tcp: make SOF_TIMESTAMPING_RX_SOFTWARE
+ feature per socket
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-At the moment, the slab objects are charged to the memcg at the
-allocation time. However there are cases where slab objects are
-allocated at the time where the right target memcg to charge it to is
-not known. One such case is the network sockets for the incoming
-connection which are allocated in the softirq context.
+On Tue, Aug 27, 2024 at 2:43=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Tue, Aug 27, 2024 at 12:03=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Jason Xing wrote:
+> > > > Hello Willem,
+> > > >
+> > > > On Mon, Aug 26, 2024 at 9:24=E2=80=AFPM Willem de Bruijn
+> > > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > > >
+> > > > > Jason Xing wrote:
+> > > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > > >
+> > > > > > Normally, if we want to record and print the rx timestamp after
+> > > > > > tcp_recvmsg_locked(), we must enable both SOF_TIMESTAMPING_SOFT=
+WARE
+> > > > > > and SOF_TIMESTAMPING_RX_SOFTWARE flags, from which we also can =
+notice
+> > > > > > through running rxtimestamp binary in selftests (see testcase 7=
+).
+> > > > > >
+> > > > > > However, there is one particular case that fails the selftests =
+with
+> > > > > > "./rxtimestamp: Expected swtstamp to not be set." error printin=
+g in
+> > > > > > testcase 6.
+> > > > > >
+> > > > > > How does it happen? When we keep running a thread starting a so=
+cket
+> > > > > > and set SOF_TIMESTAMPING_RX_HARDWARE option first, then running
+> > > > > > ./rxtimestamp, it will fail. The reason is the former thread
+> > > > > > switching on netstamp_needed_key that makes the feature global,
+> > > > > > every skb going through netif_receive_skb_list_internal() funct=
+ion
+> > > > > > will get a current timestamp in net_timestamp_check(). So the s=
+kb
+> > > > > > will have timestamp regardless of whether its socket option has
+> > > > > > SOF_TIMESTAMPING_RX_SOFTWARE or not.
+> > > > > >
+> > > > > > After this patch, we can pass the selftest and control each soc=
+ket
+> > > > > > as we want when using rx timestamp feature.
+> > > > > >
+> > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > > ---
+> > > > > >  net/ipv4/tcp.c | 10 ++++++++--
+> > > > > >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > > > > >
+> > > > > > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > > > > > index 8514257f4ecd..49e73d66c57d 100644
+> > > > > > --- a/net/ipv4/tcp.c
+> > > > > > +++ b/net/ipv4/tcp.c
+> > > > > > @@ -2235,6 +2235,7 @@ void tcp_recv_timestamp(struct msghdr *ms=
+g, const struct sock *sk,
+> > > > > >                       struct scm_timestamping_internal *tss)
+> > > > > >  {
+> > > > > >       int new_tstamp =3D sock_flag(sk, SOCK_TSTAMP_NEW);
+> > > > > > +     u32 tsflags =3D READ_ONCE(sk->sk_tsflags);
+> > > > > >       bool has_timestamping =3D false;
+> > > > > >
+> > > > > >       if (tss->ts[0].tv_sec || tss->ts[0].tv_nsec) {
+> > > > > > @@ -2274,14 +2275,19 @@ void tcp_recv_timestamp(struct msghdr *=
+msg, const struct sock *sk,
+> > > > > >                       }
+> > > > > >               }
+> > > > > >
+> > > > > > -             if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_=
+SOFTWARE)
+> > > > > > +             /* skb may contain timestamp because another sock=
+et
+> > > > > > +              * turned on netstamp_needed_key which allows gen=
+erate
+> > > > > > +              * the timestamp. So we need to check the current=
+ socket.
+> > > > > > +              */
+> > > > > > +             if (tsflags & SOF_TIMESTAMPING_SOFTWARE &&
+> > > > > > +                 tsflags & SOF_TIMESTAMPING_RX_SOFTWARE)
+> > > > > >                       has_timestamping =3D true;
+> > > > > >               else
+> > > > > >                       tss->ts[0] =3D (struct timespec64) {0};
+> > > > > >       }
+> > > > >
+> > > > > The current behavior is as described in
+> > > > > Documentation/networking/timestamping.rst:
+> > > > >
+> > > > > "The socket option configures timestamp generation for individual
+> > > > > sk_buffs (1.3.1), timestamp reporting to the socket's error
+> > > > > queue (1.3.2)"
+> > > > >
+> > > > > SOF_TIMESTAMPING_RX_SOFTWARE is a timestamp generation option.
+> > > > > SOF_TIMESTAMPING_SOFTWARE is a timestamp reporting option.
+> > > >
+> > > > Thanks for your review.
+> > > >
+> > > > Yes, it's true.
+> > > >
+> > > > >
+> > > > > This patch changes that clearly defined behavior.
+> > > >
+> > > > Why?
+> > >
+> > > Because it repurposes generation flag SOF_TIMESTAMPING_RX_SOFTWARE in
+> > > timestamp reporting.
+> > >
+> > > If a single flag configures both generation and reporting, why bother
+> > > with two flags at all.
+> >
+> > Thanks for your full and detailed explanation :)
+> >
+> > I probably understand what you're saying. You think we should strictly
+> > distinguish these two concepts "generation" and "reporting".
+> >
+> > In my opinion, they are just concepts. We can make it clear by writing
+> > some sentences in the Documentation.
+> >
+> > >
+> > > > I don't get it. Please see those testcase in
+> > > > tools/testing/selftests/net/rxtimestamp.c.
+> > > >
+> > > > >
+> > > > > On Tx the separation between generation and reporting has value, =
+as it
+> > > > > allows setting the generation on a per packet basis with SCM_TSTA=
+MP_*.
+> > > >
+> > > > I didn't break the logic on the tx path. tcp_recv_timestamp() is on=
+ly
+> > > > related to the rx path.
+> > > >
+> > > > Regarding the tx path, I carefully take care of this logic in
+> > > > patch[2/2], so now the series only handles the issue happening in t=
+he
+> > > > rx path.
+> > > >
+> > > > >
+> > > > > On Rx it is more subtle, but the two are still tested at differen=
+t
+> > > > > points in the path, and can be updated by setsockopt in between a
+> > > > > packet arrival and a recvmsg().
+> > > > >
+> > > > > The interaction between sockets on software timestamping is a
+> > > > > longstanding issue. I don't think there is any urgency to change =
+this
+> > > >
+> > > > Oh, now I see.
+> > > >
+> > > > > now. This proposed change makes the API less consistent, and may
+> > > > > also affect applications that depend on the current behavior.
+> > > > >
+> > > >
+> > > > Maybe. But, it's not the original design which we expect, right?
+> > >
+> > > It is. Your argument is against the current API design. This is not
+> > > a bug where behavior diverges from the intended interface. The doc is
+> > > clear on this.
+> > >
+> > > The API makes a distinction between generation and reporting bits. Th=
+e
+> > > shared generation early in the Rx path is a long standing known issue=
+.
+> > >
+> > > I'm not saying that the API is perfect. But it is clear in its use of
+> > > the bits. Muddling the distinction between reporting and generation
+> > > bits in one of the four cases makes the API less consistent and harde=
+r
+> > > to understand.
+> > >
+> > > If you think the API as is is wrong, then at a minimum that would
+> > > require an update to timestamping.rst. But I think that medicine may
+> > > be worse than the ailment.
+> >
+> > At least, I think it is against the use of setsockopt, that's the key
+> > reason: making people confused and thinking the setsockopt is not a
+> > per-socket fine-grained design. Don't you think it's a little bit
+> > strange?
+>
+> That is moot. This design was made many years ago and is now expected.
+>
+> I also don't see it as a huge issue.
 
-Couple hundred thousand connections are very normal on large loaded
-server and almost all of those sockets underlying those connections get
-allocated in the softirq context and thus not charged to any memcg.
-However later at the accept() time we know the right target memcg to
-charge. Let's add new API to charge already allocated objects, so we can
-have better accounting of the memory usage.
+Sure, it's not a big problem.
 
-To measure the performance impact of this change, tcp_crr is used from
-the neper [1] performance suite. Basically it is a network ping pong
-test with new connection for each ping pong.
+>
+> The effect you point out in rxtimestamp.c was known and reported in
+> the test commit itself.
+>
+> Perhaps a more interesting argument would be
+> SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_TX_SOFTWARE. But
+> spurious software rx timestamps are trivially ignored.
+>
+> > Besides those two concepts you mentioned, could you explain if there
+> > are side effects that the series has and what kind of bad consequences
+> > that the series could bring?
+>
+> It doesn't do the same for hardware timestamping, creating
+> inconsistency.
+>
+> Changing established interfaces always risks production issues. In
+> this case, I'm not convinced that the benefit outweighs this risk.
 
-The server and the client are run inside 3 level of cgroup hierarchy
-using the following commands:
+I got it.
 
-Server:
- $ tcp_crr -6
+I'm thinking that I'm not the first one and the last one who know/find
+this long standing "issue", could we at least documentented it
+somewhere, like adding comments in the selftests or Documentation, to
+avoid the similar confusion in the future? Or change the behaviour in
+the rxtimestamp.c test? What do you think about it? Adding
+documentation or comments is the simplest way:)
 
-Client:
- $ tcp_crr -6 -c -H ${server_ip}
+Thanks,
+Jason
 
-If the client and server run on different machines with 50 GBPS NIC,
-there is no visible impact of the change.
-
-For the same machine experiment with v6.11-rc5 as base.
-
-          base (throughput)     with-patch
-tcp_crr   14545 (+- 80)         14463 (+- 56)
-
-It seems like the performance impact is within the noise.
-
-Link: https://github.com/google/neper [1]
-Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
----
-
-Changes since the RFC:
-- Added check for already charged slab objects.
-- Added performance results from neper's tcp_crr
-
- include/linux/slab.h            |  1 +
- mm/slub.c                       | 54 +++++++++++++++++++++++++++++++++
- net/ipv4/inet_connection_sock.c |  5 +--
- 3 files changed, 58 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/slab.h b/include/linux/slab.h
-index eb2bf4629157..05cfab107c72 100644
---- a/include/linux/slab.h
-+++ b/include/linux/slab.h
-@@ -547,6 +547,7 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
- 			    gfp_t gfpflags) __assume_slab_alignment __malloc;
- #define kmem_cache_alloc_lru(...)	alloc_hooks(kmem_cache_alloc_lru_noprof(__VA_ARGS__))
- 
-+bool kmem_cache_charge(void *objp, gfp_t gfpflags);
- void kmem_cache_free(struct kmem_cache *s, void *objp);
- 
- kmem_buckets *kmem_buckets_create(const char *name, slab_flags_t flags,
-diff --git a/mm/slub.c b/mm/slub.c
-index c9d8a2497fd6..580683597b5c 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -2185,6 +2185,16 @@ void memcg_slab_free_hook(struct kmem_cache *s, struct slab *slab, void **p,
- 
- 	__memcg_slab_free_hook(s, slab, p, objects, obj_exts);
- }
-+
-+static __fastpath_inline
-+bool memcg_slab_post_charge(struct kmem_cache *s, void *p, gfp_t flags)
-+{
-+	if (likely(!memcg_kmem_online()))
-+		return true;
-+
-+	return __memcg_slab_post_alloc_hook(s, NULL, flags, 1, &p);
-+}
-+
- #else /* CONFIG_MEMCG */
- static inline bool memcg_slab_post_alloc_hook(struct kmem_cache *s,
- 					      struct list_lru *lru,
-@@ -2198,6 +2208,13 @@ static inline void memcg_slab_free_hook(struct kmem_cache *s, struct slab *slab,
- 					void **p, int objects)
- {
- }
-+
-+static inline bool memcg_slab_post_charge(struct kmem_cache *s,
-+					  void *p,
-+					  gfp_t flags)
-+{
-+	return true;
-+}
- #endif /* CONFIG_MEMCG */
- 
- /*
-@@ -4062,6 +4079,43 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
- }
- EXPORT_SYMBOL(kmem_cache_alloc_lru_noprof);
- 
-+#define KMALLOC_TYPE (SLAB_KMALLOC | SLAB_CACHE_DMA | \
-+		      SLAB_ACCOUNT | SLAB_RECLAIM_ACCOUNT)
-+
-+bool kmem_cache_charge(void *objp, gfp_t gfpflags)
-+{
-+	struct slabobj_ext *slab_exts;
-+	struct kmem_cache *s;
-+	struct folio *folio;
-+	struct slab *slab;
-+	unsigned long off;
-+
-+	if (!memcg_kmem_online())
-+		return true;
-+
-+	folio = virt_to_folio(objp);
-+	if (unlikely(!folio_test_slab(folio)))
-+		return false;
-+
-+	slab = folio_slab(folio);
-+	s = slab->slab_cache;
-+
-+	/* Ignore KMALLOC_NORMAL cache to avoid circular dependency. */
-+	if ((s->flags & KMALLOC_TYPE) == SLAB_KMALLOC)
-+		return true;
-+
-+	/* Ignore already charged objects. */
-+	slab_exts = slab_obj_exts(slab);
-+	if (slab_exts) {
-+		off = obj_to_index(s, slab, objp);
-+		if (unlikely(slab_exts[off].objcg))
-+			return true;
-+	}
-+
-+	return memcg_slab_post_charge(s, objp, gfpflags);
-+}
-+EXPORT_SYMBOL(kmem_cache_charge);
-+
- /**
-  * kmem_cache_alloc_node - Allocate an object on the specified node
-  * @s: The cache to allocate from.
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 64d07b842e73..3c13ca8c11fb 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -715,6 +715,7 @@ struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
- 	release_sock(sk);
- 	if (newsk && mem_cgroup_sockets_enabled) {
- 		int amt = 0;
-+		gfp_t gfp = GFP_KERNEL | __GFP_NOFAIL;
- 
- 		/* atomically get the memory usage, set and charge the
- 		 * newsk->sk_memcg.
-@@ -731,8 +732,8 @@ struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
- 		}
- 
- 		if (amt)
--			mem_cgroup_charge_skmem(newsk->sk_memcg, amt,
--						GFP_KERNEL | __GFP_NOFAIL);
-+			mem_cgroup_charge_skmem(newsk->sk_memcg, amt, gfp);
-+		kmem_cache_charge(newsk, gfp);
- 
- 		release_sock(newsk);
- 	}
--- 
-2.43.5
-
+>
+> > I tried to make it more logical and also don't want to break the
+> > existing use behaviour of applications.
+> >
+> > I believe that what I wrote doesn't have an impact on other cases and
+> > perfects what should be perfected. No offense. If the series does no
+> > harm and we keep it in the right direction, are there other reasons
+> > stopping it getting approved, I wonder.
+> >
+> > Thanks,
+> > Jason
+> >
+> > >
+> > > > I can make sure this series can fix the issue. This series is tryin=
+g
+> > > > to ask users to use/set both flags to receive an expected timestamp=
+.
+> > > > The purpose of using setsockopt is to control the socket itself
+> > > > insteading of interfering with others.
+> > > >
+> > > > About the breakage issue, let me assume, if the user only sets the
+> > > > SOF_TIMESTAMPING_SOFTWARE flag, he cannot expect the socket will
+> > > > receive a timestamp, right? So what might happen if we fix the issu=
+e?
+> > > > I think the logics in the rxtimestamp.c selftest are very clear :)
+> > > >
+> > > > Besides, test case 6 will fail under this circumstance
+> > >
+> > > Sorry about that. My team added that test, and we expanded it over
+> > > time. Crucially, the test was added well after the SO_TIMESTAMPING
+> > > API, so it was never intended to be prescriptive.
+> > >
+> > > Commit 0558c3960407 ("selftests/net: plug rxtimestamp test into
+> > > kselftest framework") actually mentions this issue:
+> > >
+> > >     Also ignore failures of test case #6 by default. This case verifi=
+es
+> > >     that a receive timestamp is not reported if timestamp reporting i=
+s
+> > >     enabled for a socket, but generation is disabled. Receive timesta=
+mp
+> > >     generation has to be enabled globally, as no associated socket is
+> > >     known yet. A background process that enables rx timestamp generat=
+ion
+> > >     therefore causes a false positive. Ntpd is one example that does.
+> > >
+> > >     Add a "--strict" option to cause failure in the event that any te=
+st
+> > >     case fails, including test #6. This is useful for environments th=
+at
+> > >     are known to not have such background processes.
+>
+>
 
