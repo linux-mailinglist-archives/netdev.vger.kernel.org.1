@@ -1,124 +1,173 @@
-Return-Path: <netdev+bounces-121915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26F4B95F390
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:07:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFF9395F39A
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D689428396A
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 14:07:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DE871F23A45
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 14:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AD418BB93;
-	Mon, 26 Aug 2024 14:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EEF6172798;
+	Mon, 26 Aug 2024 14:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b3yEYoSr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UAfGCmWw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003BD189B9B;
-	Mon, 26 Aug 2024 14:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D24043AA4;
+	Mon, 26 Aug 2024 14:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724681209; cv=none; b=mLETW0Hf+iLfNcmE1StM6RT4sQEhGdkbq9L03OkPYlEwvKrGx8zSpa+ouelmUsgfxTTsFflgtUiIlU5l1OpFknv7E4XPUrLJi8ON26HUhpDgw11bO+UFnqW9lc8R/c3eTjZ8Ih1njgnnkI8a7uz5x5ixEwhzwJnWsMd5+TyTBVI=
+	t=1724681428; cv=none; b=WOfXue3yMgb0rNUGY6ENZut6cLswcuWGnSqsOVWbroQQT5d3lSQaK7BCx0aCXYcuFTXkbrh4/qbkaW2a4PYEUghGPzpXMZa15UAJQZhCzO4qwwA2TXXt6uSfPi5luY4zEBxl3lmJE2r1ThgfQJUyKzZPXoEhBTB7ZoiwsjK+Dzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724681209; c=relaxed/simple;
-	bh=eYhKdqmbOgOpwPshoynF2ep8F7c45+A4CXEJdjw4aQA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XlORqT+/yFHHzf8HCj/mkoajGhCCsb1LhxUt9VTtORFtzjZQUHr6zeprAx1tSlTPWqZmuyWM1GAhYzaZSa0nqX92LhUJpWbWd48E8maKR+OrFk0qF5xd5MG9n6ZiyookkxWJjxBhcqIwhUw7vedlupZfpwPRuwnn5Ty2aog36J0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b3yEYoSr; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1724681428; c=relaxed/simple;
+	bh=81dO0swR54vBtuFXEwtQzbV4rRGvMioDNMn0EXezWd0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e8orXxMYAE8/It++CttDxN76UiFm0dMOKjCHwvaj+JNUmiIz1Dk1cp+y5kw4zx4JokiZkextfih9Wu9tO2sCuqOzDMYJKUcQOoml/TjtV+fvOmveNGjICbwzyBQA/MWsy2Zlp5uSISTi5h20GARq8xEZuvnhbx2ZvpaEnkCLwIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UAfGCmWw; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7b0c9bbddb4so3016512a12.3;
-        Mon, 26 Aug 2024 07:06:47 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a83597ce5beso673691466b.1;
+        Mon, 26 Aug 2024 07:10:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724681207; x=1725286007; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lM53xOUKKs6zBpzOV/WWFuOMuEf1yqdWXeukAuL97eQ=;
-        b=b3yEYoSr7lQlYdWtOnD0/4VtAMpiMN/1soNio/26n5KAUrNMt0kecq7b3acgKPBdqu
-         TF5RogZ1BVUvOxzV7BJ9ASI97yv6ar4utc3XOKY1MSBfHVPwah8kSSW7aKJrtjVBnCUn
-         FWljogbWue2ncVTxggBCuNghiydOjuqijufD2gJA2CsWjKlxjCti6JkLMzCFJeVeKr9N
-         0liIVX24jYRqG8EHluWbH6P2gCHxad7XSn4BZy6UcdWi+yDrw7djLmOHRWug92j2weBa
-         HVlHxv+U1uT2g6sP+AnTk/gt00OaXbvnSxNMeJ27/g83KXenIbb+fAVT5uLUHyy/Mt2/
-         cHZw==
+        d=gmail.com; s=20230601; t=1724681425; x=1725286225; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=laIxxNV89w8bBA1m8OYb4OYSHZUiQ+a2fQ2hNjVj8fM=;
+        b=UAfGCmWwnJzEvtosaphXMnrCQVsxImRXr/k1K/xuPm0SI7a+q75qdUeMpB0AfTQ3UF
+         ABHpUx+qTK3//4BwG528pqlGUD4r08J9OOL59uE225S7OIi7TDWz15T8AIW63CZr3WZw
+         rMOrtf43vpyFtNMU6iufngIJyJohtX6fpOFiLPomSmfsht1JDsS2ErcCF3IQvB7ITvpQ
+         iw9eBCihD+Ov895zC79V0GP/I+6vPvj4YFi2p+ndgJsOvdSyzvfG6TlFJLTjUgzz9Gt8
+         yZ1ueHAYmwXJvqhgFTo64X8P+6PTrGF9VmYrOzKqF/tLfQgM1Z1aTB4HxXv+gBoGFu4+
+         OcYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724681207; x=1725286007;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lM53xOUKKs6zBpzOV/WWFuOMuEf1yqdWXeukAuL97eQ=;
-        b=Spxk5gWiYHAIko3xarZrxTEr1ubelKZxbmwBtw5Jni7c5mGM+uZPvfF8i3mzxieOP7
-         Ecx6TmGddkfMukkSGIhJB/i4fMjUNHnJe468tonONUWVasq0kIjWd+B3XmaO7HrU2T7o
-         ToPIZ3qySAXW0xBtcmBOWcWKoDZKHMGyD0U4ch2HmppayTXr/fEmoCK7L1XWxM/zBLub
-         M8zPLc/3SSCtB1hR3HQI6ADMh7Sc4Z7D/y8s787iUw0c19UdSQD87TeoPVoPDC9zrBcV
-         DpjOIZ5sPaRYqNPz2DoARdGehn+QIACg+q2bRpR8VbmRo0yATYwaiYmZ9aAStzLjZTxr
-         DJoA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEowasG7OxhCkBN+qX17FfL9h5+keED4GMoVVLom8l1X1kRkXO+t+Btk3ptccEsoJWYlOhfx22zKFMB/E=@vger.kernel.org, AJvYcCX5sDsy/XxrbhlfNoBfTFOxFWLHWgjAojfST3o2DTYqTN5gTkLyvY4GYVfLX/y/2MoqiM4p5EH+@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLWsCf4BqTvUNW2iU1FsPV9+oF2ULXNU1yqeI0enyzk29OoBxw
-	wW6jk2oi6CRYgEHCE9xYcGNK077DnTNgqlw0Lwvwq9OX8+spkk4R
-X-Google-Smtp-Source: AGHT+IEvO+yJa/93qw11J+66UpiT7wwLV6cPyTuH24FPbdYM5oGHgz9G77XLUb545uxk6bMp7z81vg==
-X-Received: by 2002:a17:90b:1052:b0:2c9:5ecd:e3c5 with SMTP id 98e67ed59e1d1-2d646d38277mr11201760a91.33.1724681206634;
-        Mon, 26 Aug 2024 07:06:46 -0700 (PDT)
-Received: from diogo-jahchan-ASUS-TUF-Gaming-A15-FA507RM-FA507RM.. ([200.4.98.43])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d613941e6esm9884161a91.26.2024.08.26.07.06.41
+        d=1e100.net; s=20230601; t=1724681425; x=1725286225;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=laIxxNV89w8bBA1m8OYb4OYSHZUiQ+a2fQ2hNjVj8fM=;
+        b=B5ef207l20tVtXmyuC9d2hnRtQAXj3yl40w+ruOPfAu8Rf8qg4tdgRTs0oK76N87et
+         KI6aYhbRCOLlDTcqFMiWe9MJNnR2ru3OyBwCmJjomFE3VZaImo3yEo5AO90TDId5tfvZ
+         lJbi2sKHjoeyGGTs7n/xrXwY29DdHcwE4ExrR5r89qyxUWqs4HoEaQV7X0UIcc6zaScB
+         5H4aWPC8f3sV5d/HglLKlKcpH9TQ+4xIkRzxvZgQggIQVdHjSkm3uQrHg5i7jo4oUfTb
+         06zM+mvSVutLvMzxh27NBu7ky1HvmNQ+gRSl8Ec94RphltbcrvvOmjOaX4ZCBuPWLvg3
+         5DIg==
+X-Forwarded-Encrypted: i=1; AJvYcCU6chmCKPHvcdK+NVvCks/JcpfYxBSgiocUtvLjjvn6+dGMX8rRBPSx1LWBOrZZJaou1/jywaL/@vger.kernel.org, AJvYcCUFDa4+4r18Kn1Qsfu4hvE2pk9Fo0eyawhsvHcrBF7zZTDcJTehKrOZzaX1MqwX8GlUilLDzag=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSrdG4QuxqzPMzopdQn81iWMBfQdJzpHInuCIRyW55cUnXvlgX
+	PgeZMTDATXCXhj/iXDeGBAAVpYw1AXIMrvcMt0YK0BhOmaUF0c2G
+X-Google-Smtp-Source: AGHT+IGWQN0ylENMl/qg2kzZRH6WH2UcyKB7f68IOf475cLgnm+b8N8DD7/zB/vCEdym1uqfLCclyA==
+X-Received: by 2002:a17:907:6ea7:b0:a6f:996f:23ea with SMTP id a640c23a62f3a-a86a2fa1d02mr1201115366b.15.1724681425079;
+        Mon, 26 Aug 2024 07:10:25 -0700 (PDT)
+Received: from eldamar.lan (c-82-192-242-114.customer.ggaweb.ch. [82.192.242.114])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f22053dsm675939166b.31.2024.08.26.07.10.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 07:06:44 -0700 (PDT)
-From: Diogo Jahchan Koike <djahchankoike@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Diogo Jahchan Koike <djahchankoike@gmail.com>,
-	syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [patch net-next v2] net: ethtool: fix unheld rtnl lock
-Date: Mon, 26 Aug 2024 11:06:13 -0300
-Message-ID: <20240826140628.99849-1-djahchankoike@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240826130712.91391-1-djahchankoike@gmail.com>
-References: <20240826130712.91391-1-djahchankoike@gmail.com>
+        Mon, 26 Aug 2024 07:10:22 -0700 (PDT)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Received: by eldamar.lan (Postfix, from userid 1000)
+	id CC316BE2EE7; Mon, 26 Aug 2024 16:10:21 +0200 (CEST)
+Date: Mon, 26 Aug 2024 16:10:21 +0200
+From: Salvatore Bonaccorso <carnil@debian.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Vitaly Chikunov <vt@altlinux.org>,
+	Christian Heusel <christian@heusel.eu>,
+	Adrian Vladu <avladu@cloudbasesolutions.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	"alexander.duyck@gmail.com" <alexander.duyck@gmail.com>,
+	"arefev@swemel.ru" <arefev@swemel.ru>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"willemb@google.com" <willemb@google.com>,
+	"regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+	David =?iso-8859-1?Q?Pr=E9vot?= <taffit@debian.org>
+Subject: Re: [PATCH net] net: drop bad gso csum_start and offset in
+ virtio_net_hdr
+Message-ID: <ZsyMzW-4ee_U8NoX@eldamar.lan>
+References: <2024080857-contusion-womb-aae1@gregkh>
+ <60bc20c5-7512-44f7-88cb-abc540437ae1@heusel.eu>
+ <0d897b58-f4b8-4814-b3f9-5dce0540c81d@heusel.eu>
+ <20240814055408-mutt-send-email-mst@kernel.org>
+ <c746a1d2-ba0d-40fe-8983-0bf1f7ce64a7@heusel.eu>
+ <PR3PR09MB5411FC965DBCCC26AF850EA5B0872@PR3PR09MB5411.eurprd09.prod.outlook.com>
+ <ad4d96b7-d033-4292-86df-91b8d7b427c4@heusel.eu>
+ <66bcb6f68172f_adbf529471@willemb.c.googlers.com.notmuch>
+ <zkpazbrdirbgp6xgrd54urzjv2b5o3gjfubj6hi673uf35aep3@hrqxcdd7vj5c>
+ <66c5f41884850_da1e7294d2@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <66c5f41884850_da1e7294d2@willemb.c.googlers.com.notmuch>
 
-ethnl_req_get_phydev should be called with rtnl lock held.
+Hi,
 
-Reported-by: syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=ec369e6d58e210135f71
-Fixes: 31748765bed3 ("net: ethtool: pse-pd: Target the command to the requested PHY")
-Signed-off-by: Diogo Jahchan Koike <djahchankoike@gmail.com>
----
- net/ethtool/pse-pd.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Wed, Aug 21, 2024 at 10:05:12AM -0400, Willem de Bruijn wrote:
+> Vitaly Chikunov wrote:
+> > Willem,
+> > 
+> > On Wed, Aug 14, 2024 at 09:53:58AM GMT, Willem de Bruijn wrote:
+> > > Christian Heusel wrote:
+> > > > On 24/08/14 10:10AM, Adrian Vladu wrote:
+> > > > > Hello,
+> > > > > 
+> > > > > The 6.6.y branch has the patch already in the stable queue -> https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/commit/?id=3e713b73c01fac163a5c8cb0953d1e300407a773, and it should be available in the 6.6.46 upcoming minor.
+> > > > > 
+> > > > > Thanks, Adrian.
+> > > > 
+> > > > Yeah it's also queued up for 6.10, which I both missed (sorry for that!).
+> > > > If I'm able to properly backport the patch for 6.1 I'll send that one,
+> > > > but my hopes are not too high that this will work ..
+> > > 
+> > > There are two conflicts.
+> > > 
+> > > The one in include/linux/virtio_net.h is resolved by first backporting
+> > > commit fc8b2a6194693 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4
+> > > validation")
+> > > 
+> > > We did not backport that to stable because there was some slight risk
+> > > that applications might be affected. This has not surfaced.
+> > > 
+> > > The conflict in net/ipv4/udp_offload.c is not so easy to address.
+> > > There were lots of patches between v6.1 and linus/master, with far
+> > > fewer of these betwee v6.1 and linux-stable/linux-6.1.y.
+> > 
+> > BTW, we successfully cherry-picked 3 suggested[1] commits over v6.1.105 in
+> > ALT, and there is no reported problems as of yet.
+> > 
+> >   89add40066f9 ("net: drop bad gso csum_start and offset in virtio_net_hdr")
+> >   fc8b2a619469 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation")
+> >   9840036786d9 ("gso: fix dodgy bit handling for GSO_UDP_L4")
+> > 
+> > [1] https://lore.kernel.org/all/2024081147-altitude-luminous-19d1@gregkh/
+> 
+> That's good to hear.
+> 
+> These are all fine to go to 6.1 stable.
 
-diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
-index 507cb21d6bf0..0cd298851ea1 100644
---- a/net/ethtool/pse-pd.c
-+++ b/net/ethtool/pse-pd.c
-@@ -227,8 +227,11 @@ ethnl_set_pse_validate(struct ethnl_req_info *req_info, struct genl_info *info)
- 	struct nlattr **tb = info->attrs;
- 	struct phy_device *phydev;
- 
-+	rtnl_lock();
- 	phydev = ethnl_req_get_phydev(req_info, tb[ETHTOOL_A_PSE_HEADER],
- 				      info->extack);
-+	rtnl_unlock();
-+
- 	if (IS_ERR_OR_NULL(phydev)) {
- 		NL_SET_ERR_MSG(info->extack, "No PHY is attached");
- 		return -EOPNOTSUPP;
--- 
-2.43.0
+FWIW, as we are hit by this issue for Debian bookworm, we have testing
+as well from David Prévot <taffit@debian.org>, cf. the report in
+https://bugs.debian.org/1079684 .
 
+He mentions that the 9840036786d9 ("gso: fix dodgy bit handling for
+GSO_UDP_L4") patch does not apply cleanly, looks to be because of
+1fd54773c267 ("udp: allow header check for dodgy GSO_UDP_L4 packets.")
+from 6.2-rc1, which are reverted in the commit.
+
+Regards,
+Salvatore
 
