@@ -1,430 +1,357 @@
-Return-Path: <netdev+bounces-121874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 850C895F198
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 14:42:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A0A595F1BA
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 14:46:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9FA81C21767
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 12:42:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30BE9281CD2
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 12:46:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7CA1714B5;
-	Mon, 26 Aug 2024 12:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="veiNOL6I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D81816EC19;
+	Mon, 26 Aug 2024 12:46:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc0f.mail.infomaniak.ch (smtp-bc0f.mail.infomaniak.ch [45.157.188.15])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4601714A8
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 12:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12AE146A6C;
+	Mon, 26 Aug 2024 12:46:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724676025; cv=none; b=PjmbBNwtUwYc3h/q7GXiyBHcurzIkK0OgyX92tkgTzP34zQXq4+II6eYSfL5Ya5CKVUL+EK1GikEpJMV7AiDyajsn+lMtqOSSAuGjTJ5Qql79ke+4ZbmwARtd275McJ/zU5B9ltynNYsaWTHZCY8N+3cadOaVYM6DxpA5c8DcSY=
+	t=1724676369; cv=none; b=GRR4bQCXb/PzMOrjTj+fWRI9CSaUe4WhPie4cop6xTfjlCRnqLeGvnMnh1WUkBMBWNccJENNVNxpNIKH18yZJFMKAueQ9suWs0zXEE0rxmsD8d3L7QFFBnv/sBbL1bCv5kFa2JPDEXBre1hJy0lagwcPHpOTncPXjiQ1O85A2uQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724676025; c=relaxed/simple;
-	bh=fkiLOGVa7i+9iWY0FNJz2I4RqFP7yHaRFHUezaG2fOo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=THYKxkkcM3mPVjJ+HPSePq9PCv/tOc87GbVzRQoiHixyjXhcuFGSxPIzRoSyqaLCnyHtzK9cQ972MDwfnzxw6BvSSQZQ5gAAMgisQrAZpmu7l1EETwezcr6dHv45qnnPA2SuwpJrxR/hHW71ejWa9Rd6rnpUbnKcsj8b/7PmIzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=veiNOL6I; arc=none smtp.client-ip=45.157.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4WsqyN3h6DzFqy;
-	Mon, 26 Aug 2024 14:40:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1724676012;
-	bh=KsV8rfenMKN3qDcsb+DhferSBFj/rGnhu6CFyw+X3hs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=veiNOL6IGeHEruX7680sdIhjDZhQGQh3Ew/BjNpMACBlPjkNoyZs/qiKcwL13q2+5
-	 ENQeYxYwCPM7AjP8yQKGSr0X0Vtbk46sTDkI+t2LVLhYvvY4TvnZaiq/KL4/zn99ZZ
-	 vGJ6VMkNrkkTATbST+WIPGy/k75p1hrtXpcjyvjs=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4WsqyM3mlJz3qB;
-	Mon, 26 Aug 2024 14:40:11 +0200 (CEST)
-Date: Mon, 26 Aug 2024 14:40:07 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Tahera Fahimi <fahimitahera@gmail.com>
-Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com, 
-	jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 3/6] selftest/Landlock: Signal restriction tests
-Message-ID: <20240826.queS8Fah5foo@digikod.net>
-References: <cover.1723680305.git.fahimitahera@gmail.com>
- <82b0d2103013397d8b46de9fc7c8c78456055299.1723680305.git.fahimitahera@gmail.com>
+	s=arc-20240116; t=1724676369; c=relaxed/simple;
+	bh=g5m3r/eKyBo34HNs7/XEZBEwNO05vNC7y425dkJxCAg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Kh/tEwLogRwS1/9ITXgtb4zFPSksvSARxBW4m0hYoDCNI8uWOLCPlP4kLR8Qd76pYcYGDN/lwAQK34fIWBh+dRB05n+mhG3NJXbVNEqH++ALmJeDSNvi0CMOekaydynjst4nXY0nzcIP7EKhefAXFaBhbmnmHMGEFbTDtITqp9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Wsr4d0jV1zyRC5;
+	Mon, 26 Aug 2024 20:45:37 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4DFF118006C;
+	Mon, 26 Aug 2024 20:46:05 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 26 Aug 2024 20:46:05 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>
+Subject: [PATCH net-next v15 00/13] Replace page_frag with page_frag_cache for sk_page_frag()
+Date: Mon, 26 Aug 2024 20:40:07 +0800
+Message-ID: <20240826124021.2635705-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <82b0d2103013397d8b46de9fc7c8c78456055299.1723680305.git.fahimitahera@gmail.com>
-X-Infomaniak-Routing: alpha
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Thu, Aug 15, 2024 at 12:29:22PM -0600, Tahera Fahimi wrote:
-> This patch expands Landlock ABI version 6 by providing tests for
-> signal scoping mechanism. Base on kill(2), if the signal is 0,
-> no signal will be sent, but the permission of a process to send
-> a signal will be checked. Likewise, this test consider one signal
-> for each signal category.
-> 
-> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-> ---
-> Chnages in versions:
-> V2:
-> * Moving tests from ptrace_test.c to scoped_signal_test.c
-> * Remove debugging statements.
-> * Covering all basic restriction scenarios by sending 0 as signal
-> V1:
-> * Expanding Landlock ABI version 6 by providing basic tests for
->   four signals to test signal scoping mechanism.
-> ---
->  .../selftests/landlock/scoped_signal_test.c   | 302 ++++++++++++++++++
->  1 file changed, 302 insertions(+)
->  create mode 100644 tools/testing/selftests/landlock/scoped_signal_test.c
-> 
-> diff --git a/tools/testing/selftests/landlock/scoped_signal_test.c b/tools/testing/selftests/landlock/scoped_signal_test.c
-> new file mode 100644
-> index 000000000000..92958c6266ca
-> --- /dev/null
-> +++ b/tools/testing/selftests/landlock/scoped_signal_test.c
-> @@ -0,0 +1,302 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Landlock tests - Signal Scoping
-> + *
-> + * Copyright © 2017-2020 Mickaël Salaün <mic@digikod.net>
-> + * Copyright © 2019-2020 ANSSI
-> + */
-> +
-> +#define _GNU_SOURCE
-> +#include <errno.h>
-> +#include <fcntl.h>
-> +#include <linux/landlock.h>
-> +#include <signal.h>
-> +#include <sys/prctl.h>
-> +#include <sys/types.h>
-> +#include <sys/wait.h>
-> +#include <unistd.h>
-> +
-> +#include "common.h"
-> +
-> +static sig_atomic_t signaled;
+After [1], there are still two implementations for page frag:
 
-static volatile sig_atomic_t signaled;
+1. mm/page_alloc.c: net stack seems to be using it in the
+   rx part with 'struct page_frag_cache' and the main API
+   being page_frag_alloc_align().
+2. net/core/sock.c: net stack seems to be using it in the
+   tx part with 'struct page_frag' and the main API being
+   skb_page_frag_refill().
 
-> +
-> +static void create_signal_domain(struct __test_metadata *const _metadata)
-> +{
-> +	int ruleset_fd;
-> +	const struct landlock_ruleset_attr ruleset_attr = {
-> +		.scoped = LANDLOCK_SCOPED_SIGNAL,
-> +	};
-> +
-> +	ruleset_fd =
-> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-> +	EXPECT_LE(0, ruleset_fd)
-> +	{
-> +		TH_LOG("Failed to create a ruleset: %s", strerror(errno));
-> +	}
-> +	enforce_ruleset(_metadata, ruleset_fd);
-> +	EXPECT_EQ(0, close(ruleset_fd));
-> +}
-> +
-> +static void scope_signal_handler(int sig, siginfo_t *info, void *ucontext)
-> +{
-> +	if (sig == SIGHUP || sig == SIGURG || sig == SIGTSTP ||
-> +	    sig == SIGTRAP || sig == SIGUSR1) {
-> +		signaled = 1;
-> +	}
-> +}
-> +
-> +/* clang-format off */
-> +FIXTURE(signal_scoping) {};
-> +/* clang-format on */
-> +
-> +FIXTURE_VARIANT(signal_scoping)
-> +{
-> +	const int sig;
-> +	const bool domain_both;
-> +	const bool domain_parent;
-> +	const bool domain_child;
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, allow_without_domain) {
-> +	/* clang-format on */
-> +	.sig = 0,
-> +	.domain_both = false,
-> +	.domain_parent = false,
-> +	.domain_child = false,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, deny_with_child_domain) {
-> +	/* clang-format on */
-> +	.sig = 0,
-> +	.domain_both = false,
-> +	.domain_parent = false,
-> +	.domain_child = true,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, allow_with_parent_domain) {
-> +	/* clang-format on */
-> +	.sig = 0,
-> +	.domain_both = false,
-> +	.domain_parent = true,
-> +	.domain_child = false,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, deny_with_sibling_domain) {
-> +	/* clang-format on */
-> +	.sig = 0,
-> +	.domain_both = false,
-> +	.domain_parent = true,
-> +	.domain_child = true,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, allow_sibling_domain) {
-> +	/* clang-format on */
-> +	.sig = 0,
-> +	.domain_both = true,
-> +	.domain_parent = false,
-> +	.domain_child = false,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, deny_with_nested_domain) {
-> +	/* clang-format on */
-> +	.sig = 0,
-> +	.domain_both = true,
-> +	.domain_parent = false,
-> +	.domain_child = true,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, allow_with_nested_and_parent_domain) {
-> +	/* clang-format on */
-> +	.sig = 0,
-> +	.domain_both = true,
-> +	.domain_parent = true,
-> +	.domain_child = false,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain) {
-> +	/* clang-format on */
-> +	.sig = 0,
-> +	.domain_both = true,
-> +	.domain_parent = true,
-> +	.domain_child = true,
-> +};
-> +
-> +/* Default Action: Terminate*/
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain_SIGHUP) {
-> +	/* clang-format on */
-> +	.sig = SIGHUP,
-> +	.domain_both = true,
-> +	.domain_parent = true,
-> +	.domain_child = true,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, allow_with_forked_domain_SIGHUP) {
-> +	/* clang-format on */
-> +	.sig = SIGHUP,
-> +	.domain_both = false,
-> +	.domain_parent = true,
-> +	.domain_child = false,
-> +};
-> +
-> +/* Default Action: Ignore*/
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain_SIGURG) {
-> +	/* clang-format on */
-> +	.sig = SIGURG,
-> +	.domain_both = true,
-> +	.domain_parent = true,
-> +	.domain_child = true,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, allow_with_forked_domain_SIGURG) {
-> +	/* clang-format on */
-> +	.sig = SIGURG,
-> +	.domain_both = false,
-> +	.domain_parent = true,
-> +	.domain_child = false,
-> +};
-> +
-> +/* Default Action: Stop*/
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain_SIGTSTP) {
-> +	/* clang-format on */
-> +	.sig = SIGTSTP,
-> +	.domain_both = true,
-> +	.domain_parent = true,
-> +	.domain_child = true,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, allow_with_forked_domain_SIGTSTP) {
-> +	/* clang-format on */
-> +	.sig = SIGTSTP,
-> +	.domain_both = false,
-> +	.domain_parent = true,
-> +	.domain_child = false,
-> +};
-> +
-> +/* Default Action: Coredump*/
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain_SIGTRAP) {
-> +	/* clang-format on */
-> +	.sig = SIGTRAP,
-> +	.domain_both = true,
-> +	.domain_parent = true,
-> +	.domain_child = true,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, allow_with_forked_domain_SIGTRAP) {
-> +	/* clang-format on */
-> +	.sig = SIGTRAP,
-> +	.domain_both = false,
-> +	.domain_parent = true,
-> +	.domain_child = false,
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(signal_scoping, deny_with_forked_domain_SIGUSR1) {
-> +	/* clang-format on */
-> +	.sig = SIGUSR1,
-> +	.domain_both = true,
-> +	.domain_parent = true,
-> +	.domain_child = true,
-> +};
-> +
-> +FIXTURE_SETUP(signal_scoping)
-> +{
-> +}
-> +
-> +FIXTURE_TEARDOWN(signal_scoping)
-> +{
-> +}
-> +
-> +TEST_F(signal_scoping, test_signal)
+This patchset tries to unfiy the page frag implementation
+by replacing page_frag with page_frag_cache for sk_page_frag()
+first. net_high_order_alloc_disable_key for the implementation
+in net/core/sock.c doesn't seems matter that much now as pcp
+is also supported for high-order pages:
+commit 44042b449872 ("mm/page_alloc: allow high-order pages to
+be stored on the per-cpu lists")
 
-Sometime, this test hang.  I suspect the following issue:
+As the related change is mostly related to networking, so
+targeting the net-next. And will try to replace the rest
+of page_frag in the follow patchset.
 
-> +{
-> +	pid_t child;
-> +	pid_t parent = getpid();
-> +	int status;
-> +	bool can_signal;
-> +	int pipe_parent[2];
-> +	struct sigaction action = {
-> +		.sa_sigaction = scope_signal_handler,
-> +		.sa_flags = SA_SIGINFO,
-> +
-> +	};
-> +
-> +	can_signal = !variant->domain_child;
-> +
-> +	if (variant->sig > 0)
-> +		ASSERT_LE(0, sigaction(variant->sig, &action, NULL));
-> +
-> +	if (variant->domain_both) {
-> +		create_signal_domain(_metadata);
-> +		if (!__test_passed(_metadata))
-> +			/* Aborts before forking. */
-> +			return;
-> +	}
-> +	ASSERT_EQ(0, pipe2(pipe_parent, O_CLOEXEC));
-> +
-> +	child = fork();
-> +	ASSERT_LE(0, child);
-> +	if (child == 0) {
-> +		char buf_child;
-> +		int err;
-> +
-> +		ASSERT_EQ(0, close(pipe_parent[1]));
-> +		if (variant->domain_child)
-> +			create_signal_domain(_metadata);
-> +
-> +		/* Waits for the parent to be in a domain, if any. */
-> +		ASSERT_EQ(1, read(pipe_parent[0], &buf_child, 1));
+After this patchset:
+1. Unify the page frag implementation by taking the best out of
+   two the existing implementations: we are able to save some space
+   for the 'page_frag_cache' API user, and avoid 'get_page()' for
+   the old 'page_frag' API user.
+2. Future bugfix and performance can be done in one place, hence
+   improving maintainability of page_frag's implementation.
 
-There is a race condition here when the parent process didn't yet called
-pause().
+Kernel Image changing:
+    Linux Kernel   total |      text      data        bss
+    ------------------------------------------------------
+    after     45250307 |   27274279   17209996     766032
+    before    45254134 |   27278118   17209984     766032
+    delta        -3827 |      -3839        +12         +0
 
-> +
-> +		err = kill(parent, variant->sig);
-> +		if (can_signal) {
-> +			ASSERT_EQ(0, err);
-> +		} else {
-> +			ASSERT_EQ(-1, err);
-> +			ASSERT_EQ(EPERM, errno);
-> +		}
-> +		/* no matter of the domain, a process should be able to send
-> +		 * a signal to itself.
-> +		 */
-> +		ASSERT_EQ(0, raise(variant->sig));
-> +		if (variant->sig > 0)
-> +			ASSERT_EQ(1, signaled);
-> +		_exit(_metadata->exit_code);
-> +		return;
-> +	}
-> +	ASSERT_EQ(0, close(pipe_parent[0]));
-> +	if (variant->domain_parent)
-> +		create_signal_domain(_metadata);
-> +
+Performance validation:
+1. Using micro-benchmark ko added in patch 1 to test aligned and
+   non-aligned API performance impact for the existing users, there
+   is no notiable performance degradation. Instead we seems to have
+   some major performance boot for both aligned and non-aligned API
+   after switching to ptr_ring for testing, respectively about 200%
+   and 10% improvement in arm64 server as below.
 
-/* The process should not have already been signaled. */
-EXPECT_EQ(0, signaled);
+2. Use the below netcat test case, we also have some minor
+   performance boot for replacing 'page_frag' with 'page_frag_cache'
+   after this patchset.
+   server: taskset -c 32 nc -l -k 1234 > /dev/null
+   client: perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | taskset -c 1 nc 127.0.0.1 1234
 
-> +	/* Signals that the parent is in a domain, if any. */
-> +	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
-> +
-> +	if (can_signal && variant->sig > 0) {
-> +		ASSERT_EQ(-1, pause());
-> +		ASSERT_EQ(EINTR, errno);
+In order to avoid performance noise as much as possible, the testing
+is done in system without any other load and have enough iterations to
+prove the data is stable enough, complete log for testing is below:
 
-This can hang indefinitely if the child process sent the signal after
-reading from the pipe and before the call to pause().
+perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000
+perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000 test_align=1
+taskset -c 32 nc -l -k 1234 > /dev/null
+perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | taskset -c 1 nc 127.0.0.1 1234
 
-This should be a better alternative to the use of pause():
+*After* this patchset:
 
-/* Avoids race condition with the child's signal. */
-while (!signaled && !usleep(1));
-ASSERT_EQ(1, signaled);
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000' (200 runs):
 
-BTW, we cannot reliably check for errno because usleep() may still
-return 0, but that's OK.
+         17.758393      task-clock (msec)         #    0.004 CPUs utilized            ( +-  0.51% )
+                 5      context-switches          #    0.293 K/sec                    ( +-  0.65% )
+                 0      cpu-migrations            #    0.008 K/sec                    ( +- 17.21% )
+                74      page-faults               #    0.004 M/sec                    ( +-  0.12% )
+          46128650      cycles                    #    2.598 GHz                      ( +-  0.51% )
+          60810511      instructions              #    1.32  insn per cycle           ( +-  0.04% )
+          14764914      branches                  #  831.433 M/sec                    ( +-  0.04% )
+             19281      branch-misses             #    0.13% of all branches          ( +-  0.13% )
 
-> +		ASSERT_EQ(1, signaled);
-> +	} else {
-> +		ASSERT_EQ(0, signaled);
-> +	}
-> +
-> +	ASSERT_EQ(child, waitpid(child, &status, 0));
-> +
-> +	if (WIFSIGNALED(status) || !WIFEXITED(status) ||
-> +	    WEXITSTATUS(status) != EXIT_SUCCESS)
-> +		_metadata->exit_code = KSFT_FAIL;
-> +}
-> +
-> +TEST_HARNESS_MAIN
-> -- 
-> 2.34.1
-> 
-> 
+       4.240273854 seconds time elapsed                                          ( +-  0.13% )
+
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000 test_align=1' (200 runs):
+
+         17.348690      task-clock (msec)         #    0.019 CPUs utilized            ( +-  0.66% )
+                 5      context-switches          #    0.310 K/sec                    ( +-  0.84% )
+                 0      cpu-migrations            #    0.009 K/sec                    ( +- 16.55% )
+                74      page-faults               #    0.004 M/sec                    ( +-  0.11% )
+          45065287      cycles                    #    2.598 GHz                      ( +-  0.66% )
+          60755389      instructions              #    1.35  insn per cycle           ( +-  0.05% )
+          14747865      branches                  #  850.085 M/sec                    ( +-  0.05% )
+             19272      branch-misses             #    0.13% of all branches          ( +-  0.13% )
+
+       0.935251375 seconds time elapsed                                          ( +-  0.07% )
+
+ Performance counter stats for 'taskset -c 0 head -c 20G /dev/zero' (200 runs):
+
+      16626.042731      task-clock (msec)         #    0.607 CPUs utilized            ( +-  0.03% )
+           3291020      context-switches          #    0.198 M/sec                    ( +-  0.05% )
+                 1      cpu-migrations            #    0.000 K/sec                    ( +-  0.50% )
+                85      page-faults               #    0.005 K/sec                    ( +-  0.16% )
+       30581044838      cycles                    #    1.839 GHz                      ( +-  0.05% )
+       34962744631      instructions              #    1.14  insn per cycle           ( +-  0.01% )
+        6483883671      branches                  #  389.984 M/sec                    ( +-  0.02% )
+          99624551      branch-misses             #    1.54% of all branches          ( +-  0.17% )
+
+      27.370305077 seconds time elapsed                                          ( +-  0.01% )
+
+
+*Before* this patchset:
+
+Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000' (200 runs):
+
+         21.587934      task-clock (msec)         #    0.005 CPUs utilized            ( +-  0.72% )
+                 6      context-switches          #    0.281 K/sec                    ( +-  0.28% )
+                 1      cpu-migrations            #    0.047 K/sec                    ( +-  0.50% )
+                73      page-faults               #    0.003 M/sec                    ( +-  0.12% )
+          56080697      cycles                    #    2.598 GHz                      ( +-  0.72% )
+          61605150      instructions              #    1.10  insn per cycle           ( +-  0.05% )
+          14950196      branches                  #  692.526 M/sec                    ( +-  0.05% )
+             19410      branch-misses             #    0.13% of all branches          ( +-  0.18% )
+
+       4.603530546 seconds time elapsed                                          ( +-  0.11% )
+
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000 test_align=1' (200 runs):
+
+         20.988297      task-clock (msec)         #    0.006 CPUs utilized            ( +-  0.81% )
+                 7      context-switches          #    0.316 K/sec                    ( +-  0.54% )
+                 1      cpu-migrations            #    0.048 K/sec                    ( +-  0.70% )
+                73      page-faults               #    0.003 M/sec                    ( +-  0.11% )
+          54512166      cycles                    #    2.597 GHz                      ( +-  0.81% )
+          61440941      instructions              #    1.13  insn per cycle           ( +-  0.08% )
+          14906043      branches                  #  710.207 M/sec                    ( +-  0.08% )
+             19927      branch-misses             #    0.13% of all branches          ( +-  0.17% )
+
+       3.438041238 seconds time elapsed                                          ( +-  1.11% )
+
+ Performance counter stats for 'taskset -c 0 head -c 20G /dev/zero' (200 runs):
+
+      17364.040855      task-clock (msec)         #    0.624 CPUs utilized            ( +-  0.02% )
+           3340375      context-switches          #    0.192 M/sec                    ( +-  0.06% )
+                 1      cpu-migrations            #    0.000 K/sec
+                85      page-faults               #    0.005 K/sec                    ( +-  0.15% )
+       32077623335      cycles                    #    1.847 GHz                      ( +-  0.03% )
+       35121047596      instructions              #    1.09  insn per cycle           ( +-  0.01% )
+        6519872824      branches                  #  375.481 M/sec                    ( +-  0.02% )
+         101877022      branch-misses             #    1.56% of all branches          ( +-  0.14% )
+
+      27.842745343 seconds time elapsed                                          ( +-  0.02% )
+
+
+Note, ipv4-udp, ipv6-tcp and ipv6-udp is also tested with the below script:
+nc -u -l -k 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -N -u 127.0.0.1 1234
+
+nc -l6 -k 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -N ::1 1234
+
+nc -l6 -k -u 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -u -N ::1 1234
+
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+
+1. https://lore.kernel.org/all/20240228093013.8263-1-linyunsheng@huawei.com/
+
+Change log:
+V15:
+   1. Fix the compile error pointed out by Simon.
+   2. Fix Other mistakes when using new API naming and refactoring.
+
+V14:
+   1. Drop '_va' Renaming patch and use new API naming.
+   2. Use new refactoring to enable more codes to be reusable.
+   3. And other minor suggestions from Alexander.
+
+V13:
+   1. Move page_frag_test from mm/ to tools/testing/selftest/mm
+   2. Use ptr_ring to replace ptr_pool for page_frag_test.c
+   3. Retest based on the new testing ko, which shows a big different
+      result than using ptr_pool.
+
+V12:
+   1. Do not treat page_frag_test ko as DEBUG feature.
+   2. Make some improvement for the refactoring in patch 8.
+   3. Some other minor improvement as Alexander's comment.
+
+RFC v11:
+   1. Fold 'page_frag_cache' moving change into patch 2.
+   2. Optimizate patch 3 according to discussion in v9.
+
+V10:
+   1. Change Subject to "Replace page_frag with page_frag_cache for sk_page_frag()".
+   2. Move 'struct page_frag_cache' to sched.h as suggested by Alexander.
+   3. Rename skb_copy_to_page_nocache().
+   4. Adjust change between patches to make it more reviewable as Alexander's comment.
+   5. Use 'aligned_remaining' variable to generate virtual address as Alexander's
+      comment.
+   6. Some included header and typo fix as Alexander's comment.
+   7. Add back the get_order() opt patch for xtensa arch
+
+V9:
+   1. Add check for test_alloc_len and change perm of module_param()
+      to 0 as Wang Wei' comment.
+   2. Rebased on latest net-next.
+
+V8: Remove patch 2 & 3 in V7, as free_unref_page() is changed to call
+    pcp_allowed_order() and used in page_frag API recently in:
+    commit 5b8d75913a0e ("mm: combine free_the_page() and free_unref_page()")
+
+V7: Fix doc build warning and error.
+
+V6:
+   1. Fix some typo and compiler error for x86 pointed out by Jakub and
+      Simon.
+   2. Add two refactoring and optimization patches.
+
+V5:
+   1. Add page_frag_alloc_pg() API for tls_device.c case and refactor
+      some implementation, update kernel bin size changing as bin size
+      is increased after that.
+   2. Add ack from Mat.
+
+RFC v4:
+   1. Update doc according to Randy and Mat's suggestion.
+   2. Change probe API to "probe" for a specific amount of available space,
+      rather than "nonzero" space according to Mat's suggestion.
+   3. Retest and update the test result.
+
+v3:
+   1. Use new layout for 'struct page_frag_cache' as the discussion
+      with Alexander and other sugeestions from Alexander.
+   2. Add probe API to address Mat' comment about mptcp use case.
+   3. Some doc updating according to Bagas' suggestion.
+
+v2:
+   1. reorder test module to patch 1.
+   2. split doc and maintainer updating to two patches.
+   3. refactor the page_frag before moving.
+   4. fix a type and 'static' warning in test module.
+   5. add a patch for xtensa arch to enable using get_order() in
+      BUILD_BUG_ON().
+   6. Add test case and performance data for the socket code.
+
+Yunsheng Lin (13):
+  mm: page_frag: add a test module for page_frag
+  mm: move the page fragment allocator from page_alloc into its own file
+  mm: page_frag: use initial zero offset for page_frag_alloc_align()
+  mm: page_frag: avoid caller accessing 'page_frag_cache' directly
+  xtensa: remove the get_order() implementation
+  mm: page_frag: reuse existing space for 'size' and 'pfmemalloc'
+  mm: page_frag: some minor refactoring before adding new API
+  mm: page_frag: use __alloc_pages() to replace alloc_pages_node()
+  net: rename skb_copy_to_page_nocache() helper
+  mm: page_frag: introduce prepare/probe/commit API
+  net: replace page_frag with page_frag_cache
+  mm: page_frag: update documentation for page_frag
+  mm: page_frag: add an entry in MAINTAINERS for page_frag
+
+ Documentation/mm/page_frags.rst               | 173 +++++-
+ MAINTAINERS                                   |  11 +
+ arch/xtensa/include/asm/page.h                |  18 -
+ .../chelsio/inline_crypto/chtls/chtls.h       |   3 -
+ .../chelsio/inline_crypto/chtls/chtls_io.c    | 100 +---
+ .../chelsio/inline_crypto/chtls/chtls_main.c  |   3 -
+ drivers/net/tun.c                             |  47 +-
+ drivers/vhost/net.c                           |   2 +-
+ include/linux/gfp.h                           |  22 -
+ include/linux/mm_types.h                      |  18 -
+ include/linux/mm_types_task.h                 |  21 +
+ include/linux/page_frag_cache.h               | 533 ++++++++++++++++++
+ include/linux/sched.h                         |   2 +-
+ include/linux/skbuff.h                        |   1 +
+ include/net/sock.h                            |  30 +-
+ kernel/exit.c                                 |   3 +-
+ kernel/fork.c                                 |   3 +-
+ mm/Makefile                                   |   1 +
+ mm/page_alloc.c                               | 136 -----
+ mm/page_frag_cache.c                          | 158 ++++++
+ net/core/skbuff.c                             |  64 ++-
+ net/core/skmsg.c                              |  12 +-
+ net/core/sock.c                               |  31 +-
+ net/ipv4/ip_output.c                          |  28 +-
+ net/ipv4/tcp.c                                |  26 +-
+ net/ipv4/tcp_output.c                         |  25 +-
+ net/ipv6/ip6_output.c                         |  28 +-
+ net/kcm/kcmsock.c                             |  21 +-
+ net/mptcp/protocol.c                          |  44 +-
+ net/rxrpc/conn_object.c                       |   4 +-
+ net/rxrpc/local_object.c                      |   4 +-
+ net/sched/em_meta.c                           |   2 +-
+ net/sunrpc/svcsock.c                          |   6 +-
+ net/tls/tls_device.c                          |  99 ++--
+ tools/testing/selftests/mm/Makefile           |   2 +
+ tools/testing/selftests/mm/page_frag/Makefile |  18 +
+ .../selftests/mm/page_frag/page_frag_test.c   | 170 ++++++
+ tools/testing/selftests/mm/run_vmtests.sh     |   9 +-
+ 38 files changed, 1397 insertions(+), 481 deletions(-)
+ create mode 100644 include/linux/page_frag_cache.h
+ create mode 100644 mm/page_frag_cache.c
+ create mode 100644 tools/testing/selftests/mm/page_frag/Makefile
+ create mode 100644 tools/testing/selftests/mm/page_frag/page_frag_test.c
+
+-- 
+2.33.0
+
 
