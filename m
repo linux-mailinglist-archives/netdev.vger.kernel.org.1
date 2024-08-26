@@ -1,169 +1,257 @@
-Return-Path: <netdev+bounces-121822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 212DA95ED3F
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:32:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE22F95ED7A
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDB5A281AE8
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 09:32:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8530D2844F7
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 09:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9018E146019;
-	Mon, 26 Aug 2024 09:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0991482ED;
+	Mon, 26 Aug 2024 09:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="3AZBDtI0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dGxUByPL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E17613D297
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 09:31:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47E783CA3;
+	Mon, 26 Aug 2024 09:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724664690; cv=none; b=osYiJN40HuGW/dKcsjqQfL7fUnZbnNgqAE2ttMHYPwW+WghwkC6MwQwa8rmVU1Tae/jRkmyTTi5JdxE5g9p0gbZnohib3UDVnnvoV6egYIombG2Xivg/SfWD3SIfmQc1/5Aq8d6Vhka1vlYUwdRmM1HggDbosB7qOytA35hfbc8=
+	t=1724665058; cv=none; b=hNeIbcxwJZEWVz/Lx4VJeCCr6MwwGKrXM5euOGsodBU4c0ChRlR9eJ7POlls4ft8IQLm8NvUsTHEWNkitS8M0cWnWZ7goXXtPGrCYJQKzczjZXrqlCt7m4VulD3d0maGS022GZhCt1HH6sa9P3P+xFZZyR1HU14Iw5gmrc/FltI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724664690; c=relaxed/simple;
-	bh=8R8A7D+8jWmGEOdpPm8RGzl8S/henhOhKGKZ0paQ5w4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nY00Jb6qLlNz/fLWplh2or5GvyAiD/LR04w0mNRIxizG2cQZhZVQt5vMeKLJRhGjCWeEv4B0vtURngBdxjRPkBV366d8H01/gDruCAmrZ8/MQ4mom7sjvtcelqWLVyyK6GvOp2fkKid7RNorDizTQ2ITcFKL076GWVb1WIUezd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=3AZBDtI0; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a86cc0d10aaso107525766b.2
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 02:31:27 -0700 (PDT)
+	s=arc-20240116; t=1724665058; c=relaxed/simple;
+	bh=NsbQu7M4tEss+c6Y2wL0B7gbdyDQWS2Z0nkhMS5KLd4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RVQE+OEQiC3Ijq6LefLdO9F5xQBdNW8Sxz78Jh7cLyOU56NhABw65aiKwl/5FhtKdjfKKmuG86Wz4qGurfCc5CPVSXM/qb/6pMNnNLARX7RK49MQIOxsDjV2I1TN4HV+p+Lwrd+jr9djea4ULq5Kk6uibS0Y0w7CUadhn5Adx24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dGxUByPL; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a86abbd68ffso415610166b.0;
+        Mon, 26 Aug 2024 02:37:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724664686; x=1725269486; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nVCsxlno+YktAicKgTJtnrnnbALEmyZyk9gDmn8un9c=;
-        b=3AZBDtI0jGeXW2si+fwsdIQnFZJnR4C7K82NFO84JQ+7MIhB9MgH7/gdrLjtDBGzS9
-         ItruwUorUcj/7L5T3xaYtv1l4zegNC/I6U6op9NDeh+5opQT3wOl27sN2NPpHw8hcllf
-         Pa2IKWG7B6jjSln0c3uqYYHC8IMjoFVFI+qUZOYy0bBlnjD6qWwXsymjYD2dfnc9VM+V
-         04yfc8YFso/cVIJInTzCtLyshAdNP1MpZeJE7DOKiQ8Pk1THJikg8LAR6G+6Xb1IyVU0
-         KcIHfoACnWXDxnf4tAyXG7sT+v+lb0Xoydkuc2FA2qWqr5qQ0fYvwNSSgGWkwNWNU8eU
-         gjnQ==
+        d=gmail.com; s=20230601; t=1724665055; x=1725269855; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZJcVakD5ss4kZCjtqj+URrNKV2fX2XA/qeyqgDhyBSw=;
+        b=dGxUByPL3qA5hQ05l6PG/3esovqw0CniolNjVr67UB/ldgGcJLuZY1AN8F1jLioPPH
+         l+kDJp40MFGteT3+FwcrVXs/Z8G+TQx2m2i3Cl22bP4CgjPscyevy9DTo2sTm+q324lh
+         FErcMgDM3gwQOrbwYsvFl8s0sFHRwuL539A/mK1hIFAMQZO3ajAreBUBxVOuv3uP58oL
+         HF5DD5dv4T0iBY2FvNS6Wuo0vzyp8WUAFPCCzUtTd894lmYrmBDDJRJcGvwaoEWBXmwy
+         kQCD9/2Ii0SwvYmcAsNB1F2lnl/4ScRcPhHOoxkHkNJspBmhjcGHj2Az3ENxCZt6/rnM
+         IpFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724664686; x=1725269486;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nVCsxlno+YktAicKgTJtnrnnbALEmyZyk9gDmn8un9c=;
-        b=e14l+m8sGtkpOGaUUDOuCCPBa79IuSjU0jNfhxLMo4WgFwf19HyDGek/Vaj1S6duz2
-         AgMdqfZ9g9qeTa/O2rWkemsE6GtznnmuEfbJk9vP7Q839Zt/Y2c5mqagE+vW9VsyMhte
-         7rat4Kkxy2v0hahdEPr7WboDCuamWmAbgobXhm9n4J5yNvSTJVrzQ+rlJRM0NCLTpOex
-         XacJsu0NYHqFWVQ5Sc2tOp/9Kp3ywWJaUmnDRutocR3OErD8RdMr/c2pjwrC2/N4r1ZC
-         rSgMgEyrznIIYnTIBZAm762f4a43y7fd/3/AXJruoae44M4kEekwrpAV8VXaWYtAfSpm
-         bQ9w==
-X-Forwarded-Encrypted: i=1; AJvYcCV95y1zAY6P81qEthj2ItXzIataNz1m5pGi5v3OoeUYBBRSIh66nQ7s9fGVETdv1snT5OHzLvk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztDwXGMSTo+XDiQUBuZ/MM7ch5Gvj2TwcJzjgUcROT5pPQeDW9
-	P1przwJDbKhciTpQSsHMjBDwvhj2q510BAmze1mASt4HX1vDEoUWYiZ8//jbPKM=
-X-Google-Smtp-Source: AGHT+IFC0FggWceB0e+b0mfMsaVrc9aANMqizPSn+FRLaaBIGtpjtNSJHD8ZDBvGO9fR13y0C/GRVA==
-X-Received: by 2002:a17:907:c0f:b0:a86:c111:cc35 with SMTP id a640c23a62f3a-a86c111cfb5mr335672066b.50.1724664685912;
-        Mon, 26 Aug 2024 02:31:25 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f220dbesm633232066b.27.2024.08.26.02.31.24
+        d=1e100.net; s=20230601; t=1724665055; x=1725269855;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZJcVakD5ss4kZCjtqj+URrNKV2fX2XA/qeyqgDhyBSw=;
+        b=iJiGiEPEQ+w2OX0HpwyzFw6xlN2W9xsSwSxGGtJz8d9/uLp0gxfZKksF4tsHiMEjVg
+         fneYx95Y44HoQEblDgaOIRLZ3RvJfPBu72bgnVD3UeHdyfK+aeCiXHhH/q8GhDnBo4Eh
+         o/Ak30Rw+YzZJ36eFYGS6pvAlfxkYDag3qr9UyNM2uXFHebMogQ4cgKtwfyvI/5ynUaE
+         lWSMyhWEBfrTdDRS9rTgNoonsUAXMrFZD5crAEyWj7UrOsnhsfuq0+4cwrXQIbSRIF2o
+         C3kDG4heE4FJv4KE0y9rm6ppJX5fkvYTzuh0fci199a++OcIBLUrmAfDEHzq6vovYher
+         GzhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVDXnU/0EuJRyhgVa555XnIxYoB6ETE4PAZYVuXkmOj7xUVJmOhFZ1C3x33MPqPPpZ0Lx5F+H49HzJuWQA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyd/1XIB7Fq/8CmlX7uTVHF4xVcTVu/KKKT8ibOGVX0b3pHvoUr
+	SxaURwQp+WQk4r0FDPEPxakkwKQOqhMiKSINeaNvxO/pqnvbYz5x/weP06Ud
+X-Google-Smtp-Source: AGHT+IHzRY/eAHW3N9sVw8x+S0Ogb3NLphxtdQh5WtqVRBDzfsy5Q2/77/ppBWjz1T7Ch+hd3xLDkg==
+X-Received: by 2002:a17:907:2d11:b0:a86:a30f:4b00 with SMTP id a640c23a62f3a-a86a30f4d3fmr1057011866b.27.1724665054146;
+        Mon, 26 Aug 2024 02:37:34 -0700 (PDT)
+Received: from WBEC325.dom.lan ([185.188.71.122])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a868f4360c0sm640254966b.108.2024.08.26.02.37.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 02:31:25 -0700 (PDT)
-Date: Mon, 26 Aug 2024 11:31:23 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 03/12] net-shapers: implement NL get operation
-Message-ID: <ZsxLa0Ut7bWc0OmQ@nanopsycho.orion>
-References: <ZsMyI0UOn4o7OfBj@nanopsycho.orion>
- <47b4ab84-2910-4501-bbc8-c6a9b251d7a5@redhat.com>
- <Zsco7hs_XWTb3htS@nanopsycho.orion>
- <20240822074112.709f769e@kernel.org>
- <cc41bdf9-f7b6-4b5c-81ad-53230206aa57@redhat.com>
- <20240822155608.3034af6c@kernel.org>
- <Zsh3ecwUICabLyHV@nanopsycho.orion>
- <c7e0547b-a1e4-4e47-b7ec-010aa92fbc3a@redhat.com>
- <ZsiQSfTNr5G0MA58@nanopsycho.orion>
- <a15acdf5-a551-4fb2-9118-770c37b47be6@redhat.com>
+        Mon, 26 Aug 2024 02:37:33 -0700 (PDT)
+From: Pawel Dembicki <paweldembicki@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Pawel Dembicki <paweldembicki@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] net: phy: vitesse: implement MDI-X configuration in vsc73xx
+Date: Mon, 26 Aug 2024 11:37:10 +0200
+Message-Id: <20240826093710.511837-1-paweldembicki@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a15acdf5-a551-4fb2-9118-770c37b47be6@redhat.com>
+Content-Transfer-Encoding: 8bit
 
-Fri, Aug 23, 2024 at 04:23:30PM CEST, pabeni@redhat.com wrote:
->On 8/23/24 15:36, Jiri Pirko wrote:
->> Fri, Aug 23, 2024 at 02:58:27PM CEST, pabeni@redhat.com wrote:
->> > I personally think it would be much cleaner to have 2 separate set of
->> > operations, with exactly the same semantic and argument list, except for the
->> > first argument (struct net_device or struct devlink).
->> 
->> I think it is totally subjective. You like something, I like something
->> else. Both works. The amount of duplicity and need to change same
->> things on multiple places in case of bugfixes and extensions is what I
->> dislike on the 2 separate sets.
->
->My guestimate is that the amount of deltas caused by bugfixes and extensions
->will be much different in practice with the two approaches.
->
->I guess that even with the net_shaper_ops between devlink and net_device,
->there will be different callbacks implementation for devlink and net_device,
->right?
->
->If so, the differentiated operation list between devlink and net_device will
->trade a:
->
->{
->	struct {net_device, netlink} =
->net_shaper_binding_{netdevice_netlink}(binding);
->
->preamble in every callback of every driver for a single additional operations
->set definition.
+This commit introduces MDI-X configuration support in vsc73xx phys.
 
-So?
+Vsc73xx supports only auto mode or forced MDI.
 
->
->It will at least scale better with the number of driver implementing the
->interface.
->
->> Plus, there might be another binding in
->> the future, will you copy the ops struct again then?
->
->Yes. Same reasons of the above.
+Vsc73xx have auto MDI-X disabled by default in forced speed mode.
+This commit enables it.
 
-What's stopping anyone from diverging these 2-n sets? I mean, the whole
-purpose it unification and finding common ground. Once you have ops
-duplicated, sooner then later someone does change in A but ignore B.
-Having the  "preamble" in every callback seems like very good tradeoff
-to prevent this scenario.
+Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
+---
+Changes in v2:
+  - set auto MDI-X by default
+  - 'switch (mdix)' in 'vsc73xx_mdix_set' should be more readable
+---
+ drivers/net/phy/vitesse.c | 93 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 93 insertions(+)
 
+diff --git a/drivers/net/phy/vitesse.c b/drivers/net/phy/vitesse.c
+index 54eb4e8377c4..2377179de017 100644
+--- a/drivers/net/phy/vitesse.c
++++ b/drivers/net/phy/vitesse.c
+@@ -71,6 +71,19 @@
+ #define MII_VSC73XX_DOWNSHIFT_MAX		5
+ #define MII_VSC73XX_DOWNSHIFT_INVAL		1
+ 
++/* VSC73XX PHY_BYPASS_CTRL register*/
++#define MII_VSC73XX_PHY_BYPASS_CTRL		MII_DCOUNTER
++#define MII_VSC73XX_PBC_TX_DIS			BIT(15)
++#define MII_VSC73XX_PBC_FOR_SPD_AUTO_MDIX_DIS	BIT(7)
++#define MII_VSC73XX_PBC_PAIR_SWAP_DIS		BIT(5)
++#define MII_VSC73XX_PBC_POL_INV_DIS		BIT(4)
++#define MII_VSC73XX_PBC_PARALLEL_DET_DIS	BIT(3)
++#define MII_VSC73XX_PBC_AUTO_NP_EXCHANGE_DIS	BIT(1)
++
++/* VSC73XX PHY_AUX_CTRL_STAT register */
++#define MII_VSC73XX_PHY_AUX_CTRL_STAT	MII_NCONFIG
++#define MII_VSC73XX_PACS_NO_MDI_X_IND	BIT(13)
++
+ /* Vitesse VSC8601 Extended PHY Control Register 1 */
+ #define MII_VSC8601_EPHY_CTL		0x17
+ #define MII_VSC8601_EPHY_CTL_RGMII_SKEW	(1 << 8)
+@@ -219,6 +232,9 @@ static void vsc73xx_config_init(struct phy_device *phydev)
+ 
+ 	/* Enable downshift by default */
+ 	vsc73xx_set_downshift(phydev, MII_VSC73XX_DOWNSHIFT_MAX);
++
++	/* Set Auto MDI-X by default */
++	phydev->mdix_ctrl = ETH_TP_MDI_AUTO;
+ }
+ 
+ static int vsc738x_config_init(struct phy_device *phydev)
+@@ -319,6 +335,75 @@ static int vsc739x_config_init(struct phy_device *phydev)
+ 	return 0;
+ }
+ 
++static int vsc73xx_mdix_set(struct phy_device *phydev, u8 mdix)
++{
++	int ret;
++	u16 val;
++
++	val = phy_read(phydev, MII_VSC73XX_PHY_BYPASS_CTRL);
++
++	switch (mdix) {
++	case ETH_TP_MDI:
++		val |= MII_VSC73XX_PBC_FOR_SPD_AUTO_MDIX_DIS |
++		       MII_VSC73XX_PBC_PAIR_SWAP_DIS |
++		       MII_VSC73XX_PBC_POL_INV_DIS;
++		break;
++	case ETH_TP_MDI_X:
++		/* When MDI-X auto configuration is disabled, is possible
++		 * to force only MDI mode. Let's use autoconfig for forced
++		 * MDIX mode.
++		 */
++	case ETH_TP_MDI_AUTO:
++		val &= ~(MII_VSC73XX_PBC_FOR_SPD_AUTO_MDIX_DIS |
++			 MII_VSC73XX_PBC_PAIR_SWAP_DIS |
++			 MII_VSC73XX_PBC_POL_INV_DIS);
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	ret = phy_write(phydev, MII_VSC73XX_PHY_BYPASS_CTRL, val);
++	if (ret)
++		return ret;
++
++	return genphy_restart_aneg(phydev);
++}
++
++static int vsc73xx_config_aneg(struct phy_device *phydev)
++{
++	int ret;
++
++	ret = vsc73xx_mdix_set(phydev, phydev->mdix_ctrl);
++	if (ret)
++		return ret;
++
++	return genphy_config_aneg(phydev);
++}
++
++static int vsc73xx_mdix_get(struct phy_device *phydev, u8 *mdix)
++{
++	u16 reg_val;
++
++	reg_val = phy_read(phydev, MII_VSC73XX_PHY_AUX_CTRL_STAT);
++	if (reg_val & MII_VSC73XX_PACS_NO_MDI_X_IND)
++		*mdix = ETH_TP_MDI;
++	else
++		*mdix = ETH_TP_MDI_X;
++
++	return 0;
++}
++
++static int vsc73xx_read_status(struct phy_device *phydev)
++{
++	int ret;
++
++	ret = vsc73xx_mdix_get(phydev, &phydev->mdix);
++	if (ret < 0)
++		return ret;
++
++	return genphy_read_status(phydev);
++}
++
+ /* This adds a skew for both TX and RX clocks, so the skew should only be
+  * applied to "rgmii-id" interfaces. It may not work as expected
+  * on "rgmii-txid", "rgmii-rxid" or "rgmii" interfaces.
+@@ -516,6 +601,8 @@ static struct phy_driver vsc82xx_driver[] = {
+ 	.phy_id_mask    = 0x000ffff0,
+ 	/* PHY_GBIT_FEATURES */
+ 	.config_init    = vsc738x_config_init,
++	.config_aneg    = vsc73xx_config_aneg,
++	.read_status	= vsc73xx_read_status,
+ 	.read_page      = vsc73xx_read_page,
+ 	.write_page     = vsc73xx_write_page,
+ 	.get_tunable    = vsc73xx_get_tunable,
+@@ -526,6 +613,8 @@ static struct phy_driver vsc82xx_driver[] = {
+ 	.phy_id_mask    = 0x000ffff0,
+ 	/* PHY_GBIT_FEATURES */
+ 	.config_init    = vsc738x_config_init,
++	.config_aneg    = vsc73xx_config_aneg,
++	.read_status	= vsc73xx_read_status,
+ 	.read_page      = vsc73xx_read_page,
+ 	.write_page     = vsc73xx_write_page,
+ 	.get_tunable    = vsc73xx_get_tunable,
+@@ -536,6 +625,8 @@ static struct phy_driver vsc82xx_driver[] = {
+ 	.phy_id_mask    = 0x000ffff0,
+ 	/* PHY_GBIT_FEATURES */
+ 	.config_init    = vsc739x_config_init,
++	.config_aneg    = vsc73xx_config_aneg,
++	.read_status	= vsc73xx_read_status,
+ 	.read_page      = vsc73xx_read_page,
+ 	.write_page     = vsc73xx_write_page,
+ 	.get_tunable    = vsc73xx_get_tunable,
+@@ -546,6 +637,8 @@ static struct phy_driver vsc82xx_driver[] = {
+ 	.phy_id_mask    = 0x000ffff0,
+ 	/* PHY_GBIT_FEATURES */
+ 	.config_init    = vsc739x_config_init,
++	.config_aneg    = vsc73xx_config_aneg,
++	.read_status	= vsc73xx_read_status,
+ 	.read_page      = vsc73xx_read_page,
+ 	.write_page     = vsc73xx_write_page,
+ 	.get_tunable    = vsc73xx_get_tunable,
+-- 
+2.34.1
 
->
->> > The driver implementation could still de-duplicate a lot of code, as far as
->> > the shaper-related arguments are the same.
->> > 
->> > Side note, if the intention is to allow the user to touch/modify the
->> > queue-level and queue-group-level shapers via the devlink object? if that is
->> > the intention, we will need to drop the shaper cache and (re-)introduce a
->> > get() callback, as the same shaper could be reached via multiple
->> > binding/handle pairs and the core will not know all of such pairs for a given
->> > shaper.
->> 
->> That is a good question, I don't know. But gut feeling is "no".
->
->Well, at least that is not in the direction of unlimited amount of additional
->time and pain ;)
->
->Thanks,
->
->Paolo
->
 
