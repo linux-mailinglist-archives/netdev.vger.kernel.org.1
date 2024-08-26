@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-121779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294E195E807
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 07:41:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C416295E80A
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 07:42:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C4B81F21CBD
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 05:41:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CE2228316A
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 05:42:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8460F7DA97;
-	Mon, 26 Aug 2024 05:41:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A4681AB1;
+	Mon, 26 Aug 2024 05:41:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="CgbCudIe"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="bXMq8d8x"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2050.outbound.protection.outlook.com [40.107.21.50])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2078.outbound.protection.outlook.com [40.107.22.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DCB770E4;
-	Mon, 26 Aug 2024 05:41:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112EA7407A;
+	Mon, 26 Aug 2024 05:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.78
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724650889; cv=fail; b=RTJOZ5BHCG/hCfXj7TPGruoY5RQsCz0r0wIVdlq1YhLlDg44QQUcQyYJWyWVwI2OCztMRCarWkRUDoThQ2osOHpBtGlVk91Cc0WCfJGfLTQaxJhw4bxc6si5jsBiaBRqOM7EH9VGYjeknLnuOIny2fsvpV7fgACkj5lEfoa31JQ=
+	t=1724650895; cv=fail; b=uYPolIdfFIGiQK6OArQzHtWAnUJXG2+K/vRYLyLF9oxoMrW7wNQItQgXzm4cop+8jSfmB5O1AZTd/WAEas7rWM/mrOsyZXkNkRwmxg5LBuJ9SCPhtr/E3vi4WKZeLmN72xqw7dpJHl4PiVSMgSTWD6aIYTJlVx+JsKxQk2nRLPU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724650889; c=relaxed/simple;
-	bh=g4S0KLZJbKiQFWXDLNA2hT1bEDBbp/1jRrixgmTPDu4=;
+	s=arc-20240116; t=1724650895; c=relaxed/simple;
+	bh=dTh6wJYUtBEZKl9qoBzB8sYAYbFee47xoW3jN6rzvNE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DcR/2IVIeHi8ErG9I+qPrjGx+irrM/3qkuJVh07ZH4az6udJgoB0YlC7Qi+UNvfKNpXaCo2oSx85ck33/SLJ/iP/m1rJab9CKClHz8Da/BFeRB+Q9VvjkGrHs2ZbxQdgeRH+H4SulgEViBFZFfYuXPl+2NE+h5DKAC9sN/bkcTM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=CgbCudIe; arc=fail smtp.client-ip=40.107.21.50
+	 Content-Type:MIME-Version; b=fH0Wx5aEG1VvQIcHVWo9/VEr0kByVbHEdfSugZL+JhosC4saP4+sCD6KzyGnij5PSXrFJXOS6gx5mMOmZlYwt7Xll8H6yA2prEwz92suS3Jl84s1ODGXp5VngGqZTl1HXaOvbZpUZXruwLjvVRGXol4Zu3h4KDxvuog4zjPuopk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=bXMq8d8x; arc=fail smtp.client-ip=40.107.22.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=M2mQVgU2j9pmn4D4jFded0Dq2PnQyKdtDGeaLicjdTEC/7or/4DiGAeBmq7kqb8cbpHQWoLiOgpgXH1yB9SJgJiPqBs1tul5r1qyTuT9HMcsbpdLvXmcnPqh20jvAnTALXKfM+1uSqpHe4f/hh8CfqUKVDRhZNafupxSfNSEmfvqIqsHzri+LvX8IejGVsMOJkH57JaITg24GJ5zzdkB22SjnXsAg4tXftD6llL2uf5b+Rzsez9OLv8ZYPCg1F45IqJpNl/OH8yDMzRsbxYxEiAsdJm3TD0G1Tjvsjoot5UAr3/xr+E0ApVVOq5lMRorUnX+X3o5dm6kEVTjAMqeyQ==
+ b=G/Nbq94NsjzY2uXYf0Wp+m47zUcFaPEY9cLa8b98fWFBIanRfygPG4eEqXhP5K+ogfos9N/B/ZmXbUptSrmg6/yqiNrrBNtc3QqaxjwUpjhs40KaQYmbl75xYg/OPSnS5mpqLxaT97HCd/MoMEP1EYAdqJJAS0+dUsSl3u24CpymgvaD7D94BTv51jgTmwx/F1Wemc68gFwNlo0GKMoc09RfC0l2EjAuop9UQVGvJpmDMXMu5FvtDBJ/dWxqAP4Z3LKv4SoH1Uc0L2uVMfS+yezt3XZ849NEmLwqbkO0h16024LSGwXr6cj4p3fu19ObQ2kEjNpOKWYYNXysyNGSHA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zi5QfgfadH6Rzqmwc2YZ1QXOziM84vQYDXyoGepBtn0=;
- b=sZQeC3kp5VT9+fdjDMEg2uIFJsS5nzoN4ub/5sQ5cfyM9br5EqOJl+Q5mgkp8z2TxXrtZdnUNNPZZ7jVM8DadQ57iAeoSAqrmBRA29QfgWgf9fmD+rlXdSJrG/eFglYt9vl90vNYURy8iFuJCl03GltljPfhoRedzNRVuXlNH2jFKERMi0oxMoTiS2gNaEVrE7p5bUoDqz5Zwuy+eXoHK4AKEx69VsgISpq+qWhxoN6bHpQfHNTRsj/RmxJ8jtXIh79bFEuq8ZaS3J3b5qsNRK1jLo0ZdLfcODhH/nbKLEpkeJfegHk0UXOxe7PMHsG1c3YQI9kDyJxvWG1g9f4u6g==
+ bh=zxcxAgBuaO9j+hcxrrxig7XYuhzpSqsDRdxv+wGjRRc=;
+ b=XJH8OYDRvL2S0QEfM7QeQe0T1ZZKrqKu9GzfDkAWjQnrm04XYNR2wmVVkKSl9MOMOlIuS/8hlL9VPxoNh7BVDc8vBxGJPkv9q3FDGSjnMFatV/op52ZOphmLOSRacPL1TOgfrDswY0iC+CeEePBPe21NbpYX9NB5eh7enEPmy6KAbgE4u07fUosC1WVkhyMjm5MXVIIkIaItTUjyHqhdV0Irq6bIJUCQe7UIVl9GJjFX/aOEWZE/GyLf96WGBGRHWKrCsToHIAhiBEYaofVPm73ZenE0NK2QJnBs8/3RavaW+4/LmmRVeIw/7r88i441YJjUOkbZbeXv+yfLJgPA+Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zi5QfgfadH6Rzqmwc2YZ1QXOziM84vQYDXyoGepBtn0=;
- b=CgbCudIe3oOPV1GJ8yKojHkNcPC+YMeD9zSzqHyOGZxdhPCJy9p+9YHyNd5xcf1dfpcPD+McbxTQhkmLFTgy0o56c1ACDHH/BaGFNnAI6dByn6/ns+IdtsmB7aJUN1/p7G/VP2JGzg/Mo+8oYnaX4dAMnZsnwkIeN3g3Vwh3PJrRzlmbyUAKOAL69QntTtgI7mPzjOXarWN/VtSWVUIyVDtCDpMpdN0J2Jc+81i7FYT6YpvWUiTrnK8QQ/IPhMAzcyGVEmzW6Nan6bhnRhFqa7ELL+94PKdu2rbneSB0KxQRlORtR17szl39KdwHcg7uHqSD4QeBbGRNoDPuUv1LvQ==
+ bh=zxcxAgBuaO9j+hcxrrxig7XYuhzpSqsDRdxv+wGjRRc=;
+ b=bXMq8d8xdULC2K0d9bCXRZyJB8BcroJT45SKnBZ+Lk8HySL9QrQsV7yLkI+xM5IBgMx0Q8YsY7iCrMvIHagSDG8TAWDUPBGKH2lbLPPLMO5q5kc/kjOZohRGkUYyd3i42YYRqnHu1Y238vEvxna/H+83HS4DZUVAFpvbT4q4cTK7yAD3u94fp7HWRpIP8gOeAdDliib5j2Dme2pDfp7iSWBjKJSctiJVgPsMXYNDRX4ENEQ/kRRCqhX5GFpMeePflgsfGtIMmEXzMKaG2C3VRpy2BtC3Sy8xNsmGv7G39WaU79yUCm8LT/TU5/WxPDEFxtCNQDvFFLvOHABZY2zHUg==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
  by PAXPR04MB9075.eurprd04.prod.outlook.com (2603:10a6:102:229::12) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.24; Mon, 26 Aug
- 2024 05:41:25 +0000
+ 2024 05:41:30 +0000
 Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
  ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
  ([fe80::a7c2:e2fa:8e04:40db%6]) with mapi id 15.20.7897.021; Mon, 26 Aug 2024
- 05:41:25 +0000
+ 05:41:30 +0000
 From: Wei Fang <wei.fang@nxp.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -73,9 +73,9 @@ Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	imx@lists.linux.dev
-Subject: [PATCH v3 net-next 1/2] dt-bindings: net: tja11xx: add "nxp,phy-output-refclk" property
-Date: Mon, 26 Aug 2024 13:26:59 +0800
-Message-Id: <20240826052700.232453-2-wei.fang@nxp.com>
+Subject: [PATCH v3 net-next 2/2] net: phy: c45-tja11xx: add support for outputing RMII reference clock
+Date: Mon, 26 Aug 2024 13:27:00 +0800
+Message-Id: <20240826052700.232453-3-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240826052700.232453-1-wei.fang@nxp.com>
 References: <20240826052700.232453-1-wei.fang@nxp.com>
@@ -92,130 +92,183 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|PAXPR04MB9075:EE_
-X-MS-Office365-Filtering-Correlation-Id: c5c9b415-ff34-4f26-15f0-08dcc591b942
+X-MS-Office365-Filtering-Correlation-Id: 7b6ee90b-dcfd-44dc-8814-08dcc591bc7b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|52116014|7416014|376014|1800799024|366016|921020|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?GhXqVvRJI7v7kTynTVaZoKQtPpC/TnM6mWJGvL+aOiGCdMbt5KMSpC+g3RbZ?=
- =?us-ascii?Q?5/BcgqwEVG+kkRh2dwJ3J1CaFz/Z6K2o2KrfT8JP+b5TQua6jxJBRYYoN6V0?=
- =?us-ascii?Q?EzVpT/apCYEBXnjepiY92rqeCvpfmgB0yT+59Ok58YSHnUwhy+tTjZdYY9Zm?=
- =?us-ascii?Q?VYwOcqoIC9gdAky4h+RCKQNikA7UNcba6spV4UhfWhFibZKAs31eNSbU/8/N?=
- =?us-ascii?Q?0UHcmgP7ijW77SncHWebwMw5nzg6bn//gZ0jqAxaqoG5drj6x9eZT1b64Nzr?=
- =?us-ascii?Q?Eh6+8TrgB1O8qx5+q8fdfLhdrjUH7sajBocs6hCmbDGW/P026Ir39nsLd0/U?=
- =?us-ascii?Q?FxTB5VV7d6HY7cE/RVVxpHhkYgKtVG9kRjfNNZptzOWlntG8+FocCmKPxGuV?=
- =?us-ascii?Q?Vpcs9803a3XI7XDpB0mK/JqURYQnxX2S4aXprr3jPe/COB7eaBM5FIjIuGQ2?=
- =?us-ascii?Q?JGTS2sNARZtrzVw/Hh1iZz1T23kyNNyvWn9CHaJ7b051njkBLymhQ/gyidpL?=
- =?us-ascii?Q?1lXoAB45LDKWNWS6aGrFrMu8tpcogKeW0scpgogIQ5QHZ2gK4caS0b8i6D2v?=
- =?us-ascii?Q?IJKmvf4PaSAg3sKBlZjWgKlw2xftTHXza9GYvaxHD/QgpF+JoS1m5sAkWupu?=
- =?us-ascii?Q?imjnc7IYSq1lYnTdhNq9SdVuKvbOoGz7R4jcWlsbY/J6EyJOWFT712siNfB7?=
- =?us-ascii?Q?qN5DnszbQb4VlJMtLqOBNER5kH2TKW4KgjF7adgLq2KQXnlYuYDFJVkZeDAz?=
- =?us-ascii?Q?MfZcmvHo8CBaidnZzbm4dzynkOf1wb992alZOpOMofOXwLObVBkwwaap2V2s?=
- =?us-ascii?Q?Vk8U+AusXlHb6G06FzApiGsl1mfTxJvlIaQy+3q6zCMKE+pJHcTeEGEtHWcB?=
- =?us-ascii?Q?x13bFib6LhtTAW+jQNNQYiOULZdnXV7CSnGs9dLHv76Y6kMiRQLWlC7iDeKa?=
- =?us-ascii?Q?lZokQjcY2gzZoJ+1qdzjnXu/fyT+97lDwuyu0hV2Ip8Lw78o0jCVY/soUJB0?=
- =?us-ascii?Q?+hx2Ilf63f50pCNe6KzQmmGPuQT6wNXCry31J9sepSay380WJD1ZQZe+itGz?=
- =?us-ascii?Q?zbFSKsnyXKD23ZcF8iFf98sSt59wMDE7YrLNXQm0bUj28TsaXGWnvkhXGwjP?=
- =?us-ascii?Q?ELD9OdNPrfM91rADpZ1qjmlUAE/ci7aMfCUbm+dtdg4TDkWGOKf3KO+6pcij?=
- =?us-ascii?Q?krydYlmhgAwye5C9Zx1Uv3t6i0eKQS1lGZuvX+cztfN9CE1N4kzwKZEMT4Ww?=
- =?us-ascii?Q?YFsnc/CUBrsFThlpFoi6OXvadzN0de0+L2IGSoJt+puIwXNgF1JmQOTVFmFL?=
- =?us-ascii?Q?bXaWC+FXpFPaAWonPldChau0Cqf81ePRFf5VOKWDvwkRxE03w+04JrLEvwz3?=
- =?us-ascii?Q?ETLJyLc2a8G5Y2+D+Lx/CjYsW6eq7NZDMJuRj1hVh94rZ8+fx3RFwn4SbCFW?=
- =?us-ascii?Q?9TG1+gW/zIU=3D?=
+	=?us-ascii?Q?hkBHz8jdCEYvmaIN7avpgNW3oCJ23P5JLRYyNsnDDu+h1Al7z8kr7gKRHqeV?=
+ =?us-ascii?Q?4mVlQN/K1Knk2s/TQo5mEv3Az1eKgr0wTXn7X7vilIw5UqOW2h8o7a7xeaAt?=
+ =?us-ascii?Q?gHCdDjwrnvaSkmpVRsVhHa7JzReyloqOW9g1f+R01xEGoftQIrj4vDKtMFM+?=
+ =?us-ascii?Q?Q++dgVQNUr6EDvELsDmQjQJlPvrbPzhnibHsaj87oFFEGrHNG7jrLeoJwYBJ?=
+ =?us-ascii?Q?mlTjpy8s4CttMV/W36rCg7GNnFAMTzyf3LjrbdOcj5vO6YJiqQbN3G2VVTY6?=
+ =?us-ascii?Q?N80e2YzP1Bk62LKluhtrccdILhBp5tvxzFv530M7LKtcPqF0wFUnuxKujYmS?=
+ =?us-ascii?Q?e/CdgFPk6FTLN07rtFFLlYXFlFBv3la2nmhaJYM9/Bs9tjEiStUhUEQ7g44a?=
+ =?us-ascii?Q?hXxQnpj7p5yf5NVY/ipoJgZ49ixvViwzDZyb9PYCXaef/8IPkgEEJXniFvyd?=
+ =?us-ascii?Q?CmYRwgpUH/EioWVAS1iqB+O9Znj9A4bcflSeMIuq8Qr/2LomVcft5JI6WXl3?=
+ =?us-ascii?Q?CGO1YLs5y/xxsNbawk1VdUpLifdVfqM+4vQ1qvi95hONup/smQD9ktacbS5t?=
+ =?us-ascii?Q?zXgOZCTzAb/bIiA6CEyK8CGf7rX4WVhq4DJiDWDoypvxBLnK2+8faHcHDZXo?=
+ =?us-ascii?Q?Zp93Kz7xot6gjtFOGLBK4dNkOP0wvnUIFDs1IDywe4dlKvZzwoggBuHsto/a?=
+ =?us-ascii?Q?6QIFOI+Ezr/oyhWzpspFXDWWQZPrpUecuvAHPvHAYhFVIe24bsauSxDntVgj?=
+ =?us-ascii?Q?LVLaoHBUO59frCyLOjtXG6vncb/RALQF5XmlS3k4i5pPoSSXZsjvV/vMGWPI?=
+ =?us-ascii?Q?/kGh++fce7tdtHO6B9Wz4/vzEhmfgPhogWE/xkopfg5Y3L2gt3br1ZYhASBW?=
+ =?us-ascii?Q?y4Q5R+E9/2f/mA9z7bQweD6rKBVHj+NAJDadmNFsE9UR2vsRj5pcgLXkjVYK?=
+ =?us-ascii?Q?GBJzr/eh8MkPkBd19RH7sVRqq3i2cau19YltQtAeO4GLQGDvM7uGOlyprkhO?=
+ =?us-ascii?Q?fv6cvNqGHoWJY6K3IAuHppv70t2wGWAveUD/J/V9ZN7qK94sBDBgavLnX9Ra?=
+ =?us-ascii?Q?rQxUDuokH31h1XRgkKSWTgSiv3M5V7QJ4DPyCR6XSv4KCnjCf9bdDYaYGUwi?=
+ =?us-ascii?Q?R3sP7upfr1/jbFm3co3RAOwwqj/xvXmSGL4gmBUYFvg2d464+eklAQFZBfPj?=
+ =?us-ascii?Q?xb5vhl+gGDuBeWTj0+AY4qpEymqcKJFW8Jc/tX+3XPQke16DnLj9p2JsJpJC?=
+ =?us-ascii?Q?opcBMX4XENpauGPk/L7PTF92nejExNVS+Wnv+YgNEZ9OBpY3Xuz/eRs+svjI?=
+ =?us-ascii?Q?KrU1M43jHzllXf3N4sbxz61NGGuHlyT5eEy0+gYpukOTjS3jV/ImuQ0fMgHW?=
+ =?us-ascii?Q?Wj64qFMNeVcPfWvXeGsMNEfaqDJIoHxuA+5M24tLeUs+n996OXPJ6sftqyb8?=
+ =?us-ascii?Q?QgoKLkQdQ8Q=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(376014)(1800799024)(366016)(921020)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?YJ3sp04ftqwKNcnqIb/dReDLfjLjL1YDpRZyJSf0jUUi4UVeEgMwhrGCHbyu?=
- =?us-ascii?Q?z07v2y8nmBESUIvV68cLThmhMuUOgnwhsE9IDb4JAL/gZqQz/ar/B41d7//s?=
- =?us-ascii?Q?Zq+ne+UXPi5OPvzvUSicCaEx+kMiW8Nu3TOQKiZLY/E70Y+6O35CGQKfaUms?=
- =?us-ascii?Q?W796yUumoNC5gOfu14L5iMd3c+QplY5XBCYl+ezKAVjFB2Hi4Kn7ySYP0SBN?=
- =?us-ascii?Q?rWbhoYgj1Q0vgDhlwGHEiPjgOgTUEL1aj/V7YLh9EFX4Y7yONT2WxnTy6jBD?=
- =?us-ascii?Q?1JeZuXqgoFS395KMWdCaeFHtjK8VeM/+dbfkhbXnuuE7AkOSTdal8vy6zbSk?=
- =?us-ascii?Q?NCwzb9rjE6EkGrYBH+0GAeFYgfXgVgiK6djydY04/Pi0mYQOqhisT0eeGCjb?=
- =?us-ascii?Q?PgViuR2NwpjFCGH89ApHi5xCm53B0WNagwBNXExyBHXV9WQwidFeROUvIKUl?=
- =?us-ascii?Q?OtqLuCehz83N7kSiBqzT72aJc/b8sF2HxHBI7VjrLnMslQHhbHH+AICnHhj/?=
- =?us-ascii?Q?GMXijLBYZZ9IdwImskqF1hOFcWXjMknVDYCQguwZccCmKvrubj6cZEOYHaKv?=
- =?us-ascii?Q?Y7I4DiFs2WjsSZDZBmkFaTS5IWRhuWkaCmOlA/oPhScCvbC6ftnWbt734jWl?=
- =?us-ascii?Q?KUYfB5M9WBmAnJ3lZdc1wb7bUi1tKgn96t4SpVFMf8KKsFvlmywK/cbJuef9?=
- =?us-ascii?Q?hnCQnRV+lJpJikMhi/6hKmzUro3hQULmfp+som7dlYp9z99gq0Rd5BiMEkvV?=
- =?us-ascii?Q?m5gh11T+rpNs9V2Zv5muW5T+P1m6OIHUMo3Yfngn6Pxiesl6oCoZi0y4Bth+?=
- =?us-ascii?Q?nBlOvTuktihE8uIzRqnLqkWycWpaAtglGQwGuIuupXRDSplUKPz4ymXc3rZn?=
- =?us-ascii?Q?tPZ9gcyY9LMvxDpFDh4Flti+/fW9DVXYTOQEpryicFM05dOoWKjROhOFQORh?=
- =?us-ascii?Q?qGM7+i//WQFwY6d2ylxE80i5gGP8rUM0YtSSuQbFxCQxJyigwPJs0IyAyBEm?=
- =?us-ascii?Q?Et2rSPOgtKM5adcm5bkKTLG/3brd3Uqt91soy+HoHxLg9x+3PRdAFY0Lryo4?=
- =?us-ascii?Q?UlH5YGvhS92LVuHTWqmF4tLAJYWHoLsBWgJDgaAhXl3QcDXEIAe5iuWAIYSp?=
- =?us-ascii?Q?zmGfskA1sBucSBCwKhZyFoUvXDLkxT87xfxu848il791+U8KKxik0/5ynZFi?=
- =?us-ascii?Q?V+KZVmfowte9wICTOQ6DJAyMjU1gs9c39DG8raCDEI+ITMGZ6MVeh9Marsos?=
- =?us-ascii?Q?SKQV/4bsOuu4uSOu5p0ua22UhzhsW54ecszabZl4plradctUBwxfHOUKfhPm?=
- =?us-ascii?Q?D2PEtTOb/sCOjbrkpkgr//klTucYo3NLhqKYrn+X9LW2mm6AnjGkIyDhMTCM?=
- =?us-ascii?Q?XI1teRHgF3Q1JpxYw4rPQOr/cbNXWE0sW9gHPOkquwsW7GVxPEojSXzF0Eq6?=
- =?us-ascii?Q?u7Yk05Rpqi3k0ptJB7Cv6FVi7UdME0oGiOj+F632H3kVS+4RMHm3l2rmXlPO?=
- =?us-ascii?Q?mUJPfR4P2WkZ9g718Ahvggchsq8ZxrTNBKI/HcQHDT9S3aGOmsPXxhBg+MhG?=
- =?us-ascii?Q?vM2iCSXIn7XUcVMKBphtn4Byci7Nfe5pn5wTw3gw?=
+	=?us-ascii?Q?b6ARr1nIVw0HwVX9eKOK8SY+3wV25akODtJ9HNprtixZp9pznvOgX1plTKME?=
+ =?us-ascii?Q?jmYlKw8HsFU603706VmxWoENdkemXi6GJ9EBgaq6QHM63QAB0YYBEHx1+6Yx?=
+ =?us-ascii?Q?oduWFnw2lAT7PqGR/LUHEaueqGXPl51gtp93j5UM9LHGrS2p52Bapm2o4dys?=
+ =?us-ascii?Q?I3uIxQOtkMXhmE0Jvy7KSkXwaHyotqDR01i6IZt86Gk0GQFt+mEt0eai04hE?=
+ =?us-ascii?Q?gHsZ4kDyvLuoUU2fvnzZjIHZq8zWQvEzRhRVrRGQ0vEudjtcOokP5qQw1Oaq?=
+ =?us-ascii?Q?dFsmyRVKzEEROhS0dJnsGEl0M+UZD5onSyWYfexeKFPgARiTR7YcUvBW9gQI?=
+ =?us-ascii?Q?b1uLrnLuiZ+eioQAJhycsDjdphe8JUIgBzeKNseaYDiVNcMPIRzp+p3JN0lH?=
+ =?us-ascii?Q?f1XmTUaxS4wlIBxr5fqCz41lmy/cIvqnC5kXhWKLiKQkhVJSb1updgX07Ais?=
+ =?us-ascii?Q?rprdh9+yD2EuKcYuISU4dJLO85aY+GIZY9htXLEjtk7dJYPxJGgD7QnmDS4f?=
+ =?us-ascii?Q?kEsyR/Z9s/3KdreSgSQw/R6w6HsA6o9MH4rQn7ZxeusxD7zMa9riryZo3p4w?=
+ =?us-ascii?Q?f29Ydm9gOUHxdGO0WwPUSOCfliTyjRHtt5aRGQYpVV1Jc59WjQ72j7juy8Am?=
+ =?us-ascii?Q?GVU+FszSEYXvMYCuRijdhG1rSoO2KFX0OGZQ8D9Sp3WutnTeTb65ITU5tXvK?=
+ =?us-ascii?Q?zz0AMzXsbz65olaocf707TKEVLD2TrYRKISWJwHF7BmPflNr4enkPP7ktlRA?=
+ =?us-ascii?Q?hsLfwt3SCzrhRdyBXaatV4QvnnM3XzeaKs368FhBWYyRI2gBdbicEVIVY4zo?=
+ =?us-ascii?Q?lvt297TBJihOWucy/UUBj4iIEnRA+ap7IhGE1WfdeXjHlN5+PTPkjp38aT0B?=
+ =?us-ascii?Q?uNKPs4LbiDR964cNPvl4337fq6IxC4WvgSSGtE/de4lqPMEiMfj0arb+oHG0?=
+ =?us-ascii?Q?QYFO88Qk7VMiQ515B2myNF7m4RbHTon79TmJqMR/ZA1WDY0ASdQKVl/ZVq+m?=
+ =?us-ascii?Q?fECgCZsRryBVpt+UtjYkFrcZwuYiBIIMaf0y+5mn3bya94AQ5kEdxSHgFcBs?=
+ =?us-ascii?Q?T7HZrOt6aeSRBlfPxkxVd0aC9RNS/BoZ73QNe9BK0rkqVqbsVU/M/2aMjbna?=
+ =?us-ascii?Q?jJ2BTTsVTVTtquIPNgW6VnglbZP6B9d0eFzxqUXtrmnq7Bm+RwsrEwxybbYr?=
+ =?us-ascii?Q?PlVXHyadlK4IgUFFmFmSbcscfhg7GBskrWUdl2e++TSCRTcMcpHwP8PE4m9U?=
+ =?us-ascii?Q?mBJkUCjrnz2WUR5cAqjY+GNp/LS63TGn5Z0zwjPBIl05dD14G+XHt4wrp6Qn?=
+ =?us-ascii?Q?U4W0sLqxU9nS6LGdJh3snrgWfpxw9KGI/HRshwRvEGL2OWc5fZ0ievT1WKjs?=
+ =?us-ascii?Q?hcIGKVEVBLfkWeUwttKOpkMMOU9DflUQnCgqfR4WitX0rYHuDiJQvFypqtqL?=
+ =?us-ascii?Q?Tm+cAYF2jiSyCR5vvFRjgJN1JaPpPaVIjrMQ6HCyxJqKZIEIxxy/9fPtWVSv?=
+ =?us-ascii?Q?wkpD8ntg2CIgq41txWdtIAb5ZfRChRm+fi/cGs6Gs9KSmscUFQOaYus+ABSh?=
+ =?us-ascii?Q?f2V3azTI7YO3vwfNmdNfGAThCMIXqQGkGGtYWjGf?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5c9b415-ff34-4f26-15f0-08dcc591b942
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7b6ee90b-dcfd-44dc-8814-08dcc591bc7b
 X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2024 05:41:25.0299
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2024 05:41:30.4414
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ig0o6x1DGxwbGes1n+Tpn9IoP+fI4RN0yZQdSpqwsUxncAB+qW9V68EcSL9IeYbh5i6/UCZ+Lc5qARvueZ+YIA==
+X-MS-Exchange-CrossTenant-UserPrincipalName: HzZeTTWmvsTW7s0MkC3WJ+ROm9eaHbcN8HgBaIXQKGrM/KkzGdW6kFFBkJ5LDNFgmoD0bTuEEyVBbWRA5ifRLg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB9075
 
-Per the RMII specification, the REF_CLK is sourced from MAC to PHY
-or from an external source. But for TJA11xx PHYs, they support to
-output a 50MHz RMII reference clock on REF_CLK pin. Previously the
-"nxp,rmii-refclk-in" was added to indicate that in RMII mode, if
-this property present, REF_CLK is input to the PHY, otherwise it
-is output. This seems inappropriate now. Because according to the
-RMII specification, the REF_CLK is originally input, so there is
-no need to add an additional "nxp,rmii-refclk-in" property to
-declare that REF_CLK is input.
-Unfortunately, because the "nxp,rmii-refclk-in" property has been
-added for a while, and we cannot confirm which DTS use the TJA1100
-and TJA1101 PHYs, changing it to switch polarity will cause an ABI
-break. But fortunately, this property is only valid for TJA1100 and
-TJA1101. For TJA1103/TJA1104/TJA1120/TJA1121 PHYs, this property is
-invalid because they use the nxp-c45-tja11xx driver, which is a
-different driver from TJA1100/TJA1101. Therefore, for PHYs using
-nxp-c45-tja11xx driver, add "nxp,phy-output-refclk" property to
-support outputting RMII reference clock on REF_CLK pin.
+For TJA11xx PHYs, they have the capability to output 50MHz reference
+clock on REF_CLK pin in RMII mode, which is called "revRMII" mode in
+the PHY data sheet.
 
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
 V2 changes:
-1. Change the property name from "nxp,reverse-mode" to
-"nxp,phy-output-refclk".
-2. Simplify the description of the property.
-3. Modify the subject and commit message.
+1. Change tihe property name.
+2. Modify the subject and commit message.
 V3 changes:
-1. Keep the "nxp,rmii-refclk-in" property for TJA1100 and TJA1101.
-2. Rephrase the commit message and subject.
+No changes.
 ---
- Documentation/devicetree/bindings/net/nxp,tja11xx.yaml | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/net/phy/nxp-c45-tja11xx.c | 29 +++++++++++++++++++++++++++--
+ drivers/net/phy/nxp-c45-tja11xx.h |  1 +
+ 2 files changed, 28 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml b/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml
-index 85bfa45f5122..f775036a7521 100644
---- a/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml
-+++ b/Documentation/devicetree/bindings/net/nxp,tja11xx.yaml
-@@ -48,6 +48,12 @@ patternProperties:
-           reference clock output when RMII mode enabled.
-           Only supported on TJA1100 and TJA1101.
+diff --git a/drivers/net/phy/nxp-c45-tja11xx.c b/drivers/net/phy/nxp-c45-tja11xx.c
+index 5af5ade4fc64..880d4ca883a8 100644
+--- a/drivers/net/phy/nxp-c45-tja11xx.c
++++ b/drivers/net/phy/nxp-c45-tja11xx.c
+@@ -10,6 +10,7 @@
+ #include <linux/kernel.h>
+ #include <linux/mii.h>
+ #include <linux/module.h>
++#include <linux/of.h>
+ #include <linux/phy.h>
+ #include <linux/processor.h>
+ #include <linux/property.h>
+@@ -185,6 +186,8 @@
  
-+      nxp,phy-output-refclk:
-+        type: boolean
-+        description: |
-+          Enable 50MHz RMII reference clock output on REF_CLK pin. This
-+          property is only applicable to nxp-c45-tja11xx driver.
+ #define NXP_C45_SKB_CB(skb)	((struct nxp_c45_skb_cb *)(skb)->cb)
+ 
++#define TJA11XX_REVERSE_MODE		BIT(0)
 +
-     required:
-       - reg
+ struct nxp_c45_phy;
  
+ struct nxp_c45_skb_cb {
+@@ -1510,6 +1513,7 @@ static int nxp_c45_get_delays(struct phy_device *phydev)
+ 
+ static int nxp_c45_set_phy_mode(struct phy_device *phydev)
+ {
++	struct nxp_c45_phy *priv = phydev->priv;
+ 	int ret;
+ 
+ 	ret = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_ABILITIES);
+@@ -1561,8 +1565,13 @@ static int nxp_c45_set_phy_mode(struct phy_device *phydev)
+ 			phydev_err(phydev, "rmii mode not supported\n");
+ 			return -EINVAL;
+ 		}
+-		phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_MII_BASIC_CONFIG,
+-			      MII_BASIC_CONFIG_RMII);
++
++		if (priv->flags & TJA11XX_REVERSE_MODE)
++			phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_MII_BASIC_CONFIG,
++				      MII_BASIC_CONFIG_RMII | MII_BASIC_CONFIG_REV);
++		else
++			phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_MII_BASIC_CONFIG,
++				      MII_BASIC_CONFIG_RMII);
+ 		break;
+ 	case PHY_INTERFACE_MODE_SGMII:
+ 		if (!(ret & SGMII_ABILITY)) {
+@@ -1623,6 +1632,20 @@ static int nxp_c45_get_features(struct phy_device *phydev)
+ 	return genphy_c45_pma_read_abilities(phydev);
+ }
+ 
++static int nxp_c45_parse_dt(struct phy_device *phydev)
++{
++	struct device_node *node = phydev->mdio.dev.of_node;
++	struct nxp_c45_phy *priv = phydev->priv;
++
++	if (!IS_ENABLED(CONFIG_OF_MDIO))
++		return 0;
++
++	if (of_property_read_bool(node, "nxp,phy-output-refclk"))
++		priv->flags |= TJA11XX_REVERSE_MODE;
++
++	return 0;
++}
++
+ static int nxp_c45_probe(struct phy_device *phydev)
+ {
+ 	struct nxp_c45_phy *priv;
+@@ -1642,6 +1665,8 @@ static int nxp_c45_probe(struct phy_device *phydev)
+ 
+ 	phydev->priv = priv;
+ 
++	nxp_c45_parse_dt(phydev);
++
+ 	mutex_init(&priv->ptp_lock);
+ 
+ 	phy_abilities = phy_read_mmd(phydev, MDIO_MMD_VEND1,
+diff --git a/drivers/net/phy/nxp-c45-tja11xx.h b/drivers/net/phy/nxp-c45-tja11xx.h
+index f364fca68f0b..8b5fc383752b 100644
+--- a/drivers/net/phy/nxp-c45-tja11xx.h
++++ b/drivers/net/phy/nxp-c45-tja11xx.h
+@@ -28,6 +28,7 @@ struct nxp_c45_phy {
+ 	int extts_index;
+ 	bool extts;
+ 	struct nxp_c45_macsec *macsec;
++	u32 flags;
+ };
+ 
+ #if IS_ENABLED(CONFIG_MACSEC)
 -- 
 2.34.1
 
