@@ -1,83 +1,86 @@
-Return-Path: <netdev+bounces-121842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C31C95F013
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 13:44:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1AF795F01E
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 13:47:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC5C6B228D4
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:44:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 136191C217E2
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:47:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DA7B155A53;
-	Mon, 26 Aug 2024 11:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79709156236;
+	Mon, 26 Aug 2024 11:47:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Jg+gnVXN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E/UmmYQo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E04154BFB
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 11:44:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B023C155A5D;
+	Mon, 26 Aug 2024 11:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724672663; cv=none; b=eG/pHtHRjKy/9oysNw4XuCxGQWQIH6dvodH4IaMOI1Z9AMprK6f/3TSZPSSHsNuaZ43U5khbjvECIyYjEtSAJ1RJ0TASPucKDPr3J7L305E5gxpe429k+UiJfEtM13/7UmcMhchHdSxTNETVO42G5vNNLY7cetSKnfCL3ugl3MU=
+	t=1724672828; cv=none; b=YoUPPTQ0x0U0R26dVZpEaH7JE4lHJ5/bDp+bir7FDWdx+PljCyk773ZN1Jc33iVNIJPp6fVU/1DknA+LY0qkVXNr8iEJyFcjIadP1hEXVXzMkpon3fAOZgvkdGLdyFj1c6kAsq1WqIeMpwcZcTKKRB/twCIUrBzEuFsx36NxcGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724672663; c=relaxed/simple;
-	bh=Q0WCBQ+YQhJIRNMx8ZqrxOmrXT56oBALfKJQmsCvtjk=;
+	s=arc-20240116; t=1724672828; c=relaxed/simple;
+	bh=FIp0iRgd7S3IbgZ7/Eu/tmSZWUh2umZ9WKVSWgKLxko=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gsFZXH7wawA0ZbtZ/+eqB7SL/8VgHINooHei6uorWW88zQ0gtzgBkMmmJvR+wBUsF+4rJfndtjpqaQffubiAwpZgkfIEkEHv9CUPy5BLYQiDZUCID5Rtnpb3ob5szofUsquX+BT1+Hxw06lK+foCSyF9bQO/RGomQjw4M7aIqTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Jg+gnVXN; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42ab880b73eso37694645e9.0
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 04:44:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724672659; x=1725277459; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rjUOttzFKwY2nuZEkD+CwQhqUwBV7ybSocpNKcj+DgY=;
-        b=Jg+gnVXN47c4XZ/bOLnGZ+jCShSixFgRKiR3S10+NjKVG8A3+nen0q0/G27JlnFSsZ
-         paZVCYJRR0pJZEtASFwZMWqjtEN9OfGX1HcXbb/nvHoQytjSMdEr88EqW6VwNcPY8SSN
-         E3W/u8C7vtgf0NeIo/8N9CoCnp9Kq6F+TwH2/gCQ0LhmLIsJFfm0eIL5MGSfHDkMHMDN
-         ZweNRtTmvN+HWVo5syRyXqq+o6J7O+BWpHRF3y4s6XSCW2p65muWqQp9tyzfW45k2w/0
-         AXyim/u8MDr98fCv36vXSI8D8fsCzi96j7BinzFzKhY9djvBoewLVHah8ELlu/UOPaHm
-         dbgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724672659; x=1725277459;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rjUOttzFKwY2nuZEkD+CwQhqUwBV7ybSocpNKcj+DgY=;
-        b=pN3r/GkJH7DSKElORBiLh3quOIxkORvJmjiqDs92JgGB/84M2nwVlcFV0x7hiFB/Ge
-         2/lZ7vXXaePpROwHqof2X8/JphEagE0t4x2SQjM2K7hTZSOq4U6B1X/1Gxsdput2DR/l
-         4Z6m/xY6oV7oenaFpF1x8YY6dWzq8Co4BT3TB+HVzC5KTMd2O/3mU0XI0TXYYZgNRNLN
-         pGgMx2uHm6o2hiJVdHOkRWdTk/ZdydDu4sbE6cNOhKwyF9g1GmSh8AcgnNXHuLRbf9p+
-         pE7rTCLSvder6acsQZhLjKC5Y7+n24+9uFXLKVldn9xIf9t2hkF4mbELbqd0jAL3bcoi
-         XqhA==
-X-Forwarded-Encrypted: i=1; AJvYcCU1u4t4ExRE6TCfBlsO76TUjgDkflHWV2nU+2NxzEwG3tYYj4Rjo1SRGXB7pF55qXEHodxNnPc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypmYJbuEHkH83RgqX8g+6vmGhMeAbQ+NrzQQtebu/PAuKpU54p
-	Lfwqtws7FCwEGRvu9uU8eXlADt3d/V5FyN1yK1HuyzY1vmDgTKfTLuijcN2SiLc=
-X-Google-Smtp-Source: AGHT+IEmvcGc7wd4ir9DzV0B4XPRNnCMACGg2Jljc1sciB66eE9kAhJjzoAZa61suLeAH/Jsj+VoBg==
-X-Received: by 2002:a05:600c:3b90:b0:426:6ed5:fd5 with SMTP id 5b1f17b1804b1-42acc8d35e0mr64320925e9.6.1724672659114;
-        Mon, 26 Aug 2024 04:44:19 -0700 (PDT)
-Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730811044bsm10569394f8f.23.2024.08.26.04.44.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 04:44:15 -0700 (PDT)
-Date: Mon, 26 Aug 2024 13:44:14 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Yan Zhen <yanzhen@vivo.com>
-Cc: chuck.lever@oracle.com, jlayton@kernel.org, trondmy@kernel.org,
-	anna@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, neilb@suse.de,
-	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com,
-	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
-Subject: Re: [PATCH v2] sunrpc: Fix error checking for d_hash_and_lookup()
-Message-ID: <ZsxqjkYDk1k0EbPn@nanopsycho.orion>
-References: <20240826112509.2368945-1-yanzhen@vivo.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QuEeRgxJ8RcYsT5DodVR9znrsYHyypYqf6qZEuMlkw3ydYiHjnt9TjOU8b2Ly8dAUaP0ngFFgukbriFAyLrC2ANWdSRDk9a43g2a8NJjQgZxMIWwlEfOUkV9vD+CM+YP5cBm1g1+eXiYnRnC8OLHpXIiBQykKNVUjby5jtJEntQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E/UmmYQo; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724672827; x=1756208827;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FIp0iRgd7S3IbgZ7/Eu/tmSZWUh2umZ9WKVSWgKLxko=;
+  b=E/UmmYQoqbVgT31qUeyHMzLt/YiSyBWy4eq6E9KY7yz1oTYrtFIG4k4a
+   iN/b3wtGVtwe+k6LYifyvHlycZ3r5FoZoA5hl1XspGcSvt+W/XDtYbBUC
+   nu5vW5Uv4LQQ65wkBEe7LLvRT3+aNUaxz2yHgrDi3eV2YHmV85n2jNAEs
+   x+Ye4/zd5g4db6iOLouDdUc7hQfyFMCW2Fj7eTW+eSc5iWxKkcGaNoldX
+   hKDZQnefdXUnropvh9i/NV8plXDJkz6Rwpq1CE1REeJhJXOlCOhMJ6Z/h
+   Ov+zuACgShuUiRYu/M1QWI/ha4GJOjrFNpqt4jc4+dw5mkRYrF4RUP+ou
+   w==;
+X-CSE-ConnectionGUID: hCtPuIcdSceOSxwPi+0D5w==
+X-CSE-MsgGUID: 08q8crEbRTWjAa2TitUnHA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11175"; a="23243771"
+X-IronPort-AV: E=Sophos;i="6.10,177,1719903600"; 
+   d="scan'208";a="23243771"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 04:47:06 -0700
+X-CSE-ConnectionGUID: NriRihhNQvW0cnXETzoSfw==
+X-CSE-MsgGUID: vO4WWXUwRQuZOP57+w9XPQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,177,1719903600"; 
+   d="scan'208";a="62183218"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 26 Aug 2024 04:47:00 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1siYBV-000H0F-2x;
+	Mon, 26 Aug 2024 11:46:57 +0000
+Date: Mon, 26 Aug 2024 19:46:22 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	wei.huang2@amd.com, vadim.fedorenko@linux.dev, horms@kernel.org,
+	bagasdotme@gmail.com, bhelgaas@google.com, lukas@wunner.de,
+	paul.e.luse@intel.com, jing2.liu@intel.com
+Subject: Re: [PATCH V4 07/12] PCI/TPH: Add pcie_tph_set_st_entry() to set ST
+ tag
+Message-ID: <202408261902.hGVx0hL8-lkp@intel.com>
+References: <20240822204120.3634-8-wei.huang2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,51 +89,105 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240826112509.2368945-1-yanzhen@vivo.com>
+In-Reply-To: <20240822204120.3634-8-wei.huang2@amd.com>
 
-Mon, Aug 26, 2024 at 01:25:09PM CEST, yanzhen@vivo.com wrote:
->The d_hash_and_lookup() function returns either an error pointer or NULL.
->
->It might be more appropriate to check error using IS_ERR_OR_NULL().
->
->Fixes: b7ade38165ca ("sunrpc: fixed rollback in rpc_gssd_dummy_populate()")
+Hi Wei,
 
-That certainly does not look correct.
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on pci/next]
+[also build test WARNING on pci/for-linus linus/master v6.11-rc5 next-20240826]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Huang/PCI-Introduce-PCIe-TPH-support-framework/20240826-121149
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/pci/pci.git next
+patch link:    https://lore.kernel.org/r/20240822204120.3634-8-wei.huang2%40amd.com
+patch subject: [PATCH V4 07/12] PCI/TPH: Add pcie_tph_set_st_entry() to set ST tag
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20240826/202408261902.hGVx0hL8-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240826/202408261902.hGVx0hL8-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408261902.hGVx0hL8-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/pci/pcie/tph.c:116:9: warning: result of comparison of constant 18446744073709551615 with expression of type 'typeof (_Generic((mask), char: (unsigned char)0, unsigned char: (unsigned char)0, signed char: (unsigned char)0, unsigned short: (unsigned short)0, short: (unsigned short)0, unsigned int: (unsigned int)0, int: (unsigned int)0, unsigned long: (unsigned long)0, long: (unsigned long)0, unsigned long long: (unsigned long long)0, long long: (unsigned long long)0, default: (mask)))' (aka 'unsigned int') is always false [-Wtautological-constant-out-of-range-compare]
+     116 |         val |= FIELD_PREP(mask, tag);
+         |                ^~~~~~~~~~~~~~~~~~~~~
+   include/linux/bitfield.h:115:3: note: expanded from macro 'FIELD_PREP'
+     115 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");    \
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/bitfield.h:72:53: note: expanded from macro '__BF_FIELD_CHECK'
+      72 |                 BUILD_BUG_ON_MSG(__bf_cast_unsigned(_mask, _mask) >     \
+         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+      73 |                                  __bf_cast_unsigned(_reg, ~0ull),       \
+         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      74 |                                  _pfx "type of reg too small for mask"); \
+         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:39:58: note: expanded from macro 'BUILD_BUG_ON_MSG'
+      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+         |                                     ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
+   include/linux/compiler_types.h:510:22: note: expanded from macro 'compiletime_assert'
+     510 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |         ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:498:23: note: expanded from macro '_compiletime_assert'
+     498 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |         ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:490:9: note: expanded from macro '__compiletime_assert'
+     490 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   1 warning generated.
 
 
->Signed-off-by: Yan Zhen <yanzhen@vivo.com>
->---
->
->Changes in v2:
->- Providing a "fixes" tag blaming the commit.
->
-> net/sunrpc/rpc_pipe.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->
->diff --git a/net/sunrpc/rpc_pipe.c b/net/sunrpc/rpc_pipe.c
->index 910a5d850d04..fd03dd46b1f2 100644
->--- a/net/sunrpc/rpc_pipe.c
->+++ b/net/sunrpc/rpc_pipe.c
->@@ -1306,7 +1306,7 @@ rpc_gssd_dummy_populate(struct dentry *root, struct rpc_pipe *pipe_data)
-> 
-> 	/* We should never get this far if "gssd" doesn't exist */
-> 	gssd_dentry = d_hash_and_lookup(root, &q);
->-	if (!gssd_dentry)
->+	if (IS_ERR_OR_NULL(gssd_dentry))
-> 		return ERR_PTR(-ENOENT);
-> 
-> 	ret = rpc_populate(gssd_dentry, gssd_dummy_clnt_dir, 0, 1, NULL);
->@@ -1318,7 +1318,7 @@ rpc_gssd_dummy_populate(struct dentry *root, struct rpc_pipe *pipe_data)
-> 	q.name = gssd_dummy_clnt_dir[0].name;
-> 	q.len = strlen(gssd_dummy_clnt_dir[0].name);
-> 	clnt_dentry = d_hash_and_lookup(gssd_dentry, &q);
->-	if (!clnt_dentry) {
->+	if (IS_ERR_OR_NULL(clnt_dentry)) {
-> 		__rpc_depopulate(gssd_dentry, gssd_dummy_clnt_dir, 0, 1);
-> 		pipe_dentry = ERR_PTR(-ENOENT);
-> 		goto out;
->-- 
->2.34.1
->
->
+vim +116 drivers/pci/pcie/tph.c
+
+    87	
+    88	/* Write ST to MSI-X vector control reg - Return 0 if OK, otherwise -errno */
+    89	static int write_tag_to_msix(struct pci_dev *pdev, int msix_idx, u16 tag)
+    90	{
+    91		struct msi_desc *msi_desc = NULL;
+    92		void __iomem *vec_ctrl;
+    93		u32 val, mask;
+    94		int err = 0;
+    95	
+    96		msi_lock_descs(&pdev->dev);
+    97	
+    98		/* Find the msi_desc entry with matching msix_idx */
+    99		msi_for_each_desc(msi_desc, &pdev->dev, MSI_DESC_ASSOCIATED) {
+   100			if (msi_desc->msi_index == msix_idx)
+   101				break;
+   102		}
+   103	
+   104		if (!msi_desc) {
+   105			err = -ENXIO;
+   106			goto err_out;
+   107		}
+   108	
+   109		/* Get the vector control register (offset 0xc) pointed by msix_idx */
+   110		vec_ctrl = pdev->msix_base + msix_idx * PCI_MSIX_ENTRY_SIZE;
+   111		vec_ctrl += PCI_MSIX_ENTRY_VECTOR_CTRL;
+   112	
+   113		val = readl(vec_ctrl);
+   114		mask = PCI_MSIX_ENTRY_CTRL_ST_LOWER | PCI_MSIX_ENTRY_CTRL_ST_UPPER;
+   115		val &= ~mask;
+ > 116		val |= FIELD_PREP(mask, tag);
+   117		writel(val, vec_ctrl);
+   118	
+   119		/* Read back to flush the update */
+   120		val = readl(vec_ctrl);
+   121	
+   122	err_out:
+   123		msi_unlock_descs(&pdev->dev);
+   124		return err;
+   125	}
+   126	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
