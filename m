@@ -1,913 +1,231 @@
-Return-Path: <netdev+bounces-122016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBA4C95F922
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 20:45:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CC8A95F92B
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 20:46:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 149C4B21D3C
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:45:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 422D0283BAB
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:46:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21ACA1991B0;
-	Mon, 26 Aug 2024 18:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09261991D0;
+	Mon, 26 Aug 2024 18:45:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="oAffj6ii"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lCOFhr4S";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="kb7C6eIa"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2088.outbound.protection.outlook.com [40.107.102.88])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C00C419923A
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 18:44:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D981881AB4;
+	Mon, 26 Aug 2024 18:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724697894; cv=fail; b=B6GpLxJvrLurKoaCMoEJTmZR/aNqkqg6mx2/Qo0k9wErBjsjj8G69cu2B7MqimTzmajJwXIWNxaYKyIfTPVvELNfCHgrorBbZ/DHgxouiRpVe9fTBGWavpor/SYRF3+xqQPYVFBE6Sgk23jYIigTAOr0JVbHRwwW1Q5oTfbR8iE=
+	t=1724697949; cv=fail; b=louyK9Qlvl/wDT5OrtLmLWlU6oyznjF7l7Q+RKpxRrR9g7GfG+3qxR5yoZGdZtH3pvOIuzjKovf0XuFFNSFOpQGCdGV5wvjLZ2cg7k/0tF1Jnpg3dac9fiOcKrx8dYSPhhRUEb97k5LtsZO2a0e5QO5O6Qi10+XgvweHN1Vw9Ws=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724697894; c=relaxed/simple;
-	bh=4vaDTsU4DbGjlm01nZ6OcOdhxKnQ7lm1q/PtT+tD9Dg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rh/VBMcJYJaDthqj8V/nxK8K12g72/yMLL2Y1xO55OqyfuLYNnwkFVh132VVwviIdguC9Edzgx5BRKqeptFsPO/DnBvB0dWiAYqInsAMsickBJIWEG466psiJFXPzDxgdU2zP3ykUN5hyqSyXi6g3unCStL6MpSqKR0D2yGbVqU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=oAffj6ii; arc=fail smtp.client-ip=40.107.102.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1724697949; c=relaxed/simple;
+	bh=8DIejaWgn46eu08WcqjJmr6osopvQWjxLfPz9E+Ibkc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=pEVb/daunCbHjY0l90FUUX/w6/PM2fIUYky06wyHHIY1pW87zomiSwKKueqPrQ5quQTczdrmsX+ZxO6TrOTQmXho7qftyWL0OCaAEnq5cSRq5Ye1RjndJtdRdAq+JFQZQseUlnwHnMNwSfdl82kJa46U7QxgTdKNJOgjEBPmW5k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lCOFhr4S; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=kb7C6eIa; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47QIfRU4027829;
+	Mon, 26 Aug 2024 18:45:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
+	date:from:to:cc:subject:message-id:references:content-type
+	:in-reply-to:mime-version; s=corp-2023-11-20; bh=Oi1GLmXbdvzbRwc
+	jVAWmUr4mmJM8fCIkRFRb4u0f1T8=; b=lCOFhr4S7vfwo7I+zwijXaUSy/TtZeE
+	qeENdzKnF24X5gBGtuYnuxSX6BlMLSYQDIw+NJ8wt4HMl2n/eLZBE4JGK6NtvB0H
+	ciKc3TExNQSzqHjLx3mO5H8/9sJuXwqNTMVFy2X/e568Q9uiKCOo99cn6aRUsTQz
+	3ctsTYVmCGJR43I7WYT+RYpTWK9vYP0U8wJP2l8dzmcoye0sH+5jEwxeRrmFBbEF
+	DFW0vSuxC0FWQK8FmxDaAJo25Q0POadAogB26Yy9tQOIL1gDKDZx69kSF4m43Jg1
+	inLySeWj4Dz8re4JB1Kegsi2ocekxmja6qoQBxAJ7OgKl4NF8Q8aRgw==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4177nabuvb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 26 Aug 2024 18:45:36 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 47QIJQJ8032460;
+	Mon, 26 Aug 2024 18:45:35 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2043.outbound.protection.outlook.com [104.47.55.43])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 418a0swmh0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 26 Aug 2024 18:45:35 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=o9e1/ZvOgVePAUo/KmrbDTT8zf0niByC5eGcUAJyeX5oKbYn3lWvf+gAdlwX2eera1UItRbWdwp+P6smyqzAYuYsv1J7lvv8IHc2+G+MrrA/Y5jXzZ1N9HMM2/Pcq9NFa2rj+8mL0AKC5L9UBr6Kq5Mf+NLadltT7/fNpZZJkFa7Trhon0TW/VMXkwH1/DQ1WWBDAW4B7bNq6NAahNBLVQBGopevNWNaaQOnBrUBmbYcBx1BCHu8HWE851r/3XMEx3FqMlZALolxzq7Vqs0f33tLENOP4ZMizWC4OgIsVHxTDUtYrx1ljd4VhpiNdA0/DzCZ43ZbiWUTEOS2xUSMLg==
+ b=WaH5mZBPnfo/8Dt9fDfdypGrbxb/v2FXwL6MqwzKTp/1CbXvY5AcchxbuYunuNzoIlQ8hULfO5Cw99nWekdUP66ojUoY03iCnJfqXgd54AAxdTEy2Zvgb6Rz0CH5Q+3M0D0eRqy/u6Hq9FmTzzgFqu29vTfOfuXHBKy0QqP2Jt1fBgE2CL19ly3CES6MiQJTOidJQjIxQNlLWDgC8kkvgtVp24V30WYP0pzZoXliblwOgN5OVMgfBozZheP3LlWth6xSp0hT1iB0xJgJXYb3z1M0a2zEaXToHJ/BlJwGfmFwvUEt+CaqM9lExO4335YIx6OUe8t7AHdNpH1Ith8hTg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8+/O3dsDeVs9DE9yomml/Sc0Pq2WT9cVXrmLZbt3dPU=;
- b=ZY+cGcYeI9i2tZBiC4OEpgl0Wyi1byCOkTCAXhXxKt1MHvKY5BENv+2V1FsUKd0nYl3b683zMgt6/2CHGpwFAelQ8VxSZIN+WJWMw4QidHseKb6ybXJ4CLZa6QjiMCk8w3zGZ39V135i2bvc19EIDixA7BWQDGy2RS87Yb7AWsBXrSZk3FaNAMSUoCNaWC84aJTbD8ZzrZZnlru7FiaKvBH3PrF9Dvlf4B8FgRaK+TUaxuQtbe2O89S9tQsdBDObnXGGntbiCtfOEaSUxae4jx1WCIBVM37oAaANnQE/zDRfHlCAtr455xn+eJ5tsd5ZtYZ/R0bjkPpjhoZIDFVJLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ bh=Oi1GLmXbdvzbRwcjVAWmUr4mmJM8fCIkRFRb4u0f1T8=;
+ b=HdB/1EaS0HmciCp1Bc+kwWHf/adu/80EcDeXcQ8dtoIGQLRmXUMT7kck+WuH8uuzKTHQD1HUNg7w0BzM7THx/9xQBwnuKi5rjqKXzdS9b9tTqY7VyrU/IEsFWfxCJj4KUcLjy3MENmLMi9J/+V1cwLsL5qGwWyZCqoNqDocXxq1RJXN9FYMO614yqK5swnueLUoB65+fN4fa+4sGVi5hpnveybsYCgd6AYpM/AVTKm1MbzIT7N8ufY3O9zJOZjzr5f4UVQXnnDLq8E8ymWjmWkpie/eAsbdZ6vxP8Sw6WeTUkpri7DwT6dgJ8Eil5Q8e39IOq5cMbldiX8PsJZKubw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8+/O3dsDeVs9DE9yomml/Sc0Pq2WT9cVXrmLZbt3dPU=;
- b=oAffj6iijcsbTHQQs9K7HF4mbOb9xTDmN2al8cOnNmZpnkW0uMbcxjOqHdL8fkr/hdlIa7xzGFk/aFTnE3u/eBtzNVWA8NYOAAPchDlKD/OgtmzZYJq6dQkhKZIo7XWdUAH1PpZjvW+mgyFYL0LvaNzSHnipifWGWBh/KJ0hnoo=
-Received: from CH0PR04CA0083.namprd04.prod.outlook.com (2603:10b6:610:74::28)
- by MW3PR12MB4474.namprd12.prod.outlook.com (2603:10b6:303:2e::7) with
+ bh=Oi1GLmXbdvzbRwcjVAWmUr4mmJM8fCIkRFRb4u0f1T8=;
+ b=kb7C6eIaE+uTZfe+nmf8/Igxf/inBjuQruClvwH8AF4FzDycqyQfxIpYH5nB2UwcGI9Ye1Kq7Qeo/mg91QHVj6rB56Z3Bc5vdezo2WHsilJ83OzEz0PlWGbc1v75u9Wot0151lwG/eP5c5QpmeKovesMuVsYGFo9bVTx3mlurCw=
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
+ by CY5PR10MB6263.namprd10.prod.outlook.com (2603:10b6:930:41::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.24; Mon, 26 Aug
- 2024 18:44:45 +0000
-Received: from CH1PEPF0000AD75.namprd04.prod.outlook.com
- (2603:10b6:610:74:cafe::26) by CH0PR04CA0083.outlook.office365.com
- (2603:10b6:610:74::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25 via Frontend
- Transport; Mon, 26 Aug 2024 18:44:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH1PEPF0000AD75.mail.protection.outlook.com (10.167.244.54) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Mon, 26 Aug 2024 18:44:45 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 26 Aug
- 2024 13:44:41 -0500
-From: Brett Creeley <brett.creeley@amd.com>
-To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>
-CC: <shannon.nelson@amd.com>, <brett.creeley@amd.com>
-Subject: [PATCH v2 net-next 5/5] ionic: convert Rx queue buffers to use page_pool
-Date: Mon, 26 Aug 2024 11:44:22 -0700
-Message-ID: <20240826184422.21895-6-brett.creeley@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20240826184422.21895-1-brett.creeley@amd.com>
-References: <20240826184422.21895-1-brett.creeley@amd.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.14; Mon, 26 Aug
+ 2024 18:44:55 +0000
+Received: from BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::743a:3154:40da:cf90]) by BN0PR10MB5128.namprd10.prod.outlook.com
+ ([fe80::743a:3154:40da:cf90%6]) with mapi id 15.20.7918.012; Mon, 26 Aug 2024
+ 18:44:55 +0000
+Date: Mon, 26 Aug 2024 14:44:52 -0400
+From: Chuck Lever <chuck.lever@oracle.com>
+To: A K M Fazla Mehrab <a.mehrab@bytedance.com>
+Cc: netdev@vger.kernel.org, kernel-tls-handshake@lists.linux.dev
+Subject: Re: [Patch net-next] net/handshake: use sockfd_put() helper
+Message-ID: <ZszNJBRScwD6pXPB@tissot.1015granger.net>
+References: <20240826182652.2449359-1-a.mehrab@bytedance.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240826182652.2449359-1-a.mehrab@bytedance.com>
+X-ClientProxiedBy: CH0PR03CA0067.namprd03.prod.outlook.com
+ (2603:10b6:610:cc::12) To BN0PR10MB5128.namprd10.prod.outlook.com
+ (2603:10b6:408:117::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD75:EE_|MW3PR12MB4474:EE_
-X-MS-Office365-Filtering-Correlation-Id: c38ab498-317f-49fd-ddf8-08dcc5ff2795
+X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|CY5PR10MB6263:EE_
+X-MS-Office365-Filtering-Correlation-Id: b3772222-0861-4941-482a-08dcc5ff2dca
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?LzM3tnxbqcy0AHh53GbZ1r/8tVs0zgvIXZqobLqufbSQMuD5hJViduGgm8NR?=
- =?us-ascii?Q?odeiW87vv9Z8aQiq+7GyNf9GCoRFSu0woN4SyLu0IlUBEgTGj3/XuFtHy/WY?=
- =?us-ascii?Q?mzoy6nyhKBDCsx0fGqr8C8KKopMUsSYZ2qhzP0fWS6lENmm4Kvvh2XHdm0LL?=
- =?us-ascii?Q?tYhU7nsGsHtm+M2dgJIvMgTgbNpshjiJXm3/JJcH1CPFW1qv4/Yns9tK5Q4V?=
- =?us-ascii?Q?9a6VIqiQuvHQLcoXwzXu4XRCSovxMsmqHHBZL/tXvm397aBbAndlbhzZml9H?=
- =?us-ascii?Q?rQ0W5FcvViqM0qdkB1L6u1eE1mhSu2t9iGQewZoY+BPvmoyx2h6qRRIIDBlz?=
- =?us-ascii?Q?f88RPdF7PNtpnbI+xKl78PqA31FO142mMwDX33Vkq+dedDOC6A+hVVnJ26jN?=
- =?us-ascii?Q?f+PET8TeiGaK0GVfp/y9mzOx5JZYkDUyeeTBfP+jt2aWNh8PW6oKiYPX56ta?=
- =?us-ascii?Q?Y3GC+yCIwQWeRl9n+Tf5oWYahBRHWwtdCbiEUXqlwzaEexnaUdLDbHZ9i2cY?=
- =?us-ascii?Q?9xQLEoXkLKdWYamX5qp5jZv+pe1lA0Fuw5t7IS3xGJvBb83lKcz+1yBxJgXA?=
- =?us-ascii?Q?o0vHV/5DM8jQIzrswI3Bb/bL9TNnAcIO2IZYJqGeVfIcBGL6Y4t1wUtvoKvL?=
- =?us-ascii?Q?c24hQ/ghbONKcfnGd+b0lzRIWiNSITrqJ8U3YLXT6m0yzDDlBrsk+CgkN1ns?=
- =?us-ascii?Q?7UfstUFylHNvsS3jjsIg1BDCspLGT4Fyt0Jt0woI2AOvc4KtXoaB1hPM9hYs?=
- =?us-ascii?Q?j6+mBihEWQlRsfC+q8wdLPblCjuqZNSn02ENJZ7WgNFZhcsz8Vj190tQfAAa?=
- =?us-ascii?Q?chRdsT98zbysA8bV9m/1Q4N4WpaA4TwO3BNXm5iU9GYSRCJTyZCZgxG3XNBw?=
- =?us-ascii?Q?qJ+ag+/Q11sRUUIVWeb9e4uO31ZojQWXxIIpqUCO1wvE6isoMeFh3y1frpad?=
- =?us-ascii?Q?qi8uiwhq/Rlea5jHk/IWp4tvWqlzaxpTQcnUH77DyhMjOgSdls4P3bQLvdKH?=
- =?us-ascii?Q?hikpnX7UdXAiGGVzNEqI4B19Tv7lH0Ar5i+PCnzbammrwTQGLuKq2El2IZ8b?=
- =?us-ascii?Q?d8xMHHonNt9gqogPyIArcGcOh62woG2t4cBZJ+YHvtkMB8Lz1I94HPcqD65O?=
- =?us-ascii?Q?aGTVWrH1VympeiRfcGQc+5T6KANEI4f7Hve+/vWTDTvPKjBpN9E8EA/uaMFi?=
- =?us-ascii?Q?tsEJ1SelfceftqtBt6PEk2z7nDxQVRRCk36o8ytssY9hZgabhvwf4J8ziXGU?=
- =?us-ascii?Q?wpV77N9bN6IYiobQOG/uwkrgKbuIexBSqOgcjFuXGO9vwCIBF4gzE8Ovdcx9?=
- =?us-ascii?Q?nWfqG6Ct+CQ88jdsQgQ+/DqkWBxIt73XaeFPCC9CLkoEhTtTieQSe09GyU+R?=
- =?us-ascii?Q?25aLIdmZ5cadcsxzwNI5Wd6rlRcJW4xUz0SOiXP6T+RH3sabmtOTJ9gd53Jh?=
- =?us-ascii?Q?h9Enn3xaBfaOE3Xz6XtjRhlLDaK5VY0v?=
+	=?us-ascii?Q?kRdT0h+no6PijmyJQEd0CXw6zhSAVDRg0ljZziO7Udtfk3+LWxzZ+W4MXJFD?=
+ =?us-ascii?Q?lQu1c9Gkr1+qMQk73XjI9zC5i2MVKOuJ81/S/rSkCvoo8jmrixgpFSxoqjW1?=
+ =?us-ascii?Q?cXOrvknbZvVrw2yl+2Y1EalgHXtPn1ORRgcdrdfTSJI3k5SRRovbH6Yykazg?=
+ =?us-ascii?Q?XUNl0TH9APm7o5GhOzcT8symx3P1NhxPAmTjV+K1uZle/tN35rHupyzl/h8V?=
+ =?us-ascii?Q?gbSMKkv8bdDUXGURPz4YjmiBOU7j4m9SdWbHC5Y9/Dl4Asxv9tmMszuRpCPq?=
+ =?us-ascii?Q?68IDJVB8QWL9GqVe2ZkKXGQGWvQ+Ol30wI8p3log2ll3FpJ/F11YSIvzqHJI?=
+ =?us-ascii?Q?dJdGrYDwkjiucWbEZ63z+/W1Twtk8WMD2st53R69P5DgCRrotSd4jFVDqywj?=
+ =?us-ascii?Q?FXp/kUA4YOUl/5vckPJTqMSZ0Ej3LmRqf59jrbm3Qv8pR0T8AvUT3Rycug6K?=
+ =?us-ascii?Q?/DH9SI/WaIZb/4Ijpzhn6HAf/KSlDOxe5CkWfRO0sb0CEbjZNBVb5PtGlx/Z?=
+ =?us-ascii?Q?m/ZcASoOKtFihf6b+WWB64UuRTdW81oP4IKp7QfrVjiEMI2ykwYJ/KZGuLpx?=
+ =?us-ascii?Q?Yj1CulRDnLbbFoOaypoT3DMZ6uqPskcy6fx2ByVLdcLkfnwDPE+rgbmKRl2u?=
+ =?us-ascii?Q?GzazvwUx24ISm2n41x7mp4y2BRcYfixsjgFwgy8s7RFB+UYTgb8UMC5l5+bc?=
+ =?us-ascii?Q?D2Zfop6pKtTSRgjE/j0fHvP9I9IGkGbazxnm8fe6FBS0FaB97A61N4lEoglY?=
+ =?us-ascii?Q?0NOaRb3PCtcGBiB59EPMKWb1tSbVWQhgLfF0ploFVU/5BaJHPgPFM6QWISC7?=
+ =?us-ascii?Q?tBBP2B5LuR8KHBLCqixL3xr3J/LQpx3Dpy7CS4MgFeXUML1WcmxGijjJxF9Z?=
+ =?us-ascii?Q?m79Nz8L/qDCwMiqwi1WRk4h4wGMZTweqfIL1zwexrReZ48euSKMekMj5kzEc?=
+ =?us-ascii?Q?rg0cZjrb4kd5d2GVOkdvCf0XeIrE2IEXQLTzIhvgBt5x7Kynp6Yq/vrla0Hd?=
+ =?us-ascii?Q?BmCpkEKv1ZAdYW3j+oGaI1XEhZc6OatgGieScgeFqo38zLxIf4lO6b/ZZw37?=
+ =?us-ascii?Q?uw7RBeqvzPh0a9W0/TMUoRNkwobU65VE+WcMFBkpNHyAuLWBc2xqXlDsc3ar?=
+ =?us-ascii?Q?9GdXAJoGOH7XVnRbyJSyy5G51wQMKUEF0qa+f0/6d+ScQpKFEGIoiLoPwwC6?=
+ =?us-ascii?Q?+nxnCUCt6IECO5RT5gP425K9FXGQz9/4BtIndVkydvWmS91RHyPG230xjK/k?=
+ =?us-ascii?Q?S9Yjx8NIFDwGrVWZRBwyb2TANNK8n1d/bJtFFTEdRJpmedllHUUr2IHEW7y9?=
+ =?us-ascii?Q?v0yQITw2CZ+04iO+7no5kQCqbiEnJi9XfJ1j73WLST2k1Q=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2024 18:44:45.0295
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?T4aJ8AauU9saNkM24s46BeOfZy6plbiMUZOPrjazvEcmQmOLxL26A+jd4TQN?=
+ =?us-ascii?Q?9NP1D1XZkSEw2nW6Pl3+h+ApgDK87criVno+b4wLA4shuKUOnRFeWK0jmxOc?=
+ =?us-ascii?Q?Eg2ANU9O40cFGTw5KyuPc/2QHS+ocZN7AkGt/0TOWldQNLcAa55oyDW+YAiV?=
+ =?us-ascii?Q?Tu6mfBxwUrUen1sfY7MlIHuzPQUxx4ddFXZWjAUXwTaIeRx+6DAvN711SfCt?=
+ =?us-ascii?Q?OhFyEktlW+WCCfLPpF22/UX80k2glNRGPo/TEwYdWa6soylbzHLFI6QQ+6zW?=
+ =?us-ascii?Q?6wkfEsEIQvlLikASqHmlUX3JBLLg+WB9BfKkM2rC2BRSi4zXz+rtq+wqqiBq?=
+ =?us-ascii?Q?FcaC7HFjVNteNUU+0a/Q+eiH/k80K2GxmjUq/OjWaBJEmzD8cBBB0GAMyFKl?=
+ =?us-ascii?Q?9JTOWVuqrtsjOm4OjwAvdfI3yXWHmfGWc26hbfX+qremmwSWo0YXIOb0suVm?=
+ =?us-ascii?Q?U6ovf5m52737TncCFx9CKgVBOGuPvQXw/n1EDTBK8o64VOj3/76M/LshXu3k?=
+ =?us-ascii?Q?j46vwh45jOb2pte8ZbOfydiqh+8T/9cuXMquzh48689s/bMZepvHLOnY7sBd?=
+ =?us-ascii?Q?dFrpI8O2jaY8yVxY8EtfHuW7/SRPiNUmlvfL3ibfcjniY65lpbF9egovvypJ?=
+ =?us-ascii?Q?FKLG8iooyJu7tNBspZiDFY+izbfsP/9Q54WzZ9tjMi5uYYgpYsYApVuhHORI?=
+ =?us-ascii?Q?gsMCCzzQb8U7jxEROgHuBo/GnhQehTNyl0l6l6LPis1ezfSa1sX74fX1AKSQ?=
+ =?us-ascii?Q?+IelJ2uwNU6id2AEC72Q2aE0Or+5qygC6PvlJTpErpkKpLapxI8EO8MSIQQ0?=
+ =?us-ascii?Q?WGv72029NpnhGGmlwWSY+eRTusqOvdlQv6czk8FPCjihaNk22I/FAQf3lWP7?=
+ =?us-ascii?Q?J2WXPH2TT+JwbbS68JfpVDn39SkBAwLyd+iTU7YNkIP0jWx4CDOHIi6UZej+?=
+ =?us-ascii?Q?IYvG+cU5txGXoeWzHCuZshCC7uq0C+N5XObrekWEsU7wpHagUTI31UhZgXeX?=
+ =?us-ascii?Q?T/qT6T8cVL9oXL7dWBdnaCoIoqV6xtGnrl3cBJgvlVduHH+Gu2Yy9w+w2yC0?=
+ =?us-ascii?Q?rUuFw9imx9PbJGWa6fA2GNwCdszcbwV5yk1oldddhDUJABZcNhyVXElu88oB?=
+ =?us-ascii?Q?785vnHv25TAQ4+4muLmrGZ9PbGFmZOQTXDMPfrvk9RRaV96frxvmnaeKJv6p?=
+ =?us-ascii?Q?KSP6Gyh3xsRK/FdYVicjGofhYMdUD7ykegO9bHwLD+u6m1NuM+jvwlGoPfEz?=
+ =?us-ascii?Q?wFIBe69Uh82EUrW3J8vATxCXjswT6IU+okfEBZItFJiseTqYlaJqdNTwH2Cz?=
+ =?us-ascii?Q?uGkpUcWsA+8G/u/kkdGLI+yrf6Qwiexh+/HmsbAcnlsK8pY8o/2uCALm1B6/?=
+ =?us-ascii?Q?2P6sSegg86tkCORPDuqOEWs5+ggIZE5PDvUjNuORO8sYnqzy0tSXdpFVOjTC?=
+ =?us-ascii?Q?txSXX0PxZtPBSEbZoY1KPyMcw1PftypEDVo8rzSK/P5jOaitcDd2nBmruHWY?=
+ =?us-ascii?Q?c3BAlG0GNLBw+DkvVP2MSI/9xtAmHfxxZdp8hlN1w8DRTqPFxfXvdOzAUyU6?=
+ =?us-ascii?Q?hAQBvmk5Ir2AX56Sy7vFGrAZwCyIf8kxOF6dp32k?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	Km0QrMp+M1z/O5Fn2zG+RNOLfs/vmC+K2KbjWBbqkYJ65dNdhoqw2B7ox3BpVDA4YXqyUaWECc5zNNU3aAVeida8HH890XqqYw6LxYhMaXGgr4U6Pg5V23ih5T9r53biQEjMyvIwHPFQ6tSRhmmN0AlD+b8+g3H4ohkNQ6foxHtoHIqO19pdM22ARl3VCshcYCl+DJX1DeK+BaVEqgice9D5tJRsgMQ987j9hVsKkGHC71QRDkQkMim5kqbaZ3KJoeco5l2sG+wYESmzn8xelCi4Zph5pNgm7ocQrgxDbHIAHTHbLau2yiwzkKGSTFvShEvy+ILWyhqdquXGeZxY4ufZrT0eNmdxi2FzAUmq/NUHqoWsxVBJM/+rRm9ACiR1E4UEoQACOPx1ALfa3X9x54jLAGA7zuGafQCMKkI90TGJZk37RUJ3Ycd2/eidMZQj/YNOokVDmoAVhUyUbpfYvsa+/DZeoUW0qm7LZZwnX6TG20WR0ncr09CtGvyUd6ceQJRXKPB0Cx2gU9XBzjLIcwyrEBFEElxWrbkTX6uMt5MlaNVROIskCWljWr4kUQCyc52rU0RXxKyRf9I81NjGYXEclzydTYsZGk4ZVOy4Wmo=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3772222-0861-4941-482a-08dcc5ff2dca
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2024 18:44:55.7183
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c38ab498-317f-49fd-ddf8-08dcc5ff2795
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD75.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4474
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MOz2ugfOJFkBF4yKYmjeNd7FNDhKqWKBAmDO18alR738pOYel8uJX/wocCJAN8GpaDRmijNUaF1Q9NDRVnZong==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR10MB6263
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-26_14,2024-08-26_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999 mlxscore=0
+ suspectscore=0 malwarescore=0 spamscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2407110000
+ definitions=main-2408260143
+X-Proofpoint-GUID: lli0KbDF70-CY_zrNfUEo5Q0BTodcxYc
+X-Proofpoint-ORIG-GUID: lli0KbDF70-CY_zrNfUEo5Q0BTodcxYc
 
-From: Shannon Nelson <shannon.nelson@amd.com>
+Hi-
 
-Our home-grown buffer management needs to go away and we need
-to be playing nicely with the page_pool infrastructure.  This
-converts the Rx traffic queues to use page_pool.
+On Mon, Aug 26, 2024 at 06:26:52PM +0000, A K M Fazla Mehrab wrote:
+> Replace fput() with sockfd_put() in handshake_nl_done_doit().
 
-Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-Signed-off-by: Brett Creeley <brett.creeley@amd.com>
----
- drivers/net/ethernet/pensando/Kconfig         |   1 +
- .../net/ethernet/pensando/ionic/ionic_dev.h   |  14 +-
- .../net/ethernet/pensando/ionic/ionic_lif.c   |  58 ++-
- .../net/ethernet/pensando/ionic/ionic_txrx.c  | 344 +++++++++---------
- 4 files changed, 221 insertions(+), 196 deletions(-)
+The patch description needs to explain why. Lacking any other
+context, I assume this is a clean-up for consistency with other
+sockfd_lookup() call sites and that no behavior change is expected.
 
-diff --git a/drivers/net/ethernet/pensando/Kconfig b/drivers/net/ethernet/pensando/Kconfig
-index 3f7519e435b8..01fe76786f77 100644
---- a/drivers/net/ethernet/pensando/Kconfig
-+++ b/drivers/net/ethernet/pensando/Kconfig
-@@ -23,6 +23,7 @@ config IONIC
- 	depends on PTP_1588_CLOCK_OPTIONAL
- 	select NET_DEVLINK
- 	select DIMLIB
-+	select PAGE_POOL
- 	help
- 	  This enables the support for the Pensando family of Ethernet
- 	  adapters.  More specific information on this driver can be
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.h b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-index 19ae68a86a0b..fc93c5c4dbe6 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
-@@ -182,9 +182,6 @@ struct ionic_qcq;
- 
- #define IONIC_MAX_BUF_LEN			((u16)-1)
- #define IONIC_PAGE_SIZE				PAGE_SIZE
--#define IONIC_PAGE_SPLIT_SZ			(PAGE_SIZE / 2)
--#define IONIC_PAGE_GFP_MASK			(GFP_ATOMIC | __GFP_NOWARN |\
--						 __GFP_COMP | __GFP_MEMALLOC)
- 
- #define IONIC_XDP_MAX_LINEAR_MTU	(IONIC_PAGE_SIZE -	\
- 					 (VLAN_ETH_HLEN +	\
-@@ -248,11 +245,6 @@ struct ionic_queue {
- 		struct ionic_rxq_desc *rxq;
- 		struct ionic_admin_cmd *adminq;
- 	};
--	union {
--		void __iomem *cmb_base;
--		struct ionic_txq_desc __iomem *cmb_txq;
--		struct ionic_rxq_desc __iomem *cmb_rxq;
--	};
- 	union {
- 		void *sg_base;
- 		struct ionic_txq_sg_desc *txq_sgl;
-@@ -261,8 +253,14 @@ struct ionic_queue {
- 	};
- 	struct xdp_rxq_info *xdp_rxq_info;
- 	struct bpf_prog *xdp_prog;
-+	struct page_pool *page_pool;
- 	struct ionic_queue *partner;
- 
-+	union {
-+		void __iomem *cmb_base;
-+		struct ionic_txq_desc __iomem *cmb_txq;
-+		struct ionic_rxq_desc __iomem *cmb_rxq;
-+	};
- 	unsigned int type;
- 	unsigned int hw_index;
- 	dma_addr_t base_pa;
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-index 4a7763ec061f..879f2e25ec31 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
-@@ -13,6 +13,7 @@
- #include <linux/cpumask.h>
- #include <linux/crash_dump.h>
- #include <linux/vmalloc.h>
-+#include <net/page_pool/helpers.h>
- 
- #include "ionic.h"
- #include "ionic_bus.h"
-@@ -439,6 +440,9 @@ static void ionic_qcq_free(struct ionic_lif *lif, struct ionic_qcq *qcq)
- 		qcq->sg_base_pa = 0;
- 	}
- 
-+	page_pool_destroy(qcq->q.page_pool);
-+	qcq->q.page_pool = NULL;
-+
- 	ionic_qcq_intr_free(lif, qcq);
- 	vfree(qcq->q.info);
- 	qcq->q.info = NULL;
-@@ -579,6 +583,33 @@ static int ionic_qcq_alloc(struct ionic_lif *lif, unsigned int type,
- 		goto err_out_free_qcq;
- 	}
- 
-+	if (type == IONIC_QTYPE_RXQ) {
-+		struct page_pool_params pp_params = {
-+			.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
-+			.order = 0,
-+			.pool_size = num_descs,
-+			.nid = NUMA_NO_NODE,
-+			.dev = lif->ionic->dev,
-+			.napi = &new->napi,
-+			.dma_dir = DMA_FROM_DEVICE,
-+			.max_len = PAGE_SIZE,
-+			.netdev = lif->netdev,
-+		};
-+		struct bpf_prog *xdp_prog;
-+
-+		xdp_prog = READ_ONCE(lif->xdp_prog);
-+		if (xdp_prog)
-+			pp_params.dma_dir = DMA_BIDIRECTIONAL;
-+
-+		new->q.page_pool = page_pool_create(&pp_params);
-+		if (IS_ERR(new->q.page_pool)) {
-+			netdev_err(lif->netdev, "Cannot create page_pool\n");
-+			err = PTR_ERR(new->q.page_pool);
-+			new->q.page_pool = NULL;
-+			goto err_out_free_q_info;
-+		}
-+	}
-+
- 	new->q.type = type;
- 	new->q.max_sg_elems = lif->qtype_info[type].max_sg_elems;
- 
-@@ -586,12 +617,12 @@ static int ionic_qcq_alloc(struct ionic_lif *lif, unsigned int type,
- 			   desc_size, sg_desc_size, pid);
- 	if (err) {
- 		netdev_err(lif->netdev, "Cannot initialize queue\n");
--		goto err_out_free_q_info;
-+		goto err_out_free_page_pool;
- 	}
- 
- 	err = ionic_alloc_qcq_interrupt(lif, new);
- 	if (err)
--		goto err_out_free_q_info;
-+		goto err_out_free_page_pool;
- 
- 	err = ionic_cq_init(lif, &new->cq, &new->intr, num_descs, cq_desc_size);
- 	if (err) {
-@@ -712,6 +743,8 @@ static int ionic_qcq_alloc(struct ionic_lif *lif, unsigned int type,
- 		devm_free_irq(dev, new->intr.vector, &new->napi);
- 		ionic_intr_free(lif->ionic, new->intr.index);
- 	}
-+err_out_free_page_pool:
-+	page_pool_destroy(new->q.page_pool);
- err_out_free_q_info:
- 	vfree(new->q.info);
- err_out_free_qcq:
-@@ -2677,15 +2710,15 @@ static int ionic_register_rxq_info(struct ionic_queue *q, unsigned int napi_id)
- 
- 	err = xdp_rxq_info_reg(rxq_info, q->lif->netdev, q->index, napi_id);
- 	if (err) {
--		dev_err(q->dev, "Queue %d xdp_rxq_info_reg failed, err %d\n",
--			q->index, err);
-+		netdev_err(q->lif->netdev, "q%d xdp_rxq_info_reg failed, err %d\n",
-+			   q->index, err);
- 		goto err_out;
- 	}
- 
--	err = xdp_rxq_info_reg_mem_model(rxq_info, MEM_TYPE_PAGE_ORDER0, NULL);
-+	err = xdp_rxq_info_reg_mem_model(rxq_info, MEM_TYPE_PAGE_POOL, q->page_pool);
- 	if (err) {
--		dev_err(q->dev, "Queue %d xdp_rxq_info_reg_mem_model failed, err %d\n",
--			q->index, err);
-+		netdev_err(q->lif->netdev, "q%d xdp_rxq_info_reg_mem_model failed, err %d\n",
-+			   q->index, err);
- 		xdp_rxq_info_unreg(rxq_info);
- 		goto err_out;
- 	}
-@@ -2855,7 +2888,16 @@ static int ionic_cmb_reconfig(struct ionic_lif *lif,
- 
- static void ionic_swap_queues(struct ionic_qcq *a, struct ionic_qcq *b)
- {
--	/* only swapping the queues, not the napi, flags, or other stuff */
-+	/* only swapping the queues and napi, not flags or other stuff */
-+	swap(a->napi,         b->napi);
-+
-+	if (a->q.type == IONIC_QTYPE_RXQ) {
-+		swap(a->q.page_pool, b->q.page_pool);
-+		a->q.page_pool->p.napi = &a->napi;
-+		if (b->q.page_pool)  /* is NULL when increasing queue count */
-+			b->q.page_pool->p.napi = &b->napi;
-+	}
-+
- 	swap(a->q.features,   b->q.features);
- 	swap(a->q.num_descs,  b->q.num_descs);
- 	swap(a->q.desc_size,  b->q.desc_size);
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index 858ab4fd9218..35e3751dd5a7 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -6,6 +6,7 @@
- #include <linux/if_vlan.h>
- #include <net/ip6_checksum.h>
- #include <net/netdev_queues.h>
-+#include <net/page_pool/helpers.h>
- 
- #include "ionic.h"
- #include "ionic_lif.h"
-@@ -118,108 +119,57 @@ static void *ionic_rx_buf_va(struct ionic_buf_info *buf_info)
- 
- static dma_addr_t ionic_rx_buf_pa(struct ionic_buf_info *buf_info)
- {
--	return buf_info->dma_addr + buf_info->page_offset;
-+	return page_pool_get_dma_addr(buf_info->page) + buf_info->page_offset;
- }
- 
--static unsigned int ionic_rx_buf_size(struct ionic_buf_info *buf_info)
-+static void __ionic_rx_put_buf(struct ionic_queue *q,
-+			       struct ionic_buf_info *buf_info,
-+			       bool recycle_direct)
- {
--	return min_t(u32, IONIC_MAX_BUF_LEN, IONIC_PAGE_SIZE - buf_info->page_offset);
--}
--
--static int ionic_rx_page_alloc(struct ionic_queue *q,
--			       struct ionic_buf_info *buf_info)
--{
--	struct device *dev = q->dev;
--	dma_addr_t dma_addr;
--	struct page *page;
--
--	page = alloc_pages(IONIC_PAGE_GFP_MASK, 0);
--	if (unlikely(!page)) {
--		net_err_ratelimited("%s: %s page alloc failed\n",
--				    dev_name(dev), q->name);
--		q_to_rx_stats(q)->alloc_err++;
--		return -ENOMEM;
--	}
--
--	dma_addr = dma_map_page(dev, page, 0,
--				IONIC_PAGE_SIZE, DMA_FROM_DEVICE);
--	if (unlikely(dma_mapping_error(dev, dma_addr))) {
--		__free_pages(page, 0);
--		net_err_ratelimited("%s: %s dma map failed\n",
--				    dev_name(dev), q->name);
--		q_to_rx_stats(q)->dma_map_err++;
--		return -EIO;
--	}
--
--	buf_info->dma_addr = dma_addr;
--	buf_info->page = page;
--	buf_info->page_offset = 0;
--
--	return 0;
--}
--
--static void ionic_rx_page_free(struct ionic_queue *q,
--			       struct ionic_buf_info *buf_info)
--{
--	struct device *dev = q->dev;
--
--	if (unlikely(!buf_info)) {
--		net_err_ratelimited("%s: %s invalid buf_info in free\n",
--				    dev_name(dev), q->name);
--		return;
--	}
--
- 	if (!buf_info->page)
- 		return;
- 
--	dma_unmap_page(dev, buf_info->dma_addr, IONIC_PAGE_SIZE, DMA_FROM_DEVICE);
--	__free_pages(buf_info->page, 0);
-+	page_pool_put_full_page(q->page_pool, buf_info->page, recycle_direct);
- 	buf_info->page = NULL;
-+	buf_info->len = 0;
-+	buf_info->page_offset = 0;
- }
- 
--static bool ionic_rx_buf_recycle(struct ionic_queue *q,
--				 struct ionic_buf_info *buf_info, u32 len)
--{
--	u32 size;
--
--	/* don't re-use pages allocated in low-mem condition */
--	if (page_is_pfmemalloc(buf_info->page))
--		return false;
--
--	/* don't re-use buffers from non-local numa nodes */
--	if (page_to_nid(buf_info->page) != numa_mem_id())
--		return false;
--
--	size = ALIGN(len, q->xdp_prog ? IONIC_PAGE_SIZE : IONIC_PAGE_SPLIT_SZ);
--	buf_info->page_offset += size;
--	if (buf_info->page_offset >= IONIC_PAGE_SIZE)
--		return false;
- 
--	get_page(buf_info->page);
-+static void ionic_rx_put_buf(struct ionic_queue *q,
-+			     struct ionic_buf_info *buf_info)
-+{
-+	__ionic_rx_put_buf(q, buf_info, false);
-+}
- 
--	return true;
-+static void ionic_rx_put_buf_direct(struct ionic_queue *q,
-+				    struct ionic_buf_info *buf_info)
-+{
-+	__ionic_rx_put_buf(q, buf_info, true);
- }
- 
- static void ionic_rx_add_skb_frag(struct ionic_queue *q,
- 				  struct sk_buff *skb,
- 				  struct ionic_buf_info *buf_info,
--				  u32 off, u32 len,
-+				  u32 headroom, u32 len,
- 				  bool synced)
- {
- 	if (!synced)
--		dma_sync_single_range_for_cpu(q->dev, ionic_rx_buf_pa(buf_info),
--					      off, len, DMA_FROM_DEVICE);
-+		page_pool_dma_sync_for_cpu(q->page_pool,
-+					   buf_info->page,
-+					   buf_info->page_offset + headroom,
-+					   len);
- 
- 	skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
--			buf_info->page, buf_info->page_offset + off,
--			len,
--			IONIC_PAGE_SIZE);
-+			buf_info->page, buf_info->page_offset + headroom,
-+			len, buf_info->len);
- 
--	if (!ionic_rx_buf_recycle(q, buf_info, len)) {
--		dma_unmap_page(q->dev, buf_info->dma_addr,
--			       IONIC_PAGE_SIZE, DMA_FROM_DEVICE);
--		buf_info->page = NULL;
--	}
-+	/* napi_gro_frags() will release/recycle the
-+	 * page_pool buffers from the frags list
-+	 */
-+	buf_info->page = NULL;
-+	buf_info->len = 0;
-+	buf_info->page_offset = 0;
- }
- 
- static struct sk_buff *ionic_rx_build_skb(struct ionic_queue *q,
-@@ -244,12 +194,13 @@ static struct sk_buff *ionic_rx_build_skb(struct ionic_queue *q,
- 		q_to_rx_stats(q)->alloc_err++;
- 		return NULL;
- 	}
-+	skb_mark_for_recycle(skb);
- 
- 	if (headroom)
- 		frag_len = min_t(u16, len,
- 				 IONIC_XDP_MAX_LINEAR_MTU + VLAN_ETH_HLEN);
- 	else
--		frag_len = min_t(u16, len, ionic_rx_buf_size(buf_info));
-+		frag_len = min_t(u16, len, IONIC_PAGE_SIZE);
- 
- 	if (unlikely(!buf_info->page))
- 		goto err_bad_buf_page;
-@@ -260,7 +211,7 @@ static struct sk_buff *ionic_rx_build_skb(struct ionic_queue *q,
- 	for (i = 0; i < num_sg_elems; i++, buf_info++) {
- 		if (unlikely(!buf_info->page))
- 			goto err_bad_buf_page;
--		frag_len = min_t(u16, len, ionic_rx_buf_size(buf_info));
-+		frag_len = min_t(u16, len, buf_info->len);
- 		ionic_rx_add_skb_frag(q, skb, buf_info, 0, frag_len, synced);
- 		len -= frag_len;
- 	}
-@@ -277,11 +228,13 @@ static struct sk_buff *ionic_rx_copybreak(struct net_device *netdev,
- 					  struct ionic_rx_desc_info *desc_info,
- 					  unsigned int headroom,
- 					  unsigned int len,
-+					  unsigned int num_sg_elems,
- 					  bool synced)
- {
- 	struct ionic_buf_info *buf_info;
- 	struct device *dev = q->dev;
- 	struct sk_buff *skb;
-+	int i;
- 
- 	buf_info = &desc_info->bufs[0];
- 
-@@ -292,54 +245,52 @@ static struct sk_buff *ionic_rx_copybreak(struct net_device *netdev,
- 		q_to_rx_stats(q)->alloc_err++;
- 		return NULL;
- 	}
--
--	if (unlikely(!buf_info->page)) {
--		dev_kfree_skb(skb);
--		return NULL;
--	}
-+	skb_mark_for_recycle(skb);
- 
- 	if (!synced)
--		dma_sync_single_range_for_cpu(dev, ionic_rx_buf_pa(buf_info),
--					      headroom, len, DMA_FROM_DEVICE);
-+		page_pool_dma_sync_for_cpu(q->page_pool,
-+					   buf_info->page,
-+					   buf_info->page_offset + headroom,
-+					   len);
-+
- 	skb_copy_to_linear_data(skb, ionic_rx_buf_va(buf_info) + headroom, len);
--	dma_sync_single_range_for_device(dev, ionic_rx_buf_pa(buf_info),
--					 headroom, len, DMA_FROM_DEVICE);
- 
- 	skb_put(skb, len);
- 	skb->protocol = eth_type_trans(skb, netdev);
- 
-+	/* recycle the Rx buffer now that we're done with it */
-+	ionic_rx_put_buf_direct(q, buf_info);
-+	buf_info++;
-+	for (i = 0; i < num_sg_elems; i++, buf_info++)
-+		ionic_rx_put_buf_direct(q, buf_info);
-+
- 	return skb;
- }
- 
- static void ionic_xdp_tx_desc_clean(struct ionic_queue *q,
--				    struct ionic_tx_desc_info *desc_info)
-+				    struct ionic_tx_desc_info *desc_info,
-+				    bool in_napi)
- {
--	unsigned int nbufs = desc_info->nbufs;
--	struct ionic_buf_info *buf_info;
--	struct device *dev = q->dev;
--	int i;
-+	struct xdp_frame_bulk bq;
- 
--	if (!nbufs)
-+	if (!desc_info->nbufs)
- 		return;
- 
--	buf_info = desc_info->bufs;
--	dma_unmap_single(dev, buf_info->dma_addr,
--			 buf_info->len, DMA_TO_DEVICE);
--	if (desc_info->act == XDP_TX)
--		__free_pages(buf_info->page, 0);
--	buf_info->page = NULL;
-+	xdp_frame_bulk_init(&bq);
-+	rcu_read_lock(); /* need for xdp_return_frame_bulk */
- 
--	buf_info++;
--	for (i = 1; i < nbufs + 1 && buf_info->page; i++, buf_info++) {
--		dma_unmap_page(dev, buf_info->dma_addr,
--			       buf_info->len, DMA_TO_DEVICE);
--		if (desc_info->act == XDP_TX)
--			__free_pages(buf_info->page, 0);
--		buf_info->page = NULL;
-+	if (desc_info->act == XDP_TX) {
-+		if (likely(in_napi))
-+			xdp_return_frame_rx_napi(desc_info->xdpf);
-+		else
-+			xdp_return_frame(desc_info->xdpf);
-+	} else if (desc_info->act == XDP_REDIRECT) {
-+		ionic_tx_desc_unmap_bufs(q, desc_info);
-+		xdp_return_frame_bulk(desc_info->xdpf, &bq);
- 	}
- 
--	if (desc_info->act == XDP_REDIRECT)
--		xdp_return_frame(desc_info->xdpf);
-+	xdp_flush_frame_bulk(&bq);
-+	rcu_read_unlock();
- 
- 	desc_info->nbufs = 0;
- 	desc_info->xdpf = NULL;
-@@ -363,9 +314,17 @@ static int ionic_xdp_post_frame(struct ionic_queue *q, struct xdp_frame *frame,
- 	buf_info = desc_info->bufs;
- 	stats = q_to_tx_stats(q);
- 
--	dma_addr = ionic_tx_map_single(q, frame->data, len);
--	if (!dma_addr)
--		return -EIO;
-+	if (act == XDP_TX) {
-+		dma_addr = page_pool_get_dma_addr(page) +
-+			   off + XDP_PACKET_HEADROOM;
-+		dma_sync_single_for_device(q->dev, dma_addr,
-+					   len, DMA_TO_DEVICE);
-+	} else /* XDP_REDIRECT */ {
-+		dma_addr = ionic_tx_map_single(q, frame->data, len);
-+		if (!dma_addr)
-+			return -EIO;
-+	}
-+
- 	buf_info->dma_addr = dma_addr;
- 	buf_info->len = len;
- 	buf_info->page = page;
-@@ -387,10 +346,21 @@ static int ionic_xdp_post_frame(struct ionic_queue *q, struct xdp_frame *frame,
- 		frag = sinfo->frags;
- 		elem = ionic_tx_sg_elems(q);
- 		for (i = 0; i < sinfo->nr_frags; i++, frag++, bi++) {
--			dma_addr = ionic_tx_map_frag(q, frag, 0, skb_frag_size(frag));
--			if (!dma_addr) {
--				ionic_tx_desc_unmap_bufs(q, desc_info);
--				return -EIO;
-+			if (act == XDP_TX) {
-+				struct page *pg = skb_frag_page(frag);
-+
-+				dma_addr = page_pool_get_dma_addr(pg) +
-+					   skb_frag_off(frag);
-+				dma_sync_single_for_device(q->dev, dma_addr,
-+							   skb_frag_size(frag),
-+							   DMA_TO_DEVICE);
-+			} else {
-+				dma_addr = ionic_tx_map_frag(q, frag, 0,
-+							     skb_frag_size(frag));
-+				if (dma_mapping_error(q->dev, dma_addr)) {
-+					ionic_tx_desc_unmap_bufs(q, desc_info);
-+					return -EIO;
-+				}
- 			}
- 			bi->dma_addr = dma_addr;
- 			bi->len = skb_frag_size(frag);
-@@ -488,8 +458,6 @@ static void ionic_xdp_rx_unlink_bufs(struct ionic_queue *q,
- 	int i;
- 
- 	for (i = 0; i < nbufs; i++) {
--		dma_unmap_page(q->dev, buf_info->dma_addr,
--			       IONIC_PAGE_SIZE, DMA_FROM_DEVICE);
- 		buf_info->page = NULL;
- 		buf_info++;
- 	}
-@@ -516,11 +484,9 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
- 	frag_len = min_t(u16, len, IONIC_XDP_MAX_LINEAR_MTU + VLAN_ETH_HLEN);
- 	xdp_prepare_buff(&xdp_buf, ionic_rx_buf_va(buf_info),
- 			 XDP_PACKET_HEADROOM, frag_len, false);
--
--	dma_sync_single_range_for_cpu(rxq->dev, ionic_rx_buf_pa(buf_info),
--				      XDP_PACKET_HEADROOM, frag_len,
--				      DMA_FROM_DEVICE);
--
-+	page_pool_dma_sync_for_cpu(rxq->page_pool, buf_info->page,
-+				   buf_info->page_offset + XDP_PACKET_HEADROOM,
-+				   frag_len);
- 	prefetchw(&xdp_buf.data_hard_start);
- 
- 	/*  We limit MTU size to one buffer if !xdp_has_frags, so
-@@ -542,15 +508,16 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
- 		do {
- 			if (unlikely(sinfo->nr_frags >= MAX_SKB_FRAGS)) {
- 				err = -ENOSPC;
--				goto out_xdp_abort;
-+				break;
- 			}
- 
- 			frag = &sinfo->frags[sinfo->nr_frags];
- 			sinfo->nr_frags++;
- 			bi++;
--			frag_len = min_t(u16, remain_len, ionic_rx_buf_size(bi));
--			dma_sync_single_range_for_cpu(rxq->dev, ionic_rx_buf_pa(bi),
--						      0, frag_len, DMA_FROM_DEVICE);
-+			frag_len = min_t(u16, remain_len, bi->len);
-+			page_pool_dma_sync_for_cpu(rxq->page_pool, bi->page,
-+						   buf_info->page_offset,
-+						   frag_len);
- 			skb_frag_fill_page_desc(frag, bi->page, 0, frag_len);
- 			sinfo->xdp_frags_size += frag_len;
- 			remain_len -= frag_len;
-@@ -569,14 +536,16 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
- 		return false;  /* false = we didn't consume the packet */
- 
- 	case XDP_DROP:
--		ionic_rx_page_free(rxq, buf_info);
-+		ionic_rx_put_buf_direct(rxq, buf_info);
- 		stats->xdp_drop++;
- 		break;
- 
- 	case XDP_TX:
- 		xdpf = xdp_convert_buff_to_frame(&xdp_buf);
--		if (!xdpf)
--			goto out_xdp_abort;
-+		if (!xdpf) {
-+			err = -ENOSPC;
-+			break;
-+		}
- 
- 		txq = rxq->partner;
- 		nq = netdev_get_tx_queue(netdev, txq->index);
-@@ -588,7 +557,8 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
- 					  ionic_q_space_avail(txq),
- 					  1, 1)) {
- 			__netif_tx_unlock(nq);
--			goto out_xdp_abort;
-+			err = -EIO;
-+			break;
- 		}
- 
- 		err = ionic_xdp_post_frame(txq, xdpf, XDP_TX,
-@@ -598,19 +568,17 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
- 		__netif_tx_unlock(nq);
- 		if (unlikely(err)) {
- 			netdev_dbg(netdev, "tx ionic_xdp_post_frame err %d\n", err);
--			goto out_xdp_abort;
-+			break;
- 		}
- 		ionic_xdp_rx_unlink_bufs(rxq, buf_info, nbufs);
- 		stats->xdp_tx++;
--
--		/* the Tx completion will free the buffers */
- 		break;
- 
- 	case XDP_REDIRECT:
- 		err = xdp_do_redirect(netdev, &xdp_buf, xdp_prog);
- 		if (unlikely(err)) {
- 			netdev_dbg(netdev, "xdp_do_redirect err %d\n", err);
--			goto out_xdp_abort;
-+			break;
- 		}
- 		ionic_xdp_rx_unlink_bufs(rxq, buf_info, nbufs);
- 		rxq->xdp_flush = true;
-@@ -619,15 +587,15 @@ static bool ionic_run_xdp(struct ionic_rx_stats *stats,
- 
- 	case XDP_ABORTED:
- 	default:
--		goto out_xdp_abort;
-+		err = -EIO;
-+		break;
- 	}
- 
--	return true;
--
--out_xdp_abort:
--	trace_xdp_exception(netdev, xdp_prog, xdp_action);
--	ionic_rx_page_free(rxq, buf_info);
--	stats->xdp_aborted++;
-+	if (err) {
-+		ionic_rx_put_buf_direct(rxq, buf_info);
-+		trace_xdp_exception(netdev, xdp_prog, xdp_action);
-+		stats->xdp_aborted++;
-+	}
- 
- 	return true;
- }
-@@ -673,7 +641,8 @@ static void ionic_rx_clean(struct ionic_queue *q,
- 	use_copybreak = len <= q->lif->rx_copybreak;
- 	if (use_copybreak)
- 		skb = ionic_rx_copybreak(netdev, q, desc_info,
--					 headroom, len, synced);
-+					 headroom, len,
-+					 comp->num_sg_elems, synced);
- 	else
- 		skb = ionic_rx_build_skb(q, desc_info, headroom, len,
- 					 comp->num_sg_elems, synced);
-@@ -794,6 +763,9 @@ void ionic_rx_fill(struct ionic_queue *q)
- 	struct ionic_buf_info *buf_info;
- 	unsigned int fill_threshold;
- 	struct ionic_rxq_desc *desc;
-+	unsigned int first_frag_len;
-+	unsigned int first_buf_len;
-+	unsigned int headroom = 0;
- 	unsigned int remain_len;
- 	unsigned int frag_len;
- 	unsigned int nfrags;
-@@ -811,35 +783,42 @@ void ionic_rx_fill(struct ionic_queue *q)
- 
- 	len = netdev->mtu + VLAN_ETH_HLEN;
- 
--	for (i = n_fill; i; i--) {
--		unsigned int headroom = 0;
--		unsigned int buf_len;
-+	if (q->xdp_prog) {
-+		/* Always alloc the full size buffer, but only need
-+		 * the actual frag_len in the descriptor
-+		 * XDP uses space in the first buffer, so account for
-+		 * head room, tail room, and ip header in the first frag size.
-+		 */
-+		headroom = XDP_PACKET_HEADROOM;
-+		first_buf_len = IONIC_XDP_MAX_LINEAR_MTU + VLAN_ETH_HLEN + headroom;
-+		first_frag_len = min_t(u16, len + headroom, first_buf_len);
-+	} else {
-+		/* Use MTU size if smaller than max buffer size */
-+		first_frag_len = min_t(u16, len, IONIC_PAGE_SIZE);
-+		first_buf_len = first_frag_len;
-+	}
- 
-+	for (i = n_fill; i; i--) {
-+		/* fill main descriptor - buf[0] */
- 		nfrags = 0;
- 		remain_len = len;
- 		desc = &q->rxq[q->head_idx];
- 		desc_info = &q->rx_info[q->head_idx];
- 		buf_info = &desc_info->bufs[0];
- 
--		if (!buf_info->page) { /* alloc a new buffer? */
--			if (unlikely(ionic_rx_page_alloc(q, buf_info))) {
--				desc->addr = 0;
--				desc->len = 0;
--				return;
--			}
--		}
--
--		/* fill main descriptor - buf[0]
--		 * XDP uses space in the first buffer, so account for
--		 * head room, tail room, and ip header in the first frag size.
--		 */
--		if (q->xdp_prog) {
--			buf_len = IONIC_XDP_MAX_LINEAR_MTU + VLAN_ETH_HLEN;
--			headroom = XDP_PACKET_HEADROOM;
--		} else {
--			buf_len = ionic_rx_buf_size(buf_info);
-+		buf_info->len = first_buf_len;
-+		frag_len = first_frag_len - headroom;
-+
-+		/* get a new buffer if we can't reuse one */
-+		if (!buf_info->page)
-+			buf_info->page = page_pool_alloc(q->page_pool,
-+							 &buf_info->page_offset,
-+							 &buf_info->len,
-+							 GFP_ATOMIC);
-+		if (unlikely(!buf_info->page)) {
-+			buf_info->len = 0;
-+			return;
- 		}
--		frag_len = min_t(u16, len, buf_len);
- 
- 		desc->addr = cpu_to_le64(ionic_rx_buf_pa(buf_info) + headroom);
- 		desc->len = cpu_to_le16(frag_len);
-@@ -850,16 +829,26 @@ void ionic_rx_fill(struct ionic_queue *q)
- 		/* fill sg descriptors - buf[1..n] */
- 		sg_elem = q->rxq_sgl[q->head_idx].elems;
- 		for (j = 0; remain_len > 0 && j < q->max_sg_elems; j++, sg_elem++) {
--			if (!buf_info->page) { /* alloc a new sg buffer? */
--				if (unlikely(ionic_rx_page_alloc(q, buf_info))) {
--					sg_elem->addr = 0;
--					sg_elem->len = 0;
-+			frag_len = min_t(u16, remain_len, IONIC_PAGE_SIZE);
-+
-+			/* Recycle any leftover buffers that are too small to reuse */
-+			if (unlikely(buf_info->page && buf_info->len < frag_len))
-+				ionic_rx_put_buf_direct(q, buf_info);
-+
-+			/* Get new buffer if needed */
-+			if (!buf_info->page) {
-+				buf_info->len = frag_len;
-+				buf_info->page = page_pool_alloc(q->page_pool,
-+								 &buf_info->page_offset,
-+								 &buf_info->len,
-+								 GFP_ATOMIC);
-+				if (unlikely(!buf_info->page)) {
-+					buf_info->len = 0;
- 					return;
- 				}
- 			}
- 
- 			sg_elem->addr = cpu_to_le64(ionic_rx_buf_pa(buf_info));
--			frag_len = min_t(u16, remain_len, ionic_rx_buf_size(buf_info));
- 			sg_elem->len = cpu_to_le16(frag_len);
- 			remain_len -= frag_len;
- 			buf_info++;
-@@ -889,17 +878,12 @@ void ionic_rx_fill(struct ionic_queue *q)
- void ionic_rx_empty(struct ionic_queue *q)
- {
- 	struct ionic_rx_desc_info *desc_info;
--	struct ionic_buf_info *buf_info;
- 	unsigned int i, j;
- 
- 	for (i = 0; i < q->num_descs; i++) {
- 		desc_info = &q->rx_info[i];
--		for (j = 0; j < ARRAY_SIZE(desc_info->bufs); j++) {
--			buf_info = &desc_info->bufs[j];
--			if (buf_info->page)
--				ionic_rx_page_free(q, buf_info);
--		}
--
-+		for (j = 0; j < ARRAY_SIZE(desc_info->bufs); j++)
-+			ionic_rx_put_buf(q, &desc_info->bufs[j]);
- 		desc_info->nbufs = 0;
- 	}
- 
-@@ -1172,7 +1156,7 @@ static void ionic_tx_clean(struct ionic_queue *q,
- 	struct sk_buff *skb;
- 
- 	if (desc_info->xdpf) {
--		ionic_xdp_tx_desc_clean(q->partner, desc_info);
-+		ionic_xdp_tx_desc_clean(q->partner, desc_info, in_napi);
- 		stats->clean++;
- 
- 		if (unlikely(__netif_subqueue_stopped(q->lif->netdev, q->index)))
+Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
+
+
+> Signed-off-by: A K M Fazla Mehrab <a.mehrab@bytedance.com>
+> ---
+>  net/handshake/netlink.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/handshake/netlink.c b/net/handshake/netlink.c
+> index 89637e732866..7e46d130dce2 100644
+> --- a/net/handshake/netlink.c
+> +++ b/net/handshake/netlink.c
+> @@ -153,7 +153,7 @@ int handshake_nl_done_doit(struct sk_buff *skb, struct genl_info *info)
+>  	if (!req) {
+>  		err = -EBUSY;
+>  		trace_handshake_cmd_done_err(net, req, sock->sk, err);
+> -		fput(sock->file);
+> +		sockfd_put(sock);
+>  		return err;
+>  	}
+>  
+> @@ -164,7 +164,7 @@ int handshake_nl_done_doit(struct sk_buff *skb, struct genl_info *info)
+>  		status = nla_get_u32(info->attrs[HANDSHAKE_A_DONE_STATUS]);
+>  
+>  	handshake_complete(req, status, info);
+> -	fput(sock->file);
+> +	sockfd_put(sock);
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.20.1
+> 
+
 -- 
-2.17.1
-
+Chuck Lever
 
