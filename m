@@ -1,56 +1,60 @@
-Return-Path: <netdev+bounces-122046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBB1E95FA9B
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 22:27:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 933AE95FAAF
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 22:32:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A1151C2202E
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 20:27:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50CF1282F03
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 20:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01741199EAB;
-	Mon, 26 Aug 2024 20:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528C378276;
+	Mon, 26 Aug 2024 20:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k2a1nGfK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LrHbPwdJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD5D194AEF;
-	Mon, 26 Aug 2024 20:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4BB364A9;
+	Mon, 26 Aug 2024 20:32:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724704047; cv=none; b=H15u1EANI7Ht4i4JyKFRc2uVn9TssTv4TTOaUtzUMBluxtjkbsLjop/wfSXGWKc/3Msj4I/4+KbutwD4VaaLl1Kucjene+23+DwoCLJHEcwFkPWM8r4nxEVJAXbIKsEWgkYGe4u9BJgiakCtaeuu/UEeyjFJGN9sd7pzFLRbOlo=
+	t=1724704324; cv=none; b=KrobGn+vARDNtVM+hi4DCxt6S8Fjy4+ISb1w5RKg86OhY+WMCAKN7XYg19Di8bZGsaGFYp1IggyyHDPQ5gq59DqTedJ+2zHhqzR/Bq70IZ7HVpi0djT0QCFdaVKhs2aU+bT6W2mqyOQMBA6r7GNGAGKggzmHdtsuFlHYSMOg3GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724704047; c=relaxed/simple;
-	bh=MoqD/ULYzH64mjaZLoArehxYZyBV1+b/qEHFGE/6NaA=;
+	s=arc-20240116; t=1724704324; c=relaxed/simple;
+	bh=KRvbs77WcqubEIb5cFwXXC969pdORBlApI9vgtpysrI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J6B/18NpzoM0GM8LuQ4y8KpUY6qxolNz2sTjCD+ucjhKg2sEt/rKACUMFehZcu/TOYsyG9P/DnEBr7STjE/1Il5YuGZNiasYuOK33Ia1AVMTu+KOoVvTPMyy6U4ciqK5szZv7HPqss/BingES6Z4kOmKaWyB5IJFqPrUc3q/vFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k2a1nGfK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 188C3C4DE1D;
-	Mon, 26 Aug 2024 20:27:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SNkNhcdfGfu3QJ1fdzUEXueut/eRNblBx+8hXb9wWpGirWJboN9S+HoGfcOEj9yT7PxNwQrHF/i4BVKbnRUSaY7HtsplL16oJE3UrUg2oJx8fKcAsNMdDH1JR7zpiXD8IEFMvj0gaWVUniSmvuM0DE1KAq5vaBGjmQ38wPc8mzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LrHbPwdJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66A23C4FEA1;
+	Mon, 26 Aug 2024 20:32:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724704047;
-	bh=MoqD/ULYzH64mjaZLoArehxYZyBV1+b/qEHFGE/6NaA=;
+	s=k20201202; t=1724704323;
+	bh=KRvbs77WcqubEIb5cFwXXC969pdORBlApI9vgtpysrI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k2a1nGfKF2klfKcTas97l1M+biwXg+6QC/R40bj9wCpHG+WMlXupg488iA6Wc3W5m
-	 X1FRL/jDT/SJmRszc7co0WSo+6yf0RoPq675pbMO28F5QDsRTxRDqgE7sLLvn9Eqec
-	 Qn7wwUVRkb23NlQb96ONkN8pJDGdjhuGBvh2yL7HJGO/RVz+hy/6Biq6TYu5dpC1ZI
-	 sDpjUCq+8TH+j4CkbbQdHX0pRVaw0elcad7wwDZ3WuQHN9du7oKZq35HuuLtEGfmWR
-	 T45CtOo9OogHSRsWllKQa+Okx01CWIPwTDnUNFZ8Ymsrzke+/WiLe1cN3CBUOaagmI
-	 Gke51eOqqYnKg==
-Date: Mon, 26 Aug 2024 13:27:26 -0700
+	b=LrHbPwdJH4Pcrap4QcPRL+M+eIoSjfgaN4PkLIKP40V41Ygy8RKYuthpSeLHjTLnU
+	 ntbV3JcHjuRSOBVfOwqy3wQ4jnswAeuGr3MKwYkGcviuhZci1qAV4Qt3E5gbF/Hn3G
+	 FU6mKlpoEFvP9IY636NTq26nXD+p7T8QQyPssFjKkcbaKuvUFY06M5co0dt19GXe6K
+	 nR3S8I/DdM7HRuGLSBilK2ke7K9r77HLQDNyspvrYAVChEfLoZntTQFmsRZukqHdGL
+	 y7AcN3KaukU5zyBD1Ew+3ePqZ2vbPDZS4rhEzN9HljCo0vQIJOTe1Z4I9P5l6Y+jIA
+	 WEmBsEc/ulSew==
+Date: Mon, 26 Aug 2024 13:32:02 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Yuesong Li <liyuesong@vivo.com>
-Cc: mark.einon@gmail.com, davem@davemloft.net, dumazet@google.com,
- pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
-Subject: Re: [PATCH net-next v2] et131x: Remove NULL check of list_entry()
-Message-ID: <20240826132726.25570e37@kernel.org>
-In-Reply-To: <20240823012737.2995688-1-liyuesong@vivo.com>
-References: <20240823012737.2995688-1-liyuesong@vivo.com>
+To: Josh Hunt <johunt@akamai.com>
+Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell
+ <ncardwell@google.com>, davem@davemloft.net, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/1] tcp: check skb is non-NULL in
+ tcp_rto_delta_us()
+Message-ID: <20240826133202.5e8507ec@kernel.org>
+In-Reply-To: <a76ac35a-9be2-4849-985c-2f3b2a922fa5@akamai.com>
+References: <20240823033444.1257321-1-johunt@akamai.com>
+	<20240823033444.1257321-2-johunt@akamai.com>
+	<CANn89iJ7uOFshDP_VE=OSKqkw_2=9iuRpHNUV_kzHhP-Xh2icg@mail.gmail.com>
+	<a76ac35a-9be2-4849-985c-2f3b2a922fa5@akamai.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,12 +64,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 23 Aug 2024 09:27:37 +0800 Yuesong Li wrote:
-> list_entry() will never return a NULL pointer, thus remove the
-> check.
+On Fri, 23 Aug 2024 12:43:36 -0700 Josh Hunt wrote:
+> Thanks Eric. I will resend and also check the commits you mentioned. I 
+> didn't include the writeup in the patch submission b/c it was rather 
+> long and detailed, but will include it in a v2.
 
-Unclear to me whether the intent of this code is to check for empty
-list or this is defensive programming. Let's leave it be.
--- 
-pw-bot: reject
+FWIW in linux networking we use the cover letter as the merge message,
+no matter how many patches there are. So both end up in git logs.
 
