@@ -1,121 +1,122 @@
-Return-Path: <netdev+bounces-121892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C84895F22F
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 14:56:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 19EA995F249
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 15:02:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 283152849E7
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 12:56:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBBE32811E8
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 13:02:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89CEB17C98A;
-	Mon, 26 Aug 2024 12:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA2817279E;
+	Mon, 26 Aug 2024 13:02:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Dvis41ie"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="xy6hpfPj"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out203-205-221-231.mail.qq.com (out203-205-221-231.mail.qq.com [203.205.221.231])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6352C172798;
-	Mon, 26 Aug 2024 12:54:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBFC17E1;
+	Mon, 26 Aug 2024 13:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.231
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724676881; cv=none; b=YIMpNnV1eoHHu7B6vJKAQrBJJ81hKmh9ebS3sOLRZ9C/FuoNYAxgoFKlybez9gRwMJVMNEdzJAhCUkClTYOOurPnMBuXzvI/b5F6O0ANHpKessnqywcW4mxkPe/+avAR3erS6+20WyV8SG73WbPk943Mtui45f2krh5i99pbthI=
+	t=1724677324; cv=none; b=nKwzU032D2x2+FXT8pUkWcYdmzMSptfg/wGLKJr1uPXn2pXgFa78qKBgJ5vp8Cf3SJTVxHXdUVTIzTJMmn3stb431EbFM96kP24vhFcC84oHk4T77m5RTLdaNtdWtS3NYRoCH5U/zWR6VtN7OUC3YetxzBwFm9UuC3nXw5On4I4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724676881; c=relaxed/simple;
-	bh=v88WBWfZpCdGdGKjwhtcFxY3n1G9uCQbsZZkbJ7RUPw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kL3pPtgJGD5Jg4hu7wnZVTizqmlym6kIHNWHbTqPvD6ouZxwgUs03JFrEDB5cqLRUXgBaiR9O8Sqp1WiZIQYm1XTpj6nDWPO3szF5IMkU5x3CUPnvbftyoCE6u0ei6TnTaghe3gTjXcT5y7ne1RU6fLgWDtrp/CzxhjA6pCKTxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Dvis41ie; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CRtm2k1gp7t1K52GzLSjl2RYWVeceIa4paPrEJiXqdM=; b=Dvis41ieXGf3GZmZ8nlqU2mofv
-	iqJgs/BcD5SiPsKrAUZm4LXcg9kuZI9klJoXzzSdrYrvtRV5DPwOSjH7LL2MGVZ3nARZri8snLsq6
-	QPBwElAWuI/7JDeN8AX3tKKfPrY2vSeqCyFlAQA34yTSVhW+dFHpNA8ZJYypuiVCt8WA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1siZEu-005i0i-Ff; Mon, 26 Aug 2024 14:54:32 +0200
-Date: Mon, 26 Aug 2024 14:54:32 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Imran Shaik <quic_imrashai@quicinc.com>
-Cc: Bjorn Andersson <andersson@kernel.org>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Ajit Pandey <quic_ajipan@quicinc.com>,
-	Taniya Das <quic_tdas@quicinc.com>,
-	Jagadeesh Kona <quic_jkona@quicinc.com>,
-	Satya Priya Kakitapalli <quic_skakitap@quicinc.com>,
-	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] clk: qcom: Add support for Global Clock
- Controller on QCS8300
-Message-ID: <049ee7d3-9379-4c8f-88ed-7aec03ad3367@lunn.ch>
-References: <20240822-qcs8300-gcc-v2-0-b310dfa70ad8@quicinc.com>
- <20240822-qcs8300-gcc-v2-2-b310dfa70ad8@quicinc.com>
- <bf5b7607-a8fc-49e3-8cf7-8ef4b30ba542@lunn.ch>
- <01c5178e-58fe-4c45-a82e-d0b6b6789645@quicinc.com>
+	s=arc-20240116; t=1724677324; c=relaxed/simple;
+	bh=ccZU3a24KVP9awOdU/7n6f47/VRFRXbCEIAY3d6o7uM=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=aKmyz7LXaLfdJZX+i+yBahaeN5GG8n2jvLLVZvqLfeuRVNJg2SURjjyKYKcInBleRwqHqCSQLW8t3LBr6AbSpweijtzZzIiMz9Zq/bdzwlqGa6xjJ6PlRgG4SDZqy7rxTJ7+r4yA1O3sybyQTst8D/jOOKkCteQTGsMwgoy8v7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=xy6hpfPj; arc=none smtp.client-ip=203.205.221.231
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1724677318; bh=bYvkknN4lY/PzXuYKt7WBFdDB1eWxCqDPPaUzeINxOc=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=xy6hpfPjzkgMBvmaUBrPaycYp9nNEGhhRSKOG4/JqoRZ3CrVGRQMqozXEsu0VguLx
+	 MqcdHp/oyz17Orx1w9Dl5kXaVjjviQqHEdruAXsrW9fK+UB4WNs+eGDVlIMtlkwlXk
+	 1UE0/tkCgR4v/W30NlEuW/QLEnY9PYFoFW4degZo=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
+	by newxmesmtplogicsvrsza15-1.qq.com (NewEsmtp) with SMTP
+	id 771A2A8; Mon, 26 Aug 2024 21:01:55 +0800
+X-QQ-mid: xmsmtpt1724677315tf7m5rx88
+Message-ID: <tencent_0AD5762F67E03DAB364097D036C04B367409@qq.com>
+X-QQ-XMAILINFO: M1rD3f8svNzn/LR6TrDyrzWLVwUKg8NNpXgZaDAVYEFwLZZeMd3vzd46K6TEU0
+	 As715XwSA+fYEH8z4PRxoThPD3Nh31bZFAvQrrPiqvl+/dxz6GtV0d9dTksZNhAnkhkSNZOrxBfZ
+	 Kcc4AHDgNWrIUmPo9BysEwTZvR3ZuXlTmEeOnHxUHuvlC4MeTuNL8jNUSU3UPwSi4Qm+rrx/I1ES
+	 ta7c01eQUbDsl93DrbeTCi6R7BbOJZKHaKBfOoTJragwAokkJYl1rui8yHWUw7qe74jHJCn/tVE2
+	 lTs+XVtaovVF8Vuw2lnjaO1n1yNAX0ddk1buNnTzeLUPqe/2aQOUFln+c2NoQGabjwUKYkOAQHRm
+	 M8CvOx0kincHPdexwMCaEg5V/Q9F0FFNY6WixYmWUm3mBHrFZtTbam2RQ78HvoTbt7CIAVNkTOn0
+	 EOcFduoxGpEySImtLsVjJITec9hUSf/+aMyggh1dKuB6ZhH/DO4F9euxl0DRYdYGGavzeqRPbAhB
+	 f3TFFx14+0P8txfU5kCGZVcpWFb3+DKF0TlHUiziuahm2jqzQ8pMeim7M7bSfwvS8QDrYFOqTYRQ
+	 K0A2dCOC+8jX2eIgk5quJ1rh1i7PMMw0BvO3cR690l8NLOkZkjcs1ZghB1Qsm1yU4h3PWMkVYVHM
+	 6IjKrHXh7pOYastXR6ZzxbPE0j+anASEDGcyhyhi8o4ogHmBT2/5tpsHg2Z6Flh21oTn3TBuDiPa
+	 LcZywsT2HENQJdC0q/CZUhTYBAh38wPPtKc0RBro3xYQw949HUHO8EP2YLeRX2XJHX3XDKS/hewb
+	 Vxc1Lx0fMOf8KFWdzPXN1vhSDpJvbjOV5rtMRyc5RQ14mw+eAQ8GJ3VxP3GA2hcs4mSrRTyc1MOZ
+	 5zDfBTZ3Ygglx6b9IONyiAl7aKXaa3Gpa0MVzCQAExEuEKtSVYhYioqI2PeDL3B0xdLRfCok5oEK
+	 v33Diw5YmdVYoxtfmI/1+SCUEduPx2ZqYPYQpO58ziMuIFdgF385rUCWd3DnReMMjf1/N1GHUg78
+	 Azmt4pKXYjWFlydpH3xIAdCSnWvuxgZAU1lzwdDfZeoz5/4B8pOiDjWonjo7c=
+X-QQ-XMRINFO: NyFYKkN4Ny6FSmKK/uo/jdU=
+From: Edward Adam Davis <eadavis@qq.com>
+To: gregkh@linuxfoundation.org
+Cc: eadavis@qq.com,
+	kvalo@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	sergei.shtylyov@gmail.com,
+	syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH V4 1/2] wifi: ath6kl: Replace ath6kl_usb_submit_ctrl_in with usb_control_msg_recv
+Date: Mon, 26 Aug 2024 21:01:55 +0800
+X-OQ-MSGID: <20240826130154.2706792-3-eadavis@qq.com>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <2024082631-upward-zips-f7b8@gregkh>
+References: <2024082631-upward-zips-f7b8@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01c5178e-58fe-4c45-a82e-d0b6b6789645@quicinc.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 26, 2024 at 04:25:39PM +0530, Imran Shaik wrote:
-> 
-> 
-> On 8/23/2024 1:29 AM, Andrew Lunn wrote:
-> > > +static int gcc_qcs8300_probe(struct platform_device *pdev)
-> > > +{
-> > > +	struct regmap *regmap;
-> > > +	int ret;
-> > > +
-> > > +	regmap = qcom_cc_map(pdev, &gcc_qcs8300_desc);
-> > > +	if (IS_ERR(regmap))
-> > > +		return PTR_ERR(regmap);
-> > > +
-> > > +	ret = qcom_cc_register_rcg_dfs(regmap, gcc_dfs_clocks,
-> > > +				       ARRAY_SIZE(gcc_dfs_clocks));
-> > > +	if (ret)
-> > > +		return ret;
-> > > +
-> > > +	/* Keep some clocks always enabled */
-> > 
-> > Sorry, but you need to explain why. Why cannot the camera driver
-> > enable these clocks when it loads? Why cannot the display driver
-> > enable these clocks when it loads.
-> > 
-> 
-> These clocks are recommended to be kept always ON as per the HW design and
-> also exposing clock structures and marking them critical in the kernel would
-> lead to redundant code. Based on previous discussions with clock
-> maintainers, it is recommended to keep such clocks enabled at probe and not
-> model them. This approach is consistently followed for all other targets as
-> well.
+ath6kl_usb_submit_ctrl_in() did not take into account the situation where
+the length of the data read from the device is not equal to the len, and
+such missing judgments will result in subsequent code using incorrect data.
 
-I don't see why it would add redundant code. It is a few lines of code
-in the driver, which every driver using clocks has. If you really
-don't want the clock turned off because it is unused, you can use
-CLK_IGNORE_UNUSED, along with a comment explaining why.
+usb_control_msg_recv() handles the abnormal length of the returned data,
+so using it directly can fix this warning.
 
-What i was actually guessing is that you don't actually have open
-drivers for these hardware blocks, just a blob running in user
-space. As such, it cannot turn the clocks on. If that is the case, i
-would much prefer you are honest about this, and document it.
+Reported-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+V4: Adjust indentation style
 
-	Andrew
+ drivers/net/wireless/ath/ath6kl/usb.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
+index 5220809841a6..0458b5a078e1 100644
+--- a/drivers/net/wireless/ath/ath6kl/usb.c
++++ b/drivers/net/wireless/ath/ath6kl/usb.c
+@@ -1027,9 +1027,10 @@ static int ath6kl_usb_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
+ 	int ret;
+ 
+ 	/* get response */
+-	ret = ath6kl_usb_submit_ctrl_in(ar_usb,
+-					ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
+-					0, 0, buf, len);
++	ret = usb_control_msg_recv(ar_usb->udev, 0,
++				ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
++				USB_DIR_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
++				0, 0, buf, len, 2000, GFP_KERNEL);
+ 	if (ret) {
+ 		ath6kl_err("Unable to read the bmi data from the device: %d\n",
+ 			   ret);
+-- 
+2.43.0
+
 
