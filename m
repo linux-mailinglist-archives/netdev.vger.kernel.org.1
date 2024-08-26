@@ -1,106 +1,92 @@
-Return-Path: <netdev+bounces-121767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D643995E6BB
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 04:34:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6CE395E70A
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 04:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BBFC1F21741
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 02:34:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25A731C20DEA
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 02:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D246C4C6C;
-	Mon, 26 Aug 2024 02:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uZ4ud1B+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D6E56FB0;
+	Mon, 26 Aug 2024 02:50:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC2A266A7;
-	Mon, 26 Aug 2024 02:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180BA10A0D;
+	Mon, 26 Aug 2024 02:50:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724639653; cv=none; b=shzR82yVtg7WpWB0Lgs4LSHkFmaIpGp5un9geQr6mP3134J/Fj8seAwqvTwAd22Rj7tp+oZ9XBs87wsLURtRhkOAXjgTR+pZUPfL5JSL1K7I/2+ufItv0Z1ZR1HYr3fl+RTWRNHOVEhz+wich2wyABO3cPzqFd7fSAYn9+FFG6g=
+	t=1724640615; cv=none; b=fwK0O6cEM6gOl1O4RFv4exVROoE/8CP1m3+RAHcyZjdZklLCm2Vf1jeFsCeRyQqQSngh/wJNPLWN71l+ahRovwaeNPeguxh1PnaezL5QCfVKP4zioVWZ7s/LNGo223lXwBmrElwB6XuC7rI9wPrOCoePDxX6Q57RnbNJ0laleOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724639653; c=relaxed/simple;
-	bh=XFwCdiRqD8KbMHhOnUn5gZn/z1fT216PI43Mv0zZByY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fk9ipTETyrkJUFV/dr3Q/eqWIftYqqm1C8w4oerBym8GzIyW3xjdvzDYKdU6F8TTgJAboo5saYH8fKsXNn4ODBwewCgd7Bdqt3lWqlgEfjHyx5/U1mVHt2XHTmlsDKLDMn2P0o1y3s/NspN5wYMSTL2RpNYCyNP785TBAn1dnF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uZ4ud1B+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=adFmv7fY6JyWCpgyvzJgNvSpo9ewuSk0pkwBsnmVVd4=; b=uZ4ud1B+yutGNlv1nD0CPgXKOF
-	6mQLu4bb94TOoyBVK9OVA0FVa8hALIfigVV2ZmgqFvIw2Swhxvs95sNM6X3tKk0v2M7Iab/ke1tfF
-	4HAiCV1rBNv2WIkdvUbWb+uMb2t/UC397dGsLF/WWrkU0gZaBqk7yWIdjtTkKBKSfrHQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1siPYF-005fNc-2d; Mon, 26 Aug 2024 04:33:51 +0200
-Date: Mon, 26 Aug 2024 04:33:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: andi.shyti@kernel.org, jarkko.nikula@linux.intel.com,
-	andriy.shevchenko@linux.intel.com, mika.westerberg@linux.intel.com,
-	jsd@semihalf.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, rmk+kernel@armlinux.org.uk,
-	piotr.raczynski@intel.com, linux-i2c@vger.kernel.org,
-	netdev@vger.kernel.org, mengyuanlou@net-swift.com,
-	duanqiangwen@net-swift.com
-Subject: Re: [PATCH net 0/3] Add I2C bus lock for Wangxun
-Message-ID: <55ff5570-5398-48e9-bf56-d34da197d175@lunn.ch>
-References: <20240823030242.3083528-1-jiawenwu@trustnetic.com>
- <888f78a9-dea9-4f66-a4d0-00a57039733d@lunn.ch>
- <01d701daf75c$50db4450$f291ccf0$@trustnetic.com>
+	s=arc-20240116; t=1724640615; c=relaxed/simple;
+	bh=GqGFZQDcvL+2MIMaoRg+JuCYCCKes0U3X6Wfu2zhcxA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lQw3+CBb8GdvgPbnPn2vJI/hyLvZyBmv0WLfzqWKR+8yCQjNjzO6aLtg3mLA1dWheR3YdvwaZEUcEddbIBEX+9uocIsHRiL4D6BE5vxw1T/O6Ayp6cP52J/U5bbWNLI7oz4UPGd+QmjIxg5G9KDvmGkrXEN5rk79xKlFfGMqVEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WsZlx63blz20mfg;
+	Mon, 26 Aug 2024 10:45:17 +0800 (CST)
+Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9FC2D14022F;
+	Mon, 26 Aug 2024 10:50:04 +0800 (CST)
+Received: from [10.67.111.104] (10.67.111.104) by
+ dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 26 Aug 2024 10:50:04 +0800
+Message-ID: <1b1ee6e6-ff2e-45d6-bfe2-1f8efaba7b38@huawei.com>
+Date: Mon, 26 Aug 2024 10:50:03 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01d701daf75c$50db4450$f291ccf0$@trustnetic.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 7/8] net/rxrpc: Use min() to simplify the code
+To: David Howells <dhowells@redhat.com>
+CC: <johannes@sipsolutions.net>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <allison.henderson@oracle.com>,
+	<dsahern@kernel.org>, <pshelar@ovn.org>, <linux-wireless@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <rds-devel@oss.oracle.com>, <dccp@vger.kernel.org>,
+	<dev@openvswitch.org>, <linux-afs@lists.infradead.org>
+References: <20240824074033.2134514-8-lihongbo22@huawei.com>
+ <20240824074033.2134514-1-lihongbo22@huawei.com>
+ <563923.1724501215@warthog.procyon.org.uk>
+Content-Language: en-US
+From: Hongbo Li <lihongbo22@huawei.com>
+In-Reply-To: <563923.1724501215@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500022.china.huawei.com (7.185.36.66)
 
-On Mon, Aug 26, 2024 at 10:04:42AM +0800, Jiawen Wu wrote:
-> On Mon, Aug 26, 2024 9:33 AM, Andrew Lunn wrote:
-> > On Fri, Aug 23, 2024 at 11:02:39AM +0800, Jiawen Wu wrote:
-> > > Sometimes the driver can not get the SFP information because the I2C bus
-> > > is accessed by the firmware at the same time.
-> > 
-> > Please could you explain this some more. What firmware?
+
+
+On 2024/8/24 20:06, David Howells wrote:
+> Hongbo Li <lihongbo22@huawei.com> wrote:
 > 
-> It's the firmware of our ethernet devices.
+>> -	summary.ack_reason = (sp->ack.reason < RXRPC_ACK__INVALID ?
+>> -			      sp->ack.reason : RXRPC_ACK__INVALID);
+>> +	summary.ack_reason = min(sp->ack.reason, RXRPC_ACK__INVALID);
 > 
-> > There some registers which are clear on read. They don't work when you
-> > have multiple entities reading them.
+> Can you use umin() rather than min(), please?
 > 
-> I'm not trying to multiple access the I2C registers, but these registers cannot
-> be accessed by other interfaces in the process of reading complete information
-> each time. So there is a semaphore needed that locks up the entire read process.
 
-More details please.
+I see reason is u8, so may I use min_t(u8, sp->ack.reason, 
+RXRPC_ACK__INVALID)?
 
-Linux assume it is driving the hardware. Your firmware cannot be
-touching any registers which will clear on read. QSFP states that
-registers 3-31 of page 0 are all clear on read, for example. The
-firmware should also not be setting any registers, otherwise you can
-confuse Linux which assumes registers it set stay set, because it is
-controlling the hardware.
-
-Your firmware also needs to handle that Linux can change the page. If
-the firmware changes the page, it must restore it back to whatever
-page Linux selected, etc.
-
-The fact you are submitting this for net suggests you have seen real
-issues. Please describe what those issues are.
-
-	Andrew
+Thanks,
+Hongbo
 
 
+> Thanks,
+> David
+> 
+> 
 
