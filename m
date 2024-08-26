@@ -1,247 +1,231 @@
-Return-Path: <netdev+bounces-121774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B17FE95E762
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 05:43:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9882895E775
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 05:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6907E281094
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:43:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 405FC1F214A7
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 03:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0642A33CE8;
-	Mon, 26 Aug 2024 03:43:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="mEVQTHYU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6784426289;
+	Mon, 26 Aug 2024 03:52:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2060.outbound.protection.outlook.com [40.107.255.60])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2960D63D;
-	Mon, 26 Aug 2024 03:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.255.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724643823; cv=fail; b=ppkfuGAnMbrcCYRM3XajmRjM1qYW67RXW0WBVRotag9WYGMal+8sOLXxBvh1SiXFToj/SQcFUr0YxL5KwCiMq39n2H7RZz+hHTad+Jn4ogWJ8+PpuhCUkRF4G2sgWHf1cSSPwzCmuOxpk04mMl5I5eQGzGu13oGqSHXS5mlOil0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724643823; c=relaxed/simple;
-	bh=IDfUZpuolrpGtoAQVSLc6s7JwWpprxnPH98xTULsb1I=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=BnGR1nPILGNFST6002I2W6sGgURsoFjJS2qk23q4mqYt24Z8WDcgHSjkt2cLY50CYwBI9kWA4CqSUlhy6BpvQJTR7wSceMsTrTOjCyCDFFFKR+EQsKy47W26t7Btz4yHIsoGRzvejfS1cx3rDquM5Zfz+DOVEiyXh0oOMZZPngo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=mEVQTHYU; arc=fail smtp.client-ip=40.107.255.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BVtDILPr/vOOTeFglgscmO8oRv4ZarEq3XsPvJUto+bSrdweLUWRkqiownzYr8OMsVg6Bvv9ArpRBbZbfY+7a2gGdVwlPIKyVTBv/r/a5/55srJqivirbFvITs0TUOCVCNaXO5HuXWVTpF5+6CauyMdM5ojC5N9bFnoaFSZLUyJ+SAN2uBXJB/bY3F9Lz+6GN6YawptWKEio1UjM5Nn0RsGRk1a77jAn1mFBOOqi15sAnLf1ONp22sPvY0JSitFHXXnM2bGoJn5MNwtH2FWio6b4rZanrJqc00EG9DgQ9vjl16lNX7wxblRNxeTnsIyKgWU0T3seVNUmmpycXPD5eQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fgRmxpZKj1DIlm79pMnh6mbofwI1l25XI13i8m+Og28=;
- b=sryU1lN/tHt8I6vejqsX8pZypw+KH9T4QEsesoki7gmx2vv/uqd549YW5YbLNUHZeqZAz6SF4cgXgou5BhkBsKWtE08PRyOYfwIl9I0vmB15x9oZ8ZQl0uCu3Ubu09u5iN9PKZCvrda3J0lbBunJJa/tws3ZFlQxhkpOOjE5jwZRUVqPNlz66BySAc3pEP9c7JH3wHDbVgMUmEyAOPcDdBv28t0FPKW7IIJNNAU37+x5sJM3dp8Q3hgqNr3y6qd9lBlBbGtfUiuHvk4NDqBVYccFcUoeTlKc2z61Jz8xASTYrdJf1hCyl5stthj+PDxsmXYJ1S92XPPuXCXSFqGjxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fgRmxpZKj1DIlm79pMnh6mbofwI1l25XI13i8m+Og28=;
- b=mEVQTHYU9djXwWF+aYN+ir7BrqOSfSgDCsZgjyImOSd8AUFLpRgbTSGBxB9RCXzktNk3vSivYKIDF0ANnQ4b9DztWgD1RDH9Svw6V+lfoWnQV3fgOFFLpeIJaGUxKvlafcRHZF3A3rGNi6BeyN83fckrzP9BXyaQLedMUW7SWNneRPj/+HdsLEWdgS1PuJh1/ikFc8PRs1kVUH9RVbjPXIr/ASAn2jwQViLDwLnKPVNuPbR5d/g8wH69McsFLJpea3JgkTpAlIqpJFA8csRmqFGQACzTTMcIFyVrHoxFJP9W3hxn4XMODPtfBq3Dj/iF54Q6c/HYt8vNZmVXrXBbww==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from KL1PR0601MB4113.apcprd06.prod.outlook.com (2603:1096:820:31::7)
- by SI6PR06MB7218.apcprd06.prod.outlook.com (2603:1096:4:24b::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.24; Mon, 26 Aug
- 2024 03:43:37 +0000
-Received: from KL1PR0601MB4113.apcprd06.prod.outlook.com
- ([fe80::7e85:dad0:3f7:78a1]) by KL1PR0601MB4113.apcprd06.prod.outlook.com
- ([fe80::7e85:dad0:3f7:78a1%4]) with mapi id 15.20.7897.021; Mon, 26 Aug 2024
- 03:43:37 +0000
-From: Yan Zhen <yanzhen@vivo.com>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	roopa@nvidia.com,
-	razor@blackwall.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	opensource.kernel@vivo.com,
-	Yan Zhen <yanzhen@vivo.com>
-Subject: [PATCH net-next v1] netfilter: Use kmemdup_array instead of kmemdup for multiple allocation
-Date: Mon, 26 Aug 2024 11:41:36 +0800
-Message-Id: <20240826034136.1791485-1-yanzhen@vivo.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI2PR02CA0003.apcprd02.prod.outlook.com
- (2603:1096:4:194::13) To KL1PR0601MB4113.apcprd06.prod.outlook.com
- (2603:1096:820:31::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3E41373;
+	Mon, 26 Aug 2024 03:52:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724644353; cv=none; b=i0+yDVeKAYjv5jm1PHhCfQhEJII7J8v+SpfdE31hYFwjCP8AZfhPdN7GMPDoUomUNzl7VMeVBAg07hIZ0eLRSGP5tTUmpF9XxfNLp38bndQILm1IrW4Sum+Rj0mFj3dX21eZFzfOilchAGqnnXYlmnBYj1VDpLXDeCUFlghgu5Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724644353; c=relaxed/simple;
+	bh=SD63059dnQ98be+o1rkrcvanrHAW1WbyLURqeN58Bfw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=nu/kem0/Vi24jjigocMX25+l45Z9T6MHGdEY5abJtn/O5HtulWVpmENkx3aoXTnKZdSqkPX+Jzog63UZXx4sTkxrljBfL82FoUbvV8D235zvTZdrb9ba8HUy+DkfNS87g8s3B+NQ+k35OBvQuR5/dmUg7rGInmpzRPRHMn2PNos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Wsc9f2yr1z1HHLW;
+	Mon, 26 Aug 2024 11:49:10 +0800 (CST)
+Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
+	by mail.maildlp.com (Postfix) with ESMTPS id A01361A0188;
+	Mon, 26 Aug 2024 11:52:27 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 26 Aug 2024 11:52:26 +0800
+Message-ID: <680d81a5-27e3-0d56-d53d-2159928e53ad@huawei.com>
+Date: Mon, 26 Aug 2024 11:52:25 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: KL1PR0601MB4113:EE_|SI6PR06MB7218:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8d6094ea-25ca-4998-4b40-08dcc5814464
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|52116014|1800799024|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0FqLaNbbgWUbBAMM3HoujyzgeSR1DhUJMInrH6rFdjSFHr/8gGE9OZEFy6JW?=
- =?us-ascii?Q?0N84CEaok+6w9HN1/C5YtsU63xedZglJ6/6zNjl3XuXiJBtncTjCFSzVCzro?=
- =?us-ascii?Q?Ty7BgARFIEXQ1movnPGr9X0J6hlr9vYjhhBegDqvNw/d4D4eY+Ybr57q48j4?=
- =?us-ascii?Q?3yJBwVL+oAcGBJT+pmzmcxCmuOHZr83ACwHIo8C2PlbywjHfwMaaNGolaw5/?=
- =?us-ascii?Q?o5jO2X/tcCumhgb57lMa7rt3uBQRIicpcTkfKP9i7D5Qy1PVr2TPlIwquFx7?=
- =?us-ascii?Q?UEITb4ytkwR76+F1ikvgXp6KJkm8Q9C0S/n50X0YuAFBBhw4KKgEoRfVKsEy?=
- =?us-ascii?Q?O4b2vza3CZR3RcEPmOsxO6yMP4Jf0LbMutOltlvukENiHqG3OWNx7Afg6XAR?=
- =?us-ascii?Q?72j25vKNYznp1+eWg7Yy7S1rabX/U0NlgAE65ZlHh1Itmta+D9R7ITLqxcMU?=
- =?us-ascii?Q?wH1m6Moe47p9dc43L+yzqZCBjRmx6cNv+2LenRDzr9dXJR7hJ1rYjQfp6Mwv?=
- =?us-ascii?Q?UdXc6PIBcGHCwKAbnwgpbUZJvXKzK4LwKMnbdqBDe+0qDRZakd4SADhxuRJr?=
- =?us-ascii?Q?u56SDbW1+xQdIxgquGGD4VCJpO9UvCmzsnheQkCaO+HUOff57qYEHPTL+i1h?=
- =?us-ascii?Q?vpd9uRy5rhPETwI/KickHKOT3jbGiC1dHVQ4Dl6ROrnrJI4pC0kTGk5/NjS7?=
- =?us-ascii?Q?V1mY/GZwVHldlRRQ7Y6Cym+vBLK3SDm8c2QPIwadvjx3hSGcsOldl0io1baF?=
- =?us-ascii?Q?j08Nmvb0iuFeVjvVjT2tvu4OB1BgFgAOHiE4iz0YD6ECevizMVsGYM5JkvQX?=
- =?us-ascii?Q?W1KIlkQZS3bLXK0gTQW1RasRHx3F+xXO1rZ0c6zNfxwU6t2fU+WN59LJLo53?=
- =?us-ascii?Q?K5lFqJqyAclDLov7ijFNURurRPeNzh2Vxur3Wj6e87/lGMcFPqS307Cm+Qb7?=
- =?us-ascii?Q?TVoNj2JWFrV8/D15wBTTnYxP4v+fApiJ3qupyJxMkKRA7fomyBWzDsSb2Gm8?=
- =?us-ascii?Q?p7duFYOnDklnAksUxniyi2gBMWMC14euhstKpVOIDsY5autq5pJdS2g+CU5o?=
- =?us-ascii?Q?H+mCdBX2kBDtI+/PswaFmfKRdLeV6y7eRC61qG2NNOaRb+XL0JUrDFaG/HF3?=
- =?us-ascii?Q?qCZjW+ukGZ8QOYUVlcV4xtVLPUOxeMRrNt1aYyvXn/wcFPnX+rV5EUSl+fle?=
- =?us-ascii?Q?s/fDEyz99xb7gMI22hffsWt89ER8hleA0410nAdkyj6vGlrWG+1+G/ifm1sG?=
- =?us-ascii?Q?91f0FQgadE13gBYwbFNzh6CB072yL/upHswPhABC96l57WYj39cnGEq19FMV?=
- =?us-ascii?Q?mLmnuSihNHDx3tZ5qLFYqkDOD/GHT53zk4gWEOSTCrYv2dfTf0acH7Agta51?=
- =?us-ascii?Q?qqWjMrLN7NmdBxEj6oa2+o1PE2Emb6pafeMM1KqnghrSI4sXQg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR0601MB4113.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(52116014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?QkTsT6En7Wsu2wZvH7KTgI4w/JgYCUpsfuLxAXPTdCLjselwNFrd+p+4Rs55?=
- =?us-ascii?Q?5pXs6kbUD6cjjt9WB7bLYo6US0k4rqSeS54F9LQGZOKGyI1dO8MzIcafIr3L?=
- =?us-ascii?Q?5kTfbGJd6JerhSjdJVyDdTVnAtgYqZ0uzmWFn4TuFoO+cOB3eBH3hUPm8kpu?=
- =?us-ascii?Q?4PrAzQ9P+/uSTkV3A8142JgFjZxu1HfICFaOav22HXBF/6REUXHsvw5fXvRG?=
- =?us-ascii?Q?8GadAqtOGE3o65SkD5/fpVq8/sbzfTvDIm0J+0FeR50e4AY6aTLU2niUbjIe?=
- =?us-ascii?Q?iHrMWvgyZSGmNc/D+DyEf+2uTJWbP33yZ8HKpvK0wbc/Fi2UHUAOqwYtg/F6?=
- =?us-ascii?Q?R+4Su3lOCIUGGBiI3Z7I9YtlykTwrZ3AnKIFk2g3ePuB9CypvRE0JRNH8Hpl?=
- =?us-ascii?Q?HwgE05FAq9hzOjpur2PSvo82rpHcP8pJMdGJZ7tA0lKpU3lwnIb0kd6IdidQ?=
- =?us-ascii?Q?+bxjXPQu3oDxmrG54mvu3agDGkgryCGZUYucI7RYr57Vc6lKcL6sIWUAOKU4?=
- =?us-ascii?Q?6WWFG2nE450UKlPZvlOLyKLFuS4klpt7RXKndp4JtAwVExUh3QrJnZV+lzc1?=
- =?us-ascii?Q?qmf+Lu2u8FC78cugple/Au4rWg6yzpWb+XZcLDQd0N4VSTeRxNsLE3ESCChX?=
- =?us-ascii?Q?3hj5vkvTi26oYfxMTc/JklFdQxnny0TIlC6gF1+4GH95jn+yTnPm/3R576JP?=
- =?us-ascii?Q?dI8fIC4oX2Bg/oAqLmVGj9XcfHPEn/3OMH4HKTFBpfk2dPyb/+322imkzs21?=
- =?us-ascii?Q?TfrvMx1nb9R0eqJeuW29625JoONJe2IQew24xGkhAqBehoWxljX3JNAlHcEm?=
- =?us-ascii?Q?iZpdvr2+ERiimP85sGPDDRjWPewztLn6p68Y4PQPqcMTxk5fSBqLfi0bjLEz?=
- =?us-ascii?Q?b4AuuIPmtjUHak4xyuuzOxoaPA9mcCDdQJt7gnrwX3KfEwSrCilKb/HBfyGy?=
- =?us-ascii?Q?klfE6Hx9zGDkXpJmCEI+e9RyCDMZAy1Sx1MckMFVIO2rHzFXnbiTcmZ7F3/u?=
- =?us-ascii?Q?v4wmR2GNoQdtkyYPD/7DqJgAhrTkmjPYvR5DumDxU2T4ZxgfzGgY5w/Q2XvP?=
- =?us-ascii?Q?s/wtUKz7hyV9a2G3q37HXF7llZ4+1PvSzFGuaPwEUhZjAyyid3/XlWLe1XZH?=
- =?us-ascii?Q?MOKRBgCYY+7p/qV2Pk7SLr8nwIfO+3C/9KFMJVPp1Fy8LUXyPB5+zoOwYT/D?=
- =?us-ascii?Q?SewGiwnz+WcSNSvgA6LsjVV2ObklmOwcpzd0QUsw3uqUPgQh+ChvRWOKgYvD?=
- =?us-ascii?Q?bZQ/4BXSo+whalhz74V+EsNb5UBXcVIZ2w8P7stBmoheliMlNa3iYbZFaApZ?=
- =?us-ascii?Q?MP4DQcUQ2IqrAEAkan9lNKC/GiItSnjaP7HsZ827RnHn5P/Vj3mJx9ogv3cp?=
- =?us-ascii?Q?mB1GjMj67lki5x2xnrWeNHuy7Q1wztVjiYfpfTT86Yp8yvGPHyaHZH7nNcAn?=
- =?us-ascii?Q?Q803AfjPqTecWcsvo7wclAlNcxi4bE2PCnlsmczEc9PwSu6sf2c2fDnSQsuE?=
- =?us-ascii?Q?6DecQl6VB+a3D9BdrvPdwO4kRgpK0i5FL6G+Ekh6Qwy3Wx0NFv79D1L0qHcF?=
- =?us-ascii?Q?t1Gogy/AtSOXIXolEFQNxXS7z3ru9Y2nMgudjUa5?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8d6094ea-25ca-4998-4b40-08dcc5814464
-X-MS-Exchange-CrossTenant-AuthSource: KL1PR0601MB4113.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Aug 2024 03:43:37.0058
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +N9HWk5/up3KSwlrIsAXVyEEkQVZNHO7XcPATPil68MQWE1arzH/G4yT+ffghczSuTBu6IpNyenLG8Ps3MEFkA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SI6PR06MB7218
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH -next] net: dsa: Simplify with scoped for each OF child
+ loop
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Jakub Kicinski <kuba@kernel.org>, <f.fainelli@gmail.com>,
+	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240820065804.560603-1-ruanjinjie@huawei.com>
+ <20240821171817.3b935a9d@kernel.org>
+ <2d67e112-75a0-3111-3f3a-91e6a982652f@huawei.com>
+ <20240822075123.55da5a5a@kernel.org>
+ <0d2ac86a-dc01-362a-e444-e72359d1f0b7@huawei.com>
+ <af8c128a-ff6c-4441-9ab5-c0401900db76@lunn.ch>
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+In-Reply-To: <af8c128a-ff6c-4441-9ab5-c0401900db76@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemh500013.china.huawei.com (7.202.181.146)
 
-When we are allocating an array, using kmemdup_array() to take care about
-multiplication and possible overflows.
 
-Also it makes auditing the code easier.
 
-Signed-off-by: Yan Zhen <yanzhen@vivo.com>
----
- net/bridge/netfilter/ebtables.c | 2 +-
- net/ipv4/netfilter/arp_tables.c | 2 +-
- net/ipv4/netfilter/ip_tables.c  | 2 +-
- net/ipv6/netfilter/ip6_tables.c | 2 +-
- net/netfilter/nf_nat_core.c     | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
+On 2024/8/26 7:28, Andrew Lunn wrote:
+> On Fri, Aug 23, 2024 at 02:35:04PM +0800, Jinjie Ruan wrote:
+>>
+>>
+>> On 2024/8/22 22:51, Jakub Kicinski wrote:
+>>> On Thu, 22 Aug 2024 10:07:25 +0800 Jinjie Ruan wrote:
+>>>> On 2024/8/22 8:18, Jakub Kicinski wrote:
+>>>>> On Tue, 20 Aug 2024 14:58:04 +0800 Jinjie Ruan wrote:  
+>>>>>> Use scoped for_each_available_child_of_node_scoped() when iterating over
+>>>>>> device nodes to make code a bit simpler.  
+>>>>>
+>>>>> Could you add more info here that confirms this works with gotos?
+>>>>> I don't recall the details but I thought sometimes the scoped
+>>>>> constructs don't do well with gotos. I checked 5 random uses
+>>>>> of this loop and 4 of them didn't have gotos.  
+>>>>
+>>>> Hi, Jakub
+>>>>
+>>>> From what I understand, for_each_available_child_of_node_scoped() is not
+>>>> related to gotos, it only let the iterating child node self-declared and
+>>>> automatic release, so the of_node_put(iterating_child_node) can be removed.
+>>>
+>>> Could you either test it or disasm the code to double check, please?
+>>
+>> Hi, Jakub, I test it with a fake device node on QEMU with a simple
+>> example using for_each_available_child_of_node_scoped() and goto out of
+>> the scope of for_each_available_child_of_node_scoped(), the
+>> of_node_put(child) has been called successfully.
+> 
+> What compiler version?
+> 
+> Please test with 5.1
 
-diff --git a/net/bridge/netfilter/ebtables.c b/net/bridge/netfilter/ebtables.c
-index cbd0e3586c3f..3e67d4aff419 100644
---- a/net/bridge/netfilter/ebtables.c
-+++ b/net/bridge/netfilter/ebtables.c
-@@ -1256,7 +1256,7 @@ int ebt_register_table(struct net *net, const struct ebt_table *input_table,
- 		goto free_unlock;
- 	}
- 
--	ops = kmemdup(template_ops, sizeof(*ops) * num_ops, GFP_KERNEL);
-+	ops = kmemdup_array(template_ops, num_ops, sizeof(*ops), GFP_KERNEL);
- 	if (!ops) {
- 		ret = -ENOMEM;
- 		if (newinfo->nentries)
-diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
-index 14365b20f1c5..4493a785c1ea 100644
---- a/net/ipv4/netfilter/arp_tables.c
-+++ b/net/ipv4/netfilter/arp_tables.c
-@@ -1547,7 +1547,7 @@ int arpt_register_table(struct net *net,
- 		goto out_free;
- 	}
- 
--	ops = kmemdup(template_ops, sizeof(*ops) * num_ops, GFP_KERNEL);
-+	ops = kmemdup_array(template_ops, num_ops, sizeof(*ops), GFP_KERNEL);
- 	if (!ops) {
- 		ret = -ENOMEM;
- 		goto out_free;
-diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
-index fe89a056eb06..096bfef472b1 100644
---- a/net/ipv4/netfilter/ip_tables.c
-+++ b/net/ipv4/netfilter/ip_tables.c
-@@ -1767,7 +1767,7 @@ int ipt_register_table(struct net *net, const struct xt_table *table,
- 		goto out_free;
- 	}
- 
--	ops = kmemdup(template_ops, sizeof(*ops) * num_ops, GFP_KERNEL);
-+	ops = kmemdup_array(template_ops, num_ops, sizeof(*ops), GFP_KERNEL);
- 	if (!ops) {
- 		ret = -ENOMEM;
- 		goto out_free;
-diff --git a/net/ipv6/netfilter/ip6_tables.c b/net/ipv6/netfilter/ip6_tables.c
-index 131f7bb2110d..7d5602950ae7 100644
---- a/net/ipv6/netfilter/ip6_tables.c
-+++ b/net/ipv6/netfilter/ip6_tables.c
-@@ -1773,7 +1773,7 @@ int ip6t_register_table(struct net *net, const struct xt_table *table,
- 		goto out_free;
- 	}
- 
--	ops = kmemdup(template_ops, sizeof(*ops) * num_ops, GFP_KERNEL);
-+	ops = kmemdup_array(template_ops, num_ops, sizeof(*ops), GFP_KERNEL);
- 	if (!ops) {
- 		ret = -ENOMEM;
- 		goto out_free;
-diff --git a/net/netfilter/nf_nat_core.c b/net/netfilter/nf_nat_core.c
-index 016c816d91cb..6d8da6dddf99 100644
---- a/net/netfilter/nf_nat_core.c
-+++ b/net/netfilter/nf_nat_core.c
-@@ -1104,7 +1104,7 @@ int nf_nat_register_fn(struct net *net, u8 pf, const struct nf_hook_ops *ops,
- 	if (!nat_proto_net->nat_hook_ops) {
- 		WARN_ON(nat_proto_net->users != 0);
- 
--		nat_ops = kmemdup(orig_nat_ops, sizeof(*orig_nat_ops) * ops_count, GFP_KERNEL);
-+		nat_ops = kmemdup_array(orig_nat_ops, ops_count, sizeof(*orig_nat_ops), GFP_KERNEL);
- 		if (!nat_ops) {
- 			mutex_unlock(&nf_nat_proto_mutex);
- 			return -ENOMEM;
--- 
-2.34.1
+with 5.1, the result is same and of_node_put(child) has been called
+successfully.
 
+The test patch and test result is below (with CONFIG_OF_DYNAMIC=y)
+
+trace event string verifier disabled
+rcu: Hierarchical RCU implementation.
+rcu:    RCU event tracing is enabled.
+rcu:    RCU restricting CPUs from NR_CPUS=8 to nr_cpu_ids=4.
+rcu: RCU calculated value of scheduler-enlistment delay is 10 jiffies.
+rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=4
+NR_IRQS: 16, nr_irqs: 16, preallocated irqs: 16
+get ppi-partitions ok!
+OF: ====================================== of_node_put interrupt-partition-0
+of_get_child_count parts_node 2!
+OF: ====================================== of_node_put interrupt-partition-0
+OF: of_irq_init: Failed to init /interrupt-controller@1e001000
+((ptrval)), parent 00000000
+
+
+
+diff --git a/arch/arm/boot/dts/arm/vexpress-v2p-ca9.dts
+b/arch/arm/boot/dts/arm/vexpress-v2p-ca9.dts
+index 43a5a4ab6ff0..79715727ea03 100644
+--- a/arch/arm/boot/dts/arm/vexpress-v2p-ca9.dts
++++ b/arch/arm/boot/dts/arm/vexpress-v2p-ca9.dts
+@@ -161,6 +161,16 @@ gic: interrupt-controller@1e001000 {
+                interrupt-controller;
+                reg = <0x1e001000 0x1000>,
+                      <0x1e000100 0x100>;
++
++               ppi-partitions {
++                       ppi_cluster0: interrupt-partition-0 {
++                               affinity = <&A9_0 &A9_1>;
++                       };
++
++                       ppi_cluster1: interrupt-partition-1 {
++                               affinity = <&A9_2 &A9_3>;
++                       };
++               };
+        };
+
+        L2: cache-controller@1e00a000 {
+diff --git a/drivers/irqchip/irq-gic.c b/drivers/irqchip/irq-gic.c
+index 3be7bd8cd8cd..35e1387453f5 100644
+--- a/drivers/irqchip/irq-gic.c
++++ b/drivers/irqchip/irq-gic.c
+@@ -1468,10 +1468,39 @@ gic_of_init(struct device_node *node, struct
+device_node *parent)
+ {
+        struct gic_chip_data *gic;
+        int irq, ret;
++       struct device_node *parts_node;
++       int nr_parts;
+
+        if (WARN_ON(!node))
+                return -ENODEV;
+
++       parts_node = of_get_child_by_name(node, "ppi-partitions");
++       if (!parts_node)
++               return -1;
++
++       pr_err("get ppi-partitions ok!\n");
++
++       nr_parts = of_get_child_count(parts_node);
++
++       if (!nr_parts) {
++               pr_err("of_get_child_count parts_node error!\n");
++               return -1;
++       }
++
++       pr_err("of_get_child_count parts_node %d!\n", nr_parts);
++
++       /*for_each_child_of_node(parts_node, child_node) {
++               if (true) {
++                       pr_err("of_node_put child_node
+%s\n",child_node->name);
++                       of_node_put(child_node);
++                       return -1;
++               }
++       }*/
++       for_each_available_child_of_node_scoped(parts_node, child_node) {
++               if (true)
++                       goto exit;
++       }
++
+        if (WARN_ON(gic_cnt >= CONFIG_ARM_GIC_MAX_NR))
+                return -EINVAL;
+
+@@ -1509,6 +1538,9 @@ gic_of_init(struct device_node *node, struct
+device_node *parent)
+
+        gic_cnt++;
+        return 0;
++
++exit:
++       return -EINVAL;
+ }
+ IRQCHIP_DECLARE(gic_400, "arm,gic-400", gic_of_init);
+ IRQCHIP_DECLARE(arm11mp_gic, "arm,arm11mp-gic", gic_of_init);
+diff --git a/drivers/of/dynamic.c b/drivers/of/dynamic.c
+index 110104a936d9..d9ccf3117dff 100644
+--- a/drivers/of/dynamic.c
++++ b/drivers/of/dynamic.c
+@@ -46,8 +46,11 @@ EXPORT_SYMBOL(of_node_get);
+  */
+ void of_node_put(struct device_node *node)
+ {
+-       if (node)
++       if (node) {
++               if (!strcmp(node->name, "interrupt-partition-0"))
++                       pr_err("======================================
+of_node_put interrupt-partition-0\n");
+                kobject_put(&node->kobj);
++       }
+ }
+ EXPORT_SYMBOL(of_node_put);
+
+
+
+> 
+> https://www.kernel.org/doc/html/next/process/changes.html
+> 
+> 	Andrew
 
