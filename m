@@ -1,161 +1,149 @@
-Return-Path: <netdev+bounces-121998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6678F95F84B
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:39:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E18B195F851
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:41:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23B0D280C5A
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:39:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6AF69B21AC4
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:41:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD7719412F;
-	Mon, 26 Aug 2024 17:39:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B293198A0B;
+	Mon, 26 Aug 2024 17:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DR95GTWA"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="RyY4xkTi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7085F4D8BB;
-	Mon, 26 Aug 2024 17:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7199F19412F
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 17:41:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724693977; cv=none; b=gOGsSmLtUucO8lluQXWbudPqJylomMlxkZb3bzzwremMLdK3eqU5lLLeOkfD4IQ3JgIMC1JuRa9Vx7TnuGQrGXrdfW69HSB5Geut50FMVjASdcJb4sG/U4wDzhv5XwWIO3i23t/kapu2fgm85qa+gqBpmvOx0074MDqwvWUV1fM=
+	t=1724694092; cv=none; b=OqoDTbjy9eECIkXOf+0tPDG2fxFmVGrkK3Ac1PsGPwoBIykUcsp9OwA54zGgtjmDySml6u+QKB5kGfg8UNzIVBNshgiCGBSnv0foWkipL+vX1zE04X2SAIq3/TD7YzDK+zpS4ZiITDDwo2Iw8ENJPleD5Nb2+PjOe1/hGbzVkhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724693977; c=relaxed/simple;
-	bh=XAdEz3p2q81Vfpbo0wT4Nk/RuNROhuELtinYu772rRs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=L/e0/LV0euxa7AkXhlC0HrdJkpDZCEcLHe//qgUGXphvceW5qZWcD4O5nzSHpGgkDzqtBHoDV4ayL0Q9qkxb5GrK/nhwkPFLuVjQNjNCh8aBwNAV3gWoUBYD1+ztX+kwoimJhHc9s7G9rCTB1JESn/0wNeJSUMrYmTII7kGQVQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DR95GTWA; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-714226888dfso4137750b3a.1;
-        Mon, 26 Aug 2024 10:39:36 -0700 (PDT)
+	s=arc-20240116; t=1724694092; c=relaxed/simple;
+	bh=8z0ijpKLCyL0/hK7XURRlPlM8gG/OVt4zB5FIjNk014=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RGHqJe+hWxkPYyxYxP7BDvRdeIr0S+c+sezKQFdbSDWCLOVGEIW0dgcP7kYiM3JlN3cQ87EsCejOjT/pQvObjrqPxWR0hC1ITNHc5zq7wG1+o4Pmz7RxZboJWyHiJ27umCB4pm5hud/q7yrw4tHgktUNJ5E1Fl+uM4L2osWGwvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=RyY4xkTi; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-714302e7285so3860129b3a.2
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 10:41:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724693976; x=1725298776; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=broadcom.com; s=google; t=1724694090; x=1725298890; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wUr4H0CU+fExDVlEld3qLsA4TGyuO8VF3QfrjQIftzs=;
-        b=DR95GTWAyi5LUW/Dw8vJXlIsfO6jblPce1rk0xZN1jJ4gGEMUd/9HiHg6X6pj1y9UZ
-         ZpkVnR2hqIbv3I3cCu+Ywp3PcO7rSwlUQgVOgRGtpVDj1lO/PDMIyP2pkOZQElDHPl4o
-         WxZ9yehdSVW4Z3MQgrKzr+OsviV0H2RdEHn3lxs51gjt8d49I1dtkV+ii1tmftAkVPYF
-         fDhwICbF7Ch1Gfv6BOy/TGfAEOLTuSSEtaqBvY4JJuLhfN9AVlZL65mGzyLOIXv8+7DZ
-         z1I88UbyxEMJMlZmIlE8KXCYTXPbroDt9iU4yQ5lyDvp53/PhxF8Pmoch4PZNwxBIQsu
-         igDg==
+        bh=gk6yec5dWuUP0cgrAQJG6vAUBJ9aHrLwI2uJ5n3Lhmk=;
+        b=RyY4xkTipN3cKTf0Z8//tSaD5kW+wficFpJYbltMkKVdaDyPF6/WxyXU/01wxPtPct
+         zwZNAtZ1jnBNuImupSypFXtpCJJxke4rRiZzjxP75DbC14u7ovmESAb4XOtMBAtWHgCb
+         yBTtrrZ37IaYo/1fXFlIQ+TBdCgdJlfZDVHnE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724693976; x=1725298776;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1724694090; x=1725298890;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wUr4H0CU+fExDVlEld3qLsA4TGyuO8VF3QfrjQIftzs=;
-        b=S9DPh713WpiFIcmCl3U/ymABMJ3/VhBTEP7rTg6yRfPV016vuNiM5aKYJ/Ekw4EmFn
-         sWaMoIvdSRcI+4MwopG46Aw54BTUECIw9EzT3I0Jg+GP8PCY91by5k33qVa5KNLOyWPv
-         wG+eSHVz31XgFnZzUONg1iPE1rWsqweyqLXltzUKHC5+f/pPFlQtJxA4TddCD6e9TW3l
-         A1WC56cZKKV8Uyaj/IkumailNsG2kwId1T3iYFSMqWYjW+Te0vTJXWtf9TWx1sSiJssk
-         img+cW0QANdPkdtlz7wKGyauNPPurNybDRg59C7PcvjctdDzNuCtxw+BsZ53no2yG5wL
-         O1bg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXfIkvUXqGufwKUVNulPp09U/dsCWZFBaTH6kyGr1jpuvRe85K0I7p+9nYm5F71eCLlEQSPg+SEEf1Aco=@vger.kernel.org, AJvYcCWr3PpbldeF7mh+3pjkI8dvl5fCQTJIA1a+hNF1TExuuC3NvS9cyKMVc4q91glJhvwgNvr9zgLI@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrBu6k+VnUkxPArmU2LwiShcJl+Uey/CpReMgUWrUKeOVV7i4D
-	jrtnEoW2LZPGguSgAN2yYkNSVUwpoNfBOgeos4O8Bqb9E9qYE8uo
-X-Google-Smtp-Source: AGHT+IE/Mv0GuHbGC1Uq51ywTBSiqQa0J9YzXI2ipVV8DYuzOOPPO9z3kFBc3X8Nypno+EBI0+kRCw==
-X-Received: by 2002:a05:6a00:2daa:b0:714:1e28:da95 with SMTP id d2e1a72fcca58-7144579d4camr14268206b3a.7.1724693975513;
-        Mon, 26 Aug 2024 10:39:35 -0700 (PDT)
-Received: from diogo-jahchan-ASUS-TUF-Gaming-A15-FA507RM-FA507RM.. ([200.4.98.43])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7143430cc60sm7259372b3a.154.2024.08.26.10.39.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 10:39:35 -0700 (PDT)
-From: Diogo Jahchan Koike <djahchankoike@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Diogo Jahchan Koike <djahchankoike@gmail.com>,
-	syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [patch net-next v3] net: ethtool: fix unheld rtnl lock
-Date: Mon, 26 Aug 2024 14:38:53 -0300
-Message-ID: <20240826173913.7763-1-djahchankoike@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240826130712.91391-1-djahchankoike@gmail.com>
-References: <20240826130712.91391-1-djahchankoike@gmail.com>
+        bh=gk6yec5dWuUP0cgrAQJG6vAUBJ9aHrLwI2uJ5n3Lhmk=;
+        b=oWr/rLbEeMEYL4Y4JKyUtK4UOpwyn+Xkr+T45/suloRaboVNrRGnHTLh7T3VLTslJH
+         EHooyKymvcUaBJGMPe3DISu+JxJDL1h7KVFbGQC8yfVzXRfXYgtNVGb564KUZ7lylMgY
+         1RNvBm/TdLT2QLp3ct/vg1356dnv225Ex+7mO036savaJpuENdug7ZOXDp42sF3UK6R7
+         uhPsdERY/o+jtMpOUxKoxfp6CSKIn7biBLlXrQPCXjDZeQYBZoU2yFhvYXmL40T8p+3L
+         hjM/HTZreD/ecl2NNhpmYn+uCp1cQDG9mrofYmcsooSItUfGveFKjbZRNUgUvBCgOQcz
+         cGuw==
+X-Gm-Message-State: AOJu0YyI+Ew4mashPe3W0QVKECTGyzMF7+52/XDXE0VN9KSAdagZEFii
+	wKyqmI5a+Zk0QO+DTIQADFqUzs9AL9CG6fzWxF+c7ROBmT6X2kbygMZCB4CZnsLDhe14htkZKa4
+	WvS4T0WQLL4t1557PIwyjkTcqnEWY9bKU66VC
+X-Google-Smtp-Source: AGHT+IGUoZte0p19xwWBeSiInV7PcfaUqsGgBPlQ2VYY7m0wFFR9zVxHRono64Qiy0v2wUCnm32xn+uUvVhnGv9x41o=
+X-Received: by 2002:a05:6a00:1a8e:b0:710:4d08:e094 with SMTP id
+ d2e1a72fcca58-7144573cd07mr11456889b3a.2.1724694090361; Mon, 26 Aug 2024
+ 10:41:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240814221818.2612484-1-jitendra.vegiraju@broadcom.com>
+ <20240814221818.2612484-3-jitendra.vegiraju@broadcom.com> <0de48667-fe8e-4cd8-a84a-e3e5407c7263@marvell.com>
+In-Reply-To: <0de48667-fe8e-4cd8-a84a-e3e5407c7263@marvell.com>
+From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Date: Mon, 26 Aug 2024 10:41:18 -0700
+Message-ID: <CAMdnO-JSPEkJZLMPL8BLy1DKFUtU4aC_JpaXfs=g5YJFBu4_RQ@mail.gmail.com>
+Subject: Re: [net-next v4 2/5] net: stmmac: Add basic dw25gmac support to
+ stmmac core
+To: Amit Singh Tomar <amitsinght@marvell.com>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
+	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, john.fastabend@gmail.com, fancer.lancer@gmail.com, 
+	rmk+kernel@armlinux.org.uk, ahalaney@redhat.com, xiaolei.wang@windriver.com, 
+	rohan.g.thomas@intel.com, Jianheng.Zhang@synopsys.com, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
+	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-ethnl_req_get_phydev should be called with rtnl lock held.
+Hi Amit,
 
-Reported-by: syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=ec369e6d58e210135f71
-Fixes: 31748765bed3 ("net: ethtool: pse-pd: Target the command to the requested PHY")
-Signed-off-by: Diogo Jahchan Koike <djahchankoike@gmail.com>
----
- net/ethtool/pse-pd.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+On Thu, Aug 22, 2024 at 10:17=E2=80=AFAM Amit Singh Tomar
+<amitsinght@marvell.com> wrote:
+>
+> Hi,
+>
+> > The BCM8958x uses early adaptor version of DWC_xgmac version 4.00a for
+> > ethernet MAC. The DW25GMAC introduced in this version adds new DMA
+> > architecture called Hyper-DMA (HDMA) for virtualization scalability.
+> > This is realized by decoupling physical DMA channels(PDMA) from potenti=
+ally
+> > large number of virtual DMA channels (VDMA). The VDMAs are software
+> > abastractions that map to PDMAs for frame transmission and reception.
+> You should either run ./scripts/checkpatch.pl --strict --codespell
+> --patch or use :set spell in vi to check for spelling mistakes
 
-diff --git a/net/ethtool/pse-pd.c b/net/ethtool/pse-pd.c
-index 507cb21d6bf0..290edbfd47d2 100644
---- a/net/ethtool/pse-pd.c
-+++ b/net/ethtool/pse-pd.c
-@@ -226,17 +226,21 @@ ethnl_set_pse_validate(struct ethnl_req_info *req_info, struct genl_info *info)
- {
- 	struct nlattr **tb = info->attrs;
- 	struct phy_device *phydev;
-+	int ret = 1;
- 
-+	rtnl_lock();
- 	phydev = ethnl_req_get_phydev(req_info, tb[ETHTOOL_A_PSE_HEADER],
- 				      info->extack);
- 	if (IS_ERR_OR_NULL(phydev)) {
- 		NL_SET_ERR_MSG(info->extack, "No PHY is attached");
--		return -EOPNOTSUPP;
-+		ret = -EOPNOTSUPP;
-+		goto out;
- 	}
- 
- 	if (!phydev->psec) {
- 		NL_SET_ERR_MSG(info->extack, "No PSE is attached");
--		return -EOPNOTSUPP;
-+		ret = -EOPNOTSUPP;
-+		goto out;
- 	}
- 
- 	if (tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL] &&
-@@ -244,17 +248,21 @@ ethnl_set_pse_validate(struct ethnl_req_info *req_info, struct genl_info *info)
- 		NL_SET_ERR_MSG_ATTR(info->extack,
- 				    tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL],
- 				    "setting PoDL PSE admin control not supported");
--		return -EOPNOTSUPP;
-+		ret = -EOPNOTSUPP;
-+		goto out;
- 	}
- 	if (tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL] &&
- 	    !pse_has_c33(phydev->psec)) {
- 		NL_SET_ERR_MSG_ATTR(info->extack,
- 				    tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL],
- 				    "setting C33 PSE admin control not supported");
--		return -EOPNOTSUPP;
-+		ret = -EOPNOTSUPP;
-+		goto out;
- 	}
- 
--	return 1;
-+out:
-+	rtnl_unlock();
-+	return ret;
- }
- 
- static int
--- 
-2.43.0
+Thank you, I will do that next time.
 
+> > +static u32 decode_vdma_count(u32 regval)
+> > +{
+> > +     /* compressed encoding for vdma count
+> > +      * regval: VDMA count
+> > +      * 0-15  : 1 - 16
+> > +      * 16-19 : 20, 24, 28, 32
+> > +      * 20-23 : 40, 48, 56, 64
+> > +      * 24-27 : 80, 96, 112, 128
+> > +      */
+> > +     if (regval < 16)
+> > +             return regval + 1;
+> > +     return (4 << ((regval - 16) / 4)) * ((regval % 4) + 5);
+> Is there a potential for regval to be out of bounds (regval > 27)  that
+> needed to be handled properly?
+
+The IP core documentation we have only defines support upto 128 VDMAs.
+The same formula should for higher values (bound by bitmask).
+
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dw25gmac.h b/drivers/n=
+et/ethernet/stmicro/stmmac/dw25gmac.h
+> > new file mode 100644
+> > index 000000000000..c7fdf6624fea
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dw25gmac.h
+> > @@ -0,0 +1,90 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/* Copyright (c) 2024 Broadcom Corporation
+> > + * DW25GMAC definitions.
+> > + */
+> > +
+> > +#define XXVGMAC_ADDR_OFFSET          GENMASK(14, 8)
+> > +#define XXVGMAC_AUTO_INCR            GENMASK(5, 4)
+> > +#define XXVGMAC_CMD_TYPE                     BIT(1)
+> > +#define XXVGMAC_OB                   BIT(0)
+> > +#define XXVGMAC_DMA_CH_IND_DATA              0X00003084
+> nit: lower case please, 0x00003084.
+
+Thanks, will fix it.
 
