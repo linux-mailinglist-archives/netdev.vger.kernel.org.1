@@ -1,130 +1,131 @@
-Return-Path: <netdev+bounces-121805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B54E495EC54
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:50:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF16895EC58
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:50:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9A6B1C20CA9
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:50:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F53F1F21606
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36B9613D51B;
-	Mon, 26 Aug 2024 08:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8729F1420CC;
+	Mon, 26 Aug 2024 08:50:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8369513A26B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D402513CF82
 	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 08:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724662227; cv=none; b=OVor1TlpG0TStOG1AXDlLctyaZzunR4woPnuwtASgztOu0YWCM9vSw6J0AM911W9Cc9lCMXuI8R+PXcfCvMGut19VwbmmAnS8wcId573AWUjzPGFA5yq9IKQqEgqsk0hcZWVxGwZakIRE0D/VPIEYWOhUM517vShTq1isGBYCnM=
+	t=1724662228; cv=none; b=fG/ucocfd4G98rpy/3Xb/eK4PxqGuYocyn65OZtWBuH8KhWsVqZsUCjX3VaoD7QDba8UtcdABmxLt+AOqT7TIxmmiZjxw1waCQZbKFEVwevjsc7kvBFOX7+jxFB2XwtBphWUR73+3HeFDJyWX3b9SgxXAisfkAG8UyvEW3OVUrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724662227; c=relaxed/simple;
-	bh=EhWaTDBy3rVhP2m7Fx31Arc3l6ptp3Zw9fXE07YKYwI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Bvvv3AP+mgsfMlmjHKndVYHTp3qhm8jTOwGFamZOFWrw33uC43TSA/a5sxMQ/CmdzimBKezNMeVy8DJbyMsWzalqoubit3jNBwcz3vwggpNNXThQU4QvpvW4FHw+VesG08dzMBkxrd542rUey84u/y005HHQ9ocCCsH9Ac6C4tQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+	s=arc-20240116; t=1724662228; c=relaxed/simple;
+	bh=7vFJJ3txwB2z0MEcMHTFI2WBhYC02WWYy3xpouFHJKE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=NglcQSVB9k3BaTLdfUpv6E3Suk5CnJiykcDYI4WKDQVRH1bTY6PTSL03yy2Wj197QeKWeyjarCjv6RUbzbAZqxFEmXVDSYx3gOXy4UqeUGe7ugq//TRFdIGGLWrmNhH/lO43WDzCExS6iazKwbc1lkPw3V+dLJgYz+Go/K5IaEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-39d2ceca837so47171285ab.2
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39d2044b532so39190545ab.0
         for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 01:50:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724662224; x=1725267024;
+        d=1e100.net; s=20230601; t=1724662225; x=1725267025;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=C7yUeTo6zqHWjvtd+4ClcNVFnrYyq5DCC2QI+v1Yw5s=;
-        b=cXPi2LTLnx9snjWieha8pOf4bvxgj9HFZBcInOkU2nTfyRUmaFRvY9gj06MSKyC0nq
-         53HQnrVaCcwkWIzJSjfWY8hLS8s2igkzYq7b0IucyBEPPM3I11+gJ/spkynQcVZ327kx
-         IA8YCvgtBc5PWTikltW9HCTtfBxSPervE6dQXv8RAJPQfNpe73UICR+7IcW0c+6VsXog
-         pMXrBEe1UA6YDue3XYnh1lMqdpmuM6dDiCiFzKHJ3AemctD2KQI0A3FmS0MY0m2Ubf0g
-         bcnpAIOhCOZ2O1pHvRPpys166OK/kHn/DzKzpoybab6k/qg6zjUy9dedp4roKOunvsfj
-         +JKg==
-X-Forwarded-Encrypted: i=1; AJvYcCXyFMddJFD5HtpEgcFoqMGqoeHqkXcMhS1/7/8Y9xczpS6MOAB0g/BMLvdF5a7F0EBoA/QLcFw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/+5jomiv/NyKDr9t9pogisjiz397uyMcqiJdo2DkIWM3WpxSD
-	PyaoWBK+yxniLWynd44lQOnuQ5aqF8FwR8s3XBWAlXcTHKhSw6y3+36J8XKsSRg+8EuE/DpDxg1
-	oZR93MVU4RzgRpWPL90CZyfhAG9X2t+K4q4KwHBE1/ARgJgCZ+zd5P+w=
-X-Google-Smtp-Source: AGHT+IHj+/aHEvT5p9BzDuaqDFhadCHZ0XU1EUhrPlaUJIcGR2zarMtas2h3av4w3prqJQIq1CjBNup4J4CtZ1k2oJgX2hU2R5eC
+        bh=6bii5ClLr5UsuXWOo+Lybiof65kgdF6FcoRGyCA9/LM=;
+        b=ty3xvsLSfa4xCBKEvqZ1PZFc3FP2ygU4MA4CjncHY4QK+7KIcQo/Hf4hiIuBMogupC
+         1+kyx0jffhe0DOKE6w05/sy3ONG3gTbBZJJOmuJffQFrYyAKGv412oGSZ/ssSp2EbqXf
+         dVHTJAPprEtVlhx/sXWCxf/l8NfK6czt6jQoAwlQZpJFQa15Hjj+qLDP094rlymzyYK/
+         F9Z86sFiVHa5O5hVS930JNnzDo5lQavqgEHj9sDTJr32srSv9P3OXlOZTOPYuPpgtNSU
+         I1JXefYW+ubW6IWsUVFjii2oMkPb7QsHKFPY+lOzh2JpiZe0YJafWDUU6qeIeGrjBISK
+         M+7w==
+X-Forwarded-Encrypted: i=1; AJvYcCV/z8qeFBy5yyqo2qGJy7JOSxD6LGA0p8TMst5v+R26yKHZzdlqCtvb2f2QGbc9Hep5zjccfs0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJcKjhAgHMMgpOO0TyzujdVwVQFJG81GwkoA6YhQfgEtFNXGYr
+	lT6saEIjHlD+JpbVBebVWzY4vcAqxWS/bORZidJb/kqviswe/1BAiUjVKwltz/TXniJr3yt/xH8
+	qIEn2Wrujvtw4q8i5mvm59S8NXA9mUej8v3rZaiHVfmc0gMEIBrSqEPU=
+X-Google-Smtp-Source: AGHT+IGqLiPf7C/UCIC9sKZ2/snIZVM1VZbI5kIbw2a0v9194pReQWwwrsPRldTGuX+/CK7Z5p6MlV6ubhU2nWZZE/aQEKRndF4W
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d9c:b0:397:5d37:61fa with SMTP id
- e9e14a558f8ab-39e3c9841edmr7245935ab.2.1724662224605; Mon, 26 Aug 2024
- 01:50:24 -0700 (PDT)
-Date: Mon, 26 Aug 2024 01:50:24 -0700
+X-Received: by 2002:a05:6e02:1a4b:b0:397:fa4e:3df0 with SMTP id
+ e9e14a558f8ab-39e3c9e7c0cmr8404455ab.3.1724662225139; Mon, 26 Aug 2024
+ 01:50:25 -0700 (PDT)
+Date: Mon, 26 Aug 2024 01:50:25 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004168390620923787@google.com>
-Subject: [syzbot] [net?] WARNING in ethnl_req_get_phydev
-From: syzbot <syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com>
-To: andrew@lunn.ch, christophe.leroy@csgroup.eu, danieller@nvidia.com, 
-	davem@davemloft.net, edumazet@google.com, kory.maincent@bootlin.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, maxime.chevallier@bootlin.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, petrm@nvidia.com, 
-	syzkaller-bugs@googlegroups.com
+Message-ID: <00000000000049861306209237f4@google.com>
+Subject: [syzbot] [mptcp?] WARNING in mptcp_pm_nl_set_flags
+From: syzbot <syzbot+455d38ecd5f655fc45cf@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martineau@kernel.org, 
+	matttbe@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    f9db28bb09f4 Merge branch 'net-redundant-judgments'
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1051fa7b980000
+HEAD commit:    8af174ea863c net: mana: Fix race of mana_hwc_post_rx_wqe a..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=1718a993980000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=df2f0ed7e30a639d
-dashboard link: https://syzkaller.appspot.com/bug?extid=ec369e6d58e210135f71
+dashboard link: https://syzkaller.appspot.com/bug?extid=455d38ecd5f655fc45cf
 compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=113da825980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10d5f229980000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10a653d5980000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/585e02f7fe7b/disk-f9db28bb.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b9faf5d24900/vmlinux-f9db28bb.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f9df5868ea4f/bzImage-f9db28bb.xz
+disk image: https://storage.googleapis.com/syzbot-assets/86225fd99eec/disk-8af174ea.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fc4394f330d4/vmlinux-8af174ea.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1f30959324a7/bzImage-8af174ea.xz
 
 The issue was bisected to:
 
-commit 31748765bed3fb7cebf4a32b43a6fdf91b9c23de
-Author: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Date:   Wed Aug 21 15:10:04 2024 +0000
+commit 322ea3778965da72862cca2a0c50253aacf65fe6
+Author: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Date:   Mon Aug 19 19:45:26 2024 +0000
 
-    net: ethtool: pse-pd: Target the command to the requested PHY
+    mptcp: pm: only mark 'subflow' endp as available
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13d09047980000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=10309047980000
-console output: https://syzkaller.appspot.com/x/log.txt?x=17d09047980000
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=159fb015980000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=179fb015980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=139fb015980000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com
-Fixes: 31748765bed3 ("net: ethtool: pse-pd: Target the command to the requested PHY")
+Reported-by: syzbot+455d38ecd5f655fc45cf@syzkaller.appspotmail.com
+Fixes: 322ea3778965 ("mptcp: pm: only mark 'subflow' endp as available")
 
 ------------[ cut here ]------------
-RTNL: assertion failed at net/ethtool/netlink.c (218)
-WARNING: CPU: 1 PID: 5237 at net/ethtool/netlink.c:218 ethnl_req_get_phydev+0x1f2/0x220 net/ethtool/netlink.c:218
+WARNING: CPU: 1 PID: 5507 at net/mptcp/pm_netlink.c:1467 __mark_subflow_endp_available net/mptcp/pm_netlink.c:1467 [inline]
+WARNING: CPU: 1 PID: 5507 at net/mptcp/pm_netlink.c:1467 mptcp_pm_nl_fullmesh net/mptcp/pm_netlink.c:1948 [inline]
+WARNING: CPU: 1 PID: 5507 at net/mptcp/pm_netlink.c:1467 mptcp_nl_set_flags net/mptcp/pm_netlink.c:1971 [inline]
+WARNING: CPU: 1 PID: 5507 at net/mptcp/pm_netlink.c:1467 mptcp_pm_nl_set_flags+0x926/0xd50 net/mptcp/pm_netlink.c:2032
 Modules linked in:
-CPU: 1 UID: 0 PID: 5237 Comm: syz-executor314 Not tainted 6.11.0-rc4-syzkaller-00565-gf9db28bb09f4 #0
+CPU: 1 UID: 0 PID: 5507 Comm: syz.3.20 Not tainted 6.11.0-rc4-syzkaller-00138-g8af174ea863c #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-RIP: 0010:ethnl_req_get_phydev+0x1f2/0x220 net/ethtool/netlink.c:218
-Code: cc cc cc cc e8 bf ac ca f7 c6 05 52 01 39 06 01 90 48 c7 c7 00 9b 11 8d 48 c7 c6 80 99 11 8d ba da 00 00 00 e8 9f d3 8c f7 90 <0f> 0b 90 90 e9 4c fe ff ff 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c 7e
-RSP: 0018:ffffc90003ce7318 EFLAGS: 00010246
-RAX: 10ea674e901bf200 RBX: ffffc90003ce73e0 RCX: ffff88802a65bc00
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffff8155b4d2 R09: 1ffff1101726519a
-R10: dffffc0000000000 R11: ffffed101726519b R12: ffffc90003ce75f0
-R13: dffffc0000000000 R14: ffff88802cfaf314 R15: ffffc90003ce7740
-FS:  0000555586b4c380(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
+RIP: 0010:__mark_subflow_endp_available net/mptcp/pm_netlink.c:1467 [inline]
+RIP: 0010:mptcp_pm_nl_fullmesh net/mptcp/pm_netlink.c:1948 [inline]
+RIP: 0010:mptcp_nl_set_flags net/mptcp/pm_netlink.c:1971 [inline]
+RIP: 0010:mptcp_pm_nl_set_flags+0x926/0xd50 net/mptcp/pm_netlink.c:2032
+Code: 00 00 00 49 89 c5 e8 29 b4 ef f5 e9 08 fd ff ff e8 1f b4 ef f5 4c 89 f7 be 03 00 00 00 e8 02 1c 0d f9 eb a0 e8 0b b4 ef f5 90 <0f> 0b 90 e9 14 ff ff ff 89 d9 80 e1 07 38 c1 0f 8c 19 fd ff ff 48
+RSP: 0018:ffffc90003adf2a0 EFLAGS: 00010293
+RAX: ffffffff8ba3d735 RBX: 1ffff11005fae2ca RCX: ffff888016b73c00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc90003adf470 R08: ffffffff8ba3d621 R09: 1ffff11005fae2cb
+R10: dffffc0000000000 R11: ffffed1005fae2cc R12: ffff88802fd71608
+R13: ffff88802fd70bc0 R14: 0000000000000000 R15: ffff88802fd71650
+FS:  00007fe0b3ff86c0(0000) GS:ffff8880b9300000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020001ac0 CR3: 000000002041e000 CR4: 00000000003506f0
+CR2: 00007f0485fd5fb8 CR3: 000000002e73e000 CR4: 00000000003506f0
 DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
 DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
  <TASK>
- ethnl_set_pse_validate+0x88/0x360 net/ethtool/pse-pd.c:230
- ethnl_default_set_doit+0x2b5/0x910 net/ethtool/netlink.c:683
  genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
  genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
  genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
@@ -141,14 +142,14 @@ Call Trace:
  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f7423951f49
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fffce415058 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f7423951f49
-RDX: 0000000000000000 RSI: 0000000020001ac0 RDI: 0000000000000003
-RBP: 00000000000f4240 R08: 0000000000000000 R09: 0000000000000001
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007fffce4150b0
-R13: 00007f742399f406 R14: 0000000000000003 R15: 00007fffce415090
+RIP: 0033:0x7fe0b3179e79
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe0b3ff8038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fe0b3316058 RCX: 00007fe0b3179e79
+RDX: 0000000000000000 RSI: 0000000020000480 RDI: 0000000000000009
+RBP: 00007fe0b31e793e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fe0b3316058 R15: 00007ffd9b67c0d8
  </TASK>
 
 
