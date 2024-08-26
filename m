@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-121960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFF2995F61D
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:10:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC06A95F620
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:10:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7571D1F23754
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:10:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49B6FB20B9D
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:10:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BDC193429;
-	Mon, 26 Aug 2024 16:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC421946B8;
+	Mon, 26 Aug 2024 16:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SMTpCiIf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nasRoOMJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E18318E057;
-	Mon, 26 Aug 2024 16:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CDD18858E;
+	Mon, 26 Aug 2024 16:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724688629; cv=none; b=VYm7+ZbhzyG+iEPniP5jP/9zgsWB5xE1s/YlyWkz7rmG+QwfOOpArdzI9oMoh7ty2DhJLd4gEMcOyZDrhgtrDYQXQ5OvaDH7PEuczWDN+dDRYkgcuZvkZCOzRSnRCbzdBCE0foX7XVCfL6q4c4JeqSaIJgjSFLccI4IIdZKwJvA=
+	t=1724688632; cv=none; b=Ilj+fUMiYlqFSrTCwngyz0/JpAEOhMuUuS/sXtq+Ybez6/tnjw7KdTBI3WZCeMxFC8AOeZ7qLL6JfMare3x50GiIPv0P6SZpjvFhYsyLkFoHaLqebkAOuwjRvcDkB9h8rPDfDJm3e4+54Y7C9T3ZEB+fSkncscfRRBj23r/kG7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724688629; c=relaxed/simple;
-	bh=JkUZC9vqWOlLzx35Or41UD2rH5irkJt8CEWji2TjXwg=;
+	s=arc-20240116; t=1724688632; c=relaxed/simple;
+	bh=Gtmt/VyuBoYN4UaJVCGTPSHAav6dtM1HQ0ut3XXbVJ8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PQEjPb08QCdu7X1l48Io5yT+n0ZFk33vxg9AYAoLnT79KwJE/ltoRMSnEQxNiEP4gkXSxW15eMUA5Mh634u9AmcIQcAL3Dfqj7mIwcjKAH6lxjdZ7h9d1vkuNGNDOt2ISRCm+hzVb3pbe960kBOQPumeoSEzX5/Pv15grKWCO/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SMTpCiIf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A91C7C52FC2;
-	Mon, 26 Aug 2024 16:10:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=cINRwsyyFcfuzlJtDPLh2Dl1+oZE37nF/UIlUM+irJs7PM1NqEnD3UFAdsUOwrIjz7007zEzB5kd/xsHnSN1Vj5zTW7goX5ZxRc94CWPx5CyfjQvhTJLkRG7MjyA1o0D8fQeSUg6PDaqVqb4em8Nq9GiDVk+uZjnlsCGfrndKRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nasRoOMJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36313C52FC2;
+	Mon, 26 Aug 2024 16:10:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724688628;
-	bh=JkUZC9vqWOlLzx35Or41UD2rH5irkJt8CEWji2TjXwg=;
+	s=k20201202; t=1724688630;
+	bh=Gtmt/VyuBoYN4UaJVCGTPSHAav6dtM1HQ0ut3XXbVJ8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SMTpCiIfWuIfDPABnWnsIeFLg+UjSPnbVg18HMSicFe2zUIn93FHG3mDyhTiXnlGk
-	 UK1T0SKYK5jfNT1pdolq44XOswzj5fK9eFSB+DQ1R/HNoEN5pJ1xzcOcJkGw9w1FS/
-	 72Xar0JAWS8mPfl/HZVGy/CP0Q8NJRNAnm/C1yddAJdPFEesvCuWNn1LOXRuDREcMh
-	 PAawyIKD8+jXWfxykR1TgPE0gFB9aKSwUZH5BGct6uD17im4Rn7bjJAE/C+wzOBcJv
-	 1KekfX0f9XtgU7LetfGeq3LKsXdTgU0yW5FhgqSbwDyryg7EOJrzWRHJBzucy43Fss
-	 k4f25EXMaBmRg==
+	b=nasRoOMJCNbQxE/OB45ox9bSNZJvI08gCmfS6Qe1gtyapxgYp/+QukwkspVFS7v/u
+	 DCYnFAl0n0MB+M0a/EHIXMgZNIuIFkMMciX0+3Nir9fI6cgpVRsJ++zHVIyylhpGag
+	 saKtogYjwpBX5tmaYExo70aCqtSIQvgp+oJIvkIxtiVU9nZgP2eSqV6inwKfvsMjM6
+	 C/puQ0FIshlIDQz3nQ0eb6OXeungwhP+duUIO4mJYKi/rKsP6i98T1YJ+wt2Wl9DrO
+	 WqetV3WDfmXpiecaKXtPxbkVD5vXGbATLqB/JkvxReXdqYB9awuVqeUu2dhU8OnrgO
+	 v+JCZMmSeuoAg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAC863822D6D;
-	Mon, 26 Aug 2024 16:10:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CB93822D6D;
+	Mon, 26 Aug 2024 16:10:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf-next 2024-08-23
+Subject: Re: [PATCH 1/1 V2] Selftests: net: Set executable bit for shell script
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172468862851.56156.6858751928241571146.git-patchwork-notify@kernel.org>
-Date: Mon, 26 Aug 2024 16:10:28 +0000
-References: <20240823134959.1091-1-daniel@iogearbox.net>
-In-Reply-To: <20240823134959.1091-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+ <172468862999.56156.11380462339088608226.git-patchwork-notify@kernel.org>
+Date: Mon, 26 Aug 2024 16:10:29 +0000
+References: <20240824143837.228874-1-david.hunter.linux@gmail.com>
+In-Reply-To: <20240824143837.228874-1-david.hunter.linux@gmail.com>
+To: David Hunter <david.hunter.linux@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, javier.carrasco.cruz@gmail.com,
+ kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ shuah@kernel.org
 
 Hello:
 
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This patch was applied to netdev/net-next.git (main)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-On Fri, 23 Aug 2024 15:49:59 +0200 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+On Sat, 24 Aug 2024 10:38:37 -0400 you wrote:
+> Turn on the execution bit for the shell script file. The test is skipped
+> when downloaded from the linux_mainline source files.
 > 
-> The following pull-request contains BPF updates for your *net-next* tree.
-> 
-> We've added 10 non-merge commits during the last 15 day(s) which contain
-> a total of 10 files changed, 222 insertions(+), 190 deletions(-).
+> Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
+> ---
+> V1 --> V2
+> 	- Split the patch into two separate patches (one for each issue)
+> 	- Included subject prefixes
 > 
 > [...]
 
 Here is the summary with links:
-  - pull-request: bpf-next 2024-08-23
-    https://git.kernel.org/netdev/net-next/c/e540e3bcf2a2
+  - [1/1,V2] Selftests: net: Set executable bit for shell script
+    https://git.kernel.org/netdev/net-next/c/39e8111ce5ce
 
 You are awesome, thank you!
 -- 
