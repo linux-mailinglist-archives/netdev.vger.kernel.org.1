@@ -1,181 +1,195 @@
-Return-Path: <netdev+bounces-121993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3BD395F805
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:26:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EE57E95F810
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:27:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7D0F1C22360
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:26:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E70E1C2237E
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15151990D8;
-	Mon, 26 Aug 2024 17:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA3C198E9E;
+	Mon, 26 Aug 2024 17:27:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rde1H0oN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TwVyWBw7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC851990A7
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 17:25:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7F0198E99
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 17:27:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724693128; cv=none; b=VpsvnpJT/pFoJlvXeaJEDgQlSmf1+d8x2IEDE/eSQQZeHUuIfGb30a8P0y5cUF+Q22Qo1erg2jtE6rvVAl7wd+ehp2VkaRyOdVfA5trDBP2KbBV1mw1rA49W9wlWs54ryyhbNhS+22sRG0lrgj5rZRA0Kw7su9ns+eUnNmTIjNU=
+	t=1724693249; cv=none; b=SsAcSMBfUjEQz7mQFUE2ICFs6w+AQKNXUljRqVC97WBdmPLTsJy/c9w4H/ufkkwJQUkWc0d9iLG5uqIlmgMkYpFY6YJnuZqWCHzy0GOybnZ+lcuxq5kbZMRdP3jOjJjbBB7UPqUn7d1b/b8Wi1KTzBBcKjqKREHFeSB7c7tbKsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724693128; c=relaxed/simple;
-	bh=W2PyMWGeYMt5mFrtf2WUppfjyANqe3Y8QOGyt+ELaEY=;
+	s=arc-20240116; t=1724693249; c=relaxed/simple;
+	bh=GG0kyWBF7pGc+XvoEpS6Eq5nxn+pDWdxGpoLmGtH5oQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nznZaGDHJPMkqqoJdKjGrK2ymy+yMxYOlggQNXMR/UCSwrnBdsA4kRfKYSseXhBdJzZMzYDTUuAa28aaQOlwp8tfGrRJf1eOsMI8ICvS+bECdXSGz8200Kkrp4OPm85v/gFWfp7dle552pRGqSInj8crki6RLmxNff6nWMgc3DE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rde1H0oN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724693125;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vXB9I1RDogYdka/7ESImEOew6DkiGl3Ct/MkOkP43JA=;
-	b=Rde1H0oNgl+03xwCxWKT5oTFe9AwwPqxInuXzWBqysjlVI2XBxZ+McdllxwqLG4H8Ehe/2
-	60Ia8fcpghw4kfedWyZLdt9Ed//f/T8olh6jYgti5IoQWR+kbK5rKyvGwt8oxo/rutj3yl
-	k851djUFTOWmWgPcgABTwf+WGsHxovo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-271-2oUSde6qMP2wPGEjLW28MQ-1; Mon, 26 Aug 2024 13:25:24 -0400
-X-MC-Unique: 2oUSde6qMP2wPGEjLW28MQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-427feed9c71so7193235e9.0
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 10:25:24 -0700 (PDT)
+	 To:Cc:Content-Type; b=t8Kt+3gFquet653bB8dwgBJLx1ixizs7Cp1Cv0wEVkZqIlxbFTX/7wXE7x2TYda32HgO4dmDRCxZKF4WI55nxiIAKzNClFfPP6jz9lP1gpgIe+Rfo76gtGHBXoFgCjVB2/fq8gVNa/o3s+xLeUGEyOyIbc2+6E4WTS0ioEVwMTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TwVyWBw7; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a869f6ce2b9so452689966b.2
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 10:27:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724693246; x=1725298046; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PvuvOohiK2kVc/GMqKz5FTXViTH0DhlYVs1rpkwutnI=;
+        b=TwVyWBw7QPuAR/2azU5VUg9eixZgWDSkTJ5HGScMU2tmG2CBgnNYqp8qRxsCrXGK2o
+         dTTPA9zgzs6ieiTzbyjVlacY9g/OS7XEhvaxXaFyRJIjneAim/OS7HKFGFdPlodmPkZm
+         luS7rOWzJpnZJWkaEAU5NycNnPKTBwKe7wiSVP5VXfDbFi6qO1mXijLDU/RoQk2U+ABT
+         5Tduf/hS2P82i3aGNgUdFz25nTzksWglXhXSZz7RvZihdbiBnR2EbN2wIlNrT3Ti/brp
+         CR37a9sJNoQK4F+KFa7iWLEfOFDgz56j/WBY/2cMupt3KAIIpT8j6RLqyn6nbKuqqfT5
+         nxHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724693123; x=1725297923;
+        d=1e100.net; s=20230601; t=1724693246; x=1725298046;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vXB9I1RDogYdka/7ESImEOew6DkiGl3Ct/MkOkP43JA=;
-        b=bHsXKY2/qNe+9zf0gZ5ALfjFfAlzAyYew5MTQT7yThmxwaHnVGFCQipiWLvRBmLS68
-         XTtRCoOvixiD5TPJxYjcpmyYiyqZyzvgriSrm7HFRcvRk2znW+yIrnlR1x1L97rlNOKG
-         YCiX/aNO5r3YtTNXz3enGqVN2QvXmR+WtDF+6nxf3Xy8taWWhQOBhikCa7ZI3h+/FNEZ
-         PBv48KtVTbP1kdZ3eiX5VwF6iDJBitpkHePcRwJA0yk0Rn1zeF00EEgyfiS/FCHRyk++
-         Ig0kg8CSHR8AGjpABxxylBIqcRVKvBjobNK+pI6ncg31uhseZV2wkm4J8P/AcZn5AYOw
-         /g9A==
-X-Forwarded-Encrypted: i=1; AJvYcCUi3uVoMi7JOhldDAhdqK9RsjwTmi/qPJPwmrRyvSWfIxaNWPkmFo+Fbrd6dkNffmVO1CSSqTc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKTjZsGMt9y1xZm27Kl0ysjmbhjN4RO7DA/oUD2kmE1a/MPRov
-	8JhqyA+B17v7AxJxzZCsYD54rc1w5T1r13lwuwpLPEUVIk81JqGmlaoI1OkDMB1XNcm9LZdOEj2
-	XCXE0Zf90pXBCCNPKcYkX28hnRV99mhZtdyTzxChxgD3vamtvek65BEQMMiuy2sUFUoPcj6RHU1
-	QHXZr7OaovaP7hyVqsQ+FRCve2qn2g
-X-Received: by 2002:a05:600c:3ca3:b0:426:6358:7c5d with SMTP id 5b1f17b1804b1-42acca0c1c8mr45894755e9.4.1724693123149;
-        Mon, 26 Aug 2024 10:25:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHyo+gPmcRRqLioaJdl4QFYbOq6EHctF1LM1UYeexkm0D8aNQrr/L+i8vEQVt4zZEV1IJ4ZrHk0TmltECafqh8=
-X-Received: by 2002:a05:600c:3ca3:b0:426:6358:7c5d with SMTP id
- 5b1f17b1804b1-42acca0c1c8mr45894475e9.4.1724693122031; Mon, 26 Aug 2024
- 10:25:22 -0700 (PDT)
+        bh=PvuvOohiK2kVc/GMqKz5FTXViTH0DhlYVs1rpkwutnI=;
+        b=IVtXQHqhcuculg1K2m95FS74q6vFO3NMabn5uVayFuFEOgCi2hSCxiuTv4CySdTnXg
+         D5JHH/0IiCKCNU8O1s5+rIF1gonELpNHLFSoaNrY6rjSre+3NNDUXXfQvcmD4gqCru3X
+         4h+TRWrF+hfn83NkTdE/zaZnggsfq2MimLVWsXIlc9X1D1OJ+l9qDcQL8F7MqHNyIUrj
+         yv4SolQ8pMlYGnpIICkRl/6/YHqwgey90A75tE4zSIEvsx289cQvn0AHUA00rAAWug/0
+         I7O/zmVLE+auNonU64fjAdwmBmvRNiMA6wMnXBTQSsPutQwpf7Ld6g7PRVlR1rMtz8+5
+         XUmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWoevj7hggN9WDrlsZ0qn1tCW5uXUcfDWzFlpgyMuqWXR9bf6j9wtkb0djqauVlQn6+BB98Bjg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yys5h6Zl/XbfJyGXgCDeLx50srP6XDFfObiXDxf/rRtlIyjdKqi
+	4/XaZZNZN813cE6Jrpa/wC/v1nGLOORPexYwIV4IOdXVu/SF7J71iZPV/xljLhIxOj4+dYCWQZI
+	hraHik20DMLN+vk4gPdDkIrJviA8x9D9ac80b
+X-Google-Smtp-Source: AGHT+IHr5/wnZFZDgu7vVvP620oIqvUWguNOJgQVQkvYbxJXhp8kdWN6YoLlUfwYj5FPflaDJmEk60QVcsXgwkDvIkQ=
+X-Received: by 2002:a17:907:8688:b0:a7a:8586:d36b with SMTP id
+ a640c23a62f3a-a86e397e675mr12255966b.3.1724693245245; Mon, 26 Aug 2024
+ 10:27:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240821160640.115552-1-dawid.osuchowski@linux.intel.com>
-In-Reply-To: <20240821160640.115552-1-dawid.osuchowski@linux.intel.com>
-From: Michal Schmidt <mschmidt@redhat.com>
-Date: Mon, 26 Aug 2024 19:25:10 +0200
-Message-ID: <CADEbmW3kk6bfn0BFz6g5FPEPg3gOnSXW42r53K27RsKF53pi9A@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v5] ice: Add netif_device_attach/detach
- into PF reset flow
-To: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, maciej.fijalkowski@intel.com, 
-	larysa.zaremba@intel.com, netdev@vger.kernel.org, 
-	kalesh-anakkur.purayil@broadcom.com, Igor Bagnucki <igor.bagnucki@intel.com>, 
-	Jakub Kicinski <kuba@kernel.org>
+References: <20240826092707.2661435-1-edumazet@google.com> <CADVnQy=Z697P_gtkXMgPiASS6YwJ4PLDkqei3NvGJ5csKE8nhw@mail.gmail.com>
+In-Reply-To: <CADVnQy=Z697P_gtkXMgPiASS6YwJ4PLDkqei3NvGJ5csKE8nhw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 26 Aug 2024 19:27:10 +0200
+Message-ID: <CANn89iJwVq5OyH9PpWjk4vWGuLOZi=rfEf7HMcoGZ3Uf4nW-Rg@mail.gmail.com>
+Subject: Re: [PATCH net] tcp_cubic: switch ca->last_time to usec resolution
+To: Neal Cardwell <ncardwell@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Mingrui Zhang <mrzhang97@gmail.com>, Lisong Xu <xu@unl.edu>, Yuchung Cheng <ycheng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 21, 2024 at 6:07=E2=80=AFPM Dawid Osuchowski
-<dawid.osuchowski@linux.intel.com> wrote:
+On Mon, Aug 26, 2024 at 3:26=E2=80=AFPM Neal Cardwell <ncardwell@google.com=
+> wrote:
 >
-> Ethtool callbacks can be executed while reset is in progress and try to
-> access deleted resources, e.g. getting coalesce settings can result in a
-> NULL pointer dereference seen below.
+> On Mon, Aug 26, 2024 at 5:27=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > bictcp_update() uses ca->last_time as a timestamp
+> > to decide of several heuristics.
+> >
+> > Historically this timestamp has been fed with jiffies,
+> > which has too coarse resolution, some distros are
+> > still using CONFIG_HZ_250=3Dy
+> >
+> > It is time to switch to usec resolution, now TCP stack
+> > already caches in tp->tcp_mstamp the high resolution time.
+> >
+> > Also remove the 'inline' qualifier, this helper is used
+> > once and compilers are smarts.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > Link: https://lore.kernel.org/netdev/20240817163400.2616134-1-mrzhang97=
+@gmail.com/T/#mb6a64c9e2309eb98eaeeeb4b085c4a2270b6789d
+> > Cc: Mingrui Zhang <mrzhang97@gmail.com>
+> > Cc: Lisong Xu <xu@unl.edu>
+> > ---
+> >  net/ipv4/tcp_cubic.c | 18 ++++++++++--------
+> >  1 file changed, 10 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+> > index 5dbed91c6178257df8d2ccd1c8690a10bdbaf56a..3b1845103ee1866a316926a=
+130c212e6f5e78ef0 100644
+> > --- a/net/ipv4/tcp_cubic.c
+> > +++ b/net/ipv4/tcp_cubic.c
+> > @@ -87,7 +87,7 @@ struct bictcp {
+> >         u32     cnt;            /* increase cwnd by 1 after ACKs */
+> >         u32     last_max_cwnd;  /* last maximum snd_cwnd */
+> >         u32     last_cwnd;      /* the last snd_cwnd */
+> > -       u32     last_time;      /* time when updated last_cwnd */
+> > +       u32     last_time;      /* time when updated last_cwnd (usec) *=
+/
+> >         u32     bic_origin_point;/* origin point of bic function */
+> >         u32     bic_K;          /* time to origin point
+> >                                    from the beginning of the current ep=
+och */
+> > @@ -211,26 +211,28 @@ static u32 cubic_root(u64 a)
+> >  /*
+> >   * Compute congestion window to use.
+> >   */
+> > -static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 acke=
+d)
+> > +static void bictcp_update(struct sock *sk, u32 cwnd, u32 acked)
+> >  {
+> > +       const struct tcp_sock *tp =3D tcp_sk(sk);
+> > +       struct bictcp *ca =3D inet_csk_ca(sk);
+> >         u32 delta, bic_target, max_cnt;
+> >         u64 offs, t;
+> >
+> >         ca->ack_cnt +=3D acked;   /* count the number of ACKed packets =
+*/
+> >
+> > -       if (ca->last_cwnd =3D=3D cwnd &&
+> > -           (s32)(tcp_jiffies32 - ca->last_time) <=3D HZ / 32)
+> > +       delta =3D tp->tcp_mstamp - ca->last_time;
+> > +       if (ca->last_cwnd =3D=3D cwnd && delta <=3D USEC_PER_SEC / 32)
+> >                 return;
+> >
+> > -       /* The CUBIC function can update ca->cnt at most once per jiffy=
+.
+> > +       /* The CUBIC function can update ca->cnt at most once per ms.
+> >          * On all cwnd reduction events, ca->epoch_start is set to 0,
+> >          * which will force a recalculation of ca->cnt.
+> >          */
+> > -       if (ca->epoch_start && tcp_jiffies32 =3D=3D ca->last_time)
+> > +       if (ca->epoch_start && delta < USEC_PER_MSEC)
+> >                 goto tcp_friendliness;
 >
-> Reproduction steps:
-> Once the driver is fully initialized, trigger reset:
->         # echo 1 > /sys/class/net/<interface>/device/reset
-> when reset is in progress try to get coalesce settings using ethtool:
->         # ethtool -c <interface>
->
-> BUG: kernel NULL pointer dereference, address: 0000000000000020
-> PGD 0 P4D 0
-> Oops: Oops: 0000 [#1] PREEMPT SMP PTI
-> CPU: 11 PID: 19713 Comm: ethtool Tainted: G S                 6.10.0-rc7+=
- #7
-> RIP: 0010:ice_get_q_coalesce+0x2e/0xa0 [ice]
-> RSP: 0018:ffffbab1e9bcf6a8 EFLAGS: 00010206
-> RAX: 000000000000000c RBX: ffff94512305b028 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: ffff9451c3f2e588 RDI: ffff9451c3f2e588
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: ffff9451c3f2e580 R11: 000000000000001f R12: ffff945121fa9000
-> R13: ffffbab1e9bcf760 R14: 0000000000000013 R15: ffffffff9e65dd40
-> FS:  00007faee5fbe740(0000) GS:ffff94546fd80000(0000) knlGS:0000000000000=
-000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000020 CR3: 0000000106c2e005 CR4: 00000000001706f0
-> Call Trace:
-> <TASK>
-> ice_get_coalesce+0x17/0x30 [ice]
-> coalesce_prepare_data+0x61/0x80
-> ethnl_default_doit+0xde/0x340
-> genl_family_rcv_msg_doit+0xf2/0x150
-> genl_rcv_msg+0x1b3/0x2c0
-> netlink_rcv_skb+0x5b/0x110
-> genl_rcv+0x28/0x40
-> netlink_unicast+0x19c/0x290
-> netlink_sendmsg+0x222/0x490
-> __sys_sendto+0x1df/0x1f0
-> __x64_sys_sendto+0x24/0x30
-> do_syscall_64+0x82/0x160
-> entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> RIP: 0033:0x7faee60d8e27
->
-> Calling netif_device_detach() before reset makes the net core not call
-> the driver when ethtool command is issued, the attempt to execute an
-> ethtool command during reset will result in the following message:
->
->     netlink error: No such device
->
-> instead of NULL pointer dereference. Once reset is done and
-> ice_rebuild() is executing, the netif_device_attach() is called to allow
-> for ethtool operations to occur again in a safe manner.
->
-> Fixes: fcea6f3da546 ("ice: Add stats and ethtool support")
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
-> Signed-off-by: Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
-> ---
-> Changes since v1:
-> * Changed Fixes tag to point to another commit
-> * Minified the stacktrace
->
-> Changes since v2:
-> * Moved netif_device_attach() directly into ice_rebuild() and perform it
->   only on main vsi
->
-> Changes since v3:
-> * Style changes requested by Przemek Kitszel
->
-> Changes since v4:
-> * Applied reverse xmas tree rule to declaration of ice_vsi *vsi variable
->
-> Suggestion from Kuba: https://lore.kernel.org/netdev/20240610194756.5be5b=
-e90@kernel.org/
-> Previous attempt (dropped because it introduced regression with link up):=
- https://lore.kernel.org/netdev/20240722122839.51342-1-dawid.osuchowski@lin=
-ux.intel.com/
+> AFAICT there is a problem here. It is switching this line of code to
+> use microsecond resolution without also changing the core CUBIC slope
+> (ca->cnt) calculation to also use microseconds.  AFAICT that means we
+> would be re-introducing the bug that was fixed in 2015 in
+> d6b1a8a92a1417f8859a6937d2e6ffe2dfab4e6d (see below). Basically, if
+> the CUBIC slope (ca->cnt) calculation uses jiffies, then we should
+> only run that code once per jiffy, to avoid getting the wrong answer
+> for the slope:
 
-This v5 passes the tests that the previous attempt referenced above failed.
-The patch looks sane.
+Interesting.... would adding the following part deal with this
+problem, or is it something else ?
 
-Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
+diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
+index 3b1845103ee1866a316926a130c212e6f5e78ef0..bff5688ba5109fa5a0bbff7dc52=
+9525b2752dc46
+100644
+--- a/net/ipv4/tcp_cubic.c
++++ b/net/ipv4/tcp_cubic.c
+@@ -268,9 +268,10 @@ static void bictcp_update(struct sock *sk, u32
+cwnd, u32 acked)
 
+        t =3D (s32)(tcp_jiffies32 - ca->epoch_start);
+        t +=3D usecs_to_jiffies(ca->delay_min);
+-       /* change the unit from HZ to bictcp_HZ */
++       t =3D jiffies_to_msecs(t);
++       /* change the unit from ms to bictcp_HZ */
+        t <<=3D BICTCP_HZ;
+-       do_div(t, HZ);
++       do_div(t, MSEC_PER_SEC);
+
+        if (t < ca->bic_K)              /* t - K */
+                offs =3D ca->bic_K - t;
 
