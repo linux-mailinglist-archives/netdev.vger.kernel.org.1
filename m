@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-121799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEED595EBBB
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:22:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0415995EBC0
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1DCE1C21926
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:22:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3188F1C21E7D
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357EB1474BC;
-	Mon, 26 Aug 2024 08:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9991614A4D9;
+	Mon, 26 Aug 2024 08:19:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD39145A0A;
-	Mon, 26 Aug 2024 08:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579BC1465BB;
+	Mon, 26 Aug 2024 08:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724660397; cv=none; b=o1z9XvnmB0ljwxjqrtqlyCsv4tfTm44mBtzHYQKOd1xgu3ZadwswuJYeAwABgV5sv5tTz/POYIQ/b6O35lxYB9BM2nhs+WxaDjsN0E3M+KN5Grzsxo/8bjLTQUgtkdPKhgtZmKxVT+136w2ZVfkABvAPcL3A6sBfiyQOzWepH6U=
+	t=1724660398; cv=none; b=nFHk5+Nbl0eLFVungvzFts5RCgMJGqgWTjBuPz3mpYH7YXXPOjJ9AFIJf0iJjcWj0OGeXIYXPkWhnVNwkKczkOzaPlMvRwrqZtQshTQjYbCj396oBM5z4x4oSZzKJdhIqpkoGg8MYAQvYY3z0CXqbWVPrSiyQ3altps5hoIw+Qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724660397; c=relaxed/simple;
-	bh=ATVyEJlwbZPimhIz3q6w8QdVcn/4THkYOQtwFB5X738=;
+	s=arc-20240116; t=1724660398; c=relaxed/simple;
+	bh=eEypYZoG6QJSIUdINWthfnAlOoisMVXiIIU515ncHzA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bpQPi2tVo2kS8NXpqDS8Jz4xNUWwxjTAiyPD6rYv6B1fC2Pq/C+bubMoGRbAesaXG66Y/cAs2zqU9LCsVZG7ugJAzm2LUSRm7HV45t7g4MyGAZGKxF4QyQh0jKW7WUf4TGLBkdShqezq7hgMq3V8OezB2BfNQUN+U8sJ55IngXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	 MIME-Version:Content-Type; b=dTqYIfc6lRIz+8XvzrjwPo/iNpfHdLnMq5HSNFpEkcijknh8wS8yGgEflTXvEvkZhLbvQTDmtfMNgcfs3M5yEXOjH7a5DiAU+OGoSSj+6w6wVGCIEBm9xzYFPxlMO+iD8JuPnKQiE4+B3EUOMZh1Oks42SPJ/PZO72OlxTN1V64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Wsk4T55nlz69Lv;
-	Mon, 26 Aug 2024 16:15:05 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Wsk6D30Zbz1HHN9;
+	Mon, 26 Aug 2024 16:16:36 +0800 (CST)
 Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2D4C718006C;
+	by mail.maildlp.com (Postfix) with ESMTPS id D240A140135;
 	Mon, 26 Aug 2024 16:19:53 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
@@ -49,9 +49,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<horms@kernel.org>, <jonathan.cameron@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH V4 net-next 10/11] net: hibmcge: Add maintainer for hibmcge
-Date: Mon, 26 Aug 2024 16:12:57 +0800
-Message-ID: <20240826081258.1881385-11-shaojijie@huawei.com>
+Subject: [PATCH V4 net-next 11/11] net: add ndo_validate_addr check in dev_set_mac_address
+Date: Mon, 26 Aug 2024 16:12:58 +0800
+Message-ID: <20240826081258.1881385-12-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20240826081258.1881385-1-shaojijie@huawei.com>
 References: <20240826081258.1881385-1-shaojijie@huawei.com>
@@ -66,31 +66,31 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemm000007.china.huawei.com (7.193.23.189)
 
-Add myself as the maintainer for the hibmcge ethernet driver.
+If driver implements ndo_validate_addr,
+core should check the mac address before ndo_set_mac_address.
 
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+ net/core/dev.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5dbf23cf11c8..2691a08e16db 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10123,6 +10123,13 @@ S:	Maintained
- W:	http://www.hisilicon.com
- F:	drivers/net/ethernet/hisilicon/hns3/
- 
-+HISILICON NETWORK HIBMCGE DRIVER
-+M:	Jijie Shao <shaojijie@huawei.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+W:	http://www.hisilicon.com
-+F:	drivers/net/ethernet/hisilicon/hibmcge/
-+
- HISILICON NETWORK SUBSYSTEM DRIVER
- M:	Yisen Zhuang <yisen.zhuang@huawei.com>
- M:	Salil Mehta <salil.mehta@huawei.com>
+diff --git a/net/core/dev.c b/net/core/dev.c
+index e7260889d4cb..7e9c3017e705 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -9087,6 +9087,11 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+ 		return -EOPNOTSUPP;
+ 	if (sa->sa_family != dev->type)
+ 		return -EINVAL;
++	if (ops->ndo_validate_addr) {
++		err = ops->ndo_validate_addr(dev);
++		if (err)
++			return err;
++	}
+ 	if (!netif_device_present(dev))
+ 		return -ENODEV;
+ 	err = dev_pre_changeaddr_notify(dev, sa->sa_data, extack);
 -- 
 2.33.0
 
