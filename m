@@ -1,166 +1,128 @@
-Return-Path: <netdev+bounces-122083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7790195FD81
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 00:52:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 52D4395FD85
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 00:52:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 877061C21E53
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 22:52:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 741421C21C74
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 22:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357D319E7D0;
-	Mon, 26 Aug 2024 22:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A4D19DF4C;
+	Mon, 26 Aug 2024 22:51:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="GDk9DFy1"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="XkW6CcXY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-221-202.mail.qq.com (out203-205-221-202.mail.qq.com [203.205.221.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE63DB677
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 22:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B57519ADBE;
+	Mon, 26 Aug 2024 22:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724712572; cv=none; b=PDB5de3jrwgQmewOcUp7L4xYpDYHkkhWbkTQ3Z90+4qgssWzi4AlbRi/pc/q02GJWiWu2qgd60J++YchCcoRYInnKZvuoX/3C5oXP9fxxI1sx++TQP8eOkiz8vMPzdUVMOVppNeabHnn2U2k20VraseUy9iR1RBXNyohZxqhVGA=
+	t=1724712677; cv=none; b=gTQV9HeB4Qz79Ok1YCc9CvyAqKc6t4qHg9QEQoEKiblTMv59Lna2Ed00Dg+oMDG63bGhWLHG4ZMcf+Xnk5uwBac6xDiONC5tK4xQ+0DqFKiMzn+286fDMZDmfEH5T6ZJg0Ss6PXIoaJ5PHfERMznu5fQMx7iiF/Un2R8rK6n6Ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724712572; c=relaxed/simple;
-	bh=4riBHCy/ul0psyvOkTn7BvHgTDelnSNQyniXCwOavsA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tU/BCJctidU1NX04RboUx/8P29ktP7WG+ySGwkg4gIgI1vR3oM49o5rKUZ0tcM99tSj1cEbsejZu2gfJHdDmddfk8h7aukGUqzGyy+JS4UPaIfofy8nJYA/tFwmNc19kBLN1ExrscygrXk7K53y7LtOr3S1R+iDyzeBcGlf8edQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=GDk9DFy1; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e17c1881a52so1819361276.0
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 15:49:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1724712569; x=1725317369; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nWTFl5f8OPZ9kYIvj+M7W9eYYEXfjlTCvvmN9eeNnFM=;
-        b=GDk9DFy1uU5DEevxf++6WuIvZZ73OSd9X3L1keRyQJcWJE1u6gMs9mSkyo+wW34q7v
-         3Qc1tPefjxRgoUEoNXahf/fPq115S7AyyFTtmSD59YXxRTKb+u3yaSoRA2w//KesDMOS
-         K6xV0y/d/7tx8szAfjEupd2n3oRYlldJMEY+vEo4UIUW/cw/kprydvfFUn17TmGxx2pM
-         R6NefIsW1LMf7WJI1Wee+mSSKx9wnlL4p5TM8v0lOzxMgQ0JaU7IMC3RIbdXYj/X6i8H
-         TMpNiuD+0Nd32e/eZ1HAZo4EouMkv2OcpkeAhKxX1nrHlLKKboztdWFnXzJVCmQGAREN
-         c9/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724712569; x=1725317369;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nWTFl5f8OPZ9kYIvj+M7W9eYYEXfjlTCvvmN9eeNnFM=;
-        b=HKsy7iWxjQBbgSVyGES3XEdA6GT99LD9M7WaMZcjIqGqkSFsxS3RT+asxmSLVprW2+
-         pTXvzJCRFc6n+eqPVCqk8sOlmKdgHDT7YnF0JkWY6iC/zvYryJaYdGl79d7wyVm6AxjX
-         ue9OnMLbSr9pfVCHuVwP1Ym/LglOWBdhmcaifG1kkYewe5fstBJnT2e8ZsdBLQTQU6aY
-         IiApyZ2IghU8dPxQetfwGt98KXynOAaMKSEeQ+/IKegmKBR8ZbwGHjB5j4ODoaKYmwJ9
-         3FV23wbtQIaWsC51RRJa3wh25k5O0uzzI2AD5NlOU/LMlmGriUQlqMmy/W73ie134Vag
-         jVDg==
-X-Forwarded-Encrypted: i=1; AJvYcCUtDH8Tt6zWxjUK2Scs1pRHbswNKgxGbLLkF4/B52RVc5cfE5YE1DGFakwzZBM7Osb31Ao27rQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7q571+3oZQQ4j5RJhsiu+vTnJeN9Bh3lO/Wp3QaKWWSfrMbwo
-	pv2qduOBqnOvWfQuFJyIrQg0ga5+2AfTURe1qcgtvRFBC4+HtMTelsvcI75Jo8Gu/ExFKjYFPX+
-	aJx3toLzUboYzAm2+q2qO7GSGF0KYbIFBXPBK
-X-Google-Smtp-Source: AGHT+IFdXwGDNkQJWX/aeiki5niUl6YsOZL7hcKl1t9UskkQFhTdxuBmqzMkoxujlay9La0l7/VeNVTc31ug5dspjrg=
-X-Received: by 2002:a05:6902:1283:b0:e08:6373:dfc8 with SMTP id
- 3f1490d57ef6-e1a2984666bmr1176664276.23.1724712568754; Mon, 26 Aug 2024
- 15:49:28 -0700 (PDT)
+	s=arc-20240116; t=1724712677; c=relaxed/simple;
+	bh=vwxylYhqYzDcwD8VntoswCnq6jYCY0GwTMnoqPsNrFk=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=T8mR9AmjuqLjAmaXjPQL/nRH9V4jVopbi5dGLHYVEif3PEY2tZ/LKj/8pgZyJfXMQo3awVFXei6ZRza0/hv5oKP/xGlLC1o9XZm32hUSBlQvW4wFdm5Tm128jWxLOz6ugtRYkZquYOt/t4K7ARs23B0nOBRlmBWjowbwJdLTchg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=XkW6CcXY; arc=none smtp.client-ip=203.205.221.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1724712671; bh=efQry0do+stVDVzIBy/a+KnkSgRUN/Tp1juVU/tLaiI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=XkW6CcXYfSCg4KyWSNPv5U6vNBWQJybzi5cNds+DUDVi7XoTohY2hEhSRPSpiobL1
+	 jEeEewiUrCVWBdr2+6KOWwg6O1TJOVZDzpdTMaI9oaXrWfYp4onQApQb50cCXmTUgl
+	 Bqh39USOJbljbM3Lv7PEMu1SJZy32nJum0T+LMwA=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
+	by newxmesmtplogicsvrszc19-0.qq.com (NewEsmtp) with SMTP
+	id CC78C68C; Tue, 27 Aug 2024 06:51:07 +0800
+X-QQ-mid: xmsmtpt1724712667t60kv7uhh
+Message-ID: <tencent_A51B8725EABA04BB2A33BC9E1E1B2E4B0508@qq.com>
+X-QQ-XMAILINFO: MllZffuBkEb5pYkZwEBzGaWEwpFRl4rltLTzryB4XVDEIlx8mFQGAr4Aup1tKy
+	 A6BDPh0eEbwgH5l4SXq0KOWNHpR1JNhWSMgSi07KKCgc3kdBoLT344oLLrgEsLJ9UQIMPBKXYBlj
+	 ETGrE9z4GqX3m7p/XFU/+Pmn3WNwHFvngnOQhIPQg0VwCdnhZWY1db7pHr7efQPRGgXk5h9Kf0ab
+	 LKHH3ajOg6GZnI7PF5zegQkbjOsA01p1uoUA92vbqGpWjRuW/2+UyHOqp9DKbBDEeQ2u2itV8PO0
+	 YQ0XMMaCo5sovj1WLb08X5YBHe1xv34gAUb+E7YAXM0LDF5PgELUUOYRYcG5Vl6PioGvGxQscE5a
+	 8Ilc3bRbZaEsV+xvLlGY10gh9bnGOIlD5Dvxfmd08CdT6yDi/O5bZRXoesGVU9vcVIp8TH3+sJDP
+	 ul4eWYuVHfmR0rVFTPT8iCpm7h4rpomPBIQjyekeoZDcZ6049TAq+oX6VsLfBMKXqkB3VIfxL8Eh
+	 nPJ0Sy5/HCdyeVIMAdOCEuNQWd4ZDWZ+GQuC5+W+FS+KewjXScO6IYLW4LrQ9x0neZ/RpNkwWqZ8
+	 s/e0z3F02cEc4x3jQpI9Oh0b2snaJvB0KxEeOwibzAhFxW7wRrEZ+U6N2bEIX5VAfnPx1/0MN+CG
+	 1Jo+2qvn3AKBxJsQtubJDKc+z8foW/PXaeQS14lBMUHqYdqRmA7TJC4xmCHFgKcpBH6zQR+hCTEa
+	 Sb96u0pnLy6TAUWfhVHuNuY0Pcsn5QMWM6EJeoN5AyzH+w3p32j/gCmiksn8Gltw9sX1K0kYvQ8+
+	 ijzwiBE+ukPFDErQsJda4eqacmDXYI7m8maUsZtmDP3lxdvxiEutYbBSFzUnWFZ1S+cJqPTyKV+X
+	 trm6FjAj7OsEk9Wq+uv/BX3gwbJbBTs2l6pHqhjQSqbq3QPV4k4XuFtZRzCpQbBbvNXwD7lhuxwq
+	 TO5G3oZ7EkQUmdJDIb8s7sG85pAev7z9iIsiOMhs5pfy2q2R+4+3TQ2NzUU6kXGBndLBpXR9lR9V
+	 6tdoyTgcHalZVt16E+h7l2kk4loQA=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+From: Edward Adam Davis <eadavis@qq.com>
+To: kvalo@kernel.org
+Cc: eadavis@qq.com,
+	gregkh@linuxfoundation.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: [PATCH V6 1/2] wifi: ath6kl: Replace ath6kl_usb_submit_ctrl_in with usb_control_msg_recv
+Date: Tue, 27 Aug 2024 06:51:08 +0800
+X-OQ-MSGID: <20240826225107.2817092-3-eadavis@qq.com>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <87jzg3uy40.fsf@kernel.org>
+References: <87jzg3uy40.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240826120449.1666461-1-yukaixiong@huawei.com> <20240826120449.1666461-8-yukaixiong@huawei.com>
-In-Reply-To: <20240826120449.1666461-8-yukaixiong@huawei.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Mon, 26 Aug 2024 18:49:17 -0400
-Message-ID: <CAHC9VhS=5k3zZyuuon2c6Lsf5GixAra6+d3A4bG2FVytv33n_w@mail.gmail.com>
-Subject: Re: [PATCH -next 07/15] security: min_addr: move sysctl into its own file
-To: Kaixiong Yu <yukaixiong@huawei.com>
-Cc: akpm@linux-foundation.org, mcgrof@kernel.org, ysato@users.sourceforge.jp, 
-	dalias@libc.org, glaubitz@physik.fu-berlin.de, luto@kernel.org, 
-	tglx@linutronix.de, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz, kees@kernel.org, 
-	j.granados@samsung.com, willy@infradead.org, Liam.Howlett@oracle.com, 
-	vbabka@suse.cz, lorenzo.stoakes@oracle.com, trondmy@kernel.org, 
-	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de, 
-	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jmorris@namei.org, 
-	linux-sh@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-nfs@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	wangkefeng.wang@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 26, 2024 at 8:05=E2=80=AFAM Kaixiong Yu <yukaixiong@huawei.com>=
- wrote:
->
-> The dac_mmap_min_addr belongs to min_addr.c, move it into
-> its own file from /kernel/sysctl.c. In the previous Linux kernel
-> boot process, sysctl_init_bases needs to be executed before
-> init_mmap_min_addr, So, register_sysctl_init should be executed
-> before update_mmap_min_addr in init_mmap_min_addr.
->
-> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
-> ---
->  kernel/sysctl.c     |  9 ---------
->  security/min_addr.c | 11 +++++++++++
->  2 files changed, 11 insertions(+), 9 deletions(-)
->
-> diff --git a/kernel/sysctl.c b/kernel/sysctl.c
-> index 41d4afc978e6..0c0bab3dad7d 100644
-> --- a/kernel/sysctl.c
-> +++ b/kernel/sysctl.c
-> @@ -2059,15 +2059,6 @@ static struct ctl_table vm_table[] =3D {
->                 .proc_handler   =3D proc_dointvec_minmax,
->                 .extra1         =3D SYSCTL_ZERO,
->         },
-> -#ifdef CONFIG_MMU
-> -       {
-> -               .procname       =3D "mmap_min_addr",
-> -               .data           =3D &dac_mmap_min_addr,
-> -               .maxlen         =3D sizeof(unsigned long),
-> -               .mode           =3D 0644,
-> -               .proc_handler   =3D mmap_min_addr_handler,
-> -       },
-> -#endif
->  #if (defined(CONFIG_X86_32) && !defined(CONFIG_UML))|| \
->     (defined(CONFIG_SUPERH) && defined(CONFIG_VSYSCALL))
->         {
-> diff --git a/security/min_addr.c b/security/min_addr.c
-> index 0ce267c041ab..b2f61649e110 100644
-> --- a/security/min_addr.c
-> +++ b/security/min_addr.c
-> @@ -44,8 +44,19 @@ int mmap_min_addr_handler(const struct ctl_table *tabl=
-e, int write,
->         return ret;
->  }
->
-> +static struct ctl_table min_addr_sysctl_table[] =3D {
-> +       {
-> +               .procname       =3D "mmap_min_addr",
-> +               .data           =3D &dac_mmap_min_addr,
-> +               .maxlen         =3D sizeof(unsigned long),
-> +               .mode           =3D 0644,
-> +               .proc_handler   =3D mmap_min_addr_handler,
-> +       },
-> +};
+ath6kl_usb_submit_ctrl_in() did not take into account the situation where
+the length of the data read from the device is not equal to the len, and
+such missing judgments will result in subsequent code using incorrect data.
 
-I haven't chased all of the Kconfig deps to see if there is a problem,
-but please provide a quick explanation in the commit description about
-why it is okay to drop the CONFIG_MMU check.
+usb_control_msg_recv() handles the abnormal length of the returned data,
+so using it directly can fix "target's targ_info doesn't match the host's
+targ_info" warning in ath6kl_bmi_get_target_info.
 
->  static int __init init_mmap_min_addr(void)
->  {
-> +       register_sysctl_init("vm", min_addr_sysctl_table);
->         update_mmap_min_addr();
->
->         return 0;
-> --
-> 2.25.1
+Note: Compile tested only, not tested on hardware, only tested on QEMU.
 
---=20
-paul-moore.com
+Reported-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+V1 -> V2: Directly using USB functions
+V2 -> V3: Adjust indentation style
+V3 -> V4: Adjust indentation style
+V4 -> V5: Update comments, add warning info
+V5 -> V6: Update comments
+
+ drivers/net/wireless/ath/ath6kl/usb.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
+index 5220809841a6..0458b5a078e1 100644
+--- a/drivers/net/wireless/ath/ath6kl/usb.c
++++ b/drivers/net/wireless/ath/ath6kl/usb.c
+@@ -1027,9 +1027,10 @@ static int ath6kl_usb_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
+ 	int ret;
+ 
+ 	/* get response */
+-	ret = ath6kl_usb_submit_ctrl_in(ar_usb,
+-					ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
+-					0, 0, buf, len);
++	ret = usb_control_msg_recv(ar_usb->udev, 0,
++				   ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
++				   USB_DIR_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE,
++				   0, 0, buf, len, 2000, GFP_KERNEL);
+ 	if (ret) {
+ 		ath6kl_err("Unable to read the bmi data from the device: %d\n",
+ 			   ret);
+-- 
+2.43.0
+
 
