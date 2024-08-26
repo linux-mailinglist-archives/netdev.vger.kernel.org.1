@@ -1,147 +1,130 @@
-Return-Path: <netdev+bounces-121832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52ED95EF21
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 12:56:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9A2E95EF82
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 13:13:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91C79289963
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:56:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5789282D20
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 11:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF73A14B08E;
-	Mon, 26 Aug 2024 10:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 730A414F10E;
+	Mon, 26 Aug 2024 11:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="kJgLQf/k"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="etz/aUWJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from out203-205-221-149.mail.qq.com (out203-205-221-149.mail.qq.com [203.205.221.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1432B148850;
-	Mon, 26 Aug 2024 10:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776E713DDD9;
+	Mon, 26 Aug 2024 11:13:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724669773; cv=none; b=S0flcdb8SE1zvTrcOPGQ/wcNkcs44/OP/XuqzGUIUmaVdZVqjiKb+Prw2l9dRdPlzpIgxG1HPi0LiXDDSSWeg2OZ4N9QBv7IE6ORk0Uh459Me/qw+GsvJJhI+0v6aGGV4ZS6qJH4N4Lv8G6YYLuhD8EX712ezbo4KEDNyxKr92s=
+	t=1724670790; cv=none; b=qC/pt3UTStBDGxXsoil2YISBeuZGNI0kuzRgjXScX7QCT5g3yzmmxGTS+DWd0qj6Rnu2ThEigbmUYK1d4d5KXMeRG4ikPJGWbKAbI7IjUuyoHt7F1yH1tdGxzu70ELm0TdLaz1pvWVhXhlahs7+9aoilu/uWCHlXSOrWtSM4FPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724669773; c=relaxed/simple;
-	bh=h0okMoCbXS5G9Kqj2IS1qU9Pgw/i9nHgkscgkpkZ0F4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=G5nOTwFHDeOpIV/APAlDnW3okIHrFLWc397jOCFAuOtdpeOYkXVaj9c4guje4FToosi+rWTMbLAcfpIP3L4Jau3oOO/K2zmqSnWIjvQ1cqzQYfsBnj/XogslGBfoKYniThlmyzTJxjtgfNsIf/khgvkuFcJDrqoL+EczoPKDpYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=kJgLQf/k; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47Q8MPkX027697;
-	Mon, 26 Aug 2024 10:56:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	cExeb/xRDZzvLYRCG7hFO8bedIkSs2tygzFZBcSjb1E=; b=kJgLQf/kyzMOp7u6
-	NomQ9RlGRhr1CQwIGA8C4XfqcBF07hx/G4q+5NKRe3B1baR72RNnkfKNqN2pXV5x
-	uP0qlPc2VqLM7TpgjoxQxy3DbfKKR1yka8RvPIwKfWIOdSKPEQ2YlLi8jUQ7euAu
-	/WiwJtSyEsQ3z8wOSVjH+siy3UnMizFw1adKQOEpvSXQq2lYZAJ58FJq4owWwGqj
-	HvvBDEAkpncjg8tNDzpxuoa4y52kgXNjO1Pa3oRd4XmBKFRE2te271uA0G8Qq12n
-	JOw+v0fWc13+Tx39YVYtujuqJCh1sjhIPDDTY/mJRIaUkxkduB6mtt/AJpboGVCH
-	3m+3xA==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 417980ude9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 Aug 2024 10:56:00 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47QAu05I008536
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 Aug 2024 10:56:00 GMT
-Received: from [10.216.20.198] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 26 Aug
- 2024 03:55:54 -0700
-Message-ID: <01c5178e-58fe-4c45-a82e-d0b6b6789645@quicinc.com>
-Date: Mon, 26 Aug 2024 16:25:39 +0530
+	s=arc-20240116; t=1724670790; c=relaxed/simple;
+	bh=02cFjT9rCSquVRGY5ROZxzrKmwM9NghL3+cjh0Ae9ys=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=Kh7QpegXtKcnixU+8y4pu/HlLMoJxUTxy0JaYdNroMwB1YcOvVD5mp+IlyxnpCq4VMG/yHacfk8vuTDboAHSU2deJaAIX5U4WP4rYlRdRfiBjlGEJRbDNoRw7v3d3QlogZcy+nbO2TpAMV5rguQNADoaThDJS3qUfPK6/TGzEMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=etz/aUWJ; arc=none smtp.client-ip=203.205.221.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1724670779; bh=lUpulHGMOGngdtU0gm+4Ln7iEb36uBYkJQf78s2pWtg=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=etz/aUWJDNcih8LdHVLqGPS7DVB5cQBmL2bPu10BDXMiwVamL5Z42bO8c/ivbltGv
+	 Ltdu8JVck3o5HCl13VwwXRQIBPxgKiAjRkbFpcA6JIU9vbbia97aL4wz6HhL/85gpI
+	 2wrCbcCYX0gIh6iMgvMyjF3TL+nY17GTEi0luNrQ=
+Received: from pek-lxu-l1.wrs.com ([111.198.225.4])
+	by newxmesmtplogicsvrsza15-1.qq.com (NewEsmtp) with SMTP
+	id 3373ACF7; Mon, 26 Aug 2024 19:12:55 +0800
+X-QQ-mid: xmsmtpt1724670775tf2wz6iic
+Message-ID: <tencent_2C2C336C9E441B294BB21B6A2558BA34BB08@qq.com>
+X-QQ-XMAILINFO: Nq1uWKlIb9DM8ghTm7BKAMcP/rKH+fHPKtzuBJVGkSe4iTEchhTRkAJuHI6REV
+	 W26t0cY7S1wwplTCQznYfbudqI4jj7gJ6Dn3+vzelMSffkXO1E5jDjdXPkFpt12EHXkVX/YNdpA+
+	 +FOs65YRPNVp++v7Lju48A7PKaq34+6bLRjQWNP7quCN0btYd/Bx1atupZjEplzNCDrEpeDRyXfK
+	 6HjXicbcCAz3OvtRkm69DdCGu72yt8hevXWHHWiuZnTW6YP6Q6jT2ngfW6R3/+omvHDJtRnNRwUm
+	 0BBdvtEvCRhKDqo09BgdFaMWTYDoSS/ebwm/LMGMsrLrELFH7lebVFkElalfgQsZUXOBOE8ZkoMV
+	 leP3pUB7grXugYAVkax+6F9HMD6TNvU/A2C8K6QszhDE6KLUIvJcsavueDWBRJARxdXE0c6bc/8h
+	 OWtx+LVaY8D+kFMssBuGdic+hRblbCpOZFEvqRh7Q9Qa4krgAkpuv3WR4DTimpAi+Dx3dd9WRRt4
+	 z7WXdl3qQi77KTliovUl5ma1EJMxQoHFIimuwByAhXrJInFKLKZ2R4Wtp/iuNSHwM90DgMMGkshH
+	 PC12B+gBllEJ14h1KK/RntI5YxXmBC20jcbBdRHKkqiZqfNn5s3h33eSIftTgGsNTfRX11PwKnRK
+	 UByX6/7+XozbU1D7YO9Q15WT4rWzi5mTavwryiLFuZsN3o7W756YrmcMy/j8Rdi8Bufzf2guVUpF
+	 WN2ohoQwZFHMFViG0dJyFZlC9OfzzMdZzC6pM1XJd1z/EvBpUUcp6rwlElWUF7P6XatxzHVmBjGE
+	 8Hmo76IygIatdVKTsIWohPyItl+xeCk4F1EOyKvO8DZlA9YMmObXwN6O7mkyayyLJFL5lzNI6UqW
+	 HGwxm0GXyqTY+VbAmsFbeYRcQGiVfbkfraPEEcSawdDsZDniE7EHDVYQalWFGzuS51D7Yu+rNUvV
+	 rwmviHLMug9Jx4XCGrLw==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+From: Edward Adam Davis <eadavis@qq.com>
+To: gregkh@linuxfoundation.org
+Cc: sergei.shtylyov@gmail.com,
+	eadavis@qq.com,
+	kvalo@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH V2] wifi: ath6kl: Replace ath6kl_usb_submit_ctrl_in with usb_control_msg_recv
+Date: Mon, 26 Aug 2024 19:12:54 +0800
+X-OQ-MSGID: <20240826111253.2606362-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <2024082649-shape-karate-40b0@gregkh>
+References: <2024082649-shape-karate-40b0@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] clk: qcom: Add support for Global Clock Controller
- on QCS8300
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Bjorn Andersson <andersson@kernel.org>,
-        Michael Turquette
-	<mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        "Ajit
- Pandey" <quic_ajipan@quicinc.com>,
-        Taniya Das <quic_tdas@quicinc.com>,
-        Jagadeesh Kona <quic_jkona@quicinc.com>,
-        Satya Priya Kakitapalli
-	<quic_skakitap@quicinc.com>,
-        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-References: <20240822-qcs8300-gcc-v2-0-b310dfa70ad8@quicinc.com>
- <20240822-qcs8300-gcc-v2-2-b310dfa70ad8@quicinc.com>
- <bf5b7607-a8fc-49e3-8cf7-8ef4b30ba542@lunn.ch>
-Content-Language: en-US
-From: Imran Shaik <quic_imrashai@quicinc.com>
-In-Reply-To: <bf5b7607-a8fc-49e3-8cf7-8ef4b30ba542@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: dNdOVxGqU4QtIeyHhXJdRACzKHnDQ08X
-X-Proofpoint-ORIG-GUID: dNdOVxGqU4QtIeyHhXJdRACzKHnDQ08X
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-26_08,2024-08-23_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- adultscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0 clxscore=1015
- malwarescore=0 phishscore=0 priorityscore=1501 mlxscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408260085
+Content-Transfer-Encoding: 8bit
 
+Hi Greg KH and Sergey,
 
-
-On 8/23/2024 1:29 AM, Andrew Lunn wrote:
->> +static int gcc_qcs8300_probe(struct platform_device *pdev)
->> +{
->> +	struct regmap *regmap;
->> +	int ret;
->> +
->> +	regmap = qcom_cc_map(pdev, &gcc_qcs8300_desc);
->> +	if (IS_ERR(regmap))
->> +		return PTR_ERR(regmap);
->> +
->> +	ret = qcom_cc_register_rcg_dfs(regmap, gcc_dfs_clocks,
->> +				       ARRAY_SIZE(gcc_dfs_clocks));
->> +	if (ret)
->> +		return ret;
->> +
->> +	/* Keep some clocks always enabled */
+On Mon, 26 Aug 2024 07:04:00 +0200, Greg KH wrote:
+> > ath6kl_usb_submit_ctrl_in() did not take into account the situation where
+> > the length of the data read from the device is not equal to the len, and
+> > such missing judgments will result in subsequent code using incorrect data.
+> >
+> > usb_control_msg_recv() handles the abnormal length of the returned data,
+> > so using it directly can fix this warning.
+> >
+> > Reported-by: syzbot+92c6dd14aaa230be6855@syzkaller.appspotmail.com
+> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> > ---
+> > V2: Directly using USB functions
+> >
+> >  drivers/net/wireless/ath/ath6kl/usb.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/net/wireless/ath/ath6kl/usb.c b/drivers/net/wireless/ath/ath6kl/usb.c
+> > index 5220809841a6..dc1f89ebb740 100644
+> > --- a/drivers/net/wireless/ath/ath6kl/usb.c
+> > +++ b/drivers/net/wireless/ath/ath6kl/usb.c
+> > @@ -1027,9 +1027,9 @@ static int ath6kl_usb_bmi_read(struct ath6kl *ar, u8 *buf, u32 len)
+> >  	int ret;
+> >
+> >  	/* get response */
+> > -	ret = ath6kl_usb_submit_ctrl_in(ar_usb,
+> > -					ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
+> > -					0, 0, buf, len);
 > 
-> Sorry, but you need to explain why. Why cannot the camera driver
-> enable these clocks when it loads? Why cannot the display driver
-> enable these clocks when it loads.
+> By removing this call, there is now only one call left to
+> ath6kl_usb_submit_ctrl_in(), so that probably can also be unwrapped in a
+> second patch in this series, right?
+Sorry, I didn't clarify what you said.
 > 
+> > +	ret = usb_control_msg_recv(ar_usb->udev, 0, ATH6KL_USB_CONTROL_REQ_RECV_BMI_RESP,
+> > +				 USB_DIR_IN | USB_TYPE_VENDOR |
+> > +				 USB_RECIP_DEVICE, 0, 0, buf, len, 2000, GFP_KERNEL);
+> 
+> As was pointed out, this is a very odd indentation style.
+I will send V3 patch to adjust the indentation style.
 
-These clocks are recommended to be kept always ON as per the HW design 
-and also exposing clock structures and marking them critical in the 
-kernel would lead to redundant code. Based on previous discussions with 
-clock maintainers, it is recommended to keep such clocks enabled at 
-probe and not model them. This approach is consistently followed for all 
-other targets as well.
+BR,
+Edward
 
-Thanks,
-Imran
-
-> 	Andrew
 
