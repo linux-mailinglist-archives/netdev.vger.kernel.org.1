@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-121977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0126495F745
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:00:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B043695F748
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33D0F1C219A9
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:00:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 671811F22D32
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 17:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3089C1946B8;
-	Mon, 26 Aug 2024 17:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46032198A27;
+	Mon, 26 Aug 2024 17:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2by0JeI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jGf04jGx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F068E10A0D;
-	Mon, 26 Aug 2024 17:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0A9198A11;
+	Mon, 26 Aug 2024 17:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724691629; cv=none; b=TIchx5atzOEZgCAxayyGkJei1JKD6RjX/LIUlf9dE9c2xOmj706griKEtWYq/Kz8wcsaXwXw9wRsq+/mBJgz1FeplMyk555RYoO+FHHonSdx2lePyEnKICYCfpzJpCml5GdxxyUYGSaCSP3NFpbhLk5veB0HRJK184MC7VY5E2s=
+	t=1724691630; cv=none; b=PIeAs2+AxLrMiUQQ/WVqlrNI3XPb3Xnl0hKE+xIt+8sgmqUXVwOfufi9a121ydEYC8nkix5564csQRST6ns1v6oDqvqGKYjD3loVX9kPMW6JSN03uZ4yXsFrvMMWBRNpP0lAHcJ0QtMJh/bdoeX04n8TnFCskv8ZujAEGI6yrXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724691629; c=relaxed/simple;
-	bh=doOdWMqY3vxQVLC7/mSNh1GfH3I58afGjOrUy2ZiPgQ=;
+	s=arc-20240116; t=1724691630; c=relaxed/simple;
+	bh=/IRM/2tvQX8CeHRsU7kn4NXZdqvz6QJqFRyF8qUf+u8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pPzoeg2A9ivVpkQ9ccDlfN+rP/KUe360qQ5piEQbD6oVYLgCNqhtBMh6bOU5JB4Qqa1O6icEadAqZo3kEo2uYyoQK89P9685PjaHyIiM6NRcFLjyJ7wsl7s3nJH7aI0VoPX/U3ykN4wDNZit699FdFUTW2W4FhdsKGvwl/vNoA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2by0JeI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77687C4FF67;
-	Mon, 26 Aug 2024 17:00:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724691628;
-	bh=doOdWMqY3vxQVLC7/mSNh1GfH3I58afGjOrUy2ZiPgQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=a2by0JeIDJ6W8C4t3xO65+9lLCYq4kKhcVyr4oGl+oWFKZ461G9FttZHaP5Xm9Nst
-	 +cukq2A8+WuWA2+jNnt4++zeBYU3r7r0pb0OUtSFakBksDi4vidJTSQESL1AzYwAvs
-	 RIrYW8zKiPuhUN8N6e7uvvtHsVz6F2JxWANtTxgOumpzYtZyLVrYehp30Wng1pfFV8
-	 JjhefHCT2M2i/jr1sa3ppsACgT43Jjl+5cSeOcUPLqp3s0Shl/FRuqaae5LjNV+MaP
-	 fAnZ+edWM6LAW5CbhVxbfeZOs1Jstcnd5wOGvJOHkihnFjPSLx8DMQH6w44WYhVzzo
-	 FYF6b9Y1FJcTQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE38B3822D6D;
+	 In-Reply-To:To:Cc; b=qTU5lz+WKcdHmvabcZttcvQ3ZmoKyZ0u+uXKSJKCScgeRTbGHDq2Zt1xubBe3DOYLLuSUHe7Vqo7Mr6hemRrGvhYaYBx2p8IDKdw+tYWKMqWH867OuosWdZZvdwPAKRGY2NZobPQ+e0YJGMFDr23qt+BP+fnq1Oh35uG7DoN2ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jGf04jGx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DED5DC4FF73;
 	Mon, 26 Aug 2024 17:00:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724691629;
+	bh=/IRM/2tvQX8CeHRsU7kn4NXZdqvz6QJqFRyF8qUf+u8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jGf04jGxbP+XARELeB4KzXdodqH0LsPoq5a6+ZCqjgwkIRNOKrwFfoId6U2BTcVva
+	 Uig5x3X5/8AgJad2fp8t7E+Dy6iptiDTIIuXcCgM/8w9tdfLZu6I1OZifpAj5VeyFC
+	 Ch7+9jotqRYdhK8u7+teQs8RPM2ifF2ggjtIwhg5njOWOXa95TWJe8oNRDW+3VrQV5
+	 jaobbZCnePzzV2vsAMWRnTWmkot1X0MHrerNquUMJ/BQycpKthEBwW9PJHatDL8g3m
+	 +4rgAdSzSmui24Z+kuJm1wZb3mqnVYSSREjlEhr3Ofapdg2ys8ltvxwcAuendye7mx
+	 D+hic/RnDPxMA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D2F3822D6D;
+	Mon, 26 Aug 2024 17:00:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,66 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/8] Some modifications to optimize code readability
+Subject: Re: [PATCH net-next v3 0/5] net: xilinx: axienet: Multicast fixes and
+ improvements
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172469162851.70473.1457098908791177308.git-patchwork-notify@kernel.org>
-Date: Mon, 26 Aug 2024 17:00:28 +0000
-References: <20240822133908.1042240-1-lizetao1@huawei.com>
-In-Reply-To: <20240822133908.1042240-1-lizetao1@huawei.com>
-To: Li Zetao <lizetao1@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, marcel@holtmann.org, johan.hedberg@gmail.com,
- luiz.dentz@gmail.com, idryomov@gmail.com, xiubli@redhat.com,
- dsahern@kernel.org, trondmy@kernel.org, anna@kernel.org,
- chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de,
- okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, jmaloy@redhat.com,
- ying.xue@windriver.com, linux@treblig.org, jacob.e.keller@intel.com,
- willemb@google.com, kuniyu@amazon.com, wuyun.abel@bytedance.com,
- quic_abchauha@quicinc.com, gouhao@uniontech.com, netdev@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, ceph-devel@vger.kernel.org,
- linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net
+ <172469162977.70473.13914203519128416707.git-patchwork-notify@kernel.org>
+Date: Mon, 26 Aug 2024 17:00:29 +0000
+References: <20240822154059.1066595-1-sean.anderson@linux.dev>
+In-Reply-To: <20240822154059.1066595-1-sean.anderson@linux.dev>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: radhey.shyam.pandey@amd.com, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, edumazet@google.com,
+ michal.simek@amd.com, andrew@lunn.ch, daniel@iogearbox.net,
+ davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ pabeni@redhat.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 22 Aug 2024 21:39:00 +0800 you wrote:
-> This patchset is mainly optimized for readability in contexts where size
-> needs to be determined. By using min() or max(), or even directly
-> removing redundant judgments (such as the 5th patch), the code is more
-> consistent with the context.
+On Thu, 22 Aug 2024 11:40:54 -0400 you wrote:
+> This series has a few small patches improving the handling of multicast
+> addresses. In particular, it makes the driver a whole lot less spammy,
+> and adjusts things so we aren't in promiscuous mode when we have more
+> than four multicast addresses (a common occurance on modern systems).
 > 
-> Li Zetao (8):
->   atm: use min() to simplify the code
->   Bluetooth: use min() to simplify the code
->   net: caif: use max() to simplify the code
->   libceph: use min() to simplify the code
->   net: remove redundant judgments to simplify the code
->   ipv6: mcast: use min() to simplify the code
->   tipc: use min() to simplify the code
->   SUNRPC: use min() to simplify the code
+> As the hardware has a 4-entry CAM, the ideal method would be to "pack"
+> multiple addresses into one CAM entry. Something like:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/8] atm: use min() to simplify the code
+  - [net-next,v3,1/5] net: xilinx: axienet: Always disable promiscuous mode
     (no matching commit)
-  - [net-next,2/8] Bluetooth: use min() to simplify the code
+  - [net-next,v3,2/5] net: xilinx: axienet: Fix dangling multicast addresses
     (no matching commit)
-  - [net-next,3/8] net: caif: use max() to simplify the code
-    https://git.kernel.org/netdev/net-next/c/b4985aa8e312
-  - [net-next,4/8] libceph: use min() to simplify the code
-    (no matching commit)
-  - [net-next,5/8] net: remove redundant judgments to simplify the code
-    (no matching commit)
-  - [net-next,6/8] ipv6: mcast: use min() to simplify the code
-    https://git.kernel.org/netdev/net-next/c/26549dab8a46
-  - [net-next,7/8] tipc: use min() to simplify the code
-    https://git.kernel.org/netdev/net-next/c/a18308623ce3
-  - [net-next,8/8] SUNRPC: use min() to simplify the code
-    (no matching commit)
+  - [net-next,v3,3/5] net: xilinx: axienet: Don't print if we go into promiscuous mode
+    https://git.kernel.org/netdev/net-next/c/cd039e6787ff
+  - [net-next,v3,4/5] net: xilinx: axienet: Don't set IFF_PROMISC in ndev->flags
+    https://git.kernel.org/netdev/net-next/c/7a826fb3e4c6
+  - [net-next,v3,5/5] net: xilinx: axienet: Support IFF_ALLMULTI
+    https://git.kernel.org/netdev/net-next/c/749e67d5b297
 
 You are awesome, thank you!
 -- 
