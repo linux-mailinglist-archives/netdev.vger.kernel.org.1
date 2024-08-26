@@ -1,235 +1,230 @@
-Return-Path: <netdev+bounces-122023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 959FE95F97B
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 21:14:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AB9995F995
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 21:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1495E1F2101D
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:14:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B51CB284165
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 19:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1470E1991B5;
-	Mon, 26 Aug 2024 19:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E398199250;
+	Mon, 26 Aug 2024 19:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="CTH8YCb1"
+	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="QoLu3gs3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54DB2194138;
-	Mon, 26 Aug 2024 19:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8251991D2
+	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 19:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724699689; cv=none; b=EJfmZiAy/R09UGwXmDJW5p7ZF9S8dEYpSaah+umHiW0wGUbDfPWvpwQuD1fiK5O/izKyqhd90RkjozZCkprcleWf18DzNkYV52avbi0WytxFyi2GgJ0B24OGTCcaUd9BBegYvLR+xtGwMre19r+I9Rt0AGVeVwxOFhAQqTAE48c=
+	t=1724700182; cv=none; b=Fquja7zosF98c5peMh/kITM3o6FynFKrPcIdBueWF8vTT4ChVR/WjFuXKWOs/NqTYXkqtpPbia3VU3oDI7vPzxJGPg5O9seRbclIVQPxETTQRj24L12Ojv5rSyvOKPp+SxAaDFNu2XBN7Paim/5IaLvWm0qOP+w+Sklc6s7LIws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724699689; c=relaxed/simple;
-	bh=KVRMcmwnX8djX0JysOwFBlfFTwFz8k+1tcH52mTbkJE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=AnHScC76IdIplCCpZT5fygPA/8ckrd0QvJ6lZAXCVA5w16Obfur/jz8jAlI6bWD2ckx207Oprfk3hTBVxDnilby6hcM2UcMnvCXjqn+/eygNKX68TGiKGC4Wm++SgrjVkSR2wM3/b/uH/WRGXuJ9Ls1Y5LqG1Clc0TBJ+7vWG4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=CTH8YCb1; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47QGAeJx024068;
-	Mon, 26 Aug 2024 19:14:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	scGo/ReMtVA2P+UMCPVIplR5e4FSO0emnbV3UVR0J+g=; b=CTH8YCb1o/UqSNkM
-	l8G4Dig8BUKceKdgWD0JLGb1UVpdh+NCjpXniN96JdbZTp9TA2eiiif5os+RCFTk
-	vw8yrHjB6KS8qzcqKev9mYpO5AJFCEKBYirskePDuWkyMFu1ABQOpS6auSRkl4Wd
-	y3RseIacW7bArX6/nX5cfNjQLbRoeLFGBEsfJYJAwwM3z5g/Cxa3yUwl09Pxt5JT
-	Tf4axSz1mLgTy9UkMg4qf/bYcfdNCziEf7oujhwQSLVqeG+fYEn7C1VAkxlTO9PJ
-	hi4TMFPi0eRvTgkHMNzN45snPse6v09pT6UVDFL1QYF3uGO4DOgTLXBIa9K6s6Hg
-	WRuJ3Q==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 417g51gce0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 Aug 2024 19:14:41 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47QJEfXT008862;
-	Mon, 26 Aug 2024 19:14:41 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 417g51gcdu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 Aug 2024 19:14:41 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47QGPK84021761;
-	Mon, 26 Aug 2024 19:14:40 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 417suu7pgv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 Aug 2024 19:14:40 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47QJEauk47972820
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 26 Aug 2024 19:14:36 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 91D4520043;
-	Mon, 26 Aug 2024 19:14:36 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E7D7920040;
-	Mon, 26 Aug 2024 19:14:35 +0000 (GMT)
-Received: from [9.171.82.113] (unknown [9.171.82.113])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 26 Aug 2024 19:14:35 +0000 (GMT)
-Message-ID: <8a829adf-2833-4b4d-a690-5fff52967e35@linux.ibm.com>
-Date: Mon, 26 Aug 2024 21:14:34 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net/smc: add sysctl for smc_limit_hs
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-        wenjia@linux.ibm.com, wintera@linux.ibm.com, guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-        tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
-References: <1724207797-79030-1-git-send-email-alibuda@linux.alibaba.com>
- <abd79f44-aed2-4e01-a7f8-7d806f5bc755@linux.ibm.com>
- <905874a4-c000-4845-8fac-3fc4b79f43fd@linux.alibaba.com>
-From: Jan Karcher <jaka@linux.ibm.com>
-Organization: IBM - Network Linux on Z
-In-Reply-To: <905874a4-c000-4845-8fac-3fc4b79f43fd@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: fjyb7kQaI7tcJxiVYSI0ZImx0Wf_9Ygm
-X-Proofpoint-GUID: TQ_Or8n-UL1faEBG-rlgFh8V9Qmgy8k4
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1724700182; c=relaxed/simple;
+	bh=tDJNUr27zxTQ4SUunjdZ0ylIYlgXCyM8c00NYRgGDuw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j6Xa7xytuRgjBWxYzKZwxFahyffvrjvbfNPRNQh7VyEexT61nON7lL0r3n4A/9yE3u2E8XF0jcvQaUM/hqtGBPOFf+zCvlp/9Te+849NaiBv2wjoHOWeZ57A8T9LS4CC9+pAkyGLfpBLlNgKdyBJWJKn2cIyGlCQ5zAV/2CVqpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com; spf=pass smtp.mailfrom=digitalocean.com; dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b=QoLu3gs3; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digitalocean.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e02c4983bfaso4937613276.2
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 12:22:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=digitalocean.com; s=google; t=1724700179; x=1725304979; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=F6LqBt/cgf5saFNqougCditEz5JCrr5uJaPi0WKZXWo=;
+        b=QoLu3gs3omZpy7j6KkBNyUm3+qvqE79ETW/WoWzgFM8DpjcC/stY01owVBqrrG06R/
+         yazR1E8Rqfcixds5QsYgnvSLwJzTyPsIggAjENAfUqBaEGfrXmOOkqOzw5ZPsNAx64rL
+         W6dHYp2+kE2q8Ax+/bEvzlIYDX27IUqWBJKkA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724700179; x=1725304979;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=F6LqBt/cgf5saFNqougCditEz5JCrr5uJaPi0WKZXWo=;
+        b=C4Ky7BEprhAGms7OeZyHEXctHrlbC9QPHYLMDApPiUZ/mErmCu4EGJRLFayswovAb7
+         PFCdv+8/P0UACsJB17OrEWbPhXDhNOdlgDn+X/VVQpfDImLO7gvqTO5xYqzc8SxbYXqS
+         iB/tWhnwHIuUWpoqBuMLYGYz0b/8CuJgYeHTYHanDMG6Jf0VaJEpvvfo1Y0boQvpiALf
+         T8idHagZGms9sQuPtxc843wSp2Ol/mDPtWl0bdVMKuXKFE75dVBJGhnu7vED6YY+9lG4
+         YzQbiXfuU42Q7+gSCTva4PseT+R2RruHe6VgOb3bP1mpPTclwVyCVozHnwb4qMHYNv4n
+         Rn4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWgzVmlZpiE+9gWJnDVaKREdLhYnUewcPGrIYqyyiko8OaODo6ZTylCumr0glowvAbFT4w1wU4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yysno/pQs3m2XNSPPlhvH4T2guc7zO6AiT9RJgomPqy1SIsXPSq
+	ev4iaoe0VDGka4kfRJZyIrFQ9X3m5XxoBl8lYKk6UDf0fEB/80VzOL+Kr/ySuIY=
+X-Google-Smtp-Source: AGHT+IENvO39dZD8SM8XQUS6jkNMVVXZUu4Li0XJ01QpUNqrH5VA9EYbqM15qZGvjmYzMuTP3QTLBw==
+X-Received: by 2002:a05:690c:1d:b0:664:5957:f7a with SMTP id 00721157ae682-6c624dca095mr146931867b3.15.1724700179081;
+        Mon, 26 Aug 2024 12:22:59 -0700 (PDT)
+Received: from ?IPV6:2603:8080:7400:36da:45f:f211:3a7c:9377? ([2603:8080:7400:36da:45f:f211:3a7c:9377])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6c39d3a9a93sm16400567b3.89.2024.08.26.12.22.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Aug 2024 12:22:58 -0700 (PDT)
+Message-ID: <1cb17652-3437-472e-b8d5-8078ba232d60@digitalocean.com>
+Date: Mon, 26 Aug 2024 14:22:57 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-26_14,2024-08-26_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- lowpriorityscore=0 impostorscore=0 adultscore=0 spamscore=0
- priorityscore=1501 malwarescore=0 suspectscore=0 clxscore=1015
- phishscore=0 bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408260145
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
+To: Dragos Tatulea <dtatulea@nvidia.com>, eli@mellanox.com, mst@redhat.com,
+ jasowang@redhat.com, xuanzhuo@linux.alibaba.com
+Cc: virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com,
+ sashal@kernel.org, yuehaibing@huawei.com, steven.sistare@oracle.com
+References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
+ <afcbf041-7613-48e6-8088-9d52edd907ff@nvidia.com>
+ <8a15a46a-2744-4474-8add-7f6fb35552b3@digitalocean.com>
+ <2a1a4dfb-aef1-47c1-81ce-b29ed302c923@nvidia.com>
+Content-Language: en-US
+From: Carlos Bilbao <cbilbao@digitalocean.com>
+In-Reply-To: <2a1a4dfb-aef1-47c1-81ce-b29ed302c923@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Hello,
 
-
-On 26/08/2024 05:02, D. Wythe wrote:
-> 
-> 
-> On 8/21/24 4:03 PM, Jan Karcher wrote:
+On 8/26/24 10:53 AM, Dragos Tatulea wrote:
+>
+> On 26.08.24 16:26, Carlos Bilbao wrote:
+>> Hello Dragos,
 >>
+>> On 8/26/24 4:06 AM, Dragos Tatulea wrote:
+>>> On 23.08.24 18:54, Carlos Bilbao wrote:
+>>>> Hello,
+>>>>
+>>>> I'm debugging my vDPA setup, and when using ioctl to retrieve the
+>>>> configuration, I noticed that it's running in half duplex mode:
+>>>>
+>>>> Configuration data (24 bytes):
+>>>>   MAC address: (Mac address)
+>>>>   Status: 0x0001
+>>>>   Max virtqueue pairs: 8
+>>>>   MTU: 1500
+>>>>   Speed: 0 Mb
+>>>>   Duplex: Half Duplex
+>>>>   RSS max key size: 0
+>>>>   RSS max indirection table length: 0
+>>>>   Supported hash types: 0x00000000
+>>>>
+>>>> I believe this might be contributing to the underperformance of vDPA.
+>>> mlx5_vdpa vDPA devicess currently do not support the VIRTIO_NET_F_SPEED_DUPLEX
+>>> feature which reports speed and duplex. You can check the state on the
+>>> PF.
 >>
->> On 21/08/2024 04:36, D. Wythe wrote:
->>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>> According to ethtool, all my devices are running at full duplex. I assume I
+>> can disregard this configuration output from the module then.
+>>
+> Yep.
+>
+>>>> While looking into how to change this option for Mellanox, I read the following
+>>>> kernel code in mlx5_vnet.c:
+>>>>
+>>>> static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
+>>>>                  unsigned int len)
+>>>> {
+>>>>     /* not supported */
+>>>> }
+>>>>
+>>>> I was wondering why this is the case.
+>>> TBH, I don't know why it was not added. But in general, the control VQ is the
+>>> better way as it's dynamic.
 >>>
->>> In commit 48b6190a0042 ("net/smc: Limit SMC visits when handshake 
->>> workqueue congested"),
->>> we introduce a mechanism to put constraint on SMC connections visit
->>> according to the pressure of SMC handshake process.
->>>
->>> At that time, we believed that controlling the feature through netlink
->>> was sufficient. However, most people have realized now that netlink is
->>> not convenient in container scenarios, and sysctl is a more suitable
->>> approach.
+>>>> Is there another way for me to change
+>>>> these configuration settings?
+>>>>
+>>> The configuration is done using control VQ for most things (MTU, MAC, VQs,
+>>> etc). Make sure that you have the CTRL_VQ feature set (should be on by
+>>> default). It should appear in `vdpa mgmtdev show` and `vdpa dev config
+>>> show`.
 >>
->> Hi D.
+>> I see that CTRL_VQ is indeed enabled. Is there any documentation on how to
+>> use the control VQ to get/set vDPA configuration values?
 >>
->> thanks for your contribution.
->> What i wonder is should we prefer the use of netlink > sysctl or not?
->> To the upstream maintainers: Is there a prefernce for the net tree?
 >>
->> My impression from past discussions is that netlink should be chosen 
->> over sysctl.
->> If so, why is it inconvenient to use netlink in containers?
->> Can this be changed?
->>
->> Other then the general discussion the changhes look good to me.
->>
->> Reviewed-by: Jan Karcher <jaka@linux.ibm.com>
->>
-> 
-> Hi Jan,
-> 
-> I noticed that there have been relevant discussions before, perhaps this 
-> will be helpful to you.
-> 
-> Link: 
-> https://lore.kernel.org/netdev/20220224020253.GF5443@linux.alibaba.com
+> You are most likely using it already through through qemu. You can check
+> if the CTR_VQ feature also shows up in the output of `vdpa dev config show`.
+>
+> What values are you trying to configure btw?
 
-Hi D.,
 
-thanks for the pointer! If i understood Jakub correct it should be 
-possible to add a yaml definition for the SMC netlink anbd modify it vie 
-a small program.
+Yes, CTRL_VQ also shows up in vdpa dev config show. There isn't a specific
+value I want to configure ATM, but my vDPA isn't performing as expected, so
+I'm investigating potential issues. Below is the code I used to retrieve
+the configuration from the driver; I'd be happy to send it as a patch if
+you or someone else reviews it.
 
-That said I'm not to familia with the use of them in containers. So if 
-you say this is the better solution and everyone is fine with yet 
-another sysctl it is fine by me.
 
-Thanks
-- Jan
+>
+> Thanks,
+> Dragos
 
-> 
-> 
-> Best wishes,
-> D. Wythe
-> 
-> 
->>
->>>
->>> In addition, since commit 462791bbfa35 ("net/smc: add sysctl 
->>> interface for SMC")
->>> had introcuded smc_sysctl_net_init(), it is reasonable for us to
->>> initialize limit_smc_hs in it instead of initializing it in
->>> smc_pnet_net_int().
->>>
->>> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
->>> ---
->>> v1 -> v2:
->>>
->>> Modified the description in the commit and removed the incorrect
->>> spelling.
->>>
->>>   net/smc/smc_pnet.c   |  3 ---
->>>   net/smc/smc_sysctl.c | 11 +++++++++++
->>>   2 files changed, 11 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
->>> index 2adb92b..1dd3623 100644
->>> --- a/net/smc/smc_pnet.c
->>> +++ b/net/smc/smc_pnet.c
->>> @@ -887,9 +887,6 @@ int smc_pnet_net_init(struct net *net)
->>>         smc_pnet_create_pnetids_list(net);
->>>   -    /* disable handshake limitation by default */
->>> -    net->smc.limit_smc_hs = 0;
->>> -
->>>       return 0;
->>>   }
->>>   diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
->>> index 13f2bc0..2fab645 100644
->>> --- a/net/smc/smc_sysctl.c
->>> +++ b/net/smc/smc_sysctl.c
->>> @@ -90,6 +90,15 @@
->>>           .extra1        = &conns_per_lgr_min,
->>>           .extra2        = &conns_per_lgr_max,
->>>       },
->>> +    {
->>> +        .procname    = "limit_smc_hs",
->>> +        .data        = &init_net.smc.limit_smc_hs,
->>> +        .maxlen        = sizeof(int),
->>> +        .mode        = 0644,
->>> +        .proc_handler    = proc_dointvec_minmax,
->>> +        .extra1        = SYSCTL_ZERO,
->>> +        .extra2        = SYSCTL_ONE,
->>> +    },
->>>   };
->>>     int __net_init smc_sysctl_net_init(struct net *net)
->>> @@ -121,6 +130,8 @@ int __net_init smc_sysctl_net_init(struct net *net)
->>>       WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
->>>       net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
->>>       net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
->>> +    /* disable handshake limitation by default */
->>> +    net->smc.limit_smc_hs = 0;
->>>         return 0;
-> 
+
+Thanks,
+Carlos
+
+---
+
+From ab6ea66c926eaf1e95eb5d73bc23183e0021ee27 Mon Sep 17 00:00:00 2001
+From: Carlos Bilbao <bilbao@vt.edu>
+Date: Sat, 24 Aug 2024 00:24:56 +0000
+Subject: [PATCH] mlx5: Add support to update the vDPA configuration
+
+This is needed for VHOST_VDPA_SET_CONFIG.
+
+Signed-off-by: Carlos Bilbao <cbilbao@digitalocean.com>
+---
+ drivers/vdpa/mlx5/net/mlx5_vnet.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+index b56aae3f7be3..da31c743b2b9 100644
+--- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
++++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+@@ -2909,14 +2909,32 @@ static void mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset,
+     struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
+     struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
+
+-    if (offset + len <= sizeof(struct virtio_net_config))
++    if (offset + len <= sizeof(struct virtio_net_config)) {
+         memcpy(buf, (u8 *)&ndev->config + offset, len);
++        }
++        else
++        {
++            printk(KERN_ERR "%s: Offset and length out of bounds\n",
++            __func__);
++        }
++
+ }
+
+ static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
+                  unsigned int len)
+ {
+-    /* not supported */
++    struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
++    struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
++
++    if (offset + len <= sizeof(struct virtio_net_config))
++    {
++        memcpy((u8 *)&ndev->config + offset, buf, len);
++    }
++    else
++    {
++        printk(KERN_ERR "%s: Offset and length out of bounds\n",
++        __func__);
++    }
+ }
+
+ static u32 mlx5_vdpa_get_generation(struct vdpa_device *vdev)
+--
+2.34.1
+
+
 
