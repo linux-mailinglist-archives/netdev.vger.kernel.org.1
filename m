@@ -1,181 +1,109 @@
-Return-Path: <netdev+bounces-121957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5344D95F614
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:09:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A23795F61B
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 18:10:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A1EF28256B
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:09:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84741B20D2E
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 16:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8801919306F;
-	Mon, 26 Aug 2024 16:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6E1719342E;
+	Mon, 26 Aug 2024 16:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b6Qzr18S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4CA186619
-	for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 16:09:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7894A153812;
+	Mon, 26 Aug 2024 16:09:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724688567; cv=none; b=Ygs8F5iYcpJzjkVclIUA6s1CII3cWQyYQ+KTkBiMjolttEzjzrnD23DvQrfWDcN+lc6uT+TA4kijWC0873plSopOtWBHc4nzfVYHWVovP9zVLDzp/nmuAHNbo9RbaWd+zpA8mQ7JwGYpyQ26SwxAM7EhZqYlAwL1VXClGYcdd5g=
+	t=1724688590; cv=none; b=rQXt+u5ajr1FNkGLeIPHsF2woiY83swEtV5O+1OytFPGbYNabxDNDmISiWmpSeQAqaibBXh+LHf1cOV9HLbJAWnXKboyt2QajX7EajgWN28d1BJCX/pWxQ1neivG95dS9AeuKznXhODojgABndjTmWEqmgLqzCKa7U8615sAFt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724688567; c=relaxed/simple;
-	bh=xRFXY7a1NS7rsT5IPKt+2U4xXWn38dio2H9Pw0Geql8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YIyegkPWwXcW8Aq7p5PAN4AuBiwUfBPYYqJazYUYsMFMIiCVqaZMym3cmZ+cHK6mPT0cjb+bPsfA3q+wGVzL22sMqjlZiy94IOvISN+PJV/4o8+mS5T6iTbP4bfy5ytXAkccliW3ZHbrw+c0H5HWvcOUkZhFfAQ4mCfYmxjqV04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-39d3325ba79so51163345ab.2
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 09:09:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724688565; x=1725293365;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=S0mc0zFjo46BT2fOdbAUWNVmQV1JwvohMKwJbBgfLZI=;
-        b=EmtfTft62Xc54hYVIkRSwYvHTrRVw1qU3l2wtrbTiIs/Br6l91e6IdoZbG7HoCAenG
-         pjoziRnZd2j9HPb/Y7UelrjtTpmm9jBILQ/6pomzD1KChAP9qv+GnCjsNjX62GCDKXEE
-         15tpn9wXUgKuXpSk5SfMIUEGfXWWNUTYdPbefY52ke2WdGXxYgSiGGQciv2GzBGm1lvs
-         ICfuuxcwNVS3tOkyr9jQP/iSgcwWi0UszxS2F248tc8wjPJ2nh0LK9Ia9KqxT+wi6+pm
-         tHQrQsRgbOWRByi1fNsZlqIlfJK0eUVlmlLCJXQjT+9jxuh9Tk5GBSXzjeEcRTfLSHz9
-         i9aA==
-X-Forwarded-Encrypted: i=1; AJvYcCXU5ilwAwPld6oDk3w0k9GeIJfUBgN0F6BdwwRHgUdFKg88I7lzBUvojEpJv6Djau5+fUuKnUE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTP7mM1eUPRs2wYsBPlKpAw/FOFdKJ44T5zFPBfNBl1fHqTAgA
-	Bw66keqhAssiLh5W0Fd3D85f5YA1VtJqoiECPY/D3sdjcorbUkUKLddJgevd/FIN2VEieiTlBmH
-	Gsv3H0b4BL9s1iNtwvKVowuESUbl5BQPW3WlRV9rZlszj4zXUIjynGDg=
-X-Google-Smtp-Source: AGHT+IGoUMvqtqNrZf06zsHOHnmrGyNj+DWyQGAwEMMxlJdkSBcPdRRHX4Wfi6NwwZXbVgIrQadcm5S3xyQWNL6vU9Cw6EenfmJ8
+	s=arc-20240116; t=1724688590; c=relaxed/simple;
+	bh=PgVuv+2ugVeGTH07IgetYbovxINZB9KbgAWUegNwC2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HDw90NAEJGmylkEGPHPK0ugEE0DG6fBkakcFHyvVIOZ4Fm7IXXtW5zo/FZwheXflZ+Llr5YuxqW/0YbtzRc8xoQBJHBSnareSI7O8gZ074oEOIE1WAtjj8clBbufWrV17Ao3BwGt1jD1aLi2uNB2R3mHd+Fx+r52vstWaUZqmMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b6Qzr18S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE29DC52FC1;
+	Mon, 26 Aug 2024 16:09:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724688590;
+	bh=PgVuv+2ugVeGTH07IgetYbovxINZB9KbgAWUegNwC2M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=b6Qzr18ST56e+ZIkNrKXLmV9BBHjlh82KJr9E5OOI/86EGF9gml8uPYnZnw7rIZ2N
+	 uQ0Dafk4rwC/2Fc7HsUC0ncaGxD+QreYUc6nElo1zGhSuvpBFOgkwNHLGRBmDQhMMs
+	 61IAGvFe9NCNiNceBHFBfjvU19CnWf2r63ed8Jl8lKszZiE2I3Vhh6zo5kM1cBaVCb
+	 JZuhkHPJwI1qnxSDCPHVLXaWlqpBhKktrwtu+t1KTejkdgYwNG2NpHT0em0b07KdZf
+	 rNMDePdjavcn8mu7cr7YfE15Z8ImlswG5K20o7Yc2EB+rAhiGmlPLb/KTlMWRcGF5D
+	 RGh99qNKNGSeQ==
+Date: Mon, 26 Aug 2024 17:09:43 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Ayush Singh <ayush@beagleboard.org>
+Cc: lorforlinux@beagleboard.org, jkridner@beagleboard.org,
+	robertcnelson@beagleboard.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>, Johan Hovold <johan@kernel.org>,
+	Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	greybus-dev@lists.linaro.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v3 1/3] dt-bindings: net: ti,cc1352p7: Add
+ bootloader-backdoor-gpios
+Message-ID: <20240826-pristine-domelike-d995db6f2561@spud>
+References: <20240825-beagleplay_fw_upgrade-v3-0-8f424a9de9f6@beagleboard.org>
+ <20240825-beagleplay_fw_upgrade-v3-1-8f424a9de9f6@beagleboard.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20c4:b0:397:ca8e:d377 with SMTP id
- e9e14a558f8ab-39e63acc9b5mr120435ab.0.1724688565033; Mon, 26 Aug 2024
- 09:09:25 -0700 (PDT)
-Date: Mon, 26 Aug 2024 09:09:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000044832c06209859bd@google.com>
-Subject: [syzbot] [sctp?] KMSAN: uninit-value in sctp_sf_ootb
-From: syzbot <syzbot+f0cbb34d39392f2746ca@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	lucien.xin@gmail.com, marcelo.leitner@gmail.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    d2bafcf224f3 Merge tag 'cgroup-for-6.11-rc4-fixes' of git:..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15e9b7f5980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=62f882de896675a6
-dashboard link: https://syzkaller.appspot.com/bug?extid=f0cbb34d39392f2746ca
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/17f6ee87834d/disk-d2bafcf2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7783769858d1/vmlinux-d2bafcf2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/45248109d188/bzImage-d2bafcf2.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f0cbb34d39392f2746ca@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in sctp_sf_ootb+0x7f5/0xce0 net/sctp/sm_statefuns.c:3702
- sctp_sf_ootb+0x7f5/0xce0 net/sctp/sm_statefuns.c:3702
- sctp_do_sm+0x181/0x93d0 net/sctp/sm_sideeffect.c:1166
- sctp_endpoint_bh_rcv+0xc38/0xf90 net/sctp/endpointola.c:407
- sctp_inq_push+0x2ef/0x380 net/sctp/inqueue.c:88
- sctp_rcv+0x3831/0x3b20 net/sctp/input.c:243
- sctp4_rcv+0x42/0x50 net/sctp/protocol.c:1158
- ip_protocol_deliver_rcu+0xb51/0x13d0 net/ipv4/ip_input.c:205
- ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
- dst_input include/net/dst.h:460 [inline]
- ip_rcv_finish+0x4a2/0x520 net/ipv4/ip_input.c:449
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ip_rcv+0xcd/0x380 net/ipv4/ip_input.c:569
- __netif_receive_skb_one_core net/core/dev.c:5661 [inline]
- __netif_receive_skb+0x319/0xa00 net/core/dev.c:5775
- netif_receive_skb_internal net/core/dev.c:5861 [inline]
- netif_receive_skb+0x58/0x660 net/core/dev.c:5921
- tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1549
- tun_get_user+0x5677/0x6b50 drivers/net/tun.c:2006
- tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2052
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xb2f/0x1550 fs/read_write.c:590
- ksys_write+0x20f/0x4c0 fs/read_write.c:643
- __do_sys_write fs/read_write.c:655 [inline]
- __se_sys_write fs/read_write.c:652 [inline]
- __x64_sys_write+0x93/0xe0 fs/read_write.c:652
- x64_sys_call+0x306a/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:2
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:3994 [inline]
- slab_alloc_node mm/slub.c:4037 [inline]
- kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4080
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:583
- pskb_expand_head+0x222/0x19c0 net/core/skbuff.c:2259
- __skb_cow include/linux/skbuff.h:3646 [inline]
- skb_cow include/linux/skbuff.h:3665 [inline]
- ip_rcv_options net/ipv4/ip_input.c:272 [inline]
- ip_rcv_finish_core+0xf3d/0x1fe0 net/ipv4/ip_input.c:387
- ip_rcv_finish+0x2cc/0x520 net/ipv4/ip_input.c:447
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ip_rcv+0xcd/0x380 net/ipv4/ip_input.c:569
- __netif_receive_skb_one_core net/core/dev.c:5661 [inline]
- __netif_receive_skb+0x319/0xa00 net/core/dev.c:5775
- netif_receive_skb_internal net/core/dev.c:5861 [inline]
- netif_receive_skb+0x58/0x660 net/core/dev.c:5921
- tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1549
- tun_get_user+0x5677/0x6b50 drivers/net/tun.c:2006
- tun_chr_write_iter+0x3af/0x5d0 drivers/net/tun.c:2052
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xb2f/0x1550 fs/read_write.c:590
- ksys_write+0x20f/0x4c0 fs/read_write.c:643
- __do_sys_write fs/read_write.c:655 [inline]
- __se_sys_write fs/read_write.c:652 [inline]
- __x64_sys_write+0x93/0xe0 fs/read_write.c:652
- x64_sys_call+0x306a/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:2
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 1 UID: 0 PID: 13990 Comm: syz.3.1326 Not tainted 6.11.0-rc4-syzkaller-00255-gd2bafcf224f3 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-=====================================================
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="/DPLpm0pp++ZNJeN"
+Content-Disposition: inline
+In-Reply-To: <20240825-beagleplay_fw_upgrade-v3-1-8f424a9de9f6@beagleboard.org>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+--/DPLpm0pp++ZNJeN
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On Sun, Aug 25, 2024 at 10:17:05PM +0530, Ayush Singh wrote:
+> bootloader-backdoor-gpio (along with reset-gpio) is used to enable
+> bootloader backdoor for flashing new firmware.
+>=20
+> The pin and pin level to enable bootloader backdoor is configured using
+> the following CCFG variables in cc1352p7:
+> - SET_CCFG_BL_CONFIG_BL_PIN_NO
+> - SET_CCFG_BL_CONFIG_BL_LEVEL
+>=20
+> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+--/DPLpm0pp++ZNJeN
+Content-Type: application/pgp-signature; name="signature.asc"
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+-----BEGIN PGP SIGNATURE-----
 
-If you want to undo deduplication, reply with:
-#syz undup
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZsyoxwAKCRB4tDGHoIJi
+0thAAQDPuuwJz0rQ4CLBxjUEwzs+xJQjaSdCxpCtp2ypSXeDfgD/QDkE2GTbcD51
+HY+44h0CGH+wJznOESsbSYLni8+60wM=
+=7Rz+
+-----END PGP SIGNATURE-----
+
+--/DPLpm0pp++ZNJeN--
 
