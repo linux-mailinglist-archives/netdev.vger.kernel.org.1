@@ -1,74 +1,57 @@
-Return-Path: <netdev+bounces-121789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-121790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4159995EB36
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:02:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 296A295EBA9
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 10:20:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE9F3B22A9A
-	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:02:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BFDCB23D71
+	for <lists+netdev@lfdr.de>; Mon, 26 Aug 2024 08:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F52A143726;
-	Mon, 26 Aug 2024 07:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="kcrnipcX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A4C13D258;
+	Mon, 26 Aug 2024 08:19:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-190.mail.qq.com (out203-205-221-190.mail.qq.com [203.205.221.190])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2D4813EFF3;
-	Mon, 26 Aug 2024 07:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EF213AD32;
+	Mon, 26 Aug 2024 08:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724658839; cv=none; b=HpxE+pImZeQ4R2uol0XBBaje2HiAVNhCCzX7XYsN/AeED553J1g3i4vCxG+uJ0Ns7UyZeMt3ZEr/ixIZJI6QEXvWnp6Z+s859IaGPXhO8CD/4Cpk2tTM5k1Prd0uiApipuUloUDnEm4qMdMxwOpKAvAi8URjS4OsZyBOs1cogRE=
+	t=1724660392; cv=none; b=Sc+f9j3NQp4DIJIFPMJqLD+lYbkPEX8TPwc55G1bj0Ioh/wQbO6hJjtBrUukvulICMo0zYCHnzSd6U4ZlibZObptTEouKMBc7HBp6M5p7tfTKFvG/q+H9kiqcG59KA8Je4dxGF9culvk9jfVdK5z16Yl+yYaFnTURkKlQTKBvLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724658839; c=relaxed/simple;
-	bh=/upxQZ7Sx8UT5zkENbL8iXck0iH/AKtTxcQdjNMMuxs=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=UNrTEOsyvqapH1XFV9oSeVEtBgtsutPjo/Uz3Y9sZvaAIaJrXyITWkBnianfrY/dDO9y7E0kKaTGc+xxuy7RQOlBuwcWZVSv4/bOFpqOnUgu6R/1Y52VwgabpqtzVRNWgSUL4Q99DN+VlnwnnruDl857sTJk1jIgt8ImCdjEpzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=kcrnipcX; arc=none smtp.client-ip=203.205.221.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1724658834; bh=oCAK+AeRh+UjThNu95QJgjgOIPjcluclamZIa6pai4o=;
-	h=From:To:Cc:Subject:Date;
-	b=kcrnipcX4ZCC0+OlfaazIvO4NSALB6mGr5SaljwhW72ElfNocCKWaGHhiIkjsBYZP
-	 2Anv4Z/B7u7FvbJf6rOkPQb+nK5FHNQ3ulT8pJyQc7Yu8NgmEV2xKKWJHtc7QzDjFn
-	 wnRD3RQ+L4a5kD1YOfbJwJbMyVoYE2Va1AOp12qk=
-Received: from localhost.localdomain ([112.64.14.141])
-	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
-	id 8FA126AE; Mon, 26 Aug 2024 15:35:58 +0800
-X-QQ-mid: xmsmtpt1724657758txumro6zf
-Message-ID: <tencent_155F5603C098FE823F48F8918122C3783107@qq.com>
-X-QQ-XMAILINFO: N/WmRbclY25GhqgeDlXWbzugTdURPWbmQLWpGhtZoceyG/DPYJABgOhjVL5BRs
-	 NWW33nwbEa5uJ1huxF/3MrYdsB79DzwSWNZUf1kTzD4O7AwFoVhlXjsIjkt8Re4y4ghVs5iBNQuI
-	 J5GsSFCAELHghpXKXuUBmfOBqo2zBdI0TUJ6VaSkxwZzPh/56i3mZ3r7Taky+KJPYvMzhKVB/FYA
-	 drbyFfCxG9VPc1f+wnpUPdPxCgGnMKMJxnMkblJ7/YzDnff3BsGs4NTc+KdHb6x96MjDT4BxBtIU
-	 ob+eUFlKTW6NF/DNHp9f78rzub/JBVltOkwYHzW3GnVihd6PingYNFAmFD+1KkIS41Y2E2Purce2
-	 pQTzd8SzWQcw2I+Gv+AJWGTVpbQ8MpZFW3DmuS9iTfOxGIBwiqX/LvSc4lkdHnexeD9V3G4WnYJT
-	 ef7kwYAVLfkFodrerU8OhVjxAgZesYsInGmz/q743NC0U4ejSdL66mbtUqgssFiY6DXS7M4Cxk1z
-	 AyUzjfEdTrso8nXq5mLzQPNtIKcclFJl2BOynvDuqdT3fO1k2dGLi2HxZDW2dagn3dv0dK7ZAOBB
-	 Vo5kYtYZgo+UOlLM07jnkoeZ0N7zm70NucijyH86Gn/3Wu5bxkAukHj4jGFFMCSOVVav41ynewjn
-	 RWbLx7jeDNz8CZsircQnG95LDY9KsxyKKq2i9TiiwShMBDMhCVEdT/dBd6IQwbbKEvqz+8P9Caac
-	 ATBnQTMEjlHau6f4OJzFIE/sw3Ixcv48Rs7/j/8i8IOH3V0kbHXVz8dHB8Bs5xc2ztnUVJg3IbeN
-	 wQmrZfjPI97J2ceMFEpIasQdcDjkyZ3MFaCotQcn35MZFiCzyLPHLxut/9s/RmF7llrqxqyfWXFy
-	 VanrdLuqAkr32pPFfWAofuS0MQdlINKBXeq9Vnre3KUmqU5ThpGWDqGlN5IVNzIiBckFhuoaKxz0
-	 EyPCJoqEvUAe1+ceaUP+reFYxsmpAWl/GGIIrHLdaDCc2mvkXblDAlFLsdPANe
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: jiping huang <huangjiping95@qq.com>
-To: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jiping huang <huangjiping95@qq.com>
-Subject: [PATCH] net: Remove a local variable with the same name as the parameter.
-Date: Mon, 26 Aug 2024 15:35:51 +0800
-X-OQ-MSGID: <20240826073551.2212-1-huangjiping95@qq.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1724660392; c=relaxed/simple;
+	bh=F+wiOa1xJ5byy/9/D8k7IsrxLfbEmRvl6NV+7VLQxHY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=R3YU/oJLv1JNsJ1Rc+O8rhXM4pjsuYjOIO583YwBhlyIziX1TqUihqd4b1SnnQz+w4B44X2gQbnjE5wamZvIgtSFhPNDhToNVEhGu3ocp9tTb09ykRo38Quj17WAWrfj9q+BvNtaw+R6yYo+NSlHxYlW9Sy/U5Wl2WwoX2Y6H+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Wsk4M0Xzbz69Lg;
+	Mon, 26 Aug 2024 16:14:59 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 844DB140258;
+	Mon, 26 Aug 2024 16:19:46 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 26 Aug 2024 16:19:45 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <shaojijie@huawei.com>,
+	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
+	<libaihan@huawei.com>, <andrew@lunn.ch>, <jdamato@fastly.com>,
+	<horms@kernel.org>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH V4 net-next 00/11] Add support of HIBMCGE Ethernet Driver
+Date: Mon, 26 Aug 2024 16:12:47 +0800
+Message-ID: <20240826081258.1881385-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,31 +59,120 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-There is no need to use an additional local avariable to get rtmsg.flags,
-and this variable has the same name as the function argument.
+This patch set adds the support of Hisilicon BMC Gigabit Ethernet Driver.
 
-Signed-off-by: jiping huang <huangjiping95@qq.com>
+This patch set includes basic Rx/Tx functionality. It also includes
+the registration and interrupt codes.
 
-diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index f669da98d11d..0d69267c9971 100644
---- a/net/ipv4/fib_semantics.c
-+++ b/net/ipv4/fib_semantics.c
-@@ -1830,12 +1830,10 @@ int fib_dump_info(struct sk_buff *skb, u32 portid, u32 seq, int event,
- 
- 	if (nhs == 1) {
- 		const struct fib_nh_common *nhc = fib_info_nhc(fi, 0);
--		unsigned char flags = 0;
- 
--		if (fib_nexthop_info(skb, nhc, AF_INET, &flags, false) < 0)
-+		if (fib_nexthop_info(skb, nhc, AF_INET, &rtm->rtm_flags, false) < 0)
- 			goto nla_put_failure;
- 
--		rtm->rtm_flags = flags;
- #ifdef CONFIG_IP_ROUTE_CLASSID
- 		if (nhc->nhc_family == AF_INET) {
- 			struct fib_nh *nh;
+This work provides the initial support to the HIBMCGE and
+would incrementally add features or enhancements.
+
+---
+ChangeLog:
+v3 -> v4:
+  - Delete INITED_STATE in priv, suggested by Andrew.
+  - Delete unnecessary defensive code in hbg_phy_start()
+    and hbg_phy_stop(), suggested by Andrew.
+  v3: https://lore.kernel.org/all/20240822093334.1687011-1-shaojijie@huawei.com/
+v2 -> v3:
+  - Add "select PHYLIB" in Kconfig, reported by Jakub.
+  - Use ndo_validate_addr() instead of is_valid_ether_addr()
+    in dev_set_mac_address(), suggested by Jakub and Andrew.
+  v2: https://lore.kernel.org/all/20240820140154.137876-1-shaojijie@huawei.com/
+v1 -> v2:
+  - fix build errors reported by kernel test robot <lkp@intel.com>
+    Closes: https://lore.kernel.org/oe-kbuild-all/202408192219.zrGff7n1-lkp@intel.com/
+    Closes: https://lore.kernel.org/oe-kbuild-all/202408200026.q20EuSHC-lkp@intel.com/
+  v1: https://lore.kernel.org/all/20240819071229.2489506-1-shaojijie@huawei.com/
+RFC v2 -> v1:
+  - Use FIELD_PREP/FIELD_GET instead of union, suggested by Andrew.
+  - Delete unnecessary defensive code, suggested by Andrew.
+  - A few other minor changes.
+  RFC v2: https://lore.kernel.org/all/20240813135640.1694993-1-shaojijie@huawei.com/
+RFC v1 -> RFC v2:
+  - Replace linkmode_copy() with phy_remove_link_mode() to
+    simplify the PHY configuration process, suggested by Andrew.
+  - Delete hbg_get_link_status() from the scheduled task, suggested by Andrew.
+  - Delete validation for mtu in hbg_net_change_mtu(), suggested by Andrew.
+  - Delete validation for mac address in hbg_net_set_mac_address(),
+    suggested by Andrew.
+  - Use napi_complete_done() to simplify the process, suggested by Joe Damato.
+  - Use ethtool_op_get_link(), phy_ethtool_get_link_ksettings(),
+    and phy_ethtool_set_link_ksettings() to simplify the code, suggested by Andrew.
+  - Add the null pointer check on the return value of pcim_iomap_table(),
+    suggested by Jonathan.
+  - Add the check on the return value of phy_connect_direct(),
+    suggested by Jonathan.
+  - Adjusted the layout to place the fields and register definitions
+    in one place, suggested by Jonathan.
+  - Replace request_irq with devm_request_irq, suggested by Jonathan.
+  - Replace BIT_MASK() with BIT(), suggested by Jonathan.
+  - Introduce irq_handle in struct hbg_irq_info in advance to reduce code changes,
+    suggested by Jonathan.
+  - Delete workqueue for this patch set, suggested by Jonathan.
+  - Support to compile this driver on all arch in Kconfig,
+    suggested by Andrew and Jonathan.
+  - Add a patch to add is_valid_ether_addr check in dev_set_mac_address,
+    suggested by Andrew.
+  - Use macro instead of inline to fix the warning about compile-time constant
+    in FIELD_PREP(), reported by Simon Horman.
+  - A few other minor changes.
+  RFC v1: https://lore.kernel.org/all/20240731094245.1967834-1-shaojijie@huawei.com/
+---
+
+Jijie Shao (11):
+  net: hibmcge: Add pci table supported in this module
+  net: hibmcge: Add read/write registers supported through the bar space
+  net: hibmcge: Add mdio and hardware configuration supported in this
+    module
+  net: hibmcge: Add interrupt supported in this module
+  net: hibmcge: Implement some .ndo functions
+  net: hibmcge: Implement .ndo_start_xmit function
+  net: hibmcge: Implement rx_poll function to receive packets
+  net: hibmcge: Implement some ethtool_ops functions
+  net: hibmcge: Add a Makefile and update Kconfig for hibmcge
+  net: hibmcge: Add maintainer for hibmcge
+  net: add ndo_validate_addr check in dev_set_mac_address
+
+ MAINTAINERS                                   |   7 +
+ drivers/net/ethernet/hisilicon/Kconfig        |  16 +-
+ drivers/net/ethernet/hisilicon/Makefile       |   1 +
+ .../net/ethernet/hisilicon/hibmcge/Makefile   |  10 +
+ .../ethernet/hisilicon/hibmcge/hbg_common.h   | 136 ++++++
+ .../ethernet/hisilicon/hibmcge/hbg_ethtool.c  |  17 +
+ .../ethernet/hisilicon/hibmcge/hbg_ethtool.h  |  11 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 285 ++++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |  57 +++
+ .../net/ethernet/hisilicon/hibmcge/hbg_irq.c  | 124 +++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_irq.h  |  11 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 240 ++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_mdio.c | 245 ++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_mdio.h |  12 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  | 143 ++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_txrx.c | 429 ++++++++++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_txrx.h |  37 ++
+ net/core/dev.c                                |   5 +
+ 18 files changed, 1785 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/Makefile
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h
+
 -- 
-2.34.1
+2.33.0
 
 
