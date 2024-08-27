@@ -1,177 +1,123 @@
-Return-Path: <netdev+bounces-122535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06CCA961998
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 23:57:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C65B9619E5
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 00:11:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B927E28520B
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:57:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A1F55B22C18
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 22:11:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2941D3652;
-	Tue, 27 Aug 2024 21:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 627001991B5;
+	Tue, 27 Aug 2024 22:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b700Y3GG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AuFxoG8U"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1439B1C8FC4;
-	Tue, 27 Aug 2024 21:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED3CF3C08A;
+	Tue, 27 Aug 2024 22:10:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724795870; cv=none; b=Fw9ORS69vKLOI9EOgPzHmBl2ZcdmiuVfWTlUMZl+1N853HIdWV/e6hfsUGej8j6jVsO05XqsOCEQMzDVd28jg9DQjA0Wgay6PLuSurCLXAsiNBdMbsKS2ymWqIU4tmR6c3AcMLMFGP8WLRLLZ3PDnjszSuuh5LifLcAyTOsOTW8=
+	t=1724796661; cv=none; b=iv9hQvIRmS1QwMpu+keAzaTZrPe9zIyEc6BwkYPxdhdCbJDRo/LBrmittJgxM1uE8rbxtKEw6r/GAvCnfr70rt6bwXnUsO28gMk4ltb1dsVpSD7Gvvhz1GRTL0TL+SxN6H1pUU8Rvdg6Cr4z3BawtJE6WvjBGVLyScQsyOq5ee0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724795870; c=relaxed/simple;
-	bh=FfRIwOus6MnmzuKy/FXlZuQ4jG+LgSupN3ucCrt/zlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nVENwfNOGAEteSGrf63K0PSE4KFyUVG4wFmXOfaj2fXIF0OFo2Jj56HDPii8zd1cqv3dMvHAlTe79YjmjH0hP2PM+epm5OcGQ29Jfm4XJ9hbCVnVUT5da41WJBASg5mmInn+oGFJ0Q6UTe4RAs4eqoF9QfIBGAXVtllXe5W/n+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b700Y3GG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5128DC32786;
-	Tue, 27 Aug 2024 21:57:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724795869;
-	bh=FfRIwOus6MnmzuKy/FXlZuQ4jG+LgSupN3ucCrt/zlQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=b700Y3GGcYwmqZSXGPYbcTUtgF8i+iNODALS5eoh4Be6FoFuRo9LM5b+T8X8E47CX
-	 iFQ6Zr1ZT46OiIVSSKfeDMGgknlbr+nZVxDAl278Hvndph6gTav04as8BCOSnYRyta
-	 DdGuOAaJ1fV3SfwnpYKp1VxKASmt3+s8x4FVg2MKygoZ2kXH/tyM1hnPxOaVNwnTrj
-	 wT4GH5pfTwHDjCpQOevu1G04jMi8HZROn/1Mbt+SFnuDq9M5p8wCBwaddJtx95Dg5B
-	 PRjRmvZH1Gd01F3HTdSVUTLQrQWs2KfWUv5A/7A/SoZb00qeG88+OzbAvEHx06teCj
-	 FvmVOn9M13gmA==
-Date: Tue, 27 Aug 2024 14:57:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Wan Junjie <junjie.wan@inceptio.ai>
-Cc: Ioana Ciornei <ioana.ciornei@nxp.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dpaa2-switch: fix flooding domain among multiple vlans
-Message-ID: <20240827145748.1ddf0ff7@kernel.org>
-In-Reply-To: <20240827110855.3186502-1-junjie.wan@inceptio.ai>
-References: <20240827110855.3186502-1-junjie.wan@inceptio.ai>
+	s=arc-20240116; t=1724796661; c=relaxed/simple;
+	bh=aroLOKavUDzCVXxEGawFTqCx+03oSt09BdxWXcN7COY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PIjf39T76G6LRQea5w75XzGrwOmuOx77HM10+cK6U7pjoV0QI95lANfW6UCiVlS3K678u8xQyOpBTuCZsP1PUXwXUHssI9JdlGthcqlECM/nzrYYDhlkhc4qDxXuA10BA51E/lDfocV1ZZU5iy7lKUuQrce0CbvtVNoY097lRkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AuFxoG8U; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7c6aee8e8daso4282605a12.0;
+        Tue, 27 Aug 2024 15:10:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724796659; x=1725401459; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=rewCyEf31R6WgjDbqaQ0TyTu1C/1OpbUO9G91fI9oWg=;
+        b=AuFxoG8UeZGa4xfBG5uw1BllURaXteA6OQ4E9G4UNFtLuIZWpaW9/g2UCOKIMehAfL
+         jwwZ7vbPmCC/8A/Jhf1qf1ta4Bppfju95dtqPwb4LMdLUAlvx0SKdT+flPxHmDqPRYIo
+         +1YquwyaGPHvronftt9L3GcJiGmqbVm+4Kz+mWh4XEHoEUWhZiEl2l7JLDkHtkd/dLd9
+         hnY0bFAZaXbdZi+ez+JoVVqbwlsxaA9gOU2ko9W5DWHbh6EjuWWWfzbGKLgWq0ov05RY
+         1ikSrNYyC/NDZGeU2z9bcOZCSJjhvn8LmmMAorXaxDXTALlVsAf440lhCw74kEpxTJyF
+         GVew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724796659; x=1725401459;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rewCyEf31R6WgjDbqaQ0TyTu1C/1OpbUO9G91fI9oWg=;
+        b=ocOHdfVNICM7xE+JD7D7KnA4UIYbocDqKNJdb9oMxwO7/FPfDf/47+bnp35VEuzXPX
+         OE4HbfyjbJ1Q5EPk35iowQercTI6SkxO5VvRIYY7GaeB9oyEtOEqs/OPY5cZC2C9Wo0m
+         yxOPuFMLI9Xe6aj8m/E1bSPQ4gsbVIaU/5D3yVPeOSgsGEvVeB4q2azCLVB+ohzNI5zk
+         BbcdoN2OckwDQFBNtFkmguR4JVbwn3RoxkssEjLRa0WgMXagvFeLKPq+cXf4wFeIcCmP
+         Kuoze2FYKpkrq3T3X/QhyaRN46iC9lEdh6JTXfpJhVIZTESPxMOjoUJRcRv+CKC/Ikp4
+         Hd7g==
+X-Forwarded-Encrypted: i=1; AJvYcCUFOMn4sycTV6Ba1QU4l7cP29uRol4uBVHK+hOLG+Ci16TVnCWowDSekayGi9nW+wgfjYjyl77P@vger.kernel.org, AJvYcCUwtCbeBveUO9zABnS9BsFdMG4RGXiYb+wIrbY9b/W2UceqENUqKSDRQ6BQWsmCnKVUjISC2NfGnCp8GaI=@vger.kernel.org, AJvYcCW+HZ+ugNKxDf3youufemLMPljzjJyFkc9o2XHzwuimd321JYZl7KCAnzjVRORzyQYfR6yFdDZXewpkZj5daLhu@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhyBFqf09DjX5UW7gAcowGzrwIlHSvrfpcQLZZguXM0kO66cpK
+	G467KtLVBgKHtlTNoFYFhmoFTWPvgPrlu05JV9E6Rd/yzph5euhIKn94ZKvUyGXwcp97IhQGbnV
+	5uw4mpFKkyn8eGQBsDYEyLwCWH28=
+X-Google-Smtp-Source: AGHT+IFkuMfe05C9X591qKCWKdS/cLeqqd3rIrpxHnchFEEKD6L+NP13/R/yGUSEhRdoT79VrfqDDUD/mmqRyTXDXMg=
+X-Received: by 2002:a17:90a:b003:b0:2d3:dd48:992c with SMTP id
+ 98e67ed59e1d1-2d646c232ffmr15900319a91.23.1724796659077; Tue, 27 Aug 2024
+ 15:10:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240823-tcp-ao-selftests-upd-6-12-v4-0-05623636fe8c@gmail.com> <20240827141041.0c815dbd@kernel.org>
+In-Reply-To: <20240827141041.0c815dbd@kernel.org>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Tue, 27 Aug 2024 23:10:47 +0100
+Message-ID: <CAJwJo6Z662J4P-8rBpsMVmiCCO6oimStu9WTHNsBYqXQ0kcU=w@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 0/8] net/selftests: TCP-AO selftests updates
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Mohammad Nassiri <mnassiri@ciena.com>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Lots of small coding issues here..
+On Tue, 27 Aug 2024 at 22:17, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Fri, 23 Aug 2024 23:04:50 +0100 Dmitry Safonov via B4 Relay wrote:
+> > First 3 patches are more-or-less cleanups/preparations.
+> >
+> > Patches 4/5 are fixes for netns file descriptors leaks/open.
+> >
+> > Patch 6 was sent to me/contributed off-list by Mohammad, who wants 32-bit
+> > kernels to run TCP-AO.
+> >
+> > Patch 7 is a workaround/fix for slow VMs. Albeit, I can't reproduce
+> > the issue, but I hope it will fix netdev flakes for connect-deny-*
+> > tests.
+> >
+> > And the biggest change is adding TCP-AO tracepoints to selftests.
+> > I think it's a good addition by the following reasons:
+> > - The related tracepoints are now tested;
+> > - It allows tcp-ao selftests to raise expectations on the kernel
+> >   behavior - up from the syscalls exit statuses + net counters.
+> > - Provides tracepoints usage samples.
+>
+> Looks like we got no flakes over the weekend, so applying, thanks! :)
 
-On Tue, 27 Aug 2024 19:08:55 +0800 Wan Junjie wrote:
-> +	/* Default vlan, use port's fdb id directly*/
+Thanks, Jakub!
 
-add space at the end of the comment
+I think tcp-ao tests weren't particularly flaky before, but with these
+patches, those "rarer" flakes should be eliminated now (fingers
+crossed).
+To my surprise, I figured out the issue in v3 correctly, which was
+about the ftracer pthread that didn't have a chance to run during the
+test. I couldn't reproduce it even once locally.
+Yet, the newly added xfail with an unexpected tcp_hash_ao_required
+trace event I'll have to investigate.
 
-> @@ -126,16 +135,28 @@ static void dpaa2_switch_fdb_get_flood_cfg(struct ethsw_core *ethsw, u16 fdb_id,
->  					   struct dpsw_egress_flood_cfg *cfg)
->  {
->  	int i = 0, j;
-
-no need to init i any more
-
-> +	u16 vid = 4096;
-
-reorder the variable declarations, they should be sorted longest to
-shortest
-
->  	memset(cfg, 0, sizeof(*cfg));
->  
-> +	for (i = 0; i < ethsw->sw_attr.max_fdbs; i++) {
-> +		if (ethsw->fdbs[i].fdb_id == fdb_id) {
-> +			vid = ethsw->fdbs[i].vid;
-> +			break;
-> +		}
-> +	}
-
-> @@ -155,7 +176,7 @@ static void dpaa2_switch_fdb_get_flood_cfg(struct ethsw_core *ethsw, u16 fdb_id,
->  static int dpaa2_switch_fdb_set_egress_flood(struct ethsw_core *ethsw, u16 fdb_id)
->  {
->  	struct dpsw_egress_flood_cfg flood_cfg;
-> -	int err;
-> +	int err, i;
-
-unused
-
->  	/* Setup broadcast flooding domain */
->  	dpaa2_switch_fdb_get_flood_cfg(ethsw, fdb_id, DPSW_BROADCAST, &flood_cfg);
-
-> +	err = dpaa2_switch_fdb_set_egress_flood(ethsw, vcfg.fdb_id);
-> +	if (err)
-> +		return err;
-> +
->  	return 0;
-
-	return dpaa2_switch_fdb_set_egress_flood(ethsw, vcfg.fdb_id);
-
-
-> +	/* mark fdb as unsued for this vlan */
-> +	for (i = 0; i < ethsw->sw_attr.max_fdbs; i++) {
-> +		fdb = ethsw->fdbs;
-> +		if (fdb[i].vid == vid) {
-> +			fdb[i].in_use = false;
-> +		}
-
-no need for {} in case of the 'if'
-
->  static void dpaa2_switch_port_fast_age(struct ethsw_port_priv *port_priv)
->  {
-> -	dpaa2_switch_fdb_iterate(port_priv,
-> -				 dpaa2_switch_fdb_entry_fast_age, NULL);
-> +	u16 vid;
-> +
-> +	for (vid = 0; vid <= VLAN_VID_MASK; vid++) {
-> +		if (port_priv->vlans[vid] & ETHSW_VLAN_MEMBER) {
-> +			dpaa2_switch_fdb_iterate(port_priv,
-> +						 dpaa2_switch_fdb_entry_fast_age, NULL);
-> +		}
-
-same here
-
-> +	}
->  }
->  
->  static int dpaa2_switch_port_vlan_add(struct net_device *netdev, __be16 proto,
-> @@ -1670,10 +1752,24 @@ static int dpaa2_switch_port_attr_stp_state_set(struct net_device *netdev,
->  	return err;
->  }
->  
-> +static int dpaa2_switch_port_flood_vlan(struct net_device *vdev, int vid, void *arg)
-> +{
-> +	struct ethsw_port_priv *port_priv = netdev_priv(arg);
-> +	struct ethsw_core *ethsw = port_priv->ethsw_data;
-> +
-> +	if (!vdev)
-> +		return -ENODEV;
-> +
-> +	return dpaa2_switch_fdb_set_egress_flood(ethsw,
-> +						  dpaa2_switch_port_get_fdb_id(port_priv, vid));
-
-save the return value of dpaa2_switch_port_get_fdb_id(port_priv, vid)
-to a temp variable, avoid long lines
-
-> +}
-
-
-> @@ -1681,6 +1777,12 @@ static int dpaa2_switch_port_flood(struct ethsw_port_priv *port_priv,
->  	if (flags.mask & BR_FLOOD)
->  		port_priv->ucast_flood = !!(flags.val & BR_FLOOD);
->  
-> +	/* Recreate the egress flood domain of every vlan domain */
-> +	err = vlan_for_each(netdev, dpaa2_switch_port_flood_vlan, netdev);
-> +	if (err)
-> +		netdev_err(netdev, "Unable to restore vlan flood err (%d)\n", err);
-> +		return err;
-
-and here you're missing brackets :S
-
->  	return dpaa2_switch_fdb_set_egress_flood(ethsw, port_priv->fdb->fdb_id);
->  }
->  
 -- 
-pw-bot: cr
+             Dmitry
 
