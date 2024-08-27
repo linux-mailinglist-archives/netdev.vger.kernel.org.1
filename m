@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-122281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B26FD960999
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:07:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D052A96099A
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:07:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6664328721C
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 12:07:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F03628716A
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 12:07:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C201A2561;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B3D1A2844;
 	Tue, 27 Aug 2024 12:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="FOjB579M"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="alMtKGSj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CA01A2550
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 12:06:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA701A08C6
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 12:06:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724760410; cv=none; b=BDiOn35Z7hA1/ZjYU5RtDocF3KuCiRkw83mCaTwqusZpIF+gu5n2cvBOshOnr+eNITp0STuNRF8uNyP1JZgEIugE3ZXjiy6ba6QgVB6lfG3zFJm9R/DEZ018i96wiv0UNHvMBQZfWdUR0FFss/pxzc8Icz4pvMUgU+fofs6164k=
+	t=1724760410; cv=none; b=bxQigsKVR1GzvZlFGlV2MtwMzigKrOJvE0gfakmhuJRPSQnwYsTZl2rtpaa3lAhyLWxNOiiMxiQirXg5mL9gYkm0H65irQHJViKPjbjzUgqjFa2i7vY9f6lucvCYSTS9mQstu6eWtv+IQsyaopV41PQtr1utSDEj9U9Abm67o28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724760410; c=relaxed/simple;
-	bh=dei1P7GLnZZtpXnQBBYiKpEthOHZB0Gl7ZGPElJvJnA=;
+	bh=XwxoLc0wzt2wo+3Tj9Lcvww9fx/PVTAodZ7I7IVHa/s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p40gaC7hZ7nVIn4OvXFJp2sC7oT4xj92VVzdgJ1qjTaQEV9fYtBh+QU56kE69O5N3J8BGVYj+8ZypK+vb1ZnVRo29g//HkhlO/eCWjveUv1Qi68TKdjt0j3VaWhUxx2VTxHpkyZzH35ivtAcympx/mFbxRVLX5we4BDTEGFJB0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=FOjB579M; arc=none smtp.client-ip=209.85.128.45
+	 MIME-Version; b=pin++zp1lui54Y+LGaBwVOOkEyn5YyG6RvgtLjYWIq5g0mzeg5ENjGDG3pA/jtVrXT6lVGz9m8vR0pSLn2IO/dHVxAFIr2GwJ9Huw5RjcNz2d3NzKb1AhOOZJHqrA4V+4SJbWyhP+XaDYRWBNGJmr40AcaQOt8+UvYdxFdSQppI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=alMtKGSj; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4280bbdad3dso46315535e9.0
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 05:06:47 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4280c55e488so29402755e9.0
+        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 05:06:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1724760406; x=1725365206; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1724760407; x=1725365207; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZwfkecSsU/jVwN2hMJszdrHzhJ/D5WcezQOO8lja558=;
-        b=FOjB579MtDqVZbFOvz4VEH+B02GqeeJ83VW3Dg5OaEdZCcqsHrGrgeE5b9GAlwuiLv
-         B/kZuyMDzQtx3gRJ5cEXP7z3H3Gq61hjaJeJLMnYL/zPld29kq72GJjp1aM+iHq0HrLh
-         8B0FmhNsPIYywb6lwSzQQByL95Kfmr7Q4f2WxG3iRsyg5/+YOefpzZkEnIZhszJ/t1Jc
-         YtbDJXU8avi/8W1HRoGEn92NX77P5B6jEYe1MjlglgLUQ/NNIYJGorl4lopDGkZ9sXI1
-         o68E8dJpIhTyzP2xhqeSP5hynHe63vzkn3ibMu8zRbxvzm5HleX8Dma73rvhqZkbXlyq
-         akBg==
+        bh=dRUjbVsmHsrEffmbq8eRxnOHewDfpfyKdSqgab98o74=;
+        b=alMtKGSjhicvfgvPlATG1QTmDc3wTX5zMYlNdxcfzyEgGsPKKeabhwMIWJp96IYo7f
+         vuPA/ib1E6ojTVs4lRsfQkyvWCb8og9useVBPaGM7EXtzJJyt9I1fIFqOuAFfUuqe5Y6
+         VWYNb5i5VZihMcL5Ad/J0gVB33VD7P4UFJ4sbomUc+QusChArjH/83Xef3YBzFtsYkTV
+         PDcvbnEPdd1aHkFBBo71uYsAAsdH93YZ/JSVZqAnk32Rlq701hcsesZ4UdTH6TbRJgTQ
+         gLCBHMI2NaSY75b7tKafPIe1Td8xTxhGiNKU+LlDCAzRKSbevnZqjHXGyfmLBTThXjje
+         bXjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724760406; x=1725365206;
+        d=1e100.net; s=20230601; t=1724760407; x=1725365207;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZwfkecSsU/jVwN2hMJszdrHzhJ/D5WcezQOO8lja558=;
-        b=DM0Skf8mwzpd3LhmoiDmdvsC3n/fw32OspCvloD8VS3krpw9CUSUpPUh/NNMKNU+zB
-         EhTWFwokfSOgI4rpfByVvq8NLvtzy4Ab7IftNXOSfOw2kZKCh6nsvH4oiiwwpBDcKfRd
-         78+WC8c9ybaduFsnAyGmtugY/jIVYrwPZOqJgfy0ElAubnz3haz5UUaqtRmqC9SZ5FTq
-         gQSoV4cJydus8+blXc84uAc4YBXNjvrVHUr6CXQTGMzArVeyDKWIP5b7Ykam478BiTLv
-         aIWUmDoLofpPwrk6NcGrfPS3PU4xoNzDr+UA2YVR5ppohbdzQ0Ydzm6EJIjxw0+yleT/
-         JMag==
-X-Gm-Message-State: AOJu0Yz4WK1HRXVTm2kKAEHFbzhb3XHUjIHjPZ/gPpDVmCHq4y1F21Jn
-	p27+4CtUFP0Q/dh6RbVc0zpah3jZ65TSx912m6q9WzRHZIH1jFuo2JOuItUwgru0A25KbRrInV3
-	D
-X-Google-Smtp-Source: AGHT+IH0dr/gJkmGdPsv4g5H9qoQG5owNlh2jqRT82d/pUVMi88CwDP/t826GQuuNJj+dtMvINsrDw==
-X-Received: by 2002:a5d:6d51:0:b0:371:8711:4b23 with SMTP id ffacd0b85a97d-37311864645mr7750445f8f.26.1724760405958;
-        Tue, 27 Aug 2024 05:06:45 -0700 (PDT)
+        bh=dRUjbVsmHsrEffmbq8eRxnOHewDfpfyKdSqgab98o74=;
+        b=q2w10ZqD0AuZRL70Enqwfl4CCqfyBdUxs48H5fEt9uWUVAySwTc24nczeDRUuQFgd8
+         Uem/263gMLuphby+q21qfREnDd3r93KBJGL2NM13ahgl+0Hjtxuij0kGPqDgqSNropJC
+         8S7EftSia8ypULFQ9/t8RMbMmvMIJ5ZozhMnEJSOi1WwE4sFvwrwFzwXXrUiJr2aRqoF
+         v4TO7iB1UpzyCMZd6vG+js67RCIfbFvRG2sc7sUygEYxIyURUvJNen7Ku4LchIMJEFXO
+         s2psIapLX/ZdisB4ESi6Frjrato5uUNIyYAVV3fkXDBJP6BuE/dwsPqmdqf/N8hSPZe6
+         vMgg==
+X-Gm-Message-State: AOJu0YxwTRAVPAZDCOb04kOr9TZoaoBe0AsJeyfwubiHyNBnyE4wGbsP
+	sgzyBj9CwpnUlcsmuvTqhhIlfVN38RB3Tu8wCUAYKj6AmHsnDmNXHXg5e0wFIokw8Umc7N2OaX5
+	p
+X-Google-Smtp-Source: AGHT+IEBUNtjhCPDcbgEYQ9YYCERPPsiwg9jXG2P1hnFIkbXHv1byMx4T2SyxeY8s4HrQwmDWB4Jdg==
+X-Received: by 2002:a05:600c:35c1:b0:429:ea2e:36e1 with SMTP id 5b1f17b1804b1-42b9a681fc7mr16055555e9.13.1724760406817;
+        Tue, 27 Aug 2024 05:06:46 -0700 (PDT)
 Received: from serenity.mandelbit.com ([2001:67c:2fbc:1:69a:caae:ca68:74ad])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ac5158f14sm187273765e9.16.2024.08.27.05.06.45
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ac5158f14sm187273765e9.16.2024.08.27.05.06.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 05:06:45 -0700 (PDT)
+        Tue, 27 Aug 2024 05:06:46 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -76,9 +76,9 @@ Cc: kuba@kernel.org,
 	andrew@lunn.ch,
 	sd@queasysnail.net,
 	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net-next v6 06/25] ovpn: implement interface creation/destruction via netlink
-Date: Tue, 27 Aug 2024 14:07:46 +0200
-Message-ID: <20240827120805.13681-7-antonio@openvpn.net>
+Subject: [PATCH net-next v6 07/25] ovpn: keep carrier always on
+Date: Tue, 27 Aug 2024 14:07:47 +0200
+Message-ID: <20240827120805.13681-8-antonio@openvpn.net>
 X-Mailer: git-send-email 2.44.2
 In-Reply-To: <20240827120805.13681-1-antonio@openvpn.net>
 References: <20240827120805.13681-1-antonio@openvpn.net>
@@ -90,109 +90,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow userspace to create and destroy an interface using netlink
-commands.
+An ovpn interface will keep carrier always on and let the user
+decide when an interface should be considered disconnected.
+
+This way, even if an ovpn interface is not connected to any peer,
+it can still retain all IPs and routes and thus prevent any data
+leak.
 
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/ovpn/main.h    |  2 ++
- drivers/net/ovpn/netlink.c | 59 ++++++++++++++++++++++++++++++++++++--
- 2 files changed, 59 insertions(+), 2 deletions(-)
+ drivers/net/ovpn/main.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/drivers/net/ovpn/main.h b/drivers/net/ovpn/main.h
-index 4dfcba9deb59..c664d9c65573 100644
---- a/drivers/net/ovpn/main.h
-+++ b/drivers/net/ovpn/main.h
-@@ -10,6 +10,8 @@
- #ifndef _NET_OVPN_MAIN_H_
- #define _NET_OVPN_MAIN_H_
+diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+index f22259d76a0c..bcc90307c108 100644
+--- a/drivers/net/ovpn/main.c
++++ b/drivers/net/ovpn/main.c
+@@ -50,6 +50,13 @@ static void ovpn_struct_free(struct net_device *net)
  
-+#define OVPN_DEFAULT_IFNAME "ovpn%d"
-+
- struct net_device *ovpn_iface_create(const char *name, enum ovpn_mode mode,
- 				     struct net *net);
- void ovpn_iface_destruct(struct ovpn_struct *ovpn);
-diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
-index b5b53c06d64a..daa2f1ec46dc 100644
---- a/drivers/net/ovpn/netlink.c
-+++ b/drivers/net/ovpn/netlink.c
-@@ -7,6 +7,7 @@
-  */
- 
- #include <linux/netdevice.h>
-+#include <linux/rtnetlink.h>
- #include <net/genetlink.h>
- 
- #include <uapi/linux/ovpn.h>
-@@ -84,12 +85,66 @@ void ovpn_nl_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
- 
- int ovpn_nl_new_iface_doit(struct sk_buff *skb, struct genl_info *info)
+ static int ovpn_net_open(struct net_device *dev)
  {
--	return -EOPNOTSUPP;
-+	const char *ifname = OVPN_DEFAULT_IFNAME;
-+	enum ovpn_mode mode = OVPN_MODE_P2P;
-+	struct net_device *dev;
-+	struct sk_buff *msg;
-+	void *hdr;
-+
-+	if (info->attrs[OVPN_A_IFNAME])
-+		ifname = nla_data(info->attrs[OVPN_A_IFNAME]);
-+
-+	if (info->attrs[OVPN_A_MODE]) {
-+		mode = nla_get_u32(info->attrs[OVPN_A_MODE]);
-+		pr_debug("ovpn: setting device (%s) mode: %u\n", ifname, mode);
-+	}
-+
-+	dev = ovpn_iface_create(ifname, mode, genl_info_net(info));
-+	if (IS_ERR(dev)) {
-+		NL_SET_ERR_MSG_FMT_MOD(info->extack,
-+				       "error while creating interface: %ld",
-+				       PTR_ERR(dev));
-+		return PTR_ERR(dev);
-+	}
-+
-+	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!msg)
-+		return -ENOMEM;
-+
-+	hdr = genlmsg_iput(msg, info);
-+	if (!hdr) {
-+		nlmsg_free(msg);
-+		return -ENOBUFS;
-+	}
-+
-+	if (nla_put_string(msg, OVPN_A_IFNAME, dev->name)) {
-+		genlmsg_cancel(msg, hdr);
-+		nlmsg_free(msg);
-+		return -EMSGSIZE;
-+	}
-+
-+	if (nla_put_u32(msg, OVPN_A_IFINDEX, dev->ifindex)) {
-+		genlmsg_cancel(msg, hdr);
-+		nlmsg_free(msg);
-+		return -EMSGSIZE;
-+	}
-+
-+	genlmsg_end(msg, hdr);
-+
-+	return genlmsg_reply(msg, info);
++	/* ovpn keeps the carrier always on to avoid losing IP or route
++	 * configuration upon disconnection. This way it can prevent leaks
++	 * of traffic outside of the VPN tunnel.
++	 * The user may override this behaviour by tearing down the interface
++	 * manually.
++	 */
++	netif_carrier_on(dev);
+ 	netif_tx_start_all_queues(dev);
+ 	return 0;
  }
- 
- int ovpn_nl_del_iface_doit(struct sk_buff *skb, struct genl_info *info)
- {
--	return -EOPNOTSUPP;
-+	struct ovpn_struct *ovpn = info->user_ptr[0];
-+
-+	rtnl_lock();
-+	ovpn_iface_destruct(ovpn);
-+	unregister_netdevice(ovpn->dev);
-+	netdev_put(ovpn->dev, NULL);
-+	rtnl_unlock();
-+
-+	return 0;
- }
- 
- int ovpn_nl_set_peer_doit(struct sk_buff *skb, struct genl_info *info)
 -- 
 2.44.2
 
