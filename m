@@ -1,184 +1,360 @@
-Return-Path: <netdev+bounces-122272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E58696096C
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:59:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CF979609BE
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:12:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 461C22854A2
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:59:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2771D1C22303
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 12:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23AD61A08CA;
-	Tue, 27 Aug 2024 11:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179A81A072B;
+	Tue, 27 Aug 2024 12:12:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="bOTMiYIj"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="q5AJKAQs"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2046.outbound.protection.outlook.com [40.107.117.46])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2063.outbound.protection.outlook.com [40.107.223.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3461A071C;
-	Tue, 27 Aug 2024 11:59:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.117.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3827519D8BB;
+	Tue, 27 Aug 2024 12:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.63
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724759960; cv=fail; b=nHuRbNLZLFWJcp83Zv78GC0kK2nupbZG4mG3edGsTSvn3KY/ggBt2W4cZwKDjGJ0awTYib5vNLXpCLYZIFP/jwaRgY1fwb95aDgGFchBpYMasRJFGTEX7/nvdqpcGSF2780JBTfYqRFZ8UJjQ4ra97FObjknMP+auz5cNzXKlco=
+	t=1724760742; cv=fail; b=jn/w8GnKgHzwuTkQn9PA1ca+8vwAEUkynnOE4bJkAiRGo6+ief0kaN4Tgk3bJlfDfRkQbYxawjPKShWWukiKQ7IZ3M9zG1qbkFeczsSRyWJyutheQwZZNkc/+AI2Cg62/QHs8vd+3nHdxW6u/Xrmru95+wnetZQNE3ytBLNnHak=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724759960; c=relaxed/simple;
-	bh=misQeNZaT8uucUkchxQEOu3g3qPoWKbUF9lzNnXInHI=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=OjouEA2/q4du4NFOsVHzOa3Vz05nK8zjxZG+tRMV9rIvpL6PAFPX/Q6cOKwPmFvrwYwQxJGoS8AbyaLJ6SHfm0EKmCXLM0nGfFm0vf7bIK7flTj472ssyWV3W1neyqinhG5B9gJdRO5rb/wPgboZjGIFXy/au1gLICfW4zSxkuw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=bOTMiYIj; arc=fail smtp.client-ip=40.107.117.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
+	s=arc-20240116; t=1724760742; c=relaxed/simple;
+	bh=RWbWxXLrVTO6PRz7McvJuzxJTL/f1yng9xZcR+sWPS8=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=ahFXd5SIz+M6R+d8l13HE3bjETph8Ofa074w7H9Be8QNPJGitC4lB5UgLtZ8ZXHAwy/MhBjOOJRrJ/UgkS/AGjwLTVkFFvNFmu4OKtEmK8EX6ATmNikZaf10L7VcQ8+oqJopdfhHRE0O+tej6/QLsvWlyE37cdgVzDIW343zBqU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=q5AJKAQs; arc=fail smtp.client-ip=40.107.223.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=qmIPh/wlcv/pHA6SSW9RrRoO1NJYcwt+Vr5T9RGmfbm6NCLaLY2lyk3foJV/6QuH0sGPL/3TzfUdqRkoWqm9CypeRyHIjPjq4RBJiJ5B9zPqVwY2N7LGmxCm1t0sxWw6CMjz6yhjM9qkrWKR/Wco2OGFWSyrtiqlWtI/6/nA0nCIPiqMbzbiRevkeO7kw7r0wxKUuYlmD6Y72OR3eyS0CRIs02BWNTzBnw5VK3QWnokozCLI3FAgw5cqTuHHNgiK13kTg54+3cYHIDtvd9sYmFNG9De+1Nee004hXnjRQm7jqJjfJHH0lxCv1E3yEPS4DX4pVKQmNPcCmth9jZe/fg==
+ b=ya9uDrT9zHFqS8ZV8DdqjI35qlIui3M8iFt02Y05xxAo1gSEl30BnuvDCXvktOKYF75FDZX3t4SZUqGzUprg7rykMnJuRQEjQAKLCM/X4ht+i893urCdogVOts9tTW+TUCrTpPn5lKC/4QkXajdG4yMVmBeRGySzgByz/nGdk0E9K2+kqN8s7if31hyhMYJ2+ZRV/aj/b81Qf44dOwNdHfEYWoXionpTF06q1+2dBGlfwQztQlFlzO7lvUA/IFpU6VcmQ2MdgqnK+D8a+LKhQ0DfpAK5m6CzkiXpV3IQU5Um9UrppnjYH/0yLD+BmtTNnFlKYUJR7TvYHP+FVZmjKQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EEXscr/gpOx0xRv3aKxTCv2UohyKw3LCq+HqJdFl5Hw=;
- b=mh6HUMLyzBJHxDWNgRs7yxwpnP7Rs34Y680pIXKbApbahP3QwlDjiekSOaVohFGPowBBZyD1b4brW8bEfooc2R7pHan7McOk4Ma7We1s6so6/QXVTzqrVDGjyM1n/Og4dx/T+t0mgjYOH507BAbgS1zZs+IeXhkMZwXNstsRoGqI9Fd8oGAxWXd2WMYMbsgosY8L11YWSiI2tKKYQNGvWu1yUsXoAXWGafHRJflxuzpb1TR4PCEU5kMUsi7lWeJFN3ZdHv7uQbDQNlwd1fPL8U9rjjLG6cGrtFNbZu26JBmUnd02wsU1vDO+sidLxxKnOIZftoyqtR/YLGKgqTXxLw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ bh=wlI7C5mlg/4y024FjVksuI2Rm+xw8a/lTwI+B01YU94=;
+ b=i8cwm2nwK11aAupAmVQ6aMzKaomnllLRNiybMsQJInAIdMsfYkzBE4hLBemnOQAGd+2/PAO/iFHc9o9a5bUBNI369hh1OtwhgQDISxtSizMokiWuvpzIBseIQvAoe1Q0VpS/FutP2gfx1dwbp1rMKRx6lI0ckYDvwW4jRJaoEorQHNWThsnZm9LTtgb5H2DslTwVZQE7eiwAwzUyiYNZNR8foNwk6FueJBdhV+rjiGhiLH6NV9KxhPzbqU/CbWsqMD8XfdkHfidkaSbl1J7IndLBOaHnRoASHGTgtKwGZTAfd/fbPdK2id6tQYgWJmzqkch79mOg7dZBIo/evQ79bQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=nxp.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EEXscr/gpOx0xRv3aKxTCv2UohyKw3LCq+HqJdFl5Hw=;
- b=bOTMiYIjSlx3mDxXd037VhxEWQr7qvjKc0ZXtxoIeJxsGbRt85sF/TdZTI+LgorBeiSmMfiStHXV+K4IteNdxhaqaspWrEqVUTCwq0FPrOSdqTCtw7Jt5kWFjc3al6ObBhd+u3QMM/hZZ3K8+hBf7d8ClNVuTCuUHqDDal2KEk+zs3WDFJtL9e8Rhaj21/eUBHbEOuxrQRjnjQ80Zy1Jd4L8fSvmaIWUueUu/iJnjB64oz0bF0r+nHmzxxn+uuMqab9cbQy3FeKXlBjtX5temqZLf1QL+eETm3eAjAI+rKMDQ8gvsEMJxQm08iMk7GVympYNhNoA365V4D+ovR316w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from KL1PR0601MB4113.apcprd06.prod.outlook.com (2603:1096:820:31::7)
- by SEYPR06MB6929.apcprd06.prod.outlook.com (2603:1096:101:1d9::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Tue, 27 Aug
- 2024 11:59:14 +0000
-Received: from KL1PR0601MB4113.apcprd06.prod.outlook.com
- ([fe80::7e85:dad0:3f7:78a1]) by KL1PR0601MB4113.apcprd06.prod.outlook.com
- ([fe80::7e85:dad0:3f7:78a1%4]) with mapi id 15.20.7897.021; Tue, 27 Aug 2024
- 11:59:14 +0000
-From: Yan Zhen <yanzhen@vivo.com>
-To: marcin.s.wojtas@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	opensource.kernel@vivo.com,
-	Yan Zhen <yanzhen@vivo.com>
-Subject: [PATCH v1] ethernet: marvell: Use min macro
-Date: Tue, 27 Aug 2024 19:58:48 +0800
-Message-Id: <20240827115848.3908369-1-yanzhen@vivo.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TY2PR04CA0009.apcprd04.prod.outlook.com
- (2603:1096:404:f6::21) To KL1PR0601MB4113.apcprd06.prod.outlook.com
- (2603:1096:820:31::7)
+ bh=wlI7C5mlg/4y024FjVksuI2Rm+xw8a/lTwI+B01YU94=;
+ b=q5AJKAQsxi0nHnPLl2jY+EGYbLo2u4/a6hjwV+Yo55t/xzMKMgq2zFDUZ3so+CZBYRopgdqR9fpV0fcscGvJT29FCFT+CCXuUC7JkDAg5yFxLdnHXZ7Q3HbTkIgcNoxnx2a+MDc0FmxZMUjzt1UrEcDRIlo3Awqknk+pMAalnJ/oKnuZMCIm53joHZdHvgd5VJjnyKGUEeodCilLl0PzdtLhG/Li25Ys7a0o1CzR6QRh0qC12MBUxrIvo4BanSRiyY/n+ICc4dIcziDt6vttH4etbQmYdAh9GemmkxyeXXGeqJDgvCCiy10MyqXWtOLK1CXJejUK4RQ+lflZY7c9uA==
+Received: from MN2PR22CA0004.namprd22.prod.outlook.com (2603:10b6:208:238::9)
+ by DS7PR12MB8084.namprd12.prod.outlook.com (2603:10b6:8:ef::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7875.20; Tue, 27 Aug 2024 12:12:12 +0000
+Received: from BL6PEPF0001AB59.namprd02.prod.outlook.com
+ (2603:10b6:208:238:cafe::77) by MN2PR22CA0004.outlook.office365.com
+ (2603:10b6:208:238::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25 via Frontend
+ Transport; Tue, 27 Aug 2024 12:12:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL6PEPF0001AB59.mail.protection.outlook.com (10.167.241.11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7918.13 via Frontend Transport; Tue, 27 Aug 2024 12:12:11 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 27 Aug
+ 2024 05:11:56 -0700
+Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 27 Aug
+ 2024 05:11:50 -0700
+References: <cover.1724324945.git.petrm@nvidia.com>
+ <d5f8364b42f277daa9e235d23398e3dce5549e92.1724324945.git.petrm@nvidia.com>
+ <05b9caf6-ecf5-48a2-ab65-509b0d5b5fb0@intel.com>
+ <87o75f8e0l.fsf@nvidia.com>
+ <3312a4a6-97f5-4ae2-9527-c7b1b73da6d2@intel.com>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+CC: Petr Machata <petrm@nvidia.com>, Shuah Khan <shuah@kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <netdev@vger.kernel.org>, Jakub Kicinski
+	<kuba@kernel.org>, Ido Schimmel <idosch@nvidia.com>, Amit Cohen
+	<amcohen@nvidia.com>, Benjamin Poirier <bpoirier@nvidia.com>, Hangbin Liu
+	<liuhangbin@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+	<mlxsw@nvidia.com>
+Subject: Re: [RFC PATCH net-next 1/5] selftests: forwarding: Introduce
+ deferred commands
+Date: Tue, 27 Aug 2024 10:53:53 +0200
+In-Reply-To: <3312a4a6-97f5-4ae2-9527-c7b1b73da6d2@intel.com>
+Message-ID: <87jzg288sd.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: KL1PR0601MB4113:EE_|SEYPR06MB6929:EE_
-X-MS-Office365-Filtering-Correlation-Id: 21a8c9b7-a853-4c16-8e3c-08dcc68fab70
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB59:EE_|DS7PR12MB8084:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6cf3db88-894e-4181-1438-08dcc6917b5a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|52116014|38350700014;
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?H/lLY3bZhyK3uBmE89UFWM5A2iZGHlOtRvUM0WeNLmZiUEqI3tMPXVwohZQA?=
- =?us-ascii?Q?zC/YTIrC84XqxT7kz5DGI9OH8mZiEOD3WApN1JIVFBq41jD1GYmRt6okxmqz?=
- =?us-ascii?Q?QAp04lAURWFf7oGYU9arQcR3Y1/gXlSRf2B/b0OdOgoxwc7KyUQqFEi4OAOB?=
- =?us-ascii?Q?wVJaJHdbJEDZTR3mwTsERh72JaTWFawD8pv+OvYWjjGavnQz9XDk1WCXdK24?=
- =?us-ascii?Q?JYL3DDSBbzMyzQADLXlrp1LoMX3QxC76qwNyRCbxWwKHN9Of+7eE3TAZJv1a?=
- =?us-ascii?Q?6YHflU+X56idYVK4Ehx7Er26GzPxt/izyNNRbmaI093oqauHyvzuvRt0u/N0?=
- =?us-ascii?Q?1SI3l/DDR6ZnbsVGZO02Ftjx5NHhE+WWYPSUZtRFvYQ0lKDTc5ANwGGFGxAB?=
- =?us-ascii?Q?u/frgU01yKR/1Gun5YnWqYWIaLbpdb8chdjEcGy64YHzAFUVTginfvuMLSfi?=
- =?us-ascii?Q?JiKcLB7BeHnBaEhgO2nJC0GYq+y1SOFuWgBUqb9/7zhUkKHX2B5UqrdKl7mm?=
- =?us-ascii?Q?Nug2hNQdWV6RAY0n8ng1mQNNXcfTup7HjYn/iFhr7MkeIFJMZG3nW6CxUR2t?=
- =?us-ascii?Q?Chj1rES9fAsNdPSCooP+8QLqYMU7JIyud8ypo3OdtaCJU1peg7YQm+j4esXV?=
- =?us-ascii?Q?dj+OYIpbNcOwpf89ZmHrXoXX8X7nOslIfbasbF2qOB6W785zyCNKpKxZqVbp?=
- =?us-ascii?Q?JrQHMCi+1kXhzn7uysNIwpRS3nd36Z+oJzwSv7hvXTn59zrSkmtWUcJwQMHr?=
- =?us-ascii?Q?MjbNvj/0WXOd3stiIvYUXD57P488RmhYoCnZ+K7xW2xCnIPr83jF+epMyofH?=
- =?us-ascii?Q?NhQwBq+pPc4NZC3rSDLOfeh32vjScFQE1ZMJ7Alwb8UjYAQKaxX2ATIVInQv?=
- =?us-ascii?Q?DlHIMQuL+wf8Vvw07Iy7AYQnz1KsdQm0u81CpPmYlLSsxuiKmx9iZaD+QArX?=
- =?us-ascii?Q?rIQ0cbheKBnoCzDlQ34mNZV42LR0bzCFWXj0zsUx20/xenlpSPIC4xSYxqYC?=
- =?us-ascii?Q?8TFkIhP/8bbe5jZ4Os22qq7GLuNTFsi7/BNKcZkdpBmQIjiiXTBzxjIHBqCV?=
- =?us-ascii?Q?wwObN3u28BbqhYFR0inA6tNRKDi+J83itdsFiETndrj/luCi5XgZt+prhMCU?=
- =?us-ascii?Q?bWGSCUzVEvIHwUeKHgcFl7Lt9hOspP51Gi7ORe4CXIZl+jbzVKOx+Lbz0/+w?=
- =?us-ascii?Q?gHjxOvLHEX8fMZq5v1fA5gv3ET1J4Yey4t5y9dqWIJNKy6FquOB1tXMro4sf?=
- =?us-ascii?Q?ircuiQb3l1npFOFrobilztEg4uILO1HYji5L1hhSS71o38L+a8Fi44kFSkiI?=
- =?us-ascii?Q?bABfbWnyA563E35lHX1vjXEE5v+YdHmuY7qtSU8wOX8jb39XYld9rK0qfzbD?=
- =?us-ascii?Q?Gk1oGdEV2uwc8cMqdstpPDa2GegzorfbRIn5HGQQq0xWydec7w=3D=3D?=
+	=?us-ascii?Q?1QSbdpp2Ooh2KxvAitUP9LWo2YGzqe+SZO2EAf5maD71nGXKx8Dx9A0SrG+A?=
+ =?us-ascii?Q?3WUe+tDKXy5p3aO+uZ8mxFJpT8mX5a5AsFCtAwDB1xM1hpRb47tcMW9Ki7xQ?=
+ =?us-ascii?Q?VIg2pF08o26x/9P4InN4YA6HuGah+A9hrT9U5DOJPTRYwkK41FeuC98YsF/E?=
+ =?us-ascii?Q?tTIAjl1EBNPSbkvoasLQKFRSQod4mQiNTae+miHAG0INqJxJtqz4sPddy3vt?=
+ =?us-ascii?Q?M/DXJxxHFnNDDdtlUJRuGDT8EfklLnePJBk264kOmB/Vana9XhH7HrnpEI3O?=
+ =?us-ascii?Q?IIUq4MBV+0vVJ39HqNYTPsexRB7fD7iWINltUvbUK0IYkkFqqhKKcve+aZqJ?=
+ =?us-ascii?Q?CmaqmrKiK2ctacgL8ENfPQiCLJOevz/DbTZXvyAtIYpFdabt+QxMr6S5tz36?=
+ =?us-ascii?Q?ftxkW7nd7l8Eybjfl+/CrzLv0NSBs9hucZG+oDdtlElUX8Kz6GKBUAP55sEx?=
+ =?us-ascii?Q?C+ePzrlx3PhlnB1L90hjUM1zVO11NMV648HDAR32xGNGKUuoVABWQgsbiHiF?=
+ =?us-ascii?Q?o6C8q4hUZtzdM1C8XoFOaMto5lyZEs+a7SPGeXbAeSrlenns/oWubWjpYw42?=
+ =?us-ascii?Q?9MtWJ6ONKzteSKXiq5CsvcBFuozmpwlHvOgG8GxWEj8dfqrzEeG2MYIpkfkV?=
+ =?us-ascii?Q?6M+i5W3TONOzPwS5nQZbPmicIzHUesFVdP+9xoZdw4FVhYQuGy3aa7n+c8fY?=
+ =?us-ascii?Q?dO09THiEcNcjI+BhRAkmuZLrTm85J2qx3feht+iUWScTxe4rcorXvOaIqCmP?=
+ =?us-ascii?Q?A9fqyepTMWANhAs7u7hBd2+Fu3PhzcZi1WFmbmyD3ElNlcGQ4bIPo6DOKaKx?=
+ =?us-ascii?Q?4y50OK/6B1MtRsMD7ko+/oKilV0s7Hh0DUDPXxODkVDberSRwp2RBmWGH7Bc?=
+ =?us-ascii?Q?2dJ8jYbwEf50u99//JRwGKLGUo7Pw8VRlVSUR1CmHBLUoAtu+Ozx7K3cvc3Y?=
+ =?us-ascii?Q?WL+J60Y/+GXsQrQ+87Mtvxl2lFXUwQFRFJMwWK8FhyM9vsLGKx9RUONJsGnS?=
+ =?us-ascii?Q?cOD7ssb02I9x9DERqJqd3MfIABLx4AzrG1RfIY2WnIl+AEo6nJAAyMqfRZg0?=
+ =?us-ascii?Q?XbxdAlF8ssFvdTMFNDmllyOWDLsSDf+l5lNk3cAW1jEa7dbrSGoM+hkW8ngg?=
+ =?us-ascii?Q?173GCxZd2g5LfXKGCNDCDD/bvSjCXYVVbW/mhWueGLSStwdgfFqOSzRXhI58?=
+ =?us-ascii?Q?DzZ3MQxQXZ1VXp8F0cxaTVFQCGdV/rm8bgvuUpXGTitbfY8oHzX+OZHb8uEt?=
+ =?us-ascii?Q?V7VryD1JjFMoHNI5Jp3skfZ3hrgwcFrWJZTuxIr4AuYJrtRCXV0P7vOTq6Eh?=
+ =?us-ascii?Q?FG/QINC6EIlWkUsqoK45g8dzakMKGwLtsh0wQcHOFzc3m1mW/5qzQaa4GVQ6?=
+ =?us-ascii?Q?F+q2+csOrbGF51suKdTaGIfq9qdjYtNpZglKiHS9CAjv1rNzBQBwBSK/7DYT?=
+ =?us-ascii?Q?des8NgNXKGpTRKlTxmAqnGf4BPdhZMhf?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR0601MB4113.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?v/eLdJOHVotJfr75FamRPwibT8DFvkGje0sEL+qxGuOvlPoeUcj+uadS3Qvo?=
- =?us-ascii?Q?01QNQKn8+gNYoqb7MGzcIf203koH9KZ0lKqodz36bs2yYpDMK4e0z9KFD6C4?=
- =?us-ascii?Q?GJntJJvL7FvTOAR9nQclrIJaznMVLYuoxQhvZXaqbqnP5RIvEnSMcN4QJFFX?=
- =?us-ascii?Q?qyHVi1QtDXdHpJSlpA+dg7q2p3nWdchakb2Sn6hPazrY9Sdi6zRtaSkYqGpq?=
- =?us-ascii?Q?pDPfel6cQe3CIOsBtC9jR+etsTzwudDPQw005UmrNejXIg7SXmY6/xl96D6O?=
- =?us-ascii?Q?TDrxOKta7+hBSHvvxg5doMY6oSJxCv4MXgPX1EXeYaBLxLCNgT3dy5/5OW+i?=
- =?us-ascii?Q?jwfynutv4tAlK47lgCkPl57/m3H4bYmZLpRvsZcibWci8Uz2mwKgrUr9Vl6T?=
- =?us-ascii?Q?DGmIVUQ2aHYgycCPAPgVw7DcQudALpEvN+P8mHJZALMuaIkywnM9w6ZX8zMD?=
- =?us-ascii?Q?pzFhewcUr/YY34AJmFISos2zen3a+Haz5IRNYcK+FzrR71hPMCceKnOFOMx7?=
- =?us-ascii?Q?Wa4Om9N/qwdTa7b44uH4TsHEcrkJiRua/cLAk8Gd7UguUai/N2rK1eu9jKOA?=
- =?us-ascii?Q?3xB1M+v/8vUS0yJV1wOD3RbhLPEAUFTtvdcNZvA0tUr3Gw4XNaed6uS4ADXO?=
- =?us-ascii?Q?lB8eXH/B8bcjHGlNT4WtYN2MtRRFvsOH7zG01NfWQyQhnMnDYPQiWOScA6aN?=
- =?us-ascii?Q?a9FM6z5B0RnLHiW3PAwD+voIE5H6rylIlF/prKjLzO4LM8+bSbvSykgFtiW0?=
- =?us-ascii?Q?04nKowS9KS2wCzfi0PraThk0W7rAB+cuXa3VUf/oacRh1oB/8jUkF4ifDljs?=
- =?us-ascii?Q?xe54actPFHumFHyIORVC0hel7g1akBiBI9U94Cm3jg/Ia4Rhxr+LcZVg7FeK?=
- =?us-ascii?Q?Xtot4JpWRzMrgP/jf1yxA+coxMCjn/PHNMK8Rhx3lys0DWAlpmfIg0aZc2YO?=
- =?us-ascii?Q?3k8ssG8sSqOgAHabPguhFcIXOaUiapjwH2CpF1mBRB36z59CwEduRMUzEKqy?=
- =?us-ascii?Q?EA6LAvEprxm0Q15Ba4rteY10FB6ZKvuM83JvM0urFegpVonhHGtTF3NShY7m?=
- =?us-ascii?Q?BmBSp98Sm4pTL/5QbZ5pc6A6rgWjpRgm/pQqySl0u9JIhY6DERmhK1J+4VFD?=
- =?us-ascii?Q?jWrfRCWVQx20qxftLibF/yqxbdkZOHqREK4+XuhXAiaKJKNueNox+bibyqfo?=
- =?us-ascii?Q?COZ0/RnKxGpYTbMO7Qm29z4Yqy4IqapvRyroFddyNCesSkLzVhNC1nN0IrFP?=
- =?us-ascii?Q?qrCcOWa4KAlaOmYsbELJT6Fpzq7q4sta01lb3TBrn01nF2tBnpXVxugQTDaN?=
- =?us-ascii?Q?hFvIa9HALsnPWz4Cg4YZ+hVFEYGePCdaEO/gL3iUwUSY1KTC6kf1Wvwxg/Ty?=
- =?us-ascii?Q?NO3+ma+Kr7PVVhZKvxd58pymYbMc/8droaULZfjO+Q6E04pTUbt5ybKCVFGs?=
- =?us-ascii?Q?dRAJ1WmneatHf1tXNLh3ovpv2sMlIOt6vfxAn/XOmxAMvpq7cs1vf12zd72S?=
- =?us-ascii?Q?gg1NlBRw7Nmxg1D5NwltbfLP+4UQkZxQYSsiPzrRUfW90Jeusk9hJLcrIqAY?=
- =?us-ascii?Q?4AW6Q8kvMslCbn73HEPuExJj+6YuvHXKU+qAOwC+?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 21a8c9b7-a853-4c16-8e3c-08dcc68fab70
-X-MS-Exchange-CrossTenant-AuthSource: KL1PR0601MB4113.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2024 11:59:14.1112
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2024 12:12:11.9638
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PsHgYscA+N/zzT4l6vVaA3ap+k/zH4WBbGk13SyRwzCX6bIUFLDVBN9FpkId0W4X5+AHLvsS56e3al21Db4CcQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR06MB6929
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6cf3db88-894e-4181-1438-08dcc6917b5a
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB59.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8084
 
-Using the real macro is usually more intuitive and readable,
-When the original file is guaranteed to contain the minmax.h header file 
-and compile correctly.
 
-Signed-off-by: Yan Zhen <yanzhen@vivo.com>
----
- drivers/net/ethernet/marvell/mvneta.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Przemek Kitszel <przemyslaw.kitszel@intel.com> writes:
 
-diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-index d72b2d5f96db..415d2b9e63f9 100644
---- a/drivers/net/ethernet/marvell/mvneta.c
-+++ b/drivers/net/ethernet/marvell/mvneta.c
-@@ -4750,8 +4750,7 @@ mvneta_ethtool_set_ringparam(struct net_device *dev,
- 
- 	if ((ring->rx_pending == 0) || (ring->tx_pending == 0))
- 		return -EINVAL;
--	pp->rx_ring_size = ring->rx_pending < MVNETA_MAX_RXD ?
--		ring->rx_pending : MVNETA_MAX_RXD;
-+	pp->rx_ring_size = min(ring->rx_pending, MVNETA_MAX_RXD);
- 
- 	pp->tx_ring_size = clamp_t(u16, ring->tx_pending,
- 				   MVNETA_MAX_SKB_DESCS * 2, MVNETA_MAX_TXD);
--- 
-2.34.1
+> On 8/26/24 17:20, Petr Machata wrote:
+>> Przemek Kitszel <przemyslaw.kitszel@intel.com> writes:
+>> 
+>>> On 8/22/24 15:49, Petr Machata wrote:
+>>>> In commit 8510801a9dbd ("selftests: drv-net: add ability to schedule
+>>>> cleanup with defer()"), a defer helper was added to Python selftests.
+>>>> The idea is to keep cleanup commands close to their dirtying counterparts,
+>>>> thereby making it more transparent what is cleaning up what, making it
+>>>> harder to miss a cleanup, and make the whole cleanup business exception
+>>>> safe. All these benefits are applicable to bash as well, exception safety
+>>>> can be interpreted in terms of safety vs. a SIGINT.
+>>>> This patch therefore introduces a framework of several helpers that serve
+>>>> to schedule cleanups in bash selftests:
+>>>
+>>> Thank you for working on that, it would be great to have such
+>>> improvement for bash scripts in general, not limited to kselftests!
+>>>
+>>>>    tools/testing/selftests/net/forwarding/lib.sh | 83 +++++++++++++++++++
+>>>
+>>> Make it a new file in more generic location, add a comment section with
+>>> some examples and write down any assumptions there, perhaps defer.sh?
+>> I can do it, but it's gonna be more pain in setting up those
+>> TEST_INCLUDES. People will forget. It will be a nuisance.
+>> I'm thinking of just moving it to net/lib.sh, from forwarding.
+>
+> what about separate file, but included from net/lib.sh?
 
+Unfortunately that would be even worse. Then you need to remember to put
+the file into TEST_INCLUDES despite seemingly not using it.
+
+Like ideally we'd have automation for this. But I don't know how to do that
+without actually parsing the bash files, and that's just asking for
+trouble. Maybe after the defer stuff we also need a module system :-/
+
+>>>> - defer_scope_push(), defer_scope_pop(): Deferred statements can be batched > together in scopes.
+>>>> When a scope is popped, the deferred commands
+>>>>     schoduled in that scope are executed in the order opposite to order of
+>>>>     their scheduling.
+>>>
+>>> tldr of this sub-comment at the end
+>>>
+>>> such API could be used in two variants:
+>>>
+>>> 1)
+>>> function test_executor1() {
+>>> 	for t in tests; do
+>>> 		defer_scope_push()
+>>> 		exec_test1 $t
+>>> 		defer_scope_pop()
+>>> 	done
+>>> }
+>>>
+>>> 2)
+>>> function test_executor2() {
+>>> 	for t in tests; do
+>>> 		exec_test2 $t
+>>> 	done
+>>> }
+>>> function exec_test2() {
+>>> 	defer_scope_push()
+>>> 	do_stuff "$@"
+>>> 	defer_scope_pop()
+>>> }
+>>>
+>>> That fractals down in the same way for "subtests", or some special stuff
+>>> like "make a zip" sub/task that will be used. And it could be misused as
+>>> a mix of the two variants.
+>>> I believe that the 1) is the better way, rationale: you write normal
+>>> code that does what needs to be done, using defer(), and caller (that
+>>> knows better) decides whether to sub-scope.
+>> But the caller does not know better. The cleanups can't be done
+>> "sometime", but at a predictable place, so that they don't end up
+>> interfering with other work. The callee knows where it needs the
+>> cleanups to happen. The caller shouldn't have to know.
+>
+> The caller should not have to know what will be cleaned, but knows that
+> they are done with callee.
+>
+> OTOH, callee has no idea about the "other work".
+
+Nor should it have to. It just needs to dispose of all responsibilities it
+has acquired (read: clean up what it has dirtied, or what others have
+dirtied for it). That's done by closing the defer scope.
+
+But let me take a step back. I've been going back and forth on this
+basically since yesterday.
+
+In practice, the caller-defined scopes lead to nicer code.
+
+If run_tests creates an implicit scope per test, most of the tests can just
+issue their defers without thinking about it too much.
+
+For cases where the implicit scope is not enough, the caller has to know
+that a certain function needs to be run in a dedicated scope or else it
+will interfere with something else that it's running. That's not great, it
+complicates the caller-callee contract in a way that's not captured
+anywhere in the syntax. But I suspect it's going to be just fine, these
+scripts are not exactly complex, and if there's an interference, I figure
+it will be easy to notice.
+
+The major upside is that we avoid the need to pepper the code with
+defer_scoped_fn.
+
+So I'll drop defer_scoped_fn and add in_defer_scope:
+
+in_defer_scope()
+{
+	local ret
+
+	defer_scope_push
+	"$@"
+	ret=$?
+	defer_scope_pop
+
+	return ret
+}
+
+>>> Going back to the use case variants, there is no much sense to have
+>>> push() and pop() dispersed by much from each other, thus I would like
+>>> to introduce an API that just combines the two instead:
+>>>
+>>> new_scope exec_test1 $t
+>>> (name discussion below)
+>>>
+>>>> - defer(): Schedules a defer to the most recently pushed scope (or the
+>>>>     default scope if none was pushed. >
+>>>> - defer_scopes_cleanup(): Pops any unpopped scopes, including the default
+>>>>     one. The selftests that use defer should run this in their cleanup
+>>>>     function. This is important to get cleanups of interrupted scripts.
+>>>
+>>> this should be *the* trap(1)
+>>>
+>>> with that said, it should be internal to the defer.sh script and it
+>>> should be obvious that developers must not introduce their own trap
+>>> (as of now we have ~330 in kselftests, ~270 of which in networking)
+>> Yeah, we have 100+ tests that use their own traps in forwarding alone.
+>> That ship has sailed.
+>> I agree that the defer module probably has the "right" to own the exit
+>> trap. Any other cleanups can be expressed in terms of defer, and I don't
+>> know if there are legitimate uses of exit trap with that taken out. But
+>> that's for sometime.
+>
+> There could be multiple traps for ERR/EXIT/etc conditions, but for
+> simplicity it's best to rely on just EXIT trap.
+> So we should convert current scripts one by one to use your new API.
+
+I'd just grandfather those in, but having this stuff consolidated would
+obviously be nice.
+
+I think in practice we just need to add the trap registration to
+forwarding.sh, and per bash script do something like:
+
+-trap cleanup EXIT
+ setup_prepare
++defer cleanup
+ setup_wait
+
+It should be fairly mechanical most of the time. But the defer stuff works
+without it as well, so we can take care of that later on.
+
+>>>>     Consistent use of defers however obviates the need for a separate cleanup
+>>>>     function -- everything is just taken care of in defers. So this patch
+>>>>     actually introduces a cleanup() helper in the forwarding lib.sh, which
+>>>>     calls just pre_cleanup() and defer_scopes_cleanup(). Selftests are
+>>>>     obviously still free to override the function.
+>>>> - defer_scoped_fn(): Sometimes a function would like to introduce a new
+>>>>     defer scope, then run whatever it is that it wants to run, and then pop
+>>>>     the scope to run the deferred cleanups. The helper defer_scoped_fn() can
+>>>>     be used to derive from one function its wrapper that pushes a defer scope
+>>>>     before the function is called, and pops it after it returns.
+>>>
+>>> It is basically a helper I would like to see as new_scope() mentioned
+>>> above, but it takes it upside down - it should really be the caller that
+>>> sub-scopes.
+>>>
+>>> I think that the name of the new_scope() would be better, still concise,
+>>> but more precise as:
+>>> subscope_defer(),
+>>> trapped(), or
+>>> sub_trap().
+>
+> here I mean that "scope" is too broad without the word "trap" or "defer"
+> in name
+>
+>>>
+>>> I have no idea how to make a sub-trapped, SIGSEGV isolated scope of bash
+>>> execution that has ability to still edit outer scope variables. Perhaps
+>>> we could relax the need for edit to have easier implementation? It is
+>>> "all ok or failure/rollback" mode of operation anyway most of the time.
+>> I'm not sure what you have in mind.
+>
+> 	foo=1
+> 	function bumpfoo {
+> 		maybe-crash
+> 		foo=2
+> 	}
+> 	new-defer-scope bumpfoo
+> 	echo $foo
+>
+> do you want this to print 2 or 1?
+
+Oh, that's what you mean by relaxing the edits. Yeah, I think I'd want that
+to print 2 if at all possible. I think in_ns() is the only helper that
+violates this.
 
