@@ -1,228 +1,297 @@
-Return-Path: <netdev+bounces-122269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54AA960958
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:54:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DCC3960966
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:58:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E9EB28283E
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:54:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B37BE1F24250
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE2C1A01AB;
-	Tue, 27 Aug 2024 11:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F781A0B08;
+	Tue, 27 Aug 2024 11:57:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="zOzev3E+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Iu7N89W+"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-ztdg10011901.me.com (pv50p00im-ztdg10011901.me.com [17.58.6.50])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DD119D88C
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 11:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724759650; cv=none; b=KMiDgF8DAVByL6V+L79u4AN1LfHbqjAKgwAkOtcA8mAskDIX5G8+TgqksXjUzpkEC1ednTny8aH20Lu/cXg8gsNVRkKvGA3ZtHklQSGV92z2oFuKCiRWrs5QCJrfl+B/mV/Mvi4iDZcFG1IJdS5BjbNJo/SbVTXtWwwE9MKV+cE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724759650; c=relaxed/simple;
-	bh=nEi8II45wAmL1f5XTIWsbyTtcx8NX0c09t6x4DVix6A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GfSi24HYYCYku+u1mw2A0nxM7/qP7qx7V9UkORFjJoPTeaJgdnuiBhuihWKCmoy0Y3e8lR3FhBh3YrRN9eHph3MQNwu420usjtMX9YAS+tgWXMYtnYiYZFxvr7OI7GU5jWDK9nk6T0yiHCYPeY0iPckeQAZ4/Y9m/EaVXiY9lb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=zOzev3E+; arc=none smtp.client-ip=17.58.6.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1724759649;
-	bh=OYrHNLwmvHe2oa0rD8JJuTUs4ODsC2IJMqoKI314ldc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	b=zOzev3E+mosk3j16HL4HiEHL5WWqXUvHyj+nqVG/LPaaLQZRkO/seWBBb5BOOhchn
-	 O8MU75aMMqEEYO85vpySf8LxFn8N/b43eXisXvYRgH+QJU/0WExah46MmVzN9K1X48
-	 eb9NV60IlxYNaiRXPck10Ma9wo4ObI2DfJaQTEShk6Qjyvv9/tzEh9bdetfRkGQYIT
-	 EfFwSR4zeMoBe+zKTu4R0r+LCH8Cdr/Re0/DjjHX3XqpDbrjnHxBnASU5tAPwoQmhS
-	 Eeo37doe9R1qcHVXLWqFnTGzz3zUx8F64fmjjPetf/zgqiLHxrM5+Ny6OsdkusmJUN
-	 Pg5Rzlw8tC8gg==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10011901.me.com (Postfix) with ESMTPSA id DDCA83A008D;
-	Tue, 27 Aug 2024 11:53:59 +0000 (UTC)
-Message-ID: <cdfc6f98-1aa0-4cb5-bd7d-93256552c39b@icloud.com>
-Date: Tue, 27 Aug 2024 19:53:55 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57EEE1A08BC
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 11:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724759874; cv=fail; b=XLfAxmajcNVXX1MVqTrZs9litKs13zwBZob2NVyLD5Ix0YXFZXE6eNI05L1dmyY3efDzB8aChseV0jLe6Pbnag4fBX3iGQ3oP63ZXeA8FlEWS2q+nrJWVVcMfu5zvbP8no8vT0RVOOOidEMxXogQB5yxceJICRMkPMh3dRanqSA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724759874; c=relaxed/simple;
+	bh=RrfABgZwv28wS/5k98u4r5/xmRebWgKK/eUYqXrwQg8=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ROpyXlLphWnY7ry6B/0vmGraBoPppu6zt7RWJiTDQMLbU4GghZpIeCbc6Z/xkMpvPNZgw/D0j5n11KIQuDVQAN9/fB6yHOqKPLD3piB3wy0+lu7MT5txRvzVnvMrN8zc52lpJDVYYx1vlnDG83LMjt2V0zVLFldHt14HHqtarwk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Iu7N89W+; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724759872; x=1756295872;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=RrfABgZwv28wS/5k98u4r5/xmRebWgKK/eUYqXrwQg8=;
+  b=Iu7N89W+yz9DfK8EYKOWcCU7huN68LiZitie7FVejnx0HqkGZ+wJ5RDh
+   6FUWSwmRn4JNYXm8XGsAUiKzPBZF4m0UTqhXQPgebPBLjoinBPbPJyVAY
+   bfLkOXOQShMrxfE5SW8RUq+KqiTkOGzEGdET8wglypMzTMCTyzK2CNIQn
+   w01FB4vzi0m4lAU+AK7UTIcfXbALt1zFYV97CUm0XrwD4JL3Z0J8x7qCM
+   ySBjbEvXfaEZaUnX39Bg2w4RMBYVqOrXalvibk+Y0A51MZsmpKGUKnEb0
+   Fuf4CPl57tjAtRXWX6gZoNmgT1QvwtAooHbXJ6tSwv2Zuq1k473i77xQ7
+   Q==;
+X-CSE-ConnectionGUID: 7wq9I8wPQYSAKSF7l4rfKw==
+X-CSE-MsgGUID: ttQJ+AN6T72cpCi3Xgpz1w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="40702284"
+X-IronPort-AV: E=Sophos;i="6.10,180,1719903600"; 
+   d="scan'208";a="40702284"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 04:57:52 -0700
+X-CSE-ConnectionGUID: EZGad/7dSA2uoUE8/7gJXA==
+X-CSE-MsgGUID: zRDeC3poSca0fDq6j9PORw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,180,1719903600"; 
+   d="scan'208";a="63001026"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Aug 2024 04:57:51 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 27 Aug 2024 04:57:51 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 27 Aug 2024 04:57:50 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.40) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 27 Aug 2024 04:57:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=OtJIgGS+iKtnMiZOnwptXXiQkdZun5PEdfScnJhjAE86sXFGgqKknmaiIJT+0fD46+/zn7I5v36/rgHWLgbueQDkuSsv6P+kTlYOPXVWAOzLcBGFLeIPtgR8jG1UX+MymB5KyMkowdY/uh11YmP80tPR0U2hcU5mL76N+ZkBB5zN/YGTUf8NPp99B49tGPI5fNlHs74skfeabQx6JrKkumNr/plxvYTV35H0T7i9Sy/lX69QlNQsA2FZFK/ZGKAdzjgRi/1tKqYfOlzUC7QluwETY7mB5ybrkYqQzpJ8VQhiEq1ffbwLXxAv0+UlcRa6L9mo6AVVkEekKn1lkfeuxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3ajUUJRe8JK5ZmJ7veJI8J99VopPnecbPrAHIGo1GtE=;
+ b=bgBXN6c/xfwz+wlW3C54dp5TXK7XLVKvWU4h5en+XwDJpS53orBLnQ0jBt7rgRsrROCVnmDp+J4CVAas1hrH3r9Ycv6aMQrSLS8WVjEJlKTeWE6Kd9uuZEAC334g98lt7ZnWOU7BGiaCLmUdMWyL8b3qlurHFrxRyBw08lmReyqaRNUn2MeE2OvnqpmJtASFnz76ExesIFP+mj4RZXVt6ndsscI/yAQZj7126fMemzwEowhC7mgr8DGrjA36hCTDNZcKAn65axJMvDugFIDDioAbdfJttlK9mij37GrkHyrzO6gLjzuFCF54fJYgfewvcBBch2xPXDh/U44rLB2vkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by DS0PR11MB8017.namprd11.prod.outlook.com (2603:10b6:8:115::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.20; Tue, 27 Aug
+ 2024 11:57:49 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::399f:ff7c:adb2:8d29%3]) with mapi id 15.20.7897.021; Tue, 27 Aug 2024
+ 11:57:49 +0000
+Date: Tue, 27 Aug 2024 13:57:43 +0200
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Brett Creeley <brett.creeley@amd.com>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <shannon.nelson@amd.com>
+Subject: Re: [PATCH v2 net-next 3/5] ionic: use per-queue xdp_prog
+Message-ID: <Zs2/N7K/IIATcANm@lzaremba-mobl.ger.corp.intel.com>
+References: <20240826184422.21895-1-brett.creeley@amd.com>
+ <20240826184422.21895-4-brett.creeley@amd.com>
+ <Zs28CpU2ZkglgUiZ@lzaremba-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Zs28CpU2ZkglgUiZ@lzaremba-mobl.ger.corp.intel.com>
+X-ClientProxiedBy: VI1PR07CA0253.eurprd07.prod.outlook.com
+ (2603:10a6:803:b4::20) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] cxl/region: Find free cxl decoder by
- device_for_each_child()
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Davidlohr Bueso
- <dave@stgolabs.net>, Dave Jiang <dave.jiang@intel.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Takashi Sakamoto <o-takashi@sakamocchi.jp>, Timur Tabi <timur@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20240824-const_dfc_prepare-v3-0-32127ea32bba@quicinc.com>
- <20240824-const_dfc_prepare-v3-2-32127ea32bba@quicinc.com>
- <20240827123006.00004527@Huawei.com>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <20240827123006.00004527@Huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: zXSu555QJvhB-nSvhZ59A5Eowv9iK99L
-X-Proofpoint-GUID: zXSu555QJvhB-nSvhZ59A5Eowv9iK99L
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-27_06,2024-08-27_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
- clxscore=1015 adultscore=0 suspectscore=0 bulkscore=0 phishscore=0
- spamscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2408270087
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|DS0PR11MB8017:EE_
+X-MS-Office365-Filtering-Correlation-Id: 78eb700e-9867-46ad-1367-08dcc68f78e4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?09twg0KD04c+6ohrHGK/IXwCubjemqF8BsuiRyh6BOfC43nMhNdWetsfjjz0?=
+ =?us-ascii?Q?KHzGDpYk/UnUdhMB/jV71ckjHMuGRM+Xj4mkZp+GMV2JaGITz1ybNt1ooB7a?=
+ =?us-ascii?Q?62d+k33Hyg74+jd+DxWq0nzGYFATGeNcpo+SEEjwui94g9ZVvPyDn7gddLwJ?=
+ =?us-ascii?Q?XoQCtLmqd/iSSnfkCX4wbmTqwS5qxWVSegkk42xwvY2FU3xOClTczjgh/6nS?=
+ =?us-ascii?Q?1R5bMMaf9gw+FNs7oWu5yLnI/Kejykov6wEhnUCeoVt0WoFTcp9KUqWJJXZm?=
+ =?us-ascii?Q?IurUnAvW6Z8qFcqmonstDx37DsY0k3DypCNNYccNS90L0pWvYDWKYv6haTor?=
+ =?us-ascii?Q?9s2FUkvk/Xi2vt5n/I55veGVXYCTG+cHWpJjTXxEoa1qBL16+c4gO+G0qNHE?=
+ =?us-ascii?Q?jWP3ErfmgQvSJ4mAPjCXrd/z+WRuPrtniFFSMWCTFjxZZ/f9RuCzblm9UOrC?=
+ =?us-ascii?Q?UsdbvDzJPTAq/GDkLCy3UZKLfHK/b2pt104CZN0cCSeIPZjvzM0JyDlZYqGw?=
+ =?us-ascii?Q?HnJv7WT3Ikqk7WKw85taRohWrCrRJtU5DMJcVN8CbjiYIidd/9Y/63BlPsny?=
+ =?us-ascii?Q?/OiQ05SyRo8k8CIrvSmNRUkfWxP8rmNyy7N6HGmdAW1LKoqiLWpY/3ly9b3a?=
+ =?us-ascii?Q?T/6I8zqP4kolzRtZvC/76i9hKuB50X9sq2vqof+ajyLsFVRqkmSD8yxd+iVY?=
+ =?us-ascii?Q?lFyeOd4s3wd7R8O0SMJYbC6aG9uHbDEAb9JB+HV6lGkvzGzgKPGBCiJB46GU?=
+ =?us-ascii?Q?ZdGkljfUZm6DbbSZLsYdf/d6Rqf6aQjj19iiHOyJDK2xvRUyl7OSwuf0P/c5?=
+ =?us-ascii?Q?NGTbLkmXa/S4XRf95CMY4FBNPMx++WZOndai/85vuOiORaxbi6IRGxQUbWYz?=
+ =?us-ascii?Q?9YK00akvjDynUL/uzTtlJUbzKWWlCSlwtr1YDis0KZC8x/4ukHM62ARLtYy2?=
+ =?us-ascii?Q?7KfT+l2rMal6i2hDtKh48geabtbgYWFXvYGEEPso+IZjwspB76N4KintHKhP?=
+ =?us-ascii?Q?ewrWtOTt3VDPcJjfXFDlvOmN6E43GtXlNbBkeXPOEBs7BjnAXvKxx03OWN/W?=
+ =?us-ascii?Q?EBYYeiYvXTa9uV+zeb56WG09y4xD6vHYJ9EmU3/iZeuCLCsM2z7hSgslEwFm?=
+ =?us-ascii?Q?EgvU4ik5KZo4aLk57xHud0vy1dv6IOgoGH4Anyfv5K2F7weQm1M9ayzDNIXR?=
+ =?us-ascii?Q?u/Q19XSNghN4Z2AyomW+03IbTIvW8k61VGk4mGW34HbA9++xdaoURUY+fbPg?=
+ =?us-ascii?Q?8W82xA/nFcl4A9oazRLucSnPcUUoWbD8Fom++hucpmSn6cjcXFCkAv+H6fv3?=
+ =?us-ascii?Q?tV+DVUfAkAtBnZ6IBumguJjyAPnVygQ2+2VlLdYUA9UDaw=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?2d25krhPPlp+EmyTrFBCVPRQvuASp5acy76a/0b3N5/guu3QIsm8XZJuY2og?=
+ =?us-ascii?Q?CTYB1on2PKWEyKltfTS/xWNzoRU6izcXPkDj4tPTqbksqhXRd7bUF/xU3QqO?=
+ =?us-ascii?Q?5xJAyREARCQzHjV7+N8pc0sPJZXb0zslBcmVLHw9QqKdppVGhKLLlV7ETFRs?=
+ =?us-ascii?Q?WVrrJdlX9BLz12p1ufZ3uS6MFFctIZEDZJ5fp23yJwVLwr7FpLyzyZbUd/UM?=
+ =?us-ascii?Q?Lhg8OFeiNPcGBRp6BI7+CIqHWdBgT+cZnDvsg6dpqrKT6NMDlV8lLvaDcKtl?=
+ =?us-ascii?Q?3fzxUw+Zz+tffl6bKtpmsK/AcxbFPbCZWZKvG422JcezWCkq3QtfrUblqY+1?=
+ =?us-ascii?Q?OIJkcPmUcIrJZBk4lkfxYue/itnaYJtsFlT68SIDvKG0Suu4vrBTPXdeJC4Z?=
+ =?us-ascii?Q?LGL3d+SqdTyHCaj8D/q14gQBMuADYvMK+KcNePJh4guFwf4N/vN/4XCPpse2?=
+ =?us-ascii?Q?s6QCzH+xpAKo5vDlzQHAU8Fe/sKqtPnkQLUecVOjSr4GsXVHzd3Q9AdnjWlZ?=
+ =?us-ascii?Q?4Dbq3uLSLAV5vvLOkLaV+spmYgPJOj1sEINI7t8GUDNN0sRb/SsBNGVSVEne?=
+ =?us-ascii?Q?uK71CE5SrTZx4ZEp+94ul4LonJFNH9ncPA0J4IS7px68DH9eXlUc6sICX61n?=
+ =?us-ascii?Q?2jRRaUN9trtKjC6VN3K5wriQQSETqFya/V0rs601a+G/PJEdqEcZYk+2RrqN?=
+ =?us-ascii?Q?LxeJPfyjEPrkkQNoeb1+klj1AFGFqxUJWlSn174Xr5IpMcvhPotrRBVeIYpM?=
+ =?us-ascii?Q?+Z8pCeGUNdluUKOr26BgLP26umQ8DyfQcXj25XodoVMmqrqsyIdbYMe53dqj?=
+ =?us-ascii?Q?qcwIR7C3j+AVJN1ZooxDFuTb3ZK3MEKpDJKW9xJc8ef+nB/IRRGJgqPkrx9Z?=
+ =?us-ascii?Q?qafmVFxQQdYLeWxyA61cVwVLiX1K7ykmhrXBCSWyAkRHfIHtuZ/0oeUkguwT?=
+ =?us-ascii?Q?tbgPD/Gm83zBta8TGBlrJ8Wf1ejL0GM2rKSDemBUF81jZvJeI9Q7AVMvgl0B?=
+ =?us-ascii?Q?h3vQmCof8eomteQWRdMdDPT15Ful7jSM7frUO8av5PgdrC3HspcZe9famttC?=
+ =?us-ascii?Q?qZJfX9K5qoBmNZCgCbkunya9EQYo04hjTVioGE9NUFXyCO0iZV/8qFN6KAkv?=
+ =?us-ascii?Q?snApju9SUc5Tz33pDiGW/FTG49bpGtNDIiZlyPG9o14gzVWfg+7vxN5a0Gw2?=
+ =?us-ascii?Q?1BSygV46qjsIZF+EjiH1oX65VKNDzkJ/+bxglEkfUGycsbofonyKdors/RJ1?=
+ =?us-ascii?Q?y5ufBlR+zox2BcQJMhMg1Xkg7VoOGJtYG2mUUcSGhphn2sLhsTrz63k3wLKn?=
+ =?us-ascii?Q?ymAk3A8Qj2+sjXOkqbMrwN+DnAKIG/BsG0cAPhg+EvT95lazZp8t5n24uZea?=
+ =?us-ascii?Q?fzoTxkpZfSL5tUUp0qnPNIt7hADm4oRuDg+byA3dZW2NH69661bcMqc5EhXE?=
+ =?us-ascii?Q?zLL96Edt1HhmX4Ugvd0MVxSxmVSBLSB/1k42jDO/uU8hdgAiayjL3T6L+7kz?=
+ =?us-ascii?Q?BYQNYTR0KwASQO4mkQViPuc8JyBSfBjAjnnYlHjwYY8++DpcsDTJLhRwvxBT?=
+ =?us-ascii?Q?PymnL6/9cSkDFjt8BhR2dr6XYLX5l+ugoE+MkDQ4?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78eb700e-9867-46ad-1367-08dcc68f78e4
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2024 11:57:49.1287
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: no9lJfqiZ5LKunXqV/ilOCyN4+CzW2fMxnZ2rXoXywLAV3GFEyTdQhQlzBwWIUA1sxPBtFF1r3QcNWuKKcFQKpBr9z7ruTTxPP4tC8jwRJI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8017
+X-OriginatorOrg: intel.com
 
-On 2024/8/27 19:30, Jonathan Cameron wrote:
-> On Sat, 24 Aug 2024 17:07:44 +0800
-> Zijun Hu <zijun_hu@icloud.com> wrote:
+On Tue, Aug 27, 2024 at 01:44:10PM +0200, Larysa Zaremba wrote:
+> On Mon, Aug 26, 2024 at 11:44:20AM -0700, Brett Creeley wrote:
+> > From: Shannon Nelson <shannon.nelson@amd.com>
+> > 
+> > We originally were using a per-interface xdp_prog variable to track
+> > a loaded XDP program since we knew there would never be support for a
+> > per-queue XDP program.  With that, we only built the per queue rxq_info
+> > struct when an XDP program was loaded and removed it on XDP program unload,
+> > and used the pointer as an indicator in the Rx hotpath to know to how build
+> > the buffers.  However, that's really not the model generally used, and
+> > makes a conversion to page_pool Rx buffer cacheing a little problematic.
+> > 
+> > This patch converts the driver to use the more common approach of using
+> > a per-queue xdp_prog pointer to work out buffer allocations and need
+> > for bpf_prog_run_xdp().  We jostle a couple of fields in the queue struct
+> > in order to keep the new xdp_prog pointer in a warm cacheline.
+> > 
+> > Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> > Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 > 
->> From: Zijun Hu <quic_zijuhu@quicinc.com>
->>
->> To prepare for constifying the following old driver core API:
->>
->> struct device *device_find_child(struct device *dev, void *data,
->> 		int (*match)(struct device *dev, void *data));
->> to new:
->> struct device *device_find_child(struct device *dev, const void *data,
->> 		int (*match)(struct device *dev, const void *data));
->>
->> The new API does not allow its match function (*match)() to modify
->> caller's match data @*data, but match_free_decoder() as the old API's
->> match function indeed modifies relevant match data, so it is not suitable
->> for the new API any more, solved by using device_for_each_child() to
->> implement relevant finding free cxl decoder function.
->>
->> Suggested-by: Ira Weiny <ira.weiny@intel.com>
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> This seems to functionally do the same as before.
-> 
+> Reviewed-by: Larysa Zaremba <larysa.zaremba@intel.com>
+>
 
-yes, this change have the same logic as previous existing logic.
+I would like to rewoke the tag, see below why.
 
-> I'm not sure I like the original code though so a comment inline.
+> If you happen to send another version, please include in a commit message a note 
+> about READ_ONCE() removal. The removal itself is OK, but an indication that this 
+> was intentional would be nice.
 > 
->> ---
->>  drivers/cxl/core/region.c | 30 ++++++++++++++++++++++++------
->>  1 file changed, 24 insertions(+), 6 deletions(-)
->>
->> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
->> index 21ad5f242875..c2068e90bf2f 100644
->> --- a/drivers/cxl/core/region.c
->> +++ b/drivers/cxl/core/region.c
->> @@ -794,10 +794,15 @@ static size_t show_targetN(struct cxl_region *cxlr, char *buf, int pos)
->>  	return rc;
->>  }
->>  
->> +struct cxld_match_data {
->> +	int id;
->> +	struct device *target_device;
->> +};
->> +
->>  static int match_free_decoder(struct device *dev, void *data)
->>  {
->> +	struct cxld_match_data *match_data = data;
->>  	struct cxl_decoder *cxld;
->> -	int *id = data;
->>  
->>  	if (!is_switch_decoder(dev))
->>  		return 0;
->> @@ -805,17 +810,31 @@ static int match_free_decoder(struct device *dev, void *data)
->>  	cxld = to_cxl_decoder(dev);
->>  
->>  	/* enforce ordered allocation */
->> -	if (cxld->id != *id)
->> +	if (cxld->id != match_data->id)
-> 
-> Why do we carry on in this case?
-> Conditions are:
-> 1. Start match_data->id == 0
-> 2. First pass cxld->id == 0 (all good) or
->    cxld->id == 1 say (and we skip until we match
->    on cxld->id == 0 (perhaps on the second child if they are
->    ordered (1, 0, 2) etc. 
-> 
-> If we skipped and then matched on second child but it was
-> already in use (so region set), we will increment match_data->id to 1
-> but never find that as it was the one we skipped.
-> 
-> So this can only work if the children are ordered.
-> So if that's the case and the line above is just a sanity check
-> on that, it should be noisier (so an error print) and might
-> as well fail as if it doesn't match all bets are off.
-> 
+> > ---
+> >  .../net/ethernet/pensando/ionic/ionic_dev.h   |  7 +++++--
+> >  .../net/ethernet/pensando/ionic/ionic_lif.c   | 14 +++++++------
+> >  .../net/ethernet/pensando/ionic/ionic_txrx.c  | 21 +++++++++----------
+> >  3 files changed, 23 insertions(+), 19 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/pensando/ionic/ionic_dev.h b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
+> > index c647033f3ad2..19ae68a86a0b 100644
+> > --- a/drivers/net/ethernet/pensando/ionic/ionic_dev.h
+> > +++ b/drivers/net/ethernet/pensando/ionic/ionic_dev.h
+> > @@ -238,9 +238,8 @@ struct ionic_queue {
+> >  	unsigned int index;
+> >  	unsigned int num_descs;
+> >  	unsigned int max_sg_elems;
+> > +
+> >  	u64 features;
+> > -	unsigned int type;
+> > -	unsigned int hw_index;
+> >  	unsigned int hw_type;
+> >  	bool xdp_flush;
+> >  	union {
+> > @@ -261,7 +260,11 @@ struct ionic_queue {
+> >  		struct ionic_rxq_sg_desc *rxq_sgl;
+> >  	};
+> >  	struct xdp_rxq_info *xdp_rxq_info;
+> > +	struct bpf_prog *xdp_prog;
+> >  	struct ionic_queue *partner;
+> > +
+> > +	unsigned int type;
+> > +	unsigned int hw_index;
+> >  	dma_addr_t base_pa;
+> >  	dma_addr_t cmb_base_pa;
+> >  	dma_addr_t sg_base_pa;
+> > diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+> > index aa0cc31dfe6e..0fba2df33915 100644
+> > --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+> > +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+> > @@ -2700,24 +2700,24 @@ static int ionic_xdp_register_rxq_info(struct ionic_queue *q, unsigned int napi_
+> >  
+> >  static int ionic_xdp_queues_config(struct ionic_lif *lif)
+> >  {
+> > +	struct bpf_prog *xdp_prog;
+> >  	unsigned int i;
+> >  	int err;
+> >  
+> >  	if (!lif->rxqcqs)
+> >  		return 0;
+> >  
+> > -	/* There's no need to rework memory if not going to/from NULL program.
+> > -	 * If there is no lif->xdp_prog, there should also be no q.xdp_rxq_info
+> > -	 * This way we don't need to keep an *xdp_prog in every queue struct.
+> > -	 */
+> > -	if (!lif->xdp_prog == !lif->rxqcqs[0]->q.xdp_rxq_info)
+> > +	/* There's no need to rework memory if not going to/from NULL program.  */
+> > +	xdp_prog = READ_ONCE(lif->xdp_prog);
+> > +	if (!xdp_prog == !lif->rxqcqs[0]->q.xdp_prog)
+> >  		return 0;
 
-it seems Ira Weiny also has some concerns related to previous existing
-logic as following:
+In a case when we replace a non-NULL program with another non-NULL program this 
+would create a situation where lif and queues have different pointers on them.
 
-https://lore.kernel.org/all/66c4a136d9764_2ddc2429435@iweiny-mobl.notmuch/
-"Also for those working on CXL I'm questioning the use of ID here and
-the dependence on the id's being added to the parent in order.  Is that
-a guarantee?"
+> >  
+> >  	for (i = 0; i < lif->ionic->nrxqs_per_lif && lif->rxqcqs[i]; i++) {
+> >  		struct ionic_queue *q = &lif->rxqcqs[i]->q;
+> >  
+> > -		if (q->xdp_rxq_info) {
+> > +		if (q->xdp_prog) {
+> >  			ionic_xdp_unregister_rxq_info(q);
+> > +			q->xdp_prog = NULL;
+> >  			continue;
+> >  		}
+> >  
+> > @@ -2727,6 +2727,7 @@ static int ionic_xdp_queues_config(struct ionic_lif *lif)
+> >  				i, err);
+> >  			goto err_out;
+> >  		}
+> > +		q->xdp_prog = xdp_prog;
+> >  	}
+> >  
+> >  	return 0;
 
-perhaps, create a new dedicated thread to discuss original design.
-
-> Jonathan
->  
->>  		return 0;
->>  
->> -	if (!cxld->region)
->> +	if (!cxld->region) {
->> +		match_data->target_device = get_device(dev);
->>  		return 1;
->> +	}
->>  
->> -	(*id)++;
->> +	match_data->id++;
->>  
->>  	return 0;
->>  }
->>  
->> +/* NOTE: need to drop the reference with put_device() after use. */
->> +static struct device *find_free_decoder(struct device *parent)
->> +{
->> +	struct cxld_match_data match_data = {
->> +		.id = 0,
->> +		.target_device = NULL,
->> +	};
->> +
->> +	device_for_each_child(parent, &match_data, match_free_decoder);
->> +	return match_data.target_device;
->> +}
->> +
->>  static int match_auto_decoder(struct device *dev, void *data)
->>  {
->>  	struct cxl_region_params *p = data;
->> @@ -840,7 +859,6 @@ cxl_region_find_decoder(struct cxl_port *port,
->>  			struct cxl_region *cxlr)
->>  {
->>  	struct device *dev;
->> -	int id = 0;
->>  
->>  	if (port == cxled_to_port(cxled))
->>  		return &cxled->cxld;
->> @@ -849,7 +867,7 @@ cxl_region_find_decoder(struct cxl_port *port,
->>  		dev = device_find_child(&port->dev, &cxlr->params,
->>  					match_auto_decoder);
->>  	else
->> -		dev = device_find_child(&port->dev, &id, match_free_decoder);
->> +		dev = find_free_decoder(&port->dev);
->>  	if (!dev)
->>  		return NULL;
->>  	/*
->>
-> 
-
+[...]
 
