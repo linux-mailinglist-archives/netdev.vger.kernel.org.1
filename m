@@ -1,94 +1,73 @@
-Return-Path: <netdev+bounces-122519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49875961922
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 23:21:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEA396192C
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 23:25:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2D46B220B0
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:21:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 929A71C22CD4
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D76B71D417D;
-	Tue, 27 Aug 2024 21:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0451B158218;
+	Tue, 27 Aug 2024 21:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D090luz3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CJFzkgpH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6B91D4179;
-	Tue, 27 Aug 2024 21:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C751F943
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 21:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724793638; cv=none; b=aXQ2lyS4tV9LXsg3Xh651xDsrQeLLkVeyt1Ele2cwAoLiKf23AI942oxcsMsYKl2dOcggm4HZEwpkLOm+mNjf8OaPr0BxX7GR0SJhjZI8A5bfkSBtB3FsogzKk2QlNIgf47y43mw2SxbIKOnkYZejMV2cYQnoKJy0dyIT6O36Gk=
+	t=1724793944; cv=none; b=IZOgJ/Vnav0LmUdy2/127L20f2ddoIUoE9cY/YwuLvzBF4wn3AVUfnZ9oe+ZEE+TgTnUozje0ZCvhcQl/BFTFm+CrkBsx87AlqsU4BTDJBhfYbPSGxPJPLODCsKbxcsO5jJ2HRWdZaqSBNFYz3BlXAf5ux/TV3H6K4a7FJhboKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724793638; c=relaxed/simple;
-	bh=6AdjvTP1MVp1SeDszmdKg0TqLaGfboVOdRJQCz8TUXs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nnWfMm7tE05wZsb9rEZZzz2E1grlokhNzOSeWEJUUdaVR9fUKl8lf07fEuBy+uNcR/HQH5gdKcJcRX0+P78wn+VOZeMKMNbxu5KCd4NZ0s5dA1oELCuFzvOycDNIukfsoF5mQNZz4b3pha9mlVsbi7RjYX99/IHZ6VGhksYCr30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D090luz3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29871C4AF15;
-	Tue, 27 Aug 2024 21:20:38 +0000 (UTC)
+	s=arc-20240116; t=1724793944; c=relaxed/simple;
+	bh=JwyxuAxdJh5gqpmW+vRHYckqtkQopENYgeI53pC4zbA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WT7A8vd3JnW4XEv3H8gcQ+3jyhHnpuSrWGnU8ogjYlF31i03SIpT/I4qbQTZfn1+5ZTy6snPexbEOqYCVaSOQTQ05Cg+LMKBEJ1Xay5cJoDMbYl3UlREZnCipSODUb5fksjzRlnEbQTlyOJTgxeAKeQgNnV+P+rwEEMhQV10AeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CJFzkgpH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 330E0C32786;
+	Tue, 27 Aug 2024 21:25:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724793638;
-	bh=6AdjvTP1MVp1SeDszmdKg0TqLaGfboVOdRJQCz8TUXs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=D090luz3int0y9B1OXRxf0fUCsBojLIS3jBRZH389kMSxivmAJDaxio0A7NOzqzyu
-	 dRuB8kltSbwQXpzRQSK5uCwQ4FqTrxcpowkLzIenGEGbCiMuAC4iDjkI95bUpwFbf2
-	 zE9nlZPAAlAUGcuYxxFu/E3K4a0VhEP2bICXbn2++9pgs19azL34dPdN37vIkmnAGF
-	 it8NhUb9g5B5604rCzNdpndvI7A5hxW6xHXxnE+oSA1f+jp4f2kLHjvVAoAhJxBk9e
-	 4umjfjN03O/KwCSXfXQpVibZJXVMdeXgepYKCwYLaBwG9fPFU7VaBCyDidgjgfJnpR
-	 pI+QHgf06yY+g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D183822D6D;
-	Tue, 27 Aug 2024 21:20:39 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1724793944;
+	bh=JwyxuAxdJh5gqpmW+vRHYckqtkQopENYgeI53pC4zbA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CJFzkgpHhBE9/toSrPkWXdcyexCo9IxZxj3fvZ5jDuCaQeRZ0dW9NQkca5ny7RUOC
+	 2JmhvXW56AZqTTGgAo788U8iKuckST4LZyES5Lac3+5qbc7KhrzNKHszaJlmRoPqJ3
+	 xu8/n+asSttbKf0hpDiXyu4F+rgokYGG3VLrKRlTbTDgza1hnlQRn0E8I1hjCxijjq
+	 jIiCLi4glMnn5g2SmtQNJGRXUTZRSYnj7NW0K5yrlXw2H2SfUwRZPQY5Fe0uBigGWL
+	 Q9d+pVSy30DCOGJnc+rrlJCjPA2wKtjN/YlLXCJsfS6D4It6Mz9ESqPezE4oRdW20E
+	 C9j04phPsHeJA==
+Date: Tue, 27 Aug 2024 14:25:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gaosheng Cui <cuigaosheng1@huawei.com>
+Cc: <sebastian.hesselbarth@gmail.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH -next] MIPS: Remove obsoleted declaration for
+ mv64340_irq_init
+Message-ID: <20240827142543.277b1bad@kernel.org>
+In-Reply-To: <20240826032344.4012452-1-cuigaosheng1@huawei.com>
+References: <20240826032344.4012452-1-cuigaosheng1@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: thunderx: Remove unused declarations
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172479363800.765313.3854499701349975014.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Aug 2024 21:20:38 +0000
-References: <20240824082754.3637963-1-yuehaibing@huawei.com>
-In-Reply-To: <20240824082754.3637963-1-yuehaibing@huawei.com>
-To: Yue Haibing <yuehaibing@huawei.com>
-Cc: sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 26 Aug 2024 11:23:44 +0800 Gaosheng Cui wrote:
+> The mv64340_irq_init() have been removed since
+> commit 688b3d720820 ("[MIPS] Delete Ocelot 3 support."), and now
+> it is useless, so remove it.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 24 Aug 2024 16:27:54 +0800 you wrote:
-> Commit 4863dea3fab0 ("net: Adding support for Cavium ThunderX network
-> controller") declared nicvf_qset_reg_{write,read}() but never implemented.
-> 
-> Commit 4863dea3fab0 ("net: Adding support for Cavium ThunderX network
-> controller") declared bgx_add_dmac_addr() but no implementation.
-> 
-> After commit 5fc7cf179449 ("net: thunderx: Cleanup PHY probing code.")
-> octeon_mdiobus_force_mod_depencency() is not used any more.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net: thunderx: Remove unused declarations
-    https://git.kernel.org/netdev/net-next/c/9a4556862d1f
-
-You are awesome, thank you!
+Most of the drivers which used this header have been deleted.
+Please move the only 3(?) defines that are actually used into
+arch/powerpc/platforms/chrp/pegasos_eth.c
+and delete the file completely.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
