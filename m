@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-122521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 580CE961937
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 23:30:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D36B396193A
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 23:30:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1422D284FD5
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:30:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1224E1C22ED6
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:30:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D907C1C8FC4;
-	Tue, 27 Aug 2024 21:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D991D414E;
+	Tue, 27 Aug 2024 21:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d1yb9wiL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ebgEp3tX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9489B155327;
-	Tue, 27 Aug 2024 21:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD30B1D4147
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 21:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724794231; cv=none; b=tXxlxlWQjQxx76Df00YzD0RdEVd54rn1QefE/VMPhFLfl7BMl7TkkTciEFckhmgoAGqeX3rW3Fj9R4Df8R09hSnA6TsVbAc2IwypUIMylKJ5vhf3Vq1nEhh9UU++VKedjUqP4IgYYbQGKsHqx/zAD82u+XAx4MHchGRs+CPbHCg=
+	t=1724794232; cv=none; b=jwLJrtEN3YwAkUiZFiO4yONE82AL4tySknLdry8ogQvVWzabf6zYlkKSszWgJriG4z51Qc2VlGvmTWvrRj+dgQpWFs1sa8iyBorYEYqEEmnWRxC/DEgfTA/K4zn7ggMTm6skLwop4wdR32h4o1WYzi015QfPvE9f5KMlERi2/PM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724794231; c=relaxed/simple;
-	bh=pbdDCQZ3c4mWtxZF+uZDZEXyC0e0EtwYuO/5WUr+Avs=;
+	s=arc-20240116; t=1724794232; c=relaxed/simple;
+	bh=4Z7FABauvVX9rjZePg1phFgn3e7awIJw6xtGURJrYmE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TXWYlIDKtm7If+A0EjaTN1O/4qmEiB+R0NkLVoeBt0tm6UYAPyY1xuvS7W338P6H4MfflDRnAJvgiw1eS8SdscpfR7NeCTgWNWQU1SBKneMWzFyXSe14twJbEUbluz4Iit+cD9/p3zDVqSP93InCU5mOSslnpLBptuZ+CJCQ4/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1yb9wiL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B476C4AF11;
-	Tue, 27 Aug 2024 21:30:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724794231;
-	bh=pbdDCQZ3c4mWtxZF+uZDZEXyC0e0EtwYuO/5WUr+Avs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=d1yb9wiLWfHprw+iZmr9zoWZxkDcY+VcGzwrtMCGHoEA6N2a4GL8PlPyp4fqlVHRg
-	 i9lPudfXmgnGYc5JY371ROXZVrrzHtw0yv22Iy8kifSuIeO2PFNfLt00PtTMXR7Oaq
-	 CZvfBRFQRMV+vmtWZb49T5aMAm7yyIBDHFhGniD2zUDWXaddke5zdO5g5MJ1NuJm+f
-	 qu8DqCoGjdK73EEnB16hwF3QS1nd13oF3FVw5qj8oy4Xn2/pjPn3XLLdZvVccDZXCn
-	 PpOD7O/6AGQYOCE/FTubBEglXdEcL4fttaLio4ZLzOnkfHY8gXO6l+Zqk3EeYaB+HX
-	 bRKNqYFQmANNQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 712C23822D6D;
+	 In-Reply-To:To:Cc; b=DmKIti+in+IqTkToXWZ5ymNP/xy8Bq98O3/TJ6970hPrQ60JlhH1ig4wMBpMIM6WeIEKe3KWQa+vnmrgk58ShyllMMdnJDjKh5O/ul58UR7X5Bb0FYv4yQwtP519AI8UzMuMga51rI9MSRjRGttr/sNhU/zJTMuCRLe/OcvxQR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ebgEp3tX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 632EBC4AF1B;
 	Tue, 27 Aug 2024 21:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724794232;
+	bh=4Z7FABauvVX9rjZePg1phFgn3e7awIJw6xtGURJrYmE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ebgEp3tXOix8yDiicoGG+AplkxSY26sKDawYnH0IsPxxusAG8lyAK7a4vj92BROCu
+	 wnSFZSNhW6EyeuMwNu14aHM1ERo5Mh5YS516fIazcnUuaDwc+KQWePJP3Y1j3YYjn+
+	 vpkczeiaTQrDPgQLvTGMX8TbGe831VQpHjr7fIL69dn53R355A39k8/8Ziwti0Ke6f
+	 k7ZMQz86hCONYrhBzi2FWP8o1mYCFyYZgfC6Yl37dkYAd7ZQiWbMHY1H1tt/q0yqZi
+	 GwkAKwExUdL6ymlqsuvf2kvqNoU/3MnT3HRW4d0wXlPXHKOzrHFFKZMpTkW5Dg8OIu
+	 gPyNO9ADpHZYg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE303822D6D;
+	Tue, 27 Aug 2024 21:30:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net,v3] tcp: fix forever orphan socket caused by tcp_abort
+Subject: Re: [Patch net] gtp: fix a potential NULL pointer dereference
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172479423125.767553.13899166301990812537.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Aug 2024 21:30:31 +0000
-References: <20240826102327.1461482-1-kuro@kuroa.me>
-In-Reply-To: <20240826102327.1461482-1-kuro@kuroa.me>
-To: Xueming Feng <kuro@kuroa.me>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- lorenzo@google.com, kerneljasonxing@gmail.com, pabeni@redhat.com,
- kuba@kernel.org, ncardwell@google.com, ycheng@google.com, soheil@google.com,
- dsahern@kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+ <172479423249.767553.15007142293154315706.git-patchwork-notify@kernel.org>
+Date: Tue, 27 Aug 2024 21:30:32 +0000
+References: <20240825191638.146748-1-xiyou.wangcong@gmail.com>
+In-Reply-To: <20240825191638.146748-1-xiyou.wangcong@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, cong.wang@bytedance.com, aschultz@tpip.net,
+ pablo@netfilter.org, laforge@gnumonks.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 26 Aug 2024 18:23:27 +0800 you wrote:
-> We have some problem closing zero-window fin-wait-1 tcp sockets in our
-> environment. This patch come from the investigation.
+On Sun, 25 Aug 2024 12:16:38 -0700 you wrote:
+> From: Cong Wang <cong.wang@bytedance.com>
 > 
-> Previously tcp_abort only sends out reset and calls tcp_done when the
-> socket is not SOCK_DEAD, aka orphan. For orphan socket, it will only
-> purging the write queue, but not close the socket and left it to the
-> timer.
+> When sockfd_lookup() fails, gtp_encap_enable_socket() returns a
+> NULL pointer, but its callers only check for error pointers thus miss
+> the NULL pointer case.
+> 
+> Fix it by returning an error pointer with the error code carried from
+> sockfd_lookup().
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] tcp: fix forever orphan socket caused by tcp_abort
-    https://git.kernel.org/netdev/net/c/bac76cf89816
+  - [net] gtp: fix a potential NULL pointer dereference
+    https://git.kernel.org/netdev/net/c/defd8b3c37b0
 
 You are awesome, thank you!
 -- 
