@@ -1,92 +1,77 @@
-Return-Path: <netdev+bounces-122496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02B0E96184F
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 22:00:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA81961851
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 22:06:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 736CDB21A7F
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 20:00:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DC2E1F23EA7
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 20:06:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D083A1D3626;
-	Tue, 27 Aug 2024 20:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E961C57AB;
+	Tue, 27 Aug 2024 20:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nFrPQWOS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C9aGPYDW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5ED413CFB8;
-	Tue, 27 Aug 2024 20:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1432E2EAE6
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 20:06:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724788832; cv=none; b=ReLdhv8bBnA9ki+8X+vR/ySZ6g1En0ooL2g0pdC1yVXSvdWWOnCt3CLtZ7wetLwAf4z88hGbGiTe/KIydbwVmvVVBQx+vWF0uEZA8JA/2sTfPeNZAhRPODUU8m8CM0Nos28dwBYhFQnrN0kc+0QE3YP1at6cHj/PsTwBa57o+zM=
+	t=1724789181; cv=none; b=rrBBaBbuR3ntca1xt82Hokyos2ZAh+0tExNQvaHqEu8/HDtZN2n4O0hNF/X4Cp/SPElOiGg/ww5lL6o+W5x8oPIEepsGgXej4cP/LQIchnNVFEkJeNl5gxD1Nj7XTNMubZZ3kPAgCmWRXgG9/KrcigECPirScjcBN54iAqVCAqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724788832; c=relaxed/simple;
-	bh=W9kABLRdak7DuN+Eb2PnX0tfnMIYHa7LRvd0KaryRuU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=roag8anyXfz+Dc4LNKGrrZkms7+vK46UB+4OwC9QU8oQAIoc71kRA3hXzhpzqYte6OBn1Xe2grWRrAsg66iCS19FPEDvEjUelT0f8zDhvbBWLt2JbtuD/WDldmMVhzyd8d8bHdYODDlWmyYq0IbgMZCaVRrbPK/kZPVJvr+45qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nFrPQWOS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21956C567C2;
-	Tue, 27 Aug 2024 20:00:32 +0000 (UTC)
+	s=arc-20240116; t=1724789181; c=relaxed/simple;
+	bh=Pax8EwozMqqgorRSpulZH/Zb77RNUp9Zf9aKNCa5XIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zu7JdqSv1t9WjiOaOj7qNHaeliEBJofybs2pnIQG8FVsKHoARpjqQUYOMiTB/pbE4WFpcX0Vqi2+b+HMVihk9AOaEhDmYzKZKSi3NatxkUFcXve0m/lhxqDgBzz5nrTya6vmGw/QY6IiEtNyFceTz5YOGIM1IWo8XgB5uq85nTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C9aGPYDW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07536C567D8;
+	Tue, 27 Aug 2024 20:06:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724788832;
-	bh=W9kABLRdak7DuN+Eb2PnX0tfnMIYHa7LRvd0KaryRuU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nFrPQWOSb61lxNy8sBHGC+D2EfK+hLgMgqpPG4NjUCDT4REQEN3ZjUOliDY7zbdxp
-	 brhUWVnOvPbF+KKqVbBw/eravbg5oM9C9k5p8+wv7NVxX1h+fILrLQA8ak2cyfPAod
-	 HyZgOY+XM9vkBYz54pa0s0mE/sQ/FHyuLxtbX8vEUFNvfwKEszfqxD5YAFJ7S3v6gK
-	 F7zeP3L6t8/r+Mw2RGxMxlH3dONjVYSU1vRosUPnb8fCfL5z2LQPzA2N2B96raacrS
-	 6q8hHCPdqOlVeUednjlaPb/i9Y8xFKMLI19NFUUg/FbtRxV9rXglETTou3n59wGMuv
-	 o4ZOTW+CYOP1g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 714E23822D6D;
-	Tue, 27 Aug 2024 20:00:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1724789180;
+	bh=Pax8EwozMqqgorRSpulZH/Zb77RNUp9Zf9aKNCa5XIY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=C9aGPYDWYlkFHFw1Chzx+3tAO/3dT9GyobW6RVWq9m9JtRwt6VHCfOK42kEyrtZfT
+	 1DVbAutbYuqVrNYA4+ghLPQZIktgt1TuD8LEru6kEg+Hdh7F0OjCDfRq/EMMl8O6R6
+	 WVPRtG3ibnSofxRlwddZ4T0QR9R5+hSXopGTP6qa1AyM5d6eQBIky/jqu7UYeVGqyQ
+	 XeAZz9idmI6El8AOLfcr+4E9C3o2mWA24vxDwFZ34EnbHdqUnrWpnI2H/lCoRUY/P6
+	 gFimbESGRkH256h9xdx5m+9kfkIXfs9qMU9xiKIyvikcYgsF3pmKCLA+rpJLVTkCTT
+	 tKn/8l4hfBQDA==
+Date: Tue, 27 Aug 2024 13:06:19 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>, "David S .
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric
+ Dumazet <edumazet@google.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Sabrina
+ Dubroca <sd@queasysnail.net>, Simon Horman <horms@kernel.org>, Steffen
+ Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCHv4 net-next 1/3] bonding: add common function to check
+ ipsec device
+Message-ID: <20240827130619.1a1cd34f@kernel.org>
+In-Reply-To: <20240821105003.547460-2-liuhangbin@gmail.com>
+References: <20240821105003.547460-1-liuhangbin@gmail.com>
+	<20240821105003.547460-2-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: forwarding: local_termination: Down ports
- on cleanup
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172478883200.749473.14227979086325557036.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Aug 2024 20:00:32 +0000
-References: <bf9b79f45de378f88344d44550f0a5052b386199.1724692132.git.petrm@nvidia.com>
-In-Reply-To: <bf9b79f45de378f88344d44550f0a5052b386199.1724692132.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, vladimir.oltean@nxp.com,
- linux-kselftest@vger.kernel.org, shuah@kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 21 Aug 2024 18:50:01 +0800 Hangbin Liu wrote:
+> +/**
+> + * bond_ipsec_dev - return the device for ipsec offload, or NULL if not exist
+> + *                  caller must hold rcu_read_lock.
+> + * @xs: pointer to transformer state struct
+> + **/
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 26 Aug 2024 19:15:11 +0200 you wrote:
-> This test neglects to put ports down on cleanup. Fix it.
-> 
-> Fixes: 90b9566aa5cd ("selftests: forwarding: add a test for local_termination.sh")
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> ---
->  tools/testing/selftests/net/forwarding/local_termination.sh | 4 ++++
->  1 file changed, 4 insertions(+)
-
-Here is the summary with links:
-  - [net-next] selftests: forwarding: local_termination: Down ports on cleanup
-    https://git.kernel.org/netdev/net/c/65a3cce43d5b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+in addition to the feedback on v3, nit: document the return value in
+kdoc for non-void functions
 
