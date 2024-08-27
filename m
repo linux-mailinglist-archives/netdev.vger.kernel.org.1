@@ -1,127 +1,107 @@
-Return-Path: <netdev+bounces-122388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB8F5960ECA
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:52:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4B4E960EE9
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:53:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D564B236A8
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:52:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 235401C22F22
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2301BFE06;
-	Tue, 27 Aug 2024 14:51:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dyOObVee"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A28A1C6882;
+	Tue, 27 Aug 2024 14:53:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D38C31C5781
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 14:51:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31231C57A3;
+	Tue, 27 Aug 2024 14:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724770318; cv=none; b=Q0pMCnb2dh1z0tHWGYAJKm/5Gw46pvrPwwpOh7Q5eYVnHJRtSs1WkYAVLeadNrjjbrjgXCfVH1i5IDYkaA8iu+ukUZnUx7ghHSqwp5qnLa2xZzNYk3316LtNQyEvOpi7CIqayAzBahl58uwie41uo9cC7cLY+tDyo2hGh5JqTyM=
+	t=1724770402; cv=none; b=u3bk7QxFc3tqzbbr7jx5c9dEdcGmG7fKdINHlPAxbsfcBrUdEIQ0w3HSacMYMIcdZcBHynco/NG3w00dDZWLGx4zvkBhw/yYW7N2F+3v1Qk/geclUlGWX/JQFuxoijSbDdKzVuP8FgoHfQgWb72dbqRLrjyDKlMYnYIlmhy4MYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724770318; c=relaxed/simple;
-	bh=oEmaKdDA0f1kPBEUawJwo+/C8xG853En1f0dUTIk/Lw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=INLFmx/Rieo3uGSjccFURKF5pKDfhVEklb5H3RdoWkdUMrkSRZCJf3JMXphIybL5xGUGl8PiyGnIoN8Jjspg1qITOg6gDCcog7yGg4t3EnowDnrGH1gs7SfRK2KT7+rwhiSXnKYzh6iE4Y13SMTVbXlON5YUS6jaGl9qYJ9sUko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dyOObVee; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724770315;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7axL6WwXjfqeItFfnW0Apw3Twvbt3qkjjPXlRSVYpCY=;
-	b=dyOObVeeblHNdAW6U8cCyYFOkQB9a1Fyg+R9XlZdVwZWMqQ3XhN4EKtu3C3Mcy18Jjt6oj
-	QKFJPVAc1nH8cH24357pGS3QOPXBoQCiAQfz13LBDgP80MZLK3/nxQNdprRu66oeMq49FI
-	HzsKRfzm8Yh80fc2SV2W1EeLJbaGXZ8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-156-fFuk8EnYO9mDpWGXr_xCqg-1; Tue, 27 Aug 2024 10:51:53 -0400
-X-MC-Unique: fFuk8EnYO9mDpWGXr_xCqg-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42809eb7b99so29429955e9.0
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 07:51:53 -0700 (PDT)
+	s=arc-20240116; t=1724770402; c=relaxed/simple;
+	bh=NHDwsz0xtPHqFSQbOQ3vz0XTK+7kW/ZxjquzZZ/rOyk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i464EmH/0XrzsA7TDf0cS+DO9S3leTm4jIXs4JU9uUTWVfmzkyt2EHDDCTlAjo3oLAfBteF8EiDgwcMgrTX4atCKDkBS8gpU2Rz+43HZGRythz4D9X7DsriTWBFo+t22C2sQ9nGJW7/cEA9XMdguzeR3Vr39a+Dy5Krf7VKE0bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a86e5e9ff05so119402366b.1;
+        Tue, 27 Aug 2024 07:53:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724770312; x=1725375112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7axL6WwXjfqeItFfnW0Apw3Twvbt3qkjjPXlRSVYpCY=;
-        b=KJ3hIsZwXC3zTrQn4+hqamvohMWxc1L/+TPaKYGrnmm9lHaNJpBpNKqndn+h3az5F4
-         Z6cEVSVjY4/X+CPfqsg7G9S2SwIjrjIKcq51Woorp3LFOikEyynBvC85HPojIgljxw47
-         GPZUs3kfV7zN4feh8P1WW/MzgotEddVn3F7Tpx8eb3RpVoyeUS8Zhm30+FZbL8Q1ZFzH
-         OL0PR+a+WF+wylsPmdVB3NQYvjAFx51lzVzgddOS4BLkW38H9of6h3QiEpkoqesKuktI
-         sDMaAhpF1shBzgB/zxfJsMzLpm5/uA+hCpJ6eBQLFV4sCu1v9rGALa0qa5b85sqBU8W/
-         1Jdg==
-X-Gm-Message-State: AOJu0YyoPrDs0uw5UQN11rnGfWQSCVK4hgHRKNhqfIvtoctTL0+RtOQG
-	u2cGN7hlGBWc3swQ8SV8I/eC+ciZ3FKs4G3jCOT2dEDCL66Yim/69bzWVcYY0OOxhalTGuKypiK
-	WkqI2KF2t1mg22JwRE/X3Is7mcnTqidwczoA9awWxUCpFJ9MEbG3dZw==
-X-Received: by 2002:a05:600c:2a93:b0:426:62a2:34fc with SMTP id 5b1f17b1804b1-42b9a4712c4mr19881325e9.11.1724770312191;
-        Tue, 27 Aug 2024 07:51:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHZZ74kly+gbSlYShXQj2yuPWS3lSuYHmjvhCf+TLC1w87JRikCELmk2jBrsrWcEKpPgeZS/Q==
-X-Received: by 2002:a05:600c:2a93:b0:426:62a2:34fc with SMTP id 5b1f17b1804b1-42b9a4712c4mr19881125e9.11.1724770311473;
-        Tue, 27 Aug 2024 07:51:51 -0700 (PDT)
-Received: from debian (2a01cb058918ce0010ac548a3b270f8c.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:10ac:548a:3b27:f8c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42b9d945144sm23064825e9.0.2024.08.27.07.51.50
+        d=1e100.net; s=20230601; t=1724770399; x=1725375199;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=c7U3K/hyiIatkLE7W/rIDb1QwHLRm5PtGb2NGHRGU1Q=;
+        b=UMmQb7NsrbPNpuvYxU9xICOfvlStqm9E9ezAn1qThO+6/EypHVvluP319FeGyM0INR
+         knS3yP36akNtABE5t+KAW1lVfpSRBvPiR6nLmjwTV5eqGftaRNHqZ6pIZi0QBquAAUvB
+         IjhythFSPUw5nZumXWIU+X8hdE6IuuSKOpewxbWWGVRdt+rJUydw6ZIUQiTgunr5J+AP
+         H4e4698OsU87USqOBm9VDFHjZ2eIkIfm4QE2bP2SZkVOy+wWGqrXjilj0nViTfIs09A2
+         K5GjrhOXb2fJxawSMxGnzRb2Dpd0W3ZVDqzsnJBRTm8qRLps3KKWRlIXMEMgxQKRckjI
+         3ycg==
+X-Forwarded-Encrypted: i=1; AJvYcCUr6vFaLww3UcdD9aPtOZZLbztZX98Shb8Z284NCXRj9zrrpVJML3QXCRws6SSenlLUGUdnsWEGCtsIqWEGjEHP@vger.kernel.org, AJvYcCUtUQiYSbuYUl5Kx5V+IAZhfEyS5K1MMMJWZvm6cDWGsi25MNYj/CCoKmrsz4XzmkCCI5zdkW9zU2HKb5k=@vger.kernel.org, AJvYcCX+/W4on4p0SmUrfyxHyKhHSZ3QfeaaGGAUSh1/apJxY7/vCtMjvBak01xLa9NP8V2DqgTR0NS1@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZVH7RYfHe6VAgD30wivBL6ALH8UnYFmP0SjdhUDHWrykRZvGZ
+	7O4qBjgS/Ba1ouSx03Q7eiwRqVAC55Br9K0X33LN0TDRwpd3gH1Z
+X-Google-Smtp-Source: AGHT+IEcmGBKu9wpR2Z7xdlFgg0LT701kvwqVnrQ5BpD9P2y4GakD1p0SQvwQi53WacX8BdqIvLiKA==
+X-Received: by 2002:a17:907:1ca4:b0:a7a:a138:dbc1 with SMTP id a640c23a62f3a-a86e39ce823mr215762666b.20.1724770398282;
+        Tue, 27 Aug 2024 07:53:18 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-115.fbsv.net. [2a03:2880:30ff:73::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a86e549d00bsm119368266b.66.2024.08.27.07.53.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 07:51:51 -0700 (PDT)
-Date: Tue, 27 Aug 2024 16:51:49 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
-	john.fastabend@gmail.com, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 06/12] ipv4: Unmask upper DSCP bits when
- building flow key
-Message-ID: <Zs3oBWRQtDjl4JxV@debian>
-References: <20240827111813.2115285-1-idosch@nvidia.com>
- <20240827111813.2115285-7-idosch@nvidia.com>
+        Tue, 27 Aug 2024 07:53:17 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: fw@strlen.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: rbc@meta.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org
+Subject: [PATCH nf-next v3 0/2] netfilter: Make IP_NF_IPTABLES_LEGACY selectable
+Date: Tue, 27 Aug 2024 07:52:39 -0700
+Message-ID: <20240827145242.3094777-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240827111813.2115285-7-idosch@nvidia.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 27, 2024 at 02:18:07PM +0300, Ido Schimmel wrote:
-> build_sk_flow_key() and __build_flow_key() are used to build an IPv4
-> flow key before calling one of the FIB lookup APIs.
-> 
-> Unmask the upper DSCP bits so that in the future the lookup could be
-> performed according to the full DSCP value.
-> 
-> Remove IPTOS_RT_MASK since it is no longer used.
-> 
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->  include/net/route.h | 2 --
->  net/ipv4/route.c    | 4 ++--
->  2 files changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/net/route.h b/include/net/route.h
-> index b896f086ec8e..1789f1e6640b 100644
-> --- a/include/net/route.h
-> +++ b/include/net/route.h
-> @@ -266,8 +266,6 @@ static inline void ip_rt_put(struct rtable *rt)
->  	dst_release(&rt->dst);
->  }
->  
-> -#define IPTOS_RT_MASK	(IPTOS_TOS_MASK & ~3)
-> -
+These two patches make IP_NF_IPTABLES_LEGACY and IP6_NF_IPTABLES_LEGACY
+Kconfigs user selectable, avoiding creating an extra dependency by
+enabling some other config that would select IP{6}_NF_IPTABLES_LEGACY.
 
-IPTOS_RT_MASK is still used by xfrm_get_tos() (net/xfrm/xfrm_policy.c).
-To preserve bisectablility, this chunk should be moved to the next
-patch. Or just swap patch 6 and 7, whatever you prefer :).
+Changelog:
+
+v3:
+ * Make sure that the generate from  tools/testing/selftests/net/config
+ * look the same before and after. (Jakub)
+
+v2:
+ * Added the new configuration in the selftest configs (Jakub)
+ * Added this simple cover letter
+ * https://lore.kernel.org/all/20240823174855.3052334-1-leitao@debian.org/
+
+v1:
+ * https://lore.kernel.org/all/20240822175537.3626036-1-leitao@debian.org/
+
+Breno Leitao (2):
+  netfilter: Make IP_NF_IPTABLES_LEGACY selectable
+  netfilter: Make IP6_NF_IPTABLES_LEGACY selectable
+
+ net/ipv4/netfilter/Kconfig         | 19 +++++++++++--------
+ net/ipv6/netfilter/Kconfig         | 22 ++++++++++++----------
+ tools/testing/selftests/net/config | 13 +++++++++++++
+ 3 files changed, 36 insertions(+), 18 deletions(-)
+
+-- 
+2.43.5
 
 
