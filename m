@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-122338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99E96960BE5
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:24:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4614F960BE2
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCACA1C23218
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:24:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03C14286A94
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3103D1C6F45;
-	Tue, 27 Aug 2024 13:22:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27541C68A6;
+	Tue, 27 Aug 2024 13:22:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACDD71C4ED2;
-	Tue, 27 Aug 2024 13:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1B311C4ECC;
+	Tue, 27 Aug 2024 13:22:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724764948; cv=none; b=ozbRoh2YjD/uf6LTyImPobTIe3FPyID97PT8Q+e+tsrOfIT45MQVD4lZH7TsWQK8FviKXKzeeLr+bJzVF6OXc3URVYiYn/VQsaVVX+aCuZEsUTIt9Ig74jUIIvFksaGQynrmMYbA1AfySaTJ4M0613XG2LX+k7eSV1GbAHZAI5U=
+	t=1724764947; cv=none; b=Akyx28BgEyPT7WZ2/ukMkNLNVqSdk8cdfxtlOBKJ7EvN+Iohd3N8hMhkMDu91jrekgQrHP3WWhcnVrgIfGoC+OAyZ89F1tIhT+NaWWssm5BLxWcC5jy4vaRRQHrbGgJcGNPUmh4tAUErv8rn2PUgukoCbDOKzwqZTDoPAKp+Cr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724764948; c=relaxed/simple;
-	bh=a5135NMNOMFRhdVZgQGvhaFyPQM1cp2oq0qjNOomBxM=;
+	s=arc-20240116; t=1724764947; c=relaxed/simple;
+	bh=WushfD6vdnXkxgpb/FoW0A7gtMJRdBCa629d7wgPqZs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OInuvpQZNM2EVkjH+/JvQhT/3AgpsJEfK44w6wIkLiNGQ8Pn6v+Lg88EiIA8eAlEhCUzaf7UXa03RyKd3/+cB6gJ21cLFkv+oYusx2PYDe/0BPSg+aNN1klckegMVKqIIv45MJWrvqXb6DWahD9DjVaQrwAWOcwIqJJXxVmWXIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	 MIME-Version:Content-Type; b=XY1OIKP5AC2o3D5GUJHUOXa43B0CYRbof3bz9IhAcd4QSgmEL6T9JkDVSCm9VeU4jp8StG+NXjV3yKwaAvsg0lEw/OJVb6kq5HYh3CFMCTck38p/hU/SOfT0g7raNUt3mriMIEbIK6wrKeWBePxB5EbFWg9EOSL1nsBn02Frqco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WtSrM23Ngz2Cnmj;
-	Tue, 27 Aug 2024 21:22:11 +0800 (CST)
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WtSml38n9z1HHWD;
+	Tue, 27 Aug 2024 21:19:03 +0800 (CST)
 Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6EDC2140136;
-	Tue, 27 Aug 2024 21:22:21 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 34DD1140136;
+	Tue, 27 Aug 2024 21:22:22 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 27 Aug 2024 21:22:20 +0800
+ 15.1.2507.39; Tue, 27 Aug 2024 21:22:21 +0800
 From: Jijie Shao <shaojijie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>
@@ -49,9 +49,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<horms@kernel.org>, <jonathan.cameron@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH V5 net-next 08/11] net: hibmcge: Implement some ethtool_ops functions
-Date: Tue, 27 Aug 2024 21:14:52 +0800
-Message-ID: <20240827131455.2919051-9-shaojijie@huawei.com>
+Subject: [PATCH V5 net-next 09/11] net: hibmcge: Add a Makefile and update Kconfig for hibmcge
+Date: Tue, 27 Aug 2024 21:14:53 +0800
+Message-ID: <20240827131455.2919051-10-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20240827131455.2919051-1-shaojijie@huawei.com>
 References: <20240827131455.2919051-1-shaojijie@huawei.com>
@@ -66,81 +66,80 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemm000007.china.huawei.com (7.193.23.189)
 
-Implement the .get_drvinfo .get_link .get_link_ksettings to get
-the basic information and working status of the driver.
-Implement the .set_link_ksettings to modify the rate, duplex,
-and auto-negotiation status.
+Add a Makefile and update Kconfig to build hibmcge driver.
 
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- .../ethernet/hisilicon/hibmcge/hbg_ethtool.c    | 17 +++++++++++++++++
- .../ethernet/hisilicon/hibmcge/hbg_ethtool.h    | 11 +++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_main.c   |  2 ++
- 3 files changed, 30 insertions(+)
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
+ drivers/net/ethernet/hisilicon/Kconfig          | 16 +++++++++++++++-
+ drivers/net/ethernet/hisilicon/Makefile         |  1 +
+ drivers/net/ethernet/hisilicon/hibmcge/Makefile | 10 ++++++++++
+ 3 files changed, 26 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/Makefile
 
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-new file mode 100644
-index 000000000000..c3370114aef3
---- /dev/null
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-@@ -0,0 +1,17 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+// Copyright (c) 2024 Hisilicon Limited.
-+
-+#include <linux/ethtool.h>
-+#include <linux/phy.h>
-+#include "hbg_ethtool.h"
-+
-+static const struct ethtool_ops hbg_ethtool_ops = {
-+	.get_link		= ethtool_op_get_link,
-+	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
-+	.set_link_ksettings	= phy_ethtool_set_link_ksettings,
-+};
-+
-+void hbg_ethtool_set_ops(struct net_device *netdev)
-+{
-+	netdev->ethtool_ops = &hbg_ethtool_ops;
-+}
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
-new file mode 100644
-index 000000000000..628707ec2686
---- /dev/null
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: GPL-2.0+ */
-+/* Copyright (c) 2024 Hisilicon Limited. */
-+
-+#ifndef __HBG_ETHTOOL_H
-+#define __HBG_ETHTOOL_H
-+
-+#include <linux/netdevice.h>
-+
-+void hbg_ethtool_set_ops(struct net_device *netdev);
-+
-+#endif
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-index 9af508987937..b4dc423648a8 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-@@ -6,6 +6,7 @@
- #include <linux/netdevice.h>
- #include <linux/pci.h>
- #include "hbg_common.h"
-+#include "hbg_ethtool.h"
- #include "hbg_hw.h"
- #include "hbg_irq.h"
- #include "hbg_mdio.h"
-@@ -216,6 +217,7 @@ static int hbg_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (ret)
- 		return dev_err_probe(dev, ret, "failed to register netdev\n");
+diff --git a/drivers/net/ethernet/hisilicon/Kconfig b/drivers/net/ethernet/hisilicon/Kconfig
+index 3312e1d93c3b..66444794ce86 100644
+--- a/drivers/net/ethernet/hisilicon/Kconfig
++++ b/drivers/net/ethernet/hisilicon/Kconfig
+@@ -7,7 +7,6 @@ config NET_VENDOR_HISILICON
+ 	bool "Hisilicon devices"
+ 	default y
+ 	depends on OF || ACPI
+-	depends on ARM || ARM64 || COMPILE_TEST
+ 	help
+ 	  If you have a network (Ethernet) card belonging to this class, say Y.
  
-+	hbg_ethtool_set_ops(netdev);
- 	return 0;
- }
+@@ -18,6 +17,8 @@ config NET_VENDOR_HISILICON
  
+ if NET_VENDOR_HISILICON
+ 
++if ARM || ARM64 || COMPILE_TEST
++
+ config HIX5HD2_GMAC
+ 	tristate "Hisilicon HIX5HD2 Family Network Device Support"
+ 	select PHYLIB
+@@ -141,4 +142,17 @@ config HNS3_ENET
+ 
+ endif #HNS3
+ 
++endif # ARM || ARM64 || COMPILE_TEST
++
++config HIBMCGE
++	tristate "Hisilicon BMC Gigabit Ethernet Device Support"
++	depends on PCI && PCI_MSI
++	select PHYLIB
++	help
++	  If you wish to compile a kernel for a BMC with HIBMC-xx_gmac
++	  then you should answer Y to this. This makes this driver suitable for use
++	  on certain boards such as the HIBMC-210.
++
++	  If you are unsure, say N.
++
+ endif # NET_VENDOR_HISILICON
+diff --git a/drivers/net/ethernet/hisilicon/Makefile b/drivers/net/ethernet/hisilicon/Makefile
+index 7f76d412047a..0e2cadfea8ff 100644
+--- a/drivers/net/ethernet/hisilicon/Makefile
++++ b/drivers/net/ethernet/hisilicon/Makefile
+@@ -9,3 +9,4 @@ obj-$(CONFIG_HNS_MDIO) += hns_mdio.o
+ obj-$(CONFIG_HNS) += hns/
+ obj-$(CONFIG_HNS3) += hns3/
+ obj-$(CONFIG_HISI_FEMAC) += hisi_femac.o
++obj-$(CONFIG_HIBMCGE) += hibmcge/
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/Makefile b/drivers/net/ethernet/hisilicon/hibmcge/Makefile
+new file mode 100644
+index 000000000000..ea223b7207af
+--- /dev/null
++++ b/drivers/net/ethernet/hisilicon/hibmcge/Makefile
+@@ -0,0 +1,10 @@
++# SPDX-License-Identifier: GPL-2.0+
++#
++# Makefile for the HISILICON BMC GE network device drivers.
++#
++
++ccflags-y += -I$(src)
++
++obj-$(CONFIG_HIBMCGE) += hibmcge.o
++
++hibmcge-objs = hbg_main.o hbg_hw.o hbg_mdio.o hbg_irq.o hbg_txrx.o hbg_ethtool.o
 -- 
 2.33.0
 
