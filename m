@@ -1,136 +1,137 @@
-Return-Path: <netdev+bounces-122108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F8C795FEE4
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 04:14:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60EF495FEF5
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 04:22:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C12E9282F4B
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 02:14:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 942761C216CB
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 02:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD56DD517;
-	Tue, 27 Aug 2024 02:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MEtbVrrZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4843610940;
+	Tue, 27 Aug 2024 02:21:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8259C8C7
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 02:14:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8782CA9;
+	Tue, 27 Aug 2024 02:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724724854; cv=none; b=HATHQ1Rpj0njwmMVnlCd0RrafAmW+7pCnnc45wOL3xZpne4R+K0MKZ5DCQv4MzkgBfmdEwGlKemR5l6/FGHWC1/owQzCmUx0oMU5a09v8b9rInbwY7moQXsMuwSRIjj/O2BVz5dXBYd2Tu4vJ+vdXBIx7GL+iSkQrupVGJ/oM9Q=
+	t=1724725317; cv=none; b=cHGfETT8ybqYS5F5u/jrapp7wlrxP6InzsQopNyFNZZghgNHlKRdLPGQtWYV2G0B6NQwpuYSql9or7S4g4ATidRSp1KwIifKEHB5Nv5FzkRVrYeMLSOwtnoGJoUFYOKVsithRwgqNyl/XRwhoBiptWuvAT97YFnVIHmwvJzrpt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724724854; c=relaxed/simple;
-	bh=2YEBbKmszqUcMCm3UY5v3BGVGSbeYecsOYJXAz12Cbc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AC7DKqvJxPb1pclH+/7zuzwC+Yn4bFlmyYVbFKObtY94KPbsbTkYXcRwAEYGEe66lgd00pfeShZAgCc+fKXzpLKGAMuJtim5isAxlhN8+TgILq8RNBjMrv/xedqpoGErfA4VgkZ0ibkoCW37qsadgaPOV4CSsDSz95LZsIUnaos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MEtbVrrZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D673EC4DE06;
-	Tue, 27 Aug 2024 02:14:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724724854;
-	bh=2YEBbKmszqUcMCm3UY5v3BGVGSbeYecsOYJXAz12Cbc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MEtbVrrZPllXh/CRnyXIbdbn4GzD1e6AmYxUpDrgkumXSRAlvHCzkyfNG5mdyNyqS
-	 72l1PlEbqZYO+3KVmUm5Ql0fEUNubly/zSthPA1T60QrwgBjdMbgoT1/WEXMX0Vvnv
-	 Dg3g4vMm/rW8oevK78CCoQRT325Bq/KQnBtGdQk2FKwAGkleyC+bsePLDSjBamwAVm
-	 wynmTvVG14MoAG26ieFhgIu6svvoM69jI+gCNzqcuTJy3NPR64zTF0bBvFBgVpx29K
-	 e/TVa0bXTFAaACaZR2OErqe7Qsgi/X8toOikAgny/TMF8sdYDXMKTrbwBdRZHoBmbb
-	 Pva+DBm+p2+Dw==
-Date: Mon, 26 Aug 2024 19:14:13 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>
-Subject: Re: [PATCH v4 net-next 00/12] net: introduce TX H/W shaping API
-Message-ID: <20240826191413.1829b8b6@kernel.org>
-In-Reply-To: <d9cfa04f-24dd-4064-80bf-cada8bdcf9cb@redhat.com>
-References: <cover.1724165948.git.pabeni@redhat.com>
-	<20240822174319.70dac4ff@kernel.org>
-	<d9cfa04f-24dd-4064-80bf-cada8bdcf9cb@redhat.com>
+	s=arc-20240116; t=1724725317; c=relaxed/simple;
+	bh=8VBrrGu3oos3uM4w05GpcBqNhAFWmQIZAT+ADgG4gsQ=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=KSzkJrcflwQzoJBPs1DYxqU08AT2liac/kR8ITTJC9jylkb5DLcoGNDDdbEv5ar8VLGXPE4KW12FpklBx7ijfl1N+7Vxjj2+jFDjuS+PYMq6684phmW7DENhMuHXpJK7o2Zi8h8weMHQwUwkwfFu9qo6/dsJ9Lu2RSlX70EtNZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas5t1724725296t961t18306
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.120.181.182])
+X-QQ-SSF:00400000000000F0FVF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 16520017505562810091
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <andi.shyti@kernel.org>,
+	<jarkko.nikula@linux.intel.com>,
+	<andriy.shevchenko@linux.intel.com>,
+	<mika.westerberg@linux.intel.com>,
+	<jsd@semihalf.com>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<rmk+kernel@armlinux.org.uk>,
+	<linux-i2c@vger.kernel.org>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<duanqiangwen@net-swift.com>
+References: <20240823030242.3083528-1-jiawenwu@trustnetic.com> <888f78a9-dea9-4f66-a4d0-00a57039733d@lunn.ch> <01d701daf75c$50db4450$f291ccf0$@trustnetic.com> <55ff5570-5398-48e9-bf56-d34da197d175@lunn.ch>
+In-Reply-To: <55ff5570-5398-48e9-bf56-d34da197d175@lunn.ch>
+Subject: RE: [PATCH net 0/3] Add I2C bus lock for Wangxun
+Date: Tue, 27 Aug 2024 10:21:36 +0800
+Message-ID: <020f01daf827$d765ffd0$8631ff70$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQH8I/V4PrHZ+O/IFu6cfIurHK/3+gGW9YksAYhjRIgArI2qV7HZn86A
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On Fri, 23 Aug 2024 09:51:24 +0200 Paolo Abeni wrote:
-> On 8/23/24 02:43, Jakub Kicinski wrote:
-> > On Tue, 20 Aug 2024 17:12:21 +0200 Paolo Abeni wrote:  
-> >> * Delegation
-> >>
-> >> A containers wants to limit the aggregate B/W bandwidth of 2 of the 3
-> >> queues it owns - the starting configuration is the one from the
-> >> previous point:
-> >>
-> >> SPEC=Documentation/netlink/specs/net_shaper.yaml
-> >> ./tools/net/ynl/cli.py --spec $SPEC \
-> >> 	--do group --json '{"ifindex":'$IFINDEX',
-> >> 			"leaves": [
-> >> 			  {"handle": {"scope": "queue", "id":'$QID1' },
-> >> 			   "weight": '$W1'},
-> >> 			  {"handle": {"scope": "queue", "id":'$QID2' },
-> >> 			   "weight": '$W2'}],
-> >> 			"root": { "handle": {"scope": "node"},
-> >> 				  "parent": {"scope": "node", "id": 0},  
-> > 
-> > In the delegation use case I was hoping "parent" would be automatic.  
+On Mon, Aug 26, 2024 10:34 AM, Andrew Lunn wrote:
+> On Mon, Aug 26, 2024 at 10:04:42AM +0800, Jiawen Wu wrote:
+> > On Mon, Aug 26, 2024 9:33 AM, Andrew Lunn wrote:
+> > > On Fri, Aug 23, 2024 at 11:02:39AM +0800, Jiawen Wu wrote:
+> > > > Sometimes the driver can not get the SFP information because the I2C bus
+> > > > is accessed by the firmware at the same time.
+> > >
+> > > Please could you explain this some more. What firmware?
+> >
+> > It's the firmware of our ethernet devices.
+> >
+> > > There some registers which are clear on read. They don't work when you
+> > > have multiple entities reading them.
+> >
+> > I'm not trying to multiple access the I2C registers, but these registers cannot
+> > be accessed by other interfaces in the process of reading complete information
+> > each time. So there is a semaphore needed that locks up the entire read process.
 > 
-> Currently the parent is automatic/implicit when creating a node directly 
-> nested to the the netdev shaper.
+> More details please.
 > 
-> I now see we can use as default parent the current leaves' parent, when 
-> that is the same for all the to-be-grouped leaves.
+> Linux assume it is driving the hardware. Your firmware cannot be
+> touching any registers which will clear on read. QSFP states that
+> registers 3-31 of page 0 are all clear on read, for example. The
+> firmware should also not be setting any registers, otherwise you can
+> confuse Linux which assumes registers it set stay set, because it is
+> controlling the hardware.
 > 
-> Actually, if we restrict the group operation to operate only on set of 
-> leaves respecting the above, I *guess* we will not lose generality and 
-> we could simplify a bit the spec. WDYT?
+> Your firmware also needs to handle that Linux can change the page. If
+> the firmware changes the page, it must restore it back to whatever
+> page Linux selected, etc.
+> 
+> The fact you are submitting this for net suggests you have seen real
+> issues. Please describe what those issues are.
 
-I remember having a use case in mind where specifying parent would be
-very useful. I think it may have been related to atomic changes.
-I'm not sure if what I describe below is exactly that case...
+The error log shows:
 
-Imagine:
+[257681.367827] sfp sfp.1025: Host maximum power 1.0W
+[257681.370813] txgbe 0000:04:00.1: 31.504 Gb/s available PCIe bandwidth, limited by 8.0 GT/s PCIe x4 link at 0000:02:02.0 (capable
+of 63.008 Gb/s with 8.0 GT/s PCIe x8 link)
+[257681.373364] txgbe 0000:04:00.1 enp4s0f1: renamed from eth0
+[257681.434719] txgbe 0000:04:00.1 enp4s0f1: configuring for inband/10gbase-r link mode
+[257681.676747] sfp sfp.1025: EEPROM base structure checksum failure: 0x63 != 0x1f
+[257681.676755] sfp EE: 00000000: 03 04 07 10 00 00 01 00 00 00 00 06 67 02 00 00  ............g...
+[257681.676757] sfp EE: 00000010: 1e 0f 00 00 46 69 62 65 72 53 74 6f 72 65 20 64  ....FiberStore d
+[257681.676759] sfp EE: 00000020: 20 20 20 20 00 00 1b 21 53 46 50 2d 31 30 47 53      ...!SFP-10GS
+[257681.676760] sfp EE: 00000030: 52 2d 38 35 20 20 20 20 41 20 20 20 03 52 00 1f  R-85    A   .R..
+[257681.676762] sfp EE: 00000040: 00 81 cd 5b df 25 0a bd 40 f6 c6 ce 47 8e ff ff  ...[.%..@...G...
+[257681.676763] sfp EE: 00000050: 10 d8 24 33 44 8e ff ff 10 41 b0 9a ff ff ff ff  ..$3D....A......
+ 
+It looks like some fields are read incorrectly. For comparison, I printed the
+ SFP info when it loaded correctly:
 
-Qx -{hierarchy}---\
-                   \{hierarchy}-- netdev
-Q0-------P0\ SP----/   
-Q1--\ RR-P1/
-Q2--/
+[260908.194533] sfp EE: 00000000: 03 04 07 10 00 00 01 00 00 00 00 06 67 02 00 00  ............g...
+[260908.194536] sfp EE: 00000010: 1e 0f 00 00 46 69 62 65 72 53 74 6f 72 65 20 20  ....FiberStore
+[260908.194538] sfp EE: 00000020: 20 20 20 20 00 00 1b 21 53 46 50 2d 31 30 47 53      ...!SFP-10GS
+[260908.194540] sfp EE: 00000030: 52 2d 38 35 20 20 20 20 41 20 20 20 03 52 00 1f  R-85    A   .R..
+[260908.194541] sfp EE: 00000040: 40 63 bd df 40 8e ff ff 10 41 b0 9a ff ff ff ff  @c..@....A......
+[260908.194543] sfp EE: 00000050: 10 58 5b 29 41 8e ff ff 10 41 b0 9a ff ff ff ff  .X[)A....A......
+[260908.198205] sfp sfp.1025: module FiberStore       SFP-10GSR-85     rev A    sn G1804125607      dc 180605
 
-Let's say we own queues 0,1,2 and want to remove the SP layer.
-It's convenient to do:
+Since the read mechanism of I2C is to write the offset and read command
+first, and then read the target address. I think it's possible that the different
+offsets be written at the same time, from Linux and firmware.
 
-	$node = get($SP-node)
-	group(leaves: [Q0, Q1, Q2], parent=$node.parent)
 
-And have the kernel "garbage collect" the old RR node and the old SP
-node (since they will now have no children). We want to avoid the
-situations where user space has to do complex transitions thru
-states which device may not support (make sure Q1, Q2 have right prios,
-delete old RR, now we have SP w/ 3 inputs, delete the SP, create a new
-group).
-
-For the case above we could technically identify the correct parent by
-skipping the nodes which will be garbage collected later. But imagine
-that instead of deleting the hierarchy we wanted to move Q1 from P1 
-to P0:
-
-	group(leaves: [Q0, Q1], parent=SP, prio=P0)
-
-does the job.
-
-I admit this are somewhat contrived, and I agree that we won't lose
-generality, but I think it will narrow the range of hierarchies we
-can transition between atomically.
 
