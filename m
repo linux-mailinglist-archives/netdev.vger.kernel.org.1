@@ -1,114 +1,165 @@
-Return-Path: <netdev+bounces-122255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E8C1960887
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:26:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E8649608B0
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:29:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D82F62844E4
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:26:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF1BB1F23A82
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:29:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F7119EEBA;
-	Tue, 27 Aug 2024 11:26:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4491A00F7;
+	Tue, 27 Aug 2024 11:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ai1XaIxA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hu3tlNjF"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A664414;
-	Tue, 27 Aug 2024 11:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677C11A00E2;
+	Tue, 27 Aug 2024 11:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724757974; cv=none; b=pd/rlNvOEqNoEiDGRYLGbbhlzQL2XU1nedK7062gfISGSVA3K3e8Le8mRqjuODu3GkdCSYLCN1zugkks91JM4KsdEzoq/+/SWF8AgvjeRTqtn5+6UbJ/3i4tTV5qjDdrl7GN5dEPAbYzyldq9N1nrnBNZZq1T7cD8dQrzTqYZ5M=
+	t=1724758185; cv=none; b=U2tAMqikDiTscyYkQ1utB5Iwe8qiKsGAmDI+aZhCSw/SUqMzw31aLu1VcT8ViEDhwNBav6IO+9gieK1Rf2HaQqp19Nzo9kOZKmO90HRZQwcuEqi9INyn0FU6myX3Ma6kh4WzTXihDNBTZcFY+kLs1ixEyOsBiSUuq8RbptWL/ME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724757974; c=relaxed/simple;
-	bh=Hn2MFMhf4wm1sWJ1Cdtt6Zzb/TRPOxG4INVnvfR5k74=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VmSC/hsolJq8Xl3SGG7oQwhALZ4uEcUwgJ5eSj67c4zhx4VdcpkVWGDR5zPRjLoyYVS5fqhBhP7jUBGdQ6NrapKgcLmkJ9qrb3UzRCRR5YCkeOHIL5hf77KfEmTAUZEJsktneQvqKDl3oQnm1BwBu/ddee12C1XooxtM9Gkb7TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ai1XaIxA; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pPyJCT/R91XYkwzYF/KN6tVWCJJRmOpGOpF/7PNudjU=; b=ai1XaIxAI7LILZRBhBK2yNI2aq
-	hdpB046enSIHSlmoCaWmk0Qc0fK7/4H7LARWDtxKmks4YqeSG+NvYYWScheosTcjibkULw++fH325
-	thEf8Fa3V0Oi2mvLU9tLJyBjvPzxsbcth0MEDeZXWNA11Po+UzwVpW6Oy6x5hww8C8PLR76hyh6Z/
-	YYsn+i1y4i2q6PPEc7m3bUtcftKC+1tYxhSjy2IXwvaV2DwQqczbYIL7T1WEvKzT5O/tyKdw3XD7M
-	J3zlrf5eToWI6XdfwOkrslYrk11MfBsMJ1Mpf33a8t9lxoQPCyJf7q1iyHlMaG1w23TT56gnkdh2x
-	R8MDOnEA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58178)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1siuKg-0006sT-2Q;
-	Tue, 27 Aug 2024 12:25:54 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1siuKc-0003Of-2M;
-	Tue, 27 Aug 2024 12:25:50 +0100
-Date: Tue, 27 Aug 2024 12:25:50 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Yangtao Li <frank.li@vivo.com>
-Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com,
-	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, ulli.kroll@googlemail.com,
-	linus.walleij@linaro.org, marcin.s.wojtas@gmail.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	mcoquelin.stm32@gmail.com, hkallweit1@gmail.com,
-	u.kleine-koenig@pengutronix.de, jacob.e.keller@intel.com,
-	justinstitt@google.com, sd@queasysnail.net, horms@kernel.org,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [net-next v3 3/9] net: ethernet: cortina: Convert to
- devm_clk_get_enabled()
-Message-ID: <Zs23vqQn9zqOQ62S@shell.armlinux.org.uk>
-References: <20240827095712.2672820-1-frank.li@vivo.com>
- <20240827095712.2672820-4-frank.li@vivo.com>
+	s=arc-20240116; t=1724758185; c=relaxed/simple;
+	bh=etuwT1euxSljZjW4oc24vh7whpGW5rQpbQ2KaCeHW/4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TNlU0NuBSZDNyTh8LRFQ1wmxh2SpW09iaEWUB0I1cZEgkURKcSBqSlX85CkWty+D2mWJfHujBYiHMkMQ3CYWJau/xeBUWsRuZByGj8G3AEp3dsSs79Y97dZBqk7jTWX5fjZgSN35bvBBgv49QHP2r8KN6EJ/rQanp8qZRZTvFzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hu3tlNjF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6709CC58282;
+	Tue, 27 Aug 2024 11:29:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724758185;
+	bh=etuwT1euxSljZjW4oc24vh7whpGW5rQpbQ2KaCeHW/4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hu3tlNjFqxBvsAC1psinXwnoeGAeh+ElETFpdgav5V+6zLCAVxo/OaZ4BzvTrmZW3
+	 xgNnt5OJ6avWOUWvSCSkLALv+NX32eKL1PsYKVOFYcrykowIDVLpIkzgpshxjjJfZs
+	 grb+6h0ORRDr7N4nGU/i0lPCwvBk7l5drDI7uuCXhYDhSRkj5A9+fQNyQEQqOw4Uma
+	 lVByBFoAoa0vV//crfyWqKzv+cu3OdRlROBit1544apTEq9+0WuXrKYBpP22gFnYAg
+	 FZK5Z1wOjqCBvg7rdQBgKHnp9IKVAsJd4qePoFK+5E6Dl0t+mmNUvxoXmz1ck063E7
+	 trLIJRAXHyjQw==
+From: Conor Dooley <conor@kernel.org>
+To: netdev@vger.kernel.org
+Cc: conor@kernel.org,
+	Steve Wilkins <steve.wilkins@raymarine.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	valentina.fernandezalanis@microchip.com,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [RFC net-next] net: macb: add support for configuring eee via ethtool
+Date: Tue, 27 Aug 2024 12:29:23 +0100
+Message-ID: <20240827-excuse-banister-30136f43ef50@spud>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240827095712.2672820-4-frank.li@vivo.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3478; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=/jWBHfktTnMnWwd+OtzS2TE8hmCXENAXH9kNHZHk7X8=; b=owGbwMvMwCFWscWwfUFT0iXG02pJDGlnd0y6d8t2cYtNTKJfS8Cq1wpPdNJSZlrZzzj0KsDT+ 9ySQImmjlIWBjEOBlkxRZbE230tUuv/uOxw7nkLM4eVCWQIAxenAEzkoC7D/1ipkzpT5/b+P3po pdCk7VOP7/p45JNM8EwfiRe5cb8r73Uy/LPo32vqfFFUiavnoeztP5c782Y97tqzt+N4/61Q9ai 9qZwA
+X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 27, 2024 at 03:57:06AM -0600, Yangtao Li wrote:
->  	ret = register_netdev(netdev);
->  	if (ret)
-> -		goto unprepare;
-> +		return ret;
->  
->  	return 0;
+From: Steve Wilkins <steve.wilkins@raymarine.com>
 
-Same comment as per patch 1. At this point, I'm going to stop reviewing
-your patches (because I don't want to waste what little time I'm able
-to spend in front of the screen raising comments against the same issue
-throughout a patch set) and I ask you to do your own review of your
-series for this pattern - and also consider where using
-PTR_ERR_OR_ZERO() may also be appropriate in any of your patches. See
-that function's documentation in linux/err.h.
+Add ethtool_ops for configuring Energy Efficient Ethernet in the PHY.
 
-Please wait at least 24 hours before reposting.
+Signed-off-by: Steve Wilkins <steve.wilkins@raymarine.com>
+Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+---
+Steve sent me this patch (modulo the eee -> keee change), but I know
+nothing about the macb driver, so I asked Nicolas whether the patch
+made sense. His response was:
+> Interesting although I have the feeling that some support from our MAC
+> is missing for pretending to support the feature.
+> I'm not sure the phylink without the MAC support is valid.
+>
+> I think we need a real task to be spawn to support EEE / LPI on cadence
+> driver (but I don't see it scheduled in a way or another 🙁 ).
 
-Thanks.
+Since he was not sure, next port of call is lkml.. Is this patch
+sufficient in isolation, or are additional changes required to the driver
+for it?
 
+The other drivers that I looked at that use phylink_ethtool_set_eee()
+vary between doing what's done here and just forwarding the call, but
+others are more complex, so without an understanding of the subsystem
+I cannot tell :)
+
+Alternatively, Steve, shout if you can tell me why forwarding to the phy
+is sufficient, and I'll update the commit message and send this as
+non-RFC.
+
+Thanks,
+Conor.
+
+CC: valentina.fernandezalanis@microchip.com
+CC: Nicolas Ferre <nicolas.ferre@microchip.com>
+CC: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+CC: "David S. Miller" <davem@davemloft.net>
+CC: Eric Dumazet <edumazet@google.com>
+CC: Jakub Kicinski <kuba@kernel.org>
+CC: Paolo Abeni <pabeni@redhat.com>
+CC: Russell King <linux@armlinux.org.uk>
+CC: netdev@vger.kernel.org
+CC: linux-kernel@vger.kernel.org
+---
+ drivers/net/ethernet/cadence/macb_main.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+index 95e8742dce1d..a2a222954ebf 100644
+--- a/drivers/net/ethernet/cadence/macb_main.c
++++ b/drivers/net/ethernet/cadence/macb_main.c
+@@ -3321,6 +3321,20 @@ static int macb_set_link_ksettings(struct net_device *netdev,
+ 	return phylink_ethtool_ksettings_set(bp->phylink, kset);
+ }
+ 
++static int macb_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
++{
++	struct macb *bp = netdev_priv(netdev);
++
++	return phylink_ethtool_get_eee(bp->phylink, edata);
++}
++
++static int macb_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
++{
++	struct macb *bp = netdev_priv(netdev);
++
++	return phylink_ethtool_set_eee(bp->phylink, edata);
++}
++
+ static void macb_get_ringparam(struct net_device *netdev,
+ 			       struct ethtool_ringparam *ring,
+ 			       struct kernel_ethtool_ringparam *kernel_ring,
+@@ -3767,6 +3781,8 @@ static const struct ethtool_ops macb_ethtool_ops = {
+ 	.set_wol		= macb_set_wol,
+ 	.get_link_ksettings     = macb_get_link_ksettings,
+ 	.set_link_ksettings     = macb_set_link_ksettings,
++	.get_eee		= macb_get_eee,
++	.set_eee		= macb_set_eee,
+ 	.get_ringparam		= macb_get_ringparam,
+ 	.set_ringparam		= macb_set_ringparam,
+ };
+@@ -3783,6 +3799,8 @@ static const struct ethtool_ops gem_ethtool_ops = {
+ 	.get_sset_count		= gem_get_sset_count,
+ 	.get_link_ksettings     = macb_get_link_ksettings,
+ 	.set_link_ksettings     = macb_set_link_ksettings,
++	.get_eee		= macb_get_eee,
++	.set_eee		= macb_set_eee,
+ 	.get_ringparam		= macb_get_ringparam,
+ 	.set_ringparam		= macb_set_ringparam,
+ 	.get_rxnfc			= gem_get_rxnfc,
 -- 
-*** please note that I probably will only be occasionally responsive
-*** for an unknown period of time due to recent eye surgery making
-*** reading quite difficult.
+2.43.0
 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
