@@ -1,112 +1,171 @@
-Return-Path: <netdev+bounces-122303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B084D9609B9
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:10:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60AE296098F
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:06:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D8FB282191
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 12:10:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B0BC1C2257E
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 12:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4711D1A08B0;
-	Tue, 27 Aug 2024 12:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5F619F466;
+	Tue, 27 Aug 2024 12:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b="ESqWoSvv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2043.outbound.protection.outlook.com [40.107.241.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D5919EEBF;
-	Tue, 27 Aug 2024 12:10:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724760621; cv=none; b=cnWaghk9owj8EWsaWUUbWDpNZzM4ddXefQ3QStYdYQbLJxxRGRrhc4TErUUlb5bA8LLFwcBeqKUq47zZtqSHfdFR9tEIVLAYuDAEMgRxy86dsMDyf4AD7yAQmGNtN2e/KOEzcs0dQ3h7EwUhzPT5x50zIZvhNfPS/HH9mx9JS50=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724760621; c=relaxed/simple;
-	bh=F33G64sSxOt+QVRxT0KFzMzo62bODyeLCi2VwOq8QO8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LU+uF12GC41PjdLloqrC8qmhK5wV8YcQgPVvXA+Gl80tp/j5gL3JrMHRONViA5ZroNsiDM96YckT2g8vwyYYDV+yaNToEWSTYUBAZ02ynNHv+be034qxTiHetAz0BxlLXo1a2KPvgG9TH01G1NuGnCARmElGJ9etqfp37x312rQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-2705d31a35cso4768311fac.0;
-        Tue, 27 Aug 2024 05:10:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724760618; x=1725365418;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+1y6MVpUHGHncGeq7J2eB1au+7eWBsmfRUGHQOxkYTA=;
-        b=c1GB/tem0Y5jdx09sUm58WR7bbV7vommzd+4bf4m5gXGrGXO8b2xBp9f9zDrriQP4T
-         rA06V0MMw6OcdaBNDEoyanrC1qb0P7otx75XJzV3FH7P5mE+hR0uwszwav7wFQs4RgXO
-         9o39AlhFH33Oq9ThrWcVcIJz9DKx4JMbyANJNyTqEMYsZLwpuLG1qtl/UPuwyGy1IIH9
-         EjAPTa5K010QDcUb7t0CQM4nqf3/4xJZXsDyxFMm13sGVemLZeyOlD1nDZiIDBUpOpCl
-         RJn1GGNELPbHKHxDmvouHiLfNtO3S3zk/1NktHjPVZzKq242y2MC8QTw4uoObkOnmGp3
-         D4nQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUyuLxy31YYEA/VTkkBbES+VovJjKZtRYI3MMTYFPLNirQaKGnQK/X1o0feKM2nkGKNMwYSII3ZX/wnuBw=@vger.kernel.org, AJvYcCW66k8RlmFppqSs6t80zMwiXrcYT4sqNgNhIR4YFpu1YMM9UtvKKR0nBjco3L6WmCksSPFB+pEw@vger.kernel.org, AJvYcCWMXrk2G3llLCapnyOLaWew72WDQiHaMHE5UxZC0FkNY37b02awKVQ8RH2z0FX/538kqucqiEvdluR1fNumjWoyUss=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymrB2lKtYoZ3MbyOtEuahRyTZC2j2UYnuoIscg4xszoiltYZD4
-	U8GU3e5K8TlQL7XWdBZp1eUwztGxwq2FhlSMukVZYpTHpEox4U3a6+PLWfkm
-X-Google-Smtp-Source: AGHT+IHXOjW1T7FUoLXgthnxuIveKpp8XF28luyoV++xiBr/G2MFTnsaCYHQH357nBQzpDRLVDZ6cw==
-X-Received: by 2002:a05:6870:8323:b0:270:205a:4070 with SMTP id 586e51a60fabf-27759e15d10mr3031917fac.14.1724760618265;
-        Tue, 27 Aug 2024 05:10:18 -0700 (PDT)
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com. [209.85.167.182])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-273cea229bdsm3042850fac.26.2024.08.27.05.10.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Aug 2024 05:10:18 -0700 (PDT)
-Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3db145c8010so337542b6e.3;
-        Tue, 27 Aug 2024 05:10:18 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCW+3JRP9xjCzi/0Ruw0HA7G2IMgFzjw962CruG1qULYHSBShZ6g39cnNrvCZkfi0gJEjN2xKmj3@vger.kernel.org, AJvYcCX5pBUAkpS/+qfBy6PTqiYoQOZlunF2oFhA79UeIaWnG1SgvTw/cPasy3Bm7pwgG9PIz3n/5kPJhUwg2I9Zcbp2/7s=@vger.kernel.org, AJvYcCXTGfUKxzjrHmgO8lu/ZPPcyRXUdSUB8s2tP9V5h5RoQ77hgud4GiEVwhQZjbdvAb7RhbRbnxPREatzSkQ=@vger.kernel.org
-X-Received: by 2002:a05:690c:ed2:b0:64b:52e8:4ae3 with SMTP id
- 00721157ae682-6cfb950a4e6mr28198917b3.3.1724760235154; Tue, 27 Aug 2024
- 05:03:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B478C1CD31;
+	Tue, 27 Aug 2024 12:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724760368; cv=fail; b=eb5ekQ28mtP0Xdhqh9GbMoif2mhawsDZUg7n8gpHxFdgxymhMdrvPoekp00XtOYgKfO0gZ2y5zshdUU8EHg4Ka+lEbY5tB8UoiWIPLaoZMd/Vkg2PiixndS8JtHVbH73/dfljiR4H17IgY+vEcP5/zHaWdkYoYCu4c23XuWUwRk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724760368; c=relaxed/simple;
+	bh=XCVOpVA0zCVl8+huSwEOKfWSd5u38K7qWsGJa//9vTY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ke7ipwh4ZCG19AuatQ1u7n3hMW7K5qSw3i7aAfnXd8M4pGo6gK/VwQaificNGK7W+uNTzQmQu/SRsscwOUwBhuww4HVpwoV+rot9qiArMldN62vrlLGxyiZg29g9m2cFg2KRDmvKhh5+Z+wq5Br6nDx24uvmfwDhskwji+SWFKE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com; spf=pass smtp.mailfrom=ericsson.com; dkim=pass (2048-bit key) header.d=ericsson.com header.i=@ericsson.com header.b=ESqWoSvv; arc=fail smtp.client-ip=40.107.241.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=ericsson.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ericsson.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=f91bxGvRghM653PaDzz0Rvof0iJ3zyrCWqhZO778LSn8IW3cxRGHefEZPol5iUDOZ2KbWOn1Hqx6ABmrJRLCkKI5Xrhaxmd3AVpcw0cqWWuLZSAQobF2g8LzLbGXc97ryEx/kzlZ/WV40vXWhCw/SM8CRRPMk/9m2O04TLOKXolHeuP2qYt+Fm1NpofrMlMgZbVCoRAMpta5y76KfhDXZw0OOmXnIOz9Q8tY379dPYohk7WWLVbRFkMaH3qVjkEAk7D59GVi1FnlGaMQ/z7ufRcSVQhtpxFWRrshKoJbD9NA2qDHfzHxcd/iG1cjm6kdTRAsXvBMmC/utMJvc5fEHA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nNKZU8iecNpVKONbZghzKQEDoj+EAKj6RHxLlJ1p1p4=;
+ b=jg4SogV7dk8cgKhPguZyqmbz5hOhsG9A66f8gSsuH1S8+rvyTzrgEN6KDRhMRc0dh7f4uHn4PU6Lb9RjzaUyunGHc5DfS1SN7sOlJWIHTCHfAgswzdleaSroNU+yfJ97GeiRMYYgtyFY2uhaCZUgdhs4kAtFqsmitFzs1PXXVNYXhb0XaBQ1veybw5gIWsCJhezFci5/vDVuTRbfN2w7waRjYm0TPkUUtn8ewXSJxm8x7q+el548wh6X4tGk7i8ydLOzNyrDm9QzSUafIMfdzGnvPhKuADYwv2iEcWvD/6UHhy1W8pkEt3KEuiVvpDmp6gnDSMSiegR8mCkyr1wLtw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 192.176.1.74) smtp.rcpttodomain=davemloft.net smtp.mailfrom=ericsson.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=ericsson.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ericsson.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nNKZU8iecNpVKONbZghzKQEDoj+EAKj6RHxLlJ1p1p4=;
+ b=ESqWoSvveCzwoDFymk8Wp21WqJSdKflyBrPtmzJ2Pqbxr7nvfWuzNA2NrMpn7vtfqYJPhB9VvpEWm4KXLgO5R401L4XFsG5Kw7iI+x9/fj1Zwpad+NSBNBzjw2ifZlZSEDWT6Lo6khT1sAKfVqXERwarRvPmncMoegM0ik++bk3LNX1hnbNtj0v3XSzaYcJe2NPfBCnCXDHW5l7TwoGWrq2joe+7FU8kHvPygvg6B935SiRRKcI9ukWmDP/5OpoKQ9hUgnvnBJepOwMUfLF6xQW+VgaK2m2jnIsdhQs6WZwYHNtaoh5TLIf9EG3ZzrHGF9lwRvBB+C2szgGRMRNGCQ==
+Received: from AS9P250CA0013.EURP250.PROD.OUTLOOK.COM (2603:10a6:20b:532::24)
+ by AM8PR07MB7538.eurprd07.prod.outlook.com (2603:10a6:20b:246::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Tue, 27 Aug
+ 2024 12:06:01 +0000
+Received: from AM3PEPF0000A793.eurprd04.prod.outlook.com
+ (2603:10a6:20b:532:cafe::7c) by AS9P250CA0013.outlook.office365.com
+ (2603:10a6:20b:532::24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25 via Frontend
+ Transport; Tue, 27 Aug 2024 12:06:01 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 192.176.1.74)
+ smtp.mailfrom=ericsson.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=ericsson.com;
+Received-SPF: Pass (protection.outlook.com: domain of ericsson.com designates
+ 192.176.1.74 as permitted sender) receiver=protection.outlook.com;
+ client-ip=192.176.1.74; helo=oa.msg.ericsson.com; pr=C
+Received: from oa.msg.ericsson.com (192.176.1.74) by
+ AM3PEPF0000A793.mail.protection.outlook.com (10.167.16.122) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7849.8 via Frontend Transport; Tue, 27 Aug 2024 12:06:00 +0000
+Received: from seliius19697.seli.gic.ericsson.se (153.88.142.248) by
+ smtp-central.internal.ericsson.com (100.87.178.64) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 27 Aug 2024 14:06:00 +0200
+Received: from seliiuvd10563.seli.gic.ericsson.se (seliiuvd10563.seli.gic.ericsson.se [10.120.141.220])
+	by seliius19697.seli.gic.ericsson.se (Postfix) with ESMTP id CB1814020B69;
+	Tue, 27 Aug 2024 14:05:59 +0200 (CEST)
+Received: by seliiuvd10563.seli.gic.ericsson.se (Postfix, from userid 93258)
+	id AE349607B0F1; Tue, 27 Aug 2024 14:05:59 +0200 (CEST)
+From: Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Kurt Kanzenbach
+	<kurt@linutronix.de>, "David S. Miller" <davem@davemloft.net>, Georg Kunz
+	<georg.kunz@ericsson.com>, Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>
+Subject: [PATCH net] mailmap: update entry for Sriram Yagnaraman
+Date: Tue, 27 Aug 2024 14:05:58 +0200
+Message-ID: <20240827120558.3551336-1-sriram.yagnaraman@ericsson.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240827095712.2672820-1-frank.li@vivo.com> <20240827095712.2672820-6-frank.li@vivo.com>
-In-Reply-To: <20240827095712.2672820-6-frank.li@vivo.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 27 Aug 2024 14:03:42 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdX2NxBqBxkSXo8pnsDk2BMgrunwNhtb75g-17KOZ7RSEQ@mail.gmail.com>
-Message-ID: <CAMuHMdX2NxBqBxkSXo8pnsDk2BMgrunwNhtb75g-17KOZ7RSEQ@mail.gmail.com>
-Subject: Re: [net-next v3 5/9] net: dsa: rzn1_a5psw: Convert to devm_clk_get_enabled()
-To: Yangtao Li <frank.li@vivo.com>
-Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com, 
-	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, ulli.kroll@googlemail.com, linus.walleij@linaro.org, 
-	marcin.s.wojtas@gmail.com, linux@armlinux.org.uk, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, mcoquelin.stm32@gmail.com, 
-	hkallweit1@gmail.com, u.kleine-koenig@pengutronix.de, 
-	jacob.e.keller@intel.com, justinstitt@google.com, sd@queasysnail.net, 
-	horms@kernel.org, linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-stm32@st-md-mailman.stormreply.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM3PEPF0000A793:EE_|AM8PR07MB7538:EE_
+X-MS-Office365-Filtering-Correlation-Id: 82553268-fcaf-48fc-8fcb-08dcc6909e07
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aFlBY1B4TDR5UGplbGV2WHY2Q3ZMUU9lTzFFN1J4NzAxK0J3NGdieHBUbHhm?=
+ =?utf-8?B?Vm81T3JLbzhDZDlGZzZnSzRKeE1GQVJMWFRtZzI4ZXdpam5pS2RNRnJTNlRS?=
+ =?utf-8?B?YzR4NGFGQnBvclR6Ui8xTHlOUThsckM5K3I1cGIvQ2FEYXRLc3Y3Z3lnUDBL?=
+ =?utf-8?B?UmpCNEowMW5XWncwbjhIY21XVldlSTI2TGNGRm9Wc3VUcWtmTnhuZWxhUkN2?=
+ =?utf-8?B?T2NHenA1cjBmUDkxb0tNbmVvSzRSSTBQRVpiUFYrSGdGdThkN1pDRm5DMkRG?=
+ =?utf-8?B?ZkZVU2dwRjlMaUVmTjViQnlxdnZZQ1doaS9mS0RTSEFUUllWR01NdTNvS29R?=
+ =?utf-8?B?V0NOdDFjOWtkMi9WV0hWeklpdlU1aDFWRHo0VnFiQUFNZHJvSmZzZEcyaUV0?=
+ =?utf-8?B?S1lUM3Z2L01WRUpXYW5IZXVlY0p4a1VhcDgvUWJSSWlPSlc0dTRYcUdnMDVV?=
+ =?utf-8?B?K3FGYXVKNGE3blRYYXY0bVhHVVZZcDVYUHZBdVl2bnNwdFhuQkJzWlc5RFRv?=
+ =?utf-8?B?bFBSNWJNYUdweU9ZYjBLWTJrWWdTYTVYaExZZVZwOEVpM0lScGJQNkd0ZGMw?=
+ =?utf-8?B?VTg2azlYVzRaczI5MmNjZ0FBYkNzbzZ1ZVFIRTI3eTBCbnRqTHFlTHVhS000?=
+ =?utf-8?B?R0poSm80dnUvTXd2cUxLckFobUJPc1hGaThvcGg5OVgrdkdmUGQ0N29mMWNr?=
+ =?utf-8?B?cVRMTE1BaUFUWE92eERTclJkbk5rek84Yi9GcFFucVdEeDljdEdpZWVFU1hD?=
+ =?utf-8?B?WU55L0M0clBhaXQ3NklORnhJdTJUZU16b0VXWGw3NG9BbDNnbWMvanp5UGQr?=
+ =?utf-8?B?c2tRMlU5QURNcG82Um1GYWpEOXNSVHpWekdyZWtVa2oyVGhnR0k4bllHckov?=
+ =?utf-8?B?WnFBQ0lKaENOdG1mbmpSaCtjNEhmMDV5ei9WTHMwM0ZmRnNhRjQ2SU41azlR?=
+ =?utf-8?B?ODRScGFUR3VLaGpKcXVMVGw3OXJKTGZPZEJFRlNqUUMxUVNzT1VRMDZLeTdH?=
+ =?utf-8?B?c20rZTVKQnVzNUNKb1QwR2JtY09OTk80QnBHZjVMUUY3SjZ3OHJxajBET1p5?=
+ =?utf-8?B?Y2c3cmdlZU9KQm1yOFd5WkVIMDkwMGkzRXpTMmJ5VVVMRG9XZk05SlhmQ0Yz?=
+ =?utf-8?B?UVUrZllMUzIzWmtpM1RWQkxqQ2VtRldJY0lMakJDSlJZZFRxMm15VDJQbGZQ?=
+ =?utf-8?B?Rktqb3Q5NWZCSlpDNExZdWNFeXV0SXFyek5FMytZN05VcW5Ic0JRZWpNUXhT?=
+ =?utf-8?B?bUJualVoUGg2MjBzMStCY3oxSDRGMzZCT1FoNFlKVk5leHBWTm9lcEJ1OTl6?=
+ =?utf-8?B?eXBUcjBNZnpEbTBSVmpva2NqR0p4K3BhOVM1cWJneEdsMlArZ292YzJqVjlQ?=
+ =?utf-8?B?TmMwRzJLM0hPaldDc2hyQXU5MU90MFYzV1FFbU9UaHVWdDFRbVRJV2l3WnBz?=
+ =?utf-8?B?cklGcmtvOUdQM1Y1Y21uU0lZaUpWOVFpNkNkVEl1QTIyV0dsRFp6SHlJWTYv?=
+ =?utf-8?B?WWk2eCttcXh0MEZkalVVVXRVU3ZLRVJOMUVVUFprV1BjTElsdERiT2RmWDBD?=
+ =?utf-8?B?b3NQTmVXdU0yWkhnTFl6b1ZiOEwwTFNrUWVvdTRhZmRkcmFBM1FGOVFkeStX?=
+ =?utf-8?B?Y3VGZEVTS1hZVTFZTE1RNjRva0hacGg5NDVBNGdUN1FabE9ZS1RJQUVuNEVL?=
+ =?utf-8?B?UkpNOWkyVXhVNnBiRk5GUU84TGxkMWVyWVVpZVZmRXhJVnRXKzBvNVJoWXNX?=
+ =?utf-8?B?bGVvZVhJbEwvcjFMaUl2TC9ENWIrZitVVHR4UXh5SWFUL1hQcjc4TFdPRXk4?=
+ =?utf-8?B?RUtmby9seGx6Y2tYTUdOTUtBazZEbEI3V0xkZmlYMnpRREU4cit6eW53S0Fm?=
+ =?utf-8?B?d3hXaDJMbURmSWF2MTZGWlFUVXFmM0QxNmc2VklkM1FIS2FKbG9qeHZpRlZp?=
+ =?utf-8?Q?Fg8Vr+lAtgi/azQr1idnvJxIAXB0U+y3?=
+X-Forefront-Antispam-Report:
+	CIP:192.176.1.74;CTRY:SE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:oa.msg.ericsson.com;PTR:office365.se.ericsson.net;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: ericsson.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2024 12:06:00.8185
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82553268-fcaf-48fc-8fcb-08dcc6909e07
+X-MS-Exchange-CrossTenant-Id: 92e84ceb-fbfd-47ab-be52-080c6b87953f
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=92e84ceb-fbfd-47ab-be52-080c6b87953f;Ip=[192.176.1.74];Helo=[oa.msg.ericsson.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM3PEPF0000A793.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8PR07MB7538
 
-On Tue, Aug 27, 2024 at 11:44=E2=80=AFAM Yangtao Li <frank.li@vivo.com> wro=
-te:
-> Convert devm_clk_get(), clk_prepare_enable() to a single
-> call to devm_clk_get_enabled(), as this is exactly
-> what this function does.
->
-> Signed-off-by: Yangtao Li <frank.li@vivo.com>
+Link my old est.tech address to my active mail address
+---
+ .mailmap | 1 +
+ 1 file changed, 1 insertion(+)
 
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
+diff --git a/.mailmap b/.mailmap
+index 8ee01d9d7046..53ebff0e268a 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -614,6 +614,7 @@ Simon Kelley <simon@thekelleys.org.uk>
+ Sricharan Ramabadhran <quic_srichara@quicinc.com> <sricharan@codeaurora.org>
+ Srinivas Ramana <quic_sramana@quicinc.com> <sramana@codeaurora.org>
+ Sriram R <quic_srirrama@quicinc.com> <srirrama@codeaurora.org>
++Sriram Yagnaraman <sriram.yagnaraman@ericsson.com> <sriram.yagnaraman@est.tech>
+ Stanislav Fomichev <sdf@fomichev.me> <sdf@google.com>
+ Stefan Wahren <wahrenst@gmx.net> <stefan.wahren@i2se.com>
+ Stéphane Witzmann <stephane.witzmann@ubpmes.univ-bpclermont.fr>
+-- 
+2.31.1
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
