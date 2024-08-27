@@ -1,66 +1,89 @@
-Return-Path: <netdev+bounces-122401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C3D696111E
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 17:16:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFE0C96114F
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 17:19:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF028B2691B
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:16:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 159581C2371D
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:19:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B761C688E;
-	Tue, 27 Aug 2024 15:16:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96FE1CEAAD;
+	Tue, 27 Aug 2024 15:17:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nj9jUvKO"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBBCC17C96;
-	Tue, 27 Aug 2024 15:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625DC1C7B9D
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 15:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724771784; cv=none; b=Fuy6dUOHGH4ckROOxGB5NJ79qeXQfwh1jwmAuQ51bwcleaI6UJyptan4i8AILfFJaLEquUmYFtnP8mgvwRcoDxJxUro8j8z/IBqZfPUKjlCvms3I+ZJL30FAR2LxFrT3c323ycZ1YyVFT3zBYkOZviHjjXFIKwu331NkSK0Fxbk=
+	t=1724771861; cv=none; b=JB70t0NHDRjaxdIBtr1SZeWbOSi00bcQu44bVIOIm596xiysBUkECSyvjum+hKKcE/OC6A/FcBgdWdR+rT5PcBng8XSIpO2Ex6+JAceNBvfrTLEdemIfEhg0c7mo27tja/B475VLDwZcmUKYxfWkyLXwir/uwB/qmznL4GAki6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724771784; c=relaxed/simple;
-	bh=SujO2EBqBW/YHO37ijRzZexZ0ocHpWynJ+ne0STqsAk=;
+	s=arc-20240116; t=1724771861; c=relaxed/simple;
+	bh=Uis5UcWx7ESlkENuZddUEHlXPVlgyb9s9E+Dsu2AWQc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aUO2Tp0AgCEVg1gN8wC0xHJ3LrCT++ht8b7DPdc0BJSx7Vv4Qowm5w3XIg+ro+pgWBsmnKa6S/t1WPKjLBNb1ugv1qPbhHGrh86a9p68GMKMUUq6nI65U9e2P2B1r4u+SK7EAtb8oa/UtZaCIHV0iEcrpR7oemXSV5a3zcjw0Gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sixvQ-000000006K5-3LeN;
-	Tue, 27 Aug 2024 15:16:04 +0000
-Date: Tue, 27 Aug 2024 16:15:57 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Robert Marko <robimarko@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Chad Monroe <chad.monroe@adtran.com>,
-	John Crispin <john@phrozen.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: phy: aquantia: allow forcing order of
- MDI pairs
-Message-ID: <Zs3trawXqPjVK0LF@makrotopia.org>
-References: <5173302f9f1a52d7487e1fb54966673c448d6928.1724244281.git.daniel@makrotopia.org>
- <ed46220cc4c52d630fc481c8148fc749242c368d.1724244281.git.daniel@makrotopia.org>
- <a59be297-1a55-4cce-a3e1-7568e3d4e66c@lunn.ch>
- <ZsYTZK4Ku2LoZ4SA@makrotopia.org>
- <71391388-4c18-4239-b74d-807dfc48bbc5@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=u+r6R/GISL10DARO++qWZ1J3pQujesN7/HR93xToB9FMK7UJnHBzm8FyIqF2ShzIWaem+VBzDdt/emAVP5kG3jWadpw6ttuMRjq4usA1pTEeh4szha6N+OAaZiEJx3TTFP9LO8cKdA2JfRhPjcvRXdtFE1VrD+JhjnUR+Yr4VBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nj9jUvKO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724771859;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=r02ycll/0+vd2yPmctrGqk6tQvR75YJwftDX2X34Trk=;
+	b=Nj9jUvKOQPd2Lw1gBsFqpuJiS35/flZvLsM+1FBBL+J5BDdaaIIx6aK0YqFHPNrRdUGJUd
+	2UMUUyds73ALxSt8K099Lp3msSDbYZqT6525dAW+6rToFpgDQUr4nyzAy9aRlqkt6KpzWV
+	0ePTKMdmK5A2UtYfKN4BBLQv7uJ8ZoA=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-43-4X6C3JEQN32ZGjb00WLY3w-1; Tue, 27 Aug 2024 11:17:36 -0400
+X-MC-Unique: 4X6C3JEQN32ZGjb00WLY3w-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3718eb22836so3613292f8f.3
+        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 08:17:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724771855; x=1725376655;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=r02ycll/0+vd2yPmctrGqk6tQvR75YJwftDX2X34Trk=;
+        b=QkV3JToiixR9YmRFewwMq7Z4ZRb46WWdmYQEX1LDaAndxRrKfgtiLXT0Zu851TigAY
+         gH2ODfGeTM3B90x2HqkjEpiSPMunRV5sJtQPP7rfgD/p7d+5+vUrQUmvaRp0hKs8BSne
+         StrEZCbsmsfoGo/lQsUH9jKPVsc125XHP1xQ7mDJiSDqk+9Wa0xpMxzha1IX98J+jGBU
+         U90sBEqo65c8lonXOuqoQ5GjKAjOYcjHazJ+a1lm0ENxJg88qZYzRTNAY/C1EHEpwxMz
+         Q5kwZ8uAPH95bfIiCe1N4Ug5mmyKvcbEZgA6Pu4ROh/ExBVqBPo9CNo+TIKqDppiqqbk
+         NwoA==
+X-Gm-Message-State: AOJu0YxVNhYkke3GaMbzZZOKUxFUYgoFzRhS8Uf362+1ecboI2Sydwyf
+	io5rxqsEUuELb9tDjNz9Pi8ziitY2gtwNWGfvaLBo8b8Lw9awuVtaBqedMWMI6SxmAywfa0JavO
+	TygEZJwL3jXuOP5OuazOFwgd7YrUcDs8uwaU0Ee6sPhhwUoWR93xxyw==
+X-Received: by 2002:adf:f24d:0:b0:371:941f:48f2 with SMTP id ffacd0b85a97d-37311865284mr8397731f8f.32.1724771855070;
+        Tue, 27 Aug 2024 08:17:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IELEUy4Prnr9PE8d6tJK0MjviDOOjG/ZZtWnIZk+XgFtC6kYa611ltjAGDxlvpBWZTu5GJaKg==
+X-Received: by 2002:adf:f24d:0:b0:371:941f:48f2 with SMTP id ffacd0b85a97d-37311865284mr8397686f8f.32.1724771854246;
+        Tue, 27 Aug 2024 08:17:34 -0700 (PDT)
+Received: from debian (2a01cb058918ce0010ac548a3b270f8c.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:10ac:548a:3b27:f8c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730813c536sm13546752f8f.36.2024.08.27.08.17.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Aug 2024 08:17:33 -0700 (PDT)
+Date: Tue, 27 Aug 2024 17:17:31 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
+	john.fastabend@gmail.com, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 09/12] ipv6: sit: Unmask upper DSCP bits in
+ ipip6_tunnel_xmit()
+Message-ID: <Zs3uC1rpGScO4Cvn@debian>
+References: <20240827111813.2115285-1-idosch@nvidia.com>
+ <20240827111813.2115285-10-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,56 +92,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <71391388-4c18-4239-b74d-807dfc48bbc5@lunn.ch>
+In-Reply-To: <20240827111813.2115285-10-idosch@nvidia.com>
 
-On Fri, Aug 23, 2024 at 03:28:39AM +0200, Andrew Lunn wrote:
-> On Wed, Aug 21, 2024 at 05:18:44PM +0100, Daniel Golle wrote:
-> > On Wed, Aug 21, 2024 at 06:07:06PM +0200, Andrew Lunn wrote:
-> > > On Wed, Aug 21, 2024 at 01:46:50PM +0100, Daniel Golle wrote:
-> > > > Normally, the MDI reversal configuration is taken from the MDI_CFG pin.
-> > > > However, some hardware designs require overriding the value configured
-> > > > by that bootstrap pin. The PHY allows doing that by setting a bit which
-> > > > allows ignoring the state of the MDI_CFG pin and configuring whether
-> > > > the order of MDI pairs should be normal (ABCD) or reverse (DCBA).
-> > > > 
-> > > > Introduce two boolean properties which allow forcing either normal or
-> > > > reverse order of the MDI pairs from DT.
-> > > 
-> > > How does this interact with ethtool -s eth42 [mdix auto|on|off]
-> > > 
-> > > In general, you want mdix auto, so the two ends figure out how the
-> > > cable is wired and so it just works.
-> > 
-> > It looks like Aquantia only supports swapping pair (1,2) with pair (3,6)
-> > like it used to be for MDI-X on 100MBit/s networks.
-> > 
-> > When all 4 pairs are in use (for 1000MBit/s or faster) the link does not
-> > come up with pair order is not configured correctly, either using MDI_CFG
-> > pin or using the "PMA Receive Reserved Vendor Provisioning 1" register.
-> > 
-> > And yes, I did verify that Auto MDI-X is enabled in the
-> > "Autonegotiation Reserved Vendor Provisioning 1" register.
+On Tue, Aug 27, 2024 at 02:18:10PM +0300, Ido Schimmel wrote:
+> The function calls flowi4_init_output() to initialize an IPv4 flow key
+> with which it then performs a FIB lookup using ip_route_output_flow().
 > 
-> Is it possible to read the strap configuration?  All DT needs to
-> indicate is that the strap is inverted.
+> The 'tos' variable with which the TOS value in the IPv4 flow key
+> (flowi4_tos) is initialized contains the full DS field. Unmask the upper
+> DSCP bits so that in the future the FIB lookup could be performed
+> according to the full DSCP value.
 
-Sadly no, because there is only a single r/w bit which could already
-have been changed by the bootloader as well. We risk that vendor
-bootloader updates then require modifying DT again once they "fix it"
-there. I'd rather have two properties to force either ABCD or DCBA pair
-order.
-
-If it got to be a single property, then we can either use a string with
-pre-defined values "abcd" and "dcba", or use macro defined integer
-values in include/dt-bindings such as
-
-#define AQUANTIA_MII_PAIR_ORDER_ABCD 0
-#define AQUANTIA_MII_PAIR_ORDER_DCBA 1
-
-In both when using a single property for overriding the bootstrap value,
-absence of that property would mean to not touch what ever has been
-setup by bootstrap pin (or force-mode configured by the bootloader,
-which I've also seen already, and that also seems to survive PHY
-resets).
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
 
