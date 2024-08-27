@@ -1,65 +1,56 @@
-Return-Path: <netdev+bounces-122366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC88E960D62
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:17:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA1A960D80
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:24:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1C3D1F2297D
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:17:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96C691F23D5C
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873321C3F29;
-	Tue, 27 Aug 2024 14:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77561C4EC2;
+	Tue, 27 Aug 2024 14:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TK4QCSQE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K2aaUaLR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E62833E8;
-	Tue, 27 Aug 2024 14:17:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0441CABF;
+	Tue, 27 Aug 2024 14:24:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724768225; cv=none; b=jbax1e7Frpvtp807U4Ij88trVlU486qGnQd7E5aw4yijSDvDCUqXdvnr9BCwR3WqTO+j8n8+BioF0ii++h/ln43PFM3yjIGNW7XbjvysukTXuqW7v09qw1Q+9Me0fMwCzMz74Hxls3MtM5JZnaXshxEaNpBNtZ/PYAZv4ZoOO2o=
+	t=1724768664; cv=none; b=aemCis4S7jy4FFpRn62Xyr8/CLR3zFBmKws8Zq8H41cv2q4c0GuDTjFqT2uzTUTinJn3N0Hd8muCEi7mHNc+h2QzvAbuWNm+FPxX2YZ0S0W+JC02iFZGHOgpYukHZMNZ8YjOwSo7JH/lIDVNXYGkwJOX5DiKz8C6Gq24wAKdtaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724768225; c=relaxed/simple;
-	bh=97PoKtJnQqBKNmAFP5vJX4vqaKaugMDk8RUxSJ3MqhA=;
+	s=arc-20240116; t=1724768664; c=relaxed/simple;
+	bh=nPgT01Ccj6BYdANgzuzeqwZikvxxVf26U3E7v4rABQQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OjqUzV1Ohm4ZFvnaK+VOMVGu4B6Bj9IvkA7VsKOwi4znJ4v/fJAAgm4ooIaCndYWhiu+IgeT5wG1dtVkIVd4W/J7SXIsgYUhHdxsfLQhG5Bfn9zkn9fMIxVXX5wp9DadAC5xpaOwk9uVNEG6385OCy4Vx3br4MWyYqUP0aXIygA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TK4QCSQE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EC5AC581AA;
-	Tue, 27 Aug 2024 14:17:04 +0000 (UTC)
+	 MIME-Version:Content-Type; b=R7HktODjCz8UO6VecGTgVM4wuj4O7iFi5N1ozWyOeY1v9NjxdhI/VvzsJonRt8GA+MbvC1HgFAnIPfcMdV6ptTH3MsgdHrD3TAqvbITZrGl04gdRRkADJcI0n4uETKJzRPi60Xg1HivpiAn0E0O4YB4XD83OhQv8kv5F0Io1Cs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K2aaUaLR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E621C4FE0E;
+	Tue, 27 Aug 2024 14:24:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724768224;
-	bh=97PoKtJnQqBKNmAFP5vJX4vqaKaugMDk8RUxSJ3MqhA=;
+	s=k20201202; t=1724768664;
+	bh=nPgT01Ccj6BYdANgzuzeqwZikvxxVf26U3E7v4rABQQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TK4QCSQElL6rxKQhCgfsfbQ87MQWuN/pmpFAa4hH2jPiXcZttzOB4yua2RW1OvOn3
-	 V+GZWhNvCuNky4SyJMRVrEsyRj4V1YG52QFBfhjoButxa9DbJIHUwZyDfRVWcMfRW+
-	 22RYeN+CFGo8RJaQQxkMHrCWEvYMPvzMlDPDX5vmtC65Xk2TeOT3sVXUQxv58uTQ/9
-	 dhiS3rvtTrD3iyUw9U9MsbqiJoPofimMwpX/EN+CuH/q8xMI67RMNynmJ0OKZU71eU
-	 wTLFOJUQEBup6NdvwqC2C83GigAiO1TN9tmk1EU5wB8UU7bGpuS4rAfZ37T4PEepN3
-	 l1TCp/AIeNXWg==
-Date: Tue, 27 Aug 2024 07:17:03 -0700
+	b=K2aaUaLR+vlsq6FXo05CtYWkDVLlGaePedsQap2L6qi7EMpIF4U3SHyia29VXMR8p
+	 9R6x1pgOgfBgIHe/tNnZQl4sgl5fuEA8cxkfpmCXMVBgjjw6vQryx1KKLpJyWqPvz0
+	 44TpDuosRMbrGzG8eqsYxpt/B1ZtMNrUWxW4AFYo6VQz05TWEjiTiAunka2wH722Xg
+	 SeIzp4h+lYGCkWgCYACHuRwWQS5newLKz4A+RjbU6lFeC3vZJ/cKV4P9mfb+taJ+XX
+	 /x94vV9IGUO1fN9u2stcGng+yDogei7OPNNnXio6QeZ9rrWjTAhWOm8FEQDnlz+1Qp
+	 GGcREDQQjxoHQ==
+Date: Tue, 27 Aug 2024 07:24:23 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Shuah Khan
- <shuah@kernel.org>, <linux-kselftest@vger.kernel.org>,
- <netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, Amit Cohen
- <amcohen@nvidia.com>, Benjamin Poirier <bpoirier@nvidia.com>, Hangbin Liu
- <liuhangbin@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- <mlxsw@nvidia.com>
-Subject: Re: [RFC PATCH net-next 1/5] selftests: forwarding: Introduce
- deferred commands
-Message-ID: <20240827071703.59401ed7@kernel.org>
-In-Reply-To: <87jzg288sd.fsf@nvidia.com>
-References: <cover.1724324945.git.petrm@nvidia.com>
-	<d5f8364b42f277daa9e235d23398e3dce5549e92.1724324945.git.petrm@nvidia.com>
-	<05b9caf6-ecf5-48a2-ab65-509b0d5b5fb0@intel.com>
-	<87o75f8e0l.fsf@nvidia.com>
-	<3312a4a6-97f5-4ae2-9527-c7b1b73da6d2@intel.com>
-	<87jzg288sd.fsf@nvidia.com>
+To: Yan Zhen <yanzhen@vivo.com>
+Cc: louis.peens@corigine.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, oss-drivers@corigine.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, opensource.kernel@vivo.vom
+Subject: Re: [PATCH v1] netronome: nfp: Use min macro
+Message-ID: <20240827072423.4540bed6@kernel.org>
+In-Reply-To: <20240827084005.3815912-1-yanzhen@vivo.com>
+References: <20240827084005.3815912-1-yanzhen@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,21 +60,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 27 Aug 2024 10:53:53 +0200 Petr Machata wrote:
-> >> I can do it, but it's gonna be more pain in setting up those
-> >> TEST_INCLUDES. People will forget. It will be a nuisance.
-> >> I'm thinking of just moving it to net/lib.sh, from forwarding.  
-> >
-> > what about separate file, but included from net/lib.sh?  
-> 
-> Unfortunately that would be even worse. Then you need to remember to put
-> the file into TEST_INCLUDES despite seemingly not using it.
-> 
-> Like ideally we'd have automation for this. But I don't know how to do that
-> without actually parsing the bash files, and that's just asking for
-> trouble. Maybe after the defer stuff we also need a module system :-/
+On Tue, 27 Aug 2024 16:40:05 +0800 Yan Zhen wrote:
+> Using min macro not only makes the code more concise and readable
+> but also improves efficiency sometimes.
 
-FWIW we could throw it into net/lib, which has a fake target, see:
+The code is fine, you're making it worse.
 
-b86761ff6374 ("selftests: net: add scaffolding for Netlink tests in Python")
+How many of those pointless min()/max() conversions do you have 
+for drivers/net ?
+-- 
+pw-bot: reject
 
