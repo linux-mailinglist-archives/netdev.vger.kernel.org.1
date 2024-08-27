@@ -1,114 +1,153 @@
-Return-Path: <netdev+bounces-122096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7967195FE40
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 03:27:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B880C95FE59
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 03:38:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB0731C21B70
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 01:27:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7C831C219D8
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 01:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CBC4C92;
-	Tue, 27 Aug 2024 01:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="azjP73Th"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03B4479F5;
+	Tue, 27 Aug 2024 01:38:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50724C8D7;
-	Tue, 27 Aug 2024 01:27:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A31322E;
+	Tue, 27 Aug 2024 01:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724722058; cv=none; b=SoUEx7ewS2+m88jzGcwI35iuhFdfc5ixsCk+sFVwLJ5JyIfLHpYXf7LRe7Ec8aqlpWACOmlfJnZ2I24RkT+QU2hYPv7AGUQ6FLVc6DSZ4uDPf1N56SvyAOQL5903XtyM5yPKU6Cn+yvn5Aw1AQCtpOypH9tHqa3SyyT8Yu+0KvI=
+	t=1724722711; cv=none; b=UIPJYoQt/dkifSmjmMMEC7BoFCsH4vqeNhXD2WZ2y6J4OdhQoOBPz92XUmMvrn5NffMoJuJYGns9JLLLN19wIIIgXgmy4/i4rMWILAhKy+U0VKz8wE1W5h2yaxe8cnrHt0iGvbdM2FhbaqObmMQU4UNWd1q8rzPdQVcHwqwHKYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724722058; c=relaxed/simple;
-	bh=2HfsTuO4EjdMHYcVYRhIa6erVNqVZZtnlUFRv3PKkE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=alMV4EEy+kVIwcEIEm1aIfN3RzouwcfM6kzDoGQYTtRSzk6DR4ap+sHwwqDHWjIL+qyNKzlDbMMyDEIwMPhJkMebmkpCICq2Sz6juhajk3V5q9LcmaR4qcHyAT+iLzn7jBSM0IWKJupWh2mkXBZsj0JJAojvq6r4Z/7yAI0H/Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=azjP73Th; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1724722054;
-	bh=GxwmqqBGuUCy12ralveGFNVRccgdB1AfwyCMHGMx1J8=;
-	h=Date:From:To:Cc:Subject:From;
-	b=azjP73Th2Qif2TNnQZaxxvVfXo+2d3DSX4nccff4f0Jt9w+AON6NyQGwkFnZ5HqPx
-	 13vtOqurZAtQkCVqsiaD+577WxcGqAbhgKcQC/aV3dbk8WVPbkTl7PqdhFRETdyPJZ
-	 39EoIEvDRPhJ966fCkSn/VBZH/2Anu8HdcRtYNwxW7mzykEW9GGGOxjxzPFiCYPKmQ
-	 nPpD9bVvuADU48LcxPDPZlONXB5gpJl4IQtRxLrGbKGUwk6hi3MVSDfYwlGSOHdIDI
-	 a0MLx2AKFYkfJyWh4DWFLAWWmawRBKbJDSrJsNrAWsq0TwVQDTXlugAn05UQemNTu2
-	 /XnLoeplYq+TQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Wt8zn5NQhz4w2F;
-	Tue, 27 Aug 2024 11:27:33 +1000 (AEST)
-Date: Tue, 27 Aug 2024 11:27:32 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patches in the bluetooth tree
-Message-ID: <20240827112732.534c3ce0@canb.auug.org.au>
+	s=arc-20240116; t=1724722711; c=relaxed/simple;
+	bh=kLxL0xqbxKhqAeTPLBKCcg9MsVjitp4RbhV6j3qsYho=;
+	h=Subject:To:References:CC:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=umbTLUeCXb9B5cDW73DqICnAx8520IkCsvwFdNhW7lcBTTshLt/4MA4SObdoI6j0mHjigeyT0jYRHFyBiUTlOfbTvYE8B1ZSvQBWAw0oKZRpWxMDHFVH3owYHEkloBgVMkZdnlqLUvwcgF2J7TrqbCNCBMVjhWoXIFkprWgVjgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Wt96n1CSJz20mqk;
+	Tue, 27 Aug 2024 09:33:37 +0800 (CST)
+Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
+	by mail.maildlp.com (Postfix) with ESMTPS id EFFF7140120;
+	Tue, 27 Aug 2024 09:38:24 +0800 (CST)
+Received: from [10.174.178.75] (10.174.178.75) by
+ kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 27 Aug 2024 09:38:22 +0800
+Subject: Re: [PATCH -next 07/15] security: min_addr: move sysctl into its own
+ file
+To: Paul Moore <paul@paul-moore.com>
+References: <20240826120449.1666461-1-yukaixiong@huawei.com>
+ <20240826120449.1666461-8-yukaixiong@huawei.com>
+ <CAHC9VhS=5k3zZyuuon2c6Lsf5GixAra6+d3A4bG2FVytv33n_w@mail.gmail.com>
+CC: <akpm@linux-foundation.org>, <mcgrof@kernel.org>,
+	<ysato@users.sourceforge.jp>, <dalias@libc.org>,
+	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <hpa@zytor.com>,
+	<viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
+	<kees@kernel.org>, <j.granados@samsung.com>, <willy@infradead.org>,
+	<Liam.Howlett@oracle.com>, <vbabka@suse.cz>, <lorenzo.stoakes@oracle.com>,
+	<trondmy@kernel.org>, <anna@kernel.org>, <chuck.lever@oracle.com>,
+	<jlayton@kernel.org>, <neilb@suse.de>, <okorniev@redhat.com>,
+	<Dai.Ngo@oracle.com>, <tom@talpey.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<jmorris@namei.org>, <linux-sh@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <wangkefeng.wang@huawei.com>
+From: yukaixiong <yukaixiong@huawei.com>
+Message-ID: <aeb685e9-3a2d-13b4-4ec8-0752ded06d61@huawei.com>
+Date: Tue, 27 Aug 2024 09:38:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Xv61S.TvQOl4ajtM87MXSdD";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+In-Reply-To: <CAHC9VhS=5k3zZyuuon2c6Lsf5GixAra6+d3A4bG2FVytv33n_w@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggpeml500020.china.huawei.com (7.185.36.88) To
+ kwepemh100016.china.huawei.com (7.202.181.102)
 
---Sig_/Xv61S.TvQOl4ajtM87MXSdD
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
 
-The following commits are also in the net tree as different commits
-(but the same patches):
+On 2024/8/27 6:49, Paul Moore wrote:
+> On Mon, Aug 26, 2024 at 8:05 AM Kaixiong Yu <yukaixiong@huawei.com> wrote:
+>> The dac_mmap_min_addr belongs to min_addr.c, move it into
+>> its own file from /kernel/sysctl.c. In the previous Linux kernel
+>> boot process, sysctl_init_bases needs to be executed before
+>> init_mmap_min_addr, So, register_sysctl_init should be executed
+>> before update_mmap_min_addr in init_mmap_min_addr.
+>>
+>> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
+>> ---
+>>   kernel/sysctl.c     |  9 ---------
+>>   security/min_addr.c | 11 +++++++++++
+>>   2 files changed, 11 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/kernel/sysctl.c b/kernel/sysctl.c
+>> index 41d4afc978e6..0c0bab3dad7d 100644
+>> --- a/kernel/sysctl.c
+>> +++ b/kernel/sysctl.c
+>> @@ -2059,15 +2059,6 @@ static struct ctl_table vm_table[] = {
+>>                  .proc_handler   = proc_dointvec_minmax,
+>>                  .extra1         = SYSCTL_ZERO,
+>>          },
+>> -#ifdef CONFIG_MMU
+>> -       {
+>> -               .procname       = "mmap_min_addr",
+>> -               .data           = &dac_mmap_min_addr,
+>> -               .maxlen         = sizeof(unsigned long),
+>> -               .mode           = 0644,
+>> -               .proc_handler   = mmap_min_addr_handler,
+>> -       },
+>> -#endif
+>>   #if (defined(CONFIG_X86_32) && !defined(CONFIG_UML))|| \
+>>      (defined(CONFIG_SUPERH) && defined(CONFIG_VSYSCALL))
+>>          {
+>> diff --git a/security/min_addr.c b/security/min_addr.c
+>> index 0ce267c041ab..b2f61649e110 100644
+>> --- a/security/min_addr.c
+>> +++ b/security/min_addr.c
+>> @@ -44,8 +44,19 @@ int mmap_min_addr_handler(const struct ctl_table *table, int write,
+>>          return ret;
+>>   }
+>>
+>> +static struct ctl_table min_addr_sysctl_table[] = {
+>> +       {
+>> +               .procname       = "mmap_min_addr",
+>> +               .data           = &dac_mmap_min_addr,
+>> +               .maxlen         = sizeof(unsigned long),
+>> +               .mode           = 0644,
+>> +               .proc_handler   = mmap_min_addr_handler,
+>> +       },
+>> +};
+> I haven't chased all of the Kconfig deps to see if there is a problem,
+> but please provide a quick explanation in the commit description about
+> why it is okay to drop the CONFIG_MMU check.
 
-  7567b7da175b ("Bluetooth: btintel: Allow configuring drive strength of BR=
-I")
-  9f5a21d9963d ("Bluetooth: btnxpuart: Fix random crash seen while removing=
- dri
-  1594ee3e104f ("Bluetooth: hci_core: Fix not handling hibernation actions")
+According to the compilation condition in security/Makefile:
 
-These are commits
+               obj-$(CONFIG_MMU)            += min_addr.o
 
-  eb9e749c0182 ("Bluetooth: btintel: Allow configuring drive strength of BR=
-I")
-  35237475384a ("Bluetooth: btnxpuart: Fix random crash seen while removing=
- driver")
-  18b3256db76b ("Bluetooth: hci_core: Fix not handling hibernation actions")
+if CONFIG_MMU is not defined, min_addr.c would not be included in the 
+compilation process.
+So，it is okay to drop the CONFIG_MMU check.
+>>   static int __init init_mmap_min_addr(void)
+>>   {
+>> +       register_sysctl_init("vm", min_addr_sysctl_table);
+>>          update_mmap_min_addr();
+>>
+>>          return 0;
+>> --
+>> 2.25.1
 
-in the net tree.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/Xv61S.TvQOl4ajtM87MXSdD
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbNK4QACgkQAVBC80lX
-0GwdDQf/bZE+TGa9KxejtTvCpRPXY5BkGl0iE1zu2+lEil88olROMj/DOS4CGMHm
-zDmJY5HjUTOubMwLv8yUZ4QguXUltQpEP1BgQjgG4Xphv107EkBl7YlHBokWuiqv
-FGRYEKF1D3g00h8g9SCbOdDbAZXY6mIh7wczrtIEVvg3uUeIrlDi+hD8zkf8L9GC
-+rhuV0mtPNBucVtwKAbZsWkAf/+acUFnheFyypEHp8zj4oDqa/hyVzEeMPdzV/X6
-vYmWU+21+nYeH26pZMtQlptMf/FCAePABzpGdehNwPeHI+UHLprjYJh3V1bHYCLD
-XneTgjbsEIUIzooGj69avWPGVXKmqw==
-=I4au
------END PGP SIGNATURE-----
-
---Sig_/Xv61S.TvQOl4ajtM87MXSdD--
 
