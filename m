@@ -1,98 +1,106 @@
-Return-Path: <netdev+bounces-122480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A9979617A9
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:05:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92F939617C9
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:10:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC804283FEE
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 19:05:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E43C1F21067
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 19:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 815CD1D175F;
-	Tue, 27 Aug 2024 19:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB601D2F57;
+	Tue, 27 Aug 2024 19:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="doJMjLuw"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="b0nYKSim"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE96770F1;
-	Tue, 27 Aug 2024 19:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B86081AD2;
+	Tue, 27 Aug 2024 19:10:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724785547; cv=none; b=iObQOHPNyjk7o8jJGPZpLaNoLeXZqx0LVfFL7hiXhXTlDa+Zi1Vvji/nUxjFPk8yGJoaUAHBQKA7bvSj9Uvj+gtK2n7gQuec2B6K6JO1VQgYpkLUTg6RZISmjLyv/vJ/wcc1PnEqz0lQp/S2xBkt2QKc0/ndaLalOAs1vuuMjT4=
+	t=1724785845; cv=none; b=HNPMw4xHoHxhoK8EUAri3V0KdDghxP2ctBxHE/I3/wnSElBnci4mszvEvOl+eMmUNc1SzB04F85A6yu1C/Xc6gVsQQVthYVH+9U5TPKkyP3aRutwmMQHJuWa9jlli9fNj5WDfjp5wU43BtYO8xXD2o7VBTWjR5mYH7WeYw5LVBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724785547; c=relaxed/simple;
-	bh=2/HpgshCK19xkX85wh1aiPA9KDp9vPJdMLlDAGfD1ls=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bGAu9Wtni98If+piFRKmd+jFK4KFWK2eC1bcuDGklXXAphk5VD6G0lLVXA0Z7dOHue+7vj5aJWWtoXtOsaO2+o8F6t5NeOt+o2gxaFBWJRl4n30SlXkjzGYi8C4ntPp/bDzL5TzZVi6c6CMhsbPxtQqT04VJv5sRp3OOsdY+UGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=doJMjLuw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5C83C4AF1B;
-	Tue, 27 Aug 2024 19:05:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724785546;
-	bh=2/HpgshCK19xkX85wh1aiPA9KDp9vPJdMLlDAGfD1ls=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=doJMjLuwdHqPWCcV3WE6NSq7XUTWA2rkIlB8ZpgXVXjVC8xXmbqmjBGzbhDZQQLIT
-	 oIVBimeSLJ11Sa932CabKaAQUoaOYl3pS7cJ0WC3PbbRJ0f54QNzYYz8xHOVtnlJeU
-	 U8Ml6FDCn4OnF71bsjwM/mphrV3GXKuR7DcddxS4tb4y+4PmxxYnTfPwIVv5pAzGSG
-	 5xEdjMCv7uGOFx1RfdeaS0+8mhcP7c/HXzQP7jd81yFMCtsmIuqL0No0sef0D7zXhQ
-	 lK9hmCC2vol5DX8foaw6iA1nYlFwb9MVxdE7CzbmETs1afbKxAD2mWUDYrwn2lC27a
-	 yrkW2JAMtfISg==
-Date: Tue, 27 Aug 2024 12:05:44 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Cc: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, Jonathan.Cameron@huawei.com, helgaas@kernel.org,
- corbet@lwn.net, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, alex.williamson@redhat.com, michael.chan@broadcom.com,
- ajit.khaparde@broadcom.com, somnath.kotur@broadcom.com,
- manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
- vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
- bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
- jing2.liu@intel.com
-Subject: Re: [PATCH V4 11/12] bnxt_en: Add TPH support in BNXT driver
-Message-ID: <20240827120544.383a1eef@kernel.org>
-In-Reply-To: <Zs3ny988Yk1LJeEY@C02YVCJELVCG>
-References: <20240822204120.3634-1-wei.huang2@amd.com>
-	<20240822204120.3634-12-wei.huang2@amd.com>
-	<20240826132213.4c8039c0@kernel.org>
-	<ZszsBNC8HhCfFnhL@C02YVCJELVCG>
-	<20240826154912.6a85e654@kernel.org>
-	<Zs3ny988Yk1LJeEY@C02YVCJELVCG>
+	s=arc-20240116; t=1724785845; c=relaxed/simple;
+	bh=E5Ph32Yb/JTIfgjOxLjWjVUgTlDoSzJqMxgWq6g92nU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uSQlHej+oPukBBUUdN7Ku2RP5reysYW3wQ7lWHmcw3/p+yAMpV0E1ihnG8qmpgnjxF3P8AM1E1juVQpnwTGaYaPggVN7ZZCF9jS30G0Ns5pUjXkcZNapNiqh7i0b/4Kyjg2+FMl0dHuR1319/br3WaTseutfkzzUWfyFYWtC65g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=b0nYKSim; arc=none smtp.client-ip=212.227.17.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1724785829; x=1725390629; i=wahrenst@gmx.net;
+	bh=fU87Wbr4Y/qBPG1mPGxt4Kn9VQhhQrrJTpfgtHIE75w=;
+	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:
+	 MIME-Version:Content-Transfer-Encoding:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=b0nYKSimY4WNac6mmmgamEOA2PqNgnQ3Npg4Nagcn5UoTOr15pxyfbaG2CMKNiWY
+	 4NF20Ebap99JljOoQtekOTOXZ1YEK7S92lfiwhB52cISLfxRaZo1UI7K6F8LMl/W0
+	 +dhUCsmWAwDIBrQ5HNRW/hS0cvDh9yoDB7RI4Gr6VJqCaLpEDgOygVy7e6Qn90MW8
+	 LOeHZ3sFs8iAROr5MFSYWgkW7CtbkRgBLXfv6YvTXG0N0RSk6Tu5eTvB6qsuS7W8Z
+	 vqFy5X4eg8eE+irrC2+lTnvc3AX0nze5PFd++d0p/ESAiH6Jvtv1aQgGZWFSAip4Z
+	 rd072/k2kAfGdxOXuQ==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1Mlf0U-1sIBHC35JC-00kqXU; Tue, 27
+ Aug 2024 21:10:28 +0200
+From: Stefan Wahren <wahrenst@gmx.net>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stefan Wahren <stefan.wahren@chargebyte.com>
+Subject: [PATCH 0/5 next] net: vertexcom: mse102x: Minor clean-ups
+Date: Tue, 27 Aug 2024 21:09:55 +0200
+Message-Id: <20240827191000.3244-1-wahrenst@gmx.net>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:FXFh5c6lpOdqk48VgvWpN2QUfZg6WbZOKxsFEwK6wyDj9u8/NX2
+ LR+2fsxuJ+tBtaNxXWu86a3WoKHKmMb4RCAGsVbJ/rYZJCqDplesN3ZEwJnK51e3xHiI9UV
+ e2vtq27f+Ixq9SSaBtdZGWLFK6BVkkp/UR4QC71sG4O1XD/ovGPKvoZFgdI7aSoEUyfNcBB
+ Wqe/SOEGuywwpUJaRLH+g==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:UxRrkYobkjs=;nfUGe0DJuEsqN/rBhr9UwUGf74A
+ 1/i8OjQprNT9PtDqNyVBR2SprhbhOe4ivg178eNFYyT9SgDDHXWYbWlHY+maF7j8LxaA83VRT
+ gbXAtABg5qE4GsaSNqTx52NgKLDTe2kN/GUiSwF4HJsxSDSIXZmIULpanbfrR9WOqqvq5Jfcm
+ fT43SKxrSjGdzOppNoRSNillH5OHMtI+diQBBc7DVln8GbIx6vjZ6ALS49EXmnD1TBTBVmTQ/
+ taO0N9kMMpkLfU58i9CH36bBdvtIGl1nsmBFF7xbA+2Lt34GhyL9rV6z0Yv5g4ORKxHRtqF8J
+ lAHaPARQaYIPshQfxDeFthtMQP3SVGDZrMUr0VEuu1hAs4UHHB+qB9CslSVcLNBBSQ7Lex7Ej
+ cAyx+oqCw9IiKVpMHamimAE0FV4QrqXjhNTmAVKanJturL5ZG10N1UVQ8P0KQYx8CS1FCuWPy
+ E4nsR+p4kDxOWR+Y6SBVVTtonzjSEOokMyj3vIywX9s9eeEEfHhAeR69yRAjHIjtJ5RkIlz4C
+ yeu0xXttU8K4MJQuFFK+BHYCRvNOGWCL2b8s+gi89NURFSgpFdh0Nygn2Kxb1zalD/BXVcOZj
+ GyPaFQ7EeWffuzTlgVnFhUU/cHRzca2bQ4lQoGrGxIRzE6hufgqMC6JLDKgWefdMUmbSHn8uf
+ 0cW9MDVb3e9MmZ+NF//DXui5Npvz6Ma07tee96NVDz7zlyCESURf0MhNFMZv/TRYN0cR4RuXL
+ DWJF+xsHk0NUqabEjHQRDWTK5yCKt06VXpbbxEdLRsQiPLaKdipdZziRVBTAtR3Gk7tlq4G9j
+ OxgsBdfBvn3ep9gSkGAz6XvQ==
 
-On Tue, 27 Aug 2024 10:50:51 -0400 Andy Gospodarek wrote:
-> > The merge window is in 3 weeks or so, so this can wait.  
-> 
-> Are you asking for the patch for this feature to include the queue
-> stop/start instead of this? 
+From: Stefan Wahren <stefan.wahren@chargebyte.com>
 
-Yes, indeed.
+This series provides some minor clean-ups for the Vertexcom MSE102x
+driver.
 
-> I just checked linux-pci and it does have bnxt_queue_stop/bnxt_queue_start.
->
-> > I'm worried we'll find out later that the current queue reset
-> > implementation in bnxt turns out to be insufficient. And we'll
-> > be stuck with yet another close/open in this driver.  
-> 
-> The queue reset _has_ to work.  We will ensure that it does and fix any
-> problems found.  Note that these have been under test already internally
-> and fixes are/will be posted to the list as they are made.  Holding this
-> patch because an API that it uses might not work seems odd.
+Stefan Wahren (5):
+  net: vertexcom: mse102x: Use DEFINE_SIMPLE_DEV_PM_OPS
+  net: vertexcom: mse102x: Silence TX timeout
+  net: vertexcom: mse102x: Fix random MAC address log
+  net: vertexcom: mse102x: Drop log message on remove
+  net: vertexcom: mse102x: Use ETH_ZLEN
 
-Not holding because API may not work, holding because (I thought) 
-API isn't in place at all. If bnxt_queue_stop/bnxt_queue_start are in
-linux-pci please rewrite the patch to use those and then all clear 
-from my PoV.
+ drivers/net/ethernet/vertexcom/mse102x.c | 20 +++++++-------------
+ 1 file changed, 7 insertions(+), 13 deletions(-)
+
+=2D-
+2.34.1
+
 
