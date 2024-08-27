@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-122543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D4B5961A6A
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 01:20:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1995C961A73
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 01:21:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F39F1284EDF
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 23:20:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82660B228E8
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 23:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF7A1D47A5;
-	Tue, 27 Aug 2024 23:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA431D54C5;
+	Tue, 27 Aug 2024 23:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CrfHSGiR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jd2TtpJd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F44B1D4618;
-	Tue, 27 Aug 2024 23:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B56A1D2F78;
+	Tue, 27 Aug 2024 23:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724800831; cv=none; b=l1nGJenntmXvFDo38reSTK65yQ6FI2Q7LRmHLcaA5AtzCa10EAeElkaEztTO/WbBW4j5An+2iglrSxNONcWup/qFWmayGDSwWcGRK8ScNlfJK9it3+WVMkHrVGLJlfPdeJ5a0O02M2EwRA+gpUxvCIpYH0yIR9GV5E7Klqb1jEo=
+	t=1724800835; cv=none; b=tn7ucmJPXHG4CMbneI7km/NuV07/VwUXzUQU90NFg4x2kTGPlD1D3q3vLvOzmPzYbLRlSQsiEG41o3EOvhU9i9XI1jmthyfihjh6M0jkrN9WL0R8qTcOJwxrQobGHZPvxx+L1hhyWc+r6op6gedoH123J9pMGAWP7ekpNHZEXZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724800831; c=relaxed/simple;
-	bh=kwLKKjeVrbCsWWOOaGFaaEgALyESZIHFayJqbW+xteE=;
+	s=arc-20240116; t=1724800835; c=relaxed/simple;
+	bh=JqAJyDzkuTQdgzY0EdwWlgQLgQ3Cojco3ZN11kWFADM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=twaPLskt6c6TXFrLVbAQMDEvd3bnpknmWC2wRcZ5b06Sh5R8keNcz9kdosz2PzmvtpbfSL8/e/NdLGXR8TGMuW/s3GroZhXsreKzQsW2Ve9hGZ3orO+skzUWCc3Sx+gKdnvQ5oKYhUx2jJdcHUv6SzdvVv9ih4Ezc+kA2Py3KV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CrfHSGiR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 249EEC4AF61;
-	Tue, 27 Aug 2024 23:20:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=aDSsJQeHE+bY6N9CdFumA8QkqmFW9qn9vZS92Zu1WGxD6meU9pKh2CfqZEVwQNedwOz8xErUNbpNUlTPXePwW08tiXb1OToEDx1Kd9NNjOE/f2456b3mbk7T7sccPsa7RESt87RRIVWkxGSOQ4SfE/SxX3naab1Wm2CERF6OOjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jd2TtpJd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BCCEC4AF1C;
+	Tue, 27 Aug 2024 23:20:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724800831;
-	bh=kwLKKjeVrbCsWWOOaGFaaEgALyESZIHFayJqbW+xteE=;
+	s=k20201202; t=1724800834;
+	bh=JqAJyDzkuTQdgzY0EdwWlgQLgQ3Cojco3ZN11kWFADM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CrfHSGiRmHGRTVgMEyvIXORgnoLcCaBDn7cE8JMKLSN9/WwF53xGLK23TOSMMppJ0
-	 MYIlFiJN+iYcZkzTNCWArOXBHaUU54xq6yFwt76Al8lGgsZD1ito/37C2sujz/OP6a
-	 SxegJXMjycIJvHppgtvh+//eFW18oSI/xPn+CsueouuJH5tA8jLUmatGyi4ASz+enY
-	 O5HnrfBULs9dMcrDPWLTL9UenIp3ogGaHRNs/ogjHmMvG788lqbAdesy0SLqSArikJ
-	 yDO/qMVMmrEfxRGkYKgb9v06v+/5Xr1uJJpPzgTCcjtzVkjdhSkZLeK5ceBV3bR8tJ
-	 ZKMQoDEhqBnfw==
+	b=jd2TtpJdR/xdN3Jy8gFSEzmF2wnMEmpOPpIjmqWNc/0vtEQVjQFFMYmifM4cgoIL4
+	 Z5odPv04JBOsSeInvnok4H80Fwfa9dcbgUIsHSczjUILOaSG+gS0L1m0jamhwBrxBH
+	 Uk9PKJmRc19eSnNr2VDb/USDyo9TNBhwrDjSjcs4iIjaVXlHta9hdf05tR47IBns7f
+	 EtIpD/nQ0cai6oaISEscq06/uQOj6sqJaRz6vP0d7vtdNXWTyLeICQinkZrNnxbH+o
+	 UsJmD3AoMsb1hcYJdifTaeTQA5eDKT+cVezeeGMQIX2cN5j7y6ebOZJmGHyTtl7Ar9
+	 3Y4ahOty7Vx6Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C0A3822D6D;
-	Tue, 27 Aug 2024 23:20:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDD83822D6D;
+	Tue, 27 Aug 2024 23:20:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] sctp: fix association labeling in the duplicate
- COOKIE-ECHO case
+Subject: Re: [PATCH net-next v5] net: mana: Implement get_ringparam/set_ringparam
+ for mana
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172480083124.787068.2952553408915985956.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Aug 2024 23:20:31 +0000
-References: <20240826130711.141271-1-omosnace@redhat.com>
-In-Reply-To: <20240826130711.141271-1-omosnace@redhat.com>
-To: Ondrej Mosnacek <omosnace@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- lucien.xin@gmail.com, vyasevich@gmail.com, nhorman@tuxdriver.com,
- marcelo.leitner@gmail.com, paul@paul-moore.com,
- stephen.smalley.work@gmail.com, linux-sctp@vger.kernel.org,
- selinux@vger.kernel.org, linux-security-module@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <172480083424.787068.16112040114699879400.git-patchwork-notify@kernel.org>
+Date: Tue, 27 Aug 2024 23:20:34 +0000
+References: <1724688461-12203-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To: <1724688461-12203-1-git-send-email-shradhagupta@linux.microsoft.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, kys@microsoft.com,
+ haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ longli@microsoft.com, horms@kernel.org, kotaranov@microsoft.com,
+ schakrabarti@linux.microsoft.com, erick.archer@outlook.com,
+ pavan.chebbi@broadcom.com, ahmed.zaki@intel.com, colin.i.king@gmail.com,
+ shradhagupta@microsoft.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 26 Aug 2024 15:07:11 +0200 you wrote:
-> sctp_sf_do_5_2_4_dupcook() currently calls security_sctp_assoc_request()
-> on new_asoc, but as it turns out, this association is always discarded
-> and the LSM labels never get into the final association (asoc).
-> 
-> This can be reproduced by having two SCTP endpoints try to initiate an
-> association with each other at approximately the same time and then peel
-> off the association into a new socket, which exposes the unitialized
-> labels and triggers SELinux denials.
+On Mon, 26 Aug 2024 09:07:41 -0700 you wrote:
+> Currently the values of WQs for RX and TX queues for MANA devices
+> are hardcoded to default sizes.
+> Allow configuring these values for MANA devices as ringparam
+> configuration(get/set) through ethtool_ops.
+> Pre-allocate buffers at the beginning of this operation, to
+> prevent complete network loss in low-memory conditions.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] sctp: fix association labeling in the duplicate COOKIE-ECHO case
-    https://git.kernel.org/netdev/net/c/3a0504d54b3b
+  - [net-next,v5] net: mana: Implement get_ringparam/set_ringparam for mana
+    https://git.kernel.org/netdev/net-next/c/3410d0e14f9a
 
 You are awesome, thank you!
 -- 
