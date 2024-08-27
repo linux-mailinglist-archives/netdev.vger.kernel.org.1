@@ -1,274 +1,222 @@
-Return-Path: <netdev+bounces-122466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E19E9616F8
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 20:27:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 206A19616FF
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 20:29:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 570102894FA
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 18:27:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A420D1F23B8F
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 18:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC931D2795;
-	Tue, 27 Aug 2024 18:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C80551D1757;
+	Tue, 27 Aug 2024 18:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HdFr4q/a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DArm1UWW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6AA1C688E
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 18:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30211C57A5
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 18:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724783233; cv=none; b=dCXp/jNKaaZmPnOY2zNZ9D6HixOOQBPRe3EBV5jM6pCKx0SHbngBxuWCk8LLd1BOxHuNxE7fOGYuuFjRbry2memH2P1cc0lu/Ri1KBTUb6qM98KBVmS3izt7dW1FH/QWyS4eUj4V5HBSnx0gRr6SMFtOQbZueg5pCFMAfArUgJQ=
+	t=1724783376; cv=none; b=U27UuY0HaQleW2WjoycOzF64af5tcYnKsfom71huSJMnyhFNjrYbB5GgZ6H3E4h+nqvH8xs5DdsRXQG+iFCoGzHtl2d+xPTmLhHvqp3kUXelKBboxF5uV5zhs7TAXYMW0YtTCjb96gS4h1ymCttTuIoLvr6NQ9XJFqJbO5+mBKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724783233; c=relaxed/simple;
-	bh=U3S0NT5mAN5wdUNex9B7uZ/roVQlT/KDvNJFb560cvg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JiLIlO9P736Ox5cdpWxS5C2pek4ThXHLYca+oCxNBHBGNz8lMhMqoNpsyIzgWXgxBstCU+NgcXUHkPc46t3UxnYx3de+CPrdzonpsPqpuSBqOLlgS4/d8Y9Eae5U1onNGK9ZFZbZ/g/hOx5cqKSOMNZXa0j1B1O4f86Ri06AH3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HdFr4q/a; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724783232; x=1756319232;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=U3S0NT5mAN5wdUNex9B7uZ/roVQlT/KDvNJFb560cvg=;
-  b=HdFr4q/aQDWTxMqykAOTG42smxIBpHmfnJa1s03HMkGReSTQe/hUHpAt
-   KWAhkVPmHd2VGCFq0E5nIbpfxG7UVQO72/dfZ1nZ/ZxvustKOafpumZ+X
-   u7SPl1Vs71kURUeyqJXi87cMHBWKtSx34fyRjhK9481rs2215l7aQAYCC
-   hs1M7m7yH5xl9rmUHEzD7HdfZvHShqAwQvJ1VVRAq6XZHhIlcj+/fSuOL
-   WzCQZPDkx4NKL7arU+PBkbpBVju9HIxT/7220WM1PiEpsBShHJ8cYds3/
-   EQpICsc1j0hXVxPyYFHPLdJ5PVVCdiTRsL4vKo+/YE67o2oEhKBlsHO2Q
-   Q==;
-X-CSE-ConnectionGUID: pj84zxQ/QyOcPN1grvIerg==
-X-CSE-MsgGUID: JKWKmlRVQ4W9U65ktzEwqg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11177"; a="48665834"
-X-IronPort-AV: E=Sophos;i="6.10,181,1719903600"; 
-   d="scan'208";a="48665834"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 11:27:11 -0700
-X-CSE-ConnectionGUID: M03qrS0KQNqGUNKHYCV7Pw==
-X-CSE-MsgGUID: PQCa/K6lS8m6k3G9imHCJA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,181,1719903600"; 
-   d="scan'208";a="67306796"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 27 Aug 2024 11:27:10 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sj0uJ-000JwQ-0c;
-	Tue, 27 Aug 2024 18:27:07 +0000
-Date: Wed, 28 Aug 2024 02:26:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: Hongbo Li <lihongbo22@huawei.com>, sam@mendozajonas.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, horms@kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, lihongbo22@huawei.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net/ncsi: Use str_up_down to simplify
- the code
-Message-ID: <202408280152.l51y5bcU-lkp@intel.com>
-References: <20240827025246.963115-3-lihongbo22@huawei.com>
+	s=arc-20240116; t=1724783376; c=relaxed/simple;
+	bh=P3sDOaLA+BKPfV84MsxIdVubJOANjkEAf016dHH09vk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ufo+C4kxzZ3ZhUuZxDZ1Vbzxd8yK21kUzyvdGy746dQZHasn0RiSHdZS+VZo0A5d6fR2Nidb2M0EdOBeJBjk63bRHKphDppq7qReDDTiqZscUe6xxwDWCVQtl9sPQlvOB6/E+Q8hGJO5QIFxFvxufgGY99jcyu9ZiGhIpL8jiVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DArm1UWW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5749C32786;
+	Tue, 27 Aug 2024 18:29:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724783375;
+	bh=P3sDOaLA+BKPfV84MsxIdVubJOANjkEAf016dHH09vk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DArm1UWWmDOKkYaZKzC11n9tLzjv/9TdPaNvxDvtioUSLyn8VSEwy6mSHxfzg599B
+	 1GwEo0RUe4ihrCMN/VcC96+nmrlgk5DR++Amb9AoZ7ReglYju60RtL4FAsRiQjKhOh
+	 aMG+syqoLALFImK253wsWcVbdbjdAGAT7J+YpA1elJW/LEGPrnDQXW013+ElraZl82
+	 FaVCysCzUEpkt4yO65dSSmNOHe2OkwVnJEkFI9jeFZ35WxoIvtgHDN8RO1GglwM99L
+	 W5eOAlh7w8sPJorY9nuT0LsypwlSTnxF1vCn28jrmTjaZVIvUtOY60hD9mAp+HlIkj
+	 F336R0OESyP6w==
+Date: Tue, 27 Aug 2024 11:29:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
+ <przemyslaw.kitszel@intel.com>, <joshua.a.hay@intel.com>,
+ <michal.kubiak@intel.com>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>
+Subject: Re: [PATCH net-next v2 2/9] libeth: add common queue stats
+Message-ID: <20240827112933.44d783f9@kernel.org>
+In-Reply-To: <ee5eca5f-d545-4836-8775-c5f425adf1ed@intel.com>
+References: <20240819223442.48013-1-anthony.l.nguyen@intel.com>
+	<20240819223442.48013-3-anthony.l.nguyen@intel.com>
+	<20240820181757.02d83f15@kernel.org>
+	<613fb55f-b754-433a-9f27-7c66391116d9@intel.com>
+	<20240822161718.22a1840e@kernel.org>
+	<b5271512-f4bd-434c-858e-9f16fe707a5a@intel.com>
+	<20240826180921.560e112d@kernel.org>
+	<ee5eca5f-d545-4836-8775-c5f425adf1ed@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240827025246.963115-3-lihongbo22@huawei.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Hongbo,
+On Tue, 27 Aug 2024 17:31:55 +0200 Alexander Lobakin wrote:
+> >> But it's up to the vendors right, I can't force them to use this code or
+> >> just switch their driver to use it :D  
+> > 
+> > It shouldn't be up to interpretation whether the library makes code
+> > better. If it doesn't -- what's the point of the library. If it does
+> > -- the other vendors better have a solid reason to push back.  
+> 
+> Potential reasons to push back (by "we" I mean some vendor X):
+> 
+> * we want our names for Ethtool stats, not yours ("txq_X" instead of
+>   "sqX" and so on), we have scripts which already parse our names blah
 
-kernel test robot noticed the following build errors:
+If the stat is standardized in a library why is it dumped via ethtool -S
 
-[auto build test ERROR on net-next/main]
+> * we have our own infra and we just don't want / have time/resources to
+>   refactor and then test since it's not something critical
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Hongbo-Li/net-ncsi-Use-str_up_down-to-simplify-the-code/20240827-104622
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240827025246.963115-3-lihongbo22%40huawei.com
-patch subject: [PATCH net-next v2 2/2] net/ncsi: Use str_up_down to simplify the code
-config: arc-randconfig-001-20240827 (https://download.01.org/0day-ci/archive/20240828/202408280152.l51y5bcU-lkp@intel.com/config)
-compiler: arc-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240828/202408280152.l51y5bcU-lkp@intel.com/reproduce)
+Quite hypothetical.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408280152.l51y5bcU-lkp@intel.com/
+> >> In some cases, not this one, iterating over an array means way less
+> >> object code than open-coded per-field assignment. Just try do that for
+> >> 50 fields and you'll see.  
+> > 
+> > Do you have numbers? How much binary code is 50 simple moves on x86?  
+> 
+> 	for (u32 i = 0; i < 50; i++)
+> 		structX->field[i] = something * i;
+> 
+> open-coding this loop to assign 50 fields manually gives me +483 bytes
+> of object code on -O2.
 
-All error/warnings (new ones prefixed by >>):
+10 bytes per stat then. The stat itself is 8 times number of queues.
 
-   In file included from include/linux/skbuff.h:38,
-                    from include/net/net_namespace.h:43,
-                    from include/linux/netdevice.h:38,
-                    from net/ncsi/ncsi-aen.c:9:
-   net/ncsi/ncsi-aen.c: In function 'ncsi_aen_handler_lsc':
->> net/ncsi/ncsi-aen.c:78:28: error: implicit declaration of function 'str_up_down' [-Werror=implicit-function-declaration]
-      78 |                    nc->id, str_up_down(data & 0x1));
-         |                            ^~~~~~~~~~~
-   include/net/net_debug.h:66:60: note: in definition of macro 'netdev_dbg'
-      66 |                 netdev_printk(KERN_DEBUG, __dev, format, ##args); \
-         |                                                            ^~~~
->> net/ncsi/ncsi-aen.c:77:35: warning: format '%s' expects argument of type 'char *', but argument 5 has type 'int' [-Wformat=]
-      77 |         netdev_dbg(ndp->ndev.dev, "NCSI: LSC AEN - channel %u state %s\n",
-         |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      78 |                    nc->id, str_up_down(data & 0x1));
-         |                            ~~~~~~~~~~~~~~~~~~~~~~~
-         |                            |
-         |                            int
-   include/net/net_debug.h:66:50: note: in definition of macro 'netdev_dbg'
-      66 |                 netdev_printk(KERN_DEBUG, __dev, format, ##args); \
-         |                                                  ^~~~~~
-   net/ncsi/ncsi-aen.c:77:70: note: format string is defined here
-      77 |         netdev_dbg(ndp->ndev.dev, "NCSI: LSC AEN - channel %u state %s\n",
-         |                                                                     ~^
-         |                                                                      |
-         |                                                                      char *
-         |                                                                     %d
-   cc1: some warnings being treated as errors
+> But these two lines scale better than adding a new assignment for each
+> new field (and then forget to do that for some field and debug why the
+> stats are incorrect).
 
+Scale? This is control path code, first prio is for it to be correct,
+second to be readable.
 
-vim +/str_up_down +78 net/ncsi/ncsi-aen.c
+> >> But I have...  
+> > 
+> > Read, or saw it?  
+> 
+> Something in between these two, but I'll reread since you're insisting.
 
-   > 9	#include <linux/netdevice.h>
-    10	#include <linux/skbuff.h>
-    11	
-    12	#include <net/ncsi.h>
-    13	#include <net/net_namespace.h>
-    14	#include <net/sock.h>
-    15	
-    16	#include "internal.h"
-    17	#include "ncsi-pkt.h"
-    18	
-    19	static int ncsi_validate_aen_pkt(struct ncsi_aen_pkt_hdr *h,
-    20					 const unsigned short payload)
-    21	{
-    22		u32 checksum;
-    23		__be32 *pchecksum;
-    24	
-    25		if (h->common.revision != NCSI_PKT_REVISION)
-    26			return -EINVAL;
-    27		if (ntohs(h->common.length) != payload)
-    28			return -EINVAL;
-    29	
-    30		/* Validate checksum, which might be zeroes if the
-    31		 * sender doesn't support checksum according to NCSI
-    32		 * specification.
-    33		 */
-    34		pchecksum = (__be32 *)((void *)(h + 1) + payload - 4);
-    35		if (ntohl(*pchecksum) == 0)
-    36			return 0;
-    37	
-    38		checksum = ncsi_calculate_checksum((unsigned char *)h,
-    39						   sizeof(*h) + payload - 4);
-    40		if (*pchecksum != htonl(checksum))
-    41			return -EINVAL;
-    42	
-    43		return 0;
-    44	}
-    45	
-    46	static int ncsi_aen_handler_lsc(struct ncsi_dev_priv *ndp,
-    47					struct ncsi_aen_pkt_hdr *h)
-    48	{
-    49		struct ncsi_channel *nc, *tmp;
-    50		struct ncsi_channel_mode *ncm;
-    51		unsigned long old_data, data;
-    52		struct ncsi_aen_lsc_pkt *lsc;
-    53		struct ncsi_package *np;
-    54		bool had_link, has_link;
-    55		unsigned long flags;
-    56		bool chained;
-    57		int state;
-    58	
-    59		/* Find the NCSI channel */
-    60		ncsi_find_package_and_channel(ndp, h->common.channel, NULL, &nc);
-    61		if (!nc)
-    62			return -ENODEV;
-    63	
-    64		/* Update the link status */
-    65		lsc = (struct ncsi_aen_lsc_pkt *)h;
-    66	
-    67		spin_lock_irqsave(&nc->lock, flags);
-    68		ncm = &nc->modes[NCSI_MODE_LINK];
-    69		old_data = ncm->data[2];
-    70		data = ntohl(lsc->status);
-    71		ncm->data[2] = data;
-    72		ncm->data[4] = ntohl(lsc->oem_status);
-    73	
-    74		had_link = !!(old_data & 0x1);
-    75		has_link = !!(data & 0x1);
-    76	
-  > 77		netdev_dbg(ndp->ndev.dev, "NCSI: LSC AEN - channel %u state %s\n",
-  > 78			   nc->id, str_up_down(data & 0x1));
-    79	
-    80		chained = !list_empty(&nc->link);
-    81		state = nc->state;
-    82		spin_unlock_irqrestore(&nc->lock, flags);
-    83	
-    84		if (state == NCSI_CHANNEL_INACTIVE)
-    85			netdev_warn(ndp->ndev.dev,
-    86				    "NCSI: Inactive channel %u received AEN!\n",
-    87				    nc->id);
-    88	
-    89		if ((had_link == has_link) || chained)
-    90			return 0;
-    91	
-    92		if (!ndp->multi_package && !nc->package->multi_channel) {
-    93			if (had_link) {
-    94				ndp->flags |= NCSI_DEV_RESHUFFLE;
-    95				ncsi_stop_channel_monitor(nc);
-    96				spin_lock_irqsave(&ndp->lock, flags);
-    97				list_add_tail_rcu(&nc->link, &ndp->channel_queue);
-    98				spin_unlock_irqrestore(&ndp->lock, flags);
-    99				return ncsi_process_next_channel(ndp);
-   100			}
-   101			/* Configured channel came up */
-   102			return 0;
-   103		}
-   104	
-   105		if (had_link) {
-   106			ncm = &nc->modes[NCSI_MODE_TX_ENABLE];
-   107			if (ncsi_channel_is_last(ndp, nc)) {
-   108				/* No channels left, reconfigure */
-   109				return ncsi_reset_dev(&ndp->ndev);
-   110			} else if (ncm->enable) {
-   111				/* Need to failover Tx channel */
-   112				ncsi_update_tx_channel(ndp, nc->package, nc, NULL);
-   113			}
-   114		} else if (has_link && nc->package->preferred_channel == nc) {
-   115			/* Return Tx to preferred channel */
-   116			ncsi_update_tx_channel(ndp, nc->package, NULL, nc);
-   117		} else if (has_link) {
-   118			NCSI_FOR_EACH_PACKAGE(ndp, np) {
-   119				NCSI_FOR_EACH_CHANNEL(np, tmp) {
-   120					/* Enable Tx on this channel if the current Tx
-   121					 * channel is down.
-   122					 */
-   123					ncm = &tmp->modes[NCSI_MODE_TX_ENABLE];
-   124					if (ncm->enable &&
-   125					    !ncsi_channel_has_link(tmp)) {
-   126						ncsi_update_tx_channel(ndp, nc->package,
-   127								       tmp, nc);
-   128						break;
-   129					}
-   130				}
-   131			}
-   132		}
-   133	
-   134		/* Leave configured channels active in a multi-channel scenario so
-   135		 * AEN events are still received.
-   136		 */
-   137		return 0;
-   138	}
-   139	
+Please do. Docs for *any* the stats I've added in the last 3 years 
+will do.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> >> But why should it propagate?   
+> > 
+> > I'm saying it shouldn't. The next NIC driver Intel (inevitably :))  
+> 
+> FYI I already nack inside Intel any new drivers since I was promised
+> that each next generation will be based on top of idpf.
+
+I don't mind new drivers, how they get written is a bigger problem,
+but that's a different discussion.
+
+> >> I'll be happy to remove that for basic Rx/Tx queues (and leave only
+> >> those which don't exist yet in the NL stats) and when you introduce
+> >> more fields to NL stats, removing more from ethtool -S in this
+> >> library will be easy.  
+> > 
+> > I don't scale to remembering 1 easy thing for each driver we have.  
+> 
+> Introducing a new field is adding 1 line with its name to the macro
+> since everything else gets expanded from these macros anyway.
+
+Are you saying that people on your team struggle to add a statistic?
+#1 correctness, #2 readability. LoC only matters indirectly under #2.
+
+> >> But let's say what should we do with XDP Tx
+> >> queues? They're invisible to rtnl as they are past real_num_tx_queues.  
+> > 
+> > They go to ethtool -S today. It should be relatively easy to start
+> > reporting them. I didn't add them because I don't have a clear use 
+> > case at the moment.  
+> 
+> The same as for regular Tx: debugging, imbalance etc.
+
+I'm not trying to imply they are useless. I just that I, subjectively,
+don't have a clear use case in Meta's production env.
+
+> > save space on all the stats I'm not implementing.  
+> 
+> The stats I introduced here are supported by most, if not every, modern
+> NIC drivers. Not supporting header split or HW GRO will save you 16
+> bytes on the queue struct which I don't think is a game changer.
+
+You don't understand. I built some infra over the last 3 years.
+You didn't bother reading it. Now you pop our own thing to the side,
+extending ethtool -S which is _unusable_ in a multi-vendor, production
+environment.
+
+> >> * implementing NL stats in drivers, not here; not exporting NL stats
+> >> to ethtool -S
+> >>
+> >> A driver wants to export a field which is missing in the lib? It's a
+> >> couple lines to add it. Another driver doesn't support this field and
+> >> you want it to still be 0xff there? Already noted and I'm already
+> >> implementing a different model.  
+> > 
+> > I think it will be very useful if you could step back and put on paper
+> > what your goals are with this work, exactly.  
+> 
+> My goals:
+> 
+> * reduce boilerplate code in drivers: declaring stats structures,
+> Ethtool stats names, all these collecting, aggregating etc etc, you see
+> in the last commit of the series how many LoCs get deleted from idpf,
+> +/- the same amount would be removed from any other driver
+
+ 21 files changed, 1634 insertions(+), 1002 deletions(-)
+
+> * reduce the time people debug and fix bugs in stats since it will be
+> just in one place, not in each driver
+
+Examples ?
+
+> * have more consistent names in ethtool -S
+
+Forget it, better infra exists. Your hack to make stat count
+"consistent" doesn't work either. Unless you assume only one process
+can call ethtool -S at a time.
+
+> * have more consistent stats sets in drivers since even within Intel
+> drivers it's a bit of a mess which stats are exported etc.
+
+Consistently undocumented :( qstats exist and are documented.
+
+> Most of your pushback here sounds like if I would try to introduce this
+> in the core code, but I don't do that here. This infra saves a lot of
+> locs
+
+s/saves/may save/ ?
+
+> and time when used in the Intel drivers and it would be totally
+> fine for me if some pieces of the lib goes into the core, but these
+> stats don't.
+> I didn't declare anywhere that everyone must use it or that it's core
+> code, do you want me to change this MODULE_DESCRIPTION()?
+
+I deeply dislike the macro templating. Complex local systems of this
+sort make it really painful to do cross-driver changes. It's fine for
+you because you wrote this, but speaking from experience (mlx5) it makes
+modifying the driver for an outside much harder.
+
+If you think the core infra is lacking, please improve it instead of
+inventing your own, buggy one.
 
