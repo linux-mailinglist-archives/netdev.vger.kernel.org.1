@@ -1,79 +1,54 @@
-Return-Path: <netdev+bounces-122165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13EC1960370
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:41:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3037896036F
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:41:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43AD11C22715
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 07:41:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D067A1F2291D
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 07:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485CC158218;
-	Tue, 27 Aug 2024 07:41:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A0F155C97;
+	Tue, 27 Aug 2024 07:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FaQz+IjN"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="X0P/MEOT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EDEC156887
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 07:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1865145B10
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 07:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724744513; cv=none; b=UJuw2lKlV447iLIHVROoNAFDoIbo1ikJ5kK2iXoN60XESDruAq3oNLDsXgfT+WskmhOglqkPWMOFqbg5RgOin0NRoJWQyI8dkeNMMc9VnuoGilyBAUFDLf3eDghSqpKWE1I7lqS2T7EEOxfY+d0k38j8iDfixYlmV/hc/1JRQ+E=
+	t=1724744510; cv=none; b=hV4L0f+o7k4xIsCx5r+V8wKzHIP16u1QpE0Ghuqzn8AyBBKkO87x+87r/TOrPF1Z2bWGOJFVkyHqvUKc29McrL2qaly6KNeaep+57jTvSIPOuIuj5CREo1mvdSuE2u4ngqi9cCFAiqAHpe2GKZi3bGW0LQw2XcpEzSp9F21ZjLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724744513; c=relaxed/simple;
-	bh=zelOIQePu7H4uuGbqSZhIFcd309RvgW1+Nbh7fryVXw=;
+	s=arc-20240116; t=1724744510; c=relaxed/simple;
+	bh=8nLX8Gsn6K97MZA3oISwte7q22e1l7/nSWNRmTt/RU8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pow98YyFqPbVgGdwfywzdeKNGkMqiRxyLy+0seIYZRWvW69cgCWfhw4oyd2tvOmQOaYPWid1wPHQzWlLPLRzZHUDco5+kav36mdBaGlD5/7qWo9t+f9dL+d2u8QZ4kECs6dxFAdsCgbmhMLFPwDAOszX8lTWBWOcKA213OS5Auo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FaQz+IjN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724744510;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8rkmXht8ELAj8/Z1M413Q0lIBoYimB7MGM/7Iwz5T8A=;
-	b=FaQz+IjNFlkQBHmaMoBMncLsxfmX+eBc9ruWcd2oiECpmeES9GL3W0cCTsoPefCNSVsmrx
-	XUhEbLo7aFtpbzZ/X1GjDDp/E2wBEDzyT5usKSesh6DeHqKB/0lS034lPaKyPUXMYWVc7Q
-	TGRdCufih90MkQJ63CMy4yU3CujnlW8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-fHDbzGZENvitnAgV0xE2MQ-1; Tue, 27 Aug 2024 03:41:48 -0400
-X-MC-Unique: fHDbzGZENvitnAgV0xE2MQ-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-371ab0c02e0so4193426f8f.3
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 00:41:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724744507; x=1725349307;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8rkmXht8ELAj8/Z1M413Q0lIBoYimB7MGM/7Iwz5T8A=;
-        b=aRkyQeucr0cVJnhYrKA6PwX21TIJeD//+mtse6W6uuovY7vLzM/KI+QIuToSva9a6R
-         JP+dFORM47TBCHv71X0SSzaDoPdA1s3VS83YnvpjJAAGSM2AwGLR9ws8sLwpoIVrbbcG
-         PL9nNSSphFUgH8/GBlA3+8yFtVVLPgWy5QspLG1MdQt7h3HSWdxBQ3cNUG0YID7l849I
-         Uvf+HVaBMCkquyUgywh0NRucZZmc9vBBwtRXn0lArwJFmOR/meFrTR9pFZ7U9zaamYjE
-         X/GU4xZ4K7y3R2bpZWyVm8Sbd7VeK6GL7QfapPi6IHZ4uQn5j28nFl5mQdzwldzPjVwm
-         0djA==
-X-Gm-Message-State: AOJu0YxBxUDVanjVbs9WnBwuAmQONC+wGY+dzzBvn32fHMYNYDPIHOnE
-	gyNlB+D5Stm2+U7kf0e62JtOnR9Ads3AN2q1epiwPygYgx11PRJRQEaYsChe1sCZnYDWQNhJJ7F
-	KFCfkzhQS/4a2tGgXEy69i0qSWwgWTJoORyi65z8IhutghugrRUvf7w==
-X-Received: by 2002:adf:a3cd:0:b0:371:869b:4e5e with SMTP id ffacd0b85a97d-3731184053emr10030767f8f.1.1724744507339;
-        Tue, 27 Aug 2024 00:41:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFUZE9Kc58SP3ARGp/nCOgTYwrQVtiO2LVg9tB14o5e4cuJhSWDcyiBRkvA+vZ7QJnBkKXp9g==
-X-Received: by 2002:adf:a3cd:0:b0:371:869b:4e5e with SMTP id ffacd0b85a97d-3731184053emr10030747f8f.1.1724744506777;
-        Tue, 27 Aug 2024 00:41:46 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b67:7410::f71? ([2a0d:3344:1b67:7410::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-373081ffb4dsm12470636f8f.74.2024.08.27.00.41.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Aug 2024 00:41:46 -0700 (PDT)
-Message-ID: <db504183-1019-4fbb-bee9-7fc19f8bbe7d@redhat.com>
-Date: Tue, 27 Aug 2024 09:41:44 +0200
+	 In-Reply-To:Content-Type; b=GLK4rT88mJYQq2bL3tJjY2F+pnpSUwhAxj4SzBTYI3nsNNmZLn1s2eHAyGue0vvUNl7dx/yBz1C8NDnxoq621yxyukNwPWksciRxdWT0vjlX7dO5t4JtXJIwQneF8jDQ8NdUX5QiaiGNonq1Aopdoqbqb5frjDaOcb/ddnwWk3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=X0P/MEOT; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id DE670200C963;
+	Tue, 27 Aug 2024 09:41:45 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be DE670200C963
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1724744505;
+	bh=iIdSjugLXzGVwC/ZFpXzUaad4AKc8GjSTU1gircKYug=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=X0P/MEOTgPVf9Ke3ILAGMavkg0FfgGWPhgemihN5m/HmSfcV7MXYY/TM+XniDz74/
+	 69s49PGbqeb+bG1LK/fvumtbnf3sj8Ty1uVfW6Qj7ZK7cxBq3X2YdhWDr9xkWOU5lI
+	 brih56xpC52/cn/zwcpETtB/f6CYzQHz3ZtN7MPddfhe88+SpqpUxHijrcCXe8pkPn
+	 Sb18YyPHRUemQof3PLaEsRktvXKHyJHR3gfpE6wX9hfXGxO2rKeCEhfZWJAIdoclKz
+	 bsdn+QVRGec5i5isXZ6MzrFZFiS3V0x6SEROFZ2d36gTIH4IoAZIFUFOLI32Ybkqb/
+	 Y98EL0SIW4Plg==
+Message-ID: <e8420765-dec6-4802-8255-89f9f6965c59@uliege.be>
+Date: Tue, 27 Aug 2024 09:41:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,77 +56,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 02/12] netlink: spec: add shaper YAML spec
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
- Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>
-References: <cover.1724165948.git.pabeni@redhat.com>
- <dac4964232855be1444971d260dab0c106c86c26.1724165948.git.pabeni@redhat.com>
- <20240822184824.3f0c5a28@kernel.org>
- <ad5be943-2aa6-4f60-be90-929f889e6057@redhat.com>
- <20240826185055.38e1857f@kernel.org>
+Subject: Re: [PATCH iproute2-next v2 1/2] ip: lwtunnel: tunsrc support
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, dsahern@kernel.org
+References: <20240826135229.13220-1-justin.iurman@uliege.be>
+ <20240826135229.13220-2-justin.iurman@uliege.be>
+ <20240826085914.445c3510@hermes.local>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240826185055.38e1857f@kernel.org>
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <20240826085914.445c3510@hermes.local>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 8/27/24 03:50, Jakub Kicinski wrote:
-> On Fri, 23 Aug 2024 10:35:05 +0200 Paolo Abeni wrote:
->>>> +        name: node
->>>> +        doc: |
->>>> +             The shaper allows grouping of queues or others
->>>> +             node shapers, is not attached to any user-visible
->>>
->>> Saying it's not attached is confusing. Makes it sound like it exists
->>> outside of the scope of a struct net_device.
->>
->> What about:
->>
->>     Can be placed in any arbitrary location of
->>     the scheduling tree, except leaves and root.
+On 8/26/24 17:59, Stephen Hemminger wrote:
+> On Mon, 26 Aug 2024 15:52:28 +0200
+> Justin Iurman <justin.iurman@uliege.be> wrote:
 > 
-> Oh, I was thinking along the same lines above.
-> Whether "except leaves or root" or "inner node" is clearer is up to you.
-
-I agree "inner node" should be clear.
-
->>>> +      -
->>>> +        name: weight
->>>> +        type: u32
->>>> +        doc: |
->>>> +          Weighted round robin weight for given shaper.
->>>
->>> Relative weight of the input into a round robin node.
->>
->> I would avoid mentioning 'input' unless we rolls back to the previous
->> naming scheme.
+>> -	if (mode != IOAM6_IPTUNNEL_MODE_INLINE)
+>> +	if (mode != IOAM6_IPTUNNEL_MODE_INLINE) {
+>> +		if (tb[IOAM6_IPTUNNEL_SRC]) {
+>> +			print_string(PRINT_ANY, "tunsrc", "tunsrc %s ",
+>> +				     rt_addr_n2a_rta(AF_INET6,
+>> +						     tb[IOAM6_IPTUNNEL_SRC]));
+>> +		}
+>> +
+>>   		print_string(PRINT_ANY, "tundst", "tundst %s ",
+>>   			     rt_addr_n2a_rta(AF_INET6, tb[IOAM6_IPTUNNEL_DST]));
+>> +	}
 > 
-> Okay, how about:
+> Looks good.
+> These strings should be printed with
+> 		print_color_string(PRINT_ANY, COLOR_INET6, ...
 > 
-> 	Relative weight used by a parent round robin node.
+> but that is not urgent. Just to follow convention.
 
-Fine by me.
-
->>>> +           Differently from @leaves and @shaper allow specifying
->>>> +           the shaper parent handle, too.
->>>
->>> Maybe this attr is better called "node", after all.
->>
->> Fine by me, but would that cause some confusion with the alias scope
->> value?
-> 
-> But to be clear, the "root" describes the node we're creating, right?
-
-Yes. I guess the possible confusion I mentioned will not be so 
-confusing, after all. I'll go with this option.
-
-Thanks,
-
-Paolo
-
+Ack, thanks! I can submit -v3 now to include the change though. WDYT?
 
