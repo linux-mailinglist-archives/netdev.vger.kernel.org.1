@@ -1,154 +1,182 @@
-Return-Path: <netdev+bounces-122353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76935960C63
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:41:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE28960C66
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:42:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F46F1F21181
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:41:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3C551C22D9B
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28D1E1BFE04;
-	Tue, 27 Aug 2024 13:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F4C11C2DD5;
+	Tue, 27 Aug 2024 13:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AxxH/jFA"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC671BFE1C
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 13:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D0A1C1729;
+	Tue, 27 Aug 2024 13:41:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724766088; cv=none; b=o48t09yqBtfl025DEBVT+CWqGiW8vRGicdw1g7G3By++Z/o+0onZX4IaGu2KneBKVkra+anckBpcUkXv4SVqu7uPaIEb5ZZK2fJi0jchUMA6nWqz1s6KXk2sKzp7HheeM2ioYRAQCM6AtqGi0OTsSU4rKcLJHipM0kxaU0RFoys=
+	t=1724766092; cv=none; b=CBncZURCfuOCQxnRb0OvdmY7KqnOhczpYyODiSvtlxKcMsLsH4+1Nu27nc9SOwdR82RyS/f9sxUxKHke/fteEiknuG9ierMoe4uHZBFxwiqBwnL1uOl1BXmctskWI0K5ggLt+PKeq44JxeksTq+KQA3grY7bAme9HikpM9UHozQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724766088; c=relaxed/simple;
-	bh=BJQTUzZjxM9ugGvdHLngGKbxPIyGSC3VTspxMw/BoQw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j5KQ3mCcP2f68OrJW6haltZi58ym/31+SResg2CnTxVxmqROvGnfDz7swbc9Ua8R1nGGcMsm61yRujkF2wyPeCiwJbClWJpSUa0f4mjqCeQj14V2JOMTuORmt27Y68cyWD/A0Ueu8lKnldrLp4Mivd11KOA+VwS4Jc1pWdtg0L0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1siwRo-00039I-G3; Tue, 27 Aug 2024 15:41:24 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH ipsec-next] xfrm: minor update to sdb and xfrm_policy comments
-Date: Tue, 27 Aug 2024 15:38:23 +0200
-Message-ID: <20240827133827.19259-1-fw@strlen.de>
-X-Mailer: git-send-email 2.44.2
+	s=arc-20240116; t=1724766092; c=relaxed/simple;
+	bh=U7jlPpHqXBl4HV4XuzMC0RMz+LSPT7aClOWD+Th3CoE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=glLYummD94NIvB5tBO1MwHWzryZ2Xl+D9Cb33fKQlf7ZFl3yZGO1UtHICXD7+wr/QyhEKJV/fndhqnE7Erz0vPAKyTsLWIJfxjGH0rabUzsWhHv/9WfM+Vlyx22Z0lcYvnYlwy8ROIUdyuIgJ/mSvDSaWoW+PWPl00LAf1l8KUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AxxH/jFA; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724766090; x=1756302090;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=U7jlPpHqXBl4HV4XuzMC0RMz+LSPT7aClOWD+Th3CoE=;
+  b=AxxH/jFA8PZ92SNwS9sR2tRh3+AiaHN/RtchTyNECD9eOLkxSmyxGxYF
+   72ZFtt30sw2MZ1A59ZiMuLpg0Y4VviNEtnVlPT6iRsbv30f9pISmAVDrz
+   NXmeOCIefDVhxZZRvzFUeNkXGD9MtCfGOTOZn7CHw/SNw9ojN3riyCY0H
+   KwaVoXP2fVb7yd3eg9j4gqOc1FYso/uawhYJlbQEfY5a9m0qk16RX4vi1
+   8HkwjkqN7TWgAcmrY1D9599K1vUi+oENs61739snKtIWdyEb5qkzQ60XR
+   MsMJ2JUa8C44sBLf0yr95vyoaTr0/OBojFtEa2rXM2IonWSxTzh+D6sIB
+   g==;
+X-CSE-ConnectionGUID: +ccZ5rAkTEOHGXQFmjHUSw==
+X-CSE-MsgGUID: 0ELZmLKATRWPKuwdM1el7Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11177"; a="23419545"
+X-IronPort-AV: E=Sophos;i="6.10,180,1719903600"; 
+   d="scan'208";a="23419545"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 06:41:25 -0700
+X-CSE-ConnectionGUID: W1apEhwKSGmNNLyQayeLSQ==
+X-CSE-MsgGUID: Z0N4/UqFQ1C3dS2rbcQ+hw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,180,1719903600"; 
+   d="scan'208";a="67727828"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by orviesa005.jf.intel.com with ESMTP; 27 Aug 2024 06:41:21 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1siwRj-000Ih8-0F;
+	Tue, 27 Aug 2024 13:41:19 +0000
+Date: Tue, 27 Aug 2024 21:40:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: Shakeel Butt <shakeel.butt@linux.dev>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Muchun Song <muchun.song@linux.dev>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	David Rientjes <rientjes@google.com>,
+	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Meta kernel team <kernel-team@meta.com>, cgroups@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v1] memcg: add charging of already allocated slab objects
+Message-ID: <202408272111.T6bMZmU9-lkp@intel.com>
+References: <20240826232908.4076417-1-shakeel.butt@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240826232908.4076417-1-shakeel.butt@linux.dev>
 
-The spd is no longer maintained as a linear list.
-We also haven't been caching bundles in the xfrm_policy
-struct since 2010.
+Hi Shakeel,
 
-While at it, add kdoc style comments for the xfrm_policy structure
-and extend the description of the current rbtree based search to
-mention why it needs to search the candidate set.
+kernel test robot noticed the following build errors:
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- include/net/xfrm.h     | 40 +++++++++++++++++++++++++++++++++++-----
- net/xfrm/xfrm_policy.c |  6 +++++-
- 2 files changed, 40 insertions(+), 6 deletions(-)
+[auto build test ERROR on akpm-mm/mm-everything]
+[also build test ERROR on linus/master v6.11-rc5 next-20240827]
+[cannot apply to vbabka-slab/for-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 1fa2da22a49e..b6bfdc6416c7 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -67,13 +67,15 @@
-    - instance of a transformer, struct xfrm_state (=SA)
-    - template to clone xfrm_state, struct xfrm_tmpl
- 
--   SPD is plain linear list of xfrm_policy rules, ordered by priority.
-+   SPD is organized as hash table (for policies that meet minimum address prefix
-+   length setting, net->xfrm.policy_hthresh).  Other policies are stored in
-+   lists, sorted into rbtree ordered by destination and source address networks.
-+   See net/xfrm/xfrm_policy.c for details.
-+
-    (To be compatible with existing pfkeyv2 implementations,
-    many rules with priority of 0x7fffffff are allowed to exist and
-    such rules are ordered in an unpredictable way, thanks to bsd folks.)
- 
--   Lookup is plain linear search until the first match with selector.
--
-    If "action" is "block", then we prohibit the flow, otherwise:
-    if "xfrms_nr" is zero, the flow passes untransformed. Otherwise,
-    policy entry has list of up to XFRM_MAX_DEPTH transformations,
-@@ -86,8 +88,6 @@
-                      |---. child .-> dst -. xfrm .-> xfrm_state #3
-                                       |---. child .-> NULL
- 
--   Bundles are cached at xrfm_policy struct (field ->bundles).
--
- 
-    Resolution of xrfm_tmpl
-    -----------------------
-@@ -526,6 +526,36 @@ struct xfrm_policy_queue {
- 	unsigned long		timeout;
- };
- 
-+/**
-+ *	struct xfrm_policy - xfrm policy
-+ *	@xp_net: network namespace the policy lives in
-+ *	@bydst: hlist node for SPD hash table or rbtree list
-+ *	@byidx: hlist node for index hash table
-+ *	@lock: serialize changes to policy structure members
-+ *	@refcnt: reference count, freed once it reaches 0
-+ *	@pos: kernel internal tie-breaker to determine age of policy
-+ *	@timer: timer
-+ *	@genid: generation, used to invalidate old policies
-+ *	@priority: priority, set by userspace
-+ *	@index:  policy index (autogenerated)
-+ *	@if_id: virtual xfrm interface id
-+ *	@mark: packet mark
-+ *	@selector: selector
-+ *	@lft: liftime configuration data
-+ *	@curlft: liftime state
-+ *	@walk: list head on pernet policy list
-+ *	@polq: queue to hold packets while aqcuire operaion in progress
-+ *	@bydst_reinsert: policy tree node needs to be merged
-+ *	@type: XFRM_POLICY_TYPE_MAIN or _SUB
-+ *	@action: XFRM_POLICY_ALLOW or _BLOCK
-+ *	@flags: XFRM_POLICY_LOCALOK, XFRM_POLICY_ICMP
-+ *	@xfrm_nr: number of used templates in @xfrm_vec
-+ *	@family: protocol family
-+ *	@security: SELinux security label
-+ *	@xfrm_vec: array of templates to resolve state
-+ *	@rcu: rcu head, used to defer memory release
-+ *	@xdo: hardware offload state
-+ */
- struct xfrm_policy {
- 	possible_net_t		xp_net;
- 	struct hlist_node	bydst;
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 94859b2182ec..6336baa8a93c 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -109,7 +109,11 @@ struct xfrm_pol_inexact_node {
-  * 4. saddr:any list from saddr tree
-  *
-  * This result set then needs to be searched for the policy with
-- * the lowest priority.  If two results have same prio, youngest one wins.
-+ * the lowest priority.  If two candidates have the same priority, the
-+ * struct xfrm_policy pos member with the lower number is used.
-+ *
-+ * This replicates previous single-list-search algorithm which would
-+ * return first matching policy in the (ordered-by-priority) list.
-  */
- 
- struct xfrm_pol_inexact_key {
+url:    https://github.com/intel-lab-lkp/linux/commits/Shakeel-Butt/memcg-add-charging-of-already-allocated-slab-objects/20240827-073150
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-everything
+patch link:    https://lore.kernel.org/r/20240826232908.4076417-1-shakeel.butt%40linux.dev
+patch subject: [PATCH v1] memcg: add charging of already allocated slab objects
+config: openrisc-allnoconfig (https://download.01.org/0day-ci/archive/20240827/202408272111.T6bMZmU9-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240827/202408272111.T6bMZmU9-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408272111.T6bMZmU9-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/asm-generic/bug.h:5,
+                    from arch/openrisc/include/asm/bug.h:5,
+                    from include/linux/bug.h:5,
+                    from include/linux/mmdebug.h:5,
+                    from include/linux/mm.h:6,
+                    from mm/slub.c:13:
+   mm/slub.c: In function 'kmem_cache_charge':
+>> mm/slub.c:4115:44: error: 'struct slabobj_ext' has no member named 'objcg'
+    4115 |                 if (unlikely(slab_exts[off].objcg))
+         |                                            ^
+   include/linux/compiler.h:77:45: note: in definition of macro 'unlikely'
+      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+         |                                             ^
+
+
+vim +4115 mm/slub.c
+
+  4085	
+  4086	#define KMALLOC_TYPE (SLAB_KMALLOC | SLAB_CACHE_DMA | \
+  4087			      SLAB_ACCOUNT | SLAB_RECLAIM_ACCOUNT)
+  4088	
+  4089	bool kmem_cache_charge(void *objp, gfp_t gfpflags)
+  4090	{
+  4091		struct slabobj_ext *slab_exts;
+  4092		struct kmem_cache *s;
+  4093		struct folio *folio;
+  4094		struct slab *slab;
+  4095		unsigned long off;
+  4096	
+  4097		if (!memcg_kmem_online())
+  4098			return true;
+  4099	
+  4100		folio = virt_to_folio(objp);
+  4101		if (unlikely(!folio_test_slab(folio)))
+  4102			return false;
+  4103	
+  4104		slab = folio_slab(folio);
+  4105		s = slab->slab_cache;
+  4106	
+  4107		/* Ignore KMALLOC_NORMAL cache to avoid circular dependency. */
+  4108		if ((s->flags & KMALLOC_TYPE) == SLAB_KMALLOC)
+  4109			return true;
+  4110	
+  4111		/* Ignore already charged objects. */
+  4112		slab_exts = slab_obj_exts(slab);
+  4113		if (slab_exts) {
+  4114			off = obj_to_index(s, slab, objp);
+> 4115			if (unlikely(slab_exts[off].objcg))
+  4116				return true;
+  4117		}
+  4118	
+  4119		return memcg_slab_post_charge(s, objp, gfpflags);
+  4120	}
+  4121	EXPORT_SYMBOL(kmem_cache_charge);
+  4122	
+
 -- 
-2.44.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
