@@ -1,119 +1,228 @@
-Return-Path: <netdev+bounces-122268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C28A960941
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:49:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A54AA960958
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:54:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD8D6B21E89
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:49:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E9EB28283E
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C4819EEA1;
-	Tue, 27 Aug 2024 11:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFE2C1A01AB;
+	Tue, 27 Aug 2024 11:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iljnwqt9"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="zOzev3E+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pv50p00im-ztdg10011901.me.com (pv50p00im-ztdg10011901.me.com [17.58.6.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABE919DFAE
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 11:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77DD119D88C
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 11:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724759360; cv=none; b=j+56RqE42HX6bA8JEONC5z+V/mxFVBosAK9C9h3IBDKaemgsOoVhnkzo7Pe7FnTqW7LWabxGLCGOWVGp5KSfiRa1olHvmA3sGLrK9IksRl2s7Y3pVHVsqaIoEddSYGLr4g3WQERIlcVOH8J5qYPODlqINUR7leSm9iiG3wKaTVk=
+	t=1724759650; cv=none; b=KMiDgF8DAVByL6V+L79u4AN1LfHbqjAKgwAkOtcA8mAskDIX5G8+TgqksXjUzpkEC1ednTny8aH20Lu/cXg8gsNVRkKvGA3ZtHklQSGV92z2oFuKCiRWrs5QCJrfl+B/mV/Mvi4iDZcFG1IJdS5BjbNJo/SbVTXtWwwE9MKV+cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724759360; c=relaxed/simple;
-	bh=2Siwk+eoZn+UtzA3M0/PrBRxZKOZBRyUjbtOvXmjhF4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ys+Pgfa8487SDBfB5Qsb7cQ6hqO66QV3653s2cdcNwHZjeG2BWdcc9tuXYJctzs3Ag7KznA7BohtGqSdHAvUwOEfC84PNaGklyxXrWX7aZ3gD27EOdg2QpsM+bzktEv1oFZX2qLC9ijs0ZxecBnZDo6U52rLXy0VIuJW6uqa9NY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iljnwqt9; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e164ceba5ffso9112713276.3
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 04:49:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724759358; x=1725364158; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=69D5peCSYp2I00KAIuUBn8R/8xHCHZXugKONOw7+84s=;
-        b=iljnwqt9EfBtkXv9f4vns4ZS961umxy3BVd02lbzvxHrv554rSYDiR0QgwQ1e1UECm
-         XygjE5/7MdTMwAlHy9MIZ/HmhGP2peo5XJD2bn7MEzaBQRlT5LRD3TOy501xfmtq4z8B
-         K0v2S8k6ufV2UntRqXy+u/F0FZtJRD5mRQfmdCToqQGQmohOj/i6pDix4T5ZVi9+sRGW
-         CoRI30Bh4WM6y2lXsT0TMXnk8jTD0y8KfvzOTEogq5B7f9rwOogjuXkS3cr1F6pHbHS4
-         KHydeT7OQtBcThVIhqgcZNoG6msDXQ9kCHXgxRAXp74Wg02hp142u0Na1UZYgnpBHctg
-         TN0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724759358; x=1725364158;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=69D5peCSYp2I00KAIuUBn8R/8xHCHZXugKONOw7+84s=;
-        b=N5LCXSrXq77Z45syLV49/H7w7RI7rT6heyplZIIjJ9BMfU4g13aeJzAE6M64RuEpWG
-         7uk1OW/gxqr2+UTLEgcjbdJDuR8ZVBRrnWcgZ8bzi84PqqDkWvq2WAf+/cioJrjWDbmG
-         s3nehEjrYfRoLA+Ad6wTQOa+VhFf1AnKMSarPdU1cBh+RhN2cI226+uBexTkhmdTd+dK
-         87cZozBx4LveJ/D4ZIJyVxINPJ0uHxh89AjTU8LnjVBvtmkg8bP5TJfue9rMf2BuRygr
-         9SQqoJpuko7cOwNYNxkByiTnOCuk5RSbfH/Z0+X+HJWitHQk8dYJ/VIYehsGB/HPs6xF
-         MguA==
-X-Gm-Message-State: AOJu0YzfP5GiYuYIw+8kWcdqIuTlfJW+1BHgBYe8Nlcj2UCVgVf6Ia/C
-	j88dtyBKdUwuxEtt78hh00tORadVfwWpxv8uTW1WAR7Mn3IC0yrpf2nbazT5iW2rKRRGsPjcAo2
-	zRwAumsY04A==
-X-Google-Smtp-Source: AGHT+IHnqa0pwtZOjIl0VK1oOjnQLjUJtAYsw0qXoPW+TnvNIuLadlrfNkFpyCpw6qIzhhiMtSSFUFE2YY3KHA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:9:b0:e0e:cd5e:f8a5 with SMTP id
- 3f1490d57ef6-e1a2a5b0213mr23484276.4.1724759358008; Tue, 27 Aug 2024 04:49:18
- -0700 (PDT)
-Date: Tue, 27 Aug 2024 11:49:16 +0000
+	s=arc-20240116; t=1724759650; c=relaxed/simple;
+	bh=nEi8II45wAmL1f5XTIWsbyTtcx8NX0c09t6x4DVix6A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GfSi24HYYCYku+u1mw2A0nxM7/qP7qx7V9UkORFjJoPTeaJgdnuiBhuihWKCmoy0Y3e8lR3FhBh3YrRN9eHph3MQNwu420usjtMX9YAS+tgWXMYtnYiYZFxvr7OI7GU5jWDK9nk6T0yiHCYPeY0iPckeQAZ4/Y9m/EaVXiY9lb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=zOzev3E+; arc=none smtp.client-ip=17.58.6.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1724759649;
+	bh=OYrHNLwmvHe2oa0rD8JJuTUs4ODsC2IJMqoKI314ldc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	b=zOzev3E+mosk3j16HL4HiEHL5WWqXUvHyj+nqVG/LPaaLQZRkO/seWBBb5BOOhchn
+	 O8MU75aMMqEEYO85vpySf8LxFn8N/b43eXisXvYRgH+QJU/0WExah46MmVzN9K1X48
+	 eb9NV60IlxYNaiRXPck10Ma9wo4ObI2DfJaQTEShk6Qjyvv9/tzEh9bdetfRkGQYIT
+	 EfFwSR4zeMoBe+zKTu4R0r+LCH8Cdr/Re0/DjjHX3XqpDbrjnHxBnASU5tAPwoQmhS
+	 Eeo37doe9R1qcHVXLWqFnTGzz3zUx8F64fmjjPetf/zgqiLHxrM5+Ny6OsdkusmJUN
+	 Pg5Rzlw8tC8gg==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-ztdg10011901.me.com (Postfix) with ESMTPSA id DDCA83A008D;
+	Tue, 27 Aug 2024 11:53:59 +0000 (UTC)
+Message-ID: <cdfc6f98-1aa0-4cb5-bd7d-93256552c39b@icloud.com>
+Date: Tue, 27 Aug 2024 19:53:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
-Message-ID: <20240827114916.223377-1-edumazet@google.com>
-Subject: [PATCH net] net: busy-poll: use ktime_get_ns() instead of local_clock()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Mina Almasry <almasrymina@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Joe Damato <jdamato@fastly.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/3] cxl/region: Find free cxl decoder by
+ device_for_each_child()
+To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Davidlohr Bueso
+ <dave@stgolabs.net>, Dave Jiang <dave.jiang@intel.com>,
+ Alison Schofield <alison.schofield@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Takashi Sakamoto <o-takashi@sakamocchi.jp>, Timur Tabi <timur@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
+ netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+References: <20240824-const_dfc_prepare-v3-0-32127ea32bba@quicinc.com>
+ <20240824-const_dfc_prepare-v3-2-32127ea32bba@quicinc.com>
+ <20240827123006.00004527@Huawei.com>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <20240827123006.00004527@Huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: zXSu555QJvhB-nSvhZ59A5Eowv9iK99L
+X-Proofpoint-GUID: zXSu555QJvhB-nSvhZ59A5Eowv9iK99L
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-27_06,2024-08-27_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxlogscore=999
+ clxscore=1015 adultscore=0 suspectscore=0 bulkscore=0 phishscore=0
+ spamscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2408270087
 
-Typically, busy-polling durations are below 100 usec.
+On 2024/8/27 19:30, Jonathan Cameron wrote:
+> On Sat, 24 Aug 2024 17:07:44 +0800
+> Zijun Hu <zijun_hu@icloud.com> wrote:
+> 
+>> From: Zijun Hu <quic_zijuhu@quicinc.com>
+>>
+>> To prepare for constifying the following old driver core API:
+>>
+>> struct device *device_find_child(struct device *dev, void *data,
+>> 		int (*match)(struct device *dev, void *data));
+>> to new:
+>> struct device *device_find_child(struct device *dev, const void *data,
+>> 		int (*match)(struct device *dev, const void *data));
+>>
+>> The new API does not allow its match function (*match)() to modify
+>> caller's match data @*data, but match_free_decoder() as the old API's
+>> match function indeed modifies relevant match data, so it is not suitable
+>> for the new API any more, solved by using device_for_each_child() to
+>> implement relevant finding free cxl decoder function.
+>>
+>> Suggested-by: Ira Weiny <ira.weiny@intel.com>
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> This seems to functionally do the same as before.
+> 
 
-When/if the busy-poller thread migrates to another cpu,
-local_clock() can be off by +/-2msec or more for small
-values of HZ, depending on the platform.
+yes, this change have the same logic as previous existing logic.
 
-Use ktimer_get_ns() to ensure deterministic behavior,
-which is the whole point of busy-polling.
+> I'm not sure I like the original code though so a comment inline.
+> 
+>> ---
+>>  drivers/cxl/core/region.c | 30 ++++++++++++++++++++++++------
+>>  1 file changed, 24 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+>> index 21ad5f242875..c2068e90bf2f 100644
+>> --- a/drivers/cxl/core/region.c
+>> +++ b/drivers/cxl/core/region.c
+>> @@ -794,10 +794,15 @@ static size_t show_targetN(struct cxl_region *cxlr, char *buf, int pos)
+>>  	return rc;
+>>  }
+>>  
+>> +struct cxld_match_data {
+>> +	int id;
+>> +	struct device *target_device;
+>> +};
+>> +
+>>  static int match_free_decoder(struct device *dev, void *data)
+>>  {
+>> +	struct cxld_match_data *match_data = data;
+>>  	struct cxl_decoder *cxld;
+>> -	int *id = data;
+>>  
+>>  	if (!is_switch_decoder(dev))
+>>  		return 0;
+>> @@ -805,17 +810,31 @@ static int match_free_decoder(struct device *dev, void *data)
+>>  	cxld = to_cxl_decoder(dev);
+>>  
+>>  	/* enforce ordered allocation */
+>> -	if (cxld->id != *id)
+>> +	if (cxld->id != match_data->id)
+> 
+> Why do we carry on in this case?
+> Conditions are:
+> 1. Start match_data->id == 0
+> 2. First pass cxld->id == 0 (all good) or
+>    cxld->id == 1 say (and we skip until we match
+>    on cxld->id == 0 (perhaps on the second child if they are
+>    ordered (1, 0, 2) etc. 
+> 
+> If we skipped and then matched on second child but it was
+> already in use (so region set), we will increment match_data->id to 1
+> but never find that as it was the one we skipped.
+> 
+> So this can only work if the children are ordered.
+> So if that's the case and the line above is just a sanity check
+> on that, it should be noisier (so an error print) and might
+> as well fail as if it doesn't match all bets are off.
+> 
 
-Fixes: 060212928670 ("net: add low latency socket poll")
-Fixes: 9a3c71aa8024 ("net: convert low latency sockets to sched_clock()")
-Fixes: 37089834528b ("sched, net: Fixup busy_loop_us_clock()")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Mina Almasry <almasrymina@google.com>
-Cc: Willem de Bruijn <willemb@google.com>
-Cc: Joe Damato <jdamato@fastly.com>
----
- include/net/busy_poll.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+it seems Ira Weiny also has some concerns related to previous existing
+logic as following:
 
-diff --git a/include/net/busy_poll.h b/include/net/busy_poll.h
-index 9b09acac538eed8dbaa2576bf2af926ecd98eb44..522f1da8b747ac73578d8fd93301d31835a6dae0 100644
---- a/include/net/busy_poll.h
-+++ b/include/net/busy_poll.h
-@@ -68,7 +68,7 @@ static inline bool sk_can_busy_loop(struct sock *sk)
- static inline unsigned long busy_loop_current_time(void)
- {
- #ifdef CONFIG_NET_RX_BUSY_POLL
--	return (unsigned long)(local_clock() >> 10);
-+	return (unsigned long)(ktime_get_ns() >> 10);
- #else
- 	return 0;
- #endif
--- 
-2.46.0.295.g3b9ea8a38a-goog
+https://lore.kernel.org/all/66c4a136d9764_2ddc2429435@iweiny-mobl.notmuch/
+"Also for those working on CXL I'm questioning the use of ID here and
+the dependence on the id's being added to the parent in order.  Is that
+a guarantee?"
+
+perhaps, create a new dedicated thread to discuss original design.
+
+> Jonathan
+>  
+>>  		return 0;
+>>  
+>> -	if (!cxld->region)
+>> +	if (!cxld->region) {
+>> +		match_data->target_device = get_device(dev);
+>>  		return 1;
+>> +	}
+>>  
+>> -	(*id)++;
+>> +	match_data->id++;
+>>  
+>>  	return 0;
+>>  }
+>>  
+>> +/* NOTE: need to drop the reference with put_device() after use. */
+>> +static struct device *find_free_decoder(struct device *parent)
+>> +{
+>> +	struct cxld_match_data match_data = {
+>> +		.id = 0,
+>> +		.target_device = NULL,
+>> +	};
+>> +
+>> +	device_for_each_child(parent, &match_data, match_free_decoder);
+>> +	return match_data.target_device;
+>> +}
+>> +
+>>  static int match_auto_decoder(struct device *dev, void *data)
+>>  {
+>>  	struct cxl_region_params *p = data;
+>> @@ -840,7 +859,6 @@ cxl_region_find_decoder(struct cxl_port *port,
+>>  			struct cxl_region *cxlr)
+>>  {
+>>  	struct device *dev;
+>> -	int id = 0;
+>>  
+>>  	if (port == cxled_to_port(cxled))
+>>  		return &cxled->cxld;
+>> @@ -849,7 +867,7 @@ cxl_region_find_decoder(struct cxl_port *port,
+>>  		dev = device_find_child(&port->dev, &cxlr->params,
+>>  					match_auto_decoder);
+>>  	else
+>> -		dev = device_find_child(&port->dev, &id, match_free_decoder);
+>> +		dev = find_free_decoder(&port->dev);
+>>  	if (!dev)
+>>  		return NULL;
+>>  	/*
+>>
+> 
 
 
