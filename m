@@ -1,106 +1,103 @@
-Return-Path: <netdev+bounces-122090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E2195FDF3
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 02:19:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73B0695FE00
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 02:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B06351C2114C
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 00:19:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0F3EB21B38
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 00:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D9E802;
-	Tue, 27 Aug 2024 00:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5897FD;
+	Tue, 27 Aug 2024 00:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="f5LZyku+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3MIn2Y+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB551FA4
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 00:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE38366
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 00:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724717963; cv=none; b=qW5dsS2wClgs1TJdALPW0yDDhEEAMVOFkJ/gUjKcJ07cw0m8OlXChoeSSU7a6WxNDxXK3bCQLQhccXSRDCzXzm1lIz/u6wtEO/wJymSi1QYGWupwy03XnwkQcIXv1Qf+Wv+1O3q7AosX1RlfLGVr628X8LMcGZnZduSNa9iBOAU=
+	t=1724718681; cv=none; b=KCB+g6RxInC9I88dM2sY7pUpqh9B7ffnqvyyVE2yT06Qf8p5rbr1Kvct5o83bz1mgee1u1rAh3qMzEWt7Eo0v4ShHVRW+ot0MPlt+WSlb3QiHGurOvI4rdItx5xZz7/eE2ZivcVPDx9lqHi7+Sm8TRguMIA5bsLrLRMe00ty3HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724717963; c=relaxed/simple;
-	bh=FxGMeRyWSlt8qmgkJSUx2Q0BYH5hVrhUn5fQVXOQYp4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FF9CMpiWg3ImTvvFBrHr5rm7obl0sG3qb23oRzAEeqCPBD7/W4jvucOHPw5GUTBG7pYB0+oKTLLlSnUl0c53YR2OqdtqOSrYQZcW+RFH738I5te8/TisNSIab4UZ4sz9KUra/exJV72GVFji/YtbSBmlDcOqYHhPmOOTFRVhqlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=f5LZyku+; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2d3da94f059so3387308a91.2
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 17:19:21 -0700 (PDT)
+	s=arc-20240116; t=1724718681; c=relaxed/simple;
+	bh=oq8xayKC/I+36y0Q1zrk1DC6PmomC7QqY5AI2jIXKfU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G6Ji9kWS2gxrzI94XGNf1czXYevirQfqxe0bmKuMLbDLPZn9YKrD1x8YDrgZKBHnotI5Xr6Rm310C91pUwCFv6n4FXqF+uItzZt2i6oRAxUi/Pqt2+NFAUITjL3EOmEKvTpL0r/joLfzajCfHmtBGK74CnKTOYlwGdE0ZsfjoOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R3MIn2Y+; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-81fda7d7a48so181889539f.3
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 17:31:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1724717960; x=1725322760; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1724718678; x=1725323478; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SHl71JHCuvA/VjksZm8ocNbN17JY7/DIpAEt2j1O0E8=;
-        b=f5LZyku+m45Zyg1bhUX7eLO7Qws88fV59mowJVKGfEbqaoWGTcwFVFjY/TqpaYDm4k
-         NiqBxqbYnt/5mHp6cnspRg5IYgZzQ3X09ZJh1U/gEXFz+kwUuBYnhTSfjxFQ6HnWSRKY
-         8WCjapD9ogRzbbnkejOg2TiudU2txLbfN+emKeWJo01lnKtYDfDNjLpz+tDmVQ/Hx5Op
-         yQxe3QykgtQeRSiYFJfZLrFRI6mB1igOyzHKTxKm19jBij2VCWueEefM22fPDrE52o7f
-         GBhpsfC0fHvq1KTDtSrIxKTdYf/pTimeCQ7YCgydRonIcOlcm3/mtpvWULygonQAvzaz
-         RnMA==
+        bh=oq8xayKC/I+36y0Q1zrk1DC6PmomC7QqY5AI2jIXKfU=;
+        b=R3MIn2Y+q0tB0jNWho2C6UhyZiDR7bC/y9D7veg0TY+MOG0m0B0aGN3XhzXbK3eYBc
+         ulHM5Wa7VzD6pzUBAe6CrCvm4C7EEEBBJ79mpcIOeltRsfzOfrAeJusFoQQynNBbQq8S
+         H8sgswh0O1TUitQJ161pVmkum3HDYfZ4kJcptgq41D/61fVRfdQbEgBf26I+E2r/rPGS
+         GqkFroOXPX2k3zM7Qq2ZZ3zLt03fyqnBoKR5aS5qIGQrwAzBT2AqNxjFFj57neitatr+
+         HCl3JdeS5bByNJdKuuYvw5bqFS79YmpSxg4WPXC+pRag3JYUcHUBONRkQ0Q5OklU6R1m
+         1VLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724717960; x=1725322760;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1724718678; x=1725323478;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SHl71JHCuvA/VjksZm8ocNbN17JY7/DIpAEt2j1O0E8=;
-        b=fZ6H2Tv+hwU94ePlTMR6Bf7wBT3EshbBv3UQrL1nhzIbfLdvSwy6sY437z3kSpMjP+
-         wYyyR6FxAP6+X4cjep29UoA8FN0bOioDtXGD6uBqc/XV1TsIBJNZ3iYz8j2R4YXBtnAo
-         fw3OdXPc3JEBLpFB0xKVR2WtXdZ5LkzpRvR9Us8rjbkSTSprWBGl1b4gFUtFeYW8qi+G
-         Zv4lDtPAbXuo3KJgtcojGwC7urL5UFQcsHevC3+ZpAXv9i2TFsiu4o1sKSA0ZKj87S3/
-         s74fgM9HGgjRjT93QZhCNiyCLHYqNCyxg5GDhoCeAaN9GLYWucKouNbt/EeILkaUkPrR
-         NDNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXWGQjvqPjMqITsev3wRpi/bkzFnoKNT+PZ92F6uWt1+SYQNWs2poL03PJ5svqGppFLoiyApJ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxnMXeENwauGylPeiUcnqhxLAFTCvUi56GNmfG/ffM+48BzcscU
-	uSt+77GkUkJcwDc04DYdHaIL5j8WsfFtvgmGjyr9FKehuD4z/1LY+hQ3y3o6IL9gPDD2k4aAwMN
-	alE2LpA==
-X-Google-Smtp-Source: AGHT+IEAc4i9Ay8ONNFATsT7xd5EcMWKfg+fSBt5gVKFxPp0BTIiE/tb6Jc3IO0glaNFPKKDpjk7Bg==
-X-Received: by 2002:a17:90b:3ca:b0:2c9:7cc8:8e33 with SMTP id 98e67ed59e1d1-2d646bb298fmr12601117a91.13.1724717960562;
-        Mon, 26 Aug 2024 17:19:20 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d613b1cb45sm10566157a91.52.2024.08.26.17.19.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Aug 2024 17:19:19 -0700 (PDT)
-Date: Mon, 26 Aug 2024 17:19:17 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Liu Mingrui <liumingrui@huawei.com>
-Cc: <willemdebruijn.kernel@gmail.com>, <davem@davemloft.net>,
- <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH -next] af_packet: display drop field in packet_seq_show
-Message-ID: <20240826171917.55444272@hermes.local>
-In-Reply-To: <20240826092625.2637632-1-liumingrui@huawei.com>
-References: <20240826092625.2637632-1-liumingrui@huawei.com>
+        bh=oq8xayKC/I+36y0Q1zrk1DC6PmomC7QqY5AI2jIXKfU=;
+        b=oZ/C6DSo9yGy6YbTV4UbYH2ywLybMSDLDCWsNuHrjC7Yy0PKYCAR1uWRlKpGfV3f22
+         IIyyxpkmlKcFXwBvW+Q7UsuEUa+wHxlz5O0IMNd/XA7jnma9OqqTGd8LFpZHbaqgLG2m
+         r3a3sWUb+RxCH/Mslzi4iKLaoV4PikOdqAeMyBQEQUpGBImIhqBeH5NFhzQz7QbyJVVX
+         8TnvxEVPz7SnpQym36vQj0g9zzwr6rYOX/KAcXfHwUc0F3ObNa5/bhNvoGe/77rtqJGR
+         MoM2EUaT4yLAs7M20s47B/10oieMLlzl17jMAHtTalSSlI0sUBr0o29yZX8eCuxkIDRZ
+         UWNQ==
+X-Gm-Message-State: AOJu0YzwVpBNotPRwEUa1CvJJjmEaG5wyq4v5a2MjttM0SKBLy9kbt7Z
+	u2D/hbyO2V0otzB0GMBnUqhTjr+Gnbrotwx/j3XsdX1+Xb9xby86bcUe1tnDfH7BcR8e6YPRrdW
+	hsfKPpC7GyVt00J6qBeJ0imkFJUc=
+X-Google-Smtp-Source: AGHT+IFCh61k80vtWEERgPjml3zjByt1nRYNtjWNcWZt+SH9L7TAd5zAN6WaknFdNDneyh4oUneK//rohNM/Yfe2u5E=
+X-Received: by 2002:a05:6e02:214a:b0:374:aa87:bcaa with SMTP id
+ e9e14a558f8ab-39e63e91642mr14365855ab.14.1724718678407; Mon, 26 Aug 2024
+ 17:31:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240826194932.420992-1-jmaloy@redhat.com> <20240826194932.420992-2-jmaloy@redhat.com>
+In-Reply-To: <20240826194932.420992-2-jmaloy@redhat.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 27 Aug 2024 08:30:42 +0800
+Message-ID: <CAL+tcoAiZcY9KF9W5JKJGWsw+m3tg0P9mTYDATh2-hzHTCaxsQ@mail.gmail.com>
+Subject: Re: [net-next, v2 1/2] tcp: add SO_PEEK_OFF socket option tor TCPv6
+To: jmaloy@redhat.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com, 
+	dgibson@redhat.com, eric.dumazet@gmail.com, edumazet@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 26 Aug 2024 09:26:25 +0000
-Liu Mingrui <liumingrui@huawei.com> wrote:
+On Tue, Aug 27, 2024 at 3:49=E2=80=AFAM <jmaloy@redhat.com> wrote:
+>
+> From: Jon Maloy <jmaloy@redhat.com>
+>
+> When we added the SO_PEEK_OFF socket option to TCP we forgot
+> to add it even for TCP on IPv6.
+>
+> We do that here.
+>
+> Fixes: 05ea491641d3 ("tcp: add support for SO_PEEK_OFF socket option")
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+> Tested-by: Stefano Brivio <sbrivio@redhat.com>
+> Signed-off-by: Jon Maloy <jmaloy@redhat.com>
 
-> Display the dropped count of the packet, which could provide more
-> information for debugging.
-> 
-> Signed-off-by: Liu Mingrui <liumingrui@huawei.com>
-> ---
-
-At this point /proc/net/packet is a poor choice for extension.
-For example, ss command ignores it if PACKET_DIAG_MEMINFO is available.
-
-Better to add new netlink field see net/packet/diag.c.
-
-Maybe time for PACKET_DIAG_STATS with name/value like ethtool.
-
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
