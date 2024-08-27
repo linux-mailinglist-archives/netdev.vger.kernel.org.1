@@ -1,258 +1,104 @@
-Return-Path: <netdev+bounces-122125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92A9995FF9B
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 05:06:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0203E95FFAA
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 05:17:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 498F3283224
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 03:06:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93938B207E8
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 03:17:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A512C1773A;
-	Tue, 27 Aug 2024 03:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7B817D2;
+	Tue, 27 Aug 2024 03:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ezfFWOer"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nOPfV0jS"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEB218037
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 03:06:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C90C54A33
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 03:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724728004; cv=none; b=U14rj1DckV3Ws3rox20nU/V4T3mkFnvAzMOk7qhwHMRXEShJwFYilHZzl1TGdC2Enwg7w6KeSs/CXKBkS6aFVjSlIDfln85EpGcQgf7KNsss/LiFuRyIslJRb8MK4LAPKkMoSJ3warYwjhbZtQiIDfXf9qcztahu0UBzjKaUUp0=
+	t=1724728642; cv=none; b=l8g6JQl8cN+4UK792W9fmFfEvsUFx1S6uNUnUv1N7llkkNzAjp4ngYi8/eHDM7V1c6S5NGidf86l75A5ua8vpOT+mVYmsw9/Gvue/ktTpWvsGP2ohDKmU7SFFYP5NxeOuG38WMijzTfInltF98luv9QL1iprtJtyCPp4d5sECbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724728004; c=relaxed/simple;
-	bh=3+1smjmFgwyTR+ftPXMf/8E/F3WUJDcSylBHNQywtGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n1criZEoiPEy1dSWwP45CSpU/1WThH0jthm+aveUVljaY5ry09LXVkJhFor2RoAI3kKQu05waRxQJAApRDtCC6gUbz+mZ88zb9bq7bzifcP+TAMzLAdz35bTUIq88cRTkzZ0YaYMYQUutsyJxk17F9c/fi0SLu3kQRG6Av6NL4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ezfFWOer; arc=none smtp.client-ip=95.215.58.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Tue, 27 Aug 2024 03:06:32 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724728000;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DXh+mPkqGMQUdQjrnpg7XgHV33cM/bi2yysc+Jzmln0=;
-	b=ezfFWOer/4J1f3LXiOgSI2x7/WD2K4Tj/axgZi0hvYcXS9HJrGHaEtqPnOWYpSKguR1ol4
-	VMU24i7iXa71hoYOhRN3u+eArz/j46HMgVWxB+C20b5sDgk++ZP4Hh60kAJsARl6SmRo5J
-	XONw1klJ3MhxuiP1eaTEltshraeknKc=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Roman Gushchin <roman.gushchin@linux.dev>
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	David Rientjes <rientjes@google.com>,
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Meta kernel team <kernel-team@meta.com>, cgroups@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v1] memcg: add charging of already allocated slab objects
-Message-ID: <Zs1CuLa-SE88jRVx@google.com>
-References: <20240826232908.4076417-1-shakeel.butt@linux.dev>
+	s=arc-20240116; t=1724728642; c=relaxed/simple;
+	bh=zXbdGZbg8NlKHYVP1qZwXyuYpG0hZ/gp+Wa8X7omRiw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PIV6G5pdJRwbhvPbWgOxDFcSx9FdkcCfP9jNAVv+nO3XRPVlsMvCh0KOHdWVLi0ft11p89neLv+chszo9DmGNeqonWeKDv//AHInit6OgjzznW2Yj4fg9K3P25KAqZgaGz+MPgUr4icwsGJppBJlPcpd75D9gHMB98E5GmIrZ+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nOPfV0jS; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-81f8f0197abso250676439f.2
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 20:17:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724728640; x=1725333440; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zXbdGZbg8NlKHYVP1qZwXyuYpG0hZ/gp+Wa8X7omRiw=;
+        b=nOPfV0jSQ/h2oDYuTDlUOtLY9t1pEk9cxqPo9tjlBhE/2nODaxOEjm29wfqQSniwEZ
+         HI6tZhK6ZcpxmPQu2lV8tj4CFL0V+F0NG37RIMTW+ZcJqFK+1jAsM27zCHSiUFuldm27
+         SSHEFURhR9Yfq2aholhnErzKr7+mQh2WSw5LCESHr78JNDbjU3z0GYrtND3CbxnxNQvu
+         ArOCK7o7v94i/tmLXGSSNFnNNF0Gi8AyTKRc1UBQt99M146H2E51rpnzN7edp35Krwg+
+         IaMzft0AWS1rcKvUbBk8Vec/Gq5SoAGiFZkyqk5Btv0HGzzxqRSmzdE/si1Kz0MYuUiO
+         cJzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724728640; x=1725333440;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zXbdGZbg8NlKHYVP1qZwXyuYpG0hZ/gp+Wa8X7omRiw=;
+        b=V8oWhvcEE/8YK77ntuHLA4408pWQYrBNdsBJYn4t0c17AOAwwEOm78LrPxF67+eVJP
+         C54ty5BSGyRJsna+rYEum3n0iTEBDVifachh2SJcKPThkIPmfXOVPwgutVb/GFwdD3NK
+         8SXyGnYSmj/eVvdaZgIKHu/eOpk//3JQWuOECRQrVa0tRYBiLo1CtzfoJB6Nwysa+C6N
+         r4sqUEPYYHdrV4iy+fzWbl5QZklBbbb1ZoGjpzK5CeIynEtFsrIJ3rtx60rgTR+giuOE
+         9SDXF6ltQq8MBA9C+gD1qtjed33BfEy/23NXxvUiN3II0OBGZvmAvVEb2GKKwq0+LJ3e
+         4C9w==
+X-Forwarded-Encrypted: i=1; AJvYcCXw1I3DeaGPNfm+pu3GKNqRT2VCdx59BgSakdyzBs0201PFTh0M8DZ0gBdfjR/elvMBQ4KAxVs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQJeHaqL4JWfV+HYHX6XKpwVF2pRA5Nsuz/zSp64s9FpLyRQaV
+	FISxYiUzsHwkpYTbDYsgrIBKIBYfcC6szlfplOvMBv9leqIvUUwLXxmkcNtx7DLhymmXJanAscm
+	mP+V3jZ1omSpg9OQQNu4m7Qqop+o=
+X-Google-Smtp-Source: AGHT+IGNLbqEiSubJjssK0FpDDgB6TgkC2I9pU3tw9W20+o8W2jPG/L83doG2p28JMI3tRuR73tFPMkOSJQSBDkW394=
+X-Received: by 2002:a05:6e02:1a63:b0:39d:2625:b565 with SMTP id
+ e9e14a558f8ab-39e63eeb58amr19329285ab.19.1724728639977; Mon, 26 Aug 2024
+ 20:17:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240826232908.4076417-1-shakeel.butt@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+References: <20240827015250.3509197-1-edumazet@google.com> <20240827015250.3509197-2-edumazet@google.com>
+In-Reply-To: <20240827015250.3509197-2-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 27 Aug 2024 11:16:43 +0800
+Message-ID: <CAL+tcoATM_Gkj_wq+myVD-y1JQ_NOeiCpxgV=dZLxgn2-woS4Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tcp: remove volatile qualifier on tw_substate
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 26, 2024 at 04:29:08PM -0700, Shakeel Butt wrote:
-> At the moment, the slab objects are charged to the memcg at the
-> allocation time. However there are cases where slab objects are
-> allocated at the time where the right target memcg to charge it to is
-> not known. One such case is the network sockets for the incoming
-> connection which are allocated in the softirq context.
-> 
-> Couple hundred thousand connections are very normal on large loaded
-> server and almost all of those sockets underlying those connections get
-> allocated in the softirq context and thus not charged to any memcg.
-> However later at the accept() time we know the right target memcg to
-> charge. Let's add new API to charge already allocated objects, so we can
-> have better accounting of the memory usage.
-> 
-> To measure the performance impact of this change, tcp_crr is used from
-> the neper [1] performance suite. Basically it is a network ping pong
-> test with new connection for each ping pong.
-> 
-> The server and the client are run inside 3 level of cgroup hierarchy
-> using the following commands:
-> 
-> Server:
->  $ tcp_crr -6
-> 
-> Client:
->  $ tcp_crr -6 -c -H ${server_ip}
-> 
-> If the client and server run on different machines with 50 GBPS NIC,
-> there is no visible impact of the change.
-> 
-> For the same machine experiment with v6.11-rc5 as base.
-> 
->           base (throughput)     with-patch
-> tcp_crr   14545 (+- 80)         14463 (+- 56)
-> 
-> It seems like the performance impact is within the noise.
-> 
-> Link: https://github.com/google/neper [1]
-> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+On Tue, Aug 27, 2024 at 9:53=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> Using a volatile qualifier for a specific struct field is unusual.
+>
+> Use instead READ_ONCE()/WRITE_ONCE() where necessary.
+>
+> tcp_timewait_state_process() can change tw_substate while other
+> threads are reading this field.
 
-Hi Shakeel,
+Yes, it can happen.
 
-I like the idea and performance numbers look good. However some comments on
-the implementation:
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-> ---
-> 
-> Changes since the RFC:
-> - Added check for already charged slab objects.
-> - Added performance results from neper's tcp_crr
-> 
->  include/linux/slab.h            |  1 +
->  mm/slub.c                       | 54 +++++++++++++++++++++++++++++++++
->  net/ipv4/inet_connection_sock.c |  5 +--
->  3 files changed, 58 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/linux/slab.h b/include/linux/slab.h
-> index eb2bf4629157..05cfab107c72 100644
-> --- a/include/linux/slab.h
-> +++ b/include/linux/slab.h
-> @@ -547,6 +547,7 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
->  			    gfp_t gfpflags) __assume_slab_alignment __malloc;
->  #define kmem_cache_alloc_lru(...)	alloc_hooks(kmem_cache_alloc_lru_noprof(__VA_ARGS__))
->  
-> +bool kmem_cache_charge(void *objp, gfp_t gfpflags);
->  void kmem_cache_free(struct kmem_cache *s, void *objp);
->  
->  kmem_buckets *kmem_buckets_create(const char *name, slab_flags_t flags,
-> diff --git a/mm/slub.c b/mm/slub.c
-> index c9d8a2497fd6..580683597b5c 100644
-> --- a/mm/slub.c
-> +++ b/mm/slub.c
-> @@ -2185,6 +2185,16 @@ void memcg_slab_free_hook(struct kmem_cache *s, struct slab *slab, void **p,
->  
->  	__memcg_slab_free_hook(s, slab, p, objects, obj_exts);
->  }
-> +
-> +static __fastpath_inline
-> +bool memcg_slab_post_charge(struct kmem_cache *s, void *p, gfp_t flags)
-> +{
-> +	if (likely(!memcg_kmem_online()))
-> +		return true;
-
-We do have this check in kmem_cache_charge(), why do we need to check it again?
-
-> +
-> +	return __memcg_slab_post_alloc_hook(s, NULL, flags, 1, &p);
-> +}
-> +
->  #else /* CONFIG_MEMCG */
->  static inline bool memcg_slab_post_alloc_hook(struct kmem_cache *s,
->  					      struct list_lru *lru,
-> @@ -2198,6 +2208,13 @@ static inline void memcg_slab_free_hook(struct kmem_cache *s, struct slab *slab,
->  					void **p, int objects)
->  {
->  }
-> +
-> +static inline bool memcg_slab_post_charge(struct kmem_cache *s,
-> +					  void *p,
-> +					  gfp_t flags)
-> +{
-> +	return true;
-> +}
->  #endif /* CONFIG_MEMCG */
->  
->  /*
-> @@ -4062,6 +4079,43 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
->  }
->  EXPORT_SYMBOL(kmem_cache_alloc_lru_noprof);
->  
-> +#define KMALLOC_TYPE (SLAB_KMALLOC | SLAB_CACHE_DMA | \
-> +		      SLAB_ACCOUNT | SLAB_RECLAIM_ACCOUNT)
-> +
-> +bool kmem_cache_charge(void *objp, gfp_t gfpflags)
-> +{
-> +	struct slabobj_ext *slab_exts;
-> +	struct kmem_cache *s;
-> +	struct folio *folio;
-> +	struct slab *slab;
-> +	unsigned long off;
-> +
-> +	if (!memcg_kmem_online())
-> +		return true;
-> +
-> +	folio = virt_to_folio(objp);
-> +	if (unlikely(!folio_test_slab(folio)))
-> +		return false;
-
-Does it handle the case of a too-big-to-be-a-slab-object allocation?
-I think it's better to handle it properly. Also, why return false here?
-
-> +
-> +	slab = folio_slab(folio);
-> +	s = slab->slab_cache;
-> +
-> +	/* Ignore KMALLOC_NORMAL cache to avoid circular dependency. */
-> +	if ((s->flags & KMALLOC_TYPE) == SLAB_KMALLOC)
-> +		return true;
-
-And true here? It seems to be a bit inconsistent.
-Also, if we have this check here, it means your function won't handle kmallocs
-at all? Because !KMALLOC_NORMAL allocations won't get here.
-
-> +
-> +	/* Ignore already charged objects. */
-> +	slab_exts = slab_obj_exts(slab);
-> +	if (slab_exts) {
-> +		off = obj_to_index(s, slab, objp);
-> +		if (unlikely(slab_exts[off].objcg))
-> +			return true;
-> +	}
-> +
-> +	return memcg_slab_post_charge(s, objp, gfpflags);
-> +}
-> +EXPORT_SYMBOL(kmem_cache_charge);
-> +
->  /**
->   * kmem_cache_alloc_node - Allocate an object on the specified node
->   * @s: The cache to allocate from.
-> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-> index 64d07b842e73..3c13ca8c11fb 100644
-> --- a/net/ipv4/inet_connection_sock.c
-> +++ b/net/ipv4/inet_connection_sock.c
-> @@ -715,6 +715,7 @@ struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
->  	release_sock(sk);
->  	if (newsk && mem_cgroup_sockets_enabled) {
->  		int amt = 0;
-> +		gfp_t gfp = GFP_KERNEL | __GFP_NOFAIL;
->  
->  		/* atomically get the memory usage, set and charge the
->  		 * newsk->sk_memcg.
-> @@ -731,8 +732,8 @@ struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
->  		}
->  
->  		if (amt)
-> -			mem_cgroup_charge_skmem(newsk->sk_memcg, amt,
-> -						GFP_KERNEL | __GFP_NOFAIL);
-> +			mem_cgroup_charge_skmem(newsk->sk_memcg, amt, gfp);
-> +		kmem_cache_charge(newsk, gfp);
-
-Wait, so we assume that newsk->sk_memcg === current memcg? Or we're ok with them being
-different?
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
 Thanks!
 
