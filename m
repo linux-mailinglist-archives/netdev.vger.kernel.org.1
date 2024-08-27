@@ -1,197 +1,136 @@
-Return-Path: <netdev+bounces-122391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9E2C960EF7
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:54:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 996CB960EFA
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:54:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D41CB23E1B
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:54:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 549B92858F4
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:54:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8D71C8FCD;
-	Tue, 27 Aug 2024 14:53:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A21911C2DB1;
+	Tue, 27 Aug 2024 14:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SrUT5WTG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26C81C6F68;
-	Tue, 27 Aug 2024 14:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7160A1A0B13;
+	Tue, 27 Aug 2024 14:53:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724770407; cv=none; b=i8uCYo+EBld6rV8Krw62VVAFxBOmrq9RNdBAS/GRH1+dy+wDmtbvYFbV5Ft77ucbUdGJIZNJ2JNsyHj/b7XCeXsM3OR7vj4/DGxnar8lNRYBEIkW/Vj1BJpJDz+xa65JcACBJ6gro4uXdG6Z2EWEGkgyTGkHHgXCfZ6d/rBcx8g=
+	t=1724770415; cv=none; b=ju26E/uua56Sn8/Y7zhff4ATdPKU5aCm7Wk2dm/avtC7IL2dUIK2xNJCBjyGMpqnBakf8vCclcvkefgu3xLd/yaj0FPTUK2vCt8Lr0I/JxUbcniWapzZUj+6BWLPKkfed3piFK6Ciw6q3sf8ywBdoHtSE7pBI/pb9Dw1pUR6SMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724770407; c=relaxed/simple;
-	bh=qKmQ10P7wEu4ZGICAJrTaYyAWxzwXZ07wXyJ9Jkb5Ls=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AbDLdW7TdKvxDu/8i6jYnBsHJgRmbsbhZS1T1NEgwa0otW/VJfjROwWuiWuJd9WCnmd5fZvSwZOwyZQ4QAzsE108sNbcTCM+9J7Mq436HGqB1J/grhnlNidAZgHikHugkRqMVU0ixmujiUozJdOwB2SjLOFonoCJvoo6EXQNKPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c0ba8c7c17so852430a12.3;
-        Tue, 27 Aug 2024 07:53:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724770403; x=1725375203;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8HOmad9WKjizUc+THpEm69GHMQSx3SDgk6R9P99Vdmc=;
-        b=GMp+X1/mWnVS+bE0vOe6uzXuJHjaALEMMKoIfz+OVEE3AZN1dWUjzsKtRmgGyOGIhj
-         aS0U6McujKjXZYFvu6TdEKMI6mcDXwayBQrpAq0ffCCtXOZW295tqDEiUFWUqPvwCnxJ
-         Ws/jP0ebmIYxaIJWdF5NFz0zfpfhfaPyfbrbHFwgf70F7PUZsvs0irePufFoH1ZBvgRs
-         ABCP+0T3heBPgi+nA5PXum/47zQUqGtj6g6sRBFh1TLmK1HB/IAHVNP4l637IGmM6tpB
-         wJ1KL5SBkmi4AANVEklRbj6uFHTO1hbLf7qXXeZVkZKhPPwKYY8WJgAnRf1N70p71rxS
-         3VmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU4dclpWRDhycb6RpeBP+2IXBgy53owtIXffpG+nB6d2YgTKjwDgwrtqyQ0GohahNKiSrM52PHi@vger.kernel.org, AJvYcCUTg4sXbD1LPTWoMBF74yV+uiugcNo2ayvsZH8SxO5tSBu5wvll7xClsTwgzrPYYzUkoXTN8ldNuV2hzfJm+ac8@vger.kernel.org, AJvYcCW+A2quWkKALD3VXXtEgmKR0xA83pymBTM8CQL6nNeeWAOjxcrNq+3bdunpnPhKoCcoL7QQJ+9x/VlkerovDGmM@vger.kernel.org, AJvYcCWkvnlggerlNMg1Zm2gLka9ZpdGlz5TcIT6V1pUnThK8Rcx8QLexl9iWTQ21mAtUlRNSJQcpUInKw1IpXA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0mdivxM0YUrOn5/beGEjV0vIZH8vVUcFmIw3ivdmDbIDm/Zg1
-	+RYPpOxhjIwXoV50q0v0fF0ff+6/Q/DAQ9fByCCZ0Ivx30Qgz2q0
-X-Google-Smtp-Source: AGHT+IG24YrM9f5H3NKVsZd4J4AbMBgyEtSVbgqInkakGRDDRFCvwSEtCuDcKk0vBfiaGCi+ukVooQ==
-X-Received: by 2002:a05:6402:84a:b0:5bf:17f:4b7f with SMTP id 4fb4d7f45d1cf-5c089175dc4mr10932792a12.22.1724770402759;
-        Tue, 27 Aug 2024 07:53:22 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-114.fbsv.net. [2a03:2880:30ff:72::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c0e55023f4sm277912a12.70.2024.08.27.07.53.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 07:53:22 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: fw@strlen.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	David Ahern <dsahern@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: rbc@meta.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org (open list:NETFILTER),
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
-Subject: [PATCH nf-next v3 2/2] netfilter: Make IP6_NF_IPTABLES_LEGACY selectable
-Date: Tue, 27 Aug 2024 07:52:41 -0700
-Message-ID: <20240827145242.3094777-3-leitao@debian.org>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240827145242.3094777-1-leitao@debian.org>
-References: <20240827145242.3094777-1-leitao@debian.org>
+	s=arc-20240116; t=1724770415; c=relaxed/simple;
+	bh=ND1nM316SmnI2uLNfJnvcy1K3FityWNNBNH9l6o7LNo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GQzmbxSNv7WaieUTAUIa18IhBjZHumPfg64lEmuuqPduzWYgL4CQf3Ob668RoPm4HETfj03miKZeslH90PoOrAnbKC4E2LRxz/qL21RqV0cSBt50WYlJAAZNAjfpG37yQD5HbmHBYCtQTGRBq5gpOc1VDyM0x0eQcte3Enc43aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SrUT5WTG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 182FEC6106E;
+	Tue, 27 Aug 2024 14:53:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724770415;
+	bh=ND1nM316SmnI2uLNfJnvcy1K3FityWNNBNH9l6o7LNo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SrUT5WTGP2Dta6NNl3ZtipbShjUHbfPl9vEnh7+c/a0gfCvd3fDFkkwWcTD7MKw2n
+	 Eet4agTZqcI35gqrKzDGaoHu7q2uJ07SqSYazenBUo1kNwM1ApiUZUt9XjG0ZOJo/u
+	 X2McGktRiITcCGVp4FfRewwYdHqVo5CF2dFW7fZ/dfGcOI17Zrpch5UJsp86oDLRPC
+	 FexFNLbzgbQF6vXpR5wmlcHgzEvPkdAuRbiiERo86APSBoFFlVrLOtiK71YDzGug01
+	 MttaepYTrDfbTp9xphvsseJtrcuRVGD8yklUoQKFc/v5tti0bzAJOvTVYoyKJYYemO
+	 LxjX2rSk1bieQ==
+Date: Tue, 27 Aug 2024 15:53:28 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yangtao Li <frank.li@vivo.com>
+Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com,
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, ulli.kroll@googlemail.com,
+	linus.walleij@linaro.org, marcin.s.wojtas@gmail.com,
+	linux@armlinux.org.uk, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
+	hkallweit1@gmail.com, u.kleine-koenig@pengutronix.de,
+	jacob.e.keller@intel.com, justinstitt@google.com,
+	sd@queasysnail.net, linux-renesas-soc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Serge Semin <fancer.lancer@gmail.com>
+Subject: Re: [net-next v3 2/9] net: stmmac: platform: Convert to
+ devm_clk_get_enabled() and devm_clk_get_optional_enabled()
+Message-ID: <20240827145328.GJ1368797@kernel.org>
+References: <20240827095712.2672820-1-frank.li@vivo.com>
+ <20240827095712.2672820-3-frank.li@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240827095712.2672820-3-frank.li@vivo.com>
 
-This option makes IP6_NF_IPTABLES_LEGACY user selectable, giving
-users the option to configure iptables without enabling any other
-config.
+On Tue, Aug 27, 2024 at 03:57:05AM -0600, Yangtao Li wrote:
+> Use devm_clk_get_enabled() and devm_clk_get_optional_enabled()
+> to simplify code.
+> 
+> Signed-off-by: Yangtao Li <frank.li@vivo.com>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Suggested-by: Serge Semin <fancer.lancer@gmail.com>
+> ---
+> v2:
+> -remove unused 'ret'
+> -fix incompatible-pointer-types
+> 
+>  .../ethernet/stmicro/stmmac/stmmac_platform.c | 35 +++++--------------
+>  1 file changed, 8 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> index ad868e8d195d..4365afabf3c4 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -415,8 +415,6 @@ static int stmmac_of_get_mac_mode(struct device_node *np)
+>  static void stmmac_remove_config_dt(struct platform_device *pdev,
+>  				    struct plat_stmmacenet_data *plat)
+>  {
+> -	clk_disable_unprepare(plat->stmmac_clk);
+> -	clk_disable_unprepare(plat->pclk);
+>  	of_node_put(plat->phy_node);
+>  	of_node_put(plat->mdio_node);
+>  }
+> @@ -436,7 +434,6 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+>  	struct plat_stmmacenet_data *plat;
+>  	struct stmmac_dma_cfg *dma_cfg;
+>  	int phy_mode;
+> -	void *ret;
+>  	int rc;
+>  
+>  	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+> @@ -615,21 +612,16 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+>  
+>  	/* clock setup */
+>  	if (!of_device_is_compatible(np, "snps,dwc-qos-ethernet-4.10")) {
+> -		plat->stmmac_clk = devm_clk_get(&pdev->dev,
+> -						STMMAC_RESOURCE_NAME);
+> +		plat->stmmac_clk = devm_clk_get_enabled(&pdev->dev, STMMAC_RESOURCE_NAME);
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/ipv6/netfilter/Kconfig         | 22 ++++++++++++----------
- tools/testing/selftests/net/config |  5 +++++
- 2 files changed, 17 insertions(+), 10 deletions(-)
+As it looks like there will be a v3 anyway, a minor nit from my side:
+Please preserve the line wrapping so that the lines remain <= 80 columns wide,
+which is still preferred by Networking code.
 
-diff --git a/net/ipv6/netfilter/Kconfig b/net/ipv6/netfilter/Kconfig
-index f3c8e2d918e1..dad0a50d3ef4 100644
---- a/net/ipv6/netfilter/Kconfig
-+++ b/net/ipv6/netfilter/Kconfig
-@@ -8,7 +8,13 @@ menu "IPv6: Netfilter Configuration"
- 
- # old sockopt interface and eval loop
- config IP6_NF_IPTABLES_LEGACY
--	tristate
-+	tristate "Legacy IP6 tables support"
-+	depends on INET && IPV6
-+	select NETFILTER_XTABLES
-+	default n
-+	help
-+	  ip6tables is a general, extensible packet identification legacy framework.
-+	  This is not needed if you are using iptables over nftables (iptables-nft).
- 
- config NF_SOCKET_IPV6
- 	tristate "IPv6 socket lookup support"
-@@ -190,7 +196,7 @@ config IP6_NF_TARGET_HL
- config IP6_NF_FILTER
- 	tristate "Packet filtering"
- 	default m if NETFILTER_ADVANCED=n
--	select IP6_NF_IPTABLES_LEGACY
-+	depends on IP6_NF_IPTABLES_LEGACY
- 	tristate
- 	help
- 	  Packet filtering defines a table `filter', which has a series of
-@@ -227,7 +233,7 @@ config IP6_NF_TARGET_SYNPROXY
- config IP6_NF_MANGLE
- 	tristate "Packet mangling"
- 	default m if NETFILTER_ADVANCED=n
--	select IP6_NF_IPTABLES_LEGACY
-+	depends on IP6_NF_IPTABLES_LEGACY
- 	help
- 	  This option adds a `mangle' table to iptables: see the man page for
- 	  iptables(8).  This table is used for various packet alterations
-@@ -237,7 +243,7 @@ config IP6_NF_MANGLE
- 
- config IP6_NF_RAW
- 	tristate  'raw table support (required for TRACE)'
--	select IP6_NF_IPTABLES_LEGACY
-+	depends on IP6_NF_IPTABLES_LEGACY
- 	help
- 	  This option adds a `raw' table to ip6tables. This table is the very
- 	  first in the netfilter framework and hooks in at the PREROUTING
-@@ -249,9 +255,7 @@ config IP6_NF_RAW
- # security table for MAC policy
- config IP6_NF_SECURITY
- 	tristate "Security table"
--	depends on SECURITY
--	depends on NETFILTER_ADVANCED
--	select IP6_NF_IPTABLES_LEGACY
-+	depends on SECURITY && NETFILTER_ADVANCED && IP6_NF_IPTABLES_LEGACY
- 	help
- 	  This option adds a `security' table to iptables, for use
- 	  with Mandatory Access Control (MAC) policy.
-@@ -260,10 +264,8 @@ config IP6_NF_SECURITY
- 
- config IP6_NF_NAT
- 	tristate "ip6tables NAT support"
--	depends on NF_CONNTRACK
--	depends on NETFILTER_ADVANCED
-+	depends on NF_CONNTRACK && NETFILTER_ADVANCED && IP6_NF_IPTABLES_LEGACY
- 	select NF_NAT
--	select IP6_NF_IPTABLES_LEGACY
- 	select NETFILTER_XT_NAT
- 	help
- 	  This enables the `nat' table in ip6tables. This allows masquerading,
-diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
-index 90e997cfa12e..e534144c75ea 100644
---- a/tools/testing/selftests/net/config
-+++ b/tools/testing/selftests/net/config
-@@ -35,12 +35,16 @@ CONFIG_IPV6_SIT=y
- CONFIG_IP_DCCP=m
- CONFIG_NF_NAT=m
- CONFIG_IP6_NF_IPTABLES=m
-+CONFIG_IP6_NF_IPTABLES_LEGACY=m
- CONFIG_IP_NF_IPTABLES=m
- CONFIG_IP_NF_IPTABLES_LEGACY=m
- CONFIG_IP_NF_FILTER=m
- CONFIG_IP_NF_TARGET_REJECT=m
- CONFIG_IP_NF_TARGET_MASQUERADE=m
- CONFIG_IP_NF_MANGLE=m
-+CONFIG_IP6_NF_MANGLE=m
-+CONFIG_IP6_NF_FILTER=m
-+CONFIG_IP6_NF_TARGET_REJECT=m
- CONFIG_IP6_NF_NAT=m
- CONFIG_IP6_NF_RAW=m
- CONFIG_IP_NF_NAT=m
-@@ -61,6 +65,7 @@ CONFIG_NF_TABLES=m
- CONFIG_NF_TABLES_IPV6=y
- CONFIG_NF_TABLES_IPV4=y
- CONFIG_NF_REJECT_IPV4=y
-+CONFIG_NF_REJECT_IPV6=y
- CONFIG_NFT_NAT=m
- CONFIG_NETFILTER_XT_MATCH_LENGTH=m
- CONFIG_NET_ACT_CSUM=m
--- 
-2.43.5
+		plat->stmmac_clk = devm_clk_get_enabled(&pdev->dev,
+							STMMAC_RESOURCE_NAME);
 
+>  		if (IS_ERR(plat->stmmac_clk)) {
+>  			dev_warn(&pdev->dev, "Cannot get CSR clock\n");
+>  			plat->stmmac_clk = NULL;
+>  		}
+> -		clk_prepare_enable(plat->stmmac_clk);
+>  	}
+>  
+
+...
 
