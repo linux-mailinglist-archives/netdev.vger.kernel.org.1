@@ -1,74 +1,65 @@
-Return-Path: <netdev+bounces-122177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D931B9603E5
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 10:04:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92237960409
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 10:09:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95F9D2829E5
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 08:04:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DC5EB22FCE
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 08:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029371917E6;
-	Tue, 27 Aug 2024 08:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2963199E95;
+	Tue, 27 Aug 2024 08:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="f/sZPKBd"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="oK+P+wyR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E133189522
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 08:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9507199242;
+	Tue, 27 Aug 2024 08:08:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724745823; cv=none; b=gXrfaIf3g/zMCRuYCj/sC+Ut518gGDfRVmc9v/sqUGVG+tqs3uYFdAVeBZ4foUIyIwBWlLs3KieKSDWmkQjB9rUWX9sr5Z9tVjV12zNba6OVuYspKsOr/30FzqXDLt465wTCtgiZFWaZx2k2sNZ4fPoyysD5PIvQfj/0jGb5K/A=
+	t=1724746120; cv=none; b=tJp+HBey9TOEn55SUNrW+p+BATLjIT3zugYlYpHDdKKq77ohgbZGdicu9pt446NnDWGUOUSGbvYGKPetL1qUF/nADzWI674pvac+rZbIa4yO5oxUj7UVKEKAT/AeoQVkMDYnvznduqfgXfEQlYHoLwH3drGRIusAY8fg0ZJLDE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724745823; c=relaxed/simple;
-	bh=JPbLOrfitdr79yK878Qc2046eEBvIFhjLJdQeO6MPNE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sBH0nUGRNzwMy2S/CgS9GAZ20J0Tb0La75tAQg3GJ03vaySflRhSPb1+ABKC5cuXJjZDHAHSmNP9SoQEPLzTjrCWzlH/8tVjeXe6w+6tCWuMZDshXL8mY4CCfrDPxwviqqMlmpbyJy1GvWRgbGnvTfHi/1vDKFMsCFf7FlQ7Hs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=f/sZPKBd; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20227ba378eso46762945ad.0
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 01:03:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1724745821; x=1725350621; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0alnhJeXJ8CNHH+iupeZGBYbM9/noOx7k0vEP0Fbe0I=;
-        b=f/sZPKBdTBax3V66MC0r4+eAFca2bt7rVHD4qkzovMdIMbXf/068hF40GchjUhrPmt
-         aka81b8QizouBUYWUxUYQpKif5a7VsHEeb+QjOwJGnDDd/D7hScxhhs9UXwl4LY6Ze+4
-         /Ek894VEA6ZMRiRmndYHcnhWVVrpEsBYdnBMSrw93yQejD59+u/slQ/7E29JuXRZLuis
-         FFT75pWhDvLcVNWgYHqoHFHg77s9FfV81oBE/WRziTL04V21iVs6NsCr6jXhg5ltIq4J
-         ox39qJaExgNKqvEIn3DO/9JCdTjcVC+3nz1+qRqCMcilPioFe7kx4lznEqXFDKjrPsy6
-         FF4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724745821; x=1725350621;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0alnhJeXJ8CNHH+iupeZGBYbM9/noOx7k0vEP0Fbe0I=;
-        b=vqbefXy/szRBJCkzgpx1YWooeVHsiYWoDsvkJK64RLHnCsfSQr95kSz4NHcI7+akKU
-         SZ5w/E6J/5W+0cAZ43773U0nQYJtuuk9X+p0sjmhJ/8fXh26KNUVdU0iPx0gEdnVQgNc
-         E2vQm9LaBxwub5/M8D5ARa6aI+WNNflSsDFw83j/ZBy/fdxrEj/QZppuwfhRVyY4abSe
-         T6ZWjhoJvr0VbBmQqlt1q9EtrntxJQA7HN37IZZO8X4MGeoNPfKRJSrVjELKhy3PsEmB
-         VxXt487nlUPcyvjEdWMTsbG0wRb4m5mQtzfXrt1cSUxkuE+SW5A64qb5/kJmCMlNnBxZ
-         EUFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVNZqiI1AfLqfpLnVxTD9FO7IMNLqB3/hHDq+QdXSYzVMzPOLKXXLADBi7eHlM+1Xx3a6pJLcY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzRFT8hfJ6ym/eTqsPhTPrEepyT0uz7r2l/NLrXkCsmVF1vWusL
-	OO+7EkTZ9ViMAG7MbpEE8oFmD0SuG7ohKT2AVX2yCXR4GpMA+cGPcbTodBBd7hg=
-X-Google-Smtp-Source: AGHT+IEfFJcUX481vjGBLHA6+KBbX4S3KVNLdQ6kxZyqIqN2wlO5r29hxw6Z2W8raEZHF65OaG9PYg==
-X-Received: by 2002:a17:902:dacc:b0:1fa:abda:cf7b with SMTP id d9443c01a7336-2039e4428ccmr6716235ad.9.1724745821356;
-        Tue, 27 Aug 2024 01:03:41 -0700 (PDT)
-Received: from [10.68.121.74] ([63.216.146.178])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385566551sm78673775ad.13.2024.08.27.01.03.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Aug 2024 01:03:41 -0700 (PDT)
-Message-ID: <8ca80081-5935-44cb-804d-86bd6bad02d7@bytedance.com>
-Date: Tue, 27 Aug 2024 16:03:35 +0800
+	s=arc-20240116; t=1724746120; c=relaxed/simple;
+	bh=KUNevkqKItUtyAoJeoaCrfGr37Eon6c2GKQEP9yAB9U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=pYrIAh0JFJkELIEbprvX4pbVgKamqcey9j+9hq6FAgscMOreXK0Qr4pVQjch0F/3Kv+n+tjbCy7HCK+ftRRvUBeHmDRqu1TjWO2sOFTTFtvWEBNWXlWzR1lmfsBTLaZYFOxq+XmeQplPGwNQoAXKhArjMWQ346H1VdfGavhbA3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=oK+P+wyR; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47R7NZnX002527;
+	Tue, 27 Aug 2024 10:08:05 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	NL0vfsDaZi+n7IXnnxL961mLfvdpI9ZZJJiAuUY0CU8=; b=oK+P+wyRw6FWOfoE
+	ii3HFisp1T+BZcECPD9QcTmWQAnw0oAdYT+ELLEbd2HwfVDIg7dqla3qthTTlFDn
+	9dHgJfiS8GlyJMKotw2TmRX8VLsA6NXdw5Vp0hUnHbt95dJ7cvqsNkTTe8JSlqJ3
+	ilBOB9iLUYx3zQ8pltIC2PiQLRKfPPRkVT4ih9SmavhWveUdmAzzFkRyAkUJDsIg
+	3Vw5npBP4l3po35kbKOg4jkMJke1iHgIvabfPlrSXmv9OrBF/NqfqrM7/Ub5Obe3
+	fZV9bmY/1mm9Fkq5GKQXAbp2Zl9HrzxP2GDbbFfvPdDpSI9/fSwEZKZY5gub+8z+
+	Vw8oWQ==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 419ac886r4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 27 Aug 2024 10:08:05 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 2089540048;
+	Tue, 27 Aug 2024 10:08:00 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id C12A724DCC5;
+	Tue, 27 Aug 2024 10:07:11 +0200 (CEST)
+Received: from [10.252.31.50] (10.252.31.50) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Tue, 27 Aug
+ 2024 10:07:10 +0200
+Message-ID: <8a13fd32-4bc4-4711-bf6b-7e0ce2e938ec@foss.st.com>
+Date: Tue, 27 Aug 2024 10:07:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,85 +67,94 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [External] Re: [PATCH bpf-next v2] net: Don't allow to attach xdp
- if bond slave device's upper already has a program
-To: Daniel Borkmann <daniel@iogearbox.net>, Jiri Pirko <jiri@resnulli.us>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ast@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, bigeasy@linutronix.de, lorenzo@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-References: <20240823084204.67812-1-zhoufeng.zf@bytedance.com>
- <Zsh4vPAPBKdRUq8H@nanopsycho.orion>
- <6d38eaf5-0a13-9f85-3a5d-0ca354bc45d5@iogearbox.net>
-From: Feng Zhou <zhoufeng.zf@bytedance.com>
-In-Reply-To: <6d38eaf5-0a13-9f85-3a5d-0ca354bc45d5@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] arm: dts: st: stm32mp151a-prtt1l: Fix QSPI
+ configuration
+To: Ahmad Fatoum <a.fatoum@pengutronix.de>,
+        Oleksij Rempel
+	<o.rempel@pengutronix.de>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Rob
+ Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor
+ Dooley <conor+dt@kernel.org>
+CC: <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kernel@pengutronix.de>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+References: <20240806120517.406714-1-o.rempel@pengutronix.de>
+ <20dc2cd4-7684-4894-9db3-23c3f4abd661@pengutronix.de>
+Content-Language: en-US
+From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <20dc2cd4-7684-4894-9db3-23c3f4abd661@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-27_05,2024-08-26_01,2024-05-17_01
 
-在 2024/8/23 20:07, Daniel Borkmann 写道:
-> On 8/23/24 1:55 PM, Jiri Pirko wrote:
->> Fri, Aug 23, 2024 at 10:42:04AM CEST, zhoufeng.zf@bytedance.com wrote:
->>> From: Feng Zhou <zhoufeng.zf@bytedance.com>
->>>
->>> Cannot attach when an upper device already has a program, This
->>> restriction is only for bond's slave devices or team port, and
->>> should not be accidentally injured for devices like eth0 and vxlan0.
+Hi
+
+On 8/7/24 11:38, Ahmad Fatoum wrote:
+> Hello Oleksij,
+> 
+> On 06.08.24 14:05, Oleksij Rempel wrote:
+>> Rename 'pins1' to 'pins' in the qspi_bk1_pins_a node to correct the
+>> subnode name. The previous name caused the configuration to be
+>> applied to the wrong subnode, resulting in QSPI not working properly.
 >>
->> What if I attach xdp program to solo netdev and then I enslave it
->> to bond/team netdev that already has xdp program attached?
->> What prevents me from doing that?
-> 
-> In that case the enslaving of the device to bond(/team) must fail as
-> otherwise the latter won't be able to propagate the XDP prog downwards.
-> 
-> Feng, did you double check if we have net or BPF selftest coverage for
-> that? If not might be good to add.
-> 
-
-Will do, thanks.
-
->>> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
->>> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
->>> ---
->>> Changelog:
->>> v1->v2: Addressed comments from Paolo Abeni, Jiri Pirko
->>> - Use "netif_is_lag_port" relace of "netif_is_bond_slave"
->>> Details in here:
->>> https://lore.kernel.org/netdev/3bf84d23-a561-47ae-84a4-e99488fc762b@bytedance.com/T/
->>>
->>> net/core/dev.c | 10 ++++++----
->>> 1 file changed, 6 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/net/core/dev.c b/net/core/dev.c
->>> index f66e61407883..49144e62172e 100644
->>> --- a/net/core/dev.c
->>> +++ b/net/core/dev.c
->>> @@ -9502,10 +9502,12 @@ static int dev_xdp_attach(struct net_device 
->>> *dev, struct netlink_ext_ack *extack
->>>     }
->>>
->>>     /* don't allow if an upper device already has a program */
->>> -    netdev_for_each_upper_dev_rcu(dev, upper, iter) {
->>> -        if (dev_xdp_prog_count(upper) > 0) {
->>> -            NL_SET_ERR_MSG(extack, "Cannot attach when an upper 
->>> device already has a program");
->>> -            return -EEXIST;
->>> +    if (netif_is_lag_port(dev)) {
->>> +        netdev_for_each_upper_dev_rcu(dev, upper, iter) {
->>> +            if (dev_xdp_prog_count(upper) > 0) {
->>> +                NL_SET_ERR_MSG(extack, "Cannot attach when an upper 
->>> device already has a program");
->>> +                return -EEXIST;
->>> +            }
->>>         }
->>>     }
->>>
->>> -- 
->>> 2.30.2
->>>
+>> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+>> ---
+>>   arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
 >>
+>> diff --git a/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi b/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi
+>> index 3938d357e198f..4db684478c320 100644
+>> --- a/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi
+>> +++ b/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi
+>> @@ -123,7 +123,7 @@ flash@0 {
+>>   };
+>>   
+>>   &qspi_bk1_pins_a {
+>> -	pins1 {
+>> +	pins {
 > 
+> As you have seen such device tree overriding is error prone and would
+> be entirely avoidable if specifying full board-specific pinctrl groups
+> was allowed for the stm32 platforms instead of override-and-pray.
 
+You can create your own pin group in stm32mp15-pinctlr.dtsi. What is the 
+issue ? Do I miss something ? It will avoid to overwrite an existing 
+configuration
+
+regards
+alex
+
+
+> Anyways, there's better syntax for such overriding now:
+> 
+>    &{qspi_blk1_pins_a/pins}
+> 
+> which would cause a compilation error if pins was renamed again.
+> 
+>>   		bias-pull-up;
+> 
+> There's bias-disable in stm32mp15-pinctrl.dtsi. You may want to add
+> a /delete-property/ for that to make sure, it's not up to the driver
+> which one has priority.
+> 
+>>   		drive-push-pull;
+>>   		slew-rate = <1>;
+> 
+> These are already in qspi_bk1_pins_a. If repeating those is ok, why
+> not go a step further and just duplicate the pinmux property and stay
+> clear of this issue altogether, provided Alex is amenable to changing
+> his mind regarding pinctrl groups in board device trees.
+> 
+> 
+> Cheers,
+> Ahmad
+> 
 
