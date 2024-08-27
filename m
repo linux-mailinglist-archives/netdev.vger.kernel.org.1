@@ -1,95 +1,149 @@
-Return-Path: <netdev+bounces-122362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49D14960D4B
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:14:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02E5A960D53
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:15:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C31D1C20D52
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:14:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2AB628585A
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265B51C3F3B;
-	Tue, 27 Aug 2024 14:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6E91C463F;
+	Tue, 27 Aug 2024 14:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P1rv4OLK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n5U8Ac7n"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0807126F1E;
-	Tue, 27 Aug 2024 14:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C001C3F2A;
+	Tue, 27 Aug 2024 14:14:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724768069; cv=none; b=fZiOCZnq+hS39rhow8uYtrAqpyWWIwYIIKlAL4mk4//1IfUFS1kz7EhbPC4kUsM77s/9I6ck0uY3Aem9I8a2CAnbRDWQ14P7b+B+MnZGjUXgHVfU5oGMVXL/Z/XrnwY7CxZe4B0SxhM+yuD7VXGvoWsyoULjF8Z7XQNLoOhMEsQ=
+	t=1724768087; cv=none; b=oise7PE9US0rkuEy7dy8T7yFc50BUu4rYE/CfPNmkMKmrKL/P12aDUWaXOBM2lmmDn9WLwogMjllFDm32jn3FriO+JvHd6FezFCIlEd+567pcQ2gSKYtKjqntKTWixLRMRwK2svdv718MkOtCqzrAehJsczWD8mWidN4WtQlr14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724768069; c=relaxed/simple;
-	bh=MJFXP/k9RQK0ByF56VDngc+Nl9urhri3xUs+JNYlmhg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RaX/DnyyL3Ty8nzw7PHyHsjuIaeISp99Wt6GwxpUPPs4ftgdX7xuKT02/dYa1+Xx+9oLJT1JjnxA2FoF3RTqDaZFHJfYOJQxJG071ITz7iOjYmBAnkkpdVubneAAtN0lFerM3RHPPnkj60f026Qd2Au7JT+dynWSmcn1BOdzD/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P1rv4OLK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3452FC581AA;
-	Tue, 27 Aug 2024 14:14:28 +0000 (UTC)
+	s=arc-20240116; t=1724768087; c=relaxed/simple;
+	bh=a/qNXotiee3mkDBZtw/MwodPcn0+Q7aIdor21E4Jwx0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SoCumYt26yYd49qtozPBEPgZOnw+wOCn0TrKLlInF42+Reh05XoFkzP1f3jDOrpjlhxgnBGlbPyaqsNq4ZrP4KiYRGpCb1eANniVEMHYX4zDnzkIkVBWL3lX/B3C08H3QMGJNvREOjNcFzU52s15D0tRbNf56v3zc9PZb+DfQZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n5U8Ac7n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E84C4C581AA;
+	Tue, 27 Aug 2024 14:14:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724768068;
-	bh=MJFXP/k9RQK0ByF56VDngc+Nl9urhri3xUs+JNYlmhg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=P1rv4OLKi6geNW+qmLq+G/zau60NRnAQ8jlm4wMN1kQUU2ml20OJldWMFsgSWrc96
-	 IYdXuovm7OoldXaJHbgZEEvsPNZIzvOSDaLhMzn00P+cTuZW7ZvAZeMRHwHbfHN1Sx
-	 l0/GYopSKK/pPYOQDCnS/WgGemlfo5O1imN7D9Jdvbhze667OiZ13/DStg7cihbWi0
-	 e4nG9IweKQct05F0QVR96vl7xrOPrfXJA0dfZi89PLEzdEXikqOudd6itVMEiH/JQS
-	 TXBtn+4U1JrsKNgO7uwpByvLptlo3WcZdR2BpACqfHuke59Q82PokuVWQkZZYEmO9D
-	 VcHohoA2LJegw==
-Date: Tue, 27 Aug 2024 07:14:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
+	s=k20201202; t=1724768085;
+	bh=a/qNXotiee3mkDBZtw/MwodPcn0+Q7aIdor21E4Jwx0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n5U8Ac7nJsSEAL/6CjdNIlaFXssAx54V5VxtygP7756BZV/TOl4j+46zr7y5WbX7I
+	 A/440w6Jxobevbl63n9NL6cu2UIejOB/gBmN/7PZJMPmPpLgfFBHkKFXPnRlI7oTB3
+	 ez2rHZ0V7mt1vEf+0wK2pMgTWe0buH8YDBeSPSul3+F8/KFWTvdbkBOOKkKgCMcUmO
+	 jvXQCuOiqftj+ouhkTTy9g+tx20NxtxGj81SJJIw0M9pe3SWgT784z8VBlVIoYuzfB
+	 w2sY/ZU7YYBPC6tDnbSfPKYLE8EWivvzlwikrO/CbJG9iHB8709U3YOmVcn9uQDnsZ
+	 +0AV272x6BBBg==
+Date: Tue, 27 Aug 2024 15:14:40 +0100
+From: Simon Horman <horms@kernel.org>
 To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jeongjun Park <aha310510@gmail.com>, wei.liu@kernel.org, paul@xen.org,
- davem@davemloft.net, edumazet@google.com, madhuparnabhowmik04@gmail.com,
- xen-devel@lists.xenproject.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net/xen-netback: prevent UAF in xenvif_flush_hash()
-Message-ID: <20240827071427.4c45fdb8@kernel.org>
-In-Reply-To: <fd2a06d5-370f-4e07-af84-cab089b82a4b@redhat.com>
-References: <20240822181109.2577354-1-aha310510@gmail.com>
-	<fd2a06d5-370f-4e07-af84-cab089b82a4b@redhat.com>
+Cc: kernel test robot <lkp@intel.com>, netdev@vger.kernel.org,
+	oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Brian Cain <bcain@quicinc.com>, linux-hexagon@vger.kernel.org
+Subject: Re: [PATCH v4 net-next 09/12] testing: net-drv: add basic shaper test
+Message-ID: <20240827141440.GC1368797@kernel.org>
+References: <4cf74f285fa5f07be546cb83ef96775f86aa0dbf.1724165948.git.pabeni@redhat.com>
+ <202408220027.kA3pRF6J-lkp@intel.com>
+ <3b1ca110-d1e7-47c5-af31-360a233cb4aa@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3b1ca110-d1e7-47c5-af31-360a233cb4aa@redhat.com>
 
-On Tue, 27 Aug 2024 13:19:59 +0200 Paolo Abeni wrote:
-> On 8/22/24 20:11, Jeongjun Park wrote:
-> > During the list_for_each_entry_rcu iteration call of xenvif_flush_hash,
-> > kfree_rcu does not exist inside the rcu read critical section, so if  
+Cc: Brian Cain, linux-hexagon
+
+On Thu, Aug 22, 2024 at 09:53:22AM +0200, Paolo Abeni wrote:
 > 
-> The above wording is confusing, do you mean "kfree_rcu does not exit 
-> from "...?
-
-I think they mean that kfree_rcu() is called without holding RCU read
-lock..
-
-> > kfree_rcu is called when the rcu grace period ends during the iteration,
-> > UAF occurs when accessing head->next after the entry becomes free.  
-
-.. so it can run immediately. Therefore the loop fetching head->next
-may cause a UAF.
-
-> The loop runs with irq disabled, the RCU critical section extends over 
-> it, uninterrupted.
-
-Is this an official RCU rule? I remember Paul told us it's the case for
-softirq, but IDK if it is also for local IRQ disable.
-
-> Do you have a splat for the reported UAF?
 > 
-> This does not look the correct solution.
+> On 8/21/24 18:52, kernel test robot wrote:
+> > Hi Paolo,
+> > 
+> > kernel test robot noticed the following build warnings:
+> > 
+> > [auto build test WARNING on net-next/main]
+> > 
+> > url:    https://github.com/intel-lab-lkp/linux/commits/Paolo-Abeni/tools-ynl-lift-an-assumption-about-spec-file-name/20240820-231626
+> > base:   net-next/main
+> > patch link:    https://lore.kernel.org/r/4cf74f285fa5f07be546cb83ef96775f86aa0dbf.1724165948.git.pabeni%40redhat.com
+> > patch subject: [PATCH v4 net-next 09/12] testing: net-drv: add basic shaper test
+> > config: hexagon-randconfig-r112-20240821 (https://download.01.org/0day-ci/archive/20240822/202408220027.kA3pRF6J-lkp@intel.com/config)
+> > compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
+> > reproduce: (https://download.01.org/0day-ci/archive/20240822/202408220027.kA3pRF6J-lkp@intel.com/reproduce)
+> > 
+> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> > the same patch/commit), kindly add following tags
+> > | Reported-by: kernel test robot <lkp@intel.com>
+> > | Closes: https://lore.kernel.org/oe-kbuild-all/202408220027.kA3pRF6J-lkp@intel.com/
+> > 
+> > sparse warnings: (new ones prefixed by >>)
+> > > > net/shaper/shaper.c:227:24: sparse: sparse: Using plain integer as NULL pointer
+> 
+> AFAICS this warning comes directly from/is due to the hexgon cmpxchg
+> implementation:
+> 
+> #define arch_cmpxchg(ptr, old, new)                             \
+> ({                                                              \
+>         __typeof__(ptr) __ptr = (ptr);                          \
+>         __typeof__(*(ptr)) __old = (old);                       \
+>         __typeof__(*(ptr)) __new = (new);                       \
+>         __typeof__(*(ptr)) __oldval = 0;                        \
+> 				^^^^^^^ here.
 
-The problem may not exist, but FWIW the change makes sense to me :)
-We hold the write lock, and modify the list. for_each_entry_safe()
-seems like a better fit than for_each_entry_rcu()
+FWIIW, I agree.
+
+It seems that arch_cmpxchg, as implemented above, expects ptr to
+be an integer. And indeed it is used in that way from
+include/linux/atomic/atomic-arch-fallback.h:raw_atomic_cmpxchg_acquire().
+
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/include/linux/atomic/atomic-arch-fallback.h?id=f8fdda9e4f988c210b1e4519a28ddbf7d29b0038#n2055
+
+As a hack, I allowed the function to handle either int or any type of
+pointer. With this in place Sparse no longer flags the problem described
+above in shaper.c.
+
+Perhaps someone has a suggestion of how to fix this properly.
+
+diff --git a/arch/hexagon/include/asm/cmpxchg.h b/arch/hexagon/include/asm/cmpxchg.h
+index bf6cf5579cf4..d8decb8fb456 100644
+--- a/arch/hexagon/include/asm/cmpxchg.h
++++ b/arch/hexagon/include/asm/cmpxchg.h
+@@ -51,12 +51,18 @@ __arch_xchg(unsigned long x, volatile void *ptr, int size)
+  *  variable casting.
+  */
+ 
++#define arch_cmpxchg_zero(ptr)					\
++	(__typeof__(*(ptr)))					\
++		_Generic(*(ptr),				\
++			 int:		0,			\
++			 default:	NULL)
++
+ #define arch_cmpxchg(ptr, old, new)				\
+ ({								\
+ 	__typeof__(ptr) __ptr = (ptr);				\
+ 	__typeof__(*(ptr)) __old = (old);			\
+ 	__typeof__(*(ptr)) __new = (new);			\
+-	__typeof__(*(ptr)) __oldval = 0;			\
++	__typeof__(*(ptr)) __oldval = arch_cmpxchg_zero(ptr);	\
+ 								\
+ 	asm volatile(						\
+ 		"1:	%0 = memw_locked(%1);\n"		\
 
