@@ -1,413 +1,123 @@
-Return-Path: <netdev+bounces-122233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C19D96080F
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:00:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B6E696081D
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01960B20B47
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:00:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EBCA0B223CA
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F7D019EED6;
-	Tue, 27 Aug 2024 11:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C8B19D8BB;
+	Tue, 27 Aug 2024 11:03:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="by9jVxM+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PolZGFR2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADA1199E98
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 11:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724756403; cv=fail; b=nv0GE1VeBiMaGWvzr2bXE4ERRxExQ0ZqaX7OfcidTsh0TRCjRFev+y0yQCqYItwDgV8gol4a9NsqEInNy/W6422zWUldA8vyzIjh4ftXJ1HzlTvPSydZGPri+7FSnbWslp8VeRXGbT8h57SvFrX42BVQec2uNR18E+q8KB1kEKw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724756403; c=relaxed/simple;
-	bh=pxDDbL0n+X2zY4UzHzb0mcEC4bOmZAXhsATgi3I5kwE=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=BWuPD2+p0EPSbPI/fhoAXyrDSV+NkERMO/eQSjVqq/jt983ZvsAKyxcHWfBZYaKpwvax2sTsVceGv+ajokDe5ao/WW1jxxDnGg+MWeNVWvPSunyfR2gWOAldf6bU1Od1VH1h4cfhiE74eU9TNlM84qLlWctHVs7zVmeQY7zGubA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=by9jVxM+; arc=fail smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724756402; x=1756292402;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=pxDDbL0n+X2zY4UzHzb0mcEC4bOmZAXhsATgi3I5kwE=;
-  b=by9jVxM+x24t7RiQOsr4sD3pcXFf+35+gITglDFChw7lc4lkVbHaYVYa
-   lVa1t57NmMlkYjgmSON6su3b2ZtlwM7qG4FFLPUPrG6EI9KPbK79g/48x
-   AZIYIKj9rJ9i3jhSxuDOg8LA6ST6tympygoMBRHsKysAQKBYoxzrdkB6L
-   vlUV7e51uiOmMdYv2F8VxqOVmrDKXwWbeqB9apMMpvA34pqq/uRmigY6M
-   YttBnW/JVAwgcmkJJKMmhW/n6ewB2izuP9jId8/pf6lOt2zapj8KLRUx4
-   IIQ22y3e+pGPJ6qdlM0tu4lpSUUQlvqyty/GhYZfhnC7i9Hh/lijTA8nv
-   A==;
-X-CSE-ConnectionGUID: LskTTFndTkakkS0Is9UcOA==
-X-CSE-MsgGUID: A00CjP3sTM6CQ6rRtsUhGA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="22818198"
-X-IronPort-AV: E=Sophos;i="6.10,180,1719903600"; 
-   d="scan'208";a="22818198"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 04:00:01 -0700
-X-CSE-ConnectionGUID: WxInjgB0S4y7jZhbMSEvsw==
-X-CSE-MsgGUID: RZej7/prTrS9sbYS/LVtNw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,180,1719903600"; 
-   d="scan'208";a="63541109"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Aug 2024 04:00:01 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 27 Aug 2024 04:00:00 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 27 Aug 2024 04:00:00 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.172)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 27 Aug 2024 04:00:00 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZGk0uqvog4TyrCZB2KZqJU+EjeU1MG42ZsZaMpdo0CcxvtPs84vabaPmVZAzRSfNJNLxcLd2mTYc21CyganJJ8kuEIQ7U39c3IGKQYZOeKwX7IlCTpsuUVbhtquEOBYHD42O15eQpf9DYL5G5ZcMgxqp2ahdtw+GheOzJGA5WeWlJC1W//Cupahk6tKE1nemEbhGXFblmqvpMLieymOcTA8sIXzSdvLNQyT7EzWalHG66GB0Y4MXE6/9byZtPj8vXRtUex3ybZRt1eGkH8agLb3g7YvXg9b/9cQK+QaouBzaR64RoNGNruW4Rmkn8ktOwinhUYkkw9B7gwVvDZ1h1w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6Van/CL38FLNbeXVvigmtCjCfL53KOgODa1jZIczJNE=;
- b=eEEILzGILIbKci8QhqdAJsvjMrtTOULBHNuuO2MyUL75s+I3RKdWAAVNqSUp3fdYW003NRahIVpgrpNf4r1OhsOlTUhES0wiZGvHfI70dMjGNmB0ye6HtKnG/skxNioY3PBd3/sCRqr0BsA7Yh7ARuMyORF09gPGO2N6SIjPPYVB43ZSxoikVvaQ8bFT1W5ruZlZAE2Jj0q39w4NwJTwBIZinBa8oc2ru26n/llmK6KSDwjkS5jOQspYah7kqZG67AilyF/EPTqdmT5Wy9z7np9JrNHnVpBvk191ibxYXrb4NjTndsbxNptMU8jiUNuT+m2Sonptt+sbymfgQfASeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by SA2PR11MB5002.namprd11.prod.outlook.com (2603:10b6:806:fb::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Tue, 27 Aug
- 2024 10:59:57 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::4bea:b8f6:b86f:6942]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::4bea:b8f6:b86f:6942%6]) with mapi id 15.20.7897.021; Tue, 27 Aug 2024
- 10:59:57 +0000
-Message-ID: <213347f1-7af5-45a5-a9ce-448d98867d35@intel.com>
-Date: Tue, 27 Aug 2024 12:59:50 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v10 06/14] iavf: add initial framework for
- registering PTP clock
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<horms@kernel.org>, <anthony.l.nguyen@intel.com>, <kuba@kernel.org>,
-	<alexandr.lobakin@intel.com>
-References: <20240821121539.374343-1-wojciech.drewek@intel.com>
- <20240821121539.374343-7-wojciech.drewek@intel.com>
- <3278c207-b450-4ef0-b240-0fd4cfc0b1df@intel.com>
-Content-Language: en-US
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <3278c207-b450-4ef0-b240-0fd4cfc0b1df@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: VI1PR04CA0063.eurprd04.prod.outlook.com
- (2603:10a6:802:2::34) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8333C19AD48
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 11:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724756628; cv=none; b=MtKv8uP9u4Q5O/IZWeozmeOvnLza0n02gN9PG7RQjCq2A+X69hPMqVI/qquSyxcOd5+sHAJUrzGnuzS19tumHQBe1/wAcfLpvMlDn4taxUQKG2EjAEjEqZNFWRziubq3GBOYJw6LovWZPmmAlNCCbdXoocIA7JlWgYSQwB2ICo0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724756628; c=relaxed/simple;
+	bh=A+MNWj+OQxto9jsh0jURUa7HxhqCaOn/gLNcSl4YUqI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nA43qeOgceFMDr4SsZ+cWBsMSuwlk46zxVpwiiXf0LKSfUSeFoTplg3IojYkRaZoXL8iTQjik9ClZWKxzQ4aAxi/zwwfw5mc4OWyT8tkHyu2RrF99seKs9AJZvEjvHSLwnM4fj9AN3PLzMwr5r76LAi8ZOegENSWsu3iLSvY4VQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PolZGFR2; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724756625;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UgSQAdyFzCk1B7hAbRKds1KXjrwE0OwyWBIAVqcPcqY=;
+	b=PolZGFR292+kEKPTsYAPNtWevC0p8cU6y7io+Uumh6+M3UAuaQ+X5C9gMXHFITptXzZWGc
+	DCi5FtlM/MJexMpqZZDZU5Xmnjy9TALajCP+KPuHS3AcbllZV6dc3iSkIuL42bYUddfOLO
+	dAVnqRS7TxttkIyn8dDoTWXliD5BZHs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-59-QP-PJ8ysOg6zu3VNVn0N2A-1; Tue, 27 Aug 2024 07:03:44 -0400
+X-MC-Unique: QP-PJ8ysOg6zu3VNVn0N2A-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42808efc688so47294165e9.0
+        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 04:03:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724756623; x=1725361423;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UgSQAdyFzCk1B7hAbRKds1KXjrwE0OwyWBIAVqcPcqY=;
+        b=nEEor2yMIO111sxOcCJwf3AMjQiyTWpr/KF+b8gGjijVB3jmflT96fSgTen40rc4W+
+         kWMrN9miEwAWKBOAw50KuvrSCF+bntyNGPm2aV34KPKlyQfmhL+9my890VTbz4Ek3Z+W
+         +puGp0Op/nkRasmewg9xuZ1hXsMeP2lRlnJTRWQEYQAL7qbDHMkJ3cwQd03DIfJNNfzl
+         f9+4km5kpMhpEqU92ucRNFQ/9cFw/PFmuPP9l4PFntqznRChIP5BJ/zvAhIsTbojdfnt
+         L70N4sfGr+ebHtNxx5bbh/MjsKcVBWNVxsKg0yp/iC0MBPevzPI1oh+8y9htQId5kRWy
+         RhHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX3RE3Go5gvkmpTffQRje6zJJfPPl0jp8s9YNqi7PIVKaOiZQWqZEQBz444jgjs1eH2yPJdLdY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnfAvaRzSYk1QJu+NbKWTTZYb8dpfJG2h5KvpCFi3CkSczYdE5
+	lgweLCruFRNtG7WzKQfWkM1ncVtB6wT3s2le7i9LrBFyjh6pPuJhyND+IdymbQrsZEBXHbKY07P
+	JkvQ1S6vo0Lfpg1Ld1ZsGcZGaBWeoBBZl1u5c03sQYJm5TNVeZM/cbg==
+X-Received: by 2002:a05:600c:1906:b0:426:5416:67e0 with SMTP id 5b1f17b1804b1-42acca0228fmr88165325e9.31.1724756622872;
+        Tue, 27 Aug 2024 04:03:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE5rXVSWLGAoMAVG7lpEUZCl6uE3GH7MnHGgSFiGY/SippMRXHtMs4XqJiD5ahbRzNGg7baFg==
+X-Received: by 2002:a05:600c:1906:b0:426:5416:67e0 with SMTP id 5b1f17b1804b1-42acca0228fmr88165075e9.31.1724756622350;
+        Tue, 27 Aug 2024 04:03:42 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b67:7410::f71? ([2a0d:3344:1b67:7410::f71])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42b9e7b7f87sm12193365e9.1.2024.08.27.04.03.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Aug 2024 04:03:41 -0700 (PDT)
+Message-ID: <a7a33be8-6ef6-402e-b821-8ce9d4620a1b@redhat.com>
+Date: Tue, 27 Aug 2024 13:03:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|SA2PR11MB5002:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6b7f0a0a-3412-4048-3811-08dcc687635f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?bnQxelkyczh5WjMrblNaN3JOUWNTZ0dpTFZWb1ZPM1ovNE45emh0NFQ5Z21p?=
- =?utf-8?B?VXNsbTVscDBLZEpCOWVIRWdnRkdyZEsvT1oxMGQ3TGZVOUJ5VGI3b1hlcVE2?=
- =?utf-8?B?M2Rud3BCbWhPZCsvTzlLUEVXbmltbFZ2blJ3ODhPVGJkK2hLVUt2eGozY1FD?=
- =?utf-8?B?bUN4M00yMWUwdWdkYUREWXptMklsM2pDOFp1bkRVY1RjSVZ6K2pIMnFpRG1J?=
- =?utf-8?B?OFpQWEg0SkFoSjdMSkQwODN4eGtFZmwva1JtQnRtZzladmJlSUQwRkxrUzhn?=
- =?utf-8?B?Tm5rdGtYUGQ5ZWRhN29VK3Rzd2xGYnBjczNNdnAzRURyMEtmY1NwUnR4V2VW?=
- =?utf-8?B?RWVUSlBrMXF2cDljU2w2ZStiWEwva1hDK0pVUVFtQkFQSEVER001Q1JtVUF4?=
- =?utf-8?B?RWszMkltaVUrM3VVcUZOUFoxcDFuUnl2RTJPc0RLYVZxdHFBamcralBjeC8w?=
- =?utf-8?B?djBHcHFkelNjZzMzRlJjZ3I0bE53K0NWcUliM3g2TW5ISEhvdHlIY05BdmZ3?=
- =?utf-8?B?eHJoTklaaEVGaW1SS0YrdkVxQkZ0Wk5KT3JUY3IyOUxUUmNmL3JNUTNSaDQr?=
- =?utf-8?B?Mm15RU9OZTlKQjV5UGhobjJwcTc3VkpISXJhemt6NWpBekQveHR4ZldhWnB6?=
- =?utf-8?B?WCt4VStuKzRsTnh5ZnByRDJ1WkRyeWdONEIvUG4wdXFGUEgwTzdiMnZxV1N1?=
- =?utf-8?B?MDVDMHZvTS9RNFZkSWtMTGdPVjVmSHM5OGZvZmMxZFMyN3MxazU4dUZGL3A2?=
- =?utf-8?B?QTJ0eTYrRk10dVgxMzBiOWlGWkdYbGd0N214emFKa0VZSmtFaCs0MzdCM3M3?=
- =?utf-8?B?enNsMDNreitnYWphemxJaEZyQ2lwUGNXUkVEeDdTMUFEZ3lTWUZ5OHhJOGJv?=
- =?utf-8?B?a1FEUElOakJBRDBmbmhTYzJCMjBrMEl4UjNKZTdyczJ0T282K1FSb1U4WmJl?=
- =?utf-8?B?SkZXbFY5UmhJVGtpcHYxN1QzUjU5c0daRTlvVHBMSXVKajk1ZCtMUEF0WEUz?=
- =?utf-8?B?TjZ3enlXSkFiYTBWcU41WExONytoRjZEYkxJYWhuYjcrZjBMYXNSTHBoV2VS?=
- =?utf-8?B?VTVVOUJxZ0pIWmFZZm1EUThoRENFbWFFUnZvK3dMRU5tZEVTU3VGaFpWdHN2?=
- =?utf-8?B?WmZybzFadTRFQkUzall4NURNdXd3MEFYdjdnRnkrYXQyZnp2K2Y5Ym5RcUxV?=
- =?utf-8?B?WW1RZW1HZjF4dnYyYThhcFBjaXdndnppL3JQWndNQ2tBTGVFYnhPMSt3SHRF?=
- =?utf-8?B?N09nV1pVd2FEdWVMN0I0NlhwRE5iYkpNT3NjOTkyQW5LcnNQcUdyK2d6NmMv?=
- =?utf-8?B?QllJWlUvMUdjUUU2WndNQzVKbWlqU1dRQ3YvV0YxMHlJU292MG9LTndNbFYv?=
- =?utf-8?B?blcvTlFjRUdiOHhZMllOaGNHM0NtQytSdUJnTlBkajNQTHpuUVUzSGVyZXE1?=
- =?utf-8?B?MFl1Q0dWanVEUHV6WlJ2aUdKNmRsMitXVXArU0VoemlWUGpGVGpYUnFDQ1Jv?=
- =?utf-8?B?T09XSWxma09SMVVlSVdTVmpPbGVIT3UyRTVZN1VhbWpTa0cwbDEzTTJ1Z2hI?=
- =?utf-8?B?bE1sNG9vSXkxbjBuUFczNDBNR003YldQZ3BvblcxRURxY1RFUnRvUEJiWXNi?=
- =?utf-8?B?cWVDdlNzbFV3bjhlNjdKcVNBSjZRcnNhZ2EwWVhSWGZnM3RSeXFqWFBkYS84?=
- =?utf-8?B?a1ZKL1FYdmhpM2dUSW5zdEJBT0NNU2FNOUd3cnVaYWUrM0dTa09zS2lBeG93?=
- =?utf-8?B?MFozVUQvaGRrSEdxOHdxeWdvQm1lb1dDSTB4bWNBQXA1bWRhclU0SnMxTnkr?=
- =?utf-8?B?eDNnMC90MWVIZzlIY3ZuQT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MlYyL1l1TlA5T3NKaTNZc1BpRU1leGExMFZaQmRaMXJnbktmemUvSmh5c2FN?=
- =?utf-8?B?Q08zeHlHTHNYd3RqekdIYmtML3h1S0haa2YwZWRDLzczNGNTdnNqZHlYL1Rq?=
- =?utf-8?B?MXhLZFY4S3h5V0VNcGtnejh4TnVleGdTVkVPaWVkVDRzRUxoZGRqcmhrT1Rt?=
- =?utf-8?B?MEtXTUtaZmRkOEhycW5oWjZ0emk2MW9UblQ5RktPeXRZNnlhRFc4d1VIUVAr?=
- =?utf-8?B?cllnZzRzQmx5aG9ja0pzS3dnV1dEK080ZWRsdjZpNlp3Y0tOOVJmaHJvSXRY?=
- =?utf-8?B?aUhiaVF4bm5nbWsxQy9pTGFvRzNWanZrK2JCY0dOUUtSVi90SnZVYlkrQW1T?=
- =?utf-8?B?Y280UFNOUWUrMW5nMWwweE03NUpPeGNYUnh5c2JMWlhnQksyRmFON3J5USs2?=
- =?utf-8?B?OEZHL2c3Mzhoa1VOSlpjUTUyTGVQVHhtcXltWi9PbFJFSXBvRWVLV0RYM2tt?=
- =?utf-8?B?T2VVOVZlNk5Oc01Vak53TlJSaFN3RkpKWlMrVjFDWm54MUlDVUV2TGhIbG9x?=
- =?utf-8?B?d1lTeDAxNm0wM3N3WmEwRXBia0p3QlZMQlFra0kzYnU5VEJ4UHA4K0RRN1Vh?=
- =?utf-8?B?bEJQVXp2YitSN0dZSGFhSWFsdlJPa3YxWk9ZWUtDUVk5Z3hvS0RXZ3lRZWxx?=
- =?utf-8?B?bFpZWWFSOGlLZllNQTRvaElBUFltOUdBbjJzYnRuNGI0NytvY0cwNjQySzlB?=
- =?utf-8?B?MkpQazg1TmM3Y1k4UWNxbkJ0NGQ5eEhMRzE2NHByZVZBbTErY09hdEJKWUhi?=
- =?utf-8?B?Sjh6eGhyVFQ2Zis2bmVlTGJ0d2RtdWZpdS9DNUhLUzBhK2w1b3lTd2c2MzFr?=
- =?utf-8?B?djd4U0xja1MxUExmQS9ZbmxuTU5wY05VRWNvZGNHU0RVZTlBQ2ZzVmtROURh?=
- =?utf-8?B?b3BnSmFDYUt4NWF3ek5YcWg4aEZnZ1hSUVJXNlJId0pHTnZPVHZlSS9kNjg0?=
- =?utf-8?B?MU9uYitVTW5pVklmTkVLMlV6bFpuYy9OcTNzV0pPY3ZJdkpZSWpTbnZScno4?=
- =?utf-8?B?UllUMllHYUpPNHJsNDBmbFc4aGtPRnVsSGtXbUR2RnJDVmRsemdNb01MNkl2?=
- =?utf-8?B?eXZBTW9yVWIvanZNcE9KSTlCZEluS1BVZnkxRnZNZmRZcGRvYWpaYjRCRU4v?=
- =?utf-8?B?bzBVR0IyRzRBV0s1VkFsMG03SjZzWldNalUvQ3F0cXVVNmVoRVorclFkZTNo?=
- =?utf-8?B?TUZ6ZFlWblVuc0prRHBLa1lnRkdSWTZmZkJLdXZqZGJtVE1IUUF4Vld6elhv?=
- =?utf-8?B?U20zK0Nqd2ZxMENzak9qMVFtNGgxeENQQTJkSlJ1aytIV0dpNm9FK05IbDFm?=
- =?utf-8?B?TGM1Um5ScVhEZ0k2eVpZS3V4QUVKbGR6MXJSdStySC94OTAxVElSYTBxZERz?=
- =?utf-8?B?UFVHUVhnNHYrTGx6T2tZakFsNmhXWDRFR0J6RWpXWWlpS21lenBWaFk2b00y?=
- =?utf-8?B?Slp0NzMrVWg4djRZa1JhMndRVUlGL2F2ZmtkU3YzUjFIaVdxQ2kxSDJIYnZY?=
- =?utf-8?B?WEdZTWRtMklCUDdLWEhCbDRUT3dFMDlYR25TRDlKamNRNGZNaDhZT2F6UVBN?=
- =?utf-8?B?bTcrWG9Bb0wxS2NDaml5RXpaVXpkRS8rNVNYN01XMHZZekNJWXpWL0ZOaHNQ?=
- =?utf-8?B?YlNFWkgvUG04eVc5djBVZWxHVGwwMERmTGQ3dG55c2pOV3RmYTczRkRWZmxN?=
- =?utf-8?B?Z290eEFRU1BMZzh0K3pXNGtzMUkwRFRxVGRPb2xuNytSOHN0eWg5aFNRWDVD?=
- =?utf-8?B?K2tFNWpoMHk0SUNwRnRhOUFLZ2NoMlNJNy9MQWpJRVNrdEdWL1hQbEc3SVds?=
- =?utf-8?B?b2JCdytBeHNtN0V4NU8zblYrNU85ekk3S3JGNXZvSUoxK2NEVStxZVp6VUQ2?=
- =?utf-8?B?Rm9Xa1duMkxkSUhTbWN1ZkpVTlpmRU1JckxYQWg3RDBJOGZmRDhDSjk0NlJX?=
- =?utf-8?B?L0NOY0NCaHBGTFF5Ny94L3VVWjlQTlJtdmJZaFJ0SXU3akdXdCtzWjdITWFP?=
- =?utf-8?B?a0ZmaDRSS3JHTGRtZUFOYWpxb1JiZE1XMmdPem5aakg3Rm1FcitWKzFIQnF4?=
- =?utf-8?B?eGM4U2lnTWpmTUdCaWc1RUFBdzQrdlQwODlIL1Z6aVh5VThpN0F4MFZtelhz?=
- =?utf-8?B?dmV3TlNTRUZ0dG9WZ2dHUHkvN2FRakhheTNqYzI2Nmh6dWUvR1hmam9raHkz?=
- =?utf-8?B?ZVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b7f0a0a-3412-4048-3811-08dcc687635f
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2024 10:59:57.2208
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: oH3w0SppZ9vQJLuzADWEDxLkF9n8LI0Bvsa0R2ASeSwgZ9RV8Wai+eMnklXL4IEpWr2CLWp7AghImoTYaDn+i7Hn2aDl+3lUT3zQzogvDBs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5002
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: bridge: fix switchdev host mdb entry updates
+To: Felix Fietkau <nbd@nbd.name>, netdev@vger.kernel.org,
+ Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: bridge@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240822163836.67061-1-nbd@nbd.name>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240822163836.67061-1-nbd@nbd.name>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+Hi,
 
+On 8/22/24 18:38, Felix Fietkau wrote:
+> When a mdb entry is removed, the bridge switchdev code can issue a
+> switchdev_port_obj_del call for a port that was not offloaded.
+> 
+> This leads to an imbalance in switchdev_port_obj_add/del calls, since
+> br_switchdev_mdb_replay has not been called for the port before.
+> 
+> This can lead to potential multicast forwarding issues and messages such as:
+> mt7915e 0000:01:00.0 wl1-ap0: Failed to del Host Multicast Database entry
+> 	(object id=3) with error: -ENOENT (-2).
+> 
+> Fix this issue by checking the port offload status when iterating over
+> lower devs.
+> 
+> Signed-off-by: Felix Fietkau <nbd@nbd.name>
 
-On 21.08.2024 16:20, Alexander Lobakin wrote:
-> From: Wojciech Drewek <wojciech.drewek@intel.com>
-> Date: Wed, 21 Aug 2024 14:15:31 +0200
-> 
->> From: Jacob Keller <jacob.e.keller@intel.com>
->>
->> Add the iavf_ptp.c file and fill it in with a skeleton framework to
->> allow registering the PTP clock device.
->> Add implementation of helper functions to check if a PTP capability
->> is supported and handle change in PTP capabilities.
->> Enabling virtual clock would be possible, though it would probably
->> perform poorly due to the lack of direct time access.
-> 
-> [...]
-> 
->> +/**
->> + * iavf_ptp_register_clock - Register a new PTP for userspace
->> + * @adapter: private adapter structure
->> + *
->> + * Allocate and register a new PTP clock device if necessary.
->> + *
->> + * Return: 0 if success, error otherwise
-> 
-> Period ('.') at the end is desired at the end of kdoc.
+This looks like a fix suitable for the net tree and deserving a fixes 
+tag. Could you please repost adding both the target tree prefix and tag?
 
-Sure
+Thanks,
 
-> 
->> + */
->> +static int iavf_ptp_register_clock(struct iavf_adapter *adapter)
->> +{
->> +	struct ptp_clock_info *ptp_info = &adapter->ptp.info;
->> +	struct device *dev = &adapter->pdev->dev;
->> +
->> +	memset(ptp_info, 0, sizeof(*ptp_info));
-> 
-> Is this needed? adapter is allocated using kzalloc() I think?
+Paolo
 
-I think it's not needed, adapter is allocated using alloc_etherdev_mq
-since this is netdev's priv in iavf
-
-> 
->> +
->> +	snprintf(ptp_info->name, sizeof(ptp_info->name), "%s-%s-clk",
->> +		 dev_driver_string(dev), dev_name(dev));
-> 
-> dev_driver_string() can be just KBUILD_MODNAME when it's called inside
-> the actual module. It's mostly used when you need to get a module name
-> from a different module or core kernel code.
-
-Makes sense
-
-> 
->> +	ptp_info->owner = THIS_MODULE;
->> +
->> +	adapter->ptp.clock = ptp_clock_register(ptp_info, dev);
->> +	if (IS_ERR(adapter->ptp.clock)) {
->> +		adapter->ptp.clock = NULL;
->> +
->> +		return PTR_ERR(adapter->ptp.clock);
-> 
-> Braino here.
-> You first set ptp.clock to %NULL and then return PTR_ERR(ptp.clock).
-> IOW, this error path will always return 0.
-> 
-> I usually use temporary variables to avoid this.
-> 
-> 	clock = ptp_clock_register(ptp_info, dev);
-> 	if (IS_ERR(clock))
-> 		return PTR_ERR(clock);
-> 
-> 	adapter->ptp.clock = clock;
-
-will fix
-
-> 
-> 
->> +	}
->> +
->> +	dev_dbg(&adapter->pdev->dev, "PTP clock %s registered\n",
->> +		adapter->ptp.info.name);
->> +
->> +	return 0;
->> +}
->> +
->> +/**
->> + * iavf_ptp_init - Initialize PTP support if capability was negotiated
->> + * @adapter: private adapter structure
->> + *
->> + * Initialize PTP functionality, based on the capabilities that the PF has
->> + * enabled for this VF.
->> + */
->> +void iavf_ptp_init(struct iavf_adapter *adapter)
->> +{
->> +	int err;
->> +
->> +	if (!iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_READ_PHC)) {
->> +		pci_warn(adapter->pdev,
->> +			 "Device does not have PTP clock support\n");
-> 
-> I think it's pci_notice() or even pci_dbg(). A device can miss PTP
-> clock, but it's not a failure. _warn() is when something went wrong, but
-> not as wrong as _err() :D
-
-sure
-
-> 
->> +		return;
->> +	}
->> +
->> +	err = iavf_ptp_register_clock(adapter);
->> +	if (err) {
->> +		pci_err(adapter->pdev,
->> +			"Failed to register PTP clock device (%p)\n",
->> +			ERR_PTR(err));
->> +		return;
->> +	}
-> 
-> Why does this function return void if there's an error path? To make
-> sure the driver works even if PTP fails to register? But I think it's
-> better to bail out if something failed than to work without certain
-> functionality?
-
-Most of the drivers don't bail out if ptp init failed, I'll stick to that.
-
-> 
->> +
->> +	adapter->ptp.initialized = true;
->> +}
->> +
->> +/**
->> + * iavf_ptp_release - Disable PTP support
->> + * @adapter: private adapter structure
->> + *
->> + * Release all PTP resources that were previously initialized.
->> + */
->> +void iavf_ptp_release(struct iavf_adapter *adapter)
->> +{
->> +	adapter->ptp.initialized = false;
->> +
->> +	if (!IS_ERR_OR_NULL(adapter->ptp.clock)) {
-> 
-> Since you always assign clock to %NULL when the initialization failed,
-> this could be just
-
-Yep
-
-> 
-> 	if (adapter->ptp.clock)
-> 
->> +		dev_dbg(&adapter->pdev->dev, "removing PTP clock %s\n",
->> +			adapter->ptp.info.name);
-> 
-> pci_dbg()
-> 
->> +		ptp_clock_unregister(adapter->ptp.clock);
->> +		adapter->ptp.clock = NULL;
->> +	}
-> 
-> ...but I'd invert the condition to avoid +1 indent level.
-> 
-> 	if (!adapter->ptp.clock)
-> 		return;
-> 
-> 	pci_dbg() ...
-
-Agree
-
-> 
->> +}
->> +
->> +/**
->> + * iavf_ptp_process_caps - Handle change in PTP capabilities
->> + * @adapter: private adapter structure
->> + *
->> + * Handle any state changes necessary due to change in PTP capabilities, such
->> + * as after a device reset or change in configuration from the PF.
->> + */
->> +void iavf_ptp_process_caps(struct iavf_adapter *adapter)
->> +{
->> +	bool read_phc = iavf_ptp_cap_supported(adapter,
->> +					       VIRTCHNL_1588_PTP_CAP_READ_PHC);
-> 
-> Maybe split the declaration and initialization to avoid line break? My
-> editor says it would fit in 80 if you make the variable name shorter,
-> e.g. 'phc'.
-
-Sure, why not
-
-> 
->> +
->> +	/* Check if the device gained or lost necessary access to support the
->> +	 * PTP hardware clock. If so, driver must respond appropriately by
->> +	 * creating or destroying the PTP clock device.
->> +	 */
->> +	if (adapter->ptp.initialized && !read_phc)
->> +		iavf_ptp_release(adapter);
->> +	else if (!adapter->ptp.initialized && read_phc)
->> +		iavf_ptp_init(adapter);
->> +}
-> 
-> Thanks,
-> Olek
 
