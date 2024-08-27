@@ -1,98 +1,254 @@
-Return-Path: <netdev+bounces-122445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 380E2961605
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 19:54:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8434C961608
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 19:54:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E25501F240B9
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 17:54:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04C121F21D89
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 17:54:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 281A71CFEBC;
-	Tue, 27 Aug 2024 17:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A061C57B3;
+	Tue, 27 Aug 2024 17:54:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mY1D+SDY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R9r1rVuh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C811CDA3C;
-	Tue, 27 Aug 2024 17:54:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724781253; cv=none; b=sHWwnya2fRVIUNvNKEv/ilsXvmY8QOQlqKH90xCYuUbZvNfXjJ6kmqKQoPFeNb8UzDAZtlbydT9BDzq24Rl/ggdPmK/1oIf0CcSmd1ayMuZdEOjkWe/HViPGDdb0LtLRQe6bAL4+JbyuKKqdtWBxm9g+d5zAT7Uf/X9GZw1GC9o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724781253; c=relaxed/simple;
-	bh=8w5DExRTyDctlIFWIm3FFIdaZYVzpO+3H3+u6nwYWtM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JF14m3YIX/w1tJZMP+XDUHGn1nlxjNiPocSj63ObDRLyZCPCG2ebyJnsY1NWPAmYBWiYGCvVEhceMLaUdllLpXHyfinNSd/Wy2d8rvf1lq/kRYnmN3aqRsyFc3Mj0uvCRw40quHIF2RWhy6fZ04EMoUFnzCJ6y42sSefvXSx4Fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mY1D+SDY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8071C567C5;
-	Tue, 27 Aug 2024 17:54:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724781252;
-	bh=8w5DExRTyDctlIFWIm3FFIdaZYVzpO+3H3+u6nwYWtM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mY1D+SDYmFJ8Wh/wFhrWpuOkt83KaKaK6InyYTjM6yDqaky/ox4e6JIOodH2OGzRG
-	 LqwqrvStTOwgkhgtdOap8rZrSpIwBf7XAoJHCfSSIGEBjm3ZVGdbWXSf893lHSHsto
-	 DRlXgK/IWcFZhShWrVX9D+AFpzO/JlRAv9hwxPGOcl01+FWBHG2kgm0/gWtr81T/XK
-	 nUg3nz6ykeeSlBWGHxFRTp4odL1+XLc+INm6/vKbZ+7/RwIfi8+9+e5yzl9+d+aGLd
-	 n69vzXdoSQ5WgNKWPZlT0r8zSfmQyKajxNkHs6rt3nXn5SJn56n9/BuKdW6mhwNCt7
-	 SApuMu2RL3qtg==
-Date: Tue, 27 Aug 2024 18:54:08 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yan Zhen <yanzhen@vivo.com>
-Cc: marcin.s.wojtas@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
-Subject: Re: [PATCH v1] ethernet: marvell: Use min macro
-Message-ID: <20240827175408.GR1368797@kernel.org>
-References: <20240827115848.3908369-1-yanzhen@vivo.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA149126F1E
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 17:54:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724781289; cv=fail; b=liUeBl749h1QX5AYVMrRInZMw05oAAo5hKR61Z2nR0SKC3TloCZ1xDsAdPj/Hb7u9eu40XIWQbcQYDosCEE9C0KyU0l5EiilnX/EPgJ2Z7OJgpiETwdqNRKRl9GDGYKozbI6mKRsA1W1oFzyJ679Ya+DCwL2c789nXFx4hmOvFQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724781289; c=relaxed/simple;
+	bh=yiu6WnwypRhLUwxpNr88OO1I4Z4B3AIc9EpH5lyBoFQ=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=fTPGDKUBmBUMLVjvZa6Q4400w/0BtB+Cx5i/kHWr5TVfGphINZ5BLcBGBYM5iCDYw3Ig2oxAfCm/vntPa54tThjPJIF/htgKGAK2HDBT1d8YvRQCrdNn2NmLp/IxHfJgakYQlWZONT7Tu6MBnLu5dLz7cg7ZBU7dFJGWWG1lU1s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R9r1rVuh; arc=fail smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724781287; x=1756317287;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=yiu6WnwypRhLUwxpNr88OO1I4Z4B3AIc9EpH5lyBoFQ=;
+  b=R9r1rVuhrfnaB3p53iptFOUbAdbPnF/IZVTMjckSkmRykXjJSwx55wU7
+   CsRw5MIaPbUYdgadbDDtaLnfdrEpsT8ofr19mX5rnbWuBqXR34Yh4m9tz
+   VIWrHUVTsfnjtWk7U9h6gJEU+dQ+u9lB9wkefi/PHwVzRCVYlzvOpBUR0
+   yhkXKA+FW+IVijvS79bwy/7c5UUzgjBfp+Vf1e+laWoFehcfhtqcCWTcm
+   ei8kKhbJf4X2f32J6PoNsa2clPUp0tyfiHb4C+l/qvATpnN/Cag+gtcZB
+   vKOkNndjBDxmOKfwm/7fNy9XU+LQRNPnJR7a2cXWRSY+tkMxuL5N7RurC
+   g==;
+X-CSE-ConnectionGUID: 8AeXgcDLQueo/Smig3LLpg==
+X-CSE-MsgGUID: Twfv8fAQQ5eDNnF9HAslYQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11177"; a="23144546"
+X-IronPort-AV: E=Sophos;i="6.10,181,1719903600"; 
+   d="scan'208";a="23144546"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 10:54:46 -0700
+X-CSE-ConnectionGUID: pKutPVOcTWG9XnDI7XumkA==
+X-CSE-MsgGUID: VH+lfjRhR8OA9x8REN9SVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,181,1719903600"; 
+   d="scan'208";a="62781169"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Aug 2024 10:54:47 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 27 Aug 2024 10:54:45 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 27 Aug 2024 10:54:45 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.44) by
+ edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 27 Aug 2024 10:54:45 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eYdOnxA06TZxTvIPNmvzGZRiZDLDlcy4hcC5NmR17P4hJGGv0XIp65dV3P7lBohfvqQ9/I0+rzcrWlTGzEjWQ0sZlBPuoycg7yld3MyVK5pw6xkoe8M0EhqnEqZGc02W2SyRms+5FpsszIvwUbG2JDRb1SE2DnPCdR/MYFDPHKo8/hCeX/hd8QNBz4yos+oqp3RZahcCJM2Tycg57F2r6SyDMD3e4Y0r8kS3qD7CK8XVuIsWQYdlwBEyAKEOg9dwQJ2zE5lMR9qPfOZqTYcHHCe7oplsnvv9cXMubCNrWCA/PqEjvf5FdireLeP85MEUuDJ2GgGbOHfzX5RjHWnpxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ngtykXbhHaiyq5ZNci57JKS9eOwcBN0SZgH5cpV81WI=;
+ b=ogsLahqcbmVOP3A8//wMk6ISzRSsxaJelKLoKbx1WV7b+wqzwj6vvCTp9T3Bd8cqZtIZ7eNOZYmBiA1/AKjpMBolHgpGkTshz9JN+KZ0qBDZCpk/4dz/qCKWG4LA+xVIyMUON62v16mSL0iSVpmvRuVwt+JpTKgm4BPUkgqCN9biFFrlwihIVogfXUj+NlaqHBXHAeG/C8E7iNyALgPyvWE1xfpx3UV69qz0Y1h74SXaGZFH9LhmAFUxZefuVmNKlbf6szzdRT2XnRpLrIBQSlDzCR0WWvpKCCt6OdgItbnBBV2zyRXHYACMGytUCYReScwoenShQtsR2sbvip/8zw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB8268.namprd11.prod.outlook.com (2603:10b6:303:1ef::5)
+ by MW4PR11MB5935.namprd11.prod.outlook.com (2603:10b6:303:18a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Tue, 27 Aug
+ 2024 17:54:43 +0000
+Received: from MW4PR11MB8268.namprd11.prod.outlook.com
+ ([fe80::b5a5:ed80:386b:aa]) by MW4PR11MB8268.namprd11.prod.outlook.com
+ ([fe80::b5a5:ed80:386b:aa%7]) with mapi id 15.20.7897.021; Tue, 27 Aug 2024
+ 17:54:42 +0000
+Message-ID: <0c0f51d5-8ff1-44f5-8607-cee88479aa62@intel.com>
+Date: Tue, 27 Aug 2024 19:54:37 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-net] selftests/net: Fix csum test for short packets
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+CC: <netdev@vger.kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+References: <20240821142409.958668-1-krzysztof.galazka@intel.com>
+ <66c5fa663e274_dc0c22942f@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: "Galazka, Krzysztof" <krzysztof.galazka@intel.com>
+In-Reply-To: <66c5fa663e274_dc0c22942f@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR0902CA0054.eurprd09.prod.outlook.com
+ (2603:10a6:802:1::43) To MW4PR11MB8268.namprd11.prod.outlook.com
+ (2603:10b6:303:1ef::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240827115848.3908369-1-yanzhen@vivo.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB8268:EE_|MW4PR11MB5935:EE_
+X-MS-Office365-Filtering-Correlation-Id: aace988b-cae3-432b-88c3-08dcc6c1545b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?OUJFbFdiUFpUWE5MbHQ2c05XVHEyOUsxb1FuYm9qemxlblVPS01ZeVRTTndE?=
+ =?utf-8?B?TXdiMmFoOUdOejlHbVZwMHBwWUNOSXJibmRRMVdmTkdLR2hWUXlaM2FMVzZx?=
+ =?utf-8?B?OEtHSjh2TG1yYTJCWU55TUw5R2RhQUUrN0J3WlhEYlFiVll5NmlEc3VZRWtE?=
+ =?utf-8?B?dmhwbGYxUmRYRXNySmhZVmdPdStkTnRkWmppZUhTZFZUbVNQQXZhRUlnREtB?=
+ =?utf-8?B?b3FYckFydmdBcVEya2hUNUZlS3R5b1V0UmxRbjBjRVdYMWlVaWtGS2E1cFlo?=
+ =?utf-8?B?NGk2Y2sxVXpOR21zVzM1VkdkQkE1aHJTeFVlaDQ4Zkl1REZDNnpaZXBmbC92?=
+ =?utf-8?B?Z2llZFMvamdxbzNsTDR5cjVrZXkxb1FrRXdZcm0wSGZoL0RQZURmWHkxTTJh?=
+ =?utf-8?B?Sm5jckJpbFRYZmRGSFdRSXRMY1JrRmRsdCtlZjRvZEgxNEY0Mkx0U1l2YkJF?=
+ =?utf-8?B?eWJhdVUxQUxXbDdBazc5dmxSMEtSdTVSWE82aGZkY1djS0JhNkoxdEErSVdP?=
+ =?utf-8?B?S2J6TVNxMzJsdjVYSWJJL212ZW81LzBwSGwzYk53eGxYdU44NVBnMzZXeWlW?=
+ =?utf-8?B?Sm5XaVlVRG50RzVrQ3pDZ2pOSitrZDRxY3d6Z29GaWtGVVpFSDV5c1ZpU0hS?=
+ =?utf-8?B?QmJlc09ORUU4Yk56Wkx6VE55VW02enhXYW1jOWZzcEQyeW5TNURrZGUvUExi?=
+ =?utf-8?B?VEJiMmdMSW9HcE04dlVFOE16emVwRnlNZXJ5aHJFRHZGVnQxSnhFaWpWWGp1?=
+ =?utf-8?B?S3IwR2tDSDNlLys3YlREUUsxN21Db0JlMDcrUUxtTmJRV1haOTRWdU5kQ1g2?=
+ =?utf-8?B?blpQc3lSL3ZDVXZBbnlwZXdPN0RBdy91UDVwVE11bzJEVlhwUGYxMnUxN0w1?=
+ =?utf-8?B?UVF6QVozNUNMV2RqWFZRUWhiMmlZMXo5UFhoM0xSN2tQSmpuRXBUQlZxUnVu?=
+ =?utf-8?B?SDJuWE8rdmR2MUZ6WUMwRlV5dXJFWXpRbktkNldSczdEMGt6Y1Bwem55bzVC?=
+ =?utf-8?B?Sm1hekNQZk9tVWFKdTQyaVZWUXphS3dCR0t0T0UxakJ3aTdRcXM1eUM1d3VW?=
+ =?utf-8?B?VlBLYmErUHE5cWYyUFFFUURveUVlaDQxQU0yS3BwSmI1Z2hEcnpDelBFTzFo?=
+ =?utf-8?B?NURwN3o2eVgycG10T2ZYTXlqMjVmeXdPVHF6dHBXSFg5dzJIZGVBNWtEeWh2?=
+ =?utf-8?B?Y1pFWTFaNlJESk8veUl6NU1wSnVtNVpQK21uNmxwUE5obFZmYktZWDZQc2p2?=
+ =?utf-8?B?MTYwT1hDRzdkbDJXWDEvckdkSmJxUkg5a0F4SXQwU3JjSFRVM0RPZndJbkI3?=
+ =?utf-8?B?S1ZzalNLdjU1bFNZdXhPWG95a3VoeUlheDdFOUF0SWtQdE5PMEhCMVNaRU1V?=
+ =?utf-8?B?aHFGRkhxMzFJa0JtSm5DMmE5dytrK2J5WERVWjVhakJqb2ZVNGp2N1BUYkJD?=
+ =?utf-8?B?OWtPWWRMNFlqU1JjN1R0aHBxZlMxTC8rYjhJU0N2a2lIYWpQSG1rZ3BXVnF6?=
+ =?utf-8?B?TWM2RzhsWjZJUXdrNTJSZ2xBaTFWWXMrV3VOeVZiUldCVmRiMENOUEtxVmV6?=
+ =?utf-8?B?ZmRBYXJPTmxObXdwSXVwemtwN1dJeXpIQzdSL242dXEzT3Y2Y1ZKMVgwUk9m?=
+ =?utf-8?B?SkdaOU56eUJXYU8xclZtVDdJZXlKQ3Ewa2NxSDEvNXdJc2VybjF5SFRhL1U2?=
+ =?utf-8?B?djZET1g2UzFFdlBCcURUWWtEblRNTEgwRHhQdWxsMXE2Q1ltTU0xNVhCWXRz?=
+ =?utf-8?B?ZWV4VnZuQ2J2S0RkazllNWJWS3A4TkdWT3ozTUd5MTdQOFBMeDloVjQzZEgx?=
+ =?utf-8?B?Q0E4aHlPQTVRYUkyVEtFUT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB8268.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VWd6UFdvSUttc3pWTU1tK0dOQThEQ2pKZEFXWHZJb1BkWTBqZjB2TGZsa3k4?=
+ =?utf-8?B?TnZIaE5GT0orU0NZdHlUZmhzMW9Db0JTeFFFeGN3elgrNGZjMS82cHR0SEQ3?=
+ =?utf-8?B?c3NKRWlOQ2d5THFVM2xRTGNtbzczNjdOYUNZZlNSMEdMRUIyNjdBTmZmS1dD?=
+ =?utf-8?B?R0VmMmlySzdYQ3o1MVZ6VWJDSldvOEhqU1ZpSnVuQ0Y4c1c4L2pjSC9BZWhU?=
+ =?utf-8?B?b3Z5Z2l4bU5ETkJnWEgvL2dVVE1adG9jeDRlZlVYZnFtUmRxZkFOWmdCUWtp?=
+ =?utf-8?B?cVorUG5QeklIK3JkU0ZRM1kxS29JYXk4WTBGeURONGxJcFkzMnlEa3Nxd0pM?=
+ =?utf-8?B?cTk2ek1RWi8wU1d3RFBDZHBQUnM4ZDd4dlBGL2J4aXFRUUM2OXNGdkV3elp1?=
+ =?utf-8?B?U1Y3bDVKMjhCQXJVcDZGUy9HV0cyR1BWU1ZSQnkwZldXdE1zcXZSWk1HMG4x?=
+ =?utf-8?B?RCtTYUhQUU1hd01QdVNuWmdpKzdWb1BPZTcyYjZUWjAwVzd1aTRNWDBJUWMr?=
+ =?utf-8?B?azl0NmlUQU1kQ09MNnk3QUV3cWxuaUhvcWNyaTZLVmxXMER6TnZQSDJWUjZH?=
+ =?utf-8?B?akxFTnYyb0RhY2k5T2V3cUpnWW5TTUhhbTFoZWpjSEtFd0NOZ1RzVDlIVTVW?=
+ =?utf-8?B?YTViL243Ynh1RFVyK3Vmb0Y1cURqNWhBN3d4U1JyU1hjZFVyY0JSU2ZXNmIr?=
+ =?utf-8?B?cnlVNHdtK0NNM3BDeStGZXlkbVVEaFFxNzVXQWVsaWpwVlkwNjVkMEIwdWps?=
+ =?utf-8?B?Z2hSdGJyY016elRmeS9YcHN5NXJObTU1MFZxRCswU1ZDQ0xwUU9ORU1PRHlG?=
+ =?utf-8?B?dmNFSHd4ZlFBY3dzcnk2SExjR1JSTVdGNGlBT3VWdktEZHE0enVTczAycVlZ?=
+ =?utf-8?B?d1hCd0tIUkV5NEptWEJIaWNsTGFuSmh6bWVaSjZhWFhqSEFBa1orcEF1TEEz?=
+ =?utf-8?B?R2xncTVoZUE4STR1SEEycWRxZ2NpSExQeTNWVVJKYmp6ZWRRa2dUUlF3R0pn?=
+ =?utf-8?B?ZGk5b2NnbExidE1hTm1KZkh4MEU0ME9mN3pwem1iMHBrb0FzOTZPWlNjVkxz?=
+ =?utf-8?B?UG9NRWlBQ24yeGI2b3JyVE1zR2xwaFBoYThGdGJqdnRwVllpSW5iWjZ2eC9p?=
+ =?utf-8?B?OGE3ek9yZmlHck9ET2VCRlBrQUFobWp2SUE4eXV3a083WEhwSGFieG82ZFpm?=
+ =?utf-8?B?RGhucVVzcEo5eFJFQW9UblUyR0gxMmowOE1TaEpiWnVRYmlSRTRwY25HNUs1?=
+ =?utf-8?B?dDJjaGxGT1NFdGNCUGI5NHM2c2dxa09heHA1T0JXT0VVQld0THBLTGlWZFFJ?=
+ =?utf-8?B?bnEzZEU3UUhvNlFzQ21vT2hiaHNNSDRJSmZIeVM5d1JSclVwL1FKUld4SlRJ?=
+ =?utf-8?B?YnhRZ0lvWXdWeEI1ODhDMkc2N0xJdDBTYURDYnJPT1FlTmVuVWFHSVgvOHcr?=
+ =?utf-8?B?anB3c2h4SVNObFFjTFlpV0xPQy9pMkRJcUJieUxNYkVzSkJvdVZzUjFKSUdC?=
+ =?utf-8?B?QjkyZzEzVGtXYkFtSWE1VkdiQ1lkdHVpaGhKYUcvT2FXd0cwakRTcVdzOGVU?=
+ =?utf-8?B?Rko4UmpnejQ2K2RpQXliRG5CZXNZakJscVVycVY4UGo5ck8zbmk1d0FkRnV2?=
+ =?utf-8?B?L0QzRDB6N1MxaHBKT29LZklQSnNSSjNET1V4NngwY2Ixc08zakVzcjhJdUNW?=
+ =?utf-8?B?dnlqMHMzZ1ZxK2RyaGRveWJUb1ErUmZrbU9MdXMwU2xydEo3NlNIejR4QkVN?=
+ =?utf-8?B?bHlFWkVnSTVkOE16ZWxpNFJKVlFYbXBCSkt5SFRiTTNGMngwTFdtMUZ5Vng5?=
+ =?utf-8?B?M1RKd2p0a1lsQXFRcDdhRWo4a1pWMmhRSmkyaWZQeXpuWHFiemJkdkxKOVNJ?=
+ =?utf-8?B?eC92OUw4dis0NWJ3ZWU4MkNpbW0rK20yRmM5eGhrVllTczZPTHpCQWJkUjRV?=
+ =?utf-8?B?TklGRHcwQnQ4SVpvdlhaTjh2SFRJa0R2b2pFU2pRZW9OdFB2K09OelpRRGF0?=
+ =?utf-8?B?WnJWUTZ3bDdRNTMyNTJhNTBVYzBJanRydmliSDJsYVJIYTB3Qm1pRGlqdXpm?=
+ =?utf-8?B?YnBBem9CcWkzYi9JRktFSTlHdGNlTWxWRE1Rb3lJWmE2UTVmcEIxakRpZE8y?=
+ =?utf-8?B?empvRjhFQkJZK3VYUloydStnVDBqRGVYcjB5TkRkWlNqMmdrcGFmMEcvbTA4?=
+ =?utf-8?B?bUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: aace988b-cae3-432b-88c3-08dcc6c1545b
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB8268.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Aug 2024 17:54:42.8932
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: eUHMmldZRnI9o6yb6VsVTg8Z/1VUIx3ej0nO+H56rb3J4R7Li//tc8FTpmP/0fspKCynYFBP10p2+YusprBR02pZSwg1HReBcg3B3xFAT84=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5935
+X-OriginatorOrg: intel.com
 
-On Tue, Aug 27, 2024 at 07:58:48PM +0800, Yan Zhen wrote:
-> Using the real macro is usually more intuitive and readable,
-> When the original file is guaranteed to contain the minmax.h header file 
-> and compile correctly.
-> 
-> Signed-off-by: Yan Zhen <yanzhen@vivo.com>
-> ---
->  drivers/net/ethernet/marvell/mvneta.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-> index d72b2d5f96db..415d2b9e63f9 100644
-> --- a/drivers/net/ethernet/marvell/mvneta.c
-> +++ b/drivers/net/ethernet/marvell/mvneta.c
-> @@ -4750,8 +4750,7 @@ mvneta_ethtool_set_ringparam(struct net_device *dev,
->  
->  	if ((ring->rx_pending == 0) || (ring->tx_pending == 0))
->  		return -EINVAL;
-> -	pp->rx_ring_size = ring->rx_pending < MVNETA_MAX_RXD ?
-> -		ring->rx_pending : MVNETA_MAX_RXD;
-> +	pp->rx_ring_size = min(ring->rx_pending, MVNETA_MAX_RXD);
 
-Given that the type of ring->rx_pending is __32, and MVNETA_MAX_RXD is
-a positive value.
 
-See: 80fcac55385c ("minmax: add umin(a, b) and umax(a, b)")
-     https://git.kernel.org/torvalds/c/80fcac55385c
+On 2024-08-21 16:32, Willem de Bruijn wrote:
+> Krzysztof Galazka wrote:
+>> For IPv4 and IPv6 packets shorter than minimum Ethernet
+>> frame payload, recvmsg returns lenght including padding.
+> 
+> nit: length
+> 
+>> Use length from header for checksum verification to avoid
+>> csum test failing on correct packets.
+>>
+>> Fixes: 1d0dc857b5d8 (selftests: drv-net: add checksum tests)
+>> Signed-off-by: Krzysztof Galazka <krzysztof.galazka@intel.com>
+>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> 
+> This is not Intel driver specific, so can be sent straight to net
+> 
+>> ---
+>>   tools/testing/selftests/net/lib/csum.c | 6 ++++++
+>>   1 file changed, 6 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/net/lib/csum.c b/tools/testing/selftests/net/lib/csum.c
+>> index b9f3fc3c3426..3dbaf2ecd59e 100644
+>> --- a/tools/testing/selftests/net/lib/csum.c
+>> +++ b/tools/testing/selftests/net/lib/csum.c
+>> @@ -658,6 +658,9 @@ static int recv_verify_packet_ipv4(void *nh, int len)
+>>   	if (len < sizeof(*iph) || iph->protocol != proto)
+>>   		return -1;
+>>   
+>> +	/* For short packets recvmsg returns length with padding, fix that */
+>> +	len = ntohs(iph->tot_len);
+>> +
+> 
+> Are you running into this while running the standard testsuite in
+> csum.py, or a specific custom invocation?
 
->  
->  	pp->tx_ring_size = clamp_t(u16, ring->tx_pending,
->  				   MVNETA_MAX_SKB_DESCS * 2, MVNETA_MAX_TXD);
-> -- 
-> 2.34.1
+It was with standard testsuite in csum.py. Not on every run but quite often.
+
 > 
-> 
+> Since the checksum is an L3 feature, trusting the L3 length field for
+> this makes sense (as long as the packet wasn't truncated).
+
+Ah, I haven't thought about truncated packets. I'll add condition to 
+update length returned by recvmsg only if it's greater then expected.
+
+
+Thanks,
+Krzysiek
 
