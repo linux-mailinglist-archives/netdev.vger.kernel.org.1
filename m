@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-122280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEE12960998
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:07:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B26FD960999
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:07:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DA721C22728
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 12:07:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6664328721C
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 12:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4EE1A2548;
-	Tue, 27 Aug 2024 12:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14C201A2561;
+	Tue, 27 Aug 2024 12:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="UWLJlHnu"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="FOjB579M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12ED51A2542
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 12:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CA01A2550
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 12:06:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724760409; cv=none; b=kmbUrVNWjyKLs32uKd8FL8YFZ3KORYUB+8MjjQyBabsj1V4ooy4qfDTx6dTBFbvVP6JjzGyuSTl3yb2C0+2eTx4FAV36b8GmBvAj33EkZviMMzWLUQamcTeKWGqeJ28SRc14pPYyCeFI7yHZ0z97SODmKelc/19BK7LYGlRfpCc=
+	t=1724760410; cv=none; b=BDiOn35Z7hA1/ZjYU5RtDocF3KuCiRkw83mCaTwqusZpIF+gu5n2cvBOshOnr+eNITp0STuNRF8uNyP1JZgEIugE3ZXjiy6ba6QgVB6lfG3zFJm9R/DEZ018i96wiv0UNHvMBQZfWdUR0FFss/pxzc8Icz4pvMUgU+fofs6164k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724760409; c=relaxed/simple;
-	bh=ipUJPBPTXH1fPsRYCqT9w6vpSB5NcpJ9sUKNX/UYNHU=;
+	s=arc-20240116; t=1724760410; c=relaxed/simple;
+	bh=dei1P7GLnZZtpXnQBBYiKpEthOHZB0Gl7ZGPElJvJnA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TvUc/VWbXiIxkoSDPRNVY7fOWn18wjiVpev7EbSkc9Hx0VQFkyVtoUatJfsva9cy2xKPml1wyCMq2nfBOUhe9YgtJTfjBRho/7wzfhh3ZQUHTj82hAWDqmrlNFmDB6jplngZ5W/ov3zFqt7ePtRezVQnOihk7gdO0Mw6jo4mEpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=UWLJlHnu; arc=none smtp.client-ip=209.85.128.52
+	 MIME-Version; b=p40gaC7hZ7nVIn4OvXFJp2sC7oT4xj92VVzdgJ1qjTaQEV9fYtBh+QU56kE69O5N3J8BGVYj+8ZypK+vb1ZnVRo29g//HkhlO/eCWjveUv1Qi68TKdjt0j3VaWhUxx2VTxHpkyZzH35ivtAcympx/mFbxRVLX5we4BDTEGFJB0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=FOjB579M; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-42816ca797fso48445485e9.2
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 05:06:46 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4280bbdad3dso46315535e9.0
+        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 05:06:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1724760405; x=1725365205; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1724760406; x=1725365206; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eBnsqgKISc/wRS4gaNaC5M00x+6kdxEv9eAw6qJ8F8Q=;
-        b=UWLJlHnug2BRKsvFiiNetKFC3kWsvCxdvzI1y/BfNg1VTayeLO8Up38JeY5Pvrt3nV
-         K9ITi8olSJfvGQx+/EWDil+hZsUddvlDwwT3qp0q9qFXo0frsRWLl1IJuG5w8ncclFQX
-         ImykFNP/y8QbTOFrSN/y13gIS6GGyAhS3v3VnLKe6c6M3MnowLdEkUSQOv0MrpLqZueX
-         6c4FWDZB2Rq9KIMrW8vdmJ5ggHTxaHvM4IQn2KQf6qvcT7wtkrYprqZKkX4JxkdLzeAt
-         FOnUyDRE1BnoQemAX2EnTXmKEPaXc66uE6pqn/rWWonfl4uRvYyGguyeu0qL4/Wcnypm
-         +g2w==
+        bh=ZwfkecSsU/jVwN2hMJszdrHzhJ/D5WcezQOO8lja558=;
+        b=FOjB579MtDqVZbFOvz4VEH+B02GqeeJ83VW3Dg5OaEdZCcqsHrGrgeE5b9GAlwuiLv
+         B/kZuyMDzQtx3gRJ5cEXP7z3H3Gq61hjaJeJLMnYL/zPld29kq72GJjp1aM+iHq0HrLh
+         8B0FmhNsPIYywb6lwSzQQByL95Kfmr7Q4f2WxG3iRsyg5/+YOefpzZkEnIZhszJ/t1Jc
+         YtbDJXU8avi/8W1HRoGEn92NX77P5B6jEYe1MjlglgLUQ/NNIYJGorl4lopDGkZ9sXI1
+         o68E8dJpIhTyzP2xhqeSP5hynHe63vzkn3ibMu8zRbxvzm5HleX8Dma73rvhqZkbXlyq
+         akBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724760405; x=1725365205;
+        d=1e100.net; s=20230601; t=1724760406; x=1725365206;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eBnsqgKISc/wRS4gaNaC5M00x+6kdxEv9eAw6qJ8F8Q=;
-        b=CHY3J7HR6ZaUu/BMxL3QecmN6iWTr528y5VCyTcUKq8dmNi0CHKP0lrrCUsH+r9nvA
-         5mUvL8/raYydDiruqgDpLGh9F0hDNRhi+8PF0vnTKdHkrKgn5JEeQcet6ZURWQCjyPYH
-         JCziILkzGPCARSOymhxYkQuhu3hgQHMFmAHVOB5bqX3gsEggLTEYZK480KAhdadQzfdw
-         FmH7NDNyRCjxI0HfanOaeYxd8bdSolGP5j8b8YFi2aRnhrt/H59T2puFs92nvF8D13PT
-         0D00BKtm6vEWajzS5jZm5QcoiTClD+DUHCYndVqShMEeUOqVxGY7vdne+OPyNfCpw3fn
-         qSiA==
-X-Gm-Message-State: AOJu0YylifXa9UOz67EVICNLSGib3pZFCcYX62gXhDoq8AcJJIZHUjRV
-	ZZKsdBBw/50cNTTmfceg0GS9z3x8me9DkY4jgkD3HddPOl+NRznMhbMxIAoC/laEDpjtf5Xa/ZW
-	i
-X-Google-Smtp-Source: AGHT+IHzDS4ismhd3e6OuF87LOsSeW4xZ9n6CgDNaCRtQjTAehGzdOKlKOgkduGMvCqQ3YOrcT7EQg==
-X-Received: by 2002:a05:600c:3b90:b0:428:2502:75b5 with SMTP id 5b1f17b1804b1-42b9add43cemr15464455e9.11.1724760405048;
+        bh=ZwfkecSsU/jVwN2hMJszdrHzhJ/D5WcezQOO8lja558=;
+        b=DM0Skf8mwzpd3LhmoiDmdvsC3n/fw32OspCvloD8VS3krpw9CUSUpPUh/NNMKNU+zB
+         EhTWFwokfSOgI4rpfByVvq8NLvtzy4Ab7IftNXOSfOw2kZKCh6nsvH4oiiwwpBDcKfRd
+         78+WC8c9ybaduFsnAyGmtugY/jIVYrwPZOqJgfy0ElAubnz3haz5UUaqtRmqC9SZ5FTq
+         gQSoV4cJydus8+blXc84uAc4YBXNjvrVHUr6CXQTGMzArVeyDKWIP5b7Ykam478BiTLv
+         aIWUmDoLofpPwrk6NcGrfPS3PU4xoNzDr+UA2YVR5ppohbdzQ0Ydzm6EJIjxw0+yleT/
+         JMag==
+X-Gm-Message-State: AOJu0Yz4WK1HRXVTm2kKAEHFbzhb3XHUjIHjPZ/gPpDVmCHq4y1F21Jn
+	p27+4CtUFP0Q/dh6RbVc0zpah3jZ65TSx912m6q9WzRHZIH1jFuo2JOuItUwgru0A25KbRrInV3
+	D
+X-Google-Smtp-Source: AGHT+IH0dr/gJkmGdPsv4g5H9qoQG5owNlh2jqRT82d/pUVMi88CwDP/t826GQuuNJj+dtMvINsrDw==
+X-Received: by 2002:a5d:6d51:0:b0:371:8711:4b23 with SMTP id ffacd0b85a97d-37311864645mr7750445f8f.26.1724760405958;
         Tue, 27 Aug 2024 05:06:45 -0700 (PDT)
 Received: from serenity.mandelbit.com ([2001:67c:2fbc:1:69a:caae:ca68:74ad])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ac5158f14sm187273765e9.16.2024.08.27.05.06.43
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ac5158f14sm187273765e9.16.2024.08.27.05.06.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 05:06:44 -0700 (PDT)
+        Tue, 27 Aug 2024 05:06:45 -0700 (PDT)
 From: Antonio Quartulli <antonio@openvpn.net>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -76,9 +76,9 @@ Cc: kuba@kernel.org,
 	andrew@lunn.ch,
 	sd@queasysnail.net,
 	Antonio Quartulli <antonio@openvpn.net>
-Subject: [PATCH net-next v6 05/25] ovpn: add basic interface creation/destruction/management routines
-Date: Tue, 27 Aug 2024 14:07:45 +0200
-Message-ID: <20240827120805.13681-6-antonio@openvpn.net>
+Subject: [PATCH net-next v6 06/25] ovpn: implement interface creation/destruction via netlink
+Date: Tue, 27 Aug 2024 14:07:46 +0200
+Message-ID: <20240827120805.13681-7-antonio@openvpn.net>
 X-Mailer: git-send-email 2.44.2
 In-Reply-To: <20240827120805.13681-1-antonio@openvpn.net>
 References: <20240827120805.13681-1-antonio@openvpn.net>
@@ -90,323 +90,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add basic infrastructure for handling ovpn interfaces.
+Allow userspace to create and destroy an interface using netlink
+commands.
 
 Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 ---
- drivers/net/ovpn/main.c       | 162 +++++++++++++++++++++++++++++++++-
- drivers/net/ovpn/main.h       |  10 +++
- drivers/net/ovpn/ovpnstruct.h |   8 ++
- drivers/net/ovpn/packet.h     |  40 +++++++++
- 4 files changed, 217 insertions(+), 3 deletions(-)
- create mode 100644 drivers/net/ovpn/packet.h
+ drivers/net/ovpn/main.h    |  2 ++
+ drivers/net/ovpn/netlink.c | 59 ++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 59 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
-index 7c35697cb596..f22259d76a0c 100644
---- a/drivers/net/ovpn/main.c
-+++ b/drivers/net/ovpn/main.c
-@@ -10,19 +10,62 @@
- #include <linux/genetlink.h>
- #include <linux/module.h>
- #include <linux/netdevice.h>
-+#include <linux/inetdevice.h>
- #include <linux/version.h>
-+#include <net/ip.h>
- #include <net/rtnetlink.h>
-+#include <uapi/linux/if_arp.h>
- #include <uapi/linux/ovpn.h>
- 
- #include "ovpnstruct.h"
- #include "main.h"
- #include "netlink.h"
- #include "io.h"
-+#include "packet.h"
- 
- /* Driver info */
- #define DRV_DESCRIPTION	"OpenVPN data channel offload (ovpn)"
- #define DRV_COPYRIGHT	"(C) 2020-2024 OpenVPN, Inc."
- 
-+/**
-+ * ovpn_struct_init - Initialize the netdevice private area
-+ * @dev: the device to initialize
-+ * @mode: device operation mode (i.e. p2p, mp, ..)
-+ *
-+ * Return: 0 on success or a negative error code otherwise
-+ */
-+static int ovpn_struct_init(struct net_device *dev, enum ovpn_mode mode)
-+{
-+	struct ovpn_struct *ovpn = netdev_priv(dev);
-+
-+	ovpn->dev = dev;
-+	ovpn->mode = mode;
-+
-+	return 0;
-+}
-+
-+static void ovpn_struct_free(struct net_device *net)
-+{
-+}
-+
-+static int ovpn_net_open(struct net_device *dev)
-+{
-+	netif_tx_start_all_queues(dev);
-+	return 0;
-+}
-+
-+static int ovpn_net_stop(struct net_device *dev)
-+{
-+	netif_tx_stop_all_queues(dev);
-+	return 0;
-+}
-+
-+static const struct net_device_ops ovpn_netdev_ops = {
-+	.ndo_open		= ovpn_net_open,
-+	.ndo_stop		= ovpn_net_stop,
-+	.ndo_start_xmit		= ovpn_net_xmit,
-+};
-+
- /**
-  * ovpn_dev_is_valid - check if the netdevice is of type 'ovpn'
-  * @dev: the interface to check
-@@ -41,30 +84,143 @@ static struct rtnl_link_ops ovpn_link_ops = {
- 	.kind = OVPN_FAMILY_NAME,
- };
- 
-+static void ovpn_setup(struct net_device *dev)
-+{
-+	/* compute the overhead considering AEAD encryption */
-+	const int overhead = sizeof(u32) + NONCE_WIRE_SIZE + 16 +
-+			     sizeof(struct udphdr) +
-+			     max(sizeof(struct ipv6hdr), sizeof(struct iphdr));
-+
-+	netdev_features_t feat = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_RXCSUM |
-+				 NETIF_F_GSO | NETIF_F_GSO_SOFTWARE |
-+				 NETIF_F_HIGHDMA;
-+
-+	dev->needs_free_netdev = true;
-+
-+	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
-+
-+	dev->netdev_ops = &ovpn_netdev_ops;
-+	dev->rtnl_link_ops = &ovpn_link_ops;
-+
-+	dev->priv_destructor = ovpn_struct_free;
-+
-+	dev->hard_header_len = 0;
-+	dev->addr_len = 0;
-+	dev->mtu = ETH_DATA_LEN - overhead;
-+	dev->min_mtu = IPV4_MIN_MTU;
-+	dev->max_mtu = IP_MAX_MTU - overhead;
-+
-+	dev->type = ARPHRD_NONE;
-+	dev->flags = IFF_POINTOPOINT | IFF_NOARP;
-+
-+	dev->features |= NETIF_F_LLTX;
-+	dev->features |= feat;
-+	dev->hw_features |= feat;
-+	dev->hw_enc_features |= feat;
-+
-+	dev->needed_headroom = OVPN_HEAD_ROOM;
-+	dev->needed_tailroom = OVPN_MAX_PADDING;
-+}
-+
-+/**
-+ * ovpn_iface_create - create and initialize a new 'ovpn' netdevice
-+ * @name: the name of the new device
-+ * @mode: the OpenVPN mode to set this device to
-+ * @net: the netns this device should be created in
-+ *
-+ * A new netdevice is created and registered.
-+ * Its private area is initialized with an empty ovpn_struct object.
-+ *
-+ * Return: a pointer to the new device on success or a negative error code
-+ *         otherwise
-+ */
-+struct net_device *ovpn_iface_create(const char *name, enum ovpn_mode mode,
-+				     struct net *net)
-+{
-+	struct net_device *dev;
-+	int ret;
-+
-+	dev = alloc_netdev(sizeof(struct ovpn_struct), name, NET_NAME_USER,
-+			   ovpn_setup);
-+	if (!dev)
-+		return ERR_PTR(-ENOMEM);
-+
-+	dev_net_set(dev, net);
-+
-+	ret = ovpn_struct_init(dev, mode);
-+	if (ret < 0)
-+		goto err;
-+
-+	rtnl_lock();
-+	ret = register_netdevice(dev);
-+	if (ret < 0) {
-+		netdev_err(dev, "cannot register interface: %d\n", ret);
-+		rtnl_unlock();
-+		goto err;
-+	}
-+	/* turn carrier explicitly off after registration, this way state is
-+	 * clearly defined
-+	 */
-+	netif_carrier_off(dev);
-+	rtnl_unlock();
-+
-+	return dev;
-+
-+err:
-+	free_netdev(dev);
-+	return ERR_PTR(ret);
-+}
-+
-+/**
-+ * ovpn_iface_destruct - tear down netdevice
-+ * @ovpn: the ovpn instance objected related to the interface to tear down
-+ *
-+ * This function takes care of tearing down an ovpn device and can be invoked
-+ * internally or upon UNREGISTER netdev event
-+ */
-+void ovpn_iface_destruct(struct ovpn_struct *ovpn)
-+{
-+	ASSERT_RTNL();
-+
-+	netif_carrier_off(ovpn->dev);
-+
-+	ovpn->registered = false;
-+}
-+
- static int ovpn_netdev_notifier_call(struct notifier_block *nb,
- 				     unsigned long state, void *ptr)
- {
- 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-+	struct ovpn_struct *ovpn;
- 
- 	if (!ovpn_dev_is_valid(dev))
- 		return NOTIFY_DONE;
- 
-+	ovpn = netdev_priv(dev);
-+
- 	switch (state) {
- 	case NETDEV_REGISTER:
--		/* add device to internal list for later destruction upon
--		 * unregistration
--		 */
-+		ovpn->registered = true;
- 		break;
- 	case NETDEV_UNREGISTER:
-+		/* twiddle thumbs on netns device moves */
-+		if (dev->reg_state != NETREG_UNREGISTERING)
-+			break;
-+
- 		/* can be delivered multiple times, so check registered flag,
- 		 * then destroy the interface
- 		 */
-+		if (!ovpn->registered)
-+			return NOTIFY_DONE;
-+
-+		ovpn_iface_destruct(ovpn);
- 		break;
- 	case NETDEV_POST_INIT:
- 	case NETDEV_GOING_DOWN:
- 	case NETDEV_DOWN:
- 	case NETDEV_UP:
- 	case NETDEV_PRE_UP:
-+		break;
- 	default:
- 		return NOTIFY_DONE;
- 	}
 diff --git a/drivers/net/ovpn/main.h b/drivers/net/ovpn/main.h
-index a3215316c49b..4dfcba9deb59 100644
+index 4dfcba9deb59..c664d9c65573 100644
 --- a/drivers/net/ovpn/main.h
 +++ b/drivers/net/ovpn/main.h
-@@ -10,6 +10,16 @@
+@@ -10,6 +10,8 @@
  #ifndef _NET_OVPN_MAIN_H_
  #define _NET_OVPN_MAIN_H_
  
-+struct net_device *ovpn_iface_create(const char *name, enum ovpn_mode mode,
-+				     struct net *net);
-+void ovpn_iface_destruct(struct ovpn_struct *ovpn);
- bool ovpn_dev_is_valid(const struct net_device *dev);
- 
-+#define SKB_HEADER_LEN                                       \
-+	(max(sizeof(struct iphdr), sizeof(struct ipv6hdr)) + \
-+	 sizeof(struct udphdr) + NET_SKB_PAD)
++#define OVPN_DEFAULT_IFNAME "ovpn%d"
 +
-+#define OVPN_HEAD_ROOM ALIGN(16 + SKB_HEADER_LEN, 4)
-+#define OVPN_MAX_PADDING 16
-+
- #endif /* _NET_OVPN_MAIN_H_ */
-diff --git a/drivers/net/ovpn/ovpnstruct.h b/drivers/net/ovpn/ovpnstruct.h
-index ff248cad1401..ee05b8a2c61d 100644
---- a/drivers/net/ovpn/ovpnstruct.h
-+++ b/drivers/net/ovpn/ovpnstruct.h
-@@ -10,12 +10,20 @@
- #ifndef _NET_OVPN_OVPNSTRUCT_H_
- #define _NET_OVPN_OVPNSTRUCT_H_
- 
-+#include <uapi/linux/ovpn.h>
-+
- /**
-  * struct ovpn_struct - per ovpn interface state
-  * @dev: the actual netdev representing the tunnel
-+ * @registered: whether dev is still registered with netdev or not
-+ * @mode: device operation mode (i.e. p2p, mp, ..)
-+ * @dev_list: entry for the module wide device list
+ struct net_device *ovpn_iface_create(const char *name, enum ovpn_mode mode,
+ 				     struct net *net);
+ void ovpn_iface_destruct(struct ovpn_struct *ovpn);
+diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
+index b5b53c06d64a..daa2f1ec46dc 100644
+--- a/drivers/net/ovpn/netlink.c
++++ b/drivers/net/ovpn/netlink.c
+@@ -7,6 +7,7 @@
   */
- struct ovpn_struct {
- 	struct net_device *dev;
-+	bool registered;
-+	enum ovpn_mode mode;
-+	struct list_head dev_list;
- };
  
- #endif /* _NET_OVPN_OVPNSTRUCT_H_ */
-diff --git a/drivers/net/ovpn/packet.h b/drivers/net/ovpn/packet.h
-new file mode 100644
-index 000000000000..7ed146f5932a
---- /dev/null
-+++ b/drivers/net/ovpn/packet.h
-@@ -0,0 +1,40 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*  OpenVPN data channel offload
-+ *
-+ *  Copyright (C) 2020-2024 OpenVPN, Inc.
-+ *
-+ *  Author:	Antonio Quartulli <antonio@openvpn.net>
-+ *		James Yonan <james@openvpn.net>
-+ */
+ #include <linux/netdevice.h>
++#include <linux/rtnetlink.h>
+ #include <net/genetlink.h>
+ 
+ #include <uapi/linux/ovpn.h>
+@@ -84,12 +85,66 @@ void ovpn_nl_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+ 
+ int ovpn_nl_new_iface_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+-	return -EOPNOTSUPP;
++	const char *ifname = OVPN_DEFAULT_IFNAME;
++	enum ovpn_mode mode = OVPN_MODE_P2P;
++	struct net_device *dev;
++	struct sk_buff *msg;
++	void *hdr;
 +
-+#ifndef _NET_OVPN_PACKET_H_
-+#define _NET_OVPN_PACKET_H_
++	if (info->attrs[OVPN_A_IFNAME])
++		ifname = nla_data(info->attrs[OVPN_A_IFNAME]);
 +
-+/* When the OpenVPN protocol is ran in AEAD mode, use
-+ * the OpenVPN packet ID as the AEAD nonce:
-+ *
-+ *    00000005 521c3b01 4308c041
-+ *    [seq # ] [  nonce_tail   ]
-+ *    [     12-byte full IV    ] -> NONCE_SIZE
-+ *    [4-bytes                   -> NONCE_WIRE_SIZE
-+ *    on wire]
-+ */
++	if (info->attrs[OVPN_A_MODE]) {
++		mode = nla_get_u32(info->attrs[OVPN_A_MODE]);
++		pr_debug("ovpn: setting device (%s) mode: %u\n", ifname, mode);
++	}
 +
-+/* OpenVPN nonce size */
-+#define NONCE_SIZE 12
++	dev = ovpn_iface_create(ifname, mode, genl_info_net(info));
++	if (IS_ERR(dev)) {
++		NL_SET_ERR_MSG_FMT_MOD(info->extack,
++				       "error while creating interface: %ld",
++				       PTR_ERR(dev));
++		return PTR_ERR(dev);
++	}
 +
-+/* OpenVPN nonce size reduced by 8-byte nonce tail -- this is the
-+ * size of the AEAD Associated Data (AD) sent over the wire
-+ * and is normally the head of the IV
-+ */
-+#define NONCE_WIRE_SIZE (NONCE_SIZE - sizeof(struct ovpn_nonce_tail))
++	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
++	if (!msg)
++		return -ENOMEM;
 +
-+/* Last 8 bytes of AEAD nonce
-+ * Provided by userspace and usually derived from
-+ * key material generated during TLS handshake
-+ */
-+struct ovpn_nonce_tail {
-+	u8 u8[OVPN_NONCE_TAIL_SIZE];
-+};
++	hdr = genlmsg_iput(msg, info);
++	if (!hdr) {
++		nlmsg_free(msg);
++		return -ENOBUFS;
++	}
 +
-+#endif /* _NET_OVPN_PACKET_H_ */
++	if (nla_put_string(msg, OVPN_A_IFNAME, dev->name)) {
++		genlmsg_cancel(msg, hdr);
++		nlmsg_free(msg);
++		return -EMSGSIZE;
++	}
++
++	if (nla_put_u32(msg, OVPN_A_IFINDEX, dev->ifindex)) {
++		genlmsg_cancel(msg, hdr);
++		nlmsg_free(msg);
++		return -EMSGSIZE;
++	}
++
++	genlmsg_end(msg, hdr);
++
++	return genlmsg_reply(msg, info);
+ }
+ 
+ int ovpn_nl_del_iface_doit(struct sk_buff *skb, struct genl_info *info)
+ {
+-	return -EOPNOTSUPP;
++	struct ovpn_struct *ovpn = info->user_ptr[0];
++
++	rtnl_lock();
++	ovpn_iface_destruct(ovpn);
++	unregister_netdevice(ovpn->dev);
++	netdev_put(ovpn->dev, NULL);
++	rtnl_unlock();
++
++	return 0;
+ }
+ 
+ int ovpn_nl_set_peer_doit(struct sk_buff *skb, struct genl_info *info)
 -- 
 2.44.2
 
