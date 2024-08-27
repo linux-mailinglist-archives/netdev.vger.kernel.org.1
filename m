@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-122483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43BEC9617CB
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:10:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 040889617CD
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:11:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFD35B213A7
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 19:10:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B1721C2368B
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 19:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7FC91D3192;
-	Tue, 27 Aug 2024 19:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA631D31B1;
+	Tue, 27 Aug 2024 19:10:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="QJzplBAL"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="YF0TuHm/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2E61CFECE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134C51D279D;
 	Tue, 27 Aug 2024 19:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724785846; cv=none; b=OP4G2ZLctGukEgVWn15t1X/b9Zm2gavtZHlse+Cm1Lgf0mlQf5JAGHgNOL/Ohfot8bnFYOU3eNvEJ9ohKkzDG9sfaTeBW1f1mUWdZxQrxa/OJRpBOgGFcm2lwAuwpoYVCKLQnU+/QOcW8OlQ2c3sk5RoIfaA2D2m1OZISFa/Dz8=
+	t=1724785846; cv=none; b=rr0mKAt5E8TFDiZI+bEHPNGOn850rDkZNPg9iGXYph4dDri/ePsQe7pnFWBCwDBK7EzLrBm1OJWWBpn2Xie9keoHjgsRhlj5FGxU/gSPY93An69CNrBWr8qgKe01OyRRMtzH6Ac+rHfxFkYAXwEyli9fLg6BtTA5j0krX2yJAoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724785846; c=relaxed/simple;
-	bh=HRc508RbmXV0FUoC3kABdxRTsv47VzpEFEzUtcw2HZI=;
+	bh=hOJ8P1eDdJPh/P5tV+GHSuEcFo9uesg+AnwGIYG6ywg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=EfcX+UQ17F+/oH4fvP66NWGvVipHSozhBxS0u9cmZA2GZUJgGrmxFmM3m74+2XDbx5So84ALkAVZvvmPMhU3QMZcvU57kxc5OflekJhpHhKtsAGnynaQGPtC4gPqx/5Ln7lFMz2MrKRuyIQipDZ6V8p8Mk4ThQmYge3uqMxmQ/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=QJzplBAL; arc=none smtp.client-ip=212.227.17.21
+	 MIME-Version; b=AKXFnrCzTjr7qWd8jD7clkszeg+DSS5cmQQv40K+d6jGXPM7drlDpggFp8SpD1Ak8zwem/1wkog4n+ZRnYIjS6L+6VtFc/2rO0CARaCRTAM/GxztwnDuRX20v5JRAa3UYJv1S+eM6Itj8Zj22RYqUi7+GaA2kij+6c7+a/GT7ZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=YF0TuHm/; arc=none smtp.client-ip=212.227.17.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1724785829; x=1725390629; i=wahrenst@gmx.net;
-	bh=pG/5Ey5pW92eb7Gus/e9GS+zhwU9GERN5pNXlAVFNys=;
+	s=s31663417; t=1724785830; x=1725390630; i=wahrenst@gmx.net;
+	bh=x+XCBOGbZtklKS/6Dl5mPMQvwFou/sc9R6ngeOYiRcM=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=QJzplBALM0r/vwdm7kbqAmKIbIHC3ZumAjGZUa07wWqn1MzQAKX+huVCw9z9TcH0
-	 KQwFxybkH+LsiEMQf7PzGJqaeaeu4WsyJzPwGxLuHL3haqmwkrB5qIp1IJ6qIw26T
-	 JxXlrc4h7LDAsuvC5yvTqdCyco01MnG5DMSYpAi2tM6G8lQcwS+yoWP8+esLZD/Ze
-	 +lGXcWTMyvDWsSY9lfCnp5SE0FwBhu9RbN9vhv8K4E3j3xz8xN/z1PZKNI13cISob
-	 dpmODwEWp1RF9ltPV/aETv6U7/fgtXsBcVig9QGyMUxuQsTlC/MMBhXDSroj8FpFE
-	 LH52YsZTvvljdIjZOw==
+	b=YF0TuHm/J0zp7cFMraANYxQkyzgRmFDnnjhRBU/+EScaqNYjqLMWrRTIBebAAifq
+	 CCpK41OO5efZ0bMGm/npfARVH6ucikOrAzkSpo1Tjvo5/jTRLdfKUXBKeDpGwPbkR
+	 UX/r2zqGRulOpX5b+5iSmoK4mzuoDOMdVorbk0Leq2Tp04AAlXTwgutjD7fgFieRR
+	 neyWE/jKE2c8K4kR6JVpgCbvGtj7HnQ02KZ0i8NASrnAxp4SrnNm2NXsIrB4zs06z
+	 dfYQnGTEyDen9112RqRWoXerICEXoixku1oiy3BoyG0T5oPZkG3Un8CN8vKMRhio1
+	 SRaX6mhMi9Z9KB6BhA==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1N6KYb-1s3hV62REv-014HCB; Tue, 27
- Aug 2024 21:10:29 +0200
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MxlzC-1rt0X53xT4-00wsfA; Tue, 27
+ Aug 2024 21:10:30 +0200
 From: Stefan Wahren <wahrenst@gmx.net>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -56,9 +56,9 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Stefan Wahren <wahrenst@gmx.net>
-Subject: [PATCH 2/5 next] net: vertexcom: mse102x: Silence TX timeout
-Date: Tue, 27 Aug 2024 21:09:57 +0200
-Message-Id: <20240827191000.3244-3-wahrenst@gmx.net>
+Subject: [PATCH 3/5 next] net: vertexcom: mse102x: Fix random MAC address log
+Date: Tue, 27 Aug 2024 21:09:58 +0200
+Message-Id: <20240827191000.3244-4-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240827191000.3244-1-wahrenst@gmx.net>
 References: <20240827191000.3244-1-wahrenst@gmx.net>
@@ -69,49 +69,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:73bKUGUnFn9baLAlG2gPdFfDAWNap+UJv7Ta8ZKfi0g4mkEZmIS
- wxhABpHzTjuyQs8H+m+GbZovcRutydd1UMZZy+YUAkqfWinnB6WrcdT65AzQKLJTCtkm04J
- r/cqQv5B1rN1ul3F/H0hbArrA2rvVy80res6gbxPQgk8zlE9k3BG+Qs+UhOd99AdHdRmG0i
- v83QTbTVJxzVdFws2QGnQ==
+X-Provags-ID: V03:K1:9xtNyaDLTmFAd8qi+xZgWTLMFnq4pH3eEwSo4y/Srcz3c3g7Vfo
+ /aNAwNQs19fMXFsmktB4BlfyZxGknshFDhax6N99GfsMFIh47x2udbb52zU5hCDhA9CrzKQ
+ B/LFRLSXcnEzW/qZKTqawZzpZ7dlv2U6/F4RlfXP9/EQF0EJYh/mnUY1EYG/JAbslKv6RZO
+ 3KK0bJmSP8rGfcbHqL5Ow==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:ORozQXzBRXU=;ztBVa1JIpth+dnJDlOSLlmtrKTl
- cNHOW+FhEajMg+rZ3gCq34Prcrnen1fU8Lyc4ZTQ3bqA+fkzdT4vMQpxKm5TGZv7Xqueln2EQ
- YuJGPOn8yQDHG1UGJWLgSWtn8MhfGzALTGo0u4YTybuSNHHccULSMuSHtla7BvPWmNCR9dKMf
- ZpqZVwFaHrnyMVmGMEe0helsskWqJuJq2APltNhXIH3H+mddsOj35RYNhAFRwAk0gecSbz5IW
- 5c1j9VOp5J1Uk5mKjvH3afy3ZwXBgvNtZFju9FGvn6Ns01rZ6wYy7BD9PRAbRPsA1ucdKlODS
- xBTji6yE5jinRHryO2IGOBxZD97zVWA+QOHSevgZ5S8DI6ovVouDdgxGFBA+SSPcLUREAgSBw
- UgRJHNdlhu4o62TD7iTjFqr6qa/eFTYJRlRJFDCPEhgTTbSPn9K14nWk2TQByT6h+wEhwEt92
- 0CKFOhe5nr1nzKrFkYF5Je/quYZcnb8ondDBhumQjcsiCivAPtZ90ySuAGdIol9rMIdIdZuSa
- dKxW/Binr82+XgylHirKFlAWkvgtsZaCXs2JektZpuZAf9/SHny5IWqxbZIEaTuQzyHNZOjjk
- sz0/41zxC6L54Xhu4VllKLtQfCziLP081IeMNiT8Gqc6Dwh8mh9SBC7qqXMiUWkByT2ttooRd
- dQM+ljksZ1a8XGhFMS8gDaO+E2+thgLX/g6ynQQ4KdpcnTgeU5D9j+q+slrobZBqolTTCAZbv
- +SPpgfZ8Y9wNubTlDFu7REL3z0U4KQrNyEp3VdyKjlvnIt7AjV/aYOSf6g75jVU/tHmBAqcJ5
- jImLJdsAaT5TJ+yEVnQgM20w==
+UI-OutboundReport: notjunk:1;M01:P0:BCgp+o7LsLs=;TalLNIhDgCMrfrtlNU0+tPOVO04
+ kmJRDvSDenWFxpGgINcqnKZKiOiBj134oXWgcDMNy0cyYt+LxbEb3oQC3vqP/naa5QHIMAeXY
+ 2m9lGMwfcFUmCAfAk5AZTv0TvXOyL+CXomm9gtl0tkecNqwPxAh4pQy6NDf0IfbjHeJ/5B4ZU
+ I0huE72dIqGenHHt+vSAEZYGt4QnJU86YsVQp5PxTgR0SgvABKdP+UWyHRRQ/eYF9KeGmWHAS
+ 9dGDd22LmWHBWpw8PZBaRViB5Rcfo98sCCpKRqq/tMrCLLVsWk1BsQuzquN1Bq+qLYUXD+95T
+ LrCCU5W3fIZoNU8bfn8ZDQlZQrFMiTPAdaVqakZWzgjK2A1C8BNSm99XaDqtpg4F00inSBZMR
+ MkuOAvhEVrl7HipDUPZ4FbD6/0RdpB8PiHgURAHf2tsVNAXAgtIETZIZTzvEmS8CJiVCINXwW
+ GYagwQ12O73evPqQUnMXrmxI6t/DAX1UyIYLWbDbzcrEv9NFyK68UYQt4lAhh7IeFxXTrpNTx
+ 1Dt/H6UuaaqRDaVjhqPf/cd9UaEjq/yqgsoTF3/suK0DP3ZD93j5def6CYnAKPhbP7doFn68a
+ n97uOLXKHZl/ew9GTapLTYhdaotcz0AVAV4KPvJr3xK/8Sy+xAa5MOSOLjGCLShIFwX8x/41t
+ yMS7HSYuVXDXfUfccA/v1IY3DA8d2mw+dLBAfSZ1+mV5Zif1kyTuWhnW7cpuqCF2giKUn1Zfa
+ XALT9JiBEFUbUnBSQabQsqg93wIavYhoT5akwQlLScWiLpSP9nRAxDcl4MSJZe0Z62BkQdDLR
+ FtMjKf9Rap4d+fCuO+M6Tm0g==
 
-As long as the MSE102x is not operational, every packet transmission
-will run into a TX timeout and flood the kernel log. So log only the
-first TX timeout and a user is at least informed about this issue.
-The amount of timeouts are still available via netstat.
+At the time of MAC address assignment the netdev is not registered yet,
+so netdev log functions won't work as expected. While we are at this
+downgrade the log level to a warning, because a random MAC address is
+not a real error.
 
 Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
 =2D--
- drivers/net/ethernet/vertexcom/mse102x.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/vertexcom/mse102x.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethern=
 et/vertexcom/mse102x.c
-index 0711641fc3c9..336435fe8241 100644
+index 336435fe8241..4ce027f8e376 100644
 =2D-- a/drivers/net/ethernet/vertexcom/mse102x.c
 +++ b/drivers/net/ethernet/vertexcom/mse102x.c
-@@ -451,7 +451,7 @@ static void mse102x_tx_work(struct work_struct *work)
+@@ -485,8 +485,8 @@ static void mse102x_init_mac(struct mse102x_net *mse, =
+struct device_node *np)
 
- 	if (ret =3D=3D -ETIMEDOUT) {
- 		if (netif_msg_timer(mse))
--			netdev_err(mse->ndev, "tx work timeout\n");
-+			netdev_err_once(mse->ndev, "tx work timeout\n");
-
- 		mse->stats.tx_timeout++;
+ 	if (ret) {
+ 		eth_hw_addr_random(ndev);
+-		netdev_err(ndev, "Using random MAC address: %pM\n",
+-			   ndev->dev_addr);
++		dev_warn(ndev->dev.parent, "Using random MAC address: %pM\n",
++			 ndev->dev_addr);
  	}
+ }
+
 =2D-
 2.34.1
 
