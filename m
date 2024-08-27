@@ -1,121 +1,76 @@
-Return-Path: <netdev+bounces-122129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E33495FFCF
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 05:31:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0491395FFD6
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 05:33:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A5421F22830
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 03:31:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF4721F234E2
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 03:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D5561B978;
-	Tue, 27 Aug 2024 03:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F6A61B964;
+	Tue, 27 Aug 2024 03:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FXJl1j/A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mVIjOuxV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DC9199BC;
-	Tue, 27 Aug 2024 03:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078CA171AF;
+	Tue, 27 Aug 2024 03:33:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724729495; cv=none; b=pTRiacEWFCOzwwcjg2sonbdunYoyx8cb86rTcuuRFZ07derQtxr3FqG5g9S9wMT7Ns1k81FTLvHHQkoeKoPiVYd678vfFZ2SLzQG2a/OfIP8Gc3/rLmUKP+cEdJmnO8fKut1kLzWwGkqbG9lYOGhrl5lja6dzn/EGJEwvRPPgeA=
+	t=1724729590; cv=none; b=KL9r+e3S+xRSk4XYGm2RxzzolZtRLSymsUYAIIvAQFTv4ipLbIDZWXH6/slBA8IuqEsDXoUOfCFuTnnQZ8Oq5fBVnTbX8NBc3gN0VArcJaRDRDce1qlHQN6IejNJMyyS5lDDI84Bmable45VmHO206Orz1CPadl/g2sjvkJ8MB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724729495; c=relaxed/simple;
-	bh=ZsAX6fYNBN8s4cM6prV7+Nw4KR6G6zRcui+vpWCXiiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y8KwqSUTeDlG+sKSDBnVKCOjj9tPDr6vNiEuvIYximkZjNp3Ob4nCZOVxw4TOgMMoHl9d2zAzfbRg9o0OjWUfR0Oi42GDYIBDskuWqDjRipxQvnImc7pAQUPmhUAzF+qGzvBk1t6qTCOy16qNq5R2ZqZ/yxl4LIAErb5wGNLLFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FXJl1j/A; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724729492; x=1756265492;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ZsAX6fYNBN8s4cM6prV7+Nw4KR6G6zRcui+vpWCXiiM=;
-  b=FXJl1j/AyNRlQ0Km+tpPSaeXKtVgDT3lDNvXqNlbwOQdHImGWzHSyKke
-   bqz17w95kcG1tC0Af6f67Dlm8yMfHIdILGlrTX3ovKVa5pQ+66zPo+Hj5
-   gjNlqzGc9ZvTuDfDs+VGIPURzrWGByAq1N2Kq0IXCMK7rpn4JRghg8aRG
-   Rth7SNULAidyorGbn2sHqXGYlAuvlib4TnhW8Ogo0JLuwL7ijqB3ouX0k
-   dWRIergQTl41uO5gL3h5f0GQRSl46/JcuM3FaDBGsIAk/LJOuSU3t9td1
-   MAsLUiCfwg/EmJQQFKls+ertCa5P+Cr0tdpq7MsPZN2Jrs4VT1Kh6gYvu
-   w==;
-X-CSE-ConnectionGUID: U0VsYO+CQ5mT+4pCIfODow==
-X-CSE-MsgGUID: UI3+y8WLQ4i8nk9v/4WsOw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="23154137"
-X-IronPort-AV: E=Sophos;i="6.10,179,1719903600"; 
-   d="scan'208";a="23154137"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Aug 2024 20:31:30 -0700
-X-CSE-ConnectionGUID: QDU5QLH3TqucnA37kaonFw==
-X-CSE-MsgGUID: w9+02ioqSw6jKQ/o9ovjaQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,179,1719903600"; 
-   d="scan'208";a="62698679"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa008.fm.intel.com with ESMTP; 26 Aug 2024 20:31:22 -0700
-Date: Tue, 27 Aug 2024 11:28:59 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
-	Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
-	Andy Shevchenko <andy@kernel.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
-	Chaitanya Kulkarni <kch@nvidia.com>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-	linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH v3 2/9] fpga/dfl-pci.c: Replace deprecated PCI functions
-Message-ID: <Zs1H+zgzZAuLUnza@yilunxu-OptiPlex-7050>
-References: <20240822134744.44919-1-pstanner@redhat.com>
- <20240822134744.44919-3-pstanner@redhat.com>
+	s=arc-20240116; t=1724729590; c=relaxed/simple;
+	bh=6PzS5Tdk8YQgNBjy4ccnPSGnXknsU27HU1R/5Y8rlWU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XbI4NlCpaaMlQq8bS3THhfHi9+IWDI3kTs9vmssivL0ejD4c9E/vFeRvClJ2sgXQZJ5dbLvb2wFbSE3VXihD4ShJINuWGdIFNWJOePFjpQPF2Sz/KuAYHyqIKU2sswXMIatOeJqWqAcaEiIy7LJ1AGaHBb7uJ6SofxhMVlGfvuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mVIjOuxV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AA0DC8B7A3;
+	Tue, 27 Aug 2024 03:33:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724729589;
+	bh=6PzS5Tdk8YQgNBjy4ccnPSGnXknsU27HU1R/5Y8rlWU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mVIjOuxVw9qlfJ0a3XOELpEd9UlRzEf6/MNAG1ZLtdNBIjWNxKWPeIolha/JFJeIR
+	 TWrJjZ8/upkMPbudUDOwUR1Vx7AR9QdUo9x0vwyGd9YxKhMn/aZn4v99c6rkTe21T0
+	 xxldGRDpf0G64BvhxWoSzBFXEdOumFsypgmOUJnk82kOhE2HK7vNkWI7vfnZ5+MEdV
+	 pey62m470J8A2naSktnQFiN5iIJ+TT7eFyx6WpQf6Xn/nDjclCxTpVSL1uzsOpW9zX
+	 B7Yla7DPiFT9pGSF+ARUNhmtX9Cu8jqfb/rY4qt2CgPyfi+bSoVtGTKYWUhC3L3cqO
+	 hcxlwV5KSyzeg==
+Date: Mon, 26 Aug 2024 20:33:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, Geliang
+ Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Florian
+ Westphal <fw@strlen.de>, Shuah Khan <shuah@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net 0/4] mptcp: close subflow when receiving TCP+FIN and
+ misc.
+Message-ID: <20240826203308.7cc1bd5c@kernel.org>
+In-Reply-To: <20240826-net-mptcp-close-extra-sf-fin-v1-0-905199fe1172@kernel.org>
+References: <20240826-net-mptcp-close-extra-sf-fin-v1-0-905199fe1172@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822134744.44919-3-pstanner@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 22, 2024 at 03:47:34PM +0200, Philipp Stanner wrote:
-> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by the
-> PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-> pcim_iomap_table(), pcim_iomap_regions_request_all()").
-> 
-> Port dfl-pci.c to the successor, pcim_iomap_region().
-> 
-> Consistently, replace pcim_iounmap_regions() with pcim_iounmap_region().
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+On Mon, 26 Aug 2024 19:11:17 +0200 Matthieu Baerts (NGI0) wrote:
+> Matthieu Baerts (NGI0) (4):
+>       mptcp: close subflow when receiving TCP+FIN
+>       selftests: mptcp: join: cannot rm sf if closed
+>       mptcp: sched: check both backup in retrans
+>       mptcp: pr_debug: add missing \n at the end
 
-Acked-by: Xu Yilun <yilun.xu@intel.com>
-
-Thanks.
+Why are you submitting two series to the same tree at once?
+The limit of 15 patches applies, no matter how you post.
 
