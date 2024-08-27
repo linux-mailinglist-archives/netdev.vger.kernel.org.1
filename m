@@ -1,94 +1,92 @@
-Return-Path: <netdev+bounces-122369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D120960D9C
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:31:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D75DB960D9F
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:31:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 900B11C221B4
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:31:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90BB1284E35
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:31:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348C119DF5F;
-	Tue, 27 Aug 2024 14:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3461C4ED9;
+	Tue, 27 Aug 2024 14:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CR51SEQW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDC81E520;
-	Tue, 27 Aug 2024 14:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC781A08A3;
+	Tue, 27 Aug 2024 14:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724769075; cv=none; b=ieZCI74JK+u5+VyUv2Xav6m3ceucnpDyrTyi2+86gjizyvv8dG/QlfPUoAzuE48DqreL9Sh3g9TjBHFQkig/O8HmoqsFNr1Vpfs+Fb+cHWzLCYNvs8uxT/xRFmb/a3yH+Ald0QYdu5m9HpmNe4ex2fYIU25FrLvWtap127RLplA=
+	t=1724769102; cv=none; b=gotq42/p2NtE3fEa96vbou3GzMt35nzUfRHdqcWBX+ZcGTERO09MUrYE6jJ0Y868Qroj2Coppehxcc4NVFvB88VNaTd+qtZfXDWNDGD1sY9YkMH4OkwkaDBgaU4nC9HD4vwsVAhLY0KsvnaQETqHgmv7RBbWqo2sFH1ZyWP6HQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724769075; c=relaxed/simple;
-	bh=m6nhO4iWbTw4iDhbUCmU18kyJNTHT5lOP8HBqVqyiSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tKlUJ5/4tu6KBlMiCAHbJd/mXkJFnfllpf+SOYY00W7s6lXsT1FN+cjw0OZh+3nrXZN4OWdmEP6kz1daLyJQHGG6QZARAagcTp63vFJ6Q+j8pCJVdGVYdVlAGB8WLAN1tOEVQDyTrytsoC7wGhfENwgml6P/wQmRcipFqvyhD5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a868b739cd9so668895566b.2;
-        Tue, 27 Aug 2024 07:31:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724769072; x=1725373872;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sG23+qoWY46Jajm0s76Z+fW6MdmfN+U1Ppd3ZWTkb+w=;
-        b=oGuRg9v1XDJ8WppApvqAEMc68DdEvMhH5MVHZVneM/wv0AY+y4gclo/HTM4EaLkvYF
-         pRTVO06f/97hjSkvF4Xlzc6VVmcX7SFCyxUEcVAIqOsd0zmv3mr7zrN0bdMvZOScN659
-         mru0rVPieNsjihHphJ4K7BaYiZlucy69ZiRx6/GUbgU2sO+hjI+mQD0FHADLlyGxdU+8
-         EFqWtQ+403sGmTBQlmqRrh7Sjyl5aTVW+s2/8gzjmLQperxHllAzasRDX2EeQtsRbtsy
-         g7SjiJeGhcUaI78HE6VYaqtvj+QmhKIqINu06x69dzUbqaO1h1nU4//8O9nr19yX53a3
-         ccSA==
-X-Forwarded-Encrypted: i=1; AJvYcCU7UkJBWDOGdgWYsPt9esqnzvJnSiN+1TdGwVtR924ard6cotPqamyIW5YHFEhSbaLwMqkQbY84@vger.kernel.org, AJvYcCWR4RTbkhzoxwOI42VlTWvuv2aKIez0/PUZ+L7yi340WhiXjjTcdvTWm0YkKJDywkh0NSlQqijkOngFMmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLh9R7EqFO0fTHRYm2hsmDB9BGXqNVYcMHLrSCz72TQNvP1OOz
-	N6vVtoL1aVH1ugcXC9uGceTrhVuA4YdRIw9j5LgKyKgWZQpzYHco
-X-Google-Smtp-Source: AGHT+IGxCsgsUch/iKfglrbmw5nS5bILYtm6bTHIKTk/PKJ4FiT5Cb/hWiGmV1EIfL70pjGjKD+56w==
-X-Received: by 2002:a17:907:3f99:b0:a7a:3928:3529 with SMTP id a640c23a62f3a-a86e397e60fmr275905066b.13.1724769071070;
-        Tue, 27 Aug 2024 07:31:11 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a86e549cbedsm118241966b.62.2024.08.27.07.31.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 07:31:10 -0700 (PDT)
-Date: Tue, 27 Aug 2024 07:31:08 -0700
-From: Breno Leitao <leitao@debian.org>
+	s=arc-20240116; t=1724769102; c=relaxed/simple;
+	bh=jPW5CeXWol8SdzTNVQSXpa6WgMRABIvFBwXD85nKydg=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=LbQnSIObUHasqwrxMU6AFCHdh09TCkYtUuYCyT8dzla04D+Run4d/gCBfnCLzxgMG/FhRe18CJF0qQMVdTQSBId8ROXYoC6SsNc+I97zh3WlEmMIMFZP1fh9U9sYrN75oXXgQ0Mo6ThP5WvyEXyNmsR9TKSejDKZjljG1bt/wd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CR51SEQW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00F5CC4AF52;
+	Tue, 27 Aug 2024 14:31:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724769102;
+	bh=jPW5CeXWol8SdzTNVQSXpa6WgMRABIvFBwXD85nKydg=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=CR51SEQWCzFdwGlPxDcKz4Gl7UMMKEEG6+xV2kZ/5VauRsdfO+JTGHDUHETVbfW+v
+	 i7L5nPZ+DUfQqhSNvi9vzmGZk70RBURcEZy+ITaXI/ZF8fBnzpuUXEQKJg5Vk3JgDb
+	 ehz4JBvE/vSkz/jdrDyVG5PoEui1xGj8QeywqRwn1cHcEhmfdfYvnVWPEO4lBkmH/a
+	 j0A1ML67VcwUcpyw3JPUVbJL0/kgVFaXOFi8O0ZdAag2pr5IXzAfxQidwM+UlT/Uw2
+	 /s2MST3G9tntcOySE8nfddON9s9TxQlvCD5VV3Q4gUWX5AMs7SjCVIC7jmFFREq8VY
+	 Hu3Zm4NvCDhsw==
+From: Kalle Valo <kvalo@kernel.org>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, rbc@meta.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH nf-next v2 0/2] netfilter: Make IP_NF_IPTABLES_LEGACY
- selectable
-Message-ID: <Zs3jLJNuGfqtpzEE@gmail.com>
-References: <20240823174855.3052334-1-leitao@debian.org>
- <20240824103756.4fb39abc@kernel.org>
+Cc: Hongbo Li <lihongbo22@huawei.com>,  <johannes@sipsolutions.net>,
+  <davem@davemloft.net>,  <edumazet@google.com>,  <pabeni@redhat.com>,
+  <allison.henderson@oracle.com>,  <dsahern@kernel.org>,
+  <pshelar@ovn.org>,  <linux-wireless@vger.kernel.org>,
+  <netdev@vger.kernel.org>,  <rds-devel@oss.oracle.com>,
+  <dccp@vger.kernel.org>,  <dev@openvswitch.org>,
+  <linux-afs@lists.infradead.org>
+Subject: Re: [PATCH net-next 0/8] Use max/min to simplify the code
+References: <20240824074033.2134514-1-lihongbo22@huawei.com>
+	<20240826144404.03fce39c@kernel.org>
+	<4a92bb68-7fe7-4bf2-885f-e07b06ea82aa@huawei.com>
+	<878qwifub5.fsf@kernel.org> <20240827070347.4bf3a284@kernel.org>
+Date: Tue, 27 Aug 2024 17:31:36 +0300
+In-Reply-To: <20240827070347.4bf3a284@kernel.org> (Jakub Kicinski's message of
+	"Tue, 27 Aug 2024 07:03:47 -0700")
+Message-ID: <877cc2ujef.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240824103756.4fb39abc@kernel.org>
+Content-Type: text/plain
 
-On Sat, Aug 24, 2024 at 10:37:56AM -0700, Jakub Kicinski wrote:
-> On Fri, 23 Aug 2024 10:48:51 -0700 Breno Leitao wrote:
-> > These two patches make IP_NF_IPTABLES_LEGACY and IP6_NF_IPTABLES_LEGACY
-> > Kconfigs user selectable, avoiding creating an extra dependency by
-> > enabling some other config that would select IP{6}_NF_IPTABLES_LEGACY.
-> 
-> Resulting config in CI still differs quite a bit:
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Sorry about it. I wasn't comparing the whole .config.
+> On Tue, 27 Aug 2024 07:45:02 +0300 Kalle Valo wrote:
+>> > Do you mean some patches will go to other branches (such as mac80211)?  
+>> 
+>> Jakub means that your patchset had compilation errors, see the red on
+>> patchwork:
+>> 
+>> https://patchwork.kernel.org/project/netdevbpf/list/?series=882901&state=*&order=date
+>
+> FWIW I prefer not to point noobs to the patchwork checks, lest they
+> think it's a public CI and they can fling broken code at the list :(
 
-I will submit a next version that preserve the .config intact when
-running:
+Good point, that's definitely what we do not want. I'll keep this in
+mind.
 
- # rm -fr .config ; vng --build  --config tools/testing/selftests/net/config
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
-Thanks,
---breno
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+https://docs.kernel.org/process/submitting-patches.html
 
