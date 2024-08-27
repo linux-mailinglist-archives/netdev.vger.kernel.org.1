@@ -1,103 +1,95 @@
-Return-Path: <netdev+bounces-122358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7AED960CBB
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:57:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73A38960CC8
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:59:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91CCD1F23102
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:57:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E3BC283F98
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD361C460F;
-	Tue, 27 Aug 2024 13:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500BE1C3F0D;
+	Tue, 27 Aug 2024 13:59:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="awqkCmrD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ej785GW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A8D73466
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 13:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DC41C2DD8;
+	Tue, 27 Aug 2024 13:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724767049; cv=none; b=cqDbMdki/1BhFIVFR21YvQlF5A8fxORs6RBTW4aFVDEzW+m6wUy0JcZnARBPlz/djN+awLgIfchW56SQsZWvnXDFFo42Oib+k7Brewq/fzvgyqT1xiqXHb/w5Xr+h5zs8P8uUzI7PWyg4srAzPxWTIOsEID5sfTZxxHQa+A8HWg=
+	t=1724767182; cv=none; b=h/1FltFIAmYagWNM1ArdIFMrjt+tgqSCJ55f0EGI2tbT2rW83pqqMQxIU/3R6YviTDsZrHSxt4Itftg0qy1ETj3nh6DgqK4CMHRlLYCQwjk1xTZkRvWFhLTpMiGj9WoRWTZeVbhC3n1NnUC6bDuHRVkMDyV1nAA907stgybqHKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724767049; c=relaxed/simple;
-	bh=50VGgfJ39Vn095GKRLqCQYnG9dPP7cqRS8ayEwj0x0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UX2rTufGQ03QNRpzmqYpJxnrfVv/ZrC4Q72ichIcgq3rYEnAcHWm5VQ0mqlpNom0nvlG3boZuidk9k7fchowOTOVs+U6Y4caJ/DD6XLFiqae+BTRQeRLMfWdDLJlPdF34juPyTVa82rPgHOfS0yPQNYSX+I/R/hfuOU94NZcRsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=awqkCmrD; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724767047;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=50VGgfJ39Vn095GKRLqCQYnG9dPP7cqRS8ayEwj0x0k=;
-	b=awqkCmrDz1Xd6FQz2zhAs/J1rl3NTXO0mMLzlSlMABgFXzkbUv2xlEvRWtpnO1sjbjqI6a
-	68o1x08B3wNIWEXKH6FEI/oOh4yWFMXd+/ncwkiboxD2MUwu4j219ahc79p08QJ9UKbBLK
-	LuS/XCzzv1dk16Kf9m0ch8/N+U9sy8Y=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-255-3r1g_mKRP_KdRvPc8kQDJA-1; Tue, 27 Aug 2024 09:57:23 -0400
-X-MC-Unique: 3r1g_mKRP_KdRvPc8kQDJA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-428e48612acso60669265e9.3
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 06:57:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724767042; x=1725371842;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=50VGgfJ39Vn095GKRLqCQYnG9dPP7cqRS8ayEwj0x0k=;
-        b=fZpg62IG6DfwYF0OBl4rercraRcRa1afwuJ2+6t4cc7ylppkGWGI4N8S9Hj2EJspWH
-         fynomEIspACtlpcs9vzA1yHZwQjBj4I3dzkCl5uTKA44/g2U5kE/OlPbXe+eQvMcXvB9
-         VKeP5tRqVJH9oI9ECd8uD59+oJ4jz+StrBONgmGhjScKw2ZmdXuNTT497mjiFWFsc1Kl
-         QuPYIQJfuqK66rdTIloTEzIm/Et3BAX84tNAO9NAf85pGH6JgeGSc3UbN8Sud2ilpXCM
-         CpVYDTgvihvbEovuz+na8lsWtT+SuvrD4owi0NstjL8/CfUQgfcbY8WEV/nY+vWkE1q4
-         wK6w==
-X-Gm-Message-State: AOJu0YwKxnGTHnLtmZagWLOB08iDXHu2R4raKe2HKbvky1C2hfzmlIHA
-	o6+vvUUyPmJYm7fDnj+WfONfmilwlscE+rs+ww7YwdsPi89dhCUg73aKujXwYTD2aEzbU3DA447
-	HxwQr2kN6w9tWJe9kcpgowSUhp8t7Un/lH+EdXqaEhKE7Gv278J3SSw==
-X-Received: by 2002:a05:600c:354a:b0:429:d43e:dbc3 with SMTP id 5b1f17b1804b1-42acd5e7513mr114490945e9.34.1724767042672;
-        Tue, 27 Aug 2024 06:57:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFxpsjaqSyA5LuzkxA9XJ4emA+wSpbmgWayC6kww92lxBE+u93eN4thaAxJMWp0dXVk3KhlTQ==
-X-Received: by 2002:a05:600c:354a:b0:429:d43e:dbc3 with SMTP id 5b1f17b1804b1-42acd5e7513mr114490465e9.34.1724767041926;
-        Tue, 27 Aug 2024 06:57:21 -0700 (PDT)
-Received: from debian (2a01cb058918ce0010ac548a3b270f8c.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:10ac:548a:3b27:f8c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730817a5acsm13174367f8f.64.2024.08.27.06.57.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 06:57:21 -0700 (PDT)
-Date: Tue, 27 Aug 2024 15:57:19 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
-	john.fastabend@gmail.com, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 02/12] ipv4: Unmask upper DSCP bits in
- ip_route_output_key_hash()
-Message-ID: <Zs3bP9fFt1z4RJek@debian>
-References: <20240827111813.2115285-1-idosch@nvidia.com>
- <20240827111813.2115285-3-idosch@nvidia.com>
+	s=arc-20240116; t=1724767182; c=relaxed/simple;
+	bh=a89ZI3RFXA6YQYq1bevFWz3hL6zd3Z+1MGbouUOUPV0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QZ3EnNhORTBZOa0abKInYJ8pXrpg6Tuec9aQ7UbP2gif8L9sDWC3b2ivdPFf9f8JVCrsTDul3cTBIfY12WeMuY51cT404XHrUUx9z745lTw6MzgcPGgQQEHHK6WLGNaaw/BooyrJ4oC9yPL3UnrPve2gIGD+1I4HeSW5W4IZsKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ej785GW/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B0C7C61048;
+	Tue, 27 Aug 2024 13:59:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724767180;
+	bh=a89ZI3RFXA6YQYq1bevFWz3hL6zd3Z+1MGbouUOUPV0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Ej785GW/F71tVCj6Shkjf0OOcLB0lDZzJUJf7m/cf8L5bnVAN8RuIXN+7F+K/zuYW
+	 VE/x5qP3Un+clfqSn+YxaG69TmFCFtz6MYJ+/USndvGUfULBWsgzuvmu+k0yMvX5I0
+	 edKSiD0YIit2bxF/ZuNADFpE3FinkzNkc0oqkayq4tWL2oPU+YxYRYylPEEgFHnnPX
+	 Src7qVHXPJkFef0KYTkatNyRaNk8qxIY0B5qnMcx1kYjhGjmOFED8nf1VoSlqqVVB4
+	 ndEsgQ9pd5EXGxHsqra+JGKzpjUNHriL/qR3RfQR3o84MXD1b3bhQlvSjH+HUUbgbm
+	 uxiTmjS/kMscg==
+Date: Tue, 27 Aug 2024 06:59:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maksym Kutsevol <max@kutsevol.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Breno Leitao
+ <leitao@debian.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] netcons: Add udp send fail statistics to netconsole
+Message-ID: <20240827065938.6b6d3767@kernel.org>
+In-Reply-To: <CAO6EAnX0gqnDOxw5OZ7xT=3FMYoh0ELU5CTnsa6JtUxn0jX51Q@mail.gmail.com>
+References: <20240824215130.2134153-1-max@kutsevol.com>
+	<20240824215130.2134153-2-max@kutsevol.com>
+	<20240826143546.77669b47@kernel.org>
+	<CAO6EAnX0gqnDOxw5OZ7xT=3FMYoh0ELU5CTnsa6JtUxn0jX51Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240827111813.2115285-3-idosch@nvidia.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 27, 2024 at 02:18:03PM +0300, Ido Schimmel wrote:
-> Unmask the upper DSCP bits so that in the future output routes could be
-> looked up according to the full DSCP value.
+On Mon, 26 Aug 2024 19:55:36 -0400 Maksym Kutsevol wrote:
+> > > +static ssize_t stats_show(struct config_item *item, char *buf)
+> > > +{
+> > > +     struct netconsole_target *nt = to_target(item);
+> > > +
+> > > +     return
+> > > +             nt->stats.xmit_drop_count, nt->stats.enomem_count);  
+> >
+> > does configfs require value per file like sysfs or this is okay?  
+> 
+> Docs say (Documentation/filesystems/sysfs.txt):
+> 
+> Attributes should be ASCII text files, preferably with only one value
+> per file. It is noted that it may not be efficient to contain only one
+> value per file, so it is socially acceptable to express an array of
+> values of the same type.
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+Right, but this is for sysfs, main question is whether configfs has 
+the same expectations.
 
+> Given those are of the same type, I thought it's ok. To make it less
+> "fancy" maybe move to
+> just values separated by whitespace + a block in
+> Documentation/networking/netconsole.rst describing the format?
+> E.g. sysfs_emit(buf, "%lu %lu\n", .....) ? I really don't want to have
+> multiple files for it.
+> What do you think?
+
+Stats as an array are quite hard to read / understand
 
