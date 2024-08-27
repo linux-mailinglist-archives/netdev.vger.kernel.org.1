@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-122166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBBF5960377
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:44:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88117960383
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:44:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6D012828F3
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 07:44:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B61261C2255F
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 07:44:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5F815ADB4;
-	Tue, 27 Aug 2024 07:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A128518756A;
+	Tue, 27 Aug 2024 07:44:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613D8156C5E;
-	Tue, 27 Aug 2024 07:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0066F158875;
+	Tue, 27 Aug 2024 07:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724744675; cv=none; b=UDJ4WLn5YMMPTaF5NIWLGnAfavpvpcRpLDZGvGSMNj0WO/L90yy9AsHRZqcJB8nXNIgurBKrB28Cnqn5WadfZxKW3RHLO9VBDaOjvwQGOZL8K1oPE9WZwzgvUw9i1+vRMqn87nRQCBkEnAsdxczZOe5AfguBNGB5DFtT3rgeOP8=
+	t=1724744676; cv=none; b=OjW4c4Jjdj/qSPbnYBEixGZffNl7PtgOB153uBTZJiAZsLNc5CywfT2HKa/0/oPJkcOxmpQYLny/MPUMeyG2fqMzCJ1hG1eE3LHWq0bNSftOnAMZMoOgL5SZO8vaSng2VTLntvD0bZj4nnD/4mz20+z2tvoNvv0TXPH/ecZeE0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724744675; c=relaxed/simple;
-	bh=8UyNLSsGP0E5k6oltSXFYCV+nNEVDb0t3FBVM3PNeDU=;
+	s=arc-20240116; t=1724744676; c=relaxed/simple;
+	bh=g9ZvAHk+N+rt85ClMjsz9HfcR2QjF4Ufi+FbhGOz9tY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JbgplmIjIb2ss2ALzjZDxbZU5Bs41QAhSzynC8CAsKUI6J7m1pXAU+WN01nHqrgjtSzvvafbNC/lREa7LAfI4u+Npnch8dHthLIw6zYl7FyuqDy2QyOUFjGpnEmhd6PFO6cy+F97f7lmb8Xiil8a8WTSUCRwSWQ/F+BoE4ePX7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+	 MIME-Version:Content-Type; b=gVssElx9lRT/WkqsvEQp53zIqfnhS6WKN7FsBhBSbSgtiyrslRQUJfxjsYT1m0JkWMyNVi6T6wlYUHG6n8ft51KNK6iH6L1lpewr0wAA5nT2O8eiudCW6RbBmvYxABPdW4oTwFO9B+FK47VQzrhL4xfxGbyWT9iaUjy+Sp2rvRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4WtKLX1kzwz1S99K;
-	Tue, 27 Aug 2024 15:44:20 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WtKLB3T2CzyRCS;
+	Tue, 27 Aug 2024 15:44:02 +0800 (CST)
 Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id A7A601A0188;
-	Tue, 27 Aug 2024 15:44:30 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 8B15F140137;
+	Tue, 27 Aug 2024 15:44:31 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
  (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 27 Aug
- 2024 15:44:29 +0800
+ 2024 15:44:30 +0800
 From: Jinjie Ruan <ruanjinjie@huawei.com>
 To: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
 	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
@@ -54,9 +54,9 @@ To: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
 	<linux-stm32@st-md-mailman.stormreply.com>, <krzk@kernel.org>,
 	<jic23@kernel.org>
 CC: <ruanjinjie@huawei.com>
-Subject: [PATCH -next 1/7] net: stmmac: dwmac-sun8i: Use for_each_child_of_node_scoped() and __free()
-Date: Tue, 27 Aug 2024 15:52:13 +0800
-Message-ID: <20240827075219.3793198-2-ruanjinjie@huawei.com>
+Subject: [PATCH -next 2/7] net: dsa: realtek: Use for_each_child_of_node_scoped() and __free()
+Date: Tue, 27 Aug 2024 15:52:14 +0800
+Message-ID: <20240827075219.3793198-3-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240827075219.3793198-1-ruanjinjie@huawei.com>
 References: <20240827075219.3793198-1-ruanjinjie@huawei.com>
@@ -76,66 +76,49 @@ for_each_child_of_node_scoped() and __free(), which can simplfy code.
 
 Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 ---
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 20 ++++++-------------
- 1 file changed, 6 insertions(+), 14 deletions(-)
+ drivers/net/dsa/realtek/rtl8366rb.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-index cc93f73a380e..415a0d23b3a5 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-@@ -774,46 +774,38 @@ static int sun8i_dwmac_reset(struct stmmac_priv *priv)
- static int get_ephy_nodes(struct stmmac_priv *priv)
+diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
+index 9e821b42e5f3..0acdcdd93ea2 100644
+--- a/drivers/net/dsa/realtek/rtl8366rb.c
++++ b/drivers/net/dsa/realtek/rtl8366rb.c
+@@ -1009,7 +1009,6 @@ static int rtl8366rb_setup_all_leds_off(struct realtek_priv *priv)
+ 
+ static int rtl8366rb_setup_leds(struct realtek_priv *priv)
  {
- 	struct sunxi_priv_data *gmac = priv->plat->bsp_priv;
--	struct device_node *mdio_mux, *iphynode;
--	struct device_node *mdio_internal;
- 	int ret;
- 
--	mdio_mux = of_get_child_by_name(priv->device->of_node, "mdio-mux");
-+	struct device_node *mdio_mux __free(device_node) =
-+		of_get_child_by_name(priv->device->of_node, "mdio-mux");
- 	if (!mdio_mux) {
- 		dev_err(priv->device, "Cannot get mdio-mux node\n");
- 		return -ENODEV;
- 	}
- 
--	mdio_internal = of_get_compatible_child(mdio_mux,
--						"allwinner,sun8i-h3-mdio-internal");
--	of_node_put(mdio_mux);
-+	struct device_node *mdio_internal __free(device_node) =
-+		of_get_compatible_child(mdio_mux, "allwinner,sun8i-h3-mdio-internal");
- 	if (!mdio_internal) {
- 		dev_err(priv->device, "Cannot get internal_mdio node\n");
- 		return -ENODEV;
- 	}
- 
- 	/* Seek for internal PHY */
--	for_each_child_of_node(mdio_internal, iphynode) {
-+	for_each_child_of_node_scoped(mdio_internal, iphynode) {
- 		gmac->ephy_clk = of_clk_get(iphynode, 0);
- 		if (IS_ERR(gmac->ephy_clk))
+-	struct device_node *leds_np, *led_np;
+ 	struct dsa_switch *ds = &priv->ds;
+ 	struct dsa_port *dp;
+ 	int ret = 0;
+@@ -1018,23 +1017,21 @@ static int rtl8366rb_setup_leds(struct realtek_priv *priv)
+ 		if (!dp->dn)
  			continue;
- 		gmac->rst_ephy = of_reset_control_get_exclusive(iphynode, NULL);
- 		if (IS_ERR(gmac->rst_ephy)) {
- 			ret = PTR_ERR(gmac->rst_ephy);
--			if (ret == -EPROBE_DEFER) {
--				of_node_put(iphynode);
--				of_node_put(mdio_internal);
-+			if (ret == -EPROBE_DEFER)
- 				return ret;
--			}
+ 
+-		leds_np = of_get_child_by_name(dp->dn, "leds");
++		struct device_node *leds_np __free(device_node) =
++			of_get_child_by_name(dp->dn, "leds");
+ 		if (!leds_np) {
+ 			dev_dbg(priv->dev, "No leds defined for port %d",
+ 				dp->index);
  			continue;
  		}
- 		dev_info(priv->device, "Found internal PHY node\n");
--		of_node_put(iphynode);
--		of_node_put(mdio_internal);
- 		return 0;
+ 
+-		for_each_child_of_node(leds_np, led_np) {
++		for_each_child_of_node_scoped(leds_np, led_np) {
+ 			ret = rtl8366rb_setup_led(priv, dp,
+ 						  of_fwnode_handle(led_np));
+-			if (ret) {
+-				of_node_put(led_np);
++			if (ret)
+ 				break;
+-			}
+ 		}
+ 
+-		of_node_put(leds_np);
+ 		if (ret)
+ 			return ret;
  	}
- 
--	of_node_put(mdio_internal);
- 	return -ENODEV;
- }
- 
 -- 
 2.34.1
 
