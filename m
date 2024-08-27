@@ -1,89 +1,69 @@
-Return-Path: <netdev+bounces-122368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E019A960D95
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:29:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D120960D9C
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:31:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 947091F24B61
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:29:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 900B11C221B4
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CE591C4EE2;
-	Tue, 27 Aug 2024 14:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DTLFg2eD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348C119DF5F;
+	Tue, 27 Aug 2024 14:31:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53DA1C4EC2
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 14:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BDC81E520;
+	Tue, 27 Aug 2024 14:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724768952; cv=none; b=ts9+SPhdgiXUOSM3zReDfH1KCSNiIBFp2qV1WL2nheJOIxlVrOq02vhXCZ7jalqCIp3999yFt5aNb+4WVPFnSx9DVC3dTsTrI6lqbkP4ALV6Ywfr6MnaQOPK12a1dxT6dPpjwvqPpV2tv68jwr3Za67emCgTZXJ8xmeabBVTGbo=
+	t=1724769075; cv=none; b=ieZCI74JK+u5+VyUv2Xav6m3ceucnpDyrTyi2+86gjizyvv8dG/QlfPUoAzuE48DqreL9Sh3g9TjBHFQkig/O8HmoqsFNr1Vpfs+Fb+cHWzLCYNvs8uxT/xRFmb/a3yH+Ald0QYdu5m9HpmNe4ex2fYIU25FrLvWtap127RLplA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724768952; c=relaxed/simple;
-	bh=XEDPr4WOAkirqSp12c15L6XcOtIYReNICHT5/RJr5y8=;
+	s=arc-20240116; t=1724769075; c=relaxed/simple;
+	bh=m6nhO4iWbTw4iDhbUCmU18kyJNTHT5lOP8HBqVqyiSs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FF1YjJLLda4vSUwwiloot2RXB3DX7KPD52VrjZpFI3lMdAFMn/xApUvedSVPGGT0K15Lbs4ZveVZCA9GKcSCDIp8X1o3gQgoHzj4SRWXbipQfQqVVHREf6hRb2TK5e45Rn4zWDVg1QFp8pgUVMVz9C5L+b7XH3Ct52fxmXmaVfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DTLFg2eD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724768948;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PgVRezl+3Y13Dxo4oGt/1Z0OKjfZrBalmuo0EvD0nD4=;
-	b=DTLFg2eDzLqRRpXvc+AjP55nE5/cVK5HKb5lfBtFKaVo71K8BB8WJnQrxs9aPKcsYaKdMW
-	3FpfV45R9Jvlndrjsc+BRSJvJVLuPXaSnA0u1hbqdQQ+T9HIGxLcCtOne0igV2+r1FTucm
-	HeZ0OGUpsmnm6CUwzVT4UDEwwP1zQCg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-328--vJXI-neMBiQpHrna_4aYQ-1; Tue, 27 Aug 2024 10:29:07 -0400
-X-MC-Unique: -vJXI-neMBiQpHrna_4aYQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-429e937ed39so52457435e9.1
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 07:29:07 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=tKlUJ5/4tu6KBlMiCAHbJd/mXkJFnfllpf+SOYY00W7s6lXsT1FN+cjw0OZh+3nrXZN4OWdmEP6kz1daLyJQHGG6QZARAagcTp63vFJ6Q+j8pCJVdGVYdVlAGB8WLAN1tOEVQDyTrytsoC7wGhfENwgml6P/wQmRcipFqvyhD5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a868b739cd9so668895566b.2;
+        Tue, 27 Aug 2024 07:31:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724768946; x=1725373746;
+        d=1e100.net; s=20230601; t=1724769072; x=1725373872;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PgVRezl+3Y13Dxo4oGt/1Z0OKjfZrBalmuo0EvD0nD4=;
-        b=TLMceL7TlzUT10nSGkkhhLNOF1/sgRIHeJLeohtvT/G4KiQ7lprTLhl9f/P0IUd8DO
-         f6nLV94rkTCff2yvmwAEjEPjcdtTt45JqybSOEj917ULkHpEGS0bo3DPEJNOD8LQzzlt
-         dN9Rmgjd5lvIWd9OXjZn0Asjy8D4o2ICMzXUf0WmXbVvb+QzkrI1IAUTxksWBcuC1CNf
-         Rk0fH2JYA45DWHB5CAP+eTRSm6IgZoFPkR5T7uSTIWuehHAdPuaEHXCr3OFzpxaVQBOh
-         8hDUfpKc76PZiOqLRMMTgXK4LunnveHo7FD7hXTqxT71HCs/X9MhKxwK1LvhJ4EnFmf2
-         BFzw==
-X-Gm-Message-State: AOJu0YwKyFRPd7Hp695fkq9SefeArFe2TEQKvR0KVmPIyXzywJRc8Ab8
-	JRi+vkfmnSpq8XnvcJVRv98fN+199nohxddvF3Pu0Mffr63GH9l7rCCz/hi8A3puwFnVj6hpZiA
-	LtJ5dHJS63hW/9KuGl8ThVhUvL/UhpWtmw+hD5VhhsQY5RpGMexiKwg==
-X-Received: by 2002:a05:600c:1909:b0:428:1e8c:ff75 with SMTP id 5b1f17b1804b1-42b9ae4b2f4mr19739995e9.35.1724768946185;
-        Tue, 27 Aug 2024 07:29:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEFJXBA+TgtLOFs5onkG6FkZIYtlBLDuS8EzKnHJ9mOfyqPrQoz0idm9IxP/FCAp77EJ8Tiww==
-X-Received: by 2002:a05:600c:1909:b0:428:1e8c:ff75 with SMTP id 5b1f17b1804b1-42b9ae4b2f4mr19739695e9.35.1724768945275;
-        Tue, 27 Aug 2024 07:29:05 -0700 (PDT)
-Received: from debian (2a01cb058918ce0010ac548a3b270f8c.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:10ac:548a:3b27:f8c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ac517a68dsm190967095e9.33.2024.08.27.07.29.04
+        bh=sG23+qoWY46Jajm0s76Z+fW6MdmfN+U1Ppd3ZWTkb+w=;
+        b=oGuRg9v1XDJ8WppApvqAEMc68DdEvMhH5MVHZVneM/wv0AY+y4gclo/HTM4EaLkvYF
+         pRTVO06f/97hjSkvF4Xlzc6VVmcX7SFCyxUEcVAIqOsd0zmv3mr7zrN0bdMvZOScN659
+         mru0rVPieNsjihHphJ4K7BaYiZlucy69ZiRx6/GUbgU2sO+hjI+mQD0FHADLlyGxdU+8
+         EFqWtQ+403sGmTBQlmqRrh7Sjyl5aTVW+s2/8gzjmLQperxHllAzasRDX2EeQtsRbtsy
+         g7SjiJeGhcUaI78HE6VYaqtvj+QmhKIqINu06x69dzUbqaO1h1nU4//8O9nr19yX53a3
+         ccSA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7UkJBWDOGdgWYsPt9esqnzvJnSiN+1TdGwVtR924ard6cotPqamyIW5YHFEhSbaLwMqkQbY84@vger.kernel.org, AJvYcCWR4RTbkhzoxwOI42VlTWvuv2aKIez0/PUZ+L7yi340WhiXjjTcdvTWm0YkKJDywkh0NSlQqijkOngFMmQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLh9R7EqFO0fTHRYm2hsmDB9BGXqNVYcMHLrSCz72TQNvP1OOz
+	N6vVtoL1aVH1ugcXC9uGceTrhVuA4YdRIw9j5LgKyKgWZQpzYHco
+X-Google-Smtp-Source: AGHT+IGxCsgsUch/iKfglrbmw5nS5bILYtm6bTHIKTk/PKJ4FiT5Cb/hWiGmV1EIfL70pjGjKD+56w==
+X-Received: by 2002:a17:907:3f99:b0:a7a:3928:3529 with SMTP id a640c23a62f3a-a86e397e60fmr275905066b.13.1724769071070;
+        Tue, 27 Aug 2024 07:31:11 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a86e549cbedsm118241966b.62.2024.08.27.07.31.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 07:29:04 -0700 (PDT)
-Date: Tue, 27 Aug 2024 16:29:02 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
-	john.fastabend@gmail.com, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 04/12] ipv4: Unmask upper DSCP bits in
- ip_sock_rt_tos()
-Message-ID: <Zs3irqw8lmiPb0PJ@debian>
-References: <20240827111813.2115285-1-idosch@nvidia.com>
- <20240827111813.2115285-5-idosch@nvidia.com>
+        Tue, 27 Aug 2024 07:31:10 -0700 (PDT)
+Date: Tue, 27 Aug 2024 07:31:08 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, rbc@meta.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH nf-next v2 0/2] netfilter: Make IP_NF_IPTABLES_LEGACY
+ selectable
+Message-ID: <Zs3jLJNuGfqtpzEE@gmail.com>
+References: <20240823174855.3052334-1-leitao@debian.org>
+ <20240824103756.4fb39abc@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,16 +72,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240827111813.2115285-5-idosch@nvidia.com>
+In-Reply-To: <20240824103756.4fb39abc@kernel.org>
 
-On Tue, Aug 27, 2024 at 02:18:05PM +0300, Ido Schimmel wrote:
-> The function is used to read the DS field that was stored in IPv4
-> sockets via the IP_TOS socket option so that it could be used to
-> initialize the flowi4_tos field before resolving an output route.
+On Sat, Aug 24, 2024 at 10:37:56AM -0700, Jakub Kicinski wrote:
+> On Fri, 23 Aug 2024 10:48:51 -0700 Breno Leitao wrote:
+> > These two patches make IP_NF_IPTABLES_LEGACY and IP6_NF_IPTABLES_LEGACY
+> > Kconfigs user selectable, avoiding creating an extra dependency by
+> > enabling some other config that would select IP{6}_NF_IPTABLES_LEGACY.
 > 
-> Unmask the upper DSCP bits so that in the future the output route lookup
-> could be performed according to the full DSCP value.
+> Resulting config in CI still differs quite a bit:
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+Sorry about it. I wasn't comparing the whole .config.
 
+I will submit a next version that preserve the .config intact when
+running:
+
+ # rm -fr .config ; vng --build  --config tools/testing/selftests/net/config
+
+Thanks,
+--breno
 
