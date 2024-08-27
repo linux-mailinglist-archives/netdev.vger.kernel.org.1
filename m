@@ -1,137 +1,87 @@
-Return-Path: <netdev+bounces-122112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60EF495FEF5
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 04:22:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F07EF95FF06
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 04:25:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 942761C216CB
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 02:22:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FB721C21707
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 02:25:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4843610940;
-	Tue, 27 Aug 2024 02:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36C2BEAF1;
+	Tue, 27 Aug 2024 02:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dW0qNSud"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8782CA9;
-	Tue, 27 Aug 2024 02:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C64C8BEA;
+	Tue, 27 Aug 2024 02:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724725317; cv=none; b=cHGfETT8ybqYS5F5u/jrapp7wlrxP6InzsQopNyFNZZghgNHlKRdLPGQtWYV2G0B6NQwpuYSql9or7S4g4ATidRSp1KwIifKEHB5Nv5FzkRVrYeMLSOwtnoGJoUFYOKVsithRwgqNyl/XRwhoBiptWuvAT97YFnVIHmwvJzrpt8=
+	t=1724725502; cv=none; b=Bm64Hh9pvvinnG4gXuW1s1bFCTporlqRhweJAdI2zUYxa38BCWUf2AT4Ew5PH0+FL1jRXnjp1EZ15rRd3887hkB1D0lVGPWhIJS0GipNMRzoh3WrYvJVJSjZdCCW3tyvhax+iY5NVcNRd0j5vi/7WYG/LWc/FKSX7HlSfk4cPLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724725317; c=relaxed/simple;
-	bh=8VBrrGu3oos3uM4w05GpcBqNhAFWmQIZAT+ADgG4gsQ=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=KSzkJrcflwQzoJBPs1DYxqU08AT2liac/kR8ITTJC9jylkb5DLcoGNDDdbEv5ar8VLGXPE4KW12FpklBx7ijfl1N+7Vxjj2+jFDjuS+PYMq6684phmW7DENhMuHXpJK7o2Zi8h8weMHQwUwkwfFu9qo6/dsJ9Lu2RSlX70EtNZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.243.244.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas5t1724725296t961t18306
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.120.181.182])
-X-QQ-SSF:00400000000000F0FVF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 16520017505562810091
-To: "'Andrew Lunn'" <andrew@lunn.ch>
-Cc: <andi.shyti@kernel.org>,
-	<jarkko.nikula@linux.intel.com>,
-	<andriy.shevchenko@linux.intel.com>,
-	<mika.westerberg@linux.intel.com>,
-	<jsd@semihalf.com>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<rmk+kernel@armlinux.org.uk>,
-	<linux-i2c@vger.kernel.org>,
-	<netdev@vger.kernel.org>,
-	<mengyuanlou@net-swift.com>,
-	<duanqiangwen@net-swift.com>
-References: <20240823030242.3083528-1-jiawenwu@trustnetic.com> <888f78a9-dea9-4f66-a4d0-00a57039733d@lunn.ch> <01d701daf75c$50db4450$f291ccf0$@trustnetic.com> <55ff5570-5398-48e9-bf56-d34da197d175@lunn.ch>
-In-Reply-To: <55ff5570-5398-48e9-bf56-d34da197d175@lunn.ch>
-Subject: RE: [PATCH net 0/3] Add I2C bus lock for Wangxun
-Date: Tue, 27 Aug 2024 10:21:36 +0800
-Message-ID: <020f01daf827$d765ffd0$8631ff70$@trustnetic.com>
+	s=arc-20240116; t=1724725502; c=relaxed/simple;
+	bh=5obBFAgk49d6SfmCWkhvVk8SCMkmqHl7tmdg64UCpjs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mox/YLSJF+eFliidvAc5HKVIPL9ll5AQKRZowck5hEld47o4zpFsk3h4N+IkW/ugcPPHVplNEULWjbjRbM3QweEMKWWihiGEEGJG1OVH1vTbaMJJWJEep2HqSj2lWeXSlh5db7PeeqPRXE+CIuhbcJ1HErPTAqH5KQ8HRS9sEUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dW0qNSud; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36DE7C4FF0C;
+	Tue, 27 Aug 2024 02:25:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724725501;
+	bh=5obBFAgk49d6SfmCWkhvVk8SCMkmqHl7tmdg64UCpjs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dW0qNSudjZtDXdmqiCp1I6Dh28SKCWCEnsMjb+3BDLmJ9XZ92MhHy6Bo2WQ3/IH3C
+	 E+sqs9GXpM21NaCiWs+R42Y0Rmt3iA75W6Qdh3frlzoJyG5SD5wSz9Gw3SCHnK+EE4
+	 Pp5/QQeGat5HAqvoaieIZnIn6GW5CyUDlbidrMnuR7n7P6Nx1rTySv30Ylg/QWpDF9
+	 RDyOIRkqF7NHD4L6XBrWc+AY5UxCfdKZortF1p8VcH3tBnG7u9a9xFVNnWanQd7Hj7
+	 EgVx8vlLSw3SQtFjJ5kOFIKn9G47lfHDo83az8krI3Y51jKjK7m7JvJncKXScDILh+
+	 RBjBaTDQNlRLA==
+Date: Mon, 26 Aug 2024 19:25:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ fw@strlen.de, Antonio Ojea <aojea@google.com>
+Subject: Re: [PATCH net-next 2/9] selftests: netfilter: nft_queue.sh: sctp
+ coverage
+Message-ID: <20240826192500.32efa22c@kernel.org>
+In-Reply-To: <20240822221939.157858-3-pablo@netfilter.org>
+References: <20240822221939.157858-1-pablo@netfilter.org>
+	<20240822221939.157858-3-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQH8I/V4PrHZ+O/IFu6cfIurHK/3+gGW9YksAYhjRIgArI2qV7HZn86A
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On Mon, Aug 26, 2024 10:34 AM, Andrew Lunn wrote:
-> On Mon, Aug 26, 2024 at 10:04:42AM +0800, Jiawen Wu wrote:
-> > On Mon, Aug 26, 2024 9:33 AM, Andrew Lunn wrote:
-> > > On Fri, Aug 23, 2024 at 11:02:39AM +0800, Jiawen Wu wrote:
-> > > > Sometimes the driver can not get the SFP information because the I2C bus
-> > > > is accessed by the firmware at the same time.
-> > >
-> > > Please could you explain this some more. What firmware?
-> >
-> > It's the firmware of our ethernet devices.
-> >
-> > > There some registers which are clear on read. They don't work when you
-> > > have multiple entities reading them.
-> >
-> > I'm not trying to multiple access the I2C registers, but these registers cannot
-> > be accessed by other interfaces in the process of reading complete information
-> > each time. So there is a semaphore needed that locks up the entire read process.
+On Fri, 23 Aug 2024 00:19:32 +0200 Pablo Neira Ayuso wrote:
+> From: Antonio Ojea <aojea@google.com>
 > 
-> More details please.
+> Test that nfqueue with and without GSO process SCTP packets correctly.
 > 
-> Linux assume it is driving the hardware. Your firmware cannot be
-> touching any registers which will clear on read. QSFP states that
-> registers 3-31 of page 0 are all clear on read, for example. The
-> firmware should also not be setting any registers, otherwise you can
-> confuse Linux which assumes registers it set stay set, because it is
-> controlling the hardware.
-> 
-> Your firmware also needs to handle that Linux can change the page. If
-> the firmware changes the page, it must restore it back to whatever
-> page Linux selected, etc.
-> 
-> The fact you are submitting this for net suggests you have seen real
-> issues. Please describe what those issues are.
+> Joint work with Florian and Pablo.
 
-The error log shows:
+This is unhappy on a debug kernel in netdev CI:
 
-[257681.367827] sfp sfp.1025: Host maximum power 1.0W
-[257681.370813] txgbe 0000:04:00.1: 31.504 Gb/s available PCIe bandwidth, limited by 8.0 GT/s PCIe x4 link at 0000:02:02.0 (capable
-of 63.008 Gb/s with 8.0 GT/s PCIe x8 link)
-[257681.373364] txgbe 0000:04:00.1 enp4s0f1: renamed from eth0
-[257681.434719] txgbe 0000:04:00.1 enp4s0f1: configuring for inband/10gbase-r link mode
-[257681.676747] sfp sfp.1025: EEPROM base structure checksum failure: 0x63 != 0x1f
-[257681.676755] sfp EE: 00000000: 03 04 07 10 00 00 01 00 00 00 00 06 67 02 00 00  ............g...
-[257681.676757] sfp EE: 00000010: 1e 0f 00 00 46 69 62 65 72 53 74 6f 72 65 20 64  ....FiberStore d
-[257681.676759] sfp EE: 00000020: 20 20 20 20 00 00 1b 21 53 46 50 2d 31 30 47 53      ...!SFP-10GS
-[257681.676760] sfp EE: 00000030: 52 2d 38 35 20 20 20 20 41 20 20 20 03 52 00 1f  R-85    A   .R..
-[257681.676762] sfp EE: 00000040: 00 81 cd 5b df 25 0a bd 40 f6 c6 ce 47 8e ff ff  ...[.%..@...G...
-[257681.676763] sfp EE: 00000050: 10 d8 24 33 44 8e ff ff 10 41 b0 9a ff ff ff ff  ..$3D....A......
- 
-It looks like some fields are read incorrectly. For comparison, I printed the
- SFP info when it loaded correctly:
+# 2024/08/26 17:38:31 socat[12451] E write(7, 0x563837a56000, 8192): Cannot send after transport endpoint shutdown
+# Binary files /tmp/tmp.ZZAJtF9z9R and /tmp/tmp.hS8W1Te84V differ
+# FAIL: lost packets?!
 
-[260908.194533] sfp EE: 00000000: 03 04 07 10 00 00 01 00 00 00 00 06 67 02 00 00  ............g...
-[260908.194536] sfp EE: 00000010: 1e 0f 00 00 46 69 62 65 72 53 74 6f 72 65 20 20  ....FiberStore
-[260908.194538] sfp EE: 00000020: 20 20 20 20 00 00 1b 21 53 46 50 2d 31 30 47 53      ...!SFP-10GS
-[260908.194540] sfp EE: 00000030: 52 2d 38 35 20 20 20 20 41 20 20 20 03 52 00 1f  R-85    A   .R..
-[260908.194541] sfp EE: 00000040: 40 63 bd df 40 8e ff ff 10 41 b0 9a ff ff ff ff  @c..@....A......
-[260908.194543] sfp EE: 00000050: 10 58 5b 29 41 8e ff ff 10 41 b0 9a ff ff ff ff  .X[)A....A......
-[260908.198205] sfp sfp.1025: module FiberStore       SFP-10GSR-85     rev A    sn G1804125607      dc 180605
+https://netdev-3.bots.linux.dev/vmksft-nf-dbg/results/745281/2-nft-queue-sh/stdout
 
-Since the read mechanism of I2C is to write the offset and read command
-first, and then read the target address. I think it's possible that the different
-offsets be written at the same time, from Linux and firmware.
+Works fine on a non-debug kernel tho:
 
+https://netdev-3.bots.linux.dev/vmksft-nf/results/745282/5-nft-queue-sh/stdout
 
+so gotta be some race.
+
+Please follow up soon, I'll disable this test case for now.
 
