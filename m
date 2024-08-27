@@ -1,69 +1,63 @@
-Return-Path: <netdev+bounces-122305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C7DD9609D4
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:18:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B9A229609DD
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:19:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEFCC1C22A6F
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 12:18:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF9431C22BF0
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 12:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3DD1A0730;
-	Tue, 27 Aug 2024 12:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CBE1A0B07;
+	Tue, 27 Aug 2024 12:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mxsxlHug"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A16A19DF97;
-	Tue, 27 Aug 2024 12:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EC119F466;
+	Tue, 27 Aug 2024 12:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724761103; cv=none; b=JC99kI5Y7oFFxYB9ie+bxBiClmbt8TFUXRPgoGLLjfiB5LqxdmU//U/u2sXG+76yTw17VqMPL88qyG8N5RRFmSlAcmNRv96mHut55BnXmPhx8t9/aAK+I6DLd7zzbMZ3iTJmmwTeiHxwbNWMcsYqJC0sAEIKi7TMm0kCkAeqBwE=
+	t=1724761143; cv=none; b=kdi5A15op2Qs14TwOkydKsKF9IM5OvxSdWTEJ5D5iMVWbsH3TE/55ahmDPw6mvMC57xFubWDqUzvURqw/LEcEsz6+EFbNbingBbI10OUfViCsXCBtk/GuLlkrp6Qp3/ZWaMedRCM6ekdBeFBKBgGsMH+xvjQ+p6zfu1OLtCznqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724761103; c=relaxed/simple;
-	bh=XrKo7BgEbXwr0g6lhrGm2tqmwrC0mCd15I5ko3rQJKU=;
+	s=arc-20240116; t=1724761143; c=relaxed/simple;
+	bh=UyJk422VZV1mSXQaP3ENhWXbmisnUHit76yj1IDatQ0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CYbn3Esh5yHAVIIaCHfe+4VL/r70dRKFKfSviga/OpIyd7JN5BUSyavQ3693kUE/yvcNVwL0Z99ckBI6UmXaLsx4kvSEBJZ3uwasrfJfEaWaHvSEu2zAbHVRunZvnJPglKBWLU0KiuhwPpSig84l8PPqdAVIxtfAt599kbG6HkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a868b739cd9so652105166b.2;
-        Tue, 27 Aug 2024 05:18:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724761100; x=1725365900;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ldg0C6C8gUg0Mw1/T0yY1ppe51hsxkql3LZnSGcFOtA=;
-        b=YlXQKxJpabqVSQMQhQZ4d9R9B4gykFSJiZWQ178Aczp1ypAK4XURpqMWtdWa0SgE73
-         SwHFS0hNQMj1O0qL5jM4gJRLXP2ap4Bi5T72/4HW8nArYKwtCH06DxHKGPRfqXRxu2M+
-         KIUnGXLFhWzkH8QhmYU4J8+ldYQ6Gtsu/OKn5thBSgVY9i6lFiCmL4Caf+sPsFpdq4HJ
-         RZNl/6rMnJeg54supgz+IqnZjwbb12qYbui0BmiYIBxFNJ4h18uwwJ8IYDwMps7ee4mr
-         ZWOMlCRbHEEqsTCUSDBNZqhCrFrYQXt9wgYRuvKpxiLcdxz/S8i+2I8/VSddpx4hxYZz
-         DGPg==
-X-Forwarded-Encrypted: i=1; AJvYcCVE1/Y+zOXCGkDZjcdrQD5crwltqSTfJ2kf4cufyNSIjDbbQE6i99R6qCw+JqlmgGie6QUmrOq1@vger.kernel.org, AJvYcCXofD/A+5i4tGicW71Hr5SYp5nmw7gFgHDleMr/Qbav1zFp/UPcHgEJ710oA/n8Pm066482f3yJvVP9Zic=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxD62OqJtTntYmr5OqIQCVy/bsTJzIsSstWkOty2BSUuAsXkz0R
-	s2cRN1ReeR01L+4tWFtFjnspAx1vCytgbjBn4tgMxRzAoztRS61u
-X-Google-Smtp-Source: AGHT+IEVsjDlS+XlwCWM4HBqYlpFnazL068brbR7e3UpU7b1vz8wW2TMS6o2/Q4dAr7xGxt73Kt+Ug==
-X-Received: by 2002:a17:907:5c8:b0:a80:7ce0:8b2a with SMTP id a640c23a62f3a-a86e39dc919mr195156666b.19.1724761099688;
-        Tue, 27 Aug 2024 05:18:19 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-010.fbsv.net. [2a03:2880:30ff:a::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a86e5832855sm103689966b.130.2024.08.27.05.18.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 05:18:19 -0700 (PDT)
-Date: Tue, 27 Aug 2024 05:18:15 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Maksym Kutsevol <max@kutsevol.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] netcons: Add udp send fail statistics to netconsole
-Message-ID: <Zs3EB+p+Qq1nYObX@gmail.com>
-References: <20240824215130.2134153-1-max@kutsevol.com>
- <20240824215130.2134153-2-max@kutsevol.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kUzjH76pLQJjFpc7XtKx+t0bBSRl/PK8/CP7krphPiTm44UBR11aUJpBbauVYPOHvJ2tztCgC8YvOIPRAhN2tnlHXh39ZOxjRt6gZnQ5cKrbswqAyCwdt65lLR9tBynb2yqo6Hd+C9WViIyG18nR8M+sixOigSbWfLFnusB8Km0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mxsxlHug; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xezZ+taVNLl52dL3E6RzyYiJm+D3UDu4fY0+FPqfY48=; b=mxsxlHuglSBo5i99hIWS7AfAhl
+	xHRuObvOsLgAYeVSD7E9uegUt6/UupMKhpLrozYLEz36LJlWwZq05a3q9SPJLh2nda6IL87yMB6lm
+	lICNXpLo0FHWT1jah8jaaVXvLbJ6TtdM6LYGtMR+zXrNUuGRiw/vNnM8tpJc8w7bL5PI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1siv9b-005oYK-Ux; Tue, 27 Aug 2024 14:18:31 +0200
+Date: Tue, 27 Aug 2024 14:18:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: andi.shyti@kernel.org, jarkko.nikula@linux.intel.com,
+	andriy.shevchenko@linux.intel.com, mika.westerberg@linux.intel.com,
+	jsd@semihalf.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, rmk+kernel@armlinux.org.uk,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	mengyuanlou@net-swift.com, duanqiangwen@net-swift.com
+Subject: Re: [PATCH net 0/3] Add I2C bus lock for Wangxun
+Message-ID: <509abfeb-b1fb-4c53-9898-6106c8dde411@lunn.ch>
+References: <20240823030242.3083528-1-jiawenwu@trustnetic.com>
+ <888f78a9-dea9-4f66-a4d0-00a57039733d@lunn.ch>
+ <01d701daf75c$50db4450$f291ccf0$@trustnetic.com>
+ <55ff5570-5398-48e9-bf56-d34da197d175@lunn.ch>
+ <020f01daf827$d765ffd0$8631ff70$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,75 +66,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240824215130.2134153-2-max@kutsevol.com>
+In-Reply-To: <020f01daf827$d765ffd0$8631ff70$@trustnetic.com>
 
-On Sat, Aug 24, 2024 at 02:50:24PM -0700, Maksym Kutsevol wrote:
-> Enhance observability of netconsole. UDP sends can fail. Start tracking at
-> least two failure possibilities: ENOMEM and NET_XMIT_DROP for every target.
-> Stats are exposed via an additional attribute in CONFIGFS.
+> > More details please.
+> > 
+> > Linux assume it is driving the hardware. Your firmware cannot be
+> > touching any registers which will clear on read. QSFP states that
+> > registers 3-31 of page 0 are all clear on read, for example. The
+> > firmware should also not be setting any registers, otherwise you can
+> > confuse Linux which assumes registers it set stay set, because it is
+> > controlling the hardware.
+> > 
+> > Your firmware also needs to handle that Linux can change the page. If
+> > the firmware changes the page, it must restore it back to whatever
+> > page Linux selected, etc.
+> > 
+> > The fact you are submitting this for net suggests you have seen real
+> > issues. Please describe what those issues are.
 > 
-> The exposed statistics allows easier debugging of cases when netconsole
-> messages were not seen by receivers, eliminating the guesswork if the
-> sender thinks that messages in question were sent out.
+> The error log shows:
 > 
-> Stats are not reset on enable/disable/change remote ip/etc, they
-> belong to the netcons target itself.
+> [257681.367827] sfp sfp.1025: Host maximum power 1.0W
+> [257681.370813] txgbe 0000:04:00.1: 31.504 Gb/s available PCIe bandwidth, limited by 8.0 GT/s PCIe x4 link at 0000:02:02.0 (capable
+> of 63.008 Gb/s with 8.0 GT/s PCIe x8 link)
+> [257681.373364] txgbe 0000:04:00.1 enp4s0f1: renamed from eth0
+> [257681.434719] txgbe 0000:04:00.1 enp4s0f1: configuring for inband/10gbase-r link mode
+> [257681.676747] sfp sfp.1025: EEPROM base structure checksum failure: 0x63 != 0x1f
+> [257681.676755] sfp EE: 00000000: 03 04 07 10 00 00 01 00 00 00 00 06 67 02 00 00  ............g...
+> [257681.676757] sfp EE: 00000010: 1e 0f 00 00 46 69 62 65 72 53 74 6f 72 65 20 64  ....FiberStore d
+> [257681.676759] sfp EE: 00000020: 20 20 20 20 00 00 1b 21 53 46 50 2d 31 30 47 53      ...!SFP-10GS
+> [257681.676760] sfp EE: 00000030: 52 2d 38 35 20 20 20 20 41 20 20 20 03 52 00 1f  R-85    A   .R..
+> [257681.676762] sfp EE: 00000040: 00 81 cd 5b df 25 0a bd 40 f6 c6 ce 47 8e ff ff  ...[.%..@...G...
+> [257681.676763] sfp EE: 00000050: 10 d8 24 33 44 8e ff ff 10 41 b0 9a ff ff ff ff  ..$3D....A......
+>  
+> It looks like some fields are read incorrectly. For comparison, I printed the
+>  SFP info when it loaded correctly:
 > 
-> Signed-off-by: Maksym Kutsevol <max@kutsevol.com>
+> [260908.194533] sfp EE: 00000000: 03 04 07 10 00 00 01 00 00 00 00 06 67 02 00 00  ............g...
+> [260908.194536] sfp EE: 00000010: 1e 0f 00 00 46 69 62 65 72 53 74 6f 72 65 20 20  ....FiberStore
+> [260908.194538] sfp EE: 00000020: 20 20 20 20 00 00 1b 21 53 46 50 2d 31 30 47 53      ...!SFP-10GS
+> [260908.194540] sfp EE: 00000030: 52 2d 38 35 20 20 20 20 41 20 20 20 03 52 00 1f  R-85    A   .R..
+> [260908.194541] sfp EE: 00000040: 40 63 bd df 40 8e ff ff 10 41 b0 9a ff ff ff ff  @c..@....A......
+> [260908.194543] sfp EE: 00000050: 10 58 5b 29 41 8e ff ff 10 41 b0 9a ff ff ff ff  .X[)A....A......
+> [260908.198205] sfp sfp.1025: module FiberStore       SFP-10GSR-85     rev A    sn G1804125607      dc 180605
+> 
+> Since the read mechanism of I2C is to write the offset and read command
+> first, and then read the target address. I think it's possible that the different
+> offsets be written at the same time, from Linux and firmware.
+ 
+O.K, that is bad. The SFP is totally unreliable...
 
-Would you mind adding a "Reported-by" me in this case?
+You however have still not answered my question. What is the firmware
+accessing? How does it handle pages?
 
-https://lore.kernel.org/all/ZsWoUzyK5du9Ffl+@gmail.com/
+The hack you have put in place is per i2c transaction. But accessing
+pages is likely to be multiple transactions. One to change the page,
+followed by a few reads/writes in the new page, then maybe followed by
+a transactions to return to page 0.
 
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index 9c09293b5258..45c07ec7842d 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -82,6 +82,13 @@ static DEFINE_SPINLOCK(target_list_lock);
->   */
->  static struct console netconsole_ext;
->  
-> +#ifdef CONFIG_NETCONSOLE_DYNAMIC
-> +struct netconsole_target_stats  {
-> +	size_t xmit_drop_count;
-> +	size_t enomem_count;
+I think your best solution is to simply take the mutex and never
+release it. Block your firmware from accessing the SFP.
 
-I am looking at other drivers, and they use a specific type for these
-counters, u64_stats_sync.
-
-if it is possible to use this format, then you can leverage the
-`__u64_stats_update` helpers, and not worry about locking/overflow!?
-
-> @@ -1015,6 +1035,25 @@ static struct notifier_block netconsole_netdev_notifier = {
->  	.notifier_call  = netconsole_netdev_event,
->  };
->  
-> +/**
-> + * count_udp_send_stats - Classify netpoll_send_udp result and count errors.
-> + * @nt: target that was sent to
-> + * @result: result of netpoll_send_udp
-> + *
-> + * Takes the result of netpoll_send_udp and classifies the type of error that
-> + * occurred. Increments statistics in nt->stats accordingly.
-> + */
-> +static void count_udp_send_stats(struct netconsole_target *nt, int result)
-> +{
-> +#ifdef CONFIG_NETCONSOLE_DYNAMIC
-> +	if (result == NET_XMIT_DROP) {
-> +		nt->stats.xmit_drop_count++;
-
-If you change the type, you can use the `u64_stats_inc` helper here.
-
-> @@ -1126,7 +1167,11 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
->  			this_offset += this_chunk;
->  		}
->  
-> -		netpoll_send_udp(&nt->np, buf, this_header + this_offset);
-> +		count_udp_send_stats(nt,
-> +				     netpoll_send_udp(&nt->np,
-> +						      buf,
-> +						      this_header + this_offset)
-> +		);
-
-as Jakub said, this is not a format that is common in the Linux kenrel.
+	Andrew
 
