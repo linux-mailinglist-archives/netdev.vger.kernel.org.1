@@ -1,123 +1,103 @@
-Return-Path: <netdev+bounces-122162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC994960352
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:39:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D066F960365
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 999E51F230A8
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 07:39:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F2CE1C22513
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 07:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59464155CA5;
-	Tue, 27 Aug 2024 07:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3F4F15687D;
+	Tue, 27 Aug 2024 07:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="k4f9p3H9"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NKMs3uYf"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF57D153BF6;
-	Tue, 27 Aug 2024 07:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB47153BF6
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 07:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724744351; cv=none; b=GBMkfA0g1a1gFnKq61rKCK9Ib5DLeC83h3U99+vOMBf8dNJGp1o+xSy+pOsqCZ4Of48dR63IE2ZybfjUYSzjeHS1h3lxI+XHgeRNHKmornjJFjrdQcRRY2tHvqx8VnsKp368DYh6WEsv8axtI76/ffm4yoLvFVJ/Kw2BxUpBRMw=
+	t=1724744428; cv=none; b=ZvuWNv6XalVx4mXUv0oErPlb1P04n2+lJVJG7xeBxId2QcewrIqOKGfai+phxnci7R+SLEcb99JAn3MbvrTV05UlxitrOeOVnENZA6ewWHuml4fzxcMY68NbCUWi3JUpalJAPGhHa8MQ+ePJcKdWJvBI48Wv3yWRIkRySlCHgx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724744351; c=relaxed/simple;
-	bh=ImzuVf95Bocj6jkgM4cI4Tk28E5n2Hx1GlzRLG/8IY8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uBEURnmXCDJ68APbdPSAxGfB/zRIQYwJq0CUYOgTmyH2RL/Hi1meomYyfbSZAgdo2VznlYDKQnR2qF4CpDO7NKO/LDiTbiz1xfXVRlLmIXe30iLTSJoC1Bb9NjUNJ08zU1VrY7/olmBSa7y2j9a7U94pioiC+rWcHXisZThipYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=k4f9p3H9; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=yPuQJto6HhcFhEBv3siWTsS5wLOUCfRP2SoLejN+VrU=;
-	t=1724744349; x=1725953949; b=k4f9p3H9pdl+IBW1YwCUp5eu3E1lv6evOzbegchZQakZW5S
-	2SYpLla1X5WCb6K/rbFK65FG5xKe296PMwaMS3qma7vFKCfsYozw4unfYauhQIA0P/EwAhJ3MXh/v
-	LerKtM/ZFtgpsdfS0L15JatgwjsC7eAqBW7J44T8URQPJ4Ka6LPU1uV+6Oo6dK9ro6YoYgN/Vb78X
-	a1aK67gTr446jL+Y9gOqfkFl4A8UoJmRLWx+k5rwmeNhpysbLiM+M4QSYy3pGNQ2Kd9UmqNCEOz3c
-	zP33d9TvkAcYkkmrz9v3QETg10DbAOuPtiWU85qOdQEhGOLbTHDmpBy13e5c7B/A==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1siqn7-00000004QEO-2OdY;
-	Tue, 27 Aug 2024 09:39:01 +0200
-Message-ID: <4967a09d4c00532148aacd7dc4b5e21902ef7721.camel@sipsolutions.net>
-Subject: Re: [PATCH -next v2] wifi: mac80211: use max to simplify the code
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Hongbo Li <lihongbo22@huawei.com>, davem@davemloft.net,
- edumazet@google.com,  kuba@kernel.org, pabeni@redhat.com, kvalo@kernel.org
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-Date: Tue, 27 Aug 2024 09:39:00 +0200
-In-Reply-To: <82523993-61c8-4c03-8826-61da9081d3ba@huawei.com>
-References: <20240827030302.1006179-1-lihongbo22@huawei.com>
-	 <d5f495b67fe6bf128e7a51b9fcfe11f70c9b66ae.camel@sipsolutions.net>
-	 <82523993-61c8-4c03-8826-61da9081d3ba@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1724744428; c=relaxed/simple;
+	bh=pljMeg/tZIYLgASZ7cHtr7dCWNo79/sFWaht/42VsCs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HaRf3drqdzAj3OJTpVcxfZCm1P76uYaYm4tjqMnXme/0inHYVWetO33sr1Cg15OSo6bjZ262kKm1oVHxvBDCVVKBR7s666t9l+oz1zlEEtq1TqK5CxrR6j9PUfiYlUbzdyTvPEZnv+6JjNUXuSmSyi+YjzpQHe9HXoVqgPeNCr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=NKMs3uYf; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a83597ce5beso796771666b.1
+        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 00:40:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724744424; x=1725349224; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pljMeg/tZIYLgASZ7cHtr7dCWNo79/sFWaht/42VsCs=;
+        b=NKMs3uYfwgiFBt2pns9ZUjCrLAoZyxnrqxtWg+0GSFDgytouBAHuIM9zqnhtVDzRIl
+         UHsRtVlq5CMaZ5/urVMuynu6Ee26LdTDNPZSgtFSKzpcQP8HbMph6BPle7Ja+pjNyMk1
+         G+wGdfXHr5g8NeYIU0DaS4bWSx91vt/bk6zQ5JQBsH/7+m3OJmUnQ1KKE5Sk5uV3sybV
+         fmrMZKZMu+A95p9skR4t5WEYC5y68DnRvhcUpClQ/lt/4o9Q3Sw5PG+g/Qs8IIOkUyCK
+         ZRBrStdL5TLFkW6zxSvFtZm/XE1lKQSB60oM5xUzQ7XavoioOktvWZiNawO9iJC8pEYn
+         r4AA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724744424; x=1725349224;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pljMeg/tZIYLgASZ7cHtr7dCWNo79/sFWaht/42VsCs=;
+        b=fzrPezWyAD8RxghGLVgzEzq6fOSMxxvTsmip8tiZSN4M0p4bjxM2O3qc0MO6CtefGV
+         yddqVHNXsP4SDzzRW5ANLzeUcUCLzMV9rq1FORao4dCDcXm228qOxFTcNEiA9NNe6Q/J
+         uow5ySm7pC0+BSMswTpSf7/IRcVPosYAX0/iZFu0o9ze7uVE+jXrTIi856X9bJbppGQ3
+         svg2/s/Puz30ZCT7C0ysiTBax6dRyeXM7FzMi16rtSOFyWSkPpyvHHpcfvArzUEz2NJ4
+         5L0mBjpGjssxN7sqoBgwU4PYc4CfM0MdupR9qyNvcErdeotW0tUgC8BQD9kUah3U3Y5D
+         b94w==
+X-Forwarded-Encrypted: i=1; AJvYcCWRPwdDuVT6uw79YOcescnHVb6nqjan6Y0QzmG/OrfbaMmnCvZO0bBGftpE/joX5TZmHozEHPE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxp5eEuK5A0KirS2v1nGg4XgaT4HYlODT7BH194a/35COLy3bHT
+	2Aej1/286622jwJwjFRoF2moGCOIiGtGnpJ65yJQMEPGHRrT5rKeZ9y+CQjzLB8=
+X-Google-Smtp-Source: AGHT+IFV3VSINboGZ5Er0ne8BDV200ac18VnmBZ7QML+x8/y19gkiMEZo0P87rh59ZwRG9YzJqUzDQ==
+X-Received: by 2002:a17:907:2d8e:b0:a7a:c7f3:580d with SMTP id a640c23a62f3a-a86e29feb8bmr192161466b.25.1724744424121;
+        Tue, 27 Aug 2024 00:40:24 -0700 (PDT)
+Received: from localhost (37-48-50-18.nat.epc.tmcz.cz. [37.48.50.18])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a86e5485671sm74803666b.30.2024.08.27.00.40.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Aug 2024 00:40:23 -0700 (PDT)
+Date: Tue, 27 Aug 2024 09:40:22 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net] ice: Fix NULL pointer access, if PF doesn't
+ support SRIOV_LAG
+Message-ID: <Zs2C5nlDKlgxd32a@nanopsycho.orion>
+References: <20240827071602.66954-1-tbogendoerfer@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240827071602.66954-1-tbogendoerfer@suse.de>
 
-On Tue, 2024-08-27 at 15:29 +0800, Hongbo Li wrote:
->=20
-> On 2024/8/27 15:25, Johannes Berg wrote:
-> > On Tue, 2024-08-27 at 11:03 +0800, Hongbo Li wrote:
-> > > The following Coccinelle/coccicheck warning reported by
-> > > minmax.cocci:
-> > >      WARNING opportunity for max()
-> >=20
-> > Yeah well, maybe sometimes we shouldn't blindly follow tools ...
-> >=20
-> > > Let's use max() to simplify the code and fix the warning.
-> >=20
-> > You should explain why.
-> >=20
-> > I think only one out of four changes in this patch is correct,
-> > semantically.
-> >=20
-> You mean sometimes we should keep the variable type in comparison?
+Tue, Aug 27, 2024 at 09:16:02AM CEST, tbogendoerfer@suse.de wrote:
+>For PFs, which don't support SRIOV_LAG, there is no pf->lag struct
+>allocated. So before accessing pf->lag a NULL pointer check is needed.
+>
+>Fixes: 1e0f9881ef79 ("ice: Flesh out implementation of support for SRIOV on bonded interface")
+>Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
 
-No, I just don't think these are semantically calculations of a maximum,
-even if they look that way.
-
-That's why I asked: Why are you making this change? It looks like you're
-making this change just because you want coccicheck to be silent here.
-But that's *really* not a good reason! Don't do that, ever, *think*
-about the changes you're making too.
-
-We should consider the primary consumer of the code to be *people*, not
-the compiler or tools like coccicheck. And for *people*, applying max()
-to a link ID makes no sense. It's a link ID, not any kind of value that
-applying max() to makes any sense.
-In contrast, for the timeout value there that you changed, that _does_
-make sense: it clearly wants to take the longer of the two durations.
-
-
-So then why do we have patterns that look like max(0, link_id)? That's
-because we treat -1 as a special value indicating "no link, but for the
-whole sta/vif/...", "don't care about the link" or "MLD not used"
-(depending on the context). Internally in the code, however, we use 0
-for non-MLD to simplify older drivers and internal logic.
-
-That's why we end up with "link_id >=3D 0 ? link_id : 0" in some places.
-But it's fundamentally not max() even though it looks like it. Replacing
-it with max() does this a disservice.
-
-Now arguably open-coding it often (though three perhaps isn't often, but
-I'm surprised it's only three times) maybe isn't a great idea either,
-but then that should be solved differently.
-
-So yeah, please think about changes, don't make them blindly.
-
-johannes
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
