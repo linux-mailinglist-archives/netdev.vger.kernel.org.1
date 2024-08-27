@@ -1,114 +1,82 @@
-Return-Path: <netdev+bounces-122111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60FAB95FEEA
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 04:16:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD88295FEDE
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 04:11:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9349C1C218F4
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 02:16:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60A971F2225F
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 02:11:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE6E6101E6;
-	Tue, 27 Aug 2024 02:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="iI8bP8wr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34039B666;
+	Tue, 27 Aug 2024 02:11:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142F7846F;
-	Tue, 27 Aug 2024 02:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40045747F
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 02:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724724975; cv=none; b=hUaC0zp1yqjHoRwKAa+KcI7BYt88LSvRoD5utxergwE1RUJHSv+vZEbCkppUn4MQOMxStpchQUTRFWqSa2JpKi+cmPaKVMLSeV/exfyQsMJ67mxxCFu+JGDvSLl1dYMg1+dVvXSgL3cSc7q1akwWdC3uRXuLlpGKT1j1TRUeMu4=
+	t=1724724715; cv=none; b=Zi89Y6KtI0kPZRxwOsqo9hNnvBvU1GmrwoGVMKJtB9jP+KWDjlszqtu0ZR/Ju7jLvii9bm6/Kl4fup4ty+R+gvXBJH9V8+O0Jw7FrhElXLDjXt9V5kTBwyU3m3AeMS90pDlhx0Cf2v5LE9J99ddFTS5QIvWk0TynGRsIt77pLC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724724975; c=relaxed/simple;
-	bh=M3RAVr3uj665OZDliStYtNbwq0gJjrhEh2Chl4fuyDk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CGg1pJNGMBKfIMWdtdqHb5PSn5dLD6qu6PUvU+gXd5Id0JJOgbabUqNHkxfKRbDwnR7ZLck3nqs3pNL4vM44WJk1bTF7Qun8HDBdTcDyqKPUYWK58NSAnfsFUeHpRVltsebI0JeV5rDzFn0VpYWd0PpmkhcPO93to84cz/ky/ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=iI8bP8wr; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1724724493;
-	bh=p800AyUXkvfL2lcxngX4N/WQHpYo7TXzu2o3akbuxCE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=iI8bP8wrghOtYlkhRtE3kNtkxrSOM8GGTFjAUXDSBRRjhTP/Utiw/hkWpr8el4n88
-	 LzHdNXbTZfYu1l5eV7QJgwdue+gaoDUc8DLRvxM2tgkudTkZAXBQssm89g48qapUO0
-	 LljlsWoI7gI/nKLBzNa7MAo60SiME81qxsUtJjPC1FBUhHjQTzz93QkOWB+BZ/7OBJ
-	 20ii01lTAQk1783y5Gv3yw0fpNb46KMLlvZQ99ljWDARwq9a5FUF1/RZGmTrEVSXYm
-	 F4U1xaz5Pp3370OK9B7RvDUfIFLUY40wDrYDJWHFB1zL58bep5/MZiwaYQLRRoFK2o
-	 WDa8/5L9EsUOA==
-Received: by codeconstruct.com.au (Postfix, from userid 10001)
-	id 30B8965139; Tue, 27 Aug 2024 10:08:13 +0800 (AWST)
-From: Matt Johnston <matt@codeconstruct.com.au>
-To: jk@codeconstruct.com.au
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net 2/2] net: mctp-serial: Fix missing escapes on transmit
-Date: Tue, 27 Aug 2024 10:07:59 +0800
-Message-ID: <20240827020803.957250-3-matt@codeconstruct.com.au>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240827020803.957250-1-matt@codeconstruct.com.au>
-References: <20240827020803.957250-1-matt@codeconstruct.com.au>
+	s=arc-20240116; t=1724724715; c=relaxed/simple;
+	bh=J/3dY/NitXlS4mVtxi0KS/zNdhaLB8tmZ5rQXfhOZ+M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ncPLkjUaugJiMt1sbPhwpbZ1NObRvyzoBx4qpkSvv+XRAY019uA+sU+AAGIFLG10zEX1EXNtZZS8YpwoGYL1mVrSXyqUFq7u7ciw+GIRIxKV71MYOlACF7EmstMrycTOwJpA5xdEYqI3hxArwrq9EFCmQRhme4iVhtuy8vxczY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Wt9sL3QlNz20mrL;
+	Tue, 27 Aug 2024 10:07:02 +0800 (CST)
+Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 561D1140120;
+	Tue, 27 Aug 2024 10:11:50 +0800 (CST)
+Received: from [10.67.111.104] (10.67.111.104) by
+ dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 27 Aug 2024 10:11:50 +0800
+Message-ID: <566f7eb1-0b5d-444b-8d58-d5da21a86476@huawei.com>
+Date: Tue, 27 Aug 2024 10:11:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH -next 0/2] net/ncsi: Use str_up_down to simplify the code
+To: Simon Horman <horms@kernel.org>
+CC: <sam@mendozajonas.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>
+References: <20240823065259.3327201-1-lihongbo22@huawei.com>
+ <20240823162144.GW2164@kernel.org>
+Content-Language: en-US
+From: Hongbo Li <lihongbo22@huawei.com>
+In-Reply-To: <20240823162144.GW2164@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500022.china.huawei.com (7.185.36.66)
 
-0x7d and 0x7e bytes are meant to be escaped in the data portion of
-frames, but this didn't occur since next_chunk_len() had an off-by-one
-error. That also resulted in the final byte of a payload being written
-as a separate tty write op.
 
-The chunk prior to an escaped byte would be one byte short, and the
-next call would never test the txpos+1 case, which is where the escaped
-byte was located. That meant it never hit the escaping case in
-mctp_serial_tx_work().
 
-Example Input: 01 00 08 c8 7e 80 02
+On 2024/8/24 0:21, Simon Horman wrote:
+> On Fri, Aug 23, 2024 at 02:52:57PM +0800, Hongbo Li wrote:
+>> In commit a98ae7f045b2, str_up_down() helper is introduced to
+>> return "up" or "down" string literal, so we can use it to
+>> simplify the code and fix the coccinelle warning.
+> 
+> Hi Hongbo Li,
+> 
+> That commit hasn't propagated into net-next.
+> I guess these patches need to wait for that to happen.
 
-Previous incorrect chunks from next_chunk_len():
+Thank you for reminding, I will send the patch into net-next.
 
-01 00 08
-c8 7e 80
-02
-
-With this fix:
-
-01 00 08 c8
-7e
-80 02
-
-Cc: stable@vger.kernel.org
-Fixes: a0c2ccd9b5ad ("mctp: Add MCTP-over-serial transport binding")
-Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
----
- drivers/net/mctp/mctp-serial.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/mctp/mctp-serial.c b/drivers/net/mctp/mctp-serial.c
-index d7db11355909..82890e983847 100644
---- a/drivers/net/mctp/mctp-serial.c
-+++ b/drivers/net/mctp/mctp-serial.c
-@@ -91,8 +91,8 @@ static int next_chunk_len(struct mctp_serial *dev)
- 	 * will be those non-escaped bytes, and does not include the escaped
- 	 * byte.
- 	 */
--	for (i = 1; i + dev->txpos + 1 < dev->txlen; i++) {
--		if (needs_escape(dev->txbuf[dev->txpos + i + 1]))
-+	for (i = 1; i + dev->txpos < dev->txlen; i++) {
-+		if (needs_escape(dev->txbuf[dev->txpos + i]))
- 			break;
- 	}
- 
+Thanks,
+Hongbo
 
