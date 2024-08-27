@@ -1,50 +1,53 @@
-Return-Path: <netdev+bounces-122222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B909960689
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 12:00:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F194B960666
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:57:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE1B31C228FC
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 10:00:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA323285A15
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55F6A199221;
-	Tue, 27 Aug 2024 10:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rbQEXGbf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EFFB19FA9D;
+	Tue, 27 Aug 2024 09:56:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC60156C40
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 10:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7077E19F498;
+	Tue, 27 Aug 2024 09:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724752830; cv=none; b=TTOvc0T2pz3ZDvBXzVicwS1DYkgkP6MigP0YIgQ7Ua3u0k07sZ/6kBUQpbOVdrJY70fHkBvxrV14rpzws9OxMr0BZ1EpfV6DP+VPHc49/GsY+Aw+kRNYONeQl/aptLPfYHiB5+Wvt3Qeq7WKGti8/Iqlxu4hdJZAJpLXeRy+9i8=
+	t=1724752574; cv=none; b=IC3yKpHVypBasxDtoITTcXdAREue08M7H2a/1pfuidoBsuyhtiL7XiZpIrdYENTqJNY7ZNiMpl2i6i+0w5qMlTcSREJN5bdRkTZ5LOajhaXOF+5pBWvUV+pTpykYO9CrMTzJSYU+kLlRWJpLn3RgBD4owMsqAkd7POsG5lEz30Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724752830; c=relaxed/simple;
-	bh=1PZuF9R4xkPnaGSbBc71oOmfyKssAqZwwUfht5/7CYQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U4pgle2iPvsCXBfPzbrzBUwk2oJcpv4CmcQ7d87qlIvkbHkk3g3s4NKcJKsC9GfZL6T7C0tGmYY95IkyPwa4NIr1t1rEEwtMGv4NEvoCTYHQiwF6FXVIlGWiNHjMKv5vahN0mECJUoE7aVX4OIc8QvnAiSOdLXLma9CKmMPn0eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rbQEXGbf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5CC0C8B7A8;
-	Tue, 27 Aug 2024 10:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724752829;
-	bh=1PZuF9R4xkPnaGSbBc71oOmfyKssAqZwwUfht5/7CYQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rbQEXGbf0M/3UIqgvadJ8DmSG5g7sNjCkS2li9/lpW0PjX2r3O/lp+oR90jn4Qiy5
-	 m1gMMq5PV+GkZ8Wk1LxtinE3clBYqmgCJaQQ4AMwsbINJKOEAgF2PwteCPZ/ZXyELT
-	 XUzPYJ4JuiPJJPcfGkCgNveSZXaqJXI9Qoq8KUc6YCUQ79fUACod2Vv7oPr73aLJDE
-	 aBtwbdcVFAP6OB6fYM5KUl1+lO9DdYpvZk+lzTzGq9CSNzDTO82XUEE8aq2leTzvuf
-	 YDxj+4zoS1JJhIWB7cdMe40aujmm5iCKCE7Lv//8evrZz0HsS00ldybcVw5I8nc/J8
-	 072m2YD+DNhtQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE7A3822D6D;
-	Tue, 27 Aug 2024 10:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1724752574; c=relaxed/simple;
+	bh=4UOAYChPANrkYgj18yXPcjR9e8MqyGoYfOgAEkcdDSc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gV+1OoN8Dcc19eBwQeM5Mz1yUzu8ibZ6G6Cjh1324/pMA8bthsadt23mRU7dhyU/gBwFiXoO9qPZ/NMVM3YQGcZqjHpc6h4xDDvJcOtZw42zwJTK4G+CsmDiQfkbtjXPywH3V6zJXtyH/rzR0CPgzZPczcSGr297RQmx53iqhLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WtN946894zQqtL;
+	Tue, 27 Aug 2024 17:51:20 +0800 (CST)
+Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 80DAE1800FF;
+	Tue, 27 Aug 2024 17:56:09 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by dggpeml500022.china.huawei.com
+ (7.185.36.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 27 Aug
+ 2024 17:56:09 +0800
+From: Hongbo Li <lihongbo22@huawei.com>
+To: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <jmaloy@redhat.com>,
+	<ying.xue@windriver.com>, <pablo@netfilter.org>, <kadlec@netfilter.org>
+CC: <netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<lihongbo22@huawei.com>
+Subject: [PATCH net-next 0/5] make use of the helper macro LIST_HEAD()
+Date: Tue, 27 Aug 2024 18:04:02 +0800
+Message-ID: <20240827100407.3914090-1-lihongbo22@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,56 +55,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4 0/3] tc: adjust network header after 2nd vlan push
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172475282976.574013.8467556089733967730.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Aug 2024 10:00:29 +0000
-References: <20240822103510.468293-1-boris.sukholitko@broadcom.com>
-In-Reply-To: <20240822103510.468293-1-boris.sukholitko@broadcom.com>
-To: Boris Sukholitko <boris.sukholitko@broadcom.com>
-Cc: netdev@vger.kernel.org, martin.lau@linux.dev, daniel@iogearbox.net,
- john.fastabend@gmail.com, ast@kernel.org, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- pshelar@ovn.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, shuah@kernel.org, willemb@google.com,
- asml.silence@gmail.com, almasrymina@google.com, lorenzo@kernel.org,
- bigeasy@linutronix.de, dhowells@redhat.com, liangchen.linux@gmail.com,
- aleksander.lobakin@intel.com, linux@weissschuh.net, idosch@idosch.org,
- ilya.lifshits@broadcom.com
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpeml500022.china.huawei.com (7.185.36.66)
 
-Hello:
+The macro LIST_HEAD() declares a list variable and
+initializes it, which can be used to simplify the steps
+of list initialization, thereby simplifying the code.
+These serials just do some equivalatent substitutions,
+and with no functional modifications.
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Hongbo Li (5):
+  net/ipv4: make use of the helper macro LIST_HEAD()
+  net/tipc: make use of the helper macro LIST_HEAD()
+  net/netfilter: make use of the helper macro LIST_HEAD()
+  net/ipv6: make use of the helper macro LIST_HEAD()
+  net/core: make use of the helper macro LIST_HEAD()
 
-On Thu, 22 Aug 2024 13:35:07 +0300 you wrote:
-> <tldr>
-> skb network header of the single-tagged vlan packet continues to point the
-> vlan payload (e.g. IP) after second vlan tag is pushed by tc act_vlan. This
-> causes problem at the dissector which expects double-tagged packet network
-> header to point to the inner vlan.
-> 
-> The fix is to adjust network header in tcf_act_vlan.c but requires
-> refactoring of skb_vlan_push function.
-> </tldr>
-> 
-> [...]
+ net/core/dev.c       | 6 ++----
+ net/ipv4/ip_input.c  | 6 ++----
+ net/ipv6/ip6_input.c | 6 ++----
+ net/netfilter/core.c | 4 +---
+ net/tipc/socket.c    | 6 ++----
+ 5 files changed, 9 insertions(+), 19 deletions(-)
 
-Here is the summary with links:
-  - [net-next,v4,1/3] tc: adjust network header after 2nd vlan push
-    https://git.kernel.org/netdev/net-next/c/938863727076
-  - [net-next,v4,2/3] selftests: tc_actions: test ingress 2nd vlan push
-    https://git.kernel.org/netdev/net-next/c/59c330eccee8
-  - [net-next,v4,3/3] selftests: tc_actions: test egress 2nd vlan push
-    https://git.kernel.org/netdev/net-next/c/2da44703a544
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
