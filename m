@@ -1,150 +1,227 @@
-Return-Path: <netdev+bounces-122159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DBDD960315
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:31:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3506F96032E
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 255261F22007
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 07:31:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54D491C21FC3
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 07:34:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719AA145B10;
-	Tue, 27 Aug 2024 07:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59E41448E0;
+	Tue, 27 Aug 2024 07:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGTeefnm"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U4uvbeq/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1D7747F;
-	Tue, 27 Aug 2024 07:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A29D747F
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 07:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724743908; cv=none; b=tK6XwNr5kl1l6YMa0FU4B2iLnERLUEGuEbSeFBYE/8cKHv5UBxgFfV5pRmEHKmu/kNJT7t59dK86jOVwKamu6sxhrWPx/blmFPd9Wj87QcfpGQ/Gv5tdTqGfChgQgnnlZVez5OdbMCs7DmPW1PftdUUDaLP/taHnkXjVClsbvzA=
+	t=1724744045; cv=none; b=hnv7rpqJ5ynYuxBj5JCPBdtnR0Fcvo6ph2AT8LMmeKtuT77gCFhivKkCWxhNPqdU/9jw9aAjzTJ4hIKuWamlMdNYzjJanbhAH8t7B56Yzx+JZd5M/PQY0oEH2XYlwqKMLM+URw2h/2XXX+kGMV3zLcyEhSKpfZLp2Xp4UNQwX3o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724743908; c=relaxed/simple;
-	bh=mDJuyJqY7HxSUpYyQsIPkYxF6N1t9wLoCXzdOlBN48A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VF4nOyMo48LHq7AVnFBR4oL0Uh7zjKE8zARVy+ZqrEIfRyXJEa0GBpo9VP3+3yoMbiqpmM5CZYe4UAx5ZqC7JdljnJIA3a1Ch+2QzPkuaH4ubzu4f5blmQVTQfNd2U9oJlRYcuI10HTEo4FNXlq69hIP192P7BaGTavocqQruLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kGTeefnm; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-270420e231aso3474662fac.2;
-        Tue, 27 Aug 2024 00:31:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724743905; x=1725348705; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A1lD5NsHrENDzakDwTmISjEXVDogNpfvH/RKxNRH+uM=;
-        b=kGTeefnmo40otANZZA1wQC/jCOKifpdKFozNXJeiD0GkPQ8nGbZkyxT6HuegAebdvY
-         OnfUDhO9QDqVP8KY5c4nOkccMmddn4gatLEhtV0H3sunCl2/IbUnOKKDDttIz7C6gYoc
-         lCjPRuPhuhXfHvywPKVeZTrkU8ZlmhzvVm2PKbXnGicfqAZScdWnJdktuoHRQdlOyjWn
-         PG1/cxUuaF8qOsTrH6+YsDBVu4JfHicb0vlaz9e+nFVXSv0OLzDZrzKeFOgrCW/M7MFo
-         7zuibkFq3x00F0MHwBLforQ9QyLNN7Gpjgg7Jsp/9GWv4IH502UJ3fxeV1jDNV0jEFpX
-         3m8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724743905; x=1725348705;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A1lD5NsHrENDzakDwTmISjEXVDogNpfvH/RKxNRH+uM=;
-        b=R15zw/kcDnDV+P4xBAK48gos24np/M7LM5r0vbDMosxmHsxOvxVfV+v88zAkxoey4m
-         uKh1jvi7pfOQ9CdBBzf6+OvDRoDC6HUDpfUILZuB4BCIn6Tl2QhhkaXnCt+WH9+VTZow
-         smWxrkHYXmHseO94iaGEuM0GteCb8jW5EBwnrORw0N/T+o4YG/NikwW6tx9K17S7wuYR
-         2p3aevj/b0oUj2csoNbRMAjf7g+yDkEY+WH6yfkVe1EY40Vb7PoXoL1A/mBpiBpv/Yuh
-         xwjJWL51+nE+WxtjyGmOy7kJdVhSUkQ1kSM1KbTuR7zNCgPfOgWp9aVCIV7tUCC5ZdVl
-         F+sQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUMQQmB3u8Y1wTMr5VbU34SQDgORXfseeR+OspaZ3vPA+usGXMLSdE57hIi63VK73/rJuOU40zCK7YnkHuVBQDP@vger.kernel.org, AJvYcCVUUICxnwao70NPBw7tH+v2gcqeKAVkgJZjFGHYeVA0FdUXFl+xoxZd1FQZIAO9a+gNt0Xjb9t3m/IM@vger.kernel.org, AJvYcCVq32NyPCgawS8C7uk8uBDgUzm1ARB0kOsz16qNRGzfolqZ3UDG6YrdMEOVl/Lkcvzg7aey20Vw@vger.kernel.org, AJvYcCWeeCRviZU5LhqwbNyZi2H35jSPd4Zvyefxs26qZ2XWCPdU5r2+DhETHd1jDjRIlfxb5gyzOrn3RpR0@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3JUa5DH/UXektWt5h39mWxLlBnnkj0YevPNvS2zwEcQJRBE7g
-	CakENjOzPsHleQ0n8OhJlAXRYWyFxOfqg9KfMYTo9up80VGCMiRTlq3WMDWP09J2P7Mch3asmRA
-	aKwoDgLGLaqaTatVFA0R9+9jRsPw=
-X-Google-Smtp-Source: AGHT+IGmpmLBeTAPXPIRwiUfzbOE2eGaYU4f2bM4AiH6RqrYHO9Xxr86yvTVC9mVJ9J5ccdXs8Q9/sfsLUHxQxRc7WI=
-X-Received: by 2002:a05:6871:299:b0:25e:c013:a7fb with SMTP id
- 586e51a60fabf-2775a0ad385mr2070533fac.43.1724743905038; Tue, 27 Aug 2024
- 00:31:45 -0700 (PDT)
+	s=arc-20240116; t=1724744045; c=relaxed/simple;
+	bh=hICCdJDJAcH4HSbFU25gziG7zVIdO93tC/zvJvkHOr8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qXSB1Ole6mx9eHlJWDymdHvbX+qUmQ74YR6xgyecC/lpOCW+IXGWfKIP/Wyu3aqceVeVW2OlFo0UcVuum4DGqNiOb5IZfN6JFImtVsapW1kvX3kFSrMTBXZR+vgLhIV/8JOfy6DngVPxNAewzoSpcEmELNOQBlZ2kgkgjLwi5JQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U4uvbeq/; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724744044; x=1756280044;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=hICCdJDJAcH4HSbFU25gziG7zVIdO93tC/zvJvkHOr8=;
+  b=U4uvbeq/PevgY2LUjBzPyh6DRK0ZGdn6Ly9JmeIH4KTkm/3FjgsMWDEx
+   Kcjvy2IOzvNEfj1gG/mwamnD+OnRE4fFofVpZZIqjMR2eCogBHCnlhQTM
+   gDyrQe5pKXOkV57Hee9eNojXv2mHIlqj5I5jAuvi8qqY1FvHOY44dl+Sh
+   N+LSdeKotR+PT1+EjhhaWqlQZ3ZSQ+cTtCNwU0wosAHa32DGvzceeZ8Ff
+   /V/6qszlIm5WxiSRnQ52yi7V8lIfpA1PI1IOLyis1S4MZZG0DgiRQFMaN
+   XPIaVezqfZFBONCwaAHsYwPH4LhrPtIQoT5fXUSEuwdAwWAwkIiAN3M6J
+   Q==;
+X-CSE-ConnectionGUID: j6jKeLPSSByYu07veLdT8w==
+X-CSE-MsgGUID: iqxtRvrBSOuTp5y0oVWnJw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="34356177"
+X-IronPort-AV: E=Sophos;i="6.10,179,1719903600"; 
+   d="scan'208";a="34356177"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 00:34:04 -0700
+X-CSE-ConnectionGUID: LmgdmFQ5Sfq2F4vbJ8q6Xw==
+X-CSE-MsgGUID: V1y+eRyJQSeNkDefPp3tRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,179,1719903600"; 
+   d="scan'208";a="67468450"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 00:34:01 -0700
+Date: Tue, 27 Aug 2024 09:32:03 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com, horms@kernel.org,
+	helgaas@kernel.org, przemyslaw.kitszel@intel.com,
+	Hongguang Gao <hongguang.gao@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: Re: [PATCH net-next v3 9/9] bnxt_en: Support dynamic MSIX
+Message-ID: <Zs2A8wvFUoZfjPzQ@mev-dev.igk.intel.com>
+References: <20240823195657.31588-1-michael.chan@broadcom.com>
+ <20240823195657.31588-10-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822133908.1042240-1-lizetao1@huawei.com> <20240822133908.1042240-5-lizetao1@huawei.com>
- <20240824181209.GR2164@kernel.org> <CAOi1vP98rmMKKH-ik4dshO1A9chrfsPqiWDY6Wk4EfQNTeNe8Q@mail.gmail.com>
-In-Reply-To: <CAOi1vP98rmMKKH-ik4dshO1A9chrfsPqiWDY6Wk4EfQNTeNe8Q@mail.gmail.com>
-From: Ilya Dryomov <idryomov@gmail.com>
-Date: Tue, 27 Aug 2024 09:31:33 +0200
-Message-ID: <CAOi1vP8TaPmxj7Bx4jRubS7rr0+BOmFdJyZx-X6nwivei=sACw@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/8] libceph: use min() to simplify the code
-To: Simon Horman <horms@kernel.org>
-Cc: Li Zetao <lizetao1@huawei.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, marcel@holtmann.org, 
-	johan.hedberg@gmail.com, luiz.dentz@gmail.com, xiubli@redhat.com, 
-	dsahern@kernel.org, trondmy@kernel.org, anna@kernel.org, 
-	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de, 
-	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, jmaloy@redhat.com, 
-	ying.xue@windriver.com, linux@treblig.org, jacob.e.keller@intel.com, 
-	willemb@google.com, kuniyu@amazon.com, wuyun.abel@bytedance.com, 
-	quic_abchauha@quicinc.com, gouhao@uniontech.com, netdev@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, ceph-devel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240823195657.31588-10-michael.chan@broadcom.com>
 
-On Sun, Aug 25, 2024 at 6:21=E2=80=AFPM Ilya Dryomov <idryomov@gmail.com> w=
-rote:
->
-> On Sat, Aug 24, 2024 at 8:12=E2=80=AFPM Simon Horman <horms@kernel.org> w=
-rote:
-> >
-> > On Thu, Aug 22, 2024 at 09:39:04PM +0800, Li Zetao wrote:
-> > > When resolving name in ceph_dns_resolve_name(), the end address of na=
-me
-> > > is determined by the minimum value of delim_p and colon_p. So using m=
-in()
-> > > here is more in line with the context.
-> > >
-> > > Signed-off-by: Li Zetao <lizetao1@huawei.com>
-> > > ---
-> > >  net/ceph/messenger.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/ceph/messenger.c b/net/ceph/messenger.c
-> > > index 3c8b78d9c4d1..d1b5705dc0c6 100644
-> > > --- a/net/ceph/messenger.c
-> > > +++ b/net/ceph/messenger.c
-> > > @@ -1254,7 +1254,7 @@ static int ceph_dns_resolve_name(const char *na=
-me, size_t namelen,
-> > >       colon_p =3D memchr(name, ':', namelen);
-> > >
-> > >       if (delim_p && colon_p)
-> > > -             end =3D delim_p < colon_p ? delim_p : colon_p;
-> > > +             end =3D min(delim_p, colon_p);
-> >
-> > Both delim_p, and colon_p are char *, so this seems correct to me.
-> >
-> > And the code being replaced does appear to be a min() operation in
-> > both form and function.
-> >
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> >
-> > However, I don't believe libceph changes usually don't go through next-=
-next.
-> > So I think this either needs to be reposted or get some acks from
-> > one of the maintainers.
-> >
-> > Ilya, Xiubo, perhaps you can offer some guidance here?
->
-> Hi Simon,
->
-> I'm OK with this being taken through net-next.
+On Fri, Aug 23, 2024 at 12:56:57PM -0700, Michael Chan wrote:
+> A range of MSIX vectors are allocated at initialization for the number
+> needed for RocE and L2.  During run-time, if the user increases or
+> decreases the number of L2 rings, all the MSIX vectors have to be
+> freed and a new range has to be allocated.  This is not optimal and
+> causes disruptions to RoCE traffic every time there is a change in L2
+> MSIX.
+> 
+> If the system supports dynamic MSIX allocations, use dynamic
+> allocation to add new L2 MSIX vectors or free unneeded L2 MSIX
+> vectors.  RoCE traffic is not affected using this scheme.
+> 
+> Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
+> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+> v2: Fix typo in changelog
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 57 +++++++++++++++++++++--
+>  1 file changed, 54 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index fa4115f6dafe..39dc67dbe9b2 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -10622,6 +10622,43 @@ static void bnxt_setup_msix(struct bnxt *bp)
+>  
+>  static int bnxt_init_int_mode(struct bnxt *bp);
+>  
+> +static int bnxt_add_msix(struct bnxt *bp, int total)
+> +{
+> +	int i;
+> +
+> +	if (bp->total_irqs >= total)
+> +		return total;
+> +
+> +	for (i = bp->total_irqs; i < total; i++) {
+> +		struct msi_map map;
+> +
+> +		map = pci_msix_alloc_irq_at(bp->pdev, i, NULL);
+> +		if (map.index < 0)
+> +			break;
+> +		bp->irq_tbl[i].vector = map.virq;
+> +		bp->total_irqs++;
+> +	}
+> +	return bp->total_irqs;
+> +}
+> +
+> +static int bnxt_trim_msix(struct bnxt *bp, int total)
+> +{
+> +	int i;
+> +
+> +	if (bp->total_irqs <= total)
+> +		return total;
+> +
+> +	for (i = bp->total_irqs; i > total; i--) {
+> +		struct msi_map map;
+> +
+> +		map.index = i - 1;
+> +		map.virq = bp->irq_tbl[i - 1].vector;
+> +		pci_msix_free_irq(bp->pdev, map);
+> +		bp->total_irqs--;
+> +	}
+> +	return bp->total_irqs;
+> +}
 
-I see that Jakub picked up some patches from this series, but not this
-one.  I'll go ahead and apply to the Ceph tree.
+Patch looks fine, treat it only as suggestion:
+
+You can save some lines of code by merging this two function.
+
+static int bnxt_change_msix(struct bnxt *bp, int total)
+{
+	int i;
+
+	/* add MSI-Xs if needed */
+	for (i = bp->total_irqs; i < total; i++) {
+		...
+	}
+
+	/* remove MSI-Xs if needed */
+	for (i = bp->total_irqs; i > total; i--) {
+		...
+	}
+
+	return bp->total_irqs;
+}
+> +
+>  static int bnxt_setup_int_mode(struct bnxt *bp)
+>  {
+>  	int rc;
+> @@ -10788,6 +10825,7 @@ static void bnxt_clear_int_mode(struct bnxt *bp)
+>  int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
+>  {
+>  	bool irq_cleared = false;
+> +	bool irq_change = false;
+>  	int tcs = bp->num_tc;
+>  	int irqs_required;
+>  	int rc;
+> @@ -10806,15 +10844,28 @@ int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
+>  	}
+>  
+>  	if (irq_re_init && BNXT_NEW_RM(bp) && irqs_required != bp->total_irqs) {
+> -		bnxt_ulp_irq_stop(bp);
+> -		bnxt_clear_int_mode(bp);
+> -		irq_cleared = true;
+> +		irq_change = true;
+> +		if (!pci_msix_can_alloc_dyn(bp->pdev)) {
+> +			bnxt_ulp_irq_stop(bp);
+> +			bnxt_clear_int_mode(bp);
+> +			irq_cleared = true;
+> +		}
+>  	}
+>  	rc = __bnxt_reserve_rings(bp);
+>  	if (irq_cleared) {
+>  		if (!rc)
+>  			rc = bnxt_init_int_mode(bp);
+>  		bnxt_ulp_irq_restart(bp, rc);
+> +	} else if (irq_change && !rc) {
+> +		int total;
+> +
+> +		if (irqs_required > bp->total_irqs)
+> +			total = bnxt_add_msix(bp, irqs_required);
+> +		else
+> +			total = bnxt_trim_msix(bp, irqs_required);
+> +
+> +		if (total != irqs_required)
+> +			rc = -ENOSPC;
+
+and here
+
+if (bnxt_change_msix(bp, irqs_required) != irqs_required)
+	rc = -ENOSPC;
 
 Thanks,
-
-                Ilya
+Michal
+>  	}
+>  	if (rc) {
+>  		netdev_err(bp->dev, "ring reservation/IRQ init failure rc: %d\n", rc);
+> -- 
+> 2.30.1
+> 
 
