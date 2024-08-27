@@ -1,97 +1,132 @@
-Return-Path: <netdev+bounces-122339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE33A960BEB
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:25:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3024E960B90
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:15:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C41E288284
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:25:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2F26285EB0
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55AA91C8FD4;
-	Tue, 27 Aug 2024 13:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3012019E825;
+	Tue, 27 Aug 2024 13:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="eGyOcsp7"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3FA1C57B5;
-	Tue, 27 Aug 2024 13:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F102719D068;
+	Tue, 27 Aug 2024 13:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724764949; cv=none; b=CdiKF+neFkfiMPLdAuZj2jSlAZ5LCkOptxiS0FBuZ3KcLXW6WmV2oiHRE8ZGKHRK0bUI+leUYC/cQY8Xx6Z7tE4TNmWnrDFesiox/JokYja+XpKhE0cEyeEz3zVqNRb6xo9RaVNKjYSinTn0oup1v2Af3xLlCQbI3rnVIZbt/vM=
+	t=1724764540; cv=none; b=nt5I07ECl/HW6/JU1Efx2tn51luklYudWRjDNHgtAoKPO3n1cyOqrmXdiGR2wYyqKQZ9jJUbig1hImhGCm1h7CjbcW1nqmCB6Pj/OEHoRi4pucSCo2IId0C9vj+uUoQ/gKs21CdxIbyAD9yyW98FbaQbbM2Au3Zd/v+0q7FRq4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724764949; c=relaxed/simple;
-	bh=eEypYZoG6QJSIUdINWthfnAlOoisMVXiIIU515ncHzA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H1dJVyj/jX2KnvLt6rwwQL2vaMqx1hSSW/d9vDvr8369IvIeEUge6AWXzER3WSqKeZBEdA81UmDLjx3EaHlTZOKuDIvMhGo0SjKj6UVGiKuP1aG6BwejnzoUWZD1yAzKFPcg4H+aLh97R+A0+DU7hh5Uo5G/8qqvyACebN8fhAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4WtSpL2yj8z1xvlh;
-	Tue, 27 Aug 2024 21:20:26 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id A105418002B;
-	Tue, 27 Aug 2024 21:22:23 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 27 Aug 2024 21:22:22 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <shaojijie@huawei.com>,
-	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
-	<libaihan@huawei.com>, <andrew@lunn.ch>, <jdamato@fastly.com>,
-	<horms@kernel.org>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH V5 net-next 11/11] net: add ndo_validate_addr check in dev_set_mac_address
-Date: Tue, 27 Aug 2024 21:14:55 +0800
-Message-ID: <20240827131455.2919051-12-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240827131455.2919051-1-shaojijie@huawei.com>
-References: <20240827131455.2919051-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1724764540; c=relaxed/simple;
+	bh=sW2Vv1f0k8Hti2v1WTc0a0V/2hyY8fymM90miiQ3joQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j7WKKlsSk4ToWe7Tdwi8sllE4lhIbhxuiZakqQMASYFbuOGnryzmSc+veXsYT+WVYWNc1yP4T0d9oHQovgN/yk9ZE0h3FQzwL7yjzM/QbFB3+jmVq2zhTDO66/UUEz++yQFHT1/C++P2rvwgridgT+iomztT0x2WyLeQiaRJN3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=eGyOcsp7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5EE0C61042;
+	Tue, 27 Aug 2024 13:15:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1724764539;
+	bh=sW2Vv1f0k8Hti2v1WTc0a0V/2hyY8fymM90miiQ3joQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eGyOcsp74PJ8RulPIqwzjttdIdR6mPxKNj7vaPtv5a4G1hVsoJmaYoMoyHH8lmB+D
+	 X/RSCHuvXqlANiaB4RVmhAugXNIjUpOqlMGQI3qgALgZOTP6K0j7cY7d2V3xwBZTzx
+	 RsOyJtFQzh0o0nTKOc/lVIusKBckATd3oqnwLtAg=
+Date: Tue, 27 Aug 2024 15:15:36 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Vitaly Chikunov <vt@altlinux.org>,
+	Christian Heusel <christian@heusel.eu>,
+	Adrian Vladu <avladu@cloudbasesolutions.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	"alexander.duyck@gmail.com" <alexander.duyck@gmail.com>,
+	"arefev@swemel.ru" <arefev@swemel.ru>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"willemb@google.com" <willemb@google.com>,
+	"regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Subject: Re: [PATCH net] net: drop bad gso csum_start and offset in
+ virtio_net_hdr
+Message-ID: <2024082705-lark-oppose-2375@gregkh>
+References: <2024080857-contusion-womb-aae1@gregkh>
+ <60bc20c5-7512-44f7-88cb-abc540437ae1@heusel.eu>
+ <0d897b58-f4b8-4814-b3f9-5dce0540c81d@heusel.eu>
+ <20240814055408-mutt-send-email-mst@kernel.org>
+ <c746a1d2-ba0d-40fe-8983-0bf1f7ce64a7@heusel.eu>
+ <PR3PR09MB5411FC965DBCCC26AF850EA5B0872@PR3PR09MB5411.eurprd09.prod.outlook.com>
+ <ad4d96b7-d033-4292-86df-91b8d7b427c4@heusel.eu>
+ <66bcb6f68172f_adbf529471@willemb.c.googlers.com.notmuch>
+ <zkpazbrdirbgp6xgrd54urzjv2b5o3gjfubj6hi673uf35aep3@hrqxcdd7vj5c>
+ <66c5f41884850_da1e7294d2@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <66c5f41884850_da1e7294d2@willemb.c.googlers.com.notmuch>
 
-If driver implements ndo_validate_addr,
-core should check the mac address before ndo_set_mac_address.
+On Wed, Aug 21, 2024 at 10:05:12AM -0400, Willem de Bruijn wrote:
+> Vitaly Chikunov wrote:
+> > Willem,
+> > 
+> > On Wed, Aug 14, 2024 at 09:53:58AM GMT, Willem de Bruijn wrote:
+> > > Christian Heusel wrote:
+> > > > On 24/08/14 10:10AM, Adrian Vladu wrote:
+> > > > > Hello,
+> > > > > 
+> > > > > The 6.6.y branch has the patch already in the stable queue -> https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/commit/?id=3e713b73c01fac163a5c8cb0953d1e300407a773, and it should be available in the 6.6.46 upcoming minor.
+> > > > > 
+> > > > > Thanks, Adrian.
+> > > > 
+> > > > Yeah it's also queued up for 6.10, which I both missed (sorry for that!).
+> > > > If I'm able to properly backport the patch for 6.1 I'll send that one,
+> > > > but my hopes are not too high that this will work ..
+> > > 
+> > > There are two conflicts.
+> > > 
+> > > The one in include/linux/virtio_net.h is resolved by first backporting
+> > > commit fc8b2a6194693 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4
+> > > validation")
+> > > 
+> > > We did not backport that to stable because there was some slight risk
+> > > that applications might be affected. This has not surfaced.
+> > > 
+> > > The conflict in net/ipv4/udp_offload.c is not so easy to address.
+> > > There were lots of patches between v6.1 and linus/master, with far
+> > > fewer of these betwee v6.1 and linux-stable/linux-6.1.y.
+> > 
+> > BTW, we successfully cherry-picked 3 suggested[1] commits over v6.1.105 in
+> > ALT, and there is no reported problems as of yet.
+> > 
+> >   89add40066f9 ("net: drop bad gso csum_start and offset in virtio_net_hdr")
+> >   fc8b2a619469 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation")
+> >   9840036786d9 ("gso: fix dodgy bit handling for GSO_UDP_L4")
+> > 
+> > [1] https://lore.kernel.org/all/2024081147-altitude-luminous-19d1@gregkh/
+> 
+> That's good to hear.
+> 
+> These are all fine to go to 6.1 stable.
 
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- net/core/dev.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Can someone please send a series of backported patches to us so that we
+know exactly what to apply and in what order and why they need to be
+applied at all?
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index e7260889d4cb..7e9c3017e705 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -9087,6 +9087,11 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
- 		return -EOPNOTSUPP;
- 	if (sa->sa_family != dev->type)
- 		return -EINVAL;
-+	if (ops->ndo_validate_addr) {
-+		err = ops->ndo_validate_addr(dev);
-+		if (err)
-+			return err;
-+	}
- 	if (!netif_device_present(dev))
- 		return -ENODEV;
- 	err = dev_pre_changeaddr_notify(dev, sa->sa_data, extack);
--- 
-2.33.0
+thanks,
 
+greg k-h
 
