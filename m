@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-122100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ADF995FE88
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 03:53:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7B7A95FE8B
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 03:53:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83C98B2118A
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 01:53:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77A1B282B40
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 01:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAC1BBE4A;
-	Tue, 27 Aug 2024 01:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994CDC133;
+	Tue, 27 Aug 2024 01:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HQp0Gqkr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C0N+K9qY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40717BE5D
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 01:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F609479
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 01:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724723576; cv=none; b=KxK2d6+FT83QYvJEKXYBSD+wc8vJ1e3S2ttLBYUMtsbNb4ve2weh5hpj6j6Pxza51IeFbf016e32JRUZrBtiVtfTco0EOQks4LAdRQhqly5frtYOl11IzxfUzRwJTd+/WrxpYohN23ZrxWZz8r4iVT28QRgchLLXocJiz48N4Tc=
+	t=1724723578; cv=none; b=jCLClT7X9gPJAzuqAghh6WQhjw6y4c6rQmBwX0qW+MjH9nktUyyUo31/WLRkLgQu/Aq7IsEx6XQjZRJyh9Yb3mKLoYQKSIz8Y7iP/A0Cy8mVEpB8CDLJS7+gS9/fwbLpIQcrrYwUJUiAydujg5Q92xKP2LtueOUUgR7+fomiChA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724723576; c=relaxed/simple;
-	bh=N8nicuLCiRZlkeUxxgCwu3grDXgfOSF8wC9q+gqEMyc=;
+	s=arc-20240116; t=1724723578; c=relaxed/simple;
+	bh=A2l7g9sTSW2FjLIqz0umxXShwhJffJsmoZv51JNk4U0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Tw8tAUENesTopfjeLY90048IrRuzzbUm6P8SQdYOz5+LGATnyslQpOIHXC6zCZ78o+vGHMSrLiK9lKTSu9UqZqG706RIPjp7hNUqE4N0ZTKsEUneyye5qXGQvpG5xZRh2iBMWkI0zbWbgVevgwutmCTD5VRrJA4gpqLgk4o3AEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HQp0Gqkr; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=s5B3pmlNnr0L800S4HpC/XVG0SA5vGNf338cKLHVX/u+msV7vF0LUn1cLmSwRp2WAZBHnBrayoGt2DsvESPDksC5Uha3SkPwTxgfR2D5K5HLP5HRnOoXjtG0URPMhRtS1YPEM2tMboMlGYNNZnkOPlpjDcdoa0xAZaRVyK6ijn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C0N+K9qY; arc=none smtp.client-ip=209.85.222.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6ad9ffa0d77so109365347b3.2
-        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 18:52:55 -0700 (PDT)
+Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7a1d8c45a90so644749785a.2
+        for <netdev@vger.kernel.org>; Mon, 26 Aug 2024 18:52:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724723574; x=1725328374; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1724723576; x=1725328376; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hffRQ3v3sd3ifeUadUjRE0gZvpED0BVQw/7Id6v/1nE=;
-        b=HQp0Gqkr1rZY0Ne4f9PZy1+91s7ysellJk4GWM5aLkxVQnRmCmRgRnBiDGdCb5kNtG
-         KCNX+VL0Cs6cWSXkKu5VKMfLnhTfEP6AM5SJUcqj9VFIjtUOtYZtSNfQIpF1fb/xvwoq
-         TQsL8vp+vcWRcOX7DE2aQ//HfnKMvI+UWbN7hdOtBsayx3XGlV2XAvoNYuwcglLbw6dh
-         wK3gSSY7S+WMykIjWI6vcDqa8WCbLMiGqUQbvLX/zAcp14pULqPCcu3OuvgQnBzMO8Mw
-         iYbEf5oQmPL6cgbVLUs/iSPo21Z9ez51mQdsN9IwfeiAM3D3OojAvKVRB29wBxGNNywt
-         xXYA==
+        bh=pR0YplWxZD9dhJ0VESOIl+/POrsPXpKFgbxormy6WYs=;
+        b=C0N+K9qY74pAExd92YWCwtTpr7jUUDXbPi5w7eMflXSJit0M+NXqkAN3DzuP43/Fh6
+         +1FpwA0Qt8ZMll/DB8DP8p9b+WZlyMm3pHfCrn/2BSnaShTVlX9I6/DzFljPDyuk67At
+         5jI1743O7T1ruHHhErARDgKPlx+n3wfN9opBxltw+kI8TCV7CeNqj80QdcLVDJpKlOGr
+         Fk2xNO9jpjZJNLC7ilfxXW92c3Wo0FQzC+Mmn7GWcJ3zGVHoQqiEGiM1DACb+6wk09Q5
+         js0w+6GIMD8lndREalWd0O7SZkhGJjU7xgF4Ih3/DXzwZ7XTJ3SEKamit0wFFurx7XmX
+         CiqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724723574; x=1725328374;
+        d=1e100.net; s=20230601; t=1724723576; x=1725328376;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hffRQ3v3sd3ifeUadUjRE0gZvpED0BVQw/7Id6v/1nE=;
-        b=nNR6r9sY/kJLWkIOTOgC9DiKLhdsgEPpSOfMZ+TxUDqqdImiZPBUe9YUHRPStjXBSP
-         8hN8dajPEQXJ6yrN/qvzbZSrzJq+oxZKq9HHlIUqjKyo3vOfyrOkHyzsLU46RtuHdAoS
-         EN/JBdjfNBkZZKw+nPPY5/50Vi55P986MX3WvV+tBxlLipxY5E4VUHK4ctpRJbN1lANA
-         OPOxAd6dAAbtse974Tvh46/R2h18QtwSIwUVmClZk3VpQk0QSiUOUPCVpXYyZ1P63waY
-         4X7kcBiAr/HqMJB9fbKSn8pudDDe0Khf6f+evdtZIl0iOZnyvW8aqozQVhOBnR8H0f4l
-         SH3A==
-X-Gm-Message-State: AOJu0Yx//NiWZFWv8z0T/OkK7HeIL9n3C1wvaDOrfJmt8E1qJ6BPrtK7
-	uuwf50C1CfFymi5LpY76ZRSOJLG0kX+pTbw/agxtBe/Dzs/vi+nR0HaoT2Mnuco0bLiS4mf+Yg2
-	mCsUh/4Kl+A==
-X-Google-Smtp-Source: AGHT+IEdjYtx1WaSEXrD9CBGbed1n3t/Xa45yCn+MfEMeE2plyCMCNJFveDxbdDLh/G9zvGsAkerosoGzdAZEA==
+        bh=pR0YplWxZD9dhJ0VESOIl+/POrsPXpKFgbxormy6WYs=;
+        b=lkecWGMVSiBqzQmzKGKIFMiwA+mCyiOlaViYlI7inTsfAAyfOlUG/bX1dLMYS52X59
+         16dWoB+sFu0yf00GP3LBRWhV+cdZGg5S9QesMcCtPUpQ5+WVw7DM3dYxqJeiC8jqQZio
+         Dg9nu2dTTSX01EPNM58akUDHZZmg2QwIC+csy/mmE0NaiCvcyjgM52Po75KAgDZwD6+a
+         OAaIwt0FZ0GoldKilLmY328DZchxcfwrBEwgeZLwQMsCN7x2mlrStyO3Bu+9tafNGFYe
+         x92gAeNFo4lfjkBtM/R5afNEFIwPewQXHjer3KdSNbZiOpVDunbF7h5uPr62l1IdVeFV
+         BIfQ==
+X-Gm-Message-State: AOJu0YxVyarcsIF2xPG3VQYSx1v5eTa44Dzg/mkYPEhIBGtNNawmM23G
+	7/Ue0IeZEg0rba8i/kwUdF9MaE3SPcvCY9Tk3x0+sz8shOadu5r+IhB7au7EUEgrJP+nUE+4HNL
+	9sfl50SVWiw==
+X-Google-Smtp-Source: AGHT+IEvIce6GM929VxTa/4yBtbR/ej6f1g6CWscs2EN0dCnrBTDHYZJ7dEDNKXTf/Rouwvho63BjUZDGMGM7A==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:690c:2e90:b0:62f:1f63:ae4f with SMTP
- id 00721157ae682-6c6251a44efmr410557b3.1.1724723573771; Mon, 26 Aug 2024
- 18:52:53 -0700 (PDT)
-Date: Tue, 27 Aug 2024 01:52:49 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:620a:2a11:b0:79d:831e:aa2d with SMTP
+ id af79cd13be357-7a6896d66c5mr4695885a.2.1724723575699; Mon, 26 Aug 2024
+ 18:52:55 -0700 (PDT)
+Date: Tue, 27 Aug 2024 01:52:50 +0000
 In-Reply-To: <20240827015250.3509197-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240827015250.3509197-1-edumazet@google.com>
 X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
-Message-ID: <20240827015250.3509197-2-edumazet@google.com>
-Subject: [PATCH net-next 1/2] tcp: remove volatile qualifier on tw_substate
+Message-ID: <20240827015250.3509197-3-edumazet@google.com>
+Subject: [PATCH net-next 2/2] tcp: annotate data-races around tcptw->tw_rcv_nxt
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,114 +82,143 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Using a volatile qualifier for a specific struct field is unusual.
+No lock protects tcp tw fields.
 
-Use instead READ_ONCE()/WRITE_ONCE() where necessary.
+tcptw->tw_rcv_nxt can be changed from twsk_rcv_nxt_update()
+while other threads might read this field.
 
-tcp_timewait_state_process() can change tw_substate while other
-threads are reading this field.
+Add READ_ONCE()/WRITE_ONCE() annotations, and make sure
+tcp_timewait_state_process() reads tcptw->tw_rcv_nxt only once.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/inet_timewait_sock.h | 2 +-
- net/ipv4/inet_diag.c             | 4 ++--
- net/ipv4/tcp_ipv4.c              | 4 ++--
- net/ipv4/tcp_minisocks.c         | 4 ++--
- net/ipv6/tcp_ipv6.c              | 2 +-
- 5 files changed, 8 insertions(+), 8 deletions(-)
+ net/ipv4/tcp_ipv4.c      |  2 +-
+ net/ipv4/tcp_minisocks.c | 27 +++++++++++++++------------
+ net/ipv6/tcp_ipv6.c      |  3 ++-
+ 3 files changed, 18 insertions(+), 14 deletions(-)
 
-diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
-index f88b6826901275c899e79272ae39c5c4aeaaf09b..beb533a0e88098a95a1365b51bdc2d9e9dfd1d07 100644
---- a/include/net/inet_timewait_sock.h
-+++ b/include/net/inet_timewait_sock.h
-@@ -58,7 +58,7 @@ struct inet_timewait_sock {
- #define tw_dr			__tw_common.skc_tw_dr
- 
- 	__u32			tw_mark;
--	volatile unsigned char	tw_substate;
-+	unsigned char		tw_substate;
- 	unsigned char		tw_rcv_wscale;
- 
- 	/* Socket demultiplex comparisons on incoming packets. */
-diff --git a/net/ipv4/inet_diag.c b/net/ipv4/inet_diag.c
-index 9712cdb8087c2349bf289efca86172eaef729a55..67639309163d05c034fad80fc9a6096c3b79d42f 100644
---- a/net/ipv4/inet_diag.c
-+++ b/net/ipv4/inet_diag.c
-@@ -442,7 +442,7 @@ static int inet_twsk_diag_fill(struct sock *sk,
- 	inet_diag_msg_common_fill(r, sk);
- 	r->idiag_retrans      = 0;
- 
--	r->idiag_state	      = tw->tw_substate;
-+	r->idiag_state	      = READ_ONCE(tw->tw_substate);
- 	r->idiag_timer	      = 3;
- 	tmo = tw->tw_timer.expires - jiffies;
- 	r->idiag_expires      = jiffies_delta_to_msecs(tmo);
-@@ -1209,7 +1209,7 @@ void inet_diag_dump_icsk(struct inet_hashinfo *hashinfo, struct sk_buff *skb,
- 			if (num < s_num)
- 				goto next_normal;
- 			state = (sk->sk_state == TCP_TIME_WAIT) ?
--				inet_twsk(sk)->tw_substate : sk->sk_state;
-+				READ_ONCE(inet_twsk(sk)->tw_substate) : sk->sk_state;
- 			if (!(idiag_states & (1 << state)))
- 				goto next_normal;
- 			if (r->sdiag_family != AF_UNSPEC &&
 diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 5087e12209a19f4c17f0f63b8bd70fc0ec120dbf..7c29158e1abcde9049db4dbd65d9377627f61b96 100644
+index 7c29158e1abcde9049db4dbd65d9377627f61b96..eb631e66ee03cacd079da5adb36d0639bcf1d9ef 100644
 --- a/net/ipv4/tcp_ipv4.c
 +++ b/net/ipv4/tcp_ipv4.c
-@@ -120,7 +120,7 @@ int tcp_twsk_unique(struct sock *sk, struct sock *sktw, void *twp)
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	int ts_recent_stamp;
- 
--	if (tw->tw_substate == TCP_FIN_WAIT2)
-+	if (READ_ONCE(tw->tw_substate) == TCP_FIN_WAIT2)
- 		reuse = 0;
- 
- 	if (reuse == 2) {
-@@ -2948,7 +2948,7 @@ static void get_timewait4_sock(const struct inet_timewait_sock *tw,
- 
- 	seq_printf(f, "%4d: %08X:%04X %08X:%04X"
- 		" %02X %08X:%08X %02X:%08lX %08X %5d %8d %d %d %pK",
--		i, src, srcp, dest, destp, tw->tw_substate, 0, 0,
-+		i, src, srcp, dest, destp, READ_ONCE(tw->tw_substate), 0, 0,
- 		3, jiffies_delta_to_clock_t(delta), 0, 0, 0, 0,
- 		refcount_read(&tw->tw_refcnt), tw);
- }
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index a19a9dbd3409fee8a13858ff7252921e73825aef..b6d547d29f9a6a91f16c5886630598079bbb50fc 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -117,7 +117,7 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
- 		}
+@@ -1073,7 +1073,7 @@ static void tcp_v4_timewait_ack(struct sock *sk, struct sk_buff *skb)
  	}
  
--	if (tw->tw_substate == TCP_FIN_WAIT2) {
-+	if (READ_ONCE(tw->tw_substate) == TCP_FIN_WAIT2) {
- 		/* Just repeat all the checks of tcp_rcv_state_process() */
+ 	tcp_v4_send_ack(sk, skb,
+-			tcptw->tw_snd_nxt, tcptw->tw_rcv_nxt,
++			tcptw->tw_snd_nxt, READ_ONCE(tcptw->tw_rcv_nxt),
+ 			tcptw->tw_rcv_wnd >> tw->tw_rcv_wscale,
+ 			tcp_tw_tsval(tcptw),
+ 			READ_ONCE(tcptw->tw_ts_recent),
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index b6d547d29f9a6a91f16c5886630598079bbb50fc..ad562272db2edd901231fdbe8f35e3a5bb077bec 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -52,16 +52,17 @@ tcp_timewait_check_oow_rate_limit(struct inet_timewait_sock *tw,
+ 	return TCP_TW_SUCCESS;
+ }
  
+-static void twsk_rcv_nxt_update(struct tcp_timewait_sock *tcptw, u32 seq)
++static void twsk_rcv_nxt_update(struct tcp_timewait_sock *tcptw, u32 seq,
++				u32 rcv_nxt)
+ {
+ #ifdef CONFIG_TCP_AO
+ 	struct tcp_ao_info *ao;
+ 
+ 	ao = rcu_dereference(tcptw->ao_info);
+-	if (unlikely(ao && seq < tcptw->tw_rcv_nxt))
++	if (unlikely(ao && seq < rcv_nxt))
+ 		WRITE_ONCE(ao->rcv_sne, ao->rcv_sne + 1);
+ #endif
+-	tcptw->tw_rcv_nxt = seq;
++	WRITE_ONCE(tcptw->tw_rcv_nxt, seq);
+ }
+ 
+ /*
+@@ -98,8 +99,9 @@ enum tcp_tw_status
+ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 			   const struct tcphdr *th, u32 *tw_isn)
+ {
+-	struct tcp_options_received tmp_opt;
+ 	struct tcp_timewait_sock *tcptw = tcp_twsk((struct sock *)tw);
++	u32 rcv_nxt = READ_ONCE(tcptw->tw_rcv_nxt);
++	struct tcp_options_received tmp_opt;
+ 	bool paws_reject = false;
+ 	int ts_recent_stamp;
+ 
+@@ -123,20 +125,20 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
  		/* Out of window, send ACK */
-@@ -150,7 +150,7 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 		if (paws_reject ||
+ 		    !tcp_in_window(TCP_SKB_CB(skb)->seq, TCP_SKB_CB(skb)->end_seq,
+-				   tcptw->tw_rcv_nxt,
+-				   tcptw->tw_rcv_nxt + tcptw->tw_rcv_wnd))
++				   rcv_nxt,
++				   rcv_nxt + tcptw->tw_rcv_wnd))
+ 			return tcp_timewait_check_oow_rate_limit(
+ 				tw, skb, LINUX_MIB_TCPACKSKIPPEDFINWAIT2);
+ 
+ 		if (th->rst)
+ 			goto kill;
+ 
+-		if (th->syn && !before(TCP_SKB_CB(skb)->seq, tcptw->tw_rcv_nxt))
++		if (th->syn && !before(TCP_SKB_CB(skb)->seq, rcv_nxt))
+ 			return TCP_TW_RST;
+ 
+ 		/* Dup ACK? */
+ 		if (!th->ack ||
+-		    !after(TCP_SKB_CB(skb)->end_seq, tcptw->tw_rcv_nxt) ||
++		    !after(TCP_SKB_CB(skb)->end_seq, rcv_nxt) ||
+ 		    TCP_SKB_CB(skb)->end_seq == TCP_SKB_CB(skb)->seq) {
+ 			inet_twsk_put(tw);
+ 			return TCP_TW_SUCCESS;
+@@ -146,12 +148,13 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 		 * reset.
+ 		 */
+ 		if (!th->fin ||
+-		    TCP_SKB_CB(skb)->end_seq != tcptw->tw_rcv_nxt + 1)
++		    TCP_SKB_CB(skb)->end_seq != rcv_nxt + 1)
  			return TCP_TW_RST;
  
  		/* FIN arrived, enter true time-wait state. */
--		tw->tw_substate	  = TCP_TIME_WAIT;
-+		WRITE_ONCE(tw->tw_substate, TCP_TIME_WAIT);
- 		twsk_rcv_nxt_update(tcptw, TCP_SKB_CB(skb)->end_seq);
+ 		WRITE_ONCE(tw->tw_substate, TCP_TIME_WAIT);
+-		twsk_rcv_nxt_update(tcptw, TCP_SKB_CB(skb)->end_seq);
++		twsk_rcv_nxt_update(tcptw, TCP_SKB_CB(skb)->end_seq,
++				    rcv_nxt);
  
  		if (tmp_opt.saw_tstamp) {
+ 			WRITE_ONCE(tcptw->tw_ts_recent_stamp,
+@@ -182,7 +185,7 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 	 */
+ 
+ 	if (!paws_reject &&
+-	    (TCP_SKB_CB(skb)->seq == tcptw->tw_rcv_nxt &&
++	    (TCP_SKB_CB(skb)->seq == rcv_nxt &&
+ 	     (TCP_SKB_CB(skb)->seq == TCP_SKB_CB(skb)->end_seq || th->rst))) {
+ 		/* In window segment, it may be only reset or bare ack. */
+ 
+@@ -229,7 +232,7 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+ 	 */
+ 
+ 	if (th->syn && !th->rst && !th->ack && !paws_reject &&
+-	    (after(TCP_SKB_CB(skb)->seq, tcptw->tw_rcv_nxt) ||
++	    (after(TCP_SKB_CB(skb)->seq, rcv_nxt) ||
+ 	     (tmp_opt.saw_tstamp &&
+ 	      (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < 0))) {
+ 		u32 isn = tcptw->tw_snd_nxt + 65535 + 2;
 diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 200fea92f12fc99617c64ca817ff1c44d4262085..fb2e64ce660f8f0b7fc7bf74fb88276d3e29b0be 100644
+index fb2e64ce660f8f0b7fc7bf74fb88276d3e29b0be..d71ab4e1efe1c6598cf3d3e4334adf0881064ce9 100644
 --- a/net/ipv6/tcp_ipv6.c
 +++ b/net/ipv6/tcp_ipv6.c
-@@ -2258,7 +2258,7 @@ static void get_timewait6_sock(struct seq_file *seq,
- 		   src->s6_addr32[2], src->s6_addr32[3], srcp,
- 		   dest->s6_addr32[0], dest->s6_addr32[1],
- 		   dest->s6_addr32[2], dest->s6_addr32[3], destp,
--		   tw->tw_substate, 0, 0,
-+		   READ_ONCE(tw->tw_substate), 0, 0,
- 		   3, jiffies_delta_to_clock_t(delta), 0, 0, 0, 0,
- 		   refcount_read(&tw->tw_refcnt), tw);
- }
+@@ -1193,7 +1193,8 @@ static void tcp_v6_timewait_ack(struct sock *sk, struct sk_buff *skb)
+ #endif
+ 	}
+ 
+-	tcp_v6_send_ack(sk, skb, tcptw->tw_snd_nxt, tcptw->tw_rcv_nxt,
++	tcp_v6_send_ack(sk, skb, tcptw->tw_snd_nxt,
++			READ_ONCE(tcptw->tw_rcv_nxt),
+ 			tcptw->tw_rcv_wnd >> tw->tw_rcv_wscale,
+ 			tcp_tw_tsval(tcptw),
+ 			READ_ONCE(tcptw->tw_ts_recent), tw->tw_bound_dev_if,
 -- 
 2.46.0.295.g3b9ea8a38a-goog
 
