@@ -1,165 +1,198 @@
-Return-Path: <netdev+bounces-122263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E8649608B0
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:29:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CAEE9608B6
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:31:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF1BB1F23A82
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:29:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D91B828246F
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4491A00F7;
-	Tue, 27 Aug 2024 11:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hu3tlNjF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848DD19EEB4;
+	Tue, 27 Aug 2024 11:30:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677C11A00E2;
-	Tue, 27 Aug 2024 11:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BF619EED6;
+	Tue, 27 Aug 2024 11:30:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724758185; cv=none; b=U2tAMqikDiTscyYkQ1utB5Iwe8qiKsGAmDI+aZhCSw/SUqMzw31aLu1VcT8ViEDhwNBav6IO+9gieK1Rf2HaQqp19Nzo9kOZKmO90HRZQwcuEqi9INyn0FU6myX3Ma6kh4WzTXihDNBTZcFY+kLs1ixEyOsBiSUuq8RbptWL/ME=
+	t=1724758213; cv=none; b=Fx7WERJnKi5Fn9Mir27SSusXpy4rmy4azGiS0/NvsLNCXjlNykqtrJj2wHppM0VmK9ypOmZdbZvHUeNeDuU/4JP/T/5/tvqy4rwXtO9+YvCxKkQmWGxOqOogiTEcpETZToQSebSGfqKHL1QS74SyS2PcwIH/XNO+VDfCzwWfS/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724758185; c=relaxed/simple;
-	bh=etuwT1euxSljZjW4oc24vh7whpGW5rQpbQ2KaCeHW/4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TNlU0NuBSZDNyTh8LRFQ1wmxh2SpW09iaEWUB0I1cZEgkURKcSBqSlX85CkWty+D2mWJfHujBYiHMkMQ3CYWJau/xeBUWsRuZByGj8G3AEp3dsSs79Y97dZBqk7jTWX5fjZgSN35bvBBgv49QHP2r8KN6EJ/rQanp8qZRZTvFzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hu3tlNjF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6709CC58282;
-	Tue, 27 Aug 2024 11:29:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724758185;
-	bh=etuwT1euxSljZjW4oc24vh7whpGW5rQpbQ2KaCeHW/4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=hu3tlNjFqxBvsAC1psinXwnoeGAeh+ElETFpdgav5V+6zLCAVxo/OaZ4BzvTrmZW3
-	 xgNnt5OJ6avWOUWvSCSkLALv+NX32eKL1PsYKVOFYcrykowIDVLpIkzgpshxjjJfZs
-	 grb+6h0ORRDr7N4nGU/i0lPCwvBk7l5drDI7uuCXhYDhSRkj5A9+fQNyQEQqOw4Uma
-	 lVByBFoAoa0vV//crfyWqKzv+cu3OdRlROBit1544apTEq9+0WuXrKYBpP22gFnYAg
-	 FZK5Z1wOjqCBvg7rdQBgKHnp9IKVAsJd4qePoFK+5E6Dl0t+mmNUvxoXmz1ck063E7
-	 trLIJRAXHyjQw==
-From: Conor Dooley <conor@kernel.org>
-To: netdev@vger.kernel.org
-Cc: conor@kernel.org,
-	Steve Wilkins <steve.wilkins@raymarine.com>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	valentina.fernandezalanis@microchip.com,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: [RFC net-next] net: macb: add support for configuring eee via ethtool
-Date: Tue, 27 Aug 2024 12:29:23 +0100
-Message-ID: <20240827-excuse-banister-30136f43ef50@spud>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1724758213; c=relaxed/simple;
+	bh=ZIK4DVQeG/hFWSg8QSiKss4AKOZ86lowHe9qs91icjc=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=esP580EslrSAjrkWNe4vPppcyxc7OUvDmwv++SZOdeyN5dOznrH3Zf+TOLeWKdV+e1dlA1PftdRkcqT3L9fnTtNt7vzc5ssByv5yXpunPL7wx2RKHxKIe4V6RkNQ5QDcAGx7oXYoPRQFzEXRUz3YXfOibAi3Hdi6omhA0lGqHhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WtQHK0YBPz6K98L;
+	Tue, 27 Aug 2024 19:26:53 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5BF0D140257;
+	Tue, 27 Aug 2024 19:30:08 +0800 (CST)
+Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 27 Aug
+ 2024 12:30:07 +0100
+Date: Tue, 27 Aug 2024 12:30:06 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Zijun Hu <zijun_hu@icloud.com>
+CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+	<rafael@kernel.org>, Davidlohr Bueso <dave@stgolabs.net>, Dave Jiang
+	<dave.jiang@intel.com>, Alison Schofield <alison.schofield@intel.com>, Vishal
+ Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>, Dan
+ Williams <dan.j.williams@intel.com>, Takashi Sakamoto
+	<o-takashi@sakamocchi.jp>, Timur Tabi <timur@kernel.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-kernel@vger.kernel.org>, <linux-cxl@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: Re: [PATCH v3 2/3] cxl/region: Find free cxl decoder by
+ device_for_each_child()
+Message-ID: <20240827123006.00004527@Huawei.com>
+In-Reply-To: <20240824-const_dfc_prepare-v3-2-32127ea32bba@quicinc.com>
+References: <20240824-const_dfc_prepare-v3-0-32127ea32bba@quicinc.com>
+	<20240824-const_dfc_prepare-v3-2-32127ea32bba@quicinc.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3478; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=/jWBHfktTnMnWwd+OtzS2TE8hmCXENAXH9kNHZHk7X8=; b=owGbwMvMwCFWscWwfUFT0iXG02pJDGlnd0y6d8t2cYtNTKJfS8Cq1wpPdNJSZlrZzzj0KsDT+ 9ySQImmjlIWBjEOBlkxRZbE230tUuv/uOxw7nkLM4eVCWQIAxenAEzkoC7D/1ipkzpT5/b+P3po pdCk7VOP7/p45JNM8EwfiRe5cb8r73Uy/LPo32vqfFFUiavnoeztP5c782Y97tqzt+N4/61Q9ai 9qZwA
-X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-From: Steve Wilkins <steve.wilkins@raymarine.com>
+On Sat, 24 Aug 2024 17:07:44 +0800
+Zijun Hu <zijun_hu@icloud.com> wrote:
 
-Add ethtool_ops for configuring Energy Efficient Ethernet in the PHY.
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> To prepare for constifying the following old driver core API:
+> 
+> struct device *device_find_child(struct device *dev, void *data,
+> 		int (*match)(struct device *dev, void *data));
+> to new:
+> struct device *device_find_child(struct device *dev, const void *data,
+> 		int (*match)(struct device *dev, const void *data));
+> 
+> The new API does not allow its match function (*match)() to modify
+> caller's match data @*data, but match_free_decoder() as the old API's
+> match function indeed modifies relevant match data, so it is not suitable
+> for the new API any more, solved by using device_for_each_child() to
+> implement relevant finding free cxl decoder function.
+> 
+> Suggested-by: Ira Weiny <ira.weiny@intel.com>
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+This seems to functionally do the same as before.
 
-Signed-off-by: Steve Wilkins <steve.wilkins@raymarine.com>
-Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
----
-Steve sent me this patch (modulo the eee -> keee change), but I know
-nothing about the macb driver, so I asked Nicolas whether the patch
-made sense. His response was:
-> Interesting although I have the feeling that some support from our MAC
-> is missing for pretending to support the feature.
-> I'm not sure the phylink without the MAC support is valid.
->
-> I think we need a real task to be spawn to support EEE / LPI on cadence
-> driver (but I don't see it scheduled in a way or another 🙁 ).
+I'm not sure I like the original code though so a comment inline.
 
-Since he was not sure, next port of call is lkml.. Is this patch
-sufficient in isolation, or are additional changes required to the driver
-for it?
+> ---
+>  drivers/cxl/core/region.c | 30 ++++++++++++++++++++++++------
+>  1 file changed, 24 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index 21ad5f242875..c2068e90bf2f 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -794,10 +794,15 @@ static size_t show_targetN(struct cxl_region *cxlr, char *buf, int pos)
+>  	return rc;
+>  }
+>  
+> +struct cxld_match_data {
+> +	int id;
+> +	struct device *target_device;
+> +};
+> +
+>  static int match_free_decoder(struct device *dev, void *data)
+>  {
+> +	struct cxld_match_data *match_data = data;
+>  	struct cxl_decoder *cxld;
+> -	int *id = data;
+>  
+>  	if (!is_switch_decoder(dev))
+>  		return 0;
+> @@ -805,17 +810,31 @@ static int match_free_decoder(struct device *dev, void *data)
+>  	cxld = to_cxl_decoder(dev);
+>  
+>  	/* enforce ordered allocation */
+> -	if (cxld->id != *id)
+> +	if (cxld->id != match_data->id)
 
-The other drivers that I looked at that use phylink_ethtool_set_eee()
-vary between doing what's done here and just forwarding the call, but
-others are more complex, so without an understanding of the subsystem
-I cannot tell :)
+Why do we carry on in this case?
+Conditions are:
+1. Start match_data->id == 0
+2. First pass cxld->id == 0 (all good) or
+   cxld->id == 1 say (and we skip until we match
+   on cxld->id == 0 (perhaps on the second child if they are
+   ordered (1, 0, 2) etc. 
 
-Alternatively, Steve, shout if you can tell me why forwarding to the phy
-is sufficient, and I'll update the commit message and send this as
-non-RFC.
+If we skipped and then matched on second child but it was
+already in use (so region set), we will increment match_data->id to 1
+but never find that as it was the one we skipped.
 
-Thanks,
-Conor.
+So this can only work if the children are ordered.
+So if that's the case and the line above is just a sanity check
+on that, it should be noisier (so an error print) and might
+as well fail as if it doesn't match all bets are off.
 
-CC: valentina.fernandezalanis@microchip.com
-CC: Nicolas Ferre <nicolas.ferre@microchip.com>
-CC: Claudiu Beznea <claudiu.beznea@tuxon.dev>
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Eric Dumazet <edumazet@google.com>
-CC: Jakub Kicinski <kuba@kernel.org>
-CC: Paolo Abeni <pabeni@redhat.com>
-CC: Russell King <linux@armlinux.org.uk>
-CC: netdev@vger.kernel.org
-CC: linux-kernel@vger.kernel.org
----
- drivers/net/ethernet/cadence/macb_main.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 95e8742dce1d..a2a222954ebf 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -3321,6 +3321,20 @@ static int macb_set_link_ksettings(struct net_device *netdev,
- 	return phylink_ethtool_ksettings_set(bp->phylink, kset);
- }
+Jonathan
  
-+static int macb_get_eee(struct net_device *netdev, struct ethtool_keee *edata)
-+{
-+	struct macb *bp = netdev_priv(netdev);
-+
-+	return phylink_ethtool_get_eee(bp->phylink, edata);
-+}
-+
-+static int macb_set_eee(struct net_device *netdev, struct ethtool_keee *edata)
-+{
-+	struct macb *bp = netdev_priv(netdev);
-+
-+	return phylink_ethtool_set_eee(bp->phylink, edata);
-+}
-+
- static void macb_get_ringparam(struct net_device *netdev,
- 			       struct ethtool_ringparam *ring,
- 			       struct kernel_ethtool_ringparam *kernel_ring,
-@@ -3767,6 +3781,8 @@ static const struct ethtool_ops macb_ethtool_ops = {
- 	.set_wol		= macb_set_wol,
- 	.get_link_ksettings     = macb_get_link_ksettings,
- 	.set_link_ksettings     = macb_set_link_ksettings,
-+	.get_eee		= macb_get_eee,
-+	.set_eee		= macb_set_eee,
- 	.get_ringparam		= macb_get_ringparam,
- 	.set_ringparam		= macb_set_ringparam,
- };
-@@ -3783,6 +3799,8 @@ static const struct ethtool_ops gem_ethtool_ops = {
- 	.get_sset_count		= gem_get_sset_count,
- 	.get_link_ksettings     = macb_get_link_ksettings,
- 	.set_link_ksettings     = macb_set_link_ksettings,
-+	.get_eee		= macb_get_eee,
-+	.set_eee		= macb_set_eee,
- 	.get_ringparam		= macb_get_ringparam,
- 	.set_ringparam		= macb_set_ringparam,
- 	.get_rxnfc			= gem_get_rxnfc,
--- 
-2.43.0
+>  		return 0;
+>  
+> -	if (!cxld->region)
+> +	if (!cxld->region) {
+> +		match_data->target_device = get_device(dev);
+>  		return 1;
+> +	}
+>  
+> -	(*id)++;
+> +	match_data->id++;
+>  
+>  	return 0;
+>  }
+>  
+> +/* NOTE: need to drop the reference with put_device() after use. */
+> +static struct device *find_free_decoder(struct device *parent)
+> +{
+> +	struct cxld_match_data match_data = {
+> +		.id = 0,
+> +		.target_device = NULL,
+> +	};
+> +
+> +	device_for_each_child(parent, &match_data, match_free_decoder);
+> +	return match_data.target_device;
+> +}
+> +
+>  static int match_auto_decoder(struct device *dev, void *data)
+>  {
+>  	struct cxl_region_params *p = data;
+> @@ -840,7 +859,6 @@ cxl_region_find_decoder(struct cxl_port *port,
+>  			struct cxl_region *cxlr)
+>  {
+>  	struct device *dev;
+> -	int id = 0;
+>  
+>  	if (port == cxled_to_port(cxled))
+>  		return &cxled->cxld;
+> @@ -849,7 +867,7 @@ cxl_region_find_decoder(struct cxl_port *port,
+>  		dev = device_find_child(&port->dev, &cxlr->params,
+>  					match_auto_decoder);
+>  	else
+> -		dev = device_find_child(&port->dev, &id, match_free_decoder);
+> +		dev = find_free_decoder(&port->dev);
+>  	if (!dev)
+>  		return NULL;
+>  	/*
+> 
 
 
