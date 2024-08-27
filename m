@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-122514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26087961903
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 23:10:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA4F096190B
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 23:14:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6FFB284A81
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:10:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CF1FB21AE7
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 21:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FE971D318D;
-	Tue, 27 Aug 2024 21:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822371D3656;
+	Tue, 27 Aug 2024 21:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GMyY3g16"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eo3pdkxI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62289156661;
-	Tue, 27 Aug 2024 21:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BBB3481CD;
+	Tue, 27 Aug 2024 21:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724793043; cv=none; b=VR5dgopsOdVP6H/zsyu/Ch0qXCxgAOTkz32vfziS1mvT9RsPRWulXd0zHSy3mLG+TvUHUdXg/p80DX029AeeZHFT0R9PNkdcWpRgXl0v91n8+1HGR++8XcCqATtoDb3mJZ953M+GYo3UxIy2sjtq7zVGb6AZD0gdAX+VN1W1UZw=
+	t=1724793256; cv=none; b=M3kVEFVqaFwLPmFsTWcLzSiVhMkJi9nK5jQxf6oMDt3/RFY88mEaPn5Kt7ZxwdCYUhlmgXWlc0TdlBt4MbpVNLOVznPm1nYecPDuce+yIKbbdCM3vY0GL5losmoElMyed0tr4ZVokiD2MlvmbjLSl6WbuMp/OXb5K4gVJ0LIO0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724793043; c=relaxed/simple;
-	bh=Lg4iEMS7bS1Rv0HvbxACs1qOLdsM8mTeV3VcM50LMYA=;
+	s=arc-20240116; t=1724793256; c=relaxed/simple;
+	bh=Jz11fOTxb75hq3mJuuiDObI+bI82XFXqBPCYA9A5AoA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YX0ACTllNNus7VE2PH/REk7jOF3ctc1zTI2KJd0NhXr+wQK0+thLzIaXg7oxyYuK6jfQ61Fwf19t3YTNE7SlTMPQVKzkFDnm2awAhVWYpiPi8oytKL0q2asoht3/QDCeoFwhVPGSUKyaqOuYdW7fsgAoc3nIcskEYsdQeDU9L+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GMyY3g16; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B0D2C4E699;
-	Tue, 27 Aug 2024 21:10:42 +0000 (UTC)
+	 MIME-Version:Content-Type; b=DonbLF4Q12kv+xfhoG6KvADlIrjrZCuEWU/tSI4U2+Kli/MDkGH7dFDD89z9sMprrOCU7m4bAji0DEVb7oLsCqovtOTMwIOin7qPDwqB/tXesHDJfouFwkX1zC+61OwogJw9UdmAGoScU9RTLY6dSRn7xO0bIx91UllyJMkK0n0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eo3pdkxI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D76EC4FEA0;
+	Tue, 27 Aug 2024 21:14:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724793042;
-	bh=Lg4iEMS7bS1Rv0HvbxACs1qOLdsM8mTeV3VcM50LMYA=;
+	s=k20201202; t=1724793255;
+	bh=Jz11fOTxb75hq3mJuuiDObI+bI82XFXqBPCYA9A5AoA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GMyY3g16/EgYsToWiRA36+RaUBS23NlwnBFjtsglIhQhseOaRcjjoRT1Xy1PDfLsQ
-	 ZK3mPnSHpCc4lt+RNPBBU3ObmSIcdUDr9OoaFXdtV2WJnxZAaguRhdttFBlY09FK1L
-	 UguBfEWna9vBMugY8Flp7hk8gZXaBycI09p+r33hIdogMNciIZ9PmI0YSnwjA7MSSf
-	 C4NM6DHc3WUCN9ICrp6bg/KAOURgaEKzS62cvZ8JXsW0DJbI2JSTo1oQqRyaqhvI3p
-	 mtgAwNAS2C0CBguoOROycLl37D718EJHDjZHjV+Zg5jzS1zCS4cI2SybH5Nv7wdNSa
-	 ef3LOWX7WAjFQ==
-Date: Tue, 27 Aug 2024 14:10:41 -0700
+	b=eo3pdkxIOcdK4uDdXCs8vfxXGwz6C7bbpJH9yEzKVtvA1tPgEppmR25Luhg0HsGhJ
+	 J8ewxi7wRMHUnkL/YsFUU/HVyVAr+mugOPFyEd/hfnBYT4FmSP2zUufIMKglMJ7bTI
+	 +Y//bmJHehkXnmN3zvOm3SVVH4YJc6AKhz9jSBkzhv9FIIRtdbbV//tjC7VNUsJqXl
+	 /7LuoaQNCWHb3+9oRsxizNnyDqq3VaTaCXYoh8ZBM/CZN8qp3zCu56zh8e3DvJ81Gy
+	 MCNEGJaItxq/Chd6GRkN/ydopguBocx32aPRWqPdsz4v1B7/JLApe7aBAH84V8JpZX
+	 iMkzLZ4Wce18Q==
+Date: Tue, 27 Aug 2024 14:14:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
-Cc: 0x7f454c46@gmail.com, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Mohammad Nassiri <mnassiri@ciena.com>,
- netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 0/8] net/selftests: TCP-AO selftests updates
-Message-ID: <20240827141041.0c815dbd@kernel.org>
-In-Reply-To: <20240823-tcp-ao-selftests-upd-6-12-v4-0-05623636fe8c@gmail.com>
-References: <20240823-tcp-ao-selftests-upd-6-12-v4-0-05623636fe8c@gmail.com>
+To: Trevor Gross <tmgross@umich.edu>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, andrew@lunn.ch,
+ miguel.ojeda.sandonis@gmail.com, benno.lossin@proton.me,
+ aliceryhl@google.com
+Subject: Re: [PATCH net-next v7 4/6] rust: net::phy unified read/write API
+ for C22 and C45 registers
+Message-ID: <20240827141414.5df849d5@kernel.org>
+In-Reply-To: <CALNs47uSeGR_Z_Bor4yKbd848XdohHMam47zwBct39nEmKFb7g@mail.gmail.com>
+References: <20240824020617.113828-1-fujita.tomonori@gmail.com>
+	<20240824020617.113828-5-fujita.tomonori@gmail.com>
+	<CALNs47uSeGR_Z_Bor4yKbd848XdohHMam47zwBct39nEmKFb7g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,24 +64,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 23 Aug 2024 23:04:50 +0100 Dmitry Safonov via B4 Relay wrote:
-> First 3 patches are more-or-less cleanups/preparations.
+On Sat, 24 Aug 2024 00:44:50 -0500 Trevor Gross wrote:
+> Small suggestion: I think these could all be `#[derive(Clone, Copy,
+> Debug)]` so they are easy to `pr_info!(...)`. C45 doesn't have any
+> derives.
 > 
-> Patches 4/5 are fixes for netns file descriptors leaks/open.
-> 
-> Patch 6 was sent to me/contributed off-list by Mohammad, who wants 32-bit
-> kernels to run TCP-AO.
-> 
-> Patch 7 is a workaround/fix for slow VMs. Albeit, I can't reproduce
-> the issue, but I hope it will fix netdev flakes for connect-deny-*
-> tests.
-> 
-> And the biggest change is adding TCP-AO tracepoints to selftests.
-> I think it's a good addition by the following reasons:
-> - The related tracepoints are now tested;
-> - It allows tcp-ao selftests to raise expectations on the kernel
->   behavior - up from the syscalls exit statuses + net counters.
-> - Provides tracepoints usage samples.
+> This could probably be done when it is picked up if there isn't another version.
 
-Looks like we got no flakes over the weekend, so applying, thanks! :)
+Please respin, it's not too much work. It's really rare that'd edit
+people's code when applying in networking. The commit message yes
+but code very rarely.
+-- 
+pw-bot: cr
 
