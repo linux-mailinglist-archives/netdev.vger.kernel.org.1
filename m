@@ -1,89 +1,68 @@
-Return-Path: <netdev+bounces-122394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7583C960F19
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:55:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CA17960F2E
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:56:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE14EB2646E
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:55:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FD3C1C2330C
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E351C68A7;
-	Tue, 27 Aug 2024 14:54:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063A41C68A6;
+	Tue, 27 Aug 2024 14:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WdCJFUVd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mzY3Ekoi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64F371C6F68
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 14:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCC7E1C5783;
+	Tue, 27 Aug 2024 14:55:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724770494; cv=none; b=uEe3oH0gtAsXRX8d97zm8agaaoK2EgdNnAIJKIAGIM66/xOjO18wyNaBK0AzWIQAxSyPlKlVUTNVuv5oRzlZtm7WzGPhboLPjgkeH4o5qLtO8i/if2KvsD+OMTrGA9Wo1USDjo/Ygg8qPe3cw4V0jsujx4UFYFhRQKJl6G+2Gdk=
+	t=1724770532; cv=none; b=bS9gRkH6THt//RMdyZlMqWm+CsJaS3vc/r/KDoa2NsHKAd9dN6rEBDLYfRyubPWQO6nZpMFsNUB6wGzlFbgMbfI9konstRNQOnlp45Rw0N0PtdbxyEsQjo0U9aISi88h8dI1xMOscdzJD6nJ2WUdhzZbQRQb0P9pgaOwdebr5JM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724770494; c=relaxed/simple;
-	bh=E7OLqoz0tREOK7wQ3vh1lxy8eEnqLJ7OjeCXcBco4GM=;
+	s=arc-20240116; t=1724770532; c=relaxed/simple;
+	bh=D80vpx6U6QT7GcY5OtgT2Iqfz6U4g8ngRy6lrqYUReA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FHPTdjebg20TRvmK8ZH8/EqE697kALK0z8cH+Pzh+JINhW1fiIBtv6disoDdjoKeihFiJsoUhI7exCoIK3zGSaAu1P3vUYc5ZteHdRPgggvuxOnHJqjjUaeiOsw0iZ1z3lapPqXw3Kp/d6EF0kdtbb13xDjGRTbL4WPcQw36UwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WdCJFUVd; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724770492;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=s25MpL7Tq/TPGjv/St//pk5+Hzc8PYbV3QYbpZXoEM0=;
-	b=WdCJFUVdQoc0Y7lwn5H8QSMX/Dxm7QJJaZnTfv9AUKuHhLSpSdANC/D8C6n3wNGLhQwaQJ
-	q8HoK/qAHe3INflXZNt/+QiKDsjVXgFI0lmhCzckZBiDjDpB2a7gS5jVTek+Rxdpmk+oUf
-	9X+0CQbc2rZMvwLCLu0N/vVgW5IfZPY=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-668-8yXEDHkrO_GX0i2wdLsPdQ-1; Tue, 27 Aug 2024 10:54:50 -0400
-X-MC-Unique: 8yXEDHkrO_GX0i2wdLsPdQ-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5bed91ffb50so4625699a12.0
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 07:54:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724770489; x=1725375289;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s25MpL7Tq/TPGjv/St//pk5+Hzc8PYbV3QYbpZXoEM0=;
-        b=XnOD2/y+zJUIq8bt03zVfG26A0nNmWWylZZDISyDtn0xOh0pGK64y0AHmmthuh4n6L
-         svhtGvVqdjzeKIyB342J+fhUhSJaxIBrh6uxrQVg9XYeZoxqtOMFEs1Ocu2SLlStuY6H
-         QVRf2QRID1SZTLQz31qMS9WWyRSfoPDQFqu5jl+k/6h1DNPAM2qsno03/Sk7wfgtWY7K
-         P8m3mSKrFfxqwbzg/i1U+xQEE5KspelNl7WncJIXw/7thB4FDvoO3zvY4ge75DTFkPnz
-         VfGCGBEOw6xaZ9CsAYRYpyGhzcpcT1fFMFCDounAO8e5JiOt3TjYOY8TGr+Tl9qsyl6x
-         Q2lw==
-X-Gm-Message-State: AOJu0YxDIa5LQTYEe1Kk2g8BUCRXzRFSnVy/4nthQGCPfkb5LgGr4fHF
-	5qVXG1zoLq6FJVzK5LuTTAIfckUDw6FvVKkpxKFwBJB4S2aM2EI+tqHQmJ/9FUvec7xTROnrchu
-	l2KRXelSinmgr2iv2LRbfLd8oIMtW9Ut632g1Q0p5qB4LVEfHhbX4zg==
-X-Received: by 2002:a05:6402:26cc:b0:5be:fe37:41cb with SMTP id 4fb4d7f45d1cf-5c0891a92b1mr9267182a12.33.1724770489111;
-        Tue, 27 Aug 2024 07:54:49 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFIunvhNYLO3V6oMfMQBw21LFVlGYwz+wXbXvSTd7Qsz2VSiEu5iJyTRT2II+Wjdm4/C/wC9A==
-X-Received: by 2002:a05:6402:26cc:b0:5be:fe37:41cb with SMTP id 4fb4d7f45d1cf-5c0891a92b1mr9267154a12.33.1724770488424;
-        Tue, 27 Aug 2024 07:54:48 -0700 (PDT)
-Received: from debian (2a01cb058918ce0010ac548a3b270f8c.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:10ac:548a:3b27:f8c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c0bb471d7bsm1102102a12.59.2024.08.27.07.54.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 07:54:48 -0700 (PDT)
-Date: Tue, 27 Aug 2024 16:54:45 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
-	john.fastabend@gmail.com, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 07/12] xfrm: Unmask upper DSCP bits in
- xfrm_get_tos()
-Message-ID: <Zs3otVHdeeyb3z1X@debian>
-References: <20240827111813.2115285-1-idosch@nvidia.com>
- <20240827111813.2115285-8-idosch@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GhKZXs7VECeaziw/m0RWVW2DFRTl2o3hgesoB1Un4xw9tzjN+6BOWb5atGjvdcfakjU987ukoKTPq58kKN7RHZ59jTDiG6BpgNaP/xlrOiQ/I1pXZxubmZECgGj2AEngB4iMDqjIKAPXRFrp8EFJfFZ1AJW1Kp18oQBH9sjjsTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mzY3Ekoi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 903EDC4E699;
+	Tue, 27 Aug 2024 14:55:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724770532;
+	bh=D80vpx6U6QT7GcY5OtgT2Iqfz6U4g8ngRy6lrqYUReA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mzY3EkoijKjcm5DDmYoHp5H2ObZXtFKsAMa12P/QKAptq4mddaMTqo7uGVS3xob46
+	 5jUTvBkE/DZ33nI2za/bDA6MbTauhaXisYMORZ/5e9XdAIGzWXD3JDhE64Ii2i/eKt
+	 O8HiVHGByi9iQJybjjlB2SiZ9eTUVQAE39HG9gr5whw2clXYCtDtvubb7gaZpfy/pE
+	 sx8K4t+gUDaNJDGp/EXP5b8wW7lrQo6TNDlaJ+8SiWg5z61yjpl4plNnwjB9cBtYos
+	 Ql/I7sCYTMQ4C109ubkSm5qLVdm/90L4TOuXhH4QjUYve1b/uzB1+GNGVDGEX4bVCS
+	 sRdHpm4Q4lIjw==
+Date: Tue, 27 Aug 2024 15:55:25 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yangtao Li <frank.li@vivo.com>
+Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com,
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, ulli.kroll@googlemail.com,
+	linus.walleij@linaro.org, marcin.s.wojtas@gmail.com,
+	linux@armlinux.org.uk, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, mcoquelin.stm32@gmail.com,
+	hkallweit1@gmail.com, u.kleine-koenig@pengutronix.de,
+	jacob.e.keller@intel.com, justinstitt@google.com,
+	sd@queasysnail.net, linux-renesas-soc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [net-next v3 8/9] net: mvpp2: Convert to devm_clk_get_enabled()
+ and devm_clk_get_optional_enabled()
+Message-ID: <20240827145525.GK1368797@kernel.org>
+References: <20240827095712.2672820-1-frank.li@vivo.com>
+ <20240827095712.2672820-9-frank.li@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,24 +71,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240827111813.2115285-8-idosch@nvidia.com>
+In-Reply-To: <20240827095712.2672820-9-frank.li@vivo.com>
 
-On Tue, Aug 27, 2024 at 02:18:08PM +0300, Ido Schimmel wrote:
-> The function returns a value that is used to initialize 'flowi4_tos'
-> before being passed to the FIB lookup API in the following call chain:
+On Tue, Aug 27, 2024 at 03:57:11AM -0600, Yangtao Li wrote:
+> Use devm_clk_get_enabled() and devm_clk_get_optional_enabled()
+> to simplify code.
 > 
-> xfrm_bundle_create()
-> 	tos = xfrm_get_tos(fl, family)
-> 	xfrm_dst_lookup(..., tos, ...)
-> 		__xfrm_dst_lookup(..., tos, ...)
-> 			xfrm4_dst_lookup(..., tos, ...)
-> 				__xfrm4_dst_lookup(..., tos, ...)
-> 					fl4->flowi4_tos = tos
-> 					__ip_route_output_key(net, fl4)
-> 
-> Unmask the upper DSCP bits so that in the future the output route lookup
-> could be performed according to the full DSCP value.
+> Signed-off-by: Yangtao Li <frank.li@vivo.com>
+> Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> Suggested-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Reviewed-by: Marcin Wojtas <marcin.s.wojtas@gmail.com>
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+...
 
+> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> index 2fe8bae4eb3c..0ca2daeb0f90 100644
+> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c
+> @@ -7561,56 +7561,32 @@ static int mvpp2_probe(struct platform_device *pdev)
+
+...
+
+> -		priv->axi_clk = devm_clk_get_optional(&pdev->dev, "axi_clk");
+> -		if (IS_ERR(priv->axi_clk)) {
+> -			err = PTR_ERR(priv->axi_clk);
+> -			goto err_mg_core_clk;
+> +			clk = devm_clk_get_optional_enabled(&pdev->dev, "mg_core_clk");
+
+As it looks like there will be a v3 anyway, a minor nit from my side:
+IMHO, the line above could be trivially wrapped to keep it <= 80 columns wide,
+which is still preferred by Networking code.
+
+> +			if (IS_ERR(clk))
+> +				return PTR_ERR(clk);
+>  		}
+>  
+> -		err = clk_prepare_enable(priv->axi_clk);
+> -		if (err < 0)
+> -			goto err_mg_core_clk;
+> -
+> -		/* Get system's tclk rate */
+> -		priv->tclk = clk_get_rate(priv->pp_clk);
+> +		clk = devm_clk_get_optional_enabled(&pdev->dev, "axi_clk");
+> +		if (IS_ERR(clk))
+> +			return PTR_ERR(clk);
+
+...
 
