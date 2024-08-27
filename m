@@ -1,141 +1,104 @@
-Return-Path: <netdev+bounces-122403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77C0C961160
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 17:19:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA12B961176
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 17:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F3B6B2731C
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:19:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C3151F21E22
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFDC81C8FDE;
-	Tue, 27 Aug 2024 15:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0521C86F6;
+	Tue, 27 Aug 2024 15:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NLKG2Nf7"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CC761CDA04;
-	Tue, 27 Aug 2024 15:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D0C1C688E
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 15:19:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724771911; cv=none; b=p5wwfXDZMIhn7iIXHFTxX7GPkcWHv1vMGcWInRrPB1GasuxUfmjJxGAPcOdh5R7t9O91EyvpPKntDkkrVJSaTzvUdq9jqNPJN7ikljtT1+FUGO+cIPxdFgVkSQ0rOajAE5D09uE+kMMo/OZMRVZCsRIjTkUw/uK2nImIGfPz7IA=
+	t=1724771971; cv=none; b=l7SxTfp0h0mYby6hkCR8lm+RArvoiNZgOmazpVL87DTqs77eucdJAqxX79re0mEa6T2PZmstQ0zX7/99EtWaUngRRdGzXgmFfUqYe82BG+8q+ujP8JGYc11v96wtNuVy8q426luPQhJywYO5O/FPpxesQQaEHghPPVdkj4/GgM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724771911; c=relaxed/simple;
-	bh=nNRIz068p/qgB1Y61AXhoZ04ufnISP5a48d3JNGk+ak=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bDHe8cy/Dq/pjNvStO2lsCwOgITonfSNjPO+4sKPL/g3AzoIeNGAybFnHs889aDAheFg/+Zdl2mqCYtAtFcgbDmuNlRgFcY3IOochz733TLm693+U/tPIGF1PP+Fxr3btXkEfsEXSg21OpCZKeHdwt227Gx/zHVyLHCnxjIbpjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WtWLl05Yjz6K5VM;
-	Tue, 27 Aug 2024 23:15:11 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id BD348140C9C;
-	Tue, 27 Aug 2024 23:18:26 +0800 (CST)
-Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 27 Aug
- 2024 16:18:26 +0100
-Date: Tue, 27 Aug 2024 16:18:25 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>,
-	<martin.habets@xilinx.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<richard.hughes@amd.com>
-Subject: Re: [PATCH v2 09/15] cxl: define a driver interface for HPA free
- space enumaration
-Message-ID: <20240827161825.0000146b@Huawei.com>
-In-Reply-To: <adcc692e-8819-3741-31d3-d1202cc1b619@amd.com>
-References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
-	<20240715172835.24757-10-alejandro.lucero-palau@amd.com>
-	<20240804185756.000046c5@Huawei.com>
-	<adcc692e-8819-3741-31d3-d1202cc1b619@amd.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1724771971; c=relaxed/simple;
+	bh=XsXTgyfX4lK8uIlF+JZT8a96CuV8addTsgcuxyLMIXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BM9c1n+VEVhELF60MZflvoUW8tui/n5c6YxMyLifjBelr8EFcgSQxTyNoOU/seYu9UEAIz3VB1mW32YsJUwwTKcdjwtwfRsu/w4Ju/7v06rjfmiBV/Qdk3p8plJGUKxqrL9fsvK+pGUQqNcpVqRbMB7msn0bALKEZPG7z/Dbf1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NLKG2Nf7; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724771967;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XsXTgyfX4lK8uIlF+JZT8a96CuV8addTsgcuxyLMIXg=;
+	b=NLKG2Nf7I1oY1D5Lf5OgqR7eHpjWHuj84kdWBhLwQQA55sliz5+EEZtGEhoeeVyLWgXNI3
+	9i7/nqtztFXU/7knGzHzCJQQRpbWg+qqVQLcPzDqV66JTttXkzMBCGg/EPZz8nZy1j05cc
+	k+vOKatstZo/g6zB5Nj9JAPSHkfXYyk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-659-QcAFmtw2OjaFvTEvgJh0sQ-1; Tue, 27 Aug 2024 11:19:25 -0400
+X-MC-Unique: QcAFmtw2OjaFvTEvgJh0sQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-428040f49f9so52918145e9.0
+        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 08:19:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724771964; x=1725376764;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XsXTgyfX4lK8uIlF+JZT8a96CuV8addTsgcuxyLMIXg=;
+        b=OiSJHjJyaeikJ5apfkOS9w7yIY5wlV3F99K85+G7J7oU35uaeqHxEB+sLtCNYpmCcq
+         VaJ4DimxOLoAiqjN0mz+oxmFrQWXqptOUpwX4e7bjUzN/6FvrZPkSbjo5P36tmG8S4wf
+         kuBHEkXhWZeGU7gAKtQIYcXrKRSn7g41rD7Tcqsb6QXIEGGBxLTDxBofYPIArI8IiR1o
+         TOoSG+hlQsiKR30FfmXiuEglTSy0Ikh+wdapXYu975Z59Cu6rcgzAzLD1Yh07ecQQ/II
+         VKB/k1ZZO8OYxS1upe/dwQG2BE5yfN+oH2StjGWE1WQ2XaeanPPUm61cMMZgcW0NW1kx
+         PzcA==
+X-Gm-Message-State: AOJu0Yzw6lk3yI7qhS8KPf/Bu8b0hO6uPB+eDuRLBS7yhDQ9FfNpzsTz
+	e2iJx2CJW6KhLRwltbRrsBHxnE+hcPubxsQKpYL8NpDoeGtB7ndkJcJXQgxlOcRPdgoIgi4lYYv
+	DaGf+8WM7hCrbmA4EZ/NAIEhYnVEPdU8pMpy2rOGAIrpXOqMchL+vDQ==
+X-Received: by 2002:a05:600c:1909:b0:428:1e8c:ff75 with SMTP id 5b1f17b1804b1-42b9ae4b2f4mr20766265e9.35.1724771964527;
+        Tue, 27 Aug 2024 08:19:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEVs7Eq/Lgx0Ec3DmzVYMcg2muWndP6suW1Qn92j1nPKb5gJ8Gdf9ACQzJ78fT4mjD/JVG01w==
+X-Received: by 2002:a05:600c:1909:b0:428:1e8c:ff75 with SMTP id 5b1f17b1804b1-42b9ae4b2f4mr20765965e9.35.1724771963838;
+        Tue, 27 Aug 2024 08:19:23 -0700 (PDT)
+Received: from debian (2a01cb058918ce0010ac548a3b270f8c.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:10ac:548a:3b27:f8c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abeffefcasm229538755e9.45.2024.08.27.08.19.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Aug 2024 08:19:23 -0700 (PDT)
+Date: Tue, 27 Aug 2024 17:19:21 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
+	john.fastabend@gmail.com, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 10/12] ipvlan: Unmask upper DSCP bits in
+ ipvlan_process_v4_outbound()
+Message-ID: <Zs3ueeXcqw47HXa4@debian>
+References: <20240827111813.2115285-1-idosch@nvidia.com>
+ <20240827111813.2115285-11-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240827111813.2115285-11-idosch@nvidia.com>
 
-On Mon, 19 Aug 2024 15:47:48 +0100
-Alejandro Lucero Palau <alucerop@amd.com> wrote:
+On Tue, Aug 27, 2024 at 02:18:11PM +0300, Ido Schimmel wrote:
+> Unmask the upper DSCP bits when calling ip_route_output_flow() so that
+> in the future it could perform the FIB lookup according to the full DSCP
+> value.
 
-> On 8/4/24 18:57, Jonathan Cameron wrote:
-> > On Mon, 15 Jul 2024 18:28:29 +0100
-> > alejandro.lucero-palau@amd.com wrote:
-> >  
-> >> From: Alejandro Lucero <alucerop@amd.com>
-> >>
-> >> CXL region creation involves allocating capacity from device DPA
-> >> (device-physical-address space) and assigning it to decode a given HPA
-> >> (host-physical-address space). Before determining how much DPA to
-> >> allocate the amount of available HPA must be determined. Also, not all
-> >> HPA is create equal, some specifically targets RAM, some target PMEM,
-> >> some is prepared for device-memory flows like HDM-D and HDM-DB, and some
-> >> is host-only (HDM-H).
-> >>
-> >> Wrap all of those concerns into an API that retrieves a root decoder
-> >> (platform CXL window) that fits the specified constraints and the
-> >> capacity available for a new region.
-> >>
-> >> Based on https://lore.kernel.org/linux-cxl/168592149709.1948938.8663425987110396027.stgit@dwillia2-xfh.jf.intel.com/T/#m6fbe775541da3cd477d65fa95c8acdc347345b4f
-> >>
-> >> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> >> Co-developed-by: Dan Williams <dan.j.williams@intel.com>  
-> > Hi.
-> >
-> > This seems a lot more complex than an accelerator would need.
-> > If plan is to use this in the type3 driver as well, I'd like to
-> > see that done as a precursor to the main series.
-> > If it only matters to accelerator drivers (as in type 3 I think
-> > we make this a userspace problem), then limit the code to handle
-> > interleave ways == 1 only.  Maybe we will care about higher interleave
-> > in the long run, but do you have a multihead accelerator today?  
-> 
-> 
-> I would say this is needed for Type3 as well but current support relies 
-> on user space requests. I think Type3 support uses the legacy 
-> implementation for memory devices where initially the requirements are 
-> quite similar, but I think where CXL is going requires less manual 
-> intervention or more automatic assisted manual intervention. I'll wait 
-> until Dan can comment on this one for sending it as a precursor or as 
-> part of the type2 support.
-> 
-> 
-> Regarding the interleave, I know you are joking ... but who knows what 
-> the future will bring. O maybe I'm misunderstanding your comment, 
-> because in my view multi-head device and interleave are not directly 
-> related. Are they? I think you can have a single head and support 
-> interleaving, with multi-head implying different hosts and therefore 
-> different HPAs.
-
-Nothing says they heads are connected to different hosts.
-
-For type 3 version the reason you'd do this is to spread load across
-multiple root ports.  So it's just a bandwidth play and as far
-as the host is concerned they might as well be separate devices.
-
-For accelerators in theory you can do stuff like that but it gets
-fiddly fast and in theory you might care that they are the same
-device for reasons beyond RAS etc and might interleave access to
-device memory across the two heads.
-
-Don't think we care today though, so for now I'd just reject any
-interleaving.
-
-Jonathan
-
- 
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
 
