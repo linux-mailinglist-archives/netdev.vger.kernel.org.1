@@ -1,97 +1,90 @@
-Return-Path: <netdev+bounces-122114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8519E95FF08
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 04:27:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F4295FF16
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 04:30:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5DF31C21241
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 02:27:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B99E1F22D1D
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 02:30:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172BBD53F;
-	Tue, 27 Aug 2024 02:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 293DDD53F;
+	Tue, 27 Aug 2024 02:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hclob048"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3BD42F22;
-	Tue, 27 Aug 2024 02:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE5F17591;
+	Tue, 27 Aug 2024 02:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724725623; cv=none; b=ffPFsSvvkQe5ni6kDDafepsAVT9WKw0Tez0KbAZkv1HOTbBNZVD9TgHiWEyhAvnblJt6a5QkItpsO2yIuDOHekGMtPpBXZA5WcyP5Jvfqerg3EUvhOqCcHLs0uAA6nbpPk1g2FEymAeIac5JtM5lMWKnZxJ3wVFgvCkZoZEPc8c=
+	t=1724725798; cv=none; b=QS5lQZSbGxA8Ui10InOqTpOF7R+mxSE+dMdlCMEVUr7czyf3IFyvsKoSclohXKv+FlwBTvcTTrh/w1lPdQGv1MZI8tmWOMLxLsFgpJ6hUvKp8AclpYNsaccK3dvCP2L2sIHhChgOqWWQgpJPNIE8JqqeFLrCD8F7NN8z1nj4JAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724725623; c=relaxed/simple;
-	bh=mJpuWRN2/KVNYIZc4DMCkFGWK3cbP0/fORT0G8AUU80=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MuUc7QOTVhFdNGLVLaKrl+QbX0fMaXX6D8qhMtV+MsAmApKyUZFfRAhNoOMWsuPuqMYxuj5L7pvXbjfQhSGRMnP82GuXV2rPYBm14zsToCIhqL9op+gT9FjC9PWnbh+00PvW4wy7Y32qDkpBlUUA/aHJose4vKVDSz/TD8hc4P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.243.244.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid:Yeas11t1724725598t810t55324
-Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.120.181.182])
-X-QQ-SSF:00400000000000F0FVF000000000000
-From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
-X-BIZMAIL-ID: 5366385585134687173
-To: "'Jarkko Nikula'" <jarkko.nikula@linux.intel.com>,
-	<andi.shyti@kernel.org>,
-	<andriy.shevchenko@linux.intel.com>,
-	<mika.westerberg@linux.intel.com>,
-	<jsd@semihalf.com>,
-	<davem@davemloft.net>,
-	<edumazet@google.com>,
-	<kuba@kernel.org>,
-	<pabeni@redhat.com>,
-	<rmk+kernel@armlinux.org.uk>,
-	<piotr.raczynski@intel.com>,
-	<andrew@lunn.ch>,
-	<linux-i2c@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-Cc: <mengyuanlou@net-swift.com>,
-	<duanqiangwen@net-swift.com>
-References: <20240823030242.3083528-1-jiawenwu@trustnetic.com> <cacbd4a1-1e7f-4067-95ad-215dde7eedcc@linux.intel.com>
-In-Reply-To: <cacbd4a1-1e7f-4067-95ad-215dde7eedcc@linux.intel.com>
-Subject: RE: [PATCH net 0/3] Add I2C bus lock for Wangxun
-Date: Tue, 27 Aug 2024 10:26:37 +0800
-Message-ID: <021001daf828$8b4cd6e0$a1e684a0$@trustnetic.com>
+	s=arc-20240116; t=1724725798; c=relaxed/simple;
+	bh=7k4gb/RyJ7mSJ3IzlGHqF/WYxxP6KqEPsos34rR0RS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ELK4sv0KVglOfbNGPN3nBCfXNfLEpQYv7H+bt+HsybDTNPv96lNtMIKdRF+gsDckN5wy1l+9hArBeRwkJK9/QCX2UfbLkSkxMRKIk0Po9jl2Rf0MbH2NTDckDJuJKHkpLeBE5/VMilMOVhuQ0lAuq9aZxIjCq83KqQBBR/TrVec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hclob048; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE151C8B7A4;
+	Tue, 27 Aug 2024 02:29:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724725797;
+	bh=7k4gb/RyJ7mSJ3IzlGHqF/WYxxP6KqEPsos34rR0RS8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Hclob048UdBCgo/uKFC9M9XLyraGmd8WhMcAXUk5+RxQEvQK31hkjOgKXCPBEPels
+	 CHnsRYC/0NToLTfJR29w6k1ytIxV+9SruFPOCklgVpNxn5u/O1YE7I2E84lZ5dA2Hr
+	 DstHALYp+ar4zsiD3IUJ31MK3fwTfYeT64xL5J5V5XBXLZeUl7ZhGfiHUjF2U7TcTA
+	 p3iRVY9dNufqmlol7VLcbnTlokvaum4v+PiR+5kwi8px7TMNFtU+e7wfYouzQhbx4Z
+	 9+ca4+ddW11/LL+Z0sOGYfHLIgzVXC2JrF6xK+VDhN9oxrleYpmbNCCegEZWtCbG3r
+	 f1q3yr9A0X7Pw==
+Date: Mon, 26 Aug 2024 19:29:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, Geliang
+ Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Florian Westphal <fw@strlen.de>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, stable@vger.kernel.org, =?UTF-8?B?QXI=?=
+ =?UTF-8?B?xLFuw6cgw5xOQUw=?= <arinc.unal@arinc9.com>,
+ syzbot+455d38ecd5f655fc45cf@syzkaller.appspotmail.com
+Subject: Re: [PATCH net 00/15] mptcp: more fixes for the in-kernel PM
+Message-ID: <20240826192955.3dbb469d@kernel.org>
+In-Reply-To: <20240826-net-mptcp-more-pm-fix-v1-0-8cd6c87d1d6d@kernel.org>
+References: <20240826-net-mptcp-more-pm-fix-v1-0-8cd6c87d1d6d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: zh-cn
-Thread-Index: AQH8I/V4PrHZ+O/IFu6cfIurHK/3+gIePC5ksecWBcA=
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-On Fri, Aug 23, 2024 7:05 PM, Jarkko Nikula wrote:
-> Hi
-> Hi
-> 
-> On 8/23/24 6:02 AM, Jiawen Wu wrote:
-> > Sometimes the driver can not get the SFP information because the I2C bus
-> > is accessed by the firmware at the same time. So we need to add the lock
-> > on the I2C bus access. The hardware semaphores perform this lock.
-> >
-> > Jiawen Wu (3):
-> >    net: txgbe: add IO address in I2C platform device data
-> >    i2c: designware: add device private data passing to lock functions
-> >    i2c: designware: support hardware lock for Wangxun 10Gb NIC
-> >
-> I was wondering the Fixes tag use in the series. Obviously patchset is
-> not fixing a regression so question is what happens when issue occurs?
-> 
-> I don't think e.g. failing I2C transfer with an error code yet qualifies
-> backporting into Linux stable?
+On Mon, 26 Aug 2024 17:58:59 +0200 Matthieu Baerts (NGI0) wrote:
+> Matthieu Baerts (NGI0) (15):
+>       mptcp: pm: reuse ID 0 after delete and re-add
+>       mptcp: pm: fix RM_ADDR ID for the initial subflow
+>       selftests: mptcp: join: check removing ID 0 endpoint
+>       mptcp: pm: send ACK on an active subflow
+>       mptcp: pm: skip connecting to already established sf
+>       mptcp: pm: reset MPC endp ID when re-added
+>       selftests: mptcp: join: check re-adding init endp with != id
+>       selftests: mptcp: join: no extra msg if no counter
+>       mptcp: pm: do not remove already closed subflows
+>       mptcp: pm: fix ID 0 endp usage after multiple re-creations
+>       selftests: mptcp: join: check re-re-adding ID 0 endp
+>       mptcp: avoid duplicated SUB_CLOSED events
+>       selftests: mptcp: join: validate event numbers
+>       mptcp: pm: ADD_ADDR 0 is not a new address
+>       selftests: mptcp: join: check re-re-adding ID 0 signal
 
-Ah, I think this was a leftover bug from when I added Wangxun NIC support
-in I2C designware, so I added a fix tag.
-
-
+The debug runner is failing mptcp-join-sh fairly consistently with
+these applied :(
+-- 
+pw-bot: cr
 
