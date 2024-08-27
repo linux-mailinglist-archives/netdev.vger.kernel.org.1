@@ -1,118 +1,115 @@
-Return-Path: <netdev+bounces-122253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC7D96086D
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:21:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC509960872
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:21:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7163B1C22367
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:21:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7754A1F232CA
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 11:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74991A01B7;
-	Tue, 27 Aug 2024 11:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D22119FA7E;
+	Tue, 27 Aug 2024 11:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZsxPebU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XXBB7A6z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2179B1A0720
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 11:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C856619EED8;
+	Tue, 27 Aug 2024 11:21:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724757607; cv=none; b=d1GcmmxZ/r1o1iNXts13eD8RwcFIyzsx5Rq8+N4qD7/Vwdh7NmlYeyrB0pfH/Uv7GmP4Ga7gs/WboWVp2yA+dhRtzh+t5vhm0rLf6YPJzFEGqHsbkWAZQAfbkGzsdANkAwK11eEMmBRvl5dwvqAOBU1CJQnZLOfwohGMb5hN0FM=
+	t=1724757682; cv=none; b=BqDG3ZKZTv9wyKWvG3plRG/R/9rHUrPF0a0jVVhmGalbMpqoWMF+JmhU/8Kqub71hN4TfGEhVZnFh5u2578iVV9w52fADwxe7v2GTSol/y1XuDnbu5pNroUApiMo9OPoru8474JTxxCNE84AG4ZW3c4UdvfmfPX05yqw9btCEBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724757607; c=relaxed/simple;
-	bh=zPTMEjhHKawSK0fVOh5cFY/m0zfy2MzI2cerjKHrAxs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YXtfUH8M/9WN7xwruAgeBvooiUkJwsaFfJmUgKJ2aQ3SKx85nHYT+I6D8dntKOjosBSbT/SFDq8r3VXypwDHiDe5uDbDep1EuGe0wbCHiRCI9rUt8MXrR/2HuGnnXNdAeHyNFPdZl7BmV8wa3JH6NZ8/vOeoAvGV6yGo33qkOpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cZsxPebU; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724757604;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MECBd/hSEibWGsRQlj3xvU/VnK1E0855dY6x5mvZ7gA=;
-	b=cZsxPebUTcTccSil891HpRKkkxE9xMsSmYdGVUTikml66Dh0ix5Fx8Inm/9izE9BPBytit
-	ZxrPx+0rKcjbhSVO0PsxjZtfERMxFxBXp0ScOBD/cg/JU8iWTMgcMgv1+DmvLS2/9E7ZIg
-	zpvv0CCQpacFDqFo/o7wTrP5uwEu3Jg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-112-SLwU-bPbNhCpacHZKEQb2g-1; Tue, 27 Aug 2024 07:20:03 -0400
-X-MC-Unique: SLwU-bPbNhCpacHZKEQb2g-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37189fa7ad6so3889311f8f.0
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 04:20:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724757602; x=1725362402;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MECBd/hSEibWGsRQlj3xvU/VnK1E0855dY6x5mvZ7gA=;
-        b=FBbrrhUQGxgLVjIWlmIdLHeF6dATGrTzN5ADSMoor4CMaVnYwjzm1+HAIKjuWNEvjH
-         rVDW9vfJd33VBhX7dp58ENvXc62o1elTVegtux8lpLgyFg2YxQu7/nfHSSX4fW2/tL22
-         /WXN8GDqfS3K1qhG0QtkdRumeVAP4jRrEJeJNOUJxoamRl7U/AlxT/r3HhdeDJ/X2c/T
-         B4XtE6Q4vcZ8vr6CaEmdLXw0BO7TFpGJoAShqXWUxSEjOk7A149VBoa0NJfQsrknR4Vz
-         a8yjPanRv3LvlUZAAnUl9VWS+1VEDZz3PYY6Yd3XLvZ5n4DRJhPxdAK3xmR0XUYQ2Yah
-         cLGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUcfAuhCCFdAl5klmIpn748xD6ckURm0qGjmv8Gi91Pm6Pw0ypwfZhz1aeIGBPiJ225zATlUKA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZyQ+iZjDuw+K2RSaZ4Z1DrHeRCMuulnqeoDfH9yLUbV9fAG9B
-	2pOIr8U/BJ+23eFx5J0H5LbjpqlxfMka/SfX5qOdCODLzzgAiVttP23OrRn481ZYS5CRcsrAduN
-	SPjqpv6gGokEZVidaE8hhOrs8A3qOeLh11IztdPUrP2b1LXK+rAmH9A==
-X-Received: by 2002:a5d:4e10:0:b0:371:8e9c:e608 with SMTP id ffacd0b85a97d-373118e3327mr10656422f8f.52.1724757602100;
-        Tue, 27 Aug 2024 04:20:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFYvhXTuSl+sI44eFe058b0E+jARsnoT9juypCVTahh5G9OkBjlQCUYH8EuqxJDKhKuXE431g==
-X-Received: by 2002:a5d:4e10:0:b0:371:8e9c:e608 with SMTP id ffacd0b85a97d-373118e3327mr10656385f8f.52.1724757601665;
-        Tue, 27 Aug 2024 04:20:01 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b67:7410::f71? ([2a0d:3344:1b67:7410::f71])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730813c459sm12768823f8f.27.2024.08.27.04.20.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Aug 2024 04:20:01 -0700 (PDT)
-Message-ID: <fd2a06d5-370f-4e07-af84-cab089b82a4b@redhat.com>
-Date: Tue, 27 Aug 2024 13:19:59 +0200
+	s=arc-20240116; t=1724757682; c=relaxed/simple;
+	bh=jWPWjj/QHeIOYfp+cU6ccjLZvWK9LQKjVbvraTonCe0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ruyNWVgRu+vxNOcFs/9B9sRPRj/DLr3VNpy2MT3UjIa/eVC3gObFFAWJick0kksT4AhpiX3cHUDIv9LgvCqKLaD8CDrmPG94+9av4Tmmytrq8AvgZoA750Fn8kjXVItVW80AAdum3f4nu55q2+Aum4xVuCLu4Eg6jGqmb8VXRz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XXBB7A6z; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=yDxLqgwteaSZePjmW3+flmjAobg0eTLuPPhZim1kmZA=; b=XXBB7A6zsvYdQLmrtTL5cjKH4+
+	o7nFXQ+RcxH/TYawgNqYmAmFxT+yQf9lgKHF+p2IqljkPII8baGMoM0fq8L3C/ktR50tAqmAPlYAB
+	Nl5kSLd8yHbacHqh81V0Tm6FkhjmpDnup6plOzzLu0u8Jk6bad5FgHOC8vUOnK0FETXuTrfAd1ehf
+	a+I1tCTCMF7wUgW12HbaIM7Dlp0KLBNgpJFw/DnuoRo0/9rxbD4SWNBaP+rLqrfwnG5+EODc6kwR9
+	Umoyf3Vv+EI/Ndl74PXdrdJhhFIXcWSzjFfJizANa+NHugoqUJAcwomOKz/Z9ewOzseO7WH6n4p4m
+	b/wyneqQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58266)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1siuFn-0006rq-1T;
+	Tue, 27 Aug 2024 12:20:51 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1siuFg-0003OM-1i;
+	Tue, 27 Aug 2024 12:20:44 +0100
+Date: Tue, 27 Aug 2024 12:20:44 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Yangtao Li <frank.li@vivo.com>
+Cc: clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com,
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, ulli.kroll@googlemail.com,
+	linus.walleij@linaro.org, marcin.s.wojtas@gmail.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com, hkallweit1@gmail.com,
+	u.kleine-koenig@pengutronix.de, jacob.e.keller@intel.com,
+	justinstitt@google.com, sd@queasysnail.net, horms@kernel.org,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [net-next v3 1/9] net: stmmac: dwmac-intel-plat: Convert to
+ devm_clk_get_enabled()
+Message-ID: <Zs22jHBb1ztHbXDq@shell.armlinux.org.uk>
+References: <20240827095712.2672820-1-frank.li@vivo.com>
+ <20240827095712.2672820-2-frank.li@vivo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/xen-netback: prevent UAF in xenvif_flush_hash()
-To: Jeongjun Park <aha310510@gmail.com>, wei.liu@kernel.org, paul@xen.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- madhuparnabhowmik04@gmail.com, xen-devel@lists.xenproject.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240822181109.2577354-1-aha310510@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240822181109.2577354-1-aha310510@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240827095712.2672820-2-frank.li@vivo.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 8/22/24 20:11, Jeongjun Park wrote:
-> During the list_for_each_entry_rcu iteration call of xenvif_flush_hash,
-> kfree_rcu does not exist inside the rcu read critical section, so if
+On Tue, Aug 27, 2024 at 03:57:04AM -0600, Yangtao Li wrote:
+>  	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+> -	if (ret) {
+> -		clk_disable_unprepare(dwmac->tx_clk);
+> +	if (ret)
+>  		return ret;
+> -	}
+>  
+>  	return 0;
 
-The above wording is confusing, do you mean "kfree_rcu does not exit 
-from "...?
+Please head off the next "cleanup" patch that someone has to review,
+which will be to convert this to:
 
-> kfree_rcu is called when the rcu grace period ends during the iteration,
-> UAF occurs when accessing head->next after the entry becomes free.
+	return stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
 
-The loop runs with irq disabled, the RCU critical section extends over 
-it, uninterrupted.
+When doing cleanups, don't _create_ new opportunities for cleanups.
+Always try to write the best replacement code. This reduces the
+burden on reviewers - and we need the burden on reviewers to be
+minimised because there's relatively few of them compared to the
+number of people generating patches.
 
-Do you have a splat for the reported UAF?
+-- 
+*** please note that I probably will only be occasionally responsive
+*** for an unknown period of time due to recent eye surgery making
+*** reading quite difficult.
 
-This does not look the correct solution.
-
-Thanks,
-
-Paolo
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
