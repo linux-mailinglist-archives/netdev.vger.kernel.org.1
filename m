@@ -1,94 +1,130 @@
-Return-Path: <netdev+bounces-122138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B43C96007C
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 06:47:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 09DD6960083
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 06:52:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17397B2226B
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 04:47:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D8C3B21276
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 04:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BC78289C;
-	Tue, 27 Aug 2024 04:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WaMBG4br"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9757C84D3E;
+	Tue, 27 Aug 2024 04:51:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC50481AD2;
-	Tue, 27 Aug 2024 04:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25D4174413
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 04:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724733907; cv=none; b=BIWgW+o+QH2v5PGZ/fgHVt3OEQzdSCq9QSK2xWEgzMb9Y0g/B8GHsJbjOZGCoeh15SMNHxPOwQu0zoObWZDalb3MEjZa3tLOtUKrARKBTM+TElWxq63gnjZoNEnHSuRnLORzcDjMFAB4GEJ+M43Z7X8RrYxRacgPDO3Rdj3XX8Q=
+	t=1724734309; cv=none; b=uju/Rp3NGUM8Io4sm7N8kDllHLS87wD4jEgf3ugyPGQbPdmhPMpdVVvCyjvYVuYoHJKvBSjoTlQ/lxNXEsUgZju/v1XBiNrV0kzjBqhYqGupYcXJNVJNU6ZGwo2AsHolcPSKRMR5Z3fG8EKdPWJy31SHHAy+rHiMPrjPWO8s3w4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724733907; c=relaxed/simple;
-	bh=/ZD5rwjaxXCN0zfj/hf6KqnnV/iyGMI7aLUbK8uMiT4=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=kqlt80MN1LhD3OPmT8RI5bOoeUJUj1qMERXzAL9ecFCeKUWhvPHW3DbUeYTLF+kuN35R6al654d5pBleDj9nL3dlafjdEz9kyWqTEhVzsT2y6aAblSpMQI+QunJvOF9Pwt9th7Jl6hpUmbgF7alPOByC2NFoScfI/BLzsWMgIIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WaMBG4br; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87663C8B7CA;
-	Tue, 27 Aug 2024 04:45:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724733907;
-	bh=/ZD5rwjaxXCN0zfj/hf6KqnnV/iyGMI7aLUbK8uMiT4=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=WaMBG4br++PWiQKr6fJqoaodBynD4Np+AfGYkLbbU7skB9WfQSLwVUKdbVx/a/gvm
-	 /CoimdXgqVH0RVKeOv5cPF8k6+ghYTUKDz057Dd5CnavKPmfKmjeS3frSQkIiqY+fq
-	 c9dqfTPEf+aL1PKYSWNZqAIt/MjxEQ1sDq3vpW0fNG1TIhir8Zt+8l2bcSmFMxoQxf
-	 DQ+cPiYA11FaVY2g+B/TrW6TFdHTb1nzPnU/8BIUfzlDVDZFn8M8Go7XyM3EySm728
-	 Vo9nduXL/I/djYlOAQziKBEQvjSqY90JwksLYEBesTAkiWsCSRFev8FZDRD/8kEX22
-	 I3+PSmbqIx2hA==
-From: Kalle Valo <kvalo@kernel.org>
-To: Hongbo Li <lihongbo22@huawei.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,  <johannes@sipsolutions.net>,
-  <davem@davemloft.net>,  <edumazet@google.com>,  <pabeni@redhat.com>,
-  <allison.henderson@oracle.com>,  <dsahern@kernel.org>,
-  <pshelar@ovn.org>,  <linux-wireless@vger.kernel.org>,
-  <netdev@vger.kernel.org>,  <rds-devel@oss.oracle.com>,
-  <dccp@vger.kernel.org>,  <dev@openvswitch.org>,
-  <linux-afs@lists.infradead.org>
-Subject: Re: [PATCH net-next 0/8] Use max/min to simplify the code
-References: <20240824074033.2134514-1-lihongbo22@huawei.com>
-	<20240826144404.03fce39c@kernel.org>
-	<4a92bb68-7fe7-4bf2-885f-e07b06ea82aa@huawei.com>
-Date: Tue, 27 Aug 2024 07:45:02 +0300
-In-Reply-To: <4a92bb68-7fe7-4bf2-885f-e07b06ea82aa@huawei.com> (Hongbo Li's
-	message of "Tue, 27 Aug 2024 10:57:06 +0800")
-Message-ID: <878qwifub5.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1724734309; c=relaxed/simple;
+	bh=rk1ILzNR9aZcVW4we80tUSCcb66iRVn+P15SZ3FPF7Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t6crZr9CT7u4kyvSqSDtIuaFv4Xn9qW4/kmaa1l8tgF6+eN3Sqc35OXyIUa1UxkMMvh7IAYDYlOd1CZpK3xQMhUd03NYSiQ15bwi+3kmmf5wRx/qfev6rflmHORKi2xnCttWUgL79Eqlo4ui7KxNri/N6FfY7zqJtkV806ulikE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sioAz-00055m-As; Tue, 27 Aug 2024 06:51:29 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sioAx-003LV2-L4; Tue, 27 Aug 2024 06:51:27 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sioAx-008ohO-1h;
+	Tue, 27 Aug 2024 06:51:27 +0200
+Date: Tue, 27 Aug 2024 06:51:27 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/3] phy: open_alliance_helpers: Add defines
+ for link quality metrics
+Message-ID: <Zs1bT7xIkFWLyul3@pengutronix.de>
+References: <20240822115939.1387015-1-o.rempel@pengutronix.de>
+ <20240822115939.1387015-2-o.rempel@pengutronix.de>
+ <20240826093217.3e076b5c@kernel.org>
+ <4a1a72f5-44ce-4c54-9bc5-7465294a39fe@lunn.ch>
+ <20240826125719.35f0337c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240826125719.35f0337c@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hongbo Li <lihongbo22@huawei.com> writes:
+Hi Jakub,
 
-> On 2024/8/27 5:44, Jakub Kicinski wrote:
->> On Sat, 24 Aug 2024 15:40:25 +0800 Hongbo Li wrote:
->>> Many Coccinelle/coccicheck warning reported by minmax.cocci
->>> in net module, such as:
->>>          WARNING opportunity for max()
->>>          WARNING opportunity for min()
->>>
->>> Let's use max/min to simplify the code and fix these warnings.
->>> These patch have passed compilation test.
->> This set does not build.
->> 
-> Do you mean some patches will go to other branches (such as mac80211)?
+On Mon, Aug 26, 2024 at 12:57:19PM -0700, Jakub Kicinski wrote:
+> On Mon, 26 Aug 2024 19:12:52 +0200 Andrew Lunn wrote:
+> > > If these are defined by a standard why not report them as structured
+> > > data? Like we report ethtool_eth_mac_stats, ethtool_eth_ctrl_stats,
+> > > ethtool_rmon_stats etc.?  
+> > 
+> > We could do, but we have no infrastructure for this at the
+> > moment. These are PHY statistics, not MAC statistics.
+> > We don't have all the ethool_op infrastructure, etc.
+> 
+> This appears to not be a concern when calling phy_ops->get_sset_count()
+> You know this code better than me, but I can't think of any big 'infra'
+> that we'd need. ethtool code can just call phy_ops, the rest is likely
+> a repeat of the "MAC"/ethtool_ops stats.
+> 
+> > We also need to think about which PHY do we want the statics from,
+> > the bootlin code for multiple PHYs etc.
+> 
+> True, that said I'd rather we added a new group for the well-defined
+> PHY stats without supporting multi-PHY, than let the additional
+> considerations prevent us from making progress. ioctl stats are
+> strictly worse.
+> 
+> I'm sorry to pick on this particular series, but the structured ethtool
+> stats have been around for 3 years. Feels like it's time to fill the
+> gaps on the PHY side.
 
-Jakub means that your patchset had compilation errors, see the red on
-patchwork:
+I completely agree with you, but I currently don't have additional
+budget for this project.
 
-https://patchwork.kernel.org/project/netdevbpf/list/?series=882901&state=*&order=date
+What might help is a diagnostic concept that I can present to my
+customers to seek sponsorship for implementing various interfaces based
+on their relevance and priority for different projects.
 
+Since I haven't seen an existing concept from the end product or
+component vendors, I suggest starting this within the Linux Kernel
+NetDev community.
+
+I'll send my current thoughts in a separate email
+
+Regards,
+Oleksij
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
