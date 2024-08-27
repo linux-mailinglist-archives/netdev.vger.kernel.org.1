@@ -1,71 +1,48 @@
-Return-Path: <netdev+bounces-122443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CFEF961599
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 19:36:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E60B9615AC
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 19:40:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 313811C22C31
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 17:36:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AB37284643
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 17:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51B551CF298;
-	Tue, 27 Aug 2024 17:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABEB71D0DC6;
+	Tue, 27 Aug 2024 17:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b="H3R5Cia2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s6s2BhPk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74D9A1C57B3
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 17:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB601CDA3C;
+	Tue, 27 Aug 2024 17:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724780200; cv=none; b=uC5WTJ//TsfeeNKZ27TGiPH7S+kuAZ/OgebL9PKRb4CpOp3KnHrTkivFSVTP6rSLPOokKjbIRk84y1tbly5P+oB5txUbpbsNuLnnzUXp+fJUDQmkMyeCT11Zt+Amu+0rFcJO66S7Vmj/+ON2E8k4cuBIu+nF48MF3BjsbrlEmTI=
+	t=1724780452; cv=none; b=To6j6Dpn6xcrJZG3ZNYw7pmd4G5K9+A1ZrMjv/uB76MKl8rMir83N4nRDE29ypH2MJtDJdEHUah3YEsv5KUvasAU3NrANlGwg7RbalOt/wvBfAWKvnC463wPa9Cmn4vNq2+XDuC0jEiSLCyCecSJZg7kDilZbEFtaqINtP9p2FY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724780200; c=relaxed/simple;
-	bh=zdcEuao6Yueq9nynqlojGySRjewdllFC1HqW1BdVgew=;
+	s=arc-20240116; t=1724780452; c=relaxed/simple;
+	bh=vKSmcgOEjetGAkb2pcZR15D4OHVKyQNwnp0Q6FyfbPo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UUeMC3zHC+yAC3QCnuq/r+vBLp0nDynTgTIj/lhYR9NxzAbCpr6DsrD7AnfsZPxqpL+Des7CRvFsgQH4CPDwV7o3FElbj7oF3n2d4d7UXghylWfDR/nOTjYmq/b9CvjmKCtak7RzJqjOtf9SfrklQCiXxY85wSN+hs1wG0QhJFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com; spf=pass smtp.mailfrom=digitalocean.com; dkim=pass (1024-bit key) header.d=digitalocean.com header.i=@digitalocean.com header.b=H3R5Cia2; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=digitalocean.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digitalocean.com
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e116d2f5f7fso5049004276.1
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 10:36:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=digitalocean.com; s=google; t=1724780197; x=1725384997; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z6qsGfI7hgSvO5zF/HF4LG2tjSgMq9IY878EP4P7OTw=;
-        b=H3R5Cia2ZpMHDajPSSWAITsxYWASjarMiL+G320hw37hzLzAqCFKluquBb6kfoFrT5
-         3CxuLuVR2WLn8gZy2dUG5Bu8bKZtOC4d6lBKzp2mG0Ah58mI/I/P8BHfkR+YQMdCBaqq
-         p8+7kVPHwX0mJMbCj2FufMoOwFlCEMqCC/iKQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724780197; x=1725384997;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z6qsGfI7hgSvO5zF/HF4LG2tjSgMq9IY878EP4P7OTw=;
-        b=Kqf2o0dJjPjOCJKsNhfbHx/iItyjmHGe46yLIk3Su2wGxAPcl1+ourk+MYuY1zEN1U
-         Cyj7KdZWquqbt+67c8PdQzrhVfTUzOYglZiiB5gsNHR7wh3ZDDD9w+ccx1woO7NLCu6O
-         hp6o94bc2ky6vkESi+R3FZEa0mySELReAsWk2Rt8h68qaxeBEgN0B5vNgu98u8A1nkBS
-         hNyoGOfwd/zFjiRkmDXEUJzl5f0lazoHqmbB22BIgpXKpuThEvMmJ/HjsFc+6Zfs6JMS
-         bAas+/LarXqmuZhZwArDYzsR6DBdJFSbyV1C5P5988wc4JfJheKv7fv4a/3Xv+LIGX21
-         AORg==
-X-Forwarded-Encrypted: i=1; AJvYcCUdpGDhtneD7djSCwefam6Hy3fWSGMCbJXcaCIvGvSvi+14buG8FHSBYyKt3kcHsuuT/bDW6uU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGeTZZqJUk7VzPIT3OosFjYJb/7YtSAtlrpNOgx6XLCIN2AXnZ
-	ngO+xngJL8SFYIiYMPA3gZdjbu42b/LF9ksjHIPQaBH+62ROS8oFqLzBEydepnA=
-X-Google-Smtp-Source: AGHT+IEfVdmQhipnsiOiT6VThaW7IpCX0ncY4BPR8r+WLzd9JbFk7D8SGhOB6tc17o/phjE//9pqUw==
-X-Received: by 2002:a05:6902:1883:b0:e0e:83e1:d1 with SMTP id 3f1490d57ef6-e1a29824acemr3606390276.20.1724780197226;
-        Tue, 27 Aug 2024 10:36:37 -0700 (PDT)
-Received: from ?IPV6:2603:8080:7400:36da:45f:f211:3a7c:9377? ([2603:8080:7400:36da:45f:f211:3a7c:9377])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e178e4b71bbsm2622725276.37.2024.08.27.10.36.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Aug 2024 10:36:36 -0700 (PDT)
-Message-ID: <d3115e7a-6bd0-4d6d-b759-05c9b227013b@digitalocean.com>
-Date: Tue, 27 Aug 2024 12:36:35 -0500
+	 In-Reply-To:Content-Type; b=nnC42r+48ipGa1IjFjNFm6PoOtkMdaMp6gjeHyGbSo9FDNY2PR/3/7ldA8xsVOH6Aup6hmjUcakSbVLp6pZBDpshAz3Mn7KQctImAeEhcr9XlxmIek6mldTNaF75nztsTVL/Bswct4pSpRAxnaHJdN453odwTTsYN1jF49csdZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s6s2BhPk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B66E0C4FE9F;
+	Tue, 27 Aug 2024 17:40:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724780452;
+	bh=vKSmcgOEjetGAkb2pcZR15D4OHVKyQNwnp0Q6FyfbPo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=s6s2BhPkOSE1W/ULOqKXjM2Zq5mClDvCuoolvkfGlJ3WsDm8L8JgBDXffx2I4dOZa
+	 n+3hMd9538dViXIpc1a2A+yBektUNKqD2uG/DJhka5vdYGh7eCuCHsIybl6JeFJ7y7
+	 S9xMAZN7OviEPvVihkgpkGvJVxTS0zsAPZ9fUGuo5eeb0tWMWKaZghFLj/7gZdzLP1
+	 LlEY/gax9ejsoK5kpEFekhWhA5KyCrPIbGSVdWWOHxOjGRFVmSfZVXgiirLLA4B0iX
+	 Mh2FlTlq9XN0FU9Y8HAqmZ62+eYZu7mxP+Oy72TjqZJcaU3ceOdhp4PtAXrlv9rWCt
+	 wKVgsGMhem9hA==
+Message-ID: <b008ca92-419a-47d0-97d7-2bddaba75d3c@kernel.org>
+Date: Tue, 27 Aug 2024 19:40:44 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,175 +50,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
-To: Jason Wang <jasowang@redhat.com>
-Cc: Dragos Tatulea <dtatulea@nvidia.com>, eli@mellanox.com, mst@redhat.com,
- xuanzhuo@linux.alibaba.com, virtualization@lists.linux-foundation.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
- eperezma@redhat.com, sashal@kernel.org, yuehaibing@huawei.com,
- steven.sistare@oracle.com
-References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
- <afcbf041-7613-48e6-8088-9d52edd907ff@nvidia.com>
- <8a15a46a-2744-4474-8add-7f6fb35552b3@digitalocean.com>
- <2a1a4dfb-aef1-47c1-81ce-b29ed302c923@nvidia.com>
- <1cb17652-3437-472e-b8d5-8078ba232d60@digitalocean.com>
- <CACGkMEvbc_4_KrnkZb-owH1moauntBmoKhHp1tsE5SL4RCMPog@mail.gmail.com>
+Subject: Re: [PATCH v3 1/5] dt-bindings: wireless: wilc1000: Document WILC3000
+ compatible string
+To: Marek Vasut <marex@denx.de>, linux-wireless@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Adham Abozaeid <adham.abozaeid@microchip.com>,
+ Ajay Singh <ajay.kathat@microchip.com>,
+ =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
+ <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240827164042.53698-1-marex@denx.de>
+From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
-From: Carlos Bilbao <cbilbao@digitalocean.com>
-In-Reply-To: <CACGkMEvbc_4_KrnkZb-owH1moauntBmoKhHp1tsE5SL4RCMPog@mail.gmail.com>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240827164042.53698-1-marex@denx.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 27/08/2024 18:37, Marek Vasut wrote:
+> Document compatible string for the WILC3000 chip. The chip is similar
+> to WILC1000, except that the register layout is slightly different and
+> it does not support WPA3/SAE.
+> 
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> ---
 
-On 8/26/24 9:07 PM, Jason Wang wrote:
-> On Tue, Aug 27, 2024 at 3:23 AM Carlos Bilbao <cbilbao@digitalocean.com> wrote:
->> Hello,
->>
->> On 8/26/24 10:53 AM, Dragos Tatulea wrote:
->>> On 26.08.24 16:26, Carlos Bilbao wrote:
->>>> Hello Dragos,
->>>>
->>>> On 8/26/24 4:06 AM, Dragos Tatulea wrote:
->>>>> On 23.08.24 18:54, Carlos Bilbao wrote:
->>>>>> Hello,
->>>>>>
->>>>>> I'm debugging my vDPA setup, and when using ioctl to retrieve the
->>>>>> configuration, I noticed that it's running in half duplex mode:
->>>>>>
->>>>>> Configuration data (24 bytes):
->>>>>>   MAC address: (Mac address)
->>>>>>   Status: 0x0001
->>>>>>   Max virtqueue pairs: 8
->>>>>>   MTU: 1500
->>>>>>   Speed: 0 Mb
->>>>>>   Duplex: Half Duplex
->>>>>>   RSS max key size: 0
->>>>>>   RSS max indirection table length: 0
->>>>>>   Supported hash types: 0x00000000
->>>>>>
->>>>>> I believe this might be contributing to the underperformance of vDPA.
->>>>> mlx5_vdpa vDPA devicess currently do not support the VIRTIO_NET_F_SPEED_DUPLEX
->>>>> feature which reports speed and duplex. You can check the state on the
->>>>> PF.
->>>> According to ethtool, all my devices are running at full duplex. I assume I
->>>> can disregard this configuration output from the module then.
->>>>
->>> Yep.
->>>
->>>>>> While looking into how to change this option for Mellanox, I read the following
->>>>>> kernel code in mlx5_vnet.c:
->>>>>>
->>>>>> static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
->>>>>>                  unsigned int len)
->>>>>> {
->>>>>>     /* not supported */
->>>>>> }
->>>>>>
->>>>>> I was wondering why this is the case.
->>>>> TBH, I don't know why it was not added. But in general, the control VQ is the
->>>>> better way as it's dynamic.
->>>>>
->>>>>> Is there another way for me to change
->>>>>> these configuration settings?
->>>>>>
->>>>> The configuration is done using control VQ for most things (MTU, MAC, VQs,
->>>>> etc). Make sure that you have the CTRL_VQ feature set (should be on by
->>>>> default). It should appear in `vdpa mgmtdev show` and `vdpa dev config
->>>>> show`.
->>>> I see that CTRL_VQ is indeed enabled. Is there any documentation on how to
->>>> use the control VQ to get/set vDPA configuration values?
->>>>
->>>>
->>> You are most likely using it already through through qemu. You can check
->>> if the CTR_VQ feature also shows up in the output of `vdpa dev config show`.
->>>
->>> What values are you trying to configure btw?
->>
->> Yes, CTRL_VQ also shows up in vdpa dev config show. There isn't a specific
->> value I want to configure ATM, but my vDPA isn't performing as expected, so
->> I'm investigating potential issues. Below is the code I used to retrieve
->> the configuration from the driver; I'd be happy to send it as a patch if
->> you or someone else reviews it.
->>
->>
->>> Thanks,
->>> Dragos
->>
->> Thanks,
->> Carlos
->>
->> ---
->>
->> From ab6ea66c926eaf1e95eb5d73bc23183e0021ee27 Mon Sep 17 00:00:00 2001
->> From: Carlos Bilbao <bilbao@vt.edu>
->> Date: Sat, 24 Aug 2024 00:24:56 +0000
->> Subject: [PATCH] mlx5: Add support to update the vDPA configuration
->>
->> This is needed for VHOST_VDPA_SET_CONFIG.
->>
->> Signed-off-by: Carlos Bilbao <cbilbao@digitalocean.com>
->> ---
->>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 22 ++++++++++++++++++++--
->>  1 file changed, 20 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> index b56aae3f7be3..da31c743b2b9 100644
->> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
->> @@ -2909,14 +2909,32 @@ static void mlx5_vdpa_get_config(struct vdpa_device *vdev, unsigned int offset,
->>      struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
->>      struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
->>
->> -    if (offset + len <= sizeof(struct virtio_net_config))
->> +    if (offset + len <= sizeof(struct virtio_net_config)) {
->>          memcpy(buf, (u8 *)&ndev->config + offset, len);
->> +        }
->> +        else
->> +        {
->> +            printk(KERN_ERR "%s: Offset and length out of bounds\n",
->> +            __func__);
->> +        }
->> +
->>  }
->>
->>  static void mlx5_vdpa_set_config(struct vdpa_device *vdev, unsigned int offset, const void *buf,
->>                   unsigned int len)
->>  {
->> -    /* not supported */
->> +    struct mlx5_vdpa_dev *mvdev = to_mvdev(vdev);
->> +    struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
->> +
->> +    if (offset + len <= sizeof(struct virtio_net_config))
->> +    {
->> +        memcpy((u8 *)&ndev->config + offset, buf, len);
->> +    }
->> +    else
->> +    {
->> +        printk(KERN_ERR "%s: Offset and length out of bounds\n",
->> +        __func__);
->> +    }
->>  }
-> This should follow the virtio-spec, for modern virtio-net devices,
-> most of the fields are read only.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-
-Ack, according to:
-
-https://docs.oasis-open.org/virtio/virtio/v1.2/csd01/virtio-v1.2-csd01.html
-
-I believe only duplex and speed can be changed. Will resend patch.
-
-
-> Thanks
->
->>  static u32 mlx5_vdpa_get_generation(struct vdpa_device *vdev)
->> --
->> 2.34.1
->>
->>
-
-Thanks,
-Carlos
+Best regards,
+Krzysztof
 
 
