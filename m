@@ -1,100 +1,203 @@
-Return-Path: <netdev+bounces-122434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F898961470
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 18:43:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8D90961418
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 18:32:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3985E1F24966
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:43:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34E3DB21E84
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:32:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0E91D04A0;
-	Tue, 27 Aug 2024 16:42:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0028C1CB14E;
+	Tue, 27 Aug 2024 16:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Vb5x8y1I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ff3XjyZn"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1501CFED9;
-	Tue, 27 Aug 2024 16:42:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF2A1C3F1D
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 16:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724776968; cv=none; b=eEWzNij8quVsnyA35XHdwczSG7y21/auK+HEmqOiMtRkAjYwtPynUygVLvdt5GrUqvDGL106C0/L30nlF+fFu3LNhD1F1MbXx8WHDj4gjrCuH4BjjxtC2TXovWfMnvimMhNKGYVeT8q0wptz9OCfajqJPs7I5hdNqpTPuZVi1ys=
+	t=1724776343; cv=none; b=XVolCm4fxRraIAldjEckzrmcngS5kwZzE4/W/Znz/kuP4hV2Xvrkz+v3zyLOSwwjcR4tEz4TSREt6TggwwkFJ0tgojQFSEZ1F7k8oLK/dS14yQxYvuZOq9Nh2Bwl0fRbibNECzogjqWZpLS9Ut47eFVRJCEbfYUnyDr73guSzFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724776968; c=relaxed/simple;
-	bh=Jj2Oi0duJe2bHJPlHmEiXxPp7AdHFIUvtDymNXBNZBo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jg8pVnUB1jFQO4YawIKB40zaetIpUs1LNoUikQp4S5L6yE+FouEPSGGVg5O31cJoCsbkR5gmN+wzvTB1eubTs4Zo/oyzzSCjAJPn4Or85OWeIVdLkaZ9ApuMP+LY5YXBkik/vO52uEEtZfcN3GRVXh7FGbRv0EKrUkfuUVYQl70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Vb5x8y1I; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id E59F2888C8;
-	Tue, 27 Aug 2024 18:42:44 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1724776965;
-	bh=v9UgdaWGS04BSmIse3RKiwzHVfsA2BzZVmOCjBmyT48=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Vb5x8y1I6Qnu5mTLssyKJm399qGJ0RKpUKm7YhyiZ3r1O+G8nNjxpJuxSe/6c2vND
-	 ++O1Ozb1DbuvC/MA7HBZ2Q2IWhfLX60yEnxqwzUQzpYAWOJLLI5Kbq7exEONkuJY/Q
-	 s59zgFs37kBeyYlz67N458LJjNVQM0+J00pUfDqOfRiJmZyvWbunn7ixItjNjw1vFk
-	 LQiYJcEG0s1a3kv/aXQT0HzYn8aJE6grZQmgedWxpquvhUShaEjYUT+oAY7g+nlLgA
-	 WD7RwL9IXgtLWfqcZuNpvL2t+RoDsKi4FPbpoVn0vyjZtfzNDsUrRjgrBJiZ8dKkLv
-	 5iH1c2u+j1Gpw==
-Message-ID: <b8cf0639-7fe1-4225-9d95-ffd3caef595b@denx.de>
-Date: Tue, 27 Aug 2024 18:31:57 +0200
+	s=arc-20240116; t=1724776343; c=relaxed/simple;
+	bh=Nbp+yuVnRc+tOJwPJCa9jHXAgbZF9LHPie1TyjZFmTs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LyKN+VokVfjJkHAEkmOM0loF9uJg1XRbglYLqsDYyryoQJruxJHdP6lH1bWl5KUgDPUCt4e2OOl9DJm2tcHf9UYusaN0pOShY8Dd24gyP/YSmiaGhIhWwkrxJaYqZqXUUU+IKFWpIY451HpoVF6o+Ed5rbc3oBgE+fOvtoqXbZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ff3XjyZn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D020EC4CA0B;
+	Tue, 27 Aug 2024 16:32:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724776343;
+	bh=Nbp+yuVnRc+tOJwPJCa9jHXAgbZF9LHPie1TyjZFmTs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ff3XjyZnmxBOSQ8HI/6e2mPPz2rrrmfn9E2N1WsoitmCrMF5EoTvsX8QBBkhNpukU
+	 X5RojnNNvmjgbOzVeIyUgYwN1mD9NCuP5112B14UoOeWgEqu2uT8KrhdaLjoIYGYTG
+	 SKOHmZhBMNFPLzvhXcjlUJmn2bRmmAcZ1T3ZBQ8QfmC2+pVZ+/YwlC4jjE8bkn9/26
+	 8PwyN+MmpteeNxZ7KTmdNHos6UCzUPYwvOhO/S5JWfNJd1ebAyEdzoH58ely6FOTII
+	 FKMTiNVeSXrXhbxC5iBZZY4omIzfl9ysUzaVcU1r4AgA0dEUBMgkurZboqDgVyeAno
+	 C3O+wOqCXgrUA==
+Date: Tue, 27 Aug 2024 17:32:18 +0100
+From: Simon Horman <horms@kernel.org>
+To: Srujana Challa <schalla@marvell.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, sgoutham@marvell.com,
+	lcherian@marvell.com, gakula@marvell.com, jerinj@marvell.com,
+	hkelam@marvell.com, sbhatta@marvell.com, bbhushan2@marvell.com,
+	ndabilpuram@marvell.com
+Subject: Re: [PATCH net-next,1/2] octeontx2-af: reduce cpt flt interrupt
+ vectors for CN10KB
+Message-ID: <20240827163218.GO1368797@kernel.org>
+References: <20240827042512.216634-1-schalla@marvell.com>
+ <20240827042512.216634-2-schalla@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 4/4] wifi: wilc1000: Add WILC3000 support
-To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- linux-wireless@vger.kernel.org
-Cc: Ajay Singh <ajay.kathat@microchip.com>,
- "David S. Miller" <davem@davemloft.net>,
- Adham Abozaeid <adham.abozaeid@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
- <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240823161131.94305-1-marex@denx.de>
- <20240823161131.94305-4-marex@denx.de>
- <9217902b-7d1b-4d67-a148-a28484e8946e@bootlin.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <9217902b-7d1b-4d67-a148-a28484e8946e@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240827042512.216634-2-schalla@marvell.com>
 
-On 8/27/24 10:28 AM, Alexis Lothoré wrote:
+On Tue, Aug 27, 2024 at 09:55:11AM +0530, Srujana Challa wrote:
+> On CN10KB, number of flt interrupt vectors are reduced to
+> 2. So, modify the code accordingly for cn10k.
 
-Hi,
+I think it would be nice to state that the patch moves
+away from a hard-coded to dynamic number of vectors.
+And that this is in order to accommodate the CN10KB,
+which has 2 vectors, as opposed to chips supported by
+the driver to date, which have 3.
 
->> @@ -1467,6 +1604,20 @@ static int init_chip(struct net_device *dev)
->>   		}
->>   	}
->>   
->> +	if (is_wilc3000(wilc->chipid)) {
->> +		ret = wilc->hif_func->hif_read_reg(wilc, 0x207ac, &reg);
 > 
-> Some defines would be nice here instead of hardcoded addresses. I have asked
-> Ajay about those while working on wilc3000, the meaning is roughly the following:
-> - 0x000207ac: WILC_3000_BOOTROM_STATUS_REGISTER
-> - 0x004f0000: WILC_3000_CORTUS_BOOT_REGISTER_2
-> - 0x71: WILC_CORTUS_BOOT_FROM_IRAM
+> Signed-off-by: Srujana Challa <schalla@marvell.com>
 
-Fixed in V3, thanks.
+...
+
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+> index 3e09d2285814..e56d27018828 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cpt.c
+> @@ -37,6 +37,44 @@
+>  	(_rsp)->free_sts_##etype = free_sts;                        \
+>  })
+>  
+> +#define MAX_AE  GENMASK_ULL(47, 32)
+> +#define MAX_IE  GENMASK_ULL(31, 16)
+> +#define MAX_SE  GENMASK_ULL(15, 0)
+
+nit: Maybe a blank line here.
+
+> +static u32 cpt_max_engines_get(struct rvu *rvu)
+> +{
+> +	u16 max_ses, max_ies, max_aes;
+> +	u64 reg;
+> +
+> +	reg = rvu_read64(rvu, BLKADDR_CPT0, CPT_AF_CONSTANTS1);
+> +	max_ses = FIELD_GET(MAX_SE, reg);
+> +	max_ies = FIELD_GET(MAX_IE, reg);
+> +	max_aes = FIELD_GET(MAX_AE, reg);
+> +
+> +	return max_ses + max_ies + max_aes;
+
+Maybe I am wrong, but it looks like this will perform u16 addition.
+Can that overflow? I ask because the return type is u32, implying
+values larger than 64k are expected.
+
+> +}
+> +
+> +/* Number of flt interrupt vectors are depends on number of engines that the
+> + * chip has. Each flt vector represents 64 engines.
+> + */
+> +static int cpt_10k_flt_nvecs_get(struct rvu *rvu)
+> +{
+> +	u32 max_engs;
+> +	int flt_vecs;
+> +
+> +	max_engs = cpt_max_engines_get(rvu);
+> +
+> +	flt_vecs = (max_engs / 64);
+> +	flt_vecs += (max_engs % 64) ? 1 : 0;
+
+I don't think the parentheses are needed on the lines above.
+And likewise elsewhere in this patch.
+
+At any rate, here, I think you can use DIV_ROUND_UP.
+
+> +
+> +	if (flt_vecs > CPT_10K_AF_INT_VEC_FLT_MAX) {
+> +		dev_warn(rvu->dev, "flt_vecs(%d) exceeds the max vectors(%d)\n",
+> +			 flt_vecs, CPT_10K_AF_INT_VEC_FLT_MAX);
+> +		flt_vecs = CPT_10K_AF_INT_VEC_FLT_MAX;
+> +	}
+
+cpt_max_engines_get seems to get called quite a bit.
+I think dev_warn_once() is probably appropriate here.
+
+> +
+> +	return flt_vecs;
+> +}
+> +
+>  static irqreturn_t cpt_af_flt_intr_handler(int vec, void *ptr)
+>  {
+>  	struct rvu_block *block = ptr;
+> @@ -150,17 +188,25 @@ static void cpt_10k_unregister_interrupts(struct rvu_block *block, int off)
+>  {
+>  	struct rvu *rvu = block->rvu;
+>  	int blkaddr = block->addr;
+> +	u32 max_engs;
+> +	u8 nr;
+>  	int i;
+>  
+> +	max_engs = cpt_max_engines_get(rvu);
+> +
+>  	/* Disable all CPT AF interrupts */
+> -	rvu_write64(rvu, blkaddr, CPT_AF_FLTX_INT_ENA_W1C(0), ~0ULL);
+> -	rvu_write64(rvu, blkaddr, CPT_AF_FLTX_INT_ENA_W1C(1), ~0ULL);
+> -	rvu_write64(rvu, blkaddr, CPT_AF_FLTX_INT_ENA_W1C(2), 0xFFFF);
+> +	for (i = CPT_10K_AF_INT_VEC_FLT0; i < cpt_10k_flt_nvecs_get(rvu); i++) {
+
+I think it would be best to cache the value of cpt_10k_flt_nvecs_get()
+rather than run it for each iteration of the loop. I'm assuming it has a
+non-zero cost as it reads a register, the value of which which I assume
+does not change.
+
+Also, the same register is already read by the call to
+cpt_max_engines_get(). It would be nice to read it just once in this scope.
+
+Likewise elsewhere.
+
+Also, there is an inconsistency between the type of i and the return type
+of cpt_10k_flt_nvecs_get(). Probably harmless, but IMHO it would be nice to
+fix.
+
+> +		nr = (max_engs > 64) ? 64 : max_engs;
+> +		max_engs -= nr;
+> +		rvu_write64(rvu, blkaddr, CPT_AF_FLTX_INT_ENA_W1C(i),
+> +			    INTR_MASK(nr));
+> +	}
+>  
+>  	rvu_write64(rvu, blkaddr, CPT_AF_RVU_INT_ENA_W1C, 0x1);
+>  	rvu_write64(rvu, blkaddr, CPT_AF_RAS_INT_ENA_W1C, 0x1);
+>  
+> -	for (i = 0; i < CPT_10K_AF_INT_VEC_CNT; i++)
+> +	/* CPT AF interrupt vectors are flt_int, rvu_int and ras_int. */
+> +	for (i = 0; i < cpt_10k_flt_nvecs_get(rvu) + 2; i++)
+
+It would be nice to avoid the naked '2' here.
+Perhaps a macro is appropriate.
+
+>  		if (rvu->irq_allocated[off + i]) {
+>  			free_irq(pci_irq_vector(rvu->pdev, off + i), block);
+>  			rvu->irq_allocated[off + i] = false;
+
+...
+
+-- 
+pw-bot: cr
 
