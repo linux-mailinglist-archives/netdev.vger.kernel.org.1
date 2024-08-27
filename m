@@ -1,95 +1,122 @@
-Return-Path: <netdev+bounces-122359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73A38960CC8
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:59:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38E5D960CE7
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 16:03:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E3BC283F98
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 13:59:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E8D31C2316D
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 14:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500BE1C3F0D;
-	Tue, 27 Aug 2024 13:59:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2249A1C2DD5;
+	Tue, 27 Aug 2024 14:03:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ej785GW/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBk6IEpl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24DC41C2DD8;
-	Tue, 27 Aug 2024 13:59:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0801E487;
+	Tue, 27 Aug 2024 14:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724767182; cv=none; b=h/1FltFIAmYagWNM1ArdIFMrjt+tgqSCJ55f0EGI2tbT2rW83pqqMQxIU/3R6YviTDsZrHSxt4Itftg0qy1ETj3nh6DgqK4CMHRlLYCQwjk1xTZkRvWFhLTpMiGj9WoRWTZeVbhC3n1NnUC6bDuHRVkMDyV1nAA907stgybqHKg=
+	t=1724767430; cv=none; b=ezMiqSAbrlvc+BOvOOs8lwGAhlwlLj5+nVSShLeKw7iu2kUM9FegLjYWhlgpd4jrsS0Zfk5XA24xiuvLAgE9l/xn/OvViaCdr5N39l4rHV8EovZaj8qYMwP1XlXNAUBMEO7LP2ENgh320qbx63li6i/XI078ucNmIlrQ5BwoEA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724767182; c=relaxed/simple;
-	bh=a89ZI3RFXA6YQYq1bevFWz3hL6zd3Z+1MGbouUOUPV0=;
+	s=arc-20240116; t=1724767430; c=relaxed/simple;
+	bh=HSil7PMrXBywMPhgEu6QpS5TfQeHIBuVv32WKKd7Cok=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QZ3EnNhORTBZOa0abKInYJ8pXrpg6Tuec9aQ7UbP2gif8L9sDWC3b2ivdPFf9f8JVCrsTDul3cTBIfY12WeMuY51cT404XHrUUx9z745lTw6MzgcPGgQQEHHK6WLGNaaw/BooyrJ4oC9yPL3UnrPve2gIGD+1I4HeSW5W4IZsKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ej785GW/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B0C7C61048;
-	Tue, 27 Aug 2024 13:59:40 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ErkHSfSBsBxJJn/MQ1jlm84zSxSbKBVmw0dIBzz+ET8GFveTzDk5irnCy9heohkb2DqBC+aoUPZ+ozTsS3/aRG9Sv331BRhOPYidP9l6VxtnrPaSa/0InUo/vOvacTrHdyCdYnMSvg0i/x2cLfxA1FD95DbV44Hxp5qN71Rhqrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBk6IEpl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1997C61050;
+	Tue, 27 Aug 2024 14:03:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724767180;
-	bh=a89ZI3RFXA6YQYq1bevFWz3hL6zd3Z+1MGbouUOUPV0=;
+	s=k20201202; t=1724767429;
+	bh=HSil7PMrXBywMPhgEu6QpS5TfQeHIBuVv32WKKd7Cok=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ej785GW/F71tVCj6Shkjf0OOcLB0lDZzJUJf7m/cf8L5bnVAN8RuIXN+7F+K/zuYW
-	 VE/x5qP3Un+clfqSn+YxaG69TmFCFtz6MYJ+/USndvGUfULBWsgzuvmu+k0yMvX5I0
-	 edKSiD0YIit2bxF/ZuNADFpE3FinkzNkc0oqkayq4tWL2oPU+YxYRYylPEEgFHnnPX
-	 Src7qVHXPJkFef0KYTkatNyRaNk8qxIY0B5qnMcx1kYjhGjmOFED8nf1VoSlqqVVB4
-	 ndEsgQ9pd5EXGxHsqra+JGKzpjUNHriL/qR3RfQR3o84MXD1b3bhQlvSjH+HUUbgbm
-	 uxiTmjS/kMscg==
-Date: Tue, 27 Aug 2024 06:59:38 -0700
+	b=cBk6IEplgFuwFiriIePAGg0qudmq7Ghn7Ib/5m0z1lEQO67hohck2AkLE0Nc0fONh
+	 5j8mOQuqDEhalBzP8+HHj2QzTbJCsxoGqTMdMM8l65SUxcIk6eIDvOJr4QgG4AriYu
+	 t7QpeB6f20Mrced5ouDCRNGQCrO0XkDmZ7QBwqoPeii3w8zlI5K5Q38kUYaPbn/grt
+	 5ooUy5hU0R30QiU1KOIDXSnz9FmYTB+WG0BOinRC04fq7++1W8t6J9gWRnkMC1QBZK
+	 gWTdvVSxBQAsgmbNmIKQNmH7AdxmHhnIhWb+NFKyxL+aTZZou9iom6GNQdNX5M3OfI
+	 jw+zEXg5p8WsA==
+Date: Tue, 27 Aug 2024 07:03:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maksym Kutsevol <max@kutsevol.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Breno Leitao
- <leitao@debian.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] netcons: Add udp send fail statistics to netconsole
-Message-ID: <20240827065938.6b6d3767@kernel.org>
-In-Reply-To: <CAO6EAnX0gqnDOxw5OZ7xT=3FMYoh0ELU5CTnsa6JtUxn0jX51Q@mail.gmail.com>
-References: <20240824215130.2134153-1-max@kutsevol.com>
-	<20240824215130.2134153-2-max@kutsevol.com>
-	<20240826143546.77669b47@kernel.org>
-	<CAO6EAnX0gqnDOxw5OZ7xT=3FMYoh0ELU5CTnsa6JtUxn0jX51Q@mail.gmail.com>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: Hongbo Li <lihongbo22@huawei.com>, <johannes@sipsolutions.net>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <allison.henderson@oracle.com>, <dsahern@kernel.org>, <pshelar@ovn.org>,
+ <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <rds-devel@oss.oracle.com>, <dccp@vger.kernel.org>, <dev@openvswitch.org>,
+ <linux-afs@lists.infradead.org>
+Subject: Re: [PATCH net-next 0/8] Use max/min to simplify the code
+Message-ID: <20240827070347.4bf3a284@kernel.org>
+In-Reply-To: <878qwifub5.fsf@kernel.org>
+References: <20240824074033.2134514-1-lihongbo22@huawei.com>
+	<20240826144404.03fce39c@kernel.org>
+	<4a92bb68-7fe7-4bf2-885f-e07b06ea82aa@huawei.com>
+	<878qwifub5.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 26 Aug 2024 19:55:36 -0400 Maksym Kutsevol wrote:
-> > > +static ssize_t stats_show(struct config_item *item, char *buf)
-> > > +{
-> > > +     struct netconsole_target *nt = to_target(item);
-> > > +
-> > > +     return
-> > > +             nt->stats.xmit_drop_count, nt->stats.enomem_count);  
-> >
-> > does configfs require value per file like sysfs or this is okay?  
-> 
-> Docs say (Documentation/filesystems/sysfs.txt):
-> 
-> Attributes should be ASCII text files, preferably with only one value
-> per file. It is noted that it may not be efficient to contain only one
-> value per file, so it is socially acceptable to express an array of
-> values of the same type.
+On Tue, 27 Aug 2024 07:45:02 +0300 Kalle Valo wrote:
+> > Do you mean some patches will go to other branches (such as mac80211)? =
+=20
+>=20
+> Jakub means that your patchset had compilation errors, see the red on
+> patchwork:
+>=20
+> https://patchwork.kernel.org/project/netdevbpf/list/?series=3D882901&stat=
+e=3D*&order=3Ddate
 
-Right, but this is for sysfs, main question is whether configfs has 
-the same expectations.
+FWIW I prefer not to point noobs to the patchwork checks, lest they
+think it's a public CI and they can fling broken code at the list :(
+But yes, in case "code doesn't build" needs a further explanation:
 
-> Given those are of the same type, I thought it's ok. To make it less
-> "fancy" maybe move to
-> just values separated by whitespace + a block in
-> Documentation/networking/netconsole.rst describing the format?
-> E.g. sysfs_emit(buf, "%lu %lu\n", .....) ? I really don't want to have
-> multiple files for it.
-> What do you think?
-
-Stats as an array are quite hard to read / understand
+net/core/pktgen.c: In function =E2=80=98pktgen_finalize_skb=E2=80=99:
+./../include/linux/compiler_types.h:510:45: error: call to =E2=80=98__compi=
+letime_assert_928=E2=80=99 declared with attribute error: min(datalen/frags=
+, ((1UL) << 12)) signedness error
+  510 |         _compiletime_assert(condition, msg, __compiletime_assert_, =
+__COUNTER__)
+      |                                             ^
+./../include/linux/compiler_types.h:491:25: note: in definition of macro =
+=E2=80=98__compiletime_assert=E2=80=99
+  491 |                         prefix ## suffix();                        =
+     \
+      |                         ^~~~~~
+./../include/linux/compiler_types.h:510:9: note: in expansion of macro =E2=
+=80=98_compiletime_assert=E2=80=99
+  510 |         _compiletime_assert(condition, msg, __compiletime_assert_, =
+__COUNTER__)
+      |         ^~~~~~~~~~~~~~~~~~~
+../include/linux/build_bug.h:39:37: note: in expansion of macro =E2=80=98co=
+mpiletime_assert=E2=80=99
+   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+      |                                     ^~~~~~~~~~~~~~~~~~
+../include/linux/minmax.h:100:9: note: in expansion of macro =E2=80=98BUILD=
+_BUG_ON_MSG=E2=80=99
+  100 |         BUILD_BUG_ON_MSG(!__types_ok(x,y,ux,uy),        \
+      |         ^~~~~~~~~~~~~~~~
+../include/linux/minmax.h:105:9: note: in expansion of macro =E2=80=98__car=
+eful_cmp_once=E2=80=99
+  105 |         __careful_cmp_once(op, x, y, __UNIQUE_ID(x_), __UNIQUE_ID(y=
+_))
+      |         ^~~~~~~~~~~~~~~~~~
+../include/linux/minmax.h:129:25: note: in expansion of macro =E2=80=98__ca=
+reful_cmp=E2=80=99
+  129 | #define min(x, y)       __careful_cmp(min, x, y)
+      |                         ^~~~~~~~~~~~~
+../net/core/pktgen.c:2796:28: note: in expansion of macro =E2=80=98min=E2=
+=80=99
+ 2796 |                 frag_len =3D min(datalen/frags, PAGE_SIZE);
+      |                            ^~~
+make[5]: *** [../scripts/Makefile.build:244: net/core/pktgen.o] Error 1
 
