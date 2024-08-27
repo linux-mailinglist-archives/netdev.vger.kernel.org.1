@@ -1,227 +1,168 @@
-Return-Path: <netdev+bounces-122160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3506F96032E
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:34:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6A2F960349
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 09:37:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54D491C21FC3
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 07:34:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 004CEB2260C
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 07:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59E41448E0;
-	Tue, 27 Aug 2024 07:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88AB158D79;
+	Tue, 27 Aug 2024 07:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U4uvbeq/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BnMrOiD2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A29D747F
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 07:34:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C085192594
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 07:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724744045; cv=none; b=hnv7rpqJ5ynYuxBj5JCPBdtnR0Fcvo6ph2AT8LMmeKtuT77gCFhivKkCWxhNPqdU/9jw9aAjzTJ4hIKuWamlMdNYzjJanbhAH8t7B56Yzx+JZd5M/PQY0oEH2XYlwqKMLM+URw2h/2XXX+kGMV3zLcyEhSKpfZLp2Xp4UNQwX3o=
+	t=1724744183; cv=none; b=G/7s9RTbSvsC3jdxQ6bPRnAzjlAKR5atJKMtlupsfVjpeQapa6t49RpcrVgvyyHkH1WF7b2ZUtIWc6xwwuk2RR+WFEq/apFQNXBYNfr8LjWveQZw8xsO6grB3Ahv9w1FUUu6kCyhAYZyKQZZd2PAJv8m0xsWvrUU0iKsNkaUR08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724744045; c=relaxed/simple;
-	bh=hICCdJDJAcH4HSbFU25gziG7zVIdO93tC/zvJvkHOr8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qXSB1Ole6mx9eHlJWDymdHvbX+qUmQ74YR6xgyecC/lpOCW+IXGWfKIP/Wyu3aqceVeVW2OlFo0UcVuum4DGqNiOb5IZfN6JFImtVsapW1kvX3kFSrMTBXZR+vgLhIV/8JOfy6DngVPxNAewzoSpcEmELNOQBlZ2kgkgjLwi5JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U4uvbeq/; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724744044; x=1756280044;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hICCdJDJAcH4HSbFU25gziG7zVIdO93tC/zvJvkHOr8=;
-  b=U4uvbeq/PevgY2LUjBzPyh6DRK0ZGdn6Ly9JmeIH4KTkm/3FjgsMWDEx
-   Kcjvy2IOzvNEfj1gG/mwamnD+OnRE4fFofVpZZIqjMR2eCogBHCnlhQTM
-   gDyrQe5pKXOkV57Hee9eNojXv2mHIlqj5I5jAuvi8qqY1FvHOY44dl+Sh
-   N+LSdeKotR+PT1+EjhhaWqlQZ3ZSQ+cTtCNwU0wosAHa32DGvzceeZ8Ff
-   /V/6qszlIm5WxiSRnQ52yi7V8lIfpA1PI1IOLyis1S4MZZG0DgiRQFMaN
-   XPIaVezqfZFBONCwaAHsYwPH4LhrPtIQoT5fXUSEuwdAwWAwkIiAN3M6J
-   Q==;
-X-CSE-ConnectionGUID: j6jKeLPSSByYu07veLdT8w==
-X-CSE-MsgGUID: iqxtRvrBSOuTp5y0oVWnJw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11176"; a="34356177"
-X-IronPort-AV: E=Sophos;i="6.10,179,1719903600"; 
-   d="scan'208";a="34356177"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 00:34:04 -0700
-X-CSE-ConnectionGUID: LmgdmFQ5Sfq2F4vbJ8q6Xw==
-X-CSE-MsgGUID: V1y+eRyJQSeNkDefPp3tRA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,179,1719903600"; 
-   d="scan'208";a="67468450"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Aug 2024 00:34:01 -0700
-Date: Tue, 27 Aug 2024 09:32:03 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com, horms@kernel.org,
-	helgaas@kernel.org, przemyslaw.kitszel@intel.com,
-	Hongguang Gao <hongguang.gao@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: Re: [PATCH net-next v3 9/9] bnxt_en: Support dynamic MSIX
-Message-ID: <Zs2A8wvFUoZfjPzQ@mev-dev.igk.intel.com>
-References: <20240823195657.31588-1-michael.chan@broadcom.com>
- <20240823195657.31588-10-michael.chan@broadcom.com>
+	s=arc-20240116; t=1724744183; c=relaxed/simple;
+	bh=GS7NIROer0N7jdT2XAq7ukHZhWnhYgni1yTkl9nePnU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Sqif0OQa0N3WoZktsU1TSZ+tiOK/C7E/ZleAfAh0ZTgAfjhyQTsdOzgzqKA1Sxf2b76aoe1opjLVyrC/jr7VtesBanS9Opx3gWh0xJh6jWix/SjtxxlDOLBGDG3B39Ch8zGlR6TGECh2u/j3bywMW1td0d/WU7U51L8Awv8AXWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BnMrOiD2; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724744180;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LsZphpGyQjEKKfv5ANUImVoE/5KSt/7XDVfbDuFFCbg=;
+	b=BnMrOiD2m9H1vev62QFqknYm/PCNESHYo96icX7hiiFYpFnVqCBBGsjGqWUkcDjH5AoYiU
+	LJnqVhxO2VZ3FHhYgiQ5UGjEOlQ8z5Tg0ofs/BNnLnS2bqN3F5gThWZ3XADf7SGg+a1y+5
+	Te0zETR5M+RfzRYzPbmE0PhhvbGyLHA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-618-FeXQKxSvNG6rycoRaut_zg-1; Tue, 27 Aug 2024 03:36:19 -0400
+X-MC-Unique: FeXQKxSvNG6rycoRaut_zg-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-428fc34f41bso48305635e9.3
+        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 00:36:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724744178; x=1725348978;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LsZphpGyQjEKKfv5ANUImVoE/5KSt/7XDVfbDuFFCbg=;
+        b=AAqN+lL5E15TxOUnlCTlR+JglTvzYs5WhU2zD4vyCFDvW0thXMvZY0lhq4wKnwBpum
+         frFic+9CL6neMioQPZUqCuEFrCprOnls7BqOAjmMVEU7PjGnIubA538VgxJ31Bl4mENB
+         IJJKZlSrZRdtHaAE/iR7iobm9f5XPhL1qGHJmqZ72jTbGjxP/gU2h4lnLeDtfUgXXVaG
+         xTB3KfEpzqEJyGIG2ijvWzhvbjCY3tf7WrHAqekBKm1r7HlA7d/BynhDjxEJoIbjvREK
+         w7U9L2jK2iOBCGOhpF4m9JFPaEBZVESAiBcLHF/eb/e8ldOnnqp2nkXVSm+kp7+CrMKS
+         IqLw==
+X-Gm-Message-State: AOJu0YwnOzNWNqrWBFrdc5pylURDr405y8/jdeWp2fxi7rn4fJ37kpcO
+	tRyDMD04e2FNNKaJC/IqYzqQXdzU+tK7+GzdZY7+CDzMDDuAV9JnBKAnjxTdgnHkIKMEQx5C42E
+	DBbEgu9FEkIxJa8BfFfHG5A5fKy0R0//6lV/O7K1Of+BY3evqa3aWsA==
+X-Received: by 2002:a05:600c:3c90:b0:426:6551:3174 with SMTP id 5b1f17b1804b1-42b9ae247abmr13456295e9.29.1724744177829;
+        Tue, 27 Aug 2024 00:36:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEm47AyuEz110b144AegRCrXe/dhTUT0kcMyP02h/3EXfAZJ8CQjbimTuZa8RA50K6xQ+Rgkg==
+X-Received: by 2002:a05:600c:3c90:b0:426:6551:3174 with SMTP id 5b1f17b1804b1-42b9ae247abmr13456015e9.29.1724744177386;
+        Tue, 27 Aug 2024 00:36:17 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b67:7410::f71? ([2a0d:3344:1b67:7410::f71])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3730810fb6bsm12442373f8f.21.2024.08.27.00.36.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 27 Aug 2024 00:36:16 -0700 (PDT)
+Message-ID: <47cde674-9f24-4b14-a3d2-216904617c8f@redhat.com>
+Date: Tue, 27 Aug 2024 09:36:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240823195657.31588-10-michael.chan@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 03/12] net-shapers: implement NL get operation
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
+ Madhu Chittim <madhu.chittim@intel.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>
+References: <cover.1724165948.git.pabeni@redhat.com>
+ <c5ad129f46b98d899fde3f0352f5cb54c2aa915b.1724165948.git.pabeni@redhat.com>
+ <20240822191042.71a19582@kernel.org>
+ <0e5c2178-22e2-409e-8cbd-9aaa66594fdc@redhat.com>
+ <20240826185555.3f460af4@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240826185555.3f460af4@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 23, 2024 at 12:56:57PM -0700, Michael Chan wrote:
-> A range of MSIX vectors are allocated at initialization for the number
-> needed for RocE and L2.  During run-time, if the user increases or
-> decreases the number of L2 rings, all the MSIX vectors have to be
-> freed and a new range has to be allocated.  This is not optimal and
-> causes disruptions to RoCE traffic every time there is a change in L2
-> MSIX.
+
+
+On 8/27/24 03:55, Jakub Kicinski wrote:
+> On Fri, 23 Aug 2024 10:52:04 +0200 Paolo Abeni wrote:
+>>>> + * comprising the shaper scope and a scope-specific id.
+>>>> + */
+>>>> +struct net_shaper_ops {
+>>>> +	/**
+>>>> +	 * @group: create the specified shapers scheduling group
+>>>> +	 *
+>>>> +	 * Nest the @leaves shapers identified by @leaves_handles under the
+>>>> +	 * @root shaper identified by @root_handle. All the shapers belong
+>>>> +	 * to the network device @dev. The @leaves and @leaves_handles shaper
+>>>> +	 * arrays size is specified by @leaves_count.
+>>>> +	 * Create either the @leaves and the @root shaper; or if they already
+>>>> +	 * exists, links them together in the desired way.
+>>>> +	 * @leaves scope must be NET_SHAPER_SCOPE_QUEUE.
+>>>
+>>> Or SCOPE_NODE, no?
+>>
+>> I had a few back-and-forth between the two options, enforcing only QUEUE
+>> leaves or allowing even NODE.
+>>
+>> I think the first option is general enough - can create arbitrary
+>> topologies with the same amount of operations - and leads to slightly
+>> simpler code, but no objections for allow both.
 > 
-> If the system supports dynamic MSIX allocations, use dynamic
-> allocation to add new L2 MSIX vectors or free unneeded L2 MSIX
-> vectors.  RoCE traffic is not affected using this scheme.
+> Ah, so we can only "grow the tree from the side of the leaves",
+> so to speak? We can't create a group in the middle of the hierarchy?
+
+With the posted code, we can't. It can be implemented, but I think it 
+will make the interface confusing.
+
+> I have no strong use for groups in between, maybe just mention in
+> a comment or cover letter.
+
+I'll do, thanks.
+
+
+
 > 
-> Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
-> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
-> v2: Fix typo in changelog
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 57 +++++++++++++++++++++--
->  1 file changed, 54 insertions(+), 3 deletions(-)
+>>>> +static int net_shaper_fill_handle(struct sk_buff *msg,
+>>>> +				  const struct net_shaper_handle *handle,
+>>>> +				  u32 type, const struct genl_info *info)
+>>>> +{
+>>>> +	struct nlattr *handle_attr;
+>>>> +
+>>>> +	if (handle->scope == NET_SHAPER_SCOPE_UNSPEC)
+>>>> +		return 0;
+>>>
+>>> In what context can we try to fill handle with scope unspec?
+>>
+>> Uhmm... should happen only in buggy situation. What about adding adding
+>> WARN_ON_ONCE() ?
 > 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index fa4115f6dafe..39dc67dbe9b2 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -10622,6 +10622,43 @@ static void bnxt_setup_msix(struct bnxt *bp)
->  
->  static int bnxt_init_int_mode(struct bnxt *bp);
->  
-> +static int bnxt_add_msix(struct bnxt *bp, int total)
-> +{
-> +	int i;
-> +
-> +	if (bp->total_irqs >= total)
-> +		return total;
-> +
-> +	for (i = bp->total_irqs; i < total; i++) {
-> +		struct msi_map map;
-> +
-> +		map = pci_msix_alloc_irq_at(bp->pdev, i, NULL);
-> +		if (map.index < 0)
-> +			break;
-> +		bp->irq_tbl[i].vector = map.virq;
-> +		bp->total_irqs++;
-> +	}
-> +	return bp->total_irqs;
-> +}
-> +
-> +static int bnxt_trim_msix(struct bnxt *bp, int total)
-> +{
-> +	int i;
-> +
-> +	if (bp->total_irqs <= total)
-> +		return total;
-> +
-> +	for (i = bp->total_irqs; i > total; i--) {
-> +		struct msi_map map;
-> +
-> +		map.index = i - 1;
-> +		map.virq = bp->irq_tbl[i - 1].vector;
-> +		pci_msix_free_irq(bp->pdev, map);
-> +		bp->total_irqs--;
-> +	}
-> +	return bp->total_irqs;
-> +}
+> That's better, at least it will express that it's not expected.
 
-Patch looks fine, treat it only as suggestion:
-
-You can save some lines of code by merging this two function.
-
-static int bnxt_change_msix(struct bnxt *bp, int total)
-{
-	int i;
-
-	/* add MSI-Xs if needed */
-	for (i = bp->total_irqs; i < total; i++) {
-		...
-	}
-
-	/* remove MSI-Xs if needed */
-	for (i = bp->total_irqs; i > total; i--) {
-		...
-	}
-
-	return bp->total_irqs;
-}
-> +
->  static int bnxt_setup_int_mode(struct bnxt *bp)
->  {
->  	int rc;
-> @@ -10788,6 +10825,7 @@ static void bnxt_clear_int_mode(struct bnxt *bp)
->  int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
->  {
->  	bool irq_cleared = false;
-> +	bool irq_change = false;
->  	int tcs = bp->num_tc;
->  	int irqs_required;
->  	int rc;
-> @@ -10806,15 +10844,28 @@ int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
->  	}
->  
->  	if (irq_re_init && BNXT_NEW_RM(bp) && irqs_required != bp->total_irqs) {
-> -		bnxt_ulp_irq_stop(bp);
-> -		bnxt_clear_int_mode(bp);
-> -		irq_cleared = true;
-> +		irq_change = true;
-> +		if (!pci_msix_can_alloc_dyn(bp->pdev)) {
-> +			bnxt_ulp_irq_stop(bp);
-> +			bnxt_clear_int_mode(bp);
-> +			irq_cleared = true;
-> +		}
->  	}
->  	rc = __bnxt_reserve_rings(bp);
->  	if (irq_cleared) {
->  		if (!rc)
->  			rc = bnxt_init_int_mode(bp);
->  		bnxt_ulp_irq_restart(bp, rc);
-> +	} else if (irq_change && !rc) {
-> +		int total;
-> +
-> +		if (irqs_required > bp->total_irqs)
-> +			total = bnxt_add_msix(bp, irqs_required);
-> +		else
-> +			total = bnxt_trim_msix(bp, irqs_required);
-> +
-> +		if (total != irqs_required)
-> +			rc = -ENOSPC;
-
-and here
-
-if (bnxt_change_msix(bp, irqs_required) != irqs_required)
-	rc = -ENOSPC;
+I added the WARN in my local build, and that reminded me the tree root 
+(netdev) has UNSPEC parent. So I think we are better off with simply a 
+comment there.
 
 Thanks,
-Michal
->  	}
->  	if (rc) {
->  		netdev_err(bp->dev, "ring reservation/IRQ init failure rc: %d\n", rc);
-> -- 
-> 2.30.1
-> 
+
+Paolo
+
 
