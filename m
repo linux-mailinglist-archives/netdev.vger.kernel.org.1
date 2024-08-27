@@ -1,74 +1,52 @@
-Return-Path: <netdev+bounces-122178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F3C9603FE
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 10:08:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73430960422
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 10:14:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 991801C227D4
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 08:08:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEBA92839A4
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 08:14:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70766192B86;
-	Tue, 27 Aug 2024 08:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85BD18BC2D;
+	Tue, 27 Aug 2024 08:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="giF+cKXi"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TZhC9m4J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916644C92
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 08:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD33418859D;
+	Tue, 27 Aug 2024 08:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724746104; cv=none; b=jkPAm48j2r9s7vLovRPxJe/MIt1yuusdztSSHWBoK6hWsVbu1C9g4xyMMJYhGf6ZGkEwo71iSfwuneTbkcqkgSsccXd/apkXLqcxEKP2+yj1oCgHUgyFDsb1h6Od3gFr5EiyEpeRVRI9DKDUz7tzoRuQ2R9WwPqzMKM8FsPfYmM=
+	t=1724746475; cv=none; b=HFoA9CBuXVt/cNZ23XffHhNQHNASCgAQDDhToFIJwufuFoLL4sLf848pCuwsTv+kk1Bf+c/cKEmZbrGILZUQK0y5D1VVPrrqZ8LuLdkOWCA/EH90882gqbuZgakUp5QJ7iIiuRuuZwb5+hOBNX9mvaE+9KRXuxSO1yNpFBbranw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724746104; c=relaxed/simple;
-	bh=XK9OQMQTFxQ0v24Z7CPmfIFrzaLyz3iViQ/mA4nCuSQ=;
+	s=arc-20240116; t=1724746475; c=relaxed/simple;
+	bh=x6G+5+IJ7a72Cq5SOq6HjDFgUyiWiy0Jha7aSlSvAkA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NIj+4X7xs3wxPl7mlQ7WUKbfEXxCjbaNqJyOfIaRRb3LawF6+eLOD67+IOqafGMd3K0Gm0RPDtQ7fRlCjf7VRcAwa4bLc8m1yu/QqLVWNgPqetcyrnkIWDuMO3LGqCYmP/lTIeVKm9FSbEgxkmZTDFW05t/1ELxajq+mWkpYa9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=giF+cKXi; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-202508cb8ebso34978855ad.3
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 01:08:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1724746101; x=1725350901; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uBmmq+RkgFyfA69KcoqEDgnXhsBnLaX1J/E8wRgNqfo=;
-        b=giF+cKXiCnP0SV/gEJmLcoCoxoA/9BbBA2SMMK99futhz+ZQ4RcY9yOM6WEevvvBQB
-         QWm2fvJdAj6rNfPfL68Pgt/Iby8ncT/i3S7/PoocFQ28Oqmo4GRS1TS6OgKj6MhEIgBL
-         F1IXUhMLL+HALBsyZmv46r1JOeT8hOZUEi06EeqbfSzxHMyeiVWQMA5+gM8B1oDFGRXs
-         BrdXO0x0jGSVY4BJjYYQHIRO1NihSkbVocqOakYXHOH+2VAD9b2KqNMqTgQsO4ssZn9c
-         TsD6L241K/9IYNzQqH9JnUUlS08ZHMFKWDuvfULbxza4UdGFCLG95yIIp6uHAl5DwPYA
-         ojRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724746101; x=1725350901;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uBmmq+RkgFyfA69KcoqEDgnXhsBnLaX1J/E8wRgNqfo=;
-        b=p8dxle/XUVpzfvKFhQmag1GZBPqSd5olKkTNJxk9jhcw23QkyrkRgEbINYkApcDVBw
-         SGj12L6CnpH64SdFPVC5WZGMf/cdF7bFjgaSSPku50G9KyKnrYamBdzCe12Qh8+ulH5y
-         naq789I2x+ScfdLgZD9CI+ukSxKXXvzW3HJanTX6Qv/NDUl0+cjZhymyqg+F2HpHWZjW
-         Zg4LxpEk0ZW9k1ghSr2gJRlCRwG1qgRxsBOUrdkXxDJTA48lR531M5BjZ5KGQ5/bd7P5
-         OfCa8eVuiNmP3GV0IxrrGvQYJDVZ9ztlEKVFOkV2uaFODjaDGbPwkqVoIA6C2h5g9wxc
-         xj1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWkXr0CaP3U3HfAZ1mDxX6ZhW3wpxYtfz6M4HJl86H16Q7G/wV5Q2bUshHeIe7JMTvDQPgLmxw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHWZX7Mlum2SfR0kS3IqpI1mERA92iAGv8Lmeada8YUF6t7MEK
-	iLr2tmoCyJoIIJKv4+eNQJONUhw8cka32i2nxJaXH6pioCu5bAQV6jOTbvxXACk=
-X-Google-Smtp-Source: AGHT+IEFCmjJp/BUBp3nSBjKs2X74VGhP6YzGHSQdAROniu1iwOmNmyBGIa9qAYNb6Cp6vkBJF0I5A==
-X-Received: by 2002:a17:903:1210:b0:202:3e32:5d3e with SMTP id d9443c01a7336-204df47e6f6mr23310875ad.36.1724746100735;
-        Tue, 27 Aug 2024 01:08:20 -0700 (PDT)
-Received: from [10.68.121.74] ([63.216.146.178])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-203856099efsm78338535ad.200.2024.08.27.01.08.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Aug 2024 01:08:20 -0700 (PDT)
-Message-ID: <6c75215b-0bdc-4b5a-b267-6dce0faec496@bytedance.com>
-Date: Tue, 27 Aug 2024 16:08:12 +0800
+	 In-Reply-To:Content-Type; b=TDNKz3g+KGkFf2arTBwzvHOU9RYkx1gCSpUts+ASrE5t4VegTiP2PA9l3qq9/DwJnBwWo1znchegIpEd2mhl1fHUNQN+BP47X1cyxcMLKuROWNTkfa6V477g5ndIE16YEWOkhtz1f0f6PssB3FRD93Uhoum8Z+0nFun6f7ukIPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TZhC9m4J; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EFB3260003;
+	Tue, 27 Aug 2024 08:14:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1724746471;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HHeCSHZ34Mwia/PNi9Y8v1uhIR9u/g7fFvQSmjPs83E=;
+	b=TZhC9m4JfAtaAvP4/EVLb8PP+yuqfze5JokhB09Nxiu6sqYKKkldBWKYrlT/JwDY7ahRfd
+	VRfS1a7lQIq0R1Fd9/qm6TPJaGXQj8sk4B2avgYDFf06qMG7UxG7dALJ77OfVIcqOBXLsK
+	WLhEGBxv2eDHjf9PwrTqcmeq7PEccEZ/aLYKiUAwX3GCDUpc50ZwlJQP0HSD/3SvNBRC+S
+	4rWaN07xV1if/05fU2j63YTVPzh3hjafdFBJTF7IFBlrGO5r3oSk3ye/VQrU56xMEFq4xA
+	TaJJvBc8Tfl+BIrH4h0ORlx5pqV5FaePKnpZHDdeZPXVQl8fofdWCyO1mrRHiw==
+Message-ID: <9bc68261-9d5a-463c-82e8-c7a630dda79e@bootlin.com>
+Date: Tue, 27 Aug 2024 10:14:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,106 +54,113 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [External] Re: [PATCH bpf-next v2] bpf: Fix bpf_get/setsockopt to
- tos not take effect when TCP over IPv4 via INET6 API
-To: Eric Dumazet <edumazet@google.com>,
- Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, dsahern@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20240823085313.75419-1-zhoufeng.zf@bytedance.com>
- <CANn89i+ZsktuirATK0nhUmJu+TiqB9Kbozh+HhmCiP3qdnW3Ew@mail.gmail.com>
- <173d3b06-57ed-4e2e-9034-91b99f41512b@linux.dev>
- <CANn89iLKcOBBHXMSduV-DXYZfDCKAZyySggKFnQMpKH3p_Ureg@mail.gmail.com>
-From: Feng Zhou <zhoufeng.zf@bytedance.com>
-In-Reply-To: <CANn89iLKcOBBHXMSduV-DXYZfDCKAZyySggKFnQMpKH3p_Ureg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH v2 3/4] wifi: wilc1000: Fold
+ chip_allow_sleep()/chip_wakeup() into wlan.c
+To: Marek Vasut <marex@denx.de>, linux-wireless@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Adham Abozaeid <adham.abozaeid@microchip.com>,
+ Ajay Singh <ajay.kathat@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
+ <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240823161131.94305-1-marex@denx.de>
+ <20240823161131.94305-3-marex@denx.de>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20240823161131.94305-3-marex@denx.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-在 2024/8/24 02:53, Eric Dumazet 写道:
-> On Fri, Aug 23, 2024 at 8:49 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->>
->> On 8/23/24 6:35 AM, Eric Dumazet wrote:
->>> On Fri, Aug 23, 2024 at 10:53 AM Feng zhou <zhoufeng.zf@bytedance.com> wrote:
->>>>
->>>> From: Feng Zhou <zhoufeng.zf@bytedance.com>
->>>>
->>>> when TCP over IPv4 via INET6 API, bpf_get/setsockopt with ipv4 will
->>>> fail, because sk->sk_family is AF_INET6. With ipv6 will success, not
->>>> take effect, because inet_csk(sk)->icsk_af_ops is ipv6_mapped and
->>>> use ip_queue_xmit, inet_sk(sk)->tos.
->>>>
->>>> So bpf_get/setsockopt needs add the judgment of this case. Just check
->>>> "inet_csk(sk)->icsk_af_ops == &ipv6_mapped".
->>>>
->>>> | Reported-by: kernel test robot <lkp@intel.com>
->>>> | Closes: https://lore.kernel.org/oe-kbuild-all/202408152034.lw9Ilsj6-lkp@intel.com/
->>>> Signed-off-by: Feng Zhou <zhoufeng.zf@bytedance.com>
->>>> ---
->>>> Changelog:
->>>> v1->v2: Addressed comments from kernel test robot
->>>> - Fix compilation error
->>>> Details in here:
->>>> https://lore.kernel.org/bpf/202408152058.YXAnhLgZ-lkp@intel.com/T/
->>>>
->>>>    include/net/tcp.h   | 2 ++
->>>>    net/core/filter.c   | 6 +++++-
->>>>    net/ipv6/tcp_ipv6.c | 6 ++++++
->>>>    3 files changed, 13 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/include/net/tcp.h b/include/net/tcp.h
->>>> index 2aac11e7e1cc..ea673f88c900 100644
->>>> --- a/include/net/tcp.h
->>>> +++ b/include/net/tcp.h
->>>> @@ -493,6 +493,8 @@ struct request_sock *cookie_tcp_reqsk_alloc(const struct request_sock_ops *ops,
->>>>                                               struct tcp_options_received *tcp_opt,
->>>>                                               int mss, u32 tsoff);
->>>>
->>>> +bool is_tcp_sock_ipv6_mapped(struct sock *sk);
->>>> +
->>>>    #if IS_ENABLED(CONFIG_BPF)
->>>>    struct bpf_tcp_req_attrs {
->>>>           u32 rcv_tsval;
->>>> diff --git a/net/core/filter.c b/net/core/filter.c
->>>> index ecf2ddf633bf..02a825e35c4d 100644
->>>> --- a/net/core/filter.c
->>>> +++ b/net/core/filter.c
->>>> @@ -5399,7 +5399,11 @@ static int sol_ip_sockopt(struct sock *sk, int optname,
->>>>                             char *optval, int *optlen,
->>>>                             bool getopt)
->>>>    {
->>>> -       if (sk->sk_family != AF_INET)
->>>> +       if (sk->sk_family != AF_INET
->>>> +#if IS_BUILTIN(CONFIG_IPV6)
->>>> +           && !is_tcp_sock_ipv6_mapped(sk)
->>>> +#endif
->>>> +           )
->>>>                   return -EINVAL;
->>>
->>> This does not look right to me.
->>>
->>> I would remove the test completely.
->>>
->>> SOL_IP socket options are available on AF_INET6 sockets just fine.
->>
->> Good point on the SOL_IP options.
->>
->> The sk could be neither AF_INET nor AF_INET6. e.g. the bpf_get/setsockopt
->> calling from the bpf_lsm's socket_post_create). so the AF_INET test is still needed.
->>
+On 8/23/24 18:08, Marek Vasut wrote:
+> Neither chip_allow_sleep()/chip_wakeup() is used outside of wlan.c .
+> Make both functions static and remove both the exported symbol and
+> entries from wlan.h .
 > 
-> OK, then I suggest using sk_is_inet() helper.
+> Make chip_allow_sleep() return error code in preparation for the
+> follow up patches.
 > 
->> Adding "&& sk->sk_family != AF_INET6" should do. From ipv6_setsockopt, I think
->> it also needs to consider the "sk->sk_type != SOCK_RAW".
->>
->> Please add a test in the next re-spin.
->>
->> pw-bot: cr
+> Move acquire_bus() and release_bus() to avoid forward declaration
+> of chip_allow_sleep()/chip_wakeup().
+> 
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> ---
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Adham Abozaeid <adham.abozaeid@microchip.com>
+> Cc: Ajay Singh <ajay.kathat@microchip.com>
+> Cc: Alexis Lothoré <alexis.lothore@bootlin.com>
+> Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+> Cc: Conor Dooley <conor+dt@kernel.org>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Kalle Valo <kvalo@kernel.org>
+> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+> Cc: Marek Vasut <marex@denx.de>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Rob Herring <robh@kernel.org>
+> Cc: devicetree@vger.kernel.org
+> Cc: linux-wireless@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> ---
+> V2: New patch
+> ---
+>  .../net/wireless/microchip/wilc1000/wlan.c    | 47 +++++++++----------
+>  .../net/wireless/microchip/wilc1000/wlan.h    |  2 -
+>  2 files changed, 23 insertions(+), 26 deletions(-)
+> 
+> diff --git a/drivers/net/wireless/microchip/wilc1000/wlan.c b/drivers/net/wireless/microchip/wilc1000/wlan.c
+> index 1aab2f2dc159f..5fbba6876bd07 100644
+> --- a/drivers/net/wireless/microchip/wilc1000/wlan.c
+> +++ b/drivers/net/wireless/microchip/wilc1000/wlan.c
+> @@ -12,20 +12,6 @@
+>  
+>  #define WAKE_UP_TRIAL_RETRY		10000
+>  
+> -static inline void acquire_bus(struct wilc *wilc, enum bus_acquire acquire)
+> -{
+> -	mutex_lock(&wilc->hif_cs);
+> -	if (acquire == WILC_BUS_ACQUIRE_AND_WAKEUP && wilc->power_save_mode)
+> -		chip_wakeup(wilc);
+> -}
+> -
+> -static inline void release_bus(struct wilc *wilc, enum bus_release release)
+> -{
+> -	if (release == WILC_BUS_RELEASE_ALLOW_SLEEP && wilc->power_save_mode)
+> -		chip_allow_sleep(wilc);
+> -	mutex_unlock(&wilc->hif_cs);
+> -}
+> -
+>  static void wilc_wlan_txq_remove(struct wilc *wilc, u8 q_num,
+>  				 struct txq_entry_t *tqe)
+>  {
+> @@ -555,7 +541,7 @@ static struct rxq_entry_t *wilc_wlan_rxq_remove(struct wilc *wilc)
+>  	return rqe;
+>  }
+>  
+> -void chip_allow_sleep(struct wilc *wilc)
+> +static int chip_allow_sleep(struct wilc *wilc)
+>  {
+>  	u32 reg = 0;
+>  	const struct wilc_hif_func *hif_func = wilc->hif_func;
+> @@ -584,7 +570,7 @@ void chip_allow_sleep(struct wilc *wilc)
+>  	while (--trials) {
+>  		ret = hif_func->hif_read_reg(wilc, to_host_from_fw_reg, &reg);
+>  		if (ret)
+> -			return;
+> +			return ret;
 
-Thanks for your suggestion, I will add it in the next version.
+Forwarding error codes sounds like a good idea, but neither this patch nor the
+next one is reading the return value from any chip_allow_sleep[XXX] function, so
+it does not bring much value.
+
+Alexis
+
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
