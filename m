@@ -1,104 +1,116 @@
-Return-Path: <netdev+bounces-122404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA12B961176
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 17:20:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C444F96118D
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 17:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C3151F21E22
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:20:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78A05280D00
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 15:21:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0521C86F6;
-	Tue, 27 Aug 2024 15:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NLKG2Nf7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3D21C6F55;
+	Tue, 27 Aug 2024 15:20:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D0C1C688E
-	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 15:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3353A1CFBC;
+	Tue, 27 Aug 2024 15:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724771971; cv=none; b=l7SxTfp0h0mYby6hkCR8lm+RArvoiNZgOmazpVL87DTqs77eucdJAqxX79re0mEa6T2PZmstQ0zX7/99EtWaUngRRdGzXgmFfUqYe82BG+8q+ujP8JGYc11v96wtNuVy8q426luPQhJywYO5O/FPpxesQQaEHghPPVdkj4/GgM0=
+	t=1724772039; cv=none; b=P43ZN8PmBMubijIpBRVC1SsfQASHS4v6zBYBpSO7PQCbThWtOmVzHM/T1OcD4IyjOV1C+O8tyhWkdM3xA77lpp5zQff7/LTjomRiwT0ngLPn5NW9mNjidPh02fkrYq6Ivmeu+pR9dEubUvTn630FtXmgBqCX98Hq2XfCGDdPfcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724771971; c=relaxed/simple;
-	bh=XsXTgyfX4lK8uIlF+JZT8a96CuV8addTsgcuxyLMIXg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BM9c1n+VEVhELF60MZflvoUW8tui/n5c6YxMyLifjBelr8EFcgSQxTyNoOU/seYu9UEAIz3VB1mW32YsJUwwTKcdjwtwfRsu/w4Ju/7v06rjfmiBV/Qdk3p8plJGUKxqrL9fsvK+pGUQqNcpVqRbMB7msn0bALKEZPG7z/Dbf1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NLKG2Nf7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724771967;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XsXTgyfX4lK8uIlF+JZT8a96CuV8addTsgcuxyLMIXg=;
-	b=NLKG2Nf7I1oY1D5Lf5OgqR7eHpjWHuj84kdWBhLwQQA55sliz5+EEZtGEhoeeVyLWgXNI3
-	9i7/nqtztFXU/7knGzHzCJQQRpbWg+qqVQLcPzDqV66JTttXkzMBCGg/EPZz8nZy1j05cc
-	k+vOKatstZo/g6zB5Nj9JAPSHkfXYyk=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-659-QcAFmtw2OjaFvTEvgJh0sQ-1; Tue, 27 Aug 2024 11:19:25 -0400
-X-MC-Unique: QcAFmtw2OjaFvTEvgJh0sQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-428040f49f9so52918145e9.0
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 08:19:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724771964; x=1725376764;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XsXTgyfX4lK8uIlF+JZT8a96CuV8addTsgcuxyLMIXg=;
-        b=OiSJHjJyaeikJ5apfkOS9w7yIY5wlV3F99K85+G7J7oU35uaeqHxEB+sLtCNYpmCcq
-         VaJ4DimxOLoAiqjN0mz+oxmFrQWXqptOUpwX4e7bjUzN/6FvrZPkSbjo5P36tmG8S4wf
-         kuBHEkXhWZeGU7gAKtQIYcXrKRSn7g41rD7Tcqsb6QXIEGGBxLTDxBofYPIArI8IiR1o
-         TOoSG+hlQsiKR30FfmXiuEglTSy0Ikh+wdapXYu975Z59Cu6rcgzAzLD1Yh07ecQQ/II
-         VKB/k1ZZO8OYxS1upe/dwQG2BE5yfN+oH2StjGWE1WQ2XaeanPPUm61cMMZgcW0NW1kx
-         PzcA==
-X-Gm-Message-State: AOJu0Yzw6lk3yI7qhS8KPf/Bu8b0hO6uPB+eDuRLBS7yhDQ9FfNpzsTz
-	e2iJx2CJW6KhLRwltbRrsBHxnE+hcPubxsQKpYL8NpDoeGtB7ndkJcJXQgxlOcRPdgoIgi4lYYv
-	DaGf+8WM7hCrbmA4EZ/NAIEhYnVEPdU8pMpy2rOGAIrpXOqMchL+vDQ==
-X-Received: by 2002:a05:600c:1909:b0:428:1e8c:ff75 with SMTP id 5b1f17b1804b1-42b9ae4b2f4mr20766265e9.35.1724771964527;
-        Tue, 27 Aug 2024 08:19:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEVs7Eq/Lgx0Ec3DmzVYMcg2muWndP6suW1Qn92j1nPKb5gJ8Gdf9ACQzJ78fT4mjD/JVG01w==
-X-Received: by 2002:a05:600c:1909:b0:428:1e8c:ff75 with SMTP id 5b1f17b1804b1-42b9ae4b2f4mr20765965e9.35.1724771963838;
-        Tue, 27 Aug 2024 08:19:23 -0700 (PDT)
-Received: from debian (2a01cb058918ce0010ac548a3b270f8c.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:10ac:548a:3b27:f8c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42abeffefcasm229538755e9.45.2024.08.27.08.19.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 08:19:23 -0700 (PDT)
-Date: Tue, 27 Aug 2024 17:19:21 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
-	ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
-	john.fastabend@gmail.com, steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 10/12] ipvlan: Unmask upper DSCP bits in
- ipvlan_process_v4_outbound()
-Message-ID: <Zs3ueeXcqw47HXa4@debian>
-References: <20240827111813.2115285-1-idosch@nvidia.com>
- <20240827111813.2115285-11-idosch@nvidia.com>
+	s=arc-20240116; t=1724772039; c=relaxed/simple;
+	bh=OEClyW8tzUSHpxtCUWDullJ+70jg1UBt0vKBjD8Slqc=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qSmW5deqNXkRAHQcOyqpcbXgGET8wsQFYJ/4LbwM4BNeqBAxaxfAE40x2MR/DLjpAAAUtvlhdPlsvOCQRUUvpdpdnZXuUIbqHqE6ZVGKUmTrzsuhtxLUuO7dSGgvY8Y5PxGWw3UpehBTx66dIw211AdV/5CyB+RiogtKVJB6vs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WtWNP04Lbz6J6gc;
+	Tue, 27 Aug 2024 23:16:37 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7D9B1140A87;
+	Tue, 27 Aug 2024 23:20:35 +0800 (CST)
+Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 27 Aug
+ 2024 16:20:34 +0100
+Date: Tue, 27 Aug 2024 16:20:34 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Alejandro Lucero Palau <alucerop@amd.com>
+CC: Zhi Wang <zhiw@nvidia.com>, <alejandro.lucero-palau@amd.com>,
+	<linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
+	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <edumazet@google.com>, <richard.hughes@amd.com>,
+	<targupta@nvidia.com>, <zhiwang@kernel.org>
+Subject: Re: [PATCH v2 12/15] cxl: allow region creation by type2 drivers
+Message-ID: <20240827162034.00005ef0@Huawei.com>
+In-Reply-To: <17e5cf38-39f2-4136-fe2e-6936d8f45633@amd.com>
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+	<20240715172835.24757-13-alejandro.lucero-palau@amd.com>
+	<20240822161226.00001736.zhiw@nvidia.com>
+	<17e5cf38-39f2-4136-fe2e-6936d8f45633@amd.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240827111813.2115285-11-idosch@nvidia.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-On Tue, Aug 27, 2024 at 02:18:11PM +0300, Ido Schimmel wrote:
-> Unmask the upper DSCP bits when calling ip_route_output_flow() so that
-> in the future it could perform the FIB lookup according to the full DSCP
-> value.
+On Fri, 23 Aug 2024 10:31:20 +0100
+Alejandro Lucero Palau <alucerop@amd.com> wrote:
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+> On 8/22/24 14:12, Zhi Wang wrote:
+> > On Mon, 15 Jul 2024 18:28:32 +0100
+> > <alejandro.lucero-palau@amd.com> wrote:
+> >  
+> >> From: Alejandro Lucero <alucerop@amd.com>
+> >>
+> >> Creating a CXL region requires userspace intervention through the cxl
+> >> sysfs files. Type2 support should allow accelerator drivers to create
+> >> such cxl region from kernel code.
+> >>
+> >> Adding that functionality and integrating it with current support for
+> >> memory expanders.
+> >>
+> >> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c
+> >> b/drivers/net/ethernet/sfc/efx_cxl.c index b5626d724b52..4012e3faa298
+> >> 100644 --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> >> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> >> @@ -92,8 +92,18 @@ void efx_cxl_init(struct efx_nic *efx)
+> >>   
+> >>   	cxl->cxled = cxl_request_dpa(cxl->endpoint, true,
+> >> EFX_CTPIO_BUFFER_SIZE, EFX_CTPIO_BUFFER_SIZE);
+> >> -	if (IS_ERR(cxl->cxled))
+> >> +	if (IS_ERR(cxl->cxled)) {
+> >>   		pci_info(pci_dev, "CXL accel request DPA failed");
+> >> +		return;
+> >> +	}
+> >> +
+> >> +	cxl->efx_region = cxl_create_region(cxl->cxlrd, &cxl->cxled,
+> >> 1);
+> >> +	if (!cxl->efx_region) {  
+> > if (IS_ERR(cxl->efx_region))
+> >  
+> 
+> I'll fix it.
+> 
+> Thanks
+Please crop replies. It's really easy to miss the important stuff
+otherwise!
+
+Jonathan
+
 
 
