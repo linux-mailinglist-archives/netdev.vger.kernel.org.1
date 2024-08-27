@@ -1,76 +1,112 @@
-Return-Path: <netdev+bounces-122462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF85396167A
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 20:09:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C5FD96169F
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 20:16:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C590B2415E
-	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 18:09:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 272C8284224
+	for <lists+netdev@lfdr.de>; Tue, 27 Aug 2024 18:16:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DDA11D278A;
-	Tue, 27 Aug 2024 18:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF06A1D1757;
+	Tue, 27 Aug 2024 18:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XfsTYf4L"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HAWbSply"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A5E1CE6E8;
-	Tue, 27 Aug 2024 18:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A251D2F4D
+	for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 18:16:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724782138; cv=none; b=kibe+BXNML43uF6ztDDiHZCjI3KeMVVWUyxgvBXx6fZtq+Q8AEX5ppTpzxtRAh2BbCVuU2bRJDcxg1DI2CPrMMO/BELBCEjktWdoLqqUGqUI2bRhRFSo2k/Xf40ES11iyqPPMkQjjb9xpVsfHZlgnbF+8K9/c/NMFdO6w+6OB0M=
+	t=1724782598; cv=none; b=HqthsvpcRCRKZppIMhYPnaNa5oO/jnokghEuw3Fl7ZIAJjCfTCtzHusrgiTbrpDl6C8qqno+WrW8EaUrsnW+fGk9fuBksCbBAO5JrDarYo9HneBhRSdzZgwV0P3fYTdR1QN/sLlNOiVqSWIrHP+i9y12XGODycjOYci6hxut+6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724782138; c=relaxed/simple;
-	bh=vPRdnXcxzOvqwsl31MwpvcFEo2tS10nXApdk3u4GrMg=;
+	s=arc-20240116; t=1724782598; c=relaxed/simple;
+	bh=X8QcjerdXUVJM0M6K25kjjudFG+vmIr5pWvEHt8N2WE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dYPDbw9CX1AGC2A7yiNxYcU80unKUU1zkYr3RlRBS8yNm09ZthSeENcxFf0hHbaPTe8z4BqMURmwJE3DkmbNV4TV4OeQ1N69ZSrlnr2BqR4/0fuEK06q3PZR0xEipE2WEt2gbrC18W96ctRH1jkpJzPpDl7daL34PrKc0SKiW08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XfsTYf4L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E5E5C4AF19;
-	Tue, 27 Aug 2024 18:08:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724782138;
-	bh=vPRdnXcxzOvqwsl31MwpvcFEo2tS10nXApdk3u4GrMg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XfsTYf4LMwlW7krx4xXbZmqu9HLUZGMEMLYfnjRrPD8etgttmrVU992IssYZ1ckZo
-	 bccuAXlvfB0+9gvluXFVhLC6dudd5wOj81J7B6Qdrgw7UHJz6kXIuNC4dXbs5EEAH3
-	 ku5A4OfRKeCWjt7R3j68XUBd+MsO14Tniy6h1CyzbYMFi/ogWaaitBaFSGnhp0pZgC
-	 eIBcSi+6VMo8ZqRjvUmoRd1CybcKJGAqBXrdnsyMcJy91Hj5wyWOaf1f2o0zzq9LOK
-	 HeECVMS3awJZ65rqrcP3Tin3c4SWCd83SsIlbY7aRVXG/Fi2TGXxOSg1HN51BLvXfv
-	 DF4gfJhC7PYQQ==
-Date: Tue, 27 Aug 2024 19:08:54 +0100
-From: Simon Horman <horms@kernel.org>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next RESEND 3/3] net: hisilicon: hns_mdio: fix OF
- node leak in probe()
-Message-ID: <20240827180854.GV1368797@kernel.org>
-References: <20240827144421.52852-1-krzysztof.kozlowski@linaro.org>
- <20240827144421.52852-4-krzysztof.kozlowski@linaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=DYTr/HRQqsiusThVxsTpF3g9I68QwGH2l2C7ewobrFMmmIqlJBZIwqv8iQc50Wf1gicUzMtdYZKWjPMZ6EIElbG0+TDIMDOwFRDkIv1u+4CarSwvnR5QKHNLykMf+5FXAVg++r2WBtNTkKxYg7h+tB1c8sTkHSIFGFf/iLROZBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HAWbSply; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724782596;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EHSBO7ll3rbZOfjXr1T8jodqp3tHRdp2gSRkpPRf9Tg=;
+	b=HAWbSplyNrpeIEgf2zP07+t0ix/WDNJlPtOuvgEa5ulDYPiMkT1eTdxCi6eJ8Skp+mpxKa
+	ZevXnnUNa5Ejd+701HRM26ylOY466mffgmBTGiXrHQHpVUoYgPnfzb0JrrNih3dw8NY/dZ
+	uEUBX7qi0zOw0LdiR8BBLAFN+0/Kqf0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-602-dIwCQhuYM4aMfyb2E7t3iw-1; Tue, 27 Aug 2024 14:16:34 -0400
+X-MC-Unique: dIwCQhuYM4aMfyb2E7t3iw-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a86690270dcso555058366b.2
+        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 11:16:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724782594; x=1725387394;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EHSBO7ll3rbZOfjXr1T8jodqp3tHRdp2gSRkpPRf9Tg=;
+        b=eAwinLRFFl9MCOx68qjIm0LuCoJvKWKPYlx2KC7/yfU5FYmDEH0LDqNYiPlzrKI3Dk
+         lUZi0ewpmgdT4rnae4u/2NCF36U1IYCmuAIhUc5qrBRdo/CVzZRSLrvG2dQSQivuK551
+         ygyYd+dHjpj/W6nm0dpmuHH3xFH+NZ9J4k3D9acQvQtEky0cBLLerDfg46VDAVTgkqtN
+         y/nr7fDP3JEqEaPru3faDLLV4U/DrC6Ojatjz6KIm2NSbhmrr6ednrUmoTy5F3JRwXvw
+         xViSDOtJc5AXaK7avlhgeTGANU4mpyLnzzY1TV4PDOyCOikUQUkEzMJcDyW3WRTye9Nm
+         ZM/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUbFdg2xCcTKy2FY6PfNR0DZeajQldkxl/r3Rzi4eLgenpb0gnctgWHfrKuewJNfXaOz4fdkmc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuEcJBE+XeUVRuZRVcG1IKDjMKPyh8ati7M93S5mxQv9ztihOO
+	wKxDFZiPmxnXwCnQVUBNWCl/lCsniQFU5FpFYhefde/vr/qK0hqw2+FAqInptTvLx0+pwsu+qUy
+	w77LZi7oHfjeE5719sxIhe4FcAJ2MtD4bjuZVEDV4vVfsKrhojnqDHQ==
+X-Received: by 2002:a17:906:7315:b0:a86:99e9:ffa1 with SMTP id a640c23a62f3a-a86e3d3e9camr241758766b.64.1724782593699;
+        Tue, 27 Aug 2024 11:16:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHnDe3VluilgSG0vcrrqRKifn4o56qtamsjzIVVNpfdjfRpMszxTYEqVcY4D+Wi8k/eikH1ig==
+X-Received: by 2002:a17:906:7315:b0:a86:99e9:ffa1 with SMTP id a640c23a62f3a-a86e3d3e9camr241756666b.64.1724782592949;
+        Tue, 27 Aug 2024 11:16:32 -0700 (PDT)
+Received: from redhat.com ([2.55.185.222])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a86e588b39asm138757166b.159.2024.08.27.11.16.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Aug 2024 11:16:32 -0700 (PDT)
+Date: Tue, 27 Aug 2024 14:16:28 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Carlos Bilbao <cbilbao@digitalocean.com>
+Cc: virtualization@lists.linux-foundation.org, jasowang@redhat.com,
+	kvm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC] vDPA: Trying to make sense of config data
+Message-ID: <20240827141529-mutt-send-email-mst@kernel.org>
+References: <4f4572c8-1d8c-4ec6-96a1-fb74848475af@digitalocean.com>
+ <e7ba91a7-2ba6-4532-a59a-03c2023309c6@digitalocean.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240827144421.52852-4-krzysztof.kozlowski@linaro.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e7ba91a7-2ba6-4532-a59a-03c2023309c6@digitalocean.com>
 
-On Tue, Aug 27, 2024 at 04:44:21PM +0200, Krzysztof Kozlowski wrote:
-> Driver is leaking OF node reference from
-> of_parse_phandle_with_fixed_args() in probe().
+On Fri, Aug 23, 2024 at 09:51:24AM -0500, Carlos Bilbao wrote:
+> Hello again, 
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Answering my own question:
+> 
+> https://elixir.bootlin.com/linux/v6.10.2/source/include/uapi/linux/virtio_net.h#L92
+> 
+> Thanks, Carlos
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Right. kernel.org would be the official source for that header.
+Or if you want it in english, that would be the virtio spec.
+
+-- 
+MST
 
 
