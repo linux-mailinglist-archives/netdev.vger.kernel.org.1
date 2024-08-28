@@ -1,261 +1,189 @@
-Return-Path: <netdev+bounces-122571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03A49961C2F
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 04:37:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4E89961C7C
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 05:03:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67143B22CFD
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 02:36:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5682E1F2527F
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 03:03:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F5354656;
-	Wed, 28 Aug 2024 02:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A44139578;
+	Wed, 28 Aug 2024 03:03:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YKjwqr+M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="msMs74kQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC1749627
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 02:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2BF288B1;
+	Wed, 28 Aug 2024 03:03:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724812610; cv=none; b=u6clUUUXiSzaNwKZf4c89cUkjoUBOHPp8Y4jfde+vILRgk/Rqc54daiyBwVEgH2qlrtarIZirhvjFsBlfG8arzivE6ERLYldpU3zsUgctjR3yDTIY/3QyoUHgGTH7OUKSfALH61a9b69i4IrN3Wcu5Bp8NQb9P7rKz8de70PmFw=
+	t=1724814218; cv=none; b=ON+DhmTlKY1VqeFOadBglUYScV9AdPjVDvYOQAzznspEMSmi6GSzVVyDxKskMo4xQQCxvuSVz0E5dmRKqOv/Ke+Ui3DM5kDbr9P3RUEmT5ua1ccDdgBiikkIeVWKdc0pgM0Smh3J5WMilhvdXehaA9FhVeNNQu4zZMJV+L/BILI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724812610; c=relaxed/simple;
-	bh=9KVtrDIkQrqhoaYoDfW1bZqVYvk8MaW3jm5v/WUJYY8=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=nGUiO0vaPGO2lUc08vFerVzd3gdffBztwDhuM8TX5kJd+nvDwnI78kEwXpwnDcHU4XVzN6iSypRWDalI90TBwQvlaT1SzGrLuactWv7larGKt6pXopmXe2YvewHbNnKiGiVqMByi7lSzuvWaFjhJPM2FRbjj6f2k4ukPdx6Xafw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YKjwqr+M; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Content-Type: text/plain;
-	charset=us-ascii
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724812606;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d8P34oY8EX3iB+WHKFWcxCiPxWsH5mZsU2qtXZYBDx8=;
-	b=YKjwqr+Ms2AzytPHOJSEy7hIUuE3z3kiC2SNH71agCNDB0qczG2rbXsaOUosiWH2XcN8gS
-	I9g2bFPumA0+f+icndZTriMglTW6AY6PWXaBG/9DaxualYBzxxEeSC72Nhi74bDX5wvc93
-	FaxJlji4d14otrl1zaw7d0LWgP6Sl+8=
+	s=arc-20240116; t=1724814218; c=relaxed/simple;
+	bh=cCVG2dvpcm6txKhFsmgtEBhA5qVSSR/kkcVf0/zvARg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ljcHqxv1rzpcMlkwZMbZU6EpRUjhKmRraEGjGsxWBdOA0WucDSYbKvwU3UyH4lqx1BtjNSi4nzNDjWHwa9lxyoxwwoUvb5qFe4Dk3zYN2rcpRulSslwuivb+9mqkpdJDs6A0AVgDQELoLWU0CL9hysDqMKFoVIK5R/ihQtLDYuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=msMs74kQ; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7106cf5771bso5226649b3a.2;
+        Tue, 27 Aug 2024 20:03:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724814216; x=1725419016; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=u96++TBbJ71oR+HkQgBso+tiWoljyvGONtmx4MFc6sw=;
+        b=msMs74kQBTx1wCiIvu14y5BmYEt0bSDbsnXqEN4luyvMvOmsyGaWXszGoGo3MQ/hAj
+         3qClNqnOjw+qpqfcNQJRBof4u2ceuH3BylnUXtFdLLWg9mXSLR5WoihuysH04vVOCggQ
+         lI/bStEInPpNhhS2w6iYe5Xzuvzz96p8bX/qzPAg9jHxfSgKeNjBygD1zyibEwuzRhQE
+         rEBnYqUL4054KaRHVxFeBOiCd8DpwF/Cuqj1Qt9VG7R5QjvNap7ccUPqjEa1nvPP9qR+
+         j62CA6JQzJCQOZ1A9LMgPAnkc2iDKTgB2s7R4iklP7mZn6dIiPhyLMrn6HemzwKCvv43
+         qb4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724814216; x=1725419016;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u96++TBbJ71oR+HkQgBso+tiWoljyvGONtmx4MFc6sw=;
+        b=ioIkI6INxYuZdp4q1ZTSEoWD/nyT2tRmfjEJkDuMV9tmFhnD/xvIjpbSWCGvKGyfqw
+         iTX7UFA5KhJ/sA2aHdkWMrjsIViuKFd1jehQ2WkPhLcRjXD/P0AjxGGcH/dPR9XahkW3
+         lyYw6W/D9Zfp7kVC7wJFpL6LMCcxCM69HugJjjosTH7waGCSo72MPhiLmOyMCkX3Xm++
+         WRxiEZUZNBgK0D96WT5FW255a6yXN5V+fU7JmHsMZynv7qm8TNPsztYqhNjXfzMW/YwB
+         YVLI1wZgTVlv8vx69Lc2u2JCbOcsKjHmK3p6xRwvucwj2ZVpuT3qTxFQIgYtyPmZuQoH
+         tSAw==
+X-Forwarded-Encrypted: i=1; AJvYcCV3skHLyJ0gxGjFKC7GoamCrdYoX4sX/dA4X7Hb0WVNFkJ44s9Nb2U9wtOTQTgBnbfby1D+1GHb8dCoZFIcJGKPWsn13L2H@vger.kernel.org, AJvYcCVpq2br3cokzFyWsrZrJb30fuT6KXNaqUPeLE4gPYS++Rgh3NxKM5Ux8lx8xdgt3qx1lcfdxu92G8yr2u6wIA==@vger.kernel.org, AJvYcCWFI3eyZuPuq9BU/Aa6WLr+rqkUlNoYL3ygfBukBz6pd1i3yzTh8ryIGx/opz6GQrASc6cmVQ==@vger.kernel.org, AJvYcCWf7GCXQbIe6I5CYIlz5eQUib+/8XepXlpN6bX0L6efJ0DJA7MqNOnk55otw66WIJvMex69L8an@vger.kernel.org, AJvYcCWg+KpImpdHpLN7JuIQ9yerK6FRDxajrdW5iXGihOUkrEVLJCXb2xTuiHH4a4dUHq7w950aEb9HcD68o2/9D3+GxNJF@vger.kernel.org, AJvYcCWv2+Vb575Hd2t6C4MwSur+qKxMqEZSIDY+GzO7/LA5YbywGIV8K5HLdlYD8dXUuhLVRMAR@vger.kernel.org, AJvYcCXvJAet0O8obK0I8vB+ZsrIeGsUFlxnw1fL50FZRsEWRodLSVXMrJ4Zp+9N7bUCpET6O5yw3UiwJA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQelLdsTlDXdqQe6T/9H51Rj9MAmtpYGykVdhpncSnpE6dbMdh
+	/SxJm3hhig7XhYZFp5G4hT6N47MtxC8ziLVVIqxz8g/e9hOWqJbP
+X-Google-Smtp-Source: AGHT+IHibExtxV8dBZTZD5JORthJOms4iDv1rvcr+QvHWcHAfAXxuXG3hLg0KOZ+K8PqosjKn4N4Iw==
+X-Received: by 2002:a05:6a20:9c89:b0:1c3:a63a:cef2 with SMTP id adf61e73a8af0-1cc89dc90ecmr15627538637.28.1724814215888;
+        Tue, 27 Aug 2024 20:03:35 -0700 (PDT)
+Received: from localhost.localdomain ([39.144.104.43])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d8445db8f6sm317977a91.1.2024.08.27.20.03.28
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 27 Aug 2024 20:03:35 -0700 (PDT)
+From: Yafang Shao <laoar.shao@gmail.com>
+To: akpm@linux-foundation.org
+Cc: torvalds@linux-foundation.org,
+	alx@kernel.org,
+	justinstitt@google.com,
+	ebiederm@xmission.com,
+	alexei.starovoitov@gmail.com,
+	rostedt@goodmis.org,
+	catalin.marinas@arm.com,
+	penguin-kernel@i-love.sakura.ne.jp,
+	linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	audit@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	Yafang Shao <laoar.shao@gmail.com>
+Subject: [PATCH v8 0/8] Improve the copy of task comm
+Date: Wed, 28 Aug 2024 11:03:13 +0800
+Message-Id: <20240828030321.20688-1-laoar.shao@gmail.com>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
-Subject: Re: [PATCH v1] memcg: add charging of already allocated slab objects
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Muchun Song <muchun.song@linux.dev>
-In-Reply-To: <yiyx4fh6dklqpexfstkzp3gf23hjpbjujci2o6gs7nb4sutzvb@b5korjrjio3m>
-Date: Wed, 28 Aug 2024 10:36:06 +0800
-Cc: Roman Gushchin <roman.gushchin@linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>,
- Johannes Weiner <hannes@cmpxchg.org>,
- Michal Hocko <mhocko@kernel.org>,
- Vlastimil Babka <vbabka@suse.cz>,
- David Rientjes <rientjes@google.com>,
- Hyeonggon Yoo <42.hyeyoo@gmail.com>,
- Eric Dumazet <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Linux Memory Management List <linux-mm@kvack.org>,
- LKML <linux-kernel@vger.kernel.org>,
- Meta kernel team <kernel-team@meta.com>,
- cgroups@vger.kernel.org,
- netdev <netdev@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <EA5F7851-B519-4570-B299-8A096A09D6E7@linux.dev>
-References: <20240826232908.4076417-1-shakeel.butt@linux.dev>
- <Zs1CuLa-SE88jRVx@google.com>
- <yiyx4fh6dklqpexfstkzp3gf23hjpbjujci2o6gs7nb4sutzvb@b5korjrjio3m>
-To: Shakeel Butt <shakeel.butt@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
+Using {memcpy,strncpy,strcpy,kstrdup} to copy the task comm relies on the
+length of task comm. Changes in the task comm could result in a destination
+string that is overflow. Therefore, we should explicitly ensure the
+destination string is always NUL-terminated, regardless of the task comm.
+This approach will facilitate future extensions to the task comm.
 
+As suggested by Linus [0], we can identify all relevant code with the
+following git grep command:
 
-> On Aug 28, 2024, at 01:23, Shakeel Butt <shakeel.butt@linux.dev> =
-wrote:
->=20
-> On Tue, Aug 27, 2024 at 03:06:32AM GMT, Roman Gushchin wrote:
->> On Mon, Aug 26, 2024 at 04:29:08PM -0700, Shakeel Butt wrote:
->>> At the moment, the slab objects are charged to the memcg at the
->>> allocation time. However there are cases where slab objects are
->>> allocated at the time where the right target memcg to charge it to =
-is
->>> not known. One such case is the network sockets for the incoming
->>> connection which are allocated in the softirq context.
->>>=20
->>> Couple hundred thousand connections are very normal on large loaded
->>> server and almost all of those sockets underlying those connections =
-get
->>> allocated in the softirq context and thus not charged to any memcg.
->>> However later at the accept() time we know the right target memcg to
->>> charge. Let's add new API to charge already allocated objects, so we =
-can
->>> have better accounting of the memory usage.
->>>=20
->>> To measure the performance impact of this change, tcp_crr is used =
-from
->>> the neper [1] performance suite. Basically it is a network ping pong
->>> test with new connection for each ping pong.
->>>=20
->>> The server and the client are run inside 3 level of cgroup hierarchy
->>> using the following commands:
->>>=20
->>> Server:
->>> $ tcp_crr -6
->>>=20
->>> Client:
->>> $ tcp_crr -6 -c -H ${server_ip}
->>>=20
->>> If the client and server run on different machines with 50 GBPS NIC,
->>> there is no visible impact of the change.
->>>=20
->>> For the same machine experiment with v6.11-rc5 as base.
->>>=20
->>>         base (throughput)     with-patch
->>> tcp_crr   14545 (+- 80)         14463 (+- 56)
->>>=20
->>> It seems like the performance impact is within the noise.
->>>=20
->>> Link: https://github.com/google/neper [1]
->>> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
->>=20
->> Hi Shakeel,
->>=20
->> I like the idea and performance numbers look good. However some =
-comments on
->> the implementation:
->>=20
->=20
-> Thanks for taking a look.
->=20
->>> ---
->>>=20
->>> Changes since the RFC:
->>> - Added check for already charged slab objects.
->>> - Added performance results from neper's tcp_crr
->>>=20
->>> include/linux/slab.h            |  1 +
->>> mm/slub.c                       | 54 =
-+++++++++++++++++++++++++++++++++
->>> net/ipv4/inet_connection_sock.c |  5 +--
->>> 3 files changed, 58 insertions(+), 2 deletions(-)
->>>=20
->>> diff --git a/include/linux/slab.h b/include/linux/slab.h
->>> index eb2bf4629157..05cfab107c72 100644
->>> --- a/include/linux/slab.h
->>> +++ b/include/linux/slab.h
->>> @@ -547,6 +547,7 @@ void *kmem_cache_alloc_lru_noprof(struct =
-kmem_cache *s, struct list_lru *lru,
->>>    gfp_t gfpflags) __assume_slab_alignment __malloc;
->>> #define kmem_cache_alloc_lru(...) =
-alloc_hooks(kmem_cache_alloc_lru_noprof(__VA_ARGS__))
->>>=20
->>> +bool kmem_cache_charge(void *objp, gfp_t gfpflags);
->>> void kmem_cache_free(struct kmem_cache *s, void *objp);
->>>=20
->>> kmem_buckets *kmem_buckets_create(const char *name, slab_flags_t =
-flags,
->>> diff --git a/mm/slub.c b/mm/slub.c
->>> index c9d8a2497fd6..580683597b5c 100644
->>> --- a/mm/slub.c
->>> +++ b/mm/slub.c
->>> @@ -2185,6 +2185,16 @@ void memcg_slab_free_hook(struct kmem_cache =
-*s, struct slab *slab, void **p,
->>>=20
->>> __memcg_slab_free_hook(s, slab, p, objects, obj_exts);
->>> }
->>> +
->>> +static __fastpath_inline
->>> +bool memcg_slab_post_charge(struct kmem_cache *s, void *p, gfp_t =
-flags)
->>> +{
->>> + if (likely(!memcg_kmem_online()))
->>> + return true;
->>=20
->> We do have this check in kmem_cache_charge(), why do we need to check =
-it again?
->>=20
->=20
-> I missed to remove this one. I am going to rearrange the code bit more
-> in these functions to avoid the build errors in non MEMCG builds.
->=20
->>> +
->>> + return __memcg_slab_post_alloc_hook(s, NULL, flags, 1, &p);
->>> +}
->>> +
->>> #else /* CONFIG_MEMCG */
->>> static inline bool memcg_slab_post_alloc_hook(struct kmem_cache *s,
->>>      struct list_lru *lru,
->>> @@ -2198,6 +2208,13 @@ static inline void =
-memcg_slab_free_hook(struct kmem_cache *s, struct slab *slab,
->>> void **p, int objects)
->>> {
->>> }
->>> +
->>> +static inline bool memcg_slab_post_charge(struct kmem_cache *s,
->>> +   void *p,
->>> +   gfp_t flags)
->>> +{
->>> + return true;
->>> +}
->>> #endif /* CONFIG_MEMCG */
->>>=20
->>> /*
->>> @@ -4062,6 +4079,43 @@ void *kmem_cache_alloc_lru_noprof(struct =
-kmem_cache *s, struct list_lru *lru,
->>> }
->>> EXPORT_SYMBOL(kmem_cache_alloc_lru_noprof);
->>>=20
->>> +#define KMALLOC_TYPE (SLAB_KMALLOC | SLAB_CACHE_DMA | \
->>> +       SLAB_ACCOUNT | SLAB_RECLAIM_ACCOUNT)
->>> +
->>> +bool kmem_cache_charge(void *objp, gfp_t gfpflags)
->>> +{
->>> + struct slabobj_ext *slab_exts;
->>> + struct kmem_cache *s;
->>> + struct folio *folio;
->>> + struct slab *slab;
->>> + unsigned long off;
->>> +
->>> + if (!memcg_kmem_online())
->>> + return true;
->>> +
->>> + folio =3D virt_to_folio(objp);
->>> + if (unlikely(!folio_test_slab(folio)))
->>> + return false;
->>=20
->> Does it handle the case of a too-big-to-be-a-slab-object allocation?
->> I think it's better to handle it properly. Also, why return false =
-here?
->>=20
->=20
-> Yes I will fix the too-big-to-be-a-slab-object allocations. I presume =
-I
-> should just follow the kfree() hanlding on !folio_test_slab() i.e. =
-that
-> the given object is the large or too-big-to-be-a-slab-object.
+  git grep 'memcpy.*->comm\>'
+  git grep 'kstrdup.*->comm\>'
+  git grep 'strncpy.*->comm\>'
+  git grep 'strcpy.*->comm\>'
 
-Hi Shakeel,
+PATCH #2~#4:   memcpy
+PATCH #5~#6:   kstrdup
+PATCH #7~#8:   strcpy
 
-If we decide to do this, I suppose you will use memcg_kmem_charge_page
-to charge big-object. To be consistent, I suggest renaming =
-kmem_cache_charge
-to memcg_kmem_charge to handle both slab object and big-object. And I =
-saw
-all the functions related to object charging is moved to memcontrol.c =
-(e.g.
-__memcg_slab_post_alloc_hook), so maybe we should also do this for
-memcg_kmem_charge?
+Please note that strncpy() is not included in this series as it is being
+tracked by another effort. [1]
 
-Muhcun,
-Thanks.=
+In this series, we have removed __get_task_comm() because the task_lock()
+and BUILD_BUG_ON() within it are unnecessary.
+
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Link: https://lore.kernel.org/all/CAHk-=wjAmmHUg6vho1KjzQi2=psR30+CogFd4aXrThr2gsiS4g@mail.gmail.com/ [0]
+
+Changes:
+v7->v8:
+- Avoid '+1' and '-1' in string copy. (Alejandro)
+
+v6->v7: https://lore.kernel.org/all/20240817025624.13157-1-laoar.shao@gmail.com/
+- Improve the comment (Alejandro)
+- Drop strncpy as it is being tracked by another effort (Justin)
+  https://github.com/KSPP/linux/issues/90 [1]
+
+v5->v6: https://lore.kernel.org/linux-mm/20240812022933.69850-1-laoar.shao@gmail.com/
+- Get rid of __get_task_comm() (Linus)
+- Use ARRAY_SIZE() in get_task_comm() (Alejandro)
+
+v4->v5: https://lore.kernel.org/all/20240804075619.20804-1-laoar.shao@gmail.com/
+- Drop changes in the mm/kmemleak.c as it was fixed by
+  commit 0b84780134fb ("mm/kmemleak: replace strncpy() with strscpy()")
+- Drop changes in kernel/tsacct.c as it was fixed by
+  commmit 0fe2356434e ("tsacct: replace strncpy() with strscpy()")
+
+v3->v4: https://lore.kernel.org/linux-mm/20240729023719.1933-1-laoar.shao@gmail.com/
+- Rename __kstrndup() to __kmemdup_nul() and define it inside mm/util.c
+  (Matthew)
+- Remove unused local varaible (Simon)
+
+v2->v3: https://lore.kernel.org/all/20240621022959.9124-1-laoar.shao@gmail.com/
+- Deduplicate code around kstrdup (Andrew)
+- Add commit log for dropping task_lock (Catalin)
+
+v1->v2: https://lore.kernel.org/bpf/20240613023044.45873-1-laoar.shao@gmail.com/
+- Add comment for dropping task_lock() in __get_task_comm() (Alexei)
+- Drop changes in trace event (Steven)
+- Fix comment on task comm (Matus)
+
+v1: https://lore.kernel.org/all/20240602023754.25443-1-laoar.shao@gmail.com/
+
+Yafang Shao (8):
+  Get rid of __get_task_comm()
+  auditsc: Replace memcpy() with strscpy()
+  security: Replace memcpy() with get_task_comm()
+  bpftool: Ensure task comm is always NUL-terminated
+  mm/util: Fix possible race condition in kstrdup()
+  mm/util: Deduplicate code in {kstrdup,kstrndup,kmemdup_nul}
+  net: Replace strcpy() with strscpy()
+  drm: Replace strcpy() with strscpy()
+
+ drivers/gpu/drm/drm_framebuffer.c     |  2 +-
+ drivers/gpu/drm/i915/i915_gpu_error.c |  2 +-
+ fs/exec.c                             | 10 -----
+ fs/proc/array.c                       |  2 +-
+ include/linux/sched.h                 | 32 +++++++++++---
+ kernel/auditsc.c                      |  6 +--
+ kernel/kthread.c                      |  2 +-
+ mm/util.c                             | 62 ++++++++++++---------------
+ net/ipv6/ndisc.c                      |  2 +-
+ security/lsm_audit.c                  |  4 +-
+ security/selinux/selinuxfs.c          |  2 +-
+ tools/bpf/bpftool/pids.c              |  2 +
+ 12 files changed, 66 insertions(+), 62 deletions(-)
+
+-- 
+2.43.5
+
 
