@@ -1,134 +1,103 @@
-Return-Path: <netdev+bounces-122922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 344649632BC
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:48:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83B029632E5
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:51:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B448DB231D8
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:48:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BFA6286B66
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3911AD3E3;
-	Wed, 28 Aug 2024 20:41:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9601A1AC448;
+	Wed, 28 Aug 2024 20:45:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l/2Mf37s"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OKQgy4ys"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55AA41A76B5;
-	Wed, 28 Aug 2024 20:41:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0FF15ADB8;
+	Wed, 28 Aug 2024 20:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724877699; cv=none; b=JvGPCQUFTIWfile59g8hndnHMMxynvVh8CSY7e/jGM9R/vOf+xnIu0CDZy3fyetYl75ONaRwjkIn3GZUkAriZtmBwxRDHWM9c7ULMBoCZR5q77y/M3eoufwbKWe/MsKCKTFDfk3SOrNqO3YG7Zl0O4lS5KTr/ao6JmxDSwdfo1E=
+	t=1724877941; cv=none; b=iRJTH9F3Xys0nEDKS2mJubE01/kHptX2vMPRCKs+/1XTdkIAKzR/xVEf4jUaa11+QtI5dxGN++I3TxUF4Gljd8X/bK5iNEjo0lFee7zDTIw6sNPBcNznyv2OqKV+t6NGUNcwyeXz1fq/TB/6Z3Yrww5ypjLrdVSkDS1dPR6B2vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724877699; c=relaxed/simple;
-	bh=q/FpDL5p/ZR383G9c9VD8IJZyUfZRwCvyuxXsbdfrbY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qd9ZLGHWTHWOx1NAuvXSzYnCK3hRsym3prxDNFXgJ7PaPgFqmIKyQ6UDba7lQGHfWtE5gWYmkukDuczBcGMsH5+UmVUVbOwbDQAel7vgBjy8ijpEAtmNUtej34LAHM8VxodtJR8dytgLYAHDWQ2GTqP0vx2BfGPVLpcRGT0XBys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l/2Mf37s; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-202146e9538so65519825ad.3;
-        Wed, 28 Aug 2024 13:41:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724877697; x=1725482497; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=K8wKQdBwMSY0PqXi0G2BoyDS+JfvmaQ+DKG7GTu3UaI=;
-        b=l/2Mf37sodaJCmz7SV+ZE5Q5yBBQIAiuqK/nGyG8/JBf/kiYUsHEozv1gH99fLvT9R
-         GtiXjOlIBYlDqbbFPwiaeVTroNynVTD7EyAXAMcYDcw5o0EmLoeF2sZRTfgS9GL7vAhE
-         LcGu5gw46lAassziV+2VYZMnus6zzzWrbSMDaLXRELCHHdN0Vpv4hIL2jNhaTqDF83DL
-         tZ8Y1aXRAGz8Cxt++Kn7rWrzVUCSL0I5lh0om8FOJ/GmA2JVs+Kb/VDNXxSn1UFp6U9+
-         er+r2PbTHLiAQIPgweJxpiPjkj5NLERCSdKzAEkERBhD6Utkl/lmw3AQ4DoS5P8r+VVV
-         QXkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724877697; x=1725482497;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K8wKQdBwMSY0PqXi0G2BoyDS+JfvmaQ+DKG7GTu3UaI=;
-        b=f5wwkx/f7iJYD2OMgvCQJsjYkXfCgvLZDO1tugXS/K6IDgHGNzPIuR5DTwREQImF5R
-         YeZrRtiFdVtJH+tRuvGO3vOXZpRV9j2cfGfp7cafZGlzz77Py2bxtepHjfCgNwu9Xe0o
-         f1BX5uo4xslipnN6xoampVAbLqYTqd7Ti28X/sOQ8IQrXrRRT1FXoSPxeihfVV2EJX68
-         rAToUE0TEruY1tEYssJKNWWP+FQEkgQpHDtjlUfDLYzt0srpvC1xdGkng6N9BowXotlj
-         sTMWNxXHj32YQY5IzDtLQKfPp+BI6kwcIgQ+kdhtrNPfQSvjL+15PcZT0cMvBr6VJr8I
-         jHcA==
-X-Forwarded-Encrypted: i=1; AJvYcCUI+oQyCN8V1UmO8xyvjGL0J/1R6WFdywSXK3QcYD5M1pagbCsgTy51hmuFn6f65DPFVSPboutcIYdRPlw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBsp/r5yn3WkbuJWFMn2lIJJdZbd00IGVJtJ8Taem+JKFhXwi7
-	u4WPAx+zwiniyBTomD/puBdC0hU2mU8iBL6jNa6NUvpLCgV2NNHIGWk9dw==
-X-Google-Smtp-Source: AGHT+IFzyTzyGdE15dIizsY2T2NWtmfxPTMzZ4bKsHxChogqx053ZMt2BhsyK0+DEsD6jEXqsJkOxA==
-X-Received: by 2002:a17:902:ec88:b0:202:bc3:3e6e with SMTP id d9443c01a7336-2050c363669mr7796885ad.33.1724877697330;
-        Wed, 28 Aug 2024 13:41:37 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385fbc901sm103206115ad.289.2024.08.28.13.41.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 13:41:36 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux@armlinux.org.uk,
-	linux-kernel@vger.kernel.org,
-	o.rempel@pengutronix.de,
-	p.zabel@pengutronix.de
-Subject: [PATCH net-next] net: ag71xx: disable napi interrupts during probe
-Date: Wed, 28 Aug 2024 13:41:26 -0700
-Message-ID: <20240828204135.6543-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1724877941; c=relaxed/simple;
+	bh=SgkVzbZ14XDCKU36J6WIIsAV8YesujpxnFyHSFaz29I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hlJIQKs/eri4jxiOjUG/ZS8dapx6GZxt67q0SIPZWFmSZj1v1coPNPefngH1UafusQcRJu0+recOF9bmmRkDEYS37zX04FpIMimbBB0pp7ounfBtUXtjuTG3eGEGm7L+u6+3Up3eTB9BQS6s0Pso0mfAK0nAMxOTxzqm5Yf8DF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OKQgy4ys; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=26bQlRFk72rfSBekGYpkyGTtRJqwYyFZxRzNApkdSOw=; b=OKQgy4ysRnacVUQNcvrpOFp0SO
+	LP6MhA9Y051p7GyB8Tp6/9SoSV1bVKBHABXj65p6vM8XvjsX6MG4hLS/hnOQ9RWujM28wSrjNmPrC
+	sVXVOx1upE+wWFfv4ZXyIWsmMZwKIOrhflCWBr8H/eywcwgvt8qNeD98pXr5fTpMi8TY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sjPXo-005yGF-EH; Wed, 28 Aug 2024 22:45:32 +0200
+Date: Wed, 28 Aug 2024 22:45:32 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>, kernel@pengutronix.de,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] phy: open_alliance_helpers: Add defines
+ for link quality metrics
+Message-ID: <ac794205-ec9a-4e92-aa74-7c0f9ee67823@lunn.ch>
+References: <20240822115939.1387015-1-o.rempel@pengutronix.de>
+ <20240822115939.1387015-2-o.rempel@pengutronix.de>
+ <20240826093217.3e076b5c@kernel.org>
+ <4a1a72f5-44ce-4c54-9bc5-7465294a39fe@lunn.ch>
+ <20240826125719.35f0337c@kernel.org>
+ <Zs1bT7xIkFWLyul3@pengutronix.de>
+ <20240827113300.08aada20@kernel.org>
+ <Zs6spnCAPsTmUfrL@pengutronix.de>
+ <20240828133428.4988b44f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240828133428.4988b44f@kernel.org>
 
-From: Sven Eckelmann <sven@narfation.org>
+On Wed, Aug 28, 2024 at 01:34:28PM -0700, Jakub Kicinski wrote:
+> On Wed, 28 Aug 2024 06:50:46 +0200 Oleksij Rempel wrote:
+> > Considering that you've requested a change to the uAPI, the work has now become
+> > more predictable. I can plan for it within the task and update the required
+> > time budget accordingly. However, it's worth noting that while this work is
+> > manageable, the time spent on this particular task could be seen as somewhat
+> > wasted from a budget perspective, as it wasn't part of the original scope.
+> 
+> I can probably take a stab at the kernel side, since I know the code
+> already shouldn't take me more more than an hour. Would that help?
+> You'd still need to retest, fix bugs. And go thru review.. so all
+> the not-so-fun parts
+> 
+> > > Especially that we're talking about uAPI, once we go down
+> > > the string path I presume they will stick around forever.  
+> > 
+> > Yes, I agree with it. I just needed this feedback as early as possible.
+> 
+> Andrew? Do you want to decide? :)
 
-ag71xx_probe is registering ag71xx_interrupt as handler for gmac0/gmac1
-interrupts. The handler is trying to use napi_schedule to handle the
-processing of packets. But the netif_napi_add for this device is
-called a lot later in ag71xx_probe.
+I agree about avoiding free test strings. Something more structures
+would be good.
 
-It can therefore happen that a still running gmac0/gmac1 is triggering the
-interrupt handler with a bit from AG71XX_INT_POLL set in
-AG71XX_REG_INT_STATUS. The handler will then call napi_schedule and the
-napi code will crash the system because the ag->napi is not yet
-initialized.
+I can definitely help out with review, but i don't have any time at
+the moment for writing code.
 
-The gmcc0/gmac1 must be brought in a state in which it doesn't signal a
-AG71XX_INT_POLL related status bits as interrupt before registering the
-interrupt handler. ag71xx_hw_start will take care of re-initializing the
-AG71XX_REG_INT_ENABLE.
-
-Signed-off-by: Sven Eckelmann <sven@narfation.org>
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/atheros/ag71xx.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index 0674a042e8d3..435c4b19acdd 100644
---- a/drivers/net/ethernet/atheros/ag71xx.c
-+++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -1855,6 +1855,12 @@ static int ag71xx_probe(struct platform_device *pdev)
- 	if (!ag->mac_base)
- 		return -ENOMEM;
- 
-+	/* ensure that HW is in manual polling mode before interrupts are
-+	 * activated. Otherwise ag71xx_interrupt might call napi_schedule
-+	 * before it is initialized by netif_napi_add.
-+	 */
-+	ag71xx_int_disable(ag, AG71XX_INT_POLL);
-+
- 	ndev->irq = platform_get_irq(pdev, 0);
- 	err = devm_request_irq(&pdev->dev, ndev->irq, ag71xx_interrupt,
- 			       0x0, dev_name(&pdev->dev), ndev);
--- 
-2.46.0
-
+	Andrew
 
