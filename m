@@ -1,121 +1,138 @@
-Return-Path: <netdev+bounces-122753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60CE19626F7
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:25:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40410962743
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:38:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BA171F24028
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:25:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F206428534F
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A17D17A5A4;
-	Wed, 28 Aug 2024 12:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6F5176228;
+	Wed, 28 Aug 2024 12:37:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2581176233;
-	Wed, 28 Aug 2024 12:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5232116C865;
+	Wed, 28 Aug 2024 12:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724847875; cv=none; b=eh+venkpb0R2FvpuRl/eMM12bVxvgEaWoQQIMUMoek5v491WZzuDcB65aDX32++FuuW0XfBkvlrE9HWGN29TgdOB3txHSXSTT8K74R3FEbi79T/R4e++82XsUG8afIA9zBPjmFos3ZJvwF02cUecXPglbhwRLrJlVIXgauSfP9E=
+	t=1724848677; cv=none; b=cxSrgRT0ZZyoy0Yx76vTrF3Q1uoidSYUgmfIuqSdlBjekFrkaZb0OQVOBzDExXoRyzL7ROiOU7RXu4vITGe56RdhYbCdBoTyrR1rdscs6tM7iZmhWSklkj31AuVMvw9V1zZUQwnKYnl08Iqlb/cGX8ESl3L2B63sz/569vr9UZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724847875; c=relaxed/simple;
-	bh=yamfc4O+Z5YpW9l7oNEwgRHuIPAHfmVkTKB8P+Ojc7A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f2G6bEL0zwA1TyE9XDNWGzOizx4hRF+3LaVqXzF8rueUu3f8X1IVhSzIoAdRaLwKihrjbSQ996pWjyTo63Msv8pwFIR6/yXTcNvl77/hyP5H4R9gVvOEcNgsHuExCff77tCyF1QUoE/8eU5M/rVsf0OA98n5nx8k8kbqOfBLXvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+	s=arc-20240116; t=1724848677; c=relaxed/simple;
+	bh=BEofx4i8qQ9H7CSevMVf5sNaMv3SeNVdD44h8Cyrf9E=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YU/5aeWLAzhl7p5C/ASRNAIn1I0CYjRMbUnnCo8zZo2ddxyh9C9WLh7p3Tcny/1mui7mMb5NHqj7DUfgre6d3VOhUwJVBbWoE9MGEqD37/qthSLvfoAAK2fw0LupsmdzDj+LdSX8QRgJUUynGmJV+gmSi6GpcjHIR2BsWTjjuU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Wv3Pn01MXz20n1m;
-	Wed, 28 Aug 2024 20:19:40 +0800 (CST)
-Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6F7C61A016C;
-	Wed, 28 Aug 2024 20:24:30 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by dggpeml500022.china.huawei.com
- (7.185.36.66) with Microsoft SMTP Server (version=TLS1_2,
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Wv3l016Drz6H7RN;
+	Wed, 28 Aug 2024 20:34:36 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5A9B7140447;
+	Wed, 28 Aug 2024 20:37:52 +0800 (CST)
+Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 28 Aug
- 2024 20:24:30 +0800
-From: Hongbo Li <lihongbo22@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <dsahern@kernel.org>, <ralf@linux-mips.org>,
-	<jmaloy@redhat.com>, <ying.xue@windriver.com>, <dan.carpenter@linaro.org>
-CC: <netdev@vger.kernel.org>, <linux-hams@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <lihongbo22@huawei.com>
-Subject: [PATCH net-next v2 6/6] net/ipv4: net: prefer strscpy over strcpy
-Date: Wed, 28 Aug 2024 20:32:24 +0800
-Message-ID: <20240828123224.3697672-7-lihongbo22@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240828123224.3697672-1-lihongbo22@huawei.com>
-References: <20240828123224.3697672-1-lihongbo22@huawei.com>
+ 2024 13:37:51 +0100
+Date: Wed, 28 Aug 2024 13:37:50 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+CC: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
+	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <linus.walleij@linaro.org>,
+	<alsi@bang-olufsen.dk>, <justin.chen@broadcom.com>,
+	<sebastian.hesselbarth@gmail.com>, <alexandre.torgue@foss.st.com>,
+	<joabreu@synopsys.com>, <mcoquelin.stm32@gmail.com>, <wens@csie.org>,
+	<jernej.skrabec@gmail.com>, <samuel@sholland.org>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <ansuelsmth@gmail.com>,
+	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bcm-kernel-feedback-list@broadcom.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-sunxi@lists.linux.dev>,
+	<linux-stm32@st-md-mailman.stormreply.com>, <krzk@kernel.org>,
+	<jic23@kernel.org>
+Subject: Re: [PATCH net-next v2 04/13] net: dsa: realtek: Use __free() to
+ simplify code
+Message-ID: <20240828133750.00007963@Huawei.com>
+In-Reply-To: <20240828032343.1218749-5-ruanjinjie@huawei.com>
+References: <20240828032343.1218749-1-ruanjinjie@huawei.com>
+	<20240828032343.1218749-5-ruanjinjie@huawei.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500022.china.huawei.com (7.185.36.66)
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-The deprecated helper strcpy() performs no bounds checking on the
-destination buffer. This could result in linear overflows beyond
-the end of the buffer, leading to all kinds of misbehaviors.
-The safe replacement is strscpy() [1].
+On Wed, 28 Aug 2024 11:23:34 +0800
+Jinjie Ruan <ruanjinjie@huawei.com> wrote:
 
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strcpy [1]
+> Avoid need to manually handle of_node_put() by using __free(), which
+> can simplfy code.
+> 
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+One suggestion inline.
 
-Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
----
- net/ipv4/ip_tunnel.c            | 2 +-
- net/ipv4/netfilter/arp_tables.c | 2 +-
- net/ipv4/netfilter/ip_tables.c  | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+> ---
+> v2
+> - Split into 2 patches.
+> ---
+>  drivers/net/dsa/realtek/rtl8366rb.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
+> index 7001b8b1c028..0acdcdd93ea2 100644
+> --- a/drivers/net/dsa/realtek/rtl8366rb.c
+> +++ b/drivers/net/dsa/realtek/rtl8366rb.c
+> @@ -1009,7 +1009,6 @@ static int rtl8366rb_setup_all_leds_off(struct realtek_priv *priv)
+>  
+>  static int rtl8366rb_setup_leds(struct realtek_priv *priv)
+>  {
+> -	struct device_node *leds_np;
+>  	struct dsa_switch *ds = &priv->ds;
+>  	struct dsa_port *dp;
+>  	int ret = 0;
+> @@ -1018,7 +1017,8 @@ static int rtl8366rb_setup_leds(struct realtek_priv *priv)
+>  		if (!dp->dn)
+>  			continue;
+>  
+> -		leds_np = of_get_child_by_name(dp->dn, "leds");
+> +		struct device_node *leds_np __free(device_node) =
+> +			of_get_child_by_name(dp->dn, "leds");
+>  		if (!leds_np) {
+>  			dev_dbg(priv->dev, "No leds defined for port %d",
+>  				dp->index);
+> @@ -1032,7 +1032,6 @@ static int rtl8366rb_setup_leds(struct realtek_priv *priv)
+>  				break;
+>  		}
+>  
+> -		of_node_put(leds_np);
+>  		if (ret)
+>  			return ret;
 
-diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-index 5cffad42fe8c..0cd2f3de100c 100644
---- a/net/ipv4/ip_tunnel.c
-+++ b/net/ipv4/ip_tunnel.c
-@@ -1326,7 +1326,7 @@ int ip_tunnel_init(struct net_device *dev)
- 
- 	tunnel->dev = dev;
- 	tunnel->net = dev_net(dev);
--	strcpy(tunnel->parms.name, dev->name);
-+	strscpy(tunnel->parms.name, dev->name);
- 	iph->version		= 4;
- 	iph->ihl		= 5;
- 
-diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
-index 14365b20f1c5..42c34e8952da 100644
---- a/net/ipv4/netfilter/arp_tables.c
-+++ b/net/ipv4/netfilter/arp_tables.c
-@@ -826,7 +826,7 @@ static int get_info(struct net *net, void __user *user, const int *len)
- 		       sizeof(info.underflow));
- 		info.num_entries = private->number;
- 		info.size = private->size;
--		strcpy(info.name, name);
-+		strscpy(info.name, name);
- 
- 		if (copy_to_user(user, &info, *len) != 0)
- 			ret = -EFAULT;
-diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
-index fe89a056eb06..97e754ddc155 100644
---- a/net/ipv4/netfilter/ip_tables.c
-+++ b/net/ipv4/netfilter/ip_tables.c
-@@ -981,7 +981,7 @@ static int get_info(struct net *net, void __user *user, const int *len)
- 		       sizeof(info.underflow));
- 		info.num_entries = private->number;
- 		info.size = private->size;
--		strcpy(info.name, name);
-+		strscpy(info.name, name);
- 
- 		if (copy_to_user(user, &info, *len) != 0)
- 			ret = -EFAULT;
--- 
-2.34.1
+Move this return up to the only place it can come from which is
+inside the loop where the break is.
+
+You can then avoid initializing ret and indeed could bring it's
+scope into the loop
+
+		for_each_child_of_node(leds_np, led_np) {
+			int ret = rtl8366rb_setup_led(priv, dp,
+						      of_fwnode_handle(led_np));
+			if (ret)
+				return ret;
+		}	
+
+>  	}
 
 
