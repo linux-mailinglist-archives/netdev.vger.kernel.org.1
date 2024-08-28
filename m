@@ -1,140 +1,119 @@
-Return-Path: <netdev+bounces-122559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E879961B62
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 03:22:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E010961B8D
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 03:35:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFDE81C22FA9
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 01:22:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBBECB21A65
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 01:35:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E82224D7;
-	Wed, 28 Aug 2024 01:22:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="iG0QkENa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3F62C853;
+	Wed, 28 Aug 2024 01:35:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0F5224D1;
-	Wed, 28 Aug 2024 01:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2552E3EA83;
+	Wed, 28 Aug 2024 01:35:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724808140; cv=none; b=UA2GQCwTn97BVa8j6XEQVon9VhXus6RRvRNy/g9KoteFUPqEBlGxCn5MQgBOPZPEDCl6LxbY542fXTTADlKrNXBcqikSDs3eYgR2vAUy+W0QmM4dVp/OjVzUKHY5S+bOjfFHtExJGcZ6qG+NYiaw1HQl3j1rFMg5wpgityi5Mjw=
+	t=1724808941; cv=none; b=bAjKEmrOuM2f63dqB0v8yLTOEzPqxzKkvSj6dPTqZP3jUpKUJhBDLKm1vvQbma4rAEuCZ2/TA+L/b+I0OE695D3I8xJXfa8hpqcK/ft3MzkYm0tuHrT//vidpqan7mhFP252zrcrS9amlqu/8lB6yMQguMyqu4O13q/6XwbtZnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724808140; c=relaxed/simple;
-	bh=OT/ewFXToM+ETRFl/FZO1pomW5nvULege6FbtQqujCU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=R2r/nA9XnKwS2j589B6McpGlC6ZTG03wzOalQN6PBEYf3NuGRXO7FOf+vUevwKpxQlEa4wV5Kp93V4tyOmnKgZ7tMcHbgE6zyd0fTV6B0TBVB4m8aeWTFJwIwmhaT55K4Sa38Qvplw0Qut8gFUQIz1mRjBxJc3LQqy0yMfBDudI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=iG0QkENa; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1724808129;
-	bh=w0UTheu8+mOgy5zb9FccWMuqVrPi69dOGezXCZDCDzI=;
-	h=Date:From:To:Cc:Subject:From;
-	b=iG0QkENarXxaShkXGQey0EbkqdJgscDHrfCBdQtr7pE12jSAiZrPJxvdRgOSByoUf
-	 pGh0L9/lU2eVGj+wNoevgA3NGR1VkbmD7bq9o5SgBD8AjZy4FCS6Gk8MJUxGz7qk+o
-	 zevx0EKvuKDceLfN/C+9QMC701kvXUnvR2ePrmShf91DdGoO+f6I35ALtZ8DD1JuPv
-	 e6G0jvlFxwGxXCav+9+T2fogCN5LGQ8cNHs7WuzL1sFsklfd59PwJTVUhGFehUiBef
-	 bdmZ6Duok6EXMGEjuB6K1m6w69HAMZQAS9ab7T5HDJobNNw4994dTOP5NH3TslyLdP
-	 V05gjsLN8qWSg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Wtmq45wcGz4wd0;
-	Wed, 28 Aug 2024 11:22:07 +1000 (AEST)
-Date: Wed, 28 Aug 2024 11:22:07 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Jason Xing <kernelxing@tencent.com>, Networking
- <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Xueming Feng <kuro@kuroa.me>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20240828112207.5c199d41@canb.auug.org.au>
+	s=arc-20240116; t=1724808941; c=relaxed/simple;
+	bh=qBLrv9JlE70mWhVlECZv3GB4o9EX244VrjofKIZHJzI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=VwR7Yoq2ezkqxJaJ5gh3V4JexXHs6XS2ETxfzgShSn9cmDWrj5cMugLwNqTciGh7c/7la8FoluYzXCWI2M/zncdN3lHaZ7AFk+ZvbWz/wWMG75ytfXqMi714n3uTr4cOJiNZrVIWxfdIThuRpLr3oMVtAp/4pcwIjJKcbIVJ4vM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Wtn6P00Pqz1S8sL;
+	Wed, 28 Aug 2024 09:35:24 +0800 (CST)
+Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6728D180044;
+	Wed, 28 Aug 2024 09:35:36 +0800 (CST)
+Received: from [10.67.111.104] (10.67.111.104) by
+ dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 28 Aug 2024 09:35:36 +0800
+Message-ID: <55ea4acb-fd89-4ec2-9eb3-1c6aa1a423ef@huawei.com>
+Date: Wed, 28 Aug 2024 09:35:35 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/70YbzUcCK6Myv5acFf2mpXK";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/5] net/netfilter: make use of the helper macro
+ LIST_HEAD()
+Content-Language: en-US
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <jmaloy@redhat.com>,
+	<ying.xue@windriver.com>, <kadlec@netfilter.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>
+References: <20240827100407.3914090-1-lihongbo22@huawei.com>
+ <20240827100407.3914090-4-lihongbo22@huawei.com> <Zs37l04h3bsK8LIE@calendula>
+From: Hongbo Li <lihongbo22@huawei.com>
+In-Reply-To: <Zs37l04h3bsK8LIE@calendula>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500022.china.huawei.com (7.185.36.66)
 
---Sig_/70YbzUcCK6Myv5acFf2mpXK
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
 
-Today's linux-next merge of the net-next tree got a conflict in:
+On 2024/8/28 0:15, Pablo Neira Ayuso wrote:
+> Hi,
+> 
+> On Tue, Aug 27, 2024 at 06:04:05PM +0800, Hongbo Li wrote:
+>> list_head can be initialized automatically with LIST_HEAD()
+>> instead of calling INIT_LIST_HEAD(). Here we can simplify
+>> the code.
+>>
+>> Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
+>> ---
+>>   net/netfilter/core.c | 4 +---
+>>   1 file changed, 1 insertion(+), 3 deletions(-)
+>>
+>> diff --git a/net/netfilter/core.c b/net/netfilter/core.c
+>> index b00fc285b334..93642fcd379c 100644
+>> --- a/net/netfilter/core.c
+>> +++ b/net/netfilter/core.c
+>> @@ -655,10 +655,8 @@ void nf_hook_slow_list(struct list_head *head, struct nf_hook_state *state,
+>>   		       const struct nf_hook_entries *e)
+>>   {
+>>   	struct sk_buff *skb, *next;
+>> -	struct list_head sublist;
+>>   	int ret;
+>> -
+>> -	INIT_LIST_HEAD(&sublist);
+>> +	LIST_HEAD(sublist);
+> 
+> comestic:
+> 
+>    	struct sk_buff *skb, *next;
+> 	LIST_HEAD(sublist);          <- here
+>    	int ret;
+> 
+> I think this should be included in the variable declaration area at
+> the beginning of this function.
 
-  net/ipv4/tcp.c
+It is in the variable declaration area just after ret (with a blank line 
+before list_for_each_entry_safe).
 
-between commit:
-
-  bac76cf89816 ("tcp: fix forever orphan socket caused by tcp_abort")
-
-from the net tree and commit:
-
-  edefba66d929 ("tcp: rstreason: introduce SK_RST_REASON_TCP_STATE for acti=
-ve reset")
-
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc net/ipv4/tcp.c
-index 831a18dc7aa6,8514257f4ecd..000000000000
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@@ -4653,10 -4649,12 +4656,10 @@@ int tcp_abort(struct sock *sk, int err
-  	local_bh_disable();
-  	bh_lock_sock(sk);
- =20
- -	if (!sock_flag(sk, SOCK_DEAD)) {
- -		if (tcp_need_reset(sk->sk_state))
- -			tcp_send_active_reset(sk, GFP_ATOMIC,
- -					      SK_RST_REASON_TCP_STATE);
- -		tcp_done_with_error(sk, err);
- -	}
- +	if (tcp_need_reset(sk->sk_state))
- +		tcp_send_active_reset(sk, GFP_ATOMIC,
-- 				      SK_RST_REASON_NOT_SPECIFIED);
-++				      SK_RST_REASON_TCP_STATE);
- +	tcp_done_with_error(sk, err);
- =20
-  	bh_unlock_sock(sk);
-  	local_bh_enable();
-
---Sig_/70YbzUcCK6Myv5acFf2mpXK
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbOe78ACgkQAVBC80lX
-0Gx5AggAgOSkPwGXtjXRb63XxdV4bKQjB9XuqT01uBlarHLP7CjWULUnHq1NfTEV
-f58wH83Qech6DstLyFGEXeK40zwKOzzaqWlV1EHJlkQu6oE1VTjFoUdc5GbT2wbV
-u+cIralPjBNieOyzmL+nm8U3WNZA4rjKquRK7BGwv4Q85JSq9LSzgRFZsSibZZ/M
-gDH5cTkwNJF5KbPBgnWXmqBCqU1YcCMRLfHwQKuRJdJKKiZpQ5FFhLDepzUrxki4
-Q6YA5Np0dpYY20R0t2erfwe9EqWbD8HdBt+aZWOOB33fbaWAc8XkZh40UyZcTfXq
-/TCVjr8XYNMtSJCeqKwK9Zvs0AyuWQ==
-=34lI
------END PGP SIGNATURE-----
-
---Sig_/70YbzUcCK6Myv5acFf2mpXK--
+Thanks,
+Hongbo
+> 
+>>   	list_for_each_entry_safe(skb, next, head, list) {
+>>   		skb_list_del_init(skb);
+>> -- 
+>> 2.34.1
+>>
+>>
+> 
 
