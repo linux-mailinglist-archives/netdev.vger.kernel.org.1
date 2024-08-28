@@ -1,60 +1,56 @@
-Return-Path: <netdev+bounces-122803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B0749629AA
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:04:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A649629CB
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB524281636
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:04:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 815B4286136
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07303188CAD;
-	Wed, 28 Aug 2024 14:04:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4342418950B;
+	Wed, 28 Aug 2024 14:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYIXBPT/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6byQ/wbC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6FA16C859;
-	Wed, 28 Aug 2024 14:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2337818786F;
+	Wed, 28 Aug 2024 14:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724853875; cv=none; b=mTJlwFHHv/gcpuP4SiRaDgR1ULAgXi0aw+gjmPX29YIJ1xnLePzSIYO7uiV+NRaqQQb1GvIJ6ONUZupkKRnegAsXItKWv9BXJQCRM09qFWuiX2G+Fxlq4r0OyyGu6oRqKay/+MpBHhhHif+/wYIBYQXZT8KLWjQzrCzA0tmCCko=
+	t=1724854058; cv=none; b=O82OX0RFOpGK1v+YMzztfDWYQZdcZgz9X1ynB4QAfuQ4xctu6s8pBlJoXIOJw0l1M1XKN3qYaZZFNPW5ySimwHqKwHj4R2V+FpaFudLjNJ4EsNgfb++aEnToyYYVLDa4gRzDvovy3GvQIOqpTmXwCJ2R3DYXwmmxa+5Q3ZPXxas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724853875; c=relaxed/simple;
-	bh=O02XWElbfvIPDImyfaPXGTwRAgzSgaCpeA6XeqSzALk=;
+	s=arc-20240116; t=1724854058; c=relaxed/simple;
+	bh=Bd2Wxt6zHJwlx4sPJaTHqzex9WFh//rgwLGxTuqWQ0A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LOHeNGgmvZuU5V6xZjvngfrnL8esgUGnh/eRW/NyIazKVCoO4Clz/lpmW5E9Go9BKs6ho+BCUgTKNQ/ogf0MHugEuLb5nyMAo8nxTF6SAhcP2Wjxdf0BuOVulBs79fkFJIv4qr63Zfjt2+RjfgqqBVylbTVsf3s2jupksQ6zMx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYIXBPT/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 755D2C4AF68;
-	Wed, 28 Aug 2024 14:04:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724853875;
-	bh=O02XWElbfvIPDImyfaPXGTwRAgzSgaCpeA6XeqSzALk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QYIXBPT/ReIUAlFeixgiNGXsNyog7nC1PqUwFBus4KPU5NnmfOox0k+rPN5Ca+kq5
-	 myLyj02fl/6bezWhRvymqr4HYZEmWWQvjnMaRKbh/M7BrezpxhkpWDYJE1fBOKznDr
-	 KDrVea5Ye4vkjLL5BPS4KZLplr8IDZqboUP96MD95GCRnaTLpwWfef/bDe2VdjEXQf
-	 rVt43HtbTiXdafuv1ouSUO/tmNzgHubPJz05PpmZuMkrrUtnlW1jF8raVOgTVvKo8n
-	 76oBjNGqJ0/YSYBFMdcDWmulhooPlD0ZU1lWv1L0Z7DL+sodfx9A7jACKhaWHiyoZR
-	 WCLic80yCHX1g==
-Date: Wed, 28 Aug 2024 15:04:30 +0100
-From: Simon Horman <horms@kernel.org>
-To: Hongbo Li <lihongbo22@huawei.com>
-Cc: johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, allison.henderson@oracle.com,
-	dsahern@kernel.org, pshelar@ovn.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-	dccp@vger.kernel.org, dev@openvswitch.org,
-	linux-afs@lists.infradead.org
-Subject: Re: [PATCH net-next 5/8] net/dccp: Use min()/max() to simplify the
- code
-Message-ID: <20240828140430.GE1368797@kernel.org>
-References: <20240824074033.2134514-1-lihongbo22@huawei.com>
- <20240824074033.2134514-6-lihongbo22@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sLeqflCJefYCVrGfLHLHAVYMf/ugSoyw2dw7asWCN0kv3F/h1BY5iT05UWlnRXfGFJjY1c6sAXw3qSggEq7Lg84EEWdaxmLJhtlK67CW/Xggn5HkNp9OLM1pcW3dt7NNABVCQN1KHbj1CfoQFpUWAoF/0/bbmqcDtbhEi4UKnCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6byQ/wbC; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=wpfyIY3nZ/Sx2OxvbMJNMrQWF8Mem+SaqGMgbnAyKng=; b=6byQ/wbCCzwkVpi2R6ZRmtdCsT
+	PSbkV+60RMmYyLb79fpKZ3M+I4ZpIj34Gc7k5rWTVGyljHZWo643VupvpvdvUgV28I9ZSVgAC3Jtq
+	QAP4BeWVw8k/Z7sakKczGZ+zROvPUfBmd4HhsRGVke6v8AeGi7bYJutpCNpRXVvEWJJw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sjJKT-005wMg-Kn; Wed, 28 Aug 2024 16:07:21 +0200
+Date: Wed, 28 Aug 2024 16:07:21 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yajun Deng <yajun.deng@linux.dev>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: Modify register address from decimal
+ to hexadecimal
+Message-ID: <a0dfe854-c479-4165-a16e-4e4a1b2a6200@lunn.ch>
+References: <20240828125932.3478-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,50 +59,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240824074033.2134514-6-lihongbo22@huawei.com>
+In-Reply-To: <20240828125932.3478-1-yajun.deng@linux.dev>
 
-On Sat, Aug 24, 2024 at 03:40:30PM +0800, Hongbo Li wrote:
-> Let's use min()/max() to simplify the code and fix the
-> Coccinelle/coccicheck warning reported by minmax.cocci.
-> 
-> Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
-> ---
->  net/dccp/ackvec.c | 2 +-
->  net/dccp/dccp.h   | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/dccp/ackvec.c b/net/dccp/ackvec.c
-> index 1cba001bb4c8..faadd0190107 100644
-> --- a/net/dccp/ackvec.c
-> +++ b/net/dccp/ackvec.c
-> @@ -305,7 +305,7 @@ void dccp_ackvec_clear_state(struct dccp_ackvec *av, const u64 ackno)
->  	 * Deal with overlapping Ack Vectors: don't subtract more than the
->  	 * number of packets between tail_ackno and ack_ackno.
->  	 */
-> -	eff_runlen = delta < avr->avr_ack_runlen ? delta : avr->avr_ack_runlen;
-> +	eff_runlen = min(delta, avr->avr_ack_runlen);
+On Wed, Aug 28, 2024 at 08:59:32PM +0800, Yajun Deng wrote:
+> Most datasheets will use hexadecimal for register address, modify it
+> and make it fit the datasheet better.
 
-delta is s64, but known to be non-negative
-avr->avr_ack_runlen is u8
+802.3 uses decimal. Since these are all 802.3 registers, that is what
+you should mostly be looking at. You only need the datasheet when the
+device breaks the standard.
 
-I _think_ this is a candidate for umin().
+This is just pointless churn, so NACK.
 
->  
->  	runlen_now = dccp_ackvec_runlen(av->av_buf + avr->avr_ack_ptr);
->  	/*
-> diff --git a/net/dccp/dccp.h b/net/dccp/dccp.h
-> index 1f748ed1279d..872d17fb85b5 100644
-> --- a/net/dccp/dccp.h
-> +++ b/net/dccp/dccp.h
-> @@ -149,7 +149,7 @@ static inline u64 dccp_loss_count(const u64 s1, const u64 s2, const u64 ndp)
->  	WARN_ON(delta < 0);
->  	delta -= ndp + 1;
->  
-> -	return delta > 0 ? delta : 0;
-> +	return max(delta, 0);
->  }
+In a driver, when there are proprietary registers, feel free to use
+hex.
 
-As per my comment on 2/8 [*], I think you should drop this hunk.
-
-[*] https://lore.kernel.org/all/20240828135310.GC1368797@kernel.org/
+	Andrew
 
