@@ -1,142 +1,115 @@
-Return-Path: <netdev+bounces-122916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D29B6963196
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:16:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70FDB9631AF
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:22:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 108A91C21EA4
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:16:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BEF62820A4
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0931A7AF0;
-	Wed, 28 Aug 2024 20:16:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3041ABEC5;
+	Wed, 28 Aug 2024 20:22:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UA8NPRLH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r2lq+LK9"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3ADB1ABED5
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 20:16:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9AF21AAE19
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 20:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724876188; cv=none; b=DyTK3tLWUpIWH8wvQA2q1gSTVJYvbqbqitj4bz3uyxxGMtMQzNkDx49T/OVeHtbi4UGgglWJAsB27GfS4Uo4s297SZl2YuI06BdWpFgSk72+J6YEDZEwVs1YcJD8f1P3WW8LfAsuaZ/kVe5Kshh/b6ZoMscpyHiJZeN4OkZL6gY=
+	t=1724876557; cv=none; b=e3nlkebUieb+K/4naBYw393sopnbfQJIF/SDivTvXZT4xmriEVUc2h7tqgdonFZ3fa8FjNec4ufVr2Lp71m3fArPHo2UQr4spzwN5iOX5l7+AQ6vxeK7Zc6tqvALgde2noU2smNohdRttoKiMm/lORyYO3qMYNo8jHe0Zz/dw+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724876188; c=relaxed/simple;
-	bh=az5JLCJKZVd7MrP8d/pxlwJo5FDQJdNjsMiec+ZSnEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mcgApaVnWalaYZ8CJHeN6FDzBrwOVu+/51y9TS+/obvghS+DSCwBkxqyLtzCe2AH4cqAienJwJ1EZcZYLEYj/bM+FCSVGDl2EDpbfZ+9rEcNJAnXKsaLLEGW/y98w9m8eU/1PdlsnsLQYGE6vaLuBNXLUmbA7F0TPpWXiDqHFek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UA8NPRLH; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 28 Aug 2024 13:16:14 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724876183;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TcFJMtnoZx/3smatfAG72v8CqCQxeneyOqoZqcBXEJ4=;
-	b=UA8NPRLHJk8sJ2BgEWshSbomfpPfoUBD1kFcgir+M5ur3KcuRfOPjB7A2f2BlRBseINxqv
-	HhHMR6llKGwdYydRhGqyBns7E2u9qHvc/4pRMbhiEmxIwHvQJA4leZgR+BGuxL9hhusIOD
-	4baQO6VbhPbCE3d6lu4DwEUEd1ErM1U=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
-	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
-	Vlastimil Babka <vbabka@suse.cz>, David Rientjes <rientjes@google.com>, 
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	Meta kernel team <kernel-team@meta.com>, cgroups@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v2] memcg: add charging of already allocated slab objects
-Message-ID: <zjvmhbfzxpv4ujc5v7c4aojpsecmaqrznyd34lukst57kx5h43@2necqcieafy5>
-References: <20240827235228.1591842-1-shakeel.butt@linux.dev>
- <CAJD7tkawaUoTBQLW1tUfFc06uBacjJH7d6iUFE+fzM5+jgOBig@mail.gmail.com>
- <pq2zzjvxxzxcqtnf2eabp3whooysr7qbh75ts6fyzhipmtxjwf@q2jw57d5qkir>
- <CAJD7tka_OKPisXGDO56WMb6sRnYxHe2UDAh14d6VX1BW2E3usA@mail.gmail.com>
+	s=arc-20240116; t=1724876557; c=relaxed/simple;
+	bh=uR/ikCsgKvaxQ3rwsB1hFlDtpgSDe8JNz3jPLof3JL4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=p7TVGz+a5YImJSAsLU+mGUU4HUSKCTdCmrQDT8SRpTzpQvTGIB8F+zYpPuirkjMRYNgwop6gbO4Af2WS3Ahgs/YFxY4eGnf0Fx8n22t0oFF9tMTbw+dmnSKQWhWT7Lrbi3r4WyDApnKd5GnAg3uKmcDpYeVPVZJrQ9pkoBu2LfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r2lq+LK9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B870C4CEC0;
+	Wed, 28 Aug 2024 20:22:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724876556;
+	bh=uR/ikCsgKvaxQ3rwsB1hFlDtpgSDe8JNz3jPLof3JL4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=r2lq+LK91njV33yXxQJOeT6qPkPNamZ6m6Oq9nhnz7ZHNhsYrf4gOFzFSlGj+vpZZ
+	 NBor0BsNuo5SIIrUZPICXNlDACqgjR+UAskT1B+IS0Zfy4QcSTx9xfVpRVhNPHvs5R
+	 aDpa2U90Xh1F52j+vjVmB92mQaqq4irC/8SiVG9ZP8zLpEg0pKO0D4wHu99sGp45E2
+	 HehoTxdsgFm8egnx0Ui9CCuJx8n890pfnJ/NdxVCY5eiXtNZz0Ld9OMGupBQMG5Ird
+	 GyzewV4UxetWgq6Tv0zoJUCJUlC2SpdnAWi618L4jDKzTXqlNOz8znRr3ySOSFp01F
+	 2KC0fpZrgpjDQ==
+Date: Wed, 28 Aug 2024 13:22:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+ <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>,
+ <przemyslaw.kitszel@intel.com>, <joshua.a.hay@intel.com>,
+ <michal.kubiak@intel.com>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>
+Subject: Re: [PATCH net-next v2 2/9] libeth: add common queue stats
+Message-ID: <20240828132235.0e701e53@kernel.org>
+In-Reply-To: <ea4b0892-a087-4931-bc3a-319255d85038@intel.com>
+References: <20240819223442.48013-1-anthony.l.nguyen@intel.com>
+	<20240819223442.48013-3-anthony.l.nguyen@intel.com>
+	<20240820181757.02d83f15@kernel.org>
+	<613fb55f-b754-433a-9f27-7c66391116d9@intel.com>
+	<20240822161718.22a1840e@kernel.org>
+	<b5271512-f4bd-434c-858e-9f16fe707a5a@intel.com>
+	<20240826180921.560e112d@kernel.org>
+	<ee5eca5f-d545-4836-8775-c5f425adf1ed@intel.com>
+	<20240827112933.44d783f9@kernel.org>
+	<ea4b0892-a087-4931-bc3a-319255d85038@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJD7tka_OKPisXGDO56WMb6sRnYxHe2UDAh14d6VX1BW2E3usA@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 28, 2024 at 12:42:02PM GMT, Yosry Ahmed wrote:
-> On Wed, Aug 28, 2024 at 12:14 PM Shakeel Butt <shakeel.butt@linux.dev> wrote:
-> >
-> > On Tue, Aug 27, 2024 at 05:34:24PM GMT, Yosry Ahmed wrote:
-> > > On Tue, Aug 27, 2024 at 4:52 PM Shakeel Butt <shakeel.butt@linux.dev> wrote:
-> > [...]
-> > > > +
-> > > > +#define KMALLOC_TYPE (SLAB_KMALLOC | SLAB_CACHE_DMA | \
-> > > > +                     SLAB_ACCOUNT | SLAB_RECLAIM_ACCOUNT)
-> > > > +
-> > > > +static __fastpath_inline
-> > > > +bool memcg_slab_post_charge(void *p, gfp_t flags)
-> > > > +{
-> > > > +       struct slabobj_ext *slab_exts;
-> > > > +       struct kmem_cache *s;
-> > > > +       struct folio *folio;
-> > > > +       struct slab *slab;
-> > > > +       unsigned long off;
-> > > > +
-> > > > +       folio = virt_to_folio(p);
-> > > > +       if (!folio_test_slab(folio)) {
-> > > > +               return __memcg_kmem_charge_page(folio_page(folio, 0), flags,
-> > > > +                                               folio_order(folio)) == 0;
-> > >
-> > > Will this charge the folio again if it was already charged? It seems
-> > > like we avoid this for already charged slab objects below but not
-> > > here.
-> > >
-> >
-> > Thanks for catchig this. It's an easy fix and will do in v3.
-> >
-> > > > +       }
-> > > > +
-> > > > +       slab = folio_slab(folio);
-> > > > +       s = slab->slab_cache;
-> > > > +
-> > > > +       /* Ignore KMALLOC_NORMAL cache to avoid circular dependency. */
-> > > > +       if ((s->flags & KMALLOC_TYPE) == SLAB_KMALLOC)
-> > > > +               return true;
-> > >
-> > > Would it be clearer to check if the slab cache is one of
-> > > kmalloc_caches[KMALLOC_NORMAL]? This should be doable by comparing the
-> > > address of the slab cache with the addresses of
-> > > kmalloc_cache[KMALLOC_NORMAL] (perhaps in a helper). I need to refer
-> > > to your reply to Roman to understand why this works.
-> > >
-> >
-> > Do you mean looping over kmalloc_caches[KMALLOC_NORMAL] and comparing
-> > the given slab cache address? Nah man why do long loop of pointer
-> > comparisons when we can simply check the flag of the given kmem cache.
-> > Also this array will increase with the recent proposed random kmalloc
-> > caches.
+On Wed, 28 Aug 2024 17:06:17 +0200 Alexander Lobakin wrote:
+> >> The stats I introduced here are supported by most, if not every, modern
+> >> NIC drivers. Not supporting header split or HW GRO will save you 16
+> >> bytes on the queue struct which I don't think is a game changer.  
+> > 
+> > You don't understand. I built some infra over the last 3 years.
+> > You didn't bother reading it. Now you pop our own thing to the side,
+> > extending ethtool -S which is _unusable_ in a multi-vendor, production
+> > environment.  
 > 
-> Oh I thought kmalloc_caches[KMALLOC_NORMAL] is an array of the actual
-> struct kmem_cache objects, so I thought we can just check if:
-> s >= kmalloc_caches[KMALLOC_NORMAL][0] &&
-> s >= kmalloc_caches[KMALLOC_NORMAL][LAST_INDEX]
-> 
-> I just realized it's an array of pointers, so we would need to loop
-> and compare them.
-> 
-> I still find the flags comparisons unclear and not very future-proof
-> tbh. I think we can just store the type in struct kmem_cache? I think
-> there are multiple holes there.
+> I read everything at the time you introduced it. I remember Ethernet
+> standard stats, rmon, per-queue generic stats etc. I respect it and I
+> like it.
+> So just let me repeat my question so that all misunderstandings are
+> gone: did I get it correctly that instead of adding Ethtool stats, I
+> need to add new fields to the per-queue Netlink stats? I clearly don't
+> have any issues with that and I'll be happy to drop Ethtool stats from
+> the lib at all.
 
-Do you mean adding a new SLAB_KMALLOC_NORMAL? I will wait for SLAB
-maintainers for their opinion on that. BTW this kind of checks are in
-the kernel particularly for gfp flags.
+That's half of it, the other half is excess of macro magic.
+
+> (except XDP stats, they still go to ethtool -S for now? Or should I try
+> making them generic as well?)
+
+Either way is fine by me. You may want to float the XDP stats first as
+a smaller series, just extending the spec and exposing from some driver
+already implementing qstat. In case someone else does object.
+
+> >> * reduce boilerplate code in drivers: declaring stats structures,
+> >> Ethtool stats names, all these collecting, aggregating etc etc, you see
+> >> in the last commit of the series how many LoCs get deleted from idpf,
+> >> +/- the same amount would be removed from any other driver  
+> > 
+> >  21 files changed, 1634 insertions(+), 1002 deletions(-)  
+> 
+> Did you notice my "in the last commit"?
+
+I may not have. But as you said, most drivers end up with some level of
+boilerplate around stats. So unless the stuff is used by more than one
+driver, and the savings are realized, the argument about saving LoC has
+to be heavily discounted. Queue xkcd 927. I should reiterate that 
+I don't think LoC saving is a strong argument in the first place.
 
