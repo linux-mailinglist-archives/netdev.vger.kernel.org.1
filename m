@@ -1,245 +1,118 @@
-Return-Path: <netdev+bounces-122720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFF8B9624F6
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:33:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1ADD9624FB
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:33:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D3FF41C21864
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:32:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B05BA28380C
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2520016A94B;
-	Wed, 28 Aug 2024 10:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E36416B3BD;
+	Wed, 28 Aug 2024 10:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rkDzbRiK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z/DutOg2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C580C1465AC;
-	Wed, 28 Aug 2024 10:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B53916087B
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 10:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724841174; cv=none; b=jmAZZWdT5CxJYqTveduBzXX9ocV6piobDPFsYFG0YTrBlGDaETKMUKjSvEaMPriiGOe0PLppV0nRmHmYFSTn4mawYM9dcHS5koR4coP8T365czhqnx9bmzjmFJfbRy+3G5bjD2PCikIVcu0NsubeWQyWgrbUB0UEfNFvux/GA+k=
+	t=1724841185; cv=none; b=uocZNNc75CUIjPdgThChk1zKETjAUVImvBT1xi9VCmJiESmjeJ9nXPrpE8rODnAUA+PtJ8UmwJD9jiNWazFhTRJQX5crF2v8o80uXnRtnAbZbk7pHm4cpqOgQ0eJE19kzJYRW/M0SdJgsUDifbH9rHb4NbZg12Pm8+/jvkKL5oY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724841174; c=relaxed/simple;
-	bh=RAZiyHV0BW9WjoN1ECXpyLaENcTOjscCNA3CQ8WtSxg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ErEYOQUrfs3aK8H/N1fJ8pHUyI5pmRlvH2ZoAiizZGmM2W6+raoQWKKw+1IPijUKGiD1cQGaVjjEk6zlfZXhU2qcVop2DRxiT7w7akPmE+H1FrbgM9nAbHz/AxM0vkxe8aqRq3g9VjIt0obigmV9oAuZIrLVid/axf8d9Ca50Go=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rkDzbRiK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D188C98EC2;
-	Wed, 28 Aug 2024 10:32:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724841173;
-	bh=RAZiyHV0BW9WjoN1ECXpyLaENcTOjscCNA3CQ8WtSxg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rkDzbRiKRlpXFmTZretmNOGGQgiy5srKWiQ0PRA0Tk0OZDkahXPqUd4Z9CUuUNqBo
-	 nYGxEXH3rwTgaamSsdtMI/ul4SgdEA45Mv5vcQ1jvnYqV8l67eUuZvJUhL0+SpOZLc
-	 CtR3OVviUoN03RcnZCIWKOV5FaDXwjOJQL/YcDD8pcTl4aTGvITIxAaQnIJVjL/dxH
-	 TEfdTsqMfwOnr6d/uYlOW+ygSijg0UhHigPd3keM8m3YwMUpZU+wsk3kDRnsPInXGr
-	 luK/ARDKw3REReStXJIPprYvfeemOfSSHFZLRQB2gkKHeej8wuLr70XMYRGbXclw6c
-	 riP3Ob2CZ89tw==
-Date: Wed, 28 Aug 2024 12:32:47 +0200
-From: Alejandro Colomar <alx@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
-	justinstitt@google.com, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
-	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Simon Horman <horms@kernel.org>, 
-	Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v8 6/8] mm/util: Deduplicate code in
- {kstrdup,kstrndup,kmemdup_nul}
-Message-ID: <byi4tx6l2lrbs5w6oxypr44ldntlh4kp56vnsza3iuztwb37oa@2qtdx2kgz4bq>
-References: <20240828030321.20688-1-laoar.shao@gmail.com>
- <20240828030321.20688-7-laoar.shao@gmail.com>
+	s=arc-20240116; t=1724841185; c=relaxed/simple;
+	bh=DgI8dxSKx5La/d4smDIiOi+WFg0QN4hwnQJMJfsvZvw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=l179FnISP6yi6VwooWoikqP2T/4GlM1ci/d+to4rKddIosCOUs43upN6Ku0Nw2VK+WKGLSoKE1IBlMNG5I7wvPYWxjw58Xhu90fo28K7nUWantjIy7o3DqlZ8ZXfb9MRwEcDacNIY6mQJ2+v/2ybNIxoy30/DU9rjJ4ZdRcBDSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z/DutOg2; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7cd9e4f550dso2101842a12.0
+        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 03:33:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724841183; x=1725445983; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Sabd59darPAGdKpnoPWFVVFHSmOGMe8cr//Afa6wvII=;
+        b=Z/DutOg2rATZl30AW/YVNz7hNmV/V4oQVYmRa2ToVVqgi16sJKoSxc1Y+aNHritA2G
+         3z/wp3hdKlNmGrgjZNNg9UeSP0a6sSjpLEmTcqwVA+rqYV++PFA2VwOFxwiRaL7GbMCL
+         tV1Up+iN2p8Y4ZVo380UA2seKtN0c+M8EtIDoJzyem0tk33MUOk/9jHIU5xdoY1e/DOv
+         9GGydrjwVYYIt+KOg0kVz9FGjDopKS1y9DeOB5LSMgi36Lzsj4KqWZOeugM+H5VNxeI1
+         VjzR6oM9qcWFr6n88D/EJN2sQ1G/xaOZlufE0bv3FaPzU7BnutEGYG2a449f8/oKPhjT
+         33IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724841183; x=1725445983;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Sabd59darPAGdKpnoPWFVVFHSmOGMe8cr//Afa6wvII=;
+        b=pAtF5kQH0Rp2CuBACSXiwX/FVLmE5z/lFWdJa73oEOHIg/0SdPQtvwu1WrLlIRKcnY
+         P1w0QrY14PeYzVXnn41vZtJSkW1HpoGQ1x8Q3bSczGruKx4aqDc9STyGb6JOYfnQ7nWt
+         hj9L98Xhs+kp9Oo7udSmwAc/Un8na4rlWoDnRzw2TVTqt0Fn5BJjlbMCjRkncTT6c5r/
+         wteCSb3ZqUePpEc/1XECHBcewiszdDnkPxALqgpQ413HwW+4ICRwNJQsXC3Jd5eMdd5z
+         5Tn/LhCh7a37Xw9huToOXGs7A0S9ukIwWo0gBbR+gVCMXrXtYQUaq9+LULov5CpEPTNa
+         jcKg==
+X-Gm-Message-State: AOJu0YzoEjH4LgDOYbRm9M6Cc0Tu5Ni5vIF2BdpU1W73iW4GlcYNRZ85
+	h9PpTYEtKkBNcQo75+EgiusIPwFhd8h3fQTPTR7eKwlcCM7hW0D3dvVLhRiuPyRayA==
+X-Google-Smtp-Source: AGHT+IH/R9vOPDTRsSvVP+7AXpJ6/JmRpwSiQmkjKUtutaWkXisKOXhwwQ3lzekqJy5X7SnaVfnqgw==
+X-Received: by 2002:a05:6a20:9f95:b0:1c8:b849:c6b9 with SMTP id adf61e73a8af0-1cc8a21a007mr16619137637.43.1724841182463;
+        Wed, 28 Aug 2024 03:33:02 -0700 (PDT)
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-203855ddaeesm96298835ad.124.2024.08.28.03.32.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Aug 2024 03:33:01 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv5 net-next 0/3] Bonding: support new xfrm state offload functions
+Date: Wed, 28 Aug 2024 18:32:51 +0800
+Message-ID: <20240828103254.2359215-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fvf522dvf7ucivwn"
-Content-Disposition: inline
-In-Reply-To: <20240828030321.20688-7-laoar.shao@gmail.com>
+Content-Transfer-Encoding: 8bit
 
+Add 2 new xfrm state offload functions xdo_dev_state_advance_esn and
+xdo_dev_state_update_stats for bonding. The xdo_dev_state_free will be
+added by Jianbo's patchset [1]. I will add the bonding xfrm policy offload
+in future.
 
---fvf522dvf7ucivwn
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
-	justinstitt@google.com, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
-	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
-	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Simon Horman <horms@kernel.org>, 
-	Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v8 6/8] mm/util: Deduplicate code in
- {kstrdup,kstrndup,kmemdup_nul}
-References: <20240828030321.20688-1-laoar.shao@gmail.com>
- <20240828030321.20688-7-laoar.shao@gmail.com>
-MIME-Version: 1.0
-In-Reply-To: <20240828030321.20688-7-laoar.shao@gmail.com>
+v5: Rebase to latest net-next, update function doc (Jakub Kicinski)
+v4: Ratelimit pr_warn (Sabrina Dubroca)
+v3: Re-format bond_ipsec_dev, use slave_warn instead of WARN_ON (Nikolay Aleksandrov)
+    Fix bond_ipsec_dev defination, add *. (Simon Horman, kernel test robot)
+    Fix "real" typo (kernel test robot)
+v2: Add a function to process the common device checking (Nikolay Aleksandrov)
+    Remove unused variable (Simon Horman)
+v1: lore.kernel.org/netdev/20240816035518.203704-1-liuhangbin@gmail.com
 
-On Wed, Aug 28, 2024 at 11:03:19AM GMT, Yafang Shao wrote:
-> These three functions follow the same pattern. To deduplicate the code,
-> let's introduce a common helper __kmemdup_nul().
->=20
-> Suggested-by: Andrew Morton <akpm@linux-foundation.org>
-> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: Alejandro Colomar <alx@kernel.org>
-> ---
+Hangbin Liu (3):
+  bonding: add common function to check ipsec device
+  bonding: Add ESN support to IPSec HW offload
+  bonding: support xfrm state update
 
-Reviewed-by: Alejandro Colomar <alx@kernel.org>
+ drivers/net/bonding/bond_main.c | 100 +++++++++++++++++++++++++++-----
+ 1 file changed, 87 insertions(+), 13 deletions(-)
 
-Cheers,
-Alex
+-- 
+2.45.0
 
->  mm/util.c | 68 ++++++++++++++++++++++---------------------------------
->  1 file changed, 27 insertions(+), 41 deletions(-)
->=20
-> diff --git a/mm/util.c b/mm/util.c
-> index 9a77a347c385..42714fe13e24 100644
-> --- a/mm/util.c
-> +++ b/mm/util.c
-> @@ -45,33 +45,41 @@ void kfree_const(const void *x)
->  EXPORT_SYMBOL(kfree_const);
-> =20
->  /**
-> - * kstrdup - allocate space for and copy an existing string
-> - * @s: the string to duplicate
-> + * __kmemdup_nul - Create a NUL-terminated string from @s, which might b=
-e unterminated.
-> + * @s: The data to copy
-> + * @len: The size of the data, not including the NUL terminator
->   * @gfp: the GFP mask used in the kmalloc() call when allocating memory
->   *
-> - * Return: newly allocated copy of @s or %NULL in case of error
-> + * Return: newly allocated copy of @s with NUL-termination or %NULL in
-> + * case of error
->   */
-> -noinline
-> -char *kstrdup(const char *s, gfp_t gfp)
-> +static __always_inline char *__kmemdup_nul(const char *s, size_t len, gf=
-p_t gfp)
->  {
-> -	size_t len;
->  	char *buf;
-> =20
-> -	if (!s)
-> +	/* '+1' for the NUL terminator */
-> +	buf =3D kmalloc_track_caller(len + 1, gfp);
-> +	if (!buf)
->  		return NULL;
-> =20
-> -	len =3D strlen(s) + 1;
-> -	buf =3D kmalloc_track_caller(len, gfp);
-> -	if (buf) {
-> -		memcpy(buf, s, len);
-> -		/* During memcpy(), the string might be updated to a new value,
-> -		 * which could be longer than the string when strlen() is
-> -		 * called. Therefore, we need to add a NUL termimator.
-> -		 */
-> -		buf[len - 1] =3D '\0';
-> -	}
-> +	memcpy(buf, s, len);
-> +	/* Ensure the buf is always NUL-terminated, regardless of @s. */
-> +	buf[len] =3D '\0';
->  	return buf;
->  }
-> +
-> +/**
-> + * kstrdup - allocate space for and copy an existing string
-> + * @s: the string to duplicate
-> + * @gfp: the GFP mask used in the kmalloc() call when allocating memory
-> + *
-> + * Return: newly allocated copy of @s or %NULL in case of error
-> + */
-> +noinline
-> +char *kstrdup(const char *s, gfp_t gfp)
-> +{
-> +	return s ? __kmemdup_nul(s, strlen(s), gfp) : NULL;
-> +}
->  EXPORT_SYMBOL(kstrdup);
-> =20
->  /**
-> @@ -106,19 +114,7 @@ EXPORT_SYMBOL(kstrdup_const);
->   */
->  char *kstrndup(const char *s, size_t max, gfp_t gfp)
->  {
-> -	size_t len;
-> -	char *buf;
-> -
-> -	if (!s)
-> -		return NULL;
-> -
-> -	len =3D strnlen(s, max);
-> -	buf =3D kmalloc_track_caller(len+1, gfp);
-> -	if (buf) {
-> -		memcpy(buf, s, len);
-> -		buf[len] =3D '\0';
-> -	}
-> -	return buf;
-> +	return s ? __kmemdup_nul(s, strnlen(s, max), gfp) : NULL;
->  }
->  EXPORT_SYMBOL(kstrndup);
-> =20
-> @@ -192,17 +188,7 @@ EXPORT_SYMBOL(kvmemdup);
->   */
->  char *kmemdup_nul(const char *s, size_t len, gfp_t gfp)
->  {
-> -	char *buf;
-> -
-> -	if (!s)
-> -		return NULL;
-> -
-> -	buf =3D kmalloc_track_caller(len + 1, gfp);
-> -	if (buf) {
-> -		memcpy(buf, s, len);
-> -		buf[len] =3D '\0';
-> -	}
-> -	return buf;
-> +	return s ? __kmemdup_nul(s, len, gfp) : NULL;
->  }
->  EXPORT_SYMBOL(kmemdup_nul);
-> =20
-> --=20
-> 2.43.5
->=20
-
---=20
-<https://www.alejandro-colomar.es/>
-
---fvf522dvf7ucivwn
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmbO/MkACgkQnowa+77/
-2zJ0rg/6A9w0pR/IBhWTYnFTKH8DiRQVQuPVpRuWDuTYTqrMqUR2OEtQ2gWcf10h
-TYl0N0mXcVo4vsCvdthueqs1ipa1bvOY3QN5aKpL5qXRq81NBe4JWd7ym/T8TU9Z
-EP6iBPimsQMYTPMNwgCK768HYPfu9lygO8CecifrGLoSZ5EDZ2GnyDz2xzCMZIq6
-+KKTKJqyhww4ydIgm49fMi1bk59rI45fjg0GpVepcATmdR6bbPiE8yvdazxOJCT1
-t6dAVGehLzNV1hGgDqiG8QS0GuqM1YMwEy6pWoi6zoHUjT8326bOP0UXuzB1NAxd
-M93w62xDoKpceGkLS22ajjH+0H7qgBtWyXBpd6QUVoqQ0lBWpnS7FfqMh9wJmd5L
-55IaQKIPcaWDSBImqC/Mm2NYgH0DgcuF+JN/xaR6bhx+92rpzhE4/HM7Fll9OmuF
-NVDkfuQIuuuZ74Be1QOYCa4h+jeB6sksNlF18wmhH8OipYCzRVEjROxUSd4SSb2m
-bWd1Wpkx65jf1musgB9Q3oGofNPQvx9xnKYKk97o0n+UXyi7B7abukTl4oXKWbmB
-WisDpchUmGJAOm0uncet+rsM5Vod5zXbdf0aRXz5WPYAE1CDauPDzi9z2qKrYdHc
-gzn7xNZqVSRW8SsYctxEgro1zc1c8XxsHFiWJCQdjtwh9fOA1zU=
-=+sNM
------END PGP SIGNATURE-----
-
---fvf522dvf7ucivwn--
 
