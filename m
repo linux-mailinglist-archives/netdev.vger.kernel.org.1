@@ -1,59 +1,67 @@
-Return-Path: <netdev+bounces-122860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B150C962D7D
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 18:16:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70947962D84
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 18:19:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6ECFE285AEA
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:16:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 258211F25846
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE0511A38E8;
-	Wed, 28 Aug 2024 16:16:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF271A38D5;
+	Wed, 28 Aug 2024 16:19:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RdaKJ+g0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="d24hCijP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751521A254B;
-	Wed, 28 Aug 2024 16:16:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5F844C68;
+	Wed, 28 Aug 2024 16:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724861789; cv=none; b=m9QzOysWWy9Sp60dXxakDFUEl4Y9DH4axM6Otb0JbVOCfwHBZ4R8Xw3dYrMWbKO3aFWQGz4pUTxPMfjYnfVFd1dr/vu4PjRQY9ACyA9140rznDO8PoG+QjmnMG3t5a+LVfmdxNPYkkE1oul8jI9QnCnDW6zm9lGJxCA5/EsFc7k=
+	t=1724861954; cv=none; b=rdcYfYW75d19oIXGjX3WNTx/wcCPTiS6JY/m/CYDMwCpXKjo4Anq6sUA0TSaG/ZxCNxNlGDeXgSTXvWK4tsXFLNaKcm29nym9zuvsDte3ftSTBUX7C9phCVlzOdnFUd+CoHtj0wxlyNYgvf4++/T9MWYvZ8SHrJ5UFo0tEx2xY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724861789; c=relaxed/simple;
-	bh=5ehrFnCc+o7/6cA9eQPVNURWyEXSWTlwyaEFrwFQhZc=;
+	s=arc-20240116; t=1724861954; c=relaxed/simple;
+	bh=7FOCNAkyb18q93EUQmESrW55Nul8uNlZ55KN2G2hiS0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a9SGPkFoNZo19bfUJCSpRmbxk3HOq0TJjklfqn5ehbRaiBWvTDW2aCTOl1L2F9XkVK0o1W+MgUktO/kzE1XFGvrZxn8fQ0HEN3qI92x5cntPU3ZV6/7c3PrjJtc/W7hqEGw0XXKfWOFjIi1EKSL7boB9Zcf2GIj/0C3u1w5BvKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RdaKJ+g0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B4A4C4FF6C;
-	Wed, 28 Aug 2024 16:16:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724861789;
-	bh=5ehrFnCc+o7/6cA9eQPVNURWyEXSWTlwyaEFrwFQhZc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RdaKJ+g0foDLngSIME/eH0SuqkPcXepecMqvquw7sJANaAgAS9Jlw97jeTif2NKsw
-	 dZ+5UTnLcUoJ1ad5+UU8Cs0TTCJTQr9NmPv8D5bkp2FtIDe9LWp5qHQELGWy4atngv
-	 AII4OxkStsPAd86xz6bq30kOMopxtk3kEWlo5jlmfz9xuZmobwDAHofgWqimNoFbrh
-	 X2UNFAUl6JjF2DvZEGrKJ2WrMT4+9Jmf1PbB52pPxBJbgj2kBQds1RreQ9UH82b/4V
-	 ags+Fj0rpLo9WcAFAzUweELdXdH2heMxMR0vNc5+HT01o5KN9IHjg+IpygLe4q5elJ
-	 fRK7re4LGYjSA==
-Date: Wed, 28 Aug 2024 17:16:24 +0100
-From: Simon Horman <horms@kernel.org>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=DMqi7Y2hdEhY2QiK5YvqRmV6LzIz3sl4eSxoXKLoyFlsH3wp6C1zZro2t30vltPngfgf0G1uUk2mp6OkMH5HHIG97J/tJNYM2XwwJc3To6OJpLw7caIvzVGT8X+whUS/mHqYaTpMb2h6/Ag2mQaDOrSJq5ByzoY/795mN+72zjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=d24hCijP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=B55QGb3XeN8Sx1Nn0BNu8uirRXJNjaPTVSPXKaoyBqQ=; b=d24hCijPlIeMFQarbZVB30f8uy
+	q0EPYtvV5nIEB+0uc5E5OuI9uDQ56c6ME/2XExsD9By2mTFC0QbiFIfRRueAHnE+LAmgbMKxXr5gX
+	xi0YvGW7nc+ORsu9EqceUf29ZQk7+DTF3N7U7Jc7x6NzufAprezdBGbR2yfGn1gZuD3w=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sjLNr-005xEt-R4; Wed, 28 Aug 2024 18:18:59 +0200
+Date: Wed, 28 Aug 2024 18:18:59 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Wilkins, Stephen" <Stephen.Wilkins@teledyne.com>
+Cc: Conor Dooley <conor@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	"valentina.fernandezalanis@microchip.com" <valentina.fernandezalanis@microchip.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: can: cc770: Simplify parsing DT properties
-Message-ID: <20240828161624.GS1368797@kernel.org>
-References: <20240828131902.3632167-1-robh@kernel.org>
+	Russell King <linux@armlinux.org.uk>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next] net: macb: add support for configuring eee via
+ ethtool
+Message-ID: <08d191dd-bc70-4292-8031-d1d41036e731@lunn.ch>
+References: <20240827-excuse-banister-30136f43ef50@spud>
+ <3c5a3db5-a598-454e-807a-b5106008aa40@lunn.ch>
+ <AM0PR04MB41316B50F68C83A73E57A82F89952@AM0PR04MB4131.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,88 +70,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240828131902.3632167-1-robh@kernel.org>
+In-Reply-To: <AM0PR04MB41316B50F68C83A73E57A82F89952@AM0PR04MB4131.eurprd04.prod.outlook.com>
 
-On Wed, Aug 28, 2024 at 08:19:02AM -0500, Rob Herring (Arm) wrote:
-> Use of the typed property accessors is preferred over of_get_property().
-> The existing code doesn't work on little endian systems either. Replace
-> the of_get_property() calls with of_property_read_bool() and
-> of_property_read_u32().
+On Wed, Aug 28, 2024 at 03:47:21PM +0000, Wilkins, Stephen wrote:
+> Thanks for the feedback.
 > 
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> In my particular use-case I wanted to ensure the PHY didn't advertise EEE
+> support, as it can cause issues in our deployment environment. The problem I
+> had was the PHY we are using enables EEE advertisement by default, and the
+> generic phy support in phy_device.c reads the c45 registers and enables EEE if
+> there are any linkmodes already advertised. Without the phylink hook in macb, I
+> couldn't use ethtool to disable it, but I now see my patch is only a partial
+> solution and would also imply support that is missing. That's why code reviews
+> are important. Maybe I need an alternative approach for ensuring the PHY
+> advertising is disabled if the MAC layer support is missing. 
 
-...
+In this particular case, do you know what is causing you problems?
 
-> diff --git a/drivers/net/can/cc770/cc770_platform.c b/drivers/net/can/cc770/cc770_platform.c
-> index 13bcfba05f18..9993568154f8 100644
-> --- a/drivers/net/can/cc770/cc770_platform.c
-> +++ b/drivers/net/can/cc770/cc770_platform.c
-> @@ -71,16 +71,9 @@ static int cc770_get_of_node_data(struct platform_device *pdev,
->  				  struct cc770_priv *priv)
->  {
->  	struct device_node *np = pdev->dev.of_node;
-> -	const u32 *prop;
-> -	int prop_size;
-> -	u32 clkext;
-> -
-> -	prop = of_get_property(np, "bosch,external-clock-frequency",
-> -			       &prop_size);
-> -	if (prop && (prop_size ==  sizeof(u32)))
-> -		clkext = *prop;
-> -	else
-> -		clkext = CC770_PLATFORM_CAN_CLOCK; /* default */
-> +	u32 clkext = CC770_PLATFORM_CAN_CLOCK, clkout = 0;
+I agree that if the MAC does not support EEE, the PHY should not be
+advertising it. But historically EEE has been a mess. It could be the
+MAC does EEE by default, using default settings, and the PHY is
+advertising EEE, and the link partner is happy, and EEE just works. So
+if we turn advertisement of EEE off by default, we might cause
+regressions :-(
 
-Marc,
+Now, we know some PHYs are actually broken. And we have a standard way
+to express this:
 
-Could you clarify if reverse xmas tree ordering - longest line to shortest
-- of local variables is desired for can code? If so, I'm flagging that the
-above now doesn't follow that scheme.
+Documentation/devicetree/bindings/net/ethernet-phy.yaml
 
-> +
-> +	of_property_read_u32(np, "bosch,external-clock-frequency", &clkext);
->  	priv->can.clock.freq = clkext;
->  
->  	/* The system clock may not exceed 10 MHz */
+  eee-broken-100tx:
+    $ref: /schemas/types.yaml#/definitions/flag
+    description:
+      Mark the corresponding energy efficient ethernet mode as
+      broken and request the ethernet to stop advertising it.
 
-...
+  eee-broken-1000t:
+    $ref: /schemas/types.yaml#/definitions/flag
+    description:
+      Mark the corresponding energy efficient ethernet mode as
+      broken and request the ethernet to stop advertising it.
 
-> @@ -109,20 +102,16 @@ static int cc770_get_of_node_data(struct platform_device *pdev,
->  	if (of_property_read_bool(np, "bosch,polarity-dominant"))
->  		priv->bus_config |= BUSCFG_POL;
->  
-> -	prop = of_get_property(np, "bosch,clock-out-frequency", &prop_size);
-> -	if (prop && (prop_size == sizeof(u32)) && *prop > 0) {
-> -		u32 cdv = clkext / *prop;
-> -		int slew;
-> +	of_property_read_u32(np, "bosch,clock-out-frequency", &clkout);
-> +	if (clkout > 0) {
-> +		u32 cdv = clkext / clkout;
-> +		u32 slew;
->  
->  		if (cdv > 0 && cdv < 16) {
->  			priv->cpu_interface |= CPUIF_CEN;
->  			priv->clkout |= (cdv - 1) & CLKOUT_CD_MASK;
->  
-> -			prop = of_get_property(np, "bosch,slew-rate",
-> -					       &prop_size);
-> -			if (prop && (prop_size == sizeof(u32))) {
-> -				slew = *prop;
-> -			} else {
-> +			if (of_property_read_u32(np, "bosch,slew-rate", &slew)) {
->  				/* Determine default slew rate */
->  				slew = (CLKOUT_SL_MASK >>
->  					CLKOUT_SL_SHIFT) -
+If you know this MAC/PHY combination really is broken, not that it is
+just missing support for EEE, you could add these properties to your
+device tree.
 
-Rob,
+Otherwise, you do a very minimal EEE implementation. After connecting
+to the PHY call phy_ethtool_set_eee() with everything in data set to
+0. That should disable adverting of EEE.
 
-The next few lines look like this:
-
-					((cdv * clkext - 1) / 8000000);
-				if (slew < 0)
-					slew = 0;
-
-But slew is now unsigned, so this check will always be false.
-
-Flagged by Smatch and Coccinelle.
+	Andrew
 
