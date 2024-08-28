@@ -1,123 +1,114 @@
-Return-Path: <netdev+bounces-122861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70947962D84
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 18:19:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F14962D97
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 18:25:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 258211F25846
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:19:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D3B3282A5A
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF271A38D5;
-	Wed, 28 Aug 2024 16:19:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E69A188016;
+	Wed, 28 Aug 2024 16:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="d24hCijP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dFBSBUPL"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5F844C68;
-	Wed, 28 Aug 2024 16:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1ED65B216
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 16:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724861954; cv=none; b=rdcYfYW75d19oIXGjX3WNTx/wcCPTiS6JY/m/CYDMwCpXKjo4Anq6sUA0TSaG/ZxCNxNlGDeXgSTXvWK4tsXFLNaKcm29nym9zuvsDte3ftSTBUX7C9phCVlzOdnFUd+CoHtj0wxlyNYgvf4++/T9MWYvZ8SHrJ5UFo0tEx2xY8=
+	t=1724862296; cv=none; b=uEGDvIELvJSer4GrzDlBzTXB4HvgGCSUEuoB+bhnmK7yaHoFc45H/8SJeymGqC2ezDbEwq4F9rqZROTBf38hVplr1pDLkCzvkisLb/6fEEtSgdgqdenbrlhnAKMX3DAV87Hza0ZIEFdIXGbivBeKJ0Pq02QD/jmoalvrR6WX4Gg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724861954; c=relaxed/simple;
-	bh=7FOCNAkyb18q93EUQmESrW55Nul8uNlZ55KN2G2hiS0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DMqi7Y2hdEhY2QiK5YvqRmV6LzIz3sl4eSxoXKLoyFlsH3wp6C1zZro2t30vltPngfgf0G1uUk2mp6OkMH5HHIG97J/tJNYM2XwwJc3To6OJpLw7caIvzVGT8X+whUS/mHqYaTpMb2h6/Ag2mQaDOrSJq5ByzoY/795mN+72zjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=d24hCijP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=B55QGb3XeN8Sx1Nn0BNu8uirRXJNjaPTVSPXKaoyBqQ=; b=d24hCijPlIeMFQarbZVB30f8uy
-	q0EPYtvV5nIEB+0uc5E5OuI9uDQ56c6ME/2XExsD9By2mTFC0QbiFIfRRueAHnE+LAmgbMKxXr5gX
-	xi0YvGW7nc+ORsu9EqceUf29ZQk7+DTF3N7U7Jc7x6NzufAprezdBGbR2yfGn1gZuD3w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sjLNr-005xEt-R4; Wed, 28 Aug 2024 18:18:59 +0200
-Date: Wed, 28 Aug 2024 18:18:59 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Wilkins, Stephen" <Stephen.Wilkins@teledyne.com>
-Cc: Conor Dooley <conor@kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	"valentina.fernandezalanis@microchip.com" <valentina.fernandezalanis@microchip.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next] net: macb: add support for configuring eee via
- ethtool
-Message-ID: <08d191dd-bc70-4292-8031-d1d41036e731@lunn.ch>
-References: <20240827-excuse-banister-30136f43ef50@spud>
- <3c5a3db5-a598-454e-807a-b5106008aa40@lunn.ch>
- <AM0PR04MB41316B50F68C83A73E57A82F89952@AM0PR04MB4131.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1724862296; c=relaxed/simple;
+	bh=oKyyRdP4rSnKI0El82yfBJ9/2em3WkZbT4DIRKvlL9A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KJaFVpu6GcZWz4sD38Wvpp1PblpesOWA8jV8qcKbM6v3+lQ8iKzE+D/9numzB9aMLUI19EBc8KOwdWHb1auL5UrnOtj9E3yJyHp/flFwljRI3oFj0kHZ0hH92KweblRw64wtjmIpnpclwo5XcjuJbJx7BDEpXxxim66lIcB1cfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dFBSBUPL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724862293;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oKyyRdP4rSnKI0El82yfBJ9/2em3WkZbT4DIRKvlL9A=;
+	b=dFBSBUPLs6Vgv25z1K+eJjctKlctvnPWNzM8lBrs8+WNFjN09rwSFNsiN7DvmBVbZobkpJ
+	IE8uQGNOZmyXBT5ZauiUFZOqi7Xe2XAGFvhvAzYEl0/BPnejWcS+gIzOE2lknBBPx0cdm6
+	cWsn9Ts+aJqW5pdqrLJ0KuE1V/4TmXI=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-224-P6jdCsqTOBazqVyeHt6Idg-1; Wed, 28 Aug 2024 12:24:51 -0400
+X-MC-Unique: P6jdCsqTOBazqVyeHt6Idg-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-44ff289fea2so107837061cf.3
+        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 09:24:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724862290; x=1725467090;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oKyyRdP4rSnKI0El82yfBJ9/2em3WkZbT4DIRKvlL9A=;
+        b=wEpVMmuMebo8zWrcuR/3fQ6JT1m59OVlAk+JLhCbhESj8krxVdMDgWlPRteYqGWuwM
+         wj5YOd1x26HWZmJ0rokWkOzBc+m8SSCz9CCTiXQ50GO0/OK8qhy7zfESVNdaBSF+YjHR
+         EKv2YStuTXdRNzMhFwu6RaLGnyMLMo0nexuCK/nJjLIhLOaCbJcYx4V56Q0mulat2WGK
+         m4+s/xRJDnsettw5Ib18P6y26a35rAImI6jmphoIfMyY3TJVx7RujA9H2uu3vSlbHS4b
+         jsG8FNpP4yelMyP8TQIOsmfY23OzVbQ/zP9XuFt/dueU5YhLk2lGk+ClFZc1PjARvMz+
+         SFyQ==
+X-Gm-Message-State: AOJu0YzqyEwJ4yWF6SClrpiMSj0F3vnJrLD662ST0PF/Tbb1bAKZkfWo
+	lvmYxC8RJhy94zngcjsfXY6SJLmHYNvX7j0PoTx75RV/w4f8J82Tew0FpvD2xeds26MsiHHqKkU
+	eR4Kzxt82Ga/uD7BH6lKwNEUzBgiVCwWvIdCbd9vnjckj/Xh3TyRyVw==
+X-Received: by 2002:a05:622a:1f85:b0:456:4609:329c with SMTP id d75a77b69052e-456460936b3mr181490021cf.18.1724862290688;
+        Wed, 28 Aug 2024 09:24:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEcg4vHMY+AdTJr/EQ1dajxgeeZ0xuw/jbMm23N6P57VW/SVVNawMULnG+DswPYjr4ENVb4fw==
+X-Received: by 2002:a05:622a:1f85:b0:456:4609:329c with SMTP id d75a77b69052e-456460936b3mr181489631cf.18.1724862290101;
+        Wed, 28 Aug 2024 09:24:50 -0700 (PDT)
+Received: from [10.0.0.174] ([24.225.235.209])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-454fdfc097csm62814491cf.12.2024.08.28.09.24.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Aug 2024 09:24:49 -0700 (PDT)
+Message-ID: <d47f131f-2bb4-4581-a3cf-ecc2d4e215e9@redhat.com>
+Date: Wed, 28 Aug 2024 12:24:48 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM0PR04MB41316B50F68C83A73E57A82F89952@AM0PR04MB4131.eurprd04.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next, v2 2/2] selftests: add selftest for tcp SO_PEEK_OFF
+ support
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, passt-dev@passt.top,
+ sbrivio@redhat.com, lvivier@redhat.com, dgibson@redhat.com,
+ eric.dumazet@gmail.com, edumazet@google.com
+References: <20240826194932.420992-1-jmaloy@redhat.com>
+ <20240826194932.420992-3-jmaloy@redhat.com>
+ <20240827145043.2646387e@kernel.org>
+Content-Language: en-US
+From: Jon Maloy <jmaloy@redhat.com>
+In-Reply-To: <20240827145043.2646387e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 28, 2024 at 03:47:21PM +0000, Wilkins, Stephen wrote:
-> Thanks for the feedback.
-> 
-> In my particular use-case I wanted to ensure the PHY didn't advertise EEE
-> support, as it can cause issues in our deployment environment. The problem I
-> had was the PHY we are using enables EEE advertisement by default, and the
-> generic phy support in phy_device.c reads the c45 registers and enables EEE if
-> there are any linkmodes already advertised. Without the phylink hook in macb, I
-> couldn't use ethtool to disable it, but I now see my patch is only a partial
-> solution and would also imply support that is missing. That's why code reviews
-> are important. Maybe I need an alternative approach for ensuring the PHY
-> advertising is disabled if the MAC layer support is missing. 
 
-In this particular case, do you know what is causing you problems?
 
-I agree that if the MAC does not support EEE, the PHY should not be
-advertising it. But historically EEE has been a mess. It could be the
-MAC does EEE by default, using default settings, and the PHY is
-advertising EEE, and the link partner is happy, and EEE just works. So
-if we turn advertisement of EEE off by default, we might cause
-regressions :-(
+On 2024-08-27 17:50, Jakub Kicinski wrote:
+> On Mon, 26 Aug 2024 15:49:32 -0400 jmaloy@redhat.com wrote:
+>> +}
+>> +
+Does this require a re-posting?
+> nit: extra new line at the end here, git warns when applying
+>
+> BTW did someone point out v6 is missing on the list? If so could
+> we add a Link: to that thread?
+I don't understand this question. v6 of what?
 
-Now, we know some PHYs are actually broken. And we have a standard way
-to express this:
+///jon
 
-Documentation/devicetree/bindings/net/ethernet-phy.yaml
-
-  eee-broken-100tx:
-    $ref: /schemas/types.yaml#/definitions/flag
-    description:
-      Mark the corresponding energy efficient ethernet mode as
-      broken and request the ethernet to stop advertising it.
-
-  eee-broken-1000t:
-    $ref: /schemas/types.yaml#/definitions/flag
-    description:
-      Mark the corresponding energy efficient ethernet mode as
-      broken and request the ethernet to stop advertising it.
-
-If you know this MAC/PHY combination really is broken, not that it is
-just missing support for EEE, you could add these properties to your
-device tree.
-
-Otherwise, you do a very minimal EEE implementation. After connecting
-to the PHY call phy_ethtool_set_eee() with everything in data set to
-0. That should disable adverting of EEE.
-
-	Andrew
 
