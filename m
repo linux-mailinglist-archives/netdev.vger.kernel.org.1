@@ -1,355 +1,258 @@
-Return-Path: <netdev+bounces-122792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA528962926
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:46:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E527962939
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:48:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D4821F21D66
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:46:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C35A2853F3
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:48:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB03188CAD;
-	Wed, 28 Aug 2024 13:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4323F186E2C;
+	Wed, 28 Aug 2024 13:48:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fMqY5Zxu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EbjLpfkN"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2081.outbound.protection.outlook.com [40.107.92.81])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F17188CAC
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 13:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.81
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724852766; cv=fail; b=iZ2IAOVhRmgBQMjjrxatXMLytHeO2VVGd1BotGraWIINLPwXS4z9xP/0mnswv+YQY1Atzu4gqHCfSqBG5NIcgqDSVXsAEmWCp5EEZ326IGOg/QRYgE3ZquVccVf25aRnkFc8CX6CmEKA82OLJUs7eSpzr746SygvfyrR21DvL7Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724852766; c=relaxed/simple;
-	bh=BkqzjF7u7nQIbQ2L2lbRvun8QIoAlqi12VueZS8zQDw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DPUFbrf7BqHV2jk+I7if7BFtDdfLPsZGL2ERg2zUZun6mFbpmjmmWc3OTesq9tNd//q/SyYEf1wgEnuhkTRqwa/fC6TtzXhmCp3MLYfRPTWo3qqqtJQYTO2QdNT/XnFgI1gWj69xrksLb9dlQQzYwnNwxy/RSBbC8NJSSyba2DE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=fMqY5Zxu; arc=fail smtp.client-ip=40.107.92.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=iTIxVKeVZiwzZfKmgP8OuURR2Mjm77G9ZGwE/OA6dEGbAbgjxj7+pg2nx9dm/gZiKP6kWEag+jyUCZr8eSn5NuEas7FmzbgPr5xvXWjcKEuDjBObOnU28L5jyZBwyM2sq5K5ThGGwD0SU1088hy+wk2YU2k5t0vYN2MqBn2GILVCst5UT9JNatT1TbNtYzEG5iG4+b2rIxXhSsDxIOu6/ocMaABY4wWZ6DEui+8hcR/l78yw2UTPNLfWbCT7QVIwTAfW1Mcpju5FkSloo0mz0ElQC8uNXuxNPUNUIGKR7qL8txI41C9e/lndLf+j8k5n27PBKmom1LP/8nIU/GpVSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0YLxYkfwuAQ+K5oJK4ma80+49Lg1px0qurjUxzWpu3c=;
- b=AdyGBj0jbwnHLFV4SmQXIE3uP6S9vN+0xcpKX0ELqRpsOF73/ccM/JFsGLnt+ijsBV5/3zdSg4UuwtDZXualXTxa13ksWmCiES73h0BwQ2ruPsmyuMjZfcCbVOj01STfjVf2jNI2bP+7eGa/NpflbZ6Atj6m5BIKjpOu+X7836xxzFzv52DM6RB/DGWUaqsV3W4FkReprwgbhQp7gk3i4iFuvyVhiMW5YM+U1sqSD9MVKNciWs2H99C4y8JRyEhoDigfCYweKu5OJzE9DFNGfOdOZ53XbpTVy57ZsYOy3nrbAFD7DPHSNa2y/8i4eT/m4V6GjaFp7vqQ3bKtABvIxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0YLxYkfwuAQ+K5oJK4ma80+49Lg1px0qurjUxzWpu3c=;
- b=fMqY5ZxuK3PzuBhQq3CabGGDYAocimqm4FzMSSlYzouKVtsAFvosVOFifqNPbRyGtwVOJPDZQTqc3Deqmb8pzR/clCGU5QtEXyXRbmLnDQgwnO+6kyuTqL/ShHxkLDwy2cVahYnWhbXPT7UbGWj9TMyUDukKHEsI8QlVmcYi9+I=
-Received: from SA1P222CA0078.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2c1::25)
- by CY8PR12MB8068.namprd12.prod.outlook.com (2603:10b6:930:75::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Wed, 28 Aug
- 2024 13:46:01 +0000
-Received: from SN1PEPF0002BA50.namprd03.prod.outlook.com
- (2603:10b6:806:2c1:cafe::e2) by SA1P222CA0078.outlook.office365.com
- (2603:10b6:806:2c1::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.27 via Frontend
- Transport; Wed, 28 Aug 2024 13:46:01 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- SN1PEPF0002BA50.mail.protection.outlook.com (10.167.242.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Wed, 28 Aug 2024 13:46:01 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 28 Aug
- 2024 08:46:00 -0500
-Received: from xcbecree42x.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
- Transport; Wed, 28 Aug 2024 08:46:00 -0500
-From: <edward.cree@amd.com>
-To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>
-CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next 6/6] sfc: add per-queue RX and TX bytes stats
-Date: Wed, 28 Aug 2024 14:45:15 +0100
-Message-ID: <9695a02a3f50cf7d4c1a6321cd42a0538fc686be.1724852597.git.ecree.xilinx@gmail.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <cover.1724852597.git.ecree.xilinx@gmail.com>
-References: <cover.1724852597.git.ecree.xilinx@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F117B2D600;
+	Wed, 28 Aug 2024 13:48:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724852919; cv=none; b=EyK9jixn97YCWXk/5ndnZpgambIcUMvwxmF5pBJfHg/RTtM/hg2CH3oXee8iq13S0k5CPXPmXHlpK+z0jZe9/tKfhal0as5RtKo5A0H1oVwQvj9J7pVe2stKNr93KHggUrdbxCtocsilVm0qJS3jkd0uqNypECvo17gd0WrdyhE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724852919; c=relaxed/simple;
+	bh=TFXHpYUbMPU1PBJdBGzhBTwFtAf9olUiwemN+xYfsaI=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=BczjG21vG2G6uh8pM4nYtUWRzg7t2MtmdjTqKZWr5vZqgIlqDqWmVaih9kyAakCElVDYJABK7xrQ8SsvZFMIIdjIvIoV8SZu3ruVh9zR/p2JsubD9jeEGBG1ZUwTreRlSKaECwrYRkuri+Gt2Y4mPJM5uve39yDJn9JGgwt3+pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EbjLpfkN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 716F8C5FB24;
+	Wed, 28 Aug 2024 13:48:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724852918;
+	bh=TFXHpYUbMPU1PBJdBGzhBTwFtAf9olUiwemN+xYfsaI=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=EbjLpfkNlvuKmapZ4irEc3+VoB7uNdRFIRrm37fZuyRc+hVMgA7reiu+oN5SrtH3L
+	 r5aLX0kCDbqvYUq/ujIE6rw/uu06Bt8oj9Hu3IKc0vGDwjC6fnE6vBD3dN9YNxQU8u
+	 86Jxn9AehGCVE3LJBYwEIM2zAL48oXK+oLk4itMPso5Iz3c4nsCNfnEMtSE+18I/xd
+	 dEAuNkIPUKy9qd7cUdbKJLBVMrTgzuXOGogCTlVmiTQFwD7hn+LA/8kxfBjngnteo+
+	 RG5H8USGaa8sS94tdIcVvfhl5sQn6YRvK++Lwf+dnnbWq/xtWKAknb2oyJmTD/thI0
+	 PmekGQbSXjv1Q==
+Date: Wed, 28 Aug 2024 06:48:39 -0700
+From: Kees Cook <kees@kernel.org>
+To: Yafang Shao <laoar.shao@gmail.com>, Alejandro Colomar <alx@kernel.org>
+CC: akpm@linux-foundation.org, torvalds@linux-foundation.org,
+ justinstitt@google.com, ebiederm@xmission.com, alexei.starovoitov@gmail.com,
+ rostedt@goodmis.org, catalin.marinas@arm.com,
+ penguin-kernel@i-love.sakura.ne.jp, linux-mm@kvack.org,
+ linux-fsdevel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ audit@vger.kernel.org, linux-security-module@vger.kernel.org,
+ selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Kees Cook <keescook@chromium.org>, Matus Jokay <matus.jokay@stuba.sk>,
+ "Serge E. Hallyn" <serge@hallyn.com>
+Subject: Re: [PATCH v8 1/8] Get rid of __get_task_comm()
+User-Agent: K-9 Mail for Android
+In-Reply-To: <CALOAHbBAYHjDnKBVw63B8JBFc6U-2RNUX9L=ryA2Gbz7nnJfsQ@mail.gmail.com>
+References: <20240828030321.20688-1-laoar.shao@gmail.com> <20240828030321.20688-2-laoar.shao@gmail.com> <lql4y2nvs3ewadszhmv4m6fnqja4ff4ymuurpidlwvgf4twvru@esnh37a2jxbd> <n2fxqs3tekvljezaqpfnwhsmjymch4vb47y744zwmy7urf3flv@zvjtepkem4l7> <CALOAHbBAYHjDnKBVw63B8JBFc6U-2RNUX9L=ryA2Gbz7nnJfsQ@mail.gmail.com>
+Message-ID: <7839453E-CA06-430A-A198-92EB906F94D9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: None (SATLEXMB03.amd.com: edward.cree@amd.com does not designate
- permitted sender hosts)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA50:EE_|CY8PR12MB8068:EE_
-X-MS-Office365-Filtering-Correlation-Id: 03bed6a9-876b-41eb-1447-08dcc767c147
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?C/uusDqsMO1qstUxkDtKGXfvWEujiWf06vW4ddFRDBVOpYYTU496kVgcGdw9?=
- =?us-ascii?Q?qCRq1zZxdYidsKhpuf1eONVaJ0zbBWYwS1tgetigfK8Tl1mJSEsgPzhnJruB?=
- =?us-ascii?Q?au0OHwDffngRHr7LWVrTpqMNcI2mNsvnmIufIY4ub3lwNW+DAC4BILfFV8dQ?=
- =?us-ascii?Q?q7i4REmWa6xotreh/ZMVmnz2k+1Rl300xAVq6Fx/BfA1/3Z1M9ntTmUU8M4G?=
- =?us-ascii?Q?1H6hAPxy10x8CxGDhGcf3LaKqAfxBTiBtWhFhZIqWLy2EXfVcS1IbVgYSmfE?=
- =?us-ascii?Q?lKoKGhohnaAiWl3pwYztU8qaeE0MC1pfwP2dSIgSwDNFNcOc06L4botdn7cP?=
- =?us-ascii?Q?q6ECssnBwzxGlqGQg+pLWJTOMGwPZwkrDijOQb9zPOKDhFYWuszgtbGgETpa?=
- =?us-ascii?Q?hZet82ZfvS6w88AsAUyk3v2ZCq8+5CwbucZVZOF7FCyg5mW2rt/v0pN+ZQKa?=
- =?us-ascii?Q?Ky0GHQOIn0JeAsG6ySsijdJwDAzN2gcUXitmdonSwd10vawcMwiQtcq3Ra0G?=
- =?us-ascii?Q?pLNiMs13x86VfYU1cX4iyYRIC/xqgADtiAl1XiGLgkBiUYdwNI1WgyVfEUnk?=
- =?us-ascii?Q?2z/CxNox4IoUSt8zsj09Y2zLKVxBDtq3rUZXNvXjbpAi5UORUEDcLZRA/3VY?=
- =?us-ascii?Q?imQ0lpSzSWsL3whsnjjNpiOdh5mnOiWwzbp6ukYRMAwbbknG8aZXJ6Ito3kV?=
- =?us-ascii?Q?T4JKqQoiDK265VZnYTaX1WlfZQPvTHIshiibBmmoaXEP0XwU3aLH6OJfk/VJ?=
- =?us-ascii?Q?jXqUSCDme3dRC4Yn7xLYVqlNvhOJlHaEqAzqsjw0d2x+LX+zUhv/A1fIRlAH?=
- =?us-ascii?Q?7wK6b5x9AJaFj1d/XiWaNqoMyO2y09lQGvuCiPAnmVbibu/w0qkMWBw3OZtv?=
- =?us-ascii?Q?NxjScX4rclu0LwJnGc9YWn+Tcf8M878RGyH8kpCglpoJHqebZ0ZjOR9gieEA?=
- =?us-ascii?Q?W4/5jCJcQoTFopxq59oj4a+SvxqJdnj7xCEKTfsOuzK3vPyViQJMsrOyN3St?=
- =?us-ascii?Q?puCanj0bHOWBAa0D7sYCN94UgxTW2p/l06O8LXXhHdydEDhVCoSMYThq/Dyw?=
- =?us-ascii?Q?26UsBxVHuM6VJ2ex/LkXW1VlUFzn+Kd/wAT4X6x+qv6gKdSmXFFR/YaXEpsf?=
- =?us-ascii?Q?7lZR/qjJJL92arHpIBhGlFz6jxJ9e5mcRRrd6z/scF54azf3jT5h2CXCohrU?=
- =?us-ascii?Q?srhj3CPXhwRiWSbTwI3RC/bHrPcU9LtAmOIUyDFiwIPeuuk2Xjz9MPXFkvaE?=
- =?us-ascii?Q?GTOeNzEEFAMCP40g65yXYJxZjYPIlwHiGi04fGEBdjQ1npAMT3SYTPkKdO4D?=
- =?us-ascii?Q?chj6Xv4PpYHs4CvKf04WKxFkRn9mEo8620ASGIJaQ/kieP1KAokQS6sQhpTN?=
- =?us-ascii?Q?mhzNkBzYUzzZYti9vm3EoUjpHpGkoCshJx5lwl9M2SiRu5iIAuF4CO0Rokhu?=
- =?us-ascii?Q?BNfoIePc0sAoZ7+LnNG00E6+nJQMFURn?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 13:46:01.7050
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03bed6a9-876b-41eb-1447-08dcc767c147
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002BA50.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8068
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Edward Cree <ecree.xilinx@gmail.com>
 
-While this does add overhead to the fast path, it should be minimal
- as the cacheline should already be held for write from updating the
- queue's [tr]x_packets stat.
 
-Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
----
- drivers/net/ethernet/sfc/ef100_rx.c   |  1 +
- drivers/net/ethernet/sfc/ef100_tx.c   |  1 +
- drivers/net/ethernet/sfc/efx.c        |  9 +++++++++
- drivers/net/ethernet/sfc/net_driver.h | 10 ++++++++++
- drivers/net/ethernet/sfc/rx.c         |  1 +
- drivers/net/ethernet/sfc/rx_common.c  |  1 +
- drivers/net/ethernet/sfc/tx.c         |  2 ++
- drivers/net/ethernet/sfc/tx_common.c  |  1 +
- 8 files changed, 26 insertions(+)
+On August 28, 2024 6:40:35 AM PDT, Yafang Shao <laoar=2Eshao@gmail=2Ecom> =
+wrote:
+>On Wed, Aug 28, 2024 at 8:58=E2=80=AFPM Alejandro Colomar <alx@kernel=2Eo=
+rg> wrote:
+>>
+>> On Wed, Aug 28, 2024 at 12:15:40PM GMT, Alejandro Colomar wrote:
+>> > Hi Yafang,
+>> >
+>> > On Wed, Aug 28, 2024 at 11:03:14AM GMT, Yafang Shao wrote:
+>> > > We want to eliminate the use of __get_task_comm() for the following
+>> > > reasons:
+>> > >
+>> > > - The task_lock() is unnecessary
+>> > >   Quoted from Linus [0]:
+>> > >   : Since user space can randomly change their names anyway, using =
+locking
+>> > >   : was always wrong for readers (for writers it probably does make=
+ sense
+>> > >   : to have some lock - although practically speaking nobody cares =
+there
+>> > >   : either, but at least for a writer some kind of race could have
+>> > >   : long-term mixed results
+>> > >
+>> > > - The BUILD_BUG_ON() doesn't add any value
+>> > >   The only requirement is to ensure that the destination buffer is =
+a valid
+>> > >   array=2E
+>> > >
+>> > > - Zeroing is not necessary in current use cases
+>> > >   To avoid confusion, we should remove it=2E Moreover, not zeroing =
+could
+>> > >   potentially make it easier to uncover bugs=2E If the caller needs=
+ a
+>> > >   zero-padded task name, it should be explicitly handled at the cal=
+l site=2E
+>> > >
+>> > > Suggested-by: Linus Torvalds <torvalds@linux-foundation=2Eorg>
+>> > > Link: https://lore=2Ekernel=2Eorg/all/CAHk-=3DwivfrF0_zvf+oj6=3D=3D=
+Sh=3D-npJooP8chLPEfaFV0oNYTTBA@mail=2Egmail=2Ecom [0]
+>> > > Link: https://lore=2Ekernel=2Eorg/all/CAHk-=3DwhWtUC-AjmGJveAETKOMe=
+MFSTwKwu99v7+b6AyHMmaDFA@mail=2Egmail=2Ecom/
+>> > > Suggested-by: Alejandro Colomar <alx@kernel=2Eorg>
+>> > > Link: https://lore=2Ekernel=2Eorg/all/2jxak5v6dfxlpbxhpm3ey7oup4g2l=
+nr3ueurfbosf5wdo65dk4@srb3hsk72zwq
+>> > > Signed-off-by: Yafang Shao <laoar=2Eshao@gmail=2Ecom>
+>> > > Cc: Alexander Viro <viro@zeniv=2Elinux=2Eorg=2Euk>
+>> > > Cc: Christian Brauner <brauner@kernel=2Eorg>
+>> > > Cc: Jan Kara <jack@suse=2Ecz>
+>> > > Cc: Eric Biederman <ebiederm@xmission=2Ecom>
+>> > > Cc: Kees Cook <keescook@chromium=2Eorg>
+>> > > Cc: Alexei Starovoitov <alexei=2Estarovoitov@gmail=2Ecom>
+>> > > Cc: Matus Jokay <matus=2Ejokay@stuba=2Esk>
+>> > > Cc: Alejandro Colomar <alx@kernel=2Eorg>
+>> > > Cc: "Serge E=2E Hallyn" <serge@hallyn=2Ecom>
+>> > > ---
+>> > >  fs/exec=2Ec             | 10 ----------
+>> > >  fs/proc/array=2Ec       |  2 +-
+>> > >  include/linux/sched=2Eh | 32 ++++++++++++++++++++++++++------
+>> > >  kernel/kthread=2Ec      |  2 +-
+>> > >  4 files changed, 28 insertions(+), 18 deletions(-)
+>> > >
+>> >
+>> > [=2E=2E=2E]
+>> >
+>> > > diff --git a/include/linux/sched=2Eh b/include/linux/sched=2Eh
+>> > > index f8d150343d42=2E=2Ec40b95a79d80 100644
+>> > > --- a/include/linux/sched=2Eh
+>> > > +++ b/include/linux/sched=2Eh
+>> >
+>> > [=2E=2E=2E]
+>> >
+>> > > @@ -1914,10 +1917,27 @@ static inline void set_task_comm(struct tas=
+k_struct *tsk, const char *from)
+>> > >     __set_task_comm(tsk, from, false);
+>> > >  }
+>> > >
+>> > > -extern char *__get_task_comm(char *to, size_t len, struct task_str=
+uct *tsk);
+>> > > +/*
+>> >
+>> > [=2E=2E=2E]
+>> >
+>> > > + * - ARRAY_SIZE() can help ensure that @buf is indeed an array=2E
+>> > > + */
+>> > >  #define get_task_comm(buf, tsk) ({                 \
+>> > > -   BUILD_BUG_ON(sizeof(buf) !=3D TASK_COMM_LEN);     \
+>> > > -   __get_task_comm(buf, sizeof(buf), tsk);         \
+>> > > +   strscpy(buf, (tsk)->comm, ARRAY_SIZE(buf));     \
+>> >
+>> > I see that there's a two-argument macro
+>> >
+>> >       #define strscpy(dst, src)       sized_strscpy(dst, src, sizeof(=
+dst))
+>> >
+>> > which is used in patch 2/8
+>> >
+>> >       diff --git a/kernel/auditsc=2Ec b/kernel/auditsc=2Ec
+>> >       index 6f0d6fb6523f=2E=2Ee4ef5e57dde9 100644
+>> >       --- a/kernel/auditsc=2Ec
+>> >       +++ b/kernel/auditsc=2Ec
+>> >       @@ -2730,7 +2730,7 @@ void __audit_ptrace(struct task_struct *t=
+)
+>> >               context->target_uid =3D task_uid(t);
+>> >               context->target_sessionid =3D audit_get_sessionid(t);
+>> >               security_task_getsecid_obj(t, &context->target_sid);
+>> >       -       memcpy(context->target_comm, t->comm, TASK_COMM_LEN);
+>> >       +       strscpy(context->target_comm, t->comm);
+>> >        }
+>> >
+>> >        /**
+>>
+>> Ahh, the actual generic definition is in <include/linux/string=2Eh>=2E
+>> You could do
+>>
+>>         diff --git i/include/linux/string=2Eh w/include/linux/string=2E=
+h
+>>         index 9edace076ddb=2E=2E060504719904 100644
+>>         --- i/include/linux/string=2Eh
+>>         +++ w/include/linux/string=2Eh
+>>         @@ -76,11 +76,11 @@ ssize_t sized_strscpy(char *, const char *,=
+ size_t);
+>>           * known size=2E
+>>           */
+>>          #define __strscpy0(dst, src, =2E=2E=2E)      \
+>>         -       sized_strscpy(dst, src, sizeof(dst) + __must_be_array(d=
+st))
+>>         +       sized_strscpy(dst, src, ARRAY_SIZE(dst))
+>>          #define __strscpy1(dst, src, size)     sized_strscpy(dst, src,=
+ size)
+>>
+>>          #define __strscpy_pad0(dst, src, =2E=2E=2E)  \
+>>         -       sized_strscpy_pad(dst, src, sizeof(dst) + __must_be_arr=
+ay(dst))
+>>         +       sized_strscpy_pad(dst, src, ARRAY_SIZE(dst))
+>>          #define __strscpy_pad1(dst, src, size) sized_strscpy_pad(dst, =
+src, size)
+>>
+>>          /**
+>
+>Thank you for your suggestion=2E How does the following commit log look
+>to you? Does it meet your expectations?
+>
+>    string: Use ARRAY_SIZE() in strscpy()
+>
+>    We can use ARRAY_SIZE() instead to clarify that they are regular char=
+acters=2E
+>
+>    Co-developed-by: Alejandro Colomar <alx@kernel=2Eorg>
+>    Signed-off-by: Alejandro Colomar <alx@kernel=2Eorg>
+>    Signed-off-by: Yafang Shao <laoar=2Eshao@gmail=2Ecom>
+>
+>diff --git a/arch/um/include/shared/user=2Eh b/arch/um/include/shared/use=
+r=2Eh
+>index bbab79c0c074=2E=2E07216996e3a9 100644
+>--- a/arch/um/include/shared/user=2Eh
+>+++ b/arch/um/include/shared/user=2Eh
+>@@ -14,7 +14,7 @@
+>  * copying too much infrastructure for my taste, so userspace files
+>  * get less checking than kernel files=2E
+>  */
+>-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+>+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]) + __must_be_array(x))
+>
+> /* This is to get size_t and NULL */
+> #ifndef __UM_HOST__
+>@@ -60,7 +60,7 @@ static inline void print_hex_dump(const char *level,
+>const char *prefix_str,
+> extern int in_aton(char *str);
+> extern size_t strlcat(char *, const char *, size_t);
+> extern size_t sized_strscpy(char *, const char *, size_t);
+>-#define strscpy(dst, src)      sized_strscpy(dst, src, sizeof(dst))
+>+#define strscpy(dst, src)      sized_strscpy(dst, src, ARRAY_SIZE(dst))
 
-diff --git a/drivers/net/ethernet/sfc/ef100_rx.c b/drivers/net/ethernet/sfc/ef100_rx.c
-index 992151775cb8..44dc75feb162 100644
---- a/drivers/net/ethernet/sfc/ef100_rx.c
-+++ b/drivers/net/ethernet/sfc/ef100_rx.c
-@@ -135,6 +135,7 @@ void __ef100_rx_packet(struct efx_channel *channel)
- 	}
- 
- 	++rx_queue->rx_packets;
-+	rx_queue->rx_bytes += rx_buf->len;
- 
- 	efx_rx_packet_gro(channel, rx_buf, channel->rx_pkt_n_frags, eh, csum);
- 	goto out;
-diff --git a/drivers/net/ethernet/sfc/ef100_tx.c b/drivers/net/ethernet/sfc/ef100_tx.c
-index e6b6be549581..a7e30289e231 100644
---- a/drivers/net/ethernet/sfc/ef100_tx.c
-+++ b/drivers/net/ethernet/sfc/ef100_tx.c
-@@ -493,6 +493,7 @@ int __ef100_enqueue_skb(struct efx_tx_queue *tx_queue, struct sk_buff *skb,
- 	} else {
- 		tx_queue->tx_packets++;
- 	}
-+	tx_queue->tx_bytes += skb->len;
- 	return 0;
- 
- err:
-diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
-index bf06fbcdcbff..b3fbffed4e61 100644
---- a/drivers/net/ethernet/sfc/efx.c
-+++ b/drivers/net/ethernet/sfc/efx.c
-@@ -638,6 +638,7 @@ static void efx_get_queue_stats_rx(struct net_device *net_dev, int idx,
- 	rx_queue = efx_channel_get_rx_queue(channel);
- 	/* Count only packets since last time datapath was started */
- 	stats->packets = rx_queue->rx_packets - rx_queue->old_rx_packets;
-+	stats->bytes = rx_queue->rx_bytes - rx_queue->old_rx_bytes;
- 	stats->hw_drops = efx_get_queue_stat_rx_hw_drops(channel) -
- 			  channel->old_n_rx_hw_drops;
- 	stats->hw_drop_overruns = channel->n_rx_nodesc_trunc -
-@@ -653,6 +654,7 @@ static void efx_get_queue_stats_tx(struct net_device *net_dev, int idx,
- 
- 	channel = efx_get_tx_channel(efx, idx);
- 	stats->packets = 0;
-+	stats->bytes = 0;
- 	stats->hw_gso_packets = 0;
- 	stats->hw_gso_wire_packets = 0;
- 	/* If a TX channel has XDP TXQs, the stats for these will be counted
-@@ -663,6 +665,7 @@ static void efx_get_queue_stats_tx(struct net_device *net_dev, int idx,
- 	 */
- 	efx_for_each_channel_tx_queue(tx_queue, channel) {
- 		stats->packets += tx_queue->tx_packets - tx_queue->old_tx_packets;
-+		stats->bytes += tx_queue->tx_bytes - tx_queue->old_tx_bytes;
- 		stats->hw_gso_packets += tx_queue->tso_bursts -
- 					 tx_queue->old_tso_bursts;
- 		stats->hw_gso_wire_packets += tx_queue->tso_packets -
-@@ -680,9 +683,11 @@ static void efx_get_base_stats(struct net_device *net_dev,
- 	struct efx_channel *channel;
- 
- 	rx->packets = 0;
-+	rx->bytes = 0;
- 	rx->hw_drops = 0;
- 	rx->hw_drop_overruns = 0;
- 	tx->packets = 0;
-+	tx->bytes = 0;
- 	tx->hw_gso_packets = 0;
- 	tx->hw_gso_wire_packets = 0;
- 
-@@ -693,10 +698,12 @@ static void efx_get_base_stats(struct net_device *net_dev,
- 		rx_queue = efx_channel_get_rx_queue(channel);
- 		if (channel->channel >= net_dev->real_num_rx_queues) {
- 			rx->packets += rx_queue->rx_packets;
-+			rx->bytes += rx_queue->rx_bytes;
- 			rx->hw_drops += efx_get_queue_stat_rx_hw_drops(channel);
- 			rx->hw_drop_overruns += channel->n_rx_nodesc_trunc;
- 		} else {
- 			rx->packets += rx_queue->old_rx_packets;
-+			rx->bytes += rx_queue->old_rx_bytes;
- 			rx->hw_drops += channel->old_n_rx_hw_drops;
- 			rx->hw_drop_overruns += channel->old_n_rx_hw_drop_overruns;
- 		}
-@@ -705,10 +712,12 @@ static void efx_get_base_stats(struct net_device *net_dev,
- 			    channel->channel >= efx->tx_channel_offset +
- 						net_dev->real_num_tx_queues) {
- 				tx->packets += tx_queue->tx_packets;
-+				tx->bytes += tx_queue->tx_bytes;
- 				tx->hw_gso_packets += tx_queue->tso_bursts;
- 				tx->hw_gso_wire_packets += tx_queue->tso_packets;
- 			} else {
- 				tx->packets += tx_queue->old_tx_packets;
-+				tx->bytes += tx_queue->old_tx_bytes;
- 				tx->hw_gso_packets += tx_queue->old_tso_bursts;
- 				tx->hw_gso_wire_packets += tx_queue->old_tso_packets;
- 			}
-diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
-index 2cf2935a713c..147052c1e25a 100644
---- a/drivers/net/ethernet/sfc/net_driver.h
-+++ b/drivers/net/ethernet/sfc/net_driver.h
-@@ -233,7 +233,11 @@ struct efx_tx_buffer {
-  * @cb_packets: Number of times the TX copybreak feature has been used
-  * @notify_count: Count of notified descriptors to the NIC
-  * @tx_packets: Number of packets sent since this struct was created
-+ * @tx_bytes: Number of bytes sent since this struct was created.  For TSO,
-+ *	counts the superframe size, not the sizes of generated frames on the
-+ *	wire (i.e. the headers are only counted once)
-  * @old_tx_packets: Value of @tx_packets as of last efx_init_tx_queue()
-+ * @old_tx_bytes: Value of @tx_bytes as of last efx_init_tx_queue()
-  * @old_tso_bursts: Value of @tso_bursts as of last efx_init_tx_queue()
-  * @old_tso_packets: Value of @tso_packets as of last efx_init_tx_queue()
-  * @empty_read_count: If the completion path has seen the queue as empty
-@@ -285,7 +289,9 @@ struct efx_tx_queue {
- 	unsigned int notify_count;
- 	/* Statistics to supplement MAC stats */
- 	unsigned long tx_packets;
-+	unsigned long tx_bytes;
- 	unsigned long old_tx_packets;
-+	unsigned long old_tx_bytes;
- 	unsigned int old_tso_bursts;
- 	unsigned int old_tso_packets;
- 
-@@ -378,7 +384,9 @@ struct efx_rx_page_state {
-  * @slow_fill: Timer used to defer efx_nic_generate_fill_event().
-  * @grant_work: workitem used to grant credits to the MAE if @grant_credits
-  * @rx_packets: Number of packets received since this struct was created
-+ * @rx_bytes: Number of bytes received since this struct was created
-  * @old_rx_packets: Value of @rx_packets as of last efx_init_rx_queue()
-+ * @old_rx_bytes: Value of @rx_bytes as of last efx_init_rx_queue()
-  * @xdp_rxq_info: XDP specific RX queue information.
-  * @xdp_rxq_info_valid: Is xdp_rxq_info valid data?.
-  */
-@@ -415,7 +423,9 @@ struct efx_rx_queue {
- 	struct work_struct grant_work;
- 	/* Statistics to supplement MAC stats */
- 	unsigned long rx_packets;
-+	unsigned long rx_bytes;
- 	unsigned long old_rx_packets;
-+	unsigned long old_rx_bytes;
- 	struct xdp_rxq_info xdp_rxq_info;
- 	bool xdp_rxq_info_valid;
- };
-diff --git a/drivers/net/ethernet/sfc/rx.c b/drivers/net/ethernet/sfc/rx.c
-index f07495582125..ffca82207e47 100644
---- a/drivers/net/ethernet/sfc/rx.c
-+++ b/drivers/net/ethernet/sfc/rx.c
-@@ -393,6 +393,7 @@ void __efx_rx_packet(struct efx_channel *channel)
- 	}
- 
- 	rx_queue->rx_packets++;
-+	rx_queue->rx_bytes += rx_buf->len;
- 
- 	if (!efx_do_xdp(efx, channel, rx_buf, &eh))
- 		goto out;
-diff --git a/drivers/net/ethernet/sfc/rx_common.c b/drivers/net/ethernet/sfc/rx_common.c
-index bdb4325a7c2c..ab358fe13e1d 100644
---- a/drivers/net/ethernet/sfc/rx_common.c
-+++ b/drivers/net/ethernet/sfc/rx_common.c
-@@ -242,6 +242,7 @@ void efx_init_rx_queue(struct efx_rx_queue *rx_queue)
- 	rx_queue->page_recycle_full = 0;
- 
- 	rx_queue->old_rx_packets = rx_queue->rx_packets;
-+	rx_queue->old_rx_bytes = rx_queue->rx_bytes;
- 
- 	/* Initialise limit fields */
- 	max_fill = efx->rxq_entries - EFX_RXD_HEAD_ROOM;
-diff --git a/drivers/net/ethernet/sfc/tx.c b/drivers/net/ethernet/sfc/tx.c
-index fe2d476028e7..1aea19488a56 100644
---- a/drivers/net/ethernet/sfc/tx.c
-+++ b/drivers/net/ethernet/sfc/tx.c
-@@ -394,6 +394,7 @@ netdev_tx_t __efx_enqueue_skb(struct efx_tx_queue *tx_queue, struct sk_buff *skb
- 	} else {
- 		tx_queue->tx_packets++;
- 	}
-+	tx_queue->tx_bytes += skb_len;
- 
- 	return NETDEV_TX_OK;
- 
-@@ -490,6 +491,7 @@ int efx_xdp_tx_buffers(struct efx_nic *efx, int n, struct xdp_frame **xdpfs,
- 		tx_buffer->dma_offset = 0;
- 		tx_buffer->unmap_len = len;
- 		tx_queue->tx_packets++;
-+		tx_queue->tx_bytes += len;
- 	}
- 
- 	/* Pass mapped frames to hardware. */
-diff --git a/drivers/net/ethernet/sfc/tx_common.c b/drivers/net/ethernet/sfc/tx_common.c
-index cd0857131aa8..7ef2baa3439a 100644
---- a/drivers/net/ethernet/sfc/tx_common.c
-+++ b/drivers/net/ethernet/sfc/tx_common.c
-@@ -87,6 +87,7 @@ void efx_init_tx_queue(struct efx_tx_queue *tx_queue)
- 	tx_queue->completed_timestamp_minor = 0;
- 
- 	tx_queue->old_tx_packets = tx_queue->tx_packets;
-+	tx_queue->old_tx_bytes = tx_queue->tx_bytes;
- 	tx_queue->old_tso_bursts = tx_queue->tso_bursts;
- 	tx_queue->old_tso_packets = tx_queue->tso_packets;
- 
+Uh, but why? strscpy() copies bytes, not array elements=2E Using sizeof() =
+is already correct and using ARRAY_SIZE() could lead to unexpectedly small =
+counts (in admittedly odd situations)=2E
+
+What is the problem you're trying to solve here?
+
+-Kees
+
+--=20
+Kees Cook
 
