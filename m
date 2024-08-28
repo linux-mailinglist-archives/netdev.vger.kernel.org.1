@@ -1,242 +1,268 @@
-Return-Path: <netdev+bounces-122802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 647CF9629A4
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:04:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D585F9629A1
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:04:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15461282008
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:04:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C901281D83
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20EA718952B;
-	Wed, 28 Aug 2024 14:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e6zRKA1C"
-X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A32316D4C4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707AB188CC3;
 	Wed, 28 Aug 2024 14:03:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uYHfzpm/"
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A1A913BAC3;
+	Wed, 28 Aug 2024 14:03:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724853840; cv=none; b=baxmpuNSAzEs46rTA9TPJvM+fNMgDU0sz7lBO3wQAyRY6KytW6H+R2PxX0bg6NQwzfhbWctQcHhaXOptkgUYgRsFRwk7ZIqoPG1WE1VuX5drkD8C+z76qZ/Ve03sIjGi/rpj+IfLx3FKbxwM6yKEsF0BMsc6L4a0YvKRq1vgC4A=
+	t=1724853838; cv=none; b=lBCYS6UVu65GFESVjFdp4t9l//94hJ25kq7WJC1viRCmkYypUNyf0m5lLsoGEudwRBfbiEfJFGj5DLzFcuhEcEQnLRb60fmcMT8o2Btd/gfYAwtgygmTU1TxHodxQrFPoyysJHKTIwfaZANvJCeRsEk20B0U6USVJzhMgDDKsWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724853840; c=relaxed/simple;
-	bh=eZSzCsJwj7rqAjlnXNvCMvbp6dG3WM00eloeQdjFn+g=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=hEv4j1DvDeYWFs1AOQn8qpiYa9hV+qD6MfpQipZ9pNswNgLo+nCHvR1LopBbu/JCu+DRhS37qnO7q3Ac/zfwE7UFAKxlHoJ3xV/wvUwky5E51v4FJRrqeDiZbu6nJPJ7qlxv/AisNL+kCoJv7/ZOJBpdnVhIpOy1gA7r9M7GMi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e6zRKA1C; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7a337501630so433410985a.3;
-        Wed, 28 Aug 2024 07:03:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724853837; x=1725458637; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OQmc8dBb0j9CbeOENdVCHjYG/YY34AOkbiJtBQYP0Fw=;
-        b=e6zRKA1Cgm84Zu8kD2nfThZttaEWrGUYgegUA7OEPxQ4JQ0xv0N4laxf7IsdIkH5ti
-         +Vl3ymr7AvxtQZdW8bVeswG897Xn0pjK0uGGvSA7T22B5nCxWAFWZnNEsoYC4Lr+WH4Z
-         nuJzPevgblX+g2u8ckke1IWYp6mgZ9ve6spCUOQvsgDkEBkevcz6VSvXglLr5pm0A48g
-         e24tbk2qIuTurYv5NS0u8le7+6JPYkXzedWKRBlHoyED+PhsMnxsWq5R7L8HEyrw+0Cb
-         B7K+R2nTnqHMmqD6qlODRGs4XaJSDJj48gHszVU6GW/yavC1xQol2j1TeA9C9AjP4+H9
-         rgjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724853837; x=1725458637;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OQmc8dBb0j9CbeOENdVCHjYG/YY34AOkbiJtBQYP0Fw=;
-        b=PUYjp9eBS1F3hHkbQ8UExVTOklyeX44jfJaK9QeGkm2T8fcjYqsU3uQmAMzkYlbGW9
-         Bj1mFGIt/7cJCk2ySEl+CmzNasggUUu2lBjz7PVw/UIVl4vF3KrF7lc6YdgMdrdkHzbC
-         yvVYkAU7VWOPef0n+XJpB/MzUlLrLeDxXK+XwPo2uzikrx3ySeuiPeAyzv7DFd0Nm30D
-         CQr1K+jfgsDKHVwpIAcPpkMIJBdwzZMNhITUIArjtgFOMEMrqw9S33TVT7Y3/OAyX34f
-         pe1xEN+sNjltm/WH0EFFCHPqBqxaVorSqeZ1XCDvgUD7D6ILQxS0tHthLOzUHRB6btsu
-         R/mw==
-X-Forwarded-Encrypted: i=1; AJvYcCW+nX6CslG+Ap5whhlzPE4g5E+jiZb0ghsHZxYkv1UkzGz46dyhqX5BomA7sglYgb+BiGh+gG4fWt2b5TfYJVw=@vger.kernel.org, AJvYcCXNulNq61pZJKZ2JXI8dv69GO2t5O7glXw29N/onhfTLvF2cvzhqtNuxBPjeYnFhoV6MEefY7w7@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAL2AXpvcJYWjBgwyZeTTL3nK8Vg7quBKk1uzL8JPGNHZCa5Zd
-	KzvITx//FJbHuwfIpSD1X4boQEMdwWMLPX/zYGM9YzP25eXvr5J6
-X-Google-Smtp-Source: AGHT+IGCiWFEPEYqnVdRpQ4RX8PknJ9btlY6va//y4op67qcNy8CIZRS2aXBgQDQuW/VkT9ABYmmGA==
-X-Received: by 2002:a05:620a:40c:b0:7a7:fad0:d916 with SMTP id af79cd13be357-7a7fad0dbf5mr98008185a.26.1724853836696;
-        Wed, 28 Aug 2024 07:03:56 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a67f31b2d5sm643630185a.12.2024.08.28.07.03.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 07:03:56 -0700 (PDT)
-Date: Wed, 28 Aug 2024 10:03:55 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- kuba@kernel.org, 
- edumazet@google.com, 
- ncardwell@google.com, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org, 
- fw@strlen.de, 
- Willem de Bruijn <willemb@google.com>, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- martineau@kernel.org
-Message-ID: <66cf2e4bd8e89_33815c294b2@willemb.c.googlers.com.notmuch>
-In-Reply-To: <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
-References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
- <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
-Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
- ksft
+	s=arc-20240116; t=1724853838; c=relaxed/simple;
+	bh=lcHIdMYhBsJloW9fSwc6JWgDLrvYPjB0GKNuKWcKMcA=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=AVr9b3axMTmZpxPaMYC37mBtX9l1A44CuOg6eizZWkkLjxDeSG09yLVzfMI8Sr0yKeGnPVbT/kGDgPikl5d7SQLJj2nVRWahTz4VliAa26n7Nguu7y/L5TyDbpYCzr0zSqwMhLkwIFuDLJEApDPpm0GR4vJg2MmU2I/+m0uLsMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uYHfzpm/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A81A1C98ED1;
+	Wed, 28 Aug 2024 14:03:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724853837;
+	bh=lcHIdMYhBsJloW9fSwc6JWgDLrvYPjB0GKNuKWcKMcA=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=uYHfzpm/VEEl9wksfaG1d5QteWMrPN+ZXmcPmB4Ia/soAnFKfgp9mhZnydUdJy6t3
+	 5hOMGih31y5Y0fN1t96rLTITQopjIB1gRZgSkMnTAd5YlwLPxUACpAe4a5PXgNd1x2
+	 hpU8nDF5Zc6Bc8653vJzBfHxUfifFRTQnHGsz/tw6NzvgFnHzEfDdXZeB7kEqktYAm
+	 Wc8LHvMMW1amVNWZ0JQzHloemAhzlGZNsRMSB7QJdgQgyDYRfzf/czVtJC+gsxoSV0
+	 E1HK5namjymsUD6QBpH/p4y8aAuzx2hW1oimDQwAINC0Kv0Tg+aurxOigRs5WPigA4
+	 Z3zuMYGKFHTcQ==
+Date: Wed, 28 Aug 2024 07:03:58 -0700
+From: Kees Cook <kees@kernel.org>
+To: Yafang Shao <laoar.shao@gmail.com>, akpm@linux-foundation.org
+CC: torvalds@linux-foundation.org, alx@kernel.org, justinstitt@google.com,
+ ebiederm@xmission.com, alexei.starovoitov@gmail.com, rostedt@goodmis.org,
+ catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp,
+ linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org,
+ linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Kees Cook <keescook@chromium.org>, Matus Jokay <matus.jokay@stuba.sk>,
+ "Serge E. Hallyn" <serge@hallyn.com>
+Subject: Re: [PATCH v8 1/8] Get rid of __get_task_comm()
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20240828030321.20688-2-laoar.shao@gmail.com>
+References: <20240828030321.20688-1-laoar.shao@gmail.com> <20240828030321.20688-2-laoar.shao@gmail.com>
+Message-ID: <8A36564D-56E3-469B-B201-0BD7C11D6EFC@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-Paolo Abeni wrote:
-> Adding Mat(s) for awareness, it would be great (but difficult) to have 
-> mptcp too in the long run ;)
-> 
-> On 8/27/24 21:32, Willem de Bruijn wrote:
-> > From: Willem de Bruijn <willemb@google.com>
-> > 
-> > Lay the groundwork to import into kselftests the over 150 packetdrill
-> > TCP/IP conformance tests on github.com/google/packetdrill.
-> > 
-> > Florian recently added support for packetdrill tests in nf_conntrack,Addin
-> > in commit a8a388c2aae49 ("selftests: netfilter: add packetdrill based
-> > conntrack tests").
-> > 
-> > This patch takes a slightly different implementation and reuses the
-> > ksft python library for its KTAP, ksft, NetNS and other such tooling.
-> > 
-> > It also anticipates the large number of testcases, by creating a
-> > separate kselftest for each feature (directory). It does this by
-> > copying the template script packetdrill_ksft.py for each directory,
-> > and putting those in TEST_CUSTOM_PROGS so that kselftests runs each.
-> > 
-> > To demonstrate the code with minimal patch size, initially import only
-> > two features/directories from github. One with a single script, and
-> > one with two. This was the only reason to pick tcp/inq and tcp/md5.
-> > 
-> > Any future imports of packetdrill tests should require no additional
-> > coding. Just add the tcp/$FEATURE directory with *.pkt files.
-> > 
-> > Implementation notes:
-> > - restore alphabetical order when adding the new directory to
-> >    tools/testing/selftests/Makefile
-> > - copied *.pkt files and support verbatim from the github project,
-> >    except for
-> >      - update common/defaults.sh path (there are two paths on github)
-> >      - add SPDX headers
-> >      - remove one author statement
-> >      - Acknowledgment: drop an e (checkpatch)
-> > 
-> > Tested:
-> > 	make -C tools/testing/selftests/ \
-> > 	  TARGETS=net/packetdrill \
-> > 	  install INSTALL_PATH=$KSFT_INSTALL_PATH
-> > 
-> > 	# in virtme-ng
-> > 	sudo ./run_kselftest.sh -c net/packetdrill
-> > 	sudo ./run_kselftest.sh -t net/packetdrill:tcp_inq.py
-> > 
-> > Result:
-> > 	kselftest: Running tests in net/packetdrill
-> > 	TAP version 13
-> > 	1..2
-> > 	# timeout set to 45
-> > 	# selftests: net/packetdrill: tcp_inq.py
-> > 	# KTAP version 1
-> > 	# 1..4
-> > 	# ok 1 tcp_inq.client-v4
-> > 	# ok 2 tcp_inq.client-v6
-> > 	# ok 3 tcp_inq.server-v4
-> > 	# ok 4 tcp_inq.server-v6
-> > 	# # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
-> > 	ok 1 selftests: net/packetdrill: tcp_inq.py
-> > 	# timeout set to 45
-> > 	# selftests: net/packetdrill: tcp_md5.py
-> > 	# KTAP version 1
-> > 	# 1..2
-> > 	# ok 1 tcp_md5.md5-only-on-client-ack-v4
-> > 	# ok 2 tcp_md5.md5-only-on-client-ack-v6
-> > 	# # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
-> > 	ok 2 selftests: net/packetdrill: tcp_md5.py
-> > 
-> > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > 
-> > ---
-> > 
-> > RFC points for discussion
-> > 
-> > ksft: the choice for this python framework introduces a dependency on
-> > the YNL scripts, and some non-obvious code:
-> > - to include the net/lib dep in tools/testing/selftests/Makefile
-> > - a boilerplate lib/py/__init__.py that each user of ksft will need
-> > It seems preferable to me to use ksft.py over reinventing the wheel,
-> > e.g., to print KTAP output. But perhaps we can make it more obvious
-> > for future ksft users, and make the dependency on YNL optional.
-> > 
-> > kselftest-per-directory: copying packetdrill_ksft.py to create a
-> > separate script per dir is a bit of a hack. 
-> 
-> Additionally, in some setups the test directory is RO, avoding file 
-> creation there would be better.
-> 
-> What about placing in each subdiretory a trivial wrapper invoking the 
-> 'main' packetdrill_ksft.py script specifying as an argument the 
-> (sub-)directory to run/process?
 
-The files are created by kselftests, similar to any TEST_GEN_XXX or
-TEST_CUSTOM_PROGS.
 
-If instead we prepopulate in each directory that is duplicative
-boilerplate committed to git, and we still need to add it to
-kselftests. Not sure whether TEST_PROGS with paths extending into
-subdirectories are supported. And we do not want a TARGET for each
-subdirectory.
+On August 27, 2024 8:03:14 PM PDT, Yafang Shao <laoar=2Eshao@gmail=2Ecom> =
+wrote:
+>We want to eliminate the use of __get_task_comm() for the following
+>reasons:
+>
+>- The task_lock() is unnecessary
+>  Quoted from Linus [0]:
+>  : Since user space can randomly change their names anyway, using lockin=
+g
+>  : was always wrong for readers (for writers it probably does make sense
+>  : to have some lock - although practically speaking nobody cares there
+>  : either, but at least for a writer some kind of race could have
+>  : long-term mixed results
+>
+>- The BUILD_BUG_ON() doesn't add any value
+>  The only requirement is to ensure that the destination buffer is a vali=
+d
+>  array=2E
 
-It probably can be done, but I don't think that it is needed or
-simpler.
- 
-> > A single script is much
-> > simpler, optionally with nested KTAP (not supported yet by ksft). But,
-> > I'm afraid that running time without intermediate output will be very
-> > long when we integrate all packetdrill scripts.
-> 
-> If I read correctly, this runs the scripts in the given directory 
-> sequentially (as opposed to the default pktdrill run_all.py behavior 
-> that uses many concurrent threads).
-> 
-> I guess/fear that running all the pktdrill tests in a single batch would 
-> take quite a long time, which in turn could be not so good for CI 
-> integration. Currently there are a couple of CI test-cases with runtime 
->  > 1h, but that is bad ;)
+Sorry, that's not a correct evaluation=2E See below=2E
 
-Very good point, thanks! This is the third packetdrill runner that I'm
-writing. I should know this by now.. Let me see whether I can use
-run_all.py rather than reinvent the wheel here.
- 
-> > nf_conntrack: we can dedup the common.sh.
-> > 
-> > *pkt files: which of the 150+ scripts on github are candidates for
-> > kselftests, all or a subset? To avoid change detector tests. And what
-> > is the best way to eventually send up to 150 files, 7K LoC.
-> 
-> I have no idea WRT the overall test stability, is some specific case/dir 
-> is subject to very frequent false positive/false negative we could 
-> postpone importing them, but ideally IMHO all the github scripts are 
-> good candidates.
-> 
-> Side note: I think it would be great to have some easy command line 
-> parameter to run only the specified script/test-case.
+>
+>- Zeroing is not necessary in current use cases
+>  To avoid confusion, we should remove it=2E Moreover, not zeroing could
+>  potentially make it easier to uncover bugs=2E If the caller needs a
+>  zero-padded task name, it should be explicitly handled at the call site=
+=2E
 
-Makes sense. Will include.
+This is also not an appropriate rationale=2E We don't make the kernel "mor=
+e buggy" not purpose=2E ;) See below=2E
 
+>
+>Suggested-by: Linus Torvalds <torvalds@linux-foundation=2Eorg>
+>Link: https://lore=2Ekernel=2Eorg/all/CAHk-=3DwivfrF0_zvf+oj6=3D=3DSh=3D-=
+npJooP8chLPEfaFV0oNYTTBA@mail=2Egmail=2Ecom [0]
+>Link: https://lore=2Ekernel=2Eorg/all/CAHk-=3DwhWtUC-AjmGJveAETKOMeMFSTwK=
+wu99v7+b6AyHMmaDFA@mail=2Egmail=2Ecom/
+>Suggested-by: Alejandro Colomar <alx@kernel=2Eorg>
+>Link: https://lore=2Ekernel=2Eorg/all/2jxak5v6dfxlpbxhpm3ey7oup4g2lnr3ueu=
+rfbosf5wdo65dk4@srb3hsk72zwq
+>Signed-off-by: Yafang Shao <laoar=2Eshao@gmail=2Ecom>
+>Cc: Alexander Viro <viro@zeniv=2Elinux=2Eorg=2Euk>
+>Cc: Christian Brauner <brauner@kernel=2Eorg>
+>Cc: Jan Kara <jack@suse=2Ecz>
+>Cc: Eric Biederman <ebiederm@xmission=2Ecom>
+>Cc: Kees Cook <keescook@chromium=2Eorg>
+>Cc: Alexei Starovoitov <alexei=2Estarovoitov@gmail=2Ecom>
+>Cc: Matus Jokay <matus=2Ejokay@stuba=2Esk>
+>Cc: Alejandro Colomar <alx@kernel=2Eorg>
+>Cc: "Serge E=2E Hallyn" <serge@hallyn=2Ecom>
+>---
+> fs/exec=2Ec             | 10 ----------
+> fs/proc/array=2Ec       |  2 +-
+> include/linux/sched=2Eh | 32 ++++++++++++++++++++++++++------
+> kernel/kthread=2Ec      |  2 +-
+> 4 files changed, 28 insertions(+), 18 deletions(-)
+>
+>diff --git a/fs/exec=2Ec b/fs/exec=2Ec
+>index 50e76cc633c4=2E=2E8a23171bc3c3 100644
+>--- a/fs/exec=2Ec
+>+++ b/fs/exec=2Ec
+>@@ -1264,16 +1264,6 @@ static int unshare_sighand(struct task_struct *me)
+> 	return 0;
+> }
+>=20
+>-char *__get_task_comm(char *buf, size_t buf_size, struct task_struct *ts=
+k)
+>-{
+>-	task_lock(tsk);
+>-	/* Always NUL terminated and zero-padded */
+>-	strscpy_pad(buf, tsk->comm, buf_size);
+>-	task_unlock(tsk);
+>-	return buf;
+>-}
+>-EXPORT_SYMBOL_GPL(__get_task_comm);
+>-
+> /*
+>  * These functions flushes out all traces of the currently running execu=
+table
+>  * so that a new one can be started
+>diff --git a/fs/proc/array=2Ec b/fs/proc/array=2Ec
+>index 34a47fb0c57f=2E=2E55ed3510d2bb 100644
+>--- a/fs/proc/array=2Ec
+>+++ b/fs/proc/array=2Ec
+>@@ -109,7 +109,7 @@ void proc_task_name(struct seq_file *m, struct task_s=
+truct *p, bool escape)
+> 	else if (p->flags & PF_KTHREAD)
+> 		get_kthread_comm(tcomm, sizeof(tcomm), p);
+> 	else
+>-		__get_task_comm(tcomm, sizeof(tcomm), p);
+>+		get_task_comm(tcomm, p);
+>=20
+> 	if (escape)
+> 		seq_escape_str(m, tcomm, ESCAPE_SPACE | ESCAPE_SPECIAL, "\n\\");
+>diff --git a/include/linux/sched=2Eh b/include/linux/sched=2Eh
+>index f8d150343d42=2E=2Ec40b95a79d80 100644
+>--- a/include/linux/sched=2Eh
+>+++ b/include/linux/sched=2Eh
+>@@ -1096,9 +1096,12 @@ struct task_struct {
+> 	/*
+> 	 * executable name, excluding path=2E
+> 	 *
+>-	 * - normally initialized setup_new_exec()
+>-	 * - access it with [gs]et_task_comm()
+>-	 * - lock it with task_lock()
+>+	 * - normally initialized begin_new_exec()
+>+	 * - set it with set_task_comm()
+>+	 *   - strscpy_pad() to ensure it is always NUL-terminated and
+>+	 *     zero-padded
+>+	 *   - task_lock() to ensure the operation is atomic and the name is
+>+	 *     fully updated=2E
+> 	 */
+> 	char				comm[TASK_COMM_LEN];
+>=20
+>@@ -1914,10 +1917,27 @@ static inline void set_task_comm(struct task_stru=
+ct *tsk, const char *from)
+> 	__set_task_comm(tsk, from, false);
+> }
+>=20
+>-extern char *__get_task_comm(char *to, size_t len, struct task_struct *t=
+sk);
+>+/*
+>+ * - Why not use task_lock()?
+>+ *   User space can randomly change their names anyway, so locking for r=
+eaders
+>+ *   doesn't make sense=2E For writers, locking is probably necessary, a=
+s a race
+>+ *   condition could lead to long-term mixed results=2E
+>+ *   The strscpy_pad() in __set_task_comm() can ensure that the task com=
+m is
+>+ *   always NUL-terminated and zero-padded=2E Therefore the race conditi=
+on between
+>+ *   reader and writer is not an issue=2E
+>+ *
+>+ * - Why not use strscpy_pad()?
+>+ *   While strscpy_pad() prevents writing garbage past the NUL terminato=
+r, which
+>+ *   is useful when using the task name as a key in a hash map, most use=
+ cases
+>+ *   don't require this=2E Zero-padding might confuse users if it=E2=80=
+=99s unnecessary,
+>+ *   and not zeroing might even make it easier to expose bugs=2E If you =
+need a
+>+ *   zero-padded task name, please handle that explicitly at the call si=
+te=2E
+
+I really don't like this part of the change=2E You don't know that existin=
+g callers don't depend on the padding=2E Please invert this logic: get_task=
+_comm() must use strscpy_pad()=2E Calls NOT wanting padding can call strscp=
+y() themselves=2E
+
+>+ *
+>+ * - ARRAY_SIZE() can help ensure that @buf is indeed an array=2E
+
+This doesn't need checking here; strscpy() will already do that=2E=20
+
+>+ */
+> #define get_task_comm(buf, tsk) ({			\
+>-	BUILD_BUG_ON(sizeof(buf) !=3D TASK_COMM_LEN);	\
+
+Also, please leave the TASK_COMM_LEN test so that destination buffers cont=
+inue to be the correct size: current callers do not perform any return valu=
+e analysis, so they cannot accidentally start having situations where the d=
+estination string might be truncated=2E Again, anyone wanting to avoid that=
+ restriction can use strscpy() directly and check the return value=2E
+
+>-	__get_task_comm(buf, sizeof(buf), tsk);		\
+>+	strscpy(buf, (tsk)->comm, ARRAY_SIZE(buf));	\
+>+	buf;						\
+> })
+>=20
+> #ifdef CONFIG_SMP
+>diff --git a/kernel/kthread=2Ec b/kernel/kthread=2Ec
+>index f7be976ff88a=2E=2E7d001d033cf9 100644
+>--- a/kernel/kthread=2Ec
+>+++ b/kernel/kthread=2Ec
+>@@ -101,7 +101,7 @@ void get_kthread_comm(char *buf, size_t buf_size, str=
+uct task_struct *tsk)
+> 	struct kthread *kthread =3D to_kthread(tsk);
+>=20
+> 	if (!kthread || !kthread->full_name) {
+>-		__get_task_comm(buf, buf_size, tsk);
+>+		strscpy(buf, tsk->comm, buf_size);
+
+Why is this safe to not use strscpy_pad? Also, is buf_size ever not TASK_C=
+OMM_LEN?
+
+> 		return;
+> 	}
+>=20
+
+--=20
+Kees Cook
 
