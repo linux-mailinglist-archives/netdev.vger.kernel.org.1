@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-122908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93B4E963110
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 21:40:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13CC5963112
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 21:40:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23CA01F221F7
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 19:40:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3893E1C22A01
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 19:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7668A1ABECE;
-	Wed, 28 Aug 2024 19:40:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C971F1AC420;
+	Wed, 28 Aug 2024 19:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R3VBw0th"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4r52p0SU"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9C51A2554
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 19:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21422433C1
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 19:40:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724874004; cv=none; b=VdXreVxJ0R7bza6rFbBs3DEnnREjm/vFw10pW6RmAsymCYr6i17EtnY2iX8aHzb/zkSol27ED8xC2AHy+vnP6LAtZa+KEqgefm41k1s9XdNsr+HsLocl4pAA6/Yo4uQLGcLSX6f2WZrqd8WXoEpZCNHfMI0NCPTSSbXAAtmJv6I=
+	t=1724874005; cv=none; b=dV480HzpZjyaxxTfaEJsv/UdKUPnkmWGdlRUVIF6xaJnaQ8Yn33nmxaYHx+Cx7qUajgI7Fkq9D1qRcoSe1IGWOi/a3LURi/olELVkZ9+8c4zo69Mf4ukzJKFADQGa46VBIX6AY/Ll8CJXw1FaixgelRMXo018tRFCnhIdBKpQAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724874004; c=relaxed/simple;
-	bh=4M/SWmRxxD/F4SuAaahaGF2q5iygduPwrCgo+4XwLuU=;
+	s=arc-20240116; t=1724874005; c=relaxed/simple;
+	bh=NvR2xazEuVxnJMtok33g4cMWdehj65lGkk2HIlqi8x0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mUsD+qni51YCJ0QfH5bh19UqPors6ss1V5KA17tMC2xS2A6AMOEBnuikfb/tO/unYg7rDe67sSwT+teG3w7SFlLha0NBgMzqQvyG/RIy/FYU4DBZkQT6SsThRxZPBDE0Qb4yk7fB6V+mcJt96CdM5rpKXm5oR4VrnAc+Hb+dQRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R3VBw0th; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=f51Zmqr6GPXQel+7pgkf0uXmhLcbeC2fh344BkNQ3zK7oaKjP2BPczLNt9EOGDR2aKL4RV7BbsqzDd7elBwxav5jfECd6BeSznETbNw3vCLPgFxDilK0U1jJ8KQDs5FuiChy9VUQkoZPxA5AQhPD0jR3twcCe1fm61J/NN65fY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4r52p0SU; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6b0f068833bso15360797b3.0
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 12:40:02 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6ad26d5b061so126768817b3.2
+        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 12:40:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724874001; x=1725478801; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1724874003; x=1725478803; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7aU27evKvCzgKqL2JcywvLesTwuFYqoPP7yIvNFen1o=;
-        b=R3VBw0thnlilG8izLNp7hyYCybp9PN2Y9RRneJmpstUGxbiALBtGgsQmexcbG6StT3
-         NtCo+S6sEsza895vLurza13O27JJBX2xf6dIZjbQ19SUpxquDiVaUL3AQZTluGYBGCso
-         3bzH57EWQKwWL3AKDcerDKQvz7HsMyiL7lqYcOjpChQkgWg76WzR62Z83AZ69cuSRRjH
-         +ykdSXFyhiXR1ziAJGI/6zEVQ8Rxu7+KbMbLivRWWP7ukeeO7ggnyCaSQjepgqbIi6iv
-         p0v/dJd/NvTW9Ta9quMo6/k57FQjy3fyR568NTydgIG/DJ+F94AQU8Am9BXOUo8EHKQ+
-         6uJQ==
+        bh=uW8V30KIm42suk0SzdVN/98z/bnuMM+LeZAtcw4wpew=;
+        b=4r52p0SUbOcJpPHqLJAms8bD4vF2wvxYvBPD/GBaWyH5deeL7tI1og9WHwPPEKPt3/
+         SS8c5Y2NFSPdG6oBI/21YLYHjMWE5D2tkmLJRXO8Eh9trfHQkbXbIkDAYDODUJkVOWMQ
+         +1qk5qh+hcjjEvvPh0QD3yiz6c4jU4jnGqs/jX8smdR2Z92IE0fhAQnAY3dEtTzUQPb3
+         9PKUVrDCIPfrWoe1Y4KFz1rZ0kLMLz58qqmc87O8ush2pNUrrQkRvpCLgeqCzyogyYzU
+         0n9Nlk7zKeF2D02drXhS0ZEI77NfzhCJgMTFuUBuGSHy9SEXY+fjnqrNTtHkwbpDhKYH
+         QrTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724874001; x=1725478801;
+        d=1e100.net; s=20230601; t=1724874003; x=1725478803;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7aU27evKvCzgKqL2JcywvLesTwuFYqoPP7yIvNFen1o=;
-        b=Jw7vMqoBlWNSIt+hliU7pZ53MlSDnyOAB6LGnD8Ndl5sFSQxSXAk+n2P0DYDISNkA6
-         CFhCxMcWA0TpKY51/nnPYbHbJ0KIuZ+tvDhP7hf4kezMRXw6ysUkbDmRoBIYlVxGBXjd
-         VumspEGRJhLGB62RO3Zv6Cz+c40uKp1F26vl8HKM7z8Lc1PxIZT34Zz/tDl7iagZv/HD
-         V+y1g0ulLQHA1PLWfRHcUwOQbJMhwE/VEMN9/OWd5z4xvJ8b2JDLQ+A+KN7AwHBEwdMW
-         Pivx/lY/NdAMakYPz8ha5HW+gbbNp/obuh7/Btq7i3UfW1Vyzy9waXxeGXoGw971IyfE
-         3Kig==
-X-Forwarded-Encrypted: i=1; AJvYcCXmgsbFQlPuumDXXr79h3PV144RjpVec+dszHJepzPoH4X5kdQA3tWFe/s8L2hT8CiIsmZ7JIg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGAcBjiIikLH6joYmBrk5JnPQQI4lWn3huQOPd7SMqbonp5oQh
-	0KG5mATJDXKV7lLTeqGYfwrf0fYlvtuFG7NoBM6luXSrc0YkHvoK+58N2ZJHOSM7MNGrv+dUCgn
-	YhjwflGYfFg==
-X-Google-Smtp-Source: AGHT+IEes4IgUfKe1WxHBwVjpO0Dm0ki11DF2dmKBwHADmOx29wHjahICSiFxyOOssRZ74IGXo3TU7rAmCRewA==
+        bh=uW8V30KIm42suk0SzdVN/98z/bnuMM+LeZAtcw4wpew=;
+        b=ueffoYGDU9QtcCHxgq5UI2x01vh9UN2I7ennOXQdBsndWH3vMXvEX3Quja1xjMVnzf
+         UXXx2zwqrgPPSYH1uA5rqD88eWRQECfIxuZAu9MQWrKbOsXG8B8E5rm59eidAuoczmkd
+         3kMGZqzPNTkuEFVnKmfVdgg45GxBwztyL2XIHJd/1fubwWwRHVTRchRK7iG0QlXhA/zE
+         r5zpmHajlM9LokGU+veQWMWYi6ZevssIOkqTy3lwq9oy/zvPXuFd8HR1+7sFFj44Jaq8
+         XwVnkSXEzlJ/my8TYsGTisT65I8cWgHS8nBAa5Y/SyEh21Dt8DcHJ5sA9u4MscmY2XG2
+         /1cw==
+X-Forwarded-Encrypted: i=1; AJvYcCW3zokMwBPb+P4yDGVrOfI/y26od6940xLasWnD9pZ2T/WXq5As6ghWSP4KNs2Dz0/dMD0OHwU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb3SGkygOZLrXap787+j7uSL2paSbvt/enwe+4tdHKVUIkINHX
+	T6dwCmA+pop8zrSNeusTtonTu/ETRVCROrW8+oo+yxYuWcp/AqhkCCUbOBDb8uoMREja8ltE4vO
+	ZvIS3d7pCjQ==
+X-Google-Smtp-Source: AGHT+IE+v5X5CqE8u8p7h8sUh6LyoF++1Qe+xac1Zv7u7Ds7s9gPrwpAn/+6XLg5RYxzmD5zulfJYj7dy8yZYQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:690c:3706:b0:68e:8de6:617c with SMTP
- id 00721157ae682-6d285d0b62dmr58417b3.5.1724874001482; Wed, 28 Aug 2024
- 12:40:01 -0700 (PDT)
-Date: Wed, 28 Aug 2024 19:39:46 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:ab8c:0:b0:e0b:bd79:3077 with SMTP id
+ 3f1490d57ef6-e1a5adebc4amr499276.9.1724874002970; Wed, 28 Aug 2024 12:40:02
+ -0700 (PDT)
+Date: Wed, 28 Aug 2024 19:39:47 +0000
 In-Reply-To: <20240828193948.2692476-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,383 +74,166 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240828193948.2692476-1-edumazet@google.com>
 X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
-Message-ID: <20240828193948.2692476-2-edumazet@google.com>
-Subject: [PATCH net-next 1/3] icmp: change the order of rate limits
+Message-ID: <20240828193948.2692476-3-edumazet@google.com>
+Subject: [PATCH net-next 2/3] icmp: move icmp_global.credit and
+ icmp_global.stamp to per netns storage
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: David Ahern <dsahern@kernel.org>, Willy Tarreau <w@1wt.eu>, Keyu Man <keyu.man@email.ucr.edu>, 
 	Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, stable@vger.kernel.org
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-ICMP messages are ratelimited :
+Host wide ICMP ratelimiter should be per netns, to provide better isolation.
 
-After the blamed commits, the two rate limiters are applied in this order:
+Following patch in this series makes the sysctl per netns.
 
-1) host wide ratelimit (icmp_global_allow())
-
-2) Per destination ratelimit (inetpeer based)
-
-In order to avoid side-channels attacks, we need to apply
-the per destination check first.
-
-This patch makes the following change :
-
-1) icmp_global_allow() checks if the host wide limit is reached.
-   But credits are not yet consumed. This is deferred to 3)
-
-2) The per destination limit is checked/updated.
-   This might add a new node in inetpeer tree.
-
-3) icmp_global_consume() consumes tokens if prior operations succeeded.
-
-This means that host wide ratelimit is still effective
-in keeping inetpeer tree small even under DDOS.
-
-As a bonus, I removed icmp_global.lock as the fast path
-can use a lock-free operation.
-
-Fixes: c0303efeab73 ("net: reduce cycles spend on ICMP replies that gets rate limited")
-Fixes: 4cdf507d5452 ("icmp: add a global rate limitation")
-Reported-by: Keyu Man <keyu.man@email.ucr.edu>
 Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: stable@vger.kernel.org
 ---
- include/net/ip.h |   2 +
- net/ipv4/icmp.c  | 103 ++++++++++++++++++++++++++---------------------
- net/ipv6/icmp.c  |  28 ++++++++-----
- 3 files changed, 76 insertions(+), 57 deletions(-)
+ include/net/ip.h         |  4 ++--
+ include/net/netns/ipv4.h |  3 ++-
+ net/ipv4/icmp.c          | 25 ++++++++++---------------
+ net/ipv6/icmp.c          |  4 ++--
+ 4 files changed, 16 insertions(+), 20 deletions(-)
 
 diff --git a/include/net/ip.h b/include/net/ip.h
-index c5606cadb1a552f3e282a5e1e721fd47b07432b2..82248813619e3f21e09d52976accbdc76c7668c2 100644
+index 82248813619e3f21e09d52976accbdc76c7668c2..d3bca4e83979f681c4931e9ff62db5941a059c11 100644
 --- a/include/net/ip.h
 +++ b/include/net/ip.h
-@@ -795,6 +795,8 @@ static inline void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb)
+@@ -794,8 +794,8 @@ static inline void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb)
+ 	ip_cmsg_recv_offset(msg, skb->sk, skb, 0, 0);
  }
  
- bool icmp_global_allow(void);
-+void icmp_global_consume(void);
-+
+-bool icmp_global_allow(void);
+-void icmp_global_consume(void);
++bool icmp_global_allow(struct net *net);
++void icmp_global_consume(struct net *net);
+ 
  extern int sysctl_icmp_msgs_per_sec;
  extern int sysctl_icmp_msgs_burst;
- 
+diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
+index 5fcd61ada62289253844be9cbe25387dd92385a5..54fe7c079fffb285b7a8a069f3d57f9440a6655a 100644
+--- a/include/net/netns/ipv4.h
++++ b/include/net/netns/ipv4.h
+@@ -122,7 +122,8 @@ struct netns_ipv4 {
+ 	u8 sysctl_icmp_errors_use_inbound_ifaddr;
+ 	int sysctl_icmp_ratelimit;
+ 	int sysctl_icmp_ratemask;
+-
++	atomic_t icmp_global_credit;
++	u32 icmp_global_stamp;
+ 	u32 ip_rt_min_pmtu;
+ 	int ip_rt_mtu_expires;
+ 	int ip_rt_min_advmss;
 diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index b8f56d03fcbb62970a828e20dd9f05fcede2d552..0078e8fb2e86d0552ef85eb5bf5bef947b0f1c3d 100644
+index 0078e8fb2e86d0552ef85eb5bf5bef947b0f1c3d..8ad3139a00fb8c5cb8f28f92d125ef83d9e840c3 100644
 --- a/net/ipv4/icmp.c
 +++ b/net/ipv4/icmp.c
-@@ -224,57 +224,59 @@ int sysctl_icmp_msgs_per_sec __read_mostly = 1000;
+@@ -223,11 +223,6 @@ static inline void icmp_xmit_unlock(struct sock *sk)
+ int sysctl_icmp_msgs_per_sec __read_mostly = 1000;
  int sysctl_icmp_msgs_burst __read_mostly = 50;
  
- static struct {
--	spinlock_t	lock;
--	u32		credit;
-+	atomic_t	credit;
- 	u32		stamp;
--} icmp_global = {
--	.lock		= __SPIN_LOCK_UNLOCKED(icmp_global.lock),
--};
-+} icmp_global;
- 
+-static struct {
+-	atomic_t	credit;
+-	u32		stamp;
+-} icmp_global;
+-
  /**
   * icmp_global_allow - Are we allowed to send one more ICMP message ?
   *
-  * Uses a token bucket to limit our ICMP messages to ~sysctl_icmp_msgs_per_sec.
+@@ -235,7 +230,7 @@ static struct {
   * Returns false if we reached the limit and can not send another packet.
-- * Note: called with BH disabled
-+ * Works in tandem with icmp_global_consume().
+  * Works in tandem with icmp_global_consume().
   */
- bool icmp_global_allow(void)
+-bool icmp_global_allow(void)
++bool icmp_global_allow(struct net *net)
  {
--	u32 credit, delta, incr = 0, now = (u32)jiffies;
--	bool rc = false;
-+	u32 delta, now, oldstamp;
-+	int incr, new, old;
- 
--	/* Check if token bucket is empty and cannot be refilled
--	 * without taking the spinlock. The READ_ONCE() are paired
--	 * with the following WRITE_ONCE() in this same function.
-+	/* Note: many cpus could find this condition true.
-+	 * Then later icmp_global_consume() could consume more credits,
-+	 * this is an acceptable race.
+ 	u32 delta, now, oldstamp;
+ 	int incr, new, old;
+@@ -244,11 +239,11 @@ bool icmp_global_allow(void)
+ 	 * Then later icmp_global_consume() could consume more credits,
+ 	 * this is an acceptable race.
  	 */
--	if (!READ_ONCE(icmp_global.credit)) {
--		delta = min_t(u32, now - READ_ONCE(icmp_global.stamp), HZ);
--		if (delta < HZ / 50)
--			return false;
--	}
-+	if (atomic_read(&icmp_global.credit) > 0)
-+		return true;
+-	if (atomic_read(&icmp_global.credit) > 0)
++	if (atomic_read(&net->ipv4.icmp_global_credit) > 0)
+ 		return true;
  
--	spin_lock(&icmp_global.lock);
--	delta = min_t(u32, now - icmp_global.stamp, HZ);
--	if (delta >= HZ / 50) {
--		incr = READ_ONCE(sysctl_icmp_msgs_per_sec) * delta / HZ;
--		if (incr)
--			WRITE_ONCE(icmp_global.stamp, now);
--	}
--	credit = min_t(u32, icmp_global.credit + incr,
--		       READ_ONCE(sysctl_icmp_msgs_burst));
--	if (credit) {
--		/* We want to use a credit of one in average, but need to randomize
--		 * it for security reasons.
--		 */
--		credit = max_t(int, credit - get_random_u32_below(3), 0);
--		rc = true;
-+	now = jiffies;
-+	oldstamp = READ_ONCE(icmp_global.stamp);
-+	delta = min_t(u32, now - oldstamp, HZ);
-+	if (delta < HZ / 50)
-+		return false;
-+
-+	incr = READ_ONCE(sysctl_icmp_msgs_per_sec) * delta / HZ;
-+	if (!incr)
-+		return false;
-+
-+	if (cmpxchg(&icmp_global.stamp, oldstamp, now) == oldstamp) {
-+		old = atomic_read(&icmp_global.credit);
-+		do {
-+			new = min(old + incr, READ_ONCE(sysctl_icmp_msgs_burst));
-+		} while (!atomic_try_cmpxchg(&icmp_global.credit, &old, new));
+ 	now = jiffies;
+-	oldstamp = READ_ONCE(icmp_global.stamp);
++	oldstamp = READ_ONCE(net->ipv4.icmp_global_stamp);
+ 	delta = min_t(u32, now - oldstamp, HZ);
+ 	if (delta < HZ / 50)
+ 		return false;
+@@ -257,23 +252,23 @@ bool icmp_global_allow(void)
+ 	if (!incr)
+ 		return false;
+ 
+-	if (cmpxchg(&icmp_global.stamp, oldstamp, now) == oldstamp) {
+-		old = atomic_read(&icmp_global.credit);
++	if (cmpxchg(&net->ipv4.icmp_global_stamp, oldstamp, now) == oldstamp) {
++		old = atomic_read(&net->ipv4.icmp_global_credit);
+ 		do {
+ 			new = min(old + incr, READ_ONCE(sysctl_icmp_msgs_burst));
+-		} while (!atomic_try_cmpxchg(&icmp_global.credit, &old, new));
++		} while (!atomic_try_cmpxchg(&net->ipv4.icmp_global_credit, &old, new));
  	}
--	WRITE_ONCE(icmp_global.credit, credit);
--	spin_unlock(&icmp_global.lock);
--	return rc;
-+	return true;
+ 	return true;
  }
  EXPORT_SYMBOL(icmp_global_allow);
  
-+void icmp_global_consume(void)
-+{
-+	int credits = get_random_u32_below(3);
-+
-+	/* Note: this might make icmp_global.credit negative. */
-+	if (credits)
-+		atomic_sub(credits, &icmp_global.credit);
-+}
-+EXPORT_SYMBOL(icmp_global_consume);
-+
- static bool icmpv4_mask_allow(struct net *net, int type, int code)
+-void icmp_global_consume(void)
++void icmp_global_consume(struct net *net)
  {
- 	if (type > NR_ICMP_TYPES)
-@@ -291,14 +293,16 @@ static bool icmpv4_mask_allow(struct net *net, int type, int code)
- 	return false;
- }
+ 	int credits = get_random_u32_below(3);
  
--static bool icmpv4_global_allow(struct net *net, int type, int code)
-+static bool icmpv4_global_allow(struct net *net, int type, int code,
-+				bool *apply_ratelimit)
- {
+ 	/* Note: this might make icmp_global.credit negative. */
+ 	if (credits)
+-		atomic_sub(credits, &icmp_global.credit);
++		atomic_sub(credits, &net->ipv4.icmp_global_credit);
+ }
+ EXPORT_SYMBOL(icmp_global_consume);
+ 
+@@ -299,7 +294,7 @@ static bool icmpv4_global_allow(struct net *net, int type, int code,
  	if (icmpv4_mask_allow(net, type, code))
  		return true;
  
--	if (icmp_global_allow())
-+	if (icmp_global_allow()) {
-+		*apply_ratelimit = true;
+-	if (icmp_global_allow()) {
++	if (icmp_global_allow(net)) {
+ 		*apply_ratelimit = true;
  		return true;
--
-+	}
- 	__ICMP_INC_STATS(net, ICMP_MIB_RATELIMITGLOBAL);
- 	return false;
- }
-@@ -308,15 +312,16 @@ static bool icmpv4_global_allow(struct net *net, int type, int code)
-  */
- 
- static bool icmpv4_xrlim_allow(struct net *net, struct rtable *rt,
--			       struct flowi4 *fl4, int type, int code)
-+			       struct flowi4 *fl4, int type, int code,
-+			       bool apply_ratelimit)
- {
- 	struct dst_entry *dst = &rt->dst;
- 	struct inet_peer *peer;
- 	bool rc = true;
- 	int vif;
- 
--	if (icmpv4_mask_allow(net, type, code))
--		goto out;
-+	if (!apply_ratelimit)
-+		return true;
- 
- 	/* No rate limit on loopback */
- 	if (dst->dev && (dst->dev->flags&IFF_LOOPBACK))
-@@ -331,6 +336,8 @@ static bool icmpv4_xrlim_allow(struct net *net, struct rtable *rt,
- out:
+ 	}
+@@ -337,7 +332,7 @@ static bool icmpv4_xrlim_allow(struct net *net, struct rtable *rt,
  	if (!rc)
  		__ICMP_INC_STATS(net, ICMP_MIB_RATELIMITHOST);
-+	else
-+		icmp_global_consume();
+ 	else
+-		icmp_global_consume();
++		icmp_global_consume(net);
  	return rc;
  }
  
-@@ -402,6 +409,7 @@ static void icmp_reply(struct icmp_bxm *icmp_param, struct sk_buff *skb)
- 	struct ipcm_cookie ipc;
- 	struct rtable *rt = skb_rtable(skb);
- 	struct net *net = dev_net(rt->dst.dev);
-+	bool apply_ratelimit = false;
- 	struct flowi4 fl4;
- 	struct sock *sk;
- 	struct inet_sock *inet;
-@@ -413,11 +421,11 @@ static void icmp_reply(struct icmp_bxm *icmp_param, struct sk_buff *skb)
- 	if (ip_options_echo(net, &icmp_param->replyopts.opt.opt, skb))
- 		return;
- 
--	/* Needed by both icmp_global_allow and icmp_xmit_lock */
-+	/* Needed by both icmpv4_global_allow and icmp_xmit_lock */
- 	local_bh_disable();
- 
--	/* global icmp_msgs_per_sec */
--	if (!icmpv4_global_allow(net, type, code))
-+	/* is global icmp_msgs_per_sec exhausted ? */
-+	if (!icmpv4_global_allow(net, type, code, &apply_ratelimit))
- 		goto out_bh_enable;
- 
- 	sk = icmp_xmit_lock(net);
-@@ -450,7 +458,7 @@ static void icmp_reply(struct icmp_bxm *icmp_param, struct sk_buff *skb)
- 	rt = ip_route_output_key(net, &fl4);
- 	if (IS_ERR(rt))
- 		goto out_unlock;
--	if (icmpv4_xrlim_allow(net, rt, &fl4, type, code))
-+	if (icmpv4_xrlim_allow(net, rt, &fl4, type, code, apply_ratelimit))
- 		icmp_push_reply(sk, icmp_param, &fl4, &ipc, &rt);
- 	ip_rt_put(rt);
- out_unlock:
-@@ -596,6 +604,7 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 	int room;
- 	struct icmp_bxm icmp_param;
- 	struct rtable *rt = skb_rtable(skb_in);
-+	bool apply_ratelimit = false;
- 	struct ipcm_cookie ipc;
- 	struct flowi4 fl4;
- 	__be32 saddr;
-@@ -677,7 +686,7 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 		}
- 	}
- 
--	/* Needed by both icmp_global_allow and icmp_xmit_lock */
-+	/* Needed by both icmpv4_global_allow and icmp_xmit_lock */
- 	local_bh_disable();
- 
- 	/* Check global sysctl_icmp_msgs_per_sec ratelimit, unless
-@@ -685,7 +694,7 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 	 * loopback, then peer ratelimit still work (in icmpv4_xrlim_allow)
- 	 */
- 	if (!(skb_in->dev && (skb_in->dev->flags&IFF_LOOPBACK)) &&
--	      !icmpv4_global_allow(net, type, code))
-+	      !icmpv4_global_allow(net, type, code, &apply_ratelimit))
- 		goto out_bh_enable;
- 
- 	sk = icmp_xmit_lock(net);
-@@ -744,7 +753,7 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 		goto out_unlock;
- 
- 	/* peer icmp_ratelimit */
--	if (!icmpv4_xrlim_allow(net, rt, &fl4, type, code))
-+	if (!icmpv4_xrlim_allow(net, rt, &fl4, type, code, apply_ratelimit))
- 		goto ende;
- 
- 	/* RFC says return as much as we can without exceeding 576 bytes. */
 diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
-index 7b31674644efc338ec458d92dfe495480825b0fd..46f70e4a835139ef7d8925c49440865355048193 100644
+index 46f70e4a835139ef7d8925c49440865355048193..071b0bc1179d81b18c340ce415cef21e02a30cd7 100644
 --- a/net/ipv6/icmp.c
 +++ b/net/ipv6/icmp.c
-@@ -175,14 +175,16 @@ static bool icmpv6_mask_allow(struct net *net, int type)
- 	return false;
- }
- 
--static bool icmpv6_global_allow(struct net *net, int type)
-+static bool icmpv6_global_allow(struct net *net, int type,
-+				bool *apply_ratelimit)
- {
+@@ -181,7 +181,7 @@ static bool icmpv6_global_allow(struct net *net, int type,
  	if (icmpv6_mask_allow(net, type))
  		return true;
  
--	if (icmp_global_allow())
-+	if (icmp_global_allow()) {
-+		*apply_ratelimit = true;
+-	if (icmp_global_allow()) {
++	if (icmp_global_allow(net)) {
+ 		*apply_ratelimit = true;
  		return true;
--
-+	}
- 	__ICMP_INC_STATS(net, ICMP_MIB_RATELIMITGLOBAL);
- 	return false;
- }
-@@ -191,13 +193,13 @@ static bool icmpv6_global_allow(struct net *net, int type)
-  * Check the ICMP output rate limit
-  */
- static bool icmpv6_xrlim_allow(struct sock *sk, u8 type,
--			       struct flowi6 *fl6)
-+			       struct flowi6 *fl6, bool apply_ratelimit)
- {
- 	struct net *net = sock_net(sk);
- 	struct dst_entry *dst;
- 	bool res = false;
- 
--	if (icmpv6_mask_allow(net, type))
-+	if (!apply_ratelimit)
- 		return true;
- 
- 	/*
-@@ -228,6 +230,8 @@ static bool icmpv6_xrlim_allow(struct sock *sk, u8 type,
- 	if (!res)
+ 	}
+@@ -231,7 +231,7 @@ static bool icmpv6_xrlim_allow(struct sock *sk, u8 type,
  		__ICMP6_INC_STATS(net, ip6_dst_idev(dst),
  				  ICMP6_MIB_RATELIMITHOST);
-+	else
-+		icmp_global_consume();
+ 	else
+-		icmp_global_consume();
++		icmp_global_consume(net);
  	dst_release(dst);
  	return res;
  }
-@@ -452,6 +456,7 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
- 	struct net *net;
- 	struct ipv6_pinfo *np;
- 	const struct in6_addr *saddr = NULL;
-+	bool apply_ratelimit = false;
- 	struct dst_entry *dst;
- 	struct icmp6hdr tmp_hdr;
- 	struct flowi6 fl6;
-@@ -533,11 +538,12 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
- 		return;
- 	}
- 
--	/* Needed by both icmp_global_allow and icmpv6_xmit_lock */
-+	/* Needed by both icmpv6_global_allow and icmpv6_xmit_lock */
- 	local_bh_disable();
- 
- 	/* Check global sysctl_icmp_msgs_per_sec ratelimit */
--	if (!(skb->dev->flags & IFF_LOOPBACK) && !icmpv6_global_allow(net, type))
-+	if (!(skb->dev->flags & IFF_LOOPBACK) &&
-+	    !icmpv6_global_allow(net, type, &apply_ratelimit))
- 		goto out_bh_enable;
- 
- 	mip6_addr_swap(skb, parm);
-@@ -575,7 +581,7 @@ void icmp6_send(struct sk_buff *skb, u8 type, u8 code, __u32 info,
- 
- 	np = inet6_sk(sk);
- 
--	if (!icmpv6_xrlim_allow(sk, type, &fl6))
-+	if (!icmpv6_xrlim_allow(sk, type, &fl6, apply_ratelimit))
- 		goto out;
- 
- 	tmp_hdr.icmp6_type = type;
-@@ -717,6 +723,7 @@ static enum skb_drop_reason icmpv6_echo_reply(struct sk_buff *skb)
- 	struct ipv6_pinfo *np;
- 	const struct in6_addr *saddr = NULL;
- 	struct icmp6hdr *icmph = icmp6_hdr(skb);
-+	bool apply_ratelimit = false;
- 	struct icmp6hdr tmp_hdr;
- 	struct flowi6 fl6;
- 	struct icmpv6_msg msg;
-@@ -781,8 +788,9 @@ static enum skb_drop_reason icmpv6_echo_reply(struct sk_buff *skb)
- 		goto out;
- 
- 	/* Check the ratelimit */
--	if ((!(skb->dev->flags & IFF_LOOPBACK) && !icmpv6_global_allow(net, ICMPV6_ECHO_REPLY)) ||
--	    !icmpv6_xrlim_allow(sk, ICMPV6_ECHO_REPLY, &fl6))
-+	if ((!(skb->dev->flags & IFF_LOOPBACK) &&
-+	    !icmpv6_global_allow(net, ICMPV6_ECHO_REPLY, &apply_ratelimit)) ||
-+	    !icmpv6_xrlim_allow(sk, ICMPV6_ECHO_REPLY, &fl6, apply_ratelimit))
- 		goto out_dst_release;
- 
- 	idev = __in6_dev_get(skb->dev);
 -- 
 2.46.0.295.g3b9ea8a38a-goog
 
