@@ -1,104 +1,148 @@
-Return-Path: <netdev+bounces-122606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 788F8961E3C
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 07:32:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 049A3961E4D
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 07:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 336AE285841
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 05:32:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 375C91C23544
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 05:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781D714265F;
-	Wed, 28 Aug 2024 05:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C432152517;
+	Wed, 28 Aug 2024 05:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="LsIOR8RT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S4pgBgg9"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BDA145A11
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 05:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1541F14F9D5;
+	Wed, 28 Aug 2024 05:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724823174; cv=none; b=fMzZBcP+uZEC+ctaZkPlo4w+glW4QQk2HECXl5ThCOS43Avri70N/N2IzFsmxYBms/nk7UYyEn0SW/nOPASV4GwjuAb292TIVU0f09din1iATFlXbGGedAu2lEXmY6SlCIAMHtfzbHyxeer6Y1iWVt9LjlABBK1XFOsW1S4kuQI=
+	t=1724823591; cv=none; b=lycWDAniglk0Ev72+mIBBeM57n6D0T0h8vbs6PMzX+g5rO3Vnl9UY/NttwD1iXVu6KTwyyUvjDVe9AcuNCVbrwlZhqa7MU5uvKihOz1VGeK7+PDrtVVK5cMag/oxsNFQHkoPUjQP/Ski/PS5u3CtJ4Kzt8PdMF3T71RIYNjltks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724823174; c=relaxed/simple;
-	bh=Nu7NezANGDRbBc8NOcSSXxU8EpanJ9iT0P8tD4+4Uyk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JlFSu0hmO4onhFHblx8Ec+RTvsRp+38V1u2t1Rz2Ku5mxYq333sn0Tgxd9v22wcgTA7hCY1hczXKbG9/VXZMzGa1Mx074estmh1177oy863nMCzDA6EAtkaPD88woF0a4WktD4T5ycvpt+upqWKZ3vPRhQ8DDOw+DopYu6v71cM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=LsIOR8RT; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id ACDE3207D8;
-	Wed, 28 Aug 2024 07:32:48 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3TJm8gT20p-4; Wed, 28 Aug 2024 07:32:48 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 314CB207D1;
-	Wed, 28 Aug 2024 07:32:48 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 314CB207D1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1724823168;
-	bh=K7hxHqFNbhJZvyiFVLAlJ/z2SwlRa+qHrrpglYRXCHY=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=LsIOR8RTXK4VNi3KhW0EotM38AOlciqLHUJ2GPbxPMAb3W4YQ8NjpHEoeBGVoswvR
-	 buOWfTsWVX14gJldl1xng+O/FALG2NiIf8aa7xzYGEx5wKyB8IlCGcgstkOHQrKMeM
-	 +ymktTMt1kth2fgkpZz+1CTfepe2gGRTbf9bqw/q0Bk2YKm7WtSVu2AT5+4UN3SYGr
-	 tNaeX0Ve79DCgpDcGzt93+ZughOCK71ylEnDxigiknrFqASr/RH32/qWVyzcdvfUy6
-	 lDHV+aiSmQsScMixvXI/uYNUlgZUSLcRyfQdg2YoboIPE+jwnv47Z0mHpwC31xAK++
-	 TKTgU+TPlZCuA==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 28 Aug 2024 07:32:48 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 28 Aug
- 2024 07:32:47 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 8D0083182EE8; Wed, 28 Aug 2024 07:32:47 +0200 (CEST)
-Date: Wed, 28 Aug 2024 07:32:47 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Feng Wang <wangfe@google.com>
-CC: <netdev@vger.kernel.org>, <antony.antony@secunet.com>
-Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
-Message-ID: <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
-References: <20240822200252.472298-1-wangfe@google.com>
+	s=arc-20240116; t=1724823591; c=relaxed/simple;
+	bh=2utZWgmFpHz1C73dYz/cMyxqXixPHQCmnl+SOa5MRqA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TjbLbn+b0IWRKCD5oDL3W3ldZJQO72RAlqkIGhmliLPvG/JK1U9cZj87XA0d/QJ5TQPo/YKsXpmiHfUvh3DForiSAYSNCu9sIsn0yihNy5eQKs75+4NJTggcEC69SMFUOeyU1Lpn013yGs3Oaz3lTOQ9PTnwfCdGuwHbk7g+yOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S4pgBgg9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D367C32786;
+	Wed, 28 Aug 2024 05:39:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724823590;
+	bh=2utZWgmFpHz1C73dYz/cMyxqXixPHQCmnl+SOa5MRqA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=S4pgBgg9Isbo0H364/Pruhc9ME7WoneD9NWr0+YsKmK+Cbe1nZ7yGjmy48opIrIE4
+	 mw9d0nuUVbQXjuh78ZM97ciAr6t1BfNX7izWBjfBHppB0pnTWuGBKb676a9SBLbmH+
+	 qLcKsc3fBgtaSr40oA3HLUzj4B3h4BR4frZF/9/3LMalubIA0ajjTMJ/+wCVSTBzFq
+	 mr2dHM5OivaqCsKstMg5I+CezFmYnjMspbSICUvtnuMtJsiw8dXBh3BbdasfPrIbMT
+	 oB/HANWobVgFyxwln+phxf3g77H50cZD4Zn2TMMR0N3a+fRqxMyC9tPlvBp6fWUIgE
+	 Sga/+QZio1XAQ==
+Message-ID: <587ef110-592a-4fa1-ae83-cacd74f6e57b@kernel.org>
+Date: Wed, 28 Aug 2024 07:39:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240822200252.472298-1-wangfe@google.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 3/5] dt-bindings: net: wireless: brcm4329-fmac: change
+ properties enum structure
+To: Jacobe Zang <jacobe.zang@wesion.com>, arend.vanspriel@broadcom.com,
+ kvalo@kernel.org, marcan@marcan.st, sven@svenpeter.dev, alyssa@rosenzweig.io
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ saikrishnag@marvell.com, megi@xff.cz, bhelgaas@google.com,
+ duoming@zju.edu.cn, minipli@grsecurity.net, yajun.deng@linux.dev,
+ stern@rowland.harvard.edu, gregkh@linuxfoundation.org,
+ christophe.jaillet@wanadoo.fr, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+ nick@khadas.com
+References: <20240828034915.969383-1-jacobe.zang@wesion.com>
+ <20240828034915.969383-4-jacobe.zang@wesion.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240828034915.969383-4-jacobe.zang@wesion.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 22, 2024 at 01:02:52PM -0700, Feng Wang wrote:
-> From: wangfe <wangfe@google.com>
+On 28/08/2024 05:49, Jacobe Zang wrote:
+> Add "brcm,bcm4329-fmac" as fallback compatible for wireless devices that
+> used PCI ID based compatible. So that can pass the compatible check in
+> driver.
 > 
-> In packet offload mode, append Security Association (SA) information
-> to each packet, replicating the crypto offload implementation.
-> The XFRM_XMIT flag is set to enable packet to be returned immediately
-> from the validate_xmit_xfrm function, thus aligning with the existing
-> code path for packet offload mode.
-> 
-> This SA info helps HW offload match packets to their correct security
-> policies. The XFRM interface ID is included, which is crucial in setups
-> with multiple XFRM interfaces where source/destination addresses alone
-> can't pinpoint the right policy.
-> 
-> Signed-off-by: wangfe <wangfe@google.com>
+> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
+> ---
 
-Applied to ipsec-next, thanks Feng!
+<form letter>
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC. It might happen, that command when run on an older
+kernel, gives you outdated entries. Therefore please be sure you base
+your patches on recent Linux kernel.
+
+Tools like b4 or scripts/get_maintainer.pl provide you proper list of
+people, so fix your workflow. Tools might also fail if you work on some
+ancient tree (don't, instead use mainline) or work on fork of kernel
+(don't, instead use mainline). Just use b4 and everything should be
+fine, although remember about `b4 prep --auto-to-cc` if you added new
+patches to the patchset.
+
+You missed at least devicetree list (maybe more), so this won't be
+tested by automated tooling. Performing review on untested code might be
+a waste of time.
+
+Please kindly resend and include all necessary To/Cc entries.
+</form letter>
+
+Best regards,
+Krzysztof
+
 
