@@ -1,357 +1,280 @@
-Return-Path: <netdev+bounces-122856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5859E962D2B
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 18:02:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68356962D3F
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 18:06:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D68341F20CC8
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:02:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C56D1C20FD6
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:06:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A181A3BDA;
-	Wed, 28 Aug 2024 16:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D30718DF8A;
+	Wed, 28 Aug 2024 16:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jo4jUNTN"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uCaVfZFq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2068.outbound.protection.outlook.com [40.107.92.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342931A3BDB
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 16:01:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724860919; cv=none; b=L0PyL5ShnnXLU+s3VaS0L5iDOKCPX0ktzc04pF4aZEZZtYEGxUlQOExl6ZhdddKZC5VZda0EmkobVDpfYazJ4z1Hd5aAO2eqmuQBQYb91XTDKe19YUA3c3Q32XUGwkRl5XRw8nRNVyzd/CJYnpNCGsyAAroi0Z8W8W8OTl3rO/w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724860919; c=relaxed/simple;
-	bh=4FUm9+4aOF3eDSh/2a+UrkHUnymJdy7X6rrG93t+YPE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nrRVSV1Y+Vzr/0mtRGXlnapMLWEcHkUlf1bomN9XsCf17d8cBmZAO9odnF3CuvZ5Uw2Hrq+JSBTmfjBJKnC1qPDLburyxebPmCDmr9gjS3uxipSwAFCfldiD3zyPPN3X6z/l70aPaIPEbXDI/CbkJ6vW/ExVBbB8vfPbRmsn4l8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jo4jUNTN; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-201fae21398so49147735ad.1
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 09:01:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724860916; x=1725465716; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NgsON45TWsJKFfRE5AO/707YWKkV02J+tcpFgxJwyQw=;
-        b=jo4jUNTNj0OQkrP2mUESF4Y88hjdJP1GI0Ujq7uAvjufHVF5j2+i+PKlUYXpO7liX+
-         T9z2VrzleapycViM8Z/lbnmKSM566Kk95wROYfbfn4WxH4CFqh41w+3B54IAsMpwzh0q
-         AF3NKFVqoptTtU54OHPe4FZcDn/++g0T9g0a78Gl6nW/aFJve2VZvz1YjdMr7sUVcJKe
-         r9H/IgbVMMW69yuPYxaXTAVdCrC91LLejH2h8nEC5+/AnM5FRsdtb13niyNY2yqRbbZd
-         lHvYqPbCV5FU9QDsy0XE98JqlKHuNkl8YegnOWfNFvjr6U3rJ4szNkxwMhH1Hcq+ebnZ
-         +Pkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724860916; x=1725465716;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NgsON45TWsJKFfRE5AO/707YWKkV02J+tcpFgxJwyQw=;
-        b=VE8rI7iHHcA/wNLCm9xlMKyPZSosUC+z1kQHZ29d5KuqInqvG5r9Abil9NKqg5dV4l
-         bsTNtAUOvVqOEC6RRsoMmrVYUU8sU1/gDukWb3YTGjh9P7K7HGaM3+yXRmUigPAAYIG7
-         QB9UTPlk7fO8I6spUJn7X7Z+GxUI3xrBo+TDaq62ogbsp2rSX8ypmr2TelIIWhjoLDz+
-         IgCV+p+Mwlt21aHOLS0Z5VXIfPW04K6+IfpitFwrznn+YK0lZbte6EVFXVCQcFRljA1g
-         gkKI3ZPbyd5ggSxOsjBpuR9UjAcn5mCnbQkXKK89bhjq/TSXzCG0e6oadtuM+9ZN2NIz
-         JoYA==
-X-Gm-Message-State: AOJu0YyYFSvVB/jzDpOzuLppbWDtARH4MqLfF9iceGV6P09noHy7n3Su
-	ntYh5y+l2gDkil4+a/SCILkzlaZv4D2/dynfGKelOgbaCHQFGDLi
-X-Google-Smtp-Source: AGHT+IG3mV2MzBCtawipA4BxAvIYIWWzoij92oEEUqJotAdlyyhQJSK6GN5hC5UXKmdZsIC1oU1gWA==
-X-Received: by 2002:a17:903:41cb:b0:1fb:90e1:c8c0 with SMTP id d9443c01a7336-204f9c50d18mr32805905ad.63.1724860916044;
-        Wed, 28 Aug 2024 09:01:56 -0700 (PDT)
-Received: from KERNELXING-MC1.tencent.com ([114.253.36.103])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385564dd9sm100061755ad.51.2024.08.28.09.01.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 09:01:55 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	willemb@google.com
-Cc: netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: [PATCH net-next v2 2/2] net: make SOF_TIMESTAMPING_RX_SOFTWARE feature per socket
-Date: Thu, 29 Aug 2024 00:01:45 +0800
-Message-Id: <20240828160145.68805-3-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240828160145.68805-1-kerneljasonxing@gmail.com>
-References: <20240828160145.68805-1-kerneljasonxing@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30E67E574;
+	Wed, 28 Aug 2024 16:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724861173; cv=fail; b=DwOmSuHViGwMgtAS3ELeENjsSimSkNMQvzBfPF+b2gT3ekqzk+MmMpFue4U2gsVBL/gv9T7GMJkpF6L78bxqSNQg/4mrJTqEQzJ1YA8vx8Kp9a/6RKZasXmZFJr4kmSDdgN9nzkWKz+nHsbCpH2zNjxK34BA1KofXfOIU7yujJA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724861173; c=relaxed/simple;
+	bh=MObUOL7jaPvdgEZjukSvaGIQ56F4yYk407NJyThyAQo=;
+	h=Message-ID:Date:Subject:From:To:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SPpdMhF7jbP1qqAQM2IRNrfudDGxUFUmYaqzqCy5VCQFx78QtF61KfKY7W7Rz0L5x8O/5LQsqQDuJQ7SktmRBL9+wkkRFUYIYTggIpWJUrqfxRG1rays/cPhVSQfRAzwsmLyePJVBUsB53R4MGpynFK/XeMSubcYHB788wr05nA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uCaVfZFq; arc=fail smtp.client-ip=40.107.92.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FNw1q7QhH+l4W4B3ClJFlNI9Oz+aHwjSZOeaWU1Hgz7YX+uGsuLiaHONA9JqLkbSXI3++kDkNuMhN7zl22ViTyP5dB6EUN+JHxHggCY5TCQAd7UyQm//kQFrsJYozdN/MqLNK2A49wJHw6wOUWLr807UbjmrX1YMXNvdJQpnDZ0IW2/Fof4jv3aCqMcDZz9TgAUoB4ZpCXVGgIELlY0OB2JoLk8dI8UH/KfyNQmoHasO4R54kdszlQrYHSVqGPjfOr5b6B8LuXGx9gVOANXqrfOFp9NFm+13JjXXt749CCd6aGebM3tLpCgIeNVjI4JtDQdwPH8xtySCH7j74px76Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BJgBU35XwpqZ7Bst2lDA4a8V61g+L6P95DOGG5QauXY=;
+ b=xBL6NUIBX9NqDUSzipQo4AHs8c5PE7B/g3i6rLcM9cnKi949616K9B5BDHC5XwDWxq32T9Ydyt9vjSde9Ezc5sb7FewBK85Vz51GEmt5fb2PS/Psfh5N0Fz40yYPo1wVSu5uJB7tOjQv+y0KBJ9YtY8aeGKHvkXhkxX/KhBa/YIUfWuQ6FxmToPFEdoE/zEfN7K+P1nWN3cPTbixH2I8HnIpvqdqWS75xiRPVjO1FzfU2+7oAFxwj0RWI8JXfYhaRb3JJQA3yM4YgBvlafYp0FwSJ07U3BPax2JVPeeFo6DaaNPvS5R/HDPKad7egPiAVMiPWaYnA3XpfDUoJHH/wQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BJgBU35XwpqZ7Bst2lDA4a8V61g+L6P95DOGG5QauXY=;
+ b=uCaVfZFqCubOmKNHaraxdn6qrOVdjKEgzlw1aCjb52tlwLBRk8ucULI0aCWXieRoNhBzdm6Zs+nwFPwEEVGT4ovLHbA5awd/IVqYQII+75+iUkdFtZuC1Qacbw1tp9qLhqQ5ahJS9YFRpPY5ireJNeHwZyADbwcVoV/f3FmtoOs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by MW4PR12MB6705.namprd12.prod.outlook.com (2603:10b6:303:1e3::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.27; Wed, 28 Aug
+ 2024 16:06:08 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7897.027; Wed, 28 Aug 2024
+ 16:06:08 +0000
+Message-ID: <3d97e89e-09ec-01c3-787c-0164c611cc4c@amd.com>
+Date: Wed, 28 Aug 2024 17:06:00 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2 11/15] cxl: make region type based on endpoint type
+Content-Language: en-US
+From: Alejandro Lucero Palau <alucerop@amd.com>
+To: "Li, Ming4" <ming4.li@intel.com>, alejandro.lucero-palau@amd.com,
+ linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
+ martin.habets@xilinx.com, edward.cree@amd.com, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ richard.hughes@amd.com
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+ <20240715172835.24757-12-alejandro.lucero-palau@amd.com>
+ <1f082012-1ad6-4b12-8eb4-96bcc61704a0@intel.com>
+ <1cd50929-35f5-d0f1-9a68-d22e28cdf1b6@amd.com>
+In-Reply-To: <1cd50929-35f5-d0f1-9a68-d22e28cdf1b6@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO2P265CA0026.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:61::14) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|MW4PR12MB6705:EE_
+X-MS-Office365-Filtering-Correlation-Id: 65b23269-e131-4bc0-9f36-08dcc77b5409
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aXE3WTlFSXQ5U0IrQlk5K2tkQ1BERW5YUk9hUzVDdStpZ2pOc2lNa1NwcXFG?=
+ =?utf-8?B?aUhRTDhVdWtwa3ZWcGptTjExUmVkeEprL2hRcFlGTEJ3c3hzS0FGMjdVQk0v?=
+ =?utf-8?B?VXJMZGE2eXI0ZStxZjhscEZacTFUQ2dKaGxsblQ2UlZ6STc0TmhHRXZvZXFF?=
+ =?utf-8?B?MUplR1ZZczhaSkJSK1pJa296VkNobXJrM2JnelJ1ZjBwODE3emlOWlh6UDhu?=
+ =?utf-8?B?b2JQNXRoV1JTUmxHQkZ4V0llemZoTWcxVkRQSG9oOE5oZUdFM1ZIb1AyVDd0?=
+ =?utf-8?B?ZGNxelNrZ2Nodk5USWJhb3RkeitCeUZkRHBTQXN0M3lRc1laa3hmNklhR1Yv?=
+ =?utf-8?B?bGpKanVyYUFCWVd2dWJEYUhqMTB4OXBxMDlZNjZFbWhpVnAyYXJZeEphZmNm?=
+ =?utf-8?B?VFhEb2lKbDM3L0tCeGRMS1QyZGF5cUViYkR5ZXhSazUwZG9TTGY3aVlMTXFD?=
+ =?utf-8?B?NUlZQngwY2ZpVVVETkdBVjdLYkU2SUI5dndkcjBNU0ZPWkt0eUZxY1RCSmRI?=
+ =?utf-8?B?VXpFVXNXb1BQR1lySms2aTNidG5wV0liRzhwNzRkdU4zaTR2WEZDcHlyemJZ?=
+ =?utf-8?B?N3pQYU1ndUVPUWIwY0tkelhKSWNRUjlPUnBBSm1jcm1QMXpJanF0VzFCQTd0?=
+ =?utf-8?B?WHg3QWRjdnpEb3A2dHBNWUgyN1VpUWZ2a0RtL1NocHVmcHNZR0hpbXhpU1Zu?=
+ =?utf-8?B?UnVSUXlvdnFwenNMdVNkSHhzOUtKY1NVTWlEenRWeERVTFRiZk9UTUNPYnUv?=
+ =?utf-8?B?QXZINHZpYzVqdTFzL3p3VzRQQUFsdFhpU3JuOFEyWFVXVmk1Zi9rblJsZk1G?=
+ =?utf-8?B?NGhFZFFQU0phQUNuRDUybjNDQW93SDNPcVUrVFlzOXMxNjl6eUVqem9JTTZl?=
+ =?utf-8?B?SWdIMjdqVEpKZS9nR2l3d2ZiSWxuRFl6QmhzTUxjSEg0QythZC8vMFNTeTE3?=
+ =?utf-8?B?VjJBdHhlcC9zM1BQUCs5TUF4NDZrdHN4bSt3STVNZjV2Sm51RmY1WlNNZ0Q3?=
+ =?utf-8?B?b2ZadVdvTTZIcmkyNWdFVGdhQzZQVjdIUGVZRHV3SnlKdEQ4TGU5RnVUTjMr?=
+ =?utf-8?B?WHg0TFllMmhZYjRuRjdJdGl3aC81K0dUSE9hcFFLTlIvaTFDNWNvVVFIY3Jm?=
+ =?utf-8?B?U3o3RUcxczdhR2R3Nk9VODJVSy9NUHliTTZKTzkxN1hVSGtNZ0hITEdhd25w?=
+ =?utf-8?B?Q295eEl3K0RjRFJhZC84L3kvM01YNzkxeXhXT0d4c2RXUUx4WmYvMGxFdndU?=
+ =?utf-8?B?YVg5UjFwc0FKbmdSbE90QTU1OUJISnRQYktBcWpDRUlRaGIxQzhKeE1maEpj?=
+ =?utf-8?B?ZG9GczB1NVVQSzZHd0MyQ0dGSnVsWndGRTdQeGkyOStQVjFpSzVpRVBOYlBh?=
+ =?utf-8?B?VkFwT2xhdmxtTXVwZHNBbUt4bGFEMm9Eeml2dWRDc1lDcmNsWnNwbFF1a1pK?=
+ =?utf-8?B?NExsTktibnk1NzlxVnNGL0tTT2NOcjhhUzNhb2J4YU5UUk1VS3U5NFk1SlY3?=
+ =?utf-8?B?VmNEaXFseXRNTElaUkNXTFk5OFV6SStZVEtaaUdmY1hxYng3SlVLZ2J5bFAy?=
+ =?utf-8?B?VExheUtNR01lTmoyMEk4dWV4NmEwSEpCdWhOR1BDWDB2ZFV1OWg3ZExlUnhY?=
+ =?utf-8?B?OGxQYUZORUVlcGRYWGdLcHhPVG45a2ZsMStDR1VraE5xS1Q3QTdPRlhiQjN0?=
+ =?utf-8?B?UFRNbEp1UG1oTGF5c0V3aE5JTTBtZHhySzZEbmdZZHRtTXB0YmRsNkNBWEtZ?=
+ =?utf-8?B?MGtUOTBOQjdUK3haS1FvMVdublpTQ1VkamRCbG5sMkd2SzFKWVhBQXlPSkxv?=
+ =?utf-8?B?K1lCemdJdXA0L0g1VFlBWTNJL3JnMFFSVlVCVjZYQ0xqazNnclJmYlRRQ0Jw?=
+ =?utf-8?Q?mxEIs/oCMUXzA?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eGFBVURjdktYc3dHM2lFWWZjNXVGaFE0Tk5KYklBckdzMHFDUmtNME80czNl?=
+ =?utf-8?B?YU8wcHE1NnNmMEZYaHhlYTFBNjhNME43NDdNdDVwbWhDQ1R3MjB0KzBLTFNw?=
+ =?utf-8?B?ZW9RYXJJTktRVE5yM1N2UytXVnpIRGhOclk0SmZSVGRYVUN6UG1mbUpYWHpS?=
+ =?utf-8?B?SHhVTUFGUHUvVU8yUnJ0bFdKaitYUm5LclpySFEwRTB0TDAzV2tMUjNCWXNk?=
+ =?utf-8?B?ZjdxR1o2MWFBMkFKTEVZQjZRVjAxcjY0cyt3ZzJYcnFYNGNtUDlaQ0RnNlQ4?=
+ =?utf-8?B?RUM1T01BUTRoczl1WFNqQzU5VDk3eTNOTHVMazU3NTZReVZxeU44aGpaTnJQ?=
+ =?utf-8?B?Qk9weXNraG1qVDV1LzAwbzZtU3RMNG5rZk9McVlFOHpIcnFNOXBuRVgzVm1O?=
+ =?utf-8?B?aHNMNzVoNXF0akpPWk52YXp6My8rR3NkanlmaFR4bzhLOGk4VkZXTytvMkNq?=
+ =?utf-8?B?WmpvRGZKbXh4ODJjR25nR0tINEl6RzNSZVNkcDExRHhJR0JXQWVOa1d3Szg4?=
+ =?utf-8?B?TWFQSy9XLzNsajUwaU9WTW5Yd0xNclh3MGpqNDlSQ0x5OGRpTkMzSTFFOGVR?=
+ =?utf-8?B?aXhPQ01yVGE2b3oxMnAvcGhwaHlPVmVxeU91TVA1MG9jL0oxekF5M25FaG1D?=
+ =?utf-8?B?dEtpdWxlNDVGeHhOWkp2ZEJycWhxM2xPU2dtN284YWJleWxhOEd1b0cvUFE2?=
+ =?utf-8?B?MUJEeVk5ZWR2YnFLY2ZodVA4WlB2MDNlVzdVcDUrL1VRREJnOElDcC9FL0tQ?=
+ =?utf-8?B?ZkRQY2ZqV0duZGpBSS9ySkNaMDF3VzVFbFJMNC9KMm9xSjdlRUtMcFFZTGto?=
+ =?utf-8?B?TDZFencxRW5weFJTakR6cmRnbi9FTzZNRkorK1FlSGVEQTBlSDhycTFOM2E3?=
+ =?utf-8?B?TFdZM3RmaVRJNXJQSVFaZ25rVGdjYXR3bDNHSkp1RElCVTdMYjBQZ3RLVlk2?=
+ =?utf-8?B?ZXpPY0ZhWXVWZjhhaUhPN1d2SkJuSFBPeERTSGFITFcwSkR6NVVHbm91OWlo?=
+ =?utf-8?B?WmJSblhCaG1FaGV2TTFmZTVDVVRxaGZud1VHVWs4S2Y5N2U2MFh4NWpLY0Zx?=
+ =?utf-8?B?NkZ5NmJrUkdXY01zcStKMC9PV2R3VnRQMWR5WnlvQkRRTWYxelArZU5FeEl0?=
+ =?utf-8?B?eWdjUlJKYXBXRW5QVUp0UkxYY0NQM1R2S0NLWUMxdW51QkVHZ2V4QXgyZkpt?=
+ =?utf-8?B?RnpRNlBPMW5BZGxrdzVNSjZjdzF4bThFdUEyMU1Oa0M3cjRobGFEdUltVkFI?=
+ =?utf-8?B?RGZHTnZWc0FTOFhzeSsxT1lSYkhuQWZTU1kvV1o4TDNDbjQ0S1NOUVRLa3lT?=
+ =?utf-8?B?emUweHZ6Uk8wSkY3MzZJZVZoZ29LTFhOeFByWGdIcWdvcUJzVGhYUUJMN1lF?=
+ =?utf-8?B?SlA1OGhXZjVza2d0N3FvcXQrd3dCamQreDlHY1BQV1YvV0JoamtBV3l6VjhF?=
+ =?utf-8?B?VHVyZEk5WjQ5Q3M3MU96OFZoM05xODNOOTd5cG1zK25CNWdxcjZBZ2pBS08z?=
+ =?utf-8?B?L1NOU3lKaWNhZDc1QStyYVRqbnpXYk9HWThwTHdoNG9oejMvcFEwQ2tsTXN2?=
+ =?utf-8?B?blVQSEMvZTFNeVRhdHdiSkxBYmFmMVJjK0ZwWHhXZXhPZnMycU1YODFDQURE?=
+ =?utf-8?B?anRPZ1pVanhkOWowQUJzZDJpU2RFVmtvdFF1aURYR09ZUC9WSkZnbFpCWDZ6?=
+ =?utf-8?B?MUVCL0JUckRWUG1EcmRiL3NFNUNLSGRNRkhaZkd3ck9wSGNwZHMxb1NWVWI0?=
+ =?utf-8?B?d09KRTBDVmM0MmM2Smk2YmxGTmZpK3ZPYlZwcGI3VDJ1RzBjQldmbXdNTDEy?=
+ =?utf-8?B?YXA0VjNuY252QUxoS2ExRjBNR0JDZVNBUGIzTjZiaGYveTFKeU0xcWVpSnV3?=
+ =?utf-8?B?MGR0eWFnMERLdk5uekprME45bndpYTYzaFlCR3ZDV2FTcys1V3dpc3JCQnRD?=
+ =?utf-8?B?L0F2aXBKcjk1MFRYSHhmTTd5amo2TDhaQTNoVi9rYjREZDg3SDhUanc3WE5F?=
+ =?utf-8?B?aTh4UjRkclM5TjJDVTVCTkxscUtyNW5rS2FaeFVCbjBDdVp6TGN6U3F3ek9I?=
+ =?utf-8?B?RkQzOFViMHZnWWJMb1h4Tis4UzhCTXpBMC96TTVzZ1pla0lKUFZXK1RyK2ha?=
+ =?utf-8?Q?YrRT7fsrxG8Duciu45Zw+M0bb?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 65b23269-e131-4bc0-9f36-08dcc77b5409
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 16:06:08.6793
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: u+Zwol1up9t0WOZvnidgUx/sNAUsqngkVlxxWaWRLazkHIg8LU4RM1cTkQnDsDGADBe0jEQWgKhawSf32/Se6g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6705
 
-From: Jason Xing <kernelxing@tencent.com>
 
-Like the previous patch in this series, we need to make sure that
-we both set SOF_TIMESTAMPING_SOFTWARE and SOF_TIMESTAMPING_RX_SOFTWARE
-flags together so that we can let the user parse the rx timestamp.
+On 7/16/24 09:13, Alejandro Lucero Palau wrote:
+>
+> On 7/16/24 08:14, Li, Ming4 wrote:
+>> On 7/16/2024 1:28 AM, alejandro.lucero-palau@amd.com wrote:
+>>> From: Alejandro Lucero <alucerop@amd.com>
+>>>
+>>> Current code is expecting Type3 or CXL_DECODER_HOSTONLYMEM devices 
+>>> only.
+>>> Suport for Type2 implies region type needs to be based on the endpoint
+>>> type instead.
+>>>
+>>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>>> ---
+>>>   drivers/cxl/core/region.c | 14 +++++++++-----
+>>>   1 file changed, 9 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+>>> index ca464bfef77b..5cc71b8868bc 100644
+>>> --- a/drivers/cxl/core/region.c
+>>> +++ b/drivers/cxl/core/region.c
+>>> @@ -2645,7 +2645,8 @@ static ssize_t create_ram_region_show(struct 
+>>> device *dev,
+>>>   }
+>>>     static struct cxl_region *__create_region(struct 
+>>> cxl_root_decoder *cxlrd,
+>>> -                      enum cxl_decoder_mode mode, int id)
+>>> +                      enum cxl_decoder_mode mode, int id,
+>>> +                      enum cxl_decoder_type target_type)
+>>>   {
+>>>       int rc;
+>>>   @@ -2667,7 +2668,7 @@ static struct cxl_region 
+>>> *__create_region(struct cxl_root_decoder *cxlrd,
+>>>           return ERR_PTR(-EBUSY);
+>>>       }
+>>>   -    return devm_cxl_add_region(cxlrd, id, mode, 
+>>> CXL_DECODER_HOSTONLYMEM);
+>>> +    return devm_cxl_add_region(cxlrd, id, mode, target_type);
+>>>   }
+>>>     static ssize_t create_pmem_region_store(struct device *dev,
+>>> @@ -2682,7 +2683,8 @@ static ssize_t create_pmem_region_store(struct 
+>>> device *dev,
+>>>       if (rc != 1)
+>>>           return -EINVAL;
+>>>   -    cxlr = __create_region(cxlrd, CXL_DECODER_PMEM, id);
+>>> +    cxlr = __create_region(cxlrd, CXL_DECODER_PMEM, id,
+>>> +                   CXL_DECODER_HOSTONLYMEM);
+>>>       if (IS_ERR(cxlr))
+>>>           return PTR_ERR(cxlr);
+>>>   @@ -2702,7 +2704,8 @@ static ssize_t 
+>>> create_ram_region_store(struct device *dev,
+>>>       if (rc != 1)
+>>>           return -EINVAL;
+>>>   -    cxlr = __create_region(cxlrd, CXL_DECODER_RAM, id);
+>>> +    cxlr = __create_region(cxlrd, CXL_DECODER_RAM, id,
+>>> +                   CXL_DECODER_HOSTONLYMEM);
+>>>       if (IS_ERR(cxlr))
+>>>           return PTR_ERR(cxlr);
+>>>   @@ -3364,7 +3367,8 @@ static struct cxl_region 
+>>> *construct_region(struct cxl_root_decoder *cxlrd,
+>>>         do {
+>>>           cxlr = __create_region(cxlrd, cxled->mode,
+>>> - atomic_read(&cxlrd->region_id));
+>>> +                       atomic_read(&cxlrd->region_id),
+>>> +                       cxled->cxld.target_type);
+>>>       } while (IS_ERR(cxlr) && PTR_ERR(cxlr) == -EBUSY);
+>>>         if (IS_ERR(cxlr)) {
+>> I think that one more check between the type of root decoder and 
+>> endpoint decoder is necessary in this case. Currently, root decoder 
+>> type is hard coded to CXL_DECODER_HOSTONLYMEM, but it should be 
+>> CXL_DECODER_DEVMEM or CXL_DECODER_HOSTONLYMEM based on 
+>> cfmws->restrictions.
+>>
+>
+> I think you are completely right.
+>
+> I will work on this looking also for other implications.
+>
+> Thanks
+>
+>
+>>
 
-One more important and special thing is that we should take care of
-errqueue recv path because we rely on errqueue to get our timestamps
-for sendmsg(). Or else, If the user wants to read when setting
-SOF_TIMESTAMPING_TX_ACK, something like this, we cannot get timestamps,
-for example, in TCP case. So we should consider those
-SOF_TIMESTAMPING_TX_* flags.
+I think the check could be performed inside cxl_attach_region where the 
+region type is already matched against the endpoint type. That is the 
+check triggering a failure for my Type2 support and the reason behind 
+this patch.
 
-After this patch, we are able to pass the testcase 6 for IP and UDP
-cases when running ./rxtimestamp binary.
+However, I think the way encoder type is managed requires a refactoring. 
+From the cedt cfmw restrictions I assume a decoder can support different 
+types and not restricted to just one, what is what the code does now 
+using a enumeration for the encoder type. With no restrictions, what is 
+the current implementation with qemu, I would say a root decoder should 
+be fine for a Type3 or a Type2. Adding that check for matching the root 
+decoder type with the region type is therefore not possible without 
+major changes. Because other potential restrictions like only supporting 
+RAM and no PMEM is not currently being managed, I think this initial 
+type2 support should be fine without the checking you propose, but a 
+following patch should address this problem, of course, assuming I'm not 
+wrong with all this.
 
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- Documentation/networking/timestamping.rst |  7 +++++++
- include/net/sock.h                        |  7 ++++---
- net/bluetooth/hci_sock.c                  |  4 ++--
- net/core/sock.c                           |  2 +-
- net/ipv4/ip_sockglue.c                    |  2 +-
- net/ipv4/ping.c                           |  2 +-
- net/ipv6/datagram.c                       |  4 ++--
- net/l2tp/l2tp_ip.c                        |  2 +-
- net/l2tp/l2tp_ip6.c                       |  2 +-
- net/nfc/llcp_sock.c                       |  2 +-
- net/rxrpc/recvmsg.c                       |  2 +-
- net/socket.c                              | 11 ++++++++---
- net/unix/af_unix.c                        |  2 +-
- 13 files changed, 31 insertions(+), 18 deletions(-)
-
-diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
-index 5e93cd71f99f..93378b78c6dd 100644
---- a/Documentation/networking/timestamping.rst
-+++ b/Documentation/networking/timestamping.rst
-@@ -160,6 +160,13 @@ SOF_TIMESTAMPING_RAW_HARDWARE:
-   Report hardware timestamps as generated by
-   SOF_TIMESTAMPING_TX_HARDWARE when available.
- 
-+Please note: previously, if an application starts first which turns on
-+netstamp_needed_key, then another one only passing SOF_TIMESTAMPING_SOFTWARE
-+could also get rx timestamp. Now we handle this case and will not get
-+rx timestamp under this circumstance. We encourage that for each socket
-+we should use the SOF_TIMESTAMPING_RX_SOFTWARE generation flag to time
-+stamp the skb and use SOF_TIMESTAMPING_SOFTWARE report flag to tell
-+the application.
- 
- 1.3.3 Timestamp Options
- ^^^^^^^^^^^^^^^^^^^^^^^
-diff --git a/include/net/sock.h b/include/net/sock.h
-index cce23ac4d514..b8535692f340 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -2600,12 +2600,13 @@ static inline void sock_write_timestamp(struct sock *sk, ktime_t kt)
- }
- 
- void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
--			   struct sk_buff *skb);
-+			   struct sk_buff *skb, bool errqueue);
- void __sock_recv_wifi_status(struct msghdr *msg, struct sock *sk,
- 			     struct sk_buff *skb);
- 
- static inline void
--sock_recv_timestamp(struct msghdr *msg, struct sock *sk, struct sk_buff *skb)
-+sock_recv_timestamp(struct msghdr *msg, struct sock *sk, struct sk_buff *skb,
-+		    bool errqueue)
- {
- 	struct skb_shared_hwtstamps *hwtstamps = skb_hwtstamps(skb);
- 	u32 tsflags = READ_ONCE(sk->sk_tsflags);
-@@ -2621,7 +2622,7 @@ sock_recv_timestamp(struct msghdr *msg, struct sock *sk, struct sk_buff *skb)
- 	    (kt && tsflags & SOF_TIMESTAMPING_SOFTWARE) ||
- 	    (hwtstamps->hwtstamp &&
- 	     (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE)))
--		__sock_recv_timestamp(msg, sk, skb);
-+		__sock_recv_timestamp(msg, sk, skb, errqueue);
- 	else
- 		sock_write_timestamp(sk, kt);
- 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 69c2ba1e843e..c1b73c5a370b 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -1586,11 +1586,11 @@ static int hci_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 		break;
- 	case HCI_CHANNEL_USER:
- 	case HCI_CHANNEL_MONITOR:
--		sock_recv_timestamp(msg, sk, skb);
-+		sock_recv_timestamp(msg, sk, skb, false);
- 		break;
- 	default:
- 		if (hci_mgmt_chan_find(hci_pi(sk)->channel))
--			sock_recv_timestamp(msg, sk, skb);
-+			sock_recv_timestamp(msg, sk, skb, false);
- 		break;
- 	}
- 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 9abc4fe25953..d969a4901300 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -3677,7 +3677,7 @@ int sock_recv_errqueue(struct sock *sk, struct msghdr *msg, int len,
- 	if (err)
- 		goto out_free_skb;
- 
--	sock_recv_timestamp(msg, sk, skb);
-+	sock_recv_timestamp(msg, sk, skb, true);
- 
- 	serr = SKB_EXT_ERR(skb);
- 	put_cmsg(msg, level, type, sizeof(serr->ee), &serr->ee);
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index cf377377b52d..b79f859c34bf 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -547,7 +547,7 @@ int ip_recv_error(struct sock *sk, struct msghdr *msg, int len, int *addr_len)
- 		kfree_skb(skb);
- 		return err;
- 	}
--	sock_recv_timestamp(msg, sk, skb);
-+	sock_recv_timestamp(msg, sk, skb, true);
- 
- 	serr = SKB_EXT_ERR(skb);
- 
-diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
-index 619ddc087957..1cf7b0eecd63 100644
---- a/net/ipv4/ping.c
-+++ b/net/ipv4/ping.c
-@@ -880,7 +880,7 @@ int ping_recvmsg(struct sock *sk, struct msghdr *msg, size_t len, int flags,
- 	if (err)
- 		goto done;
- 
--	sock_recv_timestamp(msg, sk, skb);
-+	sock_recv_timestamp(msg, sk, skb, false);
- 
- 	/* Copy the address and add cmsg data. */
- 	if (family == AF_INET) {
-diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
-index fff78496803d..1e4c11b2d0ce 100644
---- a/net/ipv6/datagram.c
-+++ b/net/ipv6/datagram.c
-@@ -479,7 +479,7 @@ int ipv6_recv_error(struct sock *sk, struct msghdr *msg, int len, int *addr_len)
- 		kfree_skb(skb);
- 		return err;
- 	}
--	sock_recv_timestamp(msg, sk, skb);
-+	sock_recv_timestamp(msg, sk, skb, true);
- 
- 	serr = SKB_EXT_ERR(skb);
- 
-@@ -568,7 +568,7 @@ int ipv6_recv_rxpmtu(struct sock *sk, struct msghdr *msg, int len,
- 	if (err)
- 		goto out_free_skb;
- 
--	sock_recv_timestamp(msg, sk, skb);
-+	sock_recv_timestamp(msg, sk, skb, false);
- 
- 	memcpy(&mtu_info, IP6CBMTU(skb), sizeof(mtu_info));
- 
-diff --git a/net/l2tp/l2tp_ip.c b/net/l2tp/l2tp_ip.c
-index 4bc24fddfd52..164c8ed7124e 100644
---- a/net/l2tp/l2tp_ip.c
-+++ b/net/l2tp/l2tp_ip.c
-@@ -567,7 +567,7 @@ static int l2tp_ip_recvmsg(struct sock *sk, struct msghdr *msg,
- 	if (err)
- 		goto done;
- 
--	sock_recv_timestamp(msg, sk, skb);
-+	sock_recv_timestamp(msg, sk, skb, false);
- 
- 	/* Copy the address. */
- 	if (sin) {
-diff --git a/net/l2tp/l2tp_ip6.c b/net/l2tp/l2tp_ip6.c
-index f4c1da070826..b0bb0a1f772e 100644
---- a/net/l2tp/l2tp_ip6.c
-+++ b/net/l2tp/l2tp_ip6.c
-@@ -712,7 +712,7 @@ static int l2tp_ip6_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 	if (err)
- 		goto done;
- 
--	sock_recv_timestamp(msg, sk, skb);
-+	sock_recv_timestamp(msg, sk, skb, false);
- 
- 	/* Copy the address. */
- 	if (lsa) {
-diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-index 57a2f97004e1..5c6e671643f6 100644
---- a/net/nfc/llcp_sock.c
-+++ b/net/nfc/llcp_sock.c
-@@ -869,7 +869,7 @@ static int llcp_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 		return -EFAULT;
- 	}
- 
--	sock_recv_timestamp(msg, sk, skb);
-+	sock_recv_timestamp(msg, sk, skb, false);
- 
- 	if (sk->sk_type == SOCK_DGRAM && msg->msg_name) {
- 		struct nfc_llcp_ui_cb *ui_cb = nfc_llcp_ui_skb_cb(skb);
-diff --git a/net/rxrpc/recvmsg.c b/net/rxrpc/recvmsg.c
-index a482f88c5fc5..18fa392011fb 100644
---- a/net/rxrpc/recvmsg.c
-+++ b/net/rxrpc/recvmsg.c
-@@ -200,7 +200,7 @@ static int rxrpc_recvmsg_data(struct socket *sock, struct rxrpc_call *call,
- 					    sp->hdr.serial, seq);
- 
- 		if (msg)
--			sock_recv_timestamp(msg, sock->sk, skb);
-+			sock_recv_timestamp(msg, sock->sk, skb, false);
- 
- 		if (rx_pkt_offset == 0) {
- 			ret2 = rxrpc_verify_data(call, skb);
-diff --git a/net/socket.c b/net/socket.c
-index fcbdd5bc47ac..c02fb9b615b2 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -893,7 +893,7 @@ static void put_ts_pktinfo(struct msghdr *msg, struct sk_buff *skb,
-  * called from sock_recv_timestamp() if sock_flag(sk, SOCK_RCVTSTAMP)
-  */
- void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
--	struct sk_buff *skb)
-+			   struct sk_buff *skb, bool errqueue)
- {
- 	int need_software_tstamp = sock_flag(sk, SOCK_RCVTSTAMP);
- 	int new_tstamp = sock_flag(sk, SOCK_TSTAMP_NEW);
-@@ -946,7 +946,12 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
- 
- 	memset(&tss, 0, sizeof(tss));
- 	tsflags = READ_ONCE(sk->sk_tsflags);
--	if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
-+	/* We have to use the generation flag here to test if we allow the
-+	 * corresponding application to receive the rx timestamp. Only
-+	 * using report flag does not hold for receive timestamping case.
-+	 */
-+	if ((tsflags & SOF_TIMESTAMPING_SOFTWARE &&
-+	     (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE || errqueue)) &&
- 	    ktime_to_timespec64_cond(skb->tstamp, tss.ts + 0))
- 		empty = 0;
- 	if (shhwtstamps &&
-@@ -1024,7 +1029,7 @@ static void sock_recv_mark(struct msghdr *msg, struct sock *sk,
- void __sock_recv_cmsgs(struct msghdr *msg, struct sock *sk,
- 		       struct sk_buff *skb)
- {
--	sock_recv_timestamp(msg, sk, skb);
-+	sock_recv_timestamp(msg, sk, skb, false);
- 	sock_recv_drops(msg, sk, skb);
- 	sock_recv_mark(msg, sk, skb);
- }
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index a1894019ebd5..bb33f2994618 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2481,7 +2481,7 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
- 		goto out_free;
- 
- 	if (sock_flag(sk, SOCK_RCVTSTAMP))
--		__sock_recv_timestamp(msg, sk, skb);
-+		__sock_recv_timestamp(msg, sk, skb, false);
- 
- 	memset(&scm, 0, sizeof(scm));
- 
--- 
-2.37.3
 
 
