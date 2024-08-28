@@ -1,217 +1,187 @@
-Return-Path: <netdev+bounces-122836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55204962B4D
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:09:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C925962B55
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:09:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAC3D1F2122A
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:09:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 904B21F23E11
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:09:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9C81A0B16;
-	Wed, 28 Aug 2024 15:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A9C1A08DB;
+	Wed, 28 Aug 2024 15:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="Lql1IU7E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MzX2mLfI"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazolkn19010017.outbound.protection.outlook.com [52.103.2.17])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E05D1A0B08;
-	Wed, 28 Aug 2024 15:08:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.2.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724857704; cv=fail; b=YICrQDhEEi4m7vgfsm4avGAP4evIH12hMUUceG64ImXrqy00K1HZQWxhmPfNXYy25kORPpZlrciuGnyhTYsh9riazsAk3zq6BdffTrcUQftKOn/VpJRRmCg9/D1+nMCwXVqkdOH04SqNTooEMdtA/fRvUFlg4ZuBlEysyS9U5Ko=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724857704; c=relaxed/simple;
-	bh=70kS9eIoQ/QnRKGCcY95bLsYbQW3bVLRefXgV3rCFow=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=YiBQKhfD1XRaXNQfzMt4iYupkPe+kROQud9h0d1+qIP9eAa0ARKtO788n/apXdDxtq+Fd5ZpTeBFpODCkLkVfzqNI6GuRQPL/Yb4hspjOaENz44Po4SoU/uN2C2Yx/UzW5bOSuB3Z0akRDjLy2Qj3otClPqMGT8C1xywuXINpWA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=Lql1IU7E; arc=fail smtp.client-ip=52.103.2.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=E2SaMfNs9nCm1DOA3wWwZGmmVhkIoL/0d0EuT0XdkNVD92VLHnKUgXDRZxdAXp5FnhkPmIG9jSoM/DT7MDwXQSXwpd94GKO2Ijg8jeOcpgTci6VUEeF23Nv5vM543W0LGnw89i+hiirZZ2I62szC1jvCp8nvhPzAUGo3XSpCWd6QsGPmq0QXf99XPFAmrxfDmeXh/wOfbzc+ITKwsBXvAuu82NAHCiyGQPUniv9apOTBoFPP/2O8JWYBltYrXYH4faT+JjrRpmPdjY31QxrSVMGJiDabmBH7eAe+JbPhWKU+y9J0hRfwXZ8jA+4OEPPfcfVUMPyRLGPV5VoSuHVfGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IoSBeXJ2SorjUiSYs3wq2YeXv2hvHp9Lg5ZcR8z7JX4=;
- b=vGsIy5gJ3/0XOgurXQgnINuk7W41QIMH0Bm19wV8hLLz8rkNZ05ckbZHoqb62u4in/ZRdzL5xVWSSFrLn9OXep6ONS860QgSvnAOWjLd0jK3jAvo//rDHUWGDlMuaT0lOxL4qS+d/IicEK13iipueXHqDQTY6QI58X5B5eBRlxvfool9mfJJIr5MZXa8CIGtBRcMYwUdMhsiIgx8fBKh0+Zl8pP/TNkfFBoWXVXO1+8YH8WeqhuafL2fkXy6oaFeGv/I+DVaezbHyJ5n2zr4O6UXel89kre5KgIHmvVpzSXwZKu/2hVCOK/7FUgZ/z/5c9wBO8mEBkOlHOm4TT5k7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IoSBeXJ2SorjUiSYs3wq2YeXv2hvHp9Lg5ZcR8z7JX4=;
- b=Lql1IU7EAscBYx62wCLSVw4jWYZsn0aHlBmQsgL96bhGZQeecCZN5xlyQj0ZcJro9ktMNttUh8TQwytA0j3SojclcRgTPHuIFamwZZVWz5GcuMaIxPsovwiHHbv0DOaGCa4Be/lBoGYLQmm1lAtkDB9nU8sH6GCALVq3mglUAAJZHT0X8aPv2fD9eF7WNchFVYJV2u7czHEyA4fTR3Zf50ilJSrEmPTYRN+RcF1sF2aXmyoMgfjQiKe+/tDjYbdB4Rxlj0upuTx+Vq/CvXbLwGOurcV5SaatqMnR82QkfWekLmDOyZP3hLe23/jaD1830JqOtdmiMZKy8Fy3IlWSMQ==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by LV8PR02MB10308.namprd02.prod.outlook.com (2603:10b6:408:200::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Wed, 28 Aug
- 2024 15:08:20 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%6]) with mapi id 15.20.7875.018; Wed, 28 Aug 2024
- 15:08:20 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>, "kys@microsoft.com"
-	<kys@microsoft.com>, "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, "decui@microsoft.com"
-	<decui@microsoft.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC: "ernis@microsoft.com" <ernis@microsoft.com>
-Subject: RE: [PATCH v4] net: netvsc: Update default VMBus channels
-Thread-Topic: [PATCH v4] net: netvsc: Update default VMBus channels
-Thread-Index: AQHa+EBXTldwhB2dH0W0CzyXLVvRKrI8xyfg
-Date: Wed, 28 Aug 2024 15:08:20 +0000
-Message-ID:
- <SN6PR02MB415702718E57A11B32CDB24CD4952@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <1724735791-22815-1-git-send-email-ernis@linux.microsoft.com>
-In-Reply-To: <1724735791-22815-1-git-send-email-ernis@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-tmn: [IK15oAQdi5x4hHpSAI83qNC4FxLRmPbS]
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|LV8PR02MB10308:EE_
-x-ms-office365-filtering-correlation-id: e2a2b5b5-d4da-40db-ca3b-08dcc77340d6
-x-microsoft-antispam:
- BCL:0;ARA:14566002|19110799003|461199028|15080799006|8060799006|102099032|440099028|3412199025;
-x-microsoft-antispam-message-info:
- QBXrCR93O1QBX/tTGoZu8yk/Do/XXPTFloFbIhFU8/2KguAXlvHRa2i7exnvpRZ2DDI7rGFEm0Vi/1vE7p9ygwucWngFtcTh4LwkMJJmpJ34PAEBfCm8oDKPNgOMKbOAcXsrPyZDewb6pIUT/NtzDkWCXUdixs09K/+APbjtBgld5Prvmgv3N7un+lS85uiz4ZG+mKcQUS+3U3wbP4AVd1ZVRymzrT787VomOt9cpE+/FRm+FKPbJb5EETZW2wL17cCQz0D7L1rxZcrNXesijS9MhFj0gfDN64EDsd4/e9wd2Rv8Vul+50uyUXPDSvrcR6yKf13Ne9PWsQyUWqhKQTjQjASoqyMs4EAh2KzqO6eHfXT86ovp2ZB7WshUTFBwnKYLzKAtMIrwKyx2YthuKVQSVL7MF4OylOdoDiP5jMdVVCHdMNq+9qdOOSjMe5YC+/V72dNgLr6WA8Wdqo+B5Dre3OrkY3HnZZmZ13BZkvvzk4pJun1r/B+s/TC40+oqu7F1OJ9kKt8L/cnbiCI+2IEety4c+ex3T//ib1mRwbKyDOJpeQJXcKdhRYkApoP4BZCKTWrH9qzA+zCnO9a9IxtjGvDb516AFglMjRqQ4D/ZBWLtJPpPUw/qU9lHHarqgfJUDQau9NeQDQxyYf/Q8iJv3hMA0y69JGJSyBhgkz+/yHogIBq9ekPCA6ALlKlD
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?hImsKDk/Wzm5560pDXHKNF5fjP4p0asBINodJJ8cklQEflKJ0HFWTDlku8BE?=
- =?us-ascii?Q?B+pKS6TsOJJ3dvhiM4ALeqwFUwofDwcvgYUD5l8rHUxY76HzOmwkrVadoJKO?=
- =?us-ascii?Q?pX5vsemWKgM3ipklzg/RGBhl3LXjVlqRzsuvnDwXEhneDV8kFEiXps3bj28A?=
- =?us-ascii?Q?UUk2doFWlx67jl6OGr/NYo0NgKTaHIGPTolOyZR5hiFcA2S8WnQNtd7pUAvh?=
- =?us-ascii?Q?vtn/3BjQK5i2/0MOLKC0NhM86VAaSsLJQRh06F1jJzv19WHniXzdUHhrt1Mp?=
- =?us-ascii?Q?hYprBvw0iO+gl6zfqYr6vTtXCDYcR3suREruL5FNOmVRyeSVpQgUESdKQnE1?=
- =?us-ascii?Q?9hRje1vqqQN7FbmtGJRwFIjHDktBC/zEqWWpYvGGQFtS+6ja+Veuv4EfLHb0?=
- =?us-ascii?Q?WQFqv4IUgYApGtThSKN+RcvQg8cyIo+2bb0sE6OmFs3sQvdSaLXMQvhttvxq?=
- =?us-ascii?Q?xELXX/0lN2FGxKzF4a3UJMLDIvsda//E5rEDcaODBHlXUaxvFRvHurcnw2Uq?=
- =?us-ascii?Q?7h650TjDt5dhz4pTx8InIryV5NuPK6qW06+EgK93CBxrKAdLCMdgwP2ybIxo?=
- =?us-ascii?Q?QnLmDA0omWIPEcIA/IfL198BVh7MJZeJiZKUbvwUbJlMQfoHdOcdMG6VDzd8?=
- =?us-ascii?Q?t59BvHlQZk6auH58uDIYvTdHsVgASEnM7/uvOCiB571N/P34q5ZPop/Phjtt?=
- =?us-ascii?Q?kVtrw8hX4Q2h/rrduDsPqcPTM4QXUvcR6KuyJpfuWU+7eOqYiI6nAxnKVZXq?=
- =?us-ascii?Q?atEVGwn+jJ/OVMLU9owvlXSb1uKZEddE75eFHbfu4E/hHaCWnJkOfgxRZ/Lo?=
- =?us-ascii?Q?1+07x88mrve7bhWVeaIvfrYqDbuNfxP6JjV0/sB7tmVBYm1OOehZa3LO9y8N?=
- =?us-ascii?Q?o2xAGYMteMZ4+RkmmMS1/fHH9mmH6+WnkzoJw7FP4786XJVW/BdYA/LD6QZq?=
- =?us-ascii?Q?ekX5rnByB3OrzcJPaV8oQqtu2cUScyJ5WSMb3Vnyo/hRo6llJ6D0txQelJwv?=
- =?us-ascii?Q?Kh0TiSOAnOkdEezNuiGx1ga6vziMEU8DnMm1n6H+Jq6fxaM8Sz9YHRiUTxg8?=
- =?us-ascii?Q?DaLNmPUYbgQSQtztUdJDXQMBCwcc752a+jrLVrFyLIasWDubYnmNDx9A4eJ3?=
- =?us-ascii?Q?nmDNaheax6bBaF4uEfqloKWN1BRmmm63yTbTLY9F15o3gqTBqSWsn6AooPiC?=
- =?us-ascii?Q?qhYSKDNZjbVZh1aVKbsZOx7bQb+Rgv06cZIxdJoh6d40jO55Jm13i7Bk8A0?=
- =?us-ascii?Q?=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993741891AC;
+	Wed, 28 Aug 2024 15:09:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724857755; cv=none; b=ecjiVYLEV6kDp841C4eq/OSj5O50VqD+XWXqdpcCl6i5yiZjDRkq0myLNS6jILxlao7dGCpdrL2sDm3RY1EAt75MA6JkbkmjTcr/dn70JxY9IPNZpzz5bQ0fG7J2hBpeOnhLEJLRUAZaeFS2J/MTTJ5QRydrods96FYfKf4grGw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724857755; c=relaxed/simple;
+	bh=2dSGJx9DwCGU9inaMNC9w/ZuZvcpZXpFhNbyIbDXFXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HM9vWhQm8Db/vZumyL9kYmuyu7y9Lmz7/y2dETXiVKeGhMr1fdAFE+O8SNWXAiozocsdm8OeOyum3MSCitz7S4Ob/s7q4hiw6rc0k3SSE91XPALYkyYLYPZIRWscz1ytP+nMUvuCkj8b6L3AeMo5Og/21qQJEy7Zvj6gh98HuDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MzX2mLfI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B325CC4CEC1;
+	Wed, 28 Aug 2024 15:09:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724857755;
+	bh=2dSGJx9DwCGU9inaMNC9w/ZuZvcpZXpFhNbyIbDXFXg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MzX2mLfIg6MsGjolLr+V4iGnkKTQUdjm/EaJhLDbZvuJ66i2qkoGxZkO0ahAeXSdZ
+	 w0oCrFV6JtXAsleAblrSSNSVD9dFHJ0vrg3QkfqAS1/8U20Rzb14APD9K3tmZDJ6GK
+	 CR4Dl1yuEAannx47U0uCzgYJILYF9LdXJXWNUfl7nNIE49/dESf9Abd7xAUmTxni17
+	 nc95Xa/TzQiWQ+tq/H0ZbZrk7Htb3mVLOLBSQS2h3kJfVSREuRRDhSrxAxG8RtEwvG
+	 8Yo853oQ5RDwkuAxKSPdqth8jdfeROhvvFlts3CkhJ2C/SW9eezgX8my3EQlKOcR+8
+	 iHTOc/MxGSYRg==
+Date: Wed, 28 Aug 2024 17:09:08 +0200
+From: Alejandro Colomar <alx@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Yafang Shao <laoar.shao@gmail.com>, akpm@linux-foundation.org, 
+	torvalds@linux-foundation.org, justinstitt@google.com, ebiederm@xmission.com, 
+	alexei.starovoitov@gmail.com, rostedt@goodmis.org, catalin.marinas@arm.com, 
+	penguin-kernel@i-love.sakura.ne.jp, linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Kees Cook <keescook@chromium.org>, 
+	Matus Jokay <matus.jokay@stuba.sk>, "Serge E. Hallyn" <serge@hallyn.com>
+Subject: Re: [PATCH v8 1/8] Get rid of __get_task_comm()
+Message-ID: <ynrircglkinhherehtjz7woq55te55y4ol4rtxhfh75pvle3d5@uxp5esxt4slq>
+References: <20240828030321.20688-1-laoar.shao@gmail.com>
+ <20240828030321.20688-2-laoar.shao@gmail.com>
+ <lql4y2nvs3ewadszhmv4m6fnqja4ff4ymuurpidlwvgf4twvru@esnh37a2jxbd>
+ <n2fxqs3tekvljezaqpfnwhsmjymch4vb47y744zwmy7urf3flv@zvjtepkem4l7>
+ <CALOAHbBAYHjDnKBVw63B8JBFc6U-2RNUX9L=ryA2Gbz7nnJfsQ@mail.gmail.com>
+ <7839453E-CA06-430A-A198-92EB906F94D9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: e2a2b5b5-d4da-40db-ca3b-08dcc77340d6
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Aug 2024 15:08:20.2664
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR02MB10308
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="utmrbzzw4vz6dwo3"
+Content-Disposition: inline
+In-Reply-To: <7839453E-CA06-430A-A198-92EB906F94D9@kernel.org>
 
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com> Sent: Monday, Augu=
-st 26, 2024 10:17 PM
->=20
-> Change VMBus channels macro (VRSS_CHANNEL_DEFAULT) in
-> Linux netvsc from 8 to 16 to align with Azure Windows VM
-> and improve networking throughput.
->=20
-> For VMs having less than 16 vCPUS, the channels depend
-> on number of vCPUs. For greater than 16 vCPUs,
-> set the channels to maximum of VRSS_CHANNEL_DEFAULT and
-> number of physical cores / 2 which is returned by
-> netif_get_num_default_rss_queues() as a way to optimize CPU
-> resource utilization and scale for high-end processors with
-> many cores.
-> Maximum number of channels are by default set to 64.
->=20
-> Based on this change the channel creation would change as follows:
->=20
-> -----------------------------------------------------------------
-> | No. of vCPU |  dev_info->num_chn |    channels created        |
-> -----------------------------------------------------------------
-> |    1-16     |        16	   |          vCPU              |
-> |    >16      |  max(16,#cores/2)  | min(64 , max(16,#cores/2)) |
-> -----------------------------------------------------------------
->=20
-> Performance tests showed significant improvement in throughput:
-> - 0.54% for 16 vCPUs
-> - 0.83% for 32 vCPUs
-> - 0.86% for 48 vCPUs
-> - 9.72% for 64 vCPUs
-> - 13.57% for 96 vCPUs
->=20
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> ---
-> Changes in v4:
-> * Update commit message for channels created
-> ---
-> Changes in v3:
-> * Use netif_get_num_default_rss_queues() to set channels
-> * Change terminology for channels in commit message
-> ---
-> Changes in v2:
-> * Set dev_info->num_chn based on vCPU count.
-> ---
->  drivers/net/hyperv/hyperv_net.h | 2 +-
->  drivers/net/hyperv/netvsc_drv.c | 3 ++-
->  2 files changed, 3 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/net/hyperv/hyperv_net.h b/drivers/net/hyperv/hyperv_=
-net.h
-> index 810977952f95..e690b95b1bbb 100644
-> --- a/drivers/net/hyperv/hyperv_net.h
-> +++ b/drivers/net/hyperv/hyperv_net.h
-> @@ -882,7 +882,7 @@ struct nvsp_message {
->=20
->  #define VRSS_SEND_TAB_SIZE 16  /* must be power of 2 */
->  #define VRSS_CHANNEL_MAX 64
-> -#define VRSS_CHANNEL_DEFAULT 8
-> +#define VRSS_CHANNEL_DEFAULT 16
->=20
->  #define RNDIS_MAX_PKT_DEFAULT 8
->  #define RNDIS_PKT_ALIGN_DEFAULT 8
-> diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_=
-drv.c
-> index 44142245343d..a6482afe4217 100644
-> --- a/drivers/net/hyperv/netvsc_drv.c
-> +++ b/drivers/net/hyperv/netvsc_drv.c
-> @@ -987,7 +987,8 @@ struct netvsc_device_info *netvsc_devinfo_get(struct
-> netvsc_device *nvdev)
->  			dev_info->bprog =3D prog;
->  		}
->  	} else {
-> -		dev_info->num_chn =3D VRSS_CHANNEL_DEFAULT;
-> +		dev_info->num_chn =3D max(VRSS_CHANNEL_DEFAULT,
-> +					netif_get_num_default_rss_queues());
->  		dev_info->send_sections =3D NETVSC_DEFAULT_TX;
->  		dev_info->send_section_size =3D NETVSC_SEND_SECTION_SIZE;
->  		dev_info->recv_sections =3D NETVSC_DEFAULT_RX;
-> --
-> 2.34.1
->=20
 
-Reviewed-by: Michael Kelley <mhklinux@outlook.com>
+--utmrbzzw4vz6dwo3
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+From: Alejandro Colomar <alx@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Yafang Shao <laoar.shao@gmail.com>, akpm@linux-foundation.org, 
+	torvalds@linux-foundation.org, justinstitt@google.com, ebiederm@xmission.com, 
+	alexei.starovoitov@gmail.com, rostedt@goodmis.org, catalin.marinas@arm.com, 
+	penguin-kernel@i-love.sakura.ne.jp, linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Kees Cook <keescook@chromium.org>, 
+	Matus Jokay <matus.jokay@stuba.sk>, "Serge E. Hallyn" <serge@hallyn.com>
+Subject: Re: [PATCH v8 1/8] Get rid of __get_task_comm()
+References: <20240828030321.20688-1-laoar.shao@gmail.com>
+ <20240828030321.20688-2-laoar.shao@gmail.com>
+ <lql4y2nvs3ewadszhmv4m6fnqja4ff4ymuurpidlwvgf4twvru@esnh37a2jxbd>
+ <n2fxqs3tekvljezaqpfnwhsmjymch4vb47y744zwmy7urf3flv@zvjtepkem4l7>
+ <CALOAHbBAYHjDnKBVw63B8JBFc6U-2RNUX9L=ryA2Gbz7nnJfsQ@mail.gmail.com>
+ <7839453E-CA06-430A-A198-92EB906F94D9@kernel.org>
+MIME-Version: 1.0
+In-Reply-To: <7839453E-CA06-430A-A198-92EB906F94D9@kernel.org>
+
+Hi Kees,
+
+On Wed, Aug 28, 2024 at 06:48:39AM GMT, Kees Cook wrote:
+
+[...]
+
+> >Thank you for your suggestion. How does the following commit log look
+> >to you? Does it meet your expectations?
+> >
+> >    string: Use ARRAY_SIZE() in strscpy()
+> >
+> >    We can use ARRAY_SIZE() instead to clarify that they are regular cha=
+racters.
+> >
+> >    Co-developed-by: Alejandro Colomar <alx@kernel.org>
+> >    Signed-off-by: Alejandro Colomar <alx@kernel.org>
+> >    Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> >
+> >diff --git a/arch/um/include/shared/user.h b/arch/um/include/shared/user=
+=2Eh
+> >index bbab79c0c074..07216996e3a9 100644
+> >--- a/arch/um/include/shared/user.h
+> >+++ b/arch/um/include/shared/user.h
+> >@@ -14,7 +14,7 @@
+> >  * copying too much infrastructure for my taste, so userspace files
+> >  * get less checking than kernel files.
+> >  */
+> >-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+> >+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]) + __must_be_array(x))
+> >
+> > /* This is to get size_t and NULL */
+> > #ifndef __UM_HOST__
+> >@@ -60,7 +60,7 @@ static inline void print_hex_dump(const char *level,
+> >const char *prefix_str,
+> > extern int in_aton(char *str);
+> > extern size_t strlcat(char *, const char *, size_t);
+> > extern size_t sized_strscpy(char *, const char *, size_t);
+> >-#define strscpy(dst, src)      sized_strscpy(dst, src, sizeof(dst))
+> >+#define strscpy(dst, src)      sized_strscpy(dst, src, ARRAY_SIZE(dst))
+>=20
+> Uh, but why? strscpy() copies bytes, not array elements. Using sizeof() i=
+s already correct and using ARRAY_SIZE() could lead to unexpectedly small c=
+ounts (in admittedly odd situations).
+>=20
+> What is the problem you're trying to solve here?
+
+I suggested that here:
+<https://lore.kernel.org/all/2jxak5v6dfxlpbxhpm3ey7oup4g2lnr3ueurfbosf5wdo6=
+5dk4@srb3hsk72zwq/>
+
+There, you'll find the rationale (and also for avoiding the _pad calls
+where not necessary --I ignore if it's necessary here--).
+
+Have a lovely day!
+Alex
+
+>=20
+> -Kees
+>=20
+> --=20
+> Kees Cook
+
+--=20
+<https://www.alejandro-colomar.es/>
+
+--utmrbzzw4vz6dwo3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmbPPZQACgkQnowa+77/
+2zLbhBAAlmo97hSALOMFZhNvjtiifi8OS3Fmi4WyEj8YDnX4pfh+3drVAhe2b44u
+nrvjsBMEM1AHDiXa+gp3sUheR3N1kFuX1oyxlPsb9crUH3IfubT4kG0tQ6qLqE8M
+Tv0OfPWGdqeGMgvvTEiQVb4xcs/OMT5T4hVdwAtws8Lw0f1ofW5uE5Vlhu5GUXUB
+Mbz0DBwkRwBtEmnOCDeZE8zBL8ifIc7k5lQ7Kp1hr4gg/89oLXSABSSxtkyx2U20
+8Q1u2OXUiGq4J1BPkNs/5REFb+DJ5bpor7fMecfxoIKms1HXU4w3BjLO6x0ijCTc
+cKtZD6eMdpBVNhzXDsJpwMEePaKmJ8k9M4XEVFzBGvdKZ7nAx2meA0rmRssG8tVN
+PkNk/kswZIw0qi+m7Lo5uoWOoyKt/s3/UxyUehrIs2k836Zxc9gNdXzX3V9l/R7l
+KStxOPruRK2CjPtIE+OBeCpkVxVpFnNhyOVRADi9sWf4ztjwoo8acuXuDNjBDRoP
+ggNzOacqXIv8N0Ly6pn+01O6jUg5VNLndq9hOMveyamHwRAZVTDiJMh2xmJqBW41
+jIckyXwpnHly1Ag/DEWDiLlgjL0KTcqLGn3Y3oG4jd6PKxqUpxZHGw5UvLPq4QOk
+Oy6ZjqF9XGRi8kCgo0hGVLIKxJX7RfAZydaWmAjQVouEODj3TvU=
+=wcL8
+-----END PGP SIGNATURE-----
+
+--utmrbzzw4vz6dwo3--
 
