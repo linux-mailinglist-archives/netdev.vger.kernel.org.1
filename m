@@ -1,211 +1,109 @@
-Return-Path: <netdev+bounces-122933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80D1596333D
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:58:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4806F963355
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 23:00:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CA27281986
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:58:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E73E32813B9
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 21:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0210C1AD9C6;
-	Wed, 28 Aug 2024 20:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C84A159571;
+	Wed, 28 Aug 2024 21:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QBL/5Qaq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FytCoi/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 418931AD402
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 20:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D56FA153814;
+	Wed, 28 Aug 2024 21:00:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724878657; cv=none; b=dhFELkvVT4cl2E84/ED4K87ucVFlIZr7O6NGSArBtE4NSG5uJMvy1+np6p+uH1IKPijRUBFHElbA3OsJvInHMJG237n7jTR9YJ+e+HE57VLz4kpHBMYIqy77gLGhZuO7VzgwGLqRqfV9tow1w7Bez24c3YsgnLi0cZcdUpEXFYE=
+	t=1724878836; cv=none; b=CE3GlRLv0keEuTfbZTXNmGPfF2w13isxjNMMma9eTHAzPxli5cWHBUIJpH31X4SPZRL71c5bHhMwscLm10CriXqIBCtaAiKv73tclw9wlzblpAABSTvaerO25B91BTcW0pMcFz3xAH7FS8CuoFk3o0qyAnYkaOUinsd0TwyCTZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724878657; c=relaxed/simple;
-	bh=xufRkKg+iM6RsUdSlYQ0D3X5D5y0afXbEi6v8MIfOwg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eG2sa/YfaKUrltb4LKqPMamPgL4ztwD7hHRji/GZKnFP090RaJ4ocZZkTz6747qQ1HqLePo+84z9pREBLZ3c48w9jCldJYts2fPbI6cfAPcQdZrneoZAqCx4FNt+sRJX/wnup2SEjeeOgZqXW6NBJP/BSMwrhzp5ivZT2bB1+tM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QBL/5Qaq; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724878657; x=1756414657;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=xufRkKg+iM6RsUdSlYQ0D3X5D5y0afXbEi6v8MIfOwg=;
-  b=QBL/5QaqKvxYeWGbh1DPDgLU2/QZq68SpORgZCw6YBSc+eFA9txJFZ3u
-   6CZtzmBRyBQsE/pF+Zmc4NOrkQ4tkUsqlpjUYP8zdUKu3vl7yYowuWF70
-   1WLucdSiYUZGfw0mj8AoCSL4nab81DzjR2SJqgCynRZewCDGdq1lh3c1Z
-   a20/Vfdw0Y9ldr19rhLSS0bFsAFCNBxGdPgKarLhn9ikSQ8PI2aMLZ13a
-   9T47Hxa5CUT6umXT4SMWqz2ooB6Z7FrMXuahgXejKdOcUFzMmRT9boxZ6
-   58Eyr6uwKp+UIp6xG1KK+qeX5ugyiYtncB9wRG0dCMk9veUQjZx8w20fs
-   A==;
-X-CSE-ConnectionGUID: IISzszYlSFGgSGO5DuGycw==
-X-CSE-MsgGUID: F8wAZ9DmQOeR5zw0WhsRRg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="34592624"
-X-IronPort-AV: E=Sophos;i="6.10,183,1719903600"; 
-   d="scan'208";a="34592624"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 13:57:31 -0700
-X-CSE-ConnectionGUID: kcD8ZhpMQCS4GtkvBuSX1Q==
-X-CSE-MsgGUID: z8P0+UXzSv6jayJSVXJnFQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,183,1719903600"; 
-   d="scan'208";a="64049994"
-Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 13:57:29 -0700
-From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Wed, 28 Aug 2024 13:57:29 -0700
-Subject: [PATCH iwl-next v2 13/13] ice: cleanup Rx queue context
- programming functions
+	s=arc-20240116; t=1724878836; c=relaxed/simple;
+	bh=cL9LZVNKhm1Z3H3x4kb5PPTbtNB3t94LpmTa+2gYs6Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kVVWuyj72KTjkpJyb8teBDEShMaiQLA9AtR1ttMPQ4lTIlJT4QxPoFniWIeKB60nlf6SA52XUtDUoNmamxTeKaRBECS/d5xu4jnDxc7ST6PNQZpAV54CJgXPsjpyebCLLu1P1hPE8bK3Dv9xJoLOdGS784KqXmU9+uh8XX2Z47Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FytCoi/Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBF20C4CEC0;
+	Wed, 28 Aug 2024 21:00:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724878836;
+	bh=cL9LZVNKhm1Z3H3x4kb5PPTbtNB3t94LpmTa+2gYs6Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FytCoi/QT4vag7m9bGJU81+YcOFm6NdGWg+sTe3Rd9Is04thjGZjw90FWqgDD9fNj
+	 ao75ctl/O74niodZImKzilQFPC4MWw6HqV9ZbSyQQJBtsTfZQmY7L4hgQGOfnQkN9D
+	 a1RMjbwPByQ+T3kgvzfC5SKTLLcWAQD0Kn1whNDJJNYRv4jaV6GadyQMlBRx3rOUml
+	 GZkwOO+cv35sYZxnuMZy5d/nPAhegvbn8eTFTRgzNHTpYLsw6tfyOeoWzygthsS6aP
+	 XCrEeoVKPXLJHoZ0HAm9HUCNmL6zRBk5zmsuY1uK4mLuEDEOCNJrqodNNxFtem828a
+	 w/WMp3/6jqJNw==
+Date: Wed, 28 Aug 2024 14:00:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, ncardwell@google.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, fw@strlen.de, Willem de
+ Bruijn <willemb@google.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+ martineau@kernel.org
+Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
+ ksft
+Message-ID: <20240828140035.4554142f@kernel.org>
+In-Reply-To: <66cf7b8d1c480_36509229439@willemb.c.googlers.com.notmuch>
+References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
+	<401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
+	<66cf2e4bd8e89_33815c294b2@willemb.c.googlers.com.notmuch>
+	<20240828090120.71be0b20@kernel.org>
+	<66cf7b8d1c480_36509229439@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-13-558ab9e240f5@intel.com>
-References: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-0-558ab9e240f5@intel.com>
-In-Reply-To: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-0-558ab9e240f5@intel.com>
-To: Vladimir Oltean <olteanv@gmail.com>, netdev <netdev@vger.kernel.org>, 
- Anthony Nguyen <anthony.l.nguyen@intel.com>, 
- Intel Wired LAN <intel-wired-lan@lists.osuosl.org>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-X-Mailer: b4 0.14.0
 
-The ice_copy_rxq_ctx_to_hw() and ice_write_rxq_ctx() functions perform some
-defensive checks which are typically frowned upon by kernel style
-guidelines.
+On Wed, 28 Aug 2024 15:33:33 -0400 Willem de Bruijn wrote:
+> That could work.
+> 
+> Is reporting one KTAP and exitcode per directory vs per packetdrill
+> invocation good/bad/neither?
 
-In particular, they perform NULL checks on buffers which are never expected
-to be NULL. Both functions are only called once and always have valid
-buffers pointing to stack memory. These checks only serve to hide potential
-programming error, as we will not produce the normal crash dump on a NULL
-access.
+To me "neither", hopefully and unhelpfully I won't tell you anything
+that's not common sense :) The balance is between:
 
-In addition, ice_copy_rxq_ctx_to_hw() cannot fail in another way, so could
-be made void.
+ - having test cases which don't take too long (assuming debug kernel):
+     <15min is good, 
+     >1h I will start complaining,
+     >1h30m is bad because we can't retry and still make the 3h
+            deadline that NIPA has,
+     >3h the test can't run in NIPA at all.
 
-Future support for VF Live Migration will need to introduce an inverse
-function for reading Rx queue context from HW registers to unpack it, as
-well as functions to pack and unpack Tx queue context from HW.
+vs
 
-Rather than copying these style issues into the new functions, lets first
-cleanup the existing code.
+ - flip side is having so many cases it's hard to keep track and render
+   in the UI. JSON is relatively slow to process. If you have 150 cases,
+   that's 300 per branch (debug and non-debug kernels), times 8
+   branches a day => 2.4k results / day
+   I think that's still fine-ish, but on the larger side for sure. For
+   reference net and forwarding have ~100 tests each. FWIW we do have
+   the ability to collect and display nested KTAP so the information is
+   not lost (but it makes queries slower so we don't fetch it by default).
 
-For the ice_copy_rxq_ctx_to_hw() function:
+> Three other issues if this is calling packetdrill directly is
+> - passing the non-trivial IP specific flags
+> - running twice, for IPv4 and IPv6
+> - chdir into the directory of the pkt file
+> 
+> That can be addressed by instead calling a small wrapper shell script.
+> 
+> That would do the test_func_builder part of packetdrill_ksft.py.
+> But without the need to handle netns, popen/cmd, etc, and thus the
+> ksft dependencies.
 
- * Remove the NULL parameter check.
- * Move the Rx queue index check out of this function.
- * Convert the function to a void return.
- * Use a simple int variable instead of a u8 for the for loop index.
- * Use a local variable and array syntax to access the rxq_ctx.
- * Update the function description to better align with kernel doc style.
-
-For the ice_write_rxq_ctx() function:
-
- * Use the more common '= {}' syntax for initializing the context buffer.
- * Move the Rx queue index check into this function.
- * Update the function description with a Returns: to align with kernel doc
-   style.
-
-These changes align the existing write functions to current kernel
-style, and will align with the style of the new functions added when we
-implement live migration in a future series.
-
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_common.c | 42 ++++++++++++-----------------
- 1 file changed, 17 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 67273e4af7ff..bf4f4b6195f9 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1357,34 +1357,22 @@ int ice_reset(struct ice_hw *hw, enum ice_reset_req req)
- }
- 
- /**
-- * ice_copy_rxq_ctx_to_hw
-+ * ice_copy_rxq_ctx_to_hw - Copy packed Rx queue context to HW registers
-  * @hw: pointer to the hardware structure
-- * @ice_rxq_ctx: pointer to the rxq context
-+ * @rxq_ctx: pointer to the packed Rx queue context
-  * @rxq_index: the index of the Rx queue
-- *
-- * Copies rxq context from dense structure to HW register space
-  */
--static int
--ice_copy_rxq_ctx_to_hw(struct ice_hw *hw, u8 *ice_rxq_ctx, u32 rxq_index)
-+static void ice_copy_rxq_ctx_to_hw(struct ice_hw *hw, u8 *rxq_ctx,
-+				   u32 rxq_index)
- {
--	u8 i;
--
--	if (!ice_rxq_ctx)
--		return -EINVAL;
--
--	if (rxq_index > QRX_CTRL_MAX_INDEX)
--		return -EINVAL;
--
- 	/* Copy each dword separately to HW */
--	for (i = 0; i < ICE_RXQ_CTX_SIZE_DWORDS; i++) {
--		wr32(hw, QRX_CONTEXT(i, rxq_index),
--		     *((u32 *)(ice_rxq_ctx + (i * sizeof(u32)))));
-+	for (int i = 0; i < ICE_RXQ_CTX_SIZE_DWORDS; i++) {
-+		u32 ctx = ((u32 *)rxq_ctx)[i];
- 
--		ice_debug(hw, ICE_DBG_QCTX, "qrxdata[%d]: %08X\n", i,
--			  *((u32 *)(ice_rxq_ctx + (i * sizeof(u32)))));
-+		wr32(hw, QRX_CONTEXT(i, rxq_index), ctx);
-+
-+		ice_debug(hw, ICE_DBG_QCTX, "qrxdata[%d]: %08X\n", i, ctx);
- 	}
--
--	return 0;
- }
- 
- /**
-@@ -1497,23 +1485,27 @@ const struct ice_ctx_ele ice_rlan_ctx_info[] = {
- /**
-  * ice_write_rxq_ctx - Write Rx Queue context to hardware
-  * @hw: pointer to the hardware structure
-- * @rlan_ctx: pointer to the rxq context
-+ * @rlan_ctx: pointer to the packed Rx queue context
-  * @rxq_index: the index of the Rx queue
-  *
-  * Pack the sparse Rx Queue context into dense hardware format and write it
-  * into the HW register space.
-+ *
-+ * Return: 0 on success, or -EINVAL if the Rx queue index is invalid.
-  */
- int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
- 		      u32 rxq_index)
- {
--	u8 ctx_buf[ICE_RXQ_CTX_SZ] = { 0 };
-+	u8 ctx_buf[ICE_RXQ_CTX_SZ] = {};
- 
--	if (!rlan_ctx)
-+	if (rxq_index > QRX_CTRL_MAX_INDEX)
- 		return -EINVAL;
- 
- 	ice_pack_rxq_ctx(rlan_ctx, ctx_buf);
- 
--	return ice_copy_rxq_ctx_to_hw(hw, ctx_buf, rxq_index);
-+	ice_copy_rxq_ctx_to_hw(hw, ctx_buf, rxq_index);
-+
-+	return 0;
- }
- 
- /* LAN Tx Queue Context */
-
--- 
-2.46.0.124.g2dc1a81c8933
-
+Right!
 
