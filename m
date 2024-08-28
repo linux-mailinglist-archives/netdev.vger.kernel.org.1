@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-122745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D97962699
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:11:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EE1996269E
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:12:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 902152841F3
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:11:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A45491F237BB
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D94E16D4C4;
-	Wed, 28 Aug 2024 12:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A54173320;
+	Wed, 28 Aug 2024 12:12:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53E115B119;
-	Wed, 28 Aug 2024 12:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C8F172BDC;
+	Wed, 28 Aug 2024 12:12:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724847105; cv=none; b=GHr6JgnhnIYAo2CexincYxF0UfB0PRRbjNbrrFc1o8vQdcrd7AaUpzg5jcDZMgqXu4D9/wYDfrKKPDbtEk8rkmIcGq3FHMjmqinLRQdFnAXPlbPT2c0A1mtSHynsBEdFvBPjgc4RrdDdGIRAuhLgRxoGO9ZHk2pXCDGGuBQ4YrQ=
+	t=1724847170; cv=none; b=NDFhIq4A0XtBhx5vx5rMG75goySUm+4K0hz5/N2Y/uX9qqEhOm1cSQ3xObcfokIRBHxoyxXKoOLlmdGAbSbxauUCNwbKc2TdzXIaMAcRX9+uKSRTq8qcSTblTYFm35PuSfgAlhV1PaCGEQOfQ/hdRNp7YCCWRbUo+HQGCGKEpUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724847105; c=relaxed/simple;
-	bh=brvSlVRQUtSQzpnupfzaGuH7iENC8NYAFLZWH5pm/RY=;
+	s=arc-20240116; t=1724847170; c=relaxed/simple;
+	bh=3tK3XP9eaoRWp2CsV0xK++e4PqhPlJcXiz3LEX4J3/g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=GZrHJSzrmZCSp+/sL9uOpE6BC4Tsa687SIS4uafcJhuNTIm0qZfAp2mIbNgckFCp1CrGuOE8NQcxRtTztD9Yk07bYMk7DuKKssesW+Fntu0axLfaeX9xwVKpvMdEZ58tFIHoxqTEw5utFmLmnK6IZt5nWjePS+EQBUZ306c38TI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	 In-Reply-To:Content-Type; b=qVohTxfyhaxYshOOsFvtw8lR1N4opDRk2ibAuDPTDeycqZnVN8Zp8usbU+2DaTQptM4lkib6Uzp+eDyf85FfrKF158XLaIajHkQ8df64vAbom92QIcRjrqtSVy89U/Wvxie3v/s3DxafBTCxKHoYxC1yRuK53ftjI7QRvQWPlyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Wv3DJ4T87z2DbZ4;
-	Wed, 28 Aug 2024 20:11:28 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Wv3FY2kH9z1S9H3;
+	Wed, 28 Aug 2024 20:12:33 +0800 (CST)
 Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0A5D31402CD;
-	Wed, 28 Aug 2024 20:11:40 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 5DC201A016C;
+	Wed, 28 Aug 2024 20:12:45 +0800 (CST)
 Received: from [10.67.120.129] (10.67.120.129) by
  dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 28 Aug 2024 20:11:39 +0800
-Message-ID: <1c342d98-11d5-444c-825a-6af716d1dce8@huawei.com>
-Date: Wed, 28 Aug 2024 20:11:39 +0800
+ 15.2.1544.11; Wed, 28 Aug 2024 20:12:44 +0800
+Message-ID: <08bd1189-2dac-4a28-a267-81a696b0f7cb@huawei.com>
+Date: Wed, 28 Aug 2024 20:12:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,115 +48,216 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v15 06/13] mm: page_frag: reuse existing space
- for 'size' and 'pfmemalloc'
+Subject: Re: [PATCH net-next v15 07/13] mm: page_frag: some minor refactoring
+ before adding new API
 To: Alexander Duyck <alexander.duyck@gmail.com>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
 	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
 References: <20240826124021.2635705-1-linyunsheng@huawei.com>
- <20240826124021.2635705-7-linyunsheng@huawei.com>
- <CAKgT0Uc7tRi6uGTpx2n9_JAK+sbPg7QcOOOSLK+a41cFMcqCWg@mail.gmail.com>
- <82be328d-8f04-417f-bdf2-e8c0f6f58057@huawei.com>
- <CAKgT0UcEuYanVEaRViuJ5v8F7EXKJLr4_yP=ZkiMdamznt0FoQ@mail.gmail.com>
+ <20240826124021.2635705-8-linyunsheng@huawei.com>
+ <CAKgT0UcD7BqqQiEzuZUh9CEy4=pPHqWHwD5NGNtckk3HFx2DNw@mail.gmail.com>
 Content-Language: en-US
 From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0UcEuYanVEaRViuJ5v8F7EXKJLr4_yP=ZkiMdamznt0FoQ@mail.gmail.com>
+In-Reply-To: <CAKgT0UcD7BqqQiEzuZUh9CEy4=pPHqWHwD5NGNtckk3HFx2DNw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2024/8/28 2:16, Alexander Duyck wrote:
-> On Tue, Aug 27, 2024 at 5:06 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+On 2024/8/28 0:00, Alexander Duyck wrote:
+> On Mon, Aug 26, 2024 at 5:46 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
 >>
->> On 2024/8/27 0:46, Alexander Duyck wrote:
->>> On Mon, Aug 26, 2024 at 5:46 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>>>
->>>> Currently there is one 'struct page_frag' for every 'struct
->>>> sock' and 'struct task_struct', we are about to replace the
->>>> 'struct page_frag' with 'struct page_frag_cache' for them.
->>>> Before begin the replacing, we need to ensure the size of
->>>> 'struct page_frag_cache' is not bigger than the size of
->>>> 'struct page_frag', as there may be tens of thousands of
->>>> 'struct sock' and 'struct task_struct' instances in the
->>>> system.
->>>>
->>>> By or'ing the page order & pfmemalloc with lower bits of
->>>> 'va' instead of using 'u16' or 'u32' for page size and 'u8'
->>>> for pfmemalloc, we are able to avoid 3 or 5 bytes space waste.
->>>> And page address & pfmemalloc & order is unchanged for the
->>>> same page in the same 'page_frag_cache' instance, it makes
->>>> sense to fit them together.
->>>>
->>>> After this patch, the size of 'struct page_frag_cache' should be
->>>> the same as the size of 'struct page_frag'.
->>>>
->>>> CC: Alexander Duyck <alexander.duyck@gmail.com>
->>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->>>> ---
->>>>  include/linux/mm_types_task.h   | 19 ++++++-----
->>>>  include/linux/page_frag_cache.h | 60 +++++++++++++++++++++++++++++++--
->>>>  mm/page_frag_cache.c            | 51 +++++++++++++++-------------
->>>>  3 files changed, 97 insertions(+), 33 deletions(-)
->>>>
+>> Refactor common codes from __page_frag_alloc_va_align() to
+>> __page_frag_cache_prepare() and __page_frag_cache_commit(),
+>> so that the new API can make use of them.
+>>
+>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>> ---
+>>  include/linux/page_frag_cache.h | 51 +++++++++++++++++++++++++++++++--
+>>  mm/page_frag_cache.c            | 20 ++++++-------
+>>  2 files changed, 59 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
+>> index 372d6ed7e20a..2cc18a525936 100644
+>> --- a/include/linux/page_frag_cache.h
+>> +++ b/include/linux/page_frag_cache.h
+>> @@ -7,6 +7,7 @@
+>>  #include <linux/build_bug.h>
+>>  #include <linux/log2.h>
+>>  #include <linux/mm.h>
+>> +#include <linux/mmdebug.h>
+>>  #include <linux/mm_types_task.h>
+>>  #include <linux/types.h>
+>>
+>> @@ -75,8 +76,54 @@ static inline unsigned int page_frag_cache_page_size(unsigned long encoded_page)
+>>
+>>  void page_frag_cache_drain(struct page_frag_cache *nc);
+>>  void __page_frag_cache_drain(struct page *page, unsigned int count);
+>> -void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
+>> -                             gfp_t gfp_mask, unsigned int align_mask);
+>> +void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int fragsz,
+>> +                               struct page_frag *pfrag, gfp_t gfp_mask,
+>> +                               unsigned int align_mask);
+>> +
+>> +static inline void __page_frag_cache_commit(struct page_frag_cache *nc,
+>> +                                           struct page_frag *pfrag, bool referenced,
+>> +                                           unsigned int used_sz)
+>> +{
+>> +       if (referenced) {
+>> +               VM_BUG_ON(!nc->pagecnt_bias);
+>> +               nc->pagecnt_bias--;
+>> +       }
+>> +
+>> +       VM_BUG_ON(used_sz > pfrag->size);
+>> +       VM_BUG_ON(pfrag->page != page_frag_encoded_page_ptr(nc->encoded_page));
+>> +
+>> +       /* nc->offset is not reset when reusing an old page, so do not check for the
+>> +        * first fragment.
+>> +        * Committed offset might be bigger than the current offset due to alignment
+>> +        */
+> 
+> nc->offset should be reset when you are allocating a new page. I would
+
+It is reset when a new page is allocated, but not when reusing a old page.
+
+> suggest making that change as you should be able to verify that the
+> fragment you are working with contains the frag you are working with.
+> The page and offset should essentially be equal.
+
+For the part why offset is not equal, currently we do the alignment for
+local variable 'offset' and set it to pfrag->offset instead of nc->offset
+in below __page_frag_cache_prepare().
+
+> 
+>> +       VM_BUG_ON(pfrag->offset && nc->offset > pfrag->offset);
+>> +       VM_BUG_ON(pfrag->offset &&
+>> +                 pfrag->offset + pfrag->size > page_frag_cache_page_size(nc->encoded_page));
+>> +
+>> +       pfrag->size = used_sz;
+>> +
+>> +       /* Calculate true size for the fragment due to alignment, nc->offset is not
+>> +        * reset for the first fragment when reusing an old page.
+>> +        */
+>> +       pfrag->size += pfrag->offset ? (pfrag->offset - nc->offset) : 0;
+> 
+> The pfrag->size should be the truesize already. You should have stored
+> it as fragsz so that all you really need to do is push the offset
+> forward by pfrag->size.
+
+The general idea is below:
+The pfrag->size is set to indicate the max available cache of page_frag_cache
+when caller calls __page_frag_cache_prepare(), after deciding how much cache
+to use, the caller calls __page_frag_cache_commit() with 'used_sz', and
+__page_frag_cache_commit() returns the true size back to the caller by
+considering the offset alignment.
+
+And the above is mainly used to support the prepare API in patch 10.
+
+> 
+>> +
+>> +       nc->offset = pfrag->offset + used_sz;
+>> +}
+>> +
+> 
+> I think this function might be better to keep in the .c file versus
+> having it in the header file.
 > 
 > ...
 > 
->>>>  void page_frag_cache_drain(struct page_frag_cache *nc);
->>>
->>> So how many of these additions are actually needed outside of the
->>> page_frag_cache.c file? I'm just wondering if we could look at moving
+>> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+>> index 228cff9a4cdb..bba59c87d478 100644
+>> --- a/mm/page_frag_cache.c
+>> +++ b/mm/page_frag_cache.c
+>> @@ -67,16 +67,14 @@ void __page_frag_cache_drain(struct page *page, unsigned int count)
+>>  }
+>>  EXPORT_SYMBOL(__page_frag_cache_drain);
 >>
->> At least page_frag_cache_is_pfmemalloc(), page_frag_encoded_page_order(),
->> page_frag_encoded_page_ptr(), page_frag_encoded_page_address() are needed
->> out of the page_frag_cache.c file for now, which are used mostly in
->> __page_frag_cache_commit() and __page_frag_alloc_refill_probe_align() for
->> debugging and performance reason, see patch 7 & 10.
+>> -void *__page_frag_alloc_align(struct page_frag_cache *nc,
+>> -                             unsigned int fragsz, gfp_t gfp_mask,
+>> -                             unsigned int align_mask)
+>> +void *__page_frag_cache_prepare(struct page_frag_cache *nc, unsigned int fragsz,
+>> +                               struct page_frag *pfrag, gfp_t gfp_mask,
+>> +                               unsigned int align_mask)
+>>  {
+>>         unsigned long encoded_page = nc->encoded_page;
+>>         unsigned int size, offset;
 > 
-> As far as the __page_frag_cache_commit I might say that could be moved
-> to page_frag_cache.c, but admittedly I don't know how much that would
-> impact the performance.
+> The 3 changes below can all be dropped. They are unnecessary
+> optimizations of the unlikely path.
+> 
+>>         struct page *page;
+>>
+>> -       size = page_frag_cache_page_size(encoded_page);
+>> -
+>>         if (unlikely(!encoded_page)) {
+>>  refill:
+>>                 page = __page_frag_cache_refill(nc, gfp_mask);
+>> @@ -94,6 +92,9 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
+>>                 /* reset page count bias and offset to start of new frag */
+>>                 nc->pagecnt_bias = PAGE_FRAG_CACHE_MAX_SIZE + 1;
+>>                 nc->offset = 0;
+> 
+> Your code above said that offset wasn't reset. But it looks like it is
+> reset here isn't it?
 
-The performance impact seems large enough that it does not seem to justify
-the moving to page_frag_cache.c,
+This is refilling a new page for page_frag_cache, not reusing a old page for
+page_frag_cache as mentioned above, nc->offset not being reset is in below:
 
-Before the moving:
- Performance counter stats for 'insmod page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=256 nr_test=512000000 test_align=0 test_prepare=0' (20 runs):
-
-         17.749582      task-clock (msec)         #    0.002 CPUs utilized            ( +-  0.15% )
-                 5      context-switches          #    0.304 K/sec                    ( +-  2.48% )
-                 0      cpu-migrations            #    0.017 K/sec                    ( +- 35.04% )
-                76      page-faults               #    0.004 M/sec                    ( +-  0.45% )
-          46103462      cycles                    #    2.597 GHz                      ( +-  0.14% )
-          60692196      instructions              #    1.32  insn per cycle           ( +-  0.12% )
-          14734050      branches                  #  830.107 M/sec                    ( +-  0.12% )
-             19792      branch-misses             #    0.13% of all branches          ( +-  0.75% )
-
-       9.837758611 seconds time elapsed                                          ( +-  0.38% )
-
-
-After the moving:
-
- Performance counter stats for 'insmod page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=256 nr_test=512000000 test_align=0 test_prepare=0' (20 runs):
-
-         19.682296      task-clock (msec)         #    0.002 CPUs utilized            ( +-  4.08% )
-                 6      context-switches          #    0.305 K/sec                    ( +-  3.42% )
-                 0      cpu-migrations            #    0.000 K/sec
-                76      page-faults               #    0.004 M/sec                    ( +-  0.44% )
-          51128091      cycles                    #    2.598 GHz                      ( +-  4.08% )
-          58833583      instructions              #    1.15  insn per cycle           ( +-  4.50% )
-          14260855      branches                  #  724.552 M/sec                    ( +-  4.63% )
-             20120      branch-misses             #    0.14% of all branches          ( +-  0.92% )
-
-      12.318770150 seconds time elapsed                                          ( +-  0.15% )
+https://elixir.free-electrons.com/linux/v6.11-rc5/source/mm/page_alloc.c#L4902
 
 > 
->> The only left one is page_frag_encode_page(), I am not sure if it makes
->> much sense to move it to page_frag_cache.c while the rest of them are in
->> .h file.
+>> +       } else {
+>> +               size = page_frag_cache_page_size(encoded_page);
+>> +               page = page_frag_encoded_page_ptr(encoded_page);
+>>         }
+>>
+>>         offset = __ALIGN_KERNEL_MASK(nc->offset, ~align_mask);
+>> @@ -111,8 +112,6 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
+>>                         return NULL;
+>>                 }
+>>
+>> -               page = page_frag_encoded_page_ptr(encoded_page);
+>> -
+>>                 if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
+>>                         goto refill;
+>>
 > 
-> I would move it. There is no point in exposing internals more than
-> necessary. Also since you are carrying a BUILD_BUG_ON it would make
-> sense to keep that internal to your implementation.
+> These 3 changes to move the size and page are unnecessary
+> optimization. I would recommend just dropping them and leave the code
+> as is as you are just optimizing for unlikely paths.
+
+It is not an optimization, the page need to be set to pfrag->page in this
+patch, and page_frag_encoded_page_ptr() is only called when refill a new
+page and reusing a old page before this patch, the above changes enable the
+calling of page_frag_encoded_page_ptr() for all cases in this patch.
+
+> 
+>> @@ -130,12 +129,13 @@ void *__page_frag_alloc_align(struct page_frag_cache *nc,
+>>                 offset = 0;
+>>         }
+>>
+>> -       nc->pagecnt_bias--;
+>> -       nc->offset = offset + fragsz;
+>> +       pfrag->page = page;
+>> +       pfrag->offset = offset;
+>> +       pfrag->size = size - offset;
+> 
+> Why are you subtracting the offset from the size? Shouldn't this just be fragsz?
+
+As above, it is about supporting the prepare API in patch 10.
+
+> 
+>>
+>>         return page_frag_encoded_page_address(encoded_page) + offset;
+>>  }
+>> -EXPORT_SYMBOL(__page_frag_alloc_align);
+>> +EXPORT_SYMBOL(__page_frag_cache_prepare);
+>>
+>>  /*
+>>   * Frees a page fragment allocated out of either a compound or order 0 page.
+>> --
+>> 2.33.0
+>>
 
