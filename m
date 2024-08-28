@@ -1,175 +1,105 @@
-Return-Path: <netdev+bounces-122971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5A8E96350B
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 00:52:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC04D963510
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 00:54:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 641A4286E4A
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:52:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 249A1B253CB
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:54:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 943BB1AE03A;
-	Wed, 28 Aug 2024 22:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A381B1A7AD8;
+	Wed, 28 Aug 2024 22:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JB7zObz/"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FCC515A858;
-	Wed, 28 Aug 2024 22:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ABCD139578
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 22:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724885540; cv=none; b=lPa9L1GHGoFDHiPPqmEOKQumP1ZbrGkgD/AbXrTWnscqQH76GgMvQ7R0G5OTFJyemGAmBt/PkK+QSVWrxWDMVLVz05+MAKpwOxq0SAvARazXu8/TLUpPofn+XDMSf6GUSYDzRDJCQYZ7a0EvB94+VIKYXvlAfv/c1rXVRPhNemI=
+	t=1724885691; cv=none; b=UWXgDMek97yZMAYzbiN3Ngcw7yHP9FTsx4pSI179yS3ItzzXJN90KC3yS+z+nGF24g75ssxuzNtx+kdPtSVLazgNQXtaShT7Wey6rF/A9CDN6AK1nlDS5WDgPs1GZGg58f3NQtuOpVJ6my78VqWB9I+HQa+jkxSwjPK6mJ8WRXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724885540; c=relaxed/simple;
-	bh=4l/+74vOGyqtNgvEECRUDnLwQprClbg6AXJ6IFo5N7A=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bpyelMEGxdyCi2UbTdBgrGn9TDgvW3OW3iLkLVkNwfVi4v7dq7SNi0AL23hVB8TGt1lPvY6Wr0Y0+/GPWTqCCtbN6T2ZI0Ygdrf/G3lmJTDwMlffyON3ec80M2Ag/MDRj+ufIgX2i29YrCAhXZ536+j2I9xTVPFgnDd8PV/QThw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sjRWO-000000000NG-3ZNT;
-	Wed, 28 Aug 2024 22:52:12 +0000
-Date: Wed, 28 Aug 2024 23:52:09 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Robert Marko <robimarko@gmail.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Russell King <rmk+kernel@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 2/2] net: phy: aquantia: allow forcing order of
- MDI pairs
-Message-ID: <e56a9065f50cd90d33da7fe50bf01989adc65d26.1724885333.git.daniel@makrotopia.org>
-References: <1cdfd174d3ac541f3968dfe9bd14d5b6b28e4ac6.1724885333.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1724885691; c=relaxed/simple;
+	bh=uZCwDHlKEHjneT2J2ZmXUtuUfwcD+RCsUm2Xjs+9vMg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sDX7LQeWEe18Dp5VHp8NY2zwCF0waJP2e3oIAXqW+En+ThJ0HL+S1tlO9MWAEZn5x++rdSTfvC1zARVL57SHrvfBGQcNWkxj4h7rc2PFqa4a9clKg6MZYAMnY5HFI7uZvxqoGI2+T1PCAmIu6b0/MEYvJvQtzg8sRQ+BStpGrz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JB7zObz/; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724885690; x=1756421690;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=uZCwDHlKEHjneT2J2ZmXUtuUfwcD+RCsUm2Xjs+9vMg=;
+  b=JB7zObz/PCEPLza+xiFW1tCEWzfLFxL1v1oJ8gRa+NxrQsZ+eE9pYH+j
+   Zl5zz9JuzV2BeU5wpcKAWOZmXvVx9ba+vbBFNlkTX/QlSfEjb6/qnpilP
+   QFl9tpXajpa+Ghzx65ZvrLnKSTeOlbNQfQm74wdx85J1ai9OcRbBQOvJE
+   5s1NDpd2T+xatM3oHa9gOhBohUEiuQzNJvwWcYUoGy3y7LRtjR3Sk04Ai
+   EFqCKshe5NSYPejlI9EXYrvXJNkSYlD6YCHeFUtMAMZ17dO8DRoDhQD6+
+   t/KZ2xyXVPxDQMDJoeQ59JqoH0CwXAfKjMl1yO+ccsYPv6NKEY4acodGd
+   Q==;
+X-CSE-ConnectionGUID: UD96KdqdT7qoldcTb0Jq6g==
+X-CSE-MsgGUID: y0yaguJHRg+mJA5pXqSRpg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="23408503"
+X-IronPort-AV: E=Sophos;i="6.10,184,1719903600"; 
+   d="scan'208";a="23408503"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 15:54:49 -0700
+X-CSE-ConnectionGUID: zgLAHNV2SxmHKx17LmSIlQ==
+X-CSE-MsgGUID: i/DjgDDPTb6WFVJN/X1MDQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,184,1719903600"; 
+   d="scan'208";a="63022897"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa006.fm.intel.com with ESMTP; 28 Aug 2024 15:54:47 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/2][pull request] Intel Wired LAN Driver Updates 2024-08-28 (igb, ice)
+Date: Wed, 28 Aug 2024 15:54:40 -0700
+Message-ID: <20240828225444.645154-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1cdfd174d3ac541f3968dfe9bd14d5b6b28e4ac6.1724885333.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
 
-Despite supporting Auto MDI-X, it looks like Aquantia only supports
-swapping pair (1,2) with pair (3,6) like it used to be for MDI-X on
-100MBit/s networks.
+This series contains updates to igb and ice drivers.
 
-When all 4 pairs are in use (for 1000MBit/s or faster) the link does not
-come up with pair order is not configured correctly, either using
-MDI_CFG pin or using the "PMA Receive Reserved Vendor Provisioning 1"
-register.
+Daiwei Li restores writing the TSICR (TimeSync Interrupt Cause)
+register on 82850 devices to workaround a hardware issue for igb.
 
-Normally, the order of MDI pairs being either ABCD or DCBA is configured
-by pulling the MDI_CFG pin.
+Dawid detaches netdev device for reset to avoid ethtool accesses during
+reset causing NULL pointer dereferences on ice.
 
-However, some hardware designs require overriding the value configured
-by that bootstrap pin. The PHY allows doing that by setting a bit in
-"PMA Receive Reserved Vendor Provisioning 1" register which allows
-ignoring the state of the MDI_CFG pin and another bit configuring
-whether the order of MDI pairs should be normal (ABCD) or reverse
-(DCBA). Pair polarity is not affected and remains identical in both
-settings.
+The following are changes since commit 3a0504d54b3b57f0d7bf3d9184a00c9f8887f6d7:
+  sctp: fix association labeling in the duplicate COOKIE-ECHO case
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 1GbE
 
-Introduce two mutually exclusive boolean properties which allow forcing
-either normal or reverse order of the MDI pairs from DT.
+Daiwei Li (1):
+  igb: Fix not clearing TimeSync interrupts for 82580
 
-If none of the two new properties is present, the behavior is unchanged
-and MDI pair order configuration is untouched (ie. either the result of
-MDI_CFG pin pull-up/pull-down, or pair order override already configured
-by the bootloader before Linux is started).
+Dawid Osuchowski (1):
+  ice: Add netif_device_attach/detach into PF reset flow
 
-Forcing normal pair order is required on the Adtran SDG-8733A Wi-Fi 7
-residential gateway.
+ drivers/net/ethernet/intel/ice/ice_main.c |  7 +++++++
+ drivers/net/ethernet/intel/igb/igb_main.c | 10 ++++++++++
+ 2 files changed, 17 insertions(+)
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-v2: add missing 'static' keyword, improve commit description
-
- drivers/net/phy/aquantia/aquantia_main.c | 35 ++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
-
-diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-index e982e9ce44a59..32fdd203fcf05 100644
---- a/drivers/net/phy/aquantia/aquantia_main.c
-+++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -11,6 +11,7 @@
- #include <linux/module.h>
- #include <linux/delay.h>
- #include <linux/bitfield.h>
-+#include <linux/of.h>
- #include <linux/phy.h>
- 
- #include "aquantia.h"
-@@ -71,6 +72,11 @@
- #define MDIO_AN_TX_VEND_INT_MASK2		0xd401
- #define MDIO_AN_TX_VEND_INT_MASK2_LINK		BIT(0)
- 
-+#define PMAPMD_RSVD_VEND_PROV			0xe400
-+#define PMAPMD_RSVD_VEND_PROV_MDI_CONF		GENMASK(1, 0)
-+#define PMAPMD_RSVD_VEND_PROV_MDI_REVERSE	BIT(0)
-+#define PMAPMD_RSVD_VEND_PROV_MDI_FORCE		BIT(1)
-+
- #define MDIO_AN_RX_LP_STAT1			0xe820
- #define MDIO_AN_RX_LP_STAT1_1000BASET_FULL	BIT(15)
- #define MDIO_AN_RX_LP_STAT1_1000BASET_HALF	BIT(14)
-@@ -474,6 +480,31 @@ static void aqr107_chip_info(struct phy_device *phydev)
- 		   fw_major, fw_minor, build_id, prov_id);
- }
- 
-+static int aqr107_config_mdi(struct phy_device *phydev)
-+{
-+	struct device_node *np = phydev->mdio.dev.of_node;
-+	bool force_normal, force_reverse;
-+
-+	force_normal = of_property_read_bool(np, "marvell,force-mdi-order-normal");
-+	force_reverse = of_property_read_bool(np, "marvell,force-mdi-order-reverse");
-+
-+	if (force_normal && force_reverse)
-+		return -EINVAL;
-+
-+	if (force_normal)
-+		return phy_modify_mmd(phydev, MDIO_MMD_PMAPMD, PMAPMD_RSVD_VEND_PROV,
-+				      PMAPMD_RSVD_VEND_PROV_MDI_CONF,
-+				      PMAPMD_RSVD_VEND_PROV_MDI_FORCE);
-+
-+	if (force_reverse)
-+		return phy_modify_mmd(phydev, MDIO_MMD_PMAPMD, PMAPMD_RSVD_VEND_PROV,
-+				      PMAPMD_RSVD_VEND_PROV_MDI_CONF,
-+				      PMAPMD_RSVD_VEND_PROV_MDI_REVERSE |
-+				      PMAPMD_RSVD_VEND_PROV_MDI_FORCE);
-+
-+	return 0;
-+}
-+
- static int aqr107_config_init(struct phy_device *phydev)
- {
- 	struct aqr107_priv *priv = phydev->priv;
-@@ -503,6 +534,10 @@ static int aqr107_config_init(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
-+	ret = aqr107_config_mdi(phydev);
-+	if (ret)
-+		return ret;
-+
- 	/* Restore LED polarity state after reset */
- 	for_each_set_bit(led_active_low, &priv->leds_active_low, AQR_MAX_LEDS) {
- 		ret = aqr_phy_led_active_low_set(phydev, index, led_active_low);
 -- 
-2.46.0
+2.42.0
+
 
