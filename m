@@ -1,51 +1,80 @@
-Return-Path: <netdev+bounces-122730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60D4696253E
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:49:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 531E096254C
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9850BB2356C
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:49:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 860B31C21253
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D97E16C6B6;
-	Wed, 28 Aug 2024 10:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B553F16B3BA;
+	Wed, 28 Aug 2024 10:55:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="oRf35QXl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DH/9R99k"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-zteg10011501.me.com (pv50p00im-zteg10011501.me.com [17.58.6.42])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6CE16C68C
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 10:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8DA166F20
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 10:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724842146; cv=none; b=RD/Fw6NtcrFDAx3ysDy0k0jn5cw42M6CvuvggMuV7LpmqrR85pdd0OLKH5eBl1YoFwNiv8JqytUdCA/ufgu82OOn54ZFfGx3jUHht9EZwJqbMs99s3Pj12fXMiBNLjVeZiCAq4y7V9GRW/j8MRN9pJ5bGoZPLYvoFOKFzsCEZQo=
+	t=1724842538; cv=none; b=uPmZS5ApUmbPCHNo45uIWLip4XDXUwNe0cShMILIuSLJDVzqUkUA1jX6tfODLw8aXYHXcBhfDlY1BimV+WDe74DAOucxBVe1E4mbUIvcDzCziPWCKDOsLPaLS6VnGR0E8lKntmCIe4pJVXtwDxVfvekLyWW9HofavJJCYuO8sgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724842146; c=relaxed/simple;
-	bh=mvIj7j1Gi5H+RISXOAHqN+8KX54lI5r2QeLk9sPA5kU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=uOGfJ/Hc/pd8/Sw67BKx+YnKenF2EbUoaeifg01u65aubIRPfSxcnYUdVOWAH4PBWB6PLM4L9rtNRgoD+/2vq6qwdyB0yyBHxCseyepa5jmLi1adrsDB/XFhUI9ArDsi1fTA1GBzfeiKlhCLpE8DLYSOpcqG+LfNuWWNfrn2qfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=oRf35QXl; arc=none smtp.client-ip=17.58.6.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1724842144;
-	bh=wahpuMvFPO+NbQtmXheKTK2Adr9fvj/gLQT3gVp6Jfo=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
-	b=oRf35QXlR8SF+LXsjxDpJmxAhorRHdG0mG+0Y3M9DaZzsg0j4H7MyzZ0V2RF31nCm
-	 i7OmoDxjfcp7nKiIWYZnlvprn9J5HLbdmbd5OTi1KYzNHHOuqjSPoT8IQbS8ezTxus
-	 LlZWA/djb916kStb/Am/hnswG3o9r4qfssRtWk/riEm8yUzOxaF4mM4WolIC3Y9iOl
-	 oy3yGdET0LrdyZs4y2Eh8XJZPEstXpjpwpIWKkr7cZpbU3PasctVZctBr98XibnNRy
-	 YXojWVdVHbpZxhGIkhmsf10CR2qe0rmiq1kq/W93C86XR4lDlXYWkkBfeSraaTS2ME
-	 j0FzolEwiaQzg==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-zteg10011501.me.com (Postfix) with ESMTPSA id E8F694A04AA;
-	Wed, 28 Aug 2024 10:48:34 +0000 (UTC)
-Message-ID: <30fd2355-0db0-4d9c-bcfe-88b06b8aaeae@icloud.com>
-Date: Wed, 28 Aug 2024 18:48:28 +0800
+	s=arc-20240116; t=1724842538; c=relaxed/simple;
+	bh=5kX3CalZ6MG8bS2dwPy1eLkMgEzUwIPSYc5v+VMDmXw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S5XKSV3nrrHtWJLMv3hTGeFXguWIryCNdrfEJozSKIMF/EWLB2GtYb0WfhojuUl4CGWsxOJ2mcZ/9aw8K5u4BB5S0a4fHKiKCqRMbwDtf/SynB4nbozRKDa7vGB9BKK3yVAPSd4moIhMlyrZ0kSlsd8BO6SHGFZDDjh18kfFvjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DH/9R99k; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724842536;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D1PPnod1b8VOMywxjRGmIDavvbk1SqdC9+jSBOChNt4=;
+	b=DH/9R99khCO3LuyDlXQfBaQLdtKSBUOFpokvcayUfc/smdnDi5rhHqMdhclC7l/n0aaRS4
+	RzOiWXwG4U/VjWQ18OP8emkwkQaoPKGxtPo12eXc+rBPI89C1EsIXvCXI313/eLrb0+DtK
+	QVuv5gcadm31ZpimfqwncWTfbJwKOx0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-460-o9V2EA7PPqWilN-UswumiQ-1; Wed, 28 Aug 2024 06:55:35 -0400
+X-MC-Unique: o9V2EA7PPqWilN-UswumiQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-429e937ed39so61312555e9.1
+        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 03:55:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724842534; x=1725447334;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D1PPnod1b8VOMywxjRGmIDavvbk1SqdC9+jSBOChNt4=;
+        b=ljPjfJmrNBE2b9LxxKQLk3cU6WMNv3pr9GJnayK4XVd31KmV+9Az6Y6bQSmySUSvAq
+         uNyIhFt4zlquPZsfswMD0bcJmQ54CfSxAp8Ga9LgCZ4OpwwUzzS0bXEh+rk3Og36SvdN
+         qOnIKUAUXjfbMza3OE8J5ptjObmLSm+PelvvK1JJVkfX4jaEUSQCzPbEfVZMpxT7DcRz
+         r8NAPbgdZxQsg3SloJKIrWdinNSkJbU8mIhodEGl3THPhyvUh9MrJSq1R6RsXPhbKu8b
+         DqjLLE/PXJ3JDaQPPOYMST9IAq2wi3Z7zAvn6eZYlQ784qRhuiOXqJTveuuFQxMNEWqd
+         YE3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWLw3hgYl50ZyT9ikPBWHpRSSvKApprdeQlcJX96V6c9hO4nyCgPJ0XskeIhL/TMen3F08PvQw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4Inu2D9b4USdvGw4S++8AqhGPFO8CrUOKhocKy3MKRHpX9hUt
+	B484kDXC56L2G6Sy9rfMP3Ct7Je0YG1+3PFmTpfj5mRu1ZEK+emPNeq7oJe+eUteFMWr0CDiDoi
+	Jhw2pnSAvKCLcWmSS1arMN+d9L9ml2kOPt5l81OZOJFCbf80dO3AWSQ==
+X-Received: by 2002:a05:600c:5110:b0:426:68f2:4d7b with SMTP id 5b1f17b1804b1-42ba6692a82mr11623445e9.3.1724842533831;
+        Wed, 28 Aug 2024 03:55:33 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFS9PFPaRaR5tOQKG5PHb9QCxnFp3z9go/hA7XB1mHmRHSGpdVeWQQpxxA39JCiAuI/ijPjiw==
+X-Received: by 2002:a05:600c:5110:b0:426:68f2:4d7b with SMTP id 5b1f17b1804b1-42ba6692a82mr11623245e9.3.1724842533220;
+        Wed, 28 Aug 2024 03:55:33 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b50:3f10:2f04:34dd:5974:1d13? ([2a0d:3344:1b50:3f10:2f04:34dd:5974:1d13])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba6396700sm18475915e9.10.2024.08.28.03.55.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Aug 2024 03:55:32 -0700 (PDT)
+Message-ID: <061cba21-ad88-4a1e-ab37-14d42ea1adc3@redhat.com>
+Date: Wed, 28 Aug 2024 12:55:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,250 +82,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/3] cxl/region: Find free cxl decoder by
- device_for_each_child()
-From: Zijun Hu <zijun_hu@icloud.com>
-To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
- Ira Weiny <ira.weiny@intel.com>, Dave Jiang <dave.jiang@intel.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Davidlohr Bueso
- <dave@stgolabs.net>, Dave Jiang <dave.jiang@intel.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Ira Weiny <ira.weiny@intel.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Takashi Sakamoto <o-takashi@sakamocchi.jp>, Timur Tabi <timur@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20240824-const_dfc_prepare-v3-0-32127ea32bba@quicinc.com>
- <20240824-const_dfc_prepare-v3-2-32127ea32bba@quicinc.com>
- <20240827123006.00004527@Huawei.com>
- <cdfc6f98-1aa0-4cb5-bd7d-93256552c39b@icloud.com>
+Subject: Re: [PATCH v3 03/12] net-shapers: implement NL get operation
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+ Madhu Chittim <madhu.chittim@intel.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>
+References: <Zsh3ecwUICabLyHV@nanopsycho.orion>
+ <c7e0547b-a1e4-4e47-b7ec-010aa92fbc3a@redhat.com>
+ <ZsiQSfTNr5G0MA58@nanopsycho.orion>
+ <a15acdf5-a551-4fb2-9118-770c37b47be6@redhat.com>
+ <ZsxLa0Ut7bWc0OmQ@nanopsycho.orion>
+ <432f8531-cf4a-480c-84f7-61954c480e46@redhat.com>
+ <20240827075406.34050de2@kernel.org>
+ <CAF6piCL1CyLLVSG_jM2_EWH2ESGbNX4hHv35PjQvQh5cB19BnA@mail.gmail.com>
+ <20240827140351.4e0c5445@kernel.org>
+ <CAF6piC+O==5JgenRHSAGGAN0BQ-PsQyRtsObyk2xcfvhi9qEGA@mail.gmail.com>
+ <Zs7GTlTWDPYWts64@nanopsycho.orion>
 Content-Language: en-US
-In-Reply-To: <cdfc6f98-1aa0-4cb5-bd7d-93256552c39b@icloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: tb6HQHC4dIaI-_RmN3abHdv4p45pBAam
-X-Proofpoint-ORIG-GUID: tb6HQHC4dIaI-_RmN3abHdv4p45pBAam
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-28_03,2024-08-27_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999 mlxscore=0
- adultscore=0 suspectscore=0 clxscore=1015 bulkscore=0 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2408280078
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <Zs7GTlTWDPYWts64@nanopsycho.orion>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2024/8/27 19:53, Zijun Hu wrote:
-> On 2024/8/27 19:30, Jonathan Cameron wrote:
->> On Sat, 24 Aug 2024 17:07:44 +0800
->> Zijun Hu <zijun_hu@icloud.com> wrote:
->>
->>> From: Zijun Hu <quic_zijuhu@quicinc.com>
->>>
->>> To prepare for constifying the following old driver core API:
->>>
->>> struct device *device_find_child(struct device *dev, void *data,
->>> 		int (*match)(struct device *dev, void *data));
->>> to new:
->>> struct device *device_find_child(struct device *dev, const void *data,
->>> 		int (*match)(struct device *dev, const void *data));
->>>
->>> The new API does not allow its match function (*match)() to modify
->>> caller's match data @*data, but match_free_decoder() as the old API's
->>> match function indeed modifies relevant match data, so it is not suitable
->>> for the new API any more, solved by using device_for_each_child() to
->>> implement relevant finding free cxl decoder function.
->>>
->>> Suggested-by: Ira Weiny <ira.weiny@intel.com>
->>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->> This seems to functionally do the same as before.
->>
-> 
-> yes, this change have the same logic as previous existing logic.
-> 
->> I'm not sure I like the original code though so a comment inline.
->>
->>> ---
->>>  drivers/cxl/core/region.c | 30 ++++++++++++++++++++++++------
->>>  1 file changed, 24 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
->>> index 21ad5f242875..c2068e90bf2f 100644
->>> --- a/drivers/cxl/core/region.c
->>> +++ b/drivers/cxl/core/region.c
->>> @@ -794,10 +794,15 @@ static size_t show_targetN(struct cxl_region *cxlr, char *buf, int pos)
->>>  	return rc;
->>>  }
->>>  
->>> +struct cxld_match_data {
->>> +	int id;
->>> +	struct device *target_device;
->>> +};
->>> +
->>>  static int match_free_decoder(struct device *dev, void *data)
->>>  {
->>> +	struct cxld_match_data *match_data = data;
->>>  	struct cxl_decoder *cxld;
->>> -	int *id = data;
->>>  
->>>  	if (!is_switch_decoder(dev))
->>>  		return 0;
->>> @@ -805,17 +810,31 @@ static int match_free_decoder(struct device *dev, void *data)
->>>  	cxld = to_cxl_decoder(dev);
->>>  
->>>  	/* enforce ordered allocation */
->>> -	if (cxld->id != *id)
->>> +	if (cxld->id != match_data->id)
->>
->> Why do we carry on in this case?
->> Conditions are:
->> 1. Start match_data->id == 0
->> 2. First pass cxld->id == 0 (all good) or
->>    cxld->id == 1 say (and we skip until we match
->>    on cxld->id == 0 (perhaps on the second child if they are
->>    ordered (1, 0, 2) etc. 
->>
->> If we skipped and then matched on second child but it was
->> already in use (so region set), we will increment match_data->id to 1
->> but never find that as it was the one we skipped.
->>
->> So this can only work if the children are ordered.
->> So if that's the case and the line above is just a sanity check
->> on that, it should be noisier (so an error print) and might
->> as well fail as if it doesn't match all bets are off.
->>
-> 
-> it seems Ira Weiny also has some concerns related to previous existing
-> logic as following:
-> 
-> https://lore.kernel.org/all/66c4a136d9764_2ddc2429435@iweiny-mobl.notmuch/
-> "Also for those working on CXL I'm questioning the use of ID here and
-> the dependence on the id's being added to the parent in order.  Is that
-> a guarantee?"
-> 
-Hi Jonathan, ira
+On 8/28/24 08:40, Jiri Pirko wrote:
+> Makes sense?
 
-i don't know CXL decoder at all. For your concerns about original logic:
+Almost! Tacking aside the (very significant) differences between your 
+proposition and Jakub’s, we can't use devlink port here, just devlink, 
+or we will have to drop the cache too[1]. Specific devlink port shapers 
+will be reached via different handles (scope/id).
 
-is it okay to find a child with the minimal index as shown below ?
+Additionally, I think we don't need strictly the ‘binding’ nested 
+attribute to extend the NL API with different binding objects (devlink), 
+we could append the new attributes needed to support (identify) devlink 
+at the end of the net shaper attributes list. I agree that would be 
+likely less ‘nice’.
 
-i would like to submit it as a separate patch if you like it.
+What about:
+- Refactor the core and the driver api to support the ‘binding’ thing
+- Update the NL definition to nest the ‘ifindex’ attribute under the 
+‘binding’ one. No mention/reference to devlink yet, so most of the 
+documentation will be unchanged.
+- devlink support will not be included, but there should be enough 
+ground paved for it.
 
+?
 
-diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-index 21ad5f242875..d10cca02eba8 100644
---- a/drivers/cxl/core/region.c
-+++ b/drivers/cxl/core/region.c
-@@ -797,21 +797,27 @@ static size_t show_targetN(struct cxl_region
-*cxlr, char *buf, int pos)
- static int match_free_decoder(struct device *dev, void *data)
- {
-        struct cxl_decoder *cxld;
--       int *id = data;
-+       struct cxl_decoder *target_cxld;
-+       struct device **target_device = data;
+Thanks,
 
-        if (!is_switch_decoder(dev))
-                return 0;
+Paolo
 
-        cxld = to_cxl_decoder(dev);
-
--       /* enforce ordered allocation */
--       if (cxld->id != *id)
-+       if (cxld->region)
-                return 0;
-
--       if (!cxld->region)
--               return 1;
-+       if (!*target_device) {
-+               *target_device = get_device(dev);
-+               return 0;
-+       }
-
--       (*id)++;
-+       target_cxld = to_cxl_decoder(*target_device);
-+       if (cxld->id < target_cxld->id) {
-+               put_device(*target_device);
-+               *target_device = get_device(dev);
-+       }
-
-        return 0;
- }
-@@ -839,8 +845,7 @@ cxl_region_find_decoder(struct cxl_port *port,
-                        struct cxl_endpoint_decoder *cxled,
-                        struct cxl_region *cxlr)
- {
--       struct device *dev;
--       int id = 0;
-+       struct device *dev = NULL;
-
-        if (port == cxled_to_port(cxled))
-                return &cxled->cxld;
-@@ -849,7 +854,7 @@ cxl_region_find_decoder(struct cxl_port *port,
-                dev = device_find_child(&port->dev, &cxlr->params,
-                                        match_auto_decoder);
-        else
--               dev = device_find_child(&port->dev, &id,
-match_free_decoder);
-+               device_for_each_child(&port->dev, &dev, match_free_decoder);
-        if (!dev)
-                return NULL;
-        /*
-
-
-> perhaps, create a new dedicated thread to discuss original design.
-> 
->> Jonathan
->>  
->>>  		return 0;
->>>  
->>> -	if (!cxld->region)
->>> +	if (!cxld->region) {
->>> +		match_data->target_device = get_device(dev);
->>>  		return 1;
->>> +	}
->>>  
->>> -	(*id)++;
->>> +	match_data->id++;
->>>  
->>>  	return 0;
->>>  }
->>>  
->>> +/* NOTE: need to drop the reference with put_device() after use. */
->>> +static struct device *find_free_decoder(struct device *parent)
->>> +{
->>> +	struct cxld_match_data match_data = {
->>> +		.id = 0,
->>> +		.target_device = NULL,
->>> +	};
->>> +
->>> +	device_for_each_child(parent, &match_data, match_free_decoder);
->>> +	return match_data.target_device;
->>> +}
->>> +
->>>  static int match_auto_decoder(struct device *dev, void *data)
->>>  {
->>>  	struct cxl_region_params *p = data;
->>> @@ -840,7 +859,6 @@ cxl_region_find_decoder(struct cxl_port *port,
->>>  			struct cxl_region *cxlr)
->>>  {
->>>  	struct device *dev;
->>> -	int id = 0;
->>>  
->>>  	if (port == cxled_to_port(cxled))
->>>  		return &cxled->cxld;
->>> @@ -849,7 +867,7 @@ cxl_region_find_decoder(struct cxl_port *port,
->>>  		dev = device_find_child(&port->dev, &cxlr->params,
->>>  					match_auto_decoder);
->>>  	else
->>> -		dev = device_find_child(&port->dev, &id, match_free_decoder);
->>> +		dev = find_free_decoder(&port->dev);
->>>  	if (!dev)
->>>  		return NULL;
->>>  	/*
->>>
->>
-> 
+[1] the cache container belongs to the ‘entry point’ inside the shaper 
+hierarchy - i.e. currently, the struct net_device. If we add a 
+devlink_port ‘entry point’, the cache there will have to manage even the 
+shaper for devlink ports group. When accessing a group containing 
+multiple ports, we will get multiple inconsistent cache values.	
 
 
