@@ -1,126 +1,104 @@
-Return-Path: <netdev+bounces-122605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CAF6961DC1
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 06:51:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 788F8961E3C
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 07:32:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DBE51F240AE
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 04:51:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 336AE285841
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 05:32:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97867132120;
-	Wed, 28 Aug 2024 04:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781D714265F;
+	Wed, 28 Aug 2024 05:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="LsIOR8RT"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2729D3D96A
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 04:50:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BDA145A11
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 05:32:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724820660; cv=none; b=VJ01hBPtmdFxdAjrb6o1sTnmW2Qaa/rQVGBOrdfP12P8zu2tZfdmO6cTmmh1aO+sqQmeQPYTmuFT+1+hvjP0hv1TssnXniL6FGeyWqbH0CG6xe9/LpgbZY6yZ8NHmeLZpIj1l6EJUDj+K2pKitoNtT3RAmguafrfxobN4lrWO6s=
+	t=1724823174; cv=none; b=fMzZBcP+uZEC+ctaZkPlo4w+glW4QQk2HECXl5ThCOS43Avri70N/N2IzFsmxYBms/nk7UYyEn0SW/nOPASV4GwjuAb292TIVU0f09din1iATFlXbGGedAu2lEXmY6SlCIAMHtfzbHyxeer6Y1iWVt9LjlABBK1XFOsW1S4kuQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724820660; c=relaxed/simple;
-	bh=mC9LMTWSpFcuIJEu28ZZ2VhcDn6OzdsBY8UEHYOb20Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gzegikarwp3iGPaE/85ie0tgNDt2htFJ/N6lPoFVoo2kQ8PvGXcpPMHjg7NKanhfmtzWkONL15W35X3noJi10TxAJUhjHCqHDQVRyCESYFSYsieLPxt6xBXIowZ8ItQFJhFb181qj1tktYI/NT9vk7QUKL0NT8CfvfNLVTc83Ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sjAds-0007LE-UW; Wed, 28 Aug 2024 06:50:48 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sjAdq-003akd-KX; Wed, 28 Aug 2024 06:50:46 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sjAdq-00Ahtu-1f;
-	Wed, 28 Aug 2024 06:50:46 +0200
-Date: Wed, 28 Aug 2024 06:50:46 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>, linux-kernel@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>, kernel@pengutronix.de,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Subject: Re: [PATCH net-next v3 1/3] phy: open_alliance_helpers: Add defines
- for link quality metrics
-Message-ID: <Zs6spnCAPsTmUfrL@pengutronix.de>
-References: <20240822115939.1387015-1-o.rempel@pengutronix.de>
- <20240822115939.1387015-2-o.rempel@pengutronix.de>
- <20240826093217.3e076b5c@kernel.org>
- <4a1a72f5-44ce-4c54-9bc5-7465294a39fe@lunn.ch>
- <20240826125719.35f0337c@kernel.org>
- <Zs1bT7xIkFWLyul3@pengutronix.de>
- <20240827113300.08aada20@kernel.org>
+	s=arc-20240116; t=1724823174; c=relaxed/simple;
+	bh=Nu7NezANGDRbBc8NOcSSXxU8EpanJ9iT0P8tD4+4Uyk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JlFSu0hmO4onhFHblx8Ec+RTvsRp+38V1u2t1Rz2Ku5mxYq333sn0Tgxd9v22wcgTA7hCY1hczXKbG9/VXZMzGa1Mx074estmh1177oy863nMCzDA6EAtkaPD88woF0a4WktD4T5ycvpt+upqWKZ3vPRhQ8DDOw+DopYu6v71cM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=LsIOR8RT; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id ACDE3207D8;
+	Wed, 28 Aug 2024 07:32:48 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 3TJm8gT20p-4; Wed, 28 Aug 2024 07:32:48 +0200 (CEST)
+Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 314CB207D1;
+	Wed, 28 Aug 2024 07:32:48 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 314CB207D1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1724823168;
+	bh=K7hxHqFNbhJZvyiFVLAlJ/z2SwlRa+qHrrpglYRXCHY=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=LsIOR8RTXK4VNi3KhW0EotM38AOlciqLHUJ2GPbxPMAb3W4YQ8NjpHEoeBGVoswvR
+	 buOWfTsWVX14gJldl1xng+O/FALG2NiIf8aa7xzYGEx5wKyB8IlCGcgstkOHQrKMeM
+	 +ymktTMt1kth2fgkpZz+1CTfepe2gGRTbf9bqw/q0Bk2YKm7WtSVu2AT5+4UN3SYGr
+	 tNaeX0Ve79DCgpDcGzt93+ZughOCK71ylEnDxigiknrFqASr/RH32/qWVyzcdvfUy6
+	 lDHV+aiSmQsScMixvXI/uYNUlgZUSLcRyfQdg2YoboIPE+jwnv47Z0mHpwC31xAK++
+	 TKTgU+TPlZCuA==
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 28 Aug 2024 07:32:48 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
+ (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 28 Aug
+ 2024 07:32:47 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 8D0083182EE8; Wed, 28 Aug 2024 07:32:47 +0200 (CEST)
+Date: Wed, 28 Aug 2024 07:32:47 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Feng Wang <wangfe@google.com>
+CC: <netdev@vger.kernel.org>, <antony.antony@secunet.com>
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+Message-ID: <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
+References: <20240822200252.472298-1-wangfe@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240827113300.08aada20@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240822200252.472298-1-wangfe@google.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-01.secunet.de (10.53.40.197)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Tue, Aug 27, 2024 at 11:33:00AM -0700, Jakub Kicinski wrote:
-> On Tue, 27 Aug 2024 06:51:27 +0200 Oleksij Rempel wrote:
-> > I completely agree with you, but I currently don't have additional
-> > budget for this project.
+On Thu, Aug 22, 2024 at 01:02:52PM -0700, Feng Wang wrote:
+> From: wangfe <wangfe@google.com>
 > 
-> Is this a legit reason not to do something relatively simple?
+> In packet offload mode, append Security Association (SA) information
+> to each packet, replicating the crypto offload implementation.
+> The XFRM_XMIT flag is set to enable packet to be returned immediately
+> from the validate_xmit_xfrm function, thus aligning with the existing
+> code path for packet offload mode.
+> 
+> This SA info helps HW offload match packets to their correct security
+> policies. The XFRM interface ID is included, which is crucial in setups
+> with multiple XFRM interfaces where source/destination addresses alone
+> can't pinpoint the right policy.
+> 
+> Signed-off-by: wangfe <wangfe@google.com>
 
-Due to the nature of my work in a consulting company, my time is scheduled
-across multiple customers. For the 10BaseT1 PHY, I had 2 days budgeted left,
-which allowed me to implement some extra diagnostics. This was simple,
-predictable, and within the scope of the original task.
-
-However, now that the budget for this task and customer has been used up, any
-additional work would require a full process:
-- I would need to sell the idea to the customer.
-- The new task would need to be prioritized.
-- It would then be scheduled, which could happen this year, next year, or
-  possibly never.
-
-A similar situation occurred with the EEE implementation. I started with a
-simple fix for Atheros PHY's SmartEEE, but it led to reworking the entire EEE
-infrastructure in the kernel. Once the budget was exhausted, I couldn’t
-continue with SmartEEE for Atheros PHYs. These are the risks inherent to
-consulting work. I still see it as not wasted time, because we have a better
-EEE infrastructure now.
-
-Considering that you've requested a change to the uAPI, the work has now become
-more predictable. I can plan for it within the task and update the required
-time budget accordingly. However, it's worth noting that while this work is
-manageable, the time spent on this particular task could be seen as somewhat
-wasted from a budget perspective, as it wasn't part of the original scope.
-
-> Especially that we're talking about uAPI, once we go down
-> the string path I presume they will stick around forever.
-
-Yes, I agree with it. I just needed this feedback as early as possible.
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Applied to ipsec-next, thanks Feng!
 
