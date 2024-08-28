@@ -1,144 +1,184 @@
-Return-Path: <netdev+bounces-122731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 531E096254C
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:55:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EDF5962582
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:07:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 860B31C21253
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:55:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1DCEB217D3
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 11:07:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B553F16B3BA;
-	Wed, 28 Aug 2024 10:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C445016C686;
+	Wed, 28 Aug 2024 11:07:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DH/9R99k"
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="NSDzLuwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from HK2PR02CU002.outbound.protection.outlook.com (mail-eastasiaazon11010047.outbound.protection.outlook.com [52.101.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8DA166F20
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 10:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724842538; cv=none; b=uPmZS5ApUmbPCHNo45uIWLip4XDXUwNe0cShMILIuSLJDVzqUkUA1jX6tfODLw8aXYHXcBhfDlY1BimV+WDe74DAOucxBVe1E4mbUIvcDzCziPWCKDOsLPaLS6VnGR0E8lKntmCIe4pJVXtwDxVfvekLyWW9HofavJJCYuO8sgI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724842538; c=relaxed/simple;
-	bh=5kX3CalZ6MG8bS2dwPy1eLkMgEzUwIPSYc5v+VMDmXw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S5XKSV3nrrHtWJLMv3hTGeFXguWIryCNdrfEJozSKIMF/EWLB2GtYb0WfhojuUl4CGWsxOJ2mcZ/9aw8K5u4BB5S0a4fHKiKCqRMbwDtf/SynB4nbozRKDa7vGB9BKK3yVAPSd4moIhMlyrZ0kSlsd8BO6SHGFZDDjh18kfFvjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DH/9R99k; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724842536;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D1PPnod1b8VOMywxjRGmIDavvbk1SqdC9+jSBOChNt4=;
-	b=DH/9R99khCO3LuyDlXQfBaQLdtKSBUOFpokvcayUfc/smdnDi5rhHqMdhclC7l/n0aaRS4
-	RzOiWXwG4U/VjWQ18OP8emkwkQaoPKGxtPo12eXc+rBPI89C1EsIXvCXI313/eLrb0+DtK
-	QVuv5gcadm31ZpimfqwncWTfbJwKOx0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-o9V2EA7PPqWilN-UswumiQ-1; Wed, 28 Aug 2024 06:55:35 -0400
-X-MC-Unique: o9V2EA7PPqWilN-UswumiQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-429e937ed39so61312555e9.1
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 03:55:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724842534; x=1725447334;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=D1PPnod1b8VOMywxjRGmIDavvbk1SqdC9+jSBOChNt4=;
-        b=ljPjfJmrNBE2b9LxxKQLk3cU6WMNv3pr9GJnayK4XVd31KmV+9Az6Y6bQSmySUSvAq
-         uNyIhFt4zlquPZsfswMD0bcJmQ54CfSxAp8Ga9LgCZ4OpwwUzzS0bXEh+rk3Og36SvdN
-         qOnIKUAUXjfbMza3OE8J5ptjObmLSm+PelvvK1JJVkfX4jaEUSQCzPbEfVZMpxT7DcRz
-         r8NAPbgdZxQsg3SloJKIrWdinNSkJbU8mIhodEGl3THPhyvUh9MrJSq1R6RsXPhbKu8b
-         DqjLLE/PXJ3JDaQPPOYMST9IAq2wi3Z7zAvn6eZYlQ784qRhuiOXqJTveuuFQxMNEWqd
-         YE3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWLw3hgYl50ZyT9ikPBWHpRSSvKApprdeQlcJX96V6c9hO4nyCgPJ0XskeIhL/TMen3F08PvQw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4Inu2D9b4USdvGw4S++8AqhGPFO8CrUOKhocKy3MKRHpX9hUt
-	B484kDXC56L2G6Sy9rfMP3Ct7Je0YG1+3PFmTpfj5mRu1ZEK+emPNeq7oJe+eUteFMWr0CDiDoi
-	Jhw2pnSAvKCLcWmSS1arMN+d9L9ml2kOPt5l81OZOJFCbf80dO3AWSQ==
-X-Received: by 2002:a05:600c:5110:b0:426:68f2:4d7b with SMTP id 5b1f17b1804b1-42ba6692a82mr11623445e9.3.1724842533831;
-        Wed, 28 Aug 2024 03:55:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFS9PFPaRaR5tOQKG5PHb9QCxnFp3z9go/hA7XB1mHmRHSGpdVeWQQpxxA39JCiAuI/ijPjiw==
-X-Received: by 2002:a05:600c:5110:b0:426:68f2:4d7b with SMTP id 5b1f17b1804b1-42ba6692a82mr11623245e9.3.1724842533220;
-        Wed, 28 Aug 2024 03:55:33 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b50:3f10:2f04:34dd:5974:1d13? ([2a0d:3344:1b50:3f10:2f04:34dd:5974:1d13])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba6396700sm18475915e9.10.2024.08.28.03.55.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 03:55:32 -0700 (PDT)
-Message-ID: <061cba21-ad88-4a1e-ab37-14d42ea1adc3@redhat.com>
-Date: Wed, 28 Aug 2024 12:55:31 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AF416BE29;
+	Wed, 28 Aug 2024 11:07:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.128.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724843234; cv=fail; b=hxUV3FDGTm67qZN5iTNU6rNfoxUe4Y2B91JfN4x1AuPUrjX+Lh8f3vqfYuFK0UGsXepDNiPheZlWuEeIvuIZmnt1vwFopb2I+c1v7QX8UtutcT9RKK2ZXsDEAiqH+T5DUYk4KYcvBEFKMuvogmQUUs6j43SUNxm0B6r3FG+nj1s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724843234; c=relaxed/simple;
+	bh=Gzw8yUu5KhYCCCR7kxL6kMowU6tyVh70ByYXGMvcmfA=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=CHrgMMaXyPCvvhFvY9pvbi1QjPx5/qPM3z6wDkEC4VqxJ5ZZ9LfP9mlEd9q4Yh3zxaXkofMaJMsU8YCZcxJOV3pWpCC3iX+Hlz3R7+htlPJOphdA1TzYhLZKwUFAiNra6MFetPY9/2CS6eENKCkeoSO7/7d8roFh3TP3V1XBhDw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=NSDzLuwW; arc=fail smtp.client-ip=52.101.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NVFLGVegCrwbPkX7T0MlqzZSjadtc2jX5w+DJXW2kFpffHC6ZRi2z18oY8SGVYmBnCSHnO05pqK8uRFxBEZeqMKCiycZTcxyAVpgMCaQQoomJPevaTU9AvsndHr1Sy5+RleBL3olZK8L+r2dyWD/lFJR2FtQY5OlliZqF/eWILZGvScoC7LuTd+N429sULUl7S3hV5CfX//G6TYRpzk/WqJvFRahFb/uSckI3XnLqByD/zJyDSOWqI/7trIThSQH5PRCmqiN6TSwRe9D93NndcbF44cUqB+z8p5lIhKXYG28kTLoCMFTPErVf2ZK8xXXSsQH0MHMNvimelink9Vupg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=n49bgZEkPQ9PBXh10xUtzvtiuIXZCFXL1EYrWBB9zZ0=;
+ b=nUuQ5DLaMTgbIqIp2fUqKNeF8cWI5w+pWBF2J/PVz3QHd0/7LnqOjdxSrbHGul0f3+rdK+X1tzHP0r/9d+7Y0CfmlKlsWKVzo5UMXTKkZm/bqPXZyNcJqmNOuOKAm/P8chncA7EG78Et2fzIV28OL+ZasYyfqEhiTgrgn31dsyHnq1F8v8marumKub5qrqsU0nAN92Klyt8xb/7+4wzK1juiISCJajtU7R2WlWpAe5l0q1FCal7CJDbgQvIcM0900cQ/wGJ6h95A48Hdlz9wfYemmnZTi/GXttt2ZahkvoyHUivGO0fgCoA6detPtVBpfjJ4CUvGUhiijFvzRFB7Iw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=n49bgZEkPQ9PBXh10xUtzvtiuIXZCFXL1EYrWBB9zZ0=;
+ b=NSDzLuwWHgFfchOLvNv99st20F1rxFTyepiciFCYinBFD5mMamQL8liu0XBHevJS2lNea91VVDUj8tla+xOG5npbctbMcpchMc2fNWq8M80xfVHS5Dwlumggvq7ff1Qdob0yhcOTfbeLW2oeufh6nF6CRSmvwfmL7W3D+0JhOOmcygGjotbbSTLyGV2dyakSkhYjBrGyJeJgCHq8jfhDC5kBNOatVD7YOKYlJrCdv8Dgj44r6gIL9hMOSv0dgNrVduGEIxFKv1QB4/VU3eYjBnlM7BLU01Oplcw0Dr7p9SLL2m8FmuzOGeeRzVYrgBZ+aI3SRGRmtUnC5tJKesKBSQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SEZPR06MB5899.apcprd06.prod.outlook.com (2603:1096:101:e3::16)
+ by KL1PR06MB6258.apcprd06.prod.outlook.com (2603:1096:820:d8::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Wed, 28 Aug
+ 2024 11:07:09 +0000
+Received: from SEZPR06MB5899.apcprd06.prod.outlook.com
+ ([fe80::8bfc:f1ee:8923:77ce]) by SEZPR06MB5899.apcprd06.prod.outlook.com
+ ([fe80::8bfc:f1ee:8923:77ce%3]) with mapi id 15.20.7897.027; Wed, 28 Aug 2024
+ 11:07:08 +0000
+From: Shen Lichuan <shenlichuan@vivo.com>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	opensource.kernel@vivo.com,
+	Shen Lichuan <shenlichuan@vivo.com>
+Subject: [PATCH v1] netfilter: conntrack: Convert to use ERR_CAST()
+Date: Wed, 28 Aug 2024 19:06:51 +0800
+Message-Id: <20240828110651.56431-1-shenlichuan@vivo.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR06CA0013.apcprd06.prod.outlook.com
+ (2603:1096:4:186::18) To SEZPR06MB5899.apcprd06.prod.outlook.com
+ (2603:1096:101:e3::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 03/12] net-shapers: implement NL get operation
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>
-References: <Zsh3ecwUICabLyHV@nanopsycho.orion>
- <c7e0547b-a1e4-4e47-b7ec-010aa92fbc3a@redhat.com>
- <ZsiQSfTNr5G0MA58@nanopsycho.orion>
- <a15acdf5-a551-4fb2-9118-770c37b47be6@redhat.com>
- <ZsxLa0Ut7bWc0OmQ@nanopsycho.orion>
- <432f8531-cf4a-480c-84f7-61954c480e46@redhat.com>
- <20240827075406.34050de2@kernel.org>
- <CAF6piCL1CyLLVSG_jM2_EWH2ESGbNX4hHv35PjQvQh5cB19BnA@mail.gmail.com>
- <20240827140351.4e0c5445@kernel.org>
- <CAF6piC+O==5JgenRHSAGGAN0BQ-PsQyRtsObyk2xcfvhi9qEGA@mail.gmail.com>
- <Zs7GTlTWDPYWts64@nanopsycho.orion>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <Zs7GTlTWDPYWts64@nanopsycho.orion>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR06MB5899:EE_|KL1PR06MB6258:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4177cd84-5609-4239-dce2-08dcc7518e91
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|52116014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?BLmhhPVhjTChL0P2QYFsvoP3RNuMEHH8GeQDYcGKqv0AIX0pvxV/tEURfHMf?=
+ =?us-ascii?Q?dQdOWh/1YT28tffTQV9C9sY4Bso+GbvMmXlDQOeD472VlTcKEqw0TAwyfDD9?=
+ =?us-ascii?Q?WNxlcu51kCfaGiqQQt+ng35x19jIqvaC6Za8c+XMisgCUSXGWqaiDh95McI3?=
+ =?us-ascii?Q?FZEN/JAYCqud5Rh9JsmWyA97ggSoYn06xsKEG3XhMr2CneVNaucaWBRyXya5?=
+ =?us-ascii?Q?3Za5hsKhCJzEE7dyO83dvA5I5voN5CtM9aBjgi2/OrR/UsmZx5nrwDWaSiTo?=
+ =?us-ascii?Q?bp8+4q0I+nLNH8v+56CPe8VyYKN6fdk+Gwb3LwsucoxEzvwYKCdIe+rYYbUL?=
+ =?us-ascii?Q?SDSzWGPnPhFzCz2TafpVB1y335zTjAIaU+lU4Uh3DXTjwYF5LDomkXfM0lre?=
+ =?us-ascii?Q?8K9IiHxcNclBd2Gd9fgtYJp7Ovl1CwtbYEuMXU1O1MnQE34WTgxwWVG0BlQ6?=
+ =?us-ascii?Q?bxvCI+S/CysrwUg7QQybirn+DY05wmCrKuB98D9Kal+vZYU3xhendRzwELD2?=
+ =?us-ascii?Q?I0/dcDrRovBnP/VpxiOUI/dN4wgB2PNbXugl5hFYEO/xnjW7LOs6PFrFtI2d?=
+ =?us-ascii?Q?eaywGvsrYmgQw2XQ5H/RNdn11qHt6TcJO8xRKaEs5nOY0BzwYCg8sEIiNeJM?=
+ =?us-ascii?Q?06b2EK6Bb+o66Hz+viNoflOZZlJIZMW4maEytd8VZkM/JtUqb8x5z+k9bkaQ?=
+ =?us-ascii?Q?JJKzp12UV9Y0PtVPKTOn+H8b9JgdtyzALHy5pBVlOugh+rCcw0O7PkSZWzOT?=
+ =?us-ascii?Q?lgcxnRw1Ymz5GQsPWZkcAeNyUhjVmeCr65tI001qU2beegjvXr6xi7Eyiy6h?=
+ =?us-ascii?Q?GxXIO3ASLaG/TcV6vItInULAm7K4ISQSz0KLi4IULgweBpNyIp+1iFEunoiD?=
+ =?us-ascii?Q?NClt+HvgxR95pC2oUbUzZUa7V5OHHny23OPWqM7mRxFTsUNrXxNeAj7WPHkq?=
+ =?us-ascii?Q?Qg3NIuy6HiQY5U2+uEo1Nm6qH6pP3cp3mePzd+y3FhMqK0LeVTkS/tly4thc?=
+ =?us-ascii?Q?g291ldhy1oWL4VT9VNxaCJRzHzEl2AmXKAi/KdE+T1JfeeqXlHecvLvuW7PQ?=
+ =?us-ascii?Q?+G3XnfcTPht+40RaHFepBUNV/W+EbrnCIHnOidXjLFzyJAbmgXSye1Towe8H?=
+ =?us-ascii?Q?byyU3ykgrCEglXSFI3hhYWQq2jFlPJr1fFONn/sYdMnpx4qL6UP0lzqrm8/4?=
+ =?us-ascii?Q?5mImWcskbks6149YUguQsSrYAefMdgmBXVOGPw2kRbo24NlHlnzm8O+tGI/V?=
+ =?us-ascii?Q?Wv75Fx020hocHFTFYJ5CF3mVeMmCSh7lWNgpic7EbJ8S36C8xi/3zksNBEs5?=
+ =?us-ascii?Q?JXp+i/DmwknQSKN8HSv2DB6rCBt8XgncJDZ/ApJUFPXTg7ZUWfeE5+iYvsUu?=
+ =?us-ascii?Q?r0wcwZSUkH3NQ74XMywgrFM4tfskNohbjg/0zQDXa5d2l0TZWw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR06MB5899.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(52116014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?GXpyqXpaRGuMq4TmqembH02JSZwxujPnPBkOX+539zYv7LYHwRXVCr2TqTP0?=
+ =?us-ascii?Q?kwrmRElTOMHaVV+8QFjBi7L38SbUMETYfrUeYwgRe43twxBxKg4dfparuQPS?=
+ =?us-ascii?Q?qPhs+xSnARA0ZjIf676cI/fGzmBW3CFKyo1oNLN+nFy44RnjPztj3PPVIC9g?=
+ =?us-ascii?Q?9+DXUFQks/2loljBydHaMrSKhAlWABfLW1nYnHkbjUf96u8Sf60l2Yru2xv2?=
+ =?us-ascii?Q?yQDVcXz7F5Qpu0doN5n8RXm6+FZe6UXmX58u0VsDgP9qPNaVX0qM+YKmJzBu?=
+ =?us-ascii?Q?zjdMqZQk+pj59NX7uTmD4r37G0oJpYJI9xYMHOsklMrBYrKzhmBwUpsf8aFP?=
+ =?us-ascii?Q?C+wJ2P5/tpUaRDwUiJ8GQwm5VEJqOt8m4PkKLafg4hPWz7iTsC5aYJgWLJCs?=
+ =?us-ascii?Q?dlLxvxKsolCv1+7RO56NYjQCGf46vtxbAeQlasxWff4jrFsM9qNQlElYSFxy?=
+ =?us-ascii?Q?J+ZRDoEH2OKhZeipBl9NW7byRyIHHANO3LPu7YuNf2+h4yjbFvzBLePOdac5?=
+ =?us-ascii?Q?vZ0xgMrjGOt0ahIZL9wNoZBEL1Pj5pYvXVvesWf9MoThBA0mV81y0D6YZhBy?=
+ =?us-ascii?Q?qd+12/upXpYcyu5TsMqr8JSlvYl2ALeLUFeiyMbVTA6lbGJBrpPbbz4GIYYe?=
+ =?us-ascii?Q?WVabS4j6l7tV7+pEq6+StRNMATil3VQN9zeS/vYuwdsjrjdTm1ElQRzaAvFX?=
+ =?us-ascii?Q?Xpt5X7UEEWijZp1cTH0O7Cwr9zGz9/OiY6NAF/pOoX8EglHHrWdyVruo07zv?=
+ =?us-ascii?Q?8gA0RugzyR7ofDJUssKQ4oO6YjNhkwuz0Q4GTthSmX1H45okdWD6YmGa2XIt?=
+ =?us-ascii?Q?tywx7pFxZVYwl66nXpvkbKz8Ie8EWhDCc5v9nR4IyMN4ph6meaOfONI7ymhM?=
+ =?us-ascii?Q?ZmOuNZCBygOSM38NIHeYeZ/EGdOk7oFckGev0D/JKkalLrVSanrchyzY5mW1?=
+ =?us-ascii?Q?aAtNmnj5k6egQnxocjnicLpLArGVzDZI+YIpaYc/do+q+U5Oq6vXZi4wOWoQ?=
+ =?us-ascii?Q?STCmEMkeUhDBmV6QSldBvedO0LWiijR4WjoB7yLiuU62XNWh0/nlDRHTxx8D?=
+ =?us-ascii?Q?tQbHdMr/i6f91wX5/bHO2iMzCrmwTWeS3F6eVt5bMdVZ1RFt3viQAsMOUtir?=
+ =?us-ascii?Q?hTm3VtWfzfF4Ndv0/Hb4PALV76I21KsrzImBBu62bSy0A51wr57RzcGhdkxR?=
+ =?us-ascii?Q?+kCGjsukLd2lZrue6fBUEQq0GaaTZzd6ut1Yb3Y94iMmXIjxy0pUOdcVjwNM?=
+ =?us-ascii?Q?g5nAKcg58e/iaAiCKfea72C9F255gTQEAkJD1aiDwh6QYb8Skg0TpUdfuqP4?=
+ =?us-ascii?Q?Ll77Fwafo12dfaFrZXB3+B0aDtwnwEJ/9CrM/DWPGejhX5ea8fFaVltqtXz2?=
+ =?us-ascii?Q?Gn24MiuwozPdllynoZp4HbVObMJcbh16nnKLomSW5/FV95PKcFtp+eAh5Dup?=
+ =?us-ascii?Q?r7+YIQBoJYDZGZp46QjDgj3P0I2++UgMzOgf/7wYEmtcc3phLKIrEYOYmTIQ?=
+ =?us-ascii?Q?zsROaxLIn7tE7+V4VbuYSEML+neymoVEH0xkN/R2pmlznHb/hdY/7TDjbEOT?=
+ =?us-ascii?Q?e0upmhpoYMWbGYTUreQ+Wxc2E4c7/Y+mRoPJzvaX?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4177cd84-5609-4239-dce2-08dcc7518e91
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB5899.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 11:07:08.1254
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2b9jM4pVRzxLx3pkfEKeDejO8UsvVdP6su55o14zssS26iEol3FtK+1XMKK9nDphk8/VpjLG+OLEH3vUNNIwZg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR06MB6258
 
-On 8/28/24 08:40, Jiri Pirko wrote:
-> Makes sense?
+Use the ERR_CAST macro to clearly indicate that this is a pointer 
+to an error value and that a type conversion was performed.
 
-Almost! Tacking aside the (very significant) differences between your 
-proposition and Jakub’s, we can't use devlink port here, just devlink, 
-or we will have to drop the cache too[1]. Specific devlink port shapers 
-will be reached via different handles (scope/id).
+Signed-off-by: Shen Lichuan <shenlichuan@vivo.com>
+---
+ net/netfilter/nf_conntrack_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Additionally, I think we don't need strictly the ‘binding’ nested 
-attribute to extend the NL API with different binding objects (devlink), 
-we could append the new attributes needed to support (identify) devlink 
-at the end of the net shaper attributes list. I agree that would be 
-likely less ‘nice’.
-
-What about:
-- Refactor the core and the driver api to support the ‘binding’ thing
-- Update the NL definition to nest the ‘ifindex’ attribute under the 
-‘binding’ one. No mention/reference to devlink yet, so most of the 
-documentation will be unchanged.
-- devlink support will not be included, but there should be enough 
-ground paved for it.
-
-?
-
-Thanks,
-
-Paolo
-
-[1] the cache container belongs to the ‘entry point’ inside the shaper 
-hierarchy - i.e. currently, the struct net_device. If we add a 
-devlink_port ‘entry point’, the cache there will have to manage even the 
-shaper for devlink ports group. When accessing a group containing 
-multiple ports, we will get multiple inconsistent cache values.	
+diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
+index 9384426ddc06..d3cb53b008f5 100644
+--- a/net/netfilter/nf_conntrack_core.c
++++ b/net/netfilter/nf_conntrack_core.c
+@@ -1722,7 +1722,7 @@ init_conntrack(struct net *net, struct nf_conn *tmpl,
+ 	ct = __nf_conntrack_alloc(net, zone, tuple, &repl_tuple, GFP_ATOMIC,
+ 				  hash);
+ 	if (IS_ERR(ct))
+-		return (struct nf_conntrack_tuple_hash *)ct;
++		return ERR_CAST(ct);
+ 
+ 	if (!nf_ct_add_synproxy(ct, tmpl)) {
+ 		nf_conntrack_free(ct);
+-- 
+2.17.1
 
 
