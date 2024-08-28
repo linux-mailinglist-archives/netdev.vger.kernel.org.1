@@ -1,355 +1,163 @@
-Return-Path: <netdev+bounces-122828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 961F6962AFA
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:01:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD3EF962B04
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:03:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E4E82850F2
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:01:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 756DF2854AB
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9799017C9AF;
-	Wed, 28 Aug 2024 15:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D16189BAA;
+	Wed, 28 Aug 2024 15:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b="2Z2velI/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C9FE1DFCF;
-	Wed, 28 Aug 2024 15:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E185186619
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 15:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724857268; cv=none; b=DwtYRfKMocJ0lsHlMd7HGQ9Jk4ayQ0mGXLvb2T9+IwozWQtV20eaksOx3LwpFmggzLkP/DMu6oGB/ka+IPahZokaw9Z9rNrb95jWv2pzig61OtpJhbir/rSHVIuVOrgybwA3r6JiEGsVYCugL2jVGlHh68tgt09UsXailEFdShU=
+	t=1724857403; cv=none; b=iOaVT8Gkm7bulgsR71UKv6/g/dRXsDVGC6FmRbAzh1CqilZ+XFdYhSbx+Me8SXQ8dv7shtv3QMTgtmJziHK68qEB3KN/SsZB9j3o4WvHWzohWfcibnOvzobsFmxrdsT4f3ksjwDZOE/8/5keTkH9FuY/CjddNwo3iPeGDgaCmgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724857268; c=relaxed/simple;
-	bh=kvTnfwbFcVYhgjb43qUgVocpt20fPREGtLA+Nw/HJNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fryUrqJ/+p8qtak6QedkpDS4XZz9jl81tO/vUxv/t0plh3JZ5C5WhzLU5cKpAUd707IuzAAP3mjlEzepWyJ9kDmFPydCwkcfoknzQZI+wHUaIsh0G0mGpk+a3N7MZXFFthzgc+7rNTFP9w7Wy/76yHfuK8OrNaTDSxRVcno/cCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2023dd9b86aso54456135ad.1;
-        Wed, 28 Aug 2024 08:01:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724857266; x=1725462066;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1724857403; c=relaxed/simple;
+	bh=gZJvAwS84XG2gWnkUBtlpWa9JrbHPHI1F7UydNFtnGE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QNXdqwtusqxp+NlYRlGxeJXK8w8C8Mi3f0wHZgxPCvzEEkEteGJ787ay3VpwqWTLNRQ97NwKXJgHTjH6hAfpBCOLrqFeldQYX7pwgoiz/svCtJxZIe17KMyVfv7hsl8R9q4hROd/5Zyw25gEIP39IZ1XHjlBen6qiytGHXJKCAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com; spf=none smtp.mailfrom=kutsevol.com; dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b=2Z2velI/; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=kutsevol.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-44feaa08040so41027361cf.2
+        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 08:03:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kutsevol-com.20230601.gappssmtp.com; s=20230601; t=1724857401; x=1725462201; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=D63aBFm/ec4YC7NVLplUfaX+TiG3d1K7llWnJbc0KwE=;
-        b=hRB4hWr2dKrkQQdRKnEwKcirwAINPiiQf2IkL5hJdH55t+Vhav752pO7V7SZQVM8yP
-         A6lpGbmOprw/v/b7pXmHaSOkRCvWMNqMxJHOwSZmyN6XDgstcR21qV4hEF1M8QY1jCSW
-         mZ4UGpDHlqr6sJkqSJXhXsENVhaisq3tUPlO2G/2LOw109lU5ub8ohRws1wkgpIpKq+H
-         t3AMFxzGduAG/Dt6Jxpp7XT8ZFsexOhktw7YDyXeaTClnInGFEAUscTZcrLP67A1LkIH
-         sCnZx3BsHbJ7xeHYM14r8U7JA9LJWBte3NOAfgYuMMmoPQ2npuKfegOnYFtbWHzA1Vpt
-         qMFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVNN9BqKKzFQHR7CJywwM8N6apWEj5mw0+e/VaW5CCr8qszYX1BDcdxzNX9mD8flp8a8mgtBnbJ7kYW6MHBK34=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlVPk6zdJJhgZ3N6E6PnU6XsQQQ6HVIrKN5PGAzvJF1MFLCHja
-	r/ZhIhpz8b1QYhf1KWu3Kc7LpUCLUFMxT3xzpeK0O7R+gR6PmfI=
-X-Google-Smtp-Source: AGHT+IGevCgxxB4jl5QbM8gi+8rq4ssbS3kXFtURkut1orK3flHzn263mXyvDttRLgi2hYSWbEE3Xw==
-X-Received: by 2002:a17:903:2288:b0:202:4666:f02a with SMTP id d9443c01a7336-2039e50d2c0mr165740745ad.43.1724857263835;
-        Wed, 28 Aug 2024 08:01:03 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385ae7b1bsm99382585ad.262.2024.08.28.08.01.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 08:01:03 -0700 (PDT)
-Date: Wed, 28 Aug 2024 08:01:02 -0700
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, ncardwell@google.com,
-	shuah@kernel.org, linux-kselftest@vger.kernel.org, fw@strlen.de,
-	Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
- ksft
-Message-ID: <Zs87rhH9e_Lw-icJ@mini-arch>
-References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
+        bh=eirJb6fPtSkbDJD3rUL81XHybmkCT08yqrb3byO7jZo=;
+        b=2Z2velI/nr/n2+3LWssr/eveZxKwkdLFd2P6W1RvkXvVA4G201zWoY8TZeX6ldWIac
+         fs6JcLmNabEgNAjyFZuEFW8VU40zvZcemdCr1ivQ6QHBTYPa+/b3piy7jhk+btH0hn8E
+         f0ovsDvF7IMfXpMwhEkrY1vaoYh5FZ+fzmJ/y7iNmNQWms+ml1drv3DebZqh1d2IGYRd
+         0OWNxIrCBKIlN9RBwboxIYDnKv1P06wZ7UoC1ttfkbvAS+QH8TDUjtHYGbMfrx22Ntmg
+         Vfk5ChCwaPPUkSP0mSGJ6S8OaFQ7jhJqU+LqWuX7ueaZuXCOE2wp3HuTIQhzPMSrAorz
+         S6qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724857401; x=1725462201;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eirJb6fPtSkbDJD3rUL81XHybmkCT08yqrb3byO7jZo=;
+        b=vWcKV0da+K6Yg2zh46bihg5KJFVrlAgBDmwCJOdV1p3ueUEIhHsxMqfW6O2KFL6dXX
+         JSUUMykFhHNXoJJS3EFBze58P9bMCQdjIyAePzeGV+E7P9VKF4Yc/Qmvv6H8cCr0Ejc1
+         ljUv/iL3BAnBQpIrkiK9ULzVYwQ14EqkLLhg5gLwaAXXPHqVeaAXVyuxlermfoMJaeIl
+         qCeMdW4LmkQKUqdmquxsbDiVe2/E3sZVgyeMMaSN2/HuxDLbdEGJyjfua6J5T1B10aP9
+         uyo8ObM6ajWDkeJKOnFkbqbFfwIcBRgn8n0g7xt4WJOxFNJLwMHDHiwrdjMsZnqZsUm4
+         ljHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWOUCzeajG+G+lOJ+I87GXsDNDgxS4Dp7QTSbzvbzqPDEW8CyXIOknmSJEzXSoM5W6t20arqeY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLugBnhwKi7RWy96uOM3hp6a7WkAVHc7Kinmq+f7A2hinrDkfu
+	JN+PmUeXlQK09qWiZaxPrK31rQHXJgFRg3gevO0isPbOwmsspkNXEFYqidnWiGAl5G1Q9W4rFaN
+	NgfRvVZYJThNKjrIuhqTiFXgHMEvB3xCNfRnGWg==
+X-Google-Smtp-Source: AGHT+IEBiMD+hxI9m00tkhRtoece2YbpN+qgRSgRalfCt3sYMacWDcmWzugzUHSrxMs1y3oNGI+hqbq4OJVjaY2tpoY=
+X-Received: by 2002:a05:622a:244b:b0:43f:fc16:6b3f with SMTP id
+ d75a77b69052e-4566e62bffdmr24486521cf.34.1724857400716; Wed, 28 Aug 2024
+ 08:03:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
+References: <20240824215130.2134153-1-max@kutsevol.com> <20240824215130.2134153-2-max@kutsevol.com>
+ <20240826143546.77669b47@kernel.org> <CAO6EAnX0gqnDOxw5OZ7xT=3FMYoh0ELU5CTnsa6JtUxn0jX51Q@mail.gmail.com>
+ <20240827065938.6b6d3767@kernel.org>
+In-Reply-To: <20240827065938.6b6d3767@kernel.org>
+From: Maksym Kutsevol <max@kutsevol.com>
+Date: Wed, 28 Aug 2024 11:03:09 -0400
+Message-ID: <CAO6EAnUPrLZzDzm6KJDaej=S4La_z01RHX2WZa3R1wTjPc09RQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] netcons: Add udp send fail statistics to netconsole
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 08/27, Willem de Bruijn wrote:
-> From: Willem de Bruijn <willemb@google.com>
-> 
-> Lay the groundwork to import into kselftests the over 150 packetdrill
-> TCP/IP conformance tests on github.com/google/packetdrill.
-> 
-> Florian recently added support for packetdrill tests in nf_conntrack,
-> in commit a8a388c2aae49 ("selftests: netfilter: add packetdrill based
-> conntrack tests").
-> 
-> This patch takes a slightly different implementation and reuses the
-> ksft python library for its KTAP, ksft, NetNS and other such tooling.
-> 
-> It also anticipates the large number of testcases, by creating a
-> separate kselftest for each feature (directory). It does this by
-> copying the template script packetdrill_ksft.py for each directory,
-> and putting those in TEST_CUSTOM_PROGS so that kselftests runs each.
-> 
-> To demonstrate the code with minimal patch size, initially import only
-> two features/directories from github. One with a single script, and
-> one with two. This was the only reason to pick tcp/inq and tcp/md5.
-> 
-> Any future imports of packetdrill tests should require no additional
-> coding. Just add the tcp/$FEATURE directory with *.pkt files.
-> 
-> Implementation notes:
-> - restore alphabetical order when adding the new directory to
->   tools/testing/selftests/Makefile
-> - copied *.pkt files and support verbatim from the github project,
->   except for
->     - update common/defaults.sh path (there are two paths on github)
->     - add SPDX headers
->     - remove one author statement
->     - Acknowledgment: drop an e (checkpatch)
-> 
-> Tested:
-> 	make -C tools/testing/selftests/ \
-> 	  TARGETS=net/packetdrill \
-> 	  install INSTALL_PATH=$KSFT_INSTALL_PATH
-> 
-> 	# in virtme-ng
-> 	sudo ./run_kselftest.sh -c net/packetdrill
-> 	sudo ./run_kselftest.sh -t net/packetdrill:tcp_inq.py
-> 
-> Result:
-> 	kselftest: Running tests in net/packetdrill
-> 	TAP version 13
-> 	1..2
-> 	# timeout set to 45
-> 	# selftests: net/packetdrill: tcp_inq.py
-> 	# KTAP version 1
-> 	# 1..4
-> 	# ok 1 tcp_inq.client-v4
-> 	# ok 2 tcp_inq.client-v6
-> 	# ok 3 tcp_inq.server-v4
-> 	# ok 4 tcp_inq.server-v6
-> 	# # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 	ok 1 selftests: net/packetdrill: tcp_inq.py
-> 	# timeout set to 45
-> 	# selftests: net/packetdrill: tcp_md5.py
-> 	# KTAP version 1
-> 	# 1..2
-> 	# ok 1 tcp_md5.md5-only-on-client-ack-v4
-> 	# ok 2 tcp_md5.md5-only-on-client-ack-v6
-> 	# # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 	ok 2 selftests: net/packetdrill: tcp_md5.py
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> 
-> ---
-> 
-> RFC points for discussion
-> 
-> ksft: the choice for this python framework introduces a dependency on
-> the YNL scripts, and some non-obvious code:
-> - to include the net/lib dep in tools/testing/selftests/Makefile
-> - a boilerplate lib/py/__init__.py that each user of ksft will need
-> It seems preferable to me to use ksft.py over reinventing the wheel,
-> e.g., to print KTAP output. But perhaps we can make it more obvious
-> for future ksft users, and make the dependency on YNL optional.
-> 
-> kselftest-per-directory: copying packetdrill_ksft.py to create a
-> separate script per dir is a bit of a hack. A single script is much
-> simpler, optionally with nested KTAP (not supported yet by ksft). But,
-> I'm afraid that running time without intermediate output will be very
-> long when we integrate all packetdrill scripts.
-> 
-> nf_conntrack: we can dedup the common.sh.
-> 
-> *pkt files: which of the 150+ scripts on github are candidates for
-> kselftests, all or a subset? To avoid change detector tests. And what
-> is the best way to eventually send up to 150 files, 7K LoC.
-> ---
->  tools/testing/selftests/Makefile              |  7 +-
->  .../selftests/net/packetdrill/.gitignore      |  1 +
->  .../selftests/net/packetdrill/Makefile        | 28 ++++++
->  .../net/packetdrill/lib/py/__init__.py        | 15 ++++
->  .../net/packetdrill/packetdrill_ksft.py       | 90 +++++++++++++++++++
->  .../net/packetdrill/tcp/common/defaults.sh    | 63 +++++++++++++
->  .../net/packetdrill/tcp/common/set_sysctls.py | 38 ++++++++
->  .../net/packetdrill/tcp/inq/client.pkt        | 51 +++++++++++
->  .../net/packetdrill/tcp/inq/server.pkt        | 51 +++++++++++
->  .../tcp/md5/md5-only-on-client-ack.pkt        | 28 ++++++
->  10 files changed, 369 insertions(+), 3 deletions(-)
->  create mode 100644 tools/testing/selftests/net/packetdrill/.gitignore
->  create mode 100644 tools/testing/selftests/net/packetdrill/Makefile
->  create mode 100644 tools/testing/selftests/net/packetdrill/lib/py/__init__.py
->  create mode 100755 tools/testing/selftests/net/packetdrill/packetdrill_ksft.py
->  create mode 100755 tools/testing/selftests/net/packetdrill/tcp/common/defaults.sh
->  create mode 100755 tools/testing/selftests/net/packetdrill/tcp/common/set_sysctls.py
->  create mode 100644 tools/testing/selftests/net/packetdrill/tcp/inq/client.pkt
->  create mode 100644 tools/testing/selftests/net/packetdrill/tcp/inq/server.pkt
->  create mode 100644 tools/testing/selftests/net/packetdrill/tcp/md5/md5-only-on-client-ack.pkt
-> 
-> diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-> index a5f1c0c27dff9..f03d6fee7ac54 100644
-> --- a/tools/testing/selftests/Makefile
-> +++ b/tools/testing/selftests/Makefile
-> @@ -65,10 +65,11 @@ TARGETS += net/af_unix
->  TARGETS += net/forwarding
->  TARGETS += net/hsr
->  TARGETS += net/mptcp
-> -TARGETS += net/openvswitch
-> -TARGETS += net/tcp_ao
->  TARGETS += net/netfilter
-> +TARGETS += net/openvswitch
-> +TARGETS += net/packetdrill
->  TARGETS += net/rds
-> +TARGETS += net/tcp_ao
->  TARGETS += nsfs
->  TARGETS += perf_events
->  TARGETS += pidfd
-> @@ -122,7 +123,7 @@ TARGETS_HOTPLUG = cpu-hotplug
->  TARGETS_HOTPLUG += memory-hotplug
->  
->  # Networking tests want the net/lib target, include it automatically
-> -ifneq ($(filter net drivers/net drivers/net/hw,$(TARGETS)),)
-> +ifneq ($(filter net net/packetdrill drivers/net drivers/net/hw,$(TARGETS)),)
->  ifeq ($(filter net/lib,$(TARGETS)),)
->  	INSTALL_DEP_TARGETS := net/lib
->  endif
-> diff --git a/tools/testing/selftests/net/packetdrill/.gitignore b/tools/testing/selftests/net/packetdrill/.gitignore
-> new file mode 100644
-> index 0000000000000..a40f1a600eb94
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/packetdrill/.gitignore
-> @@ -0,0 +1 @@
-> +tcp*sh
-> diff --git a/tools/testing/selftests/net/packetdrill/Makefile b/tools/testing/selftests/net/packetdrill/Makefile
-> new file mode 100644
-> index 0000000000000..d94c51098d1f0
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/packetdrill/Makefile
-> @@ -0,0 +1,28 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +# KSFT includes
-> +TEST_INCLUDES := $(wildcard lib/py/*.py ../lib/py/*.py)
-> +
-> +# Packetdrill support file(s)
-> +TEST_INCLUDES += tcp/common/defaults.sh
-> +TEST_INCLUDES += tcp/common/set_sysctls.py
-> +
-> +# Packetdrill scripts: all .pkt in subdirectories
-> +TEST_INCLUDES += $(wildcard tcp/**/*.pkt)
-> +
-> +# Create a separate ksft test for each subdirectory
-> +# Running all packetdrill tests in one go will take too long
-> +#
-> +# For each tcp/$subdir, create a test script tcp_$subdir.py
-> +# Exclude tcp/common, which is a helper directory
-> +TEST_DIRS := $(wildcard tcp/*)
-> +TEST_DIRS := $(filter-out tcp/common, $(TEST_DIRS))
-> +TEST_CUSTOM_PROGS := $(foreach dir,$(TEST_DIRS),$(subst /,_,$(dir)).py)
-> +
-> +$(TEST_CUSTOM_PROGS) : packetdrill_ksft.py
-> +	cp $< $@
-> +
-> +# Needed to generate all TEST_CUSTOM_PROGS
-> +all: $(TEST_CUSTOM_PROGS)
-> +
-> +include ../../lib.mk
-> diff --git a/tools/testing/selftests/net/packetdrill/lib/py/__init__.py b/tools/testing/selftests/net/packetdrill/lib/py/__init__.py
-> new file mode 100644
-> index 0000000000000..51bb6dda43d65
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/packetdrill/lib/py/__init__.py
-> @@ -0,0 +1,15 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +import pathlib
-> +import sys
-> +
-> +KSFT_DIR = (pathlib.Path(__file__).parent / "../../../..").resolve()
-> +
-> +try:
-> +    sys.path.append(KSFT_DIR.as_posix())
-> +    from net.lib.py import *
-> +except ModuleNotFoundError as e:
-> +    ksft_pr("Failed importing `net` library from kernel sources")
-> +    ksft_pr(str(e))
-> +    ktap_result(True, comment="SKIP")
-> +    sys.exit(4)
-> diff --git a/tools/testing/selftests/net/packetdrill/packetdrill_ksft.py b/tools/testing/selftests/net/packetdrill/packetdrill_ksft.py
-> new file mode 100755
-> index 0000000000000..62572a5b8331c
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/packetdrill/packetdrill_ksft.py
-> @@ -0,0 +1,90 @@
-> +#!/usr/bin/env python3
-> +# SPDX-License-Identifier: GPL-2.0
-> +
-> +"""Run packetdrill tests in the ksft harness.
-> +
-> +   Run all packetdrill tests in a subdirectory.
-> +   Detect the relevant subdirectory from this script name.
-> +   (Because the script cannot be given arguments.)
-> +
-> +   Run each test, for both IPv4 and IPv6.
-> +   Return a separate ksft result for each test case.
-> +"""
-> +
-> +import glob
-> +import os
-> +import pathlib
-> +import shutil
-> +
-> +from lib.py import cmd, ksft_exit, ksft_run, KsftSkipEx, NetNS
-> +
-> +
-> +def test_func_builder(pktfile_path, ipv4):
-> +    """Create a function that can be passed to ksft_run."""
-> +
-> +    def f():
-> +        if ipv4:
-> +            args = ("--ip_version=ipv4 "
-> +                    "--local_ip=192.168.0.1 "
-> +                    "--gateway_ip=192.168.0.1 "
-> +                    "--netmask_ip=255.255.0.0 "
-> +                    "--remote_ip=192.0.2.1 "
-> +                    "-D CMSG_LEVEL_IP=SOL_IP "
-> +                    "-D CMSG_TYPE_RECVERR=IP_RECVERR "
-> +                    )
-> +        else:
-> +            args = ("--ip_version=ipv6 --mtu=1520 "
-> +                    "--local_ip=fd3d:0a0b:17d6::1 "
-> +                    "--gateway_ip=fd3d:0a0b:17d6:8888::1 "
-> +                    "--remote_ip=fd3d:fa7b:d17d::1 "
-> +                    "-D CMSG_LEVEL_IP=SOL_IPV6 "
-> +                    "-D CMSG_TYPE_RECVERR=IPV6_RECVERR"
-> +                    )
-> +
-> +        if not shutil.which("packetdrill"):
-> +            raise KsftSkipEx("Cannot find packetdrill")
+Hey Jakub,
+thanks for looking into this.
 
-I don't see anything about building the binary itself. Am I missing
-something or should we also have some makefile magic to do it?
-I'm not sure packetdrill is packaged by the distros... Presumably
-we want the existing NIPA runners to run those tests as well?
+PS. A couple more email send mistakes and I'll go install mutt, sorry
+for the noise :)
 
-> +
-> +        netns = NetNS()
-> +
-> +        # Call packetdrill from the directory hosting the .pkt script,
-> +        # because scripts can have relative includes.
-> +        savedir = os.getcwd()
-> +        os.chdir(os.path.dirname(pktfile_path))
-> +        basename = os.path.basename(pktfile_path)
-> +        cmd(f"packetdrill {args} {basename}", ns=netns)
-> +        os.chdir(savedir)
-> +
-> +    if ipv4:
-> +        f.__name__ = pathlib.Path(pktfile_path).stem + "-v4"
-> +    else:
-> +        f.__name__ = pathlib.Path(pktfile_path).stem + "-v6"
+On Tue, Aug 27, 2024 at 9:59=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 26 Aug 2024 19:55:36 -0400 Maksym Kutsevol wrote:
+> > > > +static ssize_t stats_show(struct config_item *item, char *buf)
+> > > > +{
+> > > > +     struct netconsole_target *nt =3D to_target(item);
+> > > > +
+> > > > +     return
+> > > > +             nt->stats.xmit_drop_count, nt->stats.enomem_count);
+> > >
+> > > does configfs require value per file like sysfs or this is okay?
+> >
+> > Docs say (Documentation/filesystems/sysfs.txt):
+> >
+> > Attributes should be ASCII text files, preferably with only one value
+> > per file. It is noted that it may not be efficient to contain only one
+> > value per file, so it is socially acceptable to express an array of
+> > values of the same type.
+>
+> Right, but this is for sysfs, main question is whether configfs has
+> the same expectations.
+Eh, my bad, thank you :)
 
-What about dualstack v4-over-v6 mode? Do we want to support that as
-well?
+Docs on configfs (Documentation/filesystems/configfs.rst) say approximately
+the same, quote:
+* Normal attributes, which similar to sysfs attributes, are small ASCII tex=
+t
+  files, with a maximum size of one page (PAGE_SIZE, 4096 on i386).  Prefer=
+ably
+  only one value per file should be used, and the same caveats from sysfs a=
+pply.
+  Configfs expects write(2) to store the entire buffer at once.  When writi=
+ng to
+  normal configfs attributes, userspace processes should first read the ent=
+ire
+  file, modify the portions they wish to change, and then write the entire
+  buffer back.
+
+so based on sysfs+configfs docs it looks ok to do so. What do you think?
+
+Regarding the overall idea of exposing stats via configfs I found this:
+https://github.com/torvalds/linux/blob/master/drivers/target/iscsi/iscsi_ta=
+rget_stat.c#L82-L87
+as an example of another place doing it, which exposes the number of
+active sessions.
+
+> > Given those are of the same type, I thought it's ok. To make it less
+> > "fancy" maybe move to
+> > just values separated by whitespace + a block in
+> > Documentation/networking/netconsole.rst describing the format?
+> > E.g. sysfs_emit(buf, "%lu %lu\n", .....) ? I really don't want to have
+> > multiple files for it.
+> > What do you think?
+>
+> Stats as an array are quite hard to read / understand
+I agree with that.
+I couldn't find examples of multiple values exported as stats from
+configfs. Only from sysfs,
+e.g. https://www.kernel.org/doc/Documentation/block/stat.txt, which
+describes a whitespace
+separated file with stats.
+
+I want to lean on the opinion of someone more experienced in kernel
+dev on how to proceed here.
+- as is
+- whitespace separated like blockdev stats
+- multiple files and stop talking about it? :)
 
