@@ -1,192 +1,125 @@
-Return-Path: <netdev+bounces-122711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EA2D962497
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:18:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AABC96249B
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:18:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B39751C23A1C
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:18:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E1CF1C24273
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA63F167296;
-	Wed, 28 Aug 2024 10:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JwUTGJbR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FCAA169382;
+	Wed, 28 Aug 2024 10:18:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E25E15535B;
-	Wed, 28 Aug 2024 10:18:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F58168489;
+	Wed, 28 Aug 2024 10:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724840317; cv=none; b=pZxi7gHG4wrx0t+816m6rK2ep4LN6f1xwSpTzsl6BVaDcbKpnKQRY2iPANIBUCa9LMJnoAOCNpol6fAamJFuVCIYQXrtW9zldHHUh2hwvz3/aclB0MAqHoWluLov+/saNJmUN5RrHq/vtEGJPB/sdZk9BdKbC8fUnGXXNS5d0lA=
+	t=1724840335; cv=none; b=MZyme0z+MoeAz4dZ/mc/yqN48ghAj+t/DOdsrxxgHbg8hyNrZFZ8xTLLZVBgqTj0IG/bHuNV0VHkFjsHh7ZNPBRgd8skJT+Yy7b8SXDw024iO7GCFs2vNLpdh34ZYh5GbOk/h0Fwep6aFRiAEJCy9bgBzmf80SISEjDb33GgRGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724840317; c=relaxed/simple;
-	bh=C6ILMftBG9rM0uvRKgmhJFx03iisUC7Ps8y9h+pykn4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Oeft0h9ky1y1xFfNzjb4Q8Xj/C1xjrRSumMDfw2AuRlp9ks5jMduD5TpLrbj2ZRBOy66Wgk23jweOzEe8OwqmgTDsZ3m0H1lHW9tefMZ0bOHpYjg+3xcAxM+ms5iDFa7Z4PlKbigbtjrnpBi97ia+DZNx6oRwKbeI1wxCt/J7j4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JwUTGJbR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A8104C98EC0;
-	Wed, 28 Aug 2024 10:18:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724840317;
-	bh=C6ILMftBG9rM0uvRKgmhJFx03iisUC7Ps8y9h+pykn4=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=JwUTGJbRROqxf02xWDz5XD0PbQUDvi2d8vZWlvxDC/FeXaMdz/xk2P1F2xBgaX4ux
-	 RMC4klQHrgx8h2yaeqTkOj8sOlpXi0Z/4ftXNaKfogvt0rJC1gBkd+UA9NGAFWal8h
-	 5TyYKlx0UUSGdwSgffTT4Rqzff14tfSguM4A432hHdJAIWWhkm5+jdn7hxvchS+Thp
-	 +hNloB+CcDTfb7JRuOxXEVsmH4FX1eayZnZQQcHu3mDylUZCwe+j9twoCUMCyvsE02
-	 3iIdG64LHOL+DDKhXibWXrJEUnrtv79h2rjfpNHctSOJYrzvgAI+9DOUOaGy6/6Jt3
-	 2tu/cH5EwvM9A==
-Message-ID: <4392ddb203b2ad27096ab6d9b3bf114fecf4e88c.camel@kernel.org>
-Subject: Re: [PATCH v3] sunrpc: Fix error checking for d_hash_and_lookup()
-From: Jeff Layton <jlayton@kernel.org>
-To: Yan Zhen <yanzhen@vivo.com>, davem@davemloft.net,
- chuck.lever@oracle.com,  trondmy@kernel.org, anna@kernel.org,
- edumazet@google.com, kuba@kernel.org,  pabeni@redhat.com
-Cc: neilb@suse.de, okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, 
- linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,  opensource.kernel@vivo.com
-Date: Wed, 28 Aug 2024 06:18:34 -0400
-In-Reply-To: <20240828044355.590260-1-yanzhen@vivo.com>
-References: <20240828044355.590260-1-yanzhen@vivo.com>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40app2) 
+	s=arc-20240116; t=1724840335; c=relaxed/simple;
+	bh=76yP45lTQsYzgwmytYtHMj0baj7C0seddbIc1mDNeEQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nfd03wyFqnSM8YFpEat9yQXDEK0S0aiuWelhomfB2xNydDV7bzirDdaNZoUfnO2FPj/qRiDCoKFAtXsiO690QpDcbQWh0qbrWsp3wBfClVTOUqs30AMuf/ThkLZN1V6El11fWTmVjucsTwq9BEz4ZyEgJ7VSEFR5Tu+T8AHMNY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4Wv0kM5zJMz9sRy;
+	Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id wconnBVW9-Lt; Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4Wv0kM5B9Sz9sRs;
+	Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id A05508B78F;
+	Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id E3dYZevYEYVw; Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
+Received: from [172.25.230.108] (unknown [172.25.230.108])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 2CE418B764;
+	Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
+Message-ID: <cdea1768-b44c-4bf5-931b-10f9357ed4cb@csgroup.eu>
+Date: Wed, 28 Aug 2024 12:18:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/6] net: ethernet: fs_enet: drop the
+ .adjust_link custom fs_ops
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+ Pantelis Antoniou <pantelis.antoniou@gmail.com>, Andrew Lunn
+ <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, Florian Fainelli
+ <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Herve Codina <herve.codina@bootlin.com>,
+ linuxppc-dev@lists.ozlabs.org
+References: <20240828095103.132625-1-maxime.chevallier@bootlin.com>
+ <20240828095103.132625-4-maxime.chevallier@bootlin.com>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <20240828095103.132625-4-maxime.chevallier@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Wed, 2024-08-28 at 12:43 +0800, Yan Zhen wrote:
-> The d_hash_and_lookup() function returns either an error pointer or NULL.
->=20
-> It might be more appropriate to check error using IS_ERR_OR_NULL().
->=20
-> Fixes: 4b9a445e3eeb ("sunrpc: create a new dummy pipe for gssd to hold op=
-en")
-> Signed-off-by: Yan Zhen <yanzhen@vivo.com>
+
+
+Le 28/08/2024 à 11:50, Maxime Chevallier a écrit :
+> There's no in-tree user for the fs_ops .adjust_link() function, so we
+> can always use the generic one in fe_enet-main.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+
 > ---
->=20
-> Changes in v3:
-> - Rewrite the "fixes".
-> - Using ERR_CAST(gssd_dentry) instead of ERR_PTR(-ENOENT).
->=20
->  net/sunrpc/rpc_pipe.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->=20
-> diff --git a/net/sunrpc/rpc_pipe.c b/net/sunrpc/rpc_pipe.c
-> index 910a5d850d04..13e905f34359 100644
-> --- a/net/sunrpc/rpc_pipe.c
-> +++ b/net/sunrpc/rpc_pipe.c
-> @@ -1306,8 +1306,8 @@ rpc_gssd_dummy_populate(struct dentry *root, struct=
- rpc_pipe *pipe_data)
-> =20
->  	/* We should never get this far if "gssd" doesn't exist */
->  	gssd_dentry =3D d_hash_and_lookup(root, &q);
-> -	if (!gssd_dentry)
-> -		return ERR_PTR(-ENOENT);
-> +	if (IS_ERR_OR_NULL(gssd_dentry))
-> +		return ERR_CAST(gssd_dentry);
-
-If you get back a NULL, then ERR_CAST will just make this return a NULL
-pointer.
-
-> =20
->  	ret =3D rpc_populate(gssd_dentry, gssd_dummy_clnt_dir, 0, 1, NULL);
->  	if (ret) {
-> @@ -1318,7 +1318,7 @@ rpc_gssd_dummy_populate(struct dentry *root, struct=
- rpc_pipe *pipe_data)
->  	q.name =3D gssd_dummy_clnt_dir[0].name;
->  	q.len =3D strlen(gssd_dummy_clnt_dir[0].name);
->  	clnt_dentry =3D d_hash_and_lookup(gssd_dentry, &q);
-> -	if (!clnt_dentry) {
-> +	if (IS_ERR_OR_NULL(clnt_dentry)) {
->  		__rpc_depopulate(gssd_dentry, gssd_dummy_clnt_dir, 0, 1);
->  		pipe_dentry =3D ERR_PTR(-ENOENT);
->  		goto out;
-
-...you probably also want to make this return the error from
-d_hash_and_lookup as well when there is one.
---=20
-Jeff Layton <jlayton@kernel.org>
+>   drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c | 7 +------
+>   drivers/net/ethernet/freescale/fs_enet/fs_enet.h      | 1 -
+>   2 files changed, 1 insertion(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> index 2b48a2a5e32d..caca81b3ccb6 100644
+> --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> @@ -649,12 +649,7 @@ static void fs_adjust_link(struct net_device *dev)
+>   	unsigned long flags;
+>   
+>   	spin_lock_irqsave(&fep->lock, flags);
+> -
+> -	if (fep->ops->adjust_link)
+> -		fep->ops->adjust_link(dev);
+> -	else
+> -		generic_adjust_link(dev);
+> -
+> +	generic_adjust_link(dev);
+>   	spin_unlock_irqrestore(&fep->lock, flags);
+>   }
+>   
+> diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet.h b/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
+> index 21c07ac05225..abe4dc97e52a 100644
+> --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
+> +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
+> @@ -77,7 +77,6 @@ struct fs_ops {
+>   	void (*free_bd)(struct net_device *dev);
+>   	void (*cleanup_data)(struct net_device *dev);
+>   	void (*set_multicast_list)(struct net_device *dev);
+> -	void (*adjust_link)(struct net_device *dev);
+>   	void (*restart)(struct net_device *dev);
+>   	void (*stop)(struct net_device *dev);
+>   	void (*napi_clear_event)(struct net_device *dev);
 
