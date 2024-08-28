@@ -1,95 +1,101 @@
-Return-Path: <netdev+bounces-122834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6C91962B27
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:07:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DAEE962A6B
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:38:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 638D4286459
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:07:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A8552821F7
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:38:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 613611A2C04;
-	Wed, 28 Aug 2024 15:06:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C291A0AFE;
+	Wed, 28 Aug 2024 14:37:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=metrotek.ru header.i=@metrotek.ru header.b="FnSQ/EHi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RexoaOpi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.pr-group.ru (mail.pr-group.ru [178.18.215.3])
-	(using TLSv1.1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22AB21A08AF;
-	Wed, 28 Aug 2024 15:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.18.215.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526BB1A08B0
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 14:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724857604; cv=none; b=OxGwgyC+82n+rMISz4E2ISZhoI9PbugmZGw9dbb0P8MT3N9U9ioYwJipySlgw1UkgVbffg6VjpURvaULoEDY4P93MMye3paXwaOS7Lp8GcCZmmfVvkw7KBgQqhqVu1pD7csJ427iV119sdjLd7A99t9BGV3ki/cf/Y0U4Ud6kL0=
+	t=1724855861; cv=none; b=vCYfNzADNIlSGZ+/10FDoNr2gTGsWqmmZEtXHDS0exZAqdsPOqxbrlKeeFS3MqNrS70cODwOWrf3LHZCrpkSQMintZBiCINFcMBZAR+9rWaON8lsNq1VdcBqGXpCbmVWdhPCCiKQvjldk6EwOCmP+wMyAhIrndG97KWAG4x/ecw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724857604; c=relaxed/simple;
-	bh=sjR6z0zfk1JV9KzZ89G1lCI6RwR/rJTW1RdNkW2xf6M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JPjeVuOUw5L6Rz890JV63/dbulXprA+Zor1tZekZGN0wB5Ei1+XXlmyGq8s8l8C8Sakdux3YSgVUPKHaJCXqbSJIzl1tKzqQTzieYKzZsPaBtxPYjPd1Fz6dGucHrPCGEmKzkgQyHLFMKuHBad/zNvEFO7ZzjbpJl/x7s9IzpiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metrotek.ru; spf=pass smtp.mailfrom=metrotek.ru; dkim=pass (2048-bit key) header.d=metrotek.ru header.i=@metrotek.ru header.b=FnSQ/EHi; arc=none smtp.client-ip=178.18.215.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=metrotek.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=metrotek.ru
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-	d=metrotek.ru; s=mail;
-	h=from:subject:date:message-id:to:cc:mime-version:content-transfer-encoding:
-	 in-reply-to:references;
-	bh=sjR6z0zfk1JV9KzZ89G1lCI6RwR/rJTW1RdNkW2xf6M=;
-	b=FnSQ/EHiJLwLjt2SBq39i2QdpN1mZw426pSEb0bTrAkH20ATaxvNBc0+tNssrmUZqeiYRBqPeG0gl
-	 yPMiSVceClRh/rbTzTdjFG8e7ZPloJOThOzYo3MQ1YVJglumvNF3zeTIWMQ8VQU8fcP5bkHGdSqeZs
-	 1Djgklg3p+VC1Jd9ZjpWPqz5OtXWnm2yx3ks1RIZ6QuBVjcdtKDHGcMCKUID9qd5IRsG+BhC0wO60A
-	 abD67QYa1Dvyo9XyJiZujvHMwBa125aE0CTGwQ+sn4si+zFsvm91sGGTS39dGEPrLg4fFLO9rgMLfX
-	 pEjA5ADvx5BcHIRSqFP5id+kMum1tSA==
-X-Kerio-Anti-Spam:  Build: [Engines: 2.18.2.1544, Stamp: 3], Multi: [Enabled, t: (0.000009,0.003730)], BW: [Enabled, t: (0.000024,0.000001)], RTDA: [Enabled, t: (0.089953), Hit: No, Details: v2.79.0; Id: 15.krszj.1i6cmkcba.2vpck; mclb], total: 0(700)
-X-Spam-Level: 
-X-Footer: bWV0cm90ZWsucnU=
-Received: from fort.ddg ([85.143.252.66])
-	(authenticated user d.dolenko@metrotek.ru)
-	by mail.pr-group.ru with ESMTPSA
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256 bits));
-	Wed, 28 Aug 2024 17:35:57 +0300
-From: Dmitry Dolenko <d.dolenko@metrotek.ru>
-To: ahalaney@redhat.com
-Cc: alexandre.torgue@foss.st.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	joabreu@synopsys.com,
-	kuba@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	mcoquelin.stm32@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	quic_abchauha@quicinc.com,
-	quic_scheluve@quicinc.com,
-	system@metrotek.ru,
-	Dmitry Dolenko <d.dolenko@metrotek.ru>
-Subject: Re: [PATCH RFC/RFT net-next] net: stmmac: drop the ethtool begin() callback
-Date: Wed, 28 Aug 2024 17:35:41 +0300
-Message-Id: <20240828143541.254436-1-d.dolenko@metrotek.ru>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240429-stmmac-no-ethtool-begin-v1-1-04c629c1c142@redhat.com>
-References: <20240429-stmmac-no-ethtool-begin-v1-1-04c629c1c142@redhat.com>
+	s=arc-20240116; t=1724855861; c=relaxed/simple;
+	bh=LfEypMyI2YOLOsHELLnwYyPfDOkZsw34uqKRseNBYmU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gHJqEA5U86CxbDMdo2B59Vqk333HVXQJtrIhi6ChTLxFGERiJlaIsNgStFhoEPRlKRoDy9g4lsc5wzlSJSbjiABusdbzyj21Nl6PkKv2WsVz7sLOx8LRWmk6U6sJuLOQKhSN422+Q7rz8JM9JD5OT5AcizexyRMUq/HbZRT7Pzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RexoaOpi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75CA7C4CEE3;
+	Wed, 28 Aug 2024 14:37:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724855860;
+	bh=LfEypMyI2YOLOsHELLnwYyPfDOkZsw34uqKRseNBYmU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RexoaOpiYHN1vBH8QCVDTathYOsW3WRj/ClWJIk4sVZqV3W2rJwAB0Noga126XCKH
+	 PQdvG/GFQusK4drE7/YI+T0lXWBIJb+JGKnqcDCTaEonAhNNyaNMXAxlD4usHDyzfa
+	 4uu4MqJ51TRiX0UuSdvwcQg+qA6NXe0LNM0om1FyWfQJijxKSEk7SY3ysG3BCVJIFe
+	 5dXbFrzimVRi/W3zkKRvVPPVh6P/A0Ei7LUw+YU2stmYiM3GUtI2zLRVSKgntUS5Yf
+	 KLK+eUNYBvdrNvS0ePJjFF5RaAC/zMV3haaSJ9M5OTza2DqfZdAXxmf/xtC9iEAo/I
+	 mzmRU+9kLachg==
+Date: Wed, 28 Aug 2024 15:37:36 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
+	andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, kernel-team@meta.com, sanmanpradhan@meta.com,
+	sdf@fomichev.me, jdamato@fastly.com
+Subject: Re: [PATCH net-next v2 2/2] eth: fbnic: Add support to fetch group
+ stats
+Message-ID: <20240828143736.GH1368797@kernel.org>
+References: <20240827205904.1944066-1-mohsin.bashr@gmail.com>
+ <20240827205904.1944066-3-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240827205904.1944066-3-mohsin.bashr@gmail.com>
 
-Are there any updates on this topic?
+On Tue, Aug 27, 2024 at 01:59:04PM -0700, Mohsin Bashir wrote:
+> Add support for group stats for mac. The fbnic_set_counter helps prevent
+> overriding the default values for counters which are not collected by the device.
+> 
+> The 'reset' flag in 'get_eth_mac_stats' allows choosing between
+> resetting the counter to recent most value or fecthing the aggregate
 
-We are faced with the fact that we can not read or change settings of
-interface while it is down, and came up with the same solution for this
-problem.
+nit: fetching
 
-I do not know if Reviewed-by and Tested-by are suitable for patch marked as
-RFC but I will post mine in case it is acceptable here.
+> values of counters. This is important to cater for cases such as
+> device reset.
+> 
+> The 'fbnic_stat_rd64' read 64b stats counters in a consistent fashion using
+> high-low-high approach. This allows to isolate cases where counter is
+> wrapped between the reads.
+> 
+> Command: ethtool -S eth0 --groups eth-mac
+> Example Output:
+> eth-mac-FramesTransmittedOK: 421644
+> eth-mac-FramesReceivedOK: 3849708
+> eth-mac-FrameCheckSequenceErrors: 0
+> eth-mac-AlignmentErrors: 0
+> eth-mac-OctetsTransmittedOK: 64799060
+> eth-mac-FramesLostDueToIntMACXmitError: 0
+> eth-mac-OctetsReceivedOK: 5134513531
+> eth-mac-FramesLostDueToIntMACRcvError: 0
+> eth-mac-MulticastFramesXmittedOK: 568
+> eth-mac-BroadcastFramesXmittedOK: 454
+> eth-mac-MulticastFramesReceivedOK: 276106
+> eth-mac-BroadcastFramesReceivedOK: 26119
+> eth-mac-FrameTooLongErrors: 0
+> 
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 
-Reviewed-by: Dmitry Dolenko <d.dolenko@metrotek.ru>
-Tested-by: Dmitry Dolenko <d.dolenko@metrotek.ru>
-
+...
 
