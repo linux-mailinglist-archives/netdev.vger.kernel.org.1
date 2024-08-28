@@ -1,119 +1,242 @@
-Return-Path: <netdev+bounces-122800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7866396299B
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:03:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 647CF9629A4
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:04:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB0531C23C01
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:03:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15461282008
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D507C188CC2;
-	Wed, 28 Aug 2024 14:03:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20EA718952B;
+	Wed, 28 Aug 2024 14:04:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Gm3Zv5lT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e6zRKA1C"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B953A176ABA;
-	Wed, 28 Aug 2024 14:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A32316D4C4;
+	Wed, 28 Aug 2024 14:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724853808; cv=none; b=fRZpV5GSVKPWFOmX4tOP2IfxDEGYmOuzoHMFhadvT9f0fSewteOPeRkmKvCExKGckf1ll+QBpb8mVqMq0SbGZ2lqedlzYBNQkoRo3vYjN18/tIOg57wJbbNuoV1h9CxBo1OjfIHQSSsTNpWPguIChnP8StnFYYXquE9sfznpUeM=
+	t=1724853840; cv=none; b=baxmpuNSAzEs46rTA9TPJvM+fNMgDU0sz7lBO3wQAyRY6KytW6H+R2PxX0bg6NQwzfhbWctQcHhaXOptkgUYgRsFRwk7ZIqoPG1WE1VuX5drkD8C+z76qZ/Ve03sIjGi/rpj+IfLx3FKbxwM6yKEsF0BMsc6L4a0YvKRq1vgC4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724853808; c=relaxed/simple;
-	bh=bCDA2OLhvtT5NvKB3PRKwz9R5Y16PPvE8RlwT39+U3w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q6WH3TwTHwsbqbLO6bucpueza4N+zizdgXunwZUyQS+2tTjyKdVNcLcnEdTYuOGisUe88Xwo18rCdrQFSXIdoDNhfD69ardZ45/gH5X6inufXGA1/D8oowsCNYYVPwv+QkUsp4DBk0CbF1A5SqCoNYei4gHhAiumZ5Bf5pV6zpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Gm3Zv5lT; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 82AA21BF209;
-	Wed, 28 Aug 2024 14:03:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1724853798;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=X17P1T7VIyC/5Yzbs/EWY2YsIqMeZFR+ix7ybz6ledM=;
-	b=Gm3Zv5lTtOQjTQ9tvnyZ10xQ21ogkqfsan2KZYbAHrJKqz5Tak5V6utCjGcSk7ZBxgI8xs
-	mx4uHixYa7yQkzLf2gm+tQ2V9h06uNfWq5TJc8bVT3CdVgJ2WADS3dKGk/n3jYz/XPuIu3
-	z/6aiNzSflHsSi2UXaqMN9mPhKL4ZLZfrr9dHbiOtGV+SmuJuu597SCIaG6Ee5mly91qr7
-	+B4D+HoZULTxowPEmO13GRxB6OTvGp7i8l9upcaVeqO/HS950C4vdr2DiEIpFNV42t57YX
-	eK1955Q+Rr9uAUqh4jeoFEP1vLgNqTVBH5AI8Gh1Qvt/9jFO5GiW42f99GZa4Q==
-Date: Wed, 28 Aug 2024 16:03:15 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Aleksandr Mishin <amishin@t-argos.ru>
-Cc: Vadym Kochan <vadym.kochan@plvision.eu>, Taras Chornyi
- <taras.chornyi@plvision.eu>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Oleksandr Mazur <oleksandr.mazur@plvision.eu>,
- Serhiy Boiko <serhiy.boiko@plvision.eu>, Volodymyr Mytnyk
- <volodymyr.mytnyk@plvision.eu>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net] net: marvell: prestera: Remove unneeded check in
- prestera_port_create()
-Message-ID: <20240828160315.077e3428@device-28.home>
-In-Reply-To: <20240828132606.19878-1-amishin@t-argos.ru>
-References: <20240828132606.19878-1-amishin@t-argos.ru>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1724853840; c=relaxed/simple;
+	bh=eZSzCsJwj7rqAjlnXNvCMvbp6dG3WM00eloeQdjFn+g=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=hEv4j1DvDeYWFs1AOQn8qpiYa9hV+qD6MfpQipZ9pNswNgLo+nCHvR1LopBbu/JCu+DRhS37qnO7q3Ac/zfwE7UFAKxlHoJ3xV/wvUwky5E51v4FJRrqeDiZbu6nJPJ7qlxv/AisNL+kCoJv7/ZOJBpdnVhIpOy1gA7r9M7GMi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e6zRKA1C; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7a337501630so433410985a.3;
+        Wed, 28 Aug 2024 07:03:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724853837; x=1725458637; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OQmc8dBb0j9CbeOENdVCHjYG/YY34AOkbiJtBQYP0Fw=;
+        b=e6zRKA1Cgm84Zu8kD2nfThZttaEWrGUYgegUA7OEPxQ4JQ0xv0N4laxf7IsdIkH5ti
+         +Vl3ymr7AvxtQZdW8bVeswG897Xn0pjK0uGGvSA7T22B5nCxWAFWZnNEsoYC4Lr+WH4Z
+         nuJzPevgblX+g2u8ckke1IWYp6mgZ9ve6spCUOQvsgDkEBkevcz6VSvXglLr5pm0A48g
+         e24tbk2qIuTurYv5NS0u8le7+6JPYkXzedWKRBlHoyED+PhsMnxsWq5R7L8HEyrw+0Cb
+         B7K+R2nTnqHMmqD6qlODRGs4XaJSDJj48gHszVU6GW/yavC1xQol2j1TeA9C9AjP4+H9
+         rgjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724853837; x=1725458637;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OQmc8dBb0j9CbeOENdVCHjYG/YY34AOkbiJtBQYP0Fw=;
+        b=PUYjp9eBS1F3hHkbQ8UExVTOklyeX44jfJaK9QeGkm2T8fcjYqsU3uQmAMzkYlbGW9
+         Bj1mFGIt/7cJCk2ySEl+CmzNasggUUu2lBjz7PVw/UIVl4vF3KrF7lc6YdgMdrdkHzbC
+         yvVYkAU7VWOPef0n+XJpB/MzUlLrLeDxXK+XwPo2uzikrx3ySeuiPeAyzv7DFd0Nm30D
+         CQr1K+jfgsDKHVwpIAcPpkMIJBdwzZMNhITUIArjtgFOMEMrqw9S33TVT7Y3/OAyX34f
+         pe1xEN+sNjltm/WH0EFFCHPqBqxaVorSqeZ1XCDvgUD7D6ILQxS0tHthLOzUHRB6btsu
+         R/mw==
+X-Forwarded-Encrypted: i=1; AJvYcCW+nX6CslG+Ap5whhlzPE4g5E+jiZb0ghsHZxYkv1UkzGz46dyhqX5BomA7sglYgb+BiGh+gG4fWt2b5TfYJVw=@vger.kernel.org, AJvYcCXNulNq61pZJKZ2JXI8dv69GO2t5O7glXw29N/onhfTLvF2cvzhqtNuxBPjeYnFhoV6MEefY7w7@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAL2AXpvcJYWjBgwyZeTTL3nK8Vg7quBKk1uzL8JPGNHZCa5Zd
+	KzvITx//FJbHuwfIpSD1X4boQEMdwWMLPX/zYGM9YzP25eXvr5J6
+X-Google-Smtp-Source: AGHT+IGCiWFEPEYqnVdRpQ4RX8PknJ9btlY6va//y4op67qcNy8CIZRS2aXBgQDQuW/VkT9ABYmmGA==
+X-Received: by 2002:a05:620a:40c:b0:7a7:fad0:d916 with SMTP id af79cd13be357-7a7fad0dbf5mr98008185a.26.1724853836696;
+        Wed, 28 Aug 2024 07:03:56 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a67f31b2d5sm643630185a.12.2024.08.28.07.03.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Aug 2024 07:03:56 -0700 (PDT)
+Date: Wed, 28 Aug 2024 10:03:55 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ edumazet@google.com, 
+ ncardwell@google.com, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ fw@strlen.de, 
+ Willem de Bruijn <willemb@google.com>, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ martineau@kernel.org
+Message-ID: <66cf2e4bd8e89_33815c294b2@willemb.c.googlers.com.notmuch>
+In-Reply-To: <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
+References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
+ <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
+Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
+ ksft
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello Aleksandr,
-
-On Wed, 28 Aug 2024 16:26:06 +0300
-Aleksandr Mishin <amishin@t-argos.ru> wrote:
-
-> prestera_port_create() calls prestera_rxtx_port_init() and analyze its
-> return code. prestera_rxtx_port_init() always returns 0, so this check is
-> unneeded and should be removed.
+Paolo Abeni wrote:
+> Adding Mat(s) for awareness, it would be great (but difficult) to have 
+> mptcp too in the long run ;)
 > 
-> Remove unneeded check to clean up the code.
+> On 8/27/24 21:32, Willem de Bruijn wrote:
+> > From: Willem de Bruijn <willemb@google.com>
+> > 
+> > Lay the groundwork to import into kselftests the over 150 packetdrill
+> > TCP/IP conformance tests on github.com/google/packetdrill.
+> > 
+> > Florian recently added support for packetdrill tests in nf_conntrack,Addin
+> > in commit a8a388c2aae49 ("selftests: netfilter: add packetdrill based
+> > conntrack tests").
+> > 
+> > This patch takes a slightly different implementation and reuses the
+> > ksft python library for its KTAP, ksft, NetNS and other such tooling.
+> > 
+> > It also anticipates the large number of testcases, by creating a
+> > separate kselftest for each feature (directory). It does this by
+> > copying the template script packetdrill_ksft.py for each directory,
+> > and putting those in TEST_CUSTOM_PROGS so that kselftests runs each.
+> > 
+> > To demonstrate the code with minimal patch size, initially import only
+> > two features/directories from github. One with a single script, and
+> > one with two. This was the only reason to pick tcp/inq and tcp/md5.
+> > 
+> > Any future imports of packetdrill tests should require no additional
+> > coding. Just add the tcp/$FEATURE directory with *.pkt files.
+> > 
+> > Implementation notes:
+> > - restore alphabetical order when adding the new directory to
+> >    tools/testing/selftests/Makefile
+> > - copied *.pkt files and support verbatim from the github project,
+> >    except for
+> >      - update common/defaults.sh path (there are two paths on github)
+> >      - add SPDX headers
+> >      - remove one author statement
+> >      - Acknowledgment: drop an e (checkpatch)
+> > 
+> > Tested:
+> > 	make -C tools/testing/selftests/ \
+> > 	  TARGETS=net/packetdrill \
+> > 	  install INSTALL_PATH=$KSFT_INSTALL_PATH
+> > 
+> > 	# in virtme-ng
+> > 	sudo ./run_kselftest.sh -c net/packetdrill
+> > 	sudo ./run_kselftest.sh -t net/packetdrill:tcp_inq.py
+> > 
+> > Result:
+> > 	kselftest: Running tests in net/packetdrill
+> > 	TAP version 13
+> > 	1..2
+> > 	# timeout set to 45
+> > 	# selftests: net/packetdrill: tcp_inq.py
+> > 	# KTAP version 1
+> > 	# 1..4
+> > 	# ok 1 tcp_inq.client-v4
+> > 	# ok 2 tcp_inq.client-v6
+> > 	# ok 3 tcp_inq.server-v4
+> > 	# ok 4 tcp_inq.server-v6
+> > 	# # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
+> > 	ok 1 selftests: net/packetdrill: tcp_inq.py
+> > 	# timeout set to 45
+> > 	# selftests: net/packetdrill: tcp_md5.py
+> > 	# KTAP version 1
+> > 	# 1..2
+> > 	# ok 1 tcp_md5.md5-only-on-client-ack-v4
+> > 	# ok 2 tcp_md5.md5-only-on-client-ack-v6
+> > 	# # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
+> > 	ok 2 selftests: net/packetdrill: tcp_md5.py
+> > 
+> > Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > 
+> > ---
+> > 
+> > RFC points for discussion
+> > 
+> > ksft: the choice for this python framework introduces a dependency on
+> > the YNL scripts, and some non-obvious code:
+> > - to include the net/lib dep in tools/testing/selftests/Makefile
+> > - a boilerplate lib/py/__init__.py that each user of ksft will need
+> > It seems preferable to me to use ksft.py over reinventing the wheel,
+> > e.g., to print KTAP output. But perhaps we can make it more obvious
+> > for future ksft users, and make the dependency on YNL optional.
+> > 
+> > kselftest-per-directory: copying packetdrill_ksft.py to create a
+> > separate script per dir is a bit of a hack. 
 > 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> Additionally, in some setups the test directory is RO, avoding file 
+> creation there would be better.
 > 
-> Fixes: 501ef3066c89 ("net: marvell: prestera: Add driver for Prestera family ASIC devices")
-> Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
-> ---
->  drivers/net/ethernet/marvell/prestera/prestera_main.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+> What about placing in each subdiretory a trivial wrapper invoking the 
+> 'main' packetdrill_ksft.py script specifying as an argument the 
+> (sub-)directory to run/process?
+
+The files are created by kselftests, similar to any TEST_GEN_XXX or
+TEST_CUSTOM_PROGS.
+
+If instead we prepopulate in each directory that is duplicative
+boilerplate committed to git, and we still need to add it to
+kselftests. Not sure whether TEST_PROGS with paths extending into
+subdirectories are supported. And we do not want a TARGET for each
+subdirectory.
+
+It probably can be done, but I don't think that it is needed or
+simpler.
+ 
+> > A single script is much
+> > simpler, optionally with nested KTAP (not supported yet by ksft). But,
+> > I'm afraid that running time without intermediate output will be very
+> > long when we integrate all packetdrill scripts.
 > 
-> diff --git a/drivers/net/ethernet/marvell/prestera/prestera_main.c b/drivers/net/ethernet/marvell/prestera/prestera_main.c
-> index 63ae01954dfc..2d4f6d03b729 100644
-> --- a/drivers/net/ethernet/marvell/prestera/prestera_main.c
-> +++ b/drivers/net/ethernet/marvell/prestera/prestera_main.c
-> @@ -718,9 +718,7 @@ static int prestera_port_create(struct prestera_switch *sw, u32 id)
->  		}
->  	}
->  
-> -	err = prestera_rxtx_port_init(port);
-> -	if (err)
-> -		goto err_port_init;
-> +	prestera_rxtx_port_init(port);
+> If I read correctly, this runs the scripts in the given directory 
+> sequentially (as opposed to the default pktdrill run_all.py behavior 
+> that uses many concurrent threads).
+> 
+> I guess/fear that running all the pktdrill tests in a single batch would 
+> take quite a long time, which in turn could be not so good for CI 
+> integration. Currently there are a couple of CI test-cases with runtime 
+>  > 1h, but that is bad ;)
 
-If this function always return 0, you might as well change it to return
-void. This would avoid future issues if one were to change
-prestera_rxtx_port_init() to acually make it return something. It would
-then become obvious that the caller doesn't check the return, whereas
-with the current patch, we are simply ignoring it.
+Very good point, thanks! This is the third packetdrill runner that I'm
+writing. I should know this by now.. Let me see whether I can use
+run_all.py rather than reinvent the wheel here.
+ 
+> > nf_conntrack: we can dedup the common.sh.
+> > 
+> > *pkt files: which of the 150+ scripts on github are candidates for
+> > kselftests, all or a subset? To avoid change detector tests. And what
+> > is the best way to eventually send up to 150 files, 7K LoC.
+> 
+> I have no idea WRT the overall test stability, is some specific case/dir 
+> is subject to very frequent false positive/false negative we could 
+> postpone importing them, but ideally IMHO all the github scripts are 
+> good candidates.
+> 
+> Side note: I think it would be great to have some easy command line 
+> parameter to run only the specified script/test-case.
 
-I also think you can target that patch to net-next, this isn't fixing
-any bug, but rather cleans the code up.
+Makes sense. Will include.
 
-Thanks,
-
-Maxime
 
