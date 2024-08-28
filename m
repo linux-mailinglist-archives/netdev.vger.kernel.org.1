@@ -1,150 +1,149 @@
-Return-Path: <netdev+bounces-122640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE73962060
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 09:11:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 833D4962067
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 09:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E8CA1C23C14
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 07:11:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1ECAB21252
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 07:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34866158A31;
-	Wed, 28 Aug 2024 07:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b25dXY6y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6831552EB;
+	Wed, 28 Aug 2024 07:13:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C0C15854D
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 07:10:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1737D2CA6;
+	Wed, 28 Aug 2024 07:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724829060; cv=none; b=LIaR0veociZyQmmHL4ZKLIb7nUuEU7LTIWQkqEULUOocdMFRRvFPZLIBNCufaXuWsSDqgIwz5JeeHyGB4VVPtmJOrF5/pLNeV3gEbpD6QP7nvUcEGDbamTLYhrajZf01tvuHPtUmz6iYA+Aoc33mXhh40sTDOzYx3tkWJhKpw9g=
+	t=1724829188; cv=none; b=DCOhIH5xVLB/ldNkTdIpWL5BIll9V3h+JMxBwCKQixiWjuP3e3oYCsvb1AtWuR5I4UeT+ooynSL2viSGXUJUmPR54ZnBMf8bLVoo0QdoX666o93BVE4EmYcky8T416g77K4OWwMG1G7FCRzeIRY75kOSo8NvVzpVgiKnlIv2Fe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724829060; c=relaxed/simple;
-	bh=hrdybWADZxrNOGDFQ+iblbPSFaRlDH4YMdydN364uxU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KDeZaeD4cYgt/GioTZlLcQQpxTrLd3/GpnnVajqcLNj9j+sv9O4nNk7ZhLCMM5XR7PXliNbpK17tW8/Pg0+4eLDSPphhN5AEgIUg8YZovcanfhpD6XcrGf+oY3qap8rrpmmdffxPMmRZ8myr4fA91fXDFwQQvFGT/iJ2cP7C7kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b25dXY6y; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724829056;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4exFj43hWLT00BAGeYDHEqubvTOHjaJM+W+ukum/0tY=;
-	b=b25dXY6yCnFhBPxNzTGVXpsjAEJZ0nyy02OSQJlrxhjbd8L9SyTACOoQjF9JK/ADVFaK/t
-	F68qNganpDe3QWhY+WI6wr03D3U7hNJ0T4iwLXnHQOqXpwcnf+3yri8KkoLKKGSDges3X0
-	GWRAv47tfQHReADcb2Izs4/Xp2l5abs=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-388-EmSEMIfUOPW3LNcM1lpvYQ-1; Wed, 28 Aug 2024 03:10:52 -0400
-X-MC-Unique: EmSEMIfUOPW3LNcM1lpvYQ-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7a1de7141f1so825964185a.3
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 00:10:52 -0700 (PDT)
+	s=arc-20240116; t=1724829188; c=relaxed/simple;
+	bh=UZYnlznxHgHahL9IgW5qk4LVk7i/ozJ7tT74Y/giKNw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M0YZLngeWovC44lXpb1pIJSnoTYdCrQVJKbi2kd9a0jSCkUpQqDdLRzhjijUpeHF+ilFjVCQUmq02bVbXKSUyGm5WI1VLScHRcUHpguDB3ynRBro0D65zHdsWjGUOESJw+B7/+Xxh8gWHpI7hvQA4bO5Ilooi99g1s3ts7cUxgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6b99988b6ceso62918747b3.0;
+        Wed, 28 Aug 2024 00:13:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724829052; x=1725433852;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4exFj43hWLT00BAGeYDHEqubvTOHjaJM+W+ukum/0tY=;
-        b=BR4Z/hZ9JxLMBfQbIeCLTSFDwVZ2abcR7J6qVbKNx4SYSG7W4zDtetWWwZwCOfkImX
-         Q9jm9uPIvA5Sm6MEe9+9unjsOVOycUO8XMsxOkrvkUuUT84uIqqFXXgQWSolMYe6jRn8
-         4FFV42VrSmtjZ1IMgSiTIKvfzNGg0sS1sIX0ctJP6Z6dFPZTTi39f+FjczhrAW0ehl0U
-         XkjCTSMC7PHcjxWihpXle97y+VbQRe/Eb7asYezHUtOaH+BV57qzcZZJCErkZ32JVCGH
-         KSMo+K0Bsgh6ChRi/IKE5M+eWn/SLvQPCB/xVHXKBB9i9K8s8AskPZrZ8iPQPBQyMfSD
-         NQVA==
-X-Forwarded-Encrypted: i=1; AJvYcCWdMVyo3MvToVgGcOABxBkNBXvsm3Zvimszqb/wZQyfZyLpvN/KP9xOyvGaGMyFGRVlAQ4n1Ys=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+KNT8AfsEeiAuJVeE2jM58ONSpiBBLSEGEyvHcYTJec+PC6n/
-	vHOsrB5dT1fOyTXOAfyQ4txhZ+oLJCZAPQ7bxg8OWum6vCXyqZ4ki/5svjXCjf7S0xGo9ph863+
-	j5MXrrq8ldWhlJFD++9fN0nyM0Wf/9auu5uH9KLRzlTDnjzU88jOw/w==
-X-Received: by 2002:a05:620a:468b:b0:79d:6276:927a with SMTP id af79cd13be357-7a68970207amr1677961085a.22.1724829052406;
-        Wed, 28 Aug 2024 00:10:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHoJpkEEQicGfWPZT1lOW4zceJ6tHVmY2Rb8P+ysJBwyYwzs7rm3IwCsm6DsOeUMwreCEmk+Q==
-X-Received: by 2002:a05:620a:468b:b0:79d:6276:927a with SMTP id af79cd13be357-7a68970207amr1677958385a.22.1724829051978;
-        Wed, 28 Aug 2024 00:10:51 -0700 (PDT)
-Received: from dhcp-64-16.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a67f319050sm617950485a.11.2024.08.28.00.10.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 00:10:51 -0700 (PDT)
-Message-ID: <189ab84e8af230092ff94cc3f3addb499b1a581d.camel@redhat.com>
-Subject: Re: [PATCH v4 3/7] block: mtip32xx: Replace deprecated PCI functions
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix
- <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
- <yilun.xu@intel.com>,  Andy Shevchenko <andy@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Alvaro Karsz <alvaro.karsz@solid-run.com>, "Michael
- S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>,  Eugenio =?ISO-8859-1?Q?P=E9rez?=
- <eperezma@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Damien
- Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, Keith Busch
- <kbusch@kernel.org>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org,  linux-pci@vger.kernel.org,
- virtualization@lists.linux.dev
-Date: Wed, 28 Aug 2024 09:10:47 +0200
-In-Reply-To: <c7acca0d-586f-41c0-a542-6b698305f17a@kernel.dk>
-References: <20240827185616.45094-1-pstanner@redhat.com>
-	 <20240827185616.45094-4-pstanner@redhat.com>
-	 <c7acca0d-586f-41c0-a542-6b698305f17a@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+        d=1e100.net; s=20230601; t=1724829184; x=1725433984;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IRttU90cGhHvxq7l+2uEOOgIlDZs3J8W+eir8dqoS4M=;
+        b=Qlx3Fj/V8cqro+ewMLurSetAOvj63OOnd84039UsfjziP/OAdMXNzOCUh2xXZSvuiT
+         9o7TlLmrSQmsAKOsY5p0WWcYK+qEkkJrQan3BmTWc3Cv2U2mOXcqJmfi5nDfx9LJNmET
+         ANxQY+wCi5KAq59NCxi/lNim8p7yh1IdU1w/rDhWGJGLcRMMS5lVJhZM9A/ahkcmhz0j
+         kv6TfF8JyPmR46PaxXknzvpQYR10PYFQmoWrC8x6jiQQPWPvuNSlyFCtw5rQvrBzf/mT
+         v42socvkrPgxOXGphF67rk8ROa3kSpnkKq+Tm1D5B9/HF5dPdQW2h9E/It/Ps8bLXsVF
+         j7nA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDJFfuAlkAqJVXOGLsDyHKpFexSZWa+uUMY4ARLC3AUwNLWEWE65d0IEXjrstSAs4huvdLsxCD@vger.kernel.org, AJvYcCVYdBD5yf//tg4D+aBDC7b3QsfsSMjQQswWzAZ0KPw/iouIcqTHohWvflrwLD8XzCxctITkfKoectfCMbs=@vger.kernel.org, AJvYcCX9zHUdx6MdjeS40L82gqfPNzesCCThoy0jEDcBxKG8m840KvcmWZynVa3xkoFqaSPXs3+oVeeIMWNHqyBlOc5jkxs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/rlg3sVbcfCkkF4ztYZz4ooGjTmjxPx/OpuBSV2Otw3XnuGGu
+	BXUVuZL9kG4mZSvcy4LfPptfmvRfr3MrFrCL8EjbPm36fHS75vJDet6rs2aA
+X-Google-Smtp-Source: AGHT+IF7INMxQFSKNupD65V2J84remS1RXbzWpoys8br3CUPNOfL5R9+j/yYCyph3CoFbvEBRwI6Lg==
+X-Received: by 2002:a05:690c:290d:b0:6be:8c:691b with SMTP id 00721157ae682-6c62557db60mr133642167b3.17.1724829183785;
+        Wed, 28 Aug 2024 00:13:03 -0700 (PDT)
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com. [209.85.128.169])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6c39d3a9f9bsm22365517b3.78.2024.08.28.00.13.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Aug 2024 00:13:02 -0700 (PDT)
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6b99988b6ceso62918477b3.0;
+        Wed, 28 Aug 2024 00:13:02 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU4x7NcJf9caucByhM7d8b/nxQofzLyLpOur+AhEXa2OmvnOd189TeQwfWBNX2kvahueYfYdbBq@vger.kernel.org, AJvYcCVL0KerHIi9epFO4dCBbp+J7F3I5C6OPnv27vU1U75Fp0wtXLSYEhJr5IhK8dkclwZ/PSgzSf0C2I7CdUBLrDnyfcI=@vger.kernel.org, AJvYcCViV+RsFC9lhw+ooUgp/fglg67Lg6vWbMvadvGgCiN2Xm+6g4osENV6SbHwb5WGtU48pqQipIanHUc51DU=@vger.kernel.org
+X-Received: by 2002:a05:690c:2f0a:b0:6b0:cad5:2239 with SMTP id
+ 00721157ae682-6c628a9f1c5mr129690527b3.31.1724829182652; Wed, 28 Aug 2024
+ 00:13:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240827095712.2672820-1-frank.li@vivo.com> <20240827095712.2672820-9-frank.li@vivo.com>
+ <20240827120953.00005450@Huawei.com> <CAHzn2R0r9Jziex+7fyhPGaPf12ckwqZwO40bshDBGdq_Tyenqg@mail.gmail.com>
+In-Reply-To: <CAHzn2R0r9Jziex+7fyhPGaPf12ckwqZwO40bshDBGdq_Tyenqg@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 28 Aug 2024 09:12:50 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdVSz32c6qXYSX4YSfO5mo-30Jku3kgPyR3-PXBoQqex3g@mail.gmail.com>
+Message-ID: <CAMuHMdVSz32c6qXYSX4YSfO5mo-30Jku3kgPyR3-PXBoQqex3g@mail.gmail.com>
+Subject: Re: [net-next v3 8/9] net: mvpp2: Convert to devm_clk_get_enabled()
+ and devm_clk_get_optional_enabled()
+To: Marcin Wojtas <marcin.s.wojtas@gmail.com>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>, Yangtao Li <frank.li@vivo.com>, 
+	clement.leger@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com, 
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, ulli.kroll@googlemail.com, linus.walleij@linaro.org, 
+	linux@armlinux.org.uk, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	mcoquelin.stm32@gmail.com, hkallweit1@gmail.com, 
+	u.kleine-koenig@pengutronix.de, jacob.e.keller@intel.com, 
+	justinstitt@google.com, sd@queasysnail.net, horms@kernel.org, 
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2024-08-27 at 13:05 -0600, Jens Axboe wrote:
-> On 8/27/24 12:56 PM, Philipp Stanner wrote:
-> > pcim_iomap_regions() and pcim_iomap_table() have been deprecated by
-> > the
-> > PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-> > pcim_iomap_table(), pcim_iomap_regions_request_all()").
-> >=20
-> > In mtip32xx, these functions can easily be replaced by their
-> > respective
-> > successors, pcim_request_region() and pcim_iomap(). Moreover, the
-> > driver's calls to pcim_iounmap_regions() in probe()'s error path
-> > and in
-> > remove() are not necessary. Cleanup can be performed by PCI devres
-> > automatically.
-> >=20
-> > Replace pcim_iomap_regions() and pcim_iomap_table().
-> >=20
-> > Remove the calls to pcim_iounmap_regions().
->=20
-> Looks fine to me - since it depends on other trees, feel free to take
-> it
-> through those:
->=20
-> Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Hi Marcin,
 
-Thank you for the review.
+On Wed, Aug 28, 2024 at 8:26=E2=80=AFAM Marcin Wojtas <marcin.s.wojtas@gmai=
+l.com> wrote:
+> wt., 27 sie 2024 o 13:09 Jonathan Cameron
+> <Jonathan.Cameron@huawei.com> napisa=C5=82(a):
+> > On Tue, 27 Aug 2024 03:57:11 -0600
+> > Yangtao Li <frank.li@vivo.com> wrote:
+> > > Use devm_clk_get_enabled() and devm_clk_get_optional_enabled()
+> > > to simplify code.
+> > >
+> > > Signed-off-by: Yangtao Li <frank.li@vivo.com>
+> > > Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > > Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > > Suggested-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> > > Reviewed-by: Marcin Wojtas <marcin.s.wojtas@gmail.com>
+> >
+> > >
+> > > @@ -7745,12 +7710,6 @@ static void mvpp2_remove(struct platform_devic=
+e *pdev)
+> > >
+> > >       if (!dev_of_node(&pdev->dev))
+> > >               return;
+> >
+> > Given this makes no difference any more, drop the above dev_of_node() c=
+heck.
+>
+> This check is to not execute the clk-related code when booting with
+> ACPI. It should remain as-is, unless the new devm_clk_get* api is
+> capable of not exploding in non-DT case. Can you confirm?
 
-I have to provide a v5 because of an issue in another patch. While I'm
-at it, I'd modify this patch here so that the comment above
-pcim_request_region() is descriptive of the actual events:
+As per the removals below, there is no code left in this function after
+the check (i.e. the "else" part became empty).
 
--	/* Map BAR5 to memory. */
-+	/* Request BAR5. */
+> > > -
+> > > -     clk_disable_unprepare(priv->axi_clk);
+> > > -     clk_disable_unprepare(priv->mg_core_clk);
+> > > -     clk_disable_unprepare(priv->mg_clk);
+> > > -     clk_disable_unprepare(priv->pp_clk);
+> > > -     clk_disable_unprepare(priv->gop_clk);
+> > >  }
 
+Gr{oetje,eeting}s,
 
-I'd keep your Reviewed-by if that's OK. It's the only change I'd do.
+                        Geert
 
-Regards,
-P.
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
