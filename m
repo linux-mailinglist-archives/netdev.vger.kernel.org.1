@@ -1,139 +1,168 @@
-Return-Path: <netdev+bounces-122942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C0129633A6
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 23:13:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71D0F9633CC
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 23:25:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D636B1F218A5
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 21:13:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3EB61C21D84
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 21:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1D3187862;
-	Wed, 28 Aug 2024 21:13:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E64CC1A7074;
+	Wed, 28 Aug 2024 21:25:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZRJldksO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sRFNZgVh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456FD45C1C
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 21:13:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185F5139578
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 21:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724879592; cv=none; b=ux4UyqWd2xZwtr0UZpBWbWEQINMUFmzaTqb+n2JHA5P5d+fY6n+V+V+Z9SRBsbNsl3/DrYi/DtOyfL/3iFrbsS05MAbk/T3cdGmTvvE0aysWcH7vg7VvZv4ViyeUgISah9Du3oK+TDCbafKTlXgQiRaYOpU4OmxmtzlfuUpJ7NY=
+	t=1724880338; cv=none; b=SZeuw4q3cSXp77xWvfEQO2v0OFYT2ZYuJ1Qab41K/wppYQr3SGkgaFaOZ48uD8zlDL+VJjLNd03JyPl+Xfyw1/iJdboficZYx0nUiaUMBvHmY3RlYSjN5k3bUO2KIJC0EFcGwrTuL1341TbbP9HON23TT5fhrNdQ/TmxK32P+pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724879592; c=relaxed/simple;
-	bh=kOMoRggHG6e1Yptmnt8TjPnr/TGtpIrli4PudpesVWA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IIOioGokvs4/CLoMqVCOn8TdREh1+NT+NFdFt62l9gY9k102tgT9Q44d5NKo36GK8BjdHV4L68kETKiUdpeFhJ+tbHiUYTPurq/w3xdEe9UWSr/fXdupp2lTjilvr9dMCwnC6LaeEvnsu/0k1aa/55sn8VATuISN+OtCYJJpZso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZRJldksO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724879590;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pp8NTASnQBu4zNe+37uUe6R0UYN9YHQCxcsRW9hG7zg=;
-	b=ZRJldksOqpmD2mr7FPXxGDM7KMwqbMidaBImGI3KtfIOuaz3UaHZYDjxDzKHDLlO64R0ye
-	fKkBwQD2UjbVZf2oQZ8TouLdaMkbzE87d8qtAIkiqdVE2x0xJ7H6XfOTW/0ZaIfJuPEOp3
-	b2Q+eeTU3paSAGBRLTDKzJGySwscsxg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-605-rqzUFLsgNUeUMD9YG-k12Q-1; Wed, 28 Aug 2024 17:13:08 -0400
-X-MC-Unique: rqzUFLsgNUeUMD9YG-k12Q-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-371b187634fso485017f8f.0
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 14:13:08 -0700 (PDT)
+	s=arc-20240116; t=1724880338; c=relaxed/simple;
+	bh=3fc8SOSqtxO0E0t83WmTrjKXi93qXUImNFcgQN4jXkQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lk/5LkWTJBW4UqNasEpCjvLgM8s30oV65IVEMxfhMCTb+XUNR5pUdYSb1TgKNrV2xd0VnshYAWMJPaA7TGeojyzQCdp6wbxC6h4kWzY3hCZahqdeip3w7YLMebOKYOzZJEGxaZmxjJvj9/KCkU9VescEZ7Cf1J/BatDMIkNQWIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sRFNZgVh; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a86abbd68ffso229166b.0
+        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 14:25:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724880335; x=1725485135; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AbDM6dUrnGJUvfT6BG+hp6ChG+JOiYpKtW5xdzXrp64=;
+        b=sRFNZgVhu/IDr7aiEN8ddul8eY8x8VMRB77WNOt7FgFNo+LX/qUMl1NuD84ZnOW0hB
+         DdUJC1I+VHyuRRle9KMXbS/wsh5hCD1litHe3CpOz7lB+NKM0dnj2w0GlVQJFsSLrSYG
+         Ei+tID8AZmgJjgpT4fFQviGGuAfi1MjZfMAeCZ6xZfReu9WiTwwBUDgwIZ1uqsNu2B2W
+         O/Um/JEUm3zYMh09EiC5WxjLitWpR9JNo0E7U30IRmGf5kSrGGNruPgwp5bpeDpJi5+e
+         fp/ilnprb9k+Z1+2x6hTKHaMwZvwSDR4B6WWpOawaNLgnUeKb5kP3rqT7AIl4Cd33NWa
+         Z+pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724879587; x=1725484387;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pp8NTASnQBu4zNe+37uUe6R0UYN9YHQCxcsRW9hG7zg=;
-        b=ArXHP/eOByOHaUW6wCVwdT19MXIp8KyYWrTYI9Dm+QLw1+cX18K7qqpVlbGDquoxIB
-         egoQtUotu+TuFEpNxid5HqYqsXpjmCc4Ik1r7GuZwowF6hlq5VgeWv0UWJAHZbj7Ql4l
-         j8vfHqhrnSKmO/4nzbpAbXqQ1H4T3aM8ZoGlpI/7DlyIGEvKyYULZjh2NIllAGrzOSMh
-         y7YSleXsY/nJ+0fVCB3Ilx/sJw0rH6/wtOMLqIYiqIAcMxStzMsnKg+Zgd7apWCmH+31
-         nhDLdDieOqh4YPzQgZgwkV+y6FtAjRG5biRWpHhxp7bhK5jpVSfyljZtnMD1n5wOuqgi
-         FPww==
-X-Forwarded-Encrypted: i=1; AJvYcCVIIgr7vLzIk0lNM/LVBdBKpNELO6MVooHlvI9G79GeVKCM5ZuYphyxlZPxxL475cs1mJ7dpI8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXm9R860cuooQuP+npnu5Wbvk/sVqhWF2Vr3n8d13GejvdP6G3
-	Duf2OClwFkn4YVn6O7CQB1yvNfEaK65+/IbTa3tlnxPIzp5k7LiNJTeDzj8+Y/MthnFocGFzl3w
-	wnRHnMjJjw+6snW8NF8ntxkv9BqtDTlLQwgmkvG2CiW+KktjY6qnaYg==
-X-Received: by 2002:adf:f24a:0:b0:371:6fb8:8fe3 with SMTP id ffacd0b85a97d-3749c1c800bmr218425f8f.12.1724879587583;
-        Wed, 28 Aug 2024 14:13:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEL49kruF4k7efTApEDE/UqMFPARkWpQbE768rMltIe+nkDxD0bHrPTPNAnrbgh81CY1wzbDA==
-X-Received: by 2002:adf:f24a:0:b0:371:6fb8:8fe3 with SMTP id ffacd0b85a97d-3749c1c800bmr218412f8f.12.1724879587053;
-        Wed, 28 Aug 2024 14:13:07 -0700 (PDT)
-Received: from [192.168.0.114] (146-241-11-249.dyn.eolo.it. [146.241.11.249])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba6397ec1sm31300005e9.4.2024.08.28.14.13.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 14:13:06 -0700 (PDT)
-Message-ID: <4dbb3aba-1bc8-4c16-b1fb-e379c6f4ac85@redhat.com>
-Date: Wed, 28 Aug 2024 23:13:04 +0200
+        d=1e100.net; s=20230601; t=1724880335; x=1725485135;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AbDM6dUrnGJUvfT6BG+hp6ChG+JOiYpKtW5xdzXrp64=;
+        b=EwuIhMWYHHFyx6DNNZsVUw4fidzibLcVAJNGSuvoq0Ji3L+a5KBBFlPGrCQonCvmTQ
+         G2YhkQv6gkajiZY0cyTYTODRfjtdI744uxU2hUqDDypPxz0WGsfh0G4M0LM+zh0pjtkB
+         XxrFs2omn/DpUwBpr/qDn8hgFQlJ8TzicMjRQZNCi4ql/qNUMmPncpvMQB8L/9lhR29C
+         i9owjLeIOJq0c6WzrucvNnZNbEzX2Trw1fbFb5A+BD/AX3u2olOtfYR4C1gd1KnZDves
+         KPq6+3KQmXOU7Wx/6PpnDTI5V6rkOCXjOWh2YaEhj+UzTQP9rkd0SpIwf0AKI/7F7dy5
+         Z+WQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWDRlLbtd0uyHYPty5WD2r0HApyIRsffHDB5kzAZ4orSXYhtTHl7NgYwYyUsLcyobIZeq3KhLo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0gI3KiZ2e3S2Cc9kRHFf5g8op4JMnKzqbXv85UfgcjHNq2tI5
+	XQP9k25ZnpaIfJxAh7St2PBoxg+3KRunSyKPEanZ1K1cEDTkUZ5t8luWf+A98uagnjTMuRljLqx
+	5ZutM/C4aAMJM1PaR3V4MDRiawfh0TNEx96HM
+X-Google-Smtp-Source: AGHT+IGI/ICFLsRswIsvzmbc2cbrhvHph/U2lKHR1+iz6r81PshkaJSOsGee1KCPgfGfpeAbpXhj4qygAr5FHypKsnE=
+X-Received: by 2002:a17:906:730d:b0:a6e:f869:d718 with SMTP id
+ a640c23a62f3a-a89825f98e8mr50961266b.21.1724880334645; Wed, 28 Aug 2024
+ 14:25:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 03/12] net-shapers: implement NL get operation
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>
-References: <Zsh3ecwUICabLyHV@nanopsycho.orion>
- <c7e0547b-a1e4-4e47-b7ec-010aa92fbc3a@redhat.com>
- <ZsiQSfTNr5G0MA58@nanopsycho.orion>
- <a15acdf5-a551-4fb2-9118-770c37b47be6@redhat.com>
- <ZsxLa0Ut7bWc0OmQ@nanopsycho.orion>
- <432f8531-cf4a-480c-84f7-61954c480e46@redhat.com>
- <20240827075406.34050de2@kernel.org>
- <CAF6piCL1CyLLVSG_jM2_EWH2ESGbNX4hHv35PjQvQh5cB19BnA@mail.gmail.com>
- <20240827140351.4e0c5445@kernel.org>
- <CAF6piC+O==5JgenRHSAGGAN0BQ-PsQyRtsObyk2xcfvhi9qEGA@mail.gmail.com>
- <Zs7GTlTWDPYWts64@nanopsycho.orion>
- <061cba21-ad88-4a1e-ab37-14d42ea1adc3@redhat.com>
- <20240828133048.35768be6@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240828133048.35768be6@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240822200252.472298-1-wangfe@google.com> <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
+ <20240828112619.GA8373@unreal>
+In-Reply-To: <20240828112619.GA8373@unreal>
+From: Feng Wang <wangfe@google.com>
+Date: Wed, 28 Aug 2024 14:25:22 -0700
+Message-ID: <CADsK2K-mnrz8TV-8-BvBU0U9DDzJhZF2GGM22vgA6GMpvK556w@mail.gmail.com>
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, 
+	antony.antony@secunet.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Leon,
 
+Thank you for your insightful questions and comments.
 
-On 8/28/24 22:30, Jakub Kicinski wrote:
-> On Wed, 28 Aug 2024 12:55:31 +0200 Paolo Abeni wrote:
->> - Update the NL definition to nest the ‘ifindex’ attribute under the
->> ‘binding’ one. No mention/reference to devlink yet, so most of the
->> documentation will be unchanged.
-> 
-> Sorry but I think that's a bad idea. Nesting attributes in netlink
-> with no semantic implications, just to "organize" attributes which
-> are somehow related just complicates the code and wastes space.
-> Netlink is not JSON.
-> 
-> Especially in this case, where we would do it for future uAPI extension
-> which I really hope we won't need, since (1) devlink already has one,
-> (2) the point of this API is to reduce the uAPI surface, not extend it,
-> (3) user requirements for devlink and netdev config are different.
+Just like in crypto offload mode, now pass SA (Security Association)
+information to the driver in packet offload mode. This helps the
+driver quickly identify the packet's source and destination, rather
+than having to parse the packet itself. The xfrm interface ID is
+especially useful here. As you can see in the kernel code
+(https://elixir.bootlin.com/linux/v6.10/source/net/xfrm/xfrm_policy.c#L1993=
+),
+it's used to differentiate between various policies in complex network
+setups.
 
-FTR I was no more than 60" from posting the new revision including that 
-when I read that. I hope Jiri would agree...
+During my testing of packet offload mode without the patch, I observed
+that the sec_path was NULL. Consequently, xo was also NULL when
+validate_xmit_xfrm was called, leading to an immediate return at line
+125 (https://elixir.bootlin.com/linux/v6.10/source/net/xfrm/xfrm_device.c#L=
+125).
 
-Well, I guess I have to roll-back a lot of changes... Not sure if I'll 
-be able to post tomorrow evening my time...
+Regarding the potential xfrm_state leak, upon further investigation,
+it may not be the case. It seems that both secpath_reset and kfree_skb
+invoke the xfrm_state_put function, which should be responsible for
+releasing the state. The call flow appears to be as follows: kfree_skb
+-> skb_release_all -> skb_release_head_state -> skb_ext_put ->
+skb_ext_put_sp -> xfrm_state_put.
 
-/P
+Please let me know if you have any further questions or concerns. I
+appreciate your valuable feedback!
 
+Feng
 
+On Wed, Aug 28, 2024 at 4:26=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
+rote:
+>
+> On Wed, Aug 28, 2024 at 07:32:47AM +0200, Steffen Klassert wrote:
+> > On Thu, Aug 22, 2024 at 01:02:52PM -0700, Feng Wang wrote:
+> > > From: wangfe <wangfe@google.com>
+> > >
+> > > In packet offload mode, append Security Association (SA) information
+> > > to each packet, replicating the crypto offload implementation.
+> > > The XFRM_XMIT flag is set to enable packet to be returned immediately
+> > > from the validate_xmit_xfrm function, thus aligning with the existing
+> > > code path for packet offload mode.
+> > >
+> > > This SA info helps HW offload match packets to their correct security
+> > > policies. The XFRM interface ID is included, which is crucial in setu=
+ps
+> > > with multiple XFRM interfaces where source/destination addresses alon=
+e
+> > > can't pinpoint the right policy.
+> > >
+> > > Signed-off-by: wangfe <wangfe@google.com>
+> >
+> > Applied to ipsec-next, thanks Feng!
+>
+> Stephen, can you please explain why do you think that this is correct
+> thing to do?
+>
+> There are no in-tree any drivers which is using this information, and it
+> is unclear to me how state is released and it has controversial code
+> around validity of xfrm_offload() too.
+>
+> For example:
+> +               sp->olen++;
+> +               sp->xvec[sp->len++] =3D x;
+> +               xfrm_state_hold(x);
+> +
+> +               xo =3D xfrm_offload(skb);
+> +               if (!xo) { <--- previous code handled this case perfectly=
+ in validate_xmit_xfrm
+> +                       secpath_reset(skb);
+> +                       XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
+> +                       kfree_skb(skb);
+> +                       return -EINVAL; <--- xfrm state leak
+> +               }
+>
+>
+> Can you please revert/drop this patch for now?
+>
+> Thanks
 
