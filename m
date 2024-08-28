@@ -1,232 +1,142 @@
-Return-Path: <netdev+bounces-122915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BFD2963178
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:10:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D29B6963196
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:16:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC4091F25478
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:10:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 108A91C21EA4
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621571A7ADD;
-	Wed, 28 Aug 2024 20:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0931A7AF0;
+	Wed, 28 Aug 2024 20:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yp8x+CJM"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UA8NPRLH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1ACD1ABEB8
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 20:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3ADB1ABED5
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 20:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724875819; cv=none; b=AvSfpOlFwVQWkTdOmGFje65pogZNDkCCDh56prBI5MHL3Tb/8rS2x7tBtQYv2XBA3QqOAJgCegkRJZ9aRe6ODUeAtcsMgbZ161AhlGfIXqAIMZuDqHXbV9mjsn4Xs8dT7heqA3LTHbqtgmUhtemaLa1Lxhe7FLQTFql/MaXXc4E=
+	t=1724876188; cv=none; b=DyTK3tLWUpIWH8wvQA2q1gSTVJYvbqbqitj4bz3uyxxGMtMQzNkDx49T/OVeHtbi4UGgglWJAsB27GfS4Uo4s297SZl2YuI06BdWpFgSk72+J6YEDZEwVs1YcJD8f1P3WW8LfAsuaZ/kVe5Kshh/b6ZoMscpyHiJZeN4OkZL6gY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724875819; c=relaxed/simple;
-	bh=w8b6PkIYjJZovuOCIqwavIgc16+Xh9q9q81R1DI+cuc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lL6UEzduFbjHq66FWEFwTZ3nUnmbqsmPelukViw0c9hy1WyMeU9PdVshUNU8ilC9YaXRIzpHxL5q4buervxiWcpDc5RLinveggcCMUB+EYAuC4BJI6cUmSkqy5Wh5/RPfyZym0q5CD9T4xocnxh+RoEEITdQIFa+sSBRIbVLS54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yp8x+CJM; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4518d9fa2f4so75531cf.0
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 13:10:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724875816; x=1725480616; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WRQZULi0fxdGaDOWgUnJwTM13nI0IO1slOUeig8k28M=;
-        b=yp8x+CJMG5utUgzd1vDw7Gjppw/nAhv6+frjKp2XBwq4d9o4369oqFkUY004DbWABJ
-         sSjQAMMzzfmRRYb7hufIjkBq60lHg6lNWtmTeoOOfHA+IoVlG85Gwy+rXwqfiSrT8UHE
-         aXxCNXyxVm3Xm6zG+XntXvynjvjsFHPcoTtC3jLLF2gTP4ovnI4eeKRB/J30FtOHSYu/
-         r0RqRVoV1wfkmwingjI01Zi7Y8EHtpSbEs0ijrAW6TcFquBfCFk75pfNNu3Lod4jmJxm
-         CfN9v4ybJIM/GEZVEhjbStlYTqBtn4bDZ4iHjKa43CFQkqNOgsHbdGCvPZxGX2yg9OJ8
-         FnNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724875816; x=1725480616;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WRQZULi0fxdGaDOWgUnJwTM13nI0IO1slOUeig8k28M=;
-        b=FWWClXX8h7Dszrvb3J65rk7FZzHlpYF91lkHCSbEXaVpGfkujgBUgqDbP6fN65bhbK
-         Mb9yBye0Wmi8OlOUGZ9WIr9SvnJxx0+F0mRivoy4Ob2+ihf6Ln2Gq8O2zGoHv/V7AARH
-         eWGDKIgJPtAcflYi9VcH1U5vLkI6QTgCK+4/pWE9X0KskSzWnzGM+VDPjktvLqd6U1yX
-         kEJt+AYPNLLbyT81nvJTSI+8jnvsj9tg+xt5nRouCGTLIhUEy5pC2XW5WevpxvL/Nv1m
-         TcouWIzFZDx1vYeNyINSSdDNHJ7PU1NZxgVSAqK5xp5XoCP+2TgujBM+/oCBILIo/Usa
-         Qw9w==
-X-Forwarded-Encrypted: i=1; AJvYcCWfwj9OU0ao3JXLe3mxu+BlsPLM1K/ahOkjwp4A3JCQTVG+c0VskgHMGRwjr+OSiDDjr0IjsGg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4ibDsULaLyzhiadMw+H0EMjqxIdLig+B2G13AtZR2L3i8exGv
-	hf0iuZxI3DQ5lSDr8jiaEdNzejuo4Kgpn7wJ5utCcNUH5QqZ8uCSjHvrICjfra3KLrH0j3bwVO1
-	4WI/t6pJnz61LeJA9GvrjAr1xwOnX2vvHFlbI
-X-Google-Smtp-Source: AGHT+IFVVPvKyQ132jKWfjlBFDK33k//CBo5j8f7kHW4CS1dThiSw5RYeMAHF/V0vGwk0WFu/U3PVi1al3YuWSKNdoc=
-X-Received: by 2002:ac8:64cd:0:b0:456:7f34:f560 with SMTP id
- d75a77b69052e-4567fcbdfbbmr637231cf.22.1724875816089; Wed, 28 Aug 2024
- 13:10:16 -0700 (PDT)
+	s=arc-20240116; t=1724876188; c=relaxed/simple;
+	bh=az5JLCJKZVd7MrP8d/pxlwJo5FDQJdNjsMiec+ZSnEg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mcgApaVnWalaYZ8CJHeN6FDzBrwOVu+/51y9TS+/obvghS+DSCwBkxqyLtzCe2AH4cqAienJwJ1EZcZYLEYj/bM+FCSVGDl2EDpbfZ+9rEcNJAnXKsaLLEGW/y98w9m8eU/1PdlsnsLQYGE6vaLuBNXLUmbA7F0TPpWXiDqHFek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UA8NPRLH; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 28 Aug 2024 13:16:14 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724876183;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TcFJMtnoZx/3smatfAG72v8CqCQxeneyOqoZqcBXEJ4=;
+	b=UA8NPRLHJk8sJ2BgEWshSbomfpPfoUBD1kFcgir+M5ur3KcuRfOPjB7A2f2BlRBseINxqv
+	HhHMR6llKGwdYydRhGqyBns7E2u9qHvc/4pRMbhiEmxIwHvQJA4leZgR+BGuxL9hhusIOD
+	4baQO6VbhPbCE3d6lu4DwEUEd1ErM1U=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Yosry Ahmed <yosryahmed@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
+	Vlastimil Babka <vbabka@suse.cz>, David Rientjes <rientjes@google.com>, 
+	Hyeonggon Yoo <42.hyeyoo@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	Meta kernel team <kernel-team@meta.com>, cgroups@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v2] memcg: add charging of already allocated slab objects
+Message-ID: <zjvmhbfzxpv4ujc5v7c4aojpsecmaqrznyd34lukst57kx5h43@2necqcieafy5>
+References: <20240827235228.1591842-1-shakeel.butt@linux.dev>
+ <CAJD7tkawaUoTBQLW1tUfFc06uBacjJH7d6iUFE+fzM5+jgOBig@mail.gmail.com>
+ <pq2zzjvxxzxcqtnf2eabp3whooysr7qbh75ts6fyzhipmtxjwf@q2jw57d5qkir>
+ <CAJD7tka_OKPisXGDO56WMb6sRnYxHe2UDAh14d6VX1BW2E3usA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240826092707.2661435-1-edumazet@google.com> <CADVnQy=Z697P_gtkXMgPiASS6YwJ4PLDkqei3NvGJ5csKE8nhw@mail.gmail.com>
- <CANn89iJwVq5OyH9PpWjk4vWGuLOZi=rfEf7HMcoGZ3Uf4nW-Rg@mail.gmail.com>
-In-Reply-To: <CANn89iJwVq5OyH9PpWjk4vWGuLOZi=rfEf7HMcoGZ3Uf4nW-Rg@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Wed, 28 Aug 2024 16:09:56 -0400
-Message-ID: <CADVnQymWJ1Ay=qWVNHeJ=kLVKnNZkTs-U38ZLGS-6JnF+xM4pg@mail.gmail.com>
-Subject: Re: [PATCH net] tcp_cubic: switch ca->last_time to usec resolution
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Mingrui Zhang <mrzhang97@gmail.com>, Lisong Xu <xu@unl.edu>, Yuchung Cheng <ycheng@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJD7tka_OKPisXGDO56WMb6sRnYxHe2UDAh14d6VX1BW2E3usA@mail.gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Aug 26, 2024 at 1:27=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Mon, Aug 26, 2024 at 3:26=E2=80=AFPM Neal Cardwell <ncardwell@google.c=
-om> wrote:
+On Wed, Aug 28, 2024 at 12:42:02PM GMT, Yosry Ahmed wrote:
+> On Wed, Aug 28, 2024 at 12:14 PM Shakeel Butt <shakeel.butt@linux.dev> wrote:
 > >
-> > On Mon, Aug 26, 2024 at 5:27=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
+> > On Tue, Aug 27, 2024 at 05:34:24PM GMT, Yosry Ahmed wrote:
+> > > On Tue, Aug 27, 2024 at 4:52 PM Shakeel Butt <shakeel.butt@linux.dev> wrote:
+> > [...]
+> > > > +
+> > > > +#define KMALLOC_TYPE (SLAB_KMALLOC | SLAB_CACHE_DMA | \
+> > > > +                     SLAB_ACCOUNT | SLAB_RECLAIM_ACCOUNT)
+> > > > +
+> > > > +static __fastpath_inline
+> > > > +bool memcg_slab_post_charge(void *p, gfp_t flags)
+> > > > +{
+> > > > +       struct slabobj_ext *slab_exts;
+> > > > +       struct kmem_cache *s;
+> > > > +       struct folio *folio;
+> > > > +       struct slab *slab;
+> > > > +       unsigned long off;
+> > > > +
+> > > > +       folio = virt_to_folio(p);
+> > > > +       if (!folio_test_slab(folio)) {
+> > > > +               return __memcg_kmem_charge_page(folio_page(folio, 0), flags,
+> > > > +                                               folio_order(folio)) == 0;
 > > >
-> > > bictcp_update() uses ca->last_time as a timestamp
-> > > to decide of several heuristics.
+> > > Will this charge the folio again if it was already charged? It seems
+> > > like we avoid this for already charged slab objects below but not
+> > > here.
 > > >
-> > > Historically this timestamp has been fed with jiffies,
-> > > which has too coarse resolution, some distros are
-> > > still using CONFIG_HZ_250=3Dy
-> > >
-> > > It is time to switch to usec resolution, now TCP stack
-> > > already caches in tp->tcp_mstamp the high resolution time.
-> > >
-> > > Also remove the 'inline' qualifier, this helper is used
-> > > once and compilers are smarts.
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > Link: https://lore.kernel.org/netdev/20240817163400.2616134-1-mrzhang=
-97@gmail.com/T/#mb6a64c9e2309eb98eaeeeb4b085c4a2270b6789d
-> > > Cc: Mingrui Zhang <mrzhang97@gmail.com>
-> > > Cc: Lisong Xu <xu@unl.edu>
-> > > ---
-> > >  net/ipv4/tcp_cubic.c | 18 ++++++++++--------
-> > >  1 file changed, 10 insertions(+), 8 deletions(-)
-> > >
-> > > diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
-> > > index 5dbed91c6178257df8d2ccd1c8690a10bdbaf56a..3b1845103ee1866a31692=
-6a130c212e6f5e78ef0 100644
-> > > --- a/net/ipv4/tcp_cubic.c
-> > > +++ b/net/ipv4/tcp_cubic.c
-> > > @@ -87,7 +87,7 @@ struct bictcp {
-> > >         u32     cnt;            /* increase cwnd by 1 after ACKs */
-> > >         u32     last_max_cwnd;  /* last maximum snd_cwnd */
-> > >         u32     last_cwnd;      /* the last snd_cwnd */
-> > > -       u32     last_time;      /* time when updated last_cwnd */
-> > > +       u32     last_time;      /* time when updated last_cwnd (usec)=
- */
-> > >         u32     bic_origin_point;/* origin point of bic function */
-> > >         u32     bic_K;          /* time to origin point
-> > >                                    from the beginning of the current =
-epoch */
-> > > @@ -211,26 +211,28 @@ static u32 cubic_root(u64 a)
-> > >  /*
-> > >   * Compute congestion window to use.
-> > >   */
-> > > -static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 ac=
-ked)
-> > > +static void bictcp_update(struct sock *sk, u32 cwnd, u32 acked)
-> > >  {
-> > > +       const struct tcp_sock *tp =3D tcp_sk(sk);
-> > > +       struct bictcp *ca =3D inet_csk_ca(sk);
-> > >         u32 delta, bic_target, max_cnt;
-> > >         u64 offs, t;
-> > >
-> > >         ca->ack_cnt +=3D acked;   /* count the number of ACKed packet=
-s */
-> > >
-> > > -       if (ca->last_cwnd =3D=3D cwnd &&
-> > > -           (s32)(tcp_jiffies32 - ca->last_time) <=3D HZ / 32)
-> > > +       delta =3D tp->tcp_mstamp - ca->last_time;
-> > > +       if (ca->last_cwnd =3D=3D cwnd && delta <=3D USEC_PER_SEC / 32=
-)
-> > >                 return;
-> > >
-> > > -       /* The CUBIC function can update ca->cnt at most once per jif=
-fy.
-> > > +       /* The CUBIC function can update ca->cnt at most once per ms.
-> > >          * On all cwnd reduction events, ca->epoch_start is set to 0,
-> > >          * which will force a recalculation of ca->cnt.
-> > >          */
-> > > -       if (ca->epoch_start && tcp_jiffies32 =3D=3D ca->last_time)
-> > > +       if (ca->epoch_start && delta < USEC_PER_MSEC)
-> > >                 goto tcp_friendliness;
 > >
-> > AFAICT there is a problem here. It is switching this line of code to
-> > use microsecond resolution without also changing the core CUBIC slope
-> > (ca->cnt) calculation to also use microseconds.  AFAICT that means we
-> > would be re-introducing the bug that was fixed in 2015 in
-> > d6b1a8a92a1417f8859a6937d2e6ffe2dfab4e6d (see below). Basically, if
-> > the CUBIC slope (ca->cnt) calculation uses jiffies, then we should
-> > only run that code once per jiffy, to avoid getting the wrong answer
-> > for the slope:
->
-> Interesting.... would adding the following part deal with this
-> problem, or is it something else ?
->
-> diff --git a/net/ipv4/tcp_cubic.c b/net/ipv4/tcp_cubic.c
-> index 3b1845103ee1866a316926a130c212e6f5e78ef0..bff5688ba5109fa5a0bbff7dc=
-529525b2752dc46
-> 100644
-> --- a/net/ipv4/tcp_cubic.c
-> +++ b/net/ipv4/tcp_cubic.c
-> @@ -268,9 +268,10 @@ static void bictcp_update(struct sock *sk, u32
-> cwnd, u32 acked)
->
->         t =3D (s32)(tcp_jiffies32 - ca->epoch_start);
->         t +=3D usecs_to_jiffies(ca->delay_min);
-> -       /* change the unit from HZ to bictcp_HZ */
-> +       t =3D jiffies_to_msecs(t);
-> +       /* change the unit from ms to bictcp_HZ */
->         t <<=3D BICTCP_HZ;
-> -       do_div(t, HZ);
-> +       do_div(t, MSEC_PER_SEC);
->
->         if (t < ca->bic_K)              /* t - K */
->                 offs =3D ca->bic_K - t;
+> > Thanks for catchig this. It's an easy fix and will do in v3.
+> >
+> > > > +       }
+> > > > +
+> > > > +       slab = folio_slab(folio);
+> > > > +       s = slab->slab_cache;
+> > > > +
+> > > > +       /* Ignore KMALLOC_NORMAL cache to avoid circular dependency. */
+> > > > +       if ((s->flags & KMALLOC_TYPE) == SLAB_KMALLOC)
+> > > > +               return true;
+> > >
+> > > Would it be clearer to check if the slab cache is one of
+> > > kmalloc_caches[KMALLOC_NORMAL]? This should be doable by comparing the
+> > > address of the slab cache with the addresses of
+> > > kmalloc_cache[KMALLOC_NORMAL] (perhaps in a helper). I need to refer
+> > > to your reply to Roman to understand why this works.
+> > >
+> >
+> > Do you mean looping over kmalloc_caches[KMALLOC_NORMAL] and comparing
+> > the given slab cache address? Nah man why do long loop of pointer
+> > comparisons when we can simply check the flag of the given kmem cache.
+> > Also this array will increase with the recent proposed random kmalloc
+> > caches.
+> 
+> Oh I thought kmalloc_caches[KMALLOC_NORMAL] is an array of the actual
+> struct kmem_cache objects, so I thought we can just check if:
+> s >= kmalloc_caches[KMALLOC_NORMAL][0] &&
+> s >= kmalloc_caches[KMALLOC_NORMAL][LAST_INDEX]
+> 
+> I just realized it's an array of pointers, so we would need to loop
+> and compare them.
+> 
+> I still find the flags comparisons unclear and not very future-proof
+> tbh. I think we can just store the type in struct kmem_cache? I think
+> there are multiple holes there.
 
-I don't think that would be sufficient to take care of the issue.
-
-The issue (addressed in d6b1a8a92a1417f8859a6937d2e6ffe2dfab4e6d) is
-that in the CUBIC bictcp_update() computation of bic_target the input
-is tcp_jiffies32. That means that the output bic_target will only
-change when the tcp_jiffies32 increments to a new jiffies value.
-
-That means that if we were to go back to executing the bic_target  and
-ca->cnt computations more than once per jiffy, the ca->cnt "slope"
-value becomes increasingly incorrect over the course of each jiffy,
-due to the ca->cnt computation looking like:
-
-  ca->cnt =3D cwnd / (bic_target - cwnd);
-
-...and the fact that cwnd can update for each ACK event, while
-bic_target is "stuck" during the course of the jiffy due to the jiffy
-granularity.
-
-I guess one approach to trying to avoid this issue would be to change
-the initial computation of the "t" variable to be in microseconds and
-increase BICTCP_HZ from 10 to 20 so that the final value of t also
-increases roughly once per microsecond. But then I suspect a lot of
-code would have to be tweaked to avoid overflows... e.g., AFAICT with
-microsecond units the core logic to cube the offs value would overflow
-quite often:
-
-  delta =3D (cube_rtt_scale * offs * offs * offs) >> (10+3*BICTCP_HZ)
-
-IMHO it's safest to just leave last_time in jiffies. :-)
-
-neal
+Do you mean adding a new SLAB_KMALLOC_NORMAL? I will wait for SLAB
+maintainers for their opinion on that. BTW this kind of checks are in
+the kernel particularly for gfp flags.
 
