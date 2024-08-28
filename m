@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-122924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C53963326
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:57:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D9E696333C
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:58:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E855C1C23DE8
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:57:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC33A1F25538
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:58:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5250C1AC442;
-	Wed, 28 Aug 2024 20:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D98C71AD5E6;
+	Wed, 28 Aug 2024 20:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gzYMH+Ym"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YRH/TM+B"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5925E156C6F
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 20:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4183B1AC8B0
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 20:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724878652; cv=none; b=sHaEQDjqPCA6g7O1CTZvCotBQuQRGLGs5BIdL2P3BqrPOHJ0mU0jVgEJQU3auguqvTVkRoOAzJ3ExAuE50GWrFGEeUIIboCKUnHoBTM+m7cYoUuZzdW9g4bLAtEXdTT8qXlShHnCYaw+Q10X2W7AvcWO0FCs0UNnBA8CqRcBOew=
+	t=1724878657; cv=none; b=El/dfTyCmC+wuY+wL7wbXe3wuc7W9VJUniAvFAbKZ8CxhhiGKRiOfGZefGm5ciAK84Vw0Wo7UatkFNqqtDkcqUePoqFtbx1Ns5aNRuexBbQOQp38QOmyRj2Zqqdb1VWBQ1eAFOS4znPizVxEb62D7+cjeKVEHvtFTVxoxofeU7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724878652; c=relaxed/simple;
-	bh=cySKZdMTLgmyhw3lp7daIkseQEt1zFRwj7CiVn4czkk=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=VdpigWq20aQA7fp86Z/MZ8QAVF8jhhWg556jbSiUVd5LSs4fis48pUiQXdos5wGXoeI/vHObeIRmFj7bNLkTF40NIN761loFFaZKVLCACzIyC6r8ArFgXdaB6M2kUjC/e+IvdB+M4pnQaYVJvXmLsrgaQ9MAOdb1NTIfNUqgjIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gzYMH+Ym; arc=none smtp.client-ip=198.175.65.13
+	s=arc-20240116; t=1724878657; c=relaxed/simple;
+	bh=6kQrbIE4kr5T8eFDQTblirQ915WMJmra1Rfj0RlaOK8=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=FhO+o9CBtvIMeHSNBGJr0ngcCuU6V74+G6w8sz1TkcQDSxSOpL+urOtyLwhTF2EZWKS0NgomuJhaPY2HfEXUAvF7Z8g1g7kxr/+X2SgNoi41CheeLVkKLgdNhiU3fzkEQtXMuMAHNbx1hsMoKllyY2lDgyttqCHdJFfNERjy64g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YRH/TM+B; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724878651; x=1756414651;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=cySKZdMTLgmyhw3lp7daIkseQEt1zFRwj7CiVn4czkk=;
-  b=gzYMH+YmwZX/gcrlKbM3a1fLFSTqiQKXibx5dpCcbpIS66xQ8mVkD9pg
-   68jFD10qADZpYugM4eM7WBq8ELtsSC6CdnQLNiyYopoJ6pqmSivWpdXZf
-   tvab7/cEVwRwICBb/o8K2IF3Tahh0r5xGtr+CZSIzE2+cQHcZR4jb5TV7
-   NPEr5X07AC/yopwHb+I8tV2RgEDp5A9S+7fCgK2/j/B1JGicPVDPHGMUe
-   cY0xNcdwvwOrJcfTds4w520y9RDgZJ7af2+g0J8mTRdUZQ362Vusp6/Nr
-   T4iGtzOMW8/EQctXSQV2KrH83l4r7NFOvCHOWHvvT2yG8/rIT+1SIbRzD
-   Q==;
-X-CSE-ConnectionGUID: wzLX1ESFSamfltseIKagVw==
-X-CSE-MsgGUID: hFyiwXdKS5iUnoyfFeDTkA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="34592597"
+  t=1724878657; x=1756414657;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=6kQrbIE4kr5T8eFDQTblirQ915WMJmra1Rfj0RlaOK8=;
+  b=YRH/TM+Bz2y0ZL4YZkeSpOtRXxkXgIeZFdxctDRYCiYaa99+f5jqiSs0
+   01T3T0eigSM5rbgJKsOGxCx77troCw8CVMe2Eybjfj+hqOj21hX1A3l1s
+   We4IV6jHoUJ4ohGosFzsD2hrCRp1wvbE1PT8bsJBElh5L2KsovJYWnZkB
+   1U4zJtOrSEGR+hsmxiJVDVg7Rm6Av/0nnNlLYwd5KDdfreGqffJzyhQvm
+   KlRy+PWoDYBCi0rHntnUgC+XL2CWlHtqNpAtf7XAIaGUxapWVu8vh1P92
+   /fUNQdNjzoBCWwqQOSsYmLxdqQKIfMqyFIuCPFcPEfMLdkZvRUit9Tg1c
+   A==;
+X-CSE-ConnectionGUID: lAze8eIZR0uQeihAbcXVFA==
+X-CSE-MsgGUID: zM74y79BRXCKT5hRSilAcw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="34592625"
 X-IronPort-AV: E=Sophos;i="6.10,183,1719903600"; 
-   d="scan'208";a="34592597"
+   d="scan'208";a="34592625"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 13:57:29 -0700
-X-CSE-ConnectionGUID: 3wihyRQBRj+jFbFawAN3gg==
-X-CSE-MsgGUID: t+VW1UmkRW+m1NH7FQsMiQ==
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 13:57:31 -0700
+X-CSE-ConnectionGUID: rE+LzBF6T26rSiB+xfKqXw==
+X-CSE-MsgGUID: GrxRlq3RRB+HmcCQRIQaJQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,183,1719903600"; 
-   d="scan'208";a="64049956"
+   d="scan'208";a="64049959"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
   by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 13:57:29 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH iwl-next v2 00/13] ice: use <linux/packing.h> for Tx and Rx
- queue context data
-Date: Wed, 28 Aug 2024 13:57:16 -0700
-Message-Id: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-0-558ab9e240f5@intel.com>
+Date: Wed, 28 Aug 2024 13:57:17 -0700
+Subject: [PATCH iwl-next v2 01/13] lib: packing: refuse operating on bit
+ indices which exceed size of buffer
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,142 +70,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAC2Pz2YC/5WOTQ7CIBCFr2Jm7RgYiVVX3sO4sDDa0UobQKxpe
- nexnsDl+8n73giRg3CE/WKEwFmidL4IWi7ANmd/ZRRXNJAio7aakLdaYSuZ8SHXcE6lj7c79oF
- 7tGnAy9PbrxnRmY2rqdrVZDdQ9krlIsPMOoK8WvQ8JDiVpJGYuvCeT2Q95z8eVX/wskaFyhhiY
- kNuTQfxiduV7R5wmqbpA3LvYKLsAAAA
+Message-Id: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-1-558ab9e240f5@intel.com>
+References: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-0-558ab9e240f5@intel.com>
+In-Reply-To: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-0-558ab9e240f5@intel.com>
 To: Vladimir Oltean <olteanv@gmail.com>, netdev <netdev@vger.kernel.org>, 
  Anthony Nguyen <anthony.l.nguyen@intel.com>, 
  Intel Wired LAN <intel-wired-lan@lists.osuosl.org>
 Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 X-Mailer: b4 0.14.0
 
-This series refactors the Tx and Rx queue context data packing in the ice
-driver to use the <linux/packing.h> API. This is intended to aid in the
-future implementation of unpacking context data for live migration. While
-it strictly does save a few bytes in the module according to bloat-o-meter,
-the savings is quite minimal (~200 bytes).
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-While initially implementing the logic, it was discovered that the packing
-code does not work properly if the provided buffer size is not a multiple
-of 4 bytes. This is also fixed by this series, along with some general
-improvements to the API including the addition of pack() and unpack().
+While reworking the implementation, it became apparent that this check
+does not exist.
 
-First, several improvements and cleanups to the packing API are made:
+There is no functional issue yet, because at call sites, "startbit" and
+"endbit" are always hardcoded to correct values, and never come from the
+user.
 
-An additional sanity check is added to packing() to ensure that the
-bit indices do not point outside the bounds of the provided buffer.
+Even with the upcoming support of arbitrary buffer lengths, the
+"startbit >= 8 * pbuflen" check will remain correct. This is because
+we intend to always interpret the packed buffer in a way that avoids
+discontinuities in the available bit indices.
 
-The packing() implementation is adjusted to work correctly when given
-an arbitrary buffer size.
-
-The duplicate kernel-doc for packing() is removed from the header
-file.
-
-The packing API gaves the pack() and unpack() wrappers which simplify
-the use of packing, and enable better const correctness checking.
-
-The pack() and unpack() implementations are separated and packing()
-becomes a simple wrapper that selects between the two operations. This is
-intended to improve the logic as several conditionals can be dropped.
-
-A suite of KUnit tests for the packing API have been added, based on
-simple selftests originally developed by Vladimir.
-
-Additional unit tests for the packing library are added.
-
-A bug in the QUIRK_MSB_ON_THE_RIGHT of the packing API is fixed, along with
-additional unit tests covering this behavior.
-
-Following the improvements to the packing API, the ice driver is
-refactored:
-
-The int_q_state field is removed from the ice_tlan_ctx structure and
-packing definitions. This field is not used, and can't even be properly
-packed or unpacked as its size exceeds 8 bytes.
-
-The existing packing code based on ice_set_ctx() is ripped out and replaced
-with an implementation based on pack().
-
-The sizes of fields in ice_tlan_ctx and ice_rlan_ctx are updated to better
-reflect their actual size.
-
-The setting of the prefetch enable bit in the Rx context is moved into
-ice_setup_rx_ctx() where the rest of the Rx context is configured. This is
-less surprising than having the ice_write_rxq_ctx() always overwrite that
-field of the context.
-
-The copy_rxq_ctx_to_hw() and ice_write_rxq_ctx() are updated to align with
-modern kernel style guidelines. This includes removing an unnecessary NULL
-check, updating the kdoc descriptions to align with the check-kdoc, and
-making ice_copy_rxq_ctx_to_hw() void. This ensures the style for these
-functions will match the style for the similar functions needed to enable
-live migration in a future series.
-
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Fixes: 554aae35007e ("lib: Add support for generic packing operations")
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Tested-by: Jacob Keller <jacob.e.keller@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
-Changes in v2:
-- Fix netdev address
-- Drop unnecessary fixes tag in prefetch enable patch
-- Add a module description to the KUnit tests
-- Mark the test cases array in packing_test.c static
-- Prefer 'Return:' over 'Returns:' for kdoc
-- Link to v1: https://lore.kernel.org/r/20240827-e810-live-migration-jk-prep-ctx-functions-v1-0-0442e2e42d32@intel.com
+ lib/packing.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-I opted to include the packing changes in this series to Intel Wired LAN,
-because the changes are only required due to the new use with the ice
-driver. I also do not believe any existing driver uses
-QUIRK_MSB_ON_THE_RIGHT, so I don't think the fix for that quirk needs to go
-through net or stable either.
+diff --git a/lib/packing.c b/lib/packing.c
+index 3f656167c17e..439125286d2b 100644
+--- a/lib/packing.c
++++ b/lib/packing.c
+@@ -86,8 +86,10 @@ int packing(void *pbuf, u64 *uval, int startbit, int endbit, size_t pbuflen,
+ 	 */
+ 	int plogical_first_u8, plogical_last_u8, box;
+ 
+-	/* startbit is expected to be larger than endbit */
+-	if (startbit < endbit)
++	/* startbit is expected to be larger than endbit, and both are
++	 * expected to be within the logically addressable range of the buffer.
++	 */
++	if (unlikely(startbit < endbit || startbit >= 8 * pbuflen || endbit < 0))
+ 		/* Invalid function call */
+ 		return -EINVAL;
+ 
 
-The packing library changes were discussed here:
-https://lore.kernel.org/netdev/a0338310-e66c-497c-bc1f-a597e50aa3ff@intel.com/
-
-In addition, several of the changes are taken from Vladimir's github:
-https://github.com/vladimiroltean/linux/tree/packing-selftests
-
-Strictly, the changes for pack() and unpack() are not required by ice, but
-Vladimir requested that we try to use the new API so that I am not adding
-another driver which needs updating in the future. In addition, pack() and
-unpack() enable const checking.
-
----
-Jacob Keller (8):
-      lib: packing: add KUnit tests adapted from selftests
-      lib: packing: add additional KUnit tests
-      lib: packing: fix QUIRK_MSB_ON_THE_RIGHT behavior
-      ice: remove int_q_state from ice_tlan_ctx
-      ice: use <linux/packing.h> for Tx and Rx queue context data
-      ice: reduce size of queue context fields
-      ice: move prefetch enable to ice_setup_rx_ctx
-      ice: cleanup Rx queue context programming functions
-
-Vladimir Oltean (5):
-      lib: packing: refuse operating on bit indices which exceed size of buffer
-      lib: packing: adjust definitions and implementation for arbitrary buffer lengths
-      lib: packing: remove kernel-doc from header file
-      lib: packing: add pack() and unpack() wrappers over packing()
-      lib: packing: duplicate pack() and unpack() implementations
-
- drivers/net/ethernet/intel/ice/ice_common.h    |  13 +-
- drivers/net/ethernet/intel/ice/ice_lan_tx_rx.h |  33 +-
- include/linux/packing.h                        |  32 +-
- drivers/net/ethernet/intel/ice/ice_base.c      |   6 +-
- drivers/net/ethernet/intel/ice/ice_common.c    | 333 ++++++--------------
- lib/packing.c                                  | 304 ++++++++++++------
- lib/packing_test.c                             | 412 +++++++++++++++++++++++++
- Documentation/core-api/packing.rst             |  71 +++++
- MAINTAINERS                                    |   1 +
- lib/Kconfig                                    |  12 +
- lib/Makefile                                   |   1 +
- 11 files changed, 840 insertions(+), 378 deletions(-)
----
-base-commit: 2c163922de69983e6ccedeb5c00dec85b6a17283
-change-id: 20240812-e810-live-migration-jk-prep-ctx-functions-d46db279b2c6
-
-Best regards,
 -- 
-Jacob Keller <jacob.e.keller@intel.com>
+2.46.0.124.g2dc1a81c8933
 
 
