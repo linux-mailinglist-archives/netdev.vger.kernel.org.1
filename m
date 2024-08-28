@@ -1,225 +1,250 @@
-Return-Path: <netdev+bounces-122668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87928962236
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:20:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 086CC962237
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:21:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACA5B1C22111
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 08:20:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4041281F88
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 08:20:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 189FE15B12A;
-	Wed, 28 Aug 2024 08:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A767C15B119;
+	Wed, 28 Aug 2024 08:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dYPTbQdG"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="djXwM0AR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B2D156967
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 08:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724833241; cv=none; b=rLmk1XUt9G6+jvumg3w/996412AOjs5+FGyy2SU4PEUWNi7+H5RPyyk7XG88z8tK5+1hxdis+ax7RXtszDyKpjp7jHnuj0SMJFLPXzY4AVnZ8Nu3kFNeM5nJFKvs9LEcBRAUAD8k0xhs/4hDarCnBLmMU8ytTxGBkK87g7539rU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724833241; c=relaxed/simple;
-	bh=1lx02cr09o0GvC4pP+O93KnU2VBN6Uii6gCTgj3Z0xE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mgrrKvoGxJHRO/H6VgSVaDayhsxZhiim7iJOCSxs8D+MhI8h3vXsufdl8sgtVt+uV8lhm82g1FpWiUFHaz+1twmtjD1t0xvff9N7aaBNhxv2HdoZZMOjJXZ5M5sh2Hh79nguJQkJuZ3s3ZeOYf7olc//wGaqR6w2AjASedxhVJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dYPTbQdG; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724833238;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RB+6lhxu3ehfP+zrXXgfWhDBZmy97wctUMf7QuJM/wI=;
-	b=dYPTbQdG8TTYum38gPkB1OF/+MV2ldS6hSu2fc+gvHD4Kl5y7x+0kujnm/4RyDi59PZ7k8
-	B4k0MN/R6CCr0Y1jKu1ywR+UPbRxWNIqhgKMshyBG9zoh76hGcSQ+zcF9j82jfcIQdSPVv
-	H40F39uLzsH03vqOV8kIl2AMDaFKcT0=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-392-tQv7xDZJOli7zXX1OzHMjw-1; Wed, 28 Aug 2024 04:20:36 -0400
-X-MC-Unique: tQv7xDZJOli7zXX1OzHMjw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4280a39ecebso1904075e9.0
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 01:20:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724833235; x=1725438035;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RB+6lhxu3ehfP+zrXXgfWhDBZmy97wctUMf7QuJM/wI=;
-        b=K2fETckj3syi5uuRV1duP1FR/LFi7sKtTE6DYzjp8zywR3XU6QPX0CEbYBjua4CXzw
-         THP8oAt208AzYCFBXlolQ4xO26UzE5W2Yd2HtrC6JbMWbwsTmOgBtPpsfhfj8laVONqu
-         101gbLti/FGPECyQY4+RuDtm98lugbXQXQkXuPiEABeO7TtE/TTsKylZkzaMonpz8bXz
-         /1LOeQmtJF73u1fTGWrJ4l9CDqj4SmRco7lVONfMOGK4sBU98+Qvh1ZjVKGXSueBC5ds
-         6+0qvS7+OKoTExDarMpQxyYLxBPsr8YFT1Ywvv+A8En17V7EbYBw+y7Mm8z0AgdkTGXU
-         U/Fg==
-X-Forwarded-Encrypted: i=1; AJvYcCVyGuXdLpxu1giqfviV/etNHTypPWUKKCOHOIFuYtxE94YIY7INBo4T44oeHz/3WlSN5RGPdKw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXitgS/FKfMWKc7IfBau7Qix3pi4jkd/PtuZeqnWTMVSZfKYCR
-	ZR+V1E02DkYLphLVhRv18zhal5KlV0m6puRdxulMOCQIn7vPK48US/XOKuqz4GT5JdTXBEnU5TW
-	g1jXihrHjIgWyWRoTWuSFYCkDw601X41Su1weh4A2wby8prTQviLlZQ==
-X-Received: by 2002:a05:600c:468a:b0:428:b4a:7001 with SMTP id 5b1f17b1804b1-42ba572f39fmr7389855e9.15.1724833234650;
-        Wed, 28 Aug 2024 01:20:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHHsbTzYkFGfKQB6RCD+HDMcq6rBfUzAZuckOuRNsoFpeBcypplDnwz5Dg+z2fP7injSiDcAw==
-X-Received: by 2002:a05:600c:468a:b0:428:b4a:7001 with SMTP id 5b1f17b1804b1-42ba572f39fmr7389605e9.15.1724833233996;
-        Wed, 28 Aug 2024 01:20:33 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b50:3f10:2f04:34dd:5974:1d13? ([2a0d:3344:1b50:3f10:2f04:34dd:5974:1d13])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba63d816bsm13471755e9.36.2024.08.28.01.20.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 01:20:33 -0700 (PDT)
-Message-ID: <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
-Date: Wed, 28 Aug 2024 10:20:31 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBBC813E3EF;
+	Wed, 28 Aug 2024 08:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724833256; cv=fail; b=lWhJlARnehf61tIJclQE9veMhvQqxzf3FcSboLc6zW+5ApbS5diyFNv2FBmhV9tRSupMfFuJt+H8DmP1XB+m0s0hLcJUIOWk8TKfkSc5YsOsSkWGLg/94d6KjSsz5BLzzCWgs/GyAEGqfO8/D9/nUnvZlw2sKDzLghlawTgTeLA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724833256; c=relaxed/simple;
+	bh=9IiuAcGGstkILhpU8LHxJXuTbXTkG7QIuNQPGFdEohg=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=q4pXoc+dAQ08DMeNGdvqh+yymPFMMacuoU0QEB5hqPwcv++CfOBrdSuJG1ke1NBaZRPpS89vV9pi1pF3pR2EmwfZV5lVAX5a3IqQg3oAh52zIO2b+zoEI6XhGMpbAh2vz+3J4fnx4AFecvm/EohI7EPFDQMeYl2p7wopmtoa5rg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=djXwM0AR; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724833255; x=1756369255;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=9IiuAcGGstkILhpU8LHxJXuTbXTkG7QIuNQPGFdEohg=;
+  b=djXwM0ARWWcpy2sR0EsimhXMsW6UWbag0ySQKCv7CX/DLhcEaXOv4bmD
+   8ave0Gflg5orqk1wJ6nHyhVS+iY0m5Qq+t+NTk09YwdW9L3k+KQa/d367
+   2Q0wys49brMPlCZhirvcBWSZNocGaJO0A8hrreWV+aBG9+grwyVeV25Oa
+   TvwZlDJO4Bz/BLGKvjtzqrfOJyzeBDSKWMUHROcI9S+kwj20syt3FUa6A
+   IddTchIT2XnEdYN7JuC4CwkSjS8DLH1cDnsLOeNR3K7Lt30dgNsWnGfjN
+   aiMlW6j7qMJGHJtqM0DjWHBi/dyhIAmpv+LFGvD5hr3imE/5WX6NuE4TV
+   Q==;
+X-CSE-ConnectionGUID: Tmi8sHFcRUei9cp3seteWw==
+X-CSE-MsgGUID: JGTvzPebTsOuP3xlWZT6kA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11177"; a="27229500"
+X-IronPort-AV: E=Sophos;i="6.10,182,1719903600"; 
+   d="scan'208";a="27229500"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 01:20:50 -0700
+X-CSE-ConnectionGUID: pCtmj4XTTBaKr/mwNyWAeQ==
+X-CSE-MsgGUID: fXnYM5GWQg6BWTaPqlJ7fw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,182,1719903600"; 
+   d="scan'208";a="63655443"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Aug 2024 01:20:50 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 28 Aug 2024 01:20:49 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 28 Aug 2024 01:20:49 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.172)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 28 Aug 2024 01:20:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SOU6SHZ6fo9k5o5rqpvRbhFLMpo39JA80EPApOtVeSWFRr2/RVJHFnBdkklDM/U1rbSJrwVwDTF/bGDNt1gN7CgHYmkLpEIdiWdjUpslWFoXrQwvVWwjQQlKe+TU3Rc7pHLKOgJwHvY7Ga84tAD9X3n6vHq0HNTWPCgbeofajV1ymqqDMqSeKwa4GjfCZV6xK9DfudM24pUFAoJ62U1p2bQUmcPJ0vCVNL++z+vKB1sJwmen7XNYHOoMshRsyKvZL/icEt0qO1W3FCFbtNFKNdOPxI3ZqTOF0YZHhAXSBYdw4JsbObuxyAXR2eGTkijouhS9Zs8eCcH3fycftgVxcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bQ8HQ8c0+5OVOYv6JAnADfYFjiABWRLxcOxVmXbpXPo=;
+ b=aRJIfQSXc8r0DjyJQEkUjo7C8DOqTJTWGB9Js38N3oaqqH1qh+IIOZHln0uQF8l56MIT+zPGGb2nZzR70+fRG80yWl1r85ybg3Wh509LClMu2jZikv6b0SHYU2YnznhvVWOz2WQZJMFoDB8EJkGlDP1zpNF2ortOHoegKSSjJ89w48QcPn77WCrbqsMaEYSNdKAob6hUWt2yLvf722TuV37ubbntOpntBUy02VB5h5zrCJ5d2/1t0utDV/y2gTRGYsWteK8URBXwRkCBQrWIoTJLeDpyCp8kgv66O84d+qgjd7ra6p4jAD833DQ00ZfG2jdMEZ5dQltxmukbY7YfXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by PH7PR11MB6473.namprd11.prod.outlook.com (2603:10b6:510:1f3::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Wed, 28 Aug
+ 2024 08:20:47 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%4]) with mapi id 15.20.7897.021; Wed, 28 Aug 2024
+ 08:20:47 +0000
+Message-ID: <cca70257-b8bf-4d4f-9a0e-b5116536734e@intel.com>
+Date: Wed, 28 Aug 2024 10:20:40 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net] ice: Fix NULL pointer access, if PF doesn't
+ support SRIOV_LAG
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+CC: "David S. Miller" <davem@davemloft.net>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Machon
+	<daniel.machon@microchip.com>, Dave Ertman <david.m.ertman@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20240827071602.66954-1-tbogendoerfer@suse.de>
+ <51b220a9-3304-4baf-a2fc-8da8d765aff7@intel.com>
+Content-Language: en-US
+In-Reply-To: <51b220a9-3304-4baf-a2fc-8da8d765aff7@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ZR0P278CA0143.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:40::22) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
- ksft
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- ncardwell@google.com, shuah@kernel.org, linux-kselftest@vger.kernel.org,
- fw@strlen.de, Willem de Bruijn <willemb@google.com>,
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, martineau@kernel.org
-References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH7PR11MB6473:EE_
+X-MS-Office365-Filtering-Correlation-Id: 19c2ca01-7290-43e8-2695-08dcc73a518c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?endLbXEzZGM3cUR3RS9lM2daNUw2VXpLdjBWL3VnOUtscW5XUnBUR2I0dVd3?=
+ =?utf-8?B?S1Z2OW5GZFNYTmFVYzJnZ2toSUp1UUt4cEsrVmk5N0NJUFlCd1BpdmJjcFhl?=
+ =?utf-8?B?UCt5Vzg3ZEc1Y0Zkd1NVSnZDaXk4M01JUWg5YnlHaG5ObFVoL1lrTURBZCtk?=
+ =?utf-8?B?VnBjeU82TkJ1TUFhN2ZyMk9Qb1B6RUlXeThOQmhLeFF0MHV5L0N4dFg2MTJL?=
+ =?utf-8?B?WjIzd0srMWRJNnhsZjFrQU5uVVZpbG9ySEJZRFloYTdpK2QzbGtlcVIwTXNO?=
+ =?utf-8?B?UXZDV1BVV3RRblN3c09RdXZxTjRBNURYMWVGNzNLeTRpMUI1cW4wVWhMTUt3?=
+ =?utf-8?B?Q0x5em5oamdUNzNnZENMWXZCbjd1cFgvS3k4TWRuV09UVXdJaEhKNGNQSGdi?=
+ =?utf-8?B?VnBVTkwzbzcvZkdJNzREK3RFSzBaZ3VUbEhkR29VY2JGZUhQeDVyQi81Rklv?=
+ =?utf-8?B?cmxMSzZZbE00ZjZENHgzeEsxZllBQk1tS1lCdW9XT0xqMkRXakRGREZZTzZq?=
+ =?utf-8?B?YjNiZzlQeENlSGJGSGNvb3dBc1YxcmxHTGVSckUrZDNIVC9EemIzYkhGUEky?=
+ =?utf-8?B?NXBjSFd1Y3FYYlFOdE93cC9nbkxiemdPRUQ1VWVRbHBQVlU2WHZRMmJVTDZp?=
+ =?utf-8?B?Q0hWWTRvOE8vWjNTVXhlUEZVNnp3M3h2WS93M3p3VWR1QVpHTFFLdHpmNmRu?=
+ =?utf-8?B?a3UzVG9mb3MydmloQk1FNUlUY0ZGMWZDWjJTdU9kWFhaRzFUbmNUOHh3bzJx?=
+ =?utf-8?B?U0xqMHNGbGNKQ3FOa29GUk56VjNOQWFQbDZiWXNGWGUrdi82Rnk5K2FJbmVp?=
+ =?utf-8?B?RndwejZqZW1MTkJlYW5mbGQxVWRiaVZob3kramcweXhZY3FyNXpuOGsxOThN?=
+ =?utf-8?B?amE0ZzFUZmZwQjNUMjdYSnEvMEllMEVhWnk4NzViaUVxektHSGl1dC9EUUdW?=
+ =?utf-8?B?ZU5aVzg5R3lGQTdWZWc1Ym92ODR0azRTbDZuODVybFVDUWF2ZEpya1BrMDBk?=
+ =?utf-8?B?T25RVEN1TnorYWlBOWhBQ2VhZnM4MzJ4NVljT3p4VlJZejhMNkNqTmdvWEdt?=
+ =?utf-8?B?VHZpVmZIb0Q3cUlNQjVFajRsYnBiOWRORElSN1lDeG5PdGs2akJrTHMvWkVW?=
+ =?utf-8?B?QTBaL1dURjBJYnM1Tk9WSkdFOG1HZm9OU2JQTm9SOXU5VFY5K1dlV0dXQkNN?=
+ =?utf-8?B?UUhKNGpzS1dUTXFNTm1EbTYyS0UreHFIYWpEeER6VE9rWk9TTmpHb1Y3TStp?=
+ =?utf-8?B?MThIdEpkNXFUR1BITVdHVnJUQlE0aEhScVYybWI0QnBvcTRQcjdmTC9vY21s?=
+ =?utf-8?B?SnBFcHhicEF4RE1oQVhyS2xpaHdCN3JMeG5BNkZKeVpZdzdTOWwzb2tncEQ2?=
+ =?utf-8?B?VGpad3phN004Wmh6ZkxtTHE0OVp6L3ZjYVYwdllyeHZTa1FhQi9wTUF0S1NS?=
+ =?utf-8?B?VGprVmZiUjQvYmJMaklZSFpvcDI1cUlSeE83MGxWRGdkck9tWTNzR0o5Z205?=
+ =?utf-8?B?bTNtcGpkQWgwcW5GOWd1SVdoTzhvWHd5THNKaHpWQ3dCTFdxMWNWVjZwWnk0?=
+ =?utf-8?B?SnVhd3N2MC9EakZ5akJpVzdUMEp0TDdyU1lxaGJ1Ty8vbHhLeTdFYVhHUEg0?=
+ =?utf-8?B?UHBkKzZVR1JsY05HNCtqTXh5SVg3TE5ReldJbUUrYWVPM3RmUE9Dc3VSQzBB?=
+ =?utf-8?B?cVdWdlpXSXN1aE40eDBsWHkrSWZwSlhhT1JzZDFBN3JIcHJGNEJZMm00TTF6?=
+ =?utf-8?B?ZDRyWStXWDJtZEUvQ1IwVFVvY094d2s0Z25ySW12M1RINFZnRHRpU25sY29E?=
+ =?utf-8?B?VnYrTy81bWEvTGowdFlmQT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RTdPbFBIWENQOUtiV2wxNlNycElmVFVaZm9oVDhlNDcxM25Ld0JDNTVaWDZG?=
+ =?utf-8?B?SEpUZktKZ1c3RG9Pc1VYUXR4M0tleXVGUjVjMmUwTlVnVGY2UlZNTUVDOEVU?=
+ =?utf-8?B?MkowekozUzNTLy9RZ29MLytqMkk0ZWJqNm52TUZ5elhnL2I0OTU4NWwzQlh1?=
+ =?utf-8?B?SDNtMWkyN0hQSng0MGJwbnpTdjAzUVIwczIvRGFDbVJKSGVEYVM0c2JhdGtP?=
+ =?utf-8?B?Uktud0JuZ09FbU1lakNSeGRSVUgvMEVhZTIzZWlHWnQzYkl2T2xCb0FxKzFp?=
+ =?utf-8?B?TWFseVNTOVk1QllBaDBBVld0ejVjdDlZU00vOG12QmRGSDNxZUJsYWF1QkZH?=
+ =?utf-8?B?UW0zMUhnWEREZVRmbVYxeVBMTVpmQlRHQksrT3Y0WE5xaUZwQXhwZFBzQTVL?=
+ =?utf-8?B?eVBuNmozNmd2N3Q1dlYwL1hRWGRxZUh5RzgwaGZxREpkdFluTEI3aXpBR29o?=
+ =?utf-8?B?V1JnbUFjd2JxOEVERzVJZUJYKzFlOUM4WGxmMzA4YzFxazZpOENlZmhrYVVT?=
+ =?utf-8?B?cUdnam15REFFWFNOcVQvODB1WndGY2tuQS9wZDJ4YTdIMGV2NERHRzFVcjlr?=
+ =?utf-8?B?bzhlN052YVM1ckkrMkJJaGFVMzRSU0d6RS90VjA5YUVUT0N4QzdXaW5aOURZ?=
+ =?utf-8?B?ODdRZ3NqOGtLeVRZejdnWTkreXJQY1FqK3ZtVEl5OTBOWmRCQzJBQXVSUUVW?=
+ =?utf-8?B?aFpQd1gyY2M0NktnVWpQRVBvSGF5OGVCWS9DaFlFbDU4OTBsM3RqYmFBSkNi?=
+ =?utf-8?B?U0c1eEcvT1lmSlVrU3BFSmtXWVRjdVlCWlI1T2QybTZZZE1rTXJPUUllUWts?=
+ =?utf-8?B?em9pRHl4VSszcStKbEU1cXFxYW8wVmZOc29YVW0yc1QvS1lKcnN1VElKdFEv?=
+ =?utf-8?B?TjVoZEpiSnhhNnZkdS80Q3NXMUVvdlIyTEx1VHlJRWFPQ20vWGplaUsrdlF6?=
+ =?utf-8?B?dU03ZkRSZ1NOUGdRdVdadlBqcUdyczU4QkJnUnJnUVlWd2hJWnpnSWdDY1pk?=
+ =?utf-8?B?Qkl1Vndlbjl3bGhWVGFsRms0S3lHZ1g3cktPcUl3cmpwSlcwZ1BwYkxiQ3lH?=
+ =?utf-8?B?aDRZbzd0OHQ2L1REeUlodFpRYkhGdGM2VEJEUHg0ZkE2UTFkcVVDbVRFSHVF?=
+ =?utf-8?B?ZktCSjZuNGIrV09mQ3pvV0ZFZmFJM3VXM09VYnZDQy9HSlZGc0hMWm1xUEtW?=
+ =?utf-8?B?V0s1a3o5TXNtUDltV01IdU1rYXA4QmVxeXdZNGp6cGtyRGYrVVJMLzVVL0RN?=
+ =?utf-8?B?Vis1bnZSYW53a29EQmpxYkVjZXZWSk8vdUtKWnFYN3NvblBKSTgybnJzQXZr?=
+ =?utf-8?B?M0hWdERaaG0xamkrRjN2eFJtSjdhTlZITkdDdlJlY2Q4dFRUMzNGQ2IzTVlM?=
+ =?utf-8?B?bVhWdlQxNWVEb0hlZ1k4czQ5d0dJOTZybkkwMEEzb2tFSFVPS0VoS0UvRmhO?=
+ =?utf-8?B?alcxMGRBbU91QTdLMnRHUUkzL0ptMmpVcVZrWEVmY0tuUE9vSWV4Y2lBSlAz?=
+ =?utf-8?B?K3hCY095SHRBUFVzbHAzVjczZ2dJayt5LzdST3NNeHVucXZCY2FHUjh2Y3RS?=
+ =?utf-8?B?NkVJZHY5K3RramtmMlZqZ1J0aDY1cGJ1T1M3TXZvSUE0TG12OHhmM29mM2x5?=
+ =?utf-8?B?RUNaaWtFQ2ttMDdxVzlRUnFaNUt6TUxoeC81S1kyUVVuOTAwMGVxZ1BsY1ps?=
+ =?utf-8?B?a0gvMzdTbnpTUmtydEdHclJUcnI5MVpBSUlLS3BlT1UvdlpZNWtla3Y1cnJ3?=
+ =?utf-8?B?RmNETS82ajZ5eXI5U0FFZTZGcVRCYnlDSzEwYUJHTFBVWXh5cDAyYkV3UmZN?=
+ =?utf-8?B?N2RvMzBDL3k5WGVFVU84eUU5aHQ4ZVRueUhncFlNQmlHNDc5YmViMmQ1VURn?=
+ =?utf-8?B?SmNDY0lGZSs2M1plVVVIMUJIYTdGZjZQUkpZWXNHZGE2aExZZ2h2QmhlQlIx?=
+ =?utf-8?B?K3UwMllCTzg0b2ZQK3NlQXpYOVFvUXJBTXUxNkpnRUF6MGtqY1Q5WkcvTzhj?=
+ =?utf-8?B?akp5K2tlNndDemxXSUxMZjBmMDI5Njc3a1BNcldSOHdBNXY4SG5OWG1QSHF3?=
+ =?utf-8?B?OXpod3FVaGY1a0xGakgxalZQV2FUcVZKOGM5Tmg4QmRrcitvSHdQMnlweHpE?=
+ =?utf-8?B?WVRrZnpzSmk0OGhGbW5pd0c2NXE4SUtkUk1VNUZ4U1NwZlZ5Q1pWZGRNZFhj?=
+ =?utf-8?Q?a3ZcFMymUY5jexly91Btm1Y=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 19c2ca01-7290-43e8-2695-08dcc73a518c
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 08:20:47.1821
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AYhk4cfXZ7KkPyXeymdvoMDHpiiFQ428vQzRoJyKpMFe027VoytGakfBcVpxGrcT+ADYfbmAuW6uU2dP1kSe3X9QVizbSyeJjHMh2SRWJ2s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6473
+X-OriginatorOrg: intel.com
 
-Adding Mat(s) for awareness, it would be great (but difficult) to have 
-mptcp too in the long run ;)
+On 8/27/24 11:52, Przemek Kitszel wrote:
+> On 8/27/24 09:16, Thomas Bogendoerfer wrote:
+>> For PFs, which don't support SRIOV_LAG, there is no pf->lag struct
+>> allocated. So before accessing pf->lag a NULL pointer check is needed.
+>>
+>> Fixes: 1e0f9881ef79 ("ice: Flesh out implementation of support for 
+>> SRIOV on bonded interface")
+>> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+>> ---
+>> v2:
+>>   - Added Fixes tag
+>> v1: 
+>> https://lore.kernel.org/netdev/20240826085830.28136-1-tbogendoerfer@suse.de/
+> 
+> Please see my reply to v1, unfortunately sent at the same time as your
+> v2. The fixes tag should be different. The check that you have
+> introduced here repeats the check in the only caller (was not effective
+> though).
+> 
+>>
+>>   drivers/net/ethernet/intel/ice/ice_lag.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c 
+>> b/drivers/net/ethernet/intel/ice/ice_lag.c
+>> index 1ccb572ce285..916a16a379a8 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_lag.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_lag.c
+>> @@ -704,7 +704,7 @@ void ice_lag_move_new_vf_nodes(struct ice_vf *vf)
+>>       lag = pf->lag;
+>>       mutex_lock(&pf->lag_mutex);
+>> -    if (!lag->bonded)
+>> +    if (!lag || !lag->bonded)
+>>           goto new_vf_unlock;
+>>       pri_port = pf->hw.port_info->lport;
+> 
+> 
 
-On 8/27/24 21:32, Willem de Bruijn wrote:
-> From: Willem de Bruijn <willemb@google.com>
-> 
-> Lay the groundwork to import into kselftests the over 150 packetdrill
-> TCP/IP conformance tests on github.com/google/packetdrill.
-> 
-> Florian recently added support for packetdrill tests in nf_conntrack,Addin
-> in commit a8a388c2aae49 ("selftests: netfilter: add packetdrill based
-> conntrack tests").
-> 
-> This patch takes a slightly different implementation and reuses the
-> ksft python library for its KTAP, ksft, NetNS and other such tooling.
-> 
-> It also anticipates the large number of testcases, by creating a
-> separate kselftest for each feature (directory). It does this by
-> copying the template script packetdrill_ksft.py for each directory,
-> and putting those in TEST_CUSTOM_PROGS so that kselftests runs each.
-> 
-> To demonstrate the code with minimal patch size, initially import only
-> two features/directories from github. One with a single script, and
-> one with two. This was the only reason to pick tcp/inq and tcp/md5.
-> 
-> Any future imports of packetdrill tests should require no additional
-> coding. Just add the tcp/$FEATURE directory with *.pkt files.
-> 
-> Implementation notes:
-> - restore alphabetical order when adding the new directory to
->    tools/testing/selftests/Makefile
-> - copied *.pkt files and support verbatim from the github project,
->    except for
->      - update common/defaults.sh path (there are two paths on github)
->      - add SPDX headers
->      - remove one author statement
->      - Acknowledgment: drop an e (checkpatch)
-> 
-> Tested:
-> 	make -C tools/testing/selftests/ \
-> 	  TARGETS=net/packetdrill \
-> 	  install INSTALL_PATH=$KSFT_INSTALL_PATH
-> 
-> 	# in virtme-ng
-> 	sudo ./run_kselftest.sh -c net/packetdrill
-> 	sudo ./run_kselftest.sh -t net/packetdrill:tcp_inq.py
-> 
-> Result:
-> 	kselftest: Running tests in net/packetdrill
-> 	TAP version 13
-> 	1..2
-> 	# timeout set to 45
-> 	# selftests: net/packetdrill: tcp_inq.py
-> 	# KTAP version 1
-> 	# 1..4
-> 	# ok 1 tcp_inq.client-v4
-> 	# ok 2 tcp_inq.client-v6
-> 	# ok 3 tcp_inq.server-v4
-> 	# ok 4 tcp_inq.server-v6
-> 	# # Totals: pass:4 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 	ok 1 selftests: net/packetdrill: tcp_inq.py
-> 	# timeout set to 45
-> 	# selftests: net/packetdrill: tcp_md5.py
-> 	# KTAP version 1
-> 	# 1..2
-> 	# ok 1 tcp_md5.md5-only-on-client-ack-v4
-> 	# ok 2 tcp_md5.md5-only-on-client-ack-v6
-> 	# # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
-> 	ok 2 selftests: net/packetdrill: tcp_md5.py
-> 
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> 
-> ---
-> 
-> RFC points for discussion
-> 
-> ksft: the choice for this python framework introduces a dependency on
-> the YNL scripts, and some non-obvious code:
-> - to include the net/lib dep in tools/testing/selftests/Makefile
-> - a boilerplate lib/py/__init__.py that each user of ksft will need
-> It seems preferable to me to use ksft.py over reinventing the wheel,
-> e.g., to print KTAP output. But perhaps we can make it more obvious
-> for future ksft users, and make the dependency on YNL optional.
-> 
-> kselftest-per-directory: copying packetdrill_ksft.py to create a
-> separate script per dir is a bit of a hack. 
-
-Additionally, in some setups the test directory is RO, avoding file 
-creation there would be better.
-
-What about placing in each subdiretory a trivial wrapper invoking the 
-'main' packetdrill_ksft.py script specifying as an argument the 
-(sub-)directory to run/process?
-
-> A single script is much
-> simpler, optionally with nested KTAP (not supported yet by ksft). But,
-> I'm afraid that running time without intermediate output will be very
-> long when we integrate all packetdrill scripts.
-
-If I read correctly, this runs the scripts in the given directory 
-sequentially (as opposed to the default pktdrill run_all.py behavior 
-that uses many concurrent threads).
-
-I guess/fear that running all the pktdrill tests in a single batch would 
-take quite a long time, which in turn could be not so good for CI 
-integration. Currently there are a couple of CI test-cases with runtime 
- > 1h, but that is bad ;)
-
-> nf_conntrack: we can dedup the common.sh.
-> 
-> *pkt files: which of the 150+ scripts on github are candidates for
-> kselftests, all or a subset? To avoid change detector tests. And what
-> is the best way to eventually send up to 150 files, 7K LoC.
-
-I have no idea WRT the overall test stability, is some specific case/dir 
-is subject to very frequent false positive/false negative we could 
-postpone importing them, but ideally IMHO all the github scripts are 
-good candidates.
-
-Side note: I think it would be great to have some easy command line 
-parameter to run only the specified script/test-case.
-
-Thanks!
-
-Paolo
-
+thank you,
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
