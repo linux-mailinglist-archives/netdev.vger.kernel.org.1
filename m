@@ -1,125 +1,94 @@
-Return-Path: <netdev+bounces-122712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AABC96249B
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:18:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 125179624B8
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:22:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E1CF1C24273
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:18:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3A1328655D
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FCAA169382;
-	Wed, 28 Aug 2024 10:18:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D79916A934;
+	Wed, 28 Aug 2024 10:22:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F58168489;
-	Wed, 28 Aug 2024 10:18:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDB6158210;
+	Wed, 28 Aug 2024 10:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724840335; cv=none; b=MZyme0z+MoeAz4dZ/mc/yqN48ghAj+t/DOdsrxxgHbg8hyNrZFZ8xTLLZVBgqTj0IG/bHuNV0VHkFjsHh7ZNPBRgd8skJT+Yy7b8SXDw024iO7GCFs2vNLpdh34ZYh5GbOk/h0Fwep6aFRiAEJCy9bgBzmf80SISEjDb33GgRGc=
+	t=1724840565; cv=none; b=UGSK3X6NvSFUdkKTkxc7a5bmXPhFtZhrs1xjR5m2BIMMwQDFDJrEb11O4409fiMewW/c5KfW10QDpi3XoFEzZ1bprvst8iQzeoa4y4VJfeKXfv7tdF++6V4+qLlBeQ3OfILv5U+3COYM1ZvR2BGQSiLx8YDasvTWRxHc4RWrohc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724840335; c=relaxed/simple;
-	bh=76yP45lTQsYzgwmytYtHMj0baj7C0seddbIc1mDNeEQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nfd03wyFqnSM8YFpEat9yQXDEK0S0aiuWelhomfB2xNydDV7bzirDdaNZoUfnO2FPj/qRiDCoKFAtXsiO690QpDcbQWh0qbrWsp3wBfClVTOUqs30AMuf/ThkLZN1V6El11fWTmVjucsTwq9BEz4ZyEgJ7VSEFR5Tu+T8AHMNY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4Wv0kM5zJMz9sRy;
-	Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wconnBVW9-Lt; Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4Wv0kM5B9Sz9sRs;
-	Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id A05508B78F;
-	Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id E3dYZevYEYVw; Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
-Received: from [172.25.230.108] (unknown [172.25.230.108])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 2CE418B764;
-	Wed, 28 Aug 2024 12:18:51 +0200 (CEST)
-Message-ID: <cdea1768-b44c-4bf5-931b-10f9357ed4cb@csgroup.eu>
-Date: Wed, 28 Aug 2024 12:18:51 +0200
+	s=arc-20240116; t=1724840565; c=relaxed/simple;
+	bh=Z+3aBQyXJmLtAAFxGMefG2tsQR01hdKFu9as6nvzYGU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=F1DpzspgUB8PfNljOe4EUvMTijOCOnMm9jLmRg9OUEs/jkyuBkc9I+dv2rl2VKLPXJ12+KH8H22OLoDw/1aMMsqu61aWHBcs3UjmzVhUy/Ww/5pV1el1cFaejSjJiFDYrrDxYcrIYlqgoMc1QP73MomjvD5IzTcGc2QxKNsh/us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.10,182,1719846000"; 
+   d="scan'208";a="216828073"
+Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
+  by relmlie5.idc.renesas.com with ESMTP; 28 Aug 2024 19:22:39 +0900
+Received: from GBR-5CG2373LKG.adwin.renesas.com (unknown [10.226.92.33])
+	by relmlir5.idc.renesas.com (Postfix) with ESMTP id 053B340061A1;
+	Wed, 28 Aug 2024 19:22:34 +0900 (JST)
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Andrew Lunn <andrew@lunn.ch>
+Cc: Paul Barker <paul.barker.ct@bp.renesas.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [net PATCH v2 0/2] Fix maximum TX/RX frame sizes in ravb driver
+Date: Wed, 28 Aug 2024 11:22:24 +0100
+Message-Id: <20240828102226.223-1-paul.barker.ct@bp.renesas.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/6] net: ethernet: fs_enet: drop the
- .adjust_link custom fs_ops
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
- Pantelis Antoniou <pantelis.antoniou@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, Florian Fainelli
- <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Herve Codina <herve.codina@bootlin.com>,
- linuxppc-dev@lists.ozlabs.org
-References: <20240828095103.132625-1-maxime.chevallier@bootlin.com>
- <20240828095103.132625-4-maxime.chevallier@bootlin.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20240828095103.132625-4-maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+These patches fix a couple of bugs in the maximum supported TX/RX frame
+sizes in the ravb driver.
 
+  * For the GbEth IP, we were advertising a maximum TX frame size/MTU
+    that was larger that the maximum the hardware can transmit.
 
-Le 28/08/2024 à 11:50, Maxime Chevallier a écrit :
-> There's no in-tree user for the fs_ops .adjust_link() function, so we
-> can always use the generic one in fe_enet-main.
-> 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+  * For the R-Car AVB IP, we were unnecessarily setting the maximum RX
+    frame size/MRU based on the MTU, which by default is smaller than
+    the maximum the hardware can receive.
 
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+For the R-Car AVB IP, the maximum TX frame size should be 2047 (not
+2048), but additional work will be required to validate that change so
+it is not included in this series.
 
-> ---
->   drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c | 7 +------
->   drivers/net/ethernet/freescale/fs_enet/fs_enet.h      | 1 -
->   2 files changed, 1 insertion(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-> index 2b48a2a5e32d..caca81b3ccb6 100644
-> --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-> +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-> @@ -649,12 +649,7 @@ static void fs_adjust_link(struct net_device *dev)
->   	unsigned long flags;
->   
->   	spin_lock_irqsave(&fep->lock, flags);
-> -
-> -	if (fep->ops->adjust_link)
-> -		fep->ops->adjust_link(dev);
-> -	else
-> -		generic_adjust_link(dev);
-> -
-> +	generic_adjust_link(dev);
->   	spin_unlock_irqrestore(&fep->lock, flags);
->   }
->   
-> diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet.h b/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
-> index 21c07ac05225..abe4dc97e52a 100644
-> --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
-> +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
-> @@ -77,7 +77,6 @@ struct fs_ops {
->   	void (*free_bd)(struct net_device *dev);
->   	void (*cleanup_data)(struct net_device *dev);
->   	void (*set_multicast_list)(struct net_device *dev);
-> -	void (*adjust_link)(struct net_device *dev);
->   	void (*restart)(struct net_device *dev);
->   	void (*stop)(struct net_device *dev);
->   	void (*napi_clear_event)(struct net_device *dev);
+Changes v1->v2:
+  * Rebase on net tree as these are both bugfixes.
+  * Pick up Reveiwed-by tags.
+
+Paul Barker (2):
+  net: ravb: Fix maximum TX frame size for GbEth devices
+  net: ravb: Fix R-Car RX frame size limit
+
+ drivers/net/ethernet/renesas/ravb.h      |  1 +
+ drivers/net/ethernet/renesas/ravb_main.c | 10 ++++++++--
+ 2 files changed, 9 insertions(+), 2 deletions(-)
+
+-- 
+2.43.0
+
 
