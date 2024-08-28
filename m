@@ -1,680 +1,430 @@
-Return-Path: <netdev+bounces-122709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCDE0962490
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:16:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7218962496
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 12:18:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46BFC1F25EB0
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:16:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAD141C23A5B
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605C916BE3A;
-	Wed, 28 Aug 2024 10:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4B115FCE5;
+	Wed, 28 Aug 2024 10:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1fSgMzNO"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2063.outbound.protection.outlook.com [40.107.237.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB34116A924;
-	Wed, 28 Aug 2024 10:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724840167; cv=none; b=cKY2YmKxZWncCV5LMySTG+WblLBGm0ADJfxWR+Y+MgbOuponSglKou64z2BNPRBqF/44Fwj2yIvCY2NVnZHEC9F2zBgzEKjg1ZkvzE7pKZLzbf+ByeUKy28/S4GDTdw0Lo/SPoL97M4bW04lszZk5yqyKKXfh9JaWG54lmlGm7k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724840167; c=relaxed/simple;
-	bh=6fTCTvHzDGJG3av16ILB08CFPQEw36dc+7Fxgo1kL54=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZOc2EX2HvweauNFdfFl3dD8uWPYlTtHWjFOqFGwgrUKzXvErzkS3ucxQsQiA/gIzf/0U61Cx4skAsf46qJTCjlybuSdpq9Z56m0nQltr9LJitAUyvSeZgNhQWZdlx46OLzEfZeX4Zila5wjZ4ZM4Rq4L91uB75/tSTXOcuO7uAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4Wv0g710RNz9sRy;
-	Wed, 28 Aug 2024 12:16:03 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 4ZUUlAldVm72; Wed, 28 Aug 2024 12:16:03 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4Wv0g66nm8z9sRs;
-	Wed, 28 Aug 2024 12:16:02 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id D75978B78F;
-	Wed, 28 Aug 2024 12:16:02 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id o2hwGq96byoD; Wed, 28 Aug 2024 12:16:02 +0200 (CEST)
-Received: from [172.25.230.108] (unknown [172.25.230.108])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 924688B764;
-	Wed, 28 Aug 2024 12:16:02 +0200 (CEST)
-Message-ID: <a675fb67-57bb-4fb3-9c34-3cee141b9539@csgroup.eu>
-Date: Wed, 28 Aug 2024 12:16:02 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA4A15535B;
+	Wed, 28 Aug 2024 10:18:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724840304; cv=fail; b=haC62o84wjK66bjb/larWNkjcmMYKz4ak78HMCoHDOkv+vemYe4NHEiSayOKwyua4lCYQj08BSyuQHT3ktfDMnDgOFz9udXIJoEPtpI+oAcS0VQjRK7ZONCOw8MQ5rGPjS+WEU4V0fO6L9uKZdHN9NURFbW3yN1qyixWSPsK8Jc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724840304; c=relaxed/simple;
+	bh=B+MpLnABdrm+ZYbjjWKNCSBHeDPoxJe1QT4YMSMVf3k=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ZeBFDN46PoNZwriCS+xyaSQAZSHda24mxyY8HYAaiY7JIHFZflpFItqyqbMwzszZ+gOCahVTYlTfTpMaholR0k7vJGvCaxvrJF2EYsM8NL5ay154ZJbMK4ML/No+DNiMN7u9tfbZ8BaR2RF1jNZ2KpaBmuUAQ9nAb8KHM8hgu8A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1fSgMzNO; arc=fail smtp.client-ip=40.107.237.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XUcTe0ir1raxRxXM9bd/J8YMxH9ZR/991MNbHCl6mFBpZIgEw1fGBfFj/r17KJpYoDo/j+Jv7xqfOR7lNUXrrr5mJBrqhlrGkoRpA435ZJKSAo47hF01p7WVHc8GShSsfYGNAU29UQrb8HuKFNvCCrsSQ07uLfdJDjCTyiD97+qJO88jqV96zZAreJdESH97qdhUfEPF/s0HkLrbeU5vQv6Exeldg1q3xpg7rcPiWZXJVNheak+lwxlaZ4Qn3w1mGven0d4Za1dZKrc0wh8emhEwTFBBtETMrvFZemhQ3plTU6ui3l63MnwIeDRWoEN0xdM4wVYvTWtCUkgOgeZs4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JAAMXfh2Vps7uPgDvutZAyCSke9JybSRzvphLjLvv7U=;
+ b=HNvuEdX/Qp8T95Fj+MHHAyk3MabhfwmGmi5fA+yr0k+zNweamzz36m6PpIaxas/CrBcIgRXe8dugmRLJHW66cY71hnf1luzhnUutcvU+FRq3Dn+4JP3Hb/ohwoIVoeJE906rGIVozYt6yfeHhachgVcwwavRJ/W35FMVZx+Q9E7SydoklMqa/a0IyZWK0VwvtS7wy2/fOSPKGOOaHrEw+qfADsWTJh+A6GEoBkltlg+fkKLH/0HU9AnCQyhfq1JU5KdNmuhYaqlIru0Fk4ceJDG5zy6lpLw2E7OfXqrSq85d+9LJwwbXflcj3477cNg76nqoDesn2TQ65zh8PVit+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JAAMXfh2Vps7uPgDvutZAyCSke9JybSRzvphLjLvv7U=;
+ b=1fSgMzNO3ku0uYobaKW826ZkAT3zG1xw5O3T92FaKyV9YXPLuEZD/i9mTWjb+n6gByxKitg8nO2AsPS+ZccmBMDspf8fV5eJQcmcIxUp3aK1V/KNRrfrVZmBpw7Yjvh9cEDnFTvUlGyrYjZv7GlKoH/qHTotPjvfy0M3v3Mne9k=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by PH7PR12MB7987.namprd12.prod.outlook.com (2603:10b6:510:27c::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.28; Wed, 28 Aug
+ 2024 10:18:19 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7897.027; Wed, 28 Aug 2024
+ 10:18:19 +0000
+Message-ID: <a6751e81-7a14-a8c9-b6b6-038e50b1b588@amd.com>
+Date: Wed, 28 Aug 2024 11:18:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2 09/15] cxl: define a driver interface for HPA free
+ space enumaration
+To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, richard.hughes@amd.com
+References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
+ <20240715172835.24757-10-alejandro.lucero-palau@amd.com>
+ <20240804185756.000046c5@Huawei.com>
+Content-Language: en-US
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20240804185756.000046c5@Huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DU2PR04CA0243.eurprd04.prod.outlook.com
+ (2603:10a6:10:28e::8) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/6] net: ethernet: fs_enet: cosmetic cleanups
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
- Pantelis Antoniou <pantelis.antoniou@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, Florian Fainelli
- <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Herve Codina <herve.codina@bootlin.com>,
- linuxppc-dev@lists.ozlabs.org
-References: <20240828095103.132625-1-maxime.chevallier@bootlin.com>
- <20240828095103.132625-3-maxime.chevallier@bootlin.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20240828095103.132625-3-maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|PH7PR12MB7987:EE_
+X-MS-Office365-Filtering-Correlation-Id: 40c31773-3fdf-4217-e1fd-08dcc74abd04
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?K20zb29rSGhrNG1Xc1NNOEdZSGhkd2Q5RWgxZjAyK2RnbDRXK3RsYTJQS3Rp?=
+ =?utf-8?B?eGpjVjZYRHZXQXU5M0ZsYzlEZ3N4WklMbEs3Z1BrZlYwY1p4WXlDRE5xcU1Y?=
+ =?utf-8?B?alZZOVlERGlOL1ErN2RSK2pTNzhJSXN2d2FZRWdqQlB5cy9lUUt5dDUzdGRs?=
+ =?utf-8?B?VlB5dURPRlpWTnkzQ3J2NjE1Mm9oRWFFcC9lQlM5bDhENTU4M0VuczNKbWhK?=
+ =?utf-8?B?V1BmcWZWYStrYTZsWUs5ZjYybkJLNndqTCtUeUNSME1KaVcvZ0ZoRkxNRTI0?=
+ =?utf-8?B?YkczM3JLeFhuV2d5bGlySTM0MmJKSjFXZ015cTNSc0dwaFlEbnZpaHhyenJ4?=
+ =?utf-8?B?dGRDY1RzcXpvanNLZzgwd2FzVnA0T1VuQzJ5OFRGVlZ6aTFhMHMwejV0YlJa?=
+ =?utf-8?B?QVh3T2xLWTFpcm5nSlp2TEtSV1FXRjRkd0dTcWsybGx1ditvYUtIL0pvaCt3?=
+ =?utf-8?B?NU5zQ01LRlM3NTNOVjNtaDFKQ2VLWkNFVGhVWGRTYUxRMlhSSUFOUDl1ellW?=
+ =?utf-8?B?bmZhaGN2MXZoQ3N3TldYd2Vrb3ViclNRNGllSGlvN0ZwNzFUVFdQY1pmOXc5?=
+ =?utf-8?B?aE1La09WUWtMSm43SVBKR2gyWEg5ZEQrWElqUW5JUjllMkR1WXJoeWg2dk94?=
+ =?utf-8?B?MXFJVFpka2wxTzJNbjdsWkNFMytiaTErZ3U0TzE0dklQZGNLbnV1OFEvMHlT?=
+ =?utf-8?B?Z3Fxbk44NzcwQ0VRN1Q5QXdWckVXbkdFQk5JM3dwemNLTmFwbXRoYzhJYjlO?=
+ =?utf-8?B?QTUxT3ltOG1tZlJ4OUNCd2NJQXFybzJhN3RhRnNwV3JCU0RvVEEwZVZFS0Vh?=
+ =?utf-8?B?Q3BscGFhSDgyR1BOM09DNGNyMS9PVmFaazNCNGszRFpyWlVQUVh4dXhiR3Ji?=
+ =?utf-8?B?b1lnbTRmaTVkNktIZzlnMnE5MTRQQm5UM1hyZGxweVZZaWNPL1R1anBCQTV0?=
+ =?utf-8?B?ZmdzSnF3di9ZK2lsQnZpM1NWb0c5VitxNmI1dXdTZTN2N1dxRUhIelRUZ1l3?=
+ =?utf-8?B?UW9WdmhYdnZYQU1lMTVidFBIT1NGcUhXZ0tZRFNaOEVPV0l5OTNtVXRScG9N?=
+ =?utf-8?B?OWtjdkRtL2xWblJCaXVibDN6R0phcFk2dmwyZ3JNaExleVVXaFl3N2dXTFY5?=
+ =?utf-8?B?R0NFRDRMR2VjRUE1dmt5NDFUMC9iOFVRTUd0MVJkRmZjZ2UreUJOdG1tY05q?=
+ =?utf-8?B?UkFKb0E5SEd2OVJiYzRCallHWUZRWlROV2xGM1QyN0JmREJCU0ZkUnNXL2Rq?=
+ =?utf-8?B?OU91VDIxa0xPcFRnWVUzb3ZubDVUS2J6aWhkeDR1dWI2R0xyZFBxVFdkd3Nz?=
+ =?utf-8?B?a3VmdVg0cnBnQTRlQm54SlF5S1pZd3Zkc0tkTFVtRlZZOWozd2o0NlRtMGJE?=
+ =?utf-8?B?cnhqRWpCWC9TQ1VhaTVWMmhsdlRRaytScjVBN01oeWlIVG16NjBmNlQxUE1l?=
+ =?utf-8?B?RHB2S3NkNTRTYTkzWXBKNksxQU5vMUhvU1ZzTGpCeUV6aTZpYlV4ZW5MWXFV?=
+ =?utf-8?B?dm15VW4vbnFJWUN5b1U1ZWJQNU1VYWp0Z093SXgyQ3V1RUNLUzZLWHA1eTdi?=
+ =?utf-8?B?RlA5aW9TK04wdmVHdCs0NmVMU0NFcVk5RysrU25WUC9BTEtiVVNnSjhSMG40?=
+ =?utf-8?B?TzRCTkdzRHpEOVJFaE5hVFQwdXl0Z0pqcWx5SEFyS3VqSzNSdGtab1FzV1hS?=
+ =?utf-8?B?Q3hKMk9xNjJHR0x1MmUyZVltYVl1YXFNUGw1Zi8ydUFkWElCOTZiVENjcnRC?=
+ =?utf-8?Q?RYF4USTGpBBAVlsxw4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cVVLNXprazdkT01MKzhoUFZuUmU3Q2N4dGZhTDMrdVN5MjFyQUtmV1pnV1lp?=
+ =?utf-8?B?SFlxemU4eXlWbjNLc21jSnJ5SjlER3kveG5kWFR3eS9WRitBQm5rR0QvQldJ?=
+ =?utf-8?B?M0pNRWlhMUkwMjhKd0ZjY0dLaVRFRVd0ZmFkcXc0Ylk0VUs5SmM2TC9zWUFJ?=
+ =?utf-8?B?dEowNmFXYnE2NGFYZ3hCeStRVUhCYmVMcTlvS1hockEySEI0YUppT1lkK0hY?=
+ =?utf-8?B?OWF6TXNVb0tPRkNkSUJLMTlLWEFJemdkV2hZSTUxUXh4MDhrU1k0SVJEVnNH?=
+ =?utf-8?B?NFJnZDV5OVdiSVN1YjJ6d2NRanl5dFRQTmRIZkVNTVMvSGtKTHVzSXM5ajMy?=
+ =?utf-8?B?Q09mZWxlR0tSVDR3M0JlNUF2RzBtNHBlVjdDTERuSVdRdElQUFpiakRVcU1m?=
+ =?utf-8?B?QzRjTm1VMm05cGM5VTd0OFgrd2x0Zjc0anJGQzZSUG03cTlnaFVqbUNweUJC?=
+ =?utf-8?B?NU5wMlVLL0tyTFZVYnFFeFNsQ0x5RTVFWkpuNXErWTkwMkVJR0dNOWRmVGhD?=
+ =?utf-8?B?NGFWZkFsdThRVGR6VW5JK3dzWU5RZWNaeHBmdzh3dUJwSmJBWlp4cE1ISFJ5?=
+ =?utf-8?B?cEFhZjhqemkvK2FVTWkzNzhkS3k4blI0anZVNHVhU3Jja0RFOTlDRGhiTHc2?=
+ =?utf-8?B?ajc1WjI5cVdudEMzbjBJZmZ2dHdSZXhCM1RraFprV0hGeC9RRmZqNHZlMmNw?=
+ =?utf-8?B?WEZEZjc4cmpwN3IwUUsySEMraG1WWFI0QkNRMGwzbDJwYjhUbEtrRmVTYmVu?=
+ =?utf-8?B?SWV0MkpYMVVOMkM1T2pTbmRPSUVjMENlUjBnVXd6N01XRklrL1A1WmRXK1BL?=
+ =?utf-8?B?d2hmTjA2QkQvV3hkWndLYVhkU3VkY25zaXd5N2FEZVRhOWNISUZ4QlVTNUFk?=
+ =?utf-8?B?WklxSUhIY2llcE5lZWdkQ05RMG1Sd0szc21MbWZzdTRUUmRjZVViOFJ0ZGNi?=
+ =?utf-8?B?OHVIbGplRFlDWlNMUHRmSnByVndyY0pOcktKUXVuei90Vmc1VHlpcHpNcExT?=
+ =?utf-8?B?aStobmNhNHZncEpTYzl6VGRZMm9jUklsa1l3WmYxemRJRzczbk9Uelk0U3Iv?=
+ =?utf-8?B?amwva3FDY1FoY2I2cDFmbGdQYmJ2amd1RWRFbVBiUWRqaVBHc3BucXJkajhL?=
+ =?utf-8?B?bzBRSXZSRnBoYmxZNmZKTEtsYVpqNUlPQUZVelNxd3lheXgvZUVMS3EwSUUy?=
+ =?utf-8?B?WjltOURxaFJDc0tlcFhiU2Z6azBtdDRodmgyU1plL3JRbkpWRUlXTzZYWWRw?=
+ =?utf-8?B?Q2kxeUFvVWxLcU5BV1lKUWx1cXh0dE5nZS9sMkd0NEZNandTa2tnS2dRZTlk?=
+ =?utf-8?B?UHlPVXljaU5UTUc4dVhpWkpKSTkvVnJlMlptenRENVdQeGUyNDNiQThtSTZP?=
+ =?utf-8?B?MXFXT3pGK21FLzlVOFYwc0s5MDl5Z01NdFhROTBUM3VVV0ZiQ3YxTjNZcGN5?=
+ =?utf-8?B?UjFiRGpCKzFpK1BVeTh3Sm5QMlFLSnE3TTcvODltcFpTSE02T25Db2V6NHBG?=
+ =?utf-8?B?ZWF6elJ2emVTZjNIak1WNVExY0ZkUDdoQkpDYUZzVTAzcDM4YklFR1prYjhX?=
+ =?utf-8?B?bGU1K2xMdGVaS0ZCc0ZXN0ZEK0pyc1IzV0tzcXNkaU5xSldRZjZTTjNJY212?=
+ =?utf-8?B?UXV4cDAxZE5TdGYrVjNuNG1waDVZMWpQS1NvN2NpN2JyTlhpYXJ6azN5MHRy?=
+ =?utf-8?B?T1YvZy9oQXJML2RjN2JqdnVCSktIelQranRlam9RSkFUczRXYlRicFJvQUlC?=
+ =?utf-8?B?M1RvbVBXdGd1WlBGOHNNRml4Y1NkdzVDUEpqRFpycVYzd2NRUUJ2OGcrVnFv?=
+ =?utf-8?B?azM3Tnc4QXNVaVI2SEF6Nm0zcjIrOHltS21JWGtYY1NkWXdrUXRGRDkzYmdK?=
+ =?utf-8?B?SjFKU1NDcmdhV3BUMFhTOFpQNUhmb3VDdVZUZDY4dWtObm15ZkpjQnpSZGZ5?=
+ =?utf-8?B?ODlRWHVMME5jNGZOTm9GQ1ZkVkFaeHNQdmdkSGN0NEliKzBwUkRUQnR4Mnl4?=
+ =?utf-8?B?Ylo2SVQ0cWRIMHJDK2YwbDJ6S25CcVNlZGFGanFEc25rTDNmUVgxcTZmZXdW?=
+ =?utf-8?B?cFRkaWcyUVNmNnZ0Q1hHeWFjTDZmcFRRRmFXK2l2L1BIYXlteFlLS2psd3ox?=
+ =?utf-8?Q?JRQhxyPoSHIJi9DGr1/cPuOKT?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40c31773-3fdf-4217-e1fd-08dcc74abd04
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 10:18:19.4464
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: q/sZM9Cv7AJPz8B2J7+Lws9FG/FOf7djKNqyPFjqzv4Fgt8PeN8xm++0esw/SQoA2Ycmkwk8tn4ODhsv9jrQ9A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7987
 
 
+On 8/4/24 18:57, Jonathan Cameron wrote:
+> On Mon, 15 Jul 2024 18:28:29 +0100
+> alejandro.lucero-palau@amd.com wrote:
+>
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> CXL region creation involves allocating capacity from device DPA
+>> (device-physical-address space) and assigning it to decode a given HPA
+>> (host-physical-address space). Before determining how much DPA to
+>> allocate the amount of available HPA must be determined. Also, not all
+>> HPA is create equal, some specifically targets RAM, some target PMEM,
+>> some is prepared for device-memory flows like HDM-D and HDM-DB, and some
+>> is host-only (HDM-H).
+>>
+>> Wrap all of those concerns into an API that retrieves a root decoder
+>> (platform CXL window) that fits the specified constraints and the
+>> capacity available for a new region.
+>>
+>> Based on https://lore.kernel.org/linux-cxl/168592149709.1948938.8663425987110396027.stgit@dwillia2-xfh.jf.intel.com/T/#m6fbe775541da3cd477d65fa95c8acdc347345b4f
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
+> Hi.
+>
+> This seems a lot more complex than an accelerator would need.
+> If plan is to use this in the type3 driver as well, I'd like to
+> see that done as a precursor to the main series.
+> If it only matters to accelerator drivers (as in type 3 I think
+> we make this a userspace problem), then limit the code to handle
+> interleave ways == 1 only.  Maybe we will care about higher interleave
+> in the long run, but do you have a multihead accelerator today?
+>
+> Jonathan
+>
+>> ---
+>>   drivers/cxl/core/region.c          | 161 +++++++++++++++++++++++++++++
+>>   drivers/cxl/cxl.h                  |   3 +
+>>   drivers/cxl/cxlmem.h               |   5 +
+>>   drivers/net/ethernet/sfc/efx_cxl.c |  14 +++
+>>   include/linux/cxl_accel_mem.h      |   9 ++
+>>   5 files changed, 192 insertions(+)
+>>
+>> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+>> index 538ebd5a64fd..ca464bfef77b 100644
+>> --- a/drivers/cxl/core/region.c
+>> +++ b/drivers/cxl/core/region.c
+>> @@ -702,6 +702,167 @@ static int free_hpa(struct cxl_region *cxlr)
+>>   	return 0;
+>>   }
+>>   
+>> +
+>> +struct cxlrd_max_context {
+>> +	struct device * const *host_bridges;
+>> +	int interleave_ways;
+>> +	unsigned long flags;
+>> +	resource_size_t max_hpa;
+>> +	struct cxl_root_decoder *cxlrd;
+>> +};
+>> +
+>> +static int find_max_hpa(struct device *dev, void *data)
+>> +{
+>> +	struct cxlrd_max_context *ctx = data;
+>> +	struct cxl_switch_decoder *cxlsd;
+>> +	struct cxl_root_decoder *cxlrd;
+>> +	struct resource *res, *prev;
+>> +	struct cxl_decoder *cxld;
+>> +	resource_size_t max;
+>> +	int found;
+>> +
+>> +	if (!is_root_decoder(dev))
+>> +		return 0;
+>> +
+>> +	cxlrd = to_cxl_root_decoder(dev);
+>> +	cxld = &cxlrd->cxlsd.cxld;
+>> +	if ((cxld->flags & ctx->flags) != ctx->flags) {
+>> +		dev_dbg(dev, "find_max_hpa, flags not matching: %08lx vs %08lx\n",
+>> +			      cxld->flags, ctx->flags);
+>> +		return 0;
+>> +	}
+>> +
+>> +	/* A Host bridge could have more interleave ways than an
+>> +	 * endpoint, couldn´t it?
+> EP interleave ways is about working out how the full HPA address (it's
+> all sent over the wire) is modified to get to the DPA.  So it needs
+> to know what the overall interleave is.  Host bridge can't interleave
+> and then have the EP not know about it.  If there are switch HDM decoders
+> in the path, the host bridge interleave may be less than that the EP needs
+> to deal with.
+>
+> Does an accelerator actually cope with interleave? Is aim here to ensure
+> that IW is never anything other than 1?  Or is this meant to have
+> more general use? I guess it is meant to. In which case, I'd like to
+> see this used in the type3 driver as well.
 
-Le 28/08/2024 à 11:50, Maxime Chevallier a écrit :
-> Due to the age of the driver and the slow recent activity on it, the code
-> has taken some layers of dust. Clean the main driver file up so that it
-> passes checkpatch and also conforms with the net coding style.
-> 
-> Changes include :
->   - Re-ordering of the variable declarations for RCT
->   - Fixing the comment styles to either one-line comments, or net-style
->     comments
->   - Adding braces around single-statement 'else' clauses
->   - Aligning function/macro parameters on the opening parenthesis
->   - Simplifying checks for NULL pointers
->   - Splitting cascaded assignments into individual assignments
->   - Fixing some typos
->   - Fixing whitespace issues
-> 
-> This is a cosmetic change and doesn't introduce any change in behaviour.
-> 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+I guess an accelerator could cope with interleave ways > 1, but not ours.
 
-> ---
->   .../ethernet/freescale/fs_enet/fs_enet-main.c | 220 +++++++-----------
->   1 file changed, 89 insertions(+), 131 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-> index 5bfdd43ffdeb..2b48a2a5e32d 100644
-> --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-> +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-> @@ -81,15 +81,14 @@ static void skb_align(struct sk_buff *skb, int align)
->   static int fs_enet_napi(struct napi_struct *napi, int budget)
->   {
->   	struct fs_enet_private *fep = container_of(napi, struct fs_enet_private, napi);
-> -	struct net_device *dev = fep->ndev;
->   	const struct fs_platform_info *fpi = fep->fpi;
-> -	cbd_t __iomem *bdp;
-> +	struct net_device *dev = fep->ndev;
-> +	int curidx, dirtyidx, received = 0;
-> +	int do_wake = 0, do_restart = 0;
-> +	int tx_left = TX_RING_SIZE;
->   	struct sk_buff *skb, *skbn;
-> -	int received = 0;
-> +	cbd_t __iomem *bdp;
->   	u16 pkt_len, sc;
-> -	int curidx;
-> -	int dirtyidx, do_wake, do_restart;
-> -	int tx_left = TX_RING_SIZE;
->   
->   	spin_lock(&fep->tx_lock);
->   	bdp = fep->dirty_tx;
-> @@ -97,7 +96,6 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   	/* clear status bits for napi*/
->   	(*fep->ops->napi_clear_event)(dev);
->   
-> -	do_wake = do_restart = 0;
->   	while (((sc = CBDR_SC(bdp)) & BD_ENET_TX_READY) == 0 && tx_left) {
->   		dirtyidx = bdp - fep->tx_bd_base;
->   
-> @@ -106,12 +104,9 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   
->   		skb = fep->tx_skbuff[dirtyidx];
->   
-> -		/*
-> -		 * Check for errors.
-> -		 */
-> +		 /* Check for errors. */
->   		if (sc & (BD_ENET_TX_HB | BD_ENET_TX_LC |
->   			  BD_ENET_TX_RL | BD_ENET_TX_UN | BD_ENET_TX_CSL)) {
-> -
->   			if (sc & BD_ENET_TX_HB)	/* No heartbeat */
->   				dev->stats.tx_heartbeat_errors++;
->   			if (sc & BD_ENET_TX_LC)	/* Late collision */
-> @@ -127,16 +122,16 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   				dev->stats.tx_errors++;
->   				do_restart = 1;
->   			}
-> -		} else
-> +		} else {
->   			dev->stats.tx_packets++;
-> +		}
->   
->   		if (sc & BD_ENET_TX_READY) {
->   			dev_warn(fep->dev,
->   				 "HEY! Enet xmit interrupt and TX_READY.\n");
->   		}
->   
-> -		/*
-> -		 * Deferred means some collisions occurred during transmit,
-> +		/* Deferred means some collisions occurred during transmit,
->   		 * but we eventually sent the packet OK.
->   		 */
->   		if (sc & BD_ENET_TX_DEF)
-> @@ -150,25 +145,20 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   			dma_unmap_single(fep->dev, CBDR_BUFADDR(bdp),
->   					 CBDR_DATLEN(bdp), DMA_TO_DEVICE);
->   
-> -		/*
-> -		 * Free the sk buffer associated with this last transmit.
-> -		 */
-> +		/* Free the sk buffer associated with this last transmit. */
->   		if (skb) {
->   			dev_kfree_skb(skb);
->   			fep->tx_skbuff[dirtyidx] = NULL;
->   		}
->   
-> -		/*
-> -		 * Update pointer to next buffer descriptor to be transmitted.
-> +		/* Update pointer to next buffer descriptor to be transmitted.
->   		 */
->   		if ((sc & BD_ENET_TX_WRAP) == 0)
->   			bdp++;
->   		else
->   			bdp = fep->tx_bd_base;
->   
-> -		/*
-> -		 * Since we have freed up a buffer, the ring is no longer
-> -		 * full.
-> +		/* Since we have freed up a buffer, the ring is no longer full.
->   		 */
->   		if (++fep->tx_free == MAX_SKB_FRAGS)
->   			do_wake = 1;
-> @@ -185,8 +175,7 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   	if (do_wake)
->   		netif_wake_queue(dev);
->   
-> -	/*
-> -	 * First, grab all of the stats for the incoming packet.
-> +	/* First, grab all of the stats for the incoming packet.
->   	 * These get messed up if we get called due to a busy condition.
->   	 */
->   	bdp = fep->cur_rx;
-> @@ -195,16 +184,13 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   	       received < budget) {
->   		curidx = bdp - fep->rx_bd_base;
->   
-> -		/*
-> -		 * Since we have allocated space to hold a complete frame,
-> +		/* Since we have allocated space to hold a complete frame,
->   		 * the last indicator should be set.
->   		 */
->   		if ((sc & BD_ENET_RX_LAST) == 0)
->   			dev_warn(fep->dev, "rcv is not +last\n");
->   
-> -		/*
-> -		 * Check for errors.
-> -		 */
-> +		/* Check for errors. */
->   		if (sc & (BD_ENET_RX_LG | BD_ENET_RX_SH | BD_ENET_RX_CL |
->   			  BD_ENET_RX_NO | BD_ENET_RX_CR | BD_ENET_RX_OV)) {
->   			dev->stats.rx_errors++;
-> @@ -225,9 +211,7 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   		} else {
->   			skb = fep->rx_skbuff[curidx];
->   
-> -			/*
-> -			 * Process the incoming frame.
-> -			 */
-> +			/* Process the incoming frame */
->   			dev->stats.rx_packets++;
->   			pkt_len = CBDR_DATLEN(bdp) - 4;	/* remove CRC */
->   			dev->stats.rx_bytes += pkt_len + 4;
-> @@ -235,15 +219,15 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   			if (pkt_len <= fpi->rx_copybreak) {
->   				/* +2 to make IP header L1 cache aligned */
->   				skbn = netdev_alloc_skb(dev, pkt_len + 2);
-> -				if (skbn != NULL) {
-> +				if (skbn) {
->   					skb_reserve(skbn, 2);	/* align IP header */
-> -					skb_copy_from_linear_data(skb,
-> -						      skbn->data, pkt_len);
-> +					skb_copy_from_linear_data(skb, skbn->data,
-> +								  pkt_len);
->   					swap(skb, skbn);
->   					dma_sync_single_for_cpu(fep->dev,
-> -						CBDR_BUFADDR(bdp),
-> -						L1_CACHE_ALIGN(pkt_len),
-> -						DMA_FROM_DEVICE);
-> +								CBDR_BUFADDR(bdp),
-> +								L1_CACHE_ALIGN(pkt_len),
-> +								DMA_FROM_DEVICE);
->   				}
->   			} else {
->   				skbn = netdev_alloc_skb(dev, ENET_RX_FRSIZE);
-> @@ -253,20 +237,18 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   
->   					skb_align(skbn, ENET_RX_ALIGN);
->   
-> -					dma_unmap_single(fep->dev,
-> -						CBDR_BUFADDR(bdp),
-> -						L1_CACHE_ALIGN(PKT_MAXBUF_SIZE),
-> -						DMA_FROM_DEVICE);
-> +					dma_unmap_single(fep->dev, CBDR_BUFADDR(bdp),
-> +							 L1_CACHE_ALIGN(PKT_MAXBUF_SIZE),
-> +							 DMA_FROM_DEVICE);
->   
-> -					dma = dma_map_single(fep->dev,
-> -						skbn->data,
-> -						L1_CACHE_ALIGN(PKT_MAXBUF_SIZE),
-> -						DMA_FROM_DEVICE);
-> +					dma = dma_map_single(fep->dev, skbn->data,
-> +							     L1_CACHE_ALIGN(PKT_MAXBUF_SIZE),
-> +							     DMA_FROM_DEVICE);
->   					CBDW_BUFADDR(bdp, dma);
->   				}
->   			}
->   
-> -			if (skbn != NULL) {
-> +			if (skbn) {
->   				skb_put(skb, pkt_len);	/* Make room */
->   				skb->protocol = eth_type_trans(skb, dev);
->   				received++;
-> @@ -281,9 +263,7 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   		CBDW_DATLEN(bdp, 0);
->   		CBDW_SC(bdp, (sc & ~BD_ENET_RX_STATS) | BD_ENET_RX_EMPTY);
->   
-> -		/*
-> -		 * Update BD pointer to next entry.
-> -		 */
-> +		/* Update BD pointer to next entry */
->   		if ((sc & BD_ENET_RX_WRAP) == 0)
->   			bdp++;
->   		else
-> @@ -305,19 +285,16 @@ static int fs_enet_napi(struct napi_struct *napi, int budget)
->   	return budget;
->   }
->   
-> -/*
-> - * The interrupt handler.
-> +/* The interrupt handler.
->    * This is called from the MPC core interrupt.
->    */
->   static irqreturn_t
->   fs_enet_interrupt(int irq, void *dev_id)
->   {
->   	struct net_device *dev = dev_id;
-> +	u32 int_events, int_clr_events;
->   	struct fs_enet_private *fep;
-> -	u32 int_events;
-> -	u32 int_clr_events;
-> -	int nr, napi_ok;
-> -	int handled;
-> +	int nr, napi_ok, handled;
->   
->   	fep = netdev_priv(dev);
->   
-> @@ -339,12 +316,12 @@ fs_enet_interrupt(int irq, void *dev_id)
->   			(*fep->ops->napi_disable)(dev);
->   			(*fep->ops->clear_int_events)(dev, fep->ev_napi);
->   
-> -			/* NOTE: it is possible for FCCs in NAPI mode    */
-> -			/* to submit a spurious interrupt while in poll  */
-> +			/* NOTE: it is possible for FCCs in NAPI mode
-> +			 * to submit a spurious interrupt while in poll
-> +			 */
->   			if (napi_ok)
->   				__napi_schedule(&fep->napi);
->   		}
-> -
->   	}
->   
->   	handled = nr > 0;
-> @@ -354,45 +331,40 @@ fs_enet_interrupt(int irq, void *dev_id)
->   void fs_init_bds(struct net_device *dev)
->   {
->   	struct fs_enet_private *fep = netdev_priv(dev);
-> -	cbd_t __iomem *bdp;
->   	struct sk_buff *skb;
-> +	cbd_t __iomem *bdp;
->   	int i;
->   
->   	fs_cleanup_bds(dev);
->   
-> -	fep->dirty_tx = fep->cur_tx = fep->tx_bd_base;
-> +	fep->dirty_tx = fep->tx_bd_base;
-> +	fep->cur_tx = fep->tx_bd_base;
->   	fep->tx_free = fep->tx_ring;
->   	fep->cur_rx = fep->rx_bd_base;
->   
-> -	/*
-> -	 * Initialize the receive buffer descriptors.
-> -	 */
-> +	/* Initialize the receive buffer descriptors */
->   	for (i = 0, bdp = fep->rx_bd_base; i < fep->rx_ring; i++, bdp++) {
->   		skb = netdev_alloc_skb(dev, ENET_RX_FRSIZE);
-> -		if (skb == NULL)
-> +		if (!skb)
->   			break;
->   
->   		skb_align(skb, ENET_RX_ALIGN);
->   		fep->rx_skbuff[i] = skb;
-> -		CBDW_BUFADDR(bdp,
-> -			dma_map_single(fep->dev, skb->data,
-> -				L1_CACHE_ALIGN(PKT_MAXBUF_SIZE),
-> -				DMA_FROM_DEVICE));
-> +		CBDW_BUFADDR(bdp, dma_map_single(fep->dev, skb->data,
-> +						 L1_CACHE_ALIGN(PKT_MAXBUF_SIZE),
-> +						 DMA_FROM_DEVICE));
->   		CBDW_DATLEN(bdp, 0);	/* zero */
->   		CBDW_SC(bdp, BD_ENET_RX_EMPTY |
->   			((i < fep->rx_ring - 1) ? 0 : BD_SC_WRAP));
->   	}
-> -	/*
-> -	 * if we failed, fillup remainder
-> -	 */
-> +
-> +	/* if we failed, fillup remainder */
->   	for (; i < fep->rx_ring; i++, bdp++) {
->   		fep->rx_skbuff[i] = NULL;
->   		CBDW_SC(bdp, (i < fep->rx_ring - 1) ? 0 : BD_SC_WRAP);
->   	}
->   
-> -	/*
-> -	 * ...and the same for transmit.
-> -	 */
-> +	/* ...and the same for transmit. */
->   	for (i = 0, bdp = fep->tx_bd_base; i < fep->tx_ring; i++, bdp++) {
->   		fep->tx_skbuff[i] = NULL;
->   		CBDW_BUFADDR(bdp, 0);
-> @@ -408,32 +380,30 @@ void fs_cleanup_bds(struct net_device *dev)
->   	cbd_t __iomem *bdp;
->   	int i;
->   
-> -	/*
-> -	 * Reset SKB transmit buffers.
-> -	 */
-> +	/* Reset SKB transmit buffers. */
->   	for (i = 0, bdp = fep->tx_bd_base; i < fep->tx_ring; i++, bdp++) {
-> -		if ((skb = fep->tx_skbuff[i]) == NULL)
-> +		skb = fep->tx_skbuff[i];
-> +		if (!skb)
->   			continue;
->   
->   		/* unmap */
->   		dma_unmap_single(fep->dev, CBDR_BUFADDR(bdp),
-> -				skb->len, DMA_TO_DEVICE);
-> +				 skb->len, DMA_TO_DEVICE);
->   
->   		fep->tx_skbuff[i] = NULL;
->   		dev_kfree_skb(skb);
->   	}
->   
-> -	/*
-> -	 * Reset SKB receive buffers
-> -	 */
-> +	/* Reset SKB receive buffers */
->   	for (i = 0, bdp = fep->rx_bd_base; i < fep->rx_ring; i++, bdp++) {
-> -		if ((skb = fep->rx_skbuff[i]) == NULL)
-> +		skb = fep->rx_skbuff[i];
-> +		if (!skb)
->   			continue;
->   
->   		/* unmap */
->   		dma_unmap_single(fep->dev, CBDR_BUFADDR(bdp),
-> -			L1_CACHE_ALIGN(PKT_MAXBUF_SIZE),
-> -			DMA_FROM_DEVICE);
-> +				 L1_CACHE_ALIGN(PKT_MAXBUF_SIZE),
-> +				 DMA_FROM_DEVICE);
->   
->   		fep->rx_skbuff[i] = NULL;
->   
-> @@ -441,12 +411,8 @@ void fs_cleanup_bds(struct net_device *dev)
->   	}
->   }
->   
-> -/**********************************************************************************/
-> -
->   #ifdef CONFIG_FS_ENET_MPC5121_FEC
-> -/*
-> - * MPC5121 FEC requeries 4-byte alignment for TX data buffer!
-> - */
-> +/* MPC5121 FEC requires 4-byte alignment for TX data buffer! */
->   static struct sk_buff *tx_skb_align_workaround(struct net_device *dev,
->   					       struct sk_buff *skb)
->   {
-> @@ -478,15 +444,12 @@ static netdev_tx_t
->   fs_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
->   {
->   	struct fs_enet_private *fep = netdev_priv(dev);
-> +	int curidx, nr_frags, len;
->   	cbd_t __iomem *bdp;
-> -	int curidx;
-> -	u16 sc;
-> -	int nr_frags;
->   	skb_frag_t *frag;
-> -	int len;
-> +	u16 sc;
->   #ifdef CONFIG_FS_ENET_MPC5121_FEC
-> -	int is_aligned = 1;
-> -	int i;
-> +	int i, is_aligned = 1;
->   
->   	if (!IS_ALIGNED((unsigned long)skb->data, 4)) {
->   		is_aligned = 0;
-> @@ -504,8 +467,7 @@ fs_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
->   	if (!is_aligned) {
->   		skb = tx_skb_align_workaround(dev, skb);
->   		if (!skb) {
-> -			/*
-> -			 * We have lost packet due to memory allocation error
-> +			/* We have lost packet due to memory allocation error
->   			 * in tx_skb_align_workaround(). Hopefully original
->   			 * skb is still valid, so try transmit it later.
->   			 */
-> @@ -516,9 +478,7 @@ fs_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
->   
->   	spin_lock(&fep->tx_lock);
->   
-> -	/*
-> -	 * Fill in a Tx ring entry
-> -	 */
-> +	/* Fill in a Tx ring entry */
->   	bdp = fep->cur_tx;
->   
->   	nr_frags = skb_shinfo(skb)->nr_frags;
-> @@ -526,8 +486,7 @@ fs_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
->   		netif_stop_queue(dev);
->   		spin_unlock(&fep->tx_lock);
->   
-> -		/*
-> -		 * Ooops.  All transmit buffers are full.  Bail out.
-> +		/* Ooops.  All transmit buffers are full.  Bail out.
->   		 * This should not happen, since the tx queue should be stopped.
->   		 */
->   		dev_warn(fep->dev, "tx queue full!.\n");
-> @@ -540,12 +499,12 @@ fs_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
->   	dev->stats.tx_bytes += len;
->   	if (nr_frags)
->   		len -= skb->data_len;
-> +
->   	fep->tx_free -= nr_frags + 1;
-> -	/*
-> -	 * Push the data cache so the CPM does not get stale memory data.
-> +	/* Push the data cache so the CPM does not get stale memory data.
->   	 */
->   	CBDW_BUFADDR(bdp, dma_map_single(fep->dev,
-> -				skb->data, len, DMA_TO_DEVICE));
-> +					 skb->data, len, DMA_TO_DEVICE));
->   	CBDW_DATLEN(bdp, len);
->   
->   	fep->mapped_as_page[curidx] = 0;
-> @@ -582,9 +541,11 @@ fs_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
->   
->   	/* note that while FEC does not have this bit
->   	 * it marks it as available for software use
-> -	 * yay for hw reuse :) */
-> +	 * yay for hw reuse :)
-> +	 */
->   	if (skb->len <= 60)
->   		sc |= BD_ENET_TX_PAD;
-> +
->   	CBDC_SC(bdp, BD_ENET_TX_STATS);
->   	CBDS_SC(bdp, sc);
->   
-> @@ -596,6 +557,7 @@ fs_enet_start_xmit(struct sk_buff *skb, struct net_device *dev)
->   		bdp++;
->   	else
->   		bdp = fep->tx_bd_base;
-> +
->   	fep->cur_tx = bdp;
->   
->   	if (fep->tx_free < MAX_SKB_FRAGS)
-> @@ -644,9 +606,7 @@ static void fs_timeout(struct net_device *dev, unsigned int txqueue)
->   	schedule_work(&fep->timeout_work);
->   }
->   
-> -/*-----------------------------------------------------------------------------
-> - *  generic link-change handler - should be sufficient for most cases
-> - *-----------------------------------------------------------------------------*/
-> +/* generic link-change handler - should be sufficient for most cases */
->   static void generic_adjust_link(struct  net_device *dev)
->   {
->   	struct fs_enet_private *fep = netdev_priv(dev);
-> @@ -683,7 +643,6 @@ static void generic_adjust_link(struct  net_device *dev)
->   		phy_print_status(phydev);
->   }
->   
-> -
->   static void fs_adjust_link(struct net_device *dev)
->   {
->   	struct fs_enet_private *fep = netdev_priv(dev);
-> @@ -691,7 +650,7 @@ static void fs_adjust_link(struct net_device *dev)
->   
->   	spin_lock_irqsave(&fep->lock, flags);
->   
-> -	if(fep->ops->adjust_link)
-> +	if (fep->ops->adjust_link)
->   		fep->ops->adjust_link(dev);
->   	else
->   		generic_adjust_link(dev);
-> @@ -728,8 +687,9 @@ static int fs_enet_open(struct net_device *dev)
->   	int r;
->   	int err;
->   
-> -	/* to initialize the fep->cur_rx,... */
-> -	/* not doing this, will cause a crash in fs_enet_napi */
-> +	/* to initialize the fep->cur_rx,...
-> +	 * not doing this, will cause a crash in fs_enet_napi
-> +	 */
->   	fs_init_bds(fep->ndev);
->   
->   	napi_enable(&fep->napi);
-> @@ -780,10 +740,8 @@ static int fs_enet_close(struct net_device *dev)
->   	return 0;
->   }
->   
-> -/*************************************************************************/
-> -
->   static void fs_get_drvinfo(struct net_device *dev,
-> -			    struct ethtool_drvinfo *info)
-> +			   struct ethtool_drvinfo *info)
->   {
->   	strscpy(info->driver, DRV_MODULE_NAME, sizeof(info->driver));
->   }
-> @@ -796,7 +754,7 @@ static int fs_get_regs_len(struct net_device *dev)
->   }
->   
->   static void fs_get_regs(struct net_device *dev, struct ethtool_regs *regs,
-> -			 void *p)
-> +			void *p)
->   {
->   	struct fs_enet_private *fep = netdev_priv(dev);
->   	unsigned long flags;
-> @@ -815,12 +773,14 @@ static void fs_get_regs(struct net_device *dev, struct ethtool_regs *regs,
->   static u32 fs_get_msglevel(struct net_device *dev)
->   {
->   	struct fs_enet_private *fep = netdev_priv(dev);
-> +
->   	return fep->msg_enable;
->   }
->   
->   static void fs_set_msglevel(struct net_device *dev, u32 value)
->   {
->   	struct fs_enet_private *fep = netdev_priv(dev);
-> +
->   	fep->msg_enable = value;
->   }
->   
-> @@ -877,8 +837,6 @@ static const struct ethtool_ops fs_ethtool_ops = {
->   	.set_tunable = fs_set_tunable,
->   };
->   
-> -/**************************************************************************************/
-> -
->   #ifdef CONFIG_FS_ENET_HAS_FEC
->   #define IS_FEC(ops) ((ops) == &fs_fec_ops)
->   #else
-> @@ -901,15 +859,14 @@ static const struct net_device_ops fs_enet_netdev_ops = {
->   
->   static int fs_enet_probe(struct platform_device *ofdev)
->   {
-> +	int err, privsize, len, ret = -ENODEV;
-> +	const char *phy_connection_type;
-> +	struct fs_platform_info *fpi;
-> +	struct fs_enet_private *fep;
->   	const struct fs_ops *ops;
->   	struct net_device *ndev;
-> -	struct fs_enet_private *fep;
-> -	struct fs_platform_info *fpi;
->   	const u32 *data;
->   	struct clk *clk;
-> -	int err;
-> -	const char *phy_connection_type;
-> -	int privsize, len, ret = -ENODEV;
->   
->   	ops = device_get_match_data(&ofdev->dev);
->   	if (!ops)
-> @@ -945,7 +902,8 @@ static int fs_enet_probe(struct platform_device *ofdev)
->   
->   	if (of_device_is_compatible(ofdev->dev.of_node, "fsl,mpc5125-fec")) {
->   		phy_connection_type = of_get_property(ofdev->dev.of_node,
-> -						"phy-connection-type", NULL);
-> +						      "phy-connection-type",
-> +						      NULL);
->   		if (phy_connection_type && !strcmp("rmii", phy_connection_type))
->   			fpi->use_rmii = 1;
->   	}
-> @@ -964,7 +922,7 @@ static int fs_enet_probe(struct platform_device *ofdev)
->   	}
->   
->   	privsize = sizeof(*fep) +
-> -	           sizeof(struct sk_buff **) *
-> +		   sizeof(struct sk_buff **) *
->   		     (fpi->rx_ring + fpi->tx_ring) +
->   		   sizeof(char) * fpi->tx_ring;
->   
-> @@ -1111,9 +1069,9 @@ static struct platform_driver fs_enet_driver = {
->   #ifdef CONFIG_NET_POLL_CONTROLLER
->   static void fs_enet_netpoll(struct net_device *dev)
->   {
-> -       disable_irq(dev->irq);
-> -       fs_enet_interrupt(dev->irq, dev);
-> -       enable_irq(dev->irq);
-> +	disable_irq(dev->irq);
-> +	fs_enet_interrupt(dev->irq, dev);
-> +	enable_irq(dev->irq);
->   }
->   #endif
->   
+And it does not make sense to me an accelerator being an EP for an 
+interleaved HPA because the memory does not make sense out of the 
+accelerator.
+
+So if the CFMW and the Host Bridge have an interleave way of 2, implying 
+accesses to the HPA through different wires, I assume an accelerator 
+should not be allowed.
+
+
+>> +	 *
+>> +	 * What does interleave ways mean here in terms of the requestor?
+>> +	 * Why the FFMWS has 0 interleave ways but root port has 1?
+> FFMWS?
+
+
+I meant CFMW, and I think this comment is because I found out the CFMW 
+is parsed with interleave ways = 0 then the root port having 1, what is 
+confusing.
+
+
+>
+>> +	 */
+>> +	if (cxld->interleave_ways != ctx->interleave_ways) {
+>> +		dev_dbg(dev, "find_max_hpa, interleave_ways  not matching\n");
+>> +		return 0;
+>> +	}
+>> +
+>> +	cxlsd = &cxlrd->cxlsd;
+>> +
+>> +	guard(rwsem_read)(&cxl_region_rwsem);
+>> +	found = 0;
+>> +	for (int i = 0; i < ctx->interleave_ways; i++)
+>> +		for (int j = 0; j < ctx->interleave_ways; j++)
+>> +			if (ctx->host_bridges[i] ==
+>> +					cxlsd->target[j]->dport_dev) {
+>> +				found++;
+>> +				break;
+>> +			}
+>> +
+>> +	if (found != ctx->interleave_ways) {
+>> +		dev_dbg(dev, "find_max_hpa, no interleave_ways found\n");
+>> +		return 0;
+>> +	}
+>> +
+>> +	/*
+>> +	 * Walk the root decoder resource range relying on cxl_region_rwsem to
+>> +	 * preclude sibling arrival/departure and find the largest free space
+>> +	 * gap.
+>> +	 */
+>> +	lockdep_assert_held_read(&cxl_region_rwsem);
+>> +	max = 0;
+>> +	res = cxlrd->res->child;
+>> +	if (!res)
+>> +		max = resource_size(cxlrd->res);
+>> +	else
+>> +		max = 0;
+>> +
+>> +	for (prev = NULL; res; prev = res, res = res->sibling) {
+>> +		struct resource *next = res->sibling;
+>> +		resource_size_t free = 0;
+>> +
+>> +		if (!prev && res->start > cxlrd->res->start) {
+>> +			free = res->start - cxlrd->res->start;
+>> +			max = max(free, max);
+>> +		}
+>> +		if (prev && res->start > prev->end + 1) {
+>> +			free = res->start - prev->end + 1;
+>> +			max = max(free, max);
+>> +		}
+>> +		if (next && res->end + 1 < next->start) {
+>> +			free = next->start - res->end + 1;
+>> +			max = max(free, max);
+>> +		}
+>> +		if (!next && res->end + 1 < cxlrd->res->end + 1) {
+>> +			free = cxlrd->res->end + 1 - res->end + 1;
+>> +			max = max(free, max);
+>> +		}
+>> +	}
+>> +
+>> +	if (max > ctx->max_hpa) {
+>> +		if (ctx->cxlrd)
+>> +			put_device(CXLRD_DEV(ctx->cxlrd));
+>> +		get_device(CXLRD_DEV(cxlrd));
+>> +		ctx->cxlrd = cxlrd;
+>> +		ctx->max_hpa = max;
+>> +		dev_info(CXLRD_DEV(cxlrd), "found %pa bytes of free space\n", &max);
+> dev_dbg()
+>
+>> +	}
+>> +	return 0;
+>> +}
+>> +
+>> +/**
+>> + * cxl_get_hpa_freespace - find a root decoder with free capacity per constraints
+>> + * @endpoint: an endpoint that is mapped by the returned decoder
+>> + * @interleave_ways: number of entries in @host_bridges
+>> + * @flags: CXL_DECODER_F flags for selecting RAM vs PMEM, and HDM-H vs HDM-D[B]
+>> + * @max: output parameter of bytes available in the returned decoder
+> @available_size
+> or something along those lines. I'd expect max to be the end address of the available
+> region
+>
+>> + *
+>> + * The return tuple of a 'struct cxl_root_decoder' and 'bytes available (@max)'
+>> + * is a point in time snapshot. If by the time the caller goes to use this root
+>> + * decoder's capacity the capacity is reduced then caller needs to loop and
+>> + * retry.
+>> + *
+>> + * The returned root decoder has an elevated reference count that needs to be
+>> + * put with put_device(cxlrd_dev(cxlrd)). Locking context is with
+>> + * cxl_{acquire,release}_endpoint(), that ensures removal of the root decoder
+>> + * does not race.
+>> + */
+>> +struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_port *endpoint,
+>> +					       int interleave_ways,
+>> +					       unsigned long flags,
+>> +					       resource_size_t *max)
+>> +{
+>> +
+>> +	struct cxlrd_max_context ctx = {
+>> +		.host_bridges = &endpoint->host_bridge,
+>> +		.interleave_ways = interleave_ways,
+>> +		.flags = flags,
+>> +	};
+>> +	struct cxl_port *root_port;
+>> +	struct cxl_root *root;
+>> +
+>> +	if (!is_cxl_endpoint(endpoint)) {
+>> +		dev_dbg(&endpoint->dev, "hpa requestor is not an endpoint\n");
+>> +		return ERR_PTR(-EINVAL);
+>> +	}
+>> +
+>> +	root = find_cxl_root(endpoint);
+>> +	if (!root) {
+>> +		dev_dbg(&endpoint->dev, "endpoint can not be related to a root port\n");
+>> +		return ERR_PTR(-ENXIO);
+>> +	}
+>> +
+>> +	root_port = &root->port;
+>> +	down_read(&cxl_region_rwsem);
+>> +	device_for_each_child(&root_port->dev, &ctx, find_max_hpa);
+>> +	up_read(&cxl_region_rwsem);
+>> +	put_device(&root_port->dev);
+>> +
+>> +	if (!ctx.cxlrd)
+>> +		return ERR_PTR(-ENOMEM);
+>> +
+>> +	*max = ctx.max_hpa;
+> Rename max_hpa to available_hpa.
+>
+>> +	return ctx.cxlrd;
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_get_hpa_freespace, CXL);
+>> +
+>> +
 
