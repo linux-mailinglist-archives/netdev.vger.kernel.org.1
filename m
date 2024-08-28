@@ -1,86 +1,86 @@
-Return-Path: <netdev+bounces-122791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E10962925
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:46:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BF51962924
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:46:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54169B232EC
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:46:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEAD0B2324D
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E6B8188CBE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752B4188CB8;
 	Wed, 28 Aug 2024 13:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="kAvr9XXp"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="V1iMjWt4"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2060.outbound.protection.outlook.com [40.107.92.60])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2051.outbound.protection.outlook.com [40.107.92.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8C5188016
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA11E188014
 	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 13:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.60
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724852766; cv=fail; b=Xs1W1yyAi1vNv/PZNmY3etZfLwMKcFoOe/zzdOy1d2YfkL5uGybhxUzN6tYpzXSTSkytS9C9wA62E29j+NQuE38Pjh8sjxpVhuQKXm3yFYqDqt9qo/mFAclHtbB14KIEq5/BGzloLzovg5b/mID83yzdX9qS1VJvsAIOU+mWZt0=
+	t=1724852766; cv=fail; b=RNGcK2ofPhXrKy+kemMGWanTaeY2f1uHpnqwEIr5ZIu4I7n18PJB19rFdAwWfRJGrHISt3ed+UgLebASjp4t91BlDQSlj76dIz9a03mMuy+rFTY+Ckbe8nI52X8SdvlIBwgHl2+tskSXKxyNuQzq6xzQ+j7q2SBuUdSl9fBjyDE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724852766; c=relaxed/simple;
-	bh=SohGqyf4xQHlPn+Jpy/FPFGTdDRzadLSivXTa/QG7V4=;
+	bh=QnlGXbssvsCcpDGbfk7mP+XhiEQcLKzKE15aqwCw8Xk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S+8rqdKK7owmXAsW1L2bCOnPsegLi8M810T/oycEk0VYoSe0IBiICItn6nTo+i/m3OjYH53EbvvGWZdRkYbgglCHqQfPZBaEmT0qHO6EhXSaSH/xcSNKhYIlgUlfnnc/Qhj2ro6RrpE05GtHP5+zWyPbYtPy1Vin1qq/kvd7XhY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=kAvr9XXp; arc=fail smtp.client-ip=40.107.92.60
+	 MIME-Version:Content-Type; b=l3NxjRG9dl2cbFgy1JxR3BeEJYo2gGbbw6gXLLNZGIrq/lG0m6O9RjxiUxRDYzdSVV1UwGMcp2d78W8U1+E1SC9OfnZZiiokgXPs6TQJyjSLNMI6UBAuQPosDZyBfZaRPgqFb89zoSSrLSTqtLCDmDKK+E/iK7MKkMfQDMZ1Syk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=V1iMjWt4; arc=fail smtp.client-ip=40.107.92.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BfX12+mjWuMTQF2YZcz9lQaw3AabkgwTp4tQrMMwH7otlksAh9DCUu2FCYKmYxA8cEaeM3VjGeFufoWDmWSKetx5HKpH+iE7NjJTqYfXvqr+7rrqmMKHxYXMdTaQW19SDk5x1h3jyj2GS2IuAi15VKbi+2w0dfhUsF0W9eumacTRi1S95DQJVRO53wY0T/zKSjI0aHS54kPeV73J7iQTzenAS1vKj3+LSsSU1Xp1xcuojj2ZpZQdZdyQEMwIzZgm3O1pZrhQDa+z30dlY23mkPkSIxDt71+dEkZvViREiaRbdHBiPPKCwt/iA591E/VHk5B3bfFepr9qWQsDOJkYPQ==
+ b=VKloY2CXp15TnzHpdkYe7TcPn6l2b9SW4dSVglITXxoBd0iJc+Cz7KwrCgen9fjw8Bu2VxPaFLMSnGRyBloElZtCk94my+MKmPg2stOS06lbmzD55riAcqtQF2HmcwtrFCW/wa5UXPhxWebzuloqZE3Fze6Smu0381wbs57GSEAWhT0hF20pSEhcj6WSGWBweqDDC+9aEVFj6W9rEVzX6+mSBFxWfeurCxSCHAoT3+HyWv2O2XmF9A/8uzGu/Zi4eU7SCV4d8tvXZrbX200yAmOCOrc3NSJik5/+nF/Ixg4PFTJxBG4A7C0PuVldyq60/j9Wrvfx4NgJg7i0dikWdw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k3iep3+X4PGt3FOGtLQgA9lEGosfrN0WZIq/WDHvOrg=;
- b=BdldpOlRVKvslLt8jgsZeAyCLlIuGnzMb4yStUS99jO326U3zl2j0R/y0dp/gXDOKcKWCUoYg5mUah3ZMolTFDDSoyAByenpaMGYg0sLGxb5/84/xMfIZnWgZjCka3ayWLBYmOf2OC9zDpjUU32TrA2APb7yvk5ydmDivh5GKZgDXQkeFT3Zl95L0lz1dRvZ1hqvA+Z5XK6Q3NOg8flPPQO0TJhRcqlJcaUkXpZligHuqD7dKK+rkBaR4OAcuQ+MHDGObO8PHxwpTwPdUekWQQQTzhOZtJhCWztadp7oxM6U6/M3n+2/pUdkR8HtOT2WCldcQ/xYILNoNJPyOkFybw==
+ bh=lbQogCNzWeAwSmJmwPOieRaXtB/5V9CyMgc+6FeYfV0=;
+ b=j3CeMUeYsUjj22JsmQF/r3RpfHkt8P0JIDlpEpcBNttlWxUdQVjY1tHMoPF9ol8ohvj5jrUng+XBly8dZ0exqNF0Fwqufqtc3fotTSe5TrYbKPud1glgsCVTGp3Cc4J7ML0saWF55HGC8ui4ez9mPaWbn1B09ML4I9Acf533jKNq1W0iYyQ7D3GDjorYeMkFDHSy2N4ZxrSflsptg2JFfD4IqkOhI258AjVNLNWTc6iSTk1O9fTMpwQws9I7wYjFLGj498l3PO5yov7mCcMamF3u4rIfiWvXX9D1jfMYSk4MXiXljaaWD4faLyNKGDdMoTUTpAMbd8+1Yix5GDS25Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=k3iep3+X4PGt3FOGtLQgA9lEGosfrN0WZIq/WDHvOrg=;
- b=kAvr9XXpqb3RKQcYEMPGj20IBOXm70hifXQJFFwnIWuzKI+Ju2SZNY4V7jOj/9fcE2f0boPOAah17F/3pnC2+svjZ8muR1VlqEaMHoBp4McVb39QFVZ+mPDzXjiqUWmyw1gHveSGGlxJ4ZK6gjFH/nxTxlvrrhR9WLSbhZyJkkA=
-Received: from BN1PR14CA0008.namprd14.prod.outlook.com (2603:10b6:408:e3::13)
- by SJ2PR12MB7865.namprd12.prod.outlook.com (2603:10b6:a03:4cc::9) with
+ bh=lbQogCNzWeAwSmJmwPOieRaXtB/5V9CyMgc+6FeYfV0=;
+ b=V1iMjWt4LH8KC2KHGpLM7MSN92muTX8CbvIC+F6+4EubcEHnPrMLEzUOBcKRbRJdtgTor65BQ2EV7geX0OH4rfFfLiy+wa15gHfcOZ5jwf2ENvGdVhRBStUrHZgVGhTuLcrWZKO6piqr2BLWkUbxXGpL3L0rEIwjqQGDpeBe7Dc=
+Received: from SA1P222CA0064.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2c1::15)
+ by SA1PR12MB8142.namprd12.prod.outlook.com (2603:10b6:806:334::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.26; Wed, 28 Aug
- 2024 13:45:59 +0000
-Received: from BL6PEPF0001AB77.namprd02.prod.outlook.com
- (2603:10b6:408:e3:cafe::76) by BN1PR14CA0008.outlook.office365.com
- (2603:10b6:408:e3::13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Wed, 28 Aug
+ 2024 13:46:00 +0000
+Received: from SN1PEPF0002BA50.namprd03.prod.outlook.com
+ (2603:10b6:806:2c1:cafe::d1) by SA1P222CA0064.outlook.office365.com
+ (2603:10b6:806:2c1::15) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.28 via Frontend
- Transport; Wed, 28 Aug 2024 13:45:59 +0000
+ Transport; Wed, 28 Aug 2024 13:46:00 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL6PEPF0001AB77.mail.protection.outlook.com (10.167.242.170) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ SN1PEPF0002BA50.mail.protection.outlook.com (10.167.242.73) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Wed, 28 Aug 2024 13:45:59 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.7918.13 via Frontend Transport; Wed, 28 Aug 2024 13:46:00 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 28 Aug
- 2024 08:45:58 -0500
+ 2024 08:45:59 -0500
 Received: from xcbecree42x.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
- Transport; Wed, 28 Aug 2024 08:45:57 -0500
+ Transport; Wed, 28 Aug 2024 08:45:58 -0500
 From: <edward.cree@amd.com>
 To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
 CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next 4/6] sfc: implement per-queue rx drop and overrun stats
-Date: Wed, 28 Aug 2024 14:45:13 +0100
-Message-ID: <379cc84db6cfb516f8eb677a1b703cbacfa46e02.1724852597.git.ecree.xilinx@gmail.com>
+Subject: [PATCH net-next 5/6] sfc: implement per-queue TSO (hw_gso) stats
+Date: Wed, 28 Aug 2024 14:45:14 +0100
+Message-ID: <35782d70ad89c72d5dc819f9a12b2e5b4e742141.1724852597.git.ecree.xilinx@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <cover.1724852597.git.ecree.xilinx@gmail.com>
 References: <cover.1724852597.git.ecree.xilinx@gmail.com>
@@ -92,164 +92,152 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Received-SPF: None (SATLEXMB04.amd.com: edward.cree@amd.com does not designate
+Received-SPF: None (SATLEXMB03.amd.com: edward.cree@amd.com does not designate
  permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB77:EE_|SJ2PR12MB7865:EE_
-X-MS-Office365-Filtering-Correlation-Id: ebba11c4-94d5-463a-6910-08dcc767bfd3
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA50:EE_|SA1PR12MB8142:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8b238878-a1ac-4570-f2d1-08dcc767c0c3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?xoZUEHrTcgL0pTthcvdC54qZTW+3duGQeSAPr9nGw0xJ+0ta5GHtu/1hyq2c?=
- =?us-ascii?Q?KZOwld7ZuWHZ3faPeZ//VAhyeaDpgUmsx9wl1P5WlWHc+FUzXwahR8oSNm/h?=
- =?us-ascii?Q?LjXUMskX7aWxK9IyrW25Okhk2+bIUPQlmR6vSDeAovXuZJfg9b+8NzmOXA6H?=
- =?us-ascii?Q?2B+bMjcH3b/tUJEwl5Lui7TGYkhA+I2+jE35DiSMHdys7J6xED8M2dfQJYBs?=
- =?us-ascii?Q?6CFP6uptdF0rjYATDm2j1DJ15GUGQT1Jpl8VNK7bcL5q0JN39W4BjuVCGjcs?=
- =?us-ascii?Q?O+7wGtNaXtESVJXE/xCNO3PG/wQd1rP7KXENosLmTSbAzg1Wonep8OkQH0/L?=
- =?us-ascii?Q?/utI/Nh6zZden1OPGeEjTG2n9HJVLcb9o136JHkXiJR8PizcQ9MQLourLNz9?=
- =?us-ascii?Q?vgcK69Va6UWvFvdKWcYfs/ZTIs2bOnhQSsHikmeD1HMYQmiogkkIklM70ij3?=
- =?us-ascii?Q?CC2z5N3rAt/fFe/Or2h4pWufi6jqimWqVIoGyE9P4TzDcQ3ZaRO7Hy8HX/IZ?=
- =?us-ascii?Q?JYwwVwGCHaI5aqPt8wIBXubHoVUWqdNLhStEEmU4hN/0Tc8ZQ5d1LIKd85NS?=
- =?us-ascii?Q?Edixkw9NTGR6azHilsJ31EuUdCGuYk6ZY55yBdOmoj+oQl/DGtIzsQc1gexx?=
- =?us-ascii?Q?mXvc+GJrR+ZLwiwDWr57Ezt5DmoV9eoDC9YAuqqp+ytqoGaqIzzehgkFjkzb?=
- =?us-ascii?Q?Pc3AC/k5jZYb2Uh/E8ru9mLAYAknRKwuKHnWAiQDrWBF5V5fDcDUNepA5VzS?=
- =?us-ascii?Q?kUj4ylN9R9kWyUmyEZ7/nVeJXduTmdcxYKd2zNZfjsu+PjGrR7CnGnC3tAZG?=
- =?us-ascii?Q?0YS406l3YOwu3Z0k5KcF/2zVPZK7mV90XekdImUufOwJcpHZvyHhvjx91s9V?=
- =?us-ascii?Q?qmzaJsECA5V7VWqZBa4e243WQgnxU1ZM7KXLmKyA84C++V0qwBPv5lgmu+/H?=
- =?us-ascii?Q?5La6fYMDZriHHy72w1BQ4t0UCH9g4sBn4cC1VASm6CD77g6Jx1JhUIHd4t2x?=
- =?us-ascii?Q?jr+wD+FFHggSBBCIHeOeqafhZrA55GkwKgmQBLqCfe/gS+EZF8ajokK1lyY0?=
- =?us-ascii?Q?2A2XfZc9irHWONiJSJCsSFP2uZ8rzfNo4NCeunNlOM6DUYEVZi8D1UJ6yAyB?=
- =?us-ascii?Q?gF+ebr23AFQcEZIYXVfowDWTovRYvkgmdUV2ff3ict0R4BIsM7caK2Yr71Jh?=
- =?us-ascii?Q?S4KsaVxoNJqBzvxi9AqhQxxTNCGq/ndfk1xOYMSvQH2Asdc23yeO/FFo4d9v?=
- =?us-ascii?Q?dU2azeCu7WnA0gf99ZyKw0parz2K7ErygCYar9o7Zl7d5LVC69ibj331wmIi?=
- =?us-ascii?Q?+WPzrlkdZQxhrglsMBGxCckjSHCSxz8pevSg1tB/8bp+tx1S1OF+7qRQIwN1?=
- =?us-ascii?Q?SYnbux5w7gUbcy0HGjlQKfEVcR/98zak5XTDynEIR2Y/3hywreUYwKgeo85X?=
- =?us-ascii?Q?0szE71G3GvvIetbowE0+oLI5cCigynrO?=
+	=?us-ascii?Q?mKQzmyGkxF+XMY3tHwTpbT9J8Nt829chJ/vx/lxLPE7BHOLxJd9dMbI7TL75?=
+ =?us-ascii?Q?8axZOulYVQA8PYJEFXrGCq69HiMB92CnaEEFsGrEqYutc2hvccY2WFae+dVB?=
+ =?us-ascii?Q?bCX+1o58yMO/iDRestgIdd9lQjFU2+VD6EJxQdXg5arFhhvkHJu/cm4LXn8e?=
+ =?us-ascii?Q?GfESCrcdBHCT68At8JmrfwPYfBIkkulVXnXigr/102m19tMxQv/K8jcvDzww?=
+ =?us-ascii?Q?FjsshUdiC0aBQm4Ipw6Ju+Et0RYsZsKuUnVDeUiHE7nJlLhmlvuGV2Jpx9mf?=
+ =?us-ascii?Q?kpB9ITw7gTq4Oyo62mML3GBVNn8LP4LfSsr/6ZhIaPFvIrpYpum76zOyXUxn?=
+ =?us-ascii?Q?JtRhglP54vK6648qm/Aic8OsnnTSKL2ldHgyC6ac3Vouqm1STOcrOlbo3Usn?=
+ =?us-ascii?Q?n6FfeDdyD82AatJuoAQUYQ+B8fwDAtyrrHE3I6L1oIiC+zM3a2fEKSMr3et1?=
+ =?us-ascii?Q?yrGG74X+GtNYTx2KOamXvlV0hZr+0PpUqWMpXuG58kKGR5y/OUpL43aAGltJ?=
+ =?us-ascii?Q?asoi73rYS7TlVWahtrzYrB7ZdZasBTL3RfUMBC+XF3A60NZQpmdVJPS1/bC0?=
+ =?us-ascii?Q?xpJUl9tcdKnQPuD494i84Ywj7UIH7GVTdpRIS9lhDyiu/Aely0PxiZYugjZk?=
+ =?us-ascii?Q?bdn42o/anYhZ50FbUtsnTo6gqABnbW2VYrH07AbaAXqh/3bApfcMXKrj7yEN?=
+ =?us-ascii?Q?0fS5cff+52Je8BJaNFaZJARrCXAOs7OaxLLunBG9wD8m5bZDvyEDLmpfndMZ?=
+ =?us-ascii?Q?pDrEEMEsP77NDalwSx9bMI/MGcvG8/GO3HgEK+h7tcbAc3ZvS3nqb63BVo6o?=
+ =?us-ascii?Q?iECvpGRqOfVepsQs8L8/sdjwfwnnEdug0cg4A57quumI2G6c9ztvTHwD5mmh?=
+ =?us-ascii?Q?GfZqPg7GC01VztCq3FfRKj9VghefHQRcUvou7Re+Ocq1PzV/QCdQRxk8VsMF?=
+ =?us-ascii?Q?k1Fsy4U7aN3tlsMnSLhwTlIQcuozgf/nnwXzRUBNt/SAfvlIN9a0xkcu+AZS?=
+ =?us-ascii?Q?w/al4V1kOch1T3z3YgjMpZI2Vi1+4afEUbvsmSOjAD/eBVe7ndhgXpkpie3r?=
+ =?us-ascii?Q?JqROfQms4dDiVQt1WmI+x3jlgb/8QwrK99U4L20JZYBD9QJSwrRXnp9FbyC4?=
+ =?us-ascii?Q?byaENJ3L8fDPIGzA1C1gc++ke2WiPwTelTCZQJHoZFqSIYsE1ngN67z6a8IG?=
+ =?us-ascii?Q?bVmeZ5wf0i/k9sSwvXEuMuMVn9WFwfYrzBJvaXJYFTXAzwCiOO/jMFtpqFMv?=
+ =?us-ascii?Q?bkdRO7yAqteS76id9Qst8sO8ZNXhj8vEzohVaqyZsu1v0H0vatjfdETNIevJ?=
+ =?us-ascii?Q?X/CRr1W6OFk9iIgt3V2ieF1NEM/7k95KPbi2uZOHWXpTVrw64aT6j1vfn/8/?=
+ =?us-ascii?Q?lpSHEohhZ+BApYY33zRosc/rU7VJXjQ8uD3u+wSvRw4AO8DYmNvNUYkR4mD9?=
+ =?us-ascii?Q?zeI6/3PIEzE=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 13:45:59.2847
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 13:46:00.8612
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ebba11c4-94d5-463a-6910-08dcc767bfd3
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b238878-a1ac-4570-f2d1-08dcc767c0c3
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB77.namprd02.prod.outlook.com
+	SN1PEPF0002BA50.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7865
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8142
 
 From: Edward Cree <ecree.xilinx@gmail.com>
 
 Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- drivers/net/ethernet/sfc/efx.c          | 15 +++++++++++++--
- drivers/net/ethernet/sfc/efx_channels.c |  4 ++++
- drivers/net/ethernet/sfc/efx_channels.h |  7 +++++++
- drivers/net/ethernet/sfc/net_driver.h   |  7 +++++++
- 4 files changed, 31 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/sfc/efx.c        | 20 +++++++++++++++++---
+ drivers/net/ethernet/sfc/net_driver.h |  4 ++++
+ drivers/net/ethernet/sfc/tx_common.c  |  2 ++
+ 3 files changed, 23 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
-index e4656efce969..8b46d143b6c7 100644
+index 8b46d143b6c7..bf06fbcdcbff 100644
 --- a/drivers/net/ethernet/sfc/efx.c
 +++ b/drivers/net/ethernet/sfc/efx.c
-@@ -638,6 +638,10 @@ static void efx_get_queue_stats_rx(struct net_device *net_dev, int idx,
- 	rx_queue = efx_channel_get_rx_queue(channel);
- 	/* Count only packets since last time datapath was started */
- 	stats->packets = rx_queue->rx_packets - rx_queue->old_rx_packets;
-+	stats->hw_drops = efx_get_queue_stat_rx_hw_drops(channel) -
-+			  channel->old_n_rx_hw_drops;
-+	stats->hw_drop_overruns = channel->n_rx_nodesc_trunc -
-+				  channel->old_n_rx_hw_drop_overruns;
+@@ -653,14 +653,21 @@ static void efx_get_queue_stats_tx(struct net_device *net_dev, int idx,
+ 
+ 	channel = efx_get_tx_channel(efx, idx);
+ 	stats->packets = 0;
++	stats->hw_gso_packets = 0;
++	stats->hw_gso_wire_packets = 0;
+ 	/* If a TX channel has XDP TXQs, the stats for these will be counted
+ 	 * under the channel rather than in base stats.  Unclear whether this
+ 	 * is correct behaviour, but we can't reliably exclude XDP TXes from
+ 	 * these stats anyway because in EFX_XDP_TX_QUEUES_BORROWED we use
+ 	 * the same TXQ as the core.
+ 	 */
+-	efx_for_each_channel_tx_queue(tx_queue, channel)
++	efx_for_each_channel_tx_queue(tx_queue, channel) {
+ 		stats->packets += tx_queue->tx_packets - tx_queue->old_tx_packets;
++		stats->hw_gso_packets += tx_queue->tso_bursts -
++					 tx_queue->old_tso_bursts;
++		stats->hw_gso_wire_packets += tx_queue->tso_packets -
++					      tx_queue->old_tso_packets;
++	}
  }
  
- static void efx_get_queue_stats_tx(struct net_device *net_dev, int idx,
-@@ -669,6 +673,8 @@ static void efx_get_base_stats(struct net_device *net_dev,
- 	struct efx_channel *channel;
- 
- 	rx->packets = 0;
-+	rx->hw_drops = 0;
-+	rx->hw_drop_overruns = 0;
+ static void efx_get_base_stats(struct net_device *net_dev,
+@@ -676,6 +683,8 @@ static void efx_get_base_stats(struct net_device *net_dev,
+ 	rx->hw_drops = 0;
+ 	rx->hw_drop_overruns = 0;
  	tx->packets = 0;
++	tx->hw_gso_packets = 0;
++	tx->hw_gso_wire_packets = 0;
  
  	/* Count all packets on non-core queues, and packets before last
-@@ -676,10 +682,15 @@ static void efx_get_base_stats(struct net_device *net_dev,
- 	 */
- 	efx_for_each_channel(channel, efx) {
- 		rx_queue = efx_channel_get_rx_queue(channel);
--		if (channel->channel >= net_dev->real_num_rx_queues)
-+		if (channel->channel >= net_dev->real_num_rx_queues) {
- 			rx->packets += rx_queue->rx_packets;
--		else
-+			rx->hw_drops += efx_get_queue_stat_rx_hw_drops(channel);
-+			rx->hw_drop_overruns += channel->n_rx_nodesc_trunc;
-+		} else {
- 			rx->packets += rx_queue->old_rx_packets;
-+			rx->hw_drops += channel->old_n_rx_hw_drops;
-+			rx->hw_drop_overruns += channel->old_n_rx_hw_drop_overruns;
-+		}
+ 	 * datapath start on core queues.
+@@ -694,10 +703,15 @@ static void efx_get_base_stats(struct net_device *net_dev,
  		efx_for_each_channel_tx_queue(tx_queue, channel) {
  			if (channel->channel < efx->tx_channel_offset ||
  			    channel->channel >= efx->tx_channel_offset +
-diff --git a/drivers/net/ethernet/sfc/efx_channels.c b/drivers/net/ethernet/sfc/efx_channels.c
-index c9e17a8208a9..90b9986ceaa3 100644
---- a/drivers/net/ethernet/sfc/efx_channels.c
-+++ b/drivers/net/ethernet/sfc/efx_channels.c
-@@ -1100,6 +1100,10 @@ void efx_start_channels(struct efx_nic *efx)
- 			atomic_inc(&efx->active_queues);
+-						net_dev->real_num_tx_queues)
++						net_dev->real_num_tx_queues) {
+ 				tx->packets += tx_queue->tx_packets;
+-			else
++				tx->hw_gso_packets += tx_queue->tso_bursts;
++				tx->hw_gso_wire_packets += tx_queue->tso_packets;
++			} else {
+ 				tx->packets += tx_queue->old_tx_packets;
++				tx->hw_gso_packets += tx_queue->old_tso_bursts;
++				tx->hw_gso_wire_packets += tx_queue->old_tso_packets;
++			}
  		}
- 
-+		/* reset per-queue stats */
-+		channel->old_n_rx_hw_drops = efx_get_queue_stat_rx_hw_drops(channel);
-+		channel->old_n_rx_hw_drop_overruns = channel->n_rx_nodesc_trunc;
-+
- 		efx_for_each_channel_rx_queue(rx_queue, channel) {
- 			efx_init_rx_queue(rx_queue);
- 			atomic_inc(&efx->active_queues);
-diff --git a/drivers/net/ethernet/sfc/efx_channels.h b/drivers/net/ethernet/sfc/efx_channels.h
-index b3b5e18a69cc..cccbc7d66e77 100644
---- a/drivers/net/ethernet/sfc/efx_channels.h
-+++ b/drivers/net/ethernet/sfc/efx_channels.h
-@@ -43,6 +43,13 @@ struct efx_channel *efx_copy_channel(const struct efx_channel *old_channel);
- void efx_start_channels(struct efx_nic *efx);
- void efx_stop_channels(struct efx_nic *efx);
- 
-+static inline u64 efx_get_queue_stat_rx_hw_drops(struct efx_channel *channel)
-+{
-+	return channel->n_rx_eth_crc_err + channel->n_rx_frm_trunc +
-+	       channel->n_rx_overlength + channel->n_rx_nodesc_trunc +
-+	       channel->n_rx_mport_bad;
-+}
-+
- void efx_init_napi_channel(struct efx_channel *channel);
- void efx_init_napi(struct efx_nic *efx);
- void efx_fini_napi_channel(struct efx_channel *channel);
+ 	}
+ }
 diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
-index cc96716d8dbe..25701f37aa40 100644
+index 25701f37aa40..2cf2935a713c 100644
 --- a/drivers/net/ethernet/sfc/net_driver.h
 +++ b/drivers/net/ethernet/sfc/net_driver.h
-@@ -472,6 +472,10 @@ enum efx_sync_events_state {
-  * @n_rx_xdp_redirect: Count of RX packets redirected to a different NIC by XDP
-  * @n_rx_mport_bad: Count of RX packets dropped because their ingress mport was
-  *	not recognised
-+ * @old_n_rx_hw_drops: Count of all RX packets dropped for any reason as of last
-+ *	efx_start_channels()
-+ * @old_n_rx_hw_drop_overruns: Value of @n_rx_nodesc_trunc as of last
-+ *	efx_start_channels()
-  * @rx_pkt_n_frags: Number of fragments in next packet to be delivered by
-  *	__efx_rx_packet(), or zero if there is none
-  * @rx_pkt_index: Ring index of first buffer for next packet to be delivered
-@@ -534,6 +538,9 @@ struct efx_channel {
- 	unsigned int n_rx_xdp_redirect;
- 	unsigned int n_rx_mport_bad;
+@@ -234,6 +234,8 @@ struct efx_tx_buffer {
+  * @notify_count: Count of notified descriptors to the NIC
+  * @tx_packets: Number of packets sent since this struct was created
+  * @old_tx_packets: Value of @tx_packets as of last efx_init_tx_queue()
++ * @old_tso_bursts: Value of @tso_bursts as of last efx_init_tx_queue()
++ * @old_tso_packets: Value of @tso_packets as of last efx_init_tx_queue()
+  * @empty_read_count: If the completion path has seen the queue as empty
+  *	and the transmission path has not yet checked this, the value of
+  *	@read_count bitwise-added to %EFX_EMPTY_COUNT_VALID; otherwise 0.
+@@ -284,6 +286,8 @@ struct efx_tx_queue {
+ 	/* Statistics to supplement MAC stats */
+ 	unsigned long tx_packets;
+ 	unsigned long old_tx_packets;
++	unsigned int old_tso_bursts;
++	unsigned int old_tso_packets;
  
-+	unsigned int old_n_rx_hw_drops;
-+	unsigned int old_n_rx_hw_drop_overruns;
-+
- 	unsigned int rx_pkt_n_frags;
- 	unsigned int rx_pkt_index;
+ 	/* Members shared between paths and sometimes updated */
+ 	unsigned int empty_read_count ____cacheline_aligned_in_smp;
+diff --git a/drivers/net/ethernet/sfc/tx_common.c b/drivers/net/ethernet/sfc/tx_common.c
+index f1694900e0f0..cd0857131aa8 100644
+--- a/drivers/net/ethernet/sfc/tx_common.c
++++ b/drivers/net/ethernet/sfc/tx_common.c
+@@ -87,6 +87,8 @@ void efx_init_tx_queue(struct efx_tx_queue *tx_queue)
+ 	tx_queue->completed_timestamp_minor = 0;
  
+ 	tx_queue->old_tx_packets = tx_queue->tx_packets;
++	tx_queue->old_tso_bursts = tx_queue->tso_bursts;
++	tx_queue->old_tso_packets = tx_queue->tso_packets;
+ 
+ 	tx_queue->xdp_tx = efx_channel_is_xdp_tx(tx_queue->channel);
+ 	tx_queue->tso_version = 0;
 
