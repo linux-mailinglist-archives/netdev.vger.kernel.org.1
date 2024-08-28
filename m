@@ -1,149 +1,146 @@
-Return-Path: <netdev+bounces-122885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C9F6962FE9
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:26:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DCE896300D
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D027E1C208DE
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 18:26:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10EE01F24CA5
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 18:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1001A76AD;
-	Wed, 28 Aug 2024 18:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F7D1A4B82;
+	Wed, 28 Aug 2024 18:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m7c8modD"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="O0nF7rIa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A80154C19
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 18:26:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2077919D8A4
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 18:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724869606; cv=none; b=aZjs2oBJ4hDetDHqEed0CwYdy0STXZZnrzM1O0Nsd7i9s9CP6Njlf+nmwGYXZmM+YD5ixdk7A+vQLf1iNvpSGWVT9q8O04nGxpmAybdGHGyireCqjs6gG4N3twv4c0ZubFtIoJAMMszjJD+WVnn5HkudFSjAbiA5PnSZ1omQcXY=
+	t=1724869979; cv=none; b=uWPneO12Ja4WqSw0fjf+4Jq5Z70heVsggu/K2y4fZ4F8Tfrcha5EyeQQPt9g2ekT3W8wvQfX5q580LeCztyAGqouCYoN9toQGMm0baIQbmE4IFx+ny4uFT9qGuZPtBKqN8ocPyyIhLxeWjXYbWqJ1iQ3xhmZvUYXi8i6pCQdXx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724869606; c=relaxed/simple;
-	bh=V1yGd8hQm7NWVW6rAxedgpvVY+o6CFEVgoXoCDOtahU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WdrEZSlcKq8e14r0GTWQGePSN/luT1kG2C9kFcJk1f20WutZS1ribtqU0P1oxzdASH1q5lsyFH+MQHnj9bXlJtws2Muh8r7RChhIfk+vOF5QOrOQzcEDFQagSIBsdlJT+DGir2mLgCTfYFCJdVPdmohHoTFwEMFfrLeCht78Kxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m7c8modD; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4567fe32141so18931cf.0
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 11:26:44 -0700 (PDT)
+	s=arc-20240116; t=1724869979; c=relaxed/simple;
+	bh=1QoVojL7AgLHIDFE70CvZWt92aAXg4BTN69zqshnV5Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UB6UiGHQ9x4vRXsc/IwaDdDKIeKRsmII+FSrR26UXpI4gDeAeQSZM1/lhN+EzUIQRWZf3I3LhuxaW5EUDJeytU59e2IPHrsm65XH/cnWbnsypx7eaegRsln1tfCL16TLPTQ3QAZVgLTs8E7MAaLrdCaMyNCeoEM9r2IH31I2xtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=O0nF7rIa; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e11693fbebaso7471675276.3
+        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 11:32:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724869603; x=1725474403; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hGauUs807uM1K0iECRfVWPVDoOsyliQyNmPh/dx1pSQ=;
-        b=m7c8modDDDv+/xZ+CzJKMSQLNOGPNg7bPw5+OKvNDXrkh1Hytt5mvFa6GqzvH5nzzK
-         OiK8Lu5iutDguCiXyRPbV0AV/hhNp8MK8uuU3zIo4X6F2Mw6jM7PSpgHrSWtTQ3bOjhF
-         qUQt2/IMQHkZrkhk9M7Juct8vm8qK0ONrCZgqc/46A7wmNdZK2WRnI4NxJskooWV3CGd
-         aGRnG9N3AN+f15W1bJqHUlgDiaB+1iriNLGSIGuK1rZPnCX9yQoSREta++QQHxE4Abz3
-         eLOs0a0jldBvoANYBK4XlRQqqteda3cyUIPC4pJaMSNzKMKTpnG0nMLzB/Esl25B1cex
-         xKlA==
+        d=broadcom.com; s=google; t=1724869977; x=1725474777; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FloWRDOBTlYrF306qltrS/yQ3ym0PC800/zOGo9ZrZk=;
+        b=O0nF7rIaO6i2oGNwrjZ3484+PG9zqW7Gftyn32vgIfMJrfbg0OfKnOd3k2O/ShVupq
+         ZbQ3qv7I876NTACHX6B/5ExF4Jm8E53LH8kYpseEnLQRo7Pwdxhr3CrVKxs37bO1u+dn
+         QLCAPjB6v+DB2PmxEMZAHKEXLFsXLOjouko3E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724869603; x=1725474403;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hGauUs807uM1K0iECRfVWPVDoOsyliQyNmPh/dx1pSQ=;
-        b=RKZAfl7TlFa7fTE0qTUzn7paawr2bOC2Z+KzJmhGcgvuOaCaTENmhtfBXWKjQqh1yG
-         tqakMb7eBS8rHrvbA7DiO3/zanM4Jy/1DhVrwGQLwQILfE9Xy85R+NBh9CitY/EqC/Ed
-         NdLyXg1JQB6bXDq6FiYkHQw9IV+Z6/mb+ZXxZDIXNCyRFbPBvQDuoDPoUht5Mm60LrTp
-         zDQ05wPVnfFNpdAwrFrWM/VAno33I73bIQG3xrIkIPetrPHggzl7buazF9kmvif8tIk1
-         Qdam4qlQfoh3P5J+k3PS7amAUjMr6HT40NL2ZpdIfwSD0E5zAOial6tIXNrLPOQQEjgi
-         Ct6A==
-X-Gm-Message-State: AOJu0YwTCfNeQVPbRFbQcOGlJ7gWChcpFCaWtc/Ga1GWaGUH5RTNvVMg
-	ebprQcHrdccvq0CXRV6ufGqmXncJ4dSsH3JynW8YhUF0EPe49ny4QiesPP9zQqsYERJBzCDYtI4
-	ttBTbAamtGzNr/Ipe66P1aj26E4VmfAxsYk/P
-X-Google-Smtp-Source: AGHT+IG1TeY5E4BcEtA875R+5U8RYeS/0Hm0fPSD6WCVJR/n+o4wbQiOLznm4XffFD4tv3sduCpPncRs0rrTfRSTMLc=
-X-Received: by 2002:a05:622a:468a:b0:456:7cc9:be15 with SMTP id
- d75a77b69052e-45680141c74mr189061cf.29.1724869603023; Wed, 28 Aug 2024
- 11:26:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724869977; x=1725474777;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FloWRDOBTlYrF306qltrS/yQ3ym0PC800/zOGo9ZrZk=;
+        b=EBcFkKCqc071Cgmn0spxXrwaIJl56Hm3DAUOU5Jjzf3vHgAKS3oFScOu9ylmbTuub6
+         5SslQ23TVxSivTLLGQIJMYCBso+t643cM73Y716oC+gaZnHG/HTDcNZh0rmHMuk58Bd6
+         W/pUi4BDrRN09CDhH4BZg+vo7KLp7bbniKKfd3PaYNuG0DiiotNKuBB818rqv1oV8cRG
+         lMd6IdAtXWqWga81nx9y8YWkNd/o/iFabFn6T5TpN07qmXN8gJyZltWdg5tn01V0BWTg
+         StiOW/4rIylbHpdUihjENBhz+vIbE8FlweVZRmGG4cE0NPCHmbkyvHmIQIfjY6yZeb9g
+         GeKg==
+X-Gm-Message-State: AOJu0Yx9U4vAPMg2DnP2SA77C/UnOk5590QdxJUJA1/VgGIpwsJWtsWv
+	DEv+ZbiFkAV/0E1Ai2x1WjOwzmdg2bM4jZryQXP9Ok8jAerNdv9HkmM/lIcPGg==
+X-Google-Smtp-Source: AGHT+IFBDgsu79ksV/TTlA7yCqGhxfvYM2/Zs6ss/6vv8+MURmvC/g2DSfufXhZMji+5sylg/ExpSg==
+X-Received: by 2002:a05:6902:843:b0:e0b:eb96:fd90 with SMTP id 3f1490d57ef6-e1a5ae0f513mr307467276.45.1724869976745;
+        Wed, 28 Aug 2024 11:32:56 -0700 (PDT)
+Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c162d4c36esm68126866d6.43.2024.08.28.11.32.55
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 28 Aug 2024 11:32:56 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	horms@kernel.org,
+	helgaas@kernel.org,
+	przemyslaw.kitszel@intel.com
+Subject: [PATCH net-next v4 0/9] bnxt_en: Update for net-next
+Date: Wed, 28 Aug 2024 11:32:26 -0700
+Message-ID: <20240828183235.128948-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
-In-Reply-To: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 28 Aug 2024 11:26:28 -0700
-Message-ID: <CAHS8izNyJgr=rFM8H_v=A3yfqdoDJysOtKA0CuZHRfgZ11ec4g@mail.gmail.com>
-Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with ksft
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, ncardwell@google.com, 
-	shuah@kernel.org, linux-kselftest@vger.kernel.org, fw@strlen.de, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 27, 2024 at 12:34=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> From: Willem de Bruijn <willemb@google.com>
->
-> Lay the groundwork to import into kselftests the over 150 packetdrill
-> TCP/IP conformance tests on github.com/google/packetdrill.
->
-> Florian recently added support for packetdrill tests in nf_conntrack,
-> in commit a8a388c2aae49 ("selftests: netfilter: add packetdrill based
-> conntrack tests").
->
-> This patch takes a slightly different implementation and reuses the
-> ksft python library for its KTAP, ksft, NetNS and other such tooling.
->
-> It also anticipates the large number of testcases, by creating a
-> separate kselftest for each feature (directory). It does this by
-> copying the template script packetdrill_ksft.py for each directory,
-> and putting those in TEST_CUSTOM_PROGS so that kselftests runs each.
->
-> To demonstrate the code with minimal patch size, initially import only
-> two features/directories from github. One with a single script, and
-> one with two. This was the only reason to pick tcp/inq and tcp/md5.
->
-> Any future imports of packetdrill tests should require no additional
-> coding. Just add the tcp/$FEATURE directory with *.pkt files.
->
-> Implementation notes:
-> - restore alphabetical order when adding the new directory to
->   tools/testing/selftests/Makefile
-> - copied *.pkt files and support verbatim from the github project,
->   except for
->     - update common/defaults.sh path (there are two paths on github)
->     - add SPDX headers
->     - remove one author statement
->     - Acknowledgment: drop an e (checkpatch)
->
-> Tested:
->         make -C tools/testing/selftests/ \
->           TARGETS=3Dnet/packetdrill \
->           install INSTALL_PATH=3D$KSFT_INSTALL_PATH
->
->         # in virtme-ng
->         sudo ./run_kselftest.sh -c net/packetdrill
->         sudo ./run_kselftest.sh -t net/packetdrill:tcp_inq.py
+This series starts with 2 patches to support firmware crash dump.  The
+driver allocates the required DMA memory ahead of time for firmware to
+store the crash dump if and when it crashes.  Patch 3 adds priority and
+TPID for the .ndo_set_vf_vlan() callback.  Note that this was rejected
+and reverted last year and it is being re-submitted after recent changes
+in the guidelines.  The remaining patches are MSIX related.  Legacy
+interrupt is no longer supported by firmware so we remove the support
+in the driver.  We then convert to use the newer kernel APIs to
+allocate and enable MSIX vectors.  The last patch adds support for
+dynamic MSIX.
 
-I did not know about run_kselftest.sh. From a quick look, it seems to
-require selftests to be installed to run them. I think nipa relies on
-something slightly different, it does something like this, AFAIU this
-runs an individual kselftest without requiring it to be installed
-first (which is nice):
+v4:
+Simplify patch #9 based on feedback from Michal Swiatkowski.
 
-make -C tools/testing/selftests TARGETS=3D"net"
-TEST_PROGS=3D"rxtimestamp.sh" TEST_GEN_PROGS=3D"" run_tests
+Link to v3:
+https://lore.kernel.org/netdev/20240823195657.31588-1-michael.chan@broadcom.com/
 
-It may be worth it to check if these added tests can be ran in a similar wa=
-y.
+v3:
+Some changes to patch #1, #2, and #8 based on feedback from Przemek
+Kitszel and internal review.  I'm keeping Simon's Reviewed-by tags since
+the changes are small.
 
-This may also solve your issue with 'intermediate output' being
-printed after every test. AFAIU if the tests can be ran individually
-using a command like this, then you don't need intermediate output,
-maybe.
+Link to v2:
+https://lore.kernel.org/netdev/20240816212832.185379-1-michael.chan@broadcom.com/
+
+v2:
+Only patch #4 is updated to fix a memory leakage reported by Simon.
+The changelog of some of the MSIX patches have been updated based on
+feedback from Bjorn Helgaas.
+
+Link to v1:
+https://lore.kernel.org/netdev/20240713234339.70293-1-michael.chan@broadcom.com/
+
+Michael Chan (6):
+  bnxt_en: Deprecate support for legacy INTX mode
+  bnxt_en: Remove BNXT_FLAG_USING_MSIX flag
+  bnxt_en: Remove register mapping to support INTX
+  bnxt_en: Replace deprecated PCI MSIX APIs
+  bnxt_en: Allocate the max bp->irq_tbl size for dynamic msix allocation
+  bnxt_en: Support dynamic MSIX
+
+Sreekanth Reddy (1):
+  bnxt_en: Support QOS and TPID settings for the SRIOV VLAN
+
+Vikas Gupta (2):
+  bnxt_en: add support for storing crash dump into host memory
+  bnxt_en: add support for retrieving crash dump using ethtool
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 310 +++++++++---------
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   8 +-
+ .../ethernet/broadcom/bnxt/bnxt_coredump.c    |  98 +++++-
+ .../ethernet/broadcom/bnxt/bnxt_coredump.h    |   8 +
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  13 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_sriov.c   |  29 +-
+ 6 files changed, 279 insertions(+), 187 deletions(-)
+
+-- 
+2.30.1
+
 
