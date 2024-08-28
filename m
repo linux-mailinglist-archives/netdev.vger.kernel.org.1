@@ -1,271 +1,122 @@
-Return-Path: <netdev+bounces-122556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE978961B24
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 02:44:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00334961B4D
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 03:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DD541F23D84
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 00:44:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A796F1F24566
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 01:14:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4E311CAF;
-	Wed, 28 Aug 2024 00:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9E811CA0;
+	Wed, 28 Aug 2024 01:14:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tpp+BuPJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="We1Q7LAd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51DA41B969
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 00:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B51224D1
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 01:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724805842; cv=none; b=Im2gqc1OPyIhcOcAIg7PF0kRRoSN+0FVf1aY8lkUpAl57FZAxA5Ppgv2a3vo/HVN1XJLxNfbK/mcW5Kfpro0nK1eEmiJwCvDRwnQfdUIp3c5jEl3JnlKYGmDrUMzC+75XHASPQ1Y5ubSEEYVyWWBO3cRGWPlYnS+BdcBvRp2sk4=
+	t=1724807686; cv=none; b=kRs27PvUXVVgPgIUD5xowYt0gacY1rZNfpKvMDEva4qTXDdUic3a4J4JEUu07e8mU6T3NY7IYCdI2wUnHAO7qB5PM6p3Z8wXI4Hn/K50T5NSUqPY3YdAJpXGlDUSr5MM26RZ/JrNfOmE5jTXKT3cmLzweJZPdB21hkH3GHPhrn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724805842; c=relaxed/simple;
-	bh=0BiOO60bMLHXVY/IWYsR8GcwRe5d/QWh+C0MevXb914=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AhXpFEafQ7933RFph9tUGGpHgJH5Z4bGWDo3eeRU0avEOtB+ajVQSk053gfUjEW4eay9+zFA2fMrTvh1hod5b1X7J29DOSe/83qOCvgE7/go2sT7T1mXM7WinGwjrDDTUDEt6pDr8oJPNRTGjLOjGQ3j2V50HsYKV4UWEewUJ9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tpp+BuPJ; arc=none smtp.client-ip=209.85.166.170
+	s=arc-20240116; t=1724807686; c=relaxed/simple;
+	bh=3b+L74gq64OIS4dvdJeKnBJJ2ruR+DL4cW2HKIJ0QUo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nsrf4a3sfXS6wsecs8XAmvxBcM0QfUPmd1oQ5AnbCvvEg+72wFePQdlTTN4zo6fBS3KSIsx48nE8sZjjsCRubSC9NscEV7XIWTq4QCNH6B6IpyHWOesERIwah44WW6LplEGbBRbw9ZhqhlMOfzEwavCgBtG0C7Wm2QWkeA9AO6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=We1Q7LAd; arc=none smtp.client-ip=209.85.215.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-39d26a8f9dbso20815335ab.1
-        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 17:44:01 -0700 (PDT)
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-6c5bcb8e8edso4441592a12.2
+        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 18:14:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724805840; x=1725410640; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gkYtcLygJe0kisfiPMwuvLJCDc88TzF8NS3zeA9dx/I=;
-        b=Tpp+BuPJRhCYTVm2bSpjx40m0u7zc14LqaHIz2q5oiW7ZpLJD3ZLtECi03THx5T2KG
-         ruX1wake9VgwopoRF1PHjNM1dFFDPierZ2cPCQh/7r9GN31UPUtwQL778XrG55wScgo/
-         aDR5APd6Ad0kfAJyU29abC+cjj3cfSfq3iiJYtXjR0iP1EWzp6GsUEMleLasR3sXUQpH
-         04CPN4Vrs2eRuOFMgFQZc7LnrU22yNLDSR43hb4Wjs1iPZLguN0BtMzrtpfin6P/CxDg
-         EqJ0FpL3Z5PBBb4/RiHStC8dSbzuXLiNrfZkLdEtP5e4/LUJMSfi6nofvgpXkZBlbSlU
-         XDoA==
+        d=gmail.com; s=20230601; t=1724807684; x=1725412484; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=HXX0mppcgky/qmevz4q2sDCXCAoRcVgIJfb18HWs2EQ=;
+        b=We1Q7LAdIKbuXVtC5L1AdW+pLHK/gOIcC/eA2MSXDW6bbvaNlX91tIgJ7w9s4nr8Li
+         dyRbLnd73fUaQdZJDeRadg2pi30EA8wlT2zFoPUxQ97QXfxLzPCK3NO1mwlE74zO7Ngb
+         po96eW+TXHQqcZa8YSqr1fXu+GPOPAt6BDuYX86i3lrDh1Ez6H7NcAU9oPn66M7jPc26
+         EEI4mh+6+HHUGq1+acJSHOaYm1HH6JmubpzfdLyDAAvdHVC+D1NprRFja5Ty9h5wqDrF
+         XpqxY5yMG55hWOSbjge/fj/5NxgPKb55oBT6O1nfkZ3A9n1a69aaszSkDCEy1pyBZF+w
+         qK3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724805840; x=1725410640;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gkYtcLygJe0kisfiPMwuvLJCDc88TzF8NS3zeA9dx/I=;
-        b=NnNmrvN/rpX2RksdZpIPmSTPvUP95hQq16mkb5sQml+oc4Y3j/e4xgX+D8Io4fRgop
-         9Ejolom6pVnNFLqyj95bd1x8McqftHQVO5tPl4bdTMbare6D81Q/K4zreCYbqgYXUTji
-         NpUc1tnJjLJvEtxT8Fv4uJkvIjA1/rQQAKrSa9XgWBmn5a5YZI0VTji2nwdm3Zpdq+wA
-         lT2FxGw9Gc1+O5RZwxqogoZ+cvRlhqcMR16J2fscFeF+arO2v6za/up6R4S9D4WpO6oD
-         DKcuzaDhsSKaWFUM/7J9tGUUt58Wc8Om2LHY6ZEi0FWGHvnfswlyswA4vBH8ivrwlYDf
-         pLHw==
-X-Forwarded-Encrypted: i=1; AJvYcCVydXEa5uA0ZY+iWk89zdrnR68dJ99aW7DM76X6O64zDj4pv4c/k6l0wPDnh1++nTYXCsiZ9Co=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzG4Kw9Ks+L6+ffRZYFhyGFuh04saTyMN9OKfj004RBw23y+xhU
-	Gaop3+Jzx79BMpFIci0zeqVZFzyZL1CQqyGMr1/sHAF/lYpAsXnniVpZcKEG35+At1qcPwcpPNT
-	PABTsLkZgNJiB2AhlyOhz+FWRMBw=
-X-Google-Smtp-Source: AGHT+IFMUa9Rm8/l1XipvYhloJoqq5ILC+6zLkLTcRYrQrDHsizDkarXJ8v03CDbTA0EqKXwohP48iF7iklHXyAUcdA=
-X-Received: by 2002:a05:6e02:1787:b0:39a:eb4d:4335 with SMTP id
- e9e14a558f8ab-39f325ed038mr5926275ab.4.1724805840157; Tue, 27 Aug 2024
- 17:44:00 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724807684; x=1725412484;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HXX0mppcgky/qmevz4q2sDCXCAoRcVgIJfb18HWs2EQ=;
+        b=qvTQMFyOWQwr/5rE58W3pBlLUpOl3+plz7v/XRTaqDWqS6r7mI06L0lVM76+PZdchX
+         KTrRa43L317N2xFFao9YvOjvehRRwrCJLv5PWQPdC3bZlYuQM8/8Ev4BZfz1PgCHULim
+         78PRItHN2MbdUXid5+Y9tVKureEM4bDv0IE7PebBZ2kniZBrbJnlLWE/Sjy8BNf9Rcil
+         j9YLujMNf0V+SEtba5i36Iik+ttjqVHJ2T7gAmTw2eWn/Gl2kmTjWZJpQ0NI129zIpbH
+         M3w9RuMvn6DIaN7b10ImNR8KRBQt3nltb0kN5QkdJvE24VeJJdD9mcAsJJzcvNAmKFUI
+         OJ6Q==
+X-Gm-Message-State: AOJu0YzdfI3n4aseb+kqVyM5wKRJxCmRhlybQqWyH8B7L88HgVW++xJN
+	ZYENMMocLYtCGOm54N95/glcz+iIDnx1UkKwMelOFDV7UyzGzW+E
+X-Google-Smtp-Source: AGHT+IHHp1UUTzLbUuDurLM/+9ezeJQLzsSV6duvDgGd73DOEhdgEoA1F3o+q/Xrfs8S/hynu+8BzA==
+X-Received: by 2002:a17:90a:3047:b0:2c9:7611:e15d with SMTP id 98e67ed59e1d1-2d646bf0e04mr15795954a91.20.1724807683709;
+        Tue, 27 Aug 2024 18:14:43 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d84462d22asm187367a91.32.2024.08.27.18.14.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Aug 2024 18:14:43 -0700 (PDT)
+Date: Wed, 28 Aug 2024 09:14:37 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCHv4 net-next 1/3] bonding: add common function to check
+ ipsec device
+Message-ID: <Zs55_Yhu-UXkeihX@Laptop-X1>
+References: <20240821105003.547460-1-liuhangbin@gmail.com>
+ <20240821105003.547460-2-liuhangbin@gmail.com>
+ <20240827130619.1a1cd34f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240825152440.93054-1-kerneljasonxing@gmail.com>
- <20240825152440.93054-2-kerneljasonxing@gmail.com> <66cc82229bea2_261e53294fd@willemb.c.googlers.com.notmuch>
- <CAL+tcoBWHqVzjesJqmmgUrX5cvKtLp_L9PZz+d+-b0FBXpatVg@mail.gmail.com>
- <66cca76683fbd_266e63294d1@willemb.c.googlers.com.notmuch>
- <CAL+tcoCbCWGMEUD7nZ0e89mxPS-DjKCRGa3XwOWRHq_1PPeQUw@mail.gmail.com>
- <66ccccbf9eccb_26d83529486@willemb.c.googlers.com.notmuch>
- <CAL+tcoDrQ4e7G2605ZdigchmgQ4YexK+co9G=AvW4Dug84k-bA@mail.gmail.com>
- <66cdd29d21fc3_2986412942f@willemb.c.googlers.com.notmuch>
- <CAL+tcoCZhakNunSGT4Y0RfaBi-UXbxDDcEU0n-OG9FXNb56Bcg@mail.gmail.com> <66ce07f174845_2a065029481@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66ce07f174845_2a065029481@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 28 Aug 2024 08:43:23 +0800
-Message-ID: <CAL+tcoDVhYpQwZ7xX4Lv+0SWuQOKMpRiJxH=R9v+M8-Lp9HGzA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: make SOF_TIMESTAMPING_RX_SOFTWARE
- feature per socket
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240827130619.1a1cd34f@kernel.org>
 
-On Wed, Aug 28, 2024 at 1:08=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> > > > > > Besides those two concepts you mentioned, could you explain if =
-there
-> > > > > > are side effects that the series has and what kind of bad conse=
-quences
-> > > > > > that the series could bring?
-> > > > >
-> > > > > It doesn't do the same for hardware timestamping, creating
-> > > > > inconsistency.
-> > >
-> > > Taking a closer look at the code, there are actually already two weir=
-d
-> > > special cases here.
-> > >
-> > > SOF_TIMESTAMPING_RX_HARDWARE never has to be passed, as rx hardware
-> > > timestamp generation is configured through SIOCSHWTSTAMP.
-> >
-> > Do you refer to the patch [1/2] I wrote? To be more specific, is it
-> > about the above wrong commit message which I just modified?
-> >
-> > Things could happen when other unrelated threads set
-> > SOF_TIMESTAMPING_RX_SOFTWARE instead of SOF_TIMESTAMPING_RX_HARDWARE.
-> >
-> > Sorry for the confusion.
->
-> No, this is referring to the current state.
->
-> > >
-> > > SOF_TIMESTAMPING_RX_SOFTWARE already enables timestamp reporting from
-> > > sock_recv_timestamp(), while reporting should not be conditional on
-> > > this generation flag.
-> >
-> > I'm not sure if you're talking about patch [2/2] in the series. But I g=
-uess so.
->
-> Nope, same thing. I mention a commit from 2014.
+Hi Jakub,
+On Tue, Aug 27, 2024 at 01:06:19PM -0700, Jakub Kicinski wrote:
+> On Wed, 21 Aug 2024 18:50:01 +0800 Hangbin Liu wrote:
+> > +/**
+> > + * bond_ipsec_dev - return the device for ipsec offload, or NULL if not exist
+> > + *                  caller must hold rcu_read_lock.
+> > + * @xs: pointer to transformer state struct
+> > + **/
+> 
+> in addition to the feedback on v3, nit: document the return value in
+> kdoc for non-void functions
 
-I thought you asked me to change these two last night. Actually you
-were only stating the fact: two cases where we use both generation and
-reporting flags already exist before.
+I already document the return value. Do you want me to change the format like:
 
-Okay, I finally got it. It's fine to me from my point of view :)
+/**
+ * bond_ipsec_dev - Get active device for IPsec offload,
+ *                  caller must hold rcu_read_lock.
+ * @xs: pointer to transformer state struct
+ *
+ * Return the device for ipsec offload, or NULL if not exist.
+ **/
 
->
-> > I can see what you mean here: you don't like combining the reporting
-> > flag and generation flag, right? But If we don't check whether those
-> > two flags (SOF_TIMESTAMPING_RX_SOFTWARE __and__
-> > SOF_TIMESTAMPING_SOFTWARE) in sock_recv_timestamp(), some tests in the
-> > protocols like udp will fail as we talked before.
-> >
-> > netstamp_needed_key cannot be implemented as per socket feature (at
-> > that time when the driver just pass the skb to the rx stack, we don't
-> > know which socket the skb belongs to). Since we cannot prevent this
-> > from happening during its generation period, I suppose we can delay
-> > the check and try to stop it when it has to report, I mean, in
-> > sock_recv_timestamp().
-> >
-> > Or am I missing something? What would you suggest?
-> >
-> > >
-> > >         /*
-> > >          * generate control messages if
-> > >          * - receive time stamping in software requested
-> > >          * - software time stamp available and wanted
-> > >          * - hardware time stamps available and wanted
-> > >          */
-> > >         if (sock_flag(sk, SOCK_RCVTSTAMP) ||
-> > >             (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE) ||
-> > >             (kt && tsflags & SOF_TIMESTAMPING_SOFTWARE) ||
-> > >             (hwtstamps->hwtstamp &&
-> > >              (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE)))
-> > >                 __sock_recv_timestamp(msg, sk, skb);
-> > >
-> > > I evidently already noticed this back in 2014, when I left a note in
-> > > commit b9f40e21ef42 ("net-timestamp: move timestamp flags out of
-> > > sk_flags"):
-> > >
-> > >     SOCK_TIMESTAMPING_RX_SOFTWARE is also used to toggle the receive
-> > >     timestamp logic (netstamp_needed). That can be simplified and thi=
-s
-> > >     last key removed, but will leave that for a separate patch.
-> > >
-> > > But I do not see __sock_recv_timestamp toggling the feature either
-> > > then or now, so I think this is vestigial and can be removed.
+BTW, The patch now has conflicts with latest net-next, I can do a rebase if
+you want.
 
-After investigating more of it, as your previous commit said, the
-legacy SOCK_TIMESTAMPING_RX_SOFTWARE flag can be replaced by
-SOF_TIMESTAMPING_RX_SOFTWARE and we can completely remove that SOCK_xx
-flag from enum sock_flags {}, right? Do you expect me to do that? If
-so, I would love to do it :)
-
-But I still don't get it when you say "__sock_recv_timestamp toggling
-the feature", could you say more, please? I'm not sure if it has
-something to do with the above line.
-
-Thanks for your patience:)
-
-> >
-> > I'm not so sure about the unix case, I can see this call trace:
-> > unix_dgram_recvmsg()->__unix_dgram_recvmsg()->__sock_recv_timestamp().
-> >
-> > The reason why I added the check in in __sock_recv_timestamp () in the
-> > patch [2/2] is considering the above call trace.
-> >
-> > One thing I can be sure of is that removing the modification in
-> > __sock_recv_timestamp in that patch doesn't affect the selftests.
-> >
-> > Please correct me if I'm wrong.
->
-> I think we're talking alongside each other. I was pointing to code
-> before your patch.
->
-> > >
-> > > > >
-> > > > > Changing established interfaces always risks production issues. I=
-n
-> > > > > this case, I'm not convinced that the benefit outweighs this risk=
-.
-> > > >
-> > > > I got it.
-> > > >
-> > > > I'm thinking that I'm not the first one and the last one who know/f=
-ind
-> > > > this long standing "issue", could we at least documentented it
-> > > > somewhere, like adding comments in the selftests or Documentation, =
-to
-> > > > avoid the similar confusion in the future? Or change the behaviour =
-in
-> > > > the rxtimestamp.c test? What do you think about it? Adding
-> > > > documentation or comments is the simplest way:)
-> > >
-> > > I can see the value of your extra filter. Given the above examples, i=
-t
-> > > won't be the first subtle variance from the API design, either.
-> >
-> > Really appreciate that you understand me :)
-> >
-> > >
-> > > So either way is fine with me: change it or leave it.
-> > >
-> > > But in both ways, yes: please update the documentation accordingly.
-> >
-> > Roger that, sir. I will do it.
-> >
-> > >
-> > > And if you do choose to change it, please be ready to revert on repor=
-t
-> > > of breakage. Applications that only pass SOF_TIMESTAMPING_SOFTWARE,
-> > > because that always worked as they subtly relied on another daemon to
-> > > enable SOF_TIMESTAMPING_RX_SOFTWARE, for instance.
-> >
-> > Yes, I still chose to change it and try to make it in the correct
-> > direction. So if there are future reports, please let me know, I will
-> > surely keep a close eye on it.
->
-> Sounds good, thanks.
-
-So let me organize my thoughts here.
-
-In the next move, I would do such things:
-1) keep two patches in this series as they are.
-2) add some descriptions about "this commit introduces subtle
-variance, if the application that only pass
-SOF_TIMESTAMPING_SOFTWARE..." something like this in the Documentation
-file.
-3) remove the last key SOCK_TIMESTAMPING_RX_SOFTWARE from enum
-sk_flags, if you want me to do so :)
-
-If there is something weird here, please point it out so that I can
-make the right move.
-
-Thanks,
-Jason
+Thanks
+Hangbin
 
