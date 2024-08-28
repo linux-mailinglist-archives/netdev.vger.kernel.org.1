@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-122786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13D9E962920
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:46:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E421B962922
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:46:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 385E01C21E69
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:46:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D53611C2183D
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:46:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABC3282E1;
-	Wed, 28 Aug 2024 13:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6DB3185B77;
+	Wed, 28 Aug 2024 13:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ZBjasoVe"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tldW8Rm5"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2072.outbound.protection.outlook.com [40.107.94.72])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2042.outbound.protection.outlook.com [40.107.94.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DD31CA94
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 13:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F028241E7
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 13:46:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.42
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724852762; cv=fail; b=m9H5Q4X8DHnemjM7wDbKhzezAaYf9pJwOmNAe7FAlg54/RvH5cbuJtxFsHUAFBCrAFqZ91Qkg6qNr2bIWoMB+3OASvgNl53pfH7wjaKlx4y52lfSsQXlVc8iv1v1pdZbPof4T+bK6bHPHuUbmB57gdE2qeMZ8HjBilp33As/fPg=
+	t=1724852763; cv=fail; b=BM4w2bK7MVrZIoRS9A69J0sb/07rs136UkheV/Ds8ytzEh+1UQ9CLNNGj5lXPcqZFL1KTOq5WgxAwlF9OL3FuqTJnhLT0YCNmKRPBmOCeI/2tCxEH+hqKPjMeCuBDDfeL2SM8nGLO9fZgb+ZF/73UKrgdJ3P6O1NUZyLw11ozKQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724852762; c=relaxed/simple;
-	bh=2uUTBNmv82u0NDiD2dfUfgc2vuO3CioHR4kzovaP4lU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=am1xCrz1Ym9WURH/mJFDnx6nrVuHMs/EdZchwbKZCXIqHrfaNYlaONfIa4iuJFzDJTwULKTs2sApNixFUudPVKCW29udOK7/azjrcEUqiAH2HeAI5FAUZfvCiLnZiTqea9miVr+SlOXODctX/mIy9bYwyVbatDk83F0aL7HhR34=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ZBjasoVe; arc=fail smtp.client-ip=40.107.94.72
+	s=arc-20240116; t=1724852763; c=relaxed/simple;
+	bh=dBAtAkuh54qvFDem+BzhpEicFd0Uw5gZa5aEg6cc7jw=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GV15g9LIvTa4a3i0mMG94emHHCsxoaWc5obdzmHGB4UucM4svvJAwfc0yo9n1TVdneigruh0kHQ1vfWUpU82LugsfrCw11QQQSSNpVKb8HwkPzztUFKYqH/0S5I81KQqgWyQaMhvQaLzzgNvzQHZL0eHndeHSG/2/q7ob616eXc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tldW8Rm5; arc=fail smtp.client-ip=40.107.94.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=YJm0w0JcHnCQbhhC084bWAoRXQNMkwDViYPYbhtvC0XZBVnmfBETZPV/S6MJ8KOl+b9oYGMRsVdIpnuV2xNtmbnqfomOFdfv9wOLeu0sn0gdQdsOtj4PTa5m1bwGsEVc4LgD7F5vOPIqOENhf685iqi/06DIm963BqniXDO6sikS9JwSSJvgSDhrQM2Mi9jSNWKmnBZc5+Xf9I1X6abmmtbkQGkUImT7ru6bf88Uf/u7PRhaAzHviUikYE1ZQPnRE3NOXewOMYcXhCfE9MqvqBUzC258NaCp1TCgDGwumhOgUJqgJaMQM/sUsqW6uiFnCM7KoiwffZ7ov1gN6OYxIg==
+ b=o5pQR76LRtiB+FuPaGJFbqzPWMZh4lPsKt3oMzd6SRKOGXgBIxNbOETngJqG4Br/C7KRrIkGi8PGljwg4Xx1tcJtGT9op8ZYtNC0esH9/G6v2aq/kS+NloBUv+/4T3QJ3ho4zkZnmZQvBGkh8av7vqOX/JF+9Tq8oIUgR+H4W5Z1rW97X7vq/o7QWKT2PmHxvuuzilEulYzZsVHEhETjVy9ah9eAOycVfufSRijULX87dxDK18cOId84AaRjaABe+inkrd84KFhI71xHU709xBiY96lWUKHuDfsyut8u8FgkjKPUBgwW5r3aLKG21OYncCWm78CXU0OC/ol4YxmtQQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EzZA1tRW46+I4CXJn2kBgKKclEhBD1aMn3nIPljV1CI=;
- b=SjR35AAKP5vbecpRoJLLjvmTDlAgfCo6RBpNDPLohxBgw/4YsoSHZx8sPF/11pO2lgLVaxgogOFtyu4x5VNGLZhIt7B0vduqPhWqJm82a3h/oUBtm4tD/LsVrEDI5ZM3sEHZn8sQl4ET12kUqkcKRAU74tCZbWG4B4JVx+643F7i4waInB40R81vZP24FLdae9BRDTdnQpNqZ1GXaa0opVZ5HB6NG5SFlnZ9P3WmQ4BV9VFfTRPBd36ueswXORu9Sf18nbUG8Mxp2ZHPv/8aa7eNXNDEbF8keofQrfbYfoPK+vtN06sq7XJUU1as66it25xNmiSakXXqGCAFzjj0tg==
+ bh=Pdzz1H6XZdB6hsXiW4gpBVn6mcDmWekWf/ieCGjvxWw=;
+ b=LCyeMYU/xfOj+OhO809qHodC5lJCq8d2DZ33Up+GBjcT41IaJ6GvNEhuRXAcRCzvYNEaKJICSdfunLhm5WVeyNwM4RdSr8iAwliqJVFiK39bLSM43om2HIMLuOJJV8IKQFyU8qo77qI68exI6p5N4H2e02yOnvQGI/LXTv3VE3i9J4B4Ry8co3qtFKMrv/j2V1QYdj1wtOzXNsJTZeI9T6qddkMSj/01p47PeK6PhaIW49NEccfCbK8XYgXwNg7vQKhuVtNEN14RdgE/2k8BF+eCn5/TyqclnyxZFfwK/VyY31iLJCaHDCAfXKcyzmaqzxLy/FUUVsUvIg1IRzDL2w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EzZA1tRW46+I4CXJn2kBgKKclEhBD1aMn3nIPljV1CI=;
- b=ZBjasoVece23cs3MsqIHZECC76auEINCxduGM8suqQ2NnMx6p6L4nKKXNWU2PAWdzD4oiVwxi5igYgvrQlFdlP4xNYvHugy8dWp1rvi9JyGBt51VsbLjhzhQI4+YV1idPKsSMfHLdoLnDPHRYJ+w7IkhtBefcvfrMxbGoyNLEnc=
-Received: from SA1P222CA0066.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2c1::21)
- by MN2PR12MB4302.namprd12.prod.outlook.com (2603:10b6:208:1de::7) with
+ bh=Pdzz1H6XZdB6hsXiW4gpBVn6mcDmWekWf/ieCGjvxWw=;
+ b=tldW8Rm54qtUPND+2Co7Cmyc8+wzzSf/5Yjnxf0jrOM7Zev7Ixb1vmXLQp89qpRXWhe2wM5orp2iwK0N0kPReULJBN5pkI/txRMNouY0UzRVClgIpr67R9tQN9Z82O7d1gXEu1a9xt5kEoNcubUkx5VJApoc9qm7jkq99Z5OqvQ=
+Received: from SA1P222CA0064.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2c1::15)
+ by SJ2PR12MB7845.namprd12.prod.outlook.com (2603:10b6:a03:4ce::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.28; Wed, 28 Aug
- 2024 13:45:57 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.19; Wed, 28 Aug
+ 2024 13:45:58 +0000
 Received: from SN1PEPF0002BA50.namprd03.prod.outlook.com
- (2603:10b6:806:2c1:cafe::8e) by SA1P222CA0066.outlook.office365.com
- (2603:10b6:806:2c1::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.27 via Frontend
- Transport; Wed, 28 Aug 2024 13:45:57 +0000
+ (2603:10b6:806:2c1:cafe::3a) by SA1P222CA0064.outlook.office365.com
+ (2603:10b6:806:2c1::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.28 via Frontend
+ Transport; Wed, 28 Aug 2024 13:45:58 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -64,27 +65,25 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB03.amd.com (165.204.84.17) by
  SN1PEPF0002BA50.mail.protection.outlook.com (10.167.242.73) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Wed, 28 Aug 2024 13:45:55 +0000
-Received: from SATLEXMB05.amd.com (10.181.40.146) by SATLEXMB03.amd.com
+ 15.20.7918.13 via Frontend Transport; Wed, 28 Aug 2024 13:45:57 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB03.amd.com
  (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 28 Aug
- 2024 08:45:54 -0500
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB05.amd.com
- (10.181.40.146) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 28 Aug
- 2024 08:45:54 -0500
+ 2024 08:45:55 -0500
 Received: from xcbecree42x.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39 via Frontend
- Transport; Wed, 28 Aug 2024 08:45:53 -0500
+ Transport; Wed, 28 Aug 2024 08:45:54 -0500
 From: <edward.cree@amd.com>
 To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
 CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next 0/6] sfc: per-queue stats
-Date: Wed, 28 Aug 2024 14:45:09 +0100
-Message-ID: <cover.1724852597.git.ecree.xilinx@gmail.com>
+Subject: [PATCH net-next 1/6] sfc: remove obsolete counters from struct efx_channel
+Date: Wed, 28 Aug 2024 14:45:10 +0100
+Message-ID: <f56eebfebfec5b780ef89e1da095cbce5cbf240a.1724852597.git.ecree.xilinx@gmail.com>
 X-Mailer: git-send-email 2.27.0
+In-Reply-To: <cover.1724852597.git.ecree.xilinx@gmail.com>
+References: <cover.1724852597.git.ecree.xilinx@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,81 +92,118 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-Received-SPF: None (SATLEXMB05.amd.com: edward.cree@amd.com does not designate
+Received-SPF: None (SATLEXMB03.amd.com: edward.cree@amd.com does not designate
  permitted sender hosts)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA50:EE_|MN2PR12MB4302:EE_
-X-MS-Office365-Filtering-Correlation-Id: a3f62578-4d81-4bde-28d5-08dcc767bdd0
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA50:EE_|SJ2PR12MB7845:EE_
+X-MS-Office365-Filtering-Correlation-Id: ab47fe83-5f4c-4184-f655-08dcc767bec0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?9CIxY3dT+9MxMbDmg0mEouUC4RVSxzoCOBNuuk0aIrBk0ZObEv/+yFYu+Y5q?=
- =?us-ascii?Q?izi9PIkDiJTDRsgpkXwbcq0XrxuNmCnqNNGoMCij7ZfExaNyodlXPJAaA4g+?=
- =?us-ascii?Q?ECpi9lr6ORinGjW5hHFF82fy8vFc40IhH4aoEEML9qRM4EOBiZucU0ItXvdW?=
- =?us-ascii?Q?A6IjziGRevU1xMYDx+KDIfAIuPgAKZ2OBM4e+krdzTrjbptyDW0FSiAi3vBp?=
- =?us-ascii?Q?uC88vzuHNL8wYFn3EtnqzMn12EQED7Tz1/9YmNoavXE5IJ6Hg0jS2pKbm8hn?=
- =?us-ascii?Q?qE0Xdg2civgDFho1aZw0b79OE/30iSU8WB4vajHdpiLDSPtm5en5tvob79Kf?=
- =?us-ascii?Q?D2OC1KzrF06rNxnEebVRFjssmZ4q5hGxHN/h+UTl3zoG2SSte+/2v3SlCfdp?=
- =?us-ascii?Q?Xd+hAjlj5IK+rzEWFHIJn5JgAL9cTxD+BcAQjm0/fyofQWAl6Hx2QdYfDl/U?=
- =?us-ascii?Q?FvODysU7Jcww9SCBHLfaWwTN25tebHdxI1MHDIP9eVmE4ph3kGW5vH5eUEYJ?=
- =?us-ascii?Q?NOHH9an9TPDiR3GAluSnchiAGtmvrz5NlT8MPADmiL7XtnvKCmd6DEJunHND?=
- =?us-ascii?Q?Jf7MJeE964SYfT8Z+i3n9tBPPInNywBhaRvootypoJYBCT3ThaHikv+e5nCY?=
- =?us-ascii?Q?xKv4UrKMjMWzaegPQAY3+KINu0URw52Gm3YVeCJ+aF8tyooZLmgA3PjsJ4vU?=
- =?us-ascii?Q?zxfJYADVb09nHo4c6rc+Q/eQfUjuDFWkcCUhZc3MJs2RBulc+uwiBzqg1/aY?=
- =?us-ascii?Q?wa/sKZ83tkx+rulULJTfMtsUtBGfSuWZ6xv1DAqk2bPtkELaMORCVAEYMWMH?=
- =?us-ascii?Q?1ciYuzqSaU1IvoeIEdQ1Js45aobtpOtFwkud0BhLa6yLvQpXsw9kATBsm9Ea?=
- =?us-ascii?Q?xRjSb2RFrMAIi5zneieuu12rjehugrBmib4cGX92gXeGAKsRTMSjopJnx3Xz?=
- =?us-ascii?Q?7B8NGrwv6Y69TQV+y9nauhW+bqn4S/C6Li6XYY+DmmaO+jLqWkYiqIVSztwK?=
- =?us-ascii?Q?SIxWxE3JHuRxZbmiryfXLa1s1SnKJCUdiQ1tzX01dCAue29AOhcAA+8NyvQx?=
- =?us-ascii?Q?L075xQerwBuTfxAE5uI3tDM2BBVgfXkHJDmY9HMtDs3Vm4wfBrZMTrfmDkAJ?=
- =?us-ascii?Q?kcMlf5M6WSqs30+AonurlvjAlhnhBFyZxzTWuHT+rD02VoSugvfG8MVlsMsL?=
- =?us-ascii?Q?+dtq6paTHeQ+TgGMflnEAQ7RdX4UByrmQCvkgpQ9AwRQXQTvWsOQ4ZRqMgwP?=
- =?us-ascii?Q?RBMvYXfcj60MBo4nV32j9Mm1VeLzA9tHyrY+QgRytVtrT8CnIQj9SlgnxTtU?=
- =?us-ascii?Q?EoX/wUWa5w7pzYksBaf2+v0MZuhwzqDIRswRuFXCUPJdHCKW3fwdGo2j43DW?=
- =?us-ascii?Q?1zahP6LdE9fS7YfzfC035o3Hy/4xspdDKK3Y0YUikvEGl+dy+hKLi4JwSTAh?=
- =?us-ascii?Q?v8ZGhUsgAUrxanbEc44rTk+iDD1leYUc?=
+	=?us-ascii?Q?/j94FcEOBV9Lm7IH/w8Q6mXvPKnWyJOf8cFJZAuPmIs67m2XeSYbHe5eajxW?=
+ =?us-ascii?Q?kZ4TE6ST7dRD1VsfDZNZRkkclsV8WBytsAAQB4MpXM/b/iqZGkgN0SqBiVpR?=
+ =?us-ascii?Q?8fKzKigM/oVTx7N7K0YMBZFvN4j2o/b4NhJeNl/pdhTV4zjNXyWZnKY2pQNd?=
+ =?us-ascii?Q?/IBqAF7xZxmTngf1po4JqdCKi1rO58M0YCSsc5yD6vPp3H4VZ5Z4X8aTX1kL?=
+ =?us-ascii?Q?sOil4nHSU6EWw3DIrjtvR4Qixaw3o3hf8BagaLiBv48UL8wa9KlwxOfC+Efh?=
+ =?us-ascii?Q?TW3iEW+3x4pT+toXKgXaWTMBYKPqQlEXzxKb8XdJ9CaTTCNQBPzvhfacsqkS?=
+ =?us-ascii?Q?cx18wt9R6Kt51PBSeCPIpBScL64BbAD8/rqtwSAe1yw2W/thRHDMQ3cGTcV8?=
+ =?us-ascii?Q?2lAbfConV5M2oQTrFGGC7JMfuqK5tE66YeoIJRXchS7peOFYVrvR+RNxKgrV?=
+ =?us-ascii?Q?zGwuMiFLpuGbWETQkK/4U2OpldlWIyTPXMUYTRva7YpmAVRHe/03pdUXJ3iF?=
+ =?us-ascii?Q?beiF0lgDu3qvZCmAT7cgsq8o+EDrOC+Gz03GxxGmPRGB9uIRYbPQvXLJH1lI?=
+ =?us-ascii?Q?x58AvamgFyj0nUGEIBuHsj/hAW/LuoFKL6DK6q2enLWAeFU/+Qkm36fUYvno?=
+ =?us-ascii?Q?FWfIhwqvAmjVqvm98a+RLp+KaQnKFOuQCPBEyDsbRCltTAB8/kzyUECnGjXz?=
+ =?us-ascii?Q?zagkC3n0R2am5OEI9L2BRVCbK8YC36uu3O2x+Odox4MyIOGx9T4v66aucmUX?=
+ =?us-ascii?Q?GdFs5RkaOKd/JU4ggP5woja7gskByO21U7aZwTPbfzdqruiECOwI61ZPF07Y?=
+ =?us-ascii?Q?TnK5br3TjvQuaEPgalz2PsqsH8Pemtl+JFLwwZXKQsGT9QFmCTvmCM6t4yCh?=
+ =?us-ascii?Q?CEafdGvhzphyL320V6tTTE0FCCjdQr5fXvmND41f96oOAfbRJ11UbfYQopJf?=
+ =?us-ascii?Q?7rrpYhFt5nSo2WrLFzYykwsH6Ufxz1kp6FD6KQh0XjiOz/M9Mun3kCnm1zOn?=
+ =?us-ascii?Q?87iR4fX+ninbXLG00PvbEq9kVzMzKjXgG1Wdm9BDgcLJpmcu1zEN7JRG+xOZ?=
+ =?us-ascii?Q?bkFyZUyxWfmVmfi4dbr84jlrJD0KaKbXALz1Qo05Nay7TCk4QW4AeigrqRmE?=
+ =?us-ascii?Q?lRyfoEFm2T+H+5F/n4CY9u+8P5DriU5hLLv3bp5O9LbJnwE6zRQiCXdOrhny?=
+ =?us-ascii?Q?94pSAlyyAc7+/ZUj1MBZ7Q5sH+OBTGB1mpLVF0dv2GGR0MqnQj/nQFe3a6nk?=
+ =?us-ascii?Q?ooAT9lRscKgDhp4tgs0oLzt07L1ven04BMkbTBgTtuOZlaFM9roybYEpXNJy?=
+ =?us-ascii?Q?GvJnRwHil/8Zzu5HcRbkKz32Z0OCGKkS149NJ3u5l7IBjvliIYP8myua45dN?=
+ =?us-ascii?Q?gdbKp1q1nF+daG7jSJQCZezWBSx+UfowClHB/mr+7zqTCTuH27iUeWIAOWPU?=
+ =?us-ascii?Q?llLt5Ag46F0L+djmgfTzbFJNuxM0ghtb?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 13:45:55.8924
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2024 13:45:57.4706
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3f62578-4d81-4bde-28d5-08dcc767bdd0
+X-MS-Exchange-CrossTenant-Network-Message-Id: ab47fe83-5f4c-4184-f655-08dcc767bec0
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	SN1PEPF0002BA50.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4302
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7845
 
 From: Edward Cree <ecree.xilinx@gmail.com>
 
-This series implements the netdev_stat_ops interface for per-queue
- statistics in the sfc driver, mostly using existing counters that
- were originally added for ethtool -S output.
+The n_rx_tobe_disc and n_rx_mcast_mismatch counters are a legacy
+ from farch, and are never written in EF10 or EF100 code.  Remove
+ them from the struct and from ethtool -S output, saving a bit of
+ memory and avoiding user confusion.
 
-Edward Cree (6):
-  sfc: remove obsolete counters from struct efx_channel
-  sfc: implement basic per-queue stats
-  sfc: add n_rx_overlength to ethtool stats
-  sfc: implement per-queue rx drop and overrun stats
-  sfc: implement per-queue TSO (hw_gso) stats
-  sfc: add per-queue RX and TX bytes stats
+Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
+---
+ drivers/net/ethernet/sfc/ethtool_common.c | 2 --
+ drivers/net/ethernet/sfc/net_driver.h     | 4 ----
+ 2 files changed, 6 deletions(-)
 
- drivers/net/ethernet/sfc/ef100_rx.c       |   5 +-
- drivers/net/ethernet/sfc/ef100_tx.c       |   1 +
- drivers/net/ethernet/sfc/efx.c            | 106 ++++++++++++++++++++++
- drivers/net/ethernet/sfc/efx_channels.c   |   4 +
- drivers/net/ethernet/sfc/efx_channels.h   |   8 +-
- drivers/net/ethernet/sfc/ethtool_common.c |   3 +-
- drivers/net/ethernet/sfc/net_driver.h     |  31 ++++++-
- drivers/net/ethernet/sfc/rx.c             |   5 +-
- drivers/net/ethernet/sfc/rx_common.c      |   3 +
- drivers/net/ethernet/sfc/tx.c             |   2 +
- drivers/net/ethernet/sfc/tx_common.c      |   5 +
- 11 files changed, 162 insertions(+), 11 deletions(-)
-
+diff --git a/drivers/net/ethernet/sfc/ethtool_common.c b/drivers/net/ethernet/sfc/ethtool_common.c
+index 6ded44b86052..a8baeacd83c0 100644
+--- a/drivers/net/ethernet/sfc/ethtool_common.c
++++ b/drivers/net/ethernet/sfc/ethtool_common.c
+@@ -75,7 +75,6 @@ static const struct efx_sw_stat_desc efx_sw_stat_desc[] = {
+ 	EFX_ETHTOOL_UINT_TXQ_STAT(pio_packets),
+ 	EFX_ETHTOOL_UINT_TXQ_STAT(cb_packets),
+ 	EFX_ETHTOOL_ATOMIC_NIC_ERROR_STAT(rx_reset),
+-	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_tobe_disc),
+ 	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_ip_hdr_chksum_err),
+ 	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_tcp_udp_chksum_err),
+ 	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_inner_ip_hdr_chksum_err),
+@@ -83,7 +82,6 @@ static const struct efx_sw_stat_desc efx_sw_stat_desc[] = {
+ 	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_outer_ip_hdr_chksum_err),
+ 	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_outer_tcp_udp_chksum_err),
+ 	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_eth_crc_err),
+-	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_mcast_mismatch),
+ 	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_frm_trunc),
+ 	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_merge_events),
+ 	EFX_ETHTOOL_UINT_CHANNEL_STAT(rx_merge_packets),
+diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
+index b85c51cbe7f9..4d904e1404d4 100644
+--- a/drivers/net/ethernet/sfc/net_driver.h
++++ b/drivers/net/ethernet/sfc/net_driver.h
+@@ -451,10 +451,8 @@ enum efx_sync_events_state {
+  * @filter_work: Work item for efx_filter_rfs_expire()
+  * @rps_flow_id: Flow IDs of filters allocated for accelerated RFS,
+  *      indexed by filter ID
+- * @n_rx_tobe_disc: Count of RX_TOBE_DISC errors
+  * @n_rx_ip_hdr_chksum_err: Count of RX IP header checksum errors
+  * @n_rx_tcp_udp_chksum_err: Count of RX TCP and UDP checksum errors
+- * @n_rx_mcast_mismatch: Count of unmatched multicast frames
+  * @n_rx_frm_trunc: Count of RX_FRM_TRUNC errors
+  * @n_rx_overlength: Count of RX_OVERLENGTH errors
+  * @n_skbuff_leaks: Count of skbuffs leaked due to RX overrun
+@@ -511,7 +509,6 @@ struct efx_channel {
+ 	u32 *rps_flow_id;
+ #endif
+ 
+-	unsigned int n_rx_tobe_disc;
+ 	unsigned int n_rx_ip_hdr_chksum_err;
+ 	unsigned int n_rx_tcp_udp_chksum_err;
+ 	unsigned int n_rx_outer_ip_hdr_chksum_err;
+@@ -519,7 +516,6 @@ struct efx_channel {
+ 	unsigned int n_rx_inner_ip_hdr_chksum_err;
+ 	unsigned int n_rx_inner_tcp_udp_chksum_err;
+ 	unsigned int n_rx_eth_crc_err;
+-	unsigned int n_rx_mcast_mismatch;
+ 	unsigned int n_rx_frm_trunc;
+ 	unsigned int n_rx_overlength;
+ 	unsigned int n_skbuff_leaks;
 
