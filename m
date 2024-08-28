@@ -1,128 +1,112 @@
-Return-Path: <netdev+bounces-122902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3E79963055
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:43:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73ED89630A5
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 21:04:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91A4B283C03
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 18:43:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B970285B90
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 19:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AB21AB50E;
-	Wed, 28 Aug 2024 18:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 064691AAE1C;
+	Wed, 28 Aug 2024 19:04:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ROtLpkCE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="K2ALeeyA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D54D1D696;
-	Wed, 28 Aug 2024 18:43:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110A245C1C
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 19:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724870616; cv=none; b=uJZwamkrjh5oRjpH6SBD4rh3eC2qJJ6li8bOxd5aUabP5asyfwAiyQQA7r8VU6YltEMBEq+S6n9QP8Dlx4h+rbIj5vevFLwfXMyBxp6V75zSS4V8oRmmBnAY/TOGSN9fiuLocENf5HO10aJBI6GJisdLzQ84IBuSHLgi6aEDWZ4=
+	t=1724871841; cv=none; b=UszfFONE8Cp1AlK8IG8Rb0XM7fnU0GlDeQX3J7PTp+ePqAuS9obOlJW1oNDUiYAq2KNWLjX85R19cf1SXF10VBjMQ8Jlc8jVw5Q1xXlAILds2jWpvrNJixpM2kpufaUc/9qk0cXdY95ryontLvzMBwZ1B1YS4KBluX7OMBuw2Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724870616; c=relaxed/simple;
-	bh=bWjjtD9ux0QAGG3fGYObh74lsPxgFpjHa3YWm0m0vIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tg8NLAiN1pUYg/CZyuIe3v/9AOKfJ3kdjm5n9ZUcJWOqRE17Iih5BlNWvRTbUydOrtYLKo/GvtwNdO9eC4UuAeS2ybdlpWXDVR7yAc0xB1IA6dKqW3Bccz1evVcTEc5V2SZTYQ6YzZwJWwYLE+78WGN6UYT7cyU0DtjrZPKn/ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ROtLpkCE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72659C4CEC0;
-	Wed, 28 Aug 2024 18:43:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724870616;
-	bh=bWjjtD9ux0QAGG3fGYObh74lsPxgFpjHa3YWm0m0vIU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ROtLpkCEGD8Ucdbs7a1iRfvuc32G3qJBY6quO3vEkfgfTtRxHiuhmUPG4800e2RsG
-	 /Lm2aGh9ZM5echC/qr/x2EXrVQ45i6g+DGFDj3b4IL1+1nBBMKPOO7F2EVPH21SXWt
-	 D3wyLlY3wzUG+pAwc9PiOyoANcpRLYBPjrk80WBsoM0sK/mk/Y/+Np3wR59Dnj9tMd
-	 zCiuTrI/cV8v34a6M0pTb4HTETCCVIQdFJzGlV39b2ciDrjitNDYPxuwRZojB40abg
-	 4ctkvmZU35i1iPs5RMsbgdrXOvldO8psyPOoy6iI6yqUNNrEivtWT76jv46HwMkF1o
-	 46/gB0lOrWDFQ==
-Date: Wed, 28 Aug 2024 11:43:33 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, Ivan
- Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>,
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
- <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert
- Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem
- de Bruijn <willemdebruijn.kernel@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBl?=
- =?UTF-8?B?bA==?= <bjorn@kernel.org>, Magnus Karlsson
- <magnus.karlsson@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
- Sumit Semwal <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, David
- Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
- <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
- Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
- Taehee Yoo <ap420073@gmail.com>, Willem de Bruijn <willemb@google.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>
-Subject: Re: [PATCH net-next v22 04/13] netdev: netdevice devmem allocator
-Message-ID: <20240828114333.560895f0@kernel.org>
-In-Reply-To: <CAHS8izP8T5Xj97M7efecBmCrG9z8E0PYTxWCYZ0ym0hv13-DKg@mail.gmail.com>
-References: <20240825041511.324452-1-almasrymina@google.com>
-	<20240825041511.324452-5-almasrymina@google.com>
-	<20240827191519.5464a0b2@kernel.org>
-	<CAHS8izP8T5Xj97M7efecBmCrG9z8E0PYTxWCYZ0ym0hv13-DKg@mail.gmail.com>
+	s=arc-20240116; t=1724871841; c=relaxed/simple;
+	bh=YRKAlMOxna+bxN7n5yTMSkuaQlQNsXOc/8IG9jDt9/g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jR8eBkC3TH3Vruq/xCEG4snGQUO06+5d8qfe0taAOB2tisYMqYCtUC/RNTlU3XhYrjn4zONbJcRnbZPt+2Qr3uDJRyrORdMRlkilxMvKHfaGZ3gSUmFZ92FTslltxtodGP6g0zxMFGjA+Q5TgfmtQrXrmhQdWFM5Xz6lBTi1IYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=K2ALeeyA; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 28 Aug 2024 12:03:47 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724871837;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j7vkDyir+DMrxX+HGm5Ta48lUpr2OMfmyuMnb1CIktI=;
+	b=K2ALeeyATuD5JWGchJFR5gsyyuMm7THk7aHTDFHr6e83Ffrdzp/9RjjjjTcyTlbHI4BBrD
+	IzXEqYz3NBwTZ/Qrb0nmDnDELPUQNbI+VqsUl2PRJp1x0AarYG5err9xiLm3VVjdGO54WM
+	U3u/VnwamuC2tX4goM0KqKWdtkQiQN4=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Muchun Song <muchun.song@linux.dev>
+Cc: Roman Gushchin <roman.gushchin@linux.dev>, 
+	Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Michal Hocko <mhocko@kernel.org>, Vlastimil Babka <vbabka@suse.cz>, 
+	David Rientjes <rientjes@google.com>, Hyeonggon Yoo <42.hyeyoo@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Linux Memory Management List <linux-mm@kvack.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Meta kernel team <kernel-team@meta.com>, cgroups@vger.kernel.org, netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v1] memcg: add charging of already allocated slab objects
+Message-ID: <a5rzw7uuf7pgrhhut7keoy66c6u4rgiuxx2qmwywbvl2iktfku@23dzxczejcet>
+References: <20240826232908.4076417-1-shakeel.butt@linux.dev>
+ <Zs1CuLa-SE88jRVx@google.com>
+ <yiyx4fh6dklqpexfstkzp3gf23hjpbjujci2o6gs7nb4sutzvb@b5korjrjio3m>
+ <EA5F7851-B519-4570-B299-8A096A09D6E7@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <EA5F7851-B519-4570-B299-8A096A09D6E7@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 28 Aug 2024 00:20:23 -0700 Mina Almasry wrote:
-> > On Sun, 25 Aug 2024 04:15:02 +0000 Mina Almasry wrote:  
-> > > +void net_devmem_free_dmabuf(struct net_iov *niov)
-> > > +{
-> > > +     struct net_devmem_dmabuf_binding *binding = net_iov_binding(niov);
-> > > +     unsigned long dma_addr = net_devmem_get_dma_addr(niov);
-> > > +
-> > > +     if (gen_pool_has_addr(binding->chunk_pool, dma_addr, PAGE_SIZE))
-> > > +             gen_pool_free(binding->chunk_pool, dma_addr, PAGE_SIZE);  
-> >
-> > Is the check necessary for correctness? Should it perhaps be a WARN
-> > under DEBUG_NET instead? The rest LGTM:
-> >  
-> 
-> Not really necessary for correctness per se, but if we try to free a
-> dma_addr that is not in a gen_pool (due to some other bug in the
-> code), then gen_pool_free ends up BUG_ON, crashing the kernel.
-> 
-> Arguably gen_pool_free should not BUG_ON, but I think that's an old
-> API, and existing call sites have worked around the BUG_ON by doing a
-> gen_pool_has_addr check like I do here, for example kernel/dma/pool.c.
-> So I did not seek to change this established behavior.
-> 
-> I think WARN seems fine to me, but maybe not under DEBUG_NET. I don't
-> want production code crashing due to this error, if it's OK with you.
-> 
-> Unless I hear otherwise I'll add a WARN without debug here.
+Hi Muchun,
 
-WARN makes sense, I didn't know about the BUG_ON() hiding inside
-gen_pool :(
+On Wed, Aug 28, 2024 at 10:36:06AM GMT, Muchun Song wrote:
+> 
+> 
+> > On Aug 28, 2024, at 01:23, Shakeel Butt <shakeel.butt@linux.dev> wrote:
+> > 
+[...]
+> >> 
+> >> Does it handle the case of a too-big-to-be-a-slab-object allocation?
+> >> I think it's better to handle it properly. Also, why return false here?
+> >> 
+> > 
+> > Yes I will fix the too-big-to-be-a-slab-object allocations. I presume I
+> > should just follow the kfree() hanlding on !folio_test_slab() i.e. that
+> > the given object is the large or too-big-to-be-a-slab-object.
+> 
+> Hi Shakeel,
+> 
+> If we decide to do this, I suppose you will use memcg_kmem_charge_page
+> to charge big-object. To be consistent, I suggest renaming kmem_cache_charge
+> to memcg_kmem_charge to handle both slab object and big-object. And I saw
+> all the functions related to object charging is moved to memcontrol.c (e.g.
+> __memcg_slab_post_alloc_hook), so maybe we should also do this for
+> memcg_kmem_charge?
+> 
+
+If I understand you correctly, you are suggesting to handle the general
+kmem charging and slab's large kmalloc (size > KMALLOC_MAX_CACHE_SIZE)
+together with memcg_kmem_charge(). However that is not possible due to
+slab path updating NR_SLAB_UNRECLAIMABLE_B stats while no updates for
+this stat in the general kmem charging path (__memcg_kmem_charge_page in
+page allocation code path).
+
+Also this general kmem charging path is used by many other users like
+vmalloc, kernel stack and thus we can not just plainly stuck updates to
+NR_SLAB_UNRECLAIMABLE_B in that path.
+
+Thanks for taking a look.
+Shakeel
 
