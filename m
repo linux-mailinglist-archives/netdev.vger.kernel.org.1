@@ -1,167 +1,90 @@
-Return-Path: <netdev+bounces-122920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61E569631CE
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:33:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FE439631D8
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:34:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E75C8285665
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:33:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00ACA1F23533
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EC11ABEAA;
-	Wed, 28 Aug 2024 20:33:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFB8D1AC453;
+	Wed, 28 Aug 2024 20:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K+jOcwrw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hm7YSjv2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD921A4F33
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 20:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E6A15A858;
+	Wed, 28 Aug 2024 20:34:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724877182; cv=none; b=SL/pSWyF58TUWPAvY+tFdekoS5fbRBK8HJGXm9Y5YwmUvn1xGwyZTruYk/4Qj5UosNCq2CBovE97oS9QtT2XBzcFW8aYc8NoD5ULwDWAfvuSv+f+M/JiFKyfMJp2DIgGdTlR3CF55B6RTCoiJ2BZeYL1KM4XK3N8SQqlUfcLi5Q=
+	t=1724877271; cv=none; b=Ij4mJkmnnjnQ6iio/vyRx6u0N0r+RF8lPyF+yHqe9TseWB+TydEcnX6/df/ec88tsLRZPjjZjhoTUS4bcRkvlrWBrG07j4QPLRNA1BQPWBmXg/s8OoaFqzScIBgGSIgMTKpZOhp8bCOSx+7uwydLIgTzl4CLHkGIE7tFhgN/Tzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724877182; c=relaxed/simple;
-	bh=fjtON7CaTVsBHlEvwyfntz+Xq8VlltTKoGm7JGhclEE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QHTLc62U/u4DFWTLH05fhnPYtPgMdkk1SnquXItvP10KruOcGJuXMBq+eXyxaD4BEfLYuwEI7qdvqP2+mTlSzIkFi/68ujaTF1FDDDf3ZsrAdjjWM2Rphp38T5Tx2P2/0152ySfpFfseN7F7YXttZL6pANehGea8hcFx9AE/ibQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K+jOcwrw; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4567fe32141so64301cf.0
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 13:32:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724877178; x=1725481978; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JHJLf4Vokck/HtI2mOdPAPAgEFikfsBko2UD6oCkgB4=;
-        b=K+jOcwrwlzPbkadNoKf5S+QcYqzZkEC+agpt9CtTe786BHmc5bvXDO/Yg6FF68ms1G
-         gFDiPI+Ey8dQxVhFDqT+FuKSiT+WdCvJRrELKcuSI3F6fp0UuWahlYeANmXOnoSdINYo
-         JtW/Jjkmpx1I/9C9r5zSryQrwULCCmGB8mlNd47NULASM1CJ3+1OhNa2SrQpvhyGufcd
-         QwEwow80x+Mwlrw99GG1O+Fm1NPKJ3Ge7IXbMe8fd4T+aamJO2mGQPjxgq8g1i5CwbS3
-         UMctXk2Ut2BAGELhobCH48843PNoC87lwwHoS2JoyJAyRxalWFFq/NVYmTBsNGXHiYdB
-         yMcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724877178; x=1725481978;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JHJLf4Vokck/HtI2mOdPAPAgEFikfsBko2UD6oCkgB4=;
-        b=OFtao75DUxo90j7oFcUz43BlUdcNQS86zlsjYbiZHGoJkbWu/ZU2NwUNv+3VMdo2dO
-         vMkA2R4Pdfa+7ijHR0L/zpZHnBdCfVg+LyT2QzmKaBde5wqpSFr6OPOpy8q2k3dPHZUh
-         E0QF8OBWviGGmYlWppT1LIYwyIeQGL3Uh9r/GB8OlFjyoSwFXURpwQu3sTfV5sTqnYEh
-         ikdDg8b2ispdyA3WXyacTAFOkMGye25ibULKD+Cmner2MPkehwrW6uqyjK+oosRUs3yk
-         rnOPyXr/DoQlXa4ljNbUu7Rl6LfRwulMYPXr2CbiWxEs3CQ7m7Vs64DyrAKS/kwd7PE0
-         xVsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV7dciS88C7Gl/c1DcKI7BhU9VdypjL3uNHA0YxAw/MGR5BfJUvv+v4mvBGufNN8yvISKUX/CI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZuvtDvUMbVNsdOez44Zea9OMLCi1mghR2GsRjJ/r6ADpsr2MW
-	0zLNzBGZEupYATuM7H2B9mFQ/ryB2H5VpoPYwkGnz8l3bPqpiahlnvPYtyCtuYy0VyfVBrcD8Oe
-	q5PgjDGIU8mMEmSUAI/SkJNuRV55VBABSjHhCGFoNWbtcuVel66o4
-X-Google-Smtp-Source: AGHT+IEpedPLMr5w+o90A9kIJw3c9RpSOyYlnsGSmY4cEWmZ9rWpx6G922ciL6XjB9ipiGcR5sMrjmEvH0HHBlmjFGU=
-X-Received: by 2002:a05:622a:1895:b0:454:b3a0:e706 with SMTP id
- d75a77b69052e-4567fc6cd3fmr830421cf.18.1724877177997; Wed, 28 Aug 2024
- 13:32:57 -0700 (PDT)
+	s=arc-20240116; t=1724877271; c=relaxed/simple;
+	bh=5nh14G/bAWdxRuLW4E1LaIv42sHt5q+xeuHO9WcnG50=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ILDU97rSAUYKvUCpowbIs242Atbh/qWw+HGcrMmlS47ee9MCC8L2lCH1M+A+53os5kK/Ve+Nak1Cda1plnowcbt7lApt4UoS8SC1TAetutDlpQ7Rn7NWQvPDxYkWtn8cEIqvwr3zfgbQg/qha39xrQkl+EUhyvuwsEO5cMiElVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hm7YSjv2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDAE1C4CEC0;
+	Wed, 28 Aug 2024 20:34:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724877270;
+	bh=5nh14G/bAWdxRuLW4E1LaIv42sHt5q+xeuHO9WcnG50=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Hm7YSjv2aZ71mf4UjBdQ3sJO7bdjlmFVRDRe6RdLkkKr/Kxe0RLnzBLakuMQdtwDi
+	 EDk9K7ZVmbZbsU6EtMpAhpwX2xLqmgn+97sWevLpeeSJew/IR7sKKMn6lg3okaRTpJ
+	 dA2Dkq6lD9rfGDxSY0jAsm9eghBkJVRX64IfZLUiIlZmFgwiyrsR/9ErfPlew+jfcF
+	 t2aCoG59SsrxHfgUrWRswWaG08fDNhSzU3dzRSwTWY6P7Lk82Ahp8x/IIkj9ZFqrmj
+	 hmu8P2WEsSv7Q1xDtSOLF/f4i9f+gZuAt/3fEypuJIlxnX+VTrZW+ub96kozCXCQi2
+	 a8yrjq/28uIMA==
+Date: Wed, 28 Aug 2024 13:34:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+ linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ kernel@pengutronix.de, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
+ <davem@davemloft.net>, Heiner Kallweit <hkallweit1@gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] phy: open_alliance_helpers: Add defines
+ for link quality metrics
+Message-ID: <20240828133428.4988b44f@kernel.org>
+In-Reply-To: <Zs6spnCAPsTmUfrL@pengutronix.de>
+References: <20240822115939.1387015-1-o.rempel@pengutronix.de>
+	<20240822115939.1387015-2-o.rempel@pengutronix.de>
+	<20240826093217.3e076b5c@kernel.org>
+	<4a1a72f5-44ce-4c54-9bc5-7465294a39fe@lunn.ch>
+	<20240826125719.35f0337c@kernel.org>
+	<Zs1bT7xIkFWLyul3@pengutronix.de>
+	<20240827113300.08aada20@kernel.org>
+	<Zs6spnCAPsTmUfrL@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240817163400.2616134-1-mrzhang97@gmail.com> <20240817163400.2616134-2-mrzhang97@gmail.com>
- <CANn89iKwN8vCH4Dx0mYvLJexWEmz5TWkfvCFnxmqKGgTTzeraQ@mail.gmail.com>
- <573e24dc-81c7-471f-bdbf-2c6eb2dd488d@gmail.com> <CANn89i+yoe=GJXUO57V84WM3FHqQBOKsvEN3+9cdp_UKKbT4Mw@mail.gmail.com>
- <cf64e6ab-7a2b-4436-8fe2-1f381ead2862@gmail.com> <CANn89iL1g3VQHDfru2yZrHD8EDgKCKGL7-AjYNw+oCdeBQLfow@mail.gmail.com>
-In-Reply-To: <CANn89iL1g3VQHDfru2yZrHD8EDgKCKGL7-AjYNw+oCdeBQLfow@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Wed, 28 Aug 2024 16:32:37 -0400
-Message-ID: <CADVnQyn2pC5Vjym490ZjjUqak0wRiV5OBhtFU8hqrM6AQQht+g@mail.gmail.com>
-Subject: Re: [PATCH net v4 1/3] tcp_cubic: fix to run bictcp_update() at least
- once per RTT
-To: Eric Dumazet <edumazet@google.com>
-Cc: Mingrui Zhang <mrzhang97@gmail.com>, davem@davemloft.net, netdev@vger.kernel.org, 
-	Lisong Xu <xu@unl.edu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 26, 2024 at 5:26=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
-...
-> I prefer you rebase your patch after mine is merged.
->
-> There is a common misconception with jiffies.
-> It can change in less than 20 nsec.
-> Assuming that delta(jiffies) =3D=3D 1 means that 1ms has elapsed is plain=
- wrong.
-> In the old days, linux TCP only could rely on jiffies and we had to
-> accept its limits.
-> We now can switch to high resolution clocks, without extra costs,
-> because we already cache in tcp->tcp_mstamp
-> the usec timestamp for the current time.
->
-> Some distros are using CONFIG_HZ_250=3Dy or CONFIG_HZ_100=3Dy, this means
-> current logic in cubic is more fuzzy for them.
->
-> Without ca->last_time conversion to jiffies, your patch would still be
-> limited to jiffies resolution:
-> usecs_to_jiffies(ca->delay_min) would round up to much bigger values
-> for DC communications.
+On Wed, 28 Aug 2024 06:50:46 +0200 Oleksij Rempel wrote:
+> Considering that you've requested a change to the uAPI, the work has now become
+> more predictable. I can plan for it within the task and update the required
+> time budget accordingly. However, it's worth noting that while this work is
+> manageable, the time spent on this particular task could be seen as somewhat
+> wasted from a budget perspective, as it wasn't part of the original scope.
 
-Even given Eric's excellent point that is raised above, that an
-increase of jiffies by one can happen even though only O(us) or less
-may have elapsed, AFAICT the patch should be fine in practice.
+I can probably take a stab at the kernel side, since I know the code
+already shouldn't take me more more than an hour. Would that help?
+You'd still need to retest, fix bugs. And go thru review.. so all
+the not-so-fun parts
 
-The patch says:
+> > Especially that we're talking about uAPI, once we go down
+> > the string path I presume they will stick around forever.  
+> 
+> Yes, I agree with it. I just needed this feedback as early as possible.
 
-+       /* Update 32 times per second if RTT > 1/32 second,
-+        * or every RTT if RTT < 1/32 second even when last_cwnd =3D=3D cwn=
-d
-+        */
-        if (ca->last_cwnd =3D=3D cwnd &&
--           (s32)(tcp_jiffies32 - ca->last_time) <=3D HZ / 32)
-+           (s32)(tcp_jiffies32 - ca->last_time) <=3D
-+           min_t(s32, HZ / 32, usecs_to_jiffies(ca->delay_min)))
-                return;
-
-So, basically, we only run fall through and try to run the core of
-bictcp_update() if cwnd has increased since ca-> last_cwnd, or
-tcp_jiffies32 has increased by more than
-min_t(s32, HZ / 32, usecs_to_jiffies(ca->delay_min)) since ca->last_time.
-
-AFAICT  this works out OK because the logic is looking for "more than"
-and usecs_to_jiffies() rounds up. That means that in the
-interesting/tricky/common case where ca->delay_min is less than a
-jiffy, usecs_to_jiffies(ca->delay_min) will return 1 jiffy. That means
-that in this case we will only fall through and try to run the core of
-bictcp_update() if cwnd has increased since ca-> last_cwnd, or
-tcp_jiffies32 has increased by more than 1 jiffy (i.e., 2 or more
-jiffies).
-
-AFAICT the fact that this check is triggering only if tcp_jiffies32
-has increased by 2 or more means that  at least one full jiffy has
-elapsed between when we set ca->last_time and the time when this check
-triggers running the core of bictcp_update().
-
-So AFAICT this logic is not tricked by the fact that a single
-increment of tcp_jiffies32 can happen over O(us) or less.
-
-At first glance it may sound like if the RTT is much less than a
-jiffy, many RTTs could elapse before we run the core of
-bictcp_update(). However,  AFAIK if the RTT is much less than a jiffy
-then CUBIC is very likely in Reno mode, and so is very likely to
-increase cwnd by roughly 1 packet per round trip (the behavior of
-Reno), so the (ca->last_cwnd =3D=3D cwnd) condition should fail roughly
-once per round trip and allow recomputation of the ca->cnt slope.
-
-So AFAICT this patch should be OK in practice.
-
-Given those considerations, Eric, do you think it would be OK to
-accept the patch as-is?
-
-Thanks!
-
-neal
+Andrew? Do you want to decide? :)
 
