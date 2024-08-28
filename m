@@ -1,67 +1,66 @@
-Return-Path: <netdev+bounces-122925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E04963328
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:57:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 977B696332D
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 22:57:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D33E1C221CA
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:57:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD32D1C23E99
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 20:57:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7DB1AC885;
-	Wed, 28 Aug 2024 20:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 100971AC8BC;
+	Wed, 28 Aug 2024 20:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X9zpmLWX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c7vlkVqe"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915C417C223
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 20:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5466D1AC448
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 20:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724878652; cv=none; b=JAnOsD7mVZtHXKzzyttbcdrT8IWRvmZaXRAmhqljToyufEzuMY8x1LWgLpt1qpM/o2tJKzzXDxLVTV+c24RfUPPSOeobY1sGGkJk0pO2rI9atXAZWhWULL2zjHhhBTF06jgdcKvMGmoMN37ad8HtW2zgU6y7VwA9Tanx6FtcWuo=
+	t=1724878654; cv=none; b=Pj5DdH+e/14b8em8CO0IC0Hr87u1l1f1arLwwgg7a3Fc6sWUtPnhAQZTbfDG2uISFzLz+PwGL4PrLAIR62hDz8iq2WcTtBuhQbI5njRh3tPUHCNXgcY8bOJm4qAUdZhVLL1EMjiBK+CYCM8p8+b2XAYCDDqgedXcxfMDrdIULf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724878652; c=relaxed/simple;
-	bh=kdYDOqPsigClw2mBSqmUdNltXzbedVdZSiP7GdsnUmI=;
+	s=arc-20240116; t=1724878654; c=relaxed/simple;
+	bh=I2Ah6OCzfIAMXv+oJczbNi/gLe6ti7p3coLoZXILxRg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Iv5uQ7w3JxV61B1ew+TmZZ0uVg40iLrUB611qVX1xLu+dnpkXtgyu/+ktpiITVFArT6BxCP7wzavGlDup3MZS0KMjjTyUQFPumStOYEmRfbkKZ49qqL14NUk9JZ6GP52jqPQDUMNlSxAKJfw7TYwRXWyCuIc3WopUoDeY29IQJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X9zpmLWX; arc=none smtp.client-ip=198.175.65.13
+	 In-Reply-To:To:Cc; b=CPb76kvoXEk1yAnUp20MZ5itmyADviNFENx+KfIUlPVYVXgz7GIL96PZ67lZWsP0xdliPmEEI//qmPlB8RZsrChwluYD/Hs6ggbjFWVa1HoIXYLyRLVRAClsLR9VJ8mXU6SOQUG2rbJO+2l7zB7ZDKz8vS81rlUIlsTz/ArGlMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c7vlkVqe; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724878651; x=1756414651;
+  t=1724878653; x=1756414653;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=kdYDOqPsigClw2mBSqmUdNltXzbedVdZSiP7GdsnUmI=;
-  b=X9zpmLWX2ZJlvY/JxRznGWOMTzjfDWpYbtiWTgPbM8rPZPbyoq7FKXlz
-   MtorKx16MpDwn6rAzy6RV+B5WI0HUVjUFLvs/2V598ERI0iViz3RmvU8i
-   LwX2Eah+dn+mGxU6z/O7ryh4uB7gr7QtBaRxYYBwuKOrMr1T4r3mfEQel
-   +hfPzeUHlUWeSbYKuuwo9RVuCy7tQ16OtXvNDz/mbOyzsT17w8j0/MHAR
-   2CO3xXqk/rLWRE6sQ7NediVukcenPSyfyt5LdfBEJ4zbWz6hIO2J2l4U4
-   n0m7HGhyxurSKzSRy0c49SgO+3d5HITfOHdmhlef5S5P2aG/FKB+GqxWz
-   A==;
-X-CSE-ConnectionGUID: d3fbc7QFStCMHiepK3HyXQ==
-X-CSE-MsgGUID: pB5TvrtKRaiXb3FO8fh+UQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="34592600"
+  bh=I2Ah6OCzfIAMXv+oJczbNi/gLe6ti7p3coLoZXILxRg=;
+  b=c7vlkVqeld22yGmCwgho9Mg0V/nKIPq2D8G8PyjzymeMtDQSlj140My6
+   qGS3Zx+pC8zaW11Ffr3sVY4I6uzl8FZDiEedxpTKvCQhB/yJCGqPt1SHA
+   ZXq2v6rPygmA+7+OUh3Y1P/YCO9IdpSu7BXpfTvACQgxFQ5RHn1dOEcaq
+   OJZC80ZQy7LvEcmo2wEEiG1vsQWT/goioUVngeImttPcMKUWTRC3gatME
+   dPy9rBxE61PoTP5hHi3tP4QuZ6fhnczBLnporl9MGBZKa8ei5kfoWnJ8l
+   QpnD75BdXUe1LQHZy+Ey3pWSaKDPCaEFZ+4jDaSsWyPWwR0yJSn5V9PvB
+   Q==;
+X-CSE-ConnectionGUID: 22//SZ2WTaqqZqFZd6MEvQ==
+X-CSE-MsgGUID: SUMEmwQgT8m4zNW6kX2HYg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="34592603"
 X-IronPort-AV: E=Sophos;i="6.10,183,1719903600"; 
-   d="scan'208";a="34592600"
+   d="scan'208";a="34592603"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
   by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 13:57:30 -0700
-X-CSE-ConnectionGUID: ecUePHjcS0iPhEv9jru8bw==
-X-CSE-MsgGUID: ICJTda+YSS6KmUCM4bTUOQ==
+X-CSE-ConnectionGUID: jw4S+9bhRxeGGiLcYCoePA==
+X-CSE-MsgGUID: d1fpVscGTD2xxQFBt6fRXw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,183,1719903600"; 
-   d="scan'208";a="64049974"
+   d="scan'208";a="64049977"
 Received: from jekeller-desk.jf.intel.com ([10.166.241.20])
   by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 13:57:29 -0700
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Wed, 28 Aug 2024 13:57:22 -0700
-Subject: [PATCH iwl-next v2 06/13] lib: packing: add KUnit tests adapted
- from selftests
+Date: Wed, 28 Aug 2024 13:57:23 -0700
+Subject: [PATCH iwl-next v2 07/13] lib: packing: add additional KUnit tests
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +69,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-6-558ab9e240f5@intel.com>
+Message-Id: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-7-558ab9e240f5@intel.com>
 References: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-0-558ab9e240f5@intel.com>
 In-Reply-To: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-0-558ab9e240f5@intel.com>
 To: Vladimir Oltean <olteanv@gmail.com>, netdev <netdev@vger.kernel.org>, 
@@ -79,338 +78,120 @@ To: Vladimir Oltean <olteanv@gmail.com>, netdev <netdev@vger.kernel.org>,
 Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 X-Mailer: b4 0.14.0
 
-Add 24 simple KUnit tests for the lib/packing.c pack() and unpack() APIs.
+While reviewing the initial KUnit tests for lib/packing, Przemek pointed
+out that the test values have duplicate bytes in the input sequence.
 
-The first 16 tests exercise all combinations of quirks with a simple magic
-number value on a 16-byte buffer. The remaining 8 tests cover
-non-multiple-of-4 buffer sizes.
+In addition, I noticed that the unit tests pack and unpack on a byte
+boundary, instead of crossing bytes. Thus, we lack good coverage of the
+corner cases of the API.
 
-These tests were originally written by Vladimir as simple selftest
-functions. I adapted them to KUnit, refactoring them into a table driven
-approach. This will aid in adding additional tests in the future.
+Add additional unit tests to cover packing and unpacking byte buffers which
+do not have duplicate bytes in the unpacked value, and which pack and
+unpack to an unaligned offset.
 
-Co-developed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+A careful reviewer may note the lack tests for QUIRK_MSB_ON_THE_RIGHT. This
+is because I found issues with that quirk during test implementation. This
+quirk will be fixed and the tests will be included in a future change.
+
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- lib/packing_test.c | 258 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- MAINTAINERS        |   1 +
- lib/Kconfig        |  12 +++
- lib/Makefile       |   1 +
- 4 files changed, 272 insertions(+)
+ lib/packing_test.c | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 82 insertions(+)
 
 diff --git a/lib/packing_test.c b/lib/packing_test.c
-new file mode 100644
-index 000000000000..4d07523dba29
---- /dev/null
+index 4d07523dba29..5d533e633e06 100644
+--- a/lib/packing_test.c
 +++ b/lib/packing_test.c
-@@ -0,0 +1,258 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2024, Vladimir Oltean <olteanv@gmail.com>
-+ * Copyright (c) 2024, Intel Corporation.
-+ */
-+#include <kunit/test.h>
-+#include <linux/packing.h>
-+
-+struct packing_test_case {
-+	const char *desc;
-+	const u8 *pbuf;
-+	size_t pbuf_size;
-+	u64 uval;
-+	size_t start_bit;
-+	size_t end_bit;
-+	u8 quirks;
-+};
-+
-+#define NO_QUIRKS	0
-+
-+/**
-+ * PBUF - Initialize .pbuf and .pbuf_size
-+ * @array: elements of constant physical buffer
-+ *
-+ * Initializes the .pbuf and .pbuf_size fields of a struct packing_test_case
-+ * with a constant array of the specified elements.
-+ */
-+#define PBUF(array...)					\
-+	.pbuf = (const u8[]){ array },			\
-+	.pbuf_size = sizeof((const u8 []){ array })
-+
-+static const struct packing_test_case cases[] = {
+@@ -210,6 +210,88 @@ static const struct packing_test_case cases[] = {
+ 		.end_bit = 32,
+ 		.quirks = QUIRK_LSW32_IS_FIRST | QUIRK_LITTLE_ENDIAN,
+ 	},
 +	/* These tests pack and unpack a magic 64-bit value
-+	 * (0xcafedeadbeefcafe) at a fixed logical offset (32) within an
++	 * (0x1122334455667788) at an odd starting bit (43) within an
 +	 * otherwise zero array of 128 bits (16 bytes). They test all possible
 +	 * bit layouts of the 128 bit buffer.
 +	 */
 +	{
-+		.desc = "no quirks, 16 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0xca, 0xfe, 0xde, 0xad,
-+		     0xbe, 0xef, 0xca, 0xfe, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
++		.desc = "no quirks, 16 bytes, non-aligned",
++		PBUF(0x00, 0x00, 0x00, 0x89, 0x11, 0x9a, 0x22, 0xab,
++		     0x33, 0xbc, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00),
++		.uval = 0x1122334455667788,
++		.start_bit = 106,
++		.end_bit = 43,
 +		.quirks = NO_QUIRKS,
 +	},
 +	{
-+		.desc = "lsw32 first, 16 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0xbe, 0xef, 0xca, 0xfe,
-+		     0xca, 0xfe, 0xde, 0xad, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
++		.desc = "lsw32 first, 16 bytes, non-aligned",
++		PBUF(0x00, 0x00, 0x00, 0x00, 0x33, 0xbc, 0x40, 0x00,
++		     0x11, 0x9a, 0x22, 0xab, 0x00, 0x00, 0x00, 0x89),
++		.uval = 0x1122334455667788,
++		.start_bit = 106,
++		.end_bit = 43,
 +		.quirks = QUIRK_LSW32_IS_FIRST,
 +	},
 +	{
-+		.desc = "little endian words, 16 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0xad, 0xde, 0xfe, 0xca,
-+		     0xfe, 0xca, 0xef, 0xbe, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
++		.desc = "little endian words, 16 bytes, non-aligned",
++		PBUF(0x89, 0x00, 0x00, 0x00, 0xab, 0x22, 0x9a, 0x11,
++		     0x00, 0x40, 0xbc, 0x33, 0x00, 0x00, 0x00, 0x00),
++		.uval = 0x1122334455667788,
++		.start_bit = 106,
++		.end_bit = 43,
 +		.quirks = QUIRK_LITTLE_ENDIAN,
 +	},
 +	{
-+		.desc = "lsw32 first + little endian words, 16 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0xfe, 0xca, 0xef, 0xbe,
-+		     0xad, 0xde, 0xfe, 0xca, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
++		.desc = "lsw32 first + little endian words, 16 bytes, non-aligned",
++		PBUF(0x00, 0x00, 0x00, 0x00, 0x00, 0x40, 0xbc, 0x33,
++		     0xab, 0x22, 0x9a, 0x11, 0x89, 0x00, 0x00, 0x00),
++		.uval = 0x1122334455667788,
++		.start_bit = 106,
++		.end_bit = 43,
 +		.quirks = QUIRK_LSW32_IS_FIRST | QUIRK_LITTLE_ENDIAN,
 +	},
-+	{
-+		.desc = "msb right, 16 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0x53, 0x7f, 0x7b, 0xb5,
-+		     0x7d, 0xf7, 0x53, 0x7f, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = QUIRK_MSB_ON_THE_RIGHT,
-+	},
-+	{
-+		.desc = "msb right + lsw32 first, 16 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0x7d, 0xf7, 0x53, 0x7f,
-+		     0x53, 0x7f, 0x7b, 0xb5, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = QUIRK_MSB_ON_THE_RIGHT | QUIRK_LSW32_IS_FIRST,
-+	},
-+	{
-+		.desc = "msb right + little endian words, 16 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0xb5, 0x7b, 0x7f, 0x53,
-+		     0x7f, 0x53, 0xf7, 0x7d, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = QUIRK_MSB_ON_THE_RIGHT | QUIRK_LITTLE_ENDIAN,
-+	},
-+	{
-+		.desc = "msb right + lsw32 first + little endian words, 16 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0x7f, 0x53, 0xf7, 0x7d,
-+		     0xb5, 0x7b, 0x7f, 0x53, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = QUIRK_MSB_ON_THE_RIGHT | QUIRK_LSW32_IS_FIRST | QUIRK_LITTLE_ENDIAN,
-+	},
-+	/* These tests pack and unpack a magic 64-bit value
-+	 * (0xcafedeadbeefcafe) at a fixed logical offset (32) within an
-+	 * otherwise zero array of varying size from 18 bytes to 24 bytes.
++	/* These tests pack and unpack a u64 with all bits set
++	 * (0xffffffffffffffff) at an odd starting bit (43) within an
++	 * otherwise zero array of 128 bits (16 bytes). They test all possible
++	 * bit layouts of the 128 bit buffer.
 +	 */
 +	{
-+		.desc = "no quirks, 18 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xca, 0xfe,
-+		     0xde, 0xad, 0xbe, 0xef, 0xca, 0xfe, 0x00, 0x00,
-+		     0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
++		.desc = "no quirks, 16 bytes, non-aligned, 0xff",
++		PBUF(0x00, 0x00, 0x07, 0xff, 0xff, 0xff, 0xff, 0xff,
++		     0xff, 0xff, 0xf8, 0x00, 0x00, 0x00, 0x00, 0x00),
++		.uval = 0xffffffffffffffff,
++		.start_bit = 106,
++		.end_bit = 43,
 +		.quirks = NO_QUIRKS,
 +	},
 +	{
-+		.desc = "no quirks, 19 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xca,
-+		     0xfe, 0xde, 0xad, 0xbe, 0xef, 0xca, 0xfe, 0x00,
-+		     0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = NO_QUIRKS,
++		.desc = "lsw32 first, 16 bytes, non-aligned, 0xff",
++		PBUF(0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xf8, 0x00,
++		     0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x07, 0xff),
++		.uval = 0xffffffffffffffff,
++		.start_bit = 106,
++		.end_bit = 43,
++		.quirks = QUIRK_LSW32_IS_FIRST,
 +	},
 +	{
-+		.desc = "no quirks, 20 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		     0xca, 0xfe, 0xde, 0xad, 0xbe, 0xef, 0xca, 0xfe,
-+		     0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = NO_QUIRKS,
++		.desc = "little endian words, 16 bytes, non-aligned, 0xff",
++		PBUF(0xff, 0x07, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
++		     0x00, 0xf8, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00),
++		.uval = 0xffffffffffffffff,
++		.start_bit = 106,
++		.end_bit = 43,
++		.quirks = QUIRK_LITTLE_ENDIAN,
 +	},
 +	{
-+		.desc = "no quirks, 22 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		     0x00, 0x00, 0xca, 0xfe, 0xde, 0xad, 0xbe, 0xef,
-+		     0xca, 0xfe, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = NO_QUIRKS,
-+	},
-+	{
-+		.desc = "no quirks, 24 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+		     0x00, 0x00, 0x00, 0x00, 0xca, 0xfe, 0xde, 0xad,
-+		     0xbe, 0xef, 0xca, 0xfe, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = NO_QUIRKS,
-+	},
-+	{
-+		.desc = "lsw32 first + little endian words, 18 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0xfe, 0xca, 0xef, 0xbe,
-+		     0xad, 0xde, 0xfe, 0xca, 0x00, 0x00, 0x00, 0x00,
-+		     0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
++		.desc = "lsw32 first + little endian words, 16 bytes, non-aligned, 0xff",
++		PBUF(0x00, 0x00, 0x00, 0x00, 0x00, 0xf8, 0xff, 0xff,
++		     0xff, 0xff, 0xff, 0xff, 0xff, 0x07, 0x00, 0x00),
++		.uval = 0xffffffffffffffff,
++		.start_bit = 106,
++		.end_bit = 43,
 +		.quirks = QUIRK_LSW32_IS_FIRST | QUIRK_LITTLE_ENDIAN,
 +	},
-+	{
-+		.desc = "lsw32 first + little endian words, 19 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0xfe, 0xca, 0xef, 0xbe,
-+		     0xad, 0xde, 0xfe, 0xca, 0x00, 0x00, 0x00, 0x00,
-+		     0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = QUIRK_LSW32_IS_FIRST | QUIRK_LITTLE_ENDIAN,
-+	},
-+	{
-+		.desc = "lsw32 first + little endian words, 20 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0xfe, 0xca, 0xef, 0xbe,
-+		     0xad, 0xde, 0xfe, 0xca, 0x00, 0x00, 0x00, 0x00,
-+		     0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = QUIRK_LSW32_IS_FIRST | QUIRK_LITTLE_ENDIAN,
-+	},
-+	{
-+		.desc = "lsw32 first + little endian words, 22 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0xfe, 0xca, 0xef, 0xbe,
-+		     0xad, 0xde, 0xfe, 0xca, 0x00, 0x00, 0x00, 0x00,
-+		     0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = QUIRK_LSW32_IS_FIRST | QUIRK_LITTLE_ENDIAN,
-+	},
-+	{
-+		.desc = "lsw32 first + little endian words, 24 bytes",
-+		PBUF(0x00, 0x00, 0x00, 0x00, 0xfe, 0xca, 0xef, 0xbe,
-+		     0xad, 0xde, 0xfe, 0xca, 0x00, 0x00, 0x00, 0x00,
-+		     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-+		.uval = 0xcafedeadbeefcafe,
-+		.start_bit = 95,
-+		.end_bit = 32,
-+		.quirks = QUIRK_LSW32_IS_FIRST | QUIRK_LITTLE_ENDIAN,
-+	},
-+};
-+
-+KUNIT_ARRAY_PARAM_DESC(packing, cases, desc);
-+
-+static void packing_test_pack(struct kunit *test)
-+{
-+	const struct packing_test_case *params = test->param_value;
-+	u8 *pbuf;
-+	int err;
-+
-+	pbuf = kunit_kzalloc(test, params->pbuf_size, GFP_KERNEL);
-+
-+	err = pack(pbuf, params->uval, params->start_bit, params->end_bit,
-+		   params->pbuf_size, params->quirks);
-+
-+	KUNIT_EXPECT_EQ_MSG(test, err, 0, "pack() returned %pe\n", ERR_PTR(err));
-+	KUNIT_EXPECT_MEMEQ(test, pbuf, params->pbuf, params->pbuf_size);
-+}
-+
-+static void packing_test_unpack(struct kunit *test)
-+{
-+	const struct packing_test_case *params = test->param_value;
-+	u64 uval;
-+	int err;
-+
-+	err = unpack(params->pbuf, &uval, params->start_bit, params->end_bit,
-+		     params->pbuf_size, params->quirks);
-+	KUNIT_EXPECT_EQ_MSG(test, err, 0, "unpack() returned %pe\n", ERR_PTR(err));
-+	KUNIT_EXPECT_EQ(test, uval, params->uval);
-+}
-+
-+static struct kunit_case packing_test_cases[] = {
-+	KUNIT_CASE_PARAM(packing_test_pack, packing_gen_params),
-+	KUNIT_CASE_PARAM(packing_test_unpack, packing_gen_params),
-+	{},
-+};
-+
-+static struct kunit_suite packing_test_suite = {
-+	.name = "packing",
-+	.test_cases = packing_test_cases,
-+};
-+
-+kunit_test_suite(packing_test_suite);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_DESCRIPTION("KUnit tests for packing library");
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 30a9b9450e11..8daa3b7d307a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17235,6 +17235,7 @@ S:	Supported
- F:	Documentation/core-api/packing.rst
- F:	include/linux/packing.h
- F:	lib/packing.c
-+F:	lib/packing_test.c
+ };
  
- PADATA PARALLEL EXECUTION MECHANISM
- M:	Steffen Klassert <steffen.klassert@secunet.com>
-diff --git a/lib/Kconfig b/lib/Kconfig
-index b38849af6f13..50d85f38b569 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -40,6 +40,18 @@ config PACKING
- 
- 	  When in doubt, say N.
- 
-+config PACKING_KUNIT_TEST
-+	tristate "KUnit tests for packing library" if !KUNIT_ALL_TESTS
-+	depends on PACKING && KUNIT
-+	default KUNIT_ALL_TESTS
-+	help
-+	  This builds KUnit tests for the packing library.
-+
-+	  For more information on KUnit and unit tests in general,
-+	  please refer to the KUnit documentation in Documentation/dev-tools/kunit/.
-+
-+	  When in doubt, say N.
-+
- config BITREVERSE
- 	tristate
- 
-diff --git a/lib/Makefile b/lib/Makefile
-index 322bb127b4dc..69db48a89cf5 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -153,6 +153,7 @@ obj-$(CONFIG_DEBUG_OBJECTS) += debugobjects.o
- obj-$(CONFIG_BITREVERSE) += bitrev.o
- obj-$(CONFIG_LINEAR_RANGES) += linear_ranges.o
- obj-$(CONFIG_PACKING)	+= packing.o
-+obj-$(CONFIG_PACKING_KUNIT_TEST) += packing_test.o
- obj-$(CONFIG_CRC_CCITT)	+= crc-ccitt.o
- obj-$(CONFIG_CRC16)	+= crc16.o
- obj-$(CONFIG_CRC_T10DIF)+= crc-t10dif.o
+ KUNIT_ARRAY_PARAM_DESC(packing, cases, desc);
 
 -- 
 2.46.0.124.g2dc1a81c8933
