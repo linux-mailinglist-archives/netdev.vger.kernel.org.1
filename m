@@ -1,256 +1,116 @@
-Return-Path: <netdev+bounces-122840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE347962C25
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:24:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F353962C43
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:27:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C2561F23F0C
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:24:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61FD01C2114B
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54171A071B;
-	Wed, 28 Aug 2024 15:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A29E1A3BC2;
+	Wed, 28 Aug 2024 15:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="VHvABM9u"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4QYF/WTy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5619513BC1E
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 15:24:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 825701A76DF;
+	Wed, 28 Aug 2024 15:25:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724858677; cv=none; b=WuBaKxpXrCW+nq1WcW0TQ0Ik+GU6gc1Bab++PdTCq5pmQ4VKXPECe/yJ4exfFhWljKqs4pAOcrYJvU7UIXFg+2LCpqG+IlCTVrTlvHrOY2nczW35LgvQG+1uEklEbT8iAuEek+XYbB9o3GVKkZTnTjUZuSd78raZOUHJMTTAAv0=
+	t=1724858731; cv=none; b=tV40/7esJ9TAwzUYOQC9eCiWbI1Z6slROT2yiwc/FiBsWY0z3lnFSLUbJ2Jyxz4TGhkG1Aj7vtep3RZHs0yaSlY0grKA4KRpTw1LOS6whYCF/IuTQ1BSsc0xGP2AplKsXc/5e+qvSHWHiJP7LJkxnib+Hhx/bbyI+3AMqXnOgOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724858677; c=relaxed/simple;
-	bh=sECdKZWmQ58VFDoOPO3d4pP0VUHs2KL2y5lS6y1lA/o=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=clQZo13XMCJtiJaNQaMSRTCF8bDBgwPY+S8IFWFnUkIlEG4xmNlijj7ghu+w1cdaG4BoKIi4fvMm25wW7BaP63AmT/sk1ZW2mmGInIfhYdRSbURtFucDfNdQU9UVrhOBanQx2rU3IBFP96E5pHcBBeS88uY6ZMYcJKyw3UTl18Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=VHvABM9u; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a8696e9bd24so749799566b.0
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 08:24:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724858674; x=1725463474; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RccO/6aYSzsD64ZgEXVUnoiwa51kK0FzwBqBJe1629o=;
-        b=VHvABM9uijgUErGZAwZhTsTmwEtdX6jkNUnwy2adhhQZuTadwx+reBpwXWUV8odp/Y
-         r8IVfFrVJwLJFGESrsupCHQG88Q12NwPfYmnz2LRjkdNm7STY/rlCKcmSBqtrq7lDwOl
-         MQeOpDgc2dNZgimM8zvAyEgEAmIyQCFgFdyHZjmSrieuxzue94fPNhFb8UOFo2ETyVxL
-         q5ckBLyZUPkbblY5tQ4wJC300X1edhbA15Wyb6udkNUj79VjdmrzxwVh3zZRB6Egssia
-         27lveneBzSwjO9joQ11yfNkxSWvDu/vR5sAEtKJq26WAaLBRW5Yq9r+J0Tih7t43x+8E
-         EmNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724858674; x=1725463474;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RccO/6aYSzsD64ZgEXVUnoiwa51kK0FzwBqBJe1629o=;
-        b=qoqznRovdIQACcZNkpRrmCFlZjEdked35dNTuXpLTe3jdN0HiwjdQE8LhVD8WT5OP5
-         s9DqU++lEvWjyOGy6I3xl3wvF5/EjH7RyjXH43wqyKmK7lHF/55SXHAb9muj5mIYSqY7
-         TFD/TAqi7Qh9q+9w+ZUCdb6ZI0UO3Yo59F2b8SIfN2BVZ95FLiCuqAND3VZLyaMKK7Kl
-         Jh4jRho/LJIj4WMHQRVnk79588nfmn2kOHMjnrD4ExTxPdk6FESRMRUsOIVqkXmSjlKH
-         rAuHFTm4MezURcpeEJehNLOSLGWuFCQmEH3VxcKTNXT4UfMq9NAOXL0Jb8PMQGnP8p3e
-         g/Jg==
-X-Forwarded-Encrypted: i=1; AJvYcCUNpBl7QU1z3Fq8fQrRx/7zZHeogPk/27TKNEhv1/6QHdlG429rJQWsMpKvfJr8RPz37YNO4Yc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEPHMz4d07LCc942fZ+Rm2kOpVg1zsXLPjsBseBIJQ9IGPXQo9
-	8W5Bz9Ql/eHBO2z58Gv/KX/JoKywdW0Zo7RenXI8w/vhRIqzUdy3UOG39qzN51g=
-X-Google-Smtp-Source: AGHT+IEGTIMf9HDmr3RD/PvAk+4C11JysnBRyFuK/mQqbOsClKq28ul4IglJqfFC2hAOgC6a2khVvQ==
-X-Received: by 2002:a17:906:6a29:b0:a7a:a7b8:adae with SMTP id a640c23a62f3a-a870a94fe14mr219949166b.4.1724858673188;
-        Wed, 28 Aug 2024 08:24:33 -0700 (PDT)
-Received: from localhost (host-80-182-198-72.retail.telecomitalia.it. [80.182.198.72])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a86e594a599sm255662266b.201.2024.08.28.08.24.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 08:24:32 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Wed, 28 Aug 2024 17:24:39 +0200
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 07/11] pinctrl: rp1: Implement RaspberryPi RP1 gpio
- support
-Message-ID: <Zs9BN_w4Ueq-VkJr@apocalypse>
-Mail-Followup-To: Linus Walleij <linus.walleij@linaro.org>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <eb39a5f3cefff2a1240a18a255dac090af16f223.1724159867.git.andrea.porta@suse.com>
- <CACRpkdbdXNeL6B43uV-2evCfr6iv8fUsSVtAND+2U0H5mSL2rw@mail.gmail.com>
+	s=arc-20240116; t=1724858731; c=relaxed/simple;
+	bh=I1Nby7tDKVVdapSHtGQT7L9Eim8jq/dT28PjMGd+PHE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r3tMRwof3rvufRb5VpW+W52dGonLBakZIwt3oOnoSNRjQvl/Ld/norSE8rb2T13321rOMZ1AbuvfVvo69e/CGg9jf8fGUONHbYZ+pQie8XNAo+YrcOeHK4RpgtQXLPyJoyQBBR04Nqr4NDb0L3yTr7VfoNBrLoqzKMaFhfeOIvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4QYF/WTy; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=q9URPVBkUtuX1b5vQ91DBWUEAecVTYj3WQtfiiyjLe8=; b=4QYF/WTy90NVcHGEOPZW700puH
+	PsWHZNWpHEEmbUSmKRVNivVlJQkwuHYMKXyODQQdUQ9oRrpIMyHeXgljjtrbAc62/dTBO/DeDzES2
+	ljIryYIG/AOUumjbxUyE+dFDD5Ya7ABiL3AzxT0XW2O9c/AC8edgXY63kxxwLYPrXxP8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sjKXU-005wr6-5U; Wed, 28 Aug 2024 17:24:52 +0200
+Date: Wed, 28 Aug 2024 17:24:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Jinjie Ruan <ruanjinjie@huawei.com>, woojung.huh@microchip.com,
+	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linus.walleij@linaro.org, alsi@bang-olufsen.dk,
+	justin.chen@broadcom.com, sebastian.hesselbarth@gmail.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com, wens@csie.org, jernej.skrabec@gmail.com,
+	samuel@sholland.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	ansuelsmth@gmail.com, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-stm32@st-md-mailman.stormreply.com, jic23@kernel.org
+Subject: Re: [PATCH net-next v2 00/13] net: Simplified with scoped function
+Message-ID: <6d88b103-ba8a-4631-bbf5-b9046b9b82cd@lunn.ch>
+References: <20240828032343.1218749-1-ruanjinjie@huawei.com>
+ <6092e318-ae0c-44f6-89fa-989a384921b7@lunn.ch>
+ <71deb322-4b54-4c1c-a665-d9de84ea9baf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACRpkdbdXNeL6B43uV-2evCfr6iv8fUsSVtAND+2U0H5mSL2rw@mail.gmail.com>
+In-Reply-To: <71deb322-4b54-4c1c-a665-d9de84ea9baf@kernel.org>
 
-Hi Linus,
+On Wed, Aug 28, 2024 at 04:45:32PM +0200, Krzysztof Kozlowski wrote:
+> On 28/08/2024 16:32, Andrew Lunn wrote:
+> > On Wed, Aug 28, 2024 at 11:23:30AM +0800, Jinjie Ruan wrote:
+> >> Simplify with scoped for each OF child loop and __free(), as well as
+> >> dev_err_probe().
+> >>
+> >> Changes in v2:
+> >> - Subject prefix: next -> net-next.
+> >> - Split __free() from scoped for each OF child loop clean.
+> >> - Fix use of_node_put() instead of __free() for the 5th patch.
+> > 
+> > I personally think all these __free() are ugly and magical. Can it
+> 
+> It is code readability so quite subjective.
 
-On 10:59 Mon 26 Aug     , Linus Walleij wrote:
-> Hi Andrea,
-> 
-> thanks for your patch!
+Try.
 
-Thanks for your review!
+But the __ is also a red flag. Anything starting with _ or __ in
+general should not be used in common code. That prefix is supposed to
+indicate it is internal plumbing which should be hidden away, out of
+sight, not to be used directly. Yet here it is, being scattered
+everywhere.
 
-> 
-> On Tue, Aug 20, 2024 at 4:36 PM Andrea della Porta
-> <andrea.porta@suse.com> wrote:
-> 
-> > The RP1 is an MFD supporting a gpio controller and /pinmux/pinctrl.
-> > Add minimum support for the gpio only portion. The driver is in
-> > pinctrl folder since upcoming patches will add the pinmux/pinctrl
-> > support where the gpio part can be seen as an addition.
-> >
-> > Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
-> (...)
-> 
-> > +#include <linux/bitmap.h>
-> > +#include <linux/bitops.h>
-> (...)
-> 
-> > +static void rp1_pad_update(struct rp1_pin_info *pin, u32 clr, u32 set)
-> > +{
-> > +       u32 padctrl = readl(pin->pad);
-> > +
-> > +       padctrl &= ~clr;
-> > +       padctrl |= set;
-> > +
-> > +       writel(padctrl, pin->pad);
-> > +}
-> 
-> Looks a bit like a reimplementation of regmap-mmio? If you want to do
-> this why not use regmap-mmio?
+I also wounder if this is lipstick on a pig. I suspect the reference
+counting on DT object is broken everywhere, because it is almost never
+used. In general, DT blobs exist from boot to shutdown. They don't go
+away, so these reference counts are never used. DT overlays do exist,
+but account for what, 1% of DT objects? And how often does an overlay
+actually get unloaded? Has anybody written a fuzzer to try unloading
+parts of DT blobs? I suspect we would quickly drown in bug reports.
 
-Agreed. I can leverage regmail_field to get rid of the reimplemented code
-for the pin->pad register region. Do you think it could be worth using
-regmap-mmio also on pin->gpio, pin->inte, pin->ints and pin->rio even
-though they are not doing any special field manipulation as the pin->pad
-case? 
+Adding missing of_node_put() seems to be high on the list of bot
+driven patches, which cause a lot of maintainer effort for no real
+gain. And those submitting the patches probably have little
+understanding of what they are doing, other than making the bot happy.
+Do we really want to be adding ugly code, probably with a few
+additional bugs thrown in, just to make a bot happy, but probably no
+real benefit?
 
-> 
-> > +static void rp1_set_dir(struct rp1_pin_info *pin, bool is_input)
-> > +{
-> > +       int offset = is_input ? RP1_CLR_OFFSET : RP1_SET_OFFSET;
-> > +
-> > +       writel(1 << pin->offset, pin->rio + RP1_RIO_OE + offset);
-> 
-> If you include bitops.h what about:
-> 
-> writel(BIT(pin->offset), pin->rio + RP1_RIO_OE + offset);
-
-Ack.
-
-> 
-> > +static int rp1_get_value(struct rp1_pin_info *pin)
-> > +{
-> > +       return !!(readl(pin->rio + RP1_RIO_IN) & (1 << pin->offset));
-> > +}
-> 
-> Also here
-
-Ack.
-
-> 
-> > +
-> > +static void rp1_set_value(struct rp1_pin_info *pin, int value)
-> > +{
-> > +       /* Assume the pin is already an output */
-> > +       writel(1 << pin->offset,
-> > +              pin->rio + RP1_RIO_OUT + (value ? RP1_SET_OFFSET : RP1_CLR_OFFSET));
-> > +}
-> 
-> And here
-
-Ack.
-
-> 
-> > +static int rp1_gpio_set_config(struct gpio_chip *chip, unsigned int offset,
-> > +                              unsigned long config)
-> > +{
-> > +       struct rp1_pin_info *pin = rp1_get_pin(chip, offset);
-> > +       unsigned long configs[] = { config };
-> > +
-> > +       return rp1_pinconf_set(pin, offset, configs,
-> > +                              ARRAY_SIZE(configs));
-> > +}
-> 
-> Nice that you implement this!
-
-Thanks :)
-
-> 
-> > +static void rp1_gpio_irq_config(struct rp1_pin_info *pin, bool enable)
-> > +{
-> > +       writel(1 << pin->offset,
-> > +              pin->inte + (enable ? RP1_SET_OFFSET : RP1_CLR_OFFSET));
-> 
-> BIT()
-
-Ack.
-
-Many thanks,
-Andrea
-
-> 
-> Yours,
-> Linus Walleij
+	Andrew
 
