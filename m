@@ -1,110 +1,143 @@
-Return-Path: <netdev+bounces-122626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53861961FA2
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 08:23:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE724961FAF
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 08:26:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 117972868C0
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 06:23:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CCB51C20DDB
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 06:26:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A0E15749A;
-	Wed, 28 Aug 2024 06:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A9B14D43D;
+	Wed, 28 Aug 2024 06:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CAQCxK0i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L88Qd74k"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1B5157A5A;
-	Wed, 28 Aug 2024 06:23:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6D01BC2F;
+	Wed, 28 Aug 2024 06:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724826198; cv=none; b=rlcX/fZECp6cijlAt/OGYTfXfXg34TFyNw48xxkw6qjCIVFvXz35A4APLgyqD1TltraPIFya0hBW7N0Pg7rtUqnVmezIjCtihdAHPP15Z5E+ld7VymmbOYlYObwr3l7qWPIQMNvm2NwA+rPZZlNXHuhOD2xdaPkTFCkiiluOMqI=
+	t=1724826375; cv=none; b=thAZjOqisSACZFWkV/fjKvEXekEaHPjr/H0zGsLNQ/HFQVY/dWMsAjU8KmjUnI0RCwhWoEYYqtDD/20/MSMgGQDaw7ss2+Id04uPTn2Yu5sudvHTt+LppnBVYswlDhQGr/QNe+tyhUuOGL+lyPYsvv4RTO65gAhf7akhdiwlDnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724826198; c=relaxed/simple;
-	bh=M4LgZVz4mIn1ZY30fwcbWgsAQnw5a1yuTqVz7xcVGsM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JKtKq4bQUQ64G2WXpsNTj+Kd5xZ/fhypzK/q8aQQV3sTqi5PuzOInKyM9BWgx2npfwuSAGPspHLm3+0tI5FjnYMLak8b3BhiGXMBLpIttr9C5R62Ta+E7PrPHuADMzAy9huiTfdgUWbMX8AMpkc3EBrmeoCYZP7eB7pB9LUKFns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CAQCxK0i; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 714C020009;
-	Wed, 28 Aug 2024 06:23:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1724826194;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MrtVMCBcACVqTWE8JfEJ5Lda89wQNtdQvQ4uwQLo7dg=;
-	b=CAQCxK0ig6dlqLuoDPZHh8BeZD3ypyah2ndaFMoNS4Wa5H8SgnUMFrC9+m5M6NEJFt06eC
-	tsqn6dD3320TEsuG4EzRxlmix2Xexv1ClIPE3I0BHtrYPAwubHaXmtqEItEdlvxXn7+aAS
-	oH24cLr6JnNC9Qgnwi40nVWhlJMNphgr8mhbdZM/0jQaf7QY6cffnxUyVTzilmh9tI+I76
-	zm43sKYq+86JEsTyG0rqptnw2ICN0Ss7qmYCfeUqd+wt/kb9NbLjvOqie3kpyN+tSCPOlE
-	ZW0ITuYwgMA54rNobWU0kS/akzdOW00sSDB/fAni3SAY3MU5n+OGNkdKIJ66Ng==
-Date: Wed, 28 Aug 2024 08:23:11 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: syzbot <syzbot+5cf270e2069645b6bd2c@syzkaller.appspotmail.com>
-Cc: andrew@lunn.ch, christophe.leroy@csgroup.eu, davem@davemloft.net,
- edumazet@google.com, hkallweit1@gmail.com, kuba@kernel.org,
- linux-kernel@vger.kernel.org, linux@armlinux.org.uk,
- netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] general protection fault in
- phy_start_cable_test_tdr
-Message-ID: <20240828082311.406c9ebb@device-28.home>
-In-Reply-To: <00000000000094740b0620b32b4e@google.com>
-References: <00000000000094740b0620b32b4e@google.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1724826375; c=relaxed/simple;
+	bh=z5um+F5kgYB+8tOJbQiMb9jUpaYqWQUvXy3B0MbjPEY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M/nQoMDzK9CQNYFQDF33YwxG8dHdcy/t9XI9e1qDizBKuDNKJie+VlAjmrVrAoCrt5zyK28hIERG9vDrMDxRYgM5KI6nSDq1f+3MDqTHEGZhVg2Yytk+FvUBAroRZsgy85aAIy3suuHq8ch589PWrRZn+jyb5/cIoJmZTILOKQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L88Qd74k; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f50966c478so32247391fa.1;
+        Tue, 27 Aug 2024 23:26:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724826371; x=1725431171; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SWJai3FOZ0aIfR9xP0d6XbyckawGCPeLPNcVBBq6JJk=;
+        b=L88Qd74k/B94gOxKOyb2zW56GT4sBYhZqblElJNPlsd3ZMiWfu1TvuMi5I4AVAxWHp
+         zHqI4jum4bHl8/Rdcj96UbhBjaiHGerdn1JcX/nDz8828voQyBUiCxfgjIYH2VpqkIK2
+         8mwENVpqfY31WdLp+YvBLLFQjrM6/6Rz4tL16X18AfO7DOyaLEBFRsrf2NphNM+qX0rq
+         GreadyW41WPLT2yslg/RCeb33Rx8+lPMUPYIppnE7+dik6N8npRWQbExuP+vf695wBL3
+         K+PNeUbrk/tUTzHLqcB0DC2Q2Sj8/n6uxS/UIZRAaeb9UBMRDQcME5A6s9DTmtauxLbZ
+         VGOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724826371; x=1725431171;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SWJai3FOZ0aIfR9xP0d6XbyckawGCPeLPNcVBBq6JJk=;
+        b=HJ6MN4MMFbpRapbFAajTr2PBfrJSCh1xsN+uMFU32vvdyYrg2+B/casNjYKEIJ5OTT
+         EDa7lCPYFnXJgZcUd+CZ1IM95lqZNJo/HaeBWqUfMJtgsTmBBOlxHJLfPBduhLdmW0YZ
+         MNyPIkCGaS2FubnUFSJFBT8xB2WFe5y8GC0CyusaOO43lzsnE6NsKy0sbbbQXrqL4IfE
+         mOaSFN9q47DC9nQoJHQuTUiO5WlbkOje81UQ7THhEbMkrqgMQDxH/jM+Yh0DpQvhn2X4
+         WHydWRryaKdwmgg3MDg9sWwLeyGvKJnXo9crao4xKhd1BXo7PzWA7YfEYVGOB9+/7Sg8
+         Gukw==
+X-Forwarded-Encrypted: i=1; AJvYcCVcaEF4kOjb1vmYOQ85eZOxWwYHOEQs5GApLvGiAqmB1lF5ExVUr8k2+K1kYXnQZX1f0mpA2re2y56Tow+gIhmh3n4=@vger.kernel.org, AJvYcCW9Ot6qJDZMMoLTUciyE09Iistwp+zoiTO00J0likbMrLDt7yCwC4UrjMJwgQgJVwPYhbtJ/URV9xkzRZA=@vger.kernel.org, AJvYcCWw01cooYTUpIQxBdS+oSEkefo2zrID49wqPKMTFO9j+LQu1Guapb1+J4qQQFTcFUDIB7EuF2wL@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+3gmdxdNG0aBAkNwszlOrQyUvyTqLYHfrnKkw3LcQ5puRRx3+
+	+oH6BWLtayA996jG7F3MCSZHv6TYj6sciya2uEupmiqbXcGEdp2OPaDZ/rt2+o9YwCzqtjnGFUB
+	UlP0ddhWb/54yeDa8CBQN6hd6d5I=
+X-Google-Smtp-Source: AGHT+IFEt9p2w9MKV8Zp367JXiujuRIJ135e9+HM1SrHI5y6rzXoYwC74hSPlKsVxIIYV0RiBX5XsG6Gi1mRzvqKcwE=
+X-Received: by 2002:a2e:bc08:0:b0:2f0:1a19:f3f1 with SMTP id
+ 38308e7fff4ca-2f55b64017cmr7038631fa.7.1724826370344; Tue, 27 Aug 2024
+ 23:26:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <20240827095712.2672820-1-frank.li@vivo.com> <20240827095712.2672820-9-frank.li@vivo.com>
+ <20240827120953.00005450@Huawei.com>
+In-Reply-To: <20240827120953.00005450@Huawei.com>
+From: Marcin Wojtas <marcin.s.wojtas@gmail.com>
+Date: Wed, 28 Aug 2024 08:25:58 +0200
+Message-ID: <CAHzn2R0r9Jziex+7fyhPGaPf12ckwqZwO40bshDBGdq_Tyenqg@mail.gmail.com>
+Subject: Re: [net-next v3 8/9] net: mvpp2: Convert to devm_clk_get_enabled()
+ and devm_clk_get_optional_enabled()
+To: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc: Yangtao Li <frank.li@vivo.com>, clement.leger@bootlin.com, andrew@lunn.ch, 
+	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	ulli.kroll@googlemail.com, linus.walleij@linaro.org, linux@armlinux.org.uk, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, mcoquelin.stm32@gmail.com, 
+	hkallweit1@gmail.com, u.kleine-koenig@pengutronix.de, 
+	jacob.e.keller@intel.com, justinstitt@google.com, sd@queasysnail.net, 
+	horms@kernel.org, linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hi Jonathan,
 
-On Tue, 27 Aug 2024 17:09:22 -0700
-syzbot <syzbot+5cf270e2069645b6bd2c@syzkaller.appspotmail.com> wrote:
+wt., 27 sie 2024 o 13:09 Jonathan Cameron
+<Jonathan.Cameron@huawei.com> napisa=C5=82(a):
+>
+> On Tue, 27 Aug 2024 03:57:11 -0600
+> Yangtao Li <frank.li@vivo.com> wrote:
+>
+> > Use devm_clk_get_enabled() and devm_clk_get_optional_enabled()
+> > to simplify code.
+> >
+> > Signed-off-by: Yangtao Li <frank.li@vivo.com>
+> > Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > Suggested-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> > Reviewed-by: Marcin Wojtas <marcin.s.wojtas@gmail.com>
+>
+> >
+> > @@ -7745,12 +7710,6 @@ static void mvpp2_remove(struct platform_device =
+*pdev)
+> >
+> >       if (!dev_of_node(&pdev->dev))
+> >               return;
+>
+> Given this makes no difference any more, drop the above dev_of_node() che=
+ck.
+>
 
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    f9db28bb09f4 Merge branch 'net-redundant-judgments'
-> git tree:       net-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=1656cc7b980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=df2f0ed7e30a639d
-> dashboard link: https://syzkaller.appspot.com/bug?extid=5cf270e2069645b6bd2c
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1582047b980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=100af825980000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/585e02f7fe7b/disk-f9db28bb.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/b9faf5d24900/vmlinux-f9db28bb.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/f9df5868ea4f/bzImage-f9db28bb.xz
-> 
-> The issue was bisected to:
-> 
-> commit 3688ff3077d3f334cee1d4b61d8bfb6a9508c2d2
-> Author: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Date:   Wed Aug 21 15:10:05 2024 +0000
-> 
->     net: ethtool: cable-test: Target the command to the requested PHY
+This check is to not execute the clk-related code when booting with
+ACPI. It should remain as-is, unless the new devm_clk_get* api is
+capable of not exploding in non-DT case. Can you confirm?
 
-A fix for this has been sent already :
+Best regards,
+Marcin
 
-https://lore.kernel.org/netdev/20240827092314.2500284-1-maxime.chevallier@bootlin.com/
-
-Thanks,
-
-Maxime
+> > -
+> > -     clk_disable_unprepare(priv->axi_clk);
+> > -     clk_disable_unprepare(priv->mg_core_clk);
+> > -     clk_disable_unprepare(priv->mg_clk);
+> > -     clk_disable_unprepare(priv->pp_clk);
+> > -     clk_disable_unprepare(priv->gop_clk);
+> >  }
+> >
+> >  static const struct of_device_id mvpp2_match[] =3D {
+>
 
