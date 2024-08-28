@@ -1,112 +1,174 @@
-Return-Path: <netdev+bounces-122561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12CBF961B8E
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 03:38:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 39C78961B9C
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 03:53:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B35BC1F245C8
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 01:38:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B59781F247C2
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 01:53:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202E0335BA;
-	Wed, 28 Aug 2024 01:38:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52BE542067;
+	Wed, 28 Aug 2024 01:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KlAMPDSM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KV2gQsyH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AC31D555;
-	Wed, 28 Aug 2024 01:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9975D3BBEF
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 01:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724809085; cv=none; b=fkZekmNLAzgFZgeOdnya5LlA1o2kKh0w3KzHC4KrWiIbo6yAwyNk4xjZ/LuGNOWP6Tz/YutYXefaDOoFqONg+5G/ndxUbQiU+1vFLIAPlUYOiq715sAUgbbQHWdAjmJtcSDi5BpEZ56tZbOgtEGUJg9/NBaS4AuObaJAM9j2eeY=
+	t=1724809976; cv=none; b=d+nzrcMYkKLlbkuU2k25+X8c1wUIGeTH1piBnTrTO16XdzvnSEnNaU+/V8AtZ1xHsf1Q9L7Xx9bMSIN3KtyH0HsXjhdwbikuXAIICsZ8WUL+ikUig+/btn3zZYw0hI5WjNZUMth2PiCPL4hkzQBy9yPLZvN9817bx3F68SNWLE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724809085; c=relaxed/simple;
-	bh=xwvhws/h5mSzgw+JQMPqpiytA4qxkjKdkpY8H8uzAV8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=emD2PARV4GtBpDbfsjMxoextkcNHCqxV1XRUEa2+gCm2swfsKZIIL8PRFCdq69umaux3gmCzfzww+zHj2U3+d21XKj+4NwIdY2Lg3mLI5m9LPNq/N2M+AwDs/FfF43fRe8TDoYR2iFmXeDN8DCOM33wyWPZax/1CJPkzK5slziQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KlAMPDSM; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7141d7b270dso4737741b3a.2;
-        Tue, 27 Aug 2024 18:38:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724809083; x=1725413883; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7A8HeH5zap9LkmdHCQZlgO7G4EHWhTJwGPQkgVaXJhc=;
-        b=KlAMPDSMGrwIoSD+laQZoXaLJe0AphSxcIQQW5G5Tl6oUux7CmchuKGbv2nh/uSHCJ
-         mYyAXnpCh9/Q69OobL8uGUiG7vK09FaFfTmuizLD0zVGnNzSmfbvbdSU81csfHGCHfQL
-         JrAcejtptilS3Kt48lT80jOqy9/pJgtRdJg/rssA1OAmUMZj4yPNS+TxmoYDaRzpaSLr
-         5771gTYJXP+GmJU/9OF3FVjARKDtVpTYY201nfSFXb3zB5sJ3luSjW6OBN+U1yjLV+jX
-         u56MsquT7dbzWSP00ZIDId89zVBHvXm5p7nvJKn20YqF/VxXTeG2pS7F40NX0ahDFN9x
-         y+ow==
+	s=arc-20240116; t=1724809976; c=relaxed/simple;
+	bh=CRar9WZIfyaGhyQ5AaPWKz0Q/05MgwL6ZvuPnpv6hGU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Sc5tcw8ZFB+PurGTwsYuR4gDBZUvzzPvGA1forYv6jiU9HI7q7j5lRJBjkxhrNn1s6wED1ri1aXV1LkklZdPI3pCTnPecSR3XuKORp6ociPEjUaW4Eehpx0gpxMOFDCVmDAGMiNDY5RFXR4ZqIc6BtkikQffPcriZU7znCkr1qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KV2gQsyH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724809973;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qWve6JE+0NypiSakiytBRnv/JlBTqmmXFs55kVgYTbU=;
+	b=KV2gQsyHztuuMIxEV1Uc5N8wNpTTr9mZzAXQ/O3aZTqhAdiqVloWEU7VRNFi1+/X+oZ1+K
+	lC51kFTnr3N/cyOHyxgYZtRm6soFHrApYI4Id5HcZYfqNyTryIbozo8//KUkTgdedAotgc
+	85sNCv2XJG1eGQOW6Cska5E/bNTs4eY=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-422-5A1wusGnNSqXJbBMEzB6bw-1; Tue, 27 Aug 2024 21:52:52 -0400
+X-MC-Unique: 5A1wusGnNSqXJbBMEzB6bw-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2d3c0088813so6319812a91.1
+        for <netdev@vger.kernel.org>; Tue, 27 Aug 2024 18:52:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724809083; x=1725413883;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7A8HeH5zap9LkmdHCQZlgO7G4EHWhTJwGPQkgVaXJhc=;
-        b=eqCfY8/lP/s8ioph6wuOsEZ9m9weRvayE4DRWb/6H/l2GRg0LmfIFigA/WmaYr3IlZ
-         v2UwE/si45Uix/Bcj25+G+4+aQeah4K/OYrVl9eL6fl3KHeeoqcr7aOurfA5QiAfVyPS
-         PZbjhgYyyLf8Svnjkz+Tn9LXzY5K9zUwptJn/S1cY0rUpZwRyw5gJADDc8xb9moY49cf
-         R9mbVUf7hFhjpUkuwKLI0cSg6IfIx7ugeZfoT8qLmMJ0U9vLtplqSPUVp2e0MIxpxN6G
-         kluSpddEXwLj2+RQnBButh4YrcmGPzk/5XndfCcolA5mH3TAQSXHtZZKTkIWTOAQHBO/
-         WTmA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfD+VuF2Zj8ouuyro4Mi6hMOppJx4HXz2rIXHcWzVW2upGW3hFqHE0mFjTqxS//DATNIdxR73A6/pDC7c=@vger.kernel.org, AJvYcCW1GPEVHgW852fp+cvPuSUwmZP8Ig9pZEBdeDsFlh5tKowY7gDDTGTzIK/PjsvUnH6ed0/S307u@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPS4iUDSBejc/VK5E9P7eMQtU4sxeMv0VwLHD4oKzXevqG38TK
-	tF+pm9E7uTmckTYD51DnI9TGBfdo5bJ2mIZizUDHRAKF7+SaazsK
-X-Google-Smtp-Source: AGHT+IFQY8SehaW+ZQSc3vqYwHobL6TbDXhAUiSrR355eOo0JS8jcBhq6CoyrE/1Pf1PhjPPyl/Hww==
-X-Received: by 2002:a05:6a00:182a:b0:714:1fc3:7a00 with SMTP id d2e1a72fcca58-71445d720f9mr16760978b3a.18.1724809082798;
-        Tue, 27 Aug 2024 18:38:02 -0700 (PDT)
-Received: from diogo-jahchan-ASUS-TUF-Gaming-A15-FA507RM-FA507RM.. ([200.4.98.43])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71434335e5dsm9083755b3a.204.2024.08.27.18.38.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Aug 2024 18:38:02 -0700 (PDT)
-From: Diogo Jahchan Koike <djahchankoike@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Diogo Jahchan Koike <djahchankoike@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [patch net-next] ethtool: cabletest: fix wrong conditional check
-Date: Tue, 27 Aug 2024 22:37:02 -0300
-Message-ID: <20240828013749.8044-1-djahchankoike@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1724809971; x=1725414771;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qWve6JE+0NypiSakiytBRnv/JlBTqmmXFs55kVgYTbU=;
+        b=rUAVHIvSsrGC/Bjhq9gPs95eW8wg6iNcHRZWSxU9Av2IbxJ3mEndGspPYRkd5lR2fc
+         AWpVMBS6c23ELAFNwgT3EDdM2kZOJocQJ7o5SpeubTuViAWdtfXmz3vS1uarMAK0le2a
+         ov7zrpMlI8KpDdJcwDY/iOHGHoIzc7RuK1lxx2qIua+K0bOZGFZeDIeISEW330aHkk1Z
+         ES0hDDxaDk4SeoQKMYzKZlfUieBxX/5OJaj/oXlS2duFkXKB34HaENvRjtauk/VdkeHF
+         rOEBmPpl30xSG6WCOtBs50h4SCwH8fBCYaaGzmPOJzQyx+dtQ+8DnZfhRQk6MA05TDfc
+         /q5A==
+X-Forwarded-Encrypted: i=1; AJvYcCX7IMKq25eapA74+DcWDxSiZdkY3lwgu4XepvgYb2Ah9iM2d5mSRgVzFvI7xGhM9xdlogzaaBo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzN59vY4bWLCYVhwHRKStF6VjR3YezOFYUpuIen+F73h5m07aNY
+	/hcmWPLyAsYhmXJLApFXkHT5FTlDI0DSmcgzR+puF0mgHcwff1280z8pbh2homjG/2l7WmiqXdd
+	7iYkY2CQtjGI1L0BcytOowvnGTCrz+vrsVgaBcus3Knb82vxSwRZkncMpBfD6q18F+4/e10tjCG
+	P5Af7ek7zrV/lDHhMTeLVKb5HbCsYn
+X-Received: by 2002:a17:90a:ea98:b0:2d3:cb10:ca20 with SMTP id 98e67ed59e1d1-2d8441dd433mr574480a91.42.1724809971168;
+        Tue, 27 Aug 2024 18:52:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG2WaxTQnck0F64/2Byf20IaMxKhRaCFgCZwbA5SnsjM2N5t2pQkjRTImPTJ5eVtBvKRqTzoXEmmHP+0WAM8Is=
+X-Received: by 2002:a17:90a:ea98:b0:2d3:cb10:ca20 with SMTP id
+ 98e67ed59e1d1-2d8441dd433mr574455a91.42.1724809970678; Tue, 27 Aug 2024
+ 18:52:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <33feec1a-2c5d-46eb-8d66-baa802130d7f@digitalocean.com>
+ <afcbf041-7613-48e6-8088-9d52edd907ff@nvidia.com> <fd8ad1d9-81a0-4155-abf5-627ef08afa9e@lunn.ch>
+ <24dbecec-d114-4150-87df-33dfbacaec54@nvidia.com> <CACGkMEsKSUs77biUTF14vENM+AfrLUOHMVe4nitd9CQ-obXuCA@mail.gmail.com>
+ <f7479a55-9eee-4dec-8e09-ca01fa933112@nvidia.com>
+In-Reply-To: <f7479a55-9eee-4dec-8e09-ca01fa933112@nvidia.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 28 Aug 2024 09:52:39 +0800
+Message-ID: <CACGkMEvUeHTKu8+=sPLz-ddr3xb7dD29bwNex=xvyRdK1gBrgw@mail.gmail.com>
+Subject: Re: [RFC] Why is set_config not supported in mlx5_vnet?
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Carlos Bilbao <cbilbao@digitalocean.com>, mst@redhat.com, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, eperezma@redhat.com, 
+	sashal@kernel.org, yuehaibing@huawei.com, steven.sistare@oracle.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In ethnl_act_cable_test_tdr, phydev is tested for the condition of being
-null or an error by checking IS_ERR_OR_NULL, however the result is being
-negated and lets a null phydev go through. Simply removing the logical
-NOT on the conditional suffices.
----
- net/ethtool/cabletest.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Aug 28, 2024 at 12:55=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia.co=
+m> wrote:
+>
+>
+>
+> On 27.08.24 04:03, Jason Wang wrote:
+> > On Tue, Aug 27, 2024 at 12:11=E2=80=AFAM Dragos Tatulea <dtatulea@nvidi=
+a.com> wrote:
+> >>
+> >>
+> >> On 26.08.24 16:24, Andrew Lunn wrote:
+> >>> On Mon, Aug 26, 2024 at 11:06:09AM +0200, Dragos Tatulea wrote:
+> >>>>
+> >>>>
+> >>>> On 23.08.24 18:54, Carlos Bilbao wrote:
+> >>>>> Hello,
+> >>>>>
+> >>>>> I'm debugging my vDPA setup, and when using ioctl to retrieve the
+> >>>>> configuration, I noticed that it's running in half duplex mode:
+> >>>>>
+> >>>>> Configuration data (24 bytes):
+> >>>>>   MAC address: (Mac address)
+> >>>>>   Status: 0x0001
+> >>>>>   Max virtqueue pairs: 8
+> >>>>>   MTU: 1500
+> >>>>>   Speed: 0 Mb
+> >>>>>   Duplex: Half Duplex
+> >>>>>   RSS max key size: 0
+> >>>>>   RSS max indirection table length: 0
+> >>>>>   Supported hash types: 0x00000000
+> >>>>>
+> >>>>> I believe this might be contributing to the underperformance of vDP=
+A.
+> >>>> mlx5_vdpa vDPA devicess currently do not support the VIRTIO_NET_F_SP=
+EED_DUPLEX
+> >>>> feature which reports speed and duplex. You can check the state on t=
+he
+> >>>> PF.
+> >>>
+> >>> Then it should probably report DUPLEX_UNKNOWN.
+> >>>
+> >>> The speed of 0 also suggests SPEED_UNKNOWN is not being returned. So
+> >>> this just looks buggy in general.
+> >>>
+> >> The virtio spec doesn't mention what those values should be when
+> >> VIRTIO_NET_F_SPEED_DUPLEX is not supported.
+> >>
+> >> Jason, should vdpa_dev_net_config_fill() initialize the speed/duplex
+> >> fields to SPEED/DUPLEX_UNKNOWN instead of 0?
+> >
+> > Spec said
+> >
+> > """
+> > The following two fields, speed and duplex, only exist if
+> > VIRTIO_NET_F_SPEED_DUPLEX is set.
+> > """
+> >
+> > So my understanding is that it is undefined behaviour, and those
+> > fields seems useless before feature negotiation. For safety, it might
+> > be better to initialize them as UNKOWN.
+> >
+> After a closer look my statement doesn't make sense: the device will copy
+> the virtio_net_config bytes on top.
+>
+> The solution is to initialize these fields to UNKNOWN in the driver. Will=
+ send
+> a patch to fix this.
+>
 
-diff --git a/net/ethtool/cabletest.c b/net/ethtool/cabletest.c
-index d365ad5f5434..f25da884b3dd 100644
---- a/net/ethtool/cabletest.c
-+++ b/net/ethtool/cabletest.c
-@@ -346,7 +346,7 @@ int ethnl_act_cable_test_tdr(struct sk_buff *skb, struct genl_info *info)
- 	phydev = ethnl_req_get_phydev(&req_info,
- 				      tb[ETHTOOL_A_CABLE_TEST_TDR_HEADER],
- 				      info->extack);
--	if (!IS_ERR_OR_NULL(phydev)) {
-+	if (IS_ERR_OR_NULL(phydev)) {
- 		ret = -EOPNOTSUPP;
- 		goto out_dev_put;
- 	}
--- 
-2.43.0
+For "driver", I guess you meant virtio-net?
+
+Thanks
+
+> Thanks,
+> Dragos
+>
 
 
