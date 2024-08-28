@@ -1,178 +1,186 @@
-Return-Path: <netdev+bounces-122830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 999CC962B08
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:03:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84EA3962B0B
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:04:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2F9BB23C27
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:03:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CA28284A0B
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E82D18A6BF;
-	Wed, 28 Aug 2024 15:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5834189BAA;
+	Wed, 28 Aug 2024 15:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="geNhUTf6";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OB5SN3gs"
+	dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b="LtBSI2bw"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D1E1891AC;
-	Wed, 28 Aug 2024 15:03:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4082A1891AC
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 15:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724857425; cv=none; b=nZJ/hb793/sa1dObSQWnVFrZKHNe+105T2uKCCw/KOs2ABMWhJ4hBVcdiwNt5RMsduyudUeTXfKZb0jmbvVLlkhTLev49z/xbrodbjyOnoWHLs0VlH+F4tttN95HzXWJZucYfgmywSqHLSIefhj4udn3ECovHQY7rAWctJmaWcM=
+	t=1724857453; cv=none; b=DsYYZL5SHFD+eSb1D1Y8cHCsurjDNDcFbhySwcLlAQrEskfUcZg2zT+htsomboTnYzRrkCtZeMew7+lRNhfHbQgw7v7q7Es8qhe21PVGhc/okZkHhyX2FXnqTVcsTbDawcI3YHzOU5j45uW+b7wcrSA89Dh3aeHuo7O2AC1+AO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724857425; c=relaxed/simple;
-	bh=yEUS2+We6pYU5E5aUU6qY7JHegaAWPxXgJVKjsaaybw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TRD3qGaVRzBeqV/7llbPB8ZsSRp+pjXyqE/JowRdwCnyHpdJ+y6k6Uv3nORbb6Q6nOieMRiWWiZkmNI7vsrv0IPI/txDNxxdN5Wl56aHJ/+Gft/77B3yD4ERB/dqkw/FbBSd1QDam1/JaTqKrtRKs5W3jPdgvovbPMnZlpcwiqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=geNhUTf6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OB5SN3gs; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-02.internal (phl-compute-02.nyi.internal [10.202.2.42])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id 08F6C1151B49;
-	Wed, 28 Aug 2024 11:03:42 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-02.internal (MEProxy); Wed, 28 Aug 2024 11:03:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1724857421;
-	 x=1724943821; bh=RYAedfyLuVntN+kLSt9YJMUi7beiuO1xRvYSBZFsvXM=; b=
-	geNhUTf6vyHVdZck3OF+RSzjQNIWfNXpFDRRITTuC+K7Tj9j5Lqh8YB9VCHgQem4
-	/QTGXlxJCkU4rcVrISAIStO1oUgvrQrhgnEqX/kNCQEHvRJN4fRQMmsD7Xn8QgNu
-	kBtkSSs1m0G7i7Pj+6ChpGodhHcATr+hmx0te81UiUxXdEZHYsPjckmDuOF8pV15
-	tWIJHf+Ge33XabGeg67lSgIUiH2i6bgebe0L9+KvC2hP1IdIOoj9JdNBBbr2cYyL
-	F8HeySqKFH5v5sKuCt1VR+GG0Q4KxmJsVJkYU7HrIqyok5yFz7gKHYjVKDwIfOhB
-	tMZsBbwbw8HW/uNzbtDxRQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1724857421; x=
-	1724943821; bh=RYAedfyLuVntN+kLSt9YJMUi7beiuO1xRvYSBZFsvXM=; b=O
-	B5SN3gsPcaVFxiRH0Dvh0noSPMW8CqJd84ThysM+JgmGJng1mXqe+8L+lflD0pyP
-	8GJdo9arSmgwRvNw/E0oLpcke7/qX5Qs/9TxKGJHGlMZ+5bTlC2NibNnzBxBk2T9
-	8JP4zMYjxP/eyg+aVKiT5K0P3tVVG9KrbhsJXM36srrScy4ehFZvL9dp4Eddh5hd
-	foBLgGtCffKsL8iw8rVAttNLe74DCmt4sfsxcXSdsa73FryC1kEuCDnzyRDBZ7XQ
-	VWhQbw6scUr0C1z9ytY6BhayZR2XO4rh79yb29qtoP5loiKInv18ailaOoM4yQeo
-	NPGUqOtIf/PL6hgqNviqg==
-X-ME-Sender: <xms:TDzPZhGBaB3uh8vwe2vr3vSCti0f-UyCYY_lIO2ifrhJNm2b_Apvqg>
-    <xme:TDzPZmVWFmuSlRE5GG39TL825SXCOtR2eeOtC_aabX6hzN40Sd1yGTHBjp6zy42SW
-    oywnthVG-WxwG8UDUM>
-X-ME-Received: <xmr:TDzPZjLfndxBlea6C5s-dV3taf-OFjdydTE-5Xe7WmoVGsSEhg029zWRTAZA0L9Gq7Q2bD2ajz0XMRB0yEYIkoluCe9URskiXw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudefvddgkedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
-    necuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhoug
-    gvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrght
-    thgvrhhnpeefhfellefhffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvd
-    elieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehn
-    ihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrsh
-    gvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohep
-    phgruhhlrdgsrghrkhgvrhdrtghtsegsphdrrhgvnhgvshgrshdrtghomhdprhgtphhtth
-    hopehsrdhshhhthihlhihovhesohhmphdrrhhupdhrtghpthhtohepuggrvhgvmhesuggr
-    vhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
-    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnh
-    drtghhpdhrtghpthhtohepsghijhhurdgurghsrdhjiiessghprdhrvghnvghsrghsrdgt
-    ohhmpdhrtghpthhtoheptghlrghuughiuhdrsggviihnvggrrdhujhessghprdhrvghnvg
-    hsrghsrdgtohhm
-X-ME-Proxy: <xmx:TDzPZnFguihRVYpr9m4yCUze_O1GyGrzvOM7uSJ0zZKaRs7-TaelNg>
-    <xmx:TDzPZnVacOxINjom0KDrDkn8GBMUvDhfmzjDMCtx3wriv_DVWksOXg>
-    <xmx:TDzPZiM-3vckoPVg23pKE6l8WHrXkvHo-PCGYcfI3s_LsZKPgjLJJw>
-    <xmx:TDzPZm14VUr3C7w0sFlH8_wFQViRI55aKzEwfQMvexQ4sdxe9FBajw>
-    <xmx:TTzPZgWL2gAl33M_n1wdxhySEdjXuDSiJFhGyhdmj-Foqo6EZP5uKrYs>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 28 Aug 2024 11:03:39 -0400 (EDT)
-Date: Wed, 28 Aug 2024 17:03:37 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, Biju Das <biju.das.jz@bp.renesas.com>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net PATCH v2 2/2] net: ravb: Fix R-Car RX frame size limit
-Message-ID: <20240828150337.GA3306821@ragnatech.se>
-References: <20240828102226.223-1-paul.barker.ct@bp.renesas.com>
- <20240828102226.223-3-paul.barker.ct@bp.renesas.com>
+	s=arc-20240116; t=1724857453; c=relaxed/simple;
+	bh=w0E6baZJpxJ6q2kjc375/bSiS/hhrHgHCpIFHjLDhnQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eKcKWPWQ2R3bODQE5RCzETyNQVQbGp4YB1a/fbsPhoL1nVHzuDQwzakP2Z4e+Wlj15XLDKTu81v/no5oTmClKUreQhf2shLkufpNRFJCrBY3N6WhBLoLtwm9ljaX1HZMG/9gdRp7JMAwLNT3pR/CQ5mKBkyIAI3Q/vIGYvDUuwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com; spf=none smtp.mailfrom=kutsevol.com; dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b=LtBSI2bw; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=kutsevol.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-454e92f001eso37912711cf.0
+        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 08:04:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kutsevol-com.20230601.gappssmtp.com; s=20230601; t=1724857451; x=1725462251; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jL9jfNB54ajh+s9h1yYJWjY7PMUSoEUGMuhE0M075gw=;
+        b=LtBSI2bwPoqjzscU0tcOzFdLqzoyaFUUONujHXJy/eEFWt3RqPhE41Klrfb94SzGtr
+         kfSCW5skPIwdOw5tWG52E/HW+2V4H2TpbKdB1teLjKMalW5EHg7Y7ciVH4Oozc8SQzq9
+         jpDma+ym0xvriC/4M6NfuqVTf1Jv+ynCydGnyeSdyylgn01lZXTIcTRwBifVZVubH+Zn
+         RHhIhYhyYmyoes86pU88uc0aeLYmp7TrSbYqFwBAhf5DZ3C4h44NvMq1GsvZxTFmyLg9
+         yatESdYMncx4qAQE+YRqoXloeiUBKFBoA20hbLmGYH9EtEWpCWs6mGNUeu0RmVwWsgYk
+         x/Ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724857451; x=1725462251;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jL9jfNB54ajh+s9h1yYJWjY7PMUSoEUGMuhE0M075gw=;
+        b=iRF+fCpk2yNy3SY2iwbshor6X9lh4EgOpYXTMPcwhtmw6OeTvpMiNqBkKD9pQe94Yv
+         EpUMdwfeeSHV7RigGLGdxw7pDiXniNGteG6YBC+2e7xBfcV/SjWVcxNfbUU9uokPN4hO
+         V+aHBiDdu3i2KAZ5DRD79PCWJ2BDjRj2wTSxFV3bo0caF3LIj0sy3/Y0qWgvOigszNvZ
+         0ls7EksAEbzQ//1UV4ohMoZ3UehKZQ8HxCYn8LLLm3KiPUXd3TNdd1zhz65X+CAPqRXF
+         KVbrkDaggl9/S2tR0GrFJ+TUkJYvkojzUcsaxJ3ZFnUQaigEgtI3vT3hb+WpSgBaOa+N
+         IuCw==
+X-Forwarded-Encrypted: i=1; AJvYcCVf9ZO1iGIx/3s+B8FxnDoKXe0zYZxL2UaSEGiNTaXJVorGLou7ZRLzayj/s5z+Hh/uYhlli+8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzb/loA5PI/HirtwlYjiSmOtfY3RSl/66+9r0wjC2DtmeTBk+mQ
+	9BsB0Tis1gB9SHO1+4e+Y3DFQFA7TED7Rjn25Lys5UW8OSinVe9PhdPKRzZsVv65XGrD07KcUKv
+	LBJaf5Ls0SUcUdas7bI8w3QrM5+PHoUxq1NCpog==
+X-Google-Smtp-Source: AGHT+IEtIJUhlSkKB2RvXZp1kGxF1wVOBlcQMg4Z+wCtFQMPliqeYYfdX1kBGSeN8VFK1FKhAt0a3GBQnVLtGI3mltw=
+X-Received: by 2002:ac8:5a87:0:b0:455:14f1:a64d with SMTP id
+ d75a77b69052e-4551500eb84mr176438801cf.24.1724857450707; Wed, 28 Aug 2024
+ 08:04:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240828102226.223-3-paul.barker.ct@bp.renesas.com>
+References: <20240824215130.2134153-1-max@kutsevol.com> <20240824215130.2134153-2-max@kutsevol.com>
+ <Zs3EB+p+Qq1nYObX@gmail.com>
+In-Reply-To: <Zs3EB+p+Qq1nYObX@gmail.com>
+From: Maksym Kutsevol <max@kutsevol.com>
+Date: Wed, 28 Aug 2024 11:04:00 -0400
+Message-ID: <CAO6EAnU91bgDnWuih1BchpvcDhScDTviQKjf=sKamVwhvFmZcw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] netcons: Add udp send fail statistics to netconsole
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Paul,
+Hey Breno,
+thanks for looking at it again :)
 
-Thanks for your work.
 
-On 2024-08-28 11:22:26 +0100, Paul Barker wrote:
-> The RX frame size limit should not be based on the current MTU setting.
-> Instead it should be based on the hardware capabilities.
-> 
-> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+On Tue, Aug 27, 2024 at 8:18=E2=80=AFAM Breno Leitao <leitao@debian.org> wr=
+ote:
+>
+> On Sat, Aug 24, 2024 at 02:50:24PM -0700, Maksym Kutsevol wrote:
+> > Enhance observability of netconsole. UDP sends can fail. Start tracking=
+ at
+> > least two failure possibilities: ENOMEM and NET_XMIT_DROP for every tar=
+get.
+> > Stats are exposed via an additional attribute in CONFIGFS.
+> >
+> > The exposed statistics allows easier debugging of cases when netconsole
+> > messages were not seen by receivers, eliminating the guesswork if the
+> > sender thinks that messages in question were sent out.
+> >
+> > Stats are not reset on enable/disable/change remote ip/etc, they
+> > belong to the netcons target itself.
+> >
+> > Signed-off-by: Maksym Kutsevol <max@kutsevol.com>
+>
+> Would you mind adding a "Reported-by" me in this case?
+>
+> https://lore.kernel.org/all/ZsWoUzyK5du9Ffl+@gmail.com/
 
-Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Absolutely!
 
-> ---
->  drivers/net/ethernet/renesas/ravb_main.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 471a68b0146e..b103632de4d4 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -555,8 +555,10 @@ static void ravb_emac_init_gbeth(struct net_device *ndev)
->  
->  static void ravb_emac_init_rcar(struct net_device *ndev)
->  {
-> +	struct ravb_private *priv = netdev_priv(ndev);
-> +
->  	/* Receive frame limit set register */
+> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> > index 9c09293b5258..45c07ec7842d 100644
+> > --- a/drivers/net/netconsole.c
+> > +++ b/drivers/net/netconsole.c
+> > @@ -82,6 +82,13 @@ static DEFINE_SPINLOCK(target_list_lock);
+> >   */
+> >  static struct console netconsole_ext;
+> >
+> > +#ifdef CONFIG_NETCONSOLE_DYNAMIC
+> > +struct netconsole_target_stats  {
+> > +     size_t xmit_drop_count;
+> > +     size_t enomem_count;
+>
+> I am looking at other drivers, and they use a specific type for these
+> counters, u64_stats_sync.
+> if it is possible to use this format, then you can leverage the
+> `__u64_stats_update` helpers, and not worry about locking/overflow!?
+>
+Do you think that these counters really need more than an int?
+Switching them to unsigned int instead might be better?
+I'd argue that at the point when an external system collection
+interval is not short enough
+to see the unsigned counter going to a lesser value (counters are
+unsigned, they go to 0 at UINT_MAX+1).
+I need advice/pointer on locking - I'm looking at it and it looks to
+me as if there's no locking needed when
+updating a member of nt there. Tell me if I'm wrong.
 
-I wonder if we also should expand this comment to explain the addition 
-of ETH_FCS_LEN, I have to look this up every time :-) How would you feel 
-about adding something like?
+> > @@ -1015,6 +1035,25 @@ static struct notifier_block netconsole_netdev_n=
+otifier =3D {
+> >       .notifier_call  =3D netconsole_netdev_event,
+> >  };
+> >
+> > +/**
+> > + * count_udp_send_stats - Classify netpoll_send_udp result and count e=
+rrors.
+> > + * @nt: target that was sent to
+> > + * @result: result of netpoll_send_udp
+> > + *
+> > + * Takes the result of netpoll_send_udp and classifies the type of err=
+or that
+> > + * occurred. Increments statistics in nt->stats accordingly.
+> > + */
+> > +static void count_udp_send_stats(struct netconsole_target *nt, int res=
+ult)
+> > +{
+> > +#ifdef CONFIG_NETCONSOLE_DYNAMIC
+> > +     if (result =3D=3D NET_XMIT_DROP) {
+> > +             nt->stats.xmit_drop_count++;
+>
+> If you change the type, you can use the `u64_stats_inc` helper here.
+ok
 
-    /* Set receive frame length
-     *
-     * The length set here described the frame from the destination 
-     * address up to and including the CRC data. However only the frame 
-     * data, exuding the CRC, are transferred to memory. To allow for 
-     * the largest frames add the CRC length to the maximum Rx 
-     * descriptor size.
-     */
-
-> -	ravb_write(ndev, ndev->mtu + ETH_HLEN + VLAN_HLEN + ETH_FCS_LEN, RFLR);
-> +	ravb_write(ndev, priv->info->rx_max_frame_size + ETH_FCS_LEN, RFLR);
->  
->  	/* EMAC Mode: PAUSE prohibition; Duplex; RX Checksum; TX; RX */
->  	ravb_write(ndev, ECMR_ZPF | ECMR_DM |
-> -- 
-> 2.43.0
-> 
-
--- 
-Kind Regards,
-Niklas Söderlund
+> > @@ -1126,7 +1167,11 @@ static void send_ext_msg_udp(struct netconsole_t=
+arget *nt, const char *msg,
+> >                       this_offset +=3D this_chunk;
+> >               }
+> >
+> > -             netpoll_send_udp(&nt->np, buf, this_header + this_offset)=
+;
+> > +             count_udp_send_stats(nt,
+> > +                                  netpoll_send_udp(&nt->np,
+> > +                                                   buf,
+> > +                                                   this_header + this_=
+offset)
+> > +             );
+>
+> as Jakub said, this is not a format that is common in the Linux kenrel.
+ok
 
