@@ -1,76 +1,140 @@
-Return-Path: <netdev+bounces-122558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8D2961B5C
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 03:20:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E879961B62
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 03:22:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2DE91F24870
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 01:20:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFDE81C22FA9
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 01:22:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F10A224D7;
-	Wed, 28 Aug 2024 01:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E82224D7;
+	Wed, 28 Aug 2024 01:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="WJNzdFvV"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="iG0QkENa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA5317C7C;
-	Wed, 28 Aug 2024 01:19:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0F5224D1;
+	Wed, 28 Aug 2024 01:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724807998; cv=none; b=hZl+3eZ2DQUFB5uUUEsO2n75caNn7GdyDdk1H6PXd0/pysaeNCAd2v/WT3jQsYo2o5m9N00OlYD5azwVa8aRXlroN0W+tZloIhpo7Cx6p6WI7q7OTmkSHyMYVReaYl7CfTrwAbXR0zt20+/w0h1d6T8NHMRmkKH0J/e44An4euQ=
+	t=1724808140; cv=none; b=UA2GQCwTn97BVa8j6XEQVon9VhXus6RRvRNy/g9KoteFUPqEBlGxCn5MQgBOPZPEDCl6LxbY542fXTTADlKrNXBcqikSDs3eYgR2vAUy+W0QmM4dVp/OjVzUKHY5S+bOjfFHtExJGcZ6qG+NYiaw1HQl3j1rFMg5wpgityi5Mjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724807998; c=relaxed/simple;
-	bh=HkTJ4Z02ayqIUPhojcsjUl5UoyOWUAcRVHBJ6olPfuQ=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=Xa32QbmEbpWKU1OzvfhmajQORHJzhHkgHaF3dExiWd+lFvyETtyRNd3LI4o+hi09z5pMKAxVcP2J2GalodBRtEcbcNR5FFRO5bdppz/1mf6X/nWhT3Mmbk38tO11x9pQOZ3S12Uk+cQ9IHLO8TGYI5EMJbxtLtnjwF223iky1kc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=WJNzdFvV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DB8BC4AF09;
-	Wed, 28 Aug 2024 01:19:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1724807997;
-	bh=HkTJ4Z02ayqIUPhojcsjUl5UoyOWUAcRVHBJ6olPfuQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WJNzdFvVwu6bdkbAexFJCp4o3xRs3N2XVgbg7dWfYc8oKkS1bGy3wp08pzoD04Ddi
-	 KD9aCsG9Qn2KIcc/d508cy8wgLYsrMSorJeUt6j5clVoffTPvg5CptfFEW1q8IOr1w
-	 Cko2CkjE/Elw/vYXQL6TuLRVPMXDuoP+ETZqaeeU=
-Date: Tue, 27 Aug 2024 18:19:56 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: torvalds@linux-foundation.org, alx@kernel.org, justinstitt@google.com,
- ebiederm@xmission.com, alexei.starovoitov@gmail.com, rostedt@goodmis.org,
- catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp,
- linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org,
- linux-security-module@vger.kernel.org, selinux@vger.kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org,
- dri-devel@lists.freedesktop.org
-Subject: Re: [PATCH v7 0/8] Improve the copy of task comm
-Message-Id: <20240827181956.73484860efe34e550f35db7a@linux-foundation.org>
-In-Reply-To: <CALOAHbA7VW3_gYzqzb+Pp2T3BqWb5x2sWPmUj2N+SzbYchEBBA@mail.gmail.com>
-References: <20240817025624.13157-1-laoar.shao@gmail.com>
-	<CALOAHbA7VW3_gYzqzb+Pp2T3BqWb5x2sWPmUj2N+SzbYchEBBA@mail.gmail.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1724808140; c=relaxed/simple;
+	bh=OT/ewFXToM+ETRFl/FZO1pomW5nvULege6FbtQqujCU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=R2r/nA9XnKwS2j589B6McpGlC6ZTG03wzOalQN6PBEYf3NuGRXO7FOf+vUevwKpxQlEa4wV5Kp93V4tyOmnKgZ7tMcHbgE6zyd0fTV6B0TBVB4m8aeWTFJwIwmhaT55K4Sa38Qvplw0Qut8gFUQIz1mRjBxJc3LQqy0yMfBDudI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=iG0QkENa; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1724808129;
+	bh=w0UTheu8+mOgy5zb9FccWMuqVrPi69dOGezXCZDCDzI=;
+	h=Date:From:To:Cc:Subject:From;
+	b=iG0QkENarXxaShkXGQey0EbkqdJgscDHrfCBdQtr7pE12jSAiZrPJxvdRgOSByoUf
+	 pGh0L9/lU2eVGj+wNoevgA3NGR1VkbmD7bq9o5SgBD8AjZy4FCS6Gk8MJUxGz7qk+o
+	 zevx0EKvuKDceLfN/C+9QMC701kvXUnvR2ePrmShf91DdGoO+f6I35ALtZ8DD1JuPv
+	 e6G0jvlFxwGxXCav+9+T2fogCN5LGQ8cNHs7WuzL1sFsklfd59PwJTVUhGFehUiBef
+	 bdmZ6Duok6EXMGEjuB6K1m6w69HAMZQAS9ab7T5HDJobNNw4994dTOP5NH3TslyLdP
+	 V05gjsLN8qWSg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Wtmq45wcGz4wd0;
+	Wed, 28 Aug 2024 11:22:07 +1000 (AEST)
+Date: Wed, 28 Aug 2024 11:22:07 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Jason Xing <kernelxing@tencent.com>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Xueming Feng <kuro@kuroa.me>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20240828112207.5c199d41@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/70YbzUcCK6Myv5acFf2mpXK";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/70YbzUcCK6Myv5acFf2mpXK
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 26 Aug 2024 10:30:54 +0800 Yafang Shao <laoar.shao@gmail.com> wrote:
+Hi all,
 
-> Hello Andrew,
-> 
-> Could you please apply this series to the mm tree ?
+Today's linux-next merge of the net-next tree got a conflict in:
 
-Your comment in
-https://lkml.kernel.org/r/CALOAHbA5VDjRYcoMOMKcLMVR0=ZwTz5FBTvQZExi6w8We9JPHg@mail.gmail.com
-led me to believe that a v8 is to be sent?
+  net/ipv4/tcp.c
+
+between commit:
+
+  bac76cf89816 ("tcp: fix forever orphan socket caused by tcp_abort")
+
+from the net tree and commit:
+
+  edefba66d929 ("tcp: rstreason: introduce SK_RST_REASON_TCP_STATE for acti=
+ve reset")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc net/ipv4/tcp.c
+index 831a18dc7aa6,8514257f4ecd..000000000000
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@@ -4653,10 -4649,12 +4656,10 @@@ int tcp_abort(struct sock *sk, int err
+  	local_bh_disable();
+  	bh_lock_sock(sk);
+ =20
+ -	if (!sock_flag(sk, SOCK_DEAD)) {
+ -		if (tcp_need_reset(sk->sk_state))
+ -			tcp_send_active_reset(sk, GFP_ATOMIC,
+ -					      SK_RST_REASON_TCP_STATE);
+ -		tcp_done_with_error(sk, err);
+ -	}
+ +	if (tcp_need_reset(sk->sk_state))
+ +		tcp_send_active_reset(sk, GFP_ATOMIC,
+- 				      SK_RST_REASON_NOT_SPECIFIED);
+++				      SK_RST_REASON_TCP_STATE);
+ +	tcp_done_with_error(sk, err);
+ =20
+  	bh_unlock_sock(sk);
+  	local_bh_enable();
+
+--Sig_/70YbzUcCK6Myv5acFf2mpXK
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbOe78ACgkQAVBC80lX
+0Gx5AggAgOSkPwGXtjXRb63XxdV4bKQjB9XuqT01uBlarHLP7CjWULUnHq1NfTEV
+f58wH83Qech6DstLyFGEXeK40zwKOzzaqWlV1EHJlkQu6oE1VTjFoUdc5GbT2wbV
+u+cIralPjBNieOyzmL+nm8U3WNZA4rjKquRK7BGwv4Q85JSq9LSzgRFZsSibZZ/M
+gDH5cTkwNJF5KbPBgnWXmqBCqU1YcCMRLfHwQKuRJdJKKiZpQ5FFhLDepzUrxki4
+Q6YA5Np0dpYY20R0t2erfwe9EqWbD8HdBt+aZWOOB33fbaWAc8XkZh40UyZcTfXq
+/TCVjr8XYNMtSJCeqKwK9Zvs0AyuWQ==
+=34lI
+-----END PGP SIGNATURE-----
+
+--Sig_/70YbzUcCK6Myv5acFf2mpXK--
 
