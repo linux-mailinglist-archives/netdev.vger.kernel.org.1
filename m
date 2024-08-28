@@ -1,190 +1,137 @@
-Return-Path: <netdev+bounces-122906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2AEE9630FE
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 21:33:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AD3A96310F
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 21:40:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F9261C21F84
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 19:33:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33E6B1F21C41
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 19:40:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF181A7042;
-	Wed, 28 Aug 2024 19:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09AC1AAE19;
+	Wed, 28 Aug 2024 19:40:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SmRxYNeA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2O9qTRrC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634EF20B22;
-	Wed, 28 Aug 2024 19:33:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F070433C1
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 19:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724873617; cv=none; b=BQ7VKQDbfepaW71NCqljLcW+D+W/iy6R8Yobw0WyppEMqnpOKrmuknrZTMt10pxaCEtXmxX1vLozNOyo3Wg+CeUBOwaBecEd5p9iO527P71XjtzI1RBuLEwdwqZFAqjUqqSEznaFc8L/FbmWMdZnl5zaKsRCk2Xnvi3wvpqqXBU=
+	t=1724874002; cv=none; b=odyKpkjxagJvsTKeI+d72jhU92YsGp0Yjp8lfcRlHkScuCeHstsMbf+d/VcAErzqzwYTHKJd+HMZcM/PRNlXJ/wf0J85NVPz2hsq2U1Q3iJJ0qrSqZG3nUMsvemto8UiSxpkFOYPn7iLJRP1yDS74c9DJDpch7AWQlGknO52T1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724873617; c=relaxed/simple;
-	bh=U8BIWiS8hHcFq3yHSF/Vs9beTWUZmzVz9vZM20MEGeo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ADuV7U4S/+4Ob7jAeyLKcwdxzmZzoRJb+F5iLhc5ggcg17krVMcMOiVLll9e2ZURgGyLWFvPxeJ7mWs4jvzrt8Ja5JYqRXCBFR1mD8cA7NfrBjojYrjjZh/LYq217Yj5mECyTfhFUAzsNeIWeeegBnGvek4ipXnoS9WP63pMheA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SmRxYNeA; arc=none smtp.client-ip=209.85.210.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-70df4b5cdd8so5199225a34.1;
-        Wed, 28 Aug 2024 12:33:35 -0700 (PDT)
+	s=arc-20240116; t=1724874002; c=relaxed/simple;
+	bh=pp4LS5OLDpwnbTmgyXABseihLB1BwQmwac5FhKUAPQ8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=umosD4ZAzcDDP/Z3o6Bea1A2wykStofI4iDlokNr6DeKlDlLWp87nDhgxCNa5aevG6zKR0Qh6kihM6jfU1mr97z4MtKg0Xp1O0zRT2cQxMhUzpI1FVkzGzKgvTG1TPt6bcb6x+k6UsUnVsV215hRMpA3hXp494Bpop/4rMUHvnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2O9qTRrC; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6b46d8bc153so136125267b3.2
+        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 12:40:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724873614; x=1725478414; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=To0ai7PZ9nRETZyZcKswl8MwHRLVlUwg6wbmZ08m7KE=;
-        b=SmRxYNeAcH66qDXLKFXS2GTxCKqLaSCwi8L5hBf7LF9ECcfv0KDJjZrPRONkBcwe9F
-         n1a6zZVPjV1XRqT4bfYYdj/1zWvihHM4lpcL9JIRolG6FqacuxXjovYuNPZiKYbeq4Av
-         Fqqh0o5PBnfTx0JHTyGkbevNsXK1T6rhikqECNvKd8dHNNKOLunvsBm/XevHgAKq1bXY
-         fC+5MMBmvAn2KRP32Ln/fTR1B6+g0hAfUsEHIrCcSSSmqdK859IvsBG/p/nR0xjeKgLH
-         O1H+Do1HCXNQ+UuriLaBKhZPNr1i9wm13EvGXidSkuQ5TJrF0IUl8YF2xtLquIxcVRSu
-         DUFQ==
+        d=google.com; s=20230601; t=1724874000; x=1725478800; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=5ETaQUT+PPfbI9id4ycXuo8+5bQkOihsNpmgMv07doI=;
+        b=2O9qTRrCPSwJvyoe5ozYQwRNJ9bbe66DPOBGKvvOB3shNZxqtnae5Y1FqEpPH95bng
+         eQmMaG8S/n4CvaCCSyjNyB7LgovYCX1qKVGk8jomFV+induz/oFSgr2L3Jx55Yyh9sCZ
+         uVdcThWjK3/lylK1nD+VuePXujkekpY8r/xDPF6nL+/huCd8SF94ZEcHfSceaf/oAoj4
+         3VPE9tABOsWAuqtBfJeI5MmdBNjgFZ9kPhnqqMxbZ2vlOF/s4NE9e6Z9VhAKlDzKbtAt
+         h5+SQvEz53+zXWk/+2ukC0Fp0yltaKbZ4Q8QCf0Lc1IXMAg6JB1Fl9l41X0qAqKy4uMi
+         eh7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724873614; x=1725478414;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=To0ai7PZ9nRETZyZcKswl8MwHRLVlUwg6wbmZ08m7KE=;
-        b=fAfW+GcOhr+MRlkJZhjmJmJlD5Ff1HULpRnwm+8oXT7LYBIGJoVkgOOX5DzIVvLx4q
-         k/1KIX/4A/liS7UHAQs87lNFokvIF0EU+PyisUZLMkD6zPQh2HD1JpP/9Pjg1kAWRO0M
-         PUcXqJoTRSg05zt9qzY0lV0uKbjWTfYbsfLON1c4DAriD03Q8FJsgaKTiEIjYtcfcs9b
-         030MilIIdv9ExHYg6VXV9h44PnZZyizv+aEkaidEUojRy0poHABNrh0fxU7tctUKPbQS
-         zfhfLcMjsE44a5p8H5Xvzkh0V0nSg3n/JTNfqd7TH1ujl7U84fgk713AXYvew0oEbEeV
-         6ueg==
-X-Forwarded-Encrypted: i=1; AJvYcCWMpFUEiaPUv1I/7X7KaTsUl5QBOk2lqnbdUSD3bISv8sEwR5a1MJRrWCW7/r9PDALBWPnfvZUT@vger.kernel.org, AJvYcCXL1XymzVJJJBIuI/3Gi6Cnwfv21k05u8Jt4LnuWvNiCr/k2smj3xJhqc0Ytx7hnO6SeM4NhED0vcTascC6fhI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCGcsyd6Fa2VdEf7emkRSVv0VRjfJweT2qgjsEHZBmpQX8k5YB
-	X0XPOs3iHJbeqoQLDoZBil9IE4wD3A/3IUaayycfrx8lgT21jEvK
-X-Google-Smtp-Source: AGHT+IEVpe9tDkDc1vZZ7HFLoUta5rz1pB7tC6rSPbMNRzm6L84KT8m1JHtPEN/BA0FoZQhQ714EkA==
-X-Received: by 2002:a05:6830:3982:b0:703:6076:a47 with SMTP id 46e09a7af769-70f5c465688mr760725a34.23.1724873614252;
-        Wed, 28 Aug 2024 12:33:34 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c162d1cf61sm67773056d6.28.2024.08.28.12.33.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 12:33:33 -0700 (PDT)
-Date: Wed, 28 Aug 2024 15:33:33 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- ncardwell@google.com, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org, 
- fw@strlen.de, 
- Willem de Bruijn <willemb@google.com>, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- martineau@kernel.org
-Message-ID: <66cf7b8d1c480_36509229439@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240828090120.71be0b20@kernel.org>
-References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
- <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
- <66cf2e4bd8e89_33815c294b2@willemb.c.googlers.com.notmuch>
- <20240828090120.71be0b20@kernel.org>
-Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
- ksft
+        d=1e100.net; s=20230601; t=1724874000; x=1725478800;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5ETaQUT+PPfbI9id4ycXuo8+5bQkOihsNpmgMv07doI=;
+        b=R2EQRsU8uXCqgHiazhLbPUYTHsFOO1iF885A+FAD/LEbV9cGOJ9VX6whK6hrk679FZ
+         G/SXe/uYJkrZ25YBX4o6+vzPHz60dxkteBMReYIlkER+aImoaRciTg19438XzwlW4uNi
+         2LHKBl+i45qe3ChjberfNjRLCKlYo0WOrWU5IDjZpCX3WHujooZPPK9Ze7OoXF2eUcuc
+         SYi06e+dJLfqkLnw1jeqv3Pgpv3l/P/OgCKw5o7JUOtDVwDjZSM01DNpyh32Vz78sxPw
+         y5jEW0IhBjBYnLnnVRIb1YvVY1r6AtSaHjmp5YOQOfcXL0cbyKP9yVL1sqnfqfapodmH
+         cM+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUIPL7CT6KArVb1Mww/2HuxkODy7NzXwAShsTtGuSaSasOIdGvsZS7SFQt42c0ni00kcZm+HNs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUT8FUTNmyOVkAsdE4zVOlfZlmPXXOSV5xx6fAdQiitOZTPf6v
+	ZCscp885uBkvgZrQAAFL7zKNBDFYL/Vjq+f1Zl41shvVPIOWhqkd4cRo9Q6LFnIk4CmNuArmrIR
+	G0Yy2sCaPQg==
+X-Google-Smtp-Source: AGHT+IGi//vftVw5AuTC+AY7KB6bjk/NxIxgwlUQrdWDL1jM2sIKWvm0q4MM/KptMfYmJsezyAh3eqj6oDiOTw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a25:ab27:0:b0:e03:59e2:e82 with SMTP id
+ 3f1490d57ef6-e1a5ae0c182mr471276.10.1724873999905; Wed, 28 Aug 2024 12:39:59
+ -0700 (PDT)
+Date: Wed, 28 Aug 2024 19:39:45 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+X-Mailer: git-send-email 2.46.0.295.g3b9ea8a38a-goog
+Message-ID: <20240828193948.2692476-1-edumazet@google.com>
+Subject: [PATCH net-next 0/3] icmp: avoid possible side-channels attacks
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, Willy Tarreau <w@1wt.eu>, Keyu Man <keyu.man@email.ucr.edu>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Jakub Kicinski wrote:
-> On Wed, 28 Aug 2024 10:03:55 -0400 Willem de Bruijn wrote:
-> > > > A single script is much
-> > > > simpler, optionally with nested KTAP (not supported yet by ksft). But,
-> > > > I'm afraid that running time without intermediate output will be very
-> > > > long when we integrate all packetdrill scripts.  
-> > > 
-> > > If I read correctly, this runs the scripts in the given directory 
-> > > sequentially (as opposed to the default pktdrill run_all.py behavior 
-> > > that uses many concurrent threads).
-> > > 
-> > > I guess/fear that running all the pktdrill tests in a single batch would 
-> > > take quite a long time, which in turn could be not so good for CI 
-> > > integration. Currently there are a couple of CI test-cases with runtime   
-> > >  > 1h, but that is bad ;)  
-> > 
-> > Very good point, thanks! This is the third packetdrill runner that I'm
-> > writing. I should know this by now.. Let me see whether I can use
-> > run_all.py rather than reinvent the wheel here.
-> 
-> Do we have to worry about this now? If you're planning to add a runner
-> specifically for packetdrill... IDK if we should. We already have a few
-> runners, not to mention that run_kselftest.sh itself can run all the
-> test cases in parallel in separate network namespaces!
-> 
-> What I was wondering is whether we can use shebang to direct the .pkt
-> files to be "executed" by the python script. Alternatively we can add
-> support to specifying "interpreter" for a given test in ksft infra
-> (kinda like we can pass cmd line arguments to a test). Completely
-> untested but it should give better idea what I mean than a description:
-> 
-> diff --git a/tools/testing/selftests/kselftest/runner.sh b/tools/testing/selftests/kselftest/runner.sh
-> index 74954f6a8f94..429c279e9c6e 100644
-> --- a/tools/testing/selftests/kselftest/runner.sh
-> +++ b/tools/testing/selftests/kselftest/runner.sh
-> @@ -56,6 +56,7 @@ run_one()
->  	export kselftest_timeout="$kselftest_default_timeout"
->  
->  	# Safe default if tr not available
-> +	kselftest_interp_ref="KSELFTEST_INTERP"
->  	kselftest_cmd_args_ref="KSELFTEST_ARGS"
->  
->  	# Optional arguments for this command, possibly defined as an
-> @@ -78,6 +79,14 @@ run_one()
->  					$TR_CMD [:lower:] [:upper:])
->  		kselftest_cmd_args_ref="KSELFTEST_${BASENAME_SANITIZED}_ARGS"
->  	fi
-> +	# Optional interpreter to run the test case
-> +	if [ -n "$TR_CMD" ]; then
-> +		SUFFIX_SANITIZED=$(echo "${BASENAME_TEST#*.}" | \
-> +				       $TR_CMD -d "[:blank:][:cntrl:]" | \
-> +				       $TR_CMD -c "[:alnum:]_" "_" | \
-> +				       $TR_CMD [:lower:] [:upper:])
-> +		kselftest_interp_ref="KSELFTEST_${SUFFIX_SANITIZED}_INTERP"
-> +	fi
->  
->  	# Load per-test-directory kselftest "settings" file.
->  	settings="$BASE_DIR/$DIR/settings"
-> @@ -110,8 +119,12 @@ run_one()
->  		if [ -x /usr/bin/stdbuf ]; then
->  			stdbuf="/usr/bin/stdbuf --output=L "
->  		fi
-> +		eval kselftest_interp="\$${kselftest_interp_ref:-}"
-> +		# Add a space at the end if interpreter is set to work in $cmd
-> +		[ -n "$kselftest_interp" ] && \
-> +		    kselftest_interp="$kselftest_interp "
->  		eval kselftest_cmd_args="\$${kselftest_cmd_args_ref:-}"
-> -		cmd="$stdbuf ./$BASENAME_TEST $kselftest_cmd_args"
-> +		cmd="$stdbuf ./$kselftest_interp$BASENAME_TEST $kselftest_cmd_args"
->  		if [ ! -x "$TEST" ]; then
->  			echo "# Warning: file $TEST is not executable"
+Keyu Man reminded us that linux ICMP rate limiting was still allowing
+side-channels attacks.
 
-That could work.
+Quoting the fine document [1]:
 
-Is reporting one KTAP and exitcode per directory vs per packetdrill
-invocation good/bad/neither?
+4.4 Private Source Port Scan Method
+...
+ We can then use the same global ICMP rate limit as a side
+ channel to infer if such an ICMP message has been triggered. At
+ first glance, this method can work but at a low speed of one port
+ per second, due to the per-IP rate limit on ICMP messages.
+ Surprisingly, after we analyze the source code of the ICMP rate
+ limit implementation, we find that the global rate limit is checked
+ prior to the per-IP rate limit. This means that even if the per-IP
+ rate limit may eventually determine that no ICMP reply should be
+ sent, a packet is still subjected to the global rate limit check and one
+ token is deducted. Ironically, such a decision is consciously made
+ by Linux developers to avoid invoking the expensive check of the
+ per-IP rate limit [ 22], involving a search process to locate the per-IP
+ data structure.
+ This effectively means that the per-IP rate limit can be disre-
+ garded for the purpose of our side channel based scan, as it only
+ determines if the final ICMP reply is generated but has nothing to
+ do with the global rate limit counter decrement. As a result, we can
+ continue to use roughly the same scan method as efficient as before,
+ achieving 1,000 ports per second
+...
 
-Three other issues if this is calling packetdrill directly is
-- passing the non-trivial IP specific flags
-- running twice, for IPv4 and IPv6
-- chdir into the directory of the pkt file
+This series :
 
-That can be addressed by instead calling a small wrapper shell script.
+1) Changes the order of the two rate limiters to fix the issue.
 
-That would do the test_func_builder part of packetdrill_ksft.py.
-But without the need to handle netns, popen/cmd, etc, and thus the
-ksft dependencies.
+2-3) Make the 'host-wide' rate limiter a per-netns one.
+
+[1]
+Link: https://dl.acm.org/doi/pdf/10.1145/3372297.3417280
+
+Eric Dumazet (3):
+  icmp: change the order of rate limits
+  icmp: move icmp_global.credit and icmp_global.stamp to per netns
+    storage
+  icmp: icmp_msgs_per_sec and icmp_msgs_burst sysctls become per netns
+
+ include/net/ip.h           |   5 +-
+ include/net/netns/ipv4.h   |   5 +-
+ net/ipv4/icmp.c            | 111 +++++++++++++++++++------------------
+ net/ipv4/sysctl_net_ipv4.c |  32 +++++------
+ net/ipv6/icmp.c            |  28 ++++++----
+ 5 files changed, 97 insertions(+), 84 deletions(-)
+
+-- 
+2.46.0.295.g3b9ea8a38a-goog
+
 
