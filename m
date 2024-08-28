@@ -1,156 +1,97 @@
-Return-Path: <netdev+bounces-122811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60D06962A45
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:32:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9740962A4B
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 16:32:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEA2D1F21EE0
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:32:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51061B212B4
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 14:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577CC1684A0;
-	Wed, 28 Aug 2024 14:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C801A18A6B9;
+	Wed, 28 Aug 2024 14:32:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RLLj6mIJ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cL7IaxrU"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FD645C1C;
-	Wed, 28 Aug 2024 14:31:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4A5F19DF48;
+	Wed, 28 Aug 2024 14:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724855519; cv=none; b=IfGfci518blAkDYK/HaJks88gjQ7LVvIXi7o/zxTHgU5JI7xEqvW/qrHUAB5x2Mkb5zVSm+J5T6JG29sn61yYzi18gFrmIhJxG9uNbuAv44diKAgEQyyGJCgpXl+ifCeh1555SuUlYr/4Lv8Ep+U2BNrDNrqIP9hAgKIVLZCm/E=
+	t=1724855551; cv=none; b=ac3XGBsdRnS3lzLhfTt5q24PMOXge2qSiM6TY7RTXkmdgbq/0UalOqkpBGPuS2Pnaj6i8/HOY+U6AnLXxPtTN4kjn7/LsXb/d4C+fJarnix59d9CRKI8iJgnLvoGwgjP8q/K3nkSVSl4KMCzofbCm5VQCQXDJWxjt9rWe+IeeZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724855519; c=relaxed/simple;
-	bh=InPDwIJmiujrgfQpi96LUvkRVAzQqx0fcm7jAgfQpEw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iQApV5CZAcv2Thh9DHFe0yUJw7BuqwnNSrbnABoA2j2xlerdCQTzUzlwECwissN8PVtddNT1FGMkkYON+IQjcT0fd6qnikl/yubFkOBejBDPsVILnonj/579x2ZcN7K+Xf6D9z3YOnpwqasdYDDUw88ZMWwceneXZ5DYN8yqzC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RLLj6mIJ; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id D26BE40003;
-	Wed, 28 Aug 2024 14:31:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1724855514;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zBp11t92VbRmerW/yNZLIw8ZxxUVRQYze0GfI/bV7yg=;
-	b=RLLj6mIJwOxD4F4Ih3EczWnuu0JhM2qh58gi/MD1Sa3Lta75YgjMDUJ8+uO4MQSDz4FYY6
-	m8q3NAJDXBcl6KQ3rey/8CZFJRZkJwZRvIyJXJFN6zOPmzKGitwfvLSAenmXterpgvmyoc
-	+WKxz/AXSepM4tFICNISb9sq6b7YdrfNa90wu9NgaXtxY/RAW9ygw77MjHquEFC2q4JoOS
-	fXuh1jHZy+dp/9swBngkuOou+yOZDndmZbb494c5+1QUkUYMxcLb+c/DChDr61ycP/sV9L
-	VJneaxmD6ees3e5lFbVyaLPED7bcNJ8JPsGdfeeQJWHxgKoc+aJvQrW+LWP5YQ==
-Date: Wed, 28 Aug 2024 16:31:51 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, Pantelis Antoniou <pantelis.antoniou@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Florian Fainelli
- <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Herve Codina <herve.codina@bootlin.com>,
- linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next 6/6] net: ethernet: fs_enet: phylink conversion
-Message-ID: <20240828163151.485b2907@device-28.home>
-In-Reply-To: <Zs8sMUxX7mnWZQnA@shell.armlinux.org.uk>
-References: <20240828095103.132625-1-maxime.chevallier@bootlin.com>
-	<20240828095103.132625-7-maxime.chevallier@bootlin.com>
-	<Zs7+J5JWpfvSQ8/T@shell.armlinux.org.uk>
-	<20240828134413.3da6f336@device-28.home>
-	<Zs8sMUxX7mnWZQnA@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1724855551; c=relaxed/simple;
+	bh=bT/aBCNB9QqhKwNipP1APafK9kmjMXK56AvUxp8ZDYw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WP0Rq0gR9fYJH87igeAB6ob44mp3oQw7TsA9vsqALdRbcXe+qz0yFpWkW/KQCyWqKJe+441y+sE/DszFTOD/15kiPJTOYKDRksJqjSxMCFun2ET2MBf2Aw8F7dtGFn30KmFUjbEY0W/46DEJR/c8C+SOYa6imypz+ohIou0Dxik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cL7IaxrU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=upv6Gct3p8vF5m+JDKyEPBGa87pA4XfIxFiex6ZYkpc=; b=cL7IaxrU5cZh/nXivzyQcjY6tA
+	XLrNAY64flw9b0tGm00VVgr5hGfVQ+lFFGHfwQnc4GKOkxmKDZ0p2QTCiVbb72Ap9/U8uYIz9O0L3
+	YkoXOJ9v5yG7J27hqGhyMn5kpKffKOsGcwMH+EdrIHmTK+ws2GbfwH5CZkM5h76tVwrI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sjJiQ-005wX9-0I; Wed, 28 Aug 2024 16:32:06 +0200
+Date: Wed, 28 Aug 2024 16:32:05 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: woojung.huh@microchip.com, f.fainelli@gmail.com, olteanv@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
+	justin.chen@broadcom.com, sebastian.hesselbarth@gmail.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com, wens@csie.org, jernej.skrabec@gmail.com,
+	samuel@sholland.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	ansuelsmth@gmail.com, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-stm32@st-md-mailman.stormreply.com, krzk@kernel.org,
+	jic23@kernel.org
+Subject: Re: [PATCH net-next v2 00/13] net: Simplified with scoped function
+Message-ID: <6092e318-ae0c-44f6-89fa-989a384921b7@lunn.ch>
+References: <20240828032343.1218749-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240828032343.1218749-1-ruanjinjie@huawei.com>
 
-Hello Russell,
-
-On Wed, 28 Aug 2024 14:54:57 +0100
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-
-> On Wed, Aug 28, 2024 at 01:44:13PM +0200, Maxime Chevallier wrote:
-> > Hi Russell,
-> > 
-> > On Wed, 28 Aug 2024 11:38:31 +0100
-> > "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-> >   
-> > > On Wed, Aug 28, 2024 at 11:51:02AM +0200, Maxime Chevallier wrote:  
-> > > > +static int fs_eth_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
-> > > > +{
-> > > > +	struct fs_enet_private *fep = netdev_priv(dev);
-> > > > +
-> > > > +	if (!netif_running(dev))
-> > > > +		return -EINVAL;    
-> > > 
-> > > Why do you need this check?
-> > >   
-> > 
-> > I included it as the original ioctl was phy_do_ioctl_running(), which
-> > includes that check.
-> > 
-> > Is this check irrelevant with phylink ? I could only find macb and
-> > xilinx_axienet that do the same check in their ioctl.
-> > 
-> > I can't tell you why that check is there in the first place in that
-> > driver, a quick grep search leads back from a major driver rework in
-> > 2011, at which point the check was already there...  
+On Wed, Aug 28, 2024 at 11:23:30AM +0800, Jinjie Ruan wrote:
+> Simplify with scoped for each OF child loop and __free(), as well as
+> dev_err_probe().
 > 
-> int phylink_mii_ioctl(struct phylink *pl, struct ifreq *ifr, int cmd)
-> {
-> 	if (pl->phydev) {
-> 		... do PHY based access / pass on to phylib ...
-> 	} else {
-> 		... for reads:
-> 		...  return emulated fixed-phy state if in fixed mode
-> 		...  return emulated inband state if in inband mode
-> 		... for writes:
-> 		...  ignore writes in fixed and inband modes
-> 		... otherwise return -EOPNOTSUPP
-> 	}
-> }
-> 
-> So, if a driver decides to connect the PHY during probe, the PHY will
-> always be accessible.
-> 
-> If a driver decides to connect the PHY during .ndo_open, the PHY will
-> only be accessible while the netdev is open, otherwise -EOPNOTSUPP
-> will be returned.
+> Changes in v2:
+> - Subject prefix: next -> net-next.
+> - Split __free() from scoped for each OF child loop clean.
+> - Fix use of_node_put() instead of __free() for the 5th patch.
 
-That makes sense, so there's no point keeping that check then.
+I personally think all these __free() are ugly and magical. Can it
+somehow be made part of of_get_child_by_name()? Add an
+of_get_child_by_name_func_ref() which holds a reference to the node
+for the scope of the function?
 
-I'll update the patch, thanks for this clarification.
+for_each_available_child_of_node_scoped() is fine. Once you have fixed
+all the reverse christmas tree, please submit them. But i would like
+to see alternatives to __free(), once which are less ugly.
 
-[...]
+	Andrew
 
-> At this point... this email has eaten up a substantial amount of time,
-> and I can't spend anymore time in front of the screen today so that's
-> the end of my contributions for today. Sorry.
+---
+pw-bot: cr
 
-I've been in the same rabbit-hole today debating in my head whether or
-not to add this check, I'm sorry that I dragged you in there... With
-what you stressed-out, I have a good enough justification to drop the
-check in the current patch.
-
-As for the current situation with the ioctl return codes, there indeed
-room for lots of improvements. For drivers that simply forward the
-ioctl to phylib/phylink, I think we could pretty easily add some
-consistency on the return code, provided we agree on the proper one to
-return.
-
-Thanks for your time,
-
-Maxime 
 
