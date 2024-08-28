@@ -1,98 +1,106 @@
-Return-Path: <netdev+bounces-122738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4BD9962600
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:26:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B5439625FF
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:26:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2439C1C22877
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 11:26:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 014DF1F26677
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 11:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3E716CD2A;
-	Wed, 28 Aug 2024 11:26:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C3E16D307;
+	Wed, 28 Aug 2024 11:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="naIJUapi"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87563FEC;
-	Wed, 28 Aug 2024 11:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD34A3FEC
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 11:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724844388; cv=none; b=CI5FtEB1g1FODa0GW5bhfevMXdHHZeHEc3USld50bFK/ULMcYlCyd3ZmSYuQaN/DXQeqnMKZjo0y6Q3ReVhIiD3eN270upMqUIGdQUCjAwuTgBA+neWvDHpqVJNCBvJg660ZvZJg63Ha3T+0ertkVlve2N99nnbHwyxoTQXPpcQ=
+	t=1724844383; cv=none; b=uAyX+ySapjAyPHYSb/cClMxf2QTtqlQ5nQywrMuXgfxvQYxTGdn4wDdX0skyq5v1dqumz+mSqn5WYsoh/FsgC3X83xbVCKvgPDcoyEuf47Pdfye5/r9ue2OlpiYYkrx2dKqLmmZbPD+17wNCN8i1WdwbHckMFlK3Kyy6gW9XHUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724844388; c=relaxed/simple;
-	bh=Le1Vfo7fOKhLyWpNlP2q66mH8jrOV4x4y91GBTZVU2k=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JZGv3iZsI3KoWZwAuPBej4DxauQ4h53+rEP9Bo8pOIKWmwpREE54iVgInMKSr5V50oFGm9HDWRW3zBInsx2vHEC+IiK2dt3SP635/qupkBeXDWw0y+XYka0Q4U7eyTwA/ikwEjB2m640N93oUNcxnTQwerhbcHzM2CoirHLjxN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Wv28S5Yvrz6K8n6;
-	Wed, 28 Aug 2024 19:23:04 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
-	by mail.maildlp.com (Postfix) with ESMTPS id E2D30140B20;
-	Wed, 28 Aug 2024 19:26:22 +0800 (CST)
-Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
- (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Wed, 28 Aug
- 2024 12:26:14 +0100
-Date: Wed, 28 Aug 2024 12:26:13 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>,
-	<martin.habets@xilinx.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<richard.hughes@amd.com>
-Subject: Re: [PATCH v2 09/15] cxl: define a driver interface for HPA free
- space enumaration
-Message-ID: <20240828122613.000032e9@Huawei.com>
-In-Reply-To: <446d8183-d334-bf5c-8ba8-de957b7e8edb@amd.com>
-References: <20240715172835.24757-1-alejandro.lucero-palau@amd.com>
-	<20240715172835.24757-10-alejandro.lucero-palau@amd.com>
-	<20240804185756.000046c5@Huawei.com>
-	<446d8183-d334-bf5c-8ba8-de957b7e8edb@amd.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1724844383; c=relaxed/simple;
+	bh=5mimbGD1RLshSEpcHCY/Eb0s7Gm26lmThCbr+w+yclI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HQnS50L+eNNmyu55mUHjdxiVd6T0xpyX6QRD6ZNMm9Ukbe0aiaTjAJLET7sJ9U3pUeORJFm4iiF/M4EHJ+04Ek1TUWcjopW1qPHrwX9DQRzo3HqppxIfV5CF2udM7Y3m1IApxAkuQ58I3U8Jei9P/NBEREZcPM+8CoWboKuu3hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=naIJUapi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1DDCC98EC1;
+	Wed, 28 Aug 2024 11:26:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724844383;
+	bh=5mimbGD1RLshSEpcHCY/Eb0s7Gm26lmThCbr+w+yclI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=naIJUapiFNxxbY+rLG+VoIEWJ8sqbJoEZQzzTeZc2um9xlbDeo+ahPmPm7MBRETAn
+	 DFea5WZtYx+XrZgHHq8RV9k5yb2Qm8B0o1FVfBOxOkFc425aHEcBL3l+0wMwii00kc
+	 lsOCk2f1EAl9vV7bE8LDLu8Rtki60ZppemwwXOrGfi8hMmDkn9l7Dt0/HxgV9E2Gvl
+	 r7ui85uj7G2G/9QaXGe/Pxxpt9/P4iBOb6txIY6RYpA6dMjrheDCkWR9X8qYLqpcWN
+	 AHnGwBJEGydAkho2PGTUh1k3Gs9wzeELq3AQa5QfFT0Dx3MfSLERnkQfRqyfAjHayV
+	 YrSqZOzAmdnpQ==
+Date: Wed, 28 Aug 2024 14:26:19 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Feng Wang <wangfe@google.com>, netdev@vger.kernel.org,
+	antony.antony@secunet.com
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+Message-ID: <20240828112619.GA8373@unreal>
+References: <20240822200252.472298-1-wangfe@google.com>
+ <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- lhrpeml500005.china.huawei.com (7.191.163.240)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
 
-On Wed, 28 Aug 2024 11:41:11 +0100
-Alejandro Lucero Palau <alucerop@amd.com> wrote:
-
-> On 8/4/24 18:57, Jonathan Cameron wrote:
-> > + }  
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +/**
-> >> + * cxl_get_hpa_freespace - find a root decoder with free capacity per constraints
-> >> + * @endpoint: an endpoint that is mapped by the returned decoder
-> >> + * @interleave_ways: number of entries in @host_bridges
-> >> + * @flags: CXL_DECODER_F flags for selecting RAM vs PMEM, and HDM-H vs HDM-D[B]
-> >> + * @max: output parameter of bytes available in the returned decoder  
-> > @available_size
-> > or something along those lines. I'd expect max to be the end address of the available
-> > region  
+On Wed, Aug 28, 2024 at 07:32:47AM +0200, Steffen Klassert wrote:
+> On Thu, Aug 22, 2024 at 01:02:52PM -0700, Feng Wang wrote:
+> > From: wangfe <wangfe@google.com>
+> > 
+> > In packet offload mode, append Security Association (SA) information
+> > to each packet, replicating the crypto offload implementation.
+> > The XFRM_XMIT flag is set to enable packet to be returned immediately
+> > from the validate_xmit_xfrm function, thus aligning with the existing
+> > code path for packet offload mode.
+> > 
+> > This SA info helps HW offload match packets to their correct security
+> > policies. The XFRM interface ID is included, which is crucial in setups
+> > with multiple XFRM interfaces where source/destination addresses alone
+> > can't pinpoint the right policy.
+> > 
+> > Signed-off-by: wangfe <wangfe@google.com>
 > 
-> 
-> No really. The code looks for the biggest free hole in the HPA. 
-> Returning available size does not help except from informing about the 
-> "internal fragmentation".
+> Applied to ipsec-next, thanks Feng!
 
-I worded that badly.  Intent was that to me 'max' ==  maximum address, not maximum available
-contiguous range.  max_hole or max_avail_contig maybe?
+Stephen, can you please explain why do you think that this is correct
+thing to do?
 
-> 
+There are no in-tree any drivers which is using this information, and it
+is unclear to me how state is released and it has controversial code
+around validity of xfrm_offload() too.
+
+For example:
++		sp->olen++;
++		sp->xvec[sp->len++] = x;
++		xfrm_state_hold(x);
++
++		xo = xfrm_offload(skb);
++		if (!xo) { <--- previous code handled this case perfectly in validate_xmit_xfrm
++			secpath_reset(skb);
++			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
++			kfree_skb(skb);
++			return -EINVAL; <--- xfrm state leak
++		}
+
+
+Can you please revert/drop this patch for now?
+
+Thanks
 
