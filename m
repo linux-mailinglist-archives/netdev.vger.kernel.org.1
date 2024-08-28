@@ -1,28 +1,29 @@
-Return-Path: <netdev+bounces-122949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCC0296341A
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 23:47:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67AB596341B
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 23:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 954542867FC
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 21:47:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E27C1F25374
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 21:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B1D81AC45D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341AF1AD40F;
 	Wed, 28 Aug 2024 21:47:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8AD156875;
-	Wed, 28 Aug 2024 21:47:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EE641A76AD;
+	Wed, 28 Aug 2024 21:47:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724881643; cv=none; b=t+zApIX53n+8XE9PdVSgTyK7UZvftMglA5dvwVMFbhWX4Gd3kBxQp1DsZOmsOe5ltkEqkx62be+wqyJNUE/Gm246wKZzGV4rcRIreK9XRKSho9cXvZJq6n0fb70nTFYnXieTD+RLGrZWM+PQL6cwly6HvtS3VAczdgrj+9YLm3Q=
+	t=1724881643; cv=none; b=XrWDEyNyYJB6QA+sJMBuW6g7A+T5bAAepJoL2d7qPoE3pmBUNRgnDleIxtkBws6fhGkeSamd+D2EFq4ZMkoGW7jYv8/nSHq1Hznzjq5XxmXL3Hhl8Zt7stCt1HUfkz/9b8ei49MYGatS58a8BIQInkAnmNyGedS5DtVjYOyZpww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724881643; c=relaxed/simple;
-	bh=NQiWokQAjGw6gIvPax91lSkOf0D9XA230vnXUtWyoY0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Hs5hCDeraahHs1Pjr7S2cuONXmVXUJzolTkf1hQYI55/qiP/Suo7ulPwj7oAGNCVVEeDEET7J/hu/zLR8pSG3WX5scYhqAryAqLysGCvWVVUCjiaNVz0pVVOIatmsxBpuqFaIl7YVvZytOezVlYPY1kB9zglLSLp1rtNOj7Dog0=
+	bh=bdNuz7ZuoR5hbXBd1PTzWYI8PyfV2TKKLdKN4Zv/8G8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=TLHSKgUdBB0ngoA22kNeDW1Xzp7gXVhgRp7J8fwWUUXNMpVis+aClmWBPUBXekm+qcBvxt9AE3VhY43TLnicJnQNT3FJ7f3IhL0BrDfw6D4D1SB5O3i7a+jycf+vVdtCSeEKKZT9vnJUxFEO34m04bFR6GiY0ql/5JnucXOqRvY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
@@ -34,10 +35,12 @@ Cc: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	fw@strlen.de
-Subject: [PATCH net 0/2] Netfilter fixes for net
-Date: Wed, 28 Aug 2024 23:47:06 +0200
-Message-Id: <20240828214708.619261-1-pablo@netfilter.org>
+Subject: [PATCH net 1/2] netfilter: nf_tables: restore IP sanity checks for netdev/egress
+Date: Wed, 28 Aug 2024 23:47:07 +0200
+Message-Id: <20240828214708.619261-2-pablo@netfilter.org>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240828214708.619261-1-pablo@netfilter.org>
+References: <20240828214708.619261-1-pablo@netfilter.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -46,47 +49,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+Subtract network offset to skb->len before performing IPv4 header sanity
+checks, then adjust transport offset from offset from mac header.
 
-The following patchset contains Netfilter fixes for net:
+Jorge Ortiz says:
 
-Patch #1 sets on NFT_PKTINFO_L4PROTO for UDP packets less than 4 bytes
-payload from netdev/egress by subtracting skb_network_offset() when
-validating IPv4 packet length, otherwise 'meta l4proto udp' never
-matches.
+When small UDP packets (< 4 bytes payload) are sent from eth0,
+`meta l4proto udp` condition is not met because `NFT_PKTINFO_L4PROTO` is
+not set. This happens because there is a comparison that checks if the
+transport header offset exceeds the total length.  This comparison does
+not take into account the fact that the skb network offset might be
+non-zero in egress mode (e.g., 14 bytes for Ethernet header).
 
-Patch #2 subtracts skb_network_offset() when validating IPv6 packet
-length for netdev/egress.
-
-Please, pull these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-08-28
-
-Thanks.
-
-----------------------------------------------------------------
-
-The following changes since commit 8af174ea863c72f25ce31cee3baad8a301c0cf0f:
-
-  net: mana: Fix race of mana_hwc_post_rx_wqe and new hwc response (2024-08-23 14:24:24 +0100)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-08-28
-
-for you to fetch changes up to 70c261d500951cf3ea0fcf32651aab9a65a91471:
-
-  netfilter: nf_tables_ipv6: consider network offset in netdev/egress validation (2024-08-27 18:11:56 +0200)
-
-----------------------------------------------------------------
-netfilter pull request 24-08-28
-
-----------------------------------------------------------------
-Pablo Neira Ayuso (2):
-      netfilter: nf_tables: restore IP sanity checks for netdev/egress
-      netfilter: nf_tables_ipv6: consider network offset in netdev/egress validation
-
+Fixes: 0ae8e4cca787 ("netfilter: nf_tables: set transport offset from mac header for netdev/egress")
+Reported-by: Jorge Ortiz <jorge.ortiz.escribano@gmail.com>
+Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+---
  include/net/netfilter/nf_tables_ipv4.h | 10 ++++++----
- include/net/netfilter/nf_tables_ipv6.h |  5 +++--
- 2 files changed, 9 insertions(+), 6 deletions(-)
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/include/net/netfilter/nf_tables_ipv4.h b/include/net/netfilter/nf_tables_ipv4.h
+index 60a7d0ce3080..fcf967286e37 100644
+--- a/include/net/netfilter/nf_tables_ipv4.h
++++ b/include/net/netfilter/nf_tables_ipv4.h
+@@ -19,7 +19,7 @@ static inline void nft_set_pktinfo_ipv4(struct nft_pktinfo *pkt)
+ static inline int __nft_set_pktinfo_ipv4_validate(struct nft_pktinfo *pkt)
+ {
+ 	struct iphdr *iph, _iph;
+-	u32 len, thoff;
++	u32 len, thoff, skb_len;
+ 
+ 	iph = skb_header_pointer(pkt->skb, skb_network_offset(pkt->skb),
+ 				 sizeof(*iph), &_iph);
+@@ -30,8 +30,10 @@ static inline int __nft_set_pktinfo_ipv4_validate(struct nft_pktinfo *pkt)
+ 		return -1;
+ 
+ 	len = iph_totlen(pkt->skb, iph);
+-	thoff = skb_network_offset(pkt->skb) + (iph->ihl * 4);
+-	if (pkt->skb->len < len)
++	thoff = iph->ihl * 4;
++	skb_len = pkt->skb->len - skb_network_offset(pkt->skb);
++
++	if (skb_len < len)
+ 		return -1;
+ 	else if (len < thoff)
+ 		return -1;
+@@ -40,7 +42,7 @@ static inline int __nft_set_pktinfo_ipv4_validate(struct nft_pktinfo *pkt)
+ 
+ 	pkt->flags = NFT_PKTINFO_L4PROTO;
+ 	pkt->tprot = iph->protocol;
+-	pkt->thoff = thoff;
++	pkt->thoff = skb_network_offset(pkt->skb) + thoff;
+ 	pkt->fragoff = ntohs(iph->frag_off) & IP_OFFSET;
+ 
+ 	return 0;
+-- 
+2.30.2
+
 
