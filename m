@@ -1,89 +1,63 @@
-Return-Path: <netdev+bounces-122568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C27A961C12
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 04:24:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC89C961C1C
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 04:28:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D73DAB230E4
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 02:24:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 792761F244C5
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 02:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9310D6F06A;
-	Wed, 28 Aug 2024 02:24:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDB7487BE;
+	Wed, 28 Aug 2024 02:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9Bmt1JR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0RNunuW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF74481B3;
-	Wed, 28 Aug 2024 02:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C870111CBD
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 02:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724811875; cv=none; b=U8N+6m44nYBDymuCksiX2gGrS/veRxwo+sIsFI+w34CAr7NoOm6HGtwJQMLnx85/n4lEMykJy4081/jTgez4R5FQuyYfij+YlSNg3bWMszRzMFN3m9Ovqbwr7Eje9LK6ndEzkn9GbW4dkRItM7tqcfMfCUqR79Amn1C15KJeEo8=
+	t=1724812082; cv=none; b=oLs30HIczcYd5hza5L+N0P7mupUm/hD2qqGUUpiOMMj0SvreH5ny2DGIOeactL2a57WEwnUzh9ZujOFDxDp3/8SIg2rh2kRG1uCW/9K/+vCHjnkvhNMooL8jJXKA2bga33EHJRJTSTcET9bOok8xiRdgb3la3u1YfZ3dNHm8PWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724811875; c=relaxed/simple;
-	bh=tbhzQ1da3mBVV060Og29QANn1s4vz5Vd4ovZ/NNJcUg=;
+	s=arc-20240116; t=1724812082; c=relaxed/simple;
+	bh=62hJEAf8diwsuVJbtFhmrKymEVz2YyRzgnk6iW146Nc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u5aEUoWvDmUqMs0c9BmJSCKrEw+/wJAr7ybcv8sT+gvqIQKl9lsaDWM9uv5QiqmW0ZIm/DuwNNPw3IBHY+5s4uggJx4wNcUdkHrCVgIa2ITWA7PiQ6E5lg+bpWScRzmL2nWCUogKSgh2eZKnjnnKRlXxYc+CcIfyphh1JrstlV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9Bmt1JR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E784C4FEE9;
-	Wed, 28 Aug 2024 02:24:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UZOS/w1rH6aCBTIExtJDblyIHQIBTdYQ8Wu1SXBi2Cc5+sk6M4AXgzOp/2mqob+nlDCUT+TS4sCSCX1i605A9AGhCRhm9YpW3t7WyoobHnM/nXLLfi9kVHa8L59d1jMnrBbyxsYv+Xl6wAso762CrzqnSKrKn77B27wr2KIJzSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0RNunuW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31E32C4DE14;
+	Wed, 28 Aug 2024 02:28:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724811874;
-	bh=tbhzQ1da3mBVV060Og29QANn1s4vz5Vd4ovZ/NNJcUg=;
+	s=k20201202; t=1724812082;
+	bh=62hJEAf8diwsuVJbtFhmrKymEVz2YyRzgnk6iW146Nc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=b9Bmt1JRKFBCrnIFqkRTsrtV2UxALLlwq9vjsa8mb6ADifsmdWpQkF6hV/RYp8vQA
-	 KnlrsUZWHHrZTtadELynyygYzNgxIL5XjiYXqvsDF4WjDbVNdoVWcjeJP/CMV5jE+5
-	 zHY1WzE7dhEgfg1nYdKdE+Kss/9anIAQAvEtqTsmXn5d1UFI9SFv6kPJc99SCMRNQM
-	 e5zmbEEJvj2B7cIjhKHtljG3nSZ00UtlbSdrVtBkmpzbQotM4l2h2mL+SWEBBmpQt7
-	 JSmguwlN4ydS894ghDp569iFgNhfAjPbkNp3FHOMAwrnt4gmuwMvVn9FUd04rX88Ko
-	 f0IMC8yARB4lw==
-Date: Tue, 27 Aug 2024 19:24:31 -0700
+	b=X0RNunuWNPPAkscwfPdGuamWtZIwq3v6NeoH+yKBxcPUScEaEaQ3z09MM+m094+vH
+	 MCjNK4bnCFixhRFF5PysOYTuzuxM+FQk/3JLYgMeqLzbDgANB8C2dGun8nesv6S20C
+	 lSaE+mB3+ReCYEFxQGGTcbWMkHd37dEbKmvOkn2omTiTcoSnCgy6HlR3aXNM3+LtZ6
+	 KbyA5vI+KyRo4tedli9ylOiJv1W3YIJGNldhoVPAVFeg5xrTPWj+sgfxYShpsY1JuK
+	 rmxXhQhIxaNGslnkxv546/GxLH2sA6jVoaoY9AuBt3LR9XzIJh53b17oh08onx827m
+	 945DvkIol0mAw==
+Date: Tue, 27 Aug 2024 19:28:01 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, Ivan
- Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
- <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert
- Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem
- de Bruijn <willemdebruijn.kernel@gmail.com>, "=?UTF-8?B?QmrDtnJuIFTDtnBl?=
- =?UTF-8?B?bA==?=" <bjorn@kernel.org>, Magnus Karlsson
- <magnus.karlsson@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
- Sumit Semwal <sumit.semwal@linaro.org>, "Christian =?UTF-8?B?S8O2bmln?="
- <christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, David
- Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
- <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
- Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
- Taehee Yoo <ap420073@gmail.com>, linux-mm@kvack.org, Matthew Wilcox
- <willy@infradead.org>
-Subject: Re: [PATCH net-next v22 05/13] page_pool: devmem support
-Message-ID: <20240827192431.7145b06e@kernel.org>
-In-Reply-To: <20240825041511.324452-6-almasrymina@google.com>
-References: <20240825041511.324452-1-almasrymina@google.com>
-	<20240825041511.324452-6-almasrymina@google.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>, "David S .
+ Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Eric
+ Dumazet <edumazet@google.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Sabrina
+ Dubroca <sd@queasysnail.net>, Simon Horman <horms@kernel.org>, Steffen
+ Klassert <steffen.klassert@secunet.com>
+Subject: Re: [PATCHv4 net-next 1/3] bonding: add common function to check
+ ipsec device
+Message-ID: <20240827192801.42b91fff@kernel.org>
+In-Reply-To: <Zs55_Yhu-UXkeihX@Laptop-X1>
+References: <20240821105003.547460-1-liuhangbin@gmail.com>
+	<20240821105003.547460-2-liuhangbin@gmail.com>
+	<20240827130619.1a1cd34f@kernel.org>
+	<Zs55_Yhu-UXkeihX@Laptop-X1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,28 +67,45 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 25 Aug 2024 04:15:03 +0000 Mina Almasry wrote:
-> +	/* Assume net_iov are on the preferred node without actually
-> +	 * checking...
-> +	 *
-> +	 * This check is only used to check for recycling memory in the page
-> +	 * pool's fast paths. Currently the only implementation of net_iov
-> +	 * is dmabuf device memory. It's a deliberate decision by the user to
-> +	 * bind a certain dmabuf to a certain netdev, and the netdev rx queue
-> +	 * would not be able to reallocate memory from another dmabuf that
-> +	 * exists on the preferred node, so, this check doesn't make much sense
-> +	 * in this case. Assume all net_iovs can be recycled for now.
-> +	 */
+On Wed, 28 Aug 2024 09:14:37 +0800 Hangbin Liu wrote:
+> On Tue, Aug 27, 2024 at 01:06:19PM -0700, Jakub Kicinski wrote:
+> > On Wed, 21 Aug 2024 18:50:01 +0800 Hangbin Liu wrote:  
+> > > +/**
+> > > + * bond_ipsec_dev - return the device for ipsec offload, or NULL if not exist
+> > > + *                  caller must hold rcu_read_lock.
+> > > + * @xs: pointer to transformer state struct
+> > > + **/  
+> > 
+> > in addition to the feedback on v3, nit: document the return value in
+> > kdoc for non-void functions  
+> 
+> I already document the return value. Do you want me to change the format like:
+> 
+> /**
+>  * bond_ipsec_dev - Get active device for IPsec offload,
+>  *                  caller must hold rcu_read_lock.
+>  * @xs: pointer to transformer state struct
+>  *
+>  * Return the device for ipsec offload, or NULL if not exist.
+>  **/
 
-This is probably a bit too verbose, and we shouldn't talk about dmabuf
-specifically:
+Yes, but still a bit too much info in the "short description"
+how about:
 
-	/* NUMA node preference only makes sense if we're allocating
-	 * system memory. Memory providers (which give us net_iovs)
-	 * choose for us.
-	 */
+/**
+ * bond_ipsec_dev - Get active device for IPsec offload
+ * @xs: pointer to transformer state struct
+ *
+ * Context: caller must hold rcu_read_lock.
+ *
+ * Return the device for ipsec offload, or NULL if not exist.
+ **/
 
-Some of the code moves could be a separate patch, but either way:
+> BTW, The patch now has conflicts with latest net-next, I can do a rebase if
+> you want.
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+net or net-next? the patches from nvidia went into net.
+If it conflicts with net-next please rebase.
+If it conflicts with net -- could you wait with repost
+until after the net PR to Linus? And then rebase & post?
 
