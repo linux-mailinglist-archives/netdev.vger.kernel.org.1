@@ -1,166 +1,94 @@
-Return-Path: <netdev+bounces-122681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D177B9622CA
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:52:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BEC29622CD
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 10:52:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A597287325
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 08:52:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FADB1C2446E
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 08:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF77165EF5;
-	Wed, 28 Aug 2024 08:50:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41311607B6;
+	Wed, 28 Aug 2024 08:51:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fFTk7Dl2"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="kIDMUdAu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680E915B12A
+	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 08:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724835067; cv=none; b=bk5/BV7F0+12YA38vZUIBKcshuWx28oZ6teb7CqM4jYV9YOM5YXZAtUKlnbTj1vV1BiWovo6dM5UhpBGEZsssoeDPO+jQcWFX6EhzmPgDCPRNG9q1mmCacq8lQoJKvivq3JXIOdwYpNXN1fSS8xs/ARa0AlAFr2l0ejUiBAu7xQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724835067; c=relaxed/simple;
+	bh=nj0Nm7m3dxEMMkzCHY6O7PKbMmoTUUusSXq0mjQd4Xc=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IigKUXgO0Lfo1Kh0d+ggjQRLHgMOLXq1Ftk2s5VMCEF9+8IcmvGXIlBLvkI0fTed6GViQ0mSV3w83GBk5H2o7WLBFapOqli+TdJvJk5jbjjnQzdZ05Uyp4IyulfJq/ukMHhbN6AfponJh5tSRga9/1njsbFq3xR/dbU/NkxAfOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=kIDMUdAu; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 25B5320518;
+	Wed, 28 Aug 2024 10:51:02 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id fMpdiTI3p8q8; Wed, 28 Aug 2024 10:51:01 +0200 (CEST)
+Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B73115B99E
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 08:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724835052; cv=none; b=jwK0ylVpbD1qdKc3aBYXt5KlDBnxzxrrQOmmlz3eWFdVW94S9NzIQqeC8K+G1gwyoMdxUAGBbCaCyfkhZOrwQhHh4O2bOvKGvSKBSq8usyqVEmngdX4f8dXdnhPKoYNgSVVinRK0E7uyvpXTEPL2whlOrE900regz9EkSbaJr28=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724835052; c=relaxed/simple;
-	bh=c9g+rp5fVpjbqkIfSqp3slDFY2jz+ztPwAXbFeXQ8t4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C+DSVJlvTjy7PA306HcWrQ8747f6YLmkmP7P6RmxHa8O34T8bTLqa/8Eh0kYifWNDiHzFoofcpz/8mcIYHO5JMwzfXOrIVAGg54OsdkOHKeBjP0J0MceJhGhmDAyXy4u/QavsH0/ZQOwLRNB9u8lrZBWznDkzv6Hfy+z5CQw15A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=fFTk7Dl2; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2d3bc043e81so5299334a91.2
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 01:50:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1724835050; x=1725439850; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=shRY5stjFi+JLGkJ+y51t2hwTW4qiG9k0qtRydA83MA=;
-        b=fFTk7Dl2INvgRC5i4K2ReeFoFvV8NCV71aqONMtVZFEYofYU34KYq/tU/A+0L3VUfd
-         S23GNQS0yv34LARi1ouwusPS0133aE/oIMgPg+qYiKVnN9TGezH5V5oEl6zAeC1n0XiI
-         BlF5P9o7gSuT+8JWQVV4GVtwi6ws60b99DYY0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724835050; x=1725439850;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=shRY5stjFi+JLGkJ+y51t2hwTW4qiG9k0qtRydA83MA=;
-        b=Pb57XnFA/h9wM7hEY0YSr1/oP/LgtArj5Xq7WQn+LgwDCfCi4zTjbMhu6Sk/C1LJsF
-         2bex7XIcpMDU39yTE5ETjhaEhVQ0Piol4K+cvNK6dELEpDt/PUv48nMrzjLhbTs+hE6V
-         Aj3q4VSgP8Y6q2fEddMSo8aQlQZVU9CmHC9TSKpfO51wlopen6bP38SD6Ur1mqEtwGUX
-         K52ZDgZAjrIWNaPr4UYBvZUwNV6ujpcIYsQ1mqWhnQvDROnzEW97xP+sj269AUR3SG8Y
-         dT/rbXOjiWqMYsLIGX6sOzaAkUVjK2+1v6kbLMc8RIif9Ow8Dbe9sc3EnmdwKeZeAFpJ
-         irqA==
-X-Forwarded-Encrypted: i=1; AJvYcCUiUOwOURTuYhLY12AE1i2+Y0s6zmPgejk7BH61Fpx2bBx0lBU+9Eyh1HGsvD9IZIolVXjwQh4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxVgmeFyluPFl5sfmT1av81GBQuZxSM2Ux5PtpqKIuzpACk0uRq
-	HN5nv7aeb5lE5fN12iiSo35FnGFYotNk473fkYQeTUXD/hdX3A2SRCvcaBmMGeAe+83p7G/dUyU
-	lSA==
-X-Google-Smtp-Source: AGHT+IGq6FJZLa1EEfe8Q6XnN8zV+OXKNWera5wQWyN99473BRSN9pCh6Zwq68D6ro5+GxN5M0vYQA==
-X-Received: by 2002:a17:90a:de8e:b0:2d3:da82:2728 with SMTP id 98e67ed59e1d1-2d646d5eba9mr15834309a91.41.1724835049454;
-        Wed, 28 Aug 2024 01:50:49 -0700 (PDT)
-Received: from [10.176.68.61] ([192.19.176.250])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d844640ab6sm1127894a91.42.2024.08.28.01.50.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 01:50:48 -0700 (PDT)
-Message-ID: <22fdbe11-830a-4084-aa5e-1b7294f3a7fd@broadcom.com>
-Date: Wed, 28 Aug 2024 10:50:43 +0200
+	by a.mx.secunet.com (Postfix) with ESMTPS id A1D49201E5;
+	Wed, 28 Aug 2024 10:51:01 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com A1D49201E5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1724835061;
+	bh=17N45y0cu1WOcHhT1BofAoWktpSH5WzHR/LqUMya9KM=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=kIDMUdAurRAp3lt85odiXouNUZ4bMvDsjVdvext7pa+t/p8ScwlD+GOhauQ8ta9BL
+	 t1uQ5JaPC3pEO3SfVhjNGkFp8mMBETXXJdjSrhbcuqdcB9xKXVTQboQAfm24XnORwN
+	 D9DXz3PcqfdH2c7darwrTIqr6nT1SOWqL1BsjPpzVRoVISkjjWuQartXaaoxZ0rR+6
+	 5qReol8Sx07gGLh98ELW79fcAbl1742OBKEuMcyaMa29z6D0HDDSc2X2qZ/5+p7oB1
+	 juFMtpjj9hU8ahJq+csNWCw8Ncuidp6GBYnIuipfERRYJyOkYcR7NXvprNAP5uHdxe
+	 nCQnjXV6Iccjw==
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 28 Aug 2024 10:51:01 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
+ (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 28 Aug
+ 2024 10:51:01 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id CC3783181C6C; Wed, 28 Aug 2024 10:51:00 +0200 (CEST)
+Date: Wed, 28 Aug 2024 10:51:00 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Florian Westphal <fw@strlen.de>
+CC: <netdev@vger.kernel.org>, <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH ipsec-next] xfrm: policy: use recently added helper in
+ more places
+Message-ID: <Zs7k9Fv3j1jrnik0@gauss3.secunet.de>
+References: <20240827133736.19187-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 3/5] dt-bindings: net: wireless: brcm4329-fmac: change
- properties enum structure
-To: Jacobe Zang <jacobe.zang@wesion.com>, Kalle Valo <kvalo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, van Spriel <arend@broadcom.com>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com
-References: <20240828-wireless-mainline-v12-0-9064ac7acf1d@wesion.com>
- <20240828-wireless-mainline-v12-3-9064ac7acf1d@wesion.com>
-Content-Language: en-US
-From: Arend van Spriel <arend.vanspriel@broadcom.com>
-Autocrypt: addr=arend.vanspriel@broadcom.com; keydata=
- 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
-In-Reply-To: <20240828-wireless-mainline-v12-3-9064ac7acf1d@wesion.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240827133736.19187-1-fw@strlen.de>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-01.secunet.de (10.53.40.197)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On 8/28/2024 9:40 AM, Jacobe Zang wrote:
-> Add "brcm,bcm4329-fmac" as fallback compatible for wireless devices that
-> used PCI ID based compatible. So that can pass the compatible check in
-> driver.
+On Tue, Aug 27, 2024 at 03:37:32PM +0200, Florian Westphal wrote:
+> No logical change intended.
+> 
+> Signed-off-by: Florian Westphal <fw@strlen.de>
 
-Hi Jacobe,
-
-Using the driver implementation as an argument for adding the fallback 
-compatible to the bindings does sound wrong. The most importants rule 
-about the bindings is that it is independent of kernel and/or driver 
-implementation.
-
-Now this actually overlaps my patch series from couple of weeks ago 
-which also covered some other existing DTS files for Apple platforms. So 
-my proposal here is to drop this patch for now. I will give it another 
-shot in v2 of my series after yours is (finally) applied. We can always 
-hope ;-) That does also mean the compatible check in the driver should 
-not be moved in brcmf_of_probe(). Also the Khadas Edge2 DTS file should 
-not use the fallback compatible yet. I can include it in my series later.
-
-Regards,
-Arend
-
-> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
-> ---
->   .../bindings/net/wireless/brcm,bcm4329-fmac.yaml     | 20 +++++++++++---------
->   1 file changed, 11 insertions(+), 9 deletions(-)
+Applied, thanks Florian!
 
