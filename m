@@ -1,163 +1,178 @@
-Return-Path: <netdev+bounces-122829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD3EF962B04
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:03:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 999CC962B08
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 17:03:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 756DF2854AB
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:03:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2F9BB23C27
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8D16189BAA;
-	Wed, 28 Aug 2024 15:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E82D18A6BF;
+	Wed, 28 Aug 2024 15:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b="2Z2velI/"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="geNhUTf6";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OB5SN3gs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E185186619
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 15:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D1E1891AC;
+	Wed, 28 Aug 2024 15:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724857403; cv=none; b=iOaVT8Gkm7bulgsR71UKv6/g/dRXsDVGC6FmRbAzh1CqilZ+XFdYhSbx+Me8SXQ8dv7shtv3QMTgtmJziHK68qEB3KN/SsZB9j3o4WvHWzohWfcibnOvzobsFmxrdsT4f3ksjwDZOE/8/5keTkH9FuY/CjddNwo3iPeGDgaCmgI=
+	t=1724857425; cv=none; b=nZJ/hb793/sa1dObSQWnVFrZKHNe+105T2uKCCw/KOs2ABMWhJ4hBVcdiwNt5RMsduyudUeTXfKZb0jmbvVLlkhTLev49z/xbrodbjyOnoWHLs0VlH+F4tttN95HzXWJZucYfgmywSqHLSIefhj4udn3ECovHQY7rAWctJmaWcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724857403; c=relaxed/simple;
-	bh=gZJvAwS84XG2gWnkUBtlpWa9JrbHPHI1F7UydNFtnGE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QNXdqwtusqxp+NlYRlGxeJXK8w8C8Mi3f0wHZgxPCvzEEkEteGJ787ay3VpwqWTLNRQ97NwKXJgHTjH6hAfpBCOLrqFeldQYX7pwgoiz/svCtJxZIe17KMyVfv7hsl8R9q4hROd/5Zyw25gEIP39IZ1XHjlBen6qiytGHXJKCAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com; spf=none smtp.mailfrom=kutsevol.com; dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b=2Z2velI/; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=kutsevol.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-44feaa08040so41027361cf.2
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 08:03:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kutsevol-com.20230601.gappssmtp.com; s=20230601; t=1724857401; x=1725462201; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eirJb6fPtSkbDJD3rUL81XHybmkCT08yqrb3byO7jZo=;
-        b=2Z2velI/nr/n2+3LWssr/eveZxKwkdLFd2P6W1RvkXvVA4G201zWoY8TZeX6ldWIac
-         fs6JcLmNabEgNAjyFZuEFW8VU40zvZcemdCr1ivQ6QHBTYPa+/b3piy7jhk+btH0hn8E
-         f0ovsDvF7IMfXpMwhEkrY1vaoYh5FZ+fzmJ/y7iNmNQWms+ml1drv3DebZqh1d2IGYRd
-         0OWNxIrCBKIlN9RBwboxIYDnKv1P06wZ7UoC1ttfkbvAS+QH8TDUjtHYGbMfrx22Ntmg
-         Vfk5ChCwaPPUkSP0mSGJ6S8OaFQ7jhJqU+LqWuX7ueaZuXCOE2wp3HuTIQhzPMSrAorz
-         S6qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724857401; x=1725462201;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eirJb6fPtSkbDJD3rUL81XHybmkCT08yqrb3byO7jZo=;
-        b=vWcKV0da+K6Yg2zh46bihg5KJFVrlAgBDmwCJOdV1p3ueUEIhHsxMqfW6O2KFL6dXX
-         JSUUMykFhHNXoJJS3EFBze58P9bMCQdjIyAePzeGV+E7P9VKF4Yc/Qmvv6H8cCr0Ejc1
-         ljUv/iL3BAnBQpIrkiK9ULzVYwQ14EqkLLhg5gLwaAXXPHqVeaAXVyuxlermfoMJaeIl
-         qCeMdW4LmkQKUqdmquxsbDiVe2/E3sZVgyeMMaSN2/HuxDLbdEGJyjfua6J5T1B10aP9
-         uyo8ObM6ajWDkeJKOnFkbqbFfwIcBRgn8n0g7xt4WJOxFNJLwMHDHiwrdjMsZnqZsUm4
-         ljHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWOUCzeajG+G+lOJ+I87GXsDNDgxS4Dp7QTSbzvbzqPDEW8CyXIOknmSJEzXSoM5W6t20arqeY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLugBnhwKi7RWy96uOM3hp6a7WkAVHc7Kinmq+f7A2hinrDkfu
-	JN+PmUeXlQK09qWiZaxPrK31rQHXJgFRg3gevO0isPbOwmsspkNXEFYqidnWiGAl5G1Q9W4rFaN
-	NgfRvVZYJThNKjrIuhqTiFXgHMEvB3xCNfRnGWg==
-X-Google-Smtp-Source: AGHT+IEBiMD+hxI9m00tkhRtoece2YbpN+qgRSgRalfCt3sYMacWDcmWzugzUHSrxMs1y3oNGI+hqbq4OJVjaY2tpoY=
-X-Received: by 2002:a05:622a:244b:b0:43f:fc16:6b3f with SMTP id
- d75a77b69052e-4566e62bffdmr24486521cf.34.1724857400716; Wed, 28 Aug 2024
- 08:03:20 -0700 (PDT)
+	s=arc-20240116; t=1724857425; c=relaxed/simple;
+	bh=yEUS2+We6pYU5E5aUU6qY7JHegaAWPxXgJVKjsaaybw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TRD3qGaVRzBeqV/7llbPB8ZsSRp+pjXyqE/JowRdwCnyHpdJ+y6k6Uv3nORbb6Q6nOieMRiWWiZkmNI7vsrv0IPI/txDNxxdN5Wl56aHJ/+Gft/77B3yD4ERB/dqkw/FbBSd1QDam1/JaTqKrtRKs5W3jPdgvovbPMnZlpcwiqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=geNhUTf6; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OB5SN3gs; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-02.internal (phl-compute-02.nyi.internal [10.202.2.42])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id 08F6C1151B49;
+	Wed, 28 Aug 2024 11:03:42 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Wed, 28 Aug 2024 11:03:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1724857421;
+	 x=1724943821; bh=RYAedfyLuVntN+kLSt9YJMUi7beiuO1xRvYSBZFsvXM=; b=
+	geNhUTf6vyHVdZck3OF+RSzjQNIWfNXpFDRRITTuC+K7Tj9j5Lqh8YB9VCHgQem4
+	/QTGXlxJCkU4rcVrISAIStO1oUgvrQrhgnEqX/kNCQEHvRJN4fRQMmsD7Xn8QgNu
+	kBtkSSs1m0G7i7Pj+6ChpGodhHcATr+hmx0te81UiUxXdEZHYsPjckmDuOF8pV15
+	tWIJHf+Ge33XabGeg67lSgIUiH2i6bgebe0L9+KvC2hP1IdIOoj9JdNBBbr2cYyL
+	F8HeySqKFH5v5sKuCt1VR+GG0Q4KxmJsVJkYU7HrIqyok5yFz7gKHYjVKDwIfOhB
+	tMZsBbwbw8HW/uNzbtDxRQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1724857421; x=
+	1724943821; bh=RYAedfyLuVntN+kLSt9YJMUi7beiuO1xRvYSBZFsvXM=; b=O
+	B5SN3gsPcaVFxiRH0Dvh0noSPMW8CqJd84ThysM+JgmGJng1mXqe+8L+lflD0pyP
+	8GJdo9arSmgwRvNw/E0oLpcke7/qX5Qs/9TxKGJHGlMZ+5bTlC2NibNnzBxBk2T9
+	8JP4zMYjxP/eyg+aVKiT5K0P3tVVG9KrbhsJXM36srrScy4ehFZvL9dp4Eddh5hd
+	foBLgGtCffKsL8iw8rVAttNLe74DCmt4sfsxcXSdsa73FryC1kEuCDnzyRDBZ7XQ
+	VWhQbw6scUr0C1z9ytY6BhayZR2XO4rh79yb29qtoP5loiKInv18ailaOoM4yQeo
+	NPGUqOtIf/PL6hgqNviqg==
+X-ME-Sender: <xms:TDzPZhGBaB3uh8vwe2vr3vSCti0f-UyCYY_lIO2ifrhJNm2b_Apvqg>
+    <xme:TDzPZmVWFmuSlRE5GG39TL825SXCOtR2eeOtC_aabX6hzN40Sd1yGTHBjp6zy42SW
+    oywnthVG-WxwG8UDUM>
+X-ME-Received: <xmr:TDzPZjLfndxBlea6C5s-dV3taf-OFjdydTE-5Xe7WmoVGsSEhg029zWRTAZA0L9Gq7Q2bD2ajz0XMRB0yEYIkoluCe9URskiXw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudefvddgkedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
+    necuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhoug
+    gvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrght
+    thgvrhhnpeefhfellefhffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvd
+    elieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehn
+    ihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrsh
+    gvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohep
+    phgruhhlrdgsrghrkhgvrhdrtghtsegsphdrrhgvnhgvshgrshdrtghomhdprhgtphhtth
+    hopehsrdhshhhthihlhihovhesohhmphdrrhhupdhrtghpthhtohepuggrvhgvmhesuggr
+    vhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
+    gtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehp
+    rggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprghnughrvgifsehluhhnnh
+    drtghhpdhrtghpthhtohepsghijhhurdgurghsrdhjiiessghprdhrvghnvghsrghsrdgt
+    ohhmpdhrtghpthhtoheptghlrghuughiuhdrsggviihnvggrrdhujhessghprdhrvghnvg
+    hsrghsrdgtohhm
+X-ME-Proxy: <xmx:TDzPZnFguihRVYpr9m4yCUze_O1GyGrzvOM7uSJ0zZKaRs7-TaelNg>
+    <xmx:TDzPZnVacOxINjom0KDrDkn8GBMUvDhfmzjDMCtx3wriv_DVWksOXg>
+    <xmx:TDzPZiM-3vckoPVg23pKE6l8WHrXkvHo-PCGYcfI3s_LsZKPgjLJJw>
+    <xmx:TDzPZm14VUr3C7w0sFlH8_wFQViRI55aKzEwfQMvexQ4sdxe9FBajw>
+    <xmx:TTzPZgWL2gAl33M_n1wdxhySEdjXuDSiJFhGyhdmj-Foqo6EZP5uKrYs>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 28 Aug 2024 11:03:39 -0400 (EDT)
+Date: Wed, 28 Aug 2024 17:03:37 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Paul Barker <paul.barker.ct@bp.renesas.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, Biju Das <biju.das.jz@bp.renesas.com>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Mitsuhiro Kimura <mitsuhiro.kimura.kc@renesas.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net PATCH v2 2/2] net: ravb: Fix R-Car RX frame size limit
+Message-ID: <20240828150337.GA3306821@ragnatech.se>
+References: <20240828102226.223-1-paul.barker.ct@bp.renesas.com>
+ <20240828102226.223-3-paul.barker.ct@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240824215130.2134153-1-max@kutsevol.com> <20240824215130.2134153-2-max@kutsevol.com>
- <20240826143546.77669b47@kernel.org> <CAO6EAnX0gqnDOxw5OZ7xT=3FMYoh0ELU5CTnsa6JtUxn0jX51Q@mail.gmail.com>
- <20240827065938.6b6d3767@kernel.org>
-In-Reply-To: <20240827065938.6b6d3767@kernel.org>
-From: Maksym Kutsevol <max@kutsevol.com>
-Date: Wed, 28 Aug 2024 11:03:09 -0400
-Message-ID: <CAO6EAnUPrLZzDzm6KJDaej=S4La_z01RHX2WZa3R1wTjPc09RQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] netcons: Add udp send fail statistics to netconsole
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240828102226.223-3-paul.barker.ct@bp.renesas.com>
 
-Hey Jakub,
-thanks for looking into this.
+Hi Paul,
 
-PS. A couple more email send mistakes and I'll go install mutt, sorry
-for the noise :)
+Thanks for your work.
 
-On Tue, Aug 27, 2024 at 9:59=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Mon, 26 Aug 2024 19:55:36 -0400 Maksym Kutsevol wrote:
-> > > > +static ssize_t stats_show(struct config_item *item, char *buf)
-> > > > +{
-> > > > +     struct netconsole_target *nt =3D to_target(item);
-> > > > +
-> > > > +     return
-> > > > +             nt->stats.xmit_drop_count, nt->stats.enomem_count);
-> > >
-> > > does configfs require value per file like sysfs or this is okay?
-> >
-> > Docs say (Documentation/filesystems/sysfs.txt):
-> >
-> > Attributes should be ASCII text files, preferably with only one value
-> > per file. It is noted that it may not be efficient to contain only one
-> > value per file, so it is socially acceptable to express an array of
-> > values of the same type.
->
-> Right, but this is for sysfs, main question is whether configfs has
-> the same expectations.
-Eh, my bad, thank you :)
+On 2024-08-28 11:22:26 +0100, Paul Barker wrote:
+> The RX frame size limit should not be based on the current MTU setting.
+> Instead it should be based on the hardware capabilities.
+> 
+> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
 
-Docs on configfs (Documentation/filesystems/configfs.rst) say approximately
-the same, quote:
-* Normal attributes, which similar to sysfs attributes, are small ASCII tex=
-t
-  files, with a maximum size of one page (PAGE_SIZE, 4096 on i386).  Prefer=
-ably
-  only one value per file should be used, and the same caveats from sysfs a=
-pply.
-  Configfs expects write(2) to store the entire buffer at once.  When writi=
-ng to
-  normal configfs attributes, userspace processes should first read the ent=
-ire
-  file, modify the portions they wish to change, and then write the entire
-  buffer back.
+Reviewed-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 
-so based on sysfs+configfs docs it looks ok to do so. What do you think?
+> ---
+>  drivers/net/ethernet/renesas/ravb_main.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 471a68b0146e..b103632de4d4 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -555,8 +555,10 @@ static void ravb_emac_init_gbeth(struct net_device *ndev)
+>  
+>  static void ravb_emac_init_rcar(struct net_device *ndev)
+>  {
+> +	struct ravb_private *priv = netdev_priv(ndev);
+> +
+>  	/* Receive frame limit set register */
 
-Regarding the overall idea of exposing stats via configfs I found this:
-https://github.com/torvalds/linux/blob/master/drivers/target/iscsi/iscsi_ta=
-rget_stat.c#L82-L87
-as an example of another place doing it, which exposes the number of
-active sessions.
+I wonder if we also should expand this comment to explain the addition 
+of ETH_FCS_LEN, I have to look this up every time :-) How would you feel 
+about adding something like?
 
-> > Given those are of the same type, I thought it's ok. To make it less
-> > "fancy" maybe move to
-> > just values separated by whitespace + a block in
-> > Documentation/networking/netconsole.rst describing the format?
-> > E.g. sysfs_emit(buf, "%lu %lu\n", .....) ? I really don't want to have
-> > multiple files for it.
-> > What do you think?
->
-> Stats as an array are quite hard to read / understand
-I agree with that.
-I couldn't find examples of multiple values exported as stats from
-configfs. Only from sysfs,
-e.g. https://www.kernel.org/doc/Documentation/block/stat.txt, which
-describes a whitespace
-separated file with stats.
+    /* Set receive frame length
+     *
+     * The length set here described the frame from the destination 
+     * address up to and including the CRC data. However only the frame 
+     * data, exuding the CRC, are transferred to memory. To allow for 
+     * the largest frames add the CRC length to the maximum Rx 
+     * descriptor size.
+     */
 
-I want to lean on the opinion of someone more experienced in kernel
-dev on how to proceed here.
-- as is
-- whitespace separated like blockdev stats
-- multiple files and stop talking about it? :)
+> -	ravb_write(ndev, ndev->mtu + ETH_HLEN + VLAN_HLEN + ETH_FCS_LEN, RFLR);
+> +	ravb_write(ndev, priv->info->rx_max_frame_size + ETH_FCS_LEN, RFLR);
+>  
+>  	/* EMAC Mode: PAUSE prohibition; Duplex; RX Checksum; TX; RX */
+>  	ravb_write(ndev, ECMR_ZPF | ECMR_DM |
+> -- 
+> 2.43.0
+> 
+
+-- 
+Kind Regards,
+Niklas Söderlund
 
