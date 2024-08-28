@@ -1,162 +1,133 @@
-Return-Path: <netdev+bounces-122775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 985E5962826
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:02:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AEBD9962831
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 15:05:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16D661F2490E
-	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:02:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64E561F219B6
+	for <lists+netdev@lfdr.de>; Wed, 28 Aug 2024 13:05:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E7B21862B3;
-	Wed, 28 Aug 2024 13:02:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C9DF178399;
+	Wed, 28 Aug 2024 13:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="nwL8iclV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/m9B7NL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8768D174EDF
-	for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 13:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BED1E4A9;
+	Wed, 28 Aug 2024 13:04:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724850133; cv=none; b=sSlh++8qGQ/bzAILSJfMi3eP2TTGFAZ0CxgG3j5Ir0cd2fS/xd3wOhrFXjLzNgjMUf6d++tjOJ/dBg1fmQ7bAZL3BTLxWdN/mSpdyB+V61x46LFUrwBjNGynlE4jHuGEcDM4eVYdtUQ6PbHR2i4WOHoiiW0f3Jet+8cdZrP3BFk=
+	t=1724850298; cv=none; b=hSJ0Gz3iTxJiLao2TRoDeENmzF8gn/2mjs7OUA8UGMai6BeEkj83rrgwH0DnBl4K7OYNRaXAMgh4AOvPoKCzRrCiEe8Nk0E4Th+G8Fp7vur/SAPBRxHk5bb+6aL+TnE434FM3ksqr69WR1/CFZRkOZMTbCEBURX/uYCgJBO/kuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724850133; c=relaxed/simple;
-	bh=YW/EEtXgeETLFFYtUTMkx2TeMKhtdDTvNiLHJqoT6SA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DDMjmgdLQkv7+BKhAl/KJ7FJNTpynOwdtGhjBjmgPYyfIdqgZ1tVJUKCuK1bRks0V38+gvULXTAK6ZgR2DuZ7F49IknGgkBeKpinRkHqhAZhPg3KiAtOad8Mr6IfZzvikvt8Lf6UW9NuFvPsBt3ktOzjVo0X/4SSWLc2EWjEI30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=nwL8iclV; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4280c55e488so3644815e9.0
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 06:02:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1724850128; x=1725454928; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Mmup1prCsSAveeq41yKkxnTwUrUc0XBZbbpuemoosDY=;
-        b=nwL8iclVz+HpbRJUqajCtTy4H3TBywU5YE6Zw25sf5i11rOSxnP4I5AFyLLRwSMTyi
-         6IdUZA84vQn9vKKFSqi1xNXOVHUf3+WggZpywS1tCZLGSGzL3UonHP1QrjWL5mFyTN/J
-         z9qgKWHmaXyvk3YUMxUZCjbooqzZ8NLt9rPkRpibYgk5+bxLEGIcv/GwaUyfxdwA+6SO
-         DcuWijugMg4bZRDNKgv9QN2HNGe1IbWv1YZ5h4oyHg0ZtGLX29eshko/m/xz5uoCVNAE
-         IveIACYRytCuVeosItkZIUpJ9pSj8XeBdvVHcEg6qHyGHhSxN8kLAZ7hI/FqUBmEuFsl
-         BU4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724850128; x=1725454928;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Mmup1prCsSAveeq41yKkxnTwUrUc0XBZbbpuemoosDY=;
-        b=uEftd3QdyszxOnslMiE//OWy5WS9O/a+c93xJUK0yEEAF3hWCCWlAIyPEX1xZu7fM3
-         f5wLEZwg6xEFzghL1K+PK14X7hx6FjcqENd144x4Lj6PnuYooG3O1FDXpGKD/JGnilhK
-         axJ2UzdR+T/Z2RHeqVixtHMRsKQVNbsXjvlqsMSvtl4zzk3b2IlHHLo/fjJ59SGKDuVf
-         fQMxcpEmiLXcIvhAVgoj6lEtXm6fOKa8h/tgbS8fCItOJXI1/MOnrSlWdK7+JGDM5sVy
-         CtIRI62omUSmEQnZVT435OoXma8FUIw3qoZuDhFF1ewL1haDRPt+5udaHBBTW4msA1LY
-         75kA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8Tz713qoYifvNqNpUuMmtStQXwNt6NMt8hZfX2WBRyT4Mh+LFsfUUo1v0hQbUwoAvRjhjjBw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywz6bH7JT46LVDAxHxHZwE040iVno/MHqgbjN3C30vFZ44VH4/a
-	EBFOFm/9rdFF+WKU/F0jm+JTvo43WNxJ0V7cSLAX7WKd3FDGaXRc5E9NqBXpkf0=
-X-Google-Smtp-Source: AGHT+IEm+WHpRdAJGfRLPoUCMWf3gf8YblqWr20+YClpfaWeQgOWWtsVTJ94b/3Yj/5DOBlz4LE5lg==
-X-Received: by 2002:a05:600c:4687:b0:424:a401:f012 with SMTP id 5b1f17b1804b1-42ba5674248mr10695785e9.3.1724850127369;
-        Wed, 28 Aug 2024 06:02:07 -0700 (PDT)
-Received: from localhost (mail.chocen-mesto.cz. [85.163.43.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba641da5asm20904025e9.36.2024.08.28.06.02.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 06:02:06 -0700 (PDT)
-Date: Wed, 28 Aug 2024 15:02:05 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>
-Subject: Re: [PATCH v3 03/12] net-shapers: implement NL get operation
-Message-ID: <Zs8fzY-QA1e8b86T@nanopsycho.orion>
-References: <ZsiQSfTNr5G0MA58@nanopsycho.orion>
- <a15acdf5-a551-4fb2-9118-770c37b47be6@redhat.com>
- <ZsxLa0Ut7bWc0OmQ@nanopsycho.orion>
- <432f8531-cf4a-480c-84f7-61954c480e46@redhat.com>
- <20240827075406.34050de2@kernel.org>
- <CAF6piCL1CyLLVSG_jM2_EWH2ESGbNX4hHv35PjQvQh5cB19BnA@mail.gmail.com>
- <20240827140351.4e0c5445@kernel.org>
- <CAF6piC+O==5JgenRHSAGGAN0BQ-PsQyRtsObyk2xcfvhi9qEGA@mail.gmail.com>
- <Zs7GTlTWDPYWts64@nanopsycho.orion>
- <061cba21-ad88-4a1e-ab37-14d42ea1adc3@redhat.com>
+	s=arc-20240116; t=1724850298; c=relaxed/simple;
+	bh=vqzAAKT65KiTHdDl33pDcTW9/5ZaQ2C7vb2Bbckf838=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EYK5YAT6DbONaIP8yjOUghA+URLJQRXAFaCWA2iES9FuUHqiqmK2m7cWogOO/uhw4IbKkSyIh3fraNZ8TWtoG82ex3l+XFvJm8NCO3hvexSEOCZV0a8R3xdiRHSthX0asEPfdc7st/8UpC/DxycAcXrbKpH02LrPvHKcNOdbefY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J/m9B7NL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3B06C4FF70;
+	Wed, 28 Aug 2024 13:04:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724850298;
+	bh=vqzAAKT65KiTHdDl33pDcTW9/5ZaQ2C7vb2Bbckf838=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=J/m9B7NLZlLMhZIIvd2owf9u5C3iNvfyfZNpeiinNWjauWGnovwHbzEU/ssHIN5D6
+	 A07uZaMXhGngJMa/k3DmX84A1GPLIKdCanOeTQ+lNim9atAoofIFAgUTyDc36RF9rt
+	 qLdGTwk5TIXaVCH8v4DruKqsx+sKu/6dFKASjuJ/CSv+3eJXtzfSdxPASWbSpuO/cH
+	 26YyJPk++REu9lQ340jVYc1vvrj5DKWRrLMMl6uky7pDiYI+PGRwmsPGeWjFQPbwQ1
+	 eL67gGYxMfR5qJCXXDt1lKxWgvefzpmOGrLiKcX+nypeH41pdaKDLhk3JWjeOW3Zxh
+	 tLQOcDCupOmqA==
+Message-ID: <ed670624-2b97-41e0-a243-26b8c5cda70b@kernel.org>
+Date: Wed, 28 Aug 2024 15:04:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <061cba21-ad88-4a1e-ab37-14d42ea1adc3@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v13 3/5] dt-bindings: net: wireless: brcm4329-fmac: change
+ properties enum structure
+To: Jacobe Zang <jacobe.zang@wesion.com>, Kalle Valo <kvalo@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, van Spriel <arend@broadcom.com>,
+ Arend van Spriel <arend.vanspriel@broadcom.com>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com
+References: <20240828-wireless-mainline-v13-0-9998b19cfe7e@wesion.com>
+ <20240828-wireless-mainline-v13-3-9998b19cfe7e@wesion.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240828-wireless-mainline-v13-3-9998b19cfe7e@wesion.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Wed, Aug 28, 2024 at 12:55:31PM CEST, pabeni@redhat.com wrote:
->On 8/28/24 08:40, Jiri Pirko wrote:
->> Makes sense?
->
->Almost! Tacking aside the (very significant) differences between your
->proposition and Jakub’s, we can't use devlink port here, just devlink, or we
->will have to drop the cache too[1]. Specific devlink port shapers will be
->reached via different handles (scope/id).
+On 28/08/2024 10:49, Jacobe Zang wrote:
+> Add "brcm,bcm4329-fmac" as fallback compatible for wireless devices that
+> used PCI ID based compatible. So that can pass the compatible check in
+> driver.
 
-Ok, I guess. Need to see the code.
+Driver? Why this has to pass compatible check?
 
+I think I asked to provide proper rationale based on hardware... if not,
+then let me ask here: Please provide proper rationale explaining how
+this hardware is compatible, especially considering these are entirely
+different buses (SDIO and PCI!).
 
->
->Additionally, I think we don't need strictly the ‘binding’ nested attribute
->to extend the NL API with different binding objects (devlink), we could
->append the new attributes needed to support (identify) devlink at the end of
->the net shaper attributes list. I agree that would be likely less ‘nice’.
+It feels you patch up bindings and DTS, because of buggy driver. Sorry
+no, fix the driver.
 
-True and true.
+Best regards,
+Krzysztof
 
-
->
->What about:
->- Refactor the core and the driver api to support the ‘binding’ thing
-
-Ack.
-
-
->- Update the NL definition to nest the ‘ifindex’ attribute under the
->‘binding’ one. No mention/reference to devlink yet, so most of the
->documentation will be unchanged.
-
-Ack.
-
-
->- devlink support will not be included, but there should be enough ground
->paved for it.
-
-Ack.
-
-
-
->
->?
-
-Thanks!
-
-
->
->Thanks,
->
->Paolo
->
->[1] the cache container belongs to the ‘entry point’ inside the shaper
->hierarchy - i.e. currently, the struct net_device. If we add a devlink_port
->‘entry point’, the cache there will have to manage even the shaper for
->devlink ports group. When accessing a group containing multiple ports, we
->will get multiple inconsistent cache values.	
->
 
