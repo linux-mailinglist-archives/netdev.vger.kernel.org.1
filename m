@@ -1,108 +1,99 @@
-Return-Path: <netdev+bounces-123364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A5D99649DB
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:20:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 465AF9649E9
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D83D1C20DDD
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 782581C22352
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE921AE87E;
-	Thu, 29 Aug 2024 15:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 781781B2EEE;
+	Thu, 29 Aug 2024 15:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OPm0P/Gw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="meiDYu5T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14F0718E373;
-	Thu, 29 Aug 2024 15:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6FEF1B29CB
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 15:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724944829; cv=none; b=DR0zDNVFrxTrgMPSEjCh+svcc9GwJH5fH90MyZARJo0rHNOoPkE+Tg2EzCh8CV/Ga+AdEm+nlxqGaKO+dXRIoxaWNXb3No7wWz+nc4YklSo+UXTR6a2533PxjOlLNSnvTQLtNgdBRUBFX3spTbuk5tjI0ceEnn2HU3KXbZdmk6A=
+	t=1724944994; cv=none; b=fe8MaJBUwGlpCRGJ/UN7rsCI7JcPYzDkGKBqgSFxHoMJvSavytiQkHxsWD7HCxZWB1Bh9H3FHgs1KsQkyYoUWQk2b4VPbMhwEnZZH0sudPGiVq3gNmb9fD5vlmakh4Fc1HAqQ3tObQbybzlPYsoaoJGoyeRC116gDlSjGAQaQgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724944829; c=relaxed/simple;
-	bh=IXYxlcYCp7DFF63JfA4Y1j/u8NAySHcOeG7Qwvedfv4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=suPfU07yfLSzLFS8Uc0oyXT2FjzLvTCgHIL87c3DJmUXgzs+8UwaWZ+qvyxoJ7JFuSColG0UaQ3zhXNJF+9WhBKf/1i5oMoanAPeFBO0UJsAxhJZvJU7HzXpsb/2DCuhv+P8HnOODl0BV8tp4BjnAioWOgokUER0TtxuUxTEb4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OPm0P/Gw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DCFDC4CEC1;
-	Thu, 29 Aug 2024 15:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724944828;
-	bh=IXYxlcYCp7DFF63JfA4Y1j/u8NAySHcOeG7Qwvedfv4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=OPm0P/GwGyHHLwYBMTCsMWDq9rvYcsPWhkp0XWmZ/cneWUqNTUb9bk1UBMD8B/ctP
-	 4OTKHXQRcVCZsbrqtNYxrPuIaIhGtxhVC+5CRya+SKoyA80zHTmVj5CYIU2ViXQAFv
-	 x5Qkfl1GEe52NAo+7QTOn0alqSpCtB60a5SGFOKHlYemxf2PKv/zpkhXF0GVs/PGWK
-	 PzCVCOr//rDHFLYTLiMHd36tPxxPFoD89w71uAsshRdC+xuLKQ084lXyWDB5Rv0HpN
-	 Lnj08vCIN6IelGvjQtKnibQUY2wYuH0Z7OBPkf6quGYkBRjx9FiNm7pfepdKgJ0TBA
-	 2PxKyrca8CC5w==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	andrew@lunn.ch,
-	corbet@lwn.net,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net] docs: netdev: document guidance on cleanup.h
-Date: Thu, 29 Aug 2024 08:20:25 -0700
-Message-ID: <20240829152025.3203577-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1724944994; c=relaxed/simple;
+	bh=3eiFbN5nzjKu4yzFtXfz2GIM1Xl+U/uh2MOzzyJsOaY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=liD18J69Amj9cFxyGcbLslcXX/uZaL0ga8aN8lU30bBi/IFfkxr9cuWAV3ErlUHN9Ij68lxx+8DEReNvX8Ot5iiSvlc03Qe597m1vSSMhgwhU1npRpyvLEn6tN2QX/Ua2n4VSphfK70JbSpKb87iClCzusu2jO7dFfprle15yH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=meiDYu5T; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c0a9f2b967so915802a12.2
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 08:23:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1724944991; x=1725549791; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3eiFbN5nzjKu4yzFtXfz2GIM1Xl+U/uh2MOzzyJsOaY=;
+        b=meiDYu5TEe+P8y2IQC7Lo8O1HQaR5IUunO2qiurUO/sYEFN5eW1ZsPZ47ptL/SCHI2
+         tDqofUOTJNMUWxRcgzKO7jGidIfnvD/gN8zcB15G7qZ4ZL+7Lg/hLHaKcGdnDIy/vIIJ
+         DK66eB4q5g2hrAnfOcU1qvQFbtfadBCGsltia1xmZgiiLYQopcu+s+MhnhXQSASd6VH7
+         m8EQHfVfP6HRtedjqvHwAsK2lTwZ7wruc/hJHJLL7bt34MeiuUCStsrGA+62shChHI6y
+         yKKUMADIf5eBcuzo1W/vJ0X1q33Pg2Ln198MaqxeuT79sIaMyrIImm83PPTZ1S0AgiB4
+         JbXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724944991; x=1725549791;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3eiFbN5nzjKu4yzFtXfz2GIM1Xl+U/uh2MOzzyJsOaY=;
+        b=Xys0tVjBjzGp/XXdCIw1ptRXtpTFmzuavAzPnwQ9br7Jq9ebK2m5LlmjoRZyVAbfnE
+         Fv3oVe+enb6LOudy8JTyfyVg5UZ+TLJwnFbqnHhvR9az0v1ZLYBxtNUz3WJ66K7QDTmC
+         oXwQyBQr8H6zM6Ks/tVPw+yeWK1BA3B5HgCYlCMTCjp9zUocLIR3HpReiFTXr5TEGWNg
+         QPYDtBvl7EXfO5wO/URSUc+QCZ2Pz2F293SBY2X/T720CHNt08q2eHiHhicVEwiPYS9Q
+         s8JKG0SroflhFcAyqDV3VzI2bIWAHlR/MFCyH2EVsEPHsoj94UAVZbTd0PVx+vImtAoY
+         mzbg==
+X-Forwarded-Encrypted: i=1; AJvYcCUFT10ePAZppQAh5AHjK+gaR3BG4J693IpmmQwuIonNsg7fEuQLP9dZM4yZKrfWn5rpFg/oDug=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFLSS3dUBzqhVCZZMpQNBiU57Tz3JJfnYn+u6/tWxx4FzW3F5O
+	ZcRIsiFxsfYd96VVDk974MR6awPrSrWjb3iTV/0RSNe6qLWqTcwVX+oQwyF0SBrGIe1k+W5wVJU
+	4bDjkg8ur0WHOU8k5W+uhhkq6tkD/BqtiOl2FVKtukCO7h/Qv4w==
+X-Google-Smtp-Source: AGHT+IGSbtS6/CWk7vGWKdV4Q6cqHzpkgdgaZWeC2y6HTP25EM/sj5jOpfnYqyUkdqMAjsAWDx2GtnP63g3oDmXNJog=
+X-Received: by 2002:a17:906:6a18:b0:a7a:9144:e24c with SMTP id
+ a640c23a62f3a-a897f79aec6mr245337266b.9.1724944990245; Thu, 29 Aug 2024
+ 08:23:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240829152025.3203577-1-kuba@kernel.org>
+In-Reply-To: <20240829152025.3203577-1-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 29 Aug 2024 17:22:59 +0200
+Message-ID: <CANn89iLEh15ZfiCZtjtayTUdYYgne340_nNQ_znyua5ngjjEDA@mail.gmail.com>
+Subject: Re: [PATCH net] docs: netdev: document guidance on cleanup.h
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	andrew@lunn.ch, corbet@lwn.net, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Document what was discussed multiple times on list and various
-virtual / in-person conversations. guard() being okay in functions
-<= 20 LoC is my own invention. If the function is trivial it should
-be fine, but feel free to disagree :)
+On Thu, Aug 29, 2024 at 5:20=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Document what was discussed multiple times on list and various
+> virtual / in-person conversations. guard() being okay in functions
+> <=3D 20 LoC is my own invention. If the function is trivial it should
+> be fine, but feel free to disagree :)
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: andrew@lunn.ch
-CC: corbet@lwn.net
-CC: linux-doc@vger.kernel.org
----
- Documentation/process/maintainer-netdev.rst | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
++2
 
-diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-index fe8616397d63..ccd6c96a169b 100644
---- a/Documentation/process/maintainer-netdev.rst
-+++ b/Documentation/process/maintainer-netdev.rst
-@@ -392,6 +392,22 @@ When working in existing code which uses nonstandard formatting make
- your code follow the most recent guidelines, so that eventually all code
- in the domain of netdev is in the preferred format.
- 
-+Using device-managed and cleanup.h constructs
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Netdev remains skeptical about promises of all "auto-cleanup" APIs,
-+including even ``devm_`` helpers, historically. They are not the preferred
-+style of implementation, merely an acceptable one.
-+
-+Use of ``guard()`` is discouraged within any function longer than 20 lines,
-+``scoped_guard()`` is considered more readable. Using normal lock/unlock is
-+still (weakly) preferred.
-+
-+Low level cleanup constructs (such as ``__free()``) can be used when building
-+APIs and helpers, especially scoped interators. However, direct use of
-+``__free()`` within networking core and drivers is discouraged.
-+Similar guidance applies to declaring variables mid-function.
-+
- Resending after review
- ~~~~~~~~~~~~~~~~~~~~~~
- 
--- 
-2.46.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
