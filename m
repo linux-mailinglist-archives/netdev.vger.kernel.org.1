@@ -1,82 +1,51 @@
-Return-Path: <netdev+bounces-123255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 292B29644BC
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:39:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88540964532
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:49:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA1FBB276B1
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 12:39:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAF3F1C24C12
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 12:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 836871B373F;
-	Thu, 29 Aug 2024 12:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HuVBptxK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91FB1B3F19;
+	Thu, 29 Aug 2024 12:42:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CB01B372E;
-	Thu, 29 Aug 2024 12:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C20B1B3B39;
+	Thu, 29 Aug 2024 12:42:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724934873; cv=none; b=cOQKIu+RYkWoQ2H4X95oPWa/sNAD/yXCOpulRJc1P8W7PJ3iN3lOEjxxW2D8yTlsIkpT/6jHzdIxNUjrtIvro0625YXrRw0IRmjwo0MUPPQlZvPRSnBGj6PpLk3wFxqombVeh0ZqYCOiJNOy7ttQVrcTnyqc8BPKm5HAFYc5AQc=
+	t=1724935353; cv=none; b=oZsC777cJ2vaRsbw7wR2bXELbjNOjd/Agv4mUzR1TWuu6LnD+1lN7KrB8qj2JTXPizyiLWtSNBzj+cXQ/HaLCOhUBPeBU1NGdkW6uElPDKw1mwyqnl78+d+hAmHrD8UYa1nEA5a8rflsKQZcy1/6Slsrdc0sfhvVu2TQP4MCPZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724934873; c=relaxed/simple;
-	bh=DZB7qu5vEbhhjIgEPoBTWvmR4XZ7sUV9Q0Y4Fzdk7mM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dYKxxaByI15SDHXhGurageJzX6lRyeoxkCHvpCmixYj1rbKESEFSiZ+w5CB8kYN8sVGbrgUe9J9dphUjVA/x4cLqknGdFJR3ZLGvb+CUxU7PLJDxBXxd3YcJDevMWoHurG2tLZg5tFREtKsVx1Hm5qrJUHsmjzkMg/hSQH886Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HuVBptxK; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724934872; x=1756470872;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DZB7qu5vEbhhjIgEPoBTWvmR4XZ7sUV9Q0Y4Fzdk7mM=;
-  b=HuVBptxKX8mExIGk1nBdU3JrDWm7wZjiscdhiQsTEarmC1W5l4Wn28hN
-   eSlQUD7ULC6+SwJXqdtxTOX2N2Fh3xxeoew85YYpKXryFvszPq4eklgIM
-   IuzTPUcjAFEESCmRK4kvnikeTbM7y7KmuSV2frTedwblTv+Pob/BHuH1F
-   NSPk0rNJ3E8rbLZbfWYTcdeqhkU20OyBFMw80iCrMKfoUe5x8lLtSjaO+
-   +Vh8QTAa4/uCN+Z23/2VT8ymIBpFVayPiFyzmzFlXIh85U365gPcFR7SW
-   79ErN6tyUP3uVyiGxS0UeafZFuCz15KRjRbkXzDHpmqlAm1QeWSuVH1Z9
-   g==;
-X-CSE-ConnectionGUID: oYiugDbXRaeHJwhCLGoNJg==
-X-CSE-MsgGUID: obmswvnuSxuVPqm2qaylsg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="46038230"
-X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="46038230"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 05:34:32 -0700
-X-CSE-ConnectionGUID: hAX0QOYZTZejBkNl5KPLEg==
-X-CSE-MsgGUID: NAeMWS/2S+WpkI7vWtw85Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="63188515"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa006.fm.intel.com with ESMTP; 29 Aug 2024 05:34:29 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	David Ahern <dsahern@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5 5/5] netdev_features: remove NETIF_F_ALL_FCOE
-Date: Thu, 29 Aug 2024 14:33:40 +0200
-Message-ID: <20240829123340.789395-6-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240829123340.789395-1-aleksander.lobakin@intel.com>
-References: <20240829123340.789395-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1724935353; c=relaxed/simple;
+	bh=Z981t5JZQAzEO9cQP3qxerhjjxc0kbCIKLu90mkxdQc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FHERnK1doKF5AqIb2mhIV9CMn/kVvh84rEWkOc8u7pg74tTEtgSzXP5J2gEge+9OMOTkbLVAsQR5HrvDGSoRz259YHSygIxdAd9Qq9bOiwpkgIu3Jd9TcYGFAoAICj97ayyQnivVTUO6Zw43YwuAhhIPPQqqdJ7lgbWB1rrNSq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WvgqD1lf4zLqsc;
+	Thu, 29 Aug 2024 20:40:24 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id A5A5D18007C;
+	Thu, 29 Aug 2024 20:42:28 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 29 Aug
+ 2024 20:42:28 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <bharat@chelsio.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <yuehaibing@huawei.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next 0/3] cleanup chelsio driver declarations
+Date: Thu, 29 Aug 2024 20:37:04 +0800
+Message-ID: <20240829123707.2276148-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,54 +53,25 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-NETIF_F_ALL_FCOE is used only in vlan_dev.c, 2 times. Now that it's only
-2 bits, open-code it and remove the definition from netdev_features.h.
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/linux/netdev_features.h | 2 --
- net/8021q/vlan_dev.c            | 5 +++--
- 2 files changed, 3 insertions(+), 4 deletions(-)
+Yue Haibing (3):
+  cxgb3: Remove unused declarations
+  cxgb4: Remove unused declarations
+  cxgb: Remove unused declarations
 
-diff --git a/include/linux/netdev_features.h b/include/linux/netdev_features.h
-index 37af2c6e7caf..66e7d26b70a4 100644
---- a/include/linux/netdev_features.h
-+++ b/include/linux/netdev_features.h
-@@ -209,8 +209,6 @@ static inline int find_next_netdev_feature(u64 feature, unsigned long start)
- #define NETIF_F_ALL_TSO 	(NETIF_F_TSO | NETIF_F_TSO6 | \
- 				 NETIF_F_TSO_ECN | NETIF_F_TSO_MANGLEID)
- 
--#define NETIF_F_ALL_FCOE	(NETIF_F_FCOE_CRC | NETIF_F_FSO)
--
- /* List of features with software fallbacks. */
- #define NETIF_F_GSO_SOFTWARE	(NETIF_F_ALL_TSO | NETIF_F_GSO_SCTP |	     \
- 				 NETIF_F_GSO_UDP_L4 | NETIF_F_GSO_FRAGLIST)
-diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
-index 09b46b057ab2..458040e8a0e0 100644
---- a/net/8021q/vlan_dev.c
-+++ b/net/8021q/vlan_dev.c
-@@ -564,7 +564,7 @@ static int vlan_dev_init(struct net_device *dev)
- 			   NETIF_F_FRAGLIST | NETIF_F_GSO_SOFTWARE |
- 			   NETIF_F_GSO_ENCAP_ALL |
- 			   NETIF_F_HIGHDMA | NETIF_F_SCTP_CRC |
--			   NETIF_F_ALL_FCOE;
-+			   NETIF_F_FCOE_CRC | NETIF_F_FSO;
- 
- 	if (real_dev->vlan_features & NETIF_F_HW_MACSEC)
- 		dev->hw_features |= NETIF_F_HW_MACSEC;
-@@ -576,7 +576,8 @@ static int vlan_dev_init(struct net_device *dev)
- 	if (dev->features & NETIF_F_VLAN_FEATURES)
- 		netdev_warn(real_dev, "VLAN features are set incorrectly.  Q-in-Q configurations may not work correctly.\n");
- 
--	dev->vlan_features = real_dev->vlan_features & ~NETIF_F_ALL_FCOE;
-+	dev->vlan_features = real_dev->vlan_features &
-+			     ~(NETIF_F_FCOE_CRC | NETIF_F_FSO);
- 	dev->hw_enc_features = vlan_tnl_features(real_dev);
- 	dev->mpls_features = real_dev->mpls_features;
- 
+ drivers/net/ethernet/chelsio/cxgb/common.h      | 2 --
+ drivers/net/ethernet/chelsio/cxgb/tp.h          | 2 --
+ drivers/net/ethernet/chelsio/cxgb3/cxgb3_defs.h | 2 --
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4.h      | 5 -----
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_dcb.h  | 1 -
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.h  | 1 -
+ 6 files changed, 13 deletions(-)
+
 -- 
-2.46.0
+2.34.1
 
 
