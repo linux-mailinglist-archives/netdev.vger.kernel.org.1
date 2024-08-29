@@ -1,149 +1,151 @@
-Return-Path: <netdev+bounces-123413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B449964BF5
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:50:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E90B964C15
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:52:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 947FC1C22794
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:50:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FB771F2323B
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17FE51B3F14;
-	Thu, 29 Aug 2024 16:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670B71B5830;
+	Thu, 29 Aug 2024 16:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mRBWKkfz"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60251B4C3B
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 16:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA091B151C;
+	Thu, 29 Aug 2024 16:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724950210; cv=none; b=no9AUqx6RLpNwViKy9ge+g4xkA2q3M2wjGPG8pZEaSMMxrmBuDE4DQUkEdFZNFkWFOFMZuzxVrpJ2kp1tnJLVDLmCcXpwGx3peus5TOVO+vkFgHQJcU6ISASFMz7+Daxz7XPo/R0xQU7n73nEJGLkEqShDQQkLpvU6Chkft9UT8=
+	t=1724950359; cv=none; b=hK7TlpTLG3lkEqpWYk/uQHoEy8D6+IkGSFxUtZyDoUnA2vebGbLnI4ZIsRk/4Qc1LMNw/mkrfagTO95kZyQaY+83FDr/h8AeOScjzfTaUVwNiIy7Zt5QIcb33TcCbOuC2FWA56U2rBMMreS0b4y0WnS0Romwo6nNdGyYvMebFDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724950210; c=relaxed/simple;
-	bh=AKr9IIeIbjZSGKlLmtkxYRMx8DPLmyjhaCOpkSuLMpE=;
+	s=arc-20240116; t=1724950359; c=relaxed/simple;
+	bh=dpcjacSyZ0wDA5iUfrSXiOJl110RtbPxhTCYt96yME0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pvBIoX8KLTcZsbp7t/0hh8d0dAgRVDPrWFzRReZSBcN4X+oIZ1ZlEFuV3I63YfQY7ZaolZAGNCKaKSKQoPWFqWJW6k18qMg+YC95fBUITo2Vkt0OPVxkaV6GeT1jKwIHrlXub1WQM26qWTUOg/YHa952dwT0HIKwCnfLdz/5yN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sjiLM-0004bS-QG; Thu, 29 Aug 2024 18:49:56 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sjiLL-003xEk-Rw; Thu, 29 Aug 2024 18:49:55 +0200
-Received: from pengutronix.de (pd9e5994e.dip0.t-ipconnect.de [217.229.153.78])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 538B232D36E;
-	Thu, 29 Aug 2024 16:49:55 +0000 (UTC)
-Date: Thu, 29 Aug 2024 18:49:55 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>, 
-	Andy Gospodarek <andy@greyhouse.net>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Sudarsana Kalluru <skalluru@marvell.com>, 
-	Manish Chopra <manishc@marvell.com>, Michael Chan <michael.chan@broadcom.com>, 
-	Pavan Chebbi <pavan.chebbi@broadcom.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>, Sunil Goutham <sgoutham@marvell.com>, 
-	Potnuri Bharat Teja <bharat@chelsio.com>, Christian Benvenuti <benve@cisco.com>, 
-	Satish Kharat <satishkh@cisco.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
-	Clark Wang <xiaoning.wang@nxp.com>, Dimitris Michailidis <dmichail@fungible.com>, 
-	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
-	Jijie Shao <shaojijie@huawei.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, Geetha sowjanya <gakula@marvell.com>, 
-	Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, 
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
-	Bryan Whitehead <bryan.whitehead@microchip.com>, UNGLinuxDriver@microchip.com, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, Lars Povlsen <lars.povlsen@microchip.com>, 
-	Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Shannon Nelson <shannon.nelson@amd.com>, 
-	Brett Creeley <brett.creeley@amd.com>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
-	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, Edward Cree <ecree.xilinx@gmail.com>, 
-	Martin Habets <habetsm.xilinx@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, 
-	MD Danish Anwar <danishanwar@ti.com>, Linus Walleij <linusw@kernel.org>, 
-	Imre Kaloz <kaloz@openwrt.org>, Richard Cochran <richardcochran@gmail.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next 1/2] ethtool: RX software timestamp for all
-Message-ID: <20240829-quick-inchworm-of-poetry-3ebc4d-mkl@pengutronix.de>
-References: <20240829144253.122215-1-gal@nvidia.com>
- <20240829144253.122215-2-gal@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oQ+hQUV6izRYz/oIjoRC2v2Ni6s03u5Vfgc+WM/d4ZfhqHF9YYAYx2ooIFNpSx4F4KKcNY2boDar1R79qTta7UvtCPqVtRG5ihTwgepbAxROTFpze//miYrlNCzEf5THWfgjlBYBqu2hxehQgrrRv/ajnF7bB2uDRN4VZLe9OvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mRBWKkfz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E907C4CEC1;
+	Thu, 29 Aug 2024 16:52:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724950358;
+	bh=dpcjacSyZ0wDA5iUfrSXiOJl110RtbPxhTCYt96yME0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mRBWKkfzZaGg0P7VYohoCehlB1b6sx+YN+5B4sx78PjOcnj86ngo/n9ZiO3iI2Ih2
+	 BJlr5kun7SALyn1l3EqHrY3mzPhpP54Uym+jpJ5qrShzAIz3x4LmcfgTW7VYz4K1c3
+	 UW49umMDKDvunI9Amdj0YTFvu6qZCegpYdaGoIqUVh80a2WapvQj3FoQ8aVJZC2Evi
+	 crt3ql6hKCR72Tw8ROhNJJZu3/hmj5+4MSVQBJagLcJzE8XxKjHGmUxPTmMpQNv7t0
+	 d2yMIsPdL8LxZkBCpQP8wvT3MPK4tElmraOb+eGuRXzjqOW1UT3Hsja5ry8tqhsSff
+	 RJSqAhWqVtazw==
+Date: Thu, 29 Aug 2024 17:52:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	linux-kernel@vger.kernel.org, o.rempel@pengutronix.de,
+	p.zabel@pengutronix.de
+Subject: Re: [PATCHv2 net-next] net: ag71xx: update FIFO bits and descriptions
+Message-ID: <20240829165234.GV1368797@kernel.org>
+References: <20240828223931.153610-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="t5eyogjq3jsiix2j"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240829144253.122215-2-gal@nvidia.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240828223931.153610-1-rosenp@gmail.com>
 
+On Wed, Aug 28, 2024 at 03:38:47PM -0700, Rosen Penev wrote:
+> Taken from QCA SDK. No functional difference as same bits get applied.
+> 
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> ---
+>  v2: forgot to send to netdev
+>  drivers/net/ethernet/atheros/ag71xx.c | 48 +++++++++++++--------------
+>  1 file changed, 24 insertions(+), 24 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
+> index db2a8ade6205..692dbded8211 100644
+> --- a/drivers/net/ethernet/atheros/ag71xx.c
+> +++ b/drivers/net/ethernet/atheros/ag71xx.c
+> @@ -149,11 +149,11 @@
+>  #define FIFO_CFG4_MC		BIT(8)	/* Multicast Packet */
+>  #define FIFO_CFG4_BC		BIT(9)	/* Broadcast Packet */
+>  #define FIFO_CFG4_DR		BIT(10)	/* Dribble */
+> -#define FIFO_CFG4_LE		BIT(11)	/* Long Event */
+> -#define FIFO_CFG4_CF		BIT(12)	/* Control Frame */
+> -#define FIFO_CFG4_PF		BIT(13)	/* Pause Frame */
+> -#define FIFO_CFG4_UO		BIT(14)	/* Unsupported Opcode */
+> -#define FIFO_CFG4_VT		BIT(15)	/* VLAN tag detected */
+> +#define FIFO_CFG4_CF		BIT(11)	/* Control Frame */
+> +#define FIFO_CFG4_PF		BIT(12)	/* Pause Frame */
+> +#define FIFO_CFG4_UO		BIT(13)	/* Unsupported Opcode */
+> +#define FIFO_CFG4_VT		BIT(14)	/* VLAN tag detected */
+> +#define FIFO_CFG4_LE		BIT(15)	/* Long Event */
+>  #define FIFO_CFG4_FT		BIT(16)	/* Frame Truncated */
+>  #define FIFO_CFG4_UC		BIT(17)	/* Unicast Packet */
+>  #define FIFO_CFG4_INIT	(FIFO_CFG4_DE | FIFO_CFG4_DV | FIFO_CFG4_FC | \
+> @@ -168,28 +168,28 @@
+>  #define FIFO_CFG5_DV		BIT(1)	/* RX_DV Event */
+>  #define FIFO_CFG5_FC		BIT(2)	/* False Carrier */
+>  #define FIFO_CFG5_CE		BIT(3)	/* Code Error */
+> -#define FIFO_CFG5_LM		BIT(4)	/* Length Mismatch */
+> -#define FIFO_CFG5_LO		BIT(5)	/* Length Out of Range */
+> -#define FIFO_CFG5_OK		BIT(6)	/* Packet is OK */
+> -#define FIFO_CFG5_MC		BIT(7)	/* Multicast Packet */
+> -#define FIFO_CFG5_BC		BIT(8)	/* Broadcast Packet */
+> -#define FIFO_CFG5_DR		BIT(9)	/* Dribble */
+> -#define FIFO_CFG5_CF		BIT(10)	/* Control Frame */
+> -#define FIFO_CFG5_PF		BIT(11)	/* Pause Frame */
+> -#define FIFO_CFG5_UO		BIT(12)	/* Unsupported Opcode */
+> -#define FIFO_CFG5_VT		BIT(13)	/* VLAN tag detected */
+> -#define FIFO_CFG5_LE		BIT(14)	/* Long Event */
+> -#define FIFO_CFG5_FT		BIT(15)	/* Frame Truncated */
+> -#define FIFO_CFG5_16		BIT(16)	/* unknown */
+> -#define FIFO_CFG5_17		BIT(17)	/* unknown */
+> +#define FIFO_CFG5_CR		BIT(4)  /* CRC error */
+> +#define FIFO_CFG5_LM		BIT(5)	/* Length Mismatch */
+> +#define FIFO_CFG5_LO		BIT(6)	/* Length Out of Range */
+> +#define FIFO_CFG5_OK		BIT(7)	/* Packet is OK */
+> +#define FIFO_CFG5_MC		BIT(8)	/* Multicast Packet */
+> +#define FIFO_CFG5_BC		BIT(9)	/* Broadcast Packet */
+> +#define FIFO_CFG5_DR		BIT(10)	/* Dribble */
+> +#define FIFO_CFG5_CF		BIT(11)	/* Control Frame */
+> +#define FIFO_CFG5_PF		BIT(12)	/* Pause Frame */
+> +#define FIFO_CFG5_UO		BIT(13)	/* Unsupported Opcode */
+> +#define FIFO_CFG5_VT		BIT(14)	/* VLAN tag detected */
+> +#define FIFO_CFG5_LE		BIT(15)	/* Long Event */
+> +#define FIFO_CFG5_FT		BIT(16)	/* Frame Truncated */
+> +#define FIFO_CFG5_UC		BIT(17)	/* Unicast Packet */
+>  #define FIFO_CFG5_SF		BIT(18)	/* Short Frame */
+>  #define FIFO_CFG5_BM		BIT(19)	/* Byte Mode */
+>  #define FIFO_CFG5_INIT	(FIFO_CFG5_DE | FIFO_CFG5_DV | FIFO_CFG5_FC | \
+> -			 FIFO_CFG5_CE | FIFO_CFG5_LO | FIFO_CFG5_OK | \
+> -			 FIFO_CFG5_MC | FIFO_CFG5_BC | FIFO_CFG5_DR | \
+> -			 FIFO_CFG5_CF | FIFO_CFG5_PF | FIFO_CFG5_VT | \
+> -			 FIFO_CFG5_LE | FIFO_CFG5_FT | FIFO_CFG5_16 | \
+> -			 FIFO_CFG5_17 | FIFO_CFG5_SF)
+> +			 FIFO_CFG5_CE | FIFO_CFG5_LM | FIFO_CFG5_L0 | \
 
---t5eyogjq3jsiix2j
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+			                               FIFO_CFG5_LO
 
-On 29.08.2024 17:42:52, Gal Pressman wrote:
-> All devices support SOF_TIMESTAMPING_RX_SOFTWARE by virtue of
-> net_timestamp_check() being called in the device independent code.
->=20
-> Move the responsibility of reporting SOF_TIMESTAMPING_RX_SOFTWARE and
-> SOF_TIMESTAMPING_SOFTWARE, and setting PHC index to -1 to the core.
-> Device drivers no longer need to use them.
->=20
-> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Link: https://lore.kernel.org/netdev/661550e348224_23a2b2294f7@willemb.c.=
-googlers.com.notmuch/
-> Co-developed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> +			 FIFO_CFG5_OK | FIFO_CFG5_MC | FIFO_CFG5_BC | \
+> +			 FIFO_CFG5_DR | FIFO_CFG5_CF | FIFO_CFG5_UO | \
+> +			 FIFO_CFG5_VT | FIFO_CFG5_LE | FIFO_CFG5_FT | \
+> +			 FIFO_CFG5_UC | FIFO_CFG5_SF)
+>  
+>  #define AG71XX_REG_TX_CTRL	0x0180
+>  #define TX_CTRL_TXE		BIT(0)	/* Tx Enable */
 
-Reviewed-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Please consider a patch to allow compilation of this driver with
+COMPILE_TEST in order to increase build coverage.
 
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---t5eyogjq3jsiix2j
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbQprAACgkQKDiiPnot
-vG/EQgf8D7XEdwjr+ypafyyl6OqZCBsIH2oCiioGIoX9OSTePxJwBROLdKkGtYj8
-OPCDj1vvSVZ+KduSEzICWZZh0fALahoQnXpNZxFL8ccLWrp9nPnAkuGV2G+pQRu7
-pS46VOy9TgNeB1220kdICRCSmcA/g9GJwj5CkHgZxAs4rKgehmFYkakNCkZeavOd
-fQecGNT9MhRLdMX+YDVjr2tyDJuflaYlUz4tkJH7ehLkrjJU+r8+msj1DZXQJZxr
-hoyDI4knPF5eoqq4tePVgp27UfxVoU0ntR1qSuFBp89XkPwlUrayiJ60e1pPG6sM
-IDC5UudpM+ax+kuCiK7DOxdjVMinQw==
-=9rFK
------END PGP SIGNATURE-----
-
---t5eyogjq3jsiix2j--
+-- 
+pw-bot: cr
 
