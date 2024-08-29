@@ -1,143 +1,167 @@
-Return-Path: <netdev+bounces-123523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2590A9652BA
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 00:16:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8546F9652C9
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 00:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1C2E1F226FE
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 22:16:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFFE02849F0
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 22:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 818D118A932;
-	Thu, 29 Aug 2024 22:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8B11B5EDB;
+	Thu, 29 Aug 2024 22:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="A4F0hWHL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PC3/FNGw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C121F18B479
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 22:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9B118B479;
+	Thu, 29 Aug 2024 22:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724969810; cv=none; b=chBhBdnERMTM+AuUWwWSUxPCSVmFFiffJqRWsDKM72Pq90bgl3p6ZmfGQPcrtqyTNxw6CRKqeY8M3Oea/mJB4LBoRYddxmR6xPo3sJkd4FTlrs+gOqtQqxdZxD7vQivoq/6vSUcF4SURHe9KmNJ2fFFJWvJ7plvbsts625PentE=
+	t=1724970020; cv=none; b=XEnIyvU0scu2jkr0pXeF23OQ5aYLVY9Hg727b6cVHAZalYNFRKA//uS28cNVCSz7w0nk+fAh4JSMoIqemlbGetBnnHLrP7ZQ9SE4IseStzKfLtWQFhUSOaB1Gi7afCnRMm6se3AxA/23Jh212LDoHEES45s0yVTnjklDxedKZ6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724969810; c=relaxed/simple;
-	bh=EVf1wNoMKz2uF2GlxsGjYPEDMW6Fe2WKaaS0DO4ekuQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=lG66v5HGd7/BmXPT7f2UeHnCfbNu+1M7OsaMVlTKiPw31EXR0bgLA6yzv/Rn/uNRcNnzL8G3TooPzGnSvHM9+7pJGwwhSoKclUGJ/5Lwef8DpjqCW1irtt07MPl6sUD1r5EELGGzXMRVTdliEcJmo1UiHR568ICGvevNiahrZXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=A4F0hWHL; arc=none smtp.client-ip=209.85.217.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-498debdf653so430415137.1
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 15:16:48 -0700 (PDT)
+	s=arc-20240116; t=1724970020; c=relaxed/simple;
+	bh=UDORaHvAN7S3yc9tW4mZMSnJAbxzblHMs30iSNOwhoA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=K9M+NNEM/HGX3TnK4UtJoZoMnJlCaFc5DHJfjEJk56QuT3OApvNJW4ae12jaF4q/aUHkM/KlWk3RddMqCILMlfJXW2kFQgseKjLmElUUIu6zKKvvA+4EwLTEbThrxuvPOvh7A1TxAoWlc8yK2eQAZce2NwJZEYuQuPjFOson4jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PC3/FNGw; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5353d0b7463so2163415e87.3;
+        Thu, 29 Aug 2024 15:20:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1724969807; x=1725574607; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=AdhyFIR6wG8Nk99mcJa0o/LUoEn4VFkj70K4F1UtVdU=;
-        b=A4F0hWHLugC5g7UFiRfaFAp/C81fbjmAFKBCirVG2nuveP6fxLL9G5wBK2lHhA984M
-         9J6UBo4hboi9YMJs+HiDVCgaESO97/HW87xKMrxpoaF2WmVhub2ZFBe1yeYmvV9Qfusg
-         K1R/mIkz4lfdcKCZ1SDWPo2ax8xEMf4M65K1o=
+        d=gmail.com; s=20230601; t=1724970017; x=1725574817; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MRGrTDKjDwHQeb9wkPVV5Mt+a0Du/e6zQoQAuS3WCHI=;
+        b=PC3/FNGw6IeSG/JvauVu/W8Vc0NEZs8vMD5BG2MnnEg6PFlv1QzhYQqjZzaqFTzdxF
+         Aw5mVTPYqfeMZparEkfSrlI42d8510cUxPO01dRo4yp8GkmIi2GZ2oX8kUOT0/0y0LS6
+         vMAXcyxd3gnigcGV9X1+t4pboK6HeFnr0WRhEx7bsgIfjXd0Uj1HnEwoxkC0LY95cv5G
+         R+J4+IFU9p9W1/JmNYdlSg8ljPkdca96NRChlQcZzxM44fyFVKEN/s/9NukfLEjbZW+M
+         8V5GAEuRv75xCRQEXwB6oWeGodCBMJeUIfMf+Rv7gZBM7XsvwycwN8fe9s75SfUPpFeJ
+         pIVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724969807; x=1725574607;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AdhyFIR6wG8Nk99mcJa0o/LUoEn4VFkj70K4F1UtVdU=;
-        b=Celqe1m6Rv+du0pQQecdCGh2MZAAAhHRIdgzRBLafsg5Bp43vZgdFsfiqe6UnrQUC/
-         yYfvTojcTUCxl8F60908LLxY3VrJqwJQawy6vxh2EO8Hlb7t3n4ZXIubFY8MBmcCy4/3
-         DkhmrYIYuTEHSTsEueeZHL1e1JS7Ytytv4zRYkqS6qJ9hSDr2ohiqHZblHKXW0qKdRvX
-         4fxQVo5C0y/yM20mFCzA5myjRASdDcHIjXYQ4PxpSC69qXRenQaZqqv+1z3DNCoyM19a
-         m29GSeIVtTOSpTSGsP/n0gAI4oQVf+nsfa9UJsAP4n//kJFGEUZRmAGiZSXzyZH4ZWG6
-         wKWA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5xySOdhkSPRrSRYne5HVG+svqCZmnC+E8lJh47tAfeHI07DvvEnKaCWlLhIgUnRSoNSD4gFY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMBjIdzPbfHDwQNoDlfJyWez/0JJIVkxaz1i61j8O9jA8OUWmN
-	YxNPNFrXT0VxLFbY6VTsMy/jMFQHlImLh/JiTdJL/T04isRhWeddLSFKwXl0Zw==
-X-Google-Smtp-Source: AGHT+IF/GKad4GoNSJTieXZ4HSfQQ6Emya12RNEV/ApIr1wHYt03Uq4P4o4Bzr4FyKoeCXEIVSEvwQ==
-X-Received: by 2002:a05:6102:32d0:b0:493:b3d8:bd8d with SMTP id ada2fe7eead31-49a5af78a2fmr4761465137.26.1724969807417;
-        Thu, 29 Aug 2024 15:16:47 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340c96aa3sm9033706d6.103.2024.08.29.15.16.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Aug 2024 15:16:46 -0700 (PDT)
-Message-ID: <1b701803-748a-47dd-a847-57a04488d692@broadcom.com>
-Date: Thu, 29 Aug 2024 15:16:41 -0700
+        d=1e100.net; s=20230601; t=1724970017; x=1725574817;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MRGrTDKjDwHQeb9wkPVV5Mt+a0Du/e6zQoQAuS3WCHI=;
+        b=TazkgVi/3RdprUjG1VoHPIqMghBqLLOmYzsqUhTbYtv0b1kL1AEGAIa5LzO7MDi6Bn
+         yBQ/l/W0jOwkm4Kjh90AZRW+71V7i6MHuoxsOW5mGn5mQN53gPXZ0pXYP7c2EQ4dLQhD
+         rBAJKO8M7rRGgityZxVCSAuuU6qPOrH2Hq+PZqMD5L8Vfjw6pp2HqJi/GIIa8kVlq1pj
+         P1McmHD/mQP6msYLeKtrGw3vMbJiomquYqzZK9fUUKXIB5+SgpI93VUrkd8N2V7ieWyt
+         jqqYIRiHg4ReV0oXAiWx/a9Hc6r/MWPEy5ODZD2L2v7Wwz77G7+OH44/a32B/3gjbV3z
+         O+5w==
+X-Forwarded-Encrypted: i=1; AJvYcCX+1frR17udRJr0Hkod6jycwDT/lKbQuOd0rl98kQ3kbRfsXWE43G/UsASDvQ4+UR4zbIGcA1nF@vger.kernel.org, AJvYcCXdvshXECKOrvdajnrjPokcRdpkHXTg7qD8J9+cHO46QhOMC1Qk+AP/t5RxWQJ+pOSyL+SHPp6DPiZcI8M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzk/kC/Np1IZe68jAjHBvbHwrN9lOaS6J3tJqXygKx+mDhI1JsS
+	t55+PSREuYbK+qYpg2DvE96x4EhGiGWAZBONHfEAXP25wJ7Q4ey5zkEfNYByJNjnl/jXs5/OtQf
+	CWc1ubMA9dmuCM3Lp387hCqGfAWA=
+X-Google-Smtp-Source: AGHT+IGeOo6Fnay+28SkVGmqj5xc7t/rED5v7GH0KaG/tn2nYGCHhZtfFa7d2JSpqiC88PrN/TtCh/rGR5/EHzwRnWY=
+X-Received: by 2002:ac2:4c45:0:b0:530:b773:b4ce with SMTP id
+ 2adb3069b0e04-53546b5a1dfmr42454e87.33.1724970017043; Thu, 29 Aug 2024
+ 15:20:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 12/13] net: bcmasp: Simplify with scoped for
- each OF child loop
-To: Jinjie Ruan <ruanjinjie@huawei.com>, woojung.huh@microchip.com,
- andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
- justin.chen@broadcom.com, sebastian.hesselbarth@gmail.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, wens@csie.org,
- jernej.skrabec@gmail.com, samuel@sholland.org, mcoquelin.stm32@gmail.com,
- hkallweit1@gmail.com, linux@armlinux.org.uk, ansuelsmth@gmail.com,
- UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
- bcm-kernel-feedback-list@broadcom.com,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
- krzk@kernel.org, jic23@kernel.org
-References: <20240829063118.67453-1-ruanjinjie@huawei.com>
- <20240829063118.67453-13-ruanjinjie@huawei.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20240829063118.67453-13-ruanjinjie@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240826212205.187073-1-rosenp@gmail.com> <20240827161258.535f8835@kernel.org>
+ <CAKxU2N-SDtFCrXWDc_2fGKSjosjBg=s4PJ2ztETrocTDo75ayQ@mail.gmail.com>
+In-Reply-To: <CAKxU2N-SDtFCrXWDc_2fGKSjosjBg=s4PJ2ztETrocTDo75ayQ@mail.gmail.com>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Thu, 29 Aug 2024 19:20:05 -0300
+Message-ID: <CAJq09z6JvN4t=xSsxAY97FAtkL2YfkVCGJ6G5YA_PTsC=jFtHg@mail.gmail.com>
+Subject: Re: [PATCHv4 net-next] net: ag71xx: get reset control using devm api
+To: Rosen Penev <rosenp@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, linux@armlinux.org.uk, 
+	linux-kernel@vger.kernel.org, o.rempel@pengutronix.de, p.zabel@pengutronix.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 8/28/24 23:31, 'Jinjie Ruan' via BCM-KERNEL-FEEDBACK-LIST,PDL wrote:
-> Use scoped for_each_available_child_of_node_scoped() when
-> iterating over device nodes to make code a bit simpler.
-> 
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> On Tue, Aug 27, 2024 at 4:13=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Mon, 26 Aug 2024 14:21:57 -0700 Rosen Penev wrote:
+> > > Currently, the of variant is missing reset_control_put in error paths=
+.
+> > > The devm variant does not require it.
+> > >
+> > > Allows removing mdio_reset from the struct as it is not used outside =
+the
+> > > function.
+> >
+> > > @@ -683,6 +682,7 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
+> > >       struct device *dev =3D &ag->pdev->dev;
+> > >       struct net_device *ndev =3D ag->ndev;
+> > >       static struct mii_bus *mii_bus;
+> > > +     struct reset_control *mdio_reset;
+> >
+> > nit: maintain the longest to shortest ordering of the variables
+> > (sorted by line length not type length)
+> >
+> > >       struct device_node *np, *mnp;
+> > >       int err;
+> > >
+> > > @@ -698,10 +698,10 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
+> > >       if (!mii_bus)
+> > >               return -ENOMEM;
+> > >
+> > > -     ag->mdio_reset =3D of_reset_control_get_exclusive(np, "mdio");
+> > > -     if (IS_ERR(ag->mdio_reset)) {
+> > > +     mdio_reset =3D devm_reset_control_get_exclusive(dev, "mdio");
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
 
+
+> > > +     if (IS_ERR(mdio_reset)) {
+> > >               netif_err(ag, probe, ndev, "Failed to get reset mdio.\n=
+");
+> > > -             return PTR_ERR(ag->mdio_reset);
+> > > +             return PTR_ERR(mdio_reset);
+> > >       }
+> > >
+> > >       mii_bus->name =3D "ag71xx_mdio";
+> > > @@ -712,10 +712,10 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
+> > >       mii_bus->parent =3D dev;
+> > >       snprintf(mii_bus->id, MII_BUS_ID_SIZE, "%s.%d", np->name, ag->m=
+ac_idx);
+> > >
+> > > -     if (!IS_ERR(ag->mdio_reset)) {
+> > > -             reset_control_assert(ag->mdio_reset);
+> > > +     if (!IS_ERR(mdio_reset)) {
+> >
+> > Are you planning to follow up to remove this check?
+> > Would be nice to do that as second patch in the same series
+> I actually have no idea why this is here. I assume it's some mistake.
+> I don't think it's meant to be optional...
+
+{devm,of}_reset_control_get_exclusive() will return an error if the OF
+node is missing. If it should be optional, it should be
+devm_reset_control_get_optional_exclusive(), which would return NULL
+if it is missing.
+
+The equivalent driver used in OpenWrt does explicitly make it
+optional. https://github.com/openwrt/openwrt/blob/4646aa169986036772b9f7539=
+3c08508d20ddf8b/target/linux/ath79/files/drivers/net/ethernet/atheros/ag71x=
+x/ag71xx_main.c#L1532,
+while the mac_reset is mandatory. They might have a reason for that or
+maybe only heritage from Atheros AG7100 driver.
+
+> >
+> > > +             reset_control_assert(mdio_reset);
+> > >               msleep(100);
+> > > -             reset_control_deassert(ag->mdio_reset);
+> > > +             reset_control_deassert(mdio_reset);
+> > >               msleep(200);
+> > >       }
+
+Regards,
+
+Luiz
 
