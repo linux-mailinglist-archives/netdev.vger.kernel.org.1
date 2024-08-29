@@ -1,101 +1,158 @@
-Return-Path: <netdev+bounces-123432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 963D7964D75
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:10:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5458E964D88
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:14:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C7CF28121E
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:10:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFF0C1F21EAD
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9CD1B6525;
-	Thu, 29 Aug 2024 18:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF2C1B81D1;
+	Thu, 29 Aug 2024 18:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Y+j9ymxn"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 027F51AD9DE
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 18:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774CB1B5EC8;
+	Thu, 29 Aug 2024 18:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724955009; cv=none; b=IOolopY/8OD5Aj8of6VjFW2gM0sks90IbMA5RolUCMoSkOLiXVb6dyrOPZQgzVMs+u/h2EKmUCvoI3WFWtzP/zc0dA7ds5zez32HPhJ0O3D/StEb/kvrKVM+a1Vgb1D+1jedbfncag7SIUt3prfDw5EJGUgyltFMNFCEsQ1ICRM=
+	t=1724955278; cv=none; b=tOjHiHL5iAf90KEF4FaWnW6ga2j7gZJR7/kyLCZGxTWFqXCWIj/IKkz+cZYucmyZafOWB71o7cpzymCzStYt51qzbk3n2DP5GplYYqtmUp2hKT7L5s0UPVZHFKbjFDIFMFjjIDozHJwmfQ2RQySxfK6UTS8SdM/mfqKZfbKPE98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724955009; c=relaxed/simple;
-	bh=7UzzKlbW3UeySdD52GyL382wftf/pCCXa3EMleqDW58=;
+	s=arc-20240116; t=1724955278; c=relaxed/simple;
+	bh=M6mcSUoRdzWYWfsq9ko3pBxTfVmKKSZdqyPPcJZrNAs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EmRaL8S+hTv3NArpS5BKhYzNb+/ABzoJ5oaPppt5YXtOi3Le/kJ8LJuKaeC4klS6yOD0pwQ6Ug74+D/KiGPUMJjyj4OsmL4yJGjdUaJ7fdo2FhsHZBk7WmT9jaEdBLoMwV0a/f/mb7bLDd4wRNUNM5hTv64YWf9QiU27a3ZuYIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sjjas-0006tR-5g; Thu, 29 Aug 2024 20:10:02 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sjjaq-003y7c-Jt; Thu, 29 Aug 2024 20:10:00 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sjjaq-00Ciqv-1a;
-	Thu, 29 Aug 2024 20:10:00 +0200
-Date: Thu, 29 Aug 2024 20:10:00 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, Vladimir Oltean <olteanv@gmail.com>,
-	andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	woojung.huh@microchip.com
-Subject: Re: [RFC net-next 1/2] net: ethtool: plumb PHY stats to PHY drivers
-Message-ID: <ZtC5eLe8GQRE5dU_@pengutronix.de>
-References: <20240829174342.3255168-1-kuba@kernel.org>
- <20240829174342.3255168-2-kuba@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YKtcgOMMFN46tfcgv3dLTydsaq6tLveSVeSqazQfNf1R1LH9Knu9exD1soapJ7pZyCI2GZtlvewjGXrBMxdquJvif54VM2in68gkHNAQgqW7IFfiguxoCn+K7SQWsQY2mZQAzTa6fTiyL0FrMuunV0GsvAqwcsBCdd/7TC+jQd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Y+j9ymxn; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724955277; x=1756491277;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=M6mcSUoRdzWYWfsq9ko3pBxTfVmKKSZdqyPPcJZrNAs=;
+  b=Y+j9ymxn9nNLn0hwWk4XwbI8XIvKa3uiaqcSZjf46KHpzEfucYCkEl0H
+   nIyyY1hHOiWpSCSTPUtYt4gYF38QPWx99Buk3Yb/1kpT2ldfcOmhVH8FF
+   6imxg/3Ub7F2r3gj9hbHBD/jygjgA463YrKRd3pwhVsyovZvzC3Xn8+Bk
+   Q9hbMocUtMhX4g7iH5FPGxxgWaR2aLgHkfuKopQyIxoNgmfTulQ3MqZpB
+   6i5VSXskVl45LNYpzLzACQ+Wm3Lijq4REAHhWGybLssBogTNOqV37HioH
+   PuxqzKccYFb01po5hW2QWFJQlutFfPJoGsJ21yx1x6T8wIkQhtSycWDxY
+   A==;
+X-CSE-ConnectionGUID: EkcG6H0HQoi4hi/i8ZW7mA==
+X-CSE-MsgGUID: IqF8Qxu2TrawIWM4taBJLw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="27449781"
+X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
+   d="scan'208";a="27449781"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 11:14:36 -0700
+X-CSE-ConnectionGUID: pmq6Ev5yQ7+8FRlvx2DKvg==
+X-CSE-MsgGUID: xeAV+TSSR5SOooeaHQAGCg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
+   d="scan'208";a="94399996"
+Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 29 Aug 2024 11:14:35 -0700
+Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sjjfE-0000ao-0L;
+	Thu, 29 Aug 2024 18:14:32 +0000
+Date: Fri, 30 Aug 2024 02:14:31 +0800
+From: kernel test robot <lkp@intel.com>
+To: Wan Junjie <junjie.wan@inceptio.ai>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"junjie.wan" <junjie.wan@inceptio.ai>
+Subject: Re: [PATCH] dpaa2-switch: fix flooding domain among multiple vlans
+Message-ID: <202408300142.EN2CiiIs-lkp@intel.com>
+References: <20240827110855.3186502-1-junjie.wan@inceptio.ai>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240829174342.3255168-2-kuba@kernel.org>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240827110855.3186502-1-junjie.wan@inceptio.ai>
 
-On Thu, Aug 29, 2024 at 10:43:41AM -0700, Jakub Kicinski wrote:
-> Feed the existing IEEE PHY counter struct (which currently
-> only has one entry) and link stats into the PHY driver.
-> The MAC driver can override the value if it somehow has a better
-> idea of PHY stats. Since the stats are "undefined" at input
-> the drivers can't += the values, so we should be safe from
-> double-counting.
-> 
-> Vladimir, I don't understand MM but doesn't MM share the PHY?
-> Ocelot seems to aggregate which I did not expect.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Hi Wan,
 
-Huh.. it is completely different compared to what I was thinking.
-If I see it correctly, it will help to replace missing HW stats for some
-MACs like ASIX. But it will fail to help diagnose MAC-PHY connections
-issues like, wrong RGMII configurations or other kind of damages on the
-PCB. Right?
+kernel test robot noticed the following build warnings:
 
-Regards,
-Oleksij
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.11-rc5 next-20240829]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Wan-Junjie/dpaa2-switch-fix-flooding-domain-among-multiple-vlans/20240827-191121
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20240827110855.3186502-1-junjie.wan%40inceptio.ai
+patch subject: [PATCH] dpaa2-switch: fix flooding domain among multiple vlans
+config: arm-allyesconfig (https://download.01.org/0day-ci/archive/20240830/202408300142.EN2CiiIs-lkp@intel.com/config)
+compiler: arm-linux-gnueabi-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240830/202408300142.EN2CiiIs-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408300142.EN2CiiIs-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c: In function 'dpaa2_switch_fdb_set_egress_flood':
+>> drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c:179:18: warning: unused variable 'i' [-Wunused-variable]
+     179 |         int err, i;
+         |                  ^
+   drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c: In function 'dpaa2_switch_port_flood':
+>> drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c:1782:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+    1782 |         if (err)
+         |         ^~
+   drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c:1784:17: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+    1784 |                 return err;
+         |                 ^~~~~~
+
+
+vim +/i +179 drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
+
+   175	
+   176	static int dpaa2_switch_fdb_set_egress_flood(struct ethsw_core *ethsw, u16 fdb_id)
+   177	{
+   178		struct dpsw_egress_flood_cfg flood_cfg;
+ > 179		int err, i;
+   180	
+   181		/* Setup broadcast flooding domain */
+   182		dpaa2_switch_fdb_get_flood_cfg(ethsw, fdb_id, DPSW_BROADCAST, &flood_cfg);
+   183		err = dpsw_set_egress_flood(ethsw->mc_io, 0, ethsw->dpsw_handle,
+   184					    &flood_cfg);
+   185		if (err) {
+   186			dev_err(ethsw->dev, "dpsw_set_egress_flood() = %d\n", err);
+   187			return err;
+   188		}
+   189	
+   190		/* Setup unknown flooding domain */
+   191		dpaa2_switch_fdb_get_flood_cfg(ethsw, fdb_id, DPSW_FLOODING, &flood_cfg);
+   192		err = dpsw_set_egress_flood(ethsw->mc_io, 0, ethsw->dpsw_handle,
+   193					    &flood_cfg);
+   194		if (err) {
+   195			dev_err(ethsw->dev, "dpsw_set_egress_flood() = %d\n", err);
+   196			return err;
+   197		}
+   198	
+   199		return 0;
+   200	}
+   201	
+
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
