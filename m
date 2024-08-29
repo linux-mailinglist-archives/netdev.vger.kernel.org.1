@@ -1,106 +1,59 @@
-Return-Path: <netdev+bounces-123480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3556096507A
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 22:06:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2726965083
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 22:11:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BED8B21CDF
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:06:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32D001F2672C
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14DE11BA870;
-	Thu, 29 Aug 2024 20:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91BAD1BA288;
+	Thu, 29 Aug 2024 20:11:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pgh05sZH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NzfEkHgj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44DA1311B5;
-	Thu, 29 Aug 2024 20:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DA201494A7
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 20:11:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724961962; cv=none; b=KVop9deUsUViAhlRJNOaVUEaNx8QPe29a8lJ1snTwbpoBjbedx9U35KGVRBh3sErOD0gdQvSO02qpQbY1TD4WqYdwm2G2OJ1RDg/wjR3P0F6Upz41plX9TcHGqFldipzPdyoSNa3QGBZahFcqnmDr1hobWETA9rWzod12XhDKbc=
+	t=1724962264; cv=none; b=c+LCwacofcoDJmFkF0ntvPaMkDA+NZQj85WFRaXT3lVF7W+MuYhj1HGMr/KMtXUxS7ifFfwazSFIQTkSEI5wjwLvtNZQ8BNBnqypbsqsqq9f8fqWrAM+nUfgP43PJu2L/LPPyFqIEOzj/8cm6ipoQm2OGhF4GamErej6Ztw0+Zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724961962; c=relaxed/simple;
-	bh=jjY3PbslKhfXvlshQ539eQ+z8Cll4clbilq8gY8N3I0=;
+	s=arc-20240116; t=1724962264; c=relaxed/simple;
+	bh=qAm0d34zoB1eJ0WQ0I6/LSz+1p9fX/OXAZI/p13/NUA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=di16iONw5wb098h76VpcyGjwdmoQ4t1bF+pbjW7d34orEsTc2dNwT0O1MCZZ4OR9XAg0rBOXv8u82Ab0iCSnuxgRzkjqitmnA8wW5WF7wh16Q9hXTAyk0T5G2KBUOVkvSYuuPmaRKoWIrikqgTAyc4KdmAQTIFrS/1tZHUlgiSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pgh05sZH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E22A9C4CEC1;
-	Thu, 29 Aug 2024 20:05:50 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ru1w7GBSvDVSjX0iWY0JuBY9EPN1ylePdasAY249tMwwchuVPzaRn9tfHjKtF5VdsesCLZR6vZkG7rDC+M1FEsr5pzXa0cWg7j5e3eTa0/f8M9oOOh5wkW833ZAJH/O3g+eQ1IWw7MTgpZ9mI6a2pKeFiTx1vv85MCn0IGTCfE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NzfEkHgj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A2C8C4CEC1;
+	Thu, 29 Aug 2024 20:11:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724961962;
-	bh=jjY3PbslKhfXvlshQ539eQ+z8Cll4clbilq8gY8N3I0=;
+	s=k20201202; t=1724962264;
+	bh=qAm0d34zoB1eJ0WQ0I6/LSz+1p9fX/OXAZI/p13/NUA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Pgh05sZHH1ibogv5993BrLByQD2Hc0qfcAv2NJeBS3Mftf84AbXP9FW90wTGti+Tf
-	 ru32QNYkthl3hI0pSdGfQtUdsHeU1uWr6boa5WmBadB/vr4S5eY2mzVWaDVz/GH8Ks
-	 JvpRPHZu38SQAmQmVTfol3Si3hAjwgijOkJkBnM/xm9lUV+WW1lQ07x1jXV6BdovV9
-	 ZQLhh2jTkOWKq8dmJVXCjaUdIP0R1ph0q54o9t2g7Pi9fTt4xeg0jKN26ZYxsETwJC
-	 pkVrvKZrhYyJUI3CTFCDMW/PZRtCtcwBFmOQJTvVO7vMftTj08uaE4xrP321ZNlR4R
-	 cuA4wT2MNl2xw==
-Date: Thu, 29 Aug 2024 21:05:48 +0100
+	b=NzfEkHgjwQnvPyTHgehSEv60nTXIM64OP7ozdcvZaZkH8G2bEFaWriXeAkLKbU3k3
+	 /+RkJxrqPCdoHU5orOabxlmGiVMuNGLbLEt7f+mNe2ndA56reYuAeB7BWND131u604
+	 qHfNheYpbxGKmC6nWCNsi8aXnL7hBnY59q8AuDoP3J2LrwYqT/4/R6cyw4a1Tg4tRn
+	 pDtUQkVDpKTgiAMxEKNzaYbKs9s4LnbOWi4qFQvwYlNsM6Hv3p5JqEp30XEhJdlEff
+	 oQaK06q3qnHBPhfudsRfPJv91oOK354RxwI2Ljv5J2r4J7CGieAS77o8hybhaovlP4
+	 eNEhQIMOE0VFQ==
+Date: Thu, 29 Aug 2024 21:11:00 +0100
 From: Simon Horman <horms@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
-	dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	=?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>,
-	Bagas Sanjaya <bagasdotme@gmail.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Taehee Yoo <ap420073@gmail.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>,
-	Daniel Vetter <daniel.vetter@ffwll.ch>
-Subject: Re: [PATCH net-next v23 03/13] netdev: support binding dma-buf to
- netdevice
-Message-ID: <20240829200548.GX1368797@kernel.org>
-References: <20240829060126.2792671-1-almasrymina@google.com>
- <20240829060126.2792671-4-almasrymina@google.com>
+	David Ahern <dsahern@kernel.org>, Willy Tarreau <w@1wt.eu>,
+	Keyu Man <keyu.man@email.ucr.edu>,
+	Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH v2 net-next 0/3]  icmp: avoid possible side-channels
+ attacks
+Message-ID: <20240829201100.GY1368797@kernel.org>
+References: <20240829144641.3880376-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,44 +62,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240829060126.2792671-4-almasrymina@google.com>
+In-Reply-To: <20240829144641.3880376-1-edumazet@google.com>
 
-On Thu, Aug 29, 2024 at 06:01:16AM +0000, Mina Almasry wrote:
+On Thu, Aug 29, 2024 at 02:46:38PM +0000, Eric Dumazet wrote:
+> Keyu Man reminded us that linux ICMP rate limiting was still allowing
+> side-channels attacks.
+> 
+> Quoting the fine document [1]:
+> 
+> 4.4 Private Source Port Scan Method
+> ...
+>  We can then use the same global ICMP rate limit as a side
+>  channel to infer if such an ICMP message has been triggered. At
+>  first glance, this method can work but at a low speed of one port
+>  per second, due to the per-IP rate limit on ICMP messages.
+>  Surprisingly, after we analyze the source code of the ICMP rate
+>  limit implementation, we find that the global rate limit is checked
+>  prior to the per-IP rate limit. This means that even if the per-IP
+>  rate limit may eventually determine that no ICMP reply should be
+>  sent, a packet is still subjected to the global rate limit check and one
+>  token is deducted. Ironically, such a decision is consciously made
+>  by Linux developers to avoid invoking the expensive check of the
+>  per-IP rate limit [ 22], involving a search process to locate the per-IP
+>  data structure.
+>  This effectively means that the per-IP rate limit can be disre-
+>  garded for the purpose of our side channel based scan, as it only
+>  determines if the final ICMP reply is generated but has nothing to
+>  do with the global rate limit counter decrement. As a result, we can
+>  continue to use roughly the same scan method as efficient as before,
+>  achieving 1,000 ports per second
+> ...
+> 
+> This series :
+> 
+> 1) Changes the order of the two rate limiters to fix the issue.
+> 
+> 2-3) Make the 'host-wide' rate limiter a per-netns one.
+> 
+> [1]
+> Link: https://dl.acm.org/doi/pdf/10.1145/3372297.3417280
+> 
+> v2: added kerneldoc changes for icmp_global_allow() (Simon)
 
-...
-
-> diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-> index 6b7fe6035067..8b87801e8d1c 100644
-> --- a/net/core/netdev-genl-gen.c
-> +++ b/net/core/netdev-genl-gen.c
-> @@ -8,6 +8,7 @@
->  
->  #include "netdev-genl-gen.h"
->  
-> +#include <linux/list.h>
->  #include <uapi/linux/netdev.h>
-
-Hi Mina,
-
-Strangely, when tools/net/ynl/ynl-regen.sh -f runs, it places
-the includes in the opposite order.
-
-I raise this as it may lead to churn later.
-
-...
-
-> diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
-> index 67c34005750c..01ef29ace149 100644
-> --- a/net/core/netdev-genl-gen.h
-> +++ b/net/core/netdev-genl-gen.h
-> @@ -9,6 +9,7 @@
->  #include <net/netlink.h>
->  #include <net/genetlink.h>
->  
-> +#include <linux/list.h>
->  #include <uapi/linux/netdev.h>
-
-Ditto.
-
-...
+Thanks for the update; confirming that part looks good to me.
 
