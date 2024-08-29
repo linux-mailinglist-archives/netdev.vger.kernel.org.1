@@ -1,609 +1,421 @@
-Return-Path: <netdev+bounces-123235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A058F96435D
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:43:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2438D96436E
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:45:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCAD0B28083
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 11:43:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 622FAB25D12
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 11:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D0C21922D9;
-	Thu, 29 Aug 2024 11:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9987718E375;
+	Thu, 29 Aug 2024 11:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kn0opovE"
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="eqZzHJ93"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.167])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BAFB1922F2
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 11:42:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316FC1917D7
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 11:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.167
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724931742; cv=none; b=qCa8l5BHaGK0N9EHynu8gsKWFhx+T6o3sQ/n1/MGihIRZBZc6tTw5GwZXn49BrMcDLWTpk+ffrzC8vP5COFvpAeRgP9R0ZSyMzmWXwj5VxLap+hyBk0y0BND010zNPyOB0cuQyvxKXZFvquC/f6DRGfX7Hg5CUjAd45F/yw5w74=
+	t=1724931913; cv=none; b=kmrrkuPSfVNTkvIOQJ9JPUe0bvVXz/XchDq5mltMIU+vpcE4PGksKv2cInfHzShGllqadFrH4ZBkh+8nSNTcSh3mhjeySRLkl+YlXYaE6f2H9/ZJGIi8N7eqU/nGZrNv21y5dJqCGFV5dZ7PC0f3dF5xbK1YdEWiIFo1eHbJIIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724931742; c=relaxed/simple;
-	bh=uxkjQWVoOPKh73eqR5RD66ouL/uExnhG5z2ccjRbZ/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gkvi+9F/uSDefQhiBB2hxLg5baF2Y9AgTQ/NqI5ysTNOxr2lu4YwzLDEIOrqJ0xldKD02WSUQ8vpnrGW7gYICIwJ74BY06uOmVk76eGVzqlDw9MS/bx6J3lTDqCFM1RUUj8gVG4MlINB0n4TDH4E9zinfTxvHAipfhYXpb21EXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kn0opovE; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724931740; x=1756467740;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=uxkjQWVoOPKh73eqR5RD66ouL/uExnhG5z2ccjRbZ/Q=;
-  b=Kn0opovE4XluJDRZWIR0R9t1vambfqPibVYdIWhhchtimFlhSit88gau
-   OGl4lvH+m5ocHa6Z9CLSo/CE8FORaaDlJh5k/MwilaATVgYtxhdQB5dCp
-   7/rGnNN3eYJLHxNli/NxgaLMtDZl5drz2vCfCGAVbFK2c2gaU/KwVaH9+
-   HyDs//5HtdhjFP6YXkAohSedkzMBScZtC5g1DwIAV96PB/FmMvu6SZotb
-   73W6NjsXBQDYM1xiJxKRrASQAuygMOH3dFIO92C4TWoP1YFJSpnnurT3g
-   WLd7zlppoo9zjfckXNNzp2YpT7JL9GOzNsjsFfk2MSeBbG1a6sXf8h3O/
-   g==;
-X-CSE-ConnectionGUID: 7DmB9s5WR/CRoHyru8Yvig==
-X-CSE-MsgGUID: DarUpnEDR/CSnFFLI5oZnQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="23092347"
-X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="23092347"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 04:42:20 -0700
-X-CSE-ConnectionGUID: aqdAtnUkRJmvnKtgC/gR9Q==
-X-CSE-MsgGUID: LRiRDyfCSxe6nk5mMNlKwA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="64045479"
-Received: from kkolacin-desk1.igk.intel.com ([10.217.160.108])
-  by orviesa007.jf.intel.com with ESMTP; 29 Aug 2024 04:42:17 -0700
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Michal Michalik <michal.michalik@intel.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Milena Olech <milena.olech@intel.com>,
-	Paul Greenwalt <paul.greenwalt@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v9 iwl-next 7/7] ice: Implement PTP support for E830 devices
-Date: Thu, 29 Aug 2024 13:37:43 +0200
-Message-ID: <20240829114201.1030938-16-karol.kolacinski@intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240829114201.1030938-9-karol.kolacinski@intel.com>
-References: <20240829114201.1030938-9-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1724931913; c=relaxed/simple;
+	bh=JTrJxhooLI6qLnBhS6Jxq2IQtct3MYih4J86EiVKU4Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VbZs5+DlnytmSTYerUNWeejZe3tO8IlUUvx39pNQH+HBdJS72n7PY2KF8IOgawdLrudkklPbMN6TGHadL8PhwngIwF79eMm/NJwhprrPTgVFOg8Iol/nPQqzrtn5XOw18JAMwBT06HW1MwOpWb51JlnsUDkz1N9lFQPFwYTP0jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=eqZzHJ93; arc=none smtp.client-ip=195.121.94.167
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
+X-KPN-MessageId: f9a02f26-65fb-11ef-b0b2-005056abbe64
+Received: from smtp.kpnmail.nl (unknown [10.31.155.39])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id f9a02f26-65fb-11ef-b0b2-005056abbe64;
+	Thu, 29 Aug 2024 13:43:57 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=ngDrZ5ulhcbXqi+3cdcOaZPEkuFWBmJJEx1FfoL6N/0=;
+	b=eqZzHJ93FAfC0lwBjHJ7K4W22+1qY+QRT10qpGzuMrW2dyP4R5GXNIOP89yQtGCqwkU3lHuQPBZUt
+	 ka+yYWmKzOg9ZGwhOw+mlzyl4jjcZmgn9Omtm0jsfWORsJDBLhpaYqU/sUKMH1fsbFE0WD3v1Xysx+
+	 cX0iCia4dLnT7FK4=
+X-KPN-MID: 33|ywHbeqyAG8hOGh8D5A/dHu8DbmxzRoWcj9xLwHzKM6gxlm1fNd9QQMd3orNZsxS
+ Ckdl5TXYNxPil+7y9BvrnkTxXnUMQMQSHAMMZEZf99iw=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|QEw2RsUmDfR1jwwLTWGVBXQwgh96gaa+ivDdc7G69A9y/JJwOepwo/fw3V4/ObO
+ pBrYhgkJWfDoFjbOYAWr5mQ==
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id f9fdd7bb-65fb-11ef-8890-005056ab7447;
+	Thu, 29 Aug 2024 13:43:59 +0200 (CEST)
+Date: Thu, 29 Aug 2024 13:43:57 +0200
+From: Antony Antony <antony@phenome.org>
+To: Christian Hopps <chopps@chopps.org>
+Cc: devel@linux-ipsec.org, Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>, Antony Antony <antony@phenome.org>,
+	Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v10 07/16] xfrm: iptfs: add new iptfs xfrm
+ mode impl
+Message-ID: <ZtBe_anpf3QOG8jW@Antony2201.local>
+References: <20240824022054.3788149-1-chopps@chopps.org>
+ <20240824022054.3788149-8-chopps@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; boundary="NMxVuAkGGEZbhbb+"
+Content-Disposition: inline
+In-Reply-To: <20240824022054.3788149-8-chopps@chopps.org>
 
-From: Michal Michalik <michal.michalik@intel.com>
 
-Add specific functions and definitions for E830 devices to enable
-PTP support.
+--NMxVuAkGGEZbhbb+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-E830 devices support direct write to GLTSYN_ registers without shadow
-registers and 64 bit read of PHC time.
+On Fri, Aug 23, 2024 at 10:20:45PM -0400, Christian Hopps wrote:
+> From: Christian Hopps <chopps@labn.net>
+> 
+> Add a new xfrm mode implementing AggFrag/IP-TFS from RFC9347.
+> 
+> This utilizes the new xfrm_mode_cbs to implement demand-driven IP-TFS
+> functionality. This functionality can be used to increase bandwidth
+> utilization through small packet aggregation, as well as help solve PMTU
+> issues through it's efficient use of fragmentation.
+> 
+>   Link: https://www.rfc-editor.org/rfc/rfc9347.txt
+> 
+> Multiple commits follow to build the functionality into xfrm_iptfs.c
+> 
+> Signed-off-by: Christian Hopps <chopps@labn.net>
+> ---
+>  net/xfrm/Makefile     |   1 +
+>  net/xfrm/xfrm_iptfs.c | 210 ++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 211 insertions(+)
+>  create mode 100644 net/xfrm/xfrm_iptfs.c
+> 
+> diff --git a/net/xfrm/Makefile b/net/xfrm/Makefile
+> index 512e0b2f8514..5a1787587cb3 100644
+> --- a/net/xfrm/Makefile
+> +++ b/net/xfrm/Makefile
+> @@ -21,5 +21,6 @@ obj-$(CONFIG_XFRM_USER) += xfrm_user.o
+>  obj-$(CONFIG_XFRM_USER_COMPAT) += xfrm_compat.o
+>  obj-$(CONFIG_XFRM_IPCOMP) += xfrm_ipcomp.o
+>  obj-$(CONFIG_XFRM_INTERFACE) += xfrm_interface.o
+> +obj-$(CONFIG_XFRM_IPTFS) += xfrm_iptfs.o
+>  obj-$(CONFIG_XFRM_ESPINTCP) += espintcp.o
+>  obj-$(CONFIG_DEBUG_INFO_BTF) += xfrm_state_bpf.o
+> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+> new file mode 100644
+> index 000000000000..201406175d17
+> --- /dev/null
+> +++ b/net/xfrm/xfrm_iptfs.c
+> @@ -0,0 +1,210 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* xfrm_iptfs: IPTFS encapsulation support
+> + *
+> + * April 21 2022, Christian Hopps <chopps@labn.net>
+> + *
+> + * Copyright (c) 2022, LabN Consulting, L.L.C.
+> + *
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/icmpv6.h>
+> +#include <net/gro.h>
+> +#include <net/icmp.h>
+> +#include <net/ip6_route.h>
+> +#include <net/inet_ecn.h>
+> +#include <net/xfrm.h>
+> +
+> +#include <crypto/aead.h>
+> +
+> +#include "xfrm_inout.h"
+> +
+> +/**
+> + * struct xfrm_iptfs_config - configuration for the IPTFS tunnel.
+> + * @pkt_size: size of the outer IP packet. 0 to use interface and MTU discovery,
+> + *	otherwise the user specified value.
+> + */
+> +struct xfrm_iptfs_config {
+> +	u32 pkt_size;	    /* outer_packet_size or 0 */
+> +};
+> +
+> +/**
+> + * struct xfrm_iptfs_data - mode specific xfrm state.
+> + * @cfg: IPTFS tunnel config.
+> + * @x: owning SA (xfrm_state).
+> + * @payload_mtu: max payload size.
+> + */
+> +struct xfrm_iptfs_data {
+> +	struct xfrm_iptfs_config cfg;
+> +
+> +	/* Ingress User Input */
+> +	struct xfrm_state *x;	    /* owning state */
+> +	u32 payload_mtu;	    /* max payload size */
+> +};
+> +
+> +/* ========================== */
+> +/* State Management Functions */
+> +/* ========================== */
+> +
+> +/**
+> + * iptfs_get_inner_mtu() - return inner MTU with no fragmentation.
+> + * @x: xfrm state.
+> + * @outer_mtu: the outer mtu
+> + */
+> +static u32 iptfs_get_inner_mtu(struct xfrm_state *x, int outer_mtu)
+> +{
+> +	struct crypto_aead *aead;
+> +	u32 blksize;
+> +
+> +	aead = x->data;
+> +	blksize = ALIGN(crypto_aead_blocksize(aead), 4);
+> +	return ((outer_mtu - x->props.header_len - crypto_aead_authsize(aead)) &
+> +		~(blksize - 1)) - 2;
+> +}
+> +
+> +/**
+> + * iptfs_user_init() - initialize the SA with IPTFS options from netlink.
+> + * @net: the net data
+> + * @x: xfrm state
+> + * @attrs: netlink attributes
+> + * @extack: extack return data
+> + *
+> + * Return: 0 on success or a negative error code on failure
+> + */
+> +static int iptfs_user_init(struct net *net, struct xfrm_state *x,
+> +			   struct nlattr **attrs,
+> +			   struct netlink_ext_ack *extack)
+> +{
+> +	struct xfrm_iptfs_data *xtfs = x->mode_data;
+> +	struct xfrm_iptfs_config *xc;
+> +
+> +	xc = &xtfs->cfg;
+> +
+> +	if (attrs[XFRMA_IPTFS_PKT_SIZE]) {
+> +		xc->pkt_size = nla_get_u32(attrs[XFRMA_IPTFS_PKT_SIZE]);
+> +		if (!xc->pkt_size) {
+> +			xtfs->payload_mtu = 0;
+> +		} else if (xc->pkt_size > x->props.header_len) {
+> +			xtfs->payload_mtu = xc->pkt_size - x->props.header_len;
+> +		} else {
+> +			NL_SET_ERR_MSG(extack,
+> +				       "Packet size must be 0 or greater than IPTFS/ESP header length");
+> +			return -EINVAL;
+> +		}
+> +	}
+> +	return 0;
+> +}
+> +
+> +static unsigned int iptfs_sa_len(const struct xfrm_state *x)
+> +{
+> +	struct xfrm_iptfs_data *xtfs = x->mode_data;
+> +	struct xfrm_iptfs_config *xc = &xtfs->cfg;
+> +	unsigned int l = 0;
+> +
+> +	if (x->dir == XFRM_SA_DIR_OUT)
+> +		l += nla_total_size(sizeof(xc->pkt_size));
+> +
+> +	return l;
+> +}
+> +
+> +static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
+> +{
+> +	struct xfrm_iptfs_data *xtfs = x->mode_data;
+> +	struct xfrm_iptfs_config *xc = &xtfs->cfg;
+> +	int ret = 0;
+> +
+> +	if (x->dir == XFRM_SA_DIR_OUT)
+> +		ret = nla_put_u32(skb, XFRMA_IPTFS_PKT_SIZE, xc->pkt_size);
+> +
+> +	return ret;
+> +}
+> +
+> +static void __iptfs_init_state(struct xfrm_state *x,
+> +			       struct xfrm_iptfs_data *xtfs)
+> +{
+> +	/* Modify type (esp) adjustment values */
+> +
+> +	if (x->props.family == AF_INET)
+> +		x->props.header_len += sizeof(struct iphdr) + sizeof(struct ip_iptfs_hdr);
+> +	else if (x->props.family == AF_INET6)
+> +		x->props.header_len += sizeof(struct ipv6hdr) + sizeof(struct ip_iptfs_hdr);
+> +	x->props.enc_hdr_len = sizeof(struct ip_iptfs_hdr);
+> +
+> +	/* Always keep a module reference when x->mode_data is set */
+> +	__module_get(x->mode_cbs->owner);
+> +
+> +	x->mode_data = xtfs;
+> +	xtfs->x = x;
+> +}
+> +
+> +static int iptfs_clone(struct xfrm_state *x, struct xfrm_state *orig)
+> +{
+> +	struct xfrm_iptfs_data *xtfs;
+> +
+> +	xtfs = kmemdup(orig->mode_data, sizeof(*xtfs), GFP_KERNEL);
+> +	if (!xtfs)
+> +		return -ENOMEM;
+> +
+> +	__iptfs_init_state(x, xtfs);
 
-Enable PTM for E830 device, which is required for cross timestamp and
-and dependency on PCIE_PTM for ICE_HWTS.
+I noticed __iptfs_init_state() is called twice during XFRM_MSG_MIGRATE.
+This, the first, call does the right thing. However, the second call resets 
+the iptfs values to zero.
 
-Check X86_FEATURE_ART for E830 as it may not be present in the CPU.
+While testing I noticed clone is not workig as expected. It seems to reset 
+values iptfs. See the "ip x s"  out before and after clone.
 
-Cc: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: Frederic Weisbecker <frederic@kernel.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Co-developed-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Co-developed-by: Milena Olech <milena.olech@intel.com>
-Signed-off-by: Milena Olech <milena.olech@intel.com>
-Co-developed-by: Paul Greenwalt <paul.greenwalt@intel.com>
-Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
-Signed-off-by: Michal Michalik <michal.michalik@intel.com>
-Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+Here are two "ip x s"  output one before clone and another after clone noice 
+iptfs values are 0, while before max-queue-size 10485760
+
+root@east:/testing/pluto/ikev2-mobike-01$ip x s
+src 192.1.2.23 dst 192.1.3.33
+	proto esp spi 0xcd561999 reqid 16393 mode iptfs
+	replay-window 0 flag af-unspec esn
+	auth-trunc hmac(sha256) 0xcba08c655b22df167c9bf16ac8005cffbe15e6baab553b8f48ec0056c037c51f 128
+	enc cbc(aes) 0xb3702487e95675713e7dfb738cc21c5dd86a666af38cdabcc3705ed30fea92e2
+	lastused 2024-08-29 12:33:12
+	anti-replay esn context:
+	 seq-hi 0x0, seq 0x0, oseq-hi 0x0, oseq 0xb
+	 replay_window 0, bitmap-length 0
+	dir out
+	iptfs-opts dont-frag init-delay 0 max-queue-size 10485760 pkt-size 0
+src 192.1.3.33 dst 192.1.2.23
+	proto esp spi 0xd9ecf873 reqid 16393 mode iptfs
+	replay-window 0 flag af-unspec esn
+	auth-trunc hmac(sha256) 0xf841c6643a06186e86a856600e071e2a220450943fdf7b64a8d2f3e3bffd6c62 128
+	enc cbc(aes) 0x5ffa993bbc568ecab82e15433b14c03e5da18ca4d216137493d552260bef0be1
+	lastused 2024-08-29 12:33:12
+	anti-replay esn context:
+	 seq-hi 0x0, seq 0xb, oseq-hi 0x0, oseq 0x0
+	 replay_window 128, bitmap-length 4
+	 00000000 00000000 00000000 000007ff
+	dir in
+	iptfs-opts drop-time 3 reorder-window 3
+
+After migrate: note iptfs vallues are 0.
+
+root@east:/testing/pluto/ikev2-mobike-01$ip x s
+src 192.1.8.22 dst 192.1.2.23
+	proto esp spi 0xd9ecf873 reqid 16393 mode iptfs
+	replay-window 0 flag af-unspec esn
+	auth-trunc hmac(sha256) 0xf841c6643a06186e86a856600e071e2a220450943fdf7b64a8d2f3e3bffd6c62 128
+	enc cbc(aes) 0x5ffa993bbc568ecab82e15433b14c03e5da18ca4d216137493d552260bef0be1
+	lastused 2024-08-29 12:33:12
+	anti-replay esn context:
+	 seq-hi 0x0, seq 0xb, oseq-hi 0x0, oseq 0x0
+	 replay_window 128, bitmap-length 4
+	 00000000 00000000 00000000 000007ff
+	dir in
+	iptfs-opts drop-time 0 reorder-window 0
+src 192.1.2.23 dst 192.1.8.22
+	proto esp spi 0xcd561999 reqid 16393 mode iptfs
+	replay-window 0 flag af-unspec esn
+	auth-trunc hmac(sha256) 0xcba08c655b22df167c9bf16ac8005cffbe15e6baab553b8f48ec0056c037c51f 128
+	enc cbc(aes) 0xb3702487e95675713e7dfb738cc21c5dd86a666af38cdabcc3705ed30fea92e2
+	lastused 2024-08-29 12:33:12
+	anti-replay esn context:
+	 seq-hi 0x0, seq 0x0, oseq-hi 0x0, oseq 0xb
+	 replay_window 0, bitmap-length 0
+	dir out
+	iptfs-opts init-delay 0 max-queue-size 0 pkt-size 0
+
+Now running under gdb during a migrate I see __iptfs_init_state() called 
+twice.
+
+I got gdb back trace to show the two calls during XFRM_MSG_MIGRATE.
+
+First call __iptfs_init_state() with bt. This is during clone/MIGRATE.
+
+#0  __iptfs_init_state (x=x@entry=0xffff888110a1fc40, xtfs=xtfs@entry=0xffff88810e275000)
+    at net/xfrm/xfrm_iptfs.c:2674
+#1  0xffffffff81ece552 in iptfs_clone (x=0xffff888110a1fc40, orig=<optimized out>)
+    at net/xfrm/xfrm_iptfs.c:2722
+#2  0xffffffff81eb65ad in xfrm_state_clone (encap=0xffffffff00000010, orig=0xffff888110a1e040)
+    at net/xfrm/xfrm_state.c:1878
+#3  xfrm_state_migrate (x=x@entry=0xffff888110a1e040, m=m@entry=0xffffc90001b47400,
+    encap=encap@entry=0x0 <fixed_percpu_data>) at net/xfrm/xfrm_state.c:1948
+#4  0xffffffff81ea9206 in xfrm_migrate (sel=sel@entry=0xffff88811193ce50, dir=<optimized out>,
+    type=type@entry=0 '\000', m=m@entry=0xffffc90001b47400, num_migrate=num_migrate@entry=1,
+    k=k@entry=0x0 <fixed_percpu_data>, net=<optimized out>, encap=<optimized out>, if_id=<optimized out>,
+    extack=<optimized out>) at net/xfrm/xfrm_policy.c:4652
+#5  0xffffffff81ec26de in xfrm_do_migrate (skb=skb@entry=0xffff888109265000, nlh=<optimized out>,
+    attrs=attrs@entry=0xffffc90001b47730, extack=<optimized out>) at net/xfrm/xfrm_user.c:3047
+#6  0xffffffff81ec3e70 in xfrm_user_rcv_msg (skb=0xffff888109265000, nlh=<optimized out>,
+    extack=<optimized out>) at net/xfrm/xfrm_user.c:3389
 ---
-V7 -> V8: Moved E830 parts of other patches to this patch
-V6 -> V7: Fixed timestamp acquisition
-V4 -> V5: Edited return values
-V3 -> V4: Fixed kdoc for other ice_is_e***() and other _e830() functions in
-          ice_ptp_hw.c
-V2 -> V3: Fixed kdoc for ice_is_e***() and ice_ptp_init_phy_e830()
-V1 -> V2: Fixed compilation issue with GENMASK bits higher than 32
+second call to __iptfs_init_state() bt.
 
- drivers/net/ethernet/intel/Kconfig            |   2 +-
- .../net/ethernet/intel/ice/ice_hw_autogen.h   |  12 ++
- drivers/net/ethernet/intel/ice/ice_main.c     |   6 +
- drivers/net/ethernet/intel/ice/ice_ptp.c      |  69 +++++++-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 163 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   7 +
- 6 files changed, 254 insertions(+), 5 deletions(-)
+#0  __iptfs_init_state (x=x@entry=0xffff888110a1fc40, xtfs=0xffff88810e272000) at net/xfrm/xfrm_iptfs.c:2674
+#1  0xffffffff81ece1a4 in iptfs_create_state (x=0xffff888110a1fc40) at net/xfrm/xfrm_iptfs.c:2742
+#2  0xffffffff81eb5c61 in xfrm_init_state (x=x@entry=0xffff888110a1fc40) at net/xfrm/xfrm_state.c:3042
+#3  0xffffffff81eb65dc in xfrm_state_migrate (x=x@entry=0xffff888110a1e040, m=m@entry=0xffffc90001b47400,
+    encap=encap@entry=0x0 <fixed_percpu_data>) at net/xfrm/xfrm_state.c:1954
+#4  0xffffffff81ea9206 in xfrm_migrate (sel=sel@entry=0xffff88811193ce50, dir=<optimized out>,
+    type=type@entry=0 '\000', m=m@entry=0xffffc90001b47400, num_migrate=num_migrate@entry=1,
+    k=k@entry=0x0 <fixed_percpu_data>, net=<optimized out>, encap=<optimized out>, if_id=<optimized out>,
+    extack=<optimized out>) at net/xfrm/xfrm_policy.c:4652
+#5  0xffffffff81ec26de in xfrm_do_migrate (skb=skb@entry=0xffff888109265000, nlh=<optimized out>,
+    attrs=attrs@entry=0xffffc90001b47730, extack=<optimized out>) at net/xfrm/xfrm_user.c:3047
+#6  0xffffffff81ec3e70 in xfrm_user_rcv_msg (skb=0xffff888109265000, 
+nlh=<optimized out>,
 
-diff --git a/drivers/net/ethernet/intel/Kconfig b/drivers/net/ethernet/intel/Kconfig
-index 0375c7448a57..90415fe785ac 100644
---- a/drivers/net/ethernet/intel/Kconfig
-+++ b/drivers/net/ethernet/intel/Kconfig
-@@ -334,7 +334,7 @@ config ICE_SWITCHDEV
- config ICE_HWTS
- 	bool "Support HW cross-timestamp on platforms with PTM support"
- 	default y
--	depends on ICE && X86
-+	depends on ICE && X86 && PCIE_PTM
- 	help
- 	  Say Y to enable hardware supported cross-timestamping on platforms
- 	  with PCIe PTM support. The cross-timestamp is available through
-diff --git a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-index 8d31bfe28cc8..b692be1cf7bf 100644
---- a/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-+++ b/drivers/net/ethernet/intel/ice/ice_hw_autogen.h
-@@ -533,10 +533,22 @@
- #define PFPM_WUS_MAG_M				BIT(1)
- #define PFPM_WUS_MNG_M				BIT(3)
- #define PFPM_WUS_FW_RST_WK_M			BIT(31)
-+#define E830_PRTMAC_TS_TX_MEM_VALID_H		0x001E2020
-+#define E830_PRTMAC_TS_TX_MEM_VALID_L		0x001E2000
- #define E830_PRTMAC_CL01_PS_QNT			0x001E32A0
- #define E830_PRTMAC_CL01_PS_QNT_CL0_M		GENMASK(15, 0)
- #define E830_PRTMAC_CL01_QNT_THR		0x001E3320
- #define E830_PRTMAC_CL01_QNT_THR_CL0_M		GENMASK(15, 0)
-+#define E830_PRTTSYN_TXTIME_H(_i)		(0x001E5800 + ((_i) * 32))
-+#define E830_PRTTSYN_TXTIME_L(_i)		(0x001E5000 + ((_i) * 32))
-+#define E830_GLPTM_ART_CTL			0x00088B50
-+#define E830_GLPTM_ART_CTL_ACTIVE_M		BIT(0)
-+#define E830_GLPTM_ART_TIME_H			0x00088B54
-+#define E830_GLPTM_ART_TIME_L			0x00088B58
-+#define E830_GLTSYN_PTMTIME_H(_i)		(0x00088B48 + ((_i) * 4))
-+#define E830_GLTSYN_PTMTIME_L(_i)		(0x00088B40 + ((_i) * 4))
-+#define E830_PFPTM_SEM				0x00088B00
-+#define E830_PFPTM_SEM_BUSY_M			BIT(0)
- #define VFINT_DYN_CTLN(_i)			(0x00003800 + ((_i) * 4))
- #define VFINT_DYN_CTLN_CLEARPBA_M		BIT(1)
- #define E830_MBX_PF_IN_FLIGHT_VF_MSGS_THRESH	0x00234000
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index fbb2aa8d3188..a3e92e89d0d1 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5067,6 +5067,12 @@ static int ice_init(struct ice_pf *pf)
- 	if (err)
- 		return err;
+I have a proposed fix against v10, that seems to work. see the attached 
+patch. The patch is applied top of the series.
+
+-antony
+
+PS: this exact issue was also reported in:
+https://www.spinics.net/lists/netdev/msg976146.html
+
+--NMxVuAkGGEZbhbb+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-call-iptfs-state-init-only-once-during-cloning.patch"
+
+From fced06475e82f328aede0370d26336bc8a48c333 Mon Sep 17 00:00:00 2001
+From: Antony Antony <antony.antony@secunet.com>
+Date: Thu, 29 Aug 2024 13:23:42 +0200
+Subject: [PATCH] call iptfs state init only once during cloning.
+
+Signed-off-by: Antony Antony <antony.antony@secunet.com>
+---
+ net/xfrm/xfrm_iptfs.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+index 7f7b3078ca70..aa18ee4733f8 100644
+--- a/net/xfrm/xfrm_iptfs.c
++++ b/net/xfrm/xfrm_iptfs.c
+@@ -2722,9 +2722,13 @@ static int iptfs_create_state(struct xfrm_state *x)
+ {
+ 	struct xfrm_iptfs_data *xtfs;
  
-+	if (pf->hw.mac_type == ICE_MAC_E830) {
-+		err = pci_enable_ptm(pf->pdev, NULL);
-+		if (err)
-+			dev_dbg(ice_pf_to_dev(pf), "PCIe PTM not supported by PCIe bus/controller\n");
+-	xtfs = kzalloc(sizeof(*xtfs), GFP_KERNEL);
+-	if (!xtfs)
+-		return -ENOMEM;
++	if (x->mode_data) {
++		xtfs = x->mode_data;
++	} else {
++		xtfs = kzalloc(sizeof(*xtfs), GFP_KERNEL);
++		if (!xtfs)
++			return -ENOMEM;
 +	}
-+
- 	err = ice_alloc_vsis(pf);
- 	if (err)
- 		goto err_alloc_vsis;
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 3375762cd8cc..ada94b980b90 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -310,6 +310,15 @@ ice_ptp_read_src_clk_reg(struct ice_pf *pf, struct ptp_system_timestamp *sts)
- 	/* Read the system timestamp pre PHC read */
- 	ptp_read_system_prets(sts);
  
-+	if (hw->mac_type == ICE_MAC_E830) {
-+		u64 clk_time = rd64(hw, E830_GLTSYN_TIME_L(tmr_idx));
-+
-+		/* Read the system timestamp post PHC read */
-+		ptp_read_system_postts(sts);
-+
-+		return clk_time;
-+	}
-+
- 	lo = rd32(hw, GLTSYN_TIME_L(tmr_idx));
- 
- 	/* Read the system timestamp post PHC read */
-@@ -1279,6 +1288,7 @@ ice_ptp_port_phy_stop(struct ice_ptp_port *ptp_port)
- 
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
-+	case ICE_MAC_E830:
- 		err = 0;
- 		break;
- 	case ICE_MAC_GENERIC:
-@@ -1325,6 +1335,7 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
- 
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
-+	case ICE_MAC_E830:
- 		err = 0;
- 		break;
- 	case ICE_MAC_GENERIC:
-@@ -1400,7 +1411,8 @@ void ice_ptp_link_change(struct ice_pf *pf, u8 port, bool linkup)
- 
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
--		/* Do not reconfigure E810 PHY */
-+	case ICE_MAC_E830:
-+		/* Do not reconfigure E810 or E830 PHY */
- 		return;
- 	case ICE_MAC_GENERIC:
- 	case ICE_MAC_GENERIC_3K_E825:
-@@ -1433,6 +1445,7 @@ static int ice_ptp_cfg_phy_interrupt(struct ice_pf *pf, bool ena, u32 threshold)
- 
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
-+	case ICE_MAC_E830:
- 		return 0;
- 	case ICE_MAC_GENERIC: {
- 		int quad;
-@@ -2181,6 +2194,21 @@ static const struct ice_crosststamp_cfg ice_crosststamp_cfg_e82x = {
- 	.dev_time_h[1] = GLTSYN_HHTIME_H(1),
- };
- 
-+#ifdef CONFIG_ICE_HWTS
-+static const struct ice_crosststamp_cfg ice_crosststamp_cfg_e830 = {
-+	.lock_reg = E830_PFPTM_SEM,
-+	.lock_busy = E830_PFPTM_SEM_BUSY_M,
-+	.ctl_reg = E830_GLPTM_ART_CTL,
-+	.ctl_active = E830_GLPTM_ART_CTL_ACTIVE_M,
-+	.art_time_l = E830_GLPTM_ART_TIME_L,
-+	.art_time_h = E830_GLPTM_ART_TIME_H,
-+	.dev_time_l[0] = E830_GLTSYN_PTMTIME_L(0),
-+	.dev_time_h[0] = E830_GLTSYN_PTMTIME_H(0),
-+	.dev_time_l[1] = E830_GLTSYN_PTMTIME_L(1),
-+	.dev_time_h[1] = E830_GLTSYN_PTMTIME_H(1),
-+};
-+
-+#endif /* CONFIG_ICE_HWTS */
- /**
-  * struct ice_crosststamp_ctx - Device cross timestamp context
-  * @snapshot: snapshot of system clocks for historic interpolation
-@@ -2302,6 +2330,11 @@ static int ice_ptp_getcrosststamp(struct ptp_clock_info *info,
- 	case ICE_MAC_GENERIC_3K_E825:
- 		ctx.cfg = &ice_crosststamp_cfg_e82x;
- 		break;
-+#ifdef CONFIG_ICE_HWTS
-+	case ICE_MAC_E830:
-+		ctx.cfg = &ice_crosststamp_cfg_e830;
-+		break;
-+#endif /* CONFIG_ICE_HWTS */
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -2651,6 +2684,26 @@ static void ice_ptp_set_funcs_e810(struct ice_pf *pf)
- 	}
- }
- 
-+/**
-+ * ice_ptp_set_funcs_e830 - Set specialized functions for E830 support
-+ * @pf: Board private structure
-+ *
-+ * Assign functions to the PTP capabiltiies structure for E830 devices.
-+ * Functions which operate across all device families should be set directly
-+ * in ice_ptp_set_caps. Only add functions here which are distinct for E830
-+ * devices.
-+ */
-+static void ice_ptp_set_funcs_e830(struct ice_pf *pf)
-+{
-+#ifdef CONFIG_ICE_HWTS
-+	if (pcie_ptm_enabled(pf->pdev) && boot_cpu_has(X86_FEATURE_ART))
-+		pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp;
-+
-+#endif /* CONFIG_ICE_HWTS */
-+	/* Rest of the config is the same as base E810 */
-+	ice_ptp_set_funcs_e810(pf);
-+}
-+
- /**
-  * ice_ptp_set_caps - Set PTP capabilities
-  * @pf: Board private structure
-@@ -2677,6 +2730,9 @@ static void ice_ptp_set_caps(struct ice_pf *pf)
- 	case ICE_MAC_E810:
- 		ice_ptp_set_funcs_e810(pf);
- 		return;
-+	case ICE_MAC_E830:
-+		ice_ptp_set_funcs_e830(pf);
-+		return;
- 	case ICE_MAC_GENERIC:
- 	case ICE_MAC_GENERIC_3K_E825:
- 		ice_ptp_set_funcs_e82x(pf);
-@@ -2837,6 +2893,16 @@ irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
- 
- 		set_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread);
- 		return IRQ_WAKE_THREAD;
-+	case ICE_MAC_E830:
-+		/* E830 can read timestamps in the top half using rd32() */
-+		if (ice_ptp_process_ts(pf) == ICE_TX_TSTAMP_WORK_PENDING) {
-+			/* Process outstanding Tx timestamps. If there
-+			 * is more work, re-arm the interrupt to trigger again.
-+			 */
-+			wr32(hw, PFINT_OICR, PFINT_OICR_TSYN_TX_M);
-+			ice_flush(hw);
-+		}
-+		return IRQ_HANDLED;
- 	default:
- 		return IRQ_HANDLED;
- 	}
-@@ -3222,6 +3288,7 @@ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
- 
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
-+	case ICE_MAC_E830:
- 	case ICE_MAC_GENERIC_3K_E825:
- 		return ice_ptp_init_tx(pf, &ptp_port->tx, ptp_port->port_num);
- 	case ICE_MAC_GENERIC:
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 65a66225797e..7789ffbf74d4 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -897,6 +897,17 @@ static void ice_ptp_exec_tmr_cmd(struct ice_hw *hw)
- 	ice_flush(hw);
- }
- 
-+/**
-+ * ice_ptp_cfg_sync_delay - Configure PHC to PHY synchronization delay
-+ * @hw: pointer to HW struct
-+ * @delay: delay between PHC and PHY SYNC command execution in nanoseconds
-+ */
-+static void ice_ptp_cfg_sync_delay(const struct ice_hw *hw, u32 delay)
-+{
-+	wr32(hw, GLTSYN_SYNC_DLAY, delay);
-+	ice_flush(hw);
-+}
-+
- /* 56G PHY device functions
-  *
-  * The following functions operate on devices with the ETH 56G PHY.
-@@ -5018,8 +5029,7 @@ static int ice_ptp_init_phc_e810(struct ice_hw *hw)
- 	u8 tmr_idx;
- 	int err;
- 
--	/* Ensure synchronization delay is zero */
--	wr32(hw, GLTSYN_SYNC_DLAY, 0);
-+	ice_ptp_cfg_sync_delay(hw, ICE_E810_E830_SYNC_DELAY);
- 
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 	err = ice_write_phy_reg_e810(hw, ETH_GLTSYN_ENA(tmr_idx),
-@@ -5313,6 +5323,128 @@ static void ice_ptp_init_phy_e810(struct ice_ptp_hw *ptp)
- 	ptp->ports_per_phy = 4;
- }
- 
-+/* E830 functions
-+ *
-+ * The following functions operate on the E830 series devices.
-+ *
-+ */
-+
-+/**
-+ * ice_ptp_init_phc_e830 - Perform E830 specific PHC initialization
-+ * @hw: pointer to HW struct
-+ *
-+ * Perform E830-specific PTP hardware clock initialization steps.
-+ */
-+static void ice_ptp_init_phc_e830(const struct ice_hw *hw)
-+{
-+	ice_ptp_cfg_sync_delay(hw, ICE_E810_E830_SYNC_DELAY);
-+}
-+
-+/**
-+ * ice_ptp_write_direct_incval_e830 - Prep PHY port increment value change
-+ * @hw: pointer to HW struct
-+ * @incval: The new 40bit increment value to prepare
-+ *
-+ * Prepare the PHY port for a new increment value by programming the PHC
-+ * GLTSYN_INCVAL_L and GLTSYN_INCVAL_H registers. The actual change is
-+ * completed by FW automatically.
-+ */
-+static void ice_ptp_write_direct_incval_e830(const struct ice_hw *hw,
-+					     u64 incval)
-+{
-+	u8 tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
-+
-+	wr32(hw, GLTSYN_INCVAL_L(tmr_idx), lower_32_bits(incval));
-+	wr32(hw, GLTSYN_INCVAL_H(tmr_idx), upper_32_bits(incval));
-+}
-+
-+/**
-+ * ice_ptp_write_direct_phc_time_e830 - Prepare PHY port with initial time
-+ * @hw: Board private structure
-+ * @time: Time to initialize the PHY port clock to
-+ *
-+ * Program the PHY port ETH_GLTSYN_SHTIME registers in preparation setting the
-+ * initial clock time. The time will not actually be programmed until the
-+ * driver issues an ICE_PTP_INIT_TIME command.
-+ *
-+ * The time value is the upper 32 bits of the PHY timer, usually in units of
-+ * nominal nanoseconds.
-+ */
-+static void ice_ptp_write_direct_phc_time_e830(const struct ice_hw *hw,
-+					       u64 time)
-+{
-+	u8 tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
-+
-+	wr32(hw, GLTSYN_TIME_0(tmr_idx), 0);
-+	wr32(hw, GLTSYN_TIME_L(tmr_idx), lower_32_bits(time));
-+	wr32(hw, GLTSYN_TIME_H(tmr_idx), upper_32_bits(time));
-+}
-+
-+/**
-+ * ice_ptp_port_cmd_e830 - Prepare all external PHYs for a timer command
-+ * @hw: pointer to HW struct
-+ * @cmd: Command to be sent to the port
-+ *
-+ * Prepare the external PHYs connected to this device for a timer sync
-+ * command.
-+ *
-+ * Return: 0 on success, negative error code when PHY write failed
-+ */
-+static int ice_ptp_port_cmd_e830(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
-+{
-+	u32 val = ice_ptp_tmr_cmd_to_port_reg(hw, cmd);
-+
-+	return ice_write_phy_reg_e810(hw, E830_ETH_GLTSYN_CMD, val);
-+}
-+
-+/**
-+ * ice_read_phy_tstamp_e830 - Read a PHY timestamp out of the external PHY
-+ * @hw: pointer to the HW struct
-+ * @idx: the timestamp index to read
-+ * @tstamp: on return, the 40bit timestamp value
-+ *
-+ * Read a 40bit timestamp value out of the timestamp block of the external PHY
-+ * on the E830 device.
-+ */
-+static void ice_read_phy_tstamp_e830(const struct ice_hw *hw, u8 idx,
-+				     u64 *tstamp)
-+{
-+	u32 hi, lo;
-+
-+	hi = rd32(hw, E830_PRTTSYN_TXTIME_H(idx));
-+	lo = rd32(hw, E830_PRTTSYN_TXTIME_L(idx));
-+
-+	/* For E830 devices, the timestamp is reported with the lower 32 bits
-+	 * in the low register, and the upper 8 bits in the high register.
-+	 */
-+	*tstamp = FIELD_PREP(PHY_EXT_40B_HIGH_M, hi) |
-+		  FIELD_PREP(PHY_EXT_40B_LOW_M, lo);
-+}
-+
-+/**
-+ * ice_get_phy_tx_tstamp_ready_e830 - Read Tx memory status register
-+ * @hw: pointer to the HW struct
-+ * @port: the PHY port to read
-+ * @tstamp_ready: contents of the Tx memory status register
-+ */
-+static void ice_get_phy_tx_tstamp_ready_e830(const struct ice_hw *hw, u8 port,
-+					     u64 *tstamp_ready)
-+{
-+	*tstamp_ready = rd32(hw, E830_PRTMAC_TS_TX_MEM_VALID_H);
-+	*tstamp_ready <<= 32;
-+	*tstamp_ready |= rd32(hw, E830_PRTMAC_TS_TX_MEM_VALID_L);
-+}
-+
-+/**
-+ * ice_ptp_init_phy_e830 - initialize PHY parameters
-+ * @ptp: pointer to the PTP HW struct
-+ */
-+static void ice_ptp_init_phy_e830(struct ice_ptp_hw *ptp)
-+{
-+	ptp->num_lports = 8;
-+	ptp->ports_per_phy = 4;
-+}
-+
- /* Device agnostic functions
-  *
-  * The following functions implement shared behavior common to all devices,
-@@ -5383,6 +5515,9 @@ void ice_ptp_init_hw(struct ice_hw *hw)
- 	case ICE_MAC_E810:
- 		ice_ptp_init_phy_e810(ptp);
- 		break;
-+	case ICE_MAC_E830:
-+		ice_ptp_init_phy_e830(ptp);
-+		break;
- 	case ICE_MAC_GENERIC:
- 		ice_ptp_init_phy_e82x(ptp);
- 		break;
-@@ -5480,6 +5615,8 @@ static int ice_ptp_port_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
- 		return ice_ptp_port_cmd_e810(hw, cmd);
-+	case ICE_MAC_E830:
-+		return ice_ptp_port_cmd_e830(hw, cmd);
- 	default:
- 		break;
- 	}
-@@ -5550,6 +5687,12 @@ int ice_ptp_init_time(struct ice_hw *hw, u64 time)
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 
- 	/* Source timers */
-+	/* For E830 we don't need to use shadow registers, its automatic */
-+	if (hw->mac_type == ICE_MAC_E830) {
-+		ice_ptp_write_direct_phc_time_e830(hw, time);
-+		return 0;
-+	}
-+
- 	wr32(hw, GLTSYN_SHTIME_L(tmr_idx), lower_32_bits(time));
- 	wr32(hw, GLTSYN_SHTIME_H(tmr_idx), upper_32_bits(time));
- 	wr32(hw, GLTSYN_SHTIME_0(tmr_idx), 0);
-@@ -5598,6 +5741,12 @@ int ice_ptp_write_incval(struct ice_hw *hw, u64 incval)
- 
- 	tmr_idx = hw->func_caps.ts_func_info.tmr_index_owned;
- 
-+	/* For E830 we don't need to use shadow registers, its automatic */
-+	if (hw->mac_type == ICE_MAC_E830) {
-+		ice_ptp_write_direct_incval_e830(hw, incval);
-+		return 0;
-+	}
-+
- 	/* Shadow Adjust */
- 	wr32(hw, GLTSYN_SHADJ_L(tmr_idx), lower_32_bits(incval));
- 	wr32(hw, GLTSYN_SHADJ_H(tmr_idx), upper_32_bits(incval));
-@@ -5707,6 +5856,9 @@ int ice_read_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx, u64 *tstamp)
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
- 		return ice_read_phy_tstamp_e810(hw, block, idx, tstamp);
-+	case ICE_MAC_E830:
-+		ice_read_phy_tstamp_e830(hw, idx, tstamp);
-+		return 0;
- 	case ICE_MAC_GENERIC:
- 		return ice_read_phy_tstamp_e82x(hw, block, idx, tstamp);
- 	case ICE_MAC_GENERIC_3K_E825:
-@@ -5829,6 +5981,9 @@ int ice_ptp_init_phc(struct ice_hw *hw)
- 	switch (hw->mac_type) {
- 	case ICE_MAC_E810:
- 		return ice_ptp_init_phc_e810(hw);
-+	case ICE_MAC_E830:
-+		ice_ptp_init_phc_e830(hw);
-+		return 0;
- 	case ICE_MAC_GENERIC:
- 		return ice_ptp_init_phc_e82x(hw);
- 	case ICE_MAC_GENERIC_3K_E825:
-@@ -5855,13 +6010,15 @@ int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready)
- 	case ICE_MAC_E810:
- 		return ice_get_phy_tx_tstamp_ready_e810(hw, block,
- 							tstamp_ready);
-+	case ICE_MAC_E830:
-+		ice_get_phy_tx_tstamp_ready_e830(hw, block, tstamp_ready);
-+		return 0;
- 	case ICE_MAC_GENERIC:
- 		return ice_get_phy_tx_tstamp_ready_e82x(hw, block,
- 							tstamp_ready);
- 	case ICE_MAC_GENERIC_3K_E825:
- 		return ice_get_phy_tx_tstamp_ready_eth56g(hw, block,
- 							  tstamp_ready);
--		break;
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 3968e064cc22..30ecd3268ac8 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -327,6 +327,7 @@ extern const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD];
- #define ICE_E810_PLL_FREQ		812500000
- #define ICE_PTP_NOMINAL_INCVAL_E810	0x13b13b13bULL
- #define ICE_E810_OUT_PROP_DELAY_NS	1
-+#define ICE_E810_E830_SYNC_DELAY	0
- #define ICE_E825C_OUT_PROP_DELAY_NS	11
- 
- /* Device agnostic functions */
-@@ -673,6 +674,12 @@ static inline bool ice_is_dual(struct ice_hw *hw)
- /* E810 timer command register */
- #define E810_ETH_GLTSYN_CMD		0x03000344
- 
-+/* E830 timer command register */
-+#define E830_ETH_GLTSYN_CMD		0x00088814
-+
-+/* E810 PHC time register */
-+#define E830_GLTSYN_TIME_L(_tmr_idx)	(0x0008A000 + 0x1000 * (_tmr_idx))
-+
- /* Source timer incval macros */
- #define INCVAL_HIGH_M			0xFF
+ 	__iptfs_init_state(x, xtfs);
  
 -- 
-2.46.0
+2.43.0
 
+
+--NMxVuAkGGEZbhbb+--
 
