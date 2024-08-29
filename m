@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-123253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C95C9644B7
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:38:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 693AC9644BA
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:38:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 823F41F264A8
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 12:38:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA782B275A0
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 12:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9BD1B29D5;
-	Thu, 29 Aug 2024 12:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3217A1B2EFD;
+	Thu, 29 Aug 2024 12:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CZCV9E0v"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CWRZssk6"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD851B29BF;
-	Thu, 29 Aug 2024 12:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B10A1B29DA;
+	Thu, 29 Aug 2024 12:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724934868; cv=none; b=iVq4YzfXwd4tW1aJnY7vnuguQDVYQDydn9eqWPAMnSdyDSQybLQPahtVCieERgckUIU6TTavqFNA3/Ei6EW4YybGur7D7HMD52YihTAX8k0kFyJyNNbFmVDsfLj2UHId9vEohBYhzE2od6FZYN+5qWhSyUQ/C84+dnS5bI/ft0Y=
+	t=1724934871; cv=none; b=QZimuNgTDht7Qx7BoK3BbkuHdejrNsEECoE+JK2syhZQ69zQgSjAXYeTtKBentPT1Z3B864RxIsp8MW+xHH/pwaqr2BzO0FmJbBMAAvIviAqgJKx9kqoNa/Zj1RKjdq5rL6Pz+QeI+FhCadCiP3QOkUO0uoYLwuQqXCCqt5o3D4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724934868; c=relaxed/simple;
-	bh=zzGyzl2LHKrTW09kdZ9hTNhg9xGQUnglGBWluuyzv2s=;
+	s=arc-20240116; t=1724934871; c=relaxed/simple;
+	bh=sLxWr77akWjfYt2HxAX0xg5Tq5NGghLS5h1ifx7+utk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Em57LEeVQM0+U6Ymv4B4NmB7WpOc95/huwQzYJ4xc0FuiH+SoR4Vr9n+p0S9V47uHDywB5iOPtnc3luRP7riFRaDRcgLrd5l2KwBYIi47+AOOWP/SudlfMgPgt7TEjnA0hgEIkzg8zgsufiqlyr60L8deq8WSHlU8TBsEhJVxGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CZCV9E0v; arc=none smtp.client-ip=198.175.65.9
+	 MIME-Version; b=ktQDJIrAwlPP3ZRcCY4ES2lEl91Nt6n362nQGihTZrFmgbtkmwH98EGi09o6OFhIHLgh5Oa9SxmeYZ54SmXNYp7dGHUpgugfdv8WCmu5KwdUGuf6o15+MbzzaOr3w3P0lBvqoNV3lN/iNKyd9QRppwDXT+262V8Pym+2lieurNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CWRZssk6; arc=none smtp.client-ip=198.175.65.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724934867; x=1756470867;
+  t=1724934870; x=1756470870;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=zzGyzl2LHKrTW09kdZ9hTNhg9xGQUnglGBWluuyzv2s=;
-  b=CZCV9E0vQXmicxazhOatzUdLleDN2U25q6IdLxnXHivZchsrb7M1309h
-   ka0OF3eIzv35OY5VI9UX3f21I/VFUP4Esy7C+/qloJ+bKNMN/hjF0aAkN
-   9DFmCD7kM+3Pr8tKtQsukKTfKeTlVpvQjpxe4EAsL2gIo1YGHp8dtTmir
-   5cba7ei9ym7m2xpJbWCiSgQvpcuwNg/uuMt087FqFLv0OhmIKuc7YUJsz
-   uWSG9I4hWdcaDjW+ez667ZyP7sZT4A1Tjj4+xy4q/cf35sf/nV+//eCp1
-   lJcXqPmBTgeQAIZgEBm64U0yz77HU6mqJiIvqUxPlNKq0Hix0BI5HcQjk
+  bh=sLxWr77akWjfYt2HxAX0xg5Tq5NGghLS5h1ifx7+utk=;
+  b=CWRZssk60udCgqDc9meJivCNsVgBru9KbzUm6r/S5S7S9tfT5LKy7x13
+   xvulYWCnBNoX5me8PbkRgiSw9h64tjv4onMpxCvdx6wOCSUmbzQ5+Q8zw
+   bsL7gRI8M21mOyoVd6mk3ZsLuuq/REwzwzyIMqvUQ5el6IrsE3O+Wc8wB
+   PzWLJ8Zfme8N6Lr1fBoWGNNfDyxoyg1xsZrmFCEx4lf23ltOtmlOJP2j5
+   FiTIqJfiK1sysxwGCvuELJC3QcGNo4RSMKNSnwPP5p/xqADCuPbQP5Rv8
+   WRG5CghJJBzdtNEskJmM5g7JHSahG5ldYwCiO28i+2YllyxRcrM6Xeq11
    g==;
-X-CSE-ConnectionGUID: bPXfgZFSRg6+y+pOH9QQEw==
-X-CSE-MsgGUID: F+T0OYrITImSODq5auxgZg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="46038206"
+X-CSE-ConnectionGUID: 9NAiXobpRz65rGMicAxeJQ==
+X-CSE-MsgGUID: lYPd4ba+TdGGzpFQEYUqbg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="46038218"
 X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="46038206"
+   d="scan'208";a="46038218"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 05:34:26 -0700
-X-CSE-ConnectionGUID: 8yLWo1fMR06T6aXoYeKrJA==
-X-CSE-MsgGUID: Ucs4+j0kTR+EOoqu3e3BRQ==
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 05:34:29 -0700
+X-CSE-ConnectionGUID: Dud/CQ3VRt2Z8YbXYAGhGQ==
+X-CSE-MsgGUID: E7vTIZdZTLO06O6NLzn4KQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="63188508"
+   d="scan'208";a="63188511"
 Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa006.fm.intel.com with ESMTP; 29 Aug 2024 05:34:22 -0700
+  by fmviesa006.fm.intel.com with ESMTP; 29 Aug 2024 05:34:26 -0700
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -71,9 +71,9 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5 3/5] netdev_features: convert NETIF_F_NETNS_LOCAL to dev->netns_local
-Date: Thu, 29 Aug 2024 14:33:38 +0200
-Message-ID: <20240829123340.789395-4-aleksander.lobakin@intel.com>
+Subject: [PATCH net-next v5 4/5] netdev_features: convert NETIF_F_FCOE_MTU to dev->fcoe_mtu
+Date: Thu, 29 Aug 2024 14:33:39 +0200
+Message-ID: <20240829123340.789395-5-aleksander.lobakin@intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240829123340.789395-1-aleksander.lobakin@intel.com>
 References: <20240829123340.789395-1-aleksander.lobakin@intel.com>
@@ -85,645 +85,273 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-"Interface can't change network namespaces" is rather an attribute,
-not a feature, and it can't be changed via Ethtool.
-Make it a "cold" private flag instead of a netdev_feature and free
-one more bit.
+Ability to handle maximum FCoE frames of 2158 bytes can never be changed
+and thus more of an attribute, not a toggleable feature.
+Move it from netdev_features_t to "cold" priv flags (bitfield bool) and
+free yet another feature bit.
 
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 ---
- Documentation/networking/net_cachelines/net_device.rst |  1 +
- Documentation/networking/netdev-features.rst           |  7 -------
- Documentation/networking/switchdev.rst                 |  4 ++--
- include/linux/netdev_features.h                        |  6 ++----
- include/linux/netdevice.h                              |  2 ++
- drivers/net/amt.c                                      |  2 +-
- drivers/net/bonding/bond_main.c                        |  6 +++---
- drivers/net/ethernet/adi/adin1110.c                    |  2 +-
- drivers/net/ethernet/marvell/prestera/prestera_main.c  |  3 ++-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c      |  4 ++--
- drivers/net/ethernet/mellanox/mlx5/core/en_rep.c       |  3 ++-
- drivers/net/ethernet/mellanox/mlxsw/spectrum.c         |  5 +++--
- drivers/net/ethernet/rocker/rocker_main.c              |  3 ++-
- drivers/net/ethernet/ti/cpsw_new.c                     |  3 ++-
- drivers/net/loopback.c                                 |  2 +-
- drivers/net/net_failover.c                             |  2 +-
- drivers/net/team/team_core.c                           |  6 +++---
- drivers/net/vrf.c                                      |  2 +-
- net/batman-adv/soft-interface.c                        |  3 ++-
- net/bridge/br_device.c                                 |  5 +++--
- net/core/dev.c                                         |  4 ++--
- net/ethtool/common.c                                   |  1 -
- net/hsr/hsr_device.c                                   |  8 ++++----
- net/ieee802154/6lowpan/core.c                          |  2 +-
- net/ieee802154/core.c                                  | 10 +++++-----
- net/ipv4/ip_tunnel.c                                   |  2 +-
- net/ipv4/ipmr.c                                        |  2 +-
- net/ipv6/ip6_gre.c                                     |  3 +--
- net/ipv6/ip6_tunnel.c                                  |  2 +-
- net/ipv6/ip6mr.c                                       |  2 +-
- net/ipv6/sit.c                                         |  2 +-
- net/openvswitch/vport-internal_dev.c                   |  2 +-
- net/wireless/core.c                                    | 10 +++++-----
- tools/testing/selftests/net/forwarding/README          |  2 +-
- 34 files changed, 61 insertions(+), 62 deletions(-)
+ .../networking/net_cachelines/net_device.rst          |  1 +
+ include/linux/netdev_features.h                       |  6 ++----
+ include/linux/netdevice.h                             |  2 ++
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_fcoe.c       |  6 ++----
+ drivers/net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c       |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c         |  4 ++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c          |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c         | 11 ++++-------
+ drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c        |  4 ++--
+ drivers/scsi/fcoe/fcoe.c                              |  4 ++--
+ net/8021q/vlan_dev.c                                  |  1 +
+ net/ethtool/common.c                                  |  1 -
+ 12 files changed, 20 insertions(+), 24 deletions(-)
 
 diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
-index 9b2b3aeaa4a9..e65ffdfc9e0a 100644
+index e65ffdfc9e0a..c3bbf101a887 100644
 --- a/Documentation/networking/net_cachelines/net_device.rst
 +++ b/Documentation/networking/net_cachelines/net_device.rst
-@@ -166,6 +166,7 @@ unsigned:1                          wol_enabled
- unsigned:1                          threaded                -                   -                   napi_poll(napi_enable,dev_set_threaded)
+@@ -167,6 +167,7 @@ unsigned:1                          threaded                -
  unsigned_long:1                     see_all_hwtstamp_requests                                       
  unsigned_long:1                     change_proto_down                                               
-+unsigned_long:1                     netns_local                                                     
+ unsigned_long:1                     netns_local                                                     
++unsigned_long:1                     fcoe_mtu                                                        
  struct_list_head                    net_notifier_list                                               
  struct_macsec_ops*                  macsec_ops                                                      
  struct_udp_tunnel_nic_info*         udp_tunnel_nic_info                                             
-diff --git a/Documentation/networking/netdev-features.rst b/Documentation/networking/netdev-features.rst
-index f29d982ebf5d..5014f7cc1398 100644
---- a/Documentation/networking/netdev-features.rst
-+++ b/Documentation/networking/netdev-features.rst
-@@ -139,13 +139,6 @@ chained skbs (skb->next/prev list).
- Features contained in NETIF_F_SOFT_FEATURES are features of networking
- stack. Driver should not change behaviour based on them.
- 
-- * netns-local device
--
--NETIF_F_NETNS_LOCAL is set for devices that are not allowed to move between
--network namespaces (e.g. loopback).
--
--Don't use it in drivers.
--
-  * VLAN challenged
- 
- NETIF_F_VLAN_CHALLENGED should be set for devices which can't cope with VLAN
-diff --git a/Documentation/networking/switchdev.rst b/Documentation/networking/switchdev.rst
-index 758f1dae3fce..f355f0166f1b 100644
---- a/Documentation/networking/switchdev.rst
-+++ b/Documentation/networking/switchdev.rst
-@@ -137,10 +137,10 @@ would be sub-port 0 on port 1 on switch 1.
- Port Features
- ^^^^^^^^^^^^^
- 
--NETIF_F_NETNS_LOCAL
-+dev->netns_local
- 
- If the switchdev driver (and device) only supports offloading of the default
--network namespace (netns), the driver should set this feature flag to prevent
-+network namespace (netns), the driver should set this private flag to prevent
- the port netdev from being moved out of the default netns.  A netns-aware
- driver/device would not set this flag and be responsible for partitioning
- hardware to preserve netns containment.  This means hardware cannot forward
 diff --git a/include/linux/netdev_features.h b/include/linux/netdev_features.h
-index a2e20b517584..d5a3836f4793 100644
+index d5a3836f4793..37af2c6e7caf 100644
 --- a/include/linux/netdev_features.h
 +++ b/include/linux/netdev_features.h
-@@ -25,7 +25,7 @@ enum {
- 	NETIF_F_VLAN_CHALLENGED_BIT,	/* Device cannot handle VLAN packets */
- 	NETIF_F_GSO_BIT,		/* Enable software GSO. */
- 	__UNUSED_NETIF_F_12,
--	NETIF_F_NETNS_LOCAL_BIT,	/* Does not change network namespaces */
-+	__UNUSED_NETIF_F_13,
- 	NETIF_F_GRO_BIT,		/* Generic receive offload */
- 	NETIF_F_LRO_BIT,		/* large receive offload */
+@@ -58,7 +58,7 @@ enum {
  
-@@ -121,7 +121,6 @@ enum {
- #define NETIF_F_IPV6_CSUM	__NETIF_F(IPV6_CSUM)
- #define NETIF_F_LOOPBACK	__NETIF_F(LOOPBACK)
- #define NETIF_F_LRO		__NETIF_F(LRO)
--#define NETIF_F_NETNS_LOCAL	__NETIF_F(NETNS_LOCAL)
- #define NETIF_F_NOCACHE_COPY	__NETIF_F(NOCACHE_COPY)
- #define NETIF_F_NTUPLE		__NETIF_F(NTUPLE)
- #define NETIF_F_RXCSUM		__NETIF_F(RXCSUM)
-@@ -190,8 +189,7 @@ static inline int find_next_netdev_feature(u64 feature, unsigned long start)
+ 	NETIF_F_FCOE_CRC_BIT,		/* FCoE CRC32 */
+ 	NETIF_F_SCTP_CRC_BIT,		/* SCTP checksum offload */
+-	NETIF_F_FCOE_MTU_BIT,		/* Supports max FCoE MTU, 2158 bytes*/
++	__UNUSED_NETIF_F_37,
+ 	NETIF_F_NTUPLE_BIT,		/* N-tuple filters supported */
+ 	NETIF_F_RXHASH_BIT,		/* Receive hashing offload */
+ 	NETIF_F_RXCSUM_BIT,		/* Receive checksumming offload */
+@@ -105,7 +105,6 @@ enum {
+ #define __NETIF_F(name)		__NETIF_F_BIT(NETIF_F_##name##_BIT)
  
- /* Features valid for ethtool to change */
- /* = all defined minus driver/device-class-related */
--#define NETIF_F_NEVER_CHANGE	(NETIF_F_VLAN_CHALLENGED | \
--				 NETIF_F_NETNS_LOCAL)
-+#define NETIF_F_NEVER_CHANGE	NETIF_F_VLAN_CHALLENGED
+ #define NETIF_F_FCOE_CRC	__NETIF_F(FCOE_CRC)
+-#define NETIF_F_FCOE_MTU	__NETIF_F(FCOE_MTU)
+ #define NETIF_F_FRAGLIST	__NETIF_F(FRAGLIST)
+ #define NETIF_F_FSO		__NETIF_F(FSO)
+ #define NETIF_F_GRO		__NETIF_F(GRO)
+@@ -210,8 +209,7 @@ static inline int find_next_netdev_feature(u64 feature, unsigned long start)
+ #define NETIF_F_ALL_TSO 	(NETIF_F_TSO | NETIF_F_TSO6 | \
+ 				 NETIF_F_TSO_ECN | NETIF_F_TSO_MANGLEID)
  
- /* remember that ((t)1 << t_BITS) is undefined in C99 */
- #define NETIF_F_ETHTOOL_BITS	((__NETIF_F_BIT(NETDEV_FEATURE_COUNT - 1) | \
+-#define NETIF_F_ALL_FCOE	(NETIF_F_FCOE_CRC | NETIF_F_FCOE_MTU | \
+-				 NETIF_F_FSO)
++#define NETIF_F_ALL_FCOE	(NETIF_F_FCOE_CRC | NETIF_F_FSO)
+ 
+ /* List of features with software fallbacks. */
+ #define NETIF_F_GSO_SOFTWARE	(NETIF_F_ALL_TSO | NETIF_F_GSO_SCTP |	     \
 diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index e22ca5e07490..a698e2402420 100644
+index a698e2402420..ca5f0dda733b 100644
 --- a/include/linux/netdevice.h
 +++ b/include/linux/netdevice.h
-@@ -1968,6 +1968,7 @@ enum netdev_reg_state {
-  *			regardless of source, even if those aren't
+@@ -1969,6 +1969,7 @@ enum netdev_reg_state {
   *			HWTSTAMP_SOURCE_NETDEV
   *	@change_proto_down: device supports setting carrier via IFLA_PROTO_DOWN
-+ *	@netns_local: interface can't change network namespaces
+  *	@netns_local: interface can't change network namespaces
++ *	@fcoe_mtu:	device supports maximum FCoE MTU, 2158 bytes
   *
   *	@net_notifier_list:	List of per-net netdev notifier block
   *				that follow this device when it is moved
-@@ -2361,6 +2362,7 @@ struct net_device {
- 	/* priv_flags_slow, ungrouped to save space */
+@@ -2363,6 +2364,7 @@ struct net_device {
  	unsigned long		see_all_hwtstamp_requests:1;
  	unsigned long		change_proto_down:1;
-+	unsigned long		netns_local:1;
+ 	unsigned long		netns_local:1;
++	unsigned long		fcoe_mtu:1;
  
  	struct list_head	net_notifier_list;
  
-diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-index 921bbfd72a38..0433a0f36d1b 100644
---- a/drivers/net/amt.c
-+++ b/drivers/net/amt.c
-@@ -3099,8 +3099,8 @@ static void amt_link_setup(struct net_device *dev)
- 	dev->addr_len		= 0;
- 	dev->priv_flags		|= IFF_NO_QUEUE;
- 	dev->lltx		= true;
-+	dev->netns_local	= true;
- 	dev->features		|= NETIF_F_GSO_SOFTWARE;
--	dev->features		|= NETIF_F_NETNS_LOCAL;
- 	dev->hw_features	|= NETIF_F_SG | NETIF_F_HW_CSUM;
- 	dev->hw_features	|= NETIF_F_FRAGLIST | NETIF_F_RXCSUM;
- 	dev->hw_features	|= NETIF_F_GSO_SOFTWARE;
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 359cb4a63098..94b62af8d349 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -5883,6 +5883,9 @@ void bond_setup(struct net_device *bond_dev)
- 	/* don't acquire bond device's netif_tx_lock when transmitting */
- 	bond_dev->lltx = true;
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_fcoe.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_fcoe.c
+index 33b2c0c45509..f6f745f5c022 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_fcoe.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_fcoe.c
+@@ -81,8 +81,7 @@ int cxgb_fcoe_enable(struct net_device *netdev)
  
-+	/* Don't allow bond devices to change network namespaces. */
-+	bond_dev->netns_local = true;
-+
- 	/* By default, we declare the bond to be fully
- 	 * VLAN hardware accelerated capable. Special
- 	 * care is taken in the various xmit functions
-@@ -5890,9 +5893,6 @@ void bond_setup(struct net_device *bond_dev)
- 	 * capable
- 	 */
+ 	netdev->features |= NETIF_F_FCOE_CRC;
+ 	netdev->vlan_features |= NETIF_F_FCOE_CRC;
+-	netdev->features |= NETIF_F_FCOE_MTU;
+-	netdev->vlan_features |= NETIF_F_FCOE_MTU;
++	netdev->fcoe_mtu = true;
  
--	/* Don't allow bond devices to change network namespaces. */
--	bond_dev->features |= NETIF_F_NETNS_LOCAL;
--
- 	bond_dev->hw_features = BOND_VLAN_FEATURES |
- 				NETIF_F_HW_VLAN_CTAG_RX |
- 				NETIF_F_HW_VLAN_CTAG_FILTER |
-diff --git a/drivers/net/ethernet/adi/adin1110.c b/drivers/net/ethernet/adi/adin1110.c
-index 0713f1e2c7f3..3431a7e62b0d 100644
---- a/drivers/net/ethernet/adi/adin1110.c
-+++ b/drivers/net/ethernet/adi/adin1110.c
-@@ -1599,7 +1599,7 @@ static int adin1110_probe_netdevs(struct adin1110_priv *priv)
- 		netdev->netdev_ops = &adin1110_netdev_ops;
- 		netdev->ethtool_ops = &adin1110_ethtool_ops;
- 		netdev->priv_flags |= IFF_UNICAST_FLT;
--		netdev->features |= NETIF_F_NETNS_LOCAL;
-+		netdev->netns_local = true;
+ 	netdev_features_change(netdev);
  
- 		port_priv->phydev = get_phy_device(priv->mii_bus, i + 1, false);
- 		if (IS_ERR(port_priv->phydev)) {
-diff --git a/drivers/net/ethernet/marvell/prestera/prestera_main.c b/drivers/net/ethernet/marvell/prestera/prestera_main.c
-index 63ae01954dfc..22ca6ee9665e 100644
---- a/drivers/net/ethernet/marvell/prestera/prestera_main.c
-+++ b/drivers/net/ethernet/marvell/prestera/prestera_main.c
-@@ -633,7 +633,8 @@ static int prestera_port_create(struct prestera_switch *sw, u32 id)
- 	if (err)
- 		goto err_dl_port_register;
+@@ -112,8 +111,7 @@ int cxgb_fcoe_disable(struct net_device *netdev)
  
--	dev->features |= NETIF_F_NETNS_LOCAL | NETIF_F_HW_TC;
-+	dev->features |= NETIF_F_HW_TC;
-+	dev->netns_local = true;
- 	dev->netdev_ops = &prestera_netdev_ops;
- 	dev->ethtool_ops = &prestera_ethtool_ops;
- 	SET_NETDEV_DEV(dev, sw->dev->dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 16b67c457b60..47e7a80d221b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -4414,9 +4414,9 @@ static netdev_features_t mlx5e_fix_features(struct net_device *netdev,
+ 	netdev->features &= ~NETIF_F_FCOE_CRC;
+ 	netdev->vlan_features &= ~NETIF_F_FCOE_CRC;
+-	netdev->features &= ~NETIF_F_FCOE_MTU;
+-	netdev->vlan_features &= ~NETIF_F_FCOE_MTU;
++	netdev->fcoe_mtu = false;
  
- 	if (mlx5e_is_uplink_rep(priv)) {
- 		features = mlx5e_fix_uplink_rep_features(netdev, features);
--		features |= NETIF_F_NETNS_LOCAL;
-+		netdev->netns_local = true;
- 	} else {
--		features &= ~NETIF_F_NETNS_LOCAL;
-+		netdev->netns_local = false;
+ 	netdev_features_change(netdev);
+ 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c
+index e85f7d2e8810..f2709b10c2e5 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c
+@@ -317,7 +317,7 @@ static u8 ixgbe_dcbnl_set_all(struct net_device *netdev)
+ 		int max_frame = adapter->netdev->mtu + ETH_HLEN + ETH_FCS_LEN;
+ 
+ #ifdef IXGBE_FCOE
+-		if (adapter->netdev->features & NETIF_F_FCOE_MTU)
++		if (adapter->netdev->fcoe_mtu)
+ 			max_frame = max(max_frame, IXGBE_FCOE_JUMBO_FRAME_SIZE);
+ #endif
+ 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c
+index 18d63c8c2ff4..955dced844a9 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c
+@@ -858,7 +858,7 @@ int ixgbe_fcoe_enable(struct net_device *netdev)
+ 
+ 	/* enable FCoE and notify stack */
+ 	adapter->flags |= IXGBE_FLAG_FCOE_ENABLED;
+-	netdev->features |= NETIF_F_FCOE_MTU;
++	netdev->fcoe_mtu = true;
+ 	netdev_features_change(netdev);
+ 
+ 	/* release existing queues and reallocate them */
+@@ -898,7 +898,7 @@ int ixgbe_fcoe_disable(struct net_device *netdev)
+ 
+ 	/* disable FCoE and notify stack */
+ 	adapter->flags &= ~IXGBE_FLAG_FCOE_ENABLED;
+-	netdev->features &= ~NETIF_F_FCOE_MTU;
++	netdev->fcoe_mtu = false;
+ 
+ 	netdev_features_change(netdev);
+ 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
+index 0ee943db3dc9..16fa621ce0ff 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c
+@@ -981,7 +981,7 @@ static int ixgbe_alloc_q_vector(struct ixgbe_adapter *adapter,
+ 			set_bit(__IXGBE_RX_CSUM_UDP_ZERO_ERR, &ring->state);
+ 
+ #ifdef IXGBE_FCOE
+-		if (adapter->netdev->features & NETIF_F_FCOE_MTU) {
++		if (adapter->netdev->fcoe_mtu) {
+ 			struct ixgbe_ring_feature *f;
+ 			f = &adapter->ring_feature[RING_F_FCOE];
+ 			if ((rxr_idx >= f->offset) &&
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 8057cef61f39..8b8404d8c946 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -5079,7 +5079,7 @@ static void ixgbe_configure_dcb(struct ixgbe_adapter *adapter)
+ 		netif_set_tso_max_size(adapter->netdev, 32768);
+ 
+ #ifdef IXGBE_FCOE
+-	if (adapter->netdev->features & NETIF_F_FCOE_MTU)
++	if (adapter->netdev->fcoe_mtu)
+ 		max_frame = max(max_frame, IXGBE_FCOE_JUMBO_FRAME_SIZE);
+ #endif
+ 
+@@ -5136,8 +5136,7 @@ static int ixgbe_hpbthresh(struct ixgbe_adapter *adapter, int pb)
+ 
+ #ifdef IXGBE_FCOE
+ 	/* FCoE traffic class uses FCOE jumbo frames */
+-	if ((dev->features & NETIF_F_FCOE_MTU) &&
+-	    (tc < IXGBE_FCOE_JUMBO_FRAME_SIZE) &&
++	if (dev->fcoe_mtu && tc < IXGBE_FCOE_JUMBO_FRAME_SIZE &&
+ 	    (pb == ixgbe_fcoe_get_tc(adapter)))
+ 		tc = IXGBE_FCOE_JUMBO_FRAME_SIZE;
+ #endif
+@@ -5197,8 +5196,7 @@ static int ixgbe_lpbthresh(struct ixgbe_adapter *adapter, int pb)
+ 
+ #ifdef IXGBE_FCOE
+ 	/* FCoE traffic class uses FCOE jumbo frames */
+-	if ((dev->features & NETIF_F_FCOE_MTU) &&
+-	    (tc < IXGBE_FCOE_JUMBO_FRAME_SIZE) &&
++	if (dev->fcoe_mtu && tc < IXGBE_FCOE_JUMBO_FRAME_SIZE &&
+ 	    (pb == netdev_get_prio_tc_map(dev, adapter->fcoe.up)))
+ 		tc = IXGBE_FCOE_JUMBO_FRAME_SIZE;
+ #endif
+@@ -11096,8 +11094,7 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 				    NETIF_F_FCOE_CRC;
+ 
+ 		netdev->vlan_features |= NETIF_F_FSO |
+-					 NETIF_F_FCOE_CRC |
+-					 NETIF_F_FCOE_MTU;
++					 NETIF_F_FCOE_CRC;
  	}
+ #endif /* IXGBE_FCOE */
+ 	if (adapter->flags2 & IXGBE_FLAG2_RSC_CAPABLE)
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+index fcfd0a075eee..e71715f5da22 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+@@ -495,7 +495,7 @@ static int ixgbe_set_vf_lpe(struct ixgbe_adapter *adapter, u32 max_frame, u32 vf
+ 		int err = 0;
  
- 	mutex_unlock(&priv->state_lock);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-index b885042eef14..92094bf60d59 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rep.c
-@@ -898,7 +898,8 @@ static void mlx5e_build_rep_netdev(struct net_device *netdev,
- 	netdev->hw_features    |= NETIF_F_RXCSUM;
+ #ifdef CONFIG_FCOE
+-		if (dev->features & NETIF_F_FCOE_MTU)
++		if (dev->fcoe_mtu)
+ 			pf_max_frame = max_t(int, pf_max_frame,
+ 					     IXGBE_FCOE_JUMBO_FRAME_SIZE);
  
- 	netdev->features |= netdev->hw_features;
--	netdev->features |= NETIF_F_NETNS_LOCAL;
-+
-+	netdev->netns_local = true;
- }
+@@ -857,7 +857,7 @@ static void ixgbe_set_vf_rx_tx(struct ixgbe_adapter *adapter, int vf)
+ 		int pf_max_frame = dev->mtu + ETH_HLEN;
  
- static int mlx5e_init_rep(struct mlx5_core_dev *mdev,
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-index 44d6e125bd6f..b9ffd7236aff 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-@@ -1676,10 +1676,11 @@ static int mlxsw_sp_port_create(struct mlxsw_sp *mlxsw_sp, u16 local_port,
+ #if IS_ENABLED(CONFIG_FCOE)
+-		if (dev->features & NETIF_F_FCOE_MTU)
++		if (dev->fcoe_mtu)
+ 			pf_max_frame = max_t(int, pf_max_frame,
+ 					     IXGBE_FCOE_JUMBO_FRAME_SIZE);
+ #endif /* CONFIG_FCOE */
+diff --git a/drivers/scsi/fcoe/fcoe.c b/drivers/scsi/fcoe/fcoe.c
+index f1429f270170..39aec710660c 100644
+--- a/drivers/scsi/fcoe/fcoe.c
++++ b/drivers/scsi/fcoe/fcoe.c
+@@ -722,7 +722,7 @@ static int fcoe_netdev_config(struct fc_lport *lport, struct net_device *netdev)
+ 	 * will return 0, so do this first.
+ 	 */
+ 	mfs = netdev->mtu;
+-	if (netdev->features & NETIF_F_FCOE_MTU) {
++	if (netdev->fcoe_mtu) {
+ 		mfs = FCOE_MTU;
+ 		FCOE_NETDEV_DBG(netdev, "Supports FCOE_MTU of %d bytes\n", mfs);
+ 	}
+@@ -1863,7 +1863,7 @@ static int fcoe_device_notification(struct notifier_block *notifier,
+ 	case NETDEV_CHANGE:
+ 		break;
+ 	case NETDEV_CHANGEMTU:
+-		if (netdev->features & NETIF_F_FCOE_MTU)
++		if (netdev->fcoe_mtu)
+ 			break;
+ 		mfs = netdev->mtu - (sizeof(struct fcoe_hdr) +
+ 				     sizeof(struct fcoe_crc_eof));
+diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
+index 3ca485537d77..09b46b057ab2 100644
+--- a/net/8021q/vlan_dev.c
++++ b/net/8021q/vlan_dev.c
+@@ -571,6 +571,7 @@ static int vlan_dev_init(struct net_device *dev)
  
- 	netif_carrier_off(dev);
- 
--	dev->features |= NETIF_F_NETNS_LOCAL | NETIF_F_SG |
--			 NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_TC;
-+	dev->features |= NETIF_F_SG | NETIF_F_HW_VLAN_CTAG_FILTER |
-+			 NETIF_F_HW_TC;
- 	dev->hw_features |= NETIF_F_HW_TC | NETIF_F_LOOPBACK;
+ 	dev->features |= dev->hw_features;
  	dev->lltx = true;
-+	dev->netns_local = true;
- 
- 	dev->min_mtu = ETH_MIN_MTU;
- 	dev->max_mtu = MLXSW_PORT_MAX_MTU - MLXSW_PORT_ETH_FRAME_HDR;
-diff --git a/drivers/net/ethernet/rocker/rocker_main.c b/drivers/net/ethernet/rocker/rocker_main.c
-index e097ce3e69ea..84fa911c78db 100644
---- a/drivers/net/ethernet/rocker/rocker_main.c
-+++ b/drivers/net/ethernet/rocker/rocker_main.c
-@@ -2575,7 +2575,8 @@ static int rocker_probe_port(struct rocker *rocker, unsigned int port_number)
- 	netif_napi_add(dev, &rocker_port->napi_rx, rocker_port_poll_rx);
- 	rocker_carrier_init(rocker_port);
- 
--	dev->features |= NETIF_F_NETNS_LOCAL | NETIF_F_SG;
-+	dev->features |= NETIF_F_SG;
-+	dev->netns_local = true;
- 
- 	/* MTU range: 68 - 9000 */
- 	dev->min_mtu = ROCKER_PORT_MIN_MTU;
-diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/ti/cpsw_new.c
-index 2baa198ebfa0..557cc71b9dd2 100644
---- a/drivers/net/ethernet/ti/cpsw_new.c
-+++ b/drivers/net/ethernet/ti/cpsw_new.c
-@@ -1407,7 +1407,8 @@ static int cpsw_create_ports(struct cpsw_common *cpsw)
- 		cpsw->slaves[i].ndev = ndev;
- 
- 		ndev->features |= NETIF_F_HW_VLAN_CTAG_FILTER |
--				  NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_NETNS_LOCAL | NETIF_F_HW_TC;
-+				  NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_TC;
-+		ndev->netns_local = true;
- 
- 		ndev->xdp_features = NETDEV_XDP_ACT_BASIC |
- 				     NETDEV_XDP_ACT_REDIRECT |
-diff --git a/drivers/net/loopback.c b/drivers/net/loopback.c
-index bf857782be0f..1993b90b1a5f 100644
---- a/drivers/net/loopback.c
-+++ b/drivers/net/loopback.c
-@@ -172,6 +172,7 @@ static void gen_lo_setup(struct net_device *dev,
- 	dev->flags		= IFF_LOOPBACK;
- 	dev->priv_flags		|= IFF_LIVE_ADDR_CHANGE | IFF_NO_QUEUE;
- 	dev->lltx		= true;
-+	dev->netns_local	= true;
- 	netif_keep_dst(dev);
- 	dev->hw_features	= NETIF_F_GSO_SOFTWARE;
- 	dev->features		= NETIF_F_SG | NETIF_F_FRAGLIST
-@@ -180,7 +181,6 @@ static void gen_lo_setup(struct net_device *dev,
- 		| NETIF_F_RXCSUM
- 		| NETIF_F_SCTP_CRC
- 		| NETIF_F_HIGHDMA
--		| NETIF_F_NETNS_LOCAL
- 		| NETIF_F_VLAN_CHALLENGED
- 		| NETIF_F_LOOPBACK;
- 	dev->ethtool_ops	= eth_ops;
-diff --git a/drivers/net/net_failover.c b/drivers/net/net_failover.c
-index 06728385a35f..54c8b9d5b5fc 100644
---- a/drivers/net/net_failover.c
-+++ b/drivers/net/net_failover.c
-@@ -734,7 +734,7 @@ struct failover *net_failover_create(struct net_device *standby_dev)
- 	failover_dev->lltx = true;
- 
- 	/* Don't allow failover devices to change network namespaces. */
--	failover_dev->features |= NETIF_F_NETNS_LOCAL;
-+	failover_dev->netns_local = true;
- 
- 	failover_dev->hw_features = FAILOVER_VLAN_FEATURES |
- 				    NETIF_F_HW_VLAN_CTAG_TX |
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index 1d1bad3cedc2..18191d5a8bd4 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -2191,10 +2191,10 @@ static void team_setup(struct net_device *dev)
- 	dev->priv_flags |= IFF_UNICAST_FLT | IFF_LIVE_ADDR_CHANGE;
- 	dev->lltx = true;
- 
--	dev->features |= NETIF_F_GRO;
--
- 	/* Don't allow team devices to change network namespaces. */
--	dev->features |= NETIF_F_NETNS_LOCAL;
-+	dev->netns_local = true;
-+
-+	dev->features |= NETIF_F_GRO;
- 
- 	dev->hw_features = TEAM_VLAN_FEATURES |
- 			   NETIF_F_HW_VLAN_CTAG_RX |
-diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
-index 860f34918776..c20cab27f27a 100644
---- a/drivers/net/vrf.c
-+++ b/drivers/net/vrf.c
-@@ -1637,7 +1637,7 @@ static void vrf_setup(struct net_device *dev)
- 	dev->lltx = true;
- 
- 	/* don't allow vrf devices to change network namespaces. */
--	dev->features |= NETIF_F_NETNS_LOCAL;
-+	dev->netns_local = true;
- 
- 	/* does not make sense for a VLAN to be added to a vrf device */
- 	dev->features   |= NETIF_F_VLAN_CHALLENGED;
-diff --git a/net/batman-adv/soft-interface.c b/net/batman-adv/soft-interface.c
-index e791a73ef901..2758aba47a2f 100644
---- a/net/batman-adv/soft-interface.c
-+++ b/net/batman-adv/soft-interface.c
-@@ -1020,9 +1020,10 @@ static void batadv_softif_init_early(struct net_device *dev)
- 	dev->netdev_ops = &batadv_netdev_ops;
- 	dev->needs_free_netdev = true;
- 	dev->priv_destructor = batadv_softif_free;
--	dev->features |= NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_NETNS_LOCAL;
-+	dev->features |= NETIF_F_HW_VLAN_CTAG_FILTER;
- 	dev->priv_flags |= IFF_NO_QUEUE;
- 	dev->lltx = true;
-+	dev->netns_local = true;
- 
- 	/* can't call min_mtu, because the needed variables
- 	 * have not been initialized yet
-diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
-index a6d25113dfb1..26b79feb385d 100644
---- a/net/bridge/br_device.c
-+++ b/net/bridge/br_device.c
-@@ -488,9 +488,10 @@ void br_dev_setup(struct net_device *dev)
- 	SET_NETDEV_DEVTYPE(dev, &br_type);
- 	dev->priv_flags = IFF_EBRIDGE | IFF_NO_QUEUE;
- 	dev->lltx = true;
-+	dev->netns_local = true;
- 
--	dev->features = COMMON_FEATURES | NETIF_F_NETNS_LOCAL |
--			NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_STAG_TX;
-+	dev->features = COMMON_FEATURES | NETIF_F_HW_VLAN_CTAG_TX |
-+			NETIF_F_HW_VLAN_STAG_TX;
- 	dev->hw_features = COMMON_FEATURES | NETIF_F_HW_VLAN_CTAG_TX |
- 			   NETIF_F_HW_VLAN_STAG_TX;
- 	dev->vlan_features = COMMON_FEATURES;
-diff --git a/net/core/dev.c b/net/core/dev.c
-index bc195ddb6566..88d4b9125f5e 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11487,7 +11487,7 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
- 
- 	/* Don't allow namespace local devices to be moved. */
- 	err = -EINVAL;
--	if (dev->features & NETIF_F_NETNS_LOCAL)
-+	if (dev->netns_local)
- 		goto out;
- 
- 	/* Ensure the device has been registered */
-@@ -11869,7 +11869,7 @@ static void __net_exit default_device_exit_net(struct net *net)
- 		char fb_name[IFNAMSIZ];
- 
- 		/* Ignore unmoveable devices (i.e. loopback) */
--		if (dev->features & NETIF_F_NETNS_LOCAL)
-+		if (dev->netns_local)
- 			continue;
- 
- 		/* Leave virtual devices for the generic cleanup */
++	dev->fcoe_mtu = true;
+ 	netif_inherit_tso_max(dev, real_dev);
+ 	if (dev->features & NETIF_F_VLAN_FEATURES)
+ 		netdev_warn(real_dev, "VLAN features are set incorrectly.  Q-in-Q configurations may not work correctly.\n");
 diff --git a/net/ethtool/common.c b/net/ethtool/common.c
-index 447fc80e1b00..ca8e64162104 100644
+index ca8e64162104..00f93c58b319 100644
 --- a/net/ethtool/common.c
 +++ b/net/ethtool/common.c
-@@ -25,7 +25,6 @@ const char netdev_features_strings[NETDEV_FEATURE_COUNT][ETH_GSTRING_LEN] = {
- 	[NETIF_F_HW_VLAN_STAG_FILTER_BIT] = "rx-vlan-stag-filter",
- 	[NETIF_F_VLAN_CHALLENGED_BIT] =  "vlan-challenged",
- 	[NETIF_F_GSO_BIT] =              "tx-generic-segmentation",
--	[NETIF_F_NETNS_LOCAL_BIT] =      "netns-local",
- 	[NETIF_F_GRO_BIT] =              "rx-gro",
- 	[NETIF_F_GRO_HW_BIT] =           "rx-gro-hw",
- 	[NETIF_F_LRO_BIT] =              "rx-lro",
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index d4c783076662..a06e790042e2 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -556,6 +556,10 @@ void hsr_dev_setup(struct net_device *dev)
- 	dev->priv_flags |= IFF_NO_QUEUE | IFF_DISABLE_NETPOLL;
- 	/* Prevent recursive tx locking */
- 	dev->lltx = true;
-+	/* Not sure about this. Taken from bridge code. netdevice.h says
-+	 * it means "Does not change network namespaces".
-+	 */
-+	dev->netns_local = true;
+@@ -50,7 +50,6 @@ const char netdev_features_strings[NETDEV_FEATURE_COUNT][ETH_GSTRING_LEN] = {
  
- 	dev->needs_free_netdev = true;
- 
-@@ -569,10 +573,6 @@ void hsr_dev_setup(struct net_device *dev)
- 	 * hsr_header_create() etc.
- 	 */
- 	dev->features |= NETIF_F_VLAN_CHALLENGED;
--	/* Not sure about this. Taken from bridge code. netdev_features.h says
--	 * it means "Does not change network namespaces".
--	 */
--	dev->features |= NETIF_F_NETNS_LOCAL;
- }
- 
- /* Return true if dev is a HSR master; return false otherwise.
-diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
-index 77b4e92027c5..175efd860f7b 100644
---- a/net/ieee802154/6lowpan/core.c
-+++ b/net/ieee802154/6lowpan/core.c
-@@ -116,7 +116,7 @@ static void lowpan_setup(struct net_device *ldev)
- 	ldev->netdev_ops	= &lowpan_netdev_ops;
- 	ldev->header_ops	= &lowpan_header_ops;
- 	ldev->needs_free_netdev	= true;
--	ldev->features		|= NETIF_F_NETNS_LOCAL;
-+	ldev->netns_local	= true;
- }
- 
- static int lowpan_validate(struct nlattr *tb[], struct nlattr *data[],
-diff --git a/net/ieee802154/core.c b/net/ieee802154/core.c
-index 60e8fff1347e..88adb04e4072 100644
---- a/net/ieee802154/core.c
-+++ b/net/ieee802154/core.c
-@@ -226,11 +226,11 @@ int cfg802154_switch_netns(struct cfg802154_registered_device *rdev,
- 	list_for_each_entry(wpan_dev, &rdev->wpan_dev_list, list) {
- 		if (!wpan_dev->netdev)
- 			continue;
--		wpan_dev->netdev->features &= ~NETIF_F_NETNS_LOCAL;
-+		wpan_dev->netdev->netns_local = false;
- 		err = dev_change_net_namespace(wpan_dev->netdev, net, "wpan%d");
- 		if (err)
- 			break;
--		wpan_dev->netdev->features |= NETIF_F_NETNS_LOCAL;
-+		wpan_dev->netdev->netns_local = true;
- 	}
- 
- 	if (err) {
-@@ -242,11 +242,11 @@ int cfg802154_switch_netns(struct cfg802154_registered_device *rdev,
- 						     list) {
- 			if (!wpan_dev->netdev)
- 				continue;
--			wpan_dev->netdev->features &= ~NETIF_F_NETNS_LOCAL;
-+			wpan_dev->netdev->netns_local = false;
- 			err = dev_change_net_namespace(wpan_dev->netdev, net,
- 						       "wpan%d");
- 			WARN_ON(err);
--			wpan_dev->netdev->features |= NETIF_F_NETNS_LOCAL;
-+			wpan_dev->netdev->netns_local = true;
- 		}
- 
- 		return err;
-@@ -291,7 +291,7 @@ static int cfg802154_netdev_notifier_call(struct notifier_block *nb,
- 	switch (state) {
- 		/* TODO NETDEV_DEVTYPE */
- 	case NETDEV_REGISTER:
--		dev->features |= NETIF_F_NETNS_LOCAL;
-+		dev->netns_local = true;
- 		wpan_dev->identifier = ++rdev->wpan_dev_id;
- 		list_add_rcu(&wpan_dev->list, &rdev->wpan_dev_list);
- 		rdev->devlist_generation++;
-diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
-index 5cffad42fe8c..023b0ee8bd85 100644
---- a/net/ipv4/ip_tunnel.c
-+++ b/net/ipv4/ip_tunnel.c
-@@ -1161,7 +1161,7 @@ int ip_tunnel_init_net(struct net *net, unsigned int ip_tnl_net_id,
- 	 * Allowing to move it to another netns is clearly unsafe.
- 	 */
- 	if (!IS_ERR(itn->fb_tunnel_dev)) {
--		itn->fb_tunnel_dev->features |= NETIF_F_NETNS_LOCAL;
-+		itn->fb_tunnel_dev->netns_local = true;
- 		itn->fb_tunnel_dev->mtu = ip_tunnel_bind_dev(itn->fb_tunnel_dev);
- 		ip_tunnel_add(itn, netdev_priv(itn->fb_tunnel_dev));
- 		itn->type = itn->fb_tunnel_dev->type;
-diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-index b0eda745e3bc..f1a43199551b 100644
---- a/net/ipv4/ipmr.c
-+++ b/net/ipv4/ipmr.c
-@@ -537,7 +537,7 @@ static void reg_vif_setup(struct net_device *dev)
- 	dev->flags		= IFF_NOARP;
- 	dev->netdev_ops		= &reg_vif_netdev_ops;
- 	dev->needs_free_netdev	= true;
--	dev->features		|= NETIF_F_NETNS_LOCAL;
-+	dev->netns_local	= true;
- }
- 
- static struct net_device *ipmr_reg_vif(struct net *net, struct mr_table *mrt)
-diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
-index 08beab638bda..235808cfec70 100644
---- a/net/ipv6/ip6_gre.c
-+++ b/net/ipv6/ip6_gre.c
-@@ -1621,8 +1621,7 @@ static int __net_init ip6gre_init_net(struct net *net)
- 	/* FB netdevice is special: we have one, and only one per netns.
- 	 * Allowing to move it to another netns is clearly unsafe.
- 	 */
--	ign->fb_tunnel_dev->features |= NETIF_F_NETNS_LOCAL;
--
-+	ign->fb_tunnel_dev->netns_local = true;
- 
- 	ip6gre_fb_tunnel_init(ign->fb_tunnel_dev);
- 	ign->fb_tunnel_dev->rtnl_link_ops = &ip6gre_link_ops;
-diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-index cbef0fcece71..ec51ab5063e8 100644
---- a/net/ipv6/ip6_tunnel.c
-+++ b/net/ipv6/ip6_tunnel.c
-@@ -2258,7 +2258,7 @@ static int __net_init ip6_tnl_init_net(struct net *net)
- 	/* FB netdevice is special: we have one, and only one per netns.
- 	 * Allowing to move it to another netns is clearly unsafe.
- 	 */
--	ip6n->fb_tnl_dev->features |= NETIF_F_NETNS_LOCAL;
-+	ip6n->fb_tnl_dev->netns_local = true;
- 
- 	err = ip6_fb_tnl_dev_init(ip6n->fb_tnl_dev);
- 	if (err < 0)
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index e3ee93c562c3..2ce4ae0d8dc3 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -640,7 +640,7 @@ static void reg_vif_setup(struct net_device *dev)
- 	dev->flags		= IFF_NOARP;
- 	dev->netdev_ops		= &reg_vif_netdev_ops;
- 	dev->needs_free_netdev	= true;
--	dev->features		|= NETIF_F_NETNS_LOCAL;
-+	dev->netns_local	= true;
- }
- 
- static struct net_device *ip6mr_reg_vif(struct net *net, struct mr_table *mrt)
-diff --git a/net/ipv6/sit.c b/net/ipv6/sit.c
-index 008bb84c3b59..a0428612f7d4 100644
---- a/net/ipv6/sit.c
-+++ b/net/ipv6/sit.c
-@@ -1855,7 +1855,7 @@ static int __net_init sit_init_net(struct net *net)
- 	/* FB netdevice is special: we have one, and only one per netns.
- 	 * Allowing to move it to another netns is clearly unsafe.
- 	 */
--	sitn->fb_tunnel_dev->features |= NETIF_F_NETNS_LOCAL;
-+	sitn->fb_tunnel_dev->netns_local = true;
- 
- 	err = register_netdev(sitn->fb_tunnel_dev);
- 	if (err)
-diff --git a/net/openvswitch/vport-internal_dev.c b/net/openvswitch/vport-internal_dev.c
-index 3a369a31c5cc..5858d65ea1a9 100644
---- a/net/openvswitch/vport-internal_dev.c
-+++ b/net/openvswitch/vport-internal_dev.c
-@@ -149,7 +149,7 @@ static struct vport *internal_dev_create(const struct vport_parms *parms)
- 
- 	/* Restrict bridge port to current netns. */
- 	if (vport->port_no == OVSP_LOCAL)
--		vport->dev->features |= NETIF_F_NETNS_LOCAL;
-+		vport->dev->netns_local = true;
- 
- 	rtnl_lock();
- 	err = register_netdevice(vport->dev);
-diff --git a/net/wireless/core.c b/net/wireless/core.c
-index 4d5d351bd0b5..661adfc77644 100644
---- a/net/wireless/core.c
-+++ b/net/wireless/core.c
-@@ -165,11 +165,11 @@ int cfg80211_switch_netns(struct cfg80211_registered_device *rdev,
- 	list_for_each_entry(wdev, &rdev->wiphy.wdev_list, list) {
- 		if (!wdev->netdev)
- 			continue;
--		wdev->netdev->features &= ~NETIF_F_NETNS_LOCAL;
-+		wdev->netdev->netns_local = false;
- 		err = dev_change_net_namespace(wdev->netdev, net, "wlan%d");
- 		if (err)
- 			break;
--		wdev->netdev->features |= NETIF_F_NETNS_LOCAL;
-+		wdev->netdev->netns_local = true;
- 	}
- 
- 	if (err) {
-@@ -181,11 +181,11 @@ int cfg80211_switch_netns(struct cfg80211_registered_device *rdev,
- 						     list) {
- 			if (!wdev->netdev)
- 				continue;
--			wdev->netdev->features &= ~NETIF_F_NETNS_LOCAL;
-+			wdev->netdev->netns_local = false;
- 			err = dev_change_net_namespace(wdev->netdev, net,
- 							"wlan%d");
- 			WARN_ON(err);
--			wdev->netdev->features |= NETIF_F_NETNS_LOCAL;
-+			wdev->netdev->netns_local = true;
- 		}
- 
- 		return err;
-@@ -1473,7 +1473,7 @@ static int cfg80211_netdev_notifier_call(struct notifier_block *nb,
- 		SET_NETDEV_DEVTYPE(dev, &wiphy_type);
- 		wdev->netdev = dev;
- 		/* can only change netns with wiphy */
--		dev->features |= NETIF_F_NETNS_LOCAL;
-+		dev->netns_local = true;
- 
- 		cfg80211_init_wdev(wdev);
- 		break;
-diff --git a/tools/testing/selftests/net/forwarding/README b/tools/testing/selftests/net/forwarding/README
-index 7fdb6a9ca543..a652429bfd53 100644
---- a/tools/testing/selftests/net/forwarding/README
-+++ b/tools/testing/selftests/net/forwarding/README
-@@ -6,7 +6,7 @@ to easily create and test complex environments.
- 
- Unfortunately, these namespaces can not be used with actual switching
- ASICs, as their ports can not be migrated to other network namespaces
--(NETIF_F_NETNS_LOCAL) and most of them probably do not support the
-+(dev->netns_local) and most of them probably do not support the
- L1-separation provided by namespaces.
- 
- However, a similar kind of flexibility can be achieved by using VRFs and
+ 	[NETIF_F_FCOE_CRC_BIT] =         "tx-checksum-fcoe-crc",
+ 	[NETIF_F_SCTP_CRC_BIT] =        "tx-checksum-sctp",
+-	[NETIF_F_FCOE_MTU_BIT] =         "fcoe-mtu",
+ 	[NETIF_F_NTUPLE_BIT] =           "rx-ntuple-filter",
+ 	[NETIF_F_RXHASH_BIT] =           "rx-hashing",
+ 	[NETIF_F_RXCSUM_BIT] =           "rx-checksum",
 -- 
 2.46.0
 
