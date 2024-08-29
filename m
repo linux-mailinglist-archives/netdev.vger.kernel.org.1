@@ -1,349 +1,313 @@
-Return-Path: <netdev+bounces-123278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68AAF9645EC
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:11:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18B929645FC
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:13:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFFD01F28739
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:11:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B2041F29134
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB03C1A4F34;
-	Thu, 29 Aug 2024 13:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5FB1A705E;
+	Thu, 29 Aug 2024 13:12:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="eiJDuvEY"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="LQ+lpXsA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AD81A3BDC
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 13:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1911A4B81
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 13:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724937096; cv=none; b=nji02bjIIrFT+qffV2QCWYM7/yt+70m0q8/s7GlqarTiof57LN8iRUwqRMKZZzmzlmIkY7sGLYd1sVYe2welJGncaq4UQobJLxiDc2Vg3fZXI76OsVTZKVGuDLnDIAfM35wNpOTvYdEIa2bnmZgHajHPExUyDEBHM4sVEgplVew=
+	t=1724937177; cv=none; b=k6YXsndlaeb9Osht9sI0FhG1BEfxleV9Z5+Jd7IH6sSqZdQeR+vg+K9YNX5oNK496kKG3gBeDllo+IT1HaIKhdbaPhgdGrKx1hIZP58qE9oL8WdPI4dtw7+ddehVa6UXXVw0Bhpb0rkCmAnzbx07xxK510ABk2mt39ubk5ub/F8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724937096; c=relaxed/simple;
-	bh=fakhpIJR2ZfTamWLWAqABaX77u05L93KwsKGKWJugw4=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sSK5xjOpWEeZ7/65VDvzaP9zsNPFq4oGtGU2fo8mDsqXAfVZbUZM/UmPD+mvWQ886dFU6/AyFMlbEJ9D6WSKXe9TP2aIzQnt+plxDNZBV3eUAGtYq4K3rbhGg654zGXvL44xjFTPn0RsOC4D0m8F8baBIjYreCvvlvmAPrLvjnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=eiJDuvEY; arc=none smtp.client-ip=209.85.208.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-5a10835487fso884429a12.1
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:11:34 -0700 (PDT)
+	s=arc-20240116; t=1724937177; c=relaxed/simple;
+	bh=W/1LfhbjRimnJDGS596SlMFLHo5vuTBlZ/w3hRkrd8A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=M0d56GCS72GvvOfthd6FZZtE1NMwfr5gR/gfs9CD/XNO1ZRLmd3wLnQNEPic6pQirvRp8DWNUrEkvOIcXd9cuEy3aXUt2xDcilwvqkiQJ04mLbosP/AkSRigCvusFgpfiFn5EO8ymWf/JQ0IQXuGBax9PqmZ9uRtBhT8hGL+Wbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=LQ+lpXsA; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2d3d0b06a2dso503388a91.0
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:12:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724937093; x=1725541893; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6HSLQ8KvULAlJol+4PZpsMQiwSkPlENMupYF/HR2lik=;
-        b=eiJDuvEYAoOlohJFbU5fyl8pTquuP5f/Qvo0RcWNOl/z9fauJCIGdi3FMiVDfAPwel
-         /jd8Np0eLvOucrO53/kcTB6QUsb13fusFXlWKHCt4uWJnLTiZp3t653yuOFe/FHw64vs
-         X2gmkZ7DyV1JOzz4x6C3xvzrs8ey8gumRz4AOs0XF97hvfPKhJBwUMyeaLDbFfBrZ0Ho
-         o5wlDZfu3R8R/d+ogDTf6a+hEDDNf480T3U511yZiPF6ICgj0IWEMENfKoCmyNhrgX4e
-         9X+sJNWFtTvW5xeDqDoVTqUt+Ijvi/kmH3unEH7KCoFGfwACEH39o4u3TnB3wUjFvOyg
-         vRRQ==
+        d=fastly.com; s=google; t=1724937175; x=1725541975; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7eTS3eeXVwPrTwK+lb5D5mdVs6X406fMnAORyEKIvww=;
+        b=LQ+lpXsAZuwOMUpnLjFG5zTuZhMg0FaP2wVc23dq+wWaIl6bpdhhMxRTjwlfFChpeV
+         38CLvA9/1YlpwIIi80nyg+Xh6ybwRqmGrjkCb4dF9oE5xOTxoHkNLI7bjumdF3ocvFvF
+         aictCx0CAyKStM2wiBAFckgkU4S6Q+Uj0NtRA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724937093; x=1725541893;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6HSLQ8KvULAlJol+4PZpsMQiwSkPlENMupYF/HR2lik=;
-        b=CcrN7QqrqN+rP44AJNcAaRnShBUXhtbrBQA/IWvbG/NfI+oeL0DmsHU2OHAR43hKLP
-         bL3ibsMGzpSnJO6LVoO3/yfq7kmzDLXVb4fkgbBOO62inNUE/5alp0Y1gKrE+OfaPopT
-         K9yzLJadtH6dzEFLAfzfGhcSNZkRKqtf2n7he59X+iRlFRwPeF9b97z37BvuVQ8O3fJs
-         zy8lOm2t5EMAnGpIs9qDKyvtQ9rrfV6qq0neeK8mFw3tpE+kvVCPcf9qr32hWdIdaFIE
-         nJKAUKj36qOHFJ/6z0zVFksMjd80R8Jrq49FFxfsc+HKUR8DDnpgDKhiSWkuNGhxsIZz
-         BQKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWiRQ/jpHDt1KKtNk3Zo1DBsTMIeoC91PyKmOjMlk4/uNH14I5fN74xyyCSqaIX3X82EBVeR4w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjfsCiXeIAdk3+9hasMFn9wykSrYGaTR7eWAeZ5MTDTYR3hg6i
-	of5VJYW+XdtNCravaZLCVloRTkTagiqO7xMlfqQFVo7eQ35kR1AX1p86gJIhJF0=
-X-Google-Smtp-Source: AGHT+IEH/zJZio4NTe6eEsV2DoExlez2oCgJWKVnp5yu1Qv76cYjCAYlwUS9Kb57z8iTsLMFbn1guw==
-X-Received: by 2002:a05:6402:268e:b0:5bf:dd0:93ad with SMTP id 4fb4d7f45d1cf-5c21ed8e66bmr2407157a12.27.1724937091825;
-        Thu, 29 Aug 2024 06:11:31 -0700 (PDT)
-Received: from localhost (host-80-182-198-72.retail.telecomitalia.it. [80.182.198.72])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8988fea68dsm77550266b.26.2024.08.29.06.11.31
+        d=1e100.net; s=20230601; t=1724937175; x=1725541975;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7eTS3eeXVwPrTwK+lb5D5mdVs6X406fMnAORyEKIvww=;
+        b=gp2ScuP9q3gNqKjKh4PHa8ZHVt5BCRYaW1j7baJWKiSE7SdXKFX4cv2JXp6TSym+mE
+         lJEKipZpLo11PbeNwTdlHxPgXqN9n38x4MNUdKU5XLCJTciHqdFtYX+R0UNCactpc0oW
+         jnd2ezEdplEbXAbvYujetPcSHDXDpCE5Rz3VJf6WmwmlszqLa+DQXQHsvrVq7xGRoDZc
+         Xf1KVzvuQH/rFuK9XT8dfOyiE3ensNV9ishFMnRwkeD1GonPvpqODC7c0twDIM12tUEQ
+         rAhAdfKziErl+Ap8oDIGs3XkfokOu6rnrNE/0Nnqwe8REuhuyRf2Dj9LF6frsJtk2+De
+         0esg==
+X-Gm-Message-State: AOJu0Yxrk4cmhhc4+cvatmQdHXginLJOCeNFj7E7H+UYby91tJD9HZHr
+	nqA4lwJ8eAKIQbXjQO4sJVUL6qNA0zifn8p2fiTyTfeOW4b8edVmVSGB7SVaCMRtXrFokX4EIe5
+	ulKTmMpb2hd6g1VjAf7i7LaVhNOUcnR8A3ebO2SAF4wmYvsDXrDNYGQOrag2yR+bx/ceV3Vojxo
+	jkJm5exE3Y4vozRr4kSyx2NwFoaxMSai89eRkFKA==
+X-Google-Smtp-Source: AGHT+IFoVrhP/gP+tZAafbwHf2HaN+A4kRXFVXFaQ5XNWgswLFhlJX4c/7hFU7m4NevAj4phXmF6FQ==
+X-Received: by 2002:a05:6a20:d707:b0:1c9:1608:ae97 with SMTP id adf61e73a8af0-1cce0efae07mr2259636637.0.1724937174502;
+        Thu, 29 Aug 2024 06:12:54 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205152b13c9sm10991065ad.62.2024.08.29.06.12.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 06:11:31 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Thu, 29 Aug 2024 15:11:38 +0200
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+        Thu, 29 Aug 2024 06:12:54 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com,
+	sdf@fomichev.me,
+	bjorn@rivosinc.com,
+	hch@infradead.org,
+	willy@infradead.org,
+	willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com,
+	kuba@kernel.org,
+	Joe Damato <jdamato@fastly.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Breno Leitao <leitao@debian.org>,
+	Daniel Jurgens <danielj@nvidia.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 00/11] Add support for RaspberryPi RP1 PCI device using a
- DT overlay
-Message-ID: <ZtBzis5CzQMm8loh@apocalypse>
-Mail-Followup-To: Krzysztof Kozlowski <krzk@kernel.org>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <14990d25-40a2-46c0-bf94-25800f379a30@kernel.org>
- <Zsb_ZeczWd-gQ5po@apocalypse>
- <d97dbb0b-2e9c-4a62-b6c2-c1ec3fa1225b@kernel.org>
+	Donald Hunter <donald.hunter@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Johannes Berg <johannes.berg@intel.com>,
+	linux-kernel@vger.kernel.org (open list),
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: [PATCH net-next 0/5] Add support for per-NAPI config via netlink
+Date: Thu, 29 Aug 2024 13:11:56 +0000
+Message-Id: <20240829131214.169977-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d97dbb0b-2e9c-4a62-b6c2-c1ec3fa1225b@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-Hi Krzysztof,
+Greetings:
 
-On 11:50 Thu 22 Aug     , Krzysztof Kozlowski wrote:
-> On 22/08/2024 11:05, Andrea della Porta wrote:
-> > Hi Krzysztof,
-> > 
-> > On 15:42 Wed 21 Aug     , Krzysztof Kozlowski wrote:
-> >> On 20/08/2024 16:36, Andrea della Porta wrote:
-> >>> RP1 is an MFD chipset that acts as a south-bridge PCIe endpoint sporting
-> >>> a pletora of subdevices (i.e.  Ethernet, USB host controller, I2C, PWM, 
-> >>> etc.) whose registers are all reachable starting from an offset from the
-> >>> BAR address.  The main point here is that while the RP1 as an endpoint
-> >>> itself is discoverable via usual PCI enumeraiton, the devices it contains
-> >>> are not discoverable and must be declared e.g. via the devicetree.
-> >>>
-> >>> This patchset is an attempt to provide a minimum infrastructure to allow
-> >>> the RP1 chipset to be discovered and perpherals it contains to be added
-> >>> from a devictree overlay loaded during RP1 PCI endpoint enumeration.
-> >>> Followup patches should add support for the several peripherals contained
-> >>> in RP1.
-> >>>
-> >>> This work is based upon dowstream drivers code and the proposal from RH
-> >>> et al. (see [1] and [2]). A similar approach is also pursued in [3].
-> >>
-> >> Looking briefly at findings it seems this was not really tested by
-> >> automation and you expect reviewers to find issues which are pointed out
-> >> by tools. That's not nice approach. Reviewer's time is limited, while
-> >> tools do it for free. And the tools are free - you can use them without
-> >> any effort.
-> > 
-> > Sorry if I gave you that impression, but this is not obviously the case.
-> 
-> Just look at number of reports... so many sparse reports that I wonder
-> how it is not the case.
-> 
-> And many kbuild reports.
+This makes gro_flush_timeout and napi_defer_hard_irqs available per NAPI
+instance, in addition to the existing sysfs parameter. The existing
+sysfs parameters remain and care was taken to support them, but an
+important edge case was introduced, described below.
 
-Ack.
+The netdev netlink spec has been updated to export both parameters when
+doing a napi-get operation and a new operation, napi-set, has been added
+to set the parameters. The parameters can be set individually or
+together. The idea is that user apps might want to update, for example,
+gro_flush_timeout dynamically during busy poll, but maybe the app is
+happy with the existing defer_hard_irqs value.
 
-> 
-> > I've spent quite a bit of time in trying to deliver a patchset that ease
-> > your and others work, at least to the best I can. In fact, I've used many
-> > of the checking facilities you mentioned before sending it, solving all
-> > of the reported issues, except the ones for which there are strong reasons
-> > to leave untouched, as explained below.
-> > 
-> >>
-> >> It does not look like you tested the DTS against bindings. Please run
-> >> `make dtbs_check W=1` (see
-> >> Documentation/devicetree/bindings/writing-schema.rst or
-> >> https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
-> >> for instructions).
-> > 
-> > #> make W=1 dt_binding_check DT_SCHEMA_FILES=raspberrypi,rp1-gpio.yaml
-> >    CHKDT   Documentation/devicetree/bindings
-> >    LINT    Documentation/devicetree/bindings
-> >    DTEX    Documentation/devicetree/bindings/pinctrl/raspberrypi,rp1-gpio.example.dts
-> >    DTC_CHK Documentation/devicetree/bindings/pinctrl/raspberrypi,rp1-gpio.example.dtb
-> > 
-> > #> make W=1 dt_binding_check DT_SCHEMA_FILES=raspberrypi,rp1-clocks.yaml
-> >    CHKDT   Documentation/devicetree/bindings
-> >    LINT    Documentation/devicetree/bindings
-> >    DTEX    Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.example.dts
-> >    DTC_CHK Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.example.dtb
-> > 
-> > I see no issues here, in case you've found something different, I kindly ask you to post
-> > the results.
-> > 
-> > #> make W=1 CHECK_DTBS=y broadcom/rp1.dtbo
-> >    DTC     arch/arm64/boot/dts/broadcom/rp1.dtbo
-> >    arch/arm64/boot/dts/broadcom/rp1.dtso:37.24-42.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/clk_xosc: missing or empty reg/ranges property
-> >    arch/arm64/boot/dts/broadcom/rp1.dtso:44.26-49.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/macb_pclk: missing or empty reg/ranges property
-> >    arch/arm64/boot/dts/broadcom/rp1.dtso:51.26-56.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/macb_hclk: missing or empty reg/ranges property
-> >    arch/arm64/boot/dts/broadcom/rp1.dtso:14.15-173.5: Warning (avoid_unnecessary_addr_size): /fragment@0/__overlay__: unnecessary #address-cells/#size-cells without "ranges", "dma-ranges" or child "reg" property 
-> > 
-> > I believe that These warnings are unavoidable, and stem from the fact that this
-> > is quite a peculiar setup (PCI endpoint which dynamically loads platform driver
-> > addressable via BAR).
-> > The missing reg/ranges in the threee clocks are due to the simple-bus of the
-> > containing node to which I believe they should belong: I did a test to place
-> 
-> This is not the place where they belong. non-MMIO nodes should not be
-> under simple-bus.
+The intention is that if this is accepted, it will be expanded to
+support the suspend parameter proposed in a recent series [1].
 
-Ack.
+Important edge case introduced:
 
-> 
-> > those clocks in the same dtso under root or /clocks node but AFAIK it doesn't
-> > seems to work. I could move them in a separate dtso to be loaded before the main
-> 
-> Well... who instantiates them? If they are in top-level, then
-> CLK_OF_DECLARE which is not called at your point?
-> 
-> You must instantiate clocks different way, since they are not part of
-> "rp1". That's another bogus DT description... external oscilator is not
-> part of RP1.
->
+In order to keep the existing sysfs parameters working as intended and
+also support per NAPI settings an important change was made:
+  - Writing the sysfs parameters writes both to the net_device level
+    field and to the per-NAPI fields for every NAPI associated with the
+    net device. This was done as the intention of writing to sysfs seems
+    to be that it takes effect globally, for all NAPIs.
+  - Reading the sysfs parameter reads the net_device level field.
+  - It is technically possible for a user to do the following:
+    - Write a value to a sysfs param, which in turn sets all NAPIs to
+      that value
+    - Using the netlink API, write a new value to every NAPI on the
+      system
+    - Print the sysfs param
 
-Ok, I'll dive into that and see what I can come up with. Many thanks for
-this feedback.
- 
-> 
-> > one but this is IMHO even more cumbersome than having a couple of warnings in
-> > CHECK_DTBS.
-> > Of course, if you have any suggestion on how to improve it I would be glad to
-> > discuss.
-> > About the last warning about the address/size-cells, if I drop those two lines
-> > in the _overlay_ node it generates even more warning, so again it's a "don't fix"
-> > one.
-> > 
-> >>
-> >> Please run standard kernel tools for static analysis, like coccinelle,
-> >> smatch and sparse, and fix reported warnings. Also please check for
-> >> warnings when building with W=1. Most of these commands (checks or W=1
-> >> build) can build specific targets, like some directory, to narrow the
-> >> scope to only your code. The code here looks like it needs a fix. Feel
-> >> free to get in touch if the warning is not clear.
-> > 
-> > I didn't run those static analyzers since I've preferred a more "manual" aproach
-> > by carfeully checking the code, but I agree that something can escape even the
-> > more carefully executed code inspection so I will add them to my arsenal from
-> > now on. Thanks for the heads up.
-> 
-> I don't care if you do not run static analyzers if you produce good
-> code. But if you produce bugs which could have been easily spotted with
-> sparser, than it is different thing.
-> 
-> Start running static checkers instead of asking reviewers to do that.
+The printing of the param will reveal a value that is no longer in use
+by any NAPI, but is used for any newly created NAPIs (e.g. if new queues
+are created).
 
-Ack.
+It's tempting to think that the implementation could be something as
+simple as (psuedocode):
 
-> 
-> > 
-> >>
-> >> Please run scripts/checkpatch.pl and fix reported warnings. Then please
-> >> run `scripts/checkpatch.pl --strict` and (probably) fix more warnings.
-> >> Some warnings can be ignored, especially from --strict run, but the code
-> >> here looks like it needs a fix. Feel free to get in touch if the warning
-> >> is not clear.
-> >>
-> > 
-> > Again, most of checkpatch's complaints have been addressed, the remaining
-> > ones I deemed as not worth fixing, for example:>
-> > #> scripts/checkpatch.pl --strict --codespell tmp/*.patch
-> > 
-> > WARNING: please write a help paragraph that fully describes the config symbol
-> > #42: FILE: drivers/clk/Kconfig:91:
-> > +config COMMON_CLK_RP1
-> > +       tristate "Raspberry Pi RP1-based clock support"
-> > +       depends on PCI || COMPILE_TEST
-> > +       depends on COMMON_CLK
-> > +       help
-> > +         Enable common clock framework support for Raspberry Pi RP1.
-> > +         This mutli-function device has 3 main PLLs and several clock
-> > +         generators to drive the internal sub-peripherals.
-> > +
-> > 
-> > I don't understand this warning, the paragraph is there and is more or less similar
-> > to many in the same file that are already upstream. Checkpatch bug?
-> > 
-> > 
-> > CHECK: Alignment should match open parenthesis
-> > #1541: FILE: drivers/clk/clk-rp1.c:1470:
-> > +       if (WARN_ON_ONCE(clock_data->num_std_parents > AUX_SEL &&
-> > +           strcmp("-", clock_data->parents[AUX_SEL])))
-> > 
-> > This would have worsen the code readability.
-> > 
-> > 
-> > WARNING: ENOTSUPP is not a SUSV4 error code, prefer EOPNOTSUPP
-> > #673: FILE: drivers/pinctrl/pinctrl-rp1.c:600:
-> > +                               return -ENOTSUPP;
-> > 
-> > This I must investigate: I've already tried to fix it before sending the patchset
-> > but for some reason it wouldn't work, so I planned to fix it in the upcoming 
-> > releases.
-> > 
-> > 
-> > WARNING: externs should be avoided in .c files
-> > #331: FILE: drivers/misc/rp1/rp1-pci.c:58:
-> > +extern char __dtbo_rp1_pci_begin[];
-> > 
-> > True, but in this case we don't have a symbol that should be exported to other
-> > translation units, it just needs to be referenced inside the driver and
-> > consumed locally. Hence it would be better to place the extern in .c file.
-> > 
-> > 
-> > Apologies for a couple of other warnings that I could have seen in the first
-> > place, but honestly they don't seems to be a big deal (one typo and on over
-> > 100 chars comment, that will be fixed in next patch version). 
-> 
-> Again, judging by number of reports from checkers that is a big deal,
-> because it is your task to run the tools.
+   if (!napi->gro_flush_timeout)
+     return dev->gro_flush_timeout;
 
-Ack.
+To avoid the complexity of writing values to every NAPI, but this
+approach does not work if the user wants the gro_flush_timeout to be 0
+for a specific NAPI while having it set to non-zero for the rest of the
+system.
 
-Many thanks,
-Andrea
+Here's a walk through of some common commands to illustrate how one
+might use this:
 
-> 
-> Best regards,
-> Krzysztof
-> 
+First, output the current NAPI settings:
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                         --dump napi-get --json='{"ifindex": 7}'
+[{'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 914,
+  'ifindex': 7,
+  'irq': 529},
+ {'defer-hard-irqs': 0,
+  'gro-flush-timeout': 0,
+  'id': 913,
+  'ifindex': 7,
+  'irq': 528},
+ [...]
+
+Now, set the global sysfs parameters:
+
+$ sudo bash -c 'echo 20000 >/sys/class/net/eth4/gro_flush_timeout'
+$ sudo bash -c 'echo 100 >/sys/class/net/eth4/napi_defer_hard_irqs' 
+
+Output current NAPI settings again:
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                         --dump napi-get --json='{"ifindex": 7}'
+[{'defer-hard-irqs': 100,
+  'gro-flush-timeout': 20000,
+  'id': 914,
+  'ifindex': 7,
+  'irq': 529},
+ {'defer-hard-irqs': 100,
+  'gro-flush-timeout': 20000,
+  'id': 913,
+  'ifindex': 7,
+  'irq': 528},
+ [...]
+
+Now set NAPI ID 913 to specific values:
+
+$ sudo ./tools/net/ynl/cli.py \
+             --spec Documentation/netlink/specs/netdev.yaml \
+             --do napi-set \
+             --json='{"id": 913, "defer-hard-irqs": 111,
+                      "gro-flush-timeout": 11111}'
+None
+
+Now output current NAPI settings again to ensure only 913 changed:
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                         --dump napi-get --json='{"ifindex": 7}'
+[{'defer-hard-irqs': 100,
+  'gro-flush-timeout': 20000,
+  'id': 914,
+  'ifindex': 7,
+  'irq': 529},
+ {'defer-hard-irqs': 111,
+  'gro-flush-timeout': 11111,
+  'id': 913,
+  'ifindex': 7,
+  'irq': 528},
+[...]
+
+Now, increase gro-flush-timeout only:
+
+$ sudo ./tools/net/ynl/cli.py \
+       --spec Documentation/netlink/specs/netdev.yaml \
+       --do napi-set --json='{"id": 913, "gro-flush-timeout": 44444}'
+None
+
+Now output the current NAPI settings once more:
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                         --dump napi-get --json='{"ifindex": 7}'
+[{'defer-hard-irqs': 100,
+  'gro-flush-timeout': 20000,
+  'id': 914,
+  'ifindex': 7,
+  'irq': 529},
+ {'defer-hard-irqs': 111,
+  'gro-flush-timeout': 44444,
+  'id': 913,
+  'ifindex': 7,
+  'irq': 528},
+[...]
+
+Now set NAPI ID 913 to have gro_flush_timeout of 0:
+
+$ sudo ./tools/net/ynl/cli.py \
+       --spec Documentation/netlink/specs/netdev.yaml \
+       --do napi-set --json='{"id": 913, "gro-flush-timeout": 0}'
+None
+
+Check that NAPI ID 913 has a value of 0:
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                         --dump napi-get --json='{"ifindex": 7}'
+[{'defer-hard-irqs': 100,
+  'gro-flush-timeout': 20000,
+  'id': 914,
+  'ifindex': 7,
+  'irq': 529},
+ {'defer-hard-irqs': 111,
+  'gro-flush-timeout': 0,
+  'id': 913,
+  'ifindex': 7,
+  'irq': 528},
+[...]
+
+Last, but not least, let's try writing the sysfs parameters to ensure
+all NAPIs are rewritten:
+
+$ sudo bash -c 'echo 33333 >/sys/class/net/eth4/gro_flush_timeout'
+$ sudo bash -c 'echo 222 >/sys/class/net/eth4/napi_defer_hard_irqs' 
+
+Check that worked:
+
+$ $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                           --dump napi-get --json='{"ifindex": 7}'
+[{'defer-hard-irqs': 222,
+  'gro-flush-timeout': 33333,
+  'id': 914,
+  'ifindex': 7,
+  'irq': 529},
+ {'defer-hard-irqs': 222,
+  'gro-flush-timeout': 33333,
+  'id': 913,
+  'ifindex': 7,
+  'irq': 528},
+[...]
+
+Thanks,
+Joe
+
+[1]: https://lore.kernel.org/lkml/20240823173103.94978-1-jdamato@fastly.com/
+
+Joe Damato (5):
+  net: napi: Make napi_defer_hard_irqs per-NAPI
+  netdev-genl: Dump napi_defer_hard_irqs
+  net: napi: Make gro_flush_timeout per-NAPI
+  netdev-genl: Dump gro_flush_timeout
+  netdev-genl: Support setting per-NAPI config values
+
+ Documentation/netlink/specs/netdev.yaml | 23 ++++++++++
+ include/linux/netdevice.h               | 49 ++++++++++++++++++++
+ include/uapi/linux/netdev.h             |  3 ++
+ net/core/dev.c                          | 61 ++++++++++++++++++++++---
+ net/core/net-sysfs.c                    |  7 ++-
+ net/core/netdev-genl-gen.c              | 14 ++++++
+ net/core/netdev-genl-gen.h              |  1 +
+ net/core/netdev-genl.c                  | 56 +++++++++++++++++++++++
+ tools/include/uapi/linux/netdev.h       |  3 ++
+ 9 files changed, 208 insertions(+), 9 deletions(-)
+
+-- 
+2.25.1
+
 
