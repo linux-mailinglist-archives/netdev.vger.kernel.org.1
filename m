@@ -1,182 +1,143 @@
-Return-Path: <netdev+bounces-123227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 286F3964328
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:33:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 141A1964302
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AE4D1C23E12
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 11:33:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0365EB25E1C
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 11:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51CF191F9D;
-	Thu, 29 Aug 2024 11:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4EE91922EE;
+	Thu, 29 Aug 2024 11:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NcMkngPc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XmTTTECi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B32F191F90
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 11:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0BD1922E5
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 11:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724931200; cv=none; b=T88DgY7jRrz3uDhFSv64boG407SYdkPpz2LyAGpGy1icSPzFgqpFAQJEI1jJLX9kNjweJsi5UiQZzjsL9y1ErW7744iJnO9PiTV31lIjDeBorxSJda3USMXSQVEvoOzabywF/ycu2KArsJS24e9ynXQj9pR5Strh5yW5ulRkLMw=
+	t=1724931066; cv=none; b=A51HDENYE7ZZVWC7toIjp0uEsE2NQsdFlyyIYSwxrLfluyyRh6PfSlsqzRCStNyqMQmUS0rKX09J1EPC6tAtMQbd1pBCP7ws528IxT+U5uqKlHfSJpXrio/x8d86GmgAe3S0vq7fO4f+fqxfY7ixbNFtXJYeAa/QnGeS8S5wkYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724931200; c=relaxed/simple;
-	bh=p7xgIQH0bb8bKwQrlGLYcFI7oXY+3QHoY5PQPeXaia8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i7FP+LQOrwpxw+YTtawxsJiw0eIalmMN5ZN5eGS+2AADTmZD7VV73Zt2VnThSMXm4b+AqIh4ZQRhR759ROezWFVVZU0cJ4PNnB6ZPeosWLrhHkZnFqXGZap23ulr1I6jqJEAos5m1pXWQ0AlL0fuxQ5TszNZlduGAPo0BjlEuVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NcMkngPc; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724931199; x=1756467199;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=p7xgIQH0bb8bKwQrlGLYcFI7oXY+3QHoY5PQPeXaia8=;
-  b=NcMkngPczHC65xN+qRcsQq21tVjKX0j/lGNpT2LmF7PfKlYax8oamkxo
-   CSy4qP9gpmxVjkfq4GYYFR27A654tNX+2IFA5rH2zRLWSTQ3tYMxo6XSP
-   xv/9wDkIL1eyn9bhPMPDWvJlH9uPRuM4u9NclcwJDj4Nz/X1iB/YV5SB/
-   lPqFn06d9PtANWO2uqTL6epjt+HORQbVMBJVSB2kSUE6ep/GlP/LZavL8
-   xp3kwv3ptSd7h181gdf49VB0QfrpJrtMYlL8zoP3VDTWjRmNaQ6qu1g7I
-   AEq4Yp0Mm6AIqZfgHjub0IYCLJVVSOEme81bmDnQTOZ4YprD4lv4AKE6Q
-   A==;
-X-CSE-ConnectionGUID: pCcnLW3bRaaKBV4WuuFC4Q==
-X-CSE-MsgGUID: SQMH5g8rR2qhFxHLUnpVeA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="23677896"
-X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="23677896"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 04:33:18 -0700
-X-CSE-ConnectionGUID: SBja+CndSGic8cOqGCQg6g==
-X-CSE-MsgGUID: F1uRUSsoSVum0eHkBXrF6g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="63230630"
-Received: from kkolacin-desk1.igk.intel.com ([10.217.160.108])
-  by fmviesa007.fm.intel.com with ESMTP; 29 Aug 2024 04:33:17 -0700
-From: Karol Kolacinski <karol.kolacinski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Karol Kolacinski <karol.kolacinski@intel.com>
-Subject: [PATCH v3 iwl-next 7/7] ice: Enable 1PPS out from CGU for E825C products
-Date: Thu, 29 Aug 2024 13:28:14 +0200
-Message-ID: <20240829113257.1023835-16-karol.kolacinski@intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240829113257.1023835-9-karol.kolacinski@intel.com>
-References: <20240829113257.1023835-9-karol.kolacinski@intel.com>
+	s=arc-20240116; t=1724931066; c=relaxed/simple;
+	bh=eOZwUW7bVg4MTUT97X3TewcSmnaCDNxiPVMHc6d3AGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZhEVNNXTIdi5mf9Jf0ZAPHVOkDH0l+8mhTEn7GgZA4ltURPzBxuQGy2EewjVDhXaYR0E9E2qBG49F8LOCepB8EpFYgcXu8EKc4wDSpcdSdHMoAZTMeq65SfqqKp8rkhNE2FnK14WmvQUU2WimucCJH0XrzGNZqLWU9yFOqtTSZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XmTTTECi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724931064;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xuutfVkQalVR3gb1Y/tF8qqD58gp2KUX9Q94SB95tKo=;
+	b=XmTTTECifHu/y3Q2A2JWv626h27zk/Sdn0EtXS2+/XFqZx+uTR2Uu1Y4ywHUnutA+Wj1Ex
+	kKOaIdAhH7d06dCb5/LXwt/6U8YDhqSkHXQX4+MLDgTc5gL+kNuQhD6VtQlLla2gOhMW9C
+	jtrJo1nrikNh2qd2Hc4rTM+sCvStPP8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-306-RNUH3DzvNOW58_OoC5OiAg-1; Thu, 29 Aug 2024 07:31:02 -0400
+X-MC-Unique: RNUH3DzvNOW58_OoC5OiAg-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42bb2efc0b5so3875555e9.0
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 04:31:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724931061; x=1725535861;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xuutfVkQalVR3gb1Y/tF8qqD58gp2KUX9Q94SB95tKo=;
+        b=tgL6+II0WtEO1PJ+N4KOL+5NB8wlV+UJYMm/C7Vhd8pw7pvbx9aC06fGzsHHny2dFE
+         4hz6ethkpaz2oCQQG+/BLf3n/8qrifYxdcj4AD0/2gMzy/dJMopzXmoPWcOI+sG61m4F
+         9rMFHSm7v03hbZY1JoVSB8AzNjA0JjL64/eZcU2Pwh9cnM1slAkMRsR0XbadcfWHLFtt
+         oJCKVWiyOhCbRkutEkVD4vDb1kKU7tU6KLN07+iFsUGvGApqwAU6Ui2P1vhBlPvVZ8oz
+         /3y2XKF/hKdgcDzDFtOcGBKfMZ0q6ZIQJXnIqNUdF2pT2e28hmj8+LB7lUtC8+trp5ze
+         XVJw==
+X-Gm-Message-State: AOJu0YwQDdxs1hXGJ9PP2N5oeXOHDmHSIfWa0Ox8/+5lvLBa8XVMCyRq
+	/baN3SHEiR01MpEbnQTsf9CSWAjVBuh8lvwgrcTFReGsAC2K0Uk3aCKfa3ddP9fruM2hHmRIlUU
+	r1QQK6VsvhGSVnhylIgYhcqeBPXAGrj8jMmm3H+LYnHReBG7aXHn7Yw==
+X-Received: by 2002:a05:600c:5025:b0:426:64c1:8388 with SMTP id 5b1f17b1804b1-42bb7461abdmr9822665e9.17.1724931061565;
+        Thu, 29 Aug 2024 04:31:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFPME53hL82GM8H8LokgUzxp/LSU12f+u9KnvmGUUqGM/HrGuBXBQ+st0DboWPrFJUuEu8yiA==
+X-Received: by 2002:a05:600c:5025:b0:426:64c1:8388 with SMTP id 5b1f17b1804b1-42bb7461abdmr9821385e9.17.1724931060619;
+        Thu, 29 Aug 2024 04:31:00 -0700 (PDT)
+Received: from debian (2a01cb058918ce00dbd0c02dbfacd1ba.ipv6.abo.wanadoo.fr. [2a01:cb05:8918:ce00:dbd0:c02d:bfac:d1ba])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ee4a0afsm1175689f8f.8.2024.08.29.04.30.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 04:31:00 -0700 (PDT)
+Date: Thu, 29 Aug 2024 13:30:58 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
+	ast@kernel.org, daniel@iogearbox.net, martin.lau@linux.dev,
+	john.fastabend@gmail.com, steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 00/12] Unmask upper DSCP bits - part 2
+Message-ID: <ZtBb8sl1JnMHZ5az@debian>
+References: <20240827111813.2115285-1-idosch@nvidia.com>
+ <Zs3Y2ehPt3jEABwa@debian>
+ <Zs30sZynSw53zQfW@shredder.mtl.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zs30sZynSw53zQfW@shredder.mtl.com>
 
-From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+On Tue, Aug 27, 2024 at 06:45:53PM +0300, Ido Schimmel wrote:
+> On Tue, Aug 27, 2024 at 03:47:05PM +0200, Guillaume Nault wrote:
+> > On Tue, Aug 27, 2024 at 02:18:01PM +0300, Ido Schimmel wrote:
+> > > tl;dr - This patchset continues to unmask the upper DSCP bits in the
+> > > IPv4 flow key in preparation for allowing IPv4 FIB rules to match on
+> > > DSCP. No functional changes are expected. Part 1 was merged in commit
+> > > ("Merge branch 'unmask-upper-dscp-bits-part-1'").
+> > > 
+> > > The TOS field in the IPv4 flow key ('flowi4_tos') is used during FIB
+> > > lookup to match against the TOS selector in FIB rules and routes.
+> > > 
+> > > It is currently impossible for user space to configure FIB rules that
+> > > match on the DSCP value as the upper DSCP bits are either masked in the
+> > > various call sites that initialize the IPv4 flow key or along the path
+> > > to the FIB core.
+> > > 
+> > > In preparation for adding a DSCP selector to IPv4 and IPv6 FIB rules, we
+> > 
+> > Hum, do you plan to add a DSCP selector for IPv6? That shouldn't be
+> > necessary as IPv6 already takes all the DSCP bits into account. Also we
+> > don't need to keep any compatibility with the legacy TOS interpretation,
+> > as it has never been defined nor used in IPv6.
+> 
+> Yes. I want to add the DSCP selector for both families so that user
+> space would not need to use different selectors for different families.
+> It's implemented in the patches I previously shared:
 
-Implement configuring 1PPS signal output from CGU. Use maximal amplitude
-because Linux PTP pin API does not have any way for user to set signal
-level.
+Hum, I guess that was a misunderstanding on my side. I read
+"adding a DSCP selector to [IPv4 and] IPv6 FIB rules" as "adding the
+possibility to match only the 3-bits TOS in fib6_rules". But your
+fib6_rule.c patch doesn't modify fib6_rule_match(), so I believe that
+what you really meant was just to add the new FRA_DSCP netlink
+attribute to IPv6. Am I getting it right?
 
-This change is necessary for E825C products to properly output any
-signal from 1PPS pin.
+> https://github.com/idosch/linux/commit/a3289a6838a0d0e6e0a30a61132bdce3d2f71a3c.patch
+> https://github.com/idosch/linux/commit/ff5dd634fb278431b58437654d7f65b57fd4ae4b.patch
+> https://github.com/idosch/linux/commit/3060ecb534475eadabfa1d419dd64804f0bd0148.patch
+> https://github.com/idosch/linux/commit/12ddbce4f519b42477ea1e130b6d2bab1cca137c.patch
 
-Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
-Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
----
-V1 -> V2: Added return value description, renamed the function and
-          enable parameter. Reworded commit message.
 
- drivers/net/ethernet/intel/ice/ice_ptp.c    | 10 +++++++++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 23 +++++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  1 +
- 3 files changed, 34 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index a35ffc31f316..e275201dff36 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -4,6 +4,7 @@
- #include "ice.h"
- #include "ice_lib.h"
- #include "ice_trace.h"
-+#include "ice_cgu_regs.h"
- 
- static const char ice_pin_names[][64] = {
- 	"SDP0",
-@@ -1709,6 +1710,15 @@ static int ice_ptp_write_perout(struct ice_hw *hw, unsigned int chan,
- 	/* 0. Reset mode & out_en in AUX_OUT */
- 	wr32(hw, GLTSYN_AUX_OUT(chan, tmr_idx), 0);
- 
-+	if (ice_is_e825c(hw)) {
-+		int err;
-+
-+		/* Enable/disable CGU 1PPS output for E825C */
-+		err = ice_cgu_cfg_pps_out(hw, !!period);
-+		if (err)
-+			return err;
-+	}
-+
- 	/* 1. Write perout with half of required period value.
- 	 * HW toggles output when source clock hits the TGT and then adds
- 	 * GLTSYN_CLKO value to the target, so it ends up with 50% duty cycle.
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 07ecf2a86742..6dff422b7f4e 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -661,6 +661,29 @@ static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
- 	return 0;
- }
- 
-+#define ICE_ONE_PPS_OUT_AMP_MAX 3
-+
-+/**
-+ * ice_cgu_cfg_pps_out - Configure 1PPS output from CGU
-+ * @hw: pointer to the HW struct
-+ * @enable: true to enable 1PPS output, false to disable it
-+ *
-+ * Return: 0 on success, other negative error code when CGU read/write failed
-+ */
-+int ice_cgu_cfg_pps_out(struct ice_hw *hw, bool enable)
-+{
-+	union nac_cgu_dword9 dw9;
-+	int err;
-+
-+	err = ice_read_cgu_reg_e82x(hw, NAC_CGU_DWORD9, &dw9.val);
-+	if (err)
-+		return err;
-+
-+	dw9.one_pps_out_en = enable;
-+	dw9.one_pps_out_amp = enable * ICE_ONE_PPS_OUT_AMP_MAX;
-+	return ice_write_cgu_reg_e82x(hw, NAC_CGU_DWORD9, dw9.val);
-+}
-+
- /**
-  * ice_cfg_cgu_pll_dis_sticky_bits_e82x - disable TS PLL sticky bits
-  * @hw: pointer to the HW struct
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index ff98f76969e3..fc946fcd28b9 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -331,6 +331,7 @@ extern const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD];
- 
- /* Device agnostic functions */
- u8 ice_get_ptp_src_clock_index(struct ice_hw *hw);
-+int ice_cgu_cfg_pps_out(struct ice_hw *hw, bool enable);
- bool ice_ptp_lock(struct ice_hw *hw);
- void ice_ptp_unlock(struct ice_hw *hw);
- void ice_ptp_src_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd);
--- 
-2.46.0
+> > > need to make sure the entire DSCP value is present in the IPv4 flow key.
+> > > This patchset continues to unmask the upper DSCP bits, but this time in
+> > > the output route path.
+> > 
+> 
 
 
