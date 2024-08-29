@@ -1,201 +1,443 @@
-Return-Path: <netdev+bounces-123409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E541964BB4
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:27:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63311964BB7
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:31:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 075741F21E4A
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:27:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A557D1F224EA
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:31:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10F11B5801;
-	Thu, 29 Aug 2024 16:27:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3FAB1B4C3B;
+	Thu, 29 Aug 2024 16:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CKJwOoto"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nwEY8MrN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BCED1B4C3E;
-	Thu, 29 Aug 2024 16:27:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F361B0132;
+	Thu, 29 Aug 2024 16:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724948856; cv=none; b=RD6IXPkht3OIYnXnDeCOz0SGXCWDs/8ZZ4Fk3nEnf86BMsk0npJFQqS6QI0b2xPOUOVJMj04D8I3skumOTwLiEGEkyeULLeXg8Zvov16XcTzVNbWNqWw+e5GOM8wgHUqfZMPj9iJmo6M4YHDdbhJHGDn8vfiaVUZb62QS+9z+Vs=
+	t=1724949098; cv=none; b=HvBqM3NlFZ4JVLT9tpPuFsgVqg2bjYKbWsIBImsbugOk0ik75DoajqFxOo1qxKO0Xl8kXhfFZFy0h64j8umIO9rdIzOP7GFYod2gnoHtFu1aFNbzXNUssNaUo/nmkygSbt66dwNqtmTtuaJHm/1s7561B1AptSA1a/OeQ6ptwHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724948856; c=relaxed/simple;
-	bh=eLvYXE2yz/fAvs+3ie/busr97f6erakb9dNF3yzzH0g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lYaGnZHO3RW9zaLBu2m2ZloHjrvU2bBhjF1LD77gYnCL4HPiDAOHiaM9lj4mZXidE9ymXaoqxlxIG6vD+HYzZRz4DC3axkyThGRoc3k4lbZRJV+jD6DHBj2T6W7n2atkmoS0+YuJ30P2Q+ryA/8IxBlFENKx60PhiY/XXj9RF4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CKJwOoto; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-428e1915e18so7446775e9.1;
-        Thu, 29 Aug 2024 09:27:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724948853; x=1725553653; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qcGXTdRd6WPKGiWNucLgLmix94On78py4jzzAZMzxTU=;
-        b=CKJwOotoBEhkK8A2m4brwan5YnKa3kEKxip8Y9JExFS3jIx1KrdBN4x2FA4jznEcx9
-         Bc++zYP+WLNGrT4kN/sVRNtOOl1U3I9xeSvNmBl23wj0SYJo+Unk7xWLQTICoiHj2hEd
-         xQ395WdoYsq+vUHprGNie8RyBTKBZ1XTEeoE1vlzsaMigBaOJ1QKthmql7Yz4LMFRqRb
-         HaUr7RM/puksWOf8RaTdyGRYqhibtg2fOb1RHft8TbE9lqJNWQQbQ40sx7oTKu8vaJWg
-         AQaD6EbDIvIC2VI5/bNTZ9LwNKaAO70l2oRWIY20fOUI9ECUqMlHM3o1amoDcmlW+syE
-         yoOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724948853; x=1725553653;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qcGXTdRd6WPKGiWNucLgLmix94On78py4jzzAZMzxTU=;
-        b=pGmj8j/E+BGoSHg3D/Cy/AaSQ121DxjeFk6fyCMCbBC/AE6ZJa3KLBd+lIfd2CJ+vq
-         6JuP2Tos4su4hpvyQ7Mg9rbqspvRRhY2vqwimXQglTAkAntnMeaXVazhyinYkKHUsNdz
-         RMIkXXBEwEi+9Bt4UfvMPO1GmWgRsSfRGNcQg3ookpLTzK/cD/Rgj0urcXXZRtEpx76t
-         ItLasRiMd95eInlrSl2uENymGcksz1L93iv2KZFJu/utsmoT8UcZaD0dXdfATv6fd/ub
-         VVLboGScCBmKaqKu6yYWAw0GSYqg441XfG5dzgPmJP8l6SewM1csyNCxiBwbdqrOk1Md
-         hKTw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5uAcSY8ArAImftkKcqjr1xr+RoURNKOpqocf+cbbwLPSRv0wbKYDHVb0LcG8nbpXDnUg=@vger.kernel.org, AJvYcCVIq+box7z3tdNqRbb0b+mBBW3syBTZkyUcL7vAJtYs0f49u6nMFn6Gp8l3OXx1EEKCs+wij2R2+j2GvuKc@vger.kernel.org, AJvYcCXBs6BKxPErdmF6B+XjWlgUXkZpERpkXDaeL03KFDtjy9jjoOEexbeupijNbqO00n4+3jargggv@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOXfWPQU9+9nBOpGRSLZ/K2E8eOjdn0wRxypsPCD+d0/Zc71YN
-	Kve660b5hTQ48iQAvmMQDfbs94rrbuphlfrzDT0nm7kalUEG/H7/OGEW2KU3/tSuDSM6iRQ5Y6E
-	dQEifJ7ENyajAT36aemCjvS7hSuE=
-X-Google-Smtp-Source: AGHT+IHs/WnNtIXb4q/iUBMt25HPdsxvozE/0N9Tj7fQbmDtFbEHALZdaQH6XWo8cNzvQHXSdUV93ADVuFcVF56fPRQ=
-X-Received: by 2002:a05:600c:3b87:b0:428:abd:1df1 with SMTP id
- 5b1f17b1804b1-42bb02ee46cmr30849495e9.9.1724948853022; Thu, 29 Aug 2024
- 09:27:33 -0700 (PDT)
+	s=arc-20240116; t=1724949098; c=relaxed/simple;
+	bh=h/1tihQVLOfVmreAgQmR9yexsQmkDj6RITif/x/+a7M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Prf1FXgqZ4m6AT1dV7P1z0cDYUx45y/yJZsP1Ew0jNtzVBkg98gK1qRdkUWY2cZ+1zg59f6NnsMReYlT7AaEo2DU26iV+Jo+NReXFVZIgWGn4mS3rDPlDOwkc0JVwIem90GJR6nK241QBs40bvYkoKyn/+2QbYBhW5sOSomw4kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nwEY8MrN; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724949096; x=1756485096;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=h/1tihQVLOfVmreAgQmR9yexsQmkDj6RITif/x/+a7M=;
+  b=nwEY8MrNcdxKIVHN/OKh8b5f9tzuxJk7Ul6LSvAU6Jo0cGqUPplS66Bm
+   IaQUWkG8bomGmnwGdGDmUWfDzjDgUxyHblg4U/gKZR3Lpp32M0XK80jFq
+   2BQJSRo01KnD3ndV0MsOJgbSZBnoQF7yq6jAtc3/9oAx6/60ARJBRBHiT
+   pM9Km8uOsUy1t4iAARpHm4HOUzEaPQFJtpR5yYoKMQFETn+lYVClhqbCY
+   urJBTbzJQm4PFX9BzYghcVnhDhIzPRGgXj3OrOrzfLf96LvK5ZijFNyb3
+   ibQPkzuZ1XF1MX3TyUxIaBsHz7DwCG9Sp86VmPkLtjVmIfA3YflWYs7mS
+   w==;
+X-CSE-ConnectionGUID: TXyNRyfsR/mxyaqRiDnmnA==
+X-CSE-MsgGUID: k50l0+VAT+K2pTYCviplsw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="34221510"
+X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
+   d="scan'208";a="34221510"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 09:31:35 -0700
+X-CSE-ConnectionGUID: /d26fRiJQkiBSIrlhX/fAQ==
+X-CSE-MsgGUID: yUo4UQ8lTBOnyfTmIyxVbQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,186,1719903600"; 
+   d="scan'208";a="68521077"
+Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 29 Aug 2024 09:31:31 -0700
+Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sji3U-0000UU-0P;
+	Thu, 29 Aug 2024 16:31:28 +0000
+Date: Fri, 30 Aug 2024 00:31:23 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jacobe Zang <jacobe.zang@wesion.com>, Kalle Valo <kvalo@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, van Spriel <arend@broadcom.com>,
+	Arend van Spriel <arend.vanspriel@broadcom.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, brcm80211@lists.linux.dev,
+	brcm80211-dev-list.pdl@broadcom.com,
+	Jacobe Zang <jacobe.zang@wesion.com>, Ondrej Jirman <megi@xff.cz>,
+	Sai Krishna <saikrishnag@marvell.com>
+Subject: Re: [PATCH v13 4/5] wifi: brcmfmac: Add optional lpo clock enable
+ support
+Message-ID: <202408300052.uYcuFzk0-lkp@intel.com>
+References: <20240828-wireless-mainline-v13-4-9998b19cfe7e@wesion.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240821093016.2533-1-Tze-nan.Wu@mediatek.com>
- <CAADnVQLLN9hbQ8FQnX_uWFAVBd7L9HhsQpQymLOmB-dHFR4VRw@mail.gmail.com>
- <3a7864f69b8c1d45a3fe8cda1b1e7a7c85ac9aee.camel@mediatek.com>
- <49d74e2c74e0e1786b976c0b12cb1cdd680c5f58.camel@mediatek.com>
- <CAADnVQLvbMRvCg2disV+_AR-154BwRpeB8Zg_8YpO=7gzL=Trg@mail.gmail.com>
- <Zsk_lGsZBBqbesqS@mini-arch> <2efb1f4751fa47380d51ce538253983974a4947c.camel@mediatek.com>
-In-Reply-To: <2efb1f4751fa47380d51ce538253983974a4947c.camel@mediatek.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 29 Aug 2024 09:27:21 -0700
-Message-ID: <CAADnVQ+woLxmNNbU--YkVc8kqevBszNbNG3WoOwKQadWvBXF-g@mail.gmail.com>
-Subject: Re: [PATCH net v4] bpf, net: Check cgroup_bpf_enabled() only once in do_sock_getsockopt()
-To: =?UTF-8?B?VHplLW5hbiBXdSAo5ZCz5r6k5Y2XKQ==?= <Tze-nan.Wu@mediatek.com>
-Cc: "sdf@fomichev.me" <sdf@fomichev.me>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kuniyu@amazon.com" <kuniyu@amazon.com>, 
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>, "ast@kernel.org" <ast@kernel.org>, 
-	=?UTF-8?B?Q2hlbmctSnVpIFdhbmcgKOeOi+ato+edvyk=?= <Cheng-Jui.Wang@mediatek.com>, 
-	=?UTF-8?B?Q2hlbi1ZYW8gQ2hhbmcgKOW8teemjuiAgCk=?= <Chen-Yao.Chang@mediatek.com>, 
-	wsd_upstream <wsd_upstream@mediatek.com>, "andrii@kernel.org" <andrii@kernel.org>, 
-	=?UTF-8?B?Qm9idWxlIENoYW5nICjlvLXlvJjnvqkp?= <bobule.chang@mediatek.com>, 
-	"jolsa@kernel.org" <jolsa@kernel.org>, "daniel@iogearbox.net" <daniel@iogearbox.net>, 
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>, "song@kernel.org" <song@kernel.org>, 
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
-	"edumazet@google.com" <edumazet@google.com>, =?UTF-8?B?WWFuZ2h1aSBMaSAo5p2O6Ziz6L6JKQ==?= <Yanghui.Li@mediatek.com>, 
-	"martin.lau@linux.dev" <martin.lau@linux.dev>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "eddyz87@gmail.com" <eddyz87@gmail.com>, 
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"kpsingh@kernel.org" <kpsingh@kernel.org>, 
-	"angelogioacchino.delregno@collabora.com" <angelogioacchino.delregno@collabora.com>, 
-	"yonghong.song@linux.dev" <yonghong.song@linux.dev>, "haoluo@google.com" <haoluo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240828-wireless-mainline-v13-4-9998b19cfe7e@wesion.com>
 
-On Thu, Aug 29, 2024 at 5:45=E2=80=AFAM Tze-nan Wu (=E5=90=B3=E6=BE=A4=E5=
-=8D=97)
-<Tze-nan.Wu@mediatek.com> wrote:
->
-> On Fri, 2024-08-23 at 19:04 -0700, Stanislav Fomichev wrote:
-> >
-> > External email : Please do not click links or open attachments until
-> > you have verified the sender or the content.
-> >  On 08/22, Alexei Starovoitov wrote:
-> > > On Thu, Aug 22, 2024 at 12:02=E2=80=AFAM Tze-nan Wu (=E5=90=B3=E6=BE=
-=A4=E5=8D=97)
-> > > <Tze-nan.Wu@mediatek.com> wrote:
-> > > >
-> > > >
-> > > > BTW, If this should be handled in kernel, modification shown
-> > below
-> > > > could fix the issue without breaking the "static_branch" usage in
-> > both
-> > > > macros:
-> > > >
-> > > >
-> > > > +++ /include/linux/bpf-cgroup.h:
-> > > >     -#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen)
-> > > >     +#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen, compat)
-> > > >      ({
-> > > >             int __ret =3D 0;
-> > > >             if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT))
-> > > >                 copy_from_sockptr(&__ret, optlen, sizeof(int));
-> > > >      +      else
-> > > >      +          *compat =3D true;
-> > > >             __ret;
-> > > >      })
-> > > >
-> > > >     #define BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock, level, optname,
-> > > > optval, optlen, max_optlen, retval)
-> > > >      ({
-> > > >          int __ret =3D retval;
-> > > >     -    if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT) &&
-> > > >     -        cgroup_bpf_sock_enabled(sock, CGROUP_GETSOCKOPT))
-> > > >     +    if (cgroup_bpf_sock_enabled(sock, CGROUP_GETSOCKOPT))
-> > > >              if (!(sock)->sk_prot->bpf_bypass_getsockopt ||
-> > > >                ...
-> > > >
-> > > >   +++ /net/socket.c:
-> > > >     int do_sock_getsockopt(struct socket *sock, bool compat, int
-> > level,
-> > > >      {
-> > > >         ...
-> > > >         ...
-> > > >     +     /* The meaning of `compat` variable could be changed
-> > here
-> > > >     +      * to indicate if cgroup_bpf_enabled(CGROUP_SOCK_OPS)
-> > is
-> > > > false.
-> > > >     +      */
-> > > >         if (!compat)
-> > > >     -       max_optlen =3D
-> > BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
-> > > >     +       max_optlen =3D BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen,
-> > > > &compat);
-> > >
-> > > This is better, but it's still quite a hack. Let's not override it.
-> > > We can have another bool, but the question:
-> > > do we really need BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN  ?
-> > > copy_from_sockptr(&__ret, optlen, sizeof(int));
-> > > should be fast enough to do it unconditionally.
-> > > What are we saving here?
-> > >
-> > > Stan ?
-> >
-> > Agreed, most likely nobody would notice :-)
->
-> Sorry for my late reply, just have the mailer fixed.
->
-> If it is feasible to make the `copy_from_sockptr` unconditionally,
-> should I submit a new patch that resolve the issue by removing
-> `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN`? Patch A shown as below.
->
->   +++ /net/socket.c:
->    int do_sock_getsockopt(...)
->    {
->   -     int max_optlen __maybe_unused;
->   +     int max_optlen __maybe_unused =3D 0;
->         const struct proto_ops *ops;
->         int err;
->   ...
->   ...
->         if (!compat) <=3D=3D wonder if we should keep the condition here?
->   -         max_optlen =3D BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
->   +         copy_from_sockptr(&max_optlen, optlen, sizeof(int));
+Hi Jacobe,
 
-This one.
-And delete the macro from bpf-cgroup.h
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on dabcfd5e116800496eb9bec2ba7c015ca2043aa0]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Jacobe-Zang/dt-bindings-net-wireless-brcm4329-fmac-add-pci14e4-449d/20240828-165201
+base:   dabcfd5e116800496eb9bec2ba7c015ca2043aa0
+patch link:    https://lore.kernel.org/r/20240828-wireless-mainline-v13-4-9998b19cfe7e%40wesion.com
+patch subject: [PATCH v13 4/5] wifi: brcmfmac: Add optional lpo clock enable support
+config: m68k-allmodconfig (https://download.01.org/0day-ci/archive/20240830/202408300052.uYcuFzk0-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240830/202408300052.uYcuFzk0-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408300052.uYcuFzk0-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c: In function 'brcmf_sdio_probe':
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4456:9: warning: this 'if' clause does not guard... [-Wmisleading-indentation]
+    4456 |         if (!bus)
+         |         ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4458:17: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the 'if'
+    4458 |                 goto fail;
+         |                 ^~~~
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4458:17: error: label 'fail' used but not defined
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4450:34: warning: unused variable 'fwreq' [-Wunused-variable]
+    4450 |         struct brcmf_fw_request *fwreq;
+         |                                  ^~~~~
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4449:34: warning: unused variable 'wq' [-Wunused-variable]
+    4449 |         struct workqueue_struct *wq;
+         |                                  ^~
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4447:13: warning: variable 'ret' set but not used [-Wunused-but-set-variable]
+    4447 |         int ret;
+         |             ^~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c: At top level:
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4461:12: error: expected '=', ',', ';', 'asm' or '__attribute__' before '->' token
+    4461 |         bus->sdiodev = sdiodev;
+         |            ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4462:16: error: expected '=', ',', ';', 'asm' or '__attribute__' before '->' token
+    4462 |         sdiodev->bus = bus;
+         |                ^~
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4463:29: error: expected declaration specifiers or '...' before '&' token
+    4463 |         skb_queue_head_init(&bus->glom);
+         |                             ^
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4464:12: error: expected '=', ',', ';', 'asm' or '__attribute__' before '->' token
+    4464 |         bus->txbound = BRCMF_TXBOUND;
+         |            ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4465:12: error: expected '=', ',', ';', 'asm' or '__attribute__' before '->' token
+    4465 |         bus->rxbound = BRCMF_RXBOUND;
+         |            ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4466:12: error: expected '=', ',', ';', 'asm' or '__attribute__' before '->' token
+    4466 |         bus->txminmax = BRCMF_TXMINMAX;
+         |            ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4467:12: error: expected '=', ',', ';', 'asm' or '__attribute__' before '->' token
+    4467 |         bus->tx_seq = SDPCM_SEQ_WRAP - 1;
+         |            ^~
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4470:9: warning: data definition has no type or storage class
+    4470 |         wq = alloc_ordered_workqueue("brcmf_wq/%s", WQ_MEM_RECLAIM | WQ_HIGHPRI,
+         |         ^~
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4470:9: error: type defaults to 'int' in declaration of 'wq' [-Wimplicit-int]
+   In file included from include/linux/netdevice.h:35,
+                    from drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:12:
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4471:48: error: 'sdiodev' undeclared here (not in a function)
+    4471 |                                      dev_name(&sdiodev->func1->dev));
+         |                                                ^~~~~~~
+   include/linux/workqueue.h:524:72: note: in definition of macro 'alloc_ordered_workqueue'
+     524 |         alloc_workqueue(fmt, WQ_UNBOUND | __WQ_ORDERED | (flags), 1, ##args)
+         |                                                                        ^~~~
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4472:9: error: expected identifier or '(' before 'if'
+    4472 |         if (!wq) {
+         |         ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4477:9: warning: data definition has no type or storage class
+    4477 |         brcmf_sdiod_freezer_count(sdiodev);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4477:9: error: type defaults to 'int' in declaration of 'brcmf_sdiod_freezer_count' [-Wimplicit-int]
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4477:9: error: parameter names (without types) in function declaration [-Wdeclaration-missing-parameter-type]
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4477:9: error: conflicting types for 'brcmf_sdiod_freezer_count'; have 'int()'
+   In file included from drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:32:
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.h:355:6: note: previous declaration of 'brcmf_sdiod_freezer_count' with type 'void(struct brcmf_sdio_dev *)'
+     355 | void brcmf_sdiod_freezer_count(struct brcmf_sdio_dev *sdiodev);
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~
+>> include/linux/workqueue.h:301:9: error: expected identifier or '(' before 'do'
+     301 |         do {                                                            \
+         |         ^~
+   include/linux/workqueue.h:308:9: note: in expansion of macro '__INIT_WORK'
+     308 |         __INIT_WORK((_work), (_func), 0)
+         |         ^~~~~~~~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4478:9: note: in expansion of macro 'INIT_WORK'
+    4478 |         INIT_WORK(&bus->datawork, brcmf_sdio_dataworker);
+         |         ^~~~~~~~~
+>> include/linux/workqueue.h:305:11: error: expected identifier or '(' before 'while'
+     305 |         } while (0)
+         |           ^~~~~
+   include/linux/workqueue.h:308:9: note: in expansion of macro '__INIT_WORK'
+     308 |         __INIT_WORK((_work), (_func), 0)
+         |         ^~~~~~~~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4478:9: note: in expansion of macro 'INIT_WORK'
+    4478 |         INIT_WORK(&bus->datawork, brcmf_sdio_dataworker);
+         |         ^~~~~~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4479:12: error: expected '=', ',', ';', 'asm' or '__attribute__' before '->' token
+    4479 |         bus->brcmf_wq = wq;
+         |            ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4482:9: warning: data definition has no type or storage class
+    4482 |         ret = brcmf_sdio_probe_attach(bus);
+         |         ^~~
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4482:9: error: type defaults to 'int' in declaration of 'ret' [-Wimplicit-int]
+>> drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4482:39: error: 'bus' undeclared here (not in a function)
+    4482 |         ret = brcmf_sdio_probe_attach(bus);
+         |                                       ^~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4483:9: error: expected identifier or '(' before 'if'
+    4483 |         if (ret < 0) {
+         |         ^~
+   In file included from include/linux/sched.h:2148,
+                    from include/linux/kthread.h:6,
+                    from drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:9:
+>> include/linux/spinlock.h:332:1: error: expected identifier or '(' before 'do'
+     332 | do {                                                            \
+         | ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4488:9: note: in expansion of macro 'spin_lock_init'
+    4488 |         spin_lock_init(&bus->rxctl_lock);
+         |         ^~~~~~~~~~~~~~
+>> include/linux/spinlock.h:337:3: error: expected identifier or '(' before 'while'
+     337 | } while (0)
+         |   ^~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4488:9: note: in expansion of macro 'spin_lock_init'
+    4488 |         spin_lock_init(&bus->rxctl_lock);
+         |         ^~~~~~~~~~~~~~
+   include/linux/spinlock.h:332:1: error: expected identifier or '(' before 'do'
+     332 | do {                                                            \
+         | ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4489:9: note: in expansion of macro 'spin_lock_init'
+    4489 |         spin_lock_init(&bus->txq_lock);
+         |         ^~~~~~~~~~~~~~
+   include/linux/spinlock.h:337:3: error: expected identifier or '(' before 'while'
+     337 | } while (0)
+         |   ^~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4489:9: note: in expansion of macro 'spin_lock_init'
+    4489 |         spin_lock_init(&bus->txq_lock);
+         |         ^~~~~~~~~~~~~~
+   In file included from include/linux/sysctl.h:27,
+                    from include/net/net_namespace.h:12,
+                    from include/linux/netdevice.h:38:
+   include/linux/wait.h:65:9: error: expected identifier or '(' before 'do'
+      65 |         do {                                                                    \
+         |         ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4490:9: note: in expansion of macro 'init_waitqueue_head'
+    4490 |         init_waitqueue_head(&bus->ctrl_wait);
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/linux/wait.h:69:11: error: expected identifier or '(' before 'while'
+      69 |         } while (0)
+         |           ^~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4490:9: note: in expansion of macro 'init_waitqueue_head'
+    4490 |         init_waitqueue_head(&bus->ctrl_wait);
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/linux/wait.h:65:9: error: expected identifier or '(' before 'do'
+      65 |         do {                                                                    \
+         |         ^~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4491:9: note: in expansion of macro 'init_waitqueue_head'
+    4491 |         init_waitqueue_head(&bus->dcmd_resp_wait);
+         |         ^~~~~~~~~~~~~~~~~~~
+   include/linux/wait.h:69:11: error: expected identifier or '(' before 'while'
+      69 |         } while (0)
+         |           ^~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4491:9: note: in expansion of macro 'init_waitqueue_head'
+    4491 |         init_waitqueue_head(&bus->dcmd_resp_wait);
+         |         ^~~~~~~~~~~~~~~~~~~
+   In file included from include/linux/netdevice.h:24:
+   include/linux/timer.h:105:24: error: expected declaration specifiers or '...' before '(' token
+     105 |         init_timer_key((_timer), (_fn), (_flags), NULL, NULL)
+         |                        ^
+   include/linux/timer.h:121:9: note: in expansion of macro '__init_timer'
+     121 |         __init_timer((timer), (callback), (flags))
+         |         ^~~~~~~~~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4494:9: note: in expansion of macro 'timer_setup'
+    4494 |         timer_setup(&bus->timer, brcmf_sdio_watchdog, 0);
+         |         ^~~~~~~~~~~
+   include/linux/timer.h:105:34: error: expected declaration specifiers or '...' before '(' token
+     105 |         init_timer_key((_timer), (_fn), (_flags), NULL, NULL)
+         |                                  ^
+   include/linux/timer.h:121:9: note: in expansion of macro '__init_timer'
+     121 |         __init_timer((timer), (callback), (flags))
+         |         ^~~~~~~~~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4494:9: note: in expansion of macro 'timer_setup'
+    4494 |         timer_setup(&bus->timer, brcmf_sdio_watchdog, 0);
+         |         ^~~~~~~~~~~
+   include/linux/timer.h:105:41: error: expected declaration specifiers or '...' before '(' token
+     105 |         init_timer_key((_timer), (_fn), (_flags), NULL, NULL)
+         |                                         ^
+   include/linux/timer.h:121:9: note: in expansion of macro '__init_timer'
+     121 |         __init_timer((timer), (callback), (flags))
+         |         ^~~~~~~~~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4494:9: note: in expansion of macro 'timer_setup'
+    4494 |         timer_setup(&bus->timer, brcmf_sdio_watchdog, 0);
+         |         ^~~~~~~~~~~
+   In file included from include/uapi/linux/posix_types.h:5,
+                    from include/uapi/linux/types.h:14,
+                    from include/linux/types.h:6,
+                    from drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:6:
+   include/linux/stddef.h:8:14: error: expected declaration specifiers or '...' before '(' token
+       8 | #define NULL ((void *)0)
+         |              ^
+   include/linux/timer.h:105:51: note: in expansion of macro 'NULL'
+     105 |         init_timer_key((_timer), (_fn), (_flags), NULL, NULL)
+         |                                                   ^~~~
+   include/linux/timer.h:121:9: note: in expansion of macro '__init_timer'
+     121 |         __init_timer((timer), (callback), (flags))
+         |         ^~~~~~~~~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4494:9: note: in expansion of macro 'timer_setup'
+    4494 |         timer_setup(&bus->timer, brcmf_sdio_watchdog, 0);
+         |         ^~~~~~~~~~~
+   include/linux/stddef.h:8:14: error: expected declaration specifiers or '...' before '(' token
+       8 | #define NULL ((void *)0)
+         |              ^
+   include/linux/timer.h:105:57: note: in expansion of macro 'NULL'
+     105 |         init_timer_key((_timer), (_fn), (_flags), NULL, NULL)
+         |                                                         ^~~~
+   include/linux/timer.h:121:9: note: in expansion of macro '__init_timer'
+     121 |         __init_timer((timer), (callback), (flags))
+         |         ^~~~~~~~~~~~
+   drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c:4494:9: note: in expansion of macro 'timer_setup'
+    4494 |         timer_setup(&bus->timer, brcmf_sdio_watchdog, 0);
+         |         ^~~~~~~~~~~
+
+
+vim +/fail +4458 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c
+
+2baa3aaee27f13 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-03-22  4444  
+82d7f3c10cf41c drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2013-12-12  4445  struct brcmf_sdio *brcmf_sdio_probe(struct brcmf_sdio_dev *sdiodev)
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4446  {
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05 @4447  	int ret;
+e92eedf4e080fc drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Franky Lin       2011-11-22  4448  	struct brcmf_sdio *bus;
+9982464379e81e drivers/net/wireless/brcm80211/brcmfmac/sdio.c          Arend van Spriel 2015-02-06 @4449  	struct workqueue_struct *wq;
+d09ae51a4b6761 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-03-22 @4450  	struct brcmf_fw_request *fwreq;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4451  
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4452  	brcmf_dbg(TRACE, "Enter\n");
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4453  
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4454  	/* Allocate private bus interface state */
+dcb77f854ae086 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Erick Archer     2024-05-27  4455  	bus = kzalloc(sizeof(*bus), GFP_ATOMIC);
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05 @4456  	if (!bus)
+b3e8126eb4c102 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Jacobe Zang      2024-08-28  4457  		ret = -ENOMEM;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05 @4458  		goto fail;
+b3e8126eb4c102 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Jacobe Zang      2024-08-28  4459  	}
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4460  
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05 @4461  	bus->sdiodev = sdiodev;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4462  	sdiodev->bus = bus;
+b83db862ffb871 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-19 @4463  	skb_queue_head_init(&bus->glom);
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4464  	bus->txbound = BRCMF_TXBOUND;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4465  	bus->rxbound = BRCMF_RXBOUND;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05 @4466  	bus->txminmax = BRCMF_TXMINMAX;
+6bc52319c2c688 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Franky Lin       2013-08-10 @4467  	bus->tx_seq = SDPCM_SEQ_WRAP - 1;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4468  
+9982464379e81e drivers/net/wireless/brcm80211/brcmfmac/sdio.c          Arend van Spriel 2015-02-06  4469  	/* single-threaded workqueue */
+41b637bac0b0a9 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Sean Anderson    2021-08-02 @4470  	wq = alloc_ordered_workqueue("brcmf_wq/%s", WQ_MEM_RECLAIM | WQ_HIGHPRI,
+c9aa7a91de740c drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-01-09 @4471  				     dev_name(&sdiodev->func1->dev));
+9982464379e81e drivers/net/wireless/brcm80211/brcmfmac/sdio.c          Arend van Spriel 2015-02-06 @4472  	if (!wq) {
+5e8149f5036afe drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2012-12-07  4473  		brcmf_err("insufficient memory to create txworkqueue\n");
+b3e8126eb4c102 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Jacobe Zang      2024-08-28  4474  		ret = -ENOMEM;
+37ac5780e08e4e drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Hante Meuleman   2012-11-14  4475  		goto fail;
+37ac5780e08e4e drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Hante Meuleman   2012-11-14  4476  	}
+9982464379e81e drivers/net/wireless/brcm80211/brcmfmac/sdio.c          Arend van Spriel 2015-02-06 @4477  	brcmf_sdiod_freezer_count(sdiodev);
+9982464379e81e drivers/net/wireless/brcm80211/brcmfmac/sdio.c          Arend van Spriel 2015-02-06 @4478  	INIT_WORK(&bus->datawork, brcmf_sdio_dataworker);
+9982464379e81e drivers/net/wireless/brcm80211/brcmfmac/sdio.c          Arend van Spriel 2015-02-06 @4479  	bus->brcmf_wq = wq;
+37ac5780e08e4e drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Hante Meuleman   2012-11-14  4480  
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4481  	/* attempt to attach to the dongle */
+b3e8126eb4c102 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Jacobe Zang      2024-08-28 @4482  	ret = brcmf_sdio_probe_attach(bus);
+b3e8126eb4c102 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Jacobe Zang      2024-08-28  4483  	if (ret < 0) {
+82d7f3c10cf41c drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2013-12-12  4484  		brcmf_err("brcmf_sdio_probe_attach failed\n");
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4485  		goto fail;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4486  	}
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4487  
+dd43a01c5cdb81 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Franky Lin       2012-11-05  4488  	spin_lock_init(&bus->rxctl_lock);
+fed7ec44e7ef64 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Hante Meuleman   2014-03-15  4489  	spin_lock_init(&bus->txq_lock);
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4490  	init_waitqueue_head(&bus->ctrl_wait);
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4491  	init_waitqueue_head(&bus->dcmd_resp_wait);
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4492  
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4493  	/* Set up the watchdog timer */
+e99e88a9d2b067 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Kees Cook        2017-10-16  4494  	timer_setup(&bus->timer, brcmf_sdio_watchdog, 0);
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4495  	/* Initialize watchdog thread */
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4496  	init_completion(&bus->watchdog_wait);
+82d7f3c10cf41c drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2013-12-12  4497  	bus->watchdog_tsk = kthread_run(brcmf_sdio_watchdog_thread,
+9982464379e81e drivers/net/wireless/brcm80211/brcmfmac/sdio.c          Arend van Spriel 2015-02-06  4498  					bus, "brcmf_wdog/%s",
+c9aa7a91de740c drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-01-09  4499  					dev_name(&sdiodev->func1->dev));
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4500  	if (IS_ERR(bus->watchdog_tsk)) {
+02f77195db6ce2 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Joe Perches      2012-01-15  4501  		pr_warn("brcmf_watchdog thread failed to start\n");
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4502  		bus->watchdog_tsk = NULL;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4503  	}
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4504  	/* Initialize DPC thread */
+2c64e16d1ff122 drivers/net/wireless/brcm80211/brcmfmac/sdio.c          Hante Meuleman   2015-03-18  4505  	bus->dpc_triggered = false;
+2c64e16d1ff122 drivers/net/wireless/brcm80211/brcmfmac/sdio.c          Hante Meuleman   2015-03-18  4506  	bus->dpc_running = false;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4507  
+706478cba54458 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Franky Lin       2013-08-10  4508  	/* default sdio bus header length for tx packet */
+706478cba54458 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Franky Lin       2013-08-10  4509  	bus->tx_hdrlen = SDPCM_HWHDR_LEN + SDPCM_SWHDR_LEN;
+706478cba54458 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Franky Lin       2013-08-10  4510  
+7dd3abc14f94bc drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Daniel Kim       2014-05-27  4511  	/* Query the F2 block size, set roundup accordingly */
+c9aa7a91de740c drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-01-09  4512  	bus->blocksize = bus->sdiodev->func2->cur_blksize;
+7dd3abc14f94bc drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Daniel Kim       2014-05-27 @4513  	bus->roundup = min(max_roundup, bus->blocksize);
+7dd3abc14f94bc drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Daniel Kim       2014-05-27  4514  
+c9aa7a91de740c drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-01-09 @4515  	sdio_claim_host(bus->sdiodev->func1);
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4516  
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4517  	/* Disable F2 to clear any intermediate frame state on the dongle */
+c9aa7a91de740c drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-01-09  4518  	sdio_disable_func(bus->sdiodev->func2);
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4519  
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4520  	bus->rxflow = false;
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4521  
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4522  	/* Done with backplane-dependent accesses, can drop clock... */
+71bd508d7ded8c drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Ian Molton       2017-12-08  4523  	brcmf_sdiod_writeb(bus->sdiodev, SBSDIO_FUNC1_CHIPCLKCSR, 0, NULL);
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4524  
+c9aa7a91de740c drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-01-09  4525  	sdio_release_host(bus->sdiodev->func1);
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4526  
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4527  	/* ...and initialize clock/power states */
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4528  	bus->clkstate = CLK_SDONLY;
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4529  	bus->idletime = BRCMF_IDLE_INTERVAL;
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4530  	bus->idleclock = BRCMF_IDLE_ACTIVE;
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4531  
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4532  	/* SR state */
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4533  	bus->sr_enabled = false;
+fad132285081c1 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-01-06  4534  
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05 @4535  	brcmf_dbg(INFO, "completed!!\n");
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4536  
+2baa3aaee27f13 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-03-22 @4537  	fwreq = brcmf_sdio_prepare_fw_request(bus);
+d09ae51a4b6761 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-03-22  4538  	if (!fwreq) {
+d09ae51a4b6761 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-03-22  4539  		ret = -ENOMEM;
+d09ae51a4b6761 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-03-22  4540  		goto fail;
+d09ae51a4b6761 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-03-22  4541  	}
+d09ae51a4b6761 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-03-22  4542  
+d09ae51a4b6761 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-03-22 @4543  	ret = brcmf_fw_get_firmwares(sdiodev->dev, fwreq,
+bd0e1b1d380efe drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-05-27  4544  				     brcmf_sdio_firmware_callback);
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05 @4545  	if (ret != 0) {
+bd0e1b1d380efe drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2014-05-27  4546  		brcmf_err("async firmware request failed: %d\n", ret);
+d09ae51a4b6761 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Arend Van Spriel 2018-03-22  4547  		kfree(fwreq);
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4548  		goto fail;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4549  	}
+15d45b6fbd01ec drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Franky Lin       2011-10-21  4550  
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05 @4551  	return bus;
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4552  
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05 @4553  fail:
+9fbe2a6dc71d85 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2013-12-12  4554  	brcmf_sdio_remove(bus);
+b3e8126eb4c102 drivers/net/wireless/broadcom/brcm80211/brcmfmac/sdio.c Jacobe Zang      2024-08-28  4555  	return ERR_PTR(ret);
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05 @4556  }
+5b435de0d78686 drivers/net/wireless/brcm80211/brcmfmac/dhd_sdio.c      Arend van Spriel 2011-10-05  4557  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
