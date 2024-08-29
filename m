@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-123257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 046A2964512
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:46:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FA14964542
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:51:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B73F928A00F
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 12:46:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D652B27EC2
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 12:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C95351AD3E6;
-	Thu, 29 Aug 2024 12:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3EB51B6522;
+	Thu, 29 Aug 2024 12:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="20KMQELy"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3SiSgawQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0369191F8B;
-	Thu, 29 Aug 2024 12:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4261AED48;
+	Thu, 29 Aug 2024 12:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724935171; cv=none; b=kL1O/QfBv6C0hrTTHDcn3OmfupXDKvZLAB+waGC7TY9puPy8abionymjN9v8bTopsDHX1ZvGJtuCNYNj5HZabYWZxjvbS5+p1tu0lqJuSEopRCi2ByiB2t1kjcGVN/Ri0Oifmu/Z7Utp8jkrUQE6gffTwQXuPgPLsLoesRgymgw=
+	t=1724935448; cv=none; b=KlFNtbI/w8YfAYmKb7lsGiSJ6bslFiYXBwk3cU+sBQZKlErIMO1rc5HvwYzuXLvC8kObkCwlWmf5nE2HyH/1rLjgnz5QWHW8Fs5qRb6pfukHVADQx5pVnodkTPe3VB3V06f80MWBoDm6kPQGnsv2XcDRLzy9bTtqQK1c3yUEN2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724935171; c=relaxed/simple;
-	bh=t45kKgaqNgp+zoCbiE0yFAUGsdMB8opYG+4Ni0FrW20=;
+	s=arc-20240116; t=1724935448; c=relaxed/simple;
+	bh=kmQ5H8GpQ9AThZb7Z64Sq14B+iL6YKG8nt5xNCwt4As=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sSeOdF+nFXYOy9pjDsYenI5h4KpMnU30hqb7ytNfOlAa3azGRs1vXYNR8fI4n6sFVKuDahrZlwpc/wLIhti3UnGpbCBzlpBT9pqA+Y0YO2zriI/e865by9C3Cqi/pHwprI+UGYWg77fm0R1l1xaKj2YE6Z/hQGh3rrAfHZjTfys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=20KMQELy; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=SX7euNsODcCCrMN37gFgD1uJv9BkDNGGVeazde6QkWuo9G5+LyMUkvvq8e9FtfUL4X421loBQERtMro6IfOFITshDsEyOw6fLsYI4aq2w9qkMHBG5VbO6zOqG91JdJjsBTG2HrcIg9ajb0VAQYl8HPF09aUJogw4euZ7m1oGC/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3SiSgawQ; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,36 +36,31 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+QyTeQW/As9IjRzVOrP1/IZ7Jkku9UOdmdk9zFQWvDM=; b=20KMQELyV/A1PdZDXK1xNzAzDD
-	yEKZShA/slL4ITbRl/MDrnlwoljjq5bv44f4wQcfBH67lWv9obxeK0rVT25FuDKpmpCx3AkVT4zEx
-	2vzJT+sjP4HMw7ZOKajAJMEajW9AheAL2BzfXrKFZzoMj5Xfdeck5vT6dBHd4FKPkxKo=;
+	bh=Of0pRpVC7r+22aF49u6u4Qqa9/5GKIrskiwj0PoVtq0=; b=3SiSgawQGgKE5NEvT3nyW6yPr/
+	qXD685UmZvTZnoKmezrZk5PaGzZjNCcylw+U6i4+EyIwNNLzDSVwx3pj3njoXayglQS6XIiz0goES
+	nMcOibjxm4qrlPtLTEreyiOdz2+vDn8b+6D57tvKnmbYap0iVGC4YfvjVXo0Fs1/Cm+U=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1sjeQU-00621R-6Z; Thu, 29 Aug 2024 14:38:58 +0200
-Date: Thu, 29 Aug 2024 14:38:58 +0200
+	id 1sjeV0-00623A-8j; Thu, 29 Aug 2024 14:43:38 +0200
+Date: Thu, 29 Aug 2024 14:43:38 +0200
 From: Andrew Lunn <andrew@lunn.ch>
 To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	woojung.huh@microchip.com, f.fainelli@gmail.com, olteanv@gmail.com,
+Cc: woojung.huh@microchip.com, f.fainelli@gmail.com, olteanv@gmail.com,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pabeni@redhat.com, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
 	justin.chen@broadcom.com, sebastian.hesselbarth@gmail.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	mcoquelin.stm32@gmail.com, wens@csie.org, jernej.skrabec@gmail.com,
-	samuel@sholland.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	ansuelsmth@gmail.com, UNGLinuxDriver@microchip.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, wens@csie.org,
+	jernej.skrabec@gmail.com, samuel@sholland.org,
+	mcoquelin.stm32@gmail.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, ansuelsmth@gmail.com,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
 	bcm-kernel-feedback-list@broadcom.com,
+	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
-	linux-stm32@st-md-mailman.stormreply.com, krzk@kernel.org,
-	jic23@kernel.org
-Subject: Re: [PATCH net-next v2 08/13] net: mdio: mux-mmioreg: Simplified
- with dev_err_probe()
-Message-ID: <df7418a8-1626-4207-b23e-7f0dc3d83164@lunn.ch>
-References: <20240828032343.1218749-1-ruanjinjie@huawei.com>
- <20240828032343.1218749-9-ruanjinjie@huawei.com>
- <20240828134814.0000569d@Huawei.com>
- <c696926d-748f-1969-f684-727d495c4a12@huawei.com>
+	krzk@kernel.org, jic23@kernel.org
+Subject: Re: [PATCH net-next v3 00/13] net: Simplified with scoped function
+Message-ID: <25cef928-6b26-447e-8106-77db0aa5954b@lunn.ch>
+References: <20240829063118.67453-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,22 +69,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c696926d-748f-1969-f684-727d495c4a12@huawei.com>
+In-Reply-To: <20240829063118.67453-1-ruanjinjie@huawei.com>
 
-> >> +		if ((u32)reg & ~s->mask)
-> >> +			return dev_err_probe(&pdev->dev, -ENODEV,
-> >> +					     "mdio-mux child node %pOF has a 'reg' value with unmasked bits\n",
-> > I'd align these super long ones as. 
-> > 			     "mdio-mux child node %pOF has a 'reg' value with unmasked bits\n",
-> > It is ugly but then so are > 100 char lines.
-> 
-> It seems that this kind string > 100 char is fine for patch check script.
+On Thu, Aug 29, 2024 at 02:31:05PM +0800, Jinjie Ruan wrote:
+> Simplify with scoped for each OF child loop and __free(), as well as
+> dev_err_probe().
 
-Strings like this can ignore the 80 char limit because developers are
-going to grep for it when it shows up in their kernel log. If it gets
-broken in odd places, grep will not find it.
+I said the for_each_child_of_node_scoped() parts are fine. The
+__free() parts are ugly, and i would like to reject them. So please
+post just the for_each_child_of_node_scoped() parts for merging, while
+we discuss what to do about __free().
 
-I would also say the indentation is correct as is, level with &pdev.
+    Andrew
 
-	Andrew
+---
+pw-bot: cr
 
