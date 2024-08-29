@@ -1,135 +1,168 @@
-Return-Path: <netdev+bounces-123160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8034963E5D
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 10:27:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEE8C963E68
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 10:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FE8B287E2F
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:27:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A4B6B20F4F
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E060618C35B;
-	Thu, 29 Aug 2024 08:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4E7918C032;
+	Thu, 29 Aug 2024 08:29:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0oBEhDI"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Nl+dGyMr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254E518C02A
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 08:27:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F217418C025;
+	Thu, 29 Aug 2024 08:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724920024; cv=none; b=qFgnOoTsitViAdvBtzEYlKs6KSpx52Nmq+h2voVp/gI+24aa7kT2ZJgC2QgT0uBiWokp0vsghM/H73tp/iiX6NIVBeRlQmKnU0NAMUpt/6HnirXmKNo1wh/oedeaokCvUdVM1IaJTXDPRxbsckpYEhv2SApb1XGLztlhVXvhMz4=
+	t=1724920159; cv=none; b=TJalwBBeTa8CPCO3VmDVx4FDEHDA25fZO9XAvMdPv3r7hSLQFx1U0TVa1mvXbXB0IQBB2/UeiroZ3WroVVqF1Tnv18HAvGyr+6cByelWkROAQK6shECXBTjk6uLZRRVqGbAVQ5jAONTJcAdwpemG1ZVS/GVIKcGnt4dn1vmOFPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724920024; c=relaxed/simple;
-	bh=Bg3qnOD/wVviS+JcQvXBgCI/eQDVp+5vsrv7n/OOhkk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a4D8RyEG1lfMGXQL/MP2Cx7tfxCjzD/KVUC5y7jiG3iE+sAnQePJNuC2VUXTVt3EiJiY4bGdJxGDq1xXcPVPno6Qxkzldel8SKj2r6b8db4wyhsLg+NKabkJXxT/mDK8vHs/y7G4dSIrpeeWx4wPEyfXb8tJs7d9xai5ZgLz8QY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P0oBEhDI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724920021;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=009aMKtYz3alNozgyKcZzRLs3QnC7nYwCnZ9axqzyJI=;
-	b=P0oBEhDIqaBVed4N7nJV8j0c/bk4MLAlpYqoKkJUmC8UFq25Z+RBL9y71j367W9vIP7LEe
-	y7PHYk6Jtf3osXqHe7jDblNTn3TV/UcOAaahtTJMm2YVE/F7ixwwVYfIcHV4uWYGaRkTy4
-	gLOpudiVRtPc6ArVBPhxwdfCmyCt+/o=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-288-lk2ulnfGO72YxDSK9IFncw-1; Thu, 29 Aug 2024 04:26:58 -0400
-X-MC-Unique: lk2ulnfGO72YxDSK9IFncw-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a867bc4f3c4so66776366b.0
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 01:26:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724920017; x=1725524817;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=009aMKtYz3alNozgyKcZzRLs3QnC7nYwCnZ9axqzyJI=;
-        b=ceXxl0jhmv2igDGUdmvCkNFU4/zejTTJaDpOwGwkIXtW5vcB5lVXp/N6IsGEPIv0F+
-         GppSXc0duWLjznRG7mJX708BUeL1tpI3Jfh7mWYNzRLLGei2ixBtI5qq6icOVBXiGXky
-         q6HVMJrYyZO4nG9DjFddpi6NnugYbIxdimgHKOuFKVQohEqnTxvK3WNbQidFI5DfRqqI
-         GFG1hnGVxb4mT2RzmNxoHBQthNW7rZV6Ydh9B7P+Lc7nbvUOQ3pzClDV/oxXc7evRyUq
-         0iz2xk2L01g4FYAFKOexv3Typq58hZadm5INYiGxTpi9infovzSg3fYbT9tAaYgRZjMn
-         MHZw==
-X-Forwarded-Encrypted: i=1; AJvYcCXg1+lNlVGHlqrLxZ5Y1HeGH12PZymgJi81d8IJPsLrtoM+JTISCyh9Id6UjVzymObGPpAbI5A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWs8iqFHsBXf8bK3ydn1LrJgdNaP7fg1Nofrlsz1NXgOV3E2He
-	ksp9dV0v28y6oN/b+F8rhqk5h5HmQY4jrUXt6Dhcl9XvFud7vHk6yf/1EcwzmVy17+bE027jQt9
-	6DDTKKq+bxCjTKlTBMcmWtFllZ1guOvl1es58d2fUmhn+W3juQNu91w==
-X-Received: by 2002:a17:907:3f08:b0:a7a:8dcd:ffb4 with SMTP id a640c23a62f3a-a898259d562mr216809066b.17.1724920016807;
-        Thu, 29 Aug 2024 01:26:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGpgPvAWdmdMwSpjC1P4giL7TG3nksWf9mUuwzWdS9aF/bqlDM5xYu2KySqyBFkeSGzQSLmJg==
-X-Received: by 2002:a17:907:3f08:b0:a7a:8dcd:ffb4 with SMTP id a640c23a62f3a-a898259d562mr216805566b.17.1724920016274;
-        Thu, 29 Aug 2024 01:26:56 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:1b50:3f10:2f04:34dd:5974:1d13? ([2a0d:3344:1b50:3f10:2f04:34dd:5974:1d13])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c226c7c060sm413582a12.50.2024.08.29.01.26.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Aug 2024 01:26:55 -0700 (PDT)
-Message-ID: <26d3f7cf-1fd8-48b6-97be-ba6819a2ff85@redhat.com>
-Date: Thu, 29 Aug 2024 10:26:53 +0200
+	s=arc-20240116; t=1724920159; c=relaxed/simple;
+	bh=E22UVlKfybQ6Tmjaw6PPYSMUlg5345khqFSuT+Vhx8M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kNYKYQJp+0YFi0PpbR6x3Cdc9K8SiQzPuuNeMZEgcmHQxoQ8Bs0mnDiAuz7OhX1VAfi8OacE9WjccJuwsQJJt0s+WkMY1Ei5TZ/JVI7KZZStmX/HIfsrLvq2hrlwR5sIUmyqhnRbVmDbR5Jj/T+sp/6fo2nDJaiLxnqAjweNDXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Nl+dGyMr; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47T8QcaV000605;
+	Thu, 29 Aug 2024 08:29:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=7ry3tTO1NvxIQ0xDSdkI6D
+	BGk1wEMGklt9PYcx1cDHY=; b=Nl+dGyMrwrKC+czRz5w4HQUwS06UGUWeL7aIJJ
+	rZm3pqlVgrDs3DbdSLMoFT153pMx6jl12Kd+wsscicg2Z54O2f5XaS+8Dt4FLscR
+	r6J+QYNEClp79f8ETxOg25rr6JqiSociVJX+SUIhiWR2kTodE6f03MzRGGVnHCPW
+	IGElkGcv2GZXxEVo7m3sQImQQvw8fcaZczGG7tF2PwKzY7u3yYxyga8GEhgbfANy
+	/IA3QTb5KBlMFeHsC8RIJYykmbRJUUyM1QdM7iBV9Jus1wYTWwPub4NFlFtrB8w5
+	Ce0b5D9Y8O+q7YqidVRnl+FBmbFJbRq3RuQu8O8p3lbchr2w==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 419puw4h9t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Aug 2024 08:29:01 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47T8Sx8C007272
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Aug 2024 08:28:59 GMT
+Received: from hu-varada-blr.qualcomm.com (10.80.80.8) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 29 Aug 2024 01:28:52 -0700
+From: Varadarajan Narayanan <quic_varada@quicinc.com>
+To: <andersson@kernel.org>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
+        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+        <konradybcio@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
+        <djakov@kernel.org>, <richardcochran@gmail.com>,
+        <geert+renesas@glider.be>, <dmitry.baryshkov@linaro.org>,
+        <neil.armstrong@linaro.org>, <arnd@arndb.de>,
+        <nfraprado@collabora.com>, <linux-arm-msm@vger.kernel.org>,
+        <linux-clk@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-pm@vger.kernel.org>, <netdev@vger.kernel.org>
+CC: Varadarajan Narayanan <quic_varada@quicinc.com>,
+        Kathiravan Thirumoorthy
+	<quic_kathirav@quicinc.com>
+Subject: [PATCH v5 0/8] Add NSS clock controller support for Qualcomm IPQ5332
+Date: Thu, 29 Aug 2024 13:58:22 +0530
+Message-ID: <20240829082830.56959-1-quic_varada@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] nfc: pn533: Add poll mod list filling check
-To: Aleksandr Mishin <amishin@t-argos.ru>,
- Samuel Ortiz <sameo@linux.intel.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-References: <20240827084822.18785-1-amishin@t-argos.ru>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240827084822.18785-1-amishin@t-argos.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: gByXCS-HlPuas1kMDGT_fDzgQ9_XjdC5
+X-Proofpoint-GUID: gByXCS-HlPuas1kMDGT_fDzgQ9_XjdC5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-29_02,2024-08-29_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 malwarescore=0 bulkscore=0 mlxscore=0
+ lowpriorityscore=0 phishscore=0 mlxlogscore=999 suspectscore=0
+ adultscore=0 spamscore=0 impostorscore=0 classifier=spam adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408290062
 
+Add bindings, driver and devicetree node for networking sub system clock
+controller on IPQ5332. Some of the nssnoc clocks present in GCC driver is
+enabled by default and its RCG is configured by bootloaders, so enable
+those clocks in driver probe.
 
+Signed-off-by: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+---
+Changes in v5:
+- Rebased on next-20240821
+- Addressed review comments
+- Dropped 'const qualifier' patches
+- Dropped 'clk: qcom: ipq5332: enable few nssnoc clocks in driver probe'
+- Enabled icc-clk for NSSCC
+- Update ICC master/slave list
+- In dt-bindings of nsscc
+	Mark #power-domain-cells as false (as it is not applicable)
+	Add #interconnect-cells
+- Link to v4: https://lore.kernel.org/lkml/20240122-ipq5332-nsscc-v4-0-19fa30019770@quicinc.com/
 
-On 8/27/24 10:48, Aleksandr Mishin wrote:
-> In case of im_protocols value is 1 and tm_protocols value is 0 this
-> combination successfully passes the check
-> 'if (!im_protocols && !tm_protocols)' in the nfc_start_poll().
-> But then after pn533_poll_create_mod_list() call in pn533_start_poll()
-> poll mod list will remain empty and dev->poll_mod_count will remain 0
-> which lead to division by zero.
-> 
-> Normally no im protocol has value 1 in the mask, so this combination is
-> not expected by driver. But these protocol values actually come from
-> userspace via Netlink interface (NFC_CMD_START_POLL operation). So a
-> broken or malicious program may pass a message containing a "bad"
-> combination of protocol parameter values so that dev->poll_mod_count
-> is not incremented inside pn533_poll_create_mod_list(), thus leading
-> to division by zero.
-> Call trace looks like:
-> nfc_genl_start_poll()
->    nfc_start_poll()
->      ->start_poll()
->      pn533_start_poll()
-> 
-> Add poll mod list filling check.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> Fixes: dfccd0f58044 ("NFC: pn533: Add some polling entropy")
-> Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+Changes in v4:
+- Rebased on next-20240122
+- Fixed the missing space on the nsscc node
+- Link to v3: https://lore.kernel.org/linux-arm-msm/20231211-ipq5332-nsscc-v3-0-ad13bef9b137@quicinc.com/
 
-The issue looks real to me and the proposed fix the correct one, but 
-waiting a little more for Krzysztof feedback, as he expressed concerns 
-on v1.
+Changes in v3:
+- Collected the tags
+- Dropped the dt-binding patch 3/9
+- Cleaned up the header file inclusion and updated the module
+  description in the driver
+- Used the decimal number instead of hex in the NSSCC node
+- Link to v2: https://lore.kernel.org/r/20231121-ipq5332-nsscc-v2-0-a7ff61beab72@quicinc.com
 
-Thanks,
+Changes in v2:
+- Change logs are in respective patches
+- Link to v1: https://lore.kernel.org/r/20231030-ipq5332-nsscc-v1-0-6162a2c65f0a@quicinc.com
 
-Paolo
+---
+Kathiravan Thirumoorthy (6):
+  dt-bindings: clock: ipq5332: add definition for GPLL0_OUT_AUX clock
+  clk: qcom: ipq5332: add gpll0_out_aux clock
+  dt-bindings: clock: add Qualcomm IPQ5332 NSSCC clock and reset
+    definitions
+  clk: qcom: add NSS clock Controller driver for Qualcomm IPQ5332
+  arm64: dts: qcom: ipq5332: add support for the NSSCC
+  arm64: defconfig: build NSS Clock Controller driver for Qualcomm
+    IPQ5332
+
+Varadarajan Narayanan (2):
+  dt-bindings: interconnect: Update master/slave id list
+  clk: qcom: ipq5332: Add couple of more interconnects
+
+ .../bindings/clock/qcom,ipq5332-nsscc.yaml    |   64 +
+ arch/arm64/boot/dts/qcom/ipq5332.dtsi         |   28 +
+ arch/arm64/configs/defconfig                  |    1 +
+ drivers/clk/qcom/Kconfig                      |    9 +
+ drivers/clk/qcom/Makefile                     |    1 +
+ drivers/clk/qcom/gcc-ipq5332.c                |   16 +
+ drivers/clk/qcom/nsscc-ipq5332.c              | 1049 +++++++++++++++++
+ include/dt-bindings/clock/qcom,ipq5332-gcc.h  |    1 +
+ .../dt-bindings/clock/qcom,ipq5332-nsscc.h    |   86 ++
+ .../dt-bindings/interconnect/qcom,ipq5332.h   |    4 +
+ 10 files changed, 1259 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/clock/qcom,ipq5332-nsscc.yaml
+ create mode 100644 drivers/clk/qcom/nsscc-ipq5332.c
+ create mode 100644 include/dt-bindings/clock/qcom,ipq5332-nsscc.h
+
+-- 
+2.34.1
 
 
