@@ -1,110 +1,155 @@
-Return-Path: <netdev+bounces-123444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8503A964DEB
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:43:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0258964E2B
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE5CF1C224D7
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:43:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CA00281105
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A69E1B375C;
-	Thu, 29 Aug 2024 18:43:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E47FF1B790B;
+	Thu, 29 Aug 2024 18:47:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPlYK/QJ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Dh73UPK9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CA94D59F;
-	Thu, 29 Aug 2024 18:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 398D81B375A;
+	Thu, 29 Aug 2024 18:47:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724957006; cv=none; b=cAMJdNt6e67gIStd0dFoRaHhVsgwCVz1oZAShJ64IwDqZtE/qYqMceoh7HkRoVIk7LiQsRvC5SjWjRobVZi8D/ng6VrIGDMbrsw/1d7pjZ0h1ZYg/lFNfEtPlLjZhhrTatRV1q9i+hPVT3fE8JvGthhqm+04v1XcPgRvPLLobdo=
+	t=1724957242; cv=none; b=puOLqWAjmljI0i1EXlfnO7YnXXCsX5cd1bDxLSQc1SyqRspfb97JqS5udWuhooWrLlJzfvPTtZy48/I/gI3oZbbiwEKiR1526YrK5d7OYWC5V3bLSJ42UNIkc2htt88G8wRyec8e4c16BRYkaUa9DWNulVMzIgG9dxZ4cnAhr4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724957006; c=relaxed/simple;
-	bh=vE+oHFDKn1n2H0ca0J6627LrKzdWqp1r5PgbRtG60jI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ijPLSjCI14NCFyj9qWwdrtxqZXgipKBvQxp1bjL9LO0XeRvwj0IM88eVkkRND7YQEmXbgGuScsUcml5eu91WVuqsWfEUOeFEHpsiO+s7vzwa/KHwlAI9549iS/lVVsRENFBEpypgKyMImKw3g0szKC8mKBsSEH2QQMRAcdNp0Wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CPlYK/QJ; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-715cdc7a153so834242b3a.0;
-        Thu, 29 Aug 2024 11:43:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724957004; x=1725561804; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4C7xSOcW/TzKaBdUZWPIdJ9PAcDUfVW7KB+BCThOMkc=;
-        b=CPlYK/QJjoZ/Sb/O82Kog2l97PSM/wl6runqGGVtcwStezgFWNxPVtWj0q7p5uanQC
-         51bsJSPJvTK+vzoxM25xZ+p5AwSHttnjFw/5cdt7DlTu+AQzBuamIM6tLvD7FdTEPEjG
-         uJW2bmae1cjBsDvfudGsoIONvua2QC4jJO+VdX2cqPo/P6f1On7pLhX4ohy9tdcbNPTr
-         gYjHwUPy80k3sfUylC1noM6qmlNWYGxYrdhP/lx+bdPRfKkV0UPXN8nko6WhVWTpK0pP
-         5XPQTYkdMsv/VJ8l2G0+KIJy+Wim72/k8svT6oANR0RrZD3YGKfSwdgWi39xylLSSC9f
-         lWUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724957004; x=1725561804;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4C7xSOcW/TzKaBdUZWPIdJ9PAcDUfVW7KB+BCThOMkc=;
-        b=M3QY542CKaPVxVo3YL81GUwmT3ujnDZ5e9WI/TUC0zLUNU/r+m7QXlTFEeFEL8LA8p
-         yfYOyNYLijhBBvqYIvRCOJn09hfd0OVDyuifcgP9pWB/vXuGbZs7T8QtBqvkFKhXwSmX
-         n4VLulwQWuhZWT0r4StnJeQUTJVBsgPp86BFVeKnQN3Ns9hEeo1RT+tOxdpGesZvcc1A
-         urSRfgIQnBX+IUhjrKVD97/BbLHAz63Bi+dZ/vkRaHl3jX3hPi1qoUzequUCu7wJUt3C
-         ZhnH/OV2Ng+zwWMg7GHmwehtfeGt++w53XiepvUFHCacpx7P8XrdwZ0znK4mRmlYoMh1
-         ZWmg==
-X-Forwarded-Encrypted: i=1; AJvYcCX7FhNDUQOdXesSqbbjydtjxCElfnI5DL5CeANEL8wDt5z6hI2mEZeHEp3Jp0Z+Th1D5+4Fdzc17lebHi8=@vger.kernel.org, AJvYcCXD1TU9oG91XW8UWdUUpiQhtPK2VEIV9eRHa2I4i63VmkAzG6Grl6yL/R6afICvzBi4xrhZVlXN@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGtlnJy14NMchxaTxxiCb1s/WccVndT2kdXwiIuXy09y1NCP1j
-	3Y9D9LvEJBu2Hkwdux+1K7K7X3MffzhiU7iqEcIGWaaZqBwT8bDN
-X-Google-Smtp-Source: AGHT+IFVq3+ktr6bQOFUC8KGniIQIVORiHvN8Mt2AhB7WSm9HpXa44ndoShl8h6MzRhY/EwEB20hIg==
-X-Received: by 2002:aa7:8895:0:b0:706:aa39:d5c1 with SMTP id d2e1a72fcca58-715e78a7047mr5738454b3a.8.1724957004073;
-        Thu, 29 Aug 2024 11:43:24 -0700 (PDT)
-Received: from [192.168.1.14] ([200.4.98.43])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-715e55b9cf0sm1486289b3a.96.2024.08.29.11.43.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Aug 2024 11:43:23 -0700 (PDT)
-Message-ID: <9f4831cc-84f4-4329-b912-d558c74797c6@gmail.com>
-Date: Thu, 29 Aug 2024 15:43:18 -0300
+	s=arc-20240116; t=1724957242; c=relaxed/simple;
+	bh=lw4WuOtFskiWnrS5jSONbN64nqc3rMpyfJ+XYFxqlkk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e0T6RopcuYm6Ms+7WKVqgU7GaZPfcg+6NhK99q/Ozpz9ZNNa3frhiyfzgafozwv+0NjEHfYLZfoCOMlQJxD5g+Ic5gNPjuyNeh1D/wJ7JIIySCadOBNSv47hUqBiDXRn07Z0ydYkmKtFVDXvsc8Lr0rV2+2reB+ba031Oson9QI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Dh73UPK9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1Bp32jBiqSLZI/T090uDwM/rXDdtbKaMXGudQmiRiig=; b=Dh73UPK996iwRUWWsAZSLIo4gl
+	WQ1yBJKYsxSpaVpk9xtkEHAaatmpbrYEjE6Jb2CJV7P0GBkUMWy6gd3iSpmVR3GTaiKv+Ja74Bk/C
+	wg7lUORJn2MpT9pQnzDqC5pELllVM7Lrj99+NB8aQrqDw4VHbzkfpn+/0ggPC9RFlaGM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sjkAi-0063yr-Gp; Thu, 29 Aug 2024 20:47:04 +0200
+Date: Thu, 29 Aug 2024 20:47:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, corbet@lwn.net, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, ecree.xilinx@gmail.com,
+	przemyslaw.kitszel@intel.com, kory.maincent@bootlin.com,
+	maxime.chevallier@bootlin.com, linux-doc@vger.kernel.org
+Subject: Re: [RFC net-next 2/2] net: ethtool: add phy(dev) specific stats
+ over netlink
+Message-ID: <056e03a1-ed13-40b0-b66d-755dd2760988@lunn.ch>
+References: <20240829174342.3255168-1-kuba@kernel.org>
+ <20240829174342.3255168-3-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [patch net-next v4] ethtool: pse-pd: move pse validation into set
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240828174340.593130-2-djahchankoike@gmail.com>
- <20240829103552.09f22f98@device-28.home>
-Content-Language: en-US
-From: Diogo Jahchan Koike <djahchankoike@gmail.com>
-In-Reply-To: <20240829103552.09f22f98@device-28.home>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240829174342.3255168-3-kuba@kernel.org>
 
-Hi Maxime,
+> +/* Additional PHY statistics, not defined by IEEE */
+> +struct ethtool_phy_stats {
+> +	/* Basic packet / byte counters are meant for PHY drivers */
+> +	u64 rx_packets;
+> +	u64 rx_bytes;
+> +	u64 rx_error; /* TODO: we need to define here whether packet
+> +		       * counted here is also counted as rx_packets,
+> +		       * and whether it's passed to the MAC with some
+> +		       * error indication or MAC never sees it.
+> +		       */
+> +	u64 tx_packets;
+> +	u64 tx_bytes;
+> +	u64 tx_error; /* TODO: same as for rx */
+> +};
 
-On 8/29/24 05:35, Maxime Chevallier wrote
-> You have an extra white space here. Make sure you run your patch through
-> the checkpatch script to detect this kind of issues. 
+I'm not sure these are actually useful.
 
-My apologies, I did forget to run checkpatch, thanks for pointing that out. Will
+adin.c:
+        { "total_frames_checked_count",         0x940A, 0x940B }, /* hi + lo */
+        { "length_error_frames_count",          0x940C },
+        { "alignment_error_frames_count",       0x940D },
+        { "symbol_error_count",                 0x940E },
+        { "oversized_frames_count",             0x940F },
+        { "undersized_frames_count",            0x9410 },
+        { "odd_nibble_frames_count",            0x9411 },
+        { "odd_preamble_packet_count",          0x9412 },
+        { "dribble_bits_frames_count",          0x9413 },
+        { "false_carrier_events_count",         0x9414 },
 
-send the corrected patch.
+bcm-phy-lib.c:
+        { "phy_receive_errors", -1, MII_BRCM_CORE_BASE12, 0, 16 },
+        { "phy_serdes_ber_errors", -1, MII_BRCM_CORE_BASE13, 8, 8 },
+        { "phy_false_carrier_sense_errors", -1, MII_BRCM_CORE_BASE13, 0, 8 },
+        { "phy_local_rcvr_nok", -1, MII_BRCM_CORE_BASE14, 8, 8 },
+        { "phy_remote_rcv_nok", -1, MII_BRCM_CORE_BASE14, 0, 8 },
+        { "phy_lpi_count", MDIO_MMD_AN, BRCM_CL45VEN_EEE_LPI_CNT, 0, 16 },
 
+icplus.c:
+        { "phy_crc_errors", 1 },
+        { "phy_symbol_errors", 11, },
 
-Thanks,
+marvell.c:
+        { "phy_receive_errors_copper", 0, 21, 16},
+        { "phy_idle_errors", 0, 10, 8 },
+        { "phy_receive_errors_fiber", 1, 21, 16},
 
-Diogo Jahchan Koike
+micrel.c:
+        { "phy_receive_errors", 21, 16},
+        { "phy_idle_errors", 10, 8 },
 
+nxp-c45-tja11xx.c:
+        { "phy_link_status_drop_cnt",
+        { "phy_link_availability_drop_cnt",
+        { "phy_link_loss_cnt",
+        { "phy_link_failure_cnt",
+        { "phy_symbol_error_cnt",
+        { "rx_preamble_count",
+        { "tx_preamble_count",
+        { "rx_ipg_length",
+        { "tx_ipg_length",
+        { "phy_symbol_error_cnt_ext",
+        { "tx_frames_xtd",
+        { "tx_frames",
+        { "rx_frames_xtd",
+        { "rx_frames",
+        { "tx_lost_frames_xtd",
+        { "tx_lost_frames",
+        { "rx_lost_frames_xtd",
+        { "rx_lost_frames",
+
+smsc.c:
+        { "phy_symbol_errors", 26, 16},
+
+802.3 does not define in PHY statistics, the same as it does not
+define any MAC statistics. As a result it is a wild west, vendors
+doing whatever they want.
+
+The exception is the Open Alliance, which have defined a number of
+different standards defining statistics which Automotive vendors can
+optionally follow.
+
+https://opensig.org/automotive-ethernet-specifications/
+
+These could be defined as either one or three groups, with the
+expectation more will be added later.
+
+	Andrew
 
