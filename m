@@ -1,124 +1,108 @@
-Return-Path: <netdev+bounces-123503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C94869651B8
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 23:19:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C81BB9651C8
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 23:22:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F9A61F21B39
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 21:19:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36C4DB2130E
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 21:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5647918A94C;
-	Thu, 29 Aug 2024 21:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A091B5820;
+	Thu, 29 Aug 2024 21:22:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rSVfkmoF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fAlm7TqT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27B94D108
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 21:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B60118C004;
+	Thu, 29 Aug 2024 21:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724966382; cv=none; b=U3Eo+WtQ5gEvOZWz3uoba/fb6yUU5SayeDSBhdmRceAocSFFo/lrDs26G1xuXhl2fjupDDUsO/c5oaffzEPN5HxhovYwiZFStrJCk8iFHq6IQ50McomJX0mrABSQy872SEzkbj1QhbsHcwh3jxZCsTQVy3eV5gITzp9xC5tH6Xg=
+	t=1724966562; cv=none; b=S8W0hLmJbcLFWcVpEViixWeRMyYNW9VooVz8SBKbBHHOzEstVWf1r+OR7idy8HYrXpyMmxJ8NHMBCAjSJRI2U/Oiaz0y/SpYXbIHzAt/RIai+YYXHZ5THXXWtXRzlkhYOJBN6iOYLOmON1KN9cXDfDIFDabyIQTr8fACGrtgmRg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724966382; c=relaxed/simple;
-	bh=cSSHR+7MIgv82yUhJt1tPdyAdr9oWGKwjfORiHPFS0Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fq/rtiucmUFYNAcduizXW5FiK1GGZJIo4qVdioYDOcUMe9jhL+gqq5oNtl62UcW4ewrhp2vwUUOS9ClVpna5ULQZaW3JIxFPJiyLbRx0L05Btc6hOO6+iyXw6EIRHKbnbEJx9GFEeGlFVgZxOCbQq+y0WyeIp5DsV9ZExapHljM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rSVfkmoF; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4281d812d3eso12557575e9.3
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 14:19:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724966379; x=1725571179; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=cSSHR+7MIgv82yUhJt1tPdyAdr9oWGKwjfORiHPFS0Q=;
-        b=rSVfkmoFRu6MriUP5eOkVinYRHqhhPoHe5G56FvTdLUvvXT/go9pb8TZrwDf3UFpre
-         vOX7gTf7fwC2lPffjjR/nlBE64AprSv1Yh0Yu9w/2hVZ7G1Ua0V6RyipRdC7VgUa1Ln2
-         fgi3XAGwkFj/SNZH7llRGQx0fLbfzxF90xniCd9aV1i3p9OlowRT8e84b15VlqcZMJx/
-         9+/EqJHgSV68x2WWcvXcQ5dr/smoKKsuRGfFk78VPYp8yJzybypuUBpx+BjLj+9h2jwX
-         VrcEt/0V58/lwRY7DBTU6hwEsqXxXTZuaOhWKR88waBDY2cydwu9ZGdj7ypuU2QvWak5
-         at/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724966379; x=1725571179;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cSSHR+7MIgv82yUhJt1tPdyAdr9oWGKwjfORiHPFS0Q=;
-        b=FVCpUuHpFlhcsKkZuyYXDcf+PC83nGTDwDIadOoeJDkQYLDNhSBCYcVqZATA7crK8a
-         JqaDBnlUKmT79pGiUnJRUv0/bn+IoOG6qRXXa0YSlqcpcpcAJdfRzux9g+ngWxtL1aQL
-         EdnxpMHvWh8b7Pf9NAnh1nlDYIBFwrqdg9xe9a+D9Vi7Q8UEhxCLmwd/JP5DuH0a71so
-         GvfPK4/zE9FScr7CucG6sQzl07UhhqdrkjR3T4zUjSHqWjT0BFGdlN3FqUWv0axskZLM
-         aaT2FScVU9R9ZHegf36U1Ty3+tBD/oZCbz4bfu7v1iLVeCbPgLNd3TDzXES08OIXDU1A
-         KKpA==
-X-Forwarded-Encrypted: i=1; AJvYcCWwxdhYY/g2hPmsXxe8TUCn/7vDonradS7ZLxwHoDPWOi2//Q971NVN6XLgzNDCtKspAZqZvUw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7OpHE4KFnt2sw/6IuYUS2c9gPuo1XBYK1B+uyI0r7/5Ku94hN
-	3QAXhVhbyHdwjV0zWL7O9o7jHN9XVuwoJLxA/N9o+IYVjfpRXym/idm7+qEpxCZrIeuhpi3BVT0
-	WDLiXsb8Askc5Kk1Y7qUoLc4ldfpRl1O/GQNjT+KyxSBvitxHeASCyhM=
-X-Google-Smtp-Source: AGHT+IF1b8OxSqTUnBvA3hUgcZ09FQh+dY865bjdQ0W331PM802F47DuxbG3pcH75Q1I8a7qWne9QJFzYgk2lxFHceg=
-X-Received: by 2002:a5d:468f:0:b0:368:4b9d:ee2c with SMTP id
- ffacd0b85a97d-3749b544ac6mr3406186f8f.19.1724966378230; Thu, 29 Aug 2024
- 14:19:38 -0700 (PDT)
+	s=arc-20240116; t=1724966562; c=relaxed/simple;
+	bh=AIUYhH6teWWXTjGRBiDsHK8aBX5HXI6HxwijcjNaPFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gU3e5cGiw0UBFDr+70P+bTyhhHtWp4n4m4ljfSgh1uWwTo4128/PWey9ESuigC6zjazraCvr9NKFAhT0DEv6xu9Q46k4cIlYXyD0MGBviFZhzfsUrLY2NDOcmx0leR8tRd3F3sTRWjKOGMdxpAzfU8mbPg0Q7lDm44JPbMtvzyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fAlm7TqT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 928C0C4CEC2;
+	Thu, 29 Aug 2024 21:22:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724966561;
+	bh=AIUYhH6teWWXTjGRBiDsHK8aBX5HXI6HxwijcjNaPFo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fAlm7TqTA1OF7bSfcuffeGQG/lby/V0HduWcVtaK1nkYVxrKsvZ0MwCaDCRnFEG+l
+	 EGJaBNwwfGDLQOAi9NQzrPu18iy/hWTtuQMNOu+0nPCHEIatFrZByxWPwE0VbOiPHV
+	 Kn0GHWp5m2uSg/qJ84b+VqPNKa0XjJ+fu/OBf1NUwvWWQNbRow+zOLCORgoxhc7dGf
+	 pDTekIK1OdDqJ+63BcryVVmg82U/GxOjsHt7S4p3UNzeciyn8EmGCSuhlNwcHWsg5Y
+	 3RQ3Plexe5T9WF8RrpcMu45Pz49Rzo8liFQtQkDcxCd6IZIB0tClRPnCbaazHUdmlH
+	 b3qPIO4BvF8ug==
+Date: Thu, 29 Aug 2024 14:22:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Donald
+ Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Richard
+ Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
+ <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>,
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert
+ Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem
+ de Bruijn <willemdebruijn.kernel@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBl?=
+ =?UTF-8?B?bA==?= <bjorn@kernel.org>, Magnus Karlsson
+ <magnus.karlsson@intel.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, David
+ Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
+ Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Taehee Yoo <ap420073@gmail.com>, Willem de Bruijn <willemb@google.com>,
+ Kaiyuan Zhang <kaiyuanz@google.com>, Daniel Vetter <daniel.vetter@ffwll.ch>
+Subject: Re: [PATCH net-next v23 03/13] netdev: support binding dma-buf to
+ netdevice
+Message-ID: <20240829142237.4f1ab1ba@kernel.org>
+In-Reply-To: <CAHS8izMCZbynEQQ3rPs2QaEbD51ew7VK0sMziBTayCi2yEZ_EA@mail.gmail.com>
+References: <20240829060126.2792671-1-almasrymina@google.com>
+	<20240829060126.2792671-4-almasrymina@google.com>
+	<CAHS8izMCZbynEQQ3rPs2QaEbD51ew7VK0sMziBTayCi2yEZ_EA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822200252.472298-1-wangfe@google.com> <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
- <20240828112619.GA8373@unreal> <CADsK2K-mnrz8TV-8-BvBU0U9DDzJhZF2GGM22vgA6GMpvK556w@mail.gmail.com>
- <20240829103846.GE26654@unreal>
-In-Reply-To: <20240829103846.GE26654@unreal>
-From: Feng Wang <wangfe@google.com>
-Date: Thu, 29 Aug 2024 14:19:25 -0700
-Message-ID: <CADsK2K8KqJThB3pkz7oAZT_4yXgy8v89TK83W50KaR-VSSKjOg@mail.gmail.com>
-Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, 
-	antony.antony@secunet.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Leon,
+On Thu, 29 Aug 2024 12:38:13 -0700 Mina Almasry wrote:
+> BTW I submitted 2 iterations already this week, Sunday and Wednesday.
+> This is easily fixable and I can resend before the end of the week,
+> but if I'm stressing NIPA too much with reposts of this large series I
+> can wait until next week. Sorry about that.
 
-Thank you again for your thoughtful questions and comments. I'd like
-to provide further clarification and address your points:
+Thanks for being considerate to our infra! :)
 
-SA Information Usage:
-
-There are several instances in the kernel code where it's used, such
-as in esp4(6)_offload.c and xfrm.c. This clearly demonstrates how SA
-information is used. Moreover, passing this information to the driver
-shouldn't negatively impact those drivers that don't require it.
-Regarding a driver example, the function mlx5e_ipsec_feature_check
-caught my attention.
-https://elixir.bootlin.com/linux/v6.10/source/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h#L89)
-As you're more familiar with this codebase, I defer to your expertise
-on whether it's an appropriate sample. However, the crucial point is
-that including this information empowers certain drivers to leverage
-it without affecting those that don't need it.
-
-validate_xmit_xfrm Function:
-My primary goal in discussing the validate_xmit_xfrm function is to
-assure you that my patch maintains the existing packet offload code
-flow, avoiding any unintended disruption.
-
-State Release:
-I've noticed that secpath_reset() is called before xfrm_output(). The
-sequence seems to be: xfrmi_xmit2 -> xfrmi_scrub_packet ->
-secpath_reset(), followed by xfrmi_xmit2 calling dst_output, which is
-essentially xfrm_output().
-I'm also open to moving the xfrm_state_hold(x) after the if (!xo)
-check block. This would ensure the state is held only when everything
-is ok. I'll gladly make this adjustment if you believe it's the better
-option.
-
-Thank you once again for your valuable insights and collaboration.
-Your feedback is greatly appreciated!
-
-Feng
+A few expensive series keep getting reposted, but re-posting tomorrow
+should be fine. 
 
