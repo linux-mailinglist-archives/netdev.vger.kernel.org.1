@@ -1,245 +1,75 @@
-Return-Path: <netdev+bounces-123491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82E1965149
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 22:55:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D965996514C
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 22:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A70E1F22AE6
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:55:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10C0F1C24382
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:55:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E362D18B491;
-	Thu, 29 Aug 2024 20:49:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9BB18C004;
+	Thu, 29 Aug 2024 20:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="AqXZ3HrE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LodG1Mv6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C106C18A92B
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 20:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA59318B46D
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 20:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724964588; cv=none; b=AnqAuBfpI9BK8Je7rbXc8WVkQPTqyWeX4SmV1A+l6ZjPF5ZPaMiKEChKc9nz5sMCbsIfIR/9WMPfuUsg0faxj0tp1BZlKq5lliKmTILaWaNX1ZaEn4SGIrZcCpIpdqiRmPW/nad2ynfuyUXE2zcgICMacOkSLcNrkGUNTLKS8eU=
+	t=1724964740; cv=none; b=n+GlBzYOO24RtmpQg1JFs24oThopyxGwDflT+0vBUKZvWXVLs71Jc4ndC+ees0isuYhWbmaCw5G1+GMdecZWXzisWIUosOJT/dQNIC7Qk1wewhVNn+nny0QTN+xyh+UCULjAXCZIxvraa6T3YcuiBfhzxkiz+NM5QdP9jOicItA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724964588; c=relaxed/simple;
-	bh=e/QBwlg4bd3jXNofdvd0gk6DuucCiYF4CgzYuOY9uk4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XeoatnrGPuVBW6BWfMBKb2ixFmiJPD1wlbOLbg5ds+kmNFN1x+TtHXr5arpr+Swx8HZ02iMtCBsy6ylgImS4Hf+oWlT8xNZbeRzRNifOLxaYwSzMAitC0Y22WflEXzRRLpTMhrdT2EznSHdbVBjL89n1u5+LwCNzXcNai7OCoWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=AqXZ3HrE; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 47TJOnG0006749;
-	Thu, 29 Aug 2024 13:49:36 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=8ZgV0ouObOTgPUGVXOafkmiJ9bimlunCYI+l9w4Fzic=; b=
-	AqXZ3HrEwfOi4xLWLNRyE6rP/TeIQTPMLwG0f9P9sqSj5KcZdPwRV2zwcLpxw7LN
-	I/om22dgrz6cqW6mbFq2aiQCfvNdOrzDRl4cpTzhUejM6KpHgNEcge04eZ40+GB8
-	zVXzXxn+O9RgVkXXqJEAdA6xuDPp+tCqshmLdbay2hcrhbyOJlh2yI34vTil0H4v
-	iMUYxYHWbrCXkR8hsA71y5U4Sz1NUihQrRxzDPJr9FCNknCmUOoT+/v4d/hXszZ6
-	gSwYx+ljTuf+vzt+czrDJXdip+M8RwIraKgw3Fcb8gZZ0BQKvKsQo/JeL/7oChjv
-	zSduWeuTev9iXn32V2npYA==
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 41axcg0xde-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 29 Aug 2024 13:49:36 -0700 (PDT)
-Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server id
- 15.2.1544.11; Thu, 29 Aug 2024 20:49:35 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Willem de Bruijn
-	<willemb@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        David Ahern <dsahern@kernel.org>
-CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next 2/2] selftests: txtimestamp: add SCM_TS_OPT_ID test
-Date: Thu, 29 Aug 2024 13:49:22 -0700
-Message-ID: <20240829204922.1674865-2-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240829204922.1674865-1-vadfed@meta.com>
-References: <20240829204922.1674865-1-vadfed@meta.com>
+	s=arc-20240116; t=1724964740; c=relaxed/simple;
+	bh=CZgmP2vHL7CyU54Sd3tLAqg6Is4OTiS5iTG4A1Yfy9U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pK/NJ3+D7HoY7FBa64xYcchV4XSazgez+O3AGuaAW9KokPBc2yOphqoUjyQf8jr+Mkzouvt2tBqFK7THuYksHaS5j7iiT7v19Skk8H6eXLQOoudBXcul2Ba2u4FIEYz+AdoZHaULsacnOox7FcEuR/xLAJ/r03A6hCczVqEf14A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LodG1Mv6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A69DC4CEC1;
+	Thu, 29 Aug 2024 20:52:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724964740;
+	bh=CZgmP2vHL7CyU54Sd3tLAqg6Is4OTiS5iTG4A1Yfy9U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LodG1Mv6z/cyCDkb/QAxsJajE102YXxfVeC+HHEcMuSQR72SOk9DdmWyV8w2lLhlE
+	 CrRrJaz7CjhGneAvO3+7KPm/OkCLqs1MbS0HbM2gSrVJ/LKPrpPAcP6xGFzE4JAP4k
+	 JUMLpYZTT455qGgfemIJxntVuSIDPygZ3L87HD18dTNX7x4Jfpxlq5uVEBU4T1ETo9
+	 RCSeDbk7aDCXIV2FidY4QOvExShgWO2mksp0bFW/xDVsHHlsPXxCyAXhF0xOlcxaMc
+	 GGcuNsw/hk2U/s6eLBttnfOiV54xrVmo7TZVHV/Dxlh9iuCXyKx5m234EAwmYVFKt6
+	 SmYanM40FE1nw==
+Date: Thu, 29 Aug 2024 21:52:15 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, donald.hunter@gmail.com, sdf@fomichev.me,
+	martin.lau@kernel.org, ast@kernel.org, nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net-next] tools: ynl: error check scanf() in a sample
+Message-ID: <20240829205215.GB1368797@kernel.org>
+References: <20240828173609.2951335-1-kuba@kernel.org>
+ <20240828180246.GA2671728@kernel.org>
+ <20240829124315.0d765696@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: sIccqrKzSE8-NElMoSBeeP7vf8yEamKO
-X-Proofpoint-ORIG-GUID: sIccqrKzSE8-NElMoSBeeP7vf8yEamKO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-29_06,2024-08-29_02,2024-05-17_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240829124315.0d765696@kernel.org>
 
-Extend txtimestamp udp test to run with fixed tskey using
-SCM_TS_OPT_ID control message.
+On Thu, Aug 29, 2024 at 12:43:15PM -0700, Jakub Kicinski wrote:
+> On Wed, 28 Aug 2024 19:02:46 +0100 Simon Horman wrote:
+> > I was able to reproduce the problem on Ubuntu 22.04,
+> > although not on Fedora 40 or Debian Trixie.
+> 
+> Thanks for the info! Made me pause and consider putting the fix
+> in net, but it's just a warning..
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- tools/include/uapi/asm-generic/socket.h    |  2 +
- tools/testing/selftests/net/txtimestamp.c  | 48 +++++++++++++++++-----
- tools/testing/selftests/net/txtimestamp.sh |  1 +
- 3 files changed, 41 insertions(+), 10 deletions(-)
-
-diff --git a/tools/include/uapi/asm-generic/socket.h b/tools/include/uapi/asm-generic/socket.h
-index 54d9c8bf7c55..281df9139d2b 100644
---- a/tools/include/uapi/asm-generic/socket.h
-+++ b/tools/include/uapi/asm-generic/socket.h
-@@ -124,6 +124,8 @@
- #define SO_PASSPIDFD		76
- #define SO_PEERPIDFD		77
- 
-+#define SCM_TS_OPT_ID		78
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
-diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
-index ec60a16c9307..3a8f716e72ae 100644
---- a/tools/testing/selftests/net/txtimestamp.c
-+++ b/tools/testing/selftests/net/txtimestamp.c
-@@ -54,6 +54,10 @@
- #define USEC_PER_SEC	1000000L
- #define NSEC_PER_SEC	1000000000LL
- 
-+#ifndef SCM_TS_OPT_ID
-+# define SCM_TS_OPT_ID 78
-+#endif
-+
- /* command line parameters */
- static int cfg_proto = SOCK_STREAM;
- static int cfg_ipproto = IPPROTO_TCP;
-@@ -77,6 +81,8 @@ static bool cfg_epollet;
- static bool cfg_do_listen;
- static uint16_t dest_port = 9000;
- static bool cfg_print_nsec;
-+static uint32_t ts_opt_id;
-+static bool cfg_use_cmsg_opt_id;
- 
- static struct sockaddr_in daddr;
- static struct sockaddr_in6 daddr6;
-@@ -136,12 +142,13 @@ static void validate_key(int tskey, int tstype)
- 	/* compare key for each subsequent request
- 	 * must only test for one type, the first one requested
- 	 */
--	if (saved_tskey == -1)
-+	if (saved_tskey == -1 || cfg_use_cmsg_opt_id)
- 		saved_tskey_type = tstype;
- 	else if (saved_tskey_type != tstype)
- 		return;
- 
- 	stepsize = cfg_proto == SOCK_STREAM ? cfg_payload_len : 1;
-+	stepsize = cfg_use_cmsg_opt_id ? 0 : stepsize;
- 	if (tskey != saved_tskey + stepsize) {
- 		fprintf(stderr, "ERROR: key %d, expected %d\n",
- 				tskey, saved_tskey + stepsize);
-@@ -480,7 +487,7 @@ static void fill_header_udp(void *p, bool is_ipv4)
- 
- static void do_test(int family, unsigned int report_opt)
- {
--	char control[CMSG_SPACE(sizeof(uint32_t))];
-+	char control[2 * CMSG_SPACE(sizeof(uint32_t))];
- 	struct sockaddr_ll laddr;
- 	unsigned int sock_opt;
- 	struct cmsghdr *cmsg;
-@@ -620,18 +627,32 @@ static void do_test(int family, unsigned int report_opt)
- 		msg.msg_iov = &iov;
- 		msg.msg_iovlen = 1;
- 
--		if (cfg_use_cmsg) {
-+		if (cfg_use_cmsg || cfg_use_cmsg_opt_id) {
- 			memset(control, 0, sizeof(control));
- 
- 			msg.msg_control = control;
--			msg.msg_controllen = sizeof(control);
-+			msg.msg_controllen = cfg_use_cmsg * CMSG_SPACE(sizeof(uint32_t));
-+			msg.msg_controllen += cfg_use_cmsg_opt_id * CMSG_SPACE(sizeof(uint32_t));
- 
--			cmsg = CMSG_FIRSTHDR(&msg);
--			cmsg->cmsg_level = SOL_SOCKET;
--			cmsg->cmsg_type = SO_TIMESTAMPING;
--			cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+			cmsg = NULL;
-+			if (cfg_use_cmsg) {
-+				cmsg = CMSG_FIRSTHDR(&msg);
-+				cmsg->cmsg_level = SOL_SOCKET;
-+				cmsg->cmsg_type = SO_TIMESTAMPING;
-+				cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+
-+				*((uint32_t *)CMSG_DATA(cmsg)) = report_opt;
-+			}
-+			if (cfg_use_cmsg_opt_id) {
-+				cmsg = cmsg ? CMSG_NXTHDR(&msg, cmsg) : CMSG_FIRSTHDR(&msg);
-+				cmsg->cmsg_level = SOL_SOCKET;
-+				cmsg->cmsg_type = SCM_TS_OPT_ID;
-+				cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+
-+				*((uint32_t *)CMSG_DATA(cmsg)) = ts_opt_id;
-+				saved_tskey = ts_opt_id;
-+			}
- 
--			*((uint32_t *) CMSG_DATA(cmsg)) = report_opt;
- 		}
- 
- 		val = sendmsg(fd, &msg, 0);
-@@ -681,6 +702,7 @@ static void __attribute__((noreturn)) usage(const char *filepath)
- 			"  -L    listen on hostname and port\n"
- 			"  -n:   set no-payload option\n"
- 			"  -N:   print timestamps and durations in nsec (instead of usec)\n"
-+			"  -o N: use SCM_TS_OPT_ID control message to provide N as tskey\n"
- 			"  -p N: connect to port N\n"
- 			"  -P:   use PF_PACKET\n"
- 			"  -r:   use raw\n"
-@@ -701,7 +723,7 @@ static void parse_opt(int argc, char **argv)
- 	int c;
- 
- 	while ((c = getopt(argc, argv,
--				"46bc:CeEFhIl:LnNp:PrRS:t:uv:V:x")) != -1) {
-+				"46bc:CeEFhIl:LnNo:p:PrRS:t:uv:V:x")) != -1) {
- 		switch (c) {
- 		case '4':
- 			do_ipv6 = 0;
-@@ -742,6 +764,10 @@ static void parse_opt(int argc, char **argv)
- 		case 'N':
- 			cfg_print_nsec = true;
- 			break;
-+		case 'o':
-+			ts_opt_id = strtoul(optarg, NULL, 10);
-+			cfg_use_cmsg_opt_id = true;
-+			break;
- 		case 'p':
- 			dest_port = strtoul(optarg, NULL, 10);
- 			break;
-@@ -799,6 +825,8 @@ static void parse_opt(int argc, char **argv)
- 		error(1, 0, "cannot ask for pktinfo over pf_packet");
- 	if (cfg_busy_poll && cfg_use_epoll)
- 		error(1, 0, "pass epoll or busy_poll, not both");
-+	if (cfg_proto != SOCK_DGRAM && cfg_use_cmsg_opt_id)
-+		error(1, 0, "control message TS_OPT_ID can only be used with udp socket");
- 
- 	if (optind != argc - 1)
- 		error(1, 0, "missing required hostname argument");
-diff --git a/tools/testing/selftests/net/txtimestamp.sh b/tools/testing/selftests/net/txtimestamp.sh
-index 25baca4b148e..7894628a9355 100755
---- a/tools/testing/selftests/net/txtimestamp.sh
-+++ b/tools/testing/selftests/net/txtimestamp.sh
-@@ -39,6 +39,7 @@ run_test_tcpudpraw() {
- 
- 	run_test_v4v6 ${args}		# tcp
- 	run_test_v4v6 ${args} -u	# udp
-+	run_test_v4v6 ${args} -u -o 5	# udp with fixed tskey
- 	run_test_v4v6 ${args} -r	# raw
- 	run_test_v4v6 ${args} -R	# raw (IPPROTO_RAW)
- 	run_test_v4v6 ${args} -P	# pf_packet
--- 
-2.43.5
-
+Yes, it made me pause about sending my version of the patch.
+But I think it is worth fixing.
 
