@@ -1,175 +1,182 @@
-Return-Path: <netdev+bounces-123317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B2E296481F
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:24:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF980964830
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:25:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DFA51F21245
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:24:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69A6A1F21C86
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1071AE86C;
-	Thu, 29 Aug 2024 14:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37341B143A;
+	Thu, 29 Aug 2024 14:23:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nrj9J1mB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A+QFh/6n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4E41AED5D
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 14:21:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD4241C79
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 14:23:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724941270; cv=none; b=sLJbmkzLvm5UAuostyEQclUx+cVF/5VpbGZ6d8g/iZsD6lgBY9fAv3WZjVpzMNfXz+oGW7hdwoycujJlO/atrDqLAfc0RdGRaw4j37eVE2lX2TzAiEEvyNypJI/4GkxxYdf0gpmOF/dO989kqX/5q8AZExlpJKNCnkFx0DiLBkY=
+	t=1724941432; cv=none; b=ISExwr/ckPScF8qyu7aa/FtWKq5es527Qb1dqq9RTUMQCIlgweOl5qe33HuM4l3HaQmYS9rQvGjJh7MU8SjlA7I+sRR+l5CpgVNMTW9vhD98Zf3wNEHfDof0xXuD1Li29af25BWSWQi4ZGqyVsyTCX17gd98u2gPbZk59GOW8Go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724941270; c=relaxed/simple;
-	bh=rY92NaB3IEQufhIbuggha/WY2ONDWaf2dJeq0CH+Kyo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=pJIKz2DB9axOn7SXYmSobsRMwMTuCOzqIWl+cF4WKO/ab2W+M1zVwKV88+p0pYoP9T4p90wpIXZxWPLvjRa0vuQml+CI0BDxQ4dI3mc2PVftFU22J3kpV4tFy7of84jjFhItH6hktaL3pdyh6jEgotuje0h6/hoP/XMk3cz5m8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nrj9J1mB; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7a80511d124so40058185a.1
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 07:21:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724941267; x=1725546067; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PTyleNQXNts2lEgbMY/wuxS9ecKaluVvjjBQna3jpSU=;
-        b=Nrj9J1mB3YZwapvx6G4nv0nzi6AFTFbsD988OkyX3itnZuQjT2uAN9u2Yx0Tif7OQD
-         ePmMTbdDvb7AK0NweTM4lW5aHVKAtzfslYWPulYoyaARLF7Qw538sOu8/HhP3evTwCgh
-         Ls2/O8WGp6J7Mb33/9KFqanvF1Xv7Bp3rfFom7tEBxLsYyNcgc7qdCcUF53kHmN35R9z
-         kwoH0AXgHQwBIfLMnCGrl7fC4VrDjIcIuw+6HQO7ItdUPd17dMTZaApjFtoGaTYUEIW4
-         f1kyAw1G3NrqhU5Yao5eXxmo/fK9nR0zdpbUZ59mFAaMKFwQcjA54HoEPddWm0B119mY
-         9vdA==
+	s=arc-20240116; t=1724941432; c=relaxed/simple;
+	bh=qPoGd42IBzZ4QGCIKQdm0vMwov6rl40Xn2loXjcYRCY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qV33ytpaB7hYT89Gc7gs208X+DYRz5QKsFgUS1Qzhtpy6hQ6w41gGdZgWy7D+qkmJBdP5P2YtlmUdPtekadZBhOjftO1S7VUF3sNJquqGbOU1j7OHPeKH99WI9+iTc38RuYdSBTrDV//Dz4rMavyO70PKB3EACw9pwHWeCgu1Q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A+QFh/6n; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724941429;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ql1Ne45LZaHMxqlqyDYKdi5gydRbYI8USnMenQZimU8=;
+	b=A+QFh/6nm1ekASyxlpoQtkiRZea6F72AmAE8eqFEZxINGzHOgFIXUB6NffJVkpEAokahLr
+	SVOe0d5yOJDUtRUqwpTkRP/cUZP8kE9XpHcKpIADtbmJzq3H4TwilDiEzv1OMW/uROe8jM
+	w+QN4ajqw4jTErvn5QoeJwcARACxiA4=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-302-G78KCA7QN2q6TMMU6z_lZg-1; Thu, 29 Aug 2024 10:23:46 -0400
+X-MC-Unique: G78KCA7QN2q6TMMU6z_lZg-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2f3f61b42c2so8732581fa.3
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 07:23:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724941267; x=1725546067;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=PTyleNQXNts2lEgbMY/wuxS9ecKaluVvjjBQna3jpSU=;
-        b=X1MrEOyOeLP+Uf11Rwh+fRdum+O3y3a7XKPObhK8omYgjX3Advu8qLtRu+Pk0YUEQL
-         hb5GV+gwbeVwJWabmya3yFGTiya7HvlVvYs10+wX+wFOyzzAdF3WjmE4HMHu8zQICMCI
-         V751/Jxz2MF9U7/Gk9SpsSw934T18N/c4iX73XI1KDZLcDLo60Nx1hDUB4hWpv19axdu
-         NhC9iKmWlExKizCSmrDBzAIxvWn9S8gNGuk/GvhrTCFl62y+74WDLvTxnlRRMw93om0v
-         bo9/seDzbYtFoog+PDt0ev8BDjrDXBq6IapBRT07YhuFluUXkOmN/f3ipn//n26KyeA8
-         4PYw==
-X-Gm-Message-State: AOJu0YwuzA8IfillfwwJrfgSdhIi4GhoXICnOk29AIJKw2g+dYnHOrBB
-	D+x9ocBCoKrT9hbqdipRaJM4gRow/uRKox/bZ9dS80jUKmaFKH+7xKOA+A==
-X-Google-Smtp-Source: AGHT+IGP6WKWFJrj0QakZQTH1ZdWNEKE6vPnVIQq9u2UZU+L7SoInKyBCYJIvxlOvcOmZHGbIoBvRA==
-X-Received: by 2002:a05:6214:3185:b0:6b0:7f0c:d30e with SMTP id 6a1803df08f44-6c33e615c62mr35593406d6.10.1724941267246;
-        Thu, 29 Aug 2024 07:21:07 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340bfa6c5sm5541866d6.8.2024.08.29.07.21.06
+        d=1e100.net; s=20230601; t=1724941425; x=1725546225;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ql1Ne45LZaHMxqlqyDYKdi5gydRbYI8USnMenQZimU8=;
+        b=rjHa9Xb9qKW4cQ613UOKVHIm4bihUIEKNzgJxU0Lx0x80FmAKuphho/SN2g285cgy8
+         LnCMbbJf3Y4cUdHg/gXVq/YPve9sOS18o9NEu3n5L7Zt53kSngJYs7jrnZF1sbhQWi7m
+         ms8my4KqhrsLaG+LyBLiObYP0L6mFAYWWSmvNcOhrbazmKmoxUhu1EkTO1RsIvZfVJD9
+         c6mu7ba9Kg6enqxWWsX8wYnrL7TgZc4IGGVX7FSNEyQ5xqkRDaebqER7CwT88366lCTv
+         2YhWU9h35Cnfsbv67ZpyymiakmVEoqzDvZo+fJORTCh8WZPqfy+LBZ4aaAKRGNigyg2R
+         d/+w==
+X-Forwarded-Encrypted: i=1; AJvYcCV2Q8gCXREId1cqXyv2C5EDVrokH1XlN+i2OrbL6Tb31HFomWkt6cWKR3KvH8Duw8dhLR+EZkM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxzEW/zyXF3Vn54A17VowWUqc4ZDqEseoRFFf8/E32DU2jqdHda
+	FpgClVIuJELtEpC75ZV6IM5yxpbZ8kUdIQ6laeA5JrGhS/X1IH1JHxjvnntsewap/qgE8MH9eC+
+	Un7CkLjfeYR4u5jO1NSkY9vBUX6QXJxOKp6szvJEd6KGOSwtATH+nVg==
+X-Received: by 2002:a05:6512:3e1b:b0:532:fb9e:a175 with SMTP id 2adb3069b0e04-5353e54320emr3380660e87.6.1724941425062;
+        Thu, 29 Aug 2024 07:23:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFORO8WjY/vuiIa32r8sJHMtCMpPhEFpMY3fd+SrJTy3Fj3cveqXXWkkApSrWhroGzyUo6WIg==
+X-Received: by 2002:a05:6512:3e1b:b0:532:fb9e:a175 with SMTP id 2adb3069b0e04-5353e54320emr3380605e87.6.1724941423996;
+        Thu, 29 Aug 2024 07:23:43 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:17c:f3dd:4b1c:bb80:a038:2df3])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a89891a3e52sm84049166b.116.2024.08.29.07.23.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 07:21:06 -0700 (PDT)
-Date: Thu, 29 Aug 2024 10:21:06 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemb@google.com
-Cc: netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Message-ID: <66d083d24aa8c_3895fa294d5@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240828160145.68805-3-kerneljasonxing@gmail.com>
-References: <20240828160145.68805-1-kerneljasonxing@gmail.com>
- <20240828160145.68805-3-kerneljasonxing@gmail.com>
-Subject: Re: [PATCH net-next v2 2/2] net: make SOF_TIMESTAMPING_RX_SOFTWARE
- feature per socket
+        Thu, 29 Aug 2024 07:23:43 -0700 (PDT)
+Date: Thu, 29 Aug 2024 10:23:35 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>,
+	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>, Andy Shevchenko <andy@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
+	John Garry <john.g.garry@oracle.com>, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, virtualization@lists.linux.dev,
+	stable@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH v5 6/7] vdpa: solidrun: Fix UB bug with devres
+Message-ID: <20240829102320-mutt-send-email-mst@kernel.org>
+References: <20240829141844.39064-1-pstanner@redhat.com>
+ <20240829141844.39064-7-pstanner@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240829141844.39064-7-pstanner@redhat.com>
 
-Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On Thu, Aug 29, 2024 at 04:16:25PM +0200, Philipp Stanner wrote:
+> In psnet_open_pf_bar() and snet_open_vf_bar() a string later passed to
+> pcim_iomap_regions() is placed on the stack. Neither
+> pcim_iomap_regions() nor the functions it calls copy that string.
 > 
-> Like the previous patch in this series, we need to make sure that
-> we both set SOF_TIMESTAMPING_SOFTWARE and SOF_TIMESTAMPING_RX_SOFTWARE
-> flags together so that we can let the user parse the rx timestamp.
+> Should the string later ever be used, this, consequently, causes
+> undefined behavior since the stack frame will by then have disappeared.
 > 
-> One more important and special thing is that we should take care of
-> errqueue recv path because we rely on errqueue to get our timestamps
-> for sendmsg(). Or else, If the user wants to read when setting
-> SOF_TIMESTAMPING_TX_ACK, something like this, we cannot get timestamps,
-> for example, in TCP case. So we should consider those
-> SOF_TIMESTAMPING_TX_* flags.
+> Fix the bug by allocating the strings on the heap through
+> devm_kasprintf().
 > 
-> After this patch, we are able to pass the testcase 6 for IP and UDP
-> cases when running ./rxtimestamp binary.
-> 
-> Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> Cc: stable@vger.kernel.org	# v6.3
+> Fixes: 51a8f9d7f587 ("virtio: vdpa: new SolidNET DPU driver.")
+> Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Closes: https://lore.kernel.org/all/74e9109a-ac59-49e2-9b1d-d825c9c9f891@wanadoo.fr/
+> Suggested-by: Andy Shevchenko <andy@kernel.org>
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+
+Post this separately, so I can apply?
+
+
 > ---
->  Documentation/networking/timestamping.rst |  7 +++++++
->  include/net/sock.h                        |  7 ++++---
->  net/bluetooth/hci_sock.c                  |  4 ++--
->  net/core/sock.c                           |  2 +-
->  net/ipv4/ip_sockglue.c                    |  2 +-
->  net/ipv4/ping.c                           |  2 +-
->  net/ipv6/datagram.c                       |  4 ++--
->  net/l2tp/l2tp_ip.c                        |  2 +-
->  net/l2tp/l2tp_ip6.c                       |  2 +-
->  net/nfc/llcp_sock.c                       |  2 +-
->  net/rxrpc/recvmsg.c                       |  2 +-
->  net/socket.c                              | 11 ++++++++---
->  net/unix/af_unix.c                        |  2 +-
->  13 files changed, 31 insertions(+), 18 deletions(-)
+>  drivers/vdpa/solidrun/snet_main.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
 > 
-> diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
-> index 5e93cd71f99f..93378b78c6dd 100644
-> --- a/Documentation/networking/timestamping.rst
-> +++ b/Documentation/networking/timestamping.rst
-> @@ -160,6 +160,13 @@ SOF_TIMESTAMPING_RAW_HARDWARE:
->    Report hardware timestamps as generated by
->    SOF_TIMESTAMPING_TX_HARDWARE when available.
+> diff --git a/drivers/vdpa/solidrun/snet_main.c b/drivers/vdpa/solidrun/snet_main.c
+> index 99428a04068d..c8b74980dbd1 100644
+> --- a/drivers/vdpa/solidrun/snet_main.c
+> +++ b/drivers/vdpa/solidrun/snet_main.c
+> @@ -555,7 +555,7 @@ static const struct vdpa_config_ops snet_config_ops = {
 >  
-> +Please note: previously, if an application starts first which turns on
-> +netstamp_needed_key, then another one only passing SOF_TIMESTAMPING_SOFTWARE
-> +could also get rx timestamp. Now we handle this case and will not get
-> +rx timestamp under this circumstance. We encourage that for each socket
-> +we should use the SOF_TIMESTAMPING_RX_SOFTWARE generation flag to time
-> +stamp the skb and use SOF_TIMESTAMPING_SOFTWARE report flag to tell
-> +the application.
-
-Don't mention previously. Readers will not be aware of when this
-Documentation was added.
-
-Also, nit: no "Please note". Else every paragraph can start with that,
-as each statement should be noteworthy.
-
+>  static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet *psnet)
+>  {
+> -	char name[50];
+> +	char *name;
+>  	int ret, i, mask = 0;
+>  	/* We don't know which BAR will be used to communicate..
+>  	 * We will map every bar with len > 0.
+> @@ -573,7 +573,10 @@ static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet *psnet)
+>  		return -ENODEV;
+>  	}
 >  
->  1.3.3 Timestamp Options
->  ^^^^^^^^^^^^^^^^^^^^^^^
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index cce23ac4d514..b8535692f340 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -2600,12 +2600,13 @@ static inline void sock_write_timestamp(struct sock *sk, ktime_t kt)
->  }
+> -	snprintf(name, sizeof(name), "psnet[%s]-bars", pci_name(pdev));
+> +	name = devm_kasprintf(&pdev->dev, GFP_KERNEL, "psnet[%s]-bars", pci_name(pdev));
+> +	if (!name)
+> +		return -ENOMEM;
+> +
+>  	ret = pcim_iomap_regions(pdev, mask, name);
+>  	if (ret) {
+>  		SNET_ERR(pdev, "Failed to request and map PCI BARs\n");
+> @@ -590,10 +593,13 @@ static int psnet_open_pf_bar(struct pci_dev *pdev, struct psnet *psnet)
 >  
->  void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
-> -			   struct sk_buff *skb);
-> +			   struct sk_buff *skb, bool errqueue);
->  void __sock_recv_wifi_status(struct msghdr *msg, struct sock *sk,
->  			     struct sk_buff *skb);
+>  static int snet_open_vf_bar(struct pci_dev *pdev, struct snet *snet)
+>  {
+> -	char name[50];
+> +	char *name;
+>  	int ret;
+>  
+> -	snprintf(name, sizeof(name), "snet[%s]-bar", pci_name(pdev));
+> +	name = devm_kasprintf(&pdev->dev, GFP_KERNEL, "snet[%s]-bars", pci_name(pdev));
+> +	if (!name)
+> +		return -ENOMEM;
+> +
+>  	/* Request and map BAR */
+>  	ret = pcim_iomap_regions(pdev, BIT(snet->psnet->cfg.vf_bar), name);
+>  	if (ret) {
+> -- 
+> 2.46.0
 
-I suspect that the direction, ingress or egress, and thus whether the
-timestamp is to be queued on the error queue or not, can be inferred
-without exceptions from skb->pkt_type == PACKET_OUTGOING.
-
-That would avoid all this boilerplate argument passing.
 
