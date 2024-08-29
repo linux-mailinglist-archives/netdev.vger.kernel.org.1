@@ -1,105 +1,183 @@
-Return-Path: <netdev+bounces-123182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94E25963FA7
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 11:15:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BAC9963FA9
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 11:16:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5359A28723E
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 09:15:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A81028721D
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 09:16:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0C318CC07;
-	Thu, 29 Aug 2024 09:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="f6eT+iev"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4BB018CC0D;
+	Thu, 29 Aug 2024 09:16:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB9918C922
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 09:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CD118C33A;
+	Thu, 29 Aug 2024 09:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724922948; cv=none; b=mxPkEgd7H7SoSGZ9PRofg/pmKO4+kfMShMa3Gv1OI0xbJ78WIxs1IYZflRF4oFo4WzrsbCpedg6bJwTr0iRAz5i+/LxmdPcrUjJfG9t71SqyOnBsJy/hQGlEusuTdTMON7E+x6vCaA7InbnTZfMedzhr0n+3edCdIyhvEP49SDg=
+	t=1724922971; cv=none; b=E0ecbMr6mLu885oVv/CL7FHdYe46cgMMs/FQKB/9EGtFRlgtF8+/LRWd4zBy+pEwCyhOMQK5Ieq1zt14JOmovgSLTVePxUZBk8MMuTmVKHpSudXsjdyUYZwObYQUmZ18STZ+tNQktkaZY+OAt0oxcDfqBuBbCeMppiWYcbGt8N0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724922948; c=relaxed/simple;
-	bh=bEolJSCCdLQnijiAHENGikR4W9YgQCYail9qjfENyV0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kQgbyIy30q9Yhj1HE4gghFMWndlnSq+Wh8DOgyLD/5yYhRbkiRja45rPExiEsUK7Fai6nfU0HUcql6m34ge4UvYGaKCZxwmW/fsyWTO51OKHavPvgmvvFc3anqzkeFch4dO/uHxl9R32kDuXirjQWBexeTjnSl7r0Yu/i9RPkBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=f6eT+iev; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from ubuntu.home (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 6F2AE200A8CE;
-	Thu, 29 Aug 2024 11:15:38 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 6F2AE200A8CE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1724922938;
-	bh=nJUAxlFWAHHNJToyYWUBw0GVs/2O/iv+y4XtUkvqwKQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=f6eT+ievrID1O5RqudnqEd0jz4rNjkXCF1UG5UPr1C9dF0vbfKgmkCK+c9biH+dby
-	 p63/24DNQD98AuUqYhTVPLGe09g+Zq1m2e8cM+jwYbqC9FXQYlqak+1BgkDfX/GuGi
-	 EGaq1dtnpjYDG0wo+Jl25hzehu5OttZr7T8gmUiAK4nsYzZCrzsnK3yIKhzoDu5sOr
-	 KWP+mZchayH+jU5IDfGR1oiYgwX+amB8aDVH7bFZcV2VXkW2DdNJ/I7BU4gAvX2b4L
-	 nALkAmbtKm7SkiQ1l0PdhrTXE21LYSQas7NtczRgCK5deBmZKqNNAkwXMCYF4LtqXF
-	 NPg48JZbAedsQ==
-From: Justin Iurman <justin.iurman@uliege.be>
-To: netdev@vger.kernel.org
-Cc: dsahern@kernel.org,
-	stephen@networkplumber.org,
-	justin.iurman@uliege.be
-Subject: [PATCH iproute2-next v3 2/2] man8: ip-route: update documentation
-Date: Thu, 29 Aug 2024 11:15:24 +0200
-Message-Id: <20240829091524.8466-3-justin.iurman@uliege.be>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240829091524.8466-1-justin.iurman@uliege.be>
-References: <20240829091524.8466-1-justin.iurman@uliege.be>
+	s=arc-20240116; t=1724922971; c=relaxed/simple;
+	bh=xCDBkZb7O6CRtQvx2dqH72aOufa9musXZqVC7/rDEx8=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nlopRYnywQSRlyw3ND4Ewc4XoD0DS+4Eu98OGSRQA9xLcO2g4JerKHXjIdRweof0v/h2Vdgijrb2uN2ttzzDj9wRlMwLrlKFw6/uBNZeGfQ1VjoRzThbesazN2utR05+Pi+zCGeYPkIX2OvH5ePqBFXALwfGjgU0KGtdp4Ae8rE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas11t1724922944t046t35655
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.120.181.182])
+X-QQ-SSF:00400000000000F0FVF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 13568882007759203019
+To: "'Andy Shevchenko'" <andriy.shevchenko@linux.intel.com>
+Cc: <andi.shyti@kernel.org>,
+	<jarkko.nikula@linux.intel.com>,
+	<mika.westerberg@linux.intel.com>,
+	<jsd@semihalf.com>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<rmk+kernel@armlinux.org.uk>,
+	<andrew@lunn.ch>,
+	<linux-i2c@vger.kernel.org>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<duanqiangwen@net-swift.com>,
+	<stable@vger.kernel.org>
+References: <20240823030242.3083528-1-jiawenwu@trustnetic.com> <20240823030242.3083528-4-jiawenwu@trustnetic.com> <ZsiZALjnoUpb0H_I@smile.fi.intel.com>
+In-Reply-To: <ZsiZALjnoUpb0H_I@smile.fi.intel.com>
+Subject: RE: [PATCH net 3/3] i2c: designware: support hardware lock for Wangxun 10Gb NIC
+Date: Thu, 29 Aug 2024 17:15:42 +0800
+Message-ID: <02a901daf9f4$063e8cf0$12bba6d0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQH8I/V4PrHZ+O/IFu6cfIurHK/3+gFePmA/AWrgqE+x5VSz4A==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Include "tunsrc" in the man page.
+On Fri, Aug 23, 2024 10:13 PM, Andy Shevchenko wrote:
+> On Fri, Aug 23, 2024 at 11:02:42AM +0800, Jiawen Wu wrote:
+> > Support acquire_lock() and release_lock() for Wangxun 10Gb NIC. Since the
+> > firmware needs to access I2C all the time for some features, the semaphore
+> > is used between software and firmware. The driver should set software
+> > semaphore before accessing I2C bus and release it when it is finished.
+> > Otherwise, there is probability that the correct information on I2C bus
+> > will not be obtained.
+> 
+> ...
+> 
+> >  i2c-designware-core-$(CONFIG_I2C_DESIGNWARE_SLAVE) 	+= i2c-designware-slave.o
+> 
+> >  i2c-designware-platform-y 				:= i2c-designware-platdrv.o
+> > +i2c-designware-platform-y 				+= i2c-designware-wx.o
+> 
+> These lines have TABs/spaces mixture. Please fix at least your entry to avoid
+> this from happening.
+> 
+> 
+> ...
+> 
+> >  int i2c_dw_amdpsp_probe_lock_support(struct dw_i2c_dev *dev);
+> >  #endif
+> 
+> ^^^
+> 
+> > +int i2c_dw_txgbe_probe_lock_support(struct dw_i2c_dev *dev);
+> 
+> See below.
+> 
+> ...
+> 
+> >  		.probe = i2c_dw_amdpsp_probe_lock_support,
+> >  	},
+> >  #endif
+> 
+> ^^^
+> 
+> > +	{
+> > +		.probe = i2c_dw_txgbe_probe_lock_support,
+> > +	},
+> 
+> Do we all need this support? Even if the driver is not compiled? Why?
 
-Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
----
- man/man8/ip-route.8.in | 8 ++++++++
- 1 file changed, 8 insertions(+)
+I'll add the macro CONFIG_I2C_DESIGNWARE_WX to control it.
 
-diff --git a/man/man8/ip-route.8.in b/man/man8/ip-route.8.in
-index df49f8b0..676f289a 100644
---- a/man/man8/ip-route.8.in
-+++ b/man/man8/ip-route.8.in
-@@ -253,6 +253,8 @@ throw " | " unreachable " | " prohibit " | " blackhole " | " nat " ]"
- .IR K "/" N " ] "
- .BR mode " [ "
- .BR inline " | " encap " | " auto " ] ["
-+.B tunsrc
-+.IR ADDRESS " ] ["
- .B tundst
- .IR ADDRESS " ] "
- .B trace
-@@ -1037,6 +1039,12 @@ divisible by 8. This attribute can be used only with NEXT-C-SID flavor.
- packets.
- .sp
+> ...
+> 
+> > +#include <linux/platform_data/i2c-wx.h>
+> > +#include <linux/platform_device.h>
+> > +#include <linux/i2c.h>
+> > +#include <linux/pci.h>
+> 
+> This is a semi-random list. Please, take your time to understand the core you
+> wrote. Follow IWYU principle.
+> 
+> ...
+> 
+> > +static int i2c_dw_txgbe_acquire_lock(struct dw_i2c_dev *dev)
+> > +{
+> > +	void __iomem *req_addr;
+> > +	u32 swsm;
+> > +	int i;
+> > +
+> > +	req_addr = dev->ext + I2C_DW_TXGBE_MNG_SW;
+> > +
+> > +	for (i = 0; i < I2C_DW_TXGBE_REQ_RETRY_CNT; i++) {
+> 
+> Retry loops much better in a form of
+> 
+> 	unsigned int retries = ...;
+> 	...
+> 	do {
+> 		...
+> 	} while (--retries);
+> 
+> BUT... see below.
+> 
+> > +		writel(I2C_DW_TXGBE_MNG_SW_SM, req_addr);
+> > +
+> > +		/* If we set the bit successfully then we got semaphore. */
+> > +		swsm = readl(req_addr);
+> > +		if (swsm & I2C_DW_TXGBE_MNG_SW_SM)
+> > +			break;
+> > +
+> > +		udelay(50);
+> 
+> So, can a macro from iopoll.h be utilised here? Why not?
+
+I need to write the register first and then read it in this loop.
+It does not seem to apply to the macros in iopoll.h.
+
+> > +	}
+> > +
+> > +	if (i == I2C_DW_TXGBE_REQ_RETRY_CNT)
+> > +		return -ETIMEDOUT;
+> > +
+> > +	return 0;
+> > +}
+> 
+> > +int i2c_dw_txgbe_probe_lock_support(struct dw_i2c_dev *dev)
+> > +{
+> > +	struct platform_device *pdev = to_platform_device(dev->dev);
+> 
+> Why do you need this dance? I.o.w. how pdev is being used here?
+
+I'll change to add the data in node property.
  
-+.B tunsrc
-+.I ADDRESS
-+- IPv6 address of the tunnel source (outer header), not used with inline mode.
-+It is optional: if not provided, the tunnel source address is chosen
-+automatically.
-+
- .B tundst
- .I ADDRESS
- - IPv6 address of the tunnel destination (outer header), not used with inline
--- 
-2.34.1
 
 
