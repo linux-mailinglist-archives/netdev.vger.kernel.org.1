@@ -1,174 +1,339 @@
-Return-Path: <netdev+bounces-123529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77A86965321
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 00:52:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 224AF965338
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 00:56:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92E821C215F3
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 22:52:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCF6E282511
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 22:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3021BB695;
-	Thu, 29 Aug 2024 22:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D481BAEF0;
+	Thu, 29 Aug 2024 22:55:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="vEfOLRsT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00EA61BAEE8
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 22:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0BF1BA860
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 22:55:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724971942; cv=none; b=XmiDhtoYHtQ+y6YLztAUYfoJro2XiriiTkvs0WSuN1O1S6cK9g0WbcEIPnE9fDTCHTX/XefgXD80KvwFaOdthw8/ZZW/cBnZUjA9NnmRdPVaw5JUas/V2iZDNmBMClGQ7XpSRVZl6BOk5f4WYCG/cFiBNGjlxD1S2M2neRyMoKw=
+	t=1724972119; cv=none; b=lyX8kMOsmAT+AnGaZ0NNFSipuO6APuicXPWtRngx0xpU39qUwAXDqwnlKPN4MKNRU03o9ihi/crKY/gZvAOD+1ThMiawAHMveouVqX6xyF1m0wgfJlxYFRX7hhAvlKrg/mheTsercyZJrBQdnX1vih5kQ2aE6n8jXqgrVI4LN8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724971942; c=relaxed/simple;
-	bh=ViWdrCt6a6K0Vj2wiEIRR3LaPMEKuEhY7asSNTKq/y8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YqTxxZRonHfZIJdsnnhx1moFdASjX9nLsxLfGQJF6lbnhanc/7NAO4lEFu2Ap4loatUJJaH9zUCJcdAnF+lwPC2diR3vDye03cv/q+bFRFWk+EjfypLAYtXUXnI1/vl+0B5P8IFP99IV4bCYVp+SechvJqE5yNUcMaCASu/b8DI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-82a217cec1fso96835939f.0
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 15:52:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724971940; x=1725576740;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bumZo3FBLWya88IH5IRSKgIMdpWcn/AV4Rx++TefK60=;
-        b=eCybWHO1x6/jdbLXaLwVBiPP864r8/mT22wIAXv5ZD1bWV6CZY2PN6mMATeRy41uqv
-         avPaXfuFIVhXtCGBHo0HJBVPcgm+je4+Rm9cQusUVUt9zZ3AzeJUzjpy0tbzzC8wffVc
-         fd+7PoNjxC3JFbUE7pR4D2/2KPYO7RToe32gucNAEv9KLTQ7FU1sPr5BIXi/rdutVqzT
-         bo3PyBc/C51UqLpLrQ2rSLzkuzfLQ1Nq0hK+FQpX9OiDp1KLzxgCEdoz2xW95B90XlaW
-         CAGe/uz6Ku1+kQzfNp7BcoLqDAacFtdCEi+XYSmBN19XqMGrOVEILRTOLZjlQk6SuxPr
-         mxJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWg5F+K7k5xpP/XA81xXwAFNIrklqBceett/5E0XmW3YKzxRgfSgkuy6uTRJRjSt86f+9N82qk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEazJB5B0U92GM23fZaPRwfh5GeCdb9mZ2VkcxdLEbZtW4ce3r
-	EYIPOWR0/kIgQlgtb4cRihtpwy/B7FYi+a4nrTHH6IU0qL01Pynn1vtthMMPzhVezDdF+MI/yxu
-	4S8GAbB3Y1NHtqJB/+Ux6GXGr9xaSESRpp269rURHFHMV8X2ajwVNudQ=
-X-Google-Smtp-Source: AGHT+IGMVjRWPf9J8J2cG2Beb5loxdx6ExYiJMpdm+PK8UtMyNFEuSYgi+X3bNn5RcXJ7OigzZA5DkGq1PI46wNCdBe48o/kCC3t
+	s=arc-20240116; t=1724972119; c=relaxed/simple;
+	bh=1ssNnL/k5bFru9h42AxcidaH4ax80+FvxxXdgP44aoI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HIO9YeaI3cMimGf7KaDZNWrQJQndPI06VklwVOUM+dCxixcBdJnDqW9I9F1GTtAdLs4oahs3l+sk+UoFrGI3keRgYtnrg6VhU5k5P3phgk7HqJABsvP5yedDLJBOpzYSMUiLjqmDXvewwxFeMMPofsGbkruZYfPUOaMKopwmNaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=vEfOLRsT; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1724972118; x=1756508118;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=YHbKDmxWbzWr5hI6s+kAruFeF3UB7hOdkRJaiOEWF6A=;
+  b=vEfOLRsTVzkLx7RcPCEiuXr4yizaWZDlj+r8FZb8zq9LnMpCZuS/4OFZ
+   tQnQzGQdkBSJPhpGX71CePuTfD+jtDtlC8mpqV0uEI0ElMa4Ua50/Gn8T
+   tvSXX3pQej/b8Bet42HlczHN7yvJ+ZOOqJeMfS/oh/f0KrlJKbPHWNy2Q
+   g=;
+X-IronPort-AV: E=Sophos;i="6.10,186,1719878400"; 
+   d="scan'208";a="228566366"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 22:55:15 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:21263]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.174:2525] with esmtp (Farcaster)
+ id 88b11d53-6878-4e39-9135-7a0f475443a5; Thu, 29 Aug 2024 22:55:13 +0000 (UTC)
+X-Farcaster-Flow-ID: 88b11d53-6878-4e39-9135-7a0f475443a5
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 29 Aug 2024 22:55:13 +0000
+Received: from 88665a182662.ant.amazon.com (10.142.208.236) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Thu, 29 Aug 2024 22:55:11 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <omid.ehtemamhaghighi@menlosecurity.com>
+CC: <adrian.oliver@menlosecurity.com>, <dsahern@gmail.com>,
+	<edumazet@google.com>, <idosch@idosch.org>, <netdev@vger.kernel.org>,
+	<kuniyu@amazon.com>
+Subject: Re: [PATCH v3] net/ipv6: Fix soft lockups in fib6_select_path under high next hop churn
+Date: Thu, 29 Aug 2024 15:55:03 -0700
+Message-ID: <20240829225503.48563-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240829222803.448995-1-omid.ehtemamhaghighi@menlosecurity.com>
+References: <20240829222803.448995-1-omid.ehtemamhaghighi@menlosecurity.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:892a:b0:4c2:7945:5a32 with SMTP id
- 8926c6da1cb9f-4d017ee53f1mr8917173.5.1724971940197; Thu, 29 Aug 2024 15:52:20
- -0700 (PDT)
-Date: Thu, 29 Aug 2024 15:52:20 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000be46510620da5362@google.com>
-Subject: [syzbot] [net?] WARNING in hsr_fill_frame_info
-From: syzbot <syzbot+3d602af7549af539274e@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D031UWC002.ant.amazon.com (10.13.139.212) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello,
+From: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>
+Date: Thu, 29 Aug 2024 15:28:03 -0700
+> Soft lockups have been observed on a cluster of Linux-based edge routers
+> located in a highly dynamic environment. Using the `bird` service, these
+> routers continuously update BGP-advertised routes due to frequently
+> changing nexthop destinations, while also managing significant IPv6
+> traffic. The lockups occur during the traversal of the multipath
+> circular linked-list in the `fib6_select_path` function, particularly
+> while iterating through the siblings in the list. The issue typically
+> arises when the nodes of the linked list are unexpectedly deleted
+> concurrently on a different core—indicated by their 'next' and
+> 'previous' elements pointing back to the node itself and their reference
+> count dropping to zero. This results in an infinite loop, leading to a
+> soft lockup that triggers a system panic via the watchdog timer.
+> 
+> To fix this issue, I applied RCU primitives in the problematic code
+> sections, which successfully resolved the issue within our testing
+> parameters and in the production environment where the issue was first
+> observed. Additionally, all references to fib6_siblings have been updated
+> to annotate or use the RCU APIs.
+> 
+> A test script that reproduces this issue is included with this patch. The
+> script periodically updates the routing table while generating a heavy load
+> of outgoing IPv6 traffic through multiple iperf3 clients. I have tested
+> this script on various machines, ranging from low to high performance, as
+> detailed in the comment section of the test script. It consistently induces
+> soft lockups within a minute.
+> 
+> Kernel log:
+> 
+>  0 [ffffbd13003e8d30] machine_kexec at ffffffff8ceaf3eb
+>  1 [ffffbd13003e8d90] __crash_kexec at ffffffff8d0120e3
+>  2 [ffffbd13003e8e58] panic at ffffffff8cef65d4
+>  3 [ffffbd13003e8ed8] watchdog_timer_fn at ffffffff8d05cb03
+>  4 [ffffbd13003e8f08] __hrtimer_run_queues at ffffffff8cfec62f
+>  5 [ffffbd13003e8f70] hrtimer_interrupt at ffffffff8cfed756
+>  6 [ffffbd13003e8fd0] __sysvec_apic_timer_interrupt at ffffffff8cea01af
+>  7 [ffffbd13003e8ff0] sysvec_apic_timer_interrupt at ffffffff8df1b83d
+> -- <IRQ stack> --
+>  8 [ffffbd13003d3708] asm_sysvec_apic_timer_interrupt at ffffffff8e000ecb
+>     [exception RIP: fib6_select_path+299]
+>     RIP: ffffffff8ddafe7b  RSP: ffffbd13003d37b8  RFLAGS: 00000287
+>     RAX: ffff975850b43600  RBX: ffff975850b40200  RCX: 0000000000000000
+>     RDX: 000000003fffffff  RSI: 0000000051d383e4  RDI: ffff975850b43618
+>     RBP: ffffbd13003d3800   R8: 0000000000000000   R9: ffff975850b40200
+>     R10: 0000000000000000  R11: 0000000000000000  R12: ffffbd13003d3830
+>     R13: ffff975850b436a8  R14: ffff975850b43600  R15: 0000000000000007
+>     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+>  9 [ffffbd13003d3808] ip6_pol_route at ffffffff8ddb030c
+> 10 [ffffbd13003d3888] ip6_pol_route_input at ffffffff8ddb068c
+> 11 [ffffbd13003d3898] fib6_rule_lookup at ffffffff8ddf02b5
+> 12 [ffffbd13003d3928] ip6_route_input at ffffffff8ddb0f47
+> 13 [ffffbd13003d3a18] ip6_rcv_finish_core.constprop.0 at ffffffff8dd950d0
+> 14 [ffffbd13003d3a30] ip6_list_rcv_finish.constprop.0 at ffffffff8dd96274
+> 15 [ffffbd13003d3a98] ip6_sublist_rcv at ffffffff8dd96474
+> 16 [ffffbd13003d3af8] ipv6_list_rcv at ffffffff8dd96615
+> 17 [ffffbd13003d3b60] __netif_receive_skb_list_core at ffffffff8dc16fec
+> 18 [ffffbd13003d3be0] netif_receive_skb_list_internal at ffffffff8dc176b3
+> 19 [ffffbd13003d3c50] napi_gro_receive at ffffffff8dc565b9
+> 20 [ffffbd13003d3c80] ice_receive_skb at ffffffffc087e4f5 [ice]
+> 21 [ffffbd13003d3c90] ice_clean_rx_irq at ffffffffc0881b80 [ice]
+> 22 [ffffbd13003d3d20] ice_napi_poll at ffffffffc088232f [ice]
+> 23 [ffffbd13003d3d80] __napi_poll at ffffffff8dc18000
+> 24 [ffffbd13003d3db8] net_rx_action at ffffffff8dc18581
+> 25 [ffffbd13003d3e40] __do_softirq at ffffffff8df352e9
+> 26 [ffffbd13003d3eb0] run_ksoftirqd at ffffffff8ceffe47
+> 27 [ffffbd13003d3ec0] smpboot_thread_fn at ffffffff8cf36a30
+> 28 [ffffbd13003d3ee8] kthread at ffffffff8cf2b39f
+> 29 [ffffbd13003d3f28] ret_from_fork at ffffffff8ce5fa64
+> 30 [ffffbd13003d3f50] ret_from_fork_asm at ffffffff8ce03cbb
+> 
+> Fixes: 51ebd3181572 ("ipv6: add support of equal cost multipath (ECMP)")
+> Reported-by: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>
+> Tested-by: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>
 
-syzbot found the following issue on:
-
-HEAD commit:    5be63fc19fca Linux 6.11-rc5
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=150a2d8d980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=8605cd35ddc8ff3c
-dashboard link: https://syzkaller.appspot.com/bug?extid=3d602af7549af539274e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15d1f76b980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17d49305980000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/13cdc3162477/disk-5be63fc1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ea315e9db653/vmlinux-5be63fc1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/eb68cddf5620/bzImage-5be63fc1.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3d602af7549af539274e@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5237 at net/hsr/hsr_forward.c:602 handle_std_frame net/hsr/hsr_forward.c:602 [inline]
-WARNING: CPU: 0 PID: 5237 at net/hsr/hsr_forward.c:602 hsr_fill_frame_info+0x3da/0x570 net/hsr/hsr_forward.c:630
-Modules linked in:
-CPU: 0 UID: 0 PID: 5237 Comm: syz-executor387 Not tainted 6.11.0-rc5-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-RIP: 0010:handle_std_frame net/hsr/hsr_forward.c:602 [inline]
-RIP: 0010:hsr_fill_frame_info+0x3da/0x570 net/hsr/hsr_forward.c:630
-Code: 00 31 c0 48 83 c4 10 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 55 bb fb f5 90 0f 0b 90 e9 09 ff ff ff e8 47 bb fb f5 90 <0f> 0b 90 eb 93 89 e9 80 e1 07 80 c1 03 38 c1 0f 8c a3 fc ff ff 48
-RSP: 0018:ffffc90000007278 EFLAGS: 00010246
-RAX: ffffffff8b97d2c9 RBX: 0000000000000000 RCX: ffff88807529bc00
-RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffff88807d910cc0 R08: ffffffff8b97d119 R09: 0000000000000000
-R10: ffffc900000073c8 R11: fffff52000000e7b R12: dffffc0000000000
-R13: 0000000000000008 R14: ffff888029d04f20 R15: ffffc900000073c0
-FS:  0000555564778380(0000) GS:ffff8880b9200000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005633c816f000 CR3: 000000001faac000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- fill_frame_info net/hsr/hsr_forward.c:700 [inline]
- hsr_forward_skb+0x847/0x2b60 net/hsr/hsr_forward.c:715
- hsr_handle_frame+0x51b/0x7d0 net/hsr/hsr_slave.c:70
- __netif_receive_skb_core+0x13e8/0x4570 net/core/dev.c:5555
- __netif_receive_skb_list_core+0x2b7/0x980 net/core/dev.c:5737
- __netif_receive_skb_list net/core/dev.c:5804 [inline]
- netif_receive_skb_list_internal+0xa51/0xe30 net/core/dev.c:5896
- gro_normal_list include/net/gro.h:515 [inline]
- napi_complete_done+0x310/0x8e0 net/core/dev.c:6247
- gro_cell_poll+0x19a/0x1c0 net/core/gro_cells.c:66
- __napi_poll+0xcb/0x490 net/core/dev.c:6772
- napi_poll net/core/dev.c:6841 [inline]
- net_rx_action+0x89b/0x1240 net/core/dev.c:6963
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- do_softirq+0x11b/0x1e0 kernel/softirq.c:455
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x1bb/0x200 kernel/softirq.c:382
- tun_rx_batched+0x732/0x8f0
- tun_get_user+0x2f84/0x4720 drivers/net/tun.c:2006
- tun_chr_write_iter+0x113/0x1f0 drivers/net/tun.c:2052
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa72/0xc90 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7ff04a780a30
-Code: 40 00 48 c7 c2 b8 ff ff ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 80 3d 71 d6 07 00 00 74 17 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 48 83 ec 28 48 89
-RSP: 002b:00007ffc50380778 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007ff04a780a30
-RDX: 000000000000006a RSI: 00000000200006c0 RDI: 00000000000000c8
-RBP: 0000000000000000 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
+Reported-by and Tested-by are redundant.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> Signed-off-by: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>
+> Cc: David Ahern <dsahern@gmail.com>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Ido Schimmel <idosch@idosch.org>
+> ---
+> v2 -> v3:
+> 	* Removed redundant rcu_read_lock()/rcu_read_unlock() pairs
+> 	* Revised the test script based on Ido Schimmel's feedback
+> 	* Updated the test script to ensure compatibility with the latest iperf3 version
+> 	* Fixed new warnings generated with 'C=2' in the previous version
+> 	* Other review comments addressed
+> 
+> v1 -> v2:
+> 	* list_del_rcu() is applied exclusively to legacy multipath code
+> 	* All occurrences of fib6_siblings have been modified to utilize RCU
+> 	  APIs for annotation and usage.
+> 	* Additionally, a test script for reproducing the reported
+> 	  issue is included
+> ---
+>  net/ipv6/ip6_fib.c                            |  22 +-
+>  net/ipv6/route.c                              |  30 ++-
+>  tools/testing/selftests/net/Makefile          |   1 +
+>  .../net/ipv6_route_update_soft_lockup.sh      | 226 ++++++++++++++++++
+>  4 files changed, 261 insertions(+), 18 deletions(-)
+>  create mode 100755 tools/testing/selftests/net/ipv6_route_update_soft_lockup.sh
+> 
+> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+> index eb111d20615c..002cddc5d3b5 100644
+> --- a/net/ipv6/ip6_fib.c
+> +++ b/net/ipv6/ip6_fib.c
+> @@ -518,7 +518,7 @@ int fib6_tables_dump(struct net *net, struct notifier_block *nb,
+>  static int fib6_dump_node(struct fib6_walker *w)
+>  {
+>  	int res;
+> -	struct fib6_info *rt;
+> +	struct fib6_info *rt, *sibling, *last_sibling;
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+while at it, reorder variables in reverse xmas tree order.
+Same for other places.
+https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+>  
+>  	for_each_fib6_walker_rt(w) {
+>  		res = rt6_dump_route(rt, w->args, w->skip_in_node);
+> @@ -540,10 +540,14 @@ static int fib6_dump_node(struct fib6_walker *w)
+>  		 * last sibling of this route (no need to dump the
+>  		 * sibling routes again)
+>  		 */
+> -		if (rt->fib6_nsiblings)
+> -			rt = list_last_entry(&rt->fib6_siblings,
+> -					     struct fib6_info,
+> -					     fib6_siblings);
+> +		if (rt->fib6_nsiblings) {
+> +			last_sibling = rt;
+> +			list_for_each_entry_rcu(sibling, &rt->fib6_siblings,
+> +						fib6_siblings)
+> +				last_sibling = sibling;
+> +
+> +			rt = last_sibling;
+> +		}
+>  	}
+>  	w->leaf = NULL;
+>  	return 0;
+> @@ -1190,8 +1194,8 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
+>  		while (sibling) {
+>  			if (sibling->fib6_metric == rt->fib6_metric &&
+>  			    rt6_qualify_for_ecmp(sibling)) {
+> -				list_add_tail(&rt->fib6_siblings,
+> -					      &sibling->fib6_siblings);
+> +				list_add_tail_rcu(&rt->fib6_siblings,
+> +						  &sibling->fib6_siblings);
+>  				break;
+>  			}
+>  			sibling = rcu_dereference_protected(sibling->fib6_next,
+> @@ -1252,7 +1256,7 @@ static int fib6_add_rt2node(struct fib6_node *fn, struct fib6_info *rt,
+>  							 fib6_siblings)
+>  					sibling->fib6_nsiblings--;
+>  				rt->fib6_nsiblings = 0;
+> -				list_del_init(&rt->fib6_siblings);
+> +				list_del_rcu(&rt->fib6_siblings);
+>  				rt6_multipath_rebalance(next_sibling);
+>  				return err;
+>  			}
+> @@ -1970,7 +1974,7 @@ static void fib6_del_route(struct fib6_table *table, struct fib6_node *fn,
+>  					 &rt->fib6_siblings, fib6_siblings)
+>  			sibling->fib6_nsiblings--;
+>  		rt->fib6_nsiblings = 0;
+> -		list_del_init(&rt->fib6_siblings);
+> +		list_del_rcu(&rt->fib6_siblings);
+>  		rt6_multipath_rebalance(next_sibling);
+>  	}
+>  
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index 219701caba1e..12dc1acb6463 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -413,7 +413,7 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
+>  		      struct flowi6 *fl6, int oif, bool have_oif_match,
+>  		      const struct sk_buff *skb, int strict)
+>  {
+> -	struct fib6_info *sibling, *next_sibling;
+> +	struct fib6_info *sibling;
+>  	struct fib6_info *match = res->f6i;
+>  
+>  	if (!match->nh && (!match->fib6_nsiblings || have_oif_match))
+> @@ -440,8 +440,10 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
+>  	if (fl6->mp_hash <= atomic_read(&match->fib6_nh->fib_nh_upper_bound))
+>  		goto out;
+>  
+> -	list_for_each_entry_safe(sibling, next_sibling, &match->fib6_siblings,
+> -				 fib6_siblings) {
+> +	rcu_read_lock();
+> +
+> +	list_for_each_entry_rcu(sibling, &match->fib6_siblings,
+> +				fib6_siblings) {
+>  		const struct fib6_nh *nh = sibling->fib6_nh;
+>  		int nh_upper_bound;
+>  
+> @@ -454,6 +456,8 @@ void fib6_select_path(const struct net *net, struct fib6_result *res,
+>  		break;
+>  	}
+>  
+> +	rcu_read_unlock();
+> +
+>  out:
+>  	res->f6i = match;
+>  	res->nh = match->fib6_nh;
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+match could be an rcu_dereference()d object.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
 
-If you want to undo deduplication, reply with:
-#syz undup
+> @@ -5195,14 +5199,18 @@ static void ip6_route_mpath_notify(struct fib6_info *rt,
+>  	 * nexthop. Since sibling routes are always added at the end of
+>  	 * the list, find the first sibling of the last route appended
+>  	 */
+> +	rcu_read_lock();
+> +
+>  	if ((nlflags & NLM_F_APPEND) && rt_last && rt_last->fib6_nsiblings) {
+> -		rt = list_first_entry(&rt_last->fib6_siblings,
+> -				      struct fib6_info,
+> -				      fib6_siblings);
+> +		rt = list_first_or_null_rcu(&rt_last->fib6_siblings,
+> +					    struct fib6_info,
+> +					    fib6_siblings);
+>  	}
+>  
+>  	if (rt)
+>  		inet6_rt_notify(RTM_NEWROUTE, rt, info, nlflags);
+> +
+> +	rcu_read_unlock();
+>  }
+>  
+>  static bool ip6_route_mpath_should_notify(const struct fib6_info *rt)
+> @@ -5547,17 +5555,21 @@ static size_t rt6_nlmsg_size(struct fib6_info *f6i)
+>  		nexthop_for_each_fib6_nh(f6i->nh, rt6_nh_nlmsg_size,
+>  					 &nexthop_len);
+>  	} else {
+> -		struct fib6_info *sibling, *next_sibling;
+> +		struct fib6_info *sibling;
+>  		struct fib6_nh *nh = f6i->fib6_nh;
+>  
+>  		nexthop_len = 0;
+>  		if (f6i->fib6_nsiblings) {
+>  			rt6_nh_nlmsg_size(nh, &nexthop_len);
+>  
+> -			list_for_each_entry_safe(sibling, next_sibling,
+> -						 &f6i->fib6_siblings, fib6_siblings) {
+> +			rcu_read_lock();
+> +
+> +			list_for_each_entry_rcu(sibling, &f6i->fib6_siblings,
+> +						fib6_siblings) {
+>  				rt6_nh_nlmsg_size(sibling->fib6_nh, &nexthop_len);
+>  			}
+> +
+> +			rcu_read_unlock();
+>  		}
+>  		nexthop_len += lwtunnel_get_encap_size(nh->fib_nh_lws);
+>  	}
 
