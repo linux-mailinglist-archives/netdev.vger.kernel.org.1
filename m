@@ -1,83 +1,172 @@
-Return-Path: <netdev+bounces-123337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1A3D9648FC
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:48:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 561DD964908
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B6111F219E7
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:48:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E78F5B261C6
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:50:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8353E1AE05A;
-	Thu, 29 Aug 2024 14:48:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7AC1B1419;
+	Thu, 29 Aug 2024 14:50:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M86qWT5C"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eA2/LinP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A57718DF87;
-	Thu, 29 Aug 2024 14:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B00D1946DF
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 14:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724942915; cv=none; b=uxPq8OMfg1yasygZ35l26eT/WNXRT+jXcxLU5lpARODOjqIRbvYB8TDFuGMbWOUYb498mAEquk+zvfRRhjwkuDL0886NDnZ408zRDEAbDFO/IerMwjUZYgHNZ+zKAEsNXahiZnrWHyqVasq72+ytNb2Eh4EKeQ/O29qkSIFAD4w=
+	t=1724943000; cv=none; b=ljf8+J9S9hK4t5gU1H434HtHNKsqm/KwsvQhmeg9WoMHOwxOb2uXWT+1X3/ph97afYFFsHHbu5Cq+bR2RPNAO98xDQyCHLYaHGTLM6zGOJVdlAGjsE36X8UY0F7jbAsaGjwTi1E8pDLV5K3bHNL1J3boV6HYc6J2Qv4X5EqP+ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724942915; c=relaxed/simple;
-	bh=9aoqy5nccnXyBftXLjR/AnO5Xsl3KEbrHNT6ttsg0gs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QOtil7tb0C4AoZic26B2YSj8WHwVI9NcadmZ6oxpYYNxXcEkO0ootTYTyfhBsd3KUbmE+haFgeJTYC5hk3PZuMuT19Dgy0aNQFde0l/HqTU+EJ52nAyztjRo6nbVXOm7TCAh4fIxRks3nur41pFBmEb0OELQ1IfCx44svZQRhtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M86qWT5C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D36FC4CEC1;
-	Thu, 29 Aug 2024 14:48:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724942914;
-	bh=9aoqy5nccnXyBftXLjR/AnO5Xsl3KEbrHNT6ttsg0gs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M86qWT5CDR7KCl6DGLbfzkSlyurf3CPdJDx59XKp3TcH46OSOaNOUvr3NIYUEqBsT
-	 WUna1+VHyZQ8BziQ84VqT7kSe+Q+lrpermrJqCJrK79zfDag5mmGNMf1QjGilcy+Ih
-	 wxU6flgYTUCrkqMfI6gVYJ3wxnPRq/Jk01TuP/HzDhMktSY0/JB6tlxr31Ys2x7A1M
-	 5gyWubVnc7r/XHopzl4Kh95MnZjJBA+rxKOeCL54nvlwbPGdAcbQ1pBXc4YiCw2YD5
-	 PBuS2CMfLhpO83DuTkqMjMn79edbiMbxI2ol9PN97iCaeBzZ4D5Cjy2HCZxDPTWTXX
-	 BkTCT3KW6O4/A==
-Date: Thu, 29 Aug 2024 07:48:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bharat Bhushan <bharatb.linux@gmail.com>
-Cc: Bharat Bhushan <bbhushan2@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, sgoutham@marvell.com, gakula@marvell.com,
- sbhatta@marvell.com, hkelam@marvell.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, jerinj@marvell.com,
- lcherian@marvell.com, richardcochran@gmail.com
-Subject: Re: [net-next PATCH v7 1/8] octeontx2-pf: map skb data as device
- writeable
-Message-ID: <20240829074832.0f091f53@kernel.org>
-In-Reply-To: <CAAeCc_=3vXvRgo1wxzHwSY6LJS-vUzeShSdJKLotYSuHBi-Vzw@mail.gmail.com>
-References: <20240827133210.1418411-1-bbhushan2@marvell.com>
-	<20240827133210.1418411-2-bbhushan2@marvell.com>
-	<20240828182140.18e386c3@kernel.org>
-	<CAAeCc_=3vXvRgo1wxzHwSY6LJS-vUzeShSdJKLotYSuHBi-Vzw@mail.gmail.com>
+	s=arc-20240116; t=1724943000; c=relaxed/simple;
+	bh=S2sT6L9UUzta00cejZJS50RWMrLlQc0scK9J+l0UXXw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=sPRCrPt32uJQBwbxHgLdvoi8wO9HVGX0aZ3zrqNA+MvqBATIt8TkRUW9Yngo75UuUm/1rH6kPqHjNGk/B1n/+fOCnwnv24+lU6zUIY6XvEj6yvtXuLlIac1gGqZdJdYfOXw3A+HbduINlN2pQmBMm0+ovIAgSX8kan8Dt1rw7pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eA2/LinP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724942996;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=S2sT6L9UUzta00cejZJS50RWMrLlQc0scK9J+l0UXXw=;
+	b=eA2/LinP/DXAdWp+P/u5Ma1iSWB3zM3SKuUcSPq6R+hyWbO+LVRNljFejIH5j35ixTDoze
+	haUmP/l6sKRDgRivHydLTpeMxsB9HBxUa10H2erl/q+ofJJ9iQhYccWKwcQpVvofH5IXiM
+	ZgM1FBzuAzGjgo+dFkIFiZb/FxMWZGs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-552-G9zm2QJcNjyGUcWb-fbpVQ-1; Thu, 29 Aug 2024 10:49:55 -0400
+X-MC-Unique: G9zm2QJcNjyGUcWb-fbpVQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37193ed09b2so1103979f8f.1
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 07:49:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724942994; x=1725547794;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=S2sT6L9UUzta00cejZJS50RWMrLlQc0scK9J+l0UXXw=;
+        b=e3DtMBzeAdAvOgPm1djJm+uAvA59jtcwoVg9AzqmLjDenND/S115F/+KY0rjP6MQwQ
+         4fpIKyXr9grUGXL/Wrfpsb2xNkleTM1zIJxRCoGL1AAHmjcnWtLZ6SLJgJymGKeL8jMq
+         BD+aJiL6dENm1EvI/aJPtWgg6mDvb1ZAZ030w+ZifelBfMKcO7ykeWZUXVKkSyxdsMuN
+         hOoTaXmgesi5kuYS1AOpvYU/VB+p4ul6DABmU/UQfCBaJwG2Z7UCYcvGyZjgUvarLNev
+         Tp/sWbBss6LH5AlHNMcANhvkZYd75RDiBzKVhIY8FKsuuWtuFkOPjI/xpJJcYzYGLd+n
+         u9uA==
+X-Forwarded-Encrypted: i=1; AJvYcCXD7Oa8ZIrJ2xw1pKVMfN2nji+Q9+NbCgxfi2R65Z5k82MxwLNo/I1SRPa4ldQrJq5Nz+61xuA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzx1XLTePQqdPPJInkk0dH08nJZmDQk5jbMCw3I7jbNvQTQl+/L
+	PoH2/VZMVhyOP7rRMliUGggzFdIZrKxtLyQfy9yXi50GHWXGTNm5o3THhHk4LfCnrluStp66y1Z
+	eE0CzT2+ZVCO3FZ842hWOoKklY91nKeTvhS2infzZkfoAUuPlr8igFQ==
+X-Received: by 2002:a05:6000:d90:b0:362:69b3:8e4d with SMTP id ffacd0b85a97d-374a02323eemr1808464f8f.25.1724942993927;
+        Thu, 29 Aug 2024 07:49:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHrfaIGeH0p8et8OYjnOCquSTWs4QXgyhcRTReJhUV0MD6wVymReUMbJDmaEmmHD/MIBOPsJA==
+X-Received: by 2002:a05:6000:d90:b0:362:69b3:8e4d with SMTP id ffacd0b85a97d-374a02323eemr1808372f8f.25.1724942993389;
+        Thu, 29 Aug 2024 07:49:53 -0700 (PDT)
+Received: from dhcp-64-16.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42baf7fa745sm33827915e9.31.2024.08.29.07.49.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 07:49:52 -0700 (PDT)
+Message-ID: <2cc5984b65beb6805f8d60ffd9627897b65b7700.camel@redhat.com>
+Subject: Re: [PATCH v5 6/7] vdpa: solidrun: Fix UB bug with devres
+From: Philipp Stanner <pstanner@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Andy Shevchenko
+	 <andy.shevchenko@gmail.com>
+Cc: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix
+ <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
+ <yilun.xu@intel.com>,  Andy Shevchenko <andy@kernel.org>, Linus Walleij
+ <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas
+ <bhelgaas@google.com>, Alvaro Karsz <alvaro.karsz@solid-run.com>, Jason
+ Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio
+ =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>, Richard Cochran
+ <richardcochran@gmail.com>, Damien Le Moal <dlemoal@kernel.org>, Hannes
+ Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>,
+ linux-block@vger.kernel.org,  linux-kernel@vger.kernel.org,
+ linux-fpga@vger.kernel.org,  linux-gpio@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
+ virtualization@lists.linux.dev, stable@vger.kernel.org, Christophe JAILLET
+ <christophe.jaillet@wanadoo.fr>
+Date: Thu, 29 Aug 2024 16:49:50 +0200
+In-Reply-To: <20240829104124-mutt-send-email-mst@kernel.org>
+References: <20240829141844.39064-1-pstanner@redhat.com>
+	 <20240829141844.39064-7-pstanner@redhat.com>
+	 <20240829102320-mutt-send-email-mst@kernel.org>
+	 <CAHp75Ve7O6eAiNx0+v_SNR2vuYgnkeWrPD1Umb1afS3pf7m8MQ@mail.gmail.com>
+	 <20240829104124-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Thu, 29 Aug 2024 11:17:25 +0530 Bharat Bhushan wrote:
-> > How did you test this prior to adding skb_unshare()?
-> > Could you share some performance data with this change?  
-> 
-> testing using flood ping and iperf with multiple instance,
+On Thu, 2024-08-29 at 10:41 -0400, Michael S. Tsirkin wrote:
+> On Thu, Aug 29, 2024 at 05:26:39PM +0300, Andy Shevchenko wrote:
+> > On Thu, Aug 29, 2024 at 5:23=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
+com>
+> > wrote:
+> > >=20
+> > > On Thu, Aug 29, 2024 at 04:16:25PM +0200, Philipp Stanner wrote:
+> > > > In psnet_open_pf_bar() and snet_open_vf_bar() a string later
+> > > > passed to
+> > > > pcim_iomap_regions() is placed on the stack. Neither
+> > > > pcim_iomap_regions() nor the functions it calls copy that
+> > > > string.
+> > > >=20
+> > > > Should the string later ever be used, this, consequently,
+> > > > causes
+> > > > undefined behavior since the stack frame will by then have
+> > > > disappeared.
+> > > >=20
+> > > > Fix the bug by allocating the strings on the heap through
+> > > > devm_kasprintf().
+> > > >=20
+> > > > Cc: stable@vger.kernel.org=C2=A0=C2=A0=C2=A0 # v6.3
+> > > > Fixes: 51a8f9d7f587 ("virtio: vdpa: new SolidNET DPU driver.")
+> > > > Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> > > > Closes:
+> > > > https://lore.kernel.org/all/74e9109a-ac59-49e2-9b1d-d825c9c9f891@wa=
+nadoo.fr/
+> > > > Suggested-by: Andy Shevchenko <andy@kernel.org>
+> > > > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> > >=20
+> > > Post this separately, so I can apply?
+> >=20
+> > Don't you use `b4`? With it it as simple as
+> >=20
+> > =C2=A0 b4 am -P 6 $MSG_ID_OF_THIS_SERIES
+> >=20
+> > --=20
+> > With Best Regards,
+> > Andy Shevchenko
+>=20
+> I can do all kind of things, but if it's posted as part of a
+> patchset,
+> it is not clear to me this has been tested outside of the patchset.
+>=20
 
-Makes sense, neither of these will detect corruption of data pages :(
-IIRC iperf just ignores the data, ping doesn't retransmit.
-You gotta beef up your testing...
+Separating it from the series would lead to merge conflicts, because
+patch 7 depends on it.
 
-> I do not see any drop in performance numbers
+If you're responsible for vdpa in general I could send patches 6 and 7
+separately to you.
 
-Well. What's the difference in CPU busy time of v5 vs v7?
-You'll copy all TCP packets, they are (pretty much) all clones.
+But number 7 depends on number 1, because pcim_iounmap_region() needs
+to be public. So if patches 1-5 enter through a different tree than
+yours, that could be a problem.
+
+
+P.
+
 
