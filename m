@@ -1,117 +1,146 @@
-Return-Path: <netdev+bounces-123082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BCA5963A03
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 07:47:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BC29963A10
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 07:56:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E7AB1C21CF8
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 05:47:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F42A1C22089
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 05:56:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F15512E1D9;
-	Thu, 29 Aug 2024 05:47:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F10145FE5;
+	Thu, 29 Aug 2024 05:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OapxtYh0"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="db2zyw6s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04234D8C8;
-	Thu, 29 Aug 2024 05:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769241487F1;
+	Thu, 29 Aug 2024 05:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724910459; cv=none; b=vFmunOmIqsCwu81w/qh/htjTR8HUPcVhr29990WFrN6mOCHJNiAT7+k5rav/vm1ycZicW1lI7mx8fBBh8f4MqwRrGIdHaUz6Q0c3AGP29BqFoO+Lrz+iB25x63W7v0NpV/xPGoVfkRs5cWJIZpxlYoKCRgRPcIwWLOubJwFc1xE=
+	t=1724910962; cv=none; b=RTSsR96OuwsKzxlFHZE0EMcU4ozolJ4LrS1fxNlVDOcOLLaIUMsLhYF6k7BpsAKTtg1eZgOaASEvYOZmj2V1Bv5M6Mnmy2eQbe7R/0sGQSfdPLoJJwP5N4VRSBdilratEg0xBltQO/JXYIPmE2KgR8+BlNmSEyBRclwUuzWAZn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724910459; c=relaxed/simple;
-	bh=/bCoNRI9t52KQOOhztNKjSY6YE5Pak0awBtXeJI6ods=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g+Gftf86rW0TkSvXztJBxDBxVP7JnuPibxl2AWI/+D7cSgdvg9jcr2+pm+PT43OzJt8+wnLK1MoZqOul5QUb3u6E/5UYxCxQVbl/2PY06Oj+kG/eFdjCTXHiAilW/GlaDq9FbCkuxyitCoHboyW0twQoRInv3wjOvkzffNpaBXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OapxtYh0; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6b6b9867faaso2773507b3.2;
-        Wed, 28 Aug 2024 22:47:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724910457; x=1725515257; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/bCoNRI9t52KQOOhztNKjSY6YE5Pak0awBtXeJI6ods=;
-        b=OapxtYh0zGUI10l9+G+21crwwsfHGgQgMwbBH5d3Ym1r2aaF0D/Rh1Eo3THYZSeVQS
-         hTou221gj1U/H4+0nU7amgOV1XxHjNtNS73oxtFbMF6cPBMJDDorlzBb5m/wUVrgGlpa
-         FxYN5Y+NnwSOI8ZqxpxY8YRSZuP0FBbdeljUNQxJvhnJZZCftNS7V/kqXdocJpiGAvLx
-         5ZKDHsCTsLCZsx8XYjmMHW4n012Y6xWg5ru1zM14gli1v8mzPQfJMfBFlVC7SyBGrc9W
-         F1c8e5cYB2c9iASkBOVRoTLttgrB6spm0gNv9Iw4LX/+tdiXbE8nNNDpd/k039swLIfY
-         qgOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724910457; x=1725515257;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/bCoNRI9t52KQOOhztNKjSY6YE5Pak0awBtXeJI6ods=;
-        b=F0gVs30CcNybl4TZwBQ9nGrMMYz5nrav1bU6ZGpUf1jLUrnOrGPK/OyIvtpAj8zViR
-         whOYbAev4HPMd0IuS+8sgmOhOvC92uQI9dLH6rTNJwZ4LhQb36QzC8RLl8xcXe79Xgwr
-         KgBe0MOw092B3NIfrrldvUdItYYHUADsLEnYm+90A3attlIwY+XuSqqrR1J1Zh1baBKK
-         2RLU1XMAcbK8q/bAkw8HRfnllO3m9kMypt5BmM0GqE4Gcp/+qCqT+m51NqhyGrsrGdQo
-         7+7TmpCBy1Q2qjykYeP/xXtQZJjil/dll7MPzoxYIV4mrqrdXC0PkfCaMr0li3p1Era8
-         yfkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUSOiko6JUeR+VGZSLwVzQla8dA5js2zifEFi6ERyKz30Jodlo0Z4U1Qw4jMums2ernp9HHgYP+@vger.kernel.org, AJvYcCVxSr/vhAfuMn5csrBn0W4G/Bc9nySmZ/TF5rJ+PA2N2z1LepyH4GN4I8Pijzp/VuqAbXKi9TtOkLxPe2M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxds/l8tKg+sjLY5k48fn5tzjJkKZNNt3nWYrGaGx2FbywFDfhg
-	JmCWGAcGsNfkcTwvY4/yVxsyhGq0Wg1T+0/YuOPuv4ewCrVHZvDrwFZEtQudwqs6FihDxf0jotZ
-	/fvCSeYtTX4wnU3Fy5msP4BIFuYA=
-X-Google-Smtp-Source: AGHT+IEc098aorGwO4QWwt1UMh8VAOPJSSeaNC4DdjXeeAWRp3Ho4GMeXtg/ighYPdCLw+sS2Ov+iqNJWITzBZHC2eA=
-X-Received: by 2002:a05:690c:7009:b0:64a:956b:c063 with SMTP id
- 00721157ae682-6d27804bc4emr19135997b3.39.1724910456523; Wed, 28 Aug 2024
- 22:47:36 -0700 (PDT)
+	s=arc-20240116; t=1724910962; c=relaxed/simple;
+	bh=awg13QCLRvaX7kb8KIorHdKyKvRmjNYCGTZ98BD5/M0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UlOtA/TELgW6H8dwrmeLnjNjGYcfj0ksMy1+T+2ej4b8tbmi5AgBRhysbriqb/8/V0FgswBpQlytUmFi4gIhT8eNvGM+bUip6h6IgkeP5IKxI0AClp3e8AoQTzFgposVYmqsU25eOHUqctRq4YD7gffhAGGrcbfUM517WXgGzrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=db2zyw6s; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1724910960; x=1756446960;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=awg13QCLRvaX7kb8KIorHdKyKvRmjNYCGTZ98BD5/M0=;
+  b=db2zyw6sAHnVrJ3gPD+jzMLaEau25XCoqPkyOyZEsofQKfx4/RYPRSh/
+   TZ8Gb8jL/RuFdfEPrCpn3esCKd+w036dEdPuL/r81WkxDsAmrSWKIEhxc
+   XJ4y3WJYTioPFHicNbYMh7+OHxV91cVlHHE5uipkl7T3DY3j+pZTUSag2
+   zMisbaperzJgB0/3L/WVZJ722pYKeL5B1gs+u7plbX2wC4ZCtKpZPVBFw
+   ztW3dnACfRII4aJAmregoMgbkXmu+E2hZrX3MAYUfYSVpujOFdEKe7YqN
+   Un5BBRbPWGiA31XJvQb6DToeaMGmOXk84vq9mk49+XVl10hlpxXwgpO4e
+   A==;
+X-CSE-ConnectionGUID: 2MQclz5sT/+LITt4o2qSTg==
+X-CSE-MsgGUID: 1GiybGNwRwyyDUmec29r2Q==
+X-IronPort-AV: E=Sophos;i="6.10,184,1719903600"; 
+   d="scan'208";a="261978658"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Aug 2024 22:55:59 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 28 Aug 2024 22:55:20 -0700
+Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 28 Aug 2024 22:55:16 -0700
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <linux@armlinux.org.uk>, <kuba@kernel.org>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <richardcochran@gmail.com>,
+	<rdunlap@infradead.org>, <Bryan.Whitehead@microchip.com>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
+	<horms@kernel.org>, <UNGLinuxDriver@microchip.com>
+Subject: [PATCH net-next V4 0/5] Add support to PHYLINK for LAN743x/PCI11x1x chips
+Date: Thu, 29 Aug 2024 11:21:27 +0530
+Message-ID: <20240829055132.79638-1-Raju.Lakkaraju@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240827133210.1418411-1-bbhushan2@marvell.com>
- <20240827133210.1418411-2-bbhushan2@marvell.com> <20240828182140.18e386c3@kernel.org>
-In-Reply-To: <20240828182140.18e386c3@kernel.org>
-From: Bharat Bhushan <bharatb.linux@gmail.com>
-Date: Thu, 29 Aug 2024 11:17:25 +0530
-Message-ID: <CAAeCc_=3vXvRgo1wxzHwSY6LJS-vUzeShSdJKLotYSuHBi-Vzw@mail.gmail.com>
-Subject: Re: [net-next PATCH v7 1/8] octeontx2-pf: map skb data as device writeable
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Bharat Bhushan <bbhushan2@marvell.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, sgoutham@marvell.com, gakula@marvell.com, 
-	sbhatta@marvell.com, hkelam@marvell.com, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, jerinj@marvell.com, 
-	lcherian@marvell.com, richardcochran@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Thu, Aug 29, 2024 at 6:51=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 27 Aug 2024 19:02:03 +0530 Bharat Bhushan wrote:
-> > Crypto hardware need write permission for in-place encrypt
-> > or decrypt operation on skb-data to support IPsec crypto
-> > offload. That patch uses skb_unshare to make sdk data writeable
->
-> sdk -> skb ? :(
-Will fix in next version
+This is the follow-up patch series of
+https://lkml.iu.edu/hypermail/linux/kernel/2310.2/02078.html
 
->
-> > for ipsec crypto offload and map skb fragment memory as
-> > device read-write.
->
-> Does the crypto engine always override the data with ciphertext?
+Divide the PHYLINK adaptation and SFP modifications into two separate patch
+series.
 
-yes,
+The current patch series focuses on transitioning the LAN743x driver's PHY
+support from phylib to phylink.
 
-> How did you test this prior to adding skb_unshare()?
-> Could you share some performance data with this change?
+Tested on PCI11010 Rev-1 Evaluation board
 
-testing using flood ping and iperf with multiple instance,
-I do not see any drop in performance numbers
+Change List:
+============
+V3 -> V4:
+  - Add fixed-link patch along with this series. 
+    Note: Note: This code was developed by Mr.Russell King
+    Ref: 
+    https://lore.kernel.org/netdev/LV8PR11MB8700C786F5F1C274C73036CC9F8E2@LV8PR11MB8700.namprd11.prod.outlook.com/T/#me943adf54f1ea082edf294aba448fa003a116815
+  - Change phylink fixed-link function header's string from "Returns" to
+    "Returns:" 
+  - Remove the EEE private variable from LAN743x adapter strcture and fix the
+    EEE's set/get functions
+  - set the individual caps (i.e. _RGMII, _RGMII_ID, _RGMII_RXID and
+    __RGMII_TXID) replace with phy_interface_set_rgmii( ) function
+  - Change lan743x_set_eee( ) to lan743x_mac_eee_enable( )
 
-Thanks
--Bharat
+V2 -> V3:
+  - Remove the unwanted parens in each of these if() sub-blocks 
+  - Replace "to_net_dev(config->dev)" with "netdev".
+  - Add GMII_ID/RGMII_TXID/RGMII_RXID in supported_interfaces
+  - Fix the lan743x_phy_handle_exists( ) return type
+
+V1 -> V2:
+  - Fix the Russell King's comments i.e. remove the speed, duplex update in 
+    lan743x_phylink_mac_config( )
+  - pre-March 2020 legacy support has been removed
+
+V0 -> V1:
+  - Integrate with Synopsys DesignWare XPCS drivers
+  - Based on external review comments,
+  - Changes made to SGMII interface support only 1G/100M/10M bps speed
+  - Changes made to 2500Base-X interface support only 2.5Gbps speed
+  - Add check for not is_sgmii_en with is_sfp_support_en support
+  - Change the "pci11x1x_strap_get_status" function return type from void to
+    int
+  - Add ethtool phylink wol, eee, pause get/set functions
+
+Raju Lakkaraju (5):
+  net: phylink: Add phylink_set_fixed_link() to configure fixed link
+    state in phylink
+  net: lan743x: Create separate PCS power reset function
+  net: lan743x: Create separate Link Speed Duplex state function
+  net: lan743x: Migrate phylib to phylink
+  net: lan743x: Add support to ethtool phylink get and set settings
+
+ drivers/net/ethernet/microchip/Kconfig        |   5 +-
+ .../net/ethernet/microchip/lan743x_ethtool.c  | 117 +--
+ drivers/net/ethernet/microchip/lan743x_main.c | 677 +++++++++++-------
+ drivers/net/ethernet/microchip/lan743x_main.h |   4 +
+ drivers/net/phy/phylink.c                     |  42 ++
+ include/linux/phylink.h                       |   2 +
+ 6 files changed, 523 insertions(+), 324 deletions(-)
+
+-- 
+2.34.1
+
 
