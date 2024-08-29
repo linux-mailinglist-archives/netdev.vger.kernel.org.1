@@ -1,306 +1,268 @@
-Return-Path: <netdev+bounces-123289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6EF296464D
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:18:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92F0E9646C2
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:35:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 423CEB246E5
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:18:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B90751C23C55
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6228B1A7062;
-	Thu, 29 Aug 2024 13:18:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD482194094;
+	Thu, 29 Aug 2024 13:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HWsdz9HH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bT8eSIQ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ED3119005B;
-	Thu, 29 Aug 2024 13:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E0E15AD9E
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 13:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724937508; cv=none; b=G+dnb1YuUNaHoeGHMWCqmsyDk0tERXMM+iWd+OER+kLdSBUeXDh0P3gra5to5+cndo3h3jMSYiFcIyM75hkTK0IwF+VaRBmjFHjZvBNdRu89ZZSSiVPFWW5Pyh7gbuar676p8sKl5FdPF1qCq3wFc4OCOkUP/onXs3eXXg+V9I4=
+	t=1724938304; cv=none; b=uuwb+Ay5lYQH9fXCMsZCLlUPkSshrTnWK6D2ZGTD6+d4BqrU9FU4SngIGsQ78EAw0RlnsinaohgiY8Yt+OPZX8/m0pBIaGakceVdgFKkF7tDFI9k1fJ2xHKdkP2PKK88Q2c2O6KIXXBrCZroHk1OVs4vvrjJO3VGBVjqykdxOIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724937508; c=relaxed/simple;
-	bh=BVRVuYX+Z7tmSeesL23NgAc31YLWeo3n7+at9NzUXJQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E4WCfDSs/rHWjPgx1fw4yWF0K1Iio/zgDU2+jMrKVEU+4BdSJa/IOcOPfRCfEjys3ROvXI0QbHOl5T/Z98r/TvvKfuaj+IuIydUTbPM+XvvWzvuMhKpfp0EEXO6WJA0jQ5SsEuraOneEgSFk0mTBR9f7INkcfNESzLE2KNJeP9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HWsdz9HH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6B0EC4CEC9;
-	Thu, 29 Aug 2024 13:18:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724937507;
-	bh=BVRVuYX+Z7tmSeesL23NgAc31YLWeo3n7+at9NzUXJQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=HWsdz9HHxmxeZdXpHeU8qqIWD5WhMgFg5F10ksh/dVVZbZ6QxmpnDgO1xwgQwNIqO
-	 Hq+vE4SEh0CrnhzLn3nVBXdPQ005w9hV9UjGulnBR4TchTRWDxalWRHGkgU1+75ztd
-	 g+0UadN1+mkPxX0mrJDg0n4Bpm89muLAsdI4ilPYVGSbA+J2/muxVqjrpEhvTB3Q+A
-	 Ewjm7fEN5Oly2BZfTU9FyZfXWLyepmq7CKh4UhH5GzG0Ta3hg6JqRkj1VVBST2Y+d5
-	 lGBfnQk6nAft/OLUmrZGfkydWYqAxfbKNdOOSNca2+ohlwxlhC36H42MeVIzowAiuG
-	 m6l2D08Jgbi7Q==
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5334879ba28so890194e87.3;
-        Thu, 29 Aug 2024 06:18:27 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUM91pfkzB5qXxPmJqBv0iOlo0uhjnDJ0FPLC6IX5l35jct/tV87rJBdiKAFYnmljEjVHQfLoDbjbcS@vger.kernel.org, AJvYcCVK2Q4XeGlEuDmWV/UWrD1devPX/DfC6q3w0+p/9e5lGxDBkdL7tke8KbC25/peb8BynSxqHcD5@vger.kernel.org, AJvYcCVc5mTwr2GPTC4gmZKaAk8ZuHihgQ05fbULdOP0l5SxroALRImsOoGs9TSQZfCzZZY6WyvwNGL34T+O@vger.kernel.org, AJvYcCW+bOycm2hg+hDCJd5E7YcTORwgdaNjh4txxrw24Z5UHVa216PpvXhYL10D6meOUML+K5IGLdww4rkbAcZU@vger.kernel.org, AJvYcCW2Opj9dyGl0AA0gPjlLVN87erqMTjWZHYmjLg9jW0Eou3ZPm6bbIvlJFi+vKIvl+LfmXLJ90t+7Wi2mQ==@vger.kernel.org, AJvYcCXwNFdLbVI06TboGNoIrtmthmVoWCCdI67v0n+agVQonFMXSE1mm0xWUS2EXUYzn79E5JGtZUN/nYvm@vger.kernel.org, AJvYcCXx27I5TufDfe08XeUdKXuoKNEqFq6AlLl8WHUs9l5ad2J+WWTG6nBNA/h4IFEJJydIt1vyl36sj4s7Zg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTzQW/8RwgeVGTO7rkOcJbcCLa342JHlaaYj4mYYSBAV8AUUy7
-	ABezfPV5Ke26cndLXZQPEQkldeEoFcNtn214EiAJsqSLDq3t8QDetGF3O3nwhgrCJ6wbT9aI0Zm
-	9oDL/nYXp1CytYtwte/6/6FmMGQ==
-X-Google-Smtp-Source: AGHT+IFctTEg7Rr6bZidsqCIt8DCoy/MV1ZFUit4qcXz6Zq+RHhM4qKEvQskUwtce+oES60wD9gdCSyG0cqSSkCaZ14=
-X-Received: by 2002:a05:6512:401d:b0:533:4722:ebb0 with SMTP id
- 2adb3069b0e04-5353e548f6fmr2127035e87.6.1724937505925; Thu, 29 Aug 2024
- 06:18:25 -0700 (PDT)
+	s=arc-20240116; t=1724938304; c=relaxed/simple;
+	bh=KKqRbhPvEc9jc7HXD8ar98KMmmYp2MKvIxhq1Vv4YTg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=RRRnAv7gLVjRHAecbm7W3qz+Gl7c9KLoNcVwveZsDxVkWrJz5NPBtEAQzuKDnr0KxyqThEN3h92Hlr0OvgmkGMx2jaiOrFHkZRm2YbsEpSeyOY//UzXRJKKkFYBvf5Lj93H6vZO32xgvqgQ3YNQTMkQh7LnsfnDVhFzrAUF/6ug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bT8eSIQ3; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6c32e1c263aso3784536d6.3
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:31:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724938302; x=1725543102; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I/2hD3tic8LUBfD7pGLxlY/6Qzw7GztjtJfR4Sg9LfA=;
+        b=bT8eSIQ3hwuqpoBLSZ9ILJ/2QG2xoNFlOvP+tQkZEvJ9h5LESbbsOVT8+hDxNuRq5N
+         EnlxbSsuXtPL9ul/k+lS0f9mGpRPGuQYoC50iD2US12+oEParv2sP0JgACo4oLDgbEP5
+         BLUzy5onT/Z+pTUxTJP10AF4CuOdGevCyPwkztHexKcFytlDEOtfewki5garSa4zKBDF
+         Za/5piyFOCXSzjXMKbSyjNk2ERn/ATtTIDDVnkdriYUfOmIL+gQtAFR0TtOGgZvDxQ3P
+         N1No7eCDmzMEvgmKFChykG+ecGvZVU2dv0U/JdtPxMmTpAsBuNLfaPMOMMrN0UZgfULM
+         ZzKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724938302; x=1725543102;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=I/2hD3tic8LUBfD7pGLxlY/6Qzw7GztjtJfR4Sg9LfA=;
+        b=wqNdUOSIp/HL/ak9Ntn5NVOMn10fXdDptuqDfPiOfQF/VsmkuVPZ4ALKwtp4RWGFK3
+         EoSWUoRnVHPh9IlS6wUM9N0x4R58s1lQ6X+344LpyV3elef0gBIcBKEah9f2tKrBGFW8
+         HS0nxgTUS5wW+Ovs1+0qpAgCovvlv617F1KOevQDC9axYu+kHLSX9J2H/vtNMN8S6SsA
+         IgDbTGJMp3dIkqq+qoF+cfhgksVRONRNwIqwSnmfhQ8cZJWbFgwBOfm2iIfc5LUfx6jx
+         G9xiF1dGmUGeBx33ADaBzOeoSY+PLqTGrXzvacFG+A/P2xZva14/kooQAVVESzRipLfB
+         ry/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUHEKK6XtclHPG0RM9Uc/TR3eWPEG4qc/ItEqfRw0TihjkMGLykiAhB8J1ePmWc1RHi82M8m8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNBUt0VAk5jEKaZqdtwvsweh3X5BMqoNKs3XCbzAeTM7giJIQJ
+	d9A/s8TT7IBtQ3QRu3cNxEu/4WSaNfjWGlnOQcOywW4SvxEFS8Fj
+X-Google-Smtp-Source: AGHT+IFHt8C2UdEVi3zDDxFvgIMYXrwQwzdjwQ3GDeBG0gIHyZcmAzvZhtMGabAC2+oXW5zvWlX4tA==
+X-Received: by 2002:a05:6214:5f0b:b0:6b7:b441:8fdf with SMTP id 6a1803df08f44-6c33e7d8a0cmr20708046d6.56.1724938301631;
+        Thu, 29 Aug 2024 06:31:41 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340ca66f8sm5084576d6.117.2024.08.29.06.31.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 06:31:41 -0700 (PDT)
+Date: Thu, 29 Aug 2024 09:31:40 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Vadim Fedorenko <vadfed@meta.com>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ David Ahern <dsahern@kernel.org>
+Cc: Vadim Fedorenko <vadfed@meta.com>, 
+ netdev@vger.kernel.org
+Message-ID: <66d0783ca3dc4_3895fa2946a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240829000355.1172094-1-vadfed@meta.com>
+References: <20240829000355.1172094-1-vadfed@meta.com>
+Subject: Re: [RFC PATCH] net_tstamp: add SCM_TS_OPT_ID to provide OPT_ID in
+ control message
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1724159867.git.andrea.porta@suse.com> <5ca13a5b01c6c737f07416be53eb05b32811da21.1724159867.git.andrea.porta@suse.com>
- <20240821001618.GA2309328-robh@kernel.org> <ZsWi86I1KG91fteb@apocalypse>
- <CAL_JsqKN0ZNMtq+_dhurwLR+FL2MBOmWujp7uy+5HzXxUb_qDQ@mail.gmail.com> <ZtBJ0jIq-QrTVs1m@apocalypse>
-In-Reply-To: <ZtBJ0jIq-QrTVs1m@apocalypse>
-From: Rob Herring <robh@kernel.org>
-Date: Thu, 29 Aug 2024 08:18:12 -0500
-X-Gmail-Original-Message-ID: <CAL_Jsq+_-m3cjTRsFZ0RwVpot3Pdcr1GWt-qiiFC8kQvsmV7VQ@mail.gmail.com>
-Message-ID: <CAL_Jsq+_-m3cjTRsFZ0RwVpot3Pdcr1GWt-qiiFC8kQvsmV7VQ@mail.gmail.com>
-Subject: Re: [PATCH 04/11] of: address: Preserve the flags portion on 1:1
- dma-ranges mapping
-To: Andrea della Porta <andrea.porta@suse.com>
-Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-	Linus Walleij <linus.walleij@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Derek Kiernan <derek.kiernan@amd.com>, 
-	Dragan Cvetic <dragan.cvetic@amd.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
-	linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Stefan Wahren <wahrenst@gmx.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 29, 2024 at 5:13=E2=80=AFAM Andrea della Porta
-<andrea.porta@suse.com> wrote:
->
-> Hi Rob,
+Vadim Fedorenko wrote:
+> SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
+> timestamps
 
-BTW, I noticed your email replies set "reply-to" to everyone in To and
-Cc. The result (with Gmail) is my reply lists everyone twice (in both
-To and Cc). "reply-to" is just supposed to be the 1 address you want
-replies sent to instead of the "from" address.
++1 on the feature. Few minor points only.
 
-> On 16:29 Mon 26 Aug     , Rob Herring wrote:
-> > On Wed, Aug 21, 2024 at 3:19=E2=80=AFAM Andrea della Porta
-> > <andrea.porta@suse.com> wrote:
-> > >
-> > > Hi Rob,
-> > >
-> > > On 19:16 Tue 20 Aug     , Rob Herring wrote:
-> > > > On Tue, Aug 20, 2024 at 04:36:06PM +0200, Andrea della Porta wrote:
-> > > > > A missing or empty dma-ranges in a DT node implies a 1:1 mapping =
-for dma
-> > > > > translations. In this specific case, rhe current behaviour is to =
-zero out
-> > > >
-> > > > typo
-> > >
-> > > Fixed, thanks!
-> > >
-> > > >
-> > > > > the entire specifier so that the translation could be carried on =
-as an
-> > > > > offset from zero.  This includes address specifier that has flags=
- (e.g.
-> > > > > PCI ranges).
-> > > > > Once the flags portion has been zeroed, the translation chain is =
-broken
-> > > > > since the mapping functions will check the upcoming address speci=
-fier
-> > > >
-> > > > What does "upcoming address" mean?
-> > >
-> > > Sorry for the confusion, this means "address specifier (with valid fl=
-ags) fed
-> > > to the translating functions and for which we are looking for a trans=
-lation".
-> > > While this address has some valid flags set, it will fail the transla=
-tion step
-> > > since the ranges it is matched against have flags zeroed out by the 1=
-:1 mapping
-> > > condition.
-> > >
-> > > >
-> > > > > against mismatching flags, always failing the 1:1 mapping and its=
- entire
-> > > > > purpose of always succeeding.
-> > > > > Set to zero only the address portion while passing the flags thro=
-ugh.
-> > > >
-> > > > Can you point me to what the failing DT looks like. I'm puzzled how
-> > > > things would have worked for anyone.
-> > > >
-> > >
-> > > The following is a simplified and lightly edited) version of the resu=
-lting DT
-> > > from RPi5:
-> > >
-> > >  pci@0,0 {
-> > >         #address-cells =3D <0x03>;
-> > >         #size-cells =3D <0x02>;
-> > >         ......
-> > >         device_type =3D "pci";
-> > >         compatible =3D "pci14e4,2712\0pciclass,060400\0pciclass,0604"=
-;
-> > >         ranges =3D <0x82000000 0x00 0x00   0x82000000 0x00 0x00   0x0=
-0 0x600000>;
-> > >         reg =3D <0x00 0x00 0x00   0x00 0x00>;
-> > >
-> > >         ......
-> > >
-> > >         rp1@0 {
-> >
-> > What does 0 represent here? There's no 0 address in 'ranges' below.
-> > Since you said the parent is a PCI-PCI bridge, then the unit-address
-> > would have to be the PCI devfn and you are missing 'reg' (or omitted
-> > it).
->
-> There's no reg property because the registers for RP1 are addressed
-> starting at 0x40108000 offset from BAR1. The devicetree specs says
-> that a missing reg node should not have any unit address specified
-> (and AFAIK there's no other special directives for simple-bus specified
-> in dt-bindings).
-> I've added @0 just to get rid of the following warning:
->
->  Warning (unit_address_vs_reg): /fragment@0/__overlay__/rp1: node has
->  a reg or ranges property, but no unit name
+Not a hard requirement, but would be nice if there was a test,
+e.g., as a tools/testing/../txtimestamp.c extension.
 
-It's still wrong as dtc only checks the unit-address is correct in a
-few cases with known bus types.
+> and packets sent via socket. Unfortunately, there is no way
+> to reliably predict socket timestamp ID value in case of error returned
+> by sendmsg [1].
 
-> coming from make W=3D1 CHECK_DTBS=3Dy broadcom/rp1.dtbo.
-> This is the exact same approach used by Bootlin patchset from:
->
-> https://lore.kernel.org/all/20240808154658.247873-2-herve.codina@bootlin.=
-com/
+Might be good to copy more context from the discussion to explain why
+reliable OPT_ID is infeasible. For UDP, it is as simple as lockless
+transmit. For RAW, things like MSG_MORE come into play.
 
-It is not. First, that has a node for the PCI device (i.e. the
-LAN966x). You do not. You only have a PCI-PCI bridge and that is
-wrong.
+> This patch adds new control message type to give user-space
+> software an opportunity to control the mapping between packets and
+> values by providing ID with each sendmsg. This works fine for UDP
+> sockets only, and explicit check is added to control message parser.
+> Also, there is no easy way to use 0 as provided ID, so this is value
+> treated as invalid.
 
-BTW, you should Cc Herve and others that are working on this feature.
-It is by no means fully sorted as you have found.
+This is because the code branches on non-zero value in the cookie,
+else uses ts_key. Please make this explicit. Or perhaps better, add a
+bit in the cookie so that the full 32-bit space can be used.
 
-> replied here below for convenience:
->
-> +       pci-ep-bus@0 {
-> +               compatible =3D "simple-bus";
-> +               #address-cells =3D <1>;
-> +               #size-cells =3D <1>;
+> [1] https://lore.kernel.org/netdev/CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9Eaa9aDPfgHdtA@mail.gmail.com/
+> 
+> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> ---
+>  include/net/inet_sock.h           |  1 +
+>  include/net/sock.h                |  1 +
+>  include/uapi/asm-generic/socket.h |  2 ++
+>  net/core/sock.c                   | 14 ++++++++++++++
+>  net/ipv4/ip_output.c              | 11 +++++++++--
+>  net/ipv6/ip6_output.c             | 11 +++++++++--
+>  6 files changed, 36 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+> index 394c3b66065e..7e8545311557 100644
+> --- a/include/net/inet_sock.h
+> +++ b/include/net/inet_sock.h
+> @@ -174,6 +174,7 @@ struct inet_cork {
+>  	__s16			tos;
+>  	char			priority;
+>  	__u16			gso_size;
+> +	u32			ts_opt_id;
+>  	u64			transmit_time;
+>  	u32			mark;
+>  };
+
+Ah there's a hole here. Nice!
+
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index f51d61fab059..73e21dad5660 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -1794,6 +1794,7 @@ struct sockcm_cookie {
+>  	u64 transmit_time;
+>  	u32 mark;
+>  	u32 tsflags;
+> +	u32 ts_opt_id;
+>  };
+>  
+>  static inline void sockcm_init(struct sockcm_cookie *sockc,
+> diff --git a/include/uapi/asm-generic/socket.h b/include/uapi/asm-generic/socket.h
+> index 8ce8a39a1e5f..db3df3e74b01 100644
+> --- a/include/uapi/asm-generic/socket.h
+> +++ b/include/uapi/asm-generic/socket.h
+> @@ -135,6 +135,8 @@
+>  #define SO_PASSPIDFD		76
+>  #define SO_PEERPIDFD		77
+>  
+> +#define SCM_TS_OPT_ID		78
 > +
-> +               /*
-> +                * map @0xe2000000 (32MB) to BAR0 (CPU)
-> +                * map @0xe0000000 (16MB) to BAR1 (AMBA)
-> +                */
-> +               ranges =3D <0xe2000000 0x00 0x00 0x00 0x2000000
+>  #if !defined(__KERNEL__)
+>  
+>  #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 468b1239606c..918cb6a0dcba 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -2859,6 +2859,20 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+>  			return -EINVAL;
+>  		sockc->transmit_time = get_unaligned((u64 *)CMSG_DATA(cmsg));
+>  		break;
+> +	case SCM_TS_OPT_ID:
+> +		/* allow this option for UDP sockets only */
+> +		if (!sk_is_udp(sk))
+> +			return -EINVAL;
+> +		tsflags = READ_ONCE(sk->sk_tsflags);
+> +		if (!(tsflags & SOF_TIMESTAMPING_OPT_ID))
+> +			return -EINVAL;
+> +		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
+> +			return -EINVAL;
+> +		sockc->ts_opt_id = get_unaligned((u32 *)CMSG_DATA(cmsg));
 
-The 0 parent address here matches the unit-address, so all good in this cas=
-e.
+Is the get_unaligned here needed? I don't usually see that on
+CMSG_DATA accesses. Even though they are indeed likely to be
+unaligned.
 
-> +                         0xe0000000 0x01 0x00 0x00 0x1000000>;
->
-> Also, I think it's not possible to know the devfn in advance, since the
-> DT part is pre-compiled as an overlay while the devfn number is coming fr=
-om
-> bus enumeration.
+> +		/* do not allow 0 as packet id for timestamp */
+> +		if (!sockc->ts_opt_id)
+> +			return -EINVAL;
+> +		break;
+>  	/* SCM_RIGHTS and SCM_CREDENTIALS are semantically in SOL_UNIX. */
+>  	case SCM_RIGHTS:
+>  	case SCM_CREDENTIALS:
+> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+> index b90d0f78ac80..f1e6695cafd2 100644
+> --- a/net/ipv4/ip_output.c
+> +++ b/net/ipv4/ip_output.c
+> @@ -1050,8 +1050,14 @@ static int __ip_append_data(struct sock *sk,
+>  
+>  	hold_tskey = cork->tx_flags & SKBTX_ANY_TSTAMP &&
+>  		     READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID;
+> -	if (hold_tskey)
+> -		tskey = atomic_inc_return(&sk->sk_tskey) - 1;
+> +	if (hold_tskey) {
+> +                if (cork->ts_opt_id) {
+> +                        hold_tskey = false;
+> +                        tskey = cork->ts_opt_id;
+> +                } else {
+> +                        tskey = atomic_inc_return(&sk->sk_tskey) - 1;
+> +                }
+> +	}
+>  
+>  	/* So, what's going on in the loop below?
+>  	 *
+> @@ -1324,6 +1330,7 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
+>  	cork->mark = ipc->sockc.mark;
+>  	cork->priority = ipc->priority;
+>  	cork->transmit_time = ipc->sockc.transmit_time;
+> +	cork->ts_opt_id = ipc->sockc.ts_opt_id;
+>  	cork->tx_flags = 0;
+>  	sock_tx_timestamp(sk, ipc->sockc.tsflags, &cork->tx_flags);
+>  
+> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+> index f26841f1490f..602064250546 100644
+> --- a/net/ipv6/ip6_output.c
+> +++ b/net/ipv6/ip6_output.c
+> @@ -1401,6 +1401,7 @@ static int ip6_setup_cork(struct sock *sk, struct inet_cork_full *cork,
+>  	cork->base.gso_size = ipc6->gso_size;
+>  	cork->base.tx_flags = 0;
+>  	cork->base.mark = ipc6->sockc.mark;
+> +	cork->base.ts_opt_id = ipc6->sockc.ts_opt_id;
+>  	sock_tx_timestamp(sk, ipc6->sockc.tsflags, &cork->base.tx_flags);
+>  
+>  	cork->base.length = 0;
+> @@ -1545,8 +1546,14 @@ static int __ip6_append_data(struct sock *sk,
+>  
+>  	hold_tskey = cork->tx_flags & SKBTX_ANY_TSTAMP &&
+>  		     READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID;
+> -	if (hold_tskey)
+> -		tskey = atomic_inc_return(&sk->sk_tskey) - 1;
+> +	if (hold_tskey) {
+> +		if (cork->ts_opt_id) {
+> +			hold_tskey = false;
+> +			tskey = cork->ts_opt_id;
+> +		} else {
+> +			tskey = atomic_inc_return(&sk->sk_tskey) - 1;
+> +		}
+> +	}
+>  
+>  	/*
+>  	 * Let's try using as much space as possible.
+> -- 
+> 2.43.5
+> 
 
-No. devfn is fixed unless you are plugging in a card in different
-slots. The bus number is the part that is not known and assigned by
-the OS, but you'll notice that is omitted.
 
-In any case, the RP1 node should be generated, so its devfn is irrelevant.
-
-> Since the registers for sub-peripherals will start (as stated in ranges
-> property) from 0xc040000000, I'd be inclined to use rp1@c040000000 as the
-> node name and address unit. Is it feasible?
-
-Yes, but that would be in nodes underneath ranges. Above, it is the
-parent bus we are talking about.
-
-> > >                 #address-cells =3D <0x02>;
-> > >                 #size-cells =3D <0x02>;
-> > >                 compatible =3D "simple-bus";
-> >
-> > The parent is a PCI-PCI bridge. Child nodes have to be PCI devices and
-> > "simple-bus" is not a PCI device.
->
-> The simple-bus is needed to automatically traverse and create platform
-> devices in of_platform_populate(). It's true that RP1 is a PCI device,
-> but sub-peripherals of RP1 are platform devices so I guess this is
-> unavoidable right now.
-
-You are missing the point. A PCI-PCI bridge does not have a
-simple-bus. However, I think it's just what you pasted here that's
-wrong. From the looks of the RP1 driver and the overlay, it should be
-correct.
-
-It would also help if you dumped out what "lspci -tvnn" prints.
-
-> > The assumption so far with all of this is that you have some specific
-> > PCI device (and therefore a driver). The simple-buses under it are
-> > defined per BAR. Not really certain if that makes sense in all cases,
-> > but since the address assignment is dynamic, it may have to. I'm also
-> > not completely convinced we should reuse 'simple-bus' here or define
-> > something specific like 'pci-bar-bus' or something.
->
-> Good point. Labeling a new bus for this kind of 'appliance' could be
-> beneficial to unify the dt overlay approach, and I guess it could be
-> adopted by the aforementioned Bootlin's Microchip patchset too.
-> However, since the difference with simple-bus would be basically non
-> existent, I believe that this could be done in a future patch due to
-> the fact that the dtbo is contained into the driver itself, so we do
-> not suffer from the proliferation that happens when dtb are managed
-> outside.
-
-It's an ABI, so we really need to decide first.
-
-> > >                 ranges =3D <0xc0 0x40000000   0x01 0x00 0x00   0x00 0=
-x400000>;
-> > >                 dma-ranges =3D <0x10 0x00   0x43000000 0x10 0x00   0x=
-10 0x00>;
-> > >                 ......
-> > >         };
-> > >  };
-> > >
-> > > The pci@0,0 bridge node is automatically created by virtue of
-> > > CONFIG_PCI_DYNAMIC_OF_NODES, and has no dma-ranges, hence it implies =
-1:1 dma
-> > > mappings (flags for this mapping are set to zero).  The rp1@0 node ha=
-s
-> > > dma-ranges with flags set (0x43000000). Since 0x43000000 !=3D 0x00 an=
-y translation
-> > > will fail.
-> >
-> > It's possible that we should fill in 'dma-ranges' when making these
-> > nodes rather than supporting missing dma-ranges here.
->
-> I really think that filling dma-ranges for dynamically created pci
-> nodes would be the correct approach.
-> However, IMHO this does not imply that we could let inconsistent
-> address (64 bit addr with 32 flag bit set) laying around the
-> translation chain, and fixing that is currently working fine. I'd
-> be then inclined to say the proposed change is outside the scope
-> of the present patchset and to postpone it to a future patch.
-
-Okay, but let's fix it with a test case. There's already a test case
-for all this in the DT unittest which can be extended.
-
-Rob
 
