@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-123115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB4C0963B53
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:24:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5F98963B5A
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:25:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98919286285
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 06:24:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 581B51F24D3E
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 06:25:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866DF16C853;
-	Thu, 29 Aug 2024 06:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0B1157488;
+	Thu, 29 Aug 2024 06:23:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF1B16BE0F
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFC417799F
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:23:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724912611; cv=none; b=lHuMkkTfFV6GD9I6Nh/k9/npL+jlNCcK4dnX4bQgEDllnrZnRAopwaJJqU0oKtFt+5Ok0kZ4060XtUzAVzFQF2mvtCteHlSHIajRX9TZYWjeevq9dmHZXdkybXwnoGYZB+U+VWo0U2EkXIPlT87moYr+5HMya7v3FSGi0yLx0M4=
+	t=1724912617; cv=none; b=FMUuCldV06RYSW/Nf+SYn3TOk4xaB5RD5LRDjjZSZxc2aPhCK0cHY8rfVmWOz25zWDTJazsXvXirz+4WudpLbu4Zi13eHsY/vlUcepPwxeU2sgu1vO95gEQVzURwZgeGlPLLd6jizSgKOW4kPloyr18AbtC4EuCV0AyAY0C8K9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724912611; c=relaxed/simple;
-	bh=vBYxsA070+KD5hBwJ7H49nP7KiSAuPjnpGbn6E6DjxY=;
+	s=arc-20240116; t=1724912617; c=relaxed/simple;
+	bh=DJs0p0IPbaKBAvxeltKu41luLE/u3RizXk/nhWsOuso=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qNP5We6v7/hRKU0sthotnGH4xPduI25CXYxA/MgO38NUsK06GHwW0nMlD0AOd/7huyVYttQlHzgHPCUNW8kZwJ41jCbP4qg65/uSpQNq+C2gqWg5JatWRjki+4K7Rf8sldqsyxkjcK+zAOE+y8oivdeSRwWgEvuB+tANcKH+Dac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+	 MIME-Version:Content-Type; b=fC5zkE+AiA+kEdtmnNvWGRldENQhGV7IX6qvoWXEsxUCtVkc5JugWapXv6V5sqvSplquvjKoc/xNgaurniX2EU6TmYF/6u634RgGMejPtAj3oJxgDLyFn/cDbZ6LbIvofZ6wLKP0ZsD6RWusu9Z2ORM1fH/blbxHDq+Yk7w9ON0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WvWLh3qchzQr41;
-	Thu, 29 Aug 2024 14:18:36 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WvWQJ5wXlzpTVL;
+	Thu, 29 Aug 2024 14:21:44 +0800 (CST)
 Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id 36289180105;
-	Thu, 29 Aug 2024 14:23:27 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 15A6E14035F;
+	Thu, 29 Aug 2024 14:23:28 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
  (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 29 Aug
- 2024 14:23:26 +0800
+ 2024 14:23:27 +0800
 From: Jinjie Ruan <ruanjinjie@huawei.com>
 To: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
 	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
@@ -54,9 +54,9 @@ To: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
 	<linux-arm-kernel@lists.infradead.org>, <linux-sunxi@lists.linux.dev>,
 	<krzk@kernel.org>, <jic23@kernel.org>
 CC: <ruanjinjie@huawei.com>
-Subject: [PATCH net-next v3 10/13] net: dsa: microchip: Use scoped function to simplfy code
-Date: Thu, 29 Aug 2024 14:31:15 +0800
-Message-ID: <20240829063118.67453-11-ruanjinjie@huawei.com>
+Subject: [PATCH net-next v3 11/13] net: dsa: microchip: Use __free() to simplfy code
+Date: Thu, 29 Aug 2024 14:31:16 +0800
+Message-ID: <20240829063118.67453-12-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240829063118.67453-1-ruanjinjie@huawei.com>
 References: <20240829063118.67453-1-ruanjinjie@huawei.com>
@@ -71,8 +71,7 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  kwepemh500013.china.huawei.com (7.202.181.146)
 
-Avoids the need for manual cleanup of_node_put() in early exits
-from the loop by using for_each_available_child_of_node_scoped().
+Avoids the need for manual cleanup of_node_put() by using __free().
 
 Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
@@ -82,36 +81,49 @@ v3:
 v2:
 - Split into 2 patches.
 ---
- drivers/net/dsa/microchip/ksz_common.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/net/dsa/microchip/ksz_common.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index cd3991792b69..86ed563938f6 100644
+index 86ed563938f6..8058a0b7c161 100644
 --- a/drivers/net/dsa/microchip/ksz_common.c
 +++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -4595,7 +4595,7 @@ static int ksz_parse_drive_strength(struct ksz_device *dev)
+@@ -4595,7 +4595,6 @@ static int ksz_parse_drive_strength(struct ksz_device *dev)
  int ksz_switch_register(struct ksz_device *dev)
  {
  	const struct ksz_chip_data *info;
--	struct device_node *port, *ports;
-+	struct device_node *ports;
+-	struct device_node *ports;
  	phy_interface_t interface;
  	unsigned int port_num;
  	int ret;
-@@ -4681,12 +4681,11 @@ int ksz_switch_register(struct ksz_device *dev)
+@@ -4677,7 +4676,8 @@ int ksz_switch_register(struct ksz_device *dev)
+ 		ret = of_get_phy_mode(dev->dev->of_node, &interface);
+ 		if (ret == 0)
+ 			dev->compat_interface = interface;
+-		ports = of_get_child_by_name(dev->dev->of_node, "ethernet-ports");
++		struct device_node *ports __free(device_node) =
++			of_get_child_by_name(dev->dev->of_node, "ethernet-ports");
  		if (!ports)
  			ports = of_get_child_by_name(dev->dev->of_node, "ports");
  		if (ports) {
--			for_each_available_child_of_node(ports, port) {
-+			for_each_available_child_of_node_scoped(ports, port) {
+@@ -4685,16 +4685,13 @@ int ksz_switch_register(struct ksz_device *dev)
  				if (of_property_read_u32(port, "reg",
  							 &port_num))
  					continue;
- 				if (!(dev->port_mask & BIT(port_num))) {
--					of_node_put(port);
- 					of_node_put(ports);
+-				if (!(dev->port_mask & BIT(port_num))) {
+-					of_node_put(ports);
++				if (!(dev->port_mask & BIT(port_num)))
  					return -EINVAL;
- 				}
+-				}
+ 				of_get_phy_mode(port,
+ 						&dev->ports[port_num].interface);
+ 
+ 				ksz_parse_rgmii_delay(dev, port_num, port);
+ 			}
+-			of_node_put(ports);
+ 		}
+ 		dev->synclko_125 = of_property_read_bool(dev->dev->of_node,
+ 							 "microchip,synclko-125");
 -- 
 2.34.1
 
