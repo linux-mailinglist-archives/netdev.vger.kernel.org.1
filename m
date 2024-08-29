@@ -1,119 +1,161 @@
-Return-Path: <netdev+bounces-123176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37F0963EE1
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 10:44:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BE17963EF5
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 10:46:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 324A81C24286
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:44:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C9441C2225F
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:46:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D5818C33B;
-	Thu, 29 Aug 2024 08:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B9618784B;
+	Thu, 29 Aug 2024 08:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="CUzmpdSI"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PjexuK6r"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33DD189B9D;
-	Thu, 29 Aug 2024 08:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A66E23BF;
+	Thu, 29 Aug 2024 08:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724921040; cv=none; b=Lhf3EgtxvgoUK6jd9fCTQvNbgdM0kRzjfWXLHplSfdCZF7VJHZdm+TX+QDtpekbD6Ik/m9MnJXwXWTbjpxO2yWUrTsN4jxXVB8qcVPkq3SzhFL4BYgSQiWij0xS0IuUQ5p58SmARgVcR1OrH6bPVq/yKzJmxici0FHI77w+ydFc=
+	t=1724921180; cv=none; b=nA+pzmaK0DXYvP1LI899TT6tZyDtpHSkXdhmNgm1P2uk51sYZbU9D0aMvVwwuyZBupaNIVzUXKjla1Q8gQh/molAwEMlJyp2cFVWjKyXJPZTfbTQbgs4+DdcMSD5bNfVYXPMp8hPC+o/rbVMiP2w4QY1QXQUcfB3g9k/Y26GEoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724921040; c=relaxed/simple;
-	bh=2C0YSL35AO+qbcMzCggkTk7ZR8ZizdAacVd9eprVcDc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=njN54YkREeZ/+Yt6FLXa3VT0NhfrEVBNi/wHNsQLHO+jExaqeSHzttfLJeIw7AGE/fIbuBZCG28lMkx2daXtBRP7tgqW0+5ukq5j/esHaROV/GlGf3/8M2yByeyTev7FGZkRrD5UUJnFnosGu072EmjbXJ9NFiPEW8R7h1VUMMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=CUzmpdSI; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id 6046720B7165; Thu, 29 Aug 2024 01:43:58 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 6046720B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1724921038;
-	bh=fjV6bhL7oCv81jbrq2vTPTnkfRQIIJK+sztlGGSrG8k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CUzmpdSI1zlx3cq7BX+BJ7Dm1eXC8AHcvb6LDRcURXH+u16/YY6K3479uaaZ1Ns61
-	 EOuoYo1u3cOAcGQ3+tFgnvrbiz+vRWZYV/WdlG5yFFQcpGz2bUySIFxs8ytLDaHH5Q
-	 uecQynjJUXgLimk4Wukte6jJXUTDVzagcxHMuWgI=
-Date: Thu, 29 Aug 2024 01:43:58 -0700
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, longli@microsoft.com, yury.norov@gmail.com,
-	leon@kernel.org, cai.huoqing@linux.dev, ssengar@linux.microsoft.com,
-	vkuznets@redhat.com, tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	schakrabarti@microsoft.com
-Subject: Re: [PATCH V2 net] net: mana: Fix error handling in
- mana_create_txq/rxq's NAPI cleanup
-Message-ID: <20240829084358.GA15997@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1724406269-10868-1-git-send-email-schakrabarti@linux.microsoft.com>
- <20240827132637.31b7eb36@kernel.org>
+	s=arc-20240116; t=1724921180; c=relaxed/simple;
+	bh=Bj0rYfFMFOdRT9x7QevbHV1veHJGPyzH0cChv7GpEhE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uoMHm29EpX3JpM4v4C5qI6OeXcVNlEAg5jkRa5t5M6JakbNUiat9yfGdZ5ETnmaVbrt3ikjM/N83fkhoVcuP/kZcQVCp63+4fBzqeZNdvwL7gfnhTm+Oy1Ml27tCc6OlTvnc3BKcTj0vBGtqGeqN4XuomQhbTir7m2v31VWdg/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PjexuK6r; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 6CFF01C000E;
+	Thu, 29 Aug 2024 08:46:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1724921170;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+T3omComrLDAWmGbNggJCqX9A019Fxez+XjpgJiOBzo=;
+	b=PjexuK6rbszk7oaGN2/pHSDc4v+HR/T3nq+tk5ETvg/N0EiaTPwdoDaCgywoEma6CLQ3ii
+	eqbUIkDSvBGoCfpS6h2tyC1HCDuu0Gzz2tA9axCqf0VFpuuxML4LdERD5D/sBG+/EihoKY
+	9mVoYexdOzraQVHbYS391BcpTmUbDP6Pu4iE6yg09M2in+l3Ux22bFceXXkRCKEdI07qSc
+	JioFW/sHo6SY1C0tqUUnWnCgvbOEahufon9hqTdtcQkI6JjiaAgkntSFHZe8wNLd7+NkF2
+	12UQ1/omVjmUrmOfF65to9XU854JOshShxqvrOwrcVAwZCwrc4daedYkVOBF6A==
+Date: Thu, 29 Aug 2024 10:46:06 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Simon Horman <horms@kernel.org>
+Cc: davem@davemloft.net, Pantelis Antoniou <pantelis.antoniou@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
+ King <linux@armlinux.org.uk>, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Herve Codina
+ <herve.codina@bootlin.com>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH net-next 6/6] net: ethernet: fs_enet: phylink conversion
+Message-ID: <20240829104606.4ba68402@device-28.home>
+In-Reply-To: <20240828163224.GT1368797@kernel.org>
+References: <20240828095103.132625-1-maxime.chevallier@bootlin.com>
+	<20240828095103.132625-7-maxime.chevallier@bootlin.com>
+	<20240828163224.GT1368797@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240827132637.31b7eb36@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Tue, Aug 27, 2024 at 01:26:37PM -0700, Jakub Kicinski wrote:
-> On Fri, 23 Aug 2024 02:44:29 -0700 Souradeep Chakrabarti wrote:
-> > @@ -2023,14 +2024,17 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
+Hello Simon,
+
+On Wed, 28 Aug 2024 17:32:24 +0100
+Simon Horman <horms@kernel.org> wrote:
+
+> On Wed, Aug 28, 2024 at 11:51:02AM +0200, Maxime Chevallier wrote:
+> > fs_enet is a quite old but still used Ethernet driver found on some NXP
+> > devices. It has support for 10/100 Mbps ethernet, with half and full
+> > duplex. Some variants of it can use RMII, while other integrations are
+> > MII-only.
+> > 
+> > Add phylink support, thus removing custom fixed-link hanldling.
+> > 
+> > This also allows removing some internal flags such as the use_rmii flag.
+> > 
+> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>  
+> 
+> Hi Maxime,
+> 
+> Some minor issues from my side: not a full review by any stretch of
+> the imagination.
+> 
+> ...
+> 
+> > @@ -911,7 +894,7 @@ static int fs_enet_probe(struct platform_device *ofdev)
+> >  	if (!IS_ERR(clk)) {
+> >  		ret = clk_prepare_enable(clk);
+> >  		if (ret)
+> > -			goto out_deregister_fixed_link;
+> > +			goto out_phylink;
 > >  
-> >  	napi = &rxq->rx_cq.napi;
+> >  		fpi->clk_per = clk;
+> >  	}  
+> 
+> This goto will result in a dereference of fep.
+> But fep is not initialised until the following line,
+> which appears a little below this hunk.
+> 
+> 	fep = netdev_priv(ndev);
+
+Nice catch, the goto should rather go to out_free_fpi.
+
+> 
+> This goto will also result in the function returning without
+> releasing clk.
+
+ah yes, it's never disabled_unprepared, the phylink cleanup label is at
+the wrong spot. I'll include a patch in the next iteration to make use
+of devm_clk_get_enabled(), that should simplify all of that.
+
+> Both flagged by Smatch.
+> 
+> > @@ -936,6 +919,26 @@ static int fs_enet_probe(struct platform_device *ofdev)
+> >  	fep->fpi = fpi;
+> >  	fep->ops = ops;
 > >  
-> > -	if (validate_state)
-> > -		napi_synchronize(napi);
-> > +	if (napi->dev == apc->ndev) {
-> >  
-> > -	napi_disable(napi);
-> > +		if (validate_state)
-> > +			napi_synchronize(napi);
-> >  
-> > -	xdp_rxq_info_unreg(&rxq->xdp_rxq);
-> > +		napi_disable(napi);
-> >  
-> > -	netif_napi_del(napi);
-> > +		netif_napi_del(napi);
-> > +	}
+> > +	fep->phylink_config.dev = &ndev->dev;
+> > +	fep->phylink_config.type = PHYLINK_NETDEV;
+> > +	fep->phylink_config.mac_capabilities = MAC_10 | MAC_100;
 > > +
-> > +	xdp_rxq_info_unreg(&rxq->xdp_rxq);
+> > +	__set_bit(PHY_INTERFACE_MODE_MII,
+> > +		  fep->phylink_config.supported_interfaces);
+> > +
+> > +	if (of_device_is_compatible(ofdev->dev.of_node, "fsl,mpc5125-fec"))
+> > +		__set_bit(PHY_INTERFACE_MODE_RMII,
+> > +			  fep->phylink_config.supported_interfaces);
+> > +
+> > +	phylink = phylink_create(&fep->phylink_config, dev_fwnode(fep->dev),
+> > +				 phy_mode, &fs_enet_phylink_mac_ops);
+> > +	if (IS_ERR(phylink)) {
+> > +		ret = PTR_ERR(phylink);
+> > +		goto out_free_fpi;  
 > 
-> Please don't use internal core state as a crutch for your cleanup.
-> 
-> IDK what "validate_state" stands for, but it gives you all the info you
-> need on Rx. On Rx NAPI registration happens as the last stage of rxq
-> activation, once nothing can fail. And the "cleanup" path calls destroy
-> with validate_state=false. The only other caller passes true.
-> 
-> So you can rewrite this as:
-> 
-> 	if (validate_state) { /* rename it maybe? */
-> 		napi_disable(napi);
-> 		...
-> 	}
-> 	xdp_rxq_info_unreg(&rxq->xdp_rxq);
-> 
-> You can take similar approach with Tx. Pass a bool which tells the
-> destroy function whether NAPI has been registered.
-Thanks Jakub for the suggestion. I have changed the implementation
-in the V3. I have added a new txq and rxq structure attribute to check
-that per queue napi is initialized.
-The use of a local flag like validate_state will not be possible with
-current design of txq destroy function, as it uses the hole vport
-and loops for all the queues for that port.
--
-Souradeep
-> -- 
-> pw-bot: cr
+> This also appears to leak clk, as well as ndev.
+
+Thanks, will be addressed in V2.
+
+> I didn't look for other cases.
+
+I'll go over the cleanup path, thanks for checking this !
+
+Thanks,
+
+Maxime
 
