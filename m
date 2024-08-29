@@ -1,105 +1,217 @@
-Return-Path: <netdev+bounces-123172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2397963EBC
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 10:36:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BEBE0963EC0
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 10:37:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 109B41C244B5
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:36:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3AED1C2107A
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:37:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C08118C324;
-	Thu, 29 Aug 2024 08:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B767189F55;
+	Thu, 29 Aug 2024 08:37:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="G0W1zO6t"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="R90Bo+6E"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1C7189912;
-	Thu, 29 Aug 2024 08:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D0C83D6A;
+	Thu, 29 Aug 2024 08:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724920559; cv=none; b=fKrnifP+T38n72qXcJV97Y0HDEXhZ9nCakfKE2SYw5zeM0Fco/9BQzwiHFch0/AdKnjbm8vqWy57M7/Yv5CNEtF4KgN6QQPg6YT6DdajdUbBRgXypSCftAGqHKOMmUDHbkV9fzYDZWBpb2sgEs6d47A3ArurNmfKjAFWBK4wqgI=
+	t=1724920626; cv=none; b=Ij/B2jBikwp91i8uph8Y0d762VOAF83rAXiTZBtvKCVh/sPaIRqnBkqaySU1jqoPAvgfIQIW9YzFSqbyE4vLYD7E0dPrvY4WhaFKT6QIZczAvqMiOaqLq2OMPT1qRMwuAlrx91M2vQt3ePLDrkG4PbhxwXiAXO1oisnR51iMp9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724920559; c=relaxed/simple;
-	bh=kYfR6vntvOP/ZNvvFwoIJHJ0pNxEGNa4BCttNEffydw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C7xCvwNw6XOzirKDE6Lmy29yAsSjE/qdbbyosheAFz3ZErcO0KGy6my7tiCLv9LeJ0+RDU4rm5t5koMWGKssAQaJ4jASCuA5Eh6Er8f+YkVbfgaIa1X92yrqtEodh1KKl7gQ9z1e+Wujf0Fm2WFSozxs4/l4CjnSVAi0EoO4DTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=G0W1zO6t; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5E6B7E0003;
-	Thu, 29 Aug 2024 08:35:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1724920554;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F8/ITs5ZwIVyovjR2zQIGYV49XbmpSZY/DEuv5GceYc=;
-	b=G0W1zO6tjw7DOdqAwN4v9iW7SlKaQ3FqxPe+/hoOcJ4aiysVXd9dL8/pBKOFkTix9E8cvv
-	skCOKDtLmOHM8jd2n0rhHa+O5UI7GkItQ9pqfexs8eaK1R4vQ729ogQKRxJjnjKgnvpZuU
-	yK3l0PjMn/xf6Zm3K61PrXwGpdvZBYlew1o7EK4gBzzwGJtZYZnHiRgQMDtDYYSJx91hqb
-	/JxH+IBhV+PfM2j27pMQgKU7Ix6BLnw98B545utC2DZ8eKAEOm9TSDhCl8lD5UfvhEx9OI
-	goF14YLFuNIgmAXqM+WAXEYDVlRONprF0PClcMPQCt+bAV+c4uULJHqpFgM0dA==
-Date: Thu, 29 Aug 2024 10:35:52 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Diogo Jahchan Koike <djahchankoike@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [patch net-next v4] ethtool: pse-pd: move pse validation into
- set
-Message-ID: <20240829103552.09f22f98@device-28.home>
-In-Reply-To: <20240828174340.593130-2-djahchankoike@gmail.com>
-References: <20240828174340.593130-2-djahchankoike@gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1724920626; c=relaxed/simple;
+	bh=1h+WeBtsVytlCUWzdY+Woq+1e7PbLK94rU8EPRzpGn4=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=H2hhGwWR7rLfeQ5pZCdX6C8esLINw+UaXkeCgtvrKT5hlewn58/doeKni0+djwEemZxiovRnKv9mik7okWtI6rMkco3lewB9qfh9gAn/9CnqzfIbFqWARQ3plZf4mgEro484BWXiDSk2GNW8jkla540c7rS5ouXETI2baxBbMEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=R90Bo+6E; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id 1725C20B7165; Thu, 29 Aug 2024 01:37:04 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1725C20B7165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1724920624;
+	bh=wzjuHwdSxz3Gg3y22vDYhlPDTd1A5vSqMohovQuwOJw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=R90Bo+6EIb9pbEgDLB+fmVPRQs3swvRrJ1NwMhk2/G5ZbhVmgwveJaSf9LWFkngtz
+	 h8ahqnw+mcuDtipo+9Egqxiz3hs2FDZBZVM+sWfNk5gZw1f7SlJOZnBFGW7BK07KV8
+	 1zY3J++NsTulZjtE2HI47pt1QHCVYRZ7PA0Q7p7M=
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	longli@microsoft.com,
+	ssengar@linux.microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: schakrabarti@microsoft.com,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH V3 net] net: mana: Fix error handling in mana_create_txq/rxq's NAPI cleanup
+Date: Thu, 29 Aug 2024 01:36:50 -0700
+Message-Id: <1724920610-15546-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi Diogo,
+Currently napi_disable() gets called during rxq and txq cleanup,
+even before napi is enabled and hrtimer is initialized. It causes
+kernel panic.
 
-On Wed, 28 Aug 2024 14:43:17 -0300
-Diogo Jahchan Koike <djahchankoike@gmail.com> wrote:
+? page_fault_oops+0x136/0x2b0
+  ? page_counter_cancel+0x2e/0x80
+  ? do_user_addr_fault+0x2f2/0x640
+  ? refill_obj_stock+0xc4/0x110
+  ? exc_page_fault+0x71/0x160
+  ? asm_exc_page_fault+0x27/0x30
+  ? __mmdrop+0x10/0x180
+  ? __mmdrop+0xec/0x180
+  ? hrtimer_active+0xd/0x50
+  hrtimer_try_to_cancel+0x2c/0xf0
+  hrtimer_cancel+0x15/0x30
+  napi_disable+0x65/0x90
+  mana_destroy_rxq+0x4c/0x2f0
+  mana_create_rxq.isra.0+0x56c/0x6d0
+  ? mana_uncfg_vport+0x50/0x50
+  mana_alloc_queues+0x21b/0x320
+  ? skb_dequeue+0x5f/0x80
 
-> Move validation into set, removing .set_validate operation as its current
-> implementation holds the rtnl lock for acquiring the PHY device, defeating
-> the intended purpose of checking before grabbing the lock.
+Cc: stable@vger.kernel.org
+Fixes: e1b5683ff62e ("net: mana: Move NAPI from EQ to CQ")
+Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+---
+V3 -> V2:
+Instead of using napi internal attribute, using an atomic
+attribute to verify napi is initialized for a particular txq / rxq.
 
-[...] 
+V2 -> V1:
+Addressed the comment on cleaning up napi for the queues,
+where queue creation was successful.
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 30 ++++++++++++-------
+ include/net/mana/mana.h                       |  4 +++
+ 2 files changed, 24 insertions(+), 10 deletions(-)
 
->  static int
-> -ethnl_set_pse_validate(struct ethnl_req_info *req_info, struct genl_info *info)
-> +ethnl_set_pse_validate(struct phy_device *phydev, struct genl_info *info)
->  {
->  	struct nlattr **tb = info->attrs;
-> -	struct phy_device *phydev;
-> -
-> -	phydev = ethnl_req_get_phydev(req_info, tb[ETHTOOL_A_PSE_HEADER],
-> -				      info->extack);
-> +	
-   ^^^
-You have an extra white space here. Make sure you run your patch through
-the checkpatch script to detect this kind of issues.
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 39f56973746d..bd303c89cfa6 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -1872,10 +1872,12 @@ static void mana_destroy_txq(struct mana_port_context *apc)
+ 
+ 	for (i = 0; i < apc->num_queues; i++) {
+ 		napi = &apc->tx_qp[i].tx_cq.napi;
+-		napi_synchronize(napi);
+-		napi_disable(napi);
+-		netif_napi_del(napi);
+-
++		if (atomic_read(&apc->tx_qp[i].txq.napi_initialized)) {
++			napi_synchronize(napi);
++			napi_disable(napi);
++			netif_napi_del(napi);
++			atomic_set(&apc->tx_qp[i].txq.napi_initialized, 0);
++		}
+ 		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
+ 
+ 		mana_deinit_cq(apc, &apc->tx_qp[i].tx_cq);
+@@ -1931,6 +1933,7 @@ static int mana_create_txq(struct mana_port_context *apc,
+ 		txq->ndev = net;
+ 		txq->net_txq = netdev_get_tx_queue(net, i);
+ 		txq->vp_offset = apc->tx_vp_offset;
++		atomic_set(&txq->napi_initialized, 0);
+ 		skb_queue_head_init(&txq->pending_skbs);
+ 
+ 		memset(&spec, 0, sizeof(spec));
+@@ -1997,6 +2000,7 @@ static int mana_create_txq(struct mana_port_context *apc,
+ 
+ 		netif_napi_add_tx(net, &cq->napi, mana_poll);
+ 		napi_enable(&cq->napi);
++		atomic_set(&txq->napi_initialized, 1);
+ 
+ 		mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
+ 	}
+@@ -2023,14 +2027,18 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
+ 
+ 	napi = &rxq->rx_cq.napi;
+ 
+-	if (validate_state)
+-		napi_synchronize(napi);
++	if (atomic_read(&rxq->napi_initialized)) {
+ 
+-	napi_disable(napi);
++		if (validate_state)
++			napi_synchronize(napi);
+ 
+-	xdp_rxq_info_unreg(&rxq->xdp_rxq);
++		napi_disable(napi);
+ 
+-	netif_napi_del(napi);
++		netif_napi_del(napi);
++		atomic_set(&rxq->napi_initialized, 0);
++	}
++
++	xdp_rxq_info_unreg(&rxq->xdp_rxq);
+ 
+ 	mana_destroy_wq_obj(apc, GDMA_RQ, rxq->rxobj);
+ 
+@@ -2199,6 +2207,7 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
+ 	rxq->num_rx_buf = RX_BUFFERS_PER_QUEUE;
+ 	rxq->rxq_idx = rxq_idx;
+ 	rxq->rxobj = INVALID_MANA_HANDLE;
++	atomic_set(&rxq->napi_initialized, 0);
+ 
+ 	mana_get_rxbuf_cfg(ndev->mtu, &rxq->datasize, &rxq->alloc_size,
+ 			   &rxq->headroom);
+@@ -2286,6 +2295,8 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
+ 
+ 	napi_enable(&cq->napi);
+ 
++	atomic_set(&rxq->napi_initialized, 1);
++
+ 	mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
+ out:
+ 	if (!err)
+@@ -2336,7 +2347,6 @@ static void mana_destroy_vport(struct mana_port_context *apc)
+ 		rxq = apc->rxqs[rxq_idx];
+ 		if (!rxq)
+ 			continue;
+-
+ 		mana_destroy_rxq(apc, rxq, true);
+ 		apc->rxqs[rxq_idx] = NULL;
+ 	}
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 7caa334f4888..be75abd63dc8 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -98,6 +98,8 @@ struct mana_txq {
+ 
+ 	atomic_t pending_sends;
+ 
++	atomic_t napi_initialized;
++
+ 	struct mana_stats_tx stats;
+ };
+ 
+@@ -335,6 +337,8 @@ struct mana_rxq {
+ 	bool xdp_flush;
+ 	int xdp_rc; /* XDP redirect return code */
+ 
++	atomic_t napi_initialized;
++
+ 	struct page_pool *page_pool;
+ 
+ 	/* MUST BE THE LAST MEMBER:
+-- 
+2.34.1
 
-The rest looks good to me. For the next version,
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Thanks,
-
-Maxime
 
