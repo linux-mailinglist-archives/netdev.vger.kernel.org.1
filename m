@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-123514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FDBC96524A
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 23:49:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 010F796524C
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 23:49:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65B521C24203
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 21:49:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FD3D1F21695
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 21:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766471BB6B5;
-	Thu, 29 Aug 2024 21:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EAF01BBBDB;
+	Thu, 29 Aug 2024 21:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LbUbFgsI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BiAAqjrH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD90E1BAECD;
-	Thu, 29 Aug 2024 21:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F015A1BB696;
+	Thu, 29 Aug 2024 21:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724968125; cv=none; b=uKDL3VX1BDSIFLMJYEI4MnBf3tiMmbue2r9FHcm0x8Un6C9a4FHZ6lL/bLxHDWM/YtYvG6d3a8hfvLFQilyiiP/4SmJH9Tc5ZFm8ZxTv6qzThVX2cMxa59kWSgXwLOf0HNkW/2qtYcJmXhgIckmqaz+9qY/GprRaoH8HVxuT2Uc=
+	t=1724968126; cv=none; b=BFcK9IGE7qAi3X/FRdGb5x8hiVJN5lWvDpu4UA01VA50ve7A5FzJfnsr1gknnaSgnHX+t6WyhfbOaEPqEaRzdEi3ilCTVjv67Njq2kvTOFV1yXVNQIWpVvIlE+K/0Sdd22fDPFa/M5Txj7wN5aUhVyvQ45JR0NTkULEcpVML/XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724968125; c=relaxed/simple;
-	bh=/Ib3RLq1lbiCNk/gwnJKNDQ9hhJgWipT3hhpkjr0OGk=;
+	s=arc-20240116; t=1724968126; c=relaxed/simple;
+	bh=DpvWD4Hx+ubjtWZr0SjKbPjMf5o7Xsp9yXZxbet1eYM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AxxUPDsgaeb2iodvUv00bKLcYMmwiQ8v2L7jYIGPAvMsyibTV+ix2bbXJ6uYrmDQmH4O4Zj14RccKeP8/7YI2xRkcGsS5ifX+drlMlO3ynF+C2EEJyUYuNo0QqTUjVx2mrJmkTPr/rdNDZsu7JNHP1GsEq+n11lrRO8pJZfg4Xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LbUbFgsI; arc=none smtp.client-ip=209.85.166.181
+	 MIME-Version; b=kPFm7aZX7pBn606Se24DTk/rEVlz81G9gVUy/Lvx76W2TTRl0L3IP2FTStLEdklmTSVSRTPFInkpveNUb6IpNPpo3FyPg4Ug3qG0PSuJkJIQzbDRIY82N1vuDqAWZCvJ3NIAclG+u0oxAkF+S8WLyrj1yj/Mn+C4++U6uWW5p0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BiAAqjrH; arc=none smtp.client-ip=209.85.166.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-39d47a9ffb9so4229235ab.1;
-        Thu, 29 Aug 2024 14:48:43 -0700 (PDT)
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-39d3b31e577so4961255ab.1;
+        Thu, 29 Aug 2024 14:48:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724968123; x=1725572923; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724968124; x=1725572924; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=y2cYzMIEtOcnTHpiB72IdBy7qlV47qa+YowYhB7YIvA=;
-        b=LbUbFgsIJ+m92sa688vjZgkpBQiko0qEorVmLAT/9VloMFrI9HqFs1bNpXlNbV6R8R
-         ImKs4zyTJ2ZyhSXEaEgwV1npADwLfH+ilh2bEevFGdvGpuk1j64PnmYh6M3kKK1pdwKI
-         uzBPYJSbdIRyp4o6CACdeoTKlQxR8mkxT+qqswHHScRLfST3xY48UqwdI3JopZ9VccVA
-         6ceV5KnXFeneOeeSVO3LtpjOVURPPTH7b8RxYzkLLhKfJYI3NjPfQ9hIgGgDJmOB5eAP
-         /+yavllwdPFCxsXDA4l8rvLKoxsZ/iHMKzJZDpdhkbS9Tcut0JRwZufkcPhPdoqHl2Wb
-         56Tw==
+        bh=KIWx7O7Yfjr0NlWYq8rnxK+R+TlNba0mB+FqBvJfLL4=;
+        b=BiAAqjrHiMPgRPL9Yf9PznWYWkyWIGlnFdOmdcTjyVekSRoldSLQdpMoP9O8a5mxwT
+         VRBhApGhlTO38jgNQdNR2MtlcEdp3ADVEIJCf4lDlgogeLnVn/liwrbYR6thVqAiELJQ
+         uIE0RAwjhxP9GMSBnGTrKSqJQd6pLLiuCbkvVdZJG6lNdlTDeL7L2PKL6gseT8NCzE0m
+         vOLx0E2QLg/nPAdryu2sDhJREF+ZxhSqJWqitctJpboV4bTrYGPn3MwPBl/RhWJP5wo7
+         7lFAe454U7bev+oCWOK6gFwxPNmvaVB9Ua64JlJWIugwIUrtlna9tDuUw7/Gj8Euzl0R
+         kmEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724968123; x=1725572923;
+        d=1e100.net; s=20230601; t=1724968124; x=1725572924;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=y2cYzMIEtOcnTHpiB72IdBy7qlV47qa+YowYhB7YIvA=;
-        b=XL1hAern20Dj5aeUnoWYljhpR19uTS9AGZPhExeF03PbaY7n5MYTSFFqmO9qgos3i+
-         qsHDLMT0hIEcPAPHk0XdOYNweqCwGrYjERHPxjW0kqm4f8DNwwhkS6N2Mn8pt4Su4ZnH
-         uol7aRX5vGTXVaxImCy8Vhao1wsaE9GQ9EmDpexTeV8P62aR6bbGvtCPTUO7dint1cwL
-         O2cj5LArSwmLocDPuHBlcDAJy45yJYTj6cZMg7xqtuGgi52rgzRyrtWVaklypLq8jsge
-         xluluhamZ7kzqn2MddKtn0bAhlpz9KDQ9j5EWA/CSZmhGbkvc+bpZlC7zkluyyLXPPAo
-         +rxg==
-X-Forwarded-Encrypted: i=1; AJvYcCX3p0U/zV2TLDH9Nx6cqUEqi2Y/QQmdG1gzQYYKR9C3TkkNKRagPmK7l4GIBGMq+qgNwmXhvIjXuHMEOhY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQ6mUxVDzyAKJDkFaoHKd2/ZHkH4QikvdU5Kn1DHLYiPu2+E43
-	3SMaR6owztveu1uYEtYnrppkphLixhV65w4MNz1DSFyL7NThN7iZ0kmki9N/
-X-Google-Smtp-Source: AGHT+IGAI0zPMj8TO3F1/Jfsd0hd4CenesfKqQ2Y6k7rb00bKaDbGGEBU0M2pNVii8kIzbF4vLAz3Q==
-X-Received: by 2002:a05:6e02:1e04:b0:39d:351a:d0a2 with SMTP id e9e14a558f8ab-39f379ae918mr51543625ab.25.1724968122609;
-        Thu, 29 Aug 2024 14:48:42 -0700 (PDT)
+        bh=KIWx7O7Yfjr0NlWYq8rnxK+R+TlNba0mB+FqBvJfLL4=;
+        b=DbQdLUIj2As3MoZsU/6Op7hlgjngGWGEYZXYRly/RSl0+nFNlJzebZhfYtDehLg7sH
+         xITfZAvCpf9rsbMNykectdUhRIvOgDWeVoTrg/sZVcw7OC4EGw35Shb7mLAHJTYmgMKY
+         rpAwVNp6uu25yYWNFqxwINxlGYAgQwbCG+w5ylnhqdKt0z+UhF9ApsONHqBFgn6epB/m
+         Aj3bq2mMLEjelms3gKXcnWEuwCSnHmXjeD1F6SPNPhVFPeglejj+YpiRYl7wIWqfeNoi
+         lTHx4Aq37CRxBTTOjhSGgXcDQsVT/Tg1TO942QEMxi1qDn9ruj96VjpmFnRvT6CVLAxl
+         RBQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW1L4MyUegXwHZ/+kW3SCrykzoO3+siU+fRyFXD0OOP99QlWfliFZiMmcBxJrhv5jFmht1D587aA1oWI/k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrkykkgO1kOyWmO9aZM/qnH4cmhlPDpSYN4FvPmb7qeRnlsxtJ
+	sMfyDseuTCuxWcIusqZ1HDh5SSU/BAXqaaQ2nFrkm/DlLM0O1k5vjNFmuIHw
+X-Google-Smtp-Source: AGHT+IHDPHIXaZ2YuwMnYDje41Rsstbt8vQ9tCYyOQmflj2gYiTOWkRUagGHXFVtl5wUPzl+oe+ZhA==
+X-Received: by 2002:a05:6e02:1446:b0:39d:22ab:9b26 with SMTP id e9e14a558f8ab-39f377ce44dmr51989165ab.4.1724968123800;
+        Thu, 29 Aug 2024 14:48:43 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d22e77a7besm1708029a12.37.2024.08.29.14.48.41
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d22e77a7besm1708029a12.37.2024.08.29.14.48.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 14:48:42 -0700 (PDT)
+        Thu, 29 Aug 2024 14:48:43 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -77,9 +77,9 @@ Cc: davem@davemloft.net,
 	linux-kernel@vger.kernel.org,
 	o.rempel@pengutronix.de,
 	p.zabel@pengutronix.de
-Subject: [PATCH net-next 2/6] net: ag71xx: update FIFO bits and descriptions
-Date: Thu, 29 Aug 2024 14:48:21 -0700
-Message-ID: <20240829214838.2235031-3-rosenp@gmail.com>
+Subject: [PATCH net-next 3/6] net: ag71xx: use ethtool_puts
+Date: Thu, 29 Aug 2024 14:48:22 -0700
+Message-ID: <20240829214838.2235031-4-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240829214838.2235031-1-rosenp@gmail.com>
 References: <20240829214838.2235031-1-rosenp@gmail.com>
@@ -91,82 +91,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Taken from QCA SDK. No functional difference as same bits get applied.
+Allows simplifying get_strings and avoids manual pointer manipulation.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/atheros/ag71xx.c | 48 +++++++++++++--------------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+ drivers/net/ethernet/atheros/ag71xx.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index db2a8ade6205..89c966b43427 100644
+index 89c966b43427..b2e68e6eae12 100644
 --- a/drivers/net/ethernet/atheros/ag71xx.c
 +++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -149,11 +149,11 @@
- #define FIFO_CFG4_MC		BIT(8)	/* Multicast Packet */
- #define FIFO_CFG4_BC		BIT(9)	/* Broadcast Packet */
- #define FIFO_CFG4_DR		BIT(10)	/* Dribble */
--#define FIFO_CFG4_LE		BIT(11)	/* Long Event */
--#define FIFO_CFG4_CF		BIT(12)	/* Control Frame */
--#define FIFO_CFG4_PF		BIT(13)	/* Pause Frame */
--#define FIFO_CFG4_UO		BIT(14)	/* Unsupported Opcode */
--#define FIFO_CFG4_VT		BIT(15)	/* VLAN tag detected */
-+#define FIFO_CFG4_CF		BIT(11)	/* Control Frame */
-+#define FIFO_CFG4_PF		BIT(12)	/* Pause Frame */
-+#define FIFO_CFG4_UO		BIT(13)	/* Unsupported Opcode */
-+#define FIFO_CFG4_VT		BIT(14)	/* VLAN tag detected */
-+#define FIFO_CFG4_LE		BIT(15)	/* Long Event */
- #define FIFO_CFG4_FT		BIT(16)	/* Frame Truncated */
- #define FIFO_CFG4_UC		BIT(17)	/* Unicast Packet */
- #define FIFO_CFG4_INIT	(FIFO_CFG4_DE | FIFO_CFG4_DV | FIFO_CFG4_FC | \
-@@ -168,28 +168,28 @@
- #define FIFO_CFG5_DV		BIT(1)	/* RX_DV Event */
- #define FIFO_CFG5_FC		BIT(2)	/* False Carrier */
- #define FIFO_CFG5_CE		BIT(3)	/* Code Error */
--#define FIFO_CFG5_LM		BIT(4)	/* Length Mismatch */
--#define FIFO_CFG5_LO		BIT(5)	/* Length Out of Range */
--#define FIFO_CFG5_OK		BIT(6)	/* Packet is OK */
--#define FIFO_CFG5_MC		BIT(7)	/* Multicast Packet */
--#define FIFO_CFG5_BC		BIT(8)	/* Broadcast Packet */
--#define FIFO_CFG5_DR		BIT(9)	/* Dribble */
--#define FIFO_CFG5_CF		BIT(10)	/* Control Frame */
--#define FIFO_CFG5_PF		BIT(11)	/* Pause Frame */
--#define FIFO_CFG5_UO		BIT(12)	/* Unsupported Opcode */
--#define FIFO_CFG5_VT		BIT(13)	/* VLAN tag detected */
--#define FIFO_CFG5_LE		BIT(14)	/* Long Event */
--#define FIFO_CFG5_FT		BIT(15)	/* Frame Truncated */
--#define FIFO_CFG5_16		BIT(16)	/* unknown */
--#define FIFO_CFG5_17		BIT(17)	/* unknown */
-+#define FIFO_CFG5_CR		BIT(4)  /* CRC error */
-+#define FIFO_CFG5_LM		BIT(5)	/* Length Mismatch */
-+#define FIFO_CFG5_LO		BIT(6)	/* Length Out of Range */
-+#define FIFO_CFG5_OK		BIT(7)	/* Packet is OK */
-+#define FIFO_CFG5_MC		BIT(8)	/* Multicast Packet */
-+#define FIFO_CFG5_BC		BIT(9)	/* Broadcast Packet */
-+#define FIFO_CFG5_DR		BIT(10)	/* Dribble */
-+#define FIFO_CFG5_CF		BIT(11)	/* Control Frame */
-+#define FIFO_CFG5_PF		BIT(12)	/* Pause Frame */
-+#define FIFO_CFG5_UO		BIT(13)	/* Unsupported Opcode */
-+#define FIFO_CFG5_VT		BIT(14)	/* VLAN tag detected */
-+#define FIFO_CFG5_LE		BIT(15)	/* Long Event */
-+#define FIFO_CFG5_FT		BIT(16)	/* Frame Truncated */
-+#define FIFO_CFG5_UC		BIT(17)	/* Unicast Packet */
- #define FIFO_CFG5_SF		BIT(18)	/* Short Frame */
- #define FIFO_CFG5_BM		BIT(19)	/* Byte Mode */
- #define FIFO_CFG5_INIT	(FIFO_CFG5_DE | FIFO_CFG5_DV | FIFO_CFG5_FC | \
--			 FIFO_CFG5_CE | FIFO_CFG5_LO | FIFO_CFG5_OK | \
--			 FIFO_CFG5_MC | FIFO_CFG5_BC | FIFO_CFG5_DR | \
--			 FIFO_CFG5_CF | FIFO_CFG5_PF | FIFO_CFG5_VT | \
--			 FIFO_CFG5_LE | FIFO_CFG5_FT | FIFO_CFG5_16 | \
--			 FIFO_CFG5_17 | FIFO_CFG5_SF)
-+			 FIFO_CFG5_CE | FIFO_CFG5_LM | FIFO_CFG5_LO | \
-+			 FIFO_CFG5_OK | FIFO_CFG5_MC | FIFO_CFG5_BC | \
-+			 FIFO_CFG5_DR | FIFO_CFG5_CF | FIFO_CFG5_UO | \
-+			 FIFO_CFG5_VT | FIFO_CFG5_LE | FIFO_CFG5_FT | \
-+			 FIFO_CFG5_UC | FIFO_CFG5_SF)
- 
- #define AG71XX_REG_TX_CTRL	0x0180
- #define TX_CTRL_TXE		BIT(0)	/* Tx Enable */
+@@ -509,8 +509,7 @@ static void ag71xx_ethtool_get_strings(struct net_device *netdev, u32 sset,
+ 	switch (sset) {
+ 	case ETH_SS_STATS:
+ 		for (i = 0; i < ARRAY_SIZE(ag71xx_statistics); i++)
+-			memcpy(data + i * ETH_GSTRING_LEN,
+-			       ag71xx_statistics[i].name, ETH_GSTRING_LEN);
++			ethtool_puts(&data, ag71xx_statistics[i].name);
+ 		break;
+ 	case ETH_SS_TEST:
+ 		net_selftest_get_strings(data);
 -- 
 2.46.0
 
