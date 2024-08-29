@@ -1,118 +1,98 @@
-Return-Path: <netdev+bounces-123025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 656979637AA
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 03:24:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E8CA9637B2
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 03:26:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D8791F21E26
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 01:24:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D16801C20F38
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 01:26:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C6918E20;
-	Thu, 29 Aug 2024 01:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D74517BB7;
+	Thu, 29 Aug 2024 01:26:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="FdJMWzzn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vrgoiexq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C10D17753
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 01:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DDA8EAD5;
+	Thu, 29 Aug 2024 01:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724894682; cv=none; b=Pg4TrOUFN+LKHyg2Lqwd32mFkQ0s1+s+YUnaho0ozpswSOLM9BxOOQi3S8Vi/NnoZvVGRhxjd2aDnqV6mDcS5JA/FeC9cVss9pzBDnVVmhEn9jps5kzrWW06fYtU0MmNnDjiMJco6cH5E2dZ4bnUDnIwigN1XyHWamc21Z4o54o=
+	t=1724894782; cv=none; b=GXMKrI1j322DZ2k6c1BdgIuGMPPd9IVszxuwiegCZySlP7Vi/mZaFARAE+NOFMix/S4ePQCn+CRppyTUxW5tCzMSBmjnr1LD3u/U8g1q+wnzf7A4mKnnIEl5mUi3w/nxeJHqBZ6/O4ZmGGmuy6LW7zmGrj3JHW7X+Bt+cDKE/y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724894682; c=relaxed/simple;
-	bh=XgeREWHRuiqTR+ZlXfIFi+cI7njGT6IJRiY7NdQKYHQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mLMk+aeedzKCzVR74G1Q84JXPVdGwVsa3XcJ+2V5SF6W6zv96TssgvU2hzlTA6CzZM0lUBXx6l1nwlvVMIB5rSd2wpoVwwu7dX5ws4rxQYfsTTVBG3fDZQKm2zKbO2HMCrSZcN+u353pIcAAc7Jo5Ih62pZbvf/9lCARe8aZ9RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=FdJMWzzn; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-81fe38c7255so11866839f.1
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 18:24:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ieee.org; s=google; t=1724894679; x=1725499479; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4602eoQt/s+125QmPR7iwEJsjffvNIMKQir7NGd7id8=;
-        b=FdJMWzznLndMCOy6I6FSpDWHZYaAxcmjz0McAvV6iSmsR5RfSEqEzbPEii5P7QP9Ag
-         L9I7oO6hRmtKRSNvE+KnUxxybdtwtaEFO+Q35TMo+hdJG2A5JHnON0iDDpn1nvB1DQRM
-         HEb0HN+noZ6g0hoozoihqFoHHFanxGKVIQ/YA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724894679; x=1725499479;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4602eoQt/s+125QmPR7iwEJsjffvNIMKQir7NGd7id8=;
-        b=XMfVL+L3tfiUnCzUvzSUR6pQ984c4SjBbtlYzV9xNuNB6AIo1cU0AypqbLkXK5M5z8
-         aS7dNuupG8lKPKG0O9KE8lqyhO4kzJHrRhguS0OYEmmYo0HsbllAlaP8KOVr37MRvCq9
-         Tx2fsX/3QcJG6Vn2GXOmcuZGaHQanChd1MJjKX/HcgzULldpiLOPf0EGUcsdtZCFYAjP
-         bkz47LdRHKpTMcMRzLz0ohqgUA3PVktsZ7yEMKY0ZFlG2oLWcsSSe0Egcudmb0x6f4su
-         WCLHTAPjdKFovawYAHwRy/JwYbmA8DMrEPSwkYd/2Nt95kf3SX2ujrdAdipR9yRrhbWz
-         8wcw==
-X-Gm-Message-State: AOJu0YzrgWHmklIeLfZgGp6+FfIBgMXRFH+o2fnEtlxwU8klhvYnTXrt
-	uffw8FKJZs8WxmL1fEhcrxqs4KfnyEOqWdQJU+tYpa/pj/AtpoUStf/8CkwSIQ==
-X-Google-Smtp-Source: AGHT+IGDy79LRhQxFBS4gO7+Dae7DlrtxwUBZUldOvFlPjvgUWzBlgBeP0c/8/PJnP6RLMziWT1HEA==
-X-Received: by 2002:a05:6602:1483:b0:825:2f0:9f74 with SMTP id ca18e2360f4ac-82a1108d3acmr162421839f.16.1724894679000;
-        Wed, 28 Aug 2024 18:24:39 -0700 (PDT)
-Received: from [172.22.22.28] (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.googlemail.com with ESMTPSA id ca18e2360f4ac-82a1a498a75sm4122739f.42.2024.08.28.18.24.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Aug 2024 18:24:38 -0700 (PDT)
-Message-ID: <cc975da7-c2cc-4ed1-8931-0260c0023145@ieee.org>
-Date: Wed, 28 Aug 2024 20:24:37 -0500
+	s=arc-20240116; t=1724894782; c=relaxed/simple;
+	bh=4XuFeSXS+A8GpA3S9dympitc6YLMVAqNw387RXuG4ac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CYhCQiDuzw09zqwE7xqLyCq2VERVRamf1zlJB5TgP3VnlA6mxf3EHuKLppO+tg+UYWm/Gm5ln/4U9fu/Q/ePKqXXcflzEwqcFeq7I+AtEWOyaNpN7nJO4gRncXw5lO18nX+F0MitXlD7ztssQQ3EBQJsvrRTG4saMHnllC2iowg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vrgoiexq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E702C4CEC0;
+	Thu, 29 Aug 2024 01:26:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724894781;
+	bh=4XuFeSXS+A8GpA3S9dympitc6YLMVAqNw387RXuG4ac=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Vrgoiexqah4AmgJards0iG+8M6tbSD67ZKnXuSkiIuDvmEy/0vVkjgnNS0ei/z0vL
+	 WvIwrdaqu72zb+FzV31m9NXr07ElEMlbB3UafXJBO4mgHddO5TtKTUoMGFCd7UYEX1
+	 kJftBCmGyVKDNTgMJRlGah/QjBeddU7B1JIn92J+fNZNVh9vKuz/ZvsDlzRF4Bb7QL
+	 LkoVdrSiFgjiMdVuh4+k6Trl6rL6Aa8TeiY12zYLGzztRD2U1D2SOdlZOktK78M+Ri
+	 z5PTaWtZHYO0P2XTSzPbsvR+/N5e2DRoincHrnQiTz5dox1IVd4UXFs/xah1Zdx3V2
+	 gCIF+/B1Y17lA==
+Date: Wed, 28 Aug 2024 18:26:20 -0700
+From: Kees Cook <kees@kernel.org>
+To: Xingyu Li <xli399@ucr.edu>
+Cc: mcgrof@kernel.org, j.granados@samsung.com, linux-kernel@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, Yu Hao <yhao016@ucr.edu>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Sven Eckelmann <sven@narfation.org>,
+	Thomas Gleixner <tglx@linutronix.de>, anna-maria@linutronix.de,
+	frederic@kernel.org, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: BUG: WARNING in retire_sysctl_set
+Message-ID: <202408281812.3F765DF@keescook>
+References: <CALAgD-4uup-u-7rVLpFqKWqeVVVnf5-88vqHOKD-TnGeYmHbQw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] net: ipa: make use of dev_err_cast_probe()
-To: Yuesong Li <liyuesong@vivo.com>, elder@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- opensource.kernel@vivo.com
-References: <20240828084115.967960-1-liyuesong@vivo.com>
-Content-Language: en-US
-From: Alex Elder <elder@ieee.org>
-In-Reply-To: <20240828084115.967960-1-liyuesong@vivo.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALAgD-4uup-u-7rVLpFqKWqeVVVnf5-88vqHOKD-TnGeYmHbQw@mail.gmail.com>
 
-On 8/28/24 3:41 AM, Yuesong Li wrote:
-> Using dev_err_cast_probe() to simplify the code.
-> 
-> Signed-off-by: Yuesong Li <liyuesong@vivo.com>
-> ---
->   drivers/net/ipa/ipa_power.c | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ipa/ipa_power.c b/drivers/net/ipa/ipa_power.c
-> index 65fd14da0f86..248bcc0b661e 100644
-> --- a/drivers/net/ipa/ipa_power.c
-> +++ b/drivers/net/ipa/ipa_power.c
-> @@ -243,9 +243,8 @@ ipa_power_init(struct device *dev, const struct ipa_power_data *data)
->   
->   	clk = clk_get(dev, "core");
->   	if (IS_ERR(clk)) {
-> -		dev_err_probe(dev, PTR_ERR(clk), "error getting core clock\n");
-> -
-> -		return ERR_CAST(clk);
-> +		return dev_err_cast_probe(dev, clk,
-> +				"error getting core clock\n");
+Hi,
 
-This looks to me like a simple replacement with equivalent code.
+On Wed, Aug 28, 2024 at 02:16:34PM -0700, Xingyu Li wrote:
+> We found a bug in Linux 6.10. It is possibly a logic   bug.
+> The bug report is as follows, but unfortunately there is no generated
+> syzkaller reproducer.
 
-Reviewed-by: Alex Elder <elder@kernel.org>
+I see you've sent 44 reports like this recently[1], but only have
+reproducers for 4 of them[2].
 
+Without reproducers these reports aren't very helpful. There
+are hundreds like them (many with reproducers) already at:
+https://syzkaller.appspot.com/upstream
 
->   	}
->   
->   	ret = clk_set_rate(clk, data->core_clock_rate);
+Please only send these kind of reports if you have a fix for them
+(preferred) or a reproducer for an actual problem. This has been mentioned
+a few times already[3][4]; have you seen these replies?
 
+-Kees
+
+[1] https://lore.kernel.org/all/?q=f%3Axli399%40
+[2] https://lore.kernel.org/all/?q=f%3Axli399%40+%22The+reproducer%22
+[3] https://lore.kernel.org/netdev/CANn89iK6rq0XWO5-R5CzA5YAv2ygaTA==EVh+O74VHGDBNqUoA@mail.gmail.com/
+[4] https://lore.kernel.org/all/20240829011805.92574-1-kuniyu@amazon.com/
+
+-- 
+Kees Cook
 
