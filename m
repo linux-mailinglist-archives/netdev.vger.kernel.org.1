@@ -1,354 +1,192 @@
-Return-Path: <netdev+bounces-123421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26768964D23
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 19:43:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7C7C964D2A
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 19:46:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B97E1C2146F
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:43:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A139128115C
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:46:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E621B81B9;
-	Thu, 29 Aug 2024 17:43:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4462F1B3F30;
+	Thu, 29 Aug 2024 17:46:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZuop0oa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WIgBxxpo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D7D11B81B1;
-	Thu, 29 Aug 2024 17:43:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9394D8C1
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 17:46:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724953426; cv=none; b=U1zGZgJq/ikGdyRIMajQzaE93h3icWl0pUHe4LjvX1QtEhYTYA5385IL5DsN9xd6LTP3dAaNxRwAji9kputvnvZMvLDk/v5OIUv8v4NHSDYfeq4zW5JEict7tVYNXGI6V5b7NKrM8fLC7Ih5qecZYMEahqgayNavPkxe51fjIIw=
+	t=1724953597; cv=none; b=ABB/0mjGrGfbLshydBG3EmOfGtk4+y/5ud9FkllrpUhuO5AsZXstCTrCUraIrTJUZI3YXKpufnAPUlU0hfHEWq3fRDqAx3t4aFmIT0tbd8EPXrRFZSVAcYuOCOKz0iL4Bd0risazZcx7VPwri7KKJXC+lB4pDrjNk7NaZ/zq5Us=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724953426; c=relaxed/simple;
-	bh=l0G1lj3t9kg7W6iJDFsH6SdUoM2JxSWq3bynPhlblBo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iAqyI5RUlwcTEMsdSKtcPRZkfAABi9MxoIMW/lyy7sfKpjwMEtJYdLaSk7CGx8iEv3faHRtgokvk4F9eCOQLrfZS1CPt280zJ6ajtSEMy8jxvWe6+VJftJaUyFK1Y7AFCKeG5yAO9O1JscEfKaDuZc0hmFLltWC4jMXZacwpDs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZuop0oa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E069BC4CEC5;
-	Thu, 29 Aug 2024 17:43:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724953426;
-	bh=l0G1lj3t9kg7W6iJDFsH6SdUoM2JxSWq3bynPhlblBo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cZuop0oaFcT53M4mV4pxUMUOyndkBLivAGhMCWIL006hlwRWzFEYQTbfqF4gMmkqK
-	 cdJH/HbZvOBrV5EbhN+1jrXuDjchrIiEztiY3kgIim6xDwlnExmg55OjUyL061cC9A
-	 YDK9rTJJV1bQDNi78rOJEdVbJ/t8uPEHxJvZEYRPKqcHcjiQzC74LfT0piQhEwb9iT
-	 pbiGM7TpjQN5l5TK2fMaERvnRdcz6KrQrL4014kIAiqOAWD1YssfBpmBfVMcwLZ1dn
-	 Va5rZhn2X3c0J9fnQ+BorkJ26NIRKJq17yactUsEVIMJRGC3RgxYkLWwQwPCwwMynR
-	 X5lQ8ZTMU1s1w==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	corbet@lwn.net,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	ecree.xilinx@gmail.com,
-	przemyslaw.kitszel@intel.com,
-	kory.maincent@bootlin.com,
-	maxime.chevallier@bootlin.com,
-	linux-doc@vger.kernel.org
-Subject: [RFC net-next 2/2] net: ethtool: add phy(dev) specific stats over netlink
-Date: Thu, 29 Aug 2024 10:43:42 -0700
-Message-ID: <20240829174342.3255168-3-kuba@kernel.org>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240829174342.3255168-1-kuba@kernel.org>
-References: <20240829174342.3255168-1-kuba@kernel.org>
+	s=arc-20240116; t=1724953597; c=relaxed/simple;
+	bh=z4qOO3mLrYSNA5ZX/uoH9SIEoDoVQickqElVeaDh9Xc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L1s2Y2Ue7WVKwd6EEYDvdKvJ51mJRDe8tp7UiSyglmi1MKyb7TyrTjXStpLSV5H7a3HsTOnigGChOZ9N68FsUlJ6n0Pw8NvcSInG2rielAMcDo6PGnhXEUEEdRVCHaZsQJ2n6kly3fIdFgr88mzy7/+zC1MRMOjTscz7Nywj+qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WIgBxxpo; arc=none smtp.client-ip=209.85.166.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-39d2256ee95so4309645ab.2
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 10:46:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724953595; x=1725558395; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z4qOO3mLrYSNA5ZX/uoH9SIEoDoVQickqElVeaDh9Xc=;
+        b=WIgBxxponUnjZBX1K+3aGMZUL7weyMbzK3+M76L44DM4I76QGFxf+/Bh7kwSspzUys
+         7Q8y1jngUYiA9tiFkEinn8XWcYac9DMUd8uBRENSJlxuzADQsvZwaBzDVpFCpaJfbuXn
+         /LW1FQeIKIaIXN5HbB8Hg36DKYzu/mtXAndjjYOREJyM9q13lHCbWx74ljcx7Gx50X+c
+         mYAK/jcy8LgkF1xVAMTu4n/zE4rTcA2ifsrzB9LJ9yCHNq1vWlmzHH/HHMZeKRBg30v+
+         DSN+4k6X8mcmBLKSdo+jyks726V3MEK/trhj7j3hV+2w52Ft+CAfANcRjKgGT9UCGRc6
+         8z5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724953595; x=1725558395;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z4qOO3mLrYSNA5ZX/uoH9SIEoDoVQickqElVeaDh9Xc=;
+        b=BxgS7CQobWQor1l0809CwANDYec3pIQHmTxMuo1ctzG4ZrHR3C+VV5HV+wwx/6E517
+         +UJGC/j0Qf7fWLcxHKlYxdAyE/04KfuQgTX1ntS1Kz7AM3ZZZC5eEbyzG5JQcp84i0jU
+         dLXeJW+Gofgs25UsbQBK+pPLdYmVnYXJ11GGNKDjdXw4hK2yUA9A+EWXGbtsFSQhdkdG
+         mcIta4iRuKXxwt4K61r8BgbPjK4Mpo5zpEGG8A7CR8XYGSmbvr4t8ts+/JCYdN/vY6w2
+         SS3ngSUmpFP3P2Vl5Waw02VMcgMpYtyak86MfJaOs32CkzyCZkg5RUAuFcfe8BnHERPM
+         8saA==
+X-Forwarded-Encrypted: i=1; AJvYcCUqyXnXYN3qlpTjWUd73ugafCdynPFSltXA9PNkZZvdDgMSHz89vuIA1k52XCjNBcOIZwJa+os=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKXNXEpgscVVjAo6QJOQeoBejX+QiAAyp9woR0h4O2fhMHj1FQ
+	3/140JxJCKEXOFapNpRgIUlD53pxjd7SCvr3f4LNs9NEavDgw05hOh0M0YFYlnhtzGv4/SE7jqD
+	zUn3vALpgqvVsKKo3Xp9eVw6eqwo=
+X-Google-Smtp-Source: AGHT+IFk0TB7oJIZvA74IIg4KsJhNfGtvD604u+g/wWQsdHgZBzlfSoYkkW1xarUdZPv1ZsAmPi5anBDoeRnmMWIecQ=
+X-Received: by 2002:a05:6e02:13a7:b0:39d:4e3e:7571 with SMTP id
+ e9e14a558f8ab-39f37854932mr49201215ab.23.1724953594861; Thu, 29 Aug 2024
+ 10:46:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240828160145.68805-1-kerneljasonxing@gmail.com>
+ <66d082422d85_3895fa29427@willemb.c.googlers.com.notmuch> <CAL+tcoD6s0rrCAvMeMDE3-QVemPy21Onh4mHC+9PE-DDLkdj-Q@mail.gmail.com>
+ <66d0a0816d6ce_39197c29476@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66d0a0816d6ce_39197c29476@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 30 Aug 2024 01:45:56 +0800
+Message-ID: <CAL+tcoCUhYH=udvB3rdVZm0gVypmAa5devPXryPwY+39mHscDA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/2] timestamp: control SOF_TIMESTAMPING_RX_SOFTWARE
+ feature per socket
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Define a way of getting PHY stats over the netlink API.
-According to my limited understanding of PHYs they are more
-standard-based than the rest of a network interface, so hopefully
-these stats can be extended to cover most cases.
+On Fri, Aug 30, 2024 at 12:23=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Thu, Aug 29, 2024 at 10:14=E2=80=AFPM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > Prior to this series, when one socket is set SOF_TIMESTAMPING_RX_SO=
+FTWARE
+> > > > which measn the whole system turns on this button, other sockets th=
+at only
+> > > > have SOF_TIMESTAMPING_SOFTWARE will be affected and then print the =
+rx
+> > > > timestamp information even without SOF_TIMESTAMPING_RX_SOFTWARE fla=
+g.
+> > > > In such a case, the rxtimestamp.c selftest surely fails, please see
+> > > > testcase 6.
+> > > >
+> > > > In a normal case, if we only set SOF_TIMESTAMPING_SOFTWARE flag, we
+> > > > can't get the rx timestamp because there is no path leading to turn=
+ on
+> > > > netstamp_needed_key button in net_enable_timestamp(). That is to sa=
+y, if
+> > > > the user only sets SOF_TIMESTAMPING_SOFTWARE, we don't expect we ar=
+e
+> > > > able to fetch the timestamp from the skb.
+> > >
+> > > I already happened to stumble upon a counterexample.
+> > >
+> > > The below code requests software timestamps, but does not set the
+> > > generate flag. I suspect because they assume a PTP daemon (sfptpd)
+> > > running that has already enabled that.
+> >
+> > To be honest, I took a quick search through the whole onload program
+> > and then suspected the use of timestamp looks really weird.
+> >
+> > 1. I searched the SOF_TIMESTAMPING_RX_SOFTWARE flag and found there is
+> > no other related place that actually uses it.
+> > 2. please also see the tx_timestamping.c file[1]. The author similarly
+> > only turns on SOF_TIMESTAMPING_SOFTWARE report flag without turning on
+> > any useful generation flag we are familiar with, like
+> > SOF_TIMESTAMPING_TX_SOFTWARE, SOF_TIMESTAMPING_TX_SCHED,
+> > SOF_TIMESTAMPING_TX_ACK.
+> >
+> > [1]: https://github.com/Xilinx-CNS/onload/blob/master/src/tests/onload/=
+hwtimestamping/tx_timestamping.c#L247
+> >
+> > >
+> > > https://github.com/Xilinx-CNS/onload/blob/master/src/tests/onload/hwt=
+imestamping/rx_timestamping.c
+> > >
+> > > I suspect that there will be more of such examples in practice. In
+> > > which case we should scuttle this. Please do a search online for
+> > > SOF_TIMESTAMPING_SOFTWARE to scan for this pattern.
+> >
+> > I feel that only the buggy program or some program particularly takes
+> > advantage of the global netstamp_needed_key...
+>
+> My point is that I just happen to stumble on one open source example
+> of this behavior.
+>
+> That is a strong indication that other applications may make the same
+> implicit assumption. Both open source, and the probably many more non
+> public users.
+>
+> Rule #1 is to not break users.
 
-There's a bit of strategic ambiguity between phy and phydev
-here, in case some integrated device wants to use these later.
-But the new group is separate from eth-phy which is reserved
-for IEEE stats.
+Yes, I know it.
 
-Oleksij, if this patch works you can add the OA stats into
-struct ethtool_phy_stats or struct ethtool_link_ext_stats.
-They should show up in ethtool -S eth0 --all-groups
-for the former or in ethtool -I eth0 for the latter.
-Note link_stats need changes to ethtool CLI, but
-they seem better suited for the stats based on their names?
+>
+> Given that we even have proof that we would break users, we cannot
+> make this change, sorry.
 
-There's a minor TODO for you to define the semantics
-of the error counter, based on however the DP83TG720 PHY
-behaves.
+Okay. Your concern indeed makes sense. Sigh, I just finished the v3
+patch series :S
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: corbet@lwn.net
-CC: andrew@lunn.ch
-CC: hkallweit1@gmail.com
-CC: linux@armlinux.org.uk
-CC: ecree.xilinx@gmail.com
-CC: przemyslaw.kitszel@intel.com
-CC: kory.maincent@bootlin.com
-CC: maxime.chevallier@bootlin.com
-CC: linux-doc@vger.kernel.org
----
- Documentation/networking/ethtool-netlink.rst |  1 +
- include/linux/ethtool.h                      | 15 +++++++
- include/linux/phy.h                          |  3 +-
- include/uapi/linux/ethtool.h                 |  2 +
- include/uapi/linux/ethtool_netlink.h         | 15 +++++++
- net/ethtool/netlink.h                        |  1 +
- net/ethtool/stats.c                          | 43 +++++++++++++++++++-
- net/ethtool/strset.c                         |  5 +++
- 8 files changed, 82 insertions(+), 3 deletions(-)
+>
+> A safer alternative is to define a new timestamp option flag that
+> opt-in enables this filter-if-SOF_TIMESTAMPING_RX_SOFTWARE is not
+> set behavior.
 
-diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-index ba90457b8b2d..7f6c23644645 100644
---- a/Documentation/networking/ethtool-netlink.rst
-+++ b/Documentation/networking/ethtool-netlink.rst
-@@ -1608,6 +1608,7 @@ Users specify which groups of statistics they are requesting via
-  ETHTOOL_STATS_ETH_PHY  eth-phy  Basic IEEE 802.3 PHY statistics (30.3.2.1.*)
-  ETHTOOL_STATS_ETH_CTRL eth-ctrl Basic IEEE 802.3 MAC Ctrl statistics (30.3.3.*)
-  ETHTOOL_STATS_RMON     rmon     RMON (RFC 2819) statistics
-+ ETHTOOL_STATS_PHY      phy      Additional PHY statistics, not defined by IEEE
-  ====================== ======== ===============================================
- 
- Each group should have a corresponding ``ETHTOOL_A_STATS_GRP`` in the reply.
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 12f6dc567598..0a09ea82e001 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -412,6 +412,21 @@ struct ethtool_eth_phy_stats {
- 	);
- };
- 
-+/* Additional PHY statistics, not defined by IEEE */
-+struct ethtool_phy_stats {
-+	/* Basic packet / byte counters are meant for PHY drivers */
-+	u64 rx_packets;
-+	u64 rx_bytes;
-+	u64 rx_error; /* TODO: we need to define here whether packet
-+		       * counted here is also counted as rx_packets,
-+		       * and whether it's passed to the MAC with some
-+		       * error indication or MAC never sees it.
-+		       */
-+	u64 tx_packets;
-+	u64 tx_bytes;
-+	u64 tx_error; /* TODO: same as for rx */
-+};
-+
- /* Basic IEEE 802.3 MAC Ctrl statistics (30.3.3.*), not otherwise exposed
-  * via a more targeted API.
-  */
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 53942fd7760f..9c3094706c7a 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1097,7 +1097,8 @@ struct phy_driver {
- 	 * must only set statistics which are actually collected by the device.
- 	 */
- 	void (*get_phy_stats)(struct phy_device *dev,
--			      struct ethtool_eth_phy_stats *eth_stats);
-+			      struct ethtool_eth_phy_stats *eth_stats,
-+			      struct ethtool_phy_stats *stats);
- 	void (*get_link_stats)(struct phy_device *dev,
- 			       struct ethtool_link_ext_stats *link_stats);
- 	/** @get_sset_count: Number of statistic counters */
-diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-index c405ed63acfa..977c5a8a0d6b 100644
---- a/include/uapi/linux/ethtool.h
-+++ b/include/uapi/linux/ethtool.h
-@@ -681,6 +681,7 @@ enum ethtool_link_ext_substate_module {
-  * @ETH_SS_STATS_ETH_MAC: names of IEEE 802.3 MAC statistics
-  * @ETH_SS_STATS_ETH_CTRL: names of IEEE 802.3 MAC Control statistics
-  * @ETH_SS_STATS_RMON: names of RMON statistics
-+ * @ETH_SS_STATS_PHY: names of PHY(dev) statistics
-  *
-  * @ETH_SS_COUNT: number of defined string sets
-  */
-@@ -706,6 +707,7 @@ enum ethtool_stringset {
- 	ETH_SS_STATS_ETH_MAC,
- 	ETH_SS_STATS_ETH_CTRL,
- 	ETH_SS_STATS_RMON,
-+	ETH_SS_STATS_PHY,
- 
- 	/* add new constants above here */
- 	ETH_SS_COUNT
-diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
-index 283305f6b063..dc332f8aa3a6 100644
---- a/include/uapi/linux/ethtool_netlink.h
-+++ b/include/uapi/linux/ethtool_netlink.h
-@@ -820,6 +820,7 @@ enum {
- 	ETHTOOL_STATS_ETH_MAC,
- 	ETHTOOL_STATS_ETH_CTRL,
- 	ETHTOOL_STATS_RMON,
-+	ETHTOOL_STATS_PHY,
- 
- 	/* add new constants above here */
- 	__ETHTOOL_STATS_CNT
-@@ -935,6 +936,20 @@ enum {
- 	ETHTOOL_A_STATS_RMON_MAX = (__ETHTOOL_A_STATS_RMON_CNT - 1)
- };
- 
-+enum {
-+	/* Basic packet counters if PHY has separate counters from the MAC */
-+	ETHTOOL_A_STATS_PHY_RX_PKTS,
-+	ETHTOOL_A_STATS_PHY_RX_BYTES,
-+	ETHTOOL_A_STATS_PHY_RX_ERRORS,
-+	ETHTOOL_A_STATS_PHY_TX_PKTS,
-+	ETHTOOL_A_STATS_PHY_TX_BYTES,
-+	ETHTOOL_A_STATS_PHY_TX_ERRORS,
-+
-+	/* add new constants above here */
-+	__ETHTOOL_A_STATS_PHY_CNT,
-+	ETHTOOL_A_STATS_PHY_MAX = (__ETHTOOL_A_STATS_PHY_CNT - 1)
-+};
-+
- /* MODULE */
- 
- enum {
-diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
-index 203b08eb6c6f..3a6ecdcb5b8c 100644
---- a/net/ethtool/netlink.h
-+++ b/net/ethtool/netlink.h
-@@ -505,5 +505,6 @@ extern const char stats_eth_phy_names[__ETHTOOL_A_STATS_ETH_PHY_CNT][ETH_GSTRING
- extern const char stats_eth_mac_names[__ETHTOOL_A_STATS_ETH_MAC_CNT][ETH_GSTRING_LEN];
- extern const char stats_eth_ctrl_names[__ETHTOOL_A_STATS_ETH_CTRL_CNT][ETH_GSTRING_LEN];
- extern const char stats_rmon_names[__ETHTOOL_A_STATS_RMON_CNT][ETH_GSTRING_LEN];
-+extern const char stats_phy_names[__ETHTOOL_A_STATS_PHY_CNT][ETH_GSTRING_LEN];
- 
- #endif /* _NET_ETHTOOL_NETLINK_H */
-diff --git a/net/ethtool/stats.c b/net/ethtool/stats.c
-index cf802b1cda6f..8ae3c57cea21 100644
---- a/net/ethtool/stats.c
-+++ b/net/ethtool/stats.c
-@@ -22,6 +22,7 @@ struct stats_reply_data {
- 		struct ethtool_eth_mac_stats	mac_stats;
- 		struct ethtool_eth_ctrl_stats	ctrl_stats;
- 		struct ethtool_rmon_stats	rmon_stats;
-+		struct ethtool_phy_stats	phydev_stats;
- 	);
- 	const struct ethtool_rmon_hist_range	*rmon_ranges;
- };
-@@ -34,6 +35,7 @@ const char stats_std_names[__ETHTOOL_STATS_CNT][ETH_GSTRING_LEN] = {
- 	[ETHTOOL_STATS_ETH_MAC]			= "eth-mac",
- 	[ETHTOOL_STATS_ETH_CTRL]		= "eth-ctrl",
- 	[ETHTOOL_STATS_RMON]			= "rmon",
-+	[ETHTOOL_STATS_PHY]			= "phydev",
- };
- 
- const char stats_eth_phy_names[__ETHTOOL_A_STATS_ETH_PHY_CNT][ETH_GSTRING_LEN] = {
-@@ -78,6 +80,15 @@ const char stats_rmon_names[__ETHTOOL_A_STATS_RMON_CNT][ETH_GSTRING_LEN] = {
- 	[ETHTOOL_A_STATS_RMON_JABBER]		= "etherStatsJabbers",
- };
- 
-+const char stats_phy_names[__ETHTOOL_A_STATS_PHY_CNT][ETH_GSTRING_LEN] = {
-+	[ETHTOOL_A_STATS_PHY_RX_PKTS]		= "RxFrames",
-+	[ETHTOOL_A_STATS_PHY_RX_BYTES]		= "RxOctets",
-+	[ETHTOOL_A_STATS_PHY_RX_ERRORS]		= "RxErrors",
-+	[ETHTOOL_A_STATS_PHY_TX_PKTS]		= "TxFrames",
-+	[ETHTOOL_A_STATS_PHY_TX_BYTES]		= "TxOctets",
-+	[ETHTOOL_A_STATS_PHY_TX_ERRORS]		= "TxErrors",
-+};
-+
- const struct nla_policy ethnl_stats_get_policy[ETHTOOL_A_STATS_SRC + 1] = {
- 	[ETHTOOL_A_STATS_HEADER]	=
- 		NLA_POLICY_NESTED(ethnl_header_policy),
-@@ -123,7 +134,8 @@ ethtool_get_phydev_stats(struct net_device *dev, struct stats_reply_data *data)
- 		return;
- 
- 	mutex_lock(&phydev->lock);
--	phydev->drv->get_phy_stats(phydev, &data->phy_stats);
-+	phydev->drv->get_phy_stats(phydev, &data->phy_stats,
-+				   &data->phydev_stats);
- 	mutex_unlock(&phydev->lock);
- }
- 
-@@ -160,7 +172,8 @@ static int stats_prepare_data(const struct ethnl_req_info *req_base,
- 	data->ctrl_stats.src = src;
- 	data->rmon_stats.src = src;
- 
--	if (test_bit(ETHTOOL_STATS_ETH_PHY, req_info->stat_mask) &&
-+	if ((test_bit(ETHTOOL_STATS_PHY, req_info->stat_mask) ||
-+	     test_bit(ETHTOOL_STATS_ETH_PHY, req_info->stat_mask)) &&
- 	    src == ETHTOOL_MAC_STATS_SRC_AGGREGATE)
- 		ethtool_get_phydev_stats(dev, data);
- 
-@@ -213,6 +226,10 @@ static int stats_reply_size(const struct ethnl_req_info *req_base,
- 			nla_total_size(4)) *	/* _A_STATS_GRP_HIST_BKT_HI */
- 			ETHTOOL_RMON_HIST_MAX * 2;
- 	}
-+	if (test_bit(ETHTOOL_STATS_PHY, req_info->stat_mask)) {
-+		n_stats += sizeof(struct ethtool_phy_stats) / sizeof(u64);
-+		n_grps++;
-+	}
- 
- 	len += n_grps * (nla_total_size(0) + /* _A_STATS_GRP */
- 			 nla_total_size(4) + /* _A_STATS_GRP_ID */
-@@ -266,6 +283,25 @@ static int stats_put_phy_stats(struct sk_buff *skb,
- 	return 0;
- }
- 
-+static int stats_put_phydev_stats(struct sk_buff *skb,
-+				  const struct stats_reply_data *data)
-+{
-+	if (stat_put(skb, ETHTOOL_A_STATS_PHY_RX_PKTS,
-+		     data->phydev_stats.rx_packets) ||
-+	    stat_put(skb, ETHTOOL_A_STATS_PHY_RX_BYTES,
-+		     data->phydev_stats.rx_packets) ||
-+	    stat_put(skb, ETHTOOL_A_STATS_PHY_RX_ERRORS,
-+		     data->phydev_stats.rx_packets) ||
-+	    stat_put(skb, ETHTOOL_A_STATS_PHY_TX_PKTS,
-+		     data->phydev_stats.rx_packets) ||
-+	    stat_put(skb, ETHTOOL_A_STATS_PHY_TX_BYTES,
-+		     data->phydev_stats.rx_packets) ||
-+	    stat_put(skb, ETHTOOL_A_STATS_PHY_TX_ERRORS,
-+		     data->phydev_stats.rx_packets))
-+		return -EMSGSIZE;
-+	return 0;
-+}
-+
- static int stats_put_mac_stats(struct sk_buff *skb,
- 			       const struct stats_reply_data *data)
- {
-@@ -442,6 +478,9 @@ static int stats_fill_reply(struct sk_buff *skb,
- 	if (!ret && test_bit(ETHTOOL_STATS_RMON, req_info->stat_mask))
- 		ret = stats_put_stats(skb, data, ETHTOOL_STATS_RMON,
- 				      ETH_SS_STATS_RMON, stats_put_rmon_stats);
-+	if (!ret && test_bit(ETHTOOL_STATS_PHY, req_info->stat_mask))
-+		ret = stats_put_stats(skb, data, ETHTOOL_STATS_PHY,
-+				      ETH_SS_STATS_PHY, stats_put_phydev_stats);
- 
- 	return ret;
- }
-diff --git a/net/ethtool/strset.c b/net/ethtool/strset.c
-index b3382b3cf325..818cf01f0911 100644
---- a/net/ethtool/strset.c
-+++ b/net/ethtool/strset.c
-@@ -105,6 +105,11 @@ static const struct strset_info info_template[] = {
- 		.count		= __ETHTOOL_A_STATS_RMON_CNT,
- 		.strings	= stats_rmon_names,
- 	},
-+	[ETH_SS_STATS_PHY] = {
-+		.per_dev	= false,
-+		.count		= __ETHTOOL_A_STATS_PHY_CNT,
-+		.strings	= stats_phy_names,
-+	},
- };
- 
- struct strset_req_info {
--- 
-2.46.0
+At the first glance, It sounds like it's a little bit similar to
+SOF_TIMESTAMPING_OPT_ID_TCP that is used to replace
+SOF_TIMESTAMPING_OPT_ID in the bytestream case for robustness
+consideration.
 
+Are you suggesting that if we can use the new report flag combined
+with SOF_TIMESTAMPING_SOFTWARE, the application will not get a rx
+timestamp report, right? The new flag goes the opposite way compared
+with SOF_TIMESTAMPING_RX_SOFTWARE, indicating we don't expect a rx sw
+report.
+
+If that is so, what would you recommend to name the new flag which is
+a report flag (not a generation flag)? How about calling
+"SOF_TIMESTAMPING_RX_SOFTWARE_CTRL". I tried, but my English
+vocabulary doesn't help, sorry :(
+
+Thanks,
+Jason
 
