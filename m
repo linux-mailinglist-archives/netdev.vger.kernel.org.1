@@ -1,145 +1,181 @@
-Return-Path: <netdev+bounces-123442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D21FB964DC5
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:37:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10E5D964DC6
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:37:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3542AB20C04
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:37:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BE26B210AF
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7AC1B8EBA;
-	Thu, 29 Aug 2024 18:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB661B9B23;
+	Thu, 29 Aug 2024 18:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="U42EkSum"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jzohJklw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED101B8E9E
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 18:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426FD1B8E83
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 18:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724956599; cv=none; b=rTNGs28l1VJ/Mw6peuYzxM4ywZKv4MXU/rqbPS7BUobArLtkMO4IrzYQXx7jSmE1OqWELqIsJ8T3iVxQYA+T6bwd+lsPYdeZgi0W05QabLz6mmiVlKQLu0V08A3OYUjMbdvUD/Rea9aH2SKfRAAMgYC3QlkgGaD44PYS4Ze/Ej0=
+	t=1724956613; cv=none; b=qbUbq739J18NrqgGzujjjRoa/4fdyZpT71E+/aZ0387MGmVPhevKq8L5d+k8+ZhwSrib1TeyI7w6lncL9DYjil2OGKWnNLEpFZFlfyMEPneDOa8gtielMLzfwVI8kqFbjyRUfAusEY79s05n1rmjN7i2c40/rEnc/TUvp5gL3QQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724956599; c=relaxed/simple;
-	bh=gDDBCPpOC1eDlyXMtb+M28G43nhd2o9AYEneDllbejE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c3Cxk4u85RT183vcrsYI/DxConKAmbonzwQUnx+Tn9V4fb9mvAWyykaWaz1dNdo0dtqHutfK4XqnFxmzXguwVJqdXQYBnLKdKjw0Z/zJrLx3Y9QuSacj/DdTxlMvQ0Nq0EjaYx1/bwM/iT1g7r2Tl6d9M33uimaiB3RMOstBa/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=U42EkSum; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 47TIY3Iu012390;
-	Thu, 29 Aug 2024 11:36:26 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=Iyis40lxIGSxee/Qz5fQ/C2M2PF4yoS2KNmODSG/FUI=; b=
-	U42EkSumWcspiT2MVRkO5qL8Yohpd/XSVhK6PxKAhPXguKlafUzGSPB+omq22riz
-	LsJGMLgqE++7jOylh8YyNqJRGtzjXH5djNvqctzmWK/Lp+iCk0ODhNIBmTumUqJv
-	t+dAFbm1dDLNuS+JJsZApmzEY0mcC5aqTl/2foRONSqU63eOheJaWHrSDZYpTg5q
-	c38/pWEZTUIYs0+pOiaEcJqE92Bf+ARCgVixw5qqoOIfZqxCJ0Khy2OYoDTpDeJy
-	XCwkf30NbiErD5uX9jn+5ifkFYzCMrBEFRKTgpalMTp8D0f6K/cfYbLvWILrpec1
-	YZeAohGw83SSoScl2qjMqQ==
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 41axcg00kb-10
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 29 Aug 2024 11:36:26 -0700 (PDT)
-Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:1c::11) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server id
- 15.2.1544.11; Thu, 29 Aug 2024 18:36:16 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Jakub Kicinski
-	<kuba@kernel.org>,
-        Jonathan Lemon <jonathan.lemon@gmail.com>,
-        Jiri Slaby
-	<jirislaby@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net v7 3/3] docs: ABI: update OCP TimeCard sysfs entries
-Date: Thu, 29 Aug 2024 11:36:03 -0700
-Message-ID: <20240829183603.1156671-4-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240829183603.1156671-1-vadfed@meta.com>
-References: <20240829183603.1156671-1-vadfed@meta.com>
+	s=arc-20240116; t=1724956613; c=relaxed/simple;
+	bh=UG5Iz04w+jmc9PEZj5ckMSLR1y1w55Zb/fhYhq0ly30=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sGU3LNpVd6YavpfR1P1Z2arDiDVKIPuhc1FZZFqxRkgU4HWPfZyngSYcJGNP9d5H0ht77MYzk7usJceDsmjTFdUgFs+SsxuIz/ppb+aouDbDZrLpcR+K1t8RQQRUKdwQaGBU6ugdaJc4XBmqgNOgA9MUD3bD3TrQzPzj0i5V6/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jzohJklw; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3864f6ed-deb5-4dc8-b351-53ba9dcb18bc@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724956609;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lv1dzFKxvInUi+QXVnM3dkpGcjD6bo+MpA58P4puN4U=;
+	b=jzohJklwUSV76+jjq0I5g5oJ0ktSoamn1w0ACIVXNQSAINg6nfXn1G0m+u2AlQTcOxtLdW
+	IIBbHbUMkdB8IvPVClI0bbSATZb/SRRYtsQSElIdjA/Y9sgocDw93AywrrC40PfM6yRXX9
+	+c8QexpvdeC7/JfmXDFWqnqWtlyIVkg=
+Date: Thu, 29 Aug 2024 11:36:41 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: YWdYiH3kxfK1Aw9mXGN45YguR1PxDRL-
-X-Proofpoint-ORIG-GUID: YWdYiH3kxfK1Aw9mXGN45YguR1PxDRL-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-29_06,2024-08-29_02,2024-05-17_01
+Subject: Re: [Patch bpf] tcp_bpf: fix return value of tcp_bpf_sendmsg()
+To: Cong Wang <xiyou.wangcong@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ Cong Wang <cong.wang@bytedance.com>,
+ John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
+ syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com,
+ Jakub Sitnicki <jakub@cloudflare.com>
+References: <20240821030744.320934-1-xiyou.wangcong@gmail.com>
+ <20240821145533.GA2164@kernel.org> <ZsaLFVB0HyQfXBXy@pop-os.localdomain>
+ <66c7a37fd0270_1b1420837@john.notmuch>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <66c7a37fd0270_1b1420837@john.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Update documentation according to the changes in the driver.
+On 8/22/24 1:45 PM, John Fastabend wrote:
+> Cong Wang wrote:
+>> On Wed, Aug 21, 2024 at 03:55:33PM +0100, Simon Horman wrote:
+>>> On Tue, Aug 20, 2024 at 08:07:44PM -0700, Cong Wang wrote:
+>>>> From: Cong Wang <cong.wang@bytedance.com>
+>>>>
+>>>> When we cork messages in psock->cork, the last message triggers the
+>>>> flushing will result in sending a sk_msg larger than the current
+>>>> message size. In this case, in tcp_bpf_send_verdict(), 'copied' becomes
+>>>> negative at least in the following case:
+>>>>
+>>>> 468         case __SK_DROP:
+>>>> 469         default:
+>>>> 470                 sk_msg_free_partial(sk, msg, tosend);
+>>>> 471                 sk_msg_apply_bytes(psock, tosend);
+>>>> 472                 *copied -= (tosend + delta); // <==== HERE
+>>>> 473                 return -EACCES;
+>>>>
+>>>> Therefore, it could lead to the following BUG with a proper value of
+>>>> 'copied' (thanks to syzbot). We should not use negative 'copied' as a
+>>>> return value here.
+>>>>
+>>>>    ------------[ cut here ]------------
+>>>>    kernel BUG at net/socket.c:733!
+>>>>    Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
+>>>>    Modules linked in:
+>>>>    CPU: 0 UID: 0 PID: 3265 Comm: syz-executor510 Not tainted 6.11.0-rc3-syzkaller-00060-gd07b43284ab3 #0
+>>>>    Hardware name: linux,dummy-virt (DT)
+>>>>    pstate: 61400009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
+>>>>    pc : sock_sendmsg_nosec net/socket.c:733 [inline]
+>>>>    pc : sock_sendmsg_nosec net/socket.c:728 [inline]
+>>>>    pc : __sock_sendmsg+0x5c/0x60 net/socket.c:745
+>>>>    lr : sock_sendmsg_nosec net/socket.c:730 [inline]
+>>>>    lr : __sock_sendmsg+0x54/0x60 net/socket.c:745
+>>>>    sp : ffff800088ea3b30
+>>>>    x29: ffff800088ea3b30 x28: fbf00000062bc900 x27: 0000000000000000
+>>>>    x26: ffff800088ea3bc0 x25: ffff800088ea3bc0 x24: 0000000000000000
+>>>>    x23: f9f00000048dc000 x22: 0000000000000000 x21: ffff800088ea3d90
+>>>>    x20: f9f00000048dc000 x19: ffff800088ea3d90 x18: 0000000000000001
+>>>>    x17: 0000000000000000 x16: 0000000000000000 x15: 000000002002ffaf
+>>>>    x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
+>>>>    x11: 0000000000000000 x10: ffff8000815849c0 x9 : ffff8000815b49c0
+>>>>    x8 : 0000000000000000 x7 : 000000000000003f x6 : 0000000000000000
+>>>>    x5 : 00000000000007e0 x4 : fff07ffffd239000 x3 : fbf00000062bc900
+>>>>    x2 : 0000000000000000 x1 : 0000000000000000 x0 : 00000000fffffdef
+>>>>    Call trace:
+>>>>     sock_sendmsg_nosec net/socket.c:733 [inline]
+>>>>     __sock_sendmsg+0x5c/0x60 net/socket.c:745
+>>>>     ____sys_sendmsg+0x274/0x2ac net/socket.c:2597
+>>>>     ___sys_sendmsg+0xac/0x100 net/socket.c:2651
+>>>>     __sys_sendmsg+0x84/0xe0 net/socket.c:2680
+>>>>     __do_sys_sendmsg net/socket.c:2689 [inline]
+>>>>     __se_sys_sendmsg net/socket.c:2687 [inline]
+>>>>     __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2687
+>>>>     __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+>>>>     invoke_syscall+0x48/0x110 arch/arm64/kernel/syscall.c:49
+>>>>     el0_svc_common.constprop.0+0x40/0xe0 arch/arm64/kernel/syscall.c:132
+>>>>     do_el0_svc+0x1c/0x28 arch/arm64/kernel/syscall.c:151
+>>>>     el0_svc+0x34/0xec arch/arm64/kernel/entry-common.c:712
+>>>>     el0t_64_sync_handler+0x100/0x12c arch/arm64/kernel/entry-common.c:730
+>>>>     el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:598
+>>>>    Code: f9404463 d63f0060 3108441f 54fffe81 (d4210000)
+>>>>    ---[ end trace 0000000000000000 ]---
+>>>>
+>>>> Fixes: 4f738adba30a ("bpf: create tcp_bpf_ulp allowing BPF to monitor socket TX/RX data")
+>>>> Reported-by: syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com
+>>>> Cc: John Fastabend <john.fastabend@gmail.com>
+>>>> Cc: Jakub Sitnicki <jakub@cloudflare.com>
+>>>> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+>>>> ---
+>>>>   net/ipv4/tcp_bpf.c | 2 +-
+>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+>>>> index 53b0d62fd2c2..fe6178715ba0 100644
+>>>> --- a/net/ipv4/tcp_bpf.c
+>>>> +++ b/net/ipv4/tcp_bpf.c
+>>>> @@ -577,7 +577,7 @@ static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+>>>>   		err = sk_stream_error(sk, msg->msg_flags, err);
+>>>>   	release_sock(sk);
+>>>>   	sk_psock_put(sk, psock);
+>>>> -	return copied ? copied : err;
+>>>> +	return copied > 0 ? copied : err;
+>>>
+>>> Does it make more sense to make the condition err:
+>>> is err 0 iif everything is ok? (completely untested!)
+>>
+>> Mind to elaborate?
+>>
+>>  From my point of view, 'copied' is to handle partial transmission, for
+>> example:
+>>
+>> 0. User wants to send 2 * 1K bytes with sendmsg()
+>> 1. Kernel already sent the first 1K successfully
+>> 2. Kernel got some error when sending the 2nd 1K
+>>
+>> In this scenario, we should return 1K instead of the error to the caller to
+>> indicate this partial transmission situation, otherwise we could not
+>> distinguish it with a compete failure (that is, 0 byte sent).
+> 
+> Yep, if we don't return the positive value on partial send we will confuse
+> apps and they will probably resent data.
+> 
+>  From my side this looks good.
+> 
+> Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 
-New attributes group tty is exposed and ttyGNSS, ttyGNSS2, ttyMAC and
-ttyNMEA are moved to this group. Also, these attributes are no more
-links to the devices but rather simple text files containing names of
-tty devices.
+Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
 
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- Documentation/ABI/testing/sysfs-timecard | 31 ++++++++++++++----------
- 1 file changed, 18 insertions(+), 13 deletions(-)
-
-diff --git a/Documentation/ABI/testing/sysfs-timecard b/Documentation/ABI/testing/sysfs-timecard
-index 220478156297..3ae41b7634ac 100644
---- a/Documentation/ABI/testing/sysfs-timecard
-+++ b/Documentation/ABI/testing/sysfs-timecard
-@@ -258,24 +258,29 @@ Description:	(RW) When retrieving the PHC with the PTP SYS_OFFSET_EXTENDED
- 		the estimated point where the FPGA latches the PHC time.  This
- 		value may be changed by writing an unsigned integer.
- 
--What:		/sys/class/timecard/ocpN/ttyGNSS
--What:		/sys/class/timecard/ocpN/ttyGNSS2
--Date:		September 2021
-+What:		/sys/class/timecard/ocpN/tty
-+Date:		August 2024
-+Contact:	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-+Description:	(RO) Directory containing the sysfs nodes for TTY attributes
-+
-+What:		/sys/class/timecard/ocpN/tty/ttyGNSS
-+What:		/sys/class/timecard/ocpN/tty/ttyGNSS2
-+Date:		August 2024
- Contact:	Jonathan Lemon <jonathan.lemon@gmail.com>
--Description:	These optional attributes link to the TTY serial ports
--		associated with the GNSS devices.
-+Description:	(RO) These optional attributes contain names of the TTY serial
-+		ports associated with the GNSS devices.
- 
--What:		/sys/class/timecard/ocpN/ttyMAC
--Date:		September 2021
-+What:		/sys/class/timecard/ocpN/tty/ttyMAC
-+Date:		August 2024
- Contact:	Jonathan Lemon <jonathan.lemon@gmail.com>
--Description:	This optional attribute links to the TTY serial port
--		associated with the Miniature Atomic Clock.
-+Description:	(RO) This optional attribute contains name of the TTY serial
-+		port associated with the Miniature Atomic Clock.
- 
--What:		/sys/class/timecard/ocpN/ttyNMEA
--Date:		September 2021
-+What:		/sys/class/timecard/ocpN/tty/ttyNMEA
-+Date:		August 2024
- Contact:	Jonathan Lemon <jonathan.lemon@gmail.com>
--Description:	This optional attribute links to the TTY serial port
--		which outputs the PHC time in NMEA ZDA format.
-+Description:	(RO) This optional attribute contains name of the TTY serial
-+		port which outputs the PHC time in NMEA ZDA format.
- 
- What:		/sys/class/timecard/ocpN/utc_tai_offset
- Date:		September 2021
--- 
-2.43.5
+Jakub, can you directly land it to the net tree?
 
 
