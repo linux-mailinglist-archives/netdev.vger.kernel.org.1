@@ -1,79 +1,130 @@
-Return-Path: <netdev+bounces-122998-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-122999-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A68199636A7
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:07:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 209DC9636B5
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:11:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62EC22862D4
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 00:07:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EA1AB21143
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 00:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C55CA29;
-	Thu, 29 Aug 2024 00:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03CB1862;
+	Thu, 29 Aug 2024 00:11:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LmZLwx+P"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="AP2qp5FB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A9879C4;
-	Thu, 29 Aug 2024 00:06:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A876236B;
+	Thu, 29 Aug 2024 00:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724890019; cv=none; b=UggxDBgRnjbDxFWqA0lPNu3AFbdAYw+c+i2ODYWZeAb9DMdteckblkynyzyGLDHooOsnNG75+2eTx41OfyCguhnQE/fmgQyygRKp8LuCSXV1PZ90hmA2TSpjJBiBXNUqSWunsigfwdoG2xRHQgk3mdX9F+WRz0b4f1gKoWomAJI=
+	t=1724890263; cv=none; b=LDuKbDsoSn7nAilxs/Lo8jOlEPZL69R5V4QAMeaTJ/x8q25ZwWcY6mBibauKyAWQfbRmGh/pEH+YCl11RXhH533iyDHJJT6oMRW1XvCD/Xy+T2xh22788XFjCvf6zomc+GZZ53lz2ru8rKon/KfciKQIZo44ZbHxPP4XGD3kEUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724890019; c=relaxed/simple;
-	bh=0KBomtwl5htJf2KliDq8qRkg58AM7cR5JxLbBwVmD/M=;
+	s=arc-20240116; t=1724890263; c=relaxed/simple;
+	bh=+rRS4QYWMsXHwEygl9hxX77ERdn3n5uZCodH7u3Oko4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F5HGjBtrFBioSFNWEmCnMqvvhTcoIwXgK4iQ1I65bQZLX2fwVKtjKcRSHpDAHPPSdmz7wvioEEf6EADhW1vXolNFPrb4I+Qwc6mI8KqRtm8sqrY1P5gzDZeE5jgrZFfIWG614PJstrSxAL8ixGik8y7Rjqx1HeQCloSx9JDiQFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LmZLwx+P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9796EC4CEC0;
-	Thu, 29 Aug 2024 00:06:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724890019;
-	bh=0KBomtwl5htJf2KliDq8qRkg58AM7cR5JxLbBwVmD/M=;
+	 MIME-Version:Content-Type; b=WMKFSD4bJwCodFWoVdRuGz2lImbibrGenQr7yLBwHi13Zu8rGtvbkugkkRxgzXw6/FBh+ZOOEs4kIIJdI4NX30YvbEo1fIl4p1xVlbDLvpHFEufREjV0VKypxqCuPQlQxydQc+hg+F2NSd4OaMRI8D80pGxRUMNHd82w+cIGvFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=AP2qp5FB; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1724890258;
+	bh=DvmFRoOXMWLoClFIxHNRmceAHCrX9fNDpGyyVHhuQ3M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LmZLwx+POZ+ZZEuXHKVyWVVwSDgrJjSJCUR3aUrxypd4Z4wK+wbPf9EJE/+P7brK+
-	 SxbhLDYEJtEpBdkHd8ZwKsdkFWzDjPHxwjPdbkJNS2jfBZv5jzatoqnUiz0zEG28tw
-	 hjUYhdxihOCJgq/u8k3cQcEl7ih41Mn0OJWPBDGbgcpU1aJFA1pEtVgtDBWDmAU/l3
-	 SHsHnTvjwc7rGXVGqyuHpCidavb1xuTXQKYBS481Y30pxpCGAw1EwM2rQcFNZH6mAD
-	 r6TnzILRj+UQJyfdOrc8aBAzwzd0JC9nICmjlULt7mfWsJxiVe4VWmakJOCcMTOr0t
-	 Sn0irpBpH5afg==
-Date: Wed, 28 Aug 2024 17:06:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, wei.liu@kernel.org, paul@xen.org,
- davem@davemloft.net, edumazet@google.com, madhuparnabhowmik04@gmail.com,
- xen-devel@lists.xenproject.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net/xen-netback: prevent UAF in xenvif_flush_hash()
-Message-ID: <20240828170657.5f493cc6@kernel.org>
-In-Reply-To: <CAO9qdTGHJw-SUFH9D16N5wSn4KmaMUcX+GVFuEFu+jqMb3HU1g@mail.gmail.com>
-References: <20240822181109.2577354-1-aha310510@gmail.com>
-	<fd2a06d5-370f-4e07-af84-cab089b82a4b@redhat.com>
-	<CAO9qdTGHJw-SUFH9D16N5wSn4KmaMUcX+GVFuEFu+jqMb3HU1g@mail.gmail.com>
+	b=AP2qp5FBvgazIlZgaJg7TAsAuhI2EiReNwFyIMo9JVOP42GUNZLnnYauY/Jppu4de
+	 m/aiP+8bk9zsUTmUMiryDiMWEtQm/MiCtGVtbjxtqTYlU/2FuIdJPH2Q71zeEPoF91
+	 2Im3astdk3CMMCj9/M4nqnKp5huUGjUmFov/jifE60A8yllcHkAyq2cwhu/z+HP+lM
+	 aM8+FLOVuJ15Sut8A3uHdGrWvZktJ8M0VETrnFDgqNbCn3FJJuVCQbXpYhp1rLrtKa
+	 VndrzSKlyTz/h9CQmlsRyXhRVM9W+Ppcb/8scEKFeVItMa0cAd+C+okEgRsU20YW6+
+	 +9Ymm2HcE9dMg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WvMBT0b2hz4wxH;
+	Thu, 29 Aug 2024 10:10:57 +1000 (AEST)
+Date: Thu, 29 Aug 2024 10:10:56 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jason Xing <kernelxing@tencent.com>,
+ Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Xueming Feng <kuro@kuroa.me>
+Subject: Re: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20240829101056.47cd3b61@canb.auug.org.au>
+In-Reply-To: <CAL+tcoC0Wh5uREYs48Oq7yyKjChbY895NTr8CuSf+2BVWToaTA@mail.gmail.com>
+References: <20240828112207.5c199d41@canb.auug.org.au>
+	<CAL+tcoC0Wh5uREYs48Oq7yyKjChbY895NTr8CuSf+2BVWToaTA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/JYbYle9A+259YtpIRA5X91V";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Wed, 28 Aug 2024 21:52:12 +0900 Jeongjun Park wrote:
-> > The loop runs with irq disabled, the RCU critical section extends over
-> > it, uninterrupted.  
-> 
-> Basically, list_for_each_entry_rcu is specified to be used under the protection
-> of rcu_read_lock(), but this is not the case with xenvif_new_hash(). If it is
-> used without the protection of rcu_read_lock(), kfree is called immediately
-> after the grace period ends after the call to kfree_rcu() inside
-> list_for_each_entry_rcu, so the entry is released, and a UAF occurs when
-> fetching with ->next thereafter.
+--Sig_/JYbYle9A+259YtpIRA5X91V
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-You cut off and didn't answer Paolo's question whether you have a splat
-/ saw this actually cause a crash or a KASAN warning.
+Hi Jason,
+
+On Thu, 29 Aug 2024 08:04:16 +0800 Jason Xing <kerneljasonxing@gmail.com> w=
+rote:
+>
+> On Wed, Aug 28, 2024 at 9:22=E2=80=AFAM Stephen Rothwell <sfr@canb.auug.o=
+rg.au> wrote:
+> >
+> > diff --cc net/ipv4/tcp.c
+> > index 831a18dc7aa6,8514257f4ecd..000000000000
+> > --- a/net/ipv4/tcp.c
+> > +++ b/net/ipv4/tcp.c
+> > @@@ -4653,10 -4649,12 +4656,10 @@@ int tcp_abort(struct sock *sk, int e=
+rr
+> >         local_bh_disable();
+> >         bh_lock_sock(sk);
+> >
+> >  -      if (!sock_flag(sk, SOCK_DEAD)) {
+> >  -              if (tcp_need_reset(sk->sk_state))
+> >  -                      tcp_send_active_reset(sk, GFP_ATOMIC,
+> >  -                                            SK_RST_REASON_TCP_STATE);
+> >  -              tcp_done_with_error(sk, err);
+> >  -      }
+> >  +      if (tcp_need_reset(sk->sk_state))
+> >  +              tcp_send_active_reset(sk, GFP_ATOMIC,
+> > -                                     SK_RST_REASON_NOT_SPECIFIED);
+> > ++                                    SK_RST_REASON_TCP_STATE); =20
+>=20
+> "++"?
+
+This is a "combined diff" of the merge commit.  The "++" line does not
+appear verbatim in either of the parent trees.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/JYbYle9A+259YtpIRA5X91V
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbPvJAACgkQAVBC80lX
+0Gy8vggAkPoAtlhRr80RmtBQpv6xWagfox7kRPLzQSj0dBYYQyJgaoTzq0tUywc4
+qATCxckR7eNdCbW8vc5M1QIyngUukenyv8Jf0p+06fRVxDNX7DnH1TkMNDxHO8RE
+VbQhxRla/2Ve3kOSn+Z1QcHrxYwWIXWATSExvHHtsonSXdo7wFbLe0rO6aBc5jqQ
+Cvlz8l4xqAa7oY5LEmKT2dad1jAwsYfJoN+Wnm1IbN7fZgMgjXx0MauyBx+Jv0mY
+Cs8AR4nL2YCEcKEWVpX8O8CRSH5YrXPWs8xkNZ7my68GwuPiX34piWEh4kw9WDkx
+zlsW9PW76QFZ3RbD+It5I/C3oq8cig==
+=8r1k
+-----END PGP SIGNATURE-----
+
+--Sig_/JYbYle9A+259YtpIRA5X91V--
 
