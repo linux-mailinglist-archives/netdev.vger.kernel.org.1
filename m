@@ -1,177 +1,206 @@
-Return-Path: <netdev+bounces-123307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26B0E9647BE
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:16:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DC01964801
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:22:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8B5E280FCC
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:16:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2461B2AE9C
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BF819005B;
-	Thu, 29 Aug 2024 14:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217A11B1514;
+	Thu, 29 Aug 2024 14:18:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SDO2DE/N"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GVfMW/nu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305AF19408D
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 14:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A271AED5D
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 14:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724940969; cv=none; b=AR2xrGmhGvyQFaLly+REiKm7OYn/Ix/HnsSUbgZT3GpNQXHF2+JmL5Pl47uk7TDq31ITTiT3Z9bkE20M9EAW6LSX7JoQJaFsjMLH6GgTy18Kd53NIB5S2XSpv7jtojJYB7MTSpqGIsPJ6UDUMx66BRc3Pi9BKDaigrFkWE5t0Fs=
+	t=1724941136; cv=none; b=awXesTpwPa0OpxLbqUD3vE1n0T7wZx6zqYESXSneiyjgFG4cnGlDGHXn+2LfkUJZxtj2IkhMBZa9SbQXiwH2oMILcfR/11iUigNsK0Z52d3MZ74ftF1RB6PSzxet4SDLmikkpEA79axWc2yyJdcnNVWBFWRWZmK/MIGVbxGma78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724940969; c=relaxed/simple;
-	bh=ywf+8W/FG1FuD2ppVyGZRMgUVcCto9o1HzWxFQ18ETs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=DZ0k4SLykNr82uud7SRdWbUNoLgFEh/uKGFX7KMXZQb7xCxDDF4u3f+j1eF7FDB1RQD7wtx8SYGX3YWWLog2q9EcZttG9bu4shzVtUyPMEon55VYS5wXnEguMnAViGALwGSmREMmLUkaeBnSzIrVp93Atug+7soIqvYCcxgFO80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SDO2DE/N; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4567587224eso3987751cf.0
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 07:16:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724940967; x=1725545767; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qjG69WwFX5tVs+S+deg2EppKgm0ohgOtGitckoFll2o=;
-        b=SDO2DE/NvIO+PwWSnamwR8KINTBTCme3qCDo6Z8pQKffTKpIGrAgWX34l6D0kDGjM1
-         r+y/6Qs8utfQxdMBky+x90juWQWAIBXn5ZhIzH7Z8POO5RrYkamXIj0qitNRa68IJtdx
-         0by3ettrzltWivEjZ17bYAqTj6H/NaCwZNPxY+xzJewo9Q+CPNX0nWLnQhAnDUocK8QS
-         jCNB20OcWhyGrttf+OOOsIM/5oTy9MXlNqf3M22lNL8YSEDmrPxVOvCXPTDp9QRaWsQJ
-         V+hKGyyimDdp1nK/o3MF3+p6tLkc0mKRw+x1kSMVHOFHFhp41lmnxQju9/+ZogC/JRXe
-         66zw==
+	s=arc-20240116; t=1724941136; c=relaxed/simple;
+	bh=bN72jrToXfY+vJucKr9xb19mZvJ9IN7YKnm5yOK/+sI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BCL77r8OLLm15AVsRaDI8X7zdHS7nSiUWNgeCMqKzGf/MjyPE1ieLLBeEy7zw9nlpM4U/bHB3Oa9KFE8HYwjjcfRI3ZnuS7i1AsiXJ9i6wPKGAk8FHNAmKqXcoLF60kZ525yYD3OoGSmVWF/HpKXhaeMbxq2BH960K+QXOMNYiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GVfMW/nu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724941133;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=UljbUeQcl4wkbV7mOtS08F4hh+nFyo1TBvQFl+wrPVQ=;
+	b=GVfMW/nu6EjwW8rQyLKMF5jXrK0tGS2BVlpMIrmR5Hm9B8JipuKJaHZ7r5dtuaFggGPD7A
+	AhZ/q97H31tjfvaVOUPmkC9wSqZUqjsFyqqB0wUgCbm6YgEdD3Me6LTmtWMpfuDzlWQoLa
+	K7kG5PTC01ctbc1Zkb0+oJSP0XzWz1o=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-190-K7GXPhiHObefGboM0Dn2bA-1; Thu, 29 Aug 2024 10:18:51 -0400
+X-MC-Unique: K7GXPhiHObefGboM0Dn2bA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42bb7178d05so6839775e9.1
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 07:18:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724940967; x=1725545767;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qjG69WwFX5tVs+S+deg2EppKgm0ohgOtGitckoFll2o=;
-        b=V/0E9eRVEhdeNwaadfuxWxsY4Uq+iivJGMexqrOeRmSxPsmo8t1iocdeSxJrWdWnlu
-         FCybkxxhoJR3RzGuNzlNojjmdzntEr5jjf/UtkDzt1BeWNYfigk+GTKxRbwKLBdLBcF1
-         mfMwtBo5oPUazGY+3dyiGcy7/R+WJTbB7DOnMjKl1IEXSXUCZ5ZFQ6gEp05VMxBo8vY0
-         nZbXpFLebpmbfKaqbkJeDf8Ps72RE7IpRkX6kxyXF8hlWAZbb/i8vv1f/AMhPK4dTq3O
-         MIs/NgfHy42afD6OUAjQnh8B2OTT9sGT/pt0IHRn5fpoYKmpgMet+ad+d+MG7uQIy1qt
-         Xslw==
-X-Gm-Message-State: AOJu0YxORYdRGO3cBAAgE+5Bx4uMeynfkzS1haiWvyFSwZgqKjihROaW
-	GM0yGIAtNzGM3ljvsneI76UXCAG2j+MwpPdWiD6zENd46v0f5Yqq
-X-Google-Smtp-Source: AGHT+IGQgyLVnUHZHkrcPvKUuNHTNYj1tMGgp8kYqZeSj/Q8TpUnJk7mQB8jeBTBzc9Y+R0On6KNGA==
-X-Received: by 2002:a05:622a:8cb:b0:446:4cc5:523d with SMTP id d75a77b69052e-4567f50e544mr31323031cf.20.1724940966779;
-        Thu, 29 Aug 2024 07:16:06 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45682cb02casm5140141cf.42.2024.08.29.07.16.05
+        d=1e100.net; s=20230601; t=1724941128; x=1725545928;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UljbUeQcl4wkbV7mOtS08F4hh+nFyo1TBvQFl+wrPVQ=;
+        b=ocPFq+Az9rpfjdil9IsDRX33PNUi1l0aIunKgdFBYModzOiCKCWOxU+AqW+13N4MYR
+         VFWakPyiXnAsTZtK3vliX7aep97CnK3FFbFDp3bPiyZA1YAOjtedq9zWmz9qElF/AMLH
+         9c06CJPlNZA3nIuq4dQjrgax9NOUdDZmZwUTVP5QTus/mq2etI9lKBv/0pM83bccQla5
+         ocys2T9b9QaZYGxur+KuWcK8XRu8FsAt3btWtF1y+avIlySaVzpkAmRCLaAIe4PGAgk5
+         IQQjLSSbV9gqTIcMxdndltIlpq6/+hAK//jc5GxuWL3/FlQXZSifIbF+Rxzj1JFu892F
+         83uA==
+X-Forwarded-Encrypted: i=1; AJvYcCUT4XJT3TjSZ+DmhGCq3Ns5Y1mHhIW8oWUOqca1Y6wpeXmS3A3hL11GHp2Tz2os7xENcuVeLtw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxp66uJ6ecAyHYvFemnD2pIVYiQf5mqMXVDixyQNuBIJ1L8Plp9
+	/Tgw8CHR2KdqpxkKDf+LHh4+4boouRrzohKTl/FF91UzGl+v/w2EIvuVCGyn9Lzb8VjVoJYzL+l
+	sQyyUrqCupW8cotXSlHEjGKuYs0I/4g72FcROwrGqsWEXlRmg0aK1vQ==
+X-Received: by 2002:a05:600c:470f:b0:428:9ba:39f with SMTP id 5b1f17b1804b1-42bb024d9d6mr24548585e9.11.1724941128523;
+        Thu, 29 Aug 2024 07:18:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHaWAd/dk5mVFnN9RDmi+8yHhRiBHqeSEZqBrS5gu6xo2wvJc2Dt1Hm0EPgbT3w2rGsknEV9A==
+X-Received: by 2002:a05:600c:470f:b0:428:9ba:39f with SMTP id 5b1f17b1804b1-42bb024d9d6mr24548445e9.11.1724941127865;
+        Thu, 29 Aug 2024 07:18:47 -0700 (PDT)
+Received: from eisenberg.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba63abebdsm52670425e9.27.2024.08.29.07.18.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 07:16:05 -0700 (PDT)
-Date: Thu, 29 Aug 2024 10:16:05 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemb@google.com
-Cc: netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Message-ID: <66d082a58cc98_3895fa294fe@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240828160145.68805-2-kerneljasonxing@gmail.com>
-References: <20240828160145.68805-1-kerneljasonxing@gmail.com>
- <20240828160145.68805-2-kerneljasonxing@gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] tcp: make SOF_TIMESTAMPING_RX_SOFTWARE
- feature per socket
+        Thu, 29 Aug 2024 07:18:47 -0700 (PDT)
+From: Philipp Stanner <pstanner@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Wu Hao <hao.wu@intel.com>,
+	Tom Rix <trix@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
+	John Garry <john.g.garry@oracle.com>,
+	Philipp Stanner <pstanner@redhat.com>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-fpga@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	virtualization@lists.linux.dev
+Subject: [PATCH v5 0/7] PCI: Remove pcim_iounmap_regions()
+Date: Thu, 29 Aug 2024 16:16:19 +0200
+Message-ID: <20240829141844.39064-1-pstanner@redhat.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> Normally, if we want to record and print the rx timestamp after
-> tcp_recvmsg_locked(), we must enable both SOF_TIMESTAMPING_SOFTWARE
-> and SOF_TIMESTAMPING_RX_SOFTWARE flags, from which we also can notice
-> through running rxtimestamp binary in selftests (see testcase 7).
-> 
-> However, there is one particular case that fails the selftests with
-> "./rxtimestamp: Expected swtstamp to not be set." error printing in
-> testcase 6.
-> 
-> How does it happen? When we keep running a thread starting a socket
-> and set SOF_TIMESTAMPING_RX_SOFTWARE option first, then running
-> ./rxtimestamp, it will fail. The reason is the former thread
-> switching on netstamp_needed_key that makes the feature global,
-> every skb going through netif_receive_skb_list_internal() function
-> will get a current timestamp in net_timestamp_check(). So the skb
-> will have timestamp regardless of whether its socket option has
-> SOF_TIMESTAMPING_RX_SOFTWARE or not.
-> 
-> After this patch, we can pass the selftest and control each socket
-> as we want when using rx timestamp feature.
-> 
-> Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  net/ipv4/tcp.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index 8514257f4ecd..5e88c765b9a1 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -2235,6 +2235,7 @@ void tcp_recv_timestamp(struct msghdr *msg, const struct sock *sk,
->  			struct scm_timestamping_internal *tss)
->  {
->  	int new_tstamp = sock_flag(sk, SOCK_TSTAMP_NEW);
-> +	u32 tsflags = READ_ONCE(sk->sk_tsflags);
->  	bool has_timestamping = false;
->  
->  	if (tss->ts[0].tv_sec || tss->ts[0].tv_nsec) {
-> @@ -2274,14 +2275,20 @@ void tcp_recv_timestamp(struct msghdr *msg, const struct sock *sk,
->  			}
->  		}
->  
-> -		if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_SOFTWARE)
-> +		/* We have to use the generation flag here to test if we
-> +		 * allow the corresponding application to receive the rx
-> +		 * timestamp. Only using report flag does not hold for
-> +		 * receive timestamping case.
-> +		 */
+OK, so unfortunately it seems very challenging to reconcile the merge
+conflict pointed up by Serge between net-next and pci-devres regarding
+"ethernet: stmicro": A patch that applies to the net-next tree does not
+apply anymore to pci-devres (and vice versa).
 
-Nit: what does "does not hold" mean here? I don't think a casual reader
-will be able to parse this comment and understand it.
+So I actually think that it would be best if we just drop the portation
+of "ethernet: stmicro" for now and port it as the last user in v6.13.
 
-Perhaps something along the lines of
+Then we can also remove pcim_iounmap_regions() completely.
 
-"Test both reporting and generation flag, to filter out false
-positives where the process asked only for tx software timestamps and
-another process enabled receive software timestamp generation."
+That should then be trivial.
 
-> +		if (tsflags & SOF_TIMESTAMPING_SOFTWARE &&
-> +		    tsflags & SOF_TIMESTAMPING_RX_SOFTWARE)
->  			has_timestamping = true;
->  		else
->  			tss->ts[0] = (struct timespec64) {0};
->  	}
->  
->  	if (tss->ts[2].tv_sec || tss->ts[2].tv_nsec) {
-> -		if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_RAW_HARDWARE)
-> +		if (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE)
->  			has_timestamping = true;
->  		else
->  			tss->ts[2] = (struct timespec64) {0};
-> -- 
-> 2.37.3
-> 
+Changes in v5:
+  - Patch "ethernet: cavium": Re-add accidentally removed
+    pcim_iounmap_region(). (Me)
+  - Add Jens's Reviewed-by to patch "block: mtip32xx". (Jens)
 
+Changes in v4:
+  - Drop the "ethernet: stmicro: [...] patch since it doesn't apply to
+    net-next, and making it apply to that prevents it from being
+    applyable to PCI ._. (Serge, me)
+  - Instead, deprecate pcim_iounmap_regions() and keep "ethernet:
+    stimicro" as the last user for now.
+  - ethernet: cavium: Use PTR_ERR_OR_ZERO(). (Andy)
+  - vdpa: solidrun (Bugfix) Correct wrong printf string (was "psnet" instead of
+    "snet"). (Christophe)
+  - vdpa: solidrun (Bugfix): Add missing blank line. (Andy)
+  - vdpa: solidrun (Portation): Use PTR_ERR_OR_ZERO(). (Andy)
+  - Apply Reviewed-by's from Andy and Xu Yilun.
+
+Changes in v3:
+  - fpga/dfl-pci.c: remove now surplus wrapper around
+    pcim_iomap_region(). (Andy)
+  - block: mtip32xx: remove now surplus label. (Andy)
+  - vdpa: solidrun: Bugfix: Include forgotten place where stack UB
+    occurs. (Andy, Christophe)
+  - Some minor wording improvements in commit messages. (Me)
+
+Changes in v2:
+  - Add a fix for the UB stack usage bug in vdap/solidrun. Separate
+    patch, put stable kernel on CC. (Christophe, Andy).
+  - Drop unnecessary pcim_release_region() in mtip32xx (Andy)
+  - Consequently, drop patch "PCI: Make pcim_release_region() a public
+    function", since there's no user anymore. (obsoletes the squash
+    requested by Damien).
+  - vdap/solidrun:
+    • make 'i' an 'unsigned short' (Andy, me)
+    • Use 'continue' to simplify loop (Andy)
+    • Remove leftover blank line
+  - Apply given Reviewed- / acked-bys (Andy, Damien, Bartosz)
+
+
+Important things first:
+This series is based on [1] and [2] which Bjorn Helgaas has currently
+queued for v6.12 in the PCI tree.
+
+This series shall remove pcim_iounmap_regions() in order to make way to
+remove its brother, pcim_iomap_regions().
+
+@Bjorn: Feel free to squash the PCI commits.
+
+Regards,
+P.
+
+[1] https://lore.kernel.org/all/20240729093625.17561-4-pstanner@redhat.com/
+[2] https://lore.kernel.org/all/20240807083018.8734-2-pstanner@redhat.com/
+
+Philipp Stanner (7):
+  PCI: Deprecate pcim_iounmap_regions()
+  fpga/dfl-pci.c: Replace deprecated PCI functions
+  block: mtip32xx: Replace deprecated PCI functions
+  gpio: Replace deprecated PCI functions
+  ethernet: cavium: Replace deprecated PCI functions
+  vdpa: solidrun: Fix UB bug with devres
+  vdap: solidrun: Replace deprecated PCI functions
+
+ drivers/block/mtip32xx/mtip32xx.c             | 18 +++---
+ drivers/fpga/dfl-pci.c                        | 16 ++---
+ drivers/gpio/gpio-merrifield.c                | 14 ++---
+ .../net/ethernet/cavium/common/cavium_ptp.c   |  7 +--
+ drivers/pci/devres.c                          |  8 ++-
+ drivers/vdpa/solidrun/snet_main.c             | 59 ++++++++-----------
+ include/linux/pci.h                           |  1 +
+ 7 files changed, 53 insertions(+), 70 deletions(-)
+
+-- 
+2.46.0
 
 
