@@ -1,181 +1,110 @@
-Return-Path: <netdev+bounces-123443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E5D964DC6
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:37:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8503A964DEB
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:43:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BE26B210AF
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:37:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE5CF1C224D7
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB661B9B23;
-	Thu, 29 Aug 2024 18:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A69E1B375C;
+	Thu, 29 Aug 2024 18:43:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="jzohJklw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPlYK/QJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426FD1B8E83
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 18:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CA94D59F;
+	Thu, 29 Aug 2024 18:43:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724956613; cv=none; b=qbUbq739J18NrqgGzujjjRoa/4fdyZpT71E+/aZ0387MGmVPhevKq8L5d+k8+ZhwSrib1TeyI7w6lncL9DYjil2OGKWnNLEpFZFlfyMEPneDOa8gtielMLzfwVI8kqFbjyRUfAusEY79s05n1rmjN7i2c40/rEnc/TUvp5gL3QQ=
+	t=1724957006; cv=none; b=cAMJdNt6e67gIStd0dFoRaHhVsgwCVz1oZAShJ64IwDqZtE/qYqMceoh7HkRoVIk7LiQsRvC5SjWjRobVZi8D/ng6VrIGDMbrsw/1d7pjZ0h1ZYg/lFNfEtPlLjZhhrTatRV1q9i+hPVT3fE8JvGthhqm+04v1XcPgRvPLLobdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724956613; c=relaxed/simple;
-	bh=UG5Iz04w+jmc9PEZj5ckMSLR1y1w55Zb/fhYhq0ly30=;
+	s=arc-20240116; t=1724957006; c=relaxed/simple;
+	bh=vE+oHFDKn1n2H0ca0J6627LrKzdWqp1r5PgbRtG60jI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sGU3LNpVd6YavpfR1P1Z2arDiDVKIPuhc1FZZFqxRkgU4HWPfZyngSYcJGNP9d5H0ht77MYzk7usJceDsmjTFdUgFs+SsxuIz/ppb+aouDbDZrLpcR+K1t8RQQRUKdwQaGBU6ugdaJc4XBmqgNOgA9MUD3bD3TrQzPzj0i5V6/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=jzohJklw; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3864f6ed-deb5-4dc8-b351-53ba9dcb18bc@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724956609;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lv1dzFKxvInUi+QXVnM3dkpGcjD6bo+MpA58P4puN4U=;
-	b=jzohJklwUSV76+jjq0I5g5oJ0ktSoamn1w0ACIVXNQSAINg6nfXn1G0m+u2AlQTcOxtLdW
-	IIBbHbUMkdB8IvPVClI0bbSATZb/SRRYtsQSElIdjA/Y9sgocDw93AywrrC40PfM6yRXX9
-	+c8QexpvdeC7/JfmXDFWqnqWtlyIVkg=
-Date: Thu, 29 Aug 2024 11:36:41 -0700
+	 In-Reply-To:Content-Type; b=ijPLSjCI14NCFyj9qWwdrtxqZXgipKBvQxp1bjL9LO0XeRvwj0IM88eVkkRND7YQEmXbgGuScsUcml5eu91WVuqsWfEUOeFEHpsiO+s7vzwa/KHwlAI9549iS/lVVsRENFBEpypgKyMImKw3g0szKC8mKBsSEH2QQMRAcdNp0Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CPlYK/QJ; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-715cdc7a153so834242b3a.0;
+        Thu, 29 Aug 2024 11:43:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724957004; x=1725561804; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4C7xSOcW/TzKaBdUZWPIdJ9PAcDUfVW7KB+BCThOMkc=;
+        b=CPlYK/QJjoZ/Sb/O82Kog2l97PSM/wl6runqGGVtcwStezgFWNxPVtWj0q7p5uanQC
+         51bsJSPJvTK+vzoxM25xZ+p5AwSHttnjFw/5cdt7DlTu+AQzBuamIM6tLvD7FdTEPEjG
+         uJW2bmae1cjBsDvfudGsoIONvua2QC4jJO+VdX2cqPo/P6f1On7pLhX4ohy9tdcbNPTr
+         gYjHwUPy80k3sfUylC1noM6qmlNWYGxYrdhP/lx+bdPRfKkV0UPXN8nko6WhVWTpK0pP
+         5XPQTYkdMsv/VJ8l2G0+KIJy+Wim72/k8svT6oANR0RrZD3YGKfSwdgWi39xylLSSC9f
+         lWUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724957004; x=1725561804;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4C7xSOcW/TzKaBdUZWPIdJ9PAcDUfVW7KB+BCThOMkc=;
+        b=M3QY542CKaPVxVo3YL81GUwmT3ujnDZ5e9WI/TUC0zLUNU/r+m7QXlTFEeFEL8LA8p
+         yfYOyNYLijhBBvqYIvRCOJn09hfd0OVDyuifcgP9pWB/vXuGbZs7T8QtBqvkFKhXwSmX
+         n4VLulwQWuhZWT0r4StnJeQUTJVBsgPp86BFVeKnQN3Ns9hEeo1RT+tOxdpGesZvcc1A
+         urSRfgIQnBX+IUhjrKVD97/BbLHAz63Bi+dZ/vkRaHl3jX3hPi1qoUzequUCu7wJUt3C
+         ZhnH/OV2Ng+zwWMg7GHmwehtfeGt++w53XiepvUFHCacpx7P8XrdwZ0znK4mRmlYoMh1
+         ZWmg==
+X-Forwarded-Encrypted: i=1; AJvYcCX7FhNDUQOdXesSqbbjydtjxCElfnI5DL5CeANEL8wDt5z6hI2mEZeHEp3Jp0Z+Th1D5+4Fdzc17lebHi8=@vger.kernel.org, AJvYcCXD1TU9oG91XW8UWdUUpiQhtPK2VEIV9eRHa2I4i63VmkAzG6Grl6yL/R6afICvzBi4xrhZVlXN@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGtlnJy14NMchxaTxxiCb1s/WccVndT2kdXwiIuXy09y1NCP1j
+	3Y9D9LvEJBu2Hkwdux+1K7K7X3MffzhiU7iqEcIGWaaZqBwT8bDN
+X-Google-Smtp-Source: AGHT+IFVq3+ktr6bQOFUC8KGniIQIVORiHvN8Mt2AhB7WSm9HpXa44ndoShl8h6MzRhY/EwEB20hIg==
+X-Received: by 2002:aa7:8895:0:b0:706:aa39:d5c1 with SMTP id d2e1a72fcca58-715e78a7047mr5738454b3a.8.1724957004073;
+        Thu, 29 Aug 2024 11:43:24 -0700 (PDT)
+Received: from [192.168.1.14] ([200.4.98.43])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-715e55b9cf0sm1486289b3a.96.2024.08.29.11.43.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Aug 2024 11:43:23 -0700 (PDT)
+Message-ID: <9f4831cc-84f4-4329-b912-d558c74797c6@gmail.com>
+Date: Thu, 29 Aug 2024 15:43:18 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Patch bpf] tcp_bpf: fix return value of tcp_bpf_sendmsg()
-To: Cong Wang <xiyou.wangcong@gmail.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- Cong Wang <cong.wang@bytedance.com>,
- John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
- syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com,
- Jakub Sitnicki <jakub@cloudflare.com>
-References: <20240821030744.320934-1-xiyou.wangcong@gmail.com>
- <20240821145533.GA2164@kernel.org> <ZsaLFVB0HyQfXBXy@pop-os.localdomain>
- <66c7a37fd0270_1b1420837@john.notmuch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch net-next v4] ethtool: pse-pd: move pse validation into set
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240828174340.593130-2-djahchankoike@gmail.com>
+ <20240829103552.09f22f98@device-28.home>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <66c7a37fd0270_1b1420837@john.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Diogo Jahchan Koike <djahchankoike@gmail.com>
+In-Reply-To: <20240829103552.09f22f98@device-28.home>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 8/22/24 1:45 PM, John Fastabend wrote:
-> Cong Wang wrote:
->> On Wed, Aug 21, 2024 at 03:55:33PM +0100, Simon Horman wrote:
->>> On Tue, Aug 20, 2024 at 08:07:44PM -0700, Cong Wang wrote:
->>>> From: Cong Wang <cong.wang@bytedance.com>
->>>>
->>>> When we cork messages in psock->cork, the last message triggers the
->>>> flushing will result in sending a sk_msg larger than the current
->>>> message size. In this case, in tcp_bpf_send_verdict(), 'copied' becomes
->>>> negative at least in the following case:
->>>>
->>>> 468         case __SK_DROP:
->>>> 469         default:
->>>> 470                 sk_msg_free_partial(sk, msg, tosend);
->>>> 471                 sk_msg_apply_bytes(psock, tosend);
->>>> 472                 *copied -= (tosend + delta); // <==== HERE
->>>> 473                 return -EACCES;
->>>>
->>>> Therefore, it could lead to the following BUG with a proper value of
->>>> 'copied' (thanks to syzbot). We should not use negative 'copied' as a
->>>> return value here.
->>>>
->>>>    ------------[ cut here ]------------
->>>>    kernel BUG at net/socket.c:733!
->>>>    Internal error: Oops - BUG: 00000000f2000800 [#1] PREEMPT SMP
->>>>    Modules linked in:
->>>>    CPU: 0 UID: 0 PID: 3265 Comm: syz-executor510 Not tainted 6.11.0-rc3-syzkaller-00060-gd07b43284ab3 #0
->>>>    Hardware name: linux,dummy-virt (DT)
->>>>    pstate: 61400009 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYPE=--)
->>>>    pc : sock_sendmsg_nosec net/socket.c:733 [inline]
->>>>    pc : sock_sendmsg_nosec net/socket.c:728 [inline]
->>>>    pc : __sock_sendmsg+0x5c/0x60 net/socket.c:745
->>>>    lr : sock_sendmsg_nosec net/socket.c:730 [inline]
->>>>    lr : __sock_sendmsg+0x54/0x60 net/socket.c:745
->>>>    sp : ffff800088ea3b30
->>>>    x29: ffff800088ea3b30 x28: fbf00000062bc900 x27: 0000000000000000
->>>>    x26: ffff800088ea3bc0 x25: ffff800088ea3bc0 x24: 0000000000000000
->>>>    x23: f9f00000048dc000 x22: 0000000000000000 x21: ffff800088ea3d90
->>>>    x20: f9f00000048dc000 x19: ffff800088ea3d90 x18: 0000000000000001
->>>>    x17: 0000000000000000 x16: 0000000000000000 x15: 000000002002ffaf
->>>>    x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
->>>>    x11: 0000000000000000 x10: ffff8000815849c0 x9 : ffff8000815b49c0
->>>>    x8 : 0000000000000000 x7 : 000000000000003f x6 : 0000000000000000
->>>>    x5 : 00000000000007e0 x4 : fff07ffffd239000 x3 : fbf00000062bc900
->>>>    x2 : 0000000000000000 x1 : 0000000000000000 x0 : 00000000fffffdef
->>>>    Call trace:
->>>>     sock_sendmsg_nosec net/socket.c:733 [inline]
->>>>     __sock_sendmsg+0x5c/0x60 net/socket.c:745
->>>>     ____sys_sendmsg+0x274/0x2ac net/socket.c:2597
->>>>     ___sys_sendmsg+0xac/0x100 net/socket.c:2651
->>>>     __sys_sendmsg+0x84/0xe0 net/socket.c:2680
->>>>     __do_sys_sendmsg net/socket.c:2689 [inline]
->>>>     __se_sys_sendmsg net/socket.c:2687 [inline]
->>>>     __arm64_sys_sendmsg+0x24/0x30 net/socket.c:2687
->>>>     __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
->>>>     invoke_syscall+0x48/0x110 arch/arm64/kernel/syscall.c:49
->>>>     el0_svc_common.constprop.0+0x40/0xe0 arch/arm64/kernel/syscall.c:132
->>>>     do_el0_svc+0x1c/0x28 arch/arm64/kernel/syscall.c:151
->>>>     el0_svc+0x34/0xec arch/arm64/kernel/entry-common.c:712
->>>>     el0t_64_sync_handler+0x100/0x12c arch/arm64/kernel/entry-common.c:730
->>>>     el0t_64_sync+0x19c/0x1a0 arch/arm64/kernel/entry.S:598
->>>>    Code: f9404463 d63f0060 3108441f 54fffe81 (d4210000)
->>>>    ---[ end trace 0000000000000000 ]---
->>>>
->>>> Fixes: 4f738adba30a ("bpf: create tcp_bpf_ulp allowing BPF to monitor socket TX/RX data")
->>>> Reported-by: syzbot+58c03971700330ce14d8@syzkaller.appspotmail.com
->>>> Cc: John Fastabend <john.fastabend@gmail.com>
->>>> Cc: Jakub Sitnicki <jakub@cloudflare.com>
->>>> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
->>>> ---
->>>>   net/ipv4/tcp_bpf.c | 2 +-
->>>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
->>>> index 53b0d62fd2c2..fe6178715ba0 100644
->>>> --- a/net/ipv4/tcp_bpf.c
->>>> +++ b/net/ipv4/tcp_bpf.c
->>>> @@ -577,7 +577,7 @@ static int tcp_bpf_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
->>>>   		err = sk_stream_error(sk, msg->msg_flags, err);
->>>>   	release_sock(sk);
->>>>   	sk_psock_put(sk, psock);
->>>> -	return copied ? copied : err;
->>>> +	return copied > 0 ? copied : err;
->>>
->>> Does it make more sense to make the condition err:
->>> is err 0 iif everything is ok? (completely untested!)
->>
->> Mind to elaborate?
->>
->>  From my point of view, 'copied' is to handle partial transmission, for
->> example:
->>
->> 0. User wants to send 2 * 1K bytes with sendmsg()
->> 1. Kernel already sent the first 1K successfully
->> 2. Kernel got some error when sending the 2nd 1K
->>
->> In this scenario, we should return 1K instead of the error to the caller to
->> indicate this partial transmission situation, otherwise we could not
->> distinguish it with a compete failure (that is, 0 byte sent).
-> 
-> Yep, if we don't return the positive value on partial send we will confuse
-> apps and they will probably resent data.
-> 
->  From my side this looks good.
-> 
-> Reviewed-by: John Fastabend <john.fastabend@gmail.com>
+Hi Maxime,
 
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
+On 8/29/24 05:35, Maxime Chevallier wrote
+> You have an extra white space here. Make sure you run your patch through
+> the checkpatch script to detect this kind of issues. 
 
-Jakub, can you directly land it to the net tree?
+My apologies, I did forget to run checkpatch, thanks for pointing that out. Will
+
+send the corrected patch.
+
+
+Thanks,
+
+Diogo Jahchan Koike
 
 
