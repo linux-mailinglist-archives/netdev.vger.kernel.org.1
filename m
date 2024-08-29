@@ -1,117 +1,107 @@
-Return-Path: <netdev+bounces-123344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 910AA964954
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:01:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44F01964964
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:05:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE2D4B2591C
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:00:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03079281687
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2FD1B2524;
-	Thu, 29 Aug 2024 15:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JT04V75K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB9D1B29CB;
+	Thu, 29 Aug 2024 15:03:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4CDF1B1D61
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 15:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20AF31B14F6;
+	Thu, 29 Aug 2024 15:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724943630; cv=none; b=GjGRjJgiUEvfnLNXd3E8Rzoz+Z+Nk7WrSBQH+4Ys3X3vh3gm9LYa8/dgrjls5o1pGthkA8m+PvJnZTKfpRCTnGU+XzkR0BMkNTe2v+I7EQLPo0aGSpLxmg/vmXhJpR/M5UjK8LtMYhLTY5uOISBB/hVA7Us3geYc1ij6JHC2RHQ=
+	t=1724943797; cv=none; b=CEZ8rJ4TDNgf8K5wAZL6Us6ygnkTXW5fSfBl9CkBrFYDJTu2rEmG55Vd00ZgvfJMPrDjsR4jjz5oalvwycx9WlPXtqn5WRpJxxHKsIOtPkFZH10szaEYK46OJn3dYhqoy7DcLMFrMKhZnrfyndG7DUSh1P9e9BQ7mm2+Swyr6kA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724943630; c=relaxed/simple;
-	bh=lYxTP2lsSLN47zFrEEVoq/xdgzWkYezXBhM3D7BX22Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pL80+VLz+yXH0h+BczXDD7Iiu6A3WxJBSoUPDzpzlGxpL0pynXbDGJrOjqskX8diqrl7HKRyCMxFeycyMEZq5Z/MkZ+P28UB7H6M9mVGI6kvd3loC5zPSZedTJObaf4Nj3lrV4knjM1IuQrKxjz1Hwlt6MuF2lRoCAvjqsLtNJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JT04V75K; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f5e46e19-b045-4ac8-b871-32affe3202c0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1724943625;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TGVotgaZ83HmpeGuFqvVop2QJz2MGRyfxLL76EaK03c=;
-	b=JT04V75Kzlhxn4eo/2FduLTbxgWyuoPIWd58OSkBiJUudaUDOGFeMKNSuMZrqprnuQkTRn
-	ZxAlMw1+n5Ggi54lx4BXlW0Pb5HJXKhuWzsOWSTQp1TEqILYRoZKexk78RfEAgG3pv6j/2
-	PBLDTXumyqpYbViBwkGW9QDGqezpbQ0=
-Date: Thu, 29 Aug 2024 16:00:21 +0100
+	s=arc-20240116; t=1724943797; c=relaxed/simple;
+	bh=dr45XjTQ8FHb7CPbxsL5rHjPqCMMvoo4rwFxQtyYNz8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mxRXyewobxjZ1EUn4tzujZQybgG75cJKnuvmpxIDK9SX7+ZJoUtWGlw4YlNu8GUbOtr6f6TpCAEggZOlLeE5gZmK6q7tg38Mmk9uMMqPMinQLzDGAhNk1ag6h+p4tjtGdbeuhyclFl2A7lA7gikb8tKhTmzw1Mnge+L2ReFAL5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a868d7f92feso89090166b.2;
+        Thu, 29 Aug 2024 08:03:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724943794; x=1725548594;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/boQQ5nSp0lspsyalK+l9WbjfJD/McCNrO/o7qkR35I=;
+        b=AZJxQlyidqo4xs2iPb5V1mnuwYypWTq+Zac7VeceXtkVhYHLbygp4UOplebwhkBoFB
+         UuHaqyrUKN4PVum1hkix7TieWOgoU58EaY4tgJqQ85Bz/NTI73OBhXhjoHztwy67ckXH
+         DN93l8RPi+i4FGJJF3yFvG5NDZNMEk8qNn0QHn/l5xb+9L8RUN2zzDGoHJrtuYhU85yg
+         9c/Z2c/FTu45VQQ32TkL9rISHEB7gDV5MxMiiqX/PX5ibt6eSSMoXlSBH2qpEinxmlMG
+         lfx7pMf3sVevkRfl7xaQ24NzpN1/XYi7ftjXX4PuAFc8ipztfwNFCjXwE/Pce0uKcVEp
+         nNHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW5CAq2RmGA+k6Wh+7udqMgW7Mc6b6HMYC/IBC3D1pr97Vn/9DEaZuAbWTboyJMeWQ8elJ3DftLRGJ5LgocJaXD@vger.kernel.org, AJvYcCWEj/uzlwf3r4NqRcneUDFzoohH/Oju544VHTi+h6LaBYCACqWudCxmBuQadDaJxiwcaFXvul4EhZq0cH0=@vger.kernel.org, AJvYcCX42xvS9DnereH/W8ETpYWoPODnV4vuq/fFP+wAQtKTFYXO1ocQsHDYXaI28q499s+XBPI3ysFw@vger.kernel.org, AJvYcCXMvpk5QMIM5dAvY5y0w4Ldf/zhRLd/yZ0eqT2YzwI0zS4dzKH42utl+Q568MLeT4VDBWnedKD3Ff0ydI/V8fzp@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuxlJ4a3HqAXJAZBodddxW/phjU7RkV7ublqafiwGTdtBryWpv
+	6m9CWx+lFhFCrOtikiZ5EOs8OteYno584KQaa14TwiycyMdbEUg/
+X-Google-Smtp-Source: AGHT+IGX0vjuiRrrF7Q4njAuRfTDg0gEtXtmJJt2CXIg/Fo8ez2WU8vK5t79ZjAVn5JzsszqFoh+Hw==
+X-Received: by 2002:a17:906:7308:b0:a7d:3cf6:48d1 with SMTP id a640c23a62f3a-a897f8d50a3mr254539366b.32.1724943791598;
+        Thu, 29 Aug 2024 08:03:11 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c226c6a2a6sm792032a12.7.2024.08.29.08.03.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 08:03:11 -0700 (PDT)
+Date: Thu, 29 Aug 2024 08:03:08 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	David Ahern <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	rbc@meta.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	"open list:NETFILTER" <coreteam@netfilter.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH nf-next v3 1/2] netfilter: Make IP_NF_IPTABLES_LEGACY
+ selectable
+Message-ID: <ZtCNrKwfPx6dhORU@gmail.com>
+References: <20240827145242.3094777-1-leitao@debian.org>
+ <20240827145242.3094777-2-leitao@debian.org>
+ <20240828074240.2abaa74c@kernel.org>
+ <Zs88pbEadxLWLLbn@gmail.com>
+ <20240828114123.3c85a9a5@kernel.org>
+ <ZtBIgekUyptmCqRa@gmail.com>
+ <20240829075303.775fce1d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH] net_tstamp: add SCM_TS_OPT_ID to provide OPT_ID in
- control message
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Vadim Fedorenko <vadfed@meta.com>, Jakub Kicinski <kuba@kernel.org>,
- Willem de Bruijn <willemb@google.com>, Paolo Abeni <pabeni@redhat.com>,
- David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org
-References: <20240829000355.1172094-1-vadfed@meta.com>
- <66d0783ca3dc4_3895fa2946a@willemb.c.googlers.com.notmuch>
- <dfe033f1-cc61-4be3-a59d-e6b623591cc6@linux.dev>
- <66d0856b4234a_38c94929436@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <66d0856b4234a_38c94929436@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240829075303.775fce1d@kernel.org>
 
-On 29/08/2024 15:27, Willem de Bruijn wrote:
-> Vadim Fedorenko wrote:
->> On 29/08/2024 14:31, Willem de Bruijn wrote:
->>> Vadim Fedorenko wrote:
->>>> SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
->>>> timestamps
->>>
->>> +1 on the feature. Few minor points only.
->>>
->>> Not a hard requirement, but would be nice if there was a test,
->>> e.g., as a tools/testing/../txtimestamp.c extension.
->>
->> Sure, I'll add some tests in the next version.
->>
->>
->>>> and packets sent via socket. Unfortunately, there is no way
->>>> to reliably predict socket timestamp ID value in case of error returned
->>>> by sendmsg [1].
->>>
->>> Might be good to copy more context from the discussion to explain why
->>> reliable OPT_ID is infeasible. For UDP, it is as simple as lockless
->>> transmit. For RAW, things like MSG_MORE come into play.
->>
->> Ok, I'll add it, thanks!
->>
->>>> This patch adds new control message type to give user-space
->>>> software an opportunity to control the mapping between packets and
->>>> values by providing ID with each sendmsg. This works fine for UDP
->>>> sockets only, and explicit check is added to control message parser.
->>>> Also, there is no easy way to use 0 as provided ID, so this is value
->>>> treated as invalid.
->>>
->>> This is because the code branches on non-zero value in the cookie,
->>> else uses ts_key. Please make this explicit. Or perhaps better, add a
->>> bit in the cookie so that the full 32-bit space can be used.
->>
->> Adding a bit in the cookie is not enough, I have to add another flag to
->> inet_cork. And we are running out of space for tx flags,
->> inet_cork::tx_flags is u8 and we have only 1 bit left for SKBTX* enum.
->> Do you think it's OK to use this last bit for OPT_ID feature?
+On Thu, Aug 29, 2024 at 07:53:03AM -0700, Jakub Kicinski wrote:
+> On Thu, 29 Aug 2024 03:08:01 -0700 Breno Leitao wrote:
+> > > There are various configs in the tree. Grep for the configs you convert
+> > > from select to depends on, they will all need updating.  
+> > 
+> > I am looking at all files that depend on these Kconfig options, and
+> > there are a lot of tests.
+> > 
+> > Thinking more about the problem, it doesn't seem to be a good idea to
+> > change dependency from all NF modules to NF_IPTABLES_LEGACY. In other
+> > words, the `s/selects/depends on/` is the part that is causing all this
+> > hassle, and it seems unnecessary.
+> > 
+> > That said, I would suggest we do not change the dependency, and keep the
+> > "select NF_IPTABLES_LEGACY", and keep NF_IPTABLES_LEGACY user selectable.
 > 
-> No, that space is particularly constrained in skb_shinfo.
-> 
-> Either a separate bit in inet_cork, or just keep as is.
+> Good idea, sounds much simpler!
 
-Ok, got it. I'll add IPCORK_TS_OPT_ID flag then. Thanks!
+Thanks, I will submit the patch soon.
+--breno
 
