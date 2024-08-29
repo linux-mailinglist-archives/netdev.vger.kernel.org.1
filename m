@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-123372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EEF7964A24
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:34:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F3909964A36
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:39:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEC1F1C2433B
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:34:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 321811C22C57
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9241B29B0;
-	Thu, 29 Aug 2024 15:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5191B2505;
+	Thu, 29 Aug 2024 15:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L4Ne1cdC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PzPH09rb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1FA1B1505
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 15:34:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5043A1B5
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 15:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724945686; cv=none; b=WQuikJK2hkvus5iBe0KGSVa5L/vNAImu05VckTat35P6o4NIjW0C5pvbjKvyKk0nrvD3Gv7cd+vSF8gU35Awu33atiuKbX6GG7gtgttYbxqSayPPc0kV4z9r0XQVeg7hOOVZeVChuSma67lfUKl9XUjXA7+0FRG5O22Y2+x2Nok=
+	t=1724945949; cv=none; b=ZHlJulS3bjKI9LqqZunXh8Rpwp+X3oeIxHVHX37Ngr0C5BlCtclxjEEdKRZGLJSLiQdAwZ/7Xp3UTfKBiH/WO5B8Gl0J6g3Mn30+7No2rEZuvFWX9DxXUMSXd8/gsNuJ9mQ5KbFOEkI9l8fj70FUnBHCQ4CMlRVPNHbHcPTUBTc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724945686; c=relaxed/simple;
-	bh=NsFyDI+PKnB5RgzOGY6tJn9LloDsFOGJpgO8yUEIJvY=;
+	s=arc-20240116; t=1724945949; c=relaxed/simple;
+	bh=U62SgozeqwXD2uP7uBrzNqg4wblJZH8FxQK213wtmCE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fV9BWd063sdajXmproro+sZ0xkmuEN8HZd+v7c/rvR5qNyIxPxtt2AQ4i/nttETn8uVwXEsbPwoI5Cd5VfgPmm0e+vW2U/Q/ijdRZggutisdzFmQgWGlfzGv7il+YewLo/1XHFtZkl4tF9qFPz6ZxIKyjepkAMTE0P43ONDwK6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L4Ne1cdC; arc=none smtp.client-ip=209.85.218.51
+	 To:Cc:Content-Type; b=fJg2aHMlGsPq5fYBAnrUr0ZSjmdjDGaaYb1AycrgeHBded1jcKp+wbrzMZUeISCU4F64fE0RElSxsQsJ2BmVEhxYIZcaTW7d5r6Tni0ggUP/Vse+2JWg0DGJ0GhSVlf8k9hWJY0powdg1OojWn5QljSwO2vBimJvsC20WqrUfKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PzPH09rb; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a8682bb5e79so105980966b.2
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 08:34:44 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a8692bbec79so96734666b.3
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 08:39:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724945683; x=1725550483; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1724945946; x=1725550746; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DkIeMUqxoStnXRZ+piOkJF5oSuKoFGVKmsBvNWzncXY=;
-        b=L4Ne1cdC4PZ+BRJd71kSl8t088LvVHBHNeg3EfLpaPQYPzcW5sKzM4w672F0Hshha3
-         7PWk98vvZiew1k0yct9Kt/foXa9N4EZeSRHzriJeZbvFbMp6aUy6TjRPqtweA+KeA21D
-         P+DJWuK+tBX4iHnm4MUbZ4vmdkYF8thJlbM8RM3XowkGvPU2fRTlBG7QYy/gPQuKJMbZ
-         6Jwk/za1wmTPRZ2+cipmQqymUhx4da9ARREwpZyZJPSDDx2KJKCecFuVKQ5uA4WB8HHn
-         r74wji0CePg8pjGnLq0JlOYLZpMsDucZeFfSu5xj4w1AyDYP+4OlCrk62HbGFXRHotn3
-         PB4g==
+        bh=4EDWTVKotRJ3uxY2VwcINZ9wLlWfG8f2AGB7KFhnpdY=;
+        b=PzPH09rbjZlYKHYIaoSWDBQfdrxguno0S99WbqoPVYYNsBqVttWVCpeLXPvAC2XtkF
+         h1/XjOx4AZokO+QXh23WymTn0HWNYHdgMLubz9bF2e4p6kWSCDE4NE7Oxdh2yu8ZMmML
+         YPFRzoV+pSemr0VXjuiZWvUFRmDdqQbGW3efw60DZHdgM8Erd7Ln+AK475j22dZKe9+t
+         exf8Xon9jyXfUXGl1iwWE/WHwysFIk3m5DbmHBm6iL0jh536uLejqs7odQdIJL/FCJ3e
+         SN37nGyNl5Tms+hqQITtm5aX3esArkwxAgiMOyohOSM547wbExcqf7Ygt3uyJpB5Xxtp
+         P+qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724945683; x=1725550483;
+        d=1e100.net; s=20230601; t=1724945946; x=1725550746;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DkIeMUqxoStnXRZ+piOkJF5oSuKoFGVKmsBvNWzncXY=;
-        b=ixkrqqWJDl6GDjhy1Xmqtx0N8RXAwlrhf1v8/ZsRSdwkSpTT6SynwZFe+3HikPNQpF
-         ydUM0+jQ5V4eC9VOE1yIxWgeYNacjd6pKZWvKgdDPvWu+iWMfb2IRaIT1sZX9dkY361e
-         4081eqM4ncOFmE4UYIdLat04TAy9NBcwxrUOrZubAzCtsJ6GTYcYPsH7UpJ0Catp4CLi
-         vugSYI5ccYgTPU3aBoLB/AeCV5d9/SBPwGE3ibu5E4bX5dfE4YJBDVgUoWeoDTP7XyL2
-         kJkEkddHHWg+XiRieB8R63Ler23zLIR6wFltDPfoRDuZrCR4Fke+sNffkzom23JB6WRk
-         YaBA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4kk25f1Qb1W8dUVO0hLZTnp0GMwQsJGdV110OOHrudPArJLb+2G/2vutw/J4RzDiy/r3owdw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxypacOQ02X3l/W9D+UVA9oasPruTp4bdNLwIYHIyrVdZ8EXz7
-	Ft0Nisxq54zZv9/DiXQzGY4z/TFRqLYrL/0gPBQw+FQ+mxNYEEihoY3RdiyK5qo8mBRBhhWYx/3
-	BheEVeKhOAO+0XI/CDqNA7PT7qnQ=
-X-Google-Smtp-Source: AGHT+IFQlep9DRGJ6MKtm4FM0htHYfe0Zvmx3ysI5qsSOhk/LuAgzmIqvAzMdjGSQWoUEBNShfQN2xNwz0pXm5+QZL4=
-X-Received: by 2002:a17:906:dac7:b0:a77:cf09:9c70 with SMTP id
- a640c23a62f3a-a897fa6370dmr271771366b.43.1724945682868; Thu, 29 Aug 2024
- 08:34:42 -0700 (PDT)
+        bh=4EDWTVKotRJ3uxY2VwcINZ9wLlWfG8f2AGB7KFhnpdY=;
+        b=ENjwPfPMmYH8gFAg8DSJzXS7iSHaq7/bcCCS4F9cNly82nWBug/q2q74FHr68z5UIJ
+         CACPk6VsBwON66jY35nu0XEpiO6ijQTi/n/2dMnbJgV8N+GXlg4Dwas9IUtaTxWYf2F8
+         9lbse0SaREVHUyOk3bq2zoImarpg46laq0t6CAgcasSfqL/nVyJsKPOShOKd6EZaAhbX
+         FRrIEZQyChSu1OaAp/oLOWDon0ok0okphv3JRWhQpXb+hsdYLbyqNipzElJ1zrr+K27z
+         sCxUdQFX0os1cnFm7w6JH1klvBu4nnPt0t5aWb/oskV85Vz3h9TxsIs1Hc/yutOtjw2/
+         l+aA==
+X-Forwarded-Encrypted: i=1; AJvYcCXWW2G8SRpmCWF9dmFjnBuFul6m2hC7Dxz1zl+w0VapdYYFuVxAw+JemCQEnn47L2B1meZsaMo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8yNgc5bH0ac4VxFaN+J28e/EhC6vy8vdB3yXfEzoOM4j5W5+W
+	V5lEaCVF1r1QmewbotEa6eeHaivh/VlzKu3BIUYn+vftIP+FyHeHY/n+JQWkb8tWMD7sGtoTNK0
+	y0Yb3Wy2g0FkHV6tywvIBOlIf6W4=
+X-Google-Smtp-Source: AGHT+IELmvZIrQ4amu2xaIbl6UOjB/kAkiAxuQbGk7XtRT5bxb47nWvEbzMKK8M3HelDUB10ZfSRWZUSYbPGZYtPz7Q=
+X-Received: by 2002:a17:907:e86:b0:a86:aee7:9736 with SMTP id
+ a640c23a62f3a-a897fa755b3mr266452566b.46.1724945946155; Thu, 29 Aug 2024
+ 08:39:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,12 +72,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240828160145.68805-1-kerneljasonxing@gmail.com>
- <20240828160145.68805-2-kerneljasonxing@gmail.com> <66d082a58cc98_3895fa294fe@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66d082a58cc98_3895fa294fe@willemb.c.googlers.com.notmuch>
+ <20240828160145.68805-3-kerneljasonxing@gmail.com> <66d083d24aa8c_3895fa294d5@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66d083d24aa8c_3895fa294d5@willemb.c.googlers.com.notmuch>
 From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 29 Aug 2024 23:34:04 +0800
-Message-ID: <CAL+tcoAr4viE-1HfQN8EpmikeSFUefr9NKiXFx3ysoGRNUn=SQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] tcp: make SOF_TIMESTAMPING_RX_SOFTWARE
+Date: Thu, 29 Aug 2024 23:38:27 +0800
+Message-ID: <CAL+tcoBby-AfrjFB8cAj5qcVK2T45=q61f3Y+W9_KfQQdVa0Nw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/2] net: make SOF_TIMESTAMPING_RX_SOFTWARE
  feature per socket
 To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
@@ -86,103 +86,100 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 29, 2024 at 10:16=E2=80=AFPM Willem de Bruijn
+On Thu, Aug 29, 2024 at 10:21=E2=80=AFPM Willem de Bruijn
 <willemdebruijn.kernel@gmail.com> wrote:
 >
 > Jason Xing wrote:
 > > From: Jason Xing <kernelxing@tencent.com>
 > >
-> > Normally, if we want to record and print the rx timestamp after
-> > tcp_recvmsg_locked(), we must enable both SOF_TIMESTAMPING_SOFTWARE
-> > and SOF_TIMESTAMPING_RX_SOFTWARE flags, from which we also can notice
-> > through running rxtimestamp binary in selftests (see testcase 7).
+> > Like the previous patch in this series, we need to make sure that
+> > we both set SOF_TIMESTAMPING_SOFTWARE and SOF_TIMESTAMPING_RX_SOFTWARE
+> > flags together so that we can let the user parse the rx timestamp.
 > >
-> > However, there is one particular case that fails the selftests with
-> > "./rxtimestamp: Expected swtstamp to not be set." error printing in
-> > testcase 6.
+> > One more important and special thing is that we should take care of
+> > errqueue recv path because we rely on errqueue to get our timestamps
+> > for sendmsg(). Or else, If the user wants to read when setting
+> > SOF_TIMESTAMPING_TX_ACK, something like this, we cannot get timestamps,
+> > for example, in TCP case. So we should consider those
+> > SOF_TIMESTAMPING_TX_* flags.
 > >
-> > How does it happen? When we keep running a thread starting a socket
-> > and set SOF_TIMESTAMPING_RX_SOFTWARE option first, then running
-> > ./rxtimestamp, it will fail. The reason is the former thread
-> > switching on netstamp_needed_key that makes the feature global,
-> > every skb going through netif_receive_skb_list_internal() function
-> > will get a current timestamp in net_timestamp_check(). So the skb
-> > will have timestamp regardless of whether its socket option has
-> > SOF_TIMESTAMPING_RX_SOFTWARE or not.
-> >
-> > After this patch, we can pass the selftest and control each socket
-> > as we want when using rx timestamp feature.
+> > After this patch, we are able to pass the testcase 6 for IP and UDP
+> > cases when running ./rxtimestamp binary.
 > >
 > > Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
 > > ---
-> >  net/ipv4/tcp.c | 11 +++++++++--
-> >  1 file changed, 9 insertions(+), 2 deletions(-)
+> >  Documentation/networking/timestamping.rst |  7 +++++++
+> >  include/net/sock.h                        |  7 ++++---
+> >  net/bluetooth/hci_sock.c                  |  4 ++--
+> >  net/core/sock.c                           |  2 +-
+> >  net/ipv4/ip_sockglue.c                    |  2 +-
+> >  net/ipv4/ping.c                           |  2 +-
+> >  net/ipv6/datagram.c                       |  4 ++--
+> >  net/l2tp/l2tp_ip.c                        |  2 +-
+> >  net/l2tp/l2tp_ip6.c                       |  2 +-
+> >  net/nfc/llcp_sock.c                       |  2 +-
+> >  net/rxrpc/recvmsg.c                       |  2 +-
+> >  net/socket.c                              | 11 ++++++++---
+> >  net/unix/af_unix.c                        |  2 +-
+> >  13 files changed, 31 insertions(+), 18 deletions(-)
 > >
-> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> > index 8514257f4ecd..5e88c765b9a1 100644
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@ -2235,6 +2235,7 @@ void tcp_recv_timestamp(struct msghdr *msg, const=
- struct sock *sk,
-> >                       struct scm_timestamping_internal *tss)
-> >  {
-> >       int new_tstamp =3D sock_flag(sk, SOCK_TSTAMP_NEW);
-> > +     u32 tsflags =3D READ_ONCE(sk->sk_tsflags);
-> >       bool has_timestamping =3D false;
+> > diff --git a/Documentation/networking/timestamping.rst b/Documentation/=
+networking/timestamping.rst
+> > index 5e93cd71f99f..93378b78c6dd 100644
+> > --- a/Documentation/networking/timestamping.rst
+> > +++ b/Documentation/networking/timestamping.rst
+> > @@ -160,6 +160,13 @@ SOF_TIMESTAMPING_RAW_HARDWARE:
+> >    Report hardware timestamps as generated by
+> >    SOF_TIMESTAMPING_TX_HARDWARE when available.
 > >
-> >       if (tss->ts[0].tv_sec || tss->ts[0].tv_nsec) {
-> > @@ -2274,14 +2275,20 @@ void tcp_recv_timestamp(struct msghdr *msg, con=
-st struct sock *sk,
-> >                       }
-> >               }
+> > +Please note: previously, if an application starts first which turns on
+> > +netstamp_needed_key, then another one only passing SOF_TIMESTAMPING_SO=
+FTWARE
+> > +could also get rx timestamp. Now we handle this case and will not get
+> > +rx timestamp under this circumstance. We encourage that for each socke=
+t
+> > +we should use the SOF_TIMESTAMPING_RX_SOFTWARE generation flag to time
+> > +stamp the skb and use SOF_TIMESTAMPING_SOFTWARE report flag to tell
+> > +the application.
+>
+> Don't mention previously. Readers will not be aware of when this
+> Documentation was added.
+
+Got it, I will remove it :)
+
+>
+> Also, nit: no "Please note". Else every paragraph can start with that,
+> as each statement should be noteworthy.
+
+I see.
+
+>
 > >
-> > -             if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_SOFTWARE=
-)
-> > +             /* We have to use the generation flag here to test if we
-> > +              * allow the corresponding application to receive the rx
-> > +              * timestamp. Only using report flag does not hold for
-> > +              * receive timestamping case.
-> > +              */
+> >  1.3.3 Timestamp Options
+> >  ^^^^^^^^^^^^^^^^^^^^^^^
+> > diff --git a/include/net/sock.h b/include/net/sock.h
+> > index cce23ac4d514..b8535692f340 100644
+> > --- a/include/net/sock.h
+> > +++ b/include/net/sock.h
+> > @@ -2600,12 +2600,13 @@ static inline void sock_write_timestamp(struct =
+sock *sk, ktime_t kt)
+> >  }
+> >
+> >  void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
+> > -                        struct sk_buff *skb);
+> > +                        struct sk_buff *skb, bool errqueue);
+> >  void __sock_recv_wifi_status(struct msghdr *msg, struct sock *sk,
+> >                            struct sk_buff *skb);
 >
-> Nit: what does "does not hold" mean here? I don't think a casual reader
-> will be able to parse this comment and understand it.
-
-=E2=80=9Chold for=E2=80=9D can be a fixed collocation, which means "be suit=
-able for"?
-I'm not that sure. I was trying to say "only using the report flag
-cannot meet our needs" something like this.
-
+> I suspect that the direction, ingress or egress, and thus whether the
+> timestamp is to be queued on the error queue or not, can be inferred
+> without exceptions from skb->pkt_type =3D=3D PACKET_OUTGOING.
 >
-> Perhaps something along the lines of
->
-> "Test both reporting and generation flag, to filter out false
-> positives where the process asked only for tx software timestamps and
-> another process enabled receive software timestamp generation."
+> That would avoid all this boilerplate argument passing.
 
-Thanks, it's much better than mine. I will use it.
+Ah, good suggestions!! I will update it in the V3.
 
 Thanks,
 Jason
-
->
-> > +             if (tsflags & SOF_TIMESTAMPING_SOFTWARE &&
-> > +                 tsflags & SOF_TIMESTAMPING_RX_SOFTWARE)
-> >                       has_timestamping =3D true;
-> >               else
-> >                       tss->ts[0] =3D (struct timespec64) {0};
-> >       }
-> >
-> >       if (tss->ts[2].tv_sec || tss->ts[2].tv_nsec) {
-> > -             if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_RAW_HARD=
-WARE)
-> > +             if (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE)
-> >                       has_timestamping =3D true;
-> >               else
-> >                       tss->ts[2] =3D (struct timespec64) {0};
-> > --
-> > 2.37.3
-> >
->
->
 
