@@ -1,220 +1,117 @@
-Return-Path: <netdev+bounces-123005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4C6A9636DA
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:25:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF1659637A6
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 03:24:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 685361F23D05
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 00:25:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2D691C2237B
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 01:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0512EAD23;
-	Thu, 29 Aug 2024 00:25:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE13117BA4;
+	Thu, 29 Aug 2024 01:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B4lHRAJg"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Kzu845Qd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0099474;
-	Thu, 29 Aug 2024 00:25:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4142F1798C;
+	Thu, 29 Aug 2024 01:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724891107; cv=none; b=uKy12cj72ZObc5AXxE2CknTLbrALmshn/1xpOh8XvDZ+1x2RqNn8mAtslBUJq6BWkX+AuyuHDmzgvgMBXFE8WnkuifbIbRWPkzLD7c7lArm90iB5ZEIQ+ookc7HYwjU6t68UaatoXdr24QsFt89Rwcd9CCOltEAz7rtq43h8bA4=
+	t=1724894661; cv=none; b=df9Bqy18sjlwa1GAZv24jhs/mesbC5+u/2bBipwyCCCb/Gma1jxxUy4CHxLdVa/g4lJOLJAC3HENoq6S0Nbm1gjJeX+reI1Z/16a4OTLyZz/Oce7yZOYO7uS5zlh1xc6XixhHdF7Xxd/A8WbtPxcEuNWFIiywNcqY7CD+qkDFAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724891107; c=relaxed/simple;
-	bh=nCM8XvqCff53EEr64RnHMSHTUq4K5/SJ/d7fShpXRWA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aeya4sFpWSYXo65Huz9yXThz9K943E000DOU76vXAxhMojMRKC7EQGWm8EY6IgOxM908Achf6eY41dFlivI7chHFlOvOVU0A830s5wiutWxYi7DhV/JMxcwRtNyajp96HUFuQyAh7goBmQbufcILa/8CT6jxlGuntFvWE3JPRqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B4lHRAJg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C767C4CEC0;
-	Thu, 29 Aug 2024 00:25:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724891107;
-	bh=nCM8XvqCff53EEr64RnHMSHTUq4K5/SJ/d7fShpXRWA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B4lHRAJg6X7XqkRKlrJ+YCiTKqMVqdBCKwXygNvBCntYpT5Vq6fZbbC+Nl0QovgDE
-	 BFcwORztl1ocSysdnEElSTbXDVJQ9CxTFxF+BSpUYXYJtMKiShrT5IEZ1V38H8RA6N
-	 Hf/pEQMJVXY5VRKwDto8lQoZMKdmlkI5keOQcIeRZZGqi8FY16e8TvC2FYJQmAJuYW
-	 yf/9525rDiO7baZJw4ny+zdrGylPp6H1khY2PrsBSc200YRIlkH5k14t2QGtrQI5BA
-	 HkIXGqgoBXNSYKoma2iEL73nWmWUkWMtVdW2JxHb5ffcxRp0a7mDeklktF8oiSQ0S3
-	 MQmp6Wq+CgrJQ==
-Date: Thu, 29 Aug 2024 02:25:00 +0200
-From: Alejandro Colomar <alx@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Yafang Shao <laoar.shao@gmail.com>, akpm@linux-foundation.org, 
-	torvalds@linux-foundation.org, justinstitt@google.com, ebiederm@xmission.com, 
-	alexei.starovoitov@gmail.com, rostedt@goodmis.org, catalin.marinas@arm.com, 
-	penguin-kernel@i-love.sakura.ne.jp, linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Matus Jokay <matus.jokay@stuba.sk>, 
-	"Serge E. Hallyn" <serge@hallyn.com>
-Subject: Re: [PATCH v8 1/8] Get rid of __get_task_comm()
-Message-ID: <q6xvpwqj7dkgu2cay5mgahscfgdwu2ohzxs7xd3nw3xa622sh4@u35topnxx36b>
-References: <20240828030321.20688-1-laoar.shao@gmail.com>
- <20240828030321.20688-2-laoar.shao@gmail.com>
- <lql4y2nvs3ewadszhmv4m6fnqja4ff4ymuurpidlwvgf4twvru@esnh37a2jxbd>
- <n2fxqs3tekvljezaqpfnwhsmjymch4vb47y744zwmy7urf3flv@zvjtepkem4l7>
- <CALOAHbBAYHjDnKBVw63B8JBFc6U-2RNUX9L=ryA2Gbz7nnJfsQ@mail.gmail.com>
- <7839453E-CA06-430A-A198-92EB906F94D9@kernel.org>
- <ynrircglkinhherehtjz7woq55te55y4ol4rtxhfh75pvle3d5@uxp5esxt4slq>
- <202408281712.F78440FF@keescook>
+	s=arc-20240116; t=1724894661; c=relaxed/simple;
+	bh=nId9wh17NcsFbj4kMb3/qQ4e+x93TtvBDX89dEhDA98=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X0KyEg/8jVokNuNUI9dHPcgnLmAc7EL5NarLSSQvPENAysyamBcw0p/swlorfuaVS8GFadAwrHRNRz+e0TyDtjToyERuWIxkH2TefavIyn8uNYbCjVQd1mfkrMKXwrVkdZmUqGIKT0BepRVMx4EXgSpDY+kTS9LbBNYTQZCIHKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Kzu845Qd; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 2700888A43;
+	Thu, 29 Aug 2024 03:24:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1724894658;
+	bh=oVFjNTxYTPIhEzBWKMmNe2XOXfD74nH2C86buWR8J+Q=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Kzu845Qd+nAiB4XF1lWl+4mV6XMgct53R0xrwesU8aZsJ9HdzVpi6d1GovllzVPT8
+	 xV5xfF0J7FB8Jqcmz4WGjF80SbR9fb9qr9JqOlAUyudRp8MzoIxS050/4qMpg0e6fb
+	 +Z9iAJD49cwsHKcGN7xCKjCwqTMGBJ/7DZnARI7x0Lo0U0vO+HpVUccwb8LLeZPfcP
+	 BSTS5Zx2DlSm6JpZrnOa1DD5seC1SpXS6t2enkCvht+PCswv7xJlIADLXSacMVK+vL
+	 qQrf5qu/LlrJ+y7JYH9hzSF9HZVOIIpgNoaYCaLx9P41ferkeroJSOFSsLPHKYo3A2
+	 mIsGb1uENj1vg==
+Message-ID: <041331c0-0ab0-473c-a8c4-89fe8e55ae6f@denx.de>
+Date: Thu, 29 Aug 2024 02:38:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="o6w5uwkuyqtfps7p"
-Content-Disposition: inline
-In-Reply-To: <202408281712.F78440FF@keescook>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/5] wifi: wilc1000: Fold wilc_get_chipid() into wlan.c
+To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ linux-wireless@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Adham Abozaeid <adham.abozaeid@microchip.com>,
+ Ajay Singh <ajay.kathat@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
+ <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240827164042.53698-1-marex@denx.de>
+ <20240827164042.53698-2-marex@denx.de>
+ <e2130ebe-1c17-412a-a8ca-ac7c1f5b5bb4@bootlin.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <e2130ebe-1c17-412a-a8ca-ac7c1f5b5bb4@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
+On 8/28/24 10:39 AM, Alexis Lothoré wrote:
+> On 8/27/24 18:37, Marek Vasut wrote:
+>> Do not use wilc_get_chipid() outside of wlan.c . Instead, call
+>> wilc_get_chipid() right after the SDIO/SPI interface has been
+>> initialized to cache the device chipid, and then use the cached
+>> chipid throughout the driver. Make wilc_get_chipid() static and
+>> remove its prototype from wlan.h . Make wilc_get_chipid() return
+>> a proper return value instead of a chipid.
+>>
+>> Signed-off-by: Marek Vasut <marex@denx.de>
+>> ---
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Adham Abozaeid <adham.abozaeid@microchip.com>
+>> Cc: Ajay Singh <ajay.kathat@microchip.com>
+>> Cc: Alexis Lothoré <alexis.lothore@bootlin.com>
+>> Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+>> Cc: Conor Dooley <conor+dt@kernel.org>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Kalle Valo <kvalo@kernel.org>
+>> Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+>> Cc: Marek Vasut <marex@denx.de>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Rob Herring <robh@kernel.org>
+>> Cc: devicetree@vger.kernel.org
+>> Cc: linux-wireless@vger.kernel.org
+>> Cc: netdev@vger.kernel.org
+> 
+> nit: The remaining wilc_getchipid() call in netdev.c should have been removed in
+> this very same commit (it is removed in a later patch in this series, but it
+> makes this commit depend on the last one).
+> 
+> Reviewed-by: Alexis Lothoré <alexis.lothore@bootlin.com>
 
---o6w5uwkuyqtfps7p
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-From: Alejandro Colomar <alx@kernel.org>
-To: Kees Cook <kees@kernel.org>
-Cc: Yafang Shao <laoar.shao@gmail.com>, akpm@linux-foundation.org, 
-	torvalds@linux-foundation.org, justinstitt@google.com, ebiederm@xmission.com, 
-	alexei.starovoitov@gmail.com, rostedt@goodmis.org, catalin.marinas@arm.com, 
-	penguin-kernel@i-love.sakura.ne.jp, linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
-	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, Matus Jokay <matus.jokay@stuba.sk>, 
-	"Serge E. Hallyn" <serge@hallyn.com>
-Subject: Re: [PATCH v8 1/8] Get rid of __get_task_comm()
-References: <20240828030321.20688-1-laoar.shao@gmail.com>
- <20240828030321.20688-2-laoar.shao@gmail.com>
- <lql4y2nvs3ewadszhmv4m6fnqja4ff4ymuurpidlwvgf4twvru@esnh37a2jxbd>
- <n2fxqs3tekvljezaqpfnwhsmjymch4vb47y744zwmy7urf3flv@zvjtepkem4l7>
- <CALOAHbBAYHjDnKBVw63B8JBFc6U-2RNUX9L=ryA2Gbz7nnJfsQ@mail.gmail.com>
- <7839453E-CA06-430A-A198-92EB906F94D9@kernel.org>
- <ynrircglkinhherehtjz7woq55te55y4ol4rtxhfh75pvle3d5@uxp5esxt4slq>
- <202408281712.F78440FF@keescook>
-MIME-Version: 1.0
-In-Reply-To: <202408281712.F78440FF@keescook>
-
-Hi Kees,
-
-On Wed, Aug 28, 2024 at 05:17:55PM GMT, Kees Cook wrote:
-> On Wed, Aug 28, 2024 at 05:09:08PM +0200, Alejandro Colomar wrote:
-> > Hi Kees,
-> >=20
-> > On Wed, Aug 28, 2024 at 06:48:39AM GMT, Kees Cook wrote:
-> >=20
-> > [...]
-> >=20
-> > > >Thank you for your suggestion. How does the following commit log look
-> > > >to you? Does it meet your expectations?
-> > > >
-> > > >    string: Use ARRAY_SIZE() in strscpy()
-> > > >
-> > > >    We can use ARRAY_SIZE() instead to clarify that they are regular=
- characters.
-> > > >
-> > > >    Co-developed-by: Alejandro Colomar <alx@kernel.org>
-> > > >    Signed-off-by: Alejandro Colomar <alx@kernel.org>
-> > > >    Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-> > > >
-> > > >diff --git a/arch/um/include/shared/user.h b/arch/um/include/shared/=
-user.h
-> > > >index bbab79c0c074..07216996e3a9 100644
-> > > >--- a/arch/um/include/shared/user.h
-> > > >+++ b/arch/um/include/shared/user.h
-> > > >@@ -14,7 +14,7 @@
-> > > >  * copying too much infrastructure for my taste, so userspace files
-> > > >  * get less checking than kernel files.
-> > > >  */
-> > > >-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-> > > >+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]) + __must_be_array=
-(x))
-> > > >
-> > > > /* This is to get size_t and NULL */
-> > > > #ifndef __UM_HOST__
-> > > >@@ -60,7 +60,7 @@ static inline void print_hex_dump(const char *leve=
-l,
-> > > >const char *prefix_str,
-> > > > extern int in_aton(char *str);
-> > > > extern size_t strlcat(char *, const char *, size_t);
-> > > > extern size_t sized_strscpy(char *, const char *, size_t);
-> > > >-#define strscpy(dst, src)      sized_strscpy(dst, src, sizeof(dst))
-> > > >+#define strscpy(dst, src)      sized_strscpy(dst, src, ARRAY_SIZE(d=
-st))
-> > >=20
-> > > Uh, but why? strscpy() copies bytes, not array elements. Using sizeof=
-() is already correct and using ARRAY_SIZE() could lead to unexpectedly sma=
-ll counts (in admittedly odd situations).
-> > >=20
-> > > What is the problem you're trying to solve here?
-> >=20
-> > I suggested that here:
-> > <https://lore.kernel.org/all/2jxak5v6dfxlpbxhpm3ey7oup4g2lnr3ueurfbosf5=
-wdo65dk4@srb3hsk72zwq/>
-> >=20
-> > There, you'll find the rationale (and also for avoiding the _pad calls
-> > where not necessary --I ignore if it's necessary here--).
->=20
-> Right, so we only use byte strings for strscpy(), so sizeof() is
-> sufficient. There's no technical need to switch to ARRAY_SIZE(), and I'd
-> like to minimize any changes to such core APIs without a good reason.
-
-Makes sense.  My original proposal was ignoring that the wrapper was
-already using __must_be_array().  Having already sizeof() +
-__must_be_array(), I'd leave it like that, since both do effectively the
-same.
-
-> And for the _pad change, we are also doing strncpy() replacement via
-> case-by-case analysis, but with a common function like get_task_comm(),
-> I don't want to change the behavior without a complete audit of the
-> padding needs of every caller.
-
-Agree.  I had the same problem with shadow.  Removing padding was the
-worst part, because it was hard to justify that nothing was relying on
-the padding.
-
-> Since that's rather a lot for this series,
-> I'd rather we just leave the existing behavior as-is, and if padding
-> removal is wanted after that, we can do it on a case-by-case basis then.
->=20
-> -Kees
-
-Have a lovely night!
-Alex
-
->=20
-> --=20
-> Kees Cook
-
---=20
-<https://www.alejandro-colomar.es/>
-
---o6w5uwkuyqtfps7p
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE6jqH8KTroDDkXfJAnowa+77/2zIFAmbPv9wACgkQnowa+77/
-2zLmfhAAqsMngDf8es0F6qRd7cwzD5RwLYJ8tk1KfFfVJjLJN6kb3mV29YiA0pl7
-LsZlkqQ/rmDcqE2Ex9UoiAlIrJw154+Dg63MqkrOYnXf3vDpMopi4jtGlBSG3cJn
-Jm9toPA7lNWwiDe6q19RzLraVFl4+t2ik2wUWtC+SYxBN/vFkU0CRQqwbSg78DMJ
-S3ZIJfLKdkkSeSV9wbddJTwtolje98WEKLtGxbnc7urnmtlvIFqcYACYe9MGVeqf
-kuq//H0SGfCjVEpzizecG93wlp5B2q1Q1sulb1l7mj5rfgaaNE/NilFGv7y/+GwY
-zEyhm6rEjbWZjsh1PxuofuN4ftlJyqlpioondQryrcE370W1Ugfcac6oP5t8ornD
-pdjU1JgIVwY+3Nug3vBKggFwOuy3aQOYP2s6E06KnDEP7GYY1xpzVE6WRbPPzO/T
-FNisBNfvY1FE9M09QiaSkbbePpvTbvYK3RSR7goiKWRMj7gB5NyTuimpZX4Z3Hxa
-y190DotOM8xuALV0EQnx/2quq2+GgT0+N2Et4UdB0U9ENq0X8hAcYYtF1MGnOsCj
-cn3A+JU5VJjLEkFyLF9g9j2dimru4mnxyT7IKtO0NqPjEb7R7TLQPWA1yqwt0Sfm
-pf5ipWUVNTfZ/CEKirXNhGKFwGyva449J3Pu8od1GEbyS8yEj7Q=
-=UqVz
------END PGP SIGNATURE-----
-
---o6w5uwkuyqtfps7p--
+Fixed in V4, thanks.
 
