@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-123283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63CA1964607
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:14:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F9A996460C
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AD80285EFC
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:14:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F8E9B21054
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD141AE856;
-	Thu, 29 Aug 2024 13:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D7D1AF4E3;
+	Thu, 29 Aug 2024 13:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="NAJr87Rq"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="dIx6Sn/I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465B415E5C0
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 13:13:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59BCC1AED50
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 13:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724937193; cv=none; b=hCpSbxOvYLrxdnqmjhFRH7+KYchbooBqE+OZBbDWrXzPVmsrOniuNoSiCFlww+1YzlSvaz22uaP+Tyx6EfGwmoSqyfIdgP7Gntnk+Iga9Q+wGz77E8vvDXFdSH9b0Uk06MbJhMRPdGsWA6bFe+6Os8FLXRqNInLg7ilaKzrh55M=
+	t=1724937200; cv=none; b=S6bnM2Xt6fPQeUT3gHxP7iEZm4Ux354rGzTpapR9IK0SJGEfBew6EW1R53D3cAQQs50ROPTBLgPLxpgDxo/bOEpmiG2sO/6d2SD9kZviSTl/KyCe2QUqyQSM2fhKm8FhtgQa8bfgY8wpZJRJLOiem5LFuBMAbD34xeSyJFfxEIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724937193; c=relaxed/simple;
-	bh=NfMMj+y0jjd3+zEO9SA39G8wNB8TIgOiJ9flYi/rUVs=;
+	s=arc-20240116; t=1724937200; c=relaxed/simple;
+	bh=LY6teNijKykhT8LcLXhvWcqr0xTJvW1UGMeUYMcjQ5s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rXnIiFtyTRpfjsyMfWL3+9BDy/OaSdCNgPFcE2gJJwNKywRLCn9cGCdApZ5ed5/+R/UYZO4iFDcN3xWcIeKQHo/JaMAD1v222TM/qePcr7dukIyhmcyExESMbI7uIDCjp/q740rrN3G5DiZWkKFUCEc6+iusfsS9rN4ktJhUQXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=NAJr87Rq; arc=none smtp.client-ip=209.85.214.180
+	 MIME-Version; b=RnyGg/jA+Z7sg1sewbZleXu/CrBtqc34CtHwvfzJb2e/m0Wg6lmoTKluIgwhD2UXvCFUPNBBEr7l11FRiQ2vzMENvR98ie41AQa88TOtaOeYJBCJiDtFAPdMyV3gRgYgUyf1yEPtTaxStfEVEnFuVJamPYNnMebj0GSbVQwWVPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=dIx6Sn/I; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-204eebfaebdso5259285ad.1
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:13:12 -0700 (PDT)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-201d5af11a4so5487835ad.3
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:13:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1724937191; x=1725541991; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1724937198; x=1725541998; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=J76VgAVWfMg9eT/1kj4172Eex7vGiEhRt/GH9utayOA=;
-        b=NAJr87RqV3r8ed0p2EuJ8pdr44WC5sQ2JWpj3ZezIBRmKOJufZ2BVR1B+wDCZspX8Y
-         8EwbP6wJx/nnZMHJ0AAI8pH6GJCcjLzcNd/gMAHkUrMx+816BAJMWzgCsN/i+9qACMRo
-         A6gq3j9PnQyc0fFJ+z9er3DlVKXsPBVH/VSxk=
+        bh=xgl23lpxXcxLJcPC+/6yHZPVWll0h2Oag84ZBhf9v4w=;
+        b=dIx6Sn/I1y8uzjLXHRiKDU9nP8K3m7jBDQcKXN4C55BOskW0tECAZqzBsXiKKW5PsQ
+         fHGjaQbmkrNTAVtQ0Q3nCsdk+8WnigIdl+cPjgpnkQPL7t4IG/OzcID41xMuVF6huTjS
+         HqoR+ZqaPndr3FlnUMX3ldOiLdmP34qq79vWs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724937191; x=1725541991;
+        d=1e100.net; s=20230601; t=1724937198; x=1725541998;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=J76VgAVWfMg9eT/1kj4172Eex7vGiEhRt/GH9utayOA=;
-        b=mJBztIWt7QLWhf7S5oEx6g9ZwayV70LmH1oFcYqsrLfzIv8kWgDEc1SGosxG4oL9Jc
-         E81f/AUwCWSnElnH4+wRpKMFhbmzWre0tIm4oerfe15xMtUItPxFmYBb6AtrLlSbOHYv
-         /RQsnYajgw5nPcwETQaTMfeKff4ca2evfw5frSEjyrJpfbE1OJzTgq4vPcgJYUOQqLmS
-         bQaiINQ0qggvOAa10z/XZD47w/2exdMHnEOHJx2lfR5/GAWn3iy/OApoJL9LuZbUcUe+
-         ZlEghYEiyRIMz1W+zNN75HOwruvk7Dj0WRAiKMHI4+AzSEB2dJrqDuRokaEO58alD6ym
-         3EXw==
-X-Gm-Message-State: AOJu0Yw5okrfeRmp2HgOhPYqAr4Njq99ODaL2v/TeBq6gFn7TAEec9YM
-	3YpzO4DCPMPK9FHweTdU+yHpsTHgwt/0i/ZhD3FUlssatCVeeesqXH7PnFxqUEDhvZ/F+6UFM3w
-	YuOe9dG62llW4Zom5PNeoizKLjbEIkYcFL6u9Y1QRHaDci3pgu/2QBCPra1E0GVlsRa2ll+Q9dI
-	fJJdbzkL7XczXV8z6s4C2V19jz445+qGmpMWD3sw==
-X-Google-Smtp-Source: AGHT+IGRrAws7CHX7jP1QU0EU6Idn1nTO6GPORRmwPdsv5pW4OpP6YLYsyLZx6bewfvVf8tm7K2EKQ==
-X-Received: by 2002:a17:902:ec88:b0:202:883:bd6 with SMTP id d9443c01a7336-2050c4c8a3fmr36374235ad.63.1724937189882;
-        Thu, 29 Aug 2024 06:13:09 -0700 (PDT)
+        bh=xgl23lpxXcxLJcPC+/6yHZPVWll0h2Oag84ZBhf9v4w=;
+        b=iwNN3vWwhWnoHQJk0jsWodWcf+RccLMwjiIxWjd+s5Mc26cmZuSWsJlEhoJC3Hf2Hp
+         iK6AbVWTApKBum0yeQAk/UPzYUaAjyr7v0M6kB/HLOBiUJ83jd2/n6AhNQIYqY9jTr/V
+         3RSqO4Nquz1gvHn2C3FkKWkoaTATlpanvD7JDfxvOnC5mEpyGjksr06Tsx4BZ9WCnOij
+         4nt8+lmBXEngskGU8CjUxpQ1ViKHURE7cbpAMaMfbVzf2QqipXK0EbukHb6lkrpuOfQX
+         kAx51Y8IsJOyiInz/UmP5HR8ymd1IJk4jfn2Og3ec98h0ViVxK4z743UaBnrfjwOiluj
+         5mJw==
+X-Gm-Message-State: AOJu0YwaAlnOO3KmhGk8IQzyW/vPcImjx0/JWs9ktB9pAlPMe5c/hLUV
+	lOdSUI5Pa8xb8EHiI6xC78v/1tDn8LJNNyYFvZoN3IKz5js4A60YEfFki5Sq6+18YPbV8TEAN8l
+	72kFG8z2x31oyvvSWphkso6Y6czheRnYczZPa+XIhron/ZXGBEMOYo6WeMaWxABegZD+1FGlCZY
+	HYs2bhbzSbdSmX8GYTzuvP+Kzn5sGv/wKG3riUag==
+X-Google-Smtp-Source: AGHT+IEai9uG2TpaQ3GILW0DtKC65AC9xQAh8DUHKEnc/3a9ZsdmyX3Zn9R455FKvzhgMm7/6Ry8RQ==
+X-Received: by 2002:a17:902:e851:b0:202:3dcf:8c38 with SMTP id d9443c01a7336-2050c453f85mr29456225ad.44.1724937194835;
+        Thu, 29 Aug 2024 06:13:14 -0700 (PDT)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205152b13c9sm10991065ad.62.2024.08.29.06.13.08
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205152b13c9sm10991065ad.62.2024.08.29.06.13.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 06:13:09 -0700 (PDT)
+        Thu, 29 Aug 2024 06:13:13 -0700 (PDT)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: edumazet@google.com,
@@ -79,19 +79,16 @@ Cc: edumazet@google.com,
 	kuba@kernel.org,
 	Joe Damato <jdamato@fastly.com>,
 	Martin Karsten <mkarsten@uwaterloo.ca>,
+	Donald Hunter <donald.hunter@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 3/5] net: napi: Make gro_flush_timeout per-NAPI
-Date: Thu, 29 Aug 2024 13:11:59 +0000
-Message-Id: <20240829131214.169977-4-jdamato@fastly.com>
+Subject: [PATCH net-next 4/5] netdev-genl: Dump gro_flush_timeout
+Date: Thu, 29 Aug 2024 13:12:00 +0000
+Message-Id: <20240829131214.169977-5-jdamato@fastly.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240829131214.169977-1-jdamato@fastly.com>
 References: <20240829131214.169977-1-jdamato@fastly.com>
@@ -103,156 +100,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow per-NAPI gro_flush_timeout setting.
-
-The existing sysfs parameter is respected; writes to sysfs will write to
-all NAPI structs for the device and the net_device gro_flush_timeout
-field.  Reads from sysfs will read from the net_device field.
-
-The ability to set gro_flush_timeout on specific NAPI instances will be
-added in a later commit, via netdev-genl.
+Support dumping gro_flush_timeout for a NAPI ID.
 
 Signed-off-by: Joe Damato <jdamato@fastly.com>
 Reviewed-by: Martin Karsten <mkarsten@uwaterloo.ca>
 Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
 ---
- include/linux/netdevice.h | 26 ++++++++++++++++++++++++++
- net/core/dev.c            | 32 ++++++++++++++++++++++++++++----
- net/core/net-sysfs.c      |  2 +-
- 3 files changed, 55 insertions(+), 5 deletions(-)
+ Documentation/netlink/specs/netdev.yaml | 6 ++++++
+ include/uapi/linux/netdev.h             | 1 +
+ net/core/netdev-genl.c                  | 6 ++++++
+ tools/include/uapi/linux/netdev.h       | 1 +
+ 4 files changed, 14 insertions(+)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 7d53380da4c0..d00024d9f857 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -372,6 +372,7 @@ struct napi_struct {
- 	int			rx_count; /* length of rx_list */
- 	unsigned int		napi_id;
- 	int			defer_hard_irqs;
-+	unsigned long		gro_flush_timeout;
- 	struct hrtimer		timer;
- 	struct task_struct	*thread;
- 	/* control-path-only fields follow */
-@@ -557,6 +558,31 @@ void napi_set_defer_hard_irqs(struct napi_struct *n, int defer);
-  */
- void netdev_set_defer_hard_irqs(struct net_device *netdev, int defer);
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index ee4f99fd4574..290894962ac4 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -249,6 +249,11 @@ attribute-sets:
+         doc: The number of consecutive empty polls before IRQ deferral ends
+              and hardware IRQs are re-enabled.
+         type: s32
++      -
++        name: gro-flush-timeout
++        doc: The timeout, in nanoseconds, of when to trigger the NAPI
++             watchdog timer and schedule NAPI processing.
++        type: u64
+   -
+     name: queue
+     attributes:
+@@ -599,6 +604,7 @@ operations:
+             - irq
+             - pid
+             - defer-hard-irqs
++            - gro-flush-timeout
+       dump:
+         request:
+           attributes:
+diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+index 43bb1aad9611..b088a34e9254 100644
+--- a/include/uapi/linux/netdev.h
++++ b/include/uapi/linux/netdev.h
+@@ -122,6 +122,7 @@ enum {
+ 	NETDEV_A_NAPI_IRQ,
+ 	NETDEV_A_NAPI_PID,
+ 	NETDEV_A_NAPI_DEFER_HARD_IRQS,
++	NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
  
-+/**
-+ * napi_get_gro_flush_timeout - get the gro_flush_timeout
-+ * @n: napi struct to get the gro_flush_timeout from
-+ *
-+ * Returns the per-NAPI value of the gro_flush_timeout field.
-+ */
-+unsigned long napi_get_gro_flush_timeout(const struct napi_struct *n);
-+
-+/**
-+ * napi_set_gro_flush_timeout - set the gro_flush_timeout for a napi
-+ * @n: napi struct to set the gro_flush_timeout
-+ * @timeout: timeout value to set
-+ *
-+ * napi_set_gro_flush_timeout sets the per-NAPI gro_flush_timeout
-+ */
-+void napi_set_gro_flush_timeout(struct napi_struct *n, unsigned long timeout);
-+
-+/**
-+ * netdev_set_gro_flush_timeout - set gro_flush_timeout for all NAPIs of a netdev
-+ * @netdev: the net_device for which all NAPIs will have their gro_flush_timeout set
-+ * @timeout: the timeout value to set
-+ */
-+void netdev_set_gro_flush_timeout(struct net_device *netdev,
-+				  unsigned long timeout);
-+
- /**
-  * napi_complete_done - NAPI processing complete
-  * @n: NAPI context
-diff --git a/net/core/dev.c b/net/core/dev.c
-index f7baff0da057..3f7cb1085efa 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6234,6 +6234,29 @@ void netdev_set_defer_hard_irqs(struct net_device *netdev, int defer)
- }
- EXPORT_SYMBOL_GPL(netdev_set_defer_hard_irqs);
- 
-+unsigned long napi_get_gro_flush_timeout(const struct napi_struct *n)
-+{
-+	return READ_ONCE(n->gro_flush_timeout);
-+}
-+EXPORT_SYMBOL_GPL(napi_get_gro_flush_timeout);
-+
-+void napi_set_gro_flush_timeout(struct napi_struct *n, unsigned long timeout)
-+{
-+	WRITE_ONCE(n->gro_flush_timeout, timeout);
-+}
-+EXPORT_SYMBOL_GPL(napi_set_gro_flush_timeout);
-+
-+void netdev_set_gro_flush_timeout(struct net_device *netdev,
-+				  unsigned long timeout)
-+{
-+	struct napi_struct *napi;
-+
-+	WRITE_ONCE(netdev->gro_flush_timeout, timeout);
-+	list_for_each_entry(napi, &netdev->napi_list, dev_list)
-+		napi_set_gro_flush_timeout(napi, timeout);
-+}
-+EXPORT_SYMBOL_GPL(netdev_set_gro_flush_timeout);
-+
- bool napi_complete_done(struct napi_struct *n, int work_done)
+ 	__NETDEV_A_NAPI_MAX,
+ 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 79b14ad6f4bb..2eee95d05fe0 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -161,6 +161,7 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
+ 			const struct genl_info *info)
  {
- 	unsigned long flags, val, new, timeout = 0;
-@@ -6251,12 +6274,12 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
+ 	int napi_defer_hard_irqs;
++	unsigned long gro_flush_timeout;
+ 	void *hdr;
+ 	pid_t pid;
  
- 	if (work_done) {
- 		if (n->gro_bitmask)
--			timeout = READ_ONCE(n->dev->gro_flush_timeout);
-+			timeout = napi_get_gro_flush_timeout(n);
- 		n->defer_hard_irqs_count = napi_get_defer_hard_irqs(n);
- 	}
- 	if (n->defer_hard_irqs_count > 0) {
- 		n->defer_hard_irqs_count--;
--		timeout = READ_ONCE(n->dev->gro_flush_timeout);
-+		timeout = napi_get_gro_flush_timeout(n);
- 		if (timeout)
- 			ret = false;
- 	}
-@@ -6391,7 +6414,7 @@ static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock,
+@@ -193,6 +194,11 @@ netdev_nl_napi_fill_one(struct sk_buff *rsp, struct napi_struct *napi,
+ 	if (nla_put_s32(rsp, NETDEV_A_NAPI_DEFER_HARD_IRQS, napi_defer_hard_irqs))
+ 		goto nla_put_failure;
  
- 	if (flags & NAPI_F_PREFER_BUSY_POLL) {
- 		napi->defer_hard_irqs_count = napi_get_defer_hard_irqs(napi);
--		timeout = READ_ONCE(napi->dev->gro_flush_timeout);
-+		timeout = napi_get_gro_flush_timeout(napi);
- 		if (napi->defer_hard_irqs_count && timeout) {
- 			hrtimer_start(&napi->timer, ns_to_ktime(timeout), HRTIMER_MODE_REL_PINNED);
- 			skip_schedule = true;
-@@ -6673,6 +6696,7 @@ void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
- 	hrtimer_init(&napi->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL_PINNED);
- 	napi->timer.function = napi_watchdog;
- 	napi_set_defer_hard_irqs(napi, READ_ONCE(dev->napi_defer_hard_irqs));
-+	napi_set_gro_flush_timeout(napi, READ_ONCE(dev->gro_flush_timeout));
- 	init_gro_hash(napi);
- 	napi->skb = NULL;
- 	INIT_LIST_HEAD(&napi->rx_list);
-@@ -11054,7 +11078,7 @@ void netdev_sw_irq_coalesce_default_on(struct net_device *dev)
- 	WARN_ON(dev->reg_state == NETREG_REGISTERED);
++	gro_flush_timeout = napi_get_gro_flush_timeout(napi);
++	if (nla_put_u64_64bit(rsp, NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
++			      gro_flush_timeout, NETDEV_A_DEV_PAD))
++		goto nla_put_failure;
++
+ 	genlmsg_end(rsp, hdr);
  
- 	if (!IS_ENABLED(CONFIG_PREEMPT_RT)) {
--		dev->gro_flush_timeout = 20000;
-+		netdev_set_gro_flush_timeout(dev, 20000);
- 		netdev_set_defer_hard_irqs(dev, 1);
- 	}
- }
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 8272f0144d81..ff545a422b1f 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -408,7 +408,7 @@ NETDEVICE_SHOW_RW(tx_queue_len, fmt_dec);
- 
- static int change_gro_flush_timeout(struct net_device *dev, unsigned long val)
- {
--	WRITE_ONCE(dev->gro_flush_timeout, val);
-+	netdev_set_gro_flush_timeout(dev, val);
  	return 0;
- }
+diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
+index 43bb1aad9611..b088a34e9254 100644
+--- a/tools/include/uapi/linux/netdev.h
++++ b/tools/include/uapi/linux/netdev.h
+@@ -122,6 +122,7 @@ enum {
+ 	NETDEV_A_NAPI_IRQ,
+ 	NETDEV_A_NAPI_PID,
+ 	NETDEV_A_NAPI_DEFER_HARD_IRQS,
++	NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
  
+ 	__NETDEV_A_NAPI_MAX,
+ 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
 -- 
 2.25.1
 
