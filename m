@@ -1,146 +1,109 @@
-Return-Path: <netdev+bounces-123511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77770965228
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 23:39:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB329965246
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 23:48:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA9CA1C24249
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 21:39:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19E101C23D12
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 21:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BA991BAEE9;
-	Thu, 29 Aug 2024 21:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B252218B47E;
+	Thu, 29 Aug 2024 21:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="CyDRL4IO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kj3X8goF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C0A1BAEDF
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 21:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BE818A933;
+	Thu, 29 Aug 2024 21:48:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724967575; cv=none; b=UbQwnreJceNao+iPdFzs57kYlu1qPukrnINqEXTkQgRDu8F8aiCVi8+J7Ibi4+1iVkA3le6EA+CtPR53GFX5x5ubH6eRo3GpCdxLHleOewl1ABLfP/JrgFvBQW7aXDgF8upsLGdeGnp8nkgyCwMYUe/AQTmXxxXbhNshvfT/N4c=
+	t=1724968122; cv=none; b=tjt5xfsrnKC52iScn5PHHcMotKe2L9JgFs/Nykyr2+ys+ee8B+CfZmWFQqZDtxiuAmijX/2zPjELfn3+6m6LPz9841/m+/sERNYauTrHHHRzuZq0yMtcKmb/HAwqf4lmWlx+pc6T4WQp5d2wGj97qLz2LqWKkE1zqo/5L549XMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724967575; c=relaxed/simple;
-	bh=5coYfGmlbLfcXMH6XIf4TkfjElNN3WfWw4tJsnYFe/I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=SHfCYhqr0bfDC/VLlKSUoTbvLofX4ymR/ivi0feh2JahKC8voIl+/yhb1WTN9gNnOGf3y5dtlNKvhGGN6ApsviwYrEy28MF6VkQADNNVtjYAccCDipZM0e/XfduJTTKnulOP3c0RcS1apyIjCBqIg5vUMxkZgMiNmC3HQyETtSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=CyDRL4IO; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2d3e46ba5bcso861150a91.0
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 14:39:33 -0700 (PDT)
+	s=arc-20240116; t=1724968122; c=relaxed/simple;
+	bh=ClZTJ22mrbLe4vhaEPwBtwExAsf6SDZ5kNm/gR/u63Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bLhMaA3z5SMi9btwCx0YROWVdJzeuPy0tpzmgeadoAg21RrJTCEp4ZnkfM9CnLh3AhojTJkQd6DmHBG1R8tGMRhPzzkLgXMWAKZOTG+9cDlRUzA2S68DwKZnKRXeVRxwHA3TBhEJ9skWCHyseNb5xJy+KFFL4re8P562woEA0zY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kj3X8goF; arc=none smtp.client-ip=209.85.210.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-70943b07c2cso756951a34.1;
+        Thu, 29 Aug 2024 14:48:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1724967573; x=1725572373; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fbqFYO4S9FnSUAynAY079AtZQYGTY3VQrABnLRjrCmE=;
-        b=CyDRL4IOdgI5M8sp7OzbLvcroSiouMEVIXxWK3KnEO87WPCC4jVtQI9mAo+1j/1642
-         FEEyrpBB05gQ4AGfcBOTCh71iH9QL8IwgqqnH3xpM3eKQ+xdp+yRSamQHeD3HPtX0cmU
-         X73W3awGSALh5Iar0yfVl8dfanwCSqgXl4Rfef1taUoEEA9TOEOKSjXfxG7NmJ0zf0sS
-         xABe0wFMvwKYH+GpmoxJX6wFknCtZuCmKi/Zrpuc8/nkWNviat1e3ZZtRrURJUSwHNuC
-         uTPpOu5LizdKhn937wm2iD9aSOm7B9kmKYRV5CX9xYS2ItlV9B2QL5vKG3FneC/7VJ8V
-         6xTA==
+        d=gmail.com; s=20230601; t=1724968120; x=1725572920; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SO+Q6EzPs5zUKPyWEYd/uHAfo+Cruq14XyujkLL83EQ=;
+        b=Kj3X8goFG37ALHf452rJ2qaY+cTUXn3EKyTiIBTnHJob5/hte+DSN5uIHJqsHUy/qp
+         ciqhFtxSMQyNx4uHxOt8VWXB3CYj/DpTP/pwipKOvHVfj0MAECfR34BnDQv3TwKr725E
+         NAyqK3A1s/NYCjh3xInsz8ggnWAIGBTtPZq1iDlAhu/prdWP9aKfmqQ7spg0aH9L8Bje
+         ZYogDlS6a/DCh/YIcoRrs8gRbPzmz4PYw6aSzZQ1EcQic4blUYGWBRJ9rBplxzbWoGVl
+         27RPrY834aBjR4Weh0YBQmo5EPfmAYhAl2ctbuY174dSwuhIcFOZaHuCwJzfirFl1sZf
+         Uz5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724967573; x=1725572373;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fbqFYO4S9FnSUAynAY079AtZQYGTY3VQrABnLRjrCmE=;
-        b=kRcpB7h7ERLzGw1MtIIYzZ2EMpj6CD8b3KCbxS0dYQre1aMAHlh/XU2+4J9soQe7Np
-         LmvMUnYnLbMAG1VCHG0TK22m06KbnaJoITuVfp47aBxZmsT+wSehrsPt+8sjBi0kATK/
-         Uh3jXfcpJlm1ZC57RGcBwdJvcqjC12kxK03CVcQVoqxdCM7TYqTIgcB9mdgN37uzXAyB
-         by//dEFwvjiUvBajLCtnYgBm6tT+0PAMo/rR83L37t58FUxR9EQzuF4t8XevwIAHDI/H
-         v6L1gezARZ5IqSoRKrNzKxaf7wyKH3EQFBxCDP3pV0YWbQFJm2hb1dqHxd7K/bOUIZ1p
-         a3nA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCw8bhOubxVjQWTiY/k1OypOUN5tCmkiKp+a98WN0BQEf3Jw6HpY+oLKx2s4m5IkBgS4h+sbw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHsBCZLqSpXuTEyvUW0i5DFdVxdmFzdiiQ65P1I+M5V8CtnX8F
-	A3J6GaQBT8ZMWyoHSJGund5ca4ORiTn3UJitMEY7ivQszey2Gus0F5DojCkcTwY=
-X-Google-Smtp-Source: AGHT+IHR2w4OGAv/4/hiYv8y+H+KUXzbVnmmVE1/lO3+LWfdUlvYwk6z3NOkhEuvbC5XvYuZLd7lZA==
-X-Received: by 2002:a17:90a:984:b0:2d3:c5f4:4298 with SMTP id 98e67ed59e1d1-2d8561a1546mr4634297a91.13.1724967572711;
-        Thu, 29 Aug 2024 14:39:32 -0700 (PDT)
-Received: from dev-mkhalfella2.dev.purestorage.com ([208.88.159.128])
-        by smtp.googlemail.com with ESMTPSA id 98e67ed59e1d1-2d84462aec5sm4705298a91.32.2024.08.29.14.39.31
+        d=1e100.net; s=20230601; t=1724968120; x=1725572920;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SO+Q6EzPs5zUKPyWEYd/uHAfo+Cruq14XyujkLL83EQ=;
+        b=XaNCBO8n5ZMNxKjfK/rVdy1+okNvdv2QnlzQ1iu4CHPqnj237LdidCPbDpkpmcbVkv
+         LMnCiONGEEG3Q2FGR7QTZSr1NkSMaJpnlu5DhIfVsY8+Sa2tcDSyQEPz7SZZun8Si7Xy
+         TiRE2JI3aT8hy/RKi23mXQyah9dxjI04x5EalzwUY/XjgQEV4jVQLixCXUNSHBwUcSBo
+         xitf38fmKWXWPEQvehKHTK3l7dehLEamQ14DNpmcb6YQ0pKjLe8kELgs9j7S3ukxFQM9
+         JgetFi8bIDLxJd6m+rKLh/R077MmGFMPf0Wkl9IZsFoDr11OzXPTp7kcMh2QjcENCNa5
+         GZDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXXJscINW1RazXAuUw2vv8sKMfDDG0D7Cv1DCtcRStmmsoC7JReuHbc/DCk82RJHcphD/xN7sRUBZd44GQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzilY5HzzIg19o2WF7632I2VzVGmrhrO1bzP5ugdBV5aJG/qqTw
+	k5BJaZ4B3rKxoEcBl5Svlor9sALjok++heVjfOhR46yekZzSkkT6APkEpNv3
+X-Google-Smtp-Source: AGHT+IEfWS9XbisgCsKEOy5wemG+RapPG01S3iQaELYUc0KqXS/kmpBchtOqrmbK04v9gxZCqB8OWQ==
+X-Received: by 2002:a05:6359:4597:b0:1b6:d3:a628 with SMTP id e5c5f4694b2df-1b603cce721mr528003955d.25.1724968120080;
+        Thu, 29 Aug 2024 14:48:40 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d22e77a7besm1708029a12.37.2024.08.29.14.48.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 14:39:32 -0700 (PDT)
-From: Mohamed Khalfella <mkhalfella@purestorage.com>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: yzhong@purestorage.com,
-	Mohamed Khalfella <mkhalfella@purestorage.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/1] net/mlx5: Added cond_resched() to crdump collection
-Date: Thu, 29 Aug 2024 15:38:56 -0600
-Message-Id: <20240829213856.77619-2-mkhalfella@purestorage.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20240829213856.77619-1-mkhalfella@purestorage.com>
-References: <20240829213856.77619-1-mkhalfella@purestorage.com>
+        Thu, 29 Aug 2024 14:48:39 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	linux-kernel@vger.kernel.org,
+	o.rempel@pengutronix.de,
+	p.zabel@pengutronix.de
+Subject: [PATCH net-next 0/6] various cleanups
+Date: Thu, 29 Aug 2024 14:48:19 -0700
+Message-ID: <20240829214838.2235031-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Collecting crdump involves reading vsc registers from pci config space
-of mlx device, which can take long time to complete. This might result
-in starving other threads waiting to run on the cpu.
+Allow CI to build. Also a bugfix for dual GMAC devices.
 
-Numbers I got from testing ConnectX-5 Ex MCX516A-CDAT in the lab:
+Rosen Penev (5):
+  net: ag71xx: add COMPILE_TEST to test compilation
+  net: ag71xx: update FIFO bits and descriptions
+  net: ag71xx: use ethtool_puts
+  net: ag71xx: get reset control using devm api
+  net: ag71xx: remove always true branch
 
-- mlx5_vsc_gw_read_block_fast() was called with length = 1310716.
-- mlx5_vsc_gw_read_fast() reads 4 bytes at a time. It was not used to
-  read the entire 1310716 bytes. It was called 53813 times because
-  there are jumps in read_addr.
-- On average mlx5_vsc_gw_read_fast() took 35284.4ns.
-- In total mlx5_vsc_wait_on_flag() called vsc_read() 54707 times.
-  The average time for each call was 17548.3ns. In some instances
-  vsc_read() was called more than one time when the flag was not set.
-  As expected the thread released the cpu after 16 iterations in
-  mlx5_vsc_wait_on_flag().
-- Total time to read crdump was 35284.4ns * 53813 ~= 1.898s.
+Sven Eckelmann (1):
+  net: ag71xx: disable napi interrupts during probe
 
-It was seen in the field that crdump can take more than 5 seconds to
-complete. During that time mlx5_vsc_wait_on_flag() did not release the
-cpu because it did not complete 16 iterations. It is believed that pci
-config reads were slow. This change adds conditional reschedule call
-every 128 register read to release the cpu if needed.
+ drivers/net/ethernet/atheros/Kconfig  |  4 +-
+ drivers/net/ethernet/atheros/ag71xx.c | 75 ++++++++++++++-------------
+ 2 files changed, 41 insertions(+), 38 deletions(-)
 
-Reviewed-by: Yuanyuan Zhong <yzhong@purestorage.com>
-Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c
-index 6b774e0c2766..bc6c38a68702 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c
-@@ -269,6 +269,7 @@ int mlx5_vsc_gw_read_block_fast(struct mlx5_core_dev *dev, u32 *data,
- {
- 	unsigned int next_read_addr = 0;
- 	unsigned int read_addr = 0;
-+	unsigned int count = 0;
- 
- 	while (read_addr < length) {
- 		if (mlx5_vsc_gw_read_fast(dev, read_addr, &next_read_addr,
-@@ -276,6 +277,9 @@ int mlx5_vsc_gw_read_block_fast(struct mlx5_core_dev *dev, u32 *data,
- 			return read_addr;
- 
- 		read_addr = next_read_addr;
-+		/* Yield the cpu every 128 register read */
-+		if ((++count & 0x7f) == 0)
-+			cond_resched();
- 	}
- 	return length;
- }
 -- 
-2.45.2
+2.46.0
 
 
