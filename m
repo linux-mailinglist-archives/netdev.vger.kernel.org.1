@@ -1,97 +1,93 @@
-Return-Path: <netdev+bounces-123043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EFD963847
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 04:40:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43BC7963850
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 04:46:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2D43285024
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:40:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 764501C21DD1
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:46:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB4518030;
-	Thu, 29 Aug 2024 02:40:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010E93B796;
+	Thu, 29 Aug 2024 02:46:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF6F481B1;
-	Thu, 29 Aug 2024 02:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD87A4A18;
+	Thu, 29 Aug 2024 02:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724899215; cv=none; b=W+4TqbEmmjEqmlGDewW5+e7gNR2gVuW4sRB2P6u/DaKkcsg3ZqTk9RoPjMWoQw788oy4bvV1zhuzTj9o8RCqZB24YS7ZPcUjBXA2fCdif8J+Csh+0KQWzx9Jb1jy6ISsza1EkAKPHeJ7exR23OTrt5t+k7Me0WNbKV7BWY/5kuU=
+	t=1724899585; cv=none; b=qm/CQh3jj9VgtEyxg9oMFqsgiZmSt83loJyDemnQVyGYUFl/8saGNNqu9P2w9LXH+ckzvI4xJo10IgM1QBo7JtL39veEAEgy9K0czc9cO+5c/fTOtYOmCy+7kF6vhqEseqGBws9a5LLP0VxX86nc7wwSiMRPkFQLgf3V8Si/sp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724899215; c=relaxed/simple;
-	bh=D4ZvmeeU1FOPRboWQswrh5spc8/PYtigkM6ItBUeReg=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=qGhmYxrbmqgNsz/tuLkikCqMPhHE4DvQ2+u5FroCx23X21cJA3BeP5sPA7Du1wY6ED0XLP65IKxpcqeJUgwcAbgInDsP7lar7NfoTUeB0s6vXxKo4DrOCEvjYPwYjfZagTjGI66EcCO7nyIMxvzkDBaEDtm0bTPMd/dPut86YOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	s=arc-20240116; t=1724899585; c=relaxed/simple;
+	bh=PSOJy8XFAwIQYiIo+WbIeFtJHCtBfiNt9ppspedr6bY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=k+QmTZv7mCVswYUIl0bWp2z+10vQHkUEpx7AJby91LIKgh0Sajtf1aeqANRhmME3ajYJL6dUCGMjb7rLHxvY/JKXzHYRc8sFVjdzy6zMfFZcnSjBT8ysAlMkSah3N2uX29dqkEJ1VeGoKsNOQKJPGP9bStoxvEBFPTdlZIbSIBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WvQQn0fh4z1HHlc;
-	Thu, 29 Aug 2024 10:36:49 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 902451A0188;
-	Thu, 29 Aug 2024 10:40:09 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WvQcp3pHfzyQWq;
+	Thu, 29 Aug 2024 10:45:30 +0800 (CST)
+Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
+	by mail.maildlp.com (Postfix) with ESMTPS id D33D4180AE6;
+	Thu, 29 Aug 2024 10:46:19 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 29 Aug 2024 10:40:08 +0800
-Message-ID: <b3d6030e-14a3-4d5f-815c-2f105f49ea6a@huawei.com>
-Date: Thu, 29 Aug 2024 10:40:07 +0800
+ 15.2.1544.11; Thu, 29 Aug 2024 10:46:18 +0800
+Message-ID: <373de0af-8aa1-263b-eb5a-3dfdd1fa19fd@huawei.com>
+Date: Thu, 29 Aug 2024 10:46:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
-	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
-	<andrew@lunn.ch>, <jdamato@fastly.com>, <horms@kernel.org>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V5 net-next 05/11] net: hibmcge: Implement some .ndo
- functions
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20240827131455.2919051-1-shaojijie@huawei.com>
- <20240827131455.2919051-6-shaojijie@huawei.com>
- <20240828183954.39ea827f@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20240828183954.39ea827f@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH net-next v2 05/13] net: phy: Fix missing of_node_put() for
+ leds
+Content-Language: en-US
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	<woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
+	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <linus.walleij@linaro.org>,
+	<alsi@bang-olufsen.dk>, <justin.chen@broadcom.com>,
+	<sebastian.hesselbarth@gmail.com>, <alexandre.torgue@foss.st.com>,
+	<joabreu@synopsys.com>, <mcoquelin.stm32@gmail.com>, <wens@csie.org>,
+	<jernej.skrabec@gmail.com>, <samuel@sholland.org>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <ansuelsmth@gmail.com>,
+	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <bcm-kernel-feedback-list@broadcom.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-sunxi@lists.linux.dev>,
+	<linux-stm32@st-md-mailman.stormreply.com>, <krzk@kernel.org>,
+	<jic23@kernel.org>
+References: <20240828032343.1218749-1-ruanjinjie@huawei.com>
+ <20240828032343.1218749-6-ruanjinjie@huawei.com>
+ <66cf4618f313_34a7b1294bb@willemb.c.googlers.com.notmuch>
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+In-Reply-To: <66cf4618f313_34a7b1294bb@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemh500013.china.huawei.com (7.202.181.146)
 
 
-on 2024/8/29 9:39, Jakub Kicinski wrote:
-> On Tue, 27 Aug 2024 21:14:49 +0800 Jijie Shao wrote:
->> +static int hbg_net_open(struct net_device *dev)
->> +{
->> +	struct hbg_priv *priv = netdev_priv(dev);
->> +
->> +	if (test_and_set_bit(HBG_NIC_STATE_OPEN, &priv->state))
->> +		return 0;
->> +
->> +	netif_carrier_off(dev);
-> Why clear the carrier during open? You should probably clear it once on
-> the probe path and then on stop.
 
-In net_open(), the GMAC is not ready to receive or transmit packets.
-Therefore, netif_carrier_off() is called.
+On 2024/8/28 23:45, Willem de Bruijn wrote:
+> Jinjie Ruan wrote:
+>> The call of of_get_child_by_name() will cause refcount incremented
+>> for leds, if it succeeds, it should call of_node_put() to decrease
+>> it, fix it.
+>>
+>> Fixes: 01e5b728e9e4 ("net: phy: Add a binding for PHY LEDs")
+>> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+> 
+> Fixes should go to net. Should not be part of this series?
 
-Packets can be received or transmitted only after the PHY is linked.
-Therefore, netif_carrier_on() should be called in adjust_link.
-
-In net_stop() we also call netif_carrier_off()
-	
-	Thanks,
-	Jijie Shao
-
+Thank you! I will separate it out.
 
