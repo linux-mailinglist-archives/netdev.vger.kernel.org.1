@@ -1,185 +1,115 @@
-Return-Path: <netdev+bounces-123379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1420964A80
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:48:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0805C964A10
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:30:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2237E1C246F0
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:48:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B6551C2303B
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6169E1B4C46;
-	Thu, 29 Aug 2024 15:48:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CB51B142B;
+	Thu, 29 Aug 2024 15:30:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AlzwR1JW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DiV3mZTE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F9B91B3F0D;
-	Thu, 29 Aug 2024 15:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411921A255C
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 15:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724946485; cv=none; b=J6Z+CiXvdUYCChjdl1N9hv7yxMYDgz2JK+SEhAdbIfLcKXjyDbWv/XzvfFNtY/7GHiQ0asBbzYk06aorDz25isywBbtq7llRd6jGgiwxMuc4XcYvLdX8YZhf1Fu9WpDK2J+EBq0BJ7/Qfj9vouiQXmrC5B8buW3bKIRJEH1QDWQ=
+	t=1724945443; cv=none; b=if7RasHRSn6utbEEXNvkJwRf2GIxZkmKaNKlB+iT4pyf/hOzzpJErPGVCpmM0iz4ds+55X29aEkrDSUA0ruK7hGMsPBkfla/vb3rHneN+qbLlxaF0L/J694ffSrrFrNZt79XIQdFAfCSkYFuyqfUjgF41f53SLb/wEg9UhIlGPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724946485; c=relaxed/simple;
-	bh=ZdTFyHhOH/KgvRxfGlDREL10X0eEz/rPixae8p3OoBc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FAiKYng4+ma00FZzJfTE9ROwQjVkGdrep3EG72CAeHNQT4QAQVUTw1NcHWazk9aMe7GZXLANffxEimj+I/dNO8u8Hv7TF6JsukTh4qQVnwDWy/5sdzFiYAFNn9KG9lc7YXP9PWC6+vNUhj4exk8bmxC3Gz7j5vnlVwn0XEAoSDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AlzwR1JW; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a868b8bb0feso106930366b.0;
-        Thu, 29 Aug 2024 08:48:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724946480; x=1725551280; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xAx32F/TqiCZPJe3l7MuMeLUWvJtELLjmkRTSYa1sjc=;
-        b=AlzwR1JWibigyRPKOtdjCJUXP+k6jFBQgV58myOV85l3oaB3DtWglK20tVmHvK2Aqh
-         LBfs59yq04A51yekHnljzNA8p53CicqgxRS8avkfaM3nbwBOxZAqxCtEwNyUL38jtxJr
-         uC8hgVWujPtqZXw6OAudd0im5K2Ar842qnifTwtxKgTVBhVz06Zl895xoV4g9Svix6H+
-         uz2Pr3jsBKltoojYVAMf/ZscULuYUsPcYQ+9UrNaeOuxActidiUiVx/fc+FII1aSV7vp
-         i38LeF2ESLxIXrC+HmTPPXbtXms5SyI4Y74dnvVKMYxzH2n+Mq+PY75XZs7i0HN9CV2K
-         ni8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724946480; x=1725551280;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xAx32F/TqiCZPJe3l7MuMeLUWvJtELLjmkRTSYa1sjc=;
-        b=bTDJ7X5kN1w64sLlIgFQapehDmZhQgEi+HfZUu7FpovvkbiQ3j94Qk6Scx6Wet7YwD
-         Hel4L3QryvA7U7qT88c1m31KUlhUfpAjo4nq1uHG17aoF1fivaheme4yJdI/P3L3tbjq
-         YnO8vBva7qQ260EehJVEWqBjyGKtEYQNGRKva84VEc6+/hMHGINhr8oY/qS6bjrekD0B
-         YIKbHe0SADdn0VBU6fb7NhfAEXl3wvyNbuzzQOrJLnrPngsFzZn79lXRKfS0iFcIbTkT
-         elf8445/iZwYyfiZQjlCDR0y5kSjaULjCqL5xeldS7V/03E9GP/2TSFLVN1+Gl/Cc84s
-         OTLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXJgksNWRgY6RrCQuCEjKkgiV6+ehm6RnfSYeebZwCIy/OYW+i85l8uHqrtbnGJhH0mhvMmuXAQ@vger.kernel.org, AJvYcCXqN9XflNGp4OsUpmTEI71O9cTzKWSgiAgiVZtk8UK8MVyj2QD9RDFGJy/B+cmn9z66S8RFU66CnIQsZX0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNeTXO7BYZPDhyBDbxrFfvlfqnHuddB6UmnNtYpH6aksg51fUK
-	EZNj8bHtQcnd6ke8Pye/58EekId+epRioD+3qODN9fxpNNR/ZXOy+uM/VQ==
-X-Google-Smtp-Source: AGHT+IFkbg1eGxyJbeBncyAP4B/tWHtxy5THWiiSaonWl5d5SEsPzMI0wadD4BQGLT91EF2QqwdmcA==
-X-Received: by 2002:a17:907:97cf:b0:a86:c9f5:68df with SMTP id a640c23a62f3a-a897fa74e79mr197368866b.44.1724946479571;
-        Thu, 29 Aug 2024 08:47:59 -0700 (PDT)
-Received: from localhost.localdomain ([46.248.82.114])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a898900f29csm93489466b.64.2024.08.29.08.47.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 08:47:59 -0700 (PDT)
-From: Uros Bizjak <ubizjak@gmail.com>
-To: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Uros Bizjak <ubizjak@gmail.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH v2 2/2] netfilter: nf_tables: Fix percpu address space issues in nf_tables_api.c
-Date: Thu, 29 Aug 2024 17:29:32 +0200
-Message-ID: <20240829154739.16691-3-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240829154739.16691-1-ubizjak@gmail.com>
-References: <20240829154739.16691-1-ubizjak@gmail.com>
+	s=arc-20240116; t=1724945443; c=relaxed/simple;
+	bh=sRPYaGqjD+NniOsExyvUbWivuOEhM5UIZt34K8SrAJU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=QF3UDrWIOSK3FqKQToF0mOS1jcuEiobBxkiQ9Z5Ga51DfUvww4ninmiFEUrld8MG0db5ZMTSPv16SxgsCEauiYDYD2LL4wEnKkBfPDPqR4GYE09zjb15iOSZ0EyyjPpiMlyfVPCjrzLDdUoQEZn3qd8RZmEDW2qjkmD41eDlfWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DiV3mZTE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724945441;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+0CA3YGpKJV/aWm75zN6DdjSYV9tIWnRxiAa+X/V8hg=;
+	b=DiV3mZTEd+FFmYDZ/PbTCy3xWkJpl51PstcKD+fUDxyO24rHeBp6k13aTSdaxDSTnNHJd3
+	8zQrQLu8fLwozVmQKmmarHzqdg8vzTLSMN2GeNcqYskqBjMHur21tQSYN+CLmROHjc3eOr
+	iAfdBmEDalh4pf8rPkgwVO87Bfiv3e8=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-451-ww_Q4s1JMi6XcZ6lSkF01Q-1; Thu,
+ 29 Aug 2024 11:30:37 -0400
+X-MC-Unique: ww_Q4s1JMi6XcZ6lSkF01Q-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 596371954B12;
+	Thu, 29 Aug 2024 15:30:32 +0000 (UTC)
+Received: from RHTRH0061144 (unknown [10.22.8.86])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0520B19560AE;
+	Thu, 29 Aug 2024 15:30:29 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Yan Zhen <yanzhen@vivo.com>
+Cc: Eelco Chaudron <echaudro@redhat.com>, dev@openvswitch.org,
+ opensource.kernel@vivo.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, davem@davemloft.net
+Subject: Re: [ovs-dev] [PATCH v1 net-next] net: openvswitch: Use ERR_CAST()
+ to return
+In-Reply-To: <20240829095509.3151987-1-yanzhen@vivo.com>
+References: <20240829095509.3151987-1-yanzhen@vivo.com>
+Date: Thu, 29 Aug 2024 11:30:27 -0400
+Message-ID: <f7tzfov1h4c.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Compiling nf_tables_api.c results in several sparse warnings:
 
-nf_tables_api.c:2077:31: warning: incorrect type in return expression (different address spaces)
-nf_tables_api.c:2080:31: warning: incorrect type in return expression (different address spaces)
-nf_tables_api.c:2084:31: warning: incorrect type in return expression (different address spaces)
+Yan Zhen <yanzhen@vivo.com> writes:
 
-nf_tables_api.c:2740:23: warning: incorrect type in assignment (different address spaces)
-nf_tables_api.c:2752:38: warning: incorrect type in assignment (different address spaces)
-nf_tables_api.c:2798:21: warning: incorrect type in argument 1 (different address spaces)
+> Using ERR_CAST() is more reasonable and safer, When it is necessary
+> to convert the type of an error pointer and return it.
+>
+> Signed-off-by: Yan Zhen <yanzhen@vivo.com>
+> ---
 
-Use {ERR_PTR,IS_ERR,PTR_ERR}_PCPU() macros when crossing between generic
-and percpu address spaces and add __percpu annotation to *stats pointer
-to fix these warnings.
+LGTM, and seems like the only remaining place where we are open coding
+the error return conversion in the OVS module (at least, where we do a
+check with IS_ERR).  At least, I tried to visit them all while looking
+at this.
 
-Found by GCC's named address space checks.
+Reviewed-by: Aaron Conole <aconole@redhat.com>
 
-There were no changes in the resulting object files.
-
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
----
-v2: Also use {ERR_PTR,IS_ERR,PTR_ERR}_PCPU() macros.
----
- net/netfilter/nf_tables_api.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 0a2f79346958..46f362d4859d 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -2074,14 +2074,14 @@ static struct nft_stats __percpu *nft_stats_alloc(const struct nlattr *attr)
- 	err = nla_parse_nested_deprecated(tb, NFTA_COUNTER_MAX, attr,
- 					  nft_counter_policy, NULL);
- 	if (err < 0)
--		return ERR_PTR(err);
-+		return ERR_PTR_PCPU(err);
- 
- 	if (!tb[NFTA_COUNTER_BYTES] || !tb[NFTA_COUNTER_PACKETS])
--		return ERR_PTR(-EINVAL);
-+		return ERR_PTR_PCPU(-EINVAL);
- 
- 	newstats = netdev_alloc_pcpu_stats(struct nft_stats);
- 	if (newstats == NULL)
--		return ERR_PTR(-ENOMEM);
-+		return ERR_PTR_PCPU(-ENOMEM);
- 
- 	/* Restore old counters on this cpu, no problem. Per-cpu statistics
- 	 * are not exposed to userspace.
-@@ -2525,10 +2525,10 @@ static int nf_tables_addchain(struct nft_ctx *ctx, u8 family, u8 genmask,
- 
- 		if (nla[NFTA_CHAIN_COUNTERS]) {
- 			stats = nft_stats_alloc(nla[NFTA_CHAIN_COUNTERS]);
--			if (IS_ERR(stats)) {
-+			if (IS_ERR_PCPU(stats)) {
- 				nft_chain_release_hook(&hook);
- 				kfree(basechain);
--				return PTR_ERR(stats);
-+				return PTR_ERR_PCPU(stats);
- 			}
- 			rcu_assign_pointer(basechain->stats, stats);
- 		}
-@@ -2642,7 +2642,7 @@ static int nf_tables_updchain(struct nft_ctx *ctx, u8 genmask, u8 policy,
- 	struct nft_table *table = ctx->table;
- 	struct nft_chain *chain = ctx->chain;
- 	struct nft_chain_hook hook = {};
--	struct nft_stats *stats = NULL;
-+	struct nft_stats __percpu *stats = NULL;
- 	struct nft_hook *h, *next;
- 	struct nf_hook_ops *ops;
- 	struct nft_trans *trans;
-@@ -2738,8 +2738,8 @@ static int nf_tables_updchain(struct nft_ctx *ctx, u8 genmask, u8 policy,
- 		}
- 
- 		stats = nft_stats_alloc(nla[NFTA_CHAIN_COUNTERS]);
--		if (IS_ERR(stats)) {
--			err = PTR_ERR(stats);
-+		if (IS_ERR_PCPU(stats)) {
-+			err = PTR_ERR_PCPU(stats);
- 			goto err_hooks;
- 		}
- 	}
--- 
-2.42.0
+>  net/openvswitch/flow_netlink.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
+> index c92bdc4dfe19..729ef582a3a8 100644
+> --- a/net/openvswitch/flow_netlink.c
+> +++ b/net/openvswitch/flow_netlink.c
+> @@ -2491,7 +2491,7 @@ static struct nlattr *reserve_sfa_size(struct sw_flow_actions **sfa,
+>
+>  	acts = nla_alloc_flow_actions(new_acts_size);
+>  	if (IS_ERR(acts))
+> -		return (void *)acts;
+> +		return ERR_CAST(acts);
+>
+>  	memcpy(acts->actions, (*sfa)->actions, (*sfa)->actions_len);
+>  	acts->actions_len = (*sfa)->actions_len;
+> -- 
+> 2.34.1
 
 
