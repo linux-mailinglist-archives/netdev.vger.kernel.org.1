@@ -1,114 +1,147 @@
-Return-Path: <netdev+bounces-123403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE763964B75
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:20:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50366964B87
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DCA51C22BF5
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:20:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75EE41C2235A
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D6301B8EAE;
-	Thu, 29 Aug 2024 16:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5E11B5816;
+	Thu, 29 Aug 2024 16:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qHFy6zh3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9739A1B654D;
-	Thu, 29 Aug 2024 16:17:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C891B5310
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 16:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724948233; cv=none; b=LjW5pD5ZQxCSz9/o3vz1jMNLol1qMKXZwO3trjLirxNsSz3LZ8HjErlUFuz6rHqsxWwiBt0DDkNl3IdV0eRxbE/GZkmTeajezCtAl/vcioVJVBnqyCVKbthHodPrGf86KUjQuESaGcHAuX3wPYhT6/MbJB0IxldYQiK8TezrjE8=
+	t=1724948440; cv=none; b=esd0s3uYlDl7Do/HjZzYMc14CQDTFP6FFCPUU56+aIK3N+x8I6+Kh36aB9X8eUr+1OozOu8xp93pfDmMAAEiuvkkU9DvdVLdL7nRSRahAo/M6kEFfp1Iy2Lu/zNV3B8A969JiKt9oeCqE9hIgWPguCtzADdhFs6tYUvFzchCTN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724948233; c=relaxed/simple;
-	bh=tiajQYn9nsePlqD4415CMV+9WOMc1VSANwqYlFxVtUg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=os+y2R69hPPzJILQtvy4WGjuj2m/8PHcWMfa8balsN+cyqdqLnynrCygztBbDWaTe91h0XEhhOV6mXRKrBjtfsrzFG5TB7a6y8P89jGb0QwbIHh23avQs6nCWxp/QS6qZWcunIgeWBSxqrq7QorZAPdHKo66vBo0V9vcSzlkFJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5bed72ff443so1054441a12.1;
-        Thu, 29 Aug 2024 09:17:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724948230; x=1725553030;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i4tTQIMCvK8JaDCUUSonRDoAPxJVCvvDpjeKG9dSjwU=;
-        b=wr7VH12CmxDuo4YBvXTynAr89rzdsH0CVe3DdMvsNC6lULHali7QMaWGJMkUTfRJrT
-         7zB/yiiNOdFGwy9CySICwl9yIoQ5kSXS50N2r3ETN5RD7t6E9h3UKgPLf4q5xCCzHWW8
-         023H6cBkwKbd0xf01639wVewbMnHemhV7TTaESglcCsTFgrjUWFCWhhBvPIjqi2zTUwt
-         BJ9aU+qjVMKuUDXwr7FpNJl0NgTjxYFRdbPSg94pjdk9lTMv7+eJfvF6sXpi6YMwe6nq
-         SibIPS++rWy7LRLfnATXzj1AUycH+0ntbHgBn1UlfWoeLFnTPOFCLgtLNjrCaoRDw58l
-         sNyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUB4pbzGqWN5iup7KjiCuaRRMvexYFKQCk9GfPaFotrFu9o6vqyc5dL9bh+kKlswa0qsGLsuyuHOUZ5AKQ=@vger.kernel.org, AJvYcCVXcPKQq3Rbc4VM1BCZDimpT5dkebGw03zmdzf6qvL2X4PavMvzdvFjlJQgVz4TuGMCrF7l3z5TtVw0RlWAKO2W@vger.kernel.org, AJvYcCXR6vo38w6v2/8Om5nylc0AsFv32KVKhbe/CQcTnW8X5QrQtXqUvYnkPX7COzSESUkU8Mton0SX@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqSNpVX1Sgj6F+9ip+Y+A3rgCA2h2Cl0uoH3RYNZJHjoWGTsjZ
-	vYzFpUGxcpW1GtZKJqawJMYyw4uJNVwHVl02myfqxjjLszx2coSF
-X-Google-Smtp-Source: AGHT+IF3lPqELwq5st4WQCl0HD/aCaayvrDgmEklE4DTN8jPOXGQRz1na1bRSeVbktGDwZM+2psK3Q==
-X-Received: by 2002:a17:907:7f25:b0:a86:8166:1b0a with SMTP id a640c23a62f3a-a897fad100dmr303802666b.56.1724948229273;
-        Thu, 29 Aug 2024 09:17:09 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8988feb112sm96683466b.39.2024.08.29.09.17.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 09:17:08 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: fw@strlen.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	David Ahern <dsahern@kernel.org>
-Cc: rbc@meta.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org (open list:NETFILTER)
-Subject: [PATCH nf-next v4 2/2] netfilter: Make IP_NF_IPTABLES_LEGACY selectable
-Date: Thu, 29 Aug 2024 09:16:55 -0700
-Message-ID: <20240829161656.832208-3-leitao@debian.org>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240829161656.832208-1-leitao@debian.org>
-References: <20240829161656.832208-1-leitao@debian.org>
+	s=arc-20240116; t=1724948440; c=relaxed/simple;
+	bh=7U6Nmbh114G96KtGYBVDLAbK4d6lfvn2XssOHsbTrO4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tDLATdPTsl8FXmz/7L2wYHGwQ098WY1doDZixmVA1eRI46HVgbJXq7dBoP9SCMur25CXwWxpXoaQTZFDCyzyl3XxdvJYLbQm3z+UgtsFzy2lpBX3gT/HYq0w8opX2kcxbeq87VkFg3T1Eay9EI2fufKaX0UmCDWV93A4lMAj4B4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qHFy6zh3; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 29 Aug 2024 16:20:28 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724948436;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TqnxVaBjgZfealincCR2Zh7tFE8qlNsIgLvhONXdZ1c=;
+	b=qHFy6zh3aSVycnfwMPa+TGK1S86Y8eGqQ+lER+GugiPaxKDt1qqI5UdERHZKWVvCiRP0uJ
+	mAc/ne4Mph2X8TNL/fp/s9L8udkV8DXLIkPNwe4JgfQchKfQE2x81o0YNdAjhxdcFzEtRz
+	eepH/wLlvDilwHkme1dwivldLtoMDfI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Roman Gushchin <roman.gushchin@linux.dev>
+To: Shakeel Butt <shakeel.butt@linux.dev>
+Cc: Vlastimil Babka <vbabka@suse.cz>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	Michal Hocko <mhocko@kernel.org>,
+	Muchun Song <muchun.song@linux.dev>,
+	David Rientjes <rientjes@google.com>,
+	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	Meta kernel team <kernel-team@meta.com>, cgroups@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2] memcg: add charging of already allocated slab objects
+Message-ID: <ZtCfzHNUSVjGsXGS@google.com>
+References: <20240827235228.1591842-1-shakeel.butt@linux.dev>
+ <9fb06d9b-dec5-4300-acef-bbce51a9a0c1@suse.cz>
+ <mvxyevmpzwatlt7z4fdjakvuixmp5hcqmvo3467kzlgp2xkbgf@xumnm2y6xxrg>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <mvxyevmpzwatlt7z4fdjakvuixmp5hcqmvo3467kzlgp2xkbgf@xumnm2y6xxrg>
+X-Migadu-Flow: FLOW_OUT
 
-This option makes IP_NF_IPTABLES_LEGACY user selectable, giving
-users the option to configure iptables without enabling any other
-config.
+On Thu, Aug 29, 2024 at 09:10:53AM -0700, Shakeel Butt wrote:
+> On Thu, Aug 29, 2024 at 11:42:10AM GMT, Vlastimil Babka wrote:
+> > On 8/28/24 01:52, Shakeel Butt wrote:
+> > > At the moment, the slab objects are charged to the memcg at the
+> > > allocation time. However there are cases where slab objects are
+> > > allocated at the time where the right target memcg to charge it to is
+> > > not known. One such case is the network sockets for the incoming
+> > > connection which are allocated in the softirq context.
+> > > 
+> > > Couple hundred thousand connections are very normal on large loaded
+> > > server and almost all of those sockets underlying those connections get
+> > > allocated in the softirq context and thus not charged to any memcg.
+> > > However later at the accept() time we know the right target memcg to
+> > > charge. Let's add new API to charge already allocated objects, so we can
+> > > have better accounting of the memory usage.
+> > > 
+> > > To measure the performance impact of this change, tcp_crr is used from
+> > > the neper [1] performance suite. Basically it is a network ping pong
+> > > test with new connection for each ping pong.
+> > > 
+> > > The server and the client are run inside 3 level of cgroup hierarchy
+> > > using the following commands:
+> > > 
+> > > Server:
+> > >  $ tcp_crr -6
+> > > 
+> > > Client:
+> > >  $ tcp_crr -6 -c -H ${server_ip}
+> > > 
+> > > If the client and server run on different machines with 50 GBPS NIC,
+> > > there is no visible impact of the change.
+> > > 
+> > > For the same machine experiment with v6.11-rc5 as base.
+> > > 
+> > >           base (throughput)     with-patch
+> > > tcp_crr   14545 (+- 80)         14463 (+- 56)
+> > > 
+> > > It seems like the performance impact is within the noise.
+> > > 
+> > > Link: https://github.com/google/neper [1]
+> > > Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+> > > ---
+> > > v1: https://lore.kernel.org/all/20240826232908.4076417-1-shakeel.butt@linux.dev/
+> > > Changes since v1:
+> > > - Correctly handle large allocations which bypass slab
+> > > - Rearrange code to avoid compilation errors for !CONFIG_MEMCG builds
+> > > 
+> > > RFC: https://lore.kernel.org/all/20240824010139.1293051-1-shakeel.butt@linux.dev/
+> > > Changes since the RFC:
+> > > - Added check for already charged slab objects.
+> > > - Added performance results from neper's tcp_crr
+> > > 
+> > >  include/linux/slab.h            |  1 +
+> > >  mm/slub.c                       | 51 +++++++++++++++++++++++++++++++++
+> > >  net/ipv4/inet_connection_sock.c |  5 ++--
+> > >  3 files changed, 55 insertions(+), 2 deletions(-)
+> > 
+> > I can take the v3 in slab tree, if net people ack?
+> 
+> Thanks.
+> 
+> > 
+> > BTW, will this be also useful for Linus's idea of charging struct files only
+> > after they exist? But IIRC there was supposed to be also a part where we
+> > have a way to quickly determine if we're not over limit (while allowing some
+> > overcharge to make it quicker).
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/ipv4/netfilter/Kconfig | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+It should work and speed up the case when we can drop the object before charging.
+I'd suggest to implement it in a separate change though.
 
-diff --git a/net/ipv4/netfilter/Kconfig b/net/ipv4/netfilter/Kconfig
-index 1b991b889506..16507ae13736 100644
---- a/net/ipv4/netfilter/Kconfig
-+++ b/net/ipv4/netfilter/Kconfig
-@@ -12,7 +12,12 @@ config NF_DEFRAG_IPV4
- 
- # old sockopt interface and eval loop
- config IP_NF_IPTABLES_LEGACY
--	tristate
-+	tristate "Legacy IP tables support"
-+	default	n
-+	select NETFILTER_XTABLES
-+	help
-+	  iptables is a general, extensible packet identification legacy framework.
-+	  This is not needed if you are using iptables over nftables (iptables-nft).
- 
- config NF_SOCKET_IPV4
- 	tristate "IPv4 socket lookup support"
--- 
-2.43.5
-
+Thanks!
 
