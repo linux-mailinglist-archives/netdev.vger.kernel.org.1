@@ -1,181 +1,349 @@
-Return-Path: <netdev+bounces-123279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 429CB9645F3
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:11:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68AAF9645EC
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:11:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 688B31C218E3
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:11:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFFD01F28739
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644011AB53F;
-	Thu, 29 Aug 2024 13:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB03C1A4F34;
+	Thu, 29 Aug 2024 13:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gia3tjaF"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="eiJDuvEY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3242C1A76A4;
-	Thu, 29 Aug 2024 13:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AD81A3BDC
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 13:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724937098; cv=none; b=Yg+KjSzu95hO03s+mBVHHs4ScbyXYC3he98PHYOEXzuJzhQTiw30vEN8WbxqVUdPPSDKtA/W/Wq5tbxpRpwjoNmmtHxTkwRxpiImH+pZ9e5F++t7W7QoQByKWDg0C0ABXWLufpIk/a/6QATQXR1+jWVTTMX4g8ZFFzf/BIB+Frk=
+	t=1724937096; cv=none; b=nji02bjIIrFT+qffV2QCWYM7/yt+70m0q8/s7GlqarTiof57LN8iRUwqRMKZZzmzlmIkY7sGLYd1sVYe2welJGncaq4UQobJLxiDc2Vg3fZXI76OsVTZKVGuDLnDIAfM35wNpOTvYdEIa2bnmZgHajHPExUyDEBHM4sVEgplVew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724937098; c=relaxed/simple;
-	bh=+DvwsmCPH5D4uVF8GSFBpGssnAS6hjNOWIMiBaZjazk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tXW4+tXMlu7+hOMrhRqnaSB/alvWrOTlsHL/+Y77gtdOpqEtTMSHbnrLIMx79T6uozdf+2j4G//yfWzZknEXonvXTXvzZ5N3FujxBgKIGzNe0ul0bk9mcl8qGwS959UJD5zv/SV8etlZZV0kpAkfWtmAG9vD2Za2nAM420NB7Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gia3tjaF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DC9DC4CECA;
-	Thu, 29 Aug 2024 13:11:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724937097;
-	bh=+DvwsmCPH5D4uVF8GSFBpGssnAS6hjNOWIMiBaZjazk=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=gia3tjaFFctO4b73k43IGI6fL+iihoxVY3Qx0gUUZYv5/9ioMKT8xBA1jcpQIRpyz
-	 b1zgEKSqFne/TDnhGMMNM1DtvNCWf2+rpcHmQroh+Yio9SPvynPkcVnzoSSArekwpw
-	 kjBtu4EhHvSuy/aV8l4EIQebQBUVBVkG9+C70hN2rhtnbJ6wLjEygETcRADsHf5/4d
-	 1C9VXwFjMwd6tYASU7wJ7zBHsM0i7bUUs5ci/NRPbh6GTEES2lu9lcNjpe9DYoOAzf
-	 mxQodxwf1a5+wVrEoQur1x4OX9A5ElWfCUb1j5ZIMrHRLfBmAJLDtuKkB/GyDUvHUH
-	 tLqvwIEH4k22A==
-Message-ID: <604b9282588697ead426564e3fe904809d1b7ae6.camel@kernel.org>
-Subject: Re: [PATCH net-next v1] sunrpc: Use ERR_CAST() to return
-From: Jeff Layton <jlayton@kernel.org>
-To: Yan Zhen <yanzhen@vivo.com>, chuck.lever@oracle.com, trondmy@kernel.org,
-  anna@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org,  pabeni@redhat.com
-Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, opensource.kernel@vivo.com, neilb@suse.de, 
-	okorniev@redhat.com, tom@talpey.com, Dai.Ngo@oracle.com
-Date: Thu, 29 Aug 2024 09:11:34 -0400
-In-Reply-To: <20240829130434.3335629-1-yanzhen@vivo.com>
-References: <20240829130434.3335629-1-yanzhen@vivo.com>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40app2) 
+	s=arc-20240116; t=1724937096; c=relaxed/simple;
+	bh=fakhpIJR2ZfTamWLWAqABaX77u05L93KwsKGKWJugw4=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sSK5xjOpWEeZ7/65VDvzaP9zsNPFq4oGtGU2fo8mDsqXAfVZbUZM/UmPD+mvWQ886dFU6/AyFMlbEJ9D6WSKXe9TP2aIzQnt+plxDNZBV3eUAGtYq4K3rbhGg654zGXvL44xjFTPn0RsOC4D0m8F8baBIjYreCvvlvmAPrLvjnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=eiJDuvEY; arc=none smtp.client-ip=209.85.208.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-5a10835487fso884429a12.1
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:11:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1724937093; x=1725541893; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:date:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6HSLQ8KvULAlJol+4PZpsMQiwSkPlENMupYF/HR2lik=;
+        b=eiJDuvEYAoOlohJFbU5fyl8pTquuP5f/Qvo0RcWNOl/z9fauJCIGdi3FMiVDfAPwel
+         /jd8Np0eLvOucrO53/kcTB6QUsb13fusFXlWKHCt4uWJnLTiZp3t653yuOFe/FHw64vs
+         X2gmkZ7DyV1JOzz4x6C3xvzrs8ey8gumRz4AOs0XF97hvfPKhJBwUMyeaLDbFfBrZ0Ho
+         o5wlDZfu3R8R/d+ogDTf6a+hEDDNf480T3U511yZiPF6ICgj0IWEMENfKoCmyNhrgX4e
+         9X+sJNWFtTvW5xeDqDoVTqUt+Ijvi/kmH3unEH7KCoFGfwACEH39o4u3TnB3wUjFvOyg
+         vRRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724937093; x=1725541893;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:date:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6HSLQ8KvULAlJol+4PZpsMQiwSkPlENMupYF/HR2lik=;
+        b=CcrN7QqrqN+rP44AJNcAaRnShBUXhtbrBQA/IWvbG/NfI+oeL0DmsHU2OHAR43hKLP
+         bL3ibsMGzpSnJO6LVoO3/yfq7kmzDLXVb4fkgbBOO62inNUE/5alp0Y1gKrE+OfaPopT
+         K9yzLJadtH6dzEFLAfzfGhcSNZkRKqtf2n7he59X+iRlFRwPeF9b97z37BvuVQ8O3fJs
+         zy8lOm2t5EMAnGpIs9qDKyvtQ9rrfV6qq0neeK8mFw3tpE+kvVCPcf9qr32hWdIdaFIE
+         nJKAUKj36qOHFJ/6z0zVFksMjd80R8Jrq49FFxfsc+HKUR8DDnpgDKhiSWkuNGhxsIZz
+         BQKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWiRQ/jpHDt1KKtNk3Zo1DBsTMIeoC91PyKmOjMlk4/uNH14I5fN74xyyCSqaIX3X82EBVeR4w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjfsCiXeIAdk3+9hasMFn9wykSrYGaTR7eWAeZ5MTDTYR3hg6i
+	of5VJYW+XdtNCravaZLCVloRTkTagiqO7xMlfqQFVo7eQ35kR1AX1p86gJIhJF0=
+X-Google-Smtp-Source: AGHT+IEH/zJZio4NTe6eEsV2DoExlez2oCgJWKVnp5yu1Qv76cYjCAYlwUS9Kb57z8iTsLMFbn1guw==
+X-Received: by 2002:a05:6402:268e:b0:5bf:dd0:93ad with SMTP id 4fb4d7f45d1cf-5c21ed8e66bmr2407157a12.27.1724937091825;
+        Thu, 29 Aug 2024 06:11:31 -0700 (PDT)
+Received: from localhost (host-80-182-198-72.retail.telecomitalia.it. [80.182.198.72])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8988fea68dsm77550266b.26.2024.08.29.06.11.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 06:11:31 -0700 (PDT)
+From: Andrea della Porta <andrea.porta@suse.com>
+X-Google-Original-From: Andrea della Porta <aporta@suse.de>
+Date: Thu, 29 Aug 2024 15:11:38 +0200
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 00/11] Add support for RaspberryPi RP1 PCI device using a
+ DT overlay
+Message-ID: <ZtBzis5CzQMm8loh@apocalypse>
+Mail-Followup-To: Krzysztof Kozlowski <krzk@kernel.org>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <14990d25-40a2-46c0-bf94-25800f379a30@kernel.org>
+ <Zsb_ZeczWd-gQ5po@apocalypse>
+ <d97dbb0b-2e9c-4a62-b6c2-c1ec3fa1225b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d97dbb0b-2e9c-4a62-b6c2-c1ec3fa1225b@kernel.org>
 
-On Thu, 2024-08-29 at 21:04 +0800, Yan Zhen wrote:
-> Using ERR_CAST() is more reasonable and safer, When it is necessary
-> to convert the type of an error pointer and return it.
->=20
-> Signed-off-by: Yan Zhen <yanzhen@vivo.com>
-> ---
->  net/sunrpc/clnt.c                        | 2 +-
->  net/sunrpc/xprtrdma/svc_rdma_transport.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
-> index 09f29a95f2bc..8ee87311b348 100644
-> --- a/net/sunrpc/clnt.c
-> +++ b/net/sunrpc/clnt.c
-> @@ -603,7 +603,7 @@ struct rpc_clnt *rpc_create(struct rpc_create_args *a=
-rgs)
-> =20
->  	xprt =3D xprt_create_transport(&xprtargs);
->  	if (IS_ERR(xprt))
-> -		return (struct rpc_clnt *)xprt;
-> +		return ERR_CAST(xprt);
-> =20
->  	/*
->  	 * By default, kernel RPC client connects from a reserved port.
-> diff --git a/net/sunrpc/xprtrdma/svc_rdma_transport.c b/net/sunrpc/xprtrd=
-ma/svc_rdma_transport.c
-> index 581cc5ed7c0c..c3fbf0779d4a 100644
-> --- a/net/sunrpc/xprtrdma/svc_rdma_transport.c
-> +++ b/net/sunrpc/xprtrdma/svc_rdma_transport.c
-> @@ -369,7 +369,7 @@ static struct svc_xprt *svc_rdma_create(struct svc_se=
-rv *serv,
->  	listen_id =3D svc_rdma_create_listen_id(net, sa, cma_xprt);
->  	if (IS_ERR(listen_id)) {
->  		kfree(cma_xprt);
-> -		return (struct svc_xprt *)listen_id;
-> +		return ERR_CAST(listen_id);
->  	}
->  	cma_xprt->sc_cm_id =3D listen_id;
-> =20
+Hi Krzysztof,
 
-Reviewed-by: Jeff Layton <jlayton@kernel.org>
+On 11:50 Thu 22 Aug     , Krzysztof Kozlowski wrote:
+> On 22/08/2024 11:05, Andrea della Porta wrote:
+> > Hi Krzysztof,
+> > 
+> > On 15:42 Wed 21 Aug     , Krzysztof Kozlowski wrote:
+> >> On 20/08/2024 16:36, Andrea della Porta wrote:
+> >>> RP1 is an MFD chipset that acts as a south-bridge PCIe endpoint sporting
+> >>> a pletora of subdevices (i.e.  Ethernet, USB host controller, I2C, PWM, 
+> >>> etc.) whose registers are all reachable starting from an offset from the
+> >>> BAR address.  The main point here is that while the RP1 as an endpoint
+> >>> itself is discoverable via usual PCI enumeraiton, the devices it contains
+> >>> are not discoverable and must be declared e.g. via the devicetree.
+> >>>
+> >>> This patchset is an attempt to provide a minimum infrastructure to allow
+> >>> the RP1 chipset to be discovered and perpherals it contains to be added
+> >>> from a devictree overlay loaded during RP1 PCI endpoint enumeration.
+> >>> Followup patches should add support for the several peripherals contained
+> >>> in RP1.
+> >>>
+> >>> This work is based upon dowstream drivers code and the proposal from RH
+> >>> et al. (see [1] and [2]). A similar approach is also pursued in [3].
+> >>
+> >> Looking briefly at findings it seems this was not really tested by
+> >> automation and you expect reviewers to find issues which are pointed out
+> >> by tools. That's not nice approach. Reviewer's time is limited, while
+> >> tools do it for free. And the tools are free - you can use them without
+> >> any effort.
+> > 
+> > Sorry if I gave you that impression, but this is not obviously the case.
+> 
+> Just look at number of reports... so many sparse reports that I wonder
+> how it is not the case.
+> 
+> And many kbuild reports.
+
+Ack.
+
+> 
+> > I've spent quite a bit of time in trying to deliver a patchset that ease
+> > your and others work, at least to the best I can. In fact, I've used many
+> > of the checking facilities you mentioned before sending it, solving all
+> > of the reported issues, except the ones for which there are strong reasons
+> > to leave untouched, as explained below.
+> > 
+> >>
+> >> It does not look like you tested the DTS against bindings. Please run
+> >> `make dtbs_check W=1` (see
+> >> Documentation/devicetree/bindings/writing-schema.rst or
+> >> https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
+> >> for instructions).
+> > 
+> > #> make W=1 dt_binding_check DT_SCHEMA_FILES=raspberrypi,rp1-gpio.yaml
+> >    CHKDT   Documentation/devicetree/bindings
+> >    LINT    Documentation/devicetree/bindings
+> >    DTEX    Documentation/devicetree/bindings/pinctrl/raspberrypi,rp1-gpio.example.dts
+> >    DTC_CHK Documentation/devicetree/bindings/pinctrl/raspberrypi,rp1-gpio.example.dtb
+> > 
+> > #> make W=1 dt_binding_check DT_SCHEMA_FILES=raspberrypi,rp1-clocks.yaml
+> >    CHKDT   Documentation/devicetree/bindings
+> >    LINT    Documentation/devicetree/bindings
+> >    DTEX    Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.example.dts
+> >    DTC_CHK Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.example.dtb
+> > 
+> > I see no issues here, in case you've found something different, I kindly ask you to post
+> > the results.
+> > 
+> > #> make W=1 CHECK_DTBS=y broadcom/rp1.dtbo
+> >    DTC     arch/arm64/boot/dts/broadcom/rp1.dtbo
+> >    arch/arm64/boot/dts/broadcom/rp1.dtso:37.24-42.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/clk_xosc: missing or empty reg/ranges property
+> >    arch/arm64/boot/dts/broadcom/rp1.dtso:44.26-49.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/macb_pclk: missing or empty reg/ranges property
+> >    arch/arm64/boot/dts/broadcom/rp1.dtso:51.26-56.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/macb_hclk: missing or empty reg/ranges property
+> >    arch/arm64/boot/dts/broadcom/rp1.dtso:14.15-173.5: Warning (avoid_unnecessary_addr_size): /fragment@0/__overlay__: unnecessary #address-cells/#size-cells without "ranges", "dma-ranges" or child "reg" property 
+> > 
+> > I believe that These warnings are unavoidable, and stem from the fact that this
+> > is quite a peculiar setup (PCI endpoint which dynamically loads platform driver
+> > addressable via BAR).
+> > The missing reg/ranges in the threee clocks are due to the simple-bus of the
+> > containing node to which I believe they should belong: I did a test to place
+> 
+> This is not the place where they belong. non-MMIO nodes should not be
+> under simple-bus.
+
+Ack.
+
+> 
+> > those clocks in the same dtso under root or /clocks node but AFAIK it doesn't
+> > seems to work. I could move them in a separate dtso to be loaded before the main
+> 
+> Well... who instantiates them? If they are in top-level, then
+> CLK_OF_DECLARE which is not called at your point?
+> 
+> You must instantiate clocks different way, since they are not part of
+> "rp1". That's another bogus DT description... external oscilator is not
+> part of RP1.
+>
+
+Ok, I'll dive into that and see what I can come up with. Many thanks for
+this feedback.
+ 
+> 
+> > one but this is IMHO even more cumbersome than having a couple of warnings in
+> > CHECK_DTBS.
+> > Of course, if you have any suggestion on how to improve it I would be glad to
+> > discuss.
+> > About the last warning about the address/size-cells, if I drop those two lines
+> > in the _overlay_ node it generates even more warning, so again it's a "don't fix"
+> > one.
+> > 
+> >>
+> >> Please run standard kernel tools for static analysis, like coccinelle,
+> >> smatch and sparse, and fix reported warnings. Also please check for
+> >> warnings when building with W=1. Most of these commands (checks or W=1
+> >> build) can build specific targets, like some directory, to narrow the
+> >> scope to only your code. The code here looks like it needs a fix. Feel
+> >> free to get in touch if the warning is not clear.
+> > 
+> > I didn't run those static analyzers since I've preferred a more "manual" aproach
+> > by carfeully checking the code, but I agree that something can escape even the
+> > more carefully executed code inspection so I will add them to my arsenal from
+> > now on. Thanks for the heads up.
+> 
+> I don't care if you do not run static analyzers if you produce good
+> code. But if you produce bugs which could have been easily spotted with
+> sparser, than it is different thing.
+> 
+> Start running static checkers instead of asking reviewers to do that.
+
+Ack.
+
+> 
+> > 
+> >>
+> >> Please run scripts/checkpatch.pl and fix reported warnings. Then please
+> >> run `scripts/checkpatch.pl --strict` and (probably) fix more warnings.
+> >> Some warnings can be ignored, especially from --strict run, but the code
+> >> here looks like it needs a fix. Feel free to get in touch if the warning
+> >> is not clear.
+> >>
+> > 
+> > Again, most of checkpatch's complaints have been addressed, the remaining
+> > ones I deemed as not worth fixing, for example:>
+> > #> scripts/checkpatch.pl --strict --codespell tmp/*.patch
+> > 
+> > WARNING: please write a help paragraph that fully describes the config symbol
+> > #42: FILE: drivers/clk/Kconfig:91:
+> > +config COMMON_CLK_RP1
+> > +       tristate "Raspberry Pi RP1-based clock support"
+> > +       depends on PCI || COMPILE_TEST
+> > +       depends on COMMON_CLK
+> > +       help
+> > +         Enable common clock framework support for Raspberry Pi RP1.
+> > +         This mutli-function device has 3 main PLLs and several clock
+> > +         generators to drive the internal sub-peripherals.
+> > +
+> > 
+> > I don't understand this warning, the paragraph is there and is more or less similar
+> > to many in the same file that are already upstream. Checkpatch bug?
+> > 
+> > 
+> > CHECK: Alignment should match open parenthesis
+> > #1541: FILE: drivers/clk/clk-rp1.c:1470:
+> > +       if (WARN_ON_ONCE(clock_data->num_std_parents > AUX_SEL &&
+> > +           strcmp("-", clock_data->parents[AUX_SEL])))
+> > 
+> > This would have worsen the code readability.
+> > 
+> > 
+> > WARNING: ENOTSUPP is not a SUSV4 error code, prefer EOPNOTSUPP
+> > #673: FILE: drivers/pinctrl/pinctrl-rp1.c:600:
+> > +                               return -ENOTSUPP;
+> > 
+> > This I must investigate: I've already tried to fix it before sending the patchset
+> > but for some reason it wouldn't work, so I planned to fix it in the upcoming 
+> > releases.
+> > 
+> > 
+> > WARNING: externs should be avoided in .c files
+> > #331: FILE: drivers/misc/rp1/rp1-pci.c:58:
+> > +extern char __dtbo_rp1_pci_begin[];
+> > 
+> > True, but in this case we don't have a symbol that should be exported to other
+> > translation units, it just needs to be referenced inside the driver and
+> > consumed locally. Hence it would be better to place the extern in .c file.
+> > 
+> > 
+> > Apologies for a couple of other warnings that I could have seen in the first
+> > place, but honestly they don't seems to be a big deal (one typo and on over
+> > 100 chars comment, that will be fixed in next patch version). 
+> 
+> Again, judging by number of reports from checkers that is a big deal,
+> because it is your task to run the tools.
+
+Ack.
+
+Many thanks,
+Andrea
+
+> 
+> Best regards,
+> Krzysztof
+> 
 
