@@ -1,90 +1,60 @@
-Return-Path: <netdev+bounces-123287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 469B2964618
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:15:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D007964626
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78AB61C2455F
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:15:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 900A6B2104A
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5D161A7068;
-	Thu, 29 Aug 2024 13:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5861AD3F1;
+	Thu, 29 Aug 2024 13:16:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TlsbY6AQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FsuDMFNl"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17BC215CD62
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 13:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40CFA1A3BDC
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 13:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724937290; cv=none; b=m3gy177Fybiu5oQj9W6COR145u0gI5NNYZr2BBCIH7W1lEnI2qDqV+R8n9dx7BhcB0wr+G9ykzDyro0Xk7di+81dgo4md67+NU7yZPtF1hoO2MNmDR+hsqncs9HIWtuIJ4HB/JBD1kbnlioLF4bnTV1S+hv/RYai5jx2ixgvsWY=
+	t=1724937375; cv=none; b=neSfCJKvyjgmZlKGrDWaEa96MSaCzXuYTpv5KMFNaInL02RtuUbmSq0KNYSxe+EqZMByoKoGGelpLjHakHpvrUZ3fshrU043sd0lnK5SL2TbVPkBEIV+rQOyyXgA6/835x1ZJOX0YrFkzlM3/0OIiMRqWsh5E2ttDwmFV+hOCTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724937290; c=relaxed/simple;
-	bh=Jm+pmtdf4qP9lPF5z1JGJhcaEsEtzSEatYaWyXpSPDw=;
+	s=arc-20240116; t=1724937375; c=relaxed/simple;
+	bh=5JATlgRN7VJYG8kLdPZeG6TRdD+4mOdYAsrmMpjPq8g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gPOzUtWishWBTUKxx0TKGp+i6k713Dz2WeZrGE1GzDOuTTBX4T08GSYs0DCAgV5sXyQ3XSeT+AJPmrVQDDSHCPUyoE4QJyjX5DOvl4M6Vcm4X1HX0E9bHHNSTcJ4SMPEHNe+s0+AbmxBVwefwNbxPLHAaz1FFei0xvlvYt859E4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TlsbY6AQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724937288;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KMkwOi4JjN6JJkWoqwgZkqx+R20QEZgxqkFxgjlzSuM=;
-	b=TlsbY6AQF22oyqK6yRlm4Yj8WEJyKcB28J8ZDoPlgcmeSJQZSg6K7WPn8hbqLCkoqx35wD
-	O6Lvi/yG4l8jebJvLBnPil0E80pfBxlEzR7WmfTVsLgbTrCvp2TB7GhoSxbLwwcr2taFBM
-	l6+3deRgTc5khif1M7KEskYGpiUcb0g=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-100-ASAXHAG-OEKa8_ga3vZHwA-1; Thu, 29 Aug 2024 09:14:46 -0400
-X-MC-Unique: ASAXHAG-OEKa8_ga3vZHwA-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-44fe49fa389so8216231cf.1
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:14:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724937286; x=1725542086;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KMkwOi4JjN6JJkWoqwgZkqx+R20QEZgxqkFxgjlzSuM=;
-        b=widrydoB0/l1cToUlwlKfXTWv22gJU3/RVk7HFDnX4CZe/oscQp5Cc/HQnNZnj0WpV
-         JrGFPmiPwx9ZKDKBLN2eFe5NDL9YXWcAVlus7JEu3Sj9EqkqjhZf4M7ca+w2W5IP2/Jh
-         55WaYg68seLGWLv9oYCkCHSje3WLTNog9Dmn5S/EOJtza3s6A4lcSe8reU+kGuBqnLOl
-         n6o16RiF900Va+nuDJWg3kcqJmJLyp74m7ynCr27AvwhkQLuda9MJxixej3RnhV7qHAM
-         lGYK39tWFkuhJQ/l5xqOtahepEHvbW0BAelCAMZ2w9d8FVStnzgSIfouzatRX5eFt5YD
-         8oIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDkfZJ2YQSTGgQ7Wfksrotgxhw9IhotUthJhsKivy36+3Hk3rsXGaIYz1aSIjxCR8JZ3GY++s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzxRP3+2YXhuhIna76J0BzXOYVi2Mv4IXz0CY5JwICzrLq2A/h
-	pJ4iOSGFEnbqJlJuUkCWNYht2e+upKxdJYnnt6BLsdsSfIObMY742rIJNMkBrPTyN8YTWkfSGJF
-	TV8ayYMNZrNTxDJn55nXLkMeoMOjS9rSwqSYSjRatSENa9YX0iIP0OQ==
-X-Received: by 2002:a05:622a:418f:b0:456:45cd:db71 with SMTP id d75a77b69052e-4567f592c65mr35525081cf.21.1724937286484;
-        Thu, 29 Aug 2024 06:14:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFur2WCumVIV79Jh3TYo0EaOZHBpT13u9xP4uBg+9WfG5rJuXo7es8ZRNZVfgld+I/exrnwqg==
-X-Received: by 2002:a05:622a:418f:b0:456:45cd:db71 with SMTP id d75a77b69052e-4567f592c65mr35524161cf.21.1724937286065;
-        Thu, 29 Aug 2024 06:14:46 -0700 (PDT)
-Received: from x1gen2nano ([2600:1700:1ff0:d0e0::33])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45682cb02casm4742421cf.42.2024.08.29.06.14.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 06:14:45 -0700 (PDT)
-Date: Thu, 29 Aug 2024 08:14:43 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Dmitry Dolenko <d.dolenko@metrotek.ru>
-Cc: alexandre.torgue@foss.st.com, davem@davemloft.net, edumazet@google.com, 
-	joabreu@synopsys.com, kuba@kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	quic_abchauha@quicinc.com, quic_scheluve@quicinc.com, system@metrotek.ru
-Subject: Re: [PATCH RFC/RFT net-next] net: stmmac: drop the ethtool begin()
- callback
-Message-ID: <ibna42mzj4tk3kddnnzgosglumngupdwxnthkm7rkqrejbr5oy@7j4ey2gtl6zl>
-References: <20240429-stmmac-no-ethtool-begin-v1-1-04c629c1c142@redhat.com>
- <20240828143541.254436-1-d.dolenko@metrotek.ru>
+	 Content-Type:Content-Disposition:In-Reply-To; b=s3E4JZ4i8F78IpoIIAwRHrmPrndwJ4Xxp692HklsOs5P0SRrSfCxF2sGWdg9byr1cl0R3KHfF6ZBa1DaTseZcUQSGDEENEwi78cPDH22lJjeSm0mNS47mz6hUiT3xUon6+HY+TcGUccMk3lNie+PRgN9T10jOZ0Anu4CPCBjdwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FsuDMFNl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=f3WfsJc2npdMj0KqN/DmDSz7jIH8KI1FL8OzmEN05rc=; b=FsuDMFNlxSMBQs2dOR4jLQg2xu
+	Cr36mg4DXQDvDBaE1zFcKyfhJVPZPJ5sDVl0TKiXmEaT9Luvnpm/vQzw9xuVtzByUZ35YRFgv08aB
+	cIwWc4Lc/UrzorEyLT+cUzayA8CrrEokVxeSHx+f9OZfPOQTcOFAEqvF83hr1Vz5mPXg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sjf0V-0062Rg-CB; Thu, 29 Aug 2024 15:16:11 +0200
+Date: Thu, 29 Aug 2024 15:16:11 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH V5 net-next 06/11] net: hibmcge: Implement
+ .ndo_start_xmit function
+Message-ID: <7822930d-1331-4631-9d7e-bd37a40f44bd@lunn.ch>
+References: <20240827131455.2919051-1-shaojijie@huawei.com>
+ <20240827131455.2919051-7-shaojijie@huawei.com>
+ <20240828184120.07102a2f@kernel.org>
+ <df861206-0a7a-4744-98f6-6335303d29ef@huawei.com>
+ <83dce3bb-28c6-4021-a343-cff2410a463f@lunn.ch>
+ <f64c04a6-8c3d-46f5-a2dd-a9864de12169@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,32 +63,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240828143541.254436-1-d.dolenko@metrotek.ru>
+In-Reply-To: <f64c04a6-8c3d-46f5-a2dd-a9864de12169@huawei.com>
 
-On Wed, Aug 28, 2024 at 05:35:41PM GMT, Dmitry Dolenko wrote:
-> Are there any updates on this topic?
+On Thu, Aug 29, 2024 at 08:55:35PM +0800, Jijie Shao wrote:
 > 
-> We are faced with the fact that we can not read or change settings of
-> interface while it is down, and came up with the same solution for this
-> problem.
+> on 2024/8/29 11:02, Andrew Lunn wrote:
+> > On Thu, Aug 29, 2024 at 10:32:33AM +0800, Jijie Shao wrote:
+> > > on 2024/8/29 9:41, Jakub Kicinski wrote:
+> > > > On Tue, 27 Aug 2024 21:14:50 +0800 Jijie Shao wrote:
+> > > > > @@ -111,6 +135,14 @@ static int hbg_init(struct hbg_priv *priv)
+> > > > >    	if (ret)
+> > > > >    		return ret;
+> > > > > +	ret = hbg_txrx_init(priv);
+> > > > > +	if (ret)
+> > > > > +		return ret;
+> > > > You allocate buffers on the probe path?
+> > > > The queues and all the memory will be sitting allocated but unused if
+> > > > admin does ip link set dev $eth0 down?
+> > > The network port has only one queue and
+> > > the TX queue depth is 64, RX queue depth is 127.
+> > > so it doesn't take up much memory.
+> > > 
+> > > Also, I plan to add the self_test feature in a future patch.
+> > > If I don't allocate buffers on the probe path,
+> > > I won't be able to do a loopback test if the network port goes down unexpectedly.
+> > When you come to implement ethtool --set-ring, you will need to
+> > allocate and free the ring buffers outside of probe.
+> > 
+> > 	Andrew
 > 
-> I do not know if Reviewed-by and Tested-by are suitable for patch marked as
-> RFC but I will post mine in case it is acceptable here.
+> We discussed this internally, and now we have a problem that we can't solve:
 > 
-> Reviewed-by: Dmitry Dolenko <d.dolenko@metrotek.ru>
-> Tested-by: Dmitry Dolenko <d.dolenko@metrotek.ru>
+> After allocate ring buffers, the driver will writes the address to the hardware FIFO
+> for receiving packets.
 > 
+> However, FIFO does not have a separate interface to clear ring buffers address.
+> 
+> If ring buffers can be allocated and released on other paths,
+> the driver buffer address is inconsistent with the hardware buffer address.
+> As a result, packet receiving is abnormal. The fault is rectified only
+> after the buffers of a queue depth are used up and new buffers are allocated for.
 
-In my opinion the tags are welcomed.
+If the hardware is designed correctly, there should be away to tell
+the hardware to stop receiving packets. Often there is then a way to
+know it has actually stopped, and all in flight DMA transfers are
+complete. Otherwise, you can make a guess at how long the worse case
+DMA transfer takes, maybe a jumbo packet at 10Mbps, and simply sleep
+that long. It is then safe to allocate new ring buffers, swap the
+pointer, and then free the old.
 
-I had sort of forgotten about this until your reply, the use case I
-had was only to try and force out another bug, so it slipped my mind.
+You probably even have this code already in u-boot. You cannot jump
+into the kernel without first ensuring the device has stopped DMAing
+packets.
 
-Since both of us were bitten by this, and nobody has indicated it's a bad
-idea otherwise, I'll rebase and send v2 with your tags to try and get
-this merged.
+> Actually, the buffer will be released during FLR reset and are allocated again after reset.
+> In this case, the FIFO are cleared. Therefore, driver writes the ring buffer address
+> to the hardware again to ensure that the driver address is the same as the hardware address.
+> 
+> If we do an FLR every time we allocate ring buffers on other path, It is expensive.
 
-Thanks,
-Andrew
+It does not matter if it is expensive. This is not hot path. ethtool
+--set-ring is only going to be called once, maybe twice before the
+machine is shut down. So we generally don't care about the cost.
 
+	Andrew
 
