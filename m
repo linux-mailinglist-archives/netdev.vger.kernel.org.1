@@ -1,58 +1,73 @@
-Return-Path: <netdev+bounces-123007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EA939636F4
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:44:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1B8B9636F6
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:45:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D80C61F23E2B
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 00:44:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 089E5285F8A
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 00:45:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A5FB657;
-	Thu, 29 Aug 2024 00:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE60B10A24;
+	Thu, 29 Aug 2024 00:45:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i0dn0C3C"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="C+V61WXw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3B3C125
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 00:44:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60D91849;
+	Thu, 29 Aug 2024 00:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724892267; cv=none; b=syeZQA5flFuAjhBllAEcN1CRzTWkK14+MtVAr+GpDTOp2XUg9eJAP7YLVOFPyjZjIdhnTdo7BJrm5X+P+pbmL3a5xUSPV/rQGNCG+twFG/fr4A7DB18QJXCrWJoURbu2zzCOCofFQBowzk/G5TOfKp26xNU/kfgte/MNj3MjmBM=
+	t=1724892342; cv=none; b=qouY7AV3g+Naa0Pq1u9ZBXymOJz/9OgpBHIhQvd43/VxMmaSe1iuKYrtTqB9T1rEjR2qLg03wx2Ll+FkiOXdVb8eKqgrkoApHcEXsa+JfuyuNoNNUM/Dbkf8WaUFLX5aodmu7bfD84LtCl8hviSOu39fiRl355ITJZLhB5MIq+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724892267; c=relaxed/simple;
-	bh=uuskT8JDoR7x3ExsPnXTMWMtiIgikoPOC9E/6ib2V9A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T0ife0z4HzeZHJEabYi/1Qjv5mQtqEzS1RjKf16dm8CaziCZll9df/+55T23Oj21IM9m6/t2rQrGCuK5qn1E6J9Ztqwp7NCOhJNxkuqhXN7XzMPzVGhi4cWgx636BpoRZWpiUbp0Dj93PBtOYTtMBJdCBFlYIMc6dk88h9KoVrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i0dn0C3C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6DE1C4CEC2;
-	Thu, 29 Aug 2024 00:44:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724892265;
-	bh=uuskT8JDoR7x3ExsPnXTMWMtiIgikoPOC9E/6ib2V9A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i0dn0C3Chy/kqaYUjQuXEMCLYM4ciG/h2QD+PB13JQak876vKzUl9wHamZ9NH0aK8
-	 rMFohPP8GmbxAQpn8V++ASMbNKA2uLYv52yUYZeeCbQ+9pibZ1Qo8mu5S0G2M/1lpB
-	 7jbO99IBYcUvCD8rHNx51wZsGRD7z2gjvkj5jjRh21XhCzVDnyPH3M+OCoIvEXdwEN
-	 EO3T2pV93PaDxdsL4Ttc3JE1jP4cVV8GCmM6PFhOqR8+BGXTLdPgFR8MIo+/TSqZ6V
-	 qzELZfzSXq35Jh44tm42JuA9k/5Tq/U9QunO/+MeTiC9c6L2ybk1lhDma1r02ivBG9
-	 lGcrbWYll4Ifw==
-Date: Wed, 28 Aug 2024 17:44:24 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: <edward.cree@amd.com>, <linux-net-drivers@amd.com>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>, Edward
- Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/6] sfc: implement basic per-queue stats
-Message-ID: <20240828174424.69a07137@kernel.org>
-In-Reply-To: <d521cec8-a112-48b1-8368-f7ff406502fb@intel.com>
-References: <cover.1724852597.git.ecree.xilinx@gmail.com>
-	<54cf35ea0d5c0ec46e0717a6181daaa2419ca91e.1724852597.git.ecree.xilinx@gmail.com>
-	<d521cec8-a112-48b1-8368-f7ff406502fb@intel.com>
+	s=arc-20240116; t=1724892342; c=relaxed/simple;
+	bh=vCQMUcJy/hZ3Zoy/YP0clLZx7pwb794hb6ScNapZUp4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eiu+EEST6Xg5UpJ/kMt3walsnbk1XHlT/YKpNVn7F8BiBa+ov4AglesrgM2Nxsyi8OB7/P72osvdKYiw1jHnno2PdC6qkpihKQbh8FgAv+EKThTuvVdzc8sfMWxkMOf5TfLjpOnw56PSei0+xDbrirKUIIm5uM8WdZEWKy19Yfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=C+V61WXw; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 9379087F3B;
+	Thu, 29 Aug 2024 02:45:37 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1724892338;
+	bh=WA0rT1dfe51e0ay6zmz8IO2cS0uHxuese6NkJJ3tMwQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=C+V61WXw0SU1jXTO5kaTEVtww+neuUAQb2giWpgKaRjfZuEOOlodlLOLdkVXQQFqV
+	 qUjsjMeyfK4c1No7cqA1QY3Zpq9uoEFCD/Jj6yLaqX0pkOAXtx2YDVXpmoBMUt8N1j
+	 BpqwreFjD9zLrw5rjVhHEeheQuJfqGvcukxgQ81X1LdK6eORrREd0jJS+0iY0gTQG9
+	 sY9VuTaylMjnq9HGc/EjEHlR+ZnfBJfm1XUngZze6KWnQaMwFDQuiNxosF0ZxK9Sni
+	 df3lLCmto62a1slq0MoPJOqIMmei45jsd63sq/ZV7yWQX77wn+4IS17afPaFuUBahA
+	 M9GW+Ub4aza7A==
+From: Marek Vasut <marex@denx.de>
+To: linux-wireless@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Adham Abozaeid <adham.abozaeid@microchip.com>,
+	Ajay Singh <ajay.kathat@microchip.com>,
+	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v4 1/5] dt-bindings: wireless: wilc1000: Document WILC3000 compatible string
+Date: Thu, 29 Aug 2024 02:44:59 +0200
+Message-ID: <20240829004510.178016-1-marex@denx.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,23 +75,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Wed, 28 Aug 2024 15:20:53 -0700 Jacob Keller wrote:
-> On 8/28/2024 6:45 AM, edward.cree@amd.com wrote:
-> > From: Edward Cree <ecree.xilinx@gmail.com>
-> >=20
-> > Just RX and TX packet counts for now.  We do not have per-queue
-> >  byte counts, which causes us to fail stats.pkt_byte_sum selftest
-> >  with "Drivers should always report basic keys" error. =20
->=20
-> Seems like the self tests here should be fixed for this?
+Document compatible string for the WILC3000 chip. The chip is similar
+to WILC1000, except that the register layout is slightly different and
+it does not support WPA3/SAE.
 
-FWIW - I just didn't take lack of byte counters into account :)
-It's probably fine to remove the requirement, imbalance (which
-is the main use for the per queue stats) is better tacked using
-packets, anyway.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Adham Abozaeid <adham.abozaeid@microchip.com>
+Cc: Ajay Singh <ajay.kathat@microchip.com>
+Cc: Alexis Lothoré <alexis.lothore@bootlin.com>
+Cc: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Conor Dooley <conor+dt@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Kalle Valo <kvalo@kernel.org>
+Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>
+Cc: Marek Vasut <marex@denx.de>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: devicetree@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org
+---
+V2: - Use WILC1000 as fallback compatible string for WILC3000
+V3: - Swap the wilc1000/wilc3000 compatible order
+V4: - Add RB from Krzysztof
+---
+ .../bindings/net/wireless/microchip,wilc1000.yaml           | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Not a requirement from my perspective to merge the series tho =F0=9F=A4=B7=
-=EF=B8=8F
+diff --git a/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml b/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
+index 2460ccc082371..5d40f22765bb6 100644
+--- a/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
++++ b/Documentation/devicetree/bindings/net/wireless/microchip,wilc1000.yaml
+@@ -16,7 +16,11 @@ description:
+ 
+ properties:
+   compatible:
+-    const: microchip,wilc1000
++    oneOf:
++      - items:
++          - const: microchip,wilc3000
++          - const: microchip,wilc1000
++      - const: microchip,wilc1000
+ 
+   reg: true
+ 
+-- 
+2.45.2
+
 
