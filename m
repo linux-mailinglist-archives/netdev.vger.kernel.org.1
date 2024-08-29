@@ -1,135 +1,175 @@
-Return-Path: <netdev+bounces-123366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E4549649FD
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:28:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2547964A04
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 17:28:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D85B282133
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:28:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 599A11F23851
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:28:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764641B1D72;
-	Thu, 29 Aug 2024 15:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0141B3734;
+	Thu, 29 Aug 2024 15:28:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="ItGVR7pC"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="pkoYZ1Wq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4851AE854
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 15:27:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7221B0117
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 15:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724945276; cv=none; b=QpbS0kW4R74o909haebyOB3P8hOz442d0vw8y39OOL+3ZZOOHYtqbp5lUfmvT3rOpAmQB9VnME9hdgEEav0u1Uw49hgXhngBAY/dGGKp8dwZ66yy1NX8RFAbyLDDUGRic9T4M4Ufyo1LWdcxhvzMAtUZsf2cWwBQZo2LWVzCr8c=
+	t=1724945288; cv=none; b=NWU/iWayxNgeWVTeEi9vpbmyE9lSe4WxyMhvJdD+fdFAijMnWUPnPwuiQypTHAXrdH3etbhsopdFimVrFH8fKFNuIvUWCtLFEXYOkqzwt9ntMZ+TBVHUW5WyKomumpemR9j+bdfs5EWWggAG8o+nZVYi6oS2khlSnORQLt0rigo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724945276; c=relaxed/simple;
-	bh=tRokqt+GOmx9sDn8JqOLZjGmYY7taAR7cm+0h+E3h+M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rwo/PncGtu0qqE1lSyrY2N1oLGL6O4UKwyZSTBiyxK1U++QTX8aFmuIPr8zZXpaqLTJFDSojd4Pmsa2Kbb9S2IOXKeuYyuOQjXOCPOK6iSktbEMPdvAvonMv2j3jt4H4Z4UiW+5u50GHdCus4M8yYJSCCoRd02orFO/oBXb3c+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=ItGVR7pC; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a8696e9bd24so103691966b.0
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 08:27:54 -0700 (PDT)
+	s=arc-20240116; t=1724945288; c=relaxed/simple;
+	bh=Lka1zm7XmcUB5solzQAlYgxWdcDi74lEnAD6wVdlaB0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YNLrpsg8ePRIlDxBCSiR9VngM4lRB2+QVWK3hdt1AYqC98yRKibSdxvWW3nCQ84zJH7riYYEPJcp9m53hjIs4ba1VfMzk8FwX9NKLs21xw+KZwR2bkcxCw2djRLZaWGDLedmBq9qJFNrWMasIhJpIUwkPd7KpVNG2jq4mHfN+j0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=pkoYZ1Wq; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5beb6ea9ed6so902946a12.1
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 08:28:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1724945273; x=1725550073; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/2jct9mt2CfCfjn41Js5/oCqYM+gziBIReSZS4ygZQg=;
-        b=ItGVR7pCBfCPrIdhzDjYAe6unXRhn5balCFeFVqhfXAIsBh6sdVYykSOwK3QsYmFyx
-         3pZoOrvELjniMWD7PECil29EfM1fA8hc/eEU0NoKV1mZHURNpErvm3I5em/yW5JZ1tjb
-         soE3Vq8TnAuOvwj7KJsXteeXkxeD8UdnAjozp/Gjf0+KortgFDYSk4agXu0u5wATVzUJ
-         aPu2btp00wVJz+oj9eZ4ujrQRJgTrLIW6Vzn7miRBoWuHZSHvtKRS2K90wAdpHLjkE7D
-         RzFdmQ+OmSSyDYkFlnN1qSjDw7iY+53PzMCa0cSMpgRWs7jD4knWac6nrOzUz2nM1U66
-         ZT1A==
+        d=fastly.com; s=google; t=1724945285; x=1725550085; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6k+Lbp/vKSlk4oMmUj+Nso6RmewTr08uCZE3vQ6ntA8=;
+        b=pkoYZ1Wq3kj2PFb0ePlgGTh915DvS0Yya9qBMxgft8N9SVNfy2ngDOB3iIN8DKreJI
+         T1bG1/PhxugXBBiF82U/qZjpiVT23dR+4tAlCD04HIxb96+vPurDrK9rMW2jg49stK1m
+         5qfufGD0S0OA7egXf91hJmVRQW8dollnc0Nyw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724945273; x=1725550073;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/2jct9mt2CfCfjn41Js5/oCqYM+gziBIReSZS4ygZQg=;
-        b=GAW4YGRefSJmqmlgWKgsUvO+UjZ+rer6SXiT6PKbXRpwKoOYSs8n9QWrvgSUSlFbkV
-         lF78pt+CblyaaATvEKxBv+Jqda6uyryc9AE57xQiKhN2qMcW5z4KYDefaYgPDQTtdhfY
-         5oJLQd7K5qFnvTg67Sk3CJEOb+luOtIw+WnS7dRLlwkl0H3ZP4z5q1faIOSvsq+F61Lk
-         ThoggGHucCM3NSomQx50SnZJ6p+uxrZ5WTo92/eRGAN9XoXRVDUJ6vCgSeawJE8IF80j
-         hnsX2nXFHUP8z6+ARypFqg4e0/ZL9oCI2w3v2W02od7W+BmJ2VpaVtp/8fwVnuUsauH/
-         Okfw==
-X-Gm-Message-State: AOJu0YwepNpig1T2KGIjFnmx+bieFCMaCaGKvQSew9KX826l0C0Hn4Nu
-	FhNggqGIAJNEP+GdMjfiKpa3UXVVYiKpZeaXjPJOp5FgPZMmzX1dPrThJKzgsdY=
-X-Google-Smtp-Source: AGHT+IG6CE4bRBHCFzW4p/RUhNwgsV0732Dtt34yk/Rn99V9FPbCrXpW+wHJ7f/oZsADu/vxvtc5Mg==
-X-Received: by 2002:a17:907:9485:b0:a86:a41c:29b with SMTP id a640c23a62f3a-a897f78cc4emr285884366b.8.1724945272288;
-        Thu, 29 Aug 2024 08:27:52 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a89891963c1sm90381166b.103.2024.08.29.08.27.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Aug 2024 08:27:51 -0700 (PDT)
-Message-ID: <5347c7b2-cbd3-4fc2-9794-6dcad4b9aae7@blackwall.org>
-Date: Thu, 29 Aug 2024 18:27:50 +0300
+        d=1e100.net; s=20230601; t=1724945285; x=1725550085;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6k+Lbp/vKSlk4oMmUj+Nso6RmewTr08uCZE3vQ6ntA8=;
+        b=Dq4SoIFUBKkv0nrld6a1bYJ+aLSM23WJ9LH2e6hVPNbUIj+Ohc3d/WVgEitbb5VSL2
+         MJElikH0vm3bbXxGBNIOy68aE/F1MPx9O+Pb9GTKebGNyjzGLpMY+QJ1azl5xWmfwZDB
+         EAh1bWqlodcPfa9zyMENlxaK3t5tKWF5Y0xI8KXaGu5lHtqH5GvTrYzwibIhsHG01Z1O
+         WfrMLPIDOwJe1SNmc/5fIK/z89JF4Ttxj1HhszafmpZEfajn2rHVMZogQTy6L/hA/v9D
+         AAurgc8LtgFQfj1eCbiCnGjdwozcr6ig5dA2tidba55d1qXXU5g2E8Iy5FryqSl9Dput
+         F75g==
+X-Gm-Message-State: AOJu0Ywxp4/MMDRsIUdecLz7IGe/plBJeeNwEhL+LAhwiBExA8W40SIJ
+	1UYztzdaWnJjstpLVFq1+VCTyZBpLZbWEdtgW7vGGxt2boJOEcDgb3SFEZay2vc=
+X-Google-Smtp-Source: AGHT+IGb3JIMQyWbOM4dnnyOp1EW2lUPeYUZ2LE2Fn5Y8fixva/Ya5HAMfpZPdTllAZGR3YEgps7qw==
+X-Received: by 2002:a05:6402:3584:b0:5be:df7a:14fd with SMTP id 4fb4d7f45d1cf-5c21ed41d85mr2980037a12.9.1724945284582;
+        Thu, 29 Aug 2024 08:28:04 -0700 (PDT)
+Received: from LQ3V64L9R2 ([80.208.222.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989223268sm90211566b.218.2024.08.29.08.28.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 08:28:04 -0700 (PDT)
+Date: Thu, 29 Aug 2024 16:28:00 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, bjorn@rivosinc.com,
+	hch@infradead.org, willy@infradead.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	kuba@kernel.org, Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Breno Leitao <leitao@debian.org>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 3/5] net: napi: Make gro_flush_timeout per-NAPI
+Message-ID: <ZtCTgEEgcL3XqQcO@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	sdf@fomichev.me, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com, kuba@kernel.org,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Breno Leitao <leitao@debian.org>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20240829131214.169977-1-jdamato@fastly.com>
+ <20240829131214.169977-4-jdamato@fastly.com>
+ <CANn89iKUqF5bO_Ca+qrfO_gsfWmutpzFL-ph5mQd86_2asW9dg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] docs: netdev: document guidance on cleanup.h
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew@lunn.ch, corbet@lwn.net, linux-doc@vger.kernel.org
-References: <20240829152025.3203577-1-kuba@kernel.org>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240829152025.3203577-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iKUqF5bO_Ca+qrfO_gsfWmutpzFL-ph5mQd86_2asW9dg@mail.gmail.com>
 
-On 29/08/2024 18:20, Jakub Kicinski wrote:
-> Document what was discussed multiple times on list and various
-> virtual / in-person conversations. guard() being okay in functions
-> <= 20 LoC is my own invention. If the function is trivial it should
-> be fine, but feel free to disagree :)
+On Thu, Aug 29, 2024 at 03:48:05PM +0200, Eric Dumazet wrote:
+> On Thu, Aug 29, 2024 at 3:13 PM Joe Damato <jdamato@fastly.com> wrote:
+> >
+> > Allow per-NAPI gro_flush_timeout setting.
+> >
+> > The existing sysfs parameter is respected; writes to sysfs will write to
+> > all NAPI structs for the device and the net_device gro_flush_timeout
+> > field.  Reads from sysfs will read from the net_device field.
+> >
+> > The ability to set gro_flush_timeout on specific NAPI instances will be
+> > added in a later commit, via netdev-genl.
+> >
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > Reviewed-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> > Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> > ---
+> >  include/linux/netdevice.h | 26 ++++++++++++++++++++++++++
+> >  net/core/dev.c            | 32 ++++++++++++++++++++++++++++----
+> >  net/core/net-sysfs.c      |  2 +-
+> >  3 files changed, 55 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > index 7d53380da4c0..d00024d9f857 100644
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> > @@ -372,6 +372,7 @@ struct napi_struct {
+> >         int                     rx_count; /* length of rx_list */
+> >         unsigned int            napi_id;
+> >         int                     defer_hard_irqs;
+> > +       unsigned long           gro_flush_timeout;
+> >         struct hrtimer          timer;
+> >         struct task_struct      *thread;
+> >         /* control-path-only fields follow */
+> > @@ -557,6 +558,31 @@ void napi_set_defer_hard_irqs(struct napi_struct *n, int defer);
+> >   */
+> >  void netdev_set_defer_hard_irqs(struct net_device *netdev, int defer);
+> >
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: andrew@lunn.ch
-> CC: corbet@lwn.net
-> CC: linux-doc@vger.kernel.org
-> ---
->  Documentation/process/maintainer-netdev.rst | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
+> Same remark :  dev->gro_flush_timeout is no longer read in the fast path.
 > 
-> diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-> index fe8616397d63..ccd6c96a169b 100644
-> --- a/Documentation/process/maintainer-netdev.rst
-> +++ b/Documentation/process/maintainer-netdev.rst
-> @@ -392,6 +392,22 @@ When working in existing code which uses nonstandard formatting make
->  your code follow the most recent guidelines, so that eventually all code
->  in the domain of netdev is in the preferred format.
->  
-> +Using device-managed and cleanup.h constructs
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +Netdev remains skeptical about promises of all "auto-cleanup" APIs,
-> +including even ``devm_`` helpers, historically. They are not the preferred
-> +style of implementation, merely an acceptable one.
-> +
-> +Use of ``guard()`` is discouraged within any function longer than 20 lines,
-> +``scoped_guard()`` is considered more readable. Using normal lock/unlock is
-> +still (weakly) preferred.
-> +
-> +Low level cleanup constructs (such as ``__free()``) can be used when building
-> +APIs and helpers, especially scoped interators. However, direct use of
-> +``__free()`` within networking core and drivers is discouraged.
-> +Similar guidance applies to declaring variables mid-function.
-> +
->  Resending after review
->  ~~~~~~~~~~~~~~~~~~~~~~
->  
+> Please move gro_flush_timeout out of net_device_read_txrx and update
+> Documentation/networking/net_cachelines/net_device.rst
 
-Definitely and strongly agree.
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Is there some tooling I should use to generate this file?
 
+I am asking because it seems like the file is missing two fields in
+net_device at the end of the struct:
+
+struct hlist_head          page_pools;
+struct dim_irq_moder *     irq_moder;
+
+Both of which seem to have been added just before and long after
+(respectively) commit 14006f1d8fa2 ("Documentations: Analyze heavily
+used Networking related structs").
+
+If this is a bug, I can submit one patch (with two fixes tags) which
+adds both fields to the file?
+
+- Joe
 
