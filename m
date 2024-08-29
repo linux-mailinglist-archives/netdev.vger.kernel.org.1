@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-123486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40BE29650B2
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 22:23:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD7896515D
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 23:06:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C16141F22C51
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:23:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3438BB20E34
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 21:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8101B78F6;
-	Thu, 29 Aug 2024 20:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1747918A958;
+	Thu, 29 Aug 2024 21:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="gCFniR7/"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="nET9SDcH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx23lb.world4you.com (mx23lb.world4you.com [81.19.149.133])
+Received: from mx08lb.world4you.com (mx08lb.world4you.com [81.19.149.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BC9335C0
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 20:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350521662F1;
+	Thu, 29 Aug 2024 21:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724962996; cv=none; b=uxSZM497wufPGHTJWl6x3LCP8yhrzRj647HMKXUKORwRBzMAjB5hq9QhIU0Lx6ncnAHjXi9AEuTHls+I+eshdu73kfARo7jiwo+lgkktMvw+kNbxZXf1f2DukdCiLp8QN57Hm8p5XwKdE08i4okxtH/uH4gXX53jzZffCL7fWG8=
+	t=1724965552; cv=none; b=T5ysPaLL6qjcg+Y9U/RfVUKedcOHl+vhVvfNmXK9Tfalg4ylBwlQ/7HiV+IDe0nb4ky7jRfvkhjGs5LR5sN/9h1ZP1ErP+5ZkZMBMHTXqhd0p97i5aO0+jDxgUeBVjVARYskoC3a+nvgw+4adkYc5g8kDF1N8MYebb/5feEu/8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724962996; c=relaxed/simple;
-	bh=a3vlx9TRyhHepjsX6RoGRJ/jeje7h1ocoKy+EYiiELw=;
+	s=arc-20240116; t=1724965552; c=relaxed/simple;
+	bh=696BIpkw6qSh37ys61ph+L8lAJ+SLZxIyuKa5FXpAKY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dL1jd6CzDHiz2HzodKxh4QtOzaWZoAScrYqkREwJPfduwEi4jh4eRenKEM/UJRvCEkKBhaAOIO+OsxfRLAIUUd6OiI1RA6Y3cImnxTyjyn24b8lJn/ZRb9PuMdYwzkR5Cx4azZ5INslNM7QWpOkSMPpIhLtTttZ9HiPJ6o2jbYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=gCFniR7/; arc=none smtp.client-ip=81.19.149.133
+	 In-Reply-To:Content-Type; b=lr/59mjO5+A9ZPgXQvGbntKhtrEsqi8ZRSBvA9mgmeW/n1nrVTo0tJe6pYXQ9firyouh7mtGVWyaTLfCWQu9YdqOgjscU2jzSzBvyzBAy5LqnB2mCjeN8aKt7zfwa2VImk0VHOEq3vyW6mDpJKUYHG8VQrHAwwTmmf35ZeyV7Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=nET9SDcH; arc=none smtp.client-ip=81.19.149.118
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,17 +37,17 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=LT0BIIlDnb+3dvng+7tLkI+8CF4K0clugWJMO7uQ8cI=; b=gCFniR7/qX7MBpoSc7XW9Cg5Vr
-	QEimjmRPSvBnxFHCLlNamZMLqHVB4vTlGxxQNY7VlDUCDJXEX0WC3fK2eIg0cnt6BNLgcfCMtqhkQ
-	bg5fx9b+SN8fWDyv6gM6AYuOF3poOBDzpBRizU4osgidW3aO9MACcrmWnbjSIMOj6mII=;
+	bh=lyDPgUZOhSh56bBL5knVf1Gg5mPzltrEGUQa4C517M4=; b=nET9SDcHx8bVspaLr9Dm7IuY4I
+	erPimdqwAz47xqqD8ZJj7A/D7Qeb9dTvvdhuDbVE0cKmf85TEdgFf2JmMG7o5mzkIANzM8dtbiZHN
+	tZIf1N+r9PXMmB62XyU38Yq0j1N5tiOKTEiT0mJ4Mh/3eSMvhwyZoq8SL89DBN1PhKFE=;
 Received: from [88.117.52.244] (helo=[10.0.0.160])
-	by mx23lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	by mx08lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96.2)
 	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1sjkhM-0001n3-0j;
-	Thu, 29 Aug 2024 21:20:48 +0200
-Message-ID: <b242917f-39d9-41df-9e65-ae648ea9c731@engleder-embedded.com>
-Date: Thu, 29 Aug 2024 21:20:24 +0200
+	id 1sjlDu-0008SF-0A;
+	Thu, 29 Aug 2024 21:54:26 +0200
+Message-ID: <d73d45af-e76e-4e87-8df1-0ed71e823abc@engleder-embedded.com>
+Date: Thu, 29 Aug 2024 21:54:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,124 +55,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: Remove setting of RX software timestamp
- from drivers
-To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
- Andy Gospodarek <andy@greyhouse.net>, Marc Kleine-Budde
- <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Sunil Goutham <sgoutham@marvell.com>,
- Potnuri Bharat Teja <bharat@chelsio.com>,
- Christian Benvenuti <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- Dimitris Michailidis <dmichail@fungible.com>,
- Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, Jijie Shao <shaojijie@huawei.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Marcin Wojtas <marcin.s.wojtas@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Geetha sowjanya <gakula@marvell.com>,
- Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
- Bryan Whitehead <bryan.whitehead@microchip.com>,
- UNGLinuxDriver@microchip.com, Horatiu Vultur <horatiu.vultur@microchip.com>,
- Lars Povlsen <lars.povlsen@microchip.com>,
- Steen Hegelund <Steen.Hegelund@microchip.com>,
- Daniel Machon <daniel.machon@microchip.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Shannon Nelson <shannon.nelson@amd.com>,
- Brett Creeley <brett.creeley@amd.com>, Sergey Shtylyov <s.shtylyov@omp.ru>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
- Edward Cree <ecree.xilinx@gmail.com>,
- Martin Habets <habetsm.xilinx@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>,
- MD Danish Anwar <danishanwar@ti.com>, Linus Walleij <linusw@kernel.org>,
- Imre Kaloz <kaloz@openwrt.org>, Richard Cochran <richardcochran@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Carolina Jubran <cjubran@nvidia.com>,
- Rahul Rameshbabu <rrameshbabu@nvidia.com>
-References: <20240829144253.122215-1-gal@nvidia.com>
- <20240829144253.122215-3-gal@nvidia.com>
+Subject: Re: [PATCH net-next] net: mana: Improve mana_set_channels() for low
+ mem conditions
 Content-Language: en-US
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org
+Cc: "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Long Li <longli@microsoft.com>,
+ Simon Horman <horms@kernel.org>, Konstantin Taranov
+ <kotaranov@microsoft.com>,
+ Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+ Erick Archer <erick.archer@outlook.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>, Ahmed Zaki <ahmed.zaki@intel.com>,
+ Colin Ian King <colin.i.king@gmail.com>,
+ Shradha Gupta <shradhagupta@microsoft.com>
+References: <1724941006-2500-1-git-send-email-shradhagupta@linux.microsoft.com>
 From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <20240829144253.122215-3-gal@nvidia.com>
+In-Reply-To: <1724941006-2500-1-git-send-email-shradhagupta@linux.microsoft.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-AV-Do-Run: Yes
 
-On 29.08.24 16:42, Gal Pressman wrote:
-> The responsibility for reporting of RX software timestamp has moved to
-> the core layer (see __ethtool_get_ts_info()), remove usage from the
-> device drivers.
+On 29.08.24 16:16, Shradha Gupta wrote:
+> The mana_set_channels() function requires detaching the mana
+> driver and reattaching it with changed channel values.
+> During this operation if the system is low on memory, the reattach
+> might fail, causing the network device being down.
+> To avoid this we pre-allocate buffers at the beginning of set operation,
+> to prevent complete network loss
 > 
-> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
 > ---
->   drivers/net/bonding/bond_main.c               |  3 ---
->   drivers/net/can/dev/dev.c                     |  3 ---
->   drivers/net/can/peak_canfd/peak_canfd.c       |  3 ---
->   drivers/net/can/usb/peak_usb/pcan_usb_core.c  |  3 ---
->   drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c  |  4 ----
->   .../ethernet/broadcom/bnx2x/bnx2x_ethtool.c   |  4 ----
->   .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  5 +----
->   drivers/net/ethernet/broadcom/tg3.c           |  6 +-----
->   drivers/net/ethernet/cadence/macb_main.c      |  5 ++---
->   .../ethernet/cavium/liquidio/lio_ethtool.c    | 16 +++++++--------
->   .../ethernet/cavium/thunder/nicvf_ethtool.c   |  2 --
->   .../ethernet/chelsio/cxgb4/cxgb4_ethtool.c    | 11 +++-------
->   .../net/ethernet/cisco/enic/enic_ethtool.c    |  4 +---
->   drivers/net/ethernet/engleder/tsnep_ethtool.c |  4 ----
->   .../ethernet/freescale/enetc/enetc_ethtool.c  | 10 ++--------
->   drivers/net/ethernet/freescale/fec_main.c     |  4 ----
->   .../net/ethernet/freescale/gianfar_ethtool.c  | 10 ++--------
->   .../ethernet/fungible/funeth/funeth_ethtool.c |  5 +----
->   .../hisilicon/hns3/hns3pf/hclge_ptp.c         |  4 ----
->   .../net/ethernet/intel/i40e/i40e_ethtool.c    |  4 ----
->   drivers/net/ethernet/intel/ice/ice_ethtool.c  |  2 --
->   drivers/net/ethernet/intel/igb/igb_ethtool.c  |  8 +-------
->   drivers/net/ethernet/intel/igc/igc_ethtool.c  |  4 ----
->   .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |  4 ----
->   .../net/ethernet/marvell/mvpp2/mvpp2_main.c   |  2 --
->   .../marvell/octeontx2/nic/otx2_ethtool.c      |  2 --
->   .../net/ethernet/mellanox/mlxsw/spectrum.c    |  6 ++++++
->   .../ethernet/mellanox/mlxsw/spectrum_ptp.h    | 20 -------------------
->   .../net/ethernet/microchip/lan743x_ethtool.c  |  4 ----
->   .../microchip/lan966x/lan966x_ethtool.c       | 11 ++++------
->   .../microchip/sparx5/sparx5_ethtool.c         | 11 ++++------
->   drivers/net/ethernet/mscc/ocelot_ptp.c        | 12 ++++-------
->   .../ethernet/pensando/ionic/ionic_ethtool.c   |  2 --
->   drivers/net/ethernet/qlogic/qede/qede_ptp.c   |  9 +--------
->   drivers/net/ethernet/renesas/ravb_main.c      |  4 ++--
->   drivers/net/ethernet/renesas/rswitch.c        |  2 --
->   drivers/net/ethernet/renesas/rtsn.c           |  2 --
->   drivers/net/ethernet/sfc/ethtool.c            |  5 -----
->   drivers/net/ethernet/sfc/siena/ethtool.c      |  5 -----
->   .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  4 ++--
->   drivers/net/ethernet/ti/am65-cpsw-ethtool.c   |  2 --
->   drivers/net/ethernet/ti/cpsw_ethtool.c        |  7 +------
->   drivers/net/ethernet/ti/icssg/icssg_ethtool.c |  2 --
->   drivers/net/ethernet/ti/netcp_ethss.c         |  7 +------
->   drivers/net/ethernet/xscale/ixp4xx_eth.c      |  4 +---
->   drivers/ptp/ptp_ines.c                        |  4 ----
->   46 files changed, 47 insertions(+), 208 deletions(-)
+>   .../ethernet/microsoft/mana/mana_ethtool.c    | 28 +++++++++++--------
+>   1 file changed, 16 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> index d6a35fbda447..5077493fdfde 100644
+> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> @@ -345,27 +345,31 @@ static int mana_set_channels(struct net_device *ndev,
+>   	struct mana_port_context *apc = netdev_priv(ndev);
+>   	unsigned int new_count = channels->combined_count;
+>   	unsigned int old_count = apc->num_queues;
+> -	int err, err2;
+> +	int err;
+> +
+> +	apc->num_queues = new_count;
+> +	err = mana_pre_alloc_rxbufs(apc, ndev->mtu);
+> +	apc->num_queues = old_count;
 
-Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com> # for 
-drivers/net/ethernet/engleder
+Are you sure that temporary changing num_queues has no side effects on
+other num_queues users like mana_chn_setxdp()?
 
-Thanks,
 Gerhard
 
