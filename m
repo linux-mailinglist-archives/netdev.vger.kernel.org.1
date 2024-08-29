@@ -1,227 +1,124 @@
-Return-Path: <netdev+bounces-123106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A84C963B38
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:23:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D441963B82
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:28:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F9011C22312
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 06:23:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CF141F24FD2
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 06:28:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 706DA14C59C;
-	Thu, 29 Aug 2024 06:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2293B1547D5;
+	Thu, 29 Aug 2024 06:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="JhvuKdak"
+	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="yKEVa7u+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA3B42A99
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99575152165;
+	Thu, 29 Aug 2024 06:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724912581; cv=none; b=SK2L+z8faRbseMYrQRd/jqp+brBsBlkTXcvY1jvzFdGJMb/QCjUUl8GB3zrqmGeIVvV+pRu8k4icHbXQOZD6445/C02mMn82/jeKKWjeYxH6EPq64+0+0gQ2TYmPlca3SEXA7/ISq1Phpg/0hy6y1RzEToh7jqcZ3zk+3t42Q78=
+	t=1724912861; cv=none; b=rMb55bqfDMSe/o2x6Pfz+pDnxMJMQs5pY6F6YLoI65eqPkdxjXykeX7nGLVLkqvurBCoiZDlofROGhJJ8RuOXtlzqpScDcSIY+uAoDqfOtcR6HW7BnYV+yg+H6MFY+0jl3HvNX6PTt+TfoigkHhw3JfjPQGPEIFcU7r5T23ZDaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724912581; c=relaxed/simple;
-	bh=w7bkXN0AYqEkbUJQ1/igWsvg/XmIHqBMXy0l44hKbfY=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=cPdy8DFYaVclYRtCK7kF4sOPdG904MRCmJiKEiY2F8loOVQIBNs3kv+LtMA3LrksB79SejrDKJRgP2z4pEmCkCIzO8l2jqPA2aCA0zMFwG7UhzXJl7GQfwV3z5vQvv6gFsRdlMmKGjlQE4HB/Jzm35EJVPttlH1sCjnOP0yaamU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=JhvuKdak; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1724912569; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=a6RU5vMi9K7uw1+/jK2YPYGo9fgrcWpZ+FnUpSE/gLc=;
-	b=JhvuKdakIXaanIP/r9PWGGwif8IPhl0fSrvxRevoNviy78p2RrwTpdvIgiRgrQ44e9UAK9brGboivwF1strvWfZDuaeAG2Q1xpaZpejqG0kaoNPqvt/UqAlMtjD3zRqec49gbobMXkwHoGd3KJgB3QHOmBmNSUOb/WpPLfWx1/E=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WDrweYM_1724912568)
-          by smtp.aliyun-inc.com;
-          Thu, 29 Aug 2024 14:22:49 +0800
-Message-ID: <1724912498.4246893-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
-Date: Thu, 29 Aug 2024 14:21:38 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev,
- "Si-Wei Liu" <si-wei.liu@oracle.com>,
- Darren Kenny <darren.kenny@oracle.com>
-References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEsJ2sckV5S1nGF+MrTgScVTTuwv6PHuLZARusJsFpf58g@mail.gmail.com>
- <1724843499.0572476-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEsNk7iYti3hSJ0EiXfusF8Kw9YEJjXFH-DApQaEY6o-cQ@mail.gmail.com>
-In-Reply-To: <CACGkMEsNk7iYti3hSJ0EiXfusF8Kw9YEJjXFH-DApQaEY6o-cQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1724912861; c=relaxed/simple;
+	bh=j4hkk4D1grsXQRQs5w6Q7xKzebFR0yWWiUJtJpfe1K8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PtADED9TpTk+jXz7jfYHCzXyd2iK7hXmDHxnKAlddz+BJKpo5uQa3RDEEWnuw9/yagoCP5YvYcTrT+7ulpNgDz2R4Gx7BCWf/ErufnBrS/C4gWvGyBIuUn3gS1VNfmHecZMwznWEuG5/BPNNK7pEgejsNVZLjW8ZsXqT81V+3oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=yKEVa7u+; arc=none smtp.client-ip=213.160.73.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
+	s=20121; t=1724912850;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=D77BSHaUFViLdDM7kfQVR6bNScj//7o43h1CahEFyCk=;
+	b=yKEVa7u+YKRRiHQAM6lxvripiGVk3vjqz7lKBIVeKZNBe5iv6XAn73xLXiyE6+IMuf0S9F
+	xEF+e9RPJQ6BPqy8eucpuPqKP4GS4j+eFDFsB1kENlay/dsePZfFulgtkYuv+shEqW3u4S
+	rVZ1r/tbEATLDm41Ajlx3cKtoxak0Ao=
+From: Sven Eckelmann <sven@narfation.org>
+To: Xingyu Li <xli399@ucr.edu>
+Cc: mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ b.a.t.m.a.n@lists.open-mesh.org, Yu Hao <yhao016@ucr.edu>
+Subject: Re: BUG: general protection fault in batadv_bla_del_backbone_claims
+Date: Thu, 29 Aug 2024 08:27:20 +0200
+Message-ID: <2212852.CQOukoFCf9@sven-l14>
+In-Reply-To:
+ <CALAgD-7AOA0At+y0BR2MZ0WXPFM03tQneRbeGZQqiKy6=1T0rw@mail.gmail.com>
+References:
+ <CALAgD-7C3t=vRTvpnVvsZ_1YhgiiynDaX_ud0O6pxSBn3suADQ@mail.gmail.com>
+ <13617673.uLZWGnKmhe@bentobox>
+ <CALAgD-7AOA0At+y0BR2MZ0WXPFM03tQneRbeGZQqiKy6=1T0rw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="nextPart23944202.6Emhk5qWAg";
+ micalg="pgp-sha512"; protocol="application/pgp-signature"
 
-On Thu, 29 Aug 2024 12:51:31 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Wed, Aug 28, 2024 at 7:21=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > On Tue, 27 Aug 2024 11:38:45 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Tue, Aug 20, 2024 at 3:19=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
-> > > >
-> > > > leads to regression on VM with the sysctl value of:
-> > > >
-> > > > - net.core.high_order_alloc_disable=3D1
-> > > >
-> > > > which could see reliable crashes or scp failure (scp a file 100M in=
- size
-> > > > to VM):
-> > > >
-> > > > The issue is that the virtnet_rq_dma takes up 16 bytes at the begin=
-ning
-> > > > of a new frag. When the frag size is larger than PAGE_SIZE,
-> > > > everything is fine. However, if the frag is only one page and the
-> > > > total size of the buffer and virtnet_rq_dma is larger than one page=
-, an
-> > > > overflow may occur. In this case, if an overflow is possible, I adj=
-ust
-> > > > the buffer size. If net.core.high_order_alloc_disable=3D1, the maxi=
-mum
-> > > > buffer size is 4096 - 16. If net.core.high_order_alloc_disable=3D0,=
- only
-> > > > the first buffer of the frag is affected.
-> > >
-> > > I wonder instead of trying to make use of headroom, would it be
-> > > simpler if we allocate dedicated arrays of virtnet_rq_dma=EF=BC=9F
-> >
-> > Sorry for the late reply. My mailbox was full, so I missed the reply to=
- this
-> > thread. Thanks to Si-Wei for reminding me.
-> >
-> > If the virtnet_rq_dma is at the headroom, we can get the virtnet_rq_dma=
- by buf.
-> >
-> >         struct page *page =3D virt_to_head_page(buf);
-> >
-> >         head =3D page_address(page);
-> >
-> > If we use a dedicated array, then we need pass the virtnet_rq_dma point=
-er to
-> > virtio core, the array has the same size with the rx ring.
-> >
-> > The virtnet_rq_dma will be:
-> >
-> > struct virtnet_rq_dma {
-> >         dma_addr_t addr;
-> >         u32 ref;
-> >         u16 len;
-> >         u16 need_sync;
-> > +       void *buf;
-> > };
-> >
-> > That will be simpler.
->
-> I'm not sure I understand here, did you mean using a dedicated array is s=
-impler?
+--nextPart23944202.6Emhk5qWAg
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
+From: Sven Eckelmann <sven@narfation.org>
+To: Xingyu Li <xli399@ucr.edu>
+Date: Thu, 29 Aug 2024 08:27:20 +0200
+Message-ID: <2212852.CQOukoFCf9@sven-l14>
+MIME-Version: 1.0
 
-YES. I will post a patch soon.
+On Thursday, 29 August 2024 06:30:23 CEST Xingyu Li wrote:
+> > Which line would that be in your build?
+> 
+> Somehow, the bug report does not include the line number in my end.
+
+You can try to use gdb or similar tools to figure out more about it [1]. Maybe 
+even adjust your kernel build to create better debuggable crashes
+
+> 
+> At the moment, I am unable to reproduce this crash with the provided
+> reproducer.
+
+Since I am missing information and you don't have a working reproducer - how 
+should I then fix anything? Your comment from the first doesn't seem to apply 
+and it is unclear how you came to the conclusion in the first place.
+
+> > Can you reproduce it with it?
+> 
+> Sorry. The above syzkaller reproducer needs the additional support  to run it.
+> But here is a C reproducer:
+> https://gist.github.com/freexxxyyy/0be5002c45d7f060cb599dd7595cab78
+
+I've tried to run it with the normal syz-execprog - but you seem to say now 
+that this reproducer is not working the upstream one? In this case, please try 
+to get it working with upstream. See also the mail from Kees Cook [2].
+
+Kind regards,
+	Sven
+
+[1] https://www.open-mesh.org/projects/devtools/wiki/Crashlog_with_pstore#Decoding-the-stack-trace
+[2] https://lore.kernel.org/r/202408281812.3F765DF@keescook
+--nextPart23944202.6Emhk5qWAg
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQS81G/PswftH/OW8cVND3cr0xT1ywUCZtAUyQAKCRBND3cr0xT1
+yxDRAP0Xgpu7aT8LpohRYfvgXf8o+GrJZqVeEyS+5DchULBSkAD/UrteyweAjX2D
+BFSV2WqmyRJuWVxsbsxYCo2hixPZhgM=
+=D8Cf
+-----END PGP SIGNATURE-----
+
+--nextPart23944202.6Emhk5qWAg--
 
 
->
-> >
-> > >
-> > > Btw, I see it has a need_sync, I wonder if it can help for performance
-> > > or not? If not, any reason to keep that?
-> >
-> > I think yes, we can skip the cpu sync when we do not need it.
->
-> I meant it looks to me the needs_sync is not necessary in the
-> structure as we can call need_sync() any time if we had dma addr.
 
-I see. I think it is ok, but if you do not like it, I will remove it.
-
-Thanks.
-
-
->
-> Thanks
->
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > >
-> > > > Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever u=
-se_dma_api")
-> > > > Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
-> > > > Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a54=
-0c0a@oracle.com
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/net/virtio_net.c | 12 +++++++++---
-> > > >  1 file changed, 9 insertions(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index c6af18948092..e5286a6da863 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_qu=
-eue *rq, u32 size, gfp_t gfp)
-> > > >         void *buf, *head;
-> > > >         dma_addr_t addr;
-> > > >
-> > > > -       if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
-> > > > -               return NULL;
-> > > > -
-> > > >         head =3D page_address(alloc_frag->page);
-> > > >
-> > > >         dma =3D head;
-> > > > @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_i=
-nfo *vi, struct receive_queue *rq,
-> > > >         len =3D SKB_DATA_ALIGN(len) +
-> > > >               SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> > > >
-> > > > +       if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gf=
-p)))
-> > > > +               return -ENOMEM;
-> > > > +
-> > > >         buf =3D virtnet_rq_alloc(rq, len, gfp);
-> > > >         if (unlikely(!buf))
-> > > >                 return -ENOMEM;
-> > > > @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virt=
-net_info *vi,
-> > > >          */
-> > > >         len =3D get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, roo=
-m);
-> > > >
-> > > > +       if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, =
-gfp)))
-> > > > +               return -ENOMEM;
-> > > > +
-> > > > +       if (!alloc_frag->offset && len + room + sizeof(struct virtn=
-et_rq_dma) > alloc_frag->size)
-> > > > +               len -=3D sizeof(struct virtnet_rq_dma);
-> > > > +
-> > > >         buf =3D virtnet_rq_alloc(rq, len + room, gfp);
-> > > >         if (unlikely(!buf))
-> > > >                 return -ENOMEM;
-> > > > --
-> > > > 2.32.0.3.g01195cf9f
-> > >
-> > > Thanks
-> > >
-> > > >
-> > >
-> > >
-> > >
-> >
->
 
