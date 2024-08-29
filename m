@@ -1,161 +1,123 @@
-Return-Path: <netdev+bounces-123177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE17963EF5
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 10:46:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21812963F53
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 11:00:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C9441C2225F
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:46:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 541D81C2450D
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 09:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B9618784B;
-	Thu, 29 Aug 2024 08:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058C3148838;
+	Thu, 29 Aug 2024 09:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="PjexuK6r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1c4bfN9"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A66E23BF;
-	Thu, 29 Aug 2024 08:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD699158541;
+	Thu, 29 Aug 2024 09:00:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724921180; cv=none; b=nA+pzmaK0DXYvP1LI899TT6tZyDtpHSkXdhmNgm1P2uk51sYZbU9D0aMvVwwuyZBupaNIVzUXKjla1Q8gQh/molAwEMlJyp2cFVWjKyXJPZTfbTQbgs4+DdcMSD5bNfVYXPMp8hPC+o/rbVMiP2w4QY1QXQUcfB3g9k/Y26GEoA=
+	t=1724922045; cv=none; b=oP2OWuO5CbUTMRM7G77Npu+flg2Z4IikJIZzI3f6ckfkpSCaodK4cLurSOc1hgRWinjof8oUGxIttgaNuB9KSfT+gNKgR6sLIxO1le8Hqq7Eyyy6ThDkY1iQ9fYw+0Ompr7W8X/OuNaHLRCkwjJEBplfXs4zFEUuO5J0MeFwpbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724921180; c=relaxed/simple;
-	bh=Bj0rYfFMFOdRT9x7QevbHV1veHJGPyzH0cChv7GpEhE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uoMHm29EpX3JpM4v4C5qI6OeXcVNlEAg5jkRa5t5M6JakbNUiat9yfGdZ5ETnmaVbrt3ikjM/N83fkhoVcuP/kZcQVCp63+4fBzqeZNdvwL7gfnhTm+Oy1Ml27tCc6OlTvnc3BKcTj0vBGtqGeqN4XuomQhbTir7m2v31VWdg/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=PjexuK6r; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6CFF01C000E;
-	Thu, 29 Aug 2024 08:46:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1724921170;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+T3omComrLDAWmGbNggJCqX9A019Fxez+XjpgJiOBzo=;
-	b=PjexuK6rbszk7oaGN2/pHSDc4v+HR/T3nq+tk5ETvg/N0EiaTPwdoDaCgywoEma6CLQ3ii
-	eqbUIkDSvBGoCfpS6h2tyC1HCDuu0Gzz2tA9axCqf0VFpuuxML4LdERD5D/sBG+/EihoKY
-	9mVoYexdOzraQVHbYS391BcpTmUbDP6Pu4iE6yg09M2in+l3Ux22bFceXXkRCKEdI07qSc
-	JioFW/sHo6SY1C0tqUUnWnCgvbOEahufon9hqTdtcQkI6JjiaAgkntSFHZe8wNLd7+NkF2
-	12UQ1/omVjmUrmOfF65to9XU854JOshShxqvrOwrcVAwZCwrc4daedYkVOBF6A==
-Date: Thu, 29 Aug 2024 10:46:06 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, Pantelis Antoniou <pantelis.antoniou@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
- King <linux@armlinux.org.uk>, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Herve Codina
- <herve.codina@bootlin.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next 6/6] net: ethernet: fs_enet: phylink conversion
-Message-ID: <20240829104606.4ba68402@device-28.home>
-In-Reply-To: <20240828163224.GT1368797@kernel.org>
-References: <20240828095103.132625-1-maxime.chevallier@bootlin.com>
-	<20240828095103.132625-7-maxime.chevallier@bootlin.com>
-	<20240828163224.GT1368797@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1724922045; c=relaxed/simple;
+	bh=6FlULx1l5ZzbnHr7od9Cx8fS3FJKI2YOaUqcI6QMaZk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QKU2PtZu8vwIhTrtCxnBqcQwsbwu7rZR+FfEb+hwX+8Ag/xVqKhAEYdEe/631rccReGerOSGR6/mCu6s7ZTHnTgLHtYBQj0OGP2OqkFzWr/ZBmP8XsinZFlMdw1MqQhPfEx17Lul0WM8l3UY9hME/ESRFfQqkfut3jSPdGdLjX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1c4bfN9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 347D0C4CEC3;
+	Thu, 29 Aug 2024 09:00:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724922045;
+	bh=6FlULx1l5ZzbnHr7od9Cx8fS3FJKI2YOaUqcI6QMaZk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Z1c4bfN9u42xl5To8HSB36ylnLJeSgoSk2Snuc/Iw93J6HrGQNp9LHfERvscNDf5q
+	 ZWCDek7aoeLnRrxX2rf/1l1rEL8A0+nsBpDfJrsrVj2qSDaTabEhMTBYq8cmur9S7X
+	 2Zj6wkakEOd3tQ5WOnmgHYT+hGBxkgEL1uhB5qMjgn3CyAHeOPtlb6aGVFH/Zc6VLp
+	 dWDIusAb2rXlI/WhuVpWInJFVLyWjOrj1T4T5dHQVM8jD5ZHGB2/1EYhA0Uv7cSTNP
+	 T8e7RRi0O0Wscgh/IWfw5wTSAVtkCi74skAvtRGQ0jtXhJTOwzq07smhtvBRgw1tT2
+	 qER1yxcalTDrA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE3A03809A80;
+	Thu, 29 Aug 2024 09:00:46 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 00/15] mptcp: more fixes for the in-kernel PM
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172492204527.1873855.649951306821371963.git-patchwork-notify@kernel.org>
+Date: Thu, 29 Aug 2024 09:00:45 +0000
+References: <20240828-net-mptcp-more-pm-fix-v2-0-7f11b283fff7@kernel.org>
+In-Reply-To: <20240828-net-mptcp-more-pm-fix-v2-0-7f11b283fff7@kernel.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shuah@kernel.org, fw@strlen.de, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ stable@vger.kernel.org, arinc.unal@arinc9.com,
+ syzbot+455d38ecd5f655fc45cf@syzkaller.appspotmail.com
 
-Hello Simon,
+Hello:
 
-On Wed, 28 Aug 2024 17:32:24 +0100
-Simon Horman <horms@kernel.org> wrote:
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> On Wed, Aug 28, 2024 at 11:51:02AM +0200, Maxime Chevallier wrote:
-> > fs_enet is a quite old but still used Ethernet driver found on some NXP
-> > devices. It has support for 10/100 Mbps ethernet, with half and full
-> > duplex. Some variants of it can use RMII, while other integrations are
-> > MII-only.
-> > 
-> > Add phylink support, thus removing custom fixed-link hanldling.
-> > 
-> > This also allows removing some internal flags such as the use_rmii flag.
-> > 
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>  
+On Wed, 28 Aug 2024 08:14:23 +0200 you wrote:
+> Here is a new batch of fixes for the MPTCP in-kernel path-manager:
 > 
-> Hi Maxime,
+> Patch 1 ensures the address ID is set to 0 when the path-manager sends
+> an ADD_ADDR for the address of the initial subflow. The same fix is
+> applied when a new subflow is created re-using this special address. A
+> fix for v6.0.
 > 
-> Some minor issues from my side: not a full review by any stretch of
-> the imagination.
-> 
-> ...
-> 
-> > @@ -911,7 +894,7 @@ static int fs_enet_probe(struct platform_device *ofdev)
-> >  	if (!IS_ERR(clk)) {
-> >  		ret = clk_prepare_enable(clk);
-> >  		if (ret)
-> > -			goto out_deregister_fixed_link;
-> > +			goto out_phylink;
-> >  
-> >  		fpi->clk_per = clk;
-> >  	}  
-> 
-> This goto will result in a dereference of fep.
-> But fep is not initialised until the following line,
-> which appears a little below this hunk.
-> 
-> 	fep = netdev_priv(ndev);
+> [...]
 
-Nice catch, the goto should rather go to out_free_fpi.
+Here is the summary with links:
+  - [net,v2,01/15] mptcp: pm: reuse ID 0 after delete and re-add
+    https://git.kernel.org/netdev/net/c/8b8ed1b429f8
+  - [net,v2,02/15] mptcp: pm: fix RM_ADDR ID for the initial subflow
+    https://git.kernel.org/netdev/net/c/87b5896f3f78
+  - [net,v2,03/15] selftests: mptcp: join: check removing ID 0 endpoint
+    https://git.kernel.org/netdev/net/c/5f94b08c0012
+  - [net,v2,04/15] mptcp: pm: send ACK on an active subflow
+    https://git.kernel.org/netdev/net/c/c07cc3ed895f
+  - [net,v2,05/15] mptcp: pm: skip connecting to already established sf
+    https://git.kernel.org/netdev/net/c/bc19ff57637f
+  - [net,v2,06/15] mptcp: pm: reset MPC endp ID when re-added
+    https://git.kernel.org/netdev/net/c/dce1c6d1e925
+  - [net,v2,07/15] selftests: mptcp: join: check re-adding init endp with != id
+    https://git.kernel.org/netdev/net/c/1c2326fcae4f
+  - [net,v2,08/15] selftests: mptcp: join: no extra msg if no counter
+    https://git.kernel.org/netdev/net/c/76a2d8394cc1
+  - [net,v2,09/15] mptcp: pm: do not remove already closed subflows
+    https://git.kernel.org/netdev/net/c/58e1b66b4e4b
+  - [net,v2,10/15] mptcp: pm: fix ID 0 endp usage after multiple re-creations
+    https://git.kernel.org/netdev/net/c/9366922adc6a
+  - [net,v2,11/15] selftests: mptcp: join: check re-re-adding ID 0 endp
+    https://git.kernel.org/netdev/net/c/d397d7246c11
+  - [net,v2,12/15] mptcp: avoid duplicated SUB_CLOSED events
+    https://git.kernel.org/netdev/net/c/d82809b6c5f2
+  - [net,v2,13/15] selftests: mptcp: join: validate event numbers
+    https://git.kernel.org/netdev/net/c/20ccc7c5f7a3
+  - [net,v2,14/15] mptcp: pm: ADD_ADDR 0 is not a new address
+    https://git.kernel.org/netdev/net/c/57f86203b41c
+  - [net,v2,15/15] selftests: mptcp: join: check re-re-adding ID 0 signal
+    https://git.kernel.org/netdev/net/c/f18fa2abf810
 
-> 
-> This goto will also result in the function returning without
-> releasing clk.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-ah yes, it's never disabled_unprepared, the phylink cleanup label is at
-the wrong spot. I'll include a patch in the next iteration to make use
-of devm_clk_get_enabled(), that should simplify all of that.
 
-> Both flagged by Smatch.
-> 
-> > @@ -936,6 +919,26 @@ static int fs_enet_probe(struct platform_device *ofdev)
-> >  	fep->fpi = fpi;
-> >  	fep->ops = ops;
-> >  
-> > +	fep->phylink_config.dev = &ndev->dev;
-> > +	fep->phylink_config.type = PHYLINK_NETDEV;
-> > +	fep->phylink_config.mac_capabilities = MAC_10 | MAC_100;
-> > +
-> > +	__set_bit(PHY_INTERFACE_MODE_MII,
-> > +		  fep->phylink_config.supported_interfaces);
-> > +
-> > +	if (of_device_is_compatible(ofdev->dev.of_node, "fsl,mpc5125-fec"))
-> > +		__set_bit(PHY_INTERFACE_MODE_RMII,
-> > +			  fep->phylink_config.supported_interfaces);
-> > +
-> > +	phylink = phylink_create(&fep->phylink_config, dev_fwnode(fep->dev),
-> > +				 phy_mode, &fs_enet_phylink_mac_ops);
-> > +	if (IS_ERR(phylink)) {
-> > +		ret = PTR_ERR(phylink);
-> > +		goto out_free_fpi;  
-> 
-> This also appears to leak clk, as well as ndev.
-
-Thanks, will be addressed in V2.
-
-> I didn't look for other cases.
-
-I'll go over the cleanup path, thanks for checking this !
-
-Thanks,
-
-Maxime
 
