@@ -1,129 +1,140 @@
-Return-Path: <netdev+bounces-123319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA778964842
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:27:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB99964847
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 16:28:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 957901F21D7E
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:27:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 185F81F2187C
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48361B0116;
-	Thu, 29 Aug 2024 14:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903E81AD9E9;
+	Thu, 29 Aug 2024 14:28:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kJ9UeZ0y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kWoH5i0u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7C61AED4A;
-	Thu, 29 Aug 2024 14:27:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD5C1A76C1
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 14:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724941640; cv=none; b=eGx1jFiVA1MzbCF8bh2FCYD4iOfiX9njfwruvwtbFOvYy/zrcZLQs+YAZqdDdEgAw8o70rLsNH6Qcj/rQfKH+NXevwowZB5448sD45E8rvAohiX5VUDi/Yl3hdPI9DvBrIgD472TMbQtjg61RSEAOLC3ZVUBN1SZC7LZegIm02A=
+	t=1724941685; cv=none; b=Z5ZqLAD4lYL+2q9EVVfZ8wgjrSLCqdRAuYcEnDr4dLF87KcRHZE1K3+gM8hN/bv7Ru4x9pBdoSunMgN8pcNG1yqdSbCW4oaVqgnqb4rXAVSesgLEcWtRKnTvbPrRjfoRInw7GgdLabo4dVELB68os5C2i8pzipGaDXssATayC70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724941640; c=relaxed/simple;
-	bh=8RoE+cdozJ3A+shrfrungz4qyxcoLBGnk/z+3xmrit0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FS9GwS/QF3bOKo06kcQhaC936PL3bIsHSD8LJE1jP9/luUj2FRdnjOlpP5CnOPw0s0B+fr4uW4EpsSMwKslPmGsO37vWzNNCEYNy5RApwNPt5XYBXGcUl1uhnAwsw/VQVpVz2vZa8NPutOuHmEBA0EV7Kp4GKpaT6wqpjzdzXKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kJ9UeZ0y; arc=none smtp.client-ip=209.85.208.44
+	s=arc-20240116; t=1724941685; c=relaxed/simple;
+	bh=lcKELKr8totNm0cUxFM2hX35N4EWGx/nhbP2H3tcdfY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=nokmBXnCkESiWit0DX+OGk0/YJQAZAWIqeDAAvyn3PU0+4XKVHJEuiRZvT9Q8RDe1jxxp+Cyc7ZDDKm9+xKmNCcnSKBc5PZZk7Cg5/ib+eoCht89kLcMV+t7cqPc3Vlp0qw6h2+i0Ecu9J4ar/lQyxTwnfFzo4Vpj2fuiMyT/ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kWoH5i0u; arc=none smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5c09fd20eddso819073a12.3;
-        Thu, 29 Aug 2024 07:27:18 -0700 (PDT)
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7a1d984ed52so45596085a.0
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 07:28:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724941637; x=1725546437; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1724941683; x=1725546483; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xZpI4afRL2FMKQeKNliFKLWSQBi1pIyubvpJPETxetg=;
-        b=kJ9UeZ0yirMCmPlj1FXkXZmD37bxwQC//lI2cZG3qnrGsxQdmCs9POtakmhXGMgBFB
-         XtWCxT/VYU0r6Pfw2KcNQBkl0QYMA3CFGt1omOdWPztm/0j3JCgOTPq+h7CNo55E/T0r
-         uF/bKev2eHDVY+dUnxfL/XhINttE6KVHVBj/9vMNErNw5RlJLexK05ctfFJMin5KMInO
-         51+45TOo3nkH9UdYLrasMbHH6hBamg/Skx0ytGVF5ocr9kBd+SpKitcs24/cBa13DLV0
-         SslQJCeE4r8JgvJp2mk9TdbKqA5Tv0aB+305mBjMegN7LJvEjoe3CJdvbOLkgnM4Cb0c
-         iKXw==
+        bh=wxopms5H26lccB7XS2Iv+r2Lk+fonFl21eb/XjH2878=;
+        b=kWoH5i0ubIQkaJmlArmwmdfGafWUvsHc+52eqJl7m7JOQofrerpPyKNhTAZvMSXv1d
+         ldglOWfWjxOXg1Alx2lFWh44s13ZdLKtki/EGt3rmsCxnGrfjw7iRJ3p1ykuSEjbvFZR
+         j+xOEcpJ4Odw0Nrz0qf2KQIl1QHdfXqwYa26ah8W/lmadNITfX5pG5a6lELzVyWq472N
+         iElkmxeafHuLo0uQouXhSnwoUo1XH3bDMKZVRka/rSOJw9NYmZ5wQupBb/1xw3/Uvzuk
+         p/rXSyIfITKFGrgQQA/CjU6I5iFCQbNg7noYKFOec7KWlbAxSUbXTB23FNdZf/4YvQQz
+         8+AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724941637; x=1725546437;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xZpI4afRL2FMKQeKNliFKLWSQBi1pIyubvpJPETxetg=;
-        b=iTZjb+9+d643SfbKaWbsPlSLpj5561ahl1gXqRI2aDxbFzXWrIr9XlKHho/LBnZ/Qn
-         ZvWrdADbcQy+QGBpfhR/LpLvpNAGWr8PAlIY+28ZDYXzNuwy/RhsQmdenbyQUxe1Pmw5
-         iHybQZaDemg/nueVx3gU3tH0zFZ9qB41aN2jNN1mG2BB+u03+oqJrVWHeZJPs3F3ji1q
-         qhIOjqCs9NuWLdiA6QB1okDSc7+VQdAtpN2PSyYLuhpxg8u7BFNg/7nsLGfeTJZdwI+P
-         SrF0LBwfRHTJZIB/gQeQAxoeNdSP4Yx+YsZWsPOPkJB3GbgByXOhe899/5JC9vocPyAs
-         5p0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVBEhz2xyOWl+7eQ37rCdIWyv1EhYcOdg/rII1domp/TvxiTWml4sElcPkcM0MDcipNmWdHZMLrIcwX@vger.kernel.org, AJvYcCWmBmVA17s/3QPRgzNg5hdOadz5mmKKR+b+wqgHmbfmwkqdhHMMpcMX8gWgW6RGakUoxT1YExecYZ/cNA==@vger.kernel.org, AJvYcCWn8dHGCniBLMIX3vEiVg3h6nsZJvAa3GQgAMmL3GJ014XRapmBJ0A3OQZuzaBfY7j+4umyvgTUQyayVg==@vger.kernel.org, AJvYcCWsLa1NxBojUIUgx0KZWF6JxfdFjn+SuZ/92OtF+JX4avor63p4KcWGEpkaaaw3EoKg7VUiZLmJ@vger.kernel.org, AJvYcCWy3HEBhsY8AszGyu8f1fmMjpB4YP9vjsQYoPdIBuwie2YVaanURov6JZH6Gdp8yg+aC6mN7QbPGhv4Sg==@vger.kernel.org, AJvYcCX8b4+FaKyS/ALiVXdKJvKLxqGDMWjxph81DSCAP8ea3LtiImZgsFbgiZBd6lIltO82KyJFIxQM@vger.kernel.org, AJvYcCXUlBgUgXQUPolb8sMfS/RyLXR6IxG4bNWB9oItDe5ozkXuW9kQY7wxC0aekWYTTp+DD0eW+D6d9D/BRaCJ@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA0kwojVf8axXA2r5mDWu7iBvVYHeag64gVzzHwoCoYxrGv9Hu
-	vE+knVZH6Gpk6HFzBC5UACPL0apn6FEU18hiUaaaFyWAUaOehwSBDa0pqtVUGWZS0039BVgKTcK
-	4DaJPASoQnsxqEPT9VRqTHPh1lCA=
-X-Google-Smtp-Source: AGHT+IFclKvq9CgocI4k5e6wl7aLHjazA02xjCsgy2N/rN/swL8vf/cOS87Uaf0R50FfdZ9+2VNUItD5IA3I6PEkM58=
-X-Received: by 2002:a05:6402:348f:b0:5be:ed8c:de7 with SMTP id
- 4fb4d7f45d1cf-5c21ed3e14bmr2812108a12.11.1724941636724; Thu, 29 Aug 2024
- 07:27:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1724941683; x=1725546483;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wxopms5H26lccB7XS2Iv+r2Lk+fonFl21eb/XjH2878=;
+        b=UpU43NpSFfugtFdM7Jd4s58M5f+Gnv5fCkILqZ9wdYHW9BGbUDbAEetkVY4Y4aJPBM
+         wcowszQ9SPPOFgpYdjiioudEEJZNGGoiiptdH4sbGyibb+fpfQJXBYoURE0h8ryqovaJ
+         O3o5N7Wt4zQGvmYfLu/VprVWtTgxJgtlu7SLoP5xkFb2+rosJpj43VfX2Ic3RH+PwjAn
+         fKPGcO9Zhbrzxozq0kSXUP4kdR+poeQkyKE0DdvbBpztL9LgGngJA5YOJ3dyK9Up18JR
+         IZOx7ztRfueUaB8Gg/66gLaWzruLk+Hmy0cechn6Sc0rhkSOKvharfDBllkAX/ZZCu1e
+         1y3g==
+X-Gm-Message-State: AOJu0Yzsa8wf7w4qREpM10LmwzxtoOcG+eJMEvTBM0g5IWh3tm5lNzlf
+	XykCbtUEzTw2QcbgRfvjxJnw2abkqlZ0f7r9obA7uOZGA1weeOFG
+X-Google-Smtp-Source: AGHT+IEqGuHpMvWwGKSuP8WHSMwaoC0yT3JZTKxiz97Qs5i5EnB4/ViF8MGiWTW2TBIQcQR+GoVL3A==
+X-Received: by 2002:a05:620a:4511:b0:7a1:df6f:4374 with SMTP id af79cd13be357-7a8041ad994mr302243285a.16.1724941676014;
+        Thu, 29 Aug 2024 07:27:56 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340dafffdsm5440436d6.140.2024.08.29.07.27.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 07:27:55 -0700 (PDT)
+Date: Thu, 29 Aug 2024 10:27:55 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Vadim Fedorenko <vadfed@meta.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org
+Message-ID: <66d0856b4234a_38c94929436@willemb.c.googlers.com.notmuch>
+In-Reply-To: <dfe033f1-cc61-4be3-a59d-e6b623591cc6@linux.dev>
+References: <20240829000355.1172094-1-vadfed@meta.com>
+ <66d0783ca3dc4_3895fa2946a@willemb.c.googlers.com.notmuch>
+ <dfe033f1-cc61-4be3-a59d-e6b623591cc6@linux.dev>
+Subject: Re: [RFC PATCH] net_tstamp: add SCM_TS_OPT_ID to provide OPT_ID in
+ control message
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240829141844.39064-1-pstanner@redhat.com> <20240829141844.39064-7-pstanner@redhat.com>
- <20240829102320-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240829102320-mutt-send-email-mst@kernel.org>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Thu, 29 Aug 2024 17:26:39 +0300
-Message-ID: <CAHp75Ve7O6eAiNx0+v_SNR2vuYgnkeWrPD1Umb1afS3pf7m8MQ@mail.gmail.com>
-Subject: Re: [PATCH v5 6/7] vdpa: solidrun: Fix UB bug with devres
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Philipp Stanner <pstanner@redhat.com>, Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, 
-	Tom Rix <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>, 
-	Andy Shevchenko <andy@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Alvaro Karsz <alvaro.karsz@solid-run.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Damien Le Moal <dlemoal@kernel.org>, 
-	Hannes Reinecke <hare@suse.de>, John Garry <john.g.garry@oracle.com>, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-fpga@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
-	virtualization@lists.linux.dev, stable@vger.kernel.org, 
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 29, 2024 at 5:23=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Thu, Aug 29, 2024 at 04:16:25PM +0200, Philipp Stanner wrote:
-> > In psnet_open_pf_bar() and snet_open_vf_bar() a string later passed to
-> > pcim_iomap_regions() is placed on the stack. Neither
-> > pcim_iomap_regions() nor the functions it calls copy that string.
-> >
-> > Should the string later ever be used, this, consequently, causes
-> > undefined behavior since the stack frame will by then have disappeared.
-> >
-> > Fix the bug by allocating the strings on the heap through
-> > devm_kasprintf().
-> >
-> > Cc: stable@vger.kernel.org    # v6.3
-> > Fixes: 51a8f9d7f587 ("virtio: vdpa: new SolidNET DPU driver.")
-> > Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> > Closes: https://lore.kernel.org/all/74e9109a-ac59-49e2-9b1d-d825c9c9f89=
-1@wanadoo.fr/
-> > Suggested-by: Andy Shevchenko <andy@kernel.org>
-> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
->
-> Post this separately, so I can apply?
+Vadim Fedorenko wrote:
+> On 29/08/2024 14:31, Willem de Bruijn wrote:
+> > Vadim Fedorenko wrote:
+> >> SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
+> >> timestamps
+> > 
+> > +1 on the feature. Few minor points only.
+> > 
+> > Not a hard requirement, but would be nice if there was a test,
+> > e.g., as a tools/testing/../txtimestamp.c extension.
+> 
+> Sure, I'll add some tests in the next version.
+> 
+> 
+> >> and packets sent via socket. Unfortunately, there is no way
+> >> to reliably predict socket timestamp ID value in case of error returned
+> >> by sendmsg [1].
+> > 
+> > Might be good to copy more context from the discussion to explain why
+> > reliable OPT_ID is infeasible. For UDP, it is as simple as lockless
+> > transmit. For RAW, things like MSG_MORE come into play.
+> 
+> Ok, I'll add it, thanks!
+> 
+> >> This patch adds new control message type to give user-space
+> >> software an opportunity to control the mapping between packets and
+> >> values by providing ID with each sendmsg. This works fine for UDP
+> >> sockets only, and explicit check is added to control message parser.
+> >> Also, there is no easy way to use 0 as provided ID, so this is value
+> >> treated as invalid.
+> > 
+> > This is because the code branches on non-zero value in the cookie,
+> > else uses ts_key. Please make this explicit. Or perhaps better, add a
+> > bit in the cookie so that the full 32-bit space can be used.
+> 
+> Adding a bit in the cookie is not enough, I have to add another flag to
+> inet_cork. And we are running out of space for tx flags, 
+> inet_cork::tx_flags is u8 and we have only 1 bit left for SKBTX* enum.
+> Do you think it's OK to use this last bit for OPT_ID feature?
 
-Don't you use `b4`? With it it as simple as
+No, that space is particularly constrained in skb_shinfo.
 
-  b4 am -P 6 $MSG_ID_OF_THIS_SERIES
-
---=20
-With Best Regards,
-Andy Shevchenko
+Either a separate bit in inet_cork, or just keep as is.
+ 
 
