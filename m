@@ -1,99 +1,158 @@
-Return-Path: <netdev+bounces-123041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44FF6963835
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 04:32:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ED3E96383E
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 04:36:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEEFE2857EF
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:32:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AD631F23DCE
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B398322EF0;
-	Thu, 29 Aug 2024 02:32:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92B7634CE5;
+	Thu, 29 Aug 2024 02:36:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vsqOzIQO"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9041E4C70;
-	Thu, 29 Aug 2024 02:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C7F24B28
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 02:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724898760; cv=none; b=FZbJhh9laqM3l3QydaUJesg1O0KK3plLY5QsRfsIoDikkvRlI3SxGB8IjTU2oNE1Jz9XmVS85PzIrN7B8b6hjE2XQ/2dWNRyicsYbL9WyuCOAKWNnX4qXkN3S49xk+5JEa1weRykGbvudYpFBHr3hu10iUykW0Y0MeXd/DU3eBE=
+	t=1724899009; cv=none; b=hd7/nMtV/C45x8eJg0XX26qrPcva/Koj4EO1HkWcVZYSM5B//7iipBhuva4ugzD8jsd7gzPM1RjPFozejpHhVJM/Rg5sjJLK+LkHjhEIMHYYoJvek2PoH1Bj5UNzd6HNmBZis6oNdOfbdnq/d0HATSl01f1lad/XWu7caIxLcN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724898760; c=relaxed/simple;
-	bh=+gYMgrzYbBYnKqgQoT73eCkdic2wIQKKFdgu6jv/Utc=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=JEagoxwLdVO3UoHmS7vGLqEt+eN8WGThcMg69/lzNkUiwln7BOJnH0VA4aZ/G679cKWIuwC5Ouq+ZlHL3sdufpIZs2IUocpWirT3YAQplTD3yGiTKo1CnC1FbuHNdzons0+V2PcAQRrcWx4Sj8blv1EyD4z6exyOxzPAOa9Hpkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4WvQHd0GHYz1xwW0;
-	Thu, 29 Aug 2024 10:30:37 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id EFC7A1A016C;
-	Thu, 29 Aug 2024 10:32:34 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 29 Aug 2024 10:32:33 +0800
-Message-ID: <df861206-0a7a-4744-98f6-6335303d29ef@huawei.com>
-Date: Thu, 29 Aug 2024 10:32:33 +0800
+	s=arc-20240116; t=1724899009; c=relaxed/simple;
+	bh=bGlQAlKtPj4qnjGq3CAst/qDUBkSaSOOIVGCqBBJ/L4=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=YHTsMZYHiuWuPyqpl2fpepz8FeWBlDURQENUkqu4DZmMNueH7WtPJn5xOcrAoqYd1oTYulNc3a/z4aogFMLClE2Ta4a5HL6DDKl6/ZqpjFbbz7CWASCmOoBeLoueBjStV82VE6xDj4NuG4W9OSdF12DQ7BiY4s6jZJVsuwPMCZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vsqOzIQO; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1724899005;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bGlQAlKtPj4qnjGq3CAst/qDUBkSaSOOIVGCqBBJ/L4=;
+	b=vsqOzIQOPmUD/dI//siE4+IIQngQgXxQBpdpB7E/BzqliMg1RHeAWk5x8XpoV96GvDofCS
+	Y29CW/+TU573wsCN6urLZsB1zRwanhC84C4aE2tiG1Z/svyHG5ZrK7Oyf0Kkzr2vEMAfdm
+	r6jlMDdK5S140QjzXQ26lhat3rHG19o=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
-	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
-	<andrew@lunn.ch>, <jdamato@fastly.com>, <horms@kernel.org>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V5 net-next 06/11] net: hibmcge: Implement .ndo_start_xmit
- function
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20240827131455.2919051-1-shaojijie@huawei.com>
- <20240827131455.2919051-7-shaojijie@huawei.com>
- <20240828184120.07102a2f@kernel.org>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20240828184120.07102a2f@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
+Subject: Re: [PATCH v1] memcg: add charging of already allocated slab objects
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Muchun Song <muchun.song@linux.dev>
+In-Reply-To: <a5rzw7uuf7pgrhhut7keoy66c6u4rgiuxx2qmwywbvl2iktfku@23dzxczejcet>
+Date: Thu, 29 Aug 2024 10:36:01 +0800
+Cc: Roman Gushchin <roman.gushchin@linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Johannes Weiner <hannes@cmpxchg.org>,
+ Michal Hocko <mhocko@kernel.org>,
+ Vlastimil Babka <vbabka@suse.cz>,
+ David Rientjes <rientjes@google.com>,
+ Hyeonggon Yoo <42.hyeyoo@gmail.com>,
+ Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Linux Memory Management List <linux-mm@kvack.org>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Meta kernel team <kernel-team@meta.com>,
+ cgroups@vger.kernel.org,
+ netdev <netdev@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <97F404E9-C3C2-4BD2-9539-C40237E71B2B@linux.dev>
+References: <20240826232908.4076417-1-shakeel.butt@linux.dev>
+ <Zs1CuLa-SE88jRVx@google.com>
+ <yiyx4fh6dklqpexfstkzp3gf23hjpbjujci2o6gs7nb4sutzvb@b5korjrjio3m>
+ <EA5F7851-B519-4570-B299-8A096A09D6E7@linux.dev>
+ <a5rzw7uuf7pgrhhut7keoy66c6u4rgiuxx2qmwywbvl2iktfku@23dzxczejcet>
+To: Shakeel Butt <shakeel.butt@linux.dev>
+X-Migadu-Flow: FLOW_OUT
 
 
-on 2024/8/29 9:41, Jakub Kicinski wrote:
-> On Tue, 27 Aug 2024 21:14:50 +0800 Jijie Shao wrote:
->> @@ -111,6 +135,14 @@ static int hbg_init(struct hbg_priv *priv)
->>   	if (ret)
->>   		return ret;
->>   
->> +	ret = hbg_txrx_init(priv);
->> +	if (ret)
->> +		return ret;
-> You allocate buffers on the probe path?
-> The queues and all the memory will be sitting allocated but unused if
-> admin does ip link set dev $eth0 down?
 
-The network port has only one queue and
-the TX queue depth is 64, RX queue depth is 127.
-so it doesn't take up much memory.
+> On Aug 29, 2024, at 03:03, Shakeel Butt <shakeel.butt@linux.dev> =
+wrote:
+>=20
+> Hi Muchun,
+>=20
+> On Wed, Aug 28, 2024 at 10:36:06AM GMT, Muchun Song wrote:
+>>=20
+>>=20
+>>> On Aug 28, 2024, at 01:23, Shakeel Butt <shakeel.butt@linux.dev> =
+wrote:
+>>>=20
+> [...]
+>>>>=20
+>>>> Does it handle the case of a too-big-to-be-a-slab-object =
+allocation?
+>>>> I think it's better to handle it properly. Also, why return false =
+here?
+>>>>=20
+>>>=20
+>>> Yes I will fix the too-big-to-be-a-slab-object allocations. I =
+presume I
+>>> should just follow the kfree() hanlding on !folio_test_slab() i.e. =
+that
+>>> the given object is the large or too-big-to-be-a-slab-object.
+>>=20
+>> Hi Shakeel,
+>>=20
+>> If we decide to do this, I suppose you will use =
+memcg_kmem_charge_page
+>> to charge big-object. To be consistent, I suggest renaming =
+kmem_cache_charge
+>> to memcg_kmem_charge to handle both slab object and big-object. And I =
+saw
+>> all the functions related to object charging is moved to memcontrol.c =
+(e.g.
+>> __memcg_slab_post_alloc_hook), so maybe we should also do this for
+>> memcg_kmem_charge?
+>>=20
+>=20
+> If I understand you correctly, you are suggesting to handle the =
+general
+> kmem charging and slab's large kmalloc (size > KMALLOC_MAX_CACHE_SIZE)
+> together with memcg_kmem_charge(). However that is not possible due to
+> slab path updating NR_SLAB_UNRECLAIMABLE_B stats while no updates for
+> this stat in the general kmem charging path (__memcg_kmem_charge_page =
+in
+> page allocation code path).
+>=20
+> Also this general kmem charging path is used by many other users like
+> vmalloc, kernel stack and thus we can not just plainly stuck updates =
+to
+> NR_SLAB_UNRECLAIMABLE_B in that path.
 
-Also, I plan to add the self_test feature in a future patch.
-If I don't allocate buffers on the probe path,
-I won't be able to do a loopback test if the network port goes down unexpectedly.
+Sorry, maybe I am not clear . To make sure we are on the same page, let
+me clarify my thought. In your v2, I thought if we can rename
+kmem_cache_charge() to memcg_kmem_charge() since kmem_cache_charge()
+already has handled both big-slab-object (size > KMALLOC_MAX_CACHE_SIZE)
+and small-slab-object cases. You know, we have a function of
+memcg_kmem_charge_page() which could be used for charging =
+big-slab-object
+but not small-slab-object. So I thought maybe memcg_kmem_charge() is a
+good name for it to handle both cases. And if we do this, how about =
+moving
+this new function to memcontrol.c since all memcg charging functions are
+moved to memcontrol.c instead of slub.c.
 
-So, if there are no other constraints, I prefer to alloc buffer memory in probe path.
+Muchun,
+Thanks.
 
-	Thanks,
-	Jijie Shao
+>=20
+> Thanks for taking a look.
+> Shakeel
 
 
