@@ -1,184 +1,219 @@
-Return-Path: <netdev+bounces-123075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A556996398D
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 06:54:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8C3A9639B8
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 07:02:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5090A1F21D76
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 04:54:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDF801C22818
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 05:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAF0854652;
-	Thu, 29 Aug 2024 04:54:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758AB5338D;
+	Thu, 29 Aug 2024 05:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JT+HypB+"
+	dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="OWCWZYvX";
+	dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b="kROzuzpj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mx2.ucr.edu (mx2.ucr.edu [138.23.62.3])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433893C482
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 04:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26B7A955
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 05:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=138.23.62.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724907261; cv=none; b=RcowNRYCb5Jl7qvOVm8oZjjqE5yUFWqHER/i7Is8yuqUZ4xGj54TZP0FWckEUJYPOJHca1kEVxSwAzDxx8NSbHcttG2Zqj1roe1OuuKs2phEW7G2RctiCsGqz6sBYwUCBAVUdZ7fah/eP7MEQ6W4Dprsqq52hon0oXBePRuu1l4=
+	t=1724907734; cv=none; b=L27nSxuHxAtxSeUQoQXbVXIf7zDl0YvrgxMY6V2c9LDVFnfz6c/zVBm15if8Z/R2QH19ycTDHPA+0ZtgVPfjeLb9X53O8RQ5I2PeBClVUC8ryQteUz5zb9P9p3+U8fEUhddkFSy7Dz3QBCt8hVGv5ePEBFEhpXnOEaq0j0rT358=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724907261; c=relaxed/simple;
-	bh=cXFzntfIyxI7W5Ve4C3WFxkZ1PmXt/SoiLVxKVar2V4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TgUL3JhcSeR/aW5XBuDrbPGAdJoa1Me6QOku4E1X6DhkqV30xhTnzzLNJlwqSTOA6xMqOjNZfNaqbBjtVki9VwnLXicIO31vUyUj9yMqsUz0DLxZx5Jk12Lx7+NJlVJ12hrhE+O7AJLh4fK6QO/Sz97u3GUBZtmeyQ5Ga7YbMXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JT+HypB+; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724907260; x=1756443260;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cXFzntfIyxI7W5Ve4C3WFxkZ1PmXt/SoiLVxKVar2V4=;
-  b=JT+HypB+b6BNeEQcz2Q0OM9wlSjNG4a/PFPKEnBlS4+UYJrvFtY+U0SZ
-   omhvUOuA/89taJeCHBQAwu2J0Ves2GT6vviEmj7i5UDWO8j0OA5ccdL8c
-   Ksa/wTSCo8HaQbDhlJoPp6MV4IpBQuVgSQSP2UCI1OyErVxTRUhIBWYVM
-   nxh/h25AJhEQEwMzJUV579bdo0ipw7mF7REXyM4zxin4zm3yfoGBL3Z8I
-   eSKRcB3CzTHcICDAVZ70Y/MHB8Sj06Rtsx42WFSdQi5WTWHiZmLLTrCzi
-   zdIQSi8aMHKw/fuEoBi8Oabw6WAL8fHJyEcXKnuqhDrZmuT7+tXznjAZg
-   A==;
-X-CSE-ConnectionGUID: sOcUJRcOSZGA+Qn4x3/cpw==
-X-CSE-MsgGUID: vIsaNBWESrGoL5PKzT3yAQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="23641748"
-X-IronPort-AV: E=Sophos;i="6.10,184,1719903600"; 
-   d="scan'208";a="23641748"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 21:54:20 -0700
-X-CSE-ConnectionGUID: KpEOCzIfSvaXNkChtqmNhg==
-X-CSE-MsgGUID: x3bUiK/fQjWX2suWI63jHg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,184,1719903600"; 
-   d="scan'208";a="63093276"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Aug 2024 21:54:16 -0700
-Date: Thu, 29 Aug 2024 06:52:21 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com, horms@kernel.org,
-	helgaas@kernel.org, przemyslaw.kitszel@intel.com,
-	Hongguang Gao <hongguang.gao@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: Re: [PATCH net-next v4 9/9] bnxt_en: Support dynamic MSIX
-Message-ID: <Zs/+hbsyBVHUgoYl@mev-dev.igk.intel.com>
-References: <20240828183235.128948-1-michael.chan@broadcom.com>
- <20240828183235.128948-10-michael.chan@broadcom.com>
+	s=arc-20240116; t=1724907734; c=relaxed/simple;
+	bh=i1fPbDH24oD861Jt9OCb/DWqJTwDV3i0koPkmGEspoE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SKFgvR5zp+cPhXG3GUfaGu5rYvtXMiyCC70EivTbFmM7f15LExoRcao+SvcyD+lmh/oH5+xser2zHMmnG1nfEIWeN88n6orolqGPhbL8/tsgo0h5zvm8EsJVBtxlBU5Xnx6+KtAn2rJS0ht5Ypj7ykiKTcScHuQDy848xY7myxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ucr.edu; spf=pass smtp.mailfrom=ucr.edu; dkim=pass (2048-bit key) header.d=ucr.edu header.i=@ucr.edu header.b=OWCWZYvX; dkim=pass (1024-bit key) header.d=ucr.edu header.i=@ucr.edu header.b=kROzuzpj; arc=none smtp.client-ip=138.23.62.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ucr.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ucr.edu
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=ucr.edu; i=@ucr.edu; q=dns/txt; s=selector3;
+  t=1724907733; x=1756443733;
+  h=dkim-signature:x-google-dkim-signature:
+   x-forwarded-encrypted:x-gm-message-state:
+   x-google-smtp-source:mime-version:references:in-reply-to:
+   from:date:message-id:subject:to:cc:content-type:
+   content-transfer-encoding:x-cse-connectionguid:
+   x-cse-msgguid;
+  bh=i1fPbDH24oD861Jt9OCb/DWqJTwDV3i0koPkmGEspoE=;
+  b=OWCWZYvXdbMgmqJk3PutuQwshtSE+derYjxw/i+0YgKPV5xIJD/5Xd6F
+   vGDdBvG/YIiKAGRLSceJYVFtokUiluKlifSHNWChTkiTcqLwZECWvgL5Z
+   Eu/6WXQvl2/gLFf6msVZ5p0SH3/ggToOSjWaxCcwMZfp5oGMM7022ojQE
+   IMUxJJYVDS7Pjypz59nO/Dp1apebMS+GU4QLCo0FXldc1KzophgvGtSvL
+   t19wli/in4w/8NhXfCPcA4cnkzrzuUPIo40MDKXKT5tfpqMIkxlQ6bYwu
+   a2ue3gCXsiBZHrAf2I+dcvp/4sgUpwoV4Yc7RbiHldg/gKwkiLhIn9qXS
+   g==;
+X-CSE-ConnectionGUID: 5V9muG3oQ/+Hi5mYWP8wcg==
+X-CSE-MsgGUID: NTU529AvTfSAdn+fKy498A==
+Received: from mail-il1-f199.google.com ([209.85.166.199])
+  by smtp2.ucr.edu with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 28 Aug 2024 22:02:12 -0700
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39d2c44422eso2117795ab.2
+        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 22:02:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ucr.edu; s=rmail; t=1724907731; x=1725512531; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Eh1bQD5cI+vzw09T28H0NLKYRrXU4Y8237RYtEC1S8U=;
+        b=kROzuzpj5DUG5SUceOpR0EqADP69cbJmcJhdgSndQPO7JTAiebxbc6tOFYrF0F1LZf
+         eg4jh4DJ6mYW9Evxz23zcuvnBmLa7QdbEkPtra26nyBkaF/Ujmhprdd/GHLh9WeQ0sYd
+         dZRXXjnLABzEwBKOiDIQOiq0zPoOVKSYx80kw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724907731; x=1725512531;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Eh1bQD5cI+vzw09T28H0NLKYRrXU4Y8237RYtEC1S8U=;
+        b=LYL2YU3WS3dKOzPaM0rmTI/tkYuFwNC1PpmnVr/F6IOFAa54CDyyHotMYJhvkD7LKR
+         AtnrWjT0WKPGUUA6N6Ntu0aeB0hQvwGxxPJGuuK1hCaowaiUPEo+5Mjj9yfyZGFRd2mT
+         PX+txzieDian0wglG1BHy4gVcCyK29dKbktNyQOO+lqMrW+x71wQ7qWoPxRzooBuwzQA
+         mavflywlmkUfY/XWBUsaD9kAcGaWXN+atDg3OGKts8C9Er+7t4lDpAsWo7pgqIF3k054
+         LeZl7oDYHpeKCB/bW8MgJzd7HDP0yJdS4HQN331Oae371sKorzoa25OIoNdUZ8pBYNtK
+         iUyg==
+X-Forwarded-Encrypted: i=1; AJvYcCX4UXK19UFdNdDKmpbkzW3AV23gOS4JRh0A4r+e8lXPn95hSQcyF+14oSHl1rZ8Ssct83TF6+M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YylrxZPMfuN1C2FLA7cQoxnXzgM47pZTRitzjH2eEWrWYmdaD9F
+	YuXBOaV0KNXpKLJ3abNyrNtSC+iCMdxfNuc/JOY7shVNeuAg977LJAHLf1on/JkcMLLB3K3r4IL
+	9mwksoCzhxHw90bINfPzv/VtT02C2Kyq0E8MsMLVDfFu8/VIclCCKSIdWfHoOdYRHrdOTv4oYrL
+	/OwMtVOmfu7Hr++vwXMgyWJ//gsc0J5w==
+X-Received: by 2002:a05:6e02:1607:b0:39b:649:f5e2 with SMTP id e9e14a558f8ab-39f3780c2fbmr25136115ab.13.1724907731269;
+        Wed, 28 Aug 2024 22:02:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEaa+ZsQ9KdlcFxh7JYAL/9GdYzaBFZJcCvNC82sLT8U3GwPSZuhQbgd/2qDHiM5i4hiGxTkqh+ZedpnYzpgEg=
+X-Received: by 2002:a05:6e02:1607:b0:39b:649:f5e2 with SMTP id
+ e9e14a558f8ab-39f3780c2fbmr25135865ab.13.1724907730838; Wed, 28 Aug 2024
+ 22:02:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240828183235.128948-10-michael.chan@broadcom.com>
+References: <CALAgD-4uup-u-7rVLpFqKWqeVVVnf5-88vqHOKD-TnGeYmHbQw@mail.gmail.com>
+ <202408281812.3F765DF@keescook>
+In-Reply-To: <202408281812.3F765DF@keescook>
+From: Xingyu Li <xli399@ucr.edu>
+Date: Wed, 28 Aug 2024 22:02:00 -0700
+Message-ID: <CALAgD-6CptEMjtkwEfSZyzPMwhbJ_965cCSb5B9pRcgxjD_Zkg@mail.gmail.com>
+Subject: Re: BUG: WARNING in retire_sysctl_set
+To: Kees Cook <kees@kernel.org>
+Cc: mcgrof@kernel.org, j.granados@samsung.com, linux-kernel@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, Yu Hao <yhao016@ucr.edu>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, Waiman Long <longman@redhat.com>, 
+	Sven Eckelmann <sven@narfation.org>, Thomas Gleixner <tglx@linutronix.de>, anna-maria@linutronix.de, 
+	frederic@kernel.org, netdev@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 28, 2024 at 11:32:35AM -0700, Michael Chan wrote:
-> A range of MSIX vectors are allocated at initialization for the number
-> needed for RocE and L2.  During run-time, if the user increases or
-> decreases the number of L2 rings, all the MSIX vectors have to be
-> freed and a new range has to be allocated.  This is not optimal and
-> causes disruptions to RoCE traffic every time there is a change in L2
-> MSIX.
-> 
-> If the system supports dynamic MSIX allocations, use dynamic
-> allocation to add new L2 MSIX vectors or free unneeded L2 MSIX
-> vectors.  RoCE traffic is not affected using this scheme.
-> 
-> Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
-> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
-> Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> v4: Simplify adding and deleting MSIX
-> v2: Fix typo in changelog
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 37 +++++++++++++++++++++--
->  1 file changed, 34 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index fa4115f6dafe..c9248ed9330c 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -10622,6 +10622,30 @@ static void bnxt_setup_msix(struct bnxt *bp)
->  
->  static int bnxt_init_int_mode(struct bnxt *bp);
->  
-> +static int bnxt_change_msix(struct bnxt *bp, int total)
-> +{
-> +	struct msi_map map;
-> +	int i;
-> +
-> +	/* add MSIX to the end if needed */
-> +	for (i = bp->total_irqs; i < total; i++) {
-> +		map = pci_msix_alloc_irq_at(bp->pdev, i, NULL);
-> +		if (map.index < 0)
-> +			return bp->total_irqs;
-> +		bp->irq_tbl[i].vector = map.virq;
-> +		bp->total_irqs++;
-> +	}
-> +
-> +	/* trim MSIX from the end if needed */
-> +	for (i = bp->total_irqs; i > total; i--) {
-> +		map.index = i - 1;
-> +		map.virq = bp->irq_tbl[i - 1].vector;
-> +		pci_msix_free_irq(bp->pdev, map);
-> +		bp->total_irqs--;
-> +	}
-> +	return bp->total_irqs;
-> +}
-> +
->  static int bnxt_setup_int_mode(struct bnxt *bp)
->  {
->  	int rc;
-> @@ -10788,6 +10812,7 @@ static void bnxt_clear_int_mode(struct bnxt *bp)
->  int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
->  {
->  	bool irq_cleared = false;
-> +	bool irq_change = false;
->  	int tcs = bp->num_tc;
->  	int irqs_required;
->  	int rc;
-> @@ -10806,15 +10831,21 @@ int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
->  	}
->  
->  	if (irq_re_init && BNXT_NEW_RM(bp) && irqs_required != bp->total_irqs) {
-> -		bnxt_ulp_irq_stop(bp);
-> -		bnxt_clear_int_mode(bp);
-> -		irq_cleared = true;
-> +		irq_change = true;
-> +		if (!pci_msix_can_alloc_dyn(bp->pdev)) {
-> +			bnxt_ulp_irq_stop(bp);
-> +			bnxt_clear_int_mode(bp);
-> +			irq_cleared = true;
-> +		}
->  	}
->  	rc = __bnxt_reserve_rings(bp);
->  	if (irq_cleared) {
->  		if (!rc)
->  			rc = bnxt_init_int_mode(bp);
->  		bnxt_ulp_irq_restart(bp, rc);
-> +	} else if (irq_change && !rc) {
-> +		if (bnxt_change_msix(bp, irqs_required) != irqs_required)
-> +			rc = -ENOSPC;
->  	}
->  	if (rc) {
->  		netdev_err(bp->dev, "ring reservation/IRQ init failure rc: %d\n", rc);
-> -- 
-> 2.30.1
+This has been mentioned
+a few times already[3][4]; have you seen these replies?
 
-Thanks,
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Sorry, I did not see this email
+https://lore.kernel.org/netdev/CANn89iK6rq0XWO5-R5CzA5YAv2ygaTA=3D=3DEVh+O7=
+4VHGDBNqUoA@mail.gmail.com/.
+And I received this reply
+https://lore.kernel.org/all/20240829011805.92574-1-kuniyu@amazon.com/
+just 8 minutes before your response.
+Previously, I did not have the experience to send emails about bug
+reporting. Later, I will take care that I only send bug reports with
+reproducer or with a patch.
 
-> 
+but only have
+reproducers for 4 of them[2].
+
+Your search words may ignore some of my emails. In fact, it has 16 bug
+reports with the C reproducer(previously, some of them is only given a
+syzkaller reproducer, and I just checked to confirm that C reproducer
+is given for each bug).
+
+https://lore.kernel.org/all/CALAgD-4M6bv53fpWnb2vdu4kxnCe_7H3kbOvs3DBAd8DeR=
+HYuw@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-5cKJnWRsS_2rjL1P9pC0dbNX66b8x09p=3DDUx1k=
+D+p6PQ@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-7TsMdA7rjxfpheXc=3DMNqikEXY9TZNxJt4z9vm6=
+Yfs5qQ@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-6miPB6F2=3D89m90HzEGT4dmCX_ws1r26w7Vr8rt=
+D8Z96Q@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-6Uy-2kVrj05SeCiN4wZu75Vq5-TCEsiUGzYwzjO4=
++Ahg@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-5myPieAa_9BY6RVfBjWT_8g48+S0CX7c=3DEihMz=
+dwakxw@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-718DVmcVHtgSFGKbgr0ePoUjN2ST=3DgBtdYtGX5=
+GUqBQg@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-5kt+F6S1aAwRhKMKb0KwFGzfJCWyHguotEvJGBBB=
+vFkA@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-7JNKw5m0wpGAN+ezCL-qn7LcTL5vgyBmQZKbf5BT=
+NUCw@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-6MJC+D0DzxLOpVvCbYzHE-r1YzNORtpOh-f+hgEk=
+Mjzg@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-7hbfOzovnPqVqo6bqb1nHZ2WciUOTsz0Dtwsgr+y=
+x04w@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-4hkHVcCq2ycdwnA2hYDBMqijLUOfZgvf1WfFpU-8=
++42w@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-6gJ4W1rPj=3DCWG7bFUPpEJnUjEhQd3uvH=3D7C=
+=3DaGKb=3DCUQ@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-7C3t=3DvRTvpnVvsZ_1YhgiiynDaX_ud0O6pxSBn=
+3suADQ@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-4b_yFdN4fwPxpXEpJkcxEwXBxRHeQjeA3x3rMX4J=
+pUwA@mail.gmail.com/
+https://lore.kernel.org/all/CALAgD-58VEomA47Srga5H-p6cZa0zPj+y3E1se0rHb3gj4=
+UvyA@mail.gmail.com/
+
+
+There
+are hundreds like them (many with reproducers) already at:
+https://syzkaller.appspot.com/upstream
+
+In fact, the bugs that I report are fuzzed by the syzkaller templates
+that we generated, but not those from the syzkaller official
+templates. We want to find bugs that do not have the corresponding
+official syzkaller template.
+I also checked to make sure that the bugs I reported did not occur on syzbo=
+t.
+
+
+
+On Wed, Aug 28, 2024 at 6:26=E2=80=AFPM Kees Cook <kees@kernel.org> wrote:
+>
+> Hi,
+>
+> On Wed, Aug 28, 2024 at 02:16:34PM -0700, Xingyu Li wrote:
+> > We found a bug in Linux 6.10. It is possibly a logic   bug.
+> > The bug report is as follows, but unfortunately there is no generated
+> > syzkaller reproducer.
+>
+> I see you've sent 44 reports like this recently[1], but only have
+> reproducers for 4 of them[2].
+>
+> Without reproducers these reports aren't very helpful. There
+> are hundreds like them (many with reproducers) already at:
+> https://syzkaller.appspot.com/upstream
+>
+> Please only send these kind of reports if you have a fix for them
+> (preferred) or a reproducer for an actual problem. This has been mentione=
+d
+> a few times already[3][4]; have you seen these replies?
+>
+> -Kees
+>
+> [1] https://lore.kernel.org/all/?q=3Df%3Axli399%40
+> [2] https://lore.kernel.org/all/?q=3Df%3Axli399%40+%22The+reproducer%22
+> [3] https://lore.kernel.org/netdev/CANn89iK6rq0XWO5-R5CzA5YAv2ygaTA=3D=3D=
+EVh+O74VHGDBNqUoA@mail.gmail.com/
+> [4] https://lore.kernel.org/all/20240829011805.92574-1-kuniyu@amazon.com/
+>
+> --
+> Kees Cook
+
+
+
+--
+Yours sincerely,
+Xingyu
 
