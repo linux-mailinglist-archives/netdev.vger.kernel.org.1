@@ -1,103 +1,135 @@
-Return-Path: <netdev+bounces-123151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CC7A963D96
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 09:49:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53E94963DEA
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 10:01:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12ED01F255A0
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 07:49:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84F9B1C21D7A
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2FF18786F;
-	Thu, 29 Aug 2024 07:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o7DR20Hj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB0E18991C;
+	Thu, 29 Aug 2024 08:01:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9297714F130;
-	Thu, 29 Aug 2024 07:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1461547C7;
+	Thu, 29 Aug 2024 08:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724917759; cv=none; b=rveIW5ONHVajWoiJnK3HY3XK7hccAX7bM72iDVZ1/AdOKZBHamWgVrvM1kjPMjBdbLE/4Me7A1PjSCreFKOxR8OYMrhRugnp7A5JTZblE2fayilFabDr2dYRIZp9ARCX/pGrGxCkKHu2iVp7KvxQAVfBLnqjEtV1GuJybchWOTk=
+	t=1724918477; cv=none; b=Fv3UnKNgQXCfdXUC1XqkSzwQAE/ABJqMCHrho5w+PTqpt6qI7y5m+JaqoQtrgWbAd+a/CDTIfWV7xK2ggBXuqrcSIetRKqtOhbYVR2MEklLnvwj/hhqgS5J9uMDQW6FFXyoJSvG9lvO98h1JZMmFjn5M9Erg5/1SDXIo5s5GAkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724917759; c=relaxed/simple;
-	bh=e0yIcq32he+tbOuBFyLsPOBT2gF950RoRJa9IdctazQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jId5qVK4iFr0sB5aFXtV+gf9GXEeSAtWM6BqCijLTFkuDODYmgIZe6gt8MRtLXUZh4iW5v5DMKhF9w1xHNXp2iVxD7Qy5AgTMP2gp/vdI1+ziWLTklPU9qJDbmL9KUWD2gsEcAtTGebxCtdhsdCkiQ35002J6DDlXoTsg2ZYN/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o7DR20Hj; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 93B811BF209;
-	Thu, 29 Aug 2024 07:49:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1724917754;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/B+6n0mZlxv3Hh4twZ/ws0hIIISEcKuIO8fCbE38Uy8=;
-	b=o7DR20HjmeFFG3XiV7cwZs3xvgw2qOw3zz9MwCOCwUik9R07tlfI+hTdjbeKXQOcSb0bXH
-	2JcpiRDsoWV/746hgB3fB5ih90PwaqdwNNDn4ZElr8u8lpIyncwwUdllnRXkcyZCRaNH4g
-	c+FDmwIoqAMlqsf3E/Yvq8nEk6h3UbbmUeaWSUcgda8WQonJ8MbapGfc3Nhlzuq+ASeln1
-	QYxgN82a/+mksI2yLHBdLaWwYy9iqqWRKWrcKsXgSSp8M5NXTasFspr8vU4UkQA1lR7bDS
-	HI0H06p3stcQKQZqoAOgTkpGQGdsbenens5qVKIMmiUjOuDbb7xz2f2vRvU/qg==
-Date: Thu, 29 Aug 2024 09:49:10 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>,
- <linux@armlinux.org.uk>, <kuba@kernel.org>, <andrew@lunn.ch>,
- <hkallweit1@gmail.com>, <richardcochran@gmail.com>,
- <rdunlap@infradead.org>, <Bryan.Whitehead@microchip.com>,
- <edumazet@google.com>, <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>,
- <horms@kernel.org>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next V4 4/5] net: lan743x: Migrate phylib to phylink
-Message-ID: <20240829094910.28ccd6ca@device-28.home>
-In-Reply-To: <20240829055132.79638-5-Raju.Lakkaraju@microchip.com>
-References: <20240829055132.79638-1-Raju.Lakkaraju@microchip.com>
-	<20240829055132.79638-5-Raju.Lakkaraju@microchip.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1724918477; c=relaxed/simple;
+	bh=PaqM9/tIwzVN4UaFTMBCtN5L0w49rgk5eRP25mcWeJY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n60GPj6BRHMl6JnMvzeto98e0ZGSdN8vW/zwRej+bj8iSngrEUnh1FApZXeI0DzGNtwbiYmpgODXaUMZjftpcz0mc8f5i57AVcgsSfg1voxaywsNcsUc21tUHbuaJQszJGWRWBnSXOgLbrm0gi/8o9U36sSwbuvAVcSDiZMAMFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sja5d-00007h-By; Thu, 29 Aug 2024 10:01:09 +0200
+Date: Thu, 29 Aug 2024 10:01:09 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net-next] selftests: netfilter: nft_queue.sh: reduce test
+ file size for debug build
+Message-ID: <20240829080109.GB30766@breakpoint.cc>
+References: <20240826192500.32efa22c@kernel.org>
+ <20240827090023.8917-1-fw@strlen.de>
+ <20240828154940.447ddc7d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240828154940.447ddc7d@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hello Raju,
-
-On Thu, 29 Aug 2024 11:21:31 +0530
-Raju Lakkaraju <Raju.Lakkaraju@microchip.com> wrote:
-
-> Migrate phy support from phylib to phylink.
+Jakub Kicinski <kuba@kernel.org> wrote:
+> On Tue, 27 Aug 2024 11:00:12 +0200 Florian Westphal wrote:
+> > The sctp selftest is very slow on debug kernels.
 > 
-> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+> I think there may be something more going on here? :(
+> 
+> For reference net-next-2024-08-27--12-00 is when this fix got queued:
+> 
+> https://netdev.bots.linux.dev/contest.html?executor=vmksft-nf-dbg&test=nft-queue-sh
+> 
+> Since then we still see occasional flakes. But take a look at 
+> the runtime. If it's happy the test case takes under a minute.
+> When it's unhappy it times out (after 5 minutes). I'll increase
+> the timeout to 10 minutes, but 1min vs 5min feels like it may
+> be getting stuck rather than being slow..
 
-[...]
+Yes, its stuck.  Only reason I could imagine is that there is a 2s
+delay between starting the nf_queue test prog and the first packet
+getting sent.  That would make the listener exit early and then
+socat sender would hang.
 
-> +static void lan743x_phylink_disconnect(struct lan743x_adapter *adapter)
-> +{
-> +	struct net_device *netdev = adapter->netdev;
-> +	struct phy_device *phydev = netdev->phydev;
-> +
-> +	phylink_stop(adapter->phylink);
-> +	phylink_disconnect_phy(adapter->phylink);
-> +
-> +	if (phydev)
-> +		if (phy_is_pseudo_fixed_link(phydev))
-> +			fixed_phy_unregister(phydev);
+I'll test following tomorrow on an old / slow machine:
 
-You shouldn't manually deal with the fixed_phy when using phylink, it
-handles fixed links already for you, without a PHY.
+diff --git a/tools/testing/selftests/net/netfilter/nft_queue.sh b/tools/testing/selftests/net/netfilter/nft_queue.sh
+--- a/tools/testing/selftests/net/netfilter/nft_queue.sh
++++ b/tools/testing/selftests/net/netfilter/nft_queue.sh
+@@ -39,7 +39,10 @@ TMPFILE2=$(mktemp)
+ TMPFILE3=$(mktemp)
+ 
+ TMPINPUT=$(mktemp)
+-dd conv=sparse status=none if=/dev/zero bs=1M count=200 of="$TMPINPUT"
++
++COUNT=200
++[ "$KSFT_MACHINE_SLOW" = "yes" ] && COUNT=25
++dd conv=sparse status=none if=/dev/zero bs=1M count=$COUNT of="$TMPINPUT"
+ 
+ if ! ip link add veth0 netns "$nsrouter" type veth peer name eth0 netns "$ns1" > /dev/null 2>&1; then
+     echo "SKIP: No virtual ethernet pair device support in kernel"
+@@ -398,7 +401,7 @@ EOF
+ 
+ 	busywait "$BUSYWAIT_TIMEOUT" sctp_listener_ready "$ns2"
+ 
+-	ip netns exec "$nsrouter" ./nf_queue -q 10 -G -t "$timeout" &
++	ip netns exec "$nsrouter" ./nf_queue -q 10 -G &
+ 	local nfqpid=$!
+ 
+ 	ip netns exec "$ns1" socat -u STDIN SCTP:10.0.2.99:12345 <"$TMPINPUT" >/dev/null
+@@ -409,6 +412,7 @@ EOF
+ 	fi
+ 
+ 	wait "$rpid" && echo "PASS: sctp and nfqueue in forward chain"
++	kill "$nfqpid"
+ 
+ 	if ! diff -u "$TMPINPUT" "$TMPFILE1" ; then
+ 		echo "FAIL: lost packets?!" 1>&2
+@@ -434,7 +438,7 @@ EOF
+ 
+ 	busywait "$BUSYWAIT_TIMEOUT" sctp_listener_ready "$ns2"
+ 
+-	ip netns exec "$ns1" ./nf_queue -q 11 -t "$timeout" &
++	ip netns exec "$ns1" ./nf_queue -q 11 &
+ 	local nfqpid=$!
+ 
+ 	ip netns exec "$ns1" socat -u STDIN SCTP:10.0.2.99:12345 <"$TMPINPUT" >/dev/null
+@@ -446,6 +450,7 @@ EOF
+ 
+ 	# must wait before checking completeness of output file.
+ 	wait "$rpid" && echo "PASS: sctp and nfqueue in output chain with GSO"
++	kill "$nfqpid"
+ 
+ 	if ! diff -u "$TMPINPUT" "$TMPFILE1" ; then
+ 		echo "FAIL: lost packets?!" 1>&2
+-- 
+2.46.0
 
-Thanks,
 
-Maxime
 
