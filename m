@@ -1,145 +1,141 @@
-Return-Path: <netdev+bounces-123118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BADD3963B57
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:25:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79393963BC9
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:41:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44729B22AB8
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 06:25:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACD561C20DD5
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 06:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38A69153BEF;
-	Thu, 29 Aug 2024 06:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5230516130B;
+	Thu, 29 Aug 2024 06:40:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6770B16D4CA
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DCE3157488;
+	Thu, 29 Aug 2024 06:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724912615; cv=none; b=rUOu9TLCcRPv2NhBq+fqO+3VJzfQ+ri+0kqIxxi9GRzi+C5C5Y4GCYSezA9F/61aGKUWGNGWemV8TJUGIiBwZBoLfIh6kMfCQN4bRc3Zh2cHtfD5DrcfI6UNtMBRil/xJ8RQSgBXXLS9B+yXTS8OetBBzoPH3TPfvjp2tpikbbA=
+	t=1724913654; cv=none; b=qjXvvSkTc7A7wv43ou9q1DNZ+nhA2tpcvLDS6hXWUJkDcUtFwi/lEqBHS7oM8Icw6oawYfd2m3//n7xdG8WUB3ZiRUeaaKuFLN8vKW9kEGA4SYEFRzuTNRufUOzJAFd/Yw4lI56bw+H5ybfrgwNmuUkTfhBR3xmNC/ygxh2Pd8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724912615; c=relaxed/simple;
-	bh=tqd/UpbuLK4fDS0wPAQt7nXr2DF6hHvwdCpb/IcE2wA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NEjFva7J0eeMRx/RjVuWrkRkFbCvvfWeoYqUbhn5Qf12HEueIDt7iZh2064dRioWah5a4Ot/4wpxzGPjbZXsuVUBw45AuEkn2w7e3lsgQ4o1FI0/5ELW7wEX00XpTk6WAM2NR5mI9iTcn8vEw2lgEmtN5s9eOGYIj9smFG2KRCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WvWS53SY1z2Dbc5;
-	Thu, 29 Aug 2024 14:23:17 +0800 (CST)
-Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id D1EE01400E8;
-	Thu, 29 Aug 2024 14:23:29 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
- (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 29 Aug
- 2024 14:23:28 +0800
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-To: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
-	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <linus.walleij@linaro.org>,
-	<alsi@bang-olufsen.dk>, <justin.chen@broadcom.com>,
-	<sebastian.hesselbarth@gmail.com>, <alexandre.torgue@foss.st.com>,
-	<joabreu@synopsys.com>, <wens@csie.org>, <jernej.skrabec@gmail.com>,
-	<samuel@sholland.org>, <mcoquelin.stm32@gmail.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <ansuelsmth@gmail.com>,
-	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
-	<bcm-kernel-feedback-list@broadcom.com>,
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-sunxi@lists.linux.dev>,
-	<krzk@kernel.org>, <jic23@kernel.org>
-CC: <ruanjinjie@huawei.com>
-Subject: [PATCH net-next v3 13/13] net: bcmasp: Simplify with __free()
-Date: Thu, 29 Aug 2024 14:31:18 +0800
-Message-ID: <20240829063118.67453-14-ruanjinjie@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240829063118.67453-1-ruanjinjie@huawei.com>
-References: <20240829063118.67453-1-ruanjinjie@huawei.com>
+	s=arc-20240116; t=1724913654; c=relaxed/simple;
+	bh=HZc4EkwuP6mDfsIJPzpkiVjvI9rRdhfz8BusHFVV/GI=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=P3hZaTdAboDDIKegiUQzEiEocaVWpxKyErnP4B7gNaqd/yYX9mcQAUpzlrdw3Xmd0wimfrVkWoiaCQvkV9XoKbg1D0icPu8EBuvXW4UPG5kyimpOq88yScaw8eGKwdG54+xol5isef80wruaWYoWaP4M5tQ19JQ7Gy9Bf9FzoYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.194.254.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas3t1724913623t215t26311
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [125.120.181.182])
+X-QQ-SSF:00400000000000F0FVF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 9027350068236494838
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <andi.shyti@kernel.org>,
+	<jarkko.nikula@linux.intel.com>,
+	<andriy.shevchenko@linux.intel.com>,
+	<mika.westerberg@linux.intel.com>,
+	<jsd@semihalf.com>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<rmk+kernel@armlinux.org.uk>,
+	<linux-i2c@vger.kernel.org>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<duanqiangwen@net-swift.com>
+References: <20240823030242.3083528-1-jiawenwu@trustnetic.com> <888f78a9-dea9-4f66-a4d0-00a57039733d@lunn.ch> <01d701daf75c$50db4450$f291ccf0$@trustnetic.com> <55ff5570-5398-48e9-bf56-d34da197d175@lunn.ch> <020f01daf827$d765ffd0$8631ff70$@trustnetic.com> <509abfeb-b1fb-4c53-9898-6106c8dde411@lunn.ch>
+In-Reply-To: <509abfeb-b1fb-4c53-9898-6106c8dde411@lunn.ch>
+Subject: RE: [PATCH net 0/3] Add I2C bus lock for Wangxun
+Date: Thu, 29 Aug 2024 14:40:22 +0800
+Message-ID: <02a001daf9de$529edd90$f7dc98b0$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemh500013.china.huawei.com (7.202.181.146)
+Content-Type: text/plain;
+	charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQH8I/V4PrHZ+O/IFu6cfIurHK/3+gGW9YksAYhjRIgArI2qVwHKSDtnAdofD32xvhTIUA==
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Avoid need to manually handle of_node_put() by using __free(), which
-can simplfy code.
+On Tue, Aug 27, 2024 8:19 PM, Andrew Lunn wrote:
+> > > More details please.
+> > >
+> > > Linux assume it is driving the hardware. Your firmware cannot be
+> > > touching any registers which will clear on read. QSFP states that
+> > > registers 3-31 of page 0 are all clear on read, for example. The
+> > > firmware should also not be setting any registers, otherwise you can
+> > > confuse Linux which assumes registers it set stay set, because it is
+> > > controlling the hardware.
+> > >
+> > > Your firmware also needs to handle that Linux can change the page. If
+> > > the firmware changes the page, it must restore it back to whatever
+> > > page Linux selected, etc.
+> > >
+> > > The fact you are submitting this for net suggests you have seen real
+> > > issues. Please describe what those issues are.
+> >
+> > The error log shows:
+> >
+> > [257681.367827] sfp sfp.1025: Host maximum power 1.0W
+> > [257681.370813] txgbe 0000:04:00.1: 31.504 Gb/s available PCIe bandwidth, limited by 8.0 GT/s PCIe x4 link at 0000:02:02.0
+(capable
+> > of 63.008 Gb/s with 8.0 GT/s PCIe x8 link)
+> > [257681.373364] txgbe 0000:04:00.1 enp4s0f1: renamed from eth0
+> > [257681.434719] txgbe 0000:04:00.1 enp4s0f1: configuring for inband/10gbase-r link mode
+> > [257681.676747] sfp sfp.1025: EEPROM base structure checksum failure: 0x63 != 0x1f
+> > [257681.676755] sfp EE: 00000000: 03 04 07 10 00 00 01 00 00 00 00 06 67 02 00 00  ............g...
+> > [257681.676757] sfp EE: 00000010: 1e 0f 00 00 46 69 62 65 72 53 74 6f 72 65 20 64  ....FiberStore d
+> > [257681.676759] sfp EE: 00000020: 20 20 20 20 00 00 1b 21 53 46 50 2d 31 30 47 53      ...!SFP-10GS
+> > [257681.676760] sfp EE: 00000030: 52 2d 38 35 20 20 20 20 41 20 20 20 03 52 00 1f  R-85    A   .R..
+> > [257681.676762] sfp EE: 00000040: 00 81 cd 5b df 25 0a bd 40 f6 c6 ce 47 8e ff ff  ...[.%..@...G...
+> > [257681.676763] sfp EE: 00000050: 10 d8 24 33 44 8e ff ff 10 41 b0 9a ff ff ff ff  ..$3D....A......
+> >
+> > It looks like some fields are read incorrectly. For comparison, I printed the
+> >  SFP info when it loaded correctly:
+> >
+> > [260908.194533] sfp EE: 00000000: 03 04 07 10 00 00 01 00 00 00 00 06 67 02 00 00  ............g...
+> > [260908.194536] sfp EE: 00000010: 1e 0f 00 00 46 69 62 65 72 53 74 6f 72 65 20 20  ....FiberStore
+> > [260908.194538] sfp EE: 00000020: 20 20 20 20 00 00 1b 21 53 46 50 2d 31 30 47 53      ...!SFP-10GS
+> > [260908.194540] sfp EE: 00000030: 52 2d 38 35 20 20 20 20 41 20 20 20 03 52 00 1f  R-85    A   .R..
+> > [260908.194541] sfp EE: 00000040: 40 63 bd df 40 8e ff ff 10 41 b0 9a ff ff ff ff  @c..@....A......
+> > [260908.194543] sfp EE: 00000050: 10 58 5b 29 41 8e ff ff 10 41 b0 9a ff ff ff ff  .X[)A....A......
+> > [260908.198205] sfp sfp.1025: module FiberStore       SFP-10GSR-85     rev A    sn G1804125607      dc 180605
+> >
+> > Since the read mechanism of I2C is to write the offset and read command
+> > first, and then read the target address. I think it's possible that the different
+> > offsets be written at the same time, from Linux and firmware.
+> 
+> O.K, that is bad. The SFP is totally unreliable...
+> 
+> You however have still not answered my question. What is the firmware
+> accessing? How does it handle pages?
+>
+> The hack you have put in place is per i2c transaction. But accessing
+> pages is likely to be multiple transactions. One to change the page,
+> followed by a few reads/writes in the new page, then maybe followed by
+> a transactions to return to page 0.
 
-Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
----
-v3:
-- Add Reviewed-by.
-v2:
-- Split into 2 patches.
----
- drivers/net/ethernet/broadcom/asp2/bcmasp.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
+Do you mean the bus address A0 or A2? Firmware accesses I2C just like driver,
+but it only change the page once per full transaction, during a possession of
+the semaphore.  What you fear seems unlikely to happen.
 
-diff --git a/drivers/net/ethernet/broadcom/asp2/bcmasp.c b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-index 297c2682a9cf..73e767aada2f 100644
---- a/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-+++ b/drivers/net/ethernet/broadcom/asp2/bcmasp.c
-@@ -1302,7 +1302,6 @@ static int bcmasp_probe(struct platform_device *pdev)
- {
- 	const struct bcmasp_plat_data *pdata;
- 	struct device *dev = &pdev->dev;
--	struct device_node *ports_node;
- 	struct bcmasp_priv *priv;
- 	struct bcmasp_intf *intf;
- 	int ret = 0, count = 0;
-@@ -1367,7 +1366,8 @@ static int bcmasp_probe(struct platform_device *pdev)
- 	bcmasp_core_init(priv);
- 	bcmasp_core_init_filters(priv);
- 
--	ports_node = of_find_node_by_name(dev->of_node, "ethernet-ports");
-+	struct device_node *ports_node __free(device_node) =
-+		of_find_node_by_name(dev->of_node, "ethernet-ports");
- 	if (!ports_node) {
- 		dev_warn(dev, "No ports found\n");
- 		return -EINVAL;
-@@ -1377,10 +1377,9 @@ static int bcmasp_probe(struct platform_device *pdev)
- 	for_each_available_child_of_node_scoped(ports_node, intf_node) {
- 		intf = bcmasp_interface_create(priv, intf_node, i);
- 		if (!intf) {
--			dev_err(dev, "Cannot create eth interface %d\n", i);
- 			bcmasp_remove_intfs(priv);
--			ret = -ENOMEM;
--			goto of_put_exit;
-+			return dev_err_probe(dev, -ENOMEM,
-+					     "Cannot create eth interface %d\n", i);
- 		}
- 		list_add_tail(&intf->list, &priv->intfs);
- 		i++;
-@@ -1406,16 +1405,14 @@ static int bcmasp_probe(struct platform_device *pdev)
- 				   "failed to register net_device: %d\n", ret);
- 			priv->destroy_wol(priv);
- 			bcmasp_remove_intfs(priv);
--			goto of_put_exit;
-+			return ret;
- 		}
- 		count++;
- 	}
- 
- 	dev_info(dev, "Initialized %d port(s)\n", count);
- 
--of_put_exit:
--	of_node_put(ports_node);
--	return ret;
-+	return 0;
- }
- 
- static void bcmasp_remove(struct platform_device *pdev)
--- 
-2.34.1
+> I think your best solution is to simply take the mutex and never
+> release it. Block your firmware from accessing the SFP.
+
+Firmware accesses the SFP in order to provide information to the BMC.
+So it cannot simply be blocked.
+
 
 
