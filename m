@@ -1,126 +1,135 @@
-Return-Path: <netdev+bounces-123159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007D8963E37
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 10:21:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8034963E5D
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 10:27:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7AB6EB20D17
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:20:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FE8B287E2F
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632A618C023;
-	Thu, 29 Aug 2024 08:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E060618C35B;
+	Thu, 29 Aug 2024 08:27:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LvYl67KD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0oBEhDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B678D18C021;
-	Thu, 29 Aug 2024 08:20:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 254E518C02A
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 08:27:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724919653; cv=none; b=Wubq5vDtxgJe0UiT8lQPYHtQ6OCkaDt/Kmawetvv2oQcUC1s/31op75WCrD5vAg9/Qt4LbmPYbmOS+VKxsNjBYQLyJEp8951EPTKWDxpmQzheAdEjW9eE9mmQG2b2JiuHLHlkx2T7Rr2Kl9etpzn4LhFOF8LronFdTaMss1eBkY=
+	t=1724920024; cv=none; b=qFgnOoTsitViAdvBtzEYlKs6KSpx52Nmq+h2voVp/gI+24aa7kT2ZJgC2QgT0uBiWokp0vsghM/H73tp/iiX6NIVBeRlQmKnU0NAMUpt/6HnirXmKNo1wh/oedeaokCvUdVM1IaJTXDPRxbsckpYEhv2SApb1XGLztlhVXvhMz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724919653; c=relaxed/simple;
-	bh=FJgsYlILKYE6AZml0b+hyh4/86XwcodMKNhsDQGUxJw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HUOZElGyUFHPmlThCMfnLlIK14V4+9IuiFzlalIO+/JYAYBpQh7J80ufWF6RoXXsAIFUKnqUhHe+PEcPaQksntiUE4kk11bCTYY9t/udiIeVL57JaUB5+u79k3ZDQIhtJv/MQhcLwoO1qzuWoolgM57v8tkTADNTZ2OslQ6l44E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LvYl67KD; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42bb72a5e0bso2506295e9.1;
-        Thu, 29 Aug 2024 01:20:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724919650; x=1725524450; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nyWujZXUph0LpAdyIQjvJMmkqt6sQ3l3/uAnrfaVN6A=;
-        b=LvYl67KDW8kubIiJZOof15lBR9RFHCdVspnAC+pBPk8NvsV63atcwRlwYisDjtRyol
-         hhOjLsEG5Z8qJ7y+sOyt2w37QVZfTyBFQOus4cTNROAFLJz5qDzY/tlE+ASJcbTXmb7m
-         56QPNd96FPQwaG83Nd9asAj42w50/jCgfCISPY+81Bo2VLjb5dXuY7HMJHkNuaLPPAW3
-         /bwlIb4msb+Ap5dm1L0+gP894tUgtFrLkpnrw1bWLIGI/0xV8VAM0OKTcY4SJJNqjKT/
-         AhiWA/UER6/oEBcqHdusnJvQVxqS7KgvB1OtIgYrlxw6Y+EOMOyERkh+vS5AzG9DIfpe
-         YtuA==
+	s=arc-20240116; t=1724920024; c=relaxed/simple;
+	bh=Bg3qnOD/wVviS+JcQvXBgCI/eQDVp+5vsrv7n/OOhkk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a4D8RyEG1lfMGXQL/MP2Cx7tfxCjzD/KVUC5y7jiG3iE+sAnQePJNuC2VUXTVt3EiJiY4bGdJxGDq1xXcPVPno6Qxkzldel8SKj2r6b8db4wyhsLg+NKabkJXxT/mDK8vHs/y7G4dSIrpeeWx4wPEyfXb8tJs7d9xai5ZgLz8QY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P0oBEhDI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724920021;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=009aMKtYz3alNozgyKcZzRLs3QnC7nYwCnZ9axqzyJI=;
+	b=P0oBEhDIqaBVed4N7nJV8j0c/bk4MLAlpYqoKkJUmC8UFq25Z+RBL9y71j367W9vIP7LEe
+	y7PHYk6Jtf3osXqHe7jDblNTn3TV/UcOAaahtTJMm2YVE/F7ixwwVYfIcHV4uWYGaRkTy4
+	gLOpudiVRtPc6ArVBPhxwdfCmyCt+/o=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-288-lk2ulnfGO72YxDSK9IFncw-1; Thu, 29 Aug 2024 04:26:58 -0400
+X-MC-Unique: lk2ulnfGO72YxDSK9IFncw-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a867bc4f3c4so66776366b.0
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 01:26:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724919650; x=1725524450;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1724920017; x=1725524817;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nyWujZXUph0LpAdyIQjvJMmkqt6sQ3l3/uAnrfaVN6A=;
-        b=AOGFIHLS7cT0FN4FJj7TYFBV/QHXi2bRTeerty0mVmtGEPeA2YxIUBJPnDO5uU8/kb
-         XmwXlSF7qJcAVgxI4b7K2ugLxzbjxLahbpyikpfw3ZcV+x+e7GVJxpUE9UbH8y4IAPUJ
-         f6gjqxyCaQXiePayvISxlycS89qf/Gz3s+uyde0tGmEhedo1NfGG/rSTyCwdatJFCECY
-         pp7oEs639XlgQO+BxkGAYnGHboKiSd0PRKh/wr/GJCNkzQHYkKHTcAyg8V8nNQVGfg+B
-         yXbWw4Lx34yjxhpTLGa70DgNXmCFnA/1b1HI46sWFX48uYjT6wqwXReTMajEgsP1DXrE
-         EPig==
-X-Forwarded-Encrypted: i=1; AJvYcCVLU5ke2qXTv5rtFCMLtjF64Ef3/ESH6WcfY5xXHR0CazN1GTzPF4brEDXanspvlxzkRARfmwIG@vger.kernel.org, AJvYcCXWEXtuarRfdHqQfQhoaSqrkF3YeATWfflh/gA86OP0O6VbK4LToO1C5cz90wO3ICVlkXuJaWpIQ1gzNfI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy21sK14Ge/tpk8k0Pyd0y8aUCnfiEqhmJBaBCrRo0Ix+NngfKq
-	mUofnktU2FsIJ56FGJJpkTspi48aAOf7kcEmLYTLbzH+Hgf1DJ/c
-X-Google-Smtp-Source: AGHT+IFYa2f9NUTllmq3w8T8mdv55B6znRTNYxVksHlaze70fPmQwiMF+jdriFc0E5XQyL+UPsGOMg==
-X-Received: by 2002:a05:600c:5102:b0:425:80d5:b8b2 with SMTP id 5b1f17b1804b1-42bb01bd7f2mr14006675e9.16.1724919649482;
-        Thu, 29 Aug 2024 01:20:49 -0700 (PDT)
-Received: from localhost ([81.168.73.77])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ee73fa0sm784667f8f.43.2024.08.29.01.20.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 01:20:48 -0700 (PDT)
-Date: Thu, 29 Aug 2024 09:20:48 +0100
-From: Martin Habets <habetsm.xilinx@gmail.com>
-To: Shen Lichuan <shenlichuan@vivo.com>
-Cc: ecree.xilinx@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-net-drivers@amd.com, linux-kernel@vger.kernel.org,
-	opensource.kernel@vivo.com
-Subject: Re: [PATCH v2] sfc: Convert to use ERR_CAST()
-Message-ID: <20240829081951.GA67561@gmail.com>
-Mail-Followup-To: Shen Lichuan <shenlichuan@vivo.com>,
-	ecree.xilinx@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-net-drivers@amd.com, linux-kernel@vger.kernel.org,
-	opensource.kernel@vivo.com
-References: <20240829021253.3066-1-shenlichuan@vivo.com>
+        bh=009aMKtYz3alNozgyKcZzRLs3QnC7nYwCnZ9axqzyJI=;
+        b=ceXxl0jhmv2igDGUdmvCkNFU4/zejTTJaDpOwGwkIXtW5vcB5lVXp/N6IsGEPIv0F+
+         GppSXc0duWLjznRG7mJX708BUeL1tpI3Jfh7mWYNzRLLGei2ixBtI5qq6icOVBXiGXky
+         q6HVMJrYyZO4nG9DjFddpi6NnugYbIxdimgHKOuFKVQohEqnTxvK3WNbQidFI5DfRqqI
+         GFG1hnGVxb4mT2RzmNxoHBQthNW7rZV6Ydh9B7P+Lc7nbvUOQ3pzClDV/oxXc7evRyUq
+         0iz2xk2L01g4FYAFKOexv3Typq58hZadm5INYiGxTpi9infovzSg3fYbT9tAaYgRZjMn
+         MHZw==
+X-Forwarded-Encrypted: i=1; AJvYcCXg1+lNlVGHlqrLxZ5Y1HeGH12PZymgJi81d8IJPsLrtoM+JTISCyh9Id6UjVzymObGPpAbI5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWs8iqFHsBXf8bK3ydn1LrJgdNaP7fg1Nofrlsz1NXgOV3E2He
+	ksp9dV0v28y6oN/b+F8rhqk5h5HmQY4jrUXt6Dhcl9XvFud7vHk6yf/1EcwzmVy17+bE027jQt9
+	6DDTKKq+bxCjTKlTBMcmWtFllZ1guOvl1es58d2fUmhn+W3juQNu91w==
+X-Received: by 2002:a17:907:3f08:b0:a7a:8dcd:ffb4 with SMTP id a640c23a62f3a-a898259d562mr216809066b.17.1724920016807;
+        Thu, 29 Aug 2024 01:26:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGpgPvAWdmdMwSpjC1P4giL7TG3nksWf9mUuwzWdS9aF/bqlDM5xYu2KySqyBFkeSGzQSLmJg==
+X-Received: by 2002:a17:907:3f08:b0:a7a:8dcd:ffb4 with SMTP id a640c23a62f3a-a898259d562mr216805566b.17.1724920016274;
+        Thu, 29 Aug 2024 01:26:56 -0700 (PDT)
+Received: from ?IPV6:2a0d:3344:1b50:3f10:2f04:34dd:5974:1d13? ([2a0d:3344:1b50:3f10:2f04:34dd:5974:1d13])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c226c7c060sm413582a12.50.2024.08.29.01.26.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Aug 2024 01:26:55 -0700 (PDT)
+Message-ID: <26d3f7cf-1fd8-48b6-97be-ba6819a2ff85@redhat.com>
+Date: Thu, 29 Aug 2024 10:26:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240829021253.3066-1-shenlichuan@vivo.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] nfc: pn533: Add poll mod list filling check
+To: Aleksandr Mishin <amishin@t-argos.ru>,
+ Samuel Ortiz <sameo@linux.intel.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+References: <20240827084822.18785-1-amishin@t-argos.ru>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240827084822.18785-1-amishin@t-argos.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 29, 2024 at 10:12:53AM +0800, Shen Lichuan wrote:
-> As opposed to open-code, using the ERR_CAST macro clearly indicates that
-> this is a pointer to an error value and a type conversion was performed.
-> 
-> Signed-off-by: Shen Lichuan <shenlichuan@vivo.com>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
-Reviewed-by: Martin Habets <habetsm.xilinx@gmail.com>
 
-> ---
-> v1 -> v2: Removed the superfluous comment.
+On 8/27/24 10:48, Aleksandr Mishin wrote:
+> In case of im_protocols value is 1 and tm_protocols value is 0 this
+> combination successfully passes the check
+> 'if (!im_protocols && !tm_protocols)' in the nfc_start_poll().
+> But then after pn533_poll_create_mod_list() call in pn533_start_poll()
+> poll mod list will remain empty and dev->poll_mod_count will remain 0
+> which lead to division by zero.
 > 
->  drivers/net/ethernet/sfc/tc_counters.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Normally no im protocol has value 1 in the mask, so this combination is
+> not expected by driver. But these protocol values actually come from
+> userspace via Netlink interface (NFC_CMD_START_POLL operation). So a
+> broken or malicious program may pass a message containing a "bad"
+> combination of protocol parameter values so that dev->poll_mod_count
+> is not incremented inside pn533_poll_create_mod_list(), thus leading
+> to division by zero.
+> Call trace looks like:
+> nfc_genl_start_poll()
+>    nfc_start_poll()
+>      ->start_poll()
+>      pn533_start_poll()
 > 
-> diff --git a/drivers/net/ethernet/sfc/tc_counters.c b/drivers/net/ethernet/sfc/tc_counters.c
-> index c44088424323..a421b0123506 100644
-> --- a/drivers/net/ethernet/sfc/tc_counters.c
-> +++ b/drivers/net/ethernet/sfc/tc_counters.c
-> @@ -249,7 +249,7 @@ struct efx_tc_counter_index *efx_tc_flower_get_counter_index(
->  					       &ctr->linkage,
->  					       efx_tc_counter_id_ht_params);
->  			kfree(ctr);
-> -			return (void *)cnt; /* it's an ERR_PTR */
-> +			return ERR_CAST(cnt);
->  		}
->  		ctr->cnt = cnt;
->  		refcount_set(&ctr->ref, 1);
-> -- 
-> 2.17.1
+> Add poll mod list filling check.
 > 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Fixes: dfccd0f58044 ("NFC: pn533: Add some polling entropy")
+> Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+
+The issue looks real to me and the proposed fix the correct one, but 
+waiting a little more for Krzysztof feedback, as he expressed concerns 
+on v1.
+
+Thanks,
+
+Paolo
+
 
