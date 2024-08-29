@@ -1,100 +1,134 @@
-Return-Path: <netdev+bounces-123195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 317AE964089
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 11:50:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2F6896409F
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 11:54:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7B1F1F22D14
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 09:50:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 723592834C1
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 09:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F355148838;
-	Thu, 29 Aug 2024 09:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476DB18C02F;
+	Thu, 29 Aug 2024 09:54:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X47FqyQZ"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="kZ/EL1fj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F8B18CBE9;
-	Thu, 29 Aug 2024 09:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265EE148838;
+	Thu, 29 Aug 2024 09:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724925024; cv=none; b=XpBopp/K0eHqWRRcch9xzV5CL1TUy8f5J2BYk+/JlbLnABymn8FUbgBBeGWLWhJDOFPP5Ai+m4PYm5PG1CGE+jdS6Fs7yrvOM2y4E96rUqZEmlYxkOZCq5tBePaD808XT3O2z56JH8WczNFIqJpDVbcKQSIWjMoAFGGIPzNQqXU=
+	t=1724925263; cv=none; b=o7fij5EbFXbnLovHUz/vs4VPkIU9Mpz5GFKZ64yi0KQGfY5oC5e2YNpVGh8ghgK+dU/FYshKW6bNwsgxJ7qnY1zD+DLHdM0I0q9suKr2s2lxd15EiFgIdtFjGZwaqPlFq5qAAAXTPfeHbGAYZ61i/1V55L5phX4hT5GLiIYdz7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724925024; c=relaxed/simple;
-	bh=hs7sKm0U6Yz2qOolLUBqB/IWcmqcYGGMJw3M4eHwXy8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JyVZCENbnDyzyPSIvh655fyU6VWVVqkJj0dHitEsGKFx5zB0ZtH8lwhkvrlH9bK62POvj/y2fSGNY1DNmYd80VUgFleBTuJ3O5p0l8+8+sM246wcyB4skRj2NlOGI/rmPIIdki/bQDfPcBd4mY1lusZi1fcNP/60Zl5OzAQ5HRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X47FqyQZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E59B3C4CEC5;
-	Thu, 29 Aug 2024 09:50:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724925024;
-	bh=hs7sKm0U6Yz2qOolLUBqB/IWcmqcYGGMJw3M4eHwXy8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=X47FqyQZnpNOBr/4C2rYcFYFAEgzOguVAGWGSmX/E1mslDwh+hXt5plrJ2CrnBSMD
-	 P1hFp6/egcHURpIHYGThoifqq7FRm46+5jZj08LqjQedAcgsUFLJrLe5C8HWZFAasB
-	 WsYld6QprQCgSd3XgtGu2FIjisn4UmqwlmuOJEgO5/vLdR8Co14vfTIaQBr2/I4y2u
-	 Bx02LnDPRrRbVITWYbgFs5au+QGFcE9vgs6JZ1AFp6sz2usbsANSp4MQz7JDxOGDCA
-	 j4kHBd/rMS/C1kVkLGrcVrbvpNdVgqcFbDPWwuH1aU9iAs6pSUqiphQEwkiVNkmOFv
-	 7ekW96a52zXBw==
-Received: from ip-10-30-226-235.us-west-2.compute.internal (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 586CD3809A81;
-	Thu, 29 Aug 2024 09:50:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1724925263; c=relaxed/simple;
+	bh=Gk17cpiqIhML5adE8yFx9OsBS/qqAMi2cjj/Day63Xg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=VJtO7LDN+u3ANVTyuRiTC9MWa7iEriMdkOrrBlypqBq8rX4jH9Xn3JTHiJlw2wmChjyklvmCMZq7UO5NNeR6mY9u43wEgxhQGB4NoCczW8tbFvn3AOcfMXc8Ka8BunSvpf7mrfs27vLbo6lqw6BOe9jbc6cWwJah6ZgUnY5U6aU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=kZ/EL1fj; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1724925261; x=1756461261;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=Gk17cpiqIhML5adE8yFx9OsBS/qqAMi2cjj/Day63Xg=;
+  b=kZ/EL1fjw0i/UennDpGt46+6WZmRMcAKov3og4/NGlOjrPq33WYmkRlZ
+   fOyEXu2g1QtaNzMz+8c4ZJnN4rCbsXu/5Ew+QPAFsjswibIUu1fIK/Hig
+   Ov9iLykUuDg2fBldxKWUww7NnpXEad5IPMzFXk4oRuS4wPkpFKBkunD2M
+   v/UJccjZpc9R8lveV4dF7d+0Ef84FPMsmRQW92B/CgucROTSkHPQVSNl8
+   zRsC0j7oIA5PRwPyv+bhqVd4P9Z769r34sdNFHAQdFyYK08wAaRLqFtYY
+   XksJne9SduCoB+mQF50XZ88dSDy6Hk8h1JoxsZzop/r/0bI8TYTt9rjom
+   A==;
+X-CSE-ConnectionGUID: G6KB1Yj2TT6z492XstGQ6w==
+X-CSE-MsgGUID: Yzs25oY3SjaweLI6DgflTw==
+X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
+   d="scan'208";a="31043205"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Aug 2024 02:54:20 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 29 Aug 2024 02:53:35 -0700
+Received: from [127.0.0.1] (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 29 Aug 2024 02:53:32 -0700
+From: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+Date: Thu, 29 Aug 2024 11:52:54 +0200
+Subject: [PATCH net] net: microchip: vcap: Fix use-after-free error in
+ kunit test
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] netfilter: nf_tables: restore IP sanity checks for
- netdev/egress
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172492502535.1887808.17550387443774732604.git-patchwork-notify@kernel.org>
-Date: Thu, 29 Aug 2024 09:50:25 +0000
-References: <20240828214708.619261-2-pablo@netfilter.org>
-In-Reply-To: <20240828214708.619261-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+Message-ID: <20240829-fix_use_after_free-v1-1-1507e307507f@microchip.com>
+X-B4-Tracking: v=1; b=H4sIAPVE0GYC/x2MQQqDMBQFrxL+uoEkSlCvIiXY9EX/JsqPiiDev
+ aHLgZm5qUAYhQZ1k+DkwmuuYF+K4jLlGZq/lckZ15rOeZ34CkdBmNIOCUkAjU/TRhO9t66nGm6
+ Cav2nI2Xs9H6eHyZ5qfhpAAAA
+To: Lars Povlsen <lars.povlsen@microchip.com>, Steen Hegelund
+	<Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, "David S. Miller" <davem@davemloft.net>,
+	"Eric Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>
+CC: Steen Hegelund <steen.hegelund@microchip.com>, Dan Carpenter
+	<error27@gmail.com>, <linux-arm-kernel@lists.infradead.org>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	=?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
+	<jensemil.schulzostergaard@microchip.com>
+X-Mailer: b4 0.15-dev
 
-Hello:
+This is a clear use-after-free error. We remove it, and rely on checking
+the return code of vcap_del_rule.
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+Reported-by: Dan Carpenter <error27@gmail.com>
+Closes: https://lore.kernel.org/kernel-janitors/7bffefc6-219a-4f71-baa0-ad4526e5c198@kili.mountain/
+Fixes: c956b9b318d9 ("net: microchip: sparx5: Adding KUNIT tests of key/action values in VCAP API")
+Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
+---
+ drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-On Wed, 28 Aug 2024 23:47:07 +0200 you wrote:
-> Subtract network offset to skb->len before performing IPv4 header sanity
-> checks, then adjust transport offset from offset from mac header.
-> 
-> Jorge Ortiz says:
-> 
-> When small UDP packets (< 4 bytes payload) are sent from eth0,
-> `meta l4proto udp` condition is not met because `NFT_PKTINFO_L4PROTO` is
-> not set. This happens because there is a comparison that checks if the
-> transport header offset exceeds the total length.  This comparison does
-> not take into account the fact that the skb network offset might be
-> non-zero in egress mode (e.g., 14 bytes for Ethernet header).
-> 
-> [...]
+diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c b/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
+index 51d9423b08a6..f2a5a36fdacd 100644
+--- a/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
++++ b/drivers/net/ethernet/microchip/vcap/vcap_api_kunit.c
+@@ -1442,18 +1442,8 @@ static void vcap_api_encode_rule_test(struct kunit *test)
+ 	vcap_enable_lookups(&test_vctrl, &test_netdev, 0, 0,
+ 			    rule->cookie, false);
+ 
+-	vcap_free_rule(rule);
+-
+-	/* Check that the rule has been freed: tricky to access since this
+-	 * memory should not be accessible anymore
+-	 */
+-	KUNIT_EXPECT_PTR_NE(test, NULL, rule);
+-	ret = list_empty(&rule->keyfields);
+-	KUNIT_EXPECT_EQ(test, true, ret);
+-	ret = list_empty(&rule->actionfields);
+-	KUNIT_EXPECT_EQ(test, true, ret);
+-
+-	vcap_del_rule(&test_vctrl, &test_netdev, id);
++	ret = vcap_del_rule(&test_vctrl, &test_netdev, id);
++	KUNIT_EXPECT_EQ(test, 0, ret);
+ }
+ 
+ static void vcap_api_set_rule_counter_test(struct kunit *test)
 
-Here is the summary with links:
-  - [net,1/2] netfilter: nf_tables: restore IP sanity checks for netdev/egress
-    https://git.kernel.org/netdev/net/c/5fd062891897
-  - [net,2/2] netfilter: nf_tables_ipv6: consider network offset in netdev/egress validation
-    https://git.kernel.org/netdev/net/c/70c261d50095
+---
+base-commit: 4186c8d9e6af57bab0687b299df10ebd47534a0a
+change-id: 20240826-fix_use_after_free-eb34c0c66129
 
-You are awesome, thank you!
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
 
 
