@@ -1,317 +1,226 @@
-Return-Path: <netdev+bounces-123103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68146963ACF
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:06:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDA24963B35
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 08:21:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CAEFB247B6
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 06:06:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76EB8285C2A
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 06:21:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008FC18C336;
-	Thu, 29 Aug 2024 06:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97A9015575B;
+	Thu, 29 Aug 2024 06:21:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dl6fC4nx"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TDeDE3ti"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2FB518A958
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:02:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0328149011
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724911328; cv=none; b=X5LV0m4Vu87oruMxKMEEq+Ue4PhR6BxolvNX9ChnelPyouSqnXzDUfrUPT+9jT2NdpKcVkfinwGrnu9f/BaJELVnuyorEcn8QB4g2XwAvX/ESZQ6cy7WGB+7rGIHQMPXbd7SgzGezCtmPH4T/uATsUFuOyrvgyoJLy7p1ZN3xMg=
+	t=1724912497; cv=none; b=cqmMKMgAoqpIPQY5ocN7ADDJe2cHM24jboNRN/+Ov6XkZgNgHX8QxwDuzTkqPLx+gDqMYVSUqyTRI2Yj/DDtJ7xd2fPuVlv2c84pY3AVYq7gogsxMRfozIC6VQi81NjVzm/zkdWrD/EpMX+Te4+aF2B+HrnAkdSqfRn+DSOjKk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724911328; c=relaxed/simple;
-	bh=PXCA9a97gwO6Rx45x8jPpvYFbNkIF4OHxIg84Wdv4U4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=VxX92zmJEkTQjN9ywDNmO9HtY40BmzY3aPCTKoAJFrkknw2a1sA8EnLtaE2gcqKrYLALaFuQgfCySytQR0JaHvtDFn0S0MQRIWMvx9ejYIgntu5Oe/XSuhIQ8HbqAGs2q12ZZYwaOtS0bqrJHI79NiHa23qaOZYwx8M9G9+PacU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dl6fC4nx; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6b2249bf2d0so8600057b3.2
-        for <netdev@vger.kernel.org>; Wed, 28 Aug 2024 23:02:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724911321; x=1725516121; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q09KG2LtUFq7/0hB8XZYqxR9Zv71xizkrAmEszHqBu8=;
-        b=Dl6fC4nxtqukNZf8IDCDDne0+2fqnwW6JEyLX+OlEvbJI7jUJjPxhPqP8eJOuUuSqB
-         8BmTCvB/z2JGawUpvIMa3IfL9MFFYjygbKCBaLWYbEpqu6fO5gVXKEhrHNpibF5mp7pE
-         knUXt7QFhmSnmqqdid2NOk5LWrATJLX9g8xXtUJoQ6n1x0QnlE+W/oCRfHaOqCCNsG6y
-         sLRpy6HZm6LF5Hc/GCGlXlWgdVk2sTalACM6L7SM/19ODgyk4CdxHkehtijuup45Ht2v
-         UFVd5hl56jdNjFgkhUyWTLRggXfgB8kVaSuZnIcwv7uItKfgoWJxJ2ykcRo0t0ZxhxUC
-         XF7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724911321; x=1725516121;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q09KG2LtUFq7/0hB8XZYqxR9Zv71xizkrAmEszHqBu8=;
-        b=iDxbs0Njq+TjCz4tKc6lT4NaSO7LEpVyIzy9QZmz2jFy/s4ELRErUc6KRxgJm+NDBu
-         E//RZ1QDbxBvU95e+rgZ0W8uMPutbvtA7NA1R7MW3cWKS/Fw5KIc01MJKr6+itcXMJSA
-         p1EdamNEa4xvwSjFaFsyit5ctOaLm3by2akYS3D5q+F1HBl8iWLykJDgKq7dmc6CN0T5
-         Guf3quJ0bZ4kOizQJor9Oen/UoBUBaY8vQdnxD7ew9ILHcPNhXTmEWMCTQxjn+d676YE
-         wuYxzcYhXFfCiYQ/YtJrTBP+o4OvsXHjjJkYbW48R7nc4VqdKtcYqSZNWDtd/gDS46fR
-         yGRA==
-X-Gm-Message-State: AOJu0Yyrlms1H8jSACkOolhMKdHVE2Pnnig0GsbKKvBUQNjW/aCDONDb
-	5DWZ9reDXY1PcLnLzyMMs7VvEaMb7xf1h9Gf0UcJciDyVnVQXp0hg2OoFQTpX/eEO7FmNtkqohM
-	saD+Dz2K7IPkAzPYmZbwvJBd49vaIRqaWxZctGZmwhxiYGHP13CWrrakzNKgHVwE6ClUQvovxlU
-	R3XeNSH30/e2ifRZcuaTyTBiV0T5gXMOw07hj2nGaAporjzQMvJeGzl+Rtzbo=
-X-Google-Smtp-Source: AGHT+IFhVsY9dMuG1cWOZF0OfZKruBiCeO194EOj0MLnC6UMx6DwH7q6IpAeLuCd3MtmXCV4ZY5V1ZdPEiGOTmmI6w==
-X-Received: from almasrymina.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:4bc5])
- (user=almasrymina job=sendgmr) by 2002:a05:6902:134e:b0:e11:6fcc:b656 with
- SMTP id 3f1490d57ef6-e1a5af5e2efmr3854276.6.1724911320312; Wed, 28 Aug 2024
- 23:02:00 -0700 (PDT)
-Date: Thu, 29 Aug 2024 06:01:26 +0000
-In-Reply-To: <20240829060126.2792671-1-almasrymina@google.com>
+	s=arc-20240116; t=1724912497; c=relaxed/simple;
+	bh=Hz2i5OBmnT1Ytkr9Jj1kC07gmlddt31ZUcV0YJO5IcQ=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=g0TSk0X/xhOzGNRNSJzY6RIgquhIXADhQsgm6JKKHsqQMXmRCmIMlh/xrgEmgv0UdrBQNKDI3eWJoVDjItQdoNFVz40SWSTVWGIN+QpaMMVX8dXPyVjszCBsmpCmwzapdU6DN6h59936aLlOrfyGffbfA9arHsLNsPkxo9pn8/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TDeDE3ti; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1724912491; h=Message-ID:Subject:Date:From:To;
+	bh=k6ln6sF2Oiog21Xym93EPP2lGA88WZi5JT1JslSdMVg=;
+	b=TDeDE3tikVBThyY7tz+DQehUTM3dQ+hXhndo4QJICn7t/WrKpyTQVxWL8QkQxJe0f4C0gs9DY5FJlRnDis4PcM91rPSsh/ERBPfucFun2qym/quIoouw0+9B1pzI/wChyjke3bVhaI8TDdwB2+TN59lfDrV1JVmgecfzplBZCyA=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WDs-kT9_1724912489)
+          by smtp.aliyun-inc.com;
+          Thu, 29 Aug 2024 14:21:30 +0800
+Message-ID: <1724912338.229802-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
+Date: Thu, 29 Aug 2024 14:18:58 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Si-Wei Liu" <si-wei.liu@oracle.com>
+Cc: netdev@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ virtualization@lists.linux.dev,
+ "Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>,
+ Darren Kenny <darren.kenny@oracle.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
+References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
+ <20240820125006-mutt-send-email-mst@kernel.org>
+ <m2o75l2585.fsf@oracle.com>
+ <546cc17a-dd57-8260-4737-c45d7b011631@oracle.com>
+In-Reply-To: <546cc17a-dd57-8260-4737-c45d7b011631@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240829060126.2792671-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
-Message-ID: <20240829060126.2792671-14-almasrymina@google.com>
-Subject: [PATCH net-next v23 13/13] netdev: add dmabuf introspection
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?=" <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, 
-	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Bagas Sanjaya <bagasdotme@gmail.com>, 
-	Christoph Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
 
-Add dmabuf information to page_pool stats:
+On Wed, 28 Aug 2024 12:57:56 -0700, "Si-Wei Liu" <si-wei.liu@oracle.com> wrote:
+> Just in case Xuan missed the last email while his email server kept
+> rejecting incoming emails in the last week.: the patch doesn't seem fix
+> the regression.
+>
+> Xuan, given this is not very hard to reproduce and we have clearly
+> stated how to, could you try to get the patch verified in house before
+> posting to upstream? Or you were unable to reproduce locally?
 
-$ ./cli.py --spec ../netlink/specs/netdev.yaml --dump page-pool-get
-...
- {'dmabuf': 10,
-  'id': 456,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 455,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 454,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 453,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 452,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 451,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 450,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 449,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
+Of course I have tested it locally first. And the crash reported this time is
+different from the previous one. I really don't know where the problem is. I may
+make a new patch based on Jason's suggestion, which should solve the problem of
+occupied frag space that you have been worried about.
 
-And queue stats:
+Of course, before sending the patch, I will reproduce and test it.
 
-$ ./cli.py --spec ../netlink/specs/netdev.yaml --dump queue-get
-...
-{'dmabuf': 10, 'id': 8, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 9, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 10, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 11, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 12, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 13, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 14, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 15, 'ifindex': 3, 'type': 'rx'},
+Thanks.
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
----
- Documentation/netlink/specs/netdev.yaml | 10 ++++++++++
- include/uapi/linux/netdev.h             |  2 ++
- net/core/netdev-genl.c                  | 10 ++++++++++
- net/core/page_pool_user.c               |  4 ++++
- tools/include/uapi/linux/netdev.h       |  2 ++
- 5 files changed, 28 insertions(+)
-
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 0c747530c275..08412c279297 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -167,6 +167,10 @@ attribute-sets:
-           "re-attached", they are just waiting to disappear.
-           Attribute is absent if Page Pool has not been detached, and
-           can still be used to allocate new memory.
-+      -
-+        name: dmabuf
-+        doc: ID of the dmabuf this page-pool is attached to.
-+        type: u32
-   -
-     name: page-pool-info
-     subset-of: page-pool
-@@ -268,6 +272,10 @@ attribute-sets:
-         name: napi-id
-         doc: ID of the NAPI instance which services this queue.
-         type: u32
-+      -
-+        name: dmabuf
-+        doc: ID of the dmabuf attached to this queue, if any.
-+        type: u32
- 
-   -
-     name: qstats
-@@ -543,6 +551,7 @@ operations:
-             - inflight
-             - inflight-mem
-             - detach-time
-+            - dmabuf
-       dump:
-         reply: *pp-reply
-       config-cond: page-pool
-@@ -607,6 +616,7 @@ operations:
-             - type
-             - napi-id
-             - ifindex
-+            - dmabuf
-       dump:
-         request:
-           attributes:
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 91bf3ecc5f1d..7c308f04e7a0 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -93,6 +93,7 @@ enum {
- 	NETDEV_A_PAGE_POOL_INFLIGHT,
- 	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
- 	NETDEV_A_PAGE_POOL_DETACH_TIME,
-+	NETDEV_A_PAGE_POOL_DMABUF,
- 
- 	__NETDEV_A_PAGE_POOL_MAX,
- 	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
-@@ -131,6 +132,7 @@ enum {
- 	NETDEV_A_QUEUE_IFINDEX,
- 	NETDEV_A_QUEUE_TYPE,
- 	NETDEV_A_QUEUE_NAPI_ID,
-+	NETDEV_A_QUEUE_DMABUF,
- 
- 	__NETDEV_A_QUEUE_MAX,
- 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 71363d258a52..50604dfd628e 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -293,6 +293,7 @@ static int
- netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 			 u32 q_idx, u32 q_type, const struct genl_info *info)
- {
-+	struct net_devmem_dmabuf_binding *binding;
- 	struct netdev_rx_queue *rxq;
- 	struct netdev_queue *txq;
- 	void *hdr;
-@@ -312,6 +313,15 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 		if (rxq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
- 					     rxq->napi->napi_id))
- 			goto nla_put_failure;
-+
-+		binding = (struct net_devmem_dmabuf_binding *)
-+				  rxq->mp_params.mp_priv;
-+		if (binding) {
-+			if (nla_put_u32(rsp, NETDEV_A_QUEUE_DMABUF,
-+					binding->id))
-+				goto nla_put_failure;
-+		}
-+
- 		break;
- 	case NETDEV_QUEUE_TYPE_TX:
- 		txq = netdev_get_tx_queue(netdev, q_idx);
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index ce5167eb5548..92d8b1d1022a 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -213,6 +213,7 @@ static int
- page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 		  const struct genl_info *info)
- {
-+	struct net_devmem_dmabuf_binding *binding = pool->mp_priv;
- 	size_t inflight, refsz;
- 	void *hdr;
- 
-@@ -242,6 +243,9 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 			 pool->user.detach_time))
- 		goto err_cancel;
- 
-+	if (binding && nla_put_u32(rsp, NETDEV_A_PAGE_POOL_DMABUF, binding->id))
-+		goto err_cancel;
-+
- 	genlmsg_end(rsp, hdr);
- 
- 	return 0;
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 91bf3ecc5f1d..7c308f04e7a0 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -93,6 +93,7 @@ enum {
- 	NETDEV_A_PAGE_POOL_INFLIGHT,
- 	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
- 	NETDEV_A_PAGE_POOL_DETACH_TIME,
-+	NETDEV_A_PAGE_POOL_DMABUF,
- 
- 	__NETDEV_A_PAGE_POOL_MAX,
- 	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
-@@ -131,6 +132,7 @@ enum {
- 	NETDEV_A_QUEUE_IFINDEX,
- 	NETDEV_A_QUEUE_TYPE,
- 	NETDEV_A_QUEUE_NAPI_ID,
-+	NETDEV_A_QUEUE_DMABUF,
- 
- 	__NETDEV_A_QUEUE_MAX,
- 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
--- 
-2.46.0.469.g59c65b2a67-goog
-
+>
+> Thanks,
+> -Siwei
+>
+> On 8/21/2024 9:47 AM, Darren Kenny wrote:
+> > Hi Michael,
+> >
+> > On Tuesday, 2024-08-20 at 12:50:39 -04, Michael S. Tsirkin wrote:
+> >> On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
+> >>> leads to regression on VM with the sysctl value of:
+> >>>
+> >>> - net.core.high_order_alloc_disable=1
+> >>
+> >>
+> >>
+> >>> which could see reliable crashes or scp failure (scp a file 100M in size
+> >>> to VM):
+> >>>
+> >>> The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
+> >>> of a new frag. When the frag size is larger than PAGE_SIZE,
+> >>> everything is fine. However, if the frag is only one page and the
+> >>> total size of the buffer and virtnet_rq_dma is larger than one page, an
+> >>> overflow may occur. In this case, if an overflow is possible, I adjust
+> >>> the buffer size. If net.core.high_order_alloc_disable=1, the maximum
+> >>> buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
+> >>> the first buffer of the frag is affected.
+> >>>
+> >>> Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
+> >>> Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+> >>> Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
+> >>> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> >>
+> >> Darren, could you pls test and confirm?
+> > Unfortunately with this change I seem to still get a panic as soon as I start a
+> > download using wget:
+> >
+> > [  144.055630] Kernel panic - not syncing: corrupted stack end detected inside scheduler
+> > [  144.056249] CPU: 8 PID: 37894 Comm: sleep Kdump: loaded Not tainted 6.10.0-1.el8uek.x86_64 #2
+> > [  144.056850] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-4.module+el8.9.0+90173+a3f3e83a 04/01/2014
+> > [  144.057585] Call Trace:
+> > [  144.057791]  <TASK>
+> > [  144.057973]  panic+0x347/0x370
+> > [  144.058223]  schedule_debug.isra.0+0xfb/0x100
+> > [  144.058565]  __schedule+0x58/0x6a0
+> > [  144.058838]  ? refill_stock+0x26/0x50
+> > [  144.059120]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.059473]  do_task_dead+0x42/0x50
+> > [  144.059752]  do_exit+0x31e/0x4b0
+> > [  144.060011]  ? __audit_syscall_entry+0xee/0x150
+> > [  144.060352]  do_group_exit+0x30/0x80
+> > [  144.060633]  __x64_sys_exit_group+0x18/0x20
+> > [  144.060946]  do_syscall_64+0x8c/0x1c0
+> > [  144.061228]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.061570]  ? __audit_filter_op+0xbe/0x140
+> > [  144.061873]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.062204]  ? audit_reset_context+0x232/0x310
+> > [  144.062514]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.062851]  ? syscall_exit_work+0x103/0x130
+> > [  144.063148]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.063473]  ? syscall_exit_to_user_mode+0x77/0x220
+> > [  144.063813]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.064142]  ? do_syscall_64+0xb9/0x1c0
+> > [  144.064411]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.064747]  ? do_syscall_64+0xb9/0x1c0
+> > [  144.065018]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.065345]  ? do_read_fault+0x109/0x1b0
+> > [  144.065628]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.065961]  ? do_fault+0x1aa/0x2f0
+> > [  144.066212]  ? handle_pte_fault+0x102/0x1a0
+> > [  144.066503]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.066836]  ? __handle_mm_fault+0x5ed/0x710
+> > [  144.067137]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.067464]  ? __count_memcg_events+0x72/0x110
+> > [  144.067779]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.068106]  ? count_memcg_events.constprop.0+0x26/0x50
+> > [  144.068457]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.068788]  ? handle_mm_fault+0xae/0x320
+> > [  144.069068]  ? srso_alias_return_thunk+0x5/0xfbef5
+> > [  144.069395]  ? do_user_addr_fault+0x34a/0x6b0
+> > [  144.069708]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> > [  144.070049] RIP: 0033:0x7fc5524f9c66
+> > [  144.070307] Code: Unable to access opcode bytes at 0x7fc5524f9c3c.
+> > [  144.070720] RSP: 002b:00007ffee052beb8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+> > [  144.071214] RAX: ffffffffffffffda RBX: 00007fc5527bb860 RCX: 00007fc5524f9c66
+> > [  144.071684] RDX: 0000000000000000 RSI: 000000000000003c RDI: 0000000000000000
+> > [  144.072146] RBP: 0000000000000000 R08: 00000000000000e7 R09: ffffffffffffff78
+> > [  144.072608] R10: 00007ffee052bdef R11: 0000000000000246 R12: 00007fc5527bb860
+> > [  144.073076] R13: 0000000000000002 R14: 00007fc5527c4528 R15: 0000000000000000
+> > [  144.073543]  </TASK>
+> > [  144.074780] Kernel Offset: 0x37c00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> >
+> > Thanks,
+> >
+> > Darren.
+> >
+> >>> ---
+> >>>   drivers/net/virtio_net.c | 12 +++++++++---
+> >>>   1 file changed, 9 insertions(+), 3 deletions(-)
+> >>>
+> >>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> >>> index c6af18948092..e5286a6da863 100644
+> >>> --- a/drivers/net/virtio_net.c
+> >>> +++ b/drivers/net/virtio_net.c
+> >>> @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
+> >>>   	void *buf, *head;
+> >>>   	dma_addr_t addr;
+> >>>
+> >>> -	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+> >>> -		return NULL;
+> >>> -
+> >>>   	head = page_address(alloc_frag->page);
+> >>>
+> >>>   	dma = head;
+> >>> @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+> >>>   	len = SKB_DATA_ALIGN(len) +
+> >>>   	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> >>>
+> >>> +	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+> >>> +		return -ENOMEM;
+> >>> +
+> >>>   	buf = virtnet_rq_alloc(rq, len, gfp);
+> >>>   	if (unlikely(!buf))
+> >>>   		return -ENOMEM;
+> >>> @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+> >>>   	 */
+> >>>   	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+> >>>
+> >>> +	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
+> >>> +		return -ENOMEM;
+> >>> +
+> >>> +	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
+> >>> +		len -= sizeof(struct virtnet_rq_dma);
+> >>> +
+> >>>   	buf = virtnet_rq_alloc(rq, len + room, gfp);
+> >>>   	if (unlikely(!buf))
+> >>>   		return -ENOMEM;
+> >>> --
+> >>> 2.32.0.3.g01195cf9f
+>
 
