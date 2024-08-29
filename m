@@ -1,150 +1,253 @@
-Return-Path: <netdev+bounces-123249-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8C21964495
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:34:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD2779644B2
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:37:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E08AB210D8
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 12:34:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B0AA1F2634C
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 12:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E09D1957F4;
-	Thu, 29 Aug 2024 12:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B681AB512;
+	Thu, 29 Aug 2024 12:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OXrvQv/4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PgRa0jWx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2D618C35B
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 12:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EE51B1507;
+	Thu, 29 Aug 2024 12:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724934802; cv=none; b=MI4NITlSGJwMgEGlybZRSLhUTXvg93y3srfQlxBrp+dQ+0QpMo2DaefsqAF34UP2s5UjXjZ+0j7ShoINKnx54bLn8uj7A30DemkURPeH2A5l17LZ7AeKAKGKyHyyt8qV/8w6fj7ojQL0bAMJqCwxBtNRxwc205hMhU7Dn3nqytQ=
+	t=1724934860; cv=none; b=G8+KVYtJ9WHSVnSPGtXac+f1s/xAWA4LTNLwMwDKLCwB2f5zgk+bxtDqZA+V2t3MdKy2Hk1xuH9vcQwAOm9D3d8cP3Tg9UK47i3n8Ij9cuzxAuKKhlQYzCRZ5iKgMYIzqIqeF0T3GLB/mWls1KsXvz17adnIpI7fPKziTtKWDfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724934802; c=relaxed/simple;
-	bh=EcAhnCfMYdSXlmNlommpCdA4tVwrlwjRudKqztdv2Gg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RhCGdL/Bg/yQ8qyqTWaOJzYI6MVJv/c7mQwMdafWm8yc92a1EGcM35UOzTAgJOKdhIUrsqd74+theDbPSf/RQ0n8PLcCjfbQW75F2mAOF3SU8BoWGfezxu+syNfSlooVMelPEyH+AnbtbqRE08uRlrNJeRFnq7XEks0YSbDghAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OXrvQv/4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724934799;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4r8mPnSNtJ1ADg7xoeNSb8EXicSerPJ5Mj0MvPbcOgA=;
-	b=OXrvQv/4rDK2EvbHRjcnxU3DXySHJCtbvYRXtfBBy7Y83ZpukbzC/Laj6B6RiGBlGj89ht
-	89/2/eUJLLZpzYAYuHnIQ0nEUGWtCax+w7YzFaEHHfT211UKKxnTbeMM4IdElBnNSEBmTP
-	i44kUnE7bQnq4M0E/e764UApiW/+uHc=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-263-8Uzo6c1PNZmUwiiHayhTzg-1; Thu, 29 Aug 2024 08:33:17 -0400
-X-MC-Unique: 8Uzo6c1PNZmUwiiHayhTzg-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a86690270dcso54721766b.2
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 05:33:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724934796; x=1725539596;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4r8mPnSNtJ1ADg7xoeNSb8EXicSerPJ5Mj0MvPbcOgA=;
-        b=PN9+3ToJecq5HQvdo+hwCPBbNK4XOc8y9TrA0Xl0eOWnPwgKspVeS2XJgjVBPme7hu
-         PKI6OCUrPl100Hd43JlQZTrW4pnvGM6PX1JzgyqzO3/uKnd1ZqtkUTXbTmURd5vZapye
-         Rt0hezuusJWSKTM6l2PzzQ9cLyezjeD5rhKP86i30x8a1UAFGC/2zf90kc2Z6ECXi7dB
-         hzins7JhWtaedm6EdRWugapej8luoq2e1xZufyi4J19hOrm8avUKcd9GXTczILCGsgjb
-         j8DMs3S4Ft1ffmZnMP+KO0ZYiMU6hndBXQAnVEovHNruh3TJO+hPVM6gZQt0AZYK4thO
-         KDCg==
-X-Forwarded-Encrypted: i=1; AJvYcCXs0kjycTkhvebN68BJBJdNdiaZXBHRKAMKdPekYwLkdfrX+yPfEEXIW9jDkz2axS8tqFuclKE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiUu9ET2lH4vvfliAkJxDMZvS/VliA7xVpVzoohCugczgdgJd8
-	949VVCHFv0k71r+F//+BtM/q5k7p6XSj2VsZd+z4HOvlL1wMRzS0BhiRBeQys03ODPIEiIuOiM+
-	QeYhKmZjse3tTUW5krq8znPVS9aAcRXLKajKLw+B53AWi1jlmUEVKHg==
-X-Received: by 2002:a17:906:f589:b0:a86:b762:52ec with SMTP id a640c23a62f3a-a897fa77ef7mr195703366b.51.1724934796387;
-        Thu, 29 Aug 2024 05:33:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG/JxqSYvZUsly+VKW9p0GbBwk8Ss46rzovAiRElrugRH0yhB2zK0/lvCUzjRHB8flUdXeiqg==
-X-Received: by 2002:a17:906:f589:b0:a86:b762:52ec with SMTP id a640c23a62f3a-a897fa77ef7mr195696066b.51.1724934795491;
-        Thu, 29 Aug 2024 05:33:15 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.99.36])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989195e8csm74386366b.105.2024.08.29.05.33.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 05:33:14 -0700 (PDT)
-Date: Thu, 29 Aug 2024 14:33:11 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Luigi Leonardi <luigi.leonardi@outlook.com>, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, marco.pinn95@gmail.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, stefanha@redhat.com, virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next v4 0/2] vsock: avoid queuing on intermediate
- queue if possible
-Message-ID: <22bjrcsjxzwpr23i4i3sx6lf5kkxdz6zjie67jhykcpqn5qmgw@jec7qktcmblu>
-References: <tblrar34qivcwsvai7z5fepxhi4irknbyne5xqqoqowwf3nwt5@kyd2nmqghews>
- <DU2P194MB21741755B3D4CC5FE4A55F4E9A962@DU2P194MB2174.EURP194.PROD.OUTLOOK.COM>
- <20240829081906-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1724934860; c=relaxed/simple;
+	bh=eFL5mRLuVSel/mqE2GDlqUZ3r6ZVa2Lq5lgr42qlrPo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FIX6REl3UxPpNx85E1VgC5Z+FoAbIHV3UX3aTwRua6B7FZSUg8fDKJULiw/n7hymh3HVfFjY8F46sLdw7IIh3mysEwEFRPOf+B48CS/+4xuxtRdSCxKWkmfTX2DaKSDootSAOcUOh/mzM95/N3bjVGW0iuYSOGpVRq5OMLOUJ6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PgRa0jWx; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1724934857; x=1756470857;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=eFL5mRLuVSel/mqE2GDlqUZ3r6ZVa2Lq5lgr42qlrPo=;
+  b=PgRa0jWxKW1D8MZQblcvTthvbH5OgzJm3DfgY2312oiWLq8Mg4XudfYh
+   /3KVbw4JgdqEZv9ZGy2rYXmiN56xHf5e6+Thz/Esut39g8gyXj3P4s6x+
+   fUcUW93Q3unnb83XJnWX9aK1NOQXwd+ezotjKAfrKu0c+Iv+qAmh7BV+t
+   oOSPoHj7CTnYysLaXVEbPoX0x0x5SLOezdqv7UDVjMAOcXnctYW2/Wffm
+   6dwlUj/R2A+MAPdIP/DgBWRjKHCe3zcslZBKX5zjcjrUENRep7pE+bJy+
+   Rvfs+NZQGTRfyau6RQ9ruR6p19H7XRa4Czh8lpKsBELj1Njbpzukm+V+i
+   Q==;
+X-CSE-ConnectionGUID: YTDdQApWQW2lXL7CKCTnKw==
+X-CSE-MsgGUID: adAqi7XnSsi4ZhUb07Bgzg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="46038165"
+X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
+   d="scan'208";a="46038165"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 05:34:16 -0700
+X-CSE-ConnectionGUID: q7eRQdXxR6yGpOwHZChFUw==
+X-CSE-MsgGUID: oGg9yOBVQfaEjJjjwEVCkw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
+   d="scan'208";a="63188497"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa006.fm.intel.com with ESMTP; 29 Aug 2024 05:34:13 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	David Ahern <dsahern@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5 0/5] netdev_features: start cleaning netdev_features_t up
+Date: Thu, 29 Aug 2024 14:33:35 +0200
+Message-ID: <20240829123340.789395-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240829081906-mutt-send-email-mst@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 29, 2024 at 08:19:31AM GMT, Michael S. Tsirkin wrote:
->On Thu, Aug 29, 2024 at 01:00:37PM +0200, Luigi Leonardi wrote:
->> Hi All,
->>
->> It has been a while since the last email and this patch has not been merged yet.
->> This is just a gentle ping :)
->>
->> Thanks,
->> Luigi
->
->
->ok I can queue it for next. Next time pls remember to CC all
->maintainers. Thanks!
+NETDEV_FEATURE_COUNT is currently 64, which means we can't add any new
+features as netdev_features_t is u64.
+As per several discussions, instead of converting netdev_features_t to
+a bitmap, which would mean A LOT of changes, we can try cleaning up
+netdev feature bits.
+There's a bunch of bits which don't really mean features, rather device
+attributes/properties that can't be changed via Ethtool in any of the
+drivers. Such attributes can be moved to netdev private flags without
+losing any functionality.
 
-Thank for queueing it!
+Start converting some read-only netdev features to private flags from
+the ones that are most obvious, like lockless Tx, inability to change
+network namespace etc. I was able to reduce NETDEV_FEATURE_COUNT from
+64 to 60, which mean 4 free slots for new features. There are obviously
+more read-only features to convert, such as highDMA, "challenged VLAN",
+HSR (4 bits) - this will be done in subsequent series.
 
-BTW, it looks like the virtio-vsock driver is listed in
-"VIRTIO AND VHOST VSOCK DRIVER" but not listed under
-"VIRTIO CORE AND NET DRIVERS", so running get_maintainer.pl I have this
-list:
+Please note that currently netdev features are not uAPI/ABI by any means.
+Ethtool passes their names and bits to the userspace separately and there
+are no hardcoded names/bits in the userspace, so that new Ethtool could
+work on older kernels and vice versa.
+This, however, isn't true for Ethtools < 3.4. I haven't changed the bit
+positions of the already existing features and instead replaced the freed
+bits with stubs. But it's anyway theoretically possible that Ethtools
+older than 2011 will break. I hope no currently supported distros supply
+such an ancient version.
+Shell scripts also most likely won't break since the removed bits were
+always read-only, meaning nobody would try touching them from a script.
 
-$ ./scripts/get_maintainer.pl -f net/vmw_vsock/virtio_transport.c
-Stefan Hajnoczi <stefanha@redhat.com> (maintainer:VIRTIO AND VHOST VSOCK DRIVER)
-Stefano Garzarella <sgarzare@redhat.com> (maintainer:VIRTIO AND VHOST VSOCK DRIVER)
-"David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING [GENERAL])
-Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING [GENERAL])
-Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING [GENERAL])
-Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING [GENERAL])
-kvm@vger.kernel.org (open list:VIRTIO AND VHOST VSOCK DRIVER)
-virtualization@lists.linux.dev (open list:VIRTIO AND VHOST VSOCK DRIVER)
-netdev@vger.kernel.org (open list:VIRTIO AND VHOST VSOCK DRIVER)
-linux-kernel@vger.kernel.org (open list)
+Alexander Lobakin (5):
+  netdevice: convert private flags > BIT(31) to bitfields
+  netdev_features: convert NETIF_F_LLTX to dev->lltx
+  netdev_features: convert NETIF_F_NETNS_LOCAL to dev->netns_local
+  netdev_features: convert NETIF_F_FCOE_MTU to dev->fcoe_mtu
+  netdev_features: remove NETIF_F_ALL_FCOE
 
-Should we add net/vmw_vsock/virtio_transport.c and related files also 
-under "VIRTIO CORE AND NET DRIVERS" ?
+ .../networking/net_cachelines/net_device.rst  |  7 +++-
+ Documentation/networking/netdev-features.rst  | 15 -------
+ Documentation/networking/netdevices.rst       |  4 +-
+ Documentation/networking/switchdev.rst        |  4 +-
+ drivers/net/ethernet/tehuti/tehuti.h          |  2 +-
+ include/linux/netdev_features.h               | 16 ++-----
+ include/linux/netdevice.h                     | 42 +++++++++++++------
+ drivers/net/amt.c                             |  4 +-
+ drivers/net/bareudp.c                         |  2 +-
+ drivers/net/bonding/bond_main.c               |  8 ++--
+ drivers/net/dummy.c                           |  3 +-
+ drivers/net/ethernet/adi/adin1110.c           |  2 +-
+ drivers/net/ethernet/chelsio/cxgb/cxgb2.c     |  3 +-
+ .../net/ethernet/chelsio/cxgb4/cxgb4_fcoe.c   |  6 +--
+ .../net/ethernet/freescale/dpaa/dpaa_eth.c    |  3 +-
+ .../net/ethernet/freescale/dpaa2/dpaa2-eth.c  |  3 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_fcoe.c |  4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |  2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 11 ++---
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |  4 +-
+ .../ethernet/marvell/prestera/prestera_main.c |  3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  4 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rep.c  |  3 +-
+ .../net/ethernet/mellanox/mlxsw/spectrum.c    |  6 ++-
+ .../ethernet/microchip/lan966x/lan966x_main.c |  2 +-
+ .../net/ethernet/netronome/nfp/nfp_net_repr.c |  3 +-
+ drivers/net/ethernet/pasemi/pasemi_mac.c      |  5 ++-
+ .../net/ethernet/qualcomm/rmnet/rmnet_vnd.c   |  2 +-
+ drivers/net/ethernet/rocker/rocker_main.c     |  3 +-
+ drivers/net/ethernet/sfc/ef100_rep.c          |  4 +-
+ drivers/net/ethernet/tehuti/tehuti.c          |  4 +-
+ drivers/net/ethernet/ti/cpsw_new.c            |  3 +-
+ drivers/net/ethernet/toshiba/spider_net.c     |  3 +-
+ drivers/net/geneve.c                          |  2 +-
+ drivers/net/gtp.c                             |  2 +-
+ drivers/net/hamradio/bpqether.c               |  2 +-
+ drivers/net/ipvlan/ipvlan_main.c              |  3 +-
+ drivers/net/loopback.c                        |  4 +-
+ drivers/net/macsec.c                          |  4 +-
+ drivers/net/macvlan.c                         |  6 ++-
+ drivers/net/net_failover.c                    |  4 +-
+ drivers/net/netkit.c                          |  3 +-
+ drivers/net/nlmon.c                           |  4 +-
+ drivers/net/ppp/ppp_generic.c                 |  2 +-
+ drivers/net/rionet.c                          |  2 +-
+ drivers/net/team/team_core.c                  |  8 ++--
+ drivers/net/tun.c                             |  5 ++-
+ drivers/net/veth.c                            |  2 +-
+ drivers/net/vrf.c                             |  4 +-
+ drivers/net/vsockmon.c                        |  4 +-
+ drivers/net/vxlan/vxlan_core.c                |  5 ++-
+ drivers/net/wireguard/device.c                |  2 +-
+ drivers/scsi/fcoe/fcoe.c                      |  4 +-
+ drivers/staging/octeon/ethernet.c             |  2 +-
+ lib/test_bpf.c                                |  3 +-
+ net/8021q/vlan_dev.c                          | 10 +++--
+ net/8021q/vlanproc.c                          |  4 +-
+ net/batman-adv/soft-interface.c               |  5 ++-
+ net/bridge/br_device.c                        |  6 ++-
+ net/core/dev.c                                |  8 ++--
+ net/core/dev_ioctl.c                          |  9 ++--
+ net/core/net-sysfs.c                          |  3 +-
+ net/core/rtnetlink.c                          |  2 +-
+ net/dsa/user.c                                |  3 +-
+ net/ethtool/common.c                          |  3 --
+ net/hsr/hsr_device.c                          | 12 +++---
+ net/ieee802154/6lowpan/core.c                 |  2 +-
+ net/ieee802154/core.c                         | 10 ++---
+ net/ipv4/ip_gre.c                             |  4 +-
+ net/ipv4/ip_tunnel.c                          |  2 +-
+ net/ipv4/ip_vti.c                             |  2 +-
+ net/ipv4/ipip.c                               |  2 +-
+ net/ipv4/ipmr.c                               |  2 +-
+ net/ipv6/ip6_gre.c                            |  7 ++--
+ net/ipv6/ip6_tunnel.c                         |  4 +-
+ net/ipv6/ip6mr.c                              |  2 +-
+ net/ipv6/sit.c                                |  4 +-
+ net/l2tp/l2tp_eth.c                           |  2 +-
+ net/openvswitch/vport-internal_dev.c          | 11 ++---
+ net/wireless/core.c                           | 10 ++---
+ net/xfrm/xfrm_interface_core.c                |  2 +-
+ tools/testing/selftests/net/forwarding/README |  2 +-
+ 83 files changed, 208 insertions(+), 194 deletions(-)
 
-Thanks,
-Stefano
+---
+From v4[0]:
+* don't remove the freed feature bits completely and replace them with
+  stubs to keep the original bit positions of the already present
+  features (Jakub);
+* mention potential Ethtool < 3.4 breakage (Eric).
 
->
->
->> >Hi Michael,
->> >this series is marked as "Not Applicable" for the net-next tree:
->> >https://patchwork.kernel.org/project/netdevbpf/patch/20240730-pinna-v4-2-5c9179164db5@outlook.com/
->>
->> >Actually this is more about the virtio-vsock driver, so can you queue
->> >this on your tree?
->>
->> >Thanks,
->> >Stefano
->
+From v3[1]:
+* 0001: fix kdoc for priv_flags_fast (it doesn't support describing
+  struct_groups()s yet) (Jakub);
+* 0006: fix subject prefix (make it consistent with the rest).
+
+From v2[2]:
+* rebase on top of the latest net-next;
+* 0003: don't remove the paragraph saying "LLTX is deprecated for real
+  HW drivers" (Willem);
+* 0006: new, remove %NETIF_F_ALL_FCOE used only 2 times in 1 file
+  (Jakub);
+* no functional changes.
+
+From v1[3]:
+* split bitfield priv flags into "hot" and "cold", leave the first
+  placed where the old ::priv_flags is and move the rest down next
+  to ::threaded (Jakub);
+* document all the changes in Documentation/networking/net_cachelines/
+  net_device.rst;
+* #3: remove the "-1 cacheline on Tx" paragraph, not really true (Eric).
+
+From RFC[4]:
+* drop:
+  * IFF_LOGICAL (as (LLTX | IFF_NO_QUEUE)) - will be discussed later;
+  * NETIF_F_HIGHDMA conversion - requires priv flags inheriting etc.,
+    maybe later;
+  * NETIF_F_VLAN_CHALLENGED conversion - same as above;
+* convert existing priv_flags > BIT(31) to bitfield booleans and define
+  new flags the same way (Jakub);
+* mention a couple times that netdev features are not uAPI/ABI by any
+  means (Andrew).
+
+[0] https://lore.kernel.org/netdev/20240821150700.1760518-1-aleksander.lobakin@intel.com
+[1] https://lore.kernel.org/netdev/20240808152757.2016725-1-aleksander.lobakin@intel.com
+[2] https://lore.kernel.org/netdev/20240703150342.1435976-1-aleksander.lobakin@intel.com
+[3] https://lore.kernel.org/netdev/20240625114432.1398320-1-aleksander.lobakin@intel.com
+[4] https://lore.kernel.org/netdev/20240405133731.1010128-1-aleksander.lobakin@intel.com
+-- 
+2.46.0
 
 
