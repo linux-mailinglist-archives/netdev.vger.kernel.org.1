@@ -1,130 +1,143 @@
-Return-Path: <netdev+bounces-122999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 209DC9636B5
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:11:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E5F69636BD
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 02:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EA1AB21143
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 00:11:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34A231F22D35
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 00:18:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03CB1862;
-	Thu, 29 Aug 2024 00:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E19C8836;
+	Thu, 29 Aug 2024 00:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="AP2qp5FB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q7q2uKup"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A876236B;
-	Thu, 29 Aug 2024 00:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2897212B73;
+	Thu, 29 Aug 2024 00:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724890263; cv=none; b=LDuKbDsoSn7nAilxs/Lo8jOlEPZL69R5V4QAMeaTJ/x8q25ZwWcY6mBibauKyAWQfbRmGh/pEH+YCl11RXhH533iyDHJJT6oMRW1XvCD/Xy+T2xh22788XFjCvf6zomc+GZZ53lz2ru8rKon/KfciKQIZo44ZbHxPP4XGD3kEUA=
+	t=1724890676; cv=none; b=sd/h1hYIBobj7RWJvgqx+T94TgNNzBAL4rtOE8iGCc3bYQVPnIMU6JjePjbmyj4I3v8Vc5wufbut5eLOgDFYSXqEdW+BsvsRtezXenweAXp42r+xbP1C9tdhtvwUyKOS9E5UZTrVdw17P0Lq9iV+urZ6JBG/vaiFi1fcXlJVFrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724890263; c=relaxed/simple;
-	bh=+rRS4QYWMsXHwEygl9hxX77ERdn3n5uZCodH7u3Oko4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WMKFSD4bJwCodFWoVdRuGz2lImbibrGenQr7yLBwHi13Zu8rGtvbkugkkRxgzXw6/FBh+ZOOEs4kIIJdI4NX30YvbEo1fIl4p1xVlbDLvpHFEufREjV0VKypxqCuPQlQxydQc+hg+F2NSd4OaMRI8D80pGxRUMNHd82w+cIGvFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=AP2qp5FB; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1724890258;
-	bh=DvmFRoOXMWLoClFIxHNRmceAHCrX9fNDpGyyVHhuQ3M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AP2qp5FBvgazIlZgaJg7TAsAuhI2EiReNwFyIMo9JVOP42GUNZLnnYauY/Jppu4de
-	 m/aiP+8bk9zsUTmUMiryDiMWEtQm/MiCtGVtbjxtqTYlU/2FuIdJPH2Q71zeEPoF91
-	 2Im3astdk3CMMCj9/M4nqnKp5huUGjUmFov/jifE60A8yllcHkAyq2cwhu/z+HP+lM
-	 aM8+FLOVuJ15Sut8A3uHdGrWvZktJ8M0VETrnFDgqNbCn3FJJuVCQbXpYhp1rLrtKa
-	 VndrzSKlyTz/h9CQmlsRyXhRVM9W+Ppcb/8scEKFeVItMa0cAd+C+okEgRsU20YW6+
-	 +9Ymm2HcE9dMg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WvMBT0b2hz4wxH;
-	Thu, 29 Aug 2024 10:10:57 +1000 (AEST)
-Date: Thu, 29 Aug 2024 10:10:56 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jason Xing <kernelxing@tencent.com>,
- Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Xueming Feng <kuro@kuroa.me>
-Subject: Re: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20240829101056.47cd3b61@canb.auug.org.au>
-In-Reply-To: <CAL+tcoC0Wh5uREYs48Oq7yyKjChbY895NTr8CuSf+2BVWToaTA@mail.gmail.com>
-References: <20240828112207.5c199d41@canb.auug.org.au>
-	<CAL+tcoC0Wh5uREYs48Oq7yyKjChbY895NTr8CuSf+2BVWToaTA@mail.gmail.com>
+	s=arc-20240116; t=1724890676; c=relaxed/simple;
+	bh=wqwfbglmiOW3zEjrozGHbRY21H9OrGw1J7tCUk4qVjg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qP/9xmiK9tj0vtuh8LUMZI5X/zTJpN7h/b2cKzLMUr0Jt5oFv97Xs3VKCGD3dmGe/5ravgj2isvyy7X4KaVKea1LQEZb3tGBnpySRo7UKki0d4tpywUEkTEljcNupr+weZ99YHUStMLGs2tuPt7t1RC4CC1O82PA2rTTFOd+r9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q7q2uKup; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA5D1C4CEC0;
+	Thu, 29 Aug 2024 00:17:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724890675;
+	bh=wqwfbglmiOW3zEjrozGHbRY21H9OrGw1J7tCUk4qVjg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q7q2uKupXiWrXEb5VBisQRcVpWz1lLcSeE7zINvaSJm8aB8JKzaa1Qlj4qvHMl9T/
+	 mB0q0BY6SVtNcYAr1aQd4hYDHFHib8zZ9wUNt5pkZkagn7QUYxvdthCYydJEcS6isS
+	 EIaBZgHBZegmK+8STHem6es+CstqnY94jKsuJoGG9Eu4OXFZpHJMWmXP/XUZReh9Ty
+	 SwdIv0b0X/rYgMw8zApCJK8AIPIiB13V8lLrSIAOdunytxsuwfeR+sQxj1xQwuY7Db
+	 UT7C88ojT+76hQqBGXasE9vK2f5kOA2shjJvfoKnyQ6Bq2qrQ6C6FSIanWfsDiAHqV
+	 G4c5NZzYW7RGA==
+Date: Wed, 28 Aug 2024 17:17:55 -0700
+From: Kees Cook <kees@kernel.org>
+To: Alejandro Colomar <alx@kernel.org>
+Cc: Yafang Shao <laoar.shao@gmail.com>, akpm@linux-foundation.org,
+	torvalds@linux-foundation.org, justinstitt@google.com,
+	ebiederm@xmission.com, alexei.starovoitov@gmail.com,
+	rostedt@goodmis.org, catalin.marinas@arm.com,
+	penguin-kernel@i-love.sakura.ne.jp, linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	audit@vger.kernel.org, linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+	Matus Jokay <matus.jokay@stuba.sk>,
+	"Serge E. Hallyn" <serge@hallyn.com>
+Subject: Re: [PATCH v8 1/8] Get rid of __get_task_comm()
+Message-ID: <202408281712.F78440FF@keescook>
+References: <20240828030321.20688-1-laoar.shao@gmail.com>
+ <20240828030321.20688-2-laoar.shao@gmail.com>
+ <lql4y2nvs3ewadszhmv4m6fnqja4ff4ymuurpidlwvgf4twvru@esnh37a2jxbd>
+ <n2fxqs3tekvljezaqpfnwhsmjymch4vb47y744zwmy7urf3flv@zvjtepkem4l7>
+ <CALOAHbBAYHjDnKBVw63B8JBFc6U-2RNUX9L=ryA2Gbz7nnJfsQ@mail.gmail.com>
+ <7839453E-CA06-430A-A198-92EB906F94D9@kernel.org>
+ <ynrircglkinhherehtjz7woq55te55y4ol4rtxhfh75pvle3d5@uxp5esxt4slq>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/JYbYle9A+259YtpIRA5X91V";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ynrircglkinhherehtjz7woq55te55y4ol4rtxhfh75pvle3d5@uxp5esxt4slq>
 
---Sig_/JYbYle9A+259YtpIRA5X91V
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On Wed, Aug 28, 2024 at 05:09:08PM +0200, Alejandro Colomar wrote:
+> Hi Kees,
+> 
+> On Wed, Aug 28, 2024 at 06:48:39AM GMT, Kees Cook wrote:
+> 
+> [...]
+> 
+> > >Thank you for your suggestion. How does the following commit log look
+> > >to you? Does it meet your expectations?
+> > >
+> > >    string: Use ARRAY_SIZE() in strscpy()
+> > >
+> > >    We can use ARRAY_SIZE() instead to clarify that they are regular characters.
+> > >
+> > >    Co-developed-by: Alejandro Colomar <alx@kernel.org>
+> > >    Signed-off-by: Alejandro Colomar <alx@kernel.org>
+> > >    Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> > >
+> > >diff --git a/arch/um/include/shared/user.h b/arch/um/include/shared/user.h
+> > >index bbab79c0c074..07216996e3a9 100644
+> > >--- a/arch/um/include/shared/user.h
+> > >+++ b/arch/um/include/shared/user.h
+> > >@@ -14,7 +14,7 @@
+> > >  * copying too much infrastructure for my taste, so userspace files
+> > >  * get less checking than kernel files.
+> > >  */
+> > >-#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+> > >+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]) + __must_be_array(x))
+> > >
+> > > /* This is to get size_t and NULL */
+> > > #ifndef __UM_HOST__
+> > >@@ -60,7 +60,7 @@ static inline void print_hex_dump(const char *level,
+> > >const char *prefix_str,
+> > > extern int in_aton(char *str);
+> > > extern size_t strlcat(char *, const char *, size_t);
+> > > extern size_t sized_strscpy(char *, const char *, size_t);
+> > >-#define strscpy(dst, src)      sized_strscpy(dst, src, sizeof(dst))
+> > >+#define strscpy(dst, src)      sized_strscpy(dst, src, ARRAY_SIZE(dst))
+> > 
+> > Uh, but why? strscpy() copies bytes, not array elements. Using sizeof() is already correct and using ARRAY_SIZE() could lead to unexpectedly small counts (in admittedly odd situations).
+> > 
+> > What is the problem you're trying to solve here?
+> 
+> I suggested that here:
+> <https://lore.kernel.org/all/2jxak5v6dfxlpbxhpm3ey7oup4g2lnr3ueurfbosf5wdo65dk4@srb3hsk72zwq/>
+> 
+> There, you'll find the rationale (and also for avoiding the _pad calls
+> where not necessary --I ignore if it's necessary here--).
 
-Hi Jason,
+Right, so we only use byte strings for strscpy(), so sizeof() is
+sufficient. There's no technical need to switch to ARRAY_SIZE(), and I'd
+like to minimize any changes to such core APIs without a good reason.
 
-On Thu, 29 Aug 2024 08:04:16 +0800 Jason Xing <kerneljasonxing@gmail.com> w=
-rote:
->
-> On Wed, Aug 28, 2024 at 9:22=E2=80=AFAM Stephen Rothwell <sfr@canb.auug.o=
-rg.au> wrote:
-> >
-> > diff --cc net/ipv4/tcp.c
-> > index 831a18dc7aa6,8514257f4ecd..000000000000
-> > --- a/net/ipv4/tcp.c
-> > +++ b/net/ipv4/tcp.c
-> > @@@ -4653,10 -4649,12 +4656,10 @@@ int tcp_abort(struct sock *sk, int e=
-rr
-> >         local_bh_disable();
-> >         bh_lock_sock(sk);
-> >
-> >  -      if (!sock_flag(sk, SOCK_DEAD)) {
-> >  -              if (tcp_need_reset(sk->sk_state))
-> >  -                      tcp_send_active_reset(sk, GFP_ATOMIC,
-> >  -                                            SK_RST_REASON_TCP_STATE);
-> >  -              tcp_done_with_error(sk, err);
-> >  -      }
-> >  +      if (tcp_need_reset(sk->sk_state))
-> >  +              tcp_send_active_reset(sk, GFP_ATOMIC,
-> > -                                     SK_RST_REASON_NOT_SPECIFIED);
-> > ++                                    SK_RST_REASON_TCP_STATE); =20
->=20
-> "++"?
+And for the _pad change, we are also doing strncpy() replacement via
+case-by-case analysis, but with a common function like get_task_comm(),
+I don't want to change the behavior without a complete audit of the
+padding needs of every caller. Since that's rather a lot for this series,
+I'd rather we just leave the existing behavior as-is, and if padding
+removal is wanted after that, we can do it on a case-by-case basis then.
 
-This is a "combined diff" of the merge commit.  The "++" line does not
-appear verbatim in either of the parent trees.
+-Kees
 
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/JYbYle9A+259YtpIRA5X91V
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbPvJAACgkQAVBC80lX
-0Gy8vggAkPoAtlhRr80RmtBQpv6xWagfox7kRPLzQSj0dBYYQyJgaoTzq0tUywc4
-qATCxckR7eNdCbW8vc5M1QIyngUukenyv8Jf0p+06fRVxDNX7DnH1TkMNDxHO8RE
-VbQhxRla/2Ve3kOSn+Z1QcHrxYwWIXWATSExvHHtsonSXdo7wFbLe0rO6aBc5jqQ
-Cvlz8l4xqAa7oY5LEmKT2dad1jAwsYfJoN+Wnm1IbN7fZgMgjXx0MauyBx+Jv0mY
-Cs8AR4nL2YCEcKEWVpX8O8CRSH5YrXPWs8xkNZ7my68GwuPiX34piWEh4kw9WDkx
-zlsW9PW76QFZ3RbD+It5I/C3oq8cig==
-=8r1k
------END PGP SIGNATURE-----
-
---Sig_/JYbYle9A+259YtpIRA5X91V--
+-- 
+Kees Cook
 
