@@ -1,187 +1,136 @@
-Return-Path: <netdev+bounces-123240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFC779643BA
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:02:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CD619643D0
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 14:04:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 872B7283E3E
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 12:02:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B06231F236C1
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 12:04:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E0C9193077;
-	Thu, 29 Aug 2024 12:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08FB6197A65;
+	Thu, 29 Aug 2024 12:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="gToss/rZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n9gDTucm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F9918CC02
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 12:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF21E19597F;
+	Thu, 29 Aug 2024 12:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724932915; cv=none; b=jfNm9Ft/5xER4JbZd/1IvPfljbGm7O8qwTqjGT/qmP1AMww2g+x5pIJKhXeLdG0oXEitzmZr88W/PGeuZcewExTmOkdnfHdWcLUSojcOaFcyTp9m5nvQ7wzssugsdVOvfP8dCNPBVhItN7B8m9EOgffzQdI8qK/CNjc5iF3fJ9E=
+	t=1724933020; cv=none; b=GZsWloHDE2dVI7ckHX4l0nZvpSwnS4zdgMrWDLFgkN3gE0Wjt3rfe+FPz9Bn0DXYBJsI9FwbqrpnSGQqrVWjD7ebKLHFqtc6Hhr9MK8MhDyp7s8O3tL71sAnah30qB02lXHVK+eUcqrK1qILiCrDD3WZz7DzI18WDPo0DtZ1OXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724932915; c=relaxed/simple;
-	bh=fOZO2d20iA45ijbTFXi/g1LkvqA+AHUmsj+CK1eEIxw=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qa6Se8b9l8YfLe3KTopcEPstw0PtpVHJHQ0bV+6mogSUfSHZuvsHhtkVWDR0kNpy/EF8GHmVZR4hu9UqqZ6+dw6+gV7tdvWxOTnJ5FUUPkouHR8vG19GoiXRMo0ir4hIBCGIi4o4XvK06EmWeY0JBki5W62E3ZaQv1ttot8wubI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=gToss/rZ; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a868b739cd9so61004866b.2
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 05:01:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1724932912; x=1725537712; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mXBtr/JbiSQG7W9JfMUYCtQfQyKUiftjthV/2nojugU=;
-        b=gToss/rZvgKVjfAPyacL/q76YmsCND4RSc+aZ2fGN9apgKW2KWpDoeRDWPAZnSBlqQ
-         mIxSU8x1ZPW//YSICJDua82zbgukZ9NzqnHfc69WdqzKHpZLKAYOnQCBbxwP/hRyGOyZ
-         m1+Pr4NezMRbmuARSjLinJrBWmlBPkR1u8hUIvJKA0RmcZ59bxkDMydo8nXjE7AcNQ9t
-         2FFoSazdfqV3ibXedxh3OzfH8Y4+9cvckn/uyvxXFZL7mqsyS3w6jj3V/XdRH/Eb/xG6
-         k4EPzxy2RvVDMFFyv98ukloFIGKNWasVr5iKaaZ4dE+LL8cSlp9OtJyDMuwLxLlPyGQA
-         qngA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724932912; x=1725537712;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mXBtr/JbiSQG7W9JfMUYCtQfQyKUiftjthV/2nojugU=;
-        b=W6MLPygyx4+i0BHM72CzVThpP7we/sXK4WpUGeaBonBchUDpviKaXhjXj1Bz6apM9s
-         06T/FJu+wrprdRo23JPCNWb53ttBemsrHcPvNH0RtBz3mJKmOg1LIl5/5uSDfuimFpov
-         6FawvWGbDnpIlgN2/nWrIbeYe7BYy9WwPbCpX2NPXcFu210n6dQnqAeKqabTVV6wH6KA
-         YBgB9zbJ91N5YIsnBov82s6ZNPnpecxQRXPS/HdpawupLLEk1Q34xubrEKV9lLdevSzL
-         9PukF6cqBEOZzXpgIVUoMxKbBMTLlm9kIou2Kzh/0nMNnUhJaDKIVkJCP/UMaPMgSk8H
-         ZWZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9KcgVBNgoX005S3l0XfQnebb1LmKhbB7N2kJRsu+0XydlBC5jBDBAiOwdf2zfw9NQZz+Zsok=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtaEAkz+OLG3oQ+1C0i0lsUMkeD1cQDAdzxWfurc5iXHBdGh+v
-	g4GQJlUIkcWSHDunaZsEqMRlzVru78k1EDLmrlefBrMPo55vRg7YzrJUvLlcJ34=
-X-Google-Smtp-Source: AGHT+IFsyk0IWnaZFMb265yPeWvESMoqgeE3DSP8XvW62AVSUHg1bVi4x43hO0c3ITnEgvBmjx2LDg==
-X-Received: by 2002:a17:907:9708:b0:a80:7ce0:8b2a with SMTP id a640c23a62f3a-a897f84d44cmr193846766b.19.1724932909698;
-        Thu, 29 Aug 2024 05:01:49 -0700 (PDT)
-Received: from localhost (host-80-182-198-72.retail.telecomitalia.it. [80.182.198.72])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989021960sm71432166b.79.2024.08.29.05.01.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 05:01:49 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Thu, 29 Aug 2024 14:01:54 +0200
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 00/11] Add support for RaspberryPi RP1 PCI device using a
- DT overlay
-Message-ID: <ZtBjMpMGtA4WfDij@apocalypse>
-Mail-Followup-To: Andrew Lunn <andrew@lunn.ch>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Stefan Wahren <wahrenst@gmx.net>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <14990d25-40a2-46c0-bf94-25800f379a30@kernel.org>
- <Zsb_ZeczWd-gQ5po@apocalypse>
- <45a41ed9-2e42-4fd5-a1d5-35de93ce0512@lunn.ch>
+	s=arc-20240116; t=1724933020; c=relaxed/simple;
+	bh=/dyoBxa9xJHe968sZ6tJXhoil32Hg5rPtRChLxVz/ds=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ZUJsM8SN2XCBg2RGZx+04gUQxV1vsU4jHDtcjl6NnFQM2OktSplccauC2C0NAHfN+QQblOgMOiZP+9KEYFJTqgo6njI1d2dQbpfP0eP3PUodxNJGxsFQzuNE43YDaXPlaE3nxEJgkvPSLDVarDutRGy4UOAIX9i4c8OLg+dPzjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n9gDTucm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83B64C4CEC3;
+	Thu, 29 Aug 2024 12:03:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724933020;
+	bh=/dyoBxa9xJHe968sZ6tJXhoil32Hg5rPtRChLxVz/ds=;
+	h=From:Subject:Date:To:Cc:From;
+	b=n9gDTucmv9+3j71iCjG18iod/fHfjSmm+FwP50Vj0sA2oNiIZBVfBZS/OvUbNlwbb
+	 U9wqrUOWj7lz/mDoN6Q7IczpBolRAE7YLh1TKrKhFKFz2cXfLcUZBBH7NkQsROuBCy
+	 HcNcrRUwz+QKgwEz82gUeozT4dBNdBrOKGlcCsb5zyDy4UilEwtXEOoTgsdqsVwcSJ
+	 VLGYttbOY51fgJ4Oy7Ptc5d4NN5vHA6d2bUXi+A/7TknPujPYmfihI31qAb8vH99lN
+	 KPiBYt+Qz/WvBJMNoSxGgw8NmCmMdhWJuyzrVjtsAMe34xmXOKsAk082JnpfAqBTnN
+	 XfOw6PEpisuEA==
+From: Roger Quadros <rogerq@kernel.org>
+Subject: [PATCH net 0/3] net: ethernet: ti: am65-cpsw: Fix XDP
+ implementation
+Date: Thu, 29 Aug 2024 15:03:18 +0300
+Message-Id: <20240829-am65-cpsw-xdp-v1-0-ff3c81054a5e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <45a41ed9-2e42-4fd5-a1d5-35de93ce0512@lunn.ch>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIZj0GYC/x3MTQ5AMBBA4avIrE1Caf1cRSxoB7NQTSs0EXfXW
+ H6L9x4I5JkC9NkDni4OfNiEMs9Ab5NdCdkkgyhEXbSiw2lXErULN0bj0Mi2UbOQVSU1pMZ5Wjj
+ +vwEsnTC+7wdTm9zqZAAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Julien Panis <jpanis@baylibre.com>, Jacob Keller <jacob.e.keller@intel.com>
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, 
+ Md Danish Anwar <danishanwar@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
+ Govindarajan Sriramakrishnan <srk@ti.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+ Roger Quadros <rogerq@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1822; i=rogerq@kernel.org;
+ h=from:subject:message-id; bh=/dyoBxa9xJHe968sZ6tJXhoil32Hg5rPtRChLxVz/ds=;
+ b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBm0GOUMUbRIWAW8V+AZ92F9m0ddcj6xfm/3ILEq
+ 6fmuNqR1SGJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZtBjlAAKCRDSWmvTvnYw
+ k4qmEADZiuLMD1lv1jMoUNHWCpx/SuLclcc5gM1R9lMXutp2hZZRWpKmkH7MjBO3iceiLg2wdnl
+ DC0LkhgPMCgYKC6mUD+ZVCDbaAlUL4EkCraAUdl6RV3VY0zxK5PcD4rD2UPRU7tY192YLxUYAlu
+ +BKrc6ltkZvIabKgZyamMDPMvZuKArEWE6234dOiQJ0BbpH11nn3eKpH9zCCJxrsa0dOvCV9naA
+ pCiIec5OFrHKM3KlZ9/79LGCvMqqfcEV5GIIBD2us/UWzvMxfWxvKNuQ0+roghy0L+ItBuVjRUx
+ 7DyKMmwKutCNCTIOT8rdkopONK3VRaHUzsuTN8BWtr6/poSU6lZuf2902M33dqF2NJLi6Orgsj5
+ iAGrFk0uUTVfIsEDwgIgAcMachDiBfssq3O18h3uNNOaxMPWT9t2P+j7N2YHZJKWq+TV98qeAsB
+ 5n3wyX6pppXlj4P97004Nv+EjlRyQfnQSqqzhx67sdTn9AbO61dKf4cIReX26bXnaofSXdTaGDA
+ xrcVSs7hAUUwRZ34XXQ58Ptg/kkh83tB65zAkoPjCr3Y9AhfYE/fdLimHRPzdHSFAAIB94sbXI+
+ DtTu3CddHJWG5N1IMfxQooO+ElUk6TNEppp3kWs3sXR9uKRD9IObhW5l2owRrMcpXgNUIcrkh36
+ lWrLd+qJGbPPozg==
+X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
+ fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
-Hi Andrew,
+The XDP implementation on am65-cpsw driver is broken in many ways
+and this series fixes it.
 
-On 15:04 Thu 22 Aug     , Andrew Lunn wrote:
-> > WARNING: ENOTSUPP is not a SUSV4 error code, prefer EOPNOTSUPP
-> > #673: FILE: drivers/pinctrl/pinctrl-rp1.c:600:
-> > +                               return -ENOTSUPP;
-> > 
-> > This I must investigate: I've already tried to fix it before sending the patchset
-> > but for some reason it wouldn't work, so I planned to fix it in the upcoming 
-> > releases.
-> 
-> ENOTSUPP is an NFS error. It should not be used outside for NFS. You
-> want EOPNOTSUPP.
+Below are the current issues that are being fixed:
 
-Ack.
+1)  The following XDP_DROP test from [1] stalls the interface after
+    250 packets.
+    ~# xdb-bench drop -m native eth0
+    This is because new RX requests are never queued. Fix that.
 
-> 
->  
-> > WARNING: externs should be avoided in .c files
-> > #331: FILE: drivers/misc/rp1/rp1-pci.c:58:
-> > +extern char __dtbo_rp1_pci_begin[];
-> > 
-> > True, but in this case we don't have a symbol that should be exported to other
-> > translation units, it just needs to be referenced inside the driver and
-> > consumed locally. Hence it would be better to place the extern in .c file.
->  
-> Did you try making it static.
+2)  The below XDP_TX test from [1] fails with a warning
+    [  499.947381] XDP_WARN: xdp_update_frame_from_buff(line:277): Driver BUG: missing reserved tailroom
+    ~# xdb-bench tx -m native eth0
+    Fix that by using PAGE_SIZE during xdp_init_buf().
 
-The dtso is compiled into an obj and linked with the driver which is in
-a different transaltion unit. I'm not aware on other ways to include that
-symbol without declaring it extern (the exception being some hackery 
-trick that compile the dtso into a .c file to be included into the driver
-main source file). 
-Or probably I'm not seeing what you are proposing, could you please elaborate
-on that?
+3)  In XDP_REDIRECT case only 1 packet was processed in rx_poll.
+    Fix it to process up to budget packets.
+    ~# ./xdp-bench redirect -m native eth0 eth0
 
-Many thanks,
-Andrea
+4)  If number of TX queues are set to 1 we get a NULL pointer
+    dereference during XDP_TX.
+    ~# ethtool -L eth0 tx 1
+    ~# ./xdp-trafficgen udp -A <ipv6-src> -a <ipv6-dst> eth0 -t 2
+    Transmitting on eth0 (ifindex 2)
+    [  241.135257] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000030
 
-> 
-> 	Andrew
+5)  Net statistics is broken for XDP_TX and XDP_REDIRECT
+
+[1] xdp-tools suite https://github.com/xdp-project/xdp-tools
+
+Signed-off-by: Roger Quadros <rogerq@kernel.org>
+---
+Roger Quadros (3):
+      net: ethernet: ti: am65-cpsw: fix XDP_DROP, XDP_TX and XDP_REDIRECT
+      net: ethernet: ti: am65-cpsw: Fix NULL dereference on XDP_TX
+      net: ethernet: ti: am65-cpsw: Fix RX statistics for XDP_TX and XDP_REDIRECT
+
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 82 +++++++++++++++++++-------------
+ 1 file changed, 49 insertions(+), 33 deletions(-)
+---
+base-commit: 5be63fc19fcaa4c236b307420483578a56986a37
+change-id: 20240829-am65-cpsw-xdp-d5876b25335c
+
+Best regards,
+-- 
+Roger Quadros <rogerq@kernel.org>
+
 
