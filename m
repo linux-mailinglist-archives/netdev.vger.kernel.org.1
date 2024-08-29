@@ -1,145 +1,249 @@
-Return-Path: <netdev+bounces-123143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8771C963D08
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 09:31:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99A8C963D2A
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 09:36:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24DC7B23248
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 07:31:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1D7EB21E6F
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 07:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F02B16CD32;
-	Thu, 29 Aug 2024 07:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 522F615A865;
+	Thu, 29 Aug 2024 07:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lj3cc1JP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YjOJ53To"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E7916C873
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 07:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC97F184549
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 07:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724916654; cv=none; b=KLBe/UT5efjpF43cGOCSqw+KMiwE3PVQ6FKoWCrcqqgU1SSshy64+Sj2PJRa/FnuUpBUhLcgUfxtanC8R5odZ0JXx+6t5AaygPELgiPdCgfRfnlpOJvjXIPJERX8ma+dhMtVAniTV+2GQdMrxMZ3yAON2WG+FuGhhl7YiFziz9c=
+	t=1724916972; cv=none; b=e/BSFSdRlXDXhbb35QDBfVBR2/b7A28K0GL5Dy9fqNf9I61WWqDobojY2kdTaMfSm+UDPEIg54enF+AHvYHGR3CRBocB8SN9UHfpFViaeFjEfKwTcr/2Pqg+szpEw7TI5N3CRV7su1ANYLDVWk4JJtkxXq7jHw+NtQsjmKg51HU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724916654; c=relaxed/simple;
-	bh=br5YSHH2dpsgd6ZsbLMoQl+gzHFga1+L7uA0e08Xg/E=;
+	s=arc-20240116; t=1724916972; c=relaxed/simple;
+	bh=cVjJYV3Z/dOa1Mqk/ebZiTjWBkbZ/d8vI//Tn7ABX7o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HceY4zca0JKhyrmakc3xiOySO+d9mwSNziv2LVCiXUXSpP8I5WKlWUTiqM1G0JZ3LUdGO/F1f3BMlyyBM5O9ltO5lalPdwcL/tiMaP8sG2uEfnrZUAihc8BEEusrvtSJyfFkfiVldhal4fQMvLOv/zV0tvVaqG5o6wy4khrLOto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lj3cc1JP; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1724916653; x=1756452653;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=br5YSHH2dpsgd6ZsbLMoQl+gzHFga1+L7uA0e08Xg/E=;
-  b=Lj3cc1JPQMSo++udepTez5Fnv0fTkEdOjshmz+J9tNh/OkesvDhftS+U
-   PvCgoWkdWsjSyn/fcypKQ2vH+yBzHiP2wczYkkvhRJe2NMq1NHCQuc3dF
-   5SvFoZDDw5m7l30e5nm0RDNbuRBhd84+ukb8mKUtmxuDimEa2mYHhzrm5
-   6j8zExSE4LuVKWme4hjpIJRPKw1DG8qz48/tLpm5ylRSKIrvf23+Z0a3J
-   BELz+49n6luXsgQZNvR4lTvnZTJYTF+pH7xL1aZay3SHjkXHqsdQdHLGv
-   lJyjlCJyZy+2DFdJrb+zTrKlLDLN7d6WQn8qrva8hdoZK26r0RXYJwKKq
-   A==;
-X-CSE-ConnectionGUID: LfHjCtWYTfyiBkHQnPy4iQ==
-X-CSE-MsgGUID: 1uEPka8SSbCKBNFHIgvB4w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11178"; a="23648921"
-X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="23648921"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Aug 2024 00:30:52 -0700
-X-CSE-ConnectionGUID: 7Dk5lrEtSiCF1bpsASUzqw==
-X-CSE-MsgGUID: l4XClNB/T3yBV4mscdRnIA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,185,1719903600"; 
-   d="scan'208";a="63173591"
-Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 29 Aug 2024 00:30:50 -0700
-Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sjZcG-000Lqw-10;
-	Thu, 29 Aug 2024 07:30:48 +0000
-Date: Thu, 29 Aug 2024 15:30:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Matt Johnston <matt@codeconstruct.com.au>, jk@codeconstruct.com.au
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	 Content-Type:Content-Disposition:In-Reply-To; b=mnDUUfAOYM4GCV36gmxdpJRrL7/YNZdbYkSRTj0wiz1gCyNQ0RL2a4vt6NkRTq1UygqcakzxAygdMar/cyuukv2m2zXn50pgaEb2FqyxC/CAcOK0LQ49aZ3VfMJ9JgbxowZ85VfROSbtYmBYVWMONWi/8efk3ZR7mqYhMq0NQV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YjOJ53To; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724916968;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ohk1fQ2YMSfcyLTh4WiLQ+42ujiY1Vu4hR2nTH7HZPc=;
+	b=YjOJ53ToR3yhHoKkaNdSJySCXDECNhp4D7ulylxuPr+q7/8rK8+E3uWbMn0phiZWLYeP4n
+	CSHDOBDK+diNC42I0OGTj4G3VMN0jk8fk5QWZb4UNKHaVcoQg/lR96usqLZP0cyauvV/QJ
+	vk6GhV/OtKOFo/3slLZ+Oc6Vnlr+jqY=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-630-Kyn5WEZ-MKypmMEk2eaBng-1; Thu, 29 Aug 2024 03:36:07 -0400
+X-MC-Unique: Kyn5WEZ-MKypmMEk2eaBng-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a86915aeb32so27038266b.3
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 00:36:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724916966; x=1725521766;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ohk1fQ2YMSfcyLTh4WiLQ+42ujiY1Vu4hR2nTH7HZPc=;
+        b=L54JMLqsWcIbt4AhLjZ3K9NpSLMDhVf6kOXNq0etGocuBI1gzjT3CrGAIGZJ+aRbPi
+         HxKyCoegnz1S8fkZGTxqdwIkbdAhbUNTl+WCyrV0/rNOaaoL0Ljbwpj7pPCl/q4/SvR9
+         qmJsPZwNDBzIkFEztMLjHl4IQ7Z4IJvmagFMZ1VWNjKyw4S/dQxTOQsDDSmeTUmol/G4
+         BV4jAuY5710HMhvQrLkmqMfOdo2gvem6Mw7EJLFZnDL9tgBKl6DlXN3DfoVDGzqmbiii
+         SohWuoz7dQ3GSBCNcjeEPR9MZRejTobyJWPn6mSdBqFs5kvSwZ/eTqf40rqixX87RmEw
+         IcGg==
+X-Forwarded-Encrypted: i=1; AJvYcCVfUlUgO2XAuhuiECU3KJrZH/GFsRiLwnbrVA9zkdcujNtMmEPlNyVcQmtkOlb/uaVn9spqhs0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiPna1A2sitVGzPufl8+e7DQQRGiWaat1SD+YpcBCnsJr2Z/ji
+	spdbii5PMeNgc7cO6fCy4Uteh1XF6Jkd5tpSoTJ5XYyoSlE+yDYMiqqmEaDcPQVYk3n3fbcnH0h
+	4G+/YcL1YZmbj/3RBA9mgsfaqX0toJ9Iz5ZFwhJwfAITbDELfYsU03A==
+X-Received: by 2002:a17:907:3f24:b0:a86:9c41:cfc1 with SMTP id a640c23a62f3a-a897f775dd1mr150157866b.8.1724916965758;
+        Thu, 29 Aug 2024 00:36:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGY4tDrnYyIp4XqYAajLJXRVCYVThMt5vYfRf0oEzyI1i5Mv46dq6eXSulL0YuqDUOF1Ev4Fg==
+X-Received: by 2002:a17:907:3f24:b0:a86:9c41:cfc1 with SMTP id a640c23a62f3a-a897f775dd1mr150152966b.8.1724916964907;
+        Thu, 29 Aug 2024 00:36:04 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1ed:a269:8195:851e:f4b1:ff5d])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a89891d80fcsm40795866b.181.2024.08.29.00.36.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 00:36:04 -0700 (PDT)
+Date: Thu, 29 Aug 2024 03:35:58 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net: mctp-serial: Add kunit test for
- next_chunk_len()
-Message-ID: <202408291542.2o5GOBhQ-lkp@intel.com>
-References: <20240827020803.957250-2-matt@codeconstruct.com.au>
+	virtualization@lists.linux.dev, Si-Wei Liu <si-wei.liu@oracle.com>,
+	Darren Kenny <darren.kenny@oracle.com>
+Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
+Message-ID: <20240829033209-mutt-send-email-mst@kernel.org>
+References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEsJ2sckV5S1nGF+MrTgScVTTuwv6PHuLZARusJsFpf58g@mail.gmail.com>
+ <1724843499.0572476-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEsNk7iYti3hSJ0EiXfusF8Kw9YEJjXFH-DApQaEY6o-cQ@mail.gmail.com>
+ <1724916360.9746847-3-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240827020803.957250-2-matt@codeconstruct.com.au>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1724916360.9746847-3-xuanzhuo@linux.alibaba.com>
 
-Hi Matt,
+On Thu, Aug 29, 2024 at 03:26:00PM +0800, Xuan Zhuo wrote:
+> On Thu, 29 Aug 2024 12:51:31 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> > On Wed, Aug 28, 2024 at 7:21 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+> > >
+> > > On Tue, 27 Aug 2024 11:38:45 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> > > > On Tue, Aug 20, 2024 at 3:19 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+> > > > >
+> > > > > leads to regression on VM with the sysctl value of:
+> > > > >
+> > > > > - net.core.high_order_alloc_disable=1
+> > > > >
+> > > > > which could see reliable crashes or scp failure (scp a file 100M in size
+> > > > > to VM):
+> > > > >
+> > > > > The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
+> > > > > of a new frag. When the frag size is larger than PAGE_SIZE,
+> > > > > everything is fine. However, if the frag is only one page and the
+> > > > > total size of the buffer and virtnet_rq_dma is larger than one page, an
+> > > > > overflow may occur. In this case, if an overflow is possible, I adjust
+> > > > > the buffer size. If net.core.high_order_alloc_disable=1, the maximum
+> > > > > buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
+> > > > > the first buffer of the frag is affected.
 
-kernel test robot noticed the following build errors:
+I don't exactly get it, when you say "only the first buffer of the frag
+is affected" what do you mean? Affected how?
 
-[auto build test ERROR on net/main]
+> > > >
+> > > > I wonder instead of trying to make use of headroom, would it be
+> > > > simpler if we allocate dedicated arrays of virtnet_rq_dma？
+> > >
+> > > Sorry for the late reply. My mailbox was full, so I missed the reply to this
+> > > thread. Thanks to Si-Wei for reminding me.
+> > >
+> > > If the virtnet_rq_dma is at the headroom, we can get the virtnet_rq_dma by buf.
+> > >
+> > >         struct page *page = virt_to_head_page(buf);
+> > >
+> > >         head = page_address(page);
+> > >
+> > > If we use a dedicated array, then we need pass the virtnet_rq_dma pointer to
+> > > virtio core, the array has the same size with the rx ring.
+> > >
+> > > The virtnet_rq_dma will be:
+> > >
+> > > struct virtnet_rq_dma {
+> > >         dma_addr_t addr;
+> > >         u32 ref;
+> > >         u16 len;
+> > >         u16 need_sync;
+> > > +       void *buf;
+> > > };
+> > >
+> > > That will be simpler.
+> >
+> > I'm not sure I understand here, did you mean using a dedicated array is simpler?
+> 
+> I found the old version(that used a dedicated array):
+> 
+> http://lore.kernel.org/all/20230710034237.12391-11-xuanzhuo@linux.alibaba.com
+> 
+> If you think that is ok, I can port a new version based that.
+> 
+> Thanks.
+> 
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Matt-Johnston/net-mctp-serial-Add-kunit-test-for-next_chunk_len/20240827-101656
-base:   net/main
-patch link:    https://lore.kernel.org/r/20240827020803.957250-2-matt%40codeconstruct.com.au
-patch subject: [PATCH net 1/2] net: mctp-serial: Add kunit test for next_chunk_len()
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20240829/202408291542.2o5GOBhQ-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240829/202408291542.2o5GOBhQ-lkp@intel.com/reproduce)
+That one got a bunch of comments that likely still apply.
+And this looks like a much bigger change than what this
+patch proposes.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408291542.2o5GOBhQ-lkp@intel.com/
+> >
+> > >
+> > > >
+> > > > Btw, I see it has a need_sync, I wonder if it can help for performance
+> > > > or not? If not, any reason to keep that?
+> > >
+> > > I think yes, we can skip the cpu sync when we do not need it.
+> >
+> > I meant it looks to me the needs_sync is not necessary in the
+> > structure as we can call need_sync() any time if we had dma addr.
+> >
+> > Thanks
+> >
+> > >
+> > > Thanks.
+> > >
+> > >
+> > > >
+> > > > >
+> > > > > Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
+> > > > > Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+> > > > > Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
+> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > ---
+> > > > >  drivers/net/virtio_net.c | 12 +++++++++---
+> > > > >  1 file changed, 9 insertions(+), 3 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > > index c6af18948092..e5286a6da863 100644
+> > > > > --- a/drivers/net/virtio_net.c
+> > > > > +++ b/drivers/net/virtio_net.c
+> > > > > @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
+> > > > >         void *buf, *head;
+> > > > >         dma_addr_t addr;
+> > > > >
+> > > > > -       if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+> > > > > -               return NULL;
+> > > > > -
+> > > > >         head = page_address(alloc_frag->page);
+> > > > >
+> > > > >         dma = head;
+> > > > > @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+> > > > >         len = SKB_DATA_ALIGN(len) +
+> > > > >               SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> > > > >
+> > > > > +       if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+> > > > > +               return -ENOMEM;
+> > > > > +
+> > > > >         buf = virtnet_rq_alloc(rq, len, gfp);
+> > > > >         if (unlikely(!buf))
+> > > > >                 return -ENOMEM;
+> > > > > @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+> > > > >          */
+> > > > >         len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+> > > > >
+> > > > > +       if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
+> > > > > +               return -ENOMEM;
+> > > > > +
+> > > > > +       if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
+> > > > > +               len -= sizeof(struct virtnet_rq_dma);
+> > > > > +
+> > > > >         buf = virtnet_rq_alloc(rq, len + room, gfp);
+> > > > >         if (unlikely(!buf))
+> > > > >                 return -ENOMEM;
+> > > > > --
+> > > > > 2.32.0.3.g01195cf9f
+> > > >
+> > > > Thanks
+> > > >
+> > > > >
+> > > >
+> > > >
+> > > >
+> > >
+> >
 
-All errors (new ones prefixed by >>):
-
->> drivers/net/mctp/mctp-serial.c:541:24: error: initializing 'struct test_chunk_tx *' with an expression of type 'const void *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
-     541 |         struct test_chunk_tx *params = test->param_value;
-         |                               ^        ~~~~~~~~~~~~~~~~~
-   1 error generated.
-
-
-vim +541 drivers/net/mctp/mctp-serial.c
-
-   534	
-   535	static void test_next_chunk_len(struct kunit *test)
-   536	{
-   537		struct mctp_serial devx;
-   538		struct mctp_serial *dev = &devx;
-   539		int next;
-   540	
- > 541		struct test_chunk_tx *params = test->param_value;
-   542	
-   543		memset(dev, 0x0, sizeof(*dev));
-   544		memcpy(dev->txbuf, params->input, params->input_len);
-   545		dev->txlen = params->input_len;
-   546	
-   547		for (size_t i = 0; i < MAX_CHUNKS; i++) {
-   548			next = next_chunk_len(dev);
-   549			dev->txpos += next;
-   550			KUNIT_EXPECT_EQ(test, next, params->chunks[i]);
-   551	
-   552			if (next == 0) {
-   553				KUNIT_EXPECT_EQ(test, dev->txpos, dev->txlen);
-   554				return;
-   555			}
-   556		}
-   557	
-   558		KUNIT_FAIL_AND_ABORT(test, "Ran out of chunks");
-   559	}
-   560	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
