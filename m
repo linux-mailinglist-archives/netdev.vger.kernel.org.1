@@ -1,138 +1,232 @@
-Return-Path: <netdev+bounces-123434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DED71964D8A
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:15:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14288964D8B
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:15:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 942821F22114
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:15:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B729B285601
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:15:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA0B1B86C0;
-	Thu, 29 Aug 2024 18:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED6661B375C;
+	Thu, 29 Aug 2024 18:15:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cu7LbsvN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+zh0PsZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E12781B81D2;
-	Thu, 29 Aug 2024 18:15:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6B61547FD
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 18:15:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724955302; cv=none; b=N0Fub5acp+efaOQRAB21IuFtYLpIATBMWDPkNS2FPrzNa5X8kSiQMvbQ2jAQoIhfYSI2Rr6FqIgEa9eUnNo1FaqLZcbkeiHen4OzYbnh7i98o7+fCNyqnvnzdF696WZLbn1FWUJfEwSHIiJ5RzqNO7hgjP3ej3V6u1IzCUsyzHc=
+	t=1724955317; cv=none; b=aljQOt/uA6l13tPHiBrfJO06beLnLfpS1CL7cMAON9llmYUStnHyr0y3Pr06OindcahTIcnMUYF6Lvw5enAVOBgMjcYBqDqyCvWHDb2UxJl9FOHudDCWslwCR8r51ycoC6ffO6COUmPU+bZrlnd+Rz9xpTDh4ixlPmL7lfzhx6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724955302; c=relaxed/simple;
-	bh=68pjJN/T0s4pW9PljETJv3LnYCfdZMsgv4u+jY3JAdg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=uwQFVWQxAJtBUB5wuilO/Gqhz9RF0/um4D6JXU/uIyOfPbf/Te6O4ab+EqfzSFa73QMfIBqArD5H9MonGpImVLziaBQNnm/H91VopkoGF2jTgjN+gv2laA2q4Z5IXMCNUNPQJwLR+P6Jftzc/vk6jpNOvSdyfvOOmAWw02IFWeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cu7LbsvN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E35ECC4CEC1;
-	Thu, 29 Aug 2024 18:15:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724955301;
-	bh=68pjJN/T0s4pW9PljETJv3LnYCfdZMsgv4u+jY3JAdg=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Cu7LbsvNjAZ86rPytatnX8nYGVP3n6pMecH2okCGZfYDGY2MKMH98ctmOqmy3zVgl
-	 qgZNCMgw3zBDYJglGk56ZAKcu5YSmJoBbiwuv1EdzgtWBcMiBbAox0radj6Df4IhWm
-	 9bC8YegzzXi04GNknISxgpiI14A0yWU3kghnbZVXmq+0hJAtx4Vd4OL9iszkqC+FUB
-	 edH61e1adfRNIp0XJTbVcExh/CCQscKUO7sP9fpLVFjHjAntekXU81dRPxZpmHMkHf
-	 QtpeF3iYd824/5kyhdGt0IMxe5nwvjqbl4+gR9EkCcHc7XEKIjzLmhmyXODfkc7tyZ
-	 Loks/GklY4stA==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Thu, 29 Aug 2024 11:14:54 -0700
-Subject: [PATCH ipsec-next v2] xfrm: policy: Restore dir assignments in
- xfrm_hash_rebuild()
+	s=arc-20240116; t=1724955317; c=relaxed/simple;
+	bh=286Q1sHNxniVqSzlVPzGlGz4+vkXCd2LeI+sx0RPun4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=KglQl3ojyuDh89+WGG+M710jLUkHxwNGcPacOitJO9WkE+3UdD0kWVfPh9rxEuqtBN9ooh2mFxFZdTvBnIFOIzXVQn/tk/QTfsWGBHyiDQ+HUxWmTZliZhbKKuU9ybPrmCeYVb6rKi6nIh8wfRaSvKguIpOLb+q65shlUzdUO3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m+zh0PsZ; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6bf6606363fso5480816d6.3
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 11:15:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724955315; x=1725560115; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CDqlaygLqrNw7btRzhPpZHmK30Fz61NYt/enkyNk8F8=;
+        b=m+zh0PsZonMpJITNfd3DJTbS+QO4mLm0yGlkGl/DV/7GVYRnzaEPVv9NtlapEpWiuD
+         5ZiFvI3fh1ed7axIkq/j5ItiY03gWnMwLrMdGag1/jugAZazWqTQ7alTKiBV5sjcXXOm
+         XyLTh8l9jCLSm2FWA40N63gMzAJzWfSGAWONUx6GWW95o7CS2qof0TzgovyPGapgJ0Bu
+         B1RraVuVnC3dPm/0Zr7z7nXJxCvw2FvlBxzulw0RZoyacP6nVYsGw9HguGW27WpzSC5/
+         kNLT1O39TItwO5swYkzjjaYZCOXQp7pVvpGqoFgX0o9773V0lCnnuXRKQ3+fA+7zPMmv
+         FMbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724955315; x=1725560115;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CDqlaygLqrNw7btRzhPpZHmK30Fz61NYt/enkyNk8F8=;
+        b=rUErfqc1lrny6A/Qn/m9GVDtL1bxv4fYhg12XCHt7T8y8cV6V28EqXiWRxxcchOEkL
+         LfrnuAWj4L1RXExoYT5SfFnnwS/U7ZBcc5zpaK1f2/CflH7QClnXvaM3ZgSbUDuyrWzk
+         bFq+1bY2JHMjX8vGrp6EYRA9/U2dMUXy4PeoCN9C4ViYjbIhxvuGS+3lEmkDQiwRgx0k
+         C+7acAp57i/VnLMnqsl4TjdXVT0vxn4EyKiM/U5HGSEE4D0iYBGuhpYh+S5PL4dNipB0
+         oErviR8mjxNfYYuS+8iUPMTnVIMFlIxaecFa9bOxuXNowXiudOsyXG+xUeqb5zAkijOZ
+         ePDw==
+X-Forwarded-Encrypted: i=1; AJvYcCUgEoaevHEx+ZkwNFVDdLwulLonSx7mnoT293uyVM8IwLNe6G+fDB3vXGx2kSSwdcAM/QzEkI0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzd+1HKx3QGpW1RGzApEPoQNSpoDRd1pHwRf8Gn74DbIg7CWkua
+	E+tV/v+lxnBnCNMqa6+4slWgC7F0BTny9GNhYvd77IATDeOu/yJh
+X-Google-Smtp-Source: AGHT+IHb9y2upRMnFdpFmAjT8531Nt57wIXNBlAHxPCjeDbmiWR7lG6N0hgd/4522yU9Cw4fLnf98g==
+X-Received: by 2002:a05:6214:5711:b0:6c1:6362:8363 with SMTP id 6a1803df08f44-6c33e68d2d4mr42110546d6.47.1724955314789;
+        Thu, 29 Aug 2024 11:15:14 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340dae127sm7327446d6.133.2024.08.29.11.15.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 11:15:13 -0700 (PDT)
+Date: Thu, 29 Aug 2024 14:15:13 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ willemb@google.com, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <66d0bab153f94_39548f29451@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoCUhYH=udvB3rdVZm0gVypmAa5devPXryPwY+39mHscDA@mail.gmail.com>
+References: <20240828160145.68805-1-kerneljasonxing@gmail.com>
+ <66d082422d85_3895fa29427@willemb.c.googlers.com.notmuch>
+ <CAL+tcoD6s0rrCAvMeMDE3-QVemPy21Onh4mHC+9PE-DDLkdj-Q@mail.gmail.com>
+ <66d0a0816d6ce_39197c29476@willemb.c.googlers.com.notmuch>
+ <CAL+tcoCUhYH=udvB3rdVZm0gVypmAa5devPXryPwY+39mHscDA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/2] timestamp: control
+ SOF_TIMESTAMPING_RX_SOFTWARE feature per socket
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240829-xfrm-restore-dir-assign-xfrm_hash_rebuild-v2-1-1cf8958f6e8e@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAJ260GYC/52OWwqDMBBFtyLz3SlJ8Nmv7qOIRB11qI0ysWIR9
- 16bJfTzPrjn7uBJmDzcoh2EVvY8uVOYSwTNYF1PyO2pwSgTq9wUuHXyQiG/TELYsqD1nnsX/Gq
- wfqiE6jePLWZx0Vhj0jjJNZx7s1DHW2A9gGdPDTraFijPbODf4CfcWHVo/EFcNWq0Rqk8TeIiq
- /X9SeJovE7SQ3kcxxdkDi3W7wAAAA==
-To: Steffen Klassert <steffen.klassert@secunet.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev, 
- Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2489; i=nathan@kernel.org;
- h=from:subject:message-id; bh=68pjJN/T0s4pW9PljETJv3LnYCfdZMsgv4u+jY3JAdg=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDGkXdi3ZyrnuT7B26DeJ5YoRnRsn7Ktc6eDio6V14dyN8
- 19v2fSmdZSyMIhxMciKKbJUP1Y9bmg45yzjjVOTYOawMoEMYeDiFICJiOoyMnzav0Zrcfr+ZRu/
- bd7b3J5ufm7a2tJftQde+rM/WPDBP/Upw3+PCO7FE36snXeQ+7mE+3PbWefFdn19Yv1N8c7PV7z
- fzJdxAQA=
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Clang warns (or errors with CONFIG_WERROR):
+Jason Xing wrote:
+> On Fri, Aug 30, 2024 at 12:23=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Jason Xing wrote:
+> > > On Thu, Aug 29, 2024 at 10:14=E2=80=AFPM Willem de Bruijn
+> > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > >
+> > > > Jason Xing wrote:
+> > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > >
+> > > > > Prior to this series, when one socket is set SOF_TIMESTAMPING_R=
+X_SOFTWARE
+> > > > > which measn the whole system turns on this button, other socket=
+s that only
+> > > > > have SOF_TIMESTAMPING_SOFTWARE will be affected and then print =
+the rx
+> > > > > timestamp information even without SOF_TIMESTAMPING_RX_SOFTWARE=
+ flag.
+> > > > > In such a case, the rxtimestamp.c selftest surely fails, please=
+ see
+> > > > > testcase 6.
+> > > > >
+> > > > > In a normal case, if we only set SOF_TIMESTAMPING_SOFTWARE flag=
+, we
+> > > > > can't get the rx timestamp because there is no path leading to =
+turn on
+> > > > > netstamp_needed_key button in net_enable_timestamp(). That is t=
+o say, if
+> > > > > the user only sets SOF_TIMESTAMPING_SOFTWARE, we don't expect w=
+e are
+> > > > > able to fetch the timestamp from the skb.
+> > > >
+> > > > I already happened to stumble upon a counterexample.
+> > > >
+> > > > The below code requests software timestamps, but does not set the=
 
-  net/xfrm/xfrm_policy.c:1286:8: error: variable 'dir' is uninitialized when used here [-Werror,-Wuninitialized]
-   1286 |                 if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
-        |                      ^~~
-  net/xfrm/xfrm_policy.c:1257:9: note: initialize the variable 'dir' to silence this warning
-   1257 |         int dir;
-        |                ^
-        |                 = 0
-  1 error generated.
+> > > > generate flag. I suspect because they assume a PTP daemon (sfptpd=
+)
+> > > > running that has already enabled that.
+> > >
+> > > To be honest, I took a quick search through the whole onload progra=
+m
+> > > and then suspected the use of timestamp looks really weird.
+> > >
+> > > 1. I searched the SOF_TIMESTAMPING_RX_SOFTWARE flag and found there=
+ is
+> > > no other related place that actually uses it.
+> > > 2. please also see the tx_timestamping.c file[1]. The author simila=
+rly
+> > > only turns on SOF_TIMESTAMPING_SOFTWARE report flag without turning=
+ on
+> > > any useful generation flag we are familiar with, like
+> > > SOF_TIMESTAMPING_TX_SOFTWARE, SOF_TIMESTAMPING_TX_SCHED,
+> > > SOF_TIMESTAMPING_TX_ACK.
+> > >
+> > > [1]: https://github.com/Xilinx-CNS/onload/blob/master/src/tests/onl=
+oad/hwtimestamping/tx_timestamping.c#L247
+> > >
+> > > >
+> > > > https://github.com/Xilinx-CNS/onload/blob/master/src/tests/onload=
+/hwtimestamping/rx_timestamping.c
+> > > >
+> > > > I suspect that there will be more of such examples in practice. I=
+n
+> > > > which case we should scuttle this. Please do a search online for
+> > > > SOF_TIMESTAMPING_SOFTWARE to scan for this pattern.
+> > >
+> > > I feel that only the buggy program or some program particularly tak=
+es
+> > > advantage of the global netstamp_needed_key...
+> >
+> > My point is that I just happen to stumble on one open source example
+> > of this behavior.
+> >
+> > That is a strong indication that other applications may make the same=
 
-A recent refactoring removed some assignments to dir because
-xfrm_policy_is_dead_or_sk() has a dir assignment in it. However, dir is
-used elsewhere in xfrm_hash_rebuild(), including within loops where it
-needs to be reloaded for each policy. Restore the assignments before the
-first use of dir to fix the warning and ensure dir is properly
-initialized throughout the function.
+> > implicit assumption. Both open source, and the probably many more non=
 
-Fixes: 08c2182cf0b4 ("xfrm: policy: use recently added helper in more places")
-Acked-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
----
-Changes in v2:
-- Restore another dir assignment in
-    list_for_each_entry_reverse(policy, ...
-  loop, necessitating a value reload to avoid a stale value (thanks to
-  Florian for the review).
-- Reword commit message slightly based on above change.
-- Pick up Florian's ack.
-- Add 'ipsec-next' subject prefix.
-- Link to v1: https://lore.kernel.org/r/20240829-xfrm-restore-dir-assign-xfrm_hash_rebuild-v1-1-a200865497b1@kernel.org
----
- net/xfrm/xfrm_policy.c | 2 ++
- 1 file changed, 2 insertions(+)
+> > public users.
+> >
+> > Rule #1 is to not break users.
+> =
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 6336baa8a93c..63890c0628c4 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -1283,6 +1283,7 @@ static void xfrm_hash_rebuild(struct work_struct *work)
- 		if (xfrm_policy_is_dead_or_sk(policy))
- 			continue;
- 
-+		dir = xfrm_policy_id2dir(policy->index);
- 		if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
- 			if (policy->family == AF_INET) {
- 				dbits = rbits4;
-@@ -1337,6 +1338,7 @@ static void xfrm_hash_rebuild(struct work_struct *work)
- 		hlist_del_rcu(&policy->bydst);
- 
- 		newpos = NULL;
-+		dir = xfrm_policy_id2dir(policy->index);
- 		chain = policy_hash_bysel(net, &policy->selector,
- 					  policy->family, dir);
- 
+> Yes, I know it.
+> =
 
----
-base-commit: 17163f23678c7599e40758d7b96f68e3f3f2ea15
-change-id: 20240829-xfrm-restore-dir-assign-xfrm_hash_rebuild-749ca2264581
+> >
+> > Given that we even have proof that we would break users, we cannot
+> > make this change, sorry.
+> =
 
-Best regards,
--- 
-Nathan Chancellor <nathan@kernel.org>
+> Okay. Your concern indeed makes sense. Sigh, I just finished the v3
+> patch series :S
+> =
+
+> >
+> > A safer alternative is to define a new timestamp option flag that
+> > opt-in enables this filter-if-SOF_TIMESTAMPING_RX_SOFTWARE is not
+> > set behavior.
+> =
+
+> At the first glance, It sounds like it's a little bit similar to
+> SOF_TIMESTAMPING_OPT_ID_TCP that is used to replace
+> SOF_TIMESTAMPING_OPT_ID in the bytestream case for robustness
+> consideration.
+>
+> Are you suggesting that if we can use the new report flag combined
+> with SOF_TIMESTAMPING_SOFTWARE, the application will not get a rx
+> timestamp report, right? The new flag goes the opposite way compared
+> with SOF_TIMESTAMPING_RX_SOFTWARE, indicating we don't expect a rx sw
+> report.
+> =
+
+> If that is so, what would you recommend to name the new flag which is
+> a report flag (not a generation flag)? How about calling
+> "SOF_TIMESTAMPING_RX_SOFTWARE_CTRL". I tried, but my English
+> vocabulary doesn't help, sorry :(
+
+Something like this?
+
+@@ -947,6 +947,8 @@ void __sock_recv_timestamp(struct msghdr *msg, struct=
+ sock *sk,
+        memset(&tss, 0, sizeof(tss));
+        tsflags =3D READ_ONCE(sk->sk_tsflags);
+        if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
++           (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
++            !tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
+
+
 
 
