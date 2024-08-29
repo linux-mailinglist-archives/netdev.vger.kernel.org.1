@@ -1,232 +1,132 @@
-Return-Path: <netdev+bounces-123435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14288964D8B
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:15:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D422D964DA8
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 20:29:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B729B285601
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:15:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A46D1F22527
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 18:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED6661B375C;
-	Thu, 29 Aug 2024 18:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9DC1B86CB;
+	Thu, 29 Aug 2024 18:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+zh0PsZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a3s9hF3Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E6B61547FD
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 18:15:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8951B81DE
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 18:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724955317; cv=none; b=aljQOt/uA6l13tPHiBrfJO06beLnLfpS1CL7cMAON9llmYUStnHyr0y3Pr06OindcahTIcnMUYF6Lvw5enAVOBgMjcYBqDqyCvWHDb2UxJl9FOHudDCWslwCR8r51ycoC6ffO6COUmPU+bZrlnd+Rz9xpTDh4ixlPmL7lfzhx6M=
+	t=1724956145; cv=none; b=KjYf0ke8P2jRbB/EAK3pO8HqxPlcY+rQihNS8MtGw4jX0xt44Q0Z8o75x/nz4krurUWm4e6eVq9I5sqPJkjh61KghfW0EM870wlKrZT0b7Qr3DeP8MaKtPFbr9itzH/9Xc9JfOWv1yYvPq5+eqjpUgosjoLrdfnlp4tQoh74zQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724955317; c=relaxed/simple;
-	bh=286Q1sHNxniVqSzlVPzGlGz4+vkXCd2LeI+sx0RPun4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=KglQl3ojyuDh89+WGG+M710jLUkHxwNGcPacOitJO9WkE+3UdD0kWVfPh9rxEuqtBN9ooh2mFxFZdTvBnIFOIzXVQn/tk/QTfsWGBHyiDQ+HUxWmTZliZhbKKuU9ybPrmCeYVb6rKi6nIh8wfRaSvKguIpOLb+q65shlUzdUO3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m+zh0PsZ; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6bf6606363fso5480816d6.3
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 11:15:15 -0700 (PDT)
+	s=arc-20240116; t=1724956145; c=relaxed/simple;
+	bh=uFlJynURVWC+M2UJehrQrk5CWf/a/Gwly+Kkpykmcts=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QTwZc41uCTC2qa9hX1Cw9WxEI4rMo8LluPSy/Zm2uo6+25MnKmNehf9OAhKXm6qaPnmiepGHZDnB7J10j/0UqcCCcT4y7PNKQzyie5pgvzxQ1VV1+9L02VwC7KgMGxuswxSDwhCSdgc3uyLod4cfv1rnpjE+eowg3j4vLD+EYwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a3s9hF3Z; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a8695cc91c8so101237266b.3
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 11:29:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724955315; x=1725560115; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CDqlaygLqrNw7btRzhPpZHmK30Fz61NYt/enkyNk8F8=;
-        b=m+zh0PsZonMpJITNfd3DJTbS+QO4mLm0yGlkGl/DV/7GVYRnzaEPVv9NtlapEpWiuD
-         5ZiFvI3fh1ed7axIkq/j5ItiY03gWnMwLrMdGag1/jugAZazWqTQ7alTKiBV5sjcXXOm
-         XyLTh8l9jCLSm2FWA40N63gMzAJzWfSGAWONUx6GWW95o7CS2qof0TzgovyPGapgJ0Bu
-         B1RraVuVnC3dPm/0Zr7z7nXJxCvw2FvlBxzulw0RZoyacP6nVYsGw9HguGW27WpzSC5/
-         kNLT1O39TItwO5swYkzjjaYZCOXQp7pVvpGqoFgX0o9773V0lCnnuXRKQ3+fA+7zPMmv
-         FMbA==
+        d=google.com; s=20230601; t=1724956142; x=1725560942; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=uFlJynURVWC+M2UJehrQrk5CWf/a/Gwly+Kkpykmcts=;
+        b=a3s9hF3Z1kRsUDVfWRJMlkEgoLOPouyvn8zpf5QacXuMkq1yjamUa83QTs0MyRhira
+         btMci4O4coCdXBTrhroz8+GInCKRlzMo7Tuk10rKt1P8l7yXTeV3YUJT54lUA27iQLbn
+         8xxp4gWSfo4tiu1QBeugA6Q6cGZcys/YqdCihvzgo07osaQnQ+NLJoPbxsfbjI/VNxVH
+         iOuAbeEBUWqBligSBzrl6L2ZEqEFlx68VarpP7uVspS2bIGQgROTKPu3MwcuEVh60GQr
+         w+Y2taID1L+oEituO7p4NT/rvdSFC5uf9pADP6g4ca5I/3ncew9qnS49uZec5wR4PWr2
+         ODhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724955315; x=1725560115;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CDqlaygLqrNw7btRzhPpZHmK30Fz61NYt/enkyNk8F8=;
-        b=rUErfqc1lrny6A/Qn/m9GVDtL1bxv4fYhg12XCHt7T8y8cV6V28EqXiWRxxcchOEkL
-         LfrnuAWj4L1RXExoYT5SfFnnwS/U7ZBcc5zpaK1f2/CflH7QClnXvaM3ZgSbUDuyrWzk
-         bFq+1bY2JHMjX8vGrp6EYRA9/U2dMUXy4PeoCN9C4ViYjbIhxvuGS+3lEmkDQiwRgx0k
-         C+7acAp57i/VnLMnqsl4TjdXVT0vxn4EyKiM/U5HGSEE4D0iYBGuhpYh+S5PL4dNipB0
-         oErviR8mjxNfYYuS+8iUPMTnVIMFlIxaecFa9bOxuXNowXiudOsyXG+xUeqb5zAkijOZ
-         ePDw==
-X-Forwarded-Encrypted: i=1; AJvYcCUgEoaevHEx+ZkwNFVDdLwulLonSx7mnoT293uyVM8IwLNe6G+fDB3vXGx2kSSwdcAM/QzEkI0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzd+1HKx3QGpW1RGzApEPoQNSpoDRd1pHwRf8Gn74DbIg7CWkua
-	E+tV/v+lxnBnCNMqa6+4slWgC7F0BTny9GNhYvd77IATDeOu/yJh
-X-Google-Smtp-Source: AGHT+IHb9y2upRMnFdpFmAjT8531Nt57wIXNBlAHxPCjeDbmiWR7lG6N0hgd/4522yU9Cw4fLnf98g==
-X-Received: by 2002:a05:6214:5711:b0:6c1:6362:8363 with SMTP id 6a1803df08f44-6c33e68d2d4mr42110546d6.47.1724955314789;
-        Thu, 29 Aug 2024 11:15:14 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340dae127sm7327446d6.133.2024.08.29.11.15.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 11:15:13 -0700 (PDT)
-Date: Thu, 29 Aug 2024 14:15:13 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemb@google.com, 
- netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>
-Message-ID: <66d0bab153f94_39548f29451@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAL+tcoCUhYH=udvB3rdVZm0gVypmAa5devPXryPwY+39mHscDA@mail.gmail.com>
-References: <20240828160145.68805-1-kerneljasonxing@gmail.com>
- <66d082422d85_3895fa29427@willemb.c.googlers.com.notmuch>
- <CAL+tcoD6s0rrCAvMeMDE3-QVemPy21Onh4mHC+9PE-DDLkdj-Q@mail.gmail.com>
- <66d0a0816d6ce_39197c29476@willemb.c.googlers.com.notmuch>
- <CAL+tcoCUhYH=udvB3rdVZm0gVypmAa5devPXryPwY+39mHscDA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 0/2] timestamp: control
- SOF_TIMESTAMPING_RX_SOFTWARE feature per socket
+        d=1e100.net; s=20230601; t=1724956142; x=1725560942;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uFlJynURVWC+M2UJehrQrk5CWf/a/Gwly+Kkpykmcts=;
+        b=Q5fU/lNhdlZc5x/9l2/YOLazMGyNzBCf9exv1RQYWPyzasKt79HTUkkpQntYTY7UMO
+         wUS8GGOsaEV0jttFtxOk2FJr9998q/nE1QrHSXqBGKT+M1HqNU8LAs7tVY2AZP7crzVR
+         PHIcpaq2c7qaQW6S+D9N0WYrg39kM4tpO7g+n1onxAgz+Z0NPRJdTx3YK3mSwrTrnbaY
+         i/5aZZYM5kFpqKCroR/iVSDKr6ekBuAGup7KAVROVM2bwGXSRLNma/RZChiH0WnKxMCt
+         SZ5hdeqU7m5b3JcjIu0kdAFXUR+6VZl/U9fCoHfQWxieM8zngQqNHIGkiOu8AdaeQFam
+         2GZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqe+bTDT2lUqiVojHhZjZVMIWUiLM/dlXWzFu130DoJibVpH9zUxOX7pzVO8KE9rgjAg9YLsg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrdPsjXhJtHILy3Bztq82NidgxOuAfHPUcn5jaxBWNRPYbLjg6
+	+j/okdT7CsuusjXmyvq12FAKn+B4eJHxiz8gvOByMQwWl2IVFqGm1sWstnzhoL55y5pI9SJFGIB
+	QZXhVp2Oep8UkRlwXdlg/9IXi5D9QD3hXUSj2
+X-Google-Smtp-Source: AGHT+IEjCsZ5C7DEJGtuDAb8jQenH6fq4Xe9rcECFO/np82w+7fJUFxQQ/NSCKZtW9cfxdwYkeCFsnLIObrWOWS1Sd0=
+X-Received: by 2002:a17:907:868a:b0:a86:9880:183 with SMTP id
+ a640c23a62f3a-a897f789550mr277753066b.10.1724956141671; Thu, 29 Aug 2024
+ 11:29:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+References: <20240827235228.1591842-1-shakeel.butt@linux.dev>
+ <CAJD7tkYPzsr8YYOXP10Z0BLAe0E36fqO3yxV=gQaVbUMGhM2VQ@mail.gmail.com>
+ <txl7l7vp6qy3udxlgmjlsrayvnj7sizjaopftyxnzlklza3n32@geligkrhgnvu>
+ <CAJD7tkY88cAnGFy2zAcjaU_8AC_P5CwZo0PSjr0JRDQDu308Wg@mail.gmail.com> <22e28cb5-4834-4a21-8ebb-e4e53259014c@suse.cz>
+In-Reply-To: <22e28cb5-4834-4a21-8ebb-e4e53259014c@suse.cz>
+From: Yosry Ahmed <yosryahmed@google.com>
+Date: Thu, 29 Aug 2024 11:28:23 -0700
+Message-ID: <CAJD7tkavjpYr54n13p9_9te-L10-wn6bc_uLkAozsuFWT31WjA@mail.gmail.com>
+Subject: Re: [PATCH v2] memcg: add charging of already allocated slab objects
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Shakeel Butt <shakeel.butt@linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
+	Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>, 
+	Roman Gushchin <roman.gushchin@linux.dev>, Muchun Song <muchun.song@linux.dev>, 
+	David Rientjes <rientjes@google.com>, Hyeonggon Yoo <42.hyeyoo@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Meta kernel team <kernel-team@meta.com>, 
+	cgroups@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Jason Xing wrote:
-> On Fri, Aug 30, 2024 at 12:23=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Jason Xing wrote:
-> > > On Thu, Aug 29, 2024 at 10:14=E2=80=AFPM Willem de Bruijn
-> > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > Jason Xing wrote:
-> > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > >
-> > > > > Prior to this series, when one socket is set SOF_TIMESTAMPING_R=
-X_SOFTWARE
-> > > > > which measn the whole system turns on this button, other socket=
-s that only
-> > > > > have SOF_TIMESTAMPING_SOFTWARE will be affected and then print =
-the rx
-> > > > > timestamp information even without SOF_TIMESTAMPING_RX_SOFTWARE=
- flag.
-> > > > > In such a case, the rxtimestamp.c selftest surely fails, please=
- see
-> > > > > testcase 6.
-> > > > >
-> > > > > In a normal case, if we only set SOF_TIMESTAMPING_SOFTWARE flag=
-, we
-> > > > > can't get the rx timestamp because there is no path leading to =
-turn on
-> > > > > netstamp_needed_key button in net_enable_timestamp(). That is t=
-o say, if
-> > > > > the user only sets SOF_TIMESTAMPING_SOFTWARE, we don't expect w=
-e are
-> > > > > able to fetch the timestamp from the skb.
-> > > >
-> > > > I already happened to stumble upon a counterexample.
-> > > >
-> > > > The below code requests software timestamps, but does not set the=
-
-> > > > generate flag. I suspect because they assume a PTP daemon (sfptpd=
-)
-> > > > running that has already enabled that.
-> > >
-> > > To be honest, I took a quick search through the whole onload progra=
-m
-> > > and then suspected the use of timestamp looks really weird.
-> > >
-> > > 1. I searched the SOF_TIMESTAMPING_RX_SOFTWARE flag and found there=
- is
-> > > no other related place that actually uses it.
-> > > 2. please also see the tx_timestamping.c file[1]. The author simila=
-rly
-> > > only turns on SOF_TIMESTAMPING_SOFTWARE report flag without turning=
- on
-> > > any useful generation flag we are familiar with, like
-> > > SOF_TIMESTAMPING_TX_SOFTWARE, SOF_TIMESTAMPING_TX_SCHED,
-> > > SOF_TIMESTAMPING_TX_ACK.
-> > >
-> > > [1]: https://github.com/Xilinx-CNS/onload/blob/master/src/tests/onl=
-oad/hwtimestamping/tx_timestamping.c#L247
-> > >
-> > > >
-> > > > https://github.com/Xilinx-CNS/onload/blob/master/src/tests/onload=
-/hwtimestamping/rx_timestamping.c
-> > > >
-> > > > I suspect that there will be more of such examples in practice. I=
-n
-> > > > which case we should scuttle this. Please do a search online for
-> > > > SOF_TIMESTAMPING_SOFTWARE to scan for this pattern.
-> > >
-> > > I feel that only the buggy program or some program particularly tak=
-es
-> > > advantage of the global netstamp_needed_key...
-> >
-> > My point is that I just happen to stumble on one open source example
-> > of this behavior.
-> >
-> > That is a strong indication that other applications may make the same=
-
-> > implicit assumption. Both open source, and the probably many more non=
-
-> > public users.
-> >
-> > Rule #1 is to not break users.
-> =
-
-> Yes, I know it.
-> =
-
-> >
-> > Given that we even have proof that we would break users, we cannot
-> > make this change, sorry.
-> =
-
-> Okay. Your concern indeed makes sense. Sigh, I just finished the v3
-> patch series :S
-> =
-
-> >
-> > A safer alternative is to define a new timestamp option flag that
-> > opt-in enables this filter-if-SOF_TIMESTAMPING_RX_SOFTWARE is not
-> > set behavior.
-> =
-
-> At the first glance, It sounds like it's a little bit similar to
-> SOF_TIMESTAMPING_OPT_ID_TCP that is used to replace
-> SOF_TIMESTAMPING_OPT_ID in the bytestream case for robustness
-> consideration.
+[..]
 >
-> Are you suggesting that if we can use the new report flag combined
-> with SOF_TIMESTAMPING_SOFTWARE, the application will not get a rx
-> timestamp report, right? The new flag goes the opposite way compared
-> with SOF_TIMESTAMPING_RX_SOFTWARE, indicating we don't expect a rx sw
-> report.
-> =
+> Another reason is memory savings, if we have a small subset of objects in
+> KMALLOC_NORMAL caches accounted, there might be e.g. one vector per a slab
+> just to account on object while the rest is unaccounted. Separating between
+> kmalloc and kmalloc-cg caches keeps the former with no vectors and the
+> latter with fully used vectors.
 
-> If that is so, what would you recommend to name the new flag which is
-> a report flag (not a generation flag)? How about calling
-> "SOF_TIMESTAMPING_RX_SOFTWARE_CTRL". I tried, but my English
-> vocabulary doesn't help, sorry :(
+Makes sense.
 
-Something like this?
+>
+> > Wouldn't it be easier to special case the specific slab cache used for
+> > the objcg vector or use a dedicated cache for it instead of using
+> > kmalloc caches to begin with?
+>
+> The problem is the vector isn't a fixed size, it depends on how many objects
+> a particular slab (not even a particular cache) has.
 
-@@ -947,6 +947,8 @@ void __sock_recv_timestamp(struct msghdr *msg, struct=
- sock *sk,
-        memset(&tss, 0, sizeof(tss));
-        tsflags =3D READ_ONCE(sk->sk_tsflags);
-        if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
-+           (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
-+            !tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
+Oh right, I missed that part. Thanks for pointing it out.
 
+>
+> > Anyway, I am fine with any approach you and/or the slab maintainers
+> > prefer, as long as we make things clear. If you keep the following
+> > approach as-is, please expand the comment or refer to the commit you
+> > just referenced.
+> >
+> > Personally, I prefer either explicitly special casing the slab cache
+> > used for the objcgs vector, explicitly tagging KMALLOC_NORMAL
+> > allocations, or having a dedicated documented helper that finds the
+> > slab cache kmalloc type (if any) or checks if it is a KMALLOC_NORMAL
+> > cache.
+>
+> A helper to check is_kmalloc_normal() would be better than defining
+> KMALLOC_TYPE and using it directly, yes. We don't need to handle any other
+> types now until anyone needs those.
 
+is_kmalloc_normal() sounds good to me.
 
+Thanks, Vlastimil.
 
