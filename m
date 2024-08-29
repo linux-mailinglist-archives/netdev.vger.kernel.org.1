@@ -1,266 +1,189 @@
-Return-Path: <netdev+bounces-123285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB04E96460E
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:14:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62FDE964610
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 15:15:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81EAD281C1E
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:14:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C3501C244A5
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 13:15:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E90F1B0105;
-	Thu, 29 Aug 2024 13:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33B41B1417;
+	Thu, 29 Aug 2024 13:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="c6VyC+39"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="bOq3mxti"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807B51ABEC2
-	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 13:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2741A7062
+	for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 13:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724937204; cv=none; b=a85ZV39ry8gqVcAhwNhFprV3u4J5I27kLb+S64QSFbSivJxzwc4zdHPFjOJvdXgQ+UwrqCCoHqW2YfYViwJb8OuF/zKqS18dPaaPFxewUDB77bmZGrLr0HZzSFGg7qy48p3wl7byKcoXJVBLZ6b7m1fB4DIsQCiMT/Ao583Tb5Y=
+	t=1724937209; cv=none; b=ZUQl+MaOOwNVpzhB2dIsXoZfdRjoi4nOnieEeehKDCnRP7aX+2iNwupgwcLdYiU0em8emd0oSwcFivduU3ESMAa6jLaaBojKOdJJZHZ78hT+H3yuUIeuhvgwDmBVeDMZiGNvrPV40yrjmk+EJAbfXBiFAJ6rCnLgfqe0T6x9ZWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724937204; c=relaxed/simple;
-	bh=0L8vN7Z5mU6GUGAu+SGn6arcn3NkZa7mF5sCgHhz5AY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=k4pQYgafk+SqrIer1xlF5gupfz8FsBLNskk7BDH4Njt8aOGsXCVGBPuk/B0BMNd6Z/elU1QZnYuijIpA6V+V22ebCsdl0LOCmZZVcnKLjH+bTSYdJ8stOlc6mUQy5D3btgt4uhqeLxmDYeHJrFMAioe6TO1TSFCWaNVs9q05pvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=c6VyC+39; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2021aeee5e4so3855435ad.0
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:13:22 -0700 (PDT)
+	s=arc-20240116; t=1724937209; c=relaxed/simple;
+	bh=qnYIj6qokB7Iw7VUBkmFypMZWVgIcjZrwzkwlqFBP9c=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YfDvLnqtwY+U/Q0tdRDflh2xeWQCED5ppwXgLqce+3b72yqx4l7+Tx3HQpxguA2iMQaJsVMW+OsLmprQig8hDXCkmJ4zRWogXjA6S4Yar29ctJiwk9+Y/FDw09YsLi+axRnnezxZxx7A3syEz2vMEwKp53pJgnQyx6X/hMm6AXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=bOq3mxti; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5343617fdddso1156883e87.0
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 06:13:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1724937201; x=1725542001; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PCqHkNfsdp0hrimdEM7KiFJuq1/lUKdseFAqTrtspZc=;
-        b=c6VyC+39I54k2m6MfY9zsHt77g5pFuvX6ctu7ZkaEO66Hwds/OiS3JiKRmFVUePTeO
-         lO0cAB2AKNmJI9HbtLZRl5VBW9QZwZmyy063EMQbH39PN4T2Q8uZeGXd8zodaSzTwWR4
-         zDk6RXYqfZLOrbFQvMFA4jw83DZsSIfi6WeHU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724937201; x=1725542001;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=suse.com; s=google; t=1724937206; x=1725542006; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:date:from:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=PCqHkNfsdp0hrimdEM7KiFJuq1/lUKdseFAqTrtspZc=;
-        b=o3PDMTqPAYrJ4ox2y4lV6AcKUcOfDzc4av+wTVIta4yttTUxc/0/4zm05GJDzR6Hnn
-         Hm0JrRf31SxtSdX6F2MjwmzYVrwg115uXI/EMeBaufAZ3yvUpCV2bMuXV7++qO0o+dG7
-         98gU2m+vuLtTWtg2/MEm6ylWwgwm2Xv4nFnPI5FneRT+B6et18QX0HbCBf8J67eUkG8v
-         HDiExcQKfg+4pwS8OQyq5LzjF8gQcF1toU3YOZtd313wu/irVHpGp0Feqem5WT0SpHLh
-         q4kK2vhiS3X+vC9xsqI4ajnFOiDz+lmLiZiv1Dr/eNajzIJuBRUaqTg+C1lwVeNwTmmg
-         lqjA==
-X-Gm-Message-State: AOJu0YzRD7A3K++skeneqTsDdgQXgbd9jVDUyo84memd2RbE4tvYHw+o
-	A2NzGVFkE6B8dYoXJACzHhuZZD4cfjSYwktItPc7BtP77/QqAYtpz53jb9M8PQJ+jO/FKKBHGg8
-	x59DzB8GdHPWCAVn3BazkQVMV5a/tivbsMvdYVHN2IP/YW6z/RMYYu+vVcRlLXIKBkQKPM6fEvn
-	i6tq2N1DDklDw8E0BX11BCAzsoSLLAE6jppgr4QA==
-X-Google-Smtp-Source: AGHT+IFAQmZRTQuLJSgAof5JbEL5kQEBY3Ia8dWCEJbF82Axvc0yD6suQQ96GHf2y+oqmB4/3JkcbA==
-X-Received: by 2002:a17:902:dacf:b0:202:859:f85 with SMTP id d9443c01a7336-2050c3d6af6mr31252725ad.24.1724937201013;
-        Thu, 29 Aug 2024 06:13:21 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205152b13c9sm10991065ad.62.2024.08.29.06.13.19
+        bh=zcevrydr3wb+wZ7r5tLJWsjj7JW9bLBAqf2EeUSSlJQ=;
+        b=bOq3mxtiP/KD5pf247A1dz5lzzRSKFBAyidvd0+TklXn+fMV3qlpgNe1xLhsvgyeLG
+         2mjCCOhmITe0B1ZnBiGD6BFqfSFe5cyZIjxXexfICVR85AELhHnbNZ3qbxhq8U96iUY0
+         Jl/NC9ck0azR8T/UKP10IsMFOCky37/Cyj8VgTiqzY5rknMVuM8AYGbToOHdYRW6G/ke
+         zuSbnwmLsD4kk1HjqVc5MQQbW33UbNNqpQOFBOIwgac+qIwjbs2ZRyz436iRQG1Weuaj
+         d+6BZ+dRyYY7/48p6AVNgFvybtNhBWzH58C8th7dQbndZZcGiNXoO4rAtMJGM+E29Hrm
+         yESQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724937206; x=1725542006;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:date:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zcevrydr3wb+wZ7r5tLJWsjj7JW9bLBAqf2EeUSSlJQ=;
+        b=EILKM3TJN6UApeqGqYiPBVj4csc4RZQSL2Tk6MDx3cM6UeTkqAfzpcl1Bd/nrmJ1cn
+         GWhMZZ6GG1PsBIW+zALXRzps1pBnnDh4lfgiv2CXmrZRJPHLhnQ6NLNOUXiHumnKSMjd
+         tYsTUWjT3Kby5F317NVlacpfX3v58dQzpVUwJBw++K5rV8uAcnyTll/md5OccSu3BXuA
+         VLvKpDC01Ba/fERy0v7LcBJddnGUA0Ga6CFggPcSYBaIyjC/Z5nNl9EPwjiSa4K7vSEI
+         9gO85IvFC42BbyDymkm4wQ9mLzYgRXqGmjtFthAQKZn1G8idu5W8VhjkX+tZnzZhY5Bw
+         5odw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDUx1GqEnjAA8UkyBslp+MgPU+Rdi95uVcjhBkZcL0EVZxNJSJHDBEFktmXdz87OqZ9P1mn/Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw615W72RT8ZKJnXBejuoS1gklUEUmqpRVKi3x5BnyVU5JoNRZD
+	msehMrYxR/AjRQfG6ZtRbcArvBApoce7i5V4xvBARMDYLbjkcU/RjD13P7xO6os=
+X-Google-Smtp-Source: AGHT+IFLMk4m6y7fSkfLg3A3IXASRJuXYrAbPU9+Ww0KPnYO42UsA+Qqa5Bo9AeJfKaUmIGFU/dvxw==
+X-Received: by 2002:a05:6512:3b9e:b0:52c:cd77:fe03 with SMTP id 2adb3069b0e04-5353e54d499mr2408631e87.14.1724937205212;
+        Thu, 29 Aug 2024 06:13:25 -0700 (PDT)
+Received: from localhost (host-80-182-198-72.pool80182.interbusiness.it. [80.182.198.72])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c226ce4f5dsm697741a12.89.2024.08.29.06.13.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Aug 2024 06:13:20 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: edumazet@google.com,
-	amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com,
-	sdf@fomichev.me,
-	bjorn@rivosinc.com,
-	hch@infradead.org,
-	willy@infradead.org,
-	willemdebruijn.kernel@gmail.com,
-	skhawaja@google.com,
-	kuba@kernel.org,
-	Joe Damato <jdamato@fastly.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	Donald Hunter <donald.hunter@gmail.com>,
+        Thu, 29 Aug 2024 06:13:24 -0700 (PDT)
+From: Andrea della Porta <andrea.porta@suse.com>
+X-Google-Original-From: Andrea della Porta <aporta@suse.de>
+Date: Thu, 29 Aug 2024 15:13:31 +0200
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
 	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 5/5] netdev-genl: Support setting per-NAPI config values
-Date: Thu, 29 Aug 2024 13:12:01 +0000
-Message-Id: <20240829131214.169977-6-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240829131214.169977-1-jdamato@fastly.com>
-References: <20240829131214.169977-1-jdamato@fastly.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 00/11] Add support for RaspberryPi RP1 PCI device using a
+ DT overlay
+Message-ID: <ZtBz-1scwp9OZ_FY@apocalypse>
+Mail-Followup-To: Andrew Lunn <andrew@lunn.ch>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Stefan Wahren <wahrenst@gmx.net>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <14990d25-40a2-46c0-bf94-25800f379a30@kernel.org>
+ <Zsb_ZeczWd-gQ5po@apocalypse>
+ <45a41ed9-2e42-4fd5-a1d5-35de93ce0512@lunn.ch>
+ <ZtBjMpMGtA4WfDij@apocalypse>
+ <e6e6c230-370f-4b04-8cb7-4158dd51efdc@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e6e6c230-370f-4b04-8cb7-4158dd51efdc@lunn.ch>
 
-Add support to set per-NAPI defer_hard_irqs and gro_flush_timeout.
+Hi Andrew,
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
-Reviewed-by: Martin Karsten <mkarsten@uwaterloo.ca>
-Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
----
- Documentation/netlink/specs/netdev.yaml | 11 ++++++
- include/uapi/linux/netdev.h             |  1 +
- net/core/netdev-genl-gen.c              | 14 ++++++++
- net/core/netdev-genl-gen.h              |  1 +
- net/core/netdev-genl.c                  | 45 +++++++++++++++++++++++++
- tools/include/uapi/linux/netdev.h       |  1 +
- 6 files changed, 73 insertions(+)
+On 15:04 Thu 29 Aug     , Andrew Lunn wrote:
+> > > > WARNING: externs should be avoided in .c files
+> > > > #331: FILE: drivers/misc/rp1/rp1-pci.c:58:
+> > > > +extern char __dtbo_rp1_pci_begin[];
+> > > > 
+> > > > True, but in this case we don't have a symbol that should be exported to other
+> > > > translation units, it just needs to be referenced inside the driver and
+> > > > consumed locally. Hence it would be better to place the extern in .c file.
+> > >  
+> > > Did you try making it static.
+> > 
+> > The dtso is compiled into an obj and linked with the driver which is in
+> > a different transaltion unit. I'm not aware on other ways to include that
+> > symbol without declaring it extern (the exception being some hackery 
+> > trick that compile the dtso into a .c file to be included into the driver
+> > main source file). 
+> > Or probably I'm not seeing what you are proposing, could you please elaborate
+> > on that?
+> 
+> Sorry, i jumped to the wrong conclusion. Often it is missing static
+> keyword which causes warnings. However, you say it needs to be global
+> scope.
+> 
+> Reading the warning again:
+> 
+> > > > WARNING: externs should be avoided in .c files
+> 
+> It is wanting you to put it in a .h file, which then gets
+> included by the two users.
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 290894962ac4..cb7049a1d6d8 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -631,6 +631,17 @@ operations:
-             - rx-bytes
-             - tx-packets
-             - tx-bytes
-+    -
-+      name: napi-set
-+      doc: Set configurable NAPI instance settings.
-+      attribute-set: napi
-+      flags: [ admin-perm ]
-+      do:
-+        request:
-+          attributes:
-+            - id
-+            - defer-hard-irqs
-+            - gro-flush-timeout
- 
- mcast-groups:
-   list:
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index b088a34e9254..4c5bfbc85504 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -188,6 +188,7 @@ enum {
- 	NETDEV_CMD_QUEUE_GET,
- 	NETDEV_CMD_NAPI_GET,
- 	NETDEV_CMD_QSTATS_GET,
-+	NETDEV_CMD_NAPI_SET,
- 
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
-diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
-index 8350a0afa9ec..5ddb5d926850 100644
---- a/net/core/netdev-genl-gen.c
-+++ b/net/core/netdev-genl-gen.c
-@@ -74,6 +74,13 @@ static const struct nla_policy netdev_qstats_get_nl_policy[NETDEV_A_QSTATS_SCOPE
- 	[NETDEV_A_QSTATS_SCOPE] = NLA_POLICY_MASK(NLA_UINT, 0x1),
- };
- 
-+/* NETDEV_CMD_NAPI_SET - set */
-+static const struct nla_policy netdev_napi_set_nl_policy[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT + 1] = {
-+	[NETDEV_A_NAPI_ID] = { .type = NLA_U32, },
-+	[NETDEV_A_NAPI_DEFER_HARD_IRQS] = { .type = NLA_S32 },
-+	[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT] = { .type = NLA_U64 },
-+};
-+
- /* Ops table for netdev */
- static const struct genl_split_ops netdev_nl_ops[] = {
- 	{
-@@ -151,6 +158,13 @@ static const struct genl_split_ops netdev_nl_ops[] = {
- 		.maxattr	= NETDEV_A_QSTATS_SCOPE,
- 		.flags		= GENL_CMD_CAP_DUMP,
- 	},
-+	{
-+		.cmd		= NETDEV_CMD_NAPI_SET,
-+		.doit		= netdev_nl_napi_set_doit,
-+		.policy		= netdev_napi_set_nl_policy,
-+		.maxattr	= NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT,
-+		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-+	},
- };
- 
- static const struct genl_multicast_group netdev_nl_mcgrps[] = {
-diff --git a/net/core/netdev-genl-gen.h b/net/core/netdev-genl-gen.h
-index 4db40fd5b4a9..b70cb0f20acb 100644
---- a/net/core/netdev-genl-gen.h
-+++ b/net/core/netdev-genl-gen.h
-@@ -28,6 +28,7 @@ int netdev_nl_queue_get_dumpit(struct sk_buff *skb,
- 			       struct netlink_callback *cb);
- int netdev_nl_napi_get_doit(struct sk_buff *skb, struct genl_info *info);
- int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb);
-+int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info);
- int netdev_nl_qstats_get_dumpit(struct sk_buff *skb,
- 				struct netlink_callback *cb);
- 
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 2eee95d05fe0..43dd30eadbc6 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -299,6 +299,51 @@ int netdev_nl_napi_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 	return err;
- }
- 
-+static int
-+netdev_nl_napi_set_config(struct napi_struct *napi, struct genl_info *info)
-+{
-+	u64 gro_flush_timeout = 0;
-+	int defer = 0;
-+
-+	if (info->attrs[NETDEV_A_NAPI_DEFER_HARD_IRQS]) {
-+		defer = nla_get_s32(info->attrs[NETDEV_A_NAPI_DEFER_HARD_IRQS]);
-+		if (defer < 0)
-+			return -EINVAL;
-+		napi_set_defer_hard_irqs(napi, defer);
-+	}
-+
-+	if (info->attrs[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT]) {
-+		gro_flush_timeout = nla_get_u64(info->attrs[NETDEV_A_NAPI_GRO_FLUSH_TIMEOUT]);
-+		napi_set_gro_flush_timeout(napi, gro_flush_timeout);
-+	}
-+
-+	return 0;
-+}
-+
-+int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct napi_struct *napi;
-+	u32 napi_id;
-+	int err;
-+
-+	if (GENL_REQ_ATTR_CHECK(info, NETDEV_A_NAPI_ID))
-+		return -EINVAL;
-+
-+	napi_id = nla_get_u32(info->attrs[NETDEV_A_NAPI_ID]);
-+
-+	rtnl_lock();
-+
-+	napi = napi_by_id(napi_id);
-+	if (napi)
-+		err = netdev_nl_napi_set_config(napi, info);
-+	else
-+		err = -EINVAL;
-+
-+	rtnl_unlock();
-+
-+	return err;
-+}
-+
- static int
- netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 			 u32 q_idx, u32 q_type, const struct genl_info *info)
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index b088a34e9254..4c5bfbc85504 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -188,6 +188,7 @@ enum {
- 	NETDEV_CMD_QUEUE_GET,
- 	NETDEV_CMD_NAPI_GET,
- 	NETDEV_CMD_QSTATS_GET,
-+	NETDEV_CMD_NAPI_SET,
- 
- 	__NETDEV_CMD_MAX,
- 	NETDEV_CMD_MAX = (__NETDEV_CMD_MAX - 1)
--- 
-2.25.1
+Ah I see now what you were referring to, thanks.
+I'll put the extern into an header file, although there are no two users
+of that, the only one being rp1-pci.c.
 
+Many thanks,
+Andrea
+
+> 
+> 	Andrew
 
