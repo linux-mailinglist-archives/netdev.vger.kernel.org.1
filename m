@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-123019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA582963724
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 03:00:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6F43963727
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 03:01:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75F0C283A20
-	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 01:00:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E86A11C21BDD
+	for <lists+netdev@lfdr.de>; Thu, 29 Aug 2024 01:01:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CE02134D1;
-	Thu, 29 Aug 2024 01:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F25717BA4;
+	Thu, 29 Aug 2024 01:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CGceqzZg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TB4cYiz2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F0F208CA;
-	Thu, 29 Aug 2024 01:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE602BAEB;
+	Thu, 29 Aug 2024 01:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724893233; cv=none; b=mWcc9+wQ/XUff3u1tOkZQR7A0HJehl8OGiRlkuWU2XOh2u879vfwN34FCAq20LJtvFMA34lv312E9Fy4OQwbJKIC/ZfMOiPHGV4sXzFWhji6YKBSEAHa70o06qVdTz75Et8Y0Edpjuf3dcuNj6L7jRZwseMhsJQZ44H3rkaq+TQ=
+	t=1724893235; cv=none; b=h1MvalHtNnF/rURTA+pRosMUPH9XUAy2gIgnNBPfKiPuYSi92ZJh5lGJE1tdjLUTpDQ4OcO71C816zbxmi2+c033+UHFcpdDTd3u9RL2wPWIX2Obl53snrs3Z1M7iXSZxcixpVow54QvIDRk/NykB3b5ZaC/YScf5iIilhhx4Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724893233; c=relaxed/simple;
-	bh=ptj+zSAgS9FcKjJPgajPrPBWlVXa5qCk7dhaNYmPgjM=;
+	s=arc-20240116; t=1724893235; c=relaxed/simple;
+	bh=5/+Fw1Dfro7if1IVlV6dOLSMIl4q+fSi+7fIjJrxyu8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PUZduLJTsjrkmLp7cNWxC6huZgfQHOim1fV5BU/OZKlWobVlvm3zQRdXIGxH32tBWx6MkkRX9NbSpsr0sTNvykOTwWoNvti5ijr9nbUwlaIK6kIj/43AkecS1LmtlxRJ/ysNWGPb3FMstzyOrio8VQRXy4TpREUqYV9lgQxDhZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CGceqzZg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDAE7C4CEC0;
-	Thu, 29 Aug 2024 01:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724893232;
-	bh=ptj+zSAgS9FcKjJPgajPrPBWlVXa5qCk7dhaNYmPgjM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CGceqzZgjkJbgM7NqQUz4JUHX4QadXY119ljwsquJXQ96p684YkrJxgMHh3AQvQz8
-	 2ZC/PbXpIMl4F/W4tYSY8QMuYKMuthV3F9PgtumNAJXFWzhc1ozFy/GaDy+/qvH/F8
-	 0fPwnONyMvG0EAcLIh5smjZqUerk3tY2UI1VGPopNfGnb7mFQCbmU8Xkm3vfcBwqXR
-	 oWCxMKHxrXM9b+HAHSLndQWKnS/13d2G1+CtlvAlQDXZtMXOZU57pyEi0ETG+CQd4a
-	 kCi00i3KOZDgklZu8rAJgfKPv+anxvdXFsuLzMKqeIlyrVTwWtn57fI4+9Dd6clL1C
-	 xsw+eKhpuoXSw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D473809A80;
+	 In-Reply-To:To:Cc; b=jjhWMk0g3Ie9AKVYnKkRNyphTbAbgVis8CguW+kJU4FeeNNXaL/5CrT9Kmlni5JOgReA1pQMXTqlbFBhUlTtJ73F7FB2SC24OrcfCokOqPQhWoX1iOyoqhNmaMjvg/dRcddIbXLhTm2a4SD5pQymMHSpAwk5/1c2RcQ0wun776U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TB4cYiz2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7676DC4CEC6;
 	Thu, 29 Aug 2024 01:00:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724893234;
+	bh=5/+Fw1Dfro7if1IVlV6dOLSMIl4q+fSi+7fIjJrxyu8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TB4cYiz2cda7012vWyxL7j5dOk/iPTtCEGao+p54LHVLZ6dkcJ+QXODDzwHwLndSr
+	 vyQDSWQ43BHdqlu1+2c2cEB1EfoZrdhm248a8jwQGQq1tJBWUld61ip9CR33KLFSxf
+	 VNpL9T9lxYomTkUhN9v7tK6cjaD/+xzaGmDZ7Cqy02TJdzvMlzUdKeO2P9jmHjc6xX
+	 4Z/KwhFf4H8kCnWAiD6sdK2LE2qe1PNBQoocKvp6xnZe/CGHL7dUFj6jREvfiFAEyv
+	 OlpMgXyxalTzxJbzTTKNAV88ujlaV78+wgnlChxm2UiiBnkDg7oJCHYJR4eyj+wgoy
+	 OmP2z3sV/XWyQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB01D3809A80;
+	Thu, 29 Aug 2024 01:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ethtool: cable-test: Release RTNL when the PHY
- isn't found
+Subject: Re: [PATCH v4] net: netvsc: Update default VMBus channels
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172489323274.1482642.18086443534337757803.git-patchwork-notify@kernel.org>
-Date: Thu, 29 Aug 2024 01:00:32 +0000
-References: <20240827092314.2500284-1-maxime.chevallier@bootlin.com>
-In-Reply-To: <20240827092314.2500284-1-maxime.chevallier@bootlin.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, andrew@lunn.ch, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, linux@armlinux.org.uk,
- linux-arm-kernel@lists.infradead.org, christophe.leroy@csgroup.eu,
- herve.codina@bootlin.com, f.fainelli@gmail.com, hkallweit1@gmail.com,
- vladimir.oltean@nxp.com, kory.maincent@bootlin.com, kabel@kernel.org,
- o.rempel@pengutronix.de, horms@kernel.org, mwojtas@chromium.org,
- dan.carpenter@linaro.org, romain.gantois@bootlin.com
+ <172489323438.1482642.16270022738691881910.git-patchwork-notify@kernel.org>
+Date: Thu, 29 Aug 2024 01:00:34 +0000
+References: <1724735791-22815-1-git-send-email-ernis@linux.microsoft.com>
+In-Reply-To: <1724735791-22815-1-git-send-email-ernis@linux.microsoft.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, ernis@microsoft.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 27 Aug 2024 11:23:13 +0200 you wrote:
-> Use the correct logic to check for the presence of a PHY device, and
-> jump to a label that correctly releases RTNL in case of an error, as we
-> are holding RTNL at that point.
+On Mon, 26 Aug 2024 22:16:31 -0700 you wrote:
+> Change VMBus channels macro (VRSS_CHANNEL_DEFAULT) in
+> Linux netvsc from 8 to 16 to align with Azure Windows VM
+> and improve networking throughput.
 > 
-> Fixes: 3688ff3077d3 ("net: ethtool: cable-test: Target the command to the requested PHY")
-> Closes: https://lore.kernel.org/netdev/20240827104825.5cbe0602@fedora-3.home/T/#m6bc49cdcc5cfab0d162516b92916b944a01c833f
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> For VMs having less than 16 vCPUS, the channels depend
+> on number of vCPUs. For greater than 16 vCPUs,
+> set the channels to maximum of VRSS_CHANNEL_DEFAULT and
+> number of physical cores / 2 which is returned by
+> netif_get_num_default_rss_queues() as a way to optimize CPU
+> resource utilization and scale for high-end processors with
+> many cores.
+> Maximum number of channels are by default set to 64.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: ethtool: cable-test: Release RTNL when the PHY isn't found
-    https://git.kernel.org/netdev/net-next/c/ad78337cb20c
+  - [v4] net: netvsc: Update default VMBus channels
+    https://git.kernel.org/netdev/net-next/c/646f071d315b
 
 You are awesome, thank you!
 -- 
