@@ -1,383 +1,177 @@
-Return-Path: <netdev+bounces-123831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 262919669D3
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 21:33:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF7E79669E6
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 21:35:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 887B6B24CC5
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:33:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8719B283F83
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBD51BD02E;
-	Fri, 30 Aug 2024 19:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F1C1BBBD8;
+	Fri, 30 Aug 2024 19:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ijP92x0n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FcauP+iT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A865E1B29D2
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 19:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B593C14D2B5;
+	Fri, 30 Aug 2024 19:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725046094; cv=none; b=K3cBVcL5E3pdVMj6XlMdXCwxIjmCc56qCnjuT9gPkkIFcPZgHHNyBuTPFSeRD2IUh1D5sGpvHR/+XjraiKvV6VU+TZk82kznGrAdQB3XLUMFJ9bcM/woc0AruhU5w4mcNLNsIhagHvOR+r8ucqotMdI6eADnjrCZuHvoMBu64sA=
+	t=1725046468; cv=none; b=dDxwwW8NLRp9vJxEgKMICvvsf+nIktU4/p5uu1DrkNxSoyMLuK12WJg/oFJCHWfqt4XQiWax8pICYNFL/u4N0Dtl6HpieSIQ/dCtIFuG6cGCwct4LwkTPoBo5SGYKiGRsb4lt3SUDwE8GzU0eNGjE0AP/lgV7VeT6DIfp5tfbeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725046094; c=relaxed/simple;
-	bh=agQNZf+YmsTnIqwkN3/XjayGX1L5F3d3d38xVDDzmhA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IFRcIEWW4rJTVkdy/+hVmwd2Zq86KftiQuJlbnnoGRIQOedR3Fu5EVl8oq11yz7yLWB7dZUYzwghBhgGY+WPeZmLO79F2+bgjUaC31l0bon9L83HweHl8MRaxW6K1MBAAf0WvVgDAaMtX4t1/6cd9EM2o5henXOaQlBpUUlatjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ijP92x0n; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725046091; x=1756582091;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=agQNZf+YmsTnIqwkN3/XjayGX1L5F3d3d38xVDDzmhA=;
-  b=ijP92x0nMzQMktYIy8WkqDuXDTrPW141RsrGhhzGGMWpPaAU1fGFhzNR
-   SXEKQUiU6lcvhXToCFCPi2byg/KRKRMca1Fb1d4l2BDGNqJLb6S6JnKu1
-   rteCjZ6/A1l5dW+7IKici3C74YkI89Kn8DeNKslw40/iVM2sXrRWhHBNh
-   dcUgMqkBhO9tgZzqYfwoDIZTE1E1Ng8qYY0qMRYByLk3dMf3pTZQInd5p
-   xCX+JqLB3IG1NtyCbImXFZtPOxd7GtgE60AsI/zQN9gzWtMNCO59c3h/e
-   5AHC/i8b971vWXCdqGSbJFqp1XmuEO7V3Yfjsdj4hWFH4Q8SRIQ9VyApF
-   w==;
-X-CSE-ConnectionGUID: qoaZgDAFQ6WD+ENy0reAWA==
-X-CSE-MsgGUID: AMcwk5aCRnGkHsFFq/GVFg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11180"; a="23219086"
-X-IronPort-AV: E=Sophos;i="6.10,189,1719903600"; 
-   d="scan'208";a="23219086"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 12:28:11 -0700
-X-CSE-ConnectionGUID: +JDtjSUDSRKDCZmgehK7XA==
-X-CSE-MsgGUID: Qzxr/zvURAWSQqf0KvbDQg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,189,1719903600"; 
-   d="scan'208";a="63795939"
-Received: from unknown (HELO amlin-019-225.igk.intel.com) ([10.102.19.225])
-  by orviesa010.jf.intel.com with ESMTP; 30 Aug 2024 12:28:09 -0700
-From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-To: intel-wired-lan@lists.osuosl.org,
-	anthony.l.nguyen@intel.com,
-	aleksandr.loktionov@intel.com
-Cc: netdev@vger.kernel.org,
-	Jan Sokolowski <jan.sokolowski@intel.com>,
-	Padraig J Connolly <padraig.j.connolly@intel.com>
-Subject: [PATCH iwl-next v3] i40e: add ability to reset vf for tx and rx mdd events
-Date: Fri, 30 Aug 2024 21:28:07 +0200
-Message-Id: <20240830192807.615867-1-aleksandr.loktionov@intel.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1725046468; c=relaxed/simple;
+	bh=Bybqk09gEVlUo9XLG+8qiSYhkm0flYbDHNeUSV7SVc4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dirJj07aiS8ulPNiQFSruTIaKYsVSHjg+xu1Q9J/9wXuAgvaLdBVjYsh3tE5xtqnEaNullhSUr1mXgdQgCX+qgd6UcLG9rWsHAzED6bcr/0eU7zvWk6HRYrBfP2gtoZeP/FcjY9g23I9rKd30UT3mnAMoGCp+zSsckXKy7FkNZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FcauP+iT; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-716609a0e2bso1058794b3a.0;
+        Fri, 30 Aug 2024 12:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725046466; x=1725651266; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4T4DD/L1ycBynDsagGFuV4APxCCk9WOAuvtMlSnh1e8=;
+        b=FcauP+iTITVCk0ZI0DOCgwcSLxpfOq7M+KKvgYv+w/KX8LEBnj4B5Si7oGCP78PoFo
+         5DGG1KanC3RSczBx0rt+mEOkcExeyZzn8+XNuP/p6SX3h7KXNDqbFbqNkdsoDutoF3kQ
+         6g/+eEJ9/Nw8ZC3EfnnrW1VNlHF48ZAQXD523QghsuI3QANZiOQed3Zg56Py8Y2HsR8L
+         yXVE+mgrJSl3kuCudxRAlpCvfV3XNvJmCpspy2nV//NoRTQ8O50pnPTK0naWhGNgz8pN
+         41e8DGdB+xMt5YpV+d+p/LH3Q5pwFHBzesbtdVMFwd0EsPlhpq66lmO1N2MC7evzR4PT
+         20Mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725046466; x=1725651266;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4T4DD/L1ycBynDsagGFuV4APxCCk9WOAuvtMlSnh1e8=;
+        b=NM+nnVW4/KCVNV+/UYaXlk7QQmxQA9fqhy49kasqi5h8ptu2Vk0o8+oI7WdR1MQod+
+         J6M+C9EuTS04wwctQg7tZiZKRJ9U3Tn1C1wsQxOKppZf9YQJdexwDVCufVI7zT3MwP0J
+         N43aXgfu2zroAl0WhMK2rtA6Hq574F2ViKyW8oFW648/DTeb9FGfJlQTOdOvZR6BS0Rp
+         HMtoNSz4jNwcOJG4dT/5z5GX3WkiApjotKFriyeR9f/soIJnBOX4AzGQ7EFNod3Vaf2S
+         EYAbBifqAcrtMpfBo5r6BLXdH+9KZvevCppsr1YSlDtSf7YKk4KNFajLB1XV28Uc8FZB
+         QSTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVjWVhq7RVqL+8VrBD+fo1UsXI8IEosSRDnJaAOBhXVF4SZ6ZYab6EIs/J5pp73GtdHrHT4fQs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3KlDSYNkkbkQNfr8iHHH9trgDaMdB3L6gsyLUyWAHgIZwilGp
+	XhPOE2A6+mcaziX94KlJ+KViRsqQb9NLf3VrV3Ws5TAd1jlaeqGL5vZrvs37pCq1zZ/KgsKB6Wx
+	sjmUqRBvaIjbbeijkOQuFjiIZ7qY=
+X-Google-Smtp-Source: AGHT+IELhpO8EFZ0TbuW8ruGGOKl7Hd0S2qc3IfGydBhjX/AqvUfL4N+n5Dlz0dg3Xm2gvJGmq1NkzYG/nGF/B0GQR8=
+X-Received: by 2002:a05:6a20:d490:b0:1c8:eb6e:5817 with SMTP id
+ adf61e73a8af0-1cce0ff1851mr7151079637.5.1725046465870; Fri, 30 Aug 2024
+ 12:34:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240829133453.882259-1-pulehui@huaweicloud.com> <20240829133453.882259-2-pulehui@huaweicloud.com>
+In-Reply-To: <20240829133453.882259-2-pulehui@huaweicloud.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 30 Aug 2024 12:34:13 -0700
+Message-ID: <CAEf4BzbvUQ1HA6GPSF23piqbEBNVDZKZC0rB-X4LgeMpp9svYA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/2] libbpf: Fix accessing first syscall argument
+ on RV64
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	netdev@vger.kernel.org, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Puranjay Mohan <puranjay@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Pu Lehui <pulehui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In cases when vf sends malformed packets that are classified as
-malicious, sometimes it causes tx queue to freeze. This frozen queue can be
-stuck for several minutes being unusable. When mdd event occurs, there is a
-posibility to perform a graceful vf reset to quickly bring vf back to
-operational state.
+On Thu, Aug 29, 2024 at 6:32=E2=80=AFAM Pu Lehui <pulehui@huaweicloud.com> =
+wrote:
+>
+> From: Pu Lehui <pulehui@huawei.com>
+>
+> On RV64, as Ilya mentioned before [0], the first syscall parameter should=
+ be
+> accessed through orig_a0 (see arch/riscv64/include/asm/syscall.h),
+> otherwise it will cause selftests like bpf_syscall_macro, vmlinux,
+> test_lsm, etc. to fail on RV64. Let's fix it by using the struct pt_regs
+> style to provide access to it only through PT_REGS_PARM1_CORE_SYSCALL().
+>
+> Link: https://lore.kernel.org/bpf/20220209021745.2215452-1-iii@linux.ibm.=
+com [0]
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+> ---
+>  tools/lib/bpf/bpf_tracing.h | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/lib/bpf/bpf_tracing.h b/tools/lib/bpf/bpf_tracing.h
+> index 9314fa95f04e..388f30cf7914 100644
+> --- a/tools/lib/bpf/bpf_tracing.h
+> +++ b/tools/lib/bpf/bpf_tracing.h
+> @@ -351,6 +351,10 @@ struct pt_regs___arm64 {
+>   * https://github.com/riscv-non-isa/riscv-elf-psabi-doc/blob/master/risc=
+v-cc.adoc#risc-v-calling-conventions
+>   */
+>
+> +struct pt_regs___riscv {
+> +       unsigned long orig_a0;
+> +};
+> +
+>  /* riscv provides struct user_regs_struct instead of struct pt_regs to u=
+serspace */
+>  #define __PT_REGS_CAST(x) ((const struct user_regs_struct *)(x))
+>  #define __PT_PARM1_REG a0
+> @@ -362,12 +366,15 @@ struct pt_regs___arm64 {
+>  #define __PT_PARM7_REG a6
+>  #define __PT_PARM8_REG a7
+>
+> -#define __PT_PARM1_SYSCALL_REG __PT_PARM1_REG
+> +#define __PT_PARM1_SYSCALL_REG orig_a0
+>  #define __PT_PARM2_SYSCALL_REG __PT_PARM2_REG
+>  #define __PT_PARM3_SYSCALL_REG __PT_PARM3_REG
+>  #define __PT_PARM4_SYSCALL_REG __PT_PARM4_REG
+>  #define __PT_PARM5_SYSCALL_REG __PT_PARM5_REG
+>  #define __PT_PARM6_SYSCALL_REG __PT_PARM6_REG
+> +#define PT_REGS_PARM1_SYSCALL(x) PT_REGS_PARM1_CORE_SYSCALL(x)
+> +#define PT_REGS_PARM1_CORE_SYSCALL(x) \
+> +       BPF_CORE_READ((const struct pt_regs___riscv *)(x), __PT_PARM1_SYS=
+CALL_REG)
 
-Currently vf iqueues are being disabled if mdd event occurs.
-Add the ability to reset vf if tx or rx mdd occurs.
-Add mdd events logging throttling /* avoid dmesg polution */.
-Unify tx rx mdd messages formats.
+I feel like what we did for s390x is a bit suboptimal, so let's (try
+to) improve that and then do the same for RV64.
 
-Co-developed-by: Jan Sokolowski <jan.sokolowski@intel.com>
-Signed-off-by: Jan Sokolowski <jan.sokolowski@intel.com>
-Co-developed-by: Padraig J Connolly <padraig.j.connolly@intel.com>
-Signed-off-by:  Padraig J Connolly <padraig.j.connolly@intel.com>
-Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
----
-v2->v3 fix compilation issue
-v1->v2 fix compilation issue
----
- drivers/net/ethernet/intel/i40e/i40e.h        |   4 +-
- .../net/ethernet/intel/i40e/i40e_debugfs.c    |   2 +-
- .../net/ethernet/intel/i40e/i40e_ethtool.c    |   2 +
- drivers/net/ethernet/intel/i40e/i40e_main.c   | 116 ++++++++++++++++--
- .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |   2 +-
- .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  11 +-
- 6 files changed, 122 insertions(+), 15 deletions(-)
+What I mean is that PT_REGS_PARMn_SYSCALL macros are used to read
+pt_regs coming directly from context, right? In that case we don't
+need to pay the price of BPF_CORE_READ(), we can just access memory
+directly (but we still need CO-RE relocation!).
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index d546567..6d6683c 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -87,6 +87,7 @@ enum i40e_state {
- 	__I40E_SERVICE_SCHED,
- 	__I40E_ADMINQ_EVENT_PENDING,
- 	__I40E_MDD_EVENT_PENDING,
-+	__I40E_MDD_VF_PRINT_PENDING,
- 	__I40E_VFLR_EVENT_PENDING,
- 	__I40E_RESET_RECOVERY_PENDING,
- 	__I40E_TIMEOUT_RECOVERY_PENDING,
-@@ -190,6 +191,7 @@ enum i40e_pf_flags {
- 	 */
- 	I40E_FLAG_TOTAL_PORT_SHUTDOWN_ENA,
- 	I40E_FLAG_VF_VLAN_PRUNING_ENA,
-+	I40E_FLAG_MDD_AUTO_RESET_VF,
- 	I40E_PF_FLAGS_NBITS,		/* must be last */
- };
- 
-@@ -571,7 +573,7 @@ struct i40e_pf {
- 	int num_alloc_vfs;	/* actual number of VFs allocated */
- 	u32 vf_aq_requests;
- 	u32 arq_overflows;	/* Not fatal, possibly indicative of problems */
--
-+	unsigned long last_printed_mdd_jiffies; /* MDD message rate limit */
- 	/* DCBx/DCBNL capability for PF that indicates
- 	 * whether DCBx is managed by firmware or host
- 	 * based agent (LLDPAD). Also, indicates what
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-index abf624d..6a697bf 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
-@@ -721,7 +721,7 @@ static void i40e_dbg_dump_vf(struct i40e_pf *pf, int vf_id)
- 		dev_info(&pf->pdev->dev, "vf %2d: VSI id=%d, seid=%d, qps=%d\n",
- 			 vf_id, vf->lan_vsi_id, vsi->seid, vf->num_queue_pairs);
- 		dev_info(&pf->pdev->dev, "       num MDD=%lld\n",
--			 vf->num_mdd_events);
-+			 vf->mdd_tx_events.count + vf->mdd_rx_events.count);
- 	} else {
- 		dev_info(&pf->pdev->dev, "invalid VF id %d\n", vf_id);
- 	}
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index 1d0d2e5..d146575 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -459,6 +459,8 @@ static const struct i40e_priv_flags i40e_gstrings_priv_flags[] = {
- 	I40E_PRIV_FLAG("base-r-fec", I40E_FLAG_BASE_R_FEC, 0),
- 	I40E_PRIV_FLAG("vf-vlan-pruning",
- 		       I40E_FLAG_VF_VLAN_PRUNING_ENA, 0),
-+	I40E_PRIV_FLAG("mdd-auto-reset-vf",
-+		       I40E_FLAG_MDD_AUTO_RESET_VF, 0),
- };
- 
- #define I40E_PRIV_FLAGS_STR_LEN ARRAY_SIZE(i40e_gstrings_priv_flags)
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index cbcfada..28df3d5 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -11189,22 +11189,102 @@ static void i40e_handle_reset_warning(struct i40e_pf *pf, bool lock_acquired)
- 	i40e_reset_and_rebuild(pf, false, lock_acquired);
- }
- 
-+/**
-+ * i40e_print_vf_rx_mdd_event - print VF Rx malicious driver detect event
-+ * @pf: board private structure
-+ * @vf: pointer to the VF structure
-+ */
-+static void i40e_print_vf_rx_mdd_event(struct i40e_pf *pf, struct i40e_vf *vf)
-+{
-+	dev_err(&pf->pdev->dev, "%lld Rx Malicious Driver Detection events detected on PF %d VF %d MAC %pm. mdd-auto-reset-vfs=%s\n",
-+		vf->mdd_rx_events.count,
-+		pf->hw.pf_id,
-+		vf->vf_id,
-+		vf->default_lan_addr.addr,
-+		test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flags) ? "on" : "off");
-+}
-+
-+/**
-+ * i40e_print_vf_tx_mdd_event - print VF Tx malicious driver detect event
-+ * @pf: board private structure
-+ * @vf: pointer to the VF structure
-+ */
-+static void i40e_print_vf_tx_mdd_event(struct i40e_pf *pf, struct i40e_vf *vf)
-+{
-+	dev_err(&pf->pdev->dev, "%lld Tx Malicious Driver Detection events detected on PF %d VF %d MAC %pm. mdd-auto-reset-vfs=%s\n",
-+		vf->mdd_tx_events.count,
-+		pf->hw.pf_id,
-+		vf->vf_id,
-+		vf->default_lan_addr.addr,
-+		test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flags) ? "on" : "off");
-+}
-+
-+/**
-+ * i40e_print_vfs_mdd_events - print VFs malicious driver detect event
-+ * @pf: pointer to the PF structure
-+ *
-+ * Called from i40e_handle_mdd_event to rate limit and print VFs MDD events.
-+ */
-+static void i40e_print_vfs_mdd_events(struct i40e_pf *pf)
-+{
-+	unsigned int i;
-+
-+	/* check that there are pending MDD events to print */
-+	if (!test_and_clear_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state))
-+		return;
-+
-+	/* VF MDD event logs are rate limited to one second intervals */
-+	if (time_is_after_jiffies(pf->last_printed_mdd_jiffies + HZ * 1))
-+		return;
-+
-+	pf->last_printed_mdd_jiffies = jiffies;
-+
-+	for (i = 0; i < pf->num_alloc_vfs; i++) {
-+		struct i40e_vf *vf = &pf->vf[i];
-+		bool is_printed = false;
-+
-+		/* only print Rx MDD event message if there are new events */
-+		if (vf->mdd_rx_events.count != vf->mdd_rx_events.last_printed) {
-+			vf->mdd_rx_events.last_printed = vf->mdd_rx_events.count;
-+			i40e_print_vf_rx_mdd_event(pf, vf);
-+			is_printed = true;
-+		}
-+
-+		/* only print Tx MDD event message if there are new events */
-+		if (vf->mdd_tx_events.count != vf->mdd_tx_events.last_printed) {
-+			vf->mdd_tx_events.last_printed = vf->mdd_tx_events.count;
-+			i40e_print_vf_tx_mdd_event(pf, vf);
-+			is_printed = true;
-+		}
-+
-+		if (is_printed && !test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flags))
-+			dev_info(&pf->pdev->dev,
-+				 "Use PF Control I/F to re-enable the VF #%d\n",
-+				 i);
-+	}
-+}
-+
- /**
-  * i40e_handle_mdd_event
-  * @pf: pointer to the PF structure
-  *
-  * Called from the MDD irq handler to identify possibly malicious vfs
-  **/
- static void i40e_handle_mdd_event(struct i40e_pf *pf)
- {
- 	struct i40e_hw *hw = &pf->hw;
- 	bool mdd_detected = false;
- 	struct i40e_vf *vf;
- 	u32 reg;
- 	int i;
- 
--	if (!test_bit(__I40E_MDD_EVENT_PENDING, pf->state))
-+	if (!test_and_clear_bit(__I40E_MDD_EVENT_PENDING, pf->state)) {
-+		/* Since the VF MDD event logging is rate limited, check if
-+		 * there are pending MDD events.
-+		 */
-+		i40e_print_vfs_mdd_events(pf);
- 		return;
-+	}
- 
- 	/* find what triggered the MDD event */
- 	reg = rd32(hw, I40E_GL_MDET_TX);
-@@ -11248,36 +11328,50 @@ static void i40e_handle_mdd_event(struct i40e_pf *pf)
- 
- 	/* see if one of the VFs needs its hand slapped */
- 	for (i = 0; i < pf->num_alloc_vfs && mdd_detected; i++) {
-+		bool is_mdd_on_tx = false;
-+		bool is_mdd_on_rx = false;
-+
- 		vf = &(pf->vf[i]);
- 		reg = rd32(hw, I40E_VP_MDET_TX(i));
- 		if (reg & I40E_VP_MDET_TX_VALID_MASK) {
-+			set_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state);
- 			wr32(hw, I40E_VP_MDET_TX(i), 0xFFFF);
--			vf->num_mdd_events++;
--			dev_info(&pf->pdev->dev, "TX driver issue detected on VF %d\n",
--				 i);
--			dev_info(&pf->pdev->dev,
--				 "Use PF Control I/F to re-enable the VF\n");
-+			vf->mdd_tx_events.count++;
- 			set_bit(I40E_VF_STATE_DISABLED, &vf->vf_states);
-+			is_mdd_on_tx = true;
- 		}
- 
- 		reg = rd32(hw, I40E_VP_MDET_RX(i));
- 		if (reg & I40E_VP_MDET_RX_VALID_MASK) {
-+			set_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state);
- 			wr32(hw, I40E_VP_MDET_RX(i), 0xFFFF);
--			vf->num_mdd_events++;
--			dev_info(&pf->pdev->dev, "RX driver issue detected on VF %d\n",
--				 i);
--			dev_info(&pf->pdev->dev,
--				 "Use PF Control I/F to re-enable the VF\n");
-+			vf->mdd_rx_events.count++;
- 			set_bit(I40E_VF_STATE_DISABLED, &vf->vf_states);
-+			is_mdd_on_rx = true;
-+		}
-+
-+		if ((is_mdd_on_tx || is_mdd_on_rx) &&
-+		    test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flags)) {
-+			/* VF MDD event counters will be cleared by
-+			 * reset, so print the event prior to reset.
-+			 */
-+			if (is_mdd_on_rx)
-+				i40e_print_vf_rx_mdd_event(pf, vf);
-+			if (is_mdd_on_tx)
-+				i40e_print_vf_tx_mdd_event(pf, vf);
-+
-+			i40e_vc_reset_vf(vf, true);
- 		}
- 	}
- 
- 	/* re-enable mdd interrupt cause */
- 	clear_bit(__I40E_MDD_EVENT_PENDING, pf->state);
- 	reg = rd32(hw, I40E_PFINT_ICR0_ENA);
- 	reg |=  I40E_PFINT_ICR0_ENA_MAL_DETECT_MASK;
- 	wr32(hw, I40E_PFINT_ICR0_ENA, reg);
- 	i40e_flush(hw);
-+
-+	i40e_print_vfs_mdd_events(pf);
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 662622f..5b4618e 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -216,7 +216,7 @@ void i40e_vc_notify_vf_reset(struct i40e_vf *vf)
-  * @notify_vf: notify vf about reset or not
-  * Reset VF handler.
-  **/
--static void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf)
-+void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf)
- {
- 	struct i40e_pf *pf = vf->pf;
- 	int i;
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-index 66f95e2..5cf74f1 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
-@@ -64,6 +64,12 @@ struct i40evf_channel {
- 	u64 max_tx_rate; /* bandwidth rate allocation for VSIs */
- };
- 
-+struct i40e_mdd_vf_events {
-+	u64 count;      /* total count of Rx|Tx events */
-+	/* count number of the last printed event */
-+	u64 last_printed;
-+};
-+
- /* VF information structure */
- struct i40e_vf {
- 	struct i40e_pf *pf;
-@@ -92,7 +98,9 @@ struct i40e_vf {
- 
- 	u8 num_queue_pairs;	/* num of qps assigned to VF vsis */
- 	u8 num_req_queues;	/* num of requested qps */
--	u64 num_mdd_events;	/* num of mdd events detected */
-+	/* num of mdd tx and rx events detected */
-+	struct i40e_mdd_vf_events mdd_rx_events;
-+	struct i40e_mdd_vf_events mdd_tx_events;
- 
- 	unsigned long vf_caps;	/* vf's adv. capabilities */
- 	unsigned long vf_states;	/* vf's runtime states */
-@@ -120,6 +128,7 @@ int i40e_alloc_vfs(struct i40e_pf *pf, u16 num_alloc_vfs);
- int i40e_vc_process_vf_msg(struct i40e_pf *pf, s16 vf_id, u32 v_opcode,
- 			   u32 v_retval, u8 *msg, u16 msglen);
- int i40e_vc_process_vflr_event(struct i40e_pf *pf);
-+void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf);
- bool i40e_reset_vf(struct i40e_vf *vf, bool flr);
- bool i40e_reset_all_vfs(struct i40e_pf *pf, bool flr);
- void i40e_vc_notify_vf_reset(struct i40e_vf *vf);
--- 
-2.25.1
+So I think what we should do is
 
+1) mark pt_regs___riscv {} with __attribute__((preserve_access_index))
+so that normal field accesses are CO-RE-relocated
+2) change PT_REGS_PARM1_SYSCALL(x) to be `((const
+struct_pt_regs___riscv *)(x))->orig_a0`, which will directly read
+memory
+3) keep PT_REGS_PARM1_CORE_SYSCALL() as is
+
+
+But having written all the above, I'm not sure whether we allow CO-RE
+relocated direct context accesses (verifier might complain about
+modifying ctx register offset or something). So can you please check
+it either on s390 or RV64 and let me know? I'm not marking it as
+"Changes Requested" for that reason, because that might not work and
+we'll have to do BPF_CORE_READ().
+
+>
+>  #define __PT_RET_REG ra
+>  #define __PT_FP_REG s0
+> --
+> 2.34.1
+>
 
