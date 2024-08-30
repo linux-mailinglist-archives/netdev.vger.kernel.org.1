@@ -1,182 +1,154 @@
-Return-Path: <netdev+bounces-123907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23C66966CBE
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 00:56:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D194966CD2
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 01:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4311C1C21E67
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 22:56:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A7BA28375E
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 23:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E63F18C906;
-	Fri, 30 Aug 2024 22:56:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EBBF17C9FB;
+	Fri, 30 Aug 2024 23:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XvbWrE1b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FCD15C150;
-	Fri, 30 Aug 2024 22:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1105178361;
+	Fri, 30 Aug 2024 23:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725058577; cv=none; b=G4CEgI5z3xG9e3N9R7eX9GL+vMqLJmmd4R2f344YQzamb2bD/myGUCMNghQ9IfuzWLwYhAT1bLEcnnQ/g5joAFnx4m3pu4tBhmvsBoDNQ7tEhL1hW93uIvc6ewSB7sJnLu78Pxisq8gSeNXD1X+mCtpJt4Qz01gs4ATCvTaOTzQ=
+	t=1725060049; cv=none; b=sQN7S1PXARZFucKkg3H/7ixcEl/GHW2QvIAlpKfLAR8RJDJgvWIdjzrfDOtk787884bqSW7JSdVFOnQ5k8M42bPBh6+UpcnNjTw4PKbMoQlc4yWzx7r7qs/FC+jPIp60dd2/MWwGzaA6P+b8xwJylLZbP83uPwQ7cOihVRkGkZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725058577; c=relaxed/simple;
-	bh=8XF3vmvNdNn9zLKrZfImEFFGflqsckIYF0ke9GOgNEM=;
+	s=arc-20240116; t=1725060049; c=relaxed/simple;
+	bh=nPwrvEN9XYrbT3J+y8lcXmeIHnztMSIuwQQIDpKMEbw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eoI+kgcLTmc7kwDvDj2Ziq5RAmLaJrl76EZov8D4WUmvoQM0ALWCj02/SHjnKVY1krzDL5iB1h+aNSeg2Gy3Rd7v/50uofg9NCGXaDmGxMLh4A7uX0bVOJ2kQyys4dJ/yi0E58+xGquGe1BYBaz8O4TT1cuppJuPbEElFvRoJek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7148912a1ebso1505523b3a.0;
-        Fri, 30 Aug 2024 15:56:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725058574; x=1725663374;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OeH8hxTVMFEpq7p+SlKqJlF16p+IrHAk0EJziH2/pls=;
-        b=nNcyosSl9EUljUD2AxlzbFXqGDivqmhNZ5ZRdsoqjCBCuUpfcVu94sDe9A53cp4avG
-         eGziM0fR4MDIBPkK4lVggr8IxQyoDJiJF4cww7y69Iqew5zlZULw6/Upb9RuKkSIfRY9
-         STHhh/7KcQ1eR+pEYA/JYdVAW889b1SzaKiWvRIRhnyWp98O37auN6zKZ/5/JrYlxgJm
-         2O9fv9d0aLgGDIFMmKw8hhdYxndQBihKuIMNcYxM951Ob/gfOZRx+T46Iw1LWxGlPysR
-         fCrdiPHuJd/X/MsiKgpVY1nDq2VngdNNCsdD5QfD407tjQmXJj5GIZ0d+NRLjlNuYp6W
-         8S5A==
-X-Forwarded-Encrypted: i=1; AJvYcCUUgLKZFF8436siSkKW97I67seiOVtt/vRxN1Aty+dQp/vv95lfeIBzk2eJXaXbpPJz5xY=@vger.kernel.org, AJvYcCW5omjajJU0Pqr4c+zq3UpK0VnLafmPgKTluRPigF17ZMfhDzLWPuLJ3vlLNJv7s1HelkuVS1P1nJcYuSnN@vger.kernel.org, AJvYcCXJEoYjKNAq6XJDXOnvr7kiv8kfrUqH+jcogIrWIuBB3byPYP6KreIpQCMJD1hwYnuWtvXkXgFm@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIOeGt5lNjPwgDQYASgGeHov+uOMrtLZREvv2rLXDzEOjPw+BX
-	Ti3eRgr27G4j4cHkbbQR7Ppg8zqro3g1REeMunDZVLNFTdOdLLE=
-X-Google-Smtp-Source: AGHT+IEVf5r+rolkiQ44IlQkVBbOxszPSaCFQ1vOzTxxgkXxPkhviLvJWKAGztNLO3pgEF5XOYsKrA==
-X-Received: by 2002:a05:6a21:e8f:b0:1c6:a4e7:bd1a with SMTP id adf61e73a8af0-1ced04c1224mr799255637.32.1725058573729;
-        Fri, 30 Aug 2024 15:56:13 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205155424e7sm31450635ad.208.2024.08.30.15.56.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Aug 2024 15:56:13 -0700 (PDT)
-Date: Fri, 30 Aug 2024 15:56:12 -0700
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next 2/9] kthread: allow vararg
- kthread_{create,run}_on_cpu()
-Message-ID: <ZtJODFOYkjgRTPCh@mini-arch>
-References: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
- <20240830162508.1009458-3-aleksander.lobakin@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gRvK+TmuHW7AyH8ObQi6wL/CyXMefaIkP/YlH0d7vnYBIm+3qZ8lZlvjMURjQg2/xmDCBqN7cWZrsRdZGR7HFpAT0Oa2kLLAcTBr8O9JYMtCNrnk+Sb3rDGThEWMpjpBhe/uiCIb4vJwg+otKpivlTKG51W/Ie95R3c+5o+z+3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XvbWrE1b; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725060047; x=1756596047;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nPwrvEN9XYrbT3J+y8lcXmeIHnztMSIuwQQIDpKMEbw=;
+  b=XvbWrE1bdyBWhAkL9P0LByjqexq/pnj1saMZfpNwjhZj/hj7ko79XSdH
+   tToN4R9cRi/M8Zi1q4JNiy2gl2D5IrzPl1rwf3nv2nrBX1rpPN6OcjBWW
+   lTl1MImKdN2esZo8PHJMEyN2mKpYJNpCVfQZVUYqB0b3dX/0/Ka4Vs/Ml
+   WpL/rvWtCMgek1LJ9d+2j4tBSzNyYv+qsoqoKUFyS3S2DmtvKWFSH2tRU
+   MBV0xCBeQTt4RVcBtMzVQXMj1v5XmOv4icx4NOuLFdvBSjY759Ic7GCk6
+   wBlaXeMddnlks7ddIC/cgx0FGoYM12dhXdbD9+JEp1I+JoLvwvWfx/IGk
+   A==;
+X-CSE-ConnectionGUID: +CV7hI3FSwmBgNfsgNEJsA==
+X-CSE-MsgGUID: TvA5UZZVRJS2bHZyN/f29A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11180"; a="35127151"
+X-IronPort-AV: E=Sophos;i="6.10,190,1719903600"; 
+   d="scan'208";a="35127151"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 16:20:46 -0700
+X-CSE-ConnectionGUID: MIvltLxURYi6utmjs8MKtg==
+X-CSE-MsgGUID: X1M4ydP+RYiEybVXoNsE0A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,190,1719903600"; 
+   d="scan'208";a="63990529"
+Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 30 Aug 2024 16:20:42 -0700
+Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1skAv1-0002Ck-1t;
+	Fri, 30 Aug 2024 23:20:39 +0000
+Date: Sat, 31 Aug 2024 07:19:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: ende.tan@starfivetech.com, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, andrew@lunn.ch,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, leyfoon.tan@starfivetech.com,
+	minda.chen@starfivetech.com, endeneer@gmail.com,
+	Tan En De <ende.tan@starfivetech.com>
+Subject: Re: [net-next,v3,1/1] net: stmmac: Batch set RX OWN flag and other
+ flags
+Message-ID: <202408310604.E3C4zDID-lkp@intel.com>
+References: <20240829134043.323855-1-ende.tan@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240830162508.1009458-3-aleksander.lobakin@intel.com>
+In-Reply-To: <20240829134043.323855-1-ende.tan@starfivetech.com>
 
-On 08/30, Alexander Lobakin wrote:
-> Currently, kthread_{create,run}_on_cpu() doesn't support varargs like
-> kthread_create{,_on_node}() do, which makes them less convenient to
-> use.
-> Convert them to take varargs as the last argument. The only difference
-> is that they always append the CPU ID at the end and require the format
-> string to have an excess '%u' at the end due to that. That's still true;
-> meanwhile, the compiler will correctly point out to that if missing.
-> One more nice side effect is that you can now use the underscored
-> __kthread_create_on_cpu() if you want to override that rule and not
-> have CPU ID at the end of the name.
-> The current callers are not anyhow affected.
-> 
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  include/linux/kthread.h | 51 ++++++++++++++++++++++++++---------------
->  kernel/kthread.c        | 22 ++++++++++--------
->  2 files changed, 45 insertions(+), 28 deletions(-)
-> 
-> diff --git a/include/linux/kthread.h b/include/linux/kthread.h
-> index b11f53c1ba2e..27a94e691948 100644
-> --- a/include/linux/kthread.h
-> +++ b/include/linux/kthread.h
-> @@ -27,11 +27,21 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
->  #define kthread_create(threadfn, data, namefmt, arg...) \
->  	kthread_create_on_node(threadfn, data, NUMA_NO_NODE, namefmt, ##arg)
->  
-> -
-> -struct task_struct *kthread_create_on_cpu(int (*threadfn)(void *data),
-> -					  void *data,
-> -					  unsigned int cpu,
-> -					  const char *namefmt);
-> +__printf(4, 5)
-> +struct task_struct *__kthread_create_on_cpu(int (*threadfn)(void *data),
-> +					    void *data, unsigned int cpu,
-> +					    const char *namefmt, ...);
-> +
-> +#define kthread_create_on_cpu(threadfn, data, cpu, namefmt, ...)	   \
-> +	_kthread_create_on_cpu(threadfn, data, cpu, __UNIQUE_ID(cpu_),	   \
-> +			       namefmt, ##__VA_ARGS__)
-> +
-> +#define _kthread_create_on_cpu(threadfn, data, cpu, uc, namefmt, ...) ({   \
-> +	u32 uc = (cpu);							   \
-> +									   \
-> +	__kthread_create_on_cpu(threadfn, data, uc, namefmt,		   \
-> +				##__VA_ARGS__, uc);			   \
-> +})
->  
->  void get_kthread_comm(char *buf, size_t buf_size, struct task_struct *tsk);
->  bool set_kthread_struct(struct task_struct *p);
-> @@ -62,25 +72,28 @@ bool kthread_is_per_cpu(struct task_struct *k);
->   * @threadfn: the function to run until signal_pending(current).
->   * @data: data ptr for @threadfn.
->   * @cpu: The cpu on which the thread should be bound,
-> - * @namefmt: printf-style name for the thread. Format is restricted
-> - *	     to "name.*%u". Code fills in cpu number.
-> + * @namefmt: printf-style name for the thread. Must have an excess '%u'
-> + *	     at the end as kthread_create_on_cpu() fills in CPU number.
->   *
->   * Description: Convenient wrapper for kthread_create_on_cpu()
->   * followed by wake_up_process().  Returns the kthread or
->   * ERR_PTR(-ENOMEM).
->   */
-> -static inline struct task_struct *
-> -kthread_run_on_cpu(int (*threadfn)(void *data), void *data,
-> -			unsigned int cpu, const char *namefmt)
-> -{
-> -	struct task_struct *p;
-> -
-> -	p = kthread_create_on_cpu(threadfn, data, cpu, namefmt);
-> -	if (!IS_ERR(p))
-> -		wake_up_process(p);
-> -
-> -	return p;
-> -}
-> +#define kthread_run_on_cpu(threadfn, data, cpu, namefmt, ...)		   \
-> +	_kthread_run_on_cpu(threadfn, data, cpu, __UNIQUE_ID(task_),	   \
-> +			    namefmt, ##__VA_ARGS__)
-> +
-> +#define _kthread_run_on_cpu(threadfn, data, cpu, ut, namefmt, ...)	   \
-> +({									   \
-> +	struct task_struct *ut;						   \
-> +									   \
-> +	ut = kthread_create_on_cpu(threadfn, data, cpu, namefmt,	   \
-> +				   ##__VA_ARGS__);			   \
-> +	if (!IS_ERR(ut))						   \
-> +		wake_up_process(ut);					   \
-> +									   \
-> +	ut;								   \
-> +})
+Hi,
 
-Why do you need to use __UNIQUE_ID here? Presumably ({}) in _kthread_run_on_cpu
-should be enough to avoid the issue of non unique variable in the parent
-scope. (and similar kthread_run isn't using any __UNIQUE_IDs)
+kernel test robot noticed the following build warnings:
 
-The rest of the patches look good.
+[auto build test WARNING on linus/master]
+[also build test WARNING on horms-ipvs/master v6.11-rc5 next-20240830]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/ende-tan-starfivetech-com/net-stmmac-Batch-set-RX-OWN-flag-and-other-flags/20240829-214324
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20240829134043.323855-1-ende.tan%40starfivetech.com
+patch subject: [net-next,v3,1/1] net: stmmac: Batch set RX OWN flag and other flags
+config: x86_64-randconfig-r132-20240830 (https://download.01.org/0day-ci/archive/20240831/202408310604.E3C4zDID-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240831/202408310604.E3C4zDID-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408310604.E3C4zDID-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:59:21: sparse: sparse: incorrect type in initializer (different base types) @@     expected unsigned int [usertype] flags @@     got restricted __le32 [usertype] @@
+   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:59:21: sparse:     expected unsigned int [usertype] flags
+   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:59:21: sparse:     got restricted __le32 [usertype]
+>> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:62:24: sparse: sparse: invalid assignment: |=
+   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:62:24: sparse:    left side has type unsigned int
+   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:62:24: sparse:    right side has type restricted __le32
+   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:64:17: sparse: sparse: invalid assignment: |=
+   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:64:17: sparse:    left side has type restricted __le32
+   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:64:17: sparse:    right side has type unsigned int
+   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:110:23: sparse: sparse: restricted __le32 degrades to integer
+   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c:110:50: sparse: sparse: restricted __le32 degrades to integer
+--
+>> drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:189:21: sparse: sparse: incorrect type in initializer (different base types) @@     expected unsigned int [usertype] flags @@     got restricted __le32 [usertype] @@
+   drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:189:21: sparse:     expected unsigned int [usertype] flags
+   drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:189:21: sparse:     got restricted __le32 [usertype]
+>> drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:192:23: sparse: sparse: invalid assignment: |=
+   drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:192:23: sparse:    left side has type unsigned int
+   drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:192:23: sparse:    right side has type restricted __le32
+   drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:194:17: sparse: sparse: invalid assignment: |=
+   drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:194:17: sparse:    left side has type restricted __le32
+   drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c:194:17: sparse:    right side has type unsigned int
+
+vim +59 drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
+
+    56	
+    57	static void dwxgmac2_set_rx_owner(struct dma_desc *p, int disable_rx_ic)
+    58	{
+  > 59		u32 flags = cpu_to_le32(XGMAC_RDES3_OWN);
+    60	
+    61		if (!disable_rx_ic)
+  > 62			 flags |= cpu_to_le32(XGMAC_RDES3_IOC);
+    63	
+    64		p->des3 |= flags;
+    65	}
+    66	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
