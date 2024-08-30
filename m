@@ -1,139 +1,71 @@
-Return-Path: <netdev+bounces-123632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A82A965E23
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 12:13:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68AE2965F1E
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 12:28:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17550284E4A
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 10:13:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C9971F27085
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 10:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E6717BB30;
-	Fri, 30 Aug 2024 10:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569CE183CDF;
+	Fri, 30 Aug 2024 10:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="uRWJU92X"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="kvcST/Ai"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from forward203b.mail.yandex.net (forward203b.mail.yandex.net [178.154.239.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F28E17BB2E;
-	Fri, 30 Aug 2024 10:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B378F184555
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 10:26:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725012662; cv=none; b=e+zpODKJ01uwWBZQiF8HkfFZqKPq+N3zLoX/rKxnVg4PdGb2B//Re/4XFS5Ngz/X2mOYPk3iKHdMZn/e00+062mzUIUsXGLuy6jUlUcM792tazAEeO8BWMe3+g97uZar3Fxz/1jaU1/HHIqKirALhdVAQi4Fnr6gHJkXMUdrMdA=
+	t=1725013603; cv=none; b=neiz7CjbyiF5PYG2CBYnoKymC6OePBxnqlH8y2THH+yGvbU0rXEwtVSy0Uq/sWwS0Iz1vrkv70hIuIFL0r9EcDzUOvkhJ8L0qiSxoGpS5jXiDVZSea1uMlY3Bl256r2KNUbROUhyAVv/pujDN2MmNCuvUGGMoDP0v/7wS6X3aq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725012662; c=relaxed/simple;
-	bh=e3v/tfFr6OXQsMA4ArsK1IK9MbBAj7ozQ+7muAQoZ88=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fS3GpHWy3WSEZDMtN8KGLhFKwpOsbC0HiMjTwEUp4phjaX4illcOohNJK2uvk7d2cxtRZQpNr1B9tGS2iUEVEJnMoOrSJ2xkvjVRAIa4OdwNKrhiO/cZElhaWv55NoE6idA7Xx7YVrC74sUlb1pfMahbMK32PmGVe14T6vUDc+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=uRWJU92X; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47UAAa12097929;
-	Fri, 30 Aug 2024 05:10:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1725012636;
-	bh=80eadUWFezgr51akxOKkbvhUOSeToUTMrD8dy25iM0A=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=uRWJU92XaXopiajVDn0Yncp5WKe507Ryk7EPanXtU0amqE8VGHPyJXI8yWKqQdmVW
-	 br3cH8eXHt0f3z+ou8fm9FCU4W3nAwAawIisJTZeYOx2XPpMaobBZoPG+DkvJiCHXr
-	 zYZ918oaCysCZHSFAXXsXP/c7iFVyWFeILnkfLuI=
-Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47UAAau4019078
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 30 Aug 2024 05:10:36 -0500
-Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE113.ent.ti.com
- (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 30
- Aug 2024 05:10:36 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 30 Aug 2024 05:10:35 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47UAAUMT092473;
-	Fri, 30 Aug 2024 05:10:31 -0500
-Message-ID: <91d80afc-a911-4932-8f29-5697059efa8d@ti.com>
-Date: Fri, 30 Aug 2024 15:40:30 +0530
+	s=arc-20240116; t=1725013603; c=relaxed/simple;
+	bh=psvNxcokM36AAT0wrzDWuJlZYR+CdS7AobzGcXZjoqs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=H6HurbkjTbF2hOt8w5+Kj+qlKAJF5HjD08xC43v1bfkzbBsFafdpHSF078kVNf0yuLwWeyryBNpxjEhZmN2d431+vM5wKC6fyECCz9IcisZZhkRQ1ssuh9Dsbw6njRstLL2/uIB/2OOHn1o7pmdUyAXxVZ6QPuaXhg8ziObW16w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=kvcST/Ai; arc=none smtp.client-ip=178.154.239.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward101b.mail.yandex.net (forward101b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d101])
+	by forward203b.mail.yandex.net (Yandex) with ESMTPS id B8558693C2
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 13:19:02 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net [IPv6:2a02:6b8:c14:3483:0:640:1715:0])
+	by forward101b.mail.yandex.net (Yandex) with ESMTPS id B655960ACB;
+	Fri, 30 Aug 2024 13:18:54 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id rIUvxkaXxCg0-RZnvht08;
+	Fri, 30 Aug 2024 13:18:54 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1725013134; bh=psvNxcokM36AAT0wrzDWuJlZYR+CdS7AobzGcXZjoqs=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=kvcST/AiWdV0tOqyiwAiPL9M80dwq44XPmgAEeUnd3nynjX7l0UW7jnvuiXw/Jahv
+	 0uwkD1bXpuCyI5NuVTczAxaFBDfYtN73OZAgPI3IgHwnNFNBRdf6HLvtz5xCaYQ5IJ
+	 glpDpbnMNnQYAIqZ/caS9aI7WTzOcMtVnJZDlIpg=
+Authentication-Results: mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: Resend taprio series 
+Date: Fri, 30 Aug 2024 13:16:30 +0300
+Message-ID: <20240830101754.1574848-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/3] net: ethernet: ti: am65-cpsw: Fix XDP
- implementation
-To: Roger Quadros <rogerq@kernel.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
-	<ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard
- Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Julien
- Panis <jpanis@baylibre.com>,
-        Jacob Keller <jacob.e.keller@intel.com>
-CC: Siddharth Vadapalli <s-vadapalli@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Govindarajan Sriramakrishnan <srk@ti.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-References: <20240829-am65-cpsw-xdp-v1-0-ff3c81054a5e@kernel.org>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20240829-am65-cpsw-xdp-v1-0-ff3c81054a5e@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: 8bit
 
-
-
-On 29/08/24 5:33 pm, Roger Quadros wrote:
-> The XDP implementation on am65-cpsw driver is broken in many ways
-> and this series fixes it.
-> 
-> Below are the current issues that are being fixed:
-> 
-> 1)  The following XDP_DROP test from [1] stalls the interface after
->     250 packets.
->     ~# xdb-bench drop -m native eth0
->     This is because new RX requests are never queued. Fix that.
-> 
-> 2)  The below XDP_TX test from [1] fails with a warning
->     [  499.947381] XDP_WARN: xdp_update_frame_from_buff(line:277): Driver BUG: missing reserved tailroom
->     ~# xdb-bench tx -m native eth0
->     Fix that by using PAGE_SIZE during xdp_init_buf().
-> 
-> 3)  In XDP_REDIRECT case only 1 packet was processed in rx_poll.
->     Fix it to process up to budget packets.
->     ~# ./xdp-bench redirect -m native eth0 eth0
-> 
-> 4)  If number of TX queues are set to 1 we get a NULL pointer
->     dereference during XDP_TX.
->     ~# ethtool -L eth0 tx 1
->     ~# ./xdp-trafficgen udp -A <ipv6-src> -a <ipv6-dst> eth0 -t 2
->     Transmitting on eth0 (ifindex 2)
->     [  241.135257] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000030
-> 
-> 5)  Net statistics is broken for XDP_TX and XDP_REDIRECT
-> 
-> [1] xdp-tools suite https://github.com/xdp-project/xdp-tools
-> 
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-
-This series looks good to me.
-
-Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
-
--- 
-Thanks and Regards,
-Danish
+This is a resend of https://lore.kernel.org/netdev/20240807103943.1633950-1-dmantipov@yandex.ru,
+briefly re-tested against 6.11.0-rc5 on x86 and arm64 qemu targets, with (hopefully) addressed
+notes from https://lore.kernel.org/netdev/20240807193352.66ceaab8@kernel.org and
+https://lore.kernel.org/netdev/878qx6y8ds.fsf@intel.com.
 
