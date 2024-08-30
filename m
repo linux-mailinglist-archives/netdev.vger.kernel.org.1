@@ -1,117 +1,117 @@
-Return-Path: <netdev+bounces-123848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD05966A96
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 22:35:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 373A5966AD3
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 22:44:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 22EBAB20A0E
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:35:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACEE0B22F56
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:44:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48D81BF31A;
-	Fri, 30 Aug 2024 20:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A628F1BF7FD;
+	Fri, 30 Aug 2024 20:44:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BOti94d7"
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="wHh63gdH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E561BDABD
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 20:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A42166F0D;
+	Fri, 30 Aug 2024 20:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725050097; cv=none; b=j5QHWxE1ipAxa4wqIVCNTD0Fp4Tl/jqp2JCRTMhzjvJ4VYA2R1SOawYNOQMvFKLqGWBKeHWgAbs8ZN9jkJWsmU8VPOtrTXgm0ToVimPgqMfmC+hVVZ3mBozp3Zo/McjIHGAckFW6+n0l44ydfKNlPeMwLewUlYsQDIm3GOZyYLI=
+	t=1725050692; cv=none; b=MO04a1LLox/7idM012ZULkJSsY+DVrVlmUUsH2DAK7vhmEXTHlnkw+I0zZ0pmMMVW1y/0SAMyUtmUgl4OcEY57vX8XcxFmfwlxq9IXLPlVuDH3af4ybIO2J3VQUJk9NvOCkyJVP+T6NXKemU/rPUOCWXAdiQfTvgiGF4WQGMNQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725050097; c=relaxed/simple;
-	bh=oGI9YR13810+qfWg8KknXvRTSXv+EhfiLvOHw7EJAj8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o7g8+OpGPPM8AsPbMYk1GRHBiSle9UEnLJ9hGmMaAVS4IiPUYuWKBw3p2jJaeEtT5Jjjkk8y2vcm3R1GKUlyNGRbc8C7R5SUQxRVp8Om7yn0yQze4ABoOfMkwY/lTyTGJ90OD0mrIBvpbrJCoQzZbJkoyAl+uBmP8I5w6AdAL+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BOti94d7; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 30 Aug 2024 20:34:46 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725050093;
+	s=arc-20240116; t=1725050692; c=relaxed/simple;
+	bh=gbsSKK8OZHKf0VMhEm//aTupK7QwVzIkC70uzXeGn3M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GNvChBXXNDfXiExiHaJZj+IoPdMtn8iNMoWMfWersAizdmRs3/ikuWKZymRBVcB475D32m13whK+Fw77gxKOZ+DNokwme0Q5gqX+n8rQCJktp64GhJhcltfeZWbsSBgA6/RLOR19fdwSp0verNb9MB76HfKYA75uMwBee95mvPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=wHh63gdH; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from [192.168.2.107] (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@datenfreihafen.org)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 35780C0227;
+	Fri, 30 Aug 2024 22:34:59 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+	s=2021; t=1725050099;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=N2MSZCjedrpsmWdTZ6nvWovh/uXXPtdm+g3LPj1tQbc=;
-	b=BOti94d7W0NPg/IHRInQnb6PRJY9TO9UZceWZQtPuLKwNaHmSFPyhW/a1EFIupa4RsHq4G
-	OUmVh944d6mSiaejsihDCCf568qT6aj+JhSkM44cEXYP9nTaQQLCh3NijTC6OjUEodkVB1
-	7nL2FE4ym7bVmNk7Lz6fIoEX7R+B9hA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Roman Gushchin <roman.gushchin@linux.dev>
-To: Shakeel Butt <shakeel.butt@linux.dev>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Michal Hocko <mhocko@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	David Rientjes <rientjes@google.com>,
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Meta kernel team <kernel-team@meta.com>, cgroups@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2] memcg: add charging of already allocated slab objects
-Message-ID: <ZtIs5qx0QBB8FqGI@google.com>
-References: <20240827235228.1591842-1-shakeel.butt@linux.dev>
+	bh=n2Y0+NJnv+WDhyHNXgn8lTJmwBV6+uwGK96LUIBqTuA=;
+	b=wHh63gdHZU6K86MkDE0iABYjR4k6JJbBZPw+IgegPBRidBy1ajuGsaYmG62eGxf5dqj1it
+	AGVIMttC5dp3tICM/V1M2VdxEY1lE6Xfk/h1eBIAYkr1gwkR6icuWJuBIxL7K/BCGKyUhu
+	c/HTNG7nH/7q2I2mK7Yyh4p0Qx3UaMgUP+rhSjftmexSxfevNA1we5HPoJ2EINirIeFxLD
+	ux05k5yCzofHelyzo7Iml6Gt9vP9JLD0yr7wQEC6rsnnaHTJcwM0I3StI9BRhywkOu08GQ
+	iwo91e4xxd0Tr8YXpvhwmBUXNlHb9mDwCHu4ynxFNAwT7HlUBAuHFTHL9AUg8Q==
+Message-ID: <b1856b58-f098-433d-b0fd-782b24c44b22@datenfreihafen.org>
+Date: Fri, 30 Aug 2024 22:34:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240827235228.1591842-1-shakeel.butt@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH wpan-next 1/2] mac802154: Correct spelling in mac802154.h
+To: Simon Horman <horms@kernel.org>, Alexander Aring <alex.aring@gmail.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240829-wpan-spell-v1-0-799d840e02c4@kernel.org>
+ <20240829-wpan-spell-v1-1-799d840e02c4@kernel.org>
+Content-Language: en-US
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20240829-wpan-spell-v1-1-799d840e02c4@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 27, 2024 at 04:52:28PM -0700, Shakeel Butt wrote:
-41;2500;0c> At the moment, the slab objects are charged to the memcg at the
-> allocation time. However there are cases where slab objects are
-> allocated at the time where the right target memcg to charge it to is
-> not known. One such case is the network sockets for the incoming
-> connection which are allocated in the softirq context.
-> 
-> Couple hundred thousand connections are very normal on large loaded
-> server and almost all of those sockets underlying those connections get
-> allocated in the softirq context and thus not charged to any memcg.
-> However later at the accept() time we know the right target memcg to
-> charge. Let's add new API to charge already allocated objects, so we can
-> have better accounting of the memory usage.
-> 
-> To measure the performance impact of this change, tcp_crr is used from
-> the neper [1] performance suite. Basically it is a network ping pong
-> test with new connection for each ping pong.
-> 
-> The server and the client are run inside 3 level of cgroup hierarchy
-> using the following commands:
-> 
-> Server:
->  $ tcp_crr -6
-> 
-> Client:
->  $ tcp_crr -6 -c -H ${server_ip}
-> 
-> If the client and server run on different machines with 50 GBPS NIC,
-> there is no visible impact of the change.
-> 
-> For the same machine experiment with v6.11-rc5 as base.
-> 
->           base (throughput)     with-patch
-> tcp_crr   14545 (+- 80)         14463 (+- 56)
-> 
-> It seems like the performance impact is within the noise.
-> 
-> Link: https://github.com/google/neper [1]
-> Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
+Hello Simon,
 
-Reviewed-by: Roman Gushchin <roman.gushchin@linux.dev>
+On 8/29/24 6:10 PM, Simon Horman wrote:
+> Correct spelling in mac802154.h.
+> As reported by codespell.
+> 
+> Signed-off-by: Simon Horman <horms@kernel.org>
+> ---
+>   include/net/mac802154.h | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/net/mac802154.h b/include/net/mac802154.h
+> index 4a3a9de9da73..1b5488fa2ff0 100644
+> --- a/include/net/mac802154.h
+> +++ b/include/net/mac802154.h
+> @@ -140,7 +140,7 @@ enum ieee802154_hw_flags {
+>    *
+>    * xmit_sync:
+>    *	  Handler that 802.15.4 module calls for each transmitted frame.
+> - *	  skb cntains the buffer starting from the IEEE 802.15.4 header.
+> + *	  skb contains the buffer starting from the IEEE 802.15.4 header.
+>    *	  The low-level driver should send the frame based on available
+>    *	  configuration. This is called by a workqueue and useful for
+>    *	  synchronous 802.15.4 drivers.
+> @@ -152,7 +152,7 @@ enum ieee802154_hw_flags {
+>    *
+>    * xmit_async:
+>    *	  Handler that 802.15.4 module calls for each transmitted frame.
+> - *	  skb cntains the buffer starting from the IEEE 802.15.4 header.
+> + *	  skb contains the buffer starting from the IEEE 802.15.4 header.
+>    *	  The low-level driver should send the frame based on available
+>    *	  configuration.
+>    *	  This function should return zero or negative errno.
+> 
 
-Thanks!
+This patch has been applied to the wpan tree and will be
+part of the next pull request to net. Thanks!
+
+regards
+Stefan Schmidt
 
