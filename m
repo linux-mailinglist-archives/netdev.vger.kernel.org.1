@@ -1,88 +1,79 @@
-Return-Path: <netdev+bounces-123750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFBF99666B4
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:19:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3A09666AF
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:18:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43EBE1F21008
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:19:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6099F1C2356F
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:18:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 045011BA863;
-	Fri, 30 Aug 2024 16:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B600A1B5ED1;
+	Fri, 30 Aug 2024 16:18:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WNDhWc51"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b0uGNjvE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22301B5EB7;
-	Fri, 30 Aug 2024 16:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF61A1B3B15
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 16:18:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725034705; cv=none; b=b8eftrLIgqVBJEVIkQQvNGVKWp8OQs3hGj5naS2bqDWtvj4BYb+K6ursjSPKshHqFUVX52QsBN3N/EcEVUzVFjH8HJ41r8RWDbmgb1SxhgGHuGAOWB24oaDTRTM82QZkpfkBafdnbMUAwm4fEE5JOLtFyxNaL/Kvh8WS7P5e/9o=
+	t=1725034702; cv=none; b=YiFT63xyoRQy1boEcKhgmovTIFzjviQw/PbfYvpoeXaABZKEBVpWGm6WaxBlhEVEcGSvUwm1gNoH6cHnoDeMtueyFcIxM6klnJL2+sqKiEGx4MfaCN4Xnev4jX5jya7lCUzeQV6Y1cmdTtDLGocVavYXkBi8yVC2A+AshnN1wWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725034705; c=relaxed/simple;
-	bh=BHdDxWxftTd+NhLkgGG1bavh6T1vX+aER+Sv1ZHn7+o=;
+	s=arc-20240116; t=1725034702; c=relaxed/simple;
+	bh=ST63oNtWEeahws4ZxuLG9rvw0D9cMNAgPwp86IE+CKc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ry8OuxjMXMgvcMMmYsKrZgM+MKeFK4TNRT8pzAodAn1SN783Gx/p+/x1RFUyQiFcmICVj4UWndHK0r9aGgmhPBEtd5xqF2sEexxzs//AaVAf1Z2D7JdZUuXNfRIf4UCRRnoFaADy3hPQrgCcXcxRXWdrCWU0SJsCTFICjuxm3KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WNDhWc51; arc=none smtp.client-ip=192.198.163.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=EmU6iuZRsE3LBh4pNktaEVCojKEbdhQn5p93t06d+0fK/DnPfAUxlmKokSND8qUWzFngfE/kBrr6elw7s/Nh6/BL/ot4AydH5Ri6DTTOt9/yeeYkUsaa+kaJt4gfjuC5/em9hEOz/Hno+M4FThQImrJWY7rjBxoxf8Kf2uWQTq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b0uGNjvE; arc=none smtp.client-ip=198.175.65.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725034702; x=1756570702;
+  t=1725034700; x=1756570700;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=BHdDxWxftTd+NhLkgGG1bavh6T1vX+aER+Sv1ZHn7+o=;
-  b=WNDhWc51ZWymm276jUVZL0RpnJ3Oe+h0uF6Udh6PW+iiFmlJaB7NmU5/
-   g33Bchc/pmYOZcrqHgaMC4dTxXQ1K47lC+37g+1QDXPxzRHH/8QHGq2YG
-   ylnF9NvjYRhGgoYyIDS4cyTKvcGpnK3TOvtEMvJS4npvMKnLbVpulO2mH
-   DX2ZGL4oqbWNklwNnGYUJT4FDUG78htNpFxIzH97NV/lUD7MW1+rHIWHR
-   FhwZbUtltXkFHcSn6jWaR7bCpuJi4fGG1InnNbxjtW6QPVdCzneP7yZa+
-   evB0geGGRz5uThM5sG4jSckPBHbl+fYQISMhRF84Hfjhpf5sveVsea6gw
-   Q==;
-X-CSE-ConnectionGUID: Po13A0ypSA+ziW9fxh9cAA==
-X-CSE-MsgGUID: zrwKsiIuQWevxTJxmDK2Yw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11180"; a="23201135"
+  bh=ST63oNtWEeahws4ZxuLG9rvw0D9cMNAgPwp86IE+CKc=;
+  b=b0uGNjvEpUToWRf713PJUvT6QX+wQHr8UEMxnwKKGFHpdDLTrLHGTrMs
+   LsJy1ZCPxUismTJi05eGwyMTo+HNCNS3UpIi0+P8oWRbxgzpydvZYZQLz
+   gcEjSYrgB6iu0yytng0pCEsO1t4HdLbjlgyKrBnm2kyd58LOdybGFvQlg
+   CNdmG/WOtYLduv3lLZmfROKNfD9eU283NzNlN+7BZiVZx/yuwgFalyjsh
+   UINvpSKGqLrTGlOZPFRGx69V0mOz1CJV1XdDTiTHsfdGu8pF7C9po5qd2
+   trM7h5vLIBQH87wh+UQ4h2FTE+ylapbXmsj4KV1WnRWsXwwmd9ffla4Xs
+   g==;
+X-CSE-ConnectionGUID: cKOWMrCSTpO75rzq5Tjvvg==
+X-CSE-MsgGUID: V5HRRROPTguioHd3y+TTrQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11180"; a="23838210"
 X-IronPort-AV: E=Sophos;i="6.10,189,1719903600"; 
-   d="scan'208";a="23201135"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 09:18:21 -0700
-X-CSE-ConnectionGUID: scwKR1YqSBO+WJXI0k+PTQ==
-X-CSE-MsgGUID: cCC4RtAKQyWaaqCcWzXWWg==
+   d="scan'208";a="23838210"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 09:18:20 -0700
+X-CSE-ConnectionGUID: 0fd0LFhmQR6AJjg59QDGAw==
+X-CSE-MsgGUID: 7HgnHx48TEy6IrrwdgYPpA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,189,1719903600"; 
-   d="scan'208";a="64134779"
+   d="scan'208";a="64445691"
 Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 30 Aug 2024 09:18:17 -0700
+  by orviesa007.jf.intel.com with ESMTP; 30 Aug 2024 09:18:17 -0700
 Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1sk4KF-0001dV-0P;
+	id 1sk4KF-0001dO-0D;
 	Fri, 30 Aug 2024 16:18:15 +0000
 Date: Sat, 31 Aug 2024 00:18:10 +0800
 From: kernel test robot <lkp@intel.com>
-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, edumazet@google.com,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	sdf@fomichev.me, bjorn@rivosinc.com, hch@infradead.org,
-	willy@infradead.org, willemdebruijn.kernel@gmail.com,
-	skhawaja@google.com, kuba@kernel.org,
-	Joe Damato <jdamato@fastly.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/5] net: napi: Make gro_flush_timeout per-NAPI
-Message-ID: <202408310043.fmwHg8BS-lkp@intel.com>
-References: <20240829131214.169977-4-jdamato@fastly.com>
+To: Vadim Fedorenko <vadfed@meta.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Willem de Bruijn <willemb@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] net_tstamp: add SCM_TS_OPT_ID to provide
+ OPT_ID in control message
+Message-ID: <202408310023.xSozGTYj-lkp@intel.com>
+References: <20240829204922.1674865-1-vadfed@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,92 +82,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240829131214.169977-4-jdamato@fastly.com>
+In-Reply-To: <20240829204922.1674865-1-vadfed@meta.com>
 
-Hi Joe,
+Hi Vadim,
 
 kernel test robot noticed the following build errors:
 
 [auto build test ERROR on net-next/main]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Joe-Damato/net-napi-Make-napi_defer_hard_irqs-per-NAPI/20240829-211617
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/selftests-txtimestamp-add-SCM_TS_OPT_ID-test/20240830-045630
 base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240829131214.169977-4-jdamato%40fastly.com
-patch subject: [PATCH net-next 3/5] net: napi: Make gro_flush_timeout per-NAPI
-config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20240831/202408310043.fmwHg8BS-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240831/202408310043.fmwHg8BS-lkp@intel.com/reproduce)
+patch link:    https://lore.kernel.org/r/20240829204922.1674865-1-vadfed%40meta.com
+patch subject: [PATCH net-next 1/2] net_tstamp: add SCM_TS_OPT_ID to provide OPT_ID in control message
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240831/202408310023.xSozGTYj-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240831/202408310023.xSozGTYj-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408310043.fmwHg8BS-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408310023.xSozGTYj-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   In file included from include/linux/minmax.h:5,
-                    from include/linux/jiffies.h:8,
-                    from include/net/pkt_sched.h:5,
-                    from drivers/net/ethernet/intel/idpf/idpf.h:12,
-                    from drivers/net/ethernet/intel/idpf/idpf_dev.c:4:
-   include/linux/build_bug.h:78:41: error: static assertion failed: "offsetof(struct idpf_q_vector, __cacheline_group_end__read_write) - offsetofend(struct idpf_q_vector, __cacheline_group_begin__read_write) == (424 + 2 * sizeof(struct dim))"
-      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
-         |                                         ^~~~~~~~~~~~~~
-   include/linux/build_bug.h:77:34: note: in expansion of macro '__static_assert'
-      77 | #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
-         |                                  ^~~~~~~~~~~~~~~
-   include/net/libeth/cache.h:17:9: note: in expansion of macro 'static_assert'
-      17 |         static_assert(offsetof(type, __cacheline_group_end__##grp) -          \
-         |         ^~~~~~~~~~~~~
-   include/net/libeth/cache.h:62:9: note: in expansion of macro 'libeth_cacheline_group_assert'
-      62 |         libeth_cacheline_group_assert(type, read_write, rw);                  \
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/intel/idpf/idpf_txrx.h:475:1: note: in expansion of macro 'libeth_cacheline_set_assert'
-     475 | libeth_cacheline_set_assert(struct idpf_q_vector, 104,
-         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~
->> include/linux/build_bug.h:78:41: error: static assertion failed: "sizeof(struct idpf_q_vector) == ((((((104)) + ((__typeof__((104)))(((1 << 6))) - 1)) & ~((__typeof__((104)))(((1 << 6))) - 1)) + ((((424 + 2 * sizeof(struct dim))) + ((__typeof__((424 + 2 * sizeof(struct dim))))(((1 << 6))) - 1)) & ~((__typeof__((424 + 2 * sizeof(struct dim))))(((1 << 6))) - 1)) + ((((8 + sizeof(cpumask_var_t))) + ((__typeof__((8 + sizeof(cpumask_var_t))))(((1 << 6))) - 1)) & ~((__typeof__((8 + sizeof(cpumask_var_t))))(((1 << 6))) - 1))))"
-      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
-         |                                         ^~~~~~~~~~~~~~
-   include/linux/build_bug.h:77:34: note: in expansion of macro '__static_assert'
-      77 | #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
-         |                                  ^~~~~~~~~~~~~~~
-   include/net/libeth/cache.h:21:9: note: in expansion of macro 'static_assert'
-      21 |         static_assert(sizeof(type) == (sz))
-         |         ^~~~~~~~~~~~~
-   include/net/libeth/cache.h:48:9: note: in expansion of macro '__libeth_cacheline_struct_assert'
-      48 |         __libeth_cacheline_struct_assert(type, __libeth_cls(__VA_ARGS__));    \
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/net/libeth/cache.h:64:9: note: in expansion of macro 'libeth_cacheline_struct_assert'
-      64 |         libeth_cacheline_struct_assert(type, ro, rw, c)
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/intel/idpf/idpf_txrx.h:475:1: note: in expansion of macro 'libeth_cacheline_set_assert'
-     475 | libeth_cacheline_set_assert(struct idpf_q_vector, 104,
-         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+   net/core/sock.c: In function '__sock_cmsg_send':
+>> net/core/sock.c:2862:14: error: 'SCM_TS_OPT_ID' undeclared (first use in this function); did you mean 'IPCORK_TS_OPT_ID'?
+    2862 |         case SCM_TS_OPT_ID:
+         |              ^~~~~~~~~~~~~
+         |              IPCORK_TS_OPT_ID
+   net/core/sock.c:2862:14: note: each undeclared identifier is reported only once for each function it appears in
 
 
-vim +78 include/linux/build_bug.h
+vim +2862 net/core/sock.c
 
-bc6245e5efd70c Ian Abbott       2017-07-10  60  
-6bab69c65013be Rasmus Villemoes 2019-03-07  61  /**
-6bab69c65013be Rasmus Villemoes 2019-03-07  62   * static_assert - check integer constant expression at build time
-6bab69c65013be Rasmus Villemoes 2019-03-07  63   *
-6bab69c65013be Rasmus Villemoes 2019-03-07  64   * static_assert() is a wrapper for the C11 _Static_assert, with a
-6bab69c65013be Rasmus Villemoes 2019-03-07  65   * little macro magic to make the message optional (defaulting to the
-6bab69c65013be Rasmus Villemoes 2019-03-07  66   * stringification of the tested expression).
-6bab69c65013be Rasmus Villemoes 2019-03-07  67   *
-6bab69c65013be Rasmus Villemoes 2019-03-07  68   * Contrary to BUILD_BUG_ON(), static_assert() can be used at global
-6bab69c65013be Rasmus Villemoes 2019-03-07  69   * scope, but requires the expression to be an integer constant
-6bab69c65013be Rasmus Villemoes 2019-03-07  70   * expression (i.e., it is not enough that __builtin_constant_p() is
-6bab69c65013be Rasmus Villemoes 2019-03-07  71   * true for expr).
-6bab69c65013be Rasmus Villemoes 2019-03-07  72   *
-6bab69c65013be Rasmus Villemoes 2019-03-07  73   * Also note that BUILD_BUG_ON() fails the build if the condition is
-6bab69c65013be Rasmus Villemoes 2019-03-07  74   * true, while static_assert() fails the build if the expression is
-6bab69c65013be Rasmus Villemoes 2019-03-07  75   * false.
-6bab69c65013be Rasmus Villemoes 2019-03-07  76   */
-6bab69c65013be Rasmus Villemoes 2019-03-07  77  #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
-6bab69c65013be Rasmus Villemoes 2019-03-07 @78  #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
-6bab69c65013be Rasmus Villemoes 2019-03-07  79  
-07a368b3f55a79 Maxim Levitsky   2022-10-25  80  
+  2828	
+  2829	int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+  2830			     struct sockcm_cookie *sockc)
+  2831	{
+  2832		u32 tsflags;
+  2833	
+  2834		switch (cmsg->cmsg_type) {
+  2835		case SO_MARK:
+  2836			if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
+  2837			    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
+  2838				return -EPERM;
+  2839			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
+  2840				return -EINVAL;
+  2841			sockc->mark = *(u32 *)CMSG_DATA(cmsg);
+  2842			break;
+  2843		case SO_TIMESTAMPING_OLD:
+  2844		case SO_TIMESTAMPING_NEW:
+  2845			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
+  2846				return -EINVAL;
+  2847	
+  2848			tsflags = *(u32 *)CMSG_DATA(cmsg);
+  2849			if (tsflags & ~SOF_TIMESTAMPING_TX_RECORD_MASK)
+  2850				return -EINVAL;
+  2851	
+  2852			sockc->tsflags &= ~SOF_TIMESTAMPING_TX_RECORD_MASK;
+  2853			sockc->tsflags |= tsflags;
+  2854			break;
+  2855		case SCM_TXTIME:
+  2856			if (!sock_flag(sk, SOCK_TXTIME))
+  2857				return -EINVAL;
+  2858			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u64)))
+  2859				return -EINVAL;
+  2860			sockc->transmit_time = get_unaligned((u64 *)CMSG_DATA(cmsg));
+  2861			break;
+> 2862		case SCM_TS_OPT_ID:
+  2863			/* allow this option for UDP sockets only */
+  2864			if (!sk_is_udp(sk))
+  2865				return -EINVAL;
+  2866			tsflags = READ_ONCE(sk->sk_tsflags);
+  2867			if (!(tsflags & SOF_TIMESTAMPING_OPT_ID))
+  2868				return -EINVAL;
+  2869			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
+  2870				return -EINVAL;
+  2871			sockc->ts_opt_id = *(u32 *)CMSG_DATA(cmsg);
+  2872			sockc->tsflags |= SOF_TIMESTAMPING_OPT_ID_CMSG;
+  2873			break;
+  2874		/* SCM_RIGHTS and SCM_CREDENTIALS are semantically in SOL_UNIX. */
+  2875		case SCM_RIGHTS:
+  2876		case SCM_CREDENTIALS:
+  2877			break;
+  2878		default:
+  2879			return -EINVAL;
+  2880		}
+  2881		return 0;
+  2882	}
+  2883	EXPORT_SYMBOL(__sock_cmsg_send);
+  2884	
 
 -- 
 0-DAY CI Kernel Test Service
