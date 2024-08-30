@@ -1,153 +1,176 @@
-Return-Path: <netdev+bounces-123591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 924E096570E
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 07:41:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA04896573F
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 08:01:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 198CB1F21B9A
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 05:41:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66C7B2869AD
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 06:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D4D1509AB;
-	Fri, 30 Aug 2024 05:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139B9136E3F;
+	Fri, 30 Aug 2024 06:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mzuDB1rY"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LFK3FZFY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A671509BF
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 05:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F52014F9C7
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 06:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724996494; cv=none; b=hETFyju+FWrMVdcRV7FjOLVPqIRvNvsbi2Oe2xcFJBnHjsU6Zv0EjAhXbGLcTe5TnF39vaZoLaaq1MogCXqtT/XiHb8Bm0He6BsFbsy0QbPwjJZtyruRYFW+189NpOp17nes0d3Up5tdlWd0wdKdrU+JTW6yE5dHBfPOuMa2Wig=
+	t=1724997697; cv=none; b=G4U5XVvnP1x44knfpsD+j8P+6L3dQC5WviVxN1YxbacdTxeaCEYIbrBgfej4LUFnBNn4+KfwHf2yqOQZaCfd435NeOGKCZSu9glOV2Qn6CyuUh7SWzk0pB6yQSk+6nUC0hs3QkhhlqTpPp4PI262YGHpgRq6GyG7M5JAcMk/fr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724996494; c=relaxed/simple;
-	bh=sw/z0V7t62DQd/qzCRru7G5IMJTzCRndRN+lm9ctM2E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YTw1SbxnhZ9r68Ju+h5fI/5H/buoGTLGzq7l3E643lDkkKpSh6SKkoHIypj9BS0RgxaNsYmiwAylQ4koQTYGKn5RArPhgggiB64jNnVh5xFGwPy6TuyF3EJPGDKHevrjr29Izv4RzmrdEa26cS6S7QNkjpfW5FI/jgU3MOkir+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mzuDB1rY; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4567fe32141so217301cf.0
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 22:41:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1724996491; x=1725601291; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fGeAe2VvLt867O6PJvkuLBlyvjINITixvnm768ff9FY=;
-        b=mzuDB1rYWDyPjZzvdX79WUt2S6rBiqFOtJAmdGK5qkwibD266jlpF2ukdux+pwTHrA
-         igSeLo8xdS6RHMHxckeZBY5j+BECFTrueAM8NoF+fNX1bCJewdx4eLfcL3g5Sv7EFINz
-         29Cy7yftlxEReyl7svsdeDc2jqhndKdN0qlPa5y35yDmdKDafvURbkhfFsFDn+/SCCuI
-         yK1/578XwWSP4rBkeZBZt7q2MRBtYIrxc+y23/CMbJYRhR/z/7h6KtAuBWUqay4Q/G4/
-         bFfuYvt5W8KIHEFweRFzxO9BinqJ8XTLALfFCAHLd36EMJ2I6pS0HZHyQVv79YIohtA8
-         kCoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724996491; x=1725601291;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fGeAe2VvLt867O6PJvkuLBlyvjINITixvnm768ff9FY=;
-        b=lg6XyRJgwZkTw0lKeft0jAuo94ApxMRchOC9w3f6UZaBRsCeCdbXblitPrC/ShDrg9
-         iSZL4lKgIkvfwrJhZZqWY6S5Uzk319ZMvDDTj90zL0klsUzDGmliaqNOph/YblxGTufi
-         XKlALmR2zQYLXDGjQXb7CmRo1HLC8l66DN6eyXEfivRgGj3uOqTom2z69HpfjxULc91k
-         KniPCSbnOkaWSOoe+gU4LVDo3yJdkQoAdX5cQByQDISqmcN1zbjWjU6oAg1Z1wYKvI53
-         5E9Y4zoZAo1QWG3uf/T7zPlQadySYjf88Yb5/5YY6fb7uIXH6ri2dbM+GAh9FVxq0qOx
-         NqOA==
-X-Forwarded-Encrypted: i=1; AJvYcCV5rn4JjYbx4hq9eBg39J0S+6wSaGl+Kv0skM6WkIzdnEcWsvngZpUdQvaPSU0kPLTXAtbB1sI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFPW0F9eRIPnNYILYdOPbjqrRbmBKh3STL9ptPq61x9OaFU9Jb
-	oIbbERUbTA/0i+95RVvS8PynTIAncoVSN4zNyOOsFeramlFQzVE4DRwVnA42az0sXKXv3o1u4Ct
-	uyl8SbgvXxECaTeVgkIzasGyZBlcDgzSaSOqX
-X-Google-Smtp-Source: AGHT+IFJ5dSdgHloFb1Pn4hIJolGDXJPa0ot44BqfHuQJyxrQVYkduwL7EuLxMx9wUjPI6We8cpcbnMVMN++0hRnKxw=
-X-Received: by 2002:a05:622a:1a9a:b0:453:56e7:c62b with SMTP id
- d75a77b69052e-4568a9fb7edmr1721641cf.12.1724996491072; Thu, 29 Aug 2024
- 22:41:31 -0700 (PDT)
+	s=arc-20240116; t=1724997697; c=relaxed/simple;
+	bh=BpQ2H6xunbxWBzaZitOZ/jyxktxvtM3fzotgLnGFOy0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MZ6yJKrJawGD8jCuQ8OM658S78FQqnNVRsrFRZhq2n0ZK6yBoHpdUWXk5RlEiwj3iIm2wmwY8q+vMSg9JQNnSUaqEqZqPYFd5e4XN2McLFulSWkdL0SdoNzX1K407Tr5t8b4B5QopRX2HZguAXDGr/fiXtvaIp+NdJagUqkfIfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LFK3FZFY; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47U5FaZX030410;
+	Thu, 29 Aug 2024 23:01:06 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pfpt0220; bh=b68NH+AyL/ppVi+dSLAub4/Ns
+	4kz7gjNc/Se3wFmmYo=; b=LFK3FZFYUZPCXNm+QvnpgeTchtPXy0XK8zaaYijYz
+	geXRgyMgU8o27qxLQGMIytQFsFefo5qiMFOPgrAxe9Aw0YgnxtRMlPngwaPqoYr1
+	xn8v1NNtXQ7sQc9UguhdixStTU5bW8l3GtcRqr7xqQGtG4fN2nJEwwWgZsgAxot3
+	tWULm8zlmD4AjDJMGwUreRP/L82TrMZeZT2+wY3zEZ9HsRZxUtNcYeQ3RQ4eV1/u
+	+Iy18f3oo6MU7D+dY7x7H7mZJMmgGuGzUYNsjGpUiKMrgIbTuEZcoSohmZewNSm3
+	Jt8IR2IMqB7Qw3GFKhz7XtRiKCKGlbQr4lXsmwQ3K+BuQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 41b1b3sewa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Aug 2024 23:01:05 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 29 Aug 2024 23:01:04 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 29 Aug 2024 23:01:04 -0700
+Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
+	by maili.marvell.com (Postfix) with SMTP id 3CD213F7085;
+	Thu, 29 Aug 2024 23:00:46 -0700 (PDT)
+Date: Fri, 30 Aug 2024 11:30:46 +0530
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: Gal Pressman <gal@nvidia.com>
+CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        <netdev@vger.kernel.org>, Jay Vosburgh <jv@jvosburgh.net>,
+        Andy Gospodarek
+	<andy@greyhouse.net>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Vincent Mailhol
+	<mailhol.vincent@wanadoo.fr>,
+        Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+        Sudarsana Kalluru <skalluru@marvell.com>,
+        Manish Chopra
+	<manishc@marvell.com>,
+        Michael Chan <michael.chan@broadcom.com>,
+        Pavan Chebbi
+	<pavan.chebbi@broadcom.com>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+        Sunil Goutham
+	<sgoutham@marvell.com>,
+        Potnuri Bharat Teja <bharat@chelsio.com>,
+        Christian
+ Benvenuti <benve@cisco.com>,
+        Satish Kharat <satishkh@cisco.com>,
+        Claudiu
+ Manoil <claudiu.manoil@nxp.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
+        Shenwei Wang <shenwei.wang@nxp.com>,
+        Clark Wang
+	<xiaoning.wang@nxp.com>,
+        Dimitris Michailidis <dmichail@fungible.com>,
+        Yisen
+ Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Jijie
+ Shao <shaojijie@huawei.com>,
+        Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Marcin Wojtas
+	<marcin.s.wojtas@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Geetha
+ sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>,
+        Ido Schimmel
+	<idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+        Bryan Whitehead
+	<bryan.whitehead@microchip.com>,
+        <UNGLinuxDriver@microchip.com>,
+        Horatiu
+ Vultur <horatiu.vultur@microchip.com>,
+        Lars Povlsen
+	<lars.povlsen@microchip.com>,
+        Steen Hegelund <Steen.Hegelund@microchip.com>,
+        Daniel Machon <daniel.machon@microchip.com>,
+        Alexandre Belloni
+	<alexandre.belloni@bootlin.com>,
+        Shannon Nelson <shannon.nelson@amd.com>,
+        Brett Creeley <brett.creeley@amd.com>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Niklas
+ =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
+        Edward Cree
+	<ecree.xilinx@gmail.com>,
+        Martin Habets <habetsm.xilinx@gmail.com>,
+        Alexandre
+ Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu <joabreu@synopsys.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Siddharth Vadapalli
+	<s-vadapalli@ti.com>,
+        Roger Quadros <rogerq@kernel.org>,
+        MD Danish Anwar
+	<danishanwar@ti.com>,
+        Linus Walleij <linusw@kernel.org>, Imre Kaloz
+	<kaloz@openwrt.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>,
+        Carolina Jubran
+	<cjubran@nvidia.com>,
+        Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: Re: [PATCH net-next 2/2] net: Remove setting of RX software
+ timestamp from drivers
+Message-ID: <ZtFgDohEl82O9u3K@test-OptiPlex-Tower-Plus-7010>
+References: <20240829144253.122215-1-gal@nvidia.com>
+ <20240829144253.122215-3-gal@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240829060126.2792671-1-almasrymina@google.com>
- <20240829060126.2792671-4-almasrymina@google.com> <20240829140824.555d016c@kernel.org>
- <e6df00ec-2c52-489e-a510-b69db7e9dbf9@linux.dev>
-In-Reply-To: <e6df00ec-2c52-489e-a510-b69db7e9dbf9@linux.dev>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 29 Aug 2024 22:41:17 -0700
-Message-ID: <CAHS8izOy26r0uoWdASgmBCENNS6cDjHpkp+AHhOaKVkZR1LZqQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v23 03/13] netdev: support binding dma-buf to netdevice
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
-	Daniel Vetter <daniel.vetter@ffwll.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240829144253.122215-3-gal@nvidia.com>
+X-Proofpoint-GUID: FVHN10tJUMOQb4M4Fgt7EAeZNsr_VJPD
+X-Proofpoint-ORIG-GUID: FVHN10tJUMOQb4M4Fgt7EAeZNsr_VJPD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-30_02,2024-08-29_02,2024-05-17_01
 
-On Thu, Aug 29, 2024 at 2:24=E2=80=AFPM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
->
-> On 29/08/2024 22:08, Jakub Kicinski wrote:
-> > On Thu, 29 Aug 2024 06:01:16 +0000 Mina Almasry wrote:
-> >> +    err =3D genlmsg_reply(rsp, info);
-> >> +    if (err)
-> >> +            goto err_unbind;
-> >> +
-> >>      return 0;
-> >> +
-> >> +err_unbind:
-> >
-> > rtnl_lock()
->
-> There are 2 places with goto err_unbind, and one is under the lock,
-> additional label (or rearrange of the last check) is needed..
->
+On 2024-08-29 at 20:12:53, Gal Pressman (gal@nvidia.com) wrote:
+> The responsibility for reporting of RX software timestamp has moved to
+> the core layer (see __ethtool_get_ts_info()), remove usage from the
+> device drivers.
+> 
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> ---
 
-Thank you, I think the right fix here is to reacquire rtnl_lock before
-the `goto err_unbind;`, since err_unbind expects rtnl to be locked at
-this point.
+for drivers/net/ethernet/marvell/octeontx2/
 
-This could introduce a weird edge case where we drop rtnl_lock, then
-find out genlmsg_reply failed, then reacquire rtnl_lock to do the
-cleanup. I can't think of anything that would horribly break if we do
-that, but I may be missing something. In theory we could race with a
-dmabuf unbind call happening in parallel.
-
-If we can't reacquire rtnl_lock to do the cleanup, I think I need to
-revert back to doing genlmsg_reply inside of rtnl_lock, and dropping
-the lock before we return from the function.
-
---=20
-Thanks,
-Mina
+Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
 
