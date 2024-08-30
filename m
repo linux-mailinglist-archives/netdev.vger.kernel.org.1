@@ -1,273 +1,194 @@
-Return-Path: <netdev+bounces-123686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8283966206
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 14:51:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B57A966217
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 14:55:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0871B20BB1
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 12:51:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 803A81C231A5
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 12:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA40719993B;
-	Fri, 30 Aug 2024 12:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3AB19ABA3;
+	Fri, 30 Aug 2024 12:55:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="B7TjDHQW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U4JUjpCf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 405B2179652;
-	Fri, 30 Aug 2024 12:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725022279; cv=fail; b=gVr04Z1pM44+iPvIOQUop68NecPDlQhP1cnr4vLdMiyuV+f7TkWl43qkRaE+G/UVUKSlGoWf3dkRVVBrxDVnvS5qgXgtXSxqKpKTpvuftIJ0+oKyuaqAzWvfxgqPHHgIZMqXQ35PcBNIehqjjkp1cjVF4aDlVQFOhrdYqRFZCsA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725022279; c=relaxed/simple;
-	bh=F7JcJnR12M20bgKiRFfoDQYAAz6N5bQv7o77S5UDK1M=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=nXMxQzNFNbVYA0b3zt3I0IB/0cek06ql4BKENbnMBJQOs1GgPJk1F+4OUkCMUI+gKVDn16OGywXtpiPOez+XT8HG1NNNoSjGLK4IgEmZD45hw7L3QgsTkLMx8toTp+Jeq1SlnrXoqksDh996gSjZ3nBrrJ0dXJ4lQAJGkwvgmso=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=B7TjDHQW; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725022278; x=1756558278;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=F7JcJnR12M20bgKiRFfoDQYAAz6N5bQv7o77S5UDK1M=;
-  b=B7TjDHQWvCRLCGfJeHE3c6aCAvLM/SYHAtL6YFqtsORQCPqq9TUQ3Oyq
-   /HDTSPa5Z5bIdpMcwuNF+2YS4ra+haZL6GTQ3I6govI9yY6By5ExBWn3J
-   jOM18z5Y5su/K44l9cqyoBiP8RlhxvQ7nk+rYdKHzoyEAfOOtiwwDZRHM
-   BTYEf5PwAHQT/ABe+3D+TV7lIBM+nojjFdcTzkTeTgWgzlgDgqja/yvoe
-   nF4Iy5GU8KEze1EivO8F1+j1Q52OwZujUMhSwwdLok2Ih4fuYiPG0JLj8
-   eDuK2Shr3033jnoxFlSn6xHC3JJqhn1DzAKiODYQeeBrEbG6YlRbfJ9Sd
-   g==;
-X-CSE-ConnectionGUID: uWxxn1UsQ26C5X0wZPLTeQ==
-X-CSE-MsgGUID: E2ddRfa4SVSn9J1PtLrDbw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11179"; a="41161187"
-X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="41161187"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 05:51:17 -0700
-X-CSE-ConnectionGUID: MkmlSKS9QxSRRUsx7yb4fA==
-X-CSE-MsgGUID: 9uarp9QkQD6A/RMkWhwYgg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,188,1719903600"; 
-   d="scan'208";a="68293915"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Aug 2024 05:51:17 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 30 Aug 2024 05:51:16 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 30 Aug 2024 05:51:16 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.49) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 30 Aug 2024 05:51:16 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Z9LJUZMS/eQFv12dCtwc9UafeSCsEDfTirWQDwOFy2UfM5h1UeDBtGokpwVb6bcoYNkL5SkfCOWih3ajx5rizXsvjo8Oel5XMTY+TFpuXQ3jxlIFiZjdv14Ulr1UNTPMB0sOI0HyYOaFftBCexaYCMAzq/Ya0chhGNLPMXsQYtTiHZtEBi0ZdzC/nybhMI31nHhuoaA5XjEKkgacI/uBcv9Z9C6+Dzf/eBZSv9gTnMxjELTY8sHTc7RacKLynCv+Sxn6wzyhGM6G5k6pW/+vkjNAnQMoMY0PPJwvBexigKfONvRCT39y8tT4yKy+ZLqGDObGKNO4rP8z7d+WrZvWPw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=liRSmD3flD75EBBoS3ykuPqDeDqB1bY2lJN5G4Byoi0=;
- b=JVz7SAZWbNP0A+VTunm0zByogu1/IC13hGvjnOjyjzMPgDm+Ax6DkgUK/oCjFMwB95spkEigX+BfNvxd8DuvPgIt4zLYTSL9QqVaHUE4C8rSgqg1QcFs3zatuDEXFW0MJ4oSL8PXq9YI7ZjWTN8vXJVjLjBJAcaPHf3JW8hv0QAKr+Cslay+OlPSMfIOCbIzRGuXjhLbcS1620rHNkMXr6oL0DOd0h5PFE6CO5UMXMxbLfrWmDKvDNK1iJMYvT2/UGAXKmjZjT83uh7ddZlFuYws7Th/viZUHYk7K2FXKjUZyGUHOovHSAAWXH3ICT+nAu1TxgEWy4rLAiFixIOn9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by PH8PR11MB6801.namprd11.prod.outlook.com (2603:10b6:510:1c9::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.20; Fri, 30 Aug
- 2024 12:51:13 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%5]) with mapi id 15.20.7875.019; Fri, 30 Aug 2024
- 12:51:13 +0000
-Message-ID: <e0effc27-f16b-4449-9661-76f0fc330aa9@intel.com>
-Date: Fri, 30 Aug 2024 14:50:44 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] can: kvaser_usb: Simplify with dev_err_probe()
-To: Yan Zhen <yanzhen@vivo.com>
-CC: <mkl@pengutronix.de>, <mailhol.vincent@wanadoo.fr>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<linux-can@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <opensource.kernel@vivo.com>
-References: <20240830110651.519119-1-yanzhen@vivo.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240830110651.519119-1-yanzhen@vivo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR2P278CA0087.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:65::12) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C9E17BB0C
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 12:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725022549; cv=none; b=leYSekaoJfRsuWS83FwJWrLoYuUx5tpuxpMjaGHpMNy8zrYukemQaj1w4YcCDwWkcLUu9RruEgf2uc0rmdLMKDvTa0Z3kkS7d12I926aiXTLM5/FTKTaqUDQXht6yOge3X6Ito1b1ZuHmax1vaIeOjh+LdUQ0cXVJibZBvIAw5A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725022549; c=relaxed/simple;
+	bh=irInylxAEO/g9EEQKtW8LWQ6H19qdYnMKqIM2kBnrlI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NKHAj0Slp1FWbwviSCf4s1sWJeXPzd32o+0Y6Laf3r1a3PeKSedI8ujqdIteGmcu6g4MXz336dVwOYt1C0rZG4XSspy5nj6QCLS8wypvSxEusAbfKrm+gFMNOoYsDVn9cxthsOmmRYybCrhkd98ewR9VDMkNg9uRxWyBZhpXKvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U4JUjpCf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725022546;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C4rwbSvsPY1zfudmMK7sUCyGMbzPRJgaFLcgZLVvf1s=;
+	b=U4JUjpCfMyn3ZQ0BZ4id3b88AUF1VT4Vz2s2SdwIyfPAVTQRjxfEVAhewbvORpDD7ROBrK
+	0S1EJPWOOGmfaAVwzW7xqt1Wccc3LRU95eazvqCbem4VVz2F0TVibgn3RZ1l5zArCIUHW1
+	6/CJxJzbrjlJhzviVwzzNCqK1Efyi3U=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-684-vp1ioZWLPyWr1izhW1o83w-1; Fri, 30 Aug 2024 08:55:45 -0400
+X-MC-Unique: vp1ioZWLPyWr1izhW1o83w-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2f3f82f55feso18960141fa.0
+        for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 05:55:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725022544; x=1725627344;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C4rwbSvsPY1zfudmMK7sUCyGMbzPRJgaFLcgZLVvf1s=;
+        b=SIbqUxAdxL1ULOnTniogR09bNp+Gn7kGuxXUBnOrrsY46KkexnfvUb9ov5Vk4wrGsd
+         KX36xdXWC5lwQgwIs2qQOoj3w0sUQEa9VsnybWCLMWuzBCGYMk7SWmkJhWJS+4SHhk8H
+         pkDuckfKvMmZJWoYQom20AU5aE2IflU+1tseOjRzVBf06bJPsoe1lTeUsW+7iWrSxnJq
+         BvP1Qwjxc8vP1OR4YSJ4eluQB5gjCzdbtpCezxfpMfp3WcJhTPhDtI/xeX9zaRxBk3YX
+         bNOSz3PmRMBfMv8+xGWQfO6mzf0s6ztWUHrAQ9II+CHjKKF8WhrvglfIA4XbWi/Qy9yZ
+         sgOg==
+X-Forwarded-Encrypted: i=1; AJvYcCXlA1wct4z/OuBPAX6SkdPdJDDxC+Rwkv0q3PtyBoKy+woROLPxaaDJprKLeWGWiCVbgEvq9Gs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwaYYIwS0OYkBjRz3KsdDynZp5pWN5lkVk/gK4oV8j+NQUJr33l
+	SX6SS8ji+yGt7x2aOM5z3rBY+ZqdaeoDJyDBgTDfCLybQZrXT4XtuWTvHZ5xtRtquJAzvvV6hOX
+	Ow711dtiBdfGc7lJlb+Uney5AGV3j5kB0ujbh/zKZXusUrwgzw6I8foNhHztAW0BHBpB212ucc1
+	ZDCYzEpNzjnJ+yDhYZC1fC0gdbjKwu
+X-Received: by 2002:a2e:b88b:0:b0:2f4:1d7:e286 with SMTP id 38308e7fff4ca-2f61e0adffdmr7465351fa.18.1725022543579;
+        Fri, 30 Aug 2024 05:55:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHFsPt6iJVHKK5Qe3E63G1+0fcVq/myUtd8Ucirw56OZNhL5CDzG8T2QsadK401r4Oy8yyJ1qR5wybXoJiHALQ=
+X-Received: by 2002:a2e:b88b:0:b0:2f4:1d7:e286 with SMTP id
+ 38308e7fff4ca-2f61e0adffdmr7465161fa.18.1725022543034; Fri, 30 Aug 2024
+ 05:55:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|PH8PR11MB6801:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1626d63f-3691-4fdd-332e-08dcc8f26e02
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?djdublZMN1lVZnpGdnZkVEdIQW1oZUFSQzRtQ1N4clZyeUtDdkpUSDArTkl0?=
- =?utf-8?B?TFcwMEZSRE1NVWJXcm9Ka2trdXRxRzhCWnJaakVBaUhraGdvRi9Gazg1Rit5?=
- =?utf-8?B?Zk4wVld5OHZwK055K2dUNk1uUUdaQkIvQW1VbndRaDdzMXNDUkVIa1JRb3pK?=
- =?utf-8?B?YUdTVVJkYnJBdStpTXdKLzJwWTgyTzhJUVhydUVadG5tZkpQb085UGUxNVUx?=
- =?utf-8?B?eVM2VFZqaXFzemg3UDQ0V3lHVncwbWhUQjdIQ3J3SjVNS2IycFAySGdHQXlS?=
- =?utf-8?B?bURobTZwMm54U2t0c3dHbmFVbHIwM0NYb2RmK1Bmazc0NmlmNExEUjU3WEdN?=
- =?utf-8?B?WmNsS3IzMFl6VVJCbW1KL1hMMTJWcktOcHV5UFZYeUZ3TmZMTHZpajE1MHgw?=
- =?utf-8?B?VWl1Tmt4UEFnZXB1N2tyK3VoQWNKSW5uUk1Tc1VGYS8vRHE2NVNWYmRxcldH?=
- =?utf-8?B?QXJJK2EyZFRBaGJFVDA4RGhtYkZrZVQxd2VpL09BdVdvNkoycjVoc3U4Qnlx?=
- =?utf-8?B?ci9KcHRGNGpjV2VvdzNyWW1PY2w3RHBsUHBLdWJreEVkYStkQ0JqY2tFYXNL?=
- =?utf-8?B?YjgzRm9maFJ1WWpPblJveHl4ZkhpZFpTd01NZVc2TGJ4bmdwR1FveWxFenRT?=
- =?utf-8?B?eWtIQWlWa3l1RW5oWXMxTitqT08yckR5R1VUWmYzemxDUDRYbWxGVU96Slla?=
- =?utf-8?B?T2VtNUhsM2pDLzhMU1FueWR6N0Z4UjQ5bXNrelFnYW5UTjF3QTNHZDF2TTRh?=
- =?utf-8?B?bzVUWGF0TmJxdVpRbjZVRXRaMTl4UnZ1UGhEYWxwN0tPMjl6ckpLSVhoYkFh?=
- =?utf-8?B?VzBwWCsxVFpUZTJsaFZmRjEwZW15QXRIaTVPcFJVUWxQOWkxUkZqSEx2REFo?=
- =?utf-8?B?WkpzUENDRVhIZ1E2MjByLzJqaWZpaGNQbHcwYldBOEl5dytyVXNxcDd4S3RC?=
- =?utf-8?B?VE9YeXhuc3Zid1BXdFgzMXBLcjh5RDdGaUV1ZlBGeEdEUGdjcXNHMXpHRWpj?=
- =?utf-8?B?dmNTcmlhbDVHVkRaR1lmQldiUks0MFVGM1VpVzBnTHg2WitEaU9jankrZ3c2?=
- =?utf-8?B?c2N5WUpsNXNnSENKWUl0cFpDUG9jb2JEc0xERDVhYS90dmN1c3pGTDBHeUZm?=
- =?utf-8?B?UEVxbkNOb1dkQVdGNWlOWktaNDhSeFhjMVlmYXV6dVk3Szh0MTkzQlVIOVZD?=
- =?utf-8?B?ZnpRTXBoQTNJbTgyQ1VCdHphUTRYVXJialBVZGduazBlbVc4N1o5K00rREsy?=
- =?utf-8?B?VW5IaGJndWFyZTZHWCtxUFh4c2NsaTdxQnl1d0lVb2UyYmJZSENhQ3pFdGph?=
- =?utf-8?B?T3FRcWZlZytIaHFUNnFNYXVuaXd1c21XSExGQUgrc1c0dWtuN05NWGhPRDVa?=
- =?utf-8?B?RXl5ODZxLzJJT2MxdFhTZjJPYlhwdkl3L1BNL2R1MWJXQnlUNFN4VnRMRUxV?=
- =?utf-8?B?V2ZIM2ZUK25pVUFRN1d4aVFwRW84TEZ3MVNuVUU5Z1RRWlJQNWJnM1RXQVZ4?=
- =?utf-8?B?OEowVkZqM015TTR4bU5YR0RRL2VySlhMek4rWW9FVmszcExXNmloK0pHc0RS?=
- =?utf-8?B?VU9jSzlMSGdLSjJETy9RZGVEdFBldW1TalhnVUF3OGxST3JZcjZXYXJKeGxJ?=
- =?utf-8?B?V1p0ODRaKzYyd1FqZ2l5Y1BGZ0ZyQUtPa2Nnc1FiOHkvTHFZOENsNkNMc0Ew?=
- =?utf-8?B?OGxiaHhXUElZVnhtSlQzRW5NLy83b0ZmVkR1RTI4cDlERGJBaVJkVDJ4NnFw?=
- =?utf-8?B?RGRLaXg2NUVIRnpzRW5QcjkvdEZPczA1VVUvTFEwNnh2RkZwbkYvejFBVlRQ?=
- =?utf-8?B?TmtBRWpQc1ovU2NJbitQQT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c0t4NXFmSm52dzNubDNva3pCaFNnWUtoRlBQWWN6UW5yK2ZINmxESG50Z1RI?=
- =?utf-8?B?Ky9FUjZCVTVWb1B5bjJwd2UvYzdDcE85dDFtUUhIZHdWcVJsZHVjWjZUcWcx?=
- =?utf-8?B?Kyt6WGE2V2RlTDhRMTQ3eU5wYWJHc05KUnBnNGZSV3JLalBHUGtmQTZVMFZi?=
- =?utf-8?B?UFpmS29QajJnQ25GaC95K2RGV05wZkVMV096dWVkbzcwVXlaWXpVWkduQWJM?=
- =?utf-8?B?dHo3d0JwWGU0UW9mV244SWIwQStUSkx6Mi90Mk4xOXFWNFlxVFprRDBleSs5?=
- =?utf-8?B?ajN6TnNMY3lNemU4c01oV3MxamwxbElzOTdEaWhwV29IRHRtYSs1NFJUU2s2?=
- =?utf-8?B?NUpwbW9Ed09uSDNuVzRLV1B0YjFmd2Njek1kZ0ZjY1VhMStOVnFvcG1RMERL?=
- =?utf-8?B?bVB2bEdMamR3OW1JVUxYNlBkciszNjQ4QlVRV1hGM0VTMjZGUlhJRlFIcG9U?=
- =?utf-8?B?NTZaQmFvaG9PMThaTFdFdTlQZWw5MXVIUHk5TFBkdTczSGVrOWFVMkVxOE9K?=
- =?utf-8?B?Y2YwQ0k2YU16L2gyTlg0ZzBYSTJDSVdDMVN1T3VjaWp3U2lOb1p0d1BmelFt?=
- =?utf-8?B?NFR6UXM3OFhUdjlCZTR6RnNCWmIvSkcwVW1hTkFWTmRxSVpPTGVpMXZHcXlq?=
- =?utf-8?B?YVVIdy9LeUZhNU9aWU8rSzlNRGVBNks5RDBCRGIrTHplYTI4MDlsZ1lFa3Rs?=
- =?utf-8?B?OTNLNmNDd2s5VWtpanVWN3BjamhOdk56VlZsalVaTUhTLzZvU01JZnN4ZW5s?=
- =?utf-8?B?c0dRb1pBRzIvZEhRWHl6cUhBY01kM1MwemFKTllQWmd2NTljSysvQWFnT1Ns?=
- =?utf-8?B?NUlmTjBLL3I5bzl6TC9RY0k3aGN3enRqdFUyMDlkUDdobnd1UVhQc3VvTmxR?=
- =?utf-8?B?U0U3cDZDZzA2SXRNZ2h0WTZoRzRQbkNIQkdXRE5vRU9wSXBlcHpyamZqY3la?=
- =?utf-8?B?eGNidUVEbVlDMkpNenN4WVpvS05WQzYzNzBMZWRISm9lTUdLc29zWEY5M2s2?=
- =?utf-8?B?bHBFZjVrOGs3N1hkVlF5b1BCbFd0U0FodnU2am96VDJNUHJXZm1jWjdhMENG?=
- =?utf-8?B?a2hOTnVSQXlSbStoQlVWZFJ6ZWRnRUZsRnp3anZtclVnVW9SaXVydFZRaWJB?=
- =?utf-8?B?NFMwRmpnbmcyVTl2a2JlZjdzallEckU5VFU5ZWd3ZG1pMk5zT1V1N0VwbjVK?=
- =?utf-8?B?RmRBQ25idkF1SEVUbVlDbUZ5ZXBZVFU5ZFVGZjlscEdTdXhKcUo0UHJDQVF5?=
- =?utf-8?B?WWU2MkJXeXh0bkxIcEdVMkFvNmRGdXJDMUZTejZSdlhvY1ltcWh2YmVwclBC?=
- =?utf-8?B?VThkRjc4d3R2U0V6MlBJNytUN2NaVHhDTkdpOXplcG41ZFpiaTNOWjN3dkNI?=
- =?utf-8?B?TWhjT3d4U3RBSGY1aUcxMG9FOHcyclVwU1d6OEd1b01qTmdaL1VDZ052bnFj?=
- =?utf-8?B?V2UvQzg0d3VWZ3JwejhJVG1mUDNUQmprRE02TkM3MldwSTBSSmI0SG9tMEtM?=
- =?utf-8?B?L21hZjIxM1g2eUZ6Si9uSGc4YTBLa3dsa1FXQTFDejMxQjZ5QnhHRlFqSmdi?=
- =?utf-8?B?UlpqVkFIdHg1WjJxOFFzSzI2UWo4L2NnRC83N3IyTVErZVQvdTg5YlN3MllE?=
- =?utf-8?B?Zmx1ZVpOTktJekV6ZlcvcDRRUFhaOTVYaEFKT3pDTEpVTFE4VnAvaEUzcnhr?=
- =?utf-8?B?cTlJai9HdDRKcHhpWjg2bWE2UkpTdzllMng0SEVpL3VnNzNwYlh5cncya1Jq?=
- =?utf-8?B?dHJUdFcybGlFTEkzNXhUZHRraVNESGRFYnRFUXptLzIybzVkZVZCTnJaTGFH?=
- =?utf-8?B?bUY1eXVtQU1JcDdBck9HYjd5SjZqY1loMUdRT05yUTcwR1Q2bFB2cFlIcit2?=
- =?utf-8?B?S2t5NC9XUDMzalk5ay9OOU1IMERWNGpSL2tZSEsrUi9oNmY0Y2NrcW1WREZQ?=
- =?utf-8?B?WW9YVk91ZDFsakYyV1dQM05jaFRhM1Q2WjR3QnlzOFI4QVMvaFRJeklqdCtD?=
- =?utf-8?B?ZmJObkdyTVkrU2ZSRkxaSDlVUW9Id0RlUGJRRXFyVkFDZkl1VkYya2RRT1NS?=
- =?utf-8?B?OHJVOHFYWlJRamEyM3NnK3VQTUtvZzdnLytYSlFRY3IzeStET0pzSE1UOG83?=
- =?utf-8?B?MEI5UjBTcmRNaHUxZE1HdTNBUGxnQ3p3Smh5TDEra1NKRGh6cTRQd1ZJNDgy?=
- =?utf-8?B?eEE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1626d63f-3691-4fdd-332e-08dcc8f26e02
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2024 12:51:13.5834
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 95QWwMKi9g0rHRYgyLormpoWRcrbuWK8uPAqUXoNFdASh8uM8GIyy/dfqRCu0z58jLEqNU4405Is8V6olioEF5v9bwpeFlOOnlnWAb7mf0A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6801
-X-OriginatorOrg: intel.com
+References: <20240827180236.316946-1-aahringo@redhat.com> <20240827180236.316946-8-aahringo@redhat.com>
+In-Reply-To: <20240827180236.316946-8-aahringo@redhat.com>
+From: Alexander Aring <aahringo@redhat.com>
+Date: Fri, 30 Aug 2024 08:55:31 -0400
+Message-ID: <CAK-6q+iedvC_b3_dO+7C6S15y2o9uuqwDaNJ=a0wZE3hW=+G1g@mail.gmail.com>
+Subject: Re: [RFC 7/7] rv: add dlm compatible lock state kernel verifier
+To: teigland@redhat.com
+Cc: gfs2@lists.linux.dev, song@kernel.org, yukuai3@huawei.com, 
+	agruenba@redhat.com, mark@fasheh.com, jlbec@evilplan.org, 
+	joseph.qi@linux.alibaba.com, gregkh@linuxfoundation.org, rafael@kernel.org, 
+	akpm@linux-foundation.org, linux-kernel@vger.kernel.org, 
+	linux-raid@vger.kernel.org, ocfs2-devel@lists.linux.dev, 
+	netdev@vger.kernel.org, vvidic@valentin-vidic.from.hr, heming.zhao@suse.com, 
+	lucien.xin@gmail.com, paulmck@kernel.org, rcu@vger.kernel.org, 
+	juri.lelli@redhat.com, williams@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Yan Zhen <yanzhen@vivo.com>
-Date: Fri, 30 Aug 2024 19:06:51 +0800
+Hi,
 
-> dev_err_probe() is used to log an error message during the probe process 
-> of a device. 
-> 
-> It can simplify the error path and unify a message template.
-> 
-> Using this helper is totally fine even if err is known to never
-> be -EPROBE_DEFER.
-> 
-> The benefit compared to a normal dev_err() is the standardized format
-> of the error code, it being emitted symbolically and the fact that
-> the error code is returned which allows more compact error paths.
-> 
-> Signed-off-by: Yan Zhen <yanzhen@vivo.com>
-> ---
->  .../net/can/usb/kvaser_usb/kvaser_usb_core.c  | 42 +++++++------------
->  1 file changed, 16 insertions(+), 26 deletions(-)
-> 
-> diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c b/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-> index 35b4132b0639..bcf8d870af17 100644
-> --- a/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-> +++ b/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
-> @@ -898,10 +898,8 @@ static int kvaser_usb_probe(struct usb_interface *intf,
->  	ops = driver_info->ops;
->  
->  	err = ops->dev_setup_endpoints(dev);
-> -	if (err) {
-> -		dev_err(&intf->dev, "Cannot get usb endpoint(s)");
-> -		return err;
-> -	}
-> +	if (err)
-> +		return dev_err_probe(&intf->dev, err, "Cannot get usb endpoint(s)");
->  
->  	dev->udev = interface_to_usbdev(intf);
->  
-> @@ -912,26 +910,20 @@ static int kvaser_usb_probe(struct usb_interface *intf,
->  	dev->card_data.ctrlmode_supported = 0;
->  	dev->card_data.capabilities = 0;
->  	err = ops->dev_init_card(dev);
-> -	if (err) {
-> -		dev_err(&intf->dev,
-> -			"Failed to initialize card, error %d\n", err);
-> -		return err;
-> -	}
-> +	if (err)
-> +		return dev_err_probe(&intf->dev, err,
-> +					"Failed to initialize card\n");
+On Tue, Aug 27, 2024 at 2:03=E2=80=AFPM Alexander Aring <aahringo@redhat.co=
+m> wrote:
+...
+> +       set_holder_state(lk, our_nodeid, mode);
+> +       rv =3D check_valid_lock_holders(lk, mode, our_nodeid);
+> +       if (rv) {
+> +               /* the whole validation process, this event signals
+> +                * everything is fine and DLM works correctly there
+> +                * are no cluster-wide locks that violates DLM locking.
+> +                */
+> +               da_handle_event_dlm(lk, with_others_compatible_dlm);
+> +       } else {
+> +               /* print all holders of the lock when a invalid lock stat=
+e is entered */
+> +               console_lock();
 
-The line wrap is wrong in all the places where you used it. It should be
-aligned to the opening brace, like
+I can't hold this lock in some contexts the ast callback can be called from=
+.
+I will drop this lock as I don't care.
 
-		return dev_err_probe(&intf->dev, err,
-				     "Failed ...)
+It would be nice to use this msg callback from the refactor but then I
+somehow need to pass the lk pointer to it.
 
-Replace one tab with 5 spaces to fix that, here and in the whole patch.
+This however works for me that I know at least which nodes/modes are
+incompatible if it hits.
 
->  
->  	err = ops->dev_get_software_info(dev);
-> -	if (err) {
-> -		dev_err(&intf->dev,
-> -			"Cannot get software info, error %d\n", err);
-> -		return err;
+> +               pr_info("---\n");
+> +               pr_info("ls_id %u lkb_id: 0x%08x\n", ls_id, lkb_id);
+> +               pr_info("holders:\n");
+> +               list_for_each_entry(hl, &lk->holders, list) {
+> +                       pr_info("\tnodeid: %u mode: %d\n", hl->nodeid,
+> +                               hl->mode);
+> +               }
+> +               pr_info("---\n");
+> +               console_unlock();
+> +
+> +               /* move into an invalid state change, we don't have a edg=
+e for that
+> +                * so we just use event_max_dlm.
+> +                */
+> +               da_handle_event_dlm(lk, event_max_dlm);
+> +       }
+> +       spin_unlock_bh(&dlm_rv_hash_lock);
+> +}
+> +
+> +/* set the holder to transition state as lock downgrades can issue
+> + * grant messages to other nodes we need to ignore if a lock on a
+> + * specific node is in state transition. From point of DLM API
+> + * the user cannot assume to still hold the lock at this point
+> + * anyway.
+> + */
+> +static void set_holder_transition(uint32_t ls_id, const char *res_name,
+> +                                 size_t res_length, uint32_t our_nodeid)
+> +{
+> +       struct dlm_rv_holder *hl;
+> +       struct dlm_rv_lock *lk;
+> +
+> +       spin_lock_bh(&dlm_rv_hash_lock);
+> +       lk =3D lookup_lock(ls_id, res_name, res_length);
+> +       if (lk) {
+> +               hl =3D lookup_holder(lk, our_nodeid);
+> +               if (hl)
+> +                       hl->mode =3D STATE_MODE_IN_TRANSITION;
+> +       }
+> +       spin_unlock_bh(&dlm_rv_hash_lock);
+> +}
+> +
+> +/* after a lock request got validated it cannot fail */
+> +static void handle_dlm_lock_validated(void *data, struct dlm_ls *ls,
+> +                                     struct dlm_lkb *lkb,
+> +                                     struct dlm_args *args,
+> +                                     const char *res_name, size_t res_le=
+ngth)
+> +{
+> +       set_holder_transition(ls->ls_global_id, res_name,
+> +                             res_length, ls->ls_dn->our_node->id);
+> +}
+> +
+> +static void handle_dlm_unlock_validated(void *data, struct dlm_ls *ls,
+> +                                       struct dlm_lkb *lkb,
+> +                                       struct dlm_args *args)
+> +{
 
-Thanks,
-Olek
+we need to ignore unlock(CANCEL) requests.
+
+> +       set_holder_transition(ls->ls_global_id,
+> +                             lkb->lkb_resource->res_name,
+> +                             lkb->lkb_resource->res_length,
+> +                             ls->ls_dn->our_node->id);
+> +}
+> +
+
+- Alex
+
 
