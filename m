@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-123716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB68696642D
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:27:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8AD4966437
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:31:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDDD11C231B8
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 14:27:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EAF51F2144C
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 14:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC9E1B1D7F;
-	Fri, 30 Aug 2024 14:27:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1650199936;
+	Fri, 30 Aug 2024 14:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BWvuF5yB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hQA8E9Xt"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A3A1AF4F8;
-	Fri, 30 Aug 2024 14:27:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5F11384B3
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 14:30:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725028068; cv=none; b=mkPA2HQAXtzbe6DShvFREhxqGpYuR88BILU1JxEmAXJHTPjNipS2ECbb6IdeklWF9PV0eNK/Xnx/DQdyxAlRyo7Vbpaq3plvD0LHF0qQQrUkAW7xlJdXfHfkjoDWkKGbLOBoJkK5kegLsmAWxI334ozq9aAuRQ5ZC9GTcORhpcA=
+	t=1725028255; cv=none; b=LzRwR2iw0m33UbGurnmbnweFJiU4tr/MTnROlD1jlSpBYkSmWqS6DIc3LifdXjGyga4+Jj/AANneAqHqlWCpXb3l/J8MwV6mFI4GIl//fRVaFAu/sZfGnEJyVzIndAxKdONyRpAB1Hsd8qrGrEO3bPkaOGTf+z42f8nH3XTYOaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725028068; c=relaxed/simple;
-	bh=lMuPFjipSF7b7/aDSYFHL7JFVCKIe9MJPgiPZ8lExcY=;
+	s=arc-20240116; t=1725028255; c=relaxed/simple;
+	bh=idrgXe3QeU8ZzGhjb/wDX2ZjXquoMenEVaZWHPbg9b0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SlKor5qCdrx+tGFOzUgkvKGbK/py0ExIqess6FrwvyqqwTSdDc8xU/INAKJ1/ZOUlk9Cxr17cMzM18oAs3pmTJWVUEnAUPF8TqmkRjOgf7ZTGjm8Vb4l6aMgHJrsrju+S311mU+xwZJpfH2PNszXf0uFMkvqpmv6o9TlIcOqp0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BWvuF5yB; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=isACkxKl1VC/LLRXrffN4FhZBqDf6axelFFY8TBD0os=; b=BWvuF5yBoeK/xIXS5MLi+4YLlM
-	3UMSgQOoUnsxC3v08nnbtcz/AgX8LBIqjGwd2sWBbzEQAOAH7va7gXzETnh47oejHzJOaH9MP9aR+
-	1sTEcAT/+FclY2dP47w2aUGvpWGhJKKaGwA3mceak3uUEZ5lq2CJshzBYSC7+WuYfndc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sk2b3-0068Ss-QN; Fri, 30 Aug 2024 16:27:29 +0200
-Date: Fri, 30 Aug 2024 16:27:29 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	f.fainelli@gmail.com, ansuelsmth@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4] net: phy: Fix missing of_node_put() for leds
-Message-ID: <6655eddc-d203-4430-a938-f4f710220b9b@lunn.ch>
-References: <20240830022025.610844-1-ruanjinjie@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=icqYgfJEXRHncBcQ/F0xdWYMPpxOweHDMhx1QbmnZlPHJMJL3hGVID4beNjyM+C5RfqJY61nvi3mi6X19ILvPw0cFz7OVRXL4Wqs5QNYobIchHVG4Iekj8s/CCBZl0Z35HFmCMCCoeY+EL+7c2ILuaTQQuWvtHttqlbYL8Dsoi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hQA8E9Xt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C605EC4CEC5;
+	Fri, 30 Aug 2024 14:30:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725028255;
+	bh=idrgXe3QeU8ZzGhjb/wDX2ZjXquoMenEVaZWHPbg9b0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hQA8E9XtzLbuqVtlX1HYr6YL/7V7h6YwRWDNOl/fi3NgtrOyovhzvYn4asizTXUW2
+	 c0JOkXyP5WmgcXbye3FZzjFVF2dm4VxgcPG4jYD+oNQntkwzA2iKLMoHRTrHpQNMgD
+	 YdvMdyRJPLEmtDiGl8KFgyi3Dm6+Hx3sxx9fOqOAKtJvxCZciWslIY65Rh+kAlLhQE
+	 D5XczvJCy114489qSH/MtKR8b8+M15bedbqguXXsdlAGFZRPmOkoE8DxUH/QnKgIuZ
+	 Zn+T0LtQ/EvH3Lu9Tk0j5mjbPbYn/k1D7N5xfgWbLRPTbnsAe9uYzxCsCqRxxW4Xil
+	 cIcersgYc44ZA==
+Date: Fri, 30 Aug 2024 17:30:51 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Feng Wang <wangfe@google.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
+	antony.antony@secunet.com
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+Message-ID: <20240830143051.GA4000@unreal>
+References: <20240822200252.472298-1-wangfe@google.com>
+ <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
+ <20240828112619.GA8373@unreal>
+ <CADsK2K-mnrz8TV-8-BvBU0U9DDzJhZF2GGM22vgA6GMpvK556w@mail.gmail.com>
+ <20240829103846.GE26654@unreal>
+ <CADsK2K8KqJThB3pkz7oAZT_4yXgy8v89TK83W50KaR-VSSKjOg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,24 +62,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240830022025.610844-1-ruanjinjie@huawei.com>
+In-Reply-To: <CADsK2K8KqJThB3pkz7oAZT_4yXgy8v89TK83W50KaR-VSSKjOg@mail.gmail.com>
 
-On Fri, Aug 30, 2024 at 10:20:25AM +0800, Jinjie Ruan wrote:
-> The call of of_get_child_by_name() will cause refcount incremented
-> for leds, if it succeeds, it should call of_node_put() to decrease
-> it, fix it.
+On Thu, Aug 29, 2024 at 02:19:25PM -0700, Feng Wang wrote:
+> Hi Leon,
 > 
-> Fixes: 01e5b728e9e4 ("net: phy: Add a binding for PHY LEDs")
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+> Thank you again for your thoughtful questions and comments. I'd like
+> to provide further clarification and address your points:
+> 
+> SA Information Usage:
+> 
+> There are several instances in the kernel code where it's used, such
+> as in esp4(6)_offload.c and xfrm.c. This clearly demonstrates how SA
+> information is used. Moreover, passing this information to the driver
+> shouldn't negatively impact those drivers that don't require it.
+> Regarding a driver example, the function mlx5e_ipsec_feature_check
+> caught my attention.
+> https://elixir.bootlin.com/linux/v6.10/source/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec_rxtx.h#L89)
+> As you're more familiar with this codebase, I defer to your expertise
+> on whether it's an appropriate sample. 
 
-To be 100% correct, it should have a CC: stable@vger.kernel.org
+This function is not involved when packet is going to be offloaded for "IPsec packet offload".
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#stable-tree
+> However, the crucial point is that including this information empowers certain drivers to leverage
+> it without affecting those that don't need it.
 
-But it will probably be O.K. with it missing.
+Can you please provide a list of drivers that will benefit from this change?
+Can you give a complete flow (including driver) which didn't work before
+and will work after this change?
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> 
+> validate_xmit_xfrm Function:
+> My primary goal in discussing the validate_xmit_xfrm function is to
+> assure you that my patch maintains the existing packet offload code
+> flow, avoiding any unintended disruption.
 
-    Andrew
+The whole idea of packet offload is to skip everything in XFRM stack and
+present packet as plain text.
+
+> 
+> State Release:
+> I've noticed that secpath_reset() is called before xfrm_output(). The
+> sequence seems to be: xfrmi_xmit2 -> xfrmi_scrub_packet ->
+> secpath_reset(), followed by xfrmi_xmit2 calling dst_output, which is
+> essentially xfrm_output().
+> I'm also open to moving the xfrm_state_hold(x) after the if (!xo)
+> check block. This would ensure the state is held only when everything
+> is ok. I'll gladly make this adjustment if you believe it's the better
+> option.
+> 
+> Thank you once again for your valuable insights and collaboration.
+> Your feedback is greatly appreciated!
+> 
+> Feng
+> 
 
