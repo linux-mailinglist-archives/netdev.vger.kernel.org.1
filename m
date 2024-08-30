@@ -1,255 +1,93 @@
-Return-Path: <netdev+bounces-123911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 140B2966CEE
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 01:35:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D242C966CF8
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 01:43:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 884CA1F23D7D
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 23:35:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 110D61C2169B
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 23:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2CB418DF9B;
-	Fri, 30 Aug 2024 23:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9C9190073;
+	Fri, 30 Aug 2024 23:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gSWt9G2w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jzJxGk5E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B4817D344
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 23:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A76D190056
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 23:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725060937; cv=none; b=mRFyFS/FCsAae2OAyYjUNmWn4EWHKrt6SziCfkB7DWpU4z32Rjhmwd94ZlkDkluaw7vYU9IznkleaXgT0R+y/sA/v2u1QoPl55ysIIR3JvvkKUlmYo2NoQadGXb/Kl5LiWAtYI/nkOa2zWOpN6dDEFCOVMwHhcF4o6PlW2NjfXg=
+	t=1725061368; cv=none; b=KjdlBidLBXFYhgRfkTXodn1bFscfGQmuhOLGuBo27boNPI4QLz9Xoo5Z+oIISLNocyTSL5qlu9v7q4VigzM5VIlhjVDi+iyltTFkT+WzKLpHVicWuBlDZDFEzm28524MnSfH2hwXIzaZUEOVwuygKJPbD6H0W1mGu4FEC0Ac6OI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725060937; c=relaxed/simple;
-	bh=LQQNZA2lQEoRi9GKKSvucUr0JF3ARJYIkZ4ezaTKJvo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sNH2PS09Gbl257IqkaPwMBUHscIqyOUg7x77ybIkALqqIjPiBOPbEvnonSXKUBkZ/k2s7AfxaL02ORa3pC2y6pCNlqkTo0dVW/FdurZig7kpSGGkPxAZipU1TGKLpQcdEiOduDd1pNjHuxmCvzKH6H8BO6Y7xTVT9mZ3DMimXGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gSWt9G2w; arc=none smtp.client-ip=209.85.215.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7cf5e179b68so1568542a12.1
-        for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 16:35:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1725060935; x=1725665735; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IGZJFABiiwQ/JcxTEIMxL9o5eO7pEFGecgwfYFoEAXo=;
-        b=gSWt9G2wjAgZ3eQ2eeljuCOT8KL8FvDMW50RDgoVVN3O2NZACd7Iqicb74p5S0mriK
-         TiHUPgUIEWPGlpcMIcPB+C2AeMiMx22Sc6SG2QSMSh1mEfXaSajxGL1/zRGW5IHmPWuT
-         f2GDrHkZZTDTXdnzh6/Oi0m8mAnmWihFEi4tk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725060935; x=1725665735;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IGZJFABiiwQ/JcxTEIMxL9o5eO7pEFGecgwfYFoEAXo=;
-        b=Mva82tPKqttxD2C0glRM7lKovdzbI8wMYopMMcsazL0cQgsuAFHuYXRuEXG61onQXB
-         9irIu35wfh/QoOS5x52UOV3ICyGgnLilJqCm09xUdrizFLd3CkkPk81Rqfavb19idZ+j
-         2qGaNxmWd4Nl2q1MyytXRPoMae3RVXNyAv1cYX2m2zZ/DESjTX/7ef2ElQOrvAzXaf5V
-         o7Hz26ZNLdpIbMmkMC0vnfiRq3/8v/HVa6W+vqRBOVXkutLn/fahDPGn4HBTy2IaiHCv
-         c6gXigTLqfeivKf5itaYYRk2+xrvhLSESK5TSq8nTaK9L8EbFEur//0AZ/h8jmQDcnmL
-         eWrA==
-X-Gm-Message-State: AOJu0YyiYQUQVN2Egu7tejyB44rvCQSqXL2LQd90IW75R7JpCGsu9eio
-	PgjMcVZYfOtuSVgfJBHlrh5Jg1oSseWBUG3UHKdUFk2Jn35zPCZEGcHoG4J0Aj7LxwAUNTsAIDU
-	3NiKDtkcuCpngThZthyDSdzFnbyosAFueG96t
-X-Google-Smtp-Source: AGHT+IFO2EmUFEtOMUYJcEffOgckKQVp9+l73ByoEm+F4H4tX/gdEvT2YlZRRuejeicxCLqYfNh//ZKxuQ+5NID+Eao=
-X-Received: by 2002:a17:90a:e16:b0:2d8:3f7a:edf2 with SMTP id
- 98e67ed59e1d1-2d856b047f7mr11126610a91.12.1725060935251; Fri, 30 Aug 2024
- 16:35:35 -0700 (PDT)
+	s=arc-20240116; t=1725061368; c=relaxed/simple;
+	bh=gdoQctlXEsRYR0UYWAtrxA9rkf2AKKcV7usYOpNoZW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=to2EknEhTBcqGFraUVKvVTWCgIu3zF/m3oagUwALWOXmvDjq6g6CuT6egZ1gQRnPsf46dAnaK0XelkDbR6fp/K817f7KAU3usZUinKoH/+F+tAC6/Fu46nEWRjQWTbx7q2OUYhqyfH+fnw5E7C6f3bvP6wNyKAsCug7AxOuBMrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jzJxGk5E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A9E9C4CEC7;
+	Fri, 30 Aug 2024 23:42:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725061367;
+	bh=gdoQctlXEsRYR0UYWAtrxA9rkf2AKKcV7usYOpNoZW8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jzJxGk5EgXVF/4YzZAbWkp4cI8uutZDyvdWX3VinL6NCtYZII/+/tmshm+Mp4Ns4w
+	 Y2TYqer6ie2duPaH+IINwnFKXqjB6AYa+areqb4Y3QnNvO1NC5kyYX0xcmi/+J3XMj
+	 LG87KQW33qnBCaU3ewnxPuEQtCkUR9nJmzOas/9KFj3O9m8PKgLNmAtPxXMWCSsa5W
+	 c/LBl/4XTjkXmJ73ub6WA2B7qvf5747M55Bsqwt0fiEyr+ouEjA7WalkBcub4gZogf
+	 ifmmm3UYfNL/ABuzFs2XImOMSY3G+I/exPDUthmBzlNl1OH8GYJLdLaBaecnjSiKuj
+	 A4G9DhHuyf79Q==
+Date: Fri, 30 Aug 2024 16:42:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
+ <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ intel-wired-lan@lists.osuosl.org, edumazet@google.com
+Subject: Re: [PATCH v5 net-next 02/12] net-shapers: implement NL get
+ operation
+Message-ID: <20240830164246.73649979@kernel.org>
+In-Reply-To: <20240830113900.4c5c9b2a@kernel.org>
+References: <cover.1724944116.git.pabeni@redhat.com>
+	<53077d35a1183d5c1110076a07d73940bb2a55f3.1724944117.git.pabeni@redhat.com>
+	<20240829182019.105962f6@kernel.org>
+	<57ef8eb8-9534-4061-ba6c-4dadaf790c45@redhat.com>
+	<20240830113900.4c5c9b2a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240814221818.2612484-1-jitendra.vegiraju@broadcom.com>
- <20240814221818.2612484-4-jitendra.vegiraju@broadcom.com> <vxpwwstbvbruaafcatq5zyi257hf25x5levct3y7s7ympcsqvh@b6wmfkd4cxfy>
- <CAMdnO-LDw0OZRfBWmh_4AEYuwbq6dmnh=W3PZwRe1766Ys2huA@mail.gmail.com> <li75hdp527xa3k23za3mfnwgwdcs7j324mlqj3qcxto6t5f6mw@yvhnpxlvlt5c>
-In-Reply-To: <li75hdp527xa3k23za3mfnwgwdcs7j324mlqj3qcxto6t5f6mw@yvhnpxlvlt5c>
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Fri, 30 Aug 2024 16:35:22 -0700
-Message-ID: <CAMdnO-K8CPMihDwJnzy1KcTXNT51FGeTAYRQFHMdG6fG45wR-g@mail.gmail.com>
-Subject: Re: [net-next v4 3/5] net: stmmac: Integrate dw25gmac into stmmac
- hwif handling
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
-	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, rmk+kernel@armlinux.org.uk, 
-	ahalaney@redhat.com, xiaolei.wang@windriver.com, rohan.g.thomas@intel.com, 
-	Jianheng.Zhang@synopsys.com, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
-	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 29, 2024 at 3:52=E2=80=AFAM Serge Semin <fancer.lancer@gmail.co=
-m> wrote:
->
-> Hi Jitendra
->
-> On Mon, Aug 26, 2024 at 11:53:13AM -0700, Jitendra Vegiraju wrote:
-> > Hi Serge(y)
-> > Thank you for reviewing the patch.
-> >
-> > On Fri, Aug 23, 2024 at 6:49=E2=80=AFAM Serge Semin <fancer.lancer@gmai=
-l.com> wrote:
-> > >
-> > > Hi Jitendra
-> > >
-> > > On Wed, Aug 14, 2024 at 03:18:16PM -0700, jitendra.vegiraju@broadcom.=
-com wrote:
-> > > > From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-> > > >
-> > > > Integrate dw25gmac support into stmmac hardware interface handling.
-> > > > Added a new entry to the stmmac_hw table in hwif.c.
-> > > > Define new macros DW25GMAC_CORE_4_00 and DW25GMAC_ID to identify 25=
-GMAC
-> > > > device.
-> > > > Since BCM8958x is an early adaptor device, the synopsis_id reported=
- in HW
-> > > > is 0x32 and device_id is DWXGMAC_ID. Provide override support by de=
-fining
-> > > > synopsys_dev_id member in struct stmmac_priv so that driver specifi=
-c setup
-> > > > functions can override the hardware reported values.
-> > > >
-> > > > Signed-off-by: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-> > > > ---
-> > > > +     }, {
-> > > > +             .gmac =3D false,
-> > > > +             .gmac4 =3D false,
-> > > > +             .xgmac =3D true,
-> > > > +             .min_id =3D DW25GMAC_CORE_4_00,
-> > > > +             .dev_id =3D DW25GMAC_ID,
-> > > > +             .regs =3D {
-> > > > +                     .ptp_off =3D PTP_XGMAC_OFFSET,
-> > > > +                     .mmc_off =3D MMC_XGMAC_OFFSET,
-> > > > +                     .est_off =3D EST_XGMAC_OFFSET,
-> > > > +             },
-> > > > +             .desc =3D &dwxgmac210_desc_ops,
-> > > > +             .dma =3D &dw25gmac400_dma_ops,
-> > > > +             .mac =3D &dwxgmac210_ops,
-> > > > +             .hwtimestamp =3D &stmmac_ptp,
-> > > > +             .mode =3D NULL,
-> > > > +             .tc =3D &dwmac510_tc_ops,
-> > > > +             .mmc =3D &dwxgmac_mmc_ops,
-> > > > +             .est =3D &dwmac510_est_ops,
-> > > > +             .setup =3D dwxgmac2_setup,
-> > > > +             .quirks =3D NULL,
-> > > >       },
-> > >
-> > > This can be replaced with just:
-> > >
-> > > +       }, {
-> > > +               .gmac =3D false,
-> > > +               .gmac4 =3D false,
-> > > +               .xgmac =3D true,
-> > > +               .min_id =3D DW25GMAC_CORE_4_00,
-> > > +               .dev_id =3D DWXGMAC_ID, /* Early DW 25GMAC IP-core ha=
-d XGMAC ID */
-> > > +               .regs =3D {
-> > > +                       .ptp_off =3D PTP_XGMAC_OFFSET,
-> > > +                       .mmc_off =3D MMC_XGMAC_OFFSET,
-> > > +                       .est_off =3D EST_XGMAC_OFFSET,
-> > > +               },
-> > > +               .desc =3D &dwxgmac210_desc_ops,
-> > > +               .dma =3D &dw25gmac400_dma_ops,
-> > > +               .mac =3D &dwxgmac210_ops,
-> > > +               .hwtimestamp =3D &stmmac_ptp,
-> > > +               .mode =3D NULL,
-> > > +               .tc =3D &dwmac510_tc_ops,
-> > > +               .mmc =3D &dwxgmac_mmc_ops,
-> > > +               .est =3D &dwmac510_est_ops,
-> > > +               .setup =3D dw25gmac_setup,
-> > > +               .quirks =3D NULL,
-> > >         }
-> > >
-> > > and you won't need to pre-define the setup() method in the
-> > > glue driver. Instead you can define a new dw25xgmac_setup() method in
-> > > the dwxgmac2_core.c as it's done for the DW XGMAC/LXGMAC IP-cores.
-> > >
-> > > Note if your device is capable to work with up to 10Gbps speed, then
-> > > just set the plat_stmmacenet_data::max_speed field to SPEED_10000.
-> > > Alternatively if you really need to specify the exact MAC
-> > > capabilities, then you can implement what Russell suggested here
-> > > sometime ago:
-> > > https://lore.kernel.org/netdev/Zf3ifH%2FCjyHtmXE3@shell.armlinux.org.=
-uk/
-> > >
-> > I like your suggestion to add one stmmac_hw[] array entry (entry_a) for=
- this
-> > "early release" DW25GMAC IP and another entry (entry_b) for final DW25M=
-AC
-> > IP, in the process eliminate the need for a new member variable in stru=
-ct
-> > stmmac_priv.
-> >
->
-> > However, I would like to bring to your attention that this device requi=
-res
-> > special handling for both synopsys_id and dev_id.
-> > This device is reporting 0x32 for synopsys_id and 0x76(XGMAC) for dev_i=
-d.
-> > The final 25GMAC spec will have 0x40 for synopsys_id and 0x55(25GMAC) f=
-or
-> > dev_id.
->
-> For some reason I was thinking that your device had only the device ID
-> pre-defined with the XGMAC value meanwhile the Synopsys ID was 0x40.
-> Indeed you get to override both of these data in the platform-specific
-> setup() method.
->
-> >
-> > So, in order to avoid falsely qualifying other XGMAC devices with
-> > synopsis_id >=3D0x32 as DW25GMAC, I am thinking we will have to overwri=
-te the
-> > synopsys_id to 0x40 (DW25GMAC_CORE_4_00) in glue driver using existing
-> > glue driver override mechanism.
-> >
-> > We can implement dw25gmac_setup() in dwxgmac2_core.c for generic 25GMAC
-> > case. But, this glue driver will have to rely on its own setup function
-> > to override the synopsys_id as DW25GMAC_CORE_4_00.
-> >
-> > Do you think it looks reasonable?
->
-> What I was trying to avoid was the setup() method re-definition just
-> for the sake of the IP-core version override. Because if not for that
-> you could have created and used the generic DW 25GMAC dw25gmac_setup()
-> function.
->
-> One of the possible solutions I was thinking was to introduce the
-> plat_stmmacenet_data::{snps_id,dev_id} fields and use their values in
-> the stmmac_hwif_init() procedure instead of the data read from the
-> MAC.VERSION CSR.
->
-Hi Serge(y),
-Thanks for the suggestions, I will implement this option since the
-code change is mostly local.
-We will have to add following check in hwif.c
-@@ -313,7 +313,10 @@ int stmmac_hwif_init(struct stmmac_priv *priv)
-        u32 id, dev_id =3D 0;
-        int i, ret;
+On Fri, 30 Aug 2024 11:39:00 -0700 Jakub Kicinski wrote:
+> > There is a misunderstanding. This helper will be used in a following 
+> > patch (7/12) with a different 'type' argument: 
+> > NET_SHAPER_A_BINDING_IFINDEX. I've put a note in the commit message, but 
+> > was unintentionally dropped in one of the recent refactors. I'll add 
+> > that note back.  
+> 
+> What I'm saying is that if you want to prep the ground for more
+> "binding" types you should also add:
+> 
+> 	if (type != ...IFINDEX) {
+> 		/* other binding types are TBD */
+> 		return -EINVAL;
+> 	}
 
--       if (needs_gmac) {
-+       if (priv->plat->snps_id && priv->plat->snps_dev_id) {
-+               id =3D priv->plat->snps_id;
-+               dev_id =3D priv->plat->snps_dev_id;
-+       } else if (needs_gmac) {
-                id =3D stmmac_get_id(priv, GMAC_VERSION);
+Ah, the part I missed is that there are two different types for ifindex:
 
-> Another solution could be to add the plat_stmmacenet_data::has_25gmac
-> field and fix the generic driver code to using it where it's relevant.
-> Then you won't need to think about what actual Synopsys ID/Device ID
-> since it would mean a whole new IP-core.
->
-> -Serge(y)
->
+NET_SHAPER_A_IFINDEX
+NET_SHAPER_A_CAPABILITIES_IFINDEX
+
+Got it now.
 
