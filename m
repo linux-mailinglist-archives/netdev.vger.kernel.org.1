@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-123576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E729C965584
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 05:06:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1E8E96557F
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 05:06:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4048285BC4
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 03:06:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BA471F23A2C
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 03:06:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E3913A243;
-	Fri, 30 Aug 2024 03:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 048FE7404E;
+	Fri, 30 Aug 2024 03:06:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526F9137764
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 03:06:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542BD82481
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 03:06:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724987167; cv=none; b=IzcyfAACDaCu5QVF17qbgQV9C7azETSLF6ghu3wF6kQVTbe6BoLTSeHYO0M5+U2W+xtOBUXKCF2tjx0lrZxkZ1G2sPp4m/xZDKQDzX7xK4sHQuTC7JZyCzoQUK1lspoThaY2ewogLVpy9DbfE4OKUYLbwPW93p/qNSK4kM5nG3U=
+	t=1724987164; cv=none; b=kI0gxYZvmRU56DaftBMWbaCwREmmvrRGWX6uoSriyD50jCT6y/SLDkDwGcV7AVcS8MHNvkFKvR8OHFVNXp0ywSTh6A/9zX8OA00kuCdB2yGC4STVuUei7PFIqMCrJofZJLr9h1aBk6kAkZ46MBpcCvPytLb0tvMpusitaWkokxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724987167; c=relaxed/simple;
-	bh=n78vuofp2s4tJftkXQbkxBEeD7/tE4CjgAxg/Q3G2YU=;
+	s=arc-20240116; t=1724987164; c=relaxed/simple;
+	bh=hKTkaTpoW9gqK66C5RMJYDBgnFgkrwlHKbYwRuYMtvE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wv1Z1ZYaevtau2iqevwvUbI27B0cJyHeSfTqwiBk0rR7/F1uLKUWuPcHxFV5ATcdER5B6/jiFxH62XhLNAV7EKJS9WClYMhIiktn27+VK4gKyGIYhwlEv2v2W2OBnyhbBgSGRcOMFGwOHT7SV4ssESFvRQywA9BMQyN8fucGaBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	 MIME-Version:Content-Type; b=IrX3l2NELbiXKEN80z34VHzpsbHf0otRIZ+gEsz6Ydy+wy5yEqLLy4hFXkCdYtMCu2D5pQ3dyyNBGCCErTjVr2FKvvMQ5/8aFsv+fjMmus3X/WCo6s/oE0xaW8p9r+M3TG/tn1E5MG7Zmb8GakMmuXCmL5DyG1ccAa3oPbpNk38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Ww2zF2RbPzLqyD;
-	Fri, 30 Aug 2024 11:03:37 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Ww2xn28S8z1HHvL;
+	Fri, 30 Aug 2024 11:02:21 +0800 (CST)
 Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0827E1401F3;
+	by mail.maildlp.com (Postfix) with ESMTPS id DFC821A016C;
 	Fri, 30 Aug 2024 11:05:42 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
  (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 30 Aug
- 2024 11:05:40 +0800
+ 2024 11:05:41 +0800
 From: Jinjie Ruan <ruanjinjie@huawei.com>
 To: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
 	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
@@ -53,9 +53,9 @@ To: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
 	<linux-stm32@st-md-mailman.stormreply.com>, <krzk@kernel.org>,
 	<jic23@kernel.org>
 CC: <ruanjinjie@huawei.com>
-Subject: [PATCH net-next v4 3/8] net: phy: Use for_each_available_child_of_node_scoped()
-Date: Fri, 30 Aug 2024 11:13:20 +0800
-Message-ID: <20240830031325.2406672-4-ruanjinjie@huawei.com>
+Subject: [PATCH net-next v4 4/8] net: mdio: mux-mmioreg: Simplified with scoped function
+Date: Fri, 30 Aug 2024 11:13:21 +0800
+Message-ID: <20240830031325.2406672-5-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240830031325.2406672-1-ruanjinjie@huawei.com>
 References: <20240830031325.2406672-1-ruanjinjie@huawei.com>
@@ -70,49 +70,58 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemh500013.china.huawei.com (7.202.181.146)
 
-Avoid need to manually handle of_node_put() by using
-for_each_available_child_of_node_scoped(), which can simplfy code.
+Avoids the need for manual cleanup of_node_put() in early exits
+from the loop by using for_each_available_child_of_node_scoped().
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 ---
 v4:
-- Rebased on the previous fix patch has been stripped out.
 - Add Reviewed-by.
 v3:
-- Add Reviewed-by
-v2
+- Add Reviewed-by.
+v2:
 - Split into 2 patches.
 ---
- drivers/net/phy/phy_device.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ drivers/net/mdio/mdio-mux-mmioreg.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 8f5314c1fecc..7c4a09455493 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3407,7 +3407,7 @@ static int of_phy_led(struct phy_device *phydev,
- static int of_phy_leds(struct phy_device *phydev)
+diff --git a/drivers/net/mdio/mdio-mux-mmioreg.c b/drivers/net/mdio/mdio-mux-mmioreg.c
+index de08419d0c98..4d87e61fec7b 100644
+--- a/drivers/net/mdio/mdio-mux-mmioreg.c
++++ b/drivers/net/mdio/mdio-mux-mmioreg.c
+@@ -96,7 +96,7 @@ static int mdio_mux_mmioreg_switch_fn(int current_child, int desired_child,
+ 
+ static int mdio_mux_mmioreg_probe(struct platform_device *pdev)
  {
- 	struct device_node *node = phydev->mdio.dev.of_node;
--	struct device_node *leds, *led;
-+	struct device_node *leds;
- 	int err;
+-	struct device_node *np2, *np = pdev->dev.of_node;
++	struct device_node *np = pdev->dev.of_node;
+ 	struct mdio_mux_mmioreg_state *s;
+ 	struct resource res;
+ 	const __be32 *iprop;
+@@ -139,20 +139,18 @@ static int mdio_mux_mmioreg_probe(struct platform_device *pdev)
+ 	 * Verify that the 'reg' property of each child MDIO bus does not
+ 	 * set any bits outside of the 'mask'.
+ 	 */
+-	for_each_available_child_of_node(np, np2) {
++	for_each_available_child_of_node_scoped(np, np2) {
+ 		u64 reg;
  
- 	if (!IS_ENABLED(CONFIG_OF_MDIO))
-@@ -3420,10 +3420,9 @@ static int of_phy_leds(struct phy_device *phydev)
- 	if (!leds)
- 		return 0;
- 
--	for_each_available_child_of_node(leds, led) {
-+	for_each_available_child_of_node_scoped(leds, led) {
- 		err = of_phy_led(phydev, led);
- 		if (err) {
--			of_node_put(led);
- 			phy_leds_unregister(phydev);
- 			return err;
+ 		if (of_property_read_reg(np2, 0, &reg, NULL)) {
+ 			dev_err(&pdev->dev, "mdio-mux child node %pOF is "
+ 				"missing a 'reg' property\n", np2);
+-			of_node_put(np2);
+ 			return -ENODEV;
  		}
+ 		if ((u32)reg & ~s->mask) {
+ 			dev_err(&pdev->dev, "mdio-mux child node %pOF has "
+ 				"a 'reg' value with unmasked bits\n",
+ 				np2);
+-			of_node_put(np2);
+ 			return -ENODEV;
+ 		}
+ 	}
 -- 
 2.34.1
 
