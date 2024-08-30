@@ -1,139 +1,144 @@
-Return-Path: <netdev+bounces-123885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED258966B78
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 23:48:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF599966B8F
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 23:52:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3487281694
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 21:48:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88F00B21462
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 21:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE97171066;
-	Fri, 30 Aug 2024 21:48:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F46C171E43;
+	Fri, 30 Aug 2024 21:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aak8bVrZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UUiShg4Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6DC16DC3A;
-	Fri, 30 Aug 2024 21:47:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2326713D60E;
+	Fri, 30 Aug 2024 21:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725054480; cv=none; b=rECC8nMhKr5rs6z9iy4rndx5VUltddiMnoMwdHiEtuSDbvSU4bE5sTvR4HcPKZ+HJauXCw7e+lKpm5PHQ/3iDc4w2PNZq1BEYIbcsJWGJITYPj5cbo321hdDzmneM7Xj3z/Dm+YJnYVshN5OgsxsVTw96tKAz52psSDNHotwuzQ=
+	t=1725054758; cv=none; b=DZKB0GlSuBExlLjVKkTjPcS3OEJAg83PpJQECN+4sgpiExvLVy5PpRB8OwxfXUBNTzQ3WBBtW8Sro3CTJz8a6XXmzDkn9CsIwwPnSPxD7u3hApUNgSpSXi+QcirYBIFqFVOdtWf2ThqTk1A0Ka8iaHARGTIjhvtsnCgTNJHHv18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725054480; c=relaxed/simple;
-	bh=V2BzNcrGkNzfsuRDDxr7pv4K4r6CmS2XCVgqdcF0iyQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nl11GiodNOQG3VN8NLXedgIQjwmCY20B21jJASQFT+L8zyWWzJyI5LwE8F0+KWHTYldMqj6YcX3s6frZcxJzqHBmMhYkkxBisd1HJDy2XKd+Knuw6KhAYOLyHwif9ERGZqKf8YVbZSwXvLTYAogq0DcTZVqCSE5fbm/oN7dle84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aak8bVrZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F30C8C4CEC2;
-	Fri, 30 Aug 2024 21:47:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725054479;
-	bh=V2BzNcrGkNzfsuRDDxr7pv4K4r6CmS2XCVgqdcF0iyQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aak8bVrZJp9udde+pUotS9CbFC1p4p3o//AvmebbToX83GtzeoiVcVfdXsBFxbHqq
-	 +VNVifvEnDPmLFj9zMdKObZpY7qM7asX3GU6LF8DCk5qGtwaAx5eSWgfCKabGSI0Yo
-	 9gfWJoYJtJgC70SxcshmWFY8LPFJAN9ycvMNEZzMqrxmL8VhDIcXjOFzSm9vuw83LY
-	 17jEdjRynzAtXkF8oxgNZlVBx9tEWqbUob9BqGD5Tjr2rGBj6rFzyheo+bQTomOOzU
-	 uimD4tddDUIbw4MUXyHqacLr+0YThBtVRLGvwjfuTN2SHixC4h44YZlaz0IC32QHfK
-	 p6hgOJlUZC7VQ==
-Date: Fri, 30 Aug 2024 14:47:57 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Naresh Kamboju <naresh.kamboju@linaro.org>,
-	clang-built-linux <llvm@lists.linux.dev>,
-	Netdev <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	lkft-triage@lists.linaro.org,
-	Linux Regressions <regressions@lists.linux.dev>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Florian Westphal <fw@strlen.de>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: net/xfrm/xfrm_policy.c:1286:8: error: variable 'dir' is
- uninitialized when used here [-Werror,-Wuninitialized]
-Message-ID: <20240830214757.GA3819549@thelio-3990X>
-References: <CA+G9fYtemFfuhc7=eNyP3TezM9Euc8sFtHe4GDR4Z9XdHzXSJA@mail.gmail.com>
- <20240830164706.GW1368797@kernel.org>
- <20240830170449.GX1368797@kernel.org>
+	s=arc-20240116; t=1725054758; c=relaxed/simple;
+	bh=IkTuCSbVLR1iXF7AXKgQbRDx1TmVCNHiQlgZe2dW0ew=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=jbEUe9MdYjCRLbKKi+8gSuOKt1BeA/zngZj0nep41Zxc/9AQqILFfF/hMoyBl2BIgV54hAmVDC+1JYr8rU9hrR1mxWZ+GA3pI7SFhJnWDGVqFCI3ojwElhQCnrKDrlB2TwHdaD+i5EgYfyzufLa6tBzttrRA7i99ijdKvYr1UA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UUiShg4Q; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-456774a0fe7so12531011cf.0;
+        Fri, 30 Aug 2024 14:52:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725054756; x=1725659556; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CcXD9EKY0OCyfbPqdutna+/Pp1nF39E/CbXST6SgpRk=;
+        b=UUiShg4QtgbwQgx4LUfwboNxtQU7VtKbIdnvSrfsPvRsbj1j5R4is3rxfs3zjzE5e5
+         ZSUSqxpfjkgHjdXQ3xHISS4H4cSXCT1U695+cqzPmdPQhnF1IKA2eYgGgCuruybO+kLp
+         aG45ZZdvoVV+GRu3m39HVHZ+719OGquTSwpn8bTUFEEbIYUGqdyUNYdO9h5Jj5mVPWUX
+         8zjZUBRgXyXPpLumI3VewTwFPBzOtCa/gBlmlUIht4G7oLuBB3OEslEYFSNAgKCl3MlO
+         e5uFZHDyAVNApkW73vvh7un93uum/zbihdmZcv6ueW7bIwIQeqla1pZ05zmKo1Lo1cPc
+         jagw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725054756; x=1725659556;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CcXD9EKY0OCyfbPqdutna+/Pp1nF39E/CbXST6SgpRk=;
+        b=B8zad2weOJfjKelYGzKT7XijCzw7ZiPj/EZzDkDMNy+OUqaaDGDdMV8HNQ7nTgACkl
+         F0p8NanN8lItbXisXRqMNkZ/Uv5xRRqnyZf5lRF1hNFPgnSXU2/2C4pLj3dalMAqGgfK
+         MrxiTCD6flLNfnjsKMSw0ZkjNQgKDPnTRBwU/lwB9YapNjKb2AaUyGrnoGIdFD0fi40N
+         TuRZJE6P6jL4GRrS6i5IkeugzwHYb0Pe7bx6H9xfOYf3ZJ2u+Li0XA3PsXdcSNad0jhB
+         AcoYOnKNnM3JCe9M7hRW+6nKS8RHeBlkCwBc55+INIRiiCmMsu6Ptum1OsI2ZS5+RohP
+         PPwA==
+X-Forwarded-Encrypted: i=1; AJvYcCUeKJDQuF7nOW5+FIbdYTmx2/Wb8REhEcq5oNbMWK3qIMHQOB+WfUG/xoVnWcPk2IKUwLNntJH+fFO34cpB4ss=@vger.kernel.org, AJvYcCXWwryOExCKq1FEnGVABkEorVB94h36Jm/d+KxOT//nHKvGz2uyYwb9VfZ+bQGN5sBlf8mAL3oZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzN06V0aXDvsNvwLKcEuS62qGF9XFuTsrKNgV8T7m91I21KCvpI
+	vvvolZAvlzVXn/ig6csnaFYvx3yXOhNrkDLSVeKv8/JjgEArEVmY
+X-Google-Smtp-Source: AGHT+IFaxoKnTc1ahBV3NjNBc8V4fwKTSlo2bknC7B4mNPLPi5ZHMsJwqwhugLHj+aP0wjGYPWnU+Q==
+X-Received: by 2002:a05:622a:6209:b0:457:79bf:9591 with SMTP id d75a77b69052e-45779bf9678mr4405331cf.62.1725054755803;
+        Fri, 30 Aug 2024 14:52:35 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45682d66b6asm17576591cf.65.2024.08.30.14.52.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Aug 2024 14:52:35 -0700 (PDT)
+Date: Fri, 30 Aug 2024 17:52:35 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ ncardwell@google.com, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ fw@strlen.de, 
+ Willem de Bruijn <willemb@google.com>, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ martineau@kernel.org
+Message-ID: <66d23f2349f7_3d8dba29489@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240830144420.5974dc5b@kernel.org>
+References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
+ <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
+ <66cf2e4bd8e89_33815c294b2@willemb.c.googlers.com.notmuch>
+ <20240828090120.71be0b20@kernel.org>
+ <66cf7b8d1c480_36509229439@willemb.c.googlers.com.notmuch>
+ <20240828140035.4554142f@kernel.org>
+ <66d1e32558532_3c08a22949e@willemb.c.googlers.com.notmuch>
+ <20240830103343.0dd20018@kernel.org>
+ <66d213cf6652e_3c8f2d294b8@willemb.c.googlers.com.notmuch>
+ <20240830144420.5974dc5b@kernel.org>
+Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
+ ksft
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240830170449.GX1368797@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Simon (and Naresh),
-
-On Fri, Aug 30, 2024 at 06:04:49PM +0100, Simon Horman wrote:
-> On Fri, Aug 30, 2024 at 05:47:06PM +0100, Simon Horman wrote:
-> > + Florian, Steffen
+Jakub Kicinski wrote:
+> On Fri, 30 Aug 2024 14:47:43 -0400 Willem de Bruijn wrote:
+> > > We have directories in net/lib, and it's a target, and it works, no?  
 > > 
-> > On Fri, Aug 30, 2024 at 12:15:10PM +0530, Naresh Kamboju wrote:
-> > > The x86_64 defconfig builds failed on today's Linux next-20240829
-> > > due to following build warnings / errors.
-> > > 
-> > > Regressions:
-> > > * i386, build
-> > >   - clang-18-defconfig
-> > >   - clang-nightly-defconfig
-> > > 
-> > > * x86_64, build
-> > >   - clang-18-lkftconfig
-> > >   - clang-18-lkftconfig-compat
-> > >   - clang-18-lkftconfig-kcsan
-> > >   - clang-18-lkftconfig-no-kselftest-frag
-> > >   - clang-18-x86_64_defconfig
-> > >   - clang-nightly-lkftconfig
-> > >   - clang-nightly-lkftconfig-kselftest
-> > >   - clang-nightly-x86_64_defconfig
-> > >   - rustclang-nightly-lkftconfig-kselftest
-> > > 
-> > > first seen on next-20240829.
-> > >   Good: next-20240828
-> > >   BAD:  next-20240829
-> > > 
-> > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> > > 
-> > > build log:
-> > > --------
-> > > net/xfrm/xfrm_policy.c:1286:8: error: variable 'dir' is uninitialized
-> > > when used here [-Werror,-Wuninitialized]
-> > >  1286 |                 if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
-> > >       |                      ^~~
-> > > net/xfrm/xfrm_policy.c:1257:9: note: initialize the variable 'dir' to
-> > > silence this warning
-> > >  1257 |         int dir;
-> > >       |                ^
-> > >       |                 = 0
-> > > 1 error generated.
-
-Thanks for the report.
-
-> > I believe that is due to
-> > commit 08c2182cf0b4 ("xfrm: policy: use recently added helper in more places")
-> > 
-> > I will work on a fix to initialise dir in the loop where it is used.
+> > net/lib is not a TARGET in tools/testing/selftests/Makefile. Its
+> > Makefile only generates dependencies for other targets: TEST_FILES,
+> > TEST_GEN_FILES and TEST_INCLUDES.
 > 
-> Patch is here:
-> - [PATCH ipsec-next] xfrm: Initialise dir in xfrm_hash_rebuild()
->   https://lore.kernel.org/netdev/20240830-xfrm_hash_rebuild-dir-v1-1-f75092d07e1b@kernel.org/T/#u
+> Oh right, TEST_FILES vs TEST_INCLUDES :(
+> 
+> Looks like only x86 does some weird stuff and prepends $(OUTPUT) to all
+> test names. Otherwise the only TEST_NAME with a / in it is
+> 
+> x86_64/nx_huge_pages_test.sh
 
-I sent the same patch as a v1 but Florian pointed out that dir needs to
-be initialized in the other loop too. I sent my v2 for it yesterday, it
-just needs to be merged.
+Oh interesting precedent. Let me take a look.
 
-https://lore.kernel.org/all/20240829-xfrm-restore-dir-assign-xfrm_hash_rebuild-v2-1-1cf8958f6e8e@kernel.org/
+> But then again maybe we should give up on the idea of using directories?
+> Use some separator like --, I mean:
+> 
+> mv packetdrill/tcp/inq/client.pkt packetdrill/tcp--inq--client.pkt
+> 
+> Assuming we're moving forward with the interpreter idea we don't need
+> directories for multi-threading, just for organization. Which perhaps
+> isn't worth the time investment? Given that we'd mostly interact with
+> these tests via UI which will flatten it all back?
 
-Cheers,
-Nathan
+That's definitely simpler :)
+
+I'd like to keep diffs between packetdrill scripts on github (and
+Google internal, we have more) and selftests to a minimum. This is
+invertible, as is rewriting source statements inside the pkt files.
+But that might be more work and more maintenance in the end.
+
+
 
