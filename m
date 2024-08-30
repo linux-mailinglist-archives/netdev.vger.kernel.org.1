@@ -1,176 +1,126 @@
-Return-Path: <netdev+bounces-123592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA04896573F
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 08:01:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9B4A96574E
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 08:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66C7B2869AD
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 06:01:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECA6E1C22E5D
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 06:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 139B9136E3F;
-	Fri, 30 Aug 2024 06:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9413E14B081;
+	Fri, 30 Aug 2024 06:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="LFK3FZFY"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="nh/oK4PJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F52014F9C7
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 06:01:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17CF14884F;
+	Fri, 30 Aug 2024 06:04:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724997697; cv=none; b=G4U5XVvnP1x44knfpsD+j8P+6L3dQC5WviVxN1YxbacdTxeaCEYIbrBgfej4LUFnBNn4+KfwHf2yqOQZaCfd435NeOGKCZSu9glOV2Qn6CyuUh7SWzk0pB6yQSk+6nUC0hs3QkhhlqTpPp4PI262YGHpgRq6GyG7M5JAcMk/fr0=
+	t=1724997855; cv=none; b=tBmnQaQaQZZ17D/Q/E0f8lJw+OQS99Zke6BvsnJUSZvwOywXExCNwnhvn5pM490fLXTeYhRi4j4Eb86kZG47dANez1AXwEpCr8FZYT/VMO9k5ZhsCXdXCryfShf0BLdazTh72uxSAxllfe44QFqyVA28BCq5WZ0/hHNNUclaOFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724997697; c=relaxed/simple;
-	bh=BpQ2H6xunbxWBzaZitOZ/jyxktxvtM3fzotgLnGFOy0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MZ6yJKrJawGD8jCuQ8OM658S78FQqnNVRsrFRZhq2n0ZK6yBoHpdUWXk5RlEiwj3iIm2wmwY8q+vMSg9JQNnSUaqEqZqPYFd5e4XN2McLFulSWkdL0SdoNzX1K407Tr5t8b4B5QopRX2HZguAXDGr/fiXtvaIp+NdJagUqkfIfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=LFK3FZFY; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47U5FaZX030410;
-	Thu, 29 Aug 2024 23:01:06 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=b68NH+AyL/ppVi+dSLAub4/Ns
-	4kz7gjNc/Se3wFmmYo=; b=LFK3FZFYUZPCXNm+QvnpgeTchtPXy0XK8zaaYijYz
-	geXRgyMgU8o27qxLQGMIytQFsFefo5qiMFOPgrAxe9Aw0YgnxtRMlPngwaPqoYr1
-	xn8v1NNtXQ7sQc9UguhdixStTU5bW8l3GtcRqr7xqQGtG4fN2nJEwwWgZsgAxot3
-	tWULm8zlmD4AjDJMGwUreRP/L82TrMZeZT2+wY3zEZ9HsRZxUtNcYeQ3RQ4eV1/u
-	+Iy18f3oo6MU7D+dY7x7H7mZJMmgGuGzUYNsjGpUiKMrgIbTuEZcoSohmZewNSm3
-	Jt8IR2IMqB7Qw3GFKhz7XtRiKCKGlbQr4lXsmwQ3K+BuQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 41b1b3sewa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Aug 2024 23:01:05 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	s=arc-20240116; t=1724997855; c=relaxed/simple;
+	bh=ghXveYyLPJmX7z11GB27xQoE+D89WFHLGgvYP9iSH8U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hYbvZ1l+rQUMWUOHfrB1XWCNUhxAxOCmK8BuEXXBWmqv28jhjyRcKulcfXiLSrXZmyS1pEpvT2hVTf5Lwms1eFmKtlrscS4k2MeRpJRSk+6+XSjrgsrMKsClzMlQ0QWp1ZTEy+Z4K8tGqUjBn0qpwnxGSoRiiSZO1Tw8QUDe2Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=nh/oK4PJ; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 47U63dj76359467, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1724997819; bh=ghXveYyLPJmX7z11GB27xQoE+D89WFHLGgvYP9iSH8U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=nh/oK4PJBi+qoOZNc//+fcu7bC9873IZR4wrFz3Vy5t55w2+qFbdPAgyWlCjwKwgy
+	 bLt/+TnEyGvAIc7Z1f8j1SkSy3Mc3/2ABUMTzVt5/jSPFj8HRv+qgP2Y+MWPgwpHh1
+	 icdb2YUGR8BN6DUGvYBjxPGUJTZyOIneNPddHvp8dCXM3ZJS/LCmU8+7JWVVEVzXYK
+	 sM8aztzwkvvWLQgiqf4OAWkQQ2g0oH64AReejcKsXHkSivI7h8CIakY6c4Vhiju+j9
+	 Tb3YYvnuM3fn54/cUf6i7OdSnR6fFd/XtcDCG5PUfOMX8E9IJwlemT8oCBhWurTimT
+	 WkVCvxd8ykPaQ==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 47U63dj76359467
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 30 Aug 2024 14:03:39 +0800
+Received: from RTEXMBS06.realtek.com.tw (172.21.6.99) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 29 Aug 2024 23:01:04 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 29 Aug 2024 23:01:04 -0700
-Received: from test-OptiPlex-Tower-Plus-7010 (unknown [10.29.37.157])
-	by maili.marvell.com (Postfix) with SMTP id 3CD213F7085;
-	Thu, 29 Aug 2024 23:00:46 -0700 (PDT)
-Date: Fri, 30 Aug 2024 11:30:46 +0530
-From: Subbaraya Sundeep <sbhatta@marvell.com>
-To: Gal Pressman <gal@nvidia.com>
-CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        <netdev@vger.kernel.org>, Jay Vosburgh <jv@jvosburgh.net>,
-        Andy Gospodarek
-	<andy@greyhouse.net>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Vincent Mailhol
-	<mailhol.vincent@wanadoo.fr>,
-        Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-        Sudarsana Kalluru <skalluru@marvell.com>,
-        Manish Chopra
-	<manishc@marvell.com>,
-        Michael Chan <michael.chan@broadcom.com>,
-        Pavan Chebbi
-	<pavan.chebbi@broadcom.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Potnuri Bharat Teja <bharat@chelsio.com>,
-        Christian
- Benvenuti <benve@cisco.com>,
-        Satish Kharat <satishkh@cisco.com>,
-        Claudiu
- Manoil <claudiu.manoil@nxp.com>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
-        Shenwei Wang <shenwei.wang@nxp.com>,
-        Clark Wang
-	<xiaoning.wang@nxp.com>,
-        Dimitris Michailidis <dmichail@fungible.com>,
-        Yisen
- Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Jijie
- Shao <shaojijie@huawei.com>,
-        Tony Nguyen <anthony.l.nguyen@intel.com>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        Marcin Wojtas
-	<marcin.s.wojtas@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Geetha
- sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>,
-        Ido Schimmel
-	<idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-        Bryan Whitehead
-	<bryan.whitehead@microchip.com>,
-        <UNGLinuxDriver@microchip.com>,
-        Horatiu
- Vultur <horatiu.vultur@microchip.com>,
-        Lars Povlsen
-	<lars.povlsen@microchip.com>,
-        Steen Hegelund <Steen.Hegelund@microchip.com>,
-        Daniel Machon <daniel.machon@microchip.com>,
-        Alexandre Belloni
-	<alexandre.belloni@bootlin.com>,
-        Shannon Nelson <shannon.nelson@amd.com>,
-        Brett Creeley <brett.creeley@amd.com>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        Niklas
- =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
-        Edward Cree
-	<ecree.xilinx@gmail.com>,
-        Martin Habets <habetsm.xilinx@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Siddharth Vadapalli
-	<s-vadapalli@ti.com>,
-        Roger Quadros <rogerq@kernel.org>,
-        MD Danish Anwar
-	<danishanwar@ti.com>,
-        Linus Walleij <linusw@kernel.org>, Imre Kaloz
-	<kaloz@openwrt.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Willem de
- Bruijn <willemdebruijn.kernel@gmail.com>,
-        Carolina Jubran
-	<cjubran@nvidia.com>,
-        Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next 2/2] net: Remove setting of RX software
- timestamp from drivers
-Message-ID: <ZtFgDohEl82O9u3K@test-OptiPlex-Tower-Plus-7010>
-References: <20240829144253.122215-1-gal@nvidia.com>
- <20240829144253.122215-3-gal@nvidia.com>
+ 15.1.2507.39; Fri, 30 Aug 2024 14:03:39 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS06.realtek.com.tw (172.21.6.99) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 30 Aug 2024 14:03:38 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f]) by
+ RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f%11]) with mapi id
+ 15.01.2507.035; Fri, 30 Aug 2024 14:03:38 +0800
+From: Hau <hau@realtek.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd <nic_swsd@realtek.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next] r8169: add support for RTL8126A rev.b
+Thread-Topic: [PATCH net-next] r8169: add support for RTL8126A rev.b
+Thread-Index: AQHa+oLe25e/1kPwh0uZ2N7oP2hFqbI+wVKAgACN8AA=
+Date: Fri, 30 Aug 2024 06:03:38 +0000
+Message-ID: <7dd4afc3ded14012a4b0ea2f34996c4d@realtek.com>
+References: <20240830021810.11993-1-hau@realtek.com>
+ <d2c681d6-2213-4cad-8b01-783ee5f864b0@gmail.com>
+In-Reply-To: <d2c681d6-2213-4cad-8b01-783ee5f864b0@gmail.com>
+Accept-Language: zh-TW, en-US
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240829144253.122215-3-gal@nvidia.com>
-X-Proofpoint-GUID: FVHN10tJUMOQb4M4Fgt7EAeZNsr_VJPD
-X-Proofpoint-ORIG-GUID: FVHN10tJUMOQb4M4Fgt7EAeZNsr_VJPD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-30_02,2024-08-29_02,2024-05-17_01
 
-On 2024-08-29 at 20:12:53, Gal Pressman (gal@nvidia.com) wrote:
-> The responsibility for reporting of RX software timestamp has moved to
-> the core layer (see __ethtool_get_ts_info()), remove usage from the
-> device drivers.
-> 
-> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> ---
-
-for drivers/net/ethernet/marvell/octeontx2/
-
-Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSGVpbmVyIEthbGx3ZWl0
+IFttYWlsdG86aGthbGx3ZWl0MUBnbWFpbC5jb21dDQo+IFNlbnQ6IEZyaWRheSwgQXVndXN0IDMw
+LCAyMDI0IDE6MzQgUE0NCj4gVG86IEhhdSA8aGF1QHJlYWx0ZWsuY29tPjsgbmljX3N3c2QgPG5p
+Y19zd3NkQHJlYWx0ZWsuY29tPjsNCj4gZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsgZWR1bWF6ZXRAZ29v
+Z2xlLmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiBwYWJlbmlAcmVkaGF0LmNvbQ0KPiBDYzogbmV0
+ZGV2QHZnZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0KPiBTdWJq
+ZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0XSByODE2OTogYWRkIHN1cHBvcnQgZm9yIFJUTDgxMjZB
+IHJldi5iDQo+IA0KPiANCj4gRXh0ZXJuYWwgbWFpbC4NCj4gDQo+IA0KPiANCj4gT24gMzAuMDgu
+MjAyNCAwNDoxOCwgQ2h1bkhhbyBMaW4gd3JvdGU6DQo+ID4gQWRkIHN1cHBvcnQgZm9yIFJUTDgx
+MjZBIHJldi5iLiBJdHMgWElEIGlzIDB4NjRhLiBJdCBpcyBiYXNpY2FsbHkNCj4gPiBiYXNlZCBv
+biB0aGUgb25lIHdpdGggWElEIDB4NjQ5LCBidXQgd2l0aCBkaWZmZXJlbnQgZmlybXdhcmUgZmls
+ZS4NCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IENodW5IYW8gTGluIDxoYXVAcmVhbHRlay5jb20+
+DQo+ID4gLS0tDQo+ID4gIGRyaXZlcnMvbmV0L2V0aGVybmV0L3JlYWx0ZWsvcjgxNjkuaCAgICAg
+ICAgICB8ICAxICsNCj4gPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2OV9tYWlu
+LmMgICAgIHwgNDIgKysrKysrKysrKysrLS0tLS0tLQ0KPiA+ICAuLi4vbmV0L2V0aGVybmV0L3Jl
+YWx0ZWsvcjgxNjlfcGh5X2NvbmZpZy5jICAgfCAgMSArDQo+ID4gIDMgZmlsZXMgY2hhbmdlZCwg
+MjkgaW5zZXJ0aW9ucygrKSwgMTUgZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEv
+ZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2OS5oDQo+ID4gYi9kcml2ZXJzL25ldC9l
+dGhlcm5ldC9yZWFsdGVrL3I4MTY5LmgNCj4gPiBpbmRleCAwMDg4MmZmYzdhMDIuLmUyZGI5NDRl
+NmZhOCAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4MTY5
+LmgNCj4gPiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4MTY5LmgNCj4gPiBA
+QCAtNjksNiArNjksNyBAQCBlbnVtIG1hY192ZXJzaW9uIHsNCj4gPiAgICAgICBSVExfR0lHQV9N
+QUNfVkVSXzYxLA0KPiA+ICAgICAgIFJUTF9HSUdBX01BQ19WRVJfNjMsDQo+ID4gICAgICAgUlRM
+X0dJR0FfTUFDX1ZFUl82NSwNCj4gPiArICAgICBSVExfR0lHQV9NQUNfVkVSXzY2LA0KPiA+ICAg
+ICAgIFJUTF9HSUdBX01BQ19OT05FDQo+ID4gIH07DQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvZHJp
+dmVycy9uZXQvZXRoZXJuZXQvcmVhbHRlay9yODE2OV9tYWluLmMNCj4gPiBiL2RyaXZlcnMvbmV0
+L2V0aGVybmV0L3JlYWx0ZWsvcjgxNjlfbWFpbi5jDQo+ID4gaW5kZXggMzUwN2MyZTI4MTEwLi4z
+Y2IxYzRmNWM5MWEgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQvcmVhbHRl
+ay9yODE2OV9tYWluLmMNCj4gPiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5ldC9yZWFsdGVrL3I4
+MTY5X21haW4uYw0KPiA+IEBAIC01Niw2ICs1Niw3IEBADQo+ID4gICNkZWZpbmUgRklSTVdBUkVf
+ODEyNUFfMyAgICAgInJ0bF9uaWMvcnRsODEyNWEtMy5mdyINCj4gPiAgI2RlZmluZSBGSVJNV0FS
+RV84MTI1Ql8yICAgICAicnRsX25pYy9ydGw4MTI1Yi0yLmZ3Ig0KPiA+ICAjZGVmaW5lIEZJUk1X
+QVJFXzgxMjZBXzIgICAgICJydGxfbmljL3J0bDgxMjZhLTIuZnciDQo+ID4gKyNkZWZpbmUgRklS
+TVdBUkVfODEyNkFfMyAgICAgInJ0bF9uaWMvcnRsODEyNmEtMy5mdyINCj4gPg0KPiANCj4gSSBj
+aGVja2VkIGxpbnV4LWZpcm13YXJlIHJlcG8sIHRoZSBuZXcgZmlybXdhcmUgaXNuJ3QgYXZhaWxh
+YmxlIHRoZXJlIHlldC4NCj4gQXJlIHlvdSBnb2luZyB0byBzdWJtaXQgdGhlIGZpcm13YXJlIGZp
+bGU/DQo+IA0KSSB3aWxsIHN1Ym1pdCB0aGUgbmV3IGZpcm13YXJlIGZpbGUuDQoNCj4gUmV2aWV3
+ZWQtYnk6IEhlaW5lciBLYWxsd2VpdCA8aGthbGx3ZWl0MUBnbWFpbC5jb20+DQo=
 
