@@ -1,74 +1,57 @@
-Return-Path: <netdev+bounces-123605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 025719658B5
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 09:37:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02117965912
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 09:50:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CC26B258AA
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 07:37:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 355E81C212A9
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 07:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17B215C147;
-	Fri, 30 Aug 2024 07:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="pIVKLswp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1842115CD7D;
+	Fri, 30 Aug 2024 07:50:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C54153BF9
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 07:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BDB14C5BA;
+	Fri, 30 Aug 2024 07:50:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725003399; cv=none; b=it5f4VFbTLlV9wSwEpgdMYbidknUAQCKlzq+BDBhYEQPXPZ0Tel4SvgQaEw+Fv+dQJu9LphLEiZcuPfCg/sZLkI2ytB+yIsXlKrr5nlRRe6QlJ64tdleSJ3P3HO3MVcEpAMOLR3j4Ov11IXaSqSal3Jeo2k2K762AUJByF4BZT0=
+	t=1725004241; cv=none; b=dusxR8nev1QYgqf5MF2b8HE2c3Ru00zvU98vdEBsL2ajWh2YtHwHZY+0LNSlT0r4NumS4qdINCTmPKqaQpFM3WKLg46GHk+iOv3SMg5mvKMK5fFxg04I8Fo9O9Tct8auyTwM6o79gk9GngSaseWTVpMME+cmXD5F5CsIw20HPEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725003399; c=relaxed/simple;
-	bh=x8/BarACP66DHb2OmZ3Q/oMwacV43SJiRhJBLFSb+/U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i07dX3K/VsJHQWJrnZlNwdbYO0niwzTV3auxHp1naMPF6pQdDd6aANRezeR6Uko7Zlq8aw9++wIgtTrJl5DwKlrfnuduq1NBEdUEjq+j5B9SlxjHYvyz6WF9huxPShlNVvg6lqr+d3/flCxNnba6mMSQcbHaNwV3Wn9yxB14D6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=pIVKLswp; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-53438aa64a4so1749140e87.3
-        for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 00:36:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1725003394; x=1725608194; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aq3ZbOruMFHcebgoxqzGvdWYBubRMesb2UNv/9i5+1w=;
-        b=pIVKLswpJeA04xBBN68YH5i66RmcqTmqEmw1ezfLPHrAaG7xFN3KzpVGMOsPWfaf5p
-         UC459T7/GcJXu55OXscCDLhTHQefxAsuDkMTUdRtnax4w8vPvOMDEAlaCQcAns5Y4zC9
-         Laot2ozrMzb/lkei5U53Xipz0Bx2RcZP/JGht4TzOKfVGn/rTkX1pVA0EACg16KCnYQD
-         Burp75T1tIkT9Wt818gfw4wQm3rbffrqWcIm39IjDwAdh7DdPB5aoHjyHapFNZeWepRa
-         W0bK6REbeBOi1PoYYw8FHeDleAwM/dBATYFnWslgep+2dO9/0tB/sPtYNDlAz6sWHfkQ
-         8VOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725003394; x=1725608194;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aq3ZbOruMFHcebgoxqzGvdWYBubRMesb2UNv/9i5+1w=;
-        b=sJUn0FSeRYOnWW4M+zkpymt5JkZJBkMVs5Mtl3faaUmSNb91L1l41clNcuX0qtsYtz
-         PQ8NLvUPjf7mntnkD07JDwXRuEOlusOTrzrmY72+bHN9riTipnVMpDKjU86W6zWekdwf
-         PrQqvxnOShKradZWqZ9r2kXVrypnbyfK93o/30TbbA6DS6JUN1CwJEgS9ak5O3rODhGh
-         o/XAszmoe+dzcMXBo0EdrKZa9S+rc6wl4Zi6Kcn/225e6OBry7WAUJbHqc14RFJIQdFJ
-         0010xpDjFq54e1EP5jQV5rb7m/QvcmudVDHyDkx1c9sMAnHO62Zen7LLFfFPOy6BpTUz
-         51oQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUJYvzNWeuyXlQMGuYcNzoVPoQ5KdgYUa7gP5fHNlADm8PansUtaag682bwBXXbX+WjNYAJGF4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbLdMq2lcoyMbxdBngVO5OPucvLhvKFgJDXk4VZ4vwcKQ8B31p
-	THxH+gU5PEG65VfBUIrx2Oses8fMg4QrQZSQyl2K/iohXSRrGPihIq9SqikVKY0=
-X-Google-Smtp-Source: AGHT+IHfZUNiJUPiW9T4fMW2U3bxiTqLrbAacKaLA5/BgyjZPfqSwAZgANQ1GW4OoLjjFNcSXi9d5g==
-X-Received: by 2002:a05:6512:3b92:b0:533:4620:ebfb with SMTP id 2adb3069b0e04-53546b042camr714413e87.21.1725003393937;
-        Fri, 30 Aug 2024 00:36:33 -0700 (PDT)
-Received: from [192.168.1.94] (56.31.102.84.rev.sfr.net. [84.102.31.56])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a898922710csm181746966b.223.2024.08.30.00.36.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Aug 2024 00:36:33 -0700 (PDT)
-Message-ID: <e86dade9-a151-42e4-94e2-7710bcd3a6a6@baylibre.com>
-Date: Fri, 30 Aug 2024 09:36:30 +0200
+	s=arc-20240116; t=1725004241; c=relaxed/simple;
+	bh=uKg4qJIpfYrSIE8D0HeA0yQsXzxv/5KdvZXOAvsvcMg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=Hz9KuKhd2/wt6LNQpnvpzXfHGxCefXKSXQ6AwLM2cHRb8lm3BQVdIxAecQ3bwCjDNn4t//j+b7nB11BRoIBakOXMfegojQXvzk6WWSmiimAaI50pcXj+f94MeS+4irImLlvFuiy3vhIveUCOch7H0itB1FopnNwVXYcAqs7+slE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 881409ea66a411efa216b1d71e6e1362-20240830
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:3781fd2f-9329-4c04-86a0-13838f35b2c1,IP:20,
+	URL:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:40
+X-CID-INFO: VERSION:1.1.38,REQID:3781fd2f-9329-4c04-86a0-13838f35b2c1,IP:20,UR
+	L:0,TC:0,Content:0,EDM:25,RT:0,SF:-5,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:40
+X-CID-META: VersionHash:82c5f88,CLOUDID:f2942b352dddbb701cf49298b2942fd7,BulkI
+	D:240830155032V78ETUYF,BulkQuantity:0,Recheck:0,SF:17|19|43|74|66|23|102,T
+	C:nil,Content:0|-5,EDM:5,IP:-2,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:n
+	il,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
+X-UUID: 881409ea66a411efa216b1d71e6e1362-20240830
+X-User: zhaomengmeng@kylinos.cn
+Received: from [192.168.109.86] [(123.53.36.118)] by mailgw.kylinos.cn
+	(envelope-from <zhaomengmeng@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
+	with ESMTP id 1999602693; Fri, 30 Aug 2024 15:50:31 +0800
+Message-ID: <d44e3c03-3322-4eae-b023-71b8bdc18b23@kylinos.cn>
+Date: Fri, 30 Aug 2024 15:49:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,74 +59,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/3] net: ethernet: ti: am65-cpsw: Fix XDP
- implementation
-To: Roger Quadros <rogerq@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Jacob Keller <jacob.e.keller@intel.com>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
- Md Danish Anwar <danishanwar@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>,
- Govindarajan Sriramakrishnan <srk@ti.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20240829-am65-cpsw-xdp-v1-0-ff3c81054a5e@kernel.org>
-Content-Language: en-US
-From: Julien Panis <jpanis@baylibre.com>
-In-Reply-To: <20240829-am65-cpsw-xdp-v1-0-ff3c81054a5e@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: syzbot+061f58eec3bde7ee8ffa@syzkaller.appspotmail.com
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com,
+ houtao@huaweicloud.com, john.fastabend@gmail.com, jolsa@kernel.org,
+ kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, sdf@google.com, song@kernel.org,
+ syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+References: <0000000000009df8df061faea836@google.com>
+Subject: Re: [syzbot] KASAN: slab-use-after-free Read in htab_map_alloc (2)
+From: Zhao Mengmeng <zhaomengmeng@kylinos.cn>
+In-Reply-To: <0000000000009df8df061faea836@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 8/29/24 14:03, Roger Quadros wrote:
-> The XDP implementation on am65-cpsw driver is broken in many ways
-> and this series fixes it.
->
-> Below are the current issues that are being fixed:
->
-> 1)  The following XDP_DROP test from [1] stalls the interface after
->      250 packets.
->      ~# xdb-bench drop -m native eth0
->      This is because new RX requests are never queued. Fix that.
->
-> 2)  The below XDP_TX test from [1] fails with a warning
->      [  499.947381] XDP_WARN: xdp_update_frame_from_buff(line:277): Driver BUG: missing reserved tailroom
->      ~# xdb-bench tx -m native eth0
->      Fix that by using PAGE_SIZE during xdp_init_buf().
->
-> 3)  In XDP_REDIRECT case only 1 packet was processed in rx_poll.
->      Fix it to process up to budget packets.
->      ~# ./xdp-bench redirect -m native eth0 eth0
->
-> 4)  If number of TX queues are set to 1 we get a NULL pointer
->      dereference during XDP_TX.
->      ~# ethtool -L eth0 tx 1
->      ~# ./xdp-trafficgen udp -A <ipv6-src> -a <ipv6-dst> eth0 -t 2
->      Transmitting on eth0 (ifindex 2)
->      [  241.135257] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000030
->
-> 5)  Net statistics is broken for XDP_TX and XDP_REDIRECT
->
-> [1] xdp-tools suite https://github.com/xdp-project/xdp-tools
->
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> ---
-> Roger Quadros (3):
->        net: ethernet: ti: am65-cpsw: fix XDP_DROP, XDP_TX and XDP_REDIRECT
->        net: ethernet: ti: am65-cpsw: Fix NULL dereference on XDP_TX
->        net: ethernet: ti: am65-cpsw: Fix RX statistics for XDP_TX and XDP_REDIRECT
->
->   drivers/net/ethernet/ti/am65-cpsw-nuss.c | 82 +++++++++++++++++++-------------
->   1 file changed, 49 insertions(+), 33 deletions(-)
-> ---
-> base-commit: 5be63fc19fcaa4c236b307420483578a56986a37
-> change-id: 20240829-am65-cpsw-xdp-d5876b25335c
->
-> Best regards,
-
-Thank you for the fixes Roger.
-
-Acked-by: Julien Panis <jpanis@baylibre.com>
-
+#syz fix: net/sched: unregister lockdep keys in qdisc_create/qdisc_alloc error path
 
