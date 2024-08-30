@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-123797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14B6B9668D1
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:20:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F5BE9668D0
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEB9B1F24185
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:20:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9229D1C21F69
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABF951BC063;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98391BBBF7;
 	Fri, 30 Aug 2024 18:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aHs/O6kO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hIQIFIcz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D7A1BBBC0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D241BB6B9;
 	Fri, 30 Aug 2024 18:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725042028; cv=none; b=FgikBMUgQUcfe4Uo0VjOJG0ZHkDMm8oxhynSn3S55oYrEO0QxV6x6jFejOndzV/CKZmU8EgBY+XBlujyx13PciKqA2yRFZQXfFaODYGtTjGZD6mGsTpRzRdiXnqNPyXkRnfoy4hgu2v6sf7eXN82B8rb/IsoSeTYVU7ryM/ST7U=
+	t=1725042028; cv=none; b=rGq3sbA3GvXKnenIEEXE0nrdQDRR2qkRemnhtRLfNMg+SWvFjFFycm+z+0AW7wpk0h9x+rttoWr8v1DesTvVy19FfTmT4PxTGNWhKsHHJjMjzH5FIE2HVH8JIEhcFHrayXSuJJ290HEYD6arCio5piXjdXp76k99BkNA/iNPCLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725042028; c=relaxed/simple;
-	bh=1yXwHZ8yhuJpiRhLARtZgOVIwcOcmD8arCpQDuOTth8=;
+	bh=S4LhiCjxkTqDlJJT4aBKOZgqogADuYYzlY2ieWc9NxM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JUNkSjFzTrerBOrXykByfjdI/bhOjt1jc/1QEXxOAYJ1266JMmYL6wXOQdjtWAr8uYp02wJ36HdXjEWnXbI+UONOt2oLVhe9GdhINrjnOvOJz9Y7o7OAKk3rvJMchMhmLiyr8S9Qf6POdJC56UiiF7WzDDqQL/nLob7DKslDmN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aHs/O6kO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29100C4CEC7;
+	 In-Reply-To:To:Cc; b=gDANFWMIE46iKofeQg+4yr0KTYrHwQOv14by5ypsJ//UA9Ku5r+nYFMx1laI0iz02071LVKuJp1XDaQImfz3nA1EaWOvGPGd8XOb79i6JDfECG1NOBEnTr5em+wQGim67PJeKW/xybppx4Gw6r4fmMPskWjyNVGlRWPfsMa/pYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hIQIFIcz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 270FEC4CEC4;
 	Fri, 30 Aug 2024 18:20:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1725042028;
-	bh=1yXwHZ8yhuJpiRhLARtZgOVIwcOcmD8arCpQDuOTth8=;
+	bh=S4LhiCjxkTqDlJJT4aBKOZgqogADuYYzlY2ieWc9NxM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aHs/O6kOKnecW5iTgfL22V6EhhlkZv6J5WDeZicVg06e0MN97X25ywFTUu/24YMAK
-	 diOUC0UNqGaCsMtF+zfQDWOapXQBTfmLd8UacfR5N/JQUNOxU2fhAp7AWIo04BLPdL
-	 npWyE/qvxr+d3AfPK0DwSMuIEK/7J7pWersDhqrzVS/+W6lXHaiOyTOFZ7ACNu1pQD
-	 28jNN7AH5lUHv3eNmtp4Jf7beoIj5L9b0+vEwjxdPNdZyCbOKaMUMta7zDFdF2xNmW
-	 d8FmwFMWpNwZp6+XnIjgQSZtdywX6sR0Wh5/9+9wFNgr/b14gjqCA0YQwAHD7v93xV
-	 PewVpG0r+1hIg==
+	b=hIQIFIczRy28YS2NnkAS7CLHqYpYLZ8NYUe5rMb3f1KHtEvUUtzOBBQakyhyFihzP
+	 4Nm137rlfseaf/Al1fFbP2GzSmOF5eMuRYtcrDiVIpqjev+3TnPpziJlpaIM2CA6HN
+	 l9+qlzN/KDFCxvP2xvxQc8NtVOd0ha9BeSlY5f4+XbmvlY2xXbX+uuNdYzqRvBQeDv
+	 THCgiPwrBukpjcnJ1+p0szqLFvHWbRz1bqyjXLgnDi1UktQtim3kfhT/scI0raMbbs
+	 vcPcYcOrZO/k0Pu/PF0qbRoAf7hXAjbyYsFaQy//L03m0xuc+oCgPkisS95eBzsBep
+	 zFWnERoLyb5Ww==
 Received: from ip-10-30-226-235.us-west-2.compute.internal (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE88C3809A81;
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id BA86E3809A82;
 	Fri, 30 Aug 2024 18:20:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net-next] nfp: Convert to use ERR_CAST()
+Subject: Re: [PATCH v1 net-next] net: openvswitch: Use ERR_CAST() to return
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172504202970.2677701.1080277774127927988.git-patchwork-notify@kernel.org>
+ <172504202975.2677701.2567446210822369558.git-patchwork-notify@kernel.org>
 Date: Fri, 30 Aug 2024 18:20:29 +0000
-References: <20240829072538.33195-1-shenlichuan@vivo.com>
-In-Reply-To: <20240829072538.33195-1-shenlichuan@vivo.com>
-To: Shen Lichuan <shenlichuan@vivo.com>
-Cc: louis.peens@corigine.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, kuba@kernel.org, oss-drivers@corigine.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- opensource.kernel@vivo.com
+References: <20240829095509.3151987-1-yanzhen@vivo.com>
+In-Reply-To: <20240829095509.3151987-1-yanzhen@vivo.com>
+To: Yan Zhen <yanzhen@vivo.com>
+Cc: edumazet@google.com, pshelar@ovn.org, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ dev@openvswitch.org, linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 29 Aug 2024 15:25:38 +0800 you wrote:
-> Use ERR_CAST() as it is designed for casting an error pointer to
-> another type.
+On Thu, 29 Aug 2024 17:55:09 +0800 you wrote:
+> Using ERR_CAST() is more reasonable and safer, When it is necessary
+> to convert the type of an error pointer and return it.
 > 
-> Signed-off-by: Shen Lichuan <shenlichuan@vivo.com>
+> Signed-off-by: Yan Zhen <yanzhen@vivo.com>
 > ---
->  drivers/net/ethernet/netronome/nfp/nfpcore/nfp_nsp.c | 2 +-
+>  net/openvswitch/flow_netlink.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [v1,net-next] nfp: Convert to use ERR_CAST()
-    https://git.kernel.org/netdev/net-next/c/f24f966feb62
+  - [v1,net-next] net: openvswitch: Use ERR_CAST() to return
+    https://git.kernel.org/netdev/net-next/c/b26b64493343
 
 You are awesome, thank you!
 -- 
