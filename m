@@ -1,91 +1,108 @@
-Return-Path: <netdev+bounces-123793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC159668C5
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:14:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEF9D9668C9
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:16:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B757A1F23715
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:14:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B2CB281D6E
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABFE81BAECC;
-	Fri, 30 Aug 2024 18:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B581BB695;
+	Fri, 30 Aug 2024 18:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MRUviqe7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u9G1Yj1k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8183A61FEB;
-	Fri, 30 Aug 2024 18:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA2A1B375E;
+	Fri, 30 Aug 2024 18:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725041675; cv=none; b=FayFCv4g3S4jhIdue2wiN34NWon7wA3+nW2lLXaGrPc6VFQtYRO7UG1LN2qduS1rt3V+FE9iaiaGohV7GTOd+H7FHS7KKMXXWPCoTtyQOcoqhFtyKBy4UwlgcWuJdNQvl6lasQ50W9SxBMY8uHmey82tLuSsd8H997YskbxImWo=
+	t=1725041790; cv=none; b=Ud20CxH/7h12JR0GDud66evpugop7ddDcrO6/XWtsqqaKoS/Tg9QklXfNRN41SJJuRF2lHZ3ES9pHxiG/2Q7OYE4r7yhiGaJP0K2kkO4RGPALkXrbHDp5ImSwsLcX2ZjtHUvlsT28SkUcOdKV2YZfnHNDuYUpcDBRUOQS0YTLXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725041675; c=relaxed/simple;
-	bh=sNqDgrGCz22L2upEkK7XHWMdxxRo6ahFTX3BiWV9QCY=;
+	s=arc-20240116; t=1725041790; c=relaxed/simple;
+	bh=noFUhXwnrutmqy9MSizoA/UaP/bDMdUHEn7t6e++Qys=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tDKcbERE+aKkb/KjSxy91fcaS6cflM1SqmzGArTlqQxxjLTOHMOGgSYg49HOi1aqtI55sD00qIoVtSp1AtKIbcjadtWpg/Lrp5ZQryAStoQBqPI+pKl0zjWqV5EMCXZdImMGtm40bWGlx9YWTzB8swRUdiMvZkoObhKJFa0NpVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MRUviqe7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08726C4CEC2;
-	Fri, 30 Aug 2024 18:14:32 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=nMSLEZnI7kCQDRJh56wAOGcwni2fajTStiQ5elKcgjI6xucuHOc006Kyd0CpQs2LTu+HTEivpO7nriej1CI/K1Mwv3muE+n51zIyxQhyhf4TtIRqPuLleKRaDyeqHd6AdrJi2W69WLIzVF3smhj2UYFdkLuF+sm9p7xNJcAaZIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u9G1Yj1k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3022BC4CEC2;
+	Fri, 30 Aug 2024 18:16:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725041675;
-	bh=sNqDgrGCz22L2upEkK7XHWMdxxRo6ahFTX3BiWV9QCY=;
+	s=k20201202; t=1725041789;
+	bh=noFUhXwnrutmqy9MSizoA/UaP/bDMdUHEn7t6e++Qys=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MRUviqe7lZN3d7NfW2SYVkqq3Fyb82myS1HSsenexEPA7UoSVQD4a0zVmLsIAmq7m
-	 VB4OxWXj4P3k/0Dke2HZquPwuG7/ZHFrRNUFefcFQf1okRRg1OA2/eAYzoPqWCG08O
-	 ivGO2XCbXIuGRKQItgTbKiQy8ClNffOH95zD0AlNXdHDuxHyT/ssJHHCNJU94i3IcP
-	 TgtcbRdPRUmo0b9e4tEVe9eFV19/oFbapyUPL5Ycz4FQcSwxgQtSXDezdLo2is1Nho
-	 5i+XlAhB+TLQGOw20jLDRwMr2YMyDc0mkGDnBV6QF2DsrSii07iebWiAiLOcJfLk76
-	 HPPbraMFw50bw==
-Date: Fri, 30 Aug 2024 19:14:30 +0100
+	b=u9G1Yj1k1u88KyiGrvBpQeXqhtrL2jsSDLucPVXKVUO8BIYumgKzeLG/25bQEJSTO
+	 YButCM8DnKE0ihmqYkOYUUkwXhCBw7+/fZKs15v7vuxkZ75qCSjGFRH5LpIcN/TIK1
+	 i268jnDqdOKJpneDMOtgb8+2DqCZj7RY/n1niFS0qT+s/kvb2pVA/6U3USUj47diVQ
+	 8v8mKPivWjtQfEnjgNf2c4hw1VffTJlemtjW2CnU5o7mzRFmpy/XgbL816/WVRZwVN
+	 MqwJ7Tdo1l0qctzGiVPmz5htlxlz7xBgtjjKO0JOv8gg7PWhf2wfCMANgoF4AGef3J
+	 VedgkY/PxjxeA==
+Date: Fri, 30 Aug 2024 19:16:25 +0100
 From: Simon Horman <horms@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	linux-kernel@vger.kernel.org, o.rempel@pengutronix.de,
-	p.zabel@pengutronix.de
-Subject: Re: [PATCH net-next 1/6] net: ag71xx: add COMPILE_TEST to test
- compilation
-Message-ID: <20240830181430.GC1368797@kernel.org>
-References: <20240829214838.2235031-1-rosenp@gmail.com>
- <20240829214838.2235031-2-rosenp@gmail.com>
- <20240830154942.GT1368797@kernel.org>
- <CAKxU2N_ao94KNa+wZFmx+ZMRjTc5UXD0PgqXF=pb27w93xh9Gw@mail.gmail.com>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Shen Lichuan <shenlichuan@vivo.com>, alex.aring@gmail.com,
+	stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	opensource.kernel@vivo.com
+Subject: Re: [PATCH v1] ieee802154: at86rf230: Simplify with dev_err_probe()
+Message-ID: <20240830181625.GD1368797@kernel.org>
+References: <20240830081402.21716-1-shenlichuan@vivo.com>
+ <20240830160228.GU1368797@kernel.org>
+ <c87f7ab7-2c8c-4c08-b686-12c56fe3edeb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKxU2N_ao94KNa+wZFmx+ZMRjTc5UXD0PgqXF=pb27w93xh9Gw@mail.gmail.com>
+In-Reply-To: <c87f7ab7-2c8c-4c08-b686-12c56fe3edeb@kernel.org>
 
-On Fri, Aug 30, 2024 at 10:32:08AM -0700, Rosen Penev wrote:
-> On Fri, Aug 30, 2024 at 8:49 AM Simon Horman <horms@kernel.org> wrote:
-> >
-> > On Thu, Aug 29, 2024 at 02:48:20PM -0700, Rosen Penev wrote:
-> > > While this driver is meant for MIPS only, it can be compiled on x86 just
-> > > fine. Remove pointless parentheses while at it.
-> > >
-> > > Enables CI building of this driver.
-> > >
-> > > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> >
-> > Thanks, this seems to work well.
-> >
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> >
-> > As a follow-up, could you consider adding a MODULE_DESCRIPTION()
-> > to this module. It now gets flagged on x86_64 allmodconfig W=1 builds.
-> v2 patchset?
+On Fri, Aug 30, 2024 at 07:43:30PM +0200, Krzysztof Kozlowski wrote:
+> On 30/08/2024 18:02, Simon Horman wrote:
+> > On Fri, Aug 30, 2024 at 04:14:02PM +0800, Shen Lichuan wrote:
+> >> Use dev_err_probe() to simplify the error path and unify a message
+> >> template.
+> >>
+> >> Using this helper is totally fine even if err is known to never
+> >> be -EPROBE_DEFER.
+> >>
+> >> The benefit compared to a normal dev_err() is the standardized format
+> >> of the error code, it being emitted symbolically and the fact that
+> >> the error code is returned which allows more compact error paths.
+> >>
+> >> Signed-off-by: Shen Lichuan <shenlichuan@vivo.com>
+> > 
+> > ...
+> > 
+> >> @@ -1576,9 +1574,8 @@ static int at86rf230_probe(struct spi_device *spi)
+> >>  
+> >>  	lp->regmap = devm_regmap_init_spi(spi, &at86rf230_regmap_spi_config);
+> >>  	if (IS_ERR(lp->regmap)) {
+> >> -		rc = PTR_ERR(lp->regmap);
+> >> -		dev_err(&spi->dev, "Failed to allocate register map: %d\n",
+> >> -			rc);
+> >> +		dev_err_probe(&spi->dev, PTR_ERR(lp->regmap),
+> >> +			      "Failed to allocate register map\n");
+> >>  		goto free_dev;
+> > 
+> > After branching to dev_free the function will return rc.
+> > So I think it still needs to be set a in this error path.
+> 
+> Another bug introduced by @vivo.com.
+> 
+> Since ~2 weeks there is tremendous amount of trivial patches coming from
+> vivo.com. I identified at least 5 buggy, where the contributor did not
+> understand the code.
+> 
+> All these "trivial" improvements should be really double-checked.
 
-I'd wait to see if this patchset is accepted.
-And if so, send a new patch separately.
-If not, perhaps add it to v2.
+Are you concerned about those that have been accepted?
 
