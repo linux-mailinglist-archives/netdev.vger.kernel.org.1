@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-123669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E1779660F4
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 13:46:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BB4D966100
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 13:50:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53E591C235E9
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 11:46:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 246BAB2197A
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 11:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539D6194C8B;
-	Fri, 30 Aug 2024 11:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C2719994F;
+	Fri, 30 Aug 2024 11:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d51iEnvv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vmxq71bK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FBF16EB42;
-	Fri, 30 Aug 2024 11:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 132C8199942
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 11:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725018401; cv=none; b=SscwgBYsfj+Atl5SybNxq2YXoo66Dh7zh5sL/aF+iv0RQ/KV3d59YgntY0eSjQtVbQhZFB4AMFSnlINhYq/fTRLym28ap7NptlFJUf4XZhIB9cARD9CsJUkxNPVZLzo15RWEYHpPicKZgcRhSPuLGzJi8sv8gAMNP+TV1/g9GTc=
+	t=1725018605; cv=none; b=oeN7KZJL+rlZS8sHJGi7GnyvQCILa3GdTYlcZIbK7EYBy/bnX896touOA55W4b1Y4/zPuOI2PyMziVmGqTuIw5Z+qQ7dL6jJxWhcL6FBKi1zm+yoJOdTAB/7Qy29VckHRRiYyxWg4EDT9cjGLBLwq6BLPaMpv/HA69+e01PvUQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725018401; c=relaxed/simple;
-	bh=s/VkjtgxTFQbSHfauzE7Qxke78j8kqoSK12Sz7gMxIc=;
+	s=arc-20240116; t=1725018605; c=relaxed/simple;
+	bh=Qed3XyZGTldlw48fvJMz5k85Ns+BNjnw4jOmNBeFZrs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ua2etqO4icLLBAyH7x89Owo66vv/bSFQh1qxD8epR8ZIcTz55WvqtfUAZ6Szf1ofEeTqocVSYH9cusSFFqBGjU8olRr/b999jhIiEBQ1N9dvpYmI4WrYTALpg8Nk4e2qg+XdW36/aW2H7+mLq8gkAD1YXl7YpI/kkKS0a3B/SoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d51iEnvv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50D2EC4CEC2;
-	Fri, 30 Aug 2024 11:46:30 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=EgQtbaauhIcbczmtpkdvgwP87U7rRCEUBlneHorYENuFZL093fSWxcMtE/XldtYLFumGWHbCe0pTDLEsVqGE2t56d4tXYWpgcctFOw3uxg8w8VNhC2skofTq3O6n3uw4hMgBZBLhg93Icd5u6Xt5B5JHGkLh9NW9HTGu/V3o21M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vmxq71bK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07610C4CEC2;
+	Fri, 30 Aug 2024 11:49:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725018400;
-	bh=s/VkjtgxTFQbSHfauzE7Qxke78j8kqoSK12Sz7gMxIc=;
+	s=k20201202; t=1725018604;
+	bh=Qed3XyZGTldlw48fvJMz5k85Ns+BNjnw4jOmNBeFZrs=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=d51iEnvvrGvL2l/XtbY10HLhDXxltAWvPJGI9/8zf+/dDWUl2gS8+drLEMkMxP6ir
-	 llVe4NrANBzust24JIUFuDbS8TN2uNwx6zPlXZTNex61M8WO5cvjhuWwGtP9uiueEJ
-	 z71sxA2k1tPk1eDBkOGLafUMCV2Sr2zvEl0ojJTtwci8ue13IsCidsBZ53+qHiQsv1
-	 sCiZTZb3PUwsYtQDtyNSz8u1g8wL12LZWbJZVQHptF8jzqFcHFLTrdTh1bNZeO6F25
-	 WAvzi00b7FPwjXlmMfQaYZU5K4dk1pYXB/QGegjl80iGHDXaLX0qEWVuBQNf3rgkY2
-	 5CzfmklABTxnQ==
-Message-ID: <e05705c1-95dc-4d77-8a0d-8c2a785b0b05@kernel.org>
-Date: Fri, 30 Aug 2024 13:46:27 +0200
+	b=Vmxq71bKwnmDthLnf/Hu2X9pPTebwJzh+AizB1AjHOwBfIXx9wWTM71WkXEx9h0bZ
+	 DIPSy8hL2cDuOAmnADK0Vw9vSrzfkHlNLKoRFCQeA54JAr/h5Ban8pGOi6fqUQmvma
+	 YIEGbaSw6+SKHHGvK2JS8UhStBiUmZGsHpBm2+spuSuFAYl+DAVCEOGcC20Ut/1Web
+	 y4ClaqIQ9IXvmg9bt5zQuTtxDTWXP9FBieIGeg3SRrbWhmeqCC/H4KcMD+KijiwKvB
+	 IP4GnWpzNWRJp4xNYaqPVpryl1SCV5zRCOfhqOJYFgEbmyv8F8ChTiDQF/2Wrw566l
+	 cqTjo6JyM+Z5Q==
+Message-ID: <c8cad0e0-0ef9-4021-b5e5-742797a6c4ee@kernel.org>
+Date: Fri, 30 Aug 2024 14:49:42 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,126 +50,80 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 02/11] dt-bindings: pinctrl: Add RaspberryPi RP1
- gpio/pinctrl/pinmux bindings
-To: Andrea della Porta <andrea.porta@suse.com>
-Cc: Michael Turquette <mturquette@baylibre.com>,
- Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
- <dragan.cvetic@amd.com>, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+Subject: Re: [PATCH net-next 2/2] net: Remove setting of RX software timestamp
+ from drivers
+To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+ Andy Gospodarek <andy@greyhouse.net>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
  Nicolas Ferre <nicolas.ferre@microchip.com>,
  Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>,
- linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
- linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Stefan Wahren <wahrenst@gmx.net>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <82d57814075ed1bc76bf17bde124c5c83925ac59.1724159867.git.andrea.porta@suse.com>
- <5zlaxts46utk66k2n2uxeqr6umppfasnqoxhwdzah44hcmyfnp@euwjda6zk5rh>
- <ZtGdTjZPYtm3EGM0@apocalypse>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+ Sunil Goutham <sgoutham@marvell.com>,
+ Potnuri Bharat Teja <bharat@chelsio.com>,
+ Christian Benvenuti <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ Dimitris Michailidis <dmichail@fungible.com>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, Jijie Shao <shaojijie@huawei.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Geetha sowjanya <gakula@marvell.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Bryan Whitehead <bryan.whitehead@microchip.com>,
+ UNGLinuxDriver@microchip.com, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ Lars Povlsen <lars.povlsen@microchip.com>,
+ Steen Hegelund <Steen.Hegelund@microchip.com>,
+ Daniel Machon <daniel.machon@microchip.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Shannon Nelson <shannon.nelson@amd.com>,
+ Brett Creeley <brett.creeley@amd.com>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+ Edward Cree <ecree.xilinx@gmail.com>,
+ Martin Habets <habetsm.xilinx@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>,
+ MD Danish Anwar <danishanwar@ti.com>, Linus Walleij <linusw@kernel.org>,
+ Imre Kaloz <kaloz@openwrt.org>, Richard Cochran <richardcochran@gmail.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Carolina Jubran <cjubran@nvidia.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>
+References: <20240829144253.122215-1-gal@nvidia.com>
+ <20240829144253.122215-3-gal@nvidia.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <ZtGdTjZPYtm3EGM0@apocalypse>
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20240829144253.122215-3-gal@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 30/08/2024 12:22, Andrea della Porta wrote:
-> Hi Krzysztof,
+
+
+On 29/08/2024 17:42, Gal Pressman wrote:
+> The responsibility for reporting of RX software timestamp has moved to
+> the core layer (see __ethtool_get_ts_info()), remove usage from the
+> device drivers.
 > 
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
 
-...
 
->>> +#define RP1_USBHOST0_AXIS_BASE 0x200000
->>> +#define RP1_USBHOST1_AXIS_BASE 0x300000
->>> +#define RP1_EXAC_BASE 0x400000
->>> +
->>> +/* Interrupts */
->>> +
->>> +#define RP1_INT_IO_BANK0 0
->>> +#define RP1_INT_IO_BANK1 1
->>
->> Also no, interrupt numbers are not considered bindings. That's too much
->> churn. Otherwise, please point me to driver code using the define
->> (directly! that's the requirement).
-> 
-> As mentioned above, RP1_INT_END is used in rp1-pci.c. To get rid of all those
+for:
 
-Number of interrupts is not a binding, either. Does not appear in the DTS.
+drivers/net/ethernet/ti/am65-cpsw-ethtool.c
+drivers/net/ethernet/ti/cpsw_ethtool.c
+drivers/net/ethernet/ti/icssg/icssg_ethtool.c
 
-> macroes from dt-binding would mean to hardcode the interrupt number in both
-> the binding example and in dtso, from this:
-> 
-> interrupts = <RP1_INT_IO_BANK0 IRQ_TYPE_LEVEL_HIGH>,
->              <RP1_INT_IO_BANK1 IRQ_TYPE_LEVEL_HIGH>,
->              <RP1_INT_IO_BANK2 IRQ_TYPE_LEVEL_HIGH>;
-> 
-> to this:
-> 
-> interrupts = <0 IRQ_TYPE_LEVEL_HIGH>,
-> 	     <1 IRQ_TYPE_LEVEL_HIGH>,
->              <2 IRQ_TYPE_LEVEL_HIGH>;
-> 
-> is this what you are proposing?
-
-Yes, just like every DTS does. I think the hard-coding of numbers is not
-a problem.
-
-Best regards,
-Krzysztof
-
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
