@@ -1,122 +1,107 @@
-Return-Path: <netdev+bounces-123614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68E81965A7F
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 10:37:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C75B965A94
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 10:41:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22E38287081
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 08:37:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECCC6281572
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 08:41:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85D1170A19;
-	Fri, 30 Aug 2024 08:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kob7DTOh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F9D167DA4;
+	Fri, 30 Aug 2024 08:41:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1420170A00;
-	Fri, 30 Aug 2024 08:36:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B51514BF90
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 08:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725007007; cv=none; b=BQ7LiHy7qKgHIvCmUY2GN5u+wtuykSGE4jxZiQQP3jg+3Dktunpmbi0DfDwvR+iBKu2MlkFF2N5zUnCqp5NBF0I9dJA/n6nTmiNtbQErQjxOV0bLyywD0RzkpamgD2XJgihlorG76hgQwD0UAvwzT0AO7FMAJR7LJB7P2bkbLL0=
+	t=1725007267; cv=none; b=P8NUTMuZe+7s6VMa3dM2YUPU/PdBbIYLQfM8EWJf7XtvVrTKsPs0wduTqoIOWQ6mqt5yR5Cq3xidn/+1Ey9qGCFTP9R7b5OQKXILava3HOie6oUL3XmfiTEZDpYvbX/+7mGCS1ST+vVYW1I4jYCqikGGBDcQop7Z8q3cFfR0E40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725007007; c=relaxed/simple;
-	bh=1a2JOCmMwUGJNO60kmTzz/sqotfRqeia2mSRSozIqcM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LSen+msqi3RxZYcu5QZ38iJa9/gUriVTEMIu1mJTrT2/WA5UT3hlZ9rMTljGCSBQafnE4nA3iFJSbRjxEgQ3vSy7JE0i62Fgp2daBu2LwuANT5mFMfwb29/DFsI0VcSIyZA3eMiNjgz2yGTcEOMNOJFwBn9GeO3W9pn6lfLDBuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kob7DTOh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18672C4CEC2;
-	Fri, 30 Aug 2024 08:36:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725007007;
-	bh=1a2JOCmMwUGJNO60kmTzz/sqotfRqeia2mSRSozIqcM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kob7DTOhbqsAaSjdfwGZvf6ryZb6RlAdR/z5yrlQ6I+NLuRHGGZIrrP3/0LDjG6BA
-	 s9Z6dvtw9amMJD0PIVt2Ir9Ebacx6jnwD3PT/OQwNqfR9F5b7AWD3KQGKUWUingNSc
-	 OZyCpU976P3wr5e1K3XKhM/uvjb3zLKdKprp6jwNwUdkC6H22+qsbRxxZ8Wox8JkKR
-	 k3NEUdPzoXew3cT+z27xek1cnHo4Tfb8FWt7bSRe6ybnN0UpD3JPaXP27mqGzbj+h1
-	 6EQxvq9TjTDtlAEQWmIkrghHn+Rxk7y/IwOBoIEHaMYKa2mwHDIPG2FSmrKcb6Kudk
-	 sH+gfj7LSMPnA==
-Date: Fri, 30 Aug 2024 09:36:41 +0100
-From: Simon Horman <horms@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, sdf@fomichev.me, bjorn@rivosinc.com,
-	hch@infradead.org, willy@infradead.org,
-	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
-	kuba@kernel.org, Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 1/5] net: napi: Make napi_defer_hard_irqs
- per-NAPI
-Message-ID: <20240830083641.GI1368797@kernel.org>
-References: <20240829131214.169977-1-jdamato@fastly.com>
- <20240829131214.169977-2-jdamato@fastly.com>
+	s=arc-20240116; t=1725007267; c=relaxed/simple;
+	bh=HTOPegl0EeIquq29FJ7vT80LYTabFugNAxkzP+x/yLY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=gdLGA/qVl4DljnGm9cjj+7gnMbygTSDAqv5YNsMalliFkWe50rGehTGTiNzMpuzDA4/0ZcWUCBwfkdVXqEd+yHOloDjqnMD55rylOXqmH2Ke5J3ANjGzEJV78kxtBbLmc9pJXiQGIM9aL5hvMOjDM/1pVswKuyutxhuL/HsXrmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-41-mtZATFM0MOGVZZXXHVDNWw-1; Fri, 30 Aug 2024 09:41:02 +0100
+X-MC-Unique: mtZATFM0MOGVZZXXHVDNWw-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 30 Aug
+ 2024 09:40:18 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 30 Aug 2024 09:40:18 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Jakub Kicinski' <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>
+CC: Hongbo Li <lihongbo22@huawei.com>, "johannes@sipsolutions.net"
+	<johannes@sipsolutions.net>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "allison.henderson@oracle.com"
+	<allison.henderson@oracle.com>, "dsahern@kernel.org" <dsahern@kernel.org>,
+	"pshelar@ovn.org" <pshelar@ovn.org>, "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "rds-devel@oss.oracle.com"
+	<rds-devel@oss.oracle.com>, "dccp@vger.kernel.org" <dccp@vger.kernel.org>,
+	"dev@openvswitch.org" <dev@openvswitch.org>, "linux-afs@lists.infradead.org"
+	<linux-afs@lists.infradead.org>
+Subject: RE: [PATCH net-next 0/8] Use max/min to simplify the code
+Thread-Topic: [PATCH net-next 0/8] Use max/min to simplify the code
+Thread-Index: AQHa+Ine9Uj88qKbsUSQ6aPvxEhV6bI/frIw
+Date: Fri, 30 Aug 2024 08:40:18 +0000
+Message-ID: <bfb315c60376419ea2ea90df7e7ae2dc@AcuMS.aculab.com>
+References: <20240824074033.2134514-1-lihongbo22@huawei.com>
+	<20240826144404.03fce39c@kernel.org>
+	<4a92bb68-7fe7-4bf2-885f-e07b06ea82aa@huawei.com>	<878qwifub5.fsf@kernel.org>
+ <20240827070347.4bf3a284@kernel.org>
+In-Reply-To: <20240827070347.4bf3a284@kernel.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240829131214.169977-2-jdamato@fastly.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-On Thu, Aug 29, 2024 at 01:11:57PM +0000, Joe Damato wrote:
-> Allow per-NAPI defer_hard_irqs setting.
-> 
-> The existing sysfs parameter is respected; writes to sysfs will write to
-> all NAPI structs for the device and the net_device defer_hard_irq field.
-> Reads from sysfs will read from the net_device field.
-> 
-> sysfs code was updated to guard against what appears to be a potential
-> overflow as the field is an int, but the value passed in is an unsigned
-> long.
-> 
-> The ability to set defer_hard_irqs on specific NAPI instances will be
-> added in a later commit, via netdev-genl.
-> 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> Reviewed-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> ---
->  include/linux/netdevice.h | 23 +++++++++++++++++++++++
->  net/core/dev.c            | 29 ++++++++++++++++++++++++++---
->  net/core/net-sysfs.c      |  5 ++++-
->  3 files changed, 53 insertions(+), 4 deletions(-)
+RnJvbTogSmFrdWIgS2ljaW5za2kNCj4gU2VudDogMjcgQXVndXN0IDIwMjQgMTU6MDQNCj4gDQo+
+IE9uIFR1ZSwgMjcgQXVnIDIwMjQgMDc6NDU6MDIgKzAzMDAgS2FsbGUgVmFsbyB3cm90ZToNCj4g
+PiA+IERvIHlvdSBtZWFuIHNvbWUgcGF0Y2hlcyB3aWxsIGdvIHRvIG90aGVyIGJyYW5jaGVzIChz
+dWNoIGFzIG1hYzgwMjExKT8NCj4gPg0KPiA+IEpha3ViIG1lYW5zIHRoYXQgeW91ciBwYXRjaHNl
+dCBoYWQgY29tcGlsYXRpb24gZXJyb3JzLCBzZWUgdGhlIHJlZCBvbg0KPiA+IHBhdGNod29yazoN
+Cj4gPg0KPiA+IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9uZXRkZXZicGYv
+bGlzdC8/c2VyaWVzPTg4MjkwMSZzdGF0ZT0qJm9yZGVyPWRhdGUNCj4gDQo+IEZXSVcgSSBwcmVm
+ZXIgbm90IHRvIHBvaW50IG5vb2JzIHRvIHRoZSBwYXRjaHdvcmsgY2hlY2tzLCBsZXN0IHRoZXkN
+Cj4gdGhpbmsgaXQncyBhIHB1YmxpYyBDSSBhbmQgdGhleSBjYW4gZmxpbmcgYnJva2VuIGNvZGUg
+YXQgdGhlIGxpc3QgOigNCj4gQnV0IHllcywgaW4gY2FzZSAiY29kZSBkb2Vzbid0IGJ1aWxkIiBu
+ZWVkcyBhIGZ1cnRoZXIgZXhwbGFuYXRpb246DQo+IA0KPiBuZXQvY29yZS9wa3RnZW4uYzogSW4g
+ZnVuY3Rpb24g4oCYcGt0Z2VuX2ZpbmFsaXplX3NrYuKAmToNCj4gLi8uLi9pbmNsdWRlL2xpbnV4
+L2NvbXBpbGVyX3R5cGVzLmg6NTEwOjQ1OiBlcnJvcjogY2FsbCB0byDigJhfX2NvbXBpbGV0aW1l
+X2Fzc2VydF85MjjigJkgZGVjbGFyZWQgd2l0aA0KPiBhdHRyaWJ1dGUgZXJyb3I6IG1pbihkYXRh
+bGVuL2ZyYWdzLCAoKDFVTCkgPDwgMTIpKSBzaWduZWRuZXNzIGVycm9yDQouLi4NCj4gLi4vbmV0
+L2NvcmUvcGt0Z2VuLmM6Mjc5NjoyODogbm90ZTogaW4gZXhwYW5zaW9uIG9mIG1hY3JvIOKAmG1p
+buKAmQ0KPiAgMjc5NiB8ICAgICAgICAgICAgICAgICBmcmFnX2xlbiA9IG1pbihkYXRhbGVuL2Zy
+YWdzLCBQQUdFX1NJWkUpOw0KPiAgICAgICB8ICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5+
+fg0KDQpJIGNhbid0IGhlbHAgZmVlbGluZyB0aGF0IGEgc2lnbmVkIGRpdmlkZSBpc24ndCBpbnRl
+bmRlZCBoZXJlLg0KV2hpY2ggcmF0aGVyIGltcGxpZXMgdGhhdCBib3RoIGRhdGFsZW4gYW5kIGZy
+YWdzIGFyZSBzaWduZWQgdHlwZXMuDQpXaGVyZWFzIG5laXRoZXIgY2FuIGJlIHNlbnNpYmx5IG5l
+Z2F0aXZlLg0KUGVyaGFwcyB0aGF0IGlzIHRoZSByZWFsIGJ1Zz8NCg0KCURhdmlkDQoNCi0NClJl
+Z2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0
+b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykN
+Cg==
 
-...
-
-> @@ -534,6 +535,28 @@ static inline void napi_schedule_irqoff(struct napi_struct *n)
->  		__napi_schedule_irqoff(n);
->  }
->  
-> +/**
-> + * napi_get_defer_hard_irqs - get the NAPI's defer_hard_irqs
-> + * @n: napi struct to get the defer_hard_irqs field from
-> + *
-> + * Returns the per-NAPI value of the defar_hard_irqs field.
-> + */
-> +int napi_get_defer_hard_irqs(const struct napi_struct *n);
-
-Hi Joe,
-
-As it looks like there will be a v2 anyway, a minor nit from my side.
-
-Thanks for documenting the return value, but I believe that
-./scripts/kernel-doc -none -Wall expects "Return: " or "Returns: "
-
-Likewise in patch 3/5.
-
-...
 
