@@ -1,94 +1,73 @@
-Return-Path: <netdev+bounces-123837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD510966A0C
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 21:46:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3176966A3D
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 22:11:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B37628329F
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:46:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF89128126E
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B091BD4F0;
-	Fri, 30 Aug 2024 19:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 964361BBBD8;
+	Fri, 30 Aug 2024 20:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQ42NSii"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AEjCKHe7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A38033CD1;
-	Fri, 30 Aug 2024 19:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF3FEEC3;
+	Fri, 30 Aug 2024 20:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725047198; cv=none; b=HEjfHsM0xye/sLFbgXWZai7MovwEyoQw3itV2bcEWS+CFO2yFapzjLIbIwhpwZ0padiGlK22qV9lP/E7CxMZvay5JmgROYt0PEvdPvjpcmXeC24xVnsqTZN9HWIuyVEtUE6/ML/4ZY55bC+UY7PUTjoBM6VdB/7FuK7Syn3vTik=
+	t=1725048676; cv=none; b=IDg6aCCC/b43BfWfyhv00Z1BGRsK24WQEl7tnkjtl6Ev4+HWcL/BuAx4S4CBo8lB7NrPPH9fsw6kcGn8EDWJiCd6wb+P3f8NBfSJMbZYHTIjIn93qPaefGHKqJM/K5yJRGSxCf/rv2gf3IM0WK9TslTc0FMAB3LCqBAAyto3jqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725047198; c=relaxed/simple;
-	bh=srlQl2hfntMUZ3gDAS9tafJno7Ca9Nn0VC725vi9Hcs=;
-	h=Message-ID:Content-Type:MIME-Version:In-Reply-To:References:
-	 Subject:From:To:Date; b=qLkSRbtNjE1+MOBZrrgCqPm7HYHmIlol4GU3heCkB2+0czajGoR/238aWbl62JpnGNC3itFer0XpYvvkhxnTMk337L2LwxSet8qr2BdZNJ2oKyfz27CgqipoghNBz+KLXh7G876xELF60EXIZNV/X0eNeiOvO1rY/dCHbU9xb+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQ42NSii; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B3C5C4CEC2;
-	Fri, 30 Aug 2024 19:46:37 +0000 (UTC)
+	s=arc-20240116; t=1725048676; c=relaxed/simple;
+	bh=IQ/fCby4wtedNLiRXiC+Utba3e2AiBRZy3nW4CKCXtU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dn5mmXodyN4/rSu2uiK62Dwd5xot41/TeiiHek8lKHQWhPufK8/zolVI1Ur6r8mMDWIxIZmpWSKd4/R7kXwvlp42+/7CzBF2uhXbLJOjym/ANA5gyFonLtpXaKPj6OJ1shRC3Ej/DvGekONaoariQwmJuRxpkOygEikRGplkJzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AEjCKHe7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BDD8C4CEC2;
+	Fri, 30 Aug 2024 20:11:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725047197;
-	bh=srlQl2hfntMUZ3gDAS9tafJno7Ca9Nn0VC725vi9Hcs=;
-	h=In-Reply-To:References:Subject:From:To:Date:From;
-	b=oQ42NSiippJMnwZECJlJ14DPMsnKjzT551O0eUYTg3N52LLWe8b46CIz7qz1/b3Rc
-	 dwkv+HxKU06gfCzrh8lVQlutAtkOGnE0Cr7NRWnmChvg7mTMCBZDbcKWIW6JOV+55/
-	 aUMR6NI3F2JSsq3BaUEfqbinZukYIMj7ZGnUEkNvWahTsU4IBZIJSoakX6xwITwUew
-	 ivchz6A3fihB5j6p+MU6PHG+G60KhgyXaxHy9fYvtes/FN+91WGuK6oKkeuaRjkl9m
-	 1Hi5S44oHi/nYegKIS2j9wzKhfMFKjVN66771sWYaVLYz/yVjaeOnnqrbd2Z9U3q0n
-	 4zatQMsP9dgXA==
-Message-ID: <2113b8df52164733a0ee3860bb793d6e.sboyd@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1725048675;
+	bh=IQ/fCby4wtedNLiRXiC+Utba3e2AiBRZy3nW4CKCXtU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AEjCKHe7WTkXudZt3NpaH0kNrS3zku//iTCSvKVHpz2utSQLiu2+x7rcCCO5/JaHs
+	 jqs0ZVlwLmEIcsxZrh7M++dUEGFkfd+zCWwyNd0G53R6e1YaA+sod52ZrIiomBkGkA
+	 7/+rj3pwy88r++2yryP+C+Lmtii0PrBWJNskbchXA8dOABA2s2MSXaubsHb8/gfIxD
+	 SnX6FGRQwRwwaUqbQGP6oJpbEAUZKq9EPeVQzNMeGZ/j7ccDhiKVAPB8Bbmzz8rchx
+	 8FdddYOLmxEQ2RffIcO5xF+13HSUMlHgL0qIL4i9LescTl0NuoHNSrHo6mkZJXYR8o
+	 UIwZ+TXqMouug==
+Date: Fri, 30 Aug 2024 21:11:12 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yue Haibing <yuehaibing@huawei.com>
+Cc: bharat@chelsio.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 3/3] cxgb: Remove unused declarations
+Message-ID: <20240830201112.GA4063074@kernel.org>
+References: <20240830093338.3742315-1-yuehaibing@huawei.com>
+ <20240830093338.3742315-4-yuehaibing@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <12d0909b1612fb6d2caa42b4fda5e5ae63d623a3.1724159867.git.andrea.porta@suse.com>
-References: <cover.1724159867.git.andrea.porta@suse.com> <12d0909b1612fb6d2caa42b4fda5e5ae63d623a3.1724159867.git.andrea.porta@suse.com>
-Subject: Re: [PATCH 05/11] vmlinux.lds.h: Preserve DTB sections from being discarded after init
-From: Stephen Boyd <sboyd@kernel.org>
-To: Andrea della Porta <andrea.porta@suse.com>, Andrew Lunn <andrew@lunn.ch>, Arnd Bergmann <arnd@arndb.de>, Bjorn Helgaas <bhelgaas@google.com>, Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Catalin Marinas <catalin.marinas@arm.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley <conor+dt@kernel.org>, David S. Miller <davem@davemloft.net>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic <dragan.cvetic@amd.com>, Eric Dumazet <edumazet@google.com>, Florian Fainelli <florian.fainelli@broadcom.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Michael Turquette <mturquette@baylibre.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Stefan Wahren <wahrenst@gmx.net>, Will Deacon <will@kernel.o
- rg>, devicetree@vger.kernel.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, netdev@vger.kernel.org
-Date: Fri, 30 Aug 2024 12:46:35 -0700
-User-Agent: alot/0.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240830093338.3742315-4-yuehaibing@huawei.com>
 
-Quoting Andrea della Porta (2024-08-20 07:36:07)
-> The special section .dtb.init.rodata contains dtb and dtbo compiled
-> as objects inside the kernel and ends up in .init.data sectiion that
-> will be discarded early after the init phase. This is a problem for
-> builtin drivers that apply dtb overlay at runtime since this happens
-> later (e.g. during bus enumeration) and also for modules that should
-> be able to do it dynamically during runtime.
-> Move the dtb section to .data.
->=20
-> Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
-> ---
->  include/asm-generic/vmlinux.lds.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmli=
-nux.lds.h
-> index ad6afc5c4918..3ae9097774b0 100644
-> --- a/include/asm-generic/vmlinux.lds.h
-> +++ b/include/asm-generic/vmlinux.lds.h
-> @@ -365,6 +365,7 @@
->         TRACE_PRINTKS()                                                 \
->         BPF_RAW_TP()                                                    \
->         TRACEPOINT_STR()                                                \
-> +       KERNEL_DTB()                                                    \
+On Fri, Aug 30, 2024 at 05:33:38PM +0800, Yue Haibing wrote:
+> These functions were never implenmented since introduction in
+> commit 8199d3a79c22 ("[PATCH] A new 10GB Ethernet Driver by Chelsio
+> Communications")
+> 
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 
-The KERNEL_DTB() macro shows the section name is dtb.init.rodata. Can
-you remove the ".init." part if this isn't initdata anymore? And
-shouldn't it be in the RO_DATA() macro?
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-It would be nice to keep the initdata properties when this isn't used
-after init as well. Perhaps we need another macro and/or filename to
-indicate that the DTB{O} can be thrown away after init/module init.
 
