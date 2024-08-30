@@ -1,165 +1,125 @@
-Return-Path: <netdev+bounces-123790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468E0966865
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:51:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCAC3966887
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:59:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 059AF2816C1
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 17:51:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFE871C237A1
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 17:59:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DB11B81B1;
-	Fri, 30 Aug 2024 17:51:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEAC81BBBF1;
+	Fri, 30 Aug 2024 17:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="NTctW4pv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LjZbkURy"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0E614A4EA;
-	Fri, 30 Aug 2024 17:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB9D14F135;
+	Fri, 30 Aug 2024 17:59:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725040281; cv=none; b=COdYk5wVV5rlJsIeWXYl2K/4GivWj9xTs4cjiSRvu/Q9AjMNmEUikzvEGST87ul7v1Zu+WmEElXQijCjPzjN/GPtYEFTn1Xj36hGOTu33icfxy2UQN7+Pq0JDYUoVnO6X9yfpsCInEWEqDQ8z0x6BVrD9yLC+O+em8PI8cHHN3I=
+	t=1725040744; cv=none; b=FXl8AOWC2tBVQuGJFzCqiHPjKK+v6R9lFwSQYu8vanMuoWJmGuB1rEc2V6slSeNgf0JgLrg9XieGO7gjmmlvN/5BQMv/t2Cx87JgOLUilAif38kLu+RCpEu42kSCGEFqQ2tPNru1nzZIizbMgYcsrdsQ+A14CiMBEvxNEtV/AJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725040281; c=relaxed/simple;
-	bh=HmM31MGwOTZmhh9rNokr+Zlh5nRbX/y5mVw4jppcrwQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=szvbkSAzRiuq+vuK4gf/1swvU7doMzOLQpa0y939b38FIJgCNqq6IhtUTWbc80yNqw26iCwjnamDqJ1VJt7fk9ff871K9eNblF+scEwWDorzudi5EJTZKmRfMHoVaImH3zlSW4dh0fY6m2mIcvDx5FW5gxQ8EO89jw7ySQAa30o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=NTctW4pv; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1725040272;
-	bh=HmM31MGwOTZmhh9rNokr+Zlh5nRbX/y5mVw4jppcrwQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=NTctW4pv1uy6hoNcbQQOW1sIcqjNBdDdCUyZLJTezkOxd5KtaP3/xZ8XwVPCldwc8
-	 I+D7TScuUSYaNJY7npEABc2xxcR+wEuYcapySkG5GnZf5FLQnkP8JpwD8XBS6KAizD
-	 oW6FxTBePGq7RGjfzR/JZLfeWAGGHGWjJI6U5pWGFyBftJNDaUQpY/GaDwdqjik6vJ
-	 19cW83oOuOi12WKUiMYKbY3+XS0gIJUXSdKRFO7u4kcI0RjA8Uoo/3YehZtQvWTLPE
-	 bhEflwjcGpDJxmVuiN2fMyY5P0XlhqDLVYsquGXWcjY0mkZ2zfMuLw7tdMiEZXJ7Ze
-	 On9rLXlF+ROIw==
-Received: from pan.lan (unknown [IPv6:2a00:23c6:c32f:9100::16d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: martyn)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 06C4B17E10C2;
-	Fri, 30 Aug 2024 19:51:11 +0200 (CEST)
-From: Martyn Welch <martyn.welch@collabora.com>
-To: Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: kernel@collabora.com,
-	Martyn Welch <martyn.welch@collabora.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: enetc: Replace ifdef with IS_ENABLED
-Date: Fri, 30 Aug 2024 18:50:50 +0100
-Message-ID: <20240830175052.1463711-1-martyn.welch@collabora.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1725040744; c=relaxed/simple;
+	bh=2Jkgq5he2WxrmzFT3bK4fOcS2dH6LFp69dhviYcUaOg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oc85VY8Gaj6GN+5QSv1jRLB9gu70C2GjLwN0tR4DSzBcz3fpHSnu5Oa8rP1kP6tKR7FwZFpVzZHrm3QBrhN3/BEXEPSixPVZTNH3Ezpkc41oG3M7N+SS3RGiRpS51PhiyDvlOWohlcuHbgxDLmU/TIupsbcdbwohIilKk/OKqqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LjZbkURy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AC5CC4CEC2;
+	Fri, 30 Aug 2024 17:59:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725040743;
+	bh=2Jkgq5he2WxrmzFT3bK4fOcS2dH6LFp69dhviYcUaOg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LjZbkURyQNKOAXItRoOtb5ppDFUPv+/i17eT3Ov4/nCswre0krz2mianWNuHI1r8v
+	 yExKTIdr9UX67PvPwuSPK4U3Wf+NlFoWyTljiZhgcBStuHt1V2pUJopoJyailtq18K
+	 yLPiChNodDGr4fr4tlLmC/K3qIiUjplzLeLAa7oR7VDZMYP+vUGFTZkOKxxb2cDhYD
+	 TBO3c0v91ccwTLdQahN5cxNE1w/rE6kPrNVD6eh0vVP3WbCWknqpNHcP5Tqc1ImrEE
+	 TBJtJvmIu954K/MBIzWorcfi12TV8HA6GQP5d7NasrFNQTufqL94j3/PGxTK3U3gxf
+	 cGCV90knr8wOg==
+Date: Fri, 30 Aug 2024 10:59:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Richard Henderson
+ <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+ Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer
+ <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
+ <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>,
+ Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
+ Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
+ <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert
+ Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem
+ de Bruijn <willemdebruijn.kernel@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBl?=
+ =?UTF-8?B?bA==?= <bjorn@kernel.org>, Magnus Karlsson
+ <magnus.karlsson@intel.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, David
+ Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
+ Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
+ <pkaligineedi@google.com>, Bagas Sanjaya <bagasdotme@gmail.com>, Christoph
+ Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Taehee Yoo <ap420073@gmail.com>, Willem de Bruijn <willemb@google.com>,
+ Kaiyuan Zhang <kaiyuanz@google.com>, Daniel Vetter <daniel.vetter@ffwll.ch>
+Subject: Re: [PATCH net-next v23 03/13] netdev: support binding dma-buf to
+ netdevice
+Message-ID: <20240830105901.27e2e139@kernel.org>
+In-Reply-To: <CAHS8izOy26r0uoWdASgmBCENNS6cDjHpkp+AHhOaKVkZR1LZqQ@mail.gmail.com>
+References: <20240829060126.2792671-1-almasrymina@google.com>
+	<20240829060126.2792671-4-almasrymina@google.com>
+	<20240829140824.555d016c@kernel.org>
+	<e6df00ec-2c52-489e-a510-b69db7e9dbf9@linux.dev>
+	<CAHS8izOy26r0uoWdASgmBCENNS6cDjHpkp+AHhOaKVkZR1LZqQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The enetc driver uses ifdefs when checking whether
-CONFIG_FSL_ENETC_PTP_CLOCK is enabled in a number of places. This works
-if the driver is compiled in but fails if the driver is available as a
-kernel module. Replace the instances of ifdef with use of the IS_ENABLED
-macro, that will evaluate as true when this feature is built as a kernel
-module.
+On Thu, 29 Aug 2024 22:41:17 -0700 Mina Almasry wrote:
+> Thank you, I think the right fix here is to reacquire rtnl_lock before
+> the `goto err_unbind;`, since err_unbind expects rtnl to be locked at
+> this point.
 
-Signed-off-by: Martyn Welch <martyn.welch@collabora.com>
----
- drivers/net/ethernet/freescale/enetc/enetc.c         | 8 ++++----
- drivers/net/ethernet/freescale/enetc/enetc.h         | 4 ++--
- drivers/net/ethernet/freescale/enetc/enetc_ethtool.c | 2 +-
- 3 files changed, 7 insertions(+), 7 deletions(-)
+FWIW it's best to keep the error path a mirror image of the success
+path, so I'd add a new label "err_relock" or something. But..
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index 5c45f42232d3..276bc96dd1ef 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -977,7 +977,7 @@ static int enetc_refill_rx_ring(struct enetc_bdr *rx_ring, const int buff_cnt)
- 	return j;
- }
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
-+#if IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)
- static void enetc_get_rx_tstamp(struct net_device *ndev,
- 				union enetc_rx_bd *rxbd,
- 				struct sk_buff *skb)
-@@ -1041,7 +1041,7 @@ static void enetc_get_offloads(struct enetc_bdr *rx_ring,
- 		__vlan_hwaccel_put_tag(skb, tpid, le16_to_cpu(rxbd->r.vlan_opt));
- 	}
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
-+#if IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)
- 	if (priv->active_offloads & ENETC_F_RX_TSTAMP)
- 		enetc_get_rx_tstamp(rx_ring->ndev, rxbd, skb);
- #endif
-@@ -2882,7 +2882,7 @@ void enetc_set_features(struct net_device *ndev, netdev_features_t features)
- }
- EXPORT_SYMBOL_GPL(enetc_set_features);
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
-+#if IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)
- static int enetc_hwtstamp_set(struct net_device *ndev, struct ifreq *ifr)
- {
- 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
-@@ -2956,7 +2956,7 @@ static int enetc_hwtstamp_get(struct net_device *ndev, struct ifreq *ifr)
- int enetc_ioctl(struct net_device *ndev, struct ifreq *rq, int cmd)
- {
- 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
-+#if IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)
- 	if (cmd == SIOCSHWTSTAMP)
- 		return enetc_hwtstamp_set(ndev, rq);
- 	if (cmd == SIOCGHWTSTAMP)
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.h b/drivers/net/ethernet/freescale/enetc/enetc.h
-index a9c2ff22431c..b527bb3d51b4 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.h
-@@ -184,7 +184,7 @@ static inline union enetc_rx_bd *enetc_rxbd(struct enetc_bdr *rx_ring, int i)
- {
- 	int hw_idx = i;
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
-+#if IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)
- 	if (rx_ring->ext_en)
- 		hw_idx = 2 * i;
- #endif
-@@ -199,7 +199,7 @@ static inline void enetc_rxbd_next(struct enetc_bdr *rx_ring,
- 
- 	new_rxbd++;
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
-+#if IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)
- 	if (rx_ring->ext_en)
- 		new_rxbd++;
- #endif
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-index 5e684b23c5f5..d6fdec2220ce 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-@@ -853,7 +853,7 @@ static int enetc_get_ts_info(struct net_device *ndev,
- 		info->phc_index = -1;
- 	}
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
-+#if IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)
- 	info->so_timestamping = SOF_TIMESTAMPING_TX_HARDWARE |
- 				SOF_TIMESTAMPING_RX_HARDWARE |
- 				SOF_TIMESTAMPING_RAW_HARDWARE |
--- 
-2.45.2
+> This could introduce a weird edge case where we drop rtnl_lock, then
+> find out genlmsg_reply failed, then reacquire rtnl_lock to do the
+> cleanup. I can't think of anything that would horribly break if we do
+> that, but I may be missing something. In theory we could race with a
+> dmabuf unbind call happening in parallel.
+> 
+> If we can't reacquire rtnl_lock to do the cleanup, I think I need to
+> revert back to doing genlmsg_reply inside of rtnl_lock, and dropping
+> the lock before we return from the function.
 
+..indeed, best to keep it atomic. So let's hold rtnl_lock longer.
+genlmsg_reply() shouldn't block, AFAIU.
+
+BTW CI is quite behind but Yunsheng ignored it and reposted his
+"refactor" which is going to take us another 10 hours back, 
+so whatever, just post v24 when you're ready...
 
