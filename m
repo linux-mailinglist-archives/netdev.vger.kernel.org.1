@@ -1,179 +1,163 @@
-Return-Path: <netdev+bounces-123748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E3A09666AF
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:18:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A709666BC
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6099F1C2356F
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:18:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88DD11C2360C
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B600A1B5ED1;
-	Fri, 30 Aug 2024 16:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615EE1494B4;
+	Fri, 30 Aug 2024 16:25:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b0uGNjvE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Vp7BOhho"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF61A1B3B15
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 16:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F121F942;
+	Fri, 30 Aug 2024 16:25:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725034702; cv=none; b=YiFT63xyoRQy1boEcKhgmovTIFzjviQw/PbfYvpoeXaABZKEBVpWGm6WaxBlhEVEcGSvUwm1gNoH6cHnoDeMtueyFcIxM6klnJL2+sqKiEGx4MfaCN4Xnev4jX5jya7lCUzeQV6Y1cmdTtDLGocVavYXkBi8yVC2A+AshnN1wWU=
+	t=1725035140; cv=none; b=DDOAgnW42xVE73foOfK5ophdl8SMKqkHohrGStu0+M2wZ/yfHQIdOj7ZjWHySespyfbp5cm/UJqS/JEKt+I2kAzC/XAi2VCYhf6P8xRhp5FyuFa9X8gb6MF2kpzc+tgrBRq3nzzVTRf0shkzGvDGp2R5q5IPGXSe3NEXNPvH9+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725034702; c=relaxed/simple;
-	bh=ST63oNtWEeahws4ZxuLG9rvw0D9cMNAgPwp86IE+CKc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EmU6iuZRsE3LBh4pNktaEVCojKEbdhQn5p93t06d+0fK/DnPfAUxlmKokSND8qUWzFngfE/kBrr6elw7s/Nh6/BL/ot4AydH5Ri6DTTOt9/yeeYkUsaa+kaJt4gfjuC5/em9hEOz/Hno+M4FThQImrJWY7rjBxoxf8Kf2uWQTq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b0uGNjvE; arc=none smtp.client-ip=198.175.65.17
+	s=arc-20240116; t=1725035140; c=relaxed/simple;
+	bh=QKQd4OO54cY06mKFo8bq2agEDnOyPynVHO6T9olXObk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tp/YzkDyaTG7QRaO0RY3OJWCBXO6gLJrJ9pRTuRq94xk+6rNRk6ffDQTDFdoEEtaP2Xhmf7yZgutVh0IKRwh1GVUK9AMqIw3XB318gZuMebMDDB0O8OKDax62NqRfSVrt2ZtODsmJ6YaGJ8X1DcXJlG+Fi79v/COkp3UmchfvsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Vp7BOhho; arc=none smtp.client-ip=192.198.163.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725034700; x=1756570700;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ST63oNtWEeahws4ZxuLG9rvw0D9cMNAgPwp86IE+CKc=;
-  b=b0uGNjvEpUToWRf713PJUvT6QX+wQHr8UEMxnwKKGFHpdDLTrLHGTrMs
-   LsJy1ZCPxUismTJi05eGwyMTo+HNCNS3UpIi0+P8oWRbxgzpydvZYZQLz
-   gcEjSYrgB6iu0yytng0pCEsO1t4HdLbjlgyKrBnm2kyd58LOdybGFvQlg
-   CNdmG/WOtYLduv3lLZmfROKNfD9eU283NzNlN+7BZiVZx/yuwgFalyjsh
-   UINvpSKGqLrTGlOZPFRGx69V0mOz1CJV1XdDTiTHsfdGu8pF7C9po5qd2
-   trM7h5vLIBQH87wh+UQ4h2FTE+ylapbXmsj4KV1WnRWsXwwmd9ffla4Xs
-   g==;
-X-CSE-ConnectionGUID: cKOWMrCSTpO75rzq5Tjvvg==
-X-CSE-MsgGUID: V5HRRROPTguioHd3y+TTrQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11180"; a="23838210"
+  t=1725035139; x=1756571139;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=QKQd4OO54cY06mKFo8bq2agEDnOyPynVHO6T9olXObk=;
+  b=Vp7BOhhobOzLvI0OjqrnTVZbH1+B9o8K806uPGu0H2DYZkt3/EGbw5UB
+   iGzDn4HvsHeCqvgus4sT9GQmksWJh02t6n1Ee6fh1mWzcrDh2OugGNx0p
+   e5gT/Mq6LnhVyPRvh+Jzf+mAkgQgURVReHsynvWgS/qJmK19tDXmL7tlk
+   5fFIjH+wnO4DRUvCDPiiKFViZo+kEqW7SbRYvX7NxTVwKyoNoY/RvpsAP
+   m8A0TAKjDFGBXWpY6j6lsUFgU9vakeDe/9tlZugUrR1+6otHoKEUP2BkY
+   wQtTdc7t+oCinfRMCBnmFmyLYsuROWWUTXQF6vMgXXHUbjSgmKEcWgltY
+   A==;
+X-CSE-ConnectionGUID: po6Uc2idTFiG+ZKnkSBu5A==
+X-CSE-MsgGUID: BLcKFJi5SRW2DaH+CkLxXQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11180"; a="49068870"
 X-IronPort-AV: E=Sophos;i="6.10,189,1719903600"; 
-   d="scan'208";a="23838210"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 09:18:20 -0700
-X-CSE-ConnectionGUID: 0fd0LFhmQR6AJjg59QDGAw==
-X-CSE-MsgGUID: 7HgnHx48TEy6IrrwdgYPpA==
+   d="scan'208";a="49068870"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 09:25:38 -0700
+X-CSE-ConnectionGUID: hrKFKfYSQ/adBhXf5pqw+A==
+X-CSE-MsgGUID: Z8+XxyUiTGCFXGXg88XA8A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,189,1719903600"; 
-   d="scan'208";a="64445691"
-Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 30 Aug 2024 09:18:17 -0700
-Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sk4KF-0001dO-0D;
-	Fri, 30 Aug 2024 16:18:15 +0000
-Date: Sat, 31 Aug 2024 00:18:10 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vadim Fedorenko <vadfed@meta.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Willem de Bruijn <willemb@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] net_tstamp: add SCM_TS_OPT_ID to provide
- OPT_ID in control message
-Message-ID: <202408310023.xSozGTYj-lkp@intel.com>
-References: <20240829204922.1674865-1-vadfed@meta.com>
+   d="scan'208";a="63996431"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa009.fm.intel.com with ESMTP; 30 Aug 2024 09:25:34 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Daniel Xu <dxu@dxuuu.xyz>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH bpf-next 0/9] bpf: cpumap: enable GRO for XDP_PASS frames
+Date: Fri, 30 Aug 2024 18:24:59 +0200
+Message-ID: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240829204922.1674865-1-vadfed@meta.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Vadim,
+Recently, I've been looking through my old XDP hints tree[0] to check
+whether some patches not directly related to hints can be sent
+standalone. Roughly at the same time, Daniel appeared and asked[1] about
+GRO for cpumap from that tree.
 
-kernel test robot noticed the following build errors:
+Currently, cpumap uses its own kthread which processes cpumap-redirected
+frames by batches of 8, without any weighting (but with rescheduling
+points). The resulting skbs get passed to the stack via
+netif_receive_skb_list(), which means no GRO happens.
+Even though we can't currently pass checksum status from the drivers,
+in many cases GRO performs better than the listified Rx without the
+aggregation, confirmed by tests.
 
-[auto build test ERROR on net-next/main]
+In order to enable GRO in cpumap, we need to do the following:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/selftests-txtimestamp-add-SCM_TS_OPT_ID-test/20240830-045630
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240829204922.1674865-1-vadfed%40meta.com
-patch subject: [PATCH net-next 1/2] net_tstamp: add SCM_TS_OPT_ID to provide OPT_ID in control message
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240831/202408310023.xSozGTYj-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240831/202408310023.xSozGTYj-lkp@intel.com/reproduce)
+* patches 1-3: allow creating CPU-pinned threaded NAPIs;
+* patch 4: switch cpumap from a custom kthread to a CPU-pinned
+  threaded NAPI;
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408310023.xSozGTYj-lkp@intel.com/
+Additional improvements:
 
-All errors (new ones prefixed by >>):
+* patch 5: optimize XDP_PASS in cpumap by using arrays instead of linked
+  lists;
+* patch 6-7: introduce and use function do get skbs from the NAPI percpu
+  caches by bulks, not one at a time;
+* patch 8-9: use that function in veth and remove the one that was
+  superseded by it.
 
-   net/core/sock.c: In function '__sock_cmsg_send':
->> net/core/sock.c:2862:14: error: 'SCM_TS_OPT_ID' undeclared (first use in this function); did you mean 'IPCORK_TS_OPT_ID'?
-    2862 |         case SCM_TS_OPT_ID:
-         |              ^~~~~~~~~~~~~
-         |              IPCORK_TS_OPT_ID
-   net/core/sock.c:2862:14: note: each undeclared identifier is reported only once for each function it appears in
+My trafficgen UDP GRO tests, small frame sizes:
 
+                GRO off    GRO on
+baseline        2.7        N/A       Mpps
+thread GRO      2.3        4         Mpps
+thr bulk GRO    2.4        4.7       Mpps
 
-vim +2862 net/core/sock.c
+1...2 diff      -17        +48       %
+1...3 diff      -14        +75       %
 
-  2828	
-  2829	int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
-  2830			     struct sockcm_cookie *sockc)
-  2831	{
-  2832		u32 tsflags;
-  2833	
-  2834		switch (cmsg->cmsg_type) {
-  2835		case SO_MARK:
-  2836			if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
-  2837			    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
-  2838				return -EPERM;
-  2839			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-  2840				return -EINVAL;
-  2841			sockc->mark = *(u32 *)CMSG_DATA(cmsg);
-  2842			break;
-  2843		case SO_TIMESTAMPING_OLD:
-  2844		case SO_TIMESTAMPING_NEW:
-  2845			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-  2846				return -EINVAL;
-  2847	
-  2848			tsflags = *(u32 *)CMSG_DATA(cmsg);
-  2849			if (tsflags & ~SOF_TIMESTAMPING_TX_RECORD_MASK)
-  2850				return -EINVAL;
-  2851	
-  2852			sockc->tsflags &= ~SOF_TIMESTAMPING_TX_RECORD_MASK;
-  2853			sockc->tsflags |= tsflags;
-  2854			break;
-  2855		case SCM_TXTIME:
-  2856			if (!sock_flag(sk, SOCK_TXTIME))
-  2857				return -EINVAL;
-  2858			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u64)))
-  2859				return -EINVAL;
-  2860			sockc->transmit_time = get_unaligned((u64 *)CMSG_DATA(cmsg));
-  2861			break;
-> 2862		case SCM_TS_OPT_ID:
-  2863			/* allow this option for UDP sockets only */
-  2864			if (!sk_is_udp(sk))
-  2865				return -EINVAL;
-  2866			tsflags = READ_ONCE(sk->sk_tsflags);
-  2867			if (!(tsflags & SOF_TIMESTAMPING_OPT_ID))
-  2868				return -EINVAL;
-  2869			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-  2870				return -EINVAL;
-  2871			sockc->ts_opt_id = *(u32 *)CMSG_DATA(cmsg);
-  2872			sockc->tsflags |= SOF_TIMESTAMPING_OPT_ID_CMSG;
-  2873			break;
-  2874		/* SCM_RIGHTS and SCM_CREDENTIALS are semantically in SOL_UNIX. */
-  2875		case SCM_RIGHTS:
-  2876		case SCM_CREDENTIALS:
-  2877			break;
-  2878		default:
-  2879			return -EINVAL;
-  2880		}
-  2881		return 0;
-  2882	}
-  2883	EXPORT_SYMBOL(__sock_cmsg_send);
-  2884	
+Daniel reported +14% of throughput in neper's TCP RR tests[2].
+
+[0] https://github.com/alobakin/linux/tree/xdp_hints
+[1] https://lore.kernel.org/bpf/cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com
+[2] https://lore.kernel.org/bpf/merfatcdvwpx2lj4j2pahhwp4vihstpidws3jwljwazhh76xkd@t5vsh4gvk4mh
+
+Alexander Lobakin (7):
+  firmware/psci: fix missing '%u' format literal in
+    kthread_create_on_cpu()
+  kthread: allow vararg kthread_{create,run}_on_cpu()
+  bpf: cpumap: reuse skb array instead of a linked list to chain skbs
+  net: skbuff: introduce napi_skb_cache_get_bulk()
+  bpf: cpumap: switch to napi_skb_cache_get_bulk()
+  veth: use napi_skb_cache_get_bulk() instead of xdp_alloc_skb_bulk()
+  xdp: remove xdp_alloc_skb_bulk()
+
+Lorenzo Bianconi (2):
+  net: napi: add ability to create CPU-pinned threaded NAPI
+  bpf: cpumap: use CPU-pinned threaded NAPI w/GRO instead of kthread
+
+ include/linux/kthread.h              |  51 ++++---
+ include/linux/netdevice.h            |  35 ++++-
+ include/linux/skbuff.h               |   1 +
+ include/net/xdp.h                    |   1 -
+ drivers/firmware/psci/psci_checker.c |   2 +-
+ drivers/net/veth.c                   |   3 +-
+ kernel/bpf/cpumap.c                  | 210 ++++++++++++---------------
+ kernel/kthread.c                     |  22 +--
+ net/core/dev.c                       |  18 ++-
+ net/core/skbuff.c                    |  62 ++++++++
+ net/core/xdp.c                       |  10 --
+ 11 files changed, 251 insertions(+), 164 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.46.0
+
 
