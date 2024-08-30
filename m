@@ -1,144 +1,156 @@
-Return-Path: <netdev+bounces-123886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF599966B8F
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 23:52:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B725966BC5
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 23:59:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88F00B21462
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 21:52:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE8D51C21C61
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 21:59:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F46C171E43;
-	Fri, 30 Aug 2024 21:52:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UUiShg4Q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03BCC1C1739;
+	Fri, 30 Aug 2024 21:59:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2326713D60E;
-	Fri, 30 Aug 2024 21:52:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 784621BF815
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 21:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725054758; cv=none; b=DZKB0GlSuBExlLjVKkTjPcS3OEJAg83PpJQECN+4sgpiExvLVy5PpRB8OwxfXUBNTzQ3WBBtW8Sro3CTJz8a6XXmzDkn9CsIwwPnSPxD7u3hApUNgSpSXi+QcirYBIFqFVOdtWf2ThqTk1A0Ka8iaHARGTIjhvtsnCgTNJHHv18=
+	t=1725055161; cv=none; b=WKyeHQ28WtYNhdW+Vnsn8iIuDcS0lIwDttcnKlMRtWZt9qWP2oFHInPxCvfxOquAqL35bo/Ak+zf3woo0JbQTBSFJ9eO4YiSUsYUPOYsHNM6zmr8CFT5VA4Rji+lanvv+llku1hEnxQ4jli4HHHMbX+T51hTAiKfNDkuZCIeDUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725054758; c=relaxed/simple;
-	bh=IkTuCSbVLR1iXF7AXKgQbRDx1TmVCNHiQlgZe2dW0ew=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=jbEUe9MdYjCRLbKKi+8gSuOKt1BeA/zngZj0nep41Zxc/9AQqILFfF/hMoyBl2BIgV54hAmVDC+1JYr8rU9hrR1mxWZ+GA3pI7SFhJnWDGVqFCI3ojwElhQCnrKDrlB2TwHdaD+i5EgYfyzufLa6tBzttrRA7i99ijdKvYr1UA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UUiShg4Q; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-456774a0fe7so12531011cf.0;
-        Fri, 30 Aug 2024 14:52:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725054756; x=1725659556; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CcXD9EKY0OCyfbPqdutna+/Pp1nF39E/CbXST6SgpRk=;
-        b=UUiShg4QtgbwQgx4LUfwboNxtQU7VtKbIdnvSrfsPvRsbj1j5R4is3rxfs3zjzE5e5
-         ZSUSqxpfjkgHjdXQ3xHISS4H4cSXCT1U695+cqzPmdPQhnF1IKA2eYgGgCuruybO+kLp
-         aG45ZZdvoVV+GRu3m39HVHZ+719OGquTSwpn8bTUFEEbIYUGqdyUNYdO9h5Jj5mVPWUX
-         8zjZUBRgXyXPpLumI3VewTwFPBzOtCa/gBlmlUIht4G7oLuBB3OEslEYFSNAgKCl3MlO
-         e5uFZHDyAVNApkW73vvh7un93uum/zbihdmZcv6ueW7bIwIQeqla1pZ05zmKo1Lo1cPc
-         jagw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725054756; x=1725659556;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CcXD9EKY0OCyfbPqdutna+/Pp1nF39E/CbXST6SgpRk=;
-        b=B8zad2weOJfjKelYGzKT7XijCzw7ZiPj/EZzDkDMNy+OUqaaDGDdMV8HNQ7nTgACkl
-         F0p8NanN8lItbXisXRqMNkZ/Uv5xRRqnyZf5lRF1hNFPgnSXU2/2C4pLj3dalMAqGgfK
-         MrxiTCD6flLNfnjsKMSw0ZkjNQgKDPnTRBwU/lwB9YapNjKb2AaUyGrnoGIdFD0fi40N
-         TuRZJE6P6jL4GRrS6i5IkeugzwHYb0Pe7bx6H9xfOYf3ZJ2u+Li0XA3PsXdcSNad0jhB
-         AcoYOnKNnM3JCe9M7hRW+6nKS8RHeBlkCwBc55+INIRiiCmMsu6Ptum1OsI2ZS5+RohP
-         PPwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUeKJDQuF7nOW5+FIbdYTmx2/Wb8REhEcq5oNbMWK3qIMHQOB+WfUG/xoVnWcPk2IKUwLNntJH+fFO34cpB4ss=@vger.kernel.org, AJvYcCXWwryOExCKq1FEnGVABkEorVB94h36Jm/d+KxOT//nHKvGz2uyYwb9VfZ+bQGN5sBlf8mAL3oZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzN06V0aXDvsNvwLKcEuS62qGF9XFuTsrKNgV8T7m91I21KCvpI
-	vvvolZAvlzVXn/ig6csnaFYvx3yXOhNrkDLSVeKv8/JjgEArEVmY
-X-Google-Smtp-Source: AGHT+IFaxoKnTc1ahBV3NjNBc8V4fwKTSlo2bknC7B4mNPLPi5ZHMsJwqwhugLHj+aP0wjGYPWnU+Q==
-X-Received: by 2002:a05:622a:6209:b0:457:79bf:9591 with SMTP id d75a77b69052e-45779bf9678mr4405331cf.62.1725054755803;
-        Fri, 30 Aug 2024 14:52:35 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45682d66b6asm17576591cf.65.2024.08.30.14.52.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Aug 2024 14:52:35 -0700 (PDT)
-Date: Fri, 30 Aug 2024 17:52:35 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- ncardwell@google.com, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org, 
- fw@strlen.de, 
- Willem de Bruijn <willemb@google.com>, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- martineau@kernel.org
-Message-ID: <66d23f2349f7_3d8dba29489@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240830144420.5974dc5b@kernel.org>
-References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
- <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
- <66cf2e4bd8e89_33815c294b2@willemb.c.googlers.com.notmuch>
- <20240828090120.71be0b20@kernel.org>
- <66cf7b8d1c480_36509229439@willemb.c.googlers.com.notmuch>
- <20240828140035.4554142f@kernel.org>
- <66d1e32558532_3c08a22949e@willemb.c.googlers.com.notmuch>
- <20240830103343.0dd20018@kernel.org>
- <66d213cf6652e_3c8f2d294b8@willemb.c.googlers.com.notmuch>
- <20240830144420.5974dc5b@kernel.org>
-Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
- ksft
+	s=arc-20240116; t=1725055161; c=relaxed/simple;
+	bh=TAFHUuVSQTZYEI54Px7n4FDkbeVnxXUGN3bZ/yvDhB0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oBffR8prFS8Ea/kkIoKllQ81j7sriOD9IrRyLR1jfwKQTxGQOgswl8FxFp2+ozVglhu/2Qlv/6Jbj5+dVIxxGYDMCreCb0s4+swDgemXTaL9DyxWCQF207buLE53hZesEPS92Olnlfcodc+bC0FzW4V51++JQpOb7oaOoIq6o5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sk9eI-00049s-RN
+	for netdev@vger.kernel.org; Fri, 30 Aug 2024 23:59:18 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sk9eI-004FUy-6X
+	for netdev@vger.kernel.org; Fri, 30 Aug 2024 23:59:18 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id D776932E4F3
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 21:59:17 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id AA20032E4D3;
+	Fri, 30 Aug 2024 21:59:16 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id da6efe6b;
+	Fri, 30 Aug 2024 21:59:15 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/n] pull-request: can 2024-08-30
+Date: Fri, 30 Aug 2024 23:53:35 +0200
+Message-ID: <20240830215914.1610393-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Jakub Kicinski wrote:
-> On Fri, 30 Aug 2024 14:47:43 -0400 Willem de Bruijn wrote:
-> > > We have directories in net/lib, and it's a target, and it works, no?  
-> > 
-> > net/lib is not a TARGET in tools/testing/selftests/Makefile. Its
-> > Makefile only generates dependencies for other targets: TEST_FILES,
-> > TEST_GEN_FILES and TEST_INCLUDES.
-> 
-> Oh right, TEST_FILES vs TEST_INCLUDES :(
-> 
-> Looks like only x86 does some weird stuff and prepends $(OUTPUT) to all
-> test names. Otherwise the only TEST_NAME with a / in it is
-> 
-> x86_64/nx_huge_pages_test.sh
+Hello netdev-team,
 
-Oh interesting precedent. Let me take a look.
+this is a pull request of 13 patches for net/master.
 
-> But then again maybe we should give up on the idea of using directories?
-> Use some separator like --, I mean:
-> 
-> mv packetdrill/tcp/inq/client.pkt packetdrill/tcp--inq--client.pkt
-> 
-> Assuming we're moving forward with the interpreter idea we don't need
-> directories for multi-threading, just for organization. Which perhaps
-> isn't worth the time investment? Given that we'd mostly interact with
-> these tests via UI which will flatten it all back?
+The first patch is by Kuniyuki Iwashima for the CAN BCM protocol that
+adds a missing proc entry removal when a device unregistered.
 
-That's definitely simpler :)
+Simon Horman fixes the cleanup in the error cleanup path of the m_can
+driver's open function.
 
-I'd like to keep diffs between packetdrill scripts on github (and
-Google internal, we have more) and selftests to a minimum. This is
-invertible, as is rewriting source statements inside the pkt files.
-But that might be more work and more maintenance in the end.
+Markus Schneider-Pargmann contributes 7 fixes for the m_can driver,
+all related to the recently added IRQ coalescing support.
 
+The next 2 patches are by me, target the mcp251xfd driver and fix ring
+and coalescing configuration problems when switching from CAN-CC to
+CAN-FD mode.
+
+Simon Arlott's patch fixes a possible deadlock in the mcp251x driver.
+
+The last patch is by Martin Jocic for the kvaser_pciefd driver and
+fixes a problem with lost IRQs, which result in starvation, under high
+load situations.
+
+regards,
+Marc
+
+---
+
+The following changes since commit 92c4ee25208d0f35dafc3213cdf355fbe449e078:
+
+  net: bridge: mcast: wait for previous gc cycles when removing port (2024-08-05 16:33:56 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.11-20240830
+
+for you to fetch changes up to dd885d90c047dbdd2773c1d33954cbd8747d81e2:
+
+  can: kvaser_pciefd: Use a single write when releasing RX buffers (2024-08-30 23:45:55 +0200)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.11-20240830
+
+----------------------------------------------------------------
+Kuniyuki Iwashima (1):
+      can: bcm: Remove proc entry when dev is unregistered.
+
+Marc Kleine-Budde (4):
+      Merge patch series "can: m_can: Fix polling and other issues"
+      can: mcp251xfd: fix ring configuration when switching from CAN-CC to CAN-FD mode
+      can: mcp251xfd: mcp251xfd_ring_init(): check TX-coalescing configuration
+      Merge patch series "can: mcp251xfd: fix ring/coalescing configuration"
+
+Markus Schneider-Pargmann (7):
+      can: m_can: Reset coalescing during suspend/resume
+      can: m_can: Remove coalesing disable in isr during suspend
+      can: m_can: Remove m_can_rx_peripheral indirection
+      can: m_can: Do not cancel timer from within timer
+      can: m_can: disable_all_interrupts, not clear active_interrupts
+      can: m_can: Reset cached active_interrupts on start
+      can: m_can: Limit coalescing to peripheral instances
+
+Martin Jocic (1):
+      can: kvaser_pciefd: Use a single write when releasing RX buffers
+
+Simon Arlott (1):
+      can: mcp251x: fix deadlock if an interrupt occurs during mcp251x_open
+
+Simon Horman (1):
+      can: m_can: Release irq on error in m_can_open
+
+ drivers/net/can/kvaser_pciefd.c                |  18 ++--
+ drivers/net/can/m_can/m_can.c                  | 116 +++++++++++++++----------
+ drivers/net/can/spi/mcp251x.c                  |   2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-ram.c  |  11 ++-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-ring.c |  34 ++++++--
+ net/can/bcm.c                                  |   4 +
+ 6 files changed, 121 insertions(+), 64 deletions(-)
 
 
