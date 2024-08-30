@@ -1,123 +1,133 @@
-Return-Path: <netdev+bounces-123739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A439665D7
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 17:39:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584B49665D9
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 17:39:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2069B25442
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 15:39:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AA821C23DA8
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 15:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ADE61BA27E;
-	Fri, 30 Aug 2024 15:37:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8188418FDAE;
+	Fri, 30 Aug 2024 15:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b="zfLFKynq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g/7mIESm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1F5A1BA26B
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 15:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC671C687
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 15:37:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725032248; cv=none; b=t8hqhDUDxWN1yItXGk0GCuF6abf3h0GgsK9PRB1V9Bdei69VxaIWRx8bPpZ4hrA+n/4u68CcPuS7eSN3d5V5CMCfGV82KnjIPssBA2+7dz/2/0hvxutpdkFxgaUdtxbPUTs5x/ChlXmi3lM7qXtjjsLUurN90aMBV860AyDwoUc=
+	t=1725032278; cv=none; b=bUT00DmQ+okp0FOxm5OKAaBzEKrxUGCorK+xt4L8Z0J/QoW1pxug2RRCmw8SKUqwRoFIrksTr8OYs0ih5WHvQSH5hS/uLK9F2guzK7D+LVvQjlmLk2cpqagLTG1n3I0J38H7DEf3c/yVJnoke8ua61AkpYBaYT6rD+eEcWpbKfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725032248; c=relaxed/simple;
-	bh=bIlIxGS4Fkuh9sfbYzRI8/VSht+5Uqa65aoRCnzW4i4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J6gZt2KMXzTr3/0Ut0MUPdxmlKHZmP/zyJEcMk4xXBWFfx8/LaPVgP1V71v9Xbi0Yl6QMJ+sW5mXLG4qafQ6UttsW7aP08FxqTQw4Gl+J2k2euD7cKPGQ7CvjBlKRBBw/ETyymEBS2lavqnOvJ3arkaa6HMsn+3WRZmpBus797A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com; spf=none smtp.mailfrom=kutsevol.com; dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b=zfLFKynq; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=kutsevol.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3df0df4814eso953239b6e.2
-        for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 08:37:26 -0700 (PDT)
+	s=arc-20240116; t=1725032278; c=relaxed/simple;
+	bh=+jmeeyRkVT33t0SMjEYm1TPRPBG5QeS4hGSNJ40a5KY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TrnLYtbzlDZJoupLKPvfm7ikbEZQ+YMZcujfcktyW9hIYba/auk0QczHnMgQFyTUuaa+CFaPB4qVeksbIGyY9MLJu7yz0ON3CiQ+ri8aRv4gJCdKWPU2DP2ABp1uS61NLCkm0+ZpINUlbrokHaAglitL8zDpFJ/PbPVWY5iAHlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g/7mIESm; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-71423273c62so1635079b3a.0
+        for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 08:37:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kutsevol-com.20230601.gappssmtp.com; s=20230601; t=1725032246; x=1725637046; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bIlIxGS4Fkuh9sfbYzRI8/VSht+5Uqa65aoRCnzW4i4=;
-        b=zfLFKynqjU29a2cMs9WcefAmWEjzVlsj0ZkvZ+mslEIwJ6ub+ysM7wzqQfwi+imDTq
-         uKELK6zNknTDlboSiWNs7s9lS6Rp6aiFnUsF2q+/KUglTbVKjAfsWfkadfneH4UzDRQZ
-         Fn+C8TP2IjkNN1qSOHK7uYIuyn6pdd909al82SeMxu++ZnjsGJimrS9a1FphqVFdr5pL
-         I1a0lIi4TLwwJhLC5uUyVXg1wv9czFFHL6jY3c2pCDvj5krAv7Uc3GZYSejvtCl/Ivvr
-         QXUCzkYiyhJbh/dfiBnnMO71kx0141kVXeihXWnaP6bec3femOCXQP2NBs0fx/NniLVB
-         OEuw==
+        d=gmail.com; s=20230601; t=1725032276; x=1725637076; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dFS5hGpAty3SAa/AVlyXUuDHkmicGxmUKDiWrgMd9qM=;
+        b=g/7mIESmB6/obOto2m7mvY2MrlKzuOPTeSSozD8UJ8H/C+XGtfq9KEMuroikHvTzRY
+         HqhFWkG40l9flyoZOIi7vsq+RaJisT2kdcY87OfaWJ/im98XZvW6tFdFl2IxMHNTcTAH
+         VSob4mdQfGjc2Qu1FwVgLykac056wDqqk1SS9lxasuc57kYxA+HK7vlQlJO2p+bRoKWn
+         sn2xElzcxrq+RLpGHKRCc61lEIEmA1cvVuJwBD5Uig8JqIVs8ogBGmTabfR1gdIStoCl
+         oPzoeAb0AF9NhbEoD9O1bbh8b9xWlhP6rS5AmKuACxGxEHFc/zh6ceeCw5uhUCaqLB2M
+         21dw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725032246; x=1725637046;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bIlIxGS4Fkuh9sfbYzRI8/VSht+5Uqa65aoRCnzW4i4=;
-        b=kdtUdvIyJWOR5XW+vtIWldrQ5jfEE9yrf0pWbaZPO5YxS2sGlxq7EEqZSwuhMhxmqr
-         I77c0+2IPs2jJXM7+g+XltfSwpDgIIfK8lU36xz4o5HuxiFKdJoU3vI3mOtr9blmbia/
-         xdrId81m9ywUyOH38eo6x+YxcxTd4ZBnWeq3dBsZwFkib4fxn4KK0iGg195eh8eux0Pq
-         0PYh+ZNjUnl0tkBBAdMRmVqn5aI8NEPGTJkM6HZpbFyxoQSU5KyiIcYCc4EpvTXbiBLy
-         drIvXoIXEgPhgHEF2bKXOLkcfj5ysBmifUT/8xC+EAZmWTSM/hBK40CadFXse6cLaTvG
-         ZgsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX/xLMLXBIjD4ULwZkrEiEYRKh0HZB8qdOyT7FKJmUaO+JrVnSlFiHnFfZl/5ObJuoHQlyrF50=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8dHOoBBDr7dEb1HEDjgEZpQDmAUGli/aCka/HTR/C61EONOWa
-	gea132kNiD0/Y5n5n0Inv39JD0VVVSiVqvkvIrSQlR1jWEISEP+iYgBz0x3Dkombp86hzi/8E70
-	mjIpurx7eMbNukzdnPvKgpkW+NKE/pNO579MDtQ==
-X-Google-Smtp-Source: AGHT+IEMOsx1yecc59LL8pG1QfZoOW0iZYfdgobhiqUG7wbaHzr+b5PQVVwb40bArXCze4oH+3B75ekFZtbkA6nO5eU=
-X-Received: by 2002:a05:6808:1645:b0:3db:23d3:8404 with SMTP id
- 5614622812f47-3df05e6203bmr6189707b6e.42.1725032245774; Fri, 30 Aug 2024
- 08:37:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725032276; x=1725637076;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dFS5hGpAty3SAa/AVlyXUuDHkmicGxmUKDiWrgMd9qM=;
+        b=oZc1HeN3mJESi1PZiSHbInwzX5HAnsZx/LPBv/jnlVN1edkaECDPD4e0vJ6X9ggtma
+         rV16vji0L1BXIF9wb7PdhYOzleSOQYgJgT1TDvlUe0MxAu5xAAg7/DivJvYbNoKe7jT0
+         ufk+2j4HLhGFmdspEBme4iFTcR07B1n+C+rEzgxmKBai/Ic3qhU70mE/KlqIYjaMPI8a
+         C/23x/wMQEiVt5H9DU3YqhmAsz36PrJxC0jczb39R62CP3ZTVKyv9ehHf8bQh3mYPtwg
+         cjmKdfn8z2brAlNhDB2Oy7VYSqhO1yIaZ4faa/kuE9Zi2FZCJky+W/ce7B4Eix8XH9qX
+         F2HA==
+X-Gm-Message-State: AOJu0Yzatktg26PbRurInCtooZFhzLWXzcMdETSVuJW6af65FkNo+lTi
+	QmfO1XCzi15ciIMQgjYYPA1hXVITRj39/V79N5swxMK8DIkHhXeC0ssOyw==
+X-Google-Smtp-Source: AGHT+IG5wVTarmDPua3N0m3dX60p6VAibTbYK0UO7+us0h3avLmL6+E07ghKMCXCV7PqZ4xj/mHAxQ==
+X-Received: by 2002:a05:6a20:bca4:b0:1cc:e4a9:9138 with SMTP id adf61e73a8af0-1cce4a99150mr4774485637.29.1725032276174;
+        Fri, 30 Aug 2024 08:37:56 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([114.253.36.103])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205152cd59esm28504795ad.81.2024.08.30.08.37.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Aug 2024 08:37:55 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	willemb@google.com
+Cc: netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v3 0/2] net-timestamp: introduce a flag to filter out rx software report
+Date: Fri, 30 Aug 2024 23:37:49 +0800
+Message-Id: <20240830153751.86895-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240824215130.2134153-1-max@kutsevol.com> <20240828214524.1867954-1-max@kutsevol.com>
- <20240828214524.1867954-2-max@kutsevol.com> <ZtGGp9DRTy6X+PLv@gmail.com>
- <CAO6EAnUe5-Yr=TE4Edi5oHenUR+mHYCh7ob7xu55V_dUn7d28w@mail.gmail.com> <ZtHTSexXueMjYGh/@gmail.com>
-In-Reply-To: <ZtHTSexXueMjYGh/@gmail.com>
-From: Maksym Kutsevol <max@kutsevol.com>
-Date: Fri, 30 Aug 2024 11:37:15 -0400
-Message-ID: <CAO6EAnXu1LO=erZYcm9UEcNBxVk=MwA4kKxAwfKq3fLntXzt0g@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] netcons: Add udp send fail statistics to netconsole
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hello Breno,
+From: Jason Xing <kernelxing@tencent.com>
 
-On Fri, Aug 30, 2024 at 10:12=E2=80=AFAM Breno Leitao <leitao@debian.org> w=
-rote:
->
-> Hello Maksym,
->
-> On Fri, Aug 30, 2024 at 08:58:12AM -0400, Maksym Kutsevol wrote:
->
-> > > I am not sure this if/else/endif is the best way. I am wondering if
-> > > something like this would make the code simpler (uncompiled/untested)=
-:
->
-> > Two calls in two different places to netpoll_send_udp bothers you or
-> > the way it has to distinct cases for enabled/disabled and you prefer to
-> > have it as added steps for the case when it's enabled?
->
-> I would say both. I try to reduce as much as possible the number of
-> similar calls and #else(s) is the goal.
->
-> At the same time, I admit it is easier said than done, and Jakub is
-> usually the one that helps me to reach the last mile.
-I see, ok.
-I was more looking for possible (maybe impossible) compiler
-optimizations in this case.
+When one socket is set SOF_TIMESTAMPING_RX_SOFTWARE which means the
+whole system turns on the netstamp_needed_key button, other sockets
+that only have SOF_TIMESTAMPING_SOFTWARE will be affected and then
+print the rx timestamp information even without setting
+SOF_TIMESTAMPING_RX_SOFTWARE generation flag.
 
-but access to nt->np probably makes it impossible anyway, I don't know
-compilers well
-enough to say.
+How to solve it without breaking users?
+We introduce a new flag named SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER.
+Using it together with SOF_TIMESTAMPING_SOFTWARE can stop reporting
+the rx timestamp.
 
-I'll make it an if then, e.g.
-if (IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC)){
+v3
+Link: https://lore.kernel.org/all/20240828160145.68805-1-kerneljasonxing@gmail.com/
+1. introduce a new flag to avoid application breakage, suggested by
+Willem.
+2. add it into the selftests.
 
-}
+v2
+Link: https://lore.kernel.org/all/20240825152440.93054-1-kerneljasonxing@gmail.com/
+Discussed with Willem
+1. update the documentation accordingly
+2. add more comments in each patch
+3. remove the previous test statements in __sock_recv_timestamp()
+
+
+Jason Xing (2):
+  net-timestamp: filter out report when setting
+    SOF_TIMESTAMPING_SOFTWARE
+  rxtimestamp.c: add the test for
+    SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER
+
+ Documentation/networking/timestamping.rst | 12 ++++++++++++
+ include/uapi/linux/net_tstamp.h           |  3 ++-
+ net/core/sock.c                           |  4 ++++
+ net/ethtool/common.c                      |  1 +
+ net/ipv4/tcp.c                            |  7 +++++--
+ net/socket.c                              |  5 ++++-
+ tools/testing/selftests/net/rxtimestamp.c |  5 +++++
+ 7 files changed, 33 insertions(+), 4 deletions(-)
+
+-- 
+2.37.3
+
 
