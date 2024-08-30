@@ -1,109 +1,152 @@
-Return-Path: <netdev+bounces-123788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D700996682A
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:39:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C16296683C
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:43:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 155E81C23F52
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 17:39:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 178EDB25AE3
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 17:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD58E1BB69D;
-	Fri, 30 Aug 2024 17:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210E31BB68E;
+	Fri, 30 Aug 2024 17:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AlBE04YI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dn/SsfCn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B1F1B78E8;
-	Fri, 30 Aug 2024 17:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72181C6A5;
+	Fri, 30 Aug 2024 17:43:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725039564; cv=none; b=nRRHHk59DGC82FEkWHSQPuNBFXCBn9BXsL4h6YNddInrfGbVgiHxOu7iLxb7sqPZ9lpOzb0IomVgmzStXZh+fcEA7YGIKO+HlnwPxozq+3fS2z9bvXjBEKJbBSWSHGj1dg08otreVgIOsDRcmTpXt0h5PlDgq1kYrdL1qHI5E30=
+	t=1725039818; cv=none; b=JPjdaTY0F68E6TJmsBvSFqK0JCmlFW4N/hdAK2Wvq2MckJ02fmOBoPJV63mVYZ5D+ErVvDEglBfWIEC5AZieGSPWsL62OmQu8ZpKahXet8Fu483AczotRXCM78QwYSab7Ho1Ekw4FwHomwU3E/r/JO/n6Ad57+SE6ify2sy/pgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725039564; c=relaxed/simple;
-	bh=Rk4heNgJ07G/k/iHA74I2zVVomiFFtB6rWrgC2mix38=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IPWJw0DVBewf38yRjfMpJ/p27ckKJfVcxQDIUZ56YKCqoYFhiq8SN1uVkOvAlBj1IL7nE27JFNGaKxNBXSbnoG6R7+/R67eIddnnnQ/YcbJuKomiXGjXeGzINMvcovsB5CDSKLG9k2bGPZ37CGIr7+YZ5E+IYdUD4/6L6i5darc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AlBE04YI; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2f3eabcd293so23362601fa.2;
-        Fri, 30 Aug 2024 10:39:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725039561; x=1725644361; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Rk4heNgJ07G/k/iHA74I2zVVomiFFtB6rWrgC2mix38=;
-        b=AlBE04YIspEQZJ6zdA2ZZ2DMLVd8+5cJnqghpmvYKdyKMyVHyX0psesKZIHAJqMd2w
-         qkIJM27uJ9FwMmxSsSc3BT8QEFB2aS6cfaUt5pQ4XGjcYPuxj1oA+EfSsq5pnY5yhJRt
-         ejCagCa3xwvO74s+1MedplN3mk8WmcYw3Pa5B0SiC8eDGTn4bbUfqG/vqtQ+IAe0oPfI
-         bhnzferuqRAgkIoo9FlvUArPhMIAvkVa7ne+LmWm6afDFbCwS6M/yeNKS0KlWu2O8tcr
-         fyW8yy36P5QDWzDvKw+emZcpGrixIPuhuJt70eJKG6gLVPZBXsTq+DTZrdpUpB5CrWTg
-         5O3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725039561; x=1725644361;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Rk4heNgJ07G/k/iHA74I2zVVomiFFtB6rWrgC2mix38=;
-        b=lUQiNQSGQzKI6fWOuIWHs2hapVEzvWMuq64Wzbue+xlx+gDbmYPKN0PcXzPed21oKX
-         li9uk5kOHAGR69Bn+JpPWprfXDWg1XucGYk+JCjqABMRevtCBuQZJhJnwWxoIpDVIGVt
-         LI/ggM7P9kIOc0C52PBhfq27435L2AGzHmLjHJB8qAf86/43ayEk8hfQWxUDGAGU3qF9
-         CbXzEVPVvA+UcEgRltdFPsxDDviNqvgQbRLODQgQ0z/E9obqHGb9JzjawfP/YeF1BO32
-         k9iqpBV1XfP3l8Kr4vRdHJJPQLHA5l2gHfPq9pBidC8fixhrxjWbHdHngyI11e2ywtE9
-         YoTg==
-X-Forwarded-Encrypted: i=1; AJvYcCVsCC01pan7wGXCc+bM38oJSYXh69AjPXiP64zuPVrAKFONId0JbcMDvmIunxVon6cRNtfLtu4E@vger.kernel.org, AJvYcCW/s6x+Df6JHUqbQSxDXgsXE8gGLsPhG0aFla7npX1tJ7fs5mikSLch1CV8c0Bd/ewU9HyiKVPpg7tl69w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwxVEsjXzCudjI2L8h+Ncn9ICXsZ2SuY/Mxs+y4xgTCBVbaUZag
-	o1R8K/4EEGi/KQ6h+AT5kYXZdtiBQP6cuLzznALuTG3ktls2eSPDwMutqstqPCPDU0ELWK01K89
-	VbmnXpvBEdpCUt4OvHfhXYBv0zGg=
-X-Google-Smtp-Source: AGHT+IHIPtnQN/arvQ1wK8jEShi1exTWQ1UyHbiq7p/BailmKivA6twYQIVXOJkMyhl02xgSmdzh2epfYYNmdIcFBSE=
-X-Received: by 2002:a05:651c:1507:b0:2f3:fd4a:eac6 with SMTP id
- 38308e7fff4ca-2f6103a71femr50226941fa.18.1725039560666; Fri, 30 Aug 2024
- 10:39:20 -0700 (PDT)
+	s=arc-20240116; t=1725039818; c=relaxed/simple;
+	bh=1AOxpZEEhPcqEtpDmtJAnlt6xV8nYDl7biA3vgOP5Es=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=buOxne8fPJqR5ChgkWychzq+Ag31Ob/5yv9D9CXUo6/eSC1IMS/HA8r1XoXTnRjMeAl+/6/X0CMPjw/4sCzUtFce8VgevL2xYOj/MLORGOW6FKr+72n0T/OrQiYPOWYLZ1uDNYjUjKBkFKu1Ls9uRhaxDrRgMswTsko5uMLJjP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dn/SsfCn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04FFDC4CEC2;
+	Fri, 30 Aug 2024 17:43:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725039817;
+	bh=1AOxpZEEhPcqEtpDmtJAnlt6xV8nYDl7biA3vgOP5Es=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Dn/SsfCntxwdUUKuRXzeQG7wnyjN4cScUhqYkfyTzSUBclO+gpqpEl6QvWumTNCPn
+	 hZXdoCFb40h3JjS546I+JTsZKcbkAkfur+2UIm7cIwIEiM+xNBjnPUGUr7eTr4mUI7
+	 jWhPNDmjRcgYtvJFc/Grslf6MG1GtWg+VHgKoUN/iugKCmJV9kauEO1F25qTrC1H18
+	 H/YlsLuSp/3dkk52ldJzyTMd+Xn3NOuJVlJvtlNXu+IDF4Ckc+zgX1K77cKmyyltJn
+	 4HzYaXqu7n/1rttcN7KjuUzlBtL2VCRsMkmbMb9+zaVZUo4tj5z/foK+oHU/xzK9TF
+	 yTkj+vCMXSMKw==
+Message-ID: <c87f7ab7-2c8c-4c08-b686-12c56fe3edeb@kernel.org>
+Date: Fri, 30 Aug 2024 19:43:30 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240830010423.3454810-1-yanzhen@vivo.com> <20240830154533.GS1368797@kernel.org>
-In-Reply-To: <20240830154533.GS1368797@kernel.org>
-From: Marcin Wojtas <marcin.s.wojtas@gmail.com>
-Date: Fri, 30 Aug 2024 19:39:09 +0200
-Message-ID: <CAHzn2R1A+9PMNN8OH2OFpAcvE5r_5Dmzxz35ZE65v-paZ4thCQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: mvneta: Use min macro
-To: Simon Horman <horms@kernel.org>
-Cc: Yan Zhen <yanzhen@vivo.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1] ieee802154: at86rf230: Simplify with dev_err_probe()
+To: Simon Horman <horms@kernel.org>, Shen Lichuan <shenlichuan@vivo.com>
+Cc: alex.aring@gmail.com, stefan@datenfreihafen.org,
+ miquel.raynal@bootlin.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ opensource.kernel@vivo.com
+References: <20240830081402.21716-1-shenlichuan@vivo.com>
+ <20240830160228.GU1368797@kernel.org>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240830160228.GU1368797@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-pt., 30 sie 2024 o 17:45 Simon Horman <horms@kernel.org> napisa=C5=82(a):
->
-> On Fri, Aug 30, 2024 at 09:04:23AM +0800, Yan Zhen wrote:
-> > Using the real macro is usually more intuitive and readable,
-> > When the original file is guaranteed to contain the minmax.h header fil=
-e
-> > and compile correctly.
-> >
-> > Signed-off-by: Yan Zhen <yanzhen@vivo.com>
-> > ---
-> >
-> > Changes in v3:
-> > - Rewrite the subject.
->
-> Thanks for the update.
->
-> Reviewed-by: Simon Horman <horms@kernel.org>
->
+On 30/08/2024 18:02, Simon Horman wrote:
+> On Fri, Aug 30, 2024 at 04:14:02PM +0800, Shen Lichuan wrote:
+>> Use dev_err_probe() to simplify the error path and unify a message
+>> template.
+>>
+>> Using this helper is totally fine even if err is known to never
+>> be -EPROBE_DEFER.
+>>
+>> The benefit compared to a normal dev_err() is the standardized format
+>> of the error code, it being emitted symbolically and the fact that
+>> the error code is returned which allows more compact error paths.
+>>
+>> Signed-off-by: Shen Lichuan <shenlichuan@vivo.com>
+> 
+> ...
+> 
+>> @@ -1576,9 +1574,8 @@ static int at86rf230_probe(struct spi_device *spi)
+>>  
+>>  	lp->regmap = devm_regmap_init_spi(spi, &at86rf230_regmap_spi_config);
+>>  	if (IS_ERR(lp->regmap)) {
+>> -		rc = PTR_ERR(lp->regmap);
+>> -		dev_err(&spi->dev, "Failed to allocate register map: %d\n",
+>> -			rc);
+>> +		dev_err_probe(&spi->dev, PTR_ERR(lp->regmap),
+>> +			      "Failed to allocate register map\n");
+>>  		goto free_dev;
+> 
+> After branching to dev_free the function will return rc.
+> So I think it still needs to be set a in this error path.
 
-Reviewed-by: Marcin Wojtas <marcin.s.wojtas@gmail.com>
+Another bug introduced by @vivo.com.
 
-Thanks!
+Since ~2 weeks there is tremendous amount of trivial patches coming from
+vivo.com. I identified at least 5 buggy, where the contributor did not
+understand the code.
+
+All these "trivial" improvements should be really double-checked.
+
+Best regards,
+Krzysztof
+
 
