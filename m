@@ -1,141 +1,227 @@
-Return-Path: <netdev+bounces-123640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC8E0965F7E
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 12:41:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2631C965F81
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 12:43:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A74C28BC07
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 10:41:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B0211C22E19
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 10:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA2618A950;
-	Fri, 30 Aug 2024 10:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 720E118B474;
+	Fri, 30 Aug 2024 10:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ECeZnR/U"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78626184543
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 10:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E5E017C7BE
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 10:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725014508; cv=none; b=U/bpl6l0bm+IXnHNdWLEzZSkcsY6jdItYmmlBRn0Ltx0ZiZpM3HQYcvfeBBAfDoCXhlK5F13eEI9u5aBnmhtB9PNK3qQyUfVV/cImX+TrKpdviF27rqrCl4Lmt0Zbv2Rolnc9ptnSbHsRWrBpU7R6kqNd0PictLhaEZ9x59UOSE=
+	t=1725014587; cv=none; b=sXtZgJQBOgJ/o+gq/d3pwUuylHRgQFZz8A7ib034lUTXv5ogRNaR4zwHtSue5CnyMy+C/9fUp4GC3rmrN5/3WHH2CPScvAVOd97H8gLtKzFMgoDJwmyLOQU6MN9g1Rr/bl0H6/9wTMpKgynYS/vTWBtl4w0hLZ8mCEjl+Xqfzgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725014508; c=relaxed/simple;
-	bh=nUYhO0WXcCD6WYdXSEvS1Vkk9/GD/8f+q+El5lLAK14=;
+	s=arc-20240116; t=1725014587; c=relaxed/simple;
+	bh=3OXDJ/YV5ntUCOTLntGPh80oAc0JLV9WHlfswnb96Ro=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rSgG6H9AsDS3GpgDEuzagXMG96g2N7kX0vdCOUQi9Q2DMKD7b7NZfqSzKYn6ppqxn+LSeOpuGdBp2qVrDeMVLlhdHfI8ZwA635HTAsizgHqRmF6LAe7Tdc1fL1VI0tLOLOaFl8GUT0aftQYO+qaUV1kTU6wz6gAcoqmgzi/4KQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sjz4F-0001vT-E4; Fri, 30 Aug 2024 12:41:23 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sjz4D-00484Y-B7; Fri, 30 Aug 2024 12:41:21 +0200
-Received: from pengutronix.de (pd9e5994e.dip0.t-ipconnect.de [217.229.153.78])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 044B632DCDC;
-	Fri, 30 Aug 2024 10:41:21 +0000 (UTC)
-Date: Fri, 30 Aug 2024 12:41:20 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
-	Duy Nguyen <duy.nguyen.rh@renesas.com>
-Subject: Re: [PATCH v3] dt-bindings: can: renesas,rcar-canfd: Document R-Car
- V4M support
-Message-ID: <20240830-tidy-glistening-bear-44918a-mkl@pengutronix.de>
-References: <68b5f910bef89508e3455c768844ebe859d6ff1d.1722520779.git.geert+renesas@glider.be>
- <20240806-fragrant-nimble-crane-c5a129-mkl@pengutronix.de>
- <CAMuHMdXy09rrzB1sc9Soy5mUvMo=u=r_-Yf0iah_HTsYJ+fNDg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eiFOKo6SJ32b+kMuueFVsQQDGW+uFniZyZjIehyZquEkRaly8/wcYTxerZgggxFmrYyNR2AZ6780YCB/vtN3TbkSbO9GvU8c3kbWTc+W9RVbkRRV+Og1WDB1duVvocbYLEVNjQSp2+n5lL/+rgnTb3/1tExBYNxv3JvA4CGfjq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ECeZnR/U; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5a10835487fso2390124a12.1
+        for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 03:43:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1725014584; x=1725619384; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Je6Wjumy2niLetCiqW7SybPIeqbB/pPPnknSrf/ORfs=;
+        b=ECeZnR/UHosC+I6qGgSuC0Hh0uwIgokhCK4PuvsBpazfjPUEg/Mf8BYKmZV3mdi428
+         742ZqbbWRhGHMQ194XdPuXV8J92Uhh2CNtvlWGXddmfefdP0bRq5VVctnG7zmAYzzUYY
+         pJpWEtVxghM07Ia2lpNSHBOrn13BCLHPxRwas=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725014584; x=1725619384;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Je6Wjumy2niLetCiqW7SybPIeqbB/pPPnknSrf/ORfs=;
+        b=ClMRFBBtm9LGyBGTi+yQ8Lfq27hUH0h5Zn2aZUx6XWqZmnd62irwikqEv2x/nnPh3D
+         snPmOFwfBG/c6K8Jht3Qmzq14G5kFE/fK1bW60tqAnhOsBtjEKl7TSa321u/7OzyfTmP
+         IX9QjYOENmPFgNqLCP7upF8OFrfzf989IpUhXu2XPG6GUGp7kSDGcEMWIGTaZUWlttqW
+         Sp854vOaySRou/IBkj2Q+wc8pBJLQckzpXurBnfYWYQTZ1rQw0RG/h6OVETQzhVwQxgv
+         tvM2w9f+4SJXWMzbvahcUBi/20avY3XlkotcCP9U0tuV1niqv74QJPIIlWpXz875hSsR
+         3DiA==
+X-Gm-Message-State: AOJu0YxkRi+6GOSpKHuHfrcU8Wy6B7ZDDUsqYXgun4RWqod4gzWU40hL
+	OJKOdNljActlWyqOjaF4Gk6yrepCP9jHDr+4k+XbnX+TdOz/R+f+GhU6eoGC5q0=
+X-Google-Smtp-Source: AGHT+IGMlDKIGEY8ssQPPlyMSo2xuzkQZhCal/VHSN4eDt+f9FqA88qFAHUKPFdbYolYA/9gjXzQrA==
+X-Received: by 2002:a05:6402:40c4:b0:5be:fbce:939e with SMTP id 4fb4d7f45d1cf-5c21ec5b94dmr5706860a12.0.1725014583088;
+        Fri, 30 Aug 2024 03:43:03 -0700 (PDT)
+Received: from LQ3V64L9R2 ([80.208.222.2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c226c7c2d0sm1778033a12.45.2024.08.30.03.43.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Aug 2024 03:43:02 -0700 (PDT)
+Date: Fri, 30 Aug 2024 11:43:00 +0100
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, bjorn@rivosinc.com,
+	hch@infradead.org, willy@infradead.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Daniel Jurgens <danielj@nvidia.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 5/5] netdev-genl: Support setting per-NAPI
+ config values
+Message-ID: <ZtGiNF0wsCRhTtOF@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, bjorn@rivosinc.com,
+	hch@infradead.org, willy@infradead.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Daniel Jurgens <danielj@nvidia.com>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20240829131214.169977-1-jdamato@fastly.com>
+ <20240829131214.169977-6-jdamato@fastly.com>
+ <20240829153105.6b813c98@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="67ai2k6iu5bb2q4h"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMuHMdXy09rrzB1sc9Soy5mUvMo=u=r_-Yf0iah_HTsYJ+fNDg@mail.gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240829153105.6b813c98@kernel.org>
 
+On Thu, Aug 29, 2024 at 03:31:05PM -0700, Jakub Kicinski wrote:
+> On Thu, 29 Aug 2024 13:12:01 +0000 Joe Damato wrote:
+> > +	napi = napi_by_id(napi_id);
+> > +	if (napi)
+> > +		err = netdev_nl_napi_set_config(napi, info);
+> > +	else
+> > +		err = -EINVAL;
+> 
+> if (napi) {
+> ...
+> } else {
+> 	NL_SET_BAD_ATTR(info->extack, info->attrs[NETDEV_A_NAPI_ID])
+> 	err = -ENOENT;
+> }
 
---67ai2k6iu5bb2q4h
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks, I'll make that change in the v2.
 
-On 30.08.2024 12:18:40, Geert Uytterhoeven wrote:
-> Hi Marc,
->=20
-> On Tue, Aug 6, 2024 at 9:15=E2=80=AFPM Marc Kleine-Budde <mkl@pengutronix=
-=2Ede> wrote:
-> > On 01.08.2024 16:03:17, Geert Uytterhoeven wrote:
-> > > From: Duy Nguyen <duy.nguyen.rh@renesas.com>
-> > >
-> > > Document support for the CAN-FD Interface on the Renesas R-Car V4M
-> > > (R8A779H0) SoC, which supports up to four channels.
-> > >
-> > > The CAN-FD module on R-Car V4M is very similar to the one on R-Car V4=
-H,
-> > > but differs in some hardware parameters, as reflected by the Parameter
-> > > Status Information part of the Global IP Version Register.  However,
-> > > none of this parameterization should have any impact on the driver, as
-> > > the driver does not access any register that is impacted by the
-> > > parameterization (except for the number of channels).
-> > >
-> > > Signed-off-by: Duy Nguyen <duy.nguyen.rh@renesas.com>
-> > > [geert: Clarify R-Car V4M differences]
-> > > Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> >
-> > Added to linux-can-next.
->=20
-> Looks like you are back from holidays, but haven't pushed linux-can-next
-> recently?
+Should I send a Fixes for the same pattern in
+netdev_nl_napi_get_doit ?
+ 
+> > +      doc: Set configurable NAPI instance settings.
+> 
+> We should pause and think here how configuring NAPI params should
+> behave. NAPI instances are ephemeral, if you close and open the
+> device (or for some drivers change any BPF or ethtool setting)
+> the NAPIs may get wiped and recreated, discarding all configuration.
+> 
+> This is not how the sysfs API behaves, the sysfs settings on the device
+> survive close. It's (weirdly?) also not how queues behave, because we
+> have struct netdev{_rx,}_queue to store stuff persistently. Even tho
+> you'd think queues are as ephemeral as NAPIs if not more.
+> 
+> I guess we can either document this, and move on (which may be fine,
+> you have more practical experience than me). Or we can add an internal
+> concept of a "channel" (which perhaps maybe if you squint is what
+> ethtool -l calls NAPIs?) or just "napi_storage" as an array inside
+> net_device and store such config there. For simplicity of matching
+> config to NAPIs we can assume drivers add NAPI instances in order. 
+> If driver wants to do something more fancy we can add a variant of
+> netif_napi_add() which specifies the channel/storage to use.
+> 
+> Thoughts? I may be overly sensitive to the ephemeral thing, maybe
+> I work with unfortunate drivers...
 
-I'll update the branch today and send a PR.
+Thanks for pointing this out. I think this is an important case to
+consider. Here's how I'm thinking about it.
 
-regards,
-Marc
+There are two cases:
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+1) sysfs setting is used by existing/legacy apps: If the NAPIs are
+discarded and recreated, the code I added to netif_napi_add_weight
+in patch 1 and 3 should take care of that case preserving how sysfs
+works today, I believe. I think we are good on this case ?
 
---67ai2k6iu5bb2q4h
-Content-Type: application/pgp-signature; name="signature.asc"
+2) apps using netlink to set various custom settings. This seems
+like a case where a future extension can be made to add a notifier
+for NAPI changes (like the netdevice notifier?).
 
------BEGIN PGP SIGNATURE-----
+If you think this is a good idea, then we'd do something like:
+  1. Document that the NAPI settings are wiped when NAPIs are wiped
+  2. In the future (not part of this series) a NAPI notifier is
+     added
+  3. User apps can then listen for NAPI create/delete events
+     and update settings when a NAPI is created. It would be
+     helpful, I think, for user apps to know about NAPI
+     create/delete events in general because it means NAPI IDs are
+     changing.
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbRoc0ACgkQKDiiPnot
-vG/ySQgAjPE+xbklHn2bSXifTp2+1FT4kR0Wq+Wa59JfrRpMqQ1zbTj1QG2dfMH7
-xcoppAQ7Qn32YljyHiAOl0Fx3tCBXQsg3qFiGbVMRPt+ovStnDBueuK7xx0ApxFs
-3/OwrY41fglcF89ihjYbxyYMETj6NTtpOc205Iu/pjcmQ5oidnSEJHgIBVcYheRa
-/yFGXdmR8j+5xuwVuLOSM2JhXC8vojHEDF2ywVC4mjMPiXxjVB19Y539OQRL1QWB
-5K+Ys/lnVbSfYhiNm8si9/TpAHbly3Rf7sd1zLR5BjlJ+Ak49lOIAA8efODW59bR
-HyvOmnNxcBmNFQvtu5Yp6W22X/RDGQ==
-=R3+d
------END PGP SIGNATURE-----
+One could argue:
 
---67ai2k6iu5bb2q4h--
+  When wiping/recreating a NAPI for an existing HW queue, that HW
+  queue gets a new NAPI ID associated with it. User apps operating
+  at this level probably care about NAPI IDs changing (as it affects
+  epoll busy poll). Since the settings in this series are per-NAPI
+  (and not per HW queue), the argument could be that user apps need
+  to setup NAPIs when they are created and settings do not persist
+  between NAPIs with different IDs even if associated with the same
+  HW queue.
+
+Admittedly, from the perspective of a user it would be nice if a new
+NAPI created for an existing HW queue retained the previous
+settings so that I, as the user, can do less work.
+
+But, what happens if a HW queue is destroyed and recreated? Will any
+HW settings be retained? And does that have any influence on what we
+do in software? See below.
+
+This part of your message:
+
+> we can assume drivers add NAPI instances in order. If driver wants
+> to do something more fancy we can add a variant of
+> netif_napi_add() which specifies the channel/storage to use.
+
+assuming drivers will "do a thing", so to speak, makes me uneasy.
+
+I started to wonder: how do drivers handle per-queue HW IRQ coalesce
+settings when queue counts increase? It's a different, but adjacent
+problem, I think.
+
+I tried a couple experiments on mlx5 and got very strange results
+suitable for their own thread and I didn't want to get this thread
+too far off track.
+
+I think you have much more practical experience when it comes to
+dealing with drivers, so I am happy to follow your lead on this one,
+but assuming drivers will "do a thing" seems mildly scary to me with
+limited driver experience.
+
+My two goals with this series are:
+  1. Make it possible to set these values per NAPI
+  2. Unblock the IRQ suspension series by threading the suspend
+     parameter through the code path carved in this series
+
+So, I'm happy to proceed with this series as you prefer whether
+that's documentation or "napi_storage"; I think you are probably the
+best person to answer this question :)
 
