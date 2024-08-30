@@ -1,120 +1,227 @@
-Return-Path: <netdev+bounces-123534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 493BB96542A
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 02:41:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2406A965450
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 02:59:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1E891F259BD
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 00:41:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66451B23B06
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 00:59:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E981D12EC;
-	Fri, 30 Aug 2024 00:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361827F6;
+	Fri, 30 Aug 2024 00:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zf27jwiA"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="HYITPizu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581E74503C
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 00:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B558D272
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 00:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724978487; cv=none; b=EUGtkckSVNIKHc4vLR6LDHJ7zi17z4BZjizuPtJkUs1d3Fz6bi7h1jsZpdtHSZAjsyvZABs+0WTdGynCgqeqAd5YlGtdiHiEd3k6Abz7SxFbVGDqmQvmAYU9C/lSg98t8YaUYQnEOuvw6f6H/x6+i++XocFb2H9jn6d3cHWsIqE=
+	t=1724979553; cv=none; b=Tp8uourigOei2P+xVt2xZS0Z3y2HqwV8mktW1Z6stCfqedXJ0FBlahBYArM5uwYN/IRaE3gp1+pjsMFDCRw5XTWcvRpqvNiPCd8SEy4keL1Fhi8nxOUAW4hUwP7hjEWkFsKG6ExTkZRo34NKmv5OG8SRzw+QibH7qPJ1N6hiIxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724978487; c=relaxed/simple;
-	bh=JF4x9ewCohlgD09KI/KsiuL5egJjiB2+YaNG+oMDIs4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y0NVvba7DWM3kYMtqF2h8EjIlVUR3d3vzJcAebTTZXw9tPoct6Go4+ufecZ9qgqq7VBBoiPtwaDoxU936RGv2fhG0sTDpYSdqUMBV3h4GxTHZwNWOKphVg/aJ71aKf61JtCUpw19Y7R0cypV5/+cL0azaggZ+uEozDrIv/8yVrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zf27jwiA; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-39d29ba04f2so5255255ab.2
-        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 17:41:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724978483; x=1725583283; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JF4x9ewCohlgD09KI/KsiuL5egJjiB2+YaNG+oMDIs4=;
-        b=Zf27jwiA6xnNPLqF6Oo4jfrvoRdPIlIpBRapg4zBw8vRc1zzkychWphm3Ahhwo3g6F
-         XGcYb+WefLXvFaLfcJ7oeUSEjCe8k/LQ3H24aS6L7hKGvrMDgJezYFR+N5QrFqq5K02E
-         ctUcITrrBpYbTXlA7hlgvf//7qbp1kyRK6EsITg21KQQQEXrcjnrNhBYzQA2cWfYT/n1
-         ZpLKsEnF1leG130LsEd3pEaQla0ScgIeZUBvfQIR9J5IUMtm1GA1CuKQc9xRIkbvl2Yj
-         kKTW1N/WFJ1Aj+rl1asc27eDD2rPlTIpugdg7FI2erLjO5/ksYBV9OmKOE+VJiycAFaX
-         1huQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724978483; x=1725583283;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JF4x9ewCohlgD09KI/KsiuL5egJjiB2+YaNG+oMDIs4=;
-        b=qP0Hb7tWQbIgSeo5D7wI+tj5e+C8i7Bxfo9YjhPd2+Lnm2eKuvpLHD1OFV1+MGWPyj
-         fg73LthmHLxG6jLfE+i6EP5cIxBRRSpAYKSzCAsInEojHr8tT8khJYrBEXiUbNuJsFtQ
-         nEoDRvHYfPr2nIbtTt6LL5p9UiCKVuu89Xz0pHREaX6InHtiqeui+FAPV/ksgQeEviW1
-         N8anPyUGA+soYRwRhiqQ6v9xQI2itXu0qtexbuee0FQSmGk2aXI39qj/3Av8IyX9eBIa
-         GTsaLmMxcXH9fj+NMUkvVGvbKU3VdX3iC2esnpCA7NfNBMW38zxMTFEsarbYDUPhI6/3
-         ja0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWt5lbdYjIO2SqueREqialv/TTRWiVKv7Vb9+isySPIqOz1298lVxhbhdZxHZSSIp+/6gp1r3k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxaIGghWpykDNItiHX0nEIJc2rjI2H3BiYlqY4XpxN3BqywXME
-	tHdbfDQOauUgKhh+44blZQdYBm7LK7Phh+HOLrcM08RI0BVXg+mAfpP6te5x/DN47ZMvLIZ+0mt
-	TULN9PkzZUNj0rAZaiZckmP1W7Zo=
-X-Google-Smtp-Source: AGHT+IExcaGKossZrdSsIpFsVTky9+VbMAqgHdnJ5bBhgZDNIxvCY6NDZwFtaHiFWgjrY3GtLXTLBY3uCAYQfsPVTWo=
-X-Received: by 2002:a92:c56f:0:b0:39b:34dd:43d1 with SMTP id
- e9e14a558f8ab-39f3786b5f8mr50739095ab.22.1724978483418; Thu, 29 Aug 2024
- 17:41:23 -0700 (PDT)
+	s=arc-20240116; t=1724979553; c=relaxed/simple;
+	bh=CbgtBfu01v9GpbfNg8UmO/CvtaKvuVF6XgIONCBZFKY=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=GqTCbS/voD2xAkyN9TwJQ1ScflaTgKGLu/fFlqTQkQ+tWckyA1ufF+dlxiyjvC+jOkW6ECVAIZ1hUV8kFEokyKPL1HrMJjoXPwy1lVrjgNJao6MgGtCxvaPSmuzmcHN5i6qvvUV1GjsCWg2ILTeCxjdDF/evqnHMjsGaR5xNipU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=HYITPizu; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1724979547; h=Message-ID:Subject:Date:From:To;
+	bh=vQbCsisdvyDUbwvZ/09puMiNIXvxirZvrp3YIXpb5PA=;
+	b=HYITPizuJ9VYdN8X3VQgkhzbNU9VCjptTPUIsalkZcOlt1ve50kBaw2Q3aQnT8vuGsyaPhC+PKN+RnGMzLYvBbopXQkGyd7LoBKB0Vh3iooR3DtJsYvdt+6o5tWThYP/C5qjpUw49S4Z5n2K2fI+wPvHddPjiLNnqYtv6zr2pgA=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WDuRsnW_1724979546)
+          by smtp.aliyun-inc.com;
+          Fri, 30 Aug 2024 08:59:07 +0800
+Message-ID: <1724979266.1598616-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
+Date: Fri, 30 Aug 2024 08:54:26 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Darren Kenny <darren.kenny@oracle.com>
+Cc: netdev@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>,
+ =?utf-8?q?EugenioP=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ virtualization@lists.linux.dev,
+ "Si-Wei Liu" <si-wei.liu@oracle.com>,
+ "Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>,
+ "Michael S. Tsirkin" <mst@redhat.com>
+References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
+ <20240820125006-mutt-send-email-mst@kernel.org>
+ <m2o75l2585.fsf@oracle.com>
+In-Reply-To: <m2o75l2585.fsf@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240828160145.68805-1-kerneljasonxing@gmail.com>
- <20240828160145.68805-3-kerneljasonxing@gmail.com> <20240829122923.33b93bad@kernel.org>
-In-Reply-To: <20240829122923.33b93bad@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 30 Aug 2024 08:40:47 +0800
-Message-ID: <CAL+tcoCXTwarrWpaZ8adVz9cV0FsROTBRHJS5v3YOtE0jJD+ZQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/2] net: make SOF_TIMESTAMPING_RX_SOFTWARE
- feature per socket
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	dsahern@kernel.org, willemb@google.com, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hello Jakub,
-
-On Fri, Aug 30, 2024 at 3:29=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
+On Wed, 21 Aug 2024 17:47:06 +0100, Darren Kenny <darren.kenny@oracle.com> wrote:
 >
-> On Thu, 29 Aug 2024 00:01:45 +0800 Jason Xing wrote:
-> > One more important and special thing is that we should take care of
-> > errqueue recv path because we rely on errqueue to get our timestamps
-> > for sendmsg(). Or else, If the user wants to read when setting
-> > SOF_TIMESTAMPING_TX_ACK, something like this, we cannot get timestamps,
-> > for example, in TCP case. So we should consider those
-> > SOF_TIMESTAMPING_TX_* flags.
+> Hi Michael,
 >
-> I read this 3 times, I don't know what you're trying to say.
+> On Tuesday, 2024-08-20 at 12:50:39 -04, Michael S. Tsirkin wrote:
+> > On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
+> >> leads to regression on VM with the sysctl value of:
+> >>
+> >> - net.core.high_order_alloc_disable=1
+> >
+> >
+> >
+> >
+> >> which could see reliable crashes or scp failure (scp a file 100M in size
+> >> to VM):
+> >>
+> >> The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
+> >> of a new frag. When the frag size is larger than PAGE_SIZE,
+> >> everything is fine. However, if the frag is only one page and the
+> >> total size of the buffer and virtnet_rq_dma is larger than one page, an
+> >> overflow may occur. In this case, if an overflow is possible, I adjust
+> >> the buffer size. If net.core.high_order_alloc_disable=1, the maximum
+> >> buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
+> >> the first buffer of the frag is affected.
+> >>
+> >> Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
+> >> Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+> >> Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
+> >> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> >
+> >
+> > Darren, could you pls test and confirm?
+>
+> Unfortunately with this change I seem to still get a panic as soon as I start a
+> download using wget:
 
-Sorry about that. It looks like I really need more time to improve my
-written English...
+It's strange that I can't reproduce your panic.
 
-I was trying to say:
-In this case, we expect to control whether we can report the rx
-timestamp in this function. But we also need to handle the egress
-path, or else reporting the tx timestamp will fail. Egress path and
-ingress path will finally call sock_recv_timestamp(). We have to
-distinguish them. Errqueue is a good indicator to reflect the flow
-direction.
+My test method is to test with net.core.high_order_alloc_disable=1 on the net
+branch code. An exception soon occurred (connection disconnected), and then
+the kernel panicked.
 
-Never mind. I'm going to replace the series with a safer alternative
-solution, which was suggested by Willem a few hours ago.
+	while true; do scp vmlinux root@192.168.122.100:; done
 
-Thanks,
-Jason
+Use this patch to recompile virtio_net.ko, restart, configure
+net.core.high_order_alloc_disable=1 again, and test for a long time without
+problems.
+
+So, could you re-test?
+
+Thanks.
+
+
+
+
+>
+> [  144.055630] Kernel panic - not syncing: corrupted stack end detected inside scheduler
+> [  144.056249] CPU: 8 PID: 37894 Comm: sleep Kdump: loaded Not tainted 6.10.0-1.el8uek.x86_64 #2
+> [  144.056850] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.0-4.module+el8.9.0+90173+a3f3e83a 04/01/2014
+> [  144.057585] Call Trace:
+> [  144.057791]  <TASK>
+> [  144.057973]  panic+0x347/0x370
+> [  144.058223]  schedule_debug.isra.0+0xfb/0x100
+> [  144.058565]  __schedule+0x58/0x6a0
+> [  144.058838]  ? refill_stock+0x26/0x50
+> [  144.059120]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.059473]  do_task_dead+0x42/0x50
+> [  144.059752]  do_exit+0x31e/0x4b0
+> [  144.060011]  ? __audit_syscall_entry+0xee/0x150
+> [  144.060352]  do_group_exit+0x30/0x80
+> [  144.060633]  __x64_sys_exit_group+0x18/0x20
+> [  144.060946]  do_syscall_64+0x8c/0x1c0
+> [  144.061228]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.061570]  ? __audit_filter_op+0xbe/0x140
+> [  144.061873]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.062204]  ? audit_reset_context+0x232/0x310
+> [  144.062514]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.062851]  ? syscall_exit_work+0x103/0x130
+> [  144.063148]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.063473]  ? syscall_exit_to_user_mode+0x77/0x220
+> [  144.063813]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.064142]  ? do_syscall_64+0xb9/0x1c0
+> [  144.064411]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.064747]  ? do_syscall_64+0xb9/0x1c0
+> [  144.065018]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.065345]  ? do_read_fault+0x109/0x1b0
+> [  144.065628]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.065961]  ? do_fault+0x1aa/0x2f0
+> [  144.066212]  ? handle_pte_fault+0x102/0x1a0
+> [  144.066503]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.066836]  ? __handle_mm_fault+0x5ed/0x710
+> [  144.067137]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.067464]  ? __count_memcg_events+0x72/0x110
+> [  144.067779]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.068106]  ? count_memcg_events.constprop.0+0x26/0x50
+> [  144.068457]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.068788]  ? handle_mm_fault+0xae/0x320
+> [  144.069068]  ? srso_alias_return_thunk+0x5/0xfbef5
+> [  144.069395]  ? do_user_addr_fault+0x34a/0x6b0
+> [  144.069708]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [  144.070049] RIP: 0033:0x7fc5524f9c66
+> [  144.070307] Code: Unable to access opcode bytes at 0x7fc5524f9c3c.
+> [  144.070720] RSP: 002b:00007ffee052beb8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+> [  144.071214] RAX: ffffffffffffffda RBX: 00007fc5527bb860 RCX: 00007fc5524f9c66
+> [  144.071684] RDX: 0000000000000000 RSI: 000000000000003c RDI: 0000000000000000
+> [  144.072146] RBP: 0000000000000000 R08: 00000000000000e7 R09: ffffffffffffff78
+> [  144.072608] R10: 00007ffee052bdef R11: 0000000000000246 R12: 00007fc5527bb860
+> [  144.073076] R13: 0000000000000002 R14: 00007fc5527c4528 R15: 0000000000000000
+> [  144.073543]  </TASK>
+> [  144.074780] Kernel Offset: 0x37c00000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+>
+> Thanks,
+>
+> Darren.
+>
+> >> ---
+> >>  drivers/net/virtio_net.c | 12 +++++++++---
+> >>  1 file changed, 9 insertions(+), 3 deletions(-)
+> >>
+> >> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> >> index c6af18948092..e5286a6da863 100644
+> >> --- a/drivers/net/virtio_net.c
+> >> +++ b/drivers/net/virtio_net.c
+> >> @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
+> >>  	void *buf, *head;
+> >>  	dma_addr_t addr;
+> >>
+> >> -	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+> >> -		return NULL;
+> >> -
+> >>  	head = page_address(alloc_frag->page);
+> >>
+> >>  	dma = head;
+> >> @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+> >>  	len = SKB_DATA_ALIGN(len) +
+> >>  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> >>
+> >> +	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+> >> +		return -ENOMEM;
+> >> +
+> >>  	buf = virtnet_rq_alloc(rq, len, gfp);
+> >>  	if (unlikely(!buf))
+> >>  		return -ENOMEM;
+> >> @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+> >>  	 */
+> >>  	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+> >>
+> >> +	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
+> >> +		return -ENOMEM;
+> >> +
+> >> +	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
+> >> +		len -= sizeof(struct virtnet_rq_dma);
+> >> +
+> >>  	buf = virtnet_rq_alloc(rq, len + room, gfp);
+> >>  	if (unlikely(!buf))
+> >>  		return -ENOMEM;
+> >> --
+> >> 2.32.0.3.g01195cf9f
+>
+>
 
