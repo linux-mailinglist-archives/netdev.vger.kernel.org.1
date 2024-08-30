@@ -1,227 +1,148 @@
-Return-Path: <netdev+bounces-123597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96869965776
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 08:14:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B6469657C6
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 08:45:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E2671F26A8C
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 06:14:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4A7C284A7F
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 06:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71768152165;
-	Fri, 30 Aug 2024 06:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD0414E2DE;
+	Fri, 30 Aug 2024 06:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="AIv9nXQw"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="onULnD5D"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12E614F9F4;
-	Fri, 30 Aug 2024 06:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD88B14B086
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 06:45:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724998437; cv=none; b=sooWfdVWpeLi1FzmLLfpgnx017y18XUmU5wQCgbpLYAwwJHzqlkqzchev5j0jzXvFNyrB+r6hSVBZIDGZeT4jlw26bQQs3M97Dg2RK/ydkkSH4ZVGl98NgJYrBghXQ5YZvBBZ+JV6xEnzONvt3w1HtPcEjl6FlgoHzfjhnCwWbE=
+	t=1725000324; cv=none; b=u8UBGF/eCXUZ+GLTP1Z4d08KNXXiv8Xdk0SCnT4hd0S+s9NY0NZIf9jipJ+OKiHaUppx1/sUcKFZctyfDfzJItaA4TQPvj0T2gVI/cHMRnsy30sTNtTvmFPyQ0cJZO+PG1WFv6mAlTwgaxEygEN9aBgmK29ujGrQGW74jsgQXO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724998437; c=relaxed/simple;
-	bh=p37CJIbeVvxUnXIiq+2XX77bD1ppgbxyfDuu2ZWeuzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Itp5xKVcjc7eyOX9EBKI1Q0s0AyTgi2/5RGisY+Fcsws+2lN8iao1XP0IcK+PoM30C2IpAp6ukz7PP1IynDUlUSgGPEx/Gl7NVSrAeRLgcr2lr++3/Yle8K76Y8+1MUIHUimS85iZjkMVCPZHiORs9yHIDYy4dPP8WqEYrI9RoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=AIv9nXQw; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 5A83020B7165; Thu, 29 Aug 2024 23:13:55 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5A83020B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1724998435;
-	bh=xCOyMDJIpLS4T3O8nkaE9qmCOU+j9U5LKWcYQs6GEfc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AIv9nXQwENmbAc6VrQ9aTwjjGRZCCYPLMNWX6HzghLrifLjjvI7Zvndn/8E+JVN2y
-	 J3OBZ8OPSOyOchOajM86xk1S3XS/vpls8V9RwPA2U1KlTBbtSq3eyH0+JSF3XgmCM/
-	 +9bTB5pno5ZSXaS1Pq+YIxQMNKVGcIZJWoHdp3uQ=
-Date: Thu, 29 Aug 2024 23:13:55 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, longli@microsoft.com,
-	ssengar@linux.microsoft.com, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, schakrabarti@microsoft.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH V3 net] net: mana: Fix error handling in
- mana_create_txq/rxq's NAPI cleanup
-Message-ID: <20240830061355.GA2986@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1724920610-15546-1-git-send-email-schakrabarti@linux.microsoft.com>
+	s=arc-20240116; t=1725000324; c=relaxed/simple;
+	bh=z2tMGYCX6QIF8USqnak/joMuhfj1TNUKUkBSSXPLdCM=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=hhu3obWsCgQV88E1ZmiqEjyinDgI8mEkS7UZd227OOvXKjSDTwsj0TQPeUg4Bh89qJETPixbmzJ895AuxfKqx8KQ4bAqELW75bX0/IoGXlkRhb0n9GTefaLS95GxUlM8C7pSdo/F5OZTP5ARvyayzLOv5vgfeGXeKmImJKPRNW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=onULnD5D; arc=none smtp.client-ip=209.85.217.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-498eb76145bso679701137.1
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 23:45:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1725000322; x=1725605122; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=rbpFfZAAGy+MvWzUwDXlPYpxkRy+IDxVTjCRFwW+Hxg=;
+        b=onULnD5DYFXABHGCMnKSyHk14Xi4dryTbgdudbvQ7KFyHG49TPBLHFRPo00GcwxnR7
+         1TzXAGo18BXREU+eLc2xl5Mc/pfyoBqiN6WgJtPP8AeAj6lRnFE+f2WlO93O9Aa9lFNI
+         vZM8ATraLidDJOp4A9xBr5OioJsiYoJJyp143jbmT3i0moeD6U/DviT7wTIWYy6lWK9X
+         nwjPyhwZkeTsAHkWLXIQemKG8JeEpxTPb5XenkB/p+ae0YzR3fsJmzeH/ZflaQPbdzAD
+         9++ozQdjOPv4qi44Tu7RmA9NBQsfDEqM0yhnTcHGC9Hpnx2/KpA+PiicU8D3K+lmMOrd
+         qs/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725000322; x=1725605122;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rbpFfZAAGy+MvWzUwDXlPYpxkRy+IDxVTjCRFwW+Hxg=;
+        b=pN9WVten/i/sH/w9c07hpmv4rsrARGy6IV+yLSR6nu1cm/96gMuP05VP3V9Ncdd+1r
+         XN7DvU6ZfqDcLlFaIUkv2NVgSK9m8MrRaakWtgmmZjT4udopHpqzVnG/99Qjzw43KS+I
+         El89jb16kmeMq/76gBQfXzsK1BE71rqImzXv1Aw2I+B+scod7GgAXIGmXilhIrpgwaAE
+         aJJZelXqgg9Aka9f4Fme4Mr52SU36CxxFcFMuHBEr9aCrgycv0dk8F79ghW7/DHB4wpg
+         JZ0CMFU0SsxV4Spvy5DyQVqaROss0rZcl5fW8MtxFjiGkQlGkRGmC3xtTYVVOFrAeoe3
+         1QFw==
+X-Forwarded-Encrypted: i=1; AJvYcCXCs78ftewDZgGboz87V2lVtQM08jeX/3FO8vfiA4Ra+E4goBry93NFEmXEEQiANe5Hh7IF5VM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjKJYn8et2ZIl2Z1xs7k7LyromRQPRaW18vYKE7qMlWogT9Fns
+	1SheNvUxx5D5QklSlRWRUp4RczWxP7erER6T2V5/9YAh2NsMEND/Es3EHhlO+GibOYIDvHL9JLp
+	w+5QgXL6sL90V2YaDEuu0kMx2LGaj2NP4OuEeKw==
+X-Google-Smtp-Source: AGHT+IGjtT+iRsWBRGw877rPBsoWnB7aehlawvTFpCsFP81H03YlByPMlEYvHuWNIHaoPnc0CqKmfajXR5onhPoZMMU=
+X-Received: by 2002:a05:6102:3754:b0:498:ccd9:5b1e with SMTP id
+ ada2fe7eead31-49a5b017424mr6994044137.4.1725000321654; Thu, 29 Aug 2024
+ 23:45:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1724920610-15546-1-git-send-email-schakrabarti@linux.microsoft.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Fri, 30 Aug 2024 12:15:10 +0530
+Message-ID: <CA+G9fYtemFfuhc7=eNyP3TezM9Euc8sFtHe4GDR4Z9XdHzXSJA@mail.gmail.com>
+Subject: net/xfrm/xfrm_policy.c:1286:8: error: variable 'dir' is uninitialized
+ when used here [-Werror,-Wuninitialized]
+To: clang-built-linux <llvm@lists.linux.dev>, Netdev <netdev@vger.kernel.org>, 
+	open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org, 
+	Linux Regressions <regressions@lists.linux.dev>
+Cc: Anders Roxell <anders.roxell@linaro.org>, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <ndesaulniers@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Aug 29, 2024 at 01:36:50AM -0700, Souradeep Chakrabarti wrote:
-> Currently napi_disable() gets called during rxq and txq cleanup,
-> even before napi is enabled and hrtimer is initialized. It causes
-> kernel panic.
-> 
-> ? page_fault_oops+0x136/0x2b0
->   ? page_counter_cancel+0x2e/0x80
->   ? do_user_addr_fault+0x2f2/0x640
->   ? refill_obj_stock+0xc4/0x110
->   ? exc_page_fault+0x71/0x160
->   ? asm_exc_page_fault+0x27/0x30
->   ? __mmdrop+0x10/0x180
->   ? __mmdrop+0xec/0x180
->   ? hrtimer_active+0xd/0x50
->   hrtimer_try_to_cancel+0x2c/0xf0
->   hrtimer_cancel+0x15/0x30
->   napi_disable+0x65/0x90
->   mana_destroy_rxq+0x4c/0x2f0
->   mana_create_rxq.isra.0+0x56c/0x6d0
->   ? mana_uncfg_vport+0x50/0x50
->   mana_alloc_queues+0x21b/0x320
->   ? skb_dequeue+0x5f/0x80
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: e1b5683ff62e ("net: mana: Move NAPI from EQ to CQ")
-> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> ---
-> V3 -> V2:
-> Instead of using napi internal attribute, using an atomic
-> attribute to verify napi is initialized for a particular txq / rxq.
-> 
-> V2 -> V1:
-> Addressed the comment on cleaning up napi for the queues,
-> where queue creation was successful.
-> ---
->  drivers/net/ethernet/microsoft/mana/mana_en.c | 30 ++++++++++++-------
->  include/net/mana/mana.h                       |  4 +++
->  2 files changed, 24 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index 39f56973746d..bd303c89cfa6 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -1872,10 +1872,12 @@ static void mana_destroy_txq(struct mana_port_context *apc)
->  
->  	for (i = 0; i < apc->num_queues; i++) {
->  		napi = &apc->tx_qp[i].tx_cq.napi;
-> -		napi_synchronize(napi);
-> -		napi_disable(napi);
-> -		netif_napi_del(napi);
-> -
-> +		if (atomic_read(&apc->tx_qp[i].txq.napi_initialized)) {
-> +			napi_synchronize(napi);
-> +			napi_disable(napi);
-> +			netif_napi_del(napi);
-> +			atomic_set(&apc->tx_qp[i].txq.napi_initialized, 0);
-> +		}
->  		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
->  
->  		mana_deinit_cq(apc, &apc->tx_qp[i].tx_cq);
-> @@ -1931,6 +1933,7 @@ static int mana_create_txq(struct mana_port_context *apc,
->  		txq->ndev = net;
->  		txq->net_txq = netdev_get_tx_queue(net, i);
->  		txq->vp_offset = apc->tx_vp_offset;
-> +		atomic_set(&txq->napi_initialized, 0);
->  		skb_queue_head_init(&txq->pending_skbs);
->  
->  		memset(&spec, 0, sizeof(spec));
-> @@ -1997,6 +2000,7 @@ static int mana_create_txq(struct mana_port_context *apc,
->  
->  		netif_napi_add_tx(net, &cq->napi, mana_poll);
->  		napi_enable(&cq->napi);
-> +		atomic_set(&txq->napi_initialized, 1);
->  
->  		mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
->  	}
-> @@ -2023,14 +2027,18 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
->  
->  	napi = &rxq->rx_cq.napi;
->  
-> -	if (validate_state)
-> -		napi_synchronize(napi);
-> +	if (atomic_read(&rxq->napi_initialized)) {
->  
-> -	napi_disable(napi);
-> +		if (validate_state)
-> +			napi_synchronize(napi);
+The x86_64 defconfig builds failed on today's Linux next-20240829
+due to following build warnings / errors.
 
-Is this validate_state flag still needed? The new napi_initialized
-variable will make sure the napi_synchronize() is called only for rxqs
-that have napi_enabled.
+Regressions:
+* i386, build
+  - clang-18-defconfig
+  - clang-nightly-defconfig
 
-Regards,
-Shradha.
+* x86_64, build
+  - clang-18-lkftconfig
+  - clang-18-lkftconfig-compat
+  - clang-18-lkftconfig-kcsan
+  - clang-18-lkftconfig-no-kselftest-frag
+  - clang-18-x86_64_defconfig
+  - clang-nightly-lkftconfig
+  - clang-nightly-lkftconfig-kselftest
+  - clang-nightly-x86_64_defconfig
+  - rustclang-nightly-lkftconfig-kselftest
 
->  
-> -	xdp_rxq_info_unreg(&rxq->xdp_rxq);
-> +		napi_disable(napi);
->  
-> -	netif_napi_del(napi);
-> +		netif_napi_del(napi);
-> +		atomic_set(&rxq->napi_initialized, 0);
-> +	}
-> +
-> +	xdp_rxq_info_unreg(&rxq->xdp_rxq);
->  
->  	mana_destroy_wq_obj(apc, GDMA_RQ, rxq->rxobj);
->  
-> @@ -2199,6 +2207,7 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
->  	rxq->num_rx_buf = RX_BUFFERS_PER_QUEUE;
->  	rxq->rxq_idx = rxq_idx;
->  	rxq->rxobj = INVALID_MANA_HANDLE;
-> +	atomic_set(&rxq->napi_initialized, 0);
->  
->  	mana_get_rxbuf_cfg(ndev->mtu, &rxq->datasize, &rxq->alloc_size,
->  			   &rxq->headroom);
-> @@ -2286,6 +2295,8 @@ static struct mana_rxq *mana_create_rxq(struct mana_port_context *apc,
->  
->  	napi_enable(&cq->napi);
->  
-> +	atomic_set(&rxq->napi_initialized, 1);
-> +
->  	mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
->  out:
->  	if (!err)
-> @@ -2336,7 +2347,6 @@ static void mana_destroy_vport(struct mana_port_context *apc)
->  		rxq = apc->rxqs[rxq_idx];
->  		if (!rxq)
->  			continue;
-> -
->  		mana_destroy_rxq(apc, rxq, true);
->  		apc->rxqs[rxq_idx] = NULL;
->  	}
-> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-> index 7caa334f4888..be75abd63dc8 100644
-> --- a/include/net/mana/mana.h
-> +++ b/include/net/mana/mana.h
-> @@ -98,6 +98,8 @@ struct mana_txq {
->  
->  	atomic_t pending_sends;
->  
-> +	atomic_t napi_initialized;
-> +
->  	struct mana_stats_tx stats;
->  };
->  
-> @@ -335,6 +337,8 @@ struct mana_rxq {
->  	bool xdp_flush;
->  	int xdp_rc; /* XDP redirect return code */
->  
-> +	atomic_t napi_initialized;
-> +
->  	struct page_pool *page_pool;
->  
->  	/* MUST BE THE LAST MEMBER:
-> -- 
-> 2.34.1
-> 
-> 
+first seen on next-20240829.
+  Good: next-20240828
+  BAD:  next-20240829
+
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+
+build log:
+--------
+net/xfrm/xfrm_policy.c:1286:8: error: variable 'dir' is uninitialized
+when used here [-Werror,-Wuninitialized]
+ 1286 |                 if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
+      |                      ^~~
+net/xfrm/xfrm_policy.c:1257:9: note: initialize the variable 'dir' to
+silence this warning
+ 1257 |         int dir;
+      |                ^
+      |                 = 0
+1 error generated.
+
+Build Log links,
+--------
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20240829/testrun/24977652/suite/build/test/clang-18-lkftconfig/log
+
+Build failed comparison:
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20240829/testrun/24977652/suite/build/test/clang-18-lkftconfig/history/
+
+metadata:
+----
+  git describe: next-20240829
+  git repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+  git sha: b18bbfc14a38b5234e09c2adcf713e38063a7e6e
+  kernel config:
+https://storage.tuxsuite.com/public/linaro/lkft/builds/2lKF49FRX1FB3IVv46cfZc30s9y/config
+  build url: https://storage.tuxsuite.com/public/linaro/lkft/builds/2lKF49FRX1FB3IVv46cfZc30s9y/
+  toolchain: clang-18 and clang-nightly
+  config: defconfig
+
+Steps to reproduce:
+---------
+ - tuxmake --runtime podman --target-arch x86_64 --toolchain clang-18
+--kconfig defconfig LLVM=1 LLVM_IAS=1
+
+--
+Linaro LKFT
+https://lkft.linaro.org
 
