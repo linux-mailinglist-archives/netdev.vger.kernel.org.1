@@ -1,117 +1,173 @@
-Return-Path: <netdev+bounces-123805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BABCD96690C
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:40:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D13B96691F
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:47:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED5031C238BA
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:40:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3209A1C219E1
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0AA1BC9ED;
-	Fri, 30 Aug 2024 18:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302211B9B57;
+	Fri, 30 Aug 2024 18:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YfOLEil3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="enndAzVf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B17E1BC9E1
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 18:40:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8E814D2B1;
+	Fri, 30 Aug 2024 18:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725043229; cv=none; b=EyfFPX6q3m/har2LgTaqkTN47whYGzTVJCV8Bd3Loq+30MSjmFRsTy2/MP5/5Sjk2Zib/oHYnkj1q/+1tDw8DV0RCG7UiRQxKUBRPznRkGjQjA/fch5D0Cz6Q/Zga/pUs2whmX4jouiteEyLqCymxIzkqfU3zY3aDjOQsH7SdMc=
+	t=1725043667; cv=none; b=FibCFm5xZwKssKtWIKTn3RjwoRRc13bD7l3hhtwY1aMyYOE3kUsdoyXvN751q4eUpuyThY0OBZvM7ulvNNVzJQasYZj+Qd5QZEhFgKuKf115TLyQKbHT8l9ZaV8/HxSB1V1rL4TWlPTkhdEkVfWz2w1jdrvfF5/ditmdkYglDgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725043229; c=relaxed/simple;
-	bh=DIdCsAjMGbaZ3f82y7lX5HLcyyCqED/BZq0Xdamlwrk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PztS7CUe4lPU5xtshtXjapYM8Tu6Prz98QURrQkGpj6n6cRsrhlnXU4GwSQp4QoC83WXUik15tP2IBJbw0SRRI6q7CV0hDh+v7BUVBH6ioS53TnWS8qhWytkkx6UydjViMtZ2r9PsxnbafJ0tQlQnsYrIG6RZB5AGlGOBE8LPdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YfOLEil3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2E2EC4CEC4;
-	Fri, 30 Aug 2024 18:40:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725043228;
-	bh=DIdCsAjMGbaZ3f82y7lX5HLcyyCqED/BZq0Xdamlwrk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YfOLEil32AtThy51yLmlRwlI6IqOzxjlYHKhAFXOPg2Bjtd/6gFLF7vke6qOEM76c
-	 mRxKWteApNRHoxv+0i+ZVennAn45TM9H3xClBNNpojwxZiVUAJXTpKJb1Bf581dTR6
-	 P9o1cCddSs02BL2j8qt/6+WlKX2ys3ZLHOaiX4+QGHZbtXvAGlI1Z49fFump6igVos
-	 pSAlfPqzQe7790gs/V09qC5oDzDZHgG8Kpm2Tn3nstYdpnEIDc5rbch7navmbL1MmZ
-	 RGJSqK7l7CNxjCEcOfHdC0UiNdUG67ol8e3ooeZG8yIZpABfkYrJLt+utwHRlxFv2u
-	 cJ27KaVIsgafA==
-Received: from ip-10-30-226-235.us-west-2.compute.internal (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 669BB3809A81;
-	Fri, 30 Aug 2024 18:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725043667; c=relaxed/simple;
+	bh=O0K//g9rblJMMkUjlCWy3HPerR4FU4Vv3JKV5mLwdRI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=IpYX8k8U8vH/D5ynJxo3NERqsW5tPNf1FC0w5VpCPSosz4cKH5P+H+YNmShuAcEP8+9KDtvJAgcEbQYABZK38Z7LM4SrnCEbz0g3SjtjC/Lv2fY36K3iGXfnYR42alW2SLhUwa5tK/rEpRKFieQd6fhtnRC3pryow8oQ+Fe+JPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=enndAzVf; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6bf92f96f83so11688616d6.3;
+        Fri, 30 Aug 2024 11:47:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725043664; x=1725648464; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EJKg/IrPQbYz6rVsgOp5ZQDc2rLl2ZLh7z0+LtKiQVU=;
+        b=enndAzVfgonEF8cF2T3NrF8uxzDfD4vxcRiXX6QNtLNSx9SP2AaD66sDFiH7RCZD/k
+         HyKq8HiN5MKFP3A+meelDEukkmPbGLHkv4/sbQdqeiIxiIqShzNtcWH8SIXiMhB0CfIS
+         sm0EBHzQGVsbaMDcOfl2drdppYqD8Enk3Qs+x6p4Bvnd+KDpIrg2yRO28STOENGbau5g
+         ++ZPW5wL6wI6NFqLLE0a3pawFcqxQ1flP+uz79VGOr0bNpA/wtn/7zKtuL9sDqGpYTvq
+         LKbYb45McSWOQ96gwJo0rR0SsxmTvCF746BFdLmNAymJ60VLDfo4QbyDSgiFZSy+7agM
+         txcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725043664; x=1725648464;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=EJKg/IrPQbYz6rVsgOp5ZQDc2rLl2ZLh7z0+LtKiQVU=;
+        b=s2HzUfRFEIhnmap9TTEzLCWEc3GdIfnGsirIHCb95rs3R39/+GN8e7NnQ4ht3oHQHI
+         NbqhXaQ9eL4q+tVIljdd5aD1mevvB2mayXGtJaVk5ZUCKi/hKMdNKEiwhTaStpCobGYs
+         BhT0s7NvoLLc7beKkLKJ51uYq2Fv12OV/janERwJ3oJ6alIFMEqwXW2+b/DRHL5VnH5s
+         KOq1bNhWU28pXwZzi5OLwJ2xZ8JDUFTKF7OJFYrFMjN0k4X7cv2wZrJ08fcLFtLtgE6W
+         uJaadacI3rvJCGzIASDUUhcFsOKX1gtWx7WLWeKljWgOAf3zU7hCJPvBGlvt1eHds9eO
+         ipOw==
+X-Forwarded-Encrypted: i=1; AJvYcCVa/uDIF4prq5QWUUjAVRjQVKGiUHfpIDUZVYJWuXQCYwX9iAjuX1WmADtcKYlgo/UY7NdujEY6noO0heaeSdw=@vger.kernel.org, AJvYcCVmrfUnZXzBsLL5wkPdp6/AP4uwLYh4hO/4pDAUtJ02OBywTUCfBnalyhI36fwURtphcY+1QKsI@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx84e5T4+s5DUDwPbg2BBxkKJDj//EnT/ncFLTGTjlWoTzoIZHr
+	PZc0027BODmKhuFgLxn8KcCoRkfpRy93DmNGy4sHsZxaN5FP0vHrk/Clelsx
+X-Google-Smtp-Source: AGHT+IG7scXD36icqYhW7HgnM0CF7QcEQFjNdpMYprOnzawvsdHJVUA7iVncwEHTp5LAi/6NNaticg==
+X-Received: by 2002:a0c:f78a:0:b0:6c3:55be:23a4 with SMTP id 6a1803df08f44-6c355be2450mr3586816d6.1.1725043664355;
+        Fri, 30 Aug 2024 11:47:44 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340db411esm16802356d6.146.2024.08.30.11.47.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Aug 2024 11:47:43 -0700 (PDT)
+Date: Fri, 30 Aug 2024 14:47:43 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ ncardwell@google.com, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ fw@strlen.de, 
+ Willem de Bruijn <willemb@google.com>, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ martineau@kernel.org
+Message-ID: <66d213cf6652e_3c8f2d294b8@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240830103343.0dd20018@kernel.org>
+References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
+ <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
+ <66cf2e4bd8e89_33815c294b2@willemb.c.googlers.com.notmuch>
+ <20240828090120.71be0b20@kernel.org>
+ <66cf7b8d1c480_36509229439@willemb.c.googlers.com.notmuch>
+ <20240828140035.4554142f@kernel.org>
+ <66d1e32558532_3c08a22949e@willemb.c.googlers.com.notmuch>
+ <20240830103343.0dd20018@kernel.org>
+Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
+ ksft
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next 0/3]  icmp: avoid possible side-channels attacks
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172504323041.2682525.16725338216073545525.git-patchwork-notify@kernel.org>
-Date: Fri, 30 Aug 2024 18:40:30 +0000
-References: <20240829144641.3880376-1-edumazet@google.com>
-In-Reply-To: <20240829144641.3880376-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, w@1wt.eu, keyu.man@email.ucr.edu, hawk@kernel.org,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 29 Aug 2024 14:46:38 +0000 you wrote:
-> Keyu Man reminded us that linux ICMP rate limiting was still allowing
-> side-channels attacks.
+Jakub Kicinski wrote:
+> On Fri, 30 Aug 2024 11:20:05 -0400 Willem de Bruijn wrote:
+> > Kselftest install does not preserve directories.
+> > 
+> > So all .pkt files are copied into net/packetdrill root. This is messy.
+> > More fundamentally it breaks the includes in the files (e..g, `source
+> > ../common/defaults.sh`).
 > 
-> Quoting the fine document [1]:
-> 
-> 4.4 Private Source Port Scan Method
-> ...
->  We can then use the same global ICMP rate limit as a side
->  channel to infer if such an ICMP message has been triggered. At
->  first glance, this method can work but at a low speed of one port
->  per second, due to the per-IP rate limit on ICMP messages.
->  Surprisingly, after we analyze the source code of the ICMP rate
->  limit implementation, we find that the global rate limit is checked
->  prior to the per-IP rate limit. This means that even if the per-IP
->  rate limit may eventually determine that no ICMP reply should be
->  sent, a packet is still subjected to the global rate limit check and one
->  token is deducted. Ironically, such a decision is consciously made
->  by Linux developers to avoid invoking the expensive check of the
->  per-IP rate limit [ 22], involving a search process to locate the per-IP
->  data structure.
->  This effectively means that the per-IP rate limit can be disre-
->  garded for the purpose of our side channel based scan, as it only
->  determines if the final ICMP reply is generated but has nothing to
->  do with the global rate limit counter decrement. As a result, we can
->  continue to use roughly the same scan method as efficient as before,
->  achieving 1,000 ports per second
-> ...
-> 
-> [...]
+> Can you show an example of exact commands and what happens?
 
-Here is the summary with links:
-  - [v2,net-next,1/3] icmp: change the order of rate limits
-    https://git.kernel.org/netdev/net-next/c/8c2bd38b95f7
-  - [v2,net-next,2/3] icmp: move icmp_global.credit and icmp_global.stamp to per netns storage
-    https://git.kernel.org/netdev/net-next/c/b056b4cd9178
-  - [v2,net-next,3/3] icmp: icmp_msgs_per_sec and icmp_msgs_burst sysctls become per netns
-    https://git.kernel.org/netdev/net-next/c/f17bf505ff89
+Running directly works fine:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+    $ KSELFTEST_PKT_INTERP=packetdrill_ksft.sh
+    $ make -C tools/testing/selftests \
+            TARGETS=net/packetdrill O=/tmp run_tests
 
+    TAP version 13
+    1..3
+    # timeout set to 45
+    # selftests: net/packetdrill: client.pkt
+    # TAP version 13
+    # 1..2
+    # ok 1 ipv4
+    # ok 2 ipv6
+    # # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
+    ok 1 selftests: net/packetdrill: client.pkt
+    [..etc..]
 
+Installing does not:
+
+    $ make -C tools/testing/selftests/ \
+          TARGETS=net/packetdrill \
+          install INSTALL_PATH=$INSTALL_DIR
+    $ cd $INSTALL_DIR
+    $ export KSELFTEST_PKT_INTERP=packetdrill_ksft.sh
+    $ ./run_kselftest.sh -c net/packetdrill
+
+    TAP version 13
+    1..3
+    # timeout set to 45
+    # selftests: net/packetdrill: client.pkt
+    # TAP version 13
+    # 1..2
+    # sh: line 1: ../common/defaults.sh: No such file or directory
+    # ./client.pkt: error executing init command: non-zero status 127
+    # not ok 1 ipv4
+    # sh: line 1: ../common/defaults.sh: No such file or directory
+    # ./client.pkt: error executing init command: non-zero status 127
+    # not ok 2 ipv6
+    # # Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
+    not ok 1 selftests: net/packetdrill: client.pkt # exit=1
+
+Due to that relative path to defaults.sh inside the scripts.
+
+It is arguably a bit weird that the relative path of the TEST_PROGS
+differs before and after install.
+
+> We have directories in net/lib, and it's a target, and it works, no?
+
+net/lib is not a TARGET in tools/testing/selftests/Makefile. Its
+Makefile only generates dependencies for other targets: TEST_FILES,
+TEST_GEN_FILES and TEST_INCLUDES.
+
+This issue with preserving paths until recently also existed for
+helper files (TEST_FILES). TEST_INCLUDES was added expressly to
+preserve those paths (commit 2a0683be5b4c).
 
