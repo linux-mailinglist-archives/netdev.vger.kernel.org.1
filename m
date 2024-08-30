@@ -1,204 +1,142 @@
-Return-Path: <netdev+bounces-123546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F5E29654DD
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 03:49:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99E289654E3
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 03:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26422281C60
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 01:49:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B39901C2255F
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 01:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBEDD4D112;
-	Fri, 30 Aug 2024 01:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BC664D8B1;
+	Fri, 30 Aug 2024 01:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="fVUtPsRo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JPLqhMEG"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2082.outbound.protection.outlook.com [40.107.21.82])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7D144690
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 01:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724982553; cv=fail; b=Y3w9IhkgcC3MUqJNZcpmEja8guBTXYzHaHITFnE41QS8Mv+/AKhW9xXKPJKVBPq0Docpu2QX5CUvP18jXI3hMQh3l89nRTN/0shTN85RVIZTYx/uulBiVemZ+3gEbu5b6HOOLxkTSqIjjMse6CJ3hvgeApkuNnicThBDlbqC+pY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724982553; c=relaxed/simple;
-	bh=DHT+kkCXWvYTvNvUAsb4IXOp2zqJlCgyTgAB3ffheBw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=arrelUiUx2dWUlPW+RJ2h0vwRSrbGyQYiPEVeMELj+pU0qjvbt4jAc5EjUnqUbQ6k6n05TRW96/XIxaj2KEuiu11kXueE3Uuo3gYnrnTgIDc9ZMQC+ak1VhaxLar1nKnXm4rE8mWdd3FiqmqZpP54uL+kta/+8zeSa79m+JBFEs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=fVUtPsRo; arc=fail smtp.client-ip=40.107.21.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MZNx5VGWIBPg8IIPYyioQJysjiuU/1XjCyee0EEKALRC/9Z6kR8G12iuk7QvSah8eRDyE9NggerzbJo6/yh9zVx/1fua22VNEpMgIzAcQ2e5pn2BJJ40e280MZHNKbOqgRKgguwMY7QZu3et2AXUbhrWFqTs/oEhQAs5G426odPzWAAYrHvXwmgzldhgkIDGJS9bBTBdrHTOD52irHvjNi7k2oUecmy+67/Lf3BxKcZgDU9pxFtO1nnB752Ef2GTym3YgNDgOWL39BS8UH7HMD723wKtaS5GEEU4HXnwNGK+cQm2FzrCaGxCSfB6W/fhwTGvUfCfhdmIb5hPSBCO2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SY2wo+iVd7X2YfLbQnLYsJPNyfgbmp0J8L7G48WNGrc=;
- b=asJq5Nqi6pqiFlpJN6lZs1j3VISS94A5E4e8K/XHjp4G1HYt82sSPkPUWteJXakbo27gAy6gj9X7vALolRTeVcH9OWzSf0bm3o1JQRYA0LgrcmsU+6h1+nP9YxGUF9zhJXIGjVghEotdPoUstzdHl1/yDpvLmXNqggpUzDwPKriCRVcKKKYIEkskPdoPHTdhq/pd5jpIwGeGO+a1wD4pxebcv9x+nxd2XltLBmLPqQdb3Vzu3U45BHSrB7tRm+SEhSOO94uS1ahxtP5k8xYvrO39sPY05vBa0C+3BrALv8XJLW0qsvIekN4+49cfGRqmxPspvoYTBmej4UKCwgzH7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SY2wo+iVd7X2YfLbQnLYsJPNyfgbmp0J8L7G48WNGrc=;
- b=fVUtPsRou8NuG2FCsc/op5QjLrMsl+YNfu7H6QJiYZBFyzo6XdQDxYc4SIxWd+FYxGT/rRwKUj5qVIn/W6mnNcSnSHhFnB0a+aRcqeI0YnhD0sxr6cLIC2gNEuG0enTgkUonb6y6og+2EJXXynpNPc7pmJPPvTNSrMKGpSminJuMPvKBMQEsAYSnMby6TA4XmJaENrqujfQp9iASKMcMhF/OxcfFtV78B3WNTEskcdcq0/hYMp/hFSdPDJmk40iWhduW3aw9a6iRBR6KXNGPZI2cffmPKUB3pneRZ/WYGmiyrITHMHyX7gX5mh2qZdfNtPJvWoBCfKDRS7VWYyFWrA==
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by GVXPR04MB10588.eurprd04.prod.outlook.com (2603:10a6:150:21a::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.20; Fri, 30 Aug
- 2024 01:49:05 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%6]) with mapi id 15.20.7897.027; Fri, 30 Aug 2024
- 01:49:05 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jay Vosburgh
-	<jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>, Marc Kleine-Budde
-	<mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Shyam
- Sundar S K <Shyam-sundar.S-k@amd.com>, Sudarsana Kalluru
-	<skalluru@marvell.com>, Manish Chopra <manishc@marvell.com>, Michael Chan
-	<michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
-	<claudiu.beznea@tuxon.dev>, Sunil Goutham <sgoutham@marvell.com>, Potnuri
- Bharat Teja <bharat@chelsio.com>, Christian Benvenuti <benve@cisco.com>,
-	Satish Kharat <satishkh@cisco.com>, Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>, Shenwei Wang
-	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Dimitris
- Michailidis <dmichail@fungible.com>, Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>, Jijie Shao <shaojijie@huawei.com>, Tony
- Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, Ido
- Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, Bryan
- Whitehead <bryan.whitehead@microchip.com>, "UNGLinuxDriver@microchip.com"
-	<UNGLinuxDriver@microchip.com>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
-	<daniel.machon@microchip.com>, Alexandre Belloni
-	<alexandre.belloni@bootlin.com>, Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>, Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	=?iso-8859-1?Q?Niklas_S=F6derlund?= <niklas.soderlund@ragnatech.se>, Edward
- Cree <ecree.xilinx@gmail.com>, Martin Habets <habetsm.xilinx@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>,
-	MD Danish Anwar <danishanwar@ti.com>, Linus Walleij <linusw@kernel.org>, Imre
- Kaloz <kaloz@openwrt.org>, Richard Cochran <richardcochran@gmail.com>, Willem
- de Bruijn <willemdebruijn.kernel@gmail.com>, Carolina Jubran
-	<cjubran@nvidia.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: RE: [PATCH net-next 2/2] net: Remove setting of RX software timestamp
- from drivers
-Thread-Topic: [PATCH net-next 2/2] net: Remove setting of RX software
- timestamp from drivers
-Thread-Index: AQHa+iHm2od5qPvDs0+3x7m8IiY89LI/B8Jg
-Date: Fri, 30 Aug 2024 01:49:04 +0000
-Message-ID:
- <PAXPR04MB85108AB7A96BC3786B65283388972@PAXPR04MB8510.eurprd04.prod.outlook.com>
-References: <20240829144253.122215-1-gal@nvidia.com>
- <20240829144253.122215-3-gal@nvidia.com>
-In-Reply-To: <20240829144253.122215-3-gal@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR04MB8510:EE_|GVXPR04MB10588:EE_
-x-ms-office365-filtering-correlation-id: 1b4b8cfe-ef0c-4e5b-1e3a-08dcc895ee22
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?3I2gR6qlcE6fHu4AOlfoJOFfBDqgvn0EJ8mGnrgft1rOTgCHssQ7TKVo1E?=
- =?iso-8859-1?Q?I2SPtzZxIHzH/7fp4t0TSOuYHa2Rf4UVxwnMwdU943yrrJAbohhAjUJwVg?=
- =?iso-8859-1?Q?slwb+5LkQOFtqhDCrEOk3/mVCXgOs1MKqV9pJ0ZcD7mV/W4IxS14cyyYCK?=
- =?iso-8859-1?Q?sIQom9ex6aIQAfod07bhZ2Irz8obP4L078HnoQLxfyyzZwFNwLBert9ozh?=
- =?iso-8859-1?Q?7pDtf7rE1m6KAOUBagIe1H7+1omhxJnisPu14XWFaz6kkvAioLuTJ/dV8X?=
- =?iso-8859-1?Q?uN/p3JAotbHDi6VSRQdI6l4pMO6ZZ6wmUUPeBv6GqRS6bzDcERIFIa66sf?=
- =?iso-8859-1?Q?UoryGCWNPtLVrrvYexRzpffPjzQr1uPulnH0JA/w4D0UfSCOMJT8i5VEuE?=
- =?iso-8859-1?Q?216zb/eq7hlp5fs7H15YxfrKyHn6LzRS+3np6R+HfRxOWMxrK2Wi9sxqFL?=
- =?iso-8859-1?Q?pIu9YQLXoHLLpd7vFLU2eouCqxUIVIfQEZcB3+yvdPjVR5qDL5/UNT8raw?=
- =?iso-8859-1?Q?EMnfwryZJ74bCxnma6P2ut05A8Q73Gr5rPMZi+w0QhmG4qfRWnh0NfntK3?=
- =?iso-8859-1?Q?qfp2eMLrWNQ404RM0sbsbcvzxsB2bN5IQOmvxqqkiSyaO5vYE0eD46LIO3?=
- =?iso-8859-1?Q?+csHtSv0qhWZMsWhc1vUI0QZaGSPvKSfZTigZql3KkZvELvz6lgsAAA9Bh?=
- =?iso-8859-1?Q?OEfMTtqtLY0ciyQnX5nQ9+7mZT3+jHBI5wI7q20T78Fgco6HLfe2QBBO6W?=
- =?iso-8859-1?Q?q1xkcCPN499t9y3uhdYwn3VzAmgfUpidqobtIH+Q02K7W+wAYx9EbnmCgb?=
- =?iso-8859-1?Q?wE2wCxu3268FuLSZ6CGm1QGFHrsq3U5ogkqnEdT/vPA9c8K87maQSwBCn8?=
- =?iso-8859-1?Q?sIag10FDlok9FsY3dekYqeM9S42vF8dtF7y66txTnfpDQ12efGjVcbbhsG?=
- =?iso-8859-1?Q?m8w6ge4hcwbYZLey/5XHFzGzYFGKKxnqeFa/I2o3adIiLuYg2yLhsBdHLy?=
- =?iso-8859-1?Q?GO+2AuTg8Ufiswdk4ajumx1mIseGrvGrBhrsCjjl4FrMyxGytZelcmxyfL?=
- =?iso-8859-1?Q?gosnBIMlD+I4fdxh4yccIGgt0qLz3+uvVxGwep9TowEv6PUbWoNwhffupB?=
- =?iso-8859-1?Q?YHCskGPsXIddv6BCF3AKi2Md9UGW0Ip2wvgUCYkjyI8PEM0hBTNkGLCD53?=
- =?iso-8859-1?Q?YkWYX5501oMdXMtea1yozJSjaORE+6EDCJOHmozIR6ViNTkgjzhusb+hLN?=
- =?iso-8859-1?Q?doz/7Un4DVkqlNfiDpCrEvjZQPWw8qhqPhbObsVGwZ4qsBkAq6pW+Y5liB?=
- =?iso-8859-1?Q?rmwholkEScjYMRrH/SU7nenZ1rQ1prxwuf7GeaX4Kwl0c2RwfVhv2Jet8/?=
- =?iso-8859-1?Q?n35tEcFUjph2Fepxh9ET2YsH2G/RAtXJrm/0kiWclcjB2fBt8f4WayGJyb?=
- =?iso-8859-1?Q?9R4+y1n9JFltaLgmZEb501AhvnkFDo+kzI5jww=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?SjkSlquIrf34zdpY+dpSRVQ2NhF1MGx8kPN7VWKoDSiL0pGkB90dZujR5n?=
- =?iso-8859-1?Q?OZztBdQ5pTRjz5j7AB4eMeUzlkciCGXdircWlpjQT3KWA1juAVxyUpVgQk?=
- =?iso-8859-1?Q?IGZ4bJxUUhHF4N1KKdreCrAo9iAvMABcsQSx2Bb+s/WBnJyZ9VtIlEwpgn?=
- =?iso-8859-1?Q?E4jlixlKNv9bqAIH1PDc4Z0ALurDNQ9S0G/Q2FyMYrno4LuHqWnw7AFe+v?=
- =?iso-8859-1?Q?aqh4ALqOLh2uOhanQGi0H09VvH5jAR7RuvJFc61i/bB3KbHPKDme2ttEmm?=
- =?iso-8859-1?Q?ot1LRNhqysN09/n+psd0vh6fGkeSGl9cMnG/XTs5rWrrWVNmMbR8Gx2UUQ?=
- =?iso-8859-1?Q?g3M0fwEsnPNSp73epdmx7VZD+lqaoUYhgoN8QFeypiQPsCDkhDQdnTYQnr?=
- =?iso-8859-1?Q?FkMsP+EBGIpiyVwmqL2hRkh5u7bAtBzG3TBHoyRWvU7d4BepDyvQDtTiKW?=
- =?iso-8859-1?Q?mwrdWOzgvz/U1Q6CkDjSWsEEnmLd2vN5GGixEJ8Ct/CkYaf99R5UgSiNdy?=
- =?iso-8859-1?Q?ratNZPHetdmNfESeCzblluDKvkYsEBbOKao92sXv31GUsdJpOH5cuFl15m?=
- =?iso-8859-1?Q?UP1T8j3E1DkLoIDjkGutwrnCGl4nKtArIvCsMOJZsxyRpB3BJRAuMKp4Wo?=
- =?iso-8859-1?Q?bh0t3JpR+PqBSBdWYpTkntKiumSf8CLcw75pVjzDE3gFqrL4fQRkx4GG54?=
- =?iso-8859-1?Q?w2Ars05STVSCqPKfsvNSRTqkGaDYO7C/4Y7A0VWKjUWP9mniDbf3yHEjbR?=
- =?iso-8859-1?Q?HqV3CtzJeEs7vue9End2MEKzxZtfcxfkr2cN2IHA/SMjT+ReCt+jFyDC7z?=
- =?iso-8859-1?Q?EbYun6QNuwgHFNkdBXdNcriEEq5a7kMFCDADeGNDHd05HkrWcxfz/EO4Ry?=
- =?iso-8859-1?Q?lZIHzB4nezAfzAVQzmPnNgCGslr72mCpu16EZh7lk4RZu6wbE4R/+WRNAI?=
- =?iso-8859-1?Q?RfLIhD94ki9ziotTqyh38RxbMXewvAEh3KpprY+yyvergi3vYrbNjMQVfe?=
- =?iso-8859-1?Q?WXrvQDYX5ADOxpL7ksldrwpGEQ9H+bWmoOEfg5b4x6hz8IgeLSKFSqbRVK?=
- =?iso-8859-1?Q?xoiU2JtRHhjx0zpUoRJFLZ8r2g4oRn6w3HZkNCq4OKH7S8vHpsikQ7IgaA?=
- =?iso-8859-1?Q?ZCBSG/fkIoIZkxG4Pvf8uAD9LgjZP26Y/VndyUL+24wpKYWW/Zn50xqjyS?=
- =?iso-8859-1?Q?8vHKZrJH+OnSwRd1+luLtpLODna0Ej9WmEaMU1UWEgs1Jd78tqAk4qTJKZ?=
- =?iso-8859-1?Q?8JmRsgJeKLoWRwDbbdQ09Z9Tj9TKg4NL0QWpWHxnyAc9Ul8FUC3dIBI+vC?=
- =?iso-8859-1?Q?AoT/NvmMgzGpOfBrxTtLF/jFi32caWEw+WigUtldskIjvjr5QXzj3oqGZ4?=
- =?iso-8859-1?Q?Geyz5iH1Dpzm5RSw5bjuAl0RJWJ+J5c62J6bqoJVhCPs6UK9ZjRd36yKa3?=
- =?iso-8859-1?Q?yDjej3eNJvJLY/NjERNyHAWUprJXQT7JZKMscyQOtf71ihTYmBdQWvQk2b?=
- =?iso-8859-1?Q?lifK+19lfXz02ePTqHPb3xR108ow+cwVSMOLNGS/hu86vd1NmZtlhjimdb?=
- =?iso-8859-1?Q?gtuAMxDp/4HhoUNPlYJLOLPrPgVZeTd/Tpq/oSt6Hv/Mrxz6a209ECwxjQ?=
- =?iso-8859-1?Q?gVZrfl06ebFW0=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDC927473;
+	Fri, 30 Aug 2024 01:55:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724982934; cv=none; b=dVxQGvXJl5L8dFCgsSLwABAnD7gC9HtK/9pQhgUuiohvubUhy991b3Ph28cNMzqJqJYs/ABqw58LeXRZeYF7TilON0PsehLKCasl2fvThJQNY3ps81DkzY6hul3t2qyUqv9bAWhGhIS2jIYuhzdfX/rLyoipae3R9aH2fDLVIqE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724982934; c=relaxed/simple;
+	bh=ixaudXjydPQWqGwW6i0tvFoJa2z+92+ZszjJYy4wsfA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gVwXM47EtGQYd0pElrAw3uKSQKlqbOVoBmt76qGfgnkOMi54KCveTFmM8M0f3a75qa40vv2bVNqZV9fo2EY38sM0MEH9JyIIJksFTmAOxmbPwQMnasQw5x0eQ/WS0SdbBVIMAfcCVg5nIifLRfuHe6WkMu6NkkUM7lrLRbA5eUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JPLqhMEG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56B2CC4CEC1;
+	Fri, 30 Aug 2024 01:55:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724982933;
+	bh=ixaudXjydPQWqGwW6i0tvFoJa2z+92+ZszjJYy4wsfA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=JPLqhMEGxt5wUdNsS6na9V0n93df0kngWwoyVclEoqbcDhaDhsMgZQlBioYY/XowC
+	 gc4Q0YVUfIUxSx9Smdg9sNfEZUT+hOR1hA8McYNaZidychT6aWCDJBI+3p+k+IQRGq
+	 3/LHP6NnevRKG+Ejoy6yp1rwZjyBWJTJacxV8ow/4ozbFHawrPaSf/sHT+AWM1P3S4
+	 sIvbJ+rDRKF4Bpw08pb3uo98xwPZtGdlSdQ7Z/dK1aSkWpEv8hgdYOfZUi4bhjYbGV
+	 2fNqCpmfaRZ2qiHPZf2qVQidg5iRCKZvDNuWsy4lqqd+s1j6Ci694dLu4kkZFefEBe
+	 AihapTtLj8nZg==
+Message-ID: <a9603de2-3ff3-40aa-9bb1-2a02c2ed3e5e@kernel.org>
+Date: Thu, 29 Aug 2024 18:55:23 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1b4b8cfe-ef0c-4e5b-1e3a-08dcc895ee22
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Aug 2024 01:49:05.0323
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rifGs1KE0l1YABQR/OaPRlJlDue7Y9nJg12o+PgN0W0qlx7X0+QT5+P4y7zZyY2L4Nn6FHPGiOw6elZddVkhrQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB10588
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 00/12] Unmask upper DSCP bits - part 2
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, gnault@redhat.com, ast@kernel.org,
+ daniel@iogearbox.net, martin.lau@linux.dev, john.fastabend@gmail.com,
+ steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+ bpf@vger.kernel.org
+References: <20240829065459.2273106-1-idosch@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240829065459.2273106-1-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
->  .../ethernet/freescale/enetc/enetc_ethtool.c  | 10 ++--------
->  drivers/net/ethernet/freescale/fec_main.c     |  4 ----
+On 8/28/24 12:54 AM, Ido Schimmel wrote:
+> tl;dr - This patchset continues to unmask the upper DSCP bits in the
+> IPv4 flow key in preparation for allowing IPv4 FIB rules to match on
+> DSCP. No functional changes are expected. Part 1 was merged in commit
+> ("Merge branch 'unmask-upper-dscp-bits-part-1'").
+> 
+> The TOS field in the IPv4 flow key ('flowi4_tos') is used during FIB
+> lookup to match against the TOS selector in FIB rules and routes.
+> 
+> It is currently impossible for user space to configure FIB rules that
+> match on the DSCP value as the upper DSCP bits are either masked in the
+> various call sites that initialize the IPv4 flow key or along the path
+> to the FIB core.
+> 
+> In preparation for adding a DSCP selector to IPv4 and IPv6 FIB rules, we
+> need to make sure the entire DSCP value is present in the IPv4 flow key.
+> This patchset continues to unmask the upper DSCP bits, but this time in
+> the output route path.
+> 
+> Patches #1-#3 unmask the upper DSCP bits in the various places that
+> invoke the core output route lookup functions directly.
+> 
+> Patches #4-#6 do the same in three helpers that are widely used in the
+> output path to initialize the TOS field in the IPv4 flow key.
+> 
+> The rest of the patches continue to unmask these bits in call sites that
+> invoke the following wrappers around the core lookup functions:
+> 
+> Patch #7 - __ip_route_output_key()
+> Patches #8-#12 - ip_route_output_flow()
+> 
+> The next patchset will handle the callers of ip_route_output_ports() and
+> ip_route_output_key().
+> 
+> No functional changes are expected as commit 1fa3314c14c6 ("ipv4:
+> Centralize TOS matching") moved the masking of the upper DSCP bits to
+> the core where 'flowi4_tos' is matched against the TOS selector.
+> 
+> Changes since v1 [1]:
+> 
+> * Remove IPTOS_RT_MASK in patch #7 instead of in patch #6
+> 
+> [1] https://lore.kernel.org/netdev/20240827111813.2115285-1-idosch@nvidia.com/
+> 
+> Ido Schimmel (12):
+>   ipv4: Unmask upper DSCP bits in RTM_GETROUTE output route lookup
+>   ipv4: Unmask upper DSCP bits in ip_route_output_key_hash()
+>   ipv4: icmp: Unmask upper DSCP bits in icmp_route_lookup()
+>   ipv4: Unmask upper DSCP bits in ip_sock_rt_tos()
+>   ipv4: Unmask upper DSCP bits in get_rttos()
+>   ipv4: Unmask upper DSCP bits when building flow key
+>   xfrm: Unmask upper DSCP bits in xfrm_get_tos()
+>   ipv4: Unmask upper DSCP bits in ip_send_unicast_reply()
+>   ipv6: sit: Unmask upper DSCP bits in ipip6_tunnel_xmit()
+>   ipvlan: Unmask upper DSCP bits in ipvlan_process_v4_outbound()
+>   vrf: Unmask upper DSCP bits in vrf_process_v4_outbound()
+>   bpf: Unmask upper DSCP bits in __bpf_redirect_neigh_v4()
+> 
+>  drivers/net/ipvlan/ipvlan_core.c | 4 +++-
+>  drivers/net/vrf.c                | 3 ++-
+>  include/net/ip.h                 | 5 ++++-
+>  include/net/route.h              | 5 ++---
+>  net/core/filter.c                | 2 +-
+>  net/ipv4/icmp.c                  | 3 ++-
+>  net/ipv4/ip_output.c             | 3 ++-
+>  net/ipv4/route.c                 | 8 ++++----
+>  net/ipv6/sit.c                   | 5 +++--
+>  net/xfrm/xfrm_policy.c           | 3 ++-
+>  10 files changed, 25 insertions(+), 16 deletions(-)
+> 
 
-Many thanks.
-For drivers/net/ethernet/freescale/fec and enetc.
-Reviewed-by: Wei Fang <wei.fang@nxp.com>
+For the set:
+
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
 
