@@ -1,173 +1,119 @@
-Return-Path: <netdev+bounces-123807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D13B96691F
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:47:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64CC6966922
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 20:48:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3209A1C219E1
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:47:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1072C1F2150C
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:48:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302211B9B57;
-	Fri, 30 Aug 2024 18:47:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2BA1BB69B;
+	Fri, 30 Aug 2024 18:48:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="enndAzVf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Segi2mHS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8E814D2B1;
-	Fri, 30 Aug 2024 18:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A9A1B9B57
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 18:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725043667; cv=none; b=FibCFm5xZwKssKtWIKTn3RjwoRRc13bD7l3hhtwY1aMyYOE3kUsdoyXvN751q4eUpuyThY0OBZvM7ulvNNVzJQasYZj+Qd5QZEhFgKuKf115TLyQKbHT8l9ZaV8/HxSB1V1rL4TWlPTkhdEkVfWz2w1jdrvfF5/ditmdkYglDgk=
+	t=1725043733; cv=none; b=bdL+y5D5GmK5aG0wIqacVprnxN38zdmredMs4JQEWBAECPQascl/AmmcfpV9NhHZAt/FWtZeloXQBgtBYmIx6+4U7r+OFo3QoRRTx8RZZUX38AuqIUkILAYv6Fu6c2Tde03z8LoTh4JqmARsowhVXvfTIieDmHs6qxXr6XLQYpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725043667; c=relaxed/simple;
-	bh=O0K//g9rblJMMkUjlCWy3HPerR4FU4Vv3JKV5mLwdRI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=IpYX8k8U8vH/D5ynJxo3NERqsW5tPNf1FC0w5VpCPSosz4cKH5P+H+YNmShuAcEP8+9KDtvJAgcEbQYABZK38Z7LM4SrnCEbz0g3SjtjC/Lv2fY36K3iGXfnYR42alW2SLhUwa5tK/rEpRKFieQd6fhtnRC3pryow8oQ+Fe+JPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=enndAzVf; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6bf92f96f83so11688616d6.3;
-        Fri, 30 Aug 2024 11:47:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725043664; x=1725648464; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EJKg/IrPQbYz6rVsgOp5ZQDc2rLl2ZLh7z0+LtKiQVU=;
-        b=enndAzVfgonEF8cF2T3NrF8uxzDfD4vxcRiXX6QNtLNSx9SP2AaD66sDFiH7RCZD/k
-         HyKq8HiN5MKFP3A+meelDEukkmPbGLHkv4/sbQdqeiIxiIqShzNtcWH8SIXiMhB0CfIS
-         sm0EBHzQGVsbaMDcOfl2drdppYqD8Enk3Qs+x6p4Bvnd+KDpIrg2yRO28STOENGbau5g
-         ++ZPW5wL6wI6NFqLLE0a3pawFcqxQ1flP+uz79VGOr0bNpA/wtn/7zKtuL9sDqGpYTvq
-         LKbYb45McSWOQ96gwJo0rR0SsxmTvCF746BFdLmNAymJ60VLDfo4QbyDSgiFZSy+7agM
-         txcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725043664; x=1725648464;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EJKg/IrPQbYz6rVsgOp5ZQDc2rLl2ZLh7z0+LtKiQVU=;
-        b=s2HzUfRFEIhnmap9TTEzLCWEc3GdIfnGsirIHCb95rs3R39/+GN8e7NnQ4ht3oHQHI
-         NbqhXaQ9eL4q+tVIljdd5aD1mevvB2mayXGtJaVk5ZUCKi/hKMdNKEiwhTaStpCobGYs
-         BhT0s7NvoLLc7beKkLKJ51uYq2Fv12OV/janERwJ3oJ6alIFMEqwXW2+b/DRHL5VnH5s
-         KOq1bNhWU28pXwZzi5OLwJ2xZ8JDUFTKF7OJFYrFMjN0k4X7cv2wZrJ08fcLFtLtgE6W
-         uJaadacI3rvJCGzIASDUUhcFsOKX1gtWx7WLWeKljWgOAf3zU7hCJPvBGlvt1eHds9eO
-         ipOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVa/uDIF4prq5QWUUjAVRjQVKGiUHfpIDUZVYJWuXQCYwX9iAjuX1WmADtcKYlgo/UY7NdujEY6noO0heaeSdw=@vger.kernel.org, AJvYcCVmrfUnZXzBsLL5wkPdp6/AP4uwLYh4hO/4pDAUtJ02OBywTUCfBnalyhI36fwURtphcY+1QKsI@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx84e5T4+s5DUDwPbg2BBxkKJDj//EnT/ncFLTGTjlWoTzoIZHr
-	PZc0027BODmKhuFgLxn8KcCoRkfpRy93DmNGy4sHsZxaN5FP0vHrk/Clelsx
-X-Google-Smtp-Source: AGHT+IG7scXD36icqYhW7HgnM0CF7QcEQFjNdpMYprOnzawvsdHJVUA7iVncwEHTp5LAi/6NNaticg==
-X-Received: by 2002:a0c:f78a:0:b0:6c3:55be:23a4 with SMTP id 6a1803df08f44-6c355be2450mr3586816d6.1.1725043664355;
-        Fri, 30 Aug 2024 11:47:44 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340db411esm16802356d6.146.2024.08.30.11.47.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Aug 2024 11:47:43 -0700 (PDT)
-Date: Fri, 30 Aug 2024 14:47:43 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- ncardwell@google.com, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org, 
- fw@strlen.de, 
- Willem de Bruijn <willemb@google.com>, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- martineau@kernel.org
-Message-ID: <66d213cf6652e_3c8f2d294b8@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240830103343.0dd20018@kernel.org>
-References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
- <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
- <66cf2e4bd8e89_33815c294b2@willemb.c.googlers.com.notmuch>
- <20240828090120.71be0b20@kernel.org>
- <66cf7b8d1c480_36509229439@willemb.c.googlers.com.notmuch>
- <20240828140035.4554142f@kernel.org>
- <66d1e32558532_3c08a22949e@willemb.c.googlers.com.notmuch>
- <20240830103343.0dd20018@kernel.org>
-Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
- ksft
+	s=arc-20240116; t=1725043733; c=relaxed/simple;
+	bh=gkEM9qoL4YZzmRpGtgnNAQ0bHBjwyWWJntONBu2fqGg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WLEEzv2vCUoVtzvlvIYXFBA/LGR0+3e8W77kt9KwsKQh1butaI8MeCnFxndMFTULp6T6QNIStkGw/ghRxYyc0ZMBv/PX4RqGQpOtiGYu20a3a6GswS31DFZcxBuY5Jw/LNcqEqifVGLBcGj7vbiXteJBeAQbTktf7ZaO11BhmSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Segi2mHS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC1A7C4CEC2;
+	Fri, 30 Aug 2024 18:48:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725043733;
+	bh=gkEM9qoL4YZzmRpGtgnNAQ0bHBjwyWWJntONBu2fqGg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Segi2mHSA4w5a5emnsbM+O658y4prhoUp3XtS1qA6ekyijRmpCPxABpQoC1oFjBeH
+	 k59B1e13rlJKmMhDY4TDWvhzuWNqU0IryUGT80/7MpcO+HwAzZRVBqv9xZXhxXyhS/
+	 PWYzA0bfDiipPhihH97UGzy3GBXe2lmm745PCmodwV/h3ZwE2+0ZI6Wss9VL8k58Fs
+	 YXDcFkfUPalpNaE6WVpSrZEJzCDn3bDjvrd7Oi1aaLOPVtIJ6Y9mCITCz1ikRE5u26
+	 By8hmaH51rqealXSwWtthsh+eMeF+kJe80jEVMafohCcuihfudpkvm8EU3vro1xPG0
+	 Qfdhyj+59MOXw==
+Date: Fri, 30 Aug 2024 11:48:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
+ <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ intel-wired-lan@lists.osuosl.org, edumazet@google.com
+Subject: Re: [PATCH v5 net-next 04/12] net-shapers: implement NL group
+ operation
+Message-ID: <20240830114851.58cd02c4@kernel.org>
+In-Reply-To: <d0244464-0596-4309-89ff-d8dcd9aa3d35@redhat.com>
+References: <cover.1724944116.git.pabeni@redhat.com>
+	<f67b0502e7e9e9e8452760c4d3ad7cdac648ecda.1724944117.git.pabeni@redhat.com>
+	<20240829190445.7bb3a569@kernel.org>
+	<d0244464-0596-4309-89ff-d8dcd9aa3d35@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski wrote:
-> On Fri, 30 Aug 2024 11:20:05 -0400 Willem de Bruijn wrote:
-> > Kselftest install does not preserve directories.
+On Fri, 30 Aug 2024 18:48:41 +0200 Paolo Abeni wrote:
+> >> +	const struct net_shaper_ops *ops = net_shaper_binding_ops(binding);
+> >> +	struct net_shaper_info *parent = NULL;
+> >> +	struct net_shaper_handle leaf_handle;
+> >> +	int i, ret;
+> >> +
+> >> +	if (node_handle->scope == NET_SHAPER_SCOPE_NODE) {
+> >> +		if (node_handle->id != NET_SHAPER_ID_UNSPEC &&
+> >> +		    !net_shaper_cache_lookup(binding, node_handle)) {
+> >> +			NL_SET_ERR_MSG_FMT(extack, "Node shaper %d:%d does not exists",
+> >> +					   node_handle->scope, node_handle->id);  
 > > 
-> > So all .pkt files are copied into net/packetdrill root. This is messy.
-> > More fundamentally it breaks the includes in the files (e..g, `source
-> > ../common/defaults.sh`).
+> > BAD_ATTR would do?  
 > 
-> Can you show an example of exact commands and what happens?
+> We can reach here from the delete() op (next patch), there will be no 
+> paired attribute is such case. Even for the group() operation it will 
+> need to push here towards several callers additional context to identify 
+> the attribute, it should be quite ugly, can we keep with ERR_MSG_FMT here?
 
-Running directly works fine:
+Alright. But TBH I haven't grasped the semantics of how you use UNSPEC.
+So I reserve the right to complain again in v6 if I think of a better
+way ;)
 
-    $ KSELFTEST_PKT_INTERP=packetdrill_ksft.sh
-    $ make -C tools/testing/selftests \
-            TARGETS=net/packetdrill O=/tmp run_tests
+> >> +	if (ret < 0)
+> >> +		goto free_shapers;
+> >> +
+> >> +	ret = net_shaper_group_send_reply(info, &node_handle);
+> >> +	if (ret) {
+> >> +		/* Error on reply is not fatal to avoid rollback a successful
+> >> +		 * configuration.  
+> > 
+> > Slight issues with the grammar here, but I think it should be fatal.
+> > The sender will most likely block until they get a response.
+> > Not to mention that the caller will not know what the handle
+> > we allocated is.  
+> 
+> You mean we should return a negative error code, and _not_ that we 
+> should additionally attempt a rollback, right? The rollback will be very 
+> difficult at best: at this point destructive action have taken place.
 
-    TAP version 13
-    1..3
-    # timeout set to 45
-    # selftests: net/packetdrill: client.pkt
-    # TAP version 13
-    # 1..2
-    # ok 1 ipv4
-    # ok 2 ipv6
-    # # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
-    ok 1 selftests: net/packetdrill: client.pkt
-    [..etc..]
-
-Installing does not:
-
-    $ make -C tools/testing/selftests/ \
-          TARGETS=net/packetdrill \
-          install INSTALL_PATH=$INSTALL_DIR
-    $ cd $INSTALL_DIR
-    $ export KSELFTEST_PKT_INTERP=packetdrill_ksft.sh
-    $ ./run_kselftest.sh -c net/packetdrill
-
-    TAP version 13
-    1..3
-    # timeout set to 45
-    # selftests: net/packetdrill: client.pkt
-    # TAP version 13
-    # 1..2
-    # sh: line 1: ../common/defaults.sh: No such file or directory
-    # ./client.pkt: error executing init command: non-zero status 127
-    # not ok 1 ipv4
-    # sh: line 1: ../common/defaults.sh: No such file or directory
-    # ./client.pkt: error executing init command: non-zero status 127
-    # not ok 2 ipv6
-    # # Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
-    not ok 1 selftests: net/packetdrill: client.pkt # exit=1
-
-Due to that relative path to defaults.sh inside the scripts.
-
-It is arguably a bit weird that the relative path of the TEST_PROGS
-differs before and after install.
-
-> We have directories in net/lib, and it's a target, and it works, no?
-
-net/lib is not a TARGET in tools/testing/selftests/Makefile. Its
-Makefile only generates dependencies for other targets: TEST_FILES,
-TEST_GEN_FILES and TEST_INCLUDES.
-
-This issue with preserving paths until recently also existed for
-helper files (TEST_FILES). TEST_INCLUDES was added expressly to
-preserve those paths (commit 2a0683be5b4c).
+net_shaper_group_send_reply() does a bit too much, TBH.
+Given the rollback complexity propagating the failure just
+from genlmsg_reply() is fine. I think the only case it fails
+is if the socket is congested, which is in senders control.
+But genlmsg_new() can be done before we start. And we should 
+size the skb so that nla_puts sever fail (just pop a WARN_ON()
+on their error path, to make sure we catch it if they grow,
+I don't think they can fail with your current code).
 
