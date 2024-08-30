@@ -1,152 +1,182 @@
-Return-Path: <netdev+bounces-123906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EE6A966C88
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 00:33:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23C66966CBE
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 00:56:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C05CE1C216E2
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 22:33:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4311C1C21E67
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 22:56:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769E51C1ACF;
-	Fri, 30 Aug 2024 22:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Dp1v7+aW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E63F18C906;
+	Fri, 30 Aug 2024 22:56:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6421BFDF5
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 22:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FCD15C150;
+	Fri, 30 Aug 2024 22:56:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725057198; cv=none; b=sr+glf0DuPp6mrymDxXhq70ifYBoSzVJHLsHRXwHfRDbmSmJjoNsrS7qJZa+/xcISXHZ34cwSJcQ85YEaTgY0HMmtj08iCZFxOneejl+pyGAT/lcOnxVOP0d+t05i4pyJdxtxNIIXKrFymmxyJ2TuYpU0UF8PyRjmEvoHHhRyRA=
+	t=1725058577; cv=none; b=G4CEgI5z3xG9e3N9R7eX9GL+vMqLJmmd4R2f344YQzamb2bD/myGUCMNghQ9IfuzWLwYhAT1bLEcnnQ/g5joAFnx4m3pu4tBhmvsBoDNQ7tEhL1hW93uIvc6ewSB7sJnLu78Pxisq8gSeNXD1X+mCtpJt4Qz01gs4ATCvTaOTzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725057198; c=relaxed/simple;
-	bh=DqAVqqLfjpgjASo+CIfe1feDonNcG4Odo1DBuX7wdR4=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sxQjgPqeTM1ZNcUs2POOJabBdGO24q048EfNsoTHeJ3LmeDWU/8ehG42vpWj7PkFEjYc/X2M0d1eBtR5Rvg/UdZ0HsOQ4lKiLaWo8vbT8WbD4ED0CsFWGlHusWqU+qfJat1+Chr91QjpkKALDMoXHWT7ApffdYA4nc8ds3tHHr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Dp1v7+aW; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a86933829dcso284623366b.3
-        for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 15:33:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1725057194; x=1725661994; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oK95C0BSC1jzK2D55nrE90clLVhwEM+Y9bSdjRWpEd8=;
-        b=Dp1v7+aWJz+A4cKaT17oli44/yP7f2EW22bHOILyblolzuTJO8ufFE9h6WAZImPwqB
-         FvIP6MkS4VBTdglAlZrkkemaTnAP17V9CI7Akrcz6QU3vjSzMSyKleqKcmbnO9iwcdxH
-         Qn/8Z6lagO/ez613Qk6hVmWoA3v/ETIgM4LbGNi9D4AGRabXoIsWYqWAV+onnKHYgcp1
-         I55prglG9jD1jTFlh0ezT84sinyOk6ck64uOBbuXon4UejFLuYgRWMu7IAYy7EnTlKMF
-         7BMHrMYhVM4xX+7bC3jEsBzlLskQRblwFvT0haTOTx2nwEi6YuL7AmptvwKLlBeKkwiA
-         P+Tg==
+	s=arc-20240116; t=1725058577; c=relaxed/simple;
+	bh=8XF3vmvNdNn9zLKrZfImEFFGflqsckIYF0ke9GOgNEM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eoI+kgcLTmc7kwDvDj2Ziq5RAmLaJrl76EZov8D4WUmvoQM0ALWCj02/SHjnKVY1krzDL5iB1h+aNSeg2Gy3Rd7v/50uofg9NCGXaDmGxMLh4A7uX0bVOJ2kQyys4dJ/yi0E58+xGquGe1BYBaz8O4TT1cuppJuPbEElFvRoJek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7148912a1ebso1505523b3a.0;
+        Fri, 30 Aug 2024 15:56:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725057194; x=1725661994;
+        d=1e100.net; s=20230601; t=1725058574; x=1725663374;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oK95C0BSC1jzK2D55nrE90clLVhwEM+Y9bSdjRWpEd8=;
-        b=KsmQxo90+siP2y7j7GCx4eYDx/Xd6YA/zMiu+hYmTAKUtrs+IeYif23htSikIPYTod
-         Im3LkxHU9iUqKc1KDeMpJFkXfBmUP0e08GuZbyBgcVTHW+f9n6+/gJB9zA/ExvHrKEuq
-         c3XOCzMpiS05An4FJb94LbV0WeeYRWdKqCtH6BF+GCDxokHHfZr2KZcP4aHwQ0bOjNCQ
-         CKqlvQ5L41G4pMCOm8D7H7PD85tYSa8TFf+FCCCBi6zyIbphRSbAOK0cZmV+Nf6PSURi
-         ImNepnC2MHUYo/h9qzVdNXWW1OwEPl8v6XJTcrus8yUB8V8q8kVjPidWe0QFO80ut+uC
-         S5Qw==
-X-Forwarded-Encrypted: i=1; AJvYcCX2zfu3iCalpQtmUVrpAGvVpATeTdAeK8IOrzXymcMQsrV6P0qzk7U/oGTgrFF8MeIgHOg7++0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZDKjquCa8TNabhyU1KWZTKtPscHd/QPOqIgNERwOhYoDAGZGU
-	B1PSLGTKGdtm3c6WrPB4FDil2w/NTQ9Chajo07Vrmm0b9xPz9vH49IFJvyMmldA=
-X-Google-Smtp-Source: AGHT+IHqkz6MDPFM4AoearcdXDKhXOMUBNtVV9Zz1IeP9NcojNkgXiXqwILRRdgqIEEC3J1YsUnnqQ==
-X-Received: by 2002:a17:907:2da2:b0:a7a:a5ae:11b7 with SMTP id a640c23a62f3a-a897fa63905mr698523966b.49.1725057193226;
-        Fri, 30 Aug 2024 15:33:13 -0700 (PDT)
-Received: from localhost (host-80-182-198-72.pool80182.interbusiness.it. [80.182.198.72])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989195e8csm260291966b.105.2024.08.30.15.33.12
+        bh=OeH8hxTVMFEpq7p+SlKqJlF16p+IrHAk0EJziH2/pls=;
+        b=nNcyosSl9EUljUD2AxlzbFXqGDivqmhNZ5ZRdsoqjCBCuUpfcVu94sDe9A53cp4avG
+         eGziM0fR4MDIBPkK4lVggr8IxQyoDJiJF4cww7y69Iqew5zlZULw6/Upb9RuKkSIfRY9
+         STHhh/7KcQ1eR+pEYA/JYdVAW889b1SzaKiWvRIRhnyWp98O37auN6zKZ/5/JrYlxgJm
+         2O9fv9d0aLgGDIFMmKw8hhdYxndQBihKuIMNcYxM951Ob/gfOZRx+T46Iw1LWxGlPysR
+         fCrdiPHuJd/X/MsiKgpVY1nDq2VngdNNCsdD5QfD407tjQmXJj5GIZ0d+NRLjlNuYp6W
+         8S5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUUgLKZFF8436siSkKW97I67seiOVtt/vRxN1Aty+dQp/vv95lfeIBzk2eJXaXbpPJz5xY=@vger.kernel.org, AJvYcCW5omjajJU0Pqr4c+zq3UpK0VnLafmPgKTluRPigF17ZMfhDzLWPuLJ3vlLNJv7s1HelkuVS1P1nJcYuSnN@vger.kernel.org, AJvYcCXJEoYjKNAq6XJDXOnvr7kiv8kfrUqH+jcogIrWIuBB3byPYP6KreIpQCMJD1hwYnuWtvXkXgFm@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIOeGt5lNjPwgDQYASgGeHov+uOMrtLZREvv2rLXDzEOjPw+BX
+	Ti3eRgr27G4j4cHkbbQR7Ppg8zqro3g1REeMunDZVLNFTdOdLLE=
+X-Google-Smtp-Source: AGHT+IEVf5r+rolkiQ44IlQkVBbOxszPSaCFQ1vOzTxxgkXxPkhviLvJWKAGztNLO3pgEF5XOYsKrA==
+X-Received: by 2002:a05:6a21:e8f:b0:1c6:a4e7:bd1a with SMTP id adf61e73a8af0-1ced04c1224mr799255637.32.1725058573729;
+        Fri, 30 Aug 2024 15:56:13 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205155424e7sm31450635ad.208.2024.08.30.15.56.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Aug 2024 15:33:12 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Sat, 31 Aug 2024 00:33:19 +0200
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+        Fri, 30 Aug 2024 15:56:13 -0700 (PDT)
+Date: Fri, 30 Aug 2024 15:56:12 -0700
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 11/11] arm64: dts: rp1: Add support for MACB contained in
- RP1
-Message-ID: <ZtJIr-PCWSQWWjaK@apocalypse>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <a3fde99c2e522ef1fbf4e4bb125bc1d97a715eaf.1724159867.git.andrea.porta@suse.com>
- <c3cgkrwnwkrzr67viuvo66ckkxc4ehcye4zomcqdwy2h4dabol@wjp4cd4clm77>
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next 2/9] kthread: allow vararg
+ kthread_{create,run}_on_cpu()
+Message-ID: <ZtJODFOYkjgRTPCh@mini-arch>
+References: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
+ <20240830162508.1009458-3-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c3cgkrwnwkrzr67viuvo66ckkxc4ehcye4zomcqdwy2h4dabol@wjp4cd4clm77>
+In-Reply-To: <20240830162508.1009458-3-aleksander.lobakin@intel.com>
 
-Hi Krzysztof,
-
-On 10:43 Wed 21 Aug     , Krzysztof Kozlowski wrote:
-> On Tue, Aug 20, 2024 at 04:36:13PM +0200, Andrea della Porta wrote:
-> > RaspberryPi RP1 is multi function PCI endpoint device that
-> > exposes several subperipherals via PCI BAR.
-> > Add an ethernet node for Cadence MACB to the RP1 dtso
-> > 
-> > Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
-> > ---
-> >  arch/arm64/boot/dts/broadcom/rp1.dtso | 23 +++++++++++++++++++++++
-> >  1 file changed, 23 insertions(+)
-> > 
-> > diff --git a/arch/arm64/boot/dts/broadcom/rp1.dtso b/arch/arm64/boot/dts/broadcom/rp1.dtso
-> > index d80178a278ee..b40e203c28d5 100644
-> > --- a/arch/arm64/boot/dts/broadcom/rp1.dtso
-> > +++ b/arch/arm64/boot/dts/broadcom/rp1.dtso
-> > @@ -78,6 +78,29 @@ rp1_clocks: clocks@c040018000 {
-> >  							       <50000000>;   // RP1_CLK_ETH_TSU
-> >  				};
-> >  
-> > +				rp1_eth: ethernet@c040100000 {
-> > +					reg = <0xc0 0x40100000  0x0 0x4000>;
-> > +					compatible = "cdns,macb";
+On 08/30, Alexander Lobakin wrote:
+> Currently, kthread_{create,run}_on_cpu() doesn't support varargs like
+> kthread_create{,_on_node}() do, which makes them less convenient to
+> use.
+> Convert them to take varargs as the last argument. The only difference
+> is that they always append the CPU ID at the end and require the format
+> string to have an excess '%u' at the end due to that. That's still true;
+> meanwhile, the compiler will correctly point out to that if missing.
+> One more nice side effect is that you can now use the underscored
+> __kthread_create_on_cpu() if you want to override that rule and not
+> have CPU ID at the end of the name.
+> The current callers are not anyhow affected.
 > 
-> Please start using DTS coding style...
-
-Ack.
-
-Regards,
-Andrea
-
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>  include/linux/kthread.h | 51 ++++++++++++++++++++++++++---------------
+>  kernel/kthread.c        | 22 ++++++++++--------
+>  2 files changed, 45 insertions(+), 28 deletions(-)
 > 
-> Best regards,
-> Krzysztof
-> 
+> diff --git a/include/linux/kthread.h b/include/linux/kthread.h
+> index b11f53c1ba2e..27a94e691948 100644
+> --- a/include/linux/kthread.h
+> +++ b/include/linux/kthread.h
+> @@ -27,11 +27,21 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
+>  #define kthread_create(threadfn, data, namefmt, arg...) \
+>  	kthread_create_on_node(threadfn, data, NUMA_NO_NODE, namefmt, ##arg)
+>  
+> -
+> -struct task_struct *kthread_create_on_cpu(int (*threadfn)(void *data),
+> -					  void *data,
+> -					  unsigned int cpu,
+> -					  const char *namefmt);
+> +__printf(4, 5)
+> +struct task_struct *__kthread_create_on_cpu(int (*threadfn)(void *data),
+> +					    void *data, unsigned int cpu,
+> +					    const char *namefmt, ...);
+> +
+> +#define kthread_create_on_cpu(threadfn, data, cpu, namefmt, ...)	   \
+> +	_kthread_create_on_cpu(threadfn, data, cpu, __UNIQUE_ID(cpu_),	   \
+> +			       namefmt, ##__VA_ARGS__)
+> +
+> +#define _kthread_create_on_cpu(threadfn, data, cpu, uc, namefmt, ...) ({   \
+> +	u32 uc = (cpu);							   \
+> +									   \
+> +	__kthread_create_on_cpu(threadfn, data, uc, namefmt,		   \
+> +				##__VA_ARGS__, uc);			   \
+> +})
+>  
+>  void get_kthread_comm(char *buf, size_t buf_size, struct task_struct *tsk);
+>  bool set_kthread_struct(struct task_struct *p);
+> @@ -62,25 +72,28 @@ bool kthread_is_per_cpu(struct task_struct *k);
+>   * @threadfn: the function to run until signal_pending(current).
+>   * @data: data ptr for @threadfn.
+>   * @cpu: The cpu on which the thread should be bound,
+> - * @namefmt: printf-style name for the thread. Format is restricted
+> - *	     to "name.*%u". Code fills in cpu number.
+> + * @namefmt: printf-style name for the thread. Must have an excess '%u'
+> + *	     at the end as kthread_create_on_cpu() fills in CPU number.
+>   *
+>   * Description: Convenient wrapper for kthread_create_on_cpu()
+>   * followed by wake_up_process().  Returns the kthread or
+>   * ERR_PTR(-ENOMEM).
+>   */
+> -static inline struct task_struct *
+> -kthread_run_on_cpu(int (*threadfn)(void *data), void *data,
+> -			unsigned int cpu, const char *namefmt)
+> -{
+> -	struct task_struct *p;
+> -
+> -	p = kthread_create_on_cpu(threadfn, data, cpu, namefmt);
+> -	if (!IS_ERR(p))
+> -		wake_up_process(p);
+> -
+> -	return p;
+> -}
+> +#define kthread_run_on_cpu(threadfn, data, cpu, namefmt, ...)		   \
+> +	_kthread_run_on_cpu(threadfn, data, cpu, __UNIQUE_ID(task_),	   \
+> +			    namefmt, ##__VA_ARGS__)
+> +
+> +#define _kthread_run_on_cpu(threadfn, data, cpu, ut, namefmt, ...)	   \
+> +({									   \
+> +	struct task_struct *ut;						   \
+> +									   \
+> +	ut = kthread_create_on_cpu(threadfn, data, cpu, namefmt,	   \
+> +				   ##__VA_ARGS__);			   \
+> +	if (!IS_ERR(ut))						   \
+> +		wake_up_process(ut);					   \
+> +									   \
+> +	ut;								   \
+> +})
+
+Why do you need to use __UNIQUE_ID here? Presumably ({}) in _kthread_run_on_cpu
+should be enough to avoid the issue of non unique variable in the parent
+scope. (and similar kthread_run isn't using any __UNIQUE_IDs)
+
+The rest of the patches look good.
 
