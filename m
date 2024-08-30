@@ -1,97 +1,115 @@
-Return-Path: <netdev+bounces-123684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE8009661C4
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 14:30:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D710F9661F3
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 14:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CD6A1C24F15
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 12:30:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D7C71F25B1A
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 12:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E9F199FBA;
-	Fri, 30 Aug 2024 12:30:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jkY6uLmv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DF3199FDD;
+	Fri, 30 Aug 2024 12:46:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CC5192D75;
-	Fri, 30 Aug 2024 12:30:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 378C917B4FF;
+	Fri, 30 Aug 2024 12:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725021025; cv=none; b=U0hCHmsrFVxmFHHnovaZkOk9OteMoOfO4iGLMTwaoYVV4wrq2mvgugq/r4vlH0Q/MJhSGywRMjULtDlmJi2zmFylQ/ln4pDwN7YDhX2mi+FcrFFL/ieRyJVwTEuOXLoVCSXPXaUUZ2fQkeP1AJNvsypGBZ14csBJoLA9uO41ft4=
+	t=1725021961; cv=none; b=ALEeXgZdrsSbYmmgLYdWIChvd4LM4HLt84+jf1JPG8OxxuMSRkPi8x68NElbJELvgl4iVl5by01t92v8+amTlcPi6oxtrtQ4WC7fn/JKcets6UDl7DcSVumslPQyONTqidP18abrFgaR/Uwp2ttpANbbpN9I1uFVc0RnY0rxBLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725021025; c=relaxed/simple;
-	bh=xgMZfXbzDCIWmQ0U4CZQEU03diJia9Y6QR0RLV86l2s=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=a9Tnm6qQvtge6o5fDWwi6rX0Y5UseKEMjksKKvzYn+NjqLt85hoG0lfBgJrt6HyOxBP7Aesw5kgSoVSZE6ak78KCxHlhUorxZ7vSfLvxaBXp7WY7tuzJADYSmoIF0eMzudLD/5kqFUXMlCdjBupZkz65BM0Fv9Txhn7uqWRQpZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jkY6uLmv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE73FC4CEC6;
-	Fri, 30 Aug 2024 12:30:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725021024;
-	bh=xgMZfXbzDCIWmQ0U4CZQEU03diJia9Y6QR0RLV86l2s=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jkY6uLmvtylqu+4aAYJtIIMIDp+ExzAWwSr/s9dUmudyR+TZZ3DuRhHpA1lo+g0lV
-	 O8V9+Y2bujTC3cEPb8dlxceoK/OtVIEdOVURQyTAbicVTq31GV6ouJTDp1f9xH4sDR
-	 xses22Cg0J43kMWyi25IcN891USavNyHI+FUUgr8WEEEfOAxSZo/y1bJ7o/fh/3yxB
-	 7U/F6DzTG0c4lNFsr0cYdTGp4TzwXGvYPR0zOOh3iEssvvMxzTed6vlQ8kAFGO9uZt
-	 gLCpeQ347QMz2dtKga/EgfqztuI3S2+Ezxcfzihfxz45Y6P+xCqJA44zITZsusCEbK
-	 RTe2LHvTbUoMQ==
-Received: from ip-10-30-226-235.us-west-2.compute.internal (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 611DF3809A81;
-	Fri, 30 Aug 2024 12:30:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725021961; c=relaxed/simple;
+	bh=SYqrsyCvhaWMTy1vjd+g6I5QKxClOIpLV9pc73Zk1Co=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=asFSeiVuf7HisMUKrNjlcgYwH5reoPOWrHKKY1608hF6yNk2T4Wt4aq4XcypixA9X0ZOQ1r8Ihu2MIMrkaC3zfKhDBvxLS5xZw6/KMMejpvUomv55ek3R7+2UtofMAzL0CfvveIm9P97DRkHW1OMpxyIn8QfFlQwZO+pg9Tua4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a83597ce5beso294775966b.1;
+        Fri, 30 Aug 2024 05:45:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725021958; x=1725626758;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XLZHYItqUThIKGDq3BwSU4uVTYQcIvrN3xmEbSMUUeU=;
+        b=KeWaQXlVj7zFm9jhctFPRnk7KNsLJcwCh3KtkhYefOcOtBpsKIAhK5q0jcBUVnnfgE
+         IiqDEy88RbDN4OJd/dqL3RKpsyHXNTHQdXbUeuoV5O13t7xVuFwAqCQbMRI3lYWmDvlR
+         rrG7EmNXM9Fd8DBtIm8+RkQGDsDraAooLoWjZQaTaKoIb/Xmc9uHKGmWPaJYs+H+rFVI
+         dWFoYEWn/irAhG8LePdSuoz9SklEMS5cvKI77c8FHlb4suSGANNZqaxbw43TjAMdvKf4
+         KgUdICLev6EQDt+Uh4SqtgpZzHYYBkIXIrPK1o4EG1cdC122lvbqAXkS7V6Cv8HWzO+e
+         jqhw==
+X-Forwarded-Encrypted: i=1; AJvYcCUyCB2Vus+wmh/2jMnE8NrJz/29H0Xq/pg9LILQn5Vsb929/IBuTk+GIwLe8/w7IaOoHTrgMrQG@vger.kernel.org, AJvYcCVFv+fmJspPtxdTeG9+tobodtz91Amx3T8sh5TqKtGyloI//j9DX1JVJLCX7icVaE2DmQwVHaPucanaflc=@vger.kernel.org, AJvYcCWNg1AYcPpLLrarV0h5jygNSDfd/aMsj6VFDVSEfXJZdQ9gcQPz/VgwEvOS49Il3kswyCNmgwVsKZbU8tzuHbRd@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzx4WkdgZtowgl6Tv79MmyBdHVxjS2MUYi4avzPXHSFeh0h2Q6Z
+	XhZNWykEThCuPQZaV1Wcdh8Mxn/DP85Vic29+oVWKUDZZ6EbNnPB
+X-Google-Smtp-Source: AGHT+IEa3fQA5oFfpE1oRsQVGh+ZYzRAZIi1EM7VzLQcYf/c+EeJ9u7F+fJPcJGdKJsB8B4NB68/JQ==
+X-Received: by 2002:a17:907:d589:b0:a7a:c7f3:580d with SMTP id a640c23a62f3a-a89a2924ab3mr238476366b.25.1725021957900;
+        Fri, 30 Aug 2024 05:45:57 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a89940980a1sm155694466b.47.2024.08.30.05.45.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Aug 2024 05:45:57 -0700 (PDT)
+Date: Fri, 30 Aug 2024 05:45:54 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	David Ahern <dsahern@kernel.org>, rbc@meta.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	"open list:NETFILTER" <coreteam@netfilter.org>
+Subject: Re: [PATCH nf-next v4 1/2] netfilter: Make IP6_NF_IPTABLES_LEGACY
+ selectable
+Message-ID: <ZtG/Ai88bIRFZZ6Y@gmail.com>
+References: <20240829161656.832208-1-leitao@debian.org>
+ <20240829161656.832208-2-leitao@debian.org>
+ <20240829162512.GA14214@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net,v7] net/smc: prevent NULL pointer dereference in txopt_get
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172502102638.2576424.109691224137525490.git-patchwork-notify@kernel.org>
-Date: Fri, 30 Aug 2024 12:30:26 +0000
-References: <20240829035648.262912-1-aha310510@gmail.com>
-In-Reply-To: <20240829035648.262912-1-aha310510@gmail.com>
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, guwen@linux.alibaba.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- dust.li@linux.alibaba.com, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller@googlegroups.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240829162512.GA14214@breakpoint.cc>
 
-Hello:
+Hello Florian,
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 29 Aug 2024 12:56:48 +0900 you wrote:
-> Since smc_inet6_prot does not initialize ipv6_pinfo_offset, inet6_create()
-> copies an incorrect address value, sk + 0 (offset), to inet_sk(sk)->pinet6.
+On Thu, Aug 29, 2024 at 06:25:12PM +0200, Florian Westphal wrote:
+> Breno Leitao <leitao@debian.org> wrote:
+> > This option makes IP6_NF_IPTABLES_LEGACY user selectable, giving
+> > users the option to configure iptables without enabling any other
+> > config.
 > 
-> In addition, since inet_sk(sk)->pinet6 and smc_sk(sk)->clcsock practically
-> point to the same address, when smc_create_clcsk() stores the newly
-> created clcsock in smc_sk(sk)->clcsock, inet_sk(sk)->pinet6 is corrupted
-> into clcsock. This causes NULL pointer dereference and various other
-> memory corruptions.
+> I don't get it.
 > 
-> [...]
+> IP(6)_NF_IPTABLES_LEGACY without iptable_filter, mangle etc.
+> is useless,
 
-Here is the summary with links:
-  - [net,v7] net/smc: prevent NULL pointer dereference in txopt_get
-    https://git.kernel.org/netdev/net/c/98d4435efcbf
+Correct. We need to have iptable_filter, mangle, etc available.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I would like to have ip6_tables as built-in
+(IP(6)_NF_IPTABLES_LEGACY=y), all the other tables built as modules.
 
+So, I am used to a configure similar to the following (before
+a9525c7f6219c ("netfilter: xtables: allow xtables-nft only builds"))
 
+	CONFIG_IP6_NF_IPTABLES=y
+	CONFIG_IP6_NF_MANGLE=m
+	CONFIG_IP6_NF_RAW=m
+	...
+
+After a9525c7f6219c ("netfilter: xtables: allow xtables-nft only
+builds"), the same configuration is not possible anymore, because 
+CONFIG_IP6_NF_IPTABLES is not user selectable anymore, thus, in order to
+set it as built-in (=y), I need to set the tables as =y.
+
+Sorry for not being clear before, and thanks for reviewing it.
+--breno
 
