@@ -1,394 +1,171 @@
-Return-Path: <netdev+bounces-123713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2902A9663E8
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:14:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 225829663F8
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:18:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9194284A11
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 14:14:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55F431C23910
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 14:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891671B250A;
-	Fri, 30 Aug 2024 14:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gy9w7rvw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E351B1D62;
+	Fri, 30 Aug 2024 14:18:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633751B3B19;
-	Fri, 30 Aug 2024 14:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 577EB1B250E
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 14:18:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725027193; cv=none; b=HDY18TE4yRvc1Pk3/Q5EQj036Reg3yRGyrSBGl5u/TcUpHpWtrFnMyDT54CCIjbNwym+jela5LLL29mdkcmZMjWuXIyMdSavtAEKthe3/kZJwNdoW4l3enksnBX/QAc7XPQcHVpU2OHSm+XgKlmuv+Xh5z8onM8FdykKX2QRH8k=
+	t=1725027503; cv=none; b=p4CRd4SYySX5IoI3rQKVNMA3vHRA16GZ0n5WOPZkDtA5SUwjr1VyaZ8ucncDWtohn8N85dysWvYt4yVZ+l2Q73nphDzAFQJ3AA5Mk8SO2zaNIA3CS+W81FnxhZtWSceAemJTBQpIVZ6/47uIHCqjnCS3WMqk0BItioQJuO7Poz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725027193; c=relaxed/simple;
-	bh=IkcIoYmLAgKtTISkzsK4x5e64jwVjAVfW9WAy79vU1E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iOFs5S3kTmE+OvRP58sPRfp4e4XYSjYHPtFkwEajPz10nSdcIhG+wzM/E04liCTF71YBfCTU0+NuyNBkRyjq8a2qQaqFSdcQQjU5+L+1cxh3gd3+r3RUMioBDwPI1hsf/L599YlxSeqaj9DfYmSgreagp+Wg0xqVmuFpAoJXuiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gy9w7rvw; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a869332c2c2so489744566b.0;
-        Fri, 30 Aug 2024 07:13:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725027190; x=1725631990; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PDh1L58sJKyioueW76oQ9OUtBcYWhTK18b85GSmBAt0=;
-        b=Gy9w7rvwITz6TnmiI9WeHSgD6k9jtypyDFIfFbjBN5/N2cYOZ7R1h+OmlCfMO/bXAA
-         NX/Fw+A+b+fNeO1h918gDzQj7qsEVAZdUp3kC1xQArw3Hr1BvF03PYsSTLGpBuBF96nW
-         jB1Bqf7LgBZ8NQnvcYuU9rEes1QXjW9Wb2URWkULNJbq9EDDNm0POHXz0GnjUpbSaQnt
-         H/DFj1waJTWrlJ+sRYAVILOWNJ7ZXVgIV2gPz34qNGNps9LSF/SQDQncD8Q7Mjh0rELE
-         m3lr24smgDzfWcTC3B2AAHBCpFy3DMQT7ZtH+N1K9Hl74oKTFbgVazUCEIkUqzl+6Lze
-         3C8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725027190; x=1725631990;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PDh1L58sJKyioueW76oQ9OUtBcYWhTK18b85GSmBAt0=;
-        b=kzrO7GwkMhhGJpgJEVpOilOaRI1y5Ygj843W2iIBkTulyQ3QUBIbMWBAHj9eMpC//F
-         EEXbYeSTRqru9boEtF28Vy+XdclQM3k4L2bz86fzqM3eon5B156aTaicxOkSJn7ENA3a
-         ZligS0Go4SPlLkOeimCtkXJwM36QfiOw5yWPWgI7W7s4SvCNrL9cewXVWJJpfioiGryE
-         COLzlL6lagfzylA7WynX1zz3xbDSXZ/+NNEBxnjh+vcITeuJCU0iQE7H2gjxGjdFbPdb
-         ls4Heve4uL7TdH2TDGUyLe+cp35uc2MwbPW/WQoCqq4NPVkbwL3nb/3WYTtUvZNG9vqc
-         AW5A==
-X-Forwarded-Encrypted: i=1; AJvYcCWKBjVUrGuzhMQGom7VhqIHQPV0EytNcscrQRp2HRYDZKEl0cycX8heN3tqfQR+6vexgUbuUCbyFF4R4Ew=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4AERLiwSRiy8QGhtCn+vKeUUlcQ1urexNG5enhC3GERwZDvhp
-	Ms+dVv3OygNqLgPqNE46yDiy08uTHk3+TfrAKZGAG+578Z/ord6xO1k1yggxXZ2xRA==
-X-Google-Smtp-Source: AGHT+IHmvj2Sj2gDYESqxEFatv1yTyCvXZqrzuQar3VCEEb2gbrPFdTgy0S/KTpZGp3gD87pyk0G6g==
-X-Received: by 2002:a17:907:608c:b0:a7d:8912:6697 with SMTP id a640c23a62f3a-a898231cbe5mr624656166b.3.1725027189485;
-        Fri, 30 Aug 2024 07:13:09 -0700 (PDT)
-Received: from lapsy144.cern.ch (lapsy144.ipv6.cern.ch. [2001:1458:202:99::100:4b])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989196975sm221304166b.135.2024.08.30.07.13.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Aug 2024 07:13:09 -0700 (PDT)
-From: vtpieter@gmail.com
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Arun.Ramadoss@microchip.com,
-	Tristram.Ha@microchip.com,
-	o.rempel@pengutronix.de,
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>
-Subject: [PATCH net-next v2 3/3] net: dsa: microchip: replace unclear KSZ8830 strings
-Date: Fri, 30 Aug 2024 16:12:43 +0200
-Message-ID: <20240830141250.30425-4-vtpieter@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240830141250.30425-1-vtpieter@gmail.com>
-References: <20240830141250.30425-1-vtpieter@gmail.com>
+	s=arc-20240116; t=1725027503; c=relaxed/simple;
+	bh=Bc0K/SvTlbFib6wHSGdzvULqLFn5sEn1KuRgEaeGJYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XCWdkVRpE4ze6srMoAvTGa4f0FAQjzMtNzmqCXORX1I+LNWk/u1ui5bU8jElOj5MHpWyFWIlmaQe4U27oVCUJUm9U0NpSkJo12L4KlEe18msoZhy6MMlm8ikKPn07kepskC5mDktOCDl9W8/d6MV8NNaMCGGG0C8WIYB9dRZVC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sk2Rv-0000A4-Ok; Fri, 30 Aug 2024 16:18:03 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sk2Rt-004AaI-1h; Fri, 30 Aug 2024 16:18:01 +0200
+Received: from pengutronix.de (pd9e5994e.dip0.t-ipconnect.de [217.229.153.78])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id B2E8832DF0E;
+	Fri, 30 Aug 2024 14:18:00 +0000 (UTC)
+Date: Fri, 30 Aug 2024 16:18:00 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Yan Zhen <yanzhen@vivo.com>, mailhol.vincent@wanadoo.fr, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	opensource.kernel@vivo.com
+Subject: Re: [PATCH v1] can: kvaser_usb: Simplify with dev_err_probe()
+Message-ID: <20240830-omniscient-impartial-capuchin-6c4490-mkl@pengutronix.de>
+References: <20240830110651.519119-1-yanzhen@vivo.com>
+ <e0effc27-f16b-4449-9661-76f0fc330aa9@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="j7xeongrjux5eock"
+Content-Disposition: inline
+In-Reply-To: <e0effc27-f16b-4449-9661-76f0fc330aa9@intel.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
 
-Replace uppercase KSZ8830 with KSZ8863 and lowercase ksz8830 with
-ksz88x3 strings. This because KSZ8830 is not an actual switch but it's
-the Chip ID shared among KSZ8863/KSZ8873 switches, impossible to
-differentiate from their Chip ID or Revision registers.
+--j7xeongrjux5eock
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Now all KSZ*_CHIP_ID macros refer to actual, existing switches which
-removes confusion.
+On 30.08.2024 14:50:44, Alexander Lobakin wrote:
+> From: Yan Zhen <yanzhen@vivo.com>
+> Date: Fri, 30 Aug 2024 19:06:51 +0800
+>=20
+> > dev_err_probe() is used to log an error message during the probe proces=
+s=20
+> > of a device.=20
+> >=20
+> > It can simplify the error path and unify a message template.
+> >=20
+> > Using this helper is totally fine even if err is known to never
+> > be -EPROBE_DEFER.
+> >=20
+> > The benefit compared to a normal dev_err() is the standardized format
+> > of the error code, it being emitted symbolically and the fact that
+> > the error code is returned which allows more compact error paths.
+> >=20
+> > Signed-off-by: Yan Zhen <yanzhen@vivo.com>
+> > ---
+> >  .../net/can/usb/kvaser_usb/kvaser_usb_core.c  | 42 +++++++------------
+> >  1 file changed, 16 insertions(+), 26 deletions(-)
+> >=20
+> > diff --git a/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c b/drivers=
+/net/can/usb/kvaser_usb/kvaser_usb_core.c
+> > index 35b4132b0639..bcf8d870af17 100644
+> > --- a/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
+> > +++ b/drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c
+> > @@ -898,10 +898,8 @@ static int kvaser_usb_probe(struct usb_interface *=
+intf,
+> >  	ops =3D driver_info->ops;
+> > =20
+> >  	err =3D ops->dev_setup_endpoints(dev);
+> > -	if (err) {
+> > -		dev_err(&intf->dev, "Cannot get usb endpoint(s)");
+> > -		return err;
+> > -	}
+> > +	if (err)
+> > +		return dev_err_probe(&intf->dev, err, "Cannot get usb endpoint(s)");
+> > =20
+> >  	dev->udev =3D interface_to_usbdev(intf);
+> > =20
+> > @@ -912,26 +910,20 @@ static int kvaser_usb_probe(struct usb_interface =
+*intf,
+> >  	dev->card_data.ctrlmode_supported =3D 0;
+> >  	dev->card_data.capabilities =3D 0;
+> >  	err =3D ops->dev_init_card(dev);
+> > -	if (err) {
+> > -		dev_err(&intf->dev,
+> > -			"Failed to initialize card, error %d\n", err);
+> > -		return err;
+> > -	}
+> > +	if (err)
+> > +		return dev_err_probe(&intf->dev, err,
+> > +					"Failed to initialize card\n");
+>=20
+> The line wrap is wrong in all the places where you used it. It should be
+> aligned to the opening brace, like
+>=20
+> 		return dev_err_probe(&intf->dev, err,
+> 				     "Failed ...)
+>=20
+> Replace one tab with 5 spaces to fix that, here and in the whole patch.
 
-Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
----
- drivers/net/dsa/microchip/ksz8.c            |  2 +-
- drivers/net/dsa/microchip/ksz8863_smi.c     |  4 +-
- drivers/net/dsa/microchip/ksz_common.c      | 48 ++++++++++-----------
- drivers/net/dsa/microchip/ksz_common.h      |  5 ++-
- drivers/net/dsa/microchip/ksz_spi.c         |  6 +--
- include/linux/platform_data/microchip-ksz.h |  2 +-
- 6 files changed, 34 insertions(+), 33 deletions(-)
+Fixed while applying.
 
-diff --git a/drivers/net/dsa/microchip/ksz8.c b/drivers/net/dsa/microchip/ksz8.c
-index 7af3c0853505..4c15e0911636 100644
---- a/drivers/net/dsa/microchip/ksz8.c
-+++ b/drivers/net/dsa/microchip/ksz8.c
-@@ -194,7 +194,7 @@ int ksz8_change_mtu(struct ksz_device *dev, int port, int mtu)
- 	case KSZ8794_CHIP_ID:
- 	case KSZ8765_CHIP_ID:
- 		return ksz8795_change_mtu(dev, frame_size);
--	case KSZ8830_CHIP_ID:
-+	case KSZ8863_CHIP_ID:
- 	case KSZ8864_CHIP_ID:
- 	case KSZ8895_CHIP_ID:
- 		return ksz8863_change_mtu(dev, frame_size);
-diff --git a/drivers/net/dsa/microchip/ksz8863_smi.c b/drivers/net/dsa/microchip/ksz8863_smi.c
-index 5711a59e2ac9..c28cb84771c1 100644
---- a/drivers/net/dsa/microchip/ksz8863_smi.c
-+++ b/drivers/net/dsa/microchip/ksz8863_smi.c
-@@ -199,11 +199,11 @@ static void ksz8863_smi_shutdown(struct mdio_device *mdiodev)
- static const struct of_device_id ksz8863_dt_ids[] = {
- 	{
- 		.compatible = "microchip,ksz8863",
--		.data = &ksz_switch_chips[KSZ8830]
-+		.data = &ksz_switch_chips[KSZ8863]
- 	},
- 	{
- 		.compatible = "microchip,ksz8873",
--		.data = &ksz_switch_chips[KSZ8830]
-+		.data = &ksz_switch_chips[KSZ8863]
- 	},
- 	{ },
- };
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 6609bf271ad0..1276d7455e5c 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -246,16 +246,16 @@ static const struct ksz_drive_strength ksz9477_drive_strengths[] = {
- 	{ SW_DRIVE_STRENGTH_28MA, 28000 },
- };
- 
--/* ksz8830_drive_strengths - Drive strength mapping for KSZ8830, KSZ8873, ..
-+/* ksz88x3_drive_strengths - Drive strength mapping for KSZ8863, KSZ8873, ..
-  *			     variants.
-  * This values are documented in KSZ8873 and KSZ8863 datasheets.
-  */
--static const struct ksz_drive_strength ksz8830_drive_strengths[] = {
-+static const struct ksz_drive_strength ksz88x3_drive_strengths[] = {
- 	{ 0,  8000 },
- 	{ KSZ8873_DRIVE_STRENGTH_16MA, 16000 },
- };
- 
--static void ksz8830_phylink_mac_config(struct phylink_config *config,
-+static void ksz88x3_phylink_mac_config(struct phylink_config *config,
- 				       unsigned int mode,
- 				       const struct phylink_link_state *state);
- static void ksz_phylink_mac_config(struct phylink_config *config,
-@@ -265,8 +265,8 @@ static void ksz_phylink_mac_link_down(struct phylink_config *config,
- 				      unsigned int mode,
- 				      phy_interface_t interface);
- 
--static const struct phylink_mac_ops ksz8830_phylink_mac_ops = {
--	.mac_config	= ksz8830_phylink_mac_config,
-+static const struct phylink_mac_ops ksz88x3_phylink_mac_ops = {
-+	.mac_config	= ksz88x3_phylink_mac_config,
- 	.mac_link_down	= ksz_phylink_mac_link_down,
- 	.mac_link_up	= ksz8_phylink_mac_link_up,
- };
-@@ -1442,8 +1442,8 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.internal_phy = {true, true, true, true, false},
- 	},
- 
--	[KSZ8830] = {
--		.chip_id = KSZ8830_CHIP_ID,
-+	[KSZ8863] = {
-+		.chip_id = KSZ8863_CHIP_ID,
- 		.dev_name = "KSZ8863/KSZ8873",
- 		.num_vlans = 16,
- 		.num_alus = 0,
-@@ -1453,7 +1453,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.num_tx_queues = 4,
- 		.num_ipms = 4,
- 		.ops = &ksz88xx_dev_ops,
--		.phylink_mac_ops = &ksz8830_phylink_mac_ops,
-+		.phylink_mac_ops = &ksz88x3_phylink_mac_ops,
- 		.mib_names = ksz88xx_mib_names,
- 		.mib_cnt = ARRAY_SIZE(ksz88xx_mib_names),
- 		.reg_mib_cnt = MIB_COUNTER_NUM,
-@@ -1487,7 +1487,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.num_tx_queues = 4,
- 		.num_ipms = 4,
- 		.ops = &ksz88xx_dev_ops,
--		.phylink_mac_ops = &ksz8830_phylink_mac_ops,
-+		.phylink_mac_ops = &ksz88x3_phylink_mac_ops,
- 		.mib_names = ksz88xx_mib_names,
- 		.mib_cnt = ARRAY_SIZE(ksz88xx_mib_names),
- 		.reg_mib_cnt = MIB_COUNTER_NUM,
-@@ -1510,7 +1510,7 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.num_tx_queues = 4,
- 		.num_ipms = 4,
- 		.ops = &ksz88xx_dev_ops,
--		.phylink_mac_ops = &ksz8830_phylink_mac_ops,
-+		.phylink_mac_ops = &ksz88x3_phylink_mac_ops,
- 		.mib_names = ksz88xx_mib_names,
- 		.mib_cnt = ARRAY_SIZE(ksz88xx_mib_names),
- 		.reg_mib_cnt = MIB_COUNTER_NUM,
-@@ -2724,7 +2724,7 @@ static u32 ksz_get_phy_flags(struct dsa_switch *ds, int port)
- 	struct ksz_device *dev = ds->priv;
- 
- 	switch (dev->chip_id) {
--	case KSZ8830_CHIP_ID:
-+	case KSZ8863_CHIP_ID:
- 		/* Silicon Errata Sheet (DS80000830A):
- 		 * Port 1 does not work with LinkMD Cable-Testing.
- 		 * Port 1 does not respond to received PAUSE control frames.
-@@ -3050,7 +3050,7 @@ static enum dsa_tag_protocol ksz_get_tag_protocol(struct dsa_switch *ds,
- 	if (ksz_is_ksz87xx(dev) || ksz_is_8895_family(dev))
- 		proto = DSA_TAG_PROTO_KSZ8795;
- 
--	if (dev->chip_id == KSZ8830_CHIP_ID ||
-+	if (dev->chip_id == KSZ8863_CHIP_ID ||
- 	    dev->chip_id == KSZ8563_CHIP_ID ||
- 	    dev->chip_id == KSZ9893_CHIP_ID ||
- 	    dev->chip_id == KSZ9563_CHIP_ID)
-@@ -3162,7 +3162,7 @@ static int ksz_max_mtu(struct dsa_switch *ds, int port)
- 	case KSZ8794_CHIP_ID:
- 	case KSZ8765_CHIP_ID:
- 		return KSZ8795_HUGE_PACKET_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN;
--	case KSZ8830_CHIP_ID:
-+	case KSZ8863_CHIP_ID:
- 	case KSZ8864_CHIP_ID:
- 	case KSZ8895_CHIP_ID:
- 		return KSZ8863_HUGE_PACKET_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN;
-@@ -3334,7 +3334,7 @@ phy_interface_t ksz_get_xmii(struct ksz_device *dev, int port, bool gbit)
- 	return interface;
- }
- 
--static void ksz8830_phylink_mac_config(struct phylink_config *config,
-+static void ksz88x3_phylink_mac_config(struct phylink_config *config,
- 				       unsigned int mode,
- 				       const struct phylink_link_state *state)
- {
-@@ -3518,7 +3518,7 @@ static int ksz_switch_detect(struct ksz_device *dev)
- 		break;
- 	case KSZ88_FAMILY_ID:
- 		if (id2 == KSZ88_CHIP_ID_63)
--			dev->chip_id = KSZ8830_CHIP_ID;
-+			dev->chip_id = KSZ8863_CHIP_ID;
- 		else
- 			return -ENODEV;
- 		break;
-@@ -4592,24 +4592,24 @@ static int ksz9477_drive_strength_write(struct ksz_device *dev,
- }
- 
- /**
-- * ksz8830_drive_strength_write() - Set the drive strength configuration for
-- *				    KSZ8830 compatible chip variants.
-+ * ksz88x3_drive_strength_write() - Set the drive strength configuration for
-+ *				    KSZ8863 compatible chip variants.
-  * @dev:       ksz device
-  * @props:     Array of drive strength properties to be set
-  * @num_props: Number of properties in the array
-  *
-- * This function applies the specified drive strength settings to KSZ8830 chip
-+ * This function applies the specified drive strength settings to KSZ88X3 chip
-  * variants (KSZ8873, KSZ8863).
-  * It ensures the configurations align with what the chip variant supports and
-  * warns or errors out on unsupported settings.
-  *
-  * Return: 0 on success, error code otherwise
-  */
--static int ksz8830_drive_strength_write(struct ksz_device *dev,
-+static int ksz88x3_drive_strength_write(struct ksz_device *dev,
- 					struct ksz_driver_strength_prop *props,
- 					int num_props)
- {
--	size_t array_size = ARRAY_SIZE(ksz8830_drive_strengths);
-+	size_t array_size = ARRAY_SIZE(ksz88x3_drive_strengths);
- 	int microamp;
- 	int i, ret;
- 
-@@ -4622,10 +4622,10 @@ static int ksz8830_drive_strength_write(struct ksz_device *dev,
- 	}
- 
- 	microamp = props[KSZ_DRIVER_STRENGTH_IO].value;
--	ret = ksz_drive_strength_to_reg(ksz8830_drive_strengths, array_size,
-+	ret = ksz_drive_strength_to_reg(ksz88x3_drive_strengths, array_size,
- 					microamp);
- 	if (ret < 0) {
--		ksz_drive_strength_error(dev, ksz8830_drive_strengths,
-+		ksz_drive_strength_error(dev, ksz88x3_drive_strengths,
- 					 array_size, microamp);
- 		return ret;
- 	}
-@@ -4685,8 +4685,8 @@ static int ksz_parse_drive_strength(struct ksz_device *dev)
- 		return 0;
- 
- 	switch (dev->chip_id) {
--	case KSZ8830_CHIP_ID:
--		return ksz8830_drive_strength_write(dev, of_props,
-+	case KSZ8863_CHIP_ID:
-+		return ksz88x3_drive_strength_write(dev, of_props,
- 						    ARRAY_SIZE(of_props));
- 	case KSZ8795_CHIP_ID:
- 	case KSZ8794_CHIP_ID:
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index e08d5a1339f4..428d2d97faca 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -200,7 +200,8 @@ enum ksz_model {
- 	KSZ8795,
- 	KSZ8794,
- 	KSZ8765,
--	KSZ8830,
-+	KSZ8863,
-+	KSZ8873,
- 	KSZ8864,
- 	KSZ8895,
- 	KSZ9477,
-@@ -628,7 +629,7 @@ static inline bool ksz_is_ksz87xx(struct ksz_device *dev)
- 
- static inline bool ksz_is_ksz88x3(struct ksz_device *dev)
- {
--	return dev->chip_id == KSZ8830_CHIP_ID;
-+	return dev->chip_id == KSZ8863_CHIP_ID;
- }
- 
- static inline bool ksz_is_8895_family(struct ksz_device *dev)
-diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-index f4287310e89f..2986274e522b 100644
---- a/drivers/net/dsa/microchip/ksz_spi.c
-+++ b/drivers/net/dsa/microchip/ksz_spi.c
-@@ -54,7 +54,7 @@ static int ksz_spi_probe(struct spi_device *spi)
- 	if (!chip)
- 		return -EINVAL;
- 
--	if (chip->chip_id == KSZ8830_CHIP_ID)
-+	if (chip->chip_id == KSZ8863_CHIP_ID)
- 		regmap_config = ksz8863_regmap_config;
- 	else if (chip->chip_id == KSZ8795_CHIP_ID ||
- 		 chip->chip_id == KSZ8794_CHIP_ID ||
-@@ -137,7 +137,7 @@ static const struct of_device_id ksz_dt_ids[] = {
- 	},
- 	{
- 		.compatible = "microchip,ksz8863",
--		.data = &ksz_switch_chips[KSZ8830]
-+		.data = &ksz_switch_chips[KSZ8863]
- 	},
- 	{
- 		.compatible = "microchip,ksz8864",
-@@ -145,7 +145,7 @@ static const struct of_device_id ksz_dt_ids[] = {
- 	},
- 	{
- 		.compatible = "microchip,ksz8873",
--		.data = &ksz_switch_chips[KSZ8830]
-+		.data = &ksz_switch_chips[KSZ8863]
- 	},
- 	{
- 		.compatible = "microchip,ksz8895",
-diff --git a/include/linux/platform_data/microchip-ksz.h b/include/linux/platform_data/microchip-ksz.h
-index d074019474f5..c7bf8d4b7805 100644
---- a/include/linux/platform_data/microchip-ksz.h
-+++ b/include/linux/platform_data/microchip-ksz.h
-@@ -27,7 +27,7 @@ enum ksz_chip_id {
- 	KSZ8795_CHIP_ID = 0x8795,
- 	KSZ8794_CHIP_ID = 0x8794,
- 	KSZ8765_CHIP_ID = 0x8765,
--	KSZ8830_CHIP_ID = 0x8830,
-+	KSZ8863_CHIP_ID = 0x8863,
- 	KSZ8864_CHIP_ID = 0x8864,
- 	KSZ8895_CHIP_ID = 0x8895,
- 	KSZ9477_CHIP_ID = 0x00947700,
--- 
-2.43.0
+Thanks,
+Marc
 
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--j7xeongrjux5eock
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbR1JMACgkQKDiiPnot
+vG8iZAf+PAIOYo18T8gGoXog1rNfStaB60QiIUsdtMuP9ZlGcPu8qTESCTsgMPDC
+yOG+eJeR7hYrYCyR71vgIzFBjqipA95X31hikZ6ro/iXdKut0iqG/IVkhCFacUys
+ZIhn/v9252RmeANar5iy0dI/Q18Y3qV81L4OkmoDl0YOm3OQlmfitLzIhSNbFTFN
+rV0nYWk+he83FPVF+fDgyCk7fDlZmpzCTN75ZSqnEQS2Pk2jxnrLb5kqq6bEfsHl
+j1vRsgdW4icKDDhgS1GDJKjTFw35/mrW47Iz/X6cycgJ+5MOdtcgSf7gCnyjUKVX
+wAv+1SuOJ/e7qBvsw2gnmRd7eRKkBg==
+=y9gF
+-----END PGP SIGNATURE-----
+
+--j7xeongrjux5eock--
 
