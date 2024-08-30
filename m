@@ -1,71 +1,111 @@
-Return-Path: <netdev+bounces-123587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33F129656C5
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 07:13:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75EF99656D0
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 07:21:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 560FC1C215CA
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 05:13:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAEB3285224
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 05:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D49214B978;
-	Fri, 30 Aug 2024 05:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3238B14D2A8;
+	Fri, 30 Aug 2024 05:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="b1kUcZ0m"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="GsFkRnyD"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ACC0481AB;
-	Fri, 30 Aug 2024 05:13:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8DA13C672
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 05:21:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724994803; cv=none; b=QdU28DUTuPQKXk58RQru6xTOD2bvD1p/wKIo9RlE8K4dIrxjPWs9an5Mwv3bVswetWau9uoFxA1d6rI1OyRtT933/4oIOgJ5m+RUkpMrlpGMgOEzamqPvKFcpwadoHRQDOexIJiBMKdo3tXbNKr3H1T6vrjvV+cbHswQUKInHYI=
+	t=1724995270; cv=none; b=PaKYZO0Fs4RrAVj7N2O+SjDbO2E3Toni+3bxeOGmrDwBpHC/ai062v/WfiVa9U12TzBHl8naz4Nmty2BOuOGbAOefMDb7JlYq/MwotG5yUpa2PJ3xcP3AY/a1DBb6rRLpf64Js/3hoN5F5WGhvS1zlYEBJJ3fCw/PCoiAgLqv7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724994803; c=relaxed/simple;
-	bh=rYuq24tDv4iwGP+294pdnVpKjFZjbqF7wVoyu8pG2R8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MkdkTw7YJtqY+AbbV3Y/t8EV8VHAt9hF/E/34JpzOU3R786STQuYGk0cBw6q+D9C5Ia9BjApq20FPhcIEObSAPRrUXj028c8DakHkr+lLU8Ou0i0LHjL1ftdcY9ZOV4IE9SB4+2LwgiB9VWdOtf9aKOProgOKQPOgrPWAdcVkPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=b1kUcZ0m; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id CBEF720B7165; Thu, 29 Aug 2024 22:13:21 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CBEF720B7165
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1724994801;
-	bh=YupYlTwGydwIzVuxwU1WXxJUQluJb6OWyZQcjr8vBJ4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b1kUcZ0mU6xjnCTVCqbmIkSwL4Rky4Grfb0dLrjf1WDk9e/Yud+pUBhLOqSUlZQAz
-	 cOzsan9XoXIkuNgMfblIDYVrcXf73FypetUBKbFVyeGHMAlhhqmvYkMFp4NFrjNDYN
-	 WYTvEpn7aaJyBQ1e6ndDUXIGSN/0+IKLlKM4u0Is=
-Date: Thu, 29 Aug 2024 22:13:21 -0700
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Gerhard Engleder <gerhard@engleder-embedded.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	KY Srinivasan <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
+	s=arc-20240116; t=1724995270; c=relaxed/simple;
+	bh=jtf7PV5qM5aW2ZTufnYu/xPa7oOq40+0/uQGqTwb61k=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OFFhU0xJZRV4eCgHEThZyeENKue6fv+0Rre73WCSG/E78T5cdIoKQaqy+ucncfxmTo1Md798OZPbEBdZWfQzKWCvT/yG4uMh2L3jRCst21JoKKo7oiXHK0AGXrnUbRYhZ2mWNmDH3RrQFa23AEYS2MKV4fNwu46GDOvfUdHBR+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=GsFkRnyD; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a86a37208b2so166997266b.0
+        for <netdev@vger.kernel.org>; Thu, 29 Aug 2024 22:21:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1724995267; x=1725600067; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GExFSIDcR+m296qL0+T8lfbyMBHXGvoOKDeyXebihgs=;
+        b=GsFkRnyDx48N26VCklfdB2GSObBJ3t8yj/CrliklVlkfQn3wrBQGaceW/ki3DjbDcx
+         1A3SybfgZCfcPvhsmS37VUfaCM3IXhnu9xeLOSbPRek9Y3wiv1/Q7Zomq95opPya7Uzo
+         0Zh2qm1famEmU79YhHqopS24/5GvaxxjrTk3cNsN1S9ZLIJkdCKo5dMgfL1OgAbUNXnn
+         LqGDntT2J7eVsAiBd1mP6ZWrSKUdbakMlSganQZbjRZjS2M1+WXhEIAi3MZBhp5nl3vW
+         wO8JZ9JlJ38w1TEGMjk53Tjkiv31euGaL2Nuuzv9NjbTCzOsu/RMJOo/4/8fuq1B4rno
+         ouBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724995267; x=1725600067;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GExFSIDcR+m296qL0+T8lfbyMBHXGvoOKDeyXebihgs=;
+        b=anT8z6OUeRtLZ57HJiMS1kKH3Q3Vt9pQiEBkPYMXonJA0MaXXnNcRr7qejL6g9MmKf
+         GGC+r9ehJwymkJCy++ZstJJvo+JjR0gcs0K4pF9aX4qLyRtrgh/q+Kvlo8OjTrOla0RU
+         maELawYA7nyUY5ScNns4B5d/eSWnMEYEQrmnE5c42EMi2TkaAkvZ/B7SM0zjuH4kYxbF
+         gZ6RNxEhT5sr5LffEqBmsTwoxTS7uMtEO+wCubCPRBLlFtfQsbZv9rqfRDpwKDb9gTZr
+         eiuwQrPwnoV5xPK4nD4RKg00KsTfTjf+jlRC+VjN58rC8iZx5ToJjF/uGlJsyMQCfO9J
+         2lBw==
+X-Forwarded-Encrypted: i=1; AJvYcCUaXxUvQTsthLbdsJvC/w5pLdeEeK0Z3OaGb2Of7127zztdsaffH1aZUkGoeMbWeiRowdUsZsU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwY0NUHgMa78Z3qoxqg0ERIUwH908Fc4LdGRmrONfqpl4688T6R
+	DWc5v6bhMsu+wdtB6OGH0oo5cfQJgIY5jP0Soo/ueHETPfaaWl5DYoH52s7FdXA=
+X-Google-Smtp-Source: AGHT+IF7+hVzizb5h2RAOKpmPeEAucZHJJ8SE3J6cbyAO0CAecmSuqQGdIsglF6MfVFAtKQonNztKg==
+X-Received: by 2002:a17:907:7da8:b0:a86:8b7b:7880 with SMTP id a640c23a62f3a-a897fad50fdmr358086866b.63.1724995265995;
+        Thu, 29 Aug 2024 22:21:05 -0700 (PDT)
+Received: from localhost (host-80-182-198-72.retail.telecomitalia.it. [80.182.198.72])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8988ff4233sm166746966b.25.2024.08.29.22.21.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 22:21:05 -0700 (PDT)
+From: Andrea della Porta <andrea.porta@suse.com>
+X-Google-Original-From: Andrea della Porta <aporta@suse.de>
+Date: Fri, 30 Aug 2024 07:21:12 +0200
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>, Simon Horman <horms@kernel.org>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Erick Archer <erick.archer@outlook.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Colin Ian King <colin.i.king@gmail.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH net-next] net: mana: Improve mana_set_channels() for low
- mem conditions
-Message-ID: <20240830051321.GA27295@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1724941006-2500-1-git-send-email-shradhagupta@linux.microsoft.com>
- <d73d45af-e76e-4e87-8df1-0ed71e823abc@engleder-embedded.com>
- <PH7PR21MB32606D2D49A7F0837A29835DCA962@PH7PR21MB3260.namprd21.prod.outlook.com>
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 00/11] Add support for RaspberryPi RP1 PCI device using a
+ DT overlay
+Message-ID: <ZtFWyAX_7OR5yYDS@apocalypse>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <14990d25-40a2-46c0-bf94-25800f379a30@kernel.org>
+ <Zsb_ZeczWd-gQ5po@apocalypse>
+ <45a41ed9-2e42-4fd5-a1d5-35de93ce0512@lunn.ch>
+ <ZtBjMpMGtA4WfDij@apocalypse>
+ <e6e6c230-370f-4b04-8cb7-4158dd51efdc@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,84 +114,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <PH7PR21MB32606D2D49A7F0837A29835DCA962@PH7PR21MB3260.namprd21.prod.outlook.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <e6e6c230-370f-4b04-8cb7-4158dd51efdc@lunn.ch>
 
-On Thu, Aug 29, 2024 at 09:00:05PM +0000, Haiyang Zhang wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Gerhard Engleder <gerhard@engleder-embedded.com>
-> > Sent: Thursday, August 29, 2024 3:54 PM
-> > To: Shradha Gupta <shradhagupta@linux.microsoft.com>; linux-
-> > hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-
-> > kernel@vger.kernel.org; linux-rdma@vger.kernel.org
-> > Cc: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
-> > <haiyangz@microsoft.com>; Wei Liu <wei.liu@kernel.org>; Dexuan Cui
-> > <decui@microsoft.com>; David S. Miller <davem@davemloft.net>; Eric
-> > Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
-> > Abeni <pabeni@redhat.com>; Long Li <longli@microsoft.com>; Simon Horman
-> > <horms@kernel.org>; Konstantin Taranov <kotaranov@microsoft.com>;
-> > Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>; Erick Archer
-> > <erick.archer@outlook.com>; Pavan Chebbi <pavan.chebbi@broadcom.com>;
-> > Ahmed Zaki <ahmed.zaki@intel.com>; Colin Ian King
-> > <colin.i.king@gmail.com>; Shradha Gupta <shradhagupta@microsoft.com>
-> > Subject: Re: [PATCH net-next] net: mana: Improve mana_set_channels() for
-> > low mem conditions
-> > 
-> > [Some people who received this message don't often get email from
-> > gerhard@engleder-embedded.com. Learn why this is important at
-> > https://aka.ms/LearnAboutSenderIdentification ]
-> > 
-> > On 29.08.24 16:16, Shradha Gupta wrote:
-> > > The mana_set_channels() function requires detaching the mana
-> > > driver and reattaching it with changed channel values.
-> > > During this operation if the system is low on memory, the reattach
-> > > might fail, causing the network device being down.
-> > > To avoid this we pre-allocate buffers at the beginning of set
-> > operation,
-> > > to prevent complete network loss
-> > >
-> > > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> > > ---
-> > >   .../ethernet/microsoft/mana/mana_ethtool.c    | 28 +++++++++++-------
-> > -
-> > >   1 file changed, 16 insertions(+), 12 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> > b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> > > index d6a35fbda447..5077493fdfde 100644
-> > > --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> > > +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> > > @@ -345,27 +345,31 @@ static int mana_set_channels(struct net_device
-> > *ndev,
-> > >       struct mana_port_context *apc = netdev_priv(ndev);
-> > >       unsigned int new_count = channels->combined_count;
-> > >       unsigned int old_count = apc->num_queues;
-> > > -     int err, err2;
-> > > +     int err;
-> > > +
-> > > +     apc->num_queues = new_count;
-> > > +     err = mana_pre_alloc_rxbufs(apc, ndev->mtu);
-> > > +     apc->num_queues = old_count;
-> > 
-> > Are you sure that temporary changing num_queues has no side effects on
-> > other num_queues users like mana_chn_setxdp()?
-> > 
-> 
-> mana_chn_setxdp() is protected by rtnl_lock, which is OK. But I'm not sure
-> if all other users are protected. mana_get_stats64() seems not.
-> 
-> @Shradha Gupta You can add num_queues as an argument of mana_pre_alloc_rxbufs()
-> to avoid changing apc->num_queues.
-> 
-> Thanks,
-> - Haiyang
+Hi Andrew,
 
-Thanks Haiyang and Gerhard. Instead of changing the apc structure value,
-I will pass it to the mana_pre_alloc_rxbufs() function in the next
-version. That should make sure other calls are unaffected.
+On 15:04 Thu 29 Aug     , Andrew Lunn wrote:
+> > > > WARNING: externs should be avoided in .c files
+> > > > #331: FILE: drivers/misc/rp1/rp1-pci.c:58:
+> > > > +extern char __dtbo_rp1_pci_begin[];
+> > > > 
+> > > > True, but in this case we don't have a symbol that should be exported to other
+> > > > translation units, it just needs to be referenced inside the driver and
+> > > > consumed locally. Hence it would be better to place the extern in .c file.
+> > >  
+> > > Did you try making it static.
+> > 
+> > The dtso is compiled into an obj and linked with the driver which is in
+> > a different transaltion unit. I'm not aware on other ways to include that
+> > symbol without declaring it extern (the exception being some hackery 
+> > trick that compile the dtso into a .c file to be included into the driver
+> > main source file). 
+> > Or probably I'm not seeing what you are proposing, could you please elaborate
+> > on that?
+> 
+> Sorry, i jumped to the wrong conclusion. Often it is missing static
+> keyword which causes warnings. However, you say it needs to be global
+> scope.
+> 
+> Reading the warning again:
+> 
+> > > > WARNING: externs should be avoided in .c files
+> 
+> It is wanting you to put it in a .h file, which then gets
+> included by the two users.
 
-Thanks,
-Shradha.
+On a second thought, are you really sure we want to proceed with the header file?
+After all the only line in it would be the extern declaration and the only one to
+include it would be rp1-dev.c. Moreover, an header file would convey the false
+premise that you can include it and use that symbol while in fact it should be
+only used inside the driver.
+OTOH, not creating that header file will continue to trigger the warning...
+
+Many thanks,
+Andrea
+
+> 
+> 	Andrew
 
