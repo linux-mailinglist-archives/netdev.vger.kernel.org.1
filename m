@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-123769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2EEF966769
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:52:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DD1D96676F
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:54:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 894E9286CC3
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:52:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 194F4B26D55
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A8B1B81CD;
-	Fri, 30 Aug 2024 16:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D13C1B3B2D;
+	Fri, 30 Aug 2024 16:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AYqfNfmY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KwP/W+2J"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70F9C192D98;
-	Fri, 30 Aug 2024 16:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CC114F131;
+	Fri, 30 Aug 2024 16:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725036765; cv=none; b=Hsfh408Qw9TahPMkOCwkl3Y3ShX7qNV9fvmNX/L4fKgcTZSjRnFqHMd3V6VY0UMRUoXN66Zflg4Lwi1TlLW22jISdx9Pny7QSmVez32rKvcn9hgaPLWhaVmcu/N70dqGoA+aMo+raV01Ry6oLF2QzBLrp7qhYNe1XA63maWgPcA=
+	t=1725036866; cv=none; b=R8I16GCJTRl7rLRGSyQVdPDqCTgyU5t655VO3MKFb458tq01P5/Yqb9DPRw5kWtHFzDJSKsuh/z+fdCnqAWvZCVW9gXQgTdH21CKEnvnkolRp0Os5irK9rtMPTxoBUJs61JLg4WTDcmNU10i3aSaMsePs3iIkxTX6KVWtca3ktI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725036765; c=relaxed/simple;
-	bh=SMcLNIaJ54MQsZ3nxl5vqmMyfb44UrOy7mGgTTHqYZo=;
+	s=arc-20240116; t=1725036866; c=relaxed/simple;
+	bh=+23hzhX5uIEvw9ZsfuJU30nMGp5PFYkjhA3vnXJTuLg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cI6DOddpaQBW5ORptdAtPgUp9qcUg9Fjx8G4UxwBqSaxyLvbUYlE1QrpmQhbsk2holWZNV/8WAUOYf6fLfji4tv69R7QU+QX6rIcCoPI16gx1AiklluK0xPmAa1dM3deZNFit9fA/wVPD+mmgw8EjCc6bI4MWUAtgJH0fkglZjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AYqfNfmY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37851C4CEC2;
-	Fri, 30 Aug 2024 16:52:34 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=A2qrUhNz30Ab3ndaVtnAXPmVTtcUJQ5xuqhdXDFaDZ422avfNQNfDaY6zra5HxPhWq/m/4/h0R/Qhyk+9ASt4W1ppsWRKvESrqBPHtbut4J1DYuIj7i3CRJVbMfppWbpZL0FGgE8/OQBVGxc2/2WfqAOSb/bU6s0s/p5mz1GQUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KwP/W+2J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A40AC4CEC2;
+	Fri, 30 Aug 2024 16:54:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725036765;
-	bh=SMcLNIaJ54MQsZ3nxl5vqmMyfb44UrOy7mGgTTHqYZo=;
+	s=k20201202; t=1725036864;
+	bh=+23hzhX5uIEvw9ZsfuJU30nMGp5PFYkjhA3vnXJTuLg=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AYqfNfmYiFPTbXVEG+bz3A0nts8/zcC0XWPxEIPNnauvCUj/p/wFOq4wpkq7Paeik
-	 ZVMxhimIvmX8KfmZ1DJIA/Fk93uwd+sRic29TktVLjwj9Fi4eCLgaVQBuh7dLmbeSb
-	 a8xUPVaKeYuLJLM02AhRR7E9QtxaTHIAdcAI6NxPhL0Mohfpyd6SRQBcM4AFfpd6eC
-	 r9Qbqf5g+0+/AIMoyKhJ809/uOryvKOzQaPzwP+L0LEn0goFcSvXQ4i241s46e2uCq
-	 jUXK3stvvzvVQ3LIacmriav8imr2uHfvQ/OO/NLR7b6EzCNXgLJOOXHxFhqKZK5W+U
-	 lCbJze5YFS6ZA==
-Message-ID: <b74327b8-43f6-47cf-ba9d-cc9a4559767b@kernel.org>
-Date: Fri, 30 Aug 2024 18:52:32 +0200
+	b=KwP/W+2JXQY4yvLY2BN5WZujkqm3Jlfw7oVG0jVky3dd1HH/fcyoaQ4G2+IGKWbIa
+	 XbCn34G+prrfzROrynl5LESAYQ6jNaugtd/7644DvwARyshvA2sWjcqiFfvz6nq7hD
+	 yBdStL1b7cgVYX7BrgwIiSaF0OLTFvnJ4iwn0zwha5BqKHxL4ytZxaB7Z2w9UoO+wX
+	 hAkRg/ucppwGJqTslFL51TJN4HILTJ1z0VlFd75ZyXKYxeZi+//1+52eieIAjGxQ89
+	 orwgTKpxgkgB3HKqlz8R4z/Cwj9IZ0bw3pGmir3ZC/dd/2LrLA/3jSI4WezE4U0DRX
+	 RcN1R6F1AQD+Q==
+Message-ID: <d73db52d-e616-4b7e-870c-e1f58c71b0ea@kernel.org>
+Date: Fri, 30 Aug 2024 18:54:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,34 +50,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
-To: Andrea della Porta <andrea.porta@suse.com>
-Cc: Michael Turquette <mturquette@baylibre.com>,
- Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
- <dragan.cvetic@amd.com>, Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+Subject: Re: [PATCH v1] net: alacritech: Switch to use dev_err_probe()
+To: Yang Ruibin <11162571@vivo.com>, Lino Sanfilippo <LinoSanfilippo@gmx.de>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>,
- linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
- linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Stefan Wahren <wahrenst@gmx.net>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
- <lrv7cpbt2n7eidog5ydhrbyo5se5l2j23n7ljxvojclnhykqs2@nfeu4wpi2d76>
- <ZtHN0B8VEGZFXs95@apocalypse>
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com
+References: <20240828122650.1324246-1-11162571@vivo.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -123,190 +102,39 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <ZtHN0B8VEGZFXs95@apocalypse>
+In-Reply-To: <20240828122650.1324246-1-11162571@vivo.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 30/08/2024 15:49, Andrea della Porta wrote:
-> Hi Krzysztof,
+On 28/08/2024 14:26, Yang Ruibin wrote:
+> use dev_err_probe() instead of dev_err() to simplify the error path and
+> standardize the format of the error code.
 > 
-> On 10:38 Wed 21 Aug     , Krzysztof Kozlowski wrote:
->> On Tue, Aug 20, 2024 at 04:36:10PM +0200, Andrea della Porta wrote:
->>> The RaspberryPi RP1 is ia PCI multi function device containing
->>> peripherals ranging from Ethernet to USB controller, I2C, SPI
->>> and others.
->>> Implement a bare minimum driver to operate the RP1, leveraging
->>> actual OF based driver implementations for the on-borad peripherals
->>> by loading a devicetree overlay during driver probe.
->>> The peripherals are accessed by mapping MMIO registers starting
->>> from PCI BAR1 region.
->>> As a minimum driver, the peripherals will not be added to the
->>> dtbo here, but in following patches.
->>>
->>> Link: https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf
->>> Signed-off-by: Andrea della Porta <andrea.porta@suse.com>
->>> ---
->>>  MAINTAINERS                           |   2 +
->>>  arch/arm64/boot/dts/broadcom/rp1.dtso | 152 ++++++++++++
->>
->> Do not mix DTS with drivers.
->>
->> These MUST be separate.
+> Signed-off-by: Yang Ruibin <11162571@vivo.com>
+> ---
+>  drivers/net/ethernet/alacritech/slicoss.c | 34 ++++++++++-------------
+>  1 file changed, 14 insertions(+), 20 deletions(-)
 > 
-> Separating the dtso from the driver in two different patches would mean
-> that the dtso patch would be ordered before the driver one. This is because
-> the driver embeds the dtbo binary blob inside itself, at build time. So
-> in order to build the driver, the dtso needs to be there also. This is not
+> diff --git a/drivers/net/ethernet/alacritech/slicoss.c b/drivers/net/ethernet/alacritech/slicoss.c
+> index 78231c852..65919ace0 100644
+> --- a/drivers/net/ethernet/alacritech/slicoss.c
+> +++ b/drivers/net/ethernet/alacritech/slicoss.c
+> @@ -1051,11 +1051,9 @@ static int slic_load_rcvseq_firmware(struct slic_device *sdev)
+>  	file = (sdev->model == SLIC_MODEL_OASIS) ?  SLIC_RCV_FIRMWARE_OASIS :
+>  						    SLIC_RCV_FIRMWARE_MOJAVE;
+>  	err = request_firmware(&fw, file, &sdev->pdev->dev);
+> -	if (err) {
+> -		dev_err(&sdev->pdev->dev,
+> +	if (err)
+> +		return dev_err_probe(&sdev->pdev->dev, err,
+>  			"failed to load receive sequencer firmware %s\n", file);
 
-Sure, in such case DTS will have to go through the same tree as driver
-as an exception. Please document it in patch changelog (---).
+NAK.
 
-> the standard approach used with 'normal' dtb/dtbo, where the dtb patch is
-> ordered last wrt the driver it refers to.
+Vivo does not understand how deferred probe works or introduces
+intentionally buggy code.
 
-It's not exactly the "ordered last" that matters, but lack of dependency
-and going through separate tree and branch - arm-soc/dts. Here there
-will be an exception how we handle patch, but still DTS is hardware
-description so should not be combined with driver code.
-
-> Are you sure you want to proceed in this way?
-
-
-> 
->>
->>>  drivers/misc/Kconfig                  |   1 +
->>>  drivers/misc/Makefile                 |   1 +
->>>  drivers/misc/rp1/Kconfig              |  20 ++
->>>  drivers/misc/rp1/Makefile             |   3 +
->>>  drivers/misc/rp1/rp1-pci.c            | 333 ++++++++++++++++++++++++++
->>>  drivers/misc/rp1/rp1-pci.dtso         |   8 +
->>>  drivers/pci/quirks.c                  |   1 +
->>>  include/linux/pci_ids.h               |   3 +
->>>  10 files changed, 524 insertions(+)
->>>  create mode 100644 arch/arm64/boot/dts/broadcom/rp1.dtso
->>>  create mode 100644 drivers/misc/rp1/Kconfig
->>>  create mode 100644 drivers/misc/rp1/Makefile
->>>  create mode 100644 drivers/misc/rp1/rp1-pci.c
->>>  create mode 100644 drivers/misc/rp1/rp1-pci.dtso
->>>
->>> diff --git a/MAINTAINERS b/MAINTAINERS
->>> index 67f460c36ea1..1359538b76e8 100644
->>> --- a/MAINTAINERS
->>> +++ b/MAINTAINERS
->>> @@ -19119,9 +19119,11 @@ F:	include/uapi/linux/media/raspberrypi/
->>>  RASPBERRY PI RP1 PCI DRIVER
->>>  M:	Andrea della Porta <andrea.porta@suse.com>
->>>  S:	Maintained
->>> +F:	arch/arm64/boot/dts/broadcom/rp1.dtso
->>>  F:	Documentation/devicetree/bindings/clock/raspberrypi,rp1-clocks.yaml
->>>  F:	Documentation/devicetree/bindings/pinctrl/raspberrypi,rp1-gpio.yaml
->>>  F:	drivers/clk/clk-rp1.c
->>> +F:	drivers/misc/rp1/
->>>  F:	drivers/pinctrl/pinctrl-rp1.c
->>>  F:	include/dt-bindings/clock/rp1.h
->>>  F:	include/dt-bindings/misc/rp1.h
->>> diff --git a/arch/arm64/boot/dts/broadcom/rp1.dtso b/arch/arm64/boot/dts/broadcom/rp1.dtso
->>> new file mode 100644
->>> index 000000000000..d80178a278ee
->>> --- /dev/null
->>> +++ b/arch/arm64/boot/dts/broadcom/rp1.dtso
->>> @@ -0,0 +1,152 @@
->>> +// SPDX-License-Identifier: (GPL-2.0 OR MIT)
->>> +
->>> +#include <dt-bindings/gpio/gpio.h>
->>> +#include <dt-bindings/interrupt-controller/irq.h>
->>> +#include <dt-bindings/clock/rp1.h>
->>> +#include <dt-bindings/misc/rp1.h>
->>> +
->>> +/dts-v1/;
->>> +/plugin/;
->>> +
->>> +/ {
->>> +	fragment@0 {
->>> +		target-path="";
->>> +		__overlay__ {
->>> +			#address-cells = <3>;
->>> +			#size-cells = <2>;
->>> +
->>> +			rp1: rp1@0 {
->>> +				compatible = "simple-bus";
->>> +				#address-cells = <2>;
->>> +				#size-cells = <2>;
->>> +				interrupt-controller;
->>> +				interrupt-parent = <&rp1>;
->>> +				#interrupt-cells = <2>;
->>> +
->>> +				// ranges and dma-ranges must be provided by the includer
->>> +				ranges = <0xc0 0x40000000
->>> +					  0x01/*0x02000000*/ 0x00 0x00000000
->>> +					  0x00 0x00400000>;
->>
->> Are you 100% sure you do not have here dtc W=1 warnings?
-> 
-> the W=1 warnings are:
-> 
-> arch/arm64/boot/dts/broadcom/rp1.dtso:37.24-42.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/clk_xosc: missing or empty reg/ranges property
-> arch/arm64/boot/dts/broadcom/rp1.dtso:44.26-49.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/macb_pclk: missing or empty reg/ranges property
-> arch/arm64/boot/dts/broadcom/rp1.dtso:51.26-56.7: Warning (simple_bus_reg): /fragment@0/__overlay__/rp1@0/macb_hclk: missing or empty reg/ranges property
-> arch/arm64/boot/dts/broadcom/rp1.dtso:14.15-173.5: Warning (avoid_unnecessary_addr_size): /fragment@0/__overlay__: unnecessary #address-cells/#size-cells without "ranges", "dma-ranges" or child "reg" property
-> 
-> I don't see anything related to the ranges line you mentioned.
-
-Hm, indeed, but I would expect warning about unit address not matching
-ranges/reg.
-
-> 
->>
->>> +
->>> +				dma-ranges =
->>> +				// inbound RP1 1x_xxxxxxxx -> PCIe 1x_xxxxxxxx
->>> +					     <0x10 0x00000000
->>> +					      0x43000000 0x10 0x00000000
->>> +					      0x10 0x00000000>;
->>> +
->>> +				clk_xosc: clk_xosc {
->>
->> Nope, switch to DTS coding style.
-> 
-> Ack.
-> 
->>
->>> +					compatible = "fixed-clock";
->>> +					#clock-cells = <0>;
->>> +					clock-output-names = "xosc";
->>> +					clock-frequency = <50000000>;
->>> +				};
->>> +
->>> +				macb_pclk: macb_pclk {
->>> +					compatible = "fixed-clock";
->>> +					#clock-cells = <0>;
->>> +					clock-output-names = "pclk";
->>> +					clock-frequency = <200000000>;
->>> +				};
->>> +
->>> +				macb_hclk: macb_hclk {
->>> +					compatible = "fixed-clock";
->>> +					#clock-cells = <0>;
->>> +					clock-output-names = "hclk";
->>> +					clock-frequency = <200000000>;
->>> +				};
->>> +
->>> +				rp1_clocks: clocks@c040018000 {
->>
->> Why do you mix MMIO with non-MMIO nodes? This really does not look
->> correct.
->>
-> 
-> Right. This is already under discussion here:
-> https://lore.kernel.org/all/ZtBzis5CzQMm8loh@apocalypse/
-> 
-> IIUC you proposed to instantiate the non-MMIO nodes (the three clocks) by
-> using CLK_OF_DECLARE.
-
-Depends. Where are these clocks? Naming suggests they might not be even
-part of this device. But if these are part of the device, then why this
-is not a clock controller (if they are controllable) or even removed
-(because we do not represent internal clock tree in DTS).
+This must be reverted.
 
 Best regards,
 Krzysztof
