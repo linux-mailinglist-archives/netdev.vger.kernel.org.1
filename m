@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-123895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F4F3966BE1
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 00:00:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EC66966BE3
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 00:00:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0565B2240E
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 22:00:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24EA01C2234C
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 22:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17081C2329;
-	Fri, 30 Aug 2024 21:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD2C1C2DBD;
+	Fri, 30 Aug 2024 21:59:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18551C1AD2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013391C1AD5
 	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 21:59:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725055166; cv=none; b=l6vsf3dC2EKk3jxSf4z2dvj7LPTq7zlxeQr+J4X+5DFMY/12N6GuSTsU1Ib4DuzRPtpltcpD6AIhfsWl8CcuDW18JKCauFkDmbeo/WpEiiP2WtuHN2O6O4JkExhsjRUifLwdWBVEBXEbeP8uyOjN0YD7xdOfuvbYXl21pigUdWo=
+	t=1725055167; cv=none; b=AGvymJ7JHPsCVqPfihY6Zw9JGsew0pgQhVLS15DZ/ul4DAYY49Cwokx4BGd3h9xL5oiSAL7+4RZSsSbKCT9BPLmJVbP84qConv5STNWrWkFKJZPpZ6sYepCMN7t1M7CHinWbfWLHJSndYDZ0jKZtHb/Ge8nO4cfPd7sYZG3MjWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725055166; c=relaxed/simple;
-	bh=IMZ0eD/ZSny3SMyy1OVx/YAci7MJ5yQn0pZ+5ZmZ4Vw=;
+	s=arc-20240116; t=1725055167; c=relaxed/simple;
+	bh=tzRpMoC3u6/ANQ048jRNEwevDB5eGK3oVnqGUZKBu3I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VB3+6SUrdpIqQHUrydPZDm0qxwK4Ct1AdiC2oJ6UqQvHiQpv+FMUmL77uvloNP56fVYvW0R9HyHjAOEd6W9QQdERxmuofz5gHf8SgLOhKFEgf/82Vjtj7DY5MNV8ByPNq5RrtLndY3USBNBv9W4GXDlhRWsZP/OZb7xLatYrqvQ=
+	 MIME-Version; b=EoiXtmnDDrtMZmSh8yma0/NleUmlT5tKPqyG9+zX+3e41aLhGT90rDioPOcIa48GcIBr05s3xkIV8WxDJ+/+8HFQkSW3HIUSasHyuccPnQ7G+xMGWaN/qPXFNajcq2QzI9C4WIMceSck6KhrGhnnbG/OOQb8piBn89oUMvmhUHA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,25 +33,25 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1sk9eM-0004G3-UC
-	for netdev@vger.kernel.org; Fri, 30 Aug 2024 23:59:22 +0200
+	id 1sk9eN-0004GP-74
+	for netdev@vger.kernel.org; Fri, 30 Aug 2024 23:59:23 +0200
 Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1sk9eK-004FZ2-Up
-	for netdev@vger.kernel.org; Fri, 30 Aug 2024 23:59:20 +0200
+	id 1sk9eL-004FZH-2c
+	for netdev@vger.kernel.org; Fri, 30 Aug 2024 23:59:21 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 9AB4A32E53C
+	by bjornoya.blackshift.org (Postfix) with SMTP id BAEE932E53E
 	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 21:59:20 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 2E76D32E4E0;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 3C12E32E4E3;
 	Fri, 30 Aug 2024 21:59:17 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 763df670;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 9b59c86b;
 	Fri, 30 Aug 2024 21:59:16 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -61,9 +61,9 @@ Cc: davem@davemloft.net,
 	kernel@pengutronix.de,
 	Markus Schneider-Pargmann <msp@baylibre.com>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 08/13] can: m_can: Reset cached active_interrupts on start
-Date: Fri, 30 Aug 2024 23:53:43 +0200
-Message-ID: <20240830215914.1610393-9-mkl@pengutronix.de>
+Subject: [PATCH net 09/13] can: m_can: Limit coalescing to peripheral instances
+Date: Fri, 30 Aug 2024 23:53:44 +0200
+Message-ID: <20240830215914.1610393-10-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240830215914.1610393-1-mkl@pengutronix.de>
 References: <20240830215914.1610393-1-mkl@pengutronix.de>
@@ -81,29 +81,65 @@ X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 From: Markus Schneider-Pargmann <msp@baylibre.com>
 
-To force writing the enabled interrupts, reset the active_interrupts
-cache.
+The use of coalescing for non-peripheral chips in the current
+implementation is limited to non-existing. Disable the possibility to
+set coalescing through ethtool.
 
-Fixes: 07f25091ca02 ("can: m_can: Implement receive coalescing")
 Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
-Link: https://lore.kernel.org/all/20240805183047.305630-7-msp@baylibre.com
+Link: https://lore.kernel.org/all/20240805183047.305630-8-msp@baylibre.com
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/m_can/m_can.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/can/m_can/m_can.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 68bd4a00ecca..67c4c740c416 100644
+index 67c4c740c416..012c3d22b01d 100644
 --- a/drivers/net/can/m_can/m_can.c
 +++ b/drivers/net/can/m_can/m_can.c
-@@ -1541,6 +1541,7 @@ static int m_can_chip_config(struct net_device *dev)
- 		else
- 			interrupts &= ~(IR_ERR_LEC_31X);
- 	}
-+	cdev->active_interrupts = 0;
- 	m_can_interrupt_enable(cdev, interrupts);
+@@ -2184,7 +2184,7 @@ static int m_can_set_coalesce(struct net_device *dev,
+ 	return 0;
+ }
  
- 	/* route all interrupts to INT0 */
+-static const struct ethtool_ops m_can_ethtool_ops = {
++static const struct ethtool_ops m_can_ethtool_ops_coalescing = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_RX_USECS_IRQ |
+ 		ETHTOOL_COALESCE_RX_MAX_FRAMES_IRQ |
+ 		ETHTOOL_COALESCE_TX_USECS_IRQ |
+@@ -2195,18 +2195,20 @@ static const struct ethtool_ops m_can_ethtool_ops = {
+ 	.set_coalesce = m_can_set_coalesce,
+ };
+ 
+-static const struct ethtool_ops m_can_ethtool_ops_polling = {
++static const struct ethtool_ops m_can_ethtool_ops = {
+ 	.get_ts_info = ethtool_op_get_ts_info,
+ };
+ 
+-static int register_m_can_dev(struct net_device *dev)
++static int register_m_can_dev(struct m_can_classdev *cdev)
+ {
++	struct net_device *dev = cdev->net;
++
+ 	dev->flags |= IFF_ECHO;	/* we support local echo */
+ 	dev->netdev_ops = &m_can_netdev_ops;
+-	if (dev->irq)
+-		dev->ethtool_ops = &m_can_ethtool_ops;
++	if (dev->irq && cdev->is_peripheral)
++		dev->ethtool_ops = &m_can_ethtool_ops_coalescing;
+ 	else
+-		dev->ethtool_ops = &m_can_ethtool_ops_polling;
++		dev->ethtool_ops = &m_can_ethtool_ops;
+ 
+ 	return register_candev(dev);
+ }
+@@ -2392,7 +2394,7 @@ int m_can_class_register(struct m_can_classdev *cdev)
+ 	if (ret)
+ 		goto rx_offload_del;
+ 
+-	ret = register_m_can_dev(cdev->net);
++	ret = register_m_can_dev(cdev);
+ 	if (ret) {
+ 		dev_err(cdev->dev, "registering %s failed (err=%d)\n",
+ 			cdev->net->name, ret);
 -- 
 2.45.2
 
