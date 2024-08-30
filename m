@@ -1,43 +1,44 @@
-Return-Path: <netdev+bounces-123580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 860B3965589
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 05:06:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CA7096557D
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 05:06:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42C202858B9
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 03:06:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EF6BB21697
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 03:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCDE137745;
-	Fri, 30 Aug 2024 03:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82E5136337;
+	Fri, 30 Aug 2024 03:05:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02688121B
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 03:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31A6071750
+	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 03:05:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724987174; cv=none; b=mQy07FaDCE/+rOZY5G5Ejp1eU61yvgd1RDJd/GSTU1tkUhdMc1oKvqEcCKpX7dLlVS+PI3y0HkvlrXFDe6D3RdLnbfpbIqaTbbNX+XnGIaMTGsgzIL68l653fb6L6lyrtr59CmuYeczqwee5vvsIz6Q+nQQuk+oq0Zina8UBHnA=
+	t=1724987154; cv=none; b=BwS7vR7y3fr659P2Iw5jIoL8WQJzMgwBGdg5jv+U0Qc1GB71hbvJv/emdAX6lVJLI26PYCWdPYXI0hinyW1NP8Wv5qFAhlDe2zAgTO3cn9LA9jTWBWOr0cfykvHm5f0098QJDG2IsBFQdFUFRXqU9reGegOEoLfsX7ZR0vJcloI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724987174; c=relaxed/simple;
-	bh=pmdoyZjfQSnf3oExzOabBeh8t3v+zj+dpDtS/vqTI84=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ck84bSnOijHISKlVgFjwaqKTfVo+uLHMpD5LXyU1zNnSMO5tz+nCaNts3EviOeYuiVUueXkOr5cG7bRuvnTO/1oj2uxodTuourgO+kWzxBN8raxCO2JyTyxOerhOK9MR2rR8LGnoCDl61fqA6oXAxbUu5qKVE0W/D8oNz71a1fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+	s=arc-20240116; t=1724987154; c=relaxed/simple;
+	bh=OeQC3mVGMaxIz8MfG4l1DZlSCVoC+D0oyUO1TzMd7mk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G2jFs+e64m3pg6KcBHmIt4xPwTpOHJ9xgkCpVlb6fA1+X6U25wJY7m/mlowc4j5B3HJpsusVnZJYNmULGJSDjcHCkrht6DYyKTngXID+L5yaQv1nI/DVVaRh7mHTyjcoR+AArN9/ZxD1IqpctoeJnohr3qlC4dToREYlHJwbZZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Ww31L0F6Kz1j7pV;
-	Fri, 30 Aug 2024 11:05:26 +0800 (CST)
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Ww2zK65xrz1xwgV;
+	Fri, 30 Aug 2024 11:03:41 +0800 (CST)
 Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id 508371402C6;
-	Fri, 30 Aug 2024 11:05:39 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 3EDD21402C6;
+	Fri, 30 Aug 2024 11:05:40 +0800 (CST)
 Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
  (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 30 Aug
- 2024 11:05:38 +0800
+ 2024 11:05:39 +0800
 From: Jinjie Ruan <ruanjinjie@huawei.com>
 To: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
 	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
@@ -52,10 +53,12 @@ To: <woojung.huh@microchip.com>, <andrew@lunn.ch>, <f.fainelli@gmail.com>,
 	<linux-stm32@st-md-mailman.stormreply.com>, <krzk@kernel.org>,
 	<jic23@kernel.org>
 CC: <ruanjinjie@huawei.com>
-Subject: [PATCH net-next v4 0/8] net: Simplified with scoped function
-Date: Fri, 30 Aug 2024 11:13:17 +0800
-Message-ID: <20240830031325.2406672-1-ruanjinjie@huawei.com>
+Subject: [PATCH net-next v4 1/8] net: stmmac: dwmac-sun8i: Use for_each_child_of_node_scoped()
+Date: Fri, 30 Aug 2024 11:13:18 +0800
+Message-ID: <20240830031325.2406672-2-ruanjinjie@huawei.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240830031325.2406672-1-ruanjinjie@huawei.com>
+References: <20240830031325.2406672-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,44 +70,61 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemh500013.china.huawei.com (7.202.181.146)
 
-Simplify with scoped for each OF child loop, as well as dev_err_probe().
+Avoid need to manually handle of_node_put() by using
+for_each_child_of_node_scoped(), which can simplfy code.
 
-Changes in v4:
-- Drop the fix patch and __free() patch.
-- Rebased on the fix patch has been stripped out.
-- Remove the extra parentheses.
-- Ensure Signed-off-by: should always be last.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+---
+v4:
 - Add Reviewed-by.
-- Update the cover letter commit message.
-
-Changes in v3:
-- Sort the variables, longest first, shortest last.
+- Signed-off-by: should always be last.
+v3:
+- Sort the variables, longest first, shortest last
 - Add Reviewed-by.
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Changes in v2:
-- Subject prefix: next -> net-next.
-- Split __free() from scoped for each OF child loop clean.
-- Fix use of_node_put() instead of __free() for the 5th patch.
-
-Jinjie Ruan (8):
-  net: stmmac: dwmac-sun8i: Use for_each_child_of_node_scoped()
-  net: dsa: realtek: Use for_each_child_of_node_scoped()
-  net: phy: Use for_each_available_child_of_node_scoped()
-  net: mdio: mux-mmioreg: Simplified with scoped function
-  net: mdio: mux-mmioreg: Simplified with dev_err_probe()
-  net: mv643xx_eth: Simplify with scoped for each OF child loop
-  net: dsa: microchip: Use scoped function to simplfy code
-  net: bcmasp: Simplify with scoped for each OF child loop
-
- drivers/net/dsa/microchip/ksz_common.c        |  5 +-
- drivers/net/dsa/realtek/rtl8366rb.c           |  8 ++-
- drivers/net/ethernet/broadcom/asp2/bcmasp.c   |  5 +-
- drivers/net/ethernet/marvell/mv643xx_eth.c    |  5 +-
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  6 +--
- drivers/net/mdio/mdio-mux-mmioreg.c           | 54 ++++++++-----------
- drivers/net/phy/phy_device.c                  |  5 +-
- 7 files changed, 35 insertions(+), 53 deletions(-)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+index cc93f73a380e..4a0ae92b3055 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+@@ -774,8 +774,8 @@ static int sun8i_dwmac_reset(struct stmmac_priv *priv)
+ static int get_ephy_nodes(struct stmmac_priv *priv)
+ {
+ 	struct sunxi_priv_data *gmac = priv->plat->bsp_priv;
+-	struct device_node *mdio_mux, *iphynode;
+ 	struct device_node *mdio_internal;
++	struct device_node *mdio_mux;
+ 	int ret;
+ 
+ 	mdio_mux = of_get_child_by_name(priv->device->of_node, "mdio-mux");
+@@ -793,7 +793,7 @@ static int get_ephy_nodes(struct stmmac_priv *priv)
+ 	}
+ 
+ 	/* Seek for internal PHY */
+-	for_each_child_of_node(mdio_internal, iphynode) {
++	for_each_child_of_node_scoped(mdio_internal, iphynode) {
+ 		gmac->ephy_clk = of_clk_get(iphynode, 0);
+ 		if (IS_ERR(gmac->ephy_clk))
+ 			continue;
+@@ -801,14 +801,12 @@ static int get_ephy_nodes(struct stmmac_priv *priv)
+ 		if (IS_ERR(gmac->rst_ephy)) {
+ 			ret = PTR_ERR(gmac->rst_ephy);
+ 			if (ret == -EPROBE_DEFER) {
+-				of_node_put(iphynode);
+ 				of_node_put(mdio_internal);
+ 				return ret;
+ 			}
+ 			continue;
+ 		}
+ 		dev_info(priv->device, "Found internal PHY node\n");
+-		of_node_put(iphynode);
+ 		of_node_put(mdio_internal);
+ 		return 0;
+ 	}
 -- 
 2.34.1
 
