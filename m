@@ -1,147 +1,192 @@
-Return-Path: <netdev+bounces-123611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C075B9659ED
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 10:17:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E795A965A40
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 10:26:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4408C1F22584
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 08:17:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 748BF1F260B4
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 08:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 496FA16D31B;
-	Fri, 30 Aug 2024 08:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C25316D317;
+	Fri, 30 Aug 2024 08:25:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nKpJZ+KG"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="qKStLXdA"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1C81531C1
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 08:16:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F61216CD08;
+	Fri, 30 Aug 2024 08:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725005798; cv=none; b=Azcz8JCO1az3NlUHgZ/oDiUJwT8bhE1mwgHx6hAyK3YkF3aKSPLqDlg5KSvh/zoVu3o8C5S3PVK2RBWhTRTgXqRfgcbpkiFT6LL6Pis5cYfQfLPZTd6K66s7+30RAZk73MXyE10U3xC+aEQ2gOg/ipayAJbksBW6sURiRR8q9Vw=
+	t=1725006359; cv=none; b=D/fDTHujqhhIHrQcJWzEb1cwBoBCTtzI4iK4IrMs6VoHzgeEEO7jrCxq+41UlLafFF+c6jXhuc1ml3hES4f4MMZ/2g7FgLyVrCso7CyT2kvGSO5+ECznHvM6PjZ0ErMS9HdjF6Lms0VqJFcHo/ym0yzGrtiwlO32nsc4Qo1vubI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725005798; c=relaxed/simple;
-	bh=30wtD8fAQFKSgNsONkptJW5zxT7Fhd816iqhzcv/lfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WwhfXQ1gDvV2s1qcV+VQtlyUekE93jmC4jkIBY9dBszNPGvlx91pqxzrGBZgq2ZN0dOrZIl8yXIukJ72jO/+9rOKdF8mT+gQboB/YMRn2I7oq/tE2uvNvBcnhIQ5NUxGbdFj6Sj5/Pwpfhoi03onZHcDl/pJhEi/cn0Dj2Dy3Yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nKpJZ+KG; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B338E20002;
-	Fri, 30 Aug 2024 08:16:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1725005793;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CD5eO7mxJrWyfvC0fyIYTA8WQMDBC0Rl9+2GNxL26dg=;
-	b=nKpJZ+KGeI/8jVg+K1sVh2EFHc785IJ8hofQ9IhUUNK8SWDWjpDH9efa48AClDmOESzxwb
-	HrcF3T23Kj5BiEI+clY/4W/OqcXCK+6TJHqlUza72bBgxnQfM1x+iHBo5GfpI7m4VpFVXd
-	R/vgCGQRFKPqC0Roqd7jWmjl8q6XAV2fEAddkgulTWdcGvOLbU+EVOPMxBJ1dAiEOjtBP8
-	qt4/sPDn2k3U1zGVsQ2qvTRNNeSe8YR+DZ3yxX+/oBpvIJhph/pYbaZGQzsFFnPW5Mphi7
-	2Y/eTxAkDsRR1ibgLKjzvqhENeSDAByIR++ywUmbjNWWCw1Uero+0C5ae9FXmg==
-Date: Fri, 30 Aug 2024 10:16:30 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, Vladimir Oltean <olteanv@gmail.com>, andrew@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, woojung.huh@microchip.com,
- o.rempel@pengutronix.de
-Subject: Re: [RFC net-next 1/2] net: ethtool: plumb PHY stats to PHY drivers
-Message-ID: <20240830101630.52032f20@device-28.home>
-In-Reply-To: <20240829174342.3255168-2-kuba@kernel.org>
-References: <20240829174342.3255168-1-kuba@kernel.org>
-	<20240829174342.3255168-2-kuba@kernel.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1725006359; c=relaxed/simple;
+	bh=Yd0XiznABLIQYOVBnH34SvRq6Qx9nJT+kDBumBgr1cw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HmmJbsNhXcOhSNxsk3RtYM+/5rvik5h71hH2BlaXR/iLJmk5/5KNUXBNeVS5bCF9MgRV4KcqkK4jbwxR98oCCx8lGv/o0kk2kVqZUdMtFPJBFCYcfYYU7eI4O3nUQePTCOR3QQMt9HfnLZC96d3C3PCOXz+NLimJPfv+qyFJIVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=qKStLXdA; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 748adda466a911ef8593d301e5c8a9c0-20240830
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=Sk5Sg+UsvXBabUWD0t2h9fPmHSQ3SzTGN9UHM5S6Mn4=;
+	b=qKStLXdAB2VWE7UmGlnq7MvdYnbTX3F4V7V1lh7UW92Btr6PUimYjGpIU3cgS1uhW8x6UxADYCiWFGTFife0i4/MtboTio3gyJeuzP2c4M6PDtGA1KNXqHH+TL9lUW9NYegaFlqsaTGOJLz/Ym0/NSVFZJJJRW82EIihkszfhtQ=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:8a216d14-222f-4f34-85fe-a3eed666f14e,IP:0,U
+	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-25
+X-CID-META: VersionHash:6dc6a47,CLOUDID:734a2ebf-d7af-4351-93aa-42531abf0c7b,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: 748adda466a911ef8593d301e5c8a9c0-20240830
+Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw01.mediatek.com
+	(envelope-from <tze-nan.wu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 626687166; Fri, 30 Aug 2024 16:25:46 +0800
+Received: from mtkmbs13n2.mediatek.inc (172.21.101.108) by
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 30 Aug 2024 01:25:47 -0700
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs13n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 30 Aug 2024 16:25:47 +0800
+From: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
+To: <netdev@vger.kernel.org>, <bpf@vger.kernel.org>, Alexei Starovoitov
+	<ast@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	<alexei.starovoitov@gmail.com>
+CC: <bobule.chang@mediatek.com>, <wsd_upstream@mediatek.com>,
+	<linux-kernel@vger.kernel.org>, <linux-mediatek@lists.infradead.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, <chen-yao.chang@mediatek.com>, Tze-nan
+ Wu <Tze-nan.Wu@mediatek.com>, Yanghui Li <yanghui.li@mediatek.com>, Cheng-Jui
+ Wang <cheng-jui.wang@mediatek.com>, Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko
+	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
+ Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Matthias Brugger
+	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+	<angelogioacchino.delregno@collabora.com>,
+	<linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH net v5] bpf, net: Fix a potential race in do_sock_getsockopt()
+Date: Fri, 30 Aug 2024 16:25:17 +0800
+Message-ID: <20240830082518.23243-1-Tze-nan.Wu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain
+X-MTK: N
 
-Hello Jakub,
+There's a potential race when `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` is
+false during the execution of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN`, but
+becomes true when `BPF_CGROUP_RUN_PROG_GETSOCKOPT` is called.
+This inconsistency can lead to `BPF_CGROUP_RUN_PROG_GETSOCKOPT` receiving
+an "-EFAULT" from `__cgroup_bpf_run_filter_getsockopt(max_optlen=0)`.
+Scenario shown as below:
 
-On Thu, 29 Aug 2024 10:43:41 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+           `process A`                      `process B`
+           -----------                      ------------
+  BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN
+                                            enable CGROUP_GETSOCKOPT
+  BPF_CGROUP_RUN_PROG_GETSOCKOPT (-EFAULT)
 
-> Feed the existing IEEE PHY counter struct (which currently
-> only has one entry) and link stats into the PHY driver.
-> The MAC driver can override the value if it somehow has a better
-> idea of PHY stats. Since the stats are "undefined" at input
-> the drivers can't += the values, so we should be safe from
-> double-counting.
-> 
-> Vladimir, I don't understand MM but doesn't MM share the PHY?
-> Ocelot seems to aggregate which I did not expect.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+To resolve this, remove the `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` macro and
+directly uses `copy_from_sockptr` to ensure that `max_optlen` is always 
+set before `BPF_CGROUP_RUN_PROG_GETSOCKOPT` is invoked.
 
-[...]
+Fixes: 0d01da6afc54 ("bpf: implement getsockopt and setsockopt hooks")
+Co-developed-by: Yanghui Li <yanghui.li@mediatek.com>
+Signed-off-by: Yanghui Li <yanghui.li@mediatek.com>
+Co-developed-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
+Signed-off-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
+Signed-off-by: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
+---
 
-> +static void
-> +ethtool_get_phydev_stats(struct net_device *dev,
-> +			 struct linkstate_reply_data *data)
-> +{
-> +	struct phy_device *phydev = dev->phydev;
+Changes from v1 to v2: https://lore.kernel.org/all/20240819082513.27176-1-Tze-nan.Wu@mediatek.com/
+  Instead of using cgroup_lock in the fastpath, invoke cgroup_bpf_enabled
+  only once and cache the value in the newly added variable `enabled`.
+  `BPF_CGROUP_*` macros in do_sock_getsockopt can then both check their
+  condition with the new variable `enable`, ensuring that either they both
+  passing the condition or both do not.
 
-This would be a very nice spot to use the new
-ethnl_req_get_phydev(), if there are multiple PHYs on that device.
-Being able to access the stats individually can help
-troubleshoot HW issues.
+Changes from v2 to v3: https://lore.kernel.org/all/20240819155627.1367-1-Tze-nan.Wu@mediatek.com/
+  Hide cgroup_bpf_enabled in the macro, and some modifications to adapt
+  the coding style.
 
-[...]
+Changes from v3 to v4: https://lore.kernel.org/all/20240820092942.16654-1-Tze-nan.Wu@mediatek.com/
+  Add bpf tag to subject, and add the Fixes tag in body.
 
-> +static void
-> +ethtool_get_phydev_stats(struct net_device *dev, struct stats_reply_data *data)
-> +{
-> +	struct phy_device *phydev = dev->phydev;
+Changes from v4 to v5: https://lore.kernel.org/all/20240821093016.2533-1-Tze-nan.Wu@mediatek.com/
+  Change subject, and fix the race by unconditional `copy_from_sockptr`,
+  instead of adding a new variable.
 
-Here as well, but that's trickier, as the MAC can override the PHY
-stats, but it doesn't know which PHY were getting the stats from.
+---
+ include/linux/bpf-cgroup.h | 9 ---------
+ net/socket.c               | 4 ++--
+ 2 files changed, 2 insertions(+), 11 deletions(-)
 
-Maybe we could make so that when we pass a phy_index in the netlink
-command, we don't allow the mac to override the phy stats ? Or better,
-don't allow the mac to override these stats and report the MAC-reported
-PHY stats alongside the PHY-reported stats ?
+diff --git a/include/linux/bpf-cgroup.h b/include/linux/bpf-cgroup.h
+index fb3c3e7181e6..ce91d9b2acb9 100644
+--- a/include/linux/bpf-cgroup.h
++++ b/include/linux/bpf-cgroup.h
+@@ -390,14 +390,6 @@ static inline bool cgroup_bpf_sock_enabled(struct sock *sk,
+ 	__ret;								       \
+ })
+ 
+-#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen)			       \
+-({									       \
+-	int __ret = 0;							       \
+-	if (cgroup_bpf_enabled(CGROUP_GETSOCKOPT))			       \
+-		copy_from_sockptr(&__ret, optlen, sizeof(int));		       \
+-	__ret;								       \
+-})
+-
+ #define BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock, level, optname, optval, optlen,   \
+ 				       max_optlen, retval)		       \
+ ({									       \
+@@ -518,7 +510,6 @@ static inline int bpf_percpu_cgroup_storage_update(struct bpf_map *map,
+ #define BPF_CGROUP_RUN_PROG_SOCK_OPS(sock_ops) ({ 0; })
+ #define BPF_CGROUP_RUN_PROG_DEVICE_CGROUP(atype, major, minor, access) ({ 0; })
+ #define BPF_CGROUP_RUN_PROG_SYSCTL(head,table,write,buf,count,pos) ({ 0; })
+-#define BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen) ({ 0; })
+ #define BPF_CGROUP_RUN_PROG_GETSOCKOPT(sock, level, optname, optval, \
+ 				       optlen, max_optlen, retval) ({ retval; })
+ #define BPF_CGROUP_RUN_PROG_GETSOCKOPT_KERN(sock, level, optname, optval, \
+diff --git a/net/socket.c b/net/socket.c
+index fcbdd5bc47ac..0a2bd22ec105 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2362,7 +2362,7 @@ INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
+ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 		       int optname, sockptr_t optval, sockptr_t optlen)
+ {
+-	int max_optlen __maybe_unused;
++	int max_optlen __maybe_unused = 0;
+ 	const struct proto_ops *ops;
+ 	int err;
+ 
+@@ -2371,7 +2371,7 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 		return err;
+ 
+ 	if (!compat)
+-		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
++		copy_from_sockptr(&max_optlen, optlen, sizeof(int));
+ 
+ 	ops = READ_ONCE(sock->ops);
+ 	if (level == SOL_SOCKET) {
+-- 
+2.45.2
 
-> +
-> +	if (!phydev || !phydev->drv || !phydev->drv->get_phy_stats)
-> +		return;
-> +
-> +	mutex_lock(&phydev->lock);
-> +	phydev->drv->get_phy_stats(phydev, &data->phy_stats);
-> +	mutex_unlock(&phydev->lock);
-> +}
-> +
->  static int stats_prepare_data(const struct ethnl_req_info *req_base,
->  			      struct ethnl_reply_data *reply_base,
->  			      const struct genl_info *info)
-> @@ -145,6 +160,10 @@ static int stats_prepare_data(const struct ethnl_req_info *req_base,
->  	data->ctrl_stats.src = src;
->  	data->rmon_stats.src = src;
->  
-> +	if (test_bit(ETHTOOL_STATS_ETH_PHY, req_info->stat_mask) &&
-> +	    src == ETHTOOL_MAC_STATS_SRC_AGGREGATE)
-> +		ethtool_get_phydev_stats(dev, data);
-
-I might be missing something, but I think
-ETHTOOL_MAC_STATS_SRC_AGGREGATE is a MM-specific flag and I don't really
-see how this applies to getting the PHY stats. I don't know much about
-MM though so I could be missing the point.
-
-I'm all in for getting the PHY stats from netlink though :)
-
-Thanks,
-
-Maxime
 
