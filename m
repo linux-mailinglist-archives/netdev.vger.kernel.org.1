@@ -1,163 +1,122 @@
-Return-Path: <netdev+bounces-123809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB544966960
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 21:14:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F38CC966972
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 21:20:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 768151F243CA
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:14:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7891228690C
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B19461BA281;
-	Fri, 30 Aug 2024 19:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD0B1BA292;
+	Fri, 30 Aug 2024 19:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fh71pGo0"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="MrvCoaR1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6E91DA22
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 19:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFA7113B297;
+	Fri, 30 Aug 2024 19:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725045260; cv=none; b=W9Sh0YMoXwMUKIfAkRnlDq6merpAB76bxnCWY8yYul51hjoKq46QP5A8FwGEVbFfQcS4+BFZA1j6IVAL+lfgAyfaP4NitLGR1dIY+SYDKUVnEcjrRBWisNQ3aUDQTLwtORCQmTdxhtEGt5FMQ+8kW5kPGooQngmLC1mayp776i0=
+	t=1725045600; cv=none; b=LRKF35uTPnzaBR0BS30madSF7QhYRiPR2Nh4wIgH9EhGRh2TDURR7B2c3LIft4+nMfsjkJ7Me2tjodw9NhUSDpYfPcniPXQfbnaiumaKUP52m6FR047ytDc0ZPhtm/PDu7RC2on3N0k8xh/mRJuxSqIfuYEB5axUyEJIhnswNO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725045260; c=relaxed/simple;
-	bh=wGhBMBgM0ROt6ktM3GMH2VAMYqx4ySKxfA5iIFGOMnI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=q5zaw6oO+5IOlWb55bfTODue4W4A3g6NskSpEn/6vIGUbBJl2Li+4AkSp4MedhKa/L10XG8STI/wF+AhiendRILBV4wfsQeZlkl2hdHhBvelp8pigd0qoSSDLShLMPZ/Hha0jXYZqZYzN0vZto0tsLjsASfFbmjeSY87jxTJWnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fh71pGo0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B39FEC4CEC2;
-	Fri, 30 Aug 2024 19:14:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725045260;
-	bh=wGhBMBgM0ROt6ktM3GMH2VAMYqx4ySKxfA5iIFGOMnI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fh71pGo0uOIsf7HRT0sPNEkWLzYikwDWdmqnrGx7mnrKLFUkL6Sidd5bluyulcB1O
-	 jWmx3z3ssVpnAoW3UVfTTpiWKBbSA8kuG96Gq1/4dtGqHMbDmRh6TrVBPckikNEmpA
-	 EbtqnQpKb1ay0vMSlFYJ1AHzof3VZ/0MtGds0rtAjOGKCbItPktDI/Raf2lT+IdK0+
-	 ay72xAGbKKotXkaVYDfAmqdvtdP9+W4o/kdvRH3EI8tB2/x5nzTy16xIWQ8agPuyE+
-	 YxYjqs7tFKz7xWsk2Wn/pyCSmFEnxE0iDCDf8Z0y3gSGghHJ8CKLruEIRvkVHXkKfe
-	 +H3mOwsNENHNw==
-Date: Fri, 30 Aug 2024 12:14:18 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, edumazet@google.com
-Subject: Re: [PATCH v5 net-next 02/12] net-shapers: implement NL get
- operation
-Message-ID: <20240830121418.39f3e6f8@kernel.org>
-In-Reply-To: <58730142-2064-46cb-bc84-0060ea73c4a0@redhat.com>
-References: <cover.1724944116.git.pabeni@redhat.com>
-	<53077d35a1183d5c1110076a07d73940bb2a55f3.1724944117.git.pabeni@redhat.com>
-	<20240829182019.105962f6@kernel.org>
-	<58730142-2064-46cb-bc84-0060ea73c4a0@redhat.com>
+	s=arc-20240116; t=1725045600; c=relaxed/simple;
+	bh=HX8kLOaPMTAtVknT9zY5Gl5BOvmcEacxGGF1dNteoAU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RB248c5/ZYDn/1K1Zp6lYfHIvt360Tnl2Tj3wnPrbx6+J3qTXopEcOHsYaSmcmRgiMjIinRF7/WGNPOWbbaDCCDdYzgE0jqtdADTNDuewQW23zzcRsmBz8f1LvTvAIpLk/CVvv0BQ+f8l2i8zjHtkln5uUrkNiVGgxjlWtoF9is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=MrvCoaR1; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from localhost.localdomain (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 8E276200BE66;
+	Fri, 30 Aug 2024 21:19:49 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 8E276200BE66
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1725045589;
+	bh=PYIyj+X/7aEiwjF1cs2nn0vYoBjyj76GNh+zXYydPpY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MrvCoaR13bzrgTimFFJ5RwGSA/aM6mROeGi4rHh6243Vz3Rl4QSEnIIAtr7xxXwZV
+	 J62vyJwhpUbVAp7k70HUzTGloppipz3ytML52ZFHWrrI00idQi1kJjfrgoOyaAH7f9
+	 K0hefm2hz8+Cc1ix/PnO5KY2X/pQ7n+0r5vkCh/+Yyu1deCVI2YyMTwtqWcJzj6gKT
+	 usDDzhnrCZ7+GsTQeZeZfEi25qigtbUzsdRFzkbyszG5ymzOJyeVzb4Z0nMpQHkuTm
+	 WvWffZnxKTrPTaEUzAbxtgbE5IDCCbbdfsGyTKaIztx/FPrq99GHhH28LG01wKpL6H
+	 RXVAt5R27xxeQ==
+From: Justin Iurman <justin.iurman@uliege.be>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	justin.iurman@uliege.be
+Subject: [PATCH net-next] ioam6: improve checks on user data 
+Date: Fri, 30 Aug 2024 21:19:19 +0200
+Message-Id: <20240830191919.51439-1-justin.iurman@uliege.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, 30 Aug 2024 17:43:08 +0200 Paolo Abeni wrote:
-> Please allow me to put a few high level questions together, to both=20
-> underline them as most critical, and keep the thread focused.
->=20
-> On 8/30/24 03:20, Jakub Kicinski wrote:
->  > This 'binding' has the same meaning as 'binding' in TCP ZC? :( =20
->=20
-> I hope we can agree that good naming is difficult. I thought we agreed=20
-> on such naming in the past week=E2=80=99s discussion. The term 'binding' =
-is=20
-> already used in the networking stack in many places to identify=20
-> different things (i.e. device tree, socket, netfilter.. ). The name=20
-> prefix avoids any ambiguity and I think this a good name, but if you=20
-> have any better suggestions, this change should be trivial.
+This patch improves two checks on user data.
 
-Ack. Maybe we can cut down the number of ambiguous nouns elsewhere:
+The first one prevents bit 23 from being set, as specified by RFC 9197
+(Sec 4.4.1):
 
-maybe call net_shaper_info -> net_shaper ?
+  Bit 23    Reserved; MUST be set to zero upon transmission and be
+            ignored upon receipt.  This bit is reserved to allow for
+            future extensions of the IOAM Trace-Type bit field.
 
-maybe net_shaper_data -> net_shaper_hierarchy ?
+The second one checks that the tunnel destination address !=
+IPV6_ADDR_ANY, just like we already do for the tunnel source address.
 
->  > I've been wondering if we shouldn't move this lock
->  > directly into net_device and combine it with the RSS lock.
->  > Create a "per-netdev" lock, instead of having multiple disparate
->  > mutexes which are hard to allocate? =20
->=20
-> The above looks like a quite unrelated refactor and one I think it will=20
-> not be worthy. The complexity of locking code in this series is very=20
-> limited, and self-encapsulated. Different locks for different things=20
-> increases scalability. Possibly we will not see much contention on the=20
-> same device, but some years ago we did not think there would be much=20
-> contention on RTNL...
+Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+---
+ net/ipv6/ioam6_iptunnel.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-We need to do this, anyway. Let me do it myself, then.
+diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
+index e34e1ff24546..beb6b4cfc551 100644
+--- a/net/ipv6/ioam6_iptunnel.c
++++ b/net/ipv6/ioam6_iptunnel.c
+@@ -89,7 +89,7 @@ static bool ioam6_validate_trace_hdr(struct ioam6_trace_hdr *trace)
+ 	    trace->type.bit12 | trace->type.bit13 | trace->type.bit14 |
+ 	    trace->type.bit15 | trace->type.bit16 | trace->type.bit17 |
+ 	    trace->type.bit18 | trace->type.bit19 | trace->type.bit20 |
+-	    trace->type.bit21)
++	    trace->type.bit21 | trace->type.bit23)
+ 		return false;
+ 
+ 	trace->nodelen = 0;
+@@ -199,9 +199,17 @@ static int ioam6_build_state(struct net *net, struct nlattr *nla,
+ 		}
+ 	}
+ 
+-	if (tb[IOAM6_IPTUNNEL_DST])
++	if (tb[IOAM6_IPTUNNEL_DST]) {
+ 		ilwt->tundst = nla_get_in6_addr(tb[IOAM6_IPTUNNEL_DST]);
+ 
++		if (ipv6_addr_any(&ilwt->tundst)) {
++			NL_SET_ERR_MSG_ATTR(extack, tb[IOAM6_IPTUNNEL_DST],
++					    "invalid tunnel dest address");
++			err = -EINVAL;
++			goto free_cache;
++		}
++	}
++
+ 	tuninfo = ioam6_lwt_info(lwt);
+ 	tuninfo->eh.hdrlen = ((sizeof(*tuninfo) + len_aligned) >> 3) - 1;
+ 	tuninfo->pad[0] = IPV6_TLV_PADN;
+-- 
+2.34.1
 
-> Additionally, if we use a per _network device_ lock, future expansion of=
-=20
-> the core to support devlink objects will be more difficult.
-
-You parse out the binding you can store a pointer to the right mutex.
-
-> [about separate handle from shaper_info arguments]
->  > Wouldn't it be convenient to store the handle in the "info"
->  > object? AFAIU the handle is forever for an info, so no risk of it
->  > being out of sync=E2=80=A6 =20
->=20
-> Was that way a couple of iterations ago. Jiri explicitly asked for the=20
-> separation, I asked for confirmation and nobody objected.
-
-Could you link to that? I must have not read it.
-You can keep it wrapped in a struct *_handle, that's fine.
-But it can live inside the shaper object.
-
-> Which if the 2 options is acceptable from both of you?
->=20
-> [about queue limit and channel reconf]
->  > we probably want to trim the queue shapers on channel reconfig,
->  > then, too? :( =20
->=20
-> what about exposing to the drivers an helper alike:
->=20
-> 	net_shaper_notify_delete(binding, handle);
->=20
-> that tells the core the shaper at the given handle just went away in the=
-=20
-> H/W? The driver will call it in the queue deletion helper, and such=20
-> helper could be later on used more generically, i.e. for vf/devlink port=
-=20
-> deletion.
-
-We can either prevent disabling queues which have shapers attached,=20
-or auto-removing the shapers. No preference on that. But put the
-callback in the core, please, netif_set_real_num_rx_queues() ?
-Why not?
-
->  > It's not just for introspection, it's also for the core to do
->  > error checking. =20
->=20
-> Actually, in the previous discussions it was never mentioned to use=20
-> capabilities to fully centralize the error checking.
->=20
-> This really looks like another feature, and can easily be added in a=20
-> second time (say, a follow-up series), with no functionality loss.
->=20
-> I (or anybody else) can=E2=80=99t keep adding new features at every itera=
-tion.=20
-> At some point we need to draw a line, and we should agree that the scope=
-=20
-> of this activity has already expanded a lot in the past year. I would=20
-> like to draw such a line here.
-
-I can help you. Just tell me which parts you want me to take care of.
 
