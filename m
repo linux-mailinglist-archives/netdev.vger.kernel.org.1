@@ -1,138 +1,92 @@
-Return-Path: <netdev+bounces-123760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FFB29666D7
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:28:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7875F9666DF
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 18:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2031283CCD
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:28:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB5A91C239AB
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 16:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96BB51BDABB;
-	Fri, 30 Aug 2024 16:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73511B81D3;
+	Fri, 30 Aug 2024 16:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SybPVICr"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="f53AMWG3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080251B9B2E;
-	Fri, 30 Aug 2024 16:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA361B81C5;
+	Fri, 30 Aug 2024 16:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725035173; cv=none; b=mcGsbykYF5miimUbUm2PhFQkI9msDx1UIPjLq3gRa6vta9TmJF1WBeMSXgVH/t69Z07VU4JZqiGXkew/KiK/X5j7qStVdzxexxRUMpbr53S4Ssv6EhOpdhJxCAVFgN5aWgRDTzqo6SdhtEuBlmvzIjv9KSmyCZWiQkslPJRQMdQ=
+	t=1725035244; cv=none; b=lmVUwwxeY1ZmzoakSC2I4Q0ftyPhhGws1234VPDkPkKQiWW9MA4a1mbJsd7SCN6M/pUeDKEnrvhYhThnYbUkDWZaitB7FQX79l/XcY9i/S/lL6K958mgGRotCrAb/s1VePXXiNkk7uuV68Ov5FJWWK+gT9XVdGwiV9jDqSE9gpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725035173; c=relaxed/simple;
-	bh=/VslWGAIDy5p/4CWQoCT3JSpikohdk4tCvhbyE0xCgQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YLLEK63EWs/YEDgnkgZFkD/DY/yGiOWa3yhEAibZgr/XHHEwVzIaoy5Cp/SvzyxeLJr5kCJQ9F3Pq98lHPN4XH1nLIGN4vqjcTkyP/S0HsLfufH3gUgaXyuMrqOeNlAC+Ch74deddMw7oQnfbjEwZvKf+agj3O7mVG5mPxUiwwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SybPVICr; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725035173; x=1756571173;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/VslWGAIDy5p/4CWQoCT3JSpikohdk4tCvhbyE0xCgQ=;
-  b=SybPVICrZUBjLieyFAfRtUMGmaFDj+s9zvRwKaYJ43JS1rFvr7fhjftM
-   mzOGEw1q1ZNkD5SR8b0Wh6gP43vb5SscS8soL+nSm+CcG3Kp04AcefBQ5
-   6yut8rHDHtzbRMNjjHvMNoO0smqtS9XF5abtO9z08GkQ5lfgm8OC9emXb
-   rirF3E7ndfK/BtBTiIyFuK8EinGgM63Su+fblSZ5RkELBlqiMMzBxMDKK
-   F0v8p9pN0w4s/8jcvcukAJh46NktWY5chN3sO0RUkhw6HH1jtpbP2oRFZ
-   X+kNRIoC7LQeniHsjPqf9Jct3yrj6AzcmNAqeASIllaoPy1EYQd0R3Fkj
-   g==;
-X-CSE-ConnectionGUID: EcDHOY1fRby5UZfeSQG8JQ==
-X-CSE-MsgGUID: umX4z53uTy+RfnrRSyCD6w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11180"; a="49069021"
-X-IronPort-AV: E=Sophos;i="6.10,189,1719903600"; 
-   d="scan'208";a="49069021"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 09:26:12 -0700
-X-CSE-ConnectionGUID: DlCb8T8HRxWFJcV8eb1G9g==
-X-CSE-MsgGUID: NzvQYEt2SN2w+Owk9Sjh7w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,189,1719903600"; 
-   d="scan'208";a="63996508"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa009.fm.intel.com with ESMTP; 30 Aug 2024 09:26:08 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Daniel Xu <dxu@dxuuu.xyz>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next 9/9] xdp: remove xdp_alloc_skb_bulk()
-Date: Fri, 30 Aug 2024 18:25:08 +0200
-Message-ID: <20240830162508.1009458-10-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
-References: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1725035244; c=relaxed/simple;
+	bh=EmgsbvjbWy2HJxgl44Y6x2WOI+6Ob1l4rAyYzIBhZ90=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gqQtjkHEl470s5ZFGq7/AGncFkQotGC1eetLtbH6KNrMCe1lzxtsRPpta7maUOx4kvscJ7kjur9bo0YgAGmK3nFwvWFc7UqI7VDHpUDyb+x7dPO4T8lrnz8N/eELyekV2ICS/6Ycy2lOKQ3IUwbSmYINSP67PKgWOk1VvPYwFy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=f53AMWG3; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 34D52FF803;
+	Fri, 30 Aug 2024 16:27:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1725035240;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cdwLIRS2cQsy5H0cWhE+G7Yz0IOQKDjmIOGIrx0jSw8=;
+	b=f53AMWG3EIIesMn3X9ye+RWoA+8LJV1VieFBbFKkpB3zkHCruEDQv/uSDLf4b2tpTt3jxM
+	IJEGBp/TO+EaDUfoVKpGSAgh+T72OqNSYLZbFZ45TWiLSHPuXlLdqoLGfGvZ5zE7ZewNgC
+	xObosrqUhsVdyFesnRgfEolrm/iKP6ncFD4p1JUyACfG4v1akAIrsDPCI6AZckeBzsyd0I
+	4t1Vb+Jdp7nXDpsW1ypgyMvA8lhzHYCKUH/4CDBjp3kPEiqWYOoYvAdajCyEeF4m+dKsuT
+	7Hv/ohU1+zPkFV2rY25n81D2XHIJedM3/57D6+gSlsBRoGxClmG95kImq1Kugw==
+Date: Fri, 30 Aug 2024 18:27:18 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Diogo Jahchan Koike <djahchankoike@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [patch net-next v5] ethtool: pse-pd: move pse validation into
+ set
+Message-ID: <20240830182718.6ed8d8e2@device-28.home>
+In-Reply-To: <20240829184830.5861-1-djahchankoike@gmail.com>
+References: <20240829184830.5861-1-djahchankoike@gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-The only user was veth, which now uses napi_skb_cache_get_bulk().
-It's now preferred over a direct allocation and is exported as
-well, so remove this one.
+Hi Diogo,
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/net/xdp.h |  1 -
- net/core/xdp.c    | 10 ----------
- 2 files changed, 11 deletions(-)
+On Thu, 29 Aug 2024 15:48:27 -0300
+Diogo Jahchan Koike <djahchankoike@gmail.com> wrote:
 
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index e6770dd40c91..bd3363e384b2 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -245,7 +245,6 @@ struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
- 					   struct net_device *dev);
- struct sk_buff *xdp_build_skb_from_frame(struct xdp_frame *xdpf,
- 					 struct net_device *dev);
--int xdp_alloc_skb_bulk(void **skbs, int n_skb, gfp_t gfp);
- struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf);
- 
- static inline
-diff --git a/net/core/xdp.c b/net/core/xdp.c
-index bcc5551c6424..34d057089d20 100644
---- a/net/core/xdp.c
-+++ b/net/core/xdp.c
-@@ -584,16 +584,6 @@ void xdp_warn(const char *msg, const char *func, const int line)
- };
- EXPORT_SYMBOL_GPL(xdp_warn);
- 
--int xdp_alloc_skb_bulk(void **skbs, int n_skb, gfp_t gfp)
--{
--	n_skb = kmem_cache_alloc_bulk(net_hotdata.skbuff_cache, gfp, n_skb, skbs);
--	if (unlikely(!n_skb))
--		return -ENOMEM;
--
--	return 0;
--}
--EXPORT_SYMBOL_GPL(xdp_alloc_skb_bulk);
--
- struct sk_buff *__xdp_build_skb_from_frame(struct xdp_frame *xdpf,
- 					   struct sk_buff *skb,
- 					   struct net_device *dev)
--- 
-2.46.0
+> Move validation into set, removing .set_validate operation as its current
+> implementation holds the rtnl lock for acquiring the PHY device, defeating
+> the intended purpose of checking before grabbing the lock.
+> 
+> Reported-by: syzbot+ec369e6d58e210135f71@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=ec369e6d58e210135f71
+> Fixes: 31748765bed3 ("net: ethtool: pse-pd: Target the command to the requested PHY")
+> Signed-off-by: Diogo Jahchan Koike <djahchankoike@gmail.com>
 
+This looks good to me, thanks !
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
 
