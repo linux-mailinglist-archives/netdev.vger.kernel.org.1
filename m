@@ -1,427 +1,190 @@
-Return-Path: <netdev+bounces-123544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498589654CD
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 03:43:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11F769654D6
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 03:47:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC37E1F23BE1
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 01:43:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE53B281307
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 01:46:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EB5A4D112;
-	Fri, 30 Aug 2024 01:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 490F9446DB;
+	Fri, 30 Aug 2024 01:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyVL5gFG"
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="NGPxusMZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2068.outbound.protection.outlook.com [40.107.255.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6BF3C0B
-	for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 01:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724982229; cv=none; b=LBzZ7st4QtEXe7kINrEF3WPj4IzLWo+eIC7pJRx9clsrcjsdn9EUj68xSTTpFYmsiG2FokWxvdUdSQiL1Qg29hNA3+7yJFYss97zBQnm3rFu6uFUFpYGVf81sAXZXBqHmFuy2SfzNB5he032DVaTPiFMr+p+Euebi5p+BbCPf+w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724982229; c=relaxed/simple;
-	bh=SFPig2ookyAhjzfhfbcqktZTQfLe4eeQ8rr/FvIUCUw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z5HU3pI4v9T0y2PGOj6gImeUuFxJfqCvTs9YzPQRKddEZVP/8vdNOlPACv2wIPEBpVbeqXGZUEttyFKisJ9Ug3Pylc7B+9RhUZuwihlqTfQYkqCx4NB9aO2bQUOBu+fJFcKPifAhRILuD93BgggNLYJWtbGQS9s0x+Q1ukTFUpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DyVL5gFG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D1FAC4CEC3;
-	Fri, 30 Aug 2024 01:43:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724982228;
-	bh=SFPig2ookyAhjzfhfbcqktZTQfLe4eeQ8rr/FvIUCUw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DyVL5gFGwr+W7vQ3gXbQ/L1XHCbWfcID3jRUa9wPZU1nDo/HJw9FQ9lAYJSzSWPMq
-	 ie7p2ZFXuDAmoHUKU2RzlLiA+u5iN7By4r/eYxpyrjNGId3xECnLHfANpznczZ8kAi
-	 kuN9M6RZCPVcrPNqvqNirRP+B/GunGv6XsArPBefw4FWC2QOlWU4ByG9i493GzeeaQ
-	 cOsB+rgxogpt3/igd/pa3SNWC/ymoQYjjT1ciyFgyOD+vi2QEfgSpWV/KpX+GUM5BW
-	 1q67nbmBcYUMtMqlWyBYVC/pPaMRh4rg4kaqfvCoycKuQWYyJpjoM+opbQpZrFL/Dl
-	 pQxGO8E0YcDvQ==
-Date: Thu, 29 Aug 2024 18:43:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, edumazet@google.com
-Subject: Re: [PATCH v5 net-next 03/12] net-shapers: implement NL set and
- delete operations
-Message-ID: <20240829184347.3a9a7910@kernel.org>
-In-Reply-To: <fcf4c258f606837cac72bb26cd751bb619e9ff87.1724944117.git.pabeni@redhat.com>
-References: <cover.1724944116.git.pabeni@redhat.com>
-	<fcf4c258f606837cac72bb26cd751bb619e9ff87.1724944117.git.pabeni@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F8091D131D;
+	Fri, 30 Aug 2024 01:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.255.68
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724982415; cv=fail; b=gDDdICdv9kmDlbiplR6fKJw9lIJHzInH5frLuKzFjZzKAaJobUnZJYUpeL7rk1FbXNL4/rYb3teGPmWAW+J3/qp/vDCDPgFD/74Bm0YWNzX+iNpnXwR4Axc0LY8IrEL6QvqiEIbS15LyVqYL1BLBmCSmVfQ/aLM8ODrFhGSOeSw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724982415; c=relaxed/simple;
+	bh=IXsj9CwF5FL/EA2mYWDihxvV9o7JUOrDcMOsPuvBC/o=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Y49PGcvMxxonXpqiXdimNY9GYGljcfiS0LZr2zbd4PqcADiYHnBetl2VIvdehbEwaEwEZFh27Khn+n6cHeGL3w04sBSmyO1vEz98hcfybGTRZq7ubtuzwOOg+H2yJM87JBRpaiu6/nPbl0vprvuVZ+KerYc5w44jsqWps8d21K4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=NGPxusMZ; arc=fail smtp.client-ip=40.107.255.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=npILMjPRpOg5d2mHOVh5QfWrEa5r69bHnpJCa3tIvayhrnJZNz3f+I/L+9Tz5o6uzlGzyzgwD4dxWOY5yJVFhJlSu79DUaRbLjyt3SYTmwSvtz7MobyZYLu1QQNKa7m1OxXpulHMwbot3WifytoyyMPPJSb2TCSdLblHrLt3CEszkeir0E+VpAAk3lYzGBLkUQoWceTfLAlNv6X07RCzu43xHowi/8n2TsiL3ZfxSgyLPITTsuMdkY/P++9RbezNJeOUWLdU281UWZL8PsM/ChIRANgYcNHLAfV5bXxBZmLyGjsOE5tMxjsg5znD6RUfztLKwU+NV3OHpODw2Mz/6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=C0ZrTu2OVI4O8FydlgFTjaxLDkH9BKaGQu55v53/0gA=;
+ b=A7yxA/iNDhok0eAoUrX6nYeZ0nuDYEG+meLOd1AevNCg9fgwJxU+fvimOTFUnYakDx6X+Ynt5DThDI2oYTJzovH4Cj8n/8BBQCkxmZkaCs2qdmUgm/RutDfxgD/HzHQB3wxvMe9Agmv6VSd+zbizMTsNpO/XbzczuP0vp6m6/arw21p/YmUzr+6I4KCi+YjkyCqamTe4HBiCEchMjBBmshbhKmXEZ7ARqDTH3SMqO1ObYB0TcD0KDX7xKvtHVN399N+DezTUsJ4y811aC3TA7sGr++PjylO1I6kM1SThkBxap/Nj8/AsXiSW6hUfqgmw1zqbjVCHP+ZUD0/hrLHckA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C0ZrTu2OVI4O8FydlgFTjaxLDkH9BKaGQu55v53/0gA=;
+ b=NGPxusMZk6oluv39wivQZd75OmzyNnzc4N+9NcMicVWlsfmv87vM7wVtg/+adXbuM4k3TvoqYU4Yhbjn0TdZle8UNRxgJhGj33+rdOlUFP7mE2VJtTq8suyHuiOp8ec8+edKWZuoDLskz9kIxnpu+nbyPCePaRH9DReCHTcE4LHYM4b8Y5fcmGfgyBOXly0TKVyG+Mdvp1FIvKejNn5XqKXMJbG+mRpMTYi/xnSzQMmcHKnDow81GDRz2xss8/0Vd3Qn4jSCyAtS6eUxYpz3aitzqd2S2SipxbcWgckJA8mwECNKQe0P1mOh5ndORc062vHKIxbBp9w8Qcl7lE4JQQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from KL1PR0601MB4113.apcprd06.prod.outlook.com (2603:1096:820:31::7)
+ by SEZPR06MB5968.apcprd06.prod.outlook.com (2603:1096:101:ef::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Fri, 30 Aug
+ 2024 01:46:50 +0000
+Received: from KL1PR0601MB4113.apcprd06.prod.outlook.com
+ ([fe80::7e85:dad0:3f7:78a1]) by KL1PR0601MB4113.apcprd06.prod.outlook.com
+ ([fe80::7e85:dad0:3f7:78a1%4]) with mapi id 15.20.7918.019; Fri, 30 Aug 2024
+ 01:46:50 +0000
+From: Yan Zhen <yanzhen@vivo.com>
+To: trondmy@kernel.org,
+	anna@kernel.org,
+	chuck.lever@oracle.com,
+	jlayton@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: neilb@suse.de,
+	okorniev@redhat.com,
+	Dai.Ngo@oracle.com,
+	tom@talpey.com,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	opensource.kernel@vivo.com,
+	Yan Zhen <yanzhen@vivo.com>
+Subject: [PATCH net-next v1] sunrpc: xprtrdma: Use ERR_CAST() to return
+Date: Fri, 30 Aug 2024 09:43:56 +0800
+Message-Id: <20240830014356.3465470-1-yanzhen@vivo.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYCPR01CA0160.jpnprd01.prod.outlook.com
+ (2603:1096:400:2b1::13) To KL1PR0601MB4113.apcprd06.prod.outlook.com
+ (2603:1096:820:31::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: KL1PR0601MB4113:EE_|SEZPR06MB5968:EE_
+X-MS-Office365-Filtering-Correlation-Id: 447acee2-4463-44ff-1c71-08dcc8959d9e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|52116014|7416014|376014|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?SSR+32PUxvkmqZS7tVJOlD2yi/JfwcF16BmwxcOdNsVaqPLSQ/I0Le0vxkNb?=
+ =?us-ascii?Q?2yFr/xbfwUIiCCkUnhPk6yy7/ZiXtjRF7uCOsrXhTqe0pccDAWoezEz6Lprt?=
+ =?us-ascii?Q?Sc81ksmwsKGur5LsGdsIfS79r9d2g7OUvWCo9I2NUI2mgwXaSDeQ+JtUXnBJ?=
+ =?us-ascii?Q?hqxvGESHjlY8eK4DvQimYePLaGPkl1MRj5IZPJVFxI3Jl6mCFzbvsaof2mIY?=
+ =?us-ascii?Q?Rpc+IUYjMRLZaOcJskWyMELHd5tILjvR7neW8CG4+u0ALv0AcIdGLhyCwNpu?=
+ =?us-ascii?Q?woD+1A+gcprx3OVfAc5e5S1hLjuZ8JeWEBpFDOpI4ghU6jv2D+CVJ5fAudHW?=
+ =?us-ascii?Q?3Cl1OGT8q8iclU3G17BDwfiqcXt1BcjRqraOt5XJ1M8Q9/7R3wL2147bPp4l?=
+ =?us-ascii?Q?BP4aJ9rFBnk2gisH2PTdqL3WWe4SLgk7gGdBROAji1TRdjrb49yq5nheD11x?=
+ =?us-ascii?Q?AfbzRq3vdhEZVak64jZJVB8A152AgA0U3p8AyEOl7PousTu76ZrIVvJwDPhm?=
+ =?us-ascii?Q?yFQG9lV2H37r6fqLNdo/ZujSBuwVwSuIEs23ttYopAQIaOFwQ6gNV6ziQLEQ?=
+ =?us-ascii?Q?508YPkSlzjgwEbnfaUKIaA5/RtI73puzwqQsZ8V6c4BbTzx8QLDyi8cXdBV3?=
+ =?us-ascii?Q?SWyk/KmgkjBcEsiG7cy4ufIYynqHMZqW6kYjA6He16eoC2v6xNr0S+GjBMRz?=
+ =?us-ascii?Q?pEWfb/zfuk5663UoUf5YsMm/mJjWoWx4AlQgALodv7FC5PZ2LY2bfKpjZbmJ?=
+ =?us-ascii?Q?sw5wMKeyWFcQLbRJS05Fbt6xoy7VIDcAYnDJ26TgSBaATBdLz7eHpw8GsLsn?=
+ =?us-ascii?Q?PqZVtZBmZppEmNS4ihNcDkSrk7hk8nvorWlDzy8ANYmibU8Jo9kd/uAFJS3C?=
+ =?us-ascii?Q?UHQAs1FkJe6eZ6XeTWED8j0ajj4jJ1h8QxdOrJEhiDK61lesIr8TlNqasRgm?=
+ =?us-ascii?Q?6IVzlzYKityoRjxcOlxyYfJ9OUVexFC7tW1NgHk3UdVDNEzS3HmnA9IXbMa7?=
+ =?us-ascii?Q?s8dxgkm4zBNcK5PcaC0nq1JaSevfpzc4RorOLsofc8PQMYSnA3nvmKJfFDH1?=
+ =?us-ascii?Q?VlPj7BpdY1hop9zoBtOkvPN45plBMuj4PnmJi1//h36Zs8Q1S6uzEjr+UcqI?=
+ =?us-ascii?Q?YAjgQLstnQkiEcCOGhthv91rGQOsIVYyHl7aCwyacU36MEJHtwcg6OGc7aI/?=
+ =?us-ascii?Q?BLzkp7uoiap2MNHKPPCI1C5YL86EKkby1Ste8XYM82tu5NWrXn+kDvWsSBZh?=
+ =?us-ascii?Q?oQ3eROcRq/02K6nrmxvcoNyHI+Tz1Wy+IYxtCB23wSwmW5iTfzOqiEqK+Obr?=
+ =?us-ascii?Q?J24PrWaEOiVFhfK+gpuNLs0LpjB7s7cwbZUawP6L+TQLLeGnnoXvylHjR7oi?=
+ =?us-ascii?Q?Xt5TwXI9FP38//aP2PToysOKNzPWjpJ0t9WCelHkfdzj8Ih+/Q=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR0601MB4113.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(52116014)(7416014)(376014)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?uWomgxzl6wERChvDjH03RT/OKd3RSdZHKCh+VSVvwJfZTtxIgKf5gWjOrq2l?=
+ =?us-ascii?Q?T4TPQWe7j9Lv3YhZBeEWFkM7lVc+IUoQjfhPJfeFfLX8sLU7XCxf6RwSI29M?=
+ =?us-ascii?Q?RH35lUSVsenszaP6EMtc1wINHYcXr0b01ug+SocuczR3yii51D1flXfoeQCK?=
+ =?us-ascii?Q?dgPRcm9cQ1fgAZGyAoch1IwP/I+bX/HTE0nj0zvibCk3XMiXFUPmzIT5vpxe?=
+ =?us-ascii?Q?d9qRMQi2EsfZz8n5NYq5ZYDALnmrXvPDEt/7DlBCXTIp9gB9qPmWOimCX/Zq?=
+ =?us-ascii?Q?Xk7a/AJ6HRcvmxGLNkA51xldHC5OlzYKGFnE+faFOR0zthvcvk04K5cRpqXN?=
+ =?us-ascii?Q?RnhXdW+qUd/YeaQshHwxYAWTX7kM6/w0Kxmy7ky2RbZPA5vdktAcxDccpajC?=
+ =?us-ascii?Q?jTn5Tf1s21g25UHLlyCnRLS1pfXNqKPeesnzN15HgZNC+emgbmShrNXzvjDn?=
+ =?us-ascii?Q?WgVNqu30qg8XextWXhlln2pitXoO7aVZY1iqtiuc/Rm6cV/+jdBFZZeXRrKo?=
+ =?us-ascii?Q?SUri8PV7g9y//LZ2n0HfPkCwjb8kRUzjjctBPzhOTli77+jQbNIdZBOClYhe?=
+ =?us-ascii?Q?QwMKS0Ic6Jp9JRDjomejpPHs04ZNtBPZPvf51EBNo1hTc8fzZwICLJWleiHv?=
+ =?us-ascii?Q?3xOs1AGF09Cfc5e+FfVpmt/hGMGJYM0Rn1zjjEQrK0WKh03BaiRfvgfxHUmr?=
+ =?us-ascii?Q?R2YNudrBZXjPqvr+I3tPu1suzskg4JjLTB/9St/SfUgtpN86RzYbz3YcxKRm?=
+ =?us-ascii?Q?R3okojT33KK+q0u3Z8KGlMR+SAK4wyf1+x5BZ6GTlVOc7TrKfC9zgBMgtviQ?=
+ =?us-ascii?Q?INKmhJBMzf3yhUMyjrz6P9hzfw/f/6G2L4x/x0hlqggonbsRne/EBkB6QR7y?=
+ =?us-ascii?Q?3Ss94yz91RLHa53MFtYGaBdLVOyWdpE1fkvg/Dhm4Uzs+9ZxkiVIERWGySgq?=
+ =?us-ascii?Q?Wsw1PGAWeQh7kkeiZoW0hZqVsjCWTt/5Y8RiszBeEbIkL4ot/xLbVyF3ojqN?=
+ =?us-ascii?Q?X5gjxQgEg2C+UH3aij92Ghl4Eo5GVfJtnF360Wn5BEyyYGhcuuBCmmPxns6k?=
+ =?us-ascii?Q?+CekDbU3L+ySPsPuoRivVzgZcJ09fA/3sxBQY6kjfmz+1bNe9+IGoRVlhfQf?=
+ =?us-ascii?Q?qsskZtxH/zM77tW2Cq4VisOQPyf7EYq1j1mwbxv40Ew2BgP1VIwSqPo/vOTL?=
+ =?us-ascii?Q?7WJyIvugpHFpASrR3aLuyaCuJnjM1WqHIUj3AyCl3yl+hLbH9bTE61QnnU5y?=
+ =?us-ascii?Q?PauFy6jjAJrYYmgPBemPlzqjBKdU3gF/74KkpoKaUKSZKnyA9wEOWul71HdD?=
+ =?us-ascii?Q?iN8kFd74ghFR2L3JeQFWI48iCmYOETtjsQB81DpgW6CrV4t5OEjZf91RHEOf?=
+ =?us-ascii?Q?7q9AT/mhSQupN5n3ZOsNnwEDTu3JB2FwONv47jXn47RCZ0mIGgQufYZRA0Kl?=
+ =?us-ascii?Q?QxzeHq+iRWaseq54Pacw9k6iVnrcPAOv2gzLv+skF0Tl3OKogxAbb4BfUVo2?=
+ =?us-ascii?Q?rKpFFTcOgNNBKz6Z14T0b6pVyAo+TlLm+cnsV2+BXATO2o3T0aG5CW94ZIrs?=
+ =?us-ascii?Q?TKaV8+4Nw+It22QDoV9LS9qE/YK4fsslVf1U7PbM?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 447acee2-4463-44ff-1c71-08dcc8959d9e
+X-MS-Exchange-CrossTenant-AuthSource: KL1PR0601MB4113.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Aug 2024 01:46:50.1875
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: X7L8T1+UtzG5unHLDEK6rEb5b4Nk6naaCN1q57gqJ2suVhRUOQWWLyi5tDNUW+e1uDx9hjwgb9XamRvwAFDHqw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB5968
 
-On Thu, 29 Aug 2024 17:16:56 +0200 Paolo Abeni wrote:
-> ithe next patch and will be implemented later in the series.
+Using ERR_CAST() is more reasonable and safer, When it is necessary
+to convert the type of an error pointer and return it.
 
-s/ithe/the/
+Signed-off-by: Yan Zhen <yanzhen@vivo.com>
+---
+ net/sunrpc/xprtrdma/svc_rdma_transport.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
-> index 2ed80df25765..a58bdd2ec013 100644
-> --- a/net/shaper/shaper.c
-> +++ b/net/shaper/shaper.c
-> @@ -23,6 +23,10 @@
->  
->  struct net_shaper_data {
->  	struct xarray shapers;
-> +
-> +	/* Serialize write ops and protects node_ids updates. */
+diff --git a/net/sunrpc/xprtrdma/svc_rdma_transport.c b/net/sunrpc/xprtrdma/svc_rdma_transport.c
+index 581cc5ed7c0c..c3fbf0779d4a 100644
+--- a/net/sunrpc/xprtrdma/svc_rdma_transport.c
++++ b/net/sunrpc/xprtrdma/svc_rdma_transport.c
+@@ -369,7 +369,7 @@ static struct svc_xprt *svc_rdma_create(struct svc_serv *serv,
+ 	listen_id = svc_rdma_create_listen_id(net, sa, cma_xprt);
+ 	if (IS_ERR(listen_id)) {
+ 		kfree(cma_xprt);
+-		return (struct svc_xprt *)listen_id;
++		return ERR_CAST(listen_id);
+ 	}
+ 	cma_xprt->sc_cm_id = listen_id;
+ 
+-- 
+2.34.1
 
-By write ops you mean all driver ops but @capabilities?
-Maybe let's say all driver ops and avoid confusion?
-
-> +	struct mutex lock;
-> +	struct idr node_ids;
-
-Do we need an IDR? can we not allocate the IDs using the xarray,
-starting at the offset of first NODE? Since type is on top bits?
-
->  };
->  
->  struct net_shaper_nl_ctx {
-> @@ -47,6 +51,27 @@ net_shaper_binding_data(struct net_shaper_binding *binding)
->  	return NULL;
->  }
->  
-> +static struct net_shaper_data *
-> +net_shaper_binding_set_data(struct net_shaper_binding *binding,
-> +			    struct net_shaper_data *data)
-> +{
-> +	if (binding->type == NET_SHAPER_BINDING_TYPE_NETDEV)
-> +		return cmpxchg(&binding->netdev->net_shaper_data, NULL, data);
-
-Hmm. Do we need this because the lock is inside the struct we're
-allocating? I've been wondering if we shouldn't move this lock
-directly into net_device and combine it with the RSS lock.
-Create a "per-netdev" lock, instead of having multiple disparate
-mutexes which are hard to allocate?
-
-> +	/* No devlink implementation yet.*/
-> +	return NULL;
-> +}
-> +
-> +static const struct net_shaper_ops *
-> +net_shaper_binding_ops(struct net_shaper_binding *binding)
-> +{
-> +	if (binding->type == NET_SHAPER_BINDING_TYPE_NETDEV)
-> +		return binding->netdev->netdev_ops->net_shaper_ops;
-> +
-> +	/* No devlink implementation yet.*/
-> +	return NULL;
-> +}
-> +
->  static int net_shaper_fill_binding(struct sk_buff *msg,
->  				   const struct net_shaper_binding *binding,
->  				   u32 type)
-> @@ -178,6 +203,26 @@ static void net_shaper_index_to_handle(u32 index,
->  	handle->id = FIELD_GET(NET_SHAPER_ID_MASK, index);
->  }
->  
-> +static void net_shaper_default_parent(const struct net_shaper_handle *handle,
-> +				      struct net_shaper_handle *parent)
-> +{
-> +	switch (handle->scope) {
-> +	case NET_SHAPER_SCOPE_UNSPEC:
-> +	case NET_SHAPER_SCOPE_NETDEV:
-> +	case __NET_SHAPER_SCOPE_MAX:
-> +		parent->scope = NET_SHAPER_SCOPE_UNSPEC;
-> +		break;
-> +
-> +	case NET_SHAPER_SCOPE_QUEUE:
-> +	case NET_SHAPER_SCOPE_NODE:
-> +		parent->scope = NET_SHAPER_SCOPE_NETDEV;
-> +		break;
-> +	}
-> +	parent->id = 0;
-> +}
-> +
-> +#define NET_SHAPER_CACHE_NOT_VALID XA_MARK_0
-> +
->  /* Lookup the given shaper inside the cache. */
->  static struct net_shaper_info *
->  net_shaper_cache_lookup(struct net_shaper_binding *binding,
-> @@ -186,7 +231,132 @@ net_shaper_cache_lookup(struct net_shaper_binding *binding,
->  	struct net_shaper_data *data = net_shaper_binding_data(binding);
->  	u32 index = net_shaper_handle_to_index(handle);
->  
-> -	return data ? xa_load(&data->shapers, index) : NULL;
-> +	if (!data || xa_get_mark(&data->shapers, index,
-> +				 NET_SHAPER_CACHE_NOT_VALID))
-> +		return NULL;
-> +
-> +	return xa_load(&data->shapers, index);
-> +}
-> +
-> +/* Allocate on demand the per device shaper's cache. */
-> +static struct net_shaper_data *
-> +net_shaper_cache_init(struct net_shaper_binding *binding,
-> +		      struct netlink_ext_ack *extack)
-> +{
-> +	struct net_shaper_data *new, *data = net_shaper_binding_data(binding);
-> +
-
-Please don't call functions in variable init if you have to check
-what they returned later.
-
-> +	if (!data) {
-
-invert the condition and return early?
-
-> +		new = kmalloc(sizeof(*data), GFP_KERNEL);
-> +		if (!new) {
-> +			NL_SET_ERR_MSG(extack, "Can't allocate memory for shaper data");
-
-no error messages needed for GFP_KERNEL OOM (pls fix everywhere)
-
-> +			return NULL;
-> +		}
-> +
-> +		mutex_init(&new->lock);
-> +		xa_init(&new->shapers);
-> +		idr_init(&new->node_ids);
-> +
-> +		/* No lock acquired yet, we can race with other operations. */
-> +		data = net_shaper_binding_set_data(binding, new);
-> +		if (!data)
-> +			data = new;
-> +		else
-> +			kfree(new);
-> +	}
-> +	return data;
-> +}
-> +
-> +/* Prepare the cache to actually insert the given shaper, doing
-> + * in advance the needed allocations.
-> + */
-> +static int net_shaper_cache_pre_insert(struct net_shaper_binding *binding,
-> +				       struct net_shaper_handle *handle,
-> +				       struct netlink_ext_ack *extack)
-> +{
-> +	struct net_shaper_data *data = net_shaper_binding_data(binding);
-> +	struct net_shaper_info *prev, *cur;
-> +	bool id_allocated = false;
-> +	int ret, id, index;
-> +
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	index = net_shaper_handle_to_index(handle);
-> +	cur = xa_load(&data->shapers, index);
-> +	if (cur)
-> +		return 0;
-> +
-> +	/* Allocated a new id, if needed. */
-> +	if (handle->scope == NET_SHAPER_SCOPE_NODE &&
-> +	    handle->id == NET_SHAPER_ID_UNSPEC) {
-> +		id = idr_alloc(&data->node_ids, NULL,
-> +			       0, NET_SHAPER_ID_UNSPEC, GFP_ATOMIC);
-
-How did we enter ATOMIC context?
-
-> +
-> +		if (id < 0) {
-> +			NL_SET_ERR_MSG(extack, "Can't allocate new id for NODE shaper");
-> +			return id;
-> +		}
-> +
-> +		handle->id = id;
-> +		index = net_shaper_handle_to_index(handle);
-> +		id_allocated = true;
-> +	}
-> +
-> +	cur = kmalloc(sizeof(*cur), GFP_KERNEL | __GFP_ZERO);
-
-kzalloc() ?
-
-> +	if (!cur) {
-> +		NL_SET_ERR_MSG(extack, "Can't allocate memory for cached shaper");
-> +		ret = -ENOMEM;
-> +		goto free_id;
-> +	}
-> +
-> +	/* Mark 'tentative' shaper inside the cache. */
-> +	xa_lock(&data->shapers);
-> +	prev = __xa_store(&data->shapers, index, cur, GFP_KERNEL);
-> +	__xa_set_mark(&data->shapers, index, NET_SHAPER_CACHE_NOT_VALID);
-
-Maybe worth calling out if it's level to xa_set_mark on a non-inserted
-handle?
-
-> +	xa_unlock(&data->shapers);
-> +	if (xa_err(prev)) {
-> +		NL_SET_ERR_MSG(extack, "Can't insert shaper into cache");
-> +		kfree(cur);
-> +		ret = xa_err(prev);
-> +		goto free_id;
-> +	}
-> +	return 0;
-> +
-> +free_id:
-> +	if (id_allocated)
-> +		idr_remove(&data->node_ids, handle->id);
-> +	return ret;
-> +}
-> +
-> +/* Commit the tentative insert with the actual values.
-> + * Must be called only after a successful net_shaper_pre_insert().
-> + */
-> +static void net_shaper_cache_commit(struct net_shaper_binding *binding,
-> +				    int nr_shapers,
-> +				    const struct net_shaper_handle *handle,
-> +				    const struct net_shaper_info *shapers)
-> +{
-> +	struct net_shaper_data *data = net_shaper_binding_data(binding);
-> +	struct net_shaper_info *cur;
-> +	int index;
-> +	int i;
-> +
-> +	xa_lock(&data->shapers);
-> +	for (i = 0; i < nr_shapers; ++i) {
-> +		index = net_shaper_handle_to_index(&handle[i]);
-> +
-> +		cur = xa_load(&data->shapers, index);
-> +		if (WARN_ON_ONCE(!cur))
-> +			continue;
-> +
-> +		/* Successful update: drop the tentative mark
-> +		 * and update the cache.
-> +		 */
-> +		__xa_clear_mark(&data->shapers, index,
-> +				NET_SHAPER_CACHE_NOT_VALID);
-> +		*cur = shapers[i];
-> +	}
-> +	xa_unlock(&data->shapers);
->  }
->  
->  static int net_shaper_parse_handle(const struct nlattr *attr,
-> @@ -227,6 +397,85 @@ static int net_shaper_parse_handle(const struct nlattr *attr,
->  	return 0;
->  }
->  
-> +static int net_shaper_parse_info(struct net_shaper_binding *binding,
-> +				 struct nlattr **tb,
-> +				 const struct genl_info *info,
-> +				 struct net_shaper_handle *handle,
-> +				 struct net_shaper_info *shaper,
-> +				 bool *cached)
-> +{
-> +	struct net_shaper_info *old;
-> +	int ret;
-> +
-> +	/* The shaper handle is the only mandatory attribute. */
-> +	if (NL_REQ_ATTR_CHECK(info->extack, NULL, tb, NET_SHAPER_A_HANDLE))
-> +		return -EINVAL;
-> +
-> +	ret = net_shaper_parse_handle(tb[NET_SHAPER_A_HANDLE], info, handle);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (handle->scope == NET_SHAPER_SCOPE_UNSPEC) {
-> +		NL_SET_BAD_ATTR(info->extack,
-> +				info->attrs[NET_SHAPER_A_HANDLE]);
-> +		return -EINVAL;
-> +	}
-> +
-> +	/* Fetch existing data, if any, so that user provide info will
-> +	 * incrementally update the existing shaper configuration.
-> +	 */
-> +	old = net_shaper_cache_lookup(binding, handle);
-> +	if (old)
-> +		*shaper = *old;
-> +	*cached = !!old;
-> +
-> +	if (tb[NET_SHAPER_A_METRIC])
-> +		shaper->metric = nla_get_u32(tb[NET_SHAPER_A_METRIC]);
-> +
-> +	if (tb[NET_SHAPER_A_BW_MIN])
-> +		shaper->bw_min = nla_get_uint(tb[NET_SHAPER_A_BW_MIN]);
-> +
-> +	if (tb[NET_SHAPER_A_BW_MAX])
-> +		shaper->bw_max = nla_get_uint(tb[NET_SHAPER_A_BW_MAX]);
-> +
-> +	if (tb[NET_SHAPER_A_BURST])
-> +		shaper->burst = nla_get_uint(tb[NET_SHAPER_A_BURST]);
-> +
-> +	if (tb[NET_SHAPER_A_PRIORITY])
-> +		shaper->priority = nla_get_u32(tb[NET_SHAPER_A_PRIORITY]);
-> +
-> +	if (tb[NET_SHAPER_A_WEIGHT])
-> +		shaper->weight = nla_get_u32(tb[NET_SHAPER_A_WEIGHT]);
-> +	return 0;
-> +}
-> +
-> +/* Fetch the cached shaper info and update them with the user-provided
-> + * attributes.
-> + */
-> +static int net_shaper_parse_info_nest(struct net_shaper_binding *binding,
-> +				      const struct nlattr *attr,
-> +				      const struct genl_info *info,
-> +				      struct net_shaper_handle *handle,
-> +				      struct net_shaper_info *shaper)
-> +{
-> +	struct nlattr *tb[NET_SHAPER_A_WEIGHT + 1];
-> +	bool cached;
-> +	int ret;
-> +
-> +	ret = nla_parse_nested(tb, NET_SHAPER_A_WEIGHT, attr,
-> +			       net_shaper_info_nl_policy, info->extack);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	ret = net_shaper_parse_info(binding, tb, info, handle, shaper, &cached);
-> +	if (ret < 0)
-> +		return ret;
-> +
-> +	if (!cached)
-> +		net_shaper_default_parent(handle, &shaper->parent);
-> +	return 0;
-> +}
-> +
->  static int net_shaper_generic_pre(struct genl_info *info, int type)
->  {
->  	struct net_shaper_nl_ctx *ctx;
-> @@ -358,14 +607,153 @@ int net_shaper_nl_get_dumpit(struct sk_buff *skb,
->  	return 0;
->  }
->  
-> +/* Update the H/W and on success update the local cache, too. */
-> +static int net_shaper_set(struct net_shaper_binding *binding,
-> +			  const struct net_shaper_handle *h,
-> +			  const struct net_shaper_info *shaper,
-> +			  struct netlink_ext_ack *extack)
-> +{
-> +	struct net_shaper_data *data = net_shaper_cache_init(binding, extack);
-> +	const struct net_shaper_ops *ops = net_shaper_binding_ops(binding);
-> +	struct net_shaper_handle handle = *h;
-> +	int ret;
-> +
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	/* Should never happen: binding lookup validates the ops presence */
-> +	if (WARN_ON_ONCE(!ops))
-> +		return -EOPNOTSUPP;
-> +
-> +	mutex_lock(&data->lock);
-> +	if (handle.scope == NET_SHAPER_SCOPE_NODE &&
-> +	    net_shaper_cache_lookup(binding, &handle)) {
-> +		ret = -ENOENT;
-
-EEXIST ? Presumably this is temporary as described in the commit
-message?
 
