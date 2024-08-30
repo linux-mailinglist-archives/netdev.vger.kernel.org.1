@@ -1,121 +1,82 @@
-Return-Path: <netdev+bounces-123781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34DAF9667C5
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:15:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7787B9667E6
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 19:23:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67D291C22C77
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 17:15:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA1341C22DB4
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 17:23:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACFA1B5813;
-	Fri, 30 Aug 2024 17:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E50E1BB6B4;
+	Fri, 30 Aug 2024 17:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HoQCbaV4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HsW82RbW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A2B1BAEC0;
-	Fri, 30 Aug 2024 17:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54ED51B6552;
+	Fri, 30 Aug 2024 17:23:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725038087; cv=none; b=dLLA80GHCOL3dtvBNR1A+m/zZ2q0Xcbk5rgxdO+4OjLdMjnVxP1mLdbxJ4Jty7hCP2qYJQEn+SvEEn0vySfj0B+FuCOU8L3i/+dqJsfzv3L5zWACVvdWZkDszy6JUYhzBLU/9D904Bs+Zn3qyibaI9gFCZsl0pNoWMc+ZkI7zfg=
+	t=1725038588; cv=none; b=hqcxE0ZejbwNhsFc5ADu4eKpOA8tdnW9D900+bMAaqn+fxH2qXVV3G1xQrfRizn4YUnEcjJSjkmmBOhcPxq2hfc2LoyWovCZG6rbXW+SIjlWNP1YitREStDtsPFvsRjGm5CT2A0hv40oVhEEuQj+gMrhMV1NwZkES84vQ8yxbkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725038087; c=relaxed/simple;
-	bh=6muzqNrp6/GvlVRaKgN/ToIdt+fZp8wXmbCAVwe1h10=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DJl4J008av3wqWUeRSZcfZWNY4WkIM1bPGzSQjUqJjqOgCio7MQEdzWl+ahNBn3eIJDa1Q1JUmbTp1q6sau7DvxgiL01F9RVK52cIm4x0TJgk5NshS4wALLUtq/hOh9N+JAVmqo4bDvFLAJ6SDLnoeOHwVXh+tWxy17ufIebny8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HoQCbaV4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58A3DC4CEC2;
-	Fri, 30 Aug 2024 17:14:45 +0000 (UTC)
+	s=arc-20240116; t=1725038588; c=relaxed/simple;
+	bh=Brr8sN57GNWRFpPZm9az4LhuYdjGjmnwTvEbe6xkjBc=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Vl6EXZG4EV57vzL1NPHMAvDLazE6JtUBNrwwtefT56lw8c/QES5UHqE4oS96Ctv74Ez8me6yjtcK9K/1rna/qWV0yX7h74Ojz4Uw+WYobxs9t7GDiRnh/TLjGawToi+M4k6pGkI5MI+Mcd4AZWoDVC99rvNsAjwSAncYKbI1X+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HsW82RbW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EFDDC4CEC8;
+	Fri, 30 Aug 2024 17:23:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725038085;
-	bh=6muzqNrp6/GvlVRaKgN/ToIdt+fZp8wXmbCAVwe1h10=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HoQCbaV4Sma/OmVwNJKJhSSmosaeZaRaGTzl0eFYwMHDDRb9D4IFcsJAjGVnk6hVm
-	 14Uc7IeKiy8modfD687HKdKizKozosTB+LWdZ1Bc+wJ5gQxQtGtmcoca9GMstMUsIh
-	 fbgzOss/mYUWLFwZlzKk/SbXL3pASxnTjw4LFksf7Hpa8IMvTm8tEbu6N80sWfhdF0
-	 4bv5msTpQKN4EfhD8WA3kW2lNRsEdQo7z7mqssdsKngImIYjwFjn+V0n3xW4+Hae5H
-	 FZg7OA6RZweRHLPyOPHiffFPsLCTN181zLgo9CJ0AVQX2u+EoVt2rkzH7AaVMOsm/Y
-	 rJyo/kfbGAMJQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	horms@kernel.org,
-	corbet@lwn.net,
-	linux-doc@vger.kernel.org
-Subject: [PATCH net v2] docs: netdev: document guidance on cleanup.h
-Date: Fri, 30 Aug 2024 10:14:42 -0700
-Message-ID: <20240830171443.3532077-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.46.0
+	s=k20201202; t=1725038587;
+	bh=Brr8sN57GNWRFpPZm9az4LhuYdjGjmnwTvEbe6xkjBc=;
+	h=From:Subject:Date:To:Cc:From;
+	b=HsW82RbWIyP4TPZMrcq3KgD4Y8TdqSH3IIMulALn80vjCLapSeeKIvRWKi8jkIsgf
+	 Y09LCTAk7QowcupDH81JAiAqPOPVFZLIeY9kec4GGk0rn2kGRkFrJcSwmbk2UTRzh1
+	 /ZjQNp0MKE+46/Pfs8hWe95hJjNA9z5+ybb3t3JhICtsd+wmpCzvP3xptv39Z3mjwz
+	 UAn7dwh1bnDepw5G7Tw8Tq+QNjQKCp7OqaozZbu930QmEQ089ZFqIN8afnRchWYsCI
+	 BOe1U8LOr7eWKTwxWoL8PIgpNlOkiqreeO8cuGHtj3LaygK3ZxQIZ3aBaBaim4gpRI
+	 MgnU+Src46k9A==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH nf-next 0/2] netfilter: Add missing Kernel doc to headers
+Date: Fri, 30 Aug 2024 18:22:59 +0100
+Message-Id: <20240830-nf-kdoc-v1-0-b974bb701b61@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPP/0WYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDC2MD3bw03eyU/GRd4+SUpCRzMyML00RLJaDqgqLUtMwKsEnRSkBFeak
+ VJUqxtbUAHJeSZ2IAAAA=
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+ netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-Document what was discussed multiple times on list and various
-virtual / in-person conversations. guard() being okay in functions
-<= 20 LoC is a bit of my own invention. If the function is trivial
-it should be fine, but feel free to disagree :)
+Hi,
 
-We'll obviously revisit this guidance as time passes and we and other
-subsystems get more experience.
+This short series addresses some minor Kernel doc problems
+in Netfilter header files.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: horms@kernel.org
-CC: corbet@lwn.net
-CC: linux-doc@vger.kernel.org
+Simon Horman (2):
+      netfilter: nf_tables: Add missing Kernel doc to nf_tables.h
+      netfilter: tproxy: Add missing Kernel doc to nf_tproxy.h
 
-v2:
- - add sentence about revisiting later to commit msg
- - fix spelling
-v1: https://lore.kernel.org/20240829152025.3203577-1-kuba@kernel.org
----
- Documentation/process/maintainer-netdev.rst | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ include/net/netfilter/nf_tables.h | 2 ++
+ include/net/netfilter/nf_tproxy.h | 1 +
+ 2 files changed, 3 insertions(+)
 
-diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-index 30d24eecdaaa..c9edf9e7362d 100644
---- a/Documentation/process/maintainer-netdev.rst
-+++ b/Documentation/process/maintainer-netdev.rst
-@@ -375,6 +375,22 @@ When working in existing code which uses nonstandard formatting make
- your code follow the most recent guidelines, so that eventually all code
- in the domain of netdev is in the preferred format.
- 
-+Using device-managed and cleanup.h constructs
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+Netdev remains skeptical about promises of all "auto-cleanup" APIs,
-+including even ``devm_`` helpers, historically. They are not the preferred
-+style of implementation, merely an acceptable one.
-+
-+Use of ``guard()`` is discouraged within any function longer than 20 lines,
-+``scoped_guard()`` is considered more readable. Using normal lock/unlock is
-+still (weakly) preferred.
-+
-+Low level cleanup constructs (such as ``__free()``) can be used when building
-+APIs and helpers, especially scoped iterators. However, direct use of
-+``__free()`` within networking core and drivers is discouraged.
-+Similar guidance applies to declaring variables mid-function.
-+
- Resending after review
- ~~~~~~~~~~~~~~~~~~~~~~
- 
--- 
-2.46.0
+base-commit: d2ab3bb890f6a88facf89494ce50b27ff8236d24
 
 
