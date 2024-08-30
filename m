@@ -1,107 +1,167 @@
-Return-Path: <netdev+bounces-123733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE91496651C
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 17:17:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C9F396652F
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 17:20:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A40F61F25249
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 15:17:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8AF81F24E08
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 15:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B60091B5813;
-	Fri, 30 Aug 2024 15:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348A41B5831;
+	Fri, 30 Aug 2024 15:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="WwYUfFfy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SsBbSKm7"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431781B4C29;
-	Fri, 30 Aug 2024 15:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986AF1B5311;
+	Fri, 30 Aug 2024 15:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725031006; cv=none; b=CPqbSMKmslEZHzXobJtomFyBt0m8cgT9F/Y509OtE08sL96awcFigRd/i8QOednUz6c7tjxcXXGWJHRox9FnvUkrecJQC1uTei1Cecf5yKI4+5ImWFT4WRJfo0aoHQhe5/yHP3e1FmHuNgcNwVj04LZW4msZ4q+en+if4YKPoZE=
+	t=1725031209; cv=none; b=CkZxPAFPLg+CCoovX2FGxlpG+TKZtiHJtbTna+iajMzLmnr70mgXNae+Ks9q8xsXGlE9llB9j0IsfH+Oa/FRKlSbx8DBeVMKkgsj0NXgZq8ExKhw7l90R5yIOpeQ3nJesSojHzHYxMsXCkUBKfjuSxv1XuchAmyDLCq4Hns2xss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725031006; c=relaxed/simple;
-	bh=L7Iu5qwM3GJ5quJn8zLnlihhTtlRQpg9g81Gl2sLvpc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=NYzOL3TgezZQorTVgtQKteup1CiQ2SVjrnVJJjY0tXH+f/ehjEGaeTws4XCk/4HD4x05ST7trZDHewKxn/rsLFtzAyARsgFClosSlF8sXSglDfo3OomRTF7EGPRIW33q5TEiYe69RS31nlYdYGnt8OaMsMLDZnQP6ww/NPEdfy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b=WwYUfFfy; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1202)
-	id F310620B7123; Fri, 30 Aug 2024 08:16:38 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F310620B7123
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-	s=default; t=1725030999;
-	bh=H+SUfZWshjMk9JAvgxKvB0iP3y3vfzyhaaXS/SuOMWk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:Reply-To:From;
-	b=WwYUfFfyBNVsIlYmk03V17hDAtLb1AjVVqOm69JbUg3QDbv64PXgfiiH/h1V94zI7
-	 yQQrDixfiM5k2gL0JTxyXOwKWZZE0ku7qCmmcIZzPO1rPJu4eLBj4PrUkJxT8BxL1P
-	 fk0HhOqVxzUvtCCe3U8ynvYhZKkWJ+Qrf9PT+6yA=
-From: longli@linuxonhyperv.com
-To: Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Long Li <longli@microsoft.com>,
-	stable@vger.kernel.org
-Subject: [PATCH rdma-next v2 2/2] RDMA/mana_ib: use the correct page size for mapping user-mode doorbell page
-Date: Fri, 30 Aug 2024 08:16:33 -0700
-Message-Id: <1725030993-16213-2-git-send-email-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1725030993-16213-1-git-send-email-longli@linuxonhyperv.com>
-References: <1725030993-16213-1-git-send-email-longli@linuxonhyperv.com>
-Reply-To: longli@microsoft.com
+	s=arc-20240116; t=1725031209; c=relaxed/simple;
+	bh=paUW6lrg/oGbNgiylxHYA3HVlrH/VYmkqMwYVUKaDtA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=D6B5Eg+T/kDrfVyORuYgvX6so297vPRNeSN8iY/oCms8JmjVsBT0rrozZJ43bzzKjaEJF5nKnf5TcVYDtqqyFANucPEx3clAs+YFYZqxKhRCdL3L8KiDO2Mo3fQj+OVSOEvylMx/e/2wuaxeNZSRqKCxD/rLmRbym0Zo9I9txGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SsBbSKm7; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7a7f8b0b7d0so83375285a.2;
+        Fri, 30 Aug 2024 08:20:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725031206; x=1725636006; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wa1HHxrncCHtu5ztN4T2T0FOnML+pcv6VrX3IGviXIY=;
+        b=SsBbSKm7AkQiAt+Jx+6fx/+sMHS23DCh1Z5IaGBguf727C+3vgkK0mE+5Yy3vgkp2/
+         R4tTxlZLmFKyXqCztEoq1UQJGhhIvQ7Go0DToCevGDbCPZPe06q3GI3gJz2OLtIxCXG8
+         jydPH7FczIpXmx409vkbGIskGwEujfjlestgTgsPIJ+RdjdtogTjhozKGw5+UWhdtuLw
+         8jY0DdMzs12DcBjdWSnIlUADmHaNEsJ3XNL8LH0I879mhHFOgpjsIj26KbNRB+uKT8+o
+         XJmT1TFqIytpqMvAM+IQrQsbbR7wp8HxQL54A1Sk0R+FQrlTW8BtNdX1Vp7s7nFHdzeD
+         hqDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725031206; x=1725636006;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Wa1HHxrncCHtu5ztN4T2T0FOnML+pcv6VrX3IGviXIY=;
+        b=bwR/+0IPDV5iVC7kfT408E7+hnl9nW3t0mT6+J0dJvFeb9J+NonW9z7ADgwlIpevEl
+         r23KSxOVdfsIM5gFBhCNucNaU1kCe1furW3Km3g0UyHo+8de4ZgWw/eG9AvMtUoFRsYA
+         sojebO9DMU6OzZOHniO2u5yitQN0avtn8N83woNN/vkcjJhX5EaGgBfzH5q77y3Qy0Yl
+         5vTp61/8OOD9RlkUrUayc8BQJ2i9nwgT1lqPIMWQldiomqM7vxQZLLnBT/YQwiT+fEQS
+         PPqDCDm8guMem+oEQHk8Iw0YJuoF9mGwz2ru7mgpmuMWLs7E/Vnq/8S4pXCvu+v7Hxqu
+         ZuFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW2MK+bfxQ0srzFb+lonGdnN+QHDco8i/ddzseUFCTy5wUOh51z3L7lRnoWYcFNqswliSxH8naY@vger.kernel.org, AJvYcCXzqrezprjpNnzNeNrdLr1yrc6DN1N89I5oAzG0dn6VllvpoNXZOudeo0/puI/4cMsX7sNAwaFU1BAhtAcotqY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOPQfxYasmYNgkxCLIL0Oy3Gxwbi5xTySiUYuMb3uditGvyHPw
+	JUrfWeGnGRYs1hS8i2j/5rk8i0p1GC4H2PwbdeNnUTveCj1EAPGr
+X-Google-Smtp-Source: AGHT+IGKywkJXzU4f21NgfkbZ6Pihq+QM5fvS4l26vW1qX1/3HuxLygJPPHCGscgy3XfbmWaDCw2Jg==
+X-Received: by 2002:a05:620a:3952:b0:79f:190a:8ad7 with SMTP id af79cd13be357-7a8041c8131mr725141985a.33.1725031206215;
+        Fri, 30 Aug 2024 08:20:06 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a806c23dfbsm151605685a.41.2024.08.30.08.20.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Aug 2024 08:20:05 -0700 (PDT)
+Date: Fri, 30 Aug 2024 11:20:05 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ ncardwell@google.com, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ fw@strlen.de, 
+ Willem de Bruijn <willemb@google.com>, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ martineau@kernel.org
+Message-ID: <66d1e32558532_3c08a22949e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240828140035.4554142f@kernel.org>
+References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
+ <401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
+ <66cf2e4bd8e89_33815c294b2@willemb.c.googlers.com.notmuch>
+ <20240828090120.71be0b20@kernel.org>
+ <66cf7b8d1c480_36509229439@willemb.c.googlers.com.notmuch>
+ <20240828140035.4554142f@kernel.org>
+Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
+ ksft
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: Long Li <longli@microsoft.com>
+Jakub Kicinski wrote:
+> On Wed, 28 Aug 2024 15:33:33 -0400 Willem de Bruijn wrote:
+> > That could work.
+> > 
+> > Is reporting one KTAP and exitcode per directory vs per packetdrill
+> > invocation good/bad/neither?
+> 
+> To me "neither", hopefully and unhelpfully I won't tell you anything
+> that's not common sense :) The balance is between:
+> 
+>  - having test cases which don't take too long (assuming debug kernel):
+>      <15min is good, 
+>      >1h I will start complaining,
+>      >1h30m is bad because we can't retry and still make the 3h
+>             deadline that NIPA has,
+>      >3h the test can't run in NIPA at all.
+> 
+> vs
+> 
+>  - flip side is having so many cases it's hard to keep track and render
+>    in the UI. JSON is relatively slow to process. If you have 150 cases,
+>    that's 300 per branch (debug and non-debug kernels), times 8
+>    branches a day => 2.4k results / day
+>    I think that's still fine-ish, but on the larger side for sure. For
+>    reference net and forwarding have ~100 tests each. FWIW we do have
+>    the ability to collect and display nested KTAP so the information is
+>    not lost (but it makes queries slower so we don't fetch it by default).
+> 
+> > Three other issues if this is calling packetdrill directly is
+> > - passing the non-trivial IP specific flags
+> > - running twice, for IPv4 and IPv6
+> > - chdir into the directory of the pkt file
+> > 
+> > That can be addressed by instead calling a small wrapper shell script.
+> > 
+> > That would do the test_func_builder part of packetdrill_ksft.py.
+> > But without the need to handle netns, popen/cmd, etc, and thus the
+> > ksft dependencies.
+> 
+> Right!
 
-When mapping doorbell page from user-mode, the driver should use the system
-page size as this memory is allocated via mmap() from user-mode.
+Implemented this, but hit a snag
 
-Cc: stable@vger.kernel.org
-Fixes: 0266a177631d ("RDMA/mana_ib: Add a driver for Microsoft Azure Network Adapter")
-Signed-off-by: Long Li <longli@microsoft.com>
----
-change log
-v2: used rdma-next tag in patch title. fixed printk format identifier for unsigned long.
+Kselftest install does not preserve directories.
 
- drivers/infiniband/hw/mana/main.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+So all .pkt files are copied into net/packetdrill root. This is messy.
+More fundamentally it breaks the includes in the files (e..g, `source
+../common/defaults.sh`).
 
-diff --git a/drivers/infiniband/hw/mana/main.c b/drivers/infiniband/hw/mana/main.c
-index f68f54aea820..67c2d43135a8 100644
---- a/drivers/infiniband/hw/mana/main.c
-+++ b/drivers/infiniband/hw/mana/main.c
-@@ -511,13 +511,13 @@ int mana_ib_mmap(struct ib_ucontext *ibcontext, struct vm_area_struct *vma)
- 	      PAGE_SHIFT;
- 	prot = pgprot_writecombine(vma->vm_page_prot);
- 
--	ret = rdma_user_mmap_io(ibcontext, vma, pfn, gc->db_page_size, prot,
-+	ret = rdma_user_mmap_io(ibcontext, vma, pfn, PAGE_SIZE, prot,
- 				NULL);
- 	if (ret)
- 		ibdev_dbg(ibdev, "can't rdma_user_mmap_io ret %d\n", ret);
- 	else
--		ibdev_dbg(ibdev, "mapped I/O pfn 0x%llx page_size %u, ret %d\n",
--			  pfn, gc->db_page_size, ret);
-+		ibdev_dbg(ibdev, "mapped I/O pfn 0x%llx page_size %lu, ret %d\n",
-+			  pfn, PAGE_SIZE, ret);
- 
- 	return ret;
- }
--- 
-2.17.1
+The output of having each test separate is also quite unreadable.
 
+An alternative is to add each subdirectory as a separate TARGET.
+But that seems similarly impractical. And does nothing to group
+KTAP output.
+
+In practice, most directories have a handful of .pkt scripts, and
+each script is fast, so serialization is not a huge issue.
+
+I found tools/testing/selftests/net/kselftest/ktap_helpers.sh,
+which has helpful KTAP boilerplate for shell tests, including
+KSFT exit codes. Am using that instead of python, to reduce the
+external dependencies.
 
