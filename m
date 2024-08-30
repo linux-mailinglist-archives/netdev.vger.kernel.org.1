@@ -1,38 +1,39 @@
-Return-Path: <netdev+bounces-123672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C924966173
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 14:22:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D498966172
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 14:22:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEE7F1F21E5E
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 12:22:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFAD9B21D34
+	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 12:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA53199FBE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9F07199FA9;
 	Fri, 30 Aug 2024 12:22:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0206D17ADF8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA07192D79;
 	Fri, 30 Aug 2024 12:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725020528; cv=none; b=A789a+NTZ3t5loSir6SjmvonL+8VPsOWf/Ta5kIbeSc4sehx/ddl9GMul+DVD7RnLUGXdfjH33cwpyt7vyiFLoMCUgZ8UFZ6t6l5uYlnqa5Ik/BDisu/AVDFESKE1uhO5R+xp5wuWnlwyqRDtm30Tqt5UWjeA286zUFW3UKL+jE=
+	t=1725020528; cv=none; b=tGw0qf+aRssGszxBq02hzW7ROMcXUamsw0b+yk7zPqK+hjtANZi2GKXPWQlUwMYRM1ygE2tTsZNYEIODepSKo/TSj2gN4q0zvz2T1MYl5xPNytSYsS1m3cvDDS+LYy9zovjZwu4pa45aF6lHY6UveBuAeOCQFB78+IG6Pkrw+HM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725020528; c=relaxed/simple;
-	bh=oPbDa16YJxkHf5+H9dpshoX4Hx8uDzq1EJYPPb9lb1c=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h1GknKkmwz7/v/SnEnOYb6yoyt5ERCI65MVMcxcoY8CU0mGEZa8hfSdCRM7SB7hlDzbv1TO8M3XK8Hof37ruRNsuoKlmkJsTWnM8/5LJmclhBnH7dJo85Z7qwETCm1XffFcIHY3NEtrWyOfT9UVr2jSnbDkujmCN+wWNJ9dF0Qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+	bh=mBS2YNRV5/RscjktKST7r5cdMsQH2mzxzlvcvtXKq38=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sWr+wWPSjX7f3OYWxRBdmbvyUIFQ+YtLHLEWYsbkNTJxoB2bP2n6XLhlX8dFWEyOp66mbpzbCn2W2dhda70Y9gIHt5eY16uFdmYdI03fklV4BYc+ce9QPfwJaXjFE8JOiGhu19aasvF/z96Z97jMbgDTekQ1MWJLt9BheEH7Woo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4WwHMG4JDZz1S9P9;
-	Fri, 30 Aug 2024 20:21:46 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WwHLx1nfKzyRDC;
+	Fri, 30 Aug 2024 20:21:29 +0800 (CST)
 Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 29589180041;
+	by mail.maildlp.com (Postfix) with ESMTPS id D3C84140202;
 	Fri, 30 Aug 2024 20:22:01 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
@@ -48,135 +49,180 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<horms@kernel.org>, <jonathan.cameron@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH V6 net-next 00/11] Add support of HIBMCGE Ethernet Driver
-Date: Fri, 30 Aug 2024 20:15:53 +0800
-Message-ID: <20240830121604.2250904-1-shaojijie@huawei.com>
+Subject: [PATCH V6 net-next 01/11] net: hibmcge: Add pci table supported in this module
+Date: Fri, 30 Aug 2024 20:15:54 +0800
+Message-ID: <20240830121604.2250904-2-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
+In-Reply-To: <20240830121604.2250904-1-shaojijie@huawei.com>
+References: <20240830121604.2250904-1-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
  kwepemm000007.china.huawei.com (7.193.23.189)
 
-This patch set adds the support of Hisilicon BMC Gigabit Ethernet Driver.
+Add pci table supported in this module, and implement pci_driver function
+to initialize this driver.
 
-This patch set includes basic Rx/Tx functionality. It also includes
-the registration and interrupt codes.
+hibmcge is a passthrough network device. Its software runs
+on the host side, and the MAC hardware runs on the BMC side
+to reduce the host CPU area. The software interacts with the
+MAC hardware through the PCIe.
 
-This work provides the initial support to the HIBMCGE and
-would incrementally add features or enhancements.
+  ┌─────────────────────────┐
+  │ HOST CPU network device │
+  │    ┌──────────────┐     │
+  │    │hibmcge driver│     │
+  │    └─────┬─┬──────┘     │
+  │          │ │            │
+  │HOST  ┌───┴─┴───┐        │
+  │      │ PCIE RC │        │
+  └──────┴───┬─┬───┴────────┘
+             │ │
+            PCIE
+             │ │
+  ┌──────┬───┴─┴───┬────────┐
+  │      │ PCIE EP │        │
+  │BMC   └───┬─┬───┘        │
+  │          │ │            │
+  │ ┌────────┴─┴──────────┐ │
+  │ │        GE           │ │
+  │ │ ┌─────┐    ┌─────┐  │ │
+  │ │ │ MAC │    │ MAC │  │ │
+  └─┴─┼─────┼────┼─────┼──┴─┘
+      │ PHY │    │ PHY │
+      └─────┘    └─────┘
 
+Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
 ChangeLog:
-v5 -> v6:
-  - Delete netif_carrier_off() in .ndo_open() and .ndo_stop(),
-    suggested by Jakub and Andrew.
-  - Remove hbg_txrx_init() from probe path, alloc ring buffer in .ndo_open(),
-    and release ring buffer in .ndo_stop(), suggested by Jakub and Andrew.
-  v5: https://lore.kernel.org/all/20240827131455.2919051-1-shaojijie@huawei.com/
-v4 -> v5:
-  - Delete unnecessary semicolon, suggested by Jakub.
-  v4: https://lore.kernel.org/all/20240826081258.1881385-1-shaojijie@huawei.com/
-v3 -> v4:
-  - Delete INITED_STATE in priv, suggested by Andrew.
-  - Delete unnecessary defensive code in hbg_phy_start()
-    and hbg_phy_stop(), suggested by Andrew.
-  v3: https://lore.kernel.org/all/20240822093334.1687011-1-shaojijie@huawei.com/
-v2 -> v3:
-  - Add "select PHYLIB" in Kconfig, reported by Jakub.
-  - Use ndo_validate_addr() instead of is_valid_ether_addr()
-    in dev_set_mac_address(), suggested by Jakub and Andrew.
-  v2: https://lore.kernel.org/all/20240820140154.137876-1-shaojijie@huawei.com/
-v1 -> v2:
-  - fix build errors reported by kernel test robot <lkp@intel.com>
-    Closes: https://lore.kernel.org/oe-kbuild-all/202408192219.zrGff7n1-lkp@intel.com/
-    Closes: https://lore.kernel.org/oe-kbuild-all/202408200026.q20EuSHC-lkp@intel.com/
-  v1: https://lore.kernel.org/all/20240819071229.2489506-1-shaojijie@huawei.com/
-RFC v2 -> v1:
-  - Use FIELD_PREP/FIELD_GET instead of union, suggested by Andrew.
-  - Delete unnecessary defensive code, suggested by Andrew.
-  - A few other minor changes.
-  RFC v2: https://lore.kernel.org/all/20240813135640.1694993-1-shaojijie@huawei.com/
 RFC v1 -> RFC v2:
-  - Replace linkmode_copy() with phy_remove_link_mode() to
-    simplify the PHY configuration process, suggested by Andrew.
-  - Delete hbg_get_link_status() from the scheduled task, suggested by Andrew.
-  - Delete validation for mtu in hbg_net_change_mtu(), suggested by Andrew.
-  - Delete validation for mac address in hbg_net_set_mac_address(),
-    suggested by Andrew.
-  - Use napi_complete_done() to simplify the process, suggested by Joe Damato.
-  - Use ethtool_op_get_link(), phy_ethtool_get_link_ksettings(),
-    and phy_ethtool_set_link_ksettings() to simplify the code, suggested by Andrew.
-  - Add the check on the return value of phy_connect_direct(),
+  - Add the null pointer check on the return value of pcim_iomap_table(),
     suggested by Jonathan.
-  - Adjusted the layout to place the fields and register definitions
-    in one place, suggested by Jonathan.
-  - Replace request_irq with devm_request_irq, suggested by Jonathan.
-  - Replace BIT_MASK() with BIT(), suggested by Jonathan.
-  - Introduce irq_handle in struct hbg_irq_info in advance to reduce code changes,
-    suggested by Jonathan.
-  - Delete workqueue for this patch set, suggested by Jonathan.
-  - Support to compile this driver on all arch in Kconfig,
-    suggested by Andrew and Jonathan.
-  - Add a patch to add is_valid_ether_addr check in dev_set_mac_address,
-    suggested by Andrew.
-  - A few other minor changes.
-  RFC v1: https://lore.kernel.org/all/20240731094245.1967834-1-shaojijie@huawei.com/
+RFC v1: https://lore.kernel.org/all/20240731094245.1967834-1-shaojijie@huawei.com/
 ---
-
-Jijie Shao (11):
-  net: hibmcge: Add pci table supported in this module
-  net: hibmcge: Add read/write registers supported through the bar space
-  net: hibmcge: Add mdio and hardware configuration supported in this
-    module
-  net: hibmcge: Add interrupt supported in this module
-  net: hibmcge: Implement some .ndo functions
-  net: hibmcge: Implement .ndo_start_xmit function
-  net: hibmcge: Implement rx_poll function to receive packets
-  net: hibmcge: Implement some ethtool_ops functions
-  net: hibmcge: Add a Makefile and update Kconfig for hibmcge
-  net: hibmcge: Add maintainer for hibmcge
-  net: add ndo_validate_addr check in dev_set_mac_address
-
- MAINTAINERS                                   |   7 +
- drivers/net/ethernet/hisilicon/Kconfig        |  16 +-
- drivers/net/ethernet/hisilicon/Makefile       |   1 +
- .../net/ethernet/hisilicon/hibmcge/Makefile   |  10 +
- .../ethernet/hisilicon/hibmcge/hbg_common.h   | 137 ++++++
- .../ethernet/hisilicon/hibmcge/hbg_ethtool.c  |  17 +
- .../ethernet/hisilicon/hibmcge/hbg_ethtool.h  |  11 +
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 281 ++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |  59 +++
- .../net/ethernet/hisilicon/hibmcge/hbg_irq.c  | 125 ++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_irq.h  |  11 +
- .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 257 +++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_mdio.c | 245 ++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_mdio.h |  12 +
- .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  | 143 ++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_txrx.c | 422 ++++++++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_txrx.h |  37 ++
- net/core/dev.c                                |   5 +
- 18 files changed, 1795 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/Makefile
+ .../ethernet/hisilicon/hibmcge/hbg_common.h   | 16 ++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 83 +++++++++++++++++++
+ 2 files changed, 99 insertions(+)
  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.h
  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h
 
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
+new file mode 100644
+index 000000000000..614650e9a71f
+--- /dev/null
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
+@@ -0,0 +1,16 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/* Copyright (c) 2024 Hisilicon Limited. */
++
++#ifndef __HBG_COMMON_H
++#define __HBG_COMMON_H
++
++#include <linux/netdevice.h>
++#include <linux/pci.h>
++
++struct hbg_priv {
++	struct net_device *netdev;
++	struct pci_dev *pdev;
++	u8 __iomem *io_base;
++};
++
++#endif
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+new file mode 100644
+index 000000000000..65c03b352153
+--- /dev/null
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+@@ -0,0 +1,83 @@
++// SPDX-License-Identifier: GPL-2.0+
++// Copyright (c) 2024 Hisilicon Limited.
++
++#include <linux/etherdevice.h>
++#include <linux/netdevice.h>
++#include <linux/pci.h>
++#include "hbg_common.h"
++
++static int hbg_pci_init(struct pci_dev *pdev)
++{
++	struct net_device *netdev = pci_get_drvdata(pdev);
++	struct hbg_priv *priv = netdev_priv(netdev);
++	struct device *dev = &pdev->dev;
++	int ret;
++
++	ret = pcim_enable_device(pdev);
++	if (ret)
++		return dev_err_probe(dev, ret, "failed to enable PCI device\n");
++
++	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
++	if (ret)
++		return dev_err_probe(dev, ret, "failed to set PCI DMA mask\n");
++
++	ret = pcim_iomap_regions(pdev, BIT(0), dev_driver_string(dev));
++	if (ret)
++		return dev_err_probe(dev, ret, "failed to map PCI bar space\n");
++
++	priv->io_base = pcim_iomap_table(pdev)[0];
++	if (!priv->io_base)
++		return dev_err_probe(dev, -ENOMEM, "failed to get io base\n");
++
++	pci_set_master(pdev);
++	return 0;
++}
++
++static int hbg_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
++{
++	struct device *dev = &pdev->dev;
++	struct net_device *netdev;
++	struct hbg_priv *priv;
++	int ret;
++
++	netdev = devm_alloc_etherdev_mqs(dev, sizeof(struct hbg_priv), 1, 1);
++	if (!netdev)
++		return -ENOMEM;
++
++	pci_set_drvdata(pdev, netdev);
++
++	SET_NETDEV_DEV(netdev, dev);
++
++	priv = netdev_priv(netdev);
++	priv->netdev = netdev;
++	priv->pdev = pdev;
++
++	ret = hbg_pci_init(pdev);
++	if (ret)
++		return ret;
++
++	ret = devm_register_netdev(dev, netdev);
++	if (ret)
++		return dev_err_probe(dev, ret, "failed to register netdev\n");
++
++	netif_carrier_off(netdev);
++	return 0;
++}
++
++static const struct pci_device_id hbg_pci_tbl[] = {
++	{PCI_VDEVICE(HUAWEI, 0x3730), 0},
++	{ }
++};
++MODULE_DEVICE_TABLE(pci, hbg_pci_tbl);
++
++static struct pci_driver hbg_driver = {
++	.name		= "hibmcge",
++	.id_table	= hbg_pci_tbl,
++	.probe		= hbg_probe,
++};
++module_pci_driver(hbg_driver);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Huawei Tech. Co., Ltd.");
++MODULE_DESCRIPTION("hibmcge driver");
++MODULE_VERSION("1.0");
 -- 
 2.33.0
 
