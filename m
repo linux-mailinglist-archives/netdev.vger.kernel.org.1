@@ -1,266 +1,107 @@
-Return-Path: <netdev+bounces-123916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC0EC966D68
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 02:22:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F4A1966D84
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 02:27:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79C3728506D
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 00:22:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA4161F238D1
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 00:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51AA184F;
-	Sat, 31 Aug 2024 00:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B9F1D1319;
+	Sat, 31 Aug 2024 00:27:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="UJClZ7qa";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LtRXlSSb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AbpOMhUU"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh5-smtp.messagingengine.com (fhigh5-smtp.messagingengine.com [103.168.172.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B9063A9;
-	Sat, 31 Aug 2024 00:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48B91D12F1
+	for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 00:27:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725063581; cv=none; b=OSoQ90M3xkqlLdhEznsmz/buU554jRlwtxyNE08uQwRqN5c7YZfY4k86J7BRj+2pFNXyKmj/dxfna5U9ZmoWB+b5nrzi7TbexAGGpX5K7k5TNyLChmTZn4dOqJjKuAorKDVhGrsThvDKZEJrSlouKjMsmKSxVP3l2vf+0XHFnbc=
+	t=1725064064; cv=none; b=JnqNGyo2pOjszafFZE3Fo14DpzkwZE2Y9DX0kqpBSm1gazY2EpDHhK8l602qwoMl2S5eb7Lq3lcsx8NV6S2jkMphBH9JN+98Af9P3BT4Gq0VIFR8bH6yZ5stkkAi7NqSrzenDX7nec4IGV/GwaEOnv93s9fbWYyl+cl5zkTny9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725063581; c=relaxed/simple;
-	bh=Xit+zkVOBlL3WyOtKLFfILoFr16PkK9e1KukdDCKCms=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=UCWHY/+bX7hlKqqSk/+joLci3kam6kQiZ6my43DA2VILnT49aniwk2gv0KzuAiOrcOZw254VwJD5SeUX9iDo1LEnHWd8db79VT1TNrsOyM3GOSo5VZxd+tzBoRZ+d5xjf7mThMCb4FGKf8XdlzsDsZGRWhTd4bkb4xLmige9yIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=UJClZ7qa; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LtRXlSSb; arc=none smtp.client-ip=103.168.172.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-03.internal (phl-compute-03.nyi.internal [10.202.2.43])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id A62AC11402B6;
-	Fri, 30 Aug 2024 20:19:38 -0400 (EDT)
-Received: from phl-imap-08 ([10.202.2.84])
-  by phl-compute-03.internal (MEProxy); Fri, 30 Aug 2024 20:19:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1725063578;
-	 x=1725149978; bh=1HRunSKQ4x8fkLSvpoO3iIkHr9AmUojJnMboig4OCPc=; b=
-	UJClZ7qa6wlu6Dj7jVVyD8UTfCFkR0mv56tuyskSSR8PunRMeJQtUSkYE1RbGeWL
-	EqxpFdOpevhzcW4ds6/x8l03oBDRfxQ1BiGQFO1UQIo7yxfc/rCpKgQ5PU4Y7iYS
-	ANQdbFtSgF8mK5VeGz+EIQ4a2sSXPk8QP2z8sIhD1Yb2HQbNP4ghwYX5QofzPAtg
-	3OyvcJaAvKtCEdj3DmP85ey5CEpAYTnL3lawzVaBa3SXkY9Q1DTFdeNUL5EHTPPx
-	yKKSsFMjP+4u7BeJhz13u0iS8QMFAsmdH0XL1zgOiej+ofSFbRs1wYvPrJqleVSM
-	8w3QMUpRN2zmVSAQMZK2DQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1725063578; x=
-	1725149978; bh=1HRunSKQ4x8fkLSvpoO3iIkHr9AmUojJnMboig4OCPc=; b=L
-	tRXlSSb4SmsrLPtfOPWfv+HuqaezDNUAO4Q3eeiLgLK/si7TtK3/tVxOzEHaM9U2
-	yQuoQ2Kf0rUEOVhy39NmLi4vBdVOZB142gTqd7ePddVSJ09yX1tT7njeeG9fDHdX
-	GGvLN+CuuW6Xa+cxDNtkn1HzBw7DGE1dBbpUBnEQDGh4N7HOvug/KaXoqMOwFxcO
-	eKg8+9x3ccoiKyevJzWkJ8Zg4zOVrsOiPIbNGgTUV1rHOJUyr+2891vZkxEEQwZz
-	k6HyWT9rPo2NBKJMPgMgjvVuKlK3CwZ87JuIE81yOTSR0VeFfTM+Wm6GI1jEEvfJ
-	eZWxGOmyU59OGvUcQK7dw==
-X-ME-Sender: <xms:mWHSZm4Ao1Wd85dKLrgqp8mXrM7VsFsPuTUSmHA0j2kMyv0BFER2aQ>
-    <xme:mWHSZv4eKPqSoIBDZxRi_Fl3lVLc_R95wqICE__xaIjYvyFhiXlw4unm3dQR3bVtE
-    1aGpusATy-s7TixMw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudefjedgfedvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnegfrhhlucfvnfffucdlfeehmdenucfjughrpefoggffhffvvefk
-    jghfufgtgfesthejredtredttdenucfhrhhomhepfdffrghnihgvlhcuighufdcuoegugi
-    husegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeegleeifffhudduueekhfei
-    fefgffegudelveejfeffueekgfdtledvvdeffeeiudenucevlhhushhtvghrufhiiigvpe
-    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiiipdhnsggp
-    rhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehjohhhnhdrfhgrshhtrggsvghn
-    ugesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
-    gtohhmpdhrtghpthhtoheprghlvghkshgrnhguvghrrdhlohgsrghkihhnsehinhhtvghl
-    rdgtohhmpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtg
-    hpthhtoheprghnughrihhisehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrshhtsehk
-    vghrnhgvlhdrohhrghdprhgtphhtthhopehhrgifkheskhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:mWHSZle-dVxZzBjilfXvCp0DwryT3oFiZ8pWygwMqnpznMxqJSJk4Q>
-    <xmx:mWHSZjKhO1ax2s2E3gQLD6ZxMfXHpDASVAIvLwA55HFHGBSiWi1d3Q>
-    <xmx:mWHSZqJSknzf8N_tERiitFhN6jUAM00XaoBSMRBB4N3giPZdNlhzsg>
-    <xmx:mWHSZkxXyaoEa3EywarhPWxH0sEipjSCicc03a4p32iJ4mbw8MjI-A>
-    <xmx:mmHSZsgbc17hu8EMcdhgMMLsSAL52hS78FusZ0uKLyDxQ7vKHvHmCpYD>
-Feedback-ID: i6a694271:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id A6C4D18A0065; Fri, 30 Aug 2024 20:19:37 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1725064064; c=relaxed/simple;
+	bh=XD3UyF4ucxrrGn8yBNqldCRojcXGYf4CpHbfttEnyAY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ljRLRNgD7otOkoWHxT9cgl9h01V5KB0vy4lIHHtuSoQBf5Pd9D1DqbXSN5cQnNeNkPkUuYiX+bgscQSjneL1owlGqIPdhLFCVfeR0rnuXFOePGAJ5lDvpkC5nvkn5pLKfmfY3SdX0rt9bWMNTmtTXO66LpNsOIsZHWFXR37+N2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AbpOMhUU; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-53346132348so3056260e87.2
+        for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 17:27:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1725064061; x=1725668861; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XD3UyF4ucxrrGn8yBNqldCRojcXGYf4CpHbfttEnyAY=;
+        b=AbpOMhUUegX2EcqsJ3JxBIpYCZuhLtZ0NLR+etl6WyryT4D5J45KY/RMPVXJL+k3ZE
+         8YGL19NGuEoL/X+dssnpXRGUZ1TZbHXnekEYz/JltdyCvnbk88pzTIJdVTEYusmexGeR
+         TAtgyln+Xcnp6/gfXlHVZ+SBIT3kPf05nIujJ8oIAJyOr8IvQJOPmxUUwlSZTcYuMjr/
+         xKO+umanB6yzWHkACqpdRlg0dQkreRNXEJhVVyphkKP152tpoXTyhJBd9Eqxj+21Ssx4
+         /Tr7gaYrKdNJ8WtsHQB/NxFZSPdfSHmGDmUVyxXyvQz8zoyG7aCNh7uQOPTom7a0jFD6
+         WpWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725064061; x=1725668861;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XD3UyF4ucxrrGn8yBNqldCRojcXGYf4CpHbfttEnyAY=;
+        b=dDvQ4y+R+3u3sMpFovvXpgUbAK1tRTB4UvDptnEtJF1UMX6jqu3Czm2ozZx74F2tuM
+         rdqlt4QYyXoC4DOnIMfU0NTI4wJFLPMRl/tDJNb1/b9qg9URp8gR9sWGr2zr2D+vf2Ft
+         0TfKSW8C+PSDSFcbJI27mlyR9r7RD+EzHf4caUBBeSqQmN6ygVY2rjjE0RPA0d9dTCko
+         8KHSzhfoxvIv3m24lDXiWtv2B3yLzP397DHO8FORyCQwURRDVlSvMmrvVOmqG63swieR
+         VTyyaCdxO7vSLy89hHeKdWE3DsDe/B+D8CRtYnen/UsSOfSzY0G8nP8/4Q5rVfdGXj3s
+         YYqA==
+X-Forwarded-Encrypted: i=1; AJvYcCXFz1Fk8vJORqg3bOgo4lVeJgH/wfoukh7irPCaXF2gINqAr4oryAWP0D7Bd6c0bP96GREEhhU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNv34jJjwCFDrCaE346JnqHx76YWaL9JYJfOLJXORSBFVcbQIh
+	84W5OB5d8+/Wbj/BfpAUuiTorq8Nm4WpOQVBEWkGGKl9ryQ+0LaLye8gW08nR2ExZef0UChElCw
+	629K5e7hLhU73pE1isp09QGOwke+Txj1M3Twfe2ETIIu4FfjPZcYG6cQ=
+X-Google-Smtp-Source: AGHT+IHc0rl9VeSL57YdWlFMwEoLeCzgfejvX4SXrv0nrsPMFUsNQkWzfq4zXN4o37PcuYMD0LKESoOuVnjj3KPhXlI=
+X-Received: by 2002:a05:6512:ba7:b0:52f:c24b:1767 with SMTP id
+ 2adb3069b0e04-53546aff12cmr2552441e87.19.1725064060067; Fri, 30 Aug 2024
+ 17:27:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 30 Aug 2024 17:19:17 -0700
-From: "Daniel Xu" <dxu@dxuuu.xyz>
-To: "Alexander Lobakin" <aleksander.lobakin@intel.com>,
- "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "Andrii Nakryiko" <andrii@kernel.org>
-Cc: "Lorenzo Bianconi" <lorenzo@kernel.org>,
- "John Fastabend" <john.fastabend@gmail.com>,
- "Jesper Dangaard Brouer" <hawk@kernel.org>,
- "Martin KaFai Lau" <martin.lau@linux.dev>,
- "David Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-Id: <60cbe452-e1f3-4507-9b3b-563906eccb15@app.fastmail.com>
-In-Reply-To: <20240830162508.1009458-4-aleksander.lobakin@intel.com>
-References: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
- <20240830162508.1009458-4-aleksander.lobakin@intel.com>
-Subject: Re: [PATCH bpf-next 3/9] net: napi: add ability to create CPU-pinned threaded
- NAPI
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+References: <20240822200252.472298-1-wangfe@google.com> <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
+ <20240828112619.GA8373@unreal> <CADsK2K-mnrz8TV-8-BvBU0U9DDzJhZF2GGM22vgA6GMpvK556w@mail.gmail.com>
+ <20240829103846.GE26654@unreal> <CADsK2K8KqJThB3pkz7oAZT_4yXgy8v89TK83W50KaR-VSSKjOg@mail.gmail.com>
+ <20240830143051.GA4000@unreal>
+In-Reply-To: <20240830143051.GA4000@unreal>
+From: Feng Wang <wangfe@google.com>
+Date: Fri, 30 Aug 2024 17:27:29 -0700
+Message-ID: <CADsK2K8+sEGwLSX_Q2nxcOosbGFFKjfKb2ffRXK2E1sp_Fbd+Q@mail.gmail.com>
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, 
+	antony.antony@secunet.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hi Leon,
 
+I believe you are right about the mlx5e_ipsec_feature_check function.
+And it shows that the driver can indeed make use of the SA
+information. Similarly, in packet offload mode, drivers can
+potentially leverage this information for their own purposes. The
+patch is designed to be non-intrusive, so drivers that don't utilize
+this information won't be affected in any way.
 
-On Fri, Aug 30, 2024, at 9:25 AM, Alexander Lobakin wrote:
-> From: Lorenzo Bianconi <lorenzo@kernel.org>
->
-> Add netif_napi_add_percpu() to pin NAPI in threaded mode to a particular
-> CPU. This means, if the NAPI is not threaded, it will be run as usually,
-> but when switching to threaded mode, it will always be run on the
-> specified CPU.
-> It's not meant to be used in drivers, but might be useful when creating
-> percpu threaded NAPIs, for example, to replace percpu kthreads or
-> workers where a NAPI context is needed.
-> The already existing netif_napi_add*() are not anyhow affected.
->
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  include/linux/netdevice.h | 35 +++++++++++++++++++++++++++++++++--
->  net/core/dev.c            | 18 +++++++++++++-----
->  2 files changed, 46 insertions(+), 7 deletions(-)
->
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index ca5f0dda733b..4d6fb0ccdea1 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -377,6 +377,7 @@ struct napi_struct {
->  	struct list_head	dev_list;
->  	struct hlist_node	napi_hash_node;
->  	int			irq;
-> +	int			thread_cpuid;
->  };
-> 
->  enum {
-> @@ -2619,8 +2620,18 @@ static inline void netif_napi_set_irq(struct 
-> napi_struct *napi, int irq)
->   */
->  #define NAPI_POLL_WEIGHT 64
-> 
-> -void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
-> -			   int (*poll)(struct napi_struct *, int), int weight);
-> +void netif_napi_add_weight_percpu(struct net_device *dev,
-> +				  struct napi_struct *napi,
-> +				  int (*poll)(struct napi_struct *, int),
-> +				  int weight, int thread_cpuid);
-> +
-> +static inline void netif_napi_add_weight(struct net_device *dev,
-> +					 struct napi_struct *napi,
-> +					 int (*poll)(struct napi_struct *, int),
-> +					 int weight)
-> +{
-> +	netif_napi_add_weight_percpu(dev, napi, poll, weight, -1);
-> +}
-> 
->  /**
->   * netif_napi_add() - initialize a NAPI context
-> @@ -2665,6 +2676,26 @@ static inline void netif_napi_add_tx(struct 
-> net_device *dev,
->  	netif_napi_add_tx_weight(dev, napi, poll, NAPI_POLL_WEIGHT);
->  }
-> 
-> +/**
-> + * netif_napi_add_percpu() - initialize a CPU-pinned threaded NAPI 
-> context
-> + * @dev:  network device
-> + * @napi: NAPI context
-> + * @poll: polling function
-> + * @thread_cpuid: CPU which this NAPI will be pinned to
-> + *
-> + * Variant of netif_napi_add() which pins the NAPI to the specified 
-> CPU. No
-> + * changes in the "standard" mode, but in case with the threaded one, 
-> this
-> + * NAPI will always be run on the passed CPU no matter where scheduled.
-> + */
-> +static inline void netif_napi_add_percpu(struct net_device *dev,
-> +					 struct napi_struct *napi,
-> +					 int (*poll)(struct napi_struct *, int),
-> +					 int thread_cpuid)
-> +{
-> +	netif_napi_add_weight_percpu(dev, napi, poll, NAPI_POLL_WEIGHT,
-> +				     thread_cpuid);
-> +}
-> +
->  /**
->   *  __netif_napi_del - remove a NAPI context
->   *  @napi: NAPI context
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 98bb5f890b88..93ca3df8e9dd 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -1428,8 +1428,13 @@ static int napi_kthread_create(struct 
-> napi_struct *n)
->  	 * TASK_INTERRUPTIBLE mode to avoid the blocked task
->  	 * warning and work with loadavg.
->  	 */
-> -	n->thread = kthread_run(napi_threaded_poll, n, "napi/%s-%d",
-> -				n->dev->name, n->napi_id);
-> +	if (n->thread_cpuid >= 0)
-> +		n->thread = kthread_run_on_cpu(napi_threaded_poll, n,
-> +					       n->thread_cpuid, "napi/%s-%u",
-> +					       n->dev->name);
-> +	else
-> +		n->thread = kthread_run(napi_threaded_poll, n, "napi/%s-%d",
-> +					n->dev->name, n->napi_id);
->  	if (IS_ERR(n->thread)) {
->  		err = PTR_ERR(n->thread);
->  		pr_err("kthread_run failed with err %d\n", err);
-> @@ -6640,8 +6645,10 @@ void netif_queue_set_napi(struct net_device 
-> *dev, unsigned int queue_index,
->  }
->  EXPORT_SYMBOL(netif_queue_set_napi);
-> 
-> -void netif_napi_add_weight(struct net_device *dev, struct napi_struct 
-> *napi,
-> -			   int (*poll)(struct napi_struct *, int), int weight)
-> +void netif_napi_add_weight_percpu(struct net_device *dev,
-> +				  struct napi_struct *napi,
-> +				  int (*poll)(struct napi_struct *, int),
-> +				  int weight, int thread_cpuid)
->  {
->  	if (WARN_ON(test_and_set_bit(NAPI_STATE_LISTED, &napi->state)))
->  		return;
-> @@ -6664,6 +6671,7 @@ void netif_napi_add_weight(struct net_device 
-> *dev, struct napi_struct *napi,
->  	napi->poll_owner = -1;
->  #endif
->  	napi->list_owner = -1;
-> +	napi->thread_cpuid = thread_cpuid;
->  	set_bit(NAPI_STATE_SCHED, &napi->state);
->  	set_bit(NAPI_STATE_NPSVC, &napi->state);
->  	list_add_rcu(&napi->dev_list, &dev->napi_list);
-> @@ -6677,7 +6685,7 @@ void netif_napi_add_weight(struct net_device 
-> *dev, struct napi_struct *napi,
->  		dev->threaded = false;
->  	netif_napi_set_irq(napi, -1);
->  }
-> -EXPORT_SYMBOL(netif_napi_add_weight);
-> +EXPORT_SYMBOL(netif_napi_add_weight_percpu);
-> 
->  void napi_disable(struct napi_struct *n)
->  {
-> -- 
-> 2.46.0
+I'm also curious about why the mlx driver doesn't seem to use the XFRM
+interface ID in the same way that xfrm_policy_match() does.
+https://elixir.bootlin.com/linux/v6.10.7/source/net/xfrm/xfrm_policy.c#L1993
+This ID is critical in scenarios with multiple IPsec tunnels, where
+source and destination addresses alone might not be sufficient to
+identify the correct security policy. Perhaps there's a specific
+reason or design choice behind this in the mlx driver?
 
-Acked-by: Daniel Xu <dxu@dxuuu.xyz>
+Thank you once again for your valuable insights and collaboration.
+
+Feng
 
