@@ -1,185 +1,117 @@
-Return-Path: <netdev+bounces-123983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 853BF96724C
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 17:01:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9563D9672BE
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 18:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1010D1F220BE
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 15:01:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 397591F2245F
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 16:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A66BC111A8;
-	Sat, 31 Aug 2024 15:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55F0542A91;
+	Sat, 31 Aug 2024 16:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PgQ8SZJG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y6Y+WHKW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180DFA932
-	for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 15:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC0D1F95A;
+	Sat, 31 Aug 2024 16:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725116466; cv=none; b=r/wXD24+4RINtHw0lvAi886wC95w6GujyeQ3cB0+1XXO4KKrHfVq/Cf7s4uF5BIswScBZPb/eub1p3Dk/6xqH2mRejWq7DHgqqLFWCDktHrRwfjEe/CjLrp+6hpczFA75UgqEjtOTI2ukV3cMh9HpvztjKyYuocgP2lzXVZpzo0=
+	t=1725123032; cv=none; b=nnAda4FP+uGSPtSQCHsnI59yUhdO+RR4FD+3KMe/mFBFbGS2Oa7wfTPyNm9AGiktHgrqicJUEbHelz19l3c72COJ3utngf/7Xg3cHE9ns5LLUTM30nq0arpw5D8zXc4sT1JOkCwJ1SzUcNzSWPytqazRIU8HHDReILeyhahbGGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725116466; c=relaxed/simple;
-	bh=3c2alasJWTHKjcO5Bclam6pAJcKezorX+rP0ZbsGNlw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ger3Uvo4TmSy9rpwaQKq9C4krODg5ziZZOMCRkoDpgafoh0BUf3uTuGX0ku23yd1dxoQWRSat2pCuST/G98kzydKRxUQOK2OThguS916aDJlcppGIFVRBHlqpy4byry2L05bZdFJKIQqeZs42XBcqN2xjVTNM1D/bA4xTtu5pXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PgQ8SZJG; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-39f376eacfaso10979775ab.2
-        for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 08:01:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725116464; x=1725721264; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8035Cu7gqofEr9nB9b7hKYigwVwejfvE8zaGtib7E28=;
-        b=PgQ8SZJG5xDTbjXglg3WKrUgEhwMVKOH1Cppamgfu1Nw/B9A+TKJpWtYDbhn5JoEoI
-         YY29nl9Ky3UZZzVnNMmCUwdiehV/m6IqR8SK9wDSo87C7dL5aDNUxvnybw4p3TyLrT5O
-         c+UBSt72l6hu22kKTjtCyQzskB5I4KoQ0vZGBUXl1mocWfT0dvu3kb4gUa/GRJflsLxo
-         qPj9Aq3bnvpswMsQ14aF2Vk3riw8KAIHgcCZfLRh3E8D9/v4yYrFpgqlwiiNs3tF/4H/
-         m56ZGOXSCXN1SseQKdz/1582dFxC1jfss0plkaLxd3Ci8RTGv0WnhFiW6rbFihuada8k
-         TQPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725116464; x=1725721264;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8035Cu7gqofEr9nB9b7hKYigwVwejfvE8zaGtib7E28=;
-        b=ZtSr6yuySNNPUPDHP7jvVK/iXcLdxgH7/bI0hRf+HXQC9iYpJ3OydHRiqRu6TsMjy7
-         An2kJr/C+eszm93GF8H3lO7C7WW4OsZW25h/rZ43q6aTHbf8I9dVgcK5wQ6/JdA4gdTD
-         vNc79uXypJi8bjzgNyEsQoou0fGsESXA3rr2GiHH3Pi9jWfIfkqjuBQJMD5YYpS7GMVe
-         +wOZNarW0tvJctCx67GRbgaHm5IzTenXeAKWtvbIU6xcdJ5qqwPnLUs+oY2SViUEkKU0
-         bPI7xAsgDQStQYV9hi7yc7AMjWjxVoRTuoCaJD2xwOolPaaSUfqmOq7UX6Iby5GtcvGA
-         Ehzg==
-X-Forwarded-Encrypted: i=1; AJvYcCXrpnX3MylinawRSiQVmrMAFwtHD/SPAEiigEfkNEbw/inrvENM5zJCdWnU8EK0wQf6dz4/5a4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQLAhGpZSeo0sacr9I2kEhkMuFBLk98jz525LqGCEQ5d0Qz/3Z
-	w2BXCCGvQuaYhFRoGwcavU1EDQxqzm2kNZmkLrPg251g+wJ4G+BVMwwxa/rMGDn8YFfvbbn/P4D
-	G+rpJv/jDfx6UgVSL5yaXzmmFfJtg3Ox8Gss=
-X-Google-Smtp-Source: AGHT+IE+1B+XIoQIikH2XXuIk+21t1mIhIguzAr/pN5tW2k5L60lldCumBzGTNmoQ4JTESMS3CXqvACh/X2fJnoCEDk=
-X-Received: by 2002:a05:6e02:1fc5:b0:39e:6e47:814d with SMTP id
- e9e14a558f8ab-39f378ed22emr102923125ab.2.1725116463670; Sat, 31 Aug 2024
- 08:01:03 -0700 (PDT)
+	s=arc-20240116; t=1725123032; c=relaxed/simple;
+	bh=XyJLHVijAzXiQHfu/LNw06AadgdkocpqbU9UqYzFAbs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=AbBaMuyeVJe5lCaC/p0Tedcc20iIPFLy+nB6Z+HkAXvusgPUAlvD8AeQvR8IaiYIXB+YTi/YhvD8IviTrcJPE6Hx0z+PZpmMrQuajcaYU+LJawpBGNXQKH3wOSrr4yOTpov9swh+jrNmpx+u7Kl2SEPeTwg+AVPQTwQWKkDEnwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y6Y+WHKW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A828CC4CEC0;
+	Sat, 31 Aug 2024 16:50:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725123031;
+	bh=XyJLHVijAzXiQHfu/LNw06AadgdkocpqbU9UqYzFAbs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Y6Y+WHKWE6mOG0UqIZrNs4nxBVjvbDhldOWj3CkhwkFx2svk/F8q4m9buTI/gJ79J
+	 cze2eVTTax1MMc2i2nQk3Tj2uFtv/WhpfMS8QqQS9TAkOR7H3eIpGCJvv0Jiiv98oN
+	 4/Cu+wmQtZwHcYvEG+ccmbPQTYrGmbpaF6uMy5H46s64gK/mmuGz2ibLqIjb4cU31e
+	 Lu2BTCKR9MYjNOVQZ+dLezGgraqLWiUDaRCwcM8HOuDRWthlfTBQpKXaAouWiu4lfU
+	 1n7h04IfwrAoa7RLhKmhKnWv7b51jx+gzpuEXLR8uyGkGXjrxiAdAbj03unuEzBMGi
+	 WQhn8iPJmXsGg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713373809A80;
+	Sat, 31 Aug 2024 16:50:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240830153751.86895-1-kerneljasonxing@gmail.com>
- <20240830153751.86895-2-kerneljasonxing@gmail.com> <66d32d9766371_3fa17629413@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66d32d9766371_3fa17629413@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 31 Aug 2024 23:00:27 +0800
-Message-ID: <CAL+tcoAxVG7xpjXG+gyqoJjspn16F3Nfq5-8BoyVqO13qFm5xg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/2] net-timestamp: filter out report when
- setting SOF_TIMESTAMPING_SOFTWARE
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 00/12] Unmask upper DSCP bits - part 2
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172512303227.2897375.10297069392571064584.git-patchwork-notify@kernel.org>
+Date: Sat, 31 Aug 2024 16:50:32 +0000
+References: <20240829065459.2273106-1-idosch@nvidia.com>
+In-Reply-To: <20240829065459.2273106-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, gnault@redhat.com,
+ dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ martin.lau@linux.dev, john.fastabend@gmail.com, steffen.klassert@secunet.com,
+ herbert@gondor.apana.org.au, bpf@vger.kernel.org
 
-On Sat, Aug 31, 2024 at 10:50=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > introduce a new flag SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER in the
-> > receive path. User can set it with SOF_TIMESTAMPING_SOFTWARE to filter
-> > out rx timestamp report, especially after a process turns on
-> > netstamp_needed_key which can time stamp every incoming skb.
-> >
-> > Previously, We found out if an application starts first which turns on
-> > netstamp_needed_key, then another one only passing SOF_TIMESTAMPING_SOF=
-TWARE
-> > could also get rx timestamp. Now we handle this case by introducing thi=
-s
-> > new flag without breaking users.
-> >
-> > In this way, we have two kinds of combination:
-> > 1. setting SOF_TIMESTAMPING_SOFTWARE|SOF_TIMESTAMPING_RX_SOFTWARE, it
-> > will surely allow users to get the rx timestamp report.
-> > 2. setting SOF_TIMESTAMPING_SOFTWARE|SOF_TIMESTAMPING_OPT_RX_SOFTWARE_F=
-ILTER
-> > while the skb is timestamped, it will stop reporting the rx timestamp.
->
-> The one point this commit does not explain is why a process would want
-> to request software timestamp reporting, but not receive software
-> timestamp generation. The only use I see is when the application does
-> request SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_TX_SOFTWARE.
+Hello:
 
-Yes, you're right.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
->
-> > Another thing about errqueue in this patch I have a few words to say:
-> > In this case, we need to handle the egress path carefully, or else
-> > reporting the tx timestamp will fail. Egress path and ingress path will
-> > finally call sock_recv_timestamp(). We have to distinguish them.
-> > Errqueue is a good indicator to reflect the flow direction.
->
-> Good find on skb_is_err_queue rather than open-coding PACKET_OUTGOING.
->
-> > Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+On Thu, 29 Aug 2024 09:54:47 +0300 you wrote:
+> tl;dr - This patchset continues to unmask the upper DSCP bits in the
+> IPv4 flow key in preparation for allowing IPv4 FIB rules to match on
+> DSCP. No functional changes are expected. Part 1 was merged in commit
+> ("Merge branch 'unmask-upper-dscp-bits-part-1'").
+> 
+> The TOS field in the IPv4 flow key ('flowi4_tos') is used during FIB
+> lookup to match against the TOS selector in FIB rules and routes.
+> 
+> [...]
 
-Thanks for your review:)
+Here is the summary with links:
+  - [net-next,v2,01/12] ipv4: Unmask upper DSCP bits in RTM_GETROUTE output route lookup
+    https://git.kernel.org/netdev/net-next/c/47afa284b96c
+  - [net-next,v2,02/12] ipv4: Unmask upper DSCP bits in ip_route_output_key_hash()
+    https://git.kernel.org/netdev/net-next/c/a63cef46adcb
+  - [net-next,v2,03/12] ipv4: icmp: Unmask upper DSCP bits in icmp_route_lookup()
+    https://git.kernel.org/netdev/net-next/c/4805646c42e5
+  - [net-next,v2,04/12] ipv4: Unmask upper DSCP bits in ip_sock_rt_tos()
+    https://git.kernel.org/netdev/net-next/c/ff95cb5e521b
+  - [net-next,v2,05/12] ipv4: Unmask upper DSCP bits in get_rttos()
+    https://git.kernel.org/netdev/net-next/c/356d054a4967
+  - [net-next,v2,06/12] ipv4: Unmask upper DSCP bits when building flow key
+    https://git.kernel.org/netdev/net-next/c/f6c89e95555a
+  - [net-next,v2,07/12] xfrm: Unmask upper DSCP bits in xfrm_get_tos()
+    https://git.kernel.org/netdev/net-next/c/b261b2c6c18b
+  - [net-next,v2,08/12] ipv4: Unmask upper DSCP bits in ip_send_unicast_reply()
+    https://git.kernel.org/netdev/net-next/c/13f6538de2b8
+  - [net-next,v2,09/12] ipv6: sit: Unmask upper DSCP bits in ipip6_tunnel_xmit()
+    https://git.kernel.org/netdev/net-next/c/6a59526628ad
+  - [net-next,v2,10/12] ipvlan: Unmask upper DSCP bits in ipvlan_process_v4_outbound()
+    https://git.kernel.org/netdev/net-next/c/939cd1abf080
+  - [net-next,v2,11/12] vrf: Unmask upper DSCP bits in vrf_process_v4_outbound()
+    https://git.kernel.org/netdev/net-next/c/c5d8ffe29cf2
+  - [net-next,v2,12/12] bpf: Unmask upper DSCP bits in __bpf_redirect_neigh_v4()
+    https://git.kernel.org/netdev/net-next/c/50033400fc3a
 
->
-> > ---
-> > 1. Willem suggested this alternative way to solve the issue, so I
-> > added his Suggested-by tag here. Thanks!
-> > ---
-> >  Documentation/networking/timestamping.rst | 12 ++++++++++++
-> >  include/uapi/linux/net_tstamp.h           |  3 ++-
-> >  net/core/sock.c                           |  4 ++++
-> >  net/ethtool/common.c                      |  1 +
-> >  net/ipv4/tcp.c                            |  7 +++++--
-> >  net/socket.c                              |  5 ++++-
-> >  6 files changed, 28 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/Documentation/networking/timestamping.rst b/Documentation/=
-networking/timestamping.rst
-> > index 5e93cd71f99f..ef2a334d373e 100644
-> > --- a/Documentation/networking/timestamping.rst
-> > +++ b/Documentation/networking/timestamping.rst
-> > @@ -266,6 +266,18 @@ SOF_TIMESTAMPING_OPT_TX_SWHW:
-> >    two separate messages will be looped to the socket's error queue,
-> >    each containing just one timestamp.
-> >
-> > +SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER:
-> > +  Used in the receive software timestamp. Enabling the flag along with
-> > +  SOF_TIMESTAMPING_SOFTWARE will not report the rx timestamp to the
-> > +  userspace so that it can filter out the case where one process start=
-s
-> > +  first which turns on netstamp_needed_key through setting generation
-> > +  flags like SOF_TIMESTAMPING_RX_SOFTWARE, then another one only passi=
-ng
-> > +  SOF_TIMESTAMPING_SOFTWARE report flag could also get the rx timestam=
-p.
-> > +
-> > +  SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER prevents the application fro=
-m
-> > +  being influenced by others and let the application finally choose
-> > +  whether to report the timestamp in the receive path or not.
-> > +
->
-> nit, so no need to revise, but for next time:
->
-> Documentation should describe the current state, not a history of
-> changes (log), so wording like "finally" does not belong.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I learned it, and will bear it in my mind:)
 
-Thanks,
-Jason
 
