@@ -1,168 +1,266 @@
-Return-Path: <netdev+bounces-123915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4847B966D1D
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 01:59:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC0EC966D68
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 02:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5F6E284ADE
-	for <lists+netdev@lfdr.de>; Fri, 30 Aug 2024 23:59:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79C3728506D
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 00:22:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB65E18FC61;
-	Fri, 30 Aug 2024 23:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51AA184F;
+	Sat, 31 Aug 2024 00:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IzqFxfOc"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="UJClZ7qa";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LtRXlSSb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh5-smtp.messagingengine.com (fhigh5-smtp.messagingengine.com [103.168.172.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F8A17C7B3;
-	Fri, 30 Aug 2024 23:59:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0B9063A9;
+	Sat, 31 Aug 2024 00:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725062379; cv=none; b=EDhq6tt3gRFx+aaZ6+aWRmYtDv96cjHUXOP0Em3va4dFOigfzD94mhVU0Q+XW0Pq66LCZHIbrEgqjHg71D5lEHZlnYDjw2Ak/7SxeOnsKCcROlDxJG9ux7OJHzKOKNeNQerLc6lwklvSD5dO5taYC17izBiVvPAqyO2B1vw6vJQ=
+	t=1725063581; cv=none; b=OSoQ90M3xkqlLdhEznsmz/buU554jRlwtxyNE08uQwRqN5c7YZfY4k86J7BRj+2pFNXyKmj/dxfna5U9ZmoWB+b5nrzi7TbexAGGpX5K7k5TNyLChmTZn4dOqJjKuAorKDVhGrsThvDKZEJrSlouKjMsmKSxVP3l2vf+0XHFnbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725062379; c=relaxed/simple;
-	bh=WL+mPsmtKe4NMOEeuBOmY6UqNzIVj6D1MStQM/ZpovQ=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=oO8NQNV/A1KF7k8Ws85PH7SZ78F9VtAWDocW0VT/cRNiDy0nCAfQ7iJNHB79ChXPW0yJA/1DdFnMkB+MejFjLyt15HjuCZhkBKPIYWCSrGjKxkhcp6HDIgVvVP8sbCqpdt2yUrXb7FuDbC8WnCwdcKRem5rffesQM+b8Y7YSpvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IzqFxfOc; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-204f52fe74dso21800285ad.1;
-        Fri, 30 Aug 2024 16:59:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725062377; x=1725667177; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=sr+m/MCpvguQ1PEITzYf3gtI8iZ+jxmN3Qz312mDJ+Y=;
-        b=IzqFxfOcCPeD18j2W4AzZS4uCmPV9NotUrQQPdRUVREpKfYJmFOYjVT9tAeA27bqkt
-         GXyXqJ5SUTepvHwbNQnyFjrQPrwcRp0RtOegjANilXmP0jIzM2eIRbWmiAyvYjca0aq8
-         WB76aUQo/FVteFQWBugzIdQDN9eLo723me2zeh/g16NxQp5+zBHPseKbUulISNsxliYQ
-         nohT/7F+0Zu2s4WvN4vr392S96+VO4riqgR4JhOow7s1o8pi/MniUV5sAmCl691k8kLR
-         DM6gAQfA8iv1N30lGIJXbHsd+hzlsbGejyIctk+vqcXaVDKIQZUrBQSZv/Q72A5Tlgnv
-         YynQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725062377; x=1725667177;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:from:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sr+m/MCpvguQ1PEITzYf3gtI8iZ+jxmN3Qz312mDJ+Y=;
-        b=CRb9Dj31Tjp15tv923jDNmSZp/LBiPyqKgR0mn8BgWVomxUr8cj1jT0bqw4xzhNVsQ
-         CfLezHc9hRDYZc64QrRKbgJSAtkgc2UIMh3cpXDWIW9QNP75xiRPKsQYQILul1xkmiR/
-         y4BUx4VYB0lQVJ/SuwgvhnKCRja6rQ9jlygAi7G5WqCUbB2xrWFNV7+ItbfFIqjVBiX2
-         isZXMF8mfjQ0l+VPpLqR8JdEx6ggP5SRoJB0Ewf977E0vx/kwApmrdrMETp4cDKdQ7Hd
-         oHwNPmEA7M4teJdZMhXQ0LDsvhxNpgrIT11izgU32/+UqMyHqqIzlmYcfYpgiiuiuJ24
-         iJ7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWdQCKBtecdtDJFs0O2SJsZhFTzbbJtT7SoPk7FfhlzkfOMlXZLD5BwM6S48lGGoz/BAUFmAO0F@vger.kernel.org, AJvYcCXR7QtmeKSMxmbYGWjhRKK2ZzrDoQ3g8BGXDjv8cALNWsn9JdFtp8dTlg7d+FYKuS5JryPDWSiFZow9pIo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/xhp1yAHQOf8FqFFm8SNdRj0BmrhpDEudsNU7kBu8GILuIxIb
-	PzHuY4/xdZLHq0SNPT+1IGROAp3epi1H+Szxm1/kIw8EYSUJpnq/
-X-Google-Smtp-Source: AGHT+IHAQjId6GpdvBN5Oyuv2ZrrV71Pt4bk2AIiEuJwheyfWAw667JccSxOY37LyeSAoczElPRHIw==
-X-Received: by 2002:a17:902:da86:b0:1fc:5ed5:ff56 with SMTP id d9443c01a7336-20546b55c5dmr8024345ad.61.1725062377258;
-        Fri, 30 Aug 2024 16:59:37 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2052a6843f3sm15745525ad.43.2024.08.30.16.59.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Aug 2024 16:59:36 -0700 (PDT)
-Message-ID: <95ce8d16-17bf-490e-a084-ac16fe8ba813@gmail.com>
-Date: Fri, 30 Aug 2024 16:59:35 -0700
+	s=arc-20240116; t=1725063581; c=relaxed/simple;
+	bh=Xit+zkVOBlL3WyOtKLFfILoFr16PkK9e1KukdDCKCms=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=UCWHY/+bX7hlKqqSk/+joLci3kam6kQiZ6my43DA2VILnT49aniwk2gv0KzuAiOrcOZw254VwJD5SeUX9iDo1LEnHWd8db79VT1TNrsOyM3GOSo5VZxd+tzBoRZ+d5xjf7mThMCb4FGKf8XdlzsDsZGRWhTd4bkb4xLmige9yIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=UJClZ7qa; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LtRXlSSb; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-03.internal (phl-compute-03.nyi.internal [10.202.2.43])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id A62AC11402B6;
+	Fri, 30 Aug 2024 20:19:38 -0400 (EDT)
+Received: from phl-imap-08 ([10.202.2.84])
+  by phl-compute-03.internal (MEProxy); Fri, 30 Aug 2024 20:19:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1725063578;
+	 x=1725149978; bh=1HRunSKQ4x8fkLSvpoO3iIkHr9AmUojJnMboig4OCPc=; b=
+	UJClZ7qa6wlu6Dj7jVVyD8UTfCFkR0mv56tuyskSSR8PunRMeJQtUSkYE1RbGeWL
+	EqxpFdOpevhzcW4ds6/x8l03oBDRfxQ1BiGQFO1UQIo7yxfc/rCpKgQ5PU4Y7iYS
+	ANQdbFtSgF8mK5VeGz+EIQ4a2sSXPk8QP2z8sIhD1Yb2HQbNP4ghwYX5QofzPAtg
+	3OyvcJaAvKtCEdj3DmP85ey5CEpAYTnL3lawzVaBa3SXkY9Q1DTFdeNUL5EHTPPx
+	yKKSsFMjP+4u7BeJhz13u0iS8QMFAsmdH0XL1zgOiej+ofSFbRs1wYvPrJqleVSM
+	8w3QMUpRN2zmVSAQMZK2DQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1725063578; x=
+	1725149978; bh=1HRunSKQ4x8fkLSvpoO3iIkHr9AmUojJnMboig4OCPc=; b=L
+	tRXlSSb4SmsrLPtfOPWfv+HuqaezDNUAO4Q3eeiLgLK/si7TtK3/tVxOzEHaM9U2
+	yQuoQ2Kf0rUEOVhy39NmLi4vBdVOZB142gTqd7ePddVSJ09yX1tT7njeeG9fDHdX
+	GGvLN+CuuW6Xa+cxDNtkn1HzBw7DGE1dBbpUBnEQDGh4N7HOvug/KaXoqMOwFxcO
+	eKg8+9x3ccoiKyevJzWkJ8Zg4zOVrsOiPIbNGgTUV1rHOJUyr+2891vZkxEEQwZz
+	k6HyWT9rPo2NBKJMPgMgjvVuKlK3CwZ87JuIE81yOTSR0VeFfTM+Wm6GI1jEEvfJ
+	eZWxGOmyU59OGvUcQK7dw==
+X-ME-Sender: <xms:mWHSZm4Ao1Wd85dKLrgqp8mXrM7VsFsPuTUSmHA0j2kMyv0BFER2aQ>
+    <xme:mWHSZv4eKPqSoIBDZxRi_Fl3lVLc_R95wqICE__xaIjYvyFhiXlw4unm3dQR3bVtE
+    1aGpusATy-s7TixMw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudefjedgfedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnegfrhhlucfvnfffucdlfeehmdenucfjughrpefoggffhffvvefk
+    jghfufgtgfesthejredtredttdenucfhrhhomhepfdffrghnihgvlhcuighufdcuoegugi
+    husegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpeegleeifffhudduueekhfei
+    fefgffegudelveejfeffueekgfdtledvvdeffeeiudenucevlhhushhtvghrufhiiigvpe
+    dtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiiipdhnsggp
+    rhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmh
+    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehjohhhnhdrfhgrshhtrggsvghn
+    ugesghhmrghilhdrtghomhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrd
+    gtohhmpdhrtghpthhtoheprghlvghkshgrnhguvghrrdhlohgsrghkihhnsehinhhtvghl
+    rdgtohhmpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtg
+    hpthhtoheprghnughrihhisehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrshhtsehk
+    vghrnhgvlhdrohhrghdprhgtphhtthhopehhrgifkheskhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:mWHSZle-dVxZzBjilfXvCp0DwryT3oFiZ8pWygwMqnpznMxqJSJk4Q>
+    <xmx:mWHSZjKhO1ax2s2E3gQLD6ZxMfXHpDASVAIvLwA55HFHGBSiWi1d3Q>
+    <xmx:mWHSZqJSknzf8N_tERiitFhN6jUAM00XaoBSMRBB4N3giPZdNlhzsg>
+    <xmx:mWHSZkxXyaoEa3EywarhPWxH0sEipjSCicc03a4p32iJ4mbw8MjI-A>
+    <xmx:mmHSZsgbc17hu8EMcdhgMMLsSAL52hS78FusZ0uKLyDxQ7vKHvHmCpYD>
+Feedback-ID: i6a694271:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id A6C4D18A0065; Fri, 30 Aug 2024 20:19:37 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [net-next,v3,1/1] net: stmmac: Batch set RX OWN flag and other
- flags
-To: ende.tan@starfivetech.com, netdev@vger.kernel.org
-Cc: andrew@lunn.ch, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mcoquelin.stm32@gmail.com, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, leyfoon.tan@starfivetech.com,
- minda.chen@starfivetech.com, endeneer@gmail.com
-References: <20240829134043.323855-1-ende.tan@starfivetech.com>
-Content-Language: en-US
-In-Reply-To: <20240829134043.323855-1-ende.tan@starfivetech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date: Fri, 30 Aug 2024 17:19:17 -0700
+From: "Daniel Xu" <dxu@dxuuu.xyz>
+To: "Alexander Lobakin" <aleksander.lobakin@intel.com>,
+ "Alexei Starovoitov" <ast@kernel.org>,
+ "Daniel Borkmann" <daniel@iogearbox.net>,
+ "Andrii Nakryiko" <andrii@kernel.org>
+Cc: "Lorenzo Bianconi" <lorenzo@kernel.org>,
+ "John Fastabend" <john.fastabend@gmail.com>,
+ "Jesper Dangaard Brouer" <hawk@kernel.org>,
+ "Martin KaFai Lau" <martin.lau@linux.dev>,
+ "David Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Message-Id: <60cbe452-e1f3-4507-9b3b-563906eccb15@app.fastmail.com>
+In-Reply-To: <20240830162508.1009458-4-aleksander.lobakin@intel.com>
+References: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
+ <20240830162508.1009458-4-aleksander.lobakin@intel.com>
+Subject: Re: [PATCH bpf-next 3/9] net: napi: add ability to create CPU-pinned threaded
+ NAPI
+Content-Type: text/plain
 Content-Transfer-Encoding: 7bit
 
-On 8/29/24 06:40, ende.tan@starfivetech.com wrote:
-> From: Tan En De <ende.tan@starfivetech.com>
-> 
-> Minimize access to the RX descriptor by collecting all the flags in a
-> local variable and then updating the descriptor at once.
-> 
-> Signed-off-by: Tan En De <ende.tan@starfivetech.com>
+
+
+On Fri, Aug 30, 2024, at 9:25 AM, Alexander Lobakin wrote:
+> From: Lorenzo Bianconi <lorenzo@kernel.org>
+>
+> Add netif_napi_add_percpu() to pin NAPI in threaded mode to a particular
+> CPU. This means, if the NAPI is not threaded, it will be run as usually,
+> but when switching to threaded mode, it will always be run on the
+> specified CPU.
+> It's not meant to be used in drivers, but might be useful when creating
+> percpu threaded NAPIs, for example, to replace percpu kthreads or
+> workers where a NAPI context is needed.
+> The already existing netif_napi_add*() are not anyhow affected.
+>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 > ---
-> v3:
-> - Use local variable to batch set the descriptor flags.
-> - This reduces the number of accesses to the descriptor.
-> v2: https://patchwork.kernel.org/project/netdevbpf/patch/20240821060307.46350-1-ende.tan@starfivetech.com/
-> - Avoid introducing a new function just to set the interrupt-on-completion
->    bit, as it is wasteful to do so.
-> - Delegate the responsibility of calling dma_wmb() from main driver code
->    to set_rx_owner() callbacks (i.e. let callbacks to manage the low-level
->    ordering/barrier rather than cluttering up the main driver code).
-> v1: https://patchwork.kernel.org/project/netdevbpf/patch/20240814092438.3129-1-ende.tan@starfivetech.com/
-> ---
->   drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c   | 6 ++++--
->   drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c | 6 ++++--
->   2 files changed, 8 insertions(+), 4 deletions(-)
+>  include/linux/netdevice.h | 35 +++++++++++++++++++++++++++++++++--
+>  net/core/dev.c            | 18 +++++++++++++-----
+>  2 files changed, 46 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index ca5f0dda733b..4d6fb0ccdea1 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -377,6 +377,7 @@ struct napi_struct {
+>  	struct list_head	dev_list;
+>  	struct hlist_node	napi_hash_node;
+>  	int			irq;
+> +	int			thread_cpuid;
+>  };
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-> index 1c5802e0d7f4..dfcbe7036988 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-> @@ -186,10 +186,12 @@ static void dwmac4_set_tx_owner(struct dma_desc *p)
->   
->   static void dwmac4_set_rx_owner(struct dma_desc *p, int disable_rx_ic)
->   {
-> -	p->des3 |= cpu_to_le32(RDES3_OWN | RDES3_BUFFER1_VALID_ADDR);
-> +	u32 flags = cpu_to_le32(RDES3_OWN | RDES3_BUFFER1_VALID_ADDR);
->   
->   	if (!disable_rx_ic)
-> -		p->des3 |= cpu_to_le32(RDES3_INT_ON_COMPLETION_EN);
-> +		flags |= cpu_to_le32(RDES3_INT_ON_COMPLETION_EN);
+>  enum {
+> @@ -2619,8 +2620,18 @@ static inline void netif_napi_set_irq(struct 
+> napi_struct *napi, int irq)
+>   */
+>  #define NAPI_POLL_WEIGHT 64
+> 
+> -void netif_napi_add_weight(struct net_device *dev, struct napi_struct *napi,
+> -			   int (*poll)(struct napi_struct *, int), int weight);
+> +void netif_napi_add_weight_percpu(struct net_device *dev,
+> +				  struct napi_struct *napi,
+> +				  int (*poll)(struct napi_struct *, int),
+> +				  int weight, int thread_cpuid);
 > +
-> +	p->des3 |= flags;
-
-You could just batch the endian conversion too:
-
-	u32 flags = DES3_OWN | RDES3_BUFFER1_VALID_ADDR;
-
-	if (!disable_rx_ic)
-		flags |= RDES3_INT_ON_COMPLETION_EN;
-
-	p->desc3 |= cpu_to_le32(flags);
-
->   }
->   
->   static int dwmac4_get_tx_ls(struct dma_desc *p)
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-> index fc82862a612c..0c7ea939f787 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-> @@ -56,10 +56,12 @@ static void dwxgmac2_set_tx_owner(struct dma_desc *p)
->   
->   static void dwxgmac2_set_rx_owner(struct dma_desc *p, int disable_rx_ic)
->   {
-> -	p->des3 |= cpu_to_le32(XGMAC_RDES3_OWN);
-> +	u32 flags = cpu_to_le32(XGMAC_RDES3_OWN);
->   
->   	if (!disable_rx_ic)
-> -		p->des3 |= cpu_to_le32(XGMAC_RDES3_IOC);
-> +		 flags |= cpu_to_le32(XGMAC_RDES3_IOC);
+> +static inline void netif_napi_add_weight(struct net_device *dev,
+> +					 struct napi_struct *napi,
+> +					 int (*poll)(struct napi_struct *, int),
+> +					 int weight)
+> +{
+> +	netif_napi_add_weight_percpu(dev, napi, poll, weight, -1);
+> +}
+> 
+>  /**
+>   * netif_napi_add() - initialize a NAPI context
+> @@ -2665,6 +2676,26 @@ static inline void netif_napi_add_tx(struct 
+> net_device *dev,
+>  	netif_napi_add_tx_weight(dev, napi, poll, NAPI_POLL_WEIGHT);
+>  }
+> 
+> +/**
+> + * netif_napi_add_percpu() - initialize a CPU-pinned threaded NAPI 
+> context
+> + * @dev:  network device
+> + * @napi: NAPI context
+> + * @poll: polling function
+> + * @thread_cpuid: CPU which this NAPI will be pinned to
+> + *
+> + * Variant of netif_napi_add() which pins the NAPI to the specified 
+> CPU. No
+> + * changes in the "standard" mode, but in case with the threaded one, 
+> this
+> + * NAPI will always be run on the passed CPU no matter where scheduled.
+> + */
+> +static inline void netif_napi_add_percpu(struct net_device *dev,
+> +					 struct napi_struct *napi,
+> +					 int (*poll)(struct napi_struct *, int),
+> +					 int thread_cpuid)
+> +{
+> +	netif_napi_add_weight_percpu(dev, napi, poll, NAPI_POLL_WEIGHT,
+> +				     thread_cpuid);
+> +}
 > +
-> +	p->des3 |= flags;
+>  /**
+>   *  __netif_napi_del - remove a NAPI context
+>   *  @napi: NAPI context
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 98bb5f890b88..93ca3df8e9dd 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -1428,8 +1428,13 @@ static int napi_kthread_create(struct 
+> napi_struct *n)
+>  	 * TASK_INTERRUPTIBLE mode to avoid the blocked task
+>  	 * warning and work with loadavg.
+>  	 */
+> -	n->thread = kthread_run(napi_threaded_poll, n, "napi/%s-%d",
+> -				n->dev->name, n->napi_id);
+> +	if (n->thread_cpuid >= 0)
+> +		n->thread = kthread_run_on_cpu(napi_threaded_poll, n,
+> +					       n->thread_cpuid, "napi/%s-%u",
+> +					       n->dev->name);
+> +	else
+> +		n->thread = kthread_run(napi_threaded_poll, n, "napi/%s-%d",
+> +					n->dev->name, n->napi_id);
+>  	if (IS_ERR(n->thread)) {
+>  		err = PTR_ERR(n->thread);
+>  		pr_err("kthread_run failed with err %d\n", err);
+> @@ -6640,8 +6645,10 @@ void netif_queue_set_napi(struct net_device 
+> *dev, unsigned int queue_index,
+>  }
+>  EXPORT_SYMBOL(netif_queue_set_napi);
+> 
+> -void netif_napi_add_weight(struct net_device *dev, struct napi_struct 
+> *napi,
+> -			   int (*poll)(struct napi_struct *, int), int weight)
+> +void netif_napi_add_weight_percpu(struct net_device *dev,
+> +				  struct napi_struct *napi,
+> +				  int (*poll)(struct napi_struct *, int),
+> +				  int weight, int thread_cpuid)
+>  {
+>  	if (WARN_ON(test_and_set_bit(NAPI_STATE_LISTED, &napi->state)))
+>  		return;
+> @@ -6664,6 +6671,7 @@ void netif_napi_add_weight(struct net_device 
+> *dev, struct napi_struct *napi,
+>  	napi->poll_owner = -1;
+>  #endif
+>  	napi->list_owner = -1;
+> +	napi->thread_cpuid = thread_cpuid;
+>  	set_bit(NAPI_STATE_SCHED, &napi->state);
+>  	set_bit(NAPI_STATE_NPSVC, &napi->state);
+>  	list_add_rcu(&napi->dev_list, &dev->napi_list);
+> @@ -6677,7 +6685,7 @@ void netif_napi_add_weight(struct net_device 
+> *dev, struct napi_struct *napi,
+>  		dev->threaded = false;
+>  	netif_napi_set_irq(napi, -1);
+>  }
+> -EXPORT_SYMBOL(netif_napi_add_weight);
+> +EXPORT_SYMBOL(netif_napi_add_weight_percpu);
+> 
+>  void napi_disable(struct napi_struct *n)
+>  {
+> -- 
+> 2.46.0
 
-And likewise here, and that would likely squash the sparse warning, 
-since you would not be assigning an 'u32' field to a __le32 field anymore.
--- 
-Florian
+Acked-by: Daniel Xu <dxu@dxuuu.xyz>
 
