@@ -1,61 +1,55 @@
-Return-Path: <netdev+bounces-123987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F350E9672D9
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 19:36:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A194B9672DB
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 19:39:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B92FC2826EA
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 17:36:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D44FC1C21354
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 17:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050F85588F;
-	Sat, 31 Aug 2024 17:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1954658210;
+	Sat, 31 Aug 2024 17:39:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nekbbEcU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mADuve5h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F6A4C8C
-	for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 17:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75A8524F
+	for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 17:39:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725125780; cv=none; b=MYu7Vv1XCn26xm7/JSoEpRo3jSbzszH+1BVhcLt3mk2gTPbio3NI2wMx+98w5KEIoqL1gykO7+tU2yyR94OTy4dtba8y/lMOGn2LEURVL9C4nKqMSTPMrxLUDsQ8IQo+45wQiZlyEzYeWtpoBsRiU7uRzWcP9o4ByOUYavQTnes=
+	t=1725125979; cv=none; b=TDVHNPa3UBCWdeFGG0LVURG6M8BW0iL9wzXIhYLHiaVpi8vbR5mWi8HTUrrjEHafsltlgsXJTRDsFMn5HbKG+1bpikc8v1xWDd6EwPMqXXVSkOuavW3Z/dcShzHwJx0746+iyztpuT4mxth4shclOtKPdvMJk7FGqagqgIuhSUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725125780; c=relaxed/simple;
-	bh=9qJqyhApIj+jFtluzzXwXGO250WG1b0aiU9Wl98xy8w=;
+	s=arc-20240116; t=1725125979; c=relaxed/simple;
+	bh=6SMAQxAGQuRTpvcOEwC7QTvR5Nu6tSJG1pUC0/B4WZ8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NQ+Gf50kuOUshTc5CgOlZbowntfRoq+FKB7hbla6IcEjaFQc0C2K+RFkBVS0aL0WqC5Xk9aArFQiDDHbSIMb+79TBg+JCGZ/plDKbK2qw2aNx8HdousrMe5LhzhVVNbL6HxwrUw17qtyyfeoOSUoUGIGzsoxyPoDUbbU5s4RP30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nekbbEcU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE82EC4CEC0;
-	Sat, 31 Aug 2024 17:36:19 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=WvNzpAZp4QSB3h06N+kMmDE7/6C0gSdzMzvMCXCaWE1ywt1L1H+zk/i0lY9iYm+lF1x9HlhWIIXLtp7f3gxT1dAaIbC82DDammwMn+sSDTMcc9ya4FLeSYvIUxOvGtDg8QVTBc+kofvUqrym8r+0VA6uEiURrLa63nQxdR5jtec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mADuve5h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7DFFC4CEC0;
+	Sat, 31 Aug 2024 17:39:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725125780;
-	bh=9qJqyhApIj+jFtluzzXwXGO250WG1b0aiU9Wl98xy8w=;
+	s=k20201202; t=1725125978;
+	bh=6SMAQxAGQuRTpvcOEwC7QTvR5Nu6tSJG1pUC0/B4WZ8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nekbbEcUvfa0lUdLRctU9jRZ2TOiWEfZeIoi3c1qqub7FQI2L/7e27TUkVPAuXVHQ
-	 q5uw09HNZ1pG2rEPbG7vq2R8HAoO5V3Cp/l04B7gmrdGFKtsXHqPiMkmdQ4O0mClYD
-	 iYBL1GvZBLPe8SPTWeYqnPeXguewxTMXJAmZmnYGe1SDPElIRPd6kJ9f/dj1++63zg
-	 4nfGqEhekekQPedXvNQk2Yqg3TL4abSf6uZLoPS2PLP5M60FZKpVFxGcmmaHF9IBoX
-	 /v8aKddHlvuyn77fNSfqHhq7q8WAzTYfDKGJtlE7a42RjJKATwsJNZNQxxeNaD1X6Z
-	 jt3W78CKjrktQ==
-Date: Sat, 31 Aug 2024 20:36:16 +0300
+	b=mADuve5h9RJTEDMHgRO5u5WIDjU5/hidlImSeZsLKW6m8/nyB7pGZKRVaZckPPSAh
+	 SsKAf+9kWt77Nx/iIWweq0Nq+sZnJlB25T8Xgz+XLyGcbRkX4beeQxhFt9HDPbm6xd
+	 hpnEIR+DT7X31bYPrQJSamaYQF7GV2ZWAR2wo4D8yIL8V9lIsKP63+aqEmoqeLr5SJ
+	 SZOY18pfmJWeGN99NvpEn7vD3NlGkDIS2na+PPTLLHqSDrjEhhY7oX3ffuNUVsjvxx
+	 b9UW1zh/KZcvp/1wMQJILZb0cF6ztebepvFcXmdRdLP5MqOudOzbR9Ro2BA/0yWjSv
+	 W4qGlzFplcn4A==
+Date: Sat, 31 Aug 2024 20:39:34 +0300
 From: Leon Romanovsky <leon@kernel.org>
-To: Feng Wang <wangfe@google.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Feng Wang <wangfe@google.com>, netdev@vger.kernel.org,
 	antony.antony@secunet.com
 Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
-Message-ID: <20240831173616.GB4000@unreal>
+Message-ID: <20240831173934.GC4000@unreal>
 References: <20240822200252.472298-1-wangfe@google.com>
  <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
- <20240828112619.GA8373@unreal>
- <CADsK2K-mnrz8TV-8-BvBU0U9DDzJhZF2GGM22vgA6GMpvK556w@mail.gmail.com>
- <20240829103846.GE26654@unreal>
- <CADsK2K8KqJThB3pkz7oAZT_4yXgy8v89TK83W50KaR-VSSKjOg@mail.gmail.com>
- <20240830143051.GA4000@unreal>
- <CADsK2K8+sEGwLSX_Q2nxcOosbGFFKjfKb2ffRXK2E1sp_Fbd+Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,42 +58,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADsK2K8+sEGwLSX_Q2nxcOosbGFFKjfKb2ffRXK2E1sp_Fbd+Q@mail.gmail.com>
+In-Reply-To: <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
 
-On Fri, Aug 30, 2024 at 05:27:29PM -0700, Feng Wang wrote:
-> Hi Leon,
+On Wed, Aug 28, 2024 at 07:32:47AM +0200, Steffen Klassert wrote:
+> On Thu, Aug 22, 2024 at 01:02:52PM -0700, Feng Wang wrote:
+> > From: wangfe <wangfe@google.com>
+> > 
+> > In packet offload mode, append Security Association (SA) information
+> > to each packet, replicating the crypto offload implementation.
+> > The XFRM_XMIT flag is set to enable packet to be returned immediately
+> > from the validate_xmit_xfrm function, thus aligning with the existing
+> > code path for packet offload mode.
+> > 
+> > This SA info helps HW offload match packets to their correct security
+> > policies. The XFRM interface ID is included, which is crucial in setups
+> > with multiple XFRM interfaces where source/destination addresses alone
+> > can't pinpoint the right policy.
+> > 
+> > Signed-off-by: wangfe <wangfe@google.com>
 > 
-> I believe you are right about the mlx5e_ipsec_feature_check function.
-> And it shows that the driver can indeed make use of the SA
-> information. Similarly, in packet offload mode, drivers can
-> potentially leverage this information for their own purposes. The
-> patch is designed to be non-intrusive, so drivers that don't utilize
-> this information won't be affected in any way.
+> Applied to ipsec-next, thanks Feng!
 
-I asked about examples of such drivers. Can you please provide them?
+Steffen,
 
-> 
-> I'm also curious about why the mlx driver doesn't seem to use the XFRM
-> interface ID in the same way that xfrm_policy_match() does.
-> https://elixir.bootlin.com/linux/v6.10.7/source/net/xfrm/xfrm_policy.c#L1993a
+What is your position on this patch?
+It is the same patch (logically) as the one that was rejected before?
+https://lore.kernel.org/all/ZfpnCIv+8eYd7CpO@gauss3.secunet.de/
 
-HW offload is always last in packet TX traversal and it means that if HW
-catches that packet and it meets the HW offload requirements, it will be
-encrypted. The main idea is that routing (sending to right if_id) is handled
-by the upper layers and HW offload is just a final step.
-
-> This ID is critical in scenarios with multiple IPsec tunnels, where
-> source and destination addresses alone might not be sufficient to
-> identify the correct security policy. Perhaps there's a specific
-> reason or design choice behind this in the mlx driver?
-
-It is not specific to mlx5, but to all HW offload drivers. They should
-implement both policy and SA offloading. It is violation of current mailing
-list deign to do not offload policy. If you offload both policy and SA, you
-won't need if_id at all.
-
-> 
-> Thank you once again for your valuable insights and collaboration.
-> 
-> Feng
+Thanks
 
