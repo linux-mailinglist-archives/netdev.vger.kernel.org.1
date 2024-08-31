@@ -1,98 +1,145 @@
-Return-Path: <netdev+bounces-123993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D649967341
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 22:55:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EA8A96738A
+	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 00:06:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 837791C210D9
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 20:55:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D45C1C20FF3
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 22:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631F317E900;
-	Sat, 31 Aug 2024 20:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A68F16DEAB;
+	Sat, 31 Aug 2024 22:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kET/rtR0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26AE16BE23
-	for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 20:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6B23C30;
+	Sat, 31 Aug 2024 22:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725137704; cv=none; b=HtMAHupzgZgtpz3CcvjDmStvikt+0Pz43+OS3eRKKj9bCe71z8mH8oJ1yf5AQbBF5Uc26VN90FCeswVRJq+wCoF/i5X3jRLZ6I9JDo3UMoEkU36oZ1c+M/K9fyQyYX9o1OtziBZhChmHCEHIclt3MIWdiHr+zUPunVl6BbxdzQU=
+	t=1725141975; cv=none; b=HWQvKHMuu2jfmFG7sCJ5jWgs5QZvjmOqouG+6MDKFkfEi4dHk/Bi3lQL8x8ihrKaoeyp4atGcH98TwgRnXzdCKMr7n6Wk7yTBScNxDJ9TlVeEr5K8I6PiepAFb4ns/RtWV6vISrfL3uO6I5XePEtYaKkjkmOfi9276nFIWhSiXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725137704; c=relaxed/simple;
-	bh=jFH484BT5R7q2HOiKMJKv1FmMZ4CHygH+s9H6wFYtsY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=tz67U1oZsHTaLKy5qbtemo97GPAbmrfpb/J/Xh2trTADx9dZ0JlOR6MmKI4CeaXVUWydI64eNRMEfXcS0qvurYGHJzC8L04nY5+FjjCKnIRacqKenAhR9sN2UzsJuWpDqt39HY7RjXjYnlNXtYz2yXKmeFcNpoJlnqZM4me80OI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82a20631362so211856339f.0
-        for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 13:55:02 -0700 (PDT)
+	s=arc-20240116; t=1725141975; c=relaxed/simple;
+	bh=SaG4v2YnHLzt1RXp0KJ5QG8OnHu3vxxOvQ8JcKO+Bw8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nuOwQvsajR+1hWEaGf6g0BOtWwnEQzt7ja8+LcxuJctvjnhlY1cQKWF946VtZMnVWo/7amaEva6cprBy5OrdoXJSEDYPdEoMY5+ZeyFEPZsB+XPoPLwoFQ8r0+IZTGR3Hp6d8EWggOkiw6v3Jr4X0BLdaIYVyWjdSckAU+4QYeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kET/rtR0; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-374bd0da617so613426f8f.3;
+        Sat, 31 Aug 2024 15:06:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725141972; x=1725746772; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iHiTRjE5wPqafGdsOpFQFAP5aZVxpmACA5LO9Bj0aoQ=;
+        b=kET/rtR0aB4AU+Feptbn8K6nUO2NxQwGjIXQp6Flw/AdkbrDXy84/xTyr5CDHT0GhT
+         p2E3Mta2imZe/ip8JTa+xFvWLANGpRww5MZ9C6v80d4kGThkIlX2hLqO1iHlz2+pjwsM
+         s85+nNfvKHkOeo72sP4et8YwwhlfdCLNcDgxXj9Wv0jOtTNGp0FUIgm/gIOIU4f7Xedt
+         T/VuGSOWZtVKDeJfl8WYTOsMpednbCSwJXz05gVgtyT8amd8mDILdGOE5480V7ZDDRB9
+         yzHlelkvELkXTE2MoU3hJOArjDp8Wos0eMFHZJ7O/nrAdupEj/950crlM70CADDdoUPl
+         15AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725137702; x=1725742502;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TXinuCcZsAGJ7z0LOnrPbuvxWrzVfa5BPSiAe1GhMOU=;
-        b=Ri/sTrPUjfcmI+cSfQ9eOIaRuJV0NHIM1DFMvgO6R3QcS/OPlf1VoK0deTy5CVUiyi
-         HnPdwgSdy8ZfmTDGGFOYhD5a40db3aEDfZLbWttlIGd4T3Adoy/tljXwwcaIQCCDHmSN
-         JplfHHvrkzf3WKqpCS1GZThFQ5pMnqoIIN0iCL71UOBOh/0xYAxyGx5akl9ud+k5mqLI
-         UxXWee+jEgIJpK/B0Oq38cXcLmalFsyd5Gdm+0LMrTp4KbzBdBDUnbV/hP+/acPk8kqG
-         ieKJWlwl+qQy5y5ZVz4HXE4WvZGiQ76b9djan+6uju1k2YIn5BYBcgdoX9CR4Bcc3PJp
-         IOsg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5E6mIvNB7t9tKAaz3zc/9peUlCEvUSGX7uShZ20bd5q1eHj2bXDSu9uX6SbpU9N4qW0s4Rz8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyi+o9a1Zjw9uUZS2oWU9VPqYkZ0S4hojbeoKA9HHj/jiU57AjE
-	WE9c2iZkcJkRzBExGmr00L/8WhtMH1yge2PUIW/COk48GH/PmdQe7a4Ypp4mBmeLsdKM6sR0r7h
-	KQShD12QRLvdZUR4QHVR5ExtuLN6Sk+QLT/8VXoCHUHuV3YAFbk3+Wns=
-X-Google-Smtp-Source: AGHT+IGM0VYo+phzMqpcyZHt8FGQ9BOhTyofLbSGzhKKdLQqrxnCP6aoFjZSGJSMGF9oIciQZ2cX72Nge3gLhsO5Q6V4uQ+vSiD2
+        d=1e100.net; s=20230601; t=1725141972; x=1725746772;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iHiTRjE5wPqafGdsOpFQFAP5aZVxpmACA5LO9Bj0aoQ=;
+        b=U6pazPXYooTS9GlbthRAOfgTmzzb0bo/JJfZXpfrb3nMO0ROwxrWcKTkFLVMVcez0t
+         e7Pndj+ddpBCrQ3ykAcjY/orWMu2mCtn4hXSfWL4oKy5tmcTAham2JOFYNREkzARZO9U
+         JJ5pQAVyl0K9H4uKUhib5DS0Qx4sHvz9W1o673pDl+s++qTpL2/zOoBaipN4AtojGv3w
+         m5Qizf6iub3q7cgka/FqkJZGAQ8bsuB5n2RP22IkuKzRMSihzTZYR/wsOuUrin+EZ4er
+         keIW9zPu68yF9QPVUlbvhg/oiqZUhyMsgYtiB83NTwM5f2cNna9BgtpUIaoPQgDvjlfb
+         tO7w==
+X-Forwarded-Encrypted: i=1; AJvYcCV4JbiarnCld94YfbvxxdASJuXsppdTba3Z2zRskinfYj21NxWl+fEadG5ZAk9JIk292eNeq8U+@vger.kernel.org, AJvYcCVYTKZysqq2fwEQSPr/v33cM74YuAkQ4CG0qwKX4FA3rNj6QjINK98ce7sU9tWLoCyt1MT2HsJvAySrtm0b@vger.kernel.org, AJvYcCXuwtz24na0pEsJ8flBGKfEb/W639rD5BdF7PCq7XAcN7WLe4DI1/VXWHxisPLBWraMlkE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykhTQnVQKL1oc+KQaHt1wSxMOC7Nhcl7b1G0lfSRIVNV/PhHDU
+	E9YpEmFalDieaQ+V6HRCkLQy4fzQt2KIvtUY13OnQ0k20kxLzR/73mZm7duZkN3ZylIawUWXwiu
+	iOtdTRB4Kxzcr9M/PNbEkxs7ZAUg=
+X-Google-Smtp-Source: AGHT+IElcSjXVcepALYdR4g4ZBYS52ra8HL1nFrQuNIj918KyHcB0GxmzUlRohlXi6yN7dyNwTT9La4BHx8mt28MpUE=
+X-Received: by 2002:adf:e5cb:0:b0:368:526d:41d8 with SMTP id
+ ffacd0b85a97d-374bceb003fmr2076156f8f.23.1725141971473; Sat, 31 Aug 2024
+ 15:06:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:14d5:b0:81a:2abb:48a7 with SMTP id
- ca18e2360f4ac-82a266d18a8mr41499139f.1.1725137702080; Sat, 31 Aug 2024
- 13:55:02 -0700 (PDT)
-Date: Sat, 31 Aug 2024 13:55:02 -0700
-In-Reply-To: <00000000000099cf25061964d113@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ebe92a062100eb94@google.com>
-Subject: Re: [syzbot] [bpf?] [net?] general protection fault in
- dev_map_enqueue (2)
-From: syzbot <syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com>
-To: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
-	bigeasy@linutronix.de, bpf@vger.kernel.org, daniel@iogearbox.net, 
-	davem@davemloft.net, eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	michal.switala@infogain.com, netdev@vger.kernel.org, revest@google.com, 
-	sdf@fomichev.me, sdf@google.com, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, toke@redhat.com, yonghong.song@linux.dev
+References: <20240830082518.23243-1-Tze-nan.Wu@mediatek.com> <ZtKOAKlNalVLIz2E@mini-arch>
+In-Reply-To: <ZtKOAKlNalVLIz2E@mini-arch>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sat, 31 Aug 2024 15:06:00 -0700
+Message-ID: <CAADnVQKF=o6q2FzssEy9-jmye7+DB=S58KD8=dh=aRR5QTpJrA@mail.gmail.com>
+Subject: Re: [PATCH net v5] bpf, net: Fix a potential race in do_sock_getsockopt()
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: Tze-nan Wu <Tze-nan.Wu@mediatek.com>, Network Development <netdev@vger.kernel.org>, 
+	bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	=?UTF-8?B?Qm9idWxlIENoYW5nICjlvLXlvJjnvqkp?= <bobule.chang@mediatek.com>, 
+	wsd_upstream <wsd_upstream@mediatek.com>, LKML <linux-kernel@vger.kernel.org>, 
+	linux-mediatek@lists.infradead.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	=?UTF-8?B?Q2hlbi1ZYW8gQ2hhbmcgKOW8teemjuiAgCk=?= <chen-yao.chang@mediatek.com>, 
+	Yanghui Li <yanghui.li@mediatek.com>, Cheng-Jui Wang <cheng-jui.wang@mediatek.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot suspects this issue was fixed by commit:
+On Fri, Aug 30, 2024 at 8:29=E2=80=AFPM Stanislav Fomichev <sdf@fomichev.me=
+> wrote:
+>
+> On 08/30, Tze-nan Wu wrote:
+> > There's a potential race when `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` i=
+s
+> > false during the execution of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN`, but
+> > becomes true when `BPF_CGROUP_RUN_PROG_GETSOCKOPT` is called.
+> > This inconsistency can lead to `BPF_CGROUP_RUN_PROG_GETSOCKOPT` receivi=
+ng
+> > an "-EFAULT" from `__cgroup_bpf_run_filter_getsockopt(max_optlen=3D0)`.
+> > Scenario shown as below:
+> >
+> >            `process A`                      `process B`
+> >            -----------                      ------------
+> >   BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN
+> >                                             enable CGROUP_GETSOCKOPT
+> >   BPF_CGROUP_RUN_PROG_GETSOCKOPT (-EFAULT)
+> >
+> > To resolve this, remove the `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` macro an=
+d
+> > directly uses `copy_from_sockptr` to ensure that `max_optlen` is always
+> > set before `BPF_CGROUP_RUN_PROG_GETSOCKOPT` is invoked.
+> >
+> > Fixes: 0d01da6afc54 ("bpf: implement getsockopt and setsockopt hooks")
+> > Co-developed-by: Yanghui Li <yanghui.li@mediatek.com>
+> > Signed-off-by: Yanghui Li <yanghui.li@mediatek.com>
+> > Co-developed-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
+> > Signed-off-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
+> > Signed-off-by: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
+>
+> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
-commit 401cb7dae8130fd34eb84648e02ab4c506df7d5e
-Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Date:   Thu Jun 20 13:22:04 2024 +0000
+Considering it's rc6 I was debating whether it's net/bpf or -next
+material, but could argue either way.
 
-    net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.
+Tze-nan,
+if I recall you were saying it affects android boot ?
+If so please describe such details in the commit log next time.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12597c63980000
-start commit:   36534d3c5453 tcp: use signed arithmetic in tcp_rtx_probe0_..
-git tree:       bpf
-kernel config:  https://syzkaller.appspot.com/x/.config?x=333ebe38d43c42e2
-dashboard link: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13390aea980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10948741980000
+Acked-by: Alexei Starovoitov <ast@kernel.org>
 
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Kuba,
+feel free to take it into net if you think it's an appropriate fix.
 
