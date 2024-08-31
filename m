@@ -1,147 +1,117 @@
-Return-Path: <netdev+bounces-123961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15CFC966FB8
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 08:16:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A83C4966FE5
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 08:57:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 468071C21B0E
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 06:16:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33E46B2170D
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 06:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B1E165F11;
-	Sat, 31 Aug 2024 06:16:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D04116B750;
+	Sat, 31 Aug 2024 06:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ipA2EL28"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02961537BB;
-	Sat, 31 Aug 2024 06:16:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF30D16A957
+	for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 06:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725084994; cv=none; b=EZfIR+9zIfqh3Oen17kpk1zej32+eObQsqSGbSUmtpq0fsBdoNnKKH6UlMnI4ctKzJyq31tt4P/Y9v/5zCYGCNjZ5+Mwm2YwTeo+ywIiGXZIfWp/Sh1tjC5natPLAW0X0JkpaqLJtW2hfb34rwFgMF95Mf6OZttC1zwgZMapGdw=
+	t=1725087418; cv=none; b=J+E9NbulCWrxGNYzSZDuv0y1ztDCQSB2QeOIGIi4ktC0a7qYRnv2zj9lB/poozaWo+I330nWqGRGMAltWdpFr77ON4htgRzGv3gX12YxNvBUoLv8NO23bV3nTsm3pilOPvcCXajDYPMK4AkFKRFN7hVokZsSXguwv4lTlsMiB84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725084994; c=relaxed/simple;
-	bh=uyTVwfyUkYvlPQT6w7Qgx1vQWk8gaNI3kobVNYQoRS8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y+O/uKIIwN/jpUzr2S6pqsFWtYVUkjA9T1LYSd/0dZQfW6enILyS5XP+5CIPlT7PRF8+iPHh5KkmTNWeb1rPwh0y7t/r23mlrDvF/gA6b7kW9Vnvu8uyr3Y4xayCeqfASdMmQZTUczgC9a8OO2pBsgjdP9YmTs2fr1Mr9UKQH5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4WwlC10ZTjz4f3jXJ;
-	Sat, 31 Aug 2024 14:16:13 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id CEE441A018D;
-	Sat, 31 Aug 2024 14:16:27 +0800 (CST)
-Received: from [10.67.109.184] (unknown [10.67.109.184])
-	by APP4 (Coremail) with SMTP id gCh0CgD3aYA3tdJmKF_YDA--.28873S2;
-	Sat, 31 Aug 2024 14:16:25 +0800 (CST)
-Message-ID: <f14d0337-0743-4490-88ba-f6e24f0e547e@huaweicloud.com>
-Date: Sat, 31 Aug 2024 14:16:23 +0800
+	s=arc-20240116; t=1725087418; c=relaxed/simple;
+	bh=8+xb/c5q8Te81bywgznH7epprrs+vus2sJDb/zrAqlI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DmG1T2N9h4TaMZWjujoXs5GxIagH9fEsdH7cmgEgkzB6nEWxz8To0dQ6Hkux3OaRbDk0AtE5pG5dIOAf5yrs7cmsbXtWXOFSnGah4d31425dyX3ZHEQz78L0hEi2KpTrmx9j5E42LXiD44pN2B2FIWFYaaAfoylGh0b15idk37A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ipA2EL28; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e115c8aa51fso2686499276.1
+        for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 23:56:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1725087416; x=1725692216; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=35/Cpco2p2doBWBoqkU/4WZL7A9fRuozoOMEP5DhBlM=;
+        b=ipA2EL28NfkHMF7Bu1AE1NRHUWJcX3Jg1VVzfgrd6xD/g/xekeEJULFMdm5ZNaVbnw
+         spp67cqXt7EZZrUaj8yk80QL6M5R2lzkRRRtdg4/F5NH2gh/kCu3E2NdOTQwube2J6NI
+         cDvDsZa1cemjGvwLj2MOgrk1/kFlE+IJq6LVi5vwqRn0iXio46lFvKKBR+AXTv862xdj
+         1/zeYScrc/34ICH/mWL9lEJogDtZ5TjTqG7oWmdzGuLmh2EkE5m39wAB/IFQUJ1ipCVu
+         IrkqFE2FuG+/gO7R6IiKnfQCbATqLRq3xLy2pZyk9GzkN/MsMCFmQ5XfAgML4RJfp47N
+         trIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725087416; x=1725692216;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=35/Cpco2p2doBWBoqkU/4WZL7A9fRuozoOMEP5DhBlM=;
+        b=cQcmxHkEBq2CAEfZJJBztISi/kBgIvIbA9Ua3qI+Rmtcmc8r1InDWCRutg4FbusSnU
+         x3pxWzEB1Caik2oRZ6eI2Nk2vTgRAN19EYH65Z2h46Gg+y/ffoy38RfGfxHkujKy/NT2
+         h3ynoM+AQDBcvNNiLsM+hqFbuhOSVP9S8g3VtmTqA8ARhViHpAY7lH/u8RtEMWJlxU5r
+         D7+gLziK5NYU1wGhiD+4mk0d3RyXz/4kPzm49135RLWkBbWR4F76raOKX4pozkbJQOSM
+         /1+XxyIm9Cg3ipzIjTsqQd17ma/7ZKxttk4n7mFvpeQv+3ViQUL1Q1rstCl15rUVunDn
+         Utlw==
+X-Forwarded-Encrypted: i=1; AJvYcCUXOnTO61qrlAfhiDz7e4GxRTi5FswGqGHmoWDg1mN3nvI+uIr0Tqm3WOUI+hsGE7pSE1BLNyE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwqrwcPEFv/x2BIliOe3Av3DcKCKfhwE0UIJQ+WZqM3XcGupTu4
+	4+g/iWdIZqlQJODScfwFPCBRhxK9ahKC4gaPSPLM/xamNE9IY9cPWh74Z5RkiJyrUIPUT7y5M1w
+	4qRLlCwlHePjAFMbnMiOSh2eBEfcNm8Y/cOa6DA==
+X-Google-Smtp-Source: AGHT+IFWbLWA4IjXvF5bKeQh1lJtnNOkDsN8Sdtsfq95rr64K/eYP6o6HPpIf8dFbQYhHTulhF5MoAz7eON8AeOpAgw=
+X-Received: by 2002:a05:690c:d81:b0:6cf:8d6f:2bef with SMTP id
+ 00721157ae682-6d40eb67be1mr51383017b3.7.1725087415578; Fri, 30 Aug 2024
+ 23:56:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 1/2] libbpf: Fix accessing first syscall argument
- on RV64
-Content-Language: en-US
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
- netdev@vger.kernel.org, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Puranjay Mohan <puranjay@kernel.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Pu Lehui <pulehui@huawei.com>
-References: <20240829133453.882259-1-pulehui@huaweicloud.com>
- <20240829133453.882259-2-pulehui@huaweicloud.com>
- <CAEf4BzbvUQ1HA6GPSF23piqbEBNVDZKZC0rB-X4LgeMpp9svYA@mail.gmail.com>
-From: Pu Lehui <pulehui@huaweicloud.com>
-In-Reply-To: <CAEf4BzbvUQ1HA6GPSF23piqbEBNVDZKZC0rB-X4LgeMpp9svYA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3aYA3tdJmKF_YDA--.28873S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJr1UGFWfXF1xXr1rGr15urg_yoW8urWkpr
-	W5ta4UKr18Wr42g347Ka12qF13Kr45trsrWF9xWaySkr4Ut3s3G3WaqrWYkF4qqr4kWw4q
-	vr9ruw18GF1ayrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvYb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
-	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x07
-	jIksgUUUUU=
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+References: <20240829082830.56959-1-quic_varada@quicinc.com>
+ <20240829082830.56959-4-quic_varada@quicinc.com> <gomm5yozebwfuhmgziajmkflbj6knmbwae4mls5kuwl5ngcbrx@mndpiktfken2>
+In-Reply-To: <gomm5yozebwfuhmgziajmkflbj6knmbwae4mls5kuwl5ngcbrx@mndpiktfken2>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Sat, 31 Aug 2024 09:56:44 +0300
+Message-ID: <CAA8EJpoSZwqw7_UVVXzwOd77Xh6j5LzKus-ZfuL_f5yrc8AYkg@mail.gmail.com>
+Subject: Re: [PATCH v5 3/8] dt-bindings: clock: add Qualcomm IPQ5332 NSSCC
+ clock and reset definitions
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Varadarajan Narayanan <quic_varada@quicinc.com>, andersson@kernel.org, mturquette@baylibre.com, 
+	sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
+	konradybcio@kernel.org, catalin.marinas@arm.com, will@kernel.org, 
+	djakov@kernel.org, richardcochran@gmail.com, geert+renesas@glider.be, 
+	neil.armstrong@linaro.org, arnd@arndb.de, nfraprado@collabora.com, 
+	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-pm@vger.kernel.org, 
+	netdev@vger.kernel.org, Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
 
+On Sat, 31 Aug 2024 at 09:11, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>
+> On Thu, Aug 29, 2024 at 01:58:25PM +0530, Varadarajan Narayanan wrote:
+> > From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+> >
+> > Add NSSCC clock and reset definitions for Qualcomm IPQ5332.
+> > Enable interconnect provider ability for use by the ethernet
+> > driver.
+> >
+> > Signed-off-by: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
+> > Signed-off-by: Varadarajan Narayanan <quic_varada@quicinc.com>
+> > ---
+> > v5: Marked #power-domain-cells as false
+> >     Included #interconnect-cells
+>
+> Then this might not be GCC-like clock controller or gcc.yaml
+> should not include power-domain-cells.
 
+qcom,gcc.yaml already doesn't mark #power-domain-cells as required, so
+it should be fine. See qcom,gcc-apq8064.yaml or qcom,gcc-ipq4019.yaml.
 
-On 2024/8/31 3:34, Andrii Nakryiko wrote:
-> On Thu, Aug 29, 2024 at 6:32 AM Pu Lehui <pulehui@huaweicloud.com> wrote:
->>
-[SNIP]
->>
->> -#define __PT_PARM1_SYSCALL_REG __PT_PARM1_REG
->> +#define __PT_PARM1_SYSCALL_REG orig_a0
->>   #define __PT_PARM2_SYSCALL_REG __PT_PARM2_REG
->>   #define __PT_PARM3_SYSCALL_REG __PT_PARM3_REG
->>   #define __PT_PARM4_SYSCALL_REG __PT_PARM4_REG
->>   #define __PT_PARM5_SYSCALL_REG __PT_PARM5_REG
->>   #define __PT_PARM6_SYSCALL_REG __PT_PARM6_REG
->> +#define PT_REGS_PARM1_SYSCALL(x) PT_REGS_PARM1_CORE_SYSCALL(x)
->> +#define PT_REGS_PARM1_CORE_SYSCALL(x) \
->> +       BPF_CORE_READ((const struct pt_regs___riscv *)(x), __PT_PARM1_SYSCALL_REG)
-> 
-> I feel like what we did for s390x is a bit suboptimal, so let's (try
-> to) improve that and then do the same for RV64.
-> 
-> What I mean is that PT_REGS_PARMn_SYSCALL macros are used to read
-> pt_regs coming directly from context, right? In that case we don't
-> need to pay the price of BPF_CORE_READ(), we can just access memory
-> directly (but we still need CO-RE relocation!).
-> 
-> So I think what we should do is
-> 
-> 1) mark pt_regs___riscv {} with __attribute__((preserve_access_index))
-> so that normal field accesses are CO-RE-relocated
-> 2) change PT_REGS_PARM1_SYSCALL(x) to be `((const
-> struct_pt_regs___riscv *)(x))->orig_a0`, which will directly read
-> memory
-> 3) keep PT_REGS_PARM1_CORE_SYSCALL() as is
-> 
-> 
-> But having written all the above, I'm not sure whether we allow CO-RE
-> relocated direct context accesses (verifier might complain about
-> modifying ctx register offset or something). So can you please check
-> it either on s390 or RV64 and let me know? I'm not marking it as
-> "Changes Requested" for that reason, because that might not work and
-> we'll have to do BPF_CORE_READ().
-
-Hi Andrii, thanks for your suggestion, it's really cool. I check that 
-work for RV64, and send a new version:
-
-https://lore.kernel.org/bpf/20240831041934.1629216-1-pulehui@huaweicloud.com
-
-> 
->>
->>   #define __PT_RET_REG ra
->>   #define __PT_FP_REG s0
->> --
->> 2.34.1
->>
-
+-- 
+With best wishes
+Dmitry
 
