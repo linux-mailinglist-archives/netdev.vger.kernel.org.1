@@ -1,64 +1,67 @@
-Return-Path: <netdev+bounces-123940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5E78966ED1
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 04:06:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6941D966EEC
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 04:34:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A49B5284DDF
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 02:06:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02F71B229CC
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 02:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43ABB13DDBA;
-	Sat, 31 Aug 2024 02:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B49CE763F8;
+	Sat, 31 Aug 2024 02:34:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5826BFCA;
-	Sat, 31 Aug 2024 02:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B36A19BB7;
+	Sat, 31 Aug 2024 02:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725069935; cv=none; b=IG6wz2sJq8cga6z1Y2XnnQX9ZZA/AfVyHRe8V/EfREvtwGbHEce/3rfnGaQteEXIMC9jv8yMlAnZ76dvfFyfbhDeFW604QHpbvwQ1L0vwSvbKECRYqGwSAoEiF+6PB/fU0tdGFAfAi53hKCwYucKAdLj2KyCdlAq4QYWHocGxck=
+	t=1725071653; cv=none; b=nVxUt4WELhU3BWGVILhb1CX4IoTEKAywbmxaBIZ0sCE62/ooEnwE/k/8FmASrthvT4zQUuWu1IJlAW/lB0VLWXneyctn6Cz5YE2hR9LpeZysUHOLOd8QSH9qmZFm+9/4nSNHru+LfXP4E7n01gXFWQ5S1XMCXj44owtLAHZjC+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725069935; c=relaxed/simple;
-	bh=Q1SNNG9W7ef1hqVdI0Qsork16INSEJRnz5CvBADlNwg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ULMG6kf/WzS/lzZranX4U1qABkW+TxHvqjX9+hblgTAA5QdOd4u/Acl24/90mVUO6E7RiWPTXS9iYNpG/Acs4Eto7BnooWpNTRgI5OWqWvrbzPn05+rrQ87THnjAuEJ47+jSy1HWkf+g4mPDwEjWhe6y/TFc7YsJO1VXjbvDcDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wwdbh1Dd5zpVB5;
-	Sat, 31 Aug 2024 10:03:44 +0800 (CST)
-Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2D0CD18010A;
-	Sat, 31 Aug 2024 10:05:30 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemd500012.china.huawei.com
- (7.221.188.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Sat, 31 Aug
- 2024 10:05:28 +0800
-From: Li Zetao <lizetao1@huawei.com>
-To: <florian.fainelli@broadcom.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <wens@csie.org>, <jernej.skrabec@gmail.com>,
-	<samuel@sholland.org>, <heiko@sntech.de>, <yisen.zhuang@huawei.com>,
-	<salil.mehta@huawei.com>, <hauke@hauke-m.de>, <alexandre.torgue@foss.st.com>,
-	<joabreu@synopsys.com>, <mcoquelin.stm32@gmail.com>, <wellslutw@gmail.com>,
-	<radhey.shyam.pandey@amd.com>, <michal.simek@amd.com>,
-	<ajay.kathat@microchip.com>, <claudiu.beznea@tuxon.dev>, <kvalo@kernel.org>,
-	<lizetao1@huawei.com>, <u.kleine-koenig@pengutronix.de>,
-	<jacky_chou@aspeedtech.com>
-CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-sunxi@lists.linux.dev>, <linux-rockchip@lists.infradead.org>,
-	<linux-stm32@st-md-mailman.stormreply.com>, <linux-wireless@vger.kernel.org>
-Subject: [PATCH net-next 12/12] wifi: wilc1000: Convert using devm_clk_get_optional_enabled() in wilc_bus_probe()
-Date: Sat, 31 Aug 2024 10:13:34 +0800
-Message-ID: <20240831021334.1907921-13-lizetao1@huawei.com>
+	s=arc-20240116; t=1725071653; c=relaxed/simple;
+	bh=UzmZp+a1cD8er+lfvb2uO3JfKl8PCAAouc5Ue+LLMz8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a43BPMdZg10EJQUnZU43gQV514AhHso85wPI/yFyWStAKW3ziNk7ULmr9K8sgxHduTjZuQUhzCRSvmq695/eICAANZsifmiiED27ZTKpW+2CxJg/q10wc2K3prBlzxhJnBRivM9hrzIjZiKH2Jq2/6NdCpuaAHVZtZzgfVVMl8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WwfGS2Yjvz4f3kw5;
+	Sat, 31 Aug 2024 10:33:52 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id F22CE1A1464;
+	Sat, 31 Aug 2024 10:34:07 +0800 (CST)
+Received: from ultra.huawei.com (unknown [10.90.53.71])
+	by APP4 (Coremail) with SMTP id gCh0CgDXSYAagdJmoPLJDA--.24950S2;
+	Sat, 31 Aug 2024 10:34:03 +0800 (CST)
+From: Pu Lehui <pulehui@huaweicloud.com>
+To: bpf@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org,
+	Andrii Nakryiko <andrii@kernel.org>
+Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Pu Lehui <pulehui@huawei.com>
+Subject: [PATCH bpf-next v2 0/4] Fix accessing first syscall argument on RV64
+Date: Sat, 31 Aug 2024 02:36:42 +0000
+Message-Id: <20240831023646.1558629-1-pulehui@huaweicloud.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240831021334.1907921-1-lizetao1@huawei.com>
-References: <20240831021334.1907921-1-lizetao1@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,55 +69,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemd500012.china.huawei.com (7.221.188.25)
+X-CM-TRANSID:gCh0CgDXSYAagdJmoPLJDA--.24950S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKr1xAr4xGry8Wr4DWr1UGFg_yoW3uwbE9w
+	40yr97JrWrCrZxtF43Wr15CrWDKa1UJr1UWF4kJrWfJw45CryDJFsY93s0yas8Xa1IgFy3
+	Ca9rXrySvFnxXjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbxAYFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
+	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
+	kEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
+	e7AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
+	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_
+	WrylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+	CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v2
+	6r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07
+	jIksgUUUUU=
+X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
 
-Use devm_clk_get_optional_enabled() instead of devm_clk_get_optional() +
-clk_prepare_enable(), which can make the clk consistent with the device
-life cycle and reduce the risk of unreleased clk resources. Since the
-device framework has automatically released the clk resource, there is
-no need to execute clk_disable_unprepare(clk) on the error path.
+On RV64, as Ilya mentioned before [0], the first syscall parameter should be
+accessed through orig_a0 (see arch/riscv64/include/asm/syscall.h),
+otherwise it will cause selftests like bpf_syscall_macro, vmlinux,
+test_lsm, etc. to fail on RV64.
 
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
- drivers/net/wireless/microchip/wilc1000/spi.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+Link: https://lore.kernel.org/bpf/20220209021745.2215452-1-iii@linux.ibm.com [0]
 
-diff --git a/drivers/net/wireless/microchip/wilc1000/spi.c b/drivers/net/wireless/microchip/wilc1000/spi.c
-index 5ff940c53ad9..05b577b1068e 100644
---- a/drivers/net/wireless/microchip/wilc1000/spi.c
-+++ b/drivers/net/wireless/microchip/wilc1000/spi.c
-@@ -228,12 +228,11 @@ static int wilc_bus_probe(struct spi_device *spi)
- 	if (ret < 0)
- 		goto netdev_cleanup;
- 
--	wilc->rtc_clk = devm_clk_get_optional(&spi->dev, "rtc");
-+	wilc->rtc_clk = devm_clk_get_optional_enabled(&spi->dev, "rtc");
- 	if (IS_ERR(wilc->rtc_clk)) {
- 		ret = PTR_ERR(wilc->rtc_clk);
- 		goto netdev_cleanup;
- 	}
--	clk_prepare_enable(wilc->rtc_clk);
- 
- 	dev_info(&spi->dev, "Selected CRC config: crc7=%s, crc16=%s\n",
- 		 enable_crc7 ? "on" : "off", enable_crc16 ? "on" : "off");
-@@ -266,7 +265,6 @@ static int wilc_bus_probe(struct spi_device *spi)
- 	return 0;
- 
- power_down:
--	clk_disable_unprepare(wilc->rtc_clk);
- 	wilc_wlan_power(wilc, false);
- netdev_cleanup:
- 	wilc_netdev_cleanup(wilc);
-@@ -280,7 +278,6 @@ static void wilc_bus_remove(struct spi_device *spi)
- 	struct wilc *wilc = spi_get_drvdata(spi);
- 	struct wilc_spi *spi_priv = wilc->bus_data;
- 
--	clk_disable_unprepare(wilc->rtc_clk);
- 	wilc_netdev_cleanup(wilc);
- 	kfree(spi_priv);
- }
+Pu Lehui (4):
+  libbpf: Access first syscall argument with CO-RE direct read on s390
+  libbpf: Access first syscall argument with CO-RE direct read on arm64
+  selftests/bpf: Enable test_bpf_syscall_macro:syscall_arg1 on s390 and
+    arm64
+  libbpf: Fix accessing first syscall argument on RV64
+
+ tools/lib/bpf/bpf_tracing.h                     | 17 ++++++++++++-----
+ .../bpf/prog_tests/test_bpf_syscall_macro.c     |  4 ----
+ 2 files changed, 12 insertions(+), 9 deletions(-)
+
 -- 
 2.34.1
 
