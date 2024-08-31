@@ -1,134 +1,121 @@
-Return-Path: <netdev+bounces-123952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 389C0966F2A
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 06:02:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1C65966F40
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 06:17:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AF391F2358E
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 04:02:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ED40284D93
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 04:17:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BFCA41A92;
-	Sat, 31 Aug 2024 04:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="aR9OUDy1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25545146D7D;
+	Sat, 31 Aug 2024 04:16:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8271421103
-	for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 04:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051FEF4EB;
+	Sat, 31 Aug 2024 04:16:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725076955; cv=none; b=DAeRgKQH5ruTSBInZZR3xMIEc7p7KVKB9vmN0f71Zpm7HvNll4ujhma8YMrbXn6dXC0NXZpq3i5abWPBfECM5WQfphpjm02+34TndVJ1rFEKDOpugKy/tNoNepKprj8S+EdDWZlkhJAZ884RKqEOKLDV4907Dsapa0LO6kb5ouE=
+	t=1725077819; cv=none; b=fODFCvQQ9FCakv6083M3nmjvxK3XcEYPIU5tlqWrcimr9HckKsNbzksftS/Eod5NNCbN1kx6tlxz5w9/EgbIHYaBXAGEYMQ7vkIYBWM9fXnAyu2Uy9EuxvsIhXRqGytiQvaUjrJXyODycBsVF+LGsF1SuC3ZO3+RK8twNX1ES2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725076955; c=relaxed/simple;
-	bh=4BAtJaQXgVeqYMzMwUQ8qu1XdfrtnNL9ejMZuleH900=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=L0BSfuJ8r/kz7LAWfR1oq1ph1r0EYrRXF/MOJdFT3fsz4ztxMIMJKHLe+M1Aj2LbdIoLJCS/pLnigba2uTOTfrDh8Ne7017hTn6ZsqlqtS6ZYw4gn2Um56bki8drpdH04h+g5EIQXSa4nfaeux1/wHMJzUJmFcYzIQRtqA+Htwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=aR9OUDy1; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <dc333b90-d8a4-488f-8c3e-9b2f3ed8b89c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725076950;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WklWTeZwdSq0goljOedo5b3AtXb4lzfT3jFQjbRMGx0=;
-	b=aR9OUDy1hinNxJd+9g/y/mhzVHAYZ+ySpKfup4Ydcy2f6yKtbRaUXaPv2+PVK3V/iLDRe3
-	gUpFA/4NPAb0NVznxQHJByZVzHQPZIGnSGMAT56Z/Xu64nVU6bI5XEUQQLTK/EQRXjJ9Qz
-	qLKPyXryj+Lp5XmS85exmlFf9IH7yXM=
-Date: Sat, 31 Aug 2024 12:02:21 +0800
+	s=arc-20240116; t=1725077819; c=relaxed/simple;
+	bh=M6vpxdCNP6fEjaROEY5jwyIvUXJz2q9yocQGi5vV1wA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=h5ApeSwAnz2pvnNJM1FjeHr+oCvxbtRJMucyXvr6eG5ePA2/KlbA78q17as4QARhj41egNLfXgvzQTkGsDZwM6EYdIKx5XMAm4nNY1abMKdyCdZm05SlP3MRyvV1HREu6z7RYKgORYMVtqBR6fwwaG850PxigdPaQWreHwgzkbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WwhY11GR2z4f3l2C;
+	Sat, 31 Aug 2024 12:16:37 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id C53CA1A018D;
+	Sat, 31 Aug 2024 12:16:52 +0800 (CST)
+Received: from ultra.huawei.com (unknown [10.90.53.71])
+	by APP2 (Coremail) with SMTP id Syh0CgBnT74ymdJmoSHHDA--.65422S2;
+	Sat, 31 Aug 2024 12:16:51 +0800 (CST)
+From: Pu Lehui <pulehui@huaweicloud.com>
+To: bpf@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	netdev@vger.kernel.org,
+	Andrii Nakryiko <andrii@kernel.org>
+Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Puranjay Mohan <puranjay@kernel.org>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Pu Lehui <pulehui@huawei.com>
+Subject: [PATCH bpf-next v3 0/4] Fix accessing first syscall argument on RV64
+Date: Sat, 31 Aug 2024 04:19:30 +0000
+Message-Id: <20240831041934.1629216-1-pulehui@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [syzbot] Monthly rdma report (Aug 2024)
-To: syzbot <syzbot+list6d1c113d5d8954339576@syzkaller.appspotmail.com>,
- linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
- netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-References: <000000000000e629df0620a63b2a@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <000000000000e629df0620a63b2a@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-CM-TRANSID:Syh0CgBnT74ymdJmoSHHDA--.65422S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrKr1xAr4xGry8Wr4DWr1UGFg_yoWkZrcEkw
+	42yr93JrWrCrZxtF4fWr15CrWDK3yUJF18GF4DtrWfCw1xAr97XFsY9r90yas8Wa10gFZx
+	Ga9rX34FvrnIvjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbIxYFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a
+	6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AK
+	xVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa
+	7IU0s2-5UUUUU==
+X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
 
-在 2024/8/27 16:43, syzbot 写道:
-> Hello rdma maintainers/developers,
-> 
-> This is a 31-day syzbot report for the rdma subsystem.
-> All related reports/information can be found at:
-> https://syzkaller.appspot.com/upstream/s/rdma
-> 
-> During the period, 1 new issues were detected and 0 were fixed.
-> In total, 5 issues are still open and 60 have been fixed so far.
-> 
-> Some of the still happening issues:
-> 
-> Ref Crashes Repro Title
-> <1> 33      No    INFO: task hung in disable_device
->                    https://syzkaller.appspot.com/bug?extid=4d0c396361b5dc5d610f
-> <2> 24      No    WARNING in rxe_pool_cleanup
->                    https://syzkaller.appspot.com/bug?extid=221e213bf17f17e0d6cd
+On RV64, as Ilya mentioned before [0], the first syscall parameter should be
+accessed through orig_a0 (see arch/riscv64/include/asm/syscall.h),
+otherwise it will cause selftests like bpf_syscall_macro, vmlinux,
+test_lsm, etc. to fail on RV64.
 
-I devled into this problem. From the call trace,we can go to this function:
+Link: https://lore.kernel.org/bpf/20220209021745.2215452-1-iii@linux.ibm.com [0]
 
-void rxe_dealloc(struct ib_device *ib_dev)
-{
-	struct rxe_dev *rxe = container_of(ib_dev, struct rxe_dev, ib_dev);
+v3:
+- Fix test case error.
 
-	rxe_pool_cleanup(&rxe->uc_pool);
-	rxe_pool_cleanup(&rxe->pd_pool);    <---- Here
-	rxe_pool_cleanup(&rxe->ah_pool);
-...
-}
+v2: https://lore.kernel.org/all/20240831023646.1558629-1-pulehui@huaweicloud.com/
+- Access first syscall argument with CO-RE direct read. (Andrii)
 
-rxe_dealloc -- > rxe_pool_cleanup
+v1: https://lore.kernel.org/all/20240829133453.882259-1-pulehui@huaweicloud.com/
 
-It seems that pd_pool is not empty when pd_pool is cleaned up.
+Pu Lehui (4):
+  libbpf: Access first syscall argument with CO-RE direct read on s390
+  libbpf: Access first syscall argument with CO-RE direct read on arm64
+  selftests/bpf: Enable test_bpf_syscall_macro:syscall_arg1 on s390 and
+    arm64
+  libbpf: Fix accessing first syscall argument on RV64
 
-But from the call trace, it is difficult to find out why pd_pool not empty.
+ tools/lib/bpf/bpf_tracing.h                     | 17 ++++++++++++-----
+ .../bpf/prog_tests/test_bpf_syscall_macro.c     |  4 ----
+ .../selftests/bpf/progs/bpf_syscall_macro.c     |  2 --
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
-I am not sure if this problem can be reproduced or not.
-If it can be reproduced, we can monitor alloc_pd and dealloc_pd 
-functions to check if these 2 functions are matched.
-Normally the number of invoked alloc_pd should be equal to the number of 
-dealloc_pd.
-
-And alloc_pd and dealloc_pd functions can be called via function 
-pointers. So these 2 functions can be called from many places. Thus, it 
-is difficult to check these 2 functions in source codes.
-
-If it can be reproduced, we can use kprobe,bpf or add call traces to 
-mointor the usages of the 2 functions. Then it is easier to find out why 
-pd_pool not empty.
-
-This is based on the fact that we can reproduce this problem.^_^
-
-Zhu Yanjun
-
-> <3> 2       No    possible deadlock in sock_set_reuseaddr
->                    https://syzkaller.appspot.com/bug?extid=af5682e4f50cd6bce838
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> To disable reminders for individual bugs, reply with the following command:
-> #syz set <Ref> no-reminders
-> 
-> To change bug's subsystems, reply with:
-> #syz set <Ref> subsystems: new-subsystem
-> 
-> You may send multiple commands in a single email message.
+-- 
+2.34.1
 
 
