@@ -1,168 +1,140 @@
-Return-Path: <netdev+bounces-123964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5663996703A
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 09:57:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3B72967054
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 10:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9AA31F22BFF
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 07:57:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 989EF1F22B75
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 08:24:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716F116F27F;
-	Sat, 31 Aug 2024 07:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C77916EBED;
+	Sat, 31 Aug 2024 08:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PThRW3+n"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3844B14A4F1;
-	Sat, 31 Aug 2024 07:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB99922095;
+	Sat, 31 Aug 2024 08:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725091027; cv=none; b=f/3OJDS9znwak6VFAE0tBin0B7yAfp5u19krbMPQEaLi28l0pr1RKpNtN5FTQ/WR5jIsFlsNMgGUFhryDliHWjpy6IcWVtOvqlK5UsPvQPfUtULsL+4ncGLO8vrkusKnjXyVXNLOotX+a3rKzOqoVXKfU8kN410Hf0r+n3gOEkg=
+	t=1725092657; cv=none; b=mF06gqTODT9//NEewMbqC90pD5LgOq0ukNwR4Ntp9n98AO0YdSHekU3T9OP3UJkfdA0cee2CFOmJXa81FptK6D3CB7yGH/a4oCJC6+Bkp/+1zEWvLBi/2ueOjMX/EdDdBut8dELNmUep20w/ZPmWLwYYYBd/QF9YxxhM9RPalBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725091027; c=relaxed/simple;
-	bh=6szWU4nLb963mx9nh9M5k8xWXTuIqLNSfy020SIaS4I=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=NsQfe0zS6XuVWB2snq0zXlWVMpNBoadwQPI/y475owLV+fX05pVNELWQFrodfU+9ZA6bHPqtEZS51nYYhZnD5vZpXkDmMdaYgHFe/U4CJPajytOqAvii3BbN2RvZAA1InWcj2fAMhmHGDxUSf23iS+Q+/KwRHotW07SgC4Lw4H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4WwnR1302pz4f3lDG;
-	Sat, 31 Aug 2024 15:56:45 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 0C2C71A058E;
-	Sat, 31 Aug 2024 15:57:01 +0800 (CST)
-Received: from [10.67.111.192] (unknown [10.67.111.192])
-	by APP4 (Coremail) with SMTP id gCh0CgCnGYDLzNJmO_LeDA--.44445S2;
-	Sat, 31 Aug 2024 15:57:00 +0800 (CST)
-Message-ID: <79b30c83-ee5e-453d-981e-61f826cf82d7@huaweicloud.com>
-Date: Sat, 31 Aug 2024 15:57:02 +0800
+	s=arc-20240116; t=1725092657; c=relaxed/simple;
+	bh=8Q0rv1U+EQwWMFT1qBVs5i+5vSbooP+Bl5Hfnffjh4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tb8yeQVbtO3EDNbooQAJVyqLv3M5geqxm94LzY5Kt/XeDsbzWxdd9kQhfs7q0GfjhqKytkaNjG7CxxkY/KBXpN4Knjkl6BB25emaEUhauiB8hR77f7bOduM8OkzK4sv5Bii7ITPNydfnPHaca1eIuuG/EICUWGn97cIf6ZfP/ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PThRW3+n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAD1CC4CEC0;
+	Sat, 31 Aug 2024 08:24:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725092656;
+	bh=8Q0rv1U+EQwWMFT1qBVs5i+5vSbooP+Bl5Hfnffjh4s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PThRW3+nZ4aRFDDLhuSiH5RqKJ6xblGOcBjhmOsCOIxA7+eOKv5dTW70+S1e7yNxP
+	 PuH1KcpVat0BQ6ivesg5oPzqIPnJMlHj/JF5wMZeak1Ue/peGfq/yFFGvNNJpRJ2X8
+	 Uh+arijRJZWunOUvbQoXai0j5/7LT/5tk3mSYrPFppqGFwnTuC3+wpCy4b3Ai4uOxv
+	 9iDxt9jn66PXSPX8ABpnzGZugz+g2/VwrEEok6U1mgp8u5vH7pH3GdEU6PdxHa4pk1
+	 mwWzJlWPbeYcaQ2tSdDCD+hIZlP7VJrUtl7/qPuWrDY0NmZVFFQEs3eED2wcAbHCoh
+	 7hUv8gH2gOkvg==
+Date: Sat, 31 Aug 2024 09:24:11 +0100
+From: Simon Horman <horms@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Naresh Kamboju <naresh.kamboju@linaro.org>,
+	clang-built-linux <llvm@lists.linux.dev>,
+	Netdev <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	lkft-triage@lists.linaro.org,
+	Linux Regressions <regressions@lists.linux.dev>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Florian Westphal <fw@strlen.de>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+Subject: Re: net/xfrm/xfrm_policy.c:1286:8: error: variable 'dir' is
+ uninitialized when used here [-Werror,-Wuninitialized]
+Message-ID: <20240831082411.GC4063074@kernel.org>
+References: <CA+G9fYtemFfuhc7=eNyP3TezM9Euc8sFtHe4GDR4Z9XdHzXSJA@mail.gmail.com>
+ <20240830164706.GW1368797@kernel.org>
+ <20240830170449.GX1368797@kernel.org>
+ <20240830214757.GA3819549@thelio-3990X>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v3 2/4] libbpf: Access first syscall argument
- with CO-RE direct read on arm64
-Content-Language: en-US
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org,
- Andrii Nakryiko <andrii@kernel.org>
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Puranjay Mohan <puranjay@kernel.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Pu Lehui <pulehui@huawei.com>
-References: <20240831041934.1629216-1-pulehui@huaweicloud.com>
- <20240831041934.1629216-3-pulehui@huaweicloud.com>
- <2379c139-6457-49dc-84fa-0d60ce226f2a@huaweicloud.com>
-In-Reply-To: <2379c139-6457-49dc-84fa-0d60ce226f2a@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgCnGYDLzNJmO_LeDA--.44445S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxCry3Xr1rZr4UJw1DCw1rZwb_yoW5tw13pF
-	W8Ca4UCr18u3yjka42g3y3JF13Jws8tw48JF93Ga4S9FWjgryFq3W2gFWakryavrs7Gwsx
-	ZrnFkry0q3W2v3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
-	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
-	s2-5UUUUU==
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240830214757.GA3819549@thelio-3990X>
 
-On 8/31/2024 3:26 PM, Xu Kuohai wrote:
-> On 8/31/2024 12:19 PM, Pu Lehui wrote:
->> From: Pu Lehui <pulehui@huawei.com>
->>
->> Currently PT_REGS_PARM1 SYSCALL(x) is consistent with PT_REGS_PARM1_CORE
->> SYSCALL(x), which will introduce the overhead of BPF_CORE_READ(), taking
->> into account the read pt_regs comes directly from the context, let's use
->> CO-RE direct read to access the first system call argument.
->>
->> Suggested-by: Andrii Nakryiko <andrii@kernel.org>
->> Signed-off-by: Pu Lehui <pulehui@huawei.com>
->> ---
->>   tools/lib/bpf/bpf_tracing.h | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/tools/lib/bpf/bpf_tracing.h b/tools/lib/bpf/bpf_tracing.h
->> index e7d9382efeb3..051c408e6aed 100644
->> --- a/tools/lib/bpf/bpf_tracing.h
->> +++ b/tools/lib/bpf/bpf_tracing.h
->> @@ -222,7 +222,7 @@ struct pt_regs___s390 {
->>   struct pt_regs___arm64 {
->>       unsigned long orig_x0;
->> -};
->> +} __attribute__((preserve_access_index));
->>   /* arm64 provides struct user_pt_regs instead of struct pt_regs to userspace */
->>   #define __PT_REGS_CAST(x) ((const struct user_pt_regs *)(x))
->> @@ -241,7 +241,7 @@ struct pt_regs___arm64 {
->>   #define __PT_PARM4_SYSCALL_REG __PT_PARM4_REG
->>   #define __PT_PARM5_SYSCALL_REG __PT_PARM5_REG
->>   #define __PT_PARM6_SYSCALL_REG __PT_PARM6_REG
->> -#define PT_REGS_PARM1_SYSCALL(x) PT_REGS_PARM1_CORE_SYSCALL(x)
->> +#define PT_REGS_PARM1_SYSCALL(x) (((const struct pt_regs___arm64 *)(x))->orig_x0)
->>   #define PT_REGS_PARM1_CORE_SYSCALL(x) \
->>       BPF_CORE_READ((const struct pt_regs___arm64 *)(x), __PT_PARM1_SYSCALL_REG)
+On Fri, Aug 30, 2024 at 02:47:57PM -0700, Nathan Chancellor wrote:
+> Hi Simon (and Naresh),
 > 
-> Cool!
+> On Fri, Aug 30, 2024 at 06:04:49PM +0100, Simon Horman wrote:
+> > On Fri, Aug 30, 2024 at 05:47:06PM +0100, Simon Horman wrote:
+> > > + Florian, Steffen
+> > > 
+> > > On Fri, Aug 30, 2024 at 12:15:10PM +0530, Naresh Kamboju wrote:
+> > > > The x86_64 defconfig builds failed on today's Linux next-20240829
+> > > > due to following build warnings / errors.
+> > > > 
+> > > > Regressions:
+> > > > * i386, build
+> > > >   - clang-18-defconfig
+> > > >   - clang-nightly-defconfig
+> > > > 
+> > > > * x86_64, build
+> > > >   - clang-18-lkftconfig
+> > > >   - clang-18-lkftconfig-compat
+> > > >   - clang-18-lkftconfig-kcsan
+> > > >   - clang-18-lkftconfig-no-kselftest-frag
+> > > >   - clang-18-x86_64_defconfig
+> > > >   - clang-nightly-lkftconfig
+> > > >   - clang-nightly-lkftconfig-kselftest
+> > > >   - clang-nightly-x86_64_defconfig
+> > > >   - rustclang-nightly-lkftconfig-kselftest
+> > > > 
+> > > > first seen on next-20240829.
+> > > >   Good: next-20240828
+> > > >   BAD:  next-20240829
+> > > > 
+> > > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > > > 
+> > > > build log:
+> > > > --------
+> > > > net/xfrm/xfrm_policy.c:1286:8: error: variable 'dir' is uninitialized
+> > > > when used here [-Werror,-Wuninitialized]
+> > > >  1286 |                 if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
+> > > >       |                      ^~~
+> > > > net/xfrm/xfrm_policy.c:1257:9: note: initialize the variable 'dir' to
+> > > > silence this warning
+> > > >  1257 |         int dir;
+> > > >       |                ^
+> > > >       |                 = 0
+> > > > 1 error generated.
 > 
-> Acked-by: Xu Kuohai <xukuohai@huawei.com>
+> Thanks for the report.
 > 
+> > > I believe that is due to
+> > > commit 08c2182cf0b4 ("xfrm: policy: use recently added helper in more places")
+> > > 
+> > > I will work on a fix to initialise dir in the loop where it is used.
+> > 
+> > Patch is here:
+> > - [PATCH ipsec-next] xfrm: Initialise dir in xfrm_hash_rebuild()
+> >   https://lore.kernel.org/netdev/20240830-xfrm_hash_rebuild-dir-v1-1-f75092d07e1b@kernel.org/T/#u
 > 
+> I sent the same patch as a v1 but Florian pointed out that dir needs to
+> be initialized in the other loop too. I sent my v2 for it yesterday, it
+> just needs to be merged.
+> 
+> https://lore.kernel.org/all/20240829-xfrm-restore-dir-assign-xfrm_hash_rebuild-v2-1-1cf8958f6e8e@kernel.org/
 
-Wait, it breaks the following test:
-
---- a/tools/testing/selftests/bpf/progs/bpf_syscall_macro.c
-+++ b/tools/testing/selftests/bpf/progs/bpf_syscall_macro.c
-@@ -43,7 +43,7 @@ int BPF_KPROBE(handle_sys_prctl)
-
-         /* test for PT_REGS_PARM */
-
--       bpf_probe_read_kernel(&tmp, sizeof(tmp), &PT_REGS_PARM1_SYSCALL(real_regs));
-+       tmp = PT_REGS_PARM1_SYSCALL(real_regs);
-         arg1 = tmp;
-         bpf_probe_read_kernel(&arg2, sizeof(arg2), &PT_REGS_PARM2_SYSCALL(real_regs));
-         bpf_probe_read_kernel(&arg3, sizeof(arg3), &PT_REGS_PARM3_SYSCALL(real_regs));
-
-Failed with verifier rejection:
-
-0: R1=ctx() R10=fp0
-; int BPF_KPROBE(handle_sys_prctl) @ bpf_syscall_macro.c:33
-0: (bf) r6 = r1                       ; R1=ctx() R6_w=ctx()
-; pid_t pid = bpf_get_current_pid_tgid() >> 32; @ bpf_syscall_macro.c:36
-1: (85) call bpf_get_current_pid_tgid#14      ; R0_w=scalar()
-; if (pid != filter_pid) @ bpf_syscall_macro.c:39
-2: (18) r1 = 0xffff800082e0e000       ; R1_w=map_value(map=bpf_sysc.rodata,ks=4,vs=4)
-4: (61) r1 = *(u32 *)(r1 +0)          ; R1_w=607
-; pid_t pid = bpf_get_current_pid_tgid() >> 32; @ bpf_syscall_macro.c:36
-5: (77) r0 >>= 32                     ; R0_w=scalar(smin=0,smax=umax=0xffffffff,var_off=(0x0; 0xffffffff))
-; if (pid != filter_pid) @ bpf_syscall_macro.c:39
-6: (5e) if w1 != w0 goto pc+98        ; R0_w=607 R1_w=607
-; real_regs = PT_REGS_SYSCALL_REGS(ctx); @ bpf_syscall_macro.c:42
-7: (79) r8 = *(u64 *)(r6 +0)          ; R6_w=ctx() R8_w=scalar()
-; tmp = PT_REGS_PARM1_SYSCALL(real_regs); @ bpf_syscall_macro.c:46
-8: (79) r1 = *(u64 *)(r8 +272)
-R8 invalid mem access 'scalar'
-processed 8 insns (limit 1000000) max_states_per_insn 0 total_states 0 peak_states 0 mark_read 0
-
+Thanks, and sorry for the noise.
 
