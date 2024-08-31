@@ -1,201 +1,125 @@
-Return-Path: <netdev+bounces-123932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B483966E57
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 03:11:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 529A2966EB6
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 04:05:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F3EA281B86
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 01:11:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06DA9284D5E
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 02:05:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ECDA1AACA;
-	Sat, 31 Aug 2024 01:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B52C2135B;
+	Sat, 31 Aug 2024 02:05:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2128.outbound.protection.partner.outlook.cn [139.219.146.128])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277BC134A8;
-	Sat, 31 Aug 2024 01:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.128
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725066704; cv=fail; b=tffiM9iDVY9qVNtYloswYI6+V/1fBzlvH/r5y6dEJGGp2ynSqxlLHcGXq6pk0gYbca90S+dOk6hr/BrSW7Q/Cjw8hntVudbyLgOPlwFDg39KOcbLnk0dci+uHmV2ZzZGvrhUZW1qIMk1nUqCyPOeogdZe6T3yjp6N8SRY7kj0eY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725066704; c=relaxed/simple;
-	bh=sVxlU5xH+fftgYtQZ2ycVGNayvbrGU+eOdWblZHcasI=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=CsWA2VIg1cygCwtoGmpcN/Lx4lr/0NW+ser8ZMYDFWLfkZYNRARwOlSuTamh0qerIpRi8CjRvtJPE2aoSUjWwuQuvK9czykuXqtcaW58JQeT+h7EPMRAfojM6fBtvBLeRvu5PmuPs39MAJ7nuJYpvXDlOfMkZWlJjtmHQqfnS/c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EqCY2JssGcg69n2G+MDp7ZwETnoRv7srsDJoW9ajhgArxdhRfJlK8lk8kP4TvMK3HyeEb4tUje5nNUQkUFwD/paCFHurS+Xx/dLwms2C9a2FfaysflwiZ8HH/9fI23KpsUSVEbxEd7FU4wAhsRkKMSJU8iLP8TPVMugnAn/BS+F3IFFt/AhCs3zRdw4HC0CXoC8P91hfcaErzfsSAnvVsWRu+eJHmqox6/4CV4xRAO6zGaUf0ZPN4BPtpvW1qSeax8hODWG01KVXznmZQeI8VxSx0WDEgzce8+YJ/7hnctu4JpEdcV9Kix1wLEDC1WfnESid4z5HqyJmxI9uitlMHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0MPHX9zImSSAX1HKiwc4rmn4gRL0LKYO6JSRmXkFBVc=;
- b=AA+CZQHFTNqhZN9TFDT4VIoxvntmaFOQS44XwffCJ7IwK7grKs0Dg9WLsiX1LXdyqELGFCRkxF2c2midanjXfBIrHCLD0RQq4yJdbKhXpQ3hkd4B9M8oeF/w4uo2Cw6Z13WOWUH4HrKeyl3d6cZTRYsEx7a44a4qYGfY6wIuYTsXo5Lj8PWfrP7vUo8+4f9gtdqc6woASiwIGYKvLt/bdVlODXqOBYKsmXPLNEizWY21iLJOerC0fMeaLYk8LcGi36HwMf+tMXMvAsRPAvlTZxsmRZjYSj25Ltoe9euy6VceoMf2rKhvpNOYAN+B24oHSRAeinP8bsZ5/D034U4uhg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-Received: from NTZPR01MB1018.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:b::7) by NTZPR01MB1018.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:b::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.23; Sat, 31 Aug
- 2024 01:11:28 +0000
-Received: from NTZPR01MB1018.CHNPR01.prod.partner.outlook.cn
- ([fe80::e1c4:5bb3:adc:97f5]) by NTZPR01MB1018.CHNPR01.prod.partner.outlook.cn
- ([fe80::e1c4:5bb3:adc:97f5%3]) with mapi id 15.20.7897.021; Sat, 31 Aug 2024
- 01:11:28 +0000
-From: ende.tan@starfivetech.com
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	leyfoon.tan@starfivetech.com,
-	minda.chen@starfivetech.com,
-	endeneer@gmail.com,
-	f.fainelli@gmail.com,
-	Tan En De <ende.tan@starfivetech.com>
-Subject: [net-next,v4,1/1] net: stmmac: Batch set RX OWN flag and other flags
-Date: Sat, 31 Aug 2024 09:11:14 +0800
-Message-Id: <20240831011114.2065912-1-ende.tan@starfivetech.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC8291B7FD;
+	Sat, 31 Aug 2024 02:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725069923; cv=none; b=JnRYMLnideG6o9H6H1MMIkghFmhP08fHHk4hCV4swVkrA0RhY76wMajzhbwmldb1oR3oQiasnEDYYbI+oqLBY6TVMVdhDfrFaCZ3JUBZ+7wK0zcVZv/nAcwOcE5x17SSCF5IcDURDIMSDJWZL0VdOpJVHF5LvLqwjpJOzn4xQqs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725069923; c=relaxed/simple;
+	bh=uCZQG+RidLhjyeH+59qsgB4Xbo7qHihv+9nku3bubP8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GkKRnXXe29EuU/5uVIOj+VetBDnCeLlPl60k4g0KpF1waCQy8fWDqTrynMQXnmn/x8rp7Kw0eRGq1gUnYQqxW127cpl/dAwBxNWahrrx83ALw7sfKikjl2zn8d9Pf8/72Yc+B9ZoAS4djDASbj5W1uL2+d94/tVC5l6iKsA5Uqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wwdb45h4NzgYbp;
+	Sat, 31 Aug 2024 10:03:12 +0800 (CST)
+Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
+	by mail.maildlp.com (Postfix) with ESMTPS id E6F5114011B;
+	Sat, 31 Aug 2024 10:05:17 +0800 (CST)
+Received: from huawei.com (10.90.53.73) by kwepemd500012.china.huawei.com
+ (7.221.188.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Sat, 31 Aug
+ 2024 10:05:16 +0800
+From: Li Zetao <lizetao1@huawei.com>
+To: <florian.fainelli@broadcom.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <wens@csie.org>, <jernej.skrabec@gmail.com>,
+	<samuel@sholland.org>, <heiko@sntech.de>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <hauke@hauke-m.de>, <alexandre.torgue@foss.st.com>,
+	<joabreu@synopsys.com>, <mcoquelin.stm32@gmail.com>, <wellslutw@gmail.com>,
+	<radhey.shyam.pandey@amd.com>, <michal.simek@amd.com>,
+	<ajay.kathat@microchip.com>, <claudiu.beznea@tuxon.dev>, <kvalo@kernel.org>,
+	<lizetao1@huawei.com>, <u.kleine-koenig@pengutronix.de>,
+	<jacky_chou@aspeedtech.com>
+CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-sunxi@lists.linux.dev>, <linux-rockchip@lists.infradead.org>,
+	<linux-stm32@st-md-mailman.stormreply.com>, <linux-wireless@vger.kernel.org>
+Subject: [PATCH net-next 00/12] net: Convert using devm_clk_get_enabled()/devm_clk_get_optional_enabled()
+Date: Sat, 31 Aug 2024 10:13:22 +0800
+Message-ID: <20240831021334.1907921-1-lizetao1@huawei.com>
 X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BJSPR01CA0002.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c211:c::14) To NTZPR01MB1018.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c510:b::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: NTZPR01MB1018:EE_
-X-MS-Office365-Filtering-Correlation-Id: 219f205b-570e-4bde-0dfd-08dcc959d774
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|7416014|366016|41320700013|1800799024|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	Na8LEw5/rg9nVlZ73USLzd9Wij1GqdwqRh0Qyg1uhR67ExEjEihYTrREsvVHMPeT3HVM2ZPsHWW4vrGCw0kfdko2gAL+RKiNlRsN8tYEGs6zi48tEnzR3UhfDTGleziJ+eLFMxwOxop2uzsV3EqGZ/mH3llbAfH+Mz9ESw2SGxOopB2orPhr+V6yb4EMCc3zc1zoreGb6gZlPbk/MeIFaAt3Tlz0RudJPWNCPiF6bc8D8jkmHkGnuFCmT1tnY5t32qFQMsQwVNsum4fA35iydEPT1SnaovGbzmAc0s+e5oSZxbgO0rXaQekFHk7SIvv0bB++dycyVWIHXN+h5VWslGpMV2gAg+IFcmzrnI26/G4KVhHE8sJJVxoGetkbibhjDkA4iaXtk7YWb0DlDyl1EK32ENcXbZIKDSEOpkHfyD0GG91anmPMPmwDDTEdOpKmjcObFZm2NquGtDgNEjcMnALmcIsyNekJWQL+AXMTFgVxgxJA/GjbEXfbYZEC++taWVOYD4bm25l6+dy32J1PypUhJeQmDLd6w3unTPRpe7tCdPoE89BxFUuZ+IseXBzJ2zKrmAiPTJTaZ9TrNh5e1Udm1Fmn5yTYXOIdVhxogV1ym0n5mnXBAgKCP/NyTVVf
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:NTZPR01MB1018.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(52116014)(7416014)(366016)(41320700013)(1800799024)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?RQfbzHU5rEVw4jm8pXTsXXyI2Zm/N/nhFDQs7ymokGMR+dCL6meBdQz6y6F7?=
- =?us-ascii?Q?PlXnxrh/rip2XTWNRI4UvUVpqvQhljQrJuP5oTVrmPvbMyv7IzziqkTDazED?=
- =?us-ascii?Q?YSqcAHZuKg4bynk7IvdiiylAmPtPELSQEVG4NL9uW37icjh2ckYymAXlTi4G?=
- =?us-ascii?Q?Yx495BKr40UAcnXcGup3c0I//dUlcbYNjAjkdK1JKyILHSsRGXFZISfRLHY+?=
- =?us-ascii?Q?lw7xwN4Ef2hOUwYVhrCXUcsCIkPp3tvpuVNGMN3x70AEkwU77UlJQ0+TNIRx?=
- =?us-ascii?Q?OsnHbUP741OTnPjcBt3kNIhUyFV9vcfDtqGz/RYfNEyPiEe22GCS4vtn37vN?=
- =?us-ascii?Q?N+icvufs3fKkjfcJr21wSpblHjloHH2rrCjgExAUuqRIzSWCEPEWmujLcFV4?=
- =?us-ascii?Q?9oln6v+ktTsMK5d8mYu3sl5jJKEMA2CRx26yQE2zMI/lV+iT+PCZL95N40vs?=
- =?us-ascii?Q?SNqVQoQw0TG8IAHYWcGRfjIaPOUCMXnVg0ExzjJ4Uj1JTxzifzg3cvx7mVoE?=
- =?us-ascii?Q?0TUE4tTwZFzZKF22jNR/Py+UdXGx4zWUoLF+Mr+ZVrc/d+aPwJXt1rGyyQaW?=
- =?us-ascii?Q?A1pvt/FlPYDNxKefVeLw2Vm3rRkJ+02P8wUABjp8ax/TEiVgihCLwI30Ysw2?=
- =?us-ascii?Q?Ob3X5OcFPWRB6FLb5ViX2oYCChRMdm//cBczZT8xt11zZwf/RayGKN8gzOkp?=
- =?us-ascii?Q?kFG7ZhLGIuS6/79Ww46eiZ8zT0rl02bkxbLlDLiA1UXTR17jZYPR503olJqj?=
- =?us-ascii?Q?e9hMVe+s86usOTFDxw8RvQMKrLkA53jPyUu1utsL9Ejz40ptmET7hhALRN/u?=
- =?us-ascii?Q?9/bzw6hrQ8anhc021mcnLpw6ILjGeXsRtbQG+3cMcxksTXqiHxGVzkPc1JFo?=
- =?us-ascii?Q?hfRtV04dTKdoFyLt/eL7Aesc9bvCS/69ewVY+9UfCxRBdJhTusxovaGNUxzA?=
- =?us-ascii?Q?GcYvGrZqHGgOVe6vCllUjzzcgqoi2UlkxsE0CSpO3DHNfuZqumTNCFsVCTvZ?=
- =?us-ascii?Q?tUCGUgPFzVtWKeHCXCy9yxfrk6KR3J+o2wr9nmC3CpNdgrFnamGkc7NiGGcx?=
- =?us-ascii?Q?ddFTgf2hvFxQOoG/lPe49ZddDgDd56zFpGLHTyPSt+I1s5E6j3M4SifKV9lF?=
- =?us-ascii?Q?D/cJDqOeHlEeX319Y9SBNEeJkmFY+BG/pBvThqnyZHqY5UXWnrHLHw8lQ/xp?=
- =?us-ascii?Q?MEvi2xERuByE9FF4euS+vdd6C9iqx1p59YqxxQ2iVhxKCbrVvny45+dg9Bo5?=
- =?us-ascii?Q?w+Z1g9G9s4VbL4EeZXdVahfrvwlBZyufxl26Jb5XzPXfRoCckRWGnYcxwHbi?=
- =?us-ascii?Q?L68+7q4N1kraTWB3Bou8Jvz/7u34g+uYUwaDtkZmHGyk4/AhJwgSSJhLbY7K?=
- =?us-ascii?Q?TZZyHI+ukDW5FH4rw0JOn0hHPNSA3YgeB6QH1rzdJQgTAqwu7LgD9rAvzGxP?=
- =?us-ascii?Q?pcrKNi2eB3ZPFQDlxQTT7f1mzUAuOkgZUeguZ14ZRMPt8RfRmp7WqhTaS3/f?=
- =?us-ascii?Q?XQ1rSnmRqFIk7x6qWQKmiHME+iH1Mks34i9aLoJogeFvzkS6o1SRqt6BtnTJ?=
- =?us-ascii?Q?1X9+IFawCgxhd/klk1Id75AEMFcjnOr1ERXqIZsA4h+ygR3rHgLpaKeQmELr?=
- =?us-ascii?Q?NA=3D=3D?=
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 219f205b-570e-4bde-0dfd-08dcc959d774
-X-MS-Exchange-CrossTenant-AuthSource: NTZPR01MB1018.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2024 01:11:28.5421
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ql23xFgrJiefYanIDNpkG4lMU6OmorShxlmIdyHyNR252Y+z8bwfB5mohKrle+aSLq7TOIYgDsk2eBRZEOOIb3BXUfXI/s80YfJWeMbZ1bw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: NTZPR01MB1018
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemd500012.china.huawei.com (7.221.188.25)
 
-From: Tan En De <ende.tan@starfivetech.com>
+There are many examples[1][2] of clk resource leakage in LTS. The
+reason is that developers need to maintain the allocation and release
+of clk resources themselves, but this will increase the burden on
+developers. Using the API related to devm_clk_get_*_enable ensures
+that the life cycle of clk is consistent with that of the device,
+reducing the risk of unreleased resources like clk.
 
-Minimize access to the RX descriptor by collecting all the flags in a
-local variable and then updating the descriptor at once.
+Several other developers are also working on converting to more
+secure interfaces, and this patch set is in principle the same as
+theirs.
 
-Signed-off-by: Tan En De <ende.tan@starfivetech.com>
----
-v4:
-- Batch the endian conversion cpu_to_le32()
-v3: https://patchwork.kernel.org/project/netdevbpf/patch/20240829134043.323855-1-ende.tan@starfivetech.com/
-- Use local variable to batch set the descriptor flags.
-- This reduces the number of accesses to the descriptor.
-v2: https://patchwork.kernel.org/project/netdevbpf/patch/20240821060307.46350-1-ende.tan@starfivetech.com/
-- Avoid introducing a new function just to set the interrupt-on-completion
-  bit, as it is wasteful to do so.
-- Delegate the responsibility of calling dma_wmb() from main driver code
-  to set_rx_owner() callbacks (i.e. let callbacks to manage the low-level
-  ordering/barrier rather than cluttering up the main driver code).
-v1: https://patchwork.kernel.org/project/netdevbpf/patch/20240814092438.3129-1-ende.tan@starfivetech.com/
----
- drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c   | 6 ++++--
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c | 6 ++++--
- 2 files changed, 8 insertions(+), 4 deletions(-)
+[1]: https://lore.kernel.org/all/20240812160128.338041191@linuxfoundation.org/
+[2]: https://lore.kernel.org/all/20240812160135.992451065@linuxfoundation.org/
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-index 1c5802e0d7f4..e99401bcc1f8 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-@@ -186,10 +186,12 @@ static void dwmac4_set_tx_owner(struct dma_desc *p)
- 
- static void dwmac4_set_rx_owner(struct dma_desc *p, int disable_rx_ic)
- {
--	p->des3 |= cpu_to_le32(RDES3_OWN | RDES3_BUFFER1_VALID_ADDR);
-+	u32 flags = (RDES3_OWN | RDES3_BUFFER1_VALID_ADDR);
- 
- 	if (!disable_rx_ic)
--		p->des3 |= cpu_to_le32(RDES3_INT_ON_COMPLETION_EN);
-+		flags |= RDES3_INT_ON_COMPLETION_EN;
-+
-+	p->des3 |= cpu_to_le32(flags);
- }
- 
- static int dwmac4_get_tx_ls(struct dma_desc *p)
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-index fc82862a612c..389aad7b5c1e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_descs.c
-@@ -56,10 +56,12 @@ static void dwxgmac2_set_tx_owner(struct dma_desc *p)
- 
- static void dwxgmac2_set_rx_owner(struct dma_desc *p, int disable_rx_ic)
- {
--	p->des3 |= cpu_to_le32(XGMAC_RDES3_OWN);
-+	u32 flags = XGMAC_RDES3_OWN;
- 
- 	if (!disable_rx_ic)
--		p->des3 |= cpu_to_le32(XGMAC_RDES3_IOC);
-+		flags |= XGMAC_RDES3_IOC;
-+
-+	p->des3 |= cpu_to_le32(flags);
- }
- 
- static int dwxgmac2_get_tx_ls(struct dma_desc *p)
+Li Zetao (12):
+  net: dsa: bcm_sf2: Convert using devm_clk_get_optional_enabled() in
+    bcm_sf2_sw_probe()
+  net: ethernet: Convert using devm_clk_get_enabled() in emac_probe()
+  net: ethernet: arc: Convert using devm_clk_get_enabled() in
+    emac_probe()
+  net: ethernet: ethoc: Convert using devm_clk_get_enabled() in
+    ethoc_probe()
+  net: ftgmac100: Convert using devm_clk_get_enabled() in
+    ftgmac100_setup_clk()
+  net: ethernet: hisilicon: Convert using devm_clk_get_enabled() in
+    hisi_femac_drv_probe()
+  net: lantiq_xrx200: Convert using devm_clk_get_enabled() in
+    xrx200_probe()
+  net: stmmac: dwmac-dwc-qos-eth: Convert using devm_clk_get_enabled()
+    in dwc_qos_probe()
+  net: ethernet: sunplus: Convert using devm_clk_get_enabled() in
+    spl2sw_probe()
+  net: xilinx: axienet: Convert using devm_clk_get_optional_enabled() in
+    axienet_probe()
+  wifi: wilc1000: Convert using devm_clk_get_optional_enabled() in
+    wilc_sdio_probe()
+  wifi: wilc1000: Convert using devm_clk_get_optional_enabled() in
+    wilc_bus_probe()
+
+ drivers/net/dsa/bcm_sf2.c                     | 28 ++----
+ drivers/net/ethernet/allwinner/sun4i-emac.c   | 13 +--
+ drivers/net/ethernet/arc/emac_rockchip.c      | 34 ++-----
+ drivers/net/ethernet/ethoc.c                  | 18 ++--
+ drivers/net/ethernet/faraday/ftgmac100.c      | 27 ++---
+ drivers/net/ethernet/hisilicon/hisi_femac.c   | 17 +---
+ drivers/net/ethernet/lantiq_xrx200.c          | 17 +---
+ .../stmicro/stmmac/dwmac-dwc-qos-eth.c        | 98 ++++---------------
+ drivers/net/ethernet/sunplus/spl2sw_driver.c  | 18 +---
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 15 +--
+ .../net/wireless/microchip/wilc1000/sdio.c    | 10 +-
+ drivers/net/wireless/microchip/wilc1000/spi.c |  5 +-
+ 12 files changed, 64 insertions(+), 236 deletions(-)
+
 -- 
 2.34.1
 
