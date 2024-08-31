@@ -1,117 +1,132 @@
-Return-Path: <netdev+bounces-123962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A83C4966FE5
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 08:57:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAB9896700F
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 09:26:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33E46B2170D
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 06:57:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93F581F23220
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 07:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D04116B750;
-	Sat, 31 Aug 2024 06:56:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ipA2EL28"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF93716A92E;
+	Sat, 31 Aug 2024 07:26:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF30D16A957
-	for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 06:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079DB33981;
+	Sat, 31 Aug 2024 07:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725087418; cv=none; b=J+E9NbulCWrxGNYzSZDuv0y1ztDCQSB2QeOIGIi4ktC0a7qYRnv2zj9lB/poozaWo+I330nWqGRGMAltWdpFr77ON4htgRzGv3gX12YxNvBUoLv8NO23bV3nTsm3pilOPvcCXajDYPMK4AkFKRFN7hVokZsSXguwv4lTlsMiB84=
+	t=1725089212; cv=none; b=WYRNzJTnnKTwB4gB3QNIL5jtwWchY68svkoS7z9fk6EeJgNGp/Dv5qE3yHvf0WLOctU/2N96MGLXxAv+5/gs40PXRkUM+IB9F+M3l591ecV8SUkaoD/+1O0Uhg1xo1+yjc8pBXOJGF/uX5FctKmcocirAKqty0l1n9ROIbEgroo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725087418; c=relaxed/simple;
-	bh=8+xb/c5q8Te81bywgznH7epprrs+vus2sJDb/zrAqlI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DmG1T2N9h4TaMZWjujoXs5GxIagH9fEsdH7cmgEgkzB6nEWxz8To0dQ6Hkux3OaRbDk0AtE5pG5dIOAf5yrs7cmsbXtWXOFSnGah4d31425dyX3ZHEQz78L0hEi2KpTrmx9j5E42LXiD44pN2B2FIWFYaaAfoylGh0b15idk37A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ipA2EL28; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e115c8aa51fso2686499276.1
-        for <netdev@vger.kernel.org>; Fri, 30 Aug 2024 23:56:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1725087416; x=1725692216; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=35/Cpco2p2doBWBoqkU/4WZL7A9fRuozoOMEP5DhBlM=;
-        b=ipA2EL28NfkHMF7Bu1AE1NRHUWJcX3Jg1VVzfgrd6xD/g/xekeEJULFMdm5ZNaVbnw
-         spp67cqXt7EZZrUaj8yk80QL6M5R2lzkRRRtdg4/F5NH2gh/kCu3E2NdOTQwube2J6NI
-         cDvDsZa1cemjGvwLj2MOgrk1/kFlE+IJq6LVi5vwqRn0iXio46lFvKKBR+AXTv862xdj
-         1/zeYScrc/34ICH/mWL9lEJogDtZ5TjTqG7oWmdzGuLmh2EkE5m39wAB/IFQUJ1ipCVu
-         IrkqFE2FuG+/gO7R6IiKnfQCbATqLRq3xLy2pZyk9GzkN/MsMCFmQ5XfAgML4RJfp47N
-         trIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725087416; x=1725692216;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=35/Cpco2p2doBWBoqkU/4WZL7A9fRuozoOMEP5DhBlM=;
-        b=cQcmxHkEBq2CAEfZJJBztISi/kBgIvIbA9Ua3qI+Rmtcmc8r1InDWCRutg4FbusSnU
-         x3pxWzEB1Caik2oRZ6eI2Nk2vTgRAN19EYH65Z2h46Gg+y/ffoy38RfGfxHkujKy/NT2
-         h3ynoM+AQDBcvNNiLsM+hqFbuhOSVP9S8g3VtmTqA8ARhViHpAY7lH/u8RtEMWJlxU5r
-         D7+gLziK5NYU1wGhiD+4mk0d3RyXz/4kPzm49135RLWkBbWR4F76raOKX4pozkbJQOSM
-         /1+XxyIm9Cg3ipzIjTsqQd17ma/7ZKxttk4n7mFvpeQv+3ViQUL1Q1rstCl15rUVunDn
-         Utlw==
-X-Forwarded-Encrypted: i=1; AJvYcCUXOnTO61qrlAfhiDz7e4GxRTi5FswGqGHmoWDg1mN3nvI+uIr0Tqm3WOUI+hsGE7pSE1BLNyE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqrwcPEFv/x2BIliOe3Av3DcKCKfhwE0UIJQ+WZqM3XcGupTu4
-	4+g/iWdIZqlQJODScfwFPCBRhxK9ahKC4gaPSPLM/xamNE9IY9cPWh74Z5RkiJyrUIPUT7y5M1w
-	4qRLlCwlHePjAFMbnMiOSh2eBEfcNm8Y/cOa6DA==
-X-Google-Smtp-Source: AGHT+IFWbLWA4IjXvF5bKeQh1lJtnNOkDsN8Sdtsfq95rr64K/eYP6o6HPpIf8dFbQYhHTulhF5MoAz7eON8AeOpAgw=
-X-Received: by 2002:a05:690c:d81:b0:6cf:8d6f:2bef with SMTP id
- 00721157ae682-6d40eb67be1mr51383017b3.7.1725087415578; Fri, 30 Aug 2024
- 23:56:55 -0700 (PDT)
+	s=arc-20240116; t=1725089212; c=relaxed/simple;
+	bh=nuHI7HnFliMd8Dt+eIqeDoMrC7klDw8n++rsR6rI6Sc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mD//dZXaxFhGK1/wIWDOVNWhXokwAW0XwvjRWgn0PSuFtddnRr0bmIkJeWvpNfCSfQufTNpQTUiZzQOIfyi65d1L0pRC4g3F5Vy2F2Z92lm+bVAMHVHZckYa3M39u6FmKleQI6SB1GY425TjUuEM2Lw8VZZkpuMsGaj2h4w/lhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Wwmm52kkpz4f3l2C;
+	Sat, 31 Aug 2024 15:26:29 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.75])
+	by mail.maildlp.com (Postfix) with ESMTP id 0403A1A018D;
+	Sat, 31 Aug 2024 15:26:45 +0800 (CST)
+Received: from [10.67.111.192] (unknown [10.67.111.192])
+	by APP2 (Coremail) with SMTP id Syh0CgAHPLuzxdJmcpHTDA--.9841S2;
+	Sat, 31 Aug 2024 15:26:44 +0800 (CST)
+Message-ID: <2379c139-6457-49dc-84fa-0d60ce226f2a@huaweicloud.com>
+Date: Sat, 31 Aug 2024 15:26:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240829082830.56959-1-quic_varada@quicinc.com>
- <20240829082830.56959-4-quic_varada@quicinc.com> <gomm5yozebwfuhmgziajmkflbj6knmbwae4mls5kuwl5ngcbrx@mndpiktfken2>
-In-Reply-To: <gomm5yozebwfuhmgziajmkflbj6knmbwae4mls5kuwl5ngcbrx@mndpiktfken2>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Sat, 31 Aug 2024 09:56:44 +0300
-Message-ID: <CAA8EJpoSZwqw7_UVVXzwOd77Xh6j5LzKus-ZfuL_f5yrc8AYkg@mail.gmail.com>
-Subject: Re: [PATCH v5 3/8] dt-bindings: clock: add Qualcomm IPQ5332 NSSCC
- clock and reset definitions
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Varadarajan Narayanan <quic_varada@quicinc.com>, andersson@kernel.org, mturquette@baylibre.com, 
-	sboyd@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, 
-	konradybcio@kernel.org, catalin.marinas@arm.com, will@kernel.org, 
-	djakov@kernel.org, richardcochran@gmail.com, geert+renesas@glider.be, 
-	neil.armstrong@linaro.org, arnd@arndb.de, nfraprado@collabora.com, 
-	linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-pm@vger.kernel.org, 
-	netdev@vger.kernel.org, Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v3 2/4] libbpf: Access first syscall argument
+ with CO-RE direct read on arm64
+Content-Language: en-US
+To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
+ linux-riscv@lists.infradead.org, netdev@vger.kernel.org,
+ Andrii Nakryiko <andrii@kernel.org>
+Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Puranjay Mohan <puranjay@kernel.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Pu Lehui <pulehui@huawei.com>
+References: <20240831041934.1629216-1-pulehui@huaweicloud.com>
+ <20240831041934.1629216-3-pulehui@huaweicloud.com>
+From: Xu Kuohai <xukuohai@huaweicloud.com>
+In-Reply-To: <20240831041934.1629216-3-pulehui@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:Syh0CgAHPLuzxdJmcpHTDA--.9841S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uF4DAr13tFWDGw47Kr4DArb_yoW8WFWrpa
+	yUCa4UKw18Ww4jkasrKF4avrW3tws3trnrCFZ7W3yS9FWUK3yrWa42grs0kw4ay3yUtw4Y
+	vr9Fkr18G3W7Z37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
+	wI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUIa
+	0PDUUUU
+X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
 
-On Sat, 31 Aug 2024 at 09:11, Krzysztof Kozlowski <krzk@kernel.org> wrote:
->
-> On Thu, Aug 29, 2024 at 01:58:25PM +0530, Varadarajan Narayanan wrote:
-> > From: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-> >
-> > Add NSSCC clock and reset definitions for Qualcomm IPQ5332.
-> > Enable interconnect provider ability for use by the ethernet
-> > driver.
-> >
-> > Signed-off-by: Kathiravan Thirumoorthy <quic_kathirav@quicinc.com>
-> > Signed-off-by: Varadarajan Narayanan <quic_varada@quicinc.com>
-> > ---
-> > v5: Marked #power-domain-cells as false
-> >     Included #interconnect-cells
->
-> Then this might not be GCC-like clock controller or gcc.yaml
-> should not include power-domain-cells.
+On 8/31/2024 12:19 PM, Pu Lehui wrote:
+> From: Pu Lehui <pulehui@huawei.com>
+> 
+> Currently PT_REGS_PARM1 SYSCALL(x) is consistent with PT_REGS_PARM1_CORE
+> SYSCALL(x), which will introduce the overhead of BPF_CORE_READ(), taking
+> into account the read pt_regs comes directly from the context, let's use
+> CO-RE direct read to access the first system call argument.
+> 
+> Suggested-by: Andrii Nakryiko <andrii@kernel.org>
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+> ---
+>   tools/lib/bpf/bpf_tracing.h | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/lib/bpf/bpf_tracing.h b/tools/lib/bpf/bpf_tracing.h
+> index e7d9382efeb3..051c408e6aed 100644
+> --- a/tools/lib/bpf/bpf_tracing.h
+> +++ b/tools/lib/bpf/bpf_tracing.h
+> @@ -222,7 +222,7 @@ struct pt_regs___s390 {
+>   
+>   struct pt_regs___arm64 {
+>   	unsigned long orig_x0;
+> -};
+> +} __attribute__((preserve_access_index));
+>   
+>   /* arm64 provides struct user_pt_regs instead of struct pt_regs to userspace */
+>   #define __PT_REGS_CAST(x) ((const struct user_pt_regs *)(x))
+> @@ -241,7 +241,7 @@ struct pt_regs___arm64 {
+>   #define __PT_PARM4_SYSCALL_REG __PT_PARM4_REG
+>   #define __PT_PARM5_SYSCALL_REG __PT_PARM5_REG
+>   #define __PT_PARM6_SYSCALL_REG __PT_PARM6_REG
+> -#define PT_REGS_PARM1_SYSCALL(x) PT_REGS_PARM1_CORE_SYSCALL(x)
+> +#define PT_REGS_PARM1_SYSCALL(x) (((const struct pt_regs___arm64 *)(x))->orig_x0)
+>   #define PT_REGS_PARM1_CORE_SYSCALL(x) \
+>   	BPF_CORE_READ((const struct pt_regs___arm64 *)(x), __PT_PARM1_SYSCALL_REG)
+>   
 
-qcom,gcc.yaml already doesn't mark #power-domain-cells as required, so
-it should be fine. See qcom,gcc-apq8064.yaml or qcom,gcc-ipq4019.yaml.
+Cool!
 
--- 
-With best wishes
-Dmitry
+Acked-by: Xu Kuohai <xukuohai@huawei.com>
+
 
