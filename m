@@ -1,153 +1,98 @@
-Return-Path: <netdev+bounces-123992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9AF2967338
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 22:14:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D649967341
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 22:55:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A1BBB21F23
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 20:14:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 837791C210D9
+	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 20:55:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2980817C7D8;
-	Sat, 31 Aug 2024 20:14:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="foDF3BYb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631F317E900;
+	Sat, 31 Aug 2024 20:55:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32D713A3E8
-	for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 20:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D26AE16BE23
+	for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 20:55:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725135244; cv=none; b=hpZIOlVLJtq7L2mNinBOdUeJ8NlPZyLewDKcxtqxdvIwxFtkdEGDjQ0/fNqVFkyTl6uYVQ0pTTIZopHMbvUbxVsiCzet9fyDVU4l3bYFrfe+/PlA3isdL6CMOXth2N9A1L3nk0nHLtcNc1oqNqIgj3G/TAzilPBtCI7vpYzRODg=
+	t=1725137704; cv=none; b=HtMAHupzgZgtpz3CcvjDmStvikt+0Pz43+OS3eRKKj9bCe71z8mH8oJ1yf5AQbBF5Uc26VN90FCeswVRJq+wCoF/i5X3jRLZ6I9JDo3UMoEkU36oZ1c+M/K9fyQyYX9o1OtziBZhChmHCEHIclt3MIWdiHr+zUPunVl6BbxdzQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725135244; c=relaxed/simple;
-	bh=lA3dDz9Vc0mtZeffGrvc48LYF6zWkPyfHBgYxQCG5ko=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mz6sVNEeE2ec+e+7L3A7N6u0K4qUqryh5muwpFRNRoDUSFuuBRJbq728aj7TqcZ7OL4KkoEHJi3RooCL+gwYbPvmDsffgRL5MUr071WwUI32DaFceSYjA6W3MCRD0Gi9h5OeQm9k96gYn0Rh6n/LdX2L7ha5oV+UPHwZBu0MiRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=foDF3BYb; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-76cb5b6b3e4so1907514a12.1
-        for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 13:14:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725135242; x=1725740042; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lA3dDz9Vc0mtZeffGrvc48LYF6zWkPyfHBgYxQCG5ko=;
-        b=foDF3BYb7NQxzpJasem2r2xzDlHdJDeVc73kbg+vrMrOgYJMpIzEfPHzNlMj9fRGdo
-         EQrUDrLGbUhc1PNAGWCm/aJQeslcY9yedlzb4+wpuF1kDkFnSMbQiQGSNJr+gMy4o4dv
-         B2xeQXgKa0VeKD+EDF4Ft1AKfBSSM7PolxYp69katYKydETH4aQwogIO5bAPt3EbgShF
-         P4r73oBS0LwjkGqVYLVy/ZrYkD/pDR/2YxJh4Ko8gEBDfJdJvftbmHsscLfy6+9T6HEz
-         1KnTT7e5TWBtVs4i66hikcRT/fyZiY20fjzlSAhuoqrw80mqO/iiDg9bLzpQP6O+f0bH
-         9CqQ==
+	s=arc-20240116; t=1725137704; c=relaxed/simple;
+	bh=jFH484BT5R7q2HOiKMJKv1FmMZ4CHygH+s9H6wFYtsY=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=tz67U1oZsHTaLKy5qbtemo97GPAbmrfpb/J/Xh2trTADx9dZ0JlOR6MmKI4CeaXVUWydI64eNRMEfXcS0qvurYGHJzC8L04nY5+FjjCKnIRacqKenAhR9sN2UzsJuWpDqt39HY7RjXjYnlNXtYz2yXKmeFcNpoJlnqZM4me80OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82a20631362so211856339f.0
+        for <netdev@vger.kernel.org>; Sat, 31 Aug 2024 13:55:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725135242; x=1725740042;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lA3dDz9Vc0mtZeffGrvc48LYF6zWkPyfHBgYxQCG5ko=;
-        b=saVyemJu0qsWO9gSV+eXPwsFk+0JtnvcK5RnQfASEReTShbx5CK9WsqrhQQlhot++P
-         i3jyrFlPRWGSpjJAywGjqjAGFLzsFtgPYvB00pV6qOKHMsh6EwXRtadoJxRCRuIygIsn
-         EHEloAKd0pgvntekfkwvyf0dHlKV9NM2E8mt4m2nGoHZzJecV88BefuNUkifMjmx/4lh
-         6zTZtOGFdsQMjRcnn4mcEQE7s2V3IDD2ttZs9/YCOEWWtgFJOPnhDq/Xhg1Ome0e3msS
-         dG/p7LUdUCEiSFWOvuV01M7fzY9EnSAYm8v6U0Y8KxHpf7890RgulrJM8M5AP5yyPyZu
-         inHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWZTZmmyYOs8BsihvVSDPXRclzWTEwbvHis0J2oenoetjwg69TY7HYuebR/WTmDlQJxd+Trck=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBlNvzwMu1OCdurhbpFOZCxdAQrgNWzvYPM0tgvf2iaxMm8L0O
-	Te88Nf0Q4BAOLg2hRjVi850wdh7Rzb6gJf9OUkDWMXHivh5LUsom9u26aIzG
-X-Google-Smtp-Source: AGHT+IFoP7q36z/iDvGe6TaerxODellsMF7sjOzFiQ6SD2PcIuM7w0kBZCCW1UHUuv5CDQ5tsv1YSg==
-X-Received: by 2002:a05:6a20:e687:b0:1cc:d45e:7303 with SMTP id adf61e73a8af0-1cece4d6db9mr4254505637.4.1725135241799;
-        Sat, 31 Aug 2024 13:14:01 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2054d4aa84dsm12691575ad.132.2024.08.31.13.13.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Aug 2024 13:14:01 -0700 (PDT)
-Date: Sat, 31 Aug 2024 13:13:56 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Potnuri Bharat Teja <bharat@chelsio.com>,
-	Christian Benvenuti <benve@cisco.com>,
-	Satish Kharat <satishkh@cisco.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Dimitris Michailidis <dmichail@fungible.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Bryan Whitehead <bryan.whitehead@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Martin Habets <habetsm.xilinx@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	MD Danish Anwar <danishanwar@ti.com>,
-	Linus Walleij <linusw@kernel.org>, Imre Kaloz <kaloz@openwrt.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Carolina Jubran <cjubran@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: Re: [PATCH net-next 2/2] net: Remove setting of RX software
- timestamp from drivers
-Message-ID: <ZtN5hJcqCo4Iw2ny@hoboy.vegasvil.org>
-References: <20240829144253.122215-1-gal@nvidia.com>
- <20240829144253.122215-3-gal@nvidia.com>
- <ZtI2xWNRuloF2RDF@hoboy.vegasvil.org>
- <067da3de-3c2f-45e5-a598-cafa62e1f0a8@nvidia.com>
+        d=1e100.net; s=20230601; t=1725137702; x=1725742502;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TXinuCcZsAGJ7z0LOnrPbuvxWrzVfa5BPSiAe1GhMOU=;
+        b=Ri/sTrPUjfcmI+cSfQ9eOIaRuJV0NHIM1DFMvgO6R3QcS/OPlf1VoK0deTy5CVUiyi
+         HnPdwgSdy8ZfmTDGGFOYhD5a40db3aEDfZLbWttlIGd4T3Adoy/tljXwwcaIQCCDHmSN
+         JplfHHvrkzf3WKqpCS1GZThFQ5pMnqoIIN0iCL71UOBOh/0xYAxyGx5akl9ud+k5mqLI
+         UxXWee+jEgIJpK/B0Oq38cXcLmalFsyd5Gdm+0LMrTp4KbzBdBDUnbV/hP+/acPk8kqG
+         ieKJWlwl+qQy5y5ZVz4HXE4WvZGiQ76b9djan+6uju1k2YIn5BYBcgdoX9CR4Bcc3PJp
+         IOsg==
+X-Forwarded-Encrypted: i=1; AJvYcCX5E6mIvNB7t9tKAaz3zc/9peUlCEvUSGX7uShZ20bd5q1eHj2bXDSu9uX6SbpU9N4qW0s4Rz8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi+o9a1Zjw9uUZS2oWU9VPqYkZ0S4hojbeoKA9HHj/jiU57AjE
+	WE9c2iZkcJkRzBExGmr00L/8WhtMH1yge2PUIW/COk48GH/PmdQe7a4Ypp4mBmeLsdKM6sR0r7h
+	KQShD12QRLvdZUR4QHVR5ExtuLN6Sk+QLT/8VXoCHUHuV3YAFbk3+Wns=
+X-Google-Smtp-Source: AGHT+IGM0VYo+phzMqpcyZHt8FGQ9BOhTyofLbSGzhKKdLQqrxnCP6aoFjZSGJSMGF9oIciQZ2cX72Nge3gLhsO5Q6V4uQ+vSiD2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <067da3de-3c2f-45e5-a598-cafa62e1f0a8@nvidia.com>
+X-Received: by 2002:a05:6602:14d5:b0:81a:2abb:48a7 with SMTP id
+ ca18e2360f4ac-82a266d18a8mr41499139f.1.1725137702080; Sat, 31 Aug 2024
+ 13:55:02 -0700 (PDT)
+Date: Sat, 31 Aug 2024 13:55:02 -0700
+In-Reply-To: <00000000000099cf25061964d113@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ebe92a062100eb94@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in
+ dev_map_enqueue (2)
+From: syzbot <syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com>
+To: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
+	bigeasy@linutronix.de, bpf@vger.kernel.org, daniel@iogearbox.net, 
+	davem@davemloft.net, eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	michal.switala@infogain.com, netdev@vger.kernel.org, revest@google.com, 
+	sdf@fomichev.me, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, toke@redhat.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Aug 31, 2024 at 08:19:06PM +0300, Gal Pressman wrote:
-> I would, but it's not allowed to post series with more than 15 patches.
+syzbot suspects this issue was fixed by commit:
 
-If that worries you, then you can post in batches.
+commit 401cb7dae8130fd34eb84648e02ab4c506df7d5e
+Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Date:   Thu Jun 20 13:22:04 2024 +0000
 
-Thanks,
-Richard
+    net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12597c63980000
+start commit:   36534d3c5453 tcp: use signed arithmetic in tcp_rtx_probe0_..
+git tree:       bpf
+kernel config:  https://syzkaller.appspot.com/x/.config?x=333ebe38d43c42e2
+dashboard link: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13390aea980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10948741980000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
