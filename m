@@ -1,349 +1,273 @@
-Return-Path: <netdev+bounces-124004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E79E2967520
-	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 07:18:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC7C967552
+	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 08:34:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA6EA282B3F
-	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 05:18:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34FB328299E
+	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 06:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00BC928DA0;
-	Sun,  1 Sep 2024 05:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35151381DF;
+	Sun,  1 Sep 2024 06:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XK+yI5Py"
+	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="LsUi6FfC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34018748A;
-	Sun,  1 Sep 2024 05:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA7239879
+	for <netdev@vger.kernel.org>; Sun,  1 Sep 2024 06:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725167910; cv=none; b=W7qRTkOnvNhkskfhxyoO6wSzgapiXK0Zv7rGWlq5hUGYl1JS08nPrZL0qGPjVZAnd1GAl1HXyV/3SoIVdqxI6z2MtlhJMFg2jlEtvs44+hzPQKSCdbxtGGPZvv0/N3BkHCEtP7Cjj3K+Z0ucJfMICy0OY8L/afWgTf12hAhjXCs=
+	t=1725172447; cv=none; b=aSGFH0pmCxKpOeKHle/GGBwiP27AKDOdnQpKi7hTziYUBr35B1y1prai8YnwJATYvB0ByA3+XPflQW1f+FV0Z7ze5dyTunzJf4VXApC6ZGvn7vjwRfLQfNXfBtyLcNpQ/k/izI8CsiKbNhYTZrNlmq9pitzFZXODU2sAZmUmsh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725167910; c=relaxed/simple;
-	bh=dNJlNA7FEKx8vGjbKAKwbl0RwTtDBfouxGcA971mtC0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pkSNJeu0ycxCw9s12Er0SuE4cqGJyxCkOQjD6CjF0blYgy3xwvOtazlfzSihQutZL8vBplFj5QtcaFeh+WdUB7ZSOIX89PlcV5Yl+PpnFoi5Gl1STMwLD6AbuCipc2K2qaXEsK1mMBm0ljxG5+EBJuVspDIZl4bxkRcy46ONor8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XK+yI5Py; arc=none smtp.client-ip=209.85.161.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5dc93fa5639so1922148eaf.1;
-        Sat, 31 Aug 2024 22:18:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725167908; x=1725772708; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rezF6iuLnPWFCk07aeciBJ4pDsFKzTvutSVVYnuI9tI=;
-        b=XK+yI5PyQKHRWhjck5zT/cPeL9Ba1mAnsaS3qUUKjfIybwn5LjIWnQu/WTcv0e+M0Y
-         nF+neUhYaq+w8f1GzopxDJym6C0g/EtTp5YAGnpynle20QQGNYhw1y73gwl47x5mwXFj
-         olwOggTFhSLMZZBLO7HQacNmrvNq6BdmKiZGJ83MBxk3yUrclDeVcAgTEu9YSvui1n0+
-         2KNVON4iMjyuJ/0UFToJA794D2jSmX8Rxv3PZ5nK8sLgdm4dka5C2/5UoXlb5f4AUrln
-         RkQQ1Kaje3tZ5j8CfdYHhS99E/wScnHB7myBgAODmv9GPC/Qkrx7k8v+zBX/8eUAIn8u
-         Z5Mg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725167908; x=1725772708;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rezF6iuLnPWFCk07aeciBJ4pDsFKzTvutSVVYnuI9tI=;
-        b=atlM5s7hW5Gn0YasIh2LcPwCodMdshIGkTrqWrVONoChQ6coLaMTyew2ssa4cpfpLU
-         ojF0u7PE/I5jUvBm66BMVwvvzJKwo5TIqFWAi1urm9rvyBeQzhKaTbpz3Bgfi+4fZKxU
-         ClvEWKrSPswT0AgNnziH5wGRiieZ2DIyxDo7ZkoJxbyzrJI7k4R7EBLRd/VlJYGVdMPY
-         ylkG9q66c0rgvaHEe7vksgCIGcqGaQaGpcIaoOpU9eHOsgGE1N2iBAKe2DqbRs67CMzM
-         hraTWdaZC5thac5cft0kx/CnAgz3VqtwHi0WmxtQ4EJe8iGIlAOaykcojjhDPnqP8kFo
-         WTgA==
-X-Forwarded-Encrypted: i=1; AJvYcCWhNzze+OWb6hSTqHdt8iQ2nLyrCPeFc5SRtugi8V5ieGm3drOU36Fve6A/Y5hQY04e5RyVbfw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSCui/v6bQuyOeN8nkCLKPjffIBRybpEOpuQMwc0iNFr4KsEQo
-	mGK0edsh8hPjMHDrebukGE6eJv532DQHaDDE5P4VL7XY937D9u3w
-X-Google-Smtp-Source: AGHT+IFFxfSz5YdrMSwTF8ZLEw0BoVNNZhU67Du1QaRGdCIjh9Tps4fJ+lSmhU+4f4+6qb28UMj96A==
-X-Received: by 2002:a05:6830:6683:b0:709:3015:fd08 with SMTP id 46e09a7af769-70f72d09868mr4634498a34.31.1725167908154;
-        Sat, 31 Aug 2024 22:18:28 -0700 (PDT)
-Received: from KERNELXING-MC1.tencent.com ([114.253.36.103])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d8d06c92dcsm115497a91.30.2024.08.31.22.18.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 31 Aug 2024 22:18:27 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	jmaloy@redhat.com
-Cc: linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next] selftests: add selftest for UDP SO_PEEK_OFF support
-Date: Sun,  1 Sep 2024 13:18:21 +0800
-Message-Id: <20240901051821.94956-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1725172447; c=relaxed/simple;
+	bh=5l9c9nUT9miF+p/k8RzXg23g4Vp4Ohb4st+XtAcJS+s=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=PTdLb9fIbs1o/g/pRWphTq9aQQathy+fVSbYm0WImEoIoFSLT3TuCKB0Kg7ddy/gI3JK09Hjofzl1DgGi6ZgIffqZCvU5YlomP0t93yaWGmLVNZGIHil4LLgkNahwk7/Yc4Qw70o9vcEj3Xt/WzdHwsNrbgT69A4J6v1iMYxw0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=LsUi6FfC; arc=none smtp.client-ip=217.79.154.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
+X-Virus-Scanned: amavisd-new at emenem.pl
+Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
+	(authenticated bits=0)
+	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 4816S5ZJ001506
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sun, 1 Sep 2024 08:28:07 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
+	t=1725172090; bh=vuUeHsMgLWaa8b3qXWK86Lho3AknKtX+veiyrc+wmCQ=;
+	h=Date:From:Subject:To:Cc;
+	b=LsUi6FfCUTpfTtZCMUPiwsnKms2kMwFcMm/KzPi6zgVNgOXD87eU4cgtQ6vjIHmuv
+	 Cf+KuAH5WEcSqXR4eedUsMybWsPBQZLaOp8HWdUWtuSnBms8ll2vnXsdwWftyMWEAA
+	 WdT4fZ0mM24mjDv4IMgxF9B8bu2RMS5+74qOw2Bw=
+Message-ID: <a7904c43-01c7-4f9c-a1f9-e0a7ce2db532@ans.pl>
+Date: Sat, 31 Aug 2024 23:28:03 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
+Subject: [mlx4] Mellanox ConnectX2 (MHQH29C aka 26428) and module diagnostic
+ support (ethtool -m) issues
+To: Ido Schimmel <idosch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Cc: Michal Kubecek <mkubecek@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
+        Andrew Lunn <andrew@lunn.ch>,
+        "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jason Xing <kernelxing@tencent.com>
+Hi,
 
-Add the SO_PEEK_OFF selftest for UDP. In this patch, I mainly do
-three things:
-1. rename tcp_so_peek_off.c
-2. adjust for UDP protocol
-3. add selftests into it
+I noticed that module diagnostic on Mellanox ConnectX2 NIC (MHQH29Caka 26428 aka 15b3:673c, FW version 2.10.0720) behaves in somehow strange ways.
 
-Suggested-by: Jon Maloy <jmaloy@redhat.com>
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-Link: https://lore.kernel.org/all/9f4dd14d-fbe3-4c61-b04c-f0e6b8096d7b@redhat.com/
----
- tools/testing/selftests/net/Makefile          |  2 +-
- .../{tcp_so_peek_off.c => sk_so_peek_off.c}   | 91 +++++++++++--------
- 2 files changed, 56 insertions(+), 37 deletions(-)
- rename tools/testing/selftests/net/{tcp_so_peek_off.c => sk_so_peek_off.c} (58%)
+1. For SFP modules the driver is able to read the first page but not the 2nd one:
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 1179e3261bef..d5029f978aa9 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -80,7 +80,7 @@ TEST_PROGS += io_uring_zerocopy_tx.sh
- TEST_GEN_FILES += bind_bhash
- TEST_GEN_PROGS += sk_bind_sendto_listen
- TEST_GEN_PROGS += sk_connect_zero_addr
--TEST_GEN_PROGS += tcp_so_peek_off
-+TEST_GEN_PROGS += sk_so_peek_off
- TEST_PROGS += test_ingress_egress_chaining.sh
- TEST_GEN_PROGS += so_incoming_cpu
- TEST_PROGS += sctp_vrf.sh
-diff --git a/tools/testing/selftests/net/tcp_so_peek_off.c b/tools/testing/selftests/net/sk_so_peek_off.c
-similarity index 58%
-rename from tools/testing/selftests/net/tcp_so_peek_off.c
-rename to tools/testing/selftests/net/sk_so_peek_off.c
-index df8a39d9d3c3..870a890138c4 100644
---- a/tools/testing/selftests/net/tcp_so_peek_off.c
-+++ b/tools/testing/selftests/net/sk_so_peek_off.c
-@@ -10,37 +10,41 @@
- #include <arpa/inet.h>
- #include "../kselftest.h"
+[  318.082923] mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(1) i2c_addr(51) offset(0) size(48): Response Mad Status(71c) - invalid I2C slave address
+[  318.082936] mlx4_en: eth1: mlx4_get_module_info i(0) offset(256) bytes_to_read(128) - FAILED (0xfffff8e4)
+
+However, as the driver intentionally tries mask the problem [1], ethtool reports "Optical diagnostics support" being available and shows completely wrong information [2].
+
+Removing the workaround allows ethtool to recognize the problem and handle everything correctly [3]:
+---- cut here ----
+--- a/drivers/net/ethernet/mellanox/mlx4/port.c	2024-07-27 02:34:11.000000000 -0700
++++ b/drivers/net/ethernet/mellanox/mlx4/port.c	2024-08-31 21:57:11.211612505 -0700
+@@ -2197,14 +2197,7 @@
+ 			  0xFF60, port, i2c_addr, offset, size,
+ 			  ret, cable_info_mad_err_str(ret));
  
--static char *afstr(int af)
-+static char *afstr(int af, int proto)
- {
--	return af == AF_INET ? "TCP/IPv4" : "TCP/IPv6";
-+	if (proto == IPPROTO_TCP)
-+		return af == AF_INET ? "TCP/IPv4" : "TCP/IPv6";
-+	else
-+		return af == AF_INET ? "UDP/IPv4" : "UDP/IPv6";
- }
- 
--int tcp_peek_offset_probe(sa_family_t af)
-+int sk_peek_offset_probe(sa_family_t af, int proto)
- {
-+	int type = (proto == IPPROTO_TCP ? SOCK_STREAM : SOCK_DGRAM);
- 	int optv = 0;
- 	int ret = 0;
- 	int s;
- 
--	s = socket(af, SOCK_STREAM | SOCK_CLOEXEC, IPPROTO_TCP);
-+	s = socket(af, type, proto);
- 	if (s < 0) {
- 		ksft_perror("Temporary TCP socket creation failed");
- 	} else {
- 		if (!setsockopt(s, SOL_SOCKET, SO_PEEK_OFF, &optv, sizeof(int)))
- 			ret = 1;
- 		else
--			printf("%s does not support SO_PEEK_OFF\n", afstr(af));
-+			printf("%s does not support SO_PEEK_OFF\n", afstr(af, proto));
- 		close(s);
- 	}
- 	return ret;
- }
- 
--static void tcp_peek_offset_set(int s, int offset)
-+static void sk_peek_offset_set(int s, int offset)
- {
- 	if (setsockopt(s, SOL_SOCKET, SO_PEEK_OFF, &offset, sizeof(offset)))
- 		ksft_perror("Failed to set SO_PEEK_OFF value\n");
- }
- 
--static int tcp_peek_offset_get(int s)
-+static int sk_peek_offset_get(int s)
- {
- 	int offset;
- 	socklen_t len = sizeof(offset);
-@@ -50,8 +54,9 @@ static int tcp_peek_offset_get(int s)
- 	return offset;
- }
- 
--static int tcp_peek_offset_test(sa_family_t af)
-+static int sk_peek_offset_test(sa_family_t af, int proto)
- {
-+	int type = (proto == IPPROTO_TCP ? SOCK_STREAM : SOCK_DGRAM);
- 	union {
- 		struct sockaddr sa;
- 		struct sockaddr_in a4;
-@@ -62,13 +67,13 @@ static int tcp_peek_offset_test(sa_family_t af)
- 	int recv_sock = 0;
- 	int offset = 0;
- 	ssize_t len;
--	char buf;
-+	char buf[2];
- 
- 	memset(&a, 0, sizeof(a));
- 	a.sa.sa_family = af;
- 
--	s[0] = socket(af, SOCK_STREAM, IPPROTO_TCP);
--	s[1] = socket(af, SOCK_STREAM | SOCK_NONBLOCK, IPPROTO_TCP);
-+	s[0] = recv_sock = socket(af, type, proto);
-+	s[1] = socket(af, type, proto);
- 
- 	if (s[0] < 0 || s[1] < 0) {
- 		ksft_perror("Temporary socket creation failed\n");
-@@ -82,76 +87,78 @@ static int tcp_peek_offset_test(sa_family_t af)
- 		ksft_perror("Temporary socket getsockname() failed\n");
+-		if (i2c_addr == I2C_ADDR_HIGH &&
+-		    MAD_STATUS_2_CABLE_ERR(ret) == CABLE_INF_I2C_ADDR)
+-			/* Some SFP cables do not support i2c slave
+-			 * address 0x51 (high page), abort silently.
+-			 */
+-			ret = 0;
+-		else
+-			ret = -ret;
++		ret = -ret;
  		goto out;
  	}
--	if (listen(s[0], 0) < 0) {
-+	if (proto == IPPROTO_TCP && listen(s[0], 0) < 0) {
- 		ksft_perror("Temporary socket listen() failed\n");
- 		goto out;
- 	}
--	if (connect(s[1], &a.sa, sizeof(a)) >= 0 || errno != EINPROGRESS) {
-+	if (connect(s[1], &a.sa, sizeof(a))) {
- 		ksft_perror("Temporary socket connect() failed\n");
- 		goto out;
- 	}
--	recv_sock = accept(s[0], NULL, NULL);
--	if (recv_sock <= 0) {
--		ksft_perror("Temporary socket accept() failed\n");
--		goto out;
-+	if (proto == IPPROTO_TCP) {
-+		recv_sock = accept(s[0], NULL, NULL);
-+		if (recv_sock <= 0) {
-+			ksft_perror("Temporary socket accept() failed\n");
-+			goto out;
-+		}
- 	}
+ 	cable_info = (struct mlx4_cable_info *)outm
+---- cut here ----
+
+However, we end up with a strange "netlink error: Unknown error 1820" error because mlx4_get_module_info returns -0x71c (0x71c is 1820 in decimal).
+
+This can be fixed with returning -EIO instead of ret, either in mlx4_get_module_info() or perhaps better mlx4_en_get_module_eeprom() from en_ethtool.c:
+---- cut here ----
+--- a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c	2024-07-27 02:34:11.000000000 -0700
++++ b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c	2024-08-31 21:52:50.370553218 -0700
+@@ -2110,7 +2110,7 @@
+ 			en_err(priv,
+ 			       "mlx4_get_module_info i(%d) offset(%d) bytes_to_read(%d) - FAILED (0x%x)\n",
+ 			       i, offset, ee->len - i, ret);
+-			return ret;
++			return -EIO;
+ 		}
  
- 	/* Some basic tests of getting/setting offset */
--	offset = tcp_peek_offset_get(recv_sock);
-+	offset = sk_peek_offset_get(recv_sock);
- 	if (offset != -1) {
- 		ksft_perror("Initial value of socket offset not -1\n");
- 		goto out;
- 	}
--	tcp_peek_offset_set(recv_sock, 0);
--	offset = tcp_peek_offset_get(recv_sock);
-+	sk_peek_offset_set(recv_sock, 0);
-+	offset = sk_peek_offset_get(recv_sock);
- 	if (offset != 0) {
- 		ksft_perror("Failed to set socket offset to 0\n");
- 		goto out;
- 	}
- 
- 	/* Transfer a message */
--	if (send(s[1], (char *)("ab"), 2, 0) <= 0 || errno != EINPROGRESS) {
-+	if (send(s[1], (char *)("ab"), 2, 0) != 2) {
- 		ksft_perror("Temporary probe socket send() failed\n");
- 		goto out;
- 	}
- 	/* Read first byte */
--	len = recv(recv_sock, &buf, 1, MSG_PEEK);
--	if (len != 1 || buf != 'a') {
-+	len = recv(recv_sock, buf, 1, MSG_PEEK);
-+	if (len != 1 || buf[0] != 'a') {
- 		ksft_perror("Failed to read first byte of message\n");
- 		goto out;
- 	}
--	offset = tcp_peek_offset_get(recv_sock);
-+	offset = sk_peek_offset_get(recv_sock);
- 	if (offset != 1) {
- 		ksft_perror("Offset not forwarded correctly at first byte\n");
- 		goto out;
- 	}
- 	/* Try to read beyond last byte */
--	len = recv(recv_sock, &buf, 2, MSG_PEEK);
--	if (len != 1 || buf != 'b') {
-+	len = recv(recv_sock, buf, 2, MSG_PEEK);
-+	if (len != 1 || buf[0] != 'b') {
- 		ksft_perror("Failed to read last byte of message\n");
- 		goto out;
- 	}
--	offset = tcp_peek_offset_get(recv_sock);
-+	offset = sk_peek_offset_get(recv_sock);
- 	if (offset != 2) {
- 		ksft_perror("Offset not forwarded correctly at last byte\n");
- 		goto out;
- 	}
- 	/* Flush message */
--	len = recv(recv_sock, NULL, 2, MSG_TRUNC);
-+	len = recv(recv_sock, buf, 2, MSG_TRUNC);
- 	if (len != 2) {
- 		ksft_perror("Failed to flush message\n");
- 		goto out;
- 	}
--	offset = tcp_peek_offset_get(recv_sock);
-+	offset = sk_peek_offset_get(recv_sock);
- 	if (offset != 0) {
- 		ksft_perror("Offset not reverted correctly after flush\n");
- 		goto out;
- 	}
- 
--	printf("%s with MSG_PEEK_OFF works correctly\n", afstr(af));
-+	printf("%s with MSG_PEEK_OFF works correctly\n", afstr(af, proto));
- 	res = 1;
- out:
--	if (recv_sock >= 0)
-+	if (proto == IPPROTO_TCP && recv_sock >= 0)
- 		close(recv_sock);
- 	if (s[1] >= 0)
- 		close(s[1]);
-@@ -160,24 +167,36 @@ static int tcp_peek_offset_test(sa_family_t af)
- 	return res;
- }
- 
--int main(void)
-+static int do_test(int proto)
- {
- 	int res4, res6;
- 
--	res4 = tcp_peek_offset_probe(AF_INET);
--	res6 = tcp_peek_offset_probe(AF_INET6);
-+	res4 = sk_peek_offset_probe(AF_INET, proto);
-+	res6 = sk_peek_offset_probe(AF_INET6, proto);
- 
- 	if (!res4 && !res6)
- 		return KSFT_SKIP;
- 
- 	if (res4)
--		res4 = tcp_peek_offset_test(AF_INET);
-+		res4 = sk_peek_offset_test(AF_INET, proto);
- 
- 	if (res6)
--		res6 = tcp_peek_offset_test(AF_INET6);
-+		res6 = sk_peek_offset_test(AF_INET6, proto);
- 
- 	if (!res4 || !res6)
- 		return KSFT_FAIL;
- 
- 	return KSFT_PASS;
- }
-+
-+int main(void)
-+{
-+	int restcp, resudp;
-+
-+	restcp = do_test(IPPROTO_TCP);
-+	resudp = do_test(IPPROTO_UDP);
-+	if (restcp == KSFT_FAIL || resudp == KSFT_FAIL)
-+		return KSFT_FAIL;
-+
-+	return KSFT_PASS;
-+}
--- 
-2.37.3
+ 		i += ret;
+---- cut here ----
+
+BTW: it is also possible to augment the error reporting in ethtool/sfpid.c:
+---- cut here ----
+-       if (ret)
++       if (ret) {
++               fprintf(stderr, "Failed to read Page A2h.\n");
+                goto out;
++       }
+---- cut here ----
+With all the above changes, we now get:
+
+---- cut here ----
+        Identifier                                : 0x03 (SFP)
+        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+(...)
+        Date code                                 : <REDACTED>
+netlink error: Input/output error
+Failed to read Page A2h.
+---- cut here ----
+
+So, the first question is if above set of fixes makes sense, give that ethtool handles this correctly? If so, I'm happy to send the fixes.
+
+The second question is if not being able to read Page A2h and "invalid I2C slave address" is a due to a bug in the driver or a HW (firmware?) limitation and if something can be done to address this?
+
+2. For a QSFP module (which works in CX3/CX3Pro), handling "ethtool -m" seems to be completely broken.
+
+With QSFP module in port #2 (eth2), for the first attempt (ethtool -m eth2):
+mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(2) i2c_addr(50) offset(0) size(48): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
+mlx4_en: eth2: mlx4_get_module_info i(0) offset(0) bytes_to_read(128) - FAILED (0xfffffbe4)
+
+However, if I first try run "ethtool -m eth1" with a SFP module installed in port #1, and then immediately "ethtool -m eth2", I end up getting the information for the SFP module:
+# ethtool -m eth2
+        Identifier                                : 0x03 (SFP)
+        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+(...)
+
+I this case, I even get the same "invalid I2C slave address" error:
+mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(2) i2c_addr(51) offset(0) size(48): Response Mad Status(71c) - invalid I2C slave address
+
+If I immediately run "ethtool -m eth1" I get:
+mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(1) i2c_addr(50) offset(224) size(32): Response Mad Status(61c) - invalid device_address or size (that is, size equals 0 or address+size is greater than 256)
+mlx4_en: eth1: mlx4_get_module_info i(96) offset(224) bytes_to_read(32) - FAILED (0xfffff9e4)
+
+Alternatively, if I remove SFP module from port #1 and run "ethtool -m eth2", I get:
+[ 1071.945737] mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module ID attr(ff60) port(2) i2c_addr(50) offset(0) size(1): Response Mad Status(31c) - cable is not connected
+
+At this point, running "ethtool -m eth1" produces one of:
+
+*)
+ mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module ID attr(ff60) port(2) i2c_addr(50) offset(0) size(1): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
+
+*)
+ mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(2) i2c_addr(50) offset(128) size(48): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
+ mlx4_en: eth2: mlx4_get_module_info i(0) offset(128) bytes_to_read(128) - FAILED (0xfffffbe4)
+
+*)
+ mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module ID attr(ff60) port(2) i2c_addr(50) offset(0) size(1): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
+
+*)
+ mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(2) i2c_addr(50) offset(0) size(48): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
+ mlx4_en: eth2: mlx4_get_module_info i(0) offset(0) bytes_to_read(128) - FAILED (0xfffffbe4)
+
+*)
+ mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module ID attr(ff60) port(2) i2c_addr(50) offset(0) size(1): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
+
+I wonder if in this situation we are communicating with a wrong device or returning some stale data from kernel memory or the firmware?
+
+Thanks,
+ Krzysztof
+
+[1]
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mellanox/mlx4/port.c#n2200
+
+
+[2]
+        Identifier                                : 0x03 (SFP)
+        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+(...) 
+        Optical diagnostics support               : Yes
+        Laser bias current                        : 0.000 mA
+        Laser output power                        : 0.0000 mW / -inf dBm
+        Receiver signal average optical power     : 0.0000 mW / -inf dBm
+        Module temperature                        : 0.00 degrees C / 32.00 degrees F
+        Module voltage                            : 0.0000 V
+        Alarm/warning flags implemented           : Yes
+        Laser bias current high alarm             : Off
+        Laser bias current low alarm              : Off
+        Laser bias current high warning           : Off
+        Laser bias current low warning            : Off
+        Laser output power high alarm             : Off
+        Laser output power low alarm              : Off
+        Laser output power high warning           : Off
+        Laser output power low warning            : Off
+        Module temperature high alarm             : Off
+        Module temperature low alarm              : Off
+        Module temperature high warning           : Off
+        Module temperature low warning            : Off
+        Module voltage high alarm                 : Off
+        Module voltage low alarm                  : Off
+        Module voltage high warning               : Off
+        Module voltage low warning                : Off
+        Laser rx power high alarm                 : Off
+        Laser rx power low alarm                  : Off
+        Laser rx power high warning               : Off
+        Laser rx power low warning                : Off
+        Laser bias current high alarm threshold   : 0.000 mA
+        Laser bias current low alarm threshold    : 0.000 mA
+        Laser bias current high warning threshold : 0.000 mA
+        Laser bias current low warning threshold  : 0.000 mA
+        Laser output power high alarm threshold   : 0.0000 mW / -inf dBm
+        Laser output power low alarm threshold    : 0.0000 mW / -inf dBm
+        Laser output power high warning threshold : 0.0000 mW / -inf dBm
+        Laser output power low warning threshold  : 0.0000 mW / -inf dBm
+        Module temperature high alarm threshold   : 0.00 degrees C / 32.00 degrees F
+        Module temperature low alarm threshold    : 0.00 degrees C / 32.00 degrees F
+        Module temperature high warning threshold : 0.00 degrees C / 32.00 degrees F
+        Module temperature low warning threshold  : 0.00 degrees C / 32.00 degrees F
+        Module voltage high alarm threshold       : 0.0000 V
+        Module voltage low alarm threshold        : 0.0000 V
+        Module voltage high warning threshold     : 0.0000 V
+        Module voltage low warning threshold      : 0.0000 V
+        Laser rx power high alarm threshold       : 0.0000 mW / -inf dBm
+        Laser rx power low alarm threshold        : 0.0000 mW / -inf dBm
+        Laser rx power high warning threshold     : 0.0000 mW / -inf dBm
+        Laser rx power low warning threshold      : 0.0000 mW / -inf dBm
+
+[3]
+# ethtool -m eth1
+        Identifier                                : 0x03 (SFP)
+        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+        Connector                                 : 0x07 (LC)
+        Transceiver codes                         : 0x10 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+        Transceiver type                          : 10G Ethernet: 10G Base-SR
+        Encoding                                  : 0x06 (64B/66B)
+        BR, Nominal                               : 10300MBd
+        Rate identifier                           : 0x00 (unspecified)
+        Length (SMF,km)                           : 0km
+        Length (SMF)                              : 0m
+        Length (50um)                             : 80m
+        Length (62.5um)                           : 30m
+        Length (Copper)                           : 0m
+        Length (OM3)                              : 300m
+        Laser wavelength                          : 850nm
+        Vendor name                               : IBM-Avago
+        Vendor OUI                                : <REDACTED>
+        Vendor PN                                 : <REDACTED>
+        Vendor rev                                : G2.3
+        Option values                             : 0x00 0x1a
+        Option                                    : RX_LOS implemented
+        Option                                    : TX_FAULT implemented
+        Option                                    : TX_DISABLE implemented
+        BR margin, max                            : 0%
+        BR margin, min                            : 0%
+        Vendor SN                                 : <REDACTED>
+        Date code                                 : <REDACTED>
+netlink error: Unknown error 1820
 
 
