@@ -1,197 +1,113 @@
-Return-Path: <netdev+bounces-124062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32AD1967C7C
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 00:08:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB4C4967CD7
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 01:58:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D4B91C204F6
-	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 22:08:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01C041C20ACC
+	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 23:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83D413A41F;
-	Sun,  1 Sep 2024 22:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1EBB13AD05;
+	Sun,  1 Sep 2024 23:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="io5H2sGx";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="0ErlRmza";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="io5H2sGx";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="0ErlRmza"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KV+gsTmP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEB717C;
-	Sun,  1 Sep 2024 22:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 835741C36
+	for <netdev@vger.kernel.org>; Sun,  1 Sep 2024 23:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725228480; cv=none; b=Gcx1tDHRY5GbfjlB60X4QVhJ0Wj86f9M25Sq0f5XVy/OgtgZGVPMST/4vgUXTqNAChFtueHzHWe79FVfCneH5/dip1D7JOuN59MJWx60pIK5JQczd98O3J46tcFTumV9sQXiYoldiCOHTSR7vdg02W811TEHQMg5BZJqoJL+jmI=
+	t=1725235089; cv=none; b=IKvGus3wIqItVtA9NOvx7/j1wN6eb7INC3Lz9CevORt24l0Jj3xiAGogqN1U5u6gCGTNDqPT0vQMNkhtWApYnLtZH5+291v80VKEaAQjxGc+UGUlu7VNw4ZK8vLOlC+mo5BdE2XozOguIgn9xcgh1ZNHR/ZGqTMAiDL605KhD14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725228480; c=relaxed/simple;
-	bh=DYhB9DuBmz7IOGvvFQm2ewICfZouiWtSYLY3fgb8eKU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=odktfZMvw6HzbCbJpCuSkWMv90GgXdF6QnHIanUh2tp5jwYdL06emBjT5P4DQrc4odaYHkJrX7yGyC0jssFAKBkJRcRlolmob6GUkne5padbw+8BQ1G1RaarJQxsBwR0fwmAV3qGyaxVTxr3q+H91aH65wVfeXBWLUttFhnGSTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=io5H2sGx; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0ErlRmza; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=io5H2sGx; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=0ErlRmza; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.225.114])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1135C21ACC;
-	Sun,  1 Sep 2024 22:07:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1725228477; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xu8AVE5JK8t78/PrT5tmJbP6bMcIjQZtHefYruXnozE=;
-	b=io5H2sGxGTAb4ZeKt7XOb19d12K/ij3A1okuvB+dBeBZ7FZi0WhzyWL0X6tKt4WfYMRk44
-	iEx/jCLRetG/DL94SyliaRT7UtkIB1dHpb26rMrp5m5KOukCWuoumwL6kyK5+8DXQ3dkR6
-	0rt8RgNcMTIj21ogM6au5bI5379jMz8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1725228477;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xu8AVE5JK8t78/PrT5tmJbP6bMcIjQZtHefYruXnozE=;
-	b=0ErlRmzazEXLsjSTBsipLos2c5O97tdjt6smpyzaj+SMbt5LKd+xxSj9l4MrBvnmG9W+xd
-	ycmc3CIQLwECiqBA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1725228477; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xu8AVE5JK8t78/PrT5tmJbP6bMcIjQZtHefYruXnozE=;
-	b=io5H2sGxGTAb4ZeKt7XOb19d12K/ij3A1okuvB+dBeBZ7FZi0WhzyWL0X6tKt4WfYMRk44
-	iEx/jCLRetG/DL94SyliaRT7UtkIB1dHpb26rMrp5m5KOukCWuoumwL6kyK5+8DXQ3dkR6
-	0rt8RgNcMTIj21ogM6au5bI5379jMz8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1725228477;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xu8AVE5JK8t78/PrT5tmJbP6bMcIjQZtHefYruXnozE=;
-	b=0ErlRmzazEXLsjSTBsipLos2c5O97tdjt6smpyzaj+SMbt5LKd+xxSj9l4MrBvnmG9W+xd
-	ycmc3CIQLwECiqBA==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id E8CAD2012C; Mon,  2 Sep 2024 00:07:56 +0200 (CEST)
-Date: Mon, 2 Sep 2024 00:07:56 +0200
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, 
-	linux-arm-kernel@lists.infradead.org, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	Herve Codina <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
-	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>, 
-	Oleksij Rempel <o.rempel@pengutronix.de>, =?utf-8?Q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>, 
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH ethtool-next v2 3/3] ethtool: Introduce a command to list
- PHYs
-Message-ID: <7fpbxztptolcuz4ppppkmpmblel7mv4nh4jgkjqbdedo4hrcjc@6oo6acqfejas>
-References: <20240828152511.194453-1-maxime.chevallier@bootlin.com>
- <20240828152511.194453-4-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1725235089; c=relaxed/simple;
+	bh=iW3JRfWcb5BV3cF0sufQHjsQ6qchdQXlqpU8ph8/J/0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mAfJBKudV4pHDCasp/MDWhK7w0aGW6O6f4a8QelsCh8GCKlAOsdbpNllpDmzDBZgyFoRNK7oShavX3hzo/J6WfD+sP6n/RT/nE/XOCFUpeWqL+fELETE+nOoIi2hh1j7CoLPfY8AcfLbeFPkedkWDB+DBY4SzG6wr2fDbo3sIEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KV+gsTmP; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2054feabfc3so7200095ad.1
+        for <netdev@vger.kernel.org>; Sun, 01 Sep 2024 16:58:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725235088; x=1725839888; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BX8aTtq62tbG6x6tKl+m15boVIotQo1+EqYnAjlD8c4=;
+        b=KV+gsTmP9jXOaIjGZxCJE2Kj449P/UX8bHOl4dwhTcxPH83u9fro04tvG0WrOtdsXp
+         VzI/dUlQKMhq8oEwn79pL3E1TlswNBBIbEhkI2dz4tNeFCErAj5QSjWU17Q1bjixqaSD
+         hN60Txlvy+EWUBrlnd8zpqyErr7Elk1zJ8nxQRIo9KOZVHQQ/mvA7ZxDrhSwLiYJXbyb
+         ygr13dSi8JLaflOdxCmYEhsCzs2OnMXO/byN35NYS5G3Mvlu53cMXM+2g7cBP122H8f7
+         8dk4+Rdc1lKbTh+ResvFw0Yiwicjo6GabnRzWw5U3kBisEYWIHATjxMnxlF2O9mFDZl4
+         tVQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725235088; x=1725839888;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BX8aTtq62tbG6x6tKl+m15boVIotQo1+EqYnAjlD8c4=;
+        b=AkrEPjXWTDuzLzhMpS8HuXSCkWk/PEk/Jb3PadhYALxOa+hSbS6ztO1NdcdDsN5apR
+         ZyGKFsSBpfBd2jsIp+xOtDz2nfT9bS3HqiAexqIlCXrjmJPCifp/np4dGv/JSVauuD6v
+         jPS0YHCXI0riyo0oszwoj5atVorHUfUCKCfBglcEWDE6DaWxSqMHWha73Au1M6+0ToVN
+         Gsg/Jw8RtpO6xWfQn7s7g8FJNgSfCXVbHq1mGYeYFS468krI2uKIpTClkydpmonRydTf
+         1Z1eCIHfzof7aoEgjnMj7fNFMTeNYLHmEqVI8Lc5Ej7ei00RhthHlOEuPrbKOyUryJxU
+         ZVdA==
+X-Gm-Message-State: AOJu0YyfFmGfQuSkYeeddOZRea9sA1i+xUAXwWR7aXRzSf9kTKUIXIh/
+	TVos20rEH1ZETLK6dqNfOUkjS4FktpYVKCyFKirJYLk8YWEN7zbW
+X-Google-Smtp-Source: AGHT+IFt+/pcgKozR79qHZLeXgIq0bHsd3NPaKy+OGzEfbLulQYbM3VOvUx3eyRXtltIFPH8QhxzAg==
+X-Received: by 2002:a17:903:18b:b0:205:8121:e995 with SMTP id d9443c01a7336-2058121eddbmr4170865ad.50.1725235087725;
+        Sun, 01 Sep 2024 16:58:07 -0700 (PDT)
+Received: from localhost.localdomain (syn-104-035-026-140.res.spectrum.com. [104.35.26.140])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2055012bbc1sm23848805ad.144.2024.09.01.16.58.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Sep 2024 16:58:07 -0700 (PDT)
+From: Eyal Birger <eyal.birger@gmail.com>
+To: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	dsahern@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	devel@linux-ipsec.org,
+	Eyal Birger <eyal.birger@gmail.com>
+Subject: [PATCH ipsec 0/2] xfrm: respect ip proto rules criteria in xfrm dst lookups
+Date: Sun,  1 Sep 2024 16:57:35 -0700
+Message-Id: <20240901235737.2757335-1-eyal.birger@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="evcqqksds2rs6c5y"
-Content-Disposition: inline
-In-Reply-To: <20240828152511.194453-4-maxime.chevallier@bootlin.com>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.40 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SIGNED_PGP(-2.00)[];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	TAGGED_RCPT(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	RCVD_COUNT_ONE(0.00)[1];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,vger.kernel.org,bootlin.com,lunn.ch,kernel.org,google.com,redhat.com,armlinux.org.uk,lists.infradead.org,csgroup.eu,gmail.com,nxp.com,lwn.net,pengutronix.de];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[lion.mk-sys.cz:helo,bootlin.com:email]
-X-Spam-Score: -4.40
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
 
+This series fixes the route lookup when done for xfrm to regard
+L4 criteria specified in ip rules.
 
---evcqqksds2rs6c5y
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The first patch is a minor refactor to allow passing more parameters
+to dst lookup functions.
+The second patch actually passes L4 information to these lookup functions.
 
-On Wed, Aug 28, 2024 at 05:25:10PM +0200, Maxime Chevallier wrote:
-> It is now possible to list all Ethernet PHYs that are present behind a
-> given interface, since the following linux commit :
-> 63d5eaf35ac3 ("net: ethtool: Introduce a command to list PHYs on an inter=
-face")
->=20
-> This command relies on the netlink DUMP command to list them, by allowing=
- to
-> pass an interface name/id as a parameter in the DUMP request to only
-> list PHYs on one interface.
->=20
-> Therefore, we introduce a new helper function to prepare a interface-filt=
-ered
-> dump request (the filter can be empty, to perform an unfiltered dump),
-> and then uses it to implement PHY enumeration through the --show-phys
-> command.
->=20
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
-[...]
-> diff --git a/netlink/extapi.h b/netlink/extapi.h
-> index c882295..fd99610 100644
-> --- a/netlink/extapi.h
-> +++ b/netlink/extapi.h
-> @@ -56,6 +56,7 @@ int nl_set_mm(struct cmd_context *ctx);
->  int nl_gpse(struct cmd_context *ctx);
->  int nl_spse(struct cmd_context *ctx);
->  int nl_flash_module_fw(struct cmd_context *ctx);
-> +int nl_get_phy(struct cmd_context *ctx);
-> =20
->  void nl_monitor_usage(void);
-> =20
+Signed-off-by: Eyal Birger <eyal.birger@gmail.com>
 
-Please add also a fallback to !ETHTOOL_ENABLE_NETLINK branch, similar
-to other netlink handlers, so that a build with --disable-netlink does
-not fail.
+Eyal Birger (2):
+  xfrm: extract dst lookup parameters into a struct
+  xfrm: respect ip protocols rules criteria when performing dst lookups
 
-Michal
+ include/net/xfrm.h      | 28 ++++++++++++-----------
+ net/ipv4/xfrm4_policy.c | 40 +++++++++++++++------------------
+ net/ipv6/xfrm6_policy.c | 31 +++++++++++++-------------
+ net/xfrm/xfrm_device.c  | 11 ++++++---
+ net/xfrm/xfrm_policy.c  | 49 +++++++++++++++++++++++++++++++----------
+ 5 files changed, 94 insertions(+), 65 deletions(-)
 
---evcqqksds2rs6c5y
-Content-Type: application/pgp-signature; name="signature.asc"
+-- 
+2.34.1
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmbU5bcACgkQ538sG/LR
-dpVJ2Qf8DGGY24yCgNhGpnmPlfv1tRX6emTG3LvB8oOHGngRoMyylyXvpnrpWAr3
-7rhlowlNOzXuXzKfQZPEcDmtO9XyH7rxIokopIZWSw5w8IjzLF5s/ZMydl7pVR8l
-BfYvpP1EaZyi9/18oEBAQ3AhXVCXW2vai9lArLtT3ZJgf9E2AsM/cZoIO8sNTiGS
-nneX7pCXn6JhFor/ykm9Llg40z//rU54g2bWsaKQF/BFxGjQ3nm3ene20HyUnZVu
-MUtK3oSvf7SzUfWZtEcf/epnQ/9Fcw6BmmSenY9U9qNbcaQULuHqwCR/jxGsIgzH
-8YEv1scgIUJkQ61JmN4Asl8hrbNZdQ==
-=ASEQ
------END PGP SIGNATURE-----
-
---evcqqksds2rs6c5y--
 
