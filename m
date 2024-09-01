@@ -1,145 +1,125 @@
-Return-Path: <netdev+bounces-123994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-123995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EA8A96738A
-	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 00:06:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 410FA967406
+	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 02:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D45C1C20FF3
-	for <lists+netdev@lfdr.de>; Sat, 31 Aug 2024 22:06:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00825281C67
+	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 00:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A68F16DEAB;
-	Sat, 31 Aug 2024 22:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8782F6FC7;
+	Sun,  1 Sep 2024 00:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kET/rtR0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bfGesE53"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE6B23C30;
-	Sat, 31 Aug 2024 22:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA4F1D1319;
+	Sun,  1 Sep 2024 00:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725141975; cv=none; b=HWQvKHMuu2jfmFG7sCJ5jWgs5QZvjmOqouG+6MDKFkfEi4dHk/Bi3lQL8x8ihrKaoeyp4atGcH98TwgRnXzdCKMr7n6Wk7yTBScNxDJ9TlVeEr5K8I6PiepAFb4ns/RtWV6vISrfL3uO6I5XePEtYaKkjkmOfi9276nFIWhSiXM=
+	t=1725150815; cv=none; b=V5FTW/P39luEoyx9mIvrK8q3qMVx2o9mdbiOQZwsbRUHyRSPuxovBPnmOmM3ciL112KaeBPYFCJrNBKuhHJeBiwIJHqsIxEqY9t7GReYCkzGWfhKETQaFju47LnVtMxXy4R7HTLiespboVefeAbNCBFqJXY+HVHpuJUt43JhY3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725141975; c=relaxed/simple;
-	bh=SaG4v2YnHLzt1RXp0KJ5QG8OnHu3vxxOvQ8JcKO+Bw8=;
+	s=arc-20240116; t=1725150815; c=relaxed/simple;
+	bh=FIFYBB5d/DjVuL/KRdGWSSyy3J0ccWBnOJQj3l4eicU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nuOwQvsajR+1hWEaGf6g0BOtWwnEQzt7ja8+LcxuJctvjnhlY1cQKWF946VtZMnVWo/7amaEva6cprBy5OrdoXJSEDYPdEoMY5+ZeyFEPZsB+XPoPLwoFQ8r0+IZTGR3Hp6d8EWggOkiw6v3Jr4X0BLdaIYVyWjdSckAU+4QYeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kET/rtR0; arc=none smtp.client-ip=209.85.221.48
+	 To:Cc:Content-Type; b=CA9+dptaq0/PgSXsOoXWlmKU2ALbKiOW2KHLhKluq3ab8gX0UVtKs0LbX0Mq9OEAbFQl+TrckMCZFk9DWYr0NjwDKfusFJsbCTDBAHKS53qPjasgmLCsnq7JT0M2Bp2KQ3C5l4vD1vbk7x8QeoeKG+nj4NlrlZ6+rOm3cYH6WkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bfGesE53; arc=none smtp.client-ip=209.85.166.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-374bd0da617so613426f8f.3;
-        Sat, 31 Aug 2024 15:06:13 -0700 (PDT)
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-39f49600297so4637615ab.1;
+        Sat, 31 Aug 2024 17:33:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725141972; x=1725746772; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725150813; x=1725755613; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iHiTRjE5wPqafGdsOpFQFAP5aZVxpmACA5LO9Bj0aoQ=;
-        b=kET/rtR0aB4AU+Feptbn8K6nUO2NxQwGjIXQp6Flw/AdkbrDXy84/xTyr5CDHT0GhT
-         p2E3Mta2imZe/ip8JTa+xFvWLANGpRww5MZ9C6v80d4kGThkIlX2hLqO1iHlz2+pjwsM
-         s85+nNfvKHkOeo72sP4et8YwwhlfdCLNcDgxXj9Wv0jOtTNGp0FUIgm/gIOIU4f7Xedt
-         T/VuGSOWZtVKDeJfl8WYTOsMpednbCSwJXz05gVgtyT8amd8mDILdGOE5480V7ZDDRB9
-         yzHlelkvELkXTE2MoU3hJOArjDp8Wos0eMFHZJ7O/nrAdupEj/950crlM70CADDdoUPl
-         15AQ==
+        bh=FIFYBB5d/DjVuL/KRdGWSSyy3J0ccWBnOJQj3l4eicU=;
+        b=bfGesE53mk6Nmio2+CSPevZTo+cUdjCkKvvY9siloKi2//y26wM8yKFCdDQaA5ASjc
+         S5mwo92VSdSE9RrlO8M6u+ncap2GJ95RyISj/eEs8coygpkP2eWHbuanUK2Vq34dvGM4
+         5iDrENU2iCsrZZWv3Sesh8Ni5TysBQN7cCTH27q5iiSKcg1WZ1H66IAZ3SXEn9e+lo6e
+         scT57ZJM1PadeSb+Tt/FhxIuFO1E+ufEDI9pwPsU1Iy0yLYRkqram1911duE5osv+TNx
+         6zCC2DxwmiaBDBqZ3DEAVFnrcs17aTAHXKeeMUEgsakB0eBbWoWcbWMrPSOUvZ+Q61hQ
+         FvRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725141972; x=1725746772;
+        d=1e100.net; s=20230601; t=1725150813; x=1725755613;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=iHiTRjE5wPqafGdsOpFQFAP5aZVxpmACA5LO9Bj0aoQ=;
-        b=U6pazPXYooTS9GlbthRAOfgTmzzb0bo/JJfZXpfrb3nMO0ROwxrWcKTkFLVMVcez0t
-         e7Pndj+ddpBCrQ3ykAcjY/orWMu2mCtn4hXSfWL4oKy5tmcTAham2JOFYNREkzARZO9U
-         JJ5pQAVyl0K9H4uKUhib5DS0Qx4sHvz9W1o673pDl+s++qTpL2/zOoBaipN4AtojGv3w
-         m5Qizf6iub3q7cgka/FqkJZGAQ8bsuB5n2RP22IkuKzRMSihzTZYR/wsOuUrin+EZ4er
-         keIW9zPu68yF9QPVUlbvhg/oiqZUhyMsgYtiB83NTwM5f2cNna9BgtpUIaoPQgDvjlfb
-         tO7w==
-X-Forwarded-Encrypted: i=1; AJvYcCV4JbiarnCld94YfbvxxdASJuXsppdTba3Z2zRskinfYj21NxWl+fEadG5ZAk9JIk292eNeq8U+@vger.kernel.org, AJvYcCVYTKZysqq2fwEQSPr/v33cM74YuAkQ4CG0qwKX4FA3rNj6QjINK98ce7sU9tWLoCyt1MT2HsJvAySrtm0b@vger.kernel.org, AJvYcCXuwtz24na0pEsJ8flBGKfEb/W639rD5BdF7PCq7XAcN7WLe4DI1/VXWHxisPLBWraMlkE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykhTQnVQKL1oc+KQaHt1wSxMOC7Nhcl7b1G0lfSRIVNV/PhHDU
-	E9YpEmFalDieaQ+V6HRCkLQy4fzQt2KIvtUY13OnQ0k20kxLzR/73mZm7duZkN3ZylIawUWXwiu
-	iOtdTRB4Kxzcr9M/PNbEkxs7ZAUg=
-X-Google-Smtp-Source: AGHT+IElcSjXVcepALYdR4g4ZBYS52ra8HL1nFrQuNIj918KyHcB0GxmzUlRohlXi6yN7dyNwTT9La4BHx8mt28MpUE=
-X-Received: by 2002:adf:e5cb:0:b0:368:526d:41d8 with SMTP id
- ffacd0b85a97d-374bceb003fmr2076156f8f.23.1725141971473; Sat, 31 Aug 2024
- 15:06:11 -0700 (PDT)
+        bh=FIFYBB5d/DjVuL/KRdGWSSyy3J0ccWBnOJQj3l4eicU=;
+        b=iwlriChbewBIt03FjflDCjlYVJ84y3vAgpcFkMe7qeTBJJIviMcukF2fUJY9Cx+WJJ
+         GSLFlAnFMTo8C74gQymTqV8nQIQ2DPgPoS/ezZ7Gt5cJS12JCQspMg13FlbQhDyiBhcC
+         VwQgaOvKE7UekNm55veD+HBW8UNwhja3a9NARaFXdrMgJ4RSc4SlwYp3wQUW86zy0hPn
+         ks6WTCwMRzv8DJXDV0w8NE290haUIZhGPpC+EL+p1hRDpEB4UHSnN7XHXo0AwdJERwP7
+         MT5VEt8nyCEmiQ3A6cXSIpygrz2MIvI4XFpA2YyY6KM85/nUioDSD9IqOqtyYvzJPnGh
+         8cbw==
+X-Forwarded-Encrypted: i=1; AJvYcCVQwxvd8OEGy0PNbnH3W+zkSOHzgLou29tZb2UbGD6EVyOErmEIV6li5yZ8FbkpGDan6udYv4EzUtn0BklWOes=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzQlzKs1vSRRQ8eWc+al+n3PQ+fv2UcGbQDmXDPBqMT7kVfv1fQ
+	WKkXpiQYk+hTtvCLhPAg8HDBqOICLuW8zxM6C5EU0MltcdeHnHQz6FbCDcvdGU3Cqn/xHY7xQIY
+	2k66ejrqz6Um5rE3skzpHOrTbfpk=
+X-Google-Smtp-Source: AGHT+IGAuVE5H8OI7mCNt6Ix3Wwb302ZPbbpuB6ddxAUy0um/AJ7EiW+n5jRqTbA7bQ1iYSBEZht0P9U307WACvd+xE=
+X-Received: by 2002:a05:6e02:b4e:b0:39d:514b:311a with SMTP id
+ e9e14a558f8ab-39f379e39f5mr101626025ab.27.1725150813050; Sat, 31 Aug 2024
+ 17:33:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240830082518.23243-1-Tze-nan.Wu@mediatek.com> <ZtKOAKlNalVLIz2E@mini-arch>
-In-Reply-To: <ZtKOAKlNalVLIz2E@mini-arch>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sat, 31 Aug 2024 15:06:00 -0700
-Message-ID: <CAADnVQKF=o6q2FzssEy9-jmye7+DB=S58KD8=dh=aRR5QTpJrA@mail.gmail.com>
-Subject: Re: [PATCH net v5] bpf, net: Fix a potential race in do_sock_getsockopt()
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: Tze-nan Wu <Tze-nan.Wu@mediatek.com>, Network Development <netdev@vger.kernel.org>, 
-	bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	=?UTF-8?B?Qm9idWxlIENoYW5nICjlvLXlvJjnvqkp?= <bobule.chang@mediatek.com>, 
-	wsd_upstream <wsd_upstream@mediatek.com>, LKML <linux-kernel@vger.kernel.org>, 
-	linux-mediatek@lists.infradead.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	=?UTF-8?B?Q2hlbi1ZYW8gQ2hhbmcgKOW8teemjuiAgCk=?= <chen-yao.chang@mediatek.com>, 
-	Yanghui Li <yanghui.li@mediatek.com>, Cheng-Jui Wang <cheng-jui.wang@mediatek.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+References: <20240823211902.143210-1-jmaloy@redhat.com> <20240823211902.143210-3-jmaloy@redhat.com>
+ <CAL+tcoCro6o5ZkhVJdKah9o2p=tPUSu06D0ZzNPPDB2Ns66kMw@mail.gmail.com> <9f4dd14d-fbe3-4c61-b04c-f0e6b8096d7b@redhat.com>
+In-Reply-To: <9f4dd14d-fbe3-4c61-b04c-f0e6b8096d7b@redhat.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 1 Sep 2024 08:32:57 +0800
+Message-ID: <CAL+tcoC-CTaD-_68Nee+CoysJV7zYojqqgU8Y+Nq6RkQRuv=DA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] selftests: add selftest for tcp SO_PEEK_OFF support
+To: Jon Maloy <jmaloy@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	davem@davemloft.net, kuba@kernel.org, passt-dev@passt.top, sbrivio@redhat.com, 
+	lvivier@redhat.com, dgibson@redhat.com, eric.dumazet@gmail.com, 
+	edumazet@google.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 30, 2024 at 8:29=E2=80=AFPM Stanislav Fomichev <sdf@fomichev.me=
-> wrote:
+Hello Jon,
+
+On Tue, Aug 27, 2024 at 3:58=E2=80=AFAM Jon Maloy <jmaloy@redhat.com> wrote=
+:
 >
-> On 08/30, Tze-nan Wu wrote:
-> > There's a potential race when `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` i=
-s
-> > false during the execution of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN`, but
-> > becomes true when `BPF_CGROUP_RUN_PROG_GETSOCKOPT` is called.
-> > This inconsistency can lead to `BPF_CGROUP_RUN_PROG_GETSOCKOPT` receivi=
-ng
-> > an "-EFAULT" from `__cgroup_bpf_run_filter_getsockopt(max_optlen=3D0)`.
-> > Scenario shown as below:
-> >
-> >            `process A`                      `process B`
-> >            -----------                      ------------
-> >   BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN
-> >                                             enable CGROUP_GETSOCKOPT
-> >   BPF_CGROUP_RUN_PROG_GETSOCKOPT (-EFAULT)
-> >
-> > To resolve this, remove the `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN` macro an=
-d
-> > directly uses `copy_from_sockptr` to ensure that `max_optlen` is always
-> > set before `BPF_CGROUP_RUN_PROG_GETSOCKOPT` is invoked.
-> >
-> > Fixes: 0d01da6afc54 ("bpf: implement getsockopt and setsockopt hooks")
-> > Co-developed-by: Yanghui Li <yanghui.li@mediatek.com>
-> > Signed-off-by: Yanghui Li <yanghui.li@mediatek.com>
-> > Co-developed-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
-> > Signed-off-by: Cheng-Jui Wang <cheng-jui.wang@mediatek.com>
-> > Signed-off-by: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
 >
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+>
+> On 2024-08-23 19:44, Jason Xing wrote:
+> > Hello Jon,
+> >
+> > On Sat, Aug 24, 2024 at 5:19=E2=80=AFAM <jmaloy@redhat.com> wrote:
+> >> From: Jon Maloy <jmaloy@redhat.com>
+> >>
+> >> We add a selftest to check that the new feature added in
+> >> commit 05ea491641d3 ("tcp: add support for SO_PEEK_OFF socket option")
+> >> works correctly.
+> >>
+> >> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+> >> Tested-by: Stefano Brivio <sbrivio@redhat.com>
+> >> Signed-off-by: Jon Maloy <jmaloy@redhat.com>
+> > Thanks for working on this. Sorry that I just noticed I missed your
+> > previous reply :(
+> There is still the ditto UDP selftest to be done ;-)
 
-Considering it's rc6 I was debating whether it's net/bpf or -next
-material, but could argue either way.
+The reason why I didn't respond at that time is because I was unsure
+if I had enough time to finish it. Now it's time.
 
-Tze-nan,
-if I recall you were saying it affects android boot ?
-If so please describe such details in the commit log next time.
+After digging into this, there will be a lot of duplicated code if I
+write a new one named like "udp_so_peek_off". I think adjusting your
+tcp_so_peek_off.c to complete the UDP part is just fine. Of course,
+tcp_so_peek_off.c will be renamed :)
 
-Acked-by: Alexei Starovoitov <ast@kernel.org>
+I will post one later to see if it's reasonable...
 
-Kuba,
-feel free to take it into net if you think it's an appropriate fix.
+Thanks,
+Jason
 
