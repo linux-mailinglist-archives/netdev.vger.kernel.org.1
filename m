@@ -1,273 +1,172 @@
-Return-Path: <netdev+bounces-124005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC7C967552
-	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 08:34:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCF2496758C
+	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 10:24:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34FB328299E
-	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 06:34:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 017271C20F7F
+	for <lists+netdev@lfdr.de>; Sun,  1 Sep 2024 08:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35151381DF;
-	Sun,  1 Sep 2024 06:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="LsUi6FfC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84F68143887;
+	Sun,  1 Sep 2024 08:24:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA7239879
-	for <netdev@vger.kernel.org>; Sun,  1 Sep 2024 06:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8AF1420B0
+	for <netdev@vger.kernel.org>; Sun,  1 Sep 2024 08:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725172447; cv=none; b=aSGFH0pmCxKpOeKHle/GGBwiP27AKDOdnQpKi7hTziYUBr35B1y1prai8YnwJATYvB0ByA3+XPflQW1f+FV0Z7ze5dyTunzJf4VXApC6ZGvn7vjwRfLQfNXfBtyLcNpQ/k/izI8CsiKbNhYTZrNlmq9pitzFZXODU2sAZmUmsh0=
+	t=1725179069; cv=none; b=KTK7C6X/WEzG/R2cN0GnC53g1KA5p4ElinB799Tn4vkpYyhdOlF8Vjqi8C9PZIR14kE9xHlUk9+jGA2zU7j/8RAr5xqM2mCtwmqZgh8Js1wWVtqVEUQSq/3GZRf4Okfve3OTDnQMmoSWGd3ShSHtaajU5riDJ1FGWAX6VDyU3NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725172447; c=relaxed/simple;
-	bh=5l9c9nUT9miF+p/k8RzXg23g4Vp4Ohb4st+XtAcJS+s=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=PTdLb9fIbs1o/g/pRWphTq9aQQathy+fVSbYm0WImEoIoFSLT3TuCKB0Kg7ddy/gI3JK09Hjofzl1DgGi6ZgIffqZCvU5YlomP0t93yaWGmLVNZGIHil4LLgkNahwk7/Yc4Qw70o9vcEj3Xt/WzdHwsNrbgT69A4J6v1iMYxw0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=LsUi6FfC; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 4816S5ZJ001506
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Sun, 1 Sep 2024 08:28:07 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1725172090; bh=vuUeHsMgLWaa8b3qXWK86Lho3AknKtX+veiyrc+wmCQ=;
-	h=Date:From:Subject:To:Cc;
-	b=LsUi6FfCUTpfTtZCMUPiwsnKms2kMwFcMm/KzPi6zgVNgOXD87eU4cgtQ6vjIHmuv
-	 Cf+KuAH5WEcSqXR4eedUsMybWsPBQZLaOp8HWdUWtuSnBms8ll2vnXsdwWftyMWEAA
-	 WdT4fZ0mM24mjDv4IMgxF9B8bu2RMS5+74qOw2Bw=
-Message-ID: <a7904c43-01c7-4f9c-a1f9-e0a7ce2db532@ans.pl>
-Date: Sat, 31 Aug 2024 23:28:03 -0700
+	s=arc-20240116; t=1725179069; c=relaxed/simple;
+	bh=VfJXLi/eYBS644okY+ARvvRY/DXHIZL5ktcbxHrOGM8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=oNxXoH2v+nDCahK6oLZ/Ljb0pU5bpT3u1slA4/Z4DOzjhOv9rWcsq8/rxoLZfxQCye+hpBdCL0GSAmWHSzrT7Y48Jt8UntupDu6IRYAC235cj+jK6f/8HJi3UQAUEeL5cPtmM3PtMA+tJNvq1LpdlTCg3Gp/Ae0iVsT2dO6USfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82a29c9d39dso178666039f.2
+        for <netdev@vger.kernel.org>; Sun, 01 Sep 2024 01:24:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725179067; x=1725783867;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=G6oQUvwwPMAkmGzaNGxf9cx+QHwwYGucQ4Fcb6+88Jk=;
+        b=XDr2hHt9KntgaPjF+OcmiECNt+OYGKMlHLIPFQEtlFNt0Hq53e9g6Bi6LBLIDgUbPH
+         XQW/sJTg3St72Jd53Uw2SsJm8HW6YytNV5plxuCEtSGSy4KGEkzpx8oAp693bGAZXn9m
+         cBmEN2/4X/wsXke9rCtJ9RRJJ78QodZLuGG21vvHFT9huqpMZb2aTAGICxTp9qOxJJrg
+         z/hGDJnN+GqNqs+sLX9CduWE3pOsM7bsKh/HFsBctyXFPojRbX+jMGK4oAwlcJ60dy19
+         2qPYDcB+VEDrCQQl+lx3cFd88bMC/xSdJrLgE9JZe58+tGyOG3BYAgLcL00nH5HY4+bZ
+         gKWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUM/nSWM0ZALcQ3JI67gSCkSp2hgMTqLE+iWGB6VbjhYaYkhwPtHmE7VHsPxwb4nMRKqH2LbKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxccfstFVgjp6pMX169cKJrbmU2qMOr17QopzgHulZAMenAFiI3
+	XysfDWJ0+8IFfvX6IC5Qr/JyktMUyigXJS0xTBwWMmOM+swF6XVmHfpZXlh/aTOspot5juE/Uvn
+	p1vfbLX+aU08WuFKHzU/JfxYwd8YBZ33dYsveQJVgr6c635mGlamYSBg=
+X-Google-Smtp-Source: AGHT+IGuK0Oea3g2cY2ppVno8G3XqkBupzbqQOjuxONfqw7esT5UgZxMFvngCGPVCxfclxjvmJPjJQ2N3urTMrvioHQYZD+qAg1V
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
-Subject: [mlx4] Mellanox ConnectX2 (MHQH29C aka 26428) and module diagnostic
- support (ethtool -m) issues
-To: Ido Schimmel <idosch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Cc: Michal Kubecek <mkubecek@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6638:40a6:b0:4ce:54dc:fa44 with SMTP id
+ 8926c6da1cb9f-4d017d788fbmr413786173.1.1725179067112; Sun, 01 Sep 2024
+ 01:24:27 -0700 (PDT)
+Date: Sun, 01 Sep 2024 01:24:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000782b4706210a8dcd@google.com>
+Subject: [syzbot] [bluetooth?] BUG: corrupted list in mgmt_pending_remove
+From: syzbot <syzbot+cc0cc52e7f43dc9e6df1@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Hello,
 
-I noticed that module diagnostic on Mellanox ConnectX2 NIC (MHQH29Caka 26428 aka 15b3:673c, FW version 2.10.0720) behaves in somehow strange ways.
+syzbot found the following issue on:
 
-1. For SFP modules the driver is able to read the first page but not the 2nd one:
+HEAD commit:    fe1910f9337b tcp_bpf: fix return value of tcp_bpf_sendmsg()
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=171d6f7b980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=996585887acdadb3
+dashboard link: https://syzkaller.appspot.com/bug?extid=cc0cc52e7f43dc9e6df1
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-[  318.082923] mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(1) i2c_addr(51) offset(0) size(48): Response Mad Status(71c) - invalid I2C slave address
-[  318.082936] mlx4_en: eth1: mlx4_get_module_info i(0) offset(256) bytes_to_read(128) - FAILED (0xfffff8e4)
+Unfortunately, I don't have any reproducer for this issue yet.
 
-However, as the driver intentionally tries mask the problem [1], ethtool reports "Optical diagnostics support" being available and shows completely wrong information [2].
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/cb37d16e2860/disk-fe1910f9.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/315198aa296e/vmlinux-fe1910f9.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b3e6fb9fa8a4/bzImage-fe1910f9.xz
 
-Removing the workaround allows ethtool to recognize the problem and handle everything correctly [3]:
----- cut here ----
---- a/drivers/net/ethernet/mellanox/mlx4/port.c	2024-07-27 02:34:11.000000000 -0700
-+++ b/drivers/net/ethernet/mellanox/mlx4/port.c	2024-08-31 21:57:11.211612505 -0700
-@@ -2197,14 +2197,7 @@
- 			  0xFF60, port, i2c_addr, offset, size,
- 			  ret, cable_info_mad_err_str(ret));
- 
--		if (i2c_addr == I2C_ADDR_HIGH &&
--		    MAD_STATUS_2_CABLE_ERR(ret) == CABLE_INF_I2C_ADDR)
--			/* Some SFP cables do not support i2c slave
--			 * address 0x51 (high page), abort silently.
--			 */
--			ret = 0;
--		else
--			ret = -ret;
-+		ret = -ret;
- 		goto out;
- 	}
- 	cable_info = (struct mlx4_cable_info *)outm
----- cut here ----
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cc0cc52e7f43dc9e6df1@syzkaller.appspotmail.com
 
-However, we end up with a strange "netlink error: Unknown error 1820" error because mlx4_get_module_info returns -0x71c (0x71c is 1820 in decimal).
-
-This can be fixed with returning -EIO instead of ret, either in mlx4_get_module_info() or perhaps better mlx4_en_get_module_eeprom() from en_ethtool.c:
----- cut here ----
---- a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c	2024-07-27 02:34:11.000000000 -0700
-+++ b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c	2024-08-31 21:52:50.370553218 -0700
-@@ -2110,7 +2110,7 @@
- 			en_err(priv,
- 			       "mlx4_get_module_info i(%d) offset(%d) bytes_to_read(%d) - FAILED (0x%x)\n",
- 			       i, offset, ee->len - i, ret);
--			return ret;
-+			return -EIO;
- 		}
- 
- 		i += ret;
----- cut here ----
-
-BTW: it is also possible to augment the error reporting in ethtool/sfpid.c:
----- cut here ----
--       if (ret)
-+       if (ret) {
-+               fprintf(stderr, "Failed to read Page A2h.\n");
-                goto out;
-+       }
----- cut here ----
-With all the above changes, we now get:
-
----- cut here ----
-        Identifier                                : 0x03 (SFP)
-        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
-(...)
-        Date code                                 : <REDACTED>
-netlink error: Input/output error
-Failed to read Page A2h.
----- cut here ----
-
-So, the first question is if above set of fixes makes sense, give that ethtool handles this correctly? If so, I'm happy to send the fixes.
-
-The second question is if not being able to read Page A2h and "invalid I2C slave address" is a due to a bug in the driver or a HW (firmware?) limitation and if something can be done to address this?
-
-2. For a QSFP module (which works in CX3/CX3Pro), handling "ethtool -m" seems to be completely broken.
-
-With QSFP module in port #2 (eth2), for the first attempt (ethtool -m eth2):
-mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(2) i2c_addr(50) offset(0) size(48): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
-mlx4_en: eth2: mlx4_get_module_info i(0) offset(0) bytes_to_read(128) - FAILED (0xfffffbe4)
-
-However, if I first try run "ethtool -m eth1" with a SFP module installed in port #1, and then immediately "ethtool -m eth2", I end up getting the information for the SFP module:
-# ethtool -m eth2
-        Identifier                                : 0x03 (SFP)
-        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
-(...)
-
-I this case, I even get the same "invalid I2C slave address" error:
-mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(2) i2c_addr(51) offset(0) size(48): Response Mad Status(71c) - invalid I2C slave address
-
-If I immediately run "ethtool -m eth1" I get:
-mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(1) i2c_addr(50) offset(224) size(32): Response Mad Status(61c) - invalid device_address or size (that is, size equals 0 or address+size is greater than 256)
-mlx4_en: eth1: mlx4_get_module_info i(96) offset(224) bytes_to_read(32) - FAILED (0xfffff9e4)
-
-Alternatively, if I remove SFP module from port #1 and run "ethtool -m eth2", I get:
-[ 1071.945737] mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module ID attr(ff60) port(2) i2c_addr(50) offset(0) size(1): Response Mad Status(31c) - cable is not connected
-
-At this point, running "ethtool -m eth1" produces one of:
-
-*)
- mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module ID attr(ff60) port(2) i2c_addr(50) offset(0) size(1): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
-
-*)
- mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(2) i2c_addr(50) offset(128) size(48): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
- mlx4_en: eth2: mlx4_get_module_info i(0) offset(128) bytes_to_read(128) - FAILED (0xfffffbe4)
-
-*)
- mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module ID attr(ff60) port(2) i2c_addr(50) offset(0) size(1): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
-
-*)
- mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(2) i2c_addr(50) offset(0) size(48): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
- mlx4_en: eth2: mlx4_get_module_info i(0) offset(0) bytes_to_read(128) - FAILED (0xfffffbe4)
-
-*)
- mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module ID attr(ff60) port(2) i2c_addr(50) offset(0) size(1): Response Mad Status(41c) - the connected cable has no EPROM (passive copper cable)
-
-I wonder if in this situation we are communicating with a wrong device or returning some stale data from kernel memory or the firmware?
-
-Thanks,
- Krzysztof
-
-[1]
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/ethernet/mellanox/mlx4/port.c#n2200
+list_del corruption, ffff88802943da00->next is LIST_POISON1 (dead000000000100)
+------------[ cut here ]------------
+kernel BUG at lib/list_debug.c:58!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 1 UID: 0 PID: 7763 Comm: syz.0.694 Not tainted 6.11.0-rc5-syzkaller-00151-gfe1910f9337b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
+Code: e8 71 64 fc 06 90 0f 0b 48 c7 c7 c0 90 60 8c 4c 89 fe e8 5f 64 fc 06 90 0f 0b 48 c7 c7 20 91 60 8c 4c 89 fe e8 4d 64 fc 06 90 <0f> 0b 48 c7 c7 80 91 60 8c 4c 89 fe e8 3b 64 fc 06 90 0f 0b 48 c7
+RSP: 0018:ffffc9000492fb58 EFLAGS: 00010246
+RAX: 000000000000004e RBX: dead000000000122 RCX: 5f038e50b22bff00
+RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+RBP: dffffc0000000000 R08: ffffffff8174013c R09: 1ffff92000925f0c
+R10: dffffc0000000000 R11: fffff52000925f0d R12: dffffc0000000000
+R13: dffffc0000000000 R14: dead000000000100 R15: ffff88802943da00
+FS:  00007fb7679de6c0(0000) GS:ffff8880b8900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffc967a2fc0 CR3: 00000000437dc000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __list_del_entry_valid include/linux/list.h:124 [inline]
+ __list_del_entry include/linux/list.h:215 [inline]
+ list_del include/linux/list.h:229 [inline]
+ mgmt_pending_remove+0x26/0x1a0 net/bluetooth/mgmt_util.c:314
+ mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
+ mgmt_index_removed+0xe6/0x340 net/bluetooth/mgmt.c:9395
+ hci_sock_bind+0xcce/0x1150 net/bluetooth/hci_sock.c:1307
+ __sys_bind_socket net/socket.c:1833 [inline]
+ __sys_bind+0x23d/0x2f0 net/socket.c:1857
+ __do_sys_bind net/socket.c:1865 [inline]
+ __se_sys_bind net/socket.c:1863 [inline]
+ __x64_sys_bind+0x7a/0x90 net/socket.c:1863
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fb767f79eb9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fb7679de038 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
+RAX: ffffffffffffffda RBX: 00007fb768116058 RCX: 00007fb767f79eb9
+RDX: 0000000000000006 RSI: 0000000020000040 RDI: 0000000000000004
+RBP: 00007fb767fe793e R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000001 R14: 00007fb768116058 R15: 00007fffd1ff2828
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
+Code: e8 71 64 fc 06 90 0f 0b 48 c7 c7 c0 90 60 8c 4c 89 fe e8 5f 64 fc 06 90 0f 0b 48 c7 c7 20 91 60 8c 4c 89 fe e8 4d 64 fc 06 90 <0f> 0b 48 c7 c7 80 91 60 8c 4c 89 fe e8 3b 64 fc 06 90 0f 0b 48 c7
+RSP: 0018:ffffc9000492fb58 EFLAGS: 00010246
+RAX: 000000000000004e RBX: dead000000000122 RCX: 5f038e50b22bff00
+RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+RBP: dffffc0000000000 R08: ffffffff8174013c R09: 1ffff92000925f0c
+R10: dffffc0000000000 R11: fffff52000925f0d R12: dffffc0000000000
+R13: dffffc0000000000 R14: dead000000000100 R15: ffff88802943da00
+FS:  00007fb7679de6c0(0000) GS:ffff8880b8900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f773e8e8178 CR3: 00000000437dc000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
 
-[2]
-        Identifier                                : 0x03 (SFP)
-        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
-(...) 
-        Optical diagnostics support               : Yes
-        Laser bias current                        : 0.000 mA
-        Laser output power                        : 0.0000 mW / -inf dBm
-        Receiver signal average optical power     : 0.0000 mW / -inf dBm
-        Module temperature                        : 0.00 degrees C / 32.00 degrees F
-        Module voltage                            : 0.0000 V
-        Alarm/warning flags implemented           : Yes
-        Laser bias current high alarm             : Off
-        Laser bias current low alarm              : Off
-        Laser bias current high warning           : Off
-        Laser bias current low warning            : Off
-        Laser output power high alarm             : Off
-        Laser output power low alarm              : Off
-        Laser output power high warning           : Off
-        Laser output power low warning            : Off
-        Module temperature high alarm             : Off
-        Module temperature low alarm              : Off
-        Module temperature high warning           : Off
-        Module temperature low warning            : Off
-        Module voltage high alarm                 : Off
-        Module voltage low alarm                  : Off
-        Module voltage high warning               : Off
-        Module voltage low warning                : Off
-        Laser rx power high alarm                 : Off
-        Laser rx power low alarm                  : Off
-        Laser rx power high warning               : Off
-        Laser rx power low warning                : Off
-        Laser bias current high alarm threshold   : 0.000 mA
-        Laser bias current low alarm threshold    : 0.000 mA
-        Laser bias current high warning threshold : 0.000 mA
-        Laser bias current low warning threshold  : 0.000 mA
-        Laser output power high alarm threshold   : 0.0000 mW / -inf dBm
-        Laser output power low alarm threshold    : 0.0000 mW / -inf dBm
-        Laser output power high warning threshold : 0.0000 mW / -inf dBm
-        Laser output power low warning threshold  : 0.0000 mW / -inf dBm
-        Module temperature high alarm threshold   : 0.00 degrees C / 32.00 degrees F
-        Module temperature low alarm threshold    : 0.00 degrees C / 32.00 degrees F
-        Module temperature high warning threshold : 0.00 degrees C / 32.00 degrees F
-        Module temperature low warning threshold  : 0.00 degrees C / 32.00 degrees F
-        Module voltage high alarm threshold       : 0.0000 V
-        Module voltage low alarm threshold        : 0.0000 V
-        Module voltage high warning threshold     : 0.0000 V
-        Module voltage low warning threshold      : 0.0000 V
-        Laser rx power high alarm threshold       : 0.0000 mW / -inf dBm
-        Laser rx power low alarm threshold        : 0.0000 mW / -inf dBm
-        Laser rx power high warning threshold     : 0.0000 mW / -inf dBm
-        Laser rx power low warning threshold      : 0.0000 mW / -inf dBm
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-[3]
-# ethtool -m eth1
-        Identifier                                : 0x03 (SFP)
-        Extended identifier                       : 0x04 (GBIC/SFP defined by 2-wire interface ID)
-        Connector                                 : 0x07 (LC)
-        Transceiver codes                         : 0x10 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
-        Transceiver type                          : 10G Ethernet: 10G Base-SR
-        Encoding                                  : 0x06 (64B/66B)
-        BR, Nominal                               : 10300MBd
-        Rate identifier                           : 0x00 (unspecified)
-        Length (SMF,km)                           : 0km
-        Length (SMF)                              : 0m
-        Length (50um)                             : 80m
-        Length (62.5um)                           : 30m
-        Length (Copper)                           : 0m
-        Length (OM3)                              : 300m
-        Laser wavelength                          : 850nm
-        Vendor name                               : IBM-Avago
-        Vendor OUI                                : <REDACTED>
-        Vendor PN                                 : <REDACTED>
-        Vendor rev                                : G2.3
-        Option values                             : 0x00 0x1a
-        Option                                    : RX_LOS implemented
-        Option                                    : TX_FAULT implemented
-        Option                                    : TX_DISABLE implemented
-        BR margin, max                            : 0%
-        BR margin, min                            : 0%
-        Vendor SN                                 : <REDACTED>
-        Date code                                 : <REDACTED>
-netlink error: Unknown error 1820
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
