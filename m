@@ -1,95 +1,118 @@
-Return-Path: <netdev+bounces-124203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B879687EC
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:51:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D971A9687F4
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:52:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EE781F22EEA
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:51:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97610282EA7
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76533200118;
-	Mon,  2 Sep 2024 12:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B004713F43B;
+	Mon,  2 Sep 2024 12:52:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nvGAMgLP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HpuqzOKV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FE6E20010C;
-	Mon,  2 Sep 2024 12:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D8B185939
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 12:52:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725281430; cv=none; b=gaSwyRQ3s7UA61Ub4LVR0dtDf+2syxcw0CwQyANjpRABkQENPUNMrBckjMFG0v7wqi3upzLNLE6xlEutuXNPNQcgNiUcjO/knYMkIcn4/3K6IISzwF89DyNJnOAbgxFqG+jvYWJXzop4dg+DsiCPINUFsFKUlcN8YJP9NEeOifI=
+	t=1725281564; cv=none; b=HGKQeopbyU9XKBehFYmURX7ySRxKko7QfXLAu4xcoTWJjFXQjiKTB0dEVAEsRrgJmI+L0t0lrTaNsYsjD6DeNE4c8RMJhSvXs8l1tmJJG2DHeWs7rKoeAJcJ10bzfharU/YNeNqk60+88iIa1c6EYUuidkQvAhwBNXjnYLaHxOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725281430; c=relaxed/simple;
-	bh=jUGbCvappkupnOCyTWEDiv39z61vi1zMHP+E6B0TIas=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tVkwWARmwr4SGPa3FQjaNK7PvfQEx2MzbxAo9jYPzyJ2NlLSGIV57O5f+kKpyBHXsW+NHKehE8IoP5Zn5RiiCzGQpS5/MBoqgJWZdNklyVRoRxS/U0MQQ1DeBAu6TgNkH7tNON9xDzqAuOvCdamayQRN/PI1Euk51YDpTzWe+Eg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nvGAMgLP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA940C4CEC7;
-	Mon,  2 Sep 2024 12:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725281429;
-	bh=jUGbCvappkupnOCyTWEDiv39z61vi1zMHP+E6B0TIas=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nvGAMgLP3s8VI2YMGOKyxVIC8+pxlpcA9hoEhVhOygDvDypHdD6T365PX4HOYokqr
-	 fR249ww16kvtWdcdkRX+BxVAOg3thn01r/nfIZY9Z6/I/93WtYKSmH7FmtrN+OLYJm
-	 mobF67bxpBAPKmKA2SBzyUd0ETwR+4F/kr5H9kw9sl7obbEEZy+q6Oa5ZGjbR1pz/0
-	 avJuxrAY/34/EXtXP9vAwJ5oEDRyE4O0KaFUJqtZa32LjJLQ7GRBST79i0RbfX/kqB
-	 H1NLBTvNk/d8RwMTMMhyl84UMN7TFtljNfFQLP09rDeKkMHrlpvqzOqOwVffjKF5IC
-	 +SzLyCAQ53jrQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCBE3805D82;
-	Mon,  2 Sep 2024 12:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725281564; c=relaxed/simple;
+	bh=Q+j5Bl7cH6ou3W2kzNmS7fE9kRHevpD//rfikQBDb0k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E/6Y8Fg2ykQfRwFk7Q/F5OdE2XqmMwLRZFhdxsbi+HnnnqZPqVHpvCBze1Gywkp2bEY9YpG7Hk5TS685tKWmoA7tYxQMmif9WheYPwBBBpQwqveUVGZIk7l0zr5TLLwr/KiluwVTywY3VsmnBUfWcnL2mep0jUwDIgKTKoEHSjw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HpuqzOKV; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725281563; x=1756817563;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Q+j5Bl7cH6ou3W2kzNmS7fE9kRHevpD//rfikQBDb0k=;
+  b=HpuqzOKVAnHFla1zuILbPyA4vVm9g96Bxof0cW0lPpUJ5FbngizdYsII
+   eVco/ndjHqJ0vB7BCksH/pX9sQCO0b9J+w6WknBiN328Hlys63/T4y4uN
+   lJCSZQ2ALFUbCsQR/19fBUaVyAHmeJmqpZNlp11m57AjR+dzJrlMcTo3C
+   BywbDEnIqf+IRYoNLMCQWQ/E1KHsm7az9iAIbqKz/+UF/kXb3m4G+jrMB
+   7eVy/nhR6RsbXwxhzJrbLoA9AgJxleVLqlGVafStfZ/NTrm/cRDcqoJyZ
+   Px58d+1/rKk1n3RPT7YDaW/G7IbbFS621CzebP0lL/xCOChzP3JG4IRKF
+   A==;
+X-CSE-ConnectionGUID: ytN4FjCmTUOE+qmXllDTvw==
+X-CSE-MsgGUID: zQ3vXMZ4TX+buw627aNX2A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11183"; a="13330974"
+X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
+   d="scan'208";a="13330974"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 05:52:42 -0700
+X-CSE-ConnectionGUID: fcplad2bTku46m4kJ3zXXQ==
+X-CSE-MsgGUID: Y6Rvj8fqRfiQyJLUBGPWng==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
+   d="scan'208";a="69469819"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 05:52:39 -0700
+Date: Mon, 2 Sep 2024 14:50:36 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
+	andrew.gospodarek@broadcom.com, horms@kernel.org,
+	helgaas@kernel.org, przemyslaw.kitszel@intel.com,
+	Hongguang Gao <hongguang.gao@broadcom.com>,
+	Somnath Kotur <somnath.kotur@broadcom.com>
+Subject: Re: [PATCH net-next v4 9/9] bnxt_en: Support dynamic MSIX
+Message-ID: <ZtW0nDQdlzkHG5Y1@mev-dev.igk.intel.com>
+References: <20240828183235.128948-1-michael.chan@broadcom.com>
+ <20240828183235.128948-10-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: stmmac: drop the ethtool begin() callback
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172528143025.3879101.12070327930578718589.git-patchwork-notify@kernel.org>
-Date: Mon, 02 Sep 2024 12:50:30 +0000
-References: <20240829-stmmac-no-ethtool-begin-v2-1-a11b497a7074@redhat.com>
-In-Reply-To: <20240829-stmmac-no-ethtool-begin-v2-1-a11b497a7074@redhat.com>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, quic_abchauha@quicinc.com,
- quic_scheluve@quicinc.com, d.dolenko@metrotek.ru, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240828183235.128948-10-michael.chan@broadcom.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 29 Aug 2024 15:48:44 -0500 you wrote:
-> This callback doesn't seem to serve much purpose, and prevents things
-> like:
+On Wed, Aug 28, 2024 at 11:32:35AM -0700, Michael Chan wrote:
+> A range of MSIX vectors are allocated at initialization for the number
+> needed for RocE and L2.  During run-time, if the user increases or
+> decreases the number of L2 rings, all the MSIX vectors have to be
+> freed and a new range has to be allocated.  This is not optimal and
+> causes disruptions to RoCE traffic every time there is a change in L2
+> MSIX.
 > 
->     - systemd.link files from disabling autonegotiation
->     - carrier detection in NetworkManager
->     - any ethtool setting
+> If the system supports dynamic MSIX allocations, use dynamic
+> allocation to add new L2 MSIX vectors or free unneeded L2 MSIX
+> vectors.  RoCE traffic is not affected using this scheme.
 > 
-> [...]
+> Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
+> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+> Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> v4: Simplify adding and deleting MSIX
+> v2: Fix typo in changelog
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 37 +++++++++++++++++++++--
+>  1 file changed, 34 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index fa4115f6dafe..c9248ed9330c 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -10622,6 +10622,30 @@ static void bnxt_setup_msix(struct bnxt *bp)
+>  
 
-Here is the summary with links:
-  - [net-next,v2] net: stmmac: drop the ethtool begin() callback
-    https://git.kernel.org/netdev/net-next/c/55ddb6c5a3ae
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
