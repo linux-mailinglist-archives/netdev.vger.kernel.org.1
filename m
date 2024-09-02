@@ -1,191 +1,84 @@
-Return-Path: <netdev+bounces-124172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A17529685EF
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:15:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A4389685FB
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:17:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 549BB2842BB
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:15:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A76DB1F231F8
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B2B1D54E4;
-	Mon,  2 Sep 2024 11:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74884181CE1;
+	Mon,  2 Sep 2024 11:17:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tt9U1E/0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oa2OVFDE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F3D1D54E2;
-	Mon,  2 Sep 2024 11:13:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40EC5175A5;
+	Mon,  2 Sep 2024 11:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725275606; cv=none; b=nif8a4gvebTjob45NtAb6UnCVKzzeunCq7qQ0GAHsiMVJ9LQE4ieMNArOOSjqfDtGqdQSFFNhF//SgOSoV2W16ZIazHTmf+idwQTa6qRMMLniyreBNtghnApc1y1MSOo2QXanjlPPPa6HaRVJPbrVDS0E80xq1/OJr84pJDA0KA=
+	t=1725275837; cv=none; b=uvMvtEii36tBGGF9aafbyhDye1nX/nHAjUaySoZSsaeIlOpYgRpuerAKhqRWqkV6fo+DVvPgxngsGGSgc3q5at/ABHFDrkJQCSPxMVd/YaL2mkjysdX5zEc5TRTxKd20M+dQpA1IhUEd6HFuhLuNy4WEjE0MUW/N8MHcK0wxl2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725275606; c=relaxed/simple;
-	bh=coivBrklEI2JUZwekWv4TknuYZt59LSzSjx3B0A/NVY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Zgml8V+EzeFUQ0iHtCsrAnDCaX+6aBklcdeGKNsrbLmmugI4n6HPzcPgPraJG4FZwuZbziXOGwPS+5/G5MgG3cL3W0j8cykdeZq5ukGGX8RrG/Q+84YQsQ9d63d2/HYfkb6sIb9STDFKeZUERn7WZe7/kgzeY+hviCV1m3tccs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tt9U1E/0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F19ADC4CEC2;
-	Mon,  2 Sep 2024 11:13:23 +0000 (UTC)
+	s=arc-20240116; t=1725275837; c=relaxed/simple;
+	bh=wvzCQzSMfpZbVTjDOjDI58dr9I+13/EP2jjJQtbCpbA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q7Auwty0o/0ndTjweHvgYJ27ehMatNqSZI5BfcLKfLeThfYYQ2ClHNQ+6hVH9gwOd4ANkU6cOuPE7jLD9NcHq7P9VZnEIqyRqIEMOwkijQdwPOlukybsIR5aGpDr21aX+FyHqTAS1JfyCCY3gqRzSNqUv7QPLNKKt+w75nZOcV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oa2OVFDE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB8FFC4CEC2;
+	Mon,  2 Sep 2024 11:17:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725275606;
-	bh=coivBrklEI2JUZwekWv4TknuYZt59LSzSjx3B0A/NVY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=tt9U1E/0P2dARXlbZA+/ZvoPav5Mi+XWYWe+GTgDH4KOAaCMciOGzSuQaxTv1YpXA
-	 /lwPWwnc4yJyxna/Sf5zNlEYAb7ctkPUoB3W/Wk6wODvSUrzCe3c/48/Bfw73OP823
-	 21/aI6jqwRQsubNNsxFXcWSxrk9lFN/QI0IBsao3Z9NspPiQSXvn0KarMUWU6Msrxy
-	 Yl0ypyYD7PPAYO59yd1TwpA4y+3yvc8j2VSbNAG3dAbbBN2mxzxBT+xB5D5Eppx7EO
-	 tW1eaJQPRgfYnGRpKd1rC/KKSdvaLwTSGbP9/r9kkgRjNvecexL1Zoc9m1JtrVCHko
-	 avGZNpILYgQKQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 02 Sep 2024 13:13:06 +0200
-Subject: [PATCH net-next 3/3] selftests: mptcp: reset the last TS before
- the first test
+	s=k20201202; t=1725275836;
+	bh=wvzCQzSMfpZbVTjDOjDI58dr9I+13/EP2jjJQtbCpbA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Oa2OVFDEmQ8slnIh2J9t1nbdAZtj/jaNpeRqN3adjCVUCV3T6V/uaPIDmhZgUrwB8
+	 MB3FRYqqbg61MJJx7GlSM7kpPcQEiw5H9LuvvSWzpIAgYfCqjI0t/orYLvZc46S9LE
+	 Q3UOQGd7QnKGVyF7l1ZRvIQid57rRSw2XDZWzF2jLHVttAyz0JkSzMjAwDyzmnBAty
+	 fCMW5ZeQzSpNzcG9wIA4VymXSquTCBhEqfJcmXGZ/0BMnX5kN+l3mdJn3gyudBURAn
+	 Xe896b74pRHiYGt5Fop6S/z9uYWqk9giPcrO3WisOsf4LTqqV4DBsM1D3/MUstgbrv
+	 hdYqne0LiItig==
+Date: Mon, 2 Sep 2024 13:17:05 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Kaixiong Yu <yukaixiong@huawei.com>
+Cc: akpm@linux-foundation.org, mcgrof@kernel.org, 
+	ysato@users.sourceforge.jp, dalias@libc.org, glaubitz@physik.fu-berlin.de, luto@kernel.org, 
+	tglx@linutronix.de, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	viro@zeniv.linux.org.uk, jack@suse.cz, kees@kernel.org, j.granados@samsung.com, 
+	willy@infradead.org, Liam.Howlett@oracle.com, vbabka@suse.cz, 
+	lorenzo.stoakes@oracle.com, trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com, 
+	jlayton@kernel.org, neilb@suse.de, okorniev@redhat.com, Dai.Ngo@oracle.com, 
+	tom@talpey.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, paul@paul-moore.com, jmorris@namei.org, linux-sh@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, 
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	wangkefeng.wang@huawei.com
+Subject: Re: [PATCH -next 12/15] fs: dcache: move the sysctl into its own file
+Message-ID: <20240902-kumpan-phosphor-439fd7ceecda@brauner>
+References: <20240826120449.1666461-1-yukaixiong@huawei.com>
+ <20240826120449.1666461-13-yukaixiong@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240902-net-next-mptcp-ksft-subtest-time-v1-3-f1ed499a11b1@kernel.org>
-References: <20240902-net-next-mptcp-ksft-subtest-time-v1-0-f1ed499a11b1@kernel.org>
-In-Reply-To: <20240902-net-next-mptcp-ksft-subtest-time-v1-0-f1ed499a11b1@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3916; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=coivBrklEI2JUZwekWv4TknuYZt59LSzSjx3B0A/NVY=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBm1Z3LG1SnxwFVM5q2+pzQSq0NpdMHS6zwszaod
- Kl8843EtkiJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZtWdywAKCRD2t4JPQmmg
- cyErD/0WernVGS/e4FYg55+ajfdTimHSiDpmTWBe7ZeZGoKWXIn1hdehr4wOxDDqKzLhXiQ198v
- hrxD6kYCbJVfZ+77R6L0wSeZjW14e0a5t3IkOAV2w+gjGBwg7gqgAC7TIiSjuGukO2J0qKRtZxp
- Qd1cde/uhLKLtoe1YeYss9eGYJJ3Yklx4VML1yQCQCNCrb3wJ8v9wpdWdflBbqvCreL5JtRhqAu
- kqwknF7WWLtMTylYRUA9pBBYPrszcMXNR7F+AmnLlz1fLtzJ1IaPJYlYn6txQCWcdZS6/IqcqPq
- UKldJeUTfdQO4qch0DzetHY9an00nb9kqaiAkTnt2Q1+mxQdJmihaAoxzTusbsd6NPiE3UFSkbV
- mfB6pF+Tw4lh7X9P854dHQv9cTOYuLP2yr7pdbR4/Kcon/d1DEQCoi+x7i9Ee+nlkwgF18fRT9n
- 9ODWgKgdd4d7puJGBjMU8mkyraHSTr5iDsW3uytFP5ZdJ+CH3KJFeF7FbYf/5XiPeTgaKJYU3Pn
- GciUD61lwwLK/70k8IWexlPLNdNlzkUH15NjqUv0uAACv/tvcUaDGvX7WcDK0fmluYcLTKe/Wgt
- UO1Y9lBWOsbRhlILDijVvVhsdJOLILcCQaM13wJY2f9d5IrTmmzIBkmiDP9PbILKFKRRhABRPur
- /Ej1Fi2hJsLluZA==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240826120449.1666461-13-yukaixiong@huawei.com>
 
-Just to slightly improve the precision of the duration of the first
-test.
+On Mon, Aug 26, 2024 at 08:04:46PM GMT, Kaixiong Yu wrote:
+> The sysctl_vfs_cache_pressure belongs to fs/dcache.c, move it to
+> its own file from kernel/sysctl.c. As a part of fs/dcache.c cleaning,
+> sysctl_vfs_cache_pressure is changed to a static variable, and export
+> vfs_pressure_ratio with EXPORT_SYMBOL_GPL to be used by other files.
+> And move the unneeded include(linux/dcache.h).
+> 
+> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
+> ---
 
-In mptcp_join.sh, the last append_prev_results is now done as soon as
-the last test is over: this will add the last result in the list, and
-get a more precise time for this last test.
-
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/mptcp_connect.sh | 2 ++
- tools/testing/selftests/net/mptcp/mptcp_join.sh    | 3 ++-
- tools/testing/selftests/net/mptcp/mptcp_sockopt.sh | 1 +
- tools/testing/selftests/net/mptcp/pm_netlink.sh    | 2 ++
- tools/testing/selftests/net/mptcp/simult_flows.sh  | 1 +
- tools/testing/selftests/net/mptcp/userspace_pm.sh  | 1 +
- 6 files changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-index f61e2f5870ea..49d90c4dbc01 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-@@ -847,6 +847,8 @@ stop_if_error()
- make_file "$cin" "client"
- make_file "$sin" "server"
- 
-+mptcp_lib_subtests_last_ts_reset
-+
- check_mptcp_disabled
- 
- stop_if_error "The kernel configuration is not valid for MPTCP"
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index a4762c49a878..c31387b74010 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -3883,9 +3883,11 @@ if [ ${#tests[@]} -eq 0 ]; then
- 	tests=("${all_tests_names[@]}")
- fi
- 
-+mptcp_lib_subtests_last_ts_reset
- for subtests in "${tests[@]}"; do
- 	"${subtests}"
- done
-+append_prev_results
- 
- if [ ${ret} -ne 0 ]; then
- 	echo
-@@ -3896,7 +3898,6 @@ if [ ${ret} -ne 0 ]; then
- 	echo
- fi
- 
--append_prev_results
- mptcp_lib_result_print_all_tap
- 
- exit $ret
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh b/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
-index 68899a303a1a..5e8d5b83e2d0 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
-@@ -349,6 +349,7 @@ init
- make_file "$cin" "client" 1
- make_file "$sin" "server" 1
- trap cleanup EXIT
-+mptcp_lib_subtests_last_ts_reset
- 
- run_tests $ns1 $ns2 10.0.1.1
- run_tests $ns1 $ns2 dead:beef:1::1
-diff --git a/tools/testing/selftests/net/mptcp/pm_netlink.sh b/tools/testing/selftests/net/mptcp/pm_netlink.sh
-index 2757378b1b13..2e6648a2b2c0 100755
---- a/tools/testing/selftests/net/mptcp/pm_netlink.sh
-+++ b/tools/testing/selftests/net/mptcp/pm_netlink.sh
-@@ -137,6 +137,8 @@ check()
- 	fi
- }
- 
-+mptcp_lib_subtests_last_ts_reset
-+
- check "show_endpoints" "" "defaults addr list"
- 
- default_limits="$(get_limits)"
-diff --git a/tools/testing/selftests/net/mptcp/simult_flows.sh b/tools/testing/selftests/net/mptcp/simult_flows.sh
-index f74e1c3c126d..8fa77c8e9b65 100755
---- a/tools/testing/selftests/net/mptcp/simult_flows.sh
-+++ b/tools/testing/selftests/net/mptcp/simult_flows.sh
-@@ -286,6 +286,7 @@ while getopts "bcdhi" option;do
- done
- 
- setup
-+mptcp_lib_subtests_last_ts_reset
- run_test 10 10 0 0 "balanced bwidth"
- run_test 10 10 1 25 "balanced bwidth with unbalanced delay"
- 
-diff --git a/tools/testing/selftests/net/mptcp/userspace_pm.sh b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-index 9cb05978269d..3651f73451cf 100755
---- a/tools/testing/selftests/net/mptcp/userspace_pm.sh
-+++ b/tools/testing/selftests/net/mptcp/userspace_pm.sh
-@@ -150,6 +150,7 @@ mptcp_lib_events "${ns2}" "${client_evts}" client_evts_pid
- server_evts=$(mktemp)
- mptcp_lib_events "${ns1}" "${server_evts}" server_evts_pid
- sleep 0.5
-+mptcp_lib_subtests_last_ts_reset
- 
- print_title "Init"
- print_test "Created network namespaces ns1, ns2"
-
--- 
-2.45.2
-
+Reviewed-by: Christian Brauner <brauner@kernel.org>
 
