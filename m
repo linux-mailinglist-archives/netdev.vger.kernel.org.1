@@ -1,126 +1,102 @@
-Return-Path: <netdev+bounces-124206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C87FF968846
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 15:02:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA199968855
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 15:03:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05A1E1C221DF
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:02:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77FFF283750
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7330F205E35;
-	Mon,  2 Sep 2024 13:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBAD205E16;
+	Mon,  2 Sep 2024 13:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZvwItzQk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Xp0TbXSm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B308519C543
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 13:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDC07205E13;
+	Mon,  2 Sep 2024 13:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725282106; cv=none; b=isULNXxrwW3m7h6GaXi0IAkbu1wwNrXbI1pbPyIpnWsW+SLUTEl/yJj+osvxSndfpi7BwC3pQKNHAB/A9OIdQluNtIDz+Fi0SXOtHUYIjL/bk7thLlPHNCB3jgT+G8dCAvZxbre4I4CtgN8dlZfVIAToQJ8XvTqQEYWL4xea8aE=
+	t=1725282195; cv=none; b=W14Pxz/myduDV1EL9eQxe4oVzC7k8c0k7ARfYUFaO8VcXL27rtFi9ynd0wf5aAtwswP4vTsC8GtESftU5GQavOLHcGA4nbsOy+0T9kh8FSiMfWUR/kmZ5uqPjFKNMitc+MkzT14pfqKrk35jbsTFicsk9XGfWgSaHw2erzSESVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725282106; c=relaxed/simple;
-	bh=OqcJZ/1GMKCCiNdCksBYuf+yCIrGEq2SbmEzRSEKkyk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=poanBC5/KrbApzD/hfzM1hHKc7Ufb0E/plmgaNRFNREDeRqv1E+fvJVrNt1YU/kuJRhzDG9euAiSkSw23XsJs+ILur0nq1P+TQZCMM1xMkqqmFY6hXOv1OrrOIJgx+wIs4mFlnyENhBL15ua+MEWjTaS8y5ya9WXXCBPUP+mZy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZvwItzQk; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a86883231b4so507162966b.3
-        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 06:01:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725282103; x=1725886903; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OqcJZ/1GMKCCiNdCksBYuf+yCIrGEq2SbmEzRSEKkyk=;
-        b=ZvwItzQkAwNedFcs630M+hLkw/tmm/lisIdJNLZDIo4ioaq6NGjbE8qAGHx8oRdjRX
-         hOHRN4BDvrfUNdMneVeSCgsjtIqTm1xdMwLzHSWqOxE0LWjKjH5/XSdpRAyxVa6g71Th
-         Ho2s40tUMpQrRrWR2fah77keuK+G9oYT0cEtYQ1FbkZhywbzz9zDEpUUaVuagODf1dkE
-         rkuZaeS2E7ApquwVR9D0OHk75WvdZzargYA/1MMIMMLjforRf5KMDjAbjrtfnHqJjqIg
-         2CphjEHDsm2ml08w8Oeb5AYrdp5Gea7gJOZXsuyqkRFQPvLU2KKbGAQek7iRI2pbfz+/
-         iPdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725282103; x=1725886903;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OqcJZ/1GMKCCiNdCksBYuf+yCIrGEq2SbmEzRSEKkyk=;
-        b=SMo7JCJkOQeSf82gBCuK9rKsHIt6HHYyS6pY4CA5523CKlLZeNy9hxuebCo9tqxOqp
-         WdObvUh0ix2jfwBzke4FCJGNAYhAES48p1GH4QZItpMWYM63hT7vbYkFRb2b7+s+MWVb
-         dR9MySKvmaeWXQCvfesHVNJhCaddzfC8ddhGgb+ky+qMrBb3gwVDGarV/iqeDxlK8q4s
-         J7RANT1gVkMQlERwqP1HYgag6ckseNVuWgi69zJ/oR3kkP27yxZWLAI7dqPhysFXPWsW
-         M8fTpP3jy+Has5pJgvSbpfOSJ5DDdvWxshlk/C8vV5teaLVnkQzU9wOoD7qKBPyI0XDA
-         YPVQ==
-X-Gm-Message-State: AOJu0YxPO0bsfT8VtNnXB+Y9zrCK3q3tb2Xd9ctEzSMIjzTkymFJl+oc
-	sko7OZF7GH3rGcdcybFe+lz5AV+HYCubRmjALAharEMiLmcXUJbTxe9H8+PolA0cF+QS095m5kg
-	9uI68wdw6ZkCFKJ+aw7hSvkBOkZNyalSYhAZ3
-X-Google-Smtp-Source: AGHT+IEqxuDt5F9iLAPqh29duXxwhGXKRe2nes7X9QlYEzjiULot5Kc8klsLZ2ZBF8NXVRMhqG5+6UVEa6rSFv8Zqvo=
-X-Received: by 2002:a17:907:701:b0:a80:7193:bd88 with SMTP id
- a640c23a62f3a-a89d879cf05mr456688866b.36.1725282101820; Mon, 02 Sep 2024
- 06:01:41 -0700 (PDT)
+	s=arc-20240116; t=1725282195; c=relaxed/simple;
+	bh=nSIF/RQGx5zQtCXbmymoOL7oYYS9z5GWXT5pcvJmmpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UE8S/Nw+FBPK1UuAzc90HbhWDeP6l9UmpV80JeS1RP09V8pBuU2iRwLHQGk6dy/KYnrD8Uni+YbMOmSA5DXcG98cqRC4MKLUomjyxUjC/XHD5bvv7pVrnDLI6QOzxsvSvAcmc65rYHbPpkCex37fjxzPbqHNhQ4y347oWALm6yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Xp0TbXSm; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=U3Xd6kNh6CWaWB54nOF4pQA55V5GFAOUyi4PSPw4mso=; b=Xp0TbXSm9K+7hX6rneaiKXKWOw
+	DDsd+SHAzXFKWIy3tHK4eMfCmpO9qTpnlUeur5aRAbFy5ifalISetHhASYuLzRwJqh1N8FRC6Ar6B
+	BejECX62TVOxatTNlP0siah1an1G0g1w32GoX3lqlEspelxX4STuHckYiWrImL1cD8uc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sl6hl-006J03-Di; Mon, 02 Sep 2024 15:02:49 +0200
+Date: Mon, 2 Sep 2024 15:02:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Anwar, Md Danish" <a0501179@ti.com>
+Cc: Roger Quadros <rogerq@kernel.org>, MD Danish Anwar <danishanwar@ti.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Jan Kiszka <jan.kiszka@siemens.com>,
+	Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman <horms@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>
+Subject: Re: [PATCH net-next v3 3/6] net: ti: icssg-prueth: Add support for
+ HSR frame forward offload
+Message-ID: <f2598368-745f-4a83-abfc-b9609ebff6b0@lunn.ch>
+References: <20240828091901.3120935-1-danishanwar@ti.com>
+ <20240828091901.3120935-4-danishanwar@ti.com>
+ <22f5442b-62e6-42d0-8bf8-163d2c4ea4bd@kernel.org>
+ <177dd95f-8577-4096-a3e8-061d29b88e9c@lunn.ch>
+ <040b3b26-a7ef-47c7-845d-068a0c734e61@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240831113223.9627-1-jdamato@fastly.com>
-In-Reply-To: <20240831113223.9627-1-jdamato@fastly.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 2 Sep 2024 15:01:28 +0200
-Message-ID: <CANn89iK+09DW95LTFwN1tA=_hV7xvA0mY4O4d-LwVbmNkO0y3w@mail.gmail.com>
-Subject: Re: [PATCH net] net: napi: Make napi_defer_irqs u32
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, stable@kernel.org, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Breno Leitao <leitao@debian.org>, 
-	Johannes Berg <johannes.berg@intel.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <040b3b26-a7ef-47c7-845d-068a0c734e61@ti.com>
 
-On Sat, Aug 31, 2024 at 1:32=E2=80=AFPM Joe Damato <jdamato@fastly.com> wro=
-te:
->
-> In commit 6f8b12d661d0 ("net: napi: add hard irqs deferral feature")
-> napi_defer_irqs was added to net_device and napi_defer_irqs_count was
-> added to napi_struct, both as type int.
->
-> This value never goes below zero. Change the type for both from int to
-> u32, and add an overflow check to sysfs to limit the value to S32_MAX.
->
-> Before this patch:
->
-> $ sudo bash -c 'echo 2147483649 > /sys/class/net/eth4/napi_defer_hard_irq=
-s'
-> $ cat /sys/class/net/eth4/napi_defer_hard_irqs
-> -2147483647
->
-> After this patch:
->
-> $ sudo bash -c 'echo 2147483649 > /sys/class/net/eth4/napi_defer_hard_irq=
-s'
-> bash: line 0: echo: write error: Numerical result out of range
->
-> Fixes: 6f8b12d661d0 ("net: napi: add hard irqs deferral feature")
-> Cc: stable@kernel.org
-> Cc: Eric Dumazet <edumazet@google.com>
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
+> Yes, and I have already added this in this series based on your feedback
+> on v2.
+> 
+> I have one question though, in emac_ndo_set_features() should I change
+> these HSR related features irrespective of the current mode?
+> 
+> AFAIK, if NETIF_F_HW_HSR_FWD is set, the forwarding is offloaded to HW.
+> If NETIF_F_HW_HSR_FWD is not set the forwarding is not offloaded to HW
+> and is done in SW.
+> 
+> So, I don't see any need to enable this features if we are currently in
+> switch mode. Let me know what do you think. Should I still enable this
+> feature irrespective of current mode and later handle this in
+> prueth_hsr_port_link / unlink()?
 
-I do not think this deserves a change to stable trees.
+The user should not need to know about the different firmwares. So i
+would allow NETIF_F_HW_HSR_FWD at any time.
 
-Signed or unsigned, what is the issue ?
+The exception would be, if you look at all the other drivers which
+implement HSR offload, if they all return an error if the offloading
+cannot be enabled, then you should do the same.
 
-Do you really need one extra bit ?
-
-/sys/class/net/XXXXX/tx_queue_len has a similar behavior.
+	Andrew
 
