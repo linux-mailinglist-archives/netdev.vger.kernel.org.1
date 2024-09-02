@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-124225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3339968A16
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 16:37:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3843B968A18
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 16:37:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C89AF1C22367
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:37:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9AB0282C98
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476E21A2648;
-	Mon,  2 Sep 2024 14:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 561E819F10C;
+	Mon,  2 Sep 2024 14:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TNhbydAY"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="fmAJfuq6"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687281A2634;
-	Mon,  2 Sep 2024 14:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EEEC1A264D;
+	Mon,  2 Sep 2024 14:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725287768; cv=none; b=Mxo7KKrjSZhO0/rcej2WsUa8eyEg3KzG4n+lPsfhytrURc7Zt6k3QTIElMbIOIFbfG2S6k2ONXzIE2H/aMS3K2hA0J24xTbBMY5s/B7x/lrneW6NPZKOS7dsEsjHumtMm7ryY3/b/AnnammOfklIj1obPbcmHcApbOxydZGIz3s=
+	t=1725287770; cv=none; b=V35t7cTwnpvS3uEVvxJjmsSKfogXglj7qriwd2dMV5FOW7bvZfLcYTN2RJzKO1yJ3jtHoIMTsiUL+RvdXaeWBP9xKDL/IzFZvNvFjO2z3fj/KH0Fl6Vjm0D0vs2zqDy3KSrSEwoKhkmUPa1vIj5IWMYZWQSCf2q27yWod/agwmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725287768; c=relaxed/simple;
-	bh=EMQ9cF08UM3iQMZPUf1ckny7JEPExS3FG5tc4/vghsQ=;
+	s=arc-20240116; t=1725287770; c=relaxed/simple;
+	bh=FU2s2IazRvyJuJ6eR3DYyCxYE4wFwIzeJ3sKgDBVtog=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VvMsNBINq8VMZyjFIOfXQan6bLiqAUX7sRP1nLaj3gUORMoO3wBjpSw6b3piqudx/1J1Wi4G5RbXN+x0l6XBL3idICimyUFK4cG6g/xw4arv48HSS1k1aj+90sPz3rU7O8i/4erchhwJuVLwIPFzFTsGLCghfiA37fY6HH8LG7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TNhbydAY; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=G3bzxWBWj/cEUOYNy3GSUSHkt2U/IDUhVeanaafhSqLon/VtJFc/Bsq/QQngUQ2/xjmdhze19b16OKpZRh2eydXXF4arK3LjK6q1CGmFduLYmaem27UpN2A22xkMfXbI2GH4EGvoTZLDYWPoD0/pRD97P6r4H3oiJUhKQhxSYAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=fmAJfuq6; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1725287766; x=1756823766;
+  t=1725287768; x=1756823768;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=EMQ9cF08UM3iQMZPUf1ckny7JEPExS3FG5tc4/vghsQ=;
-  b=TNhbydAYV2+JtCm4nzRQ4CT/O1CY/syErO8/4pWlaozvmfpSZ7YG7vOK
-   DgUM3aA9jbE9+hk/AfwdE/vUIKJyjcMBdhl0Ge7eJ86F3lYN9mu6lf+pj
-   y7ZMr2uCs1RXMJ5tau9vmnJwZssRbdTWBfRBcgn0LdLKIuThLZfFO3APv
-   sj7D+I7BGfgvDB7GQrIxkeuUnRe/WCCU6YUrFYNVBiTMWNzDa7FuyCerQ
-   80jjSM5cPpVG5cLhEJ6w7gKO+QCxrbhExBXqja9yh9IzwT6yoyjD6sCsp
-   uSumrGMYG+51pRh07QZTz1/xubzLsr/3SZBejGVCNxu9vcna2YzeJ9o8y
+  bh=FU2s2IazRvyJuJ6eR3DYyCxYE4wFwIzeJ3sKgDBVtog=;
+  b=fmAJfuq6CGBg8PmYuQHIoO5HtMWeKqzLUTWQi2a4quYgPYkeutLW9Pfx
+   1bUFQamhTsXS8Ay929GJ+I30d0fRHXwz3Cr0TtNbraMizcgH9fP+Ocw4d
+   0QKwmJigN3ykGst8+Vhj5C2x5jhcxULk45KXISOlZ0F2k62cfPVC7KYSL
+   g9gbatFAoEi/Zs3Szkc2R5RoMajWoewyiEMuweROLzOOmELpUnvnqrJXF
+   WJ09yx38rcq9lJUDZhItWv1mGLssGKmk8mCmqmjLAqHScQZqwrcYcqhjV
+   /agQBPeClg6kCM4ZMtnunn0HhMrcMw0E/wxSDp4zlaCtTawi25vLW6gFU
    A==;
 X-CSE-ConnectionGUID: nwmy61OOT8aTto41TmdklQ==
-X-CSE-MsgGUID: fh8ve3T+R76ht+ffVTqWsQ==
+X-CSE-MsgGUID: mdDKCsvUR2uVvioHd4NJdg==
 X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
-   d="scan'208";a="31855341"
+   d="scan'208";a="31855351"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Sep 2024 07:36:05 -0700
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Sep 2024 07:36:06 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 2 Sep 2024 07:35:35 -0700
+ 15.1.2507.35; Mon, 2 Sep 2024 07:35:40 -0700
 Received: from che-ll-i17164.microchip.com (10.10.85.11) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 2 Sep 2024 07:35:31 -0700
+ 15.1.2507.35 via Frontend Transport; Mon, 2 Sep 2024 07:35:35 -0700
 From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -66,9 +66,9 @@ CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<parthiban.veerasooran@microchip.com>, <UNGLinuxDriver@microchip.com>,
 	<Thorsten.Kummermehr@microchip.com>, Parthiban Veerasooran
 	<Parthiban.Veerasooran@microchip.com>
-Subject: [PATCH net-next v2 6/7] net: phy: microchip_t1s: add support for Microchip's LAN867X Rev.C2
-Date: Mon, 2 Sep 2024 20:04:57 +0530
-Message-ID: <20240902143458.601578-7-Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v2 7/7] net: phy: microchip_t1s: configure collision detection based on PLCA mode
+Date: Mon, 2 Sep 2024 20:04:58 +0530
+Message-ID: <20240902143458.601578-8-Parthiban.Veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240902143458.601578-1-Parthiban.Veerasooran@microchip.com>
 References: <20240902143458.601578-1-Parthiban.Veerasooran@microchip.com>
@@ -81,102 +81,100 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-This patch adds support for LAN8670/1/2 Rev.C2 as per the latest
-configuration note AN1699 released (Revision E (DS60001699F - June 2024))
-for Rev.C1 is also applicable for Rev.C2. Refer hardware revisions list
-in the latest AN1699 Revision E (DS60001699F - June 2024).
-https://www.microchip.com/en-us/application-notes/an1699
+As per LAN8650/1 Rev.B0/B1 AN1760 (Revision F (DS60001760G - June 2024))
+and LAN8670/1/2 Rev.C1/C2 AN1699 (Revision E (DS60001699F - June 2024)),
+under normal operation, the device should be operated in PLCA mode.
+Disabling collision detection is recommended to allow the device to
+operate in noisy environments or when reflections and other inherent
+transmission line distortion cause poor signal quality. Collision
+detection must be re-enabled if the device is configured to operate in
+CSMA/CD mode.
 
 Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
 ---
- drivers/net/phy/Kconfig         |  4 ++--
- drivers/net/phy/microchip_t1s.c | 22 +++++++++++++++++-----
- 2 files changed, 19 insertions(+), 7 deletions(-)
+ drivers/net/phy/microchip_t1s.c | 42 ++++++++++++++++++++++++++++++---
+ 1 file changed, 39 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 04f605606a8a..ee3ea0b56d48 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -292,8 +292,8 @@ config MICREL_PHY
- config MICROCHIP_T1S_PHY
- 	tristate "Microchip 10BASE-T1S Ethernet PHYs"
- 	help
--	  Currently supports the LAN8670/1/2 Rev.B1/C1 and LAN8650/1 Rev.B0/B1
--	  Internal PHYs.
-+	  Currently supports the LAN8670/1/2 Rev.B1/C1/C2 and
-+	  LAN8650/1 Rev.B0/B1 Internal PHYs.
- 
- config MICROCHIP_PHY
- 	tristate "Microchip PHYs"
 diff --git a/drivers/net/phy/microchip_t1s.c b/drivers/net/phy/microchip_t1s.c
-index 62f5ce548c6a..bd0c768df0af 100644
+index bd0c768df0af..a0565508d7d2 100644
 --- a/drivers/net/phy/microchip_t1s.c
 +++ b/drivers/net/phy/microchip_t1s.c
-@@ -3,7 +3,7 @@
-  * Driver for Microchip 10BASE-T1S PHYs
-  *
-  * Support: Microchip Phys:
-- *  lan8670/1/2 Rev.B1/C1
-+ *  lan8670/1/2 Rev.B1/C1/C2
-  *  lan8650/1 Rev.B0/B1 Internal PHYs
-  */
+@@ -26,6 +26,12 @@
+ #define LAN865X_REG_CFGPARAM_CTRL 0x00DA
+ #define LAN865X_REG_STS2 0x0019
  
-@@ -13,6 +13,7 @@
++/* Collision Detector Control 0 Register */
++#define LAN86XX_REG_COL_DET_CTRL0	0x0087
++#define COL_DET_CTRL0_ENABLE_BIT_MASK	BIT(15)
++#define COL_DET_ENABLE			BIT(15)
++#define COL_DET_DISABLE			0x0000
++
+ #define LAN865X_CFGPARAM_READ_ENABLE BIT(1)
  
- #define PHY_ID_LAN867X_REVB1 0x0007C162
- #define PHY_ID_LAN867X_REVC1 0x0007C164
-+#define PHY_ID_LAN867X_REVC2 0x0007C165
- /* Both Rev.B0 and B1 clause 22 PHYID's are same due to B1 chip limitation */
- #define PHY_ID_LAN865X_REVB 0x0007C1B3
- 
-@@ -291,7 +292,7 @@ static int lan867x_check_reset_complete(struct phy_device *phydev)
+ /* The arrays below are pulled from the following table from AN1699
+@@ -370,6 +376,36 @@ static int lan867x_revb1_config_init(struct phy_device *phydev)
  	return 0;
  }
  
--static int lan867x_revc1_config_init(struct phy_device *phydev)
-+static int lan867x_revc_config_init(struct phy_device *phydev)
++/* As per LAN8650/1 Rev.B0/B1 AN1760 (Revision F (DS60001760G - June 2024)) and
++ * LAN8670/1/2 Rev.C1/C2 AN1699 (Revision E (DS60001699F - June 2024)), under
++ * normal operation, the device should be operated in PLCA mode. Disabling
++ * collision detection is recommended to allow the device to operate in noisy
++ * environments or when reflections and other inherent transmission line
++ * distortion cause poor signal quality. Collision detection must be re-enabled
++ * if the device is configured to operate in CSMA/CD mode.
++ *
++ * AN1760: https://www.microchip.com/en-us/application-notes/an1760
++ * AN1699: https://www.microchip.com/en-us/application-notes/an1699
++ */
++static int lan86xx_plca_set_cfg(struct phy_device *phydev,
++				const struct phy_plca_cfg *plca_cfg)
++{
++	int ret;
++
++	ret = genphy_c45_plca_set_cfg(phydev, plca_cfg);
++	if (ret)
++		return ret;
++
++	if (plca_cfg->enabled)
++		return phy_modify_mmd(phydev, MDIO_MMD_VEND2,
++				      LAN86XX_REG_COL_DET_CTRL0,
++				      COL_DET_CTRL0_ENABLE_BIT_MASK,
++				      COL_DET_DISABLE);
++
++	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, LAN86XX_REG_COL_DET_CTRL0,
++			      COL_DET_CTRL0_ENABLE_BIT_MASK, COL_DET_ENABLE);
++}
++
+ static int lan86xx_read_status(struct phy_device *phydev)
  {
- 	s8 offsets[2];
- 	int ret;
-@@ -304,10 +305,10 @@ static int lan867x_revc1_config_init(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
--	/* LAN867x Rev.C1 configuration settings are equal to the first 9
-+	/* LAN867x Rev.C1/C2 configuration settings are equal to the first 9
- 	 * configuration settings and all the sqi fixup settings from LAN865x
- 	 * Rev.B0/B1. So the same fixup registers and values from LAN865x
--	 * Rev.B0/B1 are used for LAN867x Rev.C1 to avoid duplication.
-+	 * Rev.B0/B1 are used for LAN867x Rev.C1/C2 to avoid duplication.
- 	 * Refer the below links for the comparision.
- 	 * https://www.microchip.com/en-us/application-notes/an1760
- 	 * Revision F (DS60001760G - June 2024)
-@@ -399,7 +400,17 @@ static struct phy_driver microchip_t1s_driver[] = {
- 		PHY_ID_MATCH_EXACT(PHY_ID_LAN867X_REVC1),
- 		.name               = "LAN867X Rev.C1",
- 		.features           = PHY_BASIC_T1S_P2MP_FEATURES,
--		.config_init        = lan867x_revc1_config_init,
-+		.config_init        = lan867x_revc_config_init,
-+		.read_status        = lan86xx_read_status,
-+		.get_plca_cfg	    = genphy_c45_plca_get_cfg,
-+		.set_plca_cfg	    = genphy_c45_plca_set_cfg,
-+		.get_plca_status    = genphy_c45_plca_get_status,
-+	},
-+	{
-+		PHY_ID_MATCH_EXACT(PHY_ID_LAN867X_REVC2),
-+		.name               = "LAN867X Rev.C2",
-+		.features           = PHY_BASIC_T1S_P2MP_FEATURES,
-+		.config_init        = lan867x_revc_config_init,
+ 	/* The phy has some limitations, namely:
+@@ -403,7 +439,7 @@ static struct phy_driver microchip_t1s_driver[] = {
+ 		.config_init        = lan867x_revc_config_init,
  		.read_status        = lan86xx_read_status,
  		.get_plca_cfg	    = genphy_c45_plca_get_cfg,
- 		.set_plca_cfg	    = genphy_c45_plca_set_cfg,
-@@ -422,6 +433,7 @@ module_phy_driver(microchip_t1s_driver);
- static struct mdio_device_id __maybe_unused tbl[] = {
- 	{ PHY_ID_MATCH_EXACT(PHY_ID_LAN867X_REVB1) },
- 	{ PHY_ID_MATCH_EXACT(PHY_ID_LAN867X_REVC1) },
-+	{ PHY_ID_MATCH_EXACT(PHY_ID_LAN867X_REVC2) },
- 	{ PHY_ID_MATCH_EXACT(PHY_ID_LAN865X_REVB) },
- 	{ }
+-		.set_plca_cfg	    = genphy_c45_plca_set_cfg,
++		.set_plca_cfg	    = lan86xx_plca_set_cfg,
+ 		.get_plca_status    = genphy_c45_plca_get_status,
+ 	},
+ 	{
+@@ -413,7 +449,7 @@ static struct phy_driver microchip_t1s_driver[] = {
+ 		.config_init        = lan867x_revc_config_init,
+ 		.read_status        = lan86xx_read_status,
+ 		.get_plca_cfg	    = genphy_c45_plca_get_cfg,
+-		.set_plca_cfg	    = genphy_c45_plca_set_cfg,
++		.set_plca_cfg	    = lan86xx_plca_set_cfg,
+ 		.get_plca_status    = genphy_c45_plca_get_status,
+ 	},
+ 	{
+@@ -423,7 +459,7 @@ static struct phy_driver microchip_t1s_driver[] = {
+ 		.config_init        = lan865x_revb_config_init,
+ 		.read_status        = lan86xx_read_status,
+ 		.get_plca_cfg	    = genphy_c45_plca_get_cfg,
+-		.set_plca_cfg	    = genphy_c45_plca_set_cfg,
++		.set_plca_cfg	    = lan86xx_plca_set_cfg,
+ 		.get_plca_status    = genphy_c45_plca_get_status,
+ 	},
  };
 -- 
 2.34.1
