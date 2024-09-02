@@ -1,135 +1,102 @@
-Return-Path: <netdev+bounces-124155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE521968534
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:49:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42816968545
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:51:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 678A1285B74
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:49:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0F911F25795
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5345C1D67BF;
-	Mon,  2 Sep 2024 10:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E90Fy07o"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F39A18453F;
+	Mon,  2 Sep 2024 10:49:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258EC185924;
-	Mon,  2 Sep 2024 10:46:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E1718453E;
+	Mon,  2 Sep 2024 10:49:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725274003; cv=none; b=bCC7AT9Ya76nSFkTUn41duhq7zo/tw1mHjQ44voxcUgP0vdVACDqmf1g6JjZaZxi79B0LGkvKvdHYBc3gKxsYoPh17cDkFcEwAiVpnz3WFWArG244LYyMrB52b2rehPMK3f1JvcGgWp9N4+pSf0woOVJ0PjAXGT4sGmz/I57j/g=
+	t=1725274180; cv=none; b=Hgl7NMHeSViKOHGoaDBkzvksqGkG9y58V7S6aeaTD3Nr2VB44xwNkif5y5hV1Cm13pLTlYdSxzboeLwvTz519dvhViUI22UrkUac8DpnwlARBX1w7JUDKL7JtUVkuOVw9NVUqDBRDg0FDYnqh72yRlk4W7+Cu1uegM1HvSqKDhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725274003; c=relaxed/simple;
-	bh=FPZ//+LmYrdLiAR8TkZb9j4Bb/TNL62ML2xUN9hVcrg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jfB+El3xfrNyQnqUrDA7c7o+YklCf0v5YkRVCum62o+VBhd/hbQd0dhpFxYDgS076vfMM696XvT+JuBgwaD0+CxLVfwx4GO0DWOKe8Kf/fPz2MYIQo5f7j1CEMVI9MCsTkhx0kDc1P1mYSqvdWH9C8Iioj4vScq66n0ShnyGSNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E90Fy07o; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68CADC4CEC8;
-	Mon,  2 Sep 2024 10:46:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725274003;
-	bh=FPZ//+LmYrdLiAR8TkZb9j4Bb/TNL62ML2xUN9hVcrg=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=E90Fy07oI3giZ6itsts+X/Lg4jy+r/Csnn4eyeHIYYbtupxIEfFOwVJZrjF1kltIA
-	 Pm672wG5ZQDyyZyL/dOYOu2CP0HvceCwutQ1hZuxuFdMOgqLdXltNHbYtAfAP72Df/
-	 yGZY2I3NrGRdUCzQQRmwFrKuNsHbzBfmPZY/rwLgAINJOttJX4LVbf3es9ryrfFxEr
-	 p/FQk3caXnJmWuCJaEC/Imos4zROBYD83HsBdN1jE/cZHOkl7AWlNKXviHwXMhpZOZ
-	 D5ZpV1jp+ym4t5582o1zzhadtut55ytCZ+DvWVeiRJyfxiiw7YyjhW3DNHnh9n9N7p
-	 dEGSONKyR9hLw==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Mon, 02 Sep 2024 12:46:02 +0200
-Subject: [PATCH net-next 11/11] selftests: mptcp: pm_nl_ctl: remove
- re-definition
+	s=arc-20240116; t=1725274180; c=relaxed/simple;
+	bh=4qo7eUTb/ms9n952NasE1nZfFMCDySAeQvHv0tBkAXw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=guj55T2DWnSL57O68lllnH0wj1yE1kMtdprpu7ShZw9gfAaFhC5KmekkeCQg3eSf+l3HOKuJLIakZJ8Pnc+q/vEVxWFoJBWckO1nfS82IDsvz7OUocR75LhliwNs9A26u7AVuWx54vc86ZBB+ILe1ktkvRmuR2siGHMV+vGvHa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org; spf=fail smtp.mailfrom=kernel.org; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=kernel.org
+X-CSE-ConnectionGUID: zLOrOyAMQoWMCoSt+wwxsQ==
+X-CSE-MsgGUID: oRRKfw3pRmOYU0+EBtrIFA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11182"; a="41350232"
+X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
+   d="scan'208";a="41350232"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 03:49:37 -0700
+X-CSE-ConnectionGUID: z2YZOsV+QOSHt+7yVBwuQQ==
+X-CSE-MsgGUID: M1PbC1uaQA68058osujaZw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
+   d="scan'208";a="69445533"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 03:49:34 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andy@kernel.org>)
+	id 1sl4cl-00000004KVH-2dzm;
+	Mon, 02 Sep 2024 13:49:31 +0300
+Date: Mon, 2 Sep 2024 13:49:31 +0300
+From: Andy Shevchenko <andy@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Hongbo Li <lihongbo22@huawei.com>, kees@kernel.org,
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	akpm@linux-foundation.org, linux-hardening@vger.kernel.org,
+	netdev@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH -next 2/4] tun: Make use of str_disabled_enabled helper
+Message-ID: <ZtWYO-atol0Qx58h@smile.fi.intel.com>
+References: <20240831095840.4173362-1-lihongbo22@huawei.com>
+ <20240831095840.4173362-3-lihongbo22@huawei.com>
+ <20240831130741.768da6da@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240902-net-next-mptcp-mib-mpjtx-misc-v1-11-d3e0f3773b90@kernel.org>
-References: <20240902-net-next-mptcp-mib-mpjtx-misc-v1-0-d3e0f3773b90@kernel.org>
-In-Reply-To: <20240902-net-next-mptcp-mib-mpjtx-misc-v1-0-d3e0f3773b90@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1833; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=FPZ//+LmYrdLiAR8TkZb9j4Bb/TNL62ML2xUN9hVcrg=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBm1ZdudT4wm2R9q0KqWJKArlK5UY9sSC5X+xDmY
- syBGXbNPY6JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZtWXbgAKCRD2t4JPQmmg
- c0LjD/4p+CcrXWfxEhzJvn1wHTDln+iIlIcL79pFk/T/NPjL8yenuIHRReKA6Vh4xYXNebYntGC
- qM4y9GGTpwIqutQ66M1fO6JuBjMIZuVesguSRhYJlJBfjIu6NsFxbLZncsf6yRcCe5nTNGeE8Tr
- 8hNw0X8XXihLSU7EOMck9G7W98zw4UFvgb4xoti8TDGY3r6wjIgHLVH60Pph0PuZODaPlLEj9lB
- /woEJAqf30wCTbcVmXIjg5suVRXlIA2U5yDdGzD/JuhVrIQCV3DQ3ZcTe5VCkH4deyWUt9k5Af4
- V2ZJWtKILHnU6sDMA8bIqLPTySmbqaY6UK9tsJPZhJn6g3H99QlKS0QS0A3y13gJcqcYj2uEjU/
- QXQgEplYa1XSm4z7U7N4oPITm2dUI3PC0lOtAmiS9PRclsiGM5Yie8MSijq8Wpx5UKF+tC8rR0s
- nq6hIimi9cjgCvsnJ5ahbdi6xLr7bFn8Ub0tSidFy9doFuI2eXA0FeDU7j/K3HjYRMohSa/HPDL
- yW2XOEAbIBOARTYDSM0SYHZVcmarDs7qrhJK47xlVP1YgwMX+I6PsTEURysNlFi+GUw5aWr8MiC
- VJsSevC1XKA2DfinfjRzSk/0osmqlaiDzXNM9RiPBnlzwxM4Pm95NG2M/P4oFBtLghOF/PiWGyG
- IIorfhmtkJBdAvQ==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240831130741.768da6da@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-'MPTCP_PM_NAME' is defined in 'linux/mptcp_pm.h', included in
-'linux/mptcp.h', no need to re-define it.
+On Sat, Aug 31, 2024 at 01:07:41PM -0700, Jakub Kicinski wrote:
+> On Sat, 31 Aug 2024 17:58:38 +0800 Hongbo Li wrote:
+> > Use str_disabled_enabled() helper instead of open
+> > coding the same.
 
-'MPTCP_PM_EVENTS' is not defined in 'linux/mptcp.h', but
-'MPTCP_PM_EV_GRP_NAME' is, with the same value. We can then use the
-latter, and drop the other one.
+...
 
-Reviewed-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/pm_nl_ctl.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+> >  		netif_info(tun, drv, tun->dev, "ignored: set checksum %s\n",
+> > -			   arg ? "disabled" : "enabled");
+> > +			   str_disabled_enabled(arg));
+> 
+> You don't explain the 'why'. How is this an improvement?
+> nack on this and 2 similar networking changes you sent
 
-diff --git a/tools/testing/selftests/net/mptcp/pm_nl_ctl.c b/tools/testing/selftests/net/mptcp/pm_nl_ctl.c
-index 7ad5a59adff2..994a556f46c1 100644
---- a/tools/testing/selftests/net/mptcp/pm_nl_ctl.c
-+++ b/tools/testing/selftests/net/mptcp/pm_nl_ctl.c
-@@ -19,12 +19,6 @@
- 
- #include "linux/mptcp.h"
- 
--#ifndef MPTCP_PM_NAME
--#define MPTCP_PM_NAME		"mptcp_pm"
--#endif
--#ifndef MPTCP_PM_EVENTS
--#define MPTCP_PM_EVENTS		"mptcp_pm_events"
--#endif
- #ifndef IPPROTO_MPTCP
- #define IPPROTO_MPTCP 262
- #endif
-@@ -116,7 +110,7 @@ static int capture_events(int fd, int event_group)
- 
- 	if (setsockopt(fd, SOL_NETLINK, NETLINK_ADD_MEMBERSHIP,
- 		       &event_group, sizeof(event_group)) < 0)
--		error(1, errno, "could not join the " MPTCP_PM_EVENTS " mcast group");
-+		error(1, errno, "could not join the " MPTCP_PM_EV_GRP_NAME " mcast group");
- 
- 	do {
- 		FD_ZERO(&rfds);
-@@ -288,7 +282,7 @@ static int genl_parse_getfamily(struct nlmsghdr *nlh, int *pm_family,
- 					if (grp->rta_type == CTRL_ATTR_MCAST_GRP_ID)
- 						*events_mcast_grp = *(__u32 *)RTA_DATA(grp);
- 					else if (grp->rta_type == CTRL_ATTR_MCAST_GRP_NAME &&
--						 !strcmp(RTA_DATA(grp), MPTCP_PM_EVENTS))
-+						 !strcmp(RTA_DATA(grp), MPTCP_PM_EV_GRP_NAME))
- 						got_events_grp = 1;
- 
- 					grp = RTA_NEXT(grp, grp_len);
+Side opinion: This makes the messages more unified and not prone to typos
+and/or grammatical mistakes. Unification allows to shrink binary due to
+linker efforts on string literals deduplication.
+
+That said, I see an improvement here, however it might be not recognised
+as a Big Win.
+
+And yes, I agree on the commit message poor explanations.
 
 -- 
-2.45.2
+With Best Regards,
+Andy Shevchenko
+
 
 
