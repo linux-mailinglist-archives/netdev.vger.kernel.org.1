@@ -1,231 +1,149 @@
-Return-Path: <netdev+bounces-124256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C21F6968B1F
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 17:34:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E8A6968B34
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 17:43:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A45B2823B6
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 15:34:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94C9D1C2217C
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 15:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8B81A302A;
-	Mon,  2 Sep 2024 15:34:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0667C19C563;
+	Mon,  2 Sep 2024 15:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZVinsxe"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="qqggW+dA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1531A3026;
-	Mon,  2 Sep 2024 15:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C661CB51D
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 15:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725291266; cv=none; b=QyGoeshrz1WNXd14/0tdW+tUsLWdfoVHLTxZMrGHfLjwX76QPe270Q+zj98J7nskL/wULEXm9jOMm+OlOhsuPN2sNfde8+0s1KYSZM5NT+7pCcqxGP8XDtWpz/mfVRK/plko+PRp76UXdhu7jg8v64vPDr9OUrKNb6N74lZtVjg=
+	t=1725291820; cv=none; b=dsA6Ixar6gcJCgyO+nLJjDOC9oaGsqX71lu+RaQWgxkL8ZGATotjMwNWWTAI6zcVOWLHY96iqM6/3dIj/n1osJyXNpdUkVw1oub/+qs0sqlWLJmnu4Z+x2mJurJxf6ToGYXSGwkQJNKUUjp4VquaVVTJ3oHE3IBCO7y1eR6pCuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725291266; c=relaxed/simple;
-	bh=7rMbYapEXYVCo1Z3abOw0TAa9acU0xg7v3Vo9D1Y8+M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ftbhdj/STlukZlDI4dNbyLYqDm6keuTXtHYTlG+1ecUpOf51V5HOZDUOK3+17bzM2j0Aq6lIr25yqh1RXcU/YmbxnTmC4ha8axja4f6kmNeF1e8aBo5GY01cJfM7KjgyDkL8Jof2eB1dCELwezXEhv9NOm79x26jlA3xhdrat/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZVinsxe; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-39f4766a939so11902395ab.0;
-        Mon, 02 Sep 2024 08:34:24 -0700 (PDT)
+	s=arc-20240116; t=1725291820; c=relaxed/simple;
+	bh=IHnuoGZNJr5zWToilmgXr9M5nFRSDqy3gutoNShHU6s=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=KVtv8rXaHlBf9mb4hNYxW/KPVrHtvxSuUWNlQdy0zFbKtDllj1nTUGHFXejWPswLZifvXV2yzmw2bGKETfngtBLv4NunGxfzvOzRger5oonF9orFB3IvPmQi8GsD/VKIIH4CcBkG5V6P6L/nNXVZMLCq+cAlDYPxVoU7BeUe9Ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=qqggW+dA; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7142e002aceso3432557b3a.2
+        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 08:43:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725291264; x=1725896064; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DxSjun1B4tFjhBYflpUpgDEJOT2ks/51DbIQnk7jJFc=;
-        b=eZVinsxetWZT5EUWkQWRB6TkHCsJgnIfCHqfUQ0CJ+a3adf20eEmf+1wotNUkGe0gl
-         urLp/qGUsQoonUcGMOBsgqVjoCzJYA7jrjBFd6ZbqWqqih8rsGlIP+uFJw8MvjQ4KhSE
-         6+pMg39KKLLhym0tuOzyW/Tfb/RAsUr9v6uOEUU8XkkxJWH0QBwBTxFzaOAlxuktGdN0
-         B1wU77irkRuLF0CQUPOdILdXieYzwToRw1Zx0nIwkwmsee8HsCbNd41VDOE9EkYUnRYl
-         3AGK8P8KVlPGPBGfX8FmPVk+nfW17Rhduh31HZO2mno+0YYriurdOfBny8B5mq8T8Glw
-         SOpg==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1725291818; x=1725896618; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=i36ovGiN9fWknFZkeWoc+3DQG3wGUN8FsAcn1qHd8G0=;
+        b=qqggW+dA8kyrfVzqyHxqujy3ySONsbozz12NN8t4krgN6iB50qmbDW3z+9oUbqwGz1
+         rKIY8c4iUKK5eRELgi5wYkWrotQj0i9gAZPncyUghDXW9BjHHjZQDqOQmUDxPYNILqFU
+         Zz/mrH6w1ovGlGjct+Jh9tDcXRyhIBZDokDXsBJgWX8POSuKOybZlKYKnfBlWBXkHXH9
+         HJ+3HyTd94BdjYQ5yyD5O9poPy3VgNRAvOGoH29RAhE6xkDxcdPLIn4G7oUhU10NXrrO
+         RxMpK3QxYYiObd/qslsjBGgq40lRCy+tjWUpGxTKQdweG+gfsJfHzIs0nCVxupdkNRML
+         R5ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725291264; x=1725896064;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DxSjun1B4tFjhBYflpUpgDEJOT2ks/51DbIQnk7jJFc=;
-        b=DzwFfpPk33PuofD2oufqUgeWjVgdphuuQ6U48cm6RKIK/p2fZY37ZSLaA1OuyoY7Lf
-         GFyUBq35DfsPy1SJ1BWytZXfVXLz8HqUta83P90bXZl3jv8jWS0CrSw+wgxOruK/I/z2
-         dlCDnhEiB1xG4Eoo61iCVPQg5ux8JM9SP59VcdXJFr4v08m8CD97Sec5s1r7ZSo1VXxd
-         TxNNkbjU+pKLv9WimqNCEPEUrZU2b+67+ctfKb/EVJ5ouwdzHg/vmO8jtmQthjkhjtHi
-         nUKl2T2MwyEl1wb4USlI3AeVQ8rrhOaBNrk4QlLIx2/1QBSKbaTFIDIbJKHFPIaGpIcM
-         4hlA==
-X-Forwarded-Encrypted: i=1; AJvYcCUlaR2pCyaHxYVoWZYwBo2DBf/oJQCRuU0ijgY4bAY5w1qUyEIgfzeeE6+k2iPNV6ngECX0bkEoIZiI4mApuR4=@vger.kernel.org, AJvYcCW+D0GcroB4BJzrSmber/1TbV7WvxnNp2xBJ5XlUM7OpgHLJdnVakkeHTTflE4R5Xh5bojcm5tA@vger.kernel.org
-X-Gm-Message-State: AOJu0YyesRGAZvoOH+ggcfRpw7a6n2mHhqr3yHzrNPgHbfjIaTUcPoiq
-	FN7gC8clctgJe2mGZzmsuZT3jHZFJoXzDU/ZrMKThyhfGbtsxluBMiTuQiH8+pms1ADYaW3BWG6
-	wyhYNK1+tQCsxqR/Rnn5Nr1JXdtg=
-X-Google-Smtp-Source: AGHT+IEM3RjIsIIjjwBEskzmJuVc+5DHjOmYWscg9VOM+KXzS1+L1mug3vCsYQraNRwfRR/XTz85GUGGyQY5EjgzG0U=
-X-Received: by 2002:a05:6e02:1a45:b0:375:ab93:5062 with SMTP id
- e9e14a558f8ab-39f377ce3aamr182800795ab.2.1725291263829; Mon, 02 Sep 2024
- 08:34:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725291818; x=1725896618;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i36ovGiN9fWknFZkeWoc+3DQG3wGUN8FsAcn1qHd8G0=;
+        b=pJUVdiJbIIzqpbXmSftuhSWqR3V/7/7s/jvMZpbVg4j/o7HwwElfeG6uGZr2dOnZb8
+         C0DdFNjJxFJ+4zSLEIgJu9qDheDNm+wvGvsFKvodkGXa0mRrALAfk3JXCjxpDNn1soe1
+         iCBCJG80A+ynRyQa59u/CmDO0AzuQPxq3d3uYtKhbEYCGknNzEAAv4pXKgoGcPc6ELey
+         9/3OteYY4hbgqZybLoW+jqkGsyRv2lR9o4ZrMp7XntMkpsKDi/uM+44EZcpBYiMJ1wzE
+         LRjA1DqQb7wqvRYSAGmqt+wEeCSqRw7S9BUo9VP5YefIC/D84Fecevxw8Wpqz+jWk34y
+         /ZmQ==
+X-Gm-Message-State: AOJu0YxHi0ghjB2l5Sljp8N3YxjML5tyo7cxz/Oi+dLKvB0FC+mgXpUc
+	eZjwS2dzNIrUFN5NN/Pa677MHBpykonrEWwPtWPOQGYVyYZYS3CCREwEsqX4fcUeSWBR06wpI3h
+	r1XKYfQ==
+X-Google-Smtp-Source: AGHT+IHU9UvxLxLrxiB7tkRBtwVyrRtY/wTZTa7DDT2MfPRJYnlNjVhf0LDnrSyj5ShK5TAPqu4/EA==
+X-Received: by 2002:a05:6a00:b01:b0:717:6760:9c15 with SMTP id d2e1a72fcca58-7176760a74bmr892830b3a.20.1725291817723;
+        Mon, 02 Sep 2024 08:43:37 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d22e66d8f4sm7701159a12.0.2024.09.02.08.43.36
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Sep 2024 08:43:37 -0700 (PDT)
+Date: Mon, 2 Sep 2024 08:43:35 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: Fw: [Bug 219221] New: TCP connection/socket gets stuck and the
+ handshaking is delayed
+Message-ID: <20240902084335.1e048358@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240901051821.94956-1-kerneljasonxing@gmail.com> <66d5d38c1d4b_61388294f0@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66d5d38c1d4b_61388294f0@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 2 Sep 2024 23:33:47 +0800
-Message-ID: <CAL+tcoDy4XNBTZK3_MwzS1Js0NPg1e46xTtHmpJNckLywJ6NQQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests: add selftest for UDP SO_PEEK_OFF support
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, shuah@kernel.org, jmaloy@redhat.com, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 2, 2024 at 11:02=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Add the SO_PEEK_OFF selftest for UDP. In this patch, I mainly do
-> > three things:
-> > 1. rename tcp_so_peek_off.c
-> > 2. adjust for UDP protocol
-> > 3. add selftests into it
-> >
-> > Suggested-by: Jon Maloy <jmaloy@redhat.com>
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
->
-> A few minor comments. Nothing important.
->
-> Subject to Stan's point about .gitignore:
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Thanks for your review!
 
->
-> > -int tcp_peek_offset_probe(sa_family_t af)
-> > +int sk_peek_offset_probe(sa_family_t af, int proto)
-> >  {
-> > +     int type =3D (proto =3D=3D IPPROTO_TCP ? SOCK_STREAM : SOCK_DGRAM=
-);
-> >       int optv =3D 0;
-> >       int ret =3D 0;
-> >       int s;
-> >
-> > -     s =3D socket(af, SOCK_STREAM | SOCK_CLOEXEC, IPPROTO_TCP);
-> > +     s =3D socket(af, type, proto);
->
-> Removing the SOCK_CLOEXEC because not relevant to this single thread
-> process, I suppose?
+Begin forwarded message:
 
-Yep. We don't need this one.
+Date: Mon, 02 Sep 2024 14:25:13 +0000
+From: bugzilla-daemon@kernel.org
+To: stephen@networkplumber.org
+Subject: [Bug 219221] New: TCP connection/socket gets stuck and the handshaking is delayed
 
->
-> Not important, but no need for proto, can just be 0.
 
-You're right. I wonder if it is better if we explicitly pass the proto
-here? I would like not to touch it here.
+https://bugzilla.kernel.org/show_bug.cgi?id=219221
 
->
-> >       if (s < 0) {
-> >               ksft_perror("Temporary TCP socket creation failed");
-> >       } else {
-> >               if (!setsockopt(s, SOL_SOCKET, SO_PEEK_OFF, &optv, sizeof=
-(int)))
-> >                       ret =3D 1;
-> >               else
-> > -                     printf("%s does not support SO_PEEK_OFF\n", afstr=
-(af));
-> > +                     printf("%s does not support SO_PEEK_OFF\n", afstr=
-(af, proto));
-> >               close(s);
-> >       }
-> >       return ret;
-> >  }
-> >
-> > -static void tcp_peek_offset_set(int s, int offset)
-> > +static void sk_peek_offset_set(int s, int offset)
-> >  {
-> >       if (setsockopt(s, SOL_SOCKET, SO_PEEK_OFF, &offset, sizeof(offset=
-)))
-> >               ksft_perror("Failed to set SO_PEEK_OFF value\n");
-> >  }
-> >
-> > -static int tcp_peek_offset_get(int s)
-> > +static int sk_peek_offset_get(int s)
-> >  {
-> >       int offset;
-> >       socklen_t len =3D sizeof(offset);
-> > @@ -50,8 +54,9 @@ static int tcp_peek_offset_get(int s)
-> >       return offset;
-> >  }
-> >
-> > -static int tcp_peek_offset_test(sa_family_t af)
-> > +static int sk_peek_offset_test(sa_family_t af, int proto)
-> >  {
-> > +     int type =3D (proto =3D=3D IPPROTO_TCP ? SOCK_STREAM : SOCK_DGRAM=
-);
-> >       union {
-> >               struct sockaddr sa;
-> >               struct sockaddr_in a4;
-> > @@ -62,13 +67,13 @@ static int tcp_peek_offset_test(sa_family_t af)
-> >       int recv_sock =3D 0;
-> >       int offset =3D 0;
-> >       ssize_t len;
-> > -     char buf;
-> > +     char buf[2];
-> >
-> >       memset(&a, 0, sizeof(a));
-> >       a.sa.sa_family =3D af;
-> >
-> > -     s[0] =3D socket(af, SOCK_STREAM, IPPROTO_TCP);
-> > -     s[1] =3D socket(af, SOCK_STREAM | SOCK_NONBLOCK, IPPROTO_TCP);
-> > +     s[0] =3D recv_sock =3D socket(af, type, proto);
-> > +     s[1] =3D socket(af, type, proto);
->
-> Same
+            Bug ID: 219221
+           Summary: TCP connection/socket gets stuck and the handshaking
+                    is delayed
+           Product: Networking
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: IPV4
+          Assignee: stephen@networkplumber.org
+          Reporter: zbal1977@gmail.com
+        Regression: No
 
-I think we don't need this one, either.
-As we can see, there are already some existing test files without the
-SOCK_NONBLOCK flag.
+Created attachment 306806
+  --> https://bugzilla.kernel.org/attachment.cgi?id=306806&action=edit  
+working TCP connection PCAP file
 
->
-> >
-> >       if (s[0] < 0 || s[1] < 0) {
-> >               ksft_perror("Temporary socket creation failed\n");
-> > @@ -82,76 +87,78 @@ static int tcp_peek_offset_test(sa_family_t af)
-> >               ksft_perror("Temporary socket getsockname() failed\n");
-> >               goto out;
-> >       }
-> > -     if (listen(s[0], 0) < 0) {
-> > +     if (proto =3D=3D IPPROTO_TCP && listen(s[0], 0) < 0) {
-> >               ksft_perror("Temporary socket listen() failed\n");
-> >               goto out;
-> >       }
-> > -     if (connect(s[1], &a.sa, sizeof(a)) >=3D 0 || errno !=3D EINPROGR=
-ESS) {
-> > +     if (connect(s[1], &a.sa, sizeof(a))) {
-> >               ksft_perror("Temporary socket connect() failed\n");
-> >               goto out;
-> >       }
->
-> Changed due to the removal of SOCK_NONBLOCK above. Definitely
-> simplifies the test.
+Hi,
 
-Yep.
+We have a client/server application which is developed a long time ago. It has
+been running in production for more than 10 years. The client is a Windows
+application written in C++, and the server-side component is written in Java8. 
 
->
-> Just note that error test is =3D=3D -1 or < 0, also for consistency with
-> the rest of the file.
+This client/server software has been working fine for a long time on Linux
+servers. Currently, we use AlmaLinux 9. It was working on AlmaLinux 9 until
+updating the kernel. 
 
-I will add "< 0" here as you said.
+So, when we update the Linux kernel from "5.14.0-362.13.1.el9_3.x86_64" to
+"kernel-5.14.0-427.31.1.el9_4.x86_64" the application gets unstable: The client
+drops the connection based due to not receiving messages in the proper time. We
+notice delays, the client just waiting for the response from the server. The
+issue is always reproducible with the new kernel. And if we go back to the old
+kernel, the problem is gone. We kept running the test for hours in both cases.
 
-Thanks,
-Jason
+I attach the PCAP file created on the working system running with the old
+kernel (5.14.0-362). Additionally, I attach another PCAP file created on the
+non-working system. The difference is the kernel (5.14.0-427). All other
+components are the same.
+
+Please analyze it and let us know how to fix it. Whether it is a general issue
+in the Linux kernel, or only AlmaLinux distro suffers from that.
+
+Thanks a lot!
+
+Regards,
+Zoltan Balogh
+
+-- 
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.
 
