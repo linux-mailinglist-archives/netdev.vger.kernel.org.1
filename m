@@ -1,120 +1,117 @@
-Return-Path: <netdev+bounces-124134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68DC4968380
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:45:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0032B968503
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:41:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12CD81F22DE2
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 09:45:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABD6E1F21207
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3411D1F65;
-	Mon,  2 Sep 2024 09:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3F7143878;
+	Mon,  2 Sep 2024 10:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ft6az4D9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GIbN3vnU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF0F18661C
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 09:44:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C5213B2A8;
+	Mon,  2 Sep 2024 10:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725270298; cv=none; b=I+ONbJIZQCZeMyqdM4JLrsaiLN3nibXtqiEI2WBBYdexofGIoBtMabRkS6BQOluDdT++UbaFuIm/XaF/jHUMXCr021dlJADn1nuqfFNkbaQRGrsKGjNGWxb9tjB9KFcPb+ES4FSVdu+UA7M9Tcs/Uvy4jY3txwh+rYxWpSJhaes=
+	t=1725273688; cv=none; b=JETdLPbI77dsapKsTlpl083l2vRb0GM7uL3Rl1KxrIVdykr0GGAsR5BkTDcEKms19RZOOzcwche7HrjsVWliImgjpEccaLYlKN7G7tHHsLfC+CY0sXkN7O7svwGnf5Cx9R9FNQE+Xru9zWw5FKiCRUm1cVQ13T0aMbuiIVa9Vu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725270298; c=relaxed/simple;
-	bh=nfx9KdHtB7mfqNMCqfYYEmR1tL/q4jvZ6kOi2em5qw8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CB3z1C0xWF+lUof1v9k/8kIx9A0PAYJuGGFiwIU2m001y06Cor0oq9uc84IgByNf1kyVPcyjIy2Nbmg16X0Rt6hGv4ZfNOs4f4F1pFVe3Pxsc69CuZqlHPZSMbeoVYhqIEj8M5siQzvWYwaKQY6xNkdONoe504rAU4dsMfpDI44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ft6az4D9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F4ADC4CEC2;
-	Mon,  2 Sep 2024 09:44:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725270297;
-	bh=nfx9KdHtB7mfqNMCqfYYEmR1tL/q4jvZ6kOi2em5qw8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ft6az4D9vqCiDKCRe2dMAZ4KTqlpiiS8n0yEftvkxX3PaTtYBHq4ivYcOt/fkgNZ1
-	 oS7DcvyMzeflAZgjZatybOeWbsrJEmMhxh0fQlEzgTY7z+zWwkGNhIFLOyI/4vaDaJ
-	 sx1sJ6rzVCVueAre1ppwk0GrtuN+rGnKwlC28/1C/vrFRiKsLNAAwXZytjqbOa3Qnb
-	 0KuXnsakfldwBYc50KhH1UOGXMdxbomMJ9l3LwVpe6TTYnh1b+XKacC4vA5I5cZ9pD
-	 BE+ImnsOFCUPS7keTy+LGfYFMFYFdC104IkGzvxom4LwfYBZ0vclGfUdyNAlCJMpH6
-	 tULjfxp/dpZ4Q==
-Date: Mon, 2 Sep 2024 12:44:52 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Feng Wang <wangfe@google.com>, netdev@vger.kernel.org,
-	antony.antony@secunet.com
-Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
-Message-ID: <20240902094452.GE4026@unreal>
-References: <20240822200252.472298-1-wangfe@google.com>
- <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
- <20240831173934.GC4000@unreal>
- <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
+	s=arc-20240116; t=1725273688; c=relaxed/simple;
+	bh=0r45B5aFyCMHgKXSBqq3z6fkz98xzlyNLXrUbrBBjIs=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=QY5ngyOzMyTDuCIA/NiEDQZz8cXjRYpTBNJc3cNE1TEGWis8UZvesoEvTBYmHX5GXF9XaB5pI7ZwOmWvfJzBoLINkEiVcEw593DF/L9yy0PqqwIQIvNXQekJ/ulwIWOh8ShfK0CK0RcEWB5GTcaLKE2ni2rEYx5KT+sjkY4Cy+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GIbN3vnU; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5c255e3c327so1160633a12.1;
+        Mon, 02 Sep 2024 03:41:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725273685; x=1725878485; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QYFvd3mndntXawAb+f+Hoo4lqWFTYRrIZXzGbH72ilg=;
+        b=GIbN3vnUGhBoCO9ToGIcFBeAZCwc7qfmmDrvGAUp7O617KA3veCWlJEUF25Kfu75om
+         CUNn6FKh7ZOJJwwkDlMruUlhFzBglHJf8W06+RDs09DkJYa9g7b9xWC53GTINvj+r/cU
+         URwWEbLKudI3L3hB7GCIgfgUTGriPzA3tTKb3nd4NnaRhTZPAahlCXkSjpXvASDSfyWa
+         P7SaYkO92jiEaljDQ6VHb828Hm8z7W+ky9gcKvoTMBMswmTi2sp8SA/T/DCs2aNpfarr
+         wvoG0d0cHNeFHIkYtgS6VlytcjpFFGyZmJUL2yzoVgBz9K8uhS8nbw2+Wtb+ozqhXL9h
+         FSwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725273685; x=1725878485;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QYFvd3mndntXawAb+f+Hoo4lqWFTYRrIZXzGbH72ilg=;
+        b=u0VrWZOQRzSLuZbyTWkxlOfvH33/HloH5mWgmQLm7uOV5jECMeL8luY4mCRGjgb01e
+         uPrp9143F+0yqaZA7mrvYTK/QOPjTSqphrdirjqDLoE/EW6ocfZNibU9VM5oLmANuB0A
+         J5XfMsrawttAbG5lUwE2WXsZUMjyhMf19L52QU5nHmjfqpjud+IAR23Dwf/PFS0hjVxu
+         Tj7LShSeIkM6hq2/13T8lTq5lp+BpurgiSzVP0JCowduslfOnuiqHt3YuJwldp7ncntN
+         jIxWE8D1FQ3vkqUyKLq9AkOz0SIAAjLNoLhlagsS9O3coWgE2eTepwbrzrI4JQv1E5yc
+         qcAA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIWmmfoBKaqdpIRQisShpzIU++ftNe7KK9Is6uQ7iYBgqr+ktw+v5hr57uyopxpZWg+cFWXvhdhu1Zvtc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBlw50DHW9e73d6U8OA6vMozmR8DTjZSqVhOGw1r1FyMYG1eH9
+	kFi8kuYr0YG4kf5/+kE91YIY648Mtm2+fMWFRnXr2xipr+6PvRNDxuhPVw==
+X-Google-Smtp-Source: AGHT+IHY5R6FJqEx2OwECLZMjmWk695QObQE23ePtacPm0xUP/4ZMARX2OD68jnP41ydkqkKRzAAlQ==
+X-Received: by 2002:a05:6402:13d1:b0:5b9:3846:8bb3 with SMTP id 4fb4d7f45d1cf-5c25c3ad6e1mr2246921a12.12.1725273684250;
+        Mon, 02 Sep 2024 03:41:24 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:54ae:7bbe:cc21:9185])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c226c7c076sm5119694a12.46.2024.09.02.03.41.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Sep 2024 03:41:23 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Cc: netdev@vger.kernel.org,  kuba@kernel.org,  davem@davemloft.net,
+  edumazet@google.com,  pabeni@redhat.com,  jiri@resnulli.us,
+  jacob.e.keller@intel.com,  liuhangbin@gmail.com,
+  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] tools/net/ynl: fix cli.py --subscribe feature
+In-Reply-To: <20240830201321.292593-1-arkadiusz.kubalewski@intel.com>
+	(Arkadiusz Kubalewski's message of "Fri, 30 Aug 2024 22:13:21 +0200")
+Date: Mon, 02 Sep 2024 10:51:13 +0100
+Message-ID: <m2mskq2xke.fsf@gmail.com>
+References: <20240830201321.292593-1-arkadiusz.kubalewski@intel.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
+Content-Type: text/plain
 
-On Mon, Sep 02, 2024 at 09:44:24AM +0200, Steffen Klassert wrote:
-> Sorry for the delay. I'm on vacation, so responses will take a bit
-> longer during the next two weeks.
-> 
-> On Sat, Aug 31, 2024 at 08:39:34PM +0300, Leon Romanovsky wrote:
-> > On Wed, Aug 28, 2024 at 07:32:47AM +0200, Steffen Klassert wrote:
-> > > On Thu, Aug 22, 2024 at 01:02:52PM -0700, Feng Wang wrote:
-> > > > From: wangfe <wangfe@google.com>
-> > > > 
-> > > > In packet offload mode, append Security Association (SA) information
-> > > > to each packet, replicating the crypto offload implementation.
-> > > > The XFRM_XMIT flag is set to enable packet to be returned immediately
-> > > > from the validate_xmit_xfrm function, thus aligning with the existing
-> > > > code path for packet offload mode.
-> > > > 
-> > > > This SA info helps HW offload match packets to their correct security
-> > > > policies. The XFRM interface ID is included, which is crucial in setups
-> > > > with multiple XFRM interfaces where source/destination addresses alone
-> > > > can't pinpoint the right policy.
-> > > > 
-> > > > Signed-off-by: wangfe <wangfe@google.com>
-> > > 
-> > > Applied to ipsec-next, thanks Feng!
-> > 
-> > Steffen,
-> > 
-> > What is your position on this patch?
-> > It is the same patch (logically) as the one that was rejected before?
-> > https://lore.kernel.org/all/ZfpnCIv+8eYd7CpO@gauss3.secunet.de/
-> 
-> This is an infrastructure patch to support routing based IPsec
-> with xfrm interfaces. I just did not notice it because it was not
-> mentioned in the commit message of the first patchset. This should have
-> been included into the packet offload API patchset, but I overlooked
-> that xfrm interfaces can't work with packet offload mode. The stack
-> infrastructure should be complete, so that drivers can implement
-> that without the need to fix the stack before.
+Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com> writes:
 
-Core implementation that is not used by any upstream code is rarely
-right thing to do. It is not tested, complicates the code and mostly
-overlooked when patches are reviewed. The better way will be to extend
-the stack when this feature will be actually used and needed.
+> Execution of command:
+> ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/dpll.yaml /
+> 	--subscribe "monitor" --sleep 10
+> fails with:
+>   File "/repo/./tools/net/ynl/cli.py", line 109, in main
+>     ynl.check_ntf()
+>   File "/repo/tools/net/ynl/lib/ynl.py", line 924, in check_ntf
+>     op = self.rsp_by_value[nl_msg.cmd()]
+> KeyError: 19
+>
+> Parsing Generic Netlink notification messages performs lookup for op in
+> the message. The message was not yet decoded, and is not yet considered
+> GenlMsg, thus msg.cmd() returns Generic Netlink family id (19) instead of
+> proper notification command id (i.e.: DPLL_CMD_PIN_CHANGE_NTF=13).
+>
+> Allow the op to be obtained within NetlinkProtocol.decode(..) itself if the
+> op was not passed to the decode function, thus allow parsing of Generic
+> Netlink notifications without causing the failure.
+>
+> Suggested-by: Donald Hunter <donald.hunter@gmail.com>
+> Link: https://lore.kernel.org/netdev/m2le0n5xpn.fsf@gmail.com/
+> Fixes: 0a966d606c68 ("tools/net/ynl: Fix extack decoding for directional ops")
+> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 
-IMHO, attempt to enrich core code without showing users of this new flow
-is comparable to premature optimization.
-
-And Feng more than once said that this code is for some out-of-tree
-driver.
-
-> 
-> In case the patch has issues, we should fix it.
-
-Yes, this patch doesn't have in-kernel users.
-
-Thanks
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
