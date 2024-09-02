@@ -1,121 +1,150 @@
-Return-Path: <netdev+bounces-124143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D5B1968505
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:41:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83C3D968511
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:46:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFD11286308
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:41:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E239DB22BF2
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A71183CC3;
-	Mon,  2 Sep 2024 10:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D37F156F33;
+	Mon,  2 Sep 2024 10:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UNG0oxMW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i4h6tffD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6E315FD13;
-	Mon,  2 Sep 2024 10:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B86156B7C;
+	Mon,  2 Sep 2024 10:46:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725273690; cv=none; b=Q5rIh4Zyava/jT9Kq4aoSG4EjECxNegLg/fuTU017hc+foPqAc+DPGYXFq8wwaY/436r1Z/8hzKtCnSK6KbMFf63S+h/SK89FB2muPtoEobSwqvzG2UnZc+kdXZV7vbyH51OaEWdIcCJvvbC6Nh5fNroloCqoB1L3iyQZj4l/J4=
+	t=1725273969; cv=none; b=cMbwoWHly2eGS6TW4gd+JmpuNemRlFs7X0dXGtrmgLKPX8xVE+0v6dqLou4g451c+QqPBez5RR2mgptfBF7QvOrtAwXCrs+9jG21tVVCL5Al94CJjV9oemO3KhrE5eSBrCA6T0J4ZvpSIKHjWYnylXS1Hx3a8iCgwgqa5yOZYDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725273690; c=relaxed/simple;
-	bh=GARi0dW+IDquW2OJn2fLaIDDXhEgMsv9nwnKhMv8pVY=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=X2wp+sR4cFNr8kWFye1udJopliR1R6mR2sU3eNJeE3lKFtBBxNDUPv9Gk9P1UHWvciQPZTAY++R33Wm9f4vmfaqhaprjITL+XKOypG1yUmirwer2p5YLHrKFbJWVi5qw2elJ97+uTjOFRQk6Z+nl+MkIBAe9L4it68SPdlvFFkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UNG0oxMW; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5343617fdddso7003029e87.0;
-        Mon, 02 Sep 2024 03:41:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725273686; x=1725878486; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qwH47m94zEL5WR28EXlB8tmkDNShZPBPvpItP0/NTVk=;
-        b=UNG0oxMW/s3JhbAYyezyDMxS5Zsqy3R+cOXUk6T8u0/EuI5kuvMz/bGnK1O8dYrXx8
-         rmgBqg8v2sCrKGC2moD92YC/UdaD0eL30xJISkCzuKJlHqN7L/62sBSO4ANEMNhEeDq2
-         ePkV9sCnt4tHKkr0GKBSxREKWUJMcMzPjbCZJLewoBRDgUnq50wiSnvHV8dD+0xlQXue
-         FnM0G4bLbIAsq/I3tq0OqQrPmXWnBkrUjs7Lqn1SGydq3D9Xpl/LKHAfgPWG7LF8u0R0
-         R4VsSeZYGwaSjYKQtlkiBNOAM/qnWXBNvVGWYmMvtV14sxA1myENwueiC/Es1S6waA6m
-         Xc1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725273686; x=1725878486;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qwH47m94zEL5WR28EXlB8tmkDNShZPBPvpItP0/NTVk=;
-        b=UGf8aywYAhWqZFbAcjanMMLiU7/NUpUh7hnIgw0De02nmgzPQ5VkGLNO970Za9A69o
-         GqRhgPf/KBvmMYlWAPpMRhEzDiGxm+FBvqmkVNFe3gQ1lKSxZpmh3VQ3X/0W0FxmjBfy
-         WpUCNt0rJSbh+hEo8WATbDGLUWmhx7hWkdy/yoiSUdka1J7Df8lwTTcAbAM+hmdDyt/I
-         LDmMTRT7d9JkijLSirWvwQJLbOd+6JcpC+AYDC1fdf1RVpdebXFoLg8POFrNZ17Hnz+1
-         wN+M9U7a5+LanpklKFL9HQyJCtvTu3zgWh6Tp9gqLRdwgxlKqYiiDAdF5j8CzE+k/JOX
-         zTaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVjeQ5a6AZGga7Tj6hi/rfr/qG662qRgHtv+Moe40hDBGo/DtxUi2SdFPAObKF55rOnhGx0Iyg7pbN4/01Zhz4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymPMYo5e3l5aPjibI0nwIYDiIX4CIAVLlJPomv6oqJbWgXLW1c
-	lwXzla1fHXsj0BXqoNZ2Vr9hgpHwZsmxL/w0yKxdW1LTlfscj5Uvjvqs1w==
-X-Google-Smtp-Source: AGHT+IHK5EoD/x4brgOhFSzISZQ+sJeBhPurVOC+QHPyOJdBOiB6C9IePy1TzYMjgBQ999kZn1b+aQ==
-X-Received: by 2002:a05:6512:131a:b0:52c:e17c:cd7b with SMTP id 2adb3069b0e04-53546b41f62mr9719411e87.22.1725273685765;
-        Mon, 02 Sep 2024 03:41:25 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:54ae:7bbe:cc21:9185])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989221c24sm538240966b.196.2024.09.02.03.41.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Sep 2024 03:41:25 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: <netdev@vger.kernel.org>,  netfilter-devel
- <netfilter-devel@vger.kernel.org>
-Subject: Re: [PATCH net-next] netlink: specs: nftables: allow decode of
- default firewalld ruleset
-In-Reply-To: <20240902085735.70137-1-fw@strlen.de> (Florian Westphal's message
-	of "Mon, 2 Sep 2024 10:57:31 +0200")
-Date: Mon, 02 Sep 2024 11:41:16 +0100
-Message-ID: <m2ikve2v8z.fsf@gmail.com>
-References: <20240902085735.70137-1-fw@strlen.de>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1725273969; c=relaxed/simple;
+	bh=JZjtdwQfSEp8GA124fcMpM+PxDlG3oF/fyGd7aXpRh4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=uGJYkrjZrFrmQEoF+ZwSy4xsOwsAYI0wgkBhy2Ecdj+/ZsiJaGrEvFSICNyF4OeikZLr7kWkV2rx9zXWZm4erHtqCNdC8aGtR2T/XlJuU35I5meQuoQXpwIGowwIrutlaTPYsShS51zu5AShZRGfjqZ9MUCZHWtOjn1pRA961gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i4h6tffD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62127C4CEC2;
+	Mon,  2 Sep 2024 10:46:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725273969;
+	bh=JZjtdwQfSEp8GA124fcMpM+PxDlG3oF/fyGd7aXpRh4=;
+	h=From:Subject:Date:To:Cc:From;
+	b=i4h6tffDcd0lRuLY/mgKx5uSgS8HjkThv9StR6Lvyiz8gBTUd9yQYxsk/X0ylCWle
+	 9opFLUHlEAB4otes39jbetOavpss+qjpIxyUf+Mk0B6yEzicG/9ZDRjhaXId2Ds8tM
+	 G3Ui/b2wuhEPT5IiOKmWQUtgmhNBKcx4JG5u6N3exVHJQFvf61ooXdInt8+SOpA077
+	 J+RUqmECcah7fZfcaYcrI/xhELGAoztGKPrP7/N2/knoYVF8qBcxhvkpv3TohGONM1
+	 aSQPODGK+qM6OEmkJeaD0jBoAPNqgHN9+mdNm+3ZqgJ5I+uxLW+zTFpp+BE9NPE018
+	 SETRk2bilBTFw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 00/11] mptcp: MIB counters for MPJ TX + misc
+ improvements
+Date: Mon, 02 Sep 2024 12:45:51 +0200
+Message-Id: <20240902-net-next-mptcp-mib-mpjtx-misc-v1-0-d3e0f3773b90@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAF+X1WYC/zWMQQqEMAxFryJZTyB2ZKheRWahNaMRrKUtUhDvP
+ kFw8eG9xX8nJI7CCbrqhMiHJNm9Sv2qwC2DnxllUgdDpqGWDHrOupJxC9kF3GRUWnNRSg4nS6a
+ 1zdtS/QFthMg/KXe/h+cK3+v6A2CKXRR5AAAA
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2953; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=JZjtdwQfSEp8GA124fcMpM+PxDlG3oF/fyGd7aXpRh4=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBm1Zdtiw8kWDftZWvx84/2hCxkcRC3HiCSNv1fD
+ 7hl+94VRDOJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZtWXbQAKCRD2t4JPQmmg
+ cylnEADqL9SfjVBe7EZSSSAV0VWYXqnQpwFYKfa+LValfOeYrGwia4YDquvoAC33HtCGzDG/F+u
+ Y5ZGBPwldJnniGFGFxQZE47yEZThSxnM1LZpWGOY5hlfpaO6a3WXO0Y9Ad6BasFO2+25Kq7y30D
+ AcIiStDtzjwNDk5tqvsLEjL8bb3B3i/s0F8H2B11w5Hk/R0KDb1SCmbmAqxBiGRBugQD+sOkPM3
+ pBtt1B2YBi3MGHHo7FMRkHHbtJnuHK2OGgwX4b8l/xczX8zFnkEsjoVfUuptVDKhqDK403jCU/U
+ xjsLYmjMlECMuyBgWeCkNMDqOQeeZAsV1hEKxYFrdtLTtXwGVneiryUBUUx/wRNiyhiUjKrCXpp
+ A6by0rP29WTctfTK4CMnnY2kq4pZfaMLknCmdPAwXmRyZN+Al6wFKNXC3Sw3p4TFXdHSFClpZzd
+ LU6mBiWT6lOsHpXm+FpnnxCTBA3G+/TKMSJL11GRgRODzE7W7qUod6O6Po+/cQ0FtiHTBl/FE4Z
+ mdmNwQeuecVSy59CrMzjDr8CBzJoenSQgzbCpJFEgV0TYECUmvNFygEJytNCPntbgint+OucLSG
+ qMvnVetSHeILE1zHGLwgU9T/cAX7CHbRudvYhsjcpaiKWj8e9dVkeNMPo99jqUpxD73sjeRzTPH
+ XTbGtMmlaxDaH5Q==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Florian Westphal <fw@strlen.de> writes:
+Recently, a few issues have been discovered around the creation of
+additional subflows. Without these counters, it was difficult to point
+out the reason why some subflows were not created as expected.
 
-> This update allows listing default firewalld ruleset on Fedora 40 via
->   tools/net/ynl/cli.py --spec \
->      Documentation/netlink/specs/nftables.yaml --dump getrule
->
-> Default ruleset uses fib, reject and objref expressions which were
-> missing.
->
-> Other missing expressions can be added later.
->
-> Improve decoding while at it:
-> - add bitwise, ct and lookup attributes
-> - wire up the quota expression
-> - translate raw verdict codes to a human reable name, e.g.
->   'code': 4294967293 becomes 'code': 'jump'.
->
-> Cc: Donald Hunter <donald.hunter@gmail.com>
-> Signed-off-by: Florian Westphal <fw@strlen.de>
+In patch 3, all error paths from __mptcp_subflow_connect() are covered,
+except the one related to the 'fully established mode', because it can
+only happen with the userspace PM, which will propagate the error to the
+userspace in this case (ENOTCONN).
 
-One minor question below, otherwise LGTM.
+These new counters are also verified in the MPTCP Join selftest in patch
+6.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+While at it, a few other patches are improving the MPTCP path-manager
+code ...
 
+ - Patch 1: 'flush' related helpers are renamed to avoid confusions
+ - Patch 2: directly pass known ID and flags to create a new subflow,
+            i/o getting them later by iterating over all endpoints again
 
-> +    name: fib-result
-> +    type: enum
-> +    entries:
-> +      - oif
-> +      - oifname
+... and the MPJoin selftests:
 
-Did you intentionally leave out addrtype from the enum?
+ - Patch 4: reduce the number of positional parameters
+ - Patch 5: only one line for the 'join' checks, instead of 3
+ - Patch 7: more explicit check names, instead of sometimes too cryptic
+            ones: rtx, ptx, ftx, ctx, fclzrx, sum
+ - Patch 8: specify client/server instead of 'invert' for some checks
+            not suggesting one specific direction
+ - Patch 9: mute errors of mptcp_connect when ran in the background
+ - Patch 10: simplify checksum_tests by using a for-loop
+ - Patch 11: remove 'define' re-definitions
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Geliang Tang (1):
+      selftests: mptcp: join: simplify checksum_tests
+
+Matthieu Baerts (NGI0) (10):
+      mptcp: pm: rename helpers linked to 'flush'
+      mptcp: pm: reduce entries iterations on connect
+      mptcp: MIB counters for sent MP_JOIN
+      selftests: mptcp: join: reduce join_nr params
+      selftests: mptcp: join: one line for join check
+      selftests: mptcp: join: validate MPJ SYN TX MIB counters
+      selftests: mptcp: join: more explicit check name
+      selftests: mptcp: join: specify host being checked
+      selftests: mptcp: join: mute errors when ran in the background
+      selftests: mptcp: pm_nl_ctl: remove re-definition
+
+ net/mptcp/mib.c                                 |   4 +
+ net/mptcp/mib.h                                 |   4 +
+ net/mptcp/pm.c                                  |  11 -
+ net/mptcp/pm_netlink.c                          |  78 ++----
+ net/mptcp/pm_userspace.c                        |  40 +--
+ net/mptcp/protocol.h                            |  16 +-
+ net/mptcp/subflow.c                             |  50 +++-
+ tools/testing/selftests/net/mptcp/mptcp_join.sh | 350 ++++++++++++++----------
+ tools/testing/selftests/net/mptcp/pm_nl_ctl.c   |  10 +-
+ 9 files changed, 309 insertions(+), 254 deletions(-)
+---
+base-commit: 221f9cce949ac8042f65b71ed1fde13b99073256
+change-id: 20240902-net-next-mptcp-mib-mpjtx-misc-d80298438016
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
