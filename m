@@ -1,102 +1,131 @@
-Return-Path: <netdev+bounces-124303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAB9A968E66
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 21:19:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 204AE968E77
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 21:35:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88048284D85
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 19:19:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C96AD1F23361
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 19:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED441A2654;
-	Mon,  2 Sep 2024 19:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4DF19CC32;
+	Mon,  2 Sep 2024 19:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aiH15ebP"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QUk1MpnV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B351A3AB6;
-	Mon,  2 Sep 2024 19:19:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED0F1A3ABB
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 19:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725304782; cv=none; b=Gm7vJTTSNLfO0FUWoETwjUFduGoPJITi6qvovAGr2MbFlpwzq2NAP9VXEn0NvsT2Pr+Twm4bLWhyZbyUMS21nN19uTcHoqiW43PNWvNRZWHODoIFQKEgKGx9BLMduOia/WhjKxUzm6RLPkV+vtouoz5r09FLu2s79oUEqyscR40=
+	t=1725305734; cv=none; b=jewml2MZbSSbdEyEebaCALslqQVqr0+nymyNVKuk1sCIihPR+0bqHY37mDlSuykOVK6IVnzJyQLdcW9C8T6RNMDIjKN7i1tVvfUQM4MRCXMkbG0jDxGR+I/pJ/y+7pMBFTBwb70GpLHzkOlzlrjz9hm+7712if8hii7nvDZSDQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725304782; c=relaxed/simple;
-	bh=CSG42c0Zza6vQ2aeIZ0JWOH/0VvsfGO1cv6kMXBDw6U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=AbcyhXHswgO327doaJNlMN31bJ/66vINjC+jTEBkY2BEiDS3vp+zxv46AjutYAoORQXrfR4/SQXtP5Plg1lMFyMXmLyDg5ac47Xs/o7OW7uptLvgIMNjB70EXl0/tHlaq7M2k1UVMynRMqWhaumTSSuTXvmzuGQ1CrtbImJGqK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aiH15ebP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD8B6C4CEC8;
-	Mon,  2 Sep 2024 19:19:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725304781;
-	bh=CSG42c0Zza6vQ2aeIZ0JWOH/0VvsfGO1cv6kMXBDw6U=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=aiH15ebPMb+BTMSWl1RX4qe0PycRIQbNRQToY6db+26jTPBqCFdgFvktJdpRNQWmt
-	 5PoM+81kb8Q5tVXb7lzZZzXwFntFrX7959Lb8wNl5sNizqB0ZcIbjhRkPZnmmCbpYJ
-	 7Eghso8DNUif2f4LbBt7CcZkDYohImO46sSpo2CqpySPKQnge2vjnpdLLbI8RGNs8r
-	 nwmVGbEpi4Nc3lawsCs6nWOLCQF9d0cj4ouLErWVM3sroS0qlFGiCze2rf18nrFjW1
-	 PUFDWy44/PlKnmiVm+r1HOdD11OgicewSFl1TJX79hBRxjUqa+UsBlBvI5mao3MX87
-	 igNaukAwdmJdQ==
-Message-ID: <815b7445-3113-4ef7-ab36-b4a216308dd6@kernel.org>
-Date: Mon, 2 Sep 2024 22:19:34 +0300
+	s=arc-20240116; t=1725305734; c=relaxed/simple;
+	bh=WMwM3sUAvJBRUO8zkQa/BmFXhFFcDDp3n1X3GZOD91o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=k4UwlOtVpxJwQVBWusIotQJajeM+1H22gXCuX4HIMHafXqiU2YWlpPmJpHfKEiHHL9VmawHgtmdiiewNf/3pGARqT4mMdqkeOze9f/T6Kzrlv6wEz+G9Vf11quZAt+t2yuk5kjU+6IuzVD9ZOsz5snTjRzk/FBPdcOe3cGfsHcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QUk1MpnV; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f2a5db09-decc-4e40-a6cc-d4f179a7ab68@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725305729;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VLN86+xPOpxwENxvNDeU2pp+sDx1cVFn3bwwCu6PCfM=;
+	b=QUk1MpnVZ3L3Sfi7vPLaM4HwV52ffgxLI68WkqQ15DACyGIYEfw2FB+W7dYZxJXgv11Ano
+	n3T8Lql1tsocJCZexyZz1MmzfmgU/XuCsjqqJvNTisTA6CI9pP4Wa/MxjLbKOYc9Sw09Tr
+	CDTrZWjpkfYcWoTQr/dAQ1+qijr44aU=
+Date: Mon, 2 Sep 2024 20:35:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 4/8] dt-bindings: interconnect: Update master/slave id
- list
-To: Varadarajan Narayanan <quic_varada@quicinc.com>, andersson@kernel.org,
- mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, konradybcio@kernel.org,
- catalin.marinas@arm.com, will@kernel.org, richardcochran@gmail.com,
- geert+renesas@glider.be, dmitry.baryshkov@linaro.org,
- neil.armstrong@linaro.org, arnd@arndb.de, nfraprado@collabora.com,
- linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-pm@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240829082830.56959-1-quic_varada@quicinc.com>
- <20240829082830.56959-5-quic_varada@quicinc.com>
+Subject: Re: [PATCH net-next v2 1/2] net_tstamp: add SCM_TS_OPT_ID to provide
+ OPT_ID in control message
+To: Simon Horman <horms@kernel.org>
+Cc: Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Jason Xing <kerneljasonxing@gmail.com>, netdev@vger.kernel.org
+References: <20240902130937.457115-1-vadfed@meta.com>
+ <20240902183833.GK23170@kernel.org>
 Content-Language: en-US
-From: Georgi Djakov <djakov@kernel.org>
-In-Reply-To: <20240829082830.56959-5-quic_varada@quicinc.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240902183833.GK23170@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On 29.08.24 11:28, Varadarajan Narayanan wrote:
-> Update the GCC master/slave list to include couple of
-> more interfaces needed by the Network Subsystem Clock
-> Controller (NSSCC)
+On 02/09/2024 19:38, Simon Horman wrote:
+> On Mon, Sep 02, 2024 at 06:09:35AM -0700, Vadim Fedorenko wrote:
+>> SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
+>> timestamps and packets sent via socket. Unfortunately, there is no way
+>> to reliably predict socket timestamp ID value in case of error returned
+>> by sendmsg. For UDP sockets it's impossible because of lockless
+>> nature of UDP transmit, several threads may send packets in parallel. In
+>> case of RAW sockets MSG_MORE option makes things complicated. More
+>> details are in the conversation [1].
+>> This patch adds new control message type to give user-space
+>> software an opportunity to control the mapping between packets and
+>> values by providing ID with each sendmsg. This works fine for UDP
+>> sockets only, and explicit check is added to control message parser.
+>>
+>> [1] https://lore.kernel.org/netdev/CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9Eaa9aDPfgHdtA@mail.gmail.com/
+>>
+>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
 > 
-> Signed-off-by: Varadarajan Narayanan <quic_varada@quicinc.com>
-
-Acked-by: Georgi Djakov <djakov@kernel.org>
-
-> ---
->   include/dt-bindings/interconnect/qcom,ipq5332.h | 4 ++++
->   1 file changed, 4 insertions(+)
+> ...
 > 
-> diff --git a/include/dt-bindings/interconnect/qcom,ipq5332.h b/include/dt-bindings/interconnect/qcom,ipq5332.h
-> index 16475bb07a48..5c08dd3c4f47 100644
-> --- a/include/dt-bindings/interconnect/qcom,ipq5332.h
-> +++ b/include/dt-bindings/interconnect/qcom,ipq5332.h
-> @@ -28,6 +28,10 @@
->   #define SLAVE_NSSNOC_TIMEOUT_REF	23
->   #define MASTER_NSSNOC_XO_DCD		24
->   #define SLAVE_NSSNOC_XO_DCD		25
-> +#define MASTER_SNOC_NSSNOC_1_CLK	26
-> +#define SLAVE_SNOC_NSSNOC_1_CLK		27
-> +#define MASTER_SNOC_NSSNOC_CLK		28
-> +#define SLAVE_SNOC_NSSNOC_CLK		29
->   
->   #define MASTER_NSSNOC_PPE		0
->   #define SLAVE_NSSNOC_PPE		1
+>> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+> 
+> ...
+> 
+>> @@ -1543,10 +1546,15 @@ static int __ip6_append_data(struct sock *sk,
+>>   			flags &= ~MSG_SPLICE_PAGES;
+>>   	}
+>>   
+>> -	hold_tskey = cork->tx_flags & SKBTX_ANY_TSTAMP &&
+>> -		     READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID;
+>> -	if (hold_tskey)
+>> -		tskey = atomic_inc_return(&sk->sk_tskey) - 1;
+>> +	if (cork->tx_flags & SKBTX_ANY_TSTAMP &&
+>> +	    READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID) {
+>> +		if (cork->flags & IPCORK_TS_OPT_ID) {
+>> +			tskey = cork->ts_opt_id;
+>> +		} else {
+>> +			tskey = atomic_inc_return(&sk->sk_tskey) - 1;
+>> +			hold_tskey = true;
+> 
+> Hi Vadim,
+> 
+> I think that hold_tskey also needs to be assigned a value in
+> the cases where wither of the if conditions above are false.
+
+Hi Simon!
+
+Yes, you are right. I should probably init it with false to avoid
+'else' statement.
+
+Thanks,
+Vadim
+
+
+> Flagged by Smatch.
+> 
+>> +		}
+>> +	}
+>>   
+>>   	/*
+>>   	 * Let's try using as much space as possible.
+> 
 
 
