@@ -1,130 +1,141 @@
-Return-Path: <netdev+bounces-124136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE6B39683EF
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:01:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A1FF96841E
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:07:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A94F1C22779
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:01:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B5E31C2244A
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A30E13CFA1;
-	Mon,  2 Sep 2024 10:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF04C13CFA1;
+	Mon,  2 Sep 2024 10:07:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZI+ZAvJJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23AD1311B6
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 10:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2942313BC26
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 10:07:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725271291; cv=none; b=B3TZwODXgp6/AqORe8ygoN1H4K+wSzdCET0uytQSXd8UZ6HbmNHjyMCTXnJW9FatMS5b0JtDZ1okOIrcOtdeHhxFi4JqSC3B35M1hXwSgsm8UeMAw5VsgQbl5YGrvmmtRDdADkgT/vl19pQQFpDZOW+WKfaQ6VYugf4maHNk2Wc=
+	t=1725271639; cv=none; b=GUqeM1JovAfmNTejVhAyBX6C683ifEVDH7LjBRI2c/9nKVArPGNqcqUG896o51SyUUZqZj327WEqFp/R1nwLzyF6E+TsYEXHFB9fo19XKmyJTN+yuSmfjSMRf0hFIOkg/hPYzOQlJUFO1KvgjEKls4up8pP4ht8ckcFQfRNJr00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725271291; c=relaxed/simple;
-	bh=DLwcNSQz8RWmdGdVUt99mUKMNZeOYDfKI+/lFn9dl2Y=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=D1YqgUPVCAm0Eltq3nUBH0pJVq3Q3plvNM8eC+Nsytg1oLSC7CNCS28xXD8cMYEcNCQ14fVDAzKUQLbZpZ9st/1z8aKfPkSccGLF4/wjP2EUJRb2uNQtXELJQnviAIobhTtHzbQ9r1Ipus5gi4fsOaEf73J9ceVYwgzbS7IOJXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1sl3rr-00071B-ST; Mon, 02 Sep 2024 12:01:03 +0200
-Received: from [2a0a:edc0:0:900:1d::4e] (helo=lupine)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1sl3rp-004sA6-MO; Mon, 02 Sep 2024 12:01:01 +0200
-Received: from pza by lupine with local (Exim 4.96)
-	(envelope-from <p.zabel@pengutronix.de>)
-	id 1sl3rp-000gII-1q;
-	Mon, 02 Sep 2024 12:01:01 +0200
-Message-ID: <0676fcf89ca07dde911b8759b8e8b10df4bcf6cd.camel@pengutronix.de>
-Subject: Re: [PATCH v5 7/8] reset: core: add get_device()/put_device on rcdev
-From: Philipp Zabel <p.zabel@pengutronix.de>
-To: Herve Codina <herve.codina@bootlin.com>, Geert Uytterhoeven
- <geert@linux-m68k.org>, Andy Shevchenko <andy.shevchenko@gmail.com>, Simon
- Horman <horms@kernel.org>, Lee Jones <lee@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
- <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Lars Povlsen
- <lars.povlsen@microchip.com>, Steen Hegelund
- <Steen.Hegelund@microchip.com>,  Daniel Machon
- <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring
- <robh@kernel.org>,  Saravana Kannan <saravanak@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>, Andrew
- Lunn <andrew@lunn.ch>,  linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, Allan
- Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
- <luca.ceresoli@bootlin.com>,  Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, =?ISO-8859-1?Q?Cl=E9ment_L=E9ger?=
- <clement.leger@bootlin.com>
-Date: Mon, 02 Sep 2024 12:01:01 +0200
-In-Reply-To: <20240808154658.247873-8-herve.codina@bootlin.com>
-References: <20240808154658.247873-1-herve.codina@bootlin.com>
-	 <20240808154658.247873-8-herve.codina@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1725271639; c=relaxed/simple;
+	bh=UqY0ZOR4ZKOoHcoCsu6sP2jFHbPUIWb3im2waL5Wvvs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pv8g10Nw2aXtXbRbyilCIHtwhzymYQUcLcMmmiqpchfmb+UgsCYRYlCgKM4dbS8qgnknGr4KRwbtOKaKLMxlqPoC81FGFtV4FqyrXR7svYhGR+BcXwW5Ib0NLJdDqDmTftH6wz7phbBo03u1jIpSUwgyPpgMYsuSUgB1EANKDn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZI+ZAvJJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725271636;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=VadJH2ms1q8EaPkqqjbRvlwSJ3NWMZzkQQ/DtM+kzTs=;
+	b=ZI+ZAvJJhCXIGQgVlDcrmOX4lHh+P9nRluhXq5eXcqaiTyzfdLPFkRun+szh5tQY0g1MTE
+	911cTFAmk9+BKYPRc11h5lX6rqvs46CynhCrMf5/Y+Cn42qX6GdTOq9E9rQ6ICHhbbh7q7
+	BMjnlrINxBpuN8wDGm67MEA9NltkVzc=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-306-Um-XiOR0NliIVndgzN-xrw-1; Mon,
+ 02 Sep 2024 06:07:13 -0400
+X-MC-Unique: Um-XiOR0NliIVndgzN-xrw-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E9BFF1954B00;
+	Mon,  2 Sep 2024 10:07:10 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.45.224.191])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 044FA19560A3;
+	Mon,  2 Sep 2024 10:07:04 +0000 (UTC)
+From: Michal Schmidt <mschmidt@redhat.com>
+To: Wojciech Drewek <wojciech.drewek@intel.com>,
+	Marcin Szycik <marcin.szycik@intel.com>,
+	Timothy Miskell <timothy.miskell@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	Dave Ertman <david.m.ertman@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH iwl-net] ice: fix VSI lists confusion when adding VLANs
+Date: Mon,  2 Sep 2024 12:06:52 +0200
+Message-ID: <20240902100652.269398-1-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: p.zabel@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Do, 2024-08-08 at 17:46 +0200, Herve Codina wrote:
-> From: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
->=20
-> Since the rcdev structure is allocated by the reset controller drivers
-> themselves, they need to exists as long as there is a consumer. A call to
-> module_get() is already existing but that does not work when using
-> device-tree overlays. In order to guarantee that the underlying reset
-> controller device does not vanish while using it, add a get_device() call
-> when retrieving a reset control from a reset controller device and a
-> put_device() when releasing that control.
->=20
-> Signed-off-by: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> ---
->  drivers/reset/core.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/drivers/reset/core.c b/drivers/reset/core.c
-> index dba74e857be6..999c3c41cf21 100644
-> --- a/drivers/reset/core.c
-> +++ b/drivers/reset/core.c
-> @@ -812,6 +812,7 @@ __reset_control_get_internal(struct reset_controller_=
-dev *rcdev,
->  	kref_init(&rstc->refcnt);
->  	rstc->acquired =3D acquired;
->  	rstc->shared =3D shared;
-> +	get_device(rcdev->dev);
-> =20
->  	return rstc;
->  }
-> @@ -826,6 +827,7 @@ static void __reset_control_release(struct kref *kref=
-)
->  	module_put(rstc->rcdev->owner);
-> =20
->  	list_del(&rstc->list);
-> +	put_device(rstc->rcdev->dev);
->  	kfree(rstc);
->  }
+The description of function ice_find_vsi_list_entry says:
+  Search VSI list map with VSI count 1
 
-Reviewed-by: Philipp Zabel <p.zabel@pengutronix.de>
+However, since the blamed commit (see Fixes below), the function no
+longer checks vsi_count. This causes a problem in ice_add_vlan_internal,
+where the decision to share VSI lists between filter rules relies on the
+vsi_count of the found existing VSI list being 1.
 
-regards
-Philipp
+The reproducing steps:
+1. Have a PF and two VFs.
+   There will be a filter rule for VLAN 0, refering to a VSI list
+   containing VSIs: 0 (PF), 2 (VF#0), 3 (VF#1).
+2. Add VLAN 1234 to VF#0.
+   ice will make the wrong decision to share the VSI list with the new
+   rule. The wrong behavior may not be immediately apparent, but it can
+   be observed with debug prints.
+3. Add VLAN 1234 to VF#1.
+   ice will unshare the VSI list for the VLAN 1234 rule. Due to the
+   earlier bad decision, the newly created VSI list will contain
+   VSIs 0 (PF) and 3 (VF#1), instead of expected 2 (VF#0) and 3 (VF#1).
+4. Try pinging a network peer over the VLAN interface on VF#0.
+   This fails.
+
+Reproducer script at:
+https://gitlab.com/mschmidt2/repro/-/blob/master/RHEL-46814/test-vlan-vsi-list-confusion.sh
+Commented debug trace:
+https://gitlab.com/mschmidt2/repro/-/blob/master/RHEL-46814/ice-vlan-vsi-lists-debug.txt
+Patch adding the debug prints:
+https://gitlab.com/mschmidt2/linux/-/commit/f8a8814623944a45091a77c6094c40bfe726bfdb
+
+One thing I'm not certain about is the implications for the LAG feature,
+which is another caller of ice_find_vsi_list_entry. I don't have a
+LAG-capable card at hand to test.
+
+Fixes: 25746e4f06a5 ("ice: changes to the interface with the HW and FW for SRIOV_VF+LAG")
+Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+---
+ drivers/net/ethernet/intel/ice/ice_switch.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index fe8847184cb1..4e6e7af962bd 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -3264,7 +3264,7 @@ ice_find_vsi_list_entry(struct ice_hw *hw, u8 recp_id, u16 vsi_handle,
+ 
+ 	list_head = &sw->recp_list[recp_id].filt_rules;
+ 	list_for_each_entry(list_itr, list_head, list_entry) {
+-		if (list_itr->vsi_list_info) {
++		if (list_itr->vsi_count == 1 && list_itr->vsi_list_info) {
+ 			map_info = list_itr->vsi_list_info;
+ 			if (test_bit(vsi_handle, map_info->vsi_map)) {
+ 				*vsi_list_id = map_info->vsi_list_id;
+-- 
+2.45.2
+
 
