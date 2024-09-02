@@ -1,127 +1,117 @@
-Return-Path: <netdev+bounces-124218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24A41968A00
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 16:32:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8B49968A09
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 16:35:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 492D41C215A2
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:32:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DC48B22A05
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D31A210190;
-	Mon,  2 Sep 2024 14:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E8C1A263A;
+	Mon,  2 Sep 2024 14:35:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AMNzTTtH"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="URA75C91"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 080D71A2635;
-	Mon,  2 Sep 2024 14:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F431A2632;
+	Mon,  2 Sep 2024 14:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725287453; cv=none; b=MTPvydc/VgqGLHxbYOAG1sac0qYbwrLUlsJnfUyLxqRoZbyUYMgg4Q7ZXDIJTp7PV1ErKP7PAwlcyJOZ+ePJArCknHahQnOVEVXhThWhapfLLuN3nhCqVa8Mnj1BnWWHbbU2+c04lcFfWy+uceVTsPeVIa7uqK84xqGTxV8lcXo=
+	t=1725287738; cv=none; b=JGtvlWScPFkdtGNP0c6wMgnRSEBAlpd5kVyedGnFyvwwOJyXy3HVJG1A31us8KRrySUWRSKlY+ff4TRyFcUpe066kpmbI0bJrxpu4zZoEAVXkVa6VkI08t3fcf8Oi+3feRLZk3U2aV105uVmudf9woRzd+rFDqEllhy+msBouYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725287453; c=relaxed/simple;
-	bh=2hAH5QkrAb4QGYhA4EW70+aq6QJZeVXXuzVsNX5k9L8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=oUFzaUVPsYPB0BwK+ppFoZxIRuDCqIQ+2UuwbD/s08cd8xvCAugZLIhjWuPHlUYe5NOCvUcnkjJiDcTT7z2zsd35yKK9UtfFkCSnzIhyPVdJhPgVDywaRl8iyf/ayeXJSOKBDM4JowHyubp+wCY+t/0QSJBhkxpH1XUQ+Q9olcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AMNzTTtH; arc=none smtp.client-ip=209.85.160.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-457ce5fda1aso8589141cf.1;
-        Mon, 02 Sep 2024 07:30:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725287451; x=1725892251; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nWWTjaMW9Ko+2AruYroLKFk93sCipLt90Wh5KGJSmPQ=;
-        b=AMNzTTtH32vyFKbcnumdQyOCoRtucP/HuR/6A07DNJYLeIjDKHGFTphQlnh8BNuKz5
-         0YnyM3nHauVowjyEL6XvPwiigqPsa2ejVQ62yKetRdrafBrWGRbzFvrPI+O53WJFptTd
-         d/EA5WFds5+CxbAYh9p2BXBOwlSZ3/DFBCxjQi6EsiA9RWXi6OAd4eiLBI8MnKCREmZm
-         TA9ooRG3ygWHfJjjNhGizB0/uRlOnUUQwGFG++1L3h4QkRVLPKr8syYchzY/vKntWq3D
-         N1VFT/RD8io1JwUxTIjmXhOS4b/2SnJvAUj4tWnSUPVCfh8ACYLmBLMbkNkIHRQQqGRK
-         yzew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725287451; x=1725892251;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=nWWTjaMW9Ko+2AruYroLKFk93sCipLt90Wh5KGJSmPQ=;
-        b=qf0cmJowcqq/azIXbo3Vl0yP1nkE1fdiFKHI4eIGFfA698WjdDmk2rtf54DFvrkfvU
-         E15eQky60z+75KqW5gUn8hmzgy5QG5PeExcwd5TbDqEl8nTcMWKT7m0wsPyPSr4c5bIY
-         pirNeOkiiEsT6xRRBDWg8i/+waMnVAuoVZGAOfDmefE6pPjqG3b24/+i/Q23mq3p/SII
-         5dFFzTMu31yeQ4QLT89WtDmgtT8ymV7jNGcI03HaE9lPTIGra3tNGQZr1A0xI0G5QpA7
-         Uo6pMfKqqG7i6kBKkyCQ3HlDp/2mLD7/KMnyGK6F162ij9bfq8RZXf1O+pQRu5uh51cZ
-         YBzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUOIxEDai5WBk9/YoWQsmleDjbMbE5/L9MDGhQAD/DQ+V3QNKt3i2AAAAUDaLMyjIfb372LfMSF@vger.kernel.org, AJvYcCXiJC05Q9dd6mfEIT96kgjSOzbVDL/ZMOMZpUZWjrcD790RlxxVXgpxTqO2+PaCBhYXbWmCJppbdgNXugtFMMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywff39tI3JpHENfNfzyl86RSLWY1JkM1GBU1LFe5PEdinFfnUYE
-	duZvg2SLXiAlxzLHBKXlvUT+qW+1oRwKKwA1TJc3B2Ivb+zInYXW
-X-Google-Smtp-Source: AGHT+IGv/l7eBJBzS0r0UAuzxt/6jjUp/xvP4dsSMZSBjT+uXKNWAJ1q1y5viRm6+kzthjCbx6pc/g==
-X-Received: by 2002:a05:622a:5cd:b0:457:c851:8b0f with SMTP id d75a77b69052e-457c8518f3amr91501291cf.53.1725287450619;
-        Mon, 02 Sep 2024 07:30:50 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45682db8326sm39983191cf.95.2024.09.02.07.30.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Sep 2024 07:30:50 -0700 (PDT)
-Date: Mon, 02 Sep 2024 10:30:49 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Andy Shevchenko <andy@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>
-Cc: Hongbo Li <lihongbo22@huawei.com>, 
- kees@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- jasowang@redhat.com, 
- davem@davemloft.net, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- akpm@linux-foundation.org, 
- linux-hardening@vger.kernel.org, 
- netdev@vger.kernel.org, 
- linux-mm@kvack.org
-Message-ID: <66d5cc19d34c6_613882942a@willemb.c.googlers.com.notmuch>
-In-Reply-To: <ZtWYO-atol0Qx58h@smile.fi.intel.com>
-References: <20240831095840.4173362-1-lihongbo22@huawei.com>
- <20240831095840.4173362-3-lihongbo22@huawei.com>
- <20240831130741.768da6da@kernel.org>
- <ZtWYO-atol0Qx58h@smile.fi.intel.com>
-Subject: Re: [PATCH -next 2/4] tun: Make use of str_disabled_enabled helper
+	s=arc-20240116; t=1725287738; c=relaxed/simple;
+	bh=5+yszPpjmoqd5/amSYx24TtTQjGQhpbvSYUCMGZpy0I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UOHto99n32Z2ogW85n5xDolWRpXlpGzl9IqJFSMXOoF92MXPWoSHCukcRTFrcpfu9zMJcNm3rVVC6n2WbFr9t25Rm2Q4Uz2Cz0mcVb63cZy8k1RItiyqr/qW8uz9XO/gsI+MF0Y8r512OfeUnm5DgHsLrSjwgobzOeg5ocOdNcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=URA75C91; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1725287736; x=1756823736;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5+yszPpjmoqd5/amSYx24TtTQjGQhpbvSYUCMGZpy0I=;
+  b=URA75C91k37lI/YMcjxv55y066yLLLcmc4nhEZ5xKgbPHLqPFwjb+23D
+   og7lAXfIrSfe3qvdd3nfZmIkbLfxA78CSe2WkMdoPbEWR/wZELh93JMjA
+   zi8sdrqJ8XySz5l9B/QM4iqJiJzPwaTqLjbT4ScEjOalGvq/WW8loZsjN
+   ZatHE9dknTTHRpTAyJAXA26bPoF2Sr4l0tcIPQi1sgpJSNbEig0a84hJr
+   8ho1BmYbdGi0u7u1JaY6TSUXCAefvcJKGITgpYMUgpHGubn/WNJ9d8E+Q
+   uwlzneR1Yss8L1ABJmFeypDkYqrBRRZ5Ghh28oEFAJIwVqr/49pRgbVIH
+   A==;
+X-CSE-ConnectionGUID: ocGO3RCOTkuOSmOfjK4K+g==
+X-CSE-MsgGUID: x1BTIxwuTba/it2EneXaTA==
+X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
+   d="scan'208";a="34270499"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Sep 2024 07:35:35 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 2 Sep 2024 07:35:06 -0700
+Received: from che-ll-i17164.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Mon, 2 Sep 2024 07:35:02 -0700
+From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <ramon.nordin.rodriguez@ferroamp.se>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<parthiban.veerasooran@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<Thorsten.Kummermehr@microchip.com>, Parthiban Veerasooran
+	<Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v2 0/7] microchip_t1s: Update on Microchip 10BASE-T1S PHY driver
+Date: Mon, 2 Sep 2024 20:04:51 +0530
+Message-ID: <20240902143458.601578-1-Parthiban.Veerasooran@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Andy Shevchenko wrote:
-> On Sat, Aug 31, 2024 at 01:07:41PM -0700, Jakub Kicinski wrote:
-> > On Sat, 31 Aug 2024 17:58:38 +0800 Hongbo Li wrote:
-> > > Use str_disabled_enabled() helper instead of open
-> > > coding the same.
-> 
-> ...
-> 
-> > >  		netif_info(tun, drv, tun->dev, "ignored: set checksum %s\n",
-> > > -			   arg ? "disabled" : "enabled");
-> > > +			   str_disabled_enabled(arg));
-> > 
-> > You don't explain the 'why'. How is this an improvement?
-> > nack on this and 2 similar networking changes you sent
-> 
-> Side opinion: This makes the messages more unified and not prone to typos
-> and/or grammatical mistakes. Unification allows to shrink binary due to
-> linker efforts on string literals deduplication.
+This patch series contain the below updates,
 
-This adds a layer of indirection.
+v1:
+- Restructured lan865x_write_cfg_params() and lan865x_read_cfg_params()
+  functions arguments to more generic.
+- Updated new/improved initial settings of LAN865X Rev.B0 from latest
+  AN1760.
+- Added support for LAN865X Rev.B1 from latest AN1760.
+- Moved LAN867X reset handling to a new function for flexibility.
+- Added support for LAN867X Rev.C1/C2 from latest AN1699.
+- Disabled/enabled collision detection based on PLCA setting.
 
-The original code is immediately obvious. When I see the new code I
-have to take a detour through cscope to figure out what it does.
+v2:
+- Fixed indexing issue in the configuration parameter setup.
 
-To me, in this case, the benefit is too marginal to justify that.
+Parthiban Veerasooran (7):
+  net: phy: microchip_t1s: restructure cfg read/write functions
+    arguments
+  net: phy: microchip_t1s: update new initial settings for LAN865X
+    Rev.B0
+  net: phy: microchip_t1s: add support for Microchip's LAN865X Rev.B1
+  net: phy: microchip_t1s: move LAN867X reset handling to a new function
+  net: phy: microchip_t1s: add support for Microchip's LAN867X Rev.C1
+  net: phy: microchip_t1s: add support for Microchip's LAN867X Rev.C2
+  net: phy: microchip_t1s: configure collision detection based on PLCA
+    mode
+
+ drivers/net/phy/Kconfig         |   4 +-
+ drivers/net/phy/microchip_t1s.c | 299 +++++++++++++++++++++++++-------
+ 2 files changed, 239 insertions(+), 64 deletions(-)
+
+
+base-commit: 221f9cce949ac8042f65b71ed1fde13b99073256
+-- 
+2.34.1
+
 
