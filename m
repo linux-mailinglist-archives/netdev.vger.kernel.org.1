@@ -1,122 +1,151 @@
-Return-Path: <netdev+bounces-124178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 987A6968653
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:36:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A55096864A
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:33:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4211C1F239C0
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:36:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B65B12824D2
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1F2187847;
-	Mon,  2 Sep 2024 11:36:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88971D47BA;
+	Mon,  2 Sep 2024 11:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="w+ipWv+C"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E4913B58D;
-	Mon,  2 Sep 2024 11:36:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473051D2F73
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 11:32:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725276969; cv=none; b=nmUHmR3AenB5BrWGdllVwxiBGybSzo51i/TunlOeJX0PfuL0bY2qvKQDoNsdVKK7SFe+mke/aYxGT6WQhyxW5GtkH7VpoQl/ejfwaQu2A8yrfA04kM+01euMsa1FpLyjQ0J7dk1q+T6uMnLWJhbNswvx93gOH3htUMNr/OCilgw=
+	t=1725276769; cv=none; b=VoDWuWwuqs/MiH72qRtOSOgGeATy2JpXrnN8LBzKeeR1DHciH50J4mEcY5Mf7lYJBpt1GjKqnaMZhxczp1ScNfzTSjaNJdUADz+vEqbbVC9M8bqGYZEegI0ptCXW9wVavJKHAPhoB7P6H2z++u35p1W1SEwC5g0Jk2R44PEDXis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725276969; c=relaxed/simple;
-	bh=TUPedZajoDS3q6PnHER7/XYy3rrwzlsklEjE9FSVSm4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RrAgAcsD9Z1a/ptqfe7ShluYF6j2r7XeiKSo4IAEQNt5Y4KdSDZvhTkVWoCwpfOyxEzzzJ9Qq2Lu4mWz6jFgwemRDMgqHGrwljpBn74xiCmzEjeJBcb8CWmjLGr1FfPCXmydv+a1YejXtOm7mYLnvGDyX3LXWAAjfJfCmx+f0ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wy68l0t04zgYvY;
-	Mon,  2 Sep 2024 19:33:59 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6BA5814022D;
-	Mon,  2 Sep 2024 19:36:05 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 2 Sep
- 2024 19:36:04 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <ajit.khaparde@broadcom.com>, <sriharsha.basavapatna@broadcom.com>,
-	<somnath.kotur@broadcom.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <yuehaibing@huawei.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next] be2net: Remove unused declarations
-Date: Mon, 2 Sep 2024 19:32:38 +0800
-Message-ID: <20240902113238.557515-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1725276769; c=relaxed/simple;
+	bh=qio//HUwcac13spOXL+XYs3ur/zeJsKHVMAEAUYB00g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O4G1S+4iPsZd8TsoTAt00lCBJSJk4mKGe6FTO/h+I2meDuDL+HOwrDn+drP9bhRteMZAFgSyfUDmJp4H7RN6V3RJ0mv7yq9tmb88dGH7VAxvcE1QsDh30wgsXcllRhPpxcNqiKSuvPTPFi7/mmfEnNH+r1okb7V0TkFwG37XJfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=w+ipWv+C; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2f3f163e379so65904831fa.3
+        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 04:32:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1725276765; x=1725881565; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=TEdbKEfNp8l5b7UjeJFRI45ydY4UJCRIi0R/wybvHbY=;
+        b=w+ipWv+CbBMGb22jh7RqHd781F2Xhwwv36NAlJsUlieslO+zZuwbwX4kHaaBddBEIR
+         UxAncyFSL39KyGFjBj8fxnMUJWQMQm38ypEMWWJDQ+uens7jl2leQERgrpAMBFCYnuNd
+         X/Ky1T6OKHUfKPb+hRTn7U8C3JDF6opMgo3U4ch+jXCLKveUUrBHX8RqZSPHGs2jm32d
+         +Ei4f9YpBykHZ9vbETpiGpg8qp2R87KoPt3r2rL0MQyiW8mlIKrX2/GdonFrT05QL20G
+         3gzVV4Hpw+hLws8QM/YfWPFNjqaBKQfbz5XELdOaHni0mub0U50xAo2NQ1vv3N+NnhJf
+         d/Hg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725276765; x=1725881565;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TEdbKEfNp8l5b7UjeJFRI45ydY4UJCRIi0R/wybvHbY=;
+        b=nsjfUR5TMhpczt3GEvuJqoDxElQ2uhreVYqpd/Wd/pE1sLiQmX3bIZJnAgevcjJtSQ
+         g0esEYDztleLY8rreiQ03eloXG9FzLaii7qRvYmFloBPT7Gce6PdcE1s6K/HR7M8RuLI
+         UKhOZJCmRIf3QT1Sr4sujzmo5szxGGtt218jTLDdN8lfpFZqkhimlZB/1PRPsmh1S3hK
+         eUW5UH2wIkmKcFhLdV2xE8LoIPZ+Ayk1loNPTb6Kbt6zHcSNNaKguFTbIzg4+lr6Xi3n
+         aQKH59W2CsERTlixhDXvHBwhOUrDAptxGtJOcBJdIMaMelnqdSrT5hHDom3A4l0H3+AZ
+         9FUQ==
+X-Gm-Message-State: AOJu0Yz9EGQuVB0IQVztkAAEOWtqC6QaVfnqVkUTjT6npl9Ft4cW6VSh
+	lOPGjnWarr3Qxp5W5Y6ksMpsaLfJfR2GOXnghByRKeOPwcdvT3VWQr3t6vdMBmU=
+X-Google-Smtp-Source: AGHT+IEB/mi5FyufIC2z2Kb7W26FvkVShd0NagHMF9VylDvp9kcYF7OxQjcMQiqj/+KVaajyIxP4Cw==
+X-Received: by 2002:a05:6512:31cf:b0:52c:e119:7f1 with SMTP id 2adb3069b0e04-53546bfcc07mr8703769e87.51.1725276764767;
+        Mon, 02 Sep 2024 04:32:44 -0700 (PDT)
+Received: from localhost (78-80-104-44.customers.tmcz.cz. [78.80.104.44])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a89891964e5sm551343866b.98.2024.09.02.04.32.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Sep 2024 04:32:44 -0700 (PDT)
+Date: Mon, 2 Sep 2024 13:32:42 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Geethasowjanya Akula <gakula@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>
+Subject: Re: [EXTERNAL] Re: [net-next PATCH v11 00/11] Introduce RVU
+ representors
+Message-ID: <ZtWiWvjlMfROMErH@nanopsycho.orion>
+References: <20240822132031.29494-1-gakula@marvell.com>
+ <ZsdOMryDpkGLnjuh@nanopsycho.orion>
+ <CH0PR18MB433945FE2481BF86CA5309FBCD912@CH0PR18MB4339.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf500002.china.huawei.com (7.185.36.57)
+In-Reply-To: <CH0PR18MB433945FE2481BF86CA5309FBCD912@CH0PR18MB4339.namprd18.prod.outlook.com>
 
-Commit 6b7c5b947c67 ("net: Add be2net driver.") declared be_pci_fnum_get()
-and be_cmd_reset() but never implemented. And commit 9fa465c0ce0d ("be2net:
-remove code duplication relating to Lancer reset sequence") removed
-lancer_test_and_set_rdy_state() but leave declaration.
+Sun, Sep 01, 2024 at 12:01:02PM CEST, gakula@marvell.com wrote:
+>
+>
+>>-----Original Message-----
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Thursday, August 22, 2024 8:12 PM
+>>To: Geethasowjanya Akula <gakula@marvell.com>
+>>Cc: netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kuba@kernel.org;
+>>davem@davemloft.net; pabeni@redhat.com; edumazet@google.com; Sunil
+>>Kovvuri Goutham <sgoutham@marvell.com>; Subbaraya Sundeep Bhatta
+>><sbhatta@marvell.com>; Hariprasad Kelam <hkelam@marvell.com>
+>>Subject: [EXTERNAL] Re: [net-next PATCH v11 00/11] Introduce RVU
+>>representors
+>>
+>>Thu, Aug 22, 2024 at 03:20:20PM CEST, gakula@marvell.com wrote:
+>>>This series adds representor support for each rvu devices.
+>>>When switchdev mode is enabled, representor netdev is registered for
+>>>each rvu device. In implementation of representor model, one NIX HW LF
+>>>with multiple SQ and RQ is reserved, where each RQ and SQ of the LF are
+>>>mapped to a representor. A loopback channel is reserved to support
+>>>packet path between representors and VFs.
+>>>CN10K silicon supports 2 types of MACs, RPM and SDP. This patch set
+>>>adds representor support for both RPM and SDP MAC interfaces.
+>>>
+>>>- Patch 1: Refactors and exports the shared service functions.
+>>>- Patch 2: Implements basic representor driver.
+>>>- Patch 3: Add devlink support to create representor netdevs that
+>>>  can be used to manage VFs.
+>>>- Patch 4: Implements basec netdev_ndo_ops.
+>>>- Patch 5: Installs tcam rules to route packets between representor and
+>>>	   VFs.
+>>>- Patch 6: Enables fetching VF stats via representor interface
+>>>- Patch 7: Adds support to sync link state between representors and VFs .
+>>>- Patch 8: Enables configuring VF MTU via representor netdevs.
+>>>- Patch 9: Add representors for sdp MAC.
+>>>- Patch 10: Add devlink port support.
+>>
+>>What is the fastpath? Where do you offload any configuration that actually
+>>ensures VF<->physical_port and VF<->VF traffic? There should be some
+>>bridge/tc/route offload.
+>Packet between  VFs and VF -> physical ports are done based on tcam rules installed by  TC only.
 
-Commit 76a9e08e33ce ("be2net: cleanup wake-on-lan code") left behind
-be_is_wol_supported() declaration.
-Commit baaa08d148ac ("be2net: do not call be_set/get_fw_log_level() on
-Skyhawk-R") removed be_get_fw_log_level() but leave declaration.
+Where is the code implementing that?
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- drivers/net/ethernet/emulex/benet/be.h      | 2 --
- drivers/net/ethernet/emulex/benet/be_cmds.h | 3 ---
- 2 files changed, 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/emulex/benet/be.h b/drivers/net/ethernet/emulex/benet/be.h
-index 61fe9625bed1..e48b861e4ce1 100644
---- a/drivers/net/ethernet/emulex/benet/be.h
-+++ b/drivers/net/ethernet/emulex/benet/be.h
-@@ -966,9 +966,7 @@ void be_cq_notify(struct be_adapter *adapter, u16 qid, bool arm,
- void be_link_status_update(struct be_adapter *adapter, u8 link_status);
- void be_parse_stats(struct be_adapter *adapter);
- int be_load_fw(struct be_adapter *adapter, u8 *func);
--bool be_is_wol_supported(struct be_adapter *adapter);
- bool be_pause_supported(struct be_adapter *adapter);
--u32 be_get_fw_log_level(struct be_adapter *adapter);
- int be_update_queues(struct be_adapter *adapter);
- int be_poll(struct napi_struct *napi, int budget);
- void be_eqd_update(struct be_adapter *adapter, bool force_update);
-diff --git a/drivers/net/ethernet/emulex/benet/be_cmds.h b/drivers/net/ethernet/emulex/benet/be_cmds.h
-index e2085c68c0ee..d70818f06be7 100644
---- a/drivers/net/ethernet/emulex/benet/be_cmds.h
-+++ b/drivers/net/ethernet/emulex/benet/be_cmds.h
-@@ -2381,7 +2381,6 @@ struct be_cmd_req_manage_iface_filters {
- } __packed;
- 
- u16 be_POST_stage_get(struct be_adapter *adapter);
--int be_pci_fnum_get(struct be_adapter *adapter);
- int be_fw_wait_ready(struct be_adapter *adapter);
- int be_cmd_mac_addr_query(struct be_adapter *adapter, u8 *mac_addr,
- 			  bool permanent, u32 if_handle, u32 pmac_id);
-@@ -2406,7 +2405,6 @@ int be_cmd_q_destroy(struct be_adapter *adapter, struct be_queue_info *q,
- int be_cmd_rxq_destroy(struct be_adapter *adapter, struct be_queue_info *q);
- int be_cmd_link_status_query(struct be_adapter *adapter, u16 *link_speed,
- 			     u8 *link_status, u32 dom);
--int be_cmd_reset(struct be_adapter *adapter);
- int be_cmd_get_stats(struct be_adapter *adapter, struct be_dma_mem *nonemb_cmd);
- int lancer_cmd_get_pport_stats(struct be_adapter *adapter,
- 			       struct be_dma_mem *nonemb_cmd);
-@@ -2488,7 +2486,6 @@ int lancer_physdev_ctrl(struct be_adapter *adapter, u32 mask);
- int lancer_initiate_dump(struct be_adapter *adapter);
- int lancer_delete_dump(struct be_adapter *adapter);
- bool dump_present(struct be_adapter *adapter);
--int lancer_test_and_set_rdy_state(struct be_adapter *adapter);
- int be_cmd_query_port_name(struct be_adapter *adapter);
- int be_cmd_get_func_config(struct be_adapter *adapter,
- 			   struct be_resources *res);
--- 
-2.34.1
-
+>>
+>>Or, what I fear, do you use some implicit mac-based steering? If yes, you
+>No, we don’t do any mac based traffic steerring.
+>
+>>should not. In switchdev mode, if user does not configure representors to
+>>forward packets, there is no packet forwarding.
+>
+>
 
