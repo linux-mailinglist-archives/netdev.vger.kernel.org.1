@@ -1,247 +1,106 @@
-Return-Path: <netdev+bounces-124285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3271968CE3
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 19:39:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AECC0968D1E
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 20:13:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03B4C1C227CF
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 17:39:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D50FB21ACE
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 18:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95CDC1C62A1;
-	Mon,  2 Sep 2024 17:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3361AB6F5;
+	Mon,  2 Sep 2024 18:12:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZxaaGhwk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AmU2WXgc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE55B1A262F
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 17:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347AC1A2640;
+	Mon,  2 Sep 2024 18:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725298796; cv=none; b=Q8+MVo1pvM8b0d8uqU8P0ongEyqtv4pECKoXlPjdCJIC9VMKQqHajlt8cUexhqfvZG+r4Q0MGAfGD9diOOUCsgB4azTvRzMmONCduBB8bsVaBrv7nsgRXhvyd9RklFGziEieNe53q+SqpKT7Qb4ahvjvhg0EYiYQCToXQwMRHJA=
+	t=1725300778; cv=none; b=ToGDSUWn5lmjpY91sN8tcP15VaAkgA9y04QwG0KvzEZxgbbLFu2Xm12G5itbiO2Q8seKgq+srSXQBwEn5nN7GM2kMryM20Z1m6+V0boXo9drNmoqEHWt4R9B5RuDArw/i0yhqUHrb+rA6MtpMbDSLbRuscqD2N+axhLvaXc2Ni8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725298796; c=relaxed/simple;
-	bh=l2IpJMWrxDKsy65TdGxfLpHwq3D6YAeg1cb7FeoJjeg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=spQPd8/0I66yKo/DsAuH6GqByWtHo1ZCWRDbU+P6NtiSvY6+WhW8tpqYi1+llRUIDh27jPs1j19FZFIbirrv96NZ65QadxfM6xzZpt8uGw30mqb8XtjcDp6Df/qjeXOtrYaV8liD55Q9DcWIjNAggaw4pSAddAqNVbCKXY9/UPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZxaaGhwk; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1725298795; x=1756834795;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=l/GOTBmkSFAaZJW5Ja78xlK/H//09xKVSwQC76yfaUg=;
-  b=ZxaaGhwkK3HyZbMzSoJ0TlTmihjST/iM16/ZFMxC0xYmnpJEVLG74QQz
-   vcVDcoRWrnaXIFJumb2Wzf4NfMWJTe1JEbpmO7byZBJcZf8KnFW7spvQd
-   la0Lsn8Y9nIygmIYJv5AcUAUYeqGIw0fv7sKbohk0wyMHsAtF9ofJnAW8
-   M=;
-X-IronPort-AV: E=Sophos;i="6.10,196,1719878400"; 
-   d="scan'208";a="326849594"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 17:39:53 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:5939]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.29.251:2525] with esmtp (Farcaster)
- id 142c92e5-b2be-4077-84a0-95e4757cd5f0; Mon, 2 Sep 2024 17:39:52 +0000 (UTC)
-X-Farcaster-Flow-ID: 142c92e5-b2be-4077-84a0-95e4757cd5f0
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 2 Sep 2024 17:39:51 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.161.248) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 2 Sep 2024 17:39:48 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
-CC: Tom Herbert <tom@herbertland.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, <netdev@vger.kernel.org>, "Alphonse
- Kurian" <alkurian@amazon.com>
-Subject: [PATCH v2 net] fou: Fix null-ptr-deref in GRO.
-Date: Mon, 2 Sep 2024 10:39:27 -0700
-Message-ID: <20240902173927.62706-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1725300778; c=relaxed/simple;
+	bh=wTPqaKqHLzhAjxYXnUECpotow3wHFY2aVzdyea0pgis=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=evA5MJW1U3tgtG3gLGOoUjRO614/3eNj9BuzXO8mhd7UqJ1Ii9P9Sc8ZdEbOLYFp4RV69G5aOAeTmyA9KrMonf1W+63kU2jb6jFzaGS+EUeC3vHwjGrLPWcKCo9f4EEwBw6YyDywuVnHIIFHySmJxP/jVZz1n9z91ImkhCuIiYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AmU2WXgc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37201C4CEC2;
+	Mon,  2 Sep 2024 18:12:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725300777;
+	bh=wTPqaKqHLzhAjxYXnUECpotow3wHFY2aVzdyea0pgis=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AmU2WXgcJYUBfcDo6ha6IZKW7ve8E2w9YI9Pwv45SMfJbDi9sS308a2QmRqQTGkXN
+	 T0L0jtCAjxNcBRgQlF0qu/sKZhi11oxaG46EBLWNrQtBkjLvfjm1aZ2XFJ1bAUP0MM
+	 0ErERn92y5ntRPIUNeFoyxFRlTeD78+hfcnHMsu8WsH8JQghRGcRdR5DT6a37pClXc
+	 l7FARh3DYX9v0ZPGMBjpuyQp+wKPWdZjBOBg8hSVv9OAguvr8vvajJwSQTmveaCLVd
+	 QpiRXwHhrwzJcDgc9upXi4Z/571O+nMCcfoHZtR16Egyf4qfgn5bJX6Xb1/5n5EWHW
+	 uLfCmts9G4PmQ==
+Date: Mon, 2 Sep 2024 21:12:52 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: David Ahern <dsahern@gmail.com>
+Cc: Michael Guralnik <michaelgur@nvidia.com>, jgg@nvidia.com,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Chiara Meiohas <cmeiohas@nvidia.com>
+Subject: Re: [RFC iproute2-next 2/4] rdma: Add support for rdma monitor
+Message-ID: <20240902181252.GG4026@unreal>
+References: <20240901005456.25275-1-michaelgur@nvidia.com>
+ <20240901005456.25275-3-michaelgur@nvidia.com>
+ <cad1d443-ccfb-4d10-ac2d-26bb10c99d05@gmail.com>
+ <20240902075426.GD4026@unreal>
+ <8e652f69-78d0-40f0-a712-60ef8733cf29@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWA003.ant.amazon.com (10.13.139.49) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8e652f69-78d0-40f0-a712-60ef8733cf29@gmail.com>
 
-We observed a null-ptr-deref in fou_gro_receive() while shutting down
-a host.  [0]
+On Mon, Sep 02, 2024 at 10:55:15AM -0600, David Ahern wrote:
+> On 9/2/24 1:54 AM, Leon Romanovsky wrote:
+> > On Sun, Sep 01, 2024 at 08:22:50PM -0600, David Ahern wrote:
+> >> On 8/31/24 6:54 PM, Michael Guralnik wrote:
+> >>> $ echo 4 > /sys/class/net/eth2/device/sriov_numvfs
+> >>> [NETDEV_ATTACH]	dev 6 port 2 netdev 7
+> >>> [NETDEV_ATTACH]	dev 6 port 3 netdev 8
+> >>> [NETDEV_ATTACH]	dev 6 port 4 netdev 9
+> >>> [NETDEV_ATTACH]	dev 6 port 5 netdev 10
+> >>> [REGISTER]	dev 7
+> >>> [NETDEV_ATTACH]	dev 7 port 1 netdev 11
+> >>> [REGISTER]	dev 8
+> >>> [NETDEV_ATTACH]	dev 8 port 1 netdev 12
+> >>> [REGISTER]	dev 9
+> >>> [NETDEV_ATTACH]	dev 9 port 1 netdev 13
+> >>> [REGISTER]	dev 10
+> >>> [NETDEV_ATTACH]	dev 10 port 1 netdev 14
+> >>>
+> >>
+> >> at a minimum the netdev output can be device names not indices; I would
+> >> expect the same for IB devices (I think that is the `dev N` in the
+> >> output) though infrastructure might be needed in iproute2.
+> > 
+> > I understand the request and it is a good one for the users of the tool.
+> > 
+> > However, we will need to remember that "real" users of this monitoring
+> > UAPI (from kernel side) are the orchestration tools and they won't care
+> > about the names, but about the IDs, which won't be used in rdmatool.
+> > 
+> 
+> That's a big assumption.
+> 
+> It is trivial to convert indices to names, so this can be readable for both.
 
-The NULL pointer is sk->sk_user_data, and the offset 8 is of protocol
-in struct fou.
+We had an internal discussion about this earlier today and came to same
+conclusion that we will convert indexes to names in the rdmatool without
+need to change the kernel API.
 
-When fou_release() is called due to netns dismantle or explicit tunnel
-teardown, udp_tunnel_sock_release() sets NULL to sk->sk_user_data.
-Then, the tunnel socket is destroyed after a single RCU grace period.
-
-So, in-flight udp4_gro_receive() could find the socket and execute the
-FOU GRO handler, where sk->sk_user_data could be NULL.
-
-Let's use rcu_dereference_sk_user_data() in fou_from_sock() and add NULL
-checks in FOU GRO handlers.
-
-[0]:
-BUG: kernel NULL pointer dereference, address: 0000000000000008
- PF: supervisor read access in kernel mode
- PF: error_code(0x0000) - not-present page
-PGD 80000001032f4067 P4D 80000001032f4067 PUD 103240067 PMD 0
-SMP PTI
-CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.10.216-204.855.amzn2.x86_64 #1
-Hardware name: Amazon EC2 c5.large/, BIOS 1.0 10/16/2017
-RIP: 0010:fou_gro_receive (net/ipv4/fou.c:233) [fou]
-Code: 41 5f c3 cc cc cc cc e8 e7 2e 69 f4 0f 1f 80 00 00 00 00 0f 1f 44 00 00 49 89 f8 41 54 48 89 f7 48 89 d6 49 8b 80 88 02 00 00 <0f> b6 48 08 0f b7 42 4a 66 25 fd fd 80 cc 02 66 89 42 4a 0f b6 42
-RSP: 0018:ffffa330c0003d08 EFLAGS: 00010297
-RAX: 0000000000000000 RBX: ffff93d9e3a6b900 RCX: 0000000000000010
-RDX: ffff93d9e3a6b900 RSI: ffff93d9e3a6b900 RDI: ffff93dac2e24d08
-RBP: ffff93d9e3a6b900 R08: ffff93dacbce6400 R09: 0000000000000002
-R10: 0000000000000000 R11: ffffffffb5f369b0 R12: ffff93dacbce6400
-R13: ffff93dac2e24d08 R14: 0000000000000000 R15: ffffffffb4edd1c0
-FS:  0000000000000000(0000) GS:ffff93daee800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000008 CR3: 0000000102140001 CR4: 00000000007706f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-PKRU: 55555554
-Call Trace:
- <IRQ>
- ? show_trace_log_lvl (arch/x86/kernel/dumpstack.c:259)
- ? __die_body.cold (arch/x86/kernel/dumpstack.c:478 arch/x86/kernel/dumpstack.c:420)
- ? no_context (arch/x86/mm/fault.c:752)
- ? exc_page_fault (arch/x86/include/asm/irqflags.h:49 arch/x86/include/asm/irqflags.h:89 arch/x86/mm/fault.c:1435 arch/x86/mm/fault.c:1483)
- ? asm_exc_page_fault (arch/x86/include/asm/idtentry.h:571)
- ? fou_gro_receive (net/ipv4/fou.c:233) [fou]
- udp_gro_receive (include/linux/netdevice.h:2552 net/ipv4/udp_offload.c:559)
- udp4_gro_receive (net/ipv4/udp_offload.c:604)
- inet_gro_receive (net/ipv4/af_inet.c:1549 (discriminator 7))
- dev_gro_receive (net/core/dev.c:6035 (discriminator 4))
- napi_gro_receive (net/core/dev.c:6170)
- ena_clean_rx_irq (drivers/amazon/net/ena/ena_netdev.c:1558) [ena]
- ena_io_poll (drivers/amazon/net/ena/ena_netdev.c:1742) [ena]
- napi_poll (net/core/dev.c:6847)
- net_rx_action (net/core/dev.c:6917)
- __do_softirq (arch/x86/include/asm/jump_label.h:25 include/linux/jump_label.h:200 include/trace/events/irq.h:142 kernel/softirq.c:299)
- asm_call_irq_on_stack (arch/x86/entry/entry_64.S:809)
-</IRQ>
- do_softirq_own_stack (arch/x86/include/asm/irq_stack.h:27 arch/x86/include/asm/irq_stack.h:77 arch/x86/kernel/irq_64.c:77)
- irq_exit_rcu (kernel/softirq.c:393 kernel/softirq.c:423 kernel/softirq.c:435)
- common_interrupt (arch/x86/kernel/irq.c:239)
- asm_common_interrupt (arch/x86/include/asm/idtentry.h:626)
-RIP: 0010:acpi_idle_do_entry (arch/x86/include/asm/irqflags.h:49 arch/x86/include/asm/irqflags.h:89 drivers/acpi/processor_idle.c:114 drivers/acpi/processor_idle.c:575)
-Code: 8b 15 d1 3c c4 02 ed c3 cc cc cc cc 65 48 8b 04 25 40 ef 01 00 48 8b 00 a8 08 75 eb 0f 1f 44 00 00 0f 00 2d d5 09 55 00 fb f4 <fa> c3 cc cc cc cc e9 be fc ff ff 66 66 2e 0f 1f 84 00 00 00 00 00
-RSP: 0018:ffffffffb5603e58 EFLAGS: 00000246
-RAX: 0000000000004000 RBX: ffff93dac0929c00 RCX: ffff93daee833900
-RDX: ffff93daee800000 RSI: ffff93daee87dc00 RDI: ffff93daee87dc64
-RBP: 0000000000000001 R08: ffffffffb5e7b6c0 R09: 0000000000000044
-R10: ffff93daee831b04 R11: 00000000000001cd R12: 0000000000000001
-R13: ffffffffb5e7b740 R14: 0000000000000001 R15: 0000000000000000
- ? sched_clock_cpu (kernel/sched/clock.c:371)
- acpi_idle_enter (drivers/acpi/processor_idle.c:712 (discriminator 3))
- cpuidle_enter_state (drivers/cpuidle/cpuidle.c:237)
- cpuidle_enter (drivers/cpuidle/cpuidle.c:353)
- cpuidle_idle_call (kernel/sched/idle.c:158 kernel/sched/idle.c:239)
- do_idle (kernel/sched/idle.c:302)
- cpu_startup_entry (kernel/sched/idle.c:395 (discriminator 1))
- start_kernel (init/main.c:1048)
- secondary_startup_64_no_verify (arch/x86/kernel/head_64.S:310)
-Modules linked in: udp_diag tcp_diag inet_diag nft_nat ipip tunnel4 dummy fou ip_tunnel nft_masq nft_chain_nat nf_nat wireguard nft_ct curve25519_x86_64 libcurve25519_generic nf_conntrack libchacha20poly1305 nf_defrag_ipv6 nf_defrag_ipv4 nft_objref chacha_x86_64 nft_counter nf_tables nfnetlink poly1305_x86_64 ip6_udp_tunnel udp_tunnel libchacha crc32_pclmul ghash_clmulni_intel aesni_intel crypto_simd cryptd glue_helper mousedev psmouse button ena ptp pps_core crc32c_intel
-CR2: 0000000000000008
-
-Fixes: d92283e338f6 ("fou: change to use UDP socket GRO")
-Reported-by: Alphonse Kurian <alkurian@amazon.com>
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
-v2:
-  * Use rcu_dereference_sk_user_data() instead of bare rcu_dereference()
-    in fou_from_sock().
-
-v1: https://lore.kernel.org/netdev/20240830234348.16789-1-kuniyu@amazon.com/
----
- net/ipv4/fou_core.c | 29 ++++++++++++++++++++++++-----
- 1 file changed, 24 insertions(+), 5 deletions(-)
-
-diff --git a/net/ipv4/fou_core.c b/net/ipv4/fou_core.c
-index 0abbc413e0fe..78b869b31492 100644
---- a/net/ipv4/fou_core.c
-+++ b/net/ipv4/fou_core.c
-@@ -50,7 +50,7 @@ struct fou_net {
- 
- static inline struct fou *fou_from_sock(struct sock *sk)
- {
--	return sk->sk_user_data;
-+	return rcu_dereference_sk_user_data(sk);
- }
- 
- static int fou_recv_pull(struct sk_buff *skb, struct fou *fou, size_t len)
-@@ -233,9 +233,15 @@ static struct sk_buff *fou_gro_receive(struct sock *sk,
- 				       struct sk_buff *skb)
- {
- 	const struct net_offload __rcu **offloads;
--	u8 proto = fou_from_sock(sk)->protocol;
-+	struct fou *fou = fou_from_sock(sk);
- 	const struct net_offload *ops;
- 	struct sk_buff *pp = NULL;
-+	u8 proto;
-+
-+	if (!fou)
-+		goto out;
-+
-+	proto = fou->protocol;
- 
- 	/* We can clear the encap_mark for FOU as we are essentially doing
- 	 * one of two possible things.  We are either adding an L4 tunnel
-@@ -263,14 +269,24 @@ static int fou_gro_complete(struct sock *sk, struct sk_buff *skb,
- 			    int nhoff)
- {
- 	const struct net_offload __rcu **offloads;
--	u8 proto = fou_from_sock(sk)->protocol;
-+	struct fou *fou = fou_from_sock(sk);
- 	const struct net_offload *ops;
--	int err = -ENOSYS;
-+	u8 proto;
-+	int err;
-+
-+	if (!fou) {
-+		err = -ENOENT;
-+		goto out;
-+	}
-+
-+	proto = fou->protocol;
- 
- 	offloads = NAPI_GRO_CB(skb)->is_ipv6 ? inet6_offloads : inet_offloads;
- 	ops = rcu_dereference(offloads[proto]);
--	if (WARN_ON(!ops || !ops->callbacks.gro_complete))
-+	if (WARN_ON(!ops || !ops->callbacks.gro_complete)) {
-+		err = -ENOSYS;
- 		goto out;
-+	}
- 
- 	err = ops->callbacks.gro_complete(skb, nhoff);
- 
-@@ -320,6 +336,9 @@ static struct sk_buff *gue_gro_receive(struct sock *sk,
- 	struct gro_remcsum grc;
- 	u8 proto;
- 
-+	if (!fou)
-+		goto out;
-+
- 	skb_gro_remcsum_init(&grc);
- 
- 	off = skb_gro_offset(skb);
--- 
-2.30.2
-
+Thanks
 
