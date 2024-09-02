@@ -1,148 +1,231 @@
-Return-Path: <netdev+bounces-124255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12FC3968B0F
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 17:30:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C21F6968B1F
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 17:34:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C56DA282C1B
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 15:30:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A45B2823B6
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 15:34:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BEFF1A303B;
-	Mon,  2 Sep 2024 15:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8B81A302A;
+	Mon,  2 Sep 2024 15:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gv8t4yy2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZVinsxe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6CE1A3043
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 15:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1531A3026;
+	Mon,  2 Sep 2024 15:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725290978; cv=none; b=mmzBKMQ6qWEh1gnzRRne8POmDmLyNqsWt4hdnvaX5+WoiEJpmiJiXD8NUIqRaPw6fdjRlnmwxSJ9JgxPZQ3ZWteRAp/2DWAjl1Z1OJ5oFpz+AsbVgotzo3cS/mJMIRRWM1NhIUqoyON69OEnheKfNHWGoAmeSM+kQm12WiKL438=
+	t=1725291266; cv=none; b=QyGoeshrz1WNXd14/0tdW+tUsLWdfoVHLTxZMrGHfLjwX76QPe270Q+zj98J7nskL/wULEXm9jOMm+OlOhsuPN2sNfde8+0s1KYSZM5NT+7pCcqxGP8XDtWpz/mfVRK/plko+PRp76UXdhu7jg8v64vPDr9OUrKNb6N74lZtVjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725290978; c=relaxed/simple;
-	bh=NrgGCBWphUa6pn16X1Axjzk9mG5BENYVNOkJJsvyqaA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=aX0vEGl4KJ8ipwTYK1F2zTDOhcy1DpaERHKCoNBumWrPuYhKy/07p/6iEUaUy+WgsQxG45jkKavLsvzNOmWv+oC5+qqjLRH7o+ejfoUT6FJyNoBIg6CeGEsjQ5p+lXhrXXfQXDlqT7Di09pgE3EMu25gukqE1Hy9c445W+a5Lps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gv8t4yy2; arc=none smtp.client-ip=209.85.216.54
+	s=arc-20240116; t=1725291266; c=relaxed/simple;
+	bh=7rMbYapEXYVCo1Z3abOw0TAa9acU0xg7v3Vo9D1Y8+M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ftbhdj/STlukZlDI4dNbyLYqDm6keuTXtHYTlG+1ecUpOf51V5HOZDUOK3+17bzM2j0Aq6lIr25yqh1RXcU/YmbxnTmC4ha8axja4f6kmNeF1e8aBo5GY01cJfM7KjgyDkL8Jof2eB1dCELwezXEhv9NOm79x26jlA3xhdrat/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eZVinsxe; arc=none smtp.client-ip=209.85.166.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2d8fa2ca5b1so338129a91.3
-        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 08:29:35 -0700 (PDT)
+Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-39f4766a939so11902395ab.0;
+        Mon, 02 Sep 2024 08:34:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725290975; x=1725895775; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yn0qNt/zGhRL+OYRVXMnNoHz4+u9oRNyoVfW+1+Klb8=;
-        b=Gv8t4yy2rIH8n1krzhrjEl+BXLJnRul4wHU7XU/eM2/kSb9pqtJsBjIkOa11QbIWmg
-         oOu63QPPdutVLyD/YluJMozpZ2bulgL4skxsud3IYNs1z/NWS0Cos0Sz5eeiQ7thw6JO
-         xTMasDAMi2EaMeTp5JrPbri7HeyIaUwNd7jjxWjtval1d+STzb3sUsDtSW1rjyQjEZTf
-         PnYoxvroPTE6BsmOTP0UVIqcgBsSZHTvoGr5GDi0GAGKb2mUaGyqA0DMHfKAz7KnOB1F
-         MxJKL1DMnI70ZjxA1b/UYi/bts3tmqDlDP4RKQyzIhYbd5Olxz8OrmqOZYE9iqc4DmQA
-         ePhQ==
+        d=gmail.com; s=20230601; t=1725291264; x=1725896064; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DxSjun1B4tFjhBYflpUpgDEJOT2ks/51DbIQnk7jJFc=;
+        b=eZVinsxetWZT5EUWkQWRB6TkHCsJgnIfCHqfUQ0CJ+a3adf20eEmf+1wotNUkGe0gl
+         urLp/qGUsQoonUcGMOBsgqVjoCzJYA7jrjBFd6ZbqWqqih8rsGlIP+uFJw8MvjQ4KhSE
+         6+pMg39KKLLhym0tuOzyW/Tfb/RAsUr9v6uOEUU8XkkxJWH0QBwBTxFzaOAlxuktGdN0
+         B1wU77irkRuLF0CQUPOdILdXieYzwToRw1Zx0nIwkwmsee8HsCbNd41VDOE9EkYUnRYl
+         3AGK8P8KVlPGPBGfX8FmPVk+nfW17Rhduh31HZO2mno+0YYriurdOfBny8B5mq8T8Glw
+         SOpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725290975; x=1725895775;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yn0qNt/zGhRL+OYRVXMnNoHz4+u9oRNyoVfW+1+Klb8=;
-        b=PV0BMOjrxjhqcZgEehCcy9Kl6CBP1w9DAszPd4ukwYctZDWpF5mreGoZFjrkYKZKbC
-         rFsh+GP4Iz60azho0b0rGQvSRq8Uvh8IDeCufgsXfXd2rqNea5CSmRWyQ2vlGb49M4OT
-         U6Y9XDy4WJ9Z9ZfJ7SaxlakqjyFZfUcYiLISZAP2AablwLBwUCZnv3WAg0cYiXpICgwF
-         auNmIKx01MkiHSCWb+3ykX4D5pFtlIxmZI9EOOAE++hxz01az6J5DTABg+clPEXafkx0
-         pq86kwNBn4fdtR/Jh82LtkCQSG4rA/IuqOxbxzA/bJt9S/sZomYYtu5SIbNdSKe0E0oC
-         c5JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVAEpThpLvOehWN9Si9/6c7jEPRJ/mJfFcqMrbxgbD+9IKs6MBkfMcko9zRmaZbUTiFpl5FyuI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIFih2+/mb/Smob13Qw94C4HuL+hfNjCcToFKOoGi1qXlGGejY
-	40nxue+J4+ONfcuMbaAuY6cRc1/hArRrt8D7GsBgobU9k/nXwUn0
-X-Google-Smtp-Source: AGHT+IEk9g8G92Wts7sRMp4Y0O/AhNU/7/wNvFNT46Axmwo7BNebAS3H8+s8EdnF/SVM0hKlaq8kFQ==
-X-Received: by 2002:a17:90a:ff14:b0:2d8:8ab3:2889 with SMTP id 98e67ed59e1d1-2d88d69e9c8mr8633933a91.11.1725290975082;
-        Mon, 02 Sep 2024 08:29:35 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d8b8fe1f68sm3367192a91.31.2024.09.02.08.29.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Sep 2024 08:29:34 -0700 (PDT)
-Message-ID: <5ddb11d3-f001-435d-b6e4-2c4881bcd1e6@gmail.com>
-Date: Mon, 2 Sep 2024 08:29:32 -0700
+        d=1e100.net; s=20230601; t=1725291264; x=1725896064;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DxSjun1B4tFjhBYflpUpgDEJOT2ks/51DbIQnk7jJFc=;
+        b=DzwFfpPk33PuofD2oufqUgeWjVgdphuuQ6U48cm6RKIK/p2fZY37ZSLaA1OuyoY7Lf
+         GFyUBq35DfsPy1SJ1BWytZXfVXLz8HqUta83P90bXZl3jv8jWS0CrSw+wgxOruK/I/z2
+         dlCDnhEiB1xG4Eoo61iCVPQg5ux8JM9SP59VcdXJFr4v08m8CD97Sec5s1r7ZSo1VXxd
+         TxNNkbjU+pKLv9WimqNCEPEUrZU2b+67+ctfKb/EVJ5ouwdzHg/vmO8jtmQthjkhjtHi
+         nUKl2T2MwyEl1wb4USlI3AeVQ8rrhOaBNrk4QlLIx2/1QBSKbaTFIDIbJKHFPIaGpIcM
+         4hlA==
+X-Forwarded-Encrypted: i=1; AJvYcCUlaR2pCyaHxYVoWZYwBo2DBf/oJQCRuU0ijgY4bAY5w1qUyEIgfzeeE6+k2iPNV6ngECX0bkEoIZiI4mApuR4=@vger.kernel.org, AJvYcCW+D0GcroB4BJzrSmber/1TbV7WvxnNp2xBJ5XlUM7OpgHLJdnVakkeHTTflE4R5Xh5bojcm5tA@vger.kernel.org
+X-Gm-Message-State: AOJu0YyesRGAZvoOH+ggcfRpw7a6n2mHhqr3yHzrNPgHbfjIaTUcPoiq
+	FN7gC8clctgJe2mGZzmsuZT3jHZFJoXzDU/ZrMKThyhfGbtsxluBMiTuQiH8+pms1ADYaW3BWG6
+	wyhYNK1+tQCsxqR/Rnn5Nr1JXdtg=
+X-Google-Smtp-Source: AGHT+IEM3RjIsIIjjwBEskzmJuVc+5DHjOmYWscg9VOM+KXzS1+L1mug3vCsYQraNRwfRR/XTz85GUGGyQY5EjgzG0U=
+X-Received: by 2002:a05:6e02:1a45:b0:375:ab93:5062 with SMTP id
+ e9e14a558f8ab-39f377ce3aamr182800795ab.2.1725291263829; Mon, 02 Sep 2024
+ 08:34:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 7/8] net: dsa: microchip: Use scoped function
- to simplfy code
-To: Jinjie Ruan <ruanjinjie@huawei.com>, woojung.huh@microchip.com,
- andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linus.walleij@linaro.org,
- alsi@bang-olufsen.dk, justin.chen@broadcom.com,
- sebastian.hesselbarth@gmail.com, alexandre.torgue@foss.st.com,
- joabreu@synopsys.com, mcoquelin.stm32@gmail.com, wens@csie.org,
- jernej.skrabec@gmail.com, samuel@sholland.org, hkallweit1@gmail.com,
- linux@armlinux.org.uk, UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
- bcm-kernel-feedback-list@broadcom.com, linux-arm-kernel@lists.infradead.org,
- linux-sunxi@lists.linux.dev, linux-stm32@st-md-mailman.stormreply.com,
- krzk@kernel.org, jic23@kernel.org
-References: <20240830031325.2406672-1-ruanjinjie@huawei.com>
- <20240830031325.2406672-8-ruanjinjie@huawei.com>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240830031325.2406672-8-ruanjinjie@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240901051821.94956-1-kerneljasonxing@gmail.com> <66d5d38c1d4b_61388294f0@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66d5d38c1d4b_61388294f0@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 2 Sep 2024 23:33:47 +0800
+Message-ID: <CAL+tcoDy4XNBTZK3_MwzS1Js0NPg1e46xTtHmpJNckLywJ6NQQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] selftests: add selftest for UDP SO_PEEK_OFF support
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, shuah@kernel.org, jmaloy@redhat.com, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Sep 2, 2024 at 11:02=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Add the SO_PEEK_OFF selftest for UDP. In this patch, I mainly do
+> > three things:
+> > 1. rename tcp_so_peek_off.c
+> > 2. adjust for UDP protocol
+> > 3. add selftests into it
+> >
+> > Suggested-by: Jon Maloy <jmaloy@redhat.com>
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+>
+> A few minor comments. Nothing important.
+>
+> Subject to Stan's point about .gitignore:
+>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
 
+Thanks for your review!
 
-On 8/29/2024 8:13 PM, Jinjie Ruan wrote:
-> Avoids the need for manual cleanup of_node_put() in early exits
-> from the loop by using for_each_available_child_of_node_scoped().
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+>
+> > -int tcp_peek_offset_probe(sa_family_t af)
+> > +int sk_peek_offset_probe(sa_family_t af, int proto)
+> >  {
+> > +     int type =3D (proto =3D=3D IPPROTO_TCP ? SOCK_STREAM : SOCK_DGRAM=
+);
+> >       int optv =3D 0;
+> >       int ret =3D 0;
+> >       int s;
+> >
+> > -     s =3D socket(af, SOCK_STREAM | SOCK_CLOEXEC, IPPROTO_TCP);
+> > +     s =3D socket(af, type, proto);
+>
+> Removing the SOCK_CLOEXEC because not relevant to this single thread
+> process, I suppose?
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+Yep. We don't need this one.
 
+>
+> Not important, but no need for proto, can just be 0.
+
+You're right. I wonder if it is better if we explicitly pass the proto
+here? I would like not to touch it here.
+
+>
+> >       if (s < 0) {
+> >               ksft_perror("Temporary TCP socket creation failed");
+> >       } else {
+> >               if (!setsockopt(s, SOL_SOCKET, SO_PEEK_OFF, &optv, sizeof=
+(int)))
+> >                       ret =3D 1;
+> >               else
+> > -                     printf("%s does not support SO_PEEK_OFF\n", afstr=
+(af));
+> > +                     printf("%s does not support SO_PEEK_OFF\n", afstr=
+(af, proto));
+> >               close(s);
+> >       }
+> >       return ret;
+> >  }
+> >
+> > -static void tcp_peek_offset_set(int s, int offset)
+> > +static void sk_peek_offset_set(int s, int offset)
+> >  {
+> >       if (setsockopt(s, SOL_SOCKET, SO_PEEK_OFF, &offset, sizeof(offset=
+)))
+> >               ksft_perror("Failed to set SO_PEEK_OFF value\n");
+> >  }
+> >
+> > -static int tcp_peek_offset_get(int s)
+> > +static int sk_peek_offset_get(int s)
+> >  {
+> >       int offset;
+> >       socklen_t len =3D sizeof(offset);
+> > @@ -50,8 +54,9 @@ static int tcp_peek_offset_get(int s)
+> >       return offset;
+> >  }
+> >
+> > -static int tcp_peek_offset_test(sa_family_t af)
+> > +static int sk_peek_offset_test(sa_family_t af, int proto)
+> >  {
+> > +     int type =3D (proto =3D=3D IPPROTO_TCP ? SOCK_STREAM : SOCK_DGRAM=
+);
+> >       union {
+> >               struct sockaddr sa;
+> >               struct sockaddr_in a4;
+> > @@ -62,13 +67,13 @@ static int tcp_peek_offset_test(sa_family_t af)
+> >       int recv_sock =3D 0;
+> >       int offset =3D 0;
+> >       ssize_t len;
+> > -     char buf;
+> > +     char buf[2];
+> >
+> >       memset(&a, 0, sizeof(a));
+> >       a.sa.sa_family =3D af;
+> >
+> > -     s[0] =3D socket(af, SOCK_STREAM, IPPROTO_TCP);
+> > -     s[1] =3D socket(af, SOCK_STREAM | SOCK_NONBLOCK, IPPROTO_TCP);
+> > +     s[0] =3D recv_sock =3D socket(af, type, proto);
+> > +     s[1] =3D socket(af, type, proto);
+>
+> Same
+
+I think we don't need this one, either.
+As we can see, there are already some existing test files without the
+SOCK_NONBLOCK flag.
+
+>
+> >
+> >       if (s[0] < 0 || s[1] < 0) {
+> >               ksft_perror("Temporary socket creation failed\n");
+> > @@ -82,76 +87,78 @@ static int tcp_peek_offset_test(sa_family_t af)
+> >               ksft_perror("Temporary socket getsockname() failed\n");
+> >               goto out;
+> >       }
+> > -     if (listen(s[0], 0) < 0) {
+> > +     if (proto =3D=3D IPPROTO_TCP && listen(s[0], 0) < 0) {
+> >               ksft_perror("Temporary socket listen() failed\n");
+> >               goto out;
+> >       }
+> > -     if (connect(s[1], &a.sa, sizeof(a)) >=3D 0 || errno !=3D EINPROGR=
+ESS) {
+> > +     if (connect(s[1], &a.sa, sizeof(a))) {
+> >               ksft_perror("Temporary socket connect() failed\n");
+> >               goto out;
+> >       }
+>
+> Changed due to the removal of SOCK_NONBLOCK above. Definitely
+> simplifies the test.
+
+Yep.
+
+>
+> Just note that error test is =3D=3D -1 or < 0, also for consistency with
+> the rest of the file.
+
+I will add "< 0" here as you said.
+
+Thanks,
+Jason
 
