@@ -1,167 +1,129 @@
-Return-Path: <netdev+bounces-124281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED7A3968CAD
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 19:06:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CE754968CDF
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 19:39:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E35F91C202E2
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 17:06:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16E2A1C221FB
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 17:39:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B3D1AB6ED;
-	Mon,  2 Sep 2024 17:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6F71AB6FC;
+	Mon,  2 Sep 2024 17:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="yQUXHPzw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SsqnSZIm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DFDD1AB6DF
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 17:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE6F1AB6E8
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 17:39:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725296780; cv=none; b=OkL0Hk/i6Xm2eQb8Rl0aQ5vR2Pdu5QiaMAVqPJ2VPjIzr4DhOIzx0IEAFwIKGb/xle+40xJ8x4I0IhYj429eOeB7aSARyyqCVrhTVzl7h1MoH163oq6DwZ/I3ewVeNleJ+oKwIK1joqczslUOkmjb4Zfhdbkf44h0ZlshmOq9/Y=
+	t=1725298762; cv=none; b=WLTehzhUqZDUXAgpNyEdq5FPGMh+veWaXynD2t0h7V10XIBPxrB3vrgC7rhIugYWv7pnjrWUGJoN61ByHL3tYFn5hqi/U9WOnNsK6dHjlGTcdufJGoGKnIHFYT4enNjXsjUNKS6C9Izq6I8bRSmfncGFvB7acAf2Kxja9T/fwV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725296780; c=relaxed/simple;
-	bh=m/Hl05dGE8DG9LV4d7LMKZdjId9IkoBTCyuBgmslKIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X9p67XbBmnJVb5YW+F56qM+khxZ1PPF3wO0cZ9Pz/CAIncr9xYyICjr9kX+jBTeBLqfut6BgrItBAewwfWugmJpfxCREaAbUE+8CfhjDxaxTRXSC2+jKM9WC7WQIy1yZN2CztdoN1N3gybDLBKkKZa3IJj/C0MTikZSYiM+WTOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=yQUXHPzw; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a868b739cd9so529847766b.2
-        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 10:06:18 -0700 (PDT)
+	s=arc-20240116; t=1725298762; c=relaxed/simple;
+	bh=bar0Oo3HeN+i+rpgtLuh/jt2Ks6JJZL9d2B27aYJrZg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bMmNdeNMsQ9/OhRIpbyVwm86BaUSb6t4d2pALYVAQGOs9xE7AC3MuMEJc5zfnVud05h1OhAK9u2QVSxp1fVIdaqbl9Oe0DZCciGfzA0PbA4IhbZuCJNQEuwzgMSzpDHHvmMbaYLCtx75cwopXp9G//zGz4E/b3ayfTX9uCRsddc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SsqnSZIm; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-42bbf138477so24544685e9.2
+        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 10:39:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1725296777; x=1725901577; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7M8BT8N6vTwP+D5Hjg4AMJAeuxuEG1WY11kk9v24ceA=;
-        b=yQUXHPzwLakaHPlXkCRrO7aUae8f5P9dSXdXRoBhuFclC9S0bOMhP2XckKQIwQJY1G
-         e+FgxkoxrD7MZED9W94hzfslKWzxVOwr50I44Lev2VSVriG/ZTp1gzQjxxKx82A7bXtW
-         INwcl5qaPc4Qyq64vuqPBYVdGKiGziQd94m3Y=
+        d=gmail.com; s=20230601; t=1725298759; x=1725903559; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6+kFJC8cvU2nTFoSm40D7acxGkIP3j16jxtAWX3iLEQ=;
+        b=SsqnSZImxTZzzX06aKq9Epc3LdEIkAASfniLmmVP6xnJ/ibE6hFQn+bwokVvAS/SJp
+         /clpzXbjcZng3Pgi/dzBF9HEyxbgMScwTZnwnxVWOt2aRZ243OsmpwsrQv4tWaDH0i5R
+         AW6DuCfo9/PMONhlMHPOhBwxVmXn+OZHSejN7RgRov3/OjnttPz326U8sZNDBTCGtvUm
+         qBiWXUkRiUGDvFUatFtU0/vLFuKtG23dBFjDPzucRpts8L9UH1gb1onv7gR2L08doRko
+         yI3RTREWzyJZDS5dIV6zxZKq8LBpZyPfmtiSBKuh7dFM7YTfC9vmzL0OXc8Elv6KA811
+         R+zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725296777; x=1725901577;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1725298759; x=1725903559;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7M8BT8N6vTwP+D5Hjg4AMJAeuxuEG1WY11kk9v24ceA=;
-        b=Lblk8g/lqjODEYlx8+QTYEeP2NdLXBuiPdrlATIf9v3Dw3H/BQH9qUoBIZgYn+B6PB
-         fSn5U1s6Q2jWlKV1eGVW1Eu5mxefYN07SiJmUQEifTWr2MvRiYVEBFwfiFwjo3XH5HqG
-         Vkq8Ih7afzSm0hWHwTO+kg0TKI1B18g+arUTdGouvb1YR/haVqNnCEKiUnZXJgVowuYv
-         MecZ11NJBubtFDDUwiMsxfZ3vjx800tzGeJT+PlWkNW1ETCRrCYpReQ5ByJYWmXFyxEk
-         tLKxLI/fyzaLWV1fhSPZA+1tDz/lgC74S3yBdro5FpmDCjbo+3xizqoFFupGbDb6wuuU
-         pcHg==
-X-Gm-Message-State: AOJu0Yxoulyr5rXODRjsCKaVEPpXSp6qZTB8CfeQ8+IfrmBrEREoghBI
-	3A4UWma2IIvaJsR1xmv1cwwVZFQRmXHY5vRQELUN4RDFOn6AA2h8r2NP+rpYKqk=
-X-Google-Smtp-Source: AGHT+IGWJf9Avan9MoUFQ6Ai0+z5nn+fJXzqwnGlBi2FTipYcSbwZOLN+wfh53hpdVGR9SMXe/vXdg==
-X-Received: by 2002:a17:907:60d0:b0:a86:acbe:8d61 with SMTP id a640c23a62f3a-a897fa71c13mr1003988366b.53.1725296777056;
-        Mon, 02 Sep 2024 10:06:17 -0700 (PDT)
-Received: from LQ3V64L9R2.station (net-2-42-195-208.cust.vodafonedsl.it. [2.42.195.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989092143sm584447366b.96.2024.09.02.10.06.16
+        bh=6+kFJC8cvU2nTFoSm40D7acxGkIP3j16jxtAWX3iLEQ=;
+        b=DYkhaRla/zSYyzdmEfhsJDPU6XePc9OmND/lCwNMG13NvdKptXMHi/cl44QsWv6UUf
+         eb1zTPmyIvrsbmn3FuygK9te4Xz0kFWbicWBpX5T8YvMCfdhjuhGThC7phtZ/mS39P4v
+         zoClcY4TDFCU2OWgLHL0eC2mRlhRUbMwsdORzqI2T/RLx6+ifZKtVsQkowxZN6qsgVXR
+         stPFpzg/mDpdgXREtD0EbiDMoPv3MzTjg+njqUNlDV69UY6H6OIhIoHTcSW7UD2s4P3t
+         8lh0w4iWL1mYUF76hMTYfT/3+l4b4pPwbqhNhw1DjMHRhc5QUIrzT2XOPM0E2iefikQf
+         hM+g==
+X-Gm-Message-State: AOJu0YwmieFydFYRAiiIi1nQCn8SvnMWW7DiFVR7VKwPfP1JASl47WpW
+	a4aUoak1DzOyunKDrufk07CqMFHgfPIj38yTxrLBHxCHVAKV3aJwVdrdaA==
+X-Google-Smtp-Source: AGHT+IG4BGMZ2F2SX9XZkXrx+LBdxPsCDTwy6eAg6XPbBy7Ff0fToy4W+aCI8LNkhYHEz0YWLCCIsQ==
+X-Received: by 2002:a05:600c:45d1:b0:42b:afbb:1704 with SMTP id 5b1f17b1804b1-42c880ec5e4mr7156205e9.6.1725298758650;
+        Mon, 02 Sep 2024 10:39:18 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-018.fbsv.net. [2a03:2880:31ff:12::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba63abea3sm181936905e9.28.2024.09.02.10.39.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Sep 2024 10:06:16 -0700 (PDT)
-Date: Mon, 2 Sep 2024 19:06:14 +0200
-From: Joe Damato <jdamato@fastly.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, stable@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Breno Leitao <leitao@debian.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: napi: Make napi_defer_irqs u32
-Message-ID: <ZtXwhnVzR6ofBJhb@LQ3V64L9R2.station>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, stable@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-	Breno Leitao <leitao@debian.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240831113223.9627-1-jdamato@fastly.com>
- <CANn89iK+09DW95LTFwN1tA=_hV7xvA0mY4O4d-LwVbmNkO0y3w@mail.gmail.com>
- <ZtXn9gK6Dr-JGo81@LQ3V64L9R2.station>
- <CANn89iLhrKyFKf9DpJSSM9CZ9sgoRo7jovg2GhjsJABoqzzVsQ@mail.gmail.com>
+        Mon, 02 Sep 2024 10:39:18 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: alexanderduyck@fb.com,
+	kuba@kernel.org,
+	andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	kernel-team@meta.com,
+	sanmanpradhan@meta.com,
+	sdf@fomichev.me,
+	jdamato@fastly.com,
+	mohsin.bashr@gmail.com
+Subject: [PATCH net-next v3 0/2] eth: Add basic ethtool support for fbnic
+Date: Mon,  2 Sep 2024 10:39:05 -0700
+Message-ID: <20240902173907.925023-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iLhrKyFKf9DpJSSM9CZ9sgoRo7jovg2GhjsJABoqzzVsQ@mail.gmail.com>
 
-On Mon, Sep 02, 2024 at 07:00:48PM +0200, Eric Dumazet wrote:
-> On Mon, Sep 2, 2024 at 6:29 PM Joe Damato <jdamato@fastly.com> wrote:
-> >
-> > On Mon, Sep 02, 2024 at 03:01:28PM +0200, Eric Dumazet wrote:
-> > > On Sat, Aug 31, 2024 at 1:32 PM Joe Damato <jdamato@fastly.com> wrote:
-> > > >
-> > > > In commit 6f8b12d661d0 ("net: napi: add hard irqs deferral feature")
-> > > > napi_defer_irqs was added to net_device and napi_defer_irqs_count was
-> > > > added to napi_struct, both as type int.
-> > > >
-> > > > This value never goes below zero. Change the type for both from int to
-> > > > u32, and add an overflow check to sysfs to limit the value to S32_MAX.
-> > > >
-> > > > Before this patch:
-> > > >
-> > > > $ sudo bash -c 'echo 2147483649 > /sys/class/net/eth4/napi_defer_hard_irqs'
-> > > > $ cat /sys/class/net/eth4/napi_defer_hard_irqs
-> > > > -2147483647
-> > > >
-> > > > After this patch:
-> > > >
-> > > > $ sudo bash -c 'echo 2147483649 > /sys/class/net/eth4/napi_defer_hard_irqs'
-> > > > bash: line 0: echo: write error: Numerical result out of range
-> > > >
-> > > > Fixes: 6f8b12d661d0 ("net: napi: add hard irqs deferral feature")
-> > > > Cc: stable@kernel.org
-> > > > Cc: Eric Dumazet <edumazet@google.com>
-> > > > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> > > > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > > > ---
-> > >
-> > > I do not think this deserves a change to stable trees.
-> >
-> > OK, I can send any other revisions to -next, instead.
-> >
-> > > Signed or unsigned, what is the issue ?
-> > >
-> > > Do you really need one extra bit ?
-> >
-> > I made the maximum S32_MAX because the practical limit has always
-> > been S32_MAX. Any larger values overflow. Keeping it at S32_MAX does
-> > not change anything about existing behavior, which was my goal.
-> >
-> > Would you prefer if it was U32_MAX instead?
-> >
-> > Or are you asking me to leave it the way it is?
-> 
-> I think this would target net-next at most, please lets avoid hassles
-> for stable teams.
+This patch series adds basic ethtool support for fbnic. Specifically,
+the two patches focus on the following two features respectively:
 
-Sure, that's fine with me.
+1: Enable 'ethtool -i <dev>' to provide driver, firmware and bus information.
+2: Provide mac group stats.
 
-I'm just not sure what you meant by your comment about the extra
-bit and what you are asking me to make the maximum limit? I have no
-preference.
+Changes since v2:
+- Fix v1 reference link 
+- Fix nit
 
-I just want to prevent overflow and then make the per-NAPI stuff
-compatible with existing sysfs code as much as possible.
+---
+v2: https://lore.kernel.org/netdev/20240827205904.1944066-2-mohsin.bashr@gmail.com
+ 
+v1: https://lore.kernel.org/netdev/20240822184944.3882360-1-mohsin.bashr@gmail.com
+
+Thanks, Mohsin Bashir
+
+ drivers/net/ethernet/meta/fbnic/Makefile      |  2 +
+ drivers/net/ethernet/meta/fbnic/fbnic.h       |  7 ++
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h   | 37 +++++++++
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 75 +++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.c    | 13 ++++
+ drivers/net/ethernet/meta/fbnic/fbnic_fw.h    |  6 +-
+ .../net/ethernet/meta/fbnic/fbnic_hw_stats.c  | 27 +++++++
+ .../net/ethernet/meta/fbnic/fbnic_hw_stats.h  | 40 ++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.c   | 50 +++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |  3 +
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  2 +
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  1 +
+ 12 files changed, 260 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
+
+-- 
+2.43.5
+
 
