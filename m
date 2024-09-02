@@ -1,286 +1,289 @@
-Return-Path: <netdev+bounces-124068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAAEE967D5C
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 03:30:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E49B2967D80
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 03:49:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C9D61F20FA0
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 01:30:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97B1C281798
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 01:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD5A1BF37;
-	Mon,  2 Sep 2024 01:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C48218C3E;
+	Mon,  2 Sep 2024 01:49:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YUrQtuPW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mCeQxjAG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7725B208A7
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 01:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725240613; cv=none; b=V48cm/DygY3t2uwPzOvwAueoG9ReylJjaYhxLWT9Ra/A2VLlnMWcTcMJoN9cF56gHv5nSH6VmyTzqUH2t9mIPm1zrI/a9vOT/TlIt2eTMU4Tvgi6OPeGqGwUsutS1q08qQHtlOwbsf4T/ykZI/JFEeUkrcpuoB1d97eGf28VDOI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725240613; c=relaxed/simple;
-	bh=xikYwE3z0Vq5bQPvBc9/NQzAlAcu7aPn6YNlN+X/S8Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rsHhZK8bxoCiGnNDcjYjAtntsaXPKQkUSbI2/oZP99qmISxBc0AcitAMmlaxfRHVtAJi8yThfz4lesrRYLuScrguBFPAF4i99jNPJBGPrbrEbcrBaCpDSUnC/sIuiGINeB47ALHzz3ltXyrZUFfTqVMklFH76OD1mO3tlpLbT/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YUrQtuPW; arc=none smtp.client-ip=209.85.166.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-82a24deca03so115571539f.0
-        for <netdev@vger.kernel.org>; Sun, 01 Sep 2024 18:30:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725240610; x=1725845410; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q/kegE+5eg2HMOA2M2ori/64bxLSgv0kk7kk8I5nHow=;
-        b=YUrQtuPWxNhyi2DZK5gLAW+NVMAXidW69VE3pUao6yTQpuHf6r0V+GPELT2D9OJjog
-         8QKtuANuQI/jUFd14LnuRDjE4vI8P9V6PXuKlRiryxHi8I6KElCt8+x6nVGeeQaUZQ7F
-         uQK3QejyoFPImeXObFTyA0q1cjMSY80yljUHPmhJPfm3j2/ZAxHrBTYg++lhGdO3vkiO
-         3RkiuFx2k987Opv2zlz9fXGkmwPQt7SSkiKYOdmxB8QKSe860TCGIfiWJYb2YHvZrK/G
-         gGh6afYE6uiFCq5UxOHcP0Esux7eoC8PnQZX2iYvrwV38xLGYDdr1qDBBCqUUc/UPHyh
-         gKRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725240610; x=1725845410;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q/kegE+5eg2HMOA2M2ori/64bxLSgv0kk7kk8I5nHow=;
-        b=ue6B5cSfet3lV82dYJvclbBzwWuTlGzIliLZsmfTKWv0LbOtouJfzxe62Jo7M35O7b
-         LC78+Gexw79HDIlaTnFs69IB3m2M+pNVzOi7KmmB1FB5SgXRxjFfJ+NNsUyt5N/N1xg9
-         0XHwXIOZNxbeg7UzuKXKIuI0uBAPgxcLLd1pSF1blTLLUqr1PGjSIDL8i937WFSA2S20
-         ZJyb/IuBuRb2CNJpX2466I/TPpCVdazhv2LNH4TZCAJt5EZRobCR5Lm7X5Su+2816M84
-         sQXjrR0GdxYsVhwgX69TGoSyO2rXy3zgF0aMKX3O95zp3yA3dgl/aI5MV4fsSSnt2urg
-         3DvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWoRyar1IPZjR1CpiUgCiFUIeS23L8yeNH+48Zxu2apVjtXKYzZBq3H72V+kGH3+ckO6UgKVJs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAiVBFeKTUJjj9WgUrLy7sfo3AtUGxjHfhvUrcNgFIBl5Vwe3W
-	G44UQx4HPdcBv9rlgCDBRnfVn8zwQLR1YI/zySRQlOGTevHzXQ8uFvtSYlQ9uBE0w04FQWPTZou
-	MynL1oyaVtMPP/VXsujwE6VgXhLU=
-X-Google-Smtp-Source: AGHT+IFbKv4QkTatTHFgMlttEPexBu7C585E5YR1bNEZUE9PTCycgzuy15tUFbV9tJofUQClLl9oQfOwiCcrRBdk4GU=
-X-Received: by 2002:a05:6e02:148a:b0:39d:1dda:fe9 with SMTP id
- e9e14a558f8ab-39f4f681eb1mr56846835ab.5.1725240610363; Sun, 01 Sep 2024
- 18:30:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8BD14F6C
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 01:49:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725241783; cv=fail; b=nVfEbW6r9Umyh6BIvgHzQHpAh2PEJcNSTOqdsG1jA1KkDdSqzxpoA2bsufNbMxdZKaoSNBXX/bBu3QvcJW2MHWXaGN4hUWhRF/FwexSIPS23YXGPIb8tuYd4DOeFgECg4M0/puRSMdQwySnhQh9shEDfgU+tsA1xlfS6SMwKCes=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725241783; c=relaxed/simple;
+	bh=hoD9Ki50eVGN+tdCqIIcoe82etdoXs5DDKVXecYlqgg=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=atg/A+/I05ur8w0dgulSoB4zKpV6QXiE2QeKhK14ryyd2LEogUOksTeRm72BONSGre5My7FRwGIOss6c09BjCX9blhvRTpmFV7Po4wZGSlWGMLCqNSjcsPiD4ZKkmnNtBwGeNT+a+9sSxHezWKVvK/N6eG4X60xJM3P++m+wRgs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mCeQxjAG; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725241781; x=1756777781;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   mime-version;
+  bh=hoD9Ki50eVGN+tdCqIIcoe82etdoXs5DDKVXecYlqgg=;
+  b=mCeQxjAGGDZ0XH3iibJSE0GDiT+co6wxzp3d23ntD4JGR0PB5jODleVZ
+   0kDNS5qoyTHyz8wKGQQtT8/jVeWPy4zJbYaLB59ctex4QiApBUrLuI09W
+   jGxSNO4p+rO84X7+XelhPTHJLt636pKhAtmi8pYsh6BhYzWxDiKDkLPFF
+   QXOYN1lPmdtp4SNxhRNQ/q8TXb+Jr9BTtpo0tWr+08N41FJZp/51PW/1e
+   NtB0CC9cox7mzG3Hsb8ngBXsWzfmrwlglwOzjj2mvUVWRII1mYQCdsU4n
+   9dpif7RnYuPYvn4XankMwD7UZDdlFuSVoi6vcJTL4SM099yTLfs9NqDE3
+   w==;
+X-CSE-ConnectionGUID: 59WEZbiWSTmvgykoaOoKeA==
+X-CSE-MsgGUID: sPEoVgJ4RNilGgDGHP/SXw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11182"; a="49204248"
+X-IronPort-AV: E=Sophos;i="6.10,194,1719903600"; 
+   d="scan'208";a="49204248"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2024 18:49:40 -0700
+X-CSE-ConnectionGUID: VPWEfAV3Ram7SlbND5CbOQ==
+X-CSE-MsgGUID: 3giKN1IWQcOabWeALHy8TQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,194,1719903600"; 
+   d="scan'208";a="64273792"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Sep 2024 18:49:39 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sun, 1 Sep 2024 18:49:38 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Sun, 1 Sep 2024 18:49:38 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
+ edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sun, 1 Sep 2024 18:49:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BC4BOtYOKShAyo656Mj4D5VOPy4IuRys+V6E6cnMSGX3xlsEBq9RM44iUEbYVaY3Hv2hu4s+/Dk94LuN4Dt/O+p2Lxxn2eF1it22jvr6Uh+ipiX9NvFPQl0LR/J27YumRfFfH6Vq/c4lPOq8/usfhjT6F6uAuifIE4NscvgZxTK34AsgxmDLG6ckZ4+XDwChUYvLt3qpurY9BtZ02YuHQMgTjMr7oVh0yPgkoOJcRsaaU9KOi8y4uElWg6qs59rhnTC5cDIPc2+k0ye7usTpIoRKJ3niOPRAEsnw8WRknMn9dV1i2LZKAhWLd863EhNNsvIkGQtC+/R1903OF/X+Lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RidLhAV37EMompXUXLPK69JADWbw0cfL35qCmgsh624=;
+ b=Wt8t/UwmhDUItLxiyhX1yNNLsJijRJrMyLGO3cwlyao8bv3y12uSktUl1Cnk+x0edNR1lcEdUAjQs6xIkMswrDqPzveChW4OpaHrgLkIFg9kleKnfrn66pfBQXtXXOqqDeLvY7iiTIa7sENR7xs+Hu3JhxDqW+uEHtM1rYvNyod/MNZNyWXVXFAKdbmjI1bDbPcpnoeGQTFW3DwaCIuT9JOAL/26/UIotBY13ME2fF4pT1VD4ZBms52rzlLYZRvS2TRR8ddMaeY2y+Ed+bp88+HzgSyuDowNldU/QjxhHC8c0u/UqAF3GRwINmnvENXFlo8bijNfytvN5EiejEgQVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB5423.namprd11.prod.outlook.com (2603:10b6:5:39b::20)
+ by PH7PR11MB6651.namprd11.prod.outlook.com (2603:10b6:510:1a9::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.24; Mon, 2 Sep
+ 2024 01:49:34 +0000
+Received: from DM4PR11MB5423.namprd11.prod.outlook.com
+ ([fe80::dffa:e0c8:dbf1:c82e]) by DM4PR11MB5423.namprd11.prod.outlook.com
+ ([fe80::dffa:e0c8:dbf1:c82e%5]) with mapi id 15.20.7918.020; Mon, 2 Sep 2024
+ 01:49:34 +0000
+Date: Mon, 2 Sep 2024 09:49:24 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<dsahern@kernel.org>, <willemb@google.com>
+CC: <oe-kbuild-all@lists.linux.dev>, <netdev@vger.kernel.org>, Jason Xing
+	<kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v3 2/2] rxtimestamp.c: add the test for
+ SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER
+Message-ID: <ZtUZpPISIpChbcRq@rli9-mobl>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240830153751.86895-3-kerneljasonxing@gmail.com>
+X-ClientProxiedBy: SG2PR04CA0153.apcprd04.prod.outlook.com (2603:1096:4::15)
+ To DM4PR11MB5423.namprd11.prod.outlook.com (2603:10b6:5:39b::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240829204922.1674865-1-vadfed@meta.com> <20240829204922.1674865-2-vadfed@meta.com>
-In-Reply-To: <20240829204922.1674865-2-vadfed@meta.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 2 Sep 2024 09:29:34 +0800
-Message-ID: <CAL+tcoCeQ5R9Pp=__hi6xuQzACj9v1+TQarMky8c2nzcBN0+Xg@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] selftests: txtimestamp: add SCM_TS_OPT_ID test
-To: Vadim Fedorenko <vadfed@meta.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Willem de Bruijn <willemb@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5423:EE_|PH7PR11MB6651:EE_
+X-MS-Office365-Filtering-Correlation-Id: a7994caa-8c78-4fae-33cd-08dccaf17e96
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?DX+7lu523elIxqB+rJ5IaDx6vxrhWc8LoTKoT6lSaY2yusgZWLSRKNlk8QbY?=
+ =?us-ascii?Q?0911RmbBxTO3SU8Srt4gf4RrgWfF5ot+2TtqkIK8dz5jt9GMsXMSy1ostXlO?=
+ =?us-ascii?Q?TJpgDcuXSWJAV7+iZbZkJrDgao46oHQU4ftvJ4V8pwRFHp4GKsFcietcje0G?=
+ =?us-ascii?Q?/dURTTWlXTqZ7mE4oltGb/AWHn+tlI146R3sVQ2IeKGwrV8brFsE0UUWBkzJ?=
+ =?us-ascii?Q?XV6qZ5yb60qCReHyu065NZ1/I3s3A4CIt9y6DaHGCMY1yF8F5bFVMfaQJT7Q?=
+ =?us-ascii?Q?5HWSQPqYqrQXsXfDc4FZIWbPX198EvzQfM70sdn8ch9MO1O3/ghjvAVKdV8L?=
+ =?us-ascii?Q?3LRLPvcL4O0Xa9AZ4yc3NPF2RzMY1XAW/njWYsvmVJpLotrueeIrvpqjMKr2?=
+ =?us-ascii?Q?tvqq1xBpOYFM18QBpslPsHoFoXAILMXLg6I9ll14hzuuI+CgMFgSzi6KAl+y?=
+ =?us-ascii?Q?UCQLR5frCC+8hieeaDRkQreEztWcvKbA96sYwR8CHwzNNMVBLMxBuP4E6som?=
+ =?us-ascii?Q?wvmUE6Xl3k61wMBaXxWueAsiCcPlGszkH37P3Xt6IER/8N6RXZ7dR/DjLPWG?=
+ =?us-ascii?Q?CMgWyBVIndiEvG8d0KPsDQu4fx2GLfzIomFEu4rEglHlbSesz2nyJuJwkvMr?=
+ =?us-ascii?Q?NgzvncDgldudSohS5U3U+rBuez4TUEukXtsjUpw8zjmp5LsaD31YXqe3zzBA?=
+ =?us-ascii?Q?rCiPCpPqXOwxYwbdwT+m78+qiSecs8XtD9jRIaBxF57VQ1M1gXzRpUrTLaXF?=
+ =?us-ascii?Q?2eEdCO1aquO9bitQZ++l6LduKgu+9qiRGWuOBwyHWsonGm/mMPC6JZ+xVCSY?=
+ =?us-ascii?Q?1XsdqSBqKDnrJg5dn4txh7Ng8B5rYZoV6Ab9LMUpzPKGs0C1fUrn3ZPqz/f5?=
+ =?us-ascii?Q?T9WMubYxRnp3CzhbLMlOTDSCQrC6U8Mm4NqTMisJOAzNwLqEMA7fafxLOY2W?=
+ =?us-ascii?Q?MtxLtZ3D1pqJPX2Omq4dzHm3gTe3k2VagNwJt3kF9LhfvMrFI2VCKuS9PiH+?=
+ =?us-ascii?Q?fnHTGHimwUpA2k9XJiesuoYCA7HuUe8owZJC8/WJ/73uStJdPKg9CPHujdVY?=
+ =?us-ascii?Q?JJeztQniZ107NmS2VJ7sTbTnOLqXyOfwyJ65IHKIF62GNiwx9ZMUykRPXCCc?=
+ =?us-ascii?Q?ohkbbWG+hcO2Omy4L9zn6ww19e8CfV1gl+tgbVlVOMH2FZEAtrbhXaThYB03?=
+ =?us-ascii?Q?s7ykH4PTwOij5UYsNrYIgKPAuJuhEiGo03GJY2q6GApDTczNCKOMTKkb7/eX?=
+ =?us-ascii?Q?ewA2N+7IdiRwM8oSlufjcM32IRHPbVD+wYALvn/LTh8pFsW1ZAAK83L8mHwt?=
+ =?us-ascii?Q?u9ORu/3ew8dXtDsgQSBbJaPP?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5423.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MrqLHITK/JATywrM70Lk8DuargJb18GTiXAHU4QZOdUzZAA9dlCmfnS1Adca?=
+ =?us-ascii?Q?RwC3d78up+QvIWh7QddpijDBh8YG84QKky+JdYmIegJPNf4mFaJVXTLLaZEW?=
+ =?us-ascii?Q?aQbOyMD3rr0R1EzktcyrCk0wnhBu8APiHWH+mnZbfqvcuDsCseSPKyqIxuJg?=
+ =?us-ascii?Q?JqxpNh7YtdPYL2XWcgAKeM9iDGBXYP9f+f1HmNWAmNwBjGDQA5QQkU5mtpaK?=
+ =?us-ascii?Q?PGqNTG1t3ylb6hqASP2q8IzFAVIEtklqvWF3c5TlqH+Qz75h/SDEW0TSL4lV?=
+ =?us-ascii?Q?6kP4HWNKLguM2e30YQte2CZy4mqXvL7RodINj1d30RU9/j/BOpiwIcoacDUK?=
+ =?us-ascii?Q?+IgTn3MsDaL/CPRpdKiy+CMsFCwMuaX3Dblmg6SpyX7MZGLDCh13q7GBrrQY?=
+ =?us-ascii?Q?ILCHsghkpjsT9cGe1cu+BvLIila+UnL6H8YGOZXCPuW6TLlSMBogrXW0VUkW?=
+ =?us-ascii?Q?FEfzd8vyYbgx71IpBNVlYnvnK8AksYiZxWrD24vXBl1ttOqFnQbXa+O+MJ31?=
+ =?us-ascii?Q?iBvkyIlTF1p8wWLFwfziOX6Iu6GqRVX94IXuwA9qRXPZg8P9LUksvvgbx4O/?=
+ =?us-ascii?Q?g/oVL9e1lIzRWu49j05xWOjADyHBc/EwStj97clm6j7rRx+gqD4zj4cMF4N3?=
+ =?us-ascii?Q?XZ5YW4KnsNBElW5+BUnhOCVsY6wOmL+QYLJkNRthDa7n3dMP+9rGKlCrnAfm?=
+ =?us-ascii?Q?4MJkOdjCoWqdfP2Vrfh6YhNOSm8vdl7D+eSkAbUMn5p7BnxCSZhRb6ZQDa8i?=
+ =?us-ascii?Q?JXxMZKboh/wKiAVDfCRWASCc3H6y9bpUevINaRRyYMLET1wNsdx/zh5HWoNE?=
+ =?us-ascii?Q?bWI7r7el829GMjT+Eucepv1ScpmAYWttDW75vGDXOg18QArgepB5QB4d+uLP?=
+ =?us-ascii?Q?SV1+VKwQ0jKbjPSt3JH4B8T6//iTqfurzCENPPcnQ1ZtD5MI58SPEUPpDqMc?=
+ =?us-ascii?Q?xh08kQSdrnhRmxKyNqWECZJlYVEqetojVpjU1hNqTWpni1ZIH/wVRwOoyoV6?=
+ =?us-ascii?Q?L+kyugnICx1tUhxNmOoOge6ZdSmJPTlAexmi61wuMuDjOF8NuT9jnsmmsei6?=
+ =?us-ascii?Q?9rwvelIGUYaSERrxXeub3qey8/1xY6N8cWtcdxDUdQH/g95mWciSIlUTk1ZD?=
+ =?us-ascii?Q?JNcyjY1h198FJwtLjUD8eqKnVlpJWc0UR6H/UM2bTLmo3mfNjc/EsnlsNqpP?=
+ =?us-ascii?Q?SMFqezcLvBe3xNAWuqRisCMipH7uoPK7ssczgQPEIrbYfmidTHBj30mZvjzx?=
+ =?us-ascii?Q?FEhtwNa4CcFXMrIbIyVmmweKzte5pRPr3pqkCp9AtV3wC5GWKM+QYYpVHSRQ?=
+ =?us-ascii?Q?s1Q3wfc1YmgwL/e0jZxub93hmhZp9md2bM1NoMJ6fIq4IeQ/33Xd3aV5NC7/?=
+ =?us-ascii?Q?PZZZh/RPxpXQ1WZt6COY4FibjDxwTaQatmhe1+5h8een8mCE883ajJYoDRB5?=
+ =?us-ascii?Q?wax6hP2Jhw6KIOWrRX5jVl+hrXGHxdOFR1IhA96bsjkIcaR4XkOpftFdVbDu?=
+ =?us-ascii?Q?Ryg10Q0zoRZTY2yTJ4QLNYO2PM30ax9hv/wHdKOUY2kMSQK2zf/4qBhkwEVl?=
+ =?us-ascii?Q?1K3lOInmQnOWg1hMT34ZnKvL12ZYXQwa3FEgTTOr?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a7994caa-8c78-4fae-33cd-08dccaf17e96
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5423.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Sep 2024 01:49:34.5779
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: T2plCPujGdcZumnkiUWlWlPN+onRETFJEnN3UzjNV6XhUw2nhfZazlEIUi3xydTlHtL3SvlQC80qf0gJ5xzSGg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6651
+X-OriginatorOrg: intel.com
 
-Hello Vadim,
+Hi Jason,
 
-On Fri, Aug 30, 2024 at 4:55=E2=80=AFAM Vadim Fedorenko <vadfed@meta.com> w=
-rote:
->
-> Extend txtimestamp udp test to run with fixed tskey using
-> SCM_TS_OPT_ID control message.
->
-> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
-> ---
->  tools/include/uapi/asm-generic/socket.h    |  2 +
->  tools/testing/selftests/net/txtimestamp.c  | 48 +++++++++++++++++-----
->  tools/testing/selftests/net/txtimestamp.sh |  1 +
->  3 files changed, 41 insertions(+), 10 deletions(-)
->
-> diff --git a/tools/include/uapi/asm-generic/socket.h b/tools/include/uapi=
-/asm-generic/socket.h
-> index 54d9c8bf7c55..281df9139d2b 100644
-> --- a/tools/include/uapi/asm-generic/socket.h
-> +++ b/tools/include/uapi/asm-generic/socket.h
-> @@ -124,6 +124,8 @@
->  #define SO_PASSPIDFD           76
->  #define SO_PEERPIDFD           77
->
-> +#define SCM_TS_OPT_ID          78
-> +
->  #if !defined(__KERNEL__)
->
->  #if __BITS_PER_LONG =3D=3D 64 || (defined(__x86_64__) && defined(__ILP32=
-__))
-> diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/se=
-lftests/net/txtimestamp.c
-> index ec60a16c9307..3a8f716e72ae 100644
-> --- a/tools/testing/selftests/net/txtimestamp.c
-> +++ b/tools/testing/selftests/net/txtimestamp.c
-> @@ -54,6 +54,10 @@
->  #define USEC_PER_SEC   1000000L
->  #define NSEC_PER_SEC   1000000000LL
->
-> +#ifndef SCM_TS_OPT_ID
-> +# define SCM_TS_OPT_ID 78
-> +#endif
-> +
->  /* command line parameters */
->  static int cfg_proto =3D SOCK_STREAM;
->  static int cfg_ipproto =3D IPPROTO_TCP;
-> @@ -77,6 +81,8 @@ static bool cfg_epollet;
->  static bool cfg_do_listen;
->  static uint16_t dest_port =3D 9000;
->  static bool cfg_print_nsec;
-> +static uint32_t ts_opt_id;
-> +static bool cfg_use_cmsg_opt_id;
->
->  static struct sockaddr_in daddr;
->  static struct sockaddr_in6 daddr6;
-> @@ -136,12 +142,13 @@ static void validate_key(int tskey, int tstype)
->         /* compare key for each subsequent request
->          * must only test for one type, the first one requested
->          */
-> -       if (saved_tskey =3D=3D -1)
-> +       if (saved_tskey =3D=3D -1 || cfg_use_cmsg_opt_id)
->                 saved_tskey_type =3D tstype;
->         else if (saved_tskey_type !=3D tstype)
->                 return;
->
->         stepsize =3D cfg_proto =3D=3D SOCK_STREAM ? cfg_payload_len : 1;
-> +       stepsize =3D cfg_use_cmsg_opt_id ? 0 : stepsize;
->         if (tskey !=3D saved_tskey + stepsize) {
->                 fprintf(stderr, "ERROR: key %d, expected %d\n",
->                                 tskey, saved_tskey + stepsize);
-> @@ -480,7 +487,7 @@ static void fill_header_udp(void *p, bool is_ipv4)
->
->  static void do_test(int family, unsigned int report_opt)
->  {
-> -       char control[CMSG_SPACE(sizeof(uint32_t))];
-> +       char control[2 * CMSG_SPACE(sizeof(uint32_t))];
->         struct sockaddr_ll laddr;
->         unsigned int sock_opt;
->         struct cmsghdr *cmsg;
-> @@ -620,18 +627,32 @@ static void do_test(int family, unsigned int report=
-_opt)
->                 msg.msg_iov =3D &iov;
->                 msg.msg_iovlen =3D 1;
->
-> -               if (cfg_use_cmsg) {
-> +               if (cfg_use_cmsg || cfg_use_cmsg_opt_id) {
->                         memset(control, 0, sizeof(control));
->
->                         msg.msg_control =3D control;
-> -                       msg.msg_controllen =3D sizeof(control);
-> +                       msg.msg_controllen =3D cfg_use_cmsg * CMSG_SPACE(=
-sizeof(uint32_t));
-> +                       msg.msg_controllen +=3D cfg_use_cmsg_opt_id * CMS=
-G_SPACE(sizeof(uint32_t));
->
-> -                       cmsg =3D CMSG_FIRSTHDR(&msg);
-> -                       cmsg->cmsg_level =3D SOL_SOCKET;
-> -                       cmsg->cmsg_type =3D SO_TIMESTAMPING;
-> -                       cmsg->cmsg_len =3D CMSG_LEN(sizeof(uint32_t));
-> +                       cmsg =3D NULL;
+kernel test robot noticed the following build errors:
 
-nit: we don't need to initialize it with NULL since it will be init
-one way or another in the following code.
+[auto build test ERROR on net-next/main]
 
-> +                       if (cfg_use_cmsg) {
-> +                               cmsg =3D CMSG_FIRSTHDR(&msg);
-> +                               cmsg->cmsg_level =3D SOL_SOCKET;
-> +                               cmsg->cmsg_type =3D SO_TIMESTAMPING;
-> +                               cmsg->cmsg_len =3D CMSG_LEN(sizeof(uint32=
-_t));
-> +
-> +                               *((uint32_t *)CMSG_DATA(cmsg)) =3D report=
-_opt;
-> +                       }
-> +                       if (cfg_use_cmsg_opt_id) {
-> +                               cmsg =3D cmsg ? CMSG_NXTHDR(&msg, cmsg) :=
- CMSG_FIRSTHDR(&msg);
-> +                               cmsg->cmsg_level =3D SOL_SOCKET;
-> +                               cmsg->cmsg_type =3D SCM_TS_OPT_ID;
-> +                               cmsg->cmsg_len =3D CMSG_LEN(sizeof(uint32=
-_t));
-> +
-> +                               *((uint32_t *)CMSG_DATA(cmsg)) =3D ts_opt=
-_id;
-> +                               saved_tskey =3D ts_opt_id;
-> +                       }
->
-> -                       *((uint32_t *) CMSG_DATA(cmsg)) =3D report_opt;
->                 }
->
->                 val =3D sendmsg(fd, &msg, 0);
-> @@ -681,6 +702,7 @@ static void __attribute__((noreturn)) usage(const cha=
-r *filepath)
->                         "  -L    listen on hostname and port\n"
->                         "  -n:   set no-payload option\n"
->                         "  -N:   print timestamps and durations in nsec (=
-instead of usec)\n"
-> +                       "  -o N: use SCM_TS_OPT_ID control message to pro=
-vide N as tskey\n"
->                         "  -p N: connect to port N\n"
->                         "  -P:   use PF_PACKET\n"
->                         "  -r:   use raw\n"
-> @@ -701,7 +723,7 @@ static void parse_opt(int argc, char **argv)
->         int c;
->
->         while ((c =3D getopt(argc, argv,
-> -                               "46bc:CeEFhIl:LnNp:PrRS:t:uv:V:x")) !=3D =
--1) {
-> +                               "46bc:CeEFhIl:LnNo:p:PrRS:t:uv:V:x")) !=
-=3D -1) {
->                 switch (c) {
->                 case '4':
->                         do_ipv6 =3D 0;
-> @@ -742,6 +764,10 @@ static void parse_opt(int argc, char **argv)
->                 case 'N':
->                         cfg_print_nsec =3D true;
->                         break;
-> +               case 'o':
-> +                       ts_opt_id =3D strtoul(optarg, NULL, 10);
-> +                       cfg_use_cmsg_opt_id =3D true;
-> +                       break;
->                 case 'p':
->                         dest_port =3D strtoul(optarg, NULL, 10);
->                         break;
-> @@ -799,6 +825,8 @@ static void parse_opt(int argc, char **argv)
->                 error(1, 0, "cannot ask for pktinfo over pf_packet");
->         if (cfg_busy_poll && cfg_use_epoll)
->                 error(1, 0, "pass epoll or busy_poll, not both");
-> +       if (cfg_proto !=3D SOCK_DGRAM && cfg_use_cmsg_opt_id)
-> +               error(1, 0, "control message TS_OPT_ID can only be used w=
-ith udp socket");
->
->         if (optind !=3D argc - 1)
->                 error(1, 0, "missing required hostname argument");
-> diff --git a/tools/testing/selftests/net/txtimestamp.sh b/tools/testing/s=
-elftests/net/txtimestamp.sh
-> index 25baca4b148e..7894628a9355 100755
-> --- a/tools/testing/selftests/net/txtimestamp.sh
-> +++ b/tools/testing/selftests/net/txtimestamp.sh
-> @@ -39,6 +39,7 @@ run_test_tcpudpraw() {
->
->         run_test_v4v6 ${args}           # tcp
->         run_test_v4v6 ${args} -u        # udp
-> +       run_test_v4v6 ${args} -u -o 5   # udp with fixed tskey
+url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Xing/net-timestamp-filter-out-report-when-setting-SOF_TIMESTAMPING_SOFTWARE/20240830-234014
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240830153751.86895-3-kerneljasonxing%40gmail.com
+patch subject: [PATCH net-next v3 2/2] rxtimestamp.c: add the test for SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER
+:::::: branch date: 2 days ago
+:::::: commit date: 2 days ago
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240902/202409020124.YybQQDrP-lkp@intel.com/reproduce)
 
-Could we also add another test with "-C" based on the above command?
-It can test when both ID related flags are set, which will be helpful
-in the future :)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/r/202409020124.YybQQDrP-lkp@intel.com/
 
-Thanks,
-Jason
+All errors (new ones prefixed by >>):
 
->         run_test_v4v6 ${args} -r        # raw
->         run_test_v4v6 ${args} -R        # raw (IPPROTO_RAW)
->         run_test_v4v6 ${args} -P        # pf_packet
-> --
-> 2.43.5
->
->
+>> rxtimestamp.c:102:6: error: use of undeclared identifier 'SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER'
+     102 |                         | SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER },
+         |                           ^
+>> rxtimestamp.c:373:20: error: invalid application of 'sizeof' to an incomplete type 'struct test_case[]'
+     373 |                         for (t = 0; t < ARRAY_SIZE(test_cases); t++) {
+         |                                         ^~~~~~~~~~~~~~~~~~~~~~
+   ./../kselftest.h:61:32: note: expanded from macro 'ARRAY_SIZE'
+      61 | #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+         |                                ^~~~~
+   rxtimestamp.c:380:13: error: invalid application of 'sizeof' to an incomplete type 'struct test_case[]'
+     380 |                         if (t >= ARRAY_SIZE(test_cases))
+         |                                  ^~~~~~~~~~~~~~~~~~~~~~
+   ./../kselftest.h:61:32: note: expanded from macro 'ARRAY_SIZE'
+      61 | #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+         |                                ^~~~~
+   rxtimestamp.c:419:19: error: invalid application of 'sizeof' to an incomplete type 'struct test_case[]'
+     419 |                 for (t = 0; t < ARRAY_SIZE(test_cases); t++) {
+         |                                 ^~~~~~~~~~~~~~~~~~~~~~
+   ./../kselftest.h:61:32: note: expanded from macro 'ARRAY_SIZE'
+      61 | #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+         |                                ^~~~~
+   4 errors generated.
+
+
+vim +/SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER +102 tools/testing/selftests/net/rxtimestamp.c
+
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   67  
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   68  static struct test_case test_cases[] = {
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   69  	{ {}, {} },
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   70  	{
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   71  		{ .so_timestamp = 1 },
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   72  		{ .tstamp = true }
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   73  	},
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   74  	{
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   75  		{ .so_timestampns = 1 },
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   76  		{ .tstampns = true }
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   77  	},
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   78  	{
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   79  		{ .so_timestamp = 1, .so_timestampns = 1 },
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   80  		{ .tstampns = true }
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   81  	},
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   82  	{
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   83  		{ .so_timestamping = SOF_TIMESTAMPING_RX_SOFTWARE },
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   84  		{}
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   85  	},
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   86  	{
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   87  		/* Loopback device does not support hw timestamps. */
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   88  		{ .so_timestamping = SOF_TIMESTAMPING_RX_HARDWARE },
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   89  		{}
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   90  	},
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   91  	{
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   92  		{ .so_timestamping = SOF_TIMESTAMPING_SOFTWARE },
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   93  		.warn_on_fail = true
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   94  	},
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   95  	{
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04   96  		{ .so_timestamping = SOF_TIMESTAMPING_RX_SOFTWARE
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   97  			| SOF_TIMESTAMPING_RX_HARDWARE },
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   98  		{}
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22   99  	},
+93e82194e6a4ec9 tools/testing/selftests/net/rxtimestamp.c                     Jason Xing   2024-08-30  100  	{
+93e82194e6a4ec9 tools/testing/selftests/net/rxtimestamp.c                     Jason Xing   2024-08-30  101  		{ .so_timestamping = SOF_TIMESTAMPING_SOFTWARE
+93e82194e6a4ec9 tools/testing/selftests/net/rxtimestamp.c                     Jason Xing   2024-08-30 @102  			| SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER },
+93e82194e6a4ec9 tools/testing/selftests/net/rxtimestamp.c                     Jason Xing   2024-08-30  103  		{}
+93e82194e6a4ec9 tools/testing/selftests/net/rxtimestamp.c                     Jason Xing   2024-08-30  104  	},
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22  105  	{
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04  106  		{ .so_timestamping = SOF_TIMESTAMPING_SOFTWARE
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22  107  			| SOF_TIMESTAMPING_RX_SOFTWARE },
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04  108  		{ .swtstamp = true }
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22  109  	},
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22  110  	{
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04  111  		{ .so_timestamp = 1, .so_timestamping = SOF_TIMESTAMPING_SOFTWARE
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22  112  			| SOF_TIMESTAMPING_RX_SOFTWARE },
+f551e2fdaf81b7b tools/testing/selftests/net/rxtimestamp.c                     Tanner Love  2020-07-04  113  		{ .tstamp = true, .swtstamp = true }
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22  114  	},
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22  115  };
+16e781224198be0 tools/testing/selftests/networking/timestamping/rxtimestamp.c Mike Maloney 2017-08-22  116  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
 
