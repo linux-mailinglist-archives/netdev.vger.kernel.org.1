@@ -1,167 +1,378 @@
-Return-Path: <netdev+bounces-124272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67E5E968C57
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 18:46:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E249968C63
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 18:50:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A2811C21081
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 16:46:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E7531C20A28
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 16:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2831A305E;
-	Mon,  2 Sep 2024 16:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB461AB6C4;
+	Mon,  2 Sep 2024 16:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2CFJsCO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="buBZGwLB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310A719F13A;
-	Mon,  2 Sep 2024 16:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C153BB50;
+	Mon,  2 Sep 2024 16:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725295574; cv=none; b=ndspDVQ21+SYVGHOJa4K0nSD5Mu1SoJ1jp1pwuhcqN09hOQbdAqin9GMO3Ty/3/xF2ZDtIIObAjDzT2DBUnBzYLLCmtTrr+aU4LrL/cba4t4x/+i1D/B/Zt3Ji/Ci3sDokA3LtHGe4LVWYYTiCX3qH0A2yrYAmOaKSAR3IrYdbc=
+	t=1725295819; cv=none; b=foegaT7R453KgdD4UkjdEE03aJYAMynyqeyIC+u7REHjZ9CBRropZ+f0QOS5FNSmMcTpw7cffhVzqsYhhHB5Tn77pWaRND1LNWUDAMReBKAHJ4sVXNHsE89pm9MSyWe9aaqgwvjCp1vj3kh3FjlWbRsD7NAgZqaR0r6nNRgwPO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725295574; c=relaxed/simple;
-	bh=ZOrR0OdXFU035Sm7viikKM70jBcWIZYBHLfYOgH5DvM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bZO7393mxOV9nmhXEOsmSnHatclPgjIHDqPQQBMLqwfC3a+Ps4/KuVGjrxiFV920gMDJzDbHLCYPkFPaMLn26sCLOvEo9BQo0Euzy8g7AU5wprvFHavH+d0/ySxptcbmml8Gn3ZG6WwrZ8yd7hpSA2jMfF4bGYCwRXb5cYqDVzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2CFJsCO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 269E3C4CECB;
-	Mon,  2 Sep 2024 16:46:13 +0000 (UTC)
+	s=arc-20240116; t=1725295819; c=relaxed/simple;
+	bh=IaK+IdNeYH4BtKZYdqUZaylNjavpjXvtbpzDCLijfH0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pdpT3iofgMsJ0OcRKgiLqGJdpknuDs8LQ/4daA3c51tsNLf3Wd+ODSane8BONTcseQltxf2RV63csXWdwJOJIvhPtFO8T51xbXyuDZ98Yf95ivL6nrGOY6JS2r7SD4X+XLGNz1GSUu1893yrP+u7+ACnNhFOq00OqNre0wWRFgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=buBZGwLB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F750C4CEC2;
+	Mon,  2 Sep 2024 16:50:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725295573;
-	bh=ZOrR0OdXFU035Sm7viikKM70jBcWIZYBHLfYOgH5DvM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z2CFJsCOvWXzFn7cVEUOwB1jXDH+w5wDQabGS6VrcECPtQmJFt473PLjA5Q5zS9uL
-	 LMsGT5pQTVNzeUI3zil0FGOw11r5IR/0Jvk50tnRILiNsIDOYPe9nku9VIe7fc/j7O
-	 5v45olV7UbDdGrkH2c7UEE0ToHjPQRn0D66mWEbzHHnLhEH6TT4tqvQmodBctdVUlQ
-	 uqd4UzoIyA0lFp0DgExhpx5FhcKjjSOhmPoiAu+vem+Fc4CGMVgbBOc9IanlCm+eFe
-	 oGlxL/r3FP6/J1PZua5k916IJ2SfrLk3fHxOx+XOunMw8wrrag4ZP/3ETskv1dlIjd
-	 AYlaE2Ch7n2ww==
-Date: Mon, 2 Sep 2024 09:46:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, ncardwell@google.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, fw@strlen.de, Willem de
- Bruijn <willemb@google.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
- martineau@kernel.org
-Subject: Re: [PATCH net-next RFC] selftests/net: integrate packetdrill with
- ksft
-Message-ID: <20240902094612.6d40a914@kernel.org>
-In-Reply-To: <66d4d97a4cac_3df182941a@willemb.c.googlers.com.notmuch>
-References: <20240827193417.2792223-1-willemdebruijn.kernel@gmail.com>
-	<401f173b-3465-428d-9b90-b87a76a39cc8@redhat.com>
-	<66cf2e4bd8e89_33815c294b2@willemb.c.googlers.com.notmuch>
-	<20240828090120.71be0b20@kernel.org>
-	<66cf7b8d1c480_36509229439@willemb.c.googlers.com.notmuch>
-	<20240828140035.4554142f@kernel.org>
-	<66d1e32558532_3c08a22949e@willemb.c.googlers.com.notmuch>
-	<20240830103343.0dd20018@kernel.org>
-	<66d213cf6652e_3c8f2d294b8@willemb.c.googlers.com.notmuch>
-	<20240830144420.5974dc5b@kernel.org>
-	<66d23f2349f7_3d8dba29489@willemb.c.googlers.com.notmuch>
-	<66d4d97a4cac_3df182941a@willemb.c.googlers.com.notmuch>
+	s=k20201202; t=1725295819;
+	bh=IaK+IdNeYH4BtKZYdqUZaylNjavpjXvtbpzDCLijfH0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=buBZGwLBad1ESYcxR31eVXgQrLwOSqumkYy0e/JomQ6EiBynvRcGaOFMm1qOaVeHB
+	 /yJnGywXft+4GlZEOQ6uKIjtHu4879NCRFPcgvy4GZJ8tNgO6SOptn6cXSuP0tjeS+
+	 KeP0CYLeyi2/aNBJBnxWKNbMcHsCSNbrnXvXVhjhp/Ik73PhhCqBi6HcKFWwZNqfot
+	 +STyq/ZlojpsOEIz2cbY+YoBzeZ1wsxvvqcbobg9ST3+lrR3O8eHyqMGMeo5Bo5jeu
+	 akiPGn13w3HBrKNuHuxKQSMjJdDmbwlms17MWRLwK9ErdysP6S7GO55zXwmLfGx4ba
+	 MsRHQpojsuX3A==
+Message-ID: <2f5146ff-507d-4cab-a195-b28c0c9e654e@kernel.org>
+Date: Mon, 2 Sep 2024 10:50:17 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 3/3] ipv4: Centralize TOS matching
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, dsahern@kernel.org, gnault@redhat.com,
+ pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de
+References: <20240814125224.972815-1-idosch@nvidia.com>
+ <20240814125224.972815-4-idosch@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240814125224.972815-4-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, 01 Sep 2024 17:15:38 -0400 Willem de Bruijn wrote:
-> Changing kselftests to preserve directories turns out to be trivial.
-> Patch inline below.
-> 
-> But, existing TARGETS of course then start failing. Because they
-> depend on existing rsync without -R. In (at least) two ways:
-> 
-> amd-pstate fails because its TEST_FILES has includes from other
-> directories and it expects those files to land in the directory
-> with tests.
-> 
-> x86 prefixes all its output with $(OUTPUT) to form absolute paths,
-> which also creates absolute paths in kselftest-list.txt.
-> 
-> These two are examples, not necessarily the one instances of those
-> patterns. So switching to preserving directories for existing targets
-> like TEST_FILES seems intractable.
+On 8/14/24 6:52 AM, Ido Schimmel wrote:
+> diff --git a/include/uapi/linux/in_route.h b/include/uapi/linux/in_route.h
+> index 0cc2c23b47f8..10bdd7e7107f 100644
+> --- a/include/uapi/linux/in_route.h
+> +++ b/include/uapi/linux/in_route.h
+> @@ -2,6 +2,8 @@
+>  #ifndef _LINUX_IN_ROUTE_H
+>  #define _LINUX_IN_ROUTE_H
+>  
+> +#include <linux/ip.h>
+> +
+>  /* IPv4 routing cache flags */
+>  
+>  #define RTCF_DEAD	RTNH_F_DEAD
 
-I wonder how many of the targets actually need this behavior (it's
-intentionally useful to them) vs they grew to depend on it accidentally.
+This breaks compile of iproute2 (on Ubuntu 22.04 at least):
 
-> Plan B is to add a new TEST_PROGS_RECURSE, analogous to how
-> TEST_INCLUDES extended TEST_FILES with optional path preservation.
-> That is not much more complex.
-
-Alternative would be to allow opt-in (diff at the end), I'm personally
-biased against yet another TEST_* group because it's hard enough already
-to make sense of the existing ones. Maybe it's better for the test to
-"declare":
-
-PRESERVE_TEST_DIRS
-
-
----
- tools/testing/selftests/lib.mk | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
-index d6edcfcb5be8..7be9bd583642 100644
---- a/tools/testing/selftests/lib.mk
-+++ b/tools/testing/selftests/lib.mk
-@@ -51,6 +51,12 @@ else
- CC := $(CROSS_COMPILE)gcc
- endif # LLVM
- 
-+ifeq ($(PRESERVE_TEST_DIRS),)
-+RSYNC_INSTALL_FLAGS=-a --copy-unsafe-links
-+else
-+RSYNC_INSTALL_FLAGS=-aR --copy-unsafe-links
-+endif
-+
- ifeq (0,$(MAKELEVEL))
-     ifeq ($(OUTPUT),)
- 	OUTPUT := $(shell pwd)
-@@ -150,12 +156,12 @@ endif
- 
- define INSTALL_SINGLE_RULE
- 	$(if $(INSTALL_LIST),@mkdir -p $(INSTALL_PATH))
--	$(if $(INSTALL_LIST),rsync -a --copy-unsafe-links $(INSTALL_LIST) $(INSTALL_PATH)/)
-+	$(if $(INSTALL_LIST),rsync $(RSYNC_INSTALL_FLAGS) $(INSTALL_LIST) $(INSTALL_PATH)/)
- endef
- 
- define INSTALL_MODS_RULE
- 	$(if $(INSTALL_LIST),@mkdir -p $(INSTALL_PATH)/$(INSTALL_LIST))
--	$(if $(INSTALL_LIST),rsync -a --copy-unsafe-links $(INSTALL_LIST)/*.ko $(INSTALL_PATH)/$(INSTALL_LIST))
-+	$(if $(INSTALL_LIST),rsync $(RSYNC_INSTALL_FLAGS) $(INSTALL_LIST)/*.ko $(INSTALL_PATH)/$(INSTALL_LIST))
- endef
- 
- define INSTALL_RULE
-@@ -179,10 +185,17 @@ else
- endif
- 
- emit_tests:
-+ifeq ($(PRESERVE_TEST_DIRS),)
- 	for TEST in $(TEST_GEN_PROGS) $(TEST_CUSTOM_PROGS) $(TEST_PROGS); do \
- 		BASENAME_TEST=`basename $$TEST`;	\
- 		echo "$(COLLECTION):$$BASENAME_TEST";	\
- 	done
-+else
-+	for TEST in $(TEST_GEN_PROGS) $(TEST_CUSTOM_PROGS) $(TEST_PROGS); do \
-+		BASENAME_TEST=$$TEST;	\
-+		echo "$(COLLECTION):$$TEST";	\
-+	done
-+endif
- 
- # define if isn't already. It is undefined in make O= case.
- ifeq ($(RM),)
--- 
-2.46.0
-
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:25: warning: "IPTOS_TOS" redefined
+   25 | #define IPTOS_TOS(tos)          ((tos)&IPTOS_TOS_MASK)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:212: note: this is the location of the
+previous definition
+  212 | #define IPTOS_TOS(tos)          ((tos) & IPTOS_TOS_MASK)
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:29: warning: "IPTOS_MINCOST" redefined
+   29 | #define IPTOS_MINCOST           0x02
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:217: note: this is the location of the
+previous definition
+  217 | #define IPTOS_MINCOST           IPTOS_LOWCOST
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:31: warning: "IPTOS_PREC_MASK" redefined
+   31 | #define IPTOS_PREC_MASK         0xE0
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:222: note: this is the location of the
+previous definition
+  222 | #define IPTOS_PREC_MASK                 IPTOS_CLASS_MASK
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:32: warning: "IPTOS_PREC" redefined
+   32 | #define IPTOS_PREC(tos)         ((tos)&IPTOS_PREC_MASK)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:223: note: this is the location of the
+previous definition
+  223 | #define IPTOS_PREC(tos)                 IPTOS_CLASS(tos)
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:33: warning: "IPTOS_PREC_NETCONTROL" redefined
+   33 | #define IPTOS_PREC_NETCONTROL           0xe0
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:224: note: this is the location of the
+previous definition
+  224 | #define IPTOS_PREC_NETCONTROL           IPTOS_CLASS_CS7
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:34: warning: "IPTOS_PREC_INTERNETCONTROL"
+redefined
+   34 | #define IPTOS_PREC_INTERNETCONTROL      0xc0
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:225: note: this is the location of the
+previous definition
+  225 | #define IPTOS_PREC_INTERNETCONTROL      IPTOS_CLASS_CS6
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:35: warning: "IPTOS_PREC_CRITIC_ECP" redefined
+   35 | #define IPTOS_PREC_CRITIC_ECP           0xa0
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:226: note: this is the location of the
+previous definition
+  226 | #define IPTOS_PREC_CRITIC_ECP           IPTOS_CLASS_CS5
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:36: warning: "IPTOS_PREC_FLASHOVERRIDE" redefined
+   36 | #define IPTOS_PREC_FLASHOVERRIDE        0x80
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:227: note: this is the location of the
+previous definition
+  227 | #define IPTOS_PREC_FLASHOVERRIDE        IPTOS_CLASS_CS4
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:37: warning: "IPTOS_PREC_FLASH" redefined
+   37 | #define IPTOS_PREC_FLASH                0x60
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:228: note: this is the location of the
+previous definition
+  228 | #define IPTOS_PREC_FLASH                IPTOS_CLASS_CS3
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:38: warning: "IPTOS_PREC_IMMEDIATE" redefined
+   38 | #define IPTOS_PREC_IMMEDIATE            0x40
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:229: note: this is the location of the
+previous definition
+  229 | #define IPTOS_PREC_IMMEDIATE            IPTOS_CLASS_CS2
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:39: warning: "IPTOS_PREC_PRIORITY" redefined
+   39 | #define IPTOS_PREC_PRIORITY             0x20
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:230: note: this is the location of the
+previous definition
+  230 | #define IPTOS_PREC_PRIORITY             IPTOS_CLASS_CS1
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:40: warning: "IPTOS_PREC_ROUTINE" redefined
+   40 | #define IPTOS_PREC_ROUTINE              0x00
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:231: note: this is the location of the
+previous definition
+  231 | #define IPTOS_PREC_ROUTINE              IPTOS_CLASS_CS0
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:48: warning: "IPOPT_COPIED" redefined
+   48 | #define IPOPT_COPIED(o)         ((o)&IPOPT_COPY)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:240: note: this is the location of the
+previous definition
+  240 | #define IPOPT_COPIED(o)         ((o) & IPOPT_COPY)
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:49: warning: "IPOPT_CLASS" redefined
+   49 | #define IPOPT_CLASS(o)          ((o)&IPOPT_CLASS_MASK)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:241: note: this is the location of the
+previous definition
+  241 | #define IPOPT_CLASS(o)          ((o) & IPOPT_CLASS_MASK)
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:50: warning: "IPOPT_NUMBER" redefined
+   50 | #define IPOPT_NUMBER(o)         ((o)&IPOPT_NUMBER_MASK)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:242: note: this is the location of the
+previous definition
+  242 | #define IPOPT_NUMBER(o)         ((o) & IPOPT_NUMBER_MASK)
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:54: warning: "IPOPT_MEASUREMENT" redefined
+   54 | #define IPOPT_MEASUREMENT       0x40
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:247: note: this is the location of the
+previous definition
+  247 | #define IPOPT_MEASUREMENT       IPOPT_DEBMEAS
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:57: warning: "IPOPT_END" redefined
+   57 | #define IPOPT_END       (0 |IPOPT_CONTROL)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:251: note: this is the location of the
+previous definition
+  251 | #define IPOPT_END               IPOPT_EOL
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:58: warning: "IPOPT_NOOP" redefined
+   58 | #define IPOPT_NOOP      (1 |IPOPT_CONTROL)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:253: note: this is the location of the
+previous definition
+  253 | #define IPOPT_NOOP              IPOPT_NOP
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:59: warning: "IPOPT_SEC" redefined
+   59 | #define IPOPT_SEC       (2 |IPOPT_CONTROL|IPOPT_COPY)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:259: note: this is the location of the
+previous definition
+  259 | #define IPOPT_SEC               IPOPT_SECURITY
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:60: warning: "IPOPT_LSRR" redefined
+   60 | #define IPOPT_LSRR      (3 |IPOPT_CONTROL|IPOPT_COPY)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:260: note: this is the location of the
+previous definition
+  260 | #define IPOPT_LSRR              131             /* loose source
+route */
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:61: warning: "IPOPT_TIMESTAMP" redefined
+   61 | #define IPOPT_TIMESTAMP (4 |IPOPT_MEASUREMENT)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:257: note: this is the location of the
+previous definition
+  257 | #define IPOPT_TIMESTAMP         IPOPT_TS
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:63: warning: "IPOPT_RR" redefined
+   63 | #define IPOPT_RR        (7 |IPOPT_CONTROL)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:255: note: this is the location of the
+previous definition
+  255 | #define IPOPT_RR                7               /* record packet
+route */
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:64: warning: "IPOPT_SID" redefined
+   64 | #define IPOPT_SID       (8 |IPOPT_CONTROL|IPOPT_COPY)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:262: note: this is the location of the
+previous definition
+  262 | #define IPOPT_SID               IPOPT_SATID
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:65: warning: "IPOPT_SSRR" redefined
+   65 | #define IPOPT_SSRR      (9 |IPOPT_CONTROL|IPOPT_COPY)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:263: note: this is the location of the
+previous definition
+  263 | #define IPOPT_SSRR              137             /* strict source
+route */
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:66: warning: "IPOPT_RA" redefined
+   66 | #define IPOPT_RA        (20|IPOPT_CONTROL|IPOPT_COPY)
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:264: note: this is the location of the
+previous definition
+  264 | #define IPOPT_RA                148             /* router alert */
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:77: warning: "IPOPT_NOP" redefined
+   77 | #define IPOPT_NOP IPOPT_NOOP
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:252: note: this is the location of the
+previous definition
+  252 | #define IPOPT_NOP               1               /* no operation */
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:78: warning: "IPOPT_EOL" redefined
+   78 | #define IPOPT_EOL IPOPT_END
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:250: note: this is the location of the
+previous definition
+  250 | #define IPOPT_EOL               0               /* end of option
+list */
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:79: warning: "IPOPT_TS" redefined
+   79 | #define IPOPT_TS  IPOPT_TIMESTAMP
+      |
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:256: note: this is the location of the
+previous definition
+  256 | #define IPOPT_TS                68              /* timestamp */
+      |
+In file included from ../include/uapi/linux/in_route.h:5,
+                 from iproute.c:19:
+../include/uapi/linux/ip.h:87:8: error: redefinition of ‘struct iphdr’
+   87 | struct iphdr {
+      |        ^~~~~
+In file included from iproute.c:17:
+/usr/include/netinet/ip.h:44:8: note: originally defined here
+   44 | struct iphdr
+      |        ^~~~~
 
