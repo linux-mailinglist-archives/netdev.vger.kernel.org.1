@@ -1,106 +1,114 @@
-Return-Path: <netdev+bounces-124110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D29C968139
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:02:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE806968158
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8618EB20518
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 08:02:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 784081F21E2A
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 08:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE4017C22E;
-	Mon,  2 Sep 2024 08:02:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556CC17DFFA;
+	Mon,  2 Sep 2024 08:04:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ealrXrQP";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ARJT3Xlr"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KpRh+uVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33E4155739;
-	Mon,  2 Sep 2024 08:02:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86A6015573F
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 08:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725264157; cv=none; b=M0UlGiKUF5XMnvx0lLpw8jxP3amQelgqfnHgBlEzWKsGATiasm7FVOhj9rxrSqBb5nME6Ud0BXvybHwWfwf4yibFsSGZ8ReqCT8Ip7FzrlsbnEGF9+ns+dYQSGXcjX7biP3CU38SlwjGPIZDZl/zzPSTuLRqnxVJ7tsoJU4FGLc=
+	t=1725264289; cv=none; b=hPm1daiNj+qmABzG5ptdalfCAKCRhoXrVOtsyPjRGFE7RKEdXJJQZcwi6uMnGrBmrdRBnACmnWoQz2mjzZeGwj2hygrPpuz4KzYMoLu2Qrgs72lAaiMk3jwNf9A4L73KudJBGsQ7IRsCs+y8lK1Xk0MXl8XnZ4L7om50Av7AXX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725264157; c=relaxed/simple;
-	bh=C9b/4f8IouEI8tV3Ua4AGgB2h5GR5GZG1FJD8tyI7Zc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tkRYzxMiOl2/Yjwzaq2PimIM0rNv1z8btuE732KbjHHLK3aizGI70ZCPLQg+VxhCX6v4wcX1qm1JZK6NgOulaOV5j7e3WE5fH5XHuMhDeoIDzrGMMbA5VM+sOQA1lByz9buifJrfMJftTuzhkBkfSKrprIdxNS6KRtdT19crj5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ealrXrQP; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ARJT3Xlr; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Mon, 2 Sep 2024 10:02:32 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1725264153;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QWvZIOhLORWof3jiLa850xZV6SIDdy3yFYNAHu46Bhg=;
-	b=ealrXrQPiqd6PqR1a0taRQvV4xrN6y48md2kYA8fO40zz93SUbAmJJ/LEydmZ8nG/pmLNm
-	A69Bo+e+MWdyxabGqcwrZNp0Co3qbwe8Cqj1DImPgVkaHKg7RsSaJrW14KHeCD4eiBjEXH
-	ojaOwKikqHmAdkKPPYWA23TW9pR7e7e6YEB3/c6dqUmY7dUwOUPujig8Qbqte+97dpaGCZ
-	CPTTyH9E1HO+QIZnx9mSc2UmBwZuRAFfOwh5lhOhfqCMJ0TpohwYn5Kr/SZvxkf1AFyhbx
-	xniMkZ0NYIlz6DFZQnGorfywAo8TBx8LByMqsnvXoqXFw3MY3r26T1KnkOfFQA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1725264153;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QWvZIOhLORWof3jiLa850xZV6SIDdy3yFYNAHu46Bhg=;
-	b=ARJT3XlrKeAcaPioHwanooS814wM55eAUlrq7HicEyZ9VjcvfdBZGOOyFDlW+tqZjW8hwM
-	N0a6/EoHBq4X4rBw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: syzbot <syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com>
-Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
-	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
-	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
-	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev,
-	michal.switala@infogain.com, netdev@vger.kernel.org,
-	revest@google.com, sdf@fomichev.me, sdf@google.com, song@kernel.org,
-	syzkaller-bugs@googlegroups.com, toke@redhat.com,
-	yonghong.song@linux.dev
-Subject: Re: [syzbot] [bpf?] [net?] general protection fault in
- dev_map_enqueue (2)
-Message-ID: <20240902080232.wnhtxiWK@linutronix.de>
-References: <00000000000099cf25061964d113@google.com>
- <000000000000ebe92a062100eb94@google.com>
+	s=arc-20240116; t=1725264289; c=relaxed/simple;
+	bh=+UTkjM/YpFeicUPaHWpIAijZq8DD+lel03KrAl7Eqn0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YQKsaYVENqVuKQKRctOz38LD8rWpIuVJo2LCvCgzTMwP7wYCuF+SsSy1PxO6AIf/2bps+1w6KjS/9FMkQMbK74llb0/cuw2quB9gUaHKWZo75+42EZytbJVec2UAe4L0pRY86eMnZvDXzR7IgWEyPfgQlqItY5SSHRzmlv3r5bU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KpRh+uVV; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2f3f07ac2dcso42921591fa.2
+        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 01:04:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1725264285; x=1725869085; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+UTkjM/YpFeicUPaHWpIAijZq8DD+lel03KrAl7Eqn0=;
+        b=KpRh+uVVyE6rv3WYK/eXnl8mE6+ez2C4Cu9CukSxOFB5pSVO3r0UEPece1wwLiO1Qv
+         JO21Lpg26PewAGKRClUfCAxkxtImWx2g8Zfo2b5MEkcHzD3ofzsjnO7Y3RbeRs2JyXvX
+         fQFGGd6sJyaC7NMNVdlDq+ULQiripPIKOlI3bO9bqNui1T2ejw6eBCxqk43DB0tnEXq9
+         984V8tMF/9Ovv5b5T02eTHdaKC2AwubMcCkwKmX3BbshiVux2XVytXHZHIJLG+nhCUjs
+         tVgitYJzo3kQl1Xcp0TjvWDW25rD1N0MR1DzAMmh8Wd+e5oRtTl2iOKuEAiKsdufWX2k
+         lYzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725264285; x=1725869085;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+UTkjM/YpFeicUPaHWpIAijZq8DD+lel03KrAl7Eqn0=;
+        b=iVrfEgoX8E/0/yJO9/0eNWoA2Xw0yergV7bmRb9UNDBszVZoGi/c8K67JkOmn206X/
+         UNWrzfprxBzLKB86UIFAUBEYKeOM6gFDtbj09M2C9JKA2NRKCy+hae8kICD1D+cTJK08
+         MMGO0fbTJeHav1kqe9/TXBs6UmkZpyWDWL444LhNrUqvolhdypixUWPqfi+wBpDbDzRE
+         bzfJR4XlTLnagrePCQM+IRcYRzF44I/SPWXXEFrNhfYCvGL3QuKzUypySl6WsnAd05mz
+         6h67cb9EFGARnXCkuX08EMGuKojAeTOW1IQKx7L9rvbr6vvQkHa2j2pK6zyYewGjoU7/
+         IhOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUm1MWJ/2uTyjpFjRcFuD+68VUDtV4z5XCYhtrRSmShXzV5tk1IC6xkXAGn7Gvp2AJEjxFC/L0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxml0iAsrtVdYb/oXlFlBBaEM+AhCtRkeidjOAV2len4JYuGE2Y
+	29fYA247GTlgVy72mE+lW0+vRVaGcvptRRPUEa+ZthYX5uNa3SfkTY0lmgIpkcLuvrUzT/zJa1f
+	UejzwfWUAQ7dkeFQWqpJSBcClUi4G4oM7g+ZJgQ==
+X-Google-Smtp-Source: AGHT+IH/2Sron2senQlaG+hNYCIf5KgSiTssWFHnzlYklHs8dJj/QIMBsSouj5aXuELLgPa/B5+9AnhJvxEmPM1PyIw=
+X-Received: by 2002:a05:651c:1505:b0:2ef:216c:c97 with SMTP id
+ 38308e7fff4ca-2f6103a520emr84062511fa.19.1725264284861; Mon, 02 Sep 2024
+ 01:04:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <000000000000ebe92a062100eb94@google.com>
+References: <20240528120424.3353880-1-arnd@kernel.org>
+In-Reply-To: <20240528120424.3353880-1-arnd@kernel.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Mon, 2 Sep 2024 10:04:33 +0200
+Message-ID: <CACRpkdZqj7-mxCBBoWZm5QAVfNhak6PdrMnSmUWRKb6DpJLQNA@mail.gmail.com>
+Subject: Re: [PATCH] net: dsa: realtek: add LEDS_CLASS dependency
+To: Arnd Bergmann <arnd@kernel.org>, netdev <netdev@vger.kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-08-31 13:55:02 [-0700], syzbot wrote:
-> syzbot suspects this issue was fixed by commit:
-> 
-> commit 401cb7dae8130fd34eb84648e02ab4c506df7d5e
-> Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Date:   Thu Jun 20 13:22:04 2024 +0000
-> 
->     net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12597c63980000
-> start commit:   36534d3c5453 tcp: use signed arithmetic in tcp_rtx_probe0_..
-> git tree:       bpf
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=333ebe38d43c42e2
-> dashboard link: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13390aea980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10948741980000
+Hi David/Jakub,
 
-This looks like ri->tgt_value is a NULL pointer (dst in
-dev_map_enqueue()). The commit referenced by syz should not have fixed
-that.
-It is possible that there were leftovers in bpf_redirect_info (from a
-previous invocation) which were memset(,0,) during the switch from
-per-CPU to stack usage and now it does not trigger anymore. 
+On Tue, May 28, 2024 at 2:04=E2=80=AFPM Arnd Bergmann <arnd@kernel.org> wro=
+te:
 
-Sebastian
+> From: Arnd Bergmann <arnd@arndb.de>
+>
+> This driver fails to link when LED support is disabled:
+>
+> ERROR: modpost: "led_init_default_state_get" [drivers/net/dsa/realtek/rtl=
+8366.ko] undefined!
+> ERROR: modpost: "devm_led_classdev_register_ext" [drivers/net/dsa/realtek=
+/rtl8366.ko] undefined!
+>
+> Add a dependency that prevents this configuration.
+>
+> Fixes: 32d617005475 ("net: dsa: realtek: add LED drivers for rtl8366rb")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+Can you please apply this patch, the buildbots keep complaining about this,
+and we agreed (I think) to take this dependency approach for now.
+
+Yours,
+Linus Walleij
 
