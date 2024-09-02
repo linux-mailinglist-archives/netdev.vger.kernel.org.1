@@ -1,183 +1,111 @@
-Return-Path: <netdev+bounces-124071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DC69967DA1
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 03:58:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F654967DC3
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 04:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E01DAB216A5
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 01:58:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4440D1C21958
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 02:23:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6629922331;
-	Mon,  2 Sep 2024 01:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4641D273FD;
+	Mon,  2 Sep 2024 02:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JGBItNBy";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+36oGqIp";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="RMRODlBA";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="pz/141Kd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jfvhpYjL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4C18460;
-	Mon,  2 Sep 2024 01:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5345125DB;
+	Mon,  2 Sep 2024 02:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725242292; cv=none; b=ggcLJQtFMHCyeXxO1CVSF/oTF7w+Xxf3f58ie7htgfvogTtKHgNQzX6a+0xZNhsqY9E4IWedZzskDgotcM5k/Drg4H76j91wfzal4HnBLIvNGFh/l+aMOzz82fW9fa7afBqVKL2D9brrJzLSmnVsTXIwb1G//rSf6cLDLhWU0Hc=
+	t=1725243775; cv=none; b=DfXQJNnrlo/HwDtYZFUgDCrRH0twGuaFOUIDGbTW0FXn+S7cD0yLwEPoM8gqD/iUUj8Imyfngp0P+bh73tf20JSaBmCVmIBbGEJjOD9fkqR0jlEcyXommUi77Y5ykDUlyHLDL1SpzxiGWNP1A9RS8GdcVLtS8f+ULJAxWZCaxoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725242292; c=relaxed/simple;
-	bh=OL537CWRzAJ40IqGdqTBQMFURjJjl/WhL1Xlbp6rj/o=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=ipqvixUbxRlUg38ZuDPk1gc9aSWtHmBIcOqYQI4XcNN9GzEx9jBWQMamKiXIYwGEfwjp2rAkqxLpuvHAaFBcX6/h+/qE290jgWEMlJmD6R1YblKWpBwJjBoaCo2eS68M+dB/yy0fY93GRTWD846EGtYqrO7OpUzB1+FvSZ67SG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JGBItNBy; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+36oGqIp; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=RMRODlBA; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=pz/141Kd; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 74ECA21B29;
-	Mon,  2 Sep 2024 01:58:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1725242288; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rvg7XWlJCXc4p7nkjWsafWzVfFPk1Lx+S4qCiaCPFaI=;
-	b=JGBItNByrwjHzzMYfxCtB0cQ4QO4qRHMmRJq1Uv6WLu1+sagFs4Duq3+na5teL2Kg7+KNI
-	nqEsbNx1/LobqtpzjKoCOacL18wkCNK+0XX3uJhRrNZmroBc+ts1GkPT6ApyRGhxvN4fme
-	lxuERD+FqRQ68Qc2CXRpke1OJTetwbM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1725242288;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rvg7XWlJCXc4p7nkjWsafWzVfFPk1Lx+S4qCiaCPFaI=;
-	b=+36oGqIpvuT6GoiOb9Z5uwZfjAnz6Qwz5NbeviUyyIeIUUVM7rcMsuTpxyztYyTz5nkMx5
-	uZysaEnDemejWlCQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=RMRODlBA;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="pz/141Kd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1725242287; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rvg7XWlJCXc4p7nkjWsafWzVfFPk1Lx+S4qCiaCPFaI=;
-	b=RMRODlBAbsiu8ct/rp/blLPhBcoj2VGCMDuXkWaVzooRmdkwyeYkJim/WTuJYy04L3ZAkj
-	bmZfOdmmDfuhsXwJ731gRpFb1oLCPYSDIHWy+iFK3sBKCOHgCa8dTNJx4Fg/QsPeybaBAF
-	L8z5ezgicpxnhh2oJ+gaH2gJtyDpdKo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1725242287;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rvg7XWlJCXc4p7nkjWsafWzVfFPk1Lx+S4qCiaCPFaI=;
-	b=pz/141KdIzYgxqESAy/4v4SxmqBfa6Coonr3fg42CRieWfNaQl4r/JypdFGewLVlHHCbqk
-	WLqiUWMmYxZwAGCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 3D9191386E;
-	Mon,  2 Sep 2024 01:58:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Wn9rOKob1WZ2UgAAD6G6ig
-	(envelope-from <neilb@suse.de>); Mon, 02 Sep 2024 01:58:02 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1725243775; c=relaxed/simple;
+	bh=VBpOW1rPecjQYRIrpggC1kPwY63fYKTj1DOYJLkKlMQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ex6lbSE7bA85lbelVE0P9YsCnp+P1KY+wIQYxPXPZcdvOJR6AyjZFGPw3UpV1Jpw7NfXKtCKJ0G3hierZuAJ6g2fVwAhfCtS3fFXTpFxn3r4zxm7wwMR8Ige5DjtV67bWmBfYId9KqC5axo8J5dipG8mGK414BqyMSmg4LxGPs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jfvhpYjL; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-82a24dec9cbso96373539f.1;
+        Sun, 01 Sep 2024 19:22:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725243773; x=1725848573; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=smFEs2rlCqPI6yQiGlZ7Lzo3jx7RVZ+QX/9oeATf2E4=;
+        b=jfvhpYjLs8Mb4yLdu7S0ndINQzguHFMfDGLOaAh3qFX9UyFr208qArNDU2fPt8F9FF
+         JMk948H7zyF8unqR3mwv1yaiJyWAgD2YMDq4vgFaJ+Lc71/xo9zx1/rVqCXERi3y1EQ0
+         4xwxka5erP/o0Z1ijg3hRLOMIk8A4i0d1MJ8OdipMJlgnNnLm/lBDE0DzXFFZd0osRm+
+         HDOXTDmQ2nCNbWersHvOahhQYwD+eC7ZRtNOSUAT5VlymCur2P3zUhRJ1woijUMHkTPL
+         qc2Fr+j5iR/p000ZyKixGO8WN8dBcO4lK8UI287wVogsIDOxrixN7k3HjVZ9z/MedlV0
+         Sc+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725243773; x=1725848573;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=smFEs2rlCqPI6yQiGlZ7Lzo3jx7RVZ+QX/9oeATf2E4=;
+        b=aAbHNuoBMXGoihdwqv9OGdUw24Bw6kQkS08N2J+6mJpUQR+fkjHh9XEfxeYrwAhQe3
+         gKj4YCWkKCitpHIVuORZQBz9VoP8ueXNzEH7b9/U3Qoh9JE9RY+J3FM2A96d/A5rEIoT
+         ydLmkfstX0TMTYukoWCaFicyeeUXmPofnjMLDziqxTXTIoRtvWQCiBgW+13QH7ErbrLt
+         TGKC9cNvWxcyXiBIbrzCJBiC6KeMVcii1SWAwMNob4eC6ARk9P+CnwU98jzZf0zF4o5n
+         HyMgf7ix55BTmUWETe4gv5WVQEek4pHI5pLS7y32NxtrLkGQ+7W/u8N/Wb83UR0XxcCL
+         RAOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVHaOr+20Lo0Hm45N+xv7r2KnQpVEmh6hrkQkNubwy/RR23onxQ3pUYuUmwnDPp8bx2+UZr/S6wwDcD@vger.kernel.org, AJvYcCVSId4/kjl1FGgnyTrtv850ZuBVNNgN98o82OJmm9KzBLDhseXaRZ4kjCMYmcW516bliM4ZYpGc@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0onBWJDqi59BdCnV+VuD3JNVS77xcAHM8xrf+paus0hObW4F6
+	S8874H5CFS8ewhxRJI5EWpsXBpqwBNyfEVbW94zEPuxnnOzTnj7w
+X-Google-Smtp-Source: AGHT+IEureTSYk1XiTG8IaBESouuGYVQyeHzvBc4GMe4fnEP6FfX0pJ0Z7rjyt+6m+NjYnNHS7zNlQ==
+X-Received: by 2002:a6b:d210:0:b0:7f3:a0aa:164a with SMTP id ca18e2360f4ac-82a13e8eef3mr751075139f.4.1725243772663;
+        Sun, 01 Sep 2024 19:22:52 -0700 (PDT)
+Received: from ?IPV6:2601:282:1e02:1040:1009:3a3e:c395:f649? ([2601:282:1e02:1040:1009:3a3e:c395:f649])
+        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-4ced2eec745sm1925355173.176.2024.09.01.19.22.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 01 Sep 2024 19:22:52 -0700 (PDT)
+Message-ID: <cad1d443-ccfb-4d10-ac2d-26bb10c99d05@gmail.com>
+Date: Sun, 1 Sep 2024 20:22:50 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "syzbot" <syzbot+d1e76d963f757db40f91@syzkaller.appspotmail.com>
-Cc: Dai.Ngo@oracle.com, chuck.lever@oracle.com, dai.ngo@oracle.com,
- jlayton@kernel.org, kolga@netapp.com, linux-kernel@vger.kernel.org,
- linux-nfs@vger.kernel.org, lorenzo@kernel.org, netdev@vger.kernel.org,
- okorniev@redhat.com, syzkaller-bugs@googlegroups.com, tom@talpey.com
-Subject: Re: [syzbot] [nfs?] INFO: task hung in nfsd_nl_listener_set_doit
-In-reply-to: <000000000000b5ba900620fec99b@google.com>
-References: <0000000000004385ec06198753f8@google.com>,
- <000000000000b5ba900620fec99b@google.com>
-Date: Mon, 02 Sep 2024 11:57:55 +1000
-Message-id: <172524227511.4433.7227683124049217481@noble.neil.brown.name>
-X-Rspamd-Queue-Id: 74ECA21B29
-X-Spam-Score: -4.89
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.89 / 50.00];
-	BAYES_HAM(-2.88)[99.47%];
-	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCPT_COUNT_TWELVE(0.00)[13];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,noble.neil.brown.name:mid,suse.de:dkim];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TAGGED_RCPT(0.00)[d1e76d963f757db40f91];
-	DKIM_TRACE(0.00)[suse.de:+];
-	MISSING_XM_UA(0.00)[];
-	SUBJECT_HAS_QUESTION(0.00)[]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC iproute2-next 2/4] rdma: Add support for rdma monitor
+Content-Language: en-US
+To: Michael Guralnik <michaelgur@nvidia.com>, leonro@nvidia.com
+Cc: jgg@nvidia.com, linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ Chiara Meiohas <cmeiohas@nvidia.com>
+References: <20240901005456.25275-1-michaelgur@nvidia.com>
+ <20240901005456.25275-3-michaelgur@nvidia.com>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20240901005456.25275-3-michaelgur@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, 01 Sep 2024, syzbot wrote:
-> syzbot has found a reproducer for the following issue on:
+On 8/31/24 6:54 PM, Michael Guralnik wrote:
+> $ echo 4 > /sys/class/net/eth2/device/sriov_numvfs
+> [NETDEV_ATTACH]	dev 6 port 2 netdev 7
+> [NETDEV_ATTACH]	dev 6 port 3 netdev 8
+> [NETDEV_ATTACH]	dev 6 port 4 netdev 9
+> [NETDEV_ATTACH]	dev 6 port 5 netdev 10
+> [REGISTER]	dev 7
+> [NETDEV_ATTACH]	dev 7 port 1 netdev 11
+> [REGISTER]	dev 8
+> [NETDEV_ATTACH]	dev 8 port 1 netdev 12
+> [REGISTER]	dev 9
+> [NETDEV_ATTACH]	dev 9 port 1 netdev 13
+> [REGISTER]	dev 10
+> [NETDEV_ATTACH]	dev 10 port 1 netdev 14
+> 
 
-I had a poke around using the provided disk image and kernel for
-exploring.
+at a minimum the netdev output can be device names not indices; I would
+expect the same for IB devices (I think that is the `dev N` in the
+output) though infrastructure might be needed in iproute2.
 
-I think the problem is demonstrated by this stack :
-
-[<0>] rpc_wait_bit_killable+0x1b/0x160
-[<0>] __rpc_execute+0x723/0x1460
-[<0>] rpc_execute+0x1ec/0x3f0
-[<0>] rpc_run_task+0x562/0x6c0
-[<0>] rpc_call_sync+0x197/0x2e0
-[<0>] rpcb_register+0x36b/0x670
-[<0>] svc_unregister+0x208/0x730
-[<0>] svc_bind+0x1bb/0x1e0
-[<0>] nfsd_create_serv+0x3f0/0x760
-[<0>] nfsd_nl_listener_set_doit+0x135/0x1a90
-[<0>] genl_rcv_msg+0xb16/0xec0
-[<0>] netlink_rcv_skb+0x1e5/0x430
-
-No rpcbind is running on this host so that "svc_unregister" takes a
-long time.  Maybe not forever but if a few of these get queued up all
-blocking some other thread, then maybe that pushed it over the limit.
-
-The fact that rpcbind is not running might not be relevant as the test
-messes up the network.  "ping 127.0.0.1" stops working.
-
-So this bug comes down to "we try to contact rpcbind while holding a
-mutex and if that gets no response and no error, then we can hold the
-mutex for a long time".
-
-Are we surprised? Do we want to fix this?  Any suggestions how?
-
-NeilBrown
 
