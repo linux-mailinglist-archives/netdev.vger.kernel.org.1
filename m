@@ -1,86 +1,281 @@
-Return-Path: <netdev+bounces-124163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BBAE9685A5
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:05:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35C9E9685A7
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:05:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59CC7286664
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:05:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 254A71C21F42
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9A41D54D7;
-	Mon,  2 Sep 2024 11:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFCE1D54E2;
+	Mon,  2 Sep 2024 11:03:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="qhwXTyVO";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="nzIN3lLz"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9111D54D3;
-	Mon,  2 Sep 2024 11:02:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B624B185B5B;
+	Mon,  2 Sep 2024 11:03:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725274968; cv=none; b=YLU7/sgWFjQzsQvncDpR4zJod/n3i/i/HB3dCkBYI3LCmav76PVFwPzBtHopJGNccLyce+AJ+igGlYYroBFVrGJI0DCz2uI467AeRAek7A5Wbr7FbvuorSpHGNSPqmlsgeQ0NNMgAienR6frQ5J4yNOjDhot2VXRLfpgh/KQwDw=
+	t=1725274990; cv=none; b=iFveF+8RetquKuYfMDpdsb/ELWa90lEBAxMJ/MXQbB/GJaupDIxh/8VxStpw15vbm8X7gI/RMq64fIKiRB9YKtLIY7YL5bcs9eP6S+c8teSlZ44LP2sFaayO1OaEVHLVZtygbAW2yzlchK4Hj1kFlGaVY9Zlfx7y5yRFDlEh2io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725274968; c=relaxed/simple;
-	bh=thDwlJ5EuftKkTVlDoch8NaZKnpDf7MQJBGoxTWIEJQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=mipI23fjmFy1KSAJasslfV+DuiZfb0pQNVvmacNRoxuD7gZDfn6KSzll+xf79mHJYA3B0pWDbb8lKLAI0Hmu3e3STyAlKYmYEC65n1G3T5NMHGAZDMA1dCBoXPPMjuZb4ycrRCRWOX4sS5HbDedHongPELlc80tvjoYHd5q0t6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Wy5QM4W61z1xwXS;
-	Mon,  2 Sep 2024 19:00:43 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 838AC18002B;
-	Mon,  2 Sep 2024 19:02:43 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 2 Sep 2024 19:02:43 +0800
-Message-ID: <65efb50a-a8c9-40c3-8db7-7a41b88f973f@huawei.com>
-Date: Mon, 2 Sep 2024 19:02:36 +0800
+	s=arc-20240116; t=1725274990; c=relaxed/simple;
+	bh=lWhTg7umjSpKfTRPRNpeW1CdU3Qs2+EL4oj2o9FFFl4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=akKKMBECqul6XwDsuAr3n0wfWd/f7JB7Uyg6btgfyXtbiAn47s32MRqr7fwwF5sZC9blbi78xWU7hgJhHoHzGoQXtRIGLqFy9BuSA1vdKApRfs43NB2lIsopcwHgTzy8VTZw9CceQiy9ppKvmfqUxk4HrQCZXZ5pG7RtqIX08WE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=qhwXTyVO; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=nzIN3lLz; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Message-ID: <fcd41a5f-66b5-4ebe-9535-b75e14867444@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1725274985;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=CFF3OO/d63nULlHYvQ3R2X1ghl6OU+8CfeLpwbLcA5A=;
+	b=qhwXTyVOkLvUGhAaN+AjK0o3RJmmeWok4dcShzijUynn0W8c5w69J+exYGU72t4H6L+3bo
+	LA8sGNB9cGGdvjicZQzr2eKetDEak1wCIMPaxrjg8tPp9N9QLpxa89I/E2I+njPK0kN4Qq
+	RTv0pCZ4TdzIDnxzFMSslIhH/t+qku5kdBSE24O8edWDGwPSw59hRz45A6SUr0z+JVRxOj
+	uecFAc67EpoV+cIXfcjaHYYGSE1Z1tbmc6b00mqEEJvdUME81zWllWHoMFY/fQCYNRenyE
+	UzXK5Q7DasVv05B2vyDVGCidXII8Ql0j9Ar5dOGHdCox2/m7R5oPoZPTTsBf7g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1725274985;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=CFF3OO/d63nULlHYvQ3R2X1ghl6OU+8CfeLpwbLcA5A=;
+	b=nzIN3lLztN4hrsSqfnwODmqMQy/FPKzME372s8WlZbVmGelx8ECsIdZ45wJ6qh114Qeb8W
+	v7FtRb0hvJtD1ADg==
+Date: Mon, 2 Sep 2024 13:02:58 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v16 00/14] Replace page_frag with page_frag_cache
- for sk_page_frag()
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
-	<alexander.duyck@gmail.com>
-References: <20240830111845.1593542-1-linyunsheng@huawei.com>
+Subject: Re: CPU stuck due to the taprio hrtimer
+To: luyun <luyun@kylinos.cn>, Vinicius Costa Gomes
+ <vinicius.gomes@intel.com>, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240627055338.2186255-1-luyun@kylinos.cn>
+ <87sewy55gp.fsf@intel.com> <2df10720-1790-48bd-a50c-4816260543b0@kylinos.cn>
 Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20240830111845.1593542-1-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+From: Florian Kauer <florian.kauer@linutronix.de>
+Autocrypt: addr=florian.kauer@linutronix.de; keydata=
+ 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
+ ugsSqUGtSA==
+In-Reply-To: <2df10720-1790-48bd-a50c-4816260543b0@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 2024/8/30 19:18, Yunsheng Lin wrote:
-
-...
-
-> Change log:
-> V16:
->    1. Add test_page_frag.sh to handle page_frag_test.ko and add testing
->       for prepare API.
-
-It seems I missed to add the below in Makefile to copy test_page_frag.sh
-when doing a 'make install'.
-
-TEST_FILES += test_page_frag.sh
-
-Will send a new version shortly when workers are not busy in netdev CI.
-
->    2. Move inline helper unneeded outside of the page_frag_cache.c to
->       page_frag_cache.c.
->    3. Reset nc->offset when reusing an old page.
+On 9/2/24 11:12, luyun wrote:
 > 
+> 在 2024/6/28 07:30, Vinicius Costa Gomes 写道:
+>> Yun Lu <luyun@kylinos.cn> writes:
+>>
+>>> Hello,
+>>>
+>>> When I run a taprio test program on the latest kernel(v6.10-rc4), CPU stuck
+>>> is detected immediately, and the stack shows that CPU is stuck on taprio
+>>> hrtimer.
+>>>
+>>> The reproducer program link:
+>>> https://github.com/xyyluyun/taprio_test/blob/main/taprio_test.c
+>>> gcc taprio_test.c -static -o taprio_test
+>>>
+>>> In this program, start the taprio hrtimer which clockid is set to REALTIME, and
+>>> then adjust the system time by a significant value backwards. Thus, CPU will enter
+>>> an infinite loop in the__hrtimer_run_queues function, getting stuck and unable to
+>>> exit or respond to any interrupts.
+>>>
+>>> I have tried to avoid this problem by apllying the following patch, and it does work.
+>>> But I am not sure if this can be the final solution?
+>>>
+>>> Thanks.
+>>>
+>>> Signed-off-by: Yun Lu <luyun@kylinos.cn>
+>>> ---
+>>>   net/sched/sch_taprio.c | 24 ++++++++++++++++++++++++
+>>>   1 file changed, 24 insertions(+)
+>>>
+>>> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+>>> index a0d54b422186..2ff8d34bdbac 100644
+>>> --- a/net/sched/sch_taprio.c
+>>> +++ b/net/sched/sch_taprio.c
+>>> @@ -104,6 +104,7 @@ struct taprio_sched {
+>>>       u32 max_sdu[TC_MAX_QUEUE]; /* save info from the user */
+>>>       u32 fp[TC_QOPT_MAX_QUEUE]; /* only for dump and offloading */
+>>>       u32 txtime_delay;
+>>> +    ktime_t offset;
+>>>   };
+>>>     struct __tc_taprio_qopt_offload {
+>>> @@ -170,6 +171,19 @@ static ktime_t sched_base_time(const struct sched_gate_list *sched)
+>>>       return ns_to_ktime(sched->base_time);
+>>>   }
+>>>   +static ktime_t taprio_get_offset(const struct taprio_sched *q)
+>>> +{
+>>> +    enum tk_offsets tk_offset = READ_ONCE(q->tk_offset);
+>>> +    ktime_t time = ktime_get();
+>>> +
+>>> +    switch (tk_offset) {
+>>> +    case TK_OFFS_MAX:
+>>> +        return 0;
+>>> +    default:
+>>> +        return ktime_sub_ns(ktime_mono_to_any(time, tk_offset), time);
+>>> +    }
+>>> +}
+>>> +
+>>>   static ktime_t taprio_mono_to_any(const struct taprio_sched *q, ktime_t mono)
+>>>   {
+>>>       /* This pairs with WRITE_ONCE() in taprio_parse_clockid() */
+>>> @@ -918,6 +932,7 @@ static enum hrtimer_restart advance_sched(struct hrtimer *timer)
+>>>       int num_tc = netdev_get_num_tc(dev);
+>>>       struct sched_entry *entry, *next;
+>>>       struct Qdisc *sch = q->root;
+>>> +    ktime_t now_offset = taprio_get_offset(q);
+>>>       ktime_t end_time;
+>>>       int tc;
+>>>   @@ -957,6 +972,14 @@ static enum hrtimer_restart advance_sched(struct hrtimer *timer)
+>>>       end_time = ktime_add_ns(entry->end_time, next->interval);
+>>>       end_time = min_t(ktime_t, end_time, oper->cycle_end_time);
+>>>   +    if (q->offset != now_offset) {
+>>> +        ktime_t diff = ktime_sub_ns(now_offset, q->offset);
+>>> +
+>>> +        end_time = ktime_add_ns(end_time, diff);
+>>> +        oper->cycle_end_time = ktime_add_ns(oper->cycle_end_time, diff);
+>>> +        q->offset = now_offset;
+>>> +    }
+>>> +
+>> I think what we should do here is a bit different. Let me try to explain
+>> what I have in mind with some context.
+>>
+>> A bit of context: The idea of taprio is to enforce "TSN" traffic
+>> schedules, these schedules require time synchronization, for example via
+>> PTP, and in those cases, time jumps are not expected or a sign that
+>> something is wrong.
+>>
+>> In my mind, a time jump, specially a big one, kind of invalidates the
+>> schedule, as the schedule is based on an absolute time value (the
+>> base_time), and when time jumps that reference in time is lost.
+>>
+>> BUT making the user's system unresponsive is a bug, a big one, as if
+>> this happens in the real world, the user will be unable to investigate
+>> what made the system have so big a time correction.
+>>
+>> So my idea is to warn the user that the time jumped, say that the user
+>> needs to reconfigure the schedule, as it is now invalid, and disable the
+>> schedule.
+>>
+>> Does this make sense?
+>>
+>> Ah, and thanks for the report.
+> 
+> Hello Vinicius,
+> 
+> May I ask is there a fix patch for this issue?
+> 
+> I test it on the latest kernel version,  and it still seems to cause CPU stuck.
+> 
+> As you mentioned, a better way would be to warn the user that the current time has jumped and cancel the hrtimer,
+> 
+> but I'm not sure how to warn the user, or just through printk?
+> 
+> Thanks and best regards.
+
+I am not sure if it is really the best solution to force the user to reconfigure the schedule
+"just" because the clock jumped. Yes, time jumps are a big problem for TAPRIO, but stopping might
+make it worse.
+
+Vinicius wrote that the base_time can no longer reference to the correct point in time,
+so the schedule MUST be invalid after the time jump. It is true that the base_time does not longer
+refer to the same point in time it referred to before the jump from the view of the local system (!).
+But the base_time usually refers to the EXTERNAL time domain (i.e. the time the system SHOULD have
+and not the one the system currently has) and is often configured by an external entity.
+
+So it is quite likely that the schedule was incorrectly phase-shifted BEFORE the time jump and after
+the time jump the base_time refers to the CORRECT point in time viewed from the external time domain.
+
+If you now stop the schedule (and I assume you mean by this to let every queue transmit at any time
+as before the schedule was configured) and the user has to reconfigure the schedule again,
+it is quite likely that by this you actually increase the interference with the network and in
+particular confuse the time synchronization via PTP, so once the schedule is set up again,
+you might get a time jump AGAIN.
+
+So yes, a warning to the user is definitely appropriate in the case of a time jump, but apart
+from that I would prefer the system to adapt itself instead of resigning.
+
+Yun Lu, does this only happen for time jumps into the past or also for large jumps into the future?
+And does this also happen for small time "jumps"?
+
+Thanks,
+Florian
+
+> 
+> 
+>>
+>>>       for (tc = 0; tc < num_tc; tc++) {
+>>>           if (next->gate_duration[tc] == oper->cycle_time)
+>>>               next->gate_close_time[tc] = KTIME_MAX;
+>>> @@ -1210,6 +1233,7 @@ static int taprio_get_start_time(struct Qdisc *sch,
+>>>         base = sched_base_time(sched);
+>>>       now = taprio_get_time(q);
+>>> +    q->offset = taprio_get_offset(q);
+>>>         if (ktime_after(base, now)) {
+>>>           *start = base;
+>>> -- 
+>>> 2.34.1
+>>>
+>>
+>> Cheers,
 > 
 
