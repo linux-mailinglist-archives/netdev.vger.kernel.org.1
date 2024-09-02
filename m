@@ -1,208 +1,118 @@
-Return-Path: <netdev+bounces-124165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E0F89685B3
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:06:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D11D59685C5
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE0CE1F21C44
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:06:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D6E0280FEA
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631FB18453F;
-	Mon,  2 Sep 2024 11:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB48184559;
+	Mon,  2 Sep 2024 11:07:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="hI6RQIWC";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="fzhotnCT";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="SB/dkSu3";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="Kwxmk9pL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QsTJhAAg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700EF184530;
-	Mon,  2 Sep 2024 11:04:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF7A184558
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 11:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725275088; cv=none; b=kJL8CxLGDTUyE+JqEpHJmSsa4DmI+gKxqXujpbpXgR+QLujJNZr97cpIx709u1fyG0s2YVvACaryyBlVbYUAEiBt5yYEOWNcS0glmLP2QUzjKcaVG9VHgI4YR3ZUKT4cta6Oxf40Nm9mc2MtTFS3rOZ5TDv/d11vjyyUvby5pU0=
+	t=1725275253; cv=none; b=g2tw6gKXCyoT0FXPPAs+P9cAEjPCnfQyj3KkvSxTSaekKsbFyJrPFjyYJKnNxT+favlhIz8jscctaNZLm8GKOpMoCQMO8GDK7AlFLv7C1pCIXRR1Oe7/NXo0ZfK/mlDfZh+O1PhI6DUTY1E8AfWbpfKg6LGPRccPeWlS6cHeQ7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725275088; c=relaxed/simple;
-	bh=iw2MVwhX51dJhWKxubjYLfJi88FIn5V4riiOr6+qcOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nagJJmHXDWALIpx6kZKDybFModkJ2+6Y7Y01JJPBry2QxkTbkL+qfzoV0SNvQCKK+7XdY2ZVtcxjFnRZeypUEoRRyKrHuR4OOfNZV9ab7qCzQt3bktq0ik5uJmAksEt0y8xdprvJoPlPlXtNLTBUbaxhO7UC7pVN6xugYPphB1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=hI6RQIWC; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=fzhotnCT; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=SB/dkSu3; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=Kwxmk9pL; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 7D31D1FBA6;
-	Mon,  2 Sep 2024 11:04:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1725275084; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LrwrQnk3AUWu3toRtwqVBHqDGPavhHbdLcu1XMq0qOs=;
-	b=hI6RQIWCMmhPKWpe6o9I9QXZIyKLX6nWwWERaF7rK0FX8gm7K4+VUeqm/gFHwJBmh8ZpTC
-	N116j6rdT4K+BTuz7Z9A53qZSjmFH15sKy5bgWIRjmG8sLatsYFBzdpdNRTgSVXvMUO/4z
-	lVrGKOkxI+zsCsPmoMXcvFGzHJGHLcM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1725275084;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LrwrQnk3AUWu3toRtwqVBHqDGPavhHbdLcu1XMq0qOs=;
-	b=fzhotnCTLWLF4CazDLISpd0l0merMT3jIRmD475OHBF3W/wb4SdZkLUwSiLaH5yoZB77A7
-	hV9pNWjqdDeRMhAA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b="SB/dkSu3";
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=Kwxmk9pL
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1725275083; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LrwrQnk3AUWu3toRtwqVBHqDGPavhHbdLcu1XMq0qOs=;
-	b=SB/dkSu3SP2u2hBSzXm6S9gz7Spy5gi22kJpDyJ52c71E7p6DO8AlWmq6zyQ0pVQ9G9Uhn
-	2pFLu2+HoeeP/nKHNnsHmIDGpO6u4B5XSwKuLfQknyqk7TByYid/m80rz/ABTvePGVGXJ2
-	WaiGtSCgxKRWIag/SHT6W4usWrRFiAo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1725275083;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LrwrQnk3AUWu3toRtwqVBHqDGPavhHbdLcu1XMq0qOs=;
-	b=Kwxmk9pLByDZhraqS548Om7S4OJTeE0qbNRB5Q+QkqOnXvG1vuRf3Ro2cc3zr2feQ9z2yX
-	AdMOesNtHuAjMwBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6D4B113A7C;
-	Mon,  2 Sep 2024 11:04:43 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id HruoGsub1WYKcwAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 02 Sep 2024 11:04:43 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 1FCC7A0965; Mon,  2 Sep 2024 13:04:28 +0200 (CEST)
-Date: Mon, 2 Sep 2024 13:04:28 +0200
-From: Jan Kara <jack@suse.cz>
-To: Kees Cook <kees@kernel.org>
-Cc: Kaixiong Yu <yukaixiong@huawei.com>, akpm@linux-foundation.org,
-	mcgrof@kernel.org, ysato@users.sourceforge.jp, dalias@libc.org,
-	glaubitz@physik.fu-berlin.de, luto@kernel.org, tglx@linutronix.de,
-	bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-	viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz,
-	j.granados@samsung.com, willy@infradead.org,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, lorenzo.stoakes@oracle.com,
-	trondmy@kernel.org, anna@kernel.org, chuck.lever@oracle.com,
-	jlayton@kernel.org, neilb@suse.de, okorniev@redhat.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	paul@paul-moore.com, jmorris@namei.org, linux-sh@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org, linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org,
-	wangkefeng.wang@huawei.com
-Subject: Re: [PATCH -next 12/15] fs: dcache: move the sysctl into its own file
-Message-ID: <20240902110428.os726rhlt6y5i4ak@quack3>
-References: <20240826120449.1666461-1-yukaixiong@huawei.com>
- <20240826120449.1666461-13-yukaixiong@huawei.com>
- <202408261253.D155EA0@keescook>
+	s=arc-20240116; t=1725275253; c=relaxed/simple;
+	bh=JARi/mYVuOIg5UeEHlaObUQNGYz1Y5nKzr4DVVL9vrk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=b1ygPGrn7JHBeljTpPYZSV+suMQC1g1H+RhHOsuUdoBXroGT1XKsG5UXGTH/utxV1GZM1millBLEXaDJY7XHAZrNgRGwWHorxCWrUJJELd8GpIwt1qtD8S3vaBtPV8TLBn22i04YRlpzkSf9CHV+jt8DvIkODeraxBcNZMHeS70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QsTJhAAg; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7143ae1b48fso2385076b3a.1
+        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 04:07:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725275251; x=1725880051; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dKfohwBbvqBoxMYozMoCpaKyJaWyr2X75WN78ivIk8w=;
+        b=QsTJhAAgkQS/8CUEtpA1LWHUeqSDzb+Jo/o7MjEcXiegM6YuVdqkK/AdGSHFEovv2e
+         ZDP0YfClPce/8VEqJa2F1kxoWsGkYe0tNbkNjbjX7IZtekxJ/ACSffxz7x78XpBuenPe
+         XOsPCzBeykt5PPCONjmaQORwEkg60SGLT1aW/KiAoQ3/5g/avd7KFGVI5VrtR5y1JBX8
+         6VkxwHl632Fpc61wJ97/NRq+4uNO6WxcGd5mi8sKrNuxMK0MjraNEDOMLO2E6mMnN0kR
+         GqFGa/xRKsU720CLjzdadqCz0mYzh75YibdarlJSPCXZ4GUIK58L739RDxOJAfnsA6lP
+         ng6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725275251; x=1725880051;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dKfohwBbvqBoxMYozMoCpaKyJaWyr2X75WN78ivIk8w=;
+        b=oJgUv2F2Ji8sXy72sWQkJsAlZDl+uLY3J89GMyRmvZjF1Rt8dyoNVW7dt4eP1zuYcB
+         DmXPV5rYOEiuSfJOOCQUwSPFnYqPRQVH60kUFEsY6sOxUUB7KL1hzhgO5Nd3MP0Dy6SS
+         zdxlYd93Fk3I7hi2TJCt/QX6x8TVW+UomEWCacG5IV7BEshvCX1XILo7OO5PDVgqDLwa
+         A0ec6ocmQQdz0ApNnwKmJM93HFRNDSepMryA6TCSO6u8YAaA0F6+PpGaS0iqos6sNQMf
+         PsYob/c+EyiO/o70fpsL/ysG0gtWTwtetXBAusCw2tzr5svNgeWeD0ZWGHIMaZZdskMG
+         mWNA==
+X-Gm-Message-State: AOJu0Yy2FOa9r7IIKnD4s8/zljU4T3NerXmmXGohX4Wu9Wmy8QNqgD9f
+	JYFtBg2/jKt3cdwN6+B0BpkuxwsbBhgvgV8LDIIA9HnkOdjtrTI4
+X-Google-Smtp-Source: AGHT+IHjMlWWU2cAlf1/PiXY9ASqDzwp2lJa8r2xsr9kEV5dCEbPB8JupTIDSQxafQ+hEsY7vq6Rmw==
+X-Received: by 2002:a05:6300:44:b0:1cc:e069:e937 with SMTP id adf61e73a8af0-1cece502344mr6631770637.16.1725275251293;
+        Mon, 02 Sep 2024 04:07:31 -0700 (PDT)
+Received: from localhost.localdomain (syn-104-035-026-140.res.spectrum.com. [104.35.26.140])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d88edd4f90sm4797144a91.26.2024.09.02.04.07.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Sep 2024 04:07:31 -0700 (PDT)
+From: Eyal Birger <eyal.birger@gmail.com>
+To: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	dsahern@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	devel@linux-ipsec.org,
+	Eyal Birger <eyal.birger@gmail.com>
+Subject: [PATCH ipsec,v2 0/2] xfrm: respect ip proto rules criteria in xfrm dst lookups
+Date: Mon,  2 Sep 2024 04:07:17 -0700
+Message-Id: <20240902110719.502566-1-eyal.birger@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202408261253.D155EA0@keescook>
-X-Rspamd-Queue-Id: 7D31D1FBA6
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[42];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCVD_TLS_LAST(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLdxgs459xdbsauns6rcjztsec)];
-	MISSING_XM_UA(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[huawei.com:email,suse.com:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:dkim,suse.cz:email]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.01
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
 
-On Mon 26-08-24 12:56:00, Kees Cook wrote:
-> On Mon, Aug 26, 2024 at 08:04:46PM +0800, Kaixiong Yu wrote:
-> > The sysctl_vfs_cache_pressure belongs to fs/dcache.c, move it to
-> > its own file from kernel/sysctl.c. As a part of fs/dcache.c cleaning,
-> > sysctl_vfs_cache_pressure is changed to a static variable, and export
-> > vfs_pressure_ratio with EXPORT_SYMBOL_GPL to be used by other files.
-> > And move the unneeded include(linux/dcache.h).
-> > 
-> > Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
-> > ---
-> >  fs/dcache.c            | 21 +++++++++++++++++++--
-> >  include/linux/dcache.h |  7 +------
-> >  kernel/sysctl.c        |  9 ---------
-> >  3 files changed, 20 insertions(+), 17 deletions(-)
-> > 
-> > diff --git a/fs/dcache.c b/fs/dcache.c
-> > index 1af75fa68638..8717d5026cda 100644
-> > --- a/fs/dcache.c
-> > +++ b/fs/dcache.c
-> > @@ -73,8 +73,13 @@
-> >   * If no ancestor relationship:
-> >   * arbitrary, since it's serialized on rename_lock
-> >   */
-> > -int sysctl_vfs_cache_pressure __read_mostly = 100;
-> > -EXPORT_SYMBOL_GPL(sysctl_vfs_cache_pressure);
-> > +static int sysctl_vfs_cache_pressure __read_mostly = 100;
-> > +
-> > +unsigned long vfs_pressure_ratio(unsigned long val)
-> > +{
-> > +	return mult_frac(val, sysctl_vfs_cache_pressure, 100);
-> > +}
-> > +EXPORT_SYMBOL_GPL(vfs_pressure_ratio);
-> 
-> This was a static inline, but AFAICT it's only called through
-> alloc_super() which is hardly "fast path". If this series gets another
-> version it may be worth calling out this inline->out-of-line change in
-> the commit log.
-> 
-> I don't think it's a blocker, but I'm not a VFS maintainer. :)
+This series fixes the route lookup when done for xfrm to regard
+L4 criteria specified in ip rules.
 
-It's actually called from about 7 shrinkers of filesystem objects. They get
-called relatively frequently during memory reclaim but I don't think a
-function call is *that* expensive to matter in this case. Feel free to add:
+The first patch is a minor refactor to allow passing more parameters
+to dst lookup functions.
+The second patch actually passes L4 information to these lookup functions.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Eyal Birger <eyal.birger@gmail.com>
 
+---
 
-								Honza
+v2: fix first patch based on reviews from Steffen Klassert and
+    Simon Horman
+
+Eyal Birger (2):
+  xfrm: extract dst lookup parameters into a struct
+  xfrm: respect ip protocols rules criteria when performing dst lookups
+
+ include/net/xfrm.h      | 28 ++++++++++++-----------
+ net/ipv4/xfrm4_policy.c | 40 +++++++++++++++------------------
+ net/ipv6/xfrm6_policy.c | 31 +++++++++++++-------------
+ net/xfrm/xfrm_device.c  | 11 ++++++---
+ net/xfrm/xfrm_policy.c  | 49 +++++++++++++++++++++++++++++++----------
+ 5 files changed, 94 insertions(+), 65 deletions(-)
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.34.1
+
 
