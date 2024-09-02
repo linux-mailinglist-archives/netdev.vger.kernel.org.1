@@ -1,191 +1,192 @@
-Return-Path: <netdev+bounces-124199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BA069687BE
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:43:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44FCF9687DC
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:49:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E7CAB23267
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:43:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2A441F22CC3
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E3919C540;
-	Mon,  2 Sep 2024 12:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41DC13F43B;
+	Mon,  2 Sep 2024 12:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="A7EdX6XC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out28-98.mail.aliyun.com (out28-98.mail.aliyun.com [115.124.28.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AD019E99E;
-	Mon,  2 Sep 2024 12:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.98
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48BF32570;
+	Mon,  2 Sep 2024 12:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725281015; cv=none; b=kyWW2pR52kGvKnF8vBFtRbriIoe+yjidg8M469GWvmxP3xx2wUtyQoRKU+PQbxN0h54F5oQ/VIAK9dFh6ry1jxb1gg8QBfTkpZO3JnHhgZRBUMoDSdAsugCEf9pLOrs2KS205x/ef2PYQ0Ht7/cj1AQeej8lheyaELDbsjUgLws=
+	t=1725281347; cv=none; b=REwN5Fi70jT9HJgIEehbj/FsFdkRll1QOZyQgbWmYLtMJpqkNMZAyUPgKQLLetx9hk/qjH4/TztvAtVzkKmDWSkC8aNMk6aGW+WRC3Ilk7fbwHNvS/bWfGa2pBu2MIxuxgs5fsD2gHlkwlbE3bJesmhrWiSZLFXybBwilMb65Ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725281015; c=relaxed/simple;
-	bh=QqLgtho2VPe4uk3Z/TNXYAPGt2xMCUiSaF4pv/07XkA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=C34AYOaD4C5GjA/yP+PW4/+G8VOoWAE+2chB7KM7lQB+G5J3/1mQHtLAH5svJ1IsXSEducvo2zXuyVO6OajXhdV3N+tiCGoDpSXCT8OvGc+TNKujLSENnvRwvI5yRKj41uDB5tq6t7qM/NyG6mRrGiaZn1hj991DvyUdp6A12ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inceptio.ai; spf=pass smtp.mailfrom=inceptio.ai; arc=none smtp.client-ip=115.124.28.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inceptio.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inceptio.ai
-Received: from localhost.localdomain(mailfrom:junjie.wan@inceptio.ai fp:SMTPD_---.Z8k9nMo_1725280998)
-          by smtp.aliyun-inc.com;
-          Mon, 02 Sep 2024 20:43:23 +0800
-From: Wan Junjie <junjie.wan@inceptio.ai>
-To: horms@kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	ioana.ciornei@nxp.com,
-	junjie.wan@inceptio.ai,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1725281347; c=relaxed/simple;
+	bh=YzWM6nwQGHK9jZzcaTacrJZ4xwlKlWEBZBYAcAKWIvI=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=OqoxGp4RygxmFBwGv/4e5i4a1BUv3bfOrYwle7JCoSl1VNYmyLIFMjnHHiBuUBiZpWEB61+jK7rDDsCagTYQ1QILGYu8KsCIoWsyxWjg/kuVbPM+Dw7C/dXCgYRZD5JJB6Q2FZ28evcK8oK/9YcSHTiJcrbGigq6VCGoEIQF75A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=A7EdX6XC; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id DB4F420B7165; Mon,  2 Sep 2024 05:43:49 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DB4F420B7165
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1725281029;
+	bh=QePnS9pURR28M4mdGDE4ee0nwvMcy04D78FQiNn5+gs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=A7EdX6XCbR97yDKc1g7nc9ONNtgRX0kgdvaN2lqrwN1MEnWXGUOIJ1ATOB+2MB6Q6
+	 WdRk32R+7XuprFBDbpuO7JvJkib7TSbCCFovfhw0kan9+elWNrIr8hxs6gKXb14H3h
+	 vntKNmGXMtp/R2GvfRttz5qSr/0o+oIxaVwd+Tc8=
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	longli@microsoft.com,
+	ssengar@linux.microsoft.com,
+	linux-hyperv@vger.kernel.org,
 	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH v2] dpaa2-switch: fix flooding domain among multiple vlans
-Date: Mon,  2 Sep 2024 20:43:18 +0800
-Message-Id: <20240902124318.263883-1-junjie.wan@inceptio.ai>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240902105714.GH23170@kernel.org>
-References: <20240902105714.GH23170@kernel.org>
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: schakrabarti@microsoft.com,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH V4 net] net: mana: Fix error handling in mana_create_txq/rxq's NAPI cleanup
+Date: Mon,  2 Sep 2024 05:43:47 -0700
+Message-Id: <1725281027-29331-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-> On Mon, Sep 02, 2024 at 09:50:51AM +0800, Wan Junjie wrote:
-> > Currently, dpaa2 switch only cares dst mac and egress interface
-> > in FDB. And all ports with different vlans share the same FDB.
-> > 
-> > This will make things messed up when one device connected to
-> > dpaa2 switch via two interfaces. Ports get two different vlans
-> > assigned. These two ports will race for a same dst mac entry
-> > since multiple vlans share one FDB.
-> > 
-> > FDB below may not show up at the same time.
-> > 02:00:77:88:99:aa dev swp0 self
-> > 02:00:77:88:99:aa dev swp1 self
-> > But in fact, for rules on the bridge, they should be:
-> > 02:00:77:88:99:aa dev swp0 vlan 10 master br0
-> > 02:00:77:88:99:aa dev swp1 vlan 20 master br0
-> > 
-> > This patch address this by borrowing unused form ports' FDB
-> > when ports join bridge. And append offload flag to hardware
-> > offloaded rules so we can tell them from those on bridges.
-> > 
-> > Signed-off-by: Wan Junjie <junjie.wan@inceptio.ai>
->
-> Hi Wan Junjie,
->
-> Some minor feedback from my side.
->
-> ...
+Currently napi_disable() gets called during rxq and txq cleanup,
+even before napi is enabled and hrtimer is initialized. It causes
+kernel panic.
 
-Hi Simon Horman,
+? page_fault_oops+0x136/0x2b0
+  ? page_counter_cancel+0x2e/0x80
+  ? do_user_addr_fault+0x2f2/0x640
+  ? refill_obj_stock+0xc4/0x110
+  ? exc_page_fault+0x71/0x160
+  ? asm_exc_page_fault+0x27/0x30
+  ? __mmdrop+0x10/0x180
+  ? __mmdrop+0xec/0x180
+  ? hrtimer_active+0xd/0x50
+  hrtimer_try_to_cancel+0x2c/0xf0
+  hrtimer_cancel+0x15/0x30
+  napi_disable+0x65/0x90
+  mana_destroy_rxq+0x4c/0x2f0
+  mana_create_rxq.isra.0+0x56c/0x6d0
+  ? mana_uncfg_vport+0x50/0x50
+  mana_alloc_queues+0x21b/0x320
+  ? skb_dequeue+0x5f/0x80
 
-Thanks for your commnets.
+Cc: stable@vger.kernel.org
+Fixes: e1b5683ff62e ("net: mana: Move NAPI from EQ to CQ")
+Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+---
+V4 -> V3:
+Made napi_initialized from atomic_t to bool in txq, as per review comment.
+Also used validate_state for rxq as a check.
 
-> > diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> > index a293b08f36d4..217c68bb0faa 100644
-> > --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> > +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> > @@ -25,8 +25,17 @@
-> >  
-> >  #define DEFAULT_VLAN_ID			1
-> >  
-> > -static u16 dpaa2_switch_port_get_fdb_id(struct ethsw_port_priv *port_priv)
-> > +static u16 dpaa2_switch_port_get_fdb_id(struct ethsw_port_priv *port_priv, u16 vid)
-> 
-> This, and several other lines in this patch, could be trivially
-> line wrapped in order for them to be <= 80 columns wide, as is
-> still preferred in Networking code.
-> 
-> This and a number of other minor problems are flagged by:
-> ./scripts/checkpatch.pl --strict --codespell --max-line-length=80
+V3 -> V2:
+Instead of using napi internal attribute, using an atomic
+attribute to verify napi is initialized for a particular txq / rxq.
 
-It is hard to keep all lines limited to the length of 80 since some function
-names are really long. I have tried to make the line length to 85 without
-breaking some if conditions into multiple lines. You will see in v3.
+V2 -> V1:
+Addressed the comment on cleaning up napi for the queues,
+where queue creation was successful.
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 22 +++++++++++--------
+ include/net/mana/mana.h                       |  2 ++
+ 2 files changed, 15 insertions(+), 9 deletions(-)
 
-> >  {
-> > +	struct ethsw_core *ethsw = port_priv->ethsw_data;
-> > +	int i;
-> > +
-> > +	if (port_priv->fdb->bridge_dev) {
-> > +		for (i = 0; i < ethsw->sw_attr.max_fdbs; i++)
-> > +			if (ethsw->fdbs[i].vid == vid)
-> > +				return ethsw->fdbs[i].fdb_id;
-> > +	}
-> > +	/* Default vlan, use port's fdb id directly */
-> >  	return port_priv->fdb->fdb_id;
-> >  }
-> >  
-> 
-> ...
-> 
-> > @@ -191,10 +212,38 @@ static void *dpaa2_iova_to_virt(struct iommu_domain *domain,
-> >  static int dpaa2_switch_add_vlan(struct ethsw_port_priv *port_priv, u16 vid)
-> >  {
-> >  	struct ethsw_core *ethsw = port_priv->ethsw_data;
-> > +	struct net_device *netdev = port_priv->netdev;
-> > +	struct dpsw_fdb_cfg fdb_cfg = {0};
-> >  	struct dpsw_vlan_cfg vcfg = {0};
-> > +	struct dpaa2_switch_fdb *fdb;
-> > +	u16 fdb_id;
-> >  	int err;
-> >  
-> > -	vcfg.fdb_id = dpaa2_switch_port_get_fdb_id(port_priv);
-> > +	/* If ports are under a bridge, then
-> > +	 * every VLAN domain should use a different fdb.
-> > +	 * If ports are standalone, and
-> > +	 * vid is 1 this should reuse the allocated port fdb.
-> > +	 */
-> > +	if (port_priv->fdb->bridge_dev) {
-> > +		fdb = dpaa2_switch_fdb_get_unused(ethsw);
-> > +		if (!fdb) {
-> > +			/* if not available, create a new fdb */
-> > +			err = dpsw_fdb_add(ethsw->mc_io, 0, ethsw->dpsw_handle,
-> > +					   &fdb_id, &fdb_cfg);
-> > +			if (err) {
-> > +				netdev_err(netdev, "dpsw_fdb_add err %d\n", err);
-> > +				return err;
-> > +			}
-> 
-> fdb is still NULL here. Based on my reading of dpaa2_switch_port_init()
-> I think you need the following. Possibly also with an error check.
-> 
-> 			fdb = dpaa2_switch_fdb_get_unused(ethsw);
-> 
-> Flagged by Smatch.
-
-Nice catch. The fdb is not assigned anyway. And num of fdbs is limited by HW.
-So here I can do a judge instead of creating a new one.
-	if (port_priv->fdb->bridge_dev) {
-		fdb = dpaa2_switch_fdb_get_unused(ethsw);
-		if (!fdb) {
-			netdev_err(netdev, "vlan nums reach max_fdbs limits\n");
-			return -ENOENT;
-		}
-
-Thank you.
-
-> > +			fdb->fdb_id = fdb_id;
-> > +		}
-> > +		fdb->vid = vid;
-> > +		fdb->in_use = true;
-> > +		fdb->bridge_dev = NULL;
-> > +		vcfg.fdb_id = fdb->fdb_id;
-> > +	} else {
-> > +		/* Standalone, port's private fdb shared */
-> > +		vcfg.fdb_id = dpaa2_switch_port_get_fdb_id(port_priv, vid);
-> > +	}
-> >  	err = dpsw_vlan_add(ethsw->mc_io, 0,
-> >  			    ethsw->dpsw_handle, vid, &vcfg);
-> >  	if (err) {
-> 
-> ...
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 39f56973746d..3d151700f658 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -1872,10 +1872,12 @@ static void mana_destroy_txq(struct mana_port_context *apc)
+ 
+ 	for (i = 0; i < apc->num_queues; i++) {
+ 		napi = &apc->tx_qp[i].tx_cq.napi;
+-		napi_synchronize(napi);
+-		napi_disable(napi);
+-		netif_napi_del(napi);
+-
++		if (apc->tx_qp[i].txq.napi_initialized) {
++			napi_synchronize(napi);
++			napi_disable(napi);
++			netif_napi_del(napi);
++			apc->tx_qp[i].txq.napi_initialized = false;
++		}
+ 		mana_destroy_wq_obj(apc, GDMA_SQ, apc->tx_qp[i].tx_object);
+ 
+ 		mana_deinit_cq(apc, &apc->tx_qp[i].tx_cq);
+@@ -1931,6 +1933,7 @@ static int mana_create_txq(struct mana_port_context *apc,
+ 		txq->ndev = net;
+ 		txq->net_txq = netdev_get_tx_queue(net, i);
+ 		txq->vp_offset = apc->tx_vp_offset;
++		txq->napi_initialized = false;
+ 		skb_queue_head_init(&txq->pending_skbs);
+ 
+ 		memset(&spec, 0, sizeof(spec));
+@@ -1997,6 +2000,7 @@ static int mana_create_txq(struct mana_port_context *apc,
+ 
+ 		netif_napi_add_tx(net, &cq->napi, mana_poll);
+ 		napi_enable(&cq->napi);
++		txq->napi_initialized = true;
+ 
+ 		mana_gd_ring_cq(cq->gdma_cq, SET_ARM_BIT);
+ 	}
+@@ -2008,7 +2012,7 @@ static int mana_create_txq(struct mana_port_context *apc,
+ }
+ 
+ static void mana_destroy_rxq(struct mana_port_context *apc,
+-			     struct mana_rxq *rxq, bool validate_state)
++			     struct mana_rxq *rxq, bool napi_initialized)
+ 
+ {
+ 	struct gdma_context *gc = apc->ac->gdma_dev->gdma_context;
+@@ -2023,15 +2027,15 @@ static void mana_destroy_rxq(struct mana_port_context *apc,
+ 
+ 	napi = &rxq->rx_cq.napi;
+ 
+-	if (validate_state)
++	if (napi_initialized) {
+ 		napi_synchronize(napi);
+ 
+-	napi_disable(napi);
++		napi_disable(napi);
+ 
++		netif_napi_del(napi);
++	}
+ 	xdp_rxq_info_unreg(&rxq->xdp_rxq);
+ 
+-	netif_napi_del(napi);
+-
+ 	mana_destroy_wq_obj(apc, GDMA_RQ, rxq->rxobj);
+ 
+ 	mana_deinit_cq(apc, &rxq->rx_cq);
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 7caa334f4888..b8a6c7504ee1 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -98,6 +98,8 @@ struct mana_txq {
+ 
+ 	atomic_t pending_sends;
+ 
++	bool napi_initialized;
++
+ 	struct mana_stats_tx stats;
+ };
+ 
+-- 
+2.34.1
 
 
