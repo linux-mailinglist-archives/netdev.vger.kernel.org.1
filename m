@@ -1,141 +1,127 @@
-Return-Path: <netdev+bounces-124137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A1FF96841E
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:07:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1020E968421
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:08:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B5E31C2244A
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:07:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90A05B220F9
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:08:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF04C13CFA1;
-	Mon,  2 Sep 2024 10:07:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F53E13C9C0;
+	Mon,  2 Sep 2024 10:08:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZI+ZAvJJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gyXOgv6T"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2942313BC26
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 10:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1528E13AD18;
+	Mon,  2 Sep 2024 10:08:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725271639; cv=none; b=GUqeM1JovAfmNTejVhAyBX6C683ifEVDH7LjBRI2c/9nKVArPGNqcqUG896o51SyUUZqZj327WEqFp/R1nwLzyF6E+TsYEXHFB9fo19XKmyJTN+yuSmfjSMRf0hFIOkg/hPYzOQlJUFO1KvgjEKls4up8pP4ht8ckcFQfRNJr00=
+	t=1725271697; cv=none; b=kivnVY0W5VAkOmfYLeiEak8qgn/EhsTfezv67zvarAgirgAW3cqtS7R6KwMrBi2iBueNgcEyjR/lqRU/Mxc+El1moQ5QvwOCRRuQZ1o+1TDOer6R7Q3Dt6+whk9KgX3OI4Lk6TcC4eSrU7hB8LoBtjzvAMZxXqci50s8rHI0jCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725271639; c=relaxed/simple;
-	bh=UqY0ZOR4ZKOoHcoCsu6sP2jFHbPUIWb3im2waL5Wvvs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pv8g10Nw2aXtXbRbyilCIHtwhzymYQUcLcMmmiqpchfmb+UgsCYRYlCgKM4dbS8qgnknGr4KRwbtOKaKLMxlqPoC81FGFtV4FqyrXR7svYhGR+BcXwW5Ib0NLJdDqDmTftH6wz7phbBo03u1jIpSUwgyPpgMYsuSUgB1EANKDn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZI+ZAvJJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725271636;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=VadJH2ms1q8EaPkqqjbRvlwSJ3NWMZzkQQ/DtM+kzTs=;
-	b=ZI+ZAvJJhCXIGQgVlDcrmOX4lHh+P9nRluhXq5eXcqaiTyzfdLPFkRun+szh5tQY0g1MTE
-	911cTFAmk9+BKYPRc11h5lX6rqvs46CynhCrMf5/Y+Cn42qX6GdTOq9E9rQ6ICHhbbh7q7
-	BMjnlrINxBpuN8wDGm67MEA9NltkVzc=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-306-Um-XiOR0NliIVndgzN-xrw-1; Mon,
- 02 Sep 2024 06:07:13 -0400
-X-MC-Unique: Um-XiOR0NliIVndgzN-xrw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E9BFF1954B00;
-	Mon,  2 Sep 2024 10:07:10 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.45.224.191])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 044FA19560A3;
-	Mon,  2 Sep 2024 10:07:04 +0000 (UTC)
-From: Michal Schmidt <mschmidt@redhat.com>
-To: Wojciech Drewek <wojciech.drewek@intel.com>,
-	Marcin Szycik <marcin.szycik@intel.com>,
-	Timothy Miskell <timothy.miskell@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Petr Oros <poros@redhat.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Dave Ertman <david.m.ertman@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH iwl-net] ice: fix VSI lists confusion when adding VLANs
-Date: Mon,  2 Sep 2024 12:06:52 +0200
-Message-ID: <20240902100652.269398-1-mschmidt@redhat.com>
+	s=arc-20240116; t=1725271697; c=relaxed/simple;
+	bh=ihEUNzFDj1e5AgDwk+GFehGPR9gGmkrh9xrFlidV7cI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WlHjtOxBJtPKbXWZnSGhN0bORxnIryI4CO0UGO2PeecqAMgfgZTX/FMvwHz/S0nc93SU/gERlBF1NGsuiNOwUXFB4RWVSpNh4Xe9hKDbP1xsbzIjsMNx5Nw6mw/32fiTpfdkSn7NJfFmr/qc5bVGYVR3Mnaj2tqUSgeVj8tHwaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gyXOgv6T; arc=none smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5df96759e37so2717160eaf.2;
+        Mon, 02 Sep 2024 03:08:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725271695; x=1725876495; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=t5X/Tccx+Tn+6km/NHSvsrb4pi+NObw5RhahAjS2Mo0=;
+        b=gyXOgv6TLMEN4+ULsUMZDBSgInGhggRO7anR3jBybDKsdRgAayE8MG02AismQuc4EL
+         XES8KKDeIx49AGxcpLT03fzaDo6WwfDwXPqgPJuebTbqcXKEVehVyxmfUof1LRJm8PcH
+         WuXA+6q57ZBbrNOT8FLrv7ByqGOyRQR3FOwq1QClQLzNb/eAFGaMpVr+OZ8Pc2nAclYz
+         paWB4QluXS3Fv+BJfeRPaCNbKOTFoqqcRhgC3FyIcuLnV8d3LRIrpDxO/a2+mlNII7Kk
+         5AZB223itTFLGOgBbHtg0gKqEK5ge/BlbAUk+eyx0p8EYSC3QgkcHITQfUjnNXuQ+gYg
+         R6ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725271695; x=1725876495;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t5X/Tccx+Tn+6km/NHSvsrb4pi+NObw5RhahAjS2Mo0=;
+        b=OkNycC/fhICYYGKsmt0XTjRxQvYxVjXghZ+FwuEpsr/NvueNJbvIb1uIOhfQe2tF2Y
+         rdnhQyA+aD9y+4Nfnwn7YEDYL7s6jrPjsaqQDcIrFiQUuBPDQ/RIsbiKflK/ksDg3HxE
+         5evVuE4MgNvliunjBZEwVm5TXhS+gWnHRR85qkxt+ucC1JAFT+iQI9iyCDHqx5buE6cT
+         1pVAM69VHaXA8taB/oE2seMW4pCjlAUWWHyElqzhrO4svYcmNOt43b510bFyegLM4vgK
+         dL1uW1Sh6hHqpZi8Dy1QhsOpcVKuZEYPXCB8BbLizYGiGO0m/UeF41EFEPbROmmMdisQ
+         6ZFw==
+X-Forwarded-Encrypted: i=1; AJvYcCV/02QpnNDM73gm/OEb8oVXLCjSZf3yJTjEqQZp0kf0Itu2cd92kbUkY6vU3Q2X8uk3AG7l0QqGWe5J9vI=@vger.kernel.org, AJvYcCWii59mWgpd4dFYyTDPcC6eZh5jXD+zAh5TVuJLBj5b5mjjeJW8S92dMuqM0vL++CI8Wrl5LZ78@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYOOiRkJuqNfsTjtuAwyYPCrn/0GKY+5HMqoWgEDp+3+/Cv11w
+	7CS4bUeA097gmeFi9tirTTjdgQy6PjoYZKMJxNxdtPoo7wKrYWGpryK/DLei+YSdT+Hdq51WcFO
+	DZl00Bec+QNFwLZ2MdgL1Id0WrYQ=
+X-Google-Smtp-Source: AGHT+IGlky3ih60Exkp5+gqA7t4QCsIHBh2L2dQ6BoccHpsVmKeHV+qleuRG2cp+kGXk95CiIo1pqqp1YgZTiJbXPkQ=
+X-Received: by 2002:a05:6870:a10f:b0:25e:c013:a7fb with SMTP id
+ 586e51a60fabf-2779031b4cfmr15210114fac.43.1725271695097; Mon, 02 Sep 2024
+ 03:08:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+References: <20240830141250.30425-1-vtpieter@gmail.com> <20240830141250.30425-2-vtpieter@gmail.com>
+ <89aa2ceed7e14f3498b51f2d76f19132e0d77d35.camel@microchip.com>
+In-Reply-To: <89aa2ceed7e14f3498b51f2d76f19132e0d77d35.camel@microchip.com>
+From: Pieter <vtpieter@gmail.com>
+Date: Mon, 2 Sep 2024 12:08:03 +0200
+Message-ID: <CAHvy4ApAq6dvvAJhU9LSvxRD7eH76vL5KycVk-tg85tVWZ5gvQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/3] net: dsa: microchip: rename ksz8 series files
+To: Arun.Ramadoss@microchip.com
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
+	linux@armlinux.org.uk, Woojung.Huh@microchip.com, f.fainelli@gmail.com, 
+	kuba@kernel.org, UNGLinuxDriver@microchip.com, edumazet@google.com, 
+	pabeni@redhat.com, o.rempel@pengutronix.de, pieter.van.trappen@cern.ch, 
+	Tristram.Ha@microchip.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-The description of function ice_find_vsi_list_entry says:
-  Search VSI list map with VSI count 1
+Hi Arun,
 
-However, since the blamed commit (see Fixes below), the function no
-longer checks vsi_count. This causes a problem in ice_add_vlan_internal,
-where the decision to share VSI lists between filter rules relies on the
-vsi_count of the found existing VSI list being 1.
+> > -         This driver adds support for Microchip KSZ9477 series
+> > switch and
+> > -         KSZ8795/KSZ88x3 switch chips.
+> > +         This driver adds support for Microchip KSZ9477 series,
+> > +         LAN937X series and KSZ8 series switch chips, being
+> > +         KSZ9477/9896/9897/9893/9563/9567,
+>
+> You missed KSZ8567 and KSZ8563. Also it could be in order as suggested
+> by Tristram,
+> -  KSZ8863/8873, KSZ8895/8864, KSZ8794/8795/8765
+> -  KSZ9477/9897/9896/9567/8567
+> -  KSZ9893/9563/8563
+> -  LAN9370/9371/9372/9373/9374
 
-The reproducing steps:
-1. Have a PF and two VFs.
-   There will be a filter rule for VLAN 0, refering to a VSI list
-   containing VSIs: 0 (PF), 2 (VF#0), 3 (VF#1).
-2. Add VLAN 1234 to VF#0.
-   ice will make the wrong decision to share the VSI list with the new
-   rule. The wrong behavior may not be immediately apparent, but it can
-   be observed with debug prints.
-3. Add VLAN 1234 to VF#1.
-   ice will unshare the VSI list for the VLAN 1234 rule. Due to the
-   earlier bad decision, the newly created VSI list will contain
-   VSIs 0 (PF) and 3 (VF#1), instead of expected 2 (VF#0) and 3 (VF#1).
-4. Try pinging a network peer over the VLAN interface on VF#0.
-   This fails.
+OK will do.
 
-Reproducer script at:
-https://gitlab.com/mschmidt2/repro/-/blob/master/RHEL-46814/test-vlan-vsi-list-confusion.sh
-Commented debug trace:
-https://gitlab.com/mschmidt2/repro/-/blob/master/RHEL-46814/ice-vlan-vsi-lists-debug.txt
-Patch adding the debug prints:
-https://gitlab.com/mschmidt2/linux/-/commit/f8a8814623944a45091a77c6094c40bfe726bfdb
+> > + * It supports the following switches:
+> > + * - KSZ8863, KSZ8873 aka KSZ88X3
+> > + * - KSZ8895, KSZ8864 aka KSZ8895 family
+>
+> You can remove 'family' here, so as to be consistent.
 
-One thing I'm not certain about is the implications for the LAG feature,
-which is another caller of ice_find_vsi_list_entry. I don't have a
-LAG-capable card at hand to test.
+Well I'd rather keep it so it's consistent with the ksz_common.h
+ksz_is_8895_family(), do you agree?
 
-Fixes: 25746e4f06a5 ("ice: changes to the interface with the HW and FW for SRIOV_VF+LAG")
-Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
----
- drivers/net/ethernet/intel/ice/ice_switch.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> > + * - KSZ8794, KSZ8795, KSZ8765 aka KSZ87XX
+> > + * Note that it does NOT support:
+> > + * - KSZ8563, KSZ8567 - see KSZ9477 driver
+> >   *
+> >   * Copyright (C) 2017 Microchip Technology Inc.
+> >   *     Tristram Ha <Tristram.Ha@microchip.com>
+> > @@ -23,7 +30,7 @@
+> >  #include <linux/phylink.h>
+> >
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index fe8847184cb1..4e6e7af962bd 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -3264,7 +3264,7 @@ ice_find_vsi_list_entry(struct ice_hw *hw, u8 recp_id, u16 vsi_handle,
- 
- 	list_head = &sw->recp_list[recp_id].filt_rules;
- 	list_for_each_entry(list_itr, list_head, list_entry) {
--		if (list_itr->vsi_list_info) {
-+		if (list_itr->vsi_count == 1 && list_itr->vsi_list_info) {
- 			map_info = list_itr->vsi_list_info;
- 			if (test_bit(vsi_handle, map_info->vsi_map)) {
- 				*vsi_list_id = map_info->vsi_list_id;
--- 
-2.45.2
-
+Cheers, Pieter
 
