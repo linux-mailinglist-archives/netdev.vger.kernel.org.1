@@ -1,118 +1,122 @@
-Return-Path: <netdev+bounces-124204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D971A9687F4
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:52:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA64096883C
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 15:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97610282EA7
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 12:52:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E06D91C224CE
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 13:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B004713F43B;
-	Mon,  2 Sep 2024 12:52:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243C5187355;
+	Mon,  2 Sep 2024 13:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HpuqzOKV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMiT5aen"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D8B185939
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 12:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F1E92D057
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 13:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725281564; cv=none; b=HGKQeopbyU9XKBehFYmURX7ySRxKko7QfXLAu4xcoTWJjFXQjiKTB0dEVAEsRrgJmI+L0t0lrTaNsYsjD6DeNE4c8RMJhSvXs8l1tmJJG2DHeWs7rKoeAJcJ10bzfharU/YNeNqk60+88iIa1c6EYUuidkQvAhwBNXjnYLaHxOg=
+	t=1725282057; cv=none; b=L+opH2A4ulLpDEfWsGU4fdSPq9mMvLyFvmEHrnkmiMauUSbmwMC6JLsBF2J/0N7hcLZgaIJll52G1I8M7Gj/1KPhO+HNALmhMNqwtgnpWwljQDv90Jgp5wdV+1hKj8o58mYb5U7MgUfs7T+d8ZvhkarjAbLXiK5d3t23kzFN/bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725281564; c=relaxed/simple;
-	bh=Q+j5Bl7cH6ou3W2kzNmS7fE9kRHevpD//rfikQBDb0k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E/6Y8Fg2ykQfRwFk7Q/F5OdE2XqmMwLRZFhdxsbi+HnnnqZPqVHpvCBze1Gywkp2bEY9YpG7Hk5TS685tKWmoA7tYxQMmif9WheYPwBBBpQwqveUVGZIk7l0zr5TLLwr/KiluwVTywY3VsmnBUfWcnL2mep0jUwDIgKTKoEHSjw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HpuqzOKV; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725281563; x=1756817563;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Q+j5Bl7cH6ou3W2kzNmS7fE9kRHevpD//rfikQBDb0k=;
-  b=HpuqzOKVAnHFla1zuILbPyA4vVm9g96Bxof0cW0lPpUJ5FbngizdYsII
-   eVco/ndjHqJ0vB7BCksH/pX9sQCO0b9J+w6WknBiN328Hlys63/T4y4uN
-   lJCSZQ2ALFUbCsQR/19fBUaVyAHmeJmqpZNlp11m57AjR+dzJrlMcTo3C
-   BywbDEnIqf+IRYoNLMCQWQ/E1KHsm7az9iAIbqKz/+UF/kXb3m4G+jrMB
-   7eVy/nhR6RsbXwxhzJrbLoA9AgJxleVLqlGVafStfZ/NTrm/cRDcqoJyZ
-   Px58d+1/rKk1n3RPT7YDaW/G7IbbFS621CzebP0lL/xCOChzP3JG4IRKF
-   A==;
-X-CSE-ConnectionGUID: ytN4FjCmTUOE+qmXllDTvw==
-X-CSE-MsgGUID: zQ3vXMZ4TX+buw627aNX2A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11183"; a="13330974"
-X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
-   d="scan'208";a="13330974"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 05:52:42 -0700
-X-CSE-ConnectionGUID: fcplad2bTku46m4kJ3zXXQ==
-X-CSE-MsgGUID: Y6Rvj8fqRfiQyJLUBGPWng==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
-   d="scan'208";a="69469819"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 05:52:39 -0700
-Date: Mon, 2 Sep 2024 14:50:36 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com, horms@kernel.org,
-	helgaas@kernel.org, przemyslaw.kitszel@intel.com,
-	Hongguang Gao <hongguang.gao@broadcom.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>
-Subject: Re: [PATCH net-next v4 9/9] bnxt_en: Support dynamic MSIX
-Message-ID: <ZtW0nDQdlzkHG5Y1@mev-dev.igk.intel.com>
-References: <20240828183235.128948-1-michael.chan@broadcom.com>
- <20240828183235.128948-10-michael.chan@broadcom.com>
+	s=arc-20240116; t=1725282057; c=relaxed/simple;
+	bh=uXEQ6BxtJfFYS9cmShOFHvqvBEK26Ggapmvll28AZIQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WRw94dbWkXnHD+JBOMMg7SpnSYnQNPWHRJwphPcCMRhzJ2DJ5Za31MOu2CACLo1x12OJKVgcEgCHfMrx5jtmZ2iQ6/YLK8FUNc2oeOTl5gAfbasn4ln3jFMWoqdfCSAtnpS2OgpR+GKk6G5UaOuzXbwHeIg9LPlB3JWnGAVyDbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GMiT5aen; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725282054;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w4UjvHRX8Oj9LnIjMNRuX4yJ+xeGtxIsSsEqvGhv+ro=;
+	b=GMiT5aen37jkaCY1sw62sZHP0fIiPzrkxaN8g2OCF8mQfVXzsJ6JSe4q2ofeo2enrl8AOl
+	+u6mawodxcOknRL3YfWxWyyIbsymL1DfmubDaKFJcd4BkedS+xVJYd8uN3ea3MwQ1+3Y31
+	ss/eHMGSMrsZdfv8wQUmczqP+kRDqvQ=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-447-SDN1o8NtPTKGADni9om6Ug-1; Mon, 02 Sep 2024 09:00:51 -0400
+X-MC-Unique: SDN1o8NtPTKGADni9om6Ug-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a86824d2d12so375317866b.2
+        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 06:00:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725282050; x=1725886850;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=w4UjvHRX8Oj9LnIjMNRuX4yJ+xeGtxIsSsEqvGhv+ro=;
+        b=Eyo+C0WE5iRsvSIYYe6m1AequFIvOk+ZUKv4pNgeQ7xzI5JcPDE7AomV+iIsQRyWcS
+         JCswPgLTeX+CJE9A4PvCtwotlxGQesjsp3VZjXjMmRfFQZ5N0MsmRH18hdeyK45ziWDW
+         SySSWVzjfIF5qtugdMMDD167ir5t94GJS3TsvLqcu1gJvKI/BinDe1iUH7OxfpxyzJLn
+         2GtFN+NVtwQQ9MMs30K5OdWramd9X58mH8ILKCn12tNG0H3xzQFtcP0qS1Q2W58Js13V
+         OrDP0GSGiCv0VRzwWx/0dQ9XvM1rSEacjRlVekSDeyP0vwmJOlTS5AiGwOj9Ry9LUtno
+         DDUQ==
+X-Gm-Message-State: AOJu0YyZP+QOvcNTFCzhJJaOea+KvUKPdVhChh3rn/qVEzn82hApY0vc
+	70zl9I27dpfjGuk9xrp/DZTY0gwo/YSys78r98Y9vk/xAYawsn7dNxrGMFxSHloyVsTXaZGryX7
+	/BvIj8OIouri9l5JJC9VwZuKQ1jfZSJ5FqNlxD7/hbBnuXle98aC9kw==
+X-Received: by 2002:a17:906:fe4b:b0:a79:82c1:a5b2 with SMTP id a640c23a62f3a-a89b93db796mr520934066b.9.1725282050506;
+        Mon, 02 Sep 2024 06:00:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGV3/o7Jt5WWnvqUynDWlp723LhO4YRZNw/QT+Vx1+d+P4KGzj5Soa66/PUkMxaEKejnjlOOA==
+X-Received: by 2002:a17:906:fe4b:b0:a79:82c1:a5b2 with SMTP id a640c23a62f3a-a89b93db796mr520931466b.9.1725282050020;
+        Mon, 02 Sep 2024 06:00:50 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-5-217.dyn.eolo.it. [146.241.5.217])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a898900f6c4sm558071766b.68.2024.09.02.06.00.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Sep 2024 06:00:49 -0700 (PDT)
+Message-ID: <7a7bffdf-b461-49a3-b410-c58d12762550@redhat.com>
+Date: Mon, 2 Sep 2024 15:00:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240828183235.128948-10-michael.chan@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 02/12] net-shapers: implement NL get operation
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
+ Madhu Chittim <madhu.chittim@intel.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Donald Hunter
+ <donald.hunter@gmail.com>, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
+ edumazet@google.com
+References: <cover.1724944116.git.pabeni@redhat.com>
+ <53077d35a1183d5c1110076a07d73940bb2a55f3.1724944117.git.pabeni@redhat.com>
+ <20240829182019.105962f6@kernel.org>
+ <57ef8eb8-9534-4061-ba6c-4dadaf790c45@redhat.com>
+ <20240830113900.4c5c9b2a@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240830113900.4c5c9b2a@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 28, 2024 at 11:32:35AM -0700, Michael Chan wrote:
-> A range of MSIX vectors are allocated at initialization for the number
-> needed for RocE and L2.  During run-time, if the user increases or
-> decreases the number of L2 rings, all the MSIX vectors have to be
-> freed and a new range has to be allocated.  This is not optimal and
-> causes disruptions to RoCE traffic every time there is a change in L2
-> MSIX.
+On 8/30/24 20:39, Jakub Kicinski wrote:
+> On Fri, 30 Aug 2024 12:55:05 +0200 Paolo Abeni wrote:
+>> #define NETLINK_CTX_SIZE 48
+>>
+>> and use such define above and in linux/netlink.h
 > 
-> If the system supports dynamic MSIX allocations, use dynamic
-> allocation to add new L2 MSIX vectors or free unneeded L2 MSIX
-> vectors.  RoCE traffic is not affected using this scheme.
+> Aha, would be good to also have a checking macro. Maybe rename
 > 
-> Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
-> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
-> Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> v4: Simplify adding and deleting MSIX
-> v2: Fix typo in changelog
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 37 +++++++++++++++++++++--
->  1 file changed, 34 insertions(+), 3 deletions(-)
+> NL_ASSERT_DUMP_CTX_FITS()
 > 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index fa4115f6dafe..c9248ed9330c 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -10622,6 +10622,30 @@ static void bnxt_setup_msix(struct bnxt *bp)
->  
+> to apply more broadly? or add a new one? Weak preference for former.
 
-Thanks,
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+I will rename it to NL_ASSERT_CTX_FITS(), in the same patch.
+
+/P
+
 
