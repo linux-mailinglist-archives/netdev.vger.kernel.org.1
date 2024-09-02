@@ -1,259 +1,229 @@
-Return-Path: <netdev+bounces-124124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F17319682D1
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:12:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F7219682D5
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:13:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CFEBB228B8
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 09:12:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D29301F21FD0
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 09:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760DE186E58;
-	Mon,  2 Sep 2024 09:12:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="W4Jpq0bS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CCA3187861;
+	Mon,  2 Sep 2024 09:12:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BDC2D7B8
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 09:12:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E689187547;
+	Mon,  2 Sep 2024 09:12:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725268331; cv=none; b=L3sDu0Yl+yif3YmlXM0Ps6MEKx0AjlDiGbZiX8dOP1r530r+wQnQIYeuNCfrqG8Uj95CWjYEaJMsmD99JiyhYuhr1QiO6fz2uyGG35hvEjvkLX43Wdiu3hQb7nLopaqfy+fwkmfhAbCdXYvJLIh87uoNV1O2lp73SxO4xr3pJMQ=
+	t=1725268375; cv=none; b=Q9mB5N2wNRAT/jUlafl6MVh0y6UTIUdrfPemuZbsdvpW6LIErs2yy3JvJMxQGilQN7ncgzRdf2APDxfIUjGNW4B4H7mC/BoR38Tm+uUY1DWPfoeGmXDrX7BN3PjVAqYD1V1Lg3xncaBjDA2DXKYLIW9Fw7ZzpI4S0L3is/U5ibg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725268331; c=relaxed/simple;
-	bh=KWeIymKdSiHTqoIQSwZ5qlwBdfzYLYmPKZUS0DQ5Y4k=;
+	s=arc-20240116; t=1725268375; c=relaxed/simple;
+	bh=zGgj5jyXVGaaxxCaLsxnwIBByIzH1s3DIKp7nMRUOMk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TRaK/NyWg+x0o0UU2vs3GKvNUOIV1XsaNt6v8SgL4hESPxSsUQiZQ6d89pMua4bo5MU5a8aLMBJWDpIo5bX6uFj9zmaPoOLyrCaaxLefnPft8+bFjXM+fyFU8GTMO9bpRfoVxE+pnwgbxjec3EUE6WQCoOlNTN1zpJdZal6bTWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=W4Jpq0bS; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5d8b523d-ca30-40d7-bc08-f7959de47e4b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725268325;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oplwnncwtv62O4dzI3pxzyHN/OFWCNvARukmUAulhJU=;
-	b=W4Jpq0bS5jneCTZJlwqqjOs92qFyOHPCY3r5CVtmJCJkLb1PTaVuj0rGrjVVOSoHJe6sgi
-	3rR5HrdOGoRlWCTvObZTQKQzpMU6gCSMeBqXTTA1hUdd58R2Q9wBCx9uF/0ifuyLpjkdiP
-	D/43N7kYguEM76W1ejDkxosZTXTI+6s=
-Date: Mon, 2 Sep 2024 10:12:01 +0100
+	 In-Reply-To:Content-Type; b=CSYKmWoc+RtHVebR4no/pU3jKtURKjaFEcG9EoY6f+WAi4rc1WMlJt1qPyRcIhJFmDdn45eS0uNCVEGTTXA1FqGOCV3RFlQQ+OUeC3RcQirjW+bbRCodHz7ENDXPYjqzi23BOwaVu5k7bGlGmplr5SHS8v7dWtLnGWzl87Gqj68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 7ebffe58690b11efa216b1d71e6e1362-20240902
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:074946e5-9594-4ff7-9ef4-33885013dae6,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:82c5f88,CLOUDID:e1679a74f9659744bcce0c6f4470f2ac,BulkI
+	D:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|-5,EDM:-3,IP:nil,UR
+	L:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,S
+	PR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
+X-UUID: 7ebffe58690b11efa216b1d71e6e1362-20240902
+Received: from node2.com.cn [(10.44.16.197)] by mailgw.kylinos.cn
+	(envelope-from <luyun@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 795379890; Mon, 02 Sep 2024 17:12:36 +0800
+Received: from node2.com.cn (localhost [127.0.0.1])
+	by node2.com.cn (NSMail) with SMTP id 30BD7B80758A;
+	Mon,  2 Sep 2024 17:12:36 +0800 (CST)
+X-ns-mid: postfix-66D58184-1073891000
+Received: from [10.42.20.151] (unknown [10.42.20.151])
+	by node2.com.cn (NSMail) with ESMTPA id EDFB4B80758A;
+	Mon,  2 Sep 2024 09:12:34 +0000 (UTC)
+Message-ID: <2df10720-1790-48bd-a50c-4816260543b0@kylinos.cn>
+Date: Mon, 2 Sep 2024 17:12:21 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 2/2] selftests: txtimestamp: add SCM_TS_OPT_ID
- test
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org
-References: <20240829204922.1674865-1-vadfed@meta.com>
- <20240829204922.1674865-2-vadfed@meta.com>
- <CAL+tcoCeQ5R9Pp=__hi6xuQzACj9v1+TQarMky8c2nzcBN0+Xg@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: CPU stuck due to the taprio hrtimer
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>, jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240627055338.2186255-1-luyun@kylinos.cn>
+ <87sewy55gp.fsf@intel.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <CAL+tcoCeQ5R9Pp=__hi6xuQzACj9v1+TQarMky8c2nzcBN0+Xg@mail.gmail.com>
+From: luyun <luyun@kylinos.cn>
+In-Reply-To: <87sewy55gp.fsf@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: quoted-printable
 
-On 02/09/2024 02:29, Jason Xing wrote:
-> Hello Vadim,
-> 
-> On Fri, Aug 30, 2024 at 4:55 AM Vadim Fedorenko <vadfed@meta.com> wrote:
+
+=E5=9C=A8 2024/6/28 07:30, Vinicius Costa Gomes =E5=86=99=E9=81=93:
+> Yun Lu <luyun@kylinos.cn> writes:
+>
+>> Hello,
 >>
->> Extend txtimestamp udp test to run with fixed tskey using
->> SCM_TS_OPT_ID control message.
+>> When I run a taprio test program on the latest kernel(v6.10-rc4), CPU =
+stuck
+>> is detected immediately, and the stack shows that CPU is stuck on tapr=
+io
+>> hrtimer.
 >>
->> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>> The reproducer program link:
+>> https://github.com/xyyluyun/taprio_test/blob/main/taprio_test.c
+>> gcc taprio_test.c -static -o taprio_test
+>>
+>> In this program, start the taprio hrtimer which clockid is set to REAL=
+TIME, and
+>> then adjust the system time by a significant value backwards. Thus, CP=
+U will enter
+>> an infinite loop in the__hrtimer_run_queues function, getting stuck an=
+d unable to
+>> exit or respond to any interrupts.
+>>
+>> I have tried to avoid this problem by apllying the following patch, an=
+d it does work.
+>> But I am not sure if this can be the final solution?
+>>
+>> Thanks.
+>>
+>> Signed-off-by: Yun Lu <luyun@kylinos.cn>
 >> ---
->>   tools/include/uapi/asm-generic/socket.h    |  2 +
->>   tools/testing/selftests/net/txtimestamp.c  | 48 +++++++++++++++++-----
->>   tools/testing/selftests/net/txtimestamp.sh |  1 +
->>   3 files changed, 41 insertions(+), 10 deletions(-)
+>>   net/sched/sch_taprio.c | 24 ++++++++++++++++++++++++
+>>   1 file changed, 24 insertions(+)
 >>
->> diff --git a/tools/include/uapi/asm-generic/socket.h b/tools/include/uapi/asm-generic/socket.h
->> index 54d9c8bf7c55..281df9139d2b 100644
->> --- a/tools/include/uapi/asm-generic/socket.h
->> +++ b/tools/include/uapi/asm-generic/socket.h
->> @@ -124,6 +124,8 @@
->>   #define SO_PASSPIDFD           76
->>   #define SO_PEERPIDFD           77
->>
->> +#define SCM_TS_OPT_ID          78
+>> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+>> index a0d54b422186..2ff8d34bdbac 100644
+>> --- a/net/sched/sch_taprio.c
+>> +++ b/net/sched/sch_taprio.c
+>> @@ -104,6 +104,7 @@ struct taprio_sched {
+>>   	u32 max_sdu[TC_MAX_QUEUE]; /* save info from the user */
+>>   	u32 fp[TC_QOPT_MAX_QUEUE]; /* only for dump and offloading */
+>>   	u32 txtime_delay;
+>> +	ktime_t offset;
+>>   };
+>>  =20
+>>   struct __tc_taprio_qopt_offload {
+>> @@ -170,6 +171,19 @@ static ktime_t sched_base_time(const struct sched=
+_gate_list *sched)
+>>   	return ns_to_ktime(sched->base_time);
+>>   }
+>>  =20
+>> +static ktime_t taprio_get_offset(const struct taprio_sched *q)
+>> +{
+>> +	enum tk_offsets tk_offset =3D READ_ONCE(q->tk_offset);
+>> +	ktime_t time =3D ktime_get();
 >> +
->>   #if !defined(__KERNEL__)
->>
->>   #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
->> diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
->> index ec60a16c9307..3a8f716e72ae 100644
->> --- a/tools/testing/selftests/net/txtimestamp.c
->> +++ b/tools/testing/selftests/net/txtimestamp.c
->> @@ -54,6 +54,10 @@
->>   #define USEC_PER_SEC   1000000L
->>   #define NSEC_PER_SEC   1000000000LL
->>
->> +#ifndef SCM_TS_OPT_ID
->> +# define SCM_TS_OPT_ID 78
->> +#endif
+>> +	switch (tk_offset) {
+>> +	case TK_OFFS_MAX:
+>> +		return 0;
+>> +	default:
+>> +		return ktime_sub_ns(ktime_mono_to_any(time, tk_offset), time);
+>> +	}
+>> +}
 >> +
->>   /* command line parameters */
->>   static int cfg_proto = SOCK_STREAM;
->>   static int cfg_ipproto = IPPROTO_TCP;
->> @@ -77,6 +81,8 @@ static bool cfg_epollet;
->>   static bool cfg_do_listen;
->>   static uint16_t dest_port = 9000;
->>   static bool cfg_print_nsec;
->> +static uint32_t ts_opt_id;
->> +static bool cfg_use_cmsg_opt_id;
->>
->>   static struct sockaddr_in daddr;
->>   static struct sockaddr_in6 daddr6;
->> @@ -136,12 +142,13 @@ static void validate_key(int tskey, int tstype)
->>          /* compare key for each subsequent request
->>           * must only test for one type, the first one requested
->>           */
->> -       if (saved_tskey == -1)
->> +       if (saved_tskey == -1 || cfg_use_cmsg_opt_id)
->>                  saved_tskey_type = tstype;
->>          else if (saved_tskey_type != tstype)
->>                  return;
->>
->>          stepsize = cfg_proto == SOCK_STREAM ? cfg_payload_len : 1;
->> +       stepsize = cfg_use_cmsg_opt_id ? 0 : stepsize;
->>          if (tskey != saved_tskey + stepsize) {
->>                  fprintf(stderr, "ERROR: key %d, expected %d\n",
->>                                  tskey, saved_tskey + stepsize);
->> @@ -480,7 +487,7 @@ static void fill_header_udp(void *p, bool is_ipv4)
->>
->>   static void do_test(int family, unsigned int report_opt)
+>>   static ktime_t taprio_mono_to_any(const struct taprio_sched *q, ktim=
+e_t mono)
 >>   {
->> -       char control[CMSG_SPACE(sizeof(uint32_t))];
->> +       char control[2 * CMSG_SPACE(sizeof(uint32_t))];
->>          struct sockaddr_ll laddr;
->>          unsigned int sock_opt;
->>          struct cmsghdr *cmsg;
->> @@ -620,18 +627,32 @@ static void do_test(int family, unsigned int report_opt)
->>                  msg.msg_iov = &iov;
->>                  msg.msg_iovlen = 1;
->>
->> -               if (cfg_use_cmsg) {
->> +               if (cfg_use_cmsg || cfg_use_cmsg_opt_id) {
->>                          memset(control, 0, sizeof(control));
->>
->>                          msg.msg_control = control;
->> -                       msg.msg_controllen = sizeof(control);
->> +                       msg.msg_controllen = cfg_use_cmsg * CMSG_SPACE(sizeof(uint32_t));
->> +                       msg.msg_controllen += cfg_use_cmsg_opt_id * CMSG_SPACE(sizeof(uint32_t));
->>
->> -                       cmsg = CMSG_FIRSTHDR(&msg);
->> -                       cmsg->cmsg_level = SOL_SOCKET;
->> -                       cmsg->cmsg_type = SO_TIMESTAMPING;
->> -                       cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
->> +                       cmsg = NULL;
-> 
-> nit: we don't need to initialize it with NULL since it will be init
-> one way or another in the following code.
-
-NULL initialization is needed here because I use cmsg as a flag to
-choose between CMSG_FIRSTHDR or CMSG_NXTHDR.
-
->> +                       if (cfg_use_cmsg) {
->> +                               cmsg = CMSG_FIRSTHDR(&msg);
->> +                               cmsg->cmsg_level = SOL_SOCKET;
->> +                               cmsg->cmsg_type = SO_TIMESTAMPING;
->> +                               cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
+>>   	/* This pairs with WRITE_ONCE() in taprio_parse_clockid() */
+>> @@ -918,6 +932,7 @@ static enum hrtimer_restart advance_sched(struct h=
+rtimer *timer)
+>>   	int num_tc =3D netdev_get_num_tc(dev);
+>>   	struct sched_entry *entry, *next;
+>>   	struct Qdisc *sch =3D q->root;
+>> +	ktime_t now_offset =3D taprio_get_offset(q);
+>>   	ktime_t end_time;
+>>   	int tc;
+>>  =20
+>> @@ -957,6 +972,14 @@ static enum hrtimer_restart advance_sched(struct =
+hrtimer *timer)
+>>   	end_time =3D ktime_add_ns(entry->end_time, next->interval);
+>>   	end_time =3D min_t(ktime_t, end_time, oper->cycle_end_time);
+>>  =20
+>> +	if (q->offset !=3D now_offset) {
+>> +		ktime_t diff =3D ktime_sub_ns(now_offset, q->offset);
 >> +
->> +                               *((uint32_t *)CMSG_DATA(cmsg)) = report_opt;
->> +                       }
->> +                       if (cfg_use_cmsg_opt_id) {
->> +                               cmsg = cmsg ? CMSG_NXTHDR(&msg, cmsg) : CMSG_FIRSTHDR(&msg);
-
-This line has the check.
-
->> +                               cmsg->cmsg_level = SOL_SOCKET;
->> +                               cmsg->cmsg_type = SCM_TS_OPT_ID;
->> +                               cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
+>> +		end_time =3D ktime_add_ns(end_time, diff);
+>> +		oper->cycle_end_time =3D ktime_add_ns(oper->cycle_end_time, diff);
+>> +		q->offset =3D now_offset;
+>> +	}
 >> +
->> +                               *((uint32_t *)CMSG_DATA(cmsg)) = ts_opt_id;
->> +                               saved_tskey = ts_opt_id;
->> +                       }
->>
->> -                       *((uint32_t *) CMSG_DATA(cmsg)) = report_opt;
->>                  }
->>
->>                  val = sendmsg(fd, &msg, 0);
->> @@ -681,6 +702,7 @@ static void __attribute__((noreturn)) usage(const char *filepath)
->>                          "  -L    listen on hostname and port\n"
->>                          "  -n:   set no-payload option\n"
->>                          "  -N:   print timestamps and durations in nsec (instead of usec)\n"
->> +                       "  -o N: use SCM_TS_OPT_ID control message to provide N as tskey\n"
->>                          "  -p N: connect to port N\n"
->>                          "  -P:   use PF_PACKET\n"
->>                          "  -r:   use raw\n"
->> @@ -701,7 +723,7 @@ static void parse_opt(int argc, char **argv)
->>          int c;
->>
->>          while ((c = getopt(argc, argv,
->> -                               "46bc:CeEFhIl:LnNp:PrRS:t:uv:V:x")) != -1) {
->> +                               "46bc:CeEFhIl:LnNo:p:PrRS:t:uv:V:x")) != -1) {
->>                  switch (c) {
->>                  case '4':
->>                          do_ipv6 = 0;
->> @@ -742,6 +764,10 @@ static void parse_opt(int argc, char **argv)
->>                  case 'N':
->>                          cfg_print_nsec = true;
->>                          break;
->> +               case 'o':
->> +                       ts_opt_id = strtoul(optarg, NULL, 10);
->> +                       cfg_use_cmsg_opt_id = true;
->> +                       break;
->>                  case 'p':
->>                          dest_port = strtoul(optarg, NULL, 10);
->>                          break;
->> @@ -799,6 +825,8 @@ static void parse_opt(int argc, char **argv)
->>                  error(1, 0, "cannot ask for pktinfo over pf_packet");
->>          if (cfg_busy_poll && cfg_use_epoll)
->>                  error(1, 0, "pass epoll or busy_poll, not both");
->> +       if (cfg_proto != SOCK_DGRAM && cfg_use_cmsg_opt_id)
->> +               error(1, 0, "control message TS_OPT_ID can only be used with udp socket");
->>
->>          if (optind != argc - 1)
->>                  error(1, 0, "missing required hostname argument");
->> diff --git a/tools/testing/selftests/net/txtimestamp.sh b/tools/testing/selftests/net/txtimestamp.sh
->> index 25baca4b148e..7894628a9355 100755
->> --- a/tools/testing/selftests/net/txtimestamp.sh
->> +++ b/tools/testing/selftests/net/txtimestamp.sh
->> @@ -39,6 +39,7 @@ run_test_tcpudpraw() {
->>
->>          run_test_v4v6 ${args}           # tcp
->>          run_test_v4v6 ${args} -u        # udp
->> +       run_test_v4v6 ${args} -u -o 5   # udp with fixed tskey
-> 
-> Could we also add another test with "-C" based on the above command?
-> It can test when both ID related flags are set, which will be helpful
-> in the future :)
+> I think what we should do here is a bit different. Let me try to explai=
+n
+> what I have in mind with some context.
+>
+> A bit of context: The idea of taprio is to enforce "TSN" traffic
+> schedules, these schedules require time synchronization, for example vi=
+a
+> PTP, and in those cases, time jumps are not expected or a sign that
+> something is wrong.
+>
+> In my mind, a time jump, specially a big one, kind of invalidates the
+> schedule, as the schedule is based on an absolute time value (the
+> base_time), and when time jumps that reference in time is lost.
+>
+> BUT making the user's system unresponsive is a bug, a big one, as if
+> this happens in the real world, the user will be unable to investigate
+> what made the system have so big a time correction.
+>
+> So my idea is to warn the user that the time jumped, say that the user
+> needs to reconfigure the schedule, as it is now invalid, and disable th=
+e
+> schedule.
+>
+> Does this make sense?
+>
+> Ah, and thanks for the report.
 
-yep, sure, I'll add it in the next iteration.
+Hello Vinicius,
 
-> Thanks,
-> Jason
-> 
->>          run_test_v4v6 ${args} -r        # raw
->>          run_test_v4v6 ${args} -R        # raw (IPPROTO_RAW)
->>          run_test_v4v6 ${args} -P        # pf_packet
->> --
->> 2.43.5
->>
->>
+May I ask is there a fix patch for this issue?
 
+I test it on the latest kernel version,=C2=A0 and it still seems to cause=
+ CPU=20
+stuck.
+
+As you mentioned, a better way would be to warn the user that the=20
+current time has jumped and cancel the hrtimer,
+
+but I'm not sure how to warn the user, or just through printk?
+
+Thanks and best regards.
+
+
+>
+>>   	for (tc =3D 0; tc < num_tc; tc++) {
+>>   		if (next->gate_duration[tc] =3D=3D oper->cycle_time)
+>>   			next->gate_close_time[tc] =3D KTIME_MAX;
+>> @@ -1210,6 +1233,7 @@ static int taprio_get_start_time(struct Qdisc *s=
+ch,
+>>  =20
+>>   	base =3D sched_base_time(sched);
+>>   	now =3D taprio_get_time(q);
+>> +	q->offset =3D taprio_get_offset(q);
+>>  =20
+>>   	if (ktime_after(base, now)) {
+>>   		*start =3D base;
+>> --=20
+>> 2.34.1
+>>
+>
+> Cheers,
 
