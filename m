@@ -1,106 +1,106 @@
-Return-Path: <netdev+bounces-124108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AADBE968130
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:00:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D29C968139
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:02:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 673DD281231
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 08:00:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8618EB20518
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 08:02:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF3F185B59;
-	Mon,  2 Sep 2024 08:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AE4017C22E;
+	Mon,  2 Sep 2024 08:02:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="DubD/SYd"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ealrXrQP";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ARJT3Xlr"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0AC9183CCB
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 08:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33E4155739;
+	Mon,  2 Sep 2024 08:02:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725264023; cv=none; b=nQ4pCiO8vYlceQEMTf9GMIfLyAmQnZC2UDxhD69JFwiJ5g83YPNY7pK6J52uH4u09OtXB0+rg4DTEt/jCkD3/zm7T88rJzG5/F9qJ7kJG1zSmK7UpouBfVRdOA1Q3z03rGkjBb71NM6NrY+OW4IBTWYF9e4K5+4RWHGEY7x5unI=
+	t=1725264157; cv=none; b=M0UlGiKUF5XMnvx0lLpw8jxP3amQelgqfnHgBlEzWKsGATiasm7FVOhj9rxrSqBb5nME6Ud0BXvybHwWfwf4yibFsSGZ8ReqCT8Ip7FzrlsbnEGF9+ns+dYQSGXcjX7biP3CU38SlwjGPIZDZl/zzPSTuLRqnxVJ7tsoJU4FGLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725264023; c=relaxed/simple;
-	bh=yN91DSR/w23G23rQfv7XkanbX7VtXBfjnf/NKSIybWM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KZiof1Hy3AK/y9nFeHdtuEkQ4CtV1/5wD8GquYTSZi43EVHAQ4ELh6XF1HOsHE4TWGgnUc/mUKNrVLC076IfFkmNbwQn1z9SbcFarV8DmpKeqH0GbVrDQN3iP1PDiYyXsih+RYVjQRufOd3wc3HDjpbjicBMWg1UvEdLHcfEo8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=DubD/SYd; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 7158A20539;
-	Mon,  2 Sep 2024 10:00:19 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 3R0PVTgUzpyW; Mon,  2 Sep 2024 10:00:19 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id ECC89201AE;
-	Mon,  2 Sep 2024 10:00:18 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com ECC89201AE
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1725264019;
-	bh=mOG8NVGdnTYXNr+Zt8NIaaeNqrLn2UC/g0rbwitgT1E=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=DubD/SYdJ5Lz+X91UWgVU9mq/zvzUsow5Rc9XAzeXTIDDty/r/H0PZuD0y5G5GEF/
-	 HGAvwmxmEbJFU9Wbzep0ftvJJNSKp5HJ8GssE9Z3fgMKWJKrpczFZpVFD+g6ftPqLX
-	 uqwvOb/IcZBjW3OggwcRMGHVXap6pxaWWXvjwmcGpQFWJje7M0yTGWFdjufpyRyHpw
-	 ZdGErcLez0TvcCaLg8+Mat1fuVkhini73cwCvTLwh7mFoYS+I95B0dVgHHmQ66rwJo
-	 4JdDgENJSEPYO0rJBsojbhV+4bFee+k1f1bc2vRUTxcm3OtNo021mQ8lINISV7Mi8H
-	 uFhduKKFMs2EA==
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 2 Sep 2024 10:00:18 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 2 Sep
- 2024 10:00:18 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id C5E723180F97; Mon,  2 Sep 2024 10:00:17 +0200 (CEST)
-Date: Mon, 2 Sep 2024 10:00:17 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Eyal Birger <eyal.birger@gmail.com>
-CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <dsahern@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <devel@linux-ipsec.org>
-Subject: Re: [PATCH ipsec 0/2] xfrm: respect ip proto rules criteria in xfrm
- dst lookups
-Message-ID: <ZtVwkW61Nkw0yTcA@gauss3.secunet.de>
-References: <20240901235737.2757335-1-eyal.birger@gmail.com>
+	s=arc-20240116; t=1725264157; c=relaxed/simple;
+	bh=C9b/4f8IouEI8tV3Ua4AGgB2h5GR5GZG1FJD8tyI7Zc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tkRYzxMiOl2/Yjwzaq2PimIM0rNv1z8btuE732KbjHHLK3aizGI70ZCPLQg+VxhCX6v4wcX1qm1JZK6NgOulaOV5j7e3WE5fH5XHuMhDeoIDzrGMMbA5VM+sOQA1lByz9buifJrfMJftTuzhkBkfSKrprIdxNS6KRtdT19crj5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ealrXrQP; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ARJT3Xlr; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 2 Sep 2024 10:02:32 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1725264153;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QWvZIOhLORWof3jiLa850xZV6SIDdy3yFYNAHu46Bhg=;
+	b=ealrXrQPiqd6PqR1a0taRQvV4xrN6y48md2kYA8fO40zz93SUbAmJJ/LEydmZ8nG/pmLNm
+	A69Bo+e+MWdyxabGqcwrZNp0Co3qbwe8Cqj1DImPgVkaHKg7RsSaJrW14KHeCD4eiBjEXH
+	ojaOwKikqHmAdkKPPYWA23TW9pR7e7e6YEB3/c6dqUmY7dUwOUPujig8Qbqte+97dpaGCZ
+	CPTTyH9E1HO+QIZnx9mSc2UmBwZuRAFfOwh5lhOhfqCMJ0TpohwYn5Kr/SZvxkf1AFyhbx
+	xniMkZ0NYIlz6DFZQnGorfywAo8TBx8LByMqsnvXoqXFw3MY3r26T1KnkOfFQA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1725264153;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QWvZIOhLORWof3jiLa850xZV6SIDdy3yFYNAHu46Bhg=;
+	b=ARJT3XlrKeAcaPioHwanooS814wM55eAUlrq7HicEyZ9VjcvfdBZGOOyFDlW+tqZjW8hwM
+	N0a6/EoHBq4X4rBw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: syzbot <syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com>
+Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
+	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev,
+	michal.switala@infogain.com, netdev@vger.kernel.org,
+	revest@google.com, sdf@fomichev.me, sdf@google.com, song@kernel.org,
+	syzkaller-bugs@googlegroups.com, toke@redhat.com,
+	yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in
+ dev_map_enqueue (2)
+Message-ID: <20240902080232.wnhtxiWK@linutronix.de>
+References: <00000000000099cf25061964d113@google.com>
+ <000000000000ebe92a062100eb94@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240901235737.2757335-1-eyal.birger@gmail.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-01.secunet.de (10.53.40.197)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <000000000000ebe92a062100eb94@google.com>
 
-On Sun, Sep 01, 2024 at 04:57:35PM -0700, Eyal Birger wrote:
-> This series fixes the route lookup when done for xfrm to regard
-> L4 criteria specified in ip rules.
+On 2024-08-31 13:55:02 [-0700], syzbot wrote:
+> syzbot suspects this issue was fixed by commit:
 > 
-> The first patch is a minor refactor to allow passing more parameters
-> to dst lookup functions.
-> The second patch actually passes L4 information to these lookup functions.
+> commit 401cb7dae8130fd34eb84648e02ab4c506df7d5e
+> Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Date:   Thu Jun 20 13:22:04 2024 +0000
 > 
-> Signed-off-by: Eyal Birger <eyal.birger@gmail.com>
+>     net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.
 > 
-> Eyal Birger (2):
->   xfrm: extract dst lookup parameters into a struct
->   xfrm: respect ip protocols rules criteria when performing dst lookups
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12597c63980000
+> start commit:   36534d3c5453 tcp: use signed arithmetic in tcp_rtx_probe0_..
+> git tree:       bpf
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=333ebe38d43c42e2
+> dashboard link: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13390aea980000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10948741980000
 
-Hm, your patchset does not apply to the ipsec tree. Can you check
-and rebase it?
+This looks like ri->tgt_value is a NULL pointer (dst in
+dev_map_enqueue()). The commit referenced by syz should not have fixed
+that.
+It is possible that there were leftovers in bpf_redirect_info (from a
+previous invocation) which were memset(,0,) during the switch from
+per-CPU to stack usage and now it does not trigger anymore. 
+
+Sebastian
 
