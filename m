@@ -1,98 +1,120 @@
-Return-Path: <netdev+bounces-124133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43969968373
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:40:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68DC4968380
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:45:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7549F1C223DB
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 09:40:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12CD81F22DE2
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 09:45:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E313F1D1F65;
-	Mon,  2 Sep 2024 09:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3411D1F65;
+	Mon,  2 Sep 2024 09:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A7klkDRn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ft6az4D9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9ACD179654;
-	Mon,  2 Sep 2024 09:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AF0F18661C
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 09:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725270030; cv=none; b=mfhqIMUCjtJFO/oMu98G3yhJp/7aY3hLFBz52+6OGdLF5RbgRvzKNEh286ByQhSfCWCTGv9gBLqH9k7XtqU1hf+yXWKcyfKvaUNvF/5n8xxijE+wqffGBTRR3+yZNiY6GaiGdZgrH0ELBg+5Ubr0vfHlvzmxTyGjfbPQEioNWG0=
+	t=1725270298; cv=none; b=I+ONbJIZQCZeMyqdM4JLrsaiLN3nibXtqiEI2WBBYdexofGIoBtMabRkS6BQOluDdT++UbaFuIm/XaF/jHUMXCr021dlJADn1nuqfFNkbaQRGrsKGjNGWxb9tjB9KFcPb+ES4FSVdu+UA7M9Tcs/Uvy4jY3txwh+rYxWpSJhaes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725270030; c=relaxed/simple;
-	bh=gdybJDrNjg5yzvAevTD3diZeh+qDZbL1UtLKO7Yp/ok=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LJyf2WyIkz0QC3yqmJao8yCf3xMfApiA8CgViOzY02s8pOvZW0sGprvivE2hfMcBWTl/I/fcOri+4pjnXnZ91CeyaIYIBoGfHw+rq776TqGfi0Mu5GxvqGUdBZfBa2YOQeIGQDSk6l6RzzT2UMQCrnbz1miXm8itCf1ewHJ44i4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A7klkDRn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 559E8C4CEC2;
-	Mon,  2 Sep 2024 09:40:29 +0000 (UTC)
+	s=arc-20240116; t=1725270298; c=relaxed/simple;
+	bh=nfx9KdHtB7mfqNMCqfYYEmR1tL/q4jvZ6kOi2em5qw8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CB3z1C0xWF+lUof1v9k/8kIx9A0PAYJuGGFiwIU2m001y06Cor0oq9uc84IgByNf1kyVPcyjIy2Nbmg16X0Rt6hGv4ZfNOs4f4F1pFVe3Pxsc69CuZqlHPZSMbeoVYhqIEj8M5siQzvWYwaKQY6xNkdONoe504rAU4dsMfpDI44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ft6az4D9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F4ADC4CEC2;
+	Mon,  2 Sep 2024 09:44:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725270029;
-	bh=gdybJDrNjg5yzvAevTD3diZeh+qDZbL1UtLKO7Yp/ok=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=A7klkDRnYRQZpvnT0otQWDNQb0w/JFGppIAH0cGaUGuAT9Y4cftqwZzH60wA/nOE6
-	 Qo4ZRlSx8ZopwHhbCtS+Mj/84+kQ+T1T57wg4xrEgTrInqs07ZoXm9dbc3+/3TwB40
-	 yDrJUZ5mxSsex5L2nnVHaruc6J6c3rFMtPnyJ9X9V8Z7rOeIvJ8VxlO+6xtspEBAp0
-	 hBhpbd8ys05hH3kqAsQEm7iNfIMYLTjTp+zHQQ6J/yoRcTMh8xZs2PzZZa0MW3PatQ
-	 BMgalm59xWIo9ZWtJ+fEKNjFDKN4LNcJFpHJVlA9xUv88YO6KX73Ig4v3zQK+sbmw6
-	 IRh9AH84LPoUg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F4E3822D69;
-	Mon,  2 Sep 2024 09:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1725270297;
+	bh=nfx9KdHtB7mfqNMCqfYYEmR1tL/q4jvZ6kOi2em5qw8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ft6az4D9vqCiDKCRe2dMAZ4KTqlpiiS8n0yEftvkxX3PaTtYBHq4ivYcOt/fkgNZ1
+	 oS7DcvyMzeflAZgjZatybOeWbsrJEmMhxh0fQlEzgTY7z+zWwkGNhIFLOyI/4vaDaJ
+	 sx1sJ6rzVCVueAre1ppwk0GrtuN+rGnKwlC28/1C/vrFRiKsLNAAwXZytjqbOa3Qnb
+	 0KuXnsakfldwBYc50KhH1UOGXMdxbomMJ9l3LwVpe6TTYnh1b+XKacC4vA5I5cZ9pD
+	 BE+ImnsOFCUPS7keTy+LGfYFMFYFdC104IkGzvxom4LwfYBZ0vclGfUdyNAlCJMpH6
+	 tULjfxp/dpZ4Q==
+Date: Mon, 2 Sep 2024 12:44:52 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Feng Wang <wangfe@google.com>, netdev@vger.kernel.org,
+	antony.antony@secunet.com
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+Message-ID: <20240902094452.GE4026@unreal>
+References: <20240822200252.472298-1-wangfe@google.com>
+ <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
+ <20240831173934.GC4000@unreal>
+ <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: microchip: vcap: Fix use-after-free error in
- kunit test
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172527003004.3825645.3659251948161383657.git-patchwork-notify@kernel.org>
-Date: Mon, 02 Sep 2024 09:40:30 +0000
-References: <20240829-fix_use_after_free-v1-1-1507e307507f@microchip.com>
-In-Reply-To: <20240829-fix_use_after_free-v1-1-1507e307507f@microchip.com>
-To: =?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard_=3Cjensemil=2Eschulzostergaard=40?=@codeaurora.org,
-	=?utf-8?q?microchip=2Ecom=3E?=@codeaurora.org
-Cc: lars.povlsen@microchip.com, Steen.Hegelund@microchip.com,
- daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- steen.hegelund@microchip.com, error27@gmail.com,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Thu, 29 Aug 2024 11:52:54 +0200 you wrote:
-> This is a clear use-after-free error. We remove it, and rely on checking
-> the return code of vcap_del_rule.
+On Mon, Sep 02, 2024 at 09:44:24AM +0200, Steffen Klassert wrote:
+> Sorry for the delay. I'm on vacation, so responses will take a bit
+> longer during the next two weeks.
 > 
-> Reported-by: Dan Carpenter <error27@gmail.com>
-> Closes: https://lore.kernel.org/kernel-janitors/7bffefc6-219a-4f71-baa0-ad4526e5c198@kili.mountain/
-> Fixes: c956b9b318d9 ("net: microchip: sparx5: Adding KUNIT tests of key/action values in VCAP API")
-> Signed-off-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
+> On Sat, Aug 31, 2024 at 08:39:34PM +0300, Leon Romanovsky wrote:
+> > On Wed, Aug 28, 2024 at 07:32:47AM +0200, Steffen Klassert wrote:
+> > > On Thu, Aug 22, 2024 at 01:02:52PM -0700, Feng Wang wrote:
+> > > > From: wangfe <wangfe@google.com>
+> > > > 
+> > > > In packet offload mode, append Security Association (SA) information
+> > > > to each packet, replicating the crypto offload implementation.
+> > > > The XFRM_XMIT flag is set to enable packet to be returned immediately
+> > > > from the validate_xmit_xfrm function, thus aligning with the existing
+> > > > code path for packet offload mode.
+> > > > 
+> > > > This SA info helps HW offload match packets to their correct security
+> > > > policies. The XFRM interface ID is included, which is crucial in setups
+> > > > with multiple XFRM interfaces where source/destination addresses alone
+> > > > can't pinpoint the right policy.
+> > > > 
+> > > > Signed-off-by: wangfe <wangfe@google.com>
+> > > 
+> > > Applied to ipsec-next, thanks Feng!
+> > 
+> > Steffen,
+> > 
+> > What is your position on this patch?
+> > It is the same patch (logically) as the one that was rejected before?
+> > https://lore.kernel.org/all/ZfpnCIv+8eYd7CpO@gauss3.secunet.de/
 > 
-> [...]
+> This is an infrastructure patch to support routing based IPsec
+> with xfrm interfaces. I just did not notice it because it was not
+> mentioned in the commit message of the first patchset. This should have
+> been included into the packet offload API patchset, but I overlooked
+> that xfrm interfaces can't work with packet offload mode. The stack
+> infrastructure should be complete, so that drivers can implement
+> that without the need to fix the stack before.
 
-Here is the summary with links:
-  - [net] net: microchip: vcap: Fix use-after-free error in kunit test
-    https://git.kernel.org/netdev/net/c/a3c1e45156ad
+Core implementation that is not used by any upstream code is rarely
+right thing to do. It is not tested, complicates the code and mostly
+overlooked when patches are reviewed. The better way will be to extend
+the stack when this feature will be actually used and needed.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+IMHO, attempt to enrich core code without showing users of this new flow
+is comparable to premature optimization.
 
+And Feng more than once said that this code is for some out-of-tree
+driver.
 
+> 
+> In case the patch has issues, we should fix it.
+
+Yes, this patch doesn't have in-kernel users.
+
+Thanks
 
