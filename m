@@ -1,305 +1,317 @@
-Return-Path: <netdev+bounces-124316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77475968F1A
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 23:10:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80B74968F29
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 23:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F4D51C21E3A
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 21:10:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC0D7B2221A
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 21:34:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 619EC1865F0;
-	Mon,  2 Sep 2024 21:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F48D18732B;
+	Mon,  2 Sep 2024 21:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ih8RI7vy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HaqRPuaZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9D791A4E68
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 21:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DD7D1A4E8D;
+	Mon,  2 Sep 2024 21:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725311432; cv=none; b=TDa/3ql0tyeCJ+floyUTYKtlqq62SWtMSO4MvXJzoa4RyTraAP1DNrTKJlGJZaPNwvRLgpsuKVmqvZoYtQ8gV4Ww+09yhbL4UNX4xGOLw+zzxQNaz2ttEFII8+bQ7ZgO10a2Kw2R6wJ7mSeD10Zs1uIpHBMq2dKY+qb0K5TMjUI=
+	t=1725312871; cv=none; b=oIOL6OiRCZUEyCXISDDz9Npnu+NAwU1jS6tKvc4G92B+xpP0Hj02oT16cBdkXAD8u2qajHHKiAivNFln12o+pGQgyKUSOsinavbN6HxXBrx7UK1SyLVGrXE6dt0w3HJWi6t2JO1mzvnQC4e1+tXBrIbDkiGZOsYm1o+KlnkVTZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725311432; c=relaxed/simple;
-	bh=vQSTu/DB4zhofM/0qr5KgJl/A8RdXt2qGmJ8VwPQ0GI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Val4hKGIHEq3brbk7BfrJcSU9VNYKcL85l36BpbuUodEpH7Uny85V43onvf3EHdXMOAVL+PqlB5P+WQG3LKJskEuIkqYUhDG915a2H2U9hJ6q3Xp8tDCaQBginxQiDNjZ954VA5CsHtJK1HYrF4OJLhDnouacmWljT6mNAPTJBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ih8RI7vy; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <29790aa7-5679-444a-84cf-ace061bb436f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725311427;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zblPrN7T10PYrSHXn9n0fUbO/IOL6NLghRHHB0NlMZ4=;
-	b=Ih8RI7vyAEaFiGDpI+sWo3FFLksLP2Vwg3YD32F3GVCLeW7PAoKBgjvWFn1Dz/3+wja3DM
-	V4MF+V/2EDKkkez+fdkTyh2UcVA3hMpwFHDrY7adfypjGwVD/+VmYQKGvWFKr06SCuArH+
-	cGrjtZnMP4QpUqhv+/7TjOWVc7FoNYA=
-Date: Mon, 2 Sep 2024 22:10:21 +0100
+	s=arc-20240116; t=1725312871; c=relaxed/simple;
+	bh=eEHfWHSPYrEoeY6E0LRdQeuvc1bWFRUzdpGYyP8InE0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ErOwSVSvxa4oazQOoXxN/Jts2oiaqFq/BUNgjWO7xVdX3jaRPwaD/GaZ0YURG3aEL6JwoMtHjctWHQ39Bz94DFQX/cHa9zyde+2dBfLnooDAH42mMlJ1PHEmnTt1pf+UPwlU9Yq3mqB2kW/CZyjFiJPi1irQAfHW07svCF/fCf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HaqRPuaZ; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725312869; x=1756848869;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version:content-transfer-encoding;
+  bh=eEHfWHSPYrEoeY6E0LRdQeuvc1bWFRUzdpGYyP8InE0=;
+  b=HaqRPuaZDMYSMrvSIABg9sWcn9SmLKedV5lAsKpWzFc7u2NNvoXldSqe
+   Z+po1xUBXErb7cS+lDUBAUOrT11j8DLglvVLubhmcaiobCzUZVKpPW7sy
+   J5q+YOg665FjEEAFvBg7tFwwrtT3dFv4sDTM7uGORYyklg9TovCI01Ta+
+   6rb8b6fDGxSKCQS5t7IDzaD5HgdODW5LemBp3rEyzXq9ezxgt0DYOA/gs
+   KJ38ux01oN5NJNXQdfT/9fN0frxTzpfUhfg5EuWhgHt/ve+GkcjTNCep8
+   Xi4jYMLKsfBS67LyS5ZkKZg1gJf8ThaxPsJnnh2mLxhIQuFJ2NdH2Jdri
+   A==;
+X-CSE-ConnectionGUID: iGtetNmLT7SG9Sgl031aaA==
+X-CSE-MsgGUID: qgMs+sAySq2eMDCOIdlaTA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11183"; a="24076880"
+X-IronPort-AV: E=Sophos;i="6.10,196,1719903600"; 
+   d="scan'208";a="24076880"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 14:34:27 -0700
+X-CSE-ConnectionGUID: G/U6S52GRn+suBIeozyttw==
+X-CSE-MsgGUID: FB0tdK3bRn2DV0Z7XZhyGQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,196,1719903600"; 
+   d="scan'208";a="64672546"
+Received: from jairdeje-mobl1.amr.corp.intel.com (HELO vcostago-mobl3) ([10.124.221.34])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 14:34:24 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Florian Kauer <florian.kauer@linutronix.de>, luyun <luyun@kylinos.cn>,
+ jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: CPU stuck due to the taprio hrtimer
+In-Reply-To: <fcd41a5f-66b5-4ebe-9535-b75e14867444@linutronix.de>
+References: <20240627055338.2186255-1-luyun@kylinos.cn>
+ <87sewy55gp.fsf@intel.com>
+ <2df10720-1790-48bd-a50c-4816260543b0@kylinos.cn>
+ <fcd41a5f-66b5-4ebe-9535-b75e14867444@linutronix.de>
+Date: Mon, 02 Sep 2024 18:34:21 -0300
+Message-ID: <87jzftpwo2.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 1/2] net_tstamp: add SCM_TS_OPT_ID to provide
- OPT_ID in control message
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
- netdev@vger.kernel.org, Jason Xing <kerneljasonxing@gmail.com>
-References: <20240902130937.457115-1-vadfed@meta.com>
- <CAL+tcoDgai2bLqnU0KtspTu1nn=qb_23TQNUf7u=-VOhnitaOA@mail.gmail.com>
- <66d5def0ca56_66cf629420@willemb.c.googlers.com.notmuch>
- <0d79442d-438b-4960-8daf-2f178a210e64@linux.dev>
- <66d627439edbd_71ed729422@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <66d627439edbd_71ed729422@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 02/09/2024 21:59, Willem de Bruijn wrote:
-> Vadim Fedorenko wrote:
->> On 02/09/2024 16:51, Willem de Bruijn wrote:
->>> Jason Xing wrote:
->>>> On Mon, Sep 2, 2024 at 9:09 PM Vadim Fedorenko <vadfed@meta.com> wrote:
->>>>>
->>>>> SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
->>>>> timestamps and packets sent via socket. Unfortunately, there is no way
->>>>> to reliably predict socket timestamp ID value in case of error returned
->>>>> by sendmsg. For UDP sockets it's impossible because of lockless
->>>>> nature of UDP transmit, several threads may send packets in parallel. In
->>>>> case of RAW sockets MSG_MORE option makes things complicated. More
->>>>> details are in the conversation [1].
->>>>> This patch adds new control message type to give user-space
->>>>> software an opportunity to control the mapping between packets and
->>>>> values by providing ID with each sendmsg. This works fine for UDP
->>>>> sockets only, and explicit check is added to control message parser.
->>>>>
->>>>> [1] https://lore.kernel.org/netdev/CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9Eaa9aDPfgHdtA@mail.gmail.com/
->>>>>
->>>>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
->>>>> ---
->>>>>    Documentation/networking/timestamping.rst | 14 ++++++++++++++
->>>>>    arch/alpha/include/uapi/asm/socket.h      |  4 +++-
->>>>>    arch/mips/include/uapi/asm/socket.h       |  2 ++
->>>>>    arch/parisc/include/uapi/asm/socket.h     |  2 ++
->>>>>    arch/sparc/include/uapi/asm/socket.h      |  2 ++
->>>>>    include/net/inet_sock.h                   |  4 +++-
->>>>>    include/net/sock.h                        |  1 +
->>>>>    include/uapi/asm-generic/socket.h         |  2 ++
->>>>>    include/uapi/linux/net_tstamp.h           |  3 ++-
->>>>>    net/core/sock.c                           | 12 ++++++++++++
->>>>>    net/ethtool/common.c                      |  1 +
->>>>>    net/ipv4/ip_output.c                      | 16 ++++++++++++----
->>>>>    net/ipv6/ip6_output.c                     | 16 ++++++++++++----
->>>>>    13 files changed, 68 insertions(+), 11 deletions(-)
->>>>>
->>>>> diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
->>>>> index 5e93cd71f99f..93b0901e4e8e 100644
->>>>> --- a/Documentation/networking/timestamping.rst
->>>>> +++ b/Documentation/networking/timestamping.rst
->>>>> @@ -193,6 +193,20 @@ SOF_TIMESTAMPING_OPT_ID:
->>>>>      among all possibly concurrently outstanding timestamp requests for
->>>>>      that socket.
->>>>>
->>>>> +  With this option enabled user-space application can provide custom
->>>>> +  ID for each message sent via UDP socket with control message with
->>>>> +  type set to SCM_TS_OPT_ID::
->>>>> +
->>>>> +    struct msghdr *msg;
->>>>> +    ...
->>>>> +    cmsg                        = CMSG_FIRSTHDR(msg);
->>>>> +    cmsg->cmsg_level            = SOL_SOCKET;
->>>>> +    cmsg->cmsg_type             = SO_TIMESTAMPING;
->>>>> +    cmsg->cmsg_len              = CMSG_LEN(sizeof(__u32));
->>>>> +    *((__u32 *) CMSG_DATA(cmsg)) = opt_id;
->>>>> +    err = sendmsg(fd, msg, 0);
->>>>> +
->>>>> +
->>>>>    SOF_TIMESTAMPING_OPT_ID_TCP:
->>>>>      Pass this modifier along with SOF_TIMESTAMPING_OPT_ID for new TCP
->>>>>      timestamping applications. SOF_TIMESTAMPING_OPT_ID defines how the
->>>>> diff --git a/arch/alpha/include/uapi/asm/socket.h b/arch/alpha/include/uapi/asm/socket.h
->>>>> index e94f621903fe..0698e6662cdf 100644
->>>>> --- a/arch/alpha/include/uapi/asm/socket.h
->>>>> +++ b/arch/alpha/include/uapi/asm/socket.h
->>>>> @@ -10,7 +10,7 @@
->>>>>     * Note: we only bother about making the SOL_SOCKET options
->>>>>     * same as OSF/1, as that's all that "normal" programs are
->>>>>     * likely to set.  We don't necessarily want to be binary
->>>>> - * compatible with _everything_.
->>>>> + * compatible with _everything_.
->>>>>     */
->>>>>    #define SOL_SOCKET     0xffff
->>>>>
->>>>> @@ -140,6 +140,8 @@
->>>>>    #define SO_PASSPIDFD           76
->>>>>    #define SO_PEERPIDFD           77
->>>>>
->>>>> +#define SCM_TS_OPT_ID          78
->>>>> +
->>>>>    #if !defined(__KERNEL__)
->>>>>
->>>>>    #if __BITS_PER_LONG == 64
->>>>> diff --git a/arch/mips/include/uapi/asm/socket.h b/arch/mips/include/uapi/asm/socket.h
->>>>> index 60ebaed28a4c..bb3dc8feb205 100644
->>>>> --- a/arch/mips/include/uapi/asm/socket.h
->>>>> +++ b/arch/mips/include/uapi/asm/socket.h
->>>>> @@ -151,6 +151,8 @@
->>>>>    #define SO_PASSPIDFD           76
->>>>>    #define SO_PEERPIDFD           77
->>>>>
->>>>> +#define SCM_TS_OPT_ID          78
->>>>> +
->>>>>    #if !defined(__KERNEL__)
->>>>>
->>>>>    #if __BITS_PER_LONG == 64
->>>>> diff --git a/arch/parisc/include/uapi/asm/socket.h b/arch/parisc/include/uapi/asm/socket.h
->>>>> index be264c2b1a11..c3ab3b3289eb 100644
->>>>> --- a/arch/parisc/include/uapi/asm/socket.h
->>>>> +++ b/arch/parisc/include/uapi/asm/socket.h
->>>>> @@ -132,6 +132,8 @@
->>>>>    #define SO_PASSPIDFD           0x404A
->>>>>    #define SO_PEERPIDFD           0x404B
->>>>>
->>>>> +#define SCM_TS_OPT_ID          0x404C
->>>>> +
->>>>>    #if !defined(__KERNEL__)
->>>>>
->>>>>    #if __BITS_PER_LONG == 64
->>>>> diff --git a/arch/sparc/include/uapi/asm/socket.h b/arch/sparc/include/uapi/asm/socket.h
->>>>> index 682da3714686..9b40f0a57fbc 100644
->>>>> --- a/arch/sparc/include/uapi/asm/socket.h
->>>>> +++ b/arch/sparc/include/uapi/asm/socket.h
->>>>> @@ -133,6 +133,8 @@
->>>>>    #define SO_PASSPIDFD             0x0055
->>>>>    #define SO_PEERPIDFD             0x0056
->>>>>
->>>>> +#define SCM_TS_OPT_ID            0x0057
->>>>> +
->>>>>    #if !defined(__KERNEL__)
->>>>>
->>>>>
->>>>> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
->>>>> index 394c3b66065e..2161d50cf0fd 100644
->>>>> --- a/include/net/inet_sock.h
->>>>> +++ b/include/net/inet_sock.h
->>>>> @@ -174,6 +174,7 @@ struct inet_cork {
->>>>>           __s16                   tos;
->>>>>           char                    priority;
->>>>>           __u16                   gso_size;
->>>>> +       u32                     ts_opt_id;
->>>>>           u64                     transmit_time;
->>>>>           u32                     mark;
->>>>>    };
->>>>> @@ -241,7 +242,8 @@ struct inet_sock {
->>>>>           struct inet_cork_full   cork;
->>>>>    };
->>>>>
->>>>> -#define IPCORK_OPT     1       /* ip-options has been held in ipcork.opt */
->>>>> +#define IPCORK_OPT             1       /* ip-options has been held in ipcork.opt */
->>>>> +#define IPCORK_TS_OPT_ID       2       /* timestmap opt id has been provided in cmsg */
->>>>>
->>>>>    enum {
->>>>>           INET_FLAGS_PKTINFO      = 0,
->>>>> diff --git a/include/net/sock.h b/include/net/sock.h
->>>>> index f51d61fab059..73e21dad5660 100644
->>>>> --- a/include/net/sock.h
->>>>> +++ b/include/net/sock.h
->>>>> @@ -1794,6 +1794,7 @@ struct sockcm_cookie {
->>>>>           u64 transmit_time;
->>>>>           u32 mark;
->>>>>           u32 tsflags;
->>>>> +       u32 ts_opt_id;
->>>>>    };
->>>>>
->>>>>    static inline void sockcm_init(struct sockcm_cookie *sockc,
->>>>> diff --git a/include/uapi/asm-generic/socket.h b/include/uapi/asm-generic/socket.h
->>>>> index 8ce8a39a1e5f..db3df3e74b01 100644
->>>>> --- a/include/uapi/asm-generic/socket.h
->>>>> +++ b/include/uapi/asm-generic/socket.h
->>>>> @@ -135,6 +135,8 @@
->>>>>    #define SO_PASSPIDFD           76
->>>>>    #define SO_PEERPIDFD           77
->>>>>
->>>>> +#define SCM_TS_OPT_ID          78
->>>>> +
->>>>>    #if !defined(__KERNEL__)
->>>>>
->>>>>    #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
->>>>> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tstamp.h
->>>>> index a2c66b3d7f0f..e2f145e3f3a1 100644
->>>>> --- a/include/uapi/linux/net_tstamp.h
->>>>> +++ b/include/uapi/linux/net_tstamp.h
->>>>> @@ -32,8 +32,9 @@ enum {
->>>>>           SOF_TIMESTAMPING_OPT_TX_SWHW = (1<<14),
->>>>>           SOF_TIMESTAMPING_BIND_PHC = (1 << 15),
->>>>>           SOF_TIMESTAMPING_OPT_ID_TCP = (1 << 16),
->>>>> +       SOF_TIMESTAMPING_OPT_ID_CMSG = (1 << 17),
+Florian Kauer <florian.kauer@linutronix.de> writes:
+
+> On 9/2/24 11:12, luyun wrote:
+>>=20
+>> =E5=9C=A8 2024/6/28 07:30, Vinicius Costa Gomes =E5=86=99=E9=81=93:
+>>> Yun Lu <luyun@kylinos.cn> writes:
+>>>
+>>>> Hello,
 >>>>
->>>> I'm not sure if the new flag needs to be documented as well? After
->>>> this patch, people may search the key word in the documentation file
->>>> and then find nothing.
+>>>> When I run a taprio test program on the latest kernel(v6.10-rc4), CPU =
+stuck
+>>>> is detected immediately, and the stack shows that CPU is stuck on tapr=
+io
+>>>> hrtimer.
 >>>>
->>>> If we have this flag here, normally it means we can pass it through
->>>> setsockopt, so is it expected? If it's an exception, I reckon that we
->>>> can forbid passing/setting this option in sock_set_timestamping() and
->>>> document this rule?
+>>>> The reproducer program link:
+>>>> https://github.com/xyyluyun/taprio_test/blob/main/taprio_test.c
+>>>> gcc taprio_test.c -static -o taprio_test
+>>>>
+>>>> In this program, start the taprio hrtimer which clockid is set to REAL=
+TIME, and
+>>>> then adjust the system time by a significant value backwards. Thus, CP=
+U will enter
+>>>> an infinite loop in the__hrtimer_run_queues function, getting stuck an=
+d unable to
+>>>> exit or respond to any interrupts.
+>>>>
+>>>> I have tried to avoid this problem by apllying the following patch, an=
+d it does work.
+>>>> But I am not sure if this can be the final solution?
+>>>>
+>>>> Thanks.
+>>>>
+>>>> Signed-off-by: Yun Lu <luyun@kylinos.cn>
+>>>> ---
+>>>> =C2=A0 net/sched/sch_taprio.c | 24 ++++++++++++++++++++++++
+>>>> =C2=A0 1 file changed, 24 insertions(+)
+>>>>
+>>>> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+>>>> index a0d54b422186..2ff8d34bdbac 100644
+>>>> --- a/net/sched/sch_taprio.c
+>>>> +++ b/net/sched/sch_taprio.c
+>>>> @@ -104,6 +104,7 @@ struct taprio_sched {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u32 max_sdu[TC_MAX_QUEUE]; /* save info=
+ from the user */
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u32 fp[TC_QOPT_MAX_QUEUE]; /* only for =
+dump and offloading */
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 u32 txtime_delay;
+>>>> +=C2=A0=C2=A0=C2=A0 ktime_t offset;
+>>>> =C2=A0 };
+>>>> =C2=A0 =C2=A0 struct __tc_taprio_qopt_offload {
+>>>> @@ -170,6 +171,19 @@ static ktime_t sched_base_time(const struct sched=
+_gate_list *sched)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ns_to_ktime(sched->base_time);
+>>>> =C2=A0 }
+>>>> =C2=A0 +static ktime_t taprio_get_offset(const struct taprio_sched *q)
+>>>> +{
+>>>> +=C2=A0=C2=A0=C2=A0 enum tk_offsets tk_offset =3D READ_ONCE(q->tk_offs=
+et);
+>>>> +=C2=A0=C2=A0=C2=A0 ktime_t time =3D ktime_get();
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0 switch (tk_offset) {
+>>>> +=C2=A0=C2=A0=C2=A0 case TK_OFFS_MAX:
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
+>>>> +=C2=A0=C2=A0=C2=A0 default:
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return ktime_sub_ns(ktime_=
+mono_to_any(time, tk_offset), time);
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +}
+>>>> +
+>>>> =C2=A0 static ktime_t taprio_mono_to_any(const struct taprio_sched *q,=
+ ktime_t mono)
+>>>> =C2=A0 {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* This pairs with WRITE_ONCE() in tapr=
+io_parse_clockid() */
+>>>> @@ -918,6 +932,7 @@ static enum hrtimer_restart advance_sched(struct h=
+rtimer *timer)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int num_tc =3D netdev_get_num_tc(dev);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct sched_entry *entry, *next;
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct Qdisc *sch =3D q->root;
+>>>> +=C2=A0=C2=A0=C2=A0 ktime_t now_offset =3D taprio_get_offset(q);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ktime_t end_time;
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int tc;
+>>>> =C2=A0 @@ -957,6 +972,14 @@ static enum hrtimer_restart advance_sched(=
+struct hrtimer *timer)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 end_time =3D ktime_add_ns(entry->end_ti=
+me, next->interval);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 end_time =3D min_t(ktime_t, end_time, o=
+per->cycle_end_time);
+>>>> =C2=A0 +=C2=A0=C2=A0=C2=A0 if (q->offset !=3D now_offset) {
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ktime_t diff =3D ktime_sub=
+_ns(now_offset, q->offset);
+>>>> +
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 end_time =3D ktime_add_ns(=
+end_time, diff);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 oper->cycle_end_time =3D k=
+time_add_ns(oper->cycle_end_time, diff);
+>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 q->offset =3D now_offset;
+>>>> +=C2=A0=C2=A0=C2=A0 }
+>>>> +
+>>> I think what we should do here is a bit different. Let me try to explain
+>>> what I have in mind with some context.
 >>>
->>> Good point, thanks.
+>>> A bit of context: The idea of taprio is to enforce "TSN" traffic
+>>> schedules, these schedules require time synchronization, for example via
+>>> PTP, and in those cases, time jumps are not expected or a sign that
+>>> something is wrong.
 >>>
->>> It must definitely not be part of SOF_TIMESTAMPING_MASK. My bad for
->>> suggesting without giving it much thought.
+>>> In my mind, a time jump, specially a big one, kind of invalidates the
+>>> schedule, as the schedule is based on an absolute time value (the
+>>> base_time), and when time jumps that reference in time is lost.
 >>>
->>> The bit is kernel-internal. No need to even mention it in user-facing
->>> documentation. But anyone reading net_tstamp.h might wonder what it
->>> does.
+>>> BUT making the user's system unresponsive is a bug, a big one, as if
+>>> this happens in the real world, the user will be unable to investigate
+>>> what made the system have so big a time correction.
 >>>
->>> It should not even be in a UAPI header, but in an internal one.
->>> Probably include/net/sock.h, near SK_FLAGS_TIMESTAMP.
+>>> So my idea is to warn the user that the time jumped, say that the user
+>>> needs to reconfigure the schedule, as it is now invalid, and disable the
+>>> schedule.
 >>>
->>> Maybe we can reserve bit 31 in u32 sk_tsflags. And if we ever have
->>> to double that flag size, it can move up to 63, as it is not UAPI in
->>> any way. This is a workaround to having a separate flags field in
->>> sockcm_cookie.
+>>> Does this make sense?
 >>>
->>> And have a BUILD_BUG_ON if SOF_TIMESTAMPING_LAST reaches this reserved
->>> region.
->>
->> Yeah, I was also thinking of it not being UAPI, that's why I tried to
->> avoid it in my RFC using 0 as a reserved value. Do you think
->> SK_FLAGS_CMSG_TS_OPT_ID is good naming for it?
-> 
-> It's relevant only to sockcm_cookie, so maybe SOCKCM_FLAG_TS_OPT_ID?
-> 
-> One day we'll need another sockcm_cookie flag, we'll grow it to add a
-> real flags field and can get rid of this hack.
-> 
-> The struct is used embedded in ipcm_cookie and ipcm6_cookie, which
-> would grow as a result.
-> 
-> It is also simply stack allocated in cases like performance sensitive
-> tcp_sendmsg_locked. Here, the main cost is a slightly more expensive
-> zeroing in sockcm_init.
-> 
-> For now, I think we should just stick with using the highest bit in
-> sockcm.tsflags.
+>>> Ah, and thanks for the report.
+>>=20
+>> Hello Vinicius,
+>>=20
+>> May I ask is there a fix patch for this issue?
+>>=20
+>> I test it on the latest kernel version,=C2=A0 and it still seems to caus=
+e CPU stuck.
+>>=20
+>> As you mentioned, a better way would be to warn the user that the curren=
+t time has jumped and cancel the hrtimer,
+>>=20
+>> but I'm not sure how to warn the user, or just through printk?
+>>=20
+>> Thanks and best regards.
+>
+> I am not sure if it is really the best solution to force the user to reco=
+nfigure the schedule
+> "just" because the clock jumped. Yes, time jumps are a big problem for TA=
+PRIO, but stopping might
+> make it worse.
+>
+> Vinicius wrote that the base_time can no longer reference to the correct =
+point in time,
+> so the schedule MUST be invalid after the time jump. It is true that the =
+base_time does not longer
+> refer to the same point in time it referred to before the jump from the v=
+iew of the local system (!).
+> But the base_time usually refers to the EXTERNAL time domain (i.e. the ti=
+me the system SHOULD have
+> and not the one the system currently has) and is often configured by an e=
+xternal entity.
+>
+> So it is quite likely that the schedule was incorrectly phase-shifted BEF=
+ORE the time jump and after
+> the time jump the base_time refers to the CORRECT point in time viewed fr=
+om the external time domain.
+>
+> If you now stop the schedule (and I assume you mean by this to let every =
+queue transmit at any time
+> as before the schedule was configured) and the user has to reconfigure th=
+e schedule again,
+> it is quite likely that by this you actually increase the interference wi=
+th the network and in
+> particular confuse the time synchronization via PTP, so once the schedule=
+ is set up again,
+> you might get a time jump AGAIN.
+>
+> So yes, a warning to the user is definitely appropriate in the case of a =
+time jump, but apart
+> from that I would prefer the system to adapt itself instead of resigning.
+>
 
-I totally agree with using the highest bit in sockcm.tsflags for now.
-I was just wondering about the name as naming is always the hardest
-part. SOCKCM_FLAG_TS_OPT_ID looks good and reasonable, I'll use it.
+The "warn the user, disable the schedule" is more or less clear in my
+mind how to implement. But while I was writing this, I was taking
+another look at the standard, and I think this approach is wrong.
 
-Thanks,
-Vadim
+I think what we should do is something like this:
+
+1. Jump into the past:
+   1.a. before base-time: Keep all queues open until base-time;
+   1.b. after base-time: "rewind" the schedule to the new current time;
+2. Jump into the future: "fast forward" the schedule to the new current
+   time;
+
+But I think that for this to fit more neatly, we would need to change
+how advance_sched() works, right now, it doesn't look at the current
+time (it considers that the schedule will always advance one-by-one),
+instead what I am thinking is to consider that every time
+advance_sched() runs is a pontential "time jump".=20
+
+Ideas? Too complicated for an uncommon case? (is it really uncommon?)
+
+> Yun Lu, does this only happen for time jumps into the past or also for la=
+rge jumps into the future?
+> And does this also happen for small time "jumps"?
+
+AFAIU this bug will only happen with large jumps into the past. For
+small jumps into the past, it will spin uselessly for a bit. For jumps
+into the future, the schedule will be stuck in a particular gate entry
+until the future becomes now.
+
+>
+> Thanks,
+> Florian
+>
+>>=20
+>>=20
+>>>
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (tc =3D 0; tc < num_tc; tc++) {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (next->gate_=
+duration[tc] =3D=3D oper->cycle_time)
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 next->gate_close_time[tc] =3D KTIME_MAX;
+>>>> @@ -1210,6 +1233,7 @@ static int taprio_get_start_time(struct Qdisc *s=
+ch,
+>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 base =3D sched_base_time(sched);
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 now =3D taprio_get_time(q);
+>>>> +=C2=A0=C2=A0=C2=A0 q->offset =3D taprio_get_offset(q);
+>>>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ktime_after(base, now)) {
+>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 *start =3D base;
+>>>> --=C2=A0
+>>>> 2.34.1
+>>>>
+>>>
+>>> Cheers,
+>>=20
+>
+
+
+Cheers,
+--=20
+Vinicius
 
