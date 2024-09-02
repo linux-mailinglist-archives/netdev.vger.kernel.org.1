@@ -1,426 +1,199 @@
-Return-Path: <netdev+bounces-124121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64FF496828D
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 10:57:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D604D968298
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:00:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EBD6283533
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 08:57:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13CC61C2243E
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 09:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F239A186E3C;
-	Mon,  2 Sep 2024 08:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C10185B48;
+	Mon,  2 Sep 2024 09:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Qa90zpgt"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AAD186E3B;
-	Mon,  2 Sep 2024 08:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E61B9DF71
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 09:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725267469; cv=none; b=oszDaV7BEBgtRLBiQ/42yV11d12yc33SJZsMOTDdgaCBg661nSS8xRQGl9I1O6/cKiCW9eh1PJ4lKvkOZNrCHXJnIEnYo2DouV96F+YxgPu3qr+lc0nlOLMtuoOTtvB+yMVXm8EXSikK1H/Oi/DhaiRVnsNPJfR3HBYSwYl/2fo=
+	t=1725267654; cv=none; b=mSop2Djfb3QMMQMEucACpvGNrWQN63tZkpBhwP2dlHzkM/5c/tDbV01zCviiQ4M+YESRheSvkIr5PtPkw+NNDmm4VQXlI15NwLaCaBizBO00DLIBgWWgmt7AztoPfg3GgIxQCw4HWnuemQa0vJZxOAPxvi2TACbLVb+mJDuwzbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725267469; c=relaxed/simple;
-	bh=KH5xPcCcXzjUToUkS76bqEczo+jzftLVn6snrHcjIHA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NeHhnjw4LPAAAu+wrdJzGylCryCeV+iTYNVBwgUq9lIJqVbD1YT4JqCfojyMpu3bAExIvN4lTNG9Cj1UMffFVDJOnwfZA/GI4STnFvaL3o7JX/i9vBt5Cp0DjqRPT2bWPimOX5KO/UDetZSuZLU7KAk9ys9cRj4rgRPtUNyqLF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1sl2sU-0008G0-Mz; Mon, 02 Sep 2024 10:57:38 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: netfilter-devel <netfilter-devel@vger.kernel.org>,
-	Florian Westphal <fw@strlen.de>,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next] netlink: specs: nftables: allow decode of default firewalld ruleset
-Date: Mon,  2 Sep 2024 10:57:31 +0200
-Message-ID: <20240902085735.70137-1-fw@strlen.de>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1725267654; c=relaxed/simple;
+	bh=1GXmruvOjpWjsEEnI4BmFVwW8U3Xwus8o2wiwOeCA+k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l76srIXnjx0BPcsz9TfNa1Huns5yA4BhnVkBRbOjYTU9eQxARKZIO62L25PMILhtqK8nbZ10BSUsUxATj1LS3NKVP8+Hd1ECa+s/FVEjtZhnVwkQh3MkMPqcgBHKXcpubiwTSMkyQ8gi+jUhZNzYBp3vriQENoJsKGLnTEs24wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Qa90zpgt; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7142a30e3bdso3598939b3a.0
+        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 02:00:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1725267652; x=1725872452; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=itFT48or5QXWMyJdmgjyDoacOWQt+FuerZmvaW4WsSU=;
+        b=Qa90zpgt2zikrHextwrUlsRxGtzrQ5/u02d9jkWiion+37yoPXxTPBp8Y21sRJ7bfL
+         NrDCsRi6tyTdgXXdwNMQimKBL/i0XPFeIzLLywlsxB+/EQokbHR7ZiGDEF37j3U0Uau2
+         Cl7ywAMi1z5uIxnZ7lUkliSud1hpo/U5DkWdE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725267652; x=1725872452;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=itFT48or5QXWMyJdmgjyDoacOWQt+FuerZmvaW4WsSU=;
+        b=APRMuR3Xdo2EgUt+VQpeovnze5g2tzgAKUue7HT0vWlrO5pq9yv9BDqIm2xn6CuCni
+         /Cc0GJjieX5rQ/ff3GRvYgTL4GFOnAuap2TB6pgIJjkWZk/c7c4duup4ca1Oq6xWZn7x
+         /wWjb1KcPR1QHILcrp0MlPmo53GOyNwnPjrKqrhwr7OpQ8gEvhRFjxw0+0IA6oQceIrM
+         Xg9MyVuSRY8mzkzCHi4qYJgDvAXhE8ZKP1UKq9MDnYZGKlorG67ZbWGFu4BFhlzZllLM
+         C1XlPDcvbHx3C/eL5/O6jwXTn7+S9KBsW8GaqWjF2vQTig1q1qdXKrBlCiVmPaQsH85I
+         Mt0w==
+X-Forwarded-Encrypted: i=1; AJvYcCWnrFYxjEEwFBLCxLJ0+Exk+YC8pqkVT/52lVWFNp9OnQO/0EHx8KvTdp3n4v/+2I8J2nsw+Ak=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxtw7bXj5lq0jvvN9Xq4Syk+/YpUyO2AR7Euan0uVE71rK8T2a+
+	zNW+IRhKcBmE/S34aHw75hajiqFkhjy8aQd/uxcUPnMoxvWeaLDBczSb00bHIFDA2Hh5Gq2+Tgw
+	zQnHD+qEF9x+XJQci4exmDoAdOMlrru1Canzw
+X-Google-Smtp-Source: AGHT+IGXUU5jf/FhPoQUfKhS4WDcg4RadWfD6tDIH7U2OuUMUACcgVV1Mc87Eke52CrFWlCmmE6JfiYVaSSJdAjVZ5Y=
+X-Received: by 2002:a17:902:fb0f:b0:205:80e6:b7f2 with SMTP id
+ d9443c01a7336-20580e6b8d8mr23066455ad.11.1725267652001; Mon, 02 Sep 2024
+ 02:00:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240902071841.3519866-1-ruanjinjie@huawei.com>
+In-Reply-To: <20240902071841.3519866-1-ruanjinjie@huawei.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Mon, 2 Sep 2024 14:30:40 +0530
+Message-ID: <CALs4sv0YxV5YW_KZUDyXxO9RE1Me9P=ZhSGFpRtHhzTSK0WJww@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: lan743x: Use NSEC_PER_SEC macro
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com, 
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000925e0b06211f2d85"
 
-This update allows listing default firewalld ruleset on Fedora 40 via
-  tools/net/ynl/cli.py --spec \
-     Documentation/netlink/specs/nftables.yaml --dump getrule
+--000000000000925e0b06211f2d85
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Default ruleset uses fib, reject and objref expressions which were
-missing.
+On Mon, Sep 2, 2024 at 12:41=E2=80=AFPM Jinjie Ruan <ruanjinjie@huawei.com>=
+ wrote:
+>
+> 1000000000L is number of ns per second, use NSEC_PER_SEC macro to replace
+> it to make it more readable.
+>
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+> ---
+>  drivers/net/ethernet/microchip/lan743x_ptp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.c b/drivers/net/e=
+thernet/microchip/lan743x_ptp.c
+> index dcea6652d56d..9c2ec293c163 100644
+> --- a/drivers/net/ethernet/microchip/lan743x_ptp.c
+> +++ b/drivers/net/ethernet/microchip/lan743x_ptp.c
+> @@ -409,7 +409,7 @@ static int lan743x_ptpci_settime64(struct ptp_clock_i=
+nfo *ptpci,
+>                                    ts->tv_sec);
+>                         return -ERANGE;
+>                 }
+> -               if (ts->tv_nsec >=3D 1000000000L ||
+> +               if (ts->tv_nsec >=3D NSEC_PER_SEC ||
+>                     ts->tv_nsec < 0) {
+>                         netif_warn(adapter, drv, adapter->netdev,
+>                                    "ts->tv_nsec out of range, %ld\n",
+> --
+> 2.34.1
 
-Other missing expressions can be added later.
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-Improve decoding while at it:
-- add bitwise, ct and lookup attributes
-- wire up the quota expression
-- translate raw verdict codes to a human reable name, e.g.
-  'code': 4294967293 becomes 'code': 'jump'.
+--000000000000925e0b06211f2d85
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-Cc: Donald Hunter <donald.hunter@gmail.com>
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- Documentation/netlink/specs/nftables.yaml | 253 +++++++++++++++++++++-
- 1 file changed, 249 insertions(+), 4 deletions(-)
-
-diff --git a/Documentation/netlink/specs/nftables.yaml b/Documentation/netlink/specs/nftables.yaml
-index dff2a18f3d90..aba4772cd262 100644
---- a/Documentation/netlink/specs/nftables.yaml
-+++ b/Documentation/netlink/specs/nftables.yaml
-@@ -62,6 +62,13 @@ definitions:
-       - sdif
-       - sdifname
-       - bri-broute
-+  -
-+    name: bitwise-ops
-+    type: enum
-+    entries:
-+      - bool
-+      - lshift
-+      - rshift
-   -
-     name: cmp-ops
-     type: enum
-@@ -125,6 +132,98 @@ definitions:
-       - object
-       - concat
-       - expr
-+  -
-+    name: lookup-flags
-+    type: flags
-+    entries:
-+      - invert
-+  -
-+    name: ct-keys
-+    type: enum
-+    entries:
-+      - state
-+      - direction
-+      - status
-+      - mark
-+      - secmark
-+      - expiration
-+      - helper
-+      - l3protocol
-+      - src
-+      - dst
-+      - protocol
-+      - proto-src
-+      - proto-dst
-+      - labels
-+      - pkts
-+      - bytes
-+      - avgpkt
-+      - zone
-+      - eventmask
-+      - src-ip
-+      - dst-ip
-+      - src-ip6
-+      - dst-ip6
-+      - ct-id
-+  -
-+    name: ct-direction
-+    type: enum
-+    entries:
-+      - original
-+      - reply
-+  -
-+    name: quota-flags
-+    type: flags
-+    entries:
-+      - invert
-+      - depleted
-+  -
-+    name: verdict-code
-+    type: enum
-+    entries:
-+      - name: continue
-+        value: 0xffffffff
-+      - name: break
-+        value: 0xfffffffe
-+      - name: jump
-+        value: 0xfffffffd
-+      - name: goto
-+        value: 0xfffffffc
-+      - name: return
-+        value: 0xfffffffb
-+      - name: drop
-+        value: 0
-+      - name: accept
-+        value: 1
-+      - name: stolen
-+        value: 2
-+      - name: queue
-+        value: 3
-+      - name: repeat
-+        value: 4
-+  -
-+    name: fib-result
-+    type: enum
-+    entries:
-+      - oif
-+      - oifname
-+  -
-+    name: fib-flags
-+    type: flags
-+    entries:
-+      - saddr
-+      - daddr
-+      - mark
-+      - iif
-+      - oif
-+      - present
-+  -
-+    name: reject-types
-+    type: enum
-+    entries:
-+      - icmp-unreach
-+      - tcp-rst
-+      - icmpx-unreach
- 
- attribute-sets:
-   -
-@@ -611,9 +710,10 @@ attribute-sets:
-         type: u64
-         byte-order: big-endian
-       -
--        name: flags # TODO
-+        name: flags
-         type: u32
-         byte-order: big-endian
-+        enum: quota-flags
-       -
-         name: pad
-         type: pad
-@@ -664,6 +764,38 @@ attribute-sets:
-         name: devs
-         type: nest
-         nested-attributes: hook-dev-attrs
-+  -
-+    name: expr-bitwise-attrs
-+    attributes:
-+      -
-+        name: sreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: dreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: len
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: mask
-+        type: nest
-+        nested-attributes: data-attrs
-+      -
-+        name: xor
-+        type: nest
-+        nested-attributes: data-attrs
-+      -
-+        name: op
-+        type: u32
-+        byte-order: big-endian
-+        enum: bitwise-ops
-+      -
-+        name: data
-+        type: nest
-+        nested-attributes: data-attrs
-   -
-     name: expr-cmp-attrs
-     attributes:
-@@ -698,6 +830,7 @@ attribute-sets:
-         name: code
-         type: u32
-         byte-order: big-endian
-+        enum: verdict-code
-       -
-         name: chain
-         type: string
-@@ -718,6 +851,43 @@ attribute-sets:
-       -
-         name: pad
-         type: pad
-+  -
-+    name: expr-fib-attrs
-+    attributes:
-+      -
-+        name: dreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: result
-+        type: u32
-+        byte-order: big-endian
-+        enum: fib-result
-+      -
-+        name: flags
-+        type: u32
-+        byte-order: big-endian
-+        enum: fib-flags
-+  -
-+    name: expr-ct-attrs
-+    attributes:
-+      -
-+        name: dreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: key
-+        type: u32
-+        byte-order: big-endian
-+        enum: ct-keys
-+      -
-+        name: direction
-+        type: u8
-+        enum: ct-direction
-+      -
-+        name: sreg
-+        type: u32
-+        byte-order: big-endian
-   -
-     name: expr-flow-offload-attrs
-     attributes:
-@@ -736,6 +906,31 @@ attribute-sets:
-         name: data
-         type: nest
-         nested-attributes: data-attrs
-+  -
-+    name: expr-lookup-attrs
-+    attributes:
-+      -
-+        name: set
-+        type: string
-+        doc: Name of set to use
-+      -
-+        name: set id
-+        type: u32
-+        byte-order: big-endian
-+        doc: ID of set to use
-+      -
-+        name: sreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: dreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: flags
-+        type: u32
-+        byte-order: big-endian
-+        enum: lookup-flags
-   -
-     name: expr-meta-attrs
-     attributes:
-@@ -820,6 +1015,17 @@ attribute-sets:
-         name: csum-flags
-         type: u32
-         byte-order: big-endian
-+  -
-+    name: expr-reject-attrs
-+    attributes:
-+      -
-+        name: type
-+        type: u32
-+        byte-order: big-endian
-+        enum: reject-types
-+      -
-+        name: icmp-code
-+        type: u8
-   -
-     name: expr-tproxy-attrs
-     attributes:
-@@ -835,13 +1041,38 @@ attribute-sets:
-         name: reg-port
-         type: u32
-         byte-order: big-endian
-+  -
-+    name: expr-objref-attrs
-+    attributes:
-+      -
-+        name: imm-type
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: imm-name
-+        type: string
-+        doc: object name
-+      -
-+        name: set-sreg
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: set-name
-+        type: string
-+        doc: name of object map
-+      -
-+        name: set-id
-+        type: u32
-+        byte-order: big-endian
-+        doc: id of object map
- 
- sub-messages:
-   -
-     name: expr-ops
-     formats:
-       -
--        value: bitwise # TODO
-+        value: bitwise
-+        attribute-set: expr-bitwise-attrs
-       -
-         value: cmp
-         attribute-set: expr-cmp-attrs
-@@ -849,7 +1080,11 @@ sub-messages:
-         value: counter
-         attribute-set: expr-counter-attrs
-       -
--        value: ct # TODO
-+        value: ct
-+        attribute-set: expr-ct-attrs
-+      -
-+        value: fib
-+        attribute-set: expr-fib-attrs
-       -
-         value: flow_offload
-         attribute-set: expr-flow-offload-attrs
-@@ -857,16 +1092,26 @@ sub-messages:
-         value: immediate
-         attribute-set: expr-immediate-attrs
-       -
--        value: lookup # TODO
-+        value: lookup
-+        attribute-set: expr-lookup-attrs
-       -
-         value: meta
-         attribute-set: expr-meta-attrs
-       -
-         value: nat
-         attribute-set: expr-nat-attrs
-+      -
-+        value: objref
-+        attribute-set: expr-objref-attrs
-       -
-         value: payload
-         attribute-set: expr-payload-attrs
-+      -
-+        value: quota
-+        attribute-set: quota-attrs
-+      -
-+        value: reject
-+        attribute-set: expr-reject-attrs
-       -
-         value: tproxy
-         attribute-set: expr-tproxy-attrs
--- 
-2.46.0
-
+MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBUwwggQ0oAMCAQICDBX9eQgKNWxyfhI1kzANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODE3NDZaFw0yNTA5MTAwODE3NDZaMIGO
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDFBhdmFuIENoZWJiaTEoMCYGCSqGSIb3DQEJ
+ARYZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBAK3X+BRR67FR5+Spki/E25HnHoYhm/cC6VA6qHwC3QqBNhCT13zsi1FLLERdKXPRrtVBM6d0
+mfg/0rQJJ8Ez4C3CcKiO1XHcmESeW6lBKxOo83ZwWhVhyhNbGSwcrytDCKUVYBwwxR3PAyXtIlWn
+kDqifgqn3R9r2vJM7ckge8dtVPS0j9t3CNfDBjGw1DhK91fnoH1s7tLdj3vx9ZnKTmSl7F1psK2P
+OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
+dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
+fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
+9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
+pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
+25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
+Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIMNzj1CS8Mc1+tlG7RLJNN09UPK5m32N
+WOu6jg3bb2eVMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkw
+MjA5MDA1MlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQCjCx3fLvaUCJpoUBYj1irsq+AkRFJUNohyFl5K2MKjvY8IK2ML
+wSj+esVLsjkmAyiWowRkgIJtmCtwzlvd9z9IL+SyeLarNKIDEomOkJSCWa/nfzO8wIxsV30yqog8
+iCD8zf+Gr8t7Q1Kb43VLrfdQubQSzcBV13M8ByLZ5EXlE1vjxOOL2tWVxlZz+los3s51sDjqqKrP
+kii7KKyI6/al2BFa2s8V/IN1OcqTrYRv8VuHLcEg1JmLRBmq2F4j8Rrqx8bZ3RO2OlAaCfvr7uTW
+GvjgzW9aO8Ta21lZdde+RKsFysbjKZejXoSPeSPnsX37Sk3dozZkr4/m6Z+3A8BF
+--000000000000925e0b06211f2d85--
 
