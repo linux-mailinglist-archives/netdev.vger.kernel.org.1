@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-124239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3DF4968A74
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 16:58:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1FF5968A76
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 16:58:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7259E28368C
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:58:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0710282CB5
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 14:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D1AA1C62BF;
-	Mon,  2 Sep 2024 14:55:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513561C62D6;
+	Mon,  2 Sep 2024 14:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="jTrw63Sg"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="P4FtW9Ht"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF9D1C62B5;
-	Mon,  2 Sep 2024 14:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B639E1C62BC;
+	Mon,  2 Sep 2024 14:55:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725288932; cv=none; b=d2WKtbQWxVC26EGUf+xPNdJhUEpOGxiVIV7BIKHOsfyC8JsRor3ja42isLcrzBmSyJV41TdyeFSJprUeYbXCvEraE3Bd7DLUKA0ou7fDWVNEaPQIppYFsAPPWX7Xx5qwCJ6jAZ0kEF2obIvLAxLDiJK6VkXVt/6OD+cP9deTo0M=
+	t=1725288934; cv=none; b=X7CmFz5DGfD4+mq3vTzQEsFp1AwpTJVtwdqTGinsjxAa3NjpT4EeCHP0raL/sW/KMGkq6eaIchkgzvqQ9b2XZaLO2aYuZDHGd3qcgHJbOli8ZIJnQOe9dtOaKOhgKk25nxOlZNqxAkH7y5tfFlW0UthIuguCv+I1Cu9zsicvf7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725288932; c=relaxed/simple;
-	bh=aLG08PxBlNupyF1+ErIPnFVlFIj4PCZ139J4QY9jINA=;
+	s=arc-20240116; t=1725288934; c=relaxed/simple;
+	bh=VYuqsn82TNwXeOl9I4ZpMCH1VasU3oB3NNclgLdbMJo=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=e8nY3fEhnoh3SccmWy5VrageljS/sU1DSnR7FiOBsnUpSGsGAnTBxWc7X7N2sauOIma9pKVDB1dGj3UVUyOLc9K48JmWu3jqvX7sLfKn8093z8A2eZSr9K3b/QpnZlmF8XqZLYBN30eRuK5EXSjTE/5elo+LSPMRrUQt6fUMRrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=jTrw63Sg; arc=none smtp.client-ip=68.232.154.123
+	 In-Reply-To:To:CC; b=cKpY26A67mRMbqjLp/0kDhftWQZYYCIcXVEmYzwSACdGsVT+cMM5rWTAv/+6vcQ2ueeWfyB5LPxWa50TKY/EXiqei5bgnBlSJWNTNLfDtg29iv7T1IWpIYyKUEL+Fcoa6kuxpzM2GE27CWYUeFISOeC8MJ3o7rvCB8Q09/6ClkU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=P4FtW9Ht; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1725288931; x=1756824931;
+  t=1725288932; x=1756824932;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=aLG08PxBlNupyF1+ErIPnFVlFIj4PCZ139J4QY9jINA=;
-  b=jTrw63SgvkUVG2MCGSOqpEEIuogyq93w5cK89/OxQWDGS6tTMZpQ2EMF
-   54yjAUEDvBXQNJ1grz7DdQP0lrDysnRi7ODTwgYlEysPUR0R1G/GPQm0T
-   tjmO2kQRoUeIbnMmQURpy5bHbYpeLnyDVqQFQ+a36QzLSQ6g+z3pFjnoV
-   ja2Ujwy4fGPDWyRy07bnwURFklWJ2l3nocDpw0uBaVqXrej38n2Js3MBO
-   KHzN9vnEKCkfh2ybqf5CWvbNlWRPkNeBx7tjU3qqMrMakoMV0OfIY3SNw
-   12y79SrvAgfSqPp8L5oXluib6uoRoXgGj4nvIh6hRgNsJbBMZfAPPmK9y
-   Q==;
+  bh=VYuqsn82TNwXeOl9I4ZpMCH1VasU3oB3NNclgLdbMJo=;
+  b=P4FtW9Htm54NrIKwk0Wpe8uE5vu7E6ybYBxLTc5I01vsqC7rR/2IQlDc
+   LxyFMq64dMUDbT73p59b2+JNdZI+QipUFINbhheTnN8GQ3Bfq2PHgVBSM
+   x6YtalCy9E//4c0LpVcQBlUXMkKRbbTXiEtkKaOW4iOdwvU5Ujj+sPsbM
+   EDpFkqdMWMfZY9G+bxa1rEfX+4rZXzTtJHYoH6QTzdiyJa+qOUZoWtjDt
+   vKG7/W0RNxhpqd5HT+MC8cEm265M2zFSqr2I5wbc+lT/Ul9VrC02+UwGH
+   RgX4sHR13a7RGx0qOIGHUv/uN+akzIblIbY9I6+M0EY+qrJcjw8dxf3x4
+   g==;
 X-CSE-ConnectionGUID: 6WD2x+lUSXKxeZe2mffqQA==
-X-CSE-MsgGUID: K0Bz7V1LTx6WDCI2utsLfg==
+X-CSE-MsgGUID: LG5Q+ssUT9Cg0tqABrHfGA==
 X-IronPort-AV: E=Sophos;i="6.10,195,1719903600"; 
-   d="scan'208";a="31128324"
+   d="scan'208";a="31128331"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Sep 2024 07:55:30 -0700
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Sep 2024 07:55:31 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 2 Sep 2024 07:55:00 -0700
+ 15.1.2507.35; Mon, 2 Sep 2024 07:55:03 -0700
 Received: from [10.205.21.108] (10.10.85.11) by chn-vm-ex04.mchp-main.com
  (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Mon, 2 Sep 2024 07:54:58 -0700
+ Transport; Mon, 2 Sep 2024 07:55:00 -0700
 From: Daniel Machon <daniel.machon@microchip.com>
-Date: Mon, 2 Sep 2024 16:54:14 +0200
-Subject: [PATCH net-next 09/12] net: sparx5: use FDMA library for adding
- DCB's in the tx path
+Date: Mon, 2 Sep 2024 16:54:15 +0200
+Subject: [PATCH net-next 10/12] net: sparx5: use library helper for freeing
+ tx buffers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-ID: <20240902-fdma-sparx5-v1-9-1e7d5e5a9f34@microchip.com>
+Message-ID: <20240902-fdma-sparx5-v1-10-1e7d5e5a9f34@microchip.com>
 References: <20240902-fdma-sparx5-v1-0-1e7d5e5a9f34@microchip.com>
 In-Reply-To: <20240902-fdma-sparx5-v1-0-1e7d5e5a9f34@microchip.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -85,83 +85,28 @@ CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
 	<jensemil.schulzostergaard@microchip.com>
 X-Mailer: b4 0.14-dev
 
-Use the fdma_dcb_add() function to add DCB's in the tx path. This gets
-rid of the open-coding of nextptr and dataptr handling and leaves it to
-the library.
-
-Also, make sure the fdma indexes are advanced using: fdma_dcb_advance(),
-so that the correct nextptr and dataptr offsets are retrieved.
+The library has the helper fdma_free_phys() for freeing physical FDMA
+memory. Use it in the exit path.
 
 Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
 Reviewed-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
 Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 ---
- .../net/ethernet/microchip/sparx5/sparx5_fdma.c    | 39 +++++-----------------
- 1 file changed, 9 insertions(+), 30 deletions(-)
+ drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c b/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c
-index 8f721f7671ce..4fc52140752a 100644
+index 4fc52140752a..38735bac6482 100644
 --- a/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c
 +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c
-@@ -231,48 +231,27 @@ static int sparx5_fdma_napi_callback(struct napi_struct *napi, int weight)
- 	return counter;
+@@ -494,5 +494,6 @@ int sparx5_fdma_stop(struct sparx5 *sparx5)
+ 			  FDMA_PORT_CTRL_XTR_BUF_IS_EMPTY_GET(val) == 0,
+ 			  500, 10000, 0, sparx5);
+ 	fdma_free_phys(&sparx5->rx.fdma);
++	fdma_free_phys(&sparx5->tx.fdma);
+ 	return 0;
  }
- 
--static struct fdma_dcb *sparx5_fdma_next_dcb(struct sparx5_tx *tx,
--					     struct fdma_dcb *dcb)
--{
--	struct fdma_dcb *next_dcb;
--	struct fdma *fdma = &tx->fdma;
--
--	next_dcb = dcb;
--	next_dcb++;
--	/* Handle wrap-around */
--	if ((unsigned long)next_dcb >=
--	    ((unsigned long)fdma->dcbs + fdma->n_dcbs * sizeof(*dcb)))
--		next_dcb = fdma->dcbs;
--	return next_dcb;
--}
--
- int sparx5_fdma_xmit(struct sparx5 *sparx5, u32 *ifh, struct sk_buff *skb)
- {
- 	struct sparx5_tx *tx = &sparx5->tx;
- 	struct fdma *fdma = &tx->fdma;
- 	static bool first_time = true;
--	struct fdma_dcb *next_dcb_hw;
--	struct fdma_db *db_hw;
- 	struct sparx5_db *db;
- 
--	next_dcb_hw = sparx5_fdma_next_dcb(tx, fdma->last_dcb);
--	db_hw = &next_dcb_hw->db[0];
--	if (!(db_hw->status & FDMA_DCB_STATUS_DONE))
-+	fdma_dcb_advance(fdma);
-+	if (!fdma_db_is_done(fdma_db_get(fdma, fdma->dcb_index, 0)))
- 		return -EINVAL;
- 	db = list_first_entry(&tx->db_list, struct sparx5_db, list);
--	list_move_tail(&db->list, &tx->db_list);
--	next_dcb_hw->nextptr = FDMA_DCB_INVALID_DATA;
--	fdma->last_dcb->nextptr = fdma->dma +
--		((unsigned long)next_dcb_hw -
--		(unsigned long)fdma->dcbs);
--	fdma->last_dcb = next_dcb_hw;
- 	memset(db->cpu_addr, 0, FDMA_XTR_BUFFER_SIZE);
- 	memcpy(db->cpu_addr, ifh, IFH_LEN * 4);
- 	memcpy(db->cpu_addr + IFH_LEN * 4, skb->data, skb->len);
--	db_hw->status = FDMA_DCB_STATUS_SOF |
--			FDMA_DCB_STATUS_EOF |
--			FDMA_DCB_STATUS_BLOCKO(0) |
--			FDMA_DCB_STATUS_BLOCKL(skb->len + IFH_LEN * 4 + 4);
-+
-+	fdma_dcb_add(fdma, fdma->dcb_index, 0,
-+		     FDMA_DCB_STATUS_SOF |
-+		     FDMA_DCB_STATUS_EOF |
-+		     FDMA_DCB_STATUS_BLOCKO(0) |
-+		     FDMA_DCB_STATUS_BLOCKL(skb->len + IFH_LEN * 4 + 4));
-+
- 	if (first_time) {
- 		sparx5_fdma_tx_activate(sparx5, tx);
- 		first_time = false;
 
 -- 
 2.34.1
