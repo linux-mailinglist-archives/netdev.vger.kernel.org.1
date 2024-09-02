@@ -1,106 +1,113 @@
-Return-Path: <netdev+bounces-124286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AECC0968D1E
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 20:13:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E7A6968D25
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 20:15:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D50FB21ACE
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 18:13:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 907791C21F06
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 18:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3361AB6F5;
-	Mon,  2 Sep 2024 18:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FF9715250F;
+	Mon,  2 Sep 2024 18:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AmU2WXgc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iqFiJ3Wk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347AC1A2640;
-	Mon,  2 Sep 2024 18:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A598F1CB539;
+	Mon,  2 Sep 2024 18:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725300778; cv=none; b=ToGDSUWn5lmjpY91sN8tcP15VaAkgA9y04QwG0KvzEZxgbbLFu2Xm12G5itbiO2Q8seKgq+srSXQBwEn5nN7GM2kMryM20Z1m6+V0boXo9drNmoqEHWt4R9B5RuDArw/i0yhqUHrb+rA6MtpMbDSLbRuscqD2N+axhLvaXc2Ni8=
+	t=1725300935; cv=none; b=iW/Hw4Dl3a3Q3GrtBklltEvfXLIwbJJxPApnP2eUQV7jst9koX3DXXMFmvg3OlFkBhCYkotd7VmrjjSEAiLNioHjbXHxoNoH1lEh7rhC3k/SuBeq0ZK8mGC42sgROyAH1nsWlk6sK05qSVrANILYyZ3mrRfDCMGUr/2opqugZoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725300778; c=relaxed/simple;
-	bh=wTPqaKqHLzhAjxYXnUECpotow3wHFY2aVzdyea0pgis=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=evA5MJW1U3tgtG3gLGOoUjRO614/3eNj9BuzXO8mhd7UqJ1Ii9P9Sc8ZdEbOLYFp4RV69G5aOAeTmyA9KrMonf1W+63kU2jb6jFzaGS+EUeC3vHwjGrLPWcKCo9f4EEwBw6YyDywuVnHIIFHySmJxP/jVZz1n9z91ImkhCuIiYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AmU2WXgc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37201C4CEC2;
-	Mon,  2 Sep 2024 18:12:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725300777;
-	bh=wTPqaKqHLzhAjxYXnUECpotow3wHFY2aVzdyea0pgis=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AmU2WXgcJYUBfcDo6ha6IZKW7ve8E2w9YI9Pwv45SMfJbDi9sS308a2QmRqQTGkXN
-	 T0L0jtCAjxNcBRgQlF0qu/sKZhi11oxaG46EBLWNrQtBkjLvfjm1aZ2XFJ1bAUP0MM
-	 0ErERn92y5ntRPIUNeFoyxFRlTeD78+hfcnHMsu8WsH8JQghRGcRdR5DT6a37pClXc
-	 l7FARh3DYX9v0ZPGMBjpuyQp+wKPWdZjBOBg8hSVv9OAguvr8vvajJwSQTmveaCLVd
-	 QpiRXwHhrwzJcDgc9upXi4Z/571O+nMCcfoHZtR16Egyf4qfgn5bJX6Xb1/5n5EWHW
-	 uLfCmts9G4PmQ==
-Date: Mon, 2 Sep 2024 21:12:52 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: David Ahern <dsahern@gmail.com>
-Cc: Michael Guralnik <michaelgur@nvidia.com>, jgg@nvidia.com,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Chiara Meiohas <cmeiohas@nvidia.com>
-Subject: Re: [RFC iproute2-next 2/4] rdma: Add support for rdma monitor
-Message-ID: <20240902181252.GG4026@unreal>
-References: <20240901005456.25275-1-michaelgur@nvidia.com>
- <20240901005456.25275-3-michaelgur@nvidia.com>
- <cad1d443-ccfb-4d10-ac2d-26bb10c99d05@gmail.com>
- <20240902075426.GD4026@unreal>
- <8e652f69-78d0-40f0-a712-60ef8733cf29@gmail.com>
+	s=arc-20240116; t=1725300935; c=relaxed/simple;
+	bh=znSjoMQg1HhWt93uFHrwPqGoJgEjX9RIq1lgtQWd4JU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pI96rzJu7TYIMsD1TeMKbK542m7ScX2GKTpk22QINa7GjBXUwP8iC7t8+C+2hWiWxvSfwRMn6FTxXY1y6rpeZQrrDmEiYMuzl1YfwYy6ZFQanomOkYVdRHYRfhnBbyI1fOxwS4Jv0U5GHZHaibUvMnRw2VzCfyQ+o906512fExk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iqFiJ3Wk; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7176645e440so374147b3a.1;
+        Mon, 02 Sep 2024 11:15:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725300933; x=1725905733; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=un7/IFpKzgCp+4A0jckhNEuXDpv6EUswWkBGhAfXo80=;
+        b=iqFiJ3WkgSlhLg/7q7bQV1/qThIzXdw9xwXW8ViGhW5qQed0stnDcvqyDhaGKVGjb+
+         qMrdgSQxZjDdmzO+M5L5fU3PlYkvIPJox79MkX60Npc/Ab4gDS2yIYV9sDJtVQSpvYIQ
+         pi9wzSKVRO4b3DKr6nYZlTWRVh9vIlc5eKRc3witwASu0GnA/Utssy0+Xeb83ZvT6WcY
+         Z7kgoZXS+3nlEQIhXV0LDr8XjoQ3QQ5Ury+xD5x6OZhNZcfGm0amklYixhKwJAzwYKwi
+         O+HyFRW7LL64z9bp47Ti6t/KIFcTns4LAPVSUyUkLgAKvUO9zSrFdaR37K+GXGQpN+xd
+         gfJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725300933; x=1725905733;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=un7/IFpKzgCp+4A0jckhNEuXDpv6EUswWkBGhAfXo80=;
+        b=fhAUvW7gP5yrAMcRwXZ3ghqKiulnC8FB3ldarVRE95aUw5ZAGPEtU5b1c08t/7Yl/z
+         Wa0rKWLgM+tMmoNZ8RSkJvn6XWWh1TTSoL9jaTTmJED7Q24FXSLOV6ln5y+oSlO7w/EB
+         rGg6q8W6kQ2uaSvFnE2BcaYm/IvYFvEy2VRCEpp4P8oR6ICcBQdBVx+YzPVZmLF/8BD+
+         +QDuvcyLRzrbwM44sKc6VqZRlYcaI7PC3MSjsQ+YEo2S1D6P6bWe5uSQbaHF51NDUe45
+         +Zy7qmHJ43pQQEI4Ldi+dypCdtw6yk5OHTJuDTGFj6UoK1ZIYZQ+N5KWrTnWoJwsSihX
+         IazQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUXrKOdnWgs6knmUYyGKwc3uJBxonob1XACz+0WP1IxMyvGEVQD8xmyQwS6JlrwOuhyErY/UxwmbXoHklI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVbWbC+glhtqlIsDaoEz9+0zaA62wW9vRpuWJGN9VYwBbPntF1
+	QhskTksUaInZoSvYfrCOYj+Yb9cfHn/6wIT4bn5Lb7V0PgMVTbYqjBCHwJCX
+X-Google-Smtp-Source: AGHT+IHWxx4KQsibhYLnAQyW2uoea+wtTKPWTv+Rb8aJxXVDykG3AwC1IUHDHTbdbhsAF0j/2/gcQw==
+X-Received: by 2002:a05:6a00:181a:b0:714:2922:7c6d with SMTP id d2e1a72fcca58-715e101f8d7mr28043965b3a.12.1725300932624;
+        Mon, 02 Sep 2024 11:15:32 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-715e56d7804sm7109167b3a.154.2024.09.02.11.15.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 Sep 2024 11:15:32 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	jacob.e.keller@intel.com,
+	horms@kernel.org,
+	sd@queasysnail.net,
+	chunkeey@gmail.com
+Subject: [PATCH net-next 0/6] net: ibm: emac: some cleanups and devm
+Date: Mon,  2 Sep 2024 11:15:09 -0700
+Message-ID: <20240902181530.6852-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8e652f69-78d0-40f0-a712-60ef8733cf29@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 02, 2024 at 10:55:15AM -0600, David Ahern wrote:
-> On 9/2/24 1:54 AM, Leon Romanovsky wrote:
-> > On Sun, Sep 01, 2024 at 08:22:50PM -0600, David Ahern wrote:
-> >> On 8/31/24 6:54 PM, Michael Guralnik wrote:
-> >>> $ echo 4 > /sys/class/net/eth2/device/sriov_numvfs
-> >>> [NETDEV_ATTACH]	dev 6 port 2 netdev 7
-> >>> [NETDEV_ATTACH]	dev 6 port 3 netdev 8
-> >>> [NETDEV_ATTACH]	dev 6 port 4 netdev 9
-> >>> [NETDEV_ATTACH]	dev 6 port 5 netdev 10
-> >>> [REGISTER]	dev 7
-> >>> [NETDEV_ATTACH]	dev 7 port 1 netdev 11
-> >>> [REGISTER]	dev 8
-> >>> [NETDEV_ATTACH]	dev 8 port 1 netdev 12
-> >>> [REGISTER]	dev 9
-> >>> [NETDEV_ATTACH]	dev 9 port 1 netdev 13
-> >>> [REGISTER]	dev 10
-> >>> [NETDEV_ATTACH]	dev 10 port 1 netdev 14
-> >>>
-> >>
-> >> at a minimum the netdev output can be device names not indices; I would
-> >> expect the same for IB devices (I think that is the `dev N` in the
-> >> output) though infrastructure might be needed in iproute2.
-> > 
-> > I understand the request and it is a good one for the users of the tool.
-> > 
-> > However, we will need to remember that "real" users of this monitoring
-> > UAPI (from kernel side) are the orchestration tools and they won't care
-> > about the names, but about the IDs, which won't be used in rdmatool.
-> > 
-> 
-> That's a big assumption.
-> 
-> It is trivial to convert indices to names, so this can be readable for both.
+It's a very old driver with a lot of potential for cleaning up code to
+modern standards. This was a simple one dealing with mostly the probe
+function and adding some devm to it.
 
-We had an internal discussion about this earlier today and came to same
-conclusion that we will convert indexes to names in the rdmatool without
-need to change the kernel API.
+All patches were tested on a Cisco Meraki MX60W. Boot and
+Shutdown/Reboot showed no warnings.
 
-Thanks
+Rosen Penev (6):
+  net: ibm: emac: use devm for alloc_etherdev
+  net: ibm: emac: manage emac_irq with devm
+  net: ibm: emac: use devm for of_iomap
+  net: ibm: emac: remove mii_bus with devm
+  net: ibm: emac: use devm for register_netdev
+  net: ibm: emac: use netdev's phydev directly
+
+ drivers/net/ethernet/ibm/emac/core.c | 130 +++++++++++----------------
+ drivers/net/ethernet/ibm/emac/core.h |   4 -
+ 2 files changed, 50 insertions(+), 84 deletions(-)
+
+-- 
+2.46.0
+
 
