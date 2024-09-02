@@ -1,144 +1,288 @@
-Return-Path: <netdev+bounces-124245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03125968AAA
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 17:08:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97775968AC6
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 17:20:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABDD4283A14
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 15:08:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 188561F22861
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 15:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F051CB51F;
-	Mon,  2 Sep 2024 15:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA5E3183CD4;
+	Mon,  2 Sep 2024 15:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xp26qjRz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iOycwbUY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1221CB506
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 15:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 336D01CB50B
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 15:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725289733; cv=none; b=i1dQ6HbDhyHsli1CAKs9S1WvHyloM8NbdzW1LDq5rQThE/jrLQ/+XXsNyaJ2+XKSEPNinEGOWpdC7iK/rN3iSwKZ34FSqz31KgdHmjfAX9hD2Q/lz1/IaupxpqYfyucFZQ6SohuJoH2ZLR8JVKKrJzNjxX4fOC3lRD8+AD6wXDY=
+	t=1725290430; cv=none; b=YmgSGGSTvI34WYddPjEUYeImCQvrUGYcURBUpV74BzUt7VwdY3rcdwHMGUuMow8jfEUTQ/kJWjBq68hFxYf9NSGfHW/9T4LJ6OkiruK+QzjF8Gbkvfr/fuA+j+V8SY1HjkKhy7nSNM8cuzrKiioD7H6ERFBoeWIUowICBaSj9K4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725289733; c=relaxed/simple;
-	bh=s80GzV8TUj/ry+7FU0Na9/he8AX5uCYzM0pqcREWfoY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dOrNaQiiaeWa2wEILNs3hoYef1PIEHWvGwT+t75U5JBBXzEy/u4RESFEUFLF5GSrhvE5LoWzzb4EZgzWMt7mGB4J/KSbw3Q6EyeGQritAO7/bF2sbN8+rIxAVeRa1ew748jQQu8gZiDMQvQuivthRX+EuJOQDkKVqJo1fezVbiM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xp26qjRz; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1725290430; c=relaxed/simple;
+	bh=spNaR9YELXPvgd+dDdle2zziHaydW2fKWAsnn+xz3SU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=luijriIupTymNCDJgoVaZ3j+GHEaWuf+GvNwtM0XGSkPOPFq9bUJRM855SumuEExxm+ehPVI2BzgM5/L9XAkWSOf6eBklYPsDzLRBfcYsIN1bVrH/AOj0d/+B5+czU12qhwhOKZi1yrQHHF4bMfRljSKakZIJuasBptYY+5XACw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iOycwbUY; arc=none smtp.client-ip=209.85.166.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42c53379a3fso3056435e9.0
-        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 08:08:51 -0700 (PDT)
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-39f50e0caa6so7868125ab.2
+        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 08:20:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725289730; x=1725894530; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OBG4PQ/CpZsnZ2HX1NHwYJn+yDINEEs82pAtb3chHtk=;
-        b=Xp26qjRzqywjFcIcBblmA5FDmvQ6h43FpoU+F1NI+Cnhu+9UCDPzP10wKk/ycpM3oG
-         1dhH2KREepiujJmNHku53m6KaX+mmrxezd95d4FTZLx4pwgXIllZP19w1JRUVyXOkaHI
-         YyRIqO4Bwyt4JI3NmBoOLuBMxlfBkM+s0LnEVyaaube1wK99wKs823XijorFmMZTjN+N
-         tskxWkI3NY0frhR8PtOKwShxgHU8QaIB2YXF+/mdKE9HMEb14ddg0RyXfHKiBlGGyNRr
-         sLOTeHBfjeRDC/TkbutSth7ijUHhtaJYooXlwb7JWflWcssJWACt18DQuTO3m3HkPqw1
-         u3pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725289730; x=1725894530;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1725290428; x=1725895228; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OBG4PQ/CpZsnZ2HX1NHwYJn+yDINEEs82pAtb3chHtk=;
-        b=b8bBpC8ZA24mX0tELBgNgTXO7WlXhA4kzNlHgLxVvBzKhLYdEfUjHsVcUASa+Fj+rH
-         Omt3/O9kYyty6+Izn5PZsIKN3IUJ2eUdYXO6pFUSYIDjDb3yXEh2HLt2mRt+fe2NT0GG
-         vybNFg5rjxZ02XHwQqQGyGpf8n6bZNPWZQkS1uS/O7Le4ghJvCIqaTPnFkjy8NZDbpoH
-         mPFj+cP6WFcoYE+/G2FbN8atMBsrdMGy2wbLwkivGno/uMYe0G1IpJCGtr18ESF0gFFt
-         qs2tj1XI6Q4FfjjaKOezTpaItgVKAa5/el27MI6B5AYjSLB0b7k/s+1bu/hbEj5nKmI5
-         dw/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVk0Ah0nHD5TCX3lcu+xAlyFLtrHqWGjyd1fmnFC5eBicO2QUR1Dm/RfWXo+0NeRZOOmUdfK6k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywa5Rwny29xDrrGii3EJozwOMfT/XeouErVnSAS/mkrFbXUSBPI
-	3a48NGzGOuVn8EK18cJp1lNApHj2/jIftlOcWx9O6FfNfxKjNGHZ
-X-Google-Smtp-Source: AGHT+IFuPBDCOxNWdO30HwHJlrWFpCiUG4JFT1ttKWK4lEofe5Q0hulqGUKueDGrnk2FjxJ4CAte3A==
-X-Received: by 2002:a05:6000:1f8d:b0:374:d0a1:6fbd with SMTP id ffacd0b85a97d-374d0a1720bmr717045f8f.8.1725289729548;
-        Mon, 02 Sep 2024 08:08:49 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ee9ba8esm11704536f8f.50.2024.09.02.08.08.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Sep 2024 08:08:48 -0700 (PDT)
-Date: Mon, 2 Sep 2024 18:08:45 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew@lunn.ch, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, woojung.huh@microchip.com,
-	o.rempel@pengutronix.de, maxime.chevallier@bootlin.com
-Subject: Re: [RFC net-next 1/2] net: ethtool: plumb PHY stats to PHY drivers
-Message-ID: <20240902150845.jze45qvx4k3n7ijz@skbuf>
-References: <20240829174342.3255168-1-kuba@kernel.org>
- <20240829174342.3255168-2-kuba@kernel.org>
+        bh=vhIkHQW2MwS/jaA6hFOxoLaQ9BupM8fF/koLSZV8Eb8=;
+        b=iOycwbUYxpCflkyswq7OX1VcO63egRp7CN9sU9fTU1vFiSCj+P5qAbRdScMsggvz2s
+         QeRHUIeFqPfOYOUJdpqrwpZPkiVwB/WJ+Y3WV7U5CTr8bS6L82YvCV+G4F24AjfmvMXK
+         wF/3KEJXiKmwdIbD3TgvL/lcmmASjrXi6xGGX5f5KyYQPi3fSNJ2EVC2gpUPKczvxRUj
+         pP3ttJskqvsTC1GlP+zQmn1KlWaq902cI1A12los4+WW0qKJXdL0cQwVgDoh4a1qvmV8
+         PmM6x5uMy7WZcE9nzPKleM3nthQj8w3BKdmAcGtKK9E3KaJoD/VjHwinsyeiMF/Vjvs5
+         ZCNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725290428; x=1725895228;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vhIkHQW2MwS/jaA6hFOxoLaQ9BupM8fF/koLSZV8Eb8=;
+        b=MWPneStLCgCbqKqQ4N7u9T3XHl7HxxrYo2Ps8EEl4GB1mUhAxyW9n0jUez9KUMSBJR
+         TgAehy1HP64vUv2i6BwYuYr/aKIe3Z7ZKyLYgxL1zzPu2H2rQNGeyoJXCYLCwXGb3+Vi
+         L7RX7UU6t8J+W/mzSP/PSfNIZkmxqCdUUuljlKTetaKFDAQGktG8yCUS/MH8Lqrbzxj6
+         vxcWEgiEzbP8KQcbsVnaBxZxGOOiK34JGL5eyEMOiS0f1KCCKa9/FZJupFxjTNOy37g4
+         UnkOBSFNlus4jlS0ju8iFOSNRzYsXH06TARs4/5nJ/cwAeTVDLAQPAGWftB+LRF9CqON
+         EV4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUMmExlDYBl3bpiTHxsXeGoihz7srFi4MVv5zzV0WyA6GebY5I6qmuPpXGmqkn4/APa0p7Gs9U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLZFwHkISiXs8Fwcd6/F5SUn5R1qpU9g21NTcsp0dIHaTuspnd
+	VLx/rP11zJNxsPhytA39LCGl/JH+5szbuf4Fsd72o0xFEcgTwCpDgTbyP8sMz7fpRkniCduW6va
+	QItr7Elqfr5YMew6yBC+CFx9bK7s=
+X-Google-Smtp-Source: AGHT+IEsMQj7WzBKr/CZH2NNMgbdXjhh2D/2SqeUGSeSLRkrrwzBDmlSEXWSntzvVOijqeix1+/F/0fVlwSSwYnk2Jw=
+X-Received: by 2002:a05:6e02:12cb:b0:39f:5a9e:dec7 with SMTP id
+ e9e14a558f8ab-39f5a9ee812mr56165475ab.15.1725290428150; Mon, 02 Sep 2024
+ 08:20:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240829174342.3255168-2-kuba@kernel.org>
+References: <20240902130937.457115-1-vadfed@meta.com>
+In-Reply-To: <20240902130937.457115-1-vadfed@meta.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Mon, 2 Sep 2024 23:19:51 +0800
+Message-ID: <CAL+tcoDgai2bLqnU0KtspTu1nn=qb_23TQNUf7u=-VOhnitaOA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 1/2] net_tstamp: add SCM_TS_OPT_ID to provide
+ OPT_ID in control message
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Willem de Bruijn <willemb@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 29, 2024 at 10:43:41AM -0700, Jakub Kicinski wrote:
-> Vladimir, I don't understand MM
+On Mon, Sep 2, 2024 at 9:09=E2=80=AFPM Vadim Fedorenko <vadfed@meta.com> wr=
+ote:
+>
+> SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
+> timestamps and packets sent via socket. Unfortunately, there is no way
+> to reliably predict socket timestamp ID value in case of error returned
+> by sendmsg. For UDP sockets it's impossible because of lockless
+> nature of UDP transmit, several threads may send packets in parallel. In
+> case of RAW sockets MSG_MORE option makes things complicated. More
+> details are in the conversation [1].
+> This patch adds new control message type to give user-space
+> software an opportunity to control the mapping between packets and
+> values by providing ID with each sendmsg. This works fine for UDP
+> sockets only, and explicit check is added to control message parser.
+>
+> [1] https://lore.kernel.org/netdev/CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9=
+Eaa9aDPfgHdtA@mail.gmail.com/
+>
+> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> ---
+>  Documentation/networking/timestamping.rst | 14 ++++++++++++++
+>  arch/alpha/include/uapi/asm/socket.h      |  4 +++-
+>  arch/mips/include/uapi/asm/socket.h       |  2 ++
+>  arch/parisc/include/uapi/asm/socket.h     |  2 ++
+>  arch/sparc/include/uapi/asm/socket.h      |  2 ++
+>  include/net/inet_sock.h                   |  4 +++-
+>  include/net/sock.h                        |  1 +
+>  include/uapi/asm-generic/socket.h         |  2 ++
+>  include/uapi/linux/net_tstamp.h           |  3 ++-
+>  net/core/sock.c                           | 12 ++++++++++++
+>  net/ethtool/common.c                      |  1 +
+>  net/ipv4/ip_output.c                      | 16 ++++++++++++----
+>  net/ipv6/ip6_output.c                     | 16 ++++++++++++----
+>  13 files changed, 68 insertions(+), 11 deletions(-)
+>
+> diff --git a/Documentation/networking/timestamping.rst b/Documentation/ne=
+tworking/timestamping.rst
+> index 5e93cd71f99f..93b0901e4e8e 100644
+> --- a/Documentation/networking/timestamping.rst
+> +++ b/Documentation/networking/timestamping.rst
+> @@ -193,6 +193,20 @@ SOF_TIMESTAMPING_OPT_ID:
+>    among all possibly concurrently outstanding timestamp requests for
+>    that socket.
+>
+> +  With this option enabled user-space application can provide custom
+> +  ID for each message sent via UDP socket with control message with
+> +  type set to SCM_TS_OPT_ID::
+> +
+> +    struct msghdr *msg;
+> +    ...
+> +    cmsg                        =3D CMSG_FIRSTHDR(msg);
+> +    cmsg->cmsg_level            =3D SOL_SOCKET;
+> +    cmsg->cmsg_type             =3D SO_TIMESTAMPING;
+> +    cmsg->cmsg_len              =3D CMSG_LEN(sizeof(__u32));
+> +    *((__u32 *) CMSG_DATA(cmsg)) =3D opt_id;
+> +    err =3D sendmsg(fd, msg, 0);
+> +
+> +
+>  SOF_TIMESTAMPING_OPT_ID_TCP:
+>    Pass this modifier along with SOF_TIMESTAMPING_OPT_ID for new TCP
+>    timestamping applications. SOF_TIMESTAMPING_OPT_ID defines how the
+> diff --git a/arch/alpha/include/uapi/asm/socket.h b/arch/alpha/include/ua=
+pi/asm/socket.h
+> index e94f621903fe..0698e6662cdf 100644
+> --- a/arch/alpha/include/uapi/asm/socket.h
+> +++ b/arch/alpha/include/uapi/asm/socket.h
+> @@ -10,7 +10,7 @@
+>   * Note: we only bother about making the SOL_SOCKET options
+>   * same as OSF/1, as that's all that "normal" programs are
+>   * likely to set.  We don't necessarily want to be binary
+> - * compatible with _everything_.
+> + * compatible with _everything_.
+>   */
+>  #define SOL_SOCKET     0xffff
+>
+> @@ -140,6 +140,8 @@
+>  #define SO_PASSPIDFD           76
+>  #define SO_PEERPIDFD           77
+>
+> +#define SCM_TS_OPT_ID          78
+> +
+>  #if !defined(__KERNEL__)
+>
+>  #if __BITS_PER_LONG =3D=3D 64
+> diff --git a/arch/mips/include/uapi/asm/socket.h b/arch/mips/include/uapi=
+/asm/socket.h
+> index 60ebaed28a4c..bb3dc8feb205 100644
+> --- a/arch/mips/include/uapi/asm/socket.h
+> +++ b/arch/mips/include/uapi/asm/socket.h
+> @@ -151,6 +151,8 @@
+>  #define SO_PASSPIDFD           76
+>  #define SO_PEERPIDFD           77
+>
+> +#define SCM_TS_OPT_ID          78
+> +
+>  #if !defined(__KERNEL__)
+>
+>  #if __BITS_PER_LONG =3D=3D 64
+> diff --git a/arch/parisc/include/uapi/asm/socket.h b/arch/parisc/include/=
+uapi/asm/socket.h
+> index be264c2b1a11..c3ab3b3289eb 100644
+> --- a/arch/parisc/include/uapi/asm/socket.h
+> +++ b/arch/parisc/include/uapi/asm/socket.h
+> @@ -132,6 +132,8 @@
+>  #define SO_PASSPIDFD           0x404A
+>  #define SO_PEERPIDFD           0x404B
+>
+> +#define SCM_TS_OPT_ID          0x404C
+> +
+>  #if !defined(__KERNEL__)
+>
+>  #if __BITS_PER_LONG =3D=3D 64
+> diff --git a/arch/sparc/include/uapi/asm/socket.h b/arch/sparc/include/ua=
+pi/asm/socket.h
+> index 682da3714686..9b40f0a57fbc 100644
+> --- a/arch/sparc/include/uapi/asm/socket.h
+> +++ b/arch/sparc/include/uapi/asm/socket.h
+> @@ -133,6 +133,8 @@
+>  #define SO_PASSPIDFD             0x0055
+>  #define SO_PEERPIDFD             0x0056
+>
+> +#define SCM_TS_OPT_ID            0x0057
+> +
+>  #if !defined(__KERNEL__)
+>
+>
+> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+> index 394c3b66065e..2161d50cf0fd 100644
+> --- a/include/net/inet_sock.h
+> +++ b/include/net/inet_sock.h
+> @@ -174,6 +174,7 @@ struct inet_cork {
+>         __s16                   tos;
+>         char                    priority;
+>         __u16                   gso_size;
+> +       u32                     ts_opt_id;
+>         u64                     transmit_time;
+>         u32                     mark;
+>  };
+> @@ -241,7 +242,8 @@ struct inet_sock {
+>         struct inet_cork_full   cork;
+>  };
+>
+> -#define IPCORK_OPT     1       /* ip-options has been held in ipcork.opt=
+ */
+> +#define IPCORK_OPT             1       /* ip-options has been held in ip=
+cork.opt */
+> +#define IPCORK_TS_OPT_ID       2       /* timestmap opt id has been prov=
+ided in cmsg */
+>
+>  enum {
+>         INET_FLAGS_PKTINFO      =3D 0,
+> diff --git a/include/net/sock.h b/include/net/sock.h
+> index f51d61fab059..73e21dad5660 100644
+> --- a/include/net/sock.h
+> +++ b/include/net/sock.h
+> @@ -1794,6 +1794,7 @@ struct sockcm_cookie {
+>         u64 transmit_time;
+>         u32 mark;
+>         u32 tsflags;
+> +       u32 ts_opt_id;
+>  };
+>
+>  static inline void sockcm_init(struct sockcm_cookie *sockc,
+> diff --git a/include/uapi/asm-generic/socket.h b/include/uapi/asm-generic=
+/socket.h
+> index 8ce8a39a1e5f..db3df3e74b01 100644
+> --- a/include/uapi/asm-generic/socket.h
+> +++ b/include/uapi/asm-generic/socket.h
+> @@ -135,6 +135,8 @@
+>  #define SO_PASSPIDFD           76
+>  #define SO_PEERPIDFD           77
+>
+> +#define SCM_TS_OPT_ID          78
+> +
+>  #if !defined(__KERNEL__)
+>
+>  #if __BITS_PER_LONG =3D=3D 64 || (defined(__x86_64__) && defined(__ILP32=
+__))
+> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tst=
+amp.h
+> index a2c66b3d7f0f..e2f145e3f3a1 100644
+> --- a/include/uapi/linux/net_tstamp.h
+> +++ b/include/uapi/linux/net_tstamp.h
+> @@ -32,8 +32,9 @@ enum {
+>         SOF_TIMESTAMPING_OPT_TX_SWHW =3D (1<<14),
+>         SOF_TIMESTAMPING_BIND_PHC =3D (1 << 15),
+>         SOF_TIMESTAMPING_OPT_ID_TCP =3D (1 << 16),
+> +       SOF_TIMESTAMPING_OPT_ID_CMSG =3D (1 << 17),
 
-MAC Merge / Frame Preemption in a nutshell:
+I'm not sure if the new flag needs to be documented as well? After
+this patch, people may search the key word in the documentation file
+and then find nothing.
 
-- Frame is express if, after the preamble, it has a "normal" SFD of 0xD5
+If we have this flag here, normally it means we can pass it through
+setsockopt, so is it expected? If it's an exception, I reckon that we
+can forbid passing/setting this option in sock_set_timestamping() and
+document this rule?
 
-- Frame is preemptible if, after the preamble, it has an SFD of 0x07,
-  0x19, 0xE6, 0x4C, 0x7F, 0xB3, 0x61, 0x52, 0x9E or 0x2A
-
-express MAC handles express frames
-preemptible MAC handles preemptible frames
-
-ETHTOOL_MAC_STATS_SRC_EMAC counts express frames
-ETHTOOL_MAC_STATS_SRC_PMAC counts preemptible frames
-ETHTOOL_MAC_STATS_SRC_AGGREGATE counts both - also works when you don't know
-
-Now you know as much as I do.
-
-> but doesn't MM share the PHY?
-
-It does, yes. There is a single set of MII lines, and distinction
-between the express and preemptible MAC is done as described above.
-
-I wouldn't expect the PHY to be aware of MAC Merge / Frame Preemption,
-and thus, this component would normally not pay attention to the SFD of
-the frames it's counting. The entire feature actually depends on the PHY
-being unaware of the SFD, because they don't make PHYs "for" frame preemption.
-
-Although, imaginably, just like we have PHYs which emit PAUSE frames,
-and that technically means they have a MAC embedded inside, it would not
-be impossible to twist standards such that the PHY handles FPE/MM.
-This is only in the realm of theory, AFAIU, and I'm not suggesting we
-should model the UAPI based on pure theory.
-
-> Ocelot seems to aggregate which I did not expect.
-
-Ocelot aggregates stats when the request is to aggregate them
-(explicit ETHTOOL_MAC_STATS_SRC_AGGREGATE, and also default, for
-comparability/ compatibility with unaware drivers). Otherwise it
-reports them individually.
-
-Also, the stats it reports into phy_stats->SymbolErrorDuringCarrier are
-MAC stats. They count the number of frames received by the MAC with
-RX_ER being asserted on the MII interface. So these could be counted by
-either the MAC, or the PHY. The MAC is MM-aware, the PHY is probably not.
-
-Though if I follow the thread, I'm not sure if this is exactly useful to
-Oleksij, who would like to report an entirely different set of counters.
-
-I never got the impression that the ETHTOOL_STATS_ETH_PHY structured
-netlink counters were for NICs with embedded non-phylib PHYs. If they
-are - sorry. I thought it was about those MAC counters which are
-collected at the interface with the PHY.
+Thanks,
+Jason
 
