@@ -1,138 +1,191 @@
-Return-Path: <netdev+bounces-124088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D6A9967F37
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 08:15:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45E42967F50
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 08:24:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3464228249C
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 06:15:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F24652823E1
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 06:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5999C155A47;
-	Mon,  2 Sep 2024 06:15:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182C9154C00;
+	Mon,  2 Sep 2024 06:24:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b="oRNh32kr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BPih2Hqo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD26155739
-	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 06:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262F61547DB
+	for <netdev@vger.kernel.org>; Mon,  2 Sep 2024 06:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725257742; cv=none; b=Q6FXqgk6gDtNrvZiQ4jSIw9goD7g9jv4jNFqQu0pWN4/zFaEH8S8qomBVGnoADdaesxjvkFwXlZiAqSayAYUk4gakpBm/5hFsg6OQU70uGhEGNwooiVG3uJr2EERHnCoQ/YWQRwae9Q0OLsbgvVVl2CLbcFKcuE/ZfTayt8Z8xg=
+	t=1725258262; cv=none; b=HnDXB6XX03+1JZbNHgzvqFkr5oZUJdnQ4g3eJyVklcAf3305VjxiDYlpqJzRlZwR/H2Rbd52tEtwZBeuqMz9nEgiE0NUMimnnhAISSlurnUWoRIvm8LLeNixUvW1yrD0eY5FFoFKLfEbDwC07R2NyBEqg4ACPPWUnAfjV724l+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725257742; c=relaxed/simple;
-	bh=zdtqRov4ldARAeT6+pdRvlWvnPz8Nrvxo32h4N7oGMw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fPXMzzZyRKFcyQeyjhBRBRafL+xKXjyzKGBfWwjlM3NTgHD77EEckVCygYiE2SPP95AHe9CoHNwT8TF7fr8aFL0mIg7Cl88GUDXERNtUlXVg8orwc+VnhJ9E91Qe+jwMvFsq7rX6S9gF2Btk8U20Z4Z0fhu3wuEWzsZzxOmayi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b=oRNh32kr; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.jp; i=@amazon.co.jp; q=dns/txt;
-  s=amazon201209; t=1725257741; x=1756793741;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=SWdOw87/+51iqg586AVxL9Z/wKo8wamb0wgkXwwaRE0=;
-  b=oRNh32krKN36oWobEo1OnZ2TVzsrmRkxOBjQ4+SaMWWRD7Szo8L3/7xP
-   t2s6z2i3TBxrpNO/HIZgNvvsxY1O3g0aV3NYswz6bMVx2BL32kwfkGuOv
-   TmVBkU1C5zA28Hm+VwvQfACnC0jaC7MrN2ltumma71nCcvbXAPauCAfQM
-   8=;
-X-IronPort-AV: E=Sophos;i="6.10,195,1719878400"; 
-   d="scan'208";a="22718195"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Sep 2024 06:15:39 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:51579]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.120:2525] with esmtp (Farcaster)
- id f0cf710c-b7a4-4e55-bfa9-c836fc843b9b; Mon, 2 Sep 2024 06:15:38 +0000 (UTC)
-X-Farcaster-Flow-ID: f0cf710c-b7a4-4e55-bfa9-c836fc843b9b
-Received: from EX19D005ANA004.ant.amazon.com (10.37.240.178) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 2 Sep 2024 06:15:37 +0000
-Received: from 682f678c4465.ant.amazon.com (10.37.244.7) by
- EX19D005ANA004.ant.amazon.com (10.37.240.178) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Mon, 2 Sep 2024 06:15:33 +0000
-From: Takamitsu Iwai <takamitz@amazon.co.jp>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Przemek
- Kitszel" <przemyslaw.kitszel@intel.com>
-CC: Takamitsu Iwai <takamitz@amazon.co.jp>, <netdev@vger.kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>
-Subject: [PATCH v1 net-next] e1000e: Remove duplicated writel() in e1000_configure_tx/rx()
-Date: Mon, 2 Sep 2024 15:14:54 +0900
-Message-ID: <20240902061454.85744-1-takamitz@amazon.co.jp>
-X-Mailer: git-send-email 2.39.3 (Apple Git-145)
+	s=arc-20240116; t=1725258262; c=relaxed/simple;
+	bh=T1yqAXM+3xtKVMn8RRidXoz4nHOE8Ci3eZ4JabVPDqo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kCmArIOavgxR2m6OGJJ/WUh2y8eHIMZPFD3hLLwqJucyM1/wsVPQiiKLZow0a8EoeCjZ8fOp1lmVU8zEtXiZwa+01yVVIHMObgN2nv4fx7WDDp58VD3wDllLULze8cxfT5p5lm5zfGpu0/989ivGGVO/yxo7rUa8gD0yFZDl/aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BPih2Hqo; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725258258;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=N92PkDzVG2acNWBWqEKftR5u8lrNIs7d1Jmmcz1T5Sc=;
+	b=BPih2Hqozva99MUHtFoNUoWK7mNDLMKW+QlUr1sHNmKyhJPdzwC3km7g9sVBkyAh568UVl
+	oTffXqD7DHTXerxbmW+stMunGLpF9i+A1VdPqx5q5NrijcVexluyGw1a5Iou5YFk1DreV0
+	l9tX7KyrQRgiZ1EJjDYJFogkpLMOueM=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-636-2LmXVf_vN7yXS2YB7RL9Hg-1; Mon, 02 Sep 2024 02:24:17 -0400
+X-MC-Unique: 2LmXVf_vN7yXS2YB7RL9Hg-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7a8084eb116so549354085a.1
+        for <netdev@vger.kernel.org>; Sun, 01 Sep 2024 23:24:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725258256; x=1725863056;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=N92PkDzVG2acNWBWqEKftR5u8lrNIs7d1Jmmcz1T5Sc=;
+        b=ulG0y+5nX0Iln6Y1ELOMQw/Y5Rdj4sKiPV0dr0L2wLnUqHL+FEP+1wlQG3RTxeBzGR
+         i/6ceEpuMbkn86zIrroLx/fp6WVh599wVZ7g/zBHhkzhVOXW+EXUa/4sCaIenkUa14EZ
+         51/RuswBKbaq+OPm1YilfqtJTRisjjyaLrDWcBcg2LW8ZO2MCH4ys4g29yydIjP1wEGI
+         Pgn7UYZ9I0amkwetsAKNx3SlpWqUEEvFcsAqvo0euVixVN5AZMY7kQnFGrUow58FcJUg
+         mDkmVYWV+OLO5TQsth11moPVkEqGUzNhuc7FupYG8z2evLBoeQt+NQUKlWanGZBwl0vH
+         PpoA==
+X-Forwarded-Encrypted: i=1; AJvYcCWpGTeqb5NnSpCZ/RsZVELZOGF1UZIBIq4zNxhgMtch5afWjh3BgRvLlwC8lIMFxif2/Y5mmj8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPa+7tTiTRlrx/bylJ23Ww8RSsD7i3F8BENA3cipLhqTcoaT4F
+	nIFcPT//5SQqxSLM5pV5FkbsQURzZpH2bplWj0jg4kMffmK41M1pqzC3imwv7JjjIq93SjVMnr7
+	mAqTyEW6qu9WKAyYwHtLiuknpQxRRSkWWpOgmCXAvj7MDnCuzABG4YQ==
+X-Received: by 2002:a05:620a:470b:b0:79f:37f:9c40 with SMTP id af79cd13be357-7a8f6b757f6mr930477485a.12.1725258256487;
+        Sun, 01 Sep 2024 23:24:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGvWCwRx+ZDkAone/w4iYXXg0Gj5I6KQVMwBq/TysV8VXpC3ipaLBge9Ly4O8CWfgnEOFEcRw==
+X-Received: by 2002:a05:620a:470b:b0:79f:37f:9c40 with SMTP id af79cd13be357-7a8f6b757f6mr930474585a.12.1725258256145;
+        Sun, 01 Sep 2024 23:24:16 -0700 (PDT)
+Received: from eisenberg.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a806d3a34asm389211385a.84.2024.09.01.23.24.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 01 Sep 2024 23:24:15 -0700 (PDT)
+From: Philipp Stanner <pstanner@redhat.com>
+To: Jens Axboe <axboe@kernel.dk>,
+	Wu Hao <hao.wu@intel.com>,
+	Tom Rix <trix@redhat.com>,
+	Moritz Fischer <mdf@kernel.org>,
+	Xu Yilun <yilun.xu@intel.com>,
+	Andy Shevchenko <andy@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Hannes Reinecke <hare@suse.de>,
+	John Garry <john.g.garry@oracle.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Philipp Stanner <pstanner@redhat.com>
+Cc: linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-fpga@vger.kernel.org,
+	linux-gpio@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org
+Subject: [PATCH v6 0/5] PCI: Remove most pcim_iounmap_regions() users
+Date: Mon,  2 Sep 2024 08:23:37 +0200
+Message-ID: <20240902062342.10446-2-pstanner@redhat.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB001.ant.amazon.com (10.13.139.187) To
- EX19D005ANA004.ant.amazon.com (10.37.240.178)
 
-Duplicated register initialization codes exist in e1000_configure_tx()
-and e1000_configure_rx().
+Changes in v6:
+  - Remove the patches for "vdpa: solidrun" since the maintainer seems
+    unwilling to review and discuss, not to mention approve, anything
+    that is part of a wider patch series across other subsystems.
+  - Change series's name to highlight that not all callers are removed
+    by it.
 
-For example, writel(0, tx_ring->head) writes 0 to tx_ring->head, which
-is adapter->hw.hw_addr + E1000_TDH(0).
+Changes in v5:
+  - Patch "ethernet: cavium": Re-add accidentally removed
+    pcim_iounmap_region(). (Me)
+  - Add Jens's Reviewed-by to patch "block: mtip32xx". (Jens)
 
-This initialization is already done in ew32(TDH(0), 0).
+Changes in v4:
+  - Drop the "ethernet: stmicro: [...] patch since it doesn't apply to
+    net-next, and making it apply to that prevents it from being
+    applyable to PCI ._. (Serge, me)
+  - Instead, deprecate pcim_iounmap_regions() and keep "ethernet:
+    stimicro" as the last user for now.
+  - ethernet: cavium: Use PTR_ERR_OR_ZERO(). (Andy)
+  - vdpa: solidrun (Bugfix) Correct wrong printf string (was "psnet" instead of
+    "snet"). (Christophe)
+  - vdpa: solidrun (Bugfix): Add missing blank line. (Andy)
+  - vdpa: solidrun (Portation): Use PTR_ERR_OR_ZERO(). (Andy)
+  - Apply Reviewed-by's from Andy and Xu Yilun.
 
-ew32(TDH(0), 0) is equivalent to __ew32(hw, E1000_TDH(0), 0). It
-executes writel(0, hw->hw_addr + E1000_TDH(0)). Since variable hw is
-set to &adapter->hw, it is equal to writel(0, tx_ring->head).
+Changes in v3:
+  - fpga/dfl-pci.c: remove now surplus wrapper around
+    pcim_iomap_region(). (Andy)
+  - block: mtip32xx: remove now surplus label. (Andy)
+  - vdpa: solidrun: Bugfix: Include forgotten place where stack UB
+    occurs. (Andy, Christophe)
+  - Some minor wording improvements in commit messages. (Me)
 
-We can remove similar four writel() in e1000_configure_tx() and
-e1000_configure_rx().
+Changes in v2:
+  - Add a fix for the UB stack usage bug in vdap/solidrun. Separate
+    patch, put stable kernel on CC. (Christophe, Andy).
+  - Drop unnecessary pcim_release_region() in mtip32xx (Andy)
+  - Consequently, drop patch "PCI: Make pcim_release_region() a public
+    function", since there's no user anymore. (obsoletes the squash
+    requested by Damien).
+  - vdap/solidrun:
+    • make 'i' an 'unsigned short' (Andy, me)
+    • Use 'continue' to simplify loop (Andy)
+    • Remove leftover blank line
+  - Apply given Reviewed- / acked-bys (Andy, Damien, Bartosz)
 
-commit 0845d45e900c ("e1000e: Modify Tx/Rx configurations to avoid
-null pointer dereferences in e1000_open") has introduced these
-writel(). This commit moved register writing to
-e1000_configure_tx/rx(), and as result, it caused duplication in
-e1000_configure_tx/rx().
 
-Signed-off-by: Takamitsu Iwai <takamitz@amazon.co.jp>
----
- drivers/net/ethernet/intel/e1000e/netdev.c | 6 ------
- 1 file changed, 6 deletions(-)
+Important things first:
+This series is based on [1] and [2] which Bjorn Helgaas has currently
+queued for v6.12 in the PCI tree.
 
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index 360ee26557f7..cf352befaeb9 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -2928,11 +2928,8 @@ static void e1000_configure_tx(struct e1000_adapter *adapter)
- 	tx_ring->head = adapter->hw.hw_addr + E1000_TDH(0);
- 	tx_ring->tail = adapter->hw.hw_addr + E1000_TDT(0);
- 
--	writel(0, tx_ring->head);
- 	if (adapter->flags2 & FLAG2_PCIM2PCI_ARBITER_WA)
- 		e1000e_update_tdt_wa(tx_ring, 0);
--	else
--		writel(0, tx_ring->tail);
- 
- 	/* Set the Tx Interrupt Delay register */
- 	ew32(TIDV, adapter->tx_int_delay);
-@@ -3253,11 +3250,8 @@ static void e1000_configure_rx(struct e1000_adapter *adapter)
- 	rx_ring->head = adapter->hw.hw_addr + E1000_RDH(0);
- 	rx_ring->tail = adapter->hw.hw_addr + E1000_RDT(0);
- 
--	writel(0, rx_ring->head);
- 	if (adapter->flags2 & FLAG2_PCIM2PCI_ARBITER_WA)
- 		e1000e_update_rdt_wa(rx_ring, 0);
--	else
--		writel(0, rx_ring->tail);
- 
- 	/* Enable Receive Checksum Offload for TCP and UDP */
- 	rxcsum = er32(RXCSUM);
+This series shall remove pcim_iounmap_regions() in order to make way to
+remove its brother, pcim_iomap_regions().
+
+Regards,
+P.
+
+[1] https://lore.kernel.org/all/20240729093625.17561-4-pstanner@redhat.com/
+[2] https://lore.kernel.org/all/20240807083018.8734-2-pstanner@redhat.com/
+
+Philipp Stanner (5):
+  PCI: Deprecate pcim_iounmap_regions()
+  fpga/dfl-pci.c: Replace deprecated PCI functions
+  block: mtip32xx: Replace deprecated PCI functions
+  gpio: Replace deprecated PCI functions
+  ethernet: cavium: Replace deprecated PCI functions
+
+ drivers/block/mtip32xx/mtip32xx.c              | 18 ++++++++----------
+ drivers/fpga/dfl-pci.c                         | 16 ++++------------
+ drivers/gpio/gpio-merrifield.c                 | 14 +++++++-------
+ .../net/ethernet/cavium/common/cavium_ptp.c    |  7 +++----
+ drivers/pci/devres.c                           |  8 ++++++--
+ include/linux/pci.h                            |  1 +
+ 6 files changed, 29 insertions(+), 35 deletions(-)
+
 -- 
-2.39.3 (Apple Git-145)
+2.46.0
 
 
