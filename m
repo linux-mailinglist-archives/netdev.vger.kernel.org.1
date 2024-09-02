@@ -1,71 +1,61 @@
-Return-Path: <netdev+bounces-124128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C673496831E
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:24:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16C49968328
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 11:26:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02DB71C2253A
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 09:24:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA2FB281769
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 09:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7821C2DB0;
-	Mon,  2 Sep 2024 09:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94AF71C2DB4;
+	Mon,  2 Sep 2024 09:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="lzrkKoqB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hhU9U/fl"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C679C187355;
-	Mon,  2 Sep 2024 09:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA59186287;
+	Mon,  2 Sep 2024 09:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725269015; cv=none; b=iZ3dwL4l/+zac2cISsPzfQV9u4mA727UB4RedRL3v+Wn5VHqzZZ6jo9RXkE61Xept5FSWQh++W9O9FaSH2jH4saPMbGCuWDlPVZ5NEwQRbo+dDn6jsHAqGXI3hcxnOVIFYUyjhRUZaTvjxASxGMZK3/WcufBbFPy6DinDPQ2Za0=
+	t=1725269164; cv=none; b=WmmNFaaACkNKeJJFMm4JwZih7s3LD3JowxwsGlN3cop/+QSg48sIKMv08W5b1bkdkrOhpKbPEesEtPs8a5xjPW/FAwB8cmVVw3OFb78E3geci612nt267NxzRWVJN7GmVDqr4yDnp+sTEgeMkhR/1YXRWTxVnqXokx2hbycPKGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725269015; c=relaxed/simple;
-	bh=cCFseqcH4z5OSqatyQ8Njvobnvsuzyx5wOOXtcdAbc4=;
+	s=arc-20240116; t=1725269164; c=relaxed/simple;
+	bh=QhDTm4HJF/Ht+jrsMbiuFTYROIIyP9rnmpAZHvX+DHg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KAX7UY/u1SngF7yzQ7XUPAhtP/Zsyq28Jx0JlqXuNYyq2BvAmz6FH9L5gHdMYLpMwQ+OKFUy2pxZ/vRExEY4SEIlUKH3UiOdg3OUyfz9KPtXDShAjZqjexk4VjBllZtSyh2jp+KTdNxRp07jIssn+DXVt9/CTI218gkuvEAP2E8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=lzrkKoqB; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=k8fNp4lPEgrhIlaN+v3O0Q3/cbsRJ7Y/SUZlytKJl78=; b=lzrkKoqBk9ddfuYiQtaezmQCY9
-	qQH6VLJGsuaTvibz6mCM2E9uabi/UmI2NBr3jqZIfsGHTOqS82k4aeyDGpEZCs2sF2voB0R9FjoQk
-	/Nc8uO6wF5RW1GjfkGRByItVtxpE6Q6Ptn84BGh0lTJX4B7vd77ZPie49HMycq4bCFQoImQZ4aoOo
-	+Vthr5UiNlFXpf1FevZxIXuH9a6Fy6ul9uhETJk2nIKCN3wL84YCyxUEWzY7iFDs3yRlC/Qgb5yq4
-	Ih4JhokutM3IeqTvOiithyBNEcT/ZGP4yM2HUxCdimtYfiiHTVkwnpqv/7SGtJCAJmbS00llXWDzz
-	XYyX7uog==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46394)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sl3HF-0005tr-2y;
-	Mon, 02 Sep 2024 10:23:13 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sl3H9-0001gG-1n;
-	Mon, 02 Sep 2024 10:23:07 +0100
-Date: Mon, 2 Sep 2024 10:23:07 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Wentai Deng <wtdeng24@m.fudan.edu.cn>
-Cc: davem <davem@davemloft.net>, edumazet <edumazet@google.com>,
-	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-	netdev <netdev@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	=?utf-8?B?5p2c6Zuq55uI?= <21210240012@m.fudan.edu.cn>
-Subject: Re: [BUG] Possible Use-After-Free Vulnerability in ether3 Driver Due
- to Race Condition
-Message-ID: <ZtWD+/veJzhA9WH2@shell.armlinux.org.uk>
-References: <tencent_4212C4F240B0666B49355184@qq.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VxgHGT6YY9T2OYFpNkvmnZRjSO41naaNSeO8iWpzRZVigkWpb40AzxCyb4NLQyGnwWUMEvBas57Iq6GlOaYVx21xd3ZKtNi7b7rnTEja/XzpjYYxY8TmjGQXllLNi2aIy8puAUuPEd22RC1gppVgQy+UyZDnxqf+RzZtUw5TO6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hhU9U/fl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 023F1C4CEC2;
+	Mon,  2 Sep 2024 09:26:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725269164;
+	bh=QhDTm4HJF/Ht+jrsMbiuFTYROIIyP9rnmpAZHvX+DHg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hhU9U/fl62oZDkmdWRFx05vx7xX12dY+EjXBn3eQuOoDaUBcztLa3NYsVVdfn6goC
+	 dRop+SfqBnkPMLruVAo5/abgmMq9sJBQ2rwVuIRJQAfkPEwUwnh/8GwWMEqNug0pGv
+	 1cFXMy+/kKP7fFKvS3gkvs+2Dxv9NRd6HKpL/QfCEg57aqKqhLv90nUvAE6rt/95Kr
+	 n6W/pTPsNxeT9vLPLIOvAMhQM0yJTGsd0IEcX1AXS4Qie1bS4Z9DhTjt8tiOl3EJhY
+	 R6+UlMUGEr942sMQJYYsoQ6jDGrU+KfNUhpXaOh11asyLya3rfkz6Pmmpp2cJlog9l
+	 ILN4b/+LEuaCQ==
+Date: Mon, 2 Sep 2024 10:25:59 +0100
+From: Simon Horman <horms@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH nf-next 0/2] netfilter: Add missing Kernel doc to headers
+Message-ID: <20240902092559.GF23170@kernel.org>
+References: <20240830-nf-kdoc-v1-0-b974bb701b61@kernel.org>
+ <20240831200307.GA15693@breakpoint.cc>
+ <ZtTJfzkFWlNgpVO-@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,38 +64,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <tencent_4212C4F240B0666B49355184@qq.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <ZtTJfzkFWlNgpVO-@calendula>
 
-On Mon, Sep 02, 2024 at 01:19:43PM +0800, Wentai Deng wrote:
-> In the ether3_probe function, a timer is initialized with a callback function ether3_ledoff, bound to &amp;prev(dev)-&gt;timer. Once the timer is started, there is a risk of a race condition if the module or device is removed, triggering the ether3_remove function to perform cleanup. The sequence of operations that may lead to a UAF bug is as follows:
+On Sun, Sep 01, 2024 at 10:07:27PM +0200, Pablo Neira Ayuso wrote:
+> On Sat, Aug 31, 2024 at 10:03:07PM +0200, Florian Westphal wrote:
+> > Simon Horman <horms@kernel.org> wrote:
+> > > Hi,
+> > > 
+> > > This short series addresses some minor Kernel doc problems
+> > > in Netfilter header files.
+> > 
+> > Thanks Simon, this looks good to me.
+> > Series:
+> > Reviewed-by: Florian Westphal <fw@strlen.de>
 > 
+> Thanks for reviewing.
 > 
-> CPU0&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; CPU1
-> 
-> 
-> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |&nbsp; &nbsp;ether3_ledoff
-> ether3_remove&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
-> &nbsp; &nbsp; free_netdev(dev);&nbsp; &nbsp; &nbsp; &nbsp;|
-> &nbsp; &nbsp; put_device&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |
-> &nbsp; &nbsp; kfree(dev);&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;|
-> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |&nbsp; &nbsp; &nbsp; &nbsp;ether3_outw(priv(dev)-&gt;regs.config2 |= CFG2_CTRLO, REG_CONFIG2);
-> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; |&nbsp; &nbsp; &nbsp; &nbsp;// use dev
+> If you both don't mind, I am going to collapse the three pending
+> patches from Simon that are targeting kdoc stuff.
 
-This is unreadable.
+Thanks Pablo,
 
-> Request for Review:
-> 
-> 
-> We would appreciate your expert insight to confirm whether this vulnerability indeed poses a risk to the system, and if the proposed fix is appropriate.
-
-Please resend without the HTML junk in the plain text part.
-
--- 
-*** please note that I probably will only be occasionally responsive
-*** for an unknown period of time due to recent eye surgery making
-*** reading quite difficult.
-
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+No problem with that from my side.
 
