@@ -1,108 +1,97 @@
-Return-Path: <netdev+bounces-124066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC8C3967D32
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 03:07:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14D86967D56
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 03:28:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 091F81C20BEE
-	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 01:07:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65447B212FD
+	for <lists+netdev@lfdr.de>; Mon,  2 Sep 2024 01:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F58DF5C;
-	Mon,  2 Sep 2024 01:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0961175A5;
+	Mon,  2 Sep 2024 01:27:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F4B1388;
-	Mon,  2 Sep 2024 01:07:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC04171C9;
+	Mon,  2 Sep 2024 01:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725239232; cv=none; b=Tnk7J8QFZuV5VsIyfHRxaN9gcur4CTX+C0RNlaXelNJe/x/KeTWIGzp68bYuG+P9yA4ns5uRYPca/f72waGeDbDgUXxhh1svcRXJn0aJXphAJfV1y3qCQ6wZmeR7gx6QLk5BojQ50gD1Jf/sKwntEy8jUgUudLI+WzdtpRqPlj4=
+	t=1725240477; cv=none; b=lvpzOLfduuOEl7xUzpPf3leFT1hjD+HXQfQTaNNT28wvN7GN8tFmm1t8yT9Y9WtU416XNjuTwr7j+PqrSeG63oT2c6t3kWNDD7I0jnCqNkGmCJ/doPXtEZnCU3L6EyHuTxO6NrAXiKuwMpT5/AvhIaf4t2LnL6kE/+4BTi6mQwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725239232; c=relaxed/simple;
-	bh=fXbjit2TjYQpe7jXfh1oBjIMIzlcrlm1aMC1OOUm+Os=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=foc3t2qIkFO6Wn81LnFhXqIUA3P4nF8Mc40rKogor7+i5LybjM9zvavMLkeV1/JDfdaNbnGIADE3BQHio9tq6Sa6Deyiz/NHsq7QmOjtQHI8Y8yh3MKL/h3m2jh65rofJ0gZYBTj8LrwR4hjZMd16+KTRhZqRoaHZf3/PkiitAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-204d391f53bso24893505ad.2;
-        Sun, 01 Sep 2024 18:07:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725239229; x=1725844029;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3u2+qLetnJ68urYAzX26gltE44oP6De8D1CJbEpX6HU=;
-        b=qGYFwWDOGf2rIPG/EVA86OBvp5Yi44Pwb/5uYszN7HwlmG7e+5Kv2xXp2QdRRBmALk
-         7/olXsc+HRPkDLTF8uuzbkUZc493HW2/ReeMvu3PNbfLTZoLm9KRH2sg/UMZDZvxQ2RG
-         /h1RMPM58FxkLWGnUfFmc84w2sfHQ5YWoeIdTPq6DjT2Fbda6D9zp1sCzAEfddICiftM
-         bzgPgx7qoOXZPCeO8ziEIr02lvTS5NOSjQ/fznhottdNN2zokRfYaK81Nzz0MwTvV9dl
-         6u/ZdI7/I5/+H1shTdp9gJwcwDcJK0TuPjWRSQ3g9dotXX1ujH0z48LBOP/wJKlXkdTr
-         7N3g==
-X-Forwarded-Encrypted: i=1; AJvYcCU2lOdoiRPMo9FEsLxoqZ4lnMLzrvMOWAfOAkwSW3/IdNkSH0aG2l+UAX93KJLJA9bHHY3OuEFJmvp7qRm6QXA=@vger.kernel.org, AJvYcCVcOFsWpDu49CVfffZ3MiCyvdh3buEbTU6Qqg8KRo1YvYgMNAmkFDd5xunZsWCpouCAmzBk3zQv@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyy/oB7l7oNbNRn0LdJYWkujuuoSa6ICo7ipZk/X0r+mrwpQz3V
-	CmOzTcN2eJFf2AVyLTAqo+5m3Z9X1aA+ZJD+wiw0Qtv1lyTw+Ng=
-X-Google-Smtp-Source: AGHT+IHusLnqjEq1uBEMU1NLcj20Qq5xBgznO8lmV+K9CvBHSBk0lEyl9jQwi3w50AB4WtshFMQX+g==
-X-Received: by 2002:a17:902:f54f:b0:202:48a6:c882 with SMTP id d9443c01a7336-20547642846mr50292275ad.52.1725239228898;
-        Sun, 01 Sep 2024 18:07:08 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20563b7189csm13386165ad.178.2024.09.01.18.07.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Sep 2024 18:07:08 -0700 (PDT)
-Date: Sun, 1 Sep 2024 18:07:07 -0700
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shuah@kernel.org, jmaloy@redhat.com,
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next] selftests: add selftest for UDP SO_PEEK_OFF
- support
-Message-ID: <ZtUPu4OYHbitqYtn@mini-arch>
-References: <20240901051821.94956-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1725240477; c=relaxed/simple;
+	bh=G+UAgqhT/VjKnWynqGylXvw0SEuYscTjATUtVIIOxuE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Qiy+1MKZ1enKupAJh9Z934zCjYEeJ81TJfA5d6eSMIG6GL4itHNqffiLm7odLNqVXnepCvHU9xwIupPH3T8ZViAXV3y8Ds6r8mEgAbvsZ9qMX1k1s3lsqMzOXcB3Y3L5nTXoIx+Rb9uq1Q/oUH/uZ4k1SUcn3nMV+HWayvs7gVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WxrhK5Dbdz1BFLk;
+	Mon,  2 Sep 2024 09:26:57 +0800 (CST)
+Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id F04031800A7;
+	Mon,  2 Sep 2024 09:27:51 +0800 (CST)
+Received: from [10.67.111.104] (10.67.111.104) by
+ dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 2 Sep 2024 09:27:51 +0800
+Message-ID: <5b1b6fbc-6135-47ae-af32-60ef71595666@huawei.com>
+Date: Mon, 2 Sep 2024 09:27:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240901051821.94956-1-kerneljasonxing@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH -next 2/4] tun: Make use of str_disabled_enabled helper
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <kees@kernel.org>, <andy@kernel.org>, <willemdebruijn.kernel@gmail.com>,
+	<jasowang@redhat.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <akpm@linux-foundation.org>,
+	<linux-hardening@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-mm@kvack.org>
+References: <20240831095840.4173362-1-lihongbo22@huawei.com>
+ <20240831095840.4173362-3-lihongbo22@huawei.com>
+ <20240831130741.768da6da@kernel.org>
+From: Hongbo Li <lihongbo22@huawei.com>
+In-Reply-To: <20240831130741.768da6da@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500022.china.huawei.com (7.185.36.66)
 
-On 09/01, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> Add the SO_PEEK_OFF selftest for UDP. In this patch, I mainly do
-> three things:
-> 1. rename tcp_so_peek_off.c
-> 2. adjust for UDP protocol
-> 3. add selftests into it
-> 
-> Suggested-by: Jon Maloy <jmaloy@redhat.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
-> Link: https://lore.kernel.org/all/9f4dd14d-fbe3-4c61-b04c-f0e6b8096d7b@redhat.com/
-> ---
->  tools/testing/selftests/net/Makefile          |  2 +-
->  .../{tcp_so_peek_off.c => sk_so_peek_off.c}   | 91 +++++++++++--------
->  2 files changed, 56 insertions(+), 37 deletions(-)
->  rename tools/testing/selftests/net/{tcp_so_peek_off.c => sk_so_peek_off.c} (58%)
-> 
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> index 1179e3261bef..d5029f978aa9 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -80,7 +80,7 @@ TEST_PROGS += io_uring_zerocopy_tx.sh
->  TEST_GEN_FILES += bind_bhash
->  TEST_GEN_PROGS += sk_bind_sendto_listen
->  TEST_GEN_PROGS += sk_connect_zero_addr
-> -TEST_GEN_PROGS += tcp_so_peek_off
-> +TEST_GEN_PROGS += sk_so_peek_off
 
-Should we also add sk_so_peek_off to gitignore?
+
+On 2024/9/1 4:07, Jakub Kicinski wrote:
+> On Sat, 31 Aug 2024 17:58:38 +0800 Hongbo Li wrote:
+>> Use str_disabled_enabled() helper instead of open
+>> coding the same.
+> 
+>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>> index 6fe5e8f7017c..29647704bda8 100644
+>> --- a/drivers/net/tun.c
+>> +++ b/drivers/net/tun.c
+>> @@ -3178,7 +3178,7 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+>>   
+>>   		/* [unimplemented] */
+>>   		netif_info(tun, drv, tun->dev, "ignored: set checksum %s\n",
+>> -			   arg ? "disabled" : "enabled");
+>> +			   str_disabled_enabled(arg));
+> 
+> You don't explain the 'why'. How is this an improvement?
+> nack on this and 2 similar networking changes you sent
+> 
+This just give an example of using lib/string_choices' helper which 
+prevents the function from being removed due to detection of non-use. 
+These helpers are convenient. It's functionally equivalent, this avoids 
+the dispersion of such writing styles( ? XXX : noXXX) everywhere.
+
+Thanks,
+Hongbo
 
