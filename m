@@ -1,94 +1,100 @@
-Return-Path: <netdev+bounces-124496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA58B969ACE
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:53:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 333CD969AD4
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:53:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97031286353
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:53:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6553B1C239D9
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:53:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E30A1CB52C;
-	Tue,  3 Sep 2024 10:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5KjDK1W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6054D1C7683;
+	Tue,  3 Sep 2024 10:52:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660BE1A0BFD;
-	Tue,  3 Sep 2024 10:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9B921C768B;
+	Tue,  3 Sep 2024 10:52:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725360629; cv=none; b=Oqt+dLGkEKes3zwV44+b2z4KQ5AiEnXTKkx5WLPfxix5lCIQHWe5YPkEcwNG0o+bvnIvC+z4Y8am0ALw6feODFtSbfdqnbax+AJ1eb/ay2pd4BELw1kmfxXkZmc2mOIRA27FmYmzscu0BAOYldbKjCF/NrxmlVRyhkFeKEysKsQ=
+	t=1725360775; cv=none; b=JfjEeeDLa5qvkv4WAyETaKCRL4MGx1tudY2gxpoOEKa8t+ExhUBUpdyH3E+bRbrCvZE3v+UorL47DDKPNHNsG9cL56EjW4dzqMXiDeAnUynM6+GzNYN7V3zhzFsRRmXoIWqsjmf+i4Sko3zrJ7xsw65PathJtr48JOA+3mveXXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725360629; c=relaxed/simple;
-	bh=QjRKkTcjVYnnxJPoVNjGx6/Ls3fonC7hPfc/7SboZ5w=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pQIuUjy6KeBvKMME2gmFjLMQI+4qUKX7gE+2hhhmCh5RrF0MNwYD0ay8qodA3+dT1YwlCiquqeiUei71nJSAnt8uo/9XDwIvHJ0qkNAZutWvFoM6Xd0LINNPn5wYZdqoKTJaqBIOX+oG/e1FC5d8unHRFDN/mTtta+jPoZXgBJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5KjDK1W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B495C4CEC4;
-	Tue,  3 Sep 2024 10:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725360629;
-	bh=QjRKkTcjVYnnxJPoVNjGx6/Ls3fonC7hPfc/7SboZ5w=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=o5KjDK1W2HOZHZq1zXQV6aG8wIYaKwE61YXaUgkjjiD165b6NkB/piiSwMSx9qw9N
-	 2a7ZAJ8+p9Lx9HJ3CljbO0lqEpHlT9WsN35cqtjvDrh3Kmyoj36kfESLSaZmgly83r
-	 G9hRX5HYL7rKISD/Akyb+HEWRjbQypJ43bweFhsWzpdwi/uZQ9pnjaO2cA4FKiZpMp
-	 NTlqFBGN1EDcUG+m/Z5+YGBDUesFZ2iMUsriVEuEAfPFUG7QpexDtdFQha5aeQVs/b
-	 SQvRurBLL7qlNW3JtLSxhlFuvDAmtmVfeTn3YpeZrfULcfLrv7XKhUKkGOYe4YbM2w
-	 IHAS0LIb1Jzgg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEC63805D82;
-	Tue,  3 Sep 2024 10:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725360775; c=relaxed/simple;
+	bh=TCa9XECvj6a95ytuCJ/rfxMfMjBBJHeKZNA431XrJLI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Kz6e6P1ZqtitgvrOXZjbbNeDv9SA/PYNRaOHTEj4CyRU4Vn/b57tKG21vifQPgzIDi5FmGWgM5kyUaFnoBUFYR9g7c7W3lCE3tHe4Mfai08655O0oBbD7WNQtyOQKk3WHPJU+z/owuNGlM2Fyj8mWunAtXeT4RMtty1F3hGMHOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Wyj9k0Zx5z145xm;
+	Tue,  3 Sep 2024 18:51:54 +0800 (CST)
+Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
+	by mail.maildlp.com (Postfix) with ESMTPS id 262C31800FE;
+	Tue,  3 Sep 2024 18:52:50 +0800 (CST)
+Received: from [10.67.111.176] (10.67.111.176) by
+ kwepemd500012.china.huawei.com (7.221.188.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Tue, 3 Sep 2024 18:52:49 +0800
+Message-ID: <021d4b46-a559-4047-a6ca-98e30fd3e6b3@huawei.com>
+Date: Tue, 3 Sep 2024 18:52:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 11/12] wifi: wilc1000: Convert using
+ devm_clk_get_optional_enabled() in wilc_sdio_probe()
+To: Kalle Valo <kvalo@kernel.org>
+CC: <florian.fainelli@broadcom.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <wens@csie.org>, <jernej.skrabec@gmail.com>,
+	<samuel@sholland.org>, <heiko@sntech.de>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <hauke@hauke-m.de>, <alexandre.torgue@foss.st.com>,
+	<joabreu@synopsys.com>, <mcoquelin.stm32@gmail.com>, <wellslutw@gmail.com>,
+	<radhey.shyam.pandey@amd.com>, <michal.simek@amd.com>,
+	<ajay.kathat@microchip.com>, <claudiu.beznea@tuxon.dev>,
+	<u.kleine-koenig@pengutronix.de>, <jacky_chou@aspeedtech.com>,
+	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-sunxi@lists.linux.dev>, <linux-rockchip@lists.infradead.org>,
+	<linux-stm32@st-md-mailman.stormreply.com>, <linux-wireless@vger.kernel.org>
+References: <20240831021334.1907921-1-lizetao1@huawei.com>
+ <20240831021334.1907921-12-lizetao1@huawei.com> <87a5gqko2q.fsf@kernel.org>
+From: Li Zetao <lizetao1@huawei.com>
+In-Reply-To: <87a5gqko2q.fsf@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] net: phy: Fix missing of_node_put() for leds
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172536062976.252561.14904161463456653895.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Sep 2024 10:50:29 +0000
-References: <20240830022025.610844-1-ruanjinjie@huawei.com>
-In-Reply-To: <20240830022025.610844-1-ruanjinjie@huawei.com>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- f.fainelli@gmail.com, ansuelsmth@gmail.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+X-ClientProxiedBy: dggpeml500005.china.huawei.com (7.185.36.59) To
+ kwepemd500012.china.huawei.com (7.221.188.25)
 
-Hello:
+Hi,
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 30 Aug 2024 10:20:25 +0800 you wrote:
-> The call of of_get_child_by_name() will cause refcount incremented
-> for leds, if it succeeds, it should call of_node_put() to decrease
-> it, fix it.
+在 2024/9/3 0:38, Kalle Valo 写道:
+> Li Zetao <lizetao1@huawei.com> writes:
 > 
-> Fixes: 01e5b728e9e4 ("net: phy: Add a binding for PHY LEDs")
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+>> Use devm_clk_get_optional_enabled() instead of devm_clk_get_optional() +
+>> clk_prepare_enable(), which can make the clk consistent with the device
+>> life cycle and reduce the risk of unreleased clk resources. Since the
+>> device framework has automatically released the clk resource, there is
+>> no need to execute clk_disable_unprepare(clk) on the error path, drop
+>> the clk_disable_unprepare label, and the original error process can change
+>> to dispose_irq.
+>>
+>> Signed-off-by: Li Zetao <lizetao1@huawei.com>
+>> ---
+>>   drivers/net/wireless/microchip/wilc1000/sdio.c | 10 +++-------
+>>   1 file changed, 3 insertions(+), 7 deletions(-)
 > 
-> [...]
+> wifi patches (patches 11 and 12) go via wireless-next, please submit
+> those separately.
+Ok, I will resend those separately.
+> 
 
-Here is the summary with links:
-  - [net,v4] net: phy: Fix missing of_node_put() for leds
-    https://git.kernel.org/netdev/net/c/2560db6ede1a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Li Zetao.
 
