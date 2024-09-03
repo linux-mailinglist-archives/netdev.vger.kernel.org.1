@@ -1,94 +1,197 @@
-Return-Path: <netdev+bounces-124479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C478C969A88
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:47:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25846969A87
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:47:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27680B2395D
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:47:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A78021F2435E
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662641C62CE;
-	Tue,  3 Sep 2024 10:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b="VWlh31re"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09071B9849;
+	Tue,  3 Sep 2024 10:46:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9C919CC27
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 10:47:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B7B1B9829;
+	Tue,  3 Sep 2024 10:46:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725360422; cv=none; b=Id8sMDO+UeME0PVomFHvYvt+w00iVJsOJs4N4IAuqYQzckesr9KSXXI4vP4i0ukSqhwxX2BoecREXNyTyesEMZ3OHg617XW9gmeeIOWCL6MyCe+cNX+zIiseRlA/Xdd2TtvDamHbSyY7SwEnmVLF/UNONQ1C2w1rK9cp6LCQitA=
+	t=1725360416; cv=none; b=clwYEHmncS2fAr8JhZ16m6UEbBU4lTE0uJhXApibDx0ST4B/F8xNyNfelY1Uv4YdCImIvsbzrtJYHADpSk8LqhRdauu3UIzTtK8NU3V+pq1EQYU8dW86HUsoe8cY0YvhPamTo7CTFwvxo5W6Ct/MLblGBvvYF9RcmCogNUPZhs0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725360422; c=relaxed/simple;
-	bh=D3pK/xIDd4gN73xR2IAKuIfQBHRY4tf7Zw38vyUW1ow=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D9h0B/CftghVQ/W19pi83h0TQo95HwkDdQY/SG7QkOBeXZ79WVSd/2RrLFsxMhernbK3evgyFCybtvQ9ejdZ3uCZcoUqe/EECucOWJ2ZFpnbgC1355J0OivO4iIJ5n0CCGfiL0mVjO+swUGX3ZsW8YC3i/ZoW4dcGU+X8US1w0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b=VWlh31re; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.jp; i=@amazon.co.jp; q=dns/txt;
-  s=amazon201209; t=1725360420; x=1756896420;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=D3pK/xIDd4gN73xR2IAKuIfQBHRY4tf7Zw38vyUW1ow=;
-  b=VWlh31reB49mK/cEsVbc19C+7Juml32VLQkSwYeKQlMxXOvUHmw8GlsT
-   ExVENxrM4CiJu10v4ZacI7cRVGTnbRWJh2+oAAbEMLzi8lisED1+qoiu4
-   OaWxEZeGVTvNfvosOI2eQ7dqNK+sBkV6Gzjsm85xyZRLoUBWZFunhg0IG
-   A=;
-X-IronPort-AV: E=Sophos;i="6.10,198,1719878400"; 
-   d="scan'208";a="121943980"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 10:46:54 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:14951]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.188:2525] with esmtp (Farcaster)
- id 3b7296b2-e8e6-4804-8ef1-7ed099bb915d; Tue, 3 Sep 2024 10:46:54 +0000 (UTC)
-X-Farcaster-Flow-ID: 3b7296b2-e8e6-4804-8ef1-7ed099bb915d
-Received: from EX19D005ANA004.ant.amazon.com (10.37.240.178) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 3 Sep 2024 10:46:54 +0000
-Received: from 682f678c4465.ant.amazon.com.com (10.118.248.122) by
- EX19D005ANA004.ant.amazon.com (10.37.240.178) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 3 Sep 2024 10:46:50 +0000
-From: Takamitsu Iwai <takamitz@amazon.co.jp>
-To: <andrew@lunn.ch>
-CC: <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <intel-wired-lan@lists.osuosl.org>, <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<przemyslaw.kitszel@intel.com>, <takamitz@amazon.co.jp>
-Subject: Re: [PATCH v1 net-next] e1000e: Remove duplicated writel() in e1000_configure_tx/rx()
-Date: Tue, 3 Sep 2024 19:46:42 +0900
-Message-ID: <20240903104642.75303-1-takamitz@amazon.co.jp>
-X-Mailer: git-send-email 2.39.3 (Apple Git-145)
-In-Reply-To: <87af1b9e-21c3-4c22-861a-b917b5cd82c2@lunn.ch>
-References: <87af1b9e-21c3-4c22-861a-b917b5cd82c2@lunn.ch>
+	s=arc-20240116; t=1725360416; c=relaxed/simple;
+	bh=NdRXoTy+cvSsqe8qf2Zk+1dLnubKdBEvzMSoRUu2M/w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tOC5jL08dE2q1v7Yp3p5QYNfnT6IhQPoBukNZ84inb/SNdE2uFV3G4UZUUILuYm4l38WggklQ86DB9c1wUghPYGKcw0RLht/JVpsr0LnDCDPMUFZON/l8uONUCBpNnFbrY6wtFxCGpo31XzmFpH1kgYGio1u1pl/7wJwCW9lbA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WyhyB0mDhz20nQp;
+	Tue,  3 Sep 2024 18:41:54 +0800 (CST)
+Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
+	by mail.maildlp.com (Postfix) with ESMTPS id 131561A0188;
+	Tue,  3 Sep 2024 18:46:50 +0800 (CST)
+Received: from [10.67.111.176] (10.67.111.176) by
+ kwepemd500012.china.huawei.com (7.221.188.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Tue, 3 Sep 2024 18:46:48 +0800
+Message-ID: <0becf4e0-2f66-4c26-b0b3-59ee232eaaef@huawei.com>
+Date: Tue, 3 Sep 2024 18:46:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 05/12] net: ftgmac100: Convert using
+ devm_clk_get_enabled() in ftgmac100_setup_clk()
+To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+CC: <florian.fainelli@broadcom.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <wens@csie.org>, <jernej.skrabec@gmail.com>,
+	<samuel@sholland.org>, <heiko@sntech.de>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <hauke@hauke-m.de>, <alexandre.torgue@foss.st.com>,
+	<joabreu@synopsys.com>, <mcoquelin.stm32@gmail.com>, <wellslutw@gmail.com>,
+	<radhey.shyam.pandey@amd.com>, <michal.simek@amd.com>,
+	<ajay.kathat@microchip.com>, <claudiu.beznea@tuxon.dev>, <kvalo@kernel.org>,
+	<jacky_chou@aspeedtech.com>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-sunxi@lists.linux.dev>,
+	<linux-rockchip@lists.infradead.org>,
+	<linux-stm32@st-md-mailman.stormreply.com>, <linux-wireless@vger.kernel.org>
+References: <20240831021334.1907921-1-lizetao1@huawei.com>
+ <20240831021334.1907921-6-lizetao1@huawei.com>
+ <nyfm5mxrrvfeu7s25qzjxbatvgnppq7exmca3sccmm6lz7nxan@xxsdgcrueoen>
+From: Li Zetao <lizetao1@huawei.com>
+In-Reply-To: <nyfm5mxrrvfeu7s25qzjxbatvgnppq7exmca3sccmm6lz7nxan@xxsdgcrueoen>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA003.ant.amazon.com (10.13.139.46) To
- EX19D005ANA004.ant.amazon.com (10.37.240.178)
+X-ClientProxiedBy: dggpeml500005.china.huawei.com (7.185.36.59) To
+ kwepemd500012.china.huawei.com (7.221.188.25)
 
-> Did the same sequence of read/writes happen before 0845d45e900c? Or
-> did 0845d45e900c add additional writes, not just move them around?
+Hi,
 
-The sequence of read/writes happened before 0845d45e900c because the similar
-writel() exists in ew32() above the writel() moved by 0845d45e900c.
+在 2024/9/3 16:09, Uwe Kleine-König 写道:
+> Hello,
+> 
+> On Sat, Aug 31, 2024 at 10:13:27AM +0800, Li Zetao wrote:
+>> Use devm_clk_get_enabled() instead of devm_clk_get() +
+>> clk_prepare_enable(), which can make the clk consistent with the device
+>> life cycle and reduce the risk of unreleased clk resources. Since the
+>> device framework has automatically released the clk resource, there is
+>> no need to execute clk_disable_unprepare(clk) on the error path, drop
+>> the cleanup_clk label, and the original error process can return directly.
+>>
+>> Signed-off-by: Li Zetao <lizetao1@huawei.com>
+>> ---
+>>   drivers/net/ethernet/faraday/ftgmac100.c | 27 ++++++------------------
+>>   1 file changed, 7 insertions(+), 20 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+>> index 4c546c3aef0f..eb57c822c5ac 100644
+>> --- a/drivers/net/ethernet/faraday/ftgmac100.c
+>> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
+>> @@ -1752,13 +1752,10 @@ static int ftgmac100_setup_clk(struct ftgmac100 *priv)
+>>   	struct clk *clk;
+>>   	int rc;
+>>   
+>> -	clk = devm_clk_get(priv->dev, NULL /* MACCLK */);
+>> +	clk = devm_clk_get_enabled(priv->dev, NULL /* MACCLK */);
+>>   	if (IS_ERR(clk))
+>>   		return PTR_ERR(clk);
+>>   	priv->clk = clk;
+>> -	rc = clk_prepare_enable(priv->clk);
+>> -	if (rc)
+>> -		return rc;
+>>   
+>>   	/* Aspeed specifies a 100MHz clock is required for up to
+>>   	 * 1000Mbit link speeds. As NCSI is limited to 100Mbit, 25MHz
+>> @@ -1767,21 +1764,17 @@ static int ftgmac100_setup_clk(struct ftgmac100 *priv)
+>>   	rc = clk_set_rate(priv->clk, priv->use_ncsi ? FTGMAC_25MHZ :
+>>   			  FTGMAC_100MHZ);
+>>   	if (rc)
+>> -		goto cleanup_clk;
+>> +		return rc;
+>>   
+>>   	/* RCLK is for RMII, typically used for NCSI. Optional because it's not
+>>   	 * necessary if it's the AST2400 MAC, or the MAC is configured for
+>>   	 * RGMII, or the controller is not an ASPEED-based controller.
+>>   	 */
+>> -	priv->rclk = devm_clk_get_optional(priv->dev, "RCLK");
+>> -	rc = clk_prepare_enable(priv->rclk);
+>> -	if (!rc)
+>> -		return 0;
+>> +	priv->rclk = devm_clk_get_optional_enabled(priv->dev, "RCLK");
+>> +	if (IS_ERR(priv->rclk))
+>> +		return PTR_ERR(priv->rclk);
+>>   
+>> -cleanup_clk:
+>> -	clk_disable_unprepare(priv->clk);
+>> -
+>> -	return rc;
+>> +	return 0;
+> 
+> You're changing semantics here. Before your patch ftgmac100_setup_clk()
+> was left with priv->clk disabled; now you keep it enabled.
+Before my patch, ftgmac100_setup_clk() was only left with priv->clk 
+disabled when error occurs, and was left with priv->clk enabled when no 
+error occurs because when enabling priv->rclk successfully, it will 
+return 0 directly, and when enabling priv->rclk failed, it will disable 
+priv->clk.
 
-The commit 0845d45e900c moved writel() in e1000_clean_tx/rx_ring() to
-e1000_configure_tx/rx() to avoid null pointer dereference. But since the same
-writel() exists in e1000_configure_tx/rx(), we just needed to remove writel()
-from e1000_clean_rx/tx_ring().
+It turns out that the code logic is a bit counter-intuitive, but the 
+readability has been improved after adjustments.
+> 
+> Further note that there is a bug here, because in ftgmac100_probe()
+> (i.e. the caller of ftgmac100_setup_clk())
+> clk_disable_unprepare(priv->clk) is called in the error path.
+> (I only looked quickly, so I might have missed a detail.)
+I have considered the case that clk_disable_unprepare will not be 
+executed on the wrong path in ftgmac100_probe(). So I understand that 
+the problem you mentioned should not exist.
+> 
+> So while your patch is an improvement for clock enable/disable
+> balancing, it might regress on power consumption.
+> 
+>>   }
+>>   
+>>   static bool ftgmac100_has_child_node(struct device_node *np, const char *name)
+>> @@ -1996,16 +1989,13 @@ static int ftgmac100_probe(struct platform_device *pdev)
+>>   	err = register_netdev(netdev);
+>>   	if (err) {
+>>   		dev_err(&pdev->dev, "Failed to register netdev\n");
+>> -		goto err_register_netdev;
+>> +		goto err_phy_connect;
+>>   	}
+>>   
+>>   	netdev_info(netdev, "irq %d, mapped at %p\n", netdev->irq, priv->base);
+>>   
+>>   	return 0;
+>>   
+>> -err_register_netdev:
+>> -	clk_disable_unprepare(priv->rclk);
+>> -	clk_disable_unprepare(priv->clk);
+>>   err_phy_connect:
+>>   	ftgmac100_phy_disconnect(netdev);
+>>   err_ncsi_dev:
+>> @@ -2034,9 +2024,6 @@ static void ftgmac100_remove(struct platform_device *pdev)
+>>   		ncsi_unregister_dev(priv->ndev);
+>>   	unregister_netdev(netdev);
+>>   
+>> -	clk_disable_unprepare(priv->rclk);
+>> -	clk_disable_unprepare(priv->clk);
+>> -
+>>   	/* There's a small chance the reset task will have been re-queued,
+>>   	 * during stop, make sure it's gone before we free the structure.
+>>   	 */
+> 
+> Best regards
+> Uwe
 
+Thanks,
+Li Zetao.
 
