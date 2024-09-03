@@ -1,396 +1,255 @@
-Return-Path: <netdev+bounces-124628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F19A96A422
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:21:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 766F096A424
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:21:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A38DC1C23F22
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:21:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 859BE1C23B61
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DABC18BC0A;
-	Tue,  3 Sep 2024 16:20:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E8518B49C;
+	Tue,  3 Sep 2024 16:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2FQmt7k5";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Hf1iEXNB"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GL4iwoxS"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2054.outbound.protection.outlook.com [40.107.92.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF0B18BB99;
-	Tue,  3 Sep 2024 16:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725380442; cv=none; b=HXmqDJD4Rq9iZM7Pkp/kZGvL9VWL5EifcMMgbw3ulPRME0giii+peXbYKS7mk6G7xWqgXqr7w9XVk7hZKBV0tgXXghoGvfl5kUJHWHcEWHCTLPaYaNKg4cWi699MsYqxFi9AiByMgDG4Foyh3ZKxl1/4F2jH2N+K5IZisLaq7I0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725380442; c=relaxed/simple;
-	bh=aWUmoICX5/bAUIkZyCSMYqmjqTN82UbWS0+fYRz8OI8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QAkcFaZ5qVTO4Uusir94H6xVrhN47upPoNQysZ7dOYXqlKhDqDiaCpsp8tDxDgUPoFNnPzkrxescdwUgnum/1SCfFs1f5PICuoN4G+opyuI+1BCyN3pcLCUcG6riYLohX/xEJ5rL9053uQSQ/VU8bH0ry1sc6RSQKvVfKGknbZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2FQmt7k5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Hf1iEXNB; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Message-ID: <f9f124da-81f6-42d8-a59e-b57f2358ed2a@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1725380437;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=WCC0e5eo3yNikJaPXA/YYZhAkYGprLjDl6IIFERnSUs=;
-	b=2FQmt7k5tU0iieQMR7GA0Y5L1rbLoJPJVCsTz9gmZHh+phuqsE4U3F1deqBJAFmWf9dAtn
-	Q3LXyIQWr4ZBFy2YXOLa+W5qFAtQUrV0gUS0h1I+QCydKD/rMXdwBS1O/wpqHj9Ky90kXR
-	B8fBEvX/6JBu8Jijys+j/85nSX6Tun8eOS9YEkLjT3M3f6OCtdAXrGIYQNIfnZct0qFl7q
-	OWbSIbYl/xGNrFz0p8sUcR+sHlTXZ0tJe09QEEeNsX+sGDxV+0zsZsoiVagQfWUdiYh+KQ
-	lgRiWqPd/zlWXzXHx8QivUesjyjoTE6Nvl/yZn2mvZbxVxv4FbLNzAKXyzBKYg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1725380437;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=WCC0e5eo3yNikJaPXA/YYZhAkYGprLjDl6IIFERnSUs=;
-	b=Hf1iEXNBfKB9/vo1PDwHas09kVeIs+GZ9byqt4yAyO1MwV2VJMKegTJ/V8DDgcmJKujMcr
-	aeSm+mLTJLfAHbAA==
-Date: Tue, 3 Sep 2024 18:20:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647554CB2B
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 16:21:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725380466; cv=fail; b=L/V22fQylPJz6Y++6hDvXHfAeFX5tslw2KdL6VC08deiTUy6ATNgbRXYFvFuggXvL2URvNmRiU1yyDflyWKUJtD2rjWkXu8B2hwplfhL/W8s/+CQzgeMcCxGFRz7263VYJifyjsDx9nKWPo/tAovRMB636ar/nwXDRAOy7ytuZc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725380466; c=relaxed/simple;
+	bh=shFFM9X1Y+P90/w+aGdTHQtbEjizMWPEl8IFuYywRBY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JLc7jjdBBjQC7Q1N7ayLMAXw+a+lImYj2zc5UGir+kApNBS1HfAhVDCs4b8YUSNvfFDkCFIOWK6PLkIWXkVoGvNw9FNY61d2VJoAKcvMmu5XhTtqJP2L2EhVM9+0AM2uxIBEZ5m2jxy0/H9pq3f5LrCKr53WaOn3rftRJiWh0dk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GL4iwoxS; arc=fail smtp.client-ip=40.107.92.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ux/1O2HU03P+/IaYv4BRUM8sE1Uyu4dW0CHzUgBDDyh0WUjyX5JH84jngD77JCJypcGuezppWaHhwHXdv6qGgwLZWESR2dv1kZ76MT8SENAbousoEcS5WoFq6DrBWyat/3w5Y5sMh4Y3piydW5EZ53nEM85W1v0cmJDyBF5bI0hSb0p248joBQNtUSNnBhh6MqdglcVdyCekpu+UfMZi6BI/BF3slJlIenoIopH+OJSp3KXSRbtzs4zBQ5usobuNpv/2zd+rrTmbqfompWPpvqMM8b9TN6s7d7PS41uEI7aNbYKmSMxHB2T3G4QhgrmKTT3KUz7zQxJEmBRj+B67Zw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=39VuasMWWm+BH5N4VC5/cTyvYoGWJw6sPzrjRWkOBx0=;
+ b=ElFJ0J3i4KukRh4OxfE2fMKsPCTD1w2ymTIHZg/3UdQ0LS4CrG+pFL3fdxaei4vCxLLutKWLX5FwNSNFMU62FSl08z5wxmgKiPBCKMlB1hmDSDwl085RtkjlkDCIfBg/MrZafC17dvNnkCGEMpvWEr3aIYwA/oBT0WrhHZwRx0GM3y+4rtvnvWrN/jbLVyIRLJlU4DszzbtpZNGJ7IZLVVURfF+Q5Jrln1uOzZLAP1z1I5scM7jeBHgw7VPfrRqQXpkrKOXf95Re9LCVruYYdWJuu5BHRY+VfPLowY9T1GLTkjWv9S59k75hOQnMlWP2Cg73+hPc9stTIT0TaJjayw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=39VuasMWWm+BH5N4VC5/cTyvYoGWJw6sPzrjRWkOBx0=;
+ b=GL4iwoxSHQSJKVAOlDIJwuQzSakxlzv+C/VVKC3HkGrY0zPrfnkZ01vLVBOpp/1JQO9OCw5cC1Gqdln+10yVLiz2YhenrMt5UztyX2AYP+bPiXHyXwFtKC9E+lZywU69oYh0NWtjKJNai6WWJ3xjbAI4XaTgoG687A0udFNH8Ac=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by IA1PR12MB6113.namprd12.prod.outlook.com (2603:10b6:208:3eb::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.25; Tue, 3 Sep
+ 2024 16:20:59 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a%3]) with mapi id 15.20.7918.024; Tue, 3 Sep 2024
+ 16:20:59 +0000
+Message-ID: <dabb07b3-4a8a-4d14-9dcd-78e928c1dc72@amd.com>
+Date: Tue, 3 Sep 2024 09:20:49 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 06/15] ionic: Remove setting of RX software
+ timestamp
+To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+ Andy Gospodarek <andy@greyhouse.net>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+ Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Sunil Goutham <sgoutham@marvell.com>,
+ Potnuri Bharat Teja <bharat@chelsio.com>,
+ Christian Benvenuti <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>,
+ Claudiu Manoil <claudiu.manoil@nxp.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
+ Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
+ Dimitris Michailidis <dmichail@fungible.com>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, Jijie Shao <shaojijie@huawei.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Marcin Wojtas <marcin.s.wojtas@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Geetha sowjanya <gakula@marvell.com>,
+ Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Bryan Whitehead <bryan.whitehead@microchip.com>,
+ UNGLinuxDriver@microchip.com, Horatiu Vultur <horatiu.vultur@microchip.com>,
+ Lars Povlsen <lars.povlsen@microchip.com>,
+ Steen Hegelund <Steen.Hegelund@microchip.com>,
+ Daniel Machon <daniel.machon@microchip.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Shannon Nelson <shannon.nelson@amd.com>,
+ Brett Creeley <brett.creeley@amd.com>, Sergey Shtylyov <s.shtylyov@omp.ru>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+ Edward Cree <ecree.xilinx@gmail.com>,
+ Martin Habets <habetsm.xilinx@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>,
+ MD Danish Anwar <danishanwar@ti.com>, Linus Walleij <linusw@kernel.org>,
+ Imre Kaloz <kaloz@openwrt.org>, Richard Cochran <richardcochran@gmail.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Carolina Jubran <cjubran@nvidia.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>
+References: <20240901112803.212753-1-gal@nvidia.com>
+ <20240901112803.212753-7-gal@nvidia.com>
+Content-Language: en-US
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20240901112803.212753-7-gal@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR13CA0002.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c0::7) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: CPU stuck due to the taprio hrtimer
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>, luyun
- <luyun@kylinos.cn>, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240627055338.2186255-1-luyun@kylinos.cn>
- <87sewy55gp.fsf@intel.com> <2df10720-1790-48bd-a50c-4816260543b0@kylinos.cn>
- <fcd41a5f-66b5-4ebe-9535-b75e14867444@linutronix.de>
- <87jzftpwo2.fsf@intel.com>
- <18cd9ee1-6d12-469c-bf3d-c8fa080b01c1@linutronix.de>
- <87bk14pw5o.fsf@intel.com>
-Content-Language: en-US
-From: Florian Kauer <florian.kauer@linutronix.de>
-Autocrypt: addr=florian.kauer@linutronix.de; keydata=
- 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
- ugsSqUGtSA==
-In-Reply-To: <87bk14pw5o.fsf@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-On 9/3/24 17:57, Vinicius Costa Gomes wrote:
-> Florian Kauer <florian.kauer@linutronix.de> writes:
-> 
->> On 9/2/24 23:34, Vinicius Costa Gomes wrote:
->>> Florian Kauer <florian.kauer@linutronix.de> writes:
->>>
->>>> On 9/2/24 11:12, luyun wrote:
->>>>>
->>>>> 在 2024/6/28 07:30, Vinicius Costa Gomes 写道:
->>>>>> Yun Lu <luyun@kylinos.cn> writes:
->>>>>>
->>>>>>> Hello,
->>>>>>>
->>>>>>> When I run a taprio test program on the latest kernel(v6.10-rc4), CPU stuck
->>>>>>> is detected immediately, and the stack shows that CPU is stuck on taprio
->>>>>>> hrtimer.
->>>>>>>
->>>>>>> The reproducer program link:
->>>>>>> https://github.com/xyyluyun/taprio_test/blob/main/taprio_test.c
->>>>>>> gcc taprio_test.c -static -o taprio_test
->>>>>>>
->>>>>>> In this program, start the taprio hrtimer which clockid is set to REALTIME, and
->>>>>>> then adjust the system time by a significant value backwards. Thus, CPU will enter
->>>>>>> an infinite loop in the__hrtimer_run_queues function, getting stuck and unable to
->>>>>>> exit or respond to any interrupts.
->>>>>>>
->>>>>>> I have tried to avoid this problem by apllying the following patch, and it does work.
->>>>>>> But I am not sure if this can be the final solution?
->>>>>>>
->>>>>>> Thanks.
->>>>>>>
->>>>>>> Signed-off-by: Yun Lu <luyun@kylinos.cn>
->>>>>>> ---
->>>>>>>   net/sched/sch_taprio.c | 24 ++++++++++++++++++++++++
->>>>>>>   1 file changed, 24 insertions(+)
->>>>>>>
->>>>>>> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
->>>>>>> index a0d54b422186..2ff8d34bdbac 100644
->>>>>>> --- a/net/sched/sch_taprio.c
->>>>>>> +++ b/net/sched/sch_taprio.c
->>>>>>> @@ -104,6 +104,7 @@ struct taprio_sched {
->>>>>>>       u32 max_sdu[TC_MAX_QUEUE]; /* save info from the user */
->>>>>>>       u32 fp[TC_QOPT_MAX_QUEUE]; /* only for dump and offloading */
->>>>>>>       u32 txtime_delay;
->>>>>>> +    ktime_t offset;
->>>>>>>   };
->>>>>>>     struct __tc_taprio_qopt_offload {
->>>>>>> @@ -170,6 +171,19 @@ static ktime_t sched_base_time(const struct sched_gate_list *sched)
->>>>>>>       return ns_to_ktime(sched->base_time);
->>>>>>>   }
->>>>>>>   +static ktime_t taprio_get_offset(const struct taprio_sched *q)
->>>>>>> +{
->>>>>>> +    enum tk_offsets tk_offset = READ_ONCE(q->tk_offset);
->>>>>>> +    ktime_t time = ktime_get();
->>>>>>> +
->>>>>>> +    switch (tk_offset) {
->>>>>>> +    case TK_OFFS_MAX:
->>>>>>> +        return 0;
->>>>>>> +    default:
->>>>>>> +        return ktime_sub_ns(ktime_mono_to_any(time, tk_offset), time);
->>>>>>> +    }
->>>>>>> +}
->>>>>>> +
->>>>>>>   static ktime_t taprio_mono_to_any(const struct taprio_sched *q, ktime_t mono)
->>>>>>>   {
->>>>>>>       /* This pairs with WRITE_ONCE() in taprio_parse_clockid() */
->>>>>>> @@ -918,6 +932,7 @@ static enum hrtimer_restart advance_sched(struct hrtimer *timer)
->>>>>>>       int num_tc = netdev_get_num_tc(dev);
->>>>>>>       struct sched_entry *entry, *next;
->>>>>>>       struct Qdisc *sch = q->root;
->>>>>>> +    ktime_t now_offset = taprio_get_offset(q);
->>>>>>>       ktime_t end_time;
->>>>>>>       int tc;
->>>>>>>   @@ -957,6 +972,14 @@ static enum hrtimer_restart advance_sched(struct hrtimer *timer)
->>>>>>>       end_time = ktime_add_ns(entry->end_time, next->interval);
->>>>>>>       end_time = min_t(ktime_t, end_time, oper->cycle_end_time);
->>>>>>>   +    if (q->offset != now_offset) {
->>>>>>> +        ktime_t diff = ktime_sub_ns(now_offset, q->offset);
->>>>>>> +
->>>>>>> +        end_time = ktime_add_ns(end_time, diff);
->>>>>>> +        oper->cycle_end_time = ktime_add_ns(oper->cycle_end_time, diff);
->>>>>>> +        q->offset = now_offset;
->>>>>>> +    }
->>>>>>> +
->>>>>> I think what we should do here is a bit different. Let me try to explain
->>>>>> what I have in mind with some context.
->>>>>>
->>>>>> A bit of context: The idea of taprio is to enforce "TSN" traffic
->>>>>> schedules, these schedules require time synchronization, for example via
->>>>>> PTP, and in those cases, time jumps are not expected or a sign that
->>>>>> something is wrong.
->>>>>>
->>>>>> In my mind, a time jump, specially a big one, kind of invalidates the
->>>>>> schedule, as the schedule is based on an absolute time value (the
->>>>>> base_time), and when time jumps that reference in time is lost.
->>>>>>
->>>>>> BUT making the user's system unresponsive is a bug, a big one, as if
->>>>>> this happens in the real world, the user will be unable to investigate
->>>>>> what made the system have so big a time correction.
->>>>>>
->>>>>> So my idea is to warn the user that the time jumped, say that the user
->>>>>> needs to reconfigure the schedule, as it is now invalid, and disable the
->>>>>> schedule.
->>>>>>
->>>>>> Does this make sense?
->>>>>>
->>>>>> Ah, and thanks for the report.
->>>>>
->>>>> Hello Vinicius,
->>>>>
->>>>> May I ask is there a fix patch for this issue?
->>>>>
->>>>> I test it on the latest kernel version,  and it still seems to cause CPU stuck.
->>>>>
->>>>> As you mentioned, a better way would be to warn the user that the current time has jumped and cancel the hrtimer,
->>>>>
->>>>> but I'm not sure how to warn the user, or just through printk?
->>>>>
->>>>> Thanks and best regards.
->>>>
->>>> I am not sure if it is really the best solution to force the user to reconfigure the schedule
->>>> "just" because the clock jumped. Yes, time jumps are a big problem for TAPRIO, but stopping might
->>>> make it worse.
->>>>
->>>> Vinicius wrote that the base_time can no longer reference to the correct point in time,
->>>> so the schedule MUST be invalid after the time jump. It is true that the base_time does not longer
->>>> refer to the same point in time it referred to before the jump from the view of the local system (!).
->>>> But the base_time usually refers to the EXTERNAL time domain (i.e. the time the system SHOULD have
->>>> and not the one the system currently has) and is often configured by an external entity.
->>>>
->>>> So it is quite likely that the schedule was incorrectly phase-shifted BEFORE the time jump and after
->>>> the time jump the base_time refers to the CORRECT point in time viewed from the external time domain.
->>>>
->>>> If you now stop the schedule (and I assume you mean by this to let every queue transmit at any time
->>>> as before the schedule was configured) and the user has to reconfigure the schedule again,
->>>> it is quite likely that by this you actually increase the interference with the network and in
->>>> particular confuse the time synchronization via PTP, so once the schedule is set up again,
->>>> you might get a time jump AGAIN.
->>>>
->>>> So yes, a warning to the user is definitely appropriate in the case of a time jump, but apart
->>>> from that I would prefer the system to adapt itself instead of resigning.
->>>>
->>>
->>> The "warn the user, disable the schedule" is more or less clear in my
->>> mind how to implement. But while I was writing this, I was taking
->>> another look at the standard, and I think this approach is wrong.
->>>
->>> I think what we should do is something like this:
->>>
->>> 1. Jump into the past:
->>>    1.a. before base-time: Keep all queues open until base-time;
->>>    1.b. after base-time: "rewind" the schedule to the new current time;
->>> 2. Jump into the future: "fast forward" the schedule to the new current
->>>    time;
->>>
->>> But I think that for this to fit more neatly, we would need to change
->>> how advance_sched() works, right now, it doesn't look at the current
->>> time (it considers that the schedule will always advance one-by-one),
->>> instead what I am thinking is to consider that every time
->>> advance_sched() runs is a pontential "time jump". 
->>>
->>> Ideas? Too complicated for an uncommon case? (is it really uncommon?)
->>
->> I think that would be the correct solution.
->> And I don't think it is that uncommon. Especially when the device joins
->> the network for the first time and has not time synchronized itself properly yet.
->>
->> Do you know what the i225/i226 do for hardware offloaded Qbv in that case?
->>
-> 
-> In offloaded cases, in my understanding, i225/i226 re-uses most of how
-> launchtime works for Qbv, so the scheduling is almost per frame, during
-> transmission, the hw assigns each frame an offset into the gate open
-> event. And that time is used to calculate when the packet should reach
-> the wire.
-> 
-> So I would expect to see a few stuck packets (causing transmissions
-> timeouts) or early transmissions, depending on the direction of the
-> jump, but things should be able to recover eventually.
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|IA1PR12MB6113:EE_
+X-MS-Office365-Filtering-Correlation-Id: 90c5f627-7d3b-4147-f1ca-08dccc346539
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?KzNxTVZ3Q0FBYjNqVU1iU2NvQWcxOHFoK2dkRENNaVZTUUVySWRtUTJVaDd5?=
+ =?utf-8?B?QUJiMTU0UVZHdWg0MXlMMWVuSWw4SnFlMGdkRC95UzBWRUVKR2pBNjFpTTNu?=
+ =?utf-8?B?VXRpam9UOEpycWQxeGwrSGJreVdFdVI0TzdZZE5tOFA4SVhtOFExUU1pL0hx?=
+ =?utf-8?B?TmlDeGxNZjVZb1JCWXloVXozWmN6d1B1c2Yza0ZaQ1BBK1c4eDIzVWhGNFBU?=
+ =?utf-8?B?b2FZcVdSRFJvRjh0Uk1WMitqNVJhNFFXd0NrWkNiZ1J2aldUTVZ3b2JBUGNz?=
+ =?utf-8?B?N0dvVmtmZkxmQUxJZGFjK3ovVEk5Q2VDWUlIZDFaYXYzWlZBemZVRDJaZFZ4?=
+ =?utf-8?B?UUNEaG90VEpRUnBrSjU1em9aejF1UWNDNldMbE8vekpQOUdkMGRDZXV4dndx?=
+ =?utf-8?B?UWp1MjBkbjlPRUxFR0NPc1RnbFBqOGZpazVlRkZUYmJodjBqdVFhTjFiWVNZ?=
+ =?utf-8?B?WmZFTjNleHZReGg4aHFxUHN3eHBySmhXenRyckVFRGUybis5RVJuQzhjSjZj?=
+ =?utf-8?B?dUFtMGRUb1ZFWTEwMkwzQUZxYU5yUkEzWHhXRUNLa3NhalNGaElqVlFLNUgy?=
+ =?utf-8?B?MkRzcTB0U3VUcnpRdzRSbkZJL2xucFY0L04zYVRQRFpYNFozYWtYZWtrZ3Q2?=
+ =?utf-8?B?VyszeTM3Q3NFOGp1SWpjYXNncForbWpxWG9yWWg5ZE9HbERIa0FYQTExT0pC?=
+ =?utf-8?B?dllFZ05UV3puc05TcThNbksxQ0hZNC9td1dkb002d3Evd0l1T0d0MGpnZExT?=
+ =?utf-8?B?R1Q1cnVoVnprVHZ5eGk1eTFxQ052OEIwazNWQTFEcmdBMmU4cVdlQlZ0Q295?=
+ =?utf-8?B?YXVTZ2JLN0RGcWxmVGJ3RDRnbzFCQndvY2ovM3p1RnZGTUxtbXBFMUQrY2dH?=
+ =?utf-8?B?MXdncmpkQUFSUDkzeGlSVUliK08yWElJSkhDUVE1R0cvZDYzY2ZrUDZDaEhY?=
+ =?utf-8?B?TVZXd2RMOEMybFFxaDc4QXdsRTNpZm9Udm0wVFhSV2hYZElHcDZKMTBCclB5?=
+ =?utf-8?B?MnZHM29Sd0d4ZTMzemdrMXozdjBxMkt0WnJLbkJSdlhPTG96K3RaK2N0Qld4?=
+ =?utf-8?B?ZWd4TFUzdHhpeDZldFhNRVRBL2NjcGZKRU1uQkV6Wnd0NFFQUDRJaGN6QlpW?=
+ =?utf-8?B?R2IyRVZTOXNUeVo3QnU5Z2REei9zWGZRM0pxcnFPRmRDRUpSRzduS05wM1ND?=
+ =?utf-8?B?Vk9SMzRKajdzbVliOHM0b0ZqTklJTDBFcmFGZmxNeVMzM0J5OC9iUkpQeEZs?=
+ =?utf-8?B?VExKclBLUWNFSzhLeXYyeXk0TEF5VXVNS25Tb094U3l6ODU0MjFZdmtPc1U2?=
+ =?utf-8?B?NmJnUWpFTDdTWjdmNFlsVHNZRmlVZ21YcmQ4NVJSeUY5bXNiWlEyNkU4MFl6?=
+ =?utf-8?B?WENSZ1ZsWUFDOGJIUy9rWk1kY21uSWNRU0JHK211NnBHOTUzcmNTemx1ci9i?=
+ =?utf-8?B?N2VaWW14VUlmS29LWFdLYUxZc2h4K1hhdVBZWUlkK21GK0cyaW1XK0hyejBF?=
+ =?utf-8?B?MXRUTUhsdjlCc1B2YTYyZFpsU29XSzJ4NHFTWHBSbFIvVUFNNkZ0NUIwZGds?=
+ =?utf-8?B?ZXhnaFk2R1B2Y0JZSnhleStWNGlrNE91VlAzNndBckdWMHZETktISVliMGxr?=
+ =?utf-8?B?NEVuQlJHV0xsaG1mOFlLVDd3dGFvM25GZ2NhaEVLdmJ0MC92S3hnNXBuTDN0?=
+ =?utf-8?B?RjFmMitobXk5ancrRVNvMURqTStOTEgzWEhHeHBvYjFqVEpSZkNUdGRRRUhs?=
+ =?utf-8?B?OUpLeGVxM01hRmRaMGh0eWRUQllac3lPdGJnQTFsVmR1NnllTFNWR1BGVklz?=
+ =?utf-8?B?bUJJU2VMNnR0QVk2NUNZQT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Q3hBMGJpc254SUxLWU9EWXAyRFpqT2Yvd0dIdFFMdjg5REZoUVhCTWFRM0ZX?=
+ =?utf-8?B?dWtFbFhuMzI1TWtwekNmSm1pcVk1aHVPUmowUkJ0ZHg0L2w0NTE4RDJINmhs?=
+ =?utf-8?B?TGsrSDc1ejFmb2EvdTlPdmxVRjdzbUhUdjZ5d3p0bWk3b0hXd2N5UUR3Mngx?=
+ =?utf-8?B?SCtiY0xZcXpFck14akg1Y1ZUNWV2UWxhemhlRTlKdGpJbUtUUU9DMkZSZ1d0?=
+ =?utf-8?B?cFNwYkVQMS8zc0VKZnQ0SUcxV1NYTXNuVXFWQjlibzdxMEtnMkdBWU55bGJT?=
+ =?utf-8?B?L0ZPY3FMd054RGFoaTIvdUFMcDMrMHlid0ozWktSVVRUa042V3hWY2Q4U0ll?=
+ =?utf-8?B?Qi9zY2dmdm1pVjd1UDFCaEdWQlFyYVQzQmNkUWMwc1BQdmtoN3BMMTZRaDBr?=
+ =?utf-8?B?Vk9hSmhHVDhrSFZObGxyUGFXMG1IWE5JNDFaQVMwTkpEb3NoUitXWWYweVN4?=
+ =?utf-8?B?QjlDRWxPK2dzUTkrbE1KR0tBcnlUZDlobU50bFA1bXQ4UExoU2dDZHJFQlFP?=
+ =?utf-8?B?ZDZtenNjWmFOb1RuWGFoTXJiUHQ1VzE5UkREMXpPeEcvMnZhSmtLd0tRVGZR?=
+ =?utf-8?B?MWRDQVdRaCswaDZNNndTRUJqL2Y3aUdvOGVrSHlrc0dlTzkxRTdMWHk2MW5R?=
+ =?utf-8?B?elAxQWNaRXlXNGlXOWFaRVE3ay84WDc4QnhsWkdEaDFEVXpEVmFsUVkxSmQw?=
+ =?utf-8?B?UDg2aGlsWVZRempsV1lUREYxa2YwUmdvNUtTK2JqckhORlB2NG0xMk4xdzhs?=
+ =?utf-8?B?bTVYMlYvR2dEMENydkQxa2xRb2UrcDJPV0wrbzNUVm41OHowTkcwVFgvOUh6?=
+ =?utf-8?B?R094cHVHRm4wZkUwMlVMbUZNalo3OFcwSldyZ0lGeVpYVERkcS85SEpwQUJa?=
+ =?utf-8?B?SHE1RHRrRU1HNmVBUlBoL2REa1RkSlZFTER4SDhjTDRmNmNPQ3BoTDlxK1lT?=
+ =?utf-8?B?Z2ZDdzc5WmhoUUhDa2IyLzV0WFdQYW51eTNrV3dSdnBEY2dyYkRUenN3L1FO?=
+ =?utf-8?B?aUdCNXNsN0ZoUnJIVitZbGRQZWZ0Um51VjVxQ00yTFErZTdFWTF6RngwMlZJ?=
+ =?utf-8?B?bUtxOFB5Q1h5ckJ3QnlsTXBzVUxZczJCU2dabUZXQllucXZOZGlobllaZG5q?=
+ =?utf-8?B?RUdlRkR3dnlUakxmNGllYXZ4Z283S09aNUJEQjIrenNrT1diMWR2WUNZb3k3?=
+ =?utf-8?B?aXMwaHl3TFRUb0pHcHkvUVJtaFJuMXQrMU1UaktHRUJkNlNUbXhBQU90Zk90?=
+ =?utf-8?B?UXN5UkpxRjBrMnpIMjFoMHRBbFBBcUp0UnYwRlBZTTdQbUdnRzNueUd6MnMy?=
+ =?utf-8?B?MGcrb0hRQzY4cVZXdjZ5V0tRZXJieERkOGhBQUFocDRkMDNIRVEzQm02S2N2?=
+ =?utf-8?B?SlFWclQ0aUtIMmFSWldlTE1UbS9USnRjMWxJUXJaT2VHd1RzWjk1cWI0MHFn?=
+ =?utf-8?B?N3QvWHJDeENWSWozRDk4MHd3cXZiVm5jRExXTE9jNGZtWVQxWHVGbVc4eVVI?=
+ =?utf-8?B?anR2VjBINmwyVWxlaHlndzdISVdiWjI1dEI5WU5zSnBOUnd4THNpbTNJSnl5?=
+ =?utf-8?B?M1diR1YvUFpUcmpCZFdwQnV0bGRvS0w1UUlIWEZBU0VMT0VwUjBNLyt5TU9k?=
+ =?utf-8?B?TWVReDYvRDhaTlVXWGVPK2dvYVhwcEtMZmhKWitFeWVMdjBUOVVUKzRZK2hi?=
+ =?utf-8?B?N3RoNEN3dU01aFBWeTFSaEFWaE9Ba2hjeVplMHYwTVFET1JTTGd2c2MyT2Yv?=
+ =?utf-8?B?ZmNMWDhxdmo0RXhxMGFsRWRoSGUrL3I4eVJTbjZrTk5NMEdPaFdiUExja2Zn?=
+ =?utf-8?B?SjBzaXhjZXlUOFNzTGU2K0hMNXQvTFJaZmRmZTRsNzFFS0NvMExNaXNrTzlK?=
+ =?utf-8?B?RzBNRUg1YXVLZUgxbmJOU3AvQ3BabWg2WjUzNzZoMFc1ck1LaGdxS1hyWnFP?=
+ =?utf-8?B?UkErbnpYRnFOa0ZRMEU5ZDFJRWMwbVV0UkNkbVZESmZaWE1MaUUzSVNEZjBV?=
+ =?utf-8?B?UFRqVmdlU1dHZEZJdFZtV1JlRmZHelhxZmU0WVlGK25hUFhKWEV2SWN1LzU1?=
+ =?utf-8?B?dDh4d1VPOXNBMnM4RVZ2VFNGT3Z2dW14YnVxSVNyMEdkaUd1Vm15b0JDWnli?=
+ =?utf-8?Q?ViMKs6iycqiUAccU+HFk5JcJ9?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 90c5f627-7d3b-4147-f1ca-08dccc346539
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2024 16:20:59.0728
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZPCaspetLSRHMVSqPD7MzW2z281D8O/R5wqHuwdCpL9U2shwO/H2Cm3BMUUEB6WNouE+oPx9fwb24AYPNx+N3A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6113
 
 
-I think that is the important part, to recover eventually.
-So I would expect this also for the software mode.
 
-
-> 
->>>
->>>> Yun Lu, does this only happen for time jumps into the past or also for large jumps into the future?
->>>> And does this also happen for small time "jumps"?
->>>
->>> AFAIU this bug will only happen with large jumps into the past. For
->>> small jumps into the past, it will spin uselessly for a bit. For jumps
->>> into the future, the schedule will be stuck in a particular gate entry
->>> until the future becomes now.
->>
->> Does "it will spin uselessly for a bit" mean the CPU is stuck for that time
->> (even if it is short)? If that is the case, it might lead to very strange effects
->> in RT systems. And these small time jumps into the past (even if just a few us)
->> should actually be relatively common.
->>
-> 
-> Yes. The hrtimer will expire, advance_sched() will get the next entry
-> and its expiration, set the hrtimer expiration to that, this will repeat
-> until that expiration is after "current" time. As this is hrtimer
-> function, this will block other things from running on that cpu.
-> 
-> My expectation for taprio in software mode was more something that
-> people would use to validate new schedules, do some experiments, that
-> kind of thing. What I was expecting to have in more serious cases was
-> the offloaded mode.
-
-
-Ok, sorry, my statement about "relatively common" was about time jumps, not so
-much about the use of the software mode. I also fully switched to offloaded
-mode now. 
-
-Maybe I will eventually return to software mode when it comes to larger
-(containerized) endstations with a lot more streams which cannot be handled
-by the 4 queues of the i225/i226.
-
-Nevertheless, I would expect the offloaded and non-offloaded mode to work
-similar and this includes a similar reaction to time jumps which
-does not include blocking the CPU.
-
-
-> What I am trying to say is all I am hearing is that the software mode is
-> being used more seriously than I thought. So this work is a bit more
-> important. I will add this to my todo list, but I won't be sad at all if
-> someone beats me to it ;-)
-
-
-I have one other issue with software mode that I wanted to look into
-(regarding setting the interface up and down), maybe it will fit into that
-slot, but it is unfortunately very far down in my backlog. So you are likely
-still faster :-)
-
-
-> 
->> Greetings,
->> Florian
->>
->>>
->>>>
->>>> Thanks,
->>>> Florian
->>>>
->>>>>
->>>>>
->>>>>>
->>>>>>>       for (tc = 0; tc < num_tc; tc++) {
->>>>>>>           if (next->gate_duration[tc] == oper->cycle_time)
->>>>>>>               next->gate_close_time[tc] = KTIME_MAX;
->>>>>>> @@ -1210,6 +1233,7 @@ static int taprio_get_start_time(struct Qdisc *sch,
->>>>>>>         base = sched_base_time(sched);
->>>>>>>       now = taprio_get_time(q);
->>>>>>> +    q->offset = taprio_get_offset(q);
->>>>>>>         if (ktime_after(base, now)) {
->>>>>>>           *start = base;
->>>>>>> -- 
->>>>>>> 2.34.1
->>>>>>>
->>>>>>
->>>>>> Cheers,
->>>>>
->>>>
->>>
->>>
->>> Cheers,
+On 9/1/2024 4:27 AM, Gal Pressman wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
 > 
 > 
-> Cheers,
+> The responsibility for reporting of RX software timestamp has moved to
+> the core layer (see __ethtool_get_ts_info()), remove usage from the
+> device drivers.
+> 
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+> ---
+>   drivers/net/ethernet/pensando/ionic/ionic_ethtool.c | 2 --
+>   1 file changed, 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
+> index 4619fd74f3e3..dda22fa4448c 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_ethtool.c
+> @@ -989,8 +989,6 @@ static int ionic_get_ts_info(struct net_device *netdev,
+>          info->phc_index = ptp_clock_index(lif->phc->ptp);
+> 
+>          info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
+> -                               SOF_TIMESTAMPING_RX_SOFTWARE |
+> -                               SOF_TIMESTAMPING_SOFTWARE |
+>                                  SOF_TIMESTAMPING_TX_HARDWARE |
+>                                  SOF_TIMESTAMPING_RX_HARDWARE |
+>                                  SOF_TIMESTAMPING_RAW_HARDWARE;
+> --
+> 2.40.1
+> 
+
+Thanks!
+
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
 
