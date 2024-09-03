@@ -1,441 +1,134 @@
-Return-Path: <netdev+bounces-124531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90AA7969DEC
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:42:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E389D969E45
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:48:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 159701F2434E
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:42:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AED2B2582F
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E57DE201252;
-	Tue,  3 Sep 2024 12:41:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F378B1CA6A3;
+	Tue,  3 Sep 2024 12:45:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Bb9lM40k"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DD8tL+9q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029B41DA10D;
-	Tue,  3 Sep 2024 12:41:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6011F1CA691;
+	Tue,  3 Sep 2024 12:45:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725367280; cv=none; b=SNWr7W6Lk8O0JlsnmjJYpf8qtUAKDMCW4fdYqBCjscjfoefnZHRLWcFxT14ecITr+wt2yHCvP1fLq2HhOlo88rLTVCFHDxMR8AHoLmvEvIV8GaG145ioQqCJ7Xwx+1u3wBVAcE18WWwM040j2wcAGbo9ErGFcLe8ZqqY9zGTN3s=
+	t=1725367548; cv=none; b=uSDzWLwDqbXZfrp11p5wOdT2cZtcaGWSyv4fCXGyb2EOI8U3Fz0TybfQbkBHTY4ZeXQzQMVMWXEvlUMOz+0CXfHp87WsnaMz+zmhLebYuwT2LXrIHb040NGv9+Iw7sPz7CpRAjyUmOwLSaMgaFJWIy8ED4TCcDqOQIhlniM7+eA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725367280; c=relaxed/simple;
-	bh=/zbrHTDuE8i44HtzOkKfupk1xEJVwMghBMUXj9CE1u0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YXnemxswXkjQV/B6zXrHjuuiNpv12nfh3EbKcfrrBrn+rGKriUMg4l6lQ/QKV1nprwk9ipNYyxnUdrMQlry3EwNjxJqo694+ngD2xEiOk6sOyggjWKF72K1RQvAQycY0gb9QYm32O6tM955S2uqZndpgDy2z0qI8chFrKEibvi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Bb9lM40k; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48329TOd016347;
-	Tue, 3 Sep 2024 05:41:10 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=EP9OJKbEd8AFPuI3BqF0SJ4Ty
-	1z1Nud2IqC1Sicmpvk=; b=Bb9lM40k+dif1K4GUPyhJjKHsaCn8yEmKTF11DCEy
-	Mixy8UOdfgQ0nFOHKxH24bTja3tENhbZcuhKm1eb6+AkWXwOVGkcA4hjZRdIXHs+
-	PeJYKIFsZw6iUOAoQxt+dOkcJNSCd5DzsjoZ3ChfcboA7AdEj9/LhTlAZGcuTReq
-	16bkAw7MAwGmRmJXa++B27bbMcMnM1Lek4qP16FYs7LIj5i42WKJpYHNujaRbh6g
-	TS9JIqNqlQz28uY6iCt+ykraWnYjecmgRd8Wnhb1T7vmKVRTvnPQ62+994QPDggx
-	+4a8+FBOxZWt7FBw04zL+aHlYe4+gOTG6TA9oNu/bxrTQ==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 41dbv1ukc9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Sep 2024 05:41:10 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 3 Sep 2024 05:41:09 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 3 Sep 2024 05:41:09 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 9CFEA3F70E6;
-	Tue,  3 Sep 2024 05:41:05 -0700 (PDT)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <jiri@resnulli.us>, <edumazet@google.com>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net-next PATCH 4/4] octeontx2-pf: Export common APIs
-Date: Tue, 3 Sep 2024 18:10:48 +0530
-Message-ID: <20240903124048.14235-5-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20240903124048.14235-1-gakula@marvell.com>
-References: <20240903124048.14235-1-gakula@marvell.com>
+	s=arc-20240116; t=1725367548; c=relaxed/simple;
+	bh=7ttKxCoE7GSMsx2WogBL9+GX/hRN6m9P0iLBenm73qw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NvtrtyiEZW9YzMzmLi1mNRD3ugVT3s7KEDLveOu+Wy+ovWdNObySrwKJtTSe7uj5W3OFsIW8xZIYr1pYp0/N224ZzpyC5y2rPKXx5J5qHG7cr4JDvdM1RJog6zlCfEdEYwW/1Fb9Jisu2Vn7c24Swl8q2G1rAqhvawRQYzEr6YU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DD8tL+9q; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cpg6a8Dw5deggTJRHinbjwWzY46RJB0BQlkELWRuOWo=; b=DD8tL+9q5H5pKcB+Qkocv8TQo5
+	IzsbaSq65KZR1IuXZyoJZM9VGQBRgVvNUYRlWGiKHm4KJ/4AUP3gCsVbFK/SHc6b6BdRhX/Aanp6y
+	ySQPo+n+zk8jVYYEW/24y5MM/L3xTZLrV09zOfoBXxTl9PoU3oUbT9CLgpkI0mDNmmwY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1slSuV-006QPX-I6; Tue, 03 Sep 2024 14:45:27 +0200
+Date: Tue, 3 Sep 2024 14:45:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: andi.shyti@kernel.org, jarkko.nikula@linux.intel.com,
+	andriy.shevchenko@linux.intel.com, mika.westerberg@linux.intel.com,
+	jsd@semihalf.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, rmk+kernel@armlinux.org.uk,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	mengyuanlou@net-swift.com, duanqiangwen@net-swift.com
+Subject: Re: [PATCH net 0/3] Add I2C bus lock for Wangxun
+Message-ID: <7485fc03-79c3-4797-ab9a-9026b09aac7f@lunn.ch>
+References: <20240823030242.3083528-1-jiawenwu@trustnetic.com>
+ <888f78a9-dea9-4f66-a4d0-00a57039733d@lunn.ch>
+ <01d701daf75c$50db4450$f291ccf0$@trustnetic.com>
+ <55ff5570-5398-48e9-bf56-d34da197d175@lunn.ch>
+ <020f01daf827$d765ffd0$8631ff70$@trustnetic.com>
+ <509abfeb-b1fb-4c53-9898-6106c8dde411@lunn.ch>
+ <02a001daf9de$529edd90$f7dc98b0$@trustnetic.com>
+ <d91674af-1682-4efe-ad15-bd64f871c1de@lunn.ch>
+ <03fc01dafdca$ef952100$cebf6300$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: h01DmNfNUjmWLZy80r9x6l7XpioOsOFp
-X-Proofpoint-ORIG-GUID: h01DmNfNUjmWLZy80r9x6l7XpioOsOFp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-02_06,2024-09-03_01,2024-09-02_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <03fc01dafdca$ef952100$cebf6300$@trustnetic.com>
 
-Export mbox, hw resources and interrupt configuration functions.
-So, that they can be used later by the RVU representor driver.
-  
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
----
- .../marvell/octeontx2/nic/otx2_common.c       |  2 +
- .../marvell/octeontx2/nic/otx2_common.h       | 11 +++++
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 40 +++++++++++++------
- .../marvell/octeontx2/nic/otx2_txrx.c         | 17 +++++---
- .../marvell/octeontx2/nic/otx2_txrx.h         |  3 +-
- .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  6 +--
- 6 files changed, 56 insertions(+), 23 deletions(-)
+> SFP+ is used on our device.
+> 
+> But I don't quite understand why this lock is not sufficient. The entire
+> transaction is locked, include setting the bus address and selecting pages,
+> and all subsequent reads and writes on this page. Also, firmware uses this
+> lock (hardware semaphore) in the same way. Neither driver nor firmware
+> switches pages whiling the other is reading / writing ?
+ 
+The standard say you cannot read past a 1/2 page boundary. So you do
+one i2c transaction to write to byte 127. You then do transactions to
+write/read in the range 128-255. And then you do a transaction to
+write to byte 127 to set the page back, maybe.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 34e76cfd941b..e38b3eea11f3 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -246,6 +246,7 @@ int otx2_hw_set_mtu(struct otx2_nic *pfvf, int mtu)
- 	mutex_unlock(&pfvf->mbox.lock);
- 	return err;
- }
-+EXPORT_SYMBOL(otx2_hw_set_mtu);
- 
- int otx2_config_pause_frm(struct otx2_nic *pfvf)
- {
-@@ -1782,6 +1783,7 @@ void otx2_free_cints(struct otx2_nic *pfvf, int n)
- 		free_irq(vector, &qset->napi[qidx]);
- 	}
- }
-+EXPORT_SYMBOL(otx2_free_cints);
- 
- void otx2_set_cints_affinity(struct otx2_nic *pfvf)
- {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index b36b87dae2cb..327254e578d5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -1000,6 +1000,17 @@ int otx2_aura_init(struct otx2_nic *pfvf, int aura_id,
- int otx2_init_rsrc(struct pci_dev *pdev, struct otx2_nic *pf);
- void otx2_free_queue_mem(struct otx2_qset *qset);
- int otx2_alloc_queue_mem(struct otx2_nic *pf);
-+int otx2_init_hw_resources(struct otx2_nic *pfvf);
-+void otx2_free_hw_resources(struct otx2_nic *pf);
-+int otx2_wq_init(struct otx2_nic *pf);
-+int otx2_check_pf_usable(struct otx2_nic *pf);
-+int otx2_pfaf_mbox_init(struct otx2_nic *pf);
-+int otx2_register_mbox_intr(struct otx2_nic *pf, bool probe_af);
-+int otx2_realloc_msix_vectors(struct otx2_nic *pf);
-+void otx2_pfaf_mbox_destroy(struct otx2_nic *pf);
-+void otx2_disable_mbox_intr(struct otx2_nic *pf);
-+void otx2_disable_napi(struct otx2_nic *pf);
-+irqreturn_t otx2_cq_intr_handler(int irq, void *cq_irq);
- 
- /* RSS configuration APIs*/
- int otx2_rss_init(struct otx2_nic *pfvf);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index 5bb6db5a3a73..b4fa2c12721d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -1008,7 +1008,7 @@ static irqreturn_t otx2_pfaf_mbox_intr_handler(int irq, void *pf_irq)
- 	return IRQ_HANDLED;
- }
- 
--static void otx2_disable_mbox_intr(struct otx2_nic *pf)
-+void otx2_disable_mbox_intr(struct otx2_nic *pf)
- {
- 	int vector = pci_irq_vector(pf->pdev, RVU_PF_INT_VEC_AFPF_MBOX);
- 
-@@ -1016,8 +1016,9 @@ static void otx2_disable_mbox_intr(struct otx2_nic *pf)
- 	otx2_write64(pf, RVU_PF_INT_ENA_W1C, BIT_ULL(0));
- 	free_irq(vector, pf);
- }
-+EXPORT_SYMBOL(otx2_disable_mbox_intr);
- 
--static int otx2_register_mbox_intr(struct otx2_nic *pf, bool probe_af)
-+int otx2_register_mbox_intr(struct otx2_nic *pf, bool probe_af)
- {
- 	struct otx2_hw *hw = &pf->hw;
- 	struct msg_req *req;
-@@ -1060,8 +1061,9 @@ static int otx2_register_mbox_intr(struct otx2_nic *pf, bool probe_af)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL(otx2_register_mbox_intr);
- 
--static void otx2_pfaf_mbox_destroy(struct otx2_nic *pf)
-+void otx2_pfaf_mbox_destroy(struct otx2_nic *pf)
- {
- 	struct mbox *mbox = &pf->mbox;
- 
-@@ -1076,8 +1078,9 @@ static void otx2_pfaf_mbox_destroy(struct otx2_nic *pf)
- 	otx2_mbox_destroy(&mbox->mbox);
- 	otx2_mbox_destroy(&mbox->mbox_up);
- }
-+EXPORT_SYMBOL(otx2_pfaf_mbox_destroy);
- 
--static int otx2_pfaf_mbox_init(struct otx2_nic *pf)
-+int otx2_pfaf_mbox_init(struct otx2_nic *pf)
- {
- 	struct mbox *mbox = &pf->mbox;
- 	void __iomem *hwbase;
-@@ -1124,6 +1127,7 @@ static int otx2_pfaf_mbox_init(struct otx2_nic *pf)
- 	otx2_pfaf_mbox_destroy(pf);
- 	return err;
- }
-+EXPORT_SYMBOL(otx2_pfaf_mbox_init);
- 
- static int otx2_cgx_config_linkevents(struct otx2_nic *pf, bool enable)
- {
-@@ -1379,7 +1383,7 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
--static irqreturn_t otx2_cq_intr_handler(int irq, void *cq_irq)
-+irqreturn_t otx2_cq_intr_handler(int irq, void *cq_irq)
- {
- 	struct otx2_cq_poll *cq_poll = (struct otx2_cq_poll *)cq_irq;
- 	struct otx2_nic *pf = (struct otx2_nic *)cq_poll->dev;
-@@ -1398,20 +1402,25 @@ static irqreturn_t otx2_cq_intr_handler(int irq, void *cq_irq)
- 
- 	return IRQ_HANDLED;
- }
-+EXPORT_SYMBOL(otx2_cq_intr_handler);
- 
--static void otx2_disable_napi(struct otx2_nic *pf)
-+void otx2_disable_napi(struct otx2_nic *pf)
- {
- 	struct otx2_qset *qset = &pf->qset;
- 	struct otx2_cq_poll *cq_poll;
-+	struct work_struct *work;
- 	int qidx;
- 
- 	for (qidx = 0; qidx < pf->hw.cint_cnt; qidx++) {
- 		cq_poll = &qset->napi[qidx];
--		cancel_work_sync(&cq_poll->dim.work);
-+		work = &cq_poll->dim.work;
-+		if (work->func)
-+			cancel_work_sync(work);
- 		napi_disable(&cq_poll->napi);
- 		netif_napi_del(&cq_poll->napi);
- 	}
- }
-+EXPORT_SYMBOL(otx2_disable_napi);
- 
- static void otx2_free_cq_res(struct otx2_nic *pf)
- {
-@@ -1477,7 +1486,7 @@ static int otx2_get_rbuf_size(struct otx2_nic *pf, int mtu)
- 	return ALIGN(rbuf_size, 2048);
- }
- 
--static int otx2_init_hw_resources(struct otx2_nic *pf)
-+int otx2_init_hw_resources(struct otx2_nic *pf)
- {
- 	struct nix_lf_free_req *free_req;
- 	struct mbox *mbox = &pf->mbox;
-@@ -1601,8 +1610,9 @@ static int otx2_init_hw_resources(struct otx2_nic *pf)
- 	mutex_unlock(&mbox->lock);
- 	return err;
- }
-+EXPORT_SYMBOL(otx2_init_hw_resources);
- 
--static void otx2_free_hw_resources(struct otx2_nic *pf)
-+void otx2_free_hw_resources(struct otx2_nic *pf)
- {
- 	struct otx2_qset *qset = &pf->qset;
- 	struct nix_lf_free_req *free_req;
-@@ -1688,6 +1698,7 @@ static void otx2_free_hw_resources(struct otx2_nic *pf)
- 	}
- 	mutex_unlock(&mbox->lock);
- }
-+EXPORT_SYMBOL(otx2_free_hw_resources);
- 
- static bool otx2_promisc_use_mce_list(struct otx2_nic *pfvf)
- {
-@@ -1781,6 +1792,7 @@ void otx2_free_queue_mem(struct otx2_qset *qset)
- 	kfree(qset->napi);
- }
- EXPORT_SYMBOL(otx2_free_queue_mem);
-+
- int otx2_alloc_queue_mem(struct otx2_nic *pf)
- {
- 	struct otx2_qset *qset = &pf->qset;
-@@ -2103,7 +2115,7 @@ static netdev_tx_t otx2_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	sq = &pf->qset.sq[sq_idx];
- 	txq = netdev_get_tx_queue(netdev, qidx);
- 
--	if (!otx2_sq_append_skb(netdev, sq, skb, qidx)) {
-+	if (!otx2_sq_append_skb(pf, txq, sq, skb, qidx)) {
- 		netif_tx_stop_queue(txq);
- 
- 		/* Check again, incase SQBs got freed up */
-@@ -2808,7 +2820,7 @@ static const struct net_device_ops otx2_netdev_ops = {
- 	.ndo_set_vf_trust	= otx2_ndo_set_vf_trust,
- };
- 
--static int otx2_wq_init(struct otx2_nic *pf)
-+int otx2_wq_init(struct otx2_nic *pf)
- {
- 	pf->otx2_wq = create_singlethread_workqueue("otx2_wq");
- 	if (!pf->otx2_wq)
-@@ -2819,7 +2831,7 @@ static int otx2_wq_init(struct otx2_nic *pf)
- 	return 0;
- }
- 
--static int otx2_check_pf_usable(struct otx2_nic *nic)
-+int otx2_check_pf_usable(struct otx2_nic *nic)
- {
- 	u64 rev;
- 
-@@ -2836,8 +2848,9 @@ static int otx2_check_pf_usable(struct otx2_nic *nic)
- 	}
- 	return 0;
- }
-+EXPORT_SYMBOL(otx2_check_pf_usable);
- 
--static int otx2_realloc_msix_vectors(struct otx2_nic *pf)
-+int otx2_realloc_msix_vectors(struct otx2_nic *pf)
- {
- 	struct otx2_hw *hw = &pf->hw;
- 	int num_vec, err;
-@@ -2859,6 +2872,7 @@ static int otx2_realloc_msix_vectors(struct otx2_nic *pf)
- 
- 	return otx2_register_mbox_intr(pf, false);
- }
-+EXPORT_SYMBOL(otx2_realloc_msix_vectors);
- 
- static int otx2_sriov_vfcfg_init(struct otx2_nic *pf)
- {
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index 3eb85949677a..fbd9fe98259f 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -131,6 +131,7 @@ static void otx2_xdp_snd_pkt_handler(struct otx2_nic *pfvf,
- }
- 
- static void otx2_snd_pkt_handler(struct otx2_nic *pfvf,
-+				 struct net_device *ndev,
- 				 struct otx2_cq_queue *cq,
- 				 struct otx2_snd_queue *sq,
- 				 struct nix_cqe_tx_s *cqe,
-@@ -145,7 +146,7 @@ static void otx2_snd_pkt_handler(struct otx2_nic *pfvf,
- 
- 	if (unlikely(snd_comp->status) && netif_msg_tx_err(pfvf))
- 		net_err_ratelimited("%s: TX%d: Error in send CQ status:%x\n",
--				    pfvf->netdev->name, cq->cint_idx,
-+				    ndev->name, cq->cint_idx,
- 				    snd_comp->status);
- 
- 	sg = &sq->sg[snd_comp->sqe_id];
-@@ -453,6 +454,7 @@ static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
- 	int tx_pkts = 0, tx_bytes = 0, qidx;
- 	struct otx2_snd_queue *sq;
- 	struct nix_cqe_tx_s *cqe;
-+	struct net_device *ndev;
- 	int processed_cqe = 0;
- 
- 	if (cq->pend_cqe >= budget)
-@@ -464,6 +466,7 @@ static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
- process_cqe:
- 	qidx = cq->cq_idx - pfvf->hw.rx_queues;
- 	sq = &pfvf->qset.sq[qidx];
-+	ndev = pfvf->netdev;
- 
- 	while (likely(processed_cqe < budget) && cq->pend_cqe) {
- 		cqe = (struct nix_cqe_tx_s *)otx2_get_next_cqe(cq);
-@@ -478,7 +481,8 @@ static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
- 		if (cq->cq_type == CQ_XDP)
- 			otx2_xdp_snd_pkt_handler(pfvf, sq, cqe);
- 		else
--			otx2_snd_pkt_handler(pfvf, cq, &pfvf->qset.sq[qidx],
-+			otx2_snd_pkt_handler(pfvf, ndev, cq,
-+					     &pfvf->qset.sq[qidx],
- 					     cqe, budget, &tx_pkts, &tx_bytes);
- 
- 		cqe->hdr.cqe_type = NIX_XQE_TYPE_INVALID;
-@@ -505,7 +509,7 @@ static int otx2_tx_napi_handler(struct otx2_nic *pfvf,
- 		/* Check if queue was stopped earlier due to ring full */
- 		smp_mb();
- 		if (netif_tx_queue_stopped(txq) &&
--		    netif_carrier_ok(pfvf->netdev))
-+		    netif_carrier_ok(ndev))
- 			netif_tx_wake_queue(txq);
- 	}
- 	return 0;
-@@ -594,6 +598,7 @@ int otx2_napi_handler(struct napi_struct *napi, int budget)
- 	}
- 	return workdone;
- }
-+EXPORT_SYMBOL(otx2_napi_handler);
- 
- void otx2_sqe_flush(void *dev, struct otx2_snd_queue *sq,
- 		    int size, int qidx)
-@@ -1141,13 +1146,13 @@ static void otx2_set_txtstamp(struct otx2_nic *pfvf, struct sk_buff *skb,
- 	}
- }
- 
--bool otx2_sq_append_skb(struct net_device *netdev, struct otx2_snd_queue *sq,
-+bool otx2_sq_append_skb(void *dev, struct netdev_queue *txq,
-+			struct otx2_snd_queue *sq,
- 			struct sk_buff *skb, u16 qidx)
- {
--	struct netdev_queue *txq = netdev_get_tx_queue(netdev, qidx);
--	struct otx2_nic *pfvf = netdev_priv(netdev);
- 	int offset, num_segs, free_desc;
- 	struct nix_sqe_hdr_s *sqe_hdr;
-+	struct otx2_nic *pfvf = dev;
- 
- 	/* Check if there is enough room between producer
- 	 * and consumer index.
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-index 3f1d2655ff77..e1db5f961877 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-@@ -167,7 +167,8 @@ static inline u64 otx2_iova_to_phys(void *iommu_domain, dma_addr_t dma_addr)
- }
- 
- int otx2_napi_handler(struct napi_struct *napi, int budget);
--bool otx2_sq_append_skb(struct net_device *netdev, struct otx2_snd_queue *sq,
-+bool otx2_sq_append_skb(void *dev, struct netdev_queue *txq,
-+			struct otx2_snd_queue *sq,
- 			struct sk_buff *skb, u16 qidx);
- void cn10k_sqe_flush(void *dev, struct otx2_snd_queue *sq,
- 		     int size, int qidx);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-index 79a8acac6283..0486fca8b573 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-@@ -395,7 +395,7 @@ static netdev_tx_t otx2vf_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	sq = &vf->qset.sq[qidx];
- 	txq = netdev_get_tx_queue(netdev, qidx);
- 
--	if (!otx2_sq_append_skb(netdev, sq, skb, qidx)) {
-+	if (!otx2_sq_append_skb(vf, txq, sq, skb, qidx)) {
- 		netif_tx_stop_queue(txq);
- 
- 		/* Check again, incase SQBs got freed up */
-@@ -500,7 +500,7 @@ static const struct net_device_ops otx2vf_netdev_ops = {
- 	.ndo_setup_tc = otx2_setup_tc,
- };
- 
--static int otx2_wq_init(struct otx2_nic *vf)
-+static int otx2_vf_wq_init(struct otx2_nic *vf)
- {
- 	vf->otx2_wq = create_singlethread_workqueue("otx2vf_wq");
- 	if (!vf->otx2_wq)
-@@ -689,7 +689,7 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto err_ptp_destroy;
- 	}
- 
--	err = otx2_wq_init(vf);
-+	err = otx2_vf_wq_init(vf);
- 	if (err)
- 		goto err_unreg_netdev;
- 
--- 
-2.25.1
+You would need to hold the lock over all these transactions. The i2c
+bus driver is too low for this, it would need to be done in the SFP
+layer. The firmware would also need to do the same, hold the lock over
+all the transactions, not just one.
 
+And i said 'maybe'. It could leave the page select byte on something
+other than page 0. Linux is driving the hardware... It might know it
+is going to use the same page sometime later. So the firmware will
+need to take the lock, read byte 127, change it to whatever it needs,
+do its read/writes, and then restore the page value at 127, and then
+release the lock..
+
+Also, you have to think about the quirks. Cut/paste from sfp.c:
+
+/* SFP_EEPROM_BLOCK_SIZE is the size of data chunk to read the EEPROM
+ * at a time. Some SFP modules and also some Linux I2C drivers do not like
+ * reads longer than 16 bytes.
+ */
+#define SFP_EEPROM_BLOCK_SIZE   16
+
+        /* Some SFP modules (e.g. Nokia 3FE46541AA) lock up if read from
+         * address 0x51 is just one byte at a time. Also SFF-8472 requires
+         * that EEPROM supports atomic 16bit read operation for diagnostic
+         * fields, so do not switch to one byte reading at a time unless it
+         * is really required and we have no other option.
+         */
+
+/* GPON modules based on Realtek RTL8672 and RTL9601C chips (e.g. V-SOL
+ * V2801F, CarlitoxxPro CPGOS03-0490, Ubiquiti U-Fiber Instant, ...) do
+ * not support multibyte reads from the EEPROM. Each multi-byte read
+ * operation returns just one byte of EEPROM followed by zeros. There is
+ * no way to identify which modules are using Realtek RTL8672 and RTL9601C
+ * chips. Moreover every OEM of V-SOL V2801F module puts its own vendor
+ * name and vendor id into EEPROM, so there is even no way to detect if
+ * module is V-SOL V2801F. Therefore check for those zeros in the read
+ * data and then based on check switch to reading EEPROM to one byte
+ * at a time.
+ */
+
+How easy it is to update your firmware each time we add a quirk? There
+is no point Linux working around all the broken SFPs if your firmware
+then breaks it by not doing word reads when it should, reading 128
+bytes not 16, not falling back to byte reads and disabling your
+equivalent of HWMON for the sensors.
+
+	Andrew
 
