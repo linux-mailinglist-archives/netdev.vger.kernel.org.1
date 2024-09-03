@@ -1,87 +1,92 @@
-Return-Path: <netdev+bounces-124630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 937AE96A42C
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:23:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 103F496A43E
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FA22282ADC
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:23:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2BA9282358
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:27:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BAD18B48B;
-	Tue,  3 Sep 2024 16:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A591E18BB98;
+	Tue,  3 Sep 2024 16:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mUOTpf/3"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB602186E46;
-	Tue,  3 Sep 2024 16:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DCE618858F;
+	Tue,  3 Sep 2024 16:27:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725380614; cv=none; b=RT4M2EkIsfGTabExQykqRLgD8lYpynjy9yrYM9J3g6csxfmf4pTcBme8exMQaPjrznQPYR3cu+Avje+LRNhlYFgU8rswgG4+CjOg35rwZRUhPN28ylshbwfOnDfS29jcLl6ImMFwV4fcOlsVh+eIM4Yq7r/4WzUn9VUylKegkt4=
+	t=1725380826; cv=none; b=nwkJBhEQYa3g7zLSZ2tkQ4xOSTMiAdLwdEvdbcpANnnJhHIX9JkDZifUAYoQtRKzatZMYOEAe73L8tlphBAMqQR5ajYZ6RVFY9h602KZBPXUL1WU5NlLw/lKgVEfnwSfUXIbgsCTC9yhQrtp3Jul1NlwaPqK2c+jiAXQCiyoDHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725380614; c=relaxed/simple;
-	bh=Jj2KFdSWfJ6ancHgzp2FNPCwzSow8QxGTPkncQGn5YI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E/rWIVCVLjx+sshrxEFgdpib6FTKnu8XYNY2rKxbmEeTtsS5VoAKc2OMcJuZeX0wXN/fwI3q8o5wVJ1Uuc5yqdx4myTNbrp0AbiWOGbXyR0cIvaIYqAy9chUWGsDOYGjdhOKENwM4m04Y0dNR9CFv3G2lJ88KemPEXdUppH1yD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=49490 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1slWJS-00AjDi-Ea; Tue, 03 Sep 2024 18:23:28 +0200
-Date: Tue, 3 Sep 2024 18:23:25 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH v2 0/2] netfilter: nf_tables: Fix percpu address space
- issues in nf_tables_api.c
-Message-ID: <Ztc3_dZwFoR7s2c3@calendula>
-References: <20240829154739.16691-1-ubizjak@gmail.com>
- <Ztc16pw4r3Tf_U7h@calendula>
- <CAFULd4amgCH=h02SSEdxrdazq0A+5wOZgvPmRmn19eb7orSV_g@mail.gmail.com>
+	s=arc-20240116; t=1725380826; c=relaxed/simple;
+	bh=wpuyx68o8/flxPcNBVnFYnKbkR/kuE5X70J8QW218xk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HjrJrLjaAYhFX1NumnO8wQiuBxXRzMngFTE8mRGamiZw7DvLPzwv7o1ZfHvK84hAixmgImDjX8BS4DplgO8G6dmy0R10db2zYhK4HC1ztcFTdWTd5k6idqGUWssiObv4ucseHRSRWR+pU6DL9D/f+laTW0p6Bzrpek6zVScB8pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mUOTpf/3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F05A3C4CEC4;
+	Tue,  3 Sep 2024 16:27:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725380826;
+	bh=wpuyx68o8/flxPcNBVnFYnKbkR/kuE5X70J8QW218xk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=mUOTpf/3ulUCvmcq2vpx0ava3eGAtI0USsqQgJlCiwa3lrWDImGq0yxXxee43ffb+
+	 JOlJfc6Inp3acTAziD0ikgNQla4dpMm+5Bt600LDlC9wMfMa6/JNI9xyBr/g6hqd4S
+	 5lvSP6OqbpDT1RLJr7eU0EOXMJhGKB/2WDaeQA+6mUQYX7OIJXDZf2j6P+BkW6p4fB
+	 zSMOhVkeovfJA8GK5Y2bUg2dR+uUFIlmasnJ5ZCSJJBuOuStjU9ira8Rjkghrh+8FD
+	 2QtqGffV6t3kXdOLiXlHiFb6gkHu5PkJXUFJhbVaQfxROdW06X7uWIUQeoVHjGmKCn
+	 nmL1Xx1JC6yHg==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next 0/2] octeontx2: Address some Sparse warnings
+Date: Tue, 03 Sep 2024 17:26:52 +0100
+Message-Id: <20240903-octeontx2-sparse-v1-0-f190309ecb0a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAFULd4amgCH=h02SSEdxrdazq0A+5wOZgvPmRmn19eb7orSV_g@mail.gmail.com>
-X-Spam-Score: -1.8 (-)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAMw412YC/x3MQQqDMBBG4avIrDsQo63oVUoXRv/W2UwkE0pAv
+ LvB5bd47yBDEhhNzUEJfzGJWtE+Glq2WX9gWavJO9+70XUcl4youXi2fU4GfrVrwDAOzxAC1Wx
+ P+Eq5l29SZFaUTJ/zvADLUidabAAAAA==
+To: Sunil Goutham <sgoutham@marvell.com>, 
+ Linu Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, 
+ Jerin Jacob <jerinj@marvell.com>, Hariprasad Kelam <hkelam@marvell.com>, 
+ Subbaraya Sundeep <sbhatta@marvell.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ netdev@vger.kernel.org, llvm@lists.linux.dev
+X-Mailer: b4 0.14.0
 
-On Tue, Sep 03, 2024 at 06:19:57PM +0200, Uros Bizjak wrote:
-> On Tue, Sep 3, 2024 at 6:14 PM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
-> >
-> > Hi,
-> >
-> > On Thu, Aug 29, 2024 at 05:29:30PM +0200, Uros Bizjak wrote:
-> > > Use {ERR_PTR,IS_ERR,PTR_ERR}_PCPU() macros when crossing between generic
-> > > and percpu address spaces and add __percpu annotation to *stats pointer
-> > > to fix percpu address space issues.
-> >
-> > IIRC, you submitted patch 1/2 in this series to the mm tree.
-> 
-> Yes, patch 1/2 is in this series just for convenience.
-> 
-> > Let us know if this patch gets upstreamed via MM tree (if mm
-> > maintainers are fine with it) or maybe MM maintainers prefer an
-> > alternative path for this.
-> 
-> The patch is accepted into the MM tree [1].
-> 
-> [1] https://lore.kernel.org/mm-commits/20240820052852.CB380C4AF0B@smtp.kernel.org/
+Hi,
 
-Thanks, I will wait for it to propagate to the netdev tree.
+This patchset addresses some Sparse warnings that are flagged in files
+touched by recent patch submissions.
+
+Although these changes do not alter the functionality of the code, by
+addressing them real problems introduced in future which are flagged by
+Sparse will stand out more readily.
+
+Compile tested only.
+
+---
+Simon Horman (2):
+      octeontx2-af: Pass string literal as format argument of alloc_workqueue()
+      octeontx2-pf: Make iplen __be16 in otx2_sqe_add_ext()
+
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c        | 4 ++--
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+base-commit: 54f1a107bd034e8d9052f5642280876090ebe31c
+
 
