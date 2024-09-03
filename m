@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-124362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B51D99691BE
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 05:20:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF2DC9691BF
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 05:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D43ED1F2396D
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 03:20:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92064284308
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 03:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0030F1CE715;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1B991CEAA1;
 	Tue,  3 Sep 2024 03:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NUK/aRSj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKIK31zS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD36C1CE6F1
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 03:19:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD351CE719
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 03:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725333598; cv=none; b=U/iq/cGcNIAKbQeVL6fPFUKuyOBRkG3SH/M+Gshj3+4aUeHVJawqtRM1atSjNUVbCkoUOOqpTKKLQUCSF70Lwe5cZ09M1E8omxZWwb+mVjOFeBpBwZBsk+03y9r5NSmcv6LScq5UnkECkhBuz6CXphEGwCTBSk9ULYaPv3FM8YA=
+	t=1725333599; cv=none; b=XxLLLi/4BEYN74DmpMpyt5JurJMCx86yp9bRkuJ/9vUTFxuBIMfdOBui2ltp+YNtI2mC5od5+u661vPn04k7KrNEogumXgUFJpB+e5KTX8H4/1y8YnyC2hvdUP9v5Xs7kGjZk5o+DFEeZXjRFWy5KazMzKhS+Ob8pErbfqJNnLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725333598; c=relaxed/simple;
-	bh=8yoxph9H5Ndu6O0HtKm8iZlpogELcPEQ/SudKedLv+Y=;
+	s=arc-20240116; t=1725333599; c=relaxed/simple;
+	bh=y7Jt4bcG6V09vWWvQ3m3OtBY8ANPfScCkHi+ZtuiS5Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ljYYiJFLvLRwqHmtQhEWd13nZrPzFDV9MtZXl4khjfslcb9PojpUX7iRlKT7i700i74V0G7RkNx2fxltl+9cyw7uQ8QEgjTNstnzFKEiPuY2V+xTiY5FmS3/X2g79J90fgcsL7vrtarjhz3EnXeL41dVM/TAxuQivqNaufR/mFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NUK/aRSj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47F52C4CEC2;
-	Tue,  3 Sep 2024 03:19:58 +0000 (UTC)
+	 MIME-Version; b=DirGpC8yeXsqOtVW//pYUtprNJ/KhLclgRXVerl0K4Mrek6adl6OHw6KUCGgeQGTTlLLAs7SNLyeT6HJ+cEz3MQKZGnN90cq6aQhZiaAKItJVkSent2G90BwB6qeiYMhXkBy6mjjobcg3iHULP0jk6KNaBqpxAmjWewA+XZDEWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKIK31zS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 596A4C4CEC2;
+	Tue,  3 Sep 2024 03:19:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725333598;
-	bh=8yoxph9H5Ndu6O0HtKm8iZlpogELcPEQ/SudKedLv+Y=;
+	s=k20201202; t=1725333599;
+	bh=y7Jt4bcG6V09vWWvQ3m3OtBY8ANPfScCkHi+ZtuiS5Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NUK/aRSj3GAPefQOs+uxeRCfxLLgMcn0WTjKSovCNzeeuSfSCMNlw9e3khQ2TVGIi
-	 dr9wFXHlXsCod0vOir4ObyyUdb6XOKcRBIn3SaljWONgzvIgR5MJOUL/9kSwzxsvg5
-	 lVCU5aQ/f3iw+RjrCOkQO85WrvtDs2gh+NmKJN9QvPZ+IomJAOU3MGObtZLCi8kvKB
-	 ZV4ZvLBw2co+LiQTrrdSiSmRkmamcfBSZ5AoPOrWZg58BHWxO7jmJkndpdVlMeHoSh
-	 m61/1GKnkeUdM7s0S67iDnAQwcp4H93t+rQbimRMuC2Vepm88AJEmYI7V8cUOWvrf7
-	 Lixc73LKwV+lg==
+	b=FKIK31zStss9GL0YSlGUChbH5Ng7D6HfYr4WxZwIN/zZsMGtkkDBHeRS/caEw08zH
+	 pIKn2SxngYtux5uH2IrIl4dIA808KiZ9sTDv9inkbdpnsA1LqEERoyHJbywL0Qmjtn
+	 W17DgIsfcjpbkGvXGT5V5y5DQltSMCeUD4kua/pjpEjyUlbLZsrvDZMonNCTXk+L+A
+	 BmqE9WcCC+nqxZVSfVFzO8dvG54yQ+yFuQwm+E6daWTDD7AxThXex3OvTNyDq7I7k7
+	 cCn84lld7aLiah4Yx87y3S5+nTl3QsgEnLOqtUq4ZtaRVS9hqiPZKS3QCH4VCJxrI3
+	 AwrZ2WIaqRkoA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,11 +52,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Itamar Gozlan <igozlan@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>
-Subject: [net-next 07/15] net/mlx5: HWS, added matchers functionality
-Date: Mon,  2 Sep 2024 20:19:38 -0700
-Message-ID: <20240903031948.78006-8-saeed@kernel.org>
+	Hamdan Agbariya <hamdani@nvidia.com>
+Subject: [net-next 08/15] net/mlx5: HWS, added FW commands handling
+Date: Mon,  2 Sep 2024 20:19:39 -0700
+Message-ID: <20240903031948.78006-9-saeed@kernel.org>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240903031948.78006-1-saeed@kernel.org>
 References: <20240903031948.78006-1-saeed@kernel.org>
@@ -70,1362 +69,1708 @@ Content-Transfer-Encoding: 8bit
 
 From: Yevgeny Kliteynik <kliteyn@nvidia.com>
 
-Matcher object encompasses all the building blocks that are
-needed in order to perform flow steering of a given flow:
- - flow table that serves as entering point of this matcher
- - Rule Table Context (RTC) objects to hold ll the Steering
-   Table Entries (STEs), both for matching the flow and for
-   performing actions
- - rules that describe the set of matching parameters for a
-   flow and actions to perform in case of a hit.
-This patch adds implementation of matchers handling in HWS.
+This patch adds implementation of FW object handling, such
+as creation/destruction, modification, and querying.
 
-Reviewed-by: Itamar Gozlan <igozlan@nvidia.com>
+Reviewed-by: Hamdan Agbariya <hamdani@nvidia.com>
 Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
-Reviewed-by: Mark Bloch <mbloch@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mlx5/core/steering/hws/mlx5hws_matcher.c  | 1216 +++++++++++++++++
- .../mlx5/core/steering/hws/mlx5hws_matcher.h  |  107 ++
- 2 files changed, 1323 insertions(+)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.h
+ .../mlx5/core/steering/hws/mlx5hws_cmd.c      | 1316 +++++++++++++++++
+ .../mlx5/core/steering/hws/mlx5hws_cmd.h      |  361 +++++
+ 2 files changed, 1677 insertions(+)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_cmd.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_cmd.h
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_cmd.c
 new file mode 100644
-index 000000000000..8ea2e96cdebb
+index 000000000000..61f06ba71756
 --- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c
-@@ -0,0 +1,1216 @@
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_cmd.c
+@@ -0,0 +1,1316 @@
 +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
 +/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
 +
 +#include "mlx5hws_internal.h"
 +
-+enum mlx5hws_matcher_rtc_type {
-+	HWS_MATCHER_RTC_TYPE_MATCH,
-+	HWS_MATCHER_RTC_TYPE_STE_ARRAY,
-+	HWS_MATCHER_RTC_TYPE_MAX,
++static u32 hws_cmd_get_syndrome(u32 *out)
++{
++	/* Assumption: syndrome is always the second u32 */
++	return ntohl(out[1]);
++}
++
++static enum mlx5_ifc_flow_destination_type
++hws_cmd_dest_type_to_ifc_dest_type(enum mlx5_flow_destination_type type)
++{
++	switch (type) {
++	case MLX5_FLOW_DESTINATION_TYPE_VPORT:
++		return MLX5_IFC_FLOW_DESTINATION_TYPE_VPORT;
++	case MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE:
++		return MLX5_IFC_FLOW_DESTINATION_TYPE_FLOW_TABLE;
++	case MLX5_FLOW_DESTINATION_TYPE_TIR:
++		return MLX5_IFC_FLOW_DESTINATION_TYPE_TIR;
++	case MLX5_FLOW_DESTINATION_TYPE_FLOW_SAMPLER:
++		return MLX5_IFC_FLOW_DESTINATION_TYPE_FLOW_SAMPLER;
++	case MLX5_FLOW_DESTINATION_TYPE_UPLINK:
++		return MLX5_IFC_FLOW_DESTINATION_TYPE_UPLINK;
++	case MLX5_FLOW_DESTINATION_TYPE_TABLE_TYPE:
++		return MLX5_IFC_FLOW_DESTINATION_TYPE_TABLE_TYPE;
++	case MLX5_FLOW_DESTINATION_TYPE_NONE:
++	case MLX5_FLOW_DESTINATION_TYPE_PORT:
++	case MLX5_FLOW_DESTINATION_TYPE_COUNTER:
++	case MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE_NUM:
++	case MLX5_FLOW_DESTINATION_TYPE_RANGE:
++	default:
++		pr_warn("HWS: unknown flow dest type %d\n", type);
++		return 0;
++	}
 +};
 +
-+static const char * const mlx5hws_matcher_rtc_type_str[] = {
-+	[HWS_MATCHER_RTC_TYPE_MATCH] = "MATCH",
-+	[HWS_MATCHER_RTC_TYPE_STE_ARRAY] = "STE_ARRAY",
-+	[HWS_MATCHER_RTC_TYPE_MAX] = "UNKNOWN",
-+};
-+
-+static const char *hws_matcher_rtc_type_to_str(enum mlx5hws_matcher_rtc_type rtc_type)
++static int hws_cmd_general_obj_destroy(struct mlx5_core_dev *mdev,
++				       u32 object_type,
++				       u32 object_id)
 +{
-+	if (rtc_type > HWS_MATCHER_RTC_TYPE_MAX)
-+		rtc_type = HWS_MATCHER_RTC_TYPE_MAX;
-+	return mlx5hws_matcher_rtc_type_str[rtc_type];
++	u32 in[MLX5_ST_SZ_DW(general_obj_in_cmd_hdr)] = {};
++	u32 out[MLX5_ST_SZ_DW(general_obj_out_cmd_hdr)];
++
++	MLX5_SET(general_obj_in_cmd_hdr, in, opcode, MLX5_CMD_OP_DESTROY_GENERAL_OBJECT);
++	MLX5_SET(general_obj_in_cmd_hdr, in, obj_type, object_type);
++	MLX5_SET(general_obj_in_cmd_hdr, in, obj_id, object_id);
++
++	return mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
 +}
 +
-+static bool hws_matcher_requires_col_tbl(u8 log_num_of_rules)
++int mlx5hws_cmd_flow_table_create(struct mlx5_core_dev *mdev,
++				  struct mlx5hws_cmd_ft_create_attr *ft_attr,
++				  u32 *table_id)
 +{
-+	/* Collision table concatenation is done only for large rule tables */
-+	return log_num_of_rules > MLX5HWS_MATCHER_ASSURED_RULES_TH;
-+}
-+
-+static u8 hws_matcher_rules_to_tbl_depth(u8 log_num_of_rules)
-+{
-+	if (hws_matcher_requires_col_tbl(log_num_of_rules))
-+		return MLX5HWS_MATCHER_ASSURED_MAIN_TBL_DEPTH;
-+
-+	/* For small rule tables we use a single deep table to assure insertion */
-+	return min(log_num_of_rules, MLX5HWS_MATCHER_ASSURED_COL_TBL_DEPTH);
-+}
-+
-+static void hws_matcher_destroy_end_ft(struct mlx5hws_matcher *matcher)
-+{
-+	mlx5hws_table_destroy_default_ft(matcher->tbl, matcher->end_ft_id);
-+}
-+
-+static int hws_matcher_create_end_ft(struct mlx5hws_matcher *matcher)
-+{
-+	struct mlx5hws_table *tbl = matcher->tbl;
++	u32 out[MLX5_ST_SZ_DW(create_flow_table_out)] = {0};
++	u32 in[MLX5_ST_SZ_DW(create_flow_table_in)] = {0};
++	void *ft_ctx;
 +	int ret;
 +
-+	ret = mlx5hws_table_create_default_ft(tbl->ctx->mdev, tbl, &matcher->end_ft_id);
-+	if (ret) {
-+		mlx5hws_err(tbl->ctx, "Failed to create matcher end flow table\n");
-+		return ret;
-+	}
-+	return 0;
-+}
-+
-+static int hws_matcher_connect(struct mlx5hws_matcher *matcher)
-+{
-+	struct mlx5hws_table *tbl = matcher->tbl;
-+	struct mlx5hws_context *ctx = tbl->ctx;
-+	struct mlx5hws_matcher *prev = NULL;
-+	struct mlx5hws_matcher *next = NULL;
-+	struct mlx5hws_matcher *tmp_matcher;
-+	int ret;
-+
-+	/* Find location in matcher list */
-+	if (list_empty(&tbl->matchers_list)) {
-+		list_add(&matcher->list_node, &tbl->matchers_list);
-+		goto connect;
-+	}
-+
-+	list_for_each_entry(tmp_matcher, &tbl->matchers_list, list_node) {
-+		if (tmp_matcher->attr.priority > matcher->attr.priority) {
-+			next = tmp_matcher;
-+			break;
-+		}
-+		prev = tmp_matcher;
-+	}
-+
-+	if (next)
-+		/* insert before next */
-+		list_add_tail(&matcher->list_node, &next->list_node);
-+	else
-+		/* insert after prev */
-+		list_add(&matcher->list_node, &prev->list_node);
-+
-+connect:
-+	if (next) {
-+		/* Connect to next RTC */
-+		ret = mlx5hws_table_ft_set_next_rtc(ctx,
-+						    matcher->end_ft_id,
-+						    tbl->fw_ft_type,
-+						    next->match_ste.rtc_0_id,
-+						    next->match_ste.rtc_1_id);
-+		if (ret) {
-+			mlx5hws_err(ctx, "Failed to connect new matcher to next RTC\n");
-+			goto remove_from_list;
-+		}
-+	} else {
-+		/* Connect last matcher to next miss_tbl if exists */
-+		ret = mlx5hws_table_connect_to_miss_table(tbl, tbl->default_miss.miss_tbl);
-+		if (ret) {
-+			mlx5hws_err(ctx, "Failed connect new matcher to miss_tbl\n");
-+			goto remove_from_list;
-+		}
-+	}
-+
-+	/* Connect to previous FT */
-+	ret = mlx5hws_table_ft_set_next_rtc(ctx,
-+					    prev ? prev->end_ft_id : tbl->ft_id,
-+					    tbl->fw_ft_type,
-+					    matcher->match_ste.rtc_0_id,
-+					    matcher->match_ste.rtc_1_id);
-+	if (ret) {
-+		mlx5hws_err(ctx, "Failed to connect new matcher to previous FT\n");
-+		goto remove_from_list;
-+	}
-+
-+	/* Reset prev matcher FT default miss (drop refcount) */
-+	ret = mlx5hws_table_ft_set_default_next_ft(tbl, prev ? prev->end_ft_id : tbl->ft_id);
-+	if (ret) {
-+		mlx5hws_err(ctx, "Failed to reset matcher ft default miss\n");
-+		goto remove_from_list;
-+	}
-+
-+	if (!prev) {
-+		/* Update tables missing to current matcher in the table */
-+		ret = mlx5hws_table_update_connected_miss_tables(tbl);
-+		if (ret) {
-+			mlx5hws_err(ctx, "Fatal error, failed to update connected miss table\n");
-+			goto remove_from_list;
-+		}
-+	}
-+
-+	return 0;
-+
-+remove_from_list:
-+	list_del_init(&matcher->list_node);
-+	return ret;
-+}
-+
-+static int hws_matcher_disconnect(struct mlx5hws_matcher *matcher)
-+{
-+	struct mlx5hws_matcher *next = NULL, *prev = NULL;
-+	struct mlx5hws_table *tbl = matcher->tbl;
-+	u32 prev_ft_id = tbl->ft_id;
-+	int ret;
-+
-+	if (!list_is_first(&matcher->list_node, &tbl->matchers_list)) {
-+		prev = list_prev_entry(matcher, list_node);
-+		prev_ft_id = prev->end_ft_id;
-+	}
-+
-+	if (!list_is_last(&matcher->list_node, &tbl->matchers_list))
-+		next = list_next_entry(matcher, list_node);
-+
-+	list_del_init(&matcher->list_node);
-+
-+	if (next) {
-+		/* Connect previous end FT to next RTC */
-+		ret = mlx5hws_table_ft_set_next_rtc(tbl->ctx,
-+						    prev_ft_id,
-+						    tbl->fw_ft_type,
-+						    next->match_ste.rtc_0_id,
-+						    next->match_ste.rtc_1_id);
-+		if (ret) {
-+			mlx5hws_err(tbl->ctx, "Failed to disconnect matcher\n");
-+			goto matcher_reconnect;
-+		}
-+	} else {
-+		ret = mlx5hws_table_connect_to_miss_table(tbl, tbl->default_miss.miss_tbl);
-+		if (ret) {
-+			mlx5hws_err(tbl->ctx, "Failed to disconnect last matcher\n");
-+			goto matcher_reconnect;
-+		}
-+	}
-+
-+	/* Removing first matcher, update connected miss tables if exists */
-+	if (prev_ft_id == tbl->ft_id) {
-+		ret = mlx5hws_table_update_connected_miss_tables(tbl);
-+		if (ret) {
-+			mlx5hws_err(tbl->ctx, "Fatal error, failed to update connected miss table\n");
-+			goto matcher_reconnect;
-+		}
-+	}
-+
-+	ret = mlx5hws_table_ft_set_default_next_ft(tbl, prev_ft_id);
-+	if (ret) {
-+		mlx5hws_err(tbl->ctx, "Fatal error, failed to restore matcher ft default miss\n");
-+		goto matcher_reconnect;
-+	}
-+
-+	return 0;
-+
-+matcher_reconnect:
-+	if (list_empty(&tbl->matchers_list) || !prev)
-+		list_add(&matcher->list_node, &tbl->matchers_list);
-+	else
-+		/* insert after prev matcher */
-+		list_add(&matcher->list_node, &prev->list_node);
-+
-+	return ret;
-+}
-+
-+static void hws_matcher_set_rtc_attr_sz(struct mlx5hws_matcher *matcher,
-+					struct mlx5hws_cmd_rtc_create_attr *rtc_attr,
-+					enum mlx5hws_matcher_rtc_type rtc_type,
-+					bool is_mirror)
-+{
-+	struct mlx5hws_pool_chunk *ste = &matcher->action_ste[MLX5HWS_ACTION_STE_IDX_ANY].ste;
-+	enum mlx5hws_matcher_flow_src flow_src = matcher->attr.optimize_flow_src;
-+	bool is_match_rtc = rtc_type == HWS_MATCHER_RTC_TYPE_MATCH;
-+
-+	if ((flow_src == MLX5HWS_MATCHER_FLOW_SRC_VPORT && !is_mirror) ||
-+	    (flow_src == MLX5HWS_MATCHER_FLOW_SRC_WIRE && is_mirror)) {
-+		/* Optimize FDB RTC */
-+		rtc_attr->log_size = 0;
-+		rtc_attr->log_depth = 0;
-+	} else {
-+		/* Keep original values */
-+		rtc_attr->log_size = is_match_rtc ? matcher->attr.table.sz_row_log : ste->order;
-+		rtc_attr->log_depth = is_match_rtc ? matcher->attr.table.sz_col_log : 0;
-+	}
-+}
-+
-+static int hws_matcher_create_rtc(struct mlx5hws_matcher *matcher,
-+				  enum mlx5hws_matcher_rtc_type rtc_type,
-+				  u8 action_ste_selector)
-+{
-+	struct mlx5hws_matcher_attr *attr = &matcher->attr;
-+	struct mlx5hws_cmd_rtc_create_attr rtc_attr = {0};
-+	struct mlx5hws_match_template *mt = matcher->mt;
-+	struct mlx5hws_context *ctx = matcher->tbl->ctx;
-+	struct mlx5hws_action_default_stc *default_stc;
-+	struct mlx5hws_matcher_action_ste *action_ste;
-+	struct mlx5hws_table *tbl = matcher->tbl;
-+	struct mlx5hws_pool *ste_pool, *stc_pool;
-+	struct mlx5hws_pool_chunk *ste;
-+	u32 *rtc_0_id, *rtc_1_id;
-+	u32 obj_id;
-+	int ret;
-+
-+	switch (rtc_type) {
-+	case HWS_MATCHER_RTC_TYPE_MATCH:
-+		rtc_0_id = &matcher->match_ste.rtc_0_id;
-+		rtc_1_id = &matcher->match_ste.rtc_1_id;
-+		ste_pool = matcher->match_ste.pool;
-+		ste = &matcher->match_ste.ste;
-+		ste->order = attr->table.sz_col_log + attr->table.sz_row_log;
-+
-+		rtc_attr.log_size = attr->table.sz_row_log;
-+		rtc_attr.log_depth = attr->table.sz_col_log;
-+		rtc_attr.is_frst_jumbo = mlx5hws_matcher_mt_is_jumbo(mt);
-+		rtc_attr.is_scnd_range = 0;
-+		rtc_attr.miss_ft_id = matcher->end_ft_id;
-+
-+		if (attr->insert_mode == MLX5HWS_MATCHER_INSERT_BY_HASH) {
-+			/* The usual Hash Table */
-+			rtc_attr.update_index_mode = MLX5_IFC_RTC_STE_UPDATE_MODE_BY_HASH;
-+
-+			/* The first mt is used since all share the same definer */
-+			rtc_attr.match_definer_0 = mlx5hws_definer_get_id(mt->definer);
-+		} else if (attr->insert_mode == MLX5HWS_MATCHER_INSERT_BY_INDEX) {
-+			rtc_attr.update_index_mode = MLX5_IFC_RTC_STE_UPDATE_MODE_BY_OFFSET;
-+			rtc_attr.num_hash_definer = 1;
-+
-+			if (attr->distribute_mode == MLX5HWS_MATCHER_DISTRIBUTE_BY_HASH) {
-+				/* Hash Split Table */
-+				rtc_attr.access_index_mode = MLX5_IFC_RTC_STE_ACCESS_MODE_BY_HASH;
-+				rtc_attr.match_definer_0 = mlx5hws_definer_get_id(mt->definer);
-+			} else if (attr->distribute_mode == MLX5HWS_MATCHER_DISTRIBUTE_BY_LINEAR) {
-+				/* Linear Lookup Table */
-+				rtc_attr.access_index_mode = MLX5_IFC_RTC_STE_ACCESS_MODE_LINEAR;
-+				rtc_attr.match_definer_0 = ctx->caps->linear_match_definer;
-+			}
-+		}
-+
-+		/* Match pool requires implicit allocation */
-+		ret = mlx5hws_pool_chunk_alloc(ste_pool, ste);
-+		if (ret) {
-+			mlx5hws_err(ctx, "Failed to allocate STE for %s RTC",
-+				    hws_matcher_rtc_type_to_str(rtc_type));
-+			return ret;
-+		}
-+		break;
-+
-+	case HWS_MATCHER_RTC_TYPE_STE_ARRAY:
-+		action_ste = &matcher->action_ste[action_ste_selector];
-+
-+		rtc_0_id = &action_ste->rtc_0_id;
-+		rtc_1_id = &action_ste->rtc_1_id;
-+		ste_pool = action_ste->pool;
-+		ste = &action_ste->ste;
-+		ste->order = ilog2(roundup_pow_of_two(action_ste->max_stes)) +
-+			     attr->table.sz_row_log;
-+		rtc_attr.log_size = ste->order;
-+		rtc_attr.log_depth = 0;
-+		rtc_attr.update_index_mode = MLX5_IFC_RTC_STE_UPDATE_MODE_BY_OFFSET;
-+		/* The action STEs use the default always hit definer */
-+		rtc_attr.match_definer_0 = ctx->caps->trivial_match_definer;
-+		rtc_attr.is_frst_jumbo = false;
-+		rtc_attr.miss_ft_id = 0;
-+		break;
-+
-+	default:
-+		mlx5hws_err(ctx, "HWS Invalid RTC type\n");
-+		return -EINVAL;
-+	}
-+
-+	obj_id = mlx5hws_pool_chunk_get_base_id(ste_pool, ste);
-+
-+	rtc_attr.pd = ctx->pd_num;
-+	rtc_attr.ste_base = obj_id;
-+	rtc_attr.ste_offset = ste->offset;
-+	rtc_attr.reparse_mode = mlx5hws_context_get_reparse_mode(ctx);
-+	rtc_attr.table_type = mlx5hws_table_get_res_fw_ft_type(tbl->type, false);
-+	hws_matcher_set_rtc_attr_sz(matcher, &rtc_attr, rtc_type, false);
-+
-+	/* STC is a single resource (obj_id), use any STC for the ID */
-+	stc_pool = ctx->stc_pool[tbl->type];
-+	default_stc = ctx->common_res[tbl->type].default_stc;
-+	obj_id = mlx5hws_pool_chunk_get_base_id(stc_pool, &default_stc->default_hit);
-+	rtc_attr.stc_base = obj_id;
-+
-+	ret = mlx5hws_cmd_rtc_create(ctx->mdev, &rtc_attr, rtc_0_id);
-+	if (ret) {
-+		mlx5hws_err(ctx, "Failed to create matcher RTC of type %s",
-+			    hws_matcher_rtc_type_to_str(rtc_type));
-+		goto free_ste;
-+	}
-+
-+	if (tbl->type == MLX5HWS_TABLE_TYPE_FDB) {
-+		obj_id = mlx5hws_pool_chunk_get_base_mirror_id(ste_pool, ste);
-+		rtc_attr.ste_base = obj_id;
-+		rtc_attr.table_type = mlx5hws_table_get_res_fw_ft_type(tbl->type, true);
-+
-+		obj_id = mlx5hws_pool_chunk_get_base_mirror_id(stc_pool, &default_stc->default_hit);
-+		rtc_attr.stc_base = obj_id;
-+		hws_matcher_set_rtc_attr_sz(matcher, &rtc_attr, rtc_type, true);
-+
-+		ret = mlx5hws_cmd_rtc_create(ctx->mdev, &rtc_attr, rtc_1_id);
-+		if (ret) {
-+			mlx5hws_err(ctx, "Failed to create peer matcher RTC of type %s",
-+				    hws_matcher_rtc_type_to_str(rtc_type));
-+			goto destroy_rtc_0;
-+		}
-+	}
-+
-+	return 0;
-+
-+destroy_rtc_0:
-+	mlx5hws_cmd_rtc_destroy(ctx->mdev, *rtc_0_id);
-+free_ste:
-+	if (rtc_type == HWS_MATCHER_RTC_TYPE_MATCH)
-+		mlx5hws_pool_chunk_free(ste_pool, ste);
-+	return ret;
-+}
-+
-+static void hws_matcher_destroy_rtc(struct mlx5hws_matcher *matcher,
-+				    enum mlx5hws_matcher_rtc_type rtc_type,
-+				    u8 action_ste_selector)
-+{
-+	struct mlx5hws_matcher_action_ste *action_ste;
-+	struct mlx5hws_table *tbl = matcher->tbl;
-+	struct mlx5hws_pool_chunk *ste;
-+	struct mlx5hws_pool *ste_pool;
-+	u32 rtc_0_id, rtc_1_id;
-+
-+	switch (rtc_type) {
-+	case HWS_MATCHER_RTC_TYPE_MATCH:
-+		rtc_0_id = matcher->match_ste.rtc_0_id;
-+		rtc_1_id = matcher->match_ste.rtc_1_id;
-+		ste_pool = matcher->match_ste.pool;
-+		ste = &matcher->match_ste.ste;
-+		break;
-+	case HWS_MATCHER_RTC_TYPE_STE_ARRAY:
-+		action_ste = &matcher->action_ste[action_ste_selector];
-+		rtc_0_id = action_ste->rtc_0_id;
-+		rtc_1_id = action_ste->rtc_1_id;
-+		ste_pool = action_ste->pool;
-+		ste = &action_ste->ste;
-+		break;
-+	default:
-+		return;
-+	}
-+
-+	if (tbl->type == MLX5HWS_TABLE_TYPE_FDB)
-+		mlx5hws_cmd_rtc_destroy(matcher->tbl->ctx->mdev, rtc_1_id);
-+
-+	mlx5hws_cmd_rtc_destroy(matcher->tbl->ctx->mdev, rtc_0_id);
-+	if (rtc_type == HWS_MATCHER_RTC_TYPE_MATCH)
-+		mlx5hws_pool_chunk_free(ste_pool, ste);
-+}
-+
-+static int
-+hws_matcher_check_attr_sz(struct mlx5hws_cmd_query_caps *caps,
-+			  struct mlx5hws_matcher *matcher)
-+{
-+	struct mlx5hws_matcher_attr *attr = &matcher->attr;
-+
-+	if (attr->table.sz_col_log > caps->rtc_log_depth_max) {
-+		mlx5hws_err(matcher->tbl->ctx, "Matcher depth exceeds limit %d\n",
-+			    caps->rtc_log_depth_max);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (attr->table.sz_col_log + attr->table.sz_row_log > caps->ste_alloc_log_max) {
-+		mlx5hws_err(matcher->tbl->ctx, "Total matcher size exceeds limit %d\n",
-+			    caps->ste_alloc_log_max);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	if (attr->table.sz_col_log + attr->table.sz_row_log < caps->ste_alloc_log_gran) {
-+		mlx5hws_err(matcher->tbl->ctx, "Total matcher size below limit %d\n",
-+			    caps->ste_alloc_log_gran);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
-+static void hws_matcher_set_pool_attr(struct mlx5hws_pool_attr *attr,
-+				      struct mlx5hws_matcher *matcher)
-+{
-+	switch (matcher->attr.optimize_flow_src) {
-+	case MLX5HWS_MATCHER_FLOW_SRC_VPORT:
-+		attr->opt_type = MLX5HWS_POOL_OPTIMIZE_ORIG;
-+		break;
-+	case MLX5HWS_MATCHER_FLOW_SRC_WIRE:
-+		attr->opt_type = MLX5HWS_POOL_OPTIMIZE_MIRROR;
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
-+static int hws_matcher_check_and_process_at(struct mlx5hws_matcher *matcher,
-+					    struct mlx5hws_action_template *at)
-+{
-+	struct mlx5hws_context *ctx = matcher->tbl->ctx;
-+	bool valid;
-+	int ret;
-+
-+	valid = mlx5hws_action_check_combo(ctx, at->action_type_arr, matcher->tbl->type);
-+	if (!valid) {
-+		mlx5hws_err(ctx, "Invalid combination in action template\n");
-+		return -EINVAL;
-+	}
-+
-+	/* Process action template to setters */
-+	ret = mlx5hws_action_template_process(at);
-+	if (ret) {
-+		mlx5hws_err(ctx, "Failed to process action template\n");
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static int hws_matcher_resize_init(struct mlx5hws_matcher *src_matcher)
-+{
-+	struct mlx5hws_matcher_resize_data *resize_data;
-+
-+	resize_data = kzalloc(sizeof(*resize_data), GFP_KERNEL);
-+	if (!resize_data)
-+		return -ENOMEM;
-+
-+	resize_data->max_stes = src_matcher->action_ste[MLX5HWS_ACTION_STE_IDX_ANY].max_stes;
-+
-+	resize_data->action_ste[0].stc = src_matcher->action_ste[0].stc;
-+	resize_data->action_ste[0].rtc_0_id = src_matcher->action_ste[0].rtc_0_id;
-+	resize_data->action_ste[0].rtc_1_id = src_matcher->action_ste[0].rtc_1_id;
-+	resize_data->action_ste[0].pool = src_matcher->action_ste[0].max_stes ?
-+					  src_matcher->action_ste[0].pool :
-+					  NULL;
-+	resize_data->action_ste[1].stc = src_matcher->action_ste[1].stc;
-+	resize_data->action_ste[1].rtc_0_id = src_matcher->action_ste[1].rtc_0_id;
-+	resize_data->action_ste[1].rtc_1_id = src_matcher->action_ste[1].rtc_1_id;
-+	resize_data->action_ste[1].pool = src_matcher->action_ste[1].max_stes ?
-+					  src_matcher->action_ste[1].pool :
-+					   NULL;
-+
-+	/* Place the new resized matcher on the dst matcher's list */
-+	list_add(&resize_data->list_node, &src_matcher->resize_dst->resize_data);
-+
-+	/* Move all the previous resized matchers to the dst matcher's list */
-+	while (!list_empty(&src_matcher->resize_data)) {
-+		resize_data = list_first_entry(&src_matcher->resize_data,
-+					       struct mlx5hws_matcher_resize_data,
-+					       list_node);
-+		list_del_init(&resize_data->list_node);
-+		list_add(&resize_data->list_node, &src_matcher->resize_dst->resize_data);
-+	}
-+
-+	return 0;
-+}
-+
-+static void hws_matcher_resize_uninit(struct mlx5hws_matcher *matcher)
-+{
-+	struct mlx5hws_matcher_resize_data *resize_data;
-+
-+	if (!mlx5hws_matcher_is_resizable(matcher))
-+		return;
-+
-+	while (!list_empty(&matcher->resize_data)) {
-+		resize_data = list_first_entry(&matcher->resize_data,
-+					       struct mlx5hws_matcher_resize_data,
-+					       list_node);
-+		list_del_init(&resize_data->list_node);
-+
-+		if (resize_data->max_stes) {
-+			mlx5hws_action_free_single_stc(matcher->tbl->ctx,
-+						       matcher->tbl->type,
-+						       &resize_data->action_ste[1].stc);
-+			mlx5hws_action_free_single_stc(matcher->tbl->ctx,
-+						       matcher->tbl->type,
-+						       &resize_data->action_ste[0].stc);
-+
-+			if (matcher->tbl->type == MLX5HWS_TABLE_TYPE_FDB) {
-+				mlx5hws_cmd_rtc_destroy(matcher->tbl->ctx->mdev,
-+							resize_data->action_ste[1].rtc_1_id);
-+				mlx5hws_cmd_rtc_destroy(matcher->tbl->ctx->mdev,
-+							resize_data->action_ste[0].rtc_1_id);
-+			}
-+			mlx5hws_cmd_rtc_destroy(matcher->tbl->ctx->mdev,
-+						resize_data->action_ste[1].rtc_0_id);
-+			mlx5hws_cmd_rtc_destroy(matcher->tbl->ctx->mdev,
-+						resize_data->action_ste[0].rtc_0_id);
-+			if (resize_data->action_ste[MLX5HWS_ACTION_STE_IDX_ANY].pool) {
-+				mlx5hws_pool_destroy(resize_data->action_ste[1].pool);
-+				mlx5hws_pool_destroy(resize_data->action_ste[0].pool);
-+			}
-+		}
-+
-+		kfree(resize_data);
-+	}
-+}
-+
-+static int
-+hws_matcher_bind_at_idx(struct mlx5hws_matcher *matcher, u8 action_ste_selector)
-+{
-+	struct mlx5hws_cmd_stc_modify_attr stc_attr = {0};
-+	struct mlx5hws_matcher_action_ste *action_ste;
-+	struct mlx5hws_table *tbl = matcher->tbl;
-+	struct mlx5hws_pool_attr pool_attr = {0};
-+	struct mlx5hws_context *ctx = tbl->ctx;
-+	int ret;
-+
-+	action_ste = &matcher->action_ste[action_ste_selector];
-+
-+	/* Allocate action STE mempool */
-+	pool_attr.table_type = tbl->type;
-+	pool_attr.pool_type = MLX5HWS_POOL_TYPE_STE;
-+	pool_attr.flags = MLX5HWS_POOL_FLAGS_FOR_STE_ACTION_POOL;
-+	pool_attr.alloc_log_sz = ilog2(roundup_pow_of_two(action_ste->max_stes)) +
-+				 matcher->attr.table.sz_row_log;
-+	hws_matcher_set_pool_attr(&pool_attr, matcher);
-+	action_ste->pool = mlx5hws_pool_create(ctx, &pool_attr);
-+	if (!action_ste->pool) {
-+		mlx5hws_err(ctx, "Failed to create action ste pool\n");
-+		return -EINVAL;
-+	}
-+
-+	/* Allocate action RTC */
-+	ret = hws_matcher_create_rtc(matcher, HWS_MATCHER_RTC_TYPE_STE_ARRAY, action_ste_selector);
-+	if (ret) {
-+		mlx5hws_err(ctx, "Failed to create action RTC\n");
-+		goto free_ste_pool;
-+	}
-+
-+	/* Allocate STC for jumps to STE */
-+	stc_attr.action_offset = MLX5HWS_ACTION_OFFSET_HIT;
-+	stc_attr.action_type = MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_STE_TABLE;
-+	stc_attr.reparse_mode = MLX5_IFC_STC_REPARSE_IGNORE;
-+	stc_attr.ste_table.ste = action_ste->ste;
-+	stc_attr.ste_table.ste_pool = action_ste->pool;
-+	stc_attr.ste_table.match_definer_id = ctx->caps->trivial_match_definer;
-+
-+	ret = mlx5hws_action_alloc_single_stc(ctx, &stc_attr, tbl->type,
-+					      &action_ste->stc);
-+	if (ret) {
-+		mlx5hws_err(ctx, "Failed to create action jump to table STC\n");
-+		goto free_rtc;
-+	}
-+
-+	return 0;
-+
-+free_rtc:
-+	hws_matcher_destroy_rtc(matcher, HWS_MATCHER_RTC_TYPE_STE_ARRAY, action_ste_selector);
-+free_ste_pool:
-+	mlx5hws_pool_destroy(action_ste->pool);
-+	return ret;
-+}
-+
-+static void hws_matcher_unbind_at_idx(struct mlx5hws_matcher *matcher, u8 action_ste_selector)
-+{
-+	struct mlx5hws_matcher_action_ste *action_ste;
-+	struct mlx5hws_table *tbl = matcher->tbl;
-+
-+	action_ste = &matcher->action_ste[action_ste_selector];
-+
-+	if (!action_ste->max_stes ||
-+	    matcher->flags & MLX5HWS_MATCHER_FLAGS_COLLISION ||
-+	    mlx5hws_matcher_is_in_resize(matcher))
-+		return;
-+
-+	mlx5hws_action_free_single_stc(tbl->ctx, tbl->type, &action_ste->stc);
-+	hws_matcher_destroy_rtc(matcher, HWS_MATCHER_RTC_TYPE_STE_ARRAY, action_ste_selector);
-+	mlx5hws_pool_destroy(action_ste->pool);
-+}
-+
-+static int hws_matcher_bind_at(struct mlx5hws_matcher *matcher)
-+{
-+	bool is_jumbo = mlx5hws_matcher_mt_is_jumbo(matcher->mt);
-+	struct mlx5hws_table *tbl = matcher->tbl;
-+	struct mlx5hws_context *ctx = tbl->ctx;
-+	u32 required_stes;
-+	u8 max_stes = 0;
-+	int i, ret;
-+
-+	if (matcher->flags & MLX5HWS_MATCHER_FLAGS_COLLISION)
-+		return 0;
-+
-+	for (i = 0; i < matcher->num_of_at; i++) {
-+		struct mlx5hws_action_template *at = &matcher->at[i];
-+
-+		ret = hws_matcher_check_and_process_at(matcher, at);
-+		if (ret) {
-+			mlx5hws_err(ctx, "Invalid at %d", i);
-+			return ret;
-+		}
-+
-+		required_stes = at->num_of_action_stes - (!is_jumbo || at->only_term);
-+		max_stes = max(max_stes, required_stes);
-+
-+		/* Future: Optimize reparse */
-+	}
-+
-+	/* There are no additional STEs required for matcher */
-+	if (!max_stes)
-+		return 0;
-+
-+	matcher->action_ste[0].max_stes = max_stes;
-+	matcher->action_ste[1].max_stes = max_stes;
-+
-+	ret = hws_matcher_bind_at_idx(matcher, 0);
++	MLX5_SET(create_flow_table_in, in, opcode, MLX5_CMD_OP_CREATE_FLOW_TABLE);
++	MLX5_SET(create_flow_table_in, in, table_type, ft_attr->type);
++
++	ft_ctx = MLX5_ADDR_OF(create_flow_table_in, in, flow_table_context);
++	MLX5_SET(flow_table_context, ft_ctx, level, ft_attr->level);
++	MLX5_SET(flow_table_context, ft_ctx, rtc_valid, ft_attr->rtc_valid);
++	MLX5_SET(flow_table_context, ft_ctx, reformat_en, ft_attr->reformat_en);
++	MLX5_SET(flow_table_context, ft_ctx, decap_en, ft_attr->decap_en);
++
++	ret = mlx5_cmd_exec_inout(mdev, create_flow_table, in, out);
 +	if (ret)
 +		return ret;
 +
-+	ret = hws_matcher_bind_at_idx(matcher, 1);
-+	if (ret)
-+		goto free_at_0;
++	*table_id = MLX5_GET(create_flow_table_out, out, table_id);
 +
 +	return 0;
-+
-+free_at_0:
-+	hws_matcher_unbind_at_idx(matcher, 0);
-+	return ret;
 +}
 +
-+static void hws_matcher_unbind_at(struct mlx5hws_matcher *matcher)
++int mlx5hws_cmd_flow_table_modify(struct mlx5_core_dev *mdev,
++				  struct mlx5hws_cmd_ft_modify_attr *ft_attr,
++				  u32 table_id)
 +{
-+	hws_matcher_unbind_at_idx(matcher, 1);
-+	hws_matcher_unbind_at_idx(matcher, 0);
++	u32 in[MLX5_ST_SZ_DW(modify_flow_table_in)] = {0};
++	void *ft_ctx;
++
++	MLX5_SET(modify_flow_table_in, in, opcode, MLX5_CMD_OP_MODIFY_FLOW_TABLE);
++	MLX5_SET(modify_flow_table_in, in, table_type, ft_attr->type);
++	MLX5_SET(modify_flow_table_in, in, modify_field_select, ft_attr->modify_fs);
++	MLX5_SET(modify_flow_table_in, in, table_id, table_id);
++
++	ft_ctx = MLX5_ADDR_OF(modify_flow_table_in, in, flow_table_context);
++
++	MLX5_SET(flow_table_context, ft_ctx, table_miss_action, ft_attr->table_miss_action);
++	MLX5_SET(flow_table_context, ft_ctx, table_miss_id, ft_attr->table_miss_id);
++	MLX5_SET(flow_table_context, ft_ctx, hws.rtc_id_0, ft_attr->rtc_id_0);
++	MLX5_SET(flow_table_context, ft_ctx, hws.rtc_id_1, ft_attr->rtc_id_1);
++
++	return mlx5_cmd_exec_in(mdev, modify_flow_table, in);
 +}
 +
-+static int hws_matcher_bind_mt(struct mlx5hws_matcher *matcher)
++int mlx5hws_cmd_flow_table_query(struct mlx5_core_dev *mdev,
++				 u32 table_id,
++				 struct mlx5hws_cmd_ft_query_attr *ft_attr,
++				 u64 *icm_addr_0, u64 *icm_addr_1)
 +{
-+	struct mlx5hws_context *ctx = matcher->tbl->ctx;
-+	struct mlx5hws_pool_attr pool_attr = {0};
++	u32 out[MLX5_ST_SZ_DW(query_flow_table_out)] = {0};
++	u32 in[MLX5_ST_SZ_DW(query_flow_table_in)] = {0};
++	void *ft_ctx;
 +	int ret;
 +
-+	/* Calculate match, range and hash definers */
-+	if (!(matcher->flags & MLX5HWS_MATCHER_FLAGS_COLLISION)) {
-+		ret = mlx5hws_definer_mt_init(ctx, matcher->mt);
-+		if (ret) {
-+			if (ret == E2BIG)
-+				mlx5hws_err(ctx, "Failed to set matcher templates with match definers\n");
-+			return ret;
-+		}
-+	}
++	MLX5_SET(query_flow_table_in, in, opcode, MLX5_CMD_OP_QUERY_FLOW_TABLE);
++	MLX5_SET(query_flow_table_in, in, table_type, ft_attr->type);
++	MLX5_SET(query_flow_table_in, in, table_id, table_id);
 +
-+	/* Create an STE pool per matcher*/
-+	pool_attr.table_type = matcher->tbl->type;
-+	pool_attr.pool_type = MLX5HWS_POOL_TYPE_STE;
-+	pool_attr.flags = MLX5HWS_POOL_FLAGS_FOR_MATCHER_STE_POOL;
-+	pool_attr.alloc_log_sz = matcher->attr.table.sz_col_log +
-+				 matcher->attr.table.sz_row_log;
-+	hws_matcher_set_pool_attr(&pool_attr, matcher);
-+
-+	matcher->match_ste.pool = mlx5hws_pool_create(ctx, &pool_attr);
-+	if (!matcher->match_ste.pool) {
-+		mlx5hws_err(ctx, "Failed to allocate matcher STE pool\n");
-+		ret = -EOPNOTSUPP;
-+		goto uninit_match_definer;
-+	}
-+
-+	return 0;
-+
-+uninit_match_definer:
-+	if (!(matcher->flags & MLX5HWS_MATCHER_FLAGS_COLLISION))
-+		mlx5hws_definer_mt_uninit(ctx, matcher->mt);
-+	return ret;
-+}
-+
-+static void hws_matcher_unbind_mt(struct mlx5hws_matcher *matcher)
-+{
-+	mlx5hws_pool_destroy(matcher->match_ste.pool);
-+	if (!(matcher->flags & MLX5HWS_MATCHER_FLAGS_COLLISION))
-+		mlx5hws_definer_mt_uninit(matcher->tbl->ctx, matcher->mt);
-+}
-+
-+static int
-+hws_matcher_validate_insert_mode(struct mlx5hws_cmd_query_caps *caps,
-+				 struct mlx5hws_matcher *matcher)
-+{
-+	struct mlx5hws_matcher_attr *attr = &matcher->attr;
-+	struct mlx5hws_context *ctx = matcher->tbl->ctx;
-+
-+	switch (attr->insert_mode) {
-+	case MLX5HWS_MATCHER_INSERT_BY_HASH:
-+		if (matcher->attr.distribute_mode != MLX5HWS_MATCHER_DISTRIBUTE_BY_HASH) {
-+			mlx5hws_err(ctx, "Invalid matcher distribute mode\n");
-+			return -EOPNOTSUPP;
-+		}
-+		break;
-+
-+	case MLX5HWS_MATCHER_INSERT_BY_INDEX:
-+		if (attr->table.sz_col_log) {
-+			mlx5hws_err(ctx, "Matcher with INSERT_BY_INDEX supports only Nx1 table size\n");
-+			return -EOPNOTSUPP;
-+		}
-+
-+		if (attr->distribute_mode == MLX5HWS_MATCHER_DISTRIBUTE_BY_HASH) {
-+			/* Hash Split Table */
-+			if (!caps->rtc_hash_split_table) {
-+				mlx5hws_err(ctx, "FW doesn't support insert by index and hash distribute\n");
-+				return -EOPNOTSUPP;
-+			}
-+		} else if (attr->distribute_mode == MLX5HWS_MATCHER_DISTRIBUTE_BY_LINEAR) {
-+			/* Linear Lookup Table */
-+			if (!caps->rtc_linear_lookup_table ||
-+			    !IS_BIT_SET(caps->access_index_mode,
-+					MLX5_IFC_RTC_STE_ACCESS_MODE_LINEAR)) {
-+				mlx5hws_err(ctx, "FW doesn't support insert by index and linear distribute\n");
-+				return -EOPNOTSUPP;
-+			}
-+
-+			if (attr->table.sz_row_log > MLX5_IFC_RTC_LINEAR_LOOKUP_TBL_LOG_MAX) {
-+				mlx5hws_err(ctx, "Matcher with linear distribute: rows exceed limit %d",
-+					    MLX5_IFC_RTC_LINEAR_LOOKUP_TBL_LOG_MAX);
-+				return -EOPNOTSUPP;
-+			}
-+		} else {
-+			mlx5hws_err(ctx, "Matcher has unsupported distribute mode\n");
-+			return -EOPNOTSUPP;
-+		}
-+		break;
-+
-+	default:
-+		mlx5hws_err(ctx, "Matcher has unsupported insert mode\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+hws_matcher_process_attr(struct mlx5hws_cmd_query_caps *caps,
-+			 struct mlx5hws_matcher *matcher)
-+{
-+	struct mlx5hws_matcher_attr *attr = &matcher->attr;
-+
-+	if (hws_matcher_validate_insert_mode(caps, matcher))
-+		return -EOPNOTSUPP;
-+
-+	if (matcher->tbl->type != MLX5HWS_TABLE_TYPE_FDB  && attr->optimize_flow_src) {
-+		mlx5hws_err(matcher->tbl->ctx, "NIC domain doesn't support flow_src\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	/* Convert number of rules to the required depth */
-+	if (attr->mode == MLX5HWS_MATCHER_RESOURCE_MODE_RULE &&
-+	    attr->insert_mode == MLX5HWS_MATCHER_INSERT_BY_HASH)
-+		attr->table.sz_col_log = hws_matcher_rules_to_tbl_depth(attr->rule.num_log);
-+
-+	matcher->flags |= attr->resizable ? MLX5HWS_MATCHER_FLAGS_RESIZABLE : 0;
-+
-+	return hws_matcher_check_attr_sz(caps, matcher);
-+}
-+
-+static int hws_matcher_create_and_connect(struct mlx5hws_matcher *matcher)
-+{
-+	int ret;
-+
-+	/* Select and create the definers for current matcher */
-+	ret = hws_matcher_bind_mt(matcher);
++	ret = mlx5_cmd_exec_inout(mdev, query_flow_table, in, out);
 +	if (ret)
 +		return ret;
 +
-+	/* Calculate and verify action combination */
-+	ret = hws_matcher_bind_at(matcher);
-+	if (ret)
-+		goto unbind_mt;
++	ft_ctx = MLX5_ADDR_OF(query_flow_table_out, out, flow_table_context);
++	*icm_addr_0 = MLX5_GET64(flow_table_context, ft_ctx, sws.sw_owner_icm_root_0);
++	*icm_addr_1 = MLX5_GET64(flow_table_context, ft_ctx, sws.sw_owner_icm_root_1);
 +
-+	/* Create matcher end flow table anchor */
-+	ret = hws_matcher_create_end_ft(matcher);
-+	if (ret)
-+		goto unbind_at;
-+
-+	/* Allocate the RTC for the new matcher */
-+	ret = hws_matcher_create_rtc(matcher, HWS_MATCHER_RTC_TYPE_MATCH, 0);
-+	if (ret)
-+		goto destroy_end_ft;
-+
-+	/* Connect the matcher to the matcher list */
-+	ret = hws_matcher_connect(matcher);
-+	if (ret)
-+		goto destroy_rtc;
-+
-+	return 0;
-+
-+destroy_rtc:
-+	hws_matcher_destroy_rtc(matcher, HWS_MATCHER_RTC_TYPE_MATCH, 0);
-+destroy_end_ft:
-+	hws_matcher_destroy_end_ft(matcher);
-+unbind_at:
-+	hws_matcher_unbind_at(matcher);
-+unbind_mt:
-+	hws_matcher_unbind_mt(matcher);
 +	return ret;
 +}
 +
-+static void hws_matcher_destroy_and_disconnect(struct mlx5hws_matcher *matcher)
++int mlx5hws_cmd_flow_table_destroy(struct mlx5_core_dev *mdev,
++				   u8 fw_ft_type, u32 table_id)
 +{
-+	hws_matcher_resize_uninit(matcher);
-+	hws_matcher_disconnect(matcher);
-+	hws_matcher_destroy_rtc(matcher, HWS_MATCHER_RTC_TYPE_MATCH, 0);
-+	hws_matcher_destroy_end_ft(matcher);
-+	hws_matcher_unbind_at(matcher);
-+	hws_matcher_unbind_mt(matcher);
++	u32 in[MLX5_ST_SZ_DW(destroy_flow_table_in)] = {0};
++
++	MLX5_SET(destroy_flow_table_in, in, opcode, MLX5_CMD_OP_DESTROY_FLOW_TABLE);
++	MLX5_SET(destroy_flow_table_in, in, table_type, fw_ft_type);
++	MLX5_SET(destroy_flow_table_in, in, table_id, table_id);
++
++	return mlx5_cmd_exec_in(mdev, destroy_flow_table, in);
 +}
 +
-+static int
-+hws_matcher_create_col_matcher(struct mlx5hws_matcher *matcher)
++void mlx5hws_cmd_alias_flow_table_destroy(struct mlx5_core_dev *mdev,
++					  u32 table_id)
 +{
-+	struct mlx5hws_context *ctx = matcher->tbl->ctx;
-+	struct mlx5hws_matcher *col_matcher;
++	hws_cmd_general_obj_destroy(mdev, MLX5_OBJ_TYPE_FT_ALIAS, table_id);
++}
++
++static int hws_cmd_flow_group_create(struct mlx5_core_dev *mdev,
++				     struct mlx5hws_cmd_fg_attr *fg_attr,
++				     u32 *group_id)
++{
++	u32 out[MLX5_ST_SZ_DW(create_flow_group_out)] = {0};
++	int inlen = MLX5_ST_SZ_BYTES(create_flow_group_in);
++	u32 *in;
 +	int ret;
 +
-+	if (matcher->attr.mode != MLX5HWS_MATCHER_RESOURCE_MODE_RULE ||
-+	    matcher->attr.insert_mode == MLX5HWS_MATCHER_INSERT_BY_INDEX)
-+		return 0;
-+
-+	if (!hws_matcher_requires_col_tbl(matcher->attr.rule.num_log))
-+		return 0;
-+
-+	col_matcher = kzalloc(sizeof(*matcher), GFP_KERNEL);
-+	if (!col_matcher)
++	in = kvzalloc(inlen, GFP_KERNEL);
++	if (!in)
 +		return -ENOMEM;
 +
-+	INIT_LIST_HEAD(&col_matcher->resize_data);
-+
-+	col_matcher->tbl = matcher->tbl;
-+	col_matcher->mt = matcher->mt;
-+	col_matcher->at = matcher->at;
-+	col_matcher->num_of_at = matcher->num_of_at;
-+	col_matcher->num_of_mt = matcher->num_of_mt;
-+	col_matcher->attr.priority = matcher->attr.priority;
-+	col_matcher->flags = matcher->flags;
-+	col_matcher->flags |= MLX5HWS_MATCHER_FLAGS_COLLISION;
-+	col_matcher->attr.mode = MLX5HWS_MATCHER_RESOURCE_MODE_HTABLE;
-+	col_matcher->attr.optimize_flow_src = matcher->attr.optimize_flow_src;
-+	col_matcher->attr.table.sz_row_log = matcher->attr.rule.num_log;
-+	col_matcher->attr.table.sz_col_log = MLX5HWS_MATCHER_ASSURED_COL_TBL_DEPTH;
-+	if (col_matcher->attr.table.sz_row_log > MLX5HWS_MATCHER_ASSURED_ROW_RATIO)
-+		col_matcher->attr.table.sz_row_log -= MLX5HWS_MATCHER_ASSURED_ROW_RATIO;
-+
-+	col_matcher->attr.max_num_of_at_attach = matcher->attr.max_num_of_at_attach;
-+
-+	ret = hws_matcher_process_attr(ctx->caps, col_matcher);
-+	if (ret)
-+		goto free_col_matcher;
-+
-+	ret = hws_matcher_create_and_connect(col_matcher);
-+	if (ret)
-+		goto free_col_matcher;
-+
-+	matcher->col_matcher = col_matcher;
-+
-+	return 0;
-+
-+free_col_matcher:
-+	kfree(col_matcher);
-+	mlx5hws_err(ctx, "Failed to create assured collision matcher\n");
-+	return ret;
-+}
-+
-+static void
-+hws_matcher_destroy_col_matcher(struct mlx5hws_matcher *matcher)
-+{
-+	if (matcher->attr.mode != MLX5HWS_MATCHER_RESOURCE_MODE_RULE ||
-+	    matcher->attr.insert_mode == MLX5HWS_MATCHER_INSERT_BY_INDEX)
-+		return;
-+
-+	if (matcher->col_matcher) {
-+		hws_matcher_destroy_and_disconnect(matcher->col_matcher);
-+		kfree(matcher->col_matcher);
-+	}
-+}
-+
-+static int hws_matcher_init(struct mlx5hws_matcher *matcher)
-+{
-+	struct mlx5hws_context *ctx = matcher->tbl->ctx;
-+	int ret;
-+
-+	INIT_LIST_HEAD(&matcher->resize_data);
-+
-+	mutex_lock(&ctx->ctrl_lock);
-+
-+	/* Allocate matcher resource and connect to the packet pipe */
-+	ret = hws_matcher_create_and_connect(matcher);
-+	if (ret)
-+		goto unlock_err;
-+
-+	/* Create additional matcher for collision handling */
-+	ret = hws_matcher_create_col_matcher(matcher);
-+	if (ret)
-+		goto destory_and_disconnect;
-+	mutex_unlock(&ctx->ctrl_lock);
-+
-+	return 0;
-+
-+destory_and_disconnect:
-+	hws_matcher_destroy_and_disconnect(matcher);
-+unlock_err:
-+	mutex_unlock(&ctx->ctrl_lock);
-+	return ret;
-+}
-+
-+static int hws_matcher_uninit(struct mlx5hws_matcher *matcher)
-+{
-+	struct mlx5hws_context *ctx = matcher->tbl->ctx;
-+
-+	mutex_lock(&ctx->ctrl_lock);
-+	hws_matcher_destroy_col_matcher(matcher);
-+	hws_matcher_destroy_and_disconnect(matcher);
-+	mutex_unlock(&ctx->ctrl_lock);
-+
-+	return 0;
-+}
-+
-+int mlx5hws_matcher_attach_at(struct mlx5hws_matcher *matcher,
-+			      struct mlx5hws_action_template *at)
-+{
-+	bool is_jumbo = mlx5hws_matcher_mt_is_jumbo(matcher->mt);
-+	struct mlx5hws_context *ctx = matcher->tbl->ctx;
-+	u32 required_stes;
-+	int ret;
-+
-+	if (!matcher->attr.max_num_of_at_attach) {
-+		mlx5hws_dbg(ctx, "Num of current at (%d) exceed allowed value\n",
-+			    matcher->num_of_at);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	ret = hws_matcher_check_and_process_at(matcher, at);
-+	if (ret)
-+		return -ret;
-+
-+	required_stes = at->num_of_action_stes - (!is_jumbo || at->only_term);
-+	if (matcher->action_ste[MLX5HWS_ACTION_STE_IDX_ANY].max_stes < required_stes) {
-+		mlx5hws_dbg(ctx, "Required STEs [%d] exceeds initial action template STE [%d]\n",
-+			    required_stes,
-+			    matcher->action_ste[MLX5HWS_ACTION_STE_IDX_ANY].max_stes);
-+		return -ENOMEM;
-+	}
-+
-+	matcher->at[matcher->num_of_at] = *at;
-+	matcher->num_of_at += 1;
-+	matcher->attr.max_num_of_at_attach -= 1;
-+
-+	if (matcher->col_matcher)
-+		matcher->col_matcher->num_of_at = matcher->num_of_at;
-+
-+	return 0;
-+}
-+
-+static int
-+hws_matcher_set_templates(struct mlx5hws_matcher *matcher,
-+			  struct mlx5hws_match_template *mt[],
-+			  u8 num_of_mt,
-+			  struct mlx5hws_action_template *at[],
-+			  u8 num_of_at)
-+{
-+	struct mlx5hws_context *ctx = matcher->tbl->ctx;
-+	int ret = 0;
-+	int i;
-+
-+	if (!num_of_mt || !num_of_at) {
-+		mlx5hws_err(ctx, "Number of action/match template cannot be zero\n");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	matcher->mt = kcalloc(num_of_mt, sizeof(*matcher->mt), GFP_KERNEL);
-+	if (!matcher->mt)
-+		return -ENOMEM;
-+
-+	matcher->at = kcalloc(num_of_at + matcher->attr.max_num_of_at_attach,
-+			      sizeof(*matcher->at),
-+			      GFP_KERNEL);
-+	if (!matcher->at) {
-+		mlx5hws_err(ctx, "Failed to allocate action template array\n");
-+		ret = -ENOMEM;
-+		goto free_mt;
-+	}
-+
-+	for (i = 0; i < num_of_mt; i++)
-+		matcher->mt[i] = *mt[i];
-+
-+	for (i = 0; i < num_of_at; i++)
-+		matcher->at[i] = *at[i];
-+
-+	matcher->num_of_mt = num_of_mt;
-+	matcher->num_of_at = num_of_at;
-+
-+	return 0;
-+
-+free_mt:
-+	kfree(matcher->mt);
-+	return ret;
-+}
-+
-+static void
-+hws_matcher_unset_templates(struct mlx5hws_matcher *matcher)
-+{
-+	kfree(matcher->at);
-+	kfree(matcher->mt);
-+}
-+
-+struct mlx5hws_matcher *
-+mlx5hws_matcher_create(struct mlx5hws_table *tbl,
-+		       struct mlx5hws_match_template *mt[],
-+		       u8 num_of_mt,
-+		       struct mlx5hws_action_template *at[],
-+		       u8 num_of_at,
-+		       struct mlx5hws_matcher_attr *attr)
-+{
-+	struct mlx5hws_context *ctx = tbl->ctx;
-+	struct mlx5hws_matcher *matcher;
-+	int ret;
-+
-+	matcher = kzalloc(sizeof(*matcher), GFP_KERNEL);
-+	if (!matcher)
-+		return NULL;
-+
-+	matcher->tbl = tbl;
-+	matcher->attr = *attr;
-+
-+	ret = hws_matcher_process_attr(tbl->ctx->caps, matcher);
-+	if (ret)
-+		goto free_matcher;
-+
-+	ret = hws_matcher_set_templates(matcher, mt, num_of_mt, at, num_of_at);
-+	if (ret)
-+		goto free_matcher;
-+
-+	ret = hws_matcher_init(matcher);
-+	if (ret) {
-+		mlx5hws_err(ctx, "Failed to initialise matcher: %d\n", ret);
-+		goto unset_templates;
-+	}
-+
-+	return matcher;
-+
-+unset_templates:
-+	hws_matcher_unset_templates(matcher);
-+free_matcher:
-+	kfree(matcher);
-+	return NULL;
-+}
-+
-+int mlx5hws_matcher_destroy(struct mlx5hws_matcher *matcher)
-+{
-+	hws_matcher_uninit(matcher);
-+	hws_matcher_unset_templates(matcher);
-+	kfree(matcher);
-+	return 0;
-+}
-+
-+struct mlx5hws_match_template *
-+mlx5hws_match_template_create(struct mlx5hws_context *ctx,
-+			      u32 *match_param,
-+			      u32 match_param_sz,
-+			      u8 match_criteria_enable)
-+{
-+	struct mlx5hws_match_template *mt;
-+
-+	mt = kzalloc(sizeof(*mt), GFP_KERNEL);
-+	if (!mt)
-+		return NULL;
-+
-+	mt->match_param = kzalloc(MLX5_ST_SZ_BYTES(fte_match_param), GFP_KERNEL);
-+	if (!mt->match_param)
-+		goto free_template;
-+
-+	memcpy(mt->match_param, match_param, match_param_sz);
-+	mt->match_criteria_enable = match_criteria_enable;
-+
-+	return mt;
-+
-+free_template:
-+	kfree(mt);
-+	return NULL;
-+}
-+
-+int mlx5hws_match_template_destroy(struct mlx5hws_match_template *mt)
-+{
-+	kfree(mt->match_param);
-+	kfree(mt);
-+	return 0;
-+}
-+
-+static int hws_matcher_resize_precheck(struct mlx5hws_matcher *src_matcher,
-+				       struct mlx5hws_matcher *dst_matcher)
-+{
-+	struct mlx5hws_context *ctx = src_matcher->tbl->ctx;
-+	int i;
-+
-+	if (src_matcher->tbl->type != dst_matcher->tbl->type) {
-+		mlx5hws_err(ctx, "Table type mismatch for src/dst matchers\n");
-+		return -EINVAL;
-+	}
-+
-+	if (!mlx5hws_matcher_is_resizable(src_matcher) ||
-+	    !mlx5hws_matcher_is_resizable(dst_matcher)) {
-+		mlx5hws_err(ctx, "Src/dst matcher is not resizable\n");
-+		return -EINVAL;
-+	}
-+
-+	if (mlx5hws_matcher_is_insert_by_idx(src_matcher) !=
-+	    mlx5hws_matcher_is_insert_by_idx(dst_matcher)) {
-+		mlx5hws_err(ctx, "Src/dst matchers insert mode mismatch\n");
-+		return -EINVAL;
-+	}
-+
-+	if (mlx5hws_matcher_is_in_resize(src_matcher) ||
-+	    mlx5hws_matcher_is_in_resize(dst_matcher)) {
-+		mlx5hws_err(ctx, "Src/dst matcher is already in resize\n");
-+		return -EINVAL;
-+	}
-+
-+	/* Compare match templates - make sure the definers are equivalent */
-+	if (src_matcher->num_of_mt != dst_matcher->num_of_mt) {
-+		mlx5hws_err(ctx, "Src/dst matcher match templates mismatch\n");
-+		return -EINVAL;
-+	}
-+
-+	if (src_matcher->action_ste[MLX5HWS_ACTION_STE_IDX_ANY].max_stes >
-+	    dst_matcher->action_ste[0].max_stes) {
-+		mlx5hws_err(ctx, "Src/dst matcher max STEs mismatch\n");
-+		return -EINVAL;
-+	}
-+
-+	for (i = 0; i < src_matcher->num_of_mt; i++) {
-+		if (mlx5hws_definer_compare(src_matcher->mt[i].definer,
-+					    dst_matcher->mt[i].definer)) {
-+			mlx5hws_err(ctx, "Src/dst matcher definers mismatch\n");
-+			return -EINVAL;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+int mlx5hws_matcher_resize_set_target(struct mlx5hws_matcher *src_matcher,
-+				      struct mlx5hws_matcher *dst_matcher)
-+{
-+	int ret = 0;
-+
-+	mutex_lock(&src_matcher->tbl->ctx->ctrl_lock);
-+
-+	ret = hws_matcher_resize_precheck(src_matcher, dst_matcher);
++	MLX5_SET(create_flow_group_in, in, opcode, MLX5_CMD_OP_CREATE_FLOW_GROUP);
++	MLX5_SET(create_flow_group_in, in, table_type, fg_attr->table_type);
++	MLX5_SET(create_flow_group_in, in, table_id, fg_attr->table_id);
++
++	ret = mlx5_cmd_exec_inout(mdev, create_flow_group, in, out);
 +	if (ret)
 +		goto out;
 +
-+	src_matcher->resize_dst = dst_matcher;
-+
-+	ret = hws_matcher_resize_init(src_matcher);
-+	if (ret)
-+		src_matcher->resize_dst = NULL;
++	*group_id = MLX5_GET(create_flow_group_out, out, group_id);
 +
 +out:
-+	mutex_unlock(&src_matcher->tbl->ctx->ctrl_lock);
++	kvfree(in);
 +	return ret;
 +}
 +
-+int mlx5hws_matcher_resize_rule_move(struct mlx5hws_matcher *src_matcher,
-+				     struct mlx5hws_rule *rule,
-+				     struct mlx5hws_rule_attr *attr)
++static int hws_cmd_flow_group_destroy(struct mlx5_core_dev *mdev,
++				      u32 ft_id, u32 fg_id, u8 ft_type)
 +{
-+	struct mlx5hws_context *ctx = src_matcher->tbl->ctx;
++	u32 in[MLX5_ST_SZ_DW(destroy_flow_group_in)] = {};
 +
-+	if (unlikely(!mlx5hws_matcher_is_in_resize(src_matcher))) {
-+		mlx5hws_err(ctx, "Matcher is not resizable or not in resize\n");
-+		return -EINVAL;
-+	}
++	MLX5_SET(destroy_flow_group_in, in, opcode, MLX5_CMD_OP_DESTROY_FLOW_GROUP);
++	MLX5_SET(destroy_flow_group_in, in, table_type, ft_type);
++	MLX5_SET(destroy_flow_group_in, in, table_id, ft_id);
++	MLX5_SET(destroy_flow_group_in, in, group_id, fg_id);
 +
-+	if (unlikely(src_matcher != rule->matcher)) {
-+		mlx5hws_err(ctx, "Rule doesn't belong to src matcher\n");
-+		return -EINVAL;
-+	}
-+
-+	return mlx5hws_rule_move_hws_add(rule, attr);
++	return mlx5_cmd_exec_in(mdev, destroy_flow_group, in);
 +}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.h
++
++int mlx5hws_cmd_set_fte(struct mlx5_core_dev *mdev,
++			u32 table_type,
++			u32 table_id,
++			u32 group_id,
++			struct mlx5hws_cmd_set_fte_attr *fte_attr)
++{
++	u32 out[MLX5_ST_SZ_DW(set_fte_out)] = {0};
++	void *in_flow_context;
++	u32 dest_entry_sz;
++	u32 total_dest_sz;
++	u32 action_flags;
++	u8 *in_dests;
++	u32 inlen;
++	u32 *in;
++	int ret;
++	u32 i;
++
++	dest_entry_sz = fte_attr->extended_dest ?
++			MLX5_ST_SZ_BYTES(extended_dest_format) :
++			MLX5_ST_SZ_BYTES(dest_format);
++	total_dest_sz = dest_entry_sz * fte_attr->dests_num;
++	inlen = align((MLX5_ST_SZ_BYTES(set_fte_in) + total_dest_sz), DW_SIZE);
++	in = kzalloc(inlen, GFP_KERNEL);
++	if (!in)
++		return -ENOMEM;
++
++	MLX5_SET(set_fte_in, in, opcode, MLX5_CMD_OP_SET_FLOW_TABLE_ENTRY);
++	MLX5_SET(set_fte_in, in, table_type, table_type);
++	MLX5_SET(set_fte_in, in, table_id, table_id);
++
++	in_flow_context = MLX5_ADDR_OF(set_fte_in, in, flow_context);
++	MLX5_SET(flow_context, in_flow_context, group_id, group_id);
++	MLX5_SET(flow_context, in_flow_context, flow_source, fte_attr->flow_source);
++	MLX5_SET(flow_context, in_flow_context, extended_destination, fte_attr->extended_dest);
++	MLX5_SET(set_fte_in, in, ignore_flow_level, fte_attr->ignore_flow_level);
++
++	action_flags = fte_attr->action_flags;
++	MLX5_SET(flow_context, in_flow_context, action, action_flags);
++
++	if (action_flags & MLX5_FLOW_CONTEXT_ACTION_PACKET_REFORMAT) {
++		MLX5_SET(flow_context, in_flow_context,
++			 packet_reformat_id, fte_attr->packet_reformat_id);
++	}
++
++	if (action_flags & (MLX5_FLOW_CONTEXT_ACTION_DECRYPT | MLX5_FLOW_CONTEXT_ACTION_ENCRYPT)) {
++		MLX5_SET(flow_context, in_flow_context,
++			 encrypt_decrypt_type, fte_attr->encrypt_decrypt_type);
++		MLX5_SET(flow_context, in_flow_context,
++			 encrypt_decrypt_obj_id, fte_attr->encrypt_decrypt_obj_id);
++	}
++
++	if (action_flags & MLX5_FLOW_CONTEXT_ACTION_FWD_DEST) {
++		in_dests = (u8 *)MLX5_ADDR_OF(flow_context, in_flow_context, destination);
++
++		for (i = 0; i < fte_attr->dests_num; i++) {
++			struct mlx5hws_cmd_set_fte_dest *dest = &fte_attr->dests[i];
++			enum mlx5_ifc_flow_destination_type ifc_dest_type =
++				hws_cmd_dest_type_to_ifc_dest_type(dest->destination_type);
++
++			switch (dest->destination_type) {
++			case MLX5_FLOW_DESTINATION_TYPE_VPORT:
++				if (dest->ext_flags & MLX5HWS_CMD_EXT_DEST_ESW_OWNER_VHCA_ID) {
++					MLX5_SET(dest_format, in_dests,
++						 destination_eswitch_owner_vhca_id_valid, 1);
++					MLX5_SET(dest_format, in_dests,
++						 destination_eswitch_owner_vhca_id,
++						 dest->esw_owner_vhca_id);
++				}
++				fallthrough;
++			case MLX5_FLOW_DESTINATION_TYPE_TIR:
++			case MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE:
++				MLX5_SET(dest_format, in_dests, destination_type, ifc_dest_type);
++				MLX5_SET(dest_format, in_dests, destination_id,
++					 dest->destination_id);
++				if (dest->ext_flags & MLX5HWS_CMD_EXT_DEST_REFORMAT) {
++					MLX5_SET(dest_format, in_dests, packet_reformat, 1);
++					MLX5_SET(extended_dest_format, in_dests, packet_reformat_id,
++						 dest->ext_reformat_id);
++				}
++				break;
++			default:
++				ret = -EOPNOTSUPP;
++				goto out;
++			}
++
++			in_dests = in_dests + dest_entry_sz;
++		}
++		MLX5_SET(flow_context, in_flow_context, destination_list_size, fte_attr->dests_num);
++	}
++
++	ret = mlx5_cmd_exec(mdev, in, inlen, out, sizeof(out));
++	if (ret)
++		mlx5_core_err(mdev, "Failed creating FLOW_TABLE_ENTRY\n");
++
++out:
++	kfree(in);
++	return ret;
++}
++
++int mlx5hws_cmd_delete_fte(struct mlx5_core_dev *mdev,
++			   u32 table_type,
++			   u32 table_id)
++{
++	u32 in[MLX5_ST_SZ_DW(delete_fte_in)] = {};
++
++	MLX5_SET(delete_fte_in, in, opcode, MLX5_CMD_OP_DELETE_FLOW_TABLE_ENTRY);
++	MLX5_SET(delete_fte_in, in, table_type, table_type);
++	MLX5_SET(delete_fte_in, in, table_id, table_id);
++
++	return mlx5_cmd_exec_in(mdev, delete_fte, in);
++}
++
++struct mlx5hws_cmd_forward_tbl *
++mlx5hws_cmd_forward_tbl_create(struct mlx5_core_dev *mdev,
++			       struct mlx5hws_cmd_ft_create_attr *ft_attr,
++			       struct mlx5hws_cmd_set_fte_attr *fte_attr)
++{
++	struct mlx5hws_cmd_fg_attr fg_attr = {0};
++	struct mlx5hws_cmd_forward_tbl *tbl;
++	int ret;
++
++	tbl = kzalloc(sizeof(*tbl), GFP_KERNEL);
++	if (!tbl)
++		return NULL;
++
++	ret = mlx5hws_cmd_flow_table_create(mdev, ft_attr, &tbl->ft_id);
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create FT\n");
++		goto free_tbl;
++	}
++
++	fg_attr.table_id = tbl->ft_id;
++	fg_attr.table_type = ft_attr->type;
++
++	ret = hws_cmd_flow_group_create(mdev, &fg_attr, &tbl->fg_id);
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create FG\n");
++		goto free_ft;
++	}
++
++	ret = mlx5hws_cmd_set_fte(mdev, ft_attr->type,
++				  tbl->ft_id, tbl->fg_id, fte_attr);
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create FTE\n");
++		goto free_fg;
++	}
++
++	tbl->type = ft_attr->type;
++	return tbl;
++
++free_fg:
++	hws_cmd_flow_group_destroy(mdev, tbl->ft_id, tbl->fg_id, ft_attr->type);
++free_ft:
++	mlx5hws_cmd_flow_table_destroy(mdev, ft_attr->type, tbl->ft_id);
++free_tbl:
++	kfree(tbl);
++	return NULL;
++}
++
++void mlx5hws_cmd_forward_tbl_destroy(struct mlx5_core_dev *mdev,
++				     struct mlx5hws_cmd_forward_tbl *tbl)
++{
++	mlx5hws_cmd_delete_fte(mdev, tbl->type, tbl->ft_id);
++	hws_cmd_flow_group_destroy(mdev, tbl->ft_id, tbl->fg_id, tbl->type);
++	mlx5hws_cmd_flow_table_destroy(mdev, tbl->type, tbl->ft_id);
++	kfree(tbl);
++}
++
++void mlx5hws_cmd_set_attr_connect_miss_tbl(struct mlx5hws_context *ctx,
++					   u32 fw_ft_type,
++					   enum mlx5hws_table_type type,
++					   struct mlx5hws_cmd_ft_modify_attr *ft_attr)
++{
++	u32 default_miss_tbl;
++
++	if (type != MLX5HWS_TABLE_TYPE_FDB)
++		return;
++
++	ft_attr->modify_fs = MLX5_IFC_MODIFY_FLOW_TABLE_MISS_ACTION;
++	ft_attr->type = fw_ft_type;
++	ft_attr->table_miss_action = MLX5_IFC_MODIFY_FLOW_TABLE_MISS_ACTION_GOTO_TBL;
++
++	default_miss_tbl = ctx->common_res[type].default_miss->ft_id;
++	if (!default_miss_tbl) {
++		pr_warn("HWS: no flow table ID for default miss\n");
++		return;
++	}
++
++	ft_attr->table_miss_id = default_miss_tbl;
++}
++
++int mlx5hws_cmd_rtc_create(struct mlx5_core_dev *mdev,
++			   struct mlx5hws_cmd_rtc_create_attr *rtc_attr,
++			   u32 *rtc_id)
++{
++	u32 out[MLX5_ST_SZ_DW(general_obj_out_cmd_hdr)] = {0};
++	u32 in[MLX5_ST_SZ_DW(create_rtc_in)] = {0};
++	void *attr;
++	int ret;
++
++	attr = MLX5_ADDR_OF(create_rtc_in, in, hdr);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, opcode, MLX5_CMD_OP_CREATE_GENERAL_OBJECT);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, obj_type, MLX5_OBJ_TYPE_RTC);
++
++	attr = MLX5_ADDR_OF(create_rtc_in, in, rtc);
++	MLX5_SET(rtc, attr, ste_format_0, rtc_attr->is_frst_jumbo ?
++		 MLX5_IFC_RTC_STE_FORMAT_11DW :
++		 MLX5_IFC_RTC_STE_FORMAT_8DW);
++
++	if (rtc_attr->is_scnd_range) {
++		MLX5_SET(rtc, attr, ste_format_1, MLX5_IFC_RTC_STE_FORMAT_RANGE);
++		MLX5_SET(rtc, attr, num_match_ste, 2);
++	}
++
++	MLX5_SET(rtc, attr, pd, rtc_attr->pd);
++	MLX5_SET(rtc, attr, update_method, rtc_attr->fw_gen_wqe);
++	MLX5_SET(rtc, attr, update_index_mode, rtc_attr->update_index_mode);
++	MLX5_SET(rtc, attr, access_index_mode, rtc_attr->access_index_mode);
++	MLX5_SET(rtc, attr, num_hash_definer, rtc_attr->num_hash_definer);
++	MLX5_SET(rtc, attr, log_depth, rtc_attr->log_depth);
++	MLX5_SET(rtc, attr, log_hash_size, rtc_attr->log_size);
++	MLX5_SET(rtc, attr, table_type, rtc_attr->table_type);
++	MLX5_SET(rtc, attr, num_hash_definer, rtc_attr->num_hash_definer);
++	MLX5_SET(rtc, attr, match_definer_0, rtc_attr->match_definer_0);
++	MLX5_SET(rtc, attr, match_definer_1, rtc_attr->match_definer_1);
++	MLX5_SET(rtc, attr, stc_id, rtc_attr->stc_base);
++	MLX5_SET(rtc, attr, ste_table_base_id, rtc_attr->ste_base);
++	MLX5_SET(rtc, attr, ste_table_offset, rtc_attr->ste_offset);
++	MLX5_SET(rtc, attr, miss_flow_table_id, rtc_attr->miss_ft_id);
++	MLX5_SET(rtc, attr, reparse_mode, rtc_attr->reparse_mode);
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create RTC (syndrome: %#x)",
++			      hws_cmd_get_syndrome(out));
++		goto out;
++	}
++
++	*rtc_id = MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
++out:
++	return ret;
++}
++
++void mlx5hws_cmd_rtc_destroy(struct mlx5_core_dev *mdev, u32 rtc_id)
++{
++	hws_cmd_general_obj_destroy(mdev, MLX5_OBJ_TYPE_RTC, rtc_id);
++}
++
++int mlx5hws_cmd_stc_create(struct mlx5_core_dev *mdev,
++			   struct mlx5hws_cmd_stc_create_attr *stc_attr,
++			   u32 *stc_id)
++{
++	u32 out[MLX5_ST_SZ_DW(general_obj_out_cmd_hdr)] = {0};
++	u32 in[MLX5_ST_SZ_DW(create_stc_in)] = {0};
++	void *attr;
++	int ret;
++
++	attr = MLX5_ADDR_OF(create_stc_in, in, hdr);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, opcode, MLX5_CMD_OP_CREATE_GENERAL_OBJECT);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, obj_type, MLX5_OBJ_TYPE_STC);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, op_param.create.log_obj_range, stc_attr->log_obj_range);
++
++	attr = MLX5_ADDR_OF(create_stc_in, in, stc);
++	MLX5_SET(stc, attr, table_type, stc_attr->table_type);
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create STC (syndrome: %#x)",
++			      hws_cmd_get_syndrome(out));
++		goto out;
++	}
++
++	*stc_id = MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
++out:
++	return ret;
++}
++
++void mlx5hws_cmd_stc_destroy(struct mlx5_core_dev *mdev, u32 stc_id)
++{
++	hws_cmd_general_obj_destroy(mdev, MLX5_OBJ_TYPE_STC, stc_id);
++}
++
++static int
++hws_cmd_stc_modify_set_stc_param(struct mlx5_core_dev *mdev,
++				 struct mlx5hws_cmd_stc_modify_attr *stc_attr,
++				 void *stc_param)
++{
++	switch (stc_attr->action_type) {
++	case MLX5_IFC_STC_ACTION_TYPE_COUNTER:
++		MLX5_SET(stc_ste_param_flow_counter, stc_param, flow_counter_id, stc_attr->id);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_TIR:
++		MLX5_SET(stc_ste_param_tir, stc_param, tirn, stc_attr->dest_tir_num);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_FT:
++		MLX5_SET(stc_ste_param_table, stc_param, table_id, stc_attr->dest_table_id);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_ACC_MODIFY_LIST:
++		MLX5_SET(stc_ste_param_header_modify_list, stc_param,
++			 header_modify_pattern_id, stc_attr->modify_header.pattern_id);
++		MLX5_SET(stc_ste_param_header_modify_list, stc_param,
++			 header_modify_argument_id, stc_attr->modify_header.arg_id);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_HEADER_REMOVE:
++		MLX5_SET(stc_ste_param_remove, stc_param, action_type,
++			 MLX5_MODIFICATION_TYPE_REMOVE);
++		MLX5_SET(stc_ste_param_remove, stc_param, decap,
++			 stc_attr->remove_header.decap);
++		MLX5_SET(stc_ste_param_remove, stc_param, remove_start_anchor,
++			 stc_attr->remove_header.start_anchor);
++		MLX5_SET(stc_ste_param_remove, stc_param, remove_end_anchor,
++			 stc_attr->remove_header.end_anchor);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_HEADER_INSERT:
++		MLX5_SET(stc_ste_param_insert, stc_param, action_type,
++			 MLX5_MODIFICATION_TYPE_INSERT);
++		MLX5_SET(stc_ste_param_insert, stc_param, encap,
++			 stc_attr->insert_header.encap);
++		MLX5_SET(stc_ste_param_insert, stc_param, inline_data,
++			 stc_attr->insert_header.is_inline);
++		MLX5_SET(stc_ste_param_insert, stc_param, insert_anchor,
++			 stc_attr->insert_header.insert_anchor);
++		/* HW gets the next 2 sizes in words */
++		MLX5_SET(stc_ste_param_insert, stc_param, insert_size,
++			 stc_attr->insert_header.header_size / W_SIZE);
++		MLX5_SET(stc_ste_param_insert, stc_param, insert_offset,
++			 stc_attr->insert_header.insert_offset / W_SIZE);
++		MLX5_SET(stc_ste_param_insert, stc_param, insert_argument,
++			 stc_attr->insert_header.arg_id);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_COPY:
++	case MLX5_IFC_STC_ACTION_TYPE_SET:
++	case MLX5_IFC_STC_ACTION_TYPE_ADD:
++	case MLX5_IFC_STC_ACTION_TYPE_ADD_FIELD:
++		*(__be64 *)stc_param = stc_attr->modify_action.data;
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_VPORT:
++	case MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_UPLINK:
++		MLX5_SET(stc_ste_param_vport, stc_param, vport_number,
++			 stc_attr->vport.vport_num);
++		MLX5_SET(stc_ste_param_vport, stc_param, eswitch_owner_vhca_id,
++			 stc_attr->vport.esw_owner_vhca_id);
++		MLX5_SET(stc_ste_param_vport, stc_param, eswitch_owner_vhca_id_valid,
++			 stc_attr->vport.eswitch_owner_vhca_id_valid);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_DROP:
++	case MLX5_IFC_STC_ACTION_TYPE_NOP:
++	case MLX5_IFC_STC_ACTION_TYPE_TAG:
++	case MLX5_IFC_STC_ACTION_TYPE_ALLOW:
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_ASO:
++		MLX5_SET(stc_ste_param_execute_aso, stc_param, aso_object_id,
++			 stc_attr->aso.devx_obj_id);
++		MLX5_SET(stc_ste_param_execute_aso, stc_param, return_reg_id,
++			 stc_attr->aso.return_reg_id);
++		MLX5_SET(stc_ste_param_execute_aso, stc_param, aso_type,
++			 stc_attr->aso.aso_type);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_STE_TABLE:
++		MLX5_SET(stc_ste_param_ste_table, stc_param, ste_obj_id,
++			 stc_attr->ste_table.ste_obj_id);
++		MLX5_SET(stc_ste_param_ste_table, stc_param, match_definer_id,
++			 stc_attr->ste_table.match_definer_id);
++		MLX5_SET(stc_ste_param_ste_table, stc_param, log_hash_size,
++			 stc_attr->ste_table.log_hash_size);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_REMOVE_WORDS:
++		MLX5_SET(stc_ste_param_remove_words, stc_param, action_type,
++			 MLX5_MODIFICATION_TYPE_REMOVE_WORDS);
++		MLX5_SET(stc_ste_param_remove_words, stc_param, remove_start_anchor,
++			 stc_attr->remove_words.start_anchor);
++		MLX5_SET(stc_ste_param_remove_words, stc_param,
++			 remove_size, stc_attr->remove_words.num_of_words);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_CRYPTO_IPSEC_ENCRYPTION:
++		MLX5_SET(stc_ste_param_ipsec_encrypt, stc_param, ipsec_object_id,
++			 stc_attr->id);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_CRYPTO_IPSEC_DECRYPTION:
++		MLX5_SET(stc_ste_param_ipsec_decrypt, stc_param, ipsec_object_id,
++			 stc_attr->id);
++		break;
++	case MLX5_IFC_STC_ACTION_TYPE_TRAILER:
++		MLX5_SET(stc_ste_param_trailer, stc_param, command,
++			 stc_attr->reformat_trailer.op);
++		MLX5_SET(stc_ste_param_trailer, stc_param, type,
++			 stc_attr->reformat_trailer.type);
++		MLX5_SET(stc_ste_param_trailer, stc_param, length,
++			 stc_attr->reformat_trailer.size);
++		break;
++	default:
++		mlx5_core_err(mdev, "Not supported type %d\n", stc_attr->action_type);
++		return -EINVAL;
++	}
++	return 0;
++}
++
++int mlx5hws_cmd_stc_modify(struct mlx5_core_dev *mdev,
++			   u32 stc_id,
++			   struct mlx5hws_cmd_stc_modify_attr *stc_attr)
++{
++	u32 out[MLX5_ST_SZ_DW(general_obj_out_cmd_hdr)] = {0};
++	u32 in[MLX5_ST_SZ_DW(create_stc_in)] = {0};
++	void *stc_param;
++	void *attr;
++	int ret;
++
++	attr = MLX5_ADDR_OF(create_stc_in, in, hdr);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, opcode, MLX5_CMD_OP_MODIFY_GENERAL_OBJECT);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, obj_type, MLX5_OBJ_TYPE_STC);
++	MLX5_SET(general_obj_in_cmd_hdr, in, obj_id, stc_id);
++	MLX5_SET(general_obj_in_cmd_hdr, in,
++		 op_param.query.obj_offset, stc_attr->stc_offset);
++
++	attr = MLX5_ADDR_OF(create_stc_in, in, stc);
++	MLX5_SET(stc, attr, ste_action_offset, stc_attr->action_offset);
++	MLX5_SET(stc, attr, action_type, stc_attr->action_type);
++	MLX5_SET(stc, attr, reparse_mode, stc_attr->reparse_mode);
++	MLX5_SET64(stc, attr, modify_field_select,
++		   MLX5_IFC_MODIFY_STC_FIELD_SELECT_NEW_STC);
++
++	/* Set destination TIRN, TAG, FT ID, STE ID */
++	stc_param = MLX5_ADDR_OF(stc, attr, stc_param);
++	ret = hws_cmd_stc_modify_set_stc_param(mdev, stc_attr, stc_param);
++	if (ret)
++		return ret;
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret)
++		mlx5_core_err(mdev, "Failed to modify STC FW action_type %d (syndrome: %#x)",
++			      stc_attr->action_type, hws_cmd_get_syndrome(out));
++
++	return ret;
++}
++
++int mlx5hws_cmd_arg_create(struct mlx5_core_dev *mdev,
++			   u16 log_obj_range,
++			   u32 pd,
++			   u32 *arg_id)
++{
++	u32 out[MLX5_ST_SZ_DW(general_obj_out_cmd_hdr)] = {0};
++	u32 in[MLX5_ST_SZ_DW(create_arg_in)] = {0};
++	void *attr;
++	int ret;
++
++	attr = MLX5_ADDR_OF(create_arg_in, in, hdr);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, opcode, MLX5_CMD_OP_CREATE_GENERAL_OBJECT);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, obj_type, MLX5_OBJ_TYPE_HEADER_MODIFY_ARGUMENT);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, op_param.create.log_obj_range, log_obj_range);
++
++	attr = MLX5_ADDR_OF(create_arg_in, in, arg);
++	MLX5_SET(arg, attr, access_pd, pd);
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create ARG (syndrome: %#x)",
++			      hws_cmd_get_syndrome(out));
++		goto out;
++	}
++
++	*arg_id = MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
++out:
++	return ret;
++}
++
++void mlx5hws_cmd_arg_destroy(struct mlx5_core_dev *mdev,
++			     u32 arg_id)
++{
++	hws_cmd_general_obj_destroy(mdev, MLX5_OBJ_TYPE_HEADER_MODIFY_ARGUMENT, arg_id);
++}
++
++int mlx5hws_cmd_header_modify_pattern_create(struct mlx5_core_dev *mdev,
++					     u32 pattern_length,
++					     u8 *actions,
++					     u32 *ptrn_id)
++{
++	u32 in[MLX5_ST_SZ_DW(create_header_modify_pattern_in)] = {0};
++	u32 out[MLX5_ST_SZ_DW(general_obj_out_cmd_hdr)] = {0};
++	int num_of_actions;
++	u64 *pattern_data;
++	void *pattern;
++	void *attr;
++	int ret;
++	int i;
++
++	if (pattern_length > MLX5_MAX_ACTIONS_DATA_IN_HEADER_MODIFY) {
++		mlx5_core_err(mdev, "Pattern length %d exceeds limit %d\n",
++			      pattern_length, MLX5_MAX_ACTIONS_DATA_IN_HEADER_MODIFY);
++		return -EINVAL;
++	}
++
++	attr = MLX5_ADDR_OF(create_header_modify_pattern_in, in, hdr);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, opcode, MLX5_CMD_OP_CREATE_GENERAL_OBJECT);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, obj_type, MLX5_OBJ_TYPE_MODIFY_HDR_PATTERN);
++
++	pattern = MLX5_ADDR_OF(create_header_modify_pattern_in, in, pattern);
++	/* Pattern_length is in ddwords */
++	MLX5_SET(header_modify_pattern_in, pattern, pattern_length, pattern_length / (2 * DW_SIZE));
++
++	pattern_data = (u64 *)MLX5_ADDR_OF(header_modify_pattern_in, pattern, pattern_data);
++	memcpy(pattern_data, actions, pattern_length);
++
++	num_of_actions = pattern_length / MLX5HWS_MODIFY_ACTION_SIZE;
++	for (i = 0; i < num_of_actions; i++) {
++		int type;
++
++		type = MLX5_GET(set_action_in, &pattern_data[i], action_type);
++		if (type != MLX5_MODIFICATION_TYPE_COPY &&
++		    type != MLX5_MODIFICATION_TYPE_ADD_FIELD)
++			/* Action typ-copy use all bytes for control */
++			MLX5_SET(set_action_in, &pattern_data[i], data, 0);
++	}
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create header_modify_pattern (syndrome: %#x)",
++			      hws_cmd_get_syndrome(out));
++		goto out;
++	}
++
++	*ptrn_id = MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
++out:
++	return ret;
++}
++
++void mlx5hws_cmd_header_modify_pattern_destroy(struct mlx5_core_dev *mdev,
++					       u32 ptrn_id)
++{
++	hws_cmd_general_obj_destroy(mdev, MLX5_OBJ_TYPE_MODIFY_HDR_PATTERN, ptrn_id);
++}
++
++int mlx5hws_cmd_ste_create(struct mlx5_core_dev *mdev,
++			   struct mlx5hws_cmd_ste_create_attr *ste_attr,
++			   u32 *ste_id)
++{
++	u32 out[MLX5_ST_SZ_DW(general_obj_out_cmd_hdr)] = {0};
++	u32 in[MLX5_ST_SZ_DW(create_ste_in)] = {0};
++	void *attr;
++	int ret;
++
++	attr = MLX5_ADDR_OF(create_ste_in, in, hdr);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, opcode, MLX5_CMD_OP_CREATE_GENERAL_OBJECT);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, obj_type, MLX5_OBJ_TYPE_STE);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, op_param.create.log_obj_range, ste_attr->log_obj_range);
++
++	attr = MLX5_ADDR_OF(create_ste_in, in, ste);
++	MLX5_SET(ste, attr, table_type, ste_attr->table_type);
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create STE (syndrome: %#x)",
++			      hws_cmd_get_syndrome(out));
++		goto out;
++	}
++
++	*ste_id = MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
++out:
++	return ret;
++}
++
++void mlx5hws_cmd_ste_destroy(struct mlx5_core_dev *mdev, u32 ste_id)
++{
++	hws_cmd_general_obj_destroy(mdev, MLX5_OBJ_TYPE_STE, ste_id);
++}
++
++int mlx5hws_cmd_definer_create(struct mlx5_core_dev *mdev,
++			       struct mlx5hws_cmd_definer_create_attr *def_attr,
++			       u32 *definer_id)
++{
++	u32 out[MLX5_ST_SZ_DW(general_obj_out_cmd_hdr)] = {0};
++	u32 in[MLX5_ST_SZ_DW(create_definer_in)] = {0};
++	void *ptr;
++	int ret;
++
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 in, opcode, MLX5_CMD_OP_CREATE_GENERAL_OBJECT);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 in, obj_type, MLX5_OBJ_TYPE_MATCH_DEFINER);
++
++	ptr = MLX5_ADDR_OF(create_definer_in, in, definer);
++	MLX5_SET(definer, ptr, format_id, MLX5_IFC_DEFINER_FORMAT_ID_SELECT);
++
++	MLX5_SET(definer, ptr, format_select_dw0, def_attr->dw_selector[0]);
++	MLX5_SET(definer, ptr, format_select_dw1, def_attr->dw_selector[1]);
++	MLX5_SET(definer, ptr, format_select_dw2, def_attr->dw_selector[2]);
++	MLX5_SET(definer, ptr, format_select_dw3, def_attr->dw_selector[3]);
++	MLX5_SET(definer, ptr, format_select_dw4, def_attr->dw_selector[4]);
++	MLX5_SET(definer, ptr, format_select_dw5, def_attr->dw_selector[5]);
++	MLX5_SET(definer, ptr, format_select_dw6, def_attr->dw_selector[6]);
++	MLX5_SET(definer, ptr, format_select_dw7, def_attr->dw_selector[7]);
++	MLX5_SET(definer, ptr, format_select_dw8, def_attr->dw_selector[8]);
++
++	MLX5_SET(definer, ptr, format_select_byte0, def_attr->byte_selector[0]);
++	MLX5_SET(definer, ptr, format_select_byte1, def_attr->byte_selector[1]);
++	MLX5_SET(definer, ptr, format_select_byte2, def_attr->byte_selector[2]);
++	MLX5_SET(definer, ptr, format_select_byte3, def_attr->byte_selector[3]);
++	MLX5_SET(definer, ptr, format_select_byte4, def_attr->byte_selector[4]);
++	MLX5_SET(definer, ptr, format_select_byte5, def_attr->byte_selector[5]);
++	MLX5_SET(definer, ptr, format_select_byte6, def_attr->byte_selector[6]);
++	MLX5_SET(definer, ptr, format_select_byte7, def_attr->byte_selector[7]);
++
++	ptr = MLX5_ADDR_OF(definer, ptr, match_mask);
++	memcpy(ptr, def_attr->match_mask, MLX5_FLD_SZ_BYTES(definer, match_mask));
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create Definer (syndrome: %#x)",
++			      hws_cmd_get_syndrome(out));
++		goto out;
++	}
++
++	*definer_id = MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
++out:
++	return ret;
++}
++
++void mlx5hws_cmd_definer_destroy(struct mlx5_core_dev *mdev,
++				 u32 definer_id)
++{
++	hws_cmd_general_obj_destroy(mdev, MLX5_OBJ_TYPE_MATCH_DEFINER, definer_id);
++}
++
++int mlx5hws_cmd_packet_reformat_create(struct mlx5_core_dev *mdev,
++				       struct mlx5hws_cmd_packet_reformat_create_attr *attr,
++				       u32 *reformat_id)
++{
++	u32 out[MLX5_ST_SZ_DW(alloc_packet_reformat_out)] = {0};
++	size_t insz, cmd_data_sz, cmd_total_sz;
++	void *prctx;
++	void *pdata;
++	void *in;
++	int ret;
++
++	cmd_total_sz = MLX5_ST_SZ_BYTES(alloc_packet_reformat_context_in);
++	cmd_total_sz += MLX5_ST_SZ_BYTES(packet_reformat_context_in);
++	cmd_data_sz = MLX5_FLD_SZ_BYTES(packet_reformat_context_in, reformat_data);
++	insz = align(cmd_total_sz + attr->data_sz - cmd_data_sz, DW_SIZE);
++	in = kzalloc(insz, GFP_KERNEL);
++	if (!in)
++		return -ENOMEM;
++
++	MLX5_SET(alloc_packet_reformat_context_in, in, opcode,
++		 MLX5_CMD_OP_ALLOC_PACKET_REFORMAT_CONTEXT);
++
++	prctx = MLX5_ADDR_OF(alloc_packet_reformat_context_in, in,
++			     packet_reformat_context);
++	pdata = MLX5_ADDR_OF(packet_reformat_context_in, prctx, reformat_data);
++
++	MLX5_SET(packet_reformat_context_in, prctx, reformat_type, attr->type);
++	MLX5_SET(packet_reformat_context_in, prctx, reformat_param_0, attr->reformat_param_0);
++	MLX5_SET(packet_reformat_context_in, prctx, reformat_data_size, attr->data_sz);
++	memcpy(pdata, attr->data, attr->data_sz);
++
++	ret = mlx5_cmd_exec(mdev, in, insz, out, sizeof(out));
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create packet reformat (syndrome: %#x)",
++			      hws_cmd_get_syndrome(out));
++		goto out;
++	}
++
++	*reformat_id = MLX5_GET(alloc_packet_reformat_out, out, packet_reformat_id);
++out:
++	kfree(in);
++	return ret;
++}
++
++int mlx5hws_cmd_packet_reformat_destroy(struct mlx5_core_dev *mdev,
++					u32 reformat_id)
++{
++	u32 out[MLX5_ST_SZ_DW(dealloc_packet_reformat_out)] = {0};
++	u32 in[MLX5_ST_SZ_DW(dealloc_packet_reformat_in)] = {0};
++	int ret;
++
++	MLX5_SET(dealloc_packet_reformat_in, in, opcode,
++		 MLX5_CMD_OP_DEALLOC_PACKET_REFORMAT_CONTEXT);
++	MLX5_SET(dealloc_packet_reformat_in, in,
++		 packet_reformat_id, reformat_id);
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret)
++		mlx5_core_err(mdev, "Failed to destroy packet_reformat (syndrome: %#x)",
++			      hws_cmd_get_syndrome(out));
++
++	return ret;
++}
++
++int mlx5hws_cmd_sq_modify_rdy(struct mlx5_core_dev *mdev, u32 sqn)
++{
++	u32 out[MLX5_ST_SZ_DW(modify_sq_out)] = {0};
++	u32 in[MLX5_ST_SZ_DW(modify_sq_in)] = {0};
++	void *sqc = MLX5_ADDR_OF(modify_sq_in, in, ctx);
++	int ret;
++
++	MLX5_SET(modify_sq_in, in, opcode, MLX5_CMD_OP_MODIFY_SQ);
++	MLX5_SET(modify_sq_in, in, sqn, sqn);
++	MLX5_SET(modify_sq_in, in, sq_state, MLX5_SQC_STATE_RST);
++	MLX5_SET(sqc, sqc, state, MLX5_SQC_STATE_RDY);
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret)
++		mlx5_core_err(mdev, "Failed to modify SQ (syndrome: %#x)",
++			      hws_cmd_get_syndrome(out));
++
++	return ret;
++}
++
++int mlx5hws_cmd_allow_other_vhca_access(struct mlx5_core_dev *mdev,
++					struct mlx5hws_cmd_allow_other_vhca_access_attr *attr)
++{
++	u32 out[MLX5_ST_SZ_DW(allow_other_vhca_access_out)] = {0};
++	u32 in[MLX5_ST_SZ_DW(allow_other_vhca_access_in)] = {0};
++	void *key;
++	int ret;
++
++	MLX5_SET(allow_other_vhca_access_in,
++		 in, opcode, MLX5_CMD_OP_ALLOW_OTHER_VHCA_ACCESS);
++	MLX5_SET(allow_other_vhca_access_in,
++		 in, object_type_to_be_accessed, attr->obj_type);
++	MLX5_SET(allow_other_vhca_access_in,
++		 in, object_id_to_be_accessed, attr->obj_id);
++
++	key = MLX5_ADDR_OF(allow_other_vhca_access_in, in, access_key);
++	memcpy(key, attr->access_key, sizeof(attr->access_key));
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret)
++		mlx5_core_err(mdev, "Failed to execute ALLOW_OTHER_VHCA_ACCESS command");
++
++	return ret;
++}
++
++int mlx5hws_cmd_alias_obj_create(struct mlx5_core_dev *mdev,
++				 struct mlx5hws_cmd_alias_obj_create_attr *alias_attr,
++				 u32 *obj_id)
++{
++	u32 out[MLX5_ST_SZ_DW(general_obj_out_cmd_hdr)] = {0};
++	u32 in[MLX5_ST_SZ_DW(create_alias_obj_in)] = {0};
++	void *attr;
++	void *key;
++	int ret;
++
++	attr = MLX5_ADDR_OF(create_alias_obj_in, in, hdr);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, opcode, MLX5_CMD_OP_CREATE_GENERAL_OBJECT);
++	MLX5_SET(general_obj_in_cmd_hdr,
++		 attr, obj_type, alias_attr->obj_type);
++	MLX5_SET(general_obj_in_cmd_hdr, attr, op_param.create.alias_object, 1);
++
++	attr = MLX5_ADDR_OF(create_alias_obj_in, in, alias_ctx);
++	MLX5_SET(alias_context, attr, vhca_id_to_be_accessed, alias_attr->vhca_id);
++	MLX5_SET(alias_context, attr, object_id_to_be_accessed, alias_attr->obj_id);
++
++	key = MLX5_ADDR_OF(alias_context, attr, access_key);
++	memcpy(key, alias_attr->access_key, sizeof(alias_attr->access_key));
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to create ALIAS OBJ (syndrome: %#x)",
++			      hws_cmd_get_syndrome(out));
++		goto out;
++	}
++
++	*obj_id = MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
++out:
++	return ret;
++}
++
++int mlx5hws_cmd_alias_obj_destroy(struct mlx5_core_dev *mdev,
++				  u16 obj_type,
++				  u32 obj_id)
++{
++	return hws_cmd_general_obj_destroy(mdev, obj_type, obj_id);
++}
++
++int mlx5hws_cmd_generate_wqe(struct mlx5_core_dev *mdev,
++			     struct mlx5hws_cmd_generate_wqe_attr *attr,
++			     struct mlx5_cqe64 *ret_cqe)
++{
++	u32 out[MLX5_ST_SZ_DW(generate_wqe_out)] = {0};
++	u32 in[MLX5_ST_SZ_DW(generate_wqe_in)] = {0};
++	u8 status;
++	void *ptr;
++	int ret;
++
++	MLX5_SET(generate_wqe_in, in, opcode, MLX5_CMD_OP_GENERATE_WQE);
++	MLX5_SET(generate_wqe_in, in, pdn, attr->pdn);
++
++	ptr = MLX5_ADDR_OF(generate_wqe_in, in, wqe_ctrl);
++	memcpy(ptr, attr->wqe_ctrl, MLX5_FLD_SZ_BYTES(generate_wqe_in, wqe_ctrl));
++
++	ptr = MLX5_ADDR_OF(generate_wqe_in, in, wqe_gta_ctrl);
++	memcpy(ptr, attr->gta_ctrl, MLX5_FLD_SZ_BYTES(generate_wqe_in, wqe_gta_ctrl));
++
++	ptr = MLX5_ADDR_OF(generate_wqe_in, in, wqe_gta_data_0);
++	memcpy(ptr, attr->gta_data_0, MLX5_FLD_SZ_BYTES(generate_wqe_in, wqe_gta_data_0));
++
++	if (attr->gta_data_1) {
++		ptr = MLX5_ADDR_OF(generate_wqe_in, in, wqe_gta_data_1);
++		memcpy(ptr, attr->gta_data_1, MLX5_FLD_SZ_BYTES(generate_wqe_in, wqe_gta_data_1));
++	}
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to write GTA WQE using FW");
++		return ret;
++	}
++
++	status = MLX5_GET(generate_wqe_out, out, status);
++	if (status) {
++		mlx5_core_err(mdev, "Invalid FW CQE status %d", status);
++		return -EINVAL;
++	}
++
++	ptr = MLX5_ADDR_OF(generate_wqe_out, out, cqe_data);
++	memcpy(ret_cqe, ptr, sizeof(*ret_cqe));
++
++	return ret;
++}
++
++int mlx5hws_cmd_query_caps(struct mlx5_core_dev *mdev,
++			   struct mlx5hws_cmd_query_caps *caps)
++{
++	u32 in[MLX5_ST_SZ_DW(query_hca_cap_in)] = {0};
++	u32 out_size;
++	u32 *out;
++	int ret;
++
++	out_size = MLX5_ST_SZ_BYTES(query_hca_cap_out);
++	out = kzalloc(out_size, GFP_KERNEL);
++	if (!out)
++		return -ENOMEM;
++
++	MLX5_SET(query_hca_cap_in, in, opcode, MLX5_CMD_OP_QUERY_HCA_CAP);
++	MLX5_SET(query_hca_cap_in, in, op_mod,
++		 MLX5_SET_HCA_CAP_OP_MOD_GENERAL_DEVICE | HCA_CAP_OPMOD_GET_CUR);
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, out_size);
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to query device caps\n");
++		goto out;
++	}
++
++	caps->wqe_based_update =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap.wqe_based_flow_table_update_cap);
++
++	caps->eswitch_manager = MLX5_GET(query_hca_cap_out, out,
++					 capability.cmd_hca_cap.eswitch_manager);
++
++	caps->flex_protocols = MLX5_GET(query_hca_cap_out, out,
++					capability.cmd_hca_cap.flex_parser_protocols);
++
++	if (caps->flex_protocols & MLX5_FLEX_PARSER_GENEVE_TLV_OPTION_0_ENABLED)
++		caps->flex_parser_id_geneve_tlv_option_0 =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.cmd_hca_cap.flex_parser_id_geneve_tlv_option_0);
++
++	if (caps->flex_protocols & MLX5_FLEX_PARSER_MPLS_OVER_GRE_ENABLED)
++		caps->flex_parser_id_mpls_over_gre =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.cmd_hca_cap.flex_parser_id_outer_first_mpls_over_gre);
++
++	if (caps->flex_protocols & MLX5_FLEX_PARSER_MPLS_OVER_UDP_ENABLED)
++		caps->flex_parser_id_mpls_over_udp =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.cmd_hca_cap.flex_parser_id_outer_first_mpls_over_udp_label);
++
++	caps->log_header_modify_argument_granularity =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap.log_header_modify_argument_granularity);
++
++	caps->log_header_modify_argument_granularity -=
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap.log_header_modify_argument_granularity_offset);
++
++	caps->log_header_modify_argument_max_alloc =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap.log_header_modify_argument_max_alloc);
++
++	caps->definer_format_sup =
++		MLX5_GET64(query_hca_cap_out, out,
++			   capability.cmd_hca_cap.match_definer_format_supported);
++
++	caps->vhca_id = MLX5_GET(query_hca_cap_out, out,
++				 capability.cmd_hca_cap.vhca_id);
++
++	caps->sq_ts_format = MLX5_GET(query_hca_cap_out, out,
++				      capability.cmd_hca_cap.sq_ts_format);
++
++	caps->ipsec_offload = MLX5_GET(query_hca_cap_out, out,
++				       capability.cmd_hca_cap.ipsec_offload);
++
++	MLX5_SET(query_hca_cap_in, in, op_mod,
++		 MLX5_GET_HCA_CAP_OP_MOD_GENERAL_DEVICE_2 | HCA_CAP_OPMOD_GET_CUR);
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, out_size);
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to query device caps 2\n");
++		goto out;
++	}
++
++	caps->full_dw_jumbo_support =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap_2.format_select_dw_8_6_ext);
++
++	caps->format_select_gtpu_dw_0 =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap_2.format_select_dw_gtpu_dw_0);
++
++	caps->format_select_gtpu_dw_1 =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap_2.format_select_dw_gtpu_dw_1);
++
++	caps->format_select_gtpu_dw_2 =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap_2.format_select_dw_gtpu_dw_2);
++
++	caps->format_select_gtpu_ext_dw_0 =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap_2.format_select_dw_gtpu_first_ext_dw_0);
++
++	caps->supp_type_gen_wqe =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap_2.generate_wqe_type);
++
++	caps->flow_table_hash_type =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.cmd_hca_cap_2.flow_table_hash_type);
++
++	MLX5_SET(query_hca_cap_in, in, op_mod,
++		 MLX5_GET_HCA_CAP_OP_MOD_NIC_FLOW_TABLE | HCA_CAP_OPMOD_GET_CUR);
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, out_size);
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to query flow table caps\n");
++		goto out;
++	}
++
++	caps->nic_ft.max_level =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.flow_table_nic_cap.flow_table_properties_nic_receive.max_ft_level);
++
++	caps->nic_ft.reparse =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.flow_table_nic_cap.flow_table_properties_nic_receive.reparse);
++
++	caps->nic_ft.ignore_flow_level_rtc_valid =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.flow_table_nic_cap.flow_table_properties_nic_receive.ignore_flow_level_rtc_valid);
++
++	caps->flex_parser_ok_bits_supp =
++		MLX5_GET(query_hca_cap_out, out,
++			 capability.flow_table_nic_cap.flow_table_properties_nic_receive.ft_field_support.geneve_tlv_option_0_exist);
++
++	if (caps->wqe_based_update) {
++		MLX5_SET(query_hca_cap_in, in, op_mod,
++			 MLX5_GET_HCA_CAP_OP_MOD_WQE_BASED_FLOW_TABLE | HCA_CAP_OPMOD_GET_CUR);
++
++		ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, out_size);
++		if (ret) {
++			mlx5_core_err(mdev, "Failed to query WQE based FT caps\n");
++			goto out;
++		}
++
++		caps->rtc_reparse_mode =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.rtc_reparse_mode);
++
++		caps->ste_format =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.ste_format);
++
++		caps->rtc_index_mode =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.rtc_index_mode);
++
++		caps->rtc_log_depth_max =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.rtc_log_depth_max);
++
++		caps->ste_alloc_log_max =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.ste_alloc_log_max);
++
++		caps->ste_alloc_log_gran =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.ste_alloc_log_granularity);
++
++		caps->trivial_match_definer =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.trivial_match_definer);
++
++		caps->stc_alloc_log_max =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.stc_alloc_log_max);
++
++		caps->stc_alloc_log_gran =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.stc_alloc_log_granularity);
++
++		caps->rtc_hash_split_table =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.rtc_hash_split_table);
++
++		caps->rtc_linear_lookup_table =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.rtc_linear_lookup_table);
++
++		caps->access_index_mode =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.access_index_mode);
++
++		caps->linear_match_definer =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.linear_match_definer_reg_c3);
++
++		caps->rtc_max_hash_def_gen_wqe =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.rtc_max_num_hash_definer_gen_wqe);
++
++		caps->supp_ste_format_gen_wqe =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.ste_format_gen_wqe);
++
++		caps->fdb_tir_stc =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.wqe_based_flow_table_cap.fdb_jump_to_tir_stc);
++	}
++
++	if (caps->eswitch_manager) {
++		MLX5_SET(query_hca_cap_in, in, op_mod,
++			 MLX5_GET_HCA_CAP_OP_MOD_ESW_FLOW_TABLE | HCA_CAP_OPMOD_GET_CUR);
++
++		ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, out_size);
++		if (ret) {
++			mlx5_core_err(mdev, "Failed to query flow table esw caps\n");
++			goto out;
++		}
++
++		caps->fdb_ft.max_level =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.flow_table_nic_cap.flow_table_properties_nic_receive.max_ft_level);
++
++		caps->fdb_ft.reparse =
++			MLX5_GET(query_hca_cap_out, out,
++				 capability.flow_table_nic_cap.flow_table_properties_nic_receive.reparse);
++
++		MLX5_SET(query_hca_cap_in, in, op_mod,
++			 MLX5_SET_HCA_CAP_OP_MOD_ESW | HCA_CAP_OPMOD_GET_CUR);
++
++		ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, out_size);
++		if (ret) {
++			mlx5_core_err(mdev, "Failed to query eswitch capabilities\n");
++			goto out;
++		}
++
++		if (MLX5_GET(query_hca_cap_out, out,
++			     capability.esw_cap.esw_manager_vport_number_valid))
++			caps->eswitch_manager_vport_number =
++				MLX5_GET(query_hca_cap_out, out,
++					 capability.esw_cap.esw_manager_vport_number);
++
++		caps->merged_eswitch = MLX5_GET(query_hca_cap_out, out,
++						capability.esw_cap.merged_eswitch);
++	}
++
++	ret = mlx5_cmd_exec(mdev, in, sizeof(in), out, out_size);
++	if (ret) {
++		mlx5_core_err(mdev, "Failed to query device attributes\n");
++		goto out;
++	}
++
++	snprintf(caps->fw_ver, sizeof(caps->fw_ver), "%d.%d.%d",
++		 fw_rev_maj(mdev), fw_rev_min(mdev), fw_rev_sub(mdev));
++
++	caps->is_ecpf = mlx5_core_is_ecpf_esw_manager(mdev);
++
++out:
++	kfree(out);
++	return ret;
++}
++
++int mlx5hws_cmd_query_gvmi(struct mlx5_core_dev *mdev, bool other_function,
++			   u16 vport_number, u16 *gvmi)
++{
++	bool ec_vf_func = other_function ? mlx5_core_is_ec_vf_vport(mdev, vport_number) : false;
++	u32 in[MLX5_ST_SZ_DW(query_hca_cap_in)] = {};
++	int out_size;
++	void *out;
++	int err;
++
++	out_size = MLX5_ST_SZ_BYTES(query_hca_cap_out);
++	out = kzalloc(out_size, GFP_KERNEL);
++	if (!out)
++		return -ENOMEM;
++
++	MLX5_SET(query_hca_cap_in, in, opcode, MLX5_CMD_OP_QUERY_HCA_CAP);
++	MLX5_SET(query_hca_cap_in, in, other_function, other_function);
++	MLX5_SET(query_hca_cap_in, in, function_id,
++		 mlx5_vport_to_func_id(mdev, vport_number, ec_vf_func));
++	MLX5_SET(query_hca_cap_in, in, ec_vf_function, ec_vf_func);
++	MLX5_SET(query_hca_cap_in, in, op_mod,
++		 MLX5_SET_HCA_CAP_OP_MOD_GENERAL_DEVICE << 1 | HCA_CAP_OPMOD_GET_CUR);
++
++	err = mlx5_cmd_exec_inout(mdev, query_hca_cap, in, out);
++	if (err) {
++		kfree(out);
++		return err;
++	}
++
++	*gvmi = MLX5_GET(query_hca_cap_out, out, capability.cmd_hca_cap.vhca_id);
++
++	kfree(out);
++
++	return 0;
++}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_cmd.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_cmd.h
 new file mode 100644
-index 000000000000..125391d1a114
+index 000000000000..2fbcf4ff571a
 --- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.h
-@@ -0,0 +1,107 @@
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_cmd.h
+@@ -0,0 +1,361 @@
 +/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
 +/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
 +
-+#ifndef MLX5HWS_MATCHER_H_
-+#define MLX5HWS_MATCHER_H_
++#ifndef MLX5HWS_CMD_H_
++#define MLX5HWS_CMD_H_
 +
-+/* We calculated that concatenating a collision table to the main table with
-+ * 3% of the main table rows will be enough resources for high insertion
-+ * success probability.
-+ *
-+ * The calculation: log2(2^x * 3 / 100) = log2(2^x) + log2(3/100) = x - 5.05 ~ 5
-+ */
-+#define MLX5HWS_MATCHER_ASSURED_ROW_RATIO 5
-+/* Threshold to determine if amount of rules require a collision table */
-+#define MLX5HWS_MATCHER_ASSURED_RULES_TH 10
-+/* Required depth of an assured collision table */
-+#define MLX5HWS_MATCHER_ASSURED_COL_TBL_DEPTH 4
-+/* Required depth of the main large table */
-+#define MLX5HWS_MATCHER_ASSURED_MAIN_TBL_DEPTH 2
++#define WIRE_PORT 0xFFFF
 +
-+enum mlx5hws_matcher_offset {
-+	MLX5HWS_MATCHER_OFFSET_TAG_DW1 = 12,
-+	MLX5HWS_MATCHER_OFFSET_TAG_DW0 = 13,
++#define ACCESS_KEY_LEN	32
++
++enum mlx5hws_cmd_ext_dest_flags {
++	MLX5HWS_CMD_EXT_DEST_REFORMAT = 1 << 0,
++	MLX5HWS_CMD_EXT_DEST_ESW_OWNER_VHCA_ID = 1 << 1,
 +};
 +
-+enum mlx5hws_matcher_flags {
-+	MLX5HWS_MATCHER_FLAGS_COLLISION = 1 << 2,
-+	MLX5HWS_MATCHER_FLAGS_RESIZABLE	= 1 << 3,
++struct mlx5hws_cmd_set_fte_dest {
++	u8 destination_type;
++	u32 destination_id;
++	enum mlx5hws_cmd_ext_dest_flags ext_flags;
++	u32 ext_reformat_id;
++	u16 esw_owner_vhca_id;
 +};
 +
-+struct mlx5hws_match_template {
-+	struct mlx5hws_definer *definer;
-+	struct mlx5hws_definer_fc *fc;
-+	u32 *match_param;
-+	u8 match_criteria_enable;
-+	u16 fc_sz;
++struct mlx5hws_cmd_set_fte_attr {
++	u32 action_flags;
++	bool ignore_flow_level;
++	u8 flow_source;
++	u8 extended_dest;
++	u8 encrypt_decrypt_type;
++	u32 encrypt_decrypt_obj_id;
++	u32 packet_reformat_id;
++	u32 dests_num;
++	struct mlx5hws_cmd_set_fte_dest *dests;
 +};
 +
-+struct mlx5hws_matcher_match_ste {
-+	struct mlx5hws_pool_chunk ste;
-+	u32 rtc_0_id;
-+	u32 rtc_1_id;
-+	struct mlx5hws_pool *pool;
++struct mlx5hws_cmd_ft_create_attr {
++	u8 type;
++	u8 level;
++	bool rtc_valid;
++	bool decap_en;
++	bool reformat_en;
 +};
 +
-+struct mlx5hws_matcher_action_ste {
-+	struct mlx5hws_pool_chunk ste;
-+	struct mlx5hws_pool_chunk stc;
-+	u32 rtc_0_id;
-+	u32 rtc_1_id;
-+	struct mlx5hws_pool *pool;
-+	u8 max_stes;
++struct mlx5hws_cmd_ft_modify_attr {
++	u8 type;
++	u32 rtc_id_0;
++	u32 rtc_id_1;
++	u32 table_miss_id;
++	u8 table_miss_action;
++	u64 modify_fs;
 +};
 +
-+struct mlx5hws_matcher_resize_data_node {
-+	struct mlx5hws_pool_chunk stc;
-+	u32 rtc_0_id;
-+	u32 rtc_1_id;
-+	struct mlx5hws_pool *pool;
++struct mlx5hws_cmd_ft_query_attr {
++	u8 type;
 +};
 +
-+struct mlx5hws_matcher_resize_data {
-+	struct mlx5hws_matcher_resize_data_node action_ste[2];
-+	u8 max_stes;
-+	struct list_head list_node;
++struct mlx5hws_cmd_fg_attr {
++	u32 table_id;
++	u32 table_type;
 +};
 +
-+struct mlx5hws_matcher {
-+	struct mlx5hws_table *tbl;
-+	struct mlx5hws_matcher_attr attr;
-+	struct mlx5hws_match_template *mt;
-+	struct mlx5hws_action_template *at;
-+	u8 num_of_at;
-+	u8 num_of_mt;
-+	/* enum mlx5hws_matcher_flags */
-+	u8 flags;
-+	u32 end_ft_id;
-+	struct mlx5hws_matcher *col_matcher;
-+	struct mlx5hws_matcher *resize_dst;
-+	struct mlx5hws_matcher_match_ste match_ste;
-+	struct mlx5hws_matcher_action_ste action_ste[2];
-+	struct list_head list_node;
-+	struct list_head resize_data;
++struct mlx5hws_cmd_forward_tbl {
++	u8 type;
++	u32 ft_id;
++	u32 fg_id;
++	u32 refcount;
 +};
 +
-+static inline bool
-+mlx5hws_matcher_mt_is_jumbo(struct mlx5hws_match_template *mt)
-+{
-+	return mlx5hws_definer_is_jumbo(mt->definer);
-+}
++struct mlx5hws_cmd_rtc_create_attr {
++	u32 pd;
++	u32 stc_base;
++	u32 ste_base;
++	u32 ste_offset;
++	u32 miss_ft_id;
++	bool fw_gen_wqe;
++	u8 update_index_mode;
++	u8 access_index_mode;
++	u8 num_hash_definer;
++	u8 log_depth;
++	u8 log_size;
++	u8 table_type;
++	u8 match_definer_0;
++	u8 match_definer_1;
++	u8 reparse_mode;
++	bool is_frst_jumbo;
++	bool is_scnd_range;
++};
 +
-+static inline bool mlx5hws_matcher_is_resizable(struct mlx5hws_matcher *matcher)
-+{
-+	return !!(matcher->flags & MLX5HWS_MATCHER_FLAGS_RESIZABLE);
-+}
++struct mlx5hws_cmd_alias_obj_create_attr {
++	u32 obj_id;
++	u16 vhca_id;
++	u16 obj_type;
++	u8 access_key[ACCESS_KEY_LEN];
++};
 +
-+static inline bool mlx5hws_matcher_is_in_resize(struct mlx5hws_matcher *matcher)
-+{
-+	return !!matcher->resize_dst;
-+}
++struct mlx5hws_cmd_stc_create_attr {
++	u8 log_obj_range;
++	u8 table_type;
++};
 +
-+static inline bool mlx5hws_matcher_is_insert_by_idx(struct mlx5hws_matcher *matcher)
-+{
-+	return matcher->attr.insert_mode == MLX5HWS_MATCHER_INSERT_BY_INDEX;
-+}
++struct mlx5hws_cmd_stc_modify_attr {
++	u32 stc_offset;
++	u8 action_offset;
++	u8 reparse_mode;
++	enum mlx5_ifc_stc_action_type action_type;
++	union {
++		u32 id; /* TIRN, TAG, FT ID, STE ID, CRYPTO */
++		struct {
++			u8 decap;
++			u16 start_anchor;
++			u16 end_anchor;
++		} remove_header;
++		struct {
++			u32 arg_id;
++			u32 pattern_id;
++		} modify_header;
++		struct {
++			__be64 data;
++		} modify_action;
++		struct {
++			u32 arg_id;
++			u32 header_size;
++			u8 is_inline;
++			u8 encap;
++			u16 insert_anchor;
++			u16 insert_offset;
++		} insert_header;
++		struct {
++			u8 aso_type;
++			u32 devx_obj_id;
++			u8 return_reg_id;
++		} aso;
++		struct {
++			u16 vport_num;
++			u16 esw_owner_vhca_id;
++			u8 eswitch_owner_vhca_id_valid;
++		} vport;
++		struct {
++			struct mlx5hws_pool_chunk ste;
++			struct mlx5hws_pool *ste_pool;
++			u32 ste_obj_id; /* Internal */
++			u32 match_definer_id;
++			u8 log_hash_size;
++			bool ignore_tx;
++		} ste_table;
++		struct {
++			u16 start_anchor;
++			u16 num_of_words;
++		} remove_words;
++		struct {
++			u8 type;
++			u8 op;
++			u8 size;
++		} reformat_trailer;
 +
-+#endif /* MLX5HWS_MATCHER_H_ */
++		u32 dest_table_id;
++		u32 dest_tir_num;
++	};
++};
++
++struct mlx5hws_cmd_ste_create_attr {
++	u8 log_obj_range;
++	u8 table_type;
++};
++
++struct mlx5hws_cmd_definer_create_attr {
++	u8 *dw_selector;
++	u8 *byte_selector;
++	u8 *match_mask;
++};
++
++struct mlx5hws_cmd_allow_other_vhca_access_attr {
++	u16 obj_type;
++	u32 obj_id;
++	u8 access_key[ACCESS_KEY_LEN];
++};
++
++struct mlx5hws_cmd_packet_reformat_create_attr {
++	u8 type;
++	size_t data_sz;
++	void *data;
++	u8 reformat_param_0;
++};
++
++struct mlx5hws_cmd_query_ft_caps {
++	u8 max_level;
++	u8 reparse;
++	u8 ignore_flow_level_rtc_valid;
++};
++
++struct mlx5hws_cmd_generate_wqe_attr {
++	u8 *wqe_ctrl;
++	u8 *gta_ctrl;
++	u8 *gta_data_0;
++	u8 *gta_data_1;
++	u32 pdn;
++};
++
++struct mlx5hws_cmd_query_caps {
++	u32 flex_protocols;
++	u8 wqe_based_update;
++	u8 rtc_reparse_mode;
++	u16 ste_format;
++	u8 rtc_index_mode;
++	u8 ste_alloc_log_max;
++	u8 ste_alloc_log_gran;
++	u8 stc_alloc_log_max;
++	u8 stc_alloc_log_gran;
++	u8 rtc_log_depth_max;
++	u8 format_select_gtpu_dw_0;
++	u8 format_select_gtpu_dw_1;
++	u8 flow_table_hash_type;
++	u8 format_select_gtpu_dw_2;
++	u8 format_select_gtpu_ext_dw_0;
++	u8 access_index_mode;
++	u32 linear_match_definer;
++	bool full_dw_jumbo_support;
++	bool rtc_hash_split_table;
++	bool rtc_linear_lookup_table;
++	u32 supp_type_gen_wqe;
++	u8 rtc_max_hash_def_gen_wqe;
++	u16 supp_ste_format_gen_wqe;
++	struct mlx5hws_cmd_query_ft_caps nic_ft;
++	struct mlx5hws_cmd_query_ft_caps fdb_ft;
++	bool eswitch_manager;
++	bool merged_eswitch;
++	u32 eswitch_manager_vport_number;
++	u8 log_header_modify_argument_granularity;
++	u8 log_header_modify_argument_max_alloc;
++	u8 sq_ts_format;
++	u8 fdb_tir_stc;
++	u64 definer_format_sup;
++	u32 trivial_match_definer;
++	u32 vhca_id;
++	u32 shared_vhca_id;
++	char fw_ver[64];
++	bool ipsec_offload;
++	bool is_ecpf;
++	u8 flex_parser_ok_bits_supp;
++	u8 flex_parser_id_geneve_tlv_option_0;
++	u8 flex_parser_id_mpls_over_gre;
++	u8 flex_parser_id_mpls_over_udp;
++};
++
++int mlx5hws_cmd_flow_table_create(struct mlx5_core_dev *mdev,
++				  struct mlx5hws_cmd_ft_create_attr *ft_attr,
++				  u32 *table_id);
++
++int mlx5hws_cmd_flow_table_modify(struct mlx5_core_dev *mdev,
++				  struct mlx5hws_cmd_ft_modify_attr *ft_attr,
++				  u32 table_id);
++
++int mlx5hws_cmd_flow_table_query(struct mlx5_core_dev *mdev,
++				 u32 obj_id,
++				 struct mlx5hws_cmd_ft_query_attr *ft_attr,
++				 u64 *icm_addr_0, u64 *icm_addr_1);
++
++int mlx5hws_cmd_flow_table_destroy(struct mlx5_core_dev *mdev,
++				   u8 fw_ft_type, u32 table_id);
++
++void mlx5hws_cmd_alias_flow_table_destroy(struct mlx5_core_dev *mdev,
++					  u32 table_id);
++
++int mlx5hws_cmd_rtc_create(struct mlx5_core_dev *mdev,
++			   struct mlx5hws_cmd_rtc_create_attr *rtc_attr,
++			   u32 *rtc_id);
++
++void mlx5hws_cmd_rtc_destroy(struct mlx5_core_dev *mdev, u32 rtc_id);
++
++int mlx5hws_cmd_stc_create(struct mlx5_core_dev *mdev,
++			   struct mlx5hws_cmd_stc_create_attr *stc_attr,
++			   u32 *stc_id);
++
++int mlx5hws_cmd_stc_modify(struct mlx5_core_dev *mdev,
++			   u32 stc_id,
++			   struct mlx5hws_cmd_stc_modify_attr *stc_attr);
++
++void mlx5hws_cmd_stc_destroy(struct mlx5_core_dev *mdev, u32 stc_id);
++
++int mlx5hws_cmd_generate_wqe(struct mlx5_core_dev *mdev,
++			     struct mlx5hws_cmd_generate_wqe_attr *attr,
++			     struct mlx5_cqe64 *ret_cqe);
++
++int mlx5hws_cmd_ste_create(struct mlx5_core_dev *mdev,
++			   struct mlx5hws_cmd_ste_create_attr *ste_attr,
++			   u32 *ste_id);
++
++void mlx5hws_cmd_ste_destroy(struct mlx5_core_dev *mdev, u32 ste_id);
++
++int mlx5hws_cmd_definer_create(struct mlx5_core_dev *mdev,
++			       struct mlx5hws_cmd_definer_create_attr *def_attr,
++			       u32 *definer_id);
++
++void mlx5hws_cmd_definer_destroy(struct mlx5_core_dev *mdev,
++				 u32 definer_id);
++
++int mlx5hws_cmd_arg_create(struct mlx5_core_dev *mdev,
++			   u16 log_obj_range,
++			   u32 pd,
++			   u32 *arg_id);
++
++void mlx5hws_cmd_arg_destroy(struct mlx5_core_dev *mdev,
++			     u32 arg_id);
++
++int mlx5hws_cmd_header_modify_pattern_create(struct mlx5_core_dev *mdev,
++					     u32 pattern_length,
++					     u8 *actions,
++					     u32 *ptrn_id);
++
++void mlx5hws_cmd_header_modify_pattern_destroy(struct mlx5_core_dev *mdev,
++					       u32 ptrn_id);
++
++int mlx5hws_cmd_packet_reformat_create(struct mlx5_core_dev *mdev,
++				       struct mlx5hws_cmd_packet_reformat_create_attr *attr,
++				       u32 *reformat_id);
++
++int mlx5hws_cmd_packet_reformat_destroy(struct mlx5_core_dev *mdev,
++					u32 reformat_id);
++
++int mlx5hws_cmd_set_fte(struct mlx5_core_dev *mdev,
++			u32 table_type,
++			u32 table_id,
++			u32 group_id,
++			struct mlx5hws_cmd_set_fte_attr *fte_attr);
++
++int mlx5hws_cmd_delete_fte(struct mlx5_core_dev *mdev,
++			   u32 table_type, u32 table_id);
++
++struct mlx5hws_cmd_forward_tbl *
++mlx5hws_cmd_forward_tbl_create(struct mlx5_core_dev *mdev,
++			       struct mlx5hws_cmd_ft_create_attr *ft_attr,
++			       struct mlx5hws_cmd_set_fte_attr *fte_attr);
++
++void mlx5hws_cmd_forward_tbl_destroy(struct mlx5_core_dev *mdev,
++				     struct mlx5hws_cmd_forward_tbl *tbl);
++
++int mlx5hws_cmd_alias_obj_create(struct mlx5_core_dev *mdev,
++				 struct mlx5hws_cmd_alias_obj_create_attr *alias_attr,
++				 u32 *obj_id);
++
++int mlx5hws_cmd_alias_obj_destroy(struct mlx5_core_dev *mdev,
++				  u16 obj_type,
++				  u32 obj_id);
++
++int mlx5hws_cmd_sq_modify_rdy(struct mlx5_core_dev *mdev, u32 sqn);
++
++int mlx5hws_cmd_query_caps(struct mlx5_core_dev *mdev,
++			   struct mlx5hws_cmd_query_caps *caps);
++
++void mlx5hws_cmd_set_attr_connect_miss_tbl(struct mlx5hws_context *ctx,
++					   u32 fw_ft_type,
++					   enum mlx5hws_table_type type,
++					   struct mlx5hws_cmd_ft_modify_attr *ft_attr);
++
++int mlx5hws_cmd_allow_other_vhca_access(struct mlx5_core_dev *mdev,
++					struct mlx5hws_cmd_allow_other_vhca_access_attr *attr);
++
++int mlx5hws_cmd_query_gvmi(struct mlx5_core_dev *mdev, bool other_function,
++			   u16 vport_number, u16 *gvmi);
++
++#endif /* MLX5HWS_CMD_H_ */
 -- 
 2.46.0
 
