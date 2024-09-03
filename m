@@ -1,213 +1,122 @@
-Return-Path: <netdev+bounces-124495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB482969ACA
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:52:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A04F8969A96
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:48:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 643FD2864AF
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:52:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56AB81F2408E
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8FEA1CDFA3;
-	Tue,  3 Sep 2024 10:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE841C766E;
+	Tue,  3 Sep 2024 10:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="YQCkenbt"
+	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="WIq9I6/O"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414C71C768C;
-	Tue,  3 Sep 2024 10:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F022019F420
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 10:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725360608; cv=none; b=IivxNzd6r8l8gXneoWWP9/rGeC7CQVfXgEXRZjufK8kqR5Ob6V9tHAXR/xj+aKXm7jSywh8Rn+Jxa8sft1cuaIYNscI2dCQybm3ZPaMixrb8h/6UffzJF0FHNMBZbdUCeBOpnLA/NeJgS5YJY67F3TvsMsCk3DHIzmTwGbqA41Y=
+	t=1725360483; cv=none; b=XTaGMAJBEwUFJe1+2R0nnuXhjNpENsjoW9Yd7mfEKjclyQwgmJ4d/59DsXvHa1ZZ4DcdLZ9PgC5ckJ+a2Cj6R1InY0lsK13T05ftanUCoDgHk+pl/G0+GEly3WIbkqoo6kbE8GrtPsk8VH1PWdZUuO8JkeknVAOPMAe76zOoUho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725360608; c=relaxed/simple;
-	bh=wLJAyXZJlBfix3vbTRt1mSiR8OrctbS/AdSN3GODMTo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oaSiKDlEew+Z/sR3xvdn8vH/X8ulvNWtPZWRHHrocGu+4TNyF2Y3LE14fBop0QZFCpNn09OgqpMBh6TO0VMhU7jZmHYISHeSuD+3+HGQv7KScyyS7WesJuPIG6+u+ZzR9sdPQNqzzCjUsOHxp6oaiGJgpeBPqWywwM36O1SnaPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=YQCkenbt; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1725360607; x=1756896607;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=wLJAyXZJlBfix3vbTRt1mSiR8OrctbS/AdSN3GODMTo=;
-  b=YQCkenbtACsDQpNYq5rU9zqQKSkrATHkD9L7cjwjtTg4jl+moDa1OUPh
-   AkqiQ3fh6SiCZyl+GRrVLnXJNhndLProPUdkd3yeYqaP0VCTiNYFClE2h
-   INunuxgCa42IWHmZ0kPy2RyRx1OvCsoTuFvtChC/mmdb+8+nyYC2j15wt
-   7QAedysr9t3EHIU90T/fNFdgSnrumy/it+kjCcQ5LVmEtnh9Ywb6jLkIP
-   UkYFCcYc2hIX0OVYgjvgbzCydOtKLqr9JTMw7ajvR8D+18CYlGwTf5bje
-   +tePp0RHWkairHYr6nOoXFEyjpWJ1xL+HBqfW0Epu9dDJPIy0+mbtrgtE
-   w==;
-X-CSE-ConnectionGUID: /L46bepbTPyfYHrKhIsMng==
-X-CSE-MsgGUID: MJQr3xo4TluPDUwjFFBQTw==
-X-IronPort-AV: E=Sophos;i="6.10,198,1719903600"; 
-   d="scan'208";a="34314910"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Sep 2024 03:50:04 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 3 Sep 2024 03:49:55 -0700
-Received: from che-ll-i17164.microchip.com (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 3 Sep 2024 03:49:45 -0700
-From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
-	<anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <andrew@lunn.ch>, <corbet@lwn.net>,
-	<linux-doc@vger.kernel.org>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-	<devicetree@vger.kernel.org>, <horatiu.vultur@microchip.com>,
-	<ruanjinjie@huawei.com>, <steen.hegelund@microchip.com>,
-	<vladimir.oltean@nxp.com>
-CC: <parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>,
-	<alexanderduyck@fb.com>, <krzk+dt@kernel.org>, <robh@kernel.org>,
-	<rdunlap@infradead.org>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
-	<Pier.Beruto@onsemi.com>, <Selvamani.Rajagopal@onsemi.com>,
-	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
-	<linux@bigler.io>, <markku.vorne@kempower.com>, Parthiban Veerasooran
-	<Parthiban.Veerasooran@microchip.com>, Conor Dooley
-	<conor.dooley@microchip.com>
-Subject: [PATCH net-next v7 14/14] dt-bindings: net: add Microchip's LAN865X 10BASE-T1S MACPHY
-Date: Tue, 3 Sep 2024 16:17:05 +0530
-Message-ID: <20240903104705.378684-15-Parthiban.Veerasooran@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240903104705.378684-1-Parthiban.Veerasooran@microchip.com>
-References: <20240903104705.378684-1-Parthiban.Veerasooran@microchip.com>
+	s=arc-20240116; t=1725360483; c=relaxed/simple;
+	bh=5sVtSvQEtuBso82m1XCUkNDtJZezFYdITQgE7+gzWP4=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=IC1MJce86pd9xWHzQDET+z9cin4Q01o+rNO8WixhOE/srNfxqNynb2dPyZL7uEufTUSzwVLCKJMalPG6JxF1vQiS4BLYBYpRFwCSp6YjCN6PzfezOZaJjgyVPx0GqWqpIGWtbZtnsn+mUKC8wMuVlgmqL2ewDmISoqyEgPgv8PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=WIq9I6/O; arc=none smtp.client-ip=3.9.82.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
+Received: from [IPV6:2a02:8010:6359:2:34e6:741b:7236:5ff3] (unknown [IPv6:2a02:8010:6359:2:34e6:741b:7236:5ff3])
+	(Authenticated sender: james)
+	by mail.katalix.com (Postfix) with ESMTPSA id 8C1737D9AC;
+	Tue,  3 Sep 2024 11:48:00 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
+	t=1725360480; bh=5sVtSvQEtuBso82m1XCUkNDtJZezFYdITQgE7+gzWP4=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:From;
+	z=Message-ID:=20<1dce7949-58de-ce8b-7123-3c2c2dfef276@katalix.com>|
+	 Date:=20Tue,=203=20Sep=202024=2011:48:00=20+0100|MIME-Version:=201
+	 .0|To:=20Dan=20Carpenter=20<dan.carpenter@linaro.org>,=20Simon=20H
+	 orman=20<horms@kernel.org>|Cc:=20netdev@vger.kernel.org,=20davem@d
+	 avemloft.net,=20edumazet@google.com,=0D=0A=20kuba@kernel.org,=20pa
+	 beni@redhat.com,=20dsahern@kernel.org,=20tparkin@katalix.com,=0D=0
+	 A=20kernel=20test=20robot=20<lkp@intel.com>|References:=20<2024090
+	 2142953.926891-1-jchapman@katalix.com>=0D=0A=20<20240903072417.GN2
+	 3170@kernel.org>=0D=0A=20<332ef891-510e-4382-804c-bc2245276ea7@sta
+	 nley.mountain>|From:=20James=20Chapman=20<jchapman@katalix.com>|Su
+	 bject:=20Re:=20[PATCH=20net-next]=20l2tp:=20remove=20unneeded=20nu
+	 ll=20check=20in=0D=0A=20l2tp_v2_session_get_next|In-Reply-To:=20<3
+	 32ef891-510e-4382-804c-bc2245276ea7@stanley.mountain>;
+	b=WIq9I6/OjMSWuxOZhor8qtNpaRM954jDT563NSUizfULOSWI5mQIlM9ul0rPBLijA
+	 hqZ1kkXyMjtZwZRqpo2ZtWNA9d/o+gXV96Xbqkck8kYHJqIj+OKrQulx61DqnNPJUW
+	 /hmkmvUu1QGCpHrLBZgjrKLHQR7JBI9vtmF/j9/nZBGsJh22eJfLc9yl6Ogj62KueZ
+	 xphFYk8RzN0bBvUPAqFfPI67iw8W3N7hVWgouwI9RW6q/wf1BQJad3fzGouZ5JWyu4
+	 5NxHW9/0sBuNbvRGnKsls3f1EQocHZrNwmtvWxMnGy7h491Ov7CF9Mz8rKuq5yjOJv
+	 57Vf5071ZQTPQ==
+Message-ID: <1dce7949-58de-ce8b-7123-3c2c2dfef276@katalix.com>
+Date: Tue, 3 Sep 2024 11:48:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Content-Language: en-US
+To: Dan Carpenter <dan.carpenter@linaro.org>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, tparkin@katalix.com,
+ kernel test robot <lkp@intel.com>
+References: <20240902142953.926891-1-jchapman@katalix.com>
+ <20240903072417.GN23170@kernel.org>
+ <332ef891-510e-4382-804c-bc2245276ea7@stanley.mountain>
+From: James Chapman <jchapman@katalix.com>
+Organization: Katalix Systems Ltd
+Subject: Re: [PATCH net-next] l2tp: remove unneeded null check in
+ l2tp_v2_session_get_next
+In-Reply-To: <332ef891-510e-4382-804c-bc2245276ea7@stanley.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The LAN8650/1 combines a Media Access Controller (MAC) and an Ethernet
-PHY to enable 10BASE-T1S networks. The Ethernet Media Access Controller
-(MAC) module implements a 10 Mbps half duplex Ethernet MAC, compatible
-with the IEEE 802.3 standard and a 10BASE-T1S physical layer transceiver
-integrated into the LAN8650/1. The communication between the Host and the
-MAC-PHY is specified in the OPEN Alliance 10BASE-T1x MACPHY Serial
-Interface (TC6).
+On 03/09/2024 09:02, Dan Carpenter wrote:
+> On Tue, Sep 03, 2024 at 08:24:17AM +0100, Simon Horman wrote:
+>>> Reported-by: kernel test robot <lkp@intel.com>
+>>> Closes: https://lore.kernel.org/r/202408111407.HtON8jqa-lkp@intel.com/
+>>> CC: Dan Carpenter <dan.carpenter@linaro.org>
+>>> Signed-off-by: James Chapman <jchapman@katalix.com>
+>>> Signed-off-by: Tom Parkin <tparkin@katalix.com>
+>>
+>> And as you posted the patch, it would be slightly more intuitive
+>> if your SoB line came last. But I've seen conflicting advice about
+>> the order of tags within the past weeks.
+> 
+> It should be in chronological order.
+> 
+> People generally aren't going to get too fussed about the order except the
+> Signed-off-by tags.  Everyone who handles the patch adds their Signed-off-by to
+> the end.  Right now it looks like James wrote the patch and then Tom is the
+> maintainer who merged it.  Co-developed-by?
 
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
----
- .../bindings/net/microchip,lan8650.yaml       | 80 +++++++++++++++++++
- MAINTAINERS                                   |  1 +
- 2 files changed, 81 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/microchip,lan8650.yaml
+I'm probably using tags incorrectly. When Tom or I submit kernel patches 
+to netdev, we usually review each other's work first before sending the 
+patch to netdev. But we thought that adding a Reviewed-by tag might 
+short-cut proper community review, hence we use SoB to indicate that 
+we're both happy with the patch and we're both interested in review 
+feedback on it.
 
-diff --git a/Documentation/devicetree/bindings/net/microchip,lan8650.yaml b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-new file mode 100644
-index 000000000000..b7b755b27b78
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-@@ -0,0 +1,80 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/microchip,lan8650.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Microchip LAN8650/1 10BASE-T1S MACPHY Ethernet Controllers
-+
-+maintainers:
-+  - Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-+
-+description:
-+  The LAN8650/1 combines a Media Access Controller (MAC) and an Ethernet
-+  PHY to enable 10BASE‑T1S networks. The Ethernet Media Access Controller
-+  (MAC) module implements a 10 Mbps half duplex Ethernet MAC, compatible
-+  with the IEEE 802.3 standard and a 10BASE-T1S physical layer transceiver
-+  integrated into the LAN8650/1. The communication between the Host and
-+  the MAC-PHY is specified in the OPEN Alliance 10BASE-T1x MACPHY Serial
-+  Interface (TC6).
-+
-+allOf:
-+  - $ref: /schemas/net/ethernet-controller.yaml#
-+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
-+
-+properties:
-+  compatible:
-+    oneOf:
-+      - const: microchip,lan8650
-+      - items:
-+          - const: microchip,lan8651
-+          - const: microchip,lan8650
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    description:
-+      Interrupt from MAC-PHY asserted in the event of Receive Chunks
-+      Available, Transmit Chunk Credits Available and Extended Status
-+      Event.
-+    maxItems: 1
-+
-+  spi-max-frequency:
-+    minimum: 15000000
-+    maximum: 25000000
-+
-+  "#address-cells":
-+    const: 1
-+
-+  "#size-cells":
-+    const: 0
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - spi-max-frequency
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+    #include <dt-bindings/gpio/gpio.h>
-+
-+    spi {
-+      #address-cells = <1>;
-+      #size-cells = <0>;
-+
-+      ethernet@0 {
-+        compatible = "microchip,lan8651", "microchip,lan8650";
-+        reg = <0>;
-+        pinctrl-names = "default";
-+        pinctrl-0 = <&eth0_pins>;
-+        interrupt-parent = <&gpio>;
-+        interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
-+        local-mac-address = [04 05 06 01 02 03];
-+        spi-max-frequency = <15000000>;
-+      };
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 934a81151530..8456af576825 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14969,6 +14969,7 @@ MICROCHIP LAN8650/1 10BASE-T1S MACPHY ETHERNET DRIVER
- M:	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
-+F:	Documentation/devicetree/bindings/net/microchip,lan8650.yaml
- F:	drivers/net/ethernet/microchip/lan865x/lan865x.c
- 
- MICROCHIP LAN87xx/LAN937x T1 PHY DRIVER
--- 
-2.34.1
+On reflection, Acked-by would be better for this. I'll send a v2 with 
+Acked-by to avoid confusion.
+
+Thanks!
+
+--
+pw-bot: cr
+
+
+
 
 
