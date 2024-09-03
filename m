@@ -1,98 +1,289 @@
-Return-Path: <netdev+bounces-124354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 283B49691A4
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 05:04:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7FE99691B7
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 05:19:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BBA21C22A34
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 03:04:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC5931C22944
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 03:19:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB161A2624;
-	Tue,  3 Sep 2024 03:04:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243DD1CDA1F;
+	Tue,  3 Sep 2024 03:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pEouyncy"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3054B2AD02;
-	Tue,  3 Sep 2024 03:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004D119F10B
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 03:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725332654; cv=none; b=aE3yYFMG32rGgmUyZWSpdV33vGzAUFqBK3v9FPwe9obXRdLhoe45zyDdK53k7zhAAw/iRNyxZqoEzbw377/yjfEqYJmiNTVP+Qv0lov/+/uzvWRNJJnOZgiKev45/j6Gzdu0NnE/Ce+kAW6X2VoijD5+lr3vtLUOjncMOor8kmU=
+	t=1725333591; cv=none; b=YbijUm2yymzMQtV0XvwZPzCbU37lAftpHI4TGrgxq0lkdLNL8no+UsPwDSaOoOi6BE7qNbkJY7gJpl+Zmdi3cy+b18ovxHM1tcYsXGVPQZ1fobOC9QB+efVUh+pIzV+vmYsR5MD31q4js3c/HTeu3MeMpLZ+jnKe4GGtSVJ+1Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725332654; c=relaxed/simple;
-	bh=KHNqqdmeRAfr2Z0xi9CkijK+avYfSEoW0MUqG61Xf4k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cpz4L55BoZ4bLuVZD1hafH15ab+AS1gBHFpWpzGj9gGDiMeG6eE/sqQBR7Jvu9s2yUI1sSthPuE6BVc3jYqmXonX6TQkEvDBPfq9kAE9Rt2XP/pZjgUA0OVL6uEsuNJqLnPnpSJzHokiN2TEu29UPD4xB0/axXH3jBHbZvNmmSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost (unknown [124.16.138.129])
-	by APP-01 (Coremail) with SMTP id qwCowAB3fqKofNZm0Hy1AA--.34405S2;
-	Tue, 03 Sep 2024 11:04:08 +0800 (CST)
-From: Chen Ni <nichen@iscas.ac.cn>
-To: richardcochran@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chen Ni <nichen@iscas.ac.cn>
-Subject: [PATCH net-next] ptp: ptp_idt82p33: Convert comma to semicolon
-Date: Tue,  3 Sep 2024 11:03:02 +0800
-Message-Id: <20240903030303.494089-1-nichen@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1725333591; c=relaxed/simple;
+	bh=Yu5TkdADoN6CJf4ewN+zPAyPYZA6lNRgkM7k+YvsVmU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=t9mFw7Nu9R1tE4L0pIfH/daMXDzUbsrvd09/eHJM+a/WvR1IkyKgAiGET02HeA2DxNl/VuEbv5L3EnwWiIrOVAjkL0wIeHEs/Oa2R+qhA0IbtBU5tMUW1ir2VyyRaygzbT+0qr6ITVirxIkPYpQkWG65fBgs3OFI4XfyzzYGD4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pEouyncy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69F0FC4CEC2;
+	Tue,  3 Sep 2024 03:19:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725333590;
+	bh=Yu5TkdADoN6CJf4ewN+zPAyPYZA6lNRgkM7k+YvsVmU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=pEouyncyC/Y7QwVnfAZLl3J+KPrbERJffodz4kcdFJti3Q+NcA50aCCWkmE0YhEnV
+	 bWLveUEkwiFtCcUput+ACPdZKkTubXVsz9ageFK6yZLWog37t76kIFbdPTP/0GqblO
+	 Wxt2z/ikLY+ukBAK10BJVpmiVdxsaCigXcnEYnFNHiE+V1r2C+3X5kpGG+qYZnK3e9
+	 cwk5iHtHfEAykGzz03jWxs2YTMKg5vTFe9afJxxhZWLUaPBud4VNv7bx4tUU9oLpLn
+	 XfcthuaJnQVKYb2cdHAjN+n+pu1E53JJfYBW3q/nZTbZXGMcWjju8N+zjJTLmPftE9
+	 0tqhCljuwcy9g==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: [pull request][net-next 00/15] mlx5 updates 2024-09-02
+Date: Mon,  2 Sep 2024 20:19:31 -0700
+Message-ID: <20240903031948.78006-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qwCowAB3fqKofNZm0Hy1AA--.34405S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Jw4UZF15Zr47GrWUXw1DZFb_yoWDZrg_Xw
-	nF9ay7Gw4DurnF93WIva45Xry0ya9Ygrs8WryDtF9rArsrAFy3tr97Jry7W3yFgrn5WF47
-	Ja17Wr97CF9FgjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbsAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	JF0_Jw1lc2xSY4AK67AK6r48MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
-	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
-	67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
-	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
-	z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
-	UI43ZEXa7VUUY0P3UUUUU==
-X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-Replace a comma between expression statements by a semicolon.
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
----
- drivers/ptp/ptp_idt82p33.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+This series add Hardware steering support to mlx5 core driver.
+For more information please see tag log below.
 
-diff --git a/drivers/ptp/ptp_idt82p33.c b/drivers/ptp/ptp_idt82p33.c
-index 92bb42c43fb2..d5732490ed9d 100644
---- a/drivers/ptp/ptp_idt82p33.c
-+++ b/drivers/ptp/ptp_idt82p33.c
-@@ -1171,10 +1171,10 @@ static void idt82p33_caps_init(u32 index, struct ptp_clock_info *caps,
- 	caps->owner = THIS_MODULE;
- 	caps->max_adj = DCO_MAX_PPB;
- 	caps->n_per_out = MAX_PER_OUT;
--	caps->n_ext_ts = MAX_PHC_PLL,
--	caps->n_pins = max_pins,
--	caps->adjphase = idt82p33_adjwritephase,
--	caps->getmaxphase = idt82p33_getmaxphase,
-+	caps->n_ext_ts = MAX_PHC_PLL;
-+	caps->n_pins = max_pins;
-+	caps->adjphase = idt82p33_adjwritephase;
-+	caps->getmaxphase = idt82p33_getmaxphase;
- 	caps->adjfine = idt82p33_adjfine;
- 	caps->adjtime = idt82p33_adjtime;
- 	caps->gettime64 = idt82p33_gettime;
--- 
-2.25.1
+Please pull and let me know if there is any problem.
 
+Thanks,
+Saeed.
+
+
+The following changes since commit da4f3b72c8831975a06eca7e1c27392726f54d20:
+
+  Merge tag 'linux-can-next-for-6.12-20240830' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next (2024-09-02 19:10:45 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2024-09-02
+
+for you to fetch changes up to 4b1b13a9b3bcf5e2b6ab27e3512b30346748ceda:
+
+  net/mlx5: HWS, added API and enabled HWS support (2024-09-02 20:18:02 -0700)
+
+----------------------------------------------------------------
+mlx5-updates-2024-08-29
+
+HW-Managed Flow Steering in mlx5 driver
+
+Yevgeny Kliteynik says:
+=======================
+
+1. Overview
+-----------
+
+ConnectX devices support packet matching, modification, and redirection.
+This functionality is referred as Flow Steering.
+To configure a steering rule, the rule is written to the device-owned
+memory. This memory is accessed and cached by the device when processing
+a packet.
+
+The first implementation of Flow Steering was done in FW, and it is
+referred in the mlx5 driver as Device-Managed Flow Steering (DMFS).
+Later we introduced SW-managed Flow Steering (SWS or SMFS), where the
+driver is writing directly to the device's configuration memory (ICM)
+through RC QP using RDMA operations (RDMA-read and RDAM-write), thus
+achieving higher rates of rule insertion/deletion.
+
+Now we introduce a new flow steering implementation: HW-Managed Flow
+Steering (HWS or HMFS).
+
+In this new approach, the driver is configuring steering rules directly
+to the HW using the WQs with a special new type of WQE. This way we can
+reach higher rule insertion/deletion rate with much lower CPU utilization
+compared to SWS.
+
+The key benefits of HWS as opposed to SWS:
++ HW manages the steering decision tree
+   - HW calculates CRC for each entry
+   - HW handles tree hash collisions
+   - HW & FW manage objects refcount
++ HW keeps cache coherency:
+   - HW provides tree access locking and synchronization
+   - HW provides notification on completion
++ Insertion rate isn’t affected by background traffic
+   - Dedicated HW components that handle insertion
+
+2. Performance
+--------------
+
+Measuring Connection Tracking with simple IPv4 flows w/o NAT, we
+are able to get ~5 times more flows offloaded per second using HWS.
+
+3. Configuration
+----------------
+
+The enablement of HWS mode in eswitch manager is done using the same
+devlink param that is already used for switching between FW-managed
+steering and SW-managed steering modes:
+
+  # devlink dev param set pci/<PCI_ID> name flow_steering_mode cmod runtime value hmfs
+
+4. Upstream Submission
+----------------------
+
+HWS support consists of 3 main components:
++ Steering:
+   - The lower layer that exposes HWS API to upper layers and implements
+     all the management of flow steering building blocks
++ FS-Core
+   - Implementation of fs_hws layer to enable fs_core to use HWS instead
+     of FW or SW steering
+   - Create HW steering action pools to utilize the ability of HWS to
+     share steering actions among different rules
+   - Add support for configuring HWS mode through devlink command,
+     similar to configuring SWS mode
++ Connection Tracking
+   - Implementation of CT support for HW steering
+   - Hooks up the CT ops for the new steering mode and uses the HWS API
+     to implement connection tracking.
+
+Because of the large number of patches, we need to perform the submission
+in several separate patch series. This series is the first submission that
+lays the ground work for the next submissions, where an actual user of HWS
+will be added.
+
+5. Patches in this series
+-------------------------
+
+This patch series contains implementation of the first bullet from above.
+The patches are:
+
+[patch 01/15] net/mlx5: Added missing mlx5_ifc definition for HW Steering
+[patch 02/15] net/mlx5: Added missing definitions in preparation for HW Steering
+[patch 03/15] net/mlx5: HWS, added actions handling
+[patch 04/15] net/mlx5: HWS, added tables handling
+[patch 05/15] net/mlx5: HWS, added rules handling
+[patch 06/15] net/mlx5: HWS, added definers handling
+[patch 07/15] net/mlx5: HWS, added matchers functionality
+[patch 08/15] net/mlx5: HWS, added FW commands handling
+[patch 09/15] net/mlx5: HWS, added modify header pattern and args handling
+[patch 10/15] net/mlx5: HWS, added vport handling
+[patch 11/15] net/mlx5: HWS, added memory management handling
+[patch 12/15] net/mlx5: HWS, added backward-compatible API handling
+[patch 13/15] net/mlx5: HWS, added debug dump and internal headers
+[patch 14/15] net/mlx5: HWS, added send engine and context handling
+[patch 15/15] net/mlx5: HWS, added API and enabled HWS support
+
+=======================
+
+----------------------------------------------------------------
+Yevgeny Kliteynik (15):
+      net/mlx5: Added missing mlx5_ifc definition for HW Steering
+      net/mlx5: Added missing definitions in preparation for HW Steering
+      net/mlx5: HWS, added actions handling
+      net/mlx5: HWS, added tables handling
+      net/mlx5: HWS, added rules handling
+      net/mlx5: HWS, added definers handling
+      net/mlx5: HWS, added matchers functionality
+      net/mlx5: HWS, added FW commands handling
+      net/mlx5: HWS, added modify header pattern and args handling
+      net/mlx5: HWS, added vport handling
+      net/mlx5: HWS, added memory management handling
+      net/mlx5: HWS, added backward-compatible API handling
+      net/mlx5: HWS, added debug dump and internal headers
+      net/mlx5: HWS, added send engine and context handling
+      net/mlx5: HWS, added API and enabled HWS support
+
+ .../ethernet/mellanox/mlx5/kconfig.rst             |    3 +
+ drivers/net/ethernet/mellanox/mlx5/core/Kconfig    |   10 +
+ drivers/net/ethernet/mellanox/mlx5/core/Makefile   |   21 +
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.h  |    8 +-
+ .../ethernet/mellanox/mlx5/core/steering/dr_cmd.c  |   12 +-
+ .../mellanox/mlx5/core/steering/hws/Makefile       |    2 +
+ .../mellanox/mlx5/core/steering/hws/mlx5hws.h      |  954 +++++++
+ .../mlx5/core/steering/hws/mlx5hws_action.c        | 2601 ++++++++++++++++++++
+ .../mlx5/core/steering/hws/mlx5hws_action.h        |  307 +++
+ .../mlx5/core/steering/hws/mlx5hws_buddy.c         |  149 ++
+ .../mlx5/core/steering/hws/mlx5hws_buddy.h         |   21 +
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_bwc.c  |  994 ++++++++
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_bwc.h  |   73 +
+ .../mlx5/core/steering/hws/mlx5hws_bwc_complex.c   |   86 +
+ .../mlx5/core/steering/hws/mlx5hws_bwc_complex.h   |   29 +
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_cmd.c  | 1316 ++++++++++
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_cmd.h  |  361 +++
+ .../mlx5/core/steering/hws/mlx5hws_context.c       |  260 ++
+ .../mlx5/core/steering/hws/mlx5hws_context.h       |   64 +
+ .../mlx5/core/steering/hws/mlx5hws_debug.c         |  480 ++++
+ .../mlx5/core/steering/hws/mlx5hws_debug.h         |   40 +
+ .../mlx5/core/steering/hws/mlx5hws_definer.c       | 2148 ++++++++++++++++
+ .../mlx5/core/steering/hws/mlx5hws_definer.h       |  834 +++++++
+ .../mlx5/core/steering/hws/mlx5hws_internal.h      |   59 +
+ .../mlx5/core/steering/hws/mlx5hws_matcher.c       | 1216 +++++++++
+ .../mlx5/core/steering/hws/mlx5hws_matcher.h       |  107 +
+ .../mlx5/core/steering/hws/mlx5hws_pat_arg.c       |  582 +++++
+ .../mlx5/core/steering/hws/mlx5hws_pat_arg.h       |  101 +
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_pool.c |  640 +++++
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_pool.h |  151 ++
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_prm.h  |  514 ++++
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_rule.c |  780 ++++++
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_rule.h |   84 +
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_send.c | 1202 +++++++++
+ .../mellanox/mlx5/core/steering/hws/mlx5hws_send.h |  270 ++
+ .../mlx5/core/steering/hws/mlx5hws_table.c         |  493 ++++
+ .../mlx5/core/steering/hws/mlx5hws_table.h         |   68 +
+ .../mlx5/core/steering/hws/mlx5hws_vport.c         |   86 +
+ .../mlx5/core/steering/hws/mlx5hws_vport.h         |   13 +
+ include/linux/mlx5/mlx5_ifc.h                      |  189 +-
+ include/linux/mlx5/qp.h                            |    1 +
+ 41 files changed, 17293 insertions(+), 36 deletions(-)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/Makefile
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_action.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_action.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_buddy.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_buddy.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_cmd.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_cmd.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_context.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_context.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_debug.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_debug.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_definer.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_definer.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_internal.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pat_arg.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pat_arg.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_prm.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_rule.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_rule.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_send.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_send.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_table.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_table.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_vport.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_vport.h
 
