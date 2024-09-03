@@ -1,327 +1,403 @@
-Return-Path: <netdev+bounces-124748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92CE896ABF8
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 00:17:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0323796AC2A
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 00:25:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B67651C23D7E
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:17:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5571FB24010
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E7C91D58A2;
-	Tue,  3 Sep 2024 22:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F16971D58B9;
+	Tue,  3 Sep 2024 22:25:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZTmY122Z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LY/WQde8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844101CDFA6
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 22:17:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725401846; cv=none; b=VzVT579cUGwyFNstnYx9HBxVlep88FRBoBBpysYD3DatjuQLjjN8X2aJM6SC+ojRtFP3GVite50ieBIeExt0qwaqcaWRdX+qnkPVnebNBvUKgko87i7UynEo2TOeVwxfx2vSuiKtfq+MGYCgr4O4tcIAu98Mjzqt0fRAC6cePl0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725401846; c=relaxed/simple;
-	bh=6nSKMdl8/rMSTMas7fu7iffrXDBuMrREFVYndWL2WPM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gT8Dq2l+roX5dzWLlxPCK5wV9qNWioiaWvSVHhNMvTm6x7aBQQhqgSfG5VRNwH69EmCeV/MDDmM8AjSaQuic3xYRDASAYc27fvBc3aEGmuMY2/LikHY7+1em1qXIv1asWA9zJbf8AeN5i5wL9YzZdqQoBb1i8vljXCkskAAC24U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZTmY122Z; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725401843;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uX67JJ48/X+mbq8S3u6zeSeVmMvnaUsc25ToyEvfFRg=;
-	b=ZTmY122ZtzOHLAtbHw0c4M6rXfsTOP8DzJ7v9rm/k8quprz7XmzcIzbTHJQL87ja3/OBra
-	dbGPqFkMAxKOqGz0swrr8KS1ReY0OefNyDIjssArIWY+0o2+3GkuY3lUl4jrjVdLnh4Rbx
-	D9UEwOQbfadzYIRzc8pV/n5AqLdRz/Q=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-zbedxzASN82xUhVcn5OAzg-1; Tue, 03 Sep 2024 18:17:22 -0400
-X-MC-Unique: zbedxzASN82xUhVcn5OAzg-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4574542503fso46552761cf.0
-        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 15:17:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725401842; x=1726006642;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uX67JJ48/X+mbq8S3u6zeSeVmMvnaUsc25ToyEvfFRg=;
-        b=jLR97xu/VeKPdflYPzEbkRxKLgcmCU/Oi0xn2d3YnKygArm1liiFKPHvFZelFJY+pj
-         kAbiRuiDQjZOnGT/IZ9UJZYMr+/hpgmQcLgvjiWYhtExAueBPeUEAms9o3dQ5R42FlOq
-         1iAjwwaLC6iRx+65sy/I2KvfCShaT34GcH+caqSfhKrzP8/Ap4dD3HGgvLv+X56RUuK5
-         qa+cJbPxx2cotyKxXeN2iBSGAthIHoRsApMdqNuhF1YFcPrZq3w+VcfyNbuidhpkf1OC
-         Knu/KD5Bpfee9LyWuhNn/gBJ7sXFjBe6LsuWMY4DCigYVC3eMKZz9LGeffCb8tkCapdC
-         kncA==
-X-Forwarded-Encrypted: i=1; AJvYcCWJfaSOLashlNjZoujxJJPL3VX4pQp+JbxrrKnQZAlNzZcso+dgTj2UrKmX8v7ap40T4eJgHHY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzsqjdLO/72umCndxswjwlglMkJ09IS6wKPfS0+uEehmzUeEBb
-	QxVFqOhG4wGo3rMj3mCv72yu2cQ8r70ybgjGpyTZfEQT+gXNwKtsj5LXGZulP0PEEH9ucm0ceQY
-	EOvaFQCdV8/QfZAVQuYKRgvzNNxs/pyQLhAMq3wFg2tI5mQj4zITJVA==
-X-Received: by 2002:a05:622a:4892:b0:456:80dd:2b74 with SMTP id d75a77b69052e-456f166a883mr180080041cf.2.1725401841788;
-        Tue, 03 Sep 2024 15:17:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGF+ADqf+HvwhdXdoU9v++JYfldALmtFlgglwFanWYamzzbURjrFGiQObND/oVCHlOkCKZ8dQ==
-X-Received: by 2002:a05:622a:4892:b0:456:80dd:2b74 with SMTP id d75a77b69052e-456f166a883mr180079751cf.2.1725401841295;
-        Tue, 03 Sep 2024 15:17:21 -0700 (PDT)
-Received: from x1gen2nano ([2600:1700:1ff0:d0e0::40])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45682c8788asm54097881cf.1.2024.09.03.15.17.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 15:17:20 -0700 (PDT)
-Date: Tue, 3 Sep 2024 17:17:18 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-Cc: Vinod Koul <vkoul@kernel.org>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, Prasad Sodagudi <psodagud@quicinc.com>, 
-	Rob Herring <robh@kernel.org>, kernel@quicinc.com
-Subject: Re: [PATCH net] net: stmmac: Stop using a single dma_map() for
- multiple descriptors
-Message-ID: <yy2prsz3tjqwjwxgsrumt3qt2d62gdvjwqsti3favtfmf7m5qs@eychxx5qz25f>
-References: <20240902095436.3756093-1-quic_jsuraj@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E803F1D58A7
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 22:25:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725402304; cv=fail; b=NvMgyteQeJp6dA6OKswRcDdpbnQ0wvnpla37PilUEtkBxKTaaJUc4L1YiNWTTA+eqJIRmw0+ww7hnBPkGWSr4chbRmuwH0VZ5R09GknT0NKFG3+sNs8Ripw7w67tmSTtIpbbDVP8U2kq6q+vGOH0ErLqLsNcDQdSe+UXnPegb48=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725402304; c=relaxed/simple;
+	bh=woR9vv4TWc+7ub6WDeTflvfDL6by8HR9naQ2aQsS1wo=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=NcmA4iZyEC+a1EntCQwJ2eYGIySxpZjgUoACHHuAfhrWnuXOMHs6Ysg/QhtEUt0y/rXXRnwsOSBdeDbNRjbYxaWM9RyMExOUz5dFnfwOt/3ixXUYOxDXBLpAAD2sfDC8Q6vJxgaXxUuLoNbMeSNwTMzwxA+wFyRga5h/HeW1s78=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LY/WQde8; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725402302; x=1756938302;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=woR9vv4TWc+7ub6WDeTflvfDL6by8HR9naQ2aQsS1wo=;
+  b=LY/WQde8u4lW141wpOMa4r0L5rMsbB9k7BkeM+ozCG6J5hxpM2LYyU3s
+   1P62Ze686QhrsfEzutKWb6pCB2E4iqBvpxhSKyK+1cyKXbWJBks5K/NdE
+   QTgnDN7cgA1Rz7RxI4LXawR0GNkKDZoLlxp3AGv4lT3a48s2FNFCoG1zY
+   WRgOQMzDl0Dn+Kl4nZAho7AwZbQBf9MrSbO5UVi8zXgwCx32q3EDwS/mx
+   C8Q8BwuN4QHIholVXGcKZDO3qxq0imKDZVpd8vod1QPAm0T1JuxxOOkB9
+   s+dhnbUjmXQPl3eRLSbp3kg2WUsz17gw3xGmZO6dVqAgBX0LDiQrZ7ZT3
+   w==;
+X-CSE-ConnectionGUID: yzOvjFayRmmZ6L3kYzi5vQ==
+X-CSE-MsgGUID: xpudlrXSQtueqe7lMr2MPA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="35421576"
+X-IronPort-AV: E=Sophos;i="6.10,200,1719903600"; 
+   d="scan'208";a="35421576"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 15:25:01 -0700
+X-CSE-ConnectionGUID: 9b/ckZcjTOijYnU0b5SsKA==
+X-CSE-MsgGUID: da3tA1P5RWm4bOkg8B+YMw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,200,1719903600"; 
+   d="scan'208";a="69848570"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Sep 2024 15:25:01 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 3 Sep 2024 15:25:00 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 3 Sep 2024 15:25:00 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 3 Sep 2024 15:24:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wcGexgSWmaiAPUppOYdvGD45eM7TYnPPXE3H26dxWPYFkLkJ79hU9FiTFBX6VMaQpF3kdzuRkEEyJP0v+F4WxqRpBMYD6Lij32nhwe93OiW0+dr7SGgVOE9wdUjKwhfwDN/GcRyWTOh/rv4x1N/wthwyebx2/4axYyMExtK/GJf7hIw5wrmIRftkKXFgtdL6kgez4PU72AXK1u+ETNuizgwPCvbjeKKM/HV+P7LdInUd7uBDNPKp745le2965ZGexG6nCyLOneeSubZTgwen96I9lxJwC2DrjZu5bSpabYBscn+YAVtrAjwy1sKFH4ATwZ7QOdSm5zvyhLTaeKXKzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+Ny+WUJDjbbHmy1vGyw15ZpkmryaDVm1HLJeuuzMTMQ=;
+ b=DY/tjb99cWFuYGvDQZaAOdNo99Ybz+FBUMEmoB8JOZzEyKXQHUCLxDHNUOVV+zDheW1tWHcRshcR03vnre1ZchWuxkCL9TgKP0cjSFSUYrCFiAkMoKMpMHrjD0M1VeT5LJ0N325ef//gMWaaqZY6MgVxVofs24o7Mas6NGHOoeiuuQ0jHMop1vIjDmvxl3Vs33kTKMiKwYdJ/adsuqzzqdp9YJ/dRoOKu8oDlSs9a9u2nxwEHfa+dL8wcTfNhtXKYAeH3lM8y7qxt/YWQ4X/exq8BWyepwZWB2AxYJhdAa9xxZQUrKSgqkvOQwE7AXph6eeSZUyfqUYnZhygqFHbeg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by MW4PR11MB7055.namprd11.prod.outlook.com (2603:10b6:303:22b::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.24; Tue, 3 Sep
+ 2024 22:24:55 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.7918.024; Tue, 3 Sep 2024
+ 22:24:55 +0000
+Message-ID: <cfc622a9-4420-438b-a60a-5f7285689b9f@intel.com>
+Date: Tue, 3 Sep 2024 15:24:53 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v2 10/13] ice: use <linux/packing.h> for Tx and
+ Rx queue context data
+To: Vladimir Oltean <olteanv@gmail.com>
+CC: netdev <netdev@vger.kernel.org>, Anthony Nguyen
+	<anthony.l.nguyen@intel.com>, Intel Wired LAN
+	<intel-wired-lan@lists.osuosl.org>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>
+References: <20240828-e810-live-migration-jk-prep-ctx-functions-v2-0-558ab9e240f5@intel.com>
+ <20240828-e810-live-migration-jk-prep-ctx-functions-v2-10-558ab9e240f5@intel.com>
+ <20240903000800.ue77eim4664dhy4p@skbuf>
+ <00d23c42-2611-45d7-9d25-5ad394477238@intel.com>
+ <20240903221358.eupqxac7chvzxp6e@skbuf>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20240903221358.eupqxac7chvzxp6e@skbuf>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR08CA0009.namprd08.prod.outlook.com
+ (2603:10b6:a03:100::22) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240902095436.3756093-1-quic_jsuraj@quicinc.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|MW4PR11MB7055:EE_
+X-MS-Office365-Filtering-Correlation-Id: 486282c4-f39a-45f5-308d-08dccc673ce2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?S25BUWR2YTMrSDcrSWVsd1ZYbnR3TEc4bFE5WFFhK0Fzd2F0aWRlYk84dnJj?=
+ =?utf-8?B?TGVMdnlxVHJENDA4WVZHYmJRaTVFZFkzeDRyYzFHeWFvblQwcGYzTjVoK2FZ?=
+ =?utf-8?B?M1NjOW1JMTFVTlEzUXBNR0N0amtVU2RqVFdEOWdITmdKOEVuV2JESnBidVFa?=
+ =?utf-8?B?UmRROS82bEQvVXovOUdHOEF3NXpiN0tTOE1iamEvcXFhT0xpS3RoOGthQ1VQ?=
+ =?utf-8?B?dWNjQUgrQUZtaDlMWHNwK05qODlpck9OK2g5NTllWTF0TkhYRUpxTmM5S2lx?=
+ =?utf-8?B?cGJsRVdEK3dQcytDeFErUVJwNXBZQzFrWHVHMmFYVTdTRzVXQ3lQd1dwOVFI?=
+ =?utf-8?B?ajZnSEUzQW95Vzd4VGppRkFvUDhVOHpKVkNZR2xPRXh0Yjd3WVFsaXUxN0dV?=
+ =?utf-8?B?Yjl1M2dXdzhpeXRWUWNteFpjbVRMSEZGcE1EcW5wZVJBYnhXRzdoQUQ5OG9G?=
+ =?utf-8?B?NURtRU1nK0hSVlV1NGpVaVdRRUJhR05FUHlmeThmby96R3NaSTdMdFA5UERk?=
+ =?utf-8?B?d2dQSGpFcWgxaGxoUGJhcm1jZDJ3TFAzYW9uUm1jK0RpUEk1Uzd5b3VsbXJa?=
+ =?utf-8?B?S3pFVkdWaTQ2NW9NODBmRkpiNUJ5V0U0bEd1blRyMGFYK3JNZ1k1Z1ZqM2Fx?=
+ =?utf-8?B?TmprSHJoVHptUGFnWGpSZ1RUNTJuUGtnM2JMc3pFNWd4V0lpVVhaRCtFZTJP?=
+ =?utf-8?B?WTcxTXc1UGFjbGtVRnI4bjlYZHZSSTh4c0cyZGFLc0hLQjhBQ055WXg4QVRj?=
+ =?utf-8?B?RWhTM0dHZFRGYlBGRlVMVEhzclFmZ2tPeDBTRndJeTM3dkh6QlhVbS9LQU90?=
+ =?utf-8?B?dDR6VlB6QVl2RzFmdlNRczZ4OEkvdUpkMHBVYm9WNGNsREVaN3NKS3lWOTdY?=
+ =?utf-8?B?akVuUWV1U3YwcGVuZHpmOHBFaUVhQUtuRGVGSm5HV1E0RGtmbkgza0VOQTgr?=
+ =?utf-8?B?ODBOdXNZK01lNXE2UEROK0E4SHppMXZxQVREcXpwWDhRakVTVjZaOHA1NVp6?=
+ =?utf-8?B?RkdjcXc5L1RlbW8rZFVBay9vdkcxWHUwbzRkWHFQWVpUNzY3SitNbElOQ3FZ?=
+ =?utf-8?B?ZTJlUmFJNU4yK2l1UlJDU3V2ZFIwb01xUTBzZXBUZjdOcnVBaURRV1UyS1Ar?=
+ =?utf-8?B?Q2xoeXY4RHlWZ3ZBbGs4SERFL1oyOFBFb2dZWFlsWFg0TWpya3ZIYlpkVGo0?=
+ =?utf-8?B?Mmx0WWxVb050elZ1bzZ1R1VnRG9iMFdjNGJEeVJiN2NBMDl1VnhESUpEeWho?=
+ =?utf-8?B?YjhLQlJEVFk0SzlOWGxnajEwRUV1ak5uVmNQdnVhNFNxT2JkOGNMWm1JbkJZ?=
+ =?utf-8?B?Z3ZVcUNDY0FJYzAreHFzN3BrRGd4eGk3c3RjSllDZkNzQTNCdkgzd1NyOWc1?=
+ =?utf-8?B?NDNJWkNZeFkvUGxvLzFIU2l1blFiTUVUVk1UVFBQK1F2UVYzWE9HU0NBVUto?=
+ =?utf-8?B?cE9pWWVoenM4N3ZHUTFERTRQTzRPV1M4Wis5S2psd25CbFhCTndrV1Z0VEth?=
+ =?utf-8?B?Qm5IZUF2V3UyRXlpekNPaXJsMkhTN2Q2dnpmZEJZTVNrYStUczljV2luVWYw?=
+ =?utf-8?B?bGJwdWFLVzNKTzlaWUVtTHRCVFhtQ2RWbHFETmdTYkVYQzZRYXloZFkyTnVM?=
+ =?utf-8?B?a3p6Q2d5bE14NjIrd2Uyc2UvTU5McXM5MStDZE5WZnZ2U1FCb1lhakxORUdh?=
+ =?utf-8?B?ODA5WXBDUXE0TkFlYWMxaHpmQUV2dTU3QmJ2OFd1YTg2RFc0a3BXTyt1aFlF?=
+ =?utf-8?B?R2EvS2FYcUlkOGxQOGhFQ04vR2RKM1l2RXFuUDk1d3QvbFlLb3dxSG1yTUJ0?=
+ =?utf-8?Q?cOXhdaPquSZTDSTRVxb6+W0+XSdyqj8oDV+ak=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WkVOOU83Nk9ucmt3UUFZekpkeVF1WWV3azluZjA1NTh0MmtHYk5OQ0RDcDhu?=
+ =?utf-8?B?c2R0K0VKRVRCZGZTZWZLUjdyaVNzbHE4bDJDVk1FNG1HaktKV0RtRGNaY3dP?=
+ =?utf-8?B?NEJxR3ZLOFFWQ2NrODA1a3dRNCtUdmFkVkFLMThZT09zN0FhWWFUdlczUzVa?=
+ =?utf-8?B?cnFTaXlTUVNjMGxGN3pvQWVRK2JqNGhuTkdtVDdvT21hUXI3bWg2c1ZhNFdI?=
+ =?utf-8?B?R2NHQ0dhN3JnODF5dDdiMTdMc004TGR3TkhTbWZMWkhPc1dhWmpVK0E1TXJT?=
+ =?utf-8?B?ZVJiQ3lyb0VSWWhyUTJ2S0xyam5kUWg2YUppYlFYQ2wvYmdDMkd4VitveEFT?=
+ =?utf-8?B?Y3M5MllnT3UveVpxWFRFMktnaW1NK3I4WEtDWmFCd3B1OWp3LzRCSVdwVFgy?=
+ =?utf-8?B?VDhKNHRPV0VkYlFjU2NZdGVGL3BrWW5iQU5JYkNYTVB0aTh5b05KYllwUFZz?=
+ =?utf-8?B?R0ptdjI5dWhJMXYvK0pGVFM2S3dpc2pNeXQzN2EvVmYrbzZkVWRrMm44U2VC?=
+ =?utf-8?B?bm5NOTZQU3o5MVBsV2JOYWlKR1JSTGlramZLSEFVaVZDMHBKRENidTB4U3B2?=
+ =?utf-8?B?MW9uWFFHekVpQzZ5THluQVpzWUVBQS9vUGorRENkRGpvV2p1d1A5WHFlV2RV?=
+ =?utf-8?B?Z1R1UDNMdlhEV2R6T2ttOGtzRnhVa0pvRTV0cWRGeXVJOE0wWmFlQnlPUnZr?=
+ =?utf-8?B?Mmx5bi9ZdFNkNGVEL0lWRFd5WmhZUWx5UWlUaGNIMmcweHpQZ2pTcW5CWmR5?=
+ =?utf-8?B?eVI4c3QrdjNrMW03eUlsMWRiWlk2U2QyYWlyQ2FjM2pzdnFwZ1lCUWEyZEJi?=
+ =?utf-8?B?NjU4dmVZR1ZEdERCaG1BTTFnVlNhMlpWWTcxR05abENjdGxrVVZYbFNkU0Rx?=
+ =?utf-8?B?enRxS0taRW5rMUJSZ2NQSlNWSkZlOXFZcDhFL3VlRVpUUDltZVh3VHprRjFx?=
+ =?utf-8?B?ejF3UTVENkEyc0daZ3hJTCtlMGd0T0dyd1p5S0tVVlZQeWNrUzAwU2NZV3Ns?=
+ =?utf-8?B?Zm1ycnBPRkxJd2NCWVk3M2QvQnc5a1U2WHQ0bzhJOVh3YkNaMkpYamN0MCtu?=
+ =?utf-8?B?QjllMWEzdzViTFpzeEwvTXRuc0VVSzNjL0JRdThkMjF2c3BsWU5MblJmZVdM?=
+ =?utf-8?B?QVZQeXBCVmRud3BSTW1nK29tWUIyaDRKdkVoNUJBYVh0blhJeUVUaFFWSCta?=
+ =?utf-8?B?RE9pK2hYcTRzeW95RFJqcHVqWDRTUkVrRnZPbEltU2R4T0pqa0RtaVVKKy8y?=
+ =?utf-8?B?aHp6ak1FbGFyQTFJckpPdDJwN0JjTU53YWEra2drc21CcHJBdmhQOEpiQjFB?=
+ =?utf-8?B?bU1yWUlKMTFKV2dyNXpzZ3MrQ3NuZVdKS3Q2QVdTaDVxZGpPbWRxM1hHNm1r?=
+ =?utf-8?B?SHVHMG1RQXNIUys0YnhmdjFKUGg2UXErcWNGaHNLL2I4V1dEQW85SlZpSmhK?=
+ =?utf-8?B?V3NnMWxsdDdmSEZGN0wrVFZGelVzYXJlUXc3Z09UM1M5bG5RSFkwWG9XTVJJ?=
+ =?utf-8?B?TmNFMzhvT25td3pOc0VPWFZVTmQ2cnNLSzJkTDdMM3J6cFUya1F6VTJGdTBV?=
+ =?utf-8?B?ZE1VcEp5ZXhRRjdLTSt5UHFUc29DVFRCTVppbFlHaHZLN2Y1SnZObjg3TFVV?=
+ =?utf-8?B?ZGR4SVhTc2ZuR0dvbmlCQUNqbnR6UTF5TWg1a0NXWVYzQlR3VzJzejY4di94?=
+ =?utf-8?B?NUk3QUEvdzFaK2JaS25WdWI2UWpJZ0FFZUJ4ekdXNDM1N1hTSzNySWpoam1y?=
+ =?utf-8?B?LzNmL1V1aDNmK0NuK1IyM3ZyVm8rY0pIY1IyZFU3aS9PaFc1NTJ6OGZYTjBY?=
+ =?utf-8?B?NGl6MEN2cjRuZWVYbWtJYmtsNkxkdzNOUVhHY1hPYktRQWNkU1Q5VUxvZEtj?=
+ =?utf-8?B?eHEwUjR6Q3FIbjBibm5uZ2JOM25VUjhmL0hwL1d6MHhqMms0SWg3bDZWTDZ3?=
+ =?utf-8?B?NXVPaVhOcTZmY3hmUTdVMG5qUDhVVHk3ZSs1QXc4N1dwd3lrZk1aeVNWaUVP?=
+ =?utf-8?B?bHpFdVpZM1BoV0psdVMreUh3eVd6a3VTWHBpdGxJeWl5SHVYT1JYUmFneEJw?=
+ =?utf-8?B?eURGNlV2bzdkL0RGYXFtdVdOYUZzVHZVRFRadmF5TTdybkxUa3VRSGlHZXZO?=
+ =?utf-8?B?bVJTcllacWtJcU9DNWhSK0RPcWw1Q0tiM0N0R2x6TUVDdlpsT2RZclhLS3pw?=
+ =?utf-8?B?Z3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 486282c4-f39a-45f5-308d-08dccc673ce2
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2024 22:24:55.6711
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CQnIQn3MJZxpWqSEK+I1dwTYFLpSt0LJHMsX3idtaMvfDsvOcBqZsqqJHGMeAFkVRo7sEavF/02XIWtdcfK3v2gkMebxQxfn2X/FL4rlAxU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB7055
+X-OriginatorOrg: intel.com
 
-On Mon, Sep 02, 2024 at 03:24:36PM GMT, Suraj Jaiswal wrote:
-> Currently same page address is shared
-> between multiple buffer addresses and causing smmu fault for other
-> descriptor if address hold by one descriptor got cleaned.
-> Allocate separate buffer address for each descriptor
-> for TSO path so that if one descriptor cleared it should not
-> clean other descriptor address.
 
-I think maybe you mean something like:
 
-    Currently in the TSO case a page is mapped with dma_map_single(), and then
-    the resulting dma address is referenced (and offset) by multiple
-    descriptors until the whole region is programmed into the descriptors.
+On 9/3/2024 3:13 PM, Vladimir Oltean wrote:
+> On Tue, Sep 03, 2024 at 02:16:59PM -0700, Jacob Keller wrote:
+>> I only kept my interface in terms of lsb+size because I did not want to
+>> attempt to re-write the table. I actually did re-write the table at
+>> first, and discovered a documentation bug because our documentation for
+>> the table has incorrect lsb/msb for some of the fields in some versions
+>> of the doc!
+>>
+>> I ultimately don't mind switching to the packing convention of start/end
+>> (though my brain does have trouble sometimes thinking of the start as
+>> the higher bit...)
+> 
+> Well, you can keep the ICE_CTX_STORE() macro formatted in whichever way
+> you want, including Width+LSB, but reimplement it to generate a struct
+> packed_field, formatted as startbit+endbit (endbit=LSB, startbit=LSB+Width-1).
+> I actually encourage any user of the packing library to write the code
+> in the closest way possible to the field definitions as they appear in
+> the documentation. What do you think?
 
-    This makes it possible for stmmac_tx_clean() to dma_unmap() the first of the
-    already processed descriptors, while the rest are still being processed
-    by the DMA engine. This leads to an iommu fault due to the DMA engine using
-    unmapped memory as seen below:
-
-    <insert splat>
-
-    You can reproduce this easily by <reproduction steps>.
-
-    To fix this, let's map each descriptor's memory reference individually.
-    This way there's no risk of unmapping a region that's still being
-    referenced by the DMA engine in a later descriptor.
-
-That's a bit nitpicky wording wise, but your first sentence is hard
-for me to follow (buffer addresses seems to mean descriptor?). I think
-showing a splat and mentioning how to reproduce is always a bonus as
-well.
+Our documentation has both lsb, msb, and the width. I agree, and i think
+it would benefit if the packing documentation suggests this as well.
 
 > 
-> Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
-
-Fixes: ?
-
-At a quick glance I think its f748be531d70 ("stmmac: support new GMAC4")
-
-> ---
+>>> I came to the realization that this API would be nice exactly because
+>>> otherwise, you need to duplicate the field definitions, once for the
+>>> pack() call and once for the unpack(). But if they're tables, you don't.
+>>>
+>>> I'm looking at ways in which this new API could solve all the shortcomings
+>>> I don't like with lib/packing in general. Without being even aware of
+>>> ICE_CTX_STORE, I had actually implemented the type conversion to smaller
+>>> unpacked u8/u16/u32 types in exactly the same way.
+>>
+>> I think having this in the core API with a standardized table, along
+>> with support for unpacking the types would be great!
 > 
-> Changes since v2:
-> - Fixed function description 
-> - Fixed handling of return value.
+> Cool then!
 > 
-
-This is v1 as far as netdev is concerned :)
-
+>>> I also wish to do something about the way in which lib/packing deals
+>>> with errors. I don't think it's exactly great for every driver to have
+>>> to dump stack and ignore them. And also, since they're programming
+>>> errors, it's odd (and bad for performance) to perform the sanity checks
+>>> for every function call, instead of just once, say at boot time. So I
+>>> had thought of a third new API call: packed_fields_validate(), which
+>>> runs at module_init() in the consumer driver (ice, sja1105, ...) and
+>>> operates on the field tables.
+>>>
+>>
+>> It does seem reasonable to me that we can move the sanity checks here,
+>> especially since the main programmer error is if this table is incorrect
+>> in one of these ways.
 > 
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 63 ++++++++++++-------
->  1 file changed, 42 insertions(+), 21 deletions(-)
+> Actually I did manage to cook something up which I like even more than
+> packed_fields_validate(): a compile-time sanity check. I'm not completely
+> happy with it, just reasonably happy. You'll see.>>> Basically it is a singular replacement for these existing verifications
+>>> in pack() and unpack():
+>>>
+>>> 	/* startbit is expected to be larger than endbit, and both are
+>>> 	 * expected to be within the logically addressable range of the buffer.
+>>> 	 */
+>>> 	if (unlikely(startbit < endbit || startbit >= 8 * pbuflen))
+>>> 		/* Invalid function call */
+>>> 		return -EINVAL;
+>>>
+>>> 	value_width = startbit - endbit + 1;
+>>> 	if (unlikely(value_width > 64))
+>>> 		return -ERANGE;
+>>>
+>>> so you actually need to tell packed_fields_validate() what is the size
+>>> of the buffer you intend to run pack_fields() and unpack_fields() on.
+>>> I don't see it as a problem at all that the packed buffer size must be
+>>> fixed and known ahead of time - you also operate on fixed ICE_RXQ_CTX_SZ
+>>> and ... hmmm... txq_ctx[22]? sized buffers.
+>>>
+>>
+>> Yea, these are fixed sizes. Strictly I think we could have a macro
+>> defining the size of the Tx queue context as well....
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 83b654b7a9fd..5948774c403f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -4136,16 +4136,18 @@ static bool stmmac_vlan_insert(struct stmmac_priv *priv, struct sk_buff *skb,
->  /**
->   *  stmmac_tso_allocator - close entry point of the driver
->   *  @priv: driver private structure
-> - *  @des: buffer start address
-> + *  @addr: Contains either skb frag address or skb->data address
->   *  @total_len: total length to fill in descriptors
->   *  @last_segment: condition for the last descriptor
->   *  @queue: TX queue index
-> + * @is_skb_frag: condition to check whether skb data is part of fragment or not
->   *  Description:
->   *  This function fills descriptor and request new descriptors according to
->   *  buffer length to fill
-> + *  This function returns 0 on success else -ERRNO on fail
->   */
-> -static void stmmac_tso_allocator(struct stmmac_priv *priv, dma_addr_t des,
-> -				 int total_len, bool last_segment, u32 queue)
-> +static int stmmac_tso_allocator(struct stmmac_priv *priv, void *addr,
-> +				int total_len, bool last_segment, u32 queue, bool is_skb_frag)
->  {
->  	struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
->  	struct dma_desc *desc;
-> @@ -4153,6 +4155,8 @@ static void stmmac_tso_allocator(struct stmmac_priv *priv, dma_addr_t des,
->  	int tmp_len;
->  
->  	tmp_len = total_len;
-> +	unsigned int offset = 0;
-> +	unsigned char *data = addr;
+> Yeah, you'll need than when you'll see what I've prepared below :)
+> 
+>>> But this packed_fields_validate() idea quickly creates another set of 2
+>>> problems which I didn't get to the bottom of:
+>>>
+>>> 1. Some sanity checks in pack() are dynamic and cannot be run at
+>>>    module_init() time. Like this:
+>>>
+>>> 	/* Check if "uval" fits in "value_width" bits.
+>>> 	 * If value_width is 64, the check will fail, but any
+>>> 	 * 64-bit uval will surely fit.
+>>> 	 */
+>>> 	if (value_width < 64 && uval >= (1ull << value_width))
+>>> 		/* Cannot store "uval" inside "value_width" bits.
+>>> 		 * Truncating "uval" is most certainly not desirable,
+>>> 		 * so simply erroring out is appropriate.
+>>> 		 */
+>>> 		return -ERANGE;
+>>>
+>>
+>> If we support u8/u16/u32/u64 sizes as well, you could check that the
+>> size of the unpacked variable too. Could this data be in the table? Oh I
+>> guess technically not because we are checking if the actual value passed
+>> fits. I think keeping this but making it WARN would be sufficient?
+> 
+> The u8/u16/u32/u64 unpacked field size will absolutely be held in the
+> struct packed_field tables.
+> 
+>>>    The worse part is that the check is actually useful. It led to the
+>>>    quick identification of the bug behind commit 24deec6b9e4a ("net:
+>>>    dsa: sja1105: disallow C45 transactions on the BASE-TX MDIO bus"),
+>>>    rather than seeing a silent failure. But... I would still really like
+>>>    the revised lib/packing API to return void for pack_fields() and
+>>>    unpack_fields(). Not really sure how to reconcile these.
+>>>
+>>
+>> Since this is generally programmer error (not something where uAPI can
+>> affect it) what about making these WARN in the core?
+> 
+> Yes, I went for demoting the -ERANGE error in the truncation case to a
+> WARN() that is printed for both the "int pack()" as well as the new
+> "void __pack()" call. Practically, it doesn't make a big difference
+> whether we bail out or do nothing, as long as we loudly complain in
+> either case. It's the complaint that leads to the bug getting easily
+> identified and fixed.
+>
 
-Reverse xmas tree order, offset is always set below so you could just
-declare it, and data really doesn't seem necessary to me vs using addr
-directly.
+Right.
 
-https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
 
->  
->  	while (tmp_len > 0) {
->  		dma_addr_t curr_addr;
-> @@ -4161,20 +4165,44 @@ static void stmmac_tso_allocator(struct stmmac_priv *priv, dma_addr_t des,
->  						priv->dma_conf.dma_tx_size);
->  		WARN_ON(tx_q->tx_skbuff[tx_q->cur_tx]);
->  
-> +		buff_size = tmp_len >= TSO_MAX_BUFF_SIZE ? TSO_MAX_BUFF_SIZE : tmp_len;
-> +
->  		if (tx_q->tbs & STMMAC_TBS_AVAIL)
->  			desc = &tx_q->dma_entx[tx_q->cur_tx].basic;
->  		else
->  			desc = &tx_q->dma_tx[tx_q->cur_tx];
->  
-> -		curr_addr = des + (total_len - tmp_len);
-> +		offset = total_len - tmp_len;
-> +		if (!is_skb_frag) {
-> +			curr_addr = dma_map_single(priv->device, data + offset, buff_size,
-> +						   DMA_TO_DEVICE);
-
-Instead of defining "data" above, can't you just use "addr" directly here?
-
-> +
-> +			if (dma_mapping_error(priv->device, curr_addr))
-> +				return -ENOMEM;
-> +
-> +			tx_q->tx_skbuff_dma[tx_q->cur_tx].buf = curr_addr;
-> +			tx_q->tx_skbuff_dma[tx_q->cur_tx].len = buff_size;
-> +			tx_q->tx_skbuff_dma[tx_q->cur_tx].map_as_page = false;
-> +			tx_q->tx_skbuff_dma[tx_q->cur_tx].buf_type = STMMAC_TXBUF_T_SKB;
-> +		} else {
-> +			curr_addr = skb_frag_dma_map(priv->device, addr, offset,
-> +						     buff_size,
-> +						     DMA_TO_DEVICE);
-> +
-> +			if (dma_mapping_error(priv->device, curr_addr))
-> +				return -ENOMEM;
-> +
-> +			tx_q->tx_skbuff_dma[tx_q->cur_tx].buf = curr_addr;
-> +			tx_q->tx_skbuff_dma[tx_q->cur_tx].len = buff_size;
-> +			tx_q->tx_skbuff_dma[tx_q->cur_tx].map_as_page = true;
-> +			tx_q->tx_skbuff_dma[tx_q->cur_tx].buf_type = STMMAC_TXBUF_T_SKB;
-> +		}
-> +
->  		if (priv->dma_cap.addr64 <= 32)
->  			desc->des0 = cpu_to_le32(curr_addr);
->  		else
->  			stmmac_set_desc_addr(priv, desc, curr_addr);
->  
-> -		buff_size = tmp_len >= TSO_MAX_BUFF_SIZE ?
-> -			    TSO_MAX_BUFF_SIZE : tmp_len;
-> -
->  		stmmac_prepare_tso_tx_desc(priv, desc, 0, buff_size,
->  				0, 1,
->  				(last_segment) && (tmp_len <= TSO_MAX_BUFF_SIZE),
-> @@ -4182,6 +4210,7 @@ static void stmmac_tso_allocator(struct stmmac_priv *priv, dma_addr_t des,
->  
->  		tmp_len -= TSO_MAX_BUFF_SIZE;
->  	}
-> +	return 0;
-
-nit: add a newline before return 0
-
->  }
->  
->  static void stmmac_flush_tx_descriptors(struct stmmac_priv *priv, int queue)
-> @@ -4351,25 +4380,17 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
->  		pay_len = 0;
->  	}
->  
-> -	stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue);
-> +	if (stmmac_tso_allocator(priv, (skb->data + proto_hdr_len),
-> +				 tmp_pay_len, nfrags == 0, queue, false))
-> +		goto dma_map_err;
-
-Changing the second argument here is subtly changing the dma_cap.addr64 <= 32
-case right before this. Is that intentional?
-
-i.e., prior, pretend des = 0 (side note but des is a very confusing
-variable name for "dma address" when there's also mentions of desc meaning
-"descriptor" in the DMA ring). In the <= 32 case, we'd call
-stmmac_tso_allocator(priv, 0) and in the else case we'd call
-stmmac_tso_allocator(priv, 0 + proto_hdr_len).
-
-With this change in both cases its called with the (not-yet-dma-mapped)
-skb->data + proto_hdr_len always (i.e. like the else case).
-
-Honestly, the <= 32 case reads weird to me without this patch. It
-seems some of the buffer is filled but des is not properly incremented?
-
-I don't know how this hardware is supposed to be programmed (no databook
-access) but that seems fishy (and like a separate bug, which would be
-nice to squash if so in its own patch). Would you be able to explain the
-logic there to me if it does make sense to you?
-
->  
->  	/* Prepare fragments */
->  	for (i = 0; i < nfrags; i++) {
-> -		const skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
-> +		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
->  
-> -		des = skb_frag_dma_map(priv->device, frag, 0,
-> -				       skb_frag_size(frag),
-> -				       DMA_TO_DEVICE);
-> -		if (dma_mapping_error(priv->device, des))
-> +		if (stmmac_tso_allocator(priv, frag, skb_frag_size(frag),
-> +					 (i == nfrags - 1), queue, true))
-
-Personally I think it would be nice to change stmmac_tso_allocator() so
-you can keep the frag const above... i.e. something like
-stmmac_tso_allocator(..., void *addr, ..., const skb_frag_t *frag)
-and just check if frag is NULL to determine if you're dealing with a
-frag or not (instead of passing the boolean in to indicate that).
-
-I'm curious if someone else can think of a cleaner API than that for
-that function, even that's not super pretty...
-
->  			goto dma_map_err;
-> -
-> -		stmmac_tso_allocator(priv, des, skb_frag_size(frag),
-> -				     (i == nfrags - 1), queue);
-> -
-> -		tx_q->tx_skbuff_dma[tx_q->cur_tx].buf = des;
-> -		tx_q->tx_skbuff_dma[tx_q->cur_tx].len = skb_frag_size(frag);
-> -		tx_q->tx_skbuff_dma[tx_q->cur_tx].map_as_page = true;
-> -		tx_q->tx_skbuff_dma[tx_q->cur_tx].buf_type = STMMAC_TXBUF_T_SKB;
->  	}
->  
->  	tx_q->tx_skbuff_dma[tx_q->cur_tx].last_segment = true;
-> -- 
-> 2.25.1
+>>> 2. How to make sure that the pbuflen passed to packed_fields_validate()
+>>>    will be the same one as the pbuflen passed to all subsequent pack_fields()
+>>>    calls validated against that very pbuflen?
+>>
+>> I guess you either duplicate the check and WARN, or you don't, and let
+>> it panic on the invalid memory? But I guess that would only actually
+>> panic with something like KASAN
+> 
+> Yeah, I'm still not too sure here. The length of the packed buffer still
+> needs to be "obvious to the eye", since the same length must be manually
+> passed to the sanity check as well as to the actual pack_fields() call,
+> otherwise "bad things" will happen. I believe in the users' ability to
+> structure their code in such a way that this is not hard. Especially
+> since the sanity checks now rely on BUILD_BUG_ON(), and that can be
+> technically be placed anywhere in the code, I expect the best place to
+> put it is exactly near the pack_fields() call. That way, it's the most
+> obvious that the buffer length declared for the sanity check is
+> identical to the one during actual usage. Especially if the usage can be
+> restricted to just one function or two.
 > 
 
+Makes sense. I may need to do a little work on the ice driver to make
+that fit well :D I think currently we have a packing for the Tx queue
+context in different places.
+
+>>> Sorry for not posting code and just telling a story about it. There
+>>> isn't much to show other than unfinished ideas with conflicting
+>>> requirements. So I thought maybe I could use a little help with some
+>>> brainstorming. Of course, do let me know if you are not that interested
+>>> in making the ICE_CTX_STORE tables idea a part of the packing core.
+>>>
+>>> Thanks!
+>>
+>> I think moving this into core would be fantastic. Since pretty much
+>> every driver handles these sanity checks the same way, I also think that
+>> moving those into the core and making them WARN or similar seems
+>> reasonable, so we can make the pack/unpack as void.
+>>
+>> It would be interesting to see a comparison of the resulting module size.
+> 
+> Yeah, I'm also very much interested in comparisons: text size vs rodata
+> size vs dynamic memory usage. With the pack_fields() API in the sja1105
+> driver, I can shrink an enormous amount of u64 unpacked structure fields
+> to just u8. I also really like the idea of compile-time sanity checks,
+> and I'm curious how much that matters in a benchmark or something.
+> Anyway, I don't have a complete rework at the moment, so there's that.
+> 
+
+Yea. Actually my entire initial motivation for starting looking at
+reworking ice was the weird sizes used in our unpacked context
+structure... :D
+
+>> How much of this do you have code for now?
+> 
+> Well, I do have code, but it's not yet complete :)
+> I've updated by https://github.com/vladimiroltean/linux/tree/packing-selftests
+> branch on top of your patch set. Until HEAD~1, I've tested the sja1105
+> driver and it still works. The last patch - the bulk of the conversion
+> actually - is extremely tedious and is not yet ready (it doesn't even
+> compile). Yet, with a bit of imagination, it should be enough to provide
+> an example and hopefully move the discussion forward.
+
+Ok sounds good. I'll take a look at this.
 
