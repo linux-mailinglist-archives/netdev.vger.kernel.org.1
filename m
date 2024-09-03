@@ -1,72 +1,151 @@
-Return-Path: <netdev+bounces-124626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20EC396A416
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:19:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDEE896A41A
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:20:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2076287B03
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:19:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77A1B2848A8
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:20:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C272018A951;
-	Tue,  3 Sep 2024 16:19:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CD2818B47C;
+	Tue,  3 Sep 2024 16:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/QSrfeq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AdIVNYcG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96ACE405C9;
-	Tue,  3 Sep 2024 16:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696F51DFCB;
+	Tue,  3 Sep 2024 16:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725380368; cv=none; b=EL+VbKgbbUn602G/Rf3t7v64e31uqJ1GDIL0cIDllz2mY12EOCZzJaxqVtWwR0bemfWpBqs6vN/2yWGvUZ8TPEshY5zrfpWpfGfsi44hyUyJRVff7+q1AwpBfW1xfqTgsPa5ftMLnN/6f049h8CmLN5uNe1I4sfP3ZqUo6aUXvI=
+	t=1725380413; cv=none; b=P274ovIPIA2m30BGhAYJnLT8Kop4hYL4lWDzoqZ+vZkNRIxbddwmxlOwO3vqlxZslzJ0ibZSwLNFtWk2qsCCRj60yVc/JZ/fkSN1bGFTRy/vNpLx40wmnyEhi5CpPPXXyUVXhZGXnuZzZ1Vj5KBppXw2Jm91Cyj8xR85eJk+0os=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725380368; c=relaxed/simple;
-	bh=WllGggugZ28zZO74W4H1juh4xO9s8coYO5exYjqiISc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jrEjGTTfRoxTKSRYeUXYIH6v+CUQTYUnavzEU57JeVjejCxg1hq8RiBJpzqDzUYrtCYpN+u9rHVUAe3HLiQe23YwW2YyxyGe3Fd79HogDHNpmufiNNaCWwVxSuGS4TJhHXFK9jvjJ9+QAYxTh/qXNCmBPYynIYg6rz9ZUDm23YM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/QSrfeq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B513C4CEC4;
-	Tue,  3 Sep 2024 16:19:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725380368;
-	bh=WllGggugZ28zZO74W4H1juh4xO9s8coYO5exYjqiISc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=i/QSrfeqwKdbBgXMZOK9ypMoOCPtVu8+IRKiOWYrE8sPS5bwyhqbsBciU0rrON7Ln
-	 MhkEk2a6qJWm9t3vlqNmyJJ93zidWq4Z7Hn27tVIr6nz7lZiiMYHNFnlc1Oad2oABr
-	 BMmIy0oUXSFfS01XfttuAY05tYnXfbqyRX1v+ygkpUgrbj3USOPzonpqhVlESyu7RA
-	 +Wy9EOMh5VmtJIcZ8xoSTqQ0tZ856RvXkQkCIKQiH2emZ1ze/UhNdARmifYiwresfQ
-	 SSR9jRG9fj/kqhLIBfDY+OziOPNiQg5jF9yxwprRQ3Wh1F8NyD1nf+q3CPFU1sfXX8
-	 uQDwj+iJHg9og==
-Date: Tue, 3 Sep 2024 17:19:24 +0100
-From: Simon Horman <horms@kernel.org>
-To: Chen Ni <nichen@iscas.ac.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftests: net: convert comma to semicolon
-Message-ID: <20240903161924.GD4792@kernel.org>
-References: <20240903074519.781224-1-nichen@iscas.ac.cn>
+	s=arc-20240116; t=1725380413; c=relaxed/simple;
+	bh=kU60dZi/5tUizJ2hHxOG1Lno1caiHGBgxAEiEnaaI/A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m5UPLoIqy7r4DLlu7uhIKvvVUj2pLDz53EQW9mH0UHKcVJ4rLvOd90OFASjeoMQUJqUUYQGo8q/yI0QzLgzVD6qgvUanSoZ/KTudw8LvYJ9wele7alhEOMiEAMBtBMyA5R4MJS+f6zMP7MafXo7JwH4mgLR68ZXgMhVax44TvGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AdIVNYcG; arc=none smtp.client-ip=209.85.208.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2f3f163e379so2534151fa.3;
+        Tue, 03 Sep 2024 09:20:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725380409; x=1725985209; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Eg+e1TxP/Op9Jw93xjWXFvNAEp6dpRVhx1w8c9CEMg0=;
+        b=AdIVNYcGBaWrg1y/BUbsw17Ib5xbumvcTRs4ivVst15O/fMP+qGNL0cio/DNTDYO3r
+         wYuzmHBD0+mTjw23kJR62UhPH2DBDh20vxP5hU7yqNK96oYCuDOYVg7VdYOLk5OLwWo3
+         XcEnX4YM5r6JPoOBjH6sGOG0WHKW+zmGE+s6scc++VXe88z/kEOV9N+LrbFzbKrXU1nf
+         GCiriX6MyLry+zXkVXGodKHj5baCkeh7xA3i1LBNs6rWBW34RTR6Y+CLcBtWyrz7rURl
+         0V8b4PEBqL/ND1SHMXqOgo7hSkOnMESdrAfLsoXTYOKjw6tLugm1sigx1jkC8/F56omv
+         ngPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725380409; x=1725985209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Eg+e1TxP/Op9Jw93xjWXFvNAEp6dpRVhx1w8c9CEMg0=;
+        b=Pj80ZMkNB4/2fJR53euv3oRX86SxIS2gNoleNcz9QvW5/yx2km4pzNPjvNes47AFCF
+         uHZiIcjp8sBhDG+DZrxVJWIeEc5Cie/79I5z2Ke1TWJeMi/68nXnqsGKExsYVhcATgKZ
+         5Xw63jeY+IDuEK8E/p08s0+peElh2zFvYZ76PZoAUTiPP7A3hb7lM4aSDvqvoaUaRFKm
+         U6JrFWB59z9BvXwgD1+8LmEB+WJirr0cH2qoUwvRYnZ2CG0XtEIjXF/cRkME/VzZUOcf
+         gAZs1Hn9bf/xIMamioWrIb74awoCiK4bCPMGxXJlGLsWUfumws6T9Yham5AQjIXAQjlB
+         ZnTw==
+X-Forwarded-Encrypted: i=1; AJvYcCV1oyE6uQ3AA5AV5VsXGe38wYZg51ds74ZNgGr/EDVl2ger8X35eVyIPXAo/ys9ZtjldlvM2U/F@vger.kernel.org, AJvYcCX25fA/hA2GDgKvZvqpt/3d7QeDSJ+e9iiWWHJ4LeL5U18KdWsbgvgosJB5HO/t6cDQRs5lvx25Q1+rr/E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRKwm2ENi9vD83FWGJsIbCrhZxaHGZ91DjKLsvC314E2hm8T8l
+	WPASrhnXBayxLW7vGXIQSQARr0d0tPZ+3CNVDql5VBhMUKlgXupnQgq71zFv6JERsqcapCDiPH3
+	9rASqAKc76AGyxRrJksGTQtPIzzY=
+X-Google-Smtp-Source: AGHT+IGbuJMzCcU8E6GuXGE3Yw1Wnw7/FaQcsnCRRQVHXCyizIgOX5Kdra1kU41zTbMVeftv64aqZc3t5o/t96RE08M=
+X-Received: by 2002:a05:651c:220e:b0:2f3:e2fd:aae0 with SMTP id
+ 38308e7fff4ca-2f6105c4b9cmr163510071fa.6.1725380408920; Tue, 03 Sep 2024
+ 09:20:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240903074519.781224-1-nichen@iscas.ac.cn>
+References: <20240829154739.16691-1-ubizjak@gmail.com> <Ztc16pw4r3Tf_U7h@calendula>
+In-Reply-To: <Ztc16pw4r3Tf_U7h@calendula>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Tue, 3 Sep 2024 18:19:57 +0200
+Message-ID: <CAFULd4amgCH=h02SSEdxrdazq0A+5wOZgvPmRmn19eb7orSV_g@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] netfilter: nf_tables: Fix percpu address space
+ issues in nf_tables_api.c
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 03, 2024 at 03:45:19PM +0800, Chen Ni wrote:
-> Replace a comma between expression statements by a semicolon.
-> 
-> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+On Tue, Sep 3, 2024 at 6:14=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.o=
+rg> wrote:
+>
+> Hi,
+>
+> On Thu, Aug 29, 2024 at 05:29:30PM +0200, Uros Bizjak wrote:
+> > Use {ERR_PTR,IS_ERR,PTR_ERR}_PCPU() macros when crossing between generi=
+c
+> > and percpu address spaces and add __percpu annotation to *stats pointer
+> > to fix percpu address space issues.
+>
+> IIRC, you submitted patch 1/2 in this series to the mm tree.
 
-As mentioned at [1] I think it would be nice if the patch description
-was a bit more descriptive.
+Yes, patch 1/2 is in this series just for convenience.
 
-[1] https://lore.kernel.org/all/20240903152125.GA4792@kernel.org/
+> Let us know if this patch gets upstreamed via MM tree (if mm
+> maintainers are fine with it) or maybe MM maintainers prefer an
+> alternative path for this.
+
+The patch is accepted into the MM tree [1].
+
+[1] https://lore.kernel.org/mm-commits/20240820052852.CB380C4AF0B@smtp.kern=
+el.org/
+
+Thanks,
+Uros.
+
+>
+> Thanks.
+>
+> > NOTE: The patch depends on a patch that introduces *_PCPU() macros [1]
+> > that is on the way to mainline through the mm tree. For convience, the
+> > patch is included in this patch series, so CI tester is able to test
+> > the second patch without compile failures.
+> >
+> > [1] https://lore.kernel.org/lkml/20240818210235.33481-1-ubizjak@gmail.c=
+om/
+> >
+> > The netfilter patch obsoletes patch [2].
+> >
+> > [2] https://patchwork.ozlabs.org/project/netfilter-devel/patch/20240806=
+102808.804619-1-ubizjak@gmail.com/
+> >
+> > Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+> > Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> >
+> > Uros Bizjak (2):
+> >   err.h: Add ERR_PTR_PCPU(), PTR_ERR_PCPU() and IS_ERR_PCPU() macros
+> >   netfilter: nf_tables: Fix percpu address space issues in
+> >     nf_tables_api.c
+> >
+> >  include/linux/err.h           |  9 +++++++++
+> >  net/netfilter/nf_tables_api.c | 16 ++++++++--------
+> >  2 files changed, 17 insertions(+), 8 deletions(-)
+> >
+> > --
+> > 2.42.0
+> >
 
