@@ -1,218 +1,172 @@
-Return-Path: <netdev+bounces-124460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4A89698E3
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 11:29:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4926969919
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 11:34:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E0091F25A0F
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:29:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9FB31C247DD
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:34:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754DD1C9866;
-	Tue,  3 Sep 2024 09:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE33E1A0BCE;
+	Tue,  3 Sep 2024 09:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=beagleboard-org.20230601.gappssmtp.com header.i=@beagleboard-org.20230601.gappssmtp.com header.b="WoL3+8Wk"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f67.google.com (mail-ot1-f67.google.com [209.85.210.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1AA1C984B
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 09:27:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E4D1A0BC4
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 09:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725355623; cv=none; b=YZx8Y4PB+o2P1kypQ1JVDfFAmOHObLoXXw5cZDO0ypjZ5sO9jeprX8oU5Uift74uQdSwWM33h2hogTXzFVf4syEDeBLfrpL3oQSjZGbnDOiLoa0hh0t4cEqfQIlhQENI+8kLyi8rkj4NEZw9TadArIEcypS/7SnuQc6y/Hl3ySE=
+	t=1725355983; cv=none; b=K4YMKBFToYeN3IELuJpO+grkFVHBj/qOeE+g8XPheiApYaE+xgkxoMGBCYwitjrUY1CMKptogoAs47KOypPTpcWK5da6HQWxVu8PFc3kLApNZCziKVFP702vtGrJeJ+bOX/wkafk355xfOPVGGr1bjbMoBNQfepK+avHadLB43s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725355623; c=relaxed/simple;
-	bh=mTKMsk6KtNYtaaXoNT863Oq20G+QXAHuFkfPLhE+CX8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VED4PPf9ubomKLrxsLnIYDY4EdePlAxXW8mTBuxB0n/WadB/jBPEn9VXFipm9YLCn0zS+NBl7XURA8rd8XaMcMvsLe6O+tEyZHdQx6dt3dPtOh5rNwQx2RNo0PwKIaLSlXuVtaF+lNtEnPLIkxm/XpScpXIrxXCq+JuiFHoNYxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1slPoD-0003qY-PG; Tue, 03 Sep 2024 11:26:45 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1slPoD-0059iY-6T; Tue, 03 Sep 2024 11:26:45 +0200
-Received: from pengutronix.de (pd9e5994e.dip0.t-ipconnect.de [217.229.153.78])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id BC4CB3312BC;
-	Tue, 03 Sep 2024 09:26:44 +0000 (UTC)
-Date: Tue, 3 Sep 2024 11:26:44 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: kernel@pengutronix.de, Alibek Omarov <a1ba.omarov@gmail.com>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Heiko Stuebner <heiko@sntech.de>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Elaine Zhang <zhangqing@rock-chips.com>, David Jander <david.jander@protonic.nl>
-Cc: Simon Horman <horms@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org, David Jander <david@protonic.nl>
-Subject: Re: [PATCH can-next v4 00/20] can: rockchip_canfd: add support for
- CAN-FD IP core found on Rockchip RK3568
-Message-ID: <20240903-competent-fervent-cat-43c5ac-mkl@pengutronix.de>
-References: <20240903-rockchip-canfd-v4-0-1dc3f3f32856@pengutronix.de>
+	s=arc-20240116; t=1725355983; c=relaxed/simple;
+	bh=RkS5AVf/vdM06VdBh/pNZ142u7DJAZMa3GzPOEWQgE8=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=kEgELW3l+zYasmicsyiInif1VcZvCI0hktCFgfXjbHg2wRDNjea2HQp3kzZXEQ96cKQxtpEcYI1/FyrGc/pYy+0Ls/r2IM6fY1x312KcII4namXXzfLbFHe9pxVqzjSnyG9NAhnxhovukH2eRUWqGoAwTMjrAj2SzGZCKIdGjyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=beagleboard.org; spf=fail smtp.mailfrom=beagleboard.org; dkim=pass (2048-bit key) header.d=beagleboard-org.20230601.gappssmtp.com header.i=@beagleboard-org.20230601.gappssmtp.com header.b=WoL3+8Wk; arc=none smtp.client-ip=209.85.210.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=beagleboard.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=beagleboard.org
+Received: by mail-ot1-f67.google.com with SMTP id 46e09a7af769-70f794cd240so1119213a34.0
+        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 02:33:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=beagleboard-org.20230601.gappssmtp.com; s=20230601; t=1725355981; x=1725960781; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GX275WkLtFvp4P0H3VEJOqlKsL5ASXMh+yrpYY3jjm8=;
+        b=WoL3+8WkrkVep/WWWynfC7XLrlThzEvGGLALfzK4YK2XrQfKcIwTM7sJ3ybRsR39t3
+         ZADwivT4rFz96C1cPLSv4eAztnvzrslZPlqOu5PiJrzco8Wz4W6xzzYYjpUKMh3c9cjq
+         LGtTL2HeKbKfvnGy70dHWq0et/pi6Fj8st0ad47QajqF3fUkn5JIFImpaT1hctF8Wogu
+         /nP8i7XZ6W9d5NtdpYSMV0ZMBrxCLt5MdIdPntqACcIqsQpb7TKNkmpAaFTZCFEv8Ldj
+         NPXPA2gX3Dwi7GETC80iFO430sB2y1NTPJ4UsLBz/lAUkwmijD/BEnWpfzYdREg0tlws
+         isAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725355981; x=1725960781;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GX275WkLtFvp4P0H3VEJOqlKsL5ASXMh+yrpYY3jjm8=;
+        b=fqalbHYbE3BXMowyHt1ElPrSKa/fqYhVDWeLO+vIiF++Tp1yw+W5gIs7GBlCoBhISN
+         06tKLD3QAYdodAre+IJCEhpwzUzj0zCpbY5Mb28GT0axUO3/J9kz7kRNDCLRAqV57Uce
+         OfHe5WWupCwcZDiV65gvj/v0tlbcIckylrban6Q1ApMt8dyI1Sv0YAvrFUgi55T7cKXe
+         JyoxJvyVSYe0l1L9eBeS6QG/GZXRX/1MFX29ae8D1xCiZQxLWGPkgelA69z+d7iayi0S
+         TCqWuPkmtitkNXbReutma2MU3YFO3ODLFSv4o2lQL+16UixE3Ln2jAJO11ChYVIKz8G4
+         4Gmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWSpRK3BkmsxKsPOywzBihEYFiP5VGq7ItWX7SQzt1VSulYPb2q3IUMPSnEObxRhCwb4Ojfu8U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yynrsa4FfR4rOG2WNj2EtqlNtWefUDJGFXcH3rNjJP/a9sARuBx
+	eBoG8oQ2GAIpxw0P2HBKsO7CEdQThEGRFZ9P9v3kOKxooOiTetstHoxp4fYIyg==
+X-Google-Smtp-Source: AGHT+IHNAlXlP35WDQ/hjPG0ZhGzmWv5PTEpbHeyt1YwNX8aCYlzjyVLC0Eo1ipif9Q1+hnKTpuh+g==
+X-Received: by 2002:a05:6358:7e90:b0:1b5:c544:23a8 with SMTP id e5c5f4694b2df-1b7edb4ae07mr1390862855d.11.1725355980994;
+        Tue, 03 Sep 2024 02:33:00 -0700 (PDT)
+Received: from [172.22.57.189] ([117.250.76.240])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-715e56d72d1sm8365868b3a.170.2024.09.03.02.32.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Sep 2024 02:33:00 -0700 (PDT)
+From: Ayush Singh <ayush@beagleboard.org>
+Subject: [PATCH v4 0/3] Add Firmware Upload support for beagleplay cc1352
+Date: Tue, 03 Sep 2024 15:02:17 +0530
+Message-Id: <20240903-beagleplay_fw_upgrade-v4-0-526fc62204a7@beagleboard.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="eqyrqjxmrmfjzcdq"
-Content-Disposition: inline
-In-Reply-To: <20240903-rockchip-canfd-v4-0-1dc3f3f32856@pengutronix.de>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKHX1mYC/3XOTQ6DIBAF4KsY1qVBoP501Xs0jQEZkMSIgZbWG
+ O9e1E2TxuWbzPtmZhTAWwjoms3IQ7TBuiEFfspQ24nBALYqZUQJ5aTML1iCMD2MvZga/W5eo/F
+ CAeYMirYFSRRTKHVHD9p+Nvf+SLmz4en8tJ2JdJ3uYkXyAzFSTDCwoqaVLGuq5G3fk054dXbeo
+ NWN7MeiR99FlqxKc8pFraDWxb+1LMsXuxdpzwwBAAA=
+To: d-gole@ti.com, lorforlinux@beagleboard.org, jkridner@beagleboard.org, 
+ robertcnelson@beagleboard.org, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>, 
+ Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>, 
+ Johan Hovold <johan@kernel.org>, Alex Elder <elder@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: greybus-dev@lists.linaro.org, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, Ayush Singh <ayush@beagleboard.org>, 
+ Conor Dooley <conor.dooley@microchip.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2448; i=ayush@beagleboard.org;
+ h=from:subject:message-id; bh=RkS5AVf/vdM06VdBh/pNZ142u7DJAZMa3GzPOEWQgE8=;
+ b=owEBbQKS/ZANAwAIAQXO9ceJ5Vp0AcsmYgBm1tfD/vBXyGsCpKZy+AgleCzE/caFt0oMppSdH
+ xhZlfoywt6JAjMEAAEIAB0WIQTfzBMe8k8tZW+lBNYFzvXHieVadAUCZtbXwwAKCRAFzvXHieVa
+ dFpJEACfw8pLANXVXWW4dt1Ioldn8TmvpqvIqaKqWvzfuNi+tKll5YvE1o1H/kSTEqsiZrjM0MT
+ 3iuxrSqyBGTHWsP/8R5B/YMEJcT/Jhf01wr9fswejixbCA+Lyh+OlA4xdRGmWb3fUZ0UAgvp06o
+ 5SNgvSyA5dUJpKQKuH3ZYImu2DEZhA4UGxZLUtn9H9MomDcENGl8C+lO5E3LL1RhVR79Y0m8Ibe
+ u1h32l56kGTc0axW020mJ5Qc9R+8Daau61UOALhI+ntLf9n/8EfG8/T/3t2HcQTVamHSog3A/1P
+ lWmU6L4QQjVRJx+eNxcmqUnR+AcBlrigd+/7NPmqyuOAsfKnroLxeed6ShLAWGG8FMZNXCKBMqr
+ 0o9IuC+pzLXfk4LrEStfk43oIlqd1Trl9KQbuWPPNcArFDhU+aYoOHrsd35Oc5MYyJE6r/qGZRL
+ 1o5f3QiRFFoqJSN+v7JaxD4zcK+iVkrqokP5C23F3n6qdXKeGpVdUieg7KzGn8K79QIC17Gwd9j
+ R9vlKuUoz1pC2npEXsr0hDr2sKjiTkvP9kXAUEdFAg9GyKR/LuxkkOCrzWAYy3LcW7jiBZ7Or9a
+ uybSiQ4Swgj3strtRmsoET3zm3oZyRfewEvgYoyZfTyA1a+AYq61lzNJtv7ZXiyXiSS7S0OAE0z
+ snjvKIoWaGJ9DLg==
+X-Developer-Key: i=ayush@beagleboard.org; a=openpgp;
+ fpr=DFCC131EF24F2D656FA504D605CEF5C789E55A74
 
+Adds support for beagleplay cc1352 co-processor firmware upgrade using
+kernel Firmware Upload API. Uses ROM based bootloader present in
+cc13x2x7 and cc26x2x7 platforms for flashing over UART.
 
---eqyrqjxmrmfjzcdq
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Communication with the bootloader can be moved out of gb-beagleplay
+driver if required, but I am keeping it here since there are no
+immediate plans to use the on-board cc1352p7 for anything other than
+greybus (BeagleConnect Technology). Additionally, there do not seem to
+any other devices using cc1352p7 or its cousins as a co-processor.
 
-Sorry for the noise, please ignore this series.
+Bootloader backdoor and reset GPIOs are used to enable cc1352p7 bootloader
+backdoor for flashing. Flashing is skipped in case we are trying to flash
+the same image as the one that is currently present. This is determined by
+CRC32 calculation of the supplied firmware and flash data.
 
-On 03.09.2024 11:21:42, Marc Kleine-Budde wrote:
-> This series adds support for the CAN-FD IP core found on the Rockchip
-> RK3568.
->=20
-> The IP core is a bit complicated and has several documented errata.
-> The driver is added in several stages, first the base driver including
-> the RX-path. Then several workarounds for errata and the TX-path, and
-> finally features like hardware time stamping, loop-back mode and
-> bus error reporting.
->=20
-> regards,
-> Marc
->=20
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
-> ---
-> Changes in v4:
-> - dt-bindings: renamed to rockchip,rk3568v2-canfd.yaml to match the
->   first compatible
+We also do a CRC32 check after flashing to ensure that the firmware was
+flashed properly.
 
-I forgot to update the MAINTAINERS entry. I'll send a new series, but
-not today.
+Link: https://www.ti.com/lit/ug/swcu192/swcu192.pdf Ti CC1352P7 Technical Specification
 
-Marc
+Changes in v4:
+- Add acks properly
+- Fix Kconfig warning by adding select FW_LOADER
+- Link to v3: https://lore.kernel.org/r/20240825-beagleplay_fw_upgrade-v3-0-8f424a9de9f6@beagleboard.org
 
-> - dt-bindings: fix "$id" in yaml (thanks Rob's bot)
-> - all: add Tested-by: Alibek Omarov <a1ba.omarov@gmail.com>
-> - Link to v3: https://patch.msgid.link/20240830-rockchip-canfd-v3-0-d4262=
-66453fa@pengutronix.de
->=20
-> Changes in v3:
-> - dt-bindings: renamed file to rockchip,rk3568-canfd.yaml (thanks Rob)
-> - dt-bindings: reworked compatibles (thanks Rob)
-> - Link to v2: https://lore.kernel.org/all/20240731-rockchip-canfd-v2-0-d9=
-604c5b4be8@pengutronix.de
->=20
-> Changes in v2:
-> - dt-bindings: remove redundant words from subject and patch
->   description (thanks Rob)
-> - dt-bindings: clean up clock- and reset-names (thanks Rob)
-> - base driver: add missing bitfield.h header
-> - base driver: rkcanfd_handle_rx_int_one(): initialize header to avoid
->   uninitialzied variable warning on m68k
-> - base driver: rkcanfd_get_berr_counter_raw(): don't add assigned only
->   variable (bec_raw), move to 14/20 (thanks Simon)
-> - CAN-FD frame equal check + TX-path: squash, to avoid unused
->   functions (thanks Simon)
-> - TX-path: rkcanfd_handle_tx_done_one(): don't add assigned only
->   variable (skb), move to 18/20 (thanks Simon)
-> - HW-timetamping: add missing timecounter.h header (thanks Simon)
-> - Link to v1: https://lore.kernel.org/all/20240729-rockchip-canfd-v1-0-fa=
-1250fd6be3@pengutronix.de
->=20
-> ---
-> David Jander (2):
->       arm64: dts: rockchip: add CAN-FD controller nodes to rk3568
->       arm64: dts: rockchip: mecsbc: add CAN0 and CAN1 interfaces
->=20
-> Marc Kleine-Budde (18):
->       dt-bindings: can: rockchip_canfd: add rockchip CAN-FD controller
->       can: rockchip_canfd: add driver for Rockchip CAN-FD controller
->       can: rockchip_canfd: add quirks for errata workarounds
->       can: rockchip_canfd: add quirk for broken CAN-FD support
->       can: rockchip_canfd: add support for rk3568v3
->       can: rockchip_canfd: add notes about known issues
->       can: rockchip_canfd: rkcanfd_handle_rx_int_one(): implement workaro=
-und for erratum 5: check for empty FIFO
->       can: rockchip_canfd: rkcanfd_register_done(): add warning for errat=
-um 5
->       can: rockchip_canfd: add TX PATH
->       can: rockchip_canfd: implement workaround for erratum 6
->       can: rockchip_canfd: implement workaround for erratum 12
->       can: rockchip_canfd: rkcanfd_get_berr_counter_corrected(): work aro=
-und broken {RX,TX}ERRORCNT register
->       can: rockchip_canfd: add stats support for errata workarounds
->       can: rockchip_canfd: prepare to use full TX-FIFO depth
->       can: rockchip_canfd: enable full TX-FIFO depth of 2
->       can: rockchip_canfd: add hardware timestamping support
->       can: rockchip_canfd: add support for CAN_CTRLMODE_LOOPBACK
->       can: rockchip_canfd: add support for CAN_CTRLMODE_BERR_REPORTING
->=20
->  .../bindings/net/can/rockchip,rk3568v2-canfd.yaml  |  74 ++
->  MAINTAINERS                                        |   8 +
->  arch/arm64/boot/dts/rockchip/rk3568-mecsbc.dts     |  14 +
->  arch/arm64/boot/dts/rockchip/rk3568.dtsi           |  39 +
->  drivers/net/can/Kconfig                            |   1 +
->  drivers/net/can/Makefile                           |   1 +
->  drivers/net/can/rockchip/Kconfig                   |   9 +
->  drivers/net/can/rockchip/Makefile                  |  10 +
->  drivers/net/can/rockchip/rockchip_canfd-core.c     | 969 +++++++++++++++=
-++++++
->  drivers/net/can/rockchip/rockchip_canfd-ethtool.c  |  73 ++
->  drivers/net/can/rockchip/rockchip_canfd-rx.c       | 299 +++++++
->  .../net/can/rockchip/rockchip_canfd-timestamp.c    | 105 +++
->  drivers/net/can/rockchip/rockchip_canfd-tx.c       | 167 ++++
->  drivers/net/can/rockchip/rockchip_canfd.h          | 553 ++++++++++++
->  14 files changed, 2322 insertions(+)
-> ---
-> base-commit: da4f3b72c8831975a06eca7e1c27392726f54d20
-> change-id: 20240729-rockchip-canfd-4233c71f0cc6
->=20
-> Best regards,
-> --=20
-> Marc Kleine-Budde <mkl@pengutronix.de>
->=20
->=20
->=20
->=20
+Changes in v3:
+- Spelling fixes in cover letter
+- Add Ack by Rob Herring on Patch 1
+- Link to v2: https://lore.kernel.org/r/20240801-beagleplay_fw_upgrade-v2-0-e36928b792db@beagleboard.org
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Changes in v2:
+- Spelling fixes
+- Rename boot-gpios to bootloader-backdoor-gpios
+- Add doc comments
+- Add check to ensure firmware size is 704 KB
+- Link to v1: https://lore.kernel.org/all/20240719-beagleplay_fw_upgrade-v1-0-8664d4513252@beagleboard.org
 
---eqyrqjxmrmfjzcdq
-Content-Type: application/pgp-signature; name="signature.asc"
+Signed-off-by: Ayush Singh <ayush@beagleboard.org>
+---
+Ayush Singh (3):
+      dt-bindings: net: ti,cc1352p7: Add bootloader-backdoor-gpios
+      arm64: dts: ti: k3-am625-beagleplay: Add bootloader-backdoor-gpios to cc1352p7
+      greybus: gb-beagleplay: Add firmware upload API
 
------BEGIN PGP SIGNATURE-----
+ .../devicetree/bindings/net/ti,cc1352p7.yaml       |   7 +
+ arch/arm64/boot/dts/ti/k3-am625-beagleplay.dts     |   3 +-
+ drivers/greybus/Kconfig                            |   2 +
+ drivers/greybus/gb-beagleplay.c                    | 658 ++++++++++++++++++++-
+ 4 files changed, 656 insertions(+), 14 deletions(-)
+---
+base-commit: f76698bd9a8ca01d3581236082d786e9a6b72bb7
+change-id: 20240715-beagleplay_fw_upgrade-43e6cceb0d3d
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbW1lAACgkQKDiiPnot
-vG/ZHAf+O51SAV47j7T7YC6df1yEQPVMBhqcN4Z/J61mB5vKb8RadR0V6+H1/ULx
-gjasA2OvFUXnVx27BN7FFwMiiDYh7YHJkc7Fn5mQHQFmRew8AToNj5hxfBJak1PW
-wJ4FtznPhETWfHt2Zb9XwdlOEa1iD5zIo5ib/6LJbxdHUZKrQm5da1DulHChnKcG
-/06FiW1zoLHnO83AsR/RDdccf2XS99hZlm9fuSIpb/mGq6glAJ5lRSWDRS3/VBYC
-EsPPWLLK6G7omsgeAXCPJESWORg4vqeKkeR6x8lY4J49FbO++HlPZTMm+2jUrBAJ
-f9HDXt9wuGu/9UcH+0btqZiHSklQUA==
-=7FIz
------END PGP SIGNATURE-----
+Best regards,
+-- 
+Ayush Singh <ayush@beagleboard.org>
 
---eqyrqjxmrmfjzcdq--
 
