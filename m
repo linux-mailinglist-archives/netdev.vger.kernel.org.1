@@ -1,108 +1,90 @@
-Return-Path: <netdev+bounces-124721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E8E596A90D
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:52:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A7B996A74C
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 21:25:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 241621F2500A
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:52:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB5B9B20998
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 19:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3AB1D88D2;
-	Tue,  3 Sep 2024 20:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A69518EFC5;
+	Tue,  3 Sep 2024 19:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fgp1K916"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TkH6RSzB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32E01E2CE3;
-	Tue,  3 Sep 2024 20:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3CFF1D5CC6
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 19:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725396278; cv=none; b=tjq4tH6JF0bmCUgIT8gyKPs7a6J0xKvh6h2t/fjNm+QuThc41JDzx0GboV2JHiu6J8fe+C3vOiFAW4ZlChob+LgHEMocAzwrxqJ5Qj832SSFO3Mxh4skwlc3oTNDSSVn7WMeCI6xLvrBilZNLKZrIgwePjGyG303zoOG3ecVt+A=
+	t=1725391536; cv=none; b=LF+hOAZoZxhSqrGbfo5klfV067v/qMCev2gqNcTAf5xBzHKI68eqUYQ6sDooDwbOz57KbJ5LtexkYknUTCzfBH/8CUwNQ2YX48OwlfZXzY+7Uwdc/hNcRy7UjggoWvFx9SmOnFhJWC5Bq9W7Bf36u8vqIxSQ97H3PJQ6nwYaVTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725396278; c=relaxed/simple;
-	bh=Wj1iXs6w6GGC0ngNMNkpx0MMOmi/Z+zlA8R3U2RRlYY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DFMJt1jXLYsR3X1GHfm4wpATLrH6V1E/93JH0eSbIXDeJ45BmnCrAtuhcVMvTzsCs8hpeSkxOznBPob3/F0Ed8W0f7m9snonlOZdnIZ18AGPza3mstcrpIepi/utnCoxcya5XrO68XZogoLzezCHendluzZ605SdT+XkuarOZYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fgp1K916; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37768C4CEC4;
-	Tue,  3 Sep 2024 20:44:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725396278;
-	bh=Wj1iXs6w6GGC0ngNMNkpx0MMOmi/Z+zlA8R3U2RRlYY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fgp1K916j6mQZcn3TrA+kmOAXSaPGzVmBrIOrXP1KdaqextefUpgN4bAzw/TUkJl9
-	 2Zct7AqOMbqucbZJs5f+MO4NWhRNzvPT/yw3kLR7gq1Baii7CthpeK/DXFQlUvQTxs
-	 N2WKunyo97+3r1zQ+ykKRZzNnlsccAZGld4S813Cdyr9u2qXHb7W9oMa+BYUjXb1yM
-	 i2l7X3JG7BvILjx0dG/LLXxwIg5gS0xWY9bwgFJ2+e/DcM3C/IVFoQZshbqZuuiP98
-	 GDt+uzJx4c3VR3OVB9yWO3adt2skXKiBP4TAp9IZFliFwXqqrVT8Bn50265K8Gplx8
-	 4/GHX+Qua6Jbg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Dmitry Antipov <dmantipov@yandex.ru>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
+	s=arc-20240116; t=1725391536; c=relaxed/simple;
+	bh=ykCWykWpqVTMRvC3YPz6AH99OxBvDavSRS0ceXi2Zrg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DEUornYA4l/k9qPKgh8pptn+Y+qYoUYaBr5AkIq0M1o1YBA/wfj26OMX33pUDyXNxI1XJ+8LsKq8CAk2z3YTWXnBmeVw3KGly7cyJ0rtRdVPO/TtybdhM43xsXGPc+NNuouUSr4uLOcJJqpta3RehBRy64fi4Phs27r66tNvUIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TkH6RSzB; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725391531;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QF360K14VcVg7z2XyE8+/3/eZAXYC2hLsD6VFynELLc=;
+	b=TkH6RSzBANNSz9eMRL4aH1xDpt+94KF6D3b99fh83OcYt65v9F58AnMqcnx1zqkdQhMdGD
+	6qdScVDA1xOw5SUsCacyH4LihW5/0G8vWk8vdOhhvSZLup6kaNQODxPYQQx9AWF3LsMvbC
+	f2a0rTOpUvfhwqYvCV9C61uIV+4mpmA=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 19/20] wifi: mac80211: free skb on error path in ieee80211_beacon_get_ap()
-Date: Tue,  3 Sep 2024 15:23:51 -0400
-Message-ID: <20240903192425.1107562-19-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240903192425.1107562-1-sashal@kernel.org>
-References: <20240903192425.1107562-1-sashal@kernel.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Michal Simek <michal.simek@amd.com>,
+	Sean Anderson <sean.anderson@linux.dev>,
+	Heng Qi <hengqi@linux.alibaba.com>
+Subject: [PATCH net-next 0/2] net: xilinx: axienet: Enable adaptive IRQ coalescing with DIM
+Date: Tue,  3 Sep 2024 15:25:22 -0400
+Message-Id: <20240903192524.4158713-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.48
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Dmitry Antipov <dmantipov@yandex.ru>
+To improve performance without sacrificing latency under low load,
+enable DIM. While I appreciate not having to write the library myself, I
+do think there are many unusual aspects to DIM, as detailed in the last
+patch.
 
-[ Upstream commit 786c5be9ac29a39b6f37f1fdd2ea59d0fe35d525 ]
+This series depends on [1].
 
-In 'ieee80211_beacon_get_ap()', free allocated skb in case of error
-returned by 'ieee80211_beacon_protect()'. Compile tested only.
+[1] https://lore.kernel.org/netdev/20240903180059.4134461-1-sean.anderson@linux.dev/
 
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-Link: https://patch.msgid.link/20240805142035.227847-1-dmantipov@yandex.ru
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/mac80211/tx.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
-index 46b02a6ae0a36..415e951e4138a 100644
---- a/net/mac80211/tx.c
-+++ b/net/mac80211/tx.c
-@@ -5311,8 +5311,10 @@ ieee80211_beacon_get_ap(struct ieee80211_hw *hw,
- 	if (beacon->tail)
- 		skb_put_data(skb, beacon->tail, beacon->tail_len);
- 
--	if (ieee80211_beacon_protect(skb, local, sdata, link) < 0)
-+	if (ieee80211_beacon_protect(skb, local, sdata, link) < 0) {
-+		dev_kfree_skb(skb);
- 		return NULL;
-+	}
- 
- 	ieee80211_beacon_get_finish(hw, vif, link, offs, beacon, skb,
- 				    chanctx_conf, csa_off_base);
+Sean Anderson (2):
+  net: xilinx: axienet: Support adjusting coalesce settings while
+    running
+  net: xilinx: axienet: Enable adaptive IRQ coalescing with DIM
+
+ drivers/net/ethernet/xilinx/Kconfig           |   1 +
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  18 +-
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 254 ++++++++++++++----
+ 3 files changed, 220 insertions(+), 53 deletions(-)
+
 -- 
-2.43.0
+2.35.1.1320.gc452695387.dirty
 
 
