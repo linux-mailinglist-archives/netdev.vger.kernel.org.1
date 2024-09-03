@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-124673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBDB096A6C2
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:44:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DC7696A6C4
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:44:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9108A1F21FF0
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:44:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FD3328978F
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939F91925BF;
-	Tue,  3 Sep 2024 18:43:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57DA619307F;
+	Tue,  3 Sep 2024 18:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ugehQBYB"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NShfBAY3"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB42192587
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 18:43:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607081925B1
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 18:43:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725389025; cv=none; b=Zze3trewuUdF3mTW8a6o5W0YQDSEqRjmrmYk7PW6FdGusNVMhwUJGzwMd8bss+AggUSlWQLlCR2MNAe7SyGFJ2lvZyCvJYiLTfgYnpLXQ09Rl6T9TIluf5GJH6QBtPMEsgdJHS8ts62X/IQ9ba2OgqX2woQgiycKdDvPS6a/jZg=
+	t=1725389027; cv=none; b=H7TWcCx8AiAUIgLvvNrmSFJc48XG//q/Sz8ErY/YgGIB+GZqrFOUzx1+U40VB065uTLF4rx1Vhz4ccVQG4DLJ5/iNp7nbYg8QOKMTYZQns4TInrbRRaD8H5YHu+vOMCjh6SeXkxaSBx2OalJ+WBYfbWaaxHhw1ekJL2qoBPKeeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725389025; c=relaxed/simple;
-	bh=cIDDSpZqdWOsRvNfYimdfZv8iQfBpc64WvolZFWHh68=;
+	s=arc-20240116; t=1725389027; c=relaxed/simple;
+	bh=KeK2MGRF1ZYh5LMH0RB6iuHxz/h3nIj2WOQi1Ys8Y/I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L8tan5DfJhKhPUaRYlABxB+xd2XiCDMqtF1LJB89sd2T2dPvusCS5dvoSoh6K7p+BB4zpphKqdpm/TWp3dt+LCncLJCz840t9xxT+lSyk7M5ykfdUK7TUsi7E907ntIzhIlgRTVwwTInOxP3S73RNp2pkrNiw7/BhStHI4EmwH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ugehQBYB; arc=none smtp.client-ip=91.218.175.180
+	 MIME-Version; b=On74dBhtRBF9+0arcUSls1T5PBclReAd0336Zhy0kUut6RTEooAevi6kLVqTtalKQEyI6i/of/QPEoDd3ni8cwg7G5+E05sYma03/BoBIKEy5EXiD/ZJzcNbT2DoXkxi2pAhLwVYZzUSuB+c+1hj4pSmUQeVCWf5RaJWQI5KJNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NShfBAY3; arc=none smtp.client-ip=91.218.175.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725389021;
+	t=1725389023;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=miVlX6AWASpn/Rgevxfm45wsjcuK0SlwyRSflTtdySU=;
-	b=ugehQBYBI5JaPFAjPagyMl042nSEprLVnVKT6vj3dJoqXxPZ+eUrThmyZairmugvjcakf9
-	wftGOb5lDL8Alh3Qz9mcEB4HqSn5LbTxqovwJSTjgS5Gzs2I4gZrscUqwMBQ1blHpuCQV1
-	aLnHp+XgIJa9gyHdJemulrL1ilzrBy4=
+	bh=NXxxYldboyxzE9Wae39eG+jfv6vdAxMeW5NxEwKdx/M=;
+	b=NShfBAY37foLKXLE9aUjjeK3vDl801KxB506r4Er5d3tmzGPfCbIpWBGTou+3GFI8NfF5i
+	90tu1l92vHrC3vdGDDMvRjlM5E4YEYHV/gvyDX1cOz3JDy5JD3dIwWl/pqlkoTeX1NpEZ3
+	DvYLzfI1nBmFv4c9acb/gOFBufMnt7s=
 From: Sean Anderson <sean.anderson@linux.dev>
 To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
 	"David S . Miller" <davem@davemloft.net>,
@@ -53,9 +53,9 @@ Cc: Michal Simek <michal.simek@amd.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org,
 	Sean Anderson <sean.anderson@linux.dev>
-Subject: [PATCH 1/3] net: xilinx: axienet: Remove unused checksum variables
-Date: Tue,  3 Sep 2024 14:43:32 -0400
-Message-Id: <20240903184334.4150843-2-sean.anderson@linux.dev>
+Subject: [PATCH 2/3] net: xilinx: axienet: Enable NETIF_F_HW_CSUM for partial tx checksumming
+Date: Tue,  3 Sep 2024 14:43:33 -0400
+Message-Id: <20240903184334.4150843-3-sean.anderson@linux.dev>
 In-Reply-To: <20240903184334.4150843-1-sean.anderson@linux.dev>
 References: <20240903184334.4150843-1-sean.anderson@linux.dev>
 Precedence: bulk
@@ -67,81 +67,33 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-These variables are set but never used. Remove them
+Partial tx chechsumming is completely generic and does not depend on the
+L3/L4 protocol. Signal this to the net subsystem by enabling the
+more-generic offload feature (instead of restricting ourselves to
+TCP/UDP over IPv4 checksumming only like is necessary with full
+checksumming).
 
 Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 ---
 
- drivers/net/ethernet/xilinx/xilinx_axienet.h      |  5 -----
- drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 12 ------------
- 2 files changed, 17 deletions(-)
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-index c301dd2ee083..b9d2d7319220 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-@@ -527,8 +527,6 @@ struct skbuf_dma_descriptor {
-  *		  supported, the maximum frame size would be 9k. Else it is
-  *		  1522 bytes (assuming support for basic VLAN)
-  * @rxmem:	Stores rx memory size for jumbo frame handling.
-- * @csum_offload_on_tx_path:	Stores the checksum selection on TX side.
-- * @csum_offload_on_rx_path:	Stores the checksum selection on RX side.
-  * @coalesce_count_rx:	Store the irq coalesce on RX side.
-  * @coalesce_usec_rx:	IRQ coalesce delay for RX
-  * @coalesce_count_tx:	Store the irq coalesce on TX side.
-@@ -606,9 +604,6 @@ struct axienet_local {
- 	u32 max_frm_size;
- 	u32 rxmem;
- 
--	int csum_offload_on_tx_path;
--	int csum_offload_on_rx_path;
--
- 	u32 coalesce_count_rx;
- 	u32 coalesce_usec_rx;
- 	u32 coalesce_count_tx;
 diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index fe6a0e2e463f..60ec430f3eb0 100644
+index 60ec430f3eb0..74fade5a95c2 100644
 --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
 +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -2631,38 +2631,26 @@ static int axienet_probe(struct platform_device *pdev)
- 	if (!ret) {
+@@ -2632,8 +2632,8 @@ static int axienet_probe(struct platform_device *pdev)
  		switch (value) {
  		case 1:
--			lp->csum_offload_on_tx_path =
--				XAE_FEATURE_PARTIAL_TX_CSUM;
  			lp->features |= XAE_FEATURE_PARTIAL_TX_CSUM;
- 			/* Can checksum TCP/UDP over IPv4. */
- 			ndev->features |= NETIF_F_IP_CSUM;
+-			/* Can checksum TCP/UDP over IPv4. */
+-			ndev->features |= NETIF_F_IP_CSUM;
++			/* Can checksum any contiguous range */
++			ndev->features |= NETIF_F_HW_CSUM;
  			break;
  		case 2:
--			lp->csum_offload_on_tx_path =
--				XAE_FEATURE_FULL_TX_CSUM;
  			lp->features |= XAE_FEATURE_FULL_TX_CSUM;
- 			/* Can checksum TCP/UDP over IPv4. */
- 			ndev->features |= NETIF_F_IP_CSUM;
- 			break;
--		default:
--			lp->csum_offload_on_tx_path = XAE_NO_CSUM_OFFLOAD;
- 		}
- 	}
- 	ret = of_property_read_u32(pdev->dev.of_node, "xlnx,rxcsum", &value);
- 	if (!ret) {
- 		switch (value) {
- 		case 1:
--			lp->csum_offload_on_rx_path =
--				XAE_FEATURE_PARTIAL_RX_CSUM;
- 			lp->features |= XAE_FEATURE_PARTIAL_RX_CSUM;
- 			break;
- 		case 2:
--			lp->csum_offload_on_rx_path =
--				XAE_FEATURE_FULL_RX_CSUM;
- 			lp->features |= XAE_FEATURE_FULL_RX_CSUM;
- 			break;
--		default:
--			lp->csum_offload_on_rx_path = XAE_NO_CSUM_OFFLOAD;
- 		}
- 	}
- 	/* For supporting jumbo frames, the Axi Ethernet hardware must have
 -- 
 2.35.1.1320.gc452695387.dirty
 
