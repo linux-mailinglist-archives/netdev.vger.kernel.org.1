@@ -1,80 +1,46 @@
-Return-Path: <netdev+bounces-124515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61012969D02
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:08:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F417969D28
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:14:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B54F1F25B13
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:08:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFE93284419
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD791C9867;
-	Tue,  3 Sep 2024 12:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K32E9Fg+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38141C9854;
+	Tue,  3 Sep 2024 12:14:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81531A42D6
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 12:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5E71CEAC4;
+	Tue,  3 Sep 2024 12:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725365317; cv=none; b=R31WM1lImgwQWO7hnSPFTSDvoB/I3wRHweVkd/NXPlQ8q7KB9V0jyI0scb0iTky1Ee2j1zDr2V7mnfcLCHEPjbYBb8XV1Xz1RKpEiSPtidrmfzWpDyeMkybyz0Zu1Fbo3k0qIXR6Il4b6Z2Bdb4AzlYy5FiCjJ9oeCNshe12rtg=
+	t=1725365649; cv=none; b=O4aqUpE+FDZLQk5m/86GBbJqe/0dOsb/CPVk/4a2i10PquAyNn9RK+RhqyQ7CeiKbAkm3lLWtjKnxbgB8p6SHA0+uXvti3uK5UPFkHvskagx7sSjeB9Trq/OxDOdAtkEVOEIsjgBlzadS4v/6CPEdA7KPsuGi3yHElDa5eCcrCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725365317; c=relaxed/simple;
-	bh=BsZ1n0bOcMMHp87eIkC1zg9ceFjqaILO25XZebbY6Ok=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F1SAHY2/CYtKFq6Qr1z5mrqqBF/XCbve7KXxBq8FtLjdUIXKbSjNHzl6upapWCVLjV6BHJwibRjyHguK4d7/RGVRaY3fxZwQrWVXXSBUyb9B9G3pt/yDb900AS+uhi06sY42YaYKZhfib2AiY1pnSxW2gReOUwcXU6ERXz+eAFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K32E9Fg+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725365313;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9aYRYgG0kixSIOydeenongC/DRL5RnTOeLQrTKXisEc=;
-	b=K32E9Fg+vcGTIt5kmZB2CAX0PraKQyk7DCri+mtm6FmAJagnQLjAlUp42SQ90zlGpSkPZL
-	oZrkm5Ok0DGgBv6zG96s/fey1h5I/gWNuwHwXD5naBCylMNinU/K4jqsNvD7zI5vAFZ8+e
-	wYbU+raeeg7w34jWY04ZThh9Hel+H3c=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-308-7tkY4X4-ODKJQJndcYPVUQ-1; Tue, 03 Sep 2024 08:08:32 -0400
-X-MC-Unique: 7tkY4X4-ODKJQJndcYPVUQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42bb8610792so46386015e9.3
-        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 05:08:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725365311; x=1725970111;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9aYRYgG0kixSIOydeenongC/DRL5RnTOeLQrTKXisEc=;
-        b=j6LaytyOAULYUDT8v9c/d3CIR3a7dj9nUkL1X5CYWL9r8LGAz18rXOXcL3uyTfCyGz
-         PYthQF2MTlnSXiC1Cc8jBDx3UaFSN+ZETmwHvZv3zc1PNOBSrxUxSAQlDrwO6cQz9yNh
-         AlyfYQixo+lN5yu+9gxbohPWasdiCNjFznBWC8s0hgLL3SFtVKdvEohrYrDQGiaiZ3/x
-         h6HqotxIfIX6cYGx5cIv30Doohjjotc8taOAc4eixaGzSXWggjW0d8tNpJ3jA39BYRtT
-         UHu4+vWhMVCxvrXSCOib8qu+ZQCqpVgWaasODOKpIXJlNmMwkER4d08oXs9uGSSIwasD
-         RWow==
-X-Forwarded-Encrypted: i=1; AJvYcCXebDyYDSc/OkypUB2qJ66pDAAipIBeMOp/3w2Hxw1SIAukJmT8mPobo0TiNqmuJQGeyjglEjg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTd8zAYVAs43v2E/poNo4cu0Ql2prNp4BvD/XOKnhEEuahEoD8
-	vak1cDPYI/D0XuNSDoizN63HJuNMXwd39lKuG+IfpHM48cG/oCYgcP4VQ3kzmRqM2qy5lDt+z9Z
-	eEXiB9vR3ygxcykJqBtcojKpDk9GjuM42ZInP+lBhEfUotK7GfK49WQ==
-X-Received: by 2002:a05:600c:470f:b0:425:7bbf:fd07 with SMTP id 5b1f17b1804b1-42bb02c0727mr129293725e9.5.1725365311435;
-        Tue, 03 Sep 2024 05:08:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFYuACYFYmdeRau/l5pNATI4VMioGx45q1slOGtbAH3lBc6r4xbg0dCcuR4/N7ge1VOuo7FrA==
-X-Received: by 2002:a05:600c:470f:b0:425:7bbf:fd07 with SMTP id 5b1f17b1804b1-42bb02c0727mr129293435e9.5.1725365310883;
-        Tue, 03 Sep 2024 05:08:30 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-5-217.dyn.eolo.it. [146.241.5.217])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6deb3efsm170510925e9.6.2024.09.03.05.08.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Sep 2024 05:08:30 -0700 (PDT)
-Message-ID: <0f3cf321-3c23-43df-b6eb-55dd0a1fec64@redhat.com>
-Date: Tue, 3 Sep 2024 14:08:25 +0200
+	s=arc-20240116; t=1725365649; c=relaxed/simple;
+	bh=uo3J5vdSL9Nj+lyqUX2ohj9VwlQQPdz8v3pBjh5S/Xc=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ead+PVWwuEcErfQqnk/GS6OAo3/pzJhr3zdOLJRlwE2nCkWaQsw0b/IQ4Ibh4rvNYDPFdFQdZ4xLcIXmFWCU4BmtDq/2eT4r+as6Td5EfZuVW5ikfFgNHwHQo9doX5uY0eRMoNNlppD2Soi1Dq4Qm2C7itrUdR6+Fyw0q4lpKow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wyky21ZfNzgYvm;
+	Tue,  3 Sep 2024 20:11:54 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 015CF1402CC;
+	Tue,  3 Sep 2024 20:14:01 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 3 Sep 2024 20:13:59 +0800
+Message-ID: <0341f08c-fe8b-4f9c-961e-9b773d67d7bf@huawei.com>
+Date: Tue, 3 Sep 2024 20:13:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,51 +48,65 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V6 net-next 07/11] net: hibmcge: Implement rx_poll
- function to receive packets
-To: Jijie Shao <shaojijie@huawei.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org
-Cc: shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com,
- chenhao418@huawei.com, sudongming1@huawei.com, xujunsheng@huawei.com,
- shiyongbang@huawei.com, libaihan@huawei.com, andrew@lunn.ch,
- jdamato@fastly.com, horms@kernel.org, jonathan.cameron@huawei.com,
- shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+CC: <shaojijie@huawei.com>, <shenjian15@huawei.com>,
+	<wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
+	<libaihan@huawei.com>, <andrew@lunn.ch>, <jdamato@fastly.com>,
+	<horms@kernel.org>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V6 net-next 03/11] net: hibmcge: Add mdio and hardware
+ configuration supported in this module
+To: Paolo Abeni <pabeni@redhat.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>
 References: <20240830121604.2250904-1-shaojijie@huawei.com>
- <20240830121604.2250904-8-shaojijie@huawei.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240830121604.2250904-8-shaojijie@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <20240830121604.2250904-4-shaojijie@huawei.com>
+ <0ff20687-74de-4e63-90f4-57cf06795990@redhat.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <0ff20687-74de-4e63-90f4-57cf06795990@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-On 8/30/24 14:16, Jijie Shao wrote:
-> @@ -119,6 +122,20 @@ static void hbg_buffer_free_skb(struct hbg_buffer *buffer)
->   	buffer->skb = NULL;
->   }
->   
-> +static int hbg_buffer_alloc_skb(struct hbg_buffer *buffer)
-> +{
-> +	u32 len = hbg_spec_max_frame_len(buffer->priv, buffer->dir);
-> +	struct hbg_priv *priv = buffer->priv;
-> +
-> +	buffer->skb = netdev_alloc_skb(priv->netdev, len);
-> +	if (unlikely(!buffer->skb))
-> +		return -ENOMEM;
 
-It's preferable to allocate the skbuff at packet reception time, inside 
-the poll() function, just before passing the skb to the upper stack, so 
-that the header contents are fresh in the cache. Additionally that 
-increases the change for the allocator could hit its fastpath.
+on 2024/9/3 19:59, Paolo Abeni wrote:
+> On 8/30/24 14:15, Jijie Shao wrote:
+> [...]
+>> +static int hbg_mdio_wait_ready(struct hbg_mac *mac)
+>> +{
+>> +#define HBG_MDIO_OP_TIMEOUT_US        (1 * 1000 * 1000)
+>> +#define HBG_MDIO_OP_INTERVAL_US        (5 * 1000)
+>
+> Minor nit: I find the define inside the function body less readable 
+> than placing them just before the function itself.
 
-> +
-> +	buffer->skb_len = len;
-> +	memset(buffer->skb->data, 0, HBG_PACKET_HEAD_SIZE);
+These two macros are only used in this function.
+Is it necessary to move them to the header file?
 
-Out of sheer ignorace, why do you need to clear the packet data?
+>
+>> +
+>> +    struct hbg_priv *priv = HBG_MAC_GET_PRIV(mac);
+>> +    u32 cmd;
+>> +
+>> +    return readl_poll_timeout(priv->io_base + 
+>> HBG_REG_MDIO_COMMAND_ADDR, cmd,
+>> +                  !FIELD_GET(HBG_REG_MDIO_COMMAND_START_B, cmd),
+>> +                  HBG_MDIO_OP_INTERVAL_US,
+>> +                  HBG_MDIO_OP_TIMEOUT_US);
+>> +}
+>
+> [...]> +static void hbg_phy_adjust_link(struct net_device *netdev)
+>> +{
+>> +    struct hbg_priv *priv = netdev_priv(netdev);
+>> +    struct phy_device *phydev = priv->mac.phydev;
+>
+> Minor nit: please respect the reverse x-mas tree order
 
-thanks,
+Here, I need to get the *priv first, so I'm not following the reverse x-mas tree order here.
+I respect the reverse x-mas tree order everywhere else.
 
-Paolo
+	Thanks,
+	Jijie Shao
 
 
