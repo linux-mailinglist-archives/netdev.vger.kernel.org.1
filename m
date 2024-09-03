@@ -1,176 +1,103 @@
-Return-Path: <netdev+bounces-124726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAA6796A96E
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 23:02:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AD0196A75F
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 21:28:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E6822836AC
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 21:02:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E0881C23027
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 19:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314D01E9765;
-	Tue,  3 Sep 2024 20:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBBD1D7E2D;
+	Tue,  3 Sep 2024 19:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DZaw6W0T"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5ZaBWPd/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0644B1E974E;
-	Tue,  3 Sep 2024 20:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56201D7E46;
+	Tue,  3 Sep 2024 19:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725396468; cv=none; b=XMMqHpUUtVKcNbKWM3f+y3m9SsvfrFpgueKUBWjNJegnXzwfwJM9frsmvXvEXNjJ9vMrwF/Nj30xIbUQYJc+ojmE2JnldZ5ACMGM5el8MtUXGMyz31CgrlBBpi4valFGqzItawy9ULjnj2w8rE23tptjZifBbuwr2a5AXERjzxc=
+	t=1725391718; cv=none; b=pytvrlAhqKlqNwyKbA95XdtBAOMSQXFWVn34savHSEDhC0/yo/7MWqFtIYTq/x+ALk/LZ9JBEC0XBiIdcxhu7dUKgINTHv6vArSuwwpwbqwU/z1HNEQrdiLenVjNRXbNNiNOji5UhmEnqAgPH7trT+nhyphawWcVkKcqUoD/w00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725396468; c=relaxed/simple;
-	bh=DkmnPP7Rnck3U13b0kVYRAQ4fci1gmvH7X2CEfWg4wQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pt30XgfvadHm3m4irf0aUDd6jp+247OEUPaicVppEUl6YJkrz/w4Yi6YXG7tEBF3vcxZ2CowmvVboafJt2Nn3fbJI6IvOOUaAJxqvg2o+72pn+j3qLcwyrzAwF/3uxk9oNyeQ5MDDo6/EXnGza7wvLAma5RLpGgPje6A1EghF6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DZaw6W0T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52DD7C4CEC5;
-	Tue,  3 Sep 2024 20:47:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725396467;
-	bh=DkmnPP7Rnck3U13b0kVYRAQ4fci1gmvH7X2CEfWg4wQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DZaw6W0THvHlVWjk5KA0Uy/dSipRLsY4qjkWLdqHXcLRNR/DfluiKkGocLJtYY/Dt
-	 2SxzIGiKz2xDrwZiOaOG7r8vToLPvVaxZBXj/zvvL3BRDKY1Wp2rryVeX2LuMNF0eE
-	 gE/R6U5zexigXh5oHR2XRfKifZZRTFE3RtpostNA2WIM+MDTKSnC4zaTlH/mp4AHFA
-	 x67uyBkPW4Z2LkUrV3rglKebumtG99Rjp52POL5SoyB5oIXptnl+6cTo0h5GWfx15C
-	 L8p9OuAOxg+aWo7buQLqbZERbzVw1dmAcvsiKjUFhZvqG/mKe0air0T2OgEFvRyZez
-	 s+ZuyPpPjIRPQ==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Jacky Chou <jacky_chou@aspeedtech.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	u.kleine-koenig@pengutronix.de,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 6/8] net: ftgmac100: Ensure tx descriptor updates are visible
-Date: Tue,  3 Sep 2024 15:27:56 -0400
-Message-ID: <20240903192815.1108754-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240903192815.1108754-1-sashal@kernel.org>
-References: <20240903192815.1108754-1-sashal@kernel.org>
+	s=arc-20240116; t=1725391718; c=relaxed/simple;
+	bh=OTSFf8kj252HGXPAG43nb9k89jBnY6/UNwFFZLqO4tc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nEfw3oYkbyhhyPMts7F1aQYVzZdWKBVbIn2cC3qi6gzmHAgAbpe/+G5H+4mICN1212UNci7Z8e1vFSBg9tpW5WtziJv4YJEDvf5DKPhYWw1/EPdnUDCq0sNW9uYzCuzlOIvikPnXJb3+tSP+FZKLyE2MVOEsKam99LW68k58vBk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5ZaBWPd/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=w1+KyzeqNr4rzdqTfAjN87CcbaRGsYHUYc3Jeiu0BKs=; b=5Z
+	aBWPd/IYlk9ykV+HxCMDUStRvG90shF4ME0jkvPP4WQ9MNtrdU56r5Vylvqg030+/oCrJ8Zqb6UiY
+	kpYNyroXwyMRkbZ+jBoHPdJVM0vtTJ2T8nxB5DOV0HVqyWfTdz8M8ni1/ph72n26ZSMHLBUA8bsQl
+	vwn2sBW0mli86sE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1slZCV-006Ssg-4q; Tue, 03 Sep 2024 21:28:27 +0200
+Date: Tue, 3 Sep 2024 21:28:27 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next] net: ethernet: rtsn: Add MDIO read/write support for
+ C45
+Message-ID: <e0833448-1d00-497d-9f1b-b6075493982d@lunn.ch>
+References: <20240903171853.631343-1-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.224
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240903171853.631343-1-niklas.soderlund+renesas@ragnatech.se>
 
-From: Jacky Chou <jacky_chou@aspeedtech.com>
+On Tue, Sep 03, 2024 at 07:18:53PM +0200, Niklas Söderlund wrote:
+> Add C45 specific read and write implementations to support C45 PHY
+> access using SIOCGMIIREG and SIOCSMIIREG IOCTLs.
+> 
+> While the core can handle a C45 PHY using only the MDIO bus C22 read()
+> and write() callbacks there are PHY interactions that are not possible
+> without them. One use-case is accessing PHY registers using the
+> SIOCGMIIREG and SIOCSMIIREG IOCTLs. Without these callbacks trying to
+> access C45 PHY registers using these IOCTLs result in -EOPNOTSUPP.
 
-[ Upstream commit 4186c8d9e6af57bab0687b299df10ebd47534a0a ]
+This is the wrong solution. You should not be reproducing
+functionality which phylib already has.
 
-The driver must ensure TX descriptor updates are visible
-before updating TX pointer and TX clear pointer.
+Please extend the IOCTL code to do what the core does:
 
-This resolves TX hangs observed on AST2600 when running
-iperf3.
+int __phy_read_mmd(struct phy_device *phydev, int devad, u32 regnum)
+{
+        if (regnum > (u16)~0 || devad > 32)
+                return -EINVAL;
 
-Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+        if (phydev->drv && phydev->drv->read_mmd)
+                return phydev->drv->read_mmd(phydev, devad, regnum);
+
+        return mmd_phy_read(phydev->mdio.bus, phydev->mdio.addr,
+                            phydev->is_c45, devad, regnum);
+}
+
+mmd_phy_read() will fall back to indirect access if need be.
+
+Just watch out for mii_data->phy_id and what it implies.
+
+    Andrew
+
 ---
- drivers/net/ethernet/faraday/ftgmac100.c | 26 ++++++++++++++++--------
- 1 file changed, 18 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 969af4dd64055..bc9a7f2d23504 100644
---- a/drivers/net/ethernet/faraday/ftgmac100.c
-+++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -569,7 +569,7 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
- 	(*processed)++;
- 	return true;
- 
-- drop:
-+drop:
- 	/* Clean rxdes0 (which resets own bit) */
- 	rxdes->rxdes0 = cpu_to_le32(status & priv->rxdes0_edorr_mask);
- 	priv->rx_pointer = ftgmac100_next_rx_pointer(priv, pointer);
-@@ -653,6 +653,11 @@ static bool ftgmac100_tx_complete_packet(struct ftgmac100 *priv)
- 	ftgmac100_free_tx_packet(priv, pointer, skb, txdes, ctl_stat);
- 	txdes->txdes0 = cpu_to_le32(ctl_stat & priv->txdes0_edotr_mask);
- 
-+	/* Ensure the descriptor config is visible before setting the tx
-+	 * pointer.
-+	 */
-+	smp_wmb();
-+
- 	priv->tx_clean_pointer = ftgmac100_next_tx_pointer(priv, pointer);
- 
- 	return true;
-@@ -806,6 +811,11 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
- 	dma_wmb();
- 	first->txdes0 = cpu_to_le32(f_ctl_stat);
- 
-+	/* Ensure the descriptor config is visible before setting the tx
-+	 * pointer.
-+	 */
-+	smp_wmb();
-+
- 	/* Update next TX pointer */
- 	priv->tx_pointer = pointer;
- 
-@@ -826,7 +836,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
- 
- 	return NETDEV_TX_OK;
- 
-- dma_err:
-+dma_err:
- 	if (net_ratelimit())
- 		netdev_err(netdev, "map tx fragment failed\n");
- 
-@@ -848,7 +858,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
- 	 * last fragment, so we know ftgmac100_free_tx_packet()
- 	 * hasn't freed the skb yet.
- 	 */
-- drop:
-+drop:
- 	/* Drop the packet */
- 	dev_kfree_skb_any(skb);
- 	netdev->stats.tx_dropped++;
-@@ -1419,7 +1429,7 @@ static void ftgmac100_reset_task(struct work_struct *work)
- 	ftgmac100_init_all(priv, true);
- 
- 	netdev_dbg(netdev, "Reset done !\n");
-- bail:
-+bail:
- 	if (priv->mii_bus)
- 		mutex_unlock(&priv->mii_bus->mdio_lock);
- 	if (netdev->phydev)
-@@ -1490,15 +1500,15 @@ static int ftgmac100_open(struct net_device *netdev)
- 
- 	return 0;
- 
-- err_ncsi:
-+err_ncsi:
- 	napi_disable(&priv->napi);
- 	netif_stop_queue(netdev);
-- err_alloc:
-+err_alloc:
- 	ftgmac100_free_buffers(priv);
- 	free_irq(netdev->irq, netdev);
-- err_irq:
-+err_irq:
- 	netif_napi_del(&priv->napi);
-- err_hw:
-+err_hw:
- 	iowrite32(0, priv->base + FTGMAC100_OFFSET_IER);
- 	ftgmac100_free_rings(priv);
- 	return err;
--- 
-2.43.0
-
+pw-bot: cr
 
