@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-124718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C868296A8BB
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:45:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06F4C96A8D3
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:47:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73E8B1F20EF5
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:45:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A47E1C20852
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:47:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEB01D9D9D;
-	Tue,  3 Sep 2024 20:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5D511DEFF7;
+	Tue,  3 Sep 2024 20:43:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y4YBevsD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GmwUfN1n"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FEC41D9D67;
-	Tue,  3 Sep 2024 20:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A24E1DEFF1;
+	Tue,  3 Sep 2024 20:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725396152; cv=none; b=NUXJwPw1ubiJEJD/D+525+noZEFU0NHK8v3nD1OQ3mgP2SVLI+T/QagOCPBsHvLaQ6wjOTHeIbmmxLPBHHDllXzzDi9RYWPDAy3WCBSb+uMarGZtQiOqL0j7LaWeS3KDxJRaPDsS3virmDVKoJyzlWMsdHueCTfeuHVhhYbd1wE=
+	t=1725396180; cv=none; b=jQ/aVoVqfVfVjAsFyqqYuEObr/ukW9jim4k4FJWSJwdIRroRrIdYcSdPzUUr7SdU9eoDH6AvouISnWVQSVPQFpkO6XtUcBeKPqiwD8OkQfPOG69/YcgJhONeEKwaxlNfuYx60KsQ1PdPz0vs8dsaLqKatCOt/pk5gsn19kg2qas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725396152; c=relaxed/simple;
-	bh=oNOAZ4BNU00V3G+hAYOLME1AGFsmc1UfhppcdgWiXTY=;
+	s=arc-20240116; t=1725396180; c=relaxed/simple;
+	bh=tXAkq7HVw7ZJwdHtvDp4WV9gc9Vg8sJLrSdr6EehPG4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fB1pYmD5ybjFsruHfOI3zYKsxI30q1G9AkSuPtE+ggdKkgjD7K1p5sXTlmU1FLGIL5FyA65tTuTKq1dkdHGnE0Rb2dQ4vafa/mUQs6M4kBlGReb5GS3Al0nqpI3edsuIp/EWfEkRgc3k3xRyLaU2twrX9bbrZkU7+tuEzINeCfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y4YBevsD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14D5FC4CEC5;
-	Tue,  3 Sep 2024 20:42:30 +0000 (UTC)
+	 MIME-Version; b=dTLz5TomikFgRM+ny5osUFi7USh+ifY4SK0AUNKZ8IcdThTsAA/tA7wqReIb2lLb6Hz0SESb78n5ZauKxJX6qSdCWBcrJEMXTw+LSjRwFDILODQsEhtbn0CYmHr2m34l1mSm0PvB0C9y9A1Aeb1usuNQEoaiew5WRukCTElOLm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GmwUfN1n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD184C4CEC4;
+	Tue,  3 Sep 2024 20:42:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725396152;
-	bh=oNOAZ4BNU00V3G+hAYOLME1AGFsmc1UfhppcdgWiXTY=;
+	s=k20201202; t=1725396179;
+	bh=tXAkq7HVw7ZJwdHtvDp4WV9gc9Vg8sJLrSdr6EehPG4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Y4YBevsD5cvvRlSq+epG1eealwKEpUxAmF0cCWLmJm8MTPukBCMBYv70GjS+8BmZG
-	 MVvga5zyK7/7Q3t43Z22exJZOz6nuMLwhCJjGT+WP8OcPuaBnAkCvxJzrcKnE1eNG8
-	 ADf4Hb172uON0zDF1AwIGO9YGgKKLFAU3P4r/ZnBvRs5VkmJZ5T2EmYfKj+8XaE3Fs
-	 fCRrbTRYB8OSXgnOne8Sk9w6laTe6p1vZzBiw4y233UoYhgQQtMN5HJv9+MYInKkBg
-	 Biq5lB4mIZrNwDDHWIRT2A9hv3DKDTEJ04x2KtJXwQU9PV7nZcMs9PROhMnt1MAD/T
-	 gR0Bi3z5flm+g==
+	b=GmwUfN1ntd8YHNyh9AXjTGX1NcI63cTUoHNoSnj/4TxURX68LRLge0p10116U7txM
+	 m+qYWyl2ogphuTcwHPoSev5pCYz5m2dX9/7A4qB0oJqA5Jk8TMjuICibbGOBCAhL0E
+	 v6H+XujX4bZqhsAvAoizXaRM4Argh9fXJTv4Q9VF2zZg6qFHEqiRIEjc58JFtWDw7x
+	 nr39CbsKP71KkloiOS4zTpsidEzC3qlmr9t6VTeiTpYsq7Opw8LVank/SGt6PvGaaB
+	 lHYpR0b2jI7vDTSG59bHlivHIBupvI+VA+5kQxWpN0TwvBjuPOwhmd4Sar0kpOKaGR
+	 JEUkrLelqczew==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jacky Chou <jacky_chou@aspeedtech.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Dmitry Antipov <dmantipov@yandex.ru>,
+	Johannes Berg <johannes.berg@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	u.kleine-koenig@pengutronix.de,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.10 13/22] net: ftgmac100: Ensure tx descriptor updates are visible
-Date: Tue,  3 Sep 2024 15:22:00 -0400
-Message-ID: <20240903192243.1107016-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.10 21/22] wifi: mac80211: free skb on error path in ieee80211_beacon_get_ap()
+Date: Tue,  3 Sep 2024 15:22:08 -0400
+Message-ID: <20240903192243.1107016-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240903192243.1107016-1-sashal@kernel.org>
 References: <20240903192243.1107016-1-sashal@kernel.org>
@@ -69,107 +71,37 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.10.7
 Content-Transfer-Encoding: 8bit
 
-From: Jacky Chou <jacky_chou@aspeedtech.com>
+From: Dmitry Antipov <dmantipov@yandex.ru>
 
-[ Upstream commit 4186c8d9e6af57bab0687b299df10ebd47534a0a ]
+[ Upstream commit 786c5be9ac29a39b6f37f1fdd2ea59d0fe35d525 ]
 
-The driver must ensure TX descriptor updates are visible
-before updating TX pointer and TX clear pointer.
+In 'ieee80211_beacon_get_ap()', free allocated skb in case of error
+returned by 'ieee80211_beacon_protect()'. Compile tested only.
 
-This resolves TX hangs observed on AST2600 when running
-iperf3.
-
-Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+Link: https://patch.msgid.link/20240805142035.227847-1-dmantipov@yandex.ru
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/faraday/ftgmac100.c | 26 ++++++++++++++++--------
- 1 file changed, 18 insertions(+), 8 deletions(-)
+ net/mac80211/tx.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index fddfd1dd50709..4c546c3aef0fe 100644
---- a/drivers/net/ethernet/faraday/ftgmac100.c
-+++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -572,7 +572,7 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
- 	(*processed)++;
- 	return true;
+diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
+index edba4a31844fb..bca7b341dd772 100644
+--- a/net/mac80211/tx.c
++++ b/net/mac80211/tx.c
+@@ -5348,8 +5348,10 @@ ieee80211_beacon_get_ap(struct ieee80211_hw *hw,
+ 	if (beacon->tail)
+ 		skb_put_data(skb, beacon->tail, beacon->tail_len);
  
-- drop:
-+drop:
- 	/* Clean rxdes0 (which resets own bit) */
- 	rxdes->rxdes0 = cpu_to_le32(status & priv->rxdes0_edorr_mask);
- 	priv->rx_pointer = ftgmac100_next_rx_pointer(priv, pointer);
-@@ -656,6 +656,11 @@ static bool ftgmac100_tx_complete_packet(struct ftgmac100 *priv)
- 	ftgmac100_free_tx_packet(priv, pointer, skb, txdes, ctl_stat);
- 	txdes->txdes0 = cpu_to_le32(ctl_stat & priv->txdes0_edotr_mask);
+-	if (ieee80211_beacon_protect(skb, local, sdata, link) < 0)
++	if (ieee80211_beacon_protect(skb, local, sdata, link) < 0) {
++		dev_kfree_skb(skb);
+ 		return NULL;
++	}
  
-+	/* Ensure the descriptor config is visible before setting the tx
-+	 * pointer.
-+	 */
-+	smp_wmb();
-+
- 	priv->tx_clean_pointer = ftgmac100_next_tx_pointer(priv, pointer);
- 
- 	return true;
-@@ -809,6 +814,11 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
- 	dma_wmb();
- 	first->txdes0 = cpu_to_le32(f_ctl_stat);
- 
-+	/* Ensure the descriptor config is visible before setting the tx
-+	 * pointer.
-+	 */
-+	smp_wmb();
-+
- 	/* Update next TX pointer */
- 	priv->tx_pointer = pointer;
- 
-@@ -829,7 +839,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
- 
- 	return NETDEV_TX_OK;
- 
-- dma_err:
-+dma_err:
- 	if (net_ratelimit())
- 		netdev_err(netdev, "map tx fragment failed\n");
- 
-@@ -851,7 +861,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
- 	 * last fragment, so we know ftgmac100_free_tx_packet()
- 	 * hasn't freed the skb yet.
- 	 */
-- drop:
-+drop:
- 	/* Drop the packet */
- 	dev_kfree_skb_any(skb);
- 	netdev->stats.tx_dropped++;
-@@ -1344,7 +1354,7 @@ static void ftgmac100_reset(struct ftgmac100 *priv)
- 	ftgmac100_init_all(priv, true);
- 
- 	netdev_dbg(netdev, "Reset done !\n");
-- bail:
-+bail:
- 	if (priv->mii_bus)
- 		mutex_unlock(&priv->mii_bus->mdio_lock);
- 	if (netdev->phydev)
-@@ -1543,15 +1553,15 @@ static int ftgmac100_open(struct net_device *netdev)
- 
- 	return 0;
- 
-- err_ncsi:
-+err_ncsi:
- 	napi_disable(&priv->napi);
- 	netif_stop_queue(netdev);
-- err_alloc:
-+err_alloc:
- 	ftgmac100_free_buffers(priv);
- 	free_irq(netdev->irq, netdev);
-- err_irq:
-+err_irq:
- 	netif_napi_del(&priv->napi);
-- err_hw:
-+err_hw:
- 	iowrite32(0, priv->base + FTGMAC100_OFFSET_IER);
- 	ftgmac100_free_rings(priv);
- 	return err;
+ 	ieee80211_beacon_get_finish(hw, vif, link, offs, beacon, skb,
+ 				    chanctx_conf, csa_off_base);
 -- 
 2.43.0
 
