@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-124711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D0096A813
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:10:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F35BE96A818
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:10:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2B971C244DB
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:10:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA52B1F24FF8
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB10E1CDFA6;
-	Tue,  3 Sep 2024 20:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 672D31D589B;
+	Tue,  3 Sep 2024 20:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ixWllNYl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FKWRIBUY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE39190463;
-	Tue,  3 Sep 2024 20:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0121D5893;
+	Tue,  3 Sep 2024 20:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725394229; cv=none; b=GzgSBe8hmz3tiyc7ZboncVx1lDIJgvoWgMaplF6GTkHN55Vq5BVq6KZpXIQXx48yn+jcxWij+iQ0iwBv7OqmizOSRzvNI/c91HGTNTLnNhMnMAG4GOELLp6lnDWHO85u+TCL/5EQKsPVUg3Bd0G9EUHaToeDBVsXosQrUe6O4vk=
+	t=1725394232; cv=none; b=X/3CY/9sjAsKVlFbrcZCzll4ORn9iF1gsJXPTB44GiNghYPIaw2dTA2dd7dek26BbEC8dLF7ehBlvLOX6HKGA7oDu4w6udppPwl1NgCTTK03f8KH6qlhkG+xv48lLBsjpdjyMPvFLj7bugBvtPPkCeUVwPdnOPiDNt5p/4901J0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725394229; c=relaxed/simple;
-	bh=Gw0IBZUNC2LELFePtOPc07moZnDlfXuC4n8LfF7pvzU=;
+	s=arc-20240116; t=1725394232; c=relaxed/simple;
+	bh=uSp9Jl69b3k+/8tAfKbpey3QNlpf8nfEJ4foPHjBdVk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=h+UrU/Y2bNYQJWi0Bz8ez9y3yXSfhm8YI445+fv5vrolBlzdbTTfoavV7niAd4OblhE7j1pCaXFAaSMHJSnu/bPUMI+oMoVuIgbKeRCVIt9eSC/IZbOY648M/ZhuiIAmuQk5pdT7XemRpruGYqzC/VGeZ4qBMScO0UfTnXg60dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ixWllNYl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4384FC4CEC4;
-	Tue,  3 Sep 2024 20:10:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=PKWQZXufhxgseDO77Prm7Rutng6Dq/0OazNCZjfTgrysaEHZdnQkvvrz2r1IBT46IQzlsX1XzCWu9Z8sg44i6aXIZYxxF+yXBfyIPusSlEMD1E463jt5CPeBR4EpAdcIrqovRWqeuadtzGnAkwLHINTrGbjGDq5JqRiZgas2Ukk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FKWRIBUY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD902C4AF09;
+	Tue,  3 Sep 2024 20:10:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725394229;
-	bh=Gw0IBZUNC2LELFePtOPc07moZnDlfXuC4n8LfF7pvzU=;
+	s=k20201202; t=1725394230;
+	bh=uSp9Jl69b3k+/8tAfKbpey3QNlpf8nfEJ4foPHjBdVk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ixWllNYlPxV1drLcJ6si72tTxEd7GRY8zYsO2uGb8/oFrVS2IZ9nQD7XN5xS9b/GY
-	 JBSuk1ELBOIp9Ik9gy+7U2jNl7+xNpRRhSNOd9YSUl4XrTCizUuzKmSVJiwSsXZBqY
-	 UXHmJMmDbeiOuIdC1XCwdNTyc2cxZKMNYlazw/wmSV2jmyzQ0iGUDsDl0EH8g/fOFP
-	 9vGwg2CBV2lKNO41vooZQ/XlEF5+0zPTlG4gV9HOM2JyFkyFC5F/9RehYKcgYnTNA9
-	 2TH7pHX7RuO/qrhuMw2ctg4xypmAh05jlDWZyKB9BclnSUq4OuSOYHAXjCdvJOvSiJ
-	 Ybark54rrOPag==
+	b=FKWRIBUYhwBlKvJ48wmhU43A3o6UX8g1aMKZzLQUokNU2iepTD74LVjwt9gVxJo12
+	 X0Yx85NWNcx3NCVuFQu/+q0ghhMGEs+ybsaR4mAe+SJGiGEDSUn//HCeGlDhdh5q4Z
+	 nWykIPZgBD0umGLhkyM4N1IY03+c/maJu2XeCig1zqmCE8xOULI8QAPVsz7mj4Uxj+
+	 Donk5dm5v3hAzm+hKntSmBW/01vZPk7/PPjJwBR2UUjg+qpWGago5Xc0HAG/5QaLhz
+	 Sjh51zBHsaW3UG4TTyypurGPCVNUEi9HK65ZFSXtg1C3PJXkDjB1tJ1mwvg9I8BFbc
+	 cRbw7CQC+J93g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342A63805D82;
-	Tue,  3 Sep 2024 20:10:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDEE3805D82;
+	Tue,  3 Sep 2024 20:10:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5] bpf, net: Fix a potential race in do_sock_getsockopt()
+Subject: Re: [PATCH net] net: dqs: Do not use extern for unused dql_group
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172539423002.426047.5750436407367309589.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Sep 2024 20:10:30 +0000
-References: <20240830082518.23243-1-Tze-nan.Wu@mediatek.com>
-In-Reply-To: <20240830082518.23243-1-Tze-nan.Wu@mediatek.com>
-To: Tze-nan Wu <Tze-nan.Wu@mediatek.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, ast@kernel.org,
- sdf@fomichev.me, alexei.starovoitov@gmail.com, bobule.chang@mediatek.com,
- wsd_upstream@mediatek.com, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org, kuniyu@amazon.com,
- chen-yao.chang@mediatek.com, yanghui.li@mediatek.com,
- cheng-jui.wang@mediatek.com, daniel@iogearbox.net, john.fastabend@gmail.com,
- andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, linux-arm-kernel@lists.infradead.org
+ <172539423136.426047.3291554079738014106.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Sep 2024 20:10:31 +0000
+References: <20240902101734.3260455-1-leitao@debian.org>
+In-Reply-To: <20240902101734.3260455-1-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, leit@meta.com, lkp@intel.com, johannes.berg@intel.com,
+ jamie.bainbridge@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 30 Aug 2024 16:25:17 +0800 you wrote:
-> There's a potential race when `cgroup_bpf_enabled(CGROUP_GETSOCKOPT)` is
-> false during the execution of `BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN`, but
-> becomes true when `BPF_CGROUP_RUN_PROG_GETSOCKOPT` is called.
-> This inconsistency can lead to `BPF_CGROUP_RUN_PROG_GETSOCKOPT` receiving
-> an "-EFAULT" from `__cgroup_bpf_run_filter_getsockopt(max_optlen=0)`.
-> Scenario shown as below:
+On Mon,  2 Sep 2024 03:17:30 -0700 you wrote:
+> When CONFIG_DQL is not enabled, dql_group should be treated as a dead
+> declaration. However, its current extern declaration assumes the linker
+> will ignore it, which is generally true across most compiler and
+> architecture combinations.
+> 
+> But in certain cases, the linker still attempts to resolve the extern
+> struct, even when the associated code is dead, resulting in a linking
+> error. For instance the following error in loongarch64:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v5] bpf, net: Fix a potential race in do_sock_getsockopt()
-    https://git.kernel.org/netdev/net/c/33f339a1ba54
+  - [net] net: dqs: Do not use extern for unused dql_group
+    https://git.kernel.org/netdev/net/c/77461c108191
 
 You are awesome, thank you!
 -- 
