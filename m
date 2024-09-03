@@ -1,93 +1,91 @@
-Return-Path: <netdev+bounces-124680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3BDB96A6E5
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:50:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 756ED96A6ED
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:52:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A30B8281F46
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:50:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2ABE21F223F9
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8081922CB;
-	Tue,  3 Sep 2024 18:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65DB1922C9;
+	Tue,  3 Sep 2024 18:52:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kyfTuXvJ"
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="s0Ib0mV3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5021DBA53;
-	Tue,  3 Sep 2024 18:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD06BA53;
+	Tue,  3 Sep 2024 18:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725389430; cv=none; b=Yi4q6odbMccJ6Ph9S1OifWoDj0j6+ovT6lZ/7+0GDdtBpgc2bYzCrHW2iu9P3W7wCR3Fb41+myFnFAfPaUABWWK+LPxlUY+hu1sKW4je1vD5yJweuAosvEHZjBExXEFgNirvG/1XTGvIMona572ozFwGpBdk4L6Qoqs2FFbKstM=
+	t=1725389538; cv=none; b=aDIOzLfr67aEmUnJc1PJtztuweX3b4wrILPnr8k9rnuEQH2GKZ88M+ij6utE+z9zau5b3f5ErFttxj4zf3zLpJFI8LOz77d5ATaT5CjK1XJ+f5i1b6XsAXJhDuqBT2PlJXE0eTLp0EWqEEjeSUcOu5/kAIE62bOINRZqLter1yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725389430; c=relaxed/simple;
-	bh=SNpY72thgBs1zRLMoTRa0FG6EbQhuX1HeYdZwy33ptk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LJ8A8QHm8jig/+pd/W9YMLsr+DOcIi0JThZ/wghb6U5sKKV/Plajm5+Zp0pm04naL0oxpetubDoYzTNJxTEZg7YUlfNQDovwcSW9zssuy48rq1ISL3+QX45ZDfrMuXCKuUk3hW+ZcVkRcLHzdPhtP0Xp1sURgjEpmRIBODBy2fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kyfTuXvJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD3A4C4CEC4;
-	Tue,  3 Sep 2024 18:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725389429;
-	bh=SNpY72thgBs1zRLMoTRa0FG6EbQhuX1HeYdZwy33ptk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kyfTuXvJTbxwR4lTw30gPBCEAegxYLE7OubdZaIZ+ZkMxMS/56q1KvP7JCXF1zOa1
-	 1xuOPlVcbEw5vYuwz4FAMeAx+ZMfTKxqxf0137ZOwVVwNHHbXB/Tm0j1u56Xj5wSLM
-	 lrriL0EJmHqmsUWhWjOcC5hZevGL5zsZEN+grrTdvmMoH4Rv+ho5om15yb1YiXzoa7
-	 TaixYN36JPoXMMzZJoVKsaR7gI7hnKisgFyPgkeDBopIgR1Z1nE5GxDigo3BiPbwpo
-	 wrRgxKhUoPux+IVKm7SG5fVOCOrYV6IdWAB/RShm6nl5DtloGbJgIzEvzkyWZQQ/cA
-	 qIFpNTiu1Mmww==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD1B3822D69;
-	Tue,  3 Sep 2024 18:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725389538; c=relaxed/simple;
+	bh=ffplWhuK3ET293+A1hXpwhHUPquZav93WC/csF5xBcg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hBpP7CIolEvYDBxFdyLpeKyJ3kupLGhJkFis983TjZbbxUbt5BOBYU7eujW2WcCHozIAId577DKF4g0tRsKLVFcwA9bruwuZy/8kPpvA9bNbM2wADFa62Hs+GK5fm9c3/dPP/6KDAz2AakyD/1fnL+eQ6xQJ7qmQcmwt/N6mII8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=s0Ib0mV3; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from [192.168.2.107] (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@datenfreihafen.org)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id D141AC0227;
+	Tue,  3 Sep 2024 20:52:04 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+	s=2021; t=1725389525;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7w2SMbBL1iV03a0jDO7CRGlR/QttdjqKlEF+SWInx78=;
+	b=s0Ib0mV3KcRGqMU9BRe8tT1EygiGM7jUN8aXjBC+9mBYo3KKRigOa9rfR+O+oHfMw/z7Ol
+	XFJuUez8/e8rclfpOfQzzfFvnQbwt7W3Y3Zpm/ZdzkLr5Dv3kbYGtkmKZiiIK32E/fCHQp
+	HoNqvg/snsZGugz8G5hRGjme5WUm3Gz5gPl8ORZNF4A4ac53v083MYBf/OVfUqj1mk1c3e
+	Xits3WM8P4MgYyUzD9MeJwMOCNVwNgncySSYL2oljb5ZXJglDKzfAFZwLOBxY/iZNgrjcZ
+	8FYyGDSQvznJH11SHYv+DkXJ8QMLk+ljLvQ1stGCN6+uqHtnJIIEmxO+BR1vXQ==
+Message-ID: <750caf49-c4e0-43f7-a89f-5b9af96fc0f9@datenfreihafen.org>
+Date: Tue, 3 Sep 2024 20:52:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv2 net] usbnet: modern method to get random MAC
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172538943051.403883.13946561515764029455.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Sep 2024 18:50:30 +0000
-References: <20240829175201.670718-1-oneukum@suse.com>
-In-Reply-To: <20240829175201.670718-1-oneukum@suse.com>
-To: Oliver Neukum <oneukum@suse.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: pull-request: ieee802154 for net 2024-09-01
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+ alex.aring@gmail.com, miquel.raynal@bootlin.com, netdev@vger.kernel.org
+References: <20240901184213.2303047-1-stefan@datenfreihafen.org>
+ <20240903114257.7b906da2@kernel.org>
+Content-Language: en-US
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20240903114257.7b906da2@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Hello.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 29 Aug 2024 19:50:55 +0200 you wrote:
-> The driver generates a random MAC once on load
-> and uses it over and over, including on two devices
-> needing a random MAC at the same time.
+On 9/3/24 8:42 PM, Jakub Kicinski wrote:
+> On Sun,  1 Sep 2024 20:42:13 +0200 Stefan Schmidt wrote:
+>> Simon Horman catched two typos in our headers. No functional change.
 > 
-> Jakub suggested revamping the driver to the modern
-> API for setting a random MAC rather than fixing
-> the old stuff.
-> 
-> [...]
+> Is it okay if we merge these into net-next ?
+> On one hand they are unlikely^w guaranteed not to introduce
+> regressions, but on the other such trivial spelling fixes are
+> not at all urgent.
 
-Here is the summary with links:
-  - [PATCHv2,net] usbnet: modern method to get random MAC
-    https://git.kernel.org/netdev/net/c/bab8eb0dd4cb
+Sure, no problem. They just landed in my fixes queue and thus wpan. They 
+can easily go through net-next. Can you merge the pull directly or do 
+need a new one against net-next?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+regards
+Stefan Schmidt
 
