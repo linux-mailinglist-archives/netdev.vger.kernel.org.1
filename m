@@ -1,149 +1,116 @@
-Return-Path: <netdev+bounces-124750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F4DA96AC33
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 00:26:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C71096AC36
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 00:30:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D525B24668
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:26:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EB74283FE7
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 008A21D589E;
-	Tue,  3 Sep 2024 22:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4DFC187552;
+	Tue,  3 Sep 2024 22:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dZn4TZXV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GVsMSwf2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5E51EBFE4;
-	Tue,  3 Sep 2024 22:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81C3D1EC01F;
+	Tue,  3 Sep 2024 22:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725402406; cv=none; b=nDLxfs5UW/Qeh6He6KB0MfPwPE/grdeGGxDR469836Ph5SgumU4hoAfGwWtwNIUiRVMsk5Pg8SiAL0SyAljToD++j8XLm1LHmMbnYmYjFIgsok8ddRUnkgKoZKji4ICjPc7+bspNSnIForNeZKgGyPakq/1B4+KI7VxE/InvPM8=
+	t=1725402636; cv=none; b=u278AIZlpLkpRzzR63cFTYk7pHkqugFi4VbSUXMC7yLrl7saFCMSTAnLKLcl9R2RaGtDo3m3aNRzePqSt3sYWb+pXqepdkYWzFD4e7GfYDrfffyst9vHW4cXjfnXYOwERC0THrD/z7vldb+yx3KN56uEqnWUD7f1K2XnK04DfVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725402406; c=relaxed/simple;
-	bh=YXQIagdDPc90ZbJET9jNpaM1MPJKmJ5Y5fngYc6zZ5E=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=VZMM6QfOdfOIsPgcFMIvR2Co69DR7Vwe9M2ZEKtZZ6911mC8xz9L4Hl6YD6H7dv+Je6L9OfqOa1ZE4MtzfXdRAzUeYBwUmlHv08Bru2sfpZq77UfYVbB/QVYjrrDWC9kFf02JsvFpcfQcj60PoXPtwU5KMExDBb2qHgOT07xXiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dZn4TZXV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE497C4CEC4;
-	Tue,  3 Sep 2024 22:26:45 +0000 (UTC)
+	s=arc-20240116; t=1725402636; c=relaxed/simple;
+	bh=0NXvwQ8nOPQQ9cWalY9pUVsAdxuWo/Cm+R8hAX7RG9g=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=S+CNlNdTB5McAkQLgWv1vhSV43Z9pENWt7SzJNPCsDBM/ffzvmm4aDQeotfNuRFiPi32ycxa/xs7OZYGFUJQ6DK4ZoI5zWnhlk5zvqCao9P2PFxdaldut+I7h1piJQgNDFqspo2dABzf2Amx6MSf4zvHcE3r+F2TLOUME7JA1PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GVsMSwf2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F03E8C4CEC5;
+	Tue,  3 Sep 2024 22:30:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725402406;
-	bh=YXQIagdDPc90ZbJET9jNpaM1MPJKmJ5Y5fngYc6zZ5E=;
-	h=Date:From:To:Subject:In-Reply-To:From;
-	b=dZn4TZXVbXEzEwa3ibet6GkytN3NXh0+F+/hWh7n22CyMZmwuMO1drbR6aDqPSH/m
-	 1onS+XmaNIzxiX4h1AD6FfLhQyYnaF2/AgM8LQSsl2aVq3kh1VZZBtMEcyN3NWmoV7
-	 WlGawzRAr97kNfsueOFPzVcWLHcCL9fx1uyE4BVpWiZCD3Br+lCJ4EnLT86dFuTSFv
-	 RNtwJ1gX9LNZsCrEFoRM1ff4GhTGAT9H3wladciEnJy5WJx+dAMD0kSmMMoulZg4hk
-	 aulQSWoX0q7ifdHNpRfXx5NwOgTa64bW7nZm0ZcA6mpu5hGiXwivszhbdpATg3smEr
-	 PHbM0Q+6gtxrw==
-Date: Tue, 3 Sep 2024 17:26:44 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 03/11] PCI: of_property: Sanitize 32 bit PCI address
- parsed from DT
-Message-ID: <20240903222644.GA126427@bhelgaas>
+	s=k20201202; t=1725402635;
+	bh=0NXvwQ8nOPQQ9cWalY9pUVsAdxuWo/Cm+R8hAX7RG9g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GVsMSwf2zoKcqiwSThVdDpVadtc48cynOH8JvyCaNQ1SuCeK4XqiX3rU2I7OnFrV8
+	 UGEJGEj8VrcnXvvRCPQ/ESb90UZ1F15V1aWt7xsYf670iXXFOzDnwOMx2ia3v+PM9m
+	 U6eT+3yGMKLLyqS+DHLbe5lstjEqL1lKTKBmgSJ7UUSKDTOGztBHGdIT64H2l+wj6B
+	 PgEzKXAzJtl+qYFmj0AOAkrg2ql7+yjySSMhrNzfJR98VoeZbe9raFtUXMs5OC8PEo
+	 aRHiCI5iYFaeafPAcMcFjDCtiRrsXMRBGn9TW8pUbYB37qr/exEXes8Wm0b47Ta0mn
+	 AshKvLuYlEb/w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB3733806651;
+	Tue,  3 Sep 2024 22:30:36 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zszcps6bnCcdFa54@apocalypse>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/11] mptcp: MIB counters for MPJ TX + misc
+ improvements
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172540263576.468499.15933223216339757413.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Sep 2024 22:30:35 +0000
+References: <20240902-net-next-mptcp-mib-mpjtx-misc-v1-0-d3e0f3773b90@kernel.org>
+In-Reply-To: <20240902-net-next-mptcp-mib-mpjtx-misc-v1-0-d3e0f3773b90@kernel.org>
+To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Mon, Aug 26, 2024 at 09:51:02PM +0200, Andrea della Porta wrote:
-> On 10:24 Wed 21 Aug     , Bjorn Helgaas wrote:
-> > On Tue, Aug 20, 2024 at 04:36:05PM +0200, Andrea della Porta wrote:
-> > > The of_pci_set_address() function parses devicetree PCI range
-> > > specifier assuming the address is 'sanitized' at the origin,
-> > > i.e. without checking whether the incoming address is 32 or 64
-> > > bit has specified in the flags.  In this way an address with no
-> > > OF_PCI_ADDR_SPACE_MEM64 set in the flags could leak through and
-> > > the upper 32 bits of the address will be set too, and this
-> > > violates the PCI specs stating that in 32 bit address the upper
-> > > bit should be zero.
+Hello:
 
-> > I don't understand this code, so I'm probably missing something.  It
-> > looks like the interesting path here is:
-> > 
-> >   of_pci_prop_ranges
-> >     res = &pdev->resource[...];
-> >     for (j = 0; j < num; j++) {
-> >       val64 = res[j].start;
-> >       of_pci_set_address(..., val64, 0, flags, false);
-> >  +      if (OF_PCI_ADDR_SPACE_MEM64)
-> >  +        prop[1] = upper_32_bits(val64);
-> >  +      else
-> >  +        prop[1] = 0;
-> > 
-> > OF_PCI_ADDR_SPACE_MEM64 tells us about the size of the PCI bus
-> > address, but the address (val64) is a CPU physical address, not a PCI
-> > bus address, so I don't understand why of_pci_set_address() should use
-> > OF_PCI_ADDR_SPACE_MEM64 to clear part of the CPU address.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 02 Sep 2024 12:45:51 +0200 you wrote:
+> Recently, a few issues have been discovered around the creation of
+> additional subflows. Without these counters, it was difficult to point
+> out the reason why some subflows were not created as expected.
 > 
-> It all starts from of_pci_prop_ranges(), that is the caller of
-> of_pci_set_address().
+> In patch 3, all error paths from __mptcp_subflow_connect() are covered,
+> except the one related to the 'fully established mode', because it can
+> only happen with the userspace PM, which will propagate the error to the
+> userspace in this case (ENOTCONN).
+> 
+> [...]
 
-> val64 (i.e. res[j].start) is the address part of a struct resource
-> that has its own flags.  Those flags are directly translated to
-> of_pci_range flags by of_pci_get_addr_flags(), so any
-> IORESOURCE_MEM_64 / IORESOURCE_MEM in the resource flag will
-> respectively become OF_PCI_ADDR_SPACE_MEM64 /
-> OF_PCI_ADDR_SPACE_MEM32 in pci range.
+Here is the summary with links:
+  - [net-next,01/11] mptcp: pm: rename helpers linked to 'flush'
+    https://git.kernel.org/netdev/net-next/c/7bcf4d8022f9
+  - [net-next,02/11] mptcp: pm: reduce entries iterations on connect
+    https://git.kernel.org/netdev/net-next/c/b83fbca1b4c9
+  - [net-next,03/11] mptcp: MIB counters for sent MP_JOIN
+    https://git.kernel.org/netdev/net-next/c/1bd1788b6cab
+  - [net-next,04/11] selftests: mptcp: join: reduce join_nr params
+    https://git.kernel.org/netdev/net-next/c/1b2965a8cd8d
+  - [net-next,05/11] selftests: mptcp: join: one line for join check
+    https://git.kernel.org/netdev/net-next/c/ba8a664004da
+  - [net-next,06/11] selftests: mptcp: join: validate MPJ SYN TX MIB counters
+    https://git.kernel.org/netdev/net-next/c/004125c251a6
+  - [net-next,07/11] selftests: mptcp: join: more explicit check name
+    https://git.kernel.org/netdev/net-next/c/6ed495345be8
+  - [net-next,08/11] selftests: mptcp: join: specify host being checked
+    https://git.kernel.org/netdev/net-next/c/8d328dbcf61b
+  - [net-next,09/11] selftests: mptcp: join: mute errors when ran in the background
+    https://git.kernel.org/netdev/net-next/c/08eecd7e7fe7
+  - [net-next,10/11] selftests: mptcp: join: simplify checksum_tests
+    https://git.kernel.org/netdev/net-next/c/0e2b4584d61a
+  - [net-next,11/11] selftests: mptcp: pm_nl_ctl: remove re-definition
+    https://git.kernel.org/netdev/net-next/c/38dc0708bcc8
 
-> What is advertised as 32 bit at the origin (val64) should not become
-> a 64 bit PCI address at the output of of_pci_set_address(), so the
-> upper 32 bit portion should be dropped. 
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> This is explicitly stated in [1] (see page 5), where a space code of 0b10
-> implies that the upper 32 bit of the address must be zeroed out.
 
-OK, I was confused and thought IORESOURCE_MEM_64 was telling us
-something about the *CPU* address, but it's actually telling us
-something about what *PCI bus* addresses are possible, i.e., whether
-it's a 32-bit BAR or a 64-bit BAR.
-
-However, the CPU physical address space and the PCI bus address are
-not the same.  Generic code paths should account for that different by
-applying an offset (the offset will be zero on many platforms where
-CPU and PCI bus addresses *look* the same).
-
-So a generic code path like of_pci_prop_ranges() that basically copies
-a CPU physical address to a PCI bus address looks broken to me.
-
-Maybe my expectation of this being described in DT is mistaken.
-
-Bjorn
 
