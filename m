@@ -1,93 +1,77 @@
-Return-Path: <netdev+bounces-124345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 834E5969146
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 04:04:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 438A596914A
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 04:06:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 257031F22B93
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 02:04:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2D132834AF
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 02:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 141A519C54B;
-	Tue,  3 Sep 2024 02:04:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gf58l3ZB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA421CCEC4;
+	Tue,  3 Sep 2024 02:06:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4D7175B1;
-	Tue,  3 Sep 2024 02:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EF61581E5
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 02:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725329068; cv=none; b=ZDcDQsZ1oH1atdXJIYsuHE8tSsQjCY2PaBvyH37oQgv+7xppg7Kg6AQ5nJS4YY6UVTEHGOncZ/ETW6sY3CTa5FnuBx5XwbrhexqM5ipg5AaMPSsTGF5nJY5JR+hwDWoORIgldEKtGYXWJD7RWf3JHk7Iusx+ilX6Is8pK6j+Rgw=
+	t=1725329174; cv=none; b=ON0BwHAOl1mjgrUxTltoOGuickXt2gBbWDherwKLVl8A5p9cxVAGtieAzwFFE/Pky3iNjSdmiA9DTkvtIQL/baDCvglNkYI4gtl7Y6vvTfCdEMDN4yxLBetNQxQojtSkl3d9Kvoi2m8mienkegMqu3iHQW1HTQ5zC7I+dcQCpKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725329068; c=relaxed/simple;
-	bh=f6r63VNlYByyDFTmFXU7r1//1x15PRIiieh8kXz1qd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qMw/mCqkTz2WVjJHtMfW2OFzm3vFag1Qe/SYqt0Kjzldb08hNRK9VqhyXgTQv3WRwMl1hREL5zD8KgVpgP9VH3NIgVVGTYUspRnJyUmDysTTiTzD+A9kdZ+RyB03ISYURRa3cqqvOF6u+GibQq9NjlCzM4YBvdMF/UosOX5faTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gf58l3ZB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5ACBC4CEC2;
-	Tue,  3 Sep 2024 02:04:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725329067;
-	bh=f6r63VNlYByyDFTmFXU7r1//1x15PRIiieh8kXz1qd4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Gf58l3ZB2ux3D/Sy3fpWZWNoHH4opkXAvKDRP738HcsFdSpCioZpRkUbBekZ7sXpI
-	 BrQKt5s7nhgasyMhGbom1JeMQLpWQsjnOG6nXNKtghQ7hUdI1PgHotN2nox3Sq3KAy
-	 nHPXDOpl6hW+bEl874KLI+KQYJVad4lI1MvWO5z5lUg2zHkdREWgB7PaH8UKPxx3lh
-	 wrLS7TmlpaRBDWS7ie5BN+KV/66yuq62ggyHt6aP8GLSgj+QRP0FimHp+HeLEuICPw
-	 ur41zFldQYkRH+yppUxMpg9DlEEaanHbMRxDmv5ZABW2UyXSm3F9d+oMmwMgbEmfpd
-	 M9IHEKfoPOqrA==
-Date: Mon, 2 Sep 2024 19:04:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Justin Lai <justinlai0215@realtek.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <andrew@lunn.ch>,
- <jiri@resnulli.us>, <horms@kernel.org>, <rkannoth@marvell.com>,
- <jdamato@fastly.com>, <pkshih@realtek.com>, <larry.chiu@realtek.com>
-Subject: Re: [PATCH net-next v29 07/13] rtase: Implement a function to
- receive packets
-Message-ID: <20240902190425.6eef2ee6@kernel.org>
-In-Reply-To: <20240829034832.139345-8-justinlai0215@realtek.com>
-References: <20240829034832.139345-1-justinlai0215@realtek.com>
-	<20240829034832.139345-8-justinlai0215@realtek.com>
+	s=arc-20240116; t=1725329174; c=relaxed/simple;
+	bh=E8apGhay4HjJ9sUylasxZbos5bQ52XM1jSpNDISg/sI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=U5CeeLD2trXBqwAT2o73DO7sinaJin0dqAg8ThVvPngm8xkVRlooWDo2TzyJ7DIObj7xBNzXiOjg5baV4+gSokv2aEJ9ettGFr140hofd1u4nVe9A1Dkt9cJ2hE3BGdV3aTC8rucT3WwLA0Z4CZnThej45g1UPHGYNk6eC3z1F8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4WyTSg5f6Cz1xwrY;
+	Tue,  3 Sep 2024 10:04:03 +0800 (CST)
+Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
+	by mail.maildlp.com (Postfix) with ESMTPS id EAF911A0188;
+	Tue,  3 Sep 2024 10:06:03 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 3 Sep 2024 10:06:03 +0800
+Message-ID: <d20a0971-a03b-ce24-1111-ca06de234cd6@huawei.com>
+Date: Tue, 3 Sep 2024 10:06:02 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH -next] netlink: Use the BITS_PER_LONG macro
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<christophe.jaillet@wanadoo.fr>, <horms@kernel.org>, <netdev@vger.kernel.org>
+References: <20240902111052.2686366-1-ruanjinjie@huawei.com>
+ <20240902183944.6779c0a5@kernel.org>
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+In-Reply-To: <20240902183944.6779c0a5@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemh500013.china.huawei.com (7.202.181.146)
 
-On Thu, 29 Aug 2024 11:48:26 +0800 Justin Lai wrote:
-> +		skb->dev = dev;
 
-no need to assign skb->dev = dev; eth_type_trans() will do it for you
 
-> +		skb_put(skb, pkt_size);
-> +		skb_mark_for_recycle(skb);
-> +		skb->protocol = eth_type_trans(skb, dev);
-> +
-> +		if (skb->pkt_type == PACKET_MULTICAST)
-> +			tp->stats.multicast++;
-> +
-> +		rtase_rx_vlan_skb(desc, skb);
-> +		rtase_rx_skb(ring, skb);
-> +
-> +		dev_sw_netstats_rx_add(dev, pkt_size);
-> +
-> +skip_process_pkt:
-> +		workdone++;
-> +		cur_rx++;
-> +		entry = cur_rx % RTASE_NUM_DESC;
-> +		desc = ring->desc + sizeof(union rtase_rx_desc) * entry;
-> +	} while (workdone != budget);
+On 2024/9/3 9:39, Jakub Kicinski wrote:
+> On Mon, 2 Sep 2024 19:10:52 +0800 Jinjie Ruan wrote:
+>> sizeof(unsigned long) * 8 is the number of bits in an unsigned long
+>> variable, replace it with BITS_PER_LONG macro to make it simpler.
+> 
+> Does coccicheck catch such cases?
 
-The check needs to be at the start of the function.
-NAPI can be called with budget of 0 to limit the processing 
-to just Tx cleanup. In that case no packet should be received.
+Yes
+
 
