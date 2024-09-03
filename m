@@ -1,129 +1,93 @@
-Return-Path: <netdev+bounces-124645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 956E196A510
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 19:10:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B772096A517
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 19:13:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C47F01C23F7C
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 17:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7430B286C19
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 17:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE73218CC13;
-	Tue,  3 Sep 2024 17:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B23918CC15;
+	Tue,  3 Sep 2024 17:13:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UtG3Hw/j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/tZpHKP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3462B18BC1C;
-	Tue,  3 Sep 2024 17:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0011C14;
+	Tue,  3 Sep 2024 17:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725383428; cv=none; b=idTt9v8UEXBOQRrtASXCktPZ5rVx3SLGQ+52+twaCsYHd55N1yBrt0nJkNljocVMV9um4kAfQY900BGEvayNKXkvzoXX9gqE/np5uVT8bRFNS7f7UnCDqKryZWzmsViqA+MWONntqetr6WOFHwpxjZBAhKuf0v7Zqn/GvCkIjMA=
+	t=1725383586; cv=none; b=OrMuNDuba6cl1ZXWRwikXarf5HsXpMOlv0+imx/VyWm/d/Dfwhu6+Gtzfz+pkdGBwJCJ0loFqjpAhpUB0/CXmIe9dePg0DHU6WCgUjvueRb7j3gE+RtBDZf0HrfNEmzrnr1oZAFh72V7FiZSeUVBaegT+k1rRM+Feud+acVWIwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725383428; c=relaxed/simple;
-	bh=0l4evwdyan87dgGb7txNM2qR7iGQ5qw8nvVrzVmrYsk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q8SMDPeF+qfT36J1/ljfTMKuzjlVuW/TF01mJktQ9RpubzTImLah3qgBAgxe8MVu6ulcptbnZAgXMMMX276I+RiqMxwe+vNYBnfkmYXkVqkw/T7tQPPdnsSl+ZnM9vY6CoBZbU6Wg5NFzeh+0Yp67a0JewkqT/gfbFFJk8KWct0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UtG3Hw/j; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725383427; x=1756919427;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0l4evwdyan87dgGb7txNM2qR7iGQ5qw8nvVrzVmrYsk=;
-  b=UtG3Hw/jA6gYkB7bpJDEV6DJ+SB4FIXfo+D3+xNQ6Vz3JYJzdRjmatoG
-   i9Mqgn/qMap+3r2g4nvnj+q+hp7aceV6ifYv/6aUE8ObZrpWdxC2MYx/d
-   i3kl3SzcATJm6wXrDApJtFpRfulRLlbTuMbsjXA/e5GtFtb1KhB4griwx
-   QW0QdUdJVv4/vLHGSnW3okP0plzfczvUCMJMq10VIPFjlWP2UKAu5CpH7
-   oLdMdg2Ya3UPf4vaq64jXNrt84IxJ3Q4uL67YWT5nJTMVUrE3qiylssIi
-   6crU3Fe68RO9Y3LIQfUiiLjPtGA9POz4kknefL13BR9BXZzqyQJqj9GGs
-   w==;
-X-CSE-ConnectionGUID: +Atj3CcKSdSzYuKHvgv8tg==
-X-CSE-MsgGUID: 8EdiBQCMTcKvflmaLTdfBw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="34662246"
-X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
-   d="scan'208";a="34662246"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 10:10:26 -0700
-X-CSE-ConnectionGUID: 8wDNQEu0Qga0yw2/nvqSwg==
-X-CSE-MsgGUID: s/qtCeb5QmWdBmBdcM73FQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
-   d="scan'208";a="95713609"
-Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 03 Sep 2024 10:10:21 -0700
-Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1slX2p-0006wY-04;
-	Tue, 03 Sep 2024 17:10:19 +0000
-Date: Wed, 4 Sep 2024 01:09:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>, kernel@pengutronix.de,
-	Alibek Omarov <a1ba.omarov@gmail.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Elaine Zhang <zhangqing@rock-chips.com>,
-	David Jander <david.jander@protonic.nl>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Simon Horman <horms@kernel.org>, linux-can@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: Re: [PATCH can-next v4 01/20] dt-bindings: can: rockchip_canfd: add
- rockchip CAN-FD controller
-Message-ID: <202409040039.TNDhtsSe-lkp@intel.com>
-References: <20240903-rockchip-canfd-v4-1-1dc3f3f32856@pengutronix.de>
+	s=arc-20240116; t=1725383586; c=relaxed/simple;
+	bh=Nj3zSSXVJY7aWly8kxr2GE48AQpf8nGuG7nIWcYODkA=;
+	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
+	 Cc:Message-ID:Date; b=kr8JsBscUOcJtjQrwuNRli4zP339TvNboa5RcHgLC0in4TmRCExEKwBm4mqcyr0ztmqX/9oa9bEcOBgv9ObZSeSFc4bB723lpnJwCUzplQZNeYUK+aeDkasplhjIWbiPilJO0jQumsYbOy1D4V/JCrpMAwWzdWxX+qzEerg+PSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/tZpHKP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F172C4CEC4;
+	Tue,  3 Sep 2024 17:13:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725383586;
+	bh=Nj3zSSXVJY7aWly8kxr2GE48AQpf8nGuG7nIWcYODkA=;
+	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+	b=K/tZpHKPktx2CDrKKwILBE5Iz1Y8z79gvdsJWC9j309s+u/+NcGpStngyWIcEhx8b
+	 coRaxKR90TegAHXVr6mgSYoP2XIlGmrqNIHD6UGJdGrTTBqEptXRdnbJSwrNg98lnS
+	 g4HkuHG5M5aKP2Nmm9bYcRC+Sze6B6Ttv8Sch12sTtVBjioNTgnSNRq2v/jekc5aiL
+	 18v58Xu7kIhfVTao+/oWM3yWgj6flMIxKAQKRPKKZR0dK4FLA2zIaOV4D5Xd2TmM7m
+	 u/L2TuHPQYmR1+ya5K9+N5D7BkJbdYtjsWPvb7m9CYm5zDFcRw/Kf4QdAxtZxASOII
+	 4lt85LVd08KhQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240903-rockchip-canfd-v4-1-1dc3f3f32856@pengutronix.de>
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v1 5/7] wifi: brcmfmac: of: Make use of
+ irq_get_trigger_type()
+From: Kalle Valo <kvalo@kernel.org>
+In-Reply-To: <20240902225534.130383-6-vassilisamir@gmail.com>
+References: <20240902225534.130383-6-vassilisamir@gmail.com>
+To: Vasileios Amoiridis <vassilisamir@gmail.com>
+Cc: linux@armlinux.org.uk, maarten.lankhorst@linux.intel.com,
+ mripard@kernel.org, tzimmermann@suse.de, airlied@gmail.com, daniel@ffwll.ch,
+ linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
+ f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, nico@fluxnic.net,
+ arend.vanspriel@broadcom.com, robh@kernel.org, saravanak@google.com,
+ andriy.shevchenko@linux.intel.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+ devicetree@vger.kernel.org, vassilisamir@gmail.com
+User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
+Message-ID: <172538357854.1029035.14523322695529094304.kvalo@kernel.org>
+Date: Tue,  3 Sep 2024 17:13:00 +0000 (UTC)
 
-Hi Marc,
+Vasileios Amoiridis <vassilisamir@gmail.com> wrote:
 
-kernel test robot noticed the following build warnings:
+> Convert irqd_get_trigger_type(irq_get_irq_data(irq)) cases to the more
+> simple irq_get_trigger_type().
+> 
+> Signed-off-by: Vasileios Amoiridis <vassilisamir@gmail.com>
 
-[auto build test WARNING on da4f3b72c8831975a06eca7e1c27392726f54d20]
+wireless patches go via wireless-next, please submit patches 5-6
+separately.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Marc-Kleine-Budde/dt-bindings-can-rockchip_canfd-add-rockchip-CAN-FD-controller/20240903-173243
-base:   da4f3b72c8831975a06eca7e1c27392726f54d20
-patch link:    https://lore.kernel.org/r/20240903-rockchip-canfd-v4-1-1dc3f3f32856%40pengutronix.de
-patch subject: [PATCH can-next v4 01/20] dt-bindings: can: rockchip_canfd: add rockchip CAN-FD controller
-reproduce: (https://download.01.org/0day-ci/archive/20240904/202409040039.TNDhtsSe-lkp@intel.com/reproduce)
+2 patches set to Changes Requested.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409040039.TNDhtsSe-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   Warning: Documentation/devicetree/bindings/regulator/siliconmitus,sm5703-regulator.yaml references a file that doesn't exist: Documentation/devicetree/bindings/mfd/siliconmitus,sm5703.yaml
-   Warning: Documentation/hwmon/g762.rst references a file that doesn't exist: Documentation/devicetree/bindings/hwmon/g762.txt
-   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/reserved-memory/qcom
-   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/display/exynos/
-   Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/misc/fsl,qoriq-mc.txt
->> Warning: MAINTAINERS references a file that doesn't exist: Documentation/devicetree/bindings/net/can/rockchip,rk3568-canfd.yaml
-   Using alabaster theme
+13787792 [v1,5/7] wifi: brcmfmac: of: Make use of irq_get_trigger_type()
+13787793 [v1,6/7] wifi: wlcore: sdio: Make use of irq_get_trigger_type()
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+https://patchwork.kernel.org/project/linux-wireless/patch/20240902225534.130383-6-vassilisamir@gmail.com/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+https://docs.kernel.org/process/submitting-patches.html
+
 
