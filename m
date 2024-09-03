@@ -1,71 +1,106 @@
-Return-Path: <netdev+bounces-124623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE84496A3DB
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:12:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ED2C96A3F1
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B2C2281391
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:12:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B28A1C21085
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E45D188596;
-	Tue,  3 Sep 2024 16:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gp6KGnzX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21CC1189F20;
+	Tue,  3 Sep 2024 16:14:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4A41DFFC
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 16:12:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F80922F11;
+	Tue,  3 Sep 2024 16:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725379949; cv=none; b=h3s8Ta+wmJtF9hyWwiUsbdVeFkH56BaAUvM4pQBmNdsj9Q6HTGcMt1RlJ5ROTvKxHbbbFC5sbpkLv2RZhP6SRLWsW8Cv2g2WF1dUts4Ah6eNwNgeat8Ba+ne56b/y4hkIWcc7x+0mzLKovSA+I7jeV7kVeqxmkoBMQolGERzHp8=
+	t=1725380085; cv=none; b=Vd3dE+XQ8OVFgFg8HMTQjhjF92iO5BmSNw5Xvu+rvR1JiBE+4IXV3+aJRrkczUsg9JZr2nSGkXBzo2253xmrkNdZFNxJVaiBZSYI7xTAFZoHUzczjEZEMiQYvDNTjQc/nyU03Ko1lpMv3CXBsOiEfunHb2xZq9i3bsC3y1Pjzc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725379949; c=relaxed/simple;
-	bh=H1/r0HJ1CHNrtF1HlIipYtqFFTtkeZ8cWi+DFJQePag=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xd+bNU7K43YA3HgSZXUnKkthxQovUVsrWDq0+xJzDMv6iDbsZ1YWsozvrj/WzJ1F5wH0w9r9Bl3g7hFa8x2RQgsAFT8BP88LDdNRauNtOSFGQMs3Ie/UE/MjzEebj8bRIDR6eg6WBUOupPPLX8S9LuK6DUL6foeDODBoxA2iMXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gp6KGnzX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F855C4CEC4;
-	Tue,  3 Sep 2024 16:12:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725379948;
-	bh=H1/r0HJ1CHNrtF1HlIipYtqFFTtkeZ8cWi+DFJQePag=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Gp6KGnzXRltO8y/jz28T1NNf4Rx5ic2JDbW7+sZ+G6oiDM/DeB9/Y2OEg5S1RrLwT
-	 1g/Tgv0q6CA1ulRtZUhPUs6TzBc0maqDRn2Hvl9+FeMMTyZxec3YJStjEVXajswDzW
-	 hcW6hdCACRKAhRdbOzhSXIytLfUSL1YCkcrqjMjLCXviJmRq9aSDaD1xDVBCfuMIqJ
-	 hdxSVEuokN3aNNBQ7aSV+qoocEza2uM5Gr4Sq9CQtRgeMX0fFeSVRkbO65GczdQPK3
-	 zm1WnDT9Q6B7UIn+LXE6Gf/YWVxQzJ9gC/Ql25eOmaJTvLB/ZLQi0r8k4UTcWlXrzt
-	 oIMD439ca7Sow==
-Date: Tue, 3 Sep 2024 09:12:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <christophe.jaillet@wanadoo.fr>, <horms@kernel.org>,
- <netdev@vger.kernel.org>
-Subject: Re: [PATCH -next] netlink: Use the BITS_PER_LONG macro
-Message-ID: <20240903091227.75269a25@kernel.org>
-In-Reply-To: <d20a0971-a03b-ce24-1111-ca06de234cd6@huawei.com>
-References: <20240902111052.2686366-1-ruanjinjie@huawei.com>
-	<20240902183944.6779c0a5@kernel.org>
-	<d20a0971-a03b-ce24-1111-ca06de234cd6@huawei.com>
+	s=arc-20240116; t=1725380085; c=relaxed/simple;
+	bh=fra330hp3FioeSWf/FHHOBBmVKVljAd1+6iYODU0Qzc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gUWxTk8qs9muqt6CYh08BeI9vWvmLQuj8LK//0J0/u8axrWF51xn3StqzpZz78NEux0sGBdPd57ab4I6trWsuG2oEwTioMtfC8XhCiFnG0M0iB3/WEDM9dzXWKGDJS/Wt7wsAyvxsBn8APYe5DaON9efVG0lbT7bjK93Jx3hbr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=56396 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1slWAt-00AieQ-9V; Tue, 03 Sep 2024 18:14:37 +0200
+Date: Tue, 3 Sep 2024 18:14:34 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH v2 0/2] netfilter: nf_tables: Fix percpu address space
+ issues in nf_tables_api.c
+Message-ID: <Ztc16pw4r3Tf_U7h@calendula>
+References: <20240829154739.16691-1-ubizjak@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240829154739.16691-1-ubizjak@gmail.com>
+X-Spam-Score: -1.8 (-)
 
-On Tue, 3 Sep 2024 10:06:02 +0800 Jinjie Ruan wrote:
-> > Does coccicheck catch such cases?  
+Hi,
+
+On Thu, Aug 29, 2024 at 05:29:30PM +0200, Uros Bizjak wrote:
+> Use {ERR_PTR,IS_ERR,PTR_ERR}_PCPU() macros when crossing between generic
+> and percpu address spaces and add __percpu annotation to *stats pointer
+> to fix percpu address space issues.
+
+IIRC, you submitted patch 1/2 in this series to the mm tree.
+
+Let us know if this patch gets upstreamed via MM tree (if mm
+maintainers are fine with it) or maybe MM maintainers prefer an
+alternative path for this.
+
+Thanks.
+
+> NOTE: The patch depends on a patch that introduces *_PCPU() macros [1]
+> that is on the way to mainline through the mm tree. For convience, the
+> patch is included in this patch series, so CI tester is able to test
+> the second patch without compile failures.
 > 
-> Yes
-
-which script?
+> [1] https://lore.kernel.org/lkml/20240818210235.33481-1-ubizjak@gmail.com/
+> 
+> The netfilter patch obsoletes patch [2].
+> 
+> [2] https://patchwork.ozlabs.org/project/netfilter-devel/patch/20240806102808.804619-1-ubizjak@gmail.com/
+> 
+> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> 
+> Uros Bizjak (2):
+>   err.h: Add ERR_PTR_PCPU(), PTR_ERR_PCPU() and IS_ERR_PCPU() macros
+>   netfilter: nf_tables: Fix percpu address space issues in
+>     nf_tables_api.c
+> 
+>  include/linux/err.h           |  9 +++++++++
+>  net/netfilter/nf_tables_api.c | 16 ++++++++--------
+>  2 files changed, 17 insertions(+), 8 deletions(-)
+> 
+> -- 
+> 2.42.0
+> 
 
