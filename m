@@ -1,94 +1,89 @@
-Return-Path: <netdev+bounces-124334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E8839690A0
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 02:23:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87E1C9690B2
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 02:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0586AB225AF
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 00:23:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14F6FB221E9
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 00:37:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B02810FF;
-	Tue,  3 Sep 2024 00:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E41FA5F;
+	Tue,  3 Sep 2024 00:37:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mYeOqMmw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JOTcKsq2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D3EA32;
-	Tue,  3 Sep 2024 00:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA0CA32
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 00:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725322989; cv=none; b=DpOytq+15kBu60XYKM4/rsXk389o3pjHeAd4zFi/E0qpekCMAPmJnFQPC+IPAYcpGKTTeaotBJlC5OQudKzjiRHCTe3fl97BjKYtlN7gZpKR1W7+vxRumcl6G2s5pDQYuT/ZUGOqqL65YtvShgdxwDBnB+GZ/R0e0AkapqtDV80=
+	t=1725323827; cv=none; b=nJ8eIFbZtrOGhSrnIoDuSNvJciX6GdFj+aH5E5ZB8hGNPpqa3HdKE+u9QpOi9U9UZPUdsibHtwielJLT60eymZ5VdfYRSLFYjsiC2yhvUmvQoDw8hEAO1cw0xqSHs4uMeBAtvDivwsQS8PmYim5Lt7oCr8+rTyOS4CNT/aQRfrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725322989; c=relaxed/simple;
-	bh=wpgxvuvuy6MrMob5LhfNIlA18ZNhaqV3NDIQgc5JzUI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PacjbIKZxS3zwcp0bqQYMSloD5o/NLWoBMOrkrsnrjN4J0U+XQL2C2cxJXXN81CSwxIor8TPNnjxr1lS8hBPmRDPNqU1TcIpIpH8YSSbmPnP0ZMIC2n/4OFnQQdeluOkmdC0/UPF+3TaMD8BsZ5Ow9gMOZnF6rOVWbp65Gt3qSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mYeOqMmw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=FWI5RwxkEQ33xNBb8ono2qSimaDGGTfOgwhj4qFOqzk=; b=mYeOqMmwXXd3HhNWPNrFxkc0PB
-	d+LQusAnaTSTHyJcJe6/62w4ATqjmi2XJ+5CaweJTvQ6rutvd06gyDsvMkb2jw0UHZKDxfFr7ZKgG
-	VN5orC4/lwWMMNpDZcEterdpVVbtbT8m8oPvdB22DqmWrackh+qRdODaerh6I5KWzd9A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1slHJn-006LUO-9m; Tue, 03 Sep 2024 02:22:47 +0200
-Date: Tue, 3 Sep 2024 02:22:47 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vasileios Amoiridis <vassilisamir@gmail.com>
-Cc: linux@armlinux.org.uk, maarten.lankhorst@linux.intel.com,
-	mripard@kernel.org, tzimmermann@suse.de, airlied@gmail.com,
-	daniel@ffwll.ch, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
-	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	nico@fluxnic.net, arend.vanspriel@broadcom.com, kvalo@kernel.org,
-	robh@kernel.org, saravanak@google.com,
-	andriy.shevchenko@linux.intel.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
-	devicetree@vger.kernel.org
-Subject: Re: [PATCH v1 0/7] Use functionality of irq_get_trigger_type()
-Message-ID: <d6784b5c-6eb1-4b31-b870-da926fa00e32@lunn.ch>
-References: <20240902225534.130383-1-vassilisamir@gmail.com>
+	s=arc-20240116; t=1725323827; c=relaxed/simple;
+	bh=W/A4XMjAkThRmR1Qu06rR2z3sjh6iTSU03vzeapf8YA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=os1aG/VyQuH4zDcj9aHbM9e1D/rxISLPank1nElfq0DtezrDzmQzFNj0chYY0kzvLrN2bjvwwYMVp889yTYdY0VbFDhaciCwc+sdalh/1Ze1MViI3tkFUJ45wLZUyAdXh3abiOrCl3eiKZCS2nJmjja8HZD3n52DFc2Wp+nwduk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JOTcKsq2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 136E0C4CEC2;
+	Tue,  3 Sep 2024 00:37:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725323826;
+	bh=W/A4XMjAkThRmR1Qu06rR2z3sjh6iTSU03vzeapf8YA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JOTcKsq2O8g9HZTRct+iDno3H1bYpqmaTGAOdC5DR6/J0DPF2efa/UVbolo4tyIJP
+	 dBBz3MqPKE6GQDgaN2imfhusIsRYdzD/G3Cda82U53D6R6dB4FVc1loCX/OEwf6Pim
+	 6u28OSrfugAatiWg3p/q5u9WRIUJPBv46s9tWx0sFdoMCiRHj+GijXW4fhUHXVnCfr
+	 LQbFX8O6EYVl7qEe1hfoCEFlahzrhLyjJJiqcijQhgTj8VwqzNUje4L8TRJwQ/U5TJ
+	 JY4ceOcJL2QyFuy9liFegV/R3ebSBuyp7ETO/ugoYlYIgOP/WoiFlvgFEMFv+p2YPG
+	 JEYeertEZ/ykA==
+Date: Mon, 2 Sep 2024 17:37:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, Madhu Chittim
+ <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ intel-wired-lan@lists.osuosl.org, edumazet@google.com
+Subject: Re: [PATCH v5 net-next 02/12] net-shapers: implement NL get
+ operation
+Message-ID: <20240902173704.71c6b35a@kernel.org>
+In-Reply-To: <c6d8052c-c5a0-48e2-8984-0063afc1e482@redhat.com>
+References: <cover.1724944116.git.pabeni@redhat.com>
+	<53077d35a1183d5c1110076a07d73940bb2a55f3.1724944117.git.pabeni@redhat.com>
+	<20240829182019.105962f6@kernel.org>
+	<58730142-2064-46cb-bc84-0060ea73c4a0@redhat.com>
+	<20240830121418.39f3e6f8@kernel.org>
+	<c6d8052c-c5a0-48e2-8984-0063afc1e482@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240902225534.130383-1-vassilisamir@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 03, 2024 at 12:55:27AM +0200, Vasileios Amoiridis wrote:
-> Convert irqd_get_trigger_type(irq_get_irq_data(irq)) cases to the more
-> simple irq_get_trigger_type(irq).
+On Mon, 2 Sep 2024 12:10:50 +0200 Paolo Abeni wrote:
+> >> Was that way a couple of iterations ago. Jiri explicitly asked for the
+> >> separation, I asked for confirmation and nobody objected.  
+> > 
+> > Could you link to that? I must have not read it.  
 > 
-> Inspired by: https://lore.kernel.org/linux-iio/20240901135950.797396-1-jic23@kernel.org/
+> https://lore.kernel.org/netdev/ZqzIoZaGVb3jIW43@nanopsycho.orion/
 > 
-> Vasileios Amoiridis (7):
->   drm/i2c: tda998x: Make use of irq_get_trigger_type()
->   net: dsa: realtek: rtl8365mb: Make use of irq_get_trigger_type()
->   net: dsa: realtek: rtl8366rb: Make use of irq_get_trigger_type()
->   net: smc91x: Make use of irq_get_trigger_type()
->   wifi: brcmfmac: of: Make use of irq_get_trigger_type()
->   wifi: wlcore: sdio: Make use of irq_get_trigger_type()
->   of/irq: Make use of irq_get_trigger_type()
+> search for "I wonder if the handle should be part of this structure"
+> 
+> I must admit by wannabe reply on such point never left my outbox.
 
-Please spit these by subsystems.
-
-For networking, you should read:
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-	Andrew
+"I wonder if .." does not sound like a strong preference.
+And the parent ID remained in the struct, so it still partially records 
+its position in the hierarchy. Since there is no "move" op it's really
+not worth multiplying arguments to most functions 2x.
 
