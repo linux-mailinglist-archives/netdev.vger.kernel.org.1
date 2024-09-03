@@ -1,238 +1,145 @@
-Return-Path: <netdev+bounces-124740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9534796AA83
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 23:44:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7847B96AA8B
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 23:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DC89281368
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 21:44:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23E05282B0B
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 21:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091AD192B68;
-	Tue,  3 Sep 2024 21:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE618126C02;
+	Tue,  3 Sep 2024 21:48:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SsT6LKFB";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="aqDegjFQ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="SsT6LKFB";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="aqDegjFQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ER9jIvJ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1AC91EC013;
-	Tue,  3 Sep 2024 21:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7088BB647;
+	Tue,  3 Sep 2024 21:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725399843; cv=none; b=X+j6Bkvh49o1P/ozvXu24SM79CUzX9+qMTKy4clE6PFThR+yVEJu0CwKjhc1QzdHlqfYJ4wJYGdzmgI9bFF0BAunIZvhLa1Wms2y2ye7oQO4+H1C2TkoVP4a2X9Q7/9xWoveNw8Ph5FvvXgdKtHScWePjM+NGSTSKcLIw3/+FNc=
+	t=1725400111; cv=none; b=sYEb/tM7fNjSvOQBt6mXpgjDr1cHtCWXLplRFJ5KNKUbyMollSc8afT70kXRwvth9MPCaM+L5unany2qYWHns59yUcukMhRko1m1w3BbOAkKGBAiKL2CcJTVzCtRzeSrjWGxN6Rp65KlfNdBunGxUaJh2hWtGK7Gbp6dtpFAdAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725399843; c=relaxed/simple;
-	bh=b0Hg7UiymZA9O4YE79C/lPQ8JHhkZBwqn/R+sJpQyjs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cKcPEEjbSImdA15dT5rKL69sYTKWevLcZGUCyqjAEHSUNBPFhjAw5vuWwlAHrzr7cTMFxft/OfvABhB3y+LcHHPHKQyWlt4CbVzwgejg58xzI5WX55wccBj4i62UAGV7voI89FsIIIiC0VVgfCXObDNmdgkpf3kG9YeWXLrlkyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SsT6LKFB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=aqDegjFQ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=SsT6LKFB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=aqDegjFQ; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 0649321B8F;
-	Tue,  3 Sep 2024 21:44:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1725399840; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wQ2Z4c48ce6CUlKYTbl197VdpIjkeOTW1y7Y+4S08+Y=;
-	b=SsT6LKFBNSYyVy1SRGdkIMGkpkqjvNAUdiJNhSuADZP4A7FX6wbV7nXa7hgGYM/G2CfRZL
-	aYYAkH8JdI13xXs/Wgue9ALsX3AqzFdnv2AC5REUErU0Fl6XsBr1bxxCuEwvRfcUypZoLc
-	lIJYdJnoSuafTYhDtBaGNvYUpEUrF4A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1725399840;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wQ2Z4c48ce6CUlKYTbl197VdpIjkeOTW1y7Y+4S08+Y=;
-	b=aqDegjFQE/6/6LwQNwSM4FgpCF7XB9hSy+vHMJzGrpZkpPquFO9A2ee3+qMb9tq2Rajqqa
-	xZOsLzfz47HRTvBw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1725399840; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wQ2Z4c48ce6CUlKYTbl197VdpIjkeOTW1y7Y+4S08+Y=;
-	b=SsT6LKFBNSYyVy1SRGdkIMGkpkqjvNAUdiJNhSuADZP4A7FX6wbV7nXa7hgGYM/G2CfRZL
-	aYYAkH8JdI13xXs/Wgue9ALsX3AqzFdnv2AC5REUErU0Fl6XsBr1bxxCuEwvRfcUypZoLc
-	lIJYdJnoSuafTYhDtBaGNvYUpEUrF4A=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1725399840;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wQ2Z4c48ce6CUlKYTbl197VdpIjkeOTW1y7Y+4S08+Y=;
-	b=aqDegjFQE/6/6LwQNwSM4FgpCF7XB9hSy+vHMJzGrpZkpPquFO9A2ee3+qMb9tq2Rajqqa
-	xZOsLzfz47HRTvBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id BEFD4139D5;
-	Tue,  3 Sep 2024 21:43:59 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +ACvLR+D12YrVQAAD6G6ig
-	(envelope-from <tbogendoerfer@suse.de>); Tue, 03 Sep 2024 21:43:59 +0000
-Date: Tue, 3 Sep 2024 23:43:43 +0200
-From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-To: "Ertman, David M" <david.m.ertman@intel.com>
-Cc: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "Nguyen, Anthony
- L" <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, "intel-wired-lan@lists.osuosl.org"
- <intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [PATCH net] ice: Fix NULL pointer access, if PF doesn't support
- SRIOV_LAG
-Message-ID: <20240903234343.5c17f735@samweis>
-In-Reply-To: <IA1PR11MB61942396759BA7F1C20BA41BDD972@IA1PR11MB6194.namprd11.prod.outlook.com>
-References: <20240826085830.28136-1-tbogendoerfer@suse.de>
-	<ZsxNv6jN5hld7jYl@nanopsycho.orion>
-	<20240826121710.7fcd856e@samweis>
-	<362dd93c-8176-4c46-878d-dd0e1b897468@intel.com>
-	<20240827211224.0d172e40@samweis>
-	<IA1PR11MB61942396759BA7F1C20BA41BDD972@IA1PR11MB6194.namprd11.prod.outlook.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.34; x86_64-suse-linux-gnu)
+	s=arc-20240116; t=1725400111; c=relaxed/simple;
+	bh=60NYC0M5TX2Rie8WIpxDH8StGvDAha+7Nld7q0MVPCg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PVTMLWaBVjiho94P9mUM9zVqo6aNt1HTk070jAH8mzwZ8jPTi2+V9OZQ+9IqYsDfKyDCiggQDuYb3wrMNfNf9rPD1QVMshCjTB3Qyn1sXmgm+nJ+duQEhROlRzA55AcoEAiUuCgbyICwP+jA0oc6Bam3/R4wOcCf3DPbtddKmYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ER9jIvJ0; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7a8049d4a40so325956985a.1;
+        Tue, 03 Sep 2024 14:48:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725400109; x=1726004909; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=se2FtAO7iN2pqUgiakHe8ZkpdVtZFx51CeOE7clkB90=;
+        b=ER9jIvJ0KDJxDw1fxPZwY6nd60EFD2F/WKYj0Czl7QaEp+ehRQ9yXB0IOjwvDFAxcS
+         cFXyAgiV4LoMAFK+MgQPiP2spNs1K4VILAtb93KXx1E4GMgJH8KHJet/abjE28AXNgkl
+         HsG+zz79akoy7Jgjtwzl4yTbY6eGJ4CI9xC89GUhQ2GqDjWcWXtqdjRNrKLc62cMsemA
+         lWPIGlMNl17f2nY6XEXv/IqSC2J7nN2cjU4FTgi2O/xT3v0FG9mDtWHEjrpXcdSgrX0N
+         oVvknEFYKpU0lPoy+swHkNl9wJEw8zY17vDnsWu/a2RgxlveZLYDGtR0SEnQnB7lXLEo
+         Tcow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725400109; x=1726004909;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=se2FtAO7iN2pqUgiakHe8ZkpdVtZFx51CeOE7clkB90=;
+        b=nbtlho9iR69xNHQLCBg8fpBdtL2Xirn5Rc0CiV9/MdeMOqyzidNLI3uS6KDg33jCzq
+         L2Wzeo0Qi02tqzf7Wn1nMyFjSWBthFScHkVz5kkotd43eVilMm04HerqElDm8beizyYs
+         CXYgvpNp7Z6i2mojZyg93+1YhcEQJY8QG52SIkYzmbZ9BDy+JdlhEvJYflydlP0Xr1El
+         cOj71byWzVkl6wABVTgb0QcBFLgofA4XScs9luKkj5NKvmINNSoLaC+ZX2iWxD23gKy8
+         9Fp5PIKJ73U2N5l9EuhrDo7+PV9FvdKbz3I8m+xpRJa75Y42tHoOa2Q2xG36XoYlbbeg
+         vaAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUD72X6Rof296QoulmfRCuzrLuiZVyUGBkw+WI/4APipdfFqaR5Qz79qHKK3ErDWp5Qwv0l7EUn@vger.kernel.org, AJvYcCWzVku8QGUwBGFpTZs0j08sORc1m/iY268hAymcQBViosuz8mpz+NwGKbWcSx3I+oxPTr66veqeXS+J1sU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxyFu8fPBcLrqbBBGu7Y6Tn2XKnPDUUOgT0iL1VFH2dutzNsoE2
+	upU4E79xi3665WJbb4vfasZT88+1RT+Pwfb6dhehhj0Fkpg51ewS
+X-Google-Smtp-Source: AGHT+IG9EF/ZPqaA7IIOjPt6oONb+qYHpH6/TmM4UriUq0JpWXlIEBSX8R0OL4kqdK/0qc6UQW5mvA==
+X-Received: by 2002:a05:620a:31a3:b0:79e:fbca:5ceb with SMTP id af79cd13be357-7a97bd0acbdmr464694885a.47.1725400109161;
+        Tue, 03 Sep 2024 14:48:29 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a806d830a8sm568566785a.125.2024.09.03.14.48.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Sep 2024 14:48:28 -0700 (PDT)
+Message-ID: <d7c82c78-9f7f-4083-aeec-013f338df11e@gmail.com>
+Date: Tue, 3 Sep 2024 14:48:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -3.80
-X-Spamd-Result: default: False [-3.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-0.991];
-	MIME_GOOD(-0.10)[text/plain];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: dsa: vsc73xx: fix possible subblocks range of
+ CAPT block
+To: Pawel Dembicki <paweldembicki@gmail.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Linus Walleij <linus.walleij@linaro.org>, linux-kernel@vger.kernel.org
+References: <20240903203340.1518789-1-paweldembicki@gmail.com>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <20240903203340.1518789-1-paweldembicki@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 30 Aug 2024 17:12:56 +0000
-"Ertman, David M" <david.m.ertman@intel.com> wrote:
+On 9/3/24 13:33, Pawel Dembicki wrote:
+> CAPT block (CPU Capture Buffer) have 7 sublocks: 0-3, 4, 6, 7.
+> Function 'vsc73xx_is_addr_valid' allows to use only block 0 at this
+> moment.
+> 
+> This patch fix it.
 
-> > -----Original Message-----
-> > From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-> > Sent: Tuesday, August 27, 2024 12:12 PM
-> > To: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
-> > Cc: Nguyen, Anthony L <anthony.l.nguyen@intel.com>; David S. Miller
-> > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
-> > Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; intel-
-> > wired-lan@lists.osuosl.org; netdev@vger.kernel.org; linux-
-> > kernel@vger.kernel.org; Ertman, David M <david.m.ertman@intel.com>; Jiri
-> > Pirko <jiri@resnulli.us>
-> > Subject: Re: [PATCH net] ice: Fix NULL pointer access, if PF doesn't su=
-pport
-> > SRIOV_LAG
-> >=20
-> > On Tue, 27 Aug 2024 09:16:51 +0200
-> > Przemek Kitszel <przemyslaw.kitszel@intel.com> wrote:
-> >  =20
-> > > On 8/26/24 12:17, Thomas Bogendoerfer wrote: =20
-> > > > On Mon, 26 Aug 2024 11:41:19 +0200
-> > > > Jiri Pirko <jiri@resnulli.us> wrote:
-> > > > =20
-> > > >> Mon, Aug 26, 2024 at 10:58:30AM CEST, tbogendoerfer@suse.de wrote:=
- =20
-> > > >>> For PFs, which don't support SRIOV_LAG, there is no pf->lag struct
-> > > >>> allocated. So before accessing pf->lag a NULL pointer check is ne=
-eded.
-> > > >>>
-> > > >>> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de> =20
-> > > >>
-> > > >> You need to add a "fixes" tag blaming the commit that introduced t=
-he
-> > > >> bug. =20
-> > >
-> > > Would be also good to CC the author. =20
-> >=20
-> > sure, I'm using get_maintainer for building address line and looks
-> > like it only adds the author, if there is a Fixes tag, which IMHO
-> > makes more sense than mailing all possible authors of file (in this
-> > case it would work, but there are other files).
-> >  =20
-> > > > Fixes: 1e0f9881ef79 ("ice: Flesh out implementation of support for
-> > > > SRIOV on bonded interface") =20
-> > >
-> > > the bug was introduced later, the tag should be:
-> > > Fixes: ec5a6c5f79ed ("ice: process events created by lag netdev event
-> > > handler") =20
-> >=20
-> > I'd like to disagree, ec5a6c5f79ed adds an empty
-> > ice_lag_move_new_vf_nodes(),
-> > which will do no harm if pf->lag is NULL. Commit 1e0f9881ef79 introduces
-> > the access to pf->lag without checking for NULL. =20
-> > >
-> > > The mentioned commit extracted code into =20
-> > ice_lag_move_new_vf_nodes(), =20
-> > > and there is just one call to this function by now, just after
-> > > releasing lag_mutex, so would be good to change the semantics of
-> > > ice_lag_move_new_vf_nodes() to "only for lag-enabled flows, with
-> > > lag_mutex held", and fix the call to it to reflect that. =20
-> >=20
-> > I could do that for sure, but IMHO this is about fixing a bug,
-> > which crashes the kernel. Making the code better should be done
-> > after fixing. =20
->=20
-> Thomas,
->=20
-> Nice catch!
->=20
-> I looked into this a bit and it seems that when I sent in patch:
-> commit 9f74a3dfcf83 ("ice: Fix VF Reset paths when interface in a failed =
-over aggregate)
->=20
-> I left in a spurious call to the previous function for moving nodes. Sinc=
-e it is
-> just in the error path it went unnoticed this long.
->=20
-> Since this is the only call to ice_lag_move_new_vf_nodes(), it seems that
-> proper way of fixing this would be to eliminate the spurious call and the=
- function
-> definition entirely.
->=20
-> If you do no want to do this, I can volunteer to write the patch.
+No objection to targeting 'net' as it is a proper bug fix, however there 
+is nothing in 'net' that currently depends upon VSC73XX_BLOCK_CAPTURE, 
+so this has no functional impact at the moment.
 
-either way is fine. But shouldn't the fix alone just applied first ?
-Who will pick it up ?
+> 
+> Fixes: 05bd97fc559d ("net: dsa: Add Vitesse VSC73xx DSA router driver")
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
-Thomas.
-
---=20
-SUSE Software Solutions Germany GmbH
-HRB 36809 (AG N=C3=BCrnberg)
-Gesch=C3=A4ftsf=C3=BChrer: Ivo Totev, Andrew McDonald, Werner Knoblich
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+-- 
+Florian
 
