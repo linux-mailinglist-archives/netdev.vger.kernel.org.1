@@ -1,126 +1,106 @@
-Return-Path: <netdev+bounces-124475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECAA8969A4A
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:36:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91217969A5B
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:40:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B0A91C2356D
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:36:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A9DD1F23F4F
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445AB1C62A5;
-	Tue,  3 Sep 2024 10:35:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25F41A4E7C;
+	Tue,  3 Sep 2024 10:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S2e+A8fn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DiakuHCG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793D01B983B
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 10:35:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C879019F42A;
+	Tue,  3 Sep 2024 10:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725359753; cv=none; b=cnLr0SybKEdBalOPckdguJuD5G6WR19gwPWhlVFAaY4W5xPRB1rx0SsFasZgvD5m2w8cXLHc638kneQABDTeEWmhCmhNxrFV90eG9xctn+eD678bOHmB/o7ziLSwcVXsCHZhTzW+ZXcEA/jWI9M2AxrRWJ4OxoI6laVYWXCfHhc=
+	t=1725360032; cv=none; b=mCrcbBOBXrdY7nxXHo0lOxJlsu8ogUUCaUGixmdPIoemqBXfvrpVsMi82lt8wgOZqgI0I4ZbUdN5LQGFW3BTkf0XIJdadGam+mHXx3SA8qio97gnZ3kazVx4SdQOjpyfDN23fY7DXNGEPXrhL2XY4QxxA0Zty6xViTamltLvQ14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725359753; c=relaxed/simple;
-	bh=fvgsf92nqMBdARtfvJv/PBUbMrLG2lAXixMqbev6HBk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JXsCBkJxR7h+Qq9w4ZfKrFs5Ao5btcJfQKPGbkCep+kYgBqvWSlipC1gGS0XzEEzvFzNf5kKjGuwAkh6ChA1eZIRfg2NimsJ1U8VVN/nKilRe8YWWp3N5L245Wdp990uqd/gwzktHkX8bGvbblZC87pCbir3jQp0zw7fykKFX3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S2e+A8fn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725359750;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JiZ7LPo+lDEnGu3WcQsi41pio1O8K0ltTaNGTAhXDRM=;
-	b=S2e+A8fn1dcgTR3Kcv5e8Vx32xlBFfnb4YEnBsInedZODeJttJ71vAwWVe7P7Iqj75BN4z
-	yj6G892c24Xt1nLzj1iiLvZ7osJ4bt8uJZOK8/DvWLE1b9+D0F63GaIWKbGd47ROI5SAAh
-	NKC2YnDF296bKDO7jzoX/zH4rJUSnbo=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-116-6HIOz9Q8N8WeBj1UrCbPJQ-1; Tue, 03 Sep 2024 06:35:49 -0400
-X-MC-Unique: 6HIOz9Q8N8WeBj1UrCbPJQ-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42c7aa6c13cso24576305e9.1
-        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 03:35:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725359748; x=1725964548;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JiZ7LPo+lDEnGu3WcQsi41pio1O8K0ltTaNGTAhXDRM=;
-        b=nQk9eZ46xZukG1zyHsvz37O4oGp/YBzWNK8Cb+GQW7lWHovKF/auP+6qpD+ZNCZfwM
-         SBRzPnISJ4mNkwdtKkmmewBp7X3wD8XoJcGFWZhGTunfGgjVBKmh37ve9AOudl8CnNMz
-         evcMkFVe9N6EQa1xLQOXG7m7/NvwVVtzzqEpU/7UA4e16DKUNKrQixDxGYoFKsQ55O3f
-         TLppNNu17wC8VivpnfHhMmsAshLEecivyfpDYbuBnTogj6sMgf0tlnToEANXzT8+CeBZ
-         ZZOASkPEDumd+8Gqd0fwAjBzQa2xlosMIH9S2WyMsjNd6KoUnCLlmH7cHW/8EW3hRK/p
-         k0kQ==
-X-Gm-Message-State: AOJu0YxCdHmqbrrDwt9ceK1WRD26+bb0YFGqGUqCLU++mhh70wbWa9e2
-	KCrxziOEO22IqLe4SAhb1Otpm8lbyqAuzxlJUvPeuHtFMtj9reUpRMBkgkRWTP2X7r5lS467EhU
-	BUbkzByPdcpDPNIt4malLMnqjYVhvI6xo6nK8Ny3ajWbt0V3rcwX/Vg==
-X-Received: by 2002:a05:600c:46c9:b0:42b:8a35:1acf with SMTP id 5b1f17b1804b1-42bbb436e9amr91344475e9.25.1725359747913;
-        Tue, 03 Sep 2024 03:35:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFoYGR7qmmE7vWGhfaxlsISt+xOye6QRxYXMRiPyUKwRGTdlFbFeD1SmFuAzGdvXISiz/N+1A==
-X-Received: by 2002:a05:600c:46c9:b0:42b:8a35:1acf with SMTP id 5b1f17b1804b1-42bbb436e9amr91344305e9.25.1725359747457;
-        Tue, 03 Sep 2024 03:35:47 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-5-217.dyn.eolo.it. [146.241.5.217])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6df100csm165965525e9.20.2024.09.03.03.35.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Sep 2024 03:35:46 -0700 (PDT)
-Message-ID: <e767ec8e-e25d-4880-86be-d23e1875a428@redhat.com>
-Date: Tue, 3 Sep 2024 12:35:44 +0200
+	s=arc-20240116; t=1725360032; c=relaxed/simple;
+	bh=wp97o9aMEghfyByYdohbJIy/XpOlCP68IJYi+vOZEqI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZTKagCinr/+Kdx2+4s0aAKFHI7KeIqtMJFROeTyk0WA8Nnw/uakWgk+JG6/PNGXcPRKUQv1Ojkl6C+0PUk0RNPKJvBoV7gnyOD6jBWJzrgLrAfSzPnjD4tZ243Xdor0he8n8zC00ESEI0TS85gbl4VFm4TfhqqMl4jly7MM1iEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DiakuHCG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48379C4CEC4;
+	Tue,  3 Sep 2024 10:40:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725360031;
+	bh=wp97o9aMEghfyByYdohbJIy/XpOlCP68IJYi+vOZEqI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DiakuHCG9J1r6TsqGgooxvKRXhKrcnWfDvOmLCTq4i0gOmoMGXn+5UyPfhkrsgF4K
+	 PaxW/8lSUIumMqAM266D7HBVAf3JDBW+af72TjaYjdReMLwXyAFsDuW4yYW7+6OIB6
+	 PY4l/mG4kApcoEVj1X4lMQW8Ry79cZaHsXSrlhr/YXfJDzQ+SaQFTU6FG0x+/7w30Y
+	 lY3BvMPLS6GSznvoAuuW8JSWCur/oum8M03TtZdAz0Rm0y5pex3U5X2apbEvXLIHZ+
+	 E4woiCJTHqPbi5FptuVTd3jSfUCPzeGzDMwgWeTAfmAAzlo39be0mXFX6Q1ZtQpF3P
+	 U0iKmY4uQwKag==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33ECB3805D82;
+	Tue,  3 Sep 2024 10:40:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v7 2/3] ptp: ocp: adjust sysfs entries to expose tty
- information
-To: Vadim Fedorenko <vadfed@meta.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, Jakub Kicinski
- <kuba@kernel.org>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Jiri Slaby <jirislaby@kernel.org>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: netdev@vger.kernel.org
-References: <20240829183603.1156671-1-vadfed@meta.com>
- <20240829183603.1156671-3-vadfed@meta.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240829183603.1156671-3-vadfed@meta.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5 0/5] netdev_features: start cleaning
+ netdev_features_t up
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172536003201.249713.3183163361305744893.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Sep 2024 10:40:32 +0000
+References: <20240829123340.789395-1-aleksander.lobakin@intel.com>
+In-Reply-To: <20240829123340.789395-1-aleksander.lobakin@intel.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, xuanzhuo@linux.alibaba.com,
+ andrew@lunn.ch, willemdebruijn.kernel@gmail.com,
+ nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 8/29/24 20:36, Vadim Fedorenko wrote:
-> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-> index 46369de8e30b..e7479b9b90cb 100644
-> --- a/drivers/ptp/ptp_ocp.c
-> +++ b/drivers/ptp/ptp_ocp.c
-> @@ -3361,6 +3361,54 @@ static EXT_ATTR_RO(freq, frequency, 1);
->   static EXT_ATTR_RO(freq, frequency, 2);
->   static EXT_ATTR_RO(freq, frequency, 3);
->   
-> +static ssize_t
-> +ptp_ocp_tty_show(struct device *dev, struct device_attribute *attr, char *buf)
-> +{
-> +	struct dev_ext_attribute *ea = to_ext_attr(attr);
-> +	struct ptp_ocp *bp = dev_get_drvdata(dev);
-> +
-> +	return sysfs_emit(buf, "ttyS%d", bp->port[(uintptr_t)ea->var].line);
+On Thu, 29 Aug 2024 14:33:35 +0200 you wrote:
+> NETDEV_FEATURE_COUNT is currently 64, which means we can't add any new
+> features as netdev_features_t is u64.
+> As per several discussions, instead of converting netdev_features_t to
+> a bitmap, which would mean A LOT of changes, we can try cleaning up
+> netdev feature bits.
+> There's a bunch of bits which don't really mean features, rather device
+> attributes/properties that can't be changed via Ethtool in any of the
+> drivers. Such attributes can be moved to netdev private flags without
+> losing any functionality.
+> 
+> [...]
 
-Out of sheer ignorance on my side, why a trailing '\n' is not needed 
-here? do we need to copy the format string from the old link verbatim?
+Here is the summary with links:
+  - [net-next,v5,1/5] netdevice: convert private flags > BIT(31) to bitfields
+    (no matching commit)
+  - [net-next,v5,2/5] netdev_features: convert NETIF_F_LLTX to dev->lltx
+    (no matching commit)
+  - [net-next,v5,3/5] netdev_features: convert NETIF_F_NETNS_LOCAL to dev->netns_local
+    (no matching commit)
+  - [net-next,v5,4/5] netdev_features: convert NETIF_F_FCOE_MTU to dev->fcoe_mtu
+    (no matching commit)
+  - [net-next,v5,5/5] netdev_features: remove NETIF_F_ALL_FCOE
+    https://git.kernel.org/netdev/net-next/c/a61fec1c87be
 
-Thanks!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Paolo
 
 
