@@ -1,69 +1,83 @@
-Return-Path: <netdev+bounces-124670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E0B696A6B8
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:43:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE43496A6C1
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:43:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84F21F24ADF
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:43:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CE7B288CCC
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1011C1917D8;
-	Tue,  3 Sep 2024 18:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62AB192598;
+	Tue,  3 Sep 2024 18:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lF4My5JS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xrsgXmVL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3C015574F;
-	Tue,  3 Sep 2024 18:42:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15DD191F62
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 18:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725388979; cv=none; b=EIxOyo+yo66vZDZMcIWoS/5fKhKmBEUw5+ticLriASxfjaJgbFLztlP8MeNQa5OQOCbnVAQdxrzxgSm5HvuJH18Uialn+ntAwAfPCWYdQ4oehFofD2HijWAjKnztUl7sZJ6KXMOlfwBx+RWtRvHEeLfdEzImioUk84gMqciYNjI=
+	t=1725389024; cv=none; b=LUix7y9HMWIakEMkzeqtISThpHKESkkKZhXbW6EhBHdF+35PHSTxlXRhNdc2E8sKpRqLL7/HZ2hhYbpDvvE5aMDz9VuIpCMYk3k9mfgAD64lbpL5MKMJQzB1ntpoWORP5uC0LAEtmMMVgmLvK9onbFnqGcrAoi0GlJDXb9WqqqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725388979; c=relaxed/simple;
-	bh=nyaB7iBlc36IhwMs3yAlRM1OHMBbN1LH0WFI83yEy78=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kn3iqDwD5bgX17YyvsPXen6hwpybZv+Zgm8H8h4A9d6OO9R9eXAQOW3q1g0J8FwULboYVqcHCsSPd8rA7HvxpMjyAIfwNzlnYLOSn/46R+bBlmf44FIB63hAVPGTBH4qWKY0RyvfL9WI/s75tBDK6sJ+1iGMzBTgO42g7aFtuIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lF4My5JS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 149D6C4CECB;
-	Tue,  3 Sep 2024 18:42:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725388978;
-	bh=nyaB7iBlc36IhwMs3yAlRM1OHMBbN1LH0WFI83yEy78=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lF4My5JS9KgFHIjAFwCTFcj29sbb3zam9Oy7WTUZuCElkcQsLQ798hpx1C0QViTwf
-	 6GE94r1Go5AiTCHaYk9CIzzuTD2hSMnXZ1AkG8MMeWdXU0/5w3jytn5A2GlWhtNe0a
-	 PVB0DImky6z11GXIp8tK54XOR16EqP+aELMjZA9+FVgb86S6c9RSL2vBnQewbhoanJ
-	 nN7irAQUDCBRBJmoA3qRo40BHMYOw7my/LGuo5MFKmD8lcDiYMZcpNBiJdi/43NMJf
-	 H8hJTvyMssXyBfg3uzngt0Ko9NsfNJ4uwrqNaydw7vIMd0X1W0H/4FSsHiE4zDQuEu
-	 icBchEWik7KGA==
-Date: Tue, 3 Sep 2024 11:42:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
- alex.aring@gmail.com, miquel.raynal@bootlin.com, netdev@vger.kernel.org
-Subject: Re: pull-request: ieee802154 for net 2024-09-01
-Message-ID: <20240903114257.7b906da2@kernel.org>
-In-Reply-To: <20240901184213.2303047-1-stefan@datenfreihafen.org>
-References: <20240901184213.2303047-1-stefan@datenfreihafen.org>
+	s=arc-20240116; t=1725389024; c=relaxed/simple;
+	bh=cC1sXQkBjYLAnc/YMZxuskvfz6NvNprlpSRd1UINO8k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UQK+y7MFyqeNZElaVv32EjczjNS2qLVv5mG0KoK/pkB9bG2+zTtrGVixjngEFw238zT4wKxH7ptk5u+LrUIz2gdnlEDrtugTjdzIOCpANGEznBAlCFKJMKNQIKWyt9RmM2wVHqMZVyzsp0qwBD8h0iE4gQQ/jZQWjo2wraAzAT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xrsgXmVL; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725389019;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=u0V+gHjiO+W5aR/7m1PFt/lGZTb9pucfD3ixCjjavZc=;
+	b=xrsgXmVLei/Z/73DzMw7vDr4YKMRpplK7Z868CNE3MCS9Y7wL9cxwIpMdT4QH88h/tR71s
+	QNZqxBRIcsD+EHWTtPu6F16RO327PkB+uxMCYB6IfTpRBwFiMbb1lUa7zsU+7fdHCOzyvx
+	isP34qNmYXVpGi5+JRt5/pTdQnJOxR0=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: Michal Simek <michal.simek@amd.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Sean Anderson <sean.anderson@linux.dev>
+Subject: [PATCH 0/3] net: xilinx: axienet: Partial checksum offload improvements
+Date: Tue,  3 Sep 2024 14:43:31 -0400
+Message-Id: <20240903184334.4150843-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sun,  1 Sep 2024 20:42:13 +0200 Stefan Schmidt wrote:
-> Simon Horman catched two typos in our headers. No functional change.
+Partial checksum offload is not always used when it could be. Enable it
+in more cases.
 
-Is it okay if we merge these into net-next ?
-On one hand they are unlikely^w guaranteed not to introduce
-regressions, but on the other such trivial spelling fixes are
-not at all urgent.
+
+Sean Anderson (3):
+  net: xilinx: axienet: Remove unused checksum variables
+  net: xilinx: axienet: Enable NETIF_F_HW_CSUM for partial tx
+    checksumming
+  net: xilinx: axienet: Relax partial rx checksum checks
+
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  5 -----
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 20 +++----------------
+ 2 files changed, 3 insertions(+), 22 deletions(-)
+
+-- 
+2.35.1.1320.gc452695387.dirty
+
 
