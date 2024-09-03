@@ -1,335 +1,224 @@
-Return-Path: <netdev+bounces-124411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F0596954A
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:25:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BE68969554
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:27:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D58C11C224AD
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 07:25:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 034702839B1
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 07:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FDB1D6C61;
-	Tue,  3 Sep 2024 07:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 409501D6C4A;
+	Tue,  3 Sep 2024 07:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="eKNH7G3R";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sbrmLGd+"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="jDFRg6i5"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40041D61A6;
-	Tue,  3 Sep 2024 07:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1C11D6C46
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 07:27:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725348353; cv=none; b=SJmr5MOVL/B1rIAZon29+kyHGmxEnpHlgSxEhT3wB2Eg7K+4H6MTZLK/AeqBS/ZWZuj9V1+fd1lS/fPrvUvc2LZHxw/rj53JGJPdaiNmvuunXzeKEsONkBjHub8WKytUo+YCr3pis4FayXFiO5TkfK84ppJ4cGpdhMJTDuUGNi8=
+	t=1725348468; cv=none; b=K2MVKpqTZ88+j9xhdJBaSB/sUTdQ06+QjynIzzSvTJPMW9e1NcuPKDqCwxGH98DJMA5gP+f66Yso9UI4DWva0w12+nS5vJYe452Nof0XG5/bEqPx8NCrtRtlTkFLHFdd4Hm4Zso1qufMO1sB4pVfTBcOiBAn01bSGCmfO/j1T3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725348353; c=relaxed/simple;
-	bh=ygkQs7ZyOEIM40aHk6n4KczK1faIjw+ybW7hqKw7KGM=;
+	s=arc-20240116; t=1725348468; c=relaxed/simple;
+	bh=gGj3VHMffsVKcM98i8N/sYkYflpxs9vba5Oq3+GYaXI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gRm+/mihCSsmJ93lBK9ot847C4AvjWtEgrC3mFqPi94wd7gFEm7Uso1mXWyE8enqIgHBksj0y9857VC09P8Vi1SOJ8d8MzXKEmjCazSESJ5fATIBpwUBirbjPqjiui8mYBNtNOAPe/sjXf0OioPkIaOQAScilRCgPbCDxy4JtTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=eKNH7G3R; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sbrmLGd+; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Message-ID: <18cd9ee1-6d12-469c-bf3d-c8fa080b01c1@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1725348349;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=MEbfEIkAataZenuGI17UL2xPHqZIq/9zw171rgDNhPw=;
-	b=eKNH7G3RdzcAGx4BDdExiZcDdT7l2GprOG3pBm5bfQ8MI3IwafbbK02mjmeM5/8qVhHoSb
-	ZSCxxSXnt9xYgCOQ5Bm34eM6tjngEQEuZw7JnRsIKRoFVi3KSBAn4WqWqElX8i5tG5E3tY
-	fIuaOhwlE4NmvMrKkl5UFuV/fQK522Qi/1fr9qHrvMABUUKJRfBexJUUsG+PpbBZcwvTTG
-	Q1IZlM3SE4CzwATpSME4pfoXP2L0HTB1mS+ntW+0KKjQXt0fXuFrBk57xHLqLRwtOiJj2w
-	2r6/0ZPusgtP0GlOJB2Isay6kl5PE7prP5QgMdhlGbm+QURy1cH8Pvv7TejZyA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1725348349;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=MEbfEIkAataZenuGI17UL2xPHqZIq/9zw171rgDNhPw=;
-	b=sbrmLGd+oQCo5MK5fWQh4cpAoA6QnTLyBLAHRZDpepD93ueA7BKByK6DgY9zPaFyRap4j8
-	VxAH5CMMgbFGE/Aw==
-Date: Tue, 3 Sep 2024 09:25:42 +0200
+	 In-Reply-To:Content-Type; b=psBvj0HaUS7IEC/kQ41Ird7w7u5++t6iT/dbozPjLabXGtzevan3lRiWzsvQ7yb2f+U9K/A/2xwn0IBQQ6cYkWRgX+jVIsywx7BmQGHfwmT59sg51S3HG0zFXT4XqyH957aPczRPJehJvfflyEs1vBUoz9cWy3tEf0OxJmFJE2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=jDFRg6i5; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-42bac9469e8so41004725e9.3
+        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 00:27:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1725348464; x=1725953264; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nFJvmh7VK9yCH4l+cHnWAKDWl8DYAR9JbYqeBtzjBhA=;
+        b=jDFRg6i5wV+mqoR9/8dJDTzLtex1Iw1GLtynGcoWDbXa2ZpAkRpqb7pim8jcZu0iBQ
+         fVns9x58uZYq+TCuIw5pGYO1hRu3Dti6tVM1qoDmEwE+X2GgUSV3Hi7xc0/YceG8tqyw
+         Fzq8L6ytGwJP5zHnwc0Ctatt7F1I44cBSap+t7Xzda19kiUX4LMMt6m/P2huar78APDn
+         J2jcx2mEMwcLjmdQ36ol9uqm665B1GhxppYV9FdDXp8chLtTwroA0VcqsLC+8Kff79D5
+         hjyTuUpEQ8/P83Gj/lKG3C4pgZ8DfVD07C7JprrBYkbmJkgNmnQ9mScd3PGtAmJKJTXB
+         nd/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725348464; x=1725953264;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nFJvmh7VK9yCH4l+cHnWAKDWl8DYAR9JbYqeBtzjBhA=;
+        b=KmvraIM7RU+QVSESAPpgEd2vMBrhq2cOeNOBxc7zV3J3wwbueL8pxVOOPN2ZLJlUlr
+         a73K2RFtGKRsENj2ju7zsWWQ2wLmcC6tQzSfei2gNKUxKeM6Gt4EXXaE48P7Mxol3Ghl
+         10ECyz9rOlXUuyJpwwbHUPXTwAIq7lby0WrlsdiOgGjHnVatRtJlvHn8Amh/oNfJ/s85
+         47wrqDM3rnUZOA7fx2gurFXP4fqy/ipNsJk8eU4LcVG+yeAT144QAfVH8f1aFJe1J6xw
+         hHYZjCbUvuL7e1EUb+f76DwrQgVapPCtb/SDQaS8mh/G42gDbC7/5YJ06UN6OXlpEs7h
+         nV+g==
+X-Forwarded-Encrypted: i=1; AJvYcCW9nI9tX9Iz3oZsW4fRTxNqDL6sFcK3lVpAg+lxUVLz0fBhkYNgwVSWy9bqfFyyomV5IS/RI04=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaMSt3mNVywHmZikUxWMQ4F0sXETNpTwY/JZvhcyF9ZYm3XFLb
+	7G+0bWc/+MQJBGO9tAbRP8XtXZIGrThZHO/DC3O9frjmzMavSCXVNatdcvt7/BQ=
+X-Google-Smtp-Source: AGHT+IEQHFClV0KFpBCHO6n1FHyIoyoPBdf2Q5fEq9bZfr1yqIWPXgtqiqNkPkZhleCQe85yTKw+CA==
+X-Received: by 2002:a05:600c:3b1e:b0:426:62df:bdf0 with SMTP id 5b1f17b1804b1-42c82f5318fmr36445035e9.10.1725348463989;
+        Tue, 03 Sep 2024 00:27:43 -0700 (PDT)
+Received: from [192.168.0.105] (bras-109-160-30-236.comnet.bg. [109.160.30.236])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6e27364sm160150715e9.34.2024.09.03.00.27.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Sep 2024 00:27:43 -0700 (PDT)
+Message-ID: <aee25423-c9e4-4c3a-8990-d019f085467c@blackwall.org>
+Date: Tue, 3 Sep 2024 10:27:41 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: CPU stuck due to the taprio hrtimer
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>, luyun
- <luyun@kylinos.cn>, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240627055338.2186255-1-luyun@kylinos.cn>
- <87sewy55gp.fsf@intel.com> <2df10720-1790-48bd-a50c-4816260543b0@kylinos.cn>
- <fcd41a5f-66b5-4ebe-9535-b75e14867444@linutronix.de>
- <87jzftpwo2.fsf@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: bridge: allow users setting EXT_LEARN for user
+ FDB entries
+To: Ido Schimmel <idosch@nvidia.com>, Jonas Gorski <jonas.gorski@bisdn.de>
+Cc: Roopa Prabhu <roopa@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Petr Machata <petrm@mellanox.com>,
+ Ido Schimmel <idosch@mellanox.com>, bridge@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240830145356.102951-1-jonas.gorski@bisdn.de>
+ <b0544c31-cf64-41c7-8118-a8b504a982d1@blackwall.org>
+ <ZtRWACsOAnha75Ef@shredder.mtl.com>
+ <003f02c3-33e0-4f02-8f24-82f7ed47db4c@blackwall.org>
+ <CAJpXRYReCbrh0z3fmgKqycJHZ+Z8=+KnK+YpOrhD1UsmgfiSxg@mail.gmail.com>
+ <ZtXS0lxzOSSq8AMb@shredder.mtl.com>
 Content-Language: en-US
-From: Florian Kauer <florian.kauer@linutronix.de>
-Autocrypt: addr=florian.kauer@linutronix.de; keydata=
- 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
- ugsSqUGtSA==
-In-Reply-To: <87jzftpwo2.fsf@intel.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <ZtXS0lxzOSSq8AMb@shredder.mtl.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-
-
-On 9/2/24 23:34, Vinicius Costa Gomes wrote:
-> Florian Kauer <florian.kauer@linutronix.de> writes:
-> 
->> On 9/2/24 11:12, luyun wrote:
+On 9/2/24 17:59, Ido Schimmel wrote:
+> On Mon, Sep 02, 2024 at 09:34:48AM +0200, Jonas Gorski wrote:
+>> Am So., 1. Sept. 2024 um 14:25 Uhr schrieb Nikolay Aleksandrov
+>> <razor@blackwall.org>:
 >>>
->>> 在 2024/6/28 07:30, Vinicius Costa Gomes 写道:
->>>> Yun Lu <luyun@kylinos.cn> writes:
->>>>
->>>>> Hello,
+>>> On 01/09/2024 14:54, Ido Schimmel wrote:
+>>>> On Sat, Aug 31, 2024 at 11:31:50AM +0300, Nikolay Aleksandrov wrote:
+>>>>> On 30/08/2024 17:53, Jonas Gorski wrote:
+>>>>>> When userspace wants to take over a fdb entry by setting it as
+>>>>>> EXTERN_LEARNED, we set both flags BR_FDB_ADDED_BY_EXT_LEARN and
+>>>>>> BR_FDB_ADDED_BY_USER in br_fdb_external_learn_add().
+>>>>>>
+>>>>>> If the bridge updates the entry later because its port changed, we clear
+>>>>>> the BR_FDB_ADDED_BY_EXT_LEARN flag, but leave the BR_FDB_ADDED_BY_USER
+>>>>>> flag set.
+>>>>>>
+>>>>>> If userspace then wants to take over the entry again,
+>>>>>> br_fdb_external_learn_add() sees that BR_FDB_ADDED_BY_USER and skips
+>>>>>> setting the BR_FDB_ADDED_BY_EXT_LEARN flags, thus silently ignores the
+>>>>>> update:
+>>>>>>
+>>>>>>    if (test_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags)) {
+>>>>>>            /* Refresh entry */
+>>>>>>            fdb->used = jiffies;
+>>>>>>    } else if (!test_bit(BR_FDB_ADDED_BY_USER, &fdb->flags)) {
+>>>>>>            /* Take over SW learned entry */
+>>>>>>            set_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags);
+>>>>>>            modified = true;
+>>>>>>    }
+>>>>>>
+>>>>>> Fix this by relaxing the condition for setting BR_FDB_ADDED_BY_EXT_LEARN
+>>>>>> by also allowing it if swdev_notify is true, which it will only be for
+>>>>>> user initiated updates.
+>>>>>>
+>>>>>> Fixes: 710ae7287737 ("net: bridge: Mark FDB entries that were added by user as such")
+>>>>>> Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
+>>>>>> ---
+>>>>>>  net/bridge/br_fdb.c | 3 ++-
+>>>>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+>>>>>> index c77591e63841..c5d9ae13a6fb 100644
+>>>>>> --- a/net/bridge/br_fdb.c
+>>>>>> +++ b/net/bridge/br_fdb.c
+>>>>>> @@ -1472,7 +1472,8 @@ int br_fdb_external_learn_add(struct net_bridge *br, struct net_bridge_port *p,
+>>>>>>             if (test_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags)) {
+>>>>>>                     /* Refresh entry */
+>>>>>>                     fdb->used = jiffies;
+>>>>>> -           } else if (!test_bit(BR_FDB_ADDED_BY_USER, &fdb->flags)) {
+>>>>>> +           } else if (swdev_notify ||
+>>>>>> +                      !test_bit(BR_FDB_ADDED_BY_USER, &fdb->flags)) {
+>>>>>>                     /* Take over SW learned entry */
+>>>>>>                     set_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags);
+>>>>>>                     modified = true;
 >>>>>
->>>>> When I run a taprio test program on the latest kernel(v6.10-rc4), CPU stuck
->>>>> is detected immediately, and the stack shows that CPU is stuck on taprio
->>>>> hrtimer.
->>>>>
->>>>> The reproducer program link:
->>>>> https://github.com/xyyluyun/taprio_test/blob/main/taprio_test.c
->>>>> gcc taprio_test.c -static -o taprio_test
->>>>>
->>>>> In this program, start the taprio hrtimer which clockid is set to REALTIME, and
->>>>> then adjust the system time by a significant value backwards. Thus, CPU will enter
->>>>> an infinite loop in the__hrtimer_run_queues function, getting stuck and unable to
->>>>> exit or respond to any interrupts.
->>>>>
->>>>> I have tried to avoid this problem by apllying the following patch, and it does work.
->>>>> But I am not sure if this can be the final solution?
->>>>>
->>>>> Thanks.
->>>>>
->>>>> Signed-off-by: Yun Lu <luyun@kylinos.cn>
->>>>> ---
->>>>>   net/sched/sch_taprio.c | 24 ++++++++++++++++++++++++
->>>>>   1 file changed, 24 insertions(+)
->>>>>
->>>>> diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
->>>>> index a0d54b422186..2ff8d34bdbac 100644
->>>>> --- a/net/sched/sch_taprio.c
->>>>> +++ b/net/sched/sch_taprio.c
->>>>> @@ -104,6 +104,7 @@ struct taprio_sched {
->>>>>       u32 max_sdu[TC_MAX_QUEUE]; /* save info from the user */
->>>>>       u32 fp[TC_QOPT_MAX_QUEUE]; /* only for dump and offloading */
->>>>>       u32 txtime_delay;
->>>>> +    ktime_t offset;
->>>>>   };
->>>>>     struct __tc_taprio_qopt_offload {
->>>>> @@ -170,6 +171,19 @@ static ktime_t sched_base_time(const struct sched_gate_list *sched)
->>>>>       return ns_to_ktime(sched->base_time);
->>>>>   }
->>>>>   +static ktime_t taprio_get_offset(const struct taprio_sched *q)
->>>>> +{
->>>>> +    enum tk_offsets tk_offset = READ_ONCE(q->tk_offset);
->>>>> +    ktime_t time = ktime_get();
->>>>> +
->>>>> +    switch (tk_offset) {
->>>>> +    case TK_OFFS_MAX:
->>>>> +        return 0;
->>>>> +    default:
->>>>> +        return ktime_sub_ns(ktime_mono_to_any(time, tk_offset), time);
->>>>> +    }
->>>>> +}
->>>>> +
->>>>>   static ktime_t taprio_mono_to_any(const struct taprio_sched *q, ktime_t mono)
->>>>>   {
->>>>>       /* This pairs with WRITE_ONCE() in taprio_parse_clockid() */
->>>>> @@ -918,6 +932,7 @@ static enum hrtimer_restart advance_sched(struct hrtimer *timer)
->>>>>       int num_tc = netdev_get_num_tc(dev);
->>>>>       struct sched_entry *entry, *next;
->>>>>       struct Qdisc *sch = q->root;
->>>>> +    ktime_t now_offset = taprio_get_offset(q);
->>>>>       ktime_t end_time;
->>>>>       int tc;
->>>>>   @@ -957,6 +972,14 @@ static enum hrtimer_restart advance_sched(struct hrtimer *timer)
->>>>>       end_time = ktime_add_ns(entry->end_time, next->interval);
->>>>>       end_time = min_t(ktime_t, end_time, oper->cycle_end_time);
->>>>>   +    if (q->offset != now_offset) {
->>>>> +        ktime_t diff = ktime_sub_ns(now_offset, q->offset);
->>>>> +
->>>>> +        end_time = ktime_add_ns(end_time, diff);
->>>>> +        oper->cycle_end_time = ktime_add_ns(oper->cycle_end_time, diff);
->>>>> +        q->offset = now_offset;
->>>>> +    }
->>>>> +
->>>> I think what we should do here is a bit different. Let me try to explain
->>>> what I have in mind with some context.
+>>>>> This literally means if added_by_user || !added_by_user, so you can probably
+>>>>> rewrite that whole block to be more straight-forward with test_and_set_bit -
+>>>>> if it was already set then refresh, if it wasn't modified = true
 >>>>
->>>> A bit of context: The idea of taprio is to enforce "TSN" traffic
->>>> schedules, these schedules require time synchronization, for example via
->>>> PTP, and in those cases, time jumps are not expected or a sign that
->>>> something is wrong.
+>>>> Hi Nik,
 >>>>
->>>> In my mind, a time jump, specially a big one, kind of invalidates the
->>>> schedule, as the schedule is based on an absolute time value (the
->>>> base_time), and when time jumps that reference in time is lost.
+>>>> You mean like this [1]?
+>>>> I deleted the comment about "SW learned entry" since "extern_learn" flag
+>>>> not being set does not necessarily mean the entry was learned by SW.
 >>>>
->>>> BUT making the user's system unresponsive is a bug, a big one, as if
->>>> this happens in the real world, the user will be unable to investigate
->>>> what made the system have so big a time correction.
+>>>> [1]
+>>>> diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+>>>> index c77591e63841..ad7a42b505ef 100644
+>>>> --- a/net/bridge/br_fdb.c
+>>>> +++ b/net/bridge/br_fdb.c
+>>>> @@ -1469,12 +1469,10 @@ int br_fdb_external_learn_add(struct net_bridge *br, struct net_bridge_port *p,
+>>>>                         modified = true;
+>>>>                 }
 >>>>
->>>> So my idea is to warn the user that the time jumped, say that the user
->>>> needs to reconfigure the schedule, as it is now invalid, and disable the
->>>> schedule.
->>>>
->>>> Does this make sense?
->>>>
->>>> Ah, and thanks for the report.
+>>>> -               if (test_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags)) {
+>>>> +               if (test_and_set_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags)) {
+>>>>                         /* Refresh entry */
+>>>>                         fdb->used = jiffies;
+>>>> -               } else if (!test_bit(BR_FDB_ADDED_BY_USER, &fdb->flags)) {
+>>>> -                       /* Take over SW learned entry */
+>>>> -                       set_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags);
+>>>> +               } else {
+>>>>                         modified = true;
+>>>>                 }
 >>>
->>> Hello Vinicius,
->>>
->>> May I ask is there a fix patch for this issue?
->>>
->>> I test it on the latest kernel version,  and it still seems to cause CPU stuck.
->>>
->>> As you mentioned, a better way would be to warn the user that the current time has jumped and cancel the hrtimer,
->>>
->>> but I'm not sure how to warn the user, or just through printk?
->>>
->>> Thanks and best regards.
+>>> Yeah, that's exactly what I meant. Since the added_by_user condition becomes
+>>> redundant we can just drop it.
 >>
->> I am not sure if it is really the best solution to force the user to reconfigure the schedule
->> "just" because the clock jumped. Yes, time jumps are a big problem for TAPRIO, but stopping might
->> make it worse.
+>> br_fdb_external_learn_add() is called from two places; once when
+>> userspace adds a EXT_LEARN flagged fdb entry (then swdev_nofity is
+>> set), and once when a switchdev driver reports it has learned an entry
+>> (then swdev_notify isn't).
 >>
->> Vinicius wrote that the base_time can no longer reference to the correct point in time,
->> so the schedule MUST be invalid after the time jump. It is true that the base_time does not longer
->> refer to the same point in time it referred to before the jump from the view of the local system (!).
->> But the base_time usually refers to the EXTERNAL time domain (i.e. the time the system SHOULD have
->> and not the one the system currently has) and is often configured by an external entity.
->>
->> So it is quite likely that the schedule was incorrectly phase-shifted BEFORE the time jump and after
->> the time jump the base_time refers to the CORRECT point in time viewed from the external time domain.
->>
->> If you now stop the schedule (and I assume you mean by this to let every queue transmit at any time
->> as before the schedule was configured) and the user has to reconfigure the schedule again,
->> it is quite likely that by this you actually increase the interference with the network and in
->> particular confuse the time synchronization via PTP, so once the schedule is set up again,
->> you might get a time jump AGAIN.
->>
->> So yes, a warning to the user is definitely appropriate in the case of a time jump, but apart
->> from that I would prefer the system to adapt itself instead of resigning.
->>
+>> AFAIU the previous condition was to prevent user fdb entries from
+>> being taken over by hardware / switchdev events, which this would now
+>> allow to happen. OTOH, the switchdev notifications are a statement of
+>> fact, and the kernel really has a say into whether the hardware should
+>> keep the entry learned, so not allowing entries to be marked as
+>> learned by hardware would also result in a disconnect between hardware
+>> and kernel.
 > 
-> The "warn the user, disable the schedule" is more or less clear in my
-> mind how to implement. But while I was writing this, I was taking
-> another look at the standard, and I think this approach is wrong.
+> The entries were already learned by the hardware and the kernel even
+> updated their destination in br_fdb_external_learn_add(), it is just
+> that it didn't set the EXT_LEARN flag on them, which seems like a
+> mistake.
 > 
-> I think what we should do is something like this:
+>>
+>> My change was trying to accomodate for the former one, i.e. if the
+>> user bit is set, only the user may mark it as EXT_LEARN, but not any
+>> (switchdev) drivers.
+>>
+>> I have no strong feelings about what I think is right, so if this is
+>> the wanted direction, I can send a V2 doing that.
 > 
-> 1. Jump into the past:
->    1.a. before base-time: Keep all queues open until base-time;
->    1.b. after base-time: "rewind" the schedule to the new current time;
-> 2. Jump into the future: "fast forward" the schedule to the new current
->    time;
-> 
-> But I think that for this to fit more neatly, we would need to change
-> how advance_sched() works, right now, it doesn't look at the current
-> time (it considers that the schedule will always advance one-by-one),
-> instead what I am thinking is to consider that every time
-> advance_sched() runs is a pontential "time jump". 
-> 
-> Ideas? Too complicated for an uncommon case? (is it really uncommon?)
+> I prefer v2 as it means that an entry that was learned by the hardware
+> will now be marked as such regardless if it was previously added by user
+> space or not
 
-I think that would be the correct solution.
-And I don't think it is that uncommon. Especially when the device joins
-the network for the first time and has not time synchronized itself properly yet.
++1
+We were already in a bad situation, if anything this would make it
+better. We can take care of added_by_user behaviour later.
 
-Do you know what the i225/i226 do for hardware offloaded Qbv in that case?
+Thanks,
+ Nik
 
-> 
->> Yun Lu, does this only happen for time jumps into the past or also for large jumps into the future?
->> And does this also happen for small time "jumps"?
-> 
-> AFAIU this bug will only happen with large jumps into the past. For
-> small jumps into the past, it will spin uselessly for a bit. For jumps
-> into the future, the schedule will be stuck in a particular gate entry
-> until the future becomes now.
-
-Does "it will spin uselessly for a bit" mean the CPU is stuck for that time
-(even if it is short)? If that is the case, it might lead to very strange effects
-in RT systems. And these small time jumps into the past (even if just a few us)
-should actually be relatively common.
-
-Greetings,
-Florian
-
-> 
->>
->> Thanks,
->> Florian
->>
->>>
->>>
->>>>
->>>>>       for (tc = 0; tc < num_tc; tc++) {
->>>>>           if (next->gate_duration[tc] == oper->cycle_time)
->>>>>               next->gate_close_time[tc] = KTIME_MAX;
->>>>> @@ -1210,6 +1233,7 @@ static int taprio_get_start_time(struct Qdisc *sch,
->>>>>         base = sched_base_time(sched);
->>>>>       now = taprio_get_time(q);
->>>>> +    q->offset = taprio_get_offset(q);
->>>>>         if (ktime_after(base, now)) {
->>>>>           *start = base;
->>>>> -- 
->>>>> 2.34.1
->>>>>
->>>>
->>>> Cheers,
->>>
->>
-> 
-> 
-> Cheers,
 
