@@ -1,59 +1,65 @@
-Return-Path: <netdev+bounces-124640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB8896A4D5
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:49:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFB9096A4DA
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:51:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4171C1F214E9
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:49:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2E211C23A40
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FC818BB9F;
-	Tue,  3 Sep 2024 16:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA98D18BC08;
+	Tue,  3 Sep 2024 16:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6JoMw6av"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KFVhE7HU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D921E492
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 16:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0BF818BB9F;
+	Tue,  3 Sep 2024 16:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725382193; cv=none; b=jWsu9DpKCHFMMu4sVVP2FRDOFS1zYclzpK+N+nDRt10nHhh4PHc0OkSzAJbO6+PfuWAFnt/siUsta6gjun88e6ELxzlxZ+kt+lyIrImUn7Q+X90Sno1TK85f9HFqzmOu1o2cJIxWS6DoTh/jUwbxf5E+hANKDPdvyw4zvYo8//M=
+	t=1725382290; cv=none; b=cBDvjvUP9L9mkIbINHy86XoOVzTHl3odit9UidDtDfsWCiD6ElR18zXgE6gx4EBqOiH5ypcX4NSB7tyyi+9e2awupdO8yLq1/3swHYEbRZUZFXVRTkx9dXJFPlKvyylQevxkJg23fcVjasfk3ozTCfmOnZLaDJ4/FTGZ/iCnNuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725382193; c=relaxed/simple;
-	bh=ozZqRnpridoQS306kfAzBljpL2+zfI0672SvequwEEQ=;
+	s=arc-20240116; t=1725382290; c=relaxed/simple;
+	bh=v6QUWDn3Xk0vLTb/0TXXT0hs0RxaaMRHOSxlGXdBePM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UjMYKIK6FhuiPZT94luUBcp5Yugmj8l09q1lkuz2HspismG4lG6u2uB4YpbvN5HO5RywpfcVqZYATtumgPA0grzvFLAla9X1o/QgofhKT30aMQ2KxBY+W5dmpRIe+PBd32VJS1xrGGVdaw+nZnWThHn+YUBYgA+4pr2XG1+aUTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6JoMw6av; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3KBdxxJGfDHT+ZsX7lsmaHFN11MUP0q9mNOzvT33q7A=; b=6JoMw6aviMYKU7HqXk8exNlZro
-	nqw3+22UGi5Jerd2WeXvIhsEFdj2no72cAY06r0UnEVVv7nuzemysNEPkznlyv6igwVAjhE7FHEYM
-	uTm/2wPwaMl1eyH5YRYyblPwBMOZOw9HBB1nJLhkNSgEO49L9HzdN9mWP98k2gvRYr2Y=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1slWio-006S5l-Rz; Tue, 03 Sep 2024 18:49:38 +0200
-Date: Tue, 3 Sep 2024 18:49:38 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Takamitsu Iwai <takamitz@amazon.co.jp>
-Cc: anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
-	intel-wired-lan@lists.osuosl.org, kuba@kernel.org,
-	netdev@vger.kernel.org, pabeni@redhat.com,
-	przemyslaw.kitszel@intel.com
-Subject: Re: [PATCH v1 net-next] e1000e: Remove duplicated writel() in
- e1000_configure_tx/rx()
-Message-ID: <3ef52bb5-3289-416a-81b6-4064c49960c8@lunn.ch>
-References: <87af1b9e-21c3-4c22-861a-b917b5cd82c2@lunn.ch>
- <20240903104642.75303-1-takamitz@amazon.co.jp>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QQpSfa9rb1G3yT7lKB4y8J7xIDpsOLaXL4wSdrrQqJjf+LSBZOb3fdwKwiyExWdeMqVMEFmV6CNYYXPwmdRKHg5BdLyHSyg5DNLc5cCNPQRwMK6itgX5rwPl8rvCTe9QcaQA6MmOaebzO1ifd2/wFxQwone0YGsIZfFNBfozqiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KFVhE7HU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A9B3C4CEC4;
+	Tue,  3 Sep 2024 16:51:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725382290;
+	bh=v6QUWDn3Xk0vLTb/0TXXT0hs0RxaaMRHOSxlGXdBePM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KFVhE7HUztDHKoswnzl716+1BfpdDKMFPobGsXUUzoyxEc/JwV1DKOdwH2dNzPPCp
+	 +84ICnp9h4Vz4Os3Ngpo+r7TM0OLxTfH4We+YPI8IM3x5IQGojqgOsxeQIROIzBtHn
+	 1V9tRetREZ2idlJ/DoIR1S1oZC+CH6Gf1KenFx0uo08pjZGigUD+4imoTwgV08yhkG
+	 Nl355Yq8OYzFYRSInPciya4dZM/OVDn72lyB2nB7Q8ccPOwS7q0vEnMtwGSX9GAVob
+	 7t8+z+dljI2JPLmFrBSNuCizFgeVOjKbcRwkdtIkkvE3jO9sE+B/2+5+icsNt6WeW3
+	 O/pyypMxBEOiQ==
+Date: Tue, 3 Sep 2024 17:51:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: Re: [PATCH net-next 0/2] octeontx2: Address some Sparse warnings
+Message-ID: <20240903165124.GG4792@kernel.org>
+References: <20240903-octeontx2-sparse-v1-0-f190309ecb0a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,24 +68,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240903104642.75303-1-takamitz@amazon.co.jp>
+In-Reply-To: <20240903-octeontx2-sparse-v1-0-f190309ecb0a@kernel.org>
 
-On Tue, Sep 03, 2024 at 07:46:42PM +0900, Takamitsu Iwai wrote:
-> > Did the same sequence of read/writes happen before 0845d45e900c? Or
-> > did 0845d45e900c add additional writes, not just move them around?
+On Tue, Sep 03, 2024 at 05:26:52PM +0100, Simon Horman wrote:
+> Hi,
 > 
-> The sequence of read/writes happened before 0845d45e900c because the similar
-> writel() exists in ew32() above the writel() moved by 0845d45e900c.
+> This patchset addresses some Sparse warnings that are flagged in files
+> touched by recent patch submissions.
+
+Oops, I now realise that the issue addressed by patch 1/2 is
+not described there as being flagged by Sparse.
+
+I'll plan to send a v2, with an updated cover letter,
+after an appropriate timeout. Any review in the meantime
+would be appreciated.
+
 > 
-> The commit 0845d45e900c moved writel() in e1000_clean_tx/rx_ring() to
-> e1000_configure_tx/rx() to avoid null pointer dereference. But since the same
-> writel() exists in e1000_configure_tx/rx(), we just needed to remove writel()
-> from e1000_clean_rx/tx_ring().
+> Although these changes do not alter the functionality of the code, by
+> addressing them real problems introduced in future which are flagged by
+> Sparse will stand out more readily.
+> 
+> Compile tested only.
+> 
+> ---
+> Simon Horman (2):
+>       octeontx2-af: Pass string literal as format argument of alloc_workqueue()
+>       octeontx2-pf: Make iplen __be16 in otx2_sqe_add_ext()
+> 
+>  drivers/net/ethernet/marvell/octeontx2/af/rvu.c        | 4 ++--
+>  drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> base-commit: 54f1a107bd034e8d9052f5642280876090ebe31c
 
-So you have confirmed with the datsheet that the write is not needed?
-
-As i said, this is a hardware register, not memory. Writes are not
-always idempotent. It might be necessary to write it twice.
-
-	Andrew
+-- 
+pw-bot: cr
 
