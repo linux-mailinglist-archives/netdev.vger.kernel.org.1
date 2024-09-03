@@ -1,102 +1,135 @@
-Return-Path: <netdev+bounces-124371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9DFE9691C8
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 05:21:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64DBC9691FE
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 05:31:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63D9E1F239B3
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 03:21:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A36A22838C1
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 03:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22461A2624;
-	Tue,  3 Sep 2024 03:21:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88B0A1CCEEF;
+	Tue,  3 Sep 2024 03:31:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99791A4E6B;
-	Tue,  3 Sep 2024 03:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD903207;
+	Tue,  3 Sep 2024 03:31:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725333686; cv=none; b=HHv73TTx8NM/aUPoyy+T6fLMeWowdYsDmrkXGzYEEX2DP8Tp82b9qELX7v4WuCS17tUdanJggs4yxARFNbF9rj9y44zyjgO/IRfSrbI2ujiLdQDX9rWnzgv4VRqw+nsWWAhp2n1gmY2KbCRMe6hwAWR5dLQAENB0zA9hpZ/bBxA=
+	t=1725334266; cv=none; b=WELS1zcmXXao0oOI3jFb3eMeyAks83K7j4edej1dUFNpCO35RM4Gszeza6GuAC8llhC/rxtxoY0mqrugphaHY4KpRNc1Ju/+dkKHHUPplcNaR7e4mC8ufGmVMc0AJgMeRycr/p9ycL3MFU3RoOXwUjkpAp4yBILXF7eNo062Ph4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725333686; c=relaxed/simple;
-	bh=ntJPOe9QrzzPPbK8pisKeLudwfh6tjCh4wyUBXnkJXg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ULetYg4vNN0aTzrxEhBP6VJmYgj4nM/q5bBDsmrWmJBrp+c0gV5N8OsTSin6lsA7g8a6jAHjp0tyEpGkkW/YbKOfkCqnTmAK5VjcCaWosNcwleSiFiIyJeFVEalBYKq8zYqgFihI9014jjKVIS6bg/JV92nTVGW9qz8dXIkGFSw=
+	s=arc-20240116; t=1725334266; c=relaxed/simple;
+	bh=jFm7EO7ARbGov5WdE2QDUqYwjdJQGV3ecJbmMgqsloE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ISWIfMCWhv+Gn72n77WvNN7ESxcHiBug3aKyN1BBJ6+XdjJY2h+/HHYgO18IlIEqSUAJBwUUfCSNTW5A1eJxFfm/tQRDM2R3XYhW7zfDHu+ywp9F10MA0NHVf66xbZ64tkF8SaRHrjO88UflGyhQEvSebsbIMhlffy7noDQJVNI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WyW8n1QCXzyQyx;
-	Tue,  3 Sep 2024 11:20:25 +0800 (CST)
-Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id 26F551400D1;
-	Tue,  3 Sep 2024 11:21:21 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 3 Sep 2024 11:21:20 +0800
-Message-ID: <19a47bf1-44cc-4c01-d515-36b5f982a4fe@huawei.com>
-Date: Tue, 3 Sep 2024 11:21:19 +0800
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WyWNJ16TYzyRMc;
+	Tue,  3 Sep 2024 11:30:24 +0800 (CST)
+Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
+	by mail.maildlp.com (Postfix) with ESMTPS id BCE3B1402D0;
+	Tue,  3 Sep 2024 11:31:00 +0800 (CST)
+Received: from huawei.com (10.175.113.32) by kwepemh100016.china.huawei.com
+ (7.202.181.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 3 Sep
+ 2024 11:30:58 +0800
+From: Kaixiong Yu <yukaixiong@huawei.com>
+To: <akpm@linux-foundation.org>, <mcgrof@kernel.org>
+CC: <ysato@users.sourceforge.jp>, <dalias@libc.org>,
+	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <hpa@zytor.com>,
+	<viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
+	<kees@kernel.org>, <j.granados@samsung.com>, <willy@infradead.org>,
+	<Liam.Howlett@oracle.com>, <vbabka@suse.cz>, <lorenzo.stoakes@oracle.com>,
+	<trondmy@kernel.org>, <anna@kernel.org>, <chuck.lever@oracle.com>,
+	<jlayton@kernel.org>, <neilb@suse.de>, <okorniev@redhat.com>,
+	<Dai.Ngo@oracle.com>, <tom@talpey.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<paul@paul-moore.com>, <jmorris@namei.org>, <linux-sh@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <wangkefeng.wang@huawei.com>
+Subject: [PATCH v2 -next 00/15] sysctl: move sysctls from vm_table into its own files
+Date: Tue, 3 Sep 2024 11:29:56 +0800
+Message-ID: <20240903033011.2870608-1-yukaixiong@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH] eth: fbnic: Fix modpost undefined error
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-CC: <alexanderduyck@fb.com>, <kuba@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <andrew@lunn.ch>,
-	<kernel-team@meta.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20240902131947.3088456-1-ruanjinjie@huawei.com>
- <20240902190620.GM23170@kernel.org>
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-In-Reply-To: <20240902190620.GM23170@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemh500013.china.huawei.com (7.202.181.146)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemh100016.china.huawei.com (7.202.181.102)
 
+This patch series moves sysctls of vm_table in kernel/sysctl.c to
+places where they actually belong, and do some related code clean-ups.
+After this patch series, all sysctls in vm_table have been moved into its
+own files, meanwhile, delete vm_table.
 
+All the modifications of this patch series base on
+linux-next(tags/next-20240902). To test this patch series, the code was
+compiled with both the CONFIG_SYSCTL enabled and disabled on arm64 and
+x86_64 architectures. After this patch series is applied, all files
+under /proc/sys/vm can be read or written normally.
 
-On 2024/9/3 3:06, Simon Horman wrote:
-> On Mon, Sep 02, 2024 at 09:19:47PM +0800, Jinjie Ruan wrote:
->> When CONFIG_FBNIC=m, the following error occurs:
->>
->> 	ERROR: modpost: "priv_to_devlink" [drivers/net/ethernet/meta/fbnic/fbnic.ko] undefined!
->> 	ERROR: modpost: "page_pool_create" [drivers/net/ethernet/meta/fbnic/fbnic.ko] undefined!
->> 	ERROR: modpost: "devlink_info_serial_number_put" [drivers/net/ethernet/meta/fbnic/fbnic.ko] undefined!
->> 	ERROR: modpost: "page_pool_alloc_pages" [drivers/net/ethernet/meta/fbnic/fbnic.ko] undefined!
->> 	ERROR: modpost: "devlink_priv" [drivers/net/ethernet/meta/fbnic/fbnic.ko] undefined!
->> 	ERROR: modpost: "page_pool_put_unrefed_page" [drivers/net/ethernet/meta/fbnic/fbnic.ko] undefined!
->> 	ERROR: modpost: "devlink_unregister" [drivers/net/ethernet/meta/fbnic/fbnic.ko] undefined!
->> 	ERROR: modpost: "devlink_alloc_ns" [drivers/net/ethernet/meta/fbnic/fbnic.ko] undefined!
->> 	ERROR: modpost: "devlink_register" [drivers/net/ethernet/meta/fbnic/fbnic.ko] undefined!
->> 	ERROR: modpost: "devlink_free" [drivers/net/ethernet/meta/fbnic/fbnic.ko] undefined!
->>
->> The driver now uses functions exported from a helper module
->> but fails to link when the helper is disabled, select them to fix them
->>
->> Fixes: 546dd90be979 ("eth: fbnic: Add scaffolding for Meta's NIC driver")
->> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-> 
-> Thanks,
-> 
-> I believe a patch for this problem is already present upstream.
+Changes in v2:
+ - fix sysctl_max_map_count undeclared issue in mm/nommu.c for patch6
+ - update changelog for patch7/12, suggested by Kees/Paul
+ - fix patch8, sorry for wrong changes and forget to built with NOMMU
+ - add reviewed-by from Kees except patch8 since patch8 is wrong in v1
+ - add reviewed-by from Jan Kara, Christian Brauner in patch12
 
-Sorry, I compile the mainline kernel and find this problem, and not
-notice it.
+Kaixiong Yu (15):
+  mm: vmstat: move sysctls to its own files
+  mm: filemap: move sysctl to its own file
+  mm: swap: move sysctl to its own file
+  mm: vmscan: move vmscan sysctls to its own file
+  mm: util: move sysctls into it own files
+  mm: mmap: move sysctl into its own file
+  security: min_addr: move sysctl into its own file
+  mm: nommu: move sysctl to its own file
+  fs: fs-writeback: move sysctl to its own file
+  fs: drop_caches: move sysctl to its own file
+  sunrpc: use vfs_pressure_ratio() helper
+  fs: dcache: move the sysctl into its own file
+  x86: vdso: move the sysctl into its own file
+  sh: vdso: move the sysctl into its own file
+  sysctl: remove unneeded include
 
-> 
-> - 9a95b7a89dff ("eth: fbnic: select DEVLINK and PAGE_POOL")
->   https://git.kernel.org/netdev/net-next/c/9a95b7a89dff
-> 
+ arch/sh/kernel/vsyscall/vsyscall.c |  14 ++
+ arch/x86/entry/vdso/vdso32-setup.c |  16 ++-
+ fs/dcache.c                        |  21 ++-
+ fs/drop_caches.c                   |  23 ++-
+ fs/fs-writeback.c                  |  28 ++--
+ include/linux/dcache.h             |   7 +-
+ include/linux/mm.h                 |  23 ---
+ include/linux/mman.h               |   2 -
+ include/linux/swap.h               |   9 --
+ include/linux/vmstat.h             |  11 --
+ include/linux/writeback.h          |   4 -
+ kernel/sysctl.c                    | 221 -----------------------------
+ mm/filemap.c                       |  18 ++-
+ mm/internal.h                      |  10 ++
+ mm/mmap.c                          |  54 +++++++
+ mm/nommu.c                         |  15 +-
+ mm/swap.c                          |  16 ++-
+ mm/swap.h                          |   1 +
+ mm/util.c                          |  67 +++++++--
+ mm/vmscan.c                        |  23 +++
+ mm/vmstat.c                        |  42 +++++-
+ net/sunrpc/auth.c                  |   2 +-
+ security/min_addr.c                |  11 ++
+ 23 files changed, 328 insertions(+), 310 deletions(-)
+
+-- 
+2.25.1
+
 
