@@ -1,616 +1,181 @@
-Return-Path: <netdev+bounces-124553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F37E5969F8B
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 15:56:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D94E2969F91
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 15:57:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 249D71C2405D
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 13:56:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C1AE1C20B09
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 13:57:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4AB8848E;
-	Tue,  3 Sep 2024 13:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B65629CFE;
+	Tue,  3 Sep 2024 13:57:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZC1PQ+I"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qAJ5vzrU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2078.outbound.protection.outlook.com [40.107.92.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8521CA6A1
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 13:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725371776; cv=none; b=hWFueDfGUSECOF+vHdkCTZdc3N/c1r6M6aqiryK6zxUwgNfKyShnaglEphZ2RC51iWkmF/qqRrFoqPHKtWATs8o7Vqctv32/01QBAlk0hBwSjRRhLIxVdWgz6j2nb01LjVBGspUL0mM7ONfuhRF59HjAEVePliNlWDLCjzzKc0U=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725371776; c=relaxed/simple;
-	bh=t4Y7hIeIAarXA5+34v/upgeEA4IT1TimD5n6FrEchII=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pLG55cIS86NbT17Y+dS3PRMtiIoQw79T2+N8HRahZUwv8Sj/EaKtn2elFrMjKkTaXH9pxF5zBAK7WoYZ2F55eTFH5i/mdAAOyLy4GGEtoNAh1uDwV5XTG49ULO6zdn4KhM2R0dyuGWKvVd9M5Mn/aKh7CdjTkDM2mJjNXiblq3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cZC1PQ+I; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725371773;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mZUahBRGc+zhy9j2+IrRTtUJ4R6G0EU0I10UIHmemvg=;
-	b=cZC1PQ+IVsm/Jix58L6Vhd+GMnvW+fqPXL5Hus4x86d/lZQlkRqUBirmsxgiAsyLw3S0XB
-	ESzlC9WKHUj4rcvVtLcRr0/D0b638uDeHCyLtQS0xlGfDW6MmYMR2GHkGJc6fObMfHyz7X
-	Nb+X19/E/PIeG9BFjF6EwNYznbTY40U=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-435-Kf9ECiCoM7GqorU1VpyiUA-1; Tue, 03 Sep 2024 09:56:12 -0400
-X-MC-Unique: Kf9ECiCoM7GqorU1VpyiUA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-374b981dd62so2178617f8f.3
-        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 06:56:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725371771; x=1725976571;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mZUahBRGc+zhy9j2+IrRTtUJ4R6G0EU0I10UIHmemvg=;
-        b=Z6AZzq8CE/3MHCjKK1W53Zge+80sdJ4GVvXl9lDZgpWXUiqD6Ukg4p8DnYZUmGwtN/
-         dyparQBelwCRTUoStd+WxRszuM3NVYoXjye2RDlfn4N6fSLqCtplZkZvRo7vg8mF2/Qq
-         Jfy2r3FA7tzgsTUbqyscddhWHEL5JE6znRglCUMpgWKjBU4yLTW4xiL0obKFg+LD3jQl
-         wUAmibS+mJcqlHvjkfHotXxmNkofuHGyWhpcDcOqmZcTKabom3YT5cKWF25FnKL5sU9p
-         Fgpa3d4sIUWNWf8IeyeOpNap8LRhXkswmjICEJwq3wBHj1aRqQ6iY6s/QV92s3slS1uZ
-         RJ5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWO8SwrDEL5EGqY/4C7Si3khTi5uEz91zY5kccBDvgccOGD1j3ED4g3klPcIoV4jes8fWCjc74=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2UfUkT94TvHnWmO8f0kHd4hfzF53g8lih8l5MQZLjMgD5meec
-	LdGjDk7YxzVzZthmiqQ2AKLpCNEHW6Fyr14GHPZPBpPd+dv7AfqgZ8c+h67tL6nK4CyyTaSXAWD
-	keNuV6YHkxMqQs3qOu57tR3RGetL+SPiGtR6SSlkuewPpiYLBtdfBmw==
-X-Received: by 2002:a5d:67cd:0:b0:374:b5fc:d31a with SMTP id ffacd0b85a97d-374bceb37a3mr7053521f8f.25.1725371770871;
-        Tue, 03 Sep 2024 06:56:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHKMEOZbckYPKzqhZb37HeOJ7zsJWuV4GdJpSA6eNrl8UONYbHS5JM6qgDTBvQXT+ieXorLCQ==
-X-Received: by 2002:a5d:67cd:0:b0:374:b5fc:d31a with SMTP id ffacd0b85a97d-374bceb37a3mr7053489f8f.25.1725371770178;
-        Tue, 03 Sep 2024 06:56:10 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-55-250.dyn.eolo.it. [146.241.55.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-374c8547c0csm6893161f8f.17.2024.09.03.06.56.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Sep 2024 06:56:09 -0700 (PDT)
-Message-ID: <5c0303f4-c609-4a4e-a012-c27f08cfa6f9@redhat.com>
-Date: Tue, 3 Sep 2024 15:56:07 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2073C1CA6A1;
+	Tue,  3 Sep 2024 13:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725371821; cv=fail; b=Ko+6PAz6xLSkGaAgNT9Yw0W9+FXG5gutx+NJ/ks8iI9Y6NIIlncACIMhnhZauOFOPAUr9HrL3z70r/R1/eOqlk9xX6TuUcnmKKUHdv95dshERAazO/cBB/g7vshd1gxRTjFtPOcOkKFjl69Mj3NAxFV68EWdKha0KK/fVgP897g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725371821; c=relaxed/simple;
+	bh=r0FkMhZ/RfGhZ2M7jxrjv1QouvSO48zJpO2oKPw2dL4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=O1qLZrqzwUeTQGvn4T+xd6htKJ12WTBxaAZ2zsLSRJXuju8ymPMyl3bWE1pXAdvMWI10QxbjTyJ/zBI5umGVzdvfLLOFsIcc58VcCspiQwHeVJhysnARGus2P8WNla5uMBz8Hm61iHCvVm25RkFWspPZ9MUw27x+KpURHpnMiS4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qAJ5vzrU; arc=fail smtp.client-ip=40.107.92.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pdLLbAw1ygU2RxpP9IZwewEirSVYlOB2V9799LDScZ9FKJyRiVHYH3s6PslvhZxQeHLZ/hjwWEtVhpHm3UfITxcnBk+m+o8GzQPbc7winODFr35elaCnOfdLTbJ5xGcO7VinGGM6964Pl/5Td0iPw2LFxVEGeenBZembZMjE1QW2/fGkSVo0Mb19P2fazJIn0R/81PcQjViWB4jMF/tjJiUWYF+/tMnDeNSD9uW4TAHf2sdQk3VsatCYhGZKtEeJisMDKfSU6Zcci+xo4tcx6TfH6cjsycahi2SSrCfOcOT4RIOuAYVXMwKLO+3vKUjRtWQusp7sI9KnK2I5rZCRtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CU+qi9rYVgI6cvHo70YKe+C6Io2nlcn+NvFmhIRyOVE=;
+ b=tfnayYk5ZkCLzXN97+uw0d9AhxIk/WQCIjvAMRgZMtrYQ+kaI5Eq9ywV+RU+2XAZg1X4cgiLhrwPg7O/Wzcu/CodEnWpMQVbs5PEuKSCgIGRkU85Yt17qITNCnoK+Fl5eKqswcTqFZK+cSgSwVOJOlkXDs7dlQAnrksrjuK1dRmvw17ylwGbCHn93DSTjIPtB90yp8acMGuzflYReQa+Bi8ub23JkxGGIV4kqgNbQ1vxqcjVSXGZ4haqce6+yGdrX/d/2UqXRkPFbXAJ/fMrhUtur9Bq7b2ltYGIP3Q2jVtVXSrUcNqx+DjjfR6qqZH8A+EEXvzovYgSOnYKH0GYYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CU+qi9rYVgI6cvHo70YKe+C6Io2nlcn+NvFmhIRyOVE=;
+ b=qAJ5vzrU6Zl3OEKcKT05GximPUAEGy/CFbA+Au/Gld0sG9rAYFDD3qqYltDgY9eqnfpiEND6/l0oviRsDwMTp6BxNPdpOUsxkr1/aROB3Z+jeO20P2nb7+YVRGCX8W062eKgkT+OmW9zxKcz8ynHZN9sWi0L1exxJKoRtw/oIH0ioFcsTpI6NyNxt/C4uRnFxRXWluNgfrcWTQRImbxPkNJfbqoGsOgFfmtdHeTpEt+p2o2CFpaKSIRIlwB7RL7uEYK/367SxJjj0UGorQ8goaOisrsapr1lpBP4+y58r4AZuXqRN0VUYNrKdWbMLddZ6/zae2DdPzHQpFGMDpog+A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SN6PR12MB2719.namprd12.prod.outlook.com (2603:10b6:805:6c::12)
+ by LV8PR12MB9154.namprd12.prod.outlook.com (2603:10b6:408:190::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.25; Tue, 3 Sep
+ 2024 13:56:54 +0000
+Received: from SN6PR12MB2719.namprd12.prod.outlook.com
+ ([fe80::1ab4:107a:ae30:2f95]) by SN6PR12MB2719.namprd12.prod.outlook.com
+ ([fe80::1ab4:107a:ae30:2f95%7]) with mapi id 15.20.7918.024; Tue, 3 Sep 2024
+ 13:56:54 +0000
+Date: Tue, 3 Sep 2024 16:56:42 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Jonas Gorski <jonas.gorski@bisdn.de>
+Cc: Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ido Schimmel <idosch@mellanox.com>,
+	Petr Machata <petrm@mellanox.com>, bridge@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net V2] net: bridge: br_fdb_external_learn_add(): always
+ set EXT_LEARN
+Message-ID: <ZtcVmsqk0m1S-XuQ@shredder.mtl.com>
+References: <20240903081958.29951-1-jonas.gorski@bisdn.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240903081958.29951-1-jonas.gorski@bisdn.de>
+X-ClientProxiedBy: LO4P123CA0632.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:294::22) To BYAPR12MB2710.namprd12.prod.outlook.com
+ (2603:10b6:a03:68::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5] ptp: Add support for the AMZNC10C 'vmclock' device
-Content-Language: en-US
-To: David Woodhouse <dwmw2@infradead.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Peter Hilber <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>,
- "Chashper, David" <chashper@amazon.com>,
- "Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
-Cc: "Christopher S . Hall" <christopher.s.hall@intel.com>,
- Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
- Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc Zyngier <maz@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- qemu-devel <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-References: <dac0cd7e3c140dc309534a4c6e8976360bf6f3b9.camel@infradead.org>
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <dac0cd7e3c140dc309534a4c6e8976360bf6f3b9.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2719:EE_|LV8PR12MB9154:EE_
+X-MS-Office365-Filtering-Correlation-Id: 29954798-84b8-4c20-dd58-08dccc20442d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?yZzGZi/xzuBakQ0j+uE8+fJG9HtzxPXUKre7uZNyt10uOYRpgaMtOZEzoNSH?=
+ =?us-ascii?Q?tAazdMioDBALt4h/lzEdlHv0crLEBr3J+VngZSAhLizXvfnJor+q+vcSWUz5?=
+ =?us-ascii?Q?EikDNibzA4oYS8vLPW9zmu9qqIR4R0PyInJcklDbinm0sPOcSUt0psLFRSAH?=
+ =?us-ascii?Q?XKR77bkl24FQTSl+VTyd2lSmWMicea5gu8hrLUgqsInINge7wjlJKCo3Y+Tl?=
+ =?us-ascii?Q?TQVMeyjAImJiolL3QhR3zmDIa2afYN5dTEkwD4+K9eHTitjMfUE6gHsQp20I?=
+ =?us-ascii?Q?VDVmogyEdPN7CLsoAIj/PQYmyVnk3oGwrvMX8P/sh+bimcuwVOIuddBfDTpT?=
+ =?us-ascii?Q?1GKFNl3tc1f325vSgtdn3er8WISCe0DX9R45K5PZs50xeLD/7ofHl085thtn?=
+ =?us-ascii?Q?EA+kRL2e4aHnAjdchvzMhMkSU2HCq1R71pACGyH+OEXnOnjhzb8Uo5cNH4KQ?=
+ =?us-ascii?Q?XB60y5BlqyVGqsK83TAT3jbEA+eSSj3p5adXkIu46JhBwNQFI+N328MZ9CpV?=
+ =?us-ascii?Q?YaZiRMwRsSACO4INvrCeXQSe1qH/EvoAE6JLw4xBFrtXB/ZpqPCblZSyEtDi?=
+ =?us-ascii?Q?C1vkMHuRA1k1hB5wlxJTAyVJQHBraBixGEtODSFXlV/j7q8CVATloJiPuh7t?=
+ =?us-ascii?Q?9sQo5s0CQQVOgAUarFI1REBScoQkoXoCQ7jsNeqfsEm4Um1l778AOjix9t26?=
+ =?us-ascii?Q?+Fd8NXWlqCBZE67zr8uKImeanU0Hm2yibAfYqDJiZh2GCYZv0z/Q00oDNlzi?=
+ =?us-ascii?Q?P/zO2bF1p5EBIIFZLIyFnYdiSp+Nadoq7L9tHBXxvu9cs47yRe0fRQgeC7WQ?=
+ =?us-ascii?Q?cG0FBW54LTMbXAxAWAE2ANMstfsykoY9F1NTr1jSZrFlTckdBEcQzyaZCj4+?=
+ =?us-ascii?Q?HkTtXLlv6VCt18fIYXW3dhn4dTzebmwyiuX+/b1s1l9b94cpO3x6opho68x4?=
+ =?us-ascii?Q?eZWh451IVNgi1nV721Itw8hIJeC2FdnHbOdn0299yN07h0wqS6x+rZbLZwF/?=
+ =?us-ascii?Q?RqEQQkm/U/rglMFG5XoXbdAUnhxsR4zhB34s6Ga1goD3iqeHxts7KDn4moBE?=
+ =?us-ascii?Q?bzaOObgf+evUVTb60AePCCdzzfDJjxCmK7IQyTFfnDTTiC3APYHIWV9LmSbf?=
+ =?us-ascii?Q?wA0sK7B2LzUeb0QJ4RRISKzZGIBOhdgMOfz3xcnTlPwrAwllPDMtNraWz9Cx?=
+ =?us-ascii?Q?8Ezs+yG+iRSDbNB7DxwTaQZCsnZWOgC0mm01NX/+UlyRYTjppxQdxOZel5hT?=
+ =?us-ascii?Q?2ulNBiM8hRiGcoGuqusuAbeSAAKFtWlYmqZ/tnO/rig+nchWak1MMUq7844a?=
+ =?us-ascii?Q?4AMlMlzd8tUHdnN4XypjbstbKPLF7nGPp/t1Qw1ap2UV8g=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2719.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?U4/hNiom0j8GQ1+JpIUDnj8ihYqjcjCn7ntfFhpD5Klajj85uE2xsAt1q0WG?=
+ =?us-ascii?Q?5X1rUOhCaelZKTc8uCUpFkuF9vQjJCrmQAyfpw0ogYWmZQha7CVh/r2ldBf6?=
+ =?us-ascii?Q?0509L73TlkzfshSI9iO0XQ2mqM5mAdi/tR5fs0NjOiKbD7c3NXJj4mi09Lwt?=
+ =?us-ascii?Q?7ZESnSdDO0ObhmaeyFL6PDgi9GWbfoAUOTPjQ40ZE7zWvo0TO05igwVv3lL3?=
+ =?us-ascii?Q?5C3scLj6I9rsismK+WoTx+Z4lnRHDvhq9natVIbctciBqVJC0asfzOxjQYoA?=
+ =?us-ascii?Q?oIOdI33jsvpraijeSNJN8iRu3aF5S+uRRu76kFXVTNEpQBaYOdKI5JkInMnc?=
+ =?us-ascii?Q?/rmxVvzHVvWlJb2G6HlGgouc1d943De9Zm4bY5ybjDcYDN56xXTAm7azcV3v?=
+ =?us-ascii?Q?+vAYO4uYA3NOcTg40sgsAfy1m3cImJiM5Nljg6CKHKcdT4Uj1pbgRmhvvZuu?=
+ =?us-ascii?Q?ceU28dpG6AvbVR4uCH6qTAUz1cbdo36uK3v3kvyx+XjAz8FUROcESNgDUaRm?=
+ =?us-ascii?Q?Sfn+EAndHX2uDnYUtKS+NV101dt2s6GPf/mUJFFC+zFoiFfwmXUs0HIjjdqj?=
+ =?us-ascii?Q?x7H0SFRWU+fOHIskNCJ+B4l1o3/2Elq7SmlwloO6Qdm7NBIXi2Miy87v8oaS?=
+ =?us-ascii?Q?EqFV7cHfFtIOYx71IK3ukvSiMbhDRmX+4L8RlmXJHzRue7ZO9SHTKJC7sYUy?=
+ =?us-ascii?Q?I+tnnwOA/G8WknLFUhQYJc76WrBCLk0bG+HapMAPT39ObNF9f9lMoi3FcISM?=
+ =?us-ascii?Q?fE3ieRa9vq+SUqC7bsBxVCVo9QKLXWG23lE0W3r0A04APvXMTubiUsZuWU/y?=
+ =?us-ascii?Q?UyqJMOnz0Ab3OXCo1uqgQAyX6vXtn64W47CH+42OThEeo58MPvd6HbccNQkD?=
+ =?us-ascii?Q?7g7AEXkILmeggfUGIUM/EynDgyMDQymcRTq2NrNw0tMMIGIBf1122aT6BWfF?=
+ =?us-ascii?Q?pWYKwXrmVmxq3j5S9cdd7oT5ka0Lmo2woUoi1kHAz05eQqc0vI0C+K292jFT?=
+ =?us-ascii?Q?91KvQB//7HQhMgfMyU1hZVL7KRNlah7KEHspLFGXKXmJD0vDH4rCIApWud07?=
+ =?us-ascii?Q?Sub012DyB0eUKL11fNKQIDKU1aB0HZXURZ80Izws57Vz4HG1pYPOWwmTdJ9S?=
+ =?us-ascii?Q?uaoRFsvvVT42GG9JkRKwbdzbgn0rInb4783cFEka4PzUpY75mZvcs+EG8TRF?=
+ =?us-ascii?Q?zXi5uawZGsC9TeI/CqXpBzD+YPY6rkWGkVRTXrWTCV+fYFRgtsm+RBcIBpxh?=
+ =?us-ascii?Q?rcwgn+s+iVfskc2SPjFbujONBa9Q6hu1IAZzMnEX0XasSYPH32T/hF3c97qp?=
+ =?us-ascii?Q?zkF+ut6R0IghW79qr9Y5rZB9kn9SA7G0Dx1hjxHaNBhGPyqqsMJkgzLsPC8G?=
+ =?us-ascii?Q?8GTovAum4sBbFjzluJ7wQhDZiXxInGzvpNcVrp7wL/ePHQIo6V8MYdpr8rLu?=
+ =?us-ascii?Q?6Zof+hsw1Bc3wWgEgt1phwX6Mmy+RyX8RmNYB/S1K2AHhqD2s3JbgB+XXbUj?=
+ =?us-ascii?Q?dxFU8st0xFW2qZu7CwNilPSVj6r9abUhXJ9h9IIDsdIWajGv3omnGCUfRwR4?=
+ =?us-ascii?Q?pnpc7UWAfzQufKrzvKDvA7UbYEVS7eteuhBxn7Ve?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29954798-84b8-4c20-dd58-08dccc20442d
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2710.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2024 13:56:54.4868
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DkNR7LGMVH/4w38O/pGaTy9pR+FIo9bIx4ncKVvwtYk/tHX1RxTUJcAWAOdYaJX+GcbdXxLvAQaMmvfwvPIMmQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9154
 
-On 8/23/24 12:09, David Woodhouse wrote:
-> diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
-> index 604541dcb320..e98c9767e0ef 100644
-> --- a/drivers/ptp/Kconfig
-> +++ b/drivers/ptp/Kconfig
-> @@ -131,6 +131,19 @@ config PTP_1588_CLOCK_KVM
->   	  To compile this driver as a module, choose M here: the module
->   	  will be called ptp_kvm.
->   
-> +config PTP_1588_CLOCK_VMCLOCK
-> +	tristate "Virtual machine PTP clock"
-> +	depends on X86_TSC || ARM_ARCH_TIMER
-> +	depends on PTP_1588_CLOCK && ACPI && ARCH_SUPPORTS_INT128
-> +	default y
-> +	help
-> +	  This driver adds support for using a virtual precision clock
-> +	  advertised by the hypervisor. This clock is only useful in virtual
-> +	  machines where such a device is present.
-> +
-> +	  To compile this driver as a module, choose M here: the module
-> +	  will be called ptp_vmclock.
-> +
->   config PTP_1588_CLOCK_IDT82P33
->   	tristate "IDT 82P33xxx PTP clock"
->   	depends on PTP_1588_CLOCK && I2C
-> diff --git a/drivers/ptp/Makefile b/drivers/ptp/Makefile
-> index 68bf02078053..01b5cd91eb61 100644
-> --- a/drivers/ptp/Makefile
-> +++ b/drivers/ptp/Makefile
-> @@ -11,6 +11,7 @@ obj-$(CONFIG_PTP_1588_CLOCK_DTE)	+= ptp_dte.o
->   obj-$(CONFIG_PTP_1588_CLOCK_INES)	+= ptp_ines.o
->   obj-$(CONFIG_PTP_1588_CLOCK_PCH)	+= ptp_pch.o
->   obj-$(CONFIG_PTP_1588_CLOCK_KVM)	+= ptp_kvm.o
-> +obj-$(CONFIG_PTP_1588_CLOCK_VMCLOCK)	+= ptp_vmclock.o
->   obj-$(CONFIG_PTP_1588_CLOCK_QORIQ)	+= ptp-qoriq.o
->   ptp-qoriq-y				+= ptp_qoriq.o
->   ptp-qoriq-$(CONFIG_DEBUG_FS)		+= ptp_qoriq_debugfs.o
-> diff --git a/drivers/ptp/ptp_vmclock.c b/drivers/ptp/ptp_vmclock.c
-> new file mode 100644
-> index 000000000000..f772bcb23599
-> --- /dev/null
-> +++ b/drivers/ptp/ptp_vmclock.c
-> @@ -0,0 +1,607 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * Virtual PTP 1588 clock for use with LM-safe VMclock device.
-> + *
-> + * Copyright © 2024 Amazon.com, Inc. or its affiliates.
-> + */
-> +
-> +#include <linux/acpi.h>
-> +#include <linux/device.h>
-> +#include <linux/err.h>
-> +#include <linux/file.h>
-> +#include <linux/fs.h>
-> +#include <linux/init.h>
-> +#include <linux/kernel.h>
-> +#include <linux/miscdevice.h>
-> +#include <linux/mm.h>
-> +#include <linux/module.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/slab.h>
-> +
-> +#include <uapi/linux/vmclock-abi.h>
-> +
-> +#include <linux/ptp_clock_kernel.h>
-> +
-> +#ifdef CONFIG_X86
-> +#include <asm/pvclock.h>
-> +#include <asm/kvmclock.h>
-> +#endif
-> +
-> +#ifdef CONFIG_KVM_GUEST
-> +#define SUPPORT_KVMCLOCK
-> +#endif
-> +
-> +static DEFINE_IDA(vmclock_ida);
-> +
-> +ACPI_MODULE_NAME("vmclock");
-> +
-> +struct vmclock_state {
-> +	struct resource res;
-> +	struct vmclock_abi *clk;
-> +	struct miscdevice miscdev;
-> +	struct ptp_clock_info ptp_clock_info;
-> +	struct ptp_clock *ptp_clock;
-> +	enum clocksource_ids cs_id, sys_cs_id;
-> +	int index;
-> +	char *name;
-> +};
-> +
-> +#define VMCLOCK_MAX_WAIT ms_to_ktime(100)
-> +
-> +/* Require at least the flags field to be present. All else can be optional. */
-> +#define VMCLOCK_MIN_SIZE offsetof(struct vmclock_abi, pad)
-> +
-> +#define VMCLOCK_FIELD_PRESENT(_c, _f)			  \
-> +	le32_to_cpu((_c)->size) >= (offsetof(struct vmclock_abi, _f) +	\
-> +				    sizeof((_c)->_f))
-> +
-> +/*
-> + * Multiply a 64-bit count by a 64-bit tick 'period' in units of seconds >> 64
-> + * and add the fractional second part of the reference time.
-> + *
-> + * The result is a 128-bit value, the top 64 bits of which are seconds, and
-> + * the low 64 bits are (seconds >> 64).
-> + */
-> +static uint64_t mul_u64_u64_shr_add_u64(uint64_t *res_hi, uint64_t delta,
-> +					uint64_t period, uint8_t shift,
-> +					uint64_t frac_sec)
+On Tue, Sep 03, 2024 at 10:19:57AM +0200, Jonas Gorski wrote:
+> When userspace wants to take over a fdb entry by setting it as
+> EXTERN_LEARNED, we set both flags BR_FDB_ADDED_BY_EXT_LEARN and
+> BR_FDB_ADDED_BY_USER in br_fdb_external_learn_add().
+> 
+> If the bridge updates the entry later because its port changed, we clear
+> the BR_FDB_ADDED_BY_EXT_LEARN flag, but leave the BR_FDB_ADDED_BY_USER
+> flag set.
+> 
+> If userspace then wants to take over the entry again,
+> br_fdb_external_learn_add() sees that BR_FDB_ADDED_BY_USER and skips
+> setting the BR_FDB_ADDED_BY_EXT_LEARN flags, thus silently ignores the
+> update.
+> 
+> Fix this by always allowing to set BR_FDB_ADDED_BY_EXT_LEARN regardless
+> if this was a user fdb entry or not.
+> 
+> Fixes: 710ae7287737 ("net: bridge: Mark FDB entries that were added by user as such")
+> Signed-off-by: Jonas Gorski <jonas.gorski@bisdn.de>
 
-I'm sorry for the late feedback.
-
-uint64_t should be u64 (in a lot of places), mutatis mutandis uint32_t, 
-etc...
-
-> +{
-> +	unsigned __int128 res = (unsigned __int128)delta * period;
-> +
-> +	res >>= shift;
-> +	res += frac_sec;
-> +	*res_hi = res >> 64;
-> +	return (uint64_t)res;
-> +}
-> +
-> +static bool tai_adjust(struct vmclock_abi *clk, uint64_t *sec)
-> +{
-> +	if (likely(clk->time_type == VMCLOCK_TIME_UTC))
-> +		return true;
-> +
-> +	if (clk->time_type == VMCLOCK_TIME_TAI &&
-> +	    (le64_to_cpu(clk->flags) & VMCLOCK_FLAG_TAI_OFFSET_VALID)) {
-> +		if (sec)
-> +			*sec += (int16_t)le16_to_cpu(clk->tai_offset_sec);
-> +		return true;
-> +	}
-> +	return false;
-> +}
-> +
-> +static int vmclock_get_crosststamp(struct vmclock_state *st,
-> +				   struct ptp_system_timestamp *sts,
-> +				   struct system_counterval_t *system_counter,
-> +				   struct timespec64 *tspec)
-> +{
-> +	ktime_t deadline = ktime_add(ktime_get(), VMCLOCK_MAX_WAIT);
-> +	struct system_time_snapshot systime_snapshot;
-> +	uint64_t cycle, delta, seq, frac_sec;
-> +
-> +#ifdef CONFIG_X86
-> +	/*
-> +	 * We'd expect the hypervisor to know this and to report the clock
-> +	 * status as VMCLOCK_STATUS_UNRELIABLE. But be paranoid.
-> +	 */
-> +	if (check_tsc_unstable())
-> +		return -EINVAL;
-> +#endif
-> +
-> +	while (1) {
-> +		seq = le32_to_cpu(st->clk->seq_count) & ~1ULL;
-> +
-> +		/*
-> +		 * This pairs with a write barrier in the hypervisor
-> +		 * which populates this structure.
-> +		 */
-> +		virt_rmb();
-> +
-> +		if (st->clk->clock_status == VMCLOCK_STATUS_UNRELIABLE)
-> +			return -EINVAL;
-> +
-> +		/*
-> +		 * When invoked for gettimex64(), fill in the pre/post system
-> +		 * times. The simple case is when system time is based on the
-> +		 * same counter as st->cs_id, in which case all three times
-> +		 * will be derived from the *same* counter value.
-> +		 *
-> +		 * If the system isn't using the same counter, then the value
-> +		 * from ktime_get_snapshot() will still be used as pre_ts, and
-> +		 * ptp_read_system_postts() is called to populate postts after
-> +		 * calling get_cycles().
-> +		 *
-> +		 * The conversion to timespec64 happens further down, outside
-> +		 * the seq_count loop.
-> +		 */
-> +		if (sts) {
-> +			ktime_get_snapshot(&systime_snapshot);
-> +			if (systime_snapshot.cs_id == st->cs_id) {
-> +				cycle = systime_snapshot.cycles;
-> +			} else {
-> +				cycle = get_cycles();
-> +				ptp_read_system_postts(sts);
-> +			}
-> +		} else {
-> +			cycle = get_cycles();
-> +		}
-> +
-> +		delta = cycle - le64_to_cpu(st->clk->counter_value);
-> +
-> +		frac_sec = mul_u64_u64_shr_add_u64(&tspec->tv_sec, delta,
-> +						   le64_to_cpu(st->clk->counter_period_frac_sec),
-> +						   st->clk->counter_period_shift,
-> +						   le64_to_cpu(st->clk->time_frac_sec));
-> +		tspec->tv_nsec = mul_u64_u64_shr(frac_sec, NSEC_PER_SEC, 64);
-> +		tspec->tv_sec += le64_to_cpu(st->clk->time_sec);
-> +
-> +		if (!tai_adjust(st->clk, &tspec->tv_sec))
-> +			return -EINVAL;
-> +
-> +		virt_rmb();
-
-Even this one deserves a comment.
-
-> +		if (seq == le32_to_cpu(st->clk->seq_count))
-> +			break;
-> +
-> +		if (ktime_after(ktime_get(), deadline))
-> +			return -ETIMEDOUT;
-> +	}
-> +
-> +	if (system_counter) {
-> +		system_counter->cycles = cycle;
-> +		system_counter->cs_id = st->cs_id;
-> +	}
-> +
-> +	if (sts) {
-> +		sts->pre_ts = ktime_to_timespec64(systime_snapshot.real);
-> +		if (systime_snapshot.cs_id == st->cs_id)
-> +			sts->post_ts = sts->pre_ts;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +#ifdef SUPPORT_KVMCLOCK
-> +/*
-> + * In the case where the system is using the KVM clock for timekeeping, convert
-> + * the TSC value into a KVM clock time in order to return a paired reading that
-> + * get_device_system_crosststamp() can cope with.
-> + */
-> +static int vmclock_get_crosststamp_kvmclock(struct vmclock_state *st,
-> +					    struct ptp_system_timestamp *sts,
-> +					    struct system_counterval_t *system_counter,
-> +					    struct timespec64 *tspec)
-> +{
-> +	struct pvclock_vcpu_time_info *pvti = this_cpu_pvti();
-> +	unsigned pvti_ver;
-
-unsigned int
-
-> +	int ret;
-> +
-> +	preempt_disable_notrace();
-> +
-> +	do {
-> +		pvti_ver = pvclock_read_begin(pvti);
-> +
-> +		ret = vmclock_get_crosststamp(st, sts, system_counter, tspec);
-> +		if (ret)
-> +			break;
-> +
-> +		system_counter->cycles = __pvclock_read_cycles(pvti,
-> +							       system_counter->cycles);
-> +		system_counter->cs_id = CSID_X86_KVM_CLK;
-> +
-> +		/*
-> +		 * This retry should never really happen; if the TSC is
-> +		 * stable and reliable enough across vCPUS that it is sane
-> +		 * for the hypervisor to expose a VMCLOCK device which uses
-> +		 * it as the reference counter, then the KVM clock sohuld be
-> +		 * in 'master clock mode' and basically never changed. But
-> +		 * the KVM clock is a fickle and often broken thing, so do
-> +		 * it "properly" just in case.
-> +		 */
-> +	} while (pvclock_read_retry(pvti, pvti_ver));
-> +
-> +	preempt_enable_notrace();
-> +
-> +	return ret;
-> +}
-> +#endif
-> +
-> +static int ptp_vmclock_get_time_fn(ktime_t *device_time,
-> +				   struct system_counterval_t *system_counter,
-> +				   void *ctx)
-> +{
-> +	struct vmclock_state *st = ctx;
-> +	struct timespec64 tspec;
-> +	int ret;
-> +
-> +#ifdef SUPPORT_KVMCLOCK
-> +	if (READ_ONCE(st->sys_cs_id) == CSID_X86_KVM_CLK)
-> +		ret = vmclock_get_crosststamp_kvmclock(st, NULL, system_counter,
-> +						       &tspec);
-> +	else
-> +#endif
-> +		ret = vmclock_get_crosststamp(st, NULL, system_counter, &tspec);
-> +
-> +	if (!ret)
-> +		*device_time = timespec64_to_ktime(tspec);
-> +
-> +	return ret;
-> +}
-> +
-> +static int ptp_vmclock_getcrosststamp(struct ptp_clock_info *ptp,
-> +				      struct system_device_crosststamp *xtstamp)
-> +{
-> +	struct vmclock_state *st = container_of(ptp, struct vmclock_state,
-> +						ptp_clock_info);
-> +	int ret = get_device_system_crosststamp(ptp_vmclock_get_time_fn, st,
-> +						NULL, xtstamp);
-> +#ifdef SUPPORT_KVMCLOCK
-> +	/*
-> +	 * On x86, the KVM clock may be used for the system time. We can
-> +	 * actually convert a TSC reading to that, and return a paired
-> +	 * timestamp that get_device_system_crosststamp() *can* handle.
-> +	 */
-> +	if (ret == -ENODEV) {
-> +		struct system_time_snapshot systime_snapshot;
-
-Please insert an empty line after the variable declarations.
-
-> +		ktime_get_snapshot(&systime_snapshot);
-> +
-> +		if (systime_snapshot.cs_id == CSID_X86_TSC ||
-> +		    systime_snapshot.cs_id == CSID_X86_KVM_CLK) {
-> +			WRITE_ONCE(st->sys_cs_id, systime_snapshot.cs_id);
-> +			ret = get_device_system_crosststamp(ptp_vmclock_get_time_fn,
-> +							    st, NULL, xtstamp);
-> +		}
-> +	}
-> +#endif
-> +	return ret;
-> +}
-> +
-> +/*
-> + * PTP clock operations
-> + */
-> +
-> +static int ptp_vmclock_adjfine(struct ptp_clock_info *ptp, long delta)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static int ptp_vmclock_adjtime(struct ptp_clock_info *ptp, s64 delta)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static int ptp_vmclock_settime(struct ptp_clock_info *ptp,
-> +			   const struct timespec64 *ts)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static int ptp_vmclock_gettimex(struct ptp_clock_info *ptp, struct timespec64 *ts,
-> +				struct ptp_system_timestamp *sts)
-> +{
-> +	struct vmclock_state *st = container_of(ptp, struct vmclock_state,
-> +						ptp_clock_info);
-> +
-> +	return vmclock_get_crosststamp(st, sts, NULL, ts);
-> +}
-> +
-> +static int ptp_vmclock_enable(struct ptp_clock_info *ptp,
-> +			  struct ptp_clock_request *rq, int on)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
-> +static const struct ptp_clock_info ptp_vmclock_info = {
-> +	.owner		= THIS_MODULE,
-> +	.max_adj	= 0,
-> +	.n_ext_ts	= 0,
-> +	.n_pins		= 0,
-> +	.pps		= 0,
-> +	.adjfine	= ptp_vmclock_adjfine,
-> +	.adjtime	= ptp_vmclock_adjtime,
-> +	.gettimex64	= ptp_vmclock_gettimex,
-> +	.settime64	= ptp_vmclock_settime,
-> +	.enable		= ptp_vmclock_enable,
-> +	.getcrosststamp = ptp_vmclock_getcrosststamp,
-> +};
-> +
-> +static struct ptp_clock *vmclock_ptp_register(struct device *dev,
-> +					      struct vmclock_state *st)
-> +{
-> +	enum clocksource_ids cs_id;
-> +
-> +	if (IS_ENABLED(CONFIG_ARM64) &&
-> +	    st->clk->counter_id == VMCLOCK_COUNTER_ARM_VCNT) {
-> +		/* Can we check it's the virtual counter? */
-> +		cs_id = CSID_ARM_ARCH_COUNTER;
-> +	} else if (IS_ENABLED(CONFIG_X86) &&
-> +		   st->clk->counter_id == VMCLOCK_COUNTER_X86_TSC) {
-> +		cs_id = CSID_X86_TSC;
-> +	} else {
-> +		return NULL;
-> +	}
-> +
-> +	/* Only UTC, or TAI with offset */
-> +	if (!tai_adjust(st->clk, NULL)) {
-> +		dev_info(dev, "vmclock does not provide unambiguous UTC\n");
-> +		return NULL;
-> +	}
-> +
-> +	st->sys_cs_id = st->cs_id = cs_id;
-
-Please avoid multiple assignments in the same statement.
-
-> +	st->ptp_clock_info = ptp_vmclock_info;
-> +	strscpy(st->ptp_clock_info.name, st->name);
-> +
-> +	return ptp_clock_register(&st->ptp_clock_info, dev);
-> +}
-> +
-> +static int vmclock_miscdev_mmap(struct file *fp, struct vm_area_struct *vma)
-> +{
-> +	struct vmclock_state *st = container_of(fp->private_data,
-> +						struct vmclock_state, miscdev);
-> +
-> +	if ((vma->vm_flags & (VM_READ|VM_WRITE)) != VM_READ)
-> +		return -EROFS;
-> +
-> +	if (vma->vm_end - vma->vm_start != PAGE_SIZE || vma->vm_pgoff)
-> +		return -EINVAL;
-> +
-> +        if (io_remap_pfn_range(vma, vma->vm_start,
-> +			       st->res.start >> PAGE_SHIFT, PAGE_SIZE,
-> +                               vma->vm_page_prot))
-> +                return -EAGAIN;
-> +
-> +        return 0;
-
-This chunk looks whitespace-damaged, use tab for indentation.
-
-> +}
-> +
-> +static ssize_t vmclock_miscdev_read(struct file *fp, char __user *buf,
-> +				    size_t count, loff_t *ppos)
-> +{
-> +	struct vmclock_state *st = container_of(fp->private_data,
-> +						struct vmclock_state, miscdev);
-> +	ktime_t deadline = ktime_add(ktime_get(), VMCLOCK_MAX_WAIT);
-> +	size_t max_count;
-> +	uint32_t seq;
-> +
-> +	if (*ppos >= PAGE_SIZE)
-> +		return 0;
-> +
-> +	max_count = PAGE_SIZE - *ppos;
-> +	if (count > max_count)
-> +		count = max_count;
-> +
-> +	while (1) {
-> +		seq = le32_to_cpu(st->clk->seq_count) & ~1U;
-> +		virt_rmb();
-> +
-> +		if (copy_to_user(buf, ((char *)st->clk) + *ppos, count))
-> +			return -EFAULT;
-> +
-> +		virt_rmb();
-> +		if (seq == le32_to_cpu(st->clk->seq_count))
-> +			break;
-> +
-> +		if (ktime_after(ktime_get(), deadline))
-> +			return -ETIMEDOUT;
-> +	}
-> +
-> +	*ppos += count;
-> +	return count;
-> +}
-> +
-> +static const struct file_operations vmclock_miscdev_fops = {
-> +        .mmap = vmclock_miscdev_mmap,
-> +        .read = vmclock_miscdev_read,
-> +};
-> +
-> +/* module operations */
-> +
-> +static void vmclock_remove(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct vmclock_state *st = dev_get_drvdata(dev);
-> +
-> +	if (st->ptp_clock)
-> +		ptp_clock_unregister(st->ptp_clock);
-> +
-> +	if (st->miscdev.minor != MISC_DYNAMIC_MINOR)
-> +		misc_deregister(&st->miscdev);
-> +}
-> +
-> +static acpi_status vmclock_acpi_resources(struct acpi_resource *ares, void *data)
-> +{
-> +	struct vmclock_state *st = data;
-> +	struct resource_win win;
-> +	struct resource *res = &(win.res);
-
-Unnecessary parentheses
-
-There are several checkpatch offenders, please double check your next 
-version before the submission.
-
-Thanks!
-
-Paolo
-
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
