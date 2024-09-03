@@ -1,134 +1,200 @@
-Return-Path: <netdev+bounces-124512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 602B4969CA2
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 13:59:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18F3B969CFA
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:08:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 929741C239EF
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 11:59:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C59E6281B6B
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067F21B9857;
-	Tue,  3 Sep 2024 11:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C754C1A42A4;
+	Tue,  3 Sep 2024 12:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gTinp3ZV"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="af7CVuVi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2041.outbound.protection.outlook.com [40.92.62.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554401C7686
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 11:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725364762; cv=none; b=h3iY/7fzuuihXC3lckn+oDr3dGnpBR1M8AvxBiAnvYaS+ZZYiU+kD97mSdByZWFMaALodoLq7eG1CJ36NSUGngFXB1kdAPxn/p6NN0hJPRCJ+0YqvRCUrxDDIBOUmNNtAy0uNft9TSbIYNqDkXVgysv4F2DCxGatdSZG0YcIZ/s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725364762; c=relaxed/simple;
-	bh=9an5SNRHHUgCW2mocC01A8ucW7OL3399L2FiMAVZGFE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QGZpDQkw5jduAxD729ME5NGmrvXfSNri0JvLsweC7ioJvY7b/KBVwOC4Rnoclbn/GVGXrV5D2kU6Ac7fzo/+pEIc7kAGeWzw4jXMwd1W+NCna42Q3+uR4kcqGTN4mBDRlG5y3XF9hjW8PtRSkxbiEdG8dLkDKW5xFx0bsG2OPZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gTinp3ZV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725364760;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eW+oWF8uHdYs0IDc0sGYHwMXdGVR/s8ug84wPArmDAE=;
-	b=gTinp3ZVx7hhLDlnAWgWWFOfQxrRhQ4ErB3mU8YC1S0aQwD5XSgdImpKm6ipaTc46Ldh/M
-	aoZ8C7g99tYMDib7zBJRGxymd77ZhlYvuXFplge0BWsbNggVcUNLBZERB3UVe88pOLFlvP
-	fhDwJylrwBZhIKDKpFfG0kY1tDx+YyA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-528-qde0rqaWMHCWYQE6MJ1D4Q-1; Tue, 03 Sep 2024 07:59:19 -0400
-X-MC-Unique: qde0rqaWMHCWYQE6MJ1D4Q-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-374bacd5cccso2499867f8f.1
-        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 04:59:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725364758; x=1725969558;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eW+oWF8uHdYs0IDc0sGYHwMXdGVR/s8ug84wPArmDAE=;
-        b=bJQPQccW1c3fzIGEKDmERPVb9zvq6GPcmFyNz5RafdVhdM0dCUpPflXwI75QOKyFZ8
-         taUV21Loi3+TGEh8FovqlpBlt5l1dUw0u6vRQmdtpq7Y7GS4Xs9LFgFBYUNWOXhuLwmA
-         4/VC9PfGJ60S9vg0ytcGlrmeYTdlenUHl51MBVXpoyw6ypUa42l3KX3K7zfbsXkhu2c6
-         BqlR3StF/Y5yzOOcSq7NPdtm7PVfQQnSU2kU1Iu5+EJBTgc4HPb1sKzm1M5VJP2GSC92
-         gI/9ApxUaNbALUVUNBVzEgwoF5dtY1Udfuv6YUyX7SQ9KJXGitJ5v8C6osuXohXTQK81
-         UQOw==
-X-Forwarded-Encrypted: i=1; AJvYcCWSZTbgVPsxTWNiT3hQPyI59sAACXWlL3vV/XpLn2jFjh6+g2DopC4rE8xQ1JYAiUbjjoK4cW8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPyPseKwt3ab5MX7nc1YKtjw4ZO23ApufrGbIdTt8TqPSYCaUM
-	8+HNCbxpWQlV+QwH5dxHlA9H0ULB30FNSbsvS1VjsnNC9e0EZVcUk/p3rqdb5svR25JDVAtEST2
-	6zJk/w+rjv6s+Vk0G8/kgvHRjcL3b+gniCkdaImkBbLjdX427gwjlFA==
-X-Received: by 2002:adf:eb8d:0:b0:371:8319:4dbd with SMTP id ffacd0b85a97d-374a9565a7bmr8232171f8f.17.1725364757757;
-        Tue, 03 Sep 2024 04:59:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IErj+70bDHnbAELAam4llo41z/vLKYkI6hm7wHpiadIT4BVcszal3LrlvsIb+49NfmX0fZ6bw==
-X-Received: by 2002:adf:eb8d:0:b0:371:8319:4dbd with SMTP id ffacd0b85a97d-374a9565a7bmr8232145f8f.17.1725364757224;
-        Tue, 03 Sep 2024 04:59:17 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-5-217.dyn.eolo.it. [146.241.5.217])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6df100csm168343265e9.20.2024.09.03.04.59.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Sep 2024 04:59:16 -0700 (PDT)
-Message-ID: <0ff20687-74de-4e63-90f4-57cf06795990@redhat.com>
-Date: Tue, 3 Sep 2024 13:59:14 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA18D1B9859;
+	Tue,  3 Sep 2024 12:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.62.41
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725365295; cv=fail; b=k7p4P06lelvh7WCZaM6bSB6w8Ejwrtg4EYVq1f0HLkpD7+jPtqH8BHIXdj8mdBFEd+pEBzuQtesrdGJkcXnDv4rh+pvAmyDAHrOHkGA9qI2k7MkPiaEjZJetIRVPmaikC8IMchsbZHUAGyN4fs3yu0yZwlqhQnkpg0PU/wr9P68=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725365295; c=relaxed/simple;
+	bh=IvPTRavmb5ZE+LTDfwgV1vngL9K5YCVJqRgNKF97Sps=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=O8v7mlJASK5N6022ZVdHkzl/YCKoK4JgI7x9Ze5aScv0wAYpFRQXAA3rw/VIRXiX09CUZ7DLGi5x8L4nic9BgOLV+ptMoMkHWv2zw8D6ZgzM3fGD+SFAvgu4Vda6GcQSapbr/GFEyVUciTpkyHrj1zX451pJ1S2ioFtopEoDoJw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=af7CVuVi; arc=fail smtp.client-ip=40.92.62.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=g6jLgNJ4iWM6VAkZ17TsYhcaHZeTCD68mSGjhV0xWBq+DY10RHjIdMkYn53aCFwxFgvi46+N2qc4ZbtaIcNoKs82S36Lul6cvsuitOfoQDKOzUFHtAJRsfthUd+WXpIcNvfIvgj3836/qClnjokORq7Vz0ZotngK/PCYJb7v0a1MXG+/N0VoJ8dg5y3iQ2KbAUFui9LBhXCMWrVei9jHF1siHCqr4Bdm0fcR8ynJyBbgmhcq5V64nf6UwDl1fWiICKddGkwD4iX8F6iVkwAKNRWstAfAHIKxWcxYsF14zUYO2LrWy4t7sFs0ITUYWSwvOdhR+cwzZzNef/hCbY0kpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rzPmrfnypnTcXSOUzQP80L8x6QBskS0bYOPokj0QcqA=;
+ b=d2CNLUMnnCu+FoQSIk9gmoTGzqzFBUlAxLa6aaBmtjpPRhT5lYVRV8g1HNXPGlc41zZqNISqFYAU+8Bs+5NtX1j3dSLPt+seg+PT/fQ74hw1Wnu8m8UlNvoYEgr3po3h90g3NCjXzeduNfnyL8SVhb25wbSFYUPEwR+2XBiqrIIPuVPCMYCI6uvzcV7mSAR4zPEK0Htut0DUmn69Zcxkvhj4UC5UyuaDQNFn91BCxTFZafWr3Khgn5xh+KjP/roCrmsgwI7lYWABh8sfy1OXxHH6LfFQGvxJ+oL+Cnxdxxdp0B5koNL8MB5vd8O4XS73/H8t2mu+OcPNllE9CeE2Bw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=rzPmrfnypnTcXSOUzQP80L8x6QBskS0bYOPokj0QcqA=;
+ b=af7CVuViHBVqd2mfj+NtWxICtHJDd/40wV+LmNJHrxhNUVYTYqytr6OMEAjQcQOC7CQC2g28GeIECessouzsmGiLmAEFiqHsONbCFQgwONpzQS8ZkNXe/cG7CIGngtfnSN2lM7MBu60S2B6s+YVtFgITGwEUYHxHD0zBVnbUu4tvQu4WsmoTcHI2cRkqD4hzkZRs7wDeHeeFkPOVZOqfWFS2PszknkTYSTH+YyxrVmO+PqjI+HSgX5tzrEzpewsc7sSG7casgJXaWNGF6kB+q4MlVmiLDLMF8DFkOzcEAcTChL1x4Xy61p4LiCRa/6ypmzu070SfkCWg414bVjjeNQ==
+Received: from SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM (2603:10c6:10:297::10)
+ by ME0P300MB0716.AUSP300.PROD.OUTLOOK.COM (2603:10c6:220:22c::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27; Tue, 3 Sep
+ 2024 12:08:06 +0000
+Received: from SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM
+ ([fe80::14bc:d68f:122:f4f2]) by SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM
+ ([fe80::14bc:d68f:122:f4f2%4]) with mapi id 15.20.7918.024; Tue, 3 Sep 2024
+ 12:08:06 +0000
+From: Gui-Dong Han <hanguidong02@outlook.com>
+To: anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	baijiaju1990@gmail.com,
+	Gui-Dong Han <hanguidong02@outlook.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] ice: Fix improper handling of refcount in ice_sriov_set_msix_vec_count()
+Date: Tue,  3 Sep 2024 11:59:43 +0000
+Message-ID:
+ <SY8P300MB0460D0263B2105307C444520C0932@SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [/Or3ZIGSRQMGYPg027de5+660G9Qy58PF6tDioTmqRs=]
+X-ClientProxiedBy: SG2PR06CA0203.apcprd06.prod.outlook.com (2603:1096:4:1::35)
+ To SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM (2603:10c6:10:297::10)
+X-Microsoft-Original-Message-ID:
+ <20240903115943.8422-1-hanguidong02@outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V6 net-next 03/11] net: hibmcge: Add mdio and hardware
- configuration supported in this module
-To: Jijie Shao <shaojijie@huawei.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org
-Cc: shenjian15@huawei.com, wangpeiyang1@huawei.com, liuyonglong@huawei.com,
- chenhao418@huawei.com, sudongming1@huawei.com, xujunsheng@huawei.com,
- shiyongbang@huawei.com, libaihan@huawei.com, andrew@lunn.ch,
- jdamato@fastly.com, horms@kernel.org, jonathan.cameron@huawei.com,
- shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240830121604.2250904-1-shaojijie@huawei.com>
- <20240830121604.2250904-4-shaojijie@huawei.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240830121604.2250904-4-shaojijie@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SY8P300MB0460:EE_|ME0P300MB0716:EE_
+X-MS-Office365-Filtering-Correlation-Id: 46464ae1-4501-4a36-4cef-08dccc111172
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|19110799003|5072599009|461199028|8060799006|15080799006|3412199025|440099028|1710799026;
+X-Microsoft-Antispam-Message-Info:
+	IXMScY3PZE1T2+UpKP3SetFbyDG7kA+TflI3OLqMHLcmYDB47AInJo8IthheYfltCDrquj7+dD03xY7faqpltut4zA1G4yjq27Wb18Euf2KZTPAGGLgaLjCb3v5r/UpmjmDAHHxfzbhhXaA5/k5twRZVt8iuEns5hyPhUqEcPXZ5OGth4PH5EYsEGtdNxxqIpnqMrn+2jfbfhbp83w0+K8BZswXAtmLZn9Pt/Vn/kRrpyuph+KxidaSOvp1+1YqzDBUGNxHTg7dmd2ghPekZ74hVYv0KVZ8kB+xkABFZUaxyslVsf8D2fLBMrSa4kEBdAGeN4DI9HzooRbv+QRx6siDRVqW7IRM+bhGet2nOhwEZIC6jKNj/yFbgU5KYkgDWIx/sEH/2vifwmpmh7GgTHZivI+4UR9DQufnXsrjAu9zdL1DfK4oP6Ux2cDLlDDV2Jm3NsBnXs4rZ8bl37lcxcpe+MZiSZC/Mnoek6W6N2tT7h7AtFdG3BnSgc26uq8R/GT8+cptZWg4pj0YC3pGtYV0iLC8Uh4p0xW7dOuN6i3JzXiXNmERYpeHXh765ExO4WWuUv2O9CG1fgyxgEq6nqGWtZ6Vb3vivJrfcf4pYdBEHWN3OF1/grC3TITVydreeKwLwoRz5+AvaEOTtPRUE4av8P7hgfhAs3btxkfLUPM9bUvv5lRHFjnPSv6YMk3NcvkSwAoSvcyfeiAjmzZFvx3lvLV8UIbjZqqTgoUTptL8=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?9WWwcWEsahlxARVjlTOGXA6uDPE6GlRfRy6OoRz15mhc37ms1hvH+ZdRDR+u?=
+ =?us-ascii?Q?cRC+8FweK45auvaSdJH2GgZPOLd6Kxsx15fDljwIs42swnOZcrNve/iSKe3a?=
+ =?us-ascii?Q?FKHb16ZJVZZpy/TxGKW1SZgpI8UIK01Jt/wA7jXVxgQUdLB2buiCEnpejF4d?=
+ =?us-ascii?Q?4VpbJeRZiV78HQm8FeuQ1s46DKytZwabydxptfR9yOHVgWC/6tMcv/WYpJRS?=
+ =?us-ascii?Q?BzDrHgZeEhA/eJq1GJc5nELDl3Qw5bDb90WPoGe5q4JFZmMMdbVKVTdfJU92?=
+ =?us-ascii?Q?rdHSolNkaXuuKHzNTJiefViUJOz85S395jpYzrGu6y+AhGAShjlEdYe+wBXl?=
+ =?us-ascii?Q?iVSj0LhplQc6mWGxRUbzJhe7ZAmwlwPHvRPQ+eXYw8e4Q9VsUU5DI2swHzdE?=
+ =?us-ascii?Q?DXXGpSvAjm98u1hS2PJXA9zNrwIgNYEbXZChePXNk2WzpoYxLFXAqOzHmxnJ?=
+ =?us-ascii?Q?sce/7bKtCzt79NL6vO7HPMd5GxqDLjZT2KF/B3tnwaQIVEBxgXXVys5O3OOQ?=
+ =?us-ascii?Q?n/tI2QrbwJn/EhUVZgsVzvJ9ndZjEsT1U3QKegzDur9B+izBAX1ccMV0PEtv?=
+ =?us-ascii?Q?2oZSGi2BYbV+2ghm7XHj7hKGrAeB3mT/PAR14wMmlakkMnyERYFCnhGRgOug?=
+ =?us-ascii?Q?y8a/0TpXbrh055+9Q1wwb3iUu77q8FYKrjwiJw49GthHuIuT1gv81VnFdJrm?=
+ =?us-ascii?Q?K0F5F+3ecFxZZ18Ovxf5wAet3q1C7olhSFrFRmrZ6RWJox1fTffnlHBFlGsf?=
+ =?us-ascii?Q?afFszeZI/Ecq46F9zFIpTqs3jn1AafOPzPrkCV5lHBjUR5bunpzdMyki9/GZ?=
+ =?us-ascii?Q?gz34vfaZ0ri8wYIqmg6TO48kmkXY4bPiprrahaPyiXW1qapNqy2nlyv0bqO4?=
+ =?us-ascii?Q?X4BlkqnbL+JO8srS45T9hKOUCG8lODoxQacYngY8cVdq/lofVwb0+/CKyz8p?=
+ =?us-ascii?Q?vjZa0Qx3Co+wPcIeGfyzgvEfIFCOjQRKOVBjzd747bbJh1HCcdqi8cGstJuO?=
+ =?us-ascii?Q?jj9KsVEqwiYOjKFquZeVWLdaIwIIZtfEeqxvCYzGkRjY6VOzRe/1PRUxRGGx?=
+ =?us-ascii?Q?MTb6C83pPyr25hZQe8N9zdRXxgBfdtBRgS1VBbIPrRzIrnZDQIoL+My8LY1X?=
+ =?us-ascii?Q?WB91soKdJ/eQo4KcJbksppB58bIQHajc2Z8qMSZWwRIQSeQCdMDbYzfZkyrr?=
+ =?us-ascii?Q?WmrueBBPLcd2+bVLjaARC8u/KKOqceQcSDYRap+fSHfp9rj4i1jjgjf28d/O?=
+ =?us-ascii?Q?QbE704EEsfhymYIPzclR?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46464ae1-4501-4a36-4cef-08dccc111172
+X-MS-Exchange-CrossTenant-AuthSource: SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2024 12:08:06.0582
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: ME0P300MB0716
 
-On 8/30/24 14:15, Jijie Shao wrote:
-[...]
-> +static int hbg_mdio_wait_ready(struct hbg_mac *mac)
-> +{
-> +#define HBG_MDIO_OP_TIMEOUT_US		(1 * 1000 * 1000)
-> +#define HBG_MDIO_OP_INTERVAL_US		(5 * 1000)
+This patch addresses an issue with improper reference count handling in the
+ice_sriov_set_msix_vec_count() function.
 
-Minor nit: I find the define inside the function body less readable than 
-placing them just before the function itself.
+First, the function calls ice_get_vf_by_id(), which increments the
+reference count of the vf pointer. If the subsequent call to
+ice_get_vf_vsi() fails, the function currently returns an error without
+decrementing the reference count of the vf pointer, leading to a reference
+count leak. The correct behavior, as implemented in this patch, is to
+decrement the reference count using ice_put_vf(vf) before returning an
+error when vsi is NULL.
 
-> +
-> +	struct hbg_priv *priv = HBG_MAC_GET_PRIV(mac);
-> +	u32 cmd;
-> +
-> +	return readl_poll_timeout(priv->io_base + HBG_REG_MDIO_COMMAND_ADDR, cmd,
-> +				  !FIELD_GET(HBG_REG_MDIO_COMMAND_START_B, cmd),
-> +				  HBG_MDIO_OP_INTERVAL_US,
-> +				  HBG_MDIO_OP_TIMEOUT_US);
-> +}
+Second, the function calls ice_sriov_get_irqs(), which sets
+vf->first_vector_idx. If this call returns a negative value, indicating an
+error, the function returns an error without decrementing the reference
+count of the vf pointer, resulting in another reference count leak. The
+patch addresses this by adding a call to ice_put_vf(vf) before returning
+an error when vf->first_vector_idx < 0. 
 
-[...]> +static void hbg_phy_adjust_link(struct net_device *netdev)
-> +{
-> +	struct hbg_priv *priv = netdev_priv(netdev);
-> +	struct phy_device *phydev = priv->mac.phydev;
+This bug was identified by an experimental static analysis tool developed
+by our team. The tool specializes in analyzing reference count operations
+and identifying potential mismanagement of reference counts. In this case,
+the tool flagged the missing decrement operation as a potential issue,
+leading to this patch.
 
-Minor nit: please respect the reverse x-mas tree order
+Fixes: 4035c72dc1ba ("ice: reconfig host after changing MSI-X on VF")
+Fixes: 4d38cb44bd32 ("ice: manage VFs MSI-X using resource tracking")
+Cc: stable@vger.kernel.org
+Signed-off-by: Gui-Dong Han <hanguidong02@outlook.com>
+---
+v2:
+* In this patch v2, an additional resource leak was addressed when
+vf->first_vector_idx < 0. The issue is now fixed by adding ice_put_vf(vf)
+before returning an error.
+  Thanks to Simon Horman for identifying this additional leak scenario.
+---
+ drivers/net/ethernet/intel/ice/ice_sriov.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-Thanks,
-
-Paolo
+diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
+index 55ef33208456..fbf18ac97875 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sriov.c
++++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+@@ -1096,8 +1096,10 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
+ 		return -ENOENT;
+ 
+ 	vsi = ice_get_vf_vsi(vf);
+-	if (!vsi)
++	if (!vsi) {
++		ice_put_vf(vf);
+ 		return -ENOENT;
++	}
+ 
+ 	prev_msix = vf->num_msix;
+ 	prev_queues = vf->num_vf_qs;
+@@ -1142,8 +1144,10 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
+ 	vf->num_msix = prev_msix;
+ 	vf->num_vf_qs = prev_queues;
+ 	vf->first_vector_idx = ice_sriov_get_irqs(pf, vf->num_msix);
+-	if (vf->first_vector_idx < 0)
++	if (vf->first_vector_idx < 0) {
++		ice_put_vf(vf);
+ 		return -EINVAL;
++	}
+ 
+ 	if (needs_rebuild) {
+ 		ice_vf_reconfig_vsi(vf);
+-- 
+2.25.1
 
 
