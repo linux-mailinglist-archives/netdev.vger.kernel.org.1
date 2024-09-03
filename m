@@ -1,140 +1,123 @@
-Return-Path: <netdev+bounces-124556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A9F969FAC
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:01:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C9BA969FB7
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:03:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 253FA1F25342
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:01:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 764EFB2543C
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:03:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D001383A5;
-	Tue,  3 Sep 2024 14:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA991EB21;
+	Tue,  3 Sep 2024 14:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=martyn.welch@collabora.com header.b="T8IavOfe"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CGL7FdCJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o12.zoho.com (sender4-op-o12.zoho.com [136.143.188.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69ACE364BC;
-	Tue,  3 Sep 2024 14:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725372084; cv=pass; b=NEiKFyPq1iEDJg7xnFJry7QmFstWZrZsvHjT+AiPC9UaGcm5D1sictIbjcNOp/f37Qyvz7s688w39hbcGv3jmG4wOYXWqwzK80AX6ZDZPna9GSM3o62tp/hazzABsZEKXhfc2pBC/mgEZzeO2z/47D8Mn3+/s2R0pUd3ju5vQGM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725372084; c=relaxed/simple;
-	bh=DgKxU7ymeyfOn8smC+a1eI8FG8Ya+bjC3XbwIbFlPW8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=heMtNGEA17mjfMXzZgkFz2HCgJbany7HnSv02fY41u6U1xOjcJaR/bKz4QHeW+m6KEIBJRHrqZVQEEGTCxnr9TQrVeSVlQHXTx8Xd0zjjbWOQPmxVuum2TZ75mlRy1Fju9uDxXYxhEAH2s7+iGGe6TqWmNHUex8O4KYCRxn9r14=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=martyn.welch@collabora.com header.b=T8IavOfe; arc=pass smtp.client-ip=136.143.188.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-Delivered-To: kernel@collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1725372052; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=jRDM+URDR9uwOmWNvoFX5gNWeDHB2mlFa8lxqT5+BqHKd5gH1/ET2RzteklqT6gUMllBtOnEKhbEXHgilyIoHCQS4o6rJtcpsAEDJ2jjzTs18whMloAbBjib3A4W+fKLOhoyQqDwCbMZuPHm31ElMQoPX9srIRJvbSnqQg3xsx8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1725372052; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=B3X7/BScnuaQ5QIic6vas4I7lF55wl7Aex0QV6b1zjA=; 
-	b=FtWnMeyyyw1il1g48Jw+eZyB+f1o+5udDFtzZAihGuvA/wvnbgrNKLAowasYLX3P8juVlvEYPeiEBXTRt6fR/PENQi3apZ5s4PRh4sJoFOQKydTT2SpIjFmWVtFhpZi2jXrx8hbE/bL3clhV0VqagEHKwj0Qzu71X+7kXMrb8qI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=martyn.welch@collabora.com;
-	dmarc=pass header.from=<martyn.welch@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1725372052;
-	s=zohomail; d=collabora.com; i=martyn.welch@collabora.com;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=B3X7/BScnuaQ5QIic6vas4I7lF55wl7Aex0QV6b1zjA=;
-	b=T8IavOfespJk1awZh/FhBdD7tDA9xoyNL+wYPwGUCA5+9q17wAaoCmpZwuKEWbhg
-	1PvlP4tsy53JIKD+DvvQpIxrcobF1//jNwBd4xtncM/dmXtB/3Hb/fGWOBSlYlO7Ts9
-	jTcpxM0PNYYam5SWT7OfDiCP4faZFAXHr+u2z4aM=
-Received: by mx.zohomail.com with SMTPS id 1725372050874491.02003731810225;
-	Tue, 3 Sep 2024 07:00:50 -0700 (PDT)
-Message-ID: <c47861dae9d339b9033ed71c45160009a7464888.camel@collabora.com>
-Subject: Re: [PATCH] net: enetc: Replace ifdef with IS_ENABLED
-From: Martyn Welch <martyn.welch@collabora.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Claudiu Manoil	
- <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>
-Cc: kernel@collabora.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Tue, 03 Sep 2024 15:00:47 +0100
-In-Reply-To: <ecd830fe-28a8-4995-b4d3-fa4e5312b305@linux.dev>
-References: <20240830175052.1463711-1-martyn.welch@collabora.com>
-	 <ecd830fe-28a8-4995-b4d3-fa4e5312b305@linux.dev>
-Organization: Collabora Ltd.
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.53.2-1 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE08E1E505
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 14:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725372180; cv=none; b=h1DxZy0qSBh/0KutIMHfU1KfZuikYZEm2sTmxSy2rt2MDJqKGpqfbqLyt2CR0DBJqBoSZDMuTgU98MYI5+kTvgS5lPnO4Lwq8/5oWQ9lA4CzPmQD9LviE4zfao422uVRkQ76nkxJ3PE4X9sJL5OhjHo+mCJY699cuvBK/+hBSEs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725372180; c=relaxed/simple;
+	bh=KbVX5/WJLt/Z0+uhwnKhCH5C1tCBFTeakpeppFQXWBU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q3f5rJBWZ2ammm9Un/uPHeXnCY8OuVLzBMkN5a0Vx1Z/YpE5xpzYIfGnBZMGGG0TkBfxhK8wTnBMOtldG1vEn4/2oPurgO60EZMA1rBWzqGqQKkD30oRsRX4kSsAv27omcW4xqrQzxi3xJeXTIIU+00wG5zBntozKovsbfNn1HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CGL7FdCJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725372177;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1T7shADQQm1E7ZhQRMDcUIIeoOERk2k982scWhmF05E=;
+	b=CGL7FdCJsmnR6SZWa7udfltvA29PTsXwLsiowBhg4B55ild45irmPh3u2306YoN96L+/89
+	h7j/r6UfdMLLVNha7GzI9CTXMqNfXn8nJNfATH8p6QGoohfos8IJXW0iYSXt5XvhCoP/Sz
+	N1w6B2s3IToapPCiA53gzS7Ab9dYe8w=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-5-emd3evQUMxOOMSu43ma5_A-1; Tue, 03 Sep 2024 10:02:50 -0400
+X-MC-Unique: emd3evQUMxOOMSu43ma5_A-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42bb5950d1aso60944605e9.2
+        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 07:02:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725372165; x=1725976965;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1T7shADQQm1E7ZhQRMDcUIIeoOERk2k982scWhmF05E=;
+        b=K8UNve9f9U3def21vd2H61f2HnOeOwNl0n15oHBu/tHDBMj6oK3TKkR+KUE9uKYlBj
+         QeMVfoOzAriEU9Z0yScJCh2ocW10pvHhhMveMLZKHwpwG58uyfjkAFkv1dDn1q+nFfEx
+         3h4lFd1SYyJGS5rF+JTt67GziXqDW6mO6097Igy/0YcsJ0ahiJBhfYqNHI4IclAUoDCB
+         3auPp4XsDVMMxRY/lJ9xduL2po6ms4/WEf8uDeLcoL5IyzYPb2k/ilthtdi72ylAOV7R
+         WO/JSikoIx8SGDFQ2Zty7jlcfG3iMCBZExdHnKamZsO38IB3t+qCmyBx1DN1Tadvlg6z
+         TNdg==
+X-Forwarded-Encrypted: i=1; AJvYcCWjDACF+W7ALVz7ZSYkA7Mh9mcENvTj+HbZLBKEcvW4Ko2GL3VqRxcAxenbcsUTEDmpMCs0Y2o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWrrcTiwX3uJLk10KP8wqmeljMOII6llhn+Tf7i0eOH03kyl43
+	zXt+y0x32fBpIOURh48eqFT8lD7m9VGl4RTFNOJFzKpSKLraNvn2tUuXiZxaK+cRf98seiIFjKn
+	1jPRrY34hZvutgQd0ijMMXBS0nffII6boTK4DT72ioL0nKFg9pJ4bKQ==
+X-Received: by 2002:a5d:5c87:0:b0:374:c8eb:9b18 with SMTP id ffacd0b85a97d-374c8eb9b69mr5013541f8f.24.1725372164309;
+        Tue, 03 Sep 2024 07:02:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGG+gCA4emCQ8lN+v2r+4PD0Xf7gtP5260Hobybyq26ysa18Yk2eN574I3dEkpcvY9bhrHY7Q==
+X-Received: by 2002:a5d:5c87:0:b0:374:c8eb:9b18 with SMTP id ffacd0b85a97d-374c8eb9b69mr5013434f8f.24.1725372163170;
+        Tue, 03 Sep 2024 07:02:43 -0700 (PDT)
+Received: from [192.168.88.27] (146-241-55-250.dyn.eolo.it. [146.241.55.250])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ee9ba8esm14372770f8f.50.2024.09.03.07.02.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Sep 2024 07:02:42 -0700 (PDT)
+Message-ID: <c5658b79-f0bc-4b34-b113-825f40a57677@redhat.com>
+Date: Tue, 3 Sep 2024 16:02:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 5/5] ethernet: cavium: Replace deprecated PCI functions
+To: Philipp Stanner <pstanner@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+ Wu Hao <hao.wu@intel.com>, Tom Rix <trix@redhat.com>,
+ Moritz Fischer <mdf@kernel.org>, Xu Yilun <yilun.xu@intel.com>,
+ Andy Shevchenko <andy@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Damien Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>,
+ John Garry <john.g.garry@oracle.com>, Chaitanya Kulkarni <kch@nvidia.com>
+Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20240902062342.10446-2-pstanner@redhat.com>
+ <20240902062342.10446-7-pstanner@redhat.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240902062342.10446-7-pstanner@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 2024-09-02 at 10:21 +0100, Vadim Fedorenko wrote:
-> On 30/08/2024 18:50, Martyn Welch wrote:
-> > The enetc driver uses ifdefs when checking whether
-> > CONFIG_FSL_ENETC_PTP_CLOCK is enabled in a number of places. This
-> > works
-> > if the driver is compiled in but fails if the driver is available
-> > as a
-> > kernel module. Replace the instances of ifdef with use of the
-> > IS_ENABLED
-> > macro, that will evaluate as true when this feature is built as a
-> > kernel
-> > module.
-> >=20
-> > Signed-off-by: Martyn Welch <martyn.welch@collabora.com>
-> > ---
-> > =C2=A0 drivers/net/ethernet/freescale/enetc/enetc.c=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 8 ++++----
-> > =C2=A0 drivers/net/ethernet/freescale/enetc/enetc.h=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 4 ++--
-> > =C2=A0 drivers/net/ethernet/freescale/enetc/enetc_ethtool.c | 2 +-
-> > =C2=A0 3 files changed, 7 insertions(+), 7 deletions(-)
-> >=20
-> > diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c
-> > b/drivers/net/ethernet/freescale/enetc/enetc.c
-> > index 5c45f42232d3..276bc96dd1ef 100644
-> > --- a/drivers/net/ethernet/freescale/enetc/enetc.c
-> > +++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-> > @@ -977,7 +977,7 @@ static int enetc_refill_rx_ring(struct
-> > enetc_bdr *rx_ring, const int buff_cnt)
-> > =C2=A0=C2=A0	return j;
-> > =C2=A0 }
-> > =C2=A0=20
-> > -#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
-> > +#if IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)
-> > =C2=A0 static void enetc_get_rx_tstamp(struct net_device *ndev,
-> > =C2=A0=C2=A0				union enetc_rx_bd *rxbd,
-> > =C2=A0=C2=A0				struct sk_buff *skb)
-> > @@ -1041,7 +1041,7 @@ static void enetc_get_offloads(struct
-> > enetc_bdr *rx_ring,
-> > =C2=A0=C2=A0		__vlan_hwaccel_put_tag(skb, tpid,
-> > le16_to_cpu(rxbd->r.vlan_opt));
-> > =C2=A0=C2=A0	}
-> > =C2=A0=20
-> > -#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
-> > +#if IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)
-> > =C2=A0=C2=A0	if (priv->active_offloads & ENETC_F_RX_TSTAMP)
-> > =C2=A0=C2=A0		enetc_get_rx_tstamp(rx_ring->ndev, rxbd, skb);
->=20
-> I believe IS_ENABLED can go directly to if statement and there should
-> be
-> no macros dances anymore. You can change these lines into
-> 	if (IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK) &&
-> 	=C2=A0=C2=A0=C2=A0 priv->active_offloads & ENETC_F_RX_TSTAMP)
->=20
-> The same applies to other spots in the patch.
->=20
+On 9/2/24 08:23, Philipp Stanner wrote:
+> pcim_iomap_regions() and pcim_iomap_table() have been deprecated by
+> the PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+> 
+> Furthermore, the driver contains an unneeded call to
+> pcim_iounmap_regions() in its probe() function's error unwind path.
+> 
+> Replace the deprecated PCI functions with pcim_iomap_region().
+> 
+> Remove the unnecessary call to pcim_iounmap_regions().
+> 
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 
-Thanks, v2 on the way....
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-Martyn
 
