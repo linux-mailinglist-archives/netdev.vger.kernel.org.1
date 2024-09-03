@@ -1,101 +1,112 @@
-Return-Path: <netdev+bounces-124420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F3BE9695EF
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:46:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4A7596966E
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:02:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B872B212FD
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 07:46:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0643281053
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 08:02:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CB31D6DBC;
-	Tue,  3 Sep 2024 07:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CB41D54D3;
+	Tue,  3 Sep 2024 08:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v3Jw46/E"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00861CDFCD;
-	Tue,  3 Sep 2024 07:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD6815573A
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 08:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725349604; cv=none; b=N40BoYTvwUOpf2fcQnsMyfcmbPZWfwRSoLEmjev49WDyS5aeUUwGnsslvikPGxTRE/S8N1JRcznWBtRSJTmQMmNAj5o20NfBPTZI42DcS/4/WT/WZXf2njXyQZC0UhJz1v/q/Vv0jg7k42ZMBMQ6OJ7UQetXKSTQNI2b3va6nFs=
+	t=1725350561; cv=none; b=DpfvzOhLneKtpENjCKr13eW9M1PpI0B67isPGTQZDwSZeDd0rRpcDqCklOyWD7b80QiW+x2mEJHnwXDkpyPaSP/eghctLc3SFjycM4cANaAzRxxnZTc87ztXCUPhUepkN+Km9cye6BJzMAtA5EVH0MZ7keEhOmOYZmY/vz4+OLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725349604; c=relaxed/simple;
-	bh=gT5AzO0UNM6QTElViqcBqC42ZSFImmjwiORhutd450Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rO+QfJue6a3e5ELktPdn/bLzRuSav3f5RPRDPgcEj/EWQEmgB3nPH3P1vJ3Aba7SzIwcZNljQW9Wi965c+mbPfpVi3nOfUnRNznGmu980hPMSqBfQi7qjekrjbihsGFYJkViMyeprcfW9jkEe3vtA22JcU2DY1p9GzddUlsn/jk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost (unknown [124.16.138.129])
-	by APP-03 (Coremail) with SMTP id rQCowADX947WvtZmGIfAAA--.44837S2;
-	Tue, 03 Sep 2024 15:46:32 +0800 (CST)
-From: Chen Ni <nichen@iscas.ac.cn>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Chen Ni <nichen@iscas.ac.cn>
-Subject: [PATCH] selftests: net: convert comma to semicolon
-Date: Tue,  3 Sep 2024 15:45:19 +0800
-Message-Id: <20240903074519.781224-1-nichen@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1725350561; c=relaxed/simple;
+	bh=k9n4C0oZYeBWDhcob07knRQNHHDONQqXi2UEnyIap+E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FkZo1b343fwtpR9B5odpMfFiDpA0BY5fwVCNFFgJ3haRdNMwjNRni/FsM6N+Bmsg7rzqhDPvqkMNv0fC62a7Xl+yjjWVjH4xwo7yUXW3LGwUqpnZOCin17+YEP/pXTR9WicSlYO0Z01/ltaPV2sCLYsP7FnOtg3P5ZSNzYLSM30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=v3Jw46/E; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-42bb4f8a4bfso26803435e9.1
+        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 01:02:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1725350558; x=1725955358; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WaDZMPlhusgv+D7EkN0Bnlr03mHZskDfKHQFtMBCp4o=;
+        b=v3Jw46/EG12E0rchRBbkiNOD0kNofhghClC2ENoF7rE6cci71d2IiBD/E9M/uACrtj
+         RNXuWEtvwaDSEutF5YgLSSx/ttGILQtC9pP+LU2uKWokJizeW6vA6PBcvbpJ8xviYl1z
+         L3WNJ2wy0PVemXccokOK/WP1pFrhkx1jvey/jbj5KG/vgcpU7eHGHu/ysbkzt8mB8xGp
+         DTay84knH/FO1IaOUOsKp6J3pTX0+CgxfQjsrlroNqUgK5WDw+zx6GggyfTkbgSS7RTF
+         +lhjDURVpVa4p1ksjjwtOFm1QQLoAyqPDiCvMw16aojQWyfaBVLnBMchiw11jiYykG9/
+         MZyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725350558; x=1725955358;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WaDZMPlhusgv+D7EkN0Bnlr03mHZskDfKHQFtMBCp4o=;
+        b=cKXsC6uumgcYjEcPAL4wr2i/orPoiS7mw+1ZlFYZRSiK57X5CnCO9WcZTtqVpM1VZH
+         YDuRUFKyZ4DnpPbec4AFPvq1xTcNlFSpM/EhTPv4ZjJWSEJ5CopmjmbvP8jT6PDAa6e2
+         ghGl730fAffnQkGFLbfcrAJDwtRUp/reij76GILSy43HHjEmtatpCCqYaM3PagXg90Dp
+         KnDaiFy4pVnI9Lv/TtNZMb7KuJJFzq12Ls72jlVqrh9e9kS9d3Os6ORasdz04+j2tGes
+         Od/kxfvmmlqOFt52gq+NWcTbnyFE/KzdYCRmBfh72pOwLfctAapS3/peaec3i4rinDP/
+         TwqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWSlek8PaGalDiyXSj1jiAn6yimSMnGWmuIeu0yVkQAsuImh2hV6sl24SZVjFoD6yHsoQOw75I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwGzhOO60Z6mKwhqmAsln1GFj6oY41XN/mvGGfEt02O9bBBkZCo
+	ZgeuUZ9UmMi6Y2Dx6+EtASujzw3r8U3Q7QD9/oZ8Sr4o+3EdT06MeE0NfC3UOtk=
+X-Google-Smtp-Source: AGHT+IH6ywIVrbCarewFxpSi+q748WVruJR6oGhogvAuoGcgYd3YXzYkagFJrlFQa5K3pVSwc8RSng==
+X-Received: by 2002:a05:600c:1c83:b0:424:8dbe:817d with SMTP id 5b1f17b1804b1-42bb4c5e500mr98478905e9.10.1725350557604;
+        Tue, 03 Sep 2024 01:02:37 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bbc87773fsm125707815e9.0.2024.09.03.01.02.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Sep 2024 01:02:37 -0700 (PDT)
+Date: Tue, 3 Sep 2024 11:02:32 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: James Chapman <jchapman@katalix.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, dsahern@kernel.org, tparkin@katalix.com,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH net-next] l2tp: remove unneeded null check in
+ l2tp_v2_session_get_next
+Message-ID: <332ef891-510e-4382-804c-bc2245276ea7@stanley.mountain>
+References: <20240902142953.926891-1-jchapman@katalix.com>
+ <20240903072417.GN23170@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowADX947WvtZmGIfAAA--.44837S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Jw4UZF15Zr47JF43ZrWfAFb_yoWDJFcEya
-	nrtw1kAFs8Zr1vyF17Wa1Y9rn5A3ZrCrnrGF1kKF13tr1UAFy5ZFnY9w1DJFy8W390kFy3
-	Za17JryfK3409jkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbsxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r126r1DMcIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q
-	6r43MxkIecxEwVAFwVW8CwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
-	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
-	wI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjx
-	v20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
-	jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0x
-	ZFpf9x0JUSZXrUUUUU=
-X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240903072417.GN23170@kernel.org>
 
-Replace a comma between expression statements by a semicolon.
+On Tue, Sep 03, 2024 at 08:24:17AM +0100, Simon Horman wrote:
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Closes: https://lore.kernel.org/r/202408111407.HtON8jqa-lkp@intel.com/
+> > CC: Dan Carpenter <dan.carpenter@linaro.org>
+> > Signed-off-by: James Chapman <jchapman@katalix.com>
+> > Signed-off-by: Tom Parkin <tparkin@katalix.com>
+> 
+> And as you posted the patch, it would be slightly more intuitive
+> if your SoB line came last. But I've seen conflicting advice about
+> the order of tags within the past weeks.
 
-Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
----
- tools/testing/selftests/net/psock_fanout.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+It should be in chronological order.
 
-diff --git a/tools/testing/selftests/net/psock_fanout.c b/tools/testing/selftests/net/psock_fanout.c
-index 1a736f700be4..4f31e92ebd96 100644
---- a/tools/testing/selftests/net/psock_fanout.c
-+++ b/tools/testing/selftests/net/psock_fanout.c
-@@ -165,9 +165,9 @@ static void sock_fanout_set_ebpf(int fd)
- 	attr.insns = (unsigned long) prog;
- 	attr.insn_cnt = ARRAY_SIZE(prog);
- 	attr.license = (unsigned long) "GPL";
--	attr.log_buf = (unsigned long) log_buf,
--	attr.log_size = sizeof(log_buf),
--	attr.log_level = 1,
-+	attr.log_buf = (unsigned long) log_buf;
-+	attr.log_size = sizeof(log_buf);
-+	attr.log_level = 1;
- 
- 	pfd = syscall(__NR_bpf, BPF_PROG_LOAD, &attr, sizeof(attr));
- 	if (pfd < 0) {
--- 
-2.25.1
+People generally aren't going to get too fussed about the order except the
+Signed-off-by tags.  Everyone who handles the patch adds their Signed-off-by to
+the end.  Right now it looks like James wrote the patch and then Tom is the
+maintainer who merged it.  Co-developed-by?
+
+regards,
+dan carpenter
 
 
