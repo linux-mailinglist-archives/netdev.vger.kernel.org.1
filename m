@@ -1,151 +1,153 @@
-Return-Path: <netdev+bounces-124469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E939969933
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 11:36:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3595969943
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 11:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCD071F24760
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:36:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 719D7286439
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6838F1A0BC4;
-	Tue,  3 Sep 2024 09:35:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="QED1hweB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB0E71A0BE9;
+	Tue,  3 Sep 2024 09:38:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C8F1A0BC0;
-	Tue,  3 Sep 2024 09:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF411A0BC8
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 09:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725356127; cv=none; b=j9EZeQu6WvIpPeY29EHkACPpFbI+J1/160e5zyYaS28R04AdGsxatZRsQBpoBI2p8XwkGdfkQK/508JfJGWg5uWKLT+L6K10Hf2VBjf5o3yN5OS3GHKNcTH5AGnNjl3iAnrGIc7fM8+FNJ/KpFwrRdCP+FxFe1JeNmeMkMjZhho=
+	t=1725356300; cv=none; b=T0fumQst8PooXd1VuTQxoacAR8ZO72PlvLkWYt8IV6rCdQRQINC7EjDzcJPpdRPVe1erKbHtzuwPmMwq0k6Nmoe8zc/RGfJ/8/jNpYMS9HN9Hm3KPBD4Y8INZ8c/GOzFjS6xA2H+DqCBiURM5BT5+XmbfKJEMaV7BcDMKA/7/8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725356127; c=relaxed/simple;
-	bh=NlJ0ok5/WTY0rjvSQ6ryf27KtWkA3GAi9vyHrt6i/uc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=NFVcxINGg/3mBMIhRfD4709LvbvlYcf9FRxXdrssxStdu9RggEXos/apvx5mCRDqGlRc4byHZgZXbMmMcMtFnOACSbvfKaTO22vSpZs8OVnV9uGPah0RGJ+wry2w8d6jaGzhu4UZ+TSA/8W9hSh3Gv71BtcZa0OsGAZrTQPaCXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=QED1hweB; arc=none smtp.client-ip=198.47.19.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4839Z43Y033472;
-	Tue, 3 Sep 2024 04:35:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1725356104;
-	bh=vSpGKNFSCjxGWWfQk+ywct1ygSfy18oACBNzhjz25kQ=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=QED1hweBsvC7OpvGw7NZC7GArMRWqVvZKfxO7vQmpXqbIw+R3ZC0d22Pb6HOqreK6
-	 9SBNkSMheVeN1fBm6+Jbi5uaqY9s3Ns15MmDkMqlbUIQTqaKhASc9zg0j2FVWW8DbH
-	 RoX3uuFgUQFK3GZMwId0uyPCiyzGGVetvihWMO9Y=
-Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4839Z4wA032322
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 3 Sep 2024 04:35:04 -0500
-Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 3
- Sep 2024 04:35:04 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 3 Sep 2024 04:35:03 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4839Yw6c067459;
-	Tue, 3 Sep 2024 04:34:58 -0500
-Message-ID: <5a2d24d6-ebfb-4633-8548-8e9bffbbfb48@ti.com>
-Date: Tue, 3 Sep 2024 15:04:57 +0530
+	s=arc-20240116; t=1725356300; c=relaxed/simple;
+	bh=5J6KdP2Oj9RJK48xtumgyC8tF7u+LNmkzQUFdbvZH08=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d9SobMvwCqQCsuhwB6ZhW4qVujd+FmyZodzo2csj1HVQPi9hOqPzr5cYCOD73fOancG9nFW/A5c69ryEs25lF4HdqURDBfo5UCBxJ4an3XcXJLDPSJwFEJuqh0UiooJGp4Up/sXsWXipzTyDAd7MvEor6hOup/di4ZjYZMQ0kjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-271-kutVcPASMXiW5EbXuE9tXA-1; Tue,
+ 03 Sep 2024 05:38:06 -0400
+X-MC-Unique: kutVcPASMXiW5EbXuE9tXA-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0D7331956064;
+	Tue,  3 Sep 2024 09:38:04 +0000 (UTC)
+Received: from hog (unknown [10.39.192.5])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 73B8030001A4;
+	Tue,  3 Sep 2024 09:37:58 +0000 (UTC)
+Date: Tue, 3 Sep 2024 11:37:56 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Bharat Bhushan <bbhushan2@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, jerinj@marvell.com,
+	lcherian@marvell.com, richardcochran@gmail.com,
+	bharatb.linux@gmail.com
+Subject: Re: [net-next PATCH v8 5/8] cn10k-ipsec: Add SA add/del support for
+ outb ipsec crypto offload
+Message-ID: <ZtbY9AF1fjUCcBOH@hog>
+References: <20240903045937.1759543-1-bbhushan2@marvell.com>
+ <20240903045937.1759543-6-bbhushan2@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/6] net: ti: icssg-prueth: Add support for
- HSR frame forward offload
-To: Andrew Lunn <andrew@lunn.ch>, "Anwar, Md Danish" <a0501179@ti.com>,
-        Roger
- Quadros <rogerq@kernel.org>
-CC: Roger Quadros <rogerq@kernel.org>,
-        Dan Carpenter
-	<dan.carpenter@linaro.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Javier
- Carrasco <javier.carrasco.cruz@gmail.com>,
-        Jacob Keller
-	<jacob.e.keller@intel.com>,
-        Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman
-	<horms@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>
-References: <20240828091901.3120935-1-danishanwar@ti.com>
- <20240828091901.3120935-4-danishanwar@ti.com>
- <22f5442b-62e6-42d0-8bf8-163d2c4ea4bd@kernel.org>
- <177dd95f-8577-4096-a3e8-061d29b88e9c@lunn.ch>
- <040b3b26-a7ef-47c7-845d-068a0c734e61@ti.com>
- <f2598368-745f-4a83-abfc-b9609ebff6b0@lunn.ch>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <f2598368-745f-4a83-abfc-b9609ebff6b0@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240903045937.1759543-6-bbhushan2@marvell.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+
+2024-09-03, 10:29:34 +0530, Bharat Bhushan wrote:
+> +static int cn10k_ipsec_validate_state(struct xfrm_state *x)
+> +{
+> +	struct net_device *netdev = x->xso.dev;
+> +
+> +	if (x->props.aalgo != SADB_AALG_NONE) {
+> +		netdev_err(netdev, "Cannot offload authenticated xfrm states\n");
+
+This should use extack, to return this information directly to the
+application that's creating the invalid config. You can propagate it
+from cn10k_ipsec_add_state down to this function, and then:
+
+    NL_SET_ERR_MSG_MOD(extack, "Cannot offload authenticated xfrm states");
 
 
+> +static int cn10k_ipsec_inb_add_state(struct xfrm_state *x)
+> +{
+> +	struct net_device *netdev = x->xso.dev;
+> +
+> +	netdev_err(netdev, "xfrm inbound offload not supported\n");
 
-On 02/09/24 6:32 pm, Andrew Lunn wrote:
->> Yes, and I have already added this in this series based on your feedback
->> on v2.
->>
->> I have one question though, in emac_ndo_set_features() should I change
->> these HSR related features irrespective of the current mode?
->>
->> AFAIK, if NETIF_F_HW_HSR_FWD is set, the forwarding is offloaded to HW.
->> If NETIF_F_HW_HSR_FWD is not set the forwarding is not offloaded to HW
->> and is done in SW.
->>
->> So, I don't see any need to enable this features if we are currently in
->> switch mode. Let me know what do you think. Should I still enable this
->> feature irrespective of current mode and later handle this in
->> prueth_hsr_port_link / unlink()?
-> 
-> The user should not need to know about the different firmwares. So i
-> would allow NETIF_F_HW_HSR_FWD at any time.
-> 
-> The exception would be, if you look at all the other drivers which
-> implement HSR offload, if they all return an error if the offloading
-> cannot be enabled, then you should do the same.
-> 
+Here too, extack.
 
-Andrew, I looked at xrs700x dsa and microchip ksz dsa driver as an
-example. The drivers return -EOPNOTSUPP whenever offloading is not
-possible in the xrs700x_hsr_join / ksz_hsr_join api. I think the same
-should be okay for ICSSG driver as well. ICSSG drivers equivalent API is
-prueth_hsr_port_link() where I will return -EOPNOTSUPP whenever
-offloading is not possible.
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static int cn10k_ipsec_outb_add_state(struct xfrm_state *x)
+> +{
+> +	struct net_device *netdev = x->xso.dev;
+> +	struct cn10k_tx_sa_s *sa_entry;
+> +	struct cpt_ctx_info_s *sa_info;
+> +	struct otx2_nic *pf;
+> +	int err;
+> +
+> +	err = cn10k_ipsec_validate_state(x);
+> +	if (err)
+> +		return err;
+> +
+> +	pf = netdev_priv(netdev);
+> +	if (!mutex_trylock(&pf->ipsec.lock)) {
 
-So in the .ndo_set_features() I will not add any check so that the user
-wouldn't know about the current firmware and whether offloading is
-supported or not. In the prueth_hsr_port_link() based on firmware
-limitation we will error out.
+Why not wait until we can take the lock? Failing to offload the state
+because this lock is temporarily busy isn't nice to users.
 
-Andrew, Roger, Let me know if this sounds good.
+> +		netdev_err(netdev, "IPSEC device is busy\n");
+> +		return -EBUSY;
+> +	}
+> +
+> +	if (!(pf->flags & OTX2_FLAG_IPSEC_OFFLOAD_ENABLED)) {
+> +		netdev_err(netdev, "IPSEC not enabled/supported on device\n");
 
-> 	Andrew
+You should also use extack in this function.
+
+
+[...]
+> +static void cn10k_ipsec_del_state(struct xfrm_state *x)
+> +{
+> +	struct net_device *netdev = x->xso.dev;
+> +	struct cn10k_tx_sa_s *sa_entry;
+> +	struct cpt_ctx_info_s *sa_info;
+> +	struct otx2_nic *pf;
+> +	int sa_index;
+> +
+> +	if (x->xso.dir == XFRM_DEV_OFFLOAD_IN)
+> +		return;
+> +
+> +	pf = netdev_priv(netdev);
+> +	if (!mutex_trylock(&pf->ipsec.lock)) {
+> +		netdev_err(netdev, "IPSEC device is busy\n");
+> +		return;
+
+If we can't take the lock, we leave the state installed on the device
+and leak some memory? That's not good. I assume we're going to reach
+HW limits if this happens a bunch of times, and then we can't offload
+ipsec at all anymore?
+
+I think it would be better to wait until we can take the lock.
 
 -- 
-Thanks and Regards,
-Danish
+Sabrina
+
 
