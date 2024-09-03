@@ -1,99 +1,129 @@
-Return-Path: <netdev+bounces-124660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B0E96A67C
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:28:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E5396A683
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:30:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A29991C241B0
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:28:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CEE01C24225
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B631917CE;
-	Tue,  3 Sep 2024 18:28:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1EB18E043;
+	Tue,  3 Sep 2024 18:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PTDHsxHl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jDyVMY+u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D277A188936;
-	Tue,  3 Sep 2024 18:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4E118BBAD;
+	Tue,  3 Sep 2024 18:30:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725388114; cv=none; b=E02GeagIDuQ5jGBmFWvxY6cJGl+RVf7jV14mtrFkeDgelzNRxQF9n2Lkz7EDgtJXFtE7qrQU/AzftVP6hVilT8ufv1SB3Z+ISlL+ZD4jslsKD/hbUixzvWidPX6c09WAmUsktaohNsMn56LHyct3VejVHChdyp/e2V8GyaKp/8o=
+	t=1725388251; cv=none; b=m4DPgQb7sx+O+d9g8DudMit0DoHjVv971v+yj/0CQ5j5rTWRXyomE3eDNxiyCutaMJ4SV52fxPfZgRGtPRD6PBvhZC22vKdb/KoJX2MDgY4sZpxIbZ05p0/41T4D7THdaF56csfx8V6YgTffkeMHOkcj/GGM5lLMuhMe+JeRVjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725388114; c=relaxed/simple;
-	bh=vI2bYW4z4lwdz3NmwDNGx5Rnf4p5mBY486fg1g3GR58=;
-	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
-	 Cc:Message-ID:Date; b=jJg4qEaKvVq6cKhWqDCS2EGKchGfoOLjsdzujhjkFpMsXOS32CH8C/AgAosspnpbfXfk30L0gd3hsef576pBimgkywUd/D0BVQ8e6bwxptl4K4R1xmdqncdwLRPLSj3hEEg/MQdGQRJTmG1HVq6sYgMiHKPhn5PYRt6fKoYphec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PTDHsxHl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 714C0C4CEC4;
-	Tue,  3 Sep 2024 18:28:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725388113;
-	bh=vI2bYW4z4lwdz3NmwDNGx5Rnf4p5mBY486fg1g3GR58=;
-	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
-	b=PTDHsxHl2wrUtC8QkmC4w7Ps3XyCQfh4f+9kQMNHZeGpa2vYu+ub60LDe8jDB2sYO
-	 WhgwuJoff0Ke2WjSNK+zkDUIOZ9o+DIWNw6lEJIO9xcgao6B8R5NDPeMCWSWfIFUT+
-	 JDkpWP6Uyj+7lvquU1gNK+4no9IY/sTZ9luUr4Qz7EIWWi/bT2eKXVJjyfCccuk3Eo
-	 8XJ/WBc207cqCJj8OjloFxJZSQsDgICkfSFEdCUtIBr/61ypA6qA1V7sU6hIg9F2Lv
-	 R8eD+yQD1OqB0+WyECc4ebL6WW8TAhjthzk/LstHr30PkbYv1WIA16Z4elS+2ll99R
-	 K5UWLW/OsgL3A==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725388251; c=relaxed/simple;
+	bh=quS9VeWupp1GQi0efBikj9gy/ekY2XGsx7F4kOK5muE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EQdrCcEaFByepg3KFNdbWW5EYa2vX2n7EUQ56pjHmwOBg8IIikzVW0/2VDnHAnk29BwiLyzJ6+g7gJWHjK0pDKYJrd7CRrISA1d6O9bL5J90WiHS4ULa18fQvEgSZNhRbhhN2x/92LWRMLa1aGG+uDFG6k1yAoYXgF92PfexY38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jDyVMY+u; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725388249; x=1756924249;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=quS9VeWupp1GQi0efBikj9gy/ekY2XGsx7F4kOK5muE=;
+  b=jDyVMY+ufVLhhP5Zuk7Mrvnq7UHSiYejy5Tl1uYgeuY96FX8+PnCWA9s
+   JipVpBsPlK7BrF/YOll1q0Y2Nht/HcF55rpaLr9VA2/FLzWFBFHTuVQBZ
+   jJKyZY0as3r8ZlSC7Xq9+9EtkUzDA7s76bp11/lL6/yQavrXmlZ9w6ZrB
+   HbgCp1d332+Gabxd5HuLYfhklmNYG0EtDq8PB2EqekcxpFAzIb70x23D3
+   cI6m1slYPyAuZE9F6Ar2s9SlVsMcW7IwAlu+C1CEGqZFOHhWep9im71sl
+   ckVHjTrx9yJHvj6dkEwfE2LJ5DdkDOAWHQXyRFdyIfoV1rCpmRLeDPamd
+   w==;
+X-CSE-ConnectionGUID: dpl2SNMmQwSuBBU3Pe9ogA==
+X-CSE-MsgGUID: MmqG5VZvQcOaDLZiakkqBA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="24146986"
+X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
+   d="scan'208";a="24146986"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 11:30:48 -0700
+X-CSE-ConnectionGUID: JR/UhkVNRS2GOAyf9Z6jsA==
+X-CSE-MsgGUID: 395M0Ah5Qsufe7Q29iblig==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
+   d="scan'208";a="88250209"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa002.fm.intel.com with ESMTP; 03 Sep 2024 11:30:48 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	larysa.zaremba@intel.com,
+	wojciech.drewek@intel.com,
+	michal.kubiak@intel.com,
+	jacob.e.keller@intel.com,
+	amritha.nambiar@intel.com,
+	przemyslaw.kitszel@intel.com,
+	sridhar.samudrala@intel.com,
+	maciej.fijalkowski@intel.com,
+	magnus.karlsson@intel.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	bpf@vger.kernel.org
+Subject: [PATCH net 0/6][pull request] ice: fix synchronization between .ndo_bpf() and reset
+Date: Tue,  3 Sep 2024 11:30:26 -0700
+Message-ID: <20240903183034.3530411-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v3 1/1] dt-bindings: net: wireless: convert
- marvel-8xxx.txt to
- yaml format
-From: Kalle Valo <kvalo@kernel.org>
-In-Reply-To: <20240820142143.443151-1-Frank.Li@nxp.com>
-References: <20240820142143.443151-1-Frank.Li@nxp.com>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
- Brian Norris <briannorris@chromium.org>,
- linux-wireless@vger.kernel.org (open list:NETWORKING DRIVERS (WIRELESS)),
- netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
- devicetree@vger.kernel.org (open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE
- BINDINGS), linux-kernel@vger.kernel.org (open list), imx@lists.linux.dev
-User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
-Message-ID: <172538810845.1029035.7505899712659095427.kvalo@kernel.org>
-Date: Tue,  3 Sep 2024 18:28:30 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 
-Frank Li <Frank.Li@nxp.com> wrote:
+Larysa Zaremba says:
 
-> Convert binding doc marvel-8xxx.txt to yaml format.
-> Additional change:
-> - Remove marvell,caldata_00_txpwrlimit_2g_cfg_set in example.
-> - Remove mmc related property in example.
-> - Add wakeup-source property.
-> - Remove vmmc-supply and mmc-pwrseq.
-> 
-> Fix below warning:
-> arch/arm64/boot/dts/freescale/imx8mp-beacon-kit.dtb: /soc@0/bus@30800000/mmc@30b40000/wifi@1:
-> failed to match any schema with compatible: ['marvell,sd8997']
-> 
-> Acked-by: Brian Norris <briannorris@chromium.org>
-> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
-> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+PF reset can be triggered asynchronously, by tx_timeout or by a user. With some
+unfortunate timings both ice_vsi_rebuild() and .ndo_bpf will try to access and
+modify XDP rings at the same time, causing system crash.
 
-Patch applied to wireless-next.git, thanks.
+The first patch factors out rtnl-locked code from VSI rebuild code to avoid
+deadlock. The following changes lock rebuild and .ndo_bpf() critical sections
+with an internal mutex as well and provide complementary fixes.
+---
+IWL: https://lore.kernel.org/intel-wired-lan/20240823095933.17922-1-larysa.zaremba@intel.com/
 
-25f855413885 dt-bindings: net: wireless: convert marvel-8xxx.txt to yaml format
+The following are changes since commit cfd433cecef929b4d92685f570f1a480762ec260:
+  Merge branch 'ptp-ocp-fix-serial-port-information-export'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
+
+Larysa Zaremba (6):
+  ice: move netif_queue_set_napi to rtnl-protected sections
+  ice: protect XDP configuration with a mutex
+  ice: check for XDP rings instead of bpf program when unconfiguring
+  ice: check ICE_VSI_DOWN under rtnl_lock when preparing for reset
+  ice: remove ICE_CFG_BUSY locking from AF_XDP code
+  ice: do not bring the VSI up, if it was down before the XDP setup
+
+ drivers/net/ethernet/intel/ice/ice.h      |   2 +
+ drivers/net/ethernet/intel/ice/ice_base.c |  11 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c  | 179 ++++++++--------------
+ drivers/net/ethernet/intel/ice/ice_lib.h  |  10 +-
+ drivers/net/ethernet/intel/ice/ice_main.c |  47 ++++--
+ drivers/net/ethernet/intel/ice/ice_xsk.c  |  18 +--
+ 6 files changed, 106 insertions(+), 161 deletions(-)
 
 -- 
-https://patchwork.kernel.org/project/linux-wireless/patch/20240820142143.443151-1-Frank.Li@nxp.com/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
-https://docs.kernel.org/process/submitting-patches.html
+2.42.0
 
 
