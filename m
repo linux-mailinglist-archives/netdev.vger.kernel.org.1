@@ -1,205 +1,72 @@
-Return-Path: <netdev+bounces-124625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E2296A3FB
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:15:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20EC396A416
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:19:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCF941C21BFF
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:15:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2076287B03
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:19:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB3C18BB9A;
-	Tue,  3 Sep 2024 16:15:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C272018A951;
+	Tue,  3 Sep 2024 16:19:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="WmFFff2k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i/QSrfeq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com [209.85.218.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC58E189B88
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 16:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96ACE405C9;
+	Tue,  3 Sep 2024 16:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725380107; cv=none; b=T83ztAi8qhiKV7qp62mp14lrCBKqQ0dIfZAawM1bKxnRYzavVn30vOeyuhO1DzqcBI1zCTWMJ6U+kC8AfVN8+yPOLA4n22W2ardrp3FgQKOvxgCM73t08JbIu7HoWGAgKbZ2HWMcICzoDrM94KIdY2iCtw3Y6sLLkFY4MpfHTJM=
+	t=1725380368; cv=none; b=EL+VbKgbbUn602G/Rf3t7v64e31uqJ1GDIL0cIDllz2mY12EOCZzJaxqVtWwR0bemfWpBqs6vN/2yWGvUZ8TPEshY5zrfpWpfGfsi44hyUyJRVff7+q1AwpBfW1xfqTgsPa5ftMLnN/6f049h8CmLN5uNe1I4sfP3ZqUo6aUXvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725380107; c=relaxed/simple;
-	bh=xpPrjjx3C5+Im8uDKPe6tjHcImbiqGdfdOEgJ6hTna4=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H7G7TOm46c6cZVsdJaWVUPE5yCzyUUWDm+xhvqe2OsWpi/tE2/jpzGdfs/vhKmoPCi7oC7jmhryoSSZMFGlsjk2CCNlPc6ugQXmMJTSFT2lk7jWypuZqV+m6+YWBJnbKzAeSMydzKKJTUQszF83QNXVKnJmzq0ISQsnvBAMbee4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=WmFFff2k; arc=none smtp.client-ip=209.85.218.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f68.google.com with SMTP id a640c23a62f3a-a8a1d78e7b0so163447666b.3
-        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 09:15:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1725380103; x=1725984903; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ujcJQ5WbiK5TK1a1sgf7j5ujXkTQVZFXM9n+2iP5G8w=;
-        b=WmFFff2kFIq19MtQaDjm0FzF2D+n4UmBArivKNenpVoyPiaLTVuuoy/2JRdmVHz05u
-         Lqa4vliOXLpIra5yAWbRIRmH/gr73eNVqOuCZmERDdoW4IBJPAW0sYaVGWss4Y3rKkFr
-         4krm7cnvbgu1nkic+2VZPaHyF42IWfbWvSKSNHgM6O3W1GyyexRpDg7m2fL5vczsU6T9
-         rrPJgADQIB4TeWtAEmnA82LaI4PPec7TQ4J02+Yu8Ger2/dtigf3afQhVAjjOCTzdvv+
-         35EMIx1mozZG7cBMF6y4hcXC4tVN306+ThGE/zCgjgLD3OTRWnpd8TJymP+El+OaQLAH
-         PeVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725380103; x=1725984903;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ujcJQ5WbiK5TK1a1sgf7j5ujXkTQVZFXM9n+2iP5G8w=;
-        b=cw64N68YmPLeNvwtU+b7WHzFe7uiiHOQNF5/PbvHnUOKDC+wxmInCv5JcKs+nwRSnm
-         RvE/fMmXJuPa5jYGmItWf8aUzpyj4mApDoZvDPq1S3Tk5aeOP6O8y+/f6akpHUHsUEmT
-         PGCd/tJeEqYGKVovd/ye69+eCp2ZxGQaF+Ydyryf+huJBpVoou5SwqBoUr4ipJruy2Fm
-         AGCYTzGBpwrxKtavGWu1a4A9GPLuPiKzMyogAgFDHhNSvQWWven97CPfWctlsX1AlJnP
-         bnOgMmgVObo194ECBNJ5JHuhRz7D8wozGGCPKT2Am6KpoEnzHXMyMa0yShIDPpMxEl3r
-         U64A==
-X-Forwarded-Encrypted: i=1; AJvYcCVaaJ8vEsg5kuwiSdpTnywMtYQvm1llBRmJI14p6jRsb/gkEcGpgh62On+9W9pSf5ees2NQIHE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhiNBLaOLWvwfu2MxPTVspwwXNWFZKD7mBt55XyZiyGyPLdDOK
-	M1oNIFDMZ6xjDhm6W0iV4lRNteKSTT73oZzNao5XzlT4RMFLWymeww+LlHNngJA=
-X-Google-Smtp-Source: AGHT+IGOVI/KlbnVkPKcUFB/WP4ky/V34Mnqxzaki61Es6M5ZEdZH9hu90OMWXXvI1MZc9xKoKdrvw==
-X-Received: by 2002:a17:907:d08:b0:a86:6d39:cbfd with SMTP id a640c23a62f3a-a89fafad393mr618619866b.57.1725380102711;
-        Tue, 03 Sep 2024 09:15:02 -0700 (PDT)
-Received: from localhost (host-80-182-198-72.pool80182.interbusiness.it. [80.182.198.72])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8a1dbfba91sm145366666b.225.2024.09.03.09.15.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 09:15:02 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Tue, 3 Sep 2024 18:15:09 +0200
-To: Rob Herring <robh@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH 04/11] of: address: Preserve the flags portion on 1:1
- dma-ranges mapping
-Message-ID: <Ztc2DadAnxLIYFj-@apocalypse>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <5ca13a5b01c6c737f07416be53eb05b32811da21.1724159867.git.andrea.porta@suse.com>
- <20240821001618.GA2309328-robh@kernel.org>
- <ZsWi86I1KG91fteb@apocalypse>
- <CAL_JsqKN0ZNMtq+_dhurwLR+FL2MBOmWujp7uy+5HzXxUb_qDQ@mail.gmail.com>
- <ZtBJ0jIq-QrTVs1m@apocalypse>
- <CAL_Jsq+_-m3cjTRsFZ0RwVpot3Pdcr1GWt-qiiFC8kQvsmV7VQ@mail.gmail.com>
- <ZtChPt4cD8PzfEkF@apocalypse>
- <CAL_JsqJNcZx-HH-TJhsNai2fqwPJ+dtcWTdPagRjgqM31wsJkA@mail.gmail.com>
+	s=arc-20240116; t=1725380368; c=relaxed/simple;
+	bh=WllGggugZ28zZO74W4H1juh4xO9s8coYO5exYjqiISc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jrEjGTTfRoxTKSRYeUXYIH6v+CUQTYUnavzEU57JeVjejCxg1hq8RiBJpzqDzUYrtCYpN+u9rHVUAe3HLiQe23YwW2YyxyGe3Fd79HogDHNpmufiNNaCWwVxSuGS4TJhHXFK9jvjJ9+QAYxTh/qXNCmBPYynIYg6rz9ZUDm23YM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i/QSrfeq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B513C4CEC4;
+	Tue,  3 Sep 2024 16:19:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725380368;
+	bh=WllGggugZ28zZO74W4H1juh4xO9s8coYO5exYjqiISc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i/QSrfeqwKdbBgXMZOK9ypMoOCPtVu8+IRKiOWYrE8sPS5bwyhqbsBciU0rrON7Ln
+	 MhkEk2a6qJWm9t3vlqNmyJJ93zidWq4Z7Hn27tVIr6nz7lZiiMYHNFnlc1Oad2oABr
+	 BMmIy0oUXSFfS01XfttuAY05tYnXfbqyRX1v+ygkpUgrbj3USOPzonpqhVlESyu7RA
+	 +Wy9EOMh5VmtJIcZ8xoSTqQ0tZ856RvXkQkCIKQiH2emZ1ze/UhNdARmifYiwresfQ
+	 SSR9jRG9fj/kqhLIBfDY+OziOPNiQg5jF9yxwprRQ3Wh1F8NyD1nf+q3CPFU1sfXX8
+	 uQDwj+iJHg9og==
+Date: Tue, 3 Sep 2024 17:19:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Chen Ni <nichen@iscas.ac.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests: net: convert comma to semicolon
+Message-ID: <20240903161924.GD4792@kernel.org>
+References: <20240903074519.781224-1-nichen@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL_JsqJNcZx-HH-TJhsNai2fqwPJ+dtcWTdPagRjgqM31wsJkA@mail.gmail.com>
+In-Reply-To: <20240903074519.781224-1-nichen@iscas.ac.cn>
 
-Hi Rob,
-
-On 14:37 Fri 30 Aug     , Rob Herring wrote:
-> On Thu, Aug 29, 2024 at 11:26 AM Andrea della Porta
-> <andrea.porta@suse.com> wrote:
-> >
-> > Hi Rob,
-> >
-
-...
-
+On Tue, Sep 03, 2024 at 03:45:19PM +0800, Chen Ni wrote:
+> Replace a comma between expression statements by a semicolon.
 > 
-> I think simple-bus where you have it is fine. It is really 1 level up
-> that needs to be specified. Basically something that's referenced from
-> the specific PCI device's schema (e.g. the RP1 schema (which you are
-> missing)).
-> 
-> That schema needs to roughly look like this:
-> 
-> properties:
->   "#address-cells":
->     const: 3
->   "#size-cells":
->     const: 2
->   ranges:
->     minItems: 1
->     maxItems: 6
->     items:
->       additionalItems: true
->       items:
->         - maximum: 5  # The BAR number
->         - const: 0
->         - const: 0
->         - # TODO: valid PCI memory flags
-> 
-> patternProperties:
->   "^bar-bus@[0-5]$":
->     type: object
->     additionalProperties: true
->     properties:
->       compatible:
->         const: simple-bus
->       ranges: true
->
+> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
 
-Hmmm.. not sure how this is going to work. The PCI device (RP1) will
-havei, at runtime, a compatible like this:
+As mentioned at [1] I think it would be nice if the patch description
+was a bit more descriptive.
 
-compatible = "pci1de4,1\0pciclass,0200000\0pciclass,0200";
-
-that is basically generated automatically by the OF framework. So, in the
-schema you proposed above, I can put something like:
-
-properties:
-  compatible:
-    contains:
-      pattern: '^pci1de4,1'
-
-or maybe I could omit the compatible entirely, like in:
-
-https://github.com/devicetree-org/dt-schema/blob/main/dtschema/schemas/pci/pci-iommu.yaml
-
-that seems to refer to generic compatible values.
-In both cases though, I don't see how these binding could work with
-make dt_binding_check, since there's no compatible known at compile
-time (for the first approach), or no compatible at all (the second
-approach).
-Is it intended only as a loose documentation?
-Or are you proposing that for a future new bus (hence with a new, specific,
-compatible) that could be described by the schema above?
-
-Many thanks,
-Andrea
- 
-> There were some discussions around interrupt handling that might also
-> factor into this.
-> 
-> Rob
+[1] https://lore.kernel.org/all/20240903152125.GA4792@kernel.org/
 
