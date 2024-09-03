@@ -1,93 +1,197 @@
-Return-Path: <netdev+bounces-124351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A18D969164
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 04:20:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A479796916D
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 04:28:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DB3F1C228CF
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 02:20:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01958B21B3F
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 02:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0722D1CDA33;
-	Tue,  3 Sep 2024 02:20:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n9d0wza0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105571CDA17;
+	Tue,  3 Sep 2024 02:28:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23FA2AEFB;
-	Tue,  3 Sep 2024 02:20:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588501CDA00;
+	Tue,  3 Sep 2024 02:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725330034; cv=none; b=AGaRqorxUrFwDwJaMhYWnFFHK9EpVKn/v4dyGPg4iQ7mqFXPuUfyomLLfCNmueRm3za0ajfgalKiqr1iQe25cBVLBP/mtk5WRMmdvZ3N8dWkiIUZSNdb1M1jffVRvsh4jXrse/WrP2gzkHEoJr4EhsZARfTLMbk5gOFf5ATZpJU=
+	t=1725330480; cv=none; b=mgwkeeUo2yZp5M/EuShxjiIpkcT1zMeiUbrQx41ILxcXuLXPUY4KOmMx6euUXuguxDrWf4ZjW06JqqX9XnMRiJGHvwYhayBbRnV29II5lYtlNoxYmx//pg2jJ6RYxFvhp9qRXVKl4/oMzSd+HefKwWLhSLhRLkftwANGGJ1tFco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725330034; c=relaxed/simple;
-	bh=xCy0r0OI+oIFzv4+Fd73i0U/sAlrQZ+2Sxt3fHOd+tE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=c6fjSsA/3UYCG8LvXggxBNXk63ez0XzzFylNDV4oOQ46WQKAAcvhgIr4dDT4HbvwneWoHGMBEKbAtYw4cXWrQpTK9Ixoalps4SkmZi1rO4VfrArDYsnXAheIQxi1Tu/jKNyfxgATT6n+6meTHWCAjY8kOBcHWYt85p0fxiD7tgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n9d0wza0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AD9DC4CEC2;
-	Tue,  3 Sep 2024 02:20:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725330034;
-	bh=xCy0r0OI+oIFzv4+Fd73i0U/sAlrQZ+2Sxt3fHOd+tE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=n9d0wza0cBwY1gtjzwyZlLe+x06NZGCxCvnskkTtKDGK9vQvBOOcdmH0zwxeK6Fxt
-	 G5UoYWbhMNECfNUT+Q51NIe5yYFugux2BftuY/Knh1qMXeB6SGnWgwNx14RrVVEyde
-	 yER31ORcZ7lceDN+l1q09RSqBjoMMCue1G0rwlH0ZmtAe/rL2rkUg+Lk+vGg1rl6Z5
-	 Rz43eTfsE7Yn5wQ5lgsAO6Nf+FMOcwiz5VbiiZnB2apeyMIuZimip2xdYIEF6j1III
-	 W6hYWhFTWGSD5fNtFScwmtsJPpHhTG9cVq12KdJMFMfgtOuOFJ7tuad6MtudMo758v
-	 JdVsmQPRvC+4Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C943805D82;
-	Tue,  3 Sep 2024 02:20:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725330480; c=relaxed/simple;
+	bh=d6CeH9FZXCDGHQBf1C3j1Iz7qG85kQbtB7iEZcAR2Ps=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=EkUWPTLDdWaHaMnHPMpTcVt/2M3yXUkX7734poiSLJ+yM4PbtGGSkgigOdSbTYIULXe5B2v+mrepuPtDjSvx1Yh96eZkvfpQWI7Ja0X62y7qBjtf9xEJgjmgQS8mui3NqFXPY3Ntrl+rwhZIBKSU1832V571HY9JgUjF3ayJUz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WyTxl6gknzgYtl;
+	Tue,  3 Sep 2024 10:25:47 +0800 (CST)
+Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7E3E21800FE;
+	Tue,  3 Sep 2024 10:27:54 +0800 (CST)
+Received: from [10.67.111.176] (10.67.111.176) by
+ kwepemd500012.china.huawei.com (7.221.188.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Tue, 3 Sep 2024 10:27:53 +0800
+Message-ID: <73e02ee9-6631-4473-8219-d75253aaf0fc@huawei.com>
+Date: Tue, 3 Sep 2024 10:27:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 10/12] net: xilinx: axienet: Convert using
+ devm_clk_get_optional_enabled() in axienet_probe()
+To: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
+	"florian.fainelli@broadcom.com" <florian.fainelli@broadcom.com>,
+	"andrew@lunn.ch" <andrew@lunn.ch>, "olteanv@gmail.com" <olteanv@gmail.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "wens@csie.org" <wens@csie.org>,
+	"jernej.skrabec@gmail.com" <jernej.skrabec@gmail.com>, "samuel@sholland.org"
+	<samuel@sholland.org>, "heiko@sntech.de" <heiko@sntech.de>,
+	"yisen.zhuang@huawei.com" <yisen.zhuang@huawei.com>, "salil.mehta@huawei.com"
+	<salil.mehta@huawei.com>, "hauke@hauke-m.de" <hauke@hauke-m.de>,
+	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
+	"joabreu@synopsys.com" <joabreu@synopsys.com>, "mcoquelin.stm32@gmail.com"
+	<mcoquelin.stm32@gmail.com>, "wellslutw@gmail.com" <wellslutw@gmail.com>,
+	"Simek, Michal" <michal.simek@amd.com>, "ajay.kathat@microchip.com"
+	<ajay.kathat@microchip.com>, "claudiu.beznea@tuxon.dev"
+	<claudiu.beznea@tuxon.dev>, "kvalo@kernel.org" <kvalo@kernel.org>,
+	"u.kleine-koenig@pengutronix.de" <u.kleine-koenig@pengutronix.de>,
+	"jacky_chou@aspeedtech.com" <jacky_chou@aspeedtech.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-sunxi@lists.linux.dev"
+	<linux-sunxi@lists.linux.dev>, "linux-rockchip@lists.infradead.org"
+	<linux-rockchip@lists.infradead.org>,
+	"linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>, "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>
+References: <20240831021334.1907921-1-lizetao1@huawei.com>
+ <20240831021334.1907921-11-lizetao1@huawei.com>
+ <MN0PR12MB595396074210F8390ACE409DB7912@MN0PR12MB5953.namprd12.prod.outlook.com>
+From: Li Zetao <lizetao1@huawei.com>
+In-Reply-To: <MN0PR12MB595396074210F8390ACE409DB7912@MN0PR12MB5953.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] r8169: add support for RTL8126A rev.b
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172533003475.4035616.9650408916931285098.git-patchwork-notify@kernel.org>
-Date: Tue, 03 Sep 2024 02:20:34 +0000
-References: <20240830021810.11993-1-hau@realtek.com>
-In-Reply-To: <20240830021810.11993-1-hau@realtek.com>
-To: Hau <hau@realtek.com>
-Cc: hkallweit1@gmail.com, nic_swsd@realtek.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+X-ClientProxiedBy: dggpeml100004.china.huawei.com (7.185.36.247) To
+ kwepemd500012.china.huawei.com (7.221.188.25)
 
-Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 30 Aug 2024 10:18:10 +0800 you wrote:
-> Add support for RTL8126A rev.b. Its XID is 0x64a. It is basically
-> based on the one with XID 0x649, but with different firmware file.
+在 2024/9/1 20:28, Pandey, Radhey Shyam 写道:
+>> -----Original Message-----
+>> From: Li Zetao <lizetao1@huawei.com>
+>> Sent: Saturday, August 31, 2024 7:44 AM
+>> To: florian.fainelli@broadcom.com; andrew@lunn.ch; olteanv@gmail.com;
+>> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+>> pabeni@redhat.com; wens@csie.org; jernej.skrabec@gmail.com;
+>> samuel@sholland.org; heiko@sntech.de; yisen.zhuang@huawei.com;
+>> salil.mehta@huawei.com; hauke@hauke-m.de;
+>> alexandre.torgue@foss.st.com; joabreu@synopsys.com;
+>> mcoquelin.stm32@gmail.com; wellslutw@gmail.com; Pandey, Radhey
+>> Shyam <radhey.shyam.pandey@amd.com>; Simek, Michal
+>> <michal.simek@amd.com>; ajay.kathat@microchip.com;
+>> claudiu.beznea@tuxon.dev; kvalo@kernel.org; lizetao1@huawei.com;
+>> u.kleine-koenig@pengutronix.de; jacky_chou@aspeedtech.com
+>> Cc: netdev@vger.kernel.org; linux-arm-kernel@lists.infradead.org; linux-
+>> sunxi@lists.linux.dev; linux-rockchip@lists.infradead.org; linux-stm32@st-
+>> md-mailman.stormreply.com; linux-wireless@vger.kernel.org
+>> Subject: [PATCH net-next 10/12] net: xilinx: axienet: Convert using
+>> devm_clk_get_optional_enabled() in axienet_probe()
+>>
+>> Use devm_clk_get_optional_enabled() instead of devm_clk_get_optional() +
+>> clk_prepare_enable(), which can make the clk consistent with the device life
+>> cycle and reduce the risk of unreleased clk resources. Since the device
+>> framework has automatically released the clk resource, there is no need to
+>> execute clk_disable_unprepare(clk) on the error path.
+>>
+>> Signed-off-by: Li Zetao <lizetao1@huawei.com>
 > 
-> Signed-off-by: ChunHao Lin <hau@realtek.com>
-> ---
->  drivers/net/ethernet/realtek/r8169.h          |  1 +
->  drivers/net/ethernet/realtek/r8169_main.c     | 42 ++++++++++++-------
->  .../net/ethernet/realtek/r8169_phy_config.c   |  1 +
->  3 files changed, 29 insertions(+), 15 deletions(-)
+> Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+> Thanks!
+> 
+>> ---
+>>   drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 15 ++++-----------
+>>   1 file changed, 4 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> index fe6a0e2e463f..48b41e95aa74 100644
+>> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> @@ -2584,22 +2584,17 @@ static int axienet_probe(struct platform_device
+>> *pdev)
+>>   	seqcount_mutex_init(&lp->hw_stats_seqcount, &lp->stats_lock);
+>>   	INIT_DEFERRABLE_WORK(&lp->stats_work, axienet_refresh_stats);
+>>
+>> -	lp->axi_clk = devm_clk_get_optional(&pdev->dev, "s_axi_lite_clk");
+>> -	if (!lp->axi_clk) {
+>> +	lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev,
+>> "s_axi_lite_clk");
+>> +	if (!lp->axi_clk)
+>>   		/* For backward compatibility, if named AXI clock is not
+>> present,
+>>   		 * treat the first clock specified as the AXI clock.
+>>   		 */
+>> -		lp->axi_clk = devm_clk_get_optional(&pdev->dev, NULL);
+>> -	}
+>> +		lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev,
+>> NULL);
+>> +
+>>   	if (IS_ERR(lp->axi_clk)) {
+>>   		ret = PTR_ERR(lp->axi_clk);
+>>   		goto free_netdev;
+>>   	}
+>> -	ret = clk_prepare_enable(lp->axi_clk);
+>> -	if (ret) {
+>> -		dev_err(&pdev->dev, "Unable to enable AXI clock: %d\n",
+>> ret);
+>> -		goto free_netdev;
+>> -	}
+>>
+>>   	lp->misc_clks[0].id = "axis_clk";
+>>   	lp->misc_clks[1].id = "ref_clk";
+>> @@ -2915,7 +2910,6 @@ static int axienet_probe(struct platform_device
+>> *pdev)
+>>   		axienet_mdio_teardown(lp);
+>>   cleanup_clk:
+> 
+> I also find that there is goto to cleanup_clk when devm_clk_bulk_get_optional/
+> clk_bulk_prepare_enable fails which is not correct but as it is existing bug it
+> can go a separate patch.
+Thanks for the reminder, I considered solving this problem by using 
+devm_add_action_or_reset
 
-Here is the summary with links:
-  - [net-next] r8169: add support for RTL8126A rev.b
-    https://git.kernel.org/netdev/net-next/c/69cb89981c7a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks,
+Li Zetao.
+> 
+>>   	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp-
+>>> misc_clks);
+>> -	clk_disable_unprepare(lp->axi_clk);
+>>
+>>   free_netdev:
+>>   	free_netdev(ndev);
+>> @@ -2939,7 +2933,6 @@ static void axienet_remove(struct platform_device
+>> *pdev)
+>>   	axienet_mdio_teardown(lp);
+>>
+>>   	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp-
+>>> misc_clks);
+>> -	clk_disable_unprepare(lp->axi_clk);
+>>
+>>   	free_netdev(ndev);
+>>   }
+>> --
+>> 2.34.1
+> 
 
