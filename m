@@ -1,122 +1,94 @@
-Return-Path: <netdev+bounces-124482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A04F8969A96
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:48:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA58B969ACE
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:53:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56AB81F2408E
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:48:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97031286353
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE841C766E;
-	Tue,  3 Sep 2024 10:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E30A1CB52C;
+	Tue,  3 Sep 2024 10:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b="WIq9I6/O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5KjDK1W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.katalix.com (mail.katalix.com [3.9.82.81])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F022019F420
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 10:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=3.9.82.81
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 660BE1A0BFD;
+	Tue,  3 Sep 2024 10:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725360483; cv=none; b=XTaGMAJBEwUFJe1+2R0nnuXhjNpENsjoW9Yd7mfEKjclyQwgmJ4d/59DsXvHa1ZZ4DcdLZ9PgC5ckJ+a2Cj6R1InY0lsK13T05ftanUCoDgHk+pl/G0+GEly3WIbkqoo6kbE8GrtPsk8VH1PWdZUuO8JkeknVAOPMAe76zOoUho=
+	t=1725360629; cv=none; b=Oqt+dLGkEKes3zwV44+b2z4KQ5AiEnXTKkx5WLPfxix5lCIQHWe5YPkEcwNG0o+bvnIvC+z4Y8am0ALw6feODFtSbfdqnbax+AJ1eb/ay2pd4BELw1kmfxXkZmc2mOIRA27FmYmzscu0BAOYldbKjCF/NrxmlVRyhkFeKEysKsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725360483; c=relaxed/simple;
-	bh=5sVtSvQEtuBso82m1XCUkNDtJZezFYdITQgE7+gzWP4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=IC1MJce86pd9xWHzQDET+z9cin4Q01o+rNO8WixhOE/srNfxqNynb2dPyZL7uEufTUSzwVLCKJMalPG6JxF1vQiS4BLYBYpRFwCSp6YjCN6PzfezOZaJjgyVPx0GqWqpIGWtbZtnsn+mUKC8wMuVlgmqL2ewDmISoqyEgPgv8PE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com; spf=pass smtp.mailfrom=katalix.com; dkim=pass (2048-bit key) header.d=katalix.com header.i=@katalix.com header.b=WIq9I6/O; arc=none smtp.client-ip=3.9.82.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=katalix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=katalix.com
-Received: from [IPV6:2a02:8010:6359:2:34e6:741b:7236:5ff3] (unknown [IPv6:2a02:8010:6359:2:34e6:741b:7236:5ff3])
-	(Authenticated sender: james)
-	by mail.katalix.com (Postfix) with ESMTPSA id 8C1737D9AC;
-	Tue,  3 Sep 2024 11:48:00 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=katalix.com; s=mail;
-	t=1725360480; bh=5sVtSvQEtuBso82m1XCUkNDtJZezFYdITQgE7+gzWP4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:From;
-	z=Message-ID:=20<1dce7949-58de-ce8b-7123-3c2c2dfef276@katalix.com>|
-	 Date:=20Tue,=203=20Sep=202024=2011:48:00=20+0100|MIME-Version:=201
-	 .0|To:=20Dan=20Carpenter=20<dan.carpenter@linaro.org>,=20Simon=20H
-	 orman=20<horms@kernel.org>|Cc:=20netdev@vger.kernel.org,=20davem@d
-	 avemloft.net,=20edumazet@google.com,=0D=0A=20kuba@kernel.org,=20pa
-	 beni@redhat.com,=20dsahern@kernel.org,=20tparkin@katalix.com,=0D=0
-	 A=20kernel=20test=20robot=20<lkp@intel.com>|References:=20<2024090
-	 2142953.926891-1-jchapman@katalix.com>=0D=0A=20<20240903072417.GN2
-	 3170@kernel.org>=0D=0A=20<332ef891-510e-4382-804c-bc2245276ea7@sta
-	 nley.mountain>|From:=20James=20Chapman=20<jchapman@katalix.com>|Su
-	 bject:=20Re:=20[PATCH=20net-next]=20l2tp:=20remove=20unneeded=20nu
-	 ll=20check=20in=0D=0A=20l2tp_v2_session_get_next|In-Reply-To:=20<3
-	 32ef891-510e-4382-804c-bc2245276ea7@stanley.mountain>;
-	b=WIq9I6/OjMSWuxOZhor8qtNpaRM954jDT563NSUizfULOSWI5mQIlM9ul0rPBLijA
-	 hqZ1kkXyMjtZwZRqpo2ZtWNA9d/o+gXV96Xbqkck8kYHJqIj+OKrQulx61DqnNPJUW
-	 /hmkmvUu1QGCpHrLBZgjrKLHQR7JBI9vtmF/j9/nZBGsJh22eJfLc9yl6Ogj62KueZ
-	 xphFYk8RzN0bBvUPAqFfPI67iw8W3N7hVWgouwI9RW6q/wf1BQJad3fzGouZ5JWyu4
-	 5NxHW9/0sBuNbvRGnKsls3f1EQocHZrNwmtvWxMnGy7h491Ov7CF9Mz8rKuq5yjOJv
-	 57Vf5071ZQTPQ==
-Message-ID: <1dce7949-58de-ce8b-7123-3c2c2dfef276@katalix.com>
-Date: Tue, 3 Sep 2024 11:48:00 +0100
+	s=arc-20240116; t=1725360629; c=relaxed/simple;
+	bh=QjRKkTcjVYnnxJPoVNjGx6/Ls3fonC7hPfc/7SboZ5w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pQIuUjy6KeBvKMME2gmFjLMQI+4qUKX7gE+2hhhmCh5RrF0MNwYD0ay8qodA3+dT1YwlCiquqeiUei71nJSAnt8uo/9XDwIvHJ0qkNAZutWvFoM6Xd0LINNPn5wYZdqoKTJaqBIOX+oG/e1FC5d8unHRFDN/mTtta+jPoZXgBJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5KjDK1W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B495C4CEC4;
+	Tue,  3 Sep 2024 10:50:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725360629;
+	bh=QjRKkTcjVYnnxJPoVNjGx6/Ls3fonC7hPfc/7SboZ5w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=o5KjDK1W2HOZHZq1zXQV6aG8wIYaKwE61YXaUgkjjiD165b6NkB/piiSwMSx9qw9N
+	 2a7ZAJ8+p9Lx9HJ3CljbO0lqEpHlT9WsN35cqtjvDrh3Kmyoj36kfESLSaZmgly83r
+	 G9hRX5HYL7rKISD/Akyb+HEWRjbQypJ43bweFhsWzpdwi/uZQ9pnjaO2cA4FKiZpMp
+	 NTlqFBGN1EDcUG+m/Z5+YGBDUesFZ2iMUsriVEuEAfPFUG7QpexDtdFQha5aeQVs/b
+	 SQvRurBLL7qlNW3JtLSxhlFuvDAmtmVfeTn3YpeZrfULcfLrv7XKhUKkGOYe4YbM2w
+	 IHAS0LIb1Jzgg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEC63805D82;
+	Tue,  3 Sep 2024 10:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To: Dan Carpenter <dan.carpenter@linaro.org>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, tparkin@katalix.com,
- kernel test robot <lkp@intel.com>
-References: <20240902142953.926891-1-jchapman@katalix.com>
- <20240903072417.GN23170@kernel.org>
- <332ef891-510e-4382-804c-bc2245276ea7@stanley.mountain>
-From: James Chapman <jchapman@katalix.com>
-Organization: Katalix Systems Ltd
-Subject: Re: [PATCH net-next] l2tp: remove unneeded null check in
- l2tp_v2_session_get_next
-In-Reply-To: <332ef891-510e-4382-804c-bc2245276ea7@stanley.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v4] net: phy: Fix missing of_node_put() for leds
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172536062976.252561.14904161463456653895.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Sep 2024 10:50:29 +0000
+References: <20240830022025.610844-1-ruanjinjie@huawei.com>
+In-Reply-To: <20240830022025.610844-1-ruanjinjie@huawei.com>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ f.fainelli@gmail.com, ansuelsmth@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On 03/09/2024 09:02, Dan Carpenter wrote:
-> On Tue, Sep 03, 2024 at 08:24:17AM +0100, Simon Horman wrote:
->>> Reported-by: kernel test robot <lkp@intel.com>
->>> Closes: https://lore.kernel.org/r/202408111407.HtON8jqa-lkp@intel.com/
->>> CC: Dan Carpenter <dan.carpenter@linaro.org>
->>> Signed-off-by: James Chapman <jchapman@katalix.com>
->>> Signed-off-by: Tom Parkin <tparkin@katalix.com>
->>
->> And as you posted the patch, it would be slightly more intuitive
->> if your SoB line came last. But I've seen conflicting advice about
->> the order of tags within the past weeks.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri, 30 Aug 2024 10:20:25 +0800 you wrote:
+> The call of of_get_child_by_name() will cause refcount incremented
+> for leds, if it succeeds, it should call of_node_put() to decrease
+> it, fix it.
 > 
-> It should be in chronological order.
+> Fixes: 01e5b728e9e4 ("net: phy: Add a binding for PHY LEDs")
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 > 
-> People generally aren't going to get too fussed about the order except the
-> Signed-off-by tags.  Everyone who handles the patch adds their Signed-off-by to
-> the end.  Right now it looks like James wrote the patch and then Tom is the
-> maintainer who merged it.  Co-developed-by?
+> [...]
 
-I'm probably using tags incorrectly. When Tom or I submit kernel patches 
-to netdev, we usually review each other's work first before sending the 
-patch to netdev. But we thought that adding a Reviewed-by tag might 
-short-cut proper community review, hence we use SoB to indicate that 
-we're both happy with the patch and we're both interested in review 
-feedback on it.
+Here is the summary with links:
+  - [net,v4] net: phy: Fix missing of_node_put() for leds
+    https://git.kernel.org/netdev/net/c/2560db6ede1a
 
-On reflection, Acked-by would be better for this. I'll send a v2 with 
-Acked-by to avoid confusion.
-
-Thanks!
-
---
-pw-bot: cr
-
-
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
