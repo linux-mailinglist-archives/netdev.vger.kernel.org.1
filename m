@@ -1,150 +1,98 @@
-Return-Path: <netdev+bounces-124353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3126E969193
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 04:52:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 283B49691A4
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 05:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6424A1C229B7
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 02:52:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BBA21C22A34
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 03:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B7D19F131;
-	Tue,  3 Sep 2024 02:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="JXUq93zj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB161A2624;
+	Tue,  3 Sep 2024 03:04:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C67C19E998;
-	Tue,  3 Sep 2024 02:52:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3054B2AD02;
+	Tue,  3 Sep 2024 03:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725331949; cv=none; b=RxBGTYAKmypLb0has5jOirwXLGP7acLrNfdFXZ9CGG1mPHL9CS7qWMqcaYPtga6il5OmVdnvT9e+4A1RKJjmLoYN8Sd1UgejdLj4BcdyUznDopDSm2xn7zqUVD0OTQqUW38Tnx2sZ3LI5ydEKyvTynJeTCvh40X4tfOqhfClQC4=
+	t=1725332654; cv=none; b=aE3yYFMG32rGgmUyZWSpdV33vGzAUFqBK3v9FPwe9obXRdLhoe45zyDdK53k7zhAAw/iRNyxZqoEzbw377/yjfEqYJmiNTVP+Qv0lov/+/uzvWRNJJnOZgiKev45/j6Gzdu0NnE/Ce+kAW6X2VoijD5+lr3vtLUOjncMOor8kmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725331949; c=relaxed/simple;
-	bh=GztQwE1gB/QB/4pqe48TGIb07EvhsztMdvOaTHBSn+Y=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=UmP/j/G64wHAx6nlmYFWuD0ap3C/ajmD8/WU8qkz7tkqJbvuDdLGJHDDC3mUdiG1mXDo281KE5R4Bv9H8yAQyKyDP9dDNWE5hAGECWDMAVwY23EfFemfVf9nR2BSx9kg8AbFD48E2cy2kjGttDgVaoiNITwwYonl4YGVdMKVnOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=JXUq93zj; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4832piSgB651417, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1725331904; bh=GztQwE1gB/QB/4pqe48TGIb07EvhsztMdvOaTHBSn+Y=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:Content-Transfer-Encoding:MIME-Version;
-	b=JXUq93zjWN4jhvpEvjfiiXClnB3u/M4MYBb/mYU16aP42AQcqA9OA8fp+WW1OdryR
-	 ItOXKcJ6JJAy/RtiPxHni0J375A5eZf+ooNSKUgkYD0QK81j6X9/btkbVTIXxXQnAZ
-	 svYyE6/12CaBawfOFMyTVVdfIqtWp7buNcXtwxRcWjcKNiW1gS7VI5hHxqpFhItScI
-	 sPBWpKHQ1ftDKwGgDZFiXp4ilbwdm1sAm4rehwTi0z+PrIBvUUv5VTYYwP1nSmr6Qy
-	 doKhDQ1ieuTBj1sEXfGJ9SEgIR/S3sj9TOWC6QDwFtzut+geMrJh6VIAMt7wZCs5rO
-	 iBhJd1BDZD2AA==
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 4832piSgB651417
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 3 Sep 2024 10:51:44 +0800
-Received: from RTEXMBS05.realtek.com.tw (172.21.6.98) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 3 Sep 2024 10:51:44 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXMBS05.realtek.com.tw (172.21.6.98) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 3 Sep 2024 10:51:43 +0800
-Received: from RTEXMBS03.realtek.com.tw ([fe80::80c2:f580:de40:3a4f]) by
- RTEXMBS03.realtek.com.tw ([fe80::80c2:f580:de40:3a4f%2]) with mapi id
- 15.01.2507.035; Tue, 3 Sep 2024 10:51:43 +0800
-From: Larry Chiu <larry.chiu@realtek.com>
-To: Jakub Kicinski <kuba@kernel.org>, Justin Lai <justinlai0215@realtek.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com"
-	<edumazet@google.com>,
-        "pabeni@redhat.com" <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "andrew@lunn.ch"
-	<andrew@lunn.ch>,
-        "jiri@resnulli.us" <jiri@resnulli.us>,
-        "horms@kernel.org"
-	<horms@kernel.org>,
-        "rkannoth@marvell.com" <rkannoth@marvell.com>,
-        "jdamato@fastly.com" <jdamato@fastly.com>,
-        Ping-Ke Shih <pkshih@realtek.com>
-Subject: RE: [PATCH net-next v29 07/13] rtase: Implement a function to receive packets
-Thread-Topic: [PATCH net-next v29 07/13] rtase: Implement a function to
- receive packets
-Thread-Index: AQHa+cbRwwh2xyzhbkuIuTt8rA5l2bJE0YmAgACQCqA=
-Date: Tue, 3 Sep 2024 02:51:43 +0000
-Message-ID: <03177710937042bb93dfbf3237394a91@realtek.com>
-References: <20240829034832.139345-1-justinlai0215@realtek.com>
-	<20240829034832.139345-8-justinlai0215@realtek.com>
- <20240902190425.6eef2ee6@kernel.org>
-In-Reply-To: <20240902190425.6eef2ee6@kernel.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1725332654; c=relaxed/simple;
+	bh=KHNqqdmeRAfr2Z0xi9CkijK+avYfSEoW0MUqG61Xf4k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cpz4L55BoZ4bLuVZD1hafH15ab+AS1gBHFpWpzGj9gGDiMeG6eE/sqQBR7Jvu9s2yUI1sSthPuE6BVc3jYqmXonX6TQkEvDBPfq9kAE9Rt2XP/pZjgUA0OVL6uEsuNJqLnPnpSJzHokiN2TEu29UPD4xB0/axXH3jBHbZvNmmSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-01 (Coremail) with SMTP id qwCowAB3fqKofNZm0Hy1AA--.34405S2;
+	Tue, 03 Sep 2024 11:04:08 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: richardcochran@gmail.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH net-next] ptp: ptp_idt82p33: Convert comma to semicolon
+Date: Tue,  3 Sep 2024 11:03:02 +0800
+Message-Id: <20240903030303.494089-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowAB3fqKofNZm0Hy1AA--.34405S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jw4UZF15Zr47GrWUXw1DZFb_yoWDZrg_Xw
+	nF9ay7Gw4DurnF93WIva45Xry0ya9Ygrs8WryDtF9rArsrAFy3tr97Jry7W3yFgrn5WF47
+	Ja17Wr97CF9FgjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbsAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
+	Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JF0_Jw1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	JF0_Jw1lc2xSY4AK67AK6r48MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+	UI43ZEXa7VUUY0P3UUUUU==
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
+Replace a comma between expression statements by a semicolon.
 
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+---
+ drivers/ptp/ptp_idt82p33.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Tuesday, September 3, 2024 10:04 AM
-> To: Justin Lai <justinlai0215@realtek.com>
-> Cc: davem@davemloft.net; edumazet@google.com; pabeni@redhat.com;
-> linux-kernel@vger.kernel.org; netdev@vger.kernel.org; andrew@lunn.ch;
-> jiri@resnulli.us; horms@kernel.org; rkannoth@marvell.com;
-> jdamato@fastly.com; Ping-Ke Shih <pkshih@realtek.com>; Larry Chiu
-> <larry.chiu@realtek.com>
-> Subject: Re: [PATCH net-next v29 07/13] rtase: Implement a function to
-> receive packets
->=20
->=20
-> External mail.
->=20
->=20
->=20
-> On Thu, 29 Aug 2024 11:48:26 +0800 Justin Lai wrote:
-> > +             skb->dev =3D dev;
->=20
-> no need to assign skb->dev =3D dev; eth_type_trans() will do it for you
-
-Thanks, we will remove it.
-
->=20
-> > +             skb_put(skb, pkt_size);
-> > +             skb_mark_for_recycle(skb);
-> > +             skb->protocol =3D eth_type_trans(skb, dev);
-> > +
-> > +             if (skb->pkt_type =3D=3D PACKET_MULTICAST)
-> > +                     tp->stats.multicast++;
-> > +
-> > +             rtase_rx_vlan_skb(desc, skb);
-> > +             rtase_rx_skb(ring, skb);
-> > +
-> > +             dev_sw_netstats_rx_add(dev, pkt_size);
-> > +
-> > +skip_process_pkt:
-> > +             workdone++;
-> > +             cur_rx++;
-> > +             entry =3D cur_rx % RTASE_NUM_DESC;
-> > +             desc =3D ring->desc + sizeof(union rtase_rx_desc) * entry=
-;
-> > +     } while (workdone !=3D budget);
->=20
-> The check needs to be at the start of the function.
-> NAPI can be called with budget of 0 to limit the processing
-> to just Tx cleanup. In that case no packet should be received.
-
-OK, we will use a for loop instead.
+diff --git a/drivers/ptp/ptp_idt82p33.c b/drivers/ptp/ptp_idt82p33.c
+index 92bb42c43fb2..d5732490ed9d 100644
+--- a/drivers/ptp/ptp_idt82p33.c
++++ b/drivers/ptp/ptp_idt82p33.c
+@@ -1171,10 +1171,10 @@ static void idt82p33_caps_init(u32 index, struct ptp_clock_info *caps,
+ 	caps->owner = THIS_MODULE;
+ 	caps->max_adj = DCO_MAX_PPB;
+ 	caps->n_per_out = MAX_PER_OUT;
+-	caps->n_ext_ts = MAX_PHC_PLL,
+-	caps->n_pins = max_pins,
+-	caps->adjphase = idt82p33_adjwritephase,
+-	caps->getmaxphase = idt82p33_getmaxphase,
++	caps->n_ext_ts = MAX_PHC_PLL;
++	caps->n_pins = max_pins;
++	caps->adjphase = idt82p33_adjwritephase;
++	caps->getmaxphase = idt82p33_getmaxphase;
+ 	caps->adjfine = idt82p33_adjfine;
+ 	caps->adjtime = idt82p33_adjtime;
+ 	caps->gettime64 = idt82p33_gettime;
+-- 
+2.25.1
 
 
