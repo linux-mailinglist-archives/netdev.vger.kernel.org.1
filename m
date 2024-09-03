@@ -1,146 +1,69 @@
-Return-Path: <netdev+bounces-124667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28CA396A68F
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:31:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66CA196A6A5
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:34:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EDE01C22C63
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:31:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 635441C20C9A
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92481193063;
-	Tue,  3 Sep 2024 18:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBF0191477;
+	Tue,  3 Sep 2024 18:34:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XbqoL+rk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b5kP4FXM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA4A1925A5;
-	Tue,  3 Sep 2024 18:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D71188936
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 18:34:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725388256; cv=none; b=DL2+0JEtSnoZ52O5FcPdv0aFYu1ltyLH4Q4rkCuJr9/TH9nPCQKZdYLdUImGHzN0z5cWblKBk8LwJQZ/6yKE3Rc1peFmTyRwtnyBu0LpCtdDvz5NmnjOllA+skiy/gwP6rjpRDFgTjSQaz/aLrs219iQqleIixnKTY00GyzJld8=
+	t=1725388444; cv=none; b=c1PBbjhoU5c0wKzmsFKyBpEhq2GZHc2ru76eQq1i+NgPDqcGpfApZHnbgTjt4ZYXi/AfsQdg27vH/E9l0oeKzZoR7k+qrajujulnvYK6XsnvrKLdBb4bVWHjsiZ+5Tzt1IJxlpxtgXJao/Ocr4li0h/R7j23JsigEjzKf92oqAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725388256; c=relaxed/simple;
-	bh=dyjQzCj4lU41lXlE9DbWo6EUkuvxpVw8oPo3yyG7zdo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=i178AlkZXnAjYobr8VvLMsj0/ts210OjgBg7i7vT/TFzNCSjxcPd5YUJUZ/qo18djvujy5NI2hp9lXzdAft6ua612UE071SjoCE3hLMUw1Ms6s7bn8mZlkJUZ2fIH7RNxWYd86n/flnP6q6s54E30ew77z/lVbJ//o3VzVEVm6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XbqoL+rk; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725388255; x=1756924255;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dyjQzCj4lU41lXlE9DbWo6EUkuvxpVw8oPo3yyG7zdo=;
-  b=XbqoL+rkSq93LtnVfG8usuzMO4JcX8OnzTm4/tjQeYQVQtYHckPO7Z9O
-   tzOZd/v/j5I4+ENq16kOzYRqifz+NeoVS5ewxWmA5jTJmWppGLiji6u7r
-   jEqNemrgPYLy077aZfSSw4rMT5c+tlBNeSrpcXGo1L2Rc22wD+Z7vZpWO
-   PCkDZ8htU4sh/6GjUSCNiJ5bfW5rrulKeKg3TqrSbPS7onR5cGRKTL8CQ
-   MbpWoQpGACQvl0I4YoxroIVNWY76HCFVHZhlJiomQQEQbjTfgHxGRf6iu
-   5QmGlBHF5rffNsFMtGrUYh57fKzkyeK6dJYsApJv51FUSz1i8MNiOVLiZ
-   g==;
-X-CSE-ConnectionGUID: NqfD+m2JS8ilxZblxY+yoQ==
-X-CSE-MsgGUID: TvNaPBq7QKqSHXf4VRZg3w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="24147029"
-X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
-   d="scan'208";a="24147029"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 11:30:53 -0700
-X-CSE-ConnectionGUID: R8E+XnYFQuOUkp05O6wFuw==
-X-CSE-MsgGUID: PJ2z5mu/SU6nzwqPLvoUbQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
-   d="scan'208";a="88250252"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 03 Sep 2024 11:30:52 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
-	anthony.l.nguyen@intel.com,
-	wojciech.drewek@intel.com,
-	michal.kubiak@intel.com,
-	jacob.e.keller@intel.com,
-	amritha.nambiar@intel.com,
-	przemyslaw.kitszel@intel.com,
-	sridhar.samudrala@intel.com,
-	maciej.fijalkowski@intel.com,
-	magnus.karlsson@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: [PATCH net 6/6] ice: do not bring the VSI up, if it was down before the XDP setup
-Date: Tue,  3 Sep 2024 11:30:32 -0700
-Message-ID: <20240903183034.3530411-7-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240903183034.3530411-1-anthony.l.nguyen@intel.com>
-References: <20240903183034.3530411-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1725388444; c=relaxed/simple;
+	bh=FV5AiSsJ3sdJLzmEwChGFKLOaoSe4UfpfcIr7kVOIFQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uL+vxR66WAonOF6P/BeI6mS8976uJfWkieYP5BZlO2CQtJFKnlBn5KD+JR+0paMVHUujdcWF9H0iOmeJDHD5a57hw+x5XMZsS5tgnP5rPkGepygqy4g0hPFwQO0r2aeGXDDLH6bQGcQfMvJd1ioo1rD9M4mY9W8ZxrHdeMtLY4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b5kP4FXM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62355C4CEC4;
+	Tue,  3 Sep 2024 18:34:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725388443;
+	bh=FV5AiSsJ3sdJLzmEwChGFKLOaoSe4UfpfcIr7kVOIFQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b5kP4FXM3rUDbPgmzLpl235t+olP0Vz7V7M6Gw/anTP/cWX85acpiSXbg7EHCln8K
+	 L/NClhpO5MkQtNjLsRzu6EO/LhYqfNIYyELxhKqUGWP49Auk5IWvI1MXerO/Zl4+Ll
+	 OwHR7X/gwwhRlinMf2QRn+gSKRXPQMK6FaZ10+grjY9flvetZWCu9eMMDPi7C8MUZ6
+	 sE8EIYb6OWDe72CvctsBLNHNT9btLlI29ocq2j8wld+vKAFOkgjJLOCe4vhw07fJoA
+	 2rvggmZeY4sBXLMycc1Ae2ai5beJy9VwQ9Z6K+5vL509MoJINW3yeSmS29Z8IHzRgO
+	 DhcSq37qGMZeg==
+Date: Tue, 3 Sep 2024 11:34:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Martin Varghese
+ <martin.varghese@nokia.com>, Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH net] bareudp: Fix device stats updates.
+Message-ID: <20240903113402.41d19129@kernel.org>
+In-Reply-To: <04b7b9d0b480158eb3ab4366ec80aa2ab7e41fcb.1725031794.git.gnault@redhat.com>
+References: <04b7b9d0b480158eb3ab4366ec80aa2ab7e41fcb.1725031794.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Larysa Zaremba <larysa.zaremba@intel.com>
+On Fri, 30 Aug 2024 17:31:07 +0200 Guillaume Nault wrote:
+> Bareudp devices update their stats concurrently.
+> Therefore they need proper atomic increments.
 
-After XDP configuration is completed, we bring the interface up
-unconditionally, regardless of its state before the call to .ndo_bpf().
-
-Preserve the information whether the interface had to be brought down and
-later bring it up only in such case.
-
-Fixes: efc2214b6047 ("ice: Add support for XDP")
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com>
-Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 22b8ef5faf8d..c7db88b517da 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -3005,8 +3005,8 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
- 		   struct netlink_ext_ack *extack)
- {
- 	unsigned int frame_size = vsi->netdev->mtu + ICE_ETH_PKT_HDR_PAD;
--	bool if_running = netif_running(vsi->netdev);
- 	int ret = 0, xdp_ring_err = 0;
-+	bool if_running;
- 
- 	if (prog && !prog->aux->xdp_has_frags) {
- 		if (frame_size > ice_max_xdp_frame_size(vsi)) {
-@@ -3023,8 +3023,11 @@ ice_xdp_setup_prog(struct ice_vsi *vsi, struct bpf_prog *prog,
- 		return 0;
- 	}
- 
-+	if_running = netif_running(vsi->netdev) &&
-+		     !test_and_set_bit(ICE_VSI_DOWN, vsi->state);
-+
- 	/* need to stop netdev while setting up the program for Rx rings */
--	if (if_running && !test_and_set_bit(ICE_VSI_DOWN, vsi->state)) {
-+	if (if_running) {
- 		ret = ice_down(vsi);
- 		if (ret) {
- 			NL_SET_ERR_MSG_MOD(extack, "Preparing device for XDP attach failed");
--- 
-2.42.0
-
+The driver already uses struct pcpu_sw_netstats, would it make sense to
+bump it up to struct pcpu_dstats and have per CPU rx drops as well?
 
