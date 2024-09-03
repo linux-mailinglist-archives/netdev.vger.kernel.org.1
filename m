@@ -1,84 +1,81 @@
-Return-Path: <netdev+bounces-124588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BA5496A11C
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:48:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D12DE96A155
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:55:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E6B41C2401A
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:48:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F727B22A5D
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B7F154BE9;
-	Tue,  3 Sep 2024 14:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151DA1714D0;
+	Tue,  3 Sep 2024 14:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LjeUp7VR"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NiU09j9+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022BE13D8BF;
-	Tue,  3 Sep 2024 14:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B6A7156F5D
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 14:55:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725374932; cv=none; b=gPlIizwnUhdsRoKpuJA6NsxpIdpiuiS0vsQoSebeulHnudMYCa3/FQJ/vt/X8luI+Y1LDjkBCnRZCk9n/apwtgqyBQT4kWehj778SobEKLswLwNecVvZtYC56vqerWtMidYfcqhAAjd06BqDVYkELyf1skgwFRYt2uno/srRSAY=
+	t=1725375315; cv=none; b=KXKoIy5Iq5G2/qO4i41sfYVKxS3gUaeN2kBzx6ciF8UnZ+Np05/fx2GUtSakmYzwi3AbHEfI+AQcvnmoiYdoed0voN6QnnXW2sYFS4QwIysnXiRifz7BVYwqSMwQZaDhb6G2dt/QOCftKcly9yQquYcSj5c6N+mo9N19w20B8tA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725374932; c=relaxed/simple;
-	bh=Je2vmDY5FCSKlkQhUOJpUDBKbPavcaXLxF8qTKqwiI8=;
+	s=arc-20240116; t=1725375315; c=relaxed/simple;
+	bh=/S0el8odGf3dWTBUBsazXa+FnmV+VPcwZpwe+4m0TuU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f/FSRipmZljW+8h7L55WaJ1Ubyu+zrFdhOPMvQ670m2c9JndxA6pGuhDbu7svvLMFWAvs0lGKN4B4quCNnMKe8bzAz2ARDySrrjYOVso8sh0v0z2FPxoorutvKLv4VAtrPYb5YcxoXxBZl74fC9moPz21rQDRuSLdPM0FCYA5Aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LjeUp7VR; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725374931; x=1756910931;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Je2vmDY5FCSKlkQhUOJpUDBKbPavcaXLxF8qTKqwiI8=;
-  b=LjeUp7VRrd86nHlE6NwyYdhqckEmHI6A+1S9K6wmCJHRDHQh5giT4OWE
-   mXXfr+90gsKiXvEg5pgMz4eUaxC6cVPpMWVRWQFLF8X7eVYpy5tII/Maz
-   tzqim/1psQ9DYAge/2sCXJOlwoJAX5e4WWxtCtESaHde3NQBaNuXQBkgZ
-   hnQh8Mssn6pRucj9pNA3ehtshnFXfW9uPj6ICtV3ThOlcynsEKrgpEdUb
-   6DqH0PwJjG1UZO4k3nm4s2xt8rgQg93V0dDyAjwBWgO6br8hg0qp6bP3O
-   awgqdT3O2gRkdAmYLyv5DBI4BHqKevcMrb/zTvOcpJj80QrlSitTFQ4JA
-   Q==;
-X-CSE-ConnectionGUID: M64T8/GYRdeYsEB9FmIIvw==
-X-CSE-MsgGUID: wZlWUrbAThW8AEo7DuWZdw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23844849"
-X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
-   d="scan'208";a="23844849"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 07:48:49 -0700
-X-CSE-ConnectionGUID: 50vhjylPRlSYoSZBfZ1nBQ==
-X-CSE-MsgGUID: bJ4GT7Y9Qw2+1ddljY2c4A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
-   d="scan'208";a="65293586"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 07:48:44 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1slUpj-00000004k23-3JOV;
-	Tue, 03 Sep 2024 17:48:39 +0300
-Date: Tue, 3 Sep 2024 17:48:39 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Vasileios Amoiridis <vassilisamir@gmail.com>
-Cc: linux@armlinux.org.uk, maarten.lankhorst@linux.intel.com,
-	mripard@kernel.org, tzimmermann@suse.de, airlied@gmail.com,
-	daniel@ffwll.ch, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
-	andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, nico@fluxnic.net, arend.vanspriel@broadcom.com,
-	kvalo@kernel.org, robh@kernel.org, saravanak@google.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, brcm80211@lists.linux.dev,
-	brcm80211-dev-list.pdl@broadcom.com, devicetree@vger.kernel.org
-Subject: Re: [PATCH v1 7/7] of/irq: Make use of irq_get_trigger_type()
-Message-ID: <Ztchx4c2v78eGkYy@smile.fi.intel.com>
-References: <20240902225534.130383-1-vassilisamir@gmail.com>
- <20240902225534.130383-8-vassilisamir@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NuqDxX4RdeDVlkTr940iTrEO+h9M1biUjdcJdIQPolesh9Rqb0ER6eJYcyXszbgsz4VYTOIhpo8GjzfiKZBotEjBxxVcItr7zGWv2KhAQISWKiwV21fv3jt9odpZs09NjHU0FkJBaVBWz3t/qK4d0VbT8XayQG0EAFWjnVbX8BU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=NiU09j9+; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c26815e174so1784088a12.0
+        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 07:55:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1725375310; x=1725980110; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/S0el8odGf3dWTBUBsazXa+FnmV+VPcwZpwe+4m0TuU=;
+        b=NiU09j9+MCO1bekKwtwcHfUIgFVjKswR841QjCfqLQq6UlNxbnN2DK/vY3tWjykh1o
+         aje7lAZZwmR+81vTIH9pHuGgbTn0PkscKray51oysyeGJd4jblEI3QXbb6Pw/O9JX/aw
+         cY9JDZF1iBhWBAXyQb2cKnYx7BjBeuRagnMb6S396nIaTozMa9iDtr88iNm8wRFFJMP6
+         1BOVXWtJxiJJH2wYLWsGKU1dmAgULLiZHg9Xk0F4Zi530+vwD+EXCqDOzWTJExLSl/Gb
+         qKOREI4AKQEsAN+n90SVFad0JjCPJuMucqV14DERNZ/y39A/PsgPUF2toEBMJBDfi5kx
+         nasw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725375310; x=1725980110;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/S0el8odGf3dWTBUBsazXa+FnmV+VPcwZpwe+4m0TuU=;
+        b=Cj/6wX0LB5hsymRHOHd4vRdstu0rKchUUUlbiYPwWfOsFYLnfxZJtc7plTl611Fic/
+         AVPBmELzeifMSgZrGFyAtsTUMvMtMpJYJxKg58ZFhj2oSytwPShSI2zXfLMbBogdb7Yl
+         jQXttsDBo0xduSGPbiW/qouMOY6CntJQ9LNcQZnghe2N6UbqJ5E4pZoKBshNqqlLzUzx
+         1GTte9gS7txns1bt4t3qb8XAqod7J8v2qC0A8Ww0F8bM4xstXz9sAj0g9pOFT35P/RQ1
+         8qEvZA4VbfgfEXYt0ZnTXCjYC7exrswgvLggdLOVujANq3eWYUaPvwXodC5mxq77eqlf
+         qzUQ==
+X-Gm-Message-State: AOJu0YxEAPLsArgNNF2WFslTL1W0AA1lE88avLoEb+aB7TaovQAHRGvZ
+	1bs9CK/4Ve29lRzL7x7r0+U9i/6Oju7ywGDoTnmUxG3X0z5dpsR4AfA7VsTxpOs=
+X-Google-Smtp-Source: AGHT+IFNO2CexpzrY5N/V8RZAmfAMPJk2LFTKLsVObG8b67keQA7Tlhjb8AXpYmyaZYUO3laOiEt8Q==
+X-Received: by 2002:a17:906:da86:b0:a86:722c:1460 with SMTP id a640c23a62f3a-a89d8782136mr778706166b.18.1725375309425;
+        Tue, 03 Sep 2024 07:55:09 -0700 (PDT)
+Received: from localhost (78-80-104-44.customers.tmcz.cz. [78.80.104.44])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8989196c88sm690447766b.102.2024.09.03.07.55.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Sep 2024 07:55:08 -0700 (PDT)
+Date: Tue, 3 Sep 2024 16:55:07 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
+Subject: Re: [net-next PATCH 1/4] octeontx2-pf: Defines common API for HW
+ resources configuration
+Message-ID: <ZtcjS5_acSWt5YGg@nanopsycho.orion>
+References: <20240903124048.14235-1-gakula@marvell.com>
+ <20240903124048.14235-2-gakula@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,28 +84,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240902225534.130383-8-vassilisamir@gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <20240903124048.14235-2-gakula@marvell.com>
 
-On Tue, Sep 03, 2024 at 12:55:34AM +0200, Vasileios Amoiridis wrote:
-> Convert irqd_get_trigger_type(irq_get_irq_data(irq)) cases to the more
-> simple irq_get_trigger_type(irq).
+Tue, Sep 03, 2024 at 02:40:45PM CEST, gakula@marvell.com wrote:
+>Defines new API "otx2_init_rsrc" and moves the HW blocks
 
-...
+s/Defines/Define/ (in subject of the patch as well)
+s/moves/move/
 
->  		r->start = r->end = irq;
-> -		r->flags = IORESOURCE_IRQ | irqd_get_trigger_type(irq_get_irq_data(irq));
-> +		r->flags = IORESOURCE_IRQ | irq_get_trigger_type(irq);
->  		r->name = name ? name : of_node_full_name(dev);
-
-As per previous patch this can be utilised to
-
-		*r = DEFINE_RES_IRQ_NAMED(irq, name ?: of_node_full_name(dev));
-		r->flags |= irq_get_trigger_type(irq);
-
--- 
-With Best Regards,
-Andy Shevchenko
+Otherwise that patch looks ok.
 
 
+>NIX/NPA resources configuration code under this API. So, that
+>it can be used by the RVU representor driver that has similar
+>resources of RVU NIC.
+>
+>Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 
