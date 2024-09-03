@@ -1,94 +1,85 @@
-Return-Path: <netdev+bounces-124580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CACE96A0D4
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:39:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A70EC96A0D6
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:39:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F7051C239F5
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:39:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA30F1C23D9A
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EAFC13D625;
-	Tue,  3 Sep 2024 14:39:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B91D313D625;
+	Tue,  3 Sep 2024 14:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZzGyhi74"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hyPBWZPD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EDE13CF86
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 14:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F9F11CA69B;
+	Tue,  3 Sep 2024 14:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725374360; cv=none; b=ZyPb6nXqNVincvmTcTc38puMeXxv8hKdGGyqDHb5jqi8YATc+2d6Ki1Y74JggOGladYV1pQdxKbzcQgDqAOaVSnEdA81EwthFG2H8FXeC2X1w+ffOsX03o3XagW/blawEyPfXQTkGMYyG2usZcuRyArSylPgBv5AVvb0nPQ7wWc=
+	t=1725374385; cv=none; b=d4LMLiJbTyjatOOEzg0uKnZAvzyD264JIid7HJxkb07eQwMrXIhz2jW1I8leZqEIH15jyg7qGl4kxVxa741tH8jimjUcw7Xq43qyxPv+d/vrHTugkbh20H2rTrOU9nyjqNTE2/qwcQXHNhi1y9oFVVoQYGlF58gVwxxac1O4T7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725374360; c=relaxed/simple;
-	bh=ojmi4hbUSncobem9AetUsG58C6GwCKRTybSMcjq5k88=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uKxYodSMc1G+BAcvlrnkvntadMlSuhvLrAeET1thNV/9JJFkvOGzGUOlPAJfrirBbE1B3135wha3NffvoPJzeio2n9Yon+L1ZP7nedoRa6QX2r+SxAz05Tu/DE00RshxcKCrjoVM/yQ2XvJPtpYZkrZ6BboAr+xZntLSHd7u/Ig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZzGyhi74; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69B98C4CEC4;
-	Tue,  3 Sep 2024 14:39:19 +0000 (UTC)
+	s=arc-20240116; t=1725374385; c=relaxed/simple;
+	bh=D9Cdv5s5uqz98UZ38zDPKTwaHhmtDL/60jvVsg3/qPA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MbQfXU147fGB54f3JR6s7JifjHgSE5xf55lY6i/frqAFrNezlYbSWc6AXcP7DOxpQb8RH9kqnNknUmW0+fG6s3j9fGKWm7VfDUd2rYORdsuxX/1J55wklYAPaYcx6BuMuCAk8B4uXTBf41+MOc5FvbWdvflDkCiyRYPEKten4Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hyPBWZPD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F48C4CEC4;
+	Tue,  3 Sep 2024 14:39:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725374359;
-	bh=ojmi4hbUSncobem9AetUsG58C6GwCKRTybSMcjq5k88=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZzGyhi74TZanTzW4lK0VSjv/T0gRSVTAT2MTuBU7Etnsem30175zc3xPkCXtmZbRn
-	 VeuXrse7zB5x4P4jQP4Tatp/kF5t0uNEhZycWNI1q0KJp8r1TBpp6FbXPSN1lwvngP
-	 lsLp1T9MurPo7tjKTsCpyg5rRND4LmuYbJZ17O4nqf6V6DJRCO5jcZk6ogPX+c4sGk
-	 PkH1zlRL/YlNVovuOJQVXEjIDkAWAYOP5wSxDvj/gZFWh0twpP0WaacpU8Eg8O8Vkn
-	 12z96gzaFossnK+TGVoSet5iQuTJP9xz9LNMlyteE+wcvMOxZy2wRmy71sOQNOJuRK
-	 vyT+Fx5I09gZw==
-Message-ID: <8f5fe74a-277c-4b9c-b1fa-7e47fcd6a253@kernel.org>
-Date: Tue, 3 Sep 2024 08:39:18 -0600
+	s=k20201202; t=1725374385;
+	bh=D9Cdv5s5uqz98UZ38zDPKTwaHhmtDL/60jvVsg3/qPA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hyPBWZPDeICY9ZBtXSc7LSZtnnn18oNHYc3kNzVVj4ZF8b+0opmKhC80/kVyTTJox
+	 8soqTepKaf2TPia5hcdQit0VzzeRrtEP86sZO+qIQRRzdrVuur11qUNX2imBKT7hJQ
+	 xCS/ctKh/L01UWhhXNbPx7bMHOrxP5LLGapGGIJE1ShcSi9Hz54TTn7LdvTSWAKvsO
+	 QNArc8AfDXTS7/11r+m+RiFpvrl3ezBNZEaXpQdb5qr/0zYRCbCScmP6mh/7ymrJKc
+	 SFnnk2jRuCRHydK24y37jZhLxHATNhv6Jf7G86I8BcMpJEhTtoQvQ2A6C8r4KC0O6b
+	 Osp/1o0/B0mdQ==
+Date: Tue, 3 Sep 2024 09:39:43 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Vasileios Amoiridis <vassilisamir@gmail.com>
+Cc: nico@fluxnic.net, pabeni@redhat.com, daniel@ffwll.ch,
+	davem@davemloft.net, kuba@kernel.org, olteanv@gmail.com,
+	saravanak@google.com, andriy.shevchenko@linux.intel.com,
+	linux-kernel@vger.kernel.org, mripard@kernel.org,
+	edumazet@google.com, netdev@vger.kernel.org,
+	brcm80211-dev-list.pdl@broadcom.com, f.fainelli@gmail.com,
+	linux-wireless@vger.kernel.org, airlied@gmail.com,
+	linus.walleij@linaro.org, brcm80211@lists.linux.dev, andrew@lunn.ch,
+	devicetree@vger.kernel.org, linux@armlinux.org.uk,
+	alsi@bang-olufsen.dk, tzimmermann@suse.de, kvalo@kernel.org,
+	arend.vanspriel@broadcom.com, maarten.lankhorst@linux.intel.com
+Subject: Re: [PATCH v1 7/7] of/irq: Make use of irq_get_trigger_type()
+Message-ID: <172537438003.978249.2559307502514402788.robh@kernel.org>
+References: <20240902225534.130383-1-vassilisamir@gmail.com>
+ <20240902225534.130383-8-vassilisamir@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] ipv4: Fix user space build failure due to header
- change
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, gnault@redhat.com
-References: <20240903133554.2807343-1-idosch@nvidia.com>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240903133554.2807343-1-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240902225534.130383-8-vassilisamir@gmail.com>
 
-On 9/3/24 7:35 AM, Ido Schimmel wrote:
-> RT_TOS() from include/uapi/linux/in_route.h is defined using
-> IPTOS_TOS_MASK from include/uapi/linux/ip.h. This is problematic for
-> files such as include/net/ip_fib.h that want to use RT_TOS() as without
-> including both header files kernel compilation fails:
-> 
 
-...
-
+On Tue, 03 Sep 2024 00:55:34 +0200, Vasileios Amoiridis wrote:
+> Convert irqd_get_trigger_type(irq_get_irq_data(irq)) cases to the more
+> simple irq_get_trigger_type(irq).
 > 
-> Fix by changing include/net/ip_fib.h to include linux/ip.h. Note that
-> usage of RT_TOS() should not spread further in the kernel due to recent
-> work in this area.
-> 
-> Fixes: 1fa3314c14c6 ("ipv4: Centralize TOS matching")
-> Reported-by: David Ahern <dsahern@kernel.org>
-> Closes: https://lore.kernel.org/netdev/2f5146ff-507d-4cab-a195-b28c0c9e654e@kernel.org/
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Signed-off-by: Vasileios Amoiridis <vassilisamir@gmail.com>
 > ---
->  include/net/ip_fib.h          | 1 +
->  include/uapi/linux/in_route.h | 2 --
->  2 files changed, 1 insertion(+), 2 deletions(-)
+>  drivers/of/irq.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
-
-Thanks, Ido.
+Applied, thanks!
 
 
