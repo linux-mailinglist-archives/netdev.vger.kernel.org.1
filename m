@@ -1,67 +1,62 @@
-Return-Path: <netdev+bounces-124337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419819690D0
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 03:02:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3433C9690D5
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 03:12:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB6341F22C88
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 01:02:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEC61283C63
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 01:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E981A2C08;
-	Tue,  3 Sep 2024 01:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4AD1A2C1F;
+	Tue,  3 Sep 2024 01:12:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RpK3oMhi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gzSrNgmS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B744198A05;
-	Tue,  3 Sep 2024 01:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038CF1A287B;
+	Tue,  3 Sep 2024 01:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725325343; cv=none; b=Ee3qOCtG42AsB9efsnjS4/8ahzSdW3pLIUMbO44Fb6Yf4IGJJ8rpeSUbI5MKTfRoQR6EaFTaKn6NTsTUDEq4XkDM5kWk+PcwuDBlyVabLTimmQMTsc2MWBjDvebkux+9WL7InXCCz3lIONafRqSB4WVHM3gMd+Pas0j2BCwtD0k=
+	t=1725325934; cv=none; b=UiqBGHE1GkhnbKxSAZ7KpFkbiPTGVab6j7CnAb87vQyzYRQlrxp21hSMIHjy+zqWRfeSVB8Dl5wuZrEaWY94IK+79r1uR84DRkz/oULaAnAUs0tVRi8TTJ2p1whjIUzG775HHpJP+/I5fhCONOj9vHBLFWOYOyNOVP8+0F/cFCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725325343; c=relaxed/simple;
-	bh=tTvhyPtBceiZsBxdTifHd5e8Cxsmwvra7TbSzPLtJsU=;
+	s=arc-20240116; t=1725325934; c=relaxed/simple;
+	bh=T/H285DEwZ7StL39iMYzEulcVZmGCvSXusf7aj3byJA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mM9Pe7Q0+natFk9lctYihqoPZmIxj7cpTNXyLQW23+DP03xZrgl3GGYtXW/3GaKwcO/ATeYr+YE7x2BAPeajXTcZ632ef38f+duf6vf5k4dtrOFhl5VdahYeth68FtRJKmLneMu02Sf16BwfBJcnbVAuJ7UesaTr1QhXo0RX6xE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RpK3oMhi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2BF8C4CEC2;
-	Tue,  3 Sep 2024 01:02:21 +0000 (UTC)
+	 MIME-Version:Content-Type; b=c1qEFU8fPJgJXhxiPe2QtYTK1107l9X8m7dBF+3NxcT55iDlhrr7huaoGacRfINL0cFklbLG3aNK0Cnw/BLFdaCJmsoe0uT/jNfqOmY9M72N6GhmwtuB4l16RM9mdAYff2Uf/vWUmGecaVkiveSpQoJR8NqxEYENVIQvc6n63p0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gzSrNgmS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEEA6C4CEC2;
+	Tue,  3 Sep 2024 01:12:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725325342;
-	bh=tTvhyPtBceiZsBxdTifHd5e8Cxsmwvra7TbSzPLtJsU=;
+	s=k20201202; t=1725325933;
+	bh=T/H285DEwZ7StL39iMYzEulcVZmGCvSXusf7aj3byJA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RpK3oMhitV5+9evjmNDFL6FR9aEeVctNmocuzCgNciJav/ZlkcuPauUGldHD3hina
-	 MGN07F9CiuPK7oSr2qAEoLpeklw2j0XoTfELDzachiSHIBJ+LQe9HbiXXkn5ISa6BH
-	 xZVetIfITuRhk+mnpFvW5N1FuxjGyxhOdZ1yyTsnZOSKpFFKHUvEXuoEYjYULNTh5K
-	 CidCoJ9bL1DssSDUjsqmGzw9/eNmwM3R/7LalgCVvGoDO3Mn5gC3sMRzvPiFHNDdLd
-	 Zj4ShOqAjIsfnhnRkCUMzbPqrS064chyBst14FOuyya9UM1SBmmgM4ZXlTtkicn9JC
-	 bHpqKwjSbfPIg==
-Date: Mon, 2 Sep 2024 18:02:20 -0700
+	b=gzSrNgmSOwdH5eFA45twgnyKxP+nNA/OOWubcU3CmoJFjRHEQ8A7O7hFN7j6Xa/Eg
+	 C11Qy/ps0xQ2Ue7fFge81DSppBvo11s4H18+gs60ceiQ7E9Ds04wnVR/Gi0XSvkD08
+	 ucjauj5cocPl27qIDISwRjCs20VX19Yxulb6ZjsQunuyGhvL/fxCkoQd0n/Qgq3A0A
+	 XRwNYTRNjX0yDi8GnyELJHamCNhh83/xYqnZ91vTZ4/NofjcBGOjnTb2spT/BJ2oK6
+	 mifowFqX/ppRpwEYPsFHzCLVGSVcDFbKbNWUaA2OxWTfPRkifONMPS9A5CxN0lTFpU
+	 iQZn7QkK+LuEg==
+Date: Mon, 2 Sep 2024 18:12:11 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, amritha.nambiar@intel.com,
- sridhar.samudrala@intel.com, sdf@fomichev.me, bjorn@rivosinc.com,
- hch@infradead.org, willy@infradead.org, willemdebruijn.kernel@gmail.com,
- skhawaja@google.com, Martin Karsten <mkarsten@uwaterloo.ca>, Donald Hunter
- <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, Paolo
- Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Xuan
- Zhuo <xuanzhuo@linux.alibaba.com>, Daniel Jurgens <danielj@nvidia.com>,
- open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 5/5] netdev-genl: Support setting per-NAPI
- config values
-Message-ID: <20240902180220.312518bc@kernel.org>
-In-Reply-To: <ZtXuJ3TMp9cN5e9h@LQ3V64L9R2.station>
-References: <20240829131214.169977-1-jdamato@fastly.com>
-	<20240829131214.169977-6-jdamato@fastly.com>
-	<20240829153105.6b813c98@kernel.org>
-	<ZtGiNF0wsCRhTtOF@LQ3V64L9R2>
-	<20240830142235.352dbad5@kernel.org>
-	<ZtXuJ3TMp9cN5e9h@LQ3V64L9R2.station>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: idosch@nvidia.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, dsahern@kernel.org, dongml2@chinatelecom.cn,
+ amcohen@nvidia.com, gnault@redhat.com, bpoirier@nvidia.com,
+ b.galvani@gmail.com, razor@blackwall.org, petrm@nvidia.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 06/12] net: vxlan: make vxlan_set_mac()
+ return drop reasons
+Message-ID: <20240902181211.7ca407f1@kernel.org>
+In-Reply-To: <CADxym3bkVFApps1wJpSQME=WcN_Xy1_biL94TZyhQucBHaRc5w@mail.gmail.com>
+References: <20240830020001.79377-1-dongml2@chinatelecom.cn>
+	<20240830020001.79377-7-dongml2@chinatelecom.cn>
+	<20240830162627.4ba37aa3@kernel.org>
+	<CADxym3bkVFApps1wJpSQME=WcN_Xy1_biL94TZyhQucBHaRc5w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,88 +66,59 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 2 Sep 2024 18:56:07 +0200 Joe Damato wrote:
-> > How do you feel about making this configuration opt-in / require driver
-> > changes? What I'm thinking is that having the new "netif_napi_add()"
-> > variant (or perhaps extending netif_napi_set_irq()) to take an extra
-> > "index" parameter would make the whole thing much simpler.  
+On Sun, 1 Sep 2024 20:47:27 +0800 Menglong Dong wrote:
+> > > @@ -1620,7 +1620,7 @@ static bool vxlan_set_mac(struct vxlan_dev *vxlan,
+> > >
+> > >       /* Ignore packet loops (and multicast echo) */
+> > >       if (ether_addr_equal(eth_hdr(skb)->h_source, vxlan->dev->dev_addr))
+> > > -             return false;
+> > > +             return (u32)VXLAN_DROP_INVALID_SMAC;  
+> >
+> > It's the MAC address of the local interface, not just invalid...
+> >  
 > 
-> What about extending netif_queue_set_napi instead? That function
-> takes a napi and a queue index.
+> Yeah, my mistake. It seems that we need to add a
+> VXLAN_DROP_LOOP_SMAC here? I'm not sure if it is worth here,
+> or can we reuse VXLAN_DROP_INVALID_SMAC here too?
 
-This may become problematic, since there may be more queues than NAPIs.
-Either with multiple combined queues mapped to a single NAPI, or having
-separate Rx/Tx NAPIs.
+Could you take a look at the bridge code and see if it has similar
+checks? Learning the addresses and dropping frames which don't match
+static FDB entries seem like fairly normal L2 switching drop reasons.
+Perhaps we could add these as non-VXLAN specific?
 
-No strong preference on which function we modify (netif_napi_add vs the
-IRQ setting helper) but I think we need to take the index as an
-explicit param, rather than try to guess it based on another ID. 
-The queue ID will match 95% of the time, today. But Intel was
-interested in "remapping" queues. And we all think about a queue API...
-So using queue ID is going to cause problems down the road.
+The subsystem reason API was added for wireless, because wireless
+folks had their own encoding, and they have their own development
+tree (we don't merge their patches directly into net-next).
+I keep thinking that we should add the VXLAN reason to the "core"
+group rather than creating a subsystem..
 
-> Locally I kinda of hacked up something simple that:
->   - Allocates napi_storage in net_device in alloc_netdev_mqs
->   - Modifies netif_queue_set_napi to:
->      if (napi)
->        napi->storage = dev->napi_storage[queue_index];
+> > >       /* Get address from the outer IP header */
+> > >       if (vxlan_get_sk_family(vs) == AF_INET) {
+> > > @@ -1635,9 +1635,9 @@ static bool vxlan_set_mac(struct vxlan_dev *vxlan,
+> > >
+> > >       if ((vxlan->cfg.flags & VXLAN_F_LEARN) &&
+> > >           vxlan_snoop(skb->dev, &saddr, eth_hdr(skb)->h_source, ifindex, vni))
+> > > -             return false;
+> > > +             return (u32)VXLAN_DROP_ENTRY_EXISTS;  
+> >
+> > ... because it's vxlan_snoop() that checks:
+> >
+> >         if (!is_valid_ether_addr(src_mac))  
 > 
-> I think I'm still missing the bit about the
-> max(rx_queues,tx_queues), though :(
+> It seems that we need to make vxlan_snoop() return skb drop reasons
+> too, and we need to add a new patch, which makes this series too many
+> patches. Any  advice?
 
-You mean whether it's enough to do
+You could save some indentation by inverting the condition:
 
-	napi_cnt = max(txqs, rxqs)
+ 	if (!(vxlan->cfg.flags & VXLAN_F_LEARN))
+		return (u32)SKB_NOT_DROPPED_YET;
 
-? Or some other question?
+	return vxlan_snoop(skb->dev, &saddr, eth_hdr(skb)->h_source, ifindex, vni);
 
-AFAIU mlx5 can only have as many NAPIs as it has IRQs (256?).
-Look at ip -d link to see how many queues it has.
-We could do txqs + rxqs to be safe, if you prefer, but it will 
-waste a bit of memory.
+But yes, I don't see a better way than having vxlan_snoop() return a
+reason code :(
 
-> > Index would basically be an integer 0..n, where n is the number of
-> > IRQs configured for the driver. The index of a NAPI instance would
-> > likely match the queue ID of the queue the NAPI serves.  
-> 
-> Hmmm. I'm hesitant about the "number of IRQs" part. What if there
-> are NAPIs for which no IRQ is allocated ~someday~ ?
-
-A device NAPI without an IRQ? Whoever does something of such silliness
-will have to deal with consequences. I think it's unlikely.
-
-> It seems like (I could totally be wrong) that netif_queue_set_napi
-> can be called and work and create the association even without an
-> IRQ allocated.
-> 
-> I guess the issue is mostly the queue index question above: combined
-> rx/tx vs drivers having different numbers of rx and tx queues.
-
-Yes, and in the future the ability to allocate more queues than NAPIs.
-netif_queue_set_napi() was expected to cover such cases.
-
-> > We can then allocate an array of "napi_configs" in net_device -
-> > like we allocate queues, the array size would be max(num_rx_queue,
-> > num_tx_queues). We just need to store a couple of ints so it will
-> > be tiny compared to queue structs, anyway.
-> > 
-> > The NAPI_SET netlink op can then work based on NAPI index rather 
-> > than the ephemeral NAPI ID. It can apply the config to all live
-> > NAPI instances with that index (of which there really should only 
-> > be one, unless driver is mid-reconfiguration somehow but even that
-> > won't cause issues, we can give multiple instances the same settings)
-> > and also store the user config in the array in net_device.
-> > 
-> > When new NAPI instance is associate with a NAPI index it should get
-> > all the config associated with that index applied.
-> > 
-> > Thoughts? Does that makes sense, and if so do you think it's an
-> > over-complication?  
-> 
-> I think what you are proposing seems fine; I'm just working out the
-> implementation details and making sure I understand before sending
-> another revision.
-
-If you get stuck feel free to send a link to a GH or post RFC.
-I'm adding extra asks so whether form of review helps.. :)
+The patch limit count is 15, 12 is our preferred number but you can go
+higher if it helps the clarity of the series.
 
