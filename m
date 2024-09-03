@@ -1,191 +1,81 @@
-Return-Path: <netdev+bounces-124643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E02996A4F9
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 19:04:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A91BA96A4FC
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 19:04:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D32C61F2499E
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 17:04:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F4E11F26A58
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 17:04:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE7D18BC2E;
-	Tue,  3 Sep 2024 17:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE03E18BC39;
+	Tue,  3 Sep 2024 17:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XuGHg7wn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5D21C14;
-	Tue,  3 Sep 2024 17:04:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F031E492;
+	Tue,  3 Sep 2024 17:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725383053; cv=none; b=UTTRwaeLdmxLA2ZUKTAKkF/RSlXCtdM7a1EN+fI7qAVzxjofhcxVbusvQcSvZsxAjLfoM1KgzjYvPjR6SAN2jCZXkD0dxGQI5nC+OplhOYrEzrH6fWXttebB2skO9ZmkHOybbe+olwq/nLqgfmr+/CvKVB4tFlmohmUHo1DSLCY=
+	t=1725383064; cv=none; b=RBSJB8eNJRMupenLWg03owgFrmEdCIcPQ/2Td10JuADpul3ivRfr9Q17LtkiEwUv/XkE8PT1kYJ5RkaezMhH8c3jSGIadk7+K6NB7Gwf8vksSufGsUFt6xfj0CY1lTUIHJnWUy/2Dxw3rlfhB2K2H8/hpht15Ftgeyf4pROOTi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725383053; c=relaxed/simple;
-	bh=Kb50wC/hoCRwCoOcj4VfXvEouLo6N8aFx37rX4Igv94=;
+	s=arc-20240116; t=1725383064; c=relaxed/simple;
+	bh=pGn21AlLH83VAFP2QcI0XeFnk7qfUU2mFm+gHJVxwCQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uvE1twLPuAPh/ci6gTzyF8tBHnizTZrR0SHJU9dECUFw4T3sIPWzuxj4B4kC//TpMrxJixyIGxwHbsfWMfXf8r6TWiCeIjIP4vaJNVFLt578Ltzo5SHS0tO5fmqkaZ7Rd1U1ExVUQ9T+mHsJLngSMD2V9lGt+eO2R+CvAXEU3nQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20693995f68so9198135ad.1;
-        Tue, 03 Sep 2024 10:04:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725383051; x=1725987851;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WkZ76k+RsmoQcSUxXQqUyd32+/1Llwux3no1WyFmKNY=;
-        b=goTYMbkl+yhwbuPyM7683SwSM1RTIdvJ6vItOWYsRw9utl0+kqYRXyKiYOXbfQyUAk
-         4NM1xEb/t2G8sXZwYL+ENbhZDBvYFtt0WfhXXN2evacMWKkgqLGxm0QmaRGpGcJUOzk6
-         HuDK9sLsCwxpN1GD9HuBF6Y6SVHozdxKXsNcq65kho8pFB9SzbfJa1UgH2O58O+g5vPw
-         LaOiBeyDjGfmbAoCfw37Z95Im7HbB0lH2/NIoRPHdyCCEi9wt6vkklPDq48WhBuwp0S6
-         YN+bf54TNe332H+vlX52xGA7Pomm1XubcYFMGk4nR80il+69ilRSCAhfw58NbP2p9PkQ
-         yHsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVnKaSAhrcRoeE02l7Nm+Eb/j/6Vzo3oS90rmjGqvL1bCe0BNgqHPBUUJ44fDnu7wqR+FJfJB8D6YPRZZKC@vger.kernel.org, AJvYcCVs5jylmaXO2yALVslAp9bk8KNNt3aaJrCxk8zT/qDaS9wYmmyeJzsWGggHg7i7FupYGoWETXtH@vger.kernel.org, AJvYcCWiq2MDzLJuZ6A9biZtdMG8MYt8v2/lD3KOjkjiJO4qQh/mbLmaFzeVEaT3hwPIPSBgmYY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsXgE4tBgWU0Qz+iOVfSi86Ld+6kerPiY1LFLd1cdms/tRq1fV
-	956fxJj1KPuTMW6HvunbhjL1Zzi9vJbNkr2d44GcOT3H0pq1Xkpn9fVk2O0=
-X-Google-Smtp-Source: AGHT+IEC/oNDVBEgRcjtgGrRziLB/9VT3hq01Ir0SbzHbnfr0qbKxeamnnnnwV5VEunrkdgPn0ebaA==
-X-Received: by 2002:a17:902:dad1:b0:206:97d6:be8b with SMTP id d9443c01a7336-20697d6bf68mr33781695ad.25.1725383050534;
-        Tue, 03 Sep 2024 10:04:10 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:73b6:7410:eb24:cba4])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea3866dsm784975ad.153.2024.09.03.10.04.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 10:04:10 -0700 (PDT)
-Date: Tue, 3 Sep 2024 10:04:09 -0700
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=s/J0S68K0cZ16sykg3+rn45mIkHAEGAiGcB9Ku7wSDsu4001rj5jU5esvUhrXM5kvCkCFvnHN/v1cQNS3lwSTTF820CzjtybCMGc9y3wnDNP8CQk7e7Qvas6dayPwu4N25RCVHgVEGZhAEVgjglHButidZI7cbDUAUN3zy1lF5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XuGHg7wn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1605BC4CEC4;
+	Tue,  3 Sep 2024 17:04:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725383064;
+	bh=pGn21AlLH83VAFP2QcI0XeFnk7qfUU2mFm+gHJVxwCQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XuGHg7wnn9LiqRtBbmPjR0u4R1XdFvPWCD/MKYSYxjHRhUnU1mpFGjmmYY3AWwhwM
+	 hF2rbIfplNsjk9BG0g33pYQwyRNpbkgGR4KC+HaCAExf8FGbu8TTRp8rAu+v2v+tob
+	 FKsQs/qYeTngHA3qhfJs0u02FtRmJYTpLaWIn7gWTbAi5ssJRo0fGGomlyOPJYjKnz
+	 cgQ0PMlfhJeV+3UJoaBPbtld0KqwIKp3Nkehrk9uQVTSSpU4gfRRQ52TBLpnh1Jo0i
+	 9bNOfTz84tUvp3qCjdygHwFV8q5dO847io4/z81gQMAbDQBD9S/oT/vf5inWvwbc5d
+	 cntu11qerEyeA==
+Date: Tue, 3 Sep 2024 18:04:19 +0100
+From: Simon Horman <horms@kernel.org>
+To: Martyn Welch <martyn.welch@collabora.com>
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	kernel@collabora.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next 2/9] kthread: allow vararg
- kthread_{create,run}_on_cpu()
-Message-ID: <ZtdBieFVdpT4Jsf_@mini-arch>
-References: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
- <20240830162508.1009458-3-aleksander.lobakin@intel.com>
- <ZtJODFOYkjgRTPCh@mini-arch>
- <235dcd89-54a6-43ca-bbb3-45dfd6db97e6@intel.com>
+Subject: Re: [PATCH] net: enetc: Replace ifdef with IS_ENABLED
+Message-ID: <20240903170419.GH4792@kernel.org>
+References: <20240830175052.1463711-1-martyn.welch@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <235dcd89-54a6-43ca-bbb3-45dfd6db97e6@intel.com>
+In-Reply-To: <20240830175052.1463711-1-martyn.welch@collabora.com>
 
-On 09/03, Alexander Lobakin wrote:
-> From: Stanislav Fomichev <sdf@fomichev.me>
-> Date: Fri, 30 Aug 2024 15:56:12 -0700
-> 
-> > On 08/30, Alexander Lobakin wrote:
-> >> Currently, kthread_{create,run}_on_cpu() doesn't support varargs like
-> >> kthread_create{,_on_node}() do, which makes them less convenient to
-> >> use.
-> >> Convert them to take varargs as the last argument. The only difference
-> >> is that they always append the CPU ID at the end and require the format
-> >> string to have an excess '%u' at the end due to that. That's still true;
-> >> meanwhile, the compiler will correctly point out to that if missing.
-> >> One more nice side effect is that you can now use the underscored
-> >> __kthread_create_on_cpu() if you want to override that rule and not
-> >> have CPU ID at the end of the name.
-> >> The current callers are not anyhow affected.
-> >>
-> >> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> >> ---
-> >>  include/linux/kthread.h | 51 ++++++++++++++++++++++++++---------------
-> >>  kernel/kthread.c        | 22 ++++++++++--------
-> >>  2 files changed, 45 insertions(+), 28 deletions(-)
-> >>
-> >> diff --git a/include/linux/kthread.h b/include/linux/kthread.h
-> >> index b11f53c1ba2e..27a94e691948 100644
-> >> --- a/include/linux/kthread.h
-> >> +++ b/include/linux/kthread.h
-> >> @@ -27,11 +27,21 @@ struct task_struct *kthread_create_on_node(int (*threadfn)(void *data),
-> >>  #define kthread_create(threadfn, data, namefmt, arg...) \
-> >>  	kthread_create_on_node(threadfn, data, NUMA_NO_NODE, namefmt, ##arg)
-> >>  
-> >> -
-> >> -struct task_struct *kthread_create_on_cpu(int (*threadfn)(void *data),
-> >> -					  void *data,
-> >> -					  unsigned int cpu,
-> >> -					  const char *namefmt);
-> >> +__printf(4, 5)
-> >> +struct task_struct *__kthread_create_on_cpu(int (*threadfn)(void *data),
-> >> +					    void *data, unsigned int cpu,
-> >> +					    const char *namefmt, ...);
-> >> +
-> >> +#define kthread_create_on_cpu(threadfn, data, cpu, namefmt, ...)	   \
-> >> +	_kthread_create_on_cpu(threadfn, data, cpu, __UNIQUE_ID(cpu_),	   \
-> >> +			       namefmt, ##__VA_ARGS__)
-> >> +
-> >> +#define _kthread_create_on_cpu(threadfn, data, cpu, uc, namefmt, ...) ({   \
-> >> +	u32 uc = (cpu);							   \
-> >> +									   \
-> >> +	__kthread_create_on_cpu(threadfn, data, uc, namefmt,		   \
-> >> +				##__VA_ARGS__, uc);			   \
-> >> +})
-> >>  
-> >>  void get_kthread_comm(char *buf, size_t buf_size, struct task_struct *tsk);
-> >>  bool set_kthread_struct(struct task_struct *p);
-> >> @@ -62,25 +72,28 @@ bool kthread_is_per_cpu(struct task_struct *k);
-> >>   * @threadfn: the function to run until signal_pending(current).
-> >>   * @data: data ptr for @threadfn.
-> >>   * @cpu: The cpu on which the thread should be bound,
-> >> - * @namefmt: printf-style name for the thread. Format is restricted
-> >> - *	     to "name.*%u". Code fills in cpu number.
-> >> + * @namefmt: printf-style name for the thread. Must have an excess '%u'
-> >> + *	     at the end as kthread_create_on_cpu() fills in CPU number.
-> >>   *
-> >>   * Description: Convenient wrapper for kthread_create_on_cpu()
-> >>   * followed by wake_up_process().  Returns the kthread or
-> >>   * ERR_PTR(-ENOMEM).
-> >>   */
-> >> -static inline struct task_struct *
-> >> -kthread_run_on_cpu(int (*threadfn)(void *data), void *data,
-> >> -			unsigned int cpu, const char *namefmt)
-> >> -{
-> >> -	struct task_struct *p;
-> >> -
-> >> -	p = kthread_create_on_cpu(threadfn, data, cpu, namefmt);
-> >> -	if (!IS_ERR(p))
-> >> -		wake_up_process(p);
-> >> -
-> >> -	return p;
-> >> -}
-> >> +#define kthread_run_on_cpu(threadfn, data, cpu, namefmt, ...)		   \
-> >> +	_kthread_run_on_cpu(threadfn, data, cpu, __UNIQUE_ID(task_),	   \
-> >> +			    namefmt, ##__VA_ARGS__)
-> >> +
-> >> +#define _kthread_run_on_cpu(threadfn, data, cpu, ut, namefmt, ...)	   \
-> >> +({									   \
-> >> +	struct task_struct *ut;						   \
-> >> +									   \
-> >> +	ut = kthread_create_on_cpu(threadfn, data, cpu, namefmt,	   \
-> >> +				   ##__VA_ARGS__);			   \
-> >> +	if (!IS_ERR(ut))						   \
-> >> +		wake_up_process(ut);					   \
-> >> +									   \
-> >> +	ut;								   \
-> >> +})
-> > 
-> > Why do you need to use __UNIQUE_ID here? Presumably ({}) in _kthread_run_on_cpu
-> 
-> It will still be a -Wshadow warning if the caller has a variable with
-> the same name. I know it's enabled only on W=2, but anyway I feel like
-> we shouldn't introduce any new warnings when possible.
+On Fri, Aug 30, 2024 at 06:50:50PM +0100, Martyn Welch wrote:
+> The enetc driver uses ifdefs when checking whether
+> CONFIG_FSL_ENETC_PTP_CLOCK is enabled in a number of places. This works
+> if the driver is compiled in but fails if the driver is available as a
 
-Makes sense, thanks! That's why, presumably, kthread_run uses __k name
-to avoid the warning..
+maybe: compiled -> built-in
+
+> kernel module. Replace the instances of ifdef with use of the IS_ENABLED
+> macro, that will evaluate as true when this feature is built as a kernel
+> module.
+> 
+> Signed-off-by: Martyn Welch <martyn.welch@collabora.com>
+
+...
 
