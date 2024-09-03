@@ -1,184 +1,160 @@
-Return-Path: <netdev+bounces-124389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28C399692E6
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 06:29:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAD499692FC
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 07:00:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D40C3282FEF
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 04:29:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29CCD1C22B9B
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 05:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB411CB535;
-	Tue,  3 Sep 2024 04:29:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF021CDA2B;
+	Tue,  3 Sep 2024 05:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JqVi/DYe"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="ZeD8waQV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3121CDFAC
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 04:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E1E1CE6F5;
+	Tue,  3 Sep 2024 05:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725337763; cv=none; b=QdunEyxF/wpYc/LhTP9wXPIo6pzDi/5p2vepyylgyysQcmV8lOGpo6J5CowebjCf4f/6BWXTD7Bxox20nJDIdnnlwXypPNGY1KgZwoPWlwvQptXZ1ObEezrWOdHP0rEVv/aMcdmRQThm04IhWkLxwXRS8TUMPxszFQATITr5COE=
+	t=1725339610; cv=none; b=XjWzUSIPF1a8wnVnQXgW7N5ZE/gO5OBIAPvb3XQSOyLpWs2Wn9lafEExIErdfWoM8gx5m/XYxIXE2YTHUT8aRwsg3pOq3QF3O7FRhP0snabU1OGbSqfQE8TFSDS6xXfXyZpeJqNdbTQzPstl1WXnof87p5ql7Fd8dxttCOz4rgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725337763; c=relaxed/simple;
-	bh=uH7Gn3d41cpuwRq799H0mwL8fYyKUrYGCCV035KdmTo=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=XmdfcDYalQ42baKgN0EvUPYy9JnnSe5rk8ympruXyTxd95CaUCPJtIDyCInJlol98a4L5gQ7pyvESItANvJCJe0rKlb4E+SCESGpn1np5rRwfInHBvF/hxmhTI8oet6icGLvOUEYKs9hk8rVYIT0U9fTvCv7/eX8Rvv1gPLAquc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JqVi/DYe; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1725337763; x=1756873763;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=uH7Gn3d41cpuwRq799H0mwL8fYyKUrYGCCV035KdmTo=;
-  b=JqVi/DYeTMT529l4E1HqyHUyCxxkpvMN7FfsjlYFxWvfidIYABvUvGXG
-   0HqYsJK/AsL8mgq4u6DMo7Fcq8//+EVrJIVn3e4DYuZOU/K5Y+T5AZtyG
-   g7wVMxDrhdSHFKG6voPZcQri5bD1XlQjRxg2fOSYvBQSiBiLfI/zYZX13
-   k=;
-X-IronPort-AV: E=Sophos;i="6.10,197,1719878400"; 
-   d="scan'208";a="430785666"
-Subject: RE: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics reporting
- support
-Thread-Topic: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics reporting support
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 04:29:20 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.43.254:31765]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.4.97:2525] with esmtp (Farcaster)
- id bfbc5d68-0272-4b25-abd5-8fdf8f634ccc; Tue, 3 Sep 2024 04:29:18 +0000 (UTC)
-X-Farcaster-Flow-ID: bfbc5d68-0272-4b25-abd5-8fdf8f634ccc
-Received: from EX19D022EUA004.ant.amazon.com (10.252.50.82) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 3 Sep 2024 04:29:18 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D022EUA004.ant.amazon.com (10.252.50.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 3 Sep 2024 04:29:18 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.035; Tue, 3 Sep 2024 04:29:18 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: Parav Pandit <parav@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, "Xuan
- Zhuo" <xuanzhuo@linux.alibaba.com>, "Michael S. Tsirkin" <mst@redhat.com>
-CC: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, "Woodhouse, David" <dwmw@amazon.co.uk>, "Machulsky,
- Zorik" <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>,
-	"Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
-	"Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Agroskin, Shay"
-	<shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>, "Abboud, Osama"
-	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Beider, Ron" <rbeider@amazon.com>, "Chauskin,
- Igor" <igorch@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>, "Cornelia
- Huck" <cohuck@redhat.com>
-Thread-Index: AQHa7SRj5VISt7WkiEq52al7KaOO2rIkcQQAgACfhwCAAD2PAIABmGGAgAA9c4CAFP5L8IAJdm9g
-Date: Tue, 3 Sep 2024 04:29:18 +0000
-Message-ID: <686a380af2774aa9ade5a9baa1f9e49a@amazon.com>
-References: <20240811100711.12921-1-darinzon@amazon.com>
-	<20240811100711.12921-3-darinzon@amazon.com>
-	<20240812185852.46940666@kernel.org>
-	<9ea916b482fb4eb3ace2ca2fe62abd64@amazon.com>
-	<20240813081010.02742f87@kernel.org>
-	<8aea0fda1e48485291312a4451aa5d7c@amazon.com>
- <20240814121145.37202722@kernel.org>
- <IA0PR12MB87130D5D31AEFDBEDBF690ADDC952@IA0PR12MB8713.namprd12.prod.outlook.com>
-In-Reply-To: <IA0PR12MB87130D5D31AEFDBEDBF690ADDC952@IA0PR12MB8713.namprd12.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1725339610; c=relaxed/simple;
+	bh=qk0sgXPXCUp423rPtuL4WTcRq66OpxzVHbZ67bq9zZw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PJLUDVfDpn/nE8GLBREUdc3RvA4uUPsqStzZu4MlYbb06ygaIxKe8wl58pMNOYeYhOfOvU8C36p0kpdZH/6Z+OXdfzyb6fmBAC/mfpRkUJcWjmiZemoiCpJ44erFFFl1jEn+A0MHAaCYac9tmulDhR9X/oRpv/wIGebupuvbdu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=ZeD8waQV; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48329THu016348;
+	Mon, 2 Sep 2024 21:59:46 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=lFstmWVsZnwKcwpH1H25XII
+	GyN1jtIw4s8d/tDTcq9g=; b=ZeD8waQVWLHwqsMOqLTGZN9lnCz9HT3q3SQ8/3j
+	NcO7WHucVRfMCWwn5a9Gz9YzfoQ1uURLfhSv7jbAjvOTa2UCs9/P/ph7Acj01Szu
+	Xq1SfV7GB79zPhTHs/FxLHlY+AzTTGM62BU+Nh+8sHfdf7o802wvZQYunvkSm3S1
+	dhrA4uuPchg5Llta+OGCVaeXMHaurZM1oTpzOWcWg8cgaeZr0IytKp3N8Gyc1mpf
+	2G/DA6BGs85PuPZsJtuNLQqBiSDTv9rjpRlV4X2vRdTtNP3tQeJCSSJ4cyhMe6Az
+	ZftmohP4xACD6p9kmThZOWZmLtAEIPEeM1K8h6jGiXcz8jg==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 41dbv1t92f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 02 Sep 2024 21:59:46 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 2 Sep 2024 21:59:44 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 2 Sep 2024 21:59:44 -0700
+Received: from bharat-OptiPlex-Tower-Plus-7020.. (unknown [10.28.34.254])
+	by maili.marvell.com (Postfix) with ESMTP id DAE953F70DB;
+	Mon,  2 Sep 2024 21:59:39 -0700 (PDT)
+From: Bharat Bhushan <bbhushan2@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <jerinj@marvell.com>,
+        <lcherian@marvell.com>, <richardcochran@gmail.com>,
+        <bbhushan2@marvell.com>, <bharatb.linux@gmail.com>
+Subject: [net-next PATCH v8 0/8] cn10k-ipsec: Add outbound inline ipsec support
+Date: Tue, 3 Sep 2024 10:29:29 +0530
+Message-ID: <20240903045937.1759543-1-bbhushan2@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: hbo3p3jJajHOTVxRp2NfECFP-wUrxsXP
+X-Proofpoint-ORIG-GUID: hbo3p3jJajHOTVxRp2NfECFP-wUrxsXP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-02_06,2024-09-02_01,2024-09-02_01
 
-> > > I've looked into the definition of the metrics under question
-> > >
-> > > Based on AWS documentation
-> > > (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-
-> > networ
-> > > k-performance-ena.html)
-> > >
-> > > bw_in_allowance_exceeded: The number of packets queued or dropped
-> > because the inbound aggregate bandwidth exceeded the maximum for the
-> > instance.
-> > > bw_out_allowance_exceeded: The number of packets queued or
-> dropped
-> > because the outbound aggregate bandwidth exceeded the maximum for
-> the
-> > instance.
-> > >
-> > > Based on the netlink spec
-> > > (https://docs.kernel.org/next/networking/netlink_spec/netdev.html)
-> > >
-> > > rx-hw-drop-ratelimits (uint)
-> > > doc: Number of the packets dropped by the device due to the received
-> > packets bitrate exceeding the device rate limit.
-> > > tx-hw-drop-ratelimits (uint)
-> > > doc: Number of the packets dropped by the device due to the transmit
-> > packets bitrate exceeding the device rate limit.
-> > >
-> > > The AWS metrics are counting for packets dropped or queued (delayed,
-> > > but
-> > are sent/received with a delay), a change in these metrics is an
-> > indication to customers to check their applications and workloads due
-> > to risk of exceeding limits.
-> > > There's no distinction between dropped and queued in these metrics,
-> > therefore, they do not match the ratelimits in the netlink spec.
-> > > In case there will be a separation of these metrics in the future to
-> > > dropped
-> > and queued, we'll be able to add the support for hw-drop-ratelimits.
-> >
-> > Xuan, Michael, the virtio spec calls out drops due to b/w limit being
-> > exceeded, but AWS people say their NICs also count packets buffered
-> > but not dropped towards a similar metric.
-> >
-> > I presume the virtio spec is supposed to cover the same use cases.
-> On tx side, number of packets may not be queued, but may not be even
-> DMAed if the rate has exceeded.
-> This is hw nic implementation detail and a choice with trade-offs.
->=20
-> Similarly on rx, one may implement drop or queue or both (queue upto some
-> limit, and drop beyond it).
->=20
-> > Have the stats been approved?
-> Yes. it is approved last year; I have also reviewed it; It is part of the=
- spec
-> nearly 10 months ago at [1].
-> GH PR is merged but GH is not updated yet.
->=20
-> [1] https://github.com/oasis-tcs/virtio-
-> spec/commit/42f389989823039724f95bbbd243291ab0064f82
->=20
-> > Is it reasonable to extend the definition of the "exceeded" stats in
-> > the virtio spec to cover what AWS specifies?
-> Virtio may add new stats for exceeded stats in future.
-> But I do not understand how AWS ENA nic is related to virtio PCI HW nic.
->=20
-> Should virtio implement it? may be yes. Looks useful to me.
-> Should it be now in virtio spec, not sure, this depends on virtio communi=
-ty
-> and actual hw/sw supporting it.
->=20
-> > Looks like PR is still open:
-> > https://github.com/oasis-tcs/virtio-spec/issues/180
-> Spec already has it at [1] for drops. GH PR is not upto date.
+This patch series adds outbound inline ipsec support on Marvell
+cn10k series of platform. One crypto hardware logical function
+(cpt-lf) per netdev is required for inline ipsec outbound
+functionality. Software prepare and submit crypto hardware
+(CPT) instruction for outbound inline ipsec crypto mode offload.
+The CPT instruction have details for encryption and authentication
+Crypto hardware encrypt, authenticate and provide the ESP packet
+to network hardware logic to transmit ipsec packet.
 
-Thank you for the reply, Parav.
-I've raised the query and the summary of this discussion in the above menti=
-oned github ticket.
+First patch makes dma memory writable for in-place encryption,
+Second patch moves code to common file, Third patch disable
+backpressure on crypto (CPT) and network (NIX) hardware.
+Patch four onwards enables inline outbound ipsec.
+
+v7->v8:
+ - spell correction in patch 1/8 (s/sdk/skb)
+
+v6->v7:
+ - skb data was mapped as device writeable but it was not ensured
+   that skb is writeable. This version calls skb_unshare() to make
+   skb data writeable (Thanks Jakub Kicinski for pointing out).
+
+v4->v5:
+ - Fixed un-initialized warning and pointer check
+   (comment from Kalesh Anakkur Purayil)
+
+v3->v4:
+ - Few error messages in data-path removed and some moved
+   under netif_msg_tx_err().
+ - Added check for crypto offload (XFRM_DEV_OFFLOAD_CRYPTO)
+   Thanks "Leon Romanovsky" for pointing out
+ - Fixed codespell error as per comment from Simon Horman
+ - Added some other cleanup comment from Kalesh Anakkur Purayil
+
+v2->v3:
+ - Fix smatch and sparse errors (Comment from Simon Horman)
+ - Fix build error with W=1 (Comment from Simon Horman)
+   https://patchwork.kernel.org/project/netdevbpf/patch/20240513105446.297451-6-bbhushan2@marvell.com/
+ - Some other minor cleanup as per comment
+   https://www.spinics.net/lists/netdev/msg997197.html
+
+v1->v2:
+ - Fix compilation error to build driver a module
+ - Use dma_wmb() instead of architecture specific barrier
+ - Fix couple of other compilation warnings
+
+Bharat Bhushan (8):
+  octeontx2-pf: map skb data as device writeable
+  octeontx2-pf: Move skb fragment map/unmap to common code
+  octeontx2-af: Disable backpressure between CPT and NIX
+  cn10k-ipsec: Init hardware for outbound ipsec crypto offload
+  cn10k-ipsec: Add SA add/del support for outb ipsec crypto offload
+  cn10k-ipsec: Process outbound ipsec crypto offload
+  cn10k-ipsec: Allow ipsec crypto offload for skb with SA
+  cn10k-ipsec: Enable outbound ipsec crypto offload
+
+ MAINTAINERS                                   |    1 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |    4 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |   68 +-
+ .../ethernet/marvell/octeontx2/nic/Makefile   |    1 +
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1095 +++++++++++++++++
+ .../marvell/octeontx2/nic/cn10k_ipsec.h       |  266 ++++
+ .../marvell/octeontx2/nic/otx2_common.c       |  113 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |   25 +
+ .../marvell/octeontx2/nic/otx2_dcbnl.c        |    3 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   19 +-
+ .../marvell/octeontx2/nic/otx2_txrx.c         |   65 +-
+ .../marvell/octeontx2/nic/otx2_txrx.h         |    3 +
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |   10 +-
+ 13 files changed, 1619 insertions(+), 54 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+
+-- 
+2.34.1
 
 
