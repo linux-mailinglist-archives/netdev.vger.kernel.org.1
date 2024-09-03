@@ -1,197 +1,297 @@
-Return-Path: <netdev+bounces-124478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25846969A87
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:47:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F43969A8D
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 12:47:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A78021F2435E
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:47:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A59471C22DF3
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09071B9849;
-	Tue,  3 Sep 2024 10:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA581B9859;
+	Tue,  3 Sep 2024 10:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ndHqJMPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B7B1B9829;
-	Tue,  3 Sep 2024 10:46:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A6D1A3AA3;
+	Tue,  3 Sep 2024 10:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725360416; cv=none; b=clwYEHmncS2fAr8JhZ16m6UEbBU4lTE0uJhXApibDx0ST4B/F8xNyNfelY1Uv4YdCImIvsbzrtJYHADpSk8LqhRdauu3UIzTtK8NU3V+pq1EQYU8dW86HUsoe8cY0YvhPamTo7CTFwvxo5W6Ct/MLblGBvvYF9RcmCogNUPZhs0=
+	t=1725360467; cv=none; b=qFdx2i226qxWAhRPA+GQGZno/1SYlRgtmmOqVgz4uKwMMNWrkZmlq27mDMfCI8tlr8GsEuulaQTKBapCZPSnTDDNHwRV9AajgBMXFFabYmN+eM8D5zpKY2qbBkuL301L3rA99b2ld6ad8M9gi7vpoOb1LTz4QSzLtcNrMnKYGLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725360416; c=relaxed/simple;
-	bh=NdRXoTy+cvSsqe8qf2Zk+1dLnubKdBEvzMSoRUu2M/w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tOC5jL08dE2q1v7Yp3p5QYNfnT6IhQPoBukNZ84inb/SNdE2uFV3G4UZUUILuYm4l38WggklQ86DB9c1wUghPYGKcw0RLht/JVpsr0LnDCDPMUFZON/l8uONUCBpNnFbrY6wtFxCGpo31XzmFpH1kgYGio1u1pl/7wJwCW9lbA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WyhyB0mDhz20nQp;
-	Tue,  3 Sep 2024 18:41:54 +0800 (CST)
-Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id 131561A0188;
-	Tue,  3 Sep 2024 18:46:50 +0800 (CST)
-Received: from [10.67.111.176] (10.67.111.176) by
- kwepemd500012.china.huawei.com (7.221.188.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 3 Sep 2024 18:46:48 +0800
-Message-ID: <0becf4e0-2f66-4c26-b0b3-59ee232eaaef@huawei.com>
-Date: Tue, 3 Sep 2024 18:46:48 +0800
+	s=arc-20240116; t=1725360467; c=relaxed/simple;
+	bh=wyZXp4Md/MFngzkw68Lepo2K/SE40gk0xDZRG/0y18Q=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OBd6A1pdVm8vNcMzxrhTH3G3WOmhpX9Rr1bDVKQjRr3dsGIIW0eBJNSnqREhJzAQQza1Z0bsCqZQPjZi9R10XYCJvOsrpMcJshYbB67rpr2NP7q22djVU4hdf9+66cckY7FkX14b87+ZrlAc46sIxPHxIxinosPxZAyIbuMNBLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ndHqJMPa; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1725360464; x=1756896464;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wyZXp4Md/MFngzkw68Lepo2K/SE40gk0xDZRG/0y18Q=;
+  b=ndHqJMPaAUIRGexqrmky7H/PnV+UhT25qpX1/2Ds5LQ+Bfk2pseyY8vW
+   rKrjYJvYegB/RuamsoV+YLHvIjO9Jvw2JUNVNuIb2Rq4TG+RSSaaauE+h
+   YtCCAfAa9qRIxo8CO99NQeSzsb5Vz/YAd7VTDeKMvKPrSjJGYknTrtQFU
+   fwprGQOZLT0xNsTHeXCbeR3ae1ThBC01rl/VgweNCp2pPFnkWieQvye+M
+   hdObMxG2HVd6PG2jUhhSello0PztPBQeH4cLf0OJrIZ/KMK7f4+9VU3ZC
+   C4iGpDOvPgtohj8EbyWjBpa776QoUhYhNvNPLtwjKvWyChsSmykDo+tya
+   Q==;
+X-CSE-ConnectionGUID: gMxGs1AKRjyzUsZY+6HQ0g==
+X-CSE-MsgGUID: 45r109pJQu2E3EaRsjyMMQ==
+X-IronPort-AV: E=Sophos;i="6.10,198,1719903600"; 
+   d="scan'208";a="34314848"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Sep 2024 03:47:43 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 3 Sep 2024 03:47:21 -0700
+Received: from che-ll-i17164.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Tue, 3 Sep 2024 03:47:11 -0700
+From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
+	<anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <andrew@lunn.ch>, <corbet@lwn.net>,
+	<linux-doc@vger.kernel.org>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<devicetree@vger.kernel.org>, <horatiu.vultur@microchip.com>,
+	<ruanjinjie@huawei.com>, <steen.hegelund@microchip.com>,
+	<vladimir.oltean@nxp.com>
+CC: <parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>,
+	<alexanderduyck@fb.com>, <krzk+dt@kernel.org>, <robh@kernel.org>,
+	<rdunlap@infradead.org>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
+	<Pier.Beruto@onsemi.com>, <Selvamani.Rajagopal@onsemi.com>,
+	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
+	<linux@bigler.io>, <markku.vorne@kempower.com>, Parthiban Veerasooran
+	<Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v7 00/14] Add support for OPEN Alliance 10BASE-T1x MACPHY Serial Interface
+Date: Tue, 3 Sep 2024 16:16:51 +0530
+Message-ID: <20240903104705.378684-1-Parthiban.Veerasooran@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 05/12] net: ftgmac100: Convert using
- devm_clk_get_enabled() in ftgmac100_setup_clk()
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-CC: <florian.fainelli@broadcom.com>, <andrew@lunn.ch>, <olteanv@gmail.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <wens@csie.org>, <jernej.skrabec@gmail.com>,
-	<samuel@sholland.org>, <heiko@sntech.de>, <yisen.zhuang@huawei.com>,
-	<salil.mehta@huawei.com>, <hauke@hauke-m.de>, <alexandre.torgue@foss.st.com>,
-	<joabreu@synopsys.com>, <mcoquelin.stm32@gmail.com>, <wellslutw@gmail.com>,
-	<radhey.shyam.pandey@amd.com>, <michal.simek@amd.com>,
-	<ajay.kathat@microchip.com>, <claudiu.beznea@tuxon.dev>, <kvalo@kernel.org>,
-	<jacky_chou@aspeedtech.com>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-sunxi@lists.linux.dev>,
-	<linux-rockchip@lists.infradead.org>,
-	<linux-stm32@st-md-mailman.stormreply.com>, <linux-wireless@vger.kernel.org>
-References: <20240831021334.1907921-1-lizetao1@huawei.com>
- <20240831021334.1907921-6-lizetao1@huawei.com>
- <nyfm5mxrrvfeu7s25qzjxbatvgnppq7exmca3sccmm6lz7nxan@xxsdgcrueoen>
-From: Li Zetao <lizetao1@huawei.com>
-In-Reply-To: <nyfm5mxrrvfeu7s25qzjxbatvgnppq7exmca3sccmm6lz7nxan@xxsdgcrueoen>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggpeml500005.china.huawei.com (7.185.36.59) To
- kwepemd500012.china.huawei.com (7.221.188.25)
+Content-Type: text/plain
 
-Hi,
+This patch series contain the below updates,
+- Adds support for OPEN Alliance 10BASE-T1x MACPHY Serial Interface in the
+  net/ethernet/oa_tc6.c.
+  Link to the spec:
+  -----------------
+  https://opensig.org/download/document/OPEN_Alliance_10BASET1x_MAC-PHY_Serial_Interface_V1.1.pdf
 
-在 2024/9/3 16:09, Uwe Kleine-König 写道:
-> Hello,
-> 
-> On Sat, Aug 31, 2024 at 10:13:27AM +0800, Li Zetao wrote:
->> Use devm_clk_get_enabled() instead of devm_clk_get() +
->> clk_prepare_enable(), which can make the clk consistent with the device
->> life cycle and reduce the risk of unreleased clk resources. Since the
->> device framework has automatically released the clk resource, there is
->> no need to execute clk_disable_unprepare(clk) on the error path, drop
->> the cleanup_clk label, and the original error process can return directly.
->>
->> Signed-off-by: Li Zetao <lizetao1@huawei.com>
->> ---
->>   drivers/net/ethernet/faraday/ftgmac100.c | 27 ++++++------------------
->>   1 file changed, 7 insertions(+), 20 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
->> index 4c546c3aef0f..eb57c822c5ac 100644
->> --- a/drivers/net/ethernet/faraday/ftgmac100.c
->> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
->> @@ -1752,13 +1752,10 @@ static int ftgmac100_setup_clk(struct ftgmac100 *priv)
->>   	struct clk *clk;
->>   	int rc;
->>   
->> -	clk = devm_clk_get(priv->dev, NULL /* MACCLK */);
->> +	clk = devm_clk_get_enabled(priv->dev, NULL /* MACCLK */);
->>   	if (IS_ERR(clk))
->>   		return PTR_ERR(clk);
->>   	priv->clk = clk;
->> -	rc = clk_prepare_enable(priv->clk);
->> -	if (rc)
->> -		return rc;
->>   
->>   	/* Aspeed specifies a 100MHz clock is required for up to
->>   	 * 1000Mbit link speeds. As NCSI is limited to 100Mbit, 25MHz
->> @@ -1767,21 +1764,17 @@ static int ftgmac100_setup_clk(struct ftgmac100 *priv)
->>   	rc = clk_set_rate(priv->clk, priv->use_ncsi ? FTGMAC_25MHZ :
->>   			  FTGMAC_100MHZ);
->>   	if (rc)
->> -		goto cleanup_clk;
->> +		return rc;
->>   
->>   	/* RCLK is for RMII, typically used for NCSI. Optional because it's not
->>   	 * necessary if it's the AST2400 MAC, or the MAC is configured for
->>   	 * RGMII, or the controller is not an ASPEED-based controller.
->>   	 */
->> -	priv->rclk = devm_clk_get_optional(priv->dev, "RCLK");
->> -	rc = clk_prepare_enable(priv->rclk);
->> -	if (!rc)
->> -		return 0;
->> +	priv->rclk = devm_clk_get_optional_enabled(priv->dev, "RCLK");
->> +	if (IS_ERR(priv->rclk))
->> +		return PTR_ERR(priv->rclk);
->>   
->> -cleanup_clk:
->> -	clk_disable_unprepare(priv->clk);
->> -
->> -	return rc;
->> +	return 0;
-> 
-> You're changing semantics here. Before your patch ftgmac100_setup_clk()
-> was left with priv->clk disabled; now you keep it enabled.
-Before my patch, ftgmac100_setup_clk() was only left with priv->clk 
-disabled when error occurs, and was left with priv->clk enabled when no 
-error occurs because when enabling priv->rclk successfully, it will 
-return 0 directly, and when enabling priv->rclk failed, it will disable 
-priv->clk.
+- Adds driver support for Microchip LAN8650/1 Rev.B1 10BASE-T1S MACPHY
+  Ethernet driver in the net/ethernet/microchip/lan865x/lan865x.c.
+  Link to the product:
+  --------------------
+  https://www.microchip.com/en-us/product/lan8650
 
-It turns out that the code logic is a bit counter-intuitive, but the 
-readability has been improved after adjustments.
-> 
-> Further note that there is a bug here, because in ftgmac100_probe()
-> (i.e. the caller of ftgmac100_setup_clk())
-> clk_disable_unprepare(priv->clk) is called in the error path.
-> (I only looked quickly, so I might have missed a detail.)
-I have considered the case that clk_disable_unprepare will not be 
-executed on the wrong path in ftgmac100_probe(). So I understand that 
-the problem you mentioned should not exist.
-> 
-> So while your patch is an improvement for clock enable/disable
-> balancing, it might regress on power consumption.
-> 
->>   }
->>   
->>   static bool ftgmac100_has_child_node(struct device_node *np, const char *name)
->> @@ -1996,16 +1989,13 @@ static int ftgmac100_probe(struct platform_device *pdev)
->>   	err = register_netdev(netdev);
->>   	if (err) {
->>   		dev_err(&pdev->dev, "Failed to register netdev\n");
->> -		goto err_register_netdev;
->> +		goto err_phy_connect;
->>   	}
->>   
->>   	netdev_info(netdev, "irq %d, mapped at %p\n", netdev->irq, priv->base);
->>   
->>   	return 0;
->>   
->> -err_register_netdev:
->> -	clk_disable_unprepare(priv->rclk);
->> -	clk_disable_unprepare(priv->clk);
->>   err_phy_connect:
->>   	ftgmac100_phy_disconnect(netdev);
->>   err_ncsi_dev:
->> @@ -2034,9 +2024,6 @@ static void ftgmac100_remove(struct platform_device *pdev)
->>   		ncsi_unregister_dev(priv->ndev);
->>   	unregister_netdev(netdev);
->>   
->> -	clk_disable_unprepare(priv->rclk);
->> -	clk_disable_unprepare(priv->clk);
->> -
->>   	/* There's a small chance the reset task will have been re-queued,
->>   	 * during stop, make sure it's gone before we free the structure.
->>   	 */
-> 
-> Best regards
-> Uwe
+Testing Details:
+----------------
+The driver performance was tested using iperf3 in the below two setups
+separately.
 
-Thanks,
-Li Zetao.
+Setup 1:
+--------
+Node 0 - Raspberry Pi 4 with LAN8650 MAC-PHY 
+Node 1 - Raspberry Pi 4 with EVB-LAN8670-USB USB Stick
+
+Setup 2:
+--------
+Node 0 - SAMA7G54-EK with LAN8650 MAC-PHY 
+Node 1 - Raspberry Pi 4 with EVB-LAN8670-USB USB Stick
+
+Achieved maximum of 9.4 Mbps.
+
+Some systems like Raspberry Pi 4 need performance mode enabled to get the
+proper clock speed for SPI. Refer below link for more details.
+
+https://github.com/raspberrypi/linux/issues/3381#issuecomment-1144723750
+
+Changes:
+v2:
+- Removed RFC tag.
+- OA TC6 framework configured in the Kconfig and Makefile to compile as a
+  module.
+- Kerneldoc headers added for all the API methods exposed to MAC driver.
+- Odd parity calculation logic updated from the below link,
+  https://elixir.bootlin.com/linux/latest/source/lib/bch.c#L348
+- Control buffer memory allocation moved to the initial function.
+- struct oa_tc6 implemented as an obaque structure.
+- Removed kthread for handling mac-phy interrupt instead threaded irq is
+  used.
+- Removed interrupt implementation for soft reset handling instead of
+  that polling has been implemented.
+- Registers name in the defines changed according to the specification
+  document.
+- Registers defines are arranged in the order of offset and followed by
+  register fields.
+- oa_tc6_write_register() implemented for writing a single register and
+  oa_tc6_write_registers() implemented for writing multiple registers.
+- oa_tc6_read_register() implemented for reading a single register and
+  oa_tc6_read_registers() implemented for reading multiple registers.
+- Removed DRV_VERSION macro as git hash provided by ethtool.
+- Moved MDIO bus registration and PHY initialization to the OA TC6 lib.
+- Replaced lan865x_set/get_link_ksettings() functions with
+  phy_ethtool_ksettings_set/get() functions.
+- MAC-PHY's standard capability register values checked against the
+  user configured values.
+- Removed unnecessary parameters validity check in various places.
+- Removed MAC address configuration in the lan865x_net_open() function as
+  it is done in the lan865x_probe() function already.
+- Moved standard registers and proprietary vendor registers to the
+  respective files.
+- Added proper subject prefixes for the DT bindings.
+- Moved OA specific properties to a separate DT bindings and corrected the
+  types & mistakes in the DT bindings.
+- Inherited OA specific DT bindings to the LAN865x specific DT bindings.
+- Removed sparse warnings in all the places.
+- Used net_err_ratelimited() for printing the error messages.
+- oa_tc6_process_rx_chunks() function and the content of oa_tc6_handler()
+  function are split into small functions.
+- Used proper macros provided by network layer for calculating the
+  MAX_ETH_LEN.
+- Return value of netif_rx() function handled properly.
+- Removed unnecessary NULL initialization of skb in the
+  oa_tc6_rx_eth_ready() function removed.
+- Local variables declaration ordered in reverse xmas tree notation.
+
+v3:
+- Completely redesigned all the patches.
+- Control and data interface patches are divided into multiple small
+  patches.
+- Device driver APIs added in the oa-tc6-framework.rst file.
+- Code readability improved in all the patches.
+- Defined macros wherever is possible.
+- Changed RESETC to STATUS0_RESETC for improving the readability.
+- Removed OA specific DT bindings.
+- Used default configurations defined in the OA spec.
+- All variables are named properly as per OA spec for more redability.
+- Bigger functions are split into multiple smaller functions.
+- DT binding check is done.
+- Phy mask is removed in phy scanning.
+- Used NET_RX_DROP to compare the rx packet submission status.
+- Indentation in the Kconfig file corrected.
+- Removed CONFIG_OF and CONFIG_ACPI ifdefs.
+- Removed MODULE_ALIAS().
+
+v4:
+- Fixed indentation in oa-tc6-framework.rst file.
+- Replaced ENODEV error code with EPROTO in the
+  oa_tc6_check_ctrl_write_reply and oa_tc6_check_ctrl_read_reply()
+  functions.
+- Renamed oa_tc6_read_sw_reset_status() function as
+  oa_tc6_read_status0().
+- Changed software reset polling delay as 1ms and polling timeout as 1s.
+- Implemented clause 45 registers direct access.
+- Replaced ENODEV error code with ENOMEM in the
+  oa_tc6_mdiobus_register() function.
+- Changed transmit skbs queue size as 2.
+- Added skb_linearize() function to convert contiguous packet data.
+- Checked kthread_should_stop() in the oa_tc6_spi_thread_handler()
+  function before proceeding for the oa_tc6_try_spi_transfer().
+- Removed netdev_err() print in the oa_tc6_allocate_rx_skb() function.
+- Added spi-peripheral-props reference in the dt-bindings.
+- Changed the fallback order in the dt-bindings.
+- Replaced netif_start_queue() with netif_wake_queue().
+- Empty data transfer performed in the oa_tc6_init() function to clear
+  the reset complete interrupt.
+- ZARFE bit in the CONFIG0 register is set to 1 to avoid lan865x halt
+  based on the recommendation in the lan865x errata.
+
+v5:
+- Added base commit info in the cover letter.
+- Fixed all the warnings reported in the oa-tc6-framework.rst file.
+- Fixed kernel-doc reported warnings.
+- Fixed reverse christmas tree notation.
+- Printed error code in case STATUS0 register read is failed.
+- Removed C29 support in the PHY initialization.
+- Returned the same error code from the function instead of replacing
+  with another error code.
+- Used netdev_alloc_skb_ip_align() to allocate receive skb buffer.
+- Enabling zero align receive frame feature moved to OA TC6 framework
+  as a helper function for vendor specific drivers.
+- Replaced eth_hw_addr_set() with eth_commit_mac_addr_change() as it is
+  a better pair for eth_prepare_mac_addr_change().
+- Fixed device tree binding issues in the driver and documentation.
+- Fixed multicast addresses hash value calculation.
+
+v6:
+- Replaced "depends on" with "select" for selecting OA_TC6 library in the
+  lan865x Kconfig file.
+- Fixed multicast address configuration.
+
+v7:
+- Removed tx skb queue handling and introduced two skb pointers to point
+  waiting and ongoing tx skb's.
+- Removed netif_rx() return value check and rx drop statistics update as
+  it is already handled in the dev_core_stats_rx_dropped_inc(skb->dev)
+  function.
+- Removed lan865x_get_drvinfo() function as the core fills this basic
+  info automatically.
+
+Parthiban Veerasooran (14):
+  Documentation: networking: add OPEN Alliance 10BASE-T1x MAC-PHY serial
+    interface
+  net: ethernet: oa_tc6: implement register write operation
+  net: ethernet: oa_tc6: implement register read operation
+  net: ethernet: oa_tc6: implement software reset
+  net: ethernet: oa_tc6: implement error interrupts unmasking
+  net: ethernet: oa_tc6: implement internal PHY initialization
+  net: phy: microchip_t1s: add c45 direct access in LAN865x internal PHY
+  net: ethernet: oa_tc6: enable open alliance tc6 data communication
+  net: ethernet: oa_tc6: implement transmit path to transfer tx ethernet
+    frames
+  net: ethernet: oa_tc6: implement receive path to receive rx ethernet
+    frames
+  net: ethernet: oa_tc6: implement mac-phy interrupt
+  net: ethernet: oa_tc6: add helper function to enable zero align rx
+    frame
+  microchip: lan865x: add driver support for Microchip's LAN865X MAC-PHY
+  dt-bindings: net: add Microchip's LAN865X 10BASE-T1S MACPHY
+
+ .../bindings/net/microchip,lan8650.yaml       |   80 +
+ Documentation/networking/index.rst            |    1 +
+ Documentation/networking/oa-tc6-framework.rst |  497 ++++++
+ MAINTAINERS                                   |   15 +
+ drivers/net/ethernet/Kconfig                  |   11 +
+ drivers/net/ethernet/Makefile                 |    1 +
+ drivers/net/ethernet/microchip/Kconfig        |    1 +
+ drivers/net/ethernet/microchip/Makefile       |    1 +
+ .../net/ethernet/microchip/lan865x/Kconfig    |   19 +
+ .../net/ethernet/microchip/lan865x/Makefile   |    6 +
+ .../net/ethernet/microchip/lan865x/lan865x.c  |  429 ++++++
+ drivers/net/ethernet/oa_tc6.c                 | 1361 +++++++++++++++++
+ drivers/net/phy/microchip_t1s.c               |   30 +
+ include/linux/oa_tc6.h                        |   24 +
+ include/uapi/linux/mdio.h                     |    1 +
+ 15 files changed, 2477 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/microchip,lan8650.yaml
+ create mode 100644 Documentation/networking/oa-tc6-framework.rst
+ create mode 100644 drivers/net/ethernet/microchip/lan865x/Kconfig
+ create mode 100644 drivers/net/ethernet/microchip/lan865x/Makefile
+ create mode 100644 drivers/net/ethernet/microchip/lan865x/lan865x.c
+ create mode 100644 drivers/net/ethernet/oa_tc6.c
+ create mode 100644 include/linux/oa_tc6.h
+
+
+base-commit: 221f9cce949ac8042f65b71ed1fde13b99073256
+-- 
+2.34.1
+
 
