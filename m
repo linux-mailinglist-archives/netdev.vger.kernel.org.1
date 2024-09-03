@@ -1,116 +1,175 @@
-Return-Path: <netdev+bounces-124633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1550596A440
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:27:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE41696A445
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:29:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C676D282BBC
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:27:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B7641C23ACD
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ED7618BB9A;
-	Tue,  3 Sep 2024 16:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93BA18BBA7;
+	Tue,  3 Sep 2024 16:29:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KAFuA8H4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPb9eX8V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36ECC18BB98;
-	Tue,  3 Sep 2024 16:27:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA0E18BB99
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 16:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725380833; cv=none; b=jOq1wwSy+B/UrwUxQwvMTrVaNQMiO0KM+8fJC6wKuAP36UARzYLuRDGIpQNQNq2lwevIcCJ5HKQifre/VlNOMFMB0KkGT7ZEvg6o0MidSxG8+uKet6dVYRh2CO87lt2n4Arb7pFBg1dFafJQd7vI7xOpy50iUGvu4rfcvczHBxM=
+	t=1725380956; cv=none; b=oNAZKxqFeZi9oXs5vUB2rP8akHnNMVzXtk6ODW9C3li+IX9OILTSGL+qsQe5npd5euuCtdBnoonf6b8BdXbeK+zqqZwdPq0phDm76rgIff5a/umKtxqvpxbJrAhYd4TtyJwrDtBh3nDR5M+vXPZ30AKx1IPSHMDl+JuUPafpmHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725380833; c=relaxed/simple;
-	bh=vhaMH9nB7L0B5h8YVg4047SSaEis2Kis9LFU6jI5oVU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=uutURBJgqTWAJhPmSay31ks3GM1XD0dG85quPzZ5Qg8zwIEZAPL0+LU+Nuv+zSK5xZ7WkiDt3YtyiYrtNWzVkauiQPMr5YEiV8Rk78HOzvKF7FJXSSRk7TuODxHxwQ5jUibrZ3ntn8iQzpVEO7Yz9hcETRkjkSf7EgIrXbWYOwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KAFuA8H4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0E29C4CECA;
-	Tue,  3 Sep 2024 16:27:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725380832;
-	bh=vhaMH9nB7L0B5h8YVg4047SSaEis2Kis9LFU6jI5oVU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=KAFuA8H4UrstlOD0JoeX3mhoqbbICkQhhXaKFpMIGPKc+ol6KEp3xotXNqF6C4SU/
-	 OXe4iqYRgCq4ZHJNKZ0gp2nxHfAeY4kVQnKHOGCYTOzbJKRuXun/OUeWyYG9xkZp51
-	 8jLW/D4xzU63b7KsUGDCjpJmRGd7YIPu9JXbJYdYcRyksxIXSu3jHHGP6xhBZ1aKXB
-	 aEiCpzlsNvZr+vAH6csX022kDQQYD40AH/Vi9ZX137ptN2ZvuDNYZEKT0I9/ZZQPOL
-	 gI1hz8b0ZRFaUpzFqCVoFmRCuuzUoJpyvJwbuNZgU81LJkA51/sx7MUt7jpFrzLNxJ
-	 VKhaBARzWakQg==
-From: Simon Horman <horms@kernel.org>
-Date: Tue, 03 Sep 2024 17:26:54 +0100
-Subject: [PATCH net-next 2/2] octeontx2-pf: Make iplen __be16 in
- otx2_sqe_add_ext()
+	s=arc-20240116; t=1725380956; c=relaxed/simple;
+	bh=zYtlk+5sfQncdxRHQdTsxikt0082PiHmmUZg7TTvIvg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=Bd20CDfCpNlx08v2/N1MKvUizFvuFq6fG8PhmzvL6LWX7DC7gMdV+sCWhORQBWrWbesNYKsZcrjHx5GYdEJm3ixWEMP4sQrOsheONxrFszxAUQQ/fCP/LD2aDbSHrPZjIk/26LbzHuskFEkLNdtTrLu5fn5WC+dmra7cZLHvY5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GPb9eX8V; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725380954;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zrnaqsww4jvYqG6LWOK9qSkVY3XeoG7b3xEfRlLXIuA=;
+	b=GPb9eX8V6KrTUWWkgg3GcbJuSzN+gC2Lm1KKFJ4SM1x2bRBVlkEAc4zT0wuwSQmw1aYh7o
+	Q/0mDQseefE06bLPYLZ0GZQQEqDvn2l0L2fCjZblkiAiLoWotd41duJIsipd6gozPxwtaL
+	dtzE+3j4WGoebGfuRUYy53EuZcZj2fk=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-360-Oxy42L8HNia9TzHsm-04XQ-1; Tue, 03 Sep 2024 12:29:13 -0400
+X-MC-Unique: Oxy42L8HNia9TzHsm-04XQ-1
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-7cd7614d826so4894489a12.1
+        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 09:29:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725380952; x=1725985752;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :references:in-reply-to:message-id:date:subject:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zrnaqsww4jvYqG6LWOK9qSkVY3XeoG7b3xEfRlLXIuA=;
+        b=dW0jcmqzcxyTyeIt6OO5cBR6ON6ATu+KHjLgFsDe2eXTqw5Y6gvvztC60Fvbn3BAbt
+         BhpIeuOeJ9S3zPrsndRDXNEdPcCXszbNanL+a/NI3xsojdP8V+Gny3O9bggT9ybrOfIJ
+         uDq9jM8nAgKpCa37SBJwwcTBGbSmThJYTFb+os7WpwnT/dw8OnlvluJukcrr50Z6nb9q
+         mvOIDvPh5wHJmjqGemDCRSivW8SVy/UdX6rPZL0jDi6G6nACzntgAJrA3oz7LwZmBfmT
+         6OuyfvzuMXFopRPMCdHlBB94RyTQgCwpbjiXfTvksXeAl7Xqv+XS4yEbyE6mfqjxzHTW
+         OOPw==
+X-Forwarded-Encrypted: i=1; AJvYcCWSHts5oijH54k+3qK6jeZjQ8DlPrVfnKPa/L1K32oOFx2bYmIDcEBToR8+ORPMuckPYy4ySJY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1rs1Z49/xu+zUvNFCnGnqoFtQbapiwg+AuEqSOJah2gN0ofKp
+	VtRydEX0IOcYHq934mbPgJv+LdAZxy5u2OhKbYj5iPgd1ijX/ExgXmdo9ejIpi9049bgNK+bmYs
+	pNYfdRZ+irmpr+BSJsY98w/BweWyMxJrGpF/5+6TwnqSWCocbZrSWcQ==
+X-Received: by 2002:a17:902:cecc:b0:205:7b03:ec3f with SMTP id d9443c01a7336-2057b03ee0amr99540605ad.19.1725380951878;
+        Tue, 03 Sep 2024 09:29:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEFB7YsrYOLHMUBhndqah1OUkE6FYlc2YhqiVhS0lNKY7Sh/DddLuJw4Mh3nlZdjBuyYPz4vg==
+X-Received: by 2002:a17:902:cecc:b0:205:7b03:ec3f with SMTP id d9443c01a7336-2057b03ee0amr99540215ad.19.1725380951200;
+        Tue, 03 Sep 2024 09:29:11 -0700 (PDT)
+Received: from localhost.localdomain ([2804:1b3:a800:179b:467b:fbc5:3354:8591])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206ae9525d6sm550515ad.111.2024.09.03.09.29.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Sep 2024 09:29:10 -0700 (PDT)
+From: Leonardo Bras <leobras@redhat.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Leonardo Bras <leobras@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	rbc@meta.com,
+	horms@kernel.org,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] virtio_net: Fix napi_skb_cache_put warning
+Date: Tue,  3 Sep 2024 13:28:50 -0300
+Message-ID: <Ztc5QllkqaKZsaoN@LeoBras>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <ZpUHEszCj16rNoGy@gmail.com>
+References: <20240712115325.54175-1-leitao@debian.org> <20240714033803-mutt-send-email-mst@kernel.org> <ZpUHEszCj16rNoGy@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240903-octeontx2-sparse-v1-2-f190309ecb0a@kernel.org>
-References: <20240903-octeontx2-sparse-v1-0-f190309ecb0a@kernel.org>
-In-Reply-To: <20240903-octeontx2-sparse-v1-0-f190309ecb0a@kernel.org>
-To: Sunil Goutham <sgoutham@marvell.com>, 
- Linu Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, 
- Jerin Jacob <jerinj@marvell.com>, Hariprasad Kelam <hkelam@marvell.com>, 
- Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>, 
- Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- netdev@vger.kernel.org, llvm@lists.linux.dev
-X-Mailer: b4 0.14.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-In otx2_sqe_add_ext() iplen is used to hold a 16-bit big-endian value,
-but it's type is u16, indicating a host byte order integer.
+On Mon, Jul 15, 2024 at 04:25:06AM -0700, Breno Leitao wrote:
+> Hello Michael,
+> 
+> On Sun, Jul 14, 2024 at 03:38:42AM -0400, Michael S. Tsirkin wrote:
+> > On Fri, Jul 12, 2024 at 04:53:25AM -0700, Breno Leitao wrote:
+> > > After the commit bdacf3e34945 ("net: Use nested-BH locking for
+> > > napi_alloc_cache.") was merged, the following warning began to appear:
+> > > 
+> > > 	 WARNING: CPU: 5 PID: 1 at net/core/skbuff.c:1451 napi_skb_cache_put+0x82/0x4b0
+> > > 
+> > > 	  __warn+0x12f/0x340
+> > > 	  napi_skb_cache_put+0x82/0x4b0
+> > > 	  napi_skb_cache_put+0x82/0x4b0
+> > > 	  report_bug+0x165/0x370
+> > > 	  handle_bug+0x3d/0x80
+> > > 	  exc_invalid_op+0x1a/0x50
+> > > 	  asm_exc_invalid_op+0x1a/0x20
+> > > 	  __free_old_xmit+0x1c8/0x510
+> > > 	  napi_skb_cache_put+0x82/0x4b0
+> > > 	  __free_old_xmit+0x1c8/0x510
+> > > 	  __free_old_xmit+0x1c8/0x510
+> > > 	  __pfx___free_old_xmit+0x10/0x10
+> > > 
+> > > The issue arises because virtio is assuming it's running in NAPI context
+> > > even when it's not, such as in the netpoll case.
+> > > 
+> > > To resolve this, modify virtnet_poll_tx() to only set NAPI when budget
+> > > is available. Same for virtnet_poll_cleantx(), which always assumed that
+> > > it was in a NAPI context.
+> > > 
+> > > Fixes: df133f3f9625 ("virtio_net: bulk free tx skbs")
+> > > Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> > > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > 
+> > Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> > though I'm not sure I understand the connection with bdacf3e34945.
+> 
+> The warning above appeared after bdacf3e34945 landed.
 
-Address this mismatch by changing the type of iplen to __be16.
+Hi Breno,
+Thanks for fixing this!
 
-Flagged by Sparse as:
+I think the confusion is around the fact that the commit on Fixes 
+(df133f3f9625) tag is different from the commit in the commit message
+(bdacf3e34945).
 
-.../otx2_txrx.c:699:31: warning: incorrect type in assignment (different base types)
-.../otx2_txrx.c:699:31:    expected unsigned short [usertype] iplen
-.../otx2_txrx.c:699:31:    got restricted __be16 [usertype]
-.../otx2_txrx.c:701:54: warning: incorrect type in assignment (different base types)
-.../otx2_txrx.c:701:54:    expected restricted __be16 [usertype] tot_len
-.../otx2_txrx.c:701:54:    got unsigned short [usertype] iplen
-.../otx2_txrx.c:704:60: warning: incorrect type in assignment (different base types)
-.../otx2_txrx.c:704:60:    expected restricted __be16 [usertype] payload_len
-.../otx2_txrx.c:704:60:    got unsigned short [usertype] iplen
+Please help me check if the following is correct:
+###
+Any tree which includes df133f3f9625 ("virtio_net: bulk free tx skbs") 
+should also include your patch, since it fixes stuff in there.
 
-Introduced in
-commit dc1a9bf2c816 ("octeontx2-pf: Add UDP segmentation offload support")
+The fact that the warning was only made visible in 
+bdacf3e34945 ("net: Use nested-BH locking for napi_alloc_cache.")
+does not change the fact that it was already present before.
 
-No functional change intended.
-Compile tested only.
+Also, having bdacf3e34945 is not necessary for the backport, since
+it only made the bug visible.
+###
 
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Are above statements right?
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index 3eb85949677a..933e18ba2fb2 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -687,7 +687,7 @@ static void otx2_sqe_add_ext(struct otx2_nic *pfvf, struct otx2_snd_queue *sq,
- 		} else if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4) {
- 			__be16 l3_proto = vlan_get_protocol(skb);
- 			struct udphdr *udph = udp_hdr(skb);
--			u16 iplen;
-+			__be16 iplen;
- 
- 			ext->lso_sb = skb_transport_offset(skb) +
- 					sizeof(struct udphdr);
+It's important to make it clear since this helps the backporting process.
 
--- 
-2.45.2
+Thanks!
+Leo
 
 
