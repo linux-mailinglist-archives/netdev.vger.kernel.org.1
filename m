@@ -1,68 +1,95 @@
-Return-Path: <netdev+bounces-124432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BB309697B5
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:48:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 258ED9697D1
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 10:51:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12C35B27038
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 08:48:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D593C28A036
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 08:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76BDC2139DA;
-	Tue,  3 Sep 2024 08:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799091C768B;
+	Tue,  3 Sep 2024 08:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vMBoGxK6"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195C21C986E;
-	Tue,  3 Sep 2024 08:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFB31C7662;
+	Tue,  3 Sep 2024 08:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725353081; cv=none; b=mpKO5xOQ78O0ToSedrCH4E62lP2ZEZXW+OIHFQLU8iXm0bgcqDrlwYk6nCRxqpuMrZQNSFUrw5nplDq0WdQXM0x4pX5nHAU5a3zou+U4okbYE5Q9jR/77CRYuPAo8NUFFBbZl/5Ua++j5i3CgyUECxGnsOS/A0u+v1jz+JtFhI8=
+	t=1725353430; cv=none; b=ImAhtJX83LOOT1jEabuHmps1zeE9/KGfHPD67oVISup05a1oe5/qQN0aR0lDdeZcycezc5DURKcvZuiPxOQAr1INZlb65ZGIx4iO+SGXs7kVDOoS3syVZTt2/awVbfFL3EyL85KtH1DuNk686Etw9644uUcQS8mzdg6HzhUTOCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725353081; c=relaxed/simple;
-	bh=NqoJn9iurYRSAGJB23VQCprq3nW80csbT5HId7Aum88=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O8D6z1fDQ0nr45D2xSmNUkstbuBVdBmYkfc4uUlkR2p4BdRWAMmT9Q0AMsFIWh5SN8XjiL39zYEq0k1iG5g0SZPYpwgSf87vvWDdGxWNJXYq8xcsCpG8fsTbW0zn2onIndcrElyzIinvA6RM/pp6Y1K+vOkOAK0s40uXHXgCEw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=52890 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1slP9N-00AF4T-Ma; Tue, 03 Sep 2024 10:44:35 +0200
-Date: Tue, 3 Sep 2024 10:44:32 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Yan Zhen <yanzhen@vivo.com>
-Cc: kadlec@netfilter.org, roopa@nvidia.com, razor@blackwall.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, dsahern@kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	bridge@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
-Subject: Re: [PATCH net-next v1] netfilter: Use kmemdup_array instead of
- kmemdup for multiple allocation
-Message-ID: <ZtbMcPj7W_QS3-sR@calendula>
-References: <20240826034136.1791485-1-yanzhen@vivo.com>
+	s=arc-20240116; t=1725353430; c=relaxed/simple;
+	bh=4mHd+JzrSWsn4wEgnwlHfHRfgWpiCwtBiy0CiLviTPk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SHJ3fllW8avIoGv7VoEkjnvd0Y0ErQwda2YnJrhBSSEGJRiuK1/7BkSvPNrjl/u/wQxzAVZc1jluaFe5s7ceBhfcMMdm9dSBCcFWeThHe1lkxlwb5cZb5tVP0IzWsTlLvvgwlbEANvaFEjh7xdka5helryyrESh9VTh1wW8I0FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vMBoGxK6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C814AC4CEC4;
+	Tue,  3 Sep 2024 08:50:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725353429;
+	bh=4mHd+JzrSWsn4wEgnwlHfHRfgWpiCwtBiy0CiLviTPk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=vMBoGxK6j0nkdX9OOM//zNsGdDak1KCLeU/I695WRXHz8zcuvDBlFkoN+stS1/9/+
+	 E/8P8BAF8TtjRHOhAnUC+hxyTV4CiN7+GakZRVVUOTv40bYUtbQOOqzNaenrOipvAq
+	 3z81aOj2tygq3G3kgyhkFcc40/MZp9K6nsjPTn2YihgwEakuC7lJIppIiayEuk5UBS
+	 YaFiYi1Cutg2t7EsNx11ELYrr5FnAB90U3UHRQ5pL+/gxS5u7RPtXSR9VZaA09Bmda
+	 r+zdvbDSPP4sgcamOICrtcsXLRp1S8dt6i0UYFmC8u3k7kmrTzyfuu6noinrHXByP3
+	 /txQKl5/iV+2w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE363805D82;
+	Tue,  3 Sep 2024 08:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240826034136.1791485-1-yanzhen@vivo.com>
-X-Spam-Score: -1.9 (-)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3] net: dsa: vsc73xx: implement FDB operations
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172535343050.216623.17080034162332629200.git-patchwork-notify@kernel.org>
+Date: Tue, 03 Sep 2024 08:50:30 +0000
+References: <20240827123938.582789-1-paweldembicki@gmail.com>
+In-Reply-To: <20240827123938.582789-1-paweldembicki@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, f.fainelli@gmail.com,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, linux@armlinux.org.uk, linux-kernel@vger.kernel.org
 
-On Mon, Aug 26, 2024 at 11:41:36AM +0800, Yan Zhen wrote:
-> When we are allocating an array, using kmemdup_array() to take care about
-> multiplication and possible overflows.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 27 Aug 2024 14:39:38 +0200 you wrote:
+> This commit introduces implementations of three functions:
+> .port_fdb_dump
+> .port_fdb_add
+> .port_fdb_del
 > 
-> Also it makes auditing the code easier.
+> The FDB database organization is the same as in other old Vitesse chips:
+> It has 2048 rows and 4 columns (buckets). The row index is calculated by
+> the hash function 'vsc73xx_calc_hash' and the FDB entry must be placed
+> exactly into row[hash]. The chip selects the bucket number by itself.
+> 
+> [...]
 
-Applied, thanks
+Here is the summary with links:
+  - [net-next,v3] net: dsa: vsc73xx: implement FDB operations
+    https://git.kernel.org/netdev/net-next/c/075e3d30e4a3
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
