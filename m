@@ -1,103 +1,69 @@
-Return-Path: <netdev+bounces-124669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7075F96A6B5
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:41:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E0B696A6B8
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:43:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A462D1C23110
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:41:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D84F21F24ADF
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:43:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D9261917E9;
-	Tue,  3 Sep 2024 18:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1011C1917D8;
+	Tue,  3 Sep 2024 18:42:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ok4jyGQz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lF4My5JS"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004B215574F;
-	Tue,  3 Sep 2024 18:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3C015574F;
+	Tue,  3 Sep 2024 18:42:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725388881; cv=none; b=sEEyfN3G2RV1JOaQGqMXQvyRhljRlQ8PHNaGjjABNgaKLPUe/ggT9qSRK2YsiESor4VKpzWDwE8Na2n4+IuXZHKrhfg8WzVP+9t5xveVsRGeNOQhW+0Ix0DogI4rNh08fln0biqPoHwSKwfx5Slof1TlHNbD4LSS40j0R/IHGrM=
+	t=1725388979; cv=none; b=EIxOyo+yo66vZDZMcIWoS/5fKhKmBEUw5+ticLriASxfjaJgbFLztlP8MeNQa5OQOCbnVAQdxrzxgSm5HvuJH18Uialn+ntAwAfPCWYdQ4oehFofD2HijWAjKnztUl7sZJ6KXMOlfwBx+RWtRvHEeLfdEzImioUk84gMqciYNjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725388881; c=relaxed/simple;
-	bh=CZXIpq1IQk39rfsb0wPJ3zFZ6pZtmbXVHIZxEx/v6Ts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MDM87N7yw02gXiVITnt/LOQmtI/xS6qXJpGI2811ZGal+mf0a5mpgdnGYOX0EHDVS4RlviDQ/wr2yAQXN4dDFhAKiRbrFxS0N1u2aSB7vYmvTb9EnFWJS3ZKNmNwcvL7p3xXsAGAK2sy5B8AXc7Hzc4239HH3LjXA3jbVs9a/UM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ok4jyGQz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=BaSEjCyHzcCyUy3kvtvU5gvLj82QnRR+Pt0Rb/0BUzs=; b=Ok
-	4jyGQz5nl7muOCK3qg4Xa0ACL451MCXKMH2tkBD9Cuules1kyOSzihR+n4AnAz9sVDbL6K5xrVVGP
-	+ZIQHUUmGCKrFz/YlWvYqXUPAaf7O6VwLCs38a8HAma4oEN3Ab7lOCFrGPxntgWS9f0xRD8G1/x3f
-	kmotfToIZMOHd8g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1slYSg-006SZP-Mn; Tue, 03 Sep 2024 20:41:06 +0200
-Date: Tue, 3 Sep 2024 20:41:06 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next] net: phy: Check for read errors in SIOCGMIIREG
-Message-ID: <49f85a5f-3393-4d7b-8fcb-5eec00e564d6@lunn.ch>
-References: <20240903171536.628930-1-niklas.soderlund+renesas@ragnatech.se>
+	s=arc-20240116; t=1725388979; c=relaxed/simple;
+	bh=nyaB7iBlc36IhwMs3yAlRM1OHMBbN1LH0WFI83yEy78=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kn3iqDwD5bgX17YyvsPXen6hwpybZv+Zgm8H8h4A9d6OO9R9eXAQOW3q1g0J8FwULboYVqcHCsSPd8rA7HvxpMjyAIfwNzlnYLOSn/46R+bBlmf44FIB63hAVPGTBH4qWKY0RyvfL9WI/s75tBDK6sJ+1iGMzBTgO42g7aFtuIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lF4My5JS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 149D6C4CECB;
+	Tue,  3 Sep 2024 18:42:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725388978;
+	bh=nyaB7iBlc36IhwMs3yAlRM1OHMBbN1LH0WFI83yEy78=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lF4My5JS9KgFHIjAFwCTFcj29sbb3zam9Oy7WTUZuCElkcQsLQ798hpx1C0QViTwf
+	 6GE94r1Go5AiTCHaYk9CIzzuTD2hSMnXZ1AkG8MMeWdXU0/5w3jytn5A2GlWhtNe0a
+	 PVB0DImky6z11GXIp8tK54XOR16EqP+aELMjZA9+FVgb86S6c9RSL2vBnQewbhoanJ
+	 nN7irAQUDCBRBJmoA3qRo40BHMYOw7my/LGuo5MFKmD8lcDiYMZcpNBiJdi/43NMJf
+	 H8hJTvyMssXyBfg3uzngt0Ko9NsfNJ4uwrqNaydw7vIMd0X1W0H/4FSsHiE4zDQuEu
+	 icBchEWik7KGA==
+Date: Tue, 3 Sep 2024 11:42:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stefan Schmidt <stefan@datenfreihafen.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+ alex.aring@gmail.com, miquel.raynal@bootlin.com, netdev@vger.kernel.org
+Subject: Re: pull-request: ieee802154 for net 2024-09-01
+Message-ID: <20240903114257.7b906da2@kernel.org>
+In-Reply-To: <20240901184213.2303047-1-stefan@datenfreihafen.org>
+References: <20240901184213.2303047-1-stefan@datenfreihafen.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240903171536.628930-1-niklas.soderlund+renesas@ragnatech.se>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 03, 2024 at 07:15:36PM +0200, Niklas Söderlund wrote:
-> When reading registers from the PHY using the SIOCGMIIREG IOCTL any
-> errors returned from either mdiobus_read() or mdiobus_c45_read() are
-> ignored, and parts of the returned error is passed as the register value
-> back to user-space.
-> 
-> For example, if mdiobus_c45_read() is used with a bus that do not
-> implement the read_c45() callback -EOPNOTSUPP is returned. This is
-> however directly stored in mii_data->val_out and returned as the
-> registers content. As val_out is a u16 the error code is truncated and
-> returned as a plausible register value.
-> 
-> Fix this by first checking the return value for errors before returning
-> it as the register content.
-> 
-> Before this patch,
-> 
->     # phytool read eth0/0:1/0
->     0xffa1
-> 
-> After this change,
-> 
->     $ phytool read eth0/0:1/0
->     error: phy_read (-95)
-> 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+On Sun,  1 Sep 2024 20:42:13 +0200 Stefan Schmidt wrote:
+> Simon Horman catched two typos in our headers. No functional change.
 
-write is similarly broken, but i don't think we care about that.
-
-Thanks
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+Is it okay if we merge these into net-next ?
+On one hand they are unlikely^w guaranteed not to introduce
+regressions, but on the other such trivial spelling fixes are
+not at all urgent.
 
