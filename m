@@ -1,78 +1,101 @@
-Return-Path: <netdev+bounces-124419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DB7B9695E7
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:46:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F3BE9695EF
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:46:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B767281DA9
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 07:46:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B872B212FD
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 07:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22AE1CEAC5;
-	Tue,  3 Sep 2024 07:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theune.cc header.i=@theune.cc header.b="9RS35FQe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70CB31D6DBC;
+	Tue,  3 Sep 2024 07:46:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.theune.cc (mail.theune.cc [212.122.41.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2580649654;
-	Tue,  3 Sep 2024 07:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.122.41.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A00861CDFCD;
+	Tue,  3 Sep 2024 07:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725349559; cv=none; b=eTudpX2gqGg/c1w8tubzhkWxy9TjVVQFBU9FUPxJiJCZvsRG4fE5sx/Q6Dv//3pwKZsZges5x0HzJ2WULI61eNmgEJWzurH6LWYe4/K6d4igvcGBX6Y/NrYSxSUCnDu4dY6FzAC1Jrgkn9VbSOJHT0DUxj64yx8aKimLyXRfkeg=
+	t=1725349604; cv=none; b=N40BoYTvwUOpf2fcQnsMyfcmbPZWfwRSoLEmjev49WDyS5aeUUwGnsslvikPGxTRE/S8N1JRcznWBtRSJTmQMmNAj5o20NfBPTZI42DcS/4/WT/WZXf2njXyQZC0UhJz1v/q/Vv0jg7k42ZMBMQ6OJ7UQetXKSTQNI2b3va6nFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725349559; c=relaxed/simple;
-	bh=UQbVf6OKRCtWOwlejkZMkhRvD/SZFgavXNfB/+1B94g=;
-	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:Cc:To; b=JgkobMFxmq4kw0qw0PFdLE64t7btvvMFGqh8+MrC46D3A84dnR7Q1P7Z4U24luIEEjd/IsEthhFMbtgU9JIZrQk9i8wpIhvcFj4Yoja7mm2yJjyrCSuEBQMScfyH9UQlkDUgRviZ2co5WjNsvyLShWya4/h2+3VJXiv8dLjim8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=theune.cc; spf=pass smtp.mailfrom=theune.cc; dkim=pass (1024-bit key) header.d=theune.cc header.i=@theune.cc header.b=9RS35FQe; arc=none smtp.client-ip=212.122.41.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=theune.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theune.cc
-From: Christian Theune <christian@theune.cc>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=theune.cc; s=mail;
-	t=1725349071; bh=UQbVf6OKRCtWOwlejkZMkhRvD/SZFgavXNfB/+1B94g=;
-	h=From:Subject:Date:Cc:To;
-	b=9RS35FQe8yhCh1MeaHbIsWvYfhvtJjJYdy1rH5cMMCnCd4B6eizhnx12ko82U37ro
-	 SJsuea6OoSCMypFk+dV+NZ3uCu9bpNmLWTL5Zmh91SeXSWC30DGy+RGATA6GC4+OpG
-	 7W7nKOZB2arrpm0UVCpzqBYGrTwtBL4PiGfic28c=
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1725349604; c=relaxed/simple;
+	bh=gT5AzO0UNM6QTElViqcBqC42ZSFImmjwiORhutd450Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rO+QfJue6a3e5ELktPdn/bLzRuSav3f5RPRDPgcEj/EWQEmgB3nPH3P1vJ3Aba7SzIwcZNljQW9Wi965c+mbPfpVi3nOfUnRNznGmu980hPMSqBfQi7qjekrjbihsGFYJkViMyeprcfW9jkEe3vtA22JcU2DY1p9GzddUlsn/jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-03 (Coremail) with SMTP id rQCowADX947WvtZmGIfAAA--.44837S2;
+	Tue, 03 Sep 2024 15:46:32 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH] selftests: net: convert comma to semicolon
+Date: Tue,  3 Sep 2024 15:45:19 +0800
+Message-Id: <20240903074519.781224-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
-Subject: Follow-up to "net: drop bad gso csum_start and offset in
- virtio_net_hdr" - backport for 5.15 needed
-Message-Id: <89503333-86C5-4E1E-8CD8-3B882864334A@theune.cc>
-Date: Tue, 3 Sep 2024 09:37:30 +0200
-Cc: stable@vger.kernel.org,
- netdev@vger.kernel.org
-To: regressions@lists.linux.dev
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowADX947WvtZmGIfAAA--.44837S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Jw4UZF15Zr47JF43ZrWfAFb_yoWDJFcEya
+	nrtw1kAFs8Zr1vyF17Wa1Y9rn5A3ZrCrnrGF1kKF13tr1UAFy5ZFnY9w1DJFy8W390kFy3
+	Za17JryfK3409jkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbsxFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r126r1DMcIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q
+	6r43MxkIecxEwVAFwVW8CwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8Jw
+	C20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAF
+	wI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjx
+	v20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2
+	jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0x
+	ZFpf9x0JUSZXrUUUUU=
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-Hi,
+Replace a comma between expression statements by a semicolon.
 
-the issue was so far handled in =
-https://lore.kernel.org/regressions/ZsyMzW-4ee_U8NoX@eldamar.lan/T/#m390d6=
-ef7b733149949fb329ae1abffec5cefb99b and =
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219129
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+---
+ tools/testing/selftests/net/psock_fanout.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-I haven=E2=80=99t seen any communication whether a backport for 5.15 is =
-already in progress, so I thought I=E2=80=99d follow up here.=20
-
-Today we rolled out 5.15.165 and immediately ran into the same issue. =
-There=E2=80=99s at least one other person asking for a 5.15 backport in =
-Bugzilla.
-
-Hugs,
-Christian
-
--- =20
-Christian Theune - A97C62CE - 0179 7808366
-@theuni - christian@theune.cc
+diff --git a/tools/testing/selftests/net/psock_fanout.c b/tools/testing/selftests/net/psock_fanout.c
+index 1a736f700be4..4f31e92ebd96 100644
+--- a/tools/testing/selftests/net/psock_fanout.c
++++ b/tools/testing/selftests/net/psock_fanout.c
+@@ -165,9 +165,9 @@ static void sock_fanout_set_ebpf(int fd)
+ 	attr.insns = (unsigned long) prog;
+ 	attr.insn_cnt = ARRAY_SIZE(prog);
+ 	attr.license = (unsigned long) "GPL";
+-	attr.log_buf = (unsigned long) log_buf,
+-	attr.log_size = sizeof(log_buf),
+-	attr.log_level = 1,
++	attr.log_buf = (unsigned long) log_buf;
++	attr.log_size = sizeof(log_buf);
++	attr.log_level = 1;
+ 
+ 	pfd = syscall(__NR_bpf, BPF_PROG_LOAD, &attr, sizeof(attr));
+ 	if (pfd < 0) {
+-- 
+2.25.1
 
 
