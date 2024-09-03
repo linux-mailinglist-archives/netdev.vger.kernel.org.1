@@ -1,93 +1,177 @@
-Return-Path: <netdev+bounces-124646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B772096A517
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 19:13:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69C0B96A53C
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 19:16:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7430B286C19
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 17:13:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 892621C2357B
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 17:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B23918CC15;
-	Tue,  3 Sep 2024 17:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E076118890A;
+	Tue,  3 Sep 2024 17:16:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/tZpHKP"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="QPMzELJD";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="UiddwpuA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pfout7-smtp.messagingengine.com (fout7-smtp.messagingengine.com [103.168.172.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0011C14;
-	Tue,  3 Sep 2024 17:13:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2799E18BC05;
+	Tue,  3 Sep 2024 17:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725383586; cv=none; b=OrMuNDuba6cl1ZXWRwikXarf5HsXpMOlv0+imx/VyWm/d/Dfwhu6+Gtzfz+pkdGBwJCJ0loFqjpAhpUB0/CXmIe9dePg0DHU6WCgUjvueRb7j3gE+RtBDZf0HrfNEmzrnr1oZAFh72V7FiZSeUVBaegT+k1rRM+Feud+acVWIwI=
+	t=1725383794; cv=none; b=DqFedFtRQfDk5uRUDOaHmNP84NDN7X4NojWtDNduLybNWOwOLgfN6Rzi6kx8i1x5ETZSAYffSu662cHwLPWFMj4jq84lULWXk1R1Z+UNhxnxv53ePXV/cE417NJ5Sj5hU57XLc9PK2ATvDcNRBxRTkwY4gWgIrUFkok9p2mdwq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725383586; c=relaxed/simple;
-	bh=Nj3zSSXVJY7aWly8kxr2GE48AQpf8nGuG7nIWcYODkA=;
-	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
-	 Cc:Message-ID:Date; b=kr8JsBscUOcJtjQrwuNRli4zP339TvNboa5RcHgLC0in4TmRCExEKwBm4mqcyr0ztmqX/9oa9bEcOBgv9ObZSeSFc4bB723lpnJwCUzplQZNeYUK+aeDkasplhjIWbiPilJO0jQumsYbOy1D4V/JCrpMAwWzdWxX+qzEerg+PSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/tZpHKP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F172C4CEC4;
-	Tue,  3 Sep 2024 17:13:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725383586;
-	bh=Nj3zSSXVJY7aWly8kxr2GE48AQpf8nGuG7nIWcYODkA=;
-	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
-	b=K/tZpHKPktx2CDrKKwILBE5Iz1Y8z79gvdsJWC9j309s+u/+NcGpStngyWIcEhx8b
-	 coRaxKR90TegAHXVr6mgSYoP2XIlGmrqNIHD6UGJdGrTTBqEptXRdnbJSwrNg98lnS
-	 g4HkuHG5M5aKP2Nmm9bYcRC+Sze6B6Ttv8Sch12sTtVBjioNTgnSNRq2v/jekc5aiL
-	 18v58Xu7kIhfVTao+/oWM3yWgj6flMIxKAQKRPKKZR0dK4FLA2zIaOV4D5Xd2TmM7m
-	 u/L2TuHPQYmR1+ya5K9+N5D7BkJbdYtjsWPvb7m9CYm5zDFcRw/Kf4QdAxtZxASOII
-	 4lt85LVd08KhQ==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725383794; c=relaxed/simple;
+	bh=yqz4auR2r2nOIK9l3JvtHCUhXTTdVukOaNSbBKtxgbI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l6g3oJyBAMe7febzXTPw7lmdEIw5+qtGvBbpHGL1iVKR8f8rHvQxSCBtACpYzqOgeLuWCjZyFrmW/gmgc6cc3MXrRdbFHsFsY50up9ZkrKyahvdWKi/xMuKKkNSBQM9qvoLZuDrhH7FbfsrnNel1cW6EQ/TEV19y5ETYS2Z0nmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=QPMzELJD; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=UiddwpuA; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
+	by mailfout.phl.internal (Postfix) with ESMTP id 950FB13803C4;
+	Tue,  3 Sep 2024 13:16:29 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-07.internal (MEProxy); Tue, 03 Sep 2024 13:16:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:message-id:mime-version:reply-to
+	:subject:subject:to:to; s=fm3; t=1725383789; x=1725470189; bh=q8
+	I1edYloIEgRwqv0J0DQGpvJdW9FEiNQ8f3Ow1OKlo=; b=QPMzELJDHyeRpXX05N
+	vFYnr+RaH2QiFlun6xmSvsNJU+2lgrsFT7t7Tpq46Uz/kQB1pwLIgKQcD91JL2A2
+	rk7MIhuiGL2mMdTVqD3/P6z6w3P6aFLozDaqPKFgKxJ/V6nRythZBX3mE0PeuuM2
+	7wdv9LQS3+HEWJNqpUe0MBupaWqUXZP2pZopC+zcJRR3Q0xj2McPGRDKuqlttlL+
+	jy8p17e6hQa8AA7R8Zpg9SzwupfVh7KsuH+o6t5Fiqqib9NwkN4ERz/RgGIdMv5k
+	ScFk4euAsGS+jJORs+5lFNNV6EstQj0iPYRlnqsiNVxG4KiqS63CF5ST0badfQhf
+	bVRw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm1; t=1725383789; x=1725470189; bh=q8I1edYloIEgR
+	wqv0J0DQGpvJdW9FEiNQ8f3Ow1OKlo=; b=UiddwpuAOz6X0b7eFGC9w/ld+pjTq
+	r8SYDju6apWdcHMrEJTnecKlt1bjJkSuJA3FYj8jnHOKlbWoFwHMh7oN7ATnID8c
+	4jTrA4lyFgOmMZPwYjUn67JOtyhFNqn/POUnGe5MkgrwnfmqPcMM4irLpqSj6gLL
+	XlCj6XnA43IsNJn7xoanx278beWbDSIFPH4Pz8f0Was7cDmspMis0e1z6O5xtWRj
+	8x71SJXxoWblzspjlXxembYjTx2aG3DAzAKnQRgAqv6s9WqKbDEFYeWgQwyrdcJN
+	JApQ0MgpFp75Caq+4bs/kANZuWAdvDh8Fazkic0OWh+zPuj2pe1FOksxg==
+X-ME-Sender: <xms:bETXZr9BnLgivFfwJNP8Yn_ZGTygtN8aUsIaZxoS_0Y8XN2b22hciA>
+    <xme:bETXZnu0o4PgZ-dw9vfueAI_qydtJcAH4Xy4w_H8AeX0NMNlYoWUZHEMOzSV6_OAE
+    NG--UhZ3KennVRoUsg>
+X-ME-Received: <xmr:bETXZpCyniNZJLvUa3FdlEkkQmcwwutNyepfyVi7R2dFCyvJ4odKh3K7JWVVH_H2JfP_mEG8XR8bISS83N3rlM0M2w>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudehhedguddutdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffogggtgfesthekredtredtjeen
+    ucfhrhhomheppfhikhhlrghsucfunpguvghrlhhunhguuceonhhikhhlrghsrdhsohguvg
+    hrlhhunhguodhrvghnvghsrghssehrrghgnhgrthgvtghhrdhsvgeqnecuggftrfgrthht
+    vghrnhepheduleetteekgffffedufeeuvdejiedvkefhveeifeegffehledtvdevhfefte
+    egnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhhi
+    khhlrghsrdhsohguvghrlhhunhgusehrrghgnhgrthgvtghhrdhsvgdpnhgspghrtghpth
+    htohepuddtpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhgurhgvfieslhhu
+    nhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomhdprh
+    gtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohep
+    uggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvth
+    esghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdp
+    rhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepnhgvth
+    guvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrhgv
+    nhgvshgrshdqshhotgesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:bETXZnfTooAy0TFHNOiD_jrt2-7AC7p80vYuobMh-yzwmqyM_JFAxg>
+    <xmx:bETXZgO4SG9XnpEVS2_-M1xyMtmR2rbN0gSCwzUsXYiTFhBmL-dvAQ>
+    <xmx:bETXZpmn83Q5Rzgd_sjw8RUW3RtqqMGnELlhn387RUCedZCp4EzcqQ>
+    <xmx:bETXZqtj-1ULkKagC0svomHuj9or_dBN3HUg75rKe_whWvgEgKyOCw>
+    <xmx:bUTXZhFRqeRIANJggHJRlzdDP8XizaSTlMrzhxwGS1fh94nxg-hNnAZK>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 3 Sep 2024 13:16:28 -0400 (EDT)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next] net: phy: Check for read errors in SIOCGMIIREG
+Date: Tue,  3 Sep 2024 19:15:36 +0200
+Message-ID: <20240903171536.628930-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Subject: Re: [PATCH v1 5/7] wifi: brcmfmac: of: Make use of
- irq_get_trigger_type()
-From: Kalle Valo <kvalo@kernel.org>
-In-Reply-To: <20240902225534.130383-6-vassilisamir@gmail.com>
-References: <20240902225534.130383-6-vassilisamir@gmail.com>
-To: Vasileios Amoiridis <vassilisamir@gmail.com>
-Cc: linux@armlinux.org.uk, maarten.lankhorst@linux.intel.com,
- mripard@kernel.org, tzimmermann@suse.de, airlied@gmail.com, daniel@ffwll.ch,
- linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, nico@fluxnic.net,
- arend.vanspriel@broadcom.com, robh@kernel.org, saravanak@google.com,
- andriy.shevchenko@linux.intel.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
- devicetree@vger.kernel.org, vassilisamir@gmail.com
-User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
-Message-ID: <172538357854.1029035.14523322695529094304.kvalo@kernel.org>
-Date: Tue,  3 Sep 2024 17:13:00 +0000 (UTC)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Vasileios Amoiridis <vassilisamir@gmail.com> wrote:
+When reading registers from the PHY using the SIOCGMIIREG IOCTL any
+errors returned from either mdiobus_read() or mdiobus_c45_read() are
+ignored, and parts of the returned error is passed as the register value
+back to user-space.
 
-> Convert irqd_get_trigger_type(irq_get_irq_data(irq)) cases to the more
-> simple irq_get_trigger_type().
-> 
-> Signed-off-by: Vasileios Amoiridis <vassilisamir@gmail.com>
+For example, if mdiobus_c45_read() is used with a bus that do not
+implement the read_c45() callback -EOPNOTSUPP is returned. This is
+however directly stored in mii_data->val_out and returned as the
+registers content. As val_out is a u16 the error code is truncated and
+returned as a plausible register value.
 
-wireless patches go via wireless-next, please submit patches 5-6
-separately.
+Fix this by first checking the return value for errors before returning
+it as the register content.
 
-2 patches set to Changes Requested.
+Before this patch,
 
-13787792 [v1,5/7] wifi: brcmfmac: of: Make use of irq_get_trigger_type()
-13787793 [v1,6/7] wifi: wlcore: sdio: Make use of irq_get_trigger_type()
+    # phytool read eth0/0:1/0
+    0xffa1
 
+After this change,
+
+    $ phytool read eth0/0:1/0
+    error: phy_read (-95)
+
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+---
+ drivers/net/phy/phy.c | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+index cba3af926429..4f3e742907cb 100644
+--- a/drivers/net/phy/phy.c
++++ b/drivers/net/phy/phy.c
+@@ -342,14 +342,19 @@ int phy_mii_ioctl(struct phy_device *phydev, struct ifreq *ifr, int cmd)
+ 		if (mdio_phy_id_is_c45(mii_data->phy_id)) {
+ 			prtad = mdio_phy_id_prtad(mii_data->phy_id);
+ 			devad = mdio_phy_id_devad(mii_data->phy_id);
+-			mii_data->val_out = mdiobus_c45_read(
+-				phydev->mdio.bus, prtad, devad,
+-				mii_data->reg_num);
++			ret = mdiobus_c45_read(phydev->mdio.bus, prtad, devad,
++					       mii_data->reg_num);
++
+ 		} else {
+-			mii_data->val_out = mdiobus_read(
+-				phydev->mdio.bus, mii_data->phy_id,
+-				mii_data->reg_num);
++			ret = mdiobus_read(phydev->mdio.bus, mii_data->phy_id,
++					   mii_data->reg_num);
+ 		}
++
++		if (ret < 0)
++			return ret;
++
++		mii_data->val_out = ret;
++
+ 		return 0;
+ 
+ 	case SIOCSMIIREG:
 -- 
-https://patchwork.kernel.org/project/linux-wireless/patch/20240902225534.130383-6-vassilisamir@gmail.com/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
-https://docs.kernel.org/process/submitting-patches.html
+2.46.0
 
 
