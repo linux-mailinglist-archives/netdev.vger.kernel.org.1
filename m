@@ -1,215 +1,183 @@
-Return-Path: <netdev+bounces-124658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB52D96A66E
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:26:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D201996A674
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:27:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F09221C23B9F
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:26:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 032631C24134
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C89418F2DA;
-	Tue,  3 Sep 2024 18:26:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643A61917CD;
+	Tue,  3 Sep 2024 18:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P9gb+vCC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cZUJ+bTe"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783F618FDD7
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 18:26:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25E2418FDD7;
+	Tue,  3 Sep 2024 18:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725387978; cv=none; b=IW8XiFSZVjkYOWbyLeSKIjzrLFzVcec999st1tGxwN6Vb0qHGEOqW+Zw3P+Rw+vhSW1mjeKEudoq9GdkMhadYdg8/9/vWT/9IyxqhxBxWuXaLAgiXlypCAaZy+MJnETrNfHfU+w6NAr9F1YirIdp9ZdEd4mqZ5wX7Gp8uzVAG80=
+	t=1725388046; cv=none; b=ou/RFko5nRNMFP2DvXOcTkXlgT78LRbdGobEYFNevHkWhV1IJKBcC1Fi+ZJD40zNABztD+fMZZbHxMqW7nOVTr8d6npOAv9aSBrfqHEhGoZ9TSlW/gnsrB0oupFf45EcGAyMcwUa9k74TSsRQakIxJwZiS8+hv9bvn8iQggqtsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725387978; c=relaxed/simple;
-	bh=rvYtyZqb51gEA4SCses7OuOBGE+IBPdbN3p0+3ZJr2I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F/kxz36XcNzvj1UZcy7k0BcrKGvm6B1icHT9G3Mwfp9bVhIS9Z1Kg1LVFBWuxb1JTBBATbR/UXfbD2FUMvhNhR+cjxK2/TPRem43ziyo9vsBAXyIknIbaYAi5PLdiQa3++2XfbZaCej3a3s1Uab/YsiyG7BgHLC8qIS/KNzFzNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P9gb+vCC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725387975;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6/flk3hxb6gs6RQWyWRSb7d6hfydIm8MHggsK2bWkc0=;
-	b=P9gb+vCC2DhaHzfle4x3bmYgRnAuPlKA11AxpV5h9wkifnaP/35iMhX6/EMRvBXWbq59Ml
-	7mJd2Jjx9UmTMEORUoSv8AVSQTZn7lzd3cSHDZs9W4In8OeZ3SHhykmrPnsmwbKTtgbMcl
-	ZcsZQvhn5VlxrzbKJIvufvx9WAFnDFw=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-659-IdtOVd3BP4WnhKg2PQicgQ-1; Tue,
- 03 Sep 2024 14:26:13 -0400
-X-MC-Unique: IdtOVd3BP4WnhKg2PQicgQ-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D8DAA18EA8B6;
-	Tue,  3 Sep 2024 18:26:10 +0000 (UTC)
-Received: from fedora-x1.redhat.com (unknown [10.22.32.64])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7A86730001A4;
-	Tue,  3 Sep 2024 18:26:08 +0000 (UTC)
-From: Kamal Heib <kheib@redhat.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Ivan Vecera <ivecera@redhat.com>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kamal Heib <kheib@redhat.com>,
-	YangHang Liu <yanghliu@redhat.com>
-Subject: [PATCH iwl-net] i40e: Fix trying to free already-freed IRQ
-Date: Tue,  3 Sep 2024 14:25:55 -0400
-Message-ID: <20240903182555.1253466-1-kheib@redhat.com>
+	s=arc-20240116; t=1725388046; c=relaxed/simple;
+	bh=jtq+NV2hFNSsN40Ko7LAblrCis08mq85mqLfSbvwx4A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GVLkNy11Fcl92VrdgtiaJN7ybo/DNBZ3U3zPIg7ms9i+bEx0bOpLfvoTnD9DcsDsRgJsBfa+UncQO3u7gLswbZbmrk20SgJCqbciy6t8wDSoqkVa3GRfr1lHPQDDU/ULa0dPmmdMBLh9AZAP9cNasa62L543GgoIq2jFAchO6xo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cZUJ+bTe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F48FC4CEC5;
+	Tue,  3 Sep 2024 18:27:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725388045;
+	bh=jtq+NV2hFNSsN40Ko7LAblrCis08mq85mqLfSbvwx4A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cZUJ+bTeqLi5y51bzBiYvYdQHngkR/4dba4aCV397G5bKm7jE99jg4yrTptWd3CTm
+	 /eEbjScXUiD/gVAKNKlGmafp3i5yrPI2V4t91OpF105/nMYV2sSVHssF8+W+QGmMLK
+	 JdqP/bwxwprfZCNmaFuoPq/FSWeGZ3iuFRCQbrV4iwdvxJYp3IGphdluTKzdOprdQH
+	 FZ3X4Cm1vfYA5tjyYrJbVaVIvudaOqno31GQQc5OpYL8+x3yoLziuN0Z9/7guSd5dE
+	 MIrzLZyOjhvGNjE1OkfiWm+GrcAuRgpr6pjLNN1jjchtLM+S3aPzAp3d5fU+tWc5fK
+	 UPPgxFN4IYuoA==
+Message-ID: <39735704-ae94-4ff8-bf4d-d2638b046c8e@kernel.org>
+Date: Tue, 3 Sep 2024 20:27:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+ Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+ <dragan.cvetic@amd.com>, Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Stefan Wahren <wahrenst@gmx.net>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
+ <lrv7cpbt2n7eidog5ydhrbyo5se5l2j23n7ljxvojclnhykqs2@nfeu4wpi2d76>
+ <ZtHN0B8VEGZFXs95@apocalypse>
+ <b74327b8-43f6-47cf-ba9d-cc9a4559767b@kernel.org>
+ <ZtcoFmK6NPLcIwVt@apocalypse>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <ZtcoFmK6NPLcIwVt@apocalypse>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Avoid the following warning when trying to free an already freed IRQ,
-The issue happens when trying to call i40e_remove() twice from two
-different contexts which will lead to calling i40e_vsi_free_irq() twice,
-Fix the issue by using a flag to mark that the IRQ has already been freed.
+On 03/09/2024 17:15, Andrea della Porta wrote:
+>>>>> +
+>>>>> +				rp1_clocks: clocks@c040018000 {
+>>>>
+>>>> Why do you mix MMIO with non-MMIO nodes? This really does not look
+>>>> correct.
+>>>>
+>>>
+>>> Right. This is already under discussion here:
+>>> https://lore.kernel.org/all/ZtBzis5CzQMm8loh@apocalypse/
+>>>
+>>> IIUC you proposed to instantiate the non-MMIO nodes (the three clocks) by
+>>> using CLK_OF_DECLARE.
+>>
+>> Depends. Where are these clocks? Naming suggests they might not be even
+>> part of this device. But if these are part of the device, then why this
+>> is not a clock controller (if they are controllable) or even removed
+>> (because we do not represent internal clock tree in DTS).
+> 
+> xosc is a crystal connected to the oscillator input of the RP1, so I would
+> consider it an external fixed-clock. If we were in the entire dts, I would have
+> put it in root under /clocks node, but here we're in the dtbo so I'm not sure
+> where else should I put it.
 
-i40e 0000:07:00.0: i40e_ptp_stop: removed PHC on enp7s0
-------------[ cut here ]------------
-Trying to free already-free IRQ 0
-WARNING: CPU: 2 PID: 12 at kernel/irq/manage.c:1868 __free_irq+0x1e3/0x350
-Modules linked in: nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 rfkill ip_set nf_tables nfnetlink vfat fat intel_rapl_msr intel_rapl_common kvm_amd ccp iTCO_wdt iTCO_vendor_support kvm i2c_i801 pcspkr i40e lpc_ich virtio_gpu i2c_smbus virtio_dma_buf drm_shmem_helper drm_kms_helper virtio_balloon joydev drm fuse xfs libcrc32c ahci crct10dif_pclmul libahci crc32_pclmul crc32c_intel virtio_net libata virtio_blk ghash_clmulni_intel net_failover virtio_console failover serio_raw dm_mirror dm_region_hash dm_log dm_mod
-CPU: 2 PID: 12 Comm: kworker/u16:1 Kdump: loaded Not tainted 5.14.0-478.el9.x86_64 #1
-Hardware name: Red Hat KVM/RHEL, BIOS edk2-20240524-1.el9 05/24/2024
-Workqueue: kacpi_hotplug acpi_hotplug_work_fn
-RIP: 0010:__free_irq+0x1e3/0x350
-Code: 00 00 48 8b bb a8 01 00 00 e8 09 74 02 00 49 8b 7c 24 30 e8 8f 7c 1d 00 eb 35 8b 74 24 04 48 c7 c7 50 a3 61 92 e8 cd 99 f6 ff <0f> 0b 4c 89 fe 48 89 ef e8 30 aa b3 00 48 8b 43 40 48 8b 40 78 48
-RSP: 0018:ffffb971c0077ac8 EFLAGS: 00010086
-RAX: 0000000000000000 RBX: ffff8b594193ee00 RCX: 0000000000000027
-RDX: 0000000000000027 RSI: 00000000ffff7fff RDI: ffff8b59bcf208c8
-RBP: ffff8b594193eec4 R08: 0000000000000000 R09: ffffb971c0077970
-R10: ffffb971c0077968 R11: ffffffff931e7c28 R12: ffff8b5944946000
-R13: ffff8b594193ef80 R14: ffff8b5944946000 R15: 0000000000000246
-FS:  0000000000000000(0000) GS:ffff8b59bcf00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f11eb064000 CR3: 000000000ad40004 CR4: 0000000000770ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? show_trace_log_lvl+0x26e/0x2df
- ? show_trace_log_lvl+0x26e/0x2df
- ? free_irq+0x33/0x70
- ? __free_irq+0x1e3/0x350
- ? __warn+0x7e/0xd0
- ? __free_irq+0x1e3/0x350
- ? report_bug+0x100/0x140
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? handle_bug+0x3c/0x70
- ? exc_invalid_op+0x14/0x70
- ? asm_exc_invalid_op+0x16/0x20
- ? __free_irq+0x1e3/0x350
- ? __free_irq+0x1e3/0x350
- free_irq+0x33/0x70
- i40e_vsi_free_irq+0x19e/0x220 [i40e]
- i40e_vsi_close+0x2b/0xc0 [i40e]
- i40e_close+0x11/0x20 [i40e]
- __dev_close_many+0x9e/0x110
- dev_close_many+0x8b/0x140
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? free_pcppages_bulk+0xee/0x290
- unregister_netdevice_many_notify+0x162/0x690
- ? srso_alias_return_thunk+0x5/0xfbef5
- ? free_unref_page_commit+0x19a/0x310
- unregister_netdevice_queue+0xd3/0x110
- unregister_netdev+0x18/0x20
- i40e_vsi_release+0x84/0x2e0 [i40e]
- ? srso_alias_return_thunk+0x5/0xfbef5
- i40e_remove+0x15c/0x430 [i40e]
- pci_device_remove+0x3e/0xb0
- device_release_driver_internal+0x193/0x200
- pci_stop_bus_device+0x6c/0x90
- pci_stop_and_remove_bus_device+0xe/0x20
- disable_slot+0x49/0x90
- acpiphp_disable_and_eject_slot+0x15/0x90
- hotplug_event+0xea/0x210
- ? __pfx_acpiphp_hotplug_notify+0x10/0x10
- acpiphp_hotplug_notify+0x22/0x80
- ? __pfx_acpiphp_hotplug_notify+0x10/0x10
- acpi_device_hotplug+0xb8/0x210
- acpi_hotplug_work_fn+0x1a/0x30
- process_one_work+0x197/0x380
- worker_thread+0x2fe/0x410
- ? __pfx_worker_thread+0x10/0x10
- kthread+0xe0/0x100
- ? __pfx_kthread+0x10/0x10
- ret_from_fork+0x2c/0x50
- </TASK>
----[ end trace 0000000000000000 ]---
+But physically, on which PCB, where is this clock located?
 
-Fixes: 41c445ff0f48 ("i40e: main driver core")
-Tested-by: YangHang Liu <yanghliu@redhat.com>
-Signed-off-by: Kamal Heib <kheib@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e.h      | 1 +
- drivers/net/ethernet/intel/i40e/i40e_main.c | 8 ++++++++
- 2 files changed, 9 insertions(+)
+> 
+> Regarding pclk and hclk, I'm still trying to understand where they come from.
+> If they are external clocks (since they are fixed-clock too), they should be
+> in the same node as xosc. CLK_OF_DECLARE does not seem to fit here because
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index d546567e0286..910415116995 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -865,6 +865,7 @@ struct i40e_vsi {
- 	int num_q_vectors;
- 	int base_vector;
- 	bool irqs_ready;
-+	bool legacy_msi_irq_ready;
- 
- 	u16 seid;		/* HW index of this VSI (absolute index) */
- 	u16 id;			/* VSI number */
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index cbcfada7b357..b39004a42df2 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -4630,6 +4630,9 @@ static int i40e_vsi_request_irq(struct i40e_vsi *vsi, char *basename)
- 	if (err)
- 		dev_info(&pf->pdev->dev, "request_irq failed, Error %d\n", err);
- 
-+	if (!test_bit(I40E_FLAG_MSIX_ENA, pf->flags) && !err)
-+		vsi->legacy_msi_irq_ready = true;
-+
- 	return err;
- }
- 
-@@ -5061,6 +5064,10 @@ static void i40e_vsi_free_irq(struct i40e_vsi *vsi)
- 			}
- 		}
- 	} else {
-+		if (!vsi->legacy_msi_irq_ready)
-+			return;
-+
-+		vsi->legacy_msi_irq_ready = false;
- 		free_irq(pf->pdev->irq, pf);
- 
- 		val = rd32(hw, I40E_PFINT_LNKLST0);
-@@ -11519,6 +11526,7 @@ static int i40e_vsi_mem_alloc(struct i40e_pf *pf, enum i40e_vsi_type type)
- 	vsi->work_limit = I40E_DEFAULT_IRQ_WORK;
- 	hash_init(vsi->mac_filter_hash);
- 	vsi->irqs_ready = false;
-+	vsi->legacy_msi_irq_ready = false;
- 
- 	if (type == I40E_VSI_MAIN) {
- 		vsi->af_xdp_zc_qps = bitmap_zalloc(pf->num_lan_qps, GFP_KERNEL);
--- 
-2.46.0
+There is no such node as "/clocks" so do not focus on that. That's just
+placeholder but useless and it is inconsistent with other cases (e.g.
+regulators).
+
+If this is external oscillator then it is not part of RP1 and you cannot
+put it inside just to satisfy your drivers.
+
+> there's no special management of these clocks, so no new clock definition is
+> needed.
+
+> If they are internal tree, I cannot simply get rid of them because rp1_eth node
+> references these two clocks (see clocks property), so they must be decalred 
+> somewhere. Any hint about this?.
+> 
+
+Describe the hardware. Show the diagram or schematics where is which device.
+
+Best regards,
+Krzysztof
 
 
