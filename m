@@ -1,109 +1,132 @@
-Return-Path: <netdev+bounces-124400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ADAA96939E
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 08:26:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D789B9693AC
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 08:32:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3657CB240A2
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 06:26:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED73F1C22C28
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 06:32:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C64841CF2B6;
-	Tue,  3 Sep 2024 06:26:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33561CDFD7;
+	Tue,  3 Sep 2024 06:32:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29E8A5F;
-	Tue,  3 Sep 2024 06:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AF72E3EB;
+	Tue,  3 Sep 2024 06:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725344761; cv=none; b=sIQ9tEnvvEHLqwCqsLeni3MFVhH5nzC1EBbKiuI2V19ys/J94WTrWo8H3rPE+LlXO7KVegJ/x/AtrlsyjIIN0/iWL0P+c0cVpABOng5Fq0/4tcYfujCvM4zrGcp06+qQaEX43aEMuz5FypSBdfH9NrZlDvkkQSoM8h/gZJgPkho=
+	t=1725345129; cv=none; b=hIUehsqk7NzhRa8OBYdbrwyCG2U/TGiXnjVAm6gHJ9mDCFEa1BUwCEu+tGHOt21a0vKDS2TXfZ90T0Kx8fltmD/gyDYMunBmfSIkfuvSnGglp04SjKYKZ9unOCjkwveRj0WL7ICCRWSognfI5aWYRT9HLeYQ2a37HAwf4rOfCC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725344761; c=relaxed/simple;
-	bh=RveC8/MtBdXkAVZAvb4sx93mHUq7TmZDF/eGhgAu8Js=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=XMNz2vaUIVOVyz+I8NvSEz+vbEbl6vBYmny9L6GniVWxU9JiFEXowwXDtFwg4/U+30bHuh1aV85lM2AHy0MZdW5ZwhAx/7UztK7xpIAEMbpG0mJz+I5YHPo1iGELBoQ313H5vrZ/VPw7rDyN4EnNJPf48XfLU45qwL566/oBtFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WybBr3K9dz1HHkC;
-	Tue,  3 Sep 2024 14:22:28 +0800 (CST)
-Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
-	by mail.maildlp.com (Postfix) with ESMTPS id A1EC81A016C;
-	Tue,  3 Sep 2024 14:25:54 +0800 (CST)
-Received: from [10.67.111.104] (10.67.111.104) by
- dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 3 Sep 2024 14:25:54 +0800
-Message-ID: <9d844c72-bda6-4e28-b48c-63c4f8855ae7@huawei.com>
-Date: Tue, 3 Sep 2024 14:25:53 +0800
+	s=arc-20240116; t=1725345129; c=relaxed/simple;
+	bh=TQJ7arkdIBp5yX+vuXqYFlQY5ccrRvnjonclOD81gd0=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=hPqz9MzeoPVJT5Z9ffZBIMOBSfekufRZ2PLpdlJ4GyBHM9eIo6ZtXzBt964djFg42WzYpbPD+5BUj7c/4hcPZhbvO+dWgz3FA8mOCqSrLNzpShbLTq2XTY35CCbIgisrB7qszDJ9ECd7Pc2j8y1vH6anC0tDSMJGOHGbykOG3Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid:Yeas4t1725345101t318t42991
+Received: from 3DB253DBDE8942B29385B9DFB0B7E889 (jiawenwu@trustnetic.com [36.24.207.154])
+X-QQ-SSF:00400000000000F0FVF000000000000
+From: =?utf-8?b?Smlhd2VuIFd1?= <jiawenwu@trustnetic.com>
+X-BIZMAIL-ID: 10604168048739067028
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <andi.shyti@kernel.org>,
+	<jarkko.nikula@linux.intel.com>,
+	<andriy.shevchenko@linux.intel.com>,
+	<mika.westerberg@linux.intel.com>,
+	<jsd@semihalf.com>,
+	<davem@davemloft.net>,
+	<edumazet@google.com>,
+	<kuba@kernel.org>,
+	<pabeni@redhat.com>,
+	<rmk+kernel@armlinux.org.uk>,
+	<linux-i2c@vger.kernel.org>,
+	<netdev@vger.kernel.org>,
+	<mengyuanlou@net-swift.com>,
+	<duanqiangwen@net-swift.com>
+References: <20240823030242.3083528-1-jiawenwu@trustnetic.com> <888f78a9-dea9-4f66-a4d0-00a57039733d@lunn.ch> <01d701daf75c$50db4450$f291ccf0$@trustnetic.com> <55ff5570-5398-48e9-bf56-d34da197d175@lunn.ch> <020f01daf827$d765ffd0$8631ff70$@trustnetic.com> <509abfeb-b1fb-4c53-9898-6106c8dde411@lunn.ch> <02a001daf9de$529edd90$f7dc98b0$@trustnetic.com> <d91674af-1682-4efe-ad15-bd64f871c1de@lunn.ch>
+In-Reply-To: <d91674af-1682-4efe-ad15-bd64f871c1de@lunn.ch>
+Subject: RE: [PATCH net 0/3] Add I2C bus lock for Wangxun
+Date: Tue, 3 Sep 2024 14:31:40 +0800
+Message-ID: <03fc01dafdca$ef952100$cebf6300$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH -next 2/4] tun: Make use of str_disabled_enabled helper
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Andy Shevchenko
-	<andy@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-CC: <kees@kernel.org>, <jasowang@redhat.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <akpm@linux-foundation.org>,
-	<linux-hardening@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-mm@kvack.org>
-References: <20240831095840.4173362-1-lihongbo22@huawei.com>
- <20240831095840.4173362-3-lihongbo22@huawei.com>
- <20240831130741.768da6da@kernel.org> <ZtWYO-atol0Qx58h@smile.fi.intel.com>
- <66d5cc19d34c6_613882942a@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Hongbo Li <lihongbo22@huawei.com>
-In-Reply-To: <66d5cc19d34c6_613882942a@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain;
+	charset="us-ascii"
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml500022.china.huawei.com (7.185.36.66)
+X-Mailer: Microsoft Outlook 16.0
+Content-Language: zh-cn
+Thread-Index: AQH8I/V4PrHZ+O/IFu6cfIurHK/3+gGW9YksAYhjRIgArI2qVwHKSDtnAdofD30BqZdG0QHWvGUmsaUz5dA=
+X-QQ-SENDSIZE: 520
+Feedback-ID: Yeas:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-
-
-On 2024/9/2 22:30, Willem de Bruijn wrote:
-> Andy Shevchenko wrote:
->> On Sat, Aug 31, 2024 at 01:07:41PM -0700, Jakub Kicinski wrote:
->>> On Sat, 31 Aug 2024 17:58:38 +0800 Hongbo Li wrote:
->>>> Use str_disabled_enabled() helper instead of open
->>>> coding the same.
->>
->> ...
->>
->>>>   		netif_info(tun, drv, tun->dev, "ignored: set checksum %s\n",
->>>> -			   arg ? "disabled" : "enabled");
->>>> +			   str_disabled_enabled(arg));
->>>
->>> You don't explain the 'why'. How is this an improvement?
->>> nack on this and 2 similar networking changes you sent
->>
->> Side opinion: This makes the messages more unified and not prone to typos
->> and/or grammatical mistakes. Unification allows to shrink binary due to
->> linker efforts on string literals deduplication.
+On Thu, Aug 29, 2024 11:28 PM, Andrew Lunn wrote:
+> > > O.K, that is bad. The SFP is totally unreliable...
+> > >
+> > > You however have still not answered my question. What is the firmware
+> > > accessing? How does it handle pages?
+> > >
+> > > The hack you have put in place is per i2c transaction. But accessing
+> > > pages is likely to be multiple transactions. One to change the page,
+> > > followed by a few reads/writes in the new page, then maybe followed by
+> > > a transactions to return to page 0.
+> >
+> > Do you mean the bus address A0 or A2? Firmware accesses I2C just like driver,
+> > but it only change the page once per full transaction, during a possession of
+> > the semaphore.  What you fear seems unlikely to happen.
 > 
-> This adds a layer of indirection.
+> What sort of SFP is this? QSFP byte 127 selects the page for addresses
+> 128-255. Paged 0 and 3 are mandatory, pages 1 and 2 are optional.
+>
+> SFP+ also uses byte 127 in the same way:
 > 
-> The original code is immediately obvious. When I see the new code I
-> have to take a detour through cscope to figure out what it does.
-If they have used it once, there is no need for more jumps, because it's 
-relatively simple.
-
-Using a dedicated function seems very elegant and unified, especially 
-for some string printing situations, such as disable/enable. Even in 
-today's kernel tree, there are several different formats that appear: 
-'enable/disable', 'enabled/disabled', 'en/dis'.
-
-Thanks,
-Hongbo
-
+> 10.3 Optional Page Select Byte [Address A2h, Byte 127]
 > 
-> To me, in this case, the benefit is too marginal to justify that.
+> In order to provide memory space for DWDM and CDR control functions
+> and for other potential extensions, multiple Pages can be defined for
+> the upper half of the A2h address space. At startup the value of byte
+> 127 defaults to 00h, which points to the User EEPROM. This ensures
+> backward compatibility for transceivers that do not implement the
+> optional Page structure. When a Page value is written to byte 127,
+> subsequent reads and writes to bytes 128-255 are made to the relevant
+> Page.
+> 
+> This specification defines functions in Pages 00h-02h. Pages 03-7Fh
+> are reserved for future use. Writing the value of a non-supported Page
+> shall not be accepted by the transceiver. The Page Select byte shall
+> revert to 0 and read / write operations shall be to the unpaged A2h
+> memory map.
+> 
+> ethtool allows you to access more than page 0.
+> 
+> ethtool -m|--dump-module-eeprom|--module-info devname [raw on|off]
+>         [hex on|off] [offset N] [length N] [page N] [bank N] [i2c N]
+> 
+> > > I think your best solution is to simply take the mutex and never
+> > > release it. Block your firmware from accessing the SFP.
+> >
+> > Firmware accesses the SFP in order to provide information to the BMC.
+> > So it cannot simply be blocked.
+> 
+> Then you have a design problem. And i don't think locking the I2C bus
+> per transaction is sufficient.
+
+SFP+ is used on our device.
+
+But I don't quite understand why this lock is not sufficient. The entire
+transaction is locked, include setting the bus address and selecting pages,
+and all subsequent reads and writes on this page. Also, firmware uses this
+lock (hardware semaphore) in the same way. Neither driver nor firmware
+switches pages whiling the other is reading / writing ?
+
+
 
