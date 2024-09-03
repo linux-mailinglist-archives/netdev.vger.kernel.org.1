@@ -1,101 +1,95 @@
-Return-Path: <netdev+bounces-124619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EDA296A391
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:03:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 070DB96A39B
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 18:07:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07A791F24FC3
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:03:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A6821C21348
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77901189516;
-	Tue,  3 Sep 2024 16:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DB51189536;
+	Tue,  3 Sep 2024 16:07:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RI0CDY8t"
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="Q4ecfTA2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C433918991A
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 16:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C2937462;
+	Tue,  3 Sep 2024 16:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725379409; cv=none; b=S1XFN/72eDFP6v+X5szWe1JYsk4BEa6YPH+5Liz+sR0/TgW5tk1F3jHRDjZgllZmY3621YRvZ7aEsfYEwh/gctIg5tg8/jCWV4EvsO78DUM03TMyjRHjyk0UaJ29EyBh2Go2uKRdD7QRw7A7etoaeqKVOn6aF8VxweJj0Rhj68g=
+	t=1725379630; cv=none; b=GF9tPPqzoObvUaMfek/bdUDZubzJw/mUzC/ThDPtWo8OikXiVAoAMI9L1fs5tW0F8cFTWHTaUnfyEqUNFEzUHTSopPgiwBljF/xizIrqPrJ5Pefl5z2kxOBLb5NQhWCiTHXSJflWqAIom4a+DYYfWTuMMAJzQMT6zkYaVwXIZfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725379409; c=relaxed/simple;
-	bh=3IvJSrBYxVN8dC86n/L5zD6oHtI+vPQnUe0Qz97ymvI=;
+	s=arc-20240116; t=1725379630; c=relaxed/simple;
+	bh=ZK/1w6Ap/OIkmGOTQs+JfOp4gTkKRiP9LPHx30+PPyE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ab63a9cJwzKK+3ch+m4x8IXUAxNZqL5gmUP8sSeAWcTdXMsgGyE9CVLoB6Uf7gR1mTS93mwBHqO8lcdEF9KYST8WTKRdKwoRAh1EAXri7Xsxzj+Xq65v3dggl3FM0ZkoCjBYp8IxoeogzXJiiBAqjNYTCH1rlrc0FfHEgorKDNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RI0CDY8t; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725379403;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3IvJSrBYxVN8dC86n/L5zD6oHtI+vPQnUe0Qz97ymvI=;
-	b=RI0CDY8tKv7QwL4CrhZhuLQzEZ4cnb8FKP0Zm3MP06i6qGaVxlExG3TU/jsp+pNIeMHHMa
-	NnegqmUK1Ge+npYANv17xc+h57zO87wJL3HsDKi4/nMx8z+tZUsd3wzrcjkwxB92I8+gDx
-	eqXYSi+fyxTNWdWp7Xy66Nh5xLJA+fU=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-590-Eipo7XJtOZaxDs3z-RmcDw-1; Tue, 03 Sep 2024 12:02:46 -0400
-X-MC-Unique: Eipo7XJtOZaxDs3z-RmcDw-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2f515891a64so53762171fa.2
-        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 09:02:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725379356; x=1725984156;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3IvJSrBYxVN8dC86n/L5zD6oHtI+vPQnUe0Qz97ymvI=;
-        b=cUaxh/5FP/QI0QMXWJXetGNL8ksGVT82m9YPZa9ri3lHP1o3GcF6rUMUoo7P9L9glS
-         BNcsR7dKWXeQ1Z1R0QdYVZSER/rutMJPvREPvZ0FxNzult0r9pWpZelCvvWteH99xHN7
-         LZtJhzgdpZ0ufX0YX8Lwt3deLpmnUsGeM4FBoY4slX8FJlkrue2LbJO8arrZlTQKflUE
-         pvouwAz8f721afyW5XdxJPbkv3Wm0LuDcMuhU3b6GLvqEd+sjN0B0zoCOrX4uKyi0a70
-         Lf3tqqMiDyKhcPVoaY+zEtMNiDijyO3DqEoONlETCqRMJUawnviIseKRSxFuT/LkWbII
-         tZbw==
-X-Gm-Message-State: AOJu0YwRB/fHtmodwgAgXEMDpqHt4ROK6l8dOYo1e8wjzmYPxbb5KJZw
-	2aAmSkZpbb10djCj+T1S5AhcBIRMrLk3jTM/ifASG3J6zrE3MZo2ZP+104kYvN3TKkee8mGoJwz
-	OIYOUdTxoDC7+OPwe80dxhtu3r1YwHtroACFHhlR14R4PidaNqNzh+Q==
-X-Received: by 2002:a05:651c:221e:b0:2ef:3093:e2c3 with SMTP id 38308e7fff4ca-2f636a7fd94mr52595301fa.31.1725379355803;
-        Tue, 03 Sep 2024 09:02:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFCIkj+1j3B5tgRkqNDiCuGqjul3hIbjzKGIqKIIx+nPDIWR8iq8GsNl8OZ3I0Xs83FDegyxg==
-X-Received: by 2002:a05:651c:221e:b0:2ef:3093:e2c3 with SMTP id 38308e7fff4ca-2f636a7fd94mr52594381fa.31.1725379354665;
-        Tue, 03 Sep 2024 09:02:34 -0700 (PDT)
-Received: from debian (2a01cb058d23d600f5dfa0c7b061efd4.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:f5df:a0c7:b061:efd4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6df84b9sm175745215e9.24.2024.09.03.09.02.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 09:02:34 -0700 (PDT)
-Date: Tue, 3 Sep 2024 18:02:32 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, dsahern@kernel.org
-Subject: Re: [PATCH net-next 4/4] ipv6: sit: Unmask upper DSCP bits in
- ipip6_tunnel_bind_dev()
-Message-ID: <ZtczGFcrsh/3xXcM@debian>
-References: <20240903135327.2810535-1-idosch@nvidia.com>
- <20240903135327.2810535-5-idosch@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WFE3BRmLcEq+P3hHgigEVT0W9Rr+85HXKVIsE4j8VpwPAa0BxAB1ytvCJ2uWmZZV/bBMmNYA6gObJ+EjJ556ac3YV2WH/DQFLiYj+EKV9wOK0FUgDri033Y+ol5qSF0BU6JHqmdJYE0Yz/VtP7mDJAJ5qBLGqQSGpE+7pDjdXdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=Q4ecfTA2; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+Received: from francesco-nb (31-10-206-125.static.upc.ch [31.10.206.125])
+	by mail11.truemail.it (Postfix) with ESMTPA id 0E3BC1F92C;
+	Tue,  3 Sep 2024 18:07:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1725379623;
+	bh=ZK/1w6Ap/OIkmGOTQs+JfOp4gTkKRiP9LPHx30+PPyE=; h=From:To:Subject;
+	b=Q4ecfTA2JU91IHhHBvgMxs6J0idLbj/P8pl/0ig/63RIjK4KRcOcoWCI/HQopswfh
+	 TQL8S5r5wJvo/eR4Rq7he2kHt4qmizNEhWwjF9EFD+/r8egSTfTXCRGx2g25rrJXhF
+	 zTcTexme7k5u/UyOZriYfHfg7389XliTLMONjUc5AipczA6kYqO12/s7qKvxmkrF4H
+	 NI368XqJTQ9x7zncW4JJ4p/VsYfYWk9jOlWofTMLHVdPe1dkQYGGazVjT0sv0tWD0t
+	 uAStGIMNqv02noxLa3A46gp8IlKxjlJxOL1JKWpQLZED8qdQnXjY0XXisUpeSFs/mO
+	 W/LUGOqWw23mA==
+Date: Tue, 3 Sep 2024 18:07:00 +0200
+From: Francesco Dolcini <francesco@dolcini.it>
+To: =?iso-8859-1?B?Q3Pza+Fz?= Bence <csokas.bence@prolan.hu>
+Cc: Francesco Dolcini <francesco@dolcini.it>, Wei Fang <wei.fang@nxp.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Linux Team <linux-imx@nxp.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	imx@lists.linux.dev, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v3 0/3] net: fec: add PPS channel configuration
+Message-ID: <20240903160700.GB20205@francesco-nb>
+References: <20240809094804.391441-1-francesco@dolcini.it>
+ <311a8d91-8fa8-4f46-8950-74d5fcfa7d15@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240903135327.2810535-5-idosch@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <311a8d91-8fa8-4f46-8950-74d5fcfa7d15@prolan.hu>
 
-On Tue, Sep 03, 2024 at 04:53:27PM +0300, Ido Schimmel wrote:
-> Unmask the upper DSCP bits when calling ip_route_output_ports() so that
-> in the future it could perform the FIB lookup according to the full DSCP
-> value.
+Hello,
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+On Tue, Sep 03, 2024 at 04:10:28PM +0200, Csókás Bence wrote:
+> What's the status of this? Also, please Cc: me in further
+> conversations/revisions as well.
+
+I am going to send a v4 in the next few days to address the comments
+on the dt-bindings change and apart of that I hope is good to go.
+
+Francesco
+
+
 
 
