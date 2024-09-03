@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-124725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7C5396A950
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:59:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAA6796A96E
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 23:02:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C6E31F258D4
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 20:59:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E6822836AC
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 21:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE20E1E764F;
-	Tue,  3 Sep 2024 20:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314D01E9765;
+	Tue,  3 Sep 2024 20:47:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nZlI5Icw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DZaw6W0T"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F4E1E764C;
-	Tue,  3 Sep 2024 20:46:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0644B1E974E;
+	Tue,  3 Sep 2024 20:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725396411; cv=none; b=RHq3xtbJutdpho8wehRW4sqPIOAa9HmmXmVc3cTMDhFC+ni1S3H5sM+SHA6W1+apsHBTM90yAS8NICnvIvMfrdshVj2p4gLbstzlFbigZpT/IbSoxb4BTt8nwK9Ulsibqh7SxYusmBqrEeRuGpMRiKNQZHIB3CL6bCMQ1HmZKkc=
+	t=1725396468; cv=none; b=XMMqHpUUtVKcNbKWM3f+y3m9SsvfrFpgueKUBWjNJegnXzwfwJM9frsmvXvEXNjJ9vMrwF/Nj30xIbUQYJc+ojmE2JnldZ5ACMGM5el8MtUXGMyz31CgrlBBpi4valFGqzItawy9ULjnj2w8rE23tptjZifBbuwr2a5AXERjzxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725396411; c=relaxed/simple;
-	bh=gNcHIH7zDKtglRJHjdDjSUwKONRbvEy93Ho05OVKvpU=;
+	s=arc-20240116; t=1725396468; c=relaxed/simple;
+	bh=DkmnPP7Rnck3U13b0kVYRAQ4fci1gmvH7X2CEfWg4wQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QoY13q3eubX+JjzWie+lmb9/GQ/BCXavWW3m/q6fHrqXJX7pcTXEvzUfZEsz6kIUV3gDMCxb1xslIhIPr75fZi9JGtaMnXiSp+Dy3SLptajEqZj2xJHNhsuvyI2yy6xQZhVSMJTfubnCRACnf2YI/mCb8zCi/FwolhQyGev6CTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nZlI5Icw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B859C4CEC4;
-	Tue,  3 Sep 2024 20:46:50 +0000 (UTC)
+	 MIME-Version; b=Pt30XgfvadHm3m4irf0aUDd6jp+247OEUPaicVppEUl6YJkrz/w4Yi6YXG7tEBF3vcxZ2CowmvVboafJt2Nn3fbJI6IvOOUaAJxqvg2o+72pn+j3qLcwyrzAwF/3uxk9oNyeQ5MDDo6/EXnGza7wvLAma5RLpGgPje6A1EghF6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DZaw6W0T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52DD7C4CEC5;
+	Tue,  3 Sep 2024 20:47:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725396411;
-	bh=gNcHIH7zDKtglRJHjdDjSUwKONRbvEy93Ho05OVKvpU=;
+	s=k20201202; t=1725396467;
+	bh=DkmnPP7Rnck3U13b0kVYRAQ4fci1gmvH7X2CEfWg4wQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nZlI5IcwKqVDvu9X1iMa7EajvkFe9pXaHl3o7ZXmqYZCvhc6DhcIVOa0P78weIFZd
-	 rEcVOYjX16VgcbjVkTQ02ymB0Rup7Rf2T/curzvuYtzEc5KZe6ZHYSRnwBfmROPLmr
-	 BCpq3ZlkdqEoyfXfgu2Dpfwz1I77v4Mw/qm6nQfvg1b0jo9R1ZUpBEgbr4ibGt54VO
-	 SYA6mz8RfSv05RnGLjMyW+DAEbxobQiQs68psWZqk2BF6a5AOssDqeskbGEbFtOSAC
-	 mlLA61oFijCfuXgMzLqm3gBGbqNR3ktYajOW5XGKOSybYNLbAs3TyGx93BW8J6Th2t
-	 AHbVWRSySVNiA==
+	b=DZaw6W0THvHlVWjk5KA0Uy/dSipRLsY4qjkWLdqHXcLRNR/DfluiKkGocLJtYY/Dt
+	 2SxzIGiKz2xDrwZiOaOG7r8vToLPvVaxZBXj/zvvL3BRDKY1Wp2rryVeX2LuMNF0eE
+	 gE/R6U5zexigXh5oHR2XRfKifZZRTFE3RtpostNA2WIM+MDTKSnC4zaTlH/mp4AHFA
+	 x67uyBkPW4Z2LkUrV3rglKebumtG99Rjp52POL5SoyB5oIXptnl+6cTo0h5GWfx15C
+	 L8p9OuAOxg+aWo7buQLqbZERbzVw1dmAcvsiKjUFhZvqG/mKe0air0T2OgEFvRyZez
+	 s+ZuyPpPjIRPQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -52,12 +52,12 @@ Cc: Jacky Chou <jacky_chou@aspeedtech.com>,
 	pabeni@redhat.com,
 	u.kleine-koenig@pengutronix.de,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 07/12] net: ftgmac100: Ensure tx descriptor updates are visible
-Date: Tue,  3 Sep 2024 15:26:51 -0400
-Message-ID: <20240903192718.1108456-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 6/8] net: ftgmac100: Ensure tx descriptor updates are visible
+Date: Tue,  3 Sep 2024 15:27:56 -0400
+Message-ID: <20240903192815.1108754-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240903192718.1108456-1-sashal@kernel.org>
-References: <20240903192718.1108456-1-sashal@kernel.org>
+In-Reply-To: <20240903192815.1108754-1-sashal@kernel.org>
+References: <20240903192815.1108754-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,7 +66,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.165
+X-stable-base: Linux 5.10.224
 Content-Transfer-Encoding: 8bit
 
 From: Jacky Chou <jacky_chou@aspeedtech.com>
@@ -87,7 +87,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 18 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 11f76e56d0316..9179014e90d11 100644
+index 969af4dd64055..bc9a7f2d23504 100644
 --- a/drivers/net/ethernet/faraday/ftgmac100.c
 +++ b/drivers/net/ethernet/faraday/ftgmac100.c
 @@ -569,7 +569,7 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
@@ -141,7 +141,7 @@ index 11f76e56d0316..9179014e90d11 100644
  	/* Drop the packet */
  	dev_kfree_skb_any(skb);
  	netdev->stats.tx_dropped++;
-@@ -1448,7 +1458,7 @@ static void ftgmac100_reset_task(struct work_struct *work)
+@@ -1419,7 +1429,7 @@ static void ftgmac100_reset_task(struct work_struct *work)
  	ftgmac100_init_all(priv, true);
  
  	netdev_dbg(netdev, "Reset done !\n");
@@ -150,7 +150,7 @@ index 11f76e56d0316..9179014e90d11 100644
  	if (priv->mii_bus)
  		mutex_unlock(&priv->mii_bus->mdio_lock);
  	if (netdev->phydev)
-@@ -1519,15 +1529,15 @@ static int ftgmac100_open(struct net_device *netdev)
+@@ -1490,15 +1500,15 @@ static int ftgmac100_open(struct net_device *netdev)
  
  	return 0;
  
