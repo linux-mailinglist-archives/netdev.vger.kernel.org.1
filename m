@@ -1,123 +1,156 @@
-Return-Path: <netdev+bounces-124572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBB6396A025
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:16:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B4AE96A05B
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:25:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 889F7281271
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:16:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 666671C20F2B
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:25:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54FC47A73;
-	Tue,  3 Sep 2024 14:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4678213CF86;
+	Tue,  3 Sep 2024 14:25:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="oqiv1463"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CleTK0i1"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B01BD26AD0;
-	Tue,  3 Sep 2024 14:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7B57581A;
+	Tue,  3 Sep 2024 14:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725373004; cv=none; b=p49gVQOlIMCW6T231Xp0GYk0x18bXQqGTP54Ol2F6XVoQxglTO3alrkMYHk6mf/xSi9vGsMw5My/k/QrWLZGMenoCmYZRTqrcNm9j1ovLzwNmUcAnzfFYq5RhuOphjeSGgEa+guodJMY5DLwvdm4Sq+3/o+FIdIA8tFG+TydRMI=
+	t=1725373517; cv=none; b=CZ/HeLu91iutTiu1Bvl1bYbo3+LVI0W5s+WfNj4MXcoeYC0rj6iH08PqWcaZnttbi3zzSPjf4LH/krgl6xILlFQTPS7axEdO3j1uVjgCJARq9CwMG0otuEo47Lx4iDR2E5s+crJj2GAyAgsqBPZ25rHcDRF9E/vp5AMInuXc6dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725373004; c=relaxed/simple;
-	bh=Wj0/CkZjNtPEN9TmeojDd8DReHMeuuUivOijpUh8fG4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Lrabdmqi92eHfzYZKZnGGjrgXISzGManaRghZDmbIVUyCPfUUc2vnXTjqNZ5MqPGuYHyGXItnUXzIMCZRNWhu5s48FGoDfxzWZuYnbXu6EIpM4lTsZh17qGFkZDE7xthaEJhUX7rH4zxH8+fPenarqNtBYf4QZ7LPk7j78Njxao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=oqiv1463; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id E0F2CA0A26;
-	Tue,  3 Sep 2024 16:10:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=mail; bh=c1isXRtW6S6Xq9eW9dV/
-	yijfSpFZrqCLG5+XN8gwzGU=; b=oqiv1463LDdbv77UwTn6xSZTQh6huAHS2iRw
-	rTcE2sEvKhjno1i29wSCO122UWI1ZjqEMSwhMuJm4g2r70AW+gqB8iIMLH57DF+k
-	JvDLIvOsf23hIMiO/VfleCa5ntxyMSebaYRF1vHae7RJtxen7ATYkhhrix/pHR8W
-	FF2TaH/12t/lWrFDrexd3x/K0LAjCD7hA1SCBOPfVUe1p309XUbF1fQLpWKBwSO4
-	2SnB2aFiykblvFjQFBGW57TEFQ92Gw0rGbQmseJVkYjgAoM7Bh/l51f7d+A8lT33
-	hRNk0gQAw5aHY9Be7M/yrb2ahkxkbeeK3dUEqmBo+kC6l05Mj9E5HtRVTiPd1ZoK
-	TUq9OqBQBNo06aHME0e6PiNziaafjjeX9cAP0cAXYNxLpE8jt2UUoWPkmzfrn1w5
-	GSOOBdFTkXNmjNrIgY8/sToF+cUjuPmyYFVn3/SYVTaZxO/Snmix6mUYR314Wxyd
-	MdLT/3mDD9w7eXof8znKdHRDYd+IMKfrzxWtArsRniaVBfLHq7h4lAYaXmEYziWn
-	0ZG7zenfoVbJN0brIDzYdiVhIqG34Pw2NHWR5joeYAg3iER+iN0D/urSnnG77VAE
-	Wixmr/ykL/tnUuFiMF7k1ZWlmee5e0gUsOK/iZgZw6dQh2osL6jiLKplPdJgEk2K
-	wUMzJRo=
-Message-ID: <311a8d91-8fa8-4f46-8950-74d5fcfa7d15@prolan.hu>
-Date: Tue, 3 Sep 2024 16:10:28 +0200
+	s=arc-20240116; t=1725373517; c=relaxed/simple;
+	bh=8oF38+wcTyCFFLJNltFe9UX5N5NexPR+hPC1BNLasBQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SfDfIgHte1kDPJyjutcng91fhjtLjPDDBdd6A5T6f7mCZmeB44yk5DzTvlGErOJN26JiLYLT+DLxKpu4iMVu3SRY3w4343k3NW8YIRM4rQUdGn57vCgCtEueVCFVvH+wFkRI4yVFSbnPS5b86wkX0kwhe3l/59dHYkVVJ7YSIKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CleTK0i1; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725373515; x=1756909515;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8oF38+wcTyCFFLJNltFe9UX5N5NexPR+hPC1BNLasBQ=;
+  b=CleTK0i1pwGISF7KsbHEH/bGdmO51AvQNELxQ5AL0XaJFJd1GTIbIByn
+   CtFhQzWUpmUG43tGhulsoAjEcOjEV+Jrc8fE9kenpnuV/VSciYMTV/HNI
+   c5NnNyPig5iORBFc/KirsxhIkzvmur/6m6Ce2AiRgveoEly6U90ftLiod
+   v+1BuLCZv8kjdcG/n3GOyeObOIdd2/zZzD0U8LCbHmP9fL0HIawg5TXGo
+   sUz58gvBj7rvFhcVA7X0Q44sn3W9Tz/Bf691NNoBKJHR+cpJG7Ze7UCaa
+   lEzfvMgyLQXPg5O4VVvGY/1rnz/xel8d5yX7OrgayXJw/l5nTbS2S1lSp
+   g==;
+X-CSE-ConnectionGUID: O5lyGBRKQMCfAxlmyXSdwQ==
+X-CSE-MsgGUID: 9pW7PLqHRCyvZnkmhAwMNg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23541263"
+X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
+   d="scan'208";a="23541263"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 07:25:14 -0700
+X-CSE-ConnectionGUID: rb+5gYZhQFG9CNAs2BREDQ==
+X-CSE-MsgGUID: 3n4/huujQW21hYevl0+/+A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
+   d="scan'208";a="65658762"
+Received: from black.fi.intel.com (HELO black.fi.intel.com.) ([10.237.72.28])
+  by orviesa008.jf.intel.com with ESMTP; 03 Sep 2024 07:25:07 -0700
+From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+To: Andi Shyti <andi.shyti@kernel.org>,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	Jan Dabros <jsd@semihalf.com>,
+	linux-i2c@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Vineet Gupta <vgupta@kernel.org>,
+	Russell King <linux@armlinux.org.uk>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	UNGLinuxDriver@microchip.com,
+	linux-mips@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-snps-arc@lists.infradead.org
+Subject: [PATCH v2 0/7] i2c: designware: Group all DesignWare drivers under a single option
+Date: Tue,  3 Sep 2024 17:24:59 +0300
+Message-ID: <20240903142506.3444628-1-heikki.krogerus@linux.intel.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 0/3] net: fec: add PPS channel configuration
-To: Francesco Dolcini <francesco@dolcini.it>, Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Rob
- Herring" <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, "Conor
- Dooley" <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
-	<s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>, Richard Cochran
-	<richardcochran@gmail.com>, Linux Team <linux-imx@nxp.com>
-CC: Francesco Dolcini <francesco.dolcini@toradex.com>, <imx@lists.linux.dev>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-References: <20240809094804.391441-1-francesco@dolcini.it>
-Content-Language: en-US
-From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
-In-Reply-To: <20240809094804.391441-1-francesco@dolcini.it>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
- ATLAS.intranet.prolan.hu (10.254.0.229)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2980D94854627567
 
-Hi!
-I already proposed this 2 years ago. I was just about to resubmit it and 
-found this series.
+Hi guys,
 
-Link: 
-https://lore.kernel.org/netdev/20220803112449.37309-1-csokas.bence@prolan.hu/
+This is a proposal for Kconfig improvement regarding the Synopsys
+DesignWare I2C adapter driver.
 
-What's the status of this? Also, please Cc: me in further 
-conversations/revisions as well.
+Changes since v1:
 
-Reviewed-by: "Csókás, Bence" <csokas.bence@prolan.hu>
+There was one driver that selects I2C_DESIGNWARE_PLATFORM in its
+Kconfig which causes an error because I2C_DESIGNWARE_CORE is not
+selected.
 
-Thanks,
-Bence
+The drivers Kconfig I'm proposing that we fix by using "depends on"
+instead of "select". There are also a number of defconfigs that enable
+I2C_DESIGNWARE_PLATFORM that now need to enable I2C_DESIGNWARE_CORE.
 
-On 8/9/24 11:48, Francesco Dolcini wrote:
-> From: Francesco Dolcini <francesco.dolcini@toradex.com>
-> 
-> Make the FEC Ethernet PPS channel configurable from device tree.
-> 
-> v3 to just add the missing "net-next" subject prefix, sorry about the spam, it
-> seems like friday morning plus the mid of august heat wave is badly affecting
-> myself ...
-> 
-> v2: https://lore.kernel.org/all/20240809091844.387824-1-francesco@dolcini.it/
-> v1: https://lore.kernel.org/all/20240807144349.297342-1-francesco@dolcini.it/
-> 
-> Francesco Dolcini (3):
->    dt-bindings: net: fec: add pps channel property
->    net: fec: refactor PPS channel configuration
->    net: fec: make PPS channel configurable
-> 
->   Documentation/devicetree/bindings/net/fsl,fec.yaml |  7 +++++++
->   drivers/net/ethernet/freescale/fec_ptp.c           | 11 ++++++-----
->   2 files changed, 13 insertions(+), 5 deletions(-)
-> 
+The original patch:
+https://lore.kernel.org/linux-i2c/20240830111222.2131172-1-heikki.krogerus@linux.intel.com/
+
+thanks,
+
+Heikki Krogerus (7):
+  ARC: configs: enable I2C_DESIGNWARE_CORE with I2C_DESIGNWARE_PLATFORM
+  ARM: configs: enable I2C_DESIGNWARE_CORE with I2C_DESIGNWARE_PLATFORM
+  arm64: defconfig: enable I2C_DESIGNWARE_CORE with
+    I2C_DESIGNWARE_PLATFORM
+  mips: configs: enable I2C_DESIGNWARE_CORE with I2C_DESIGNWARE_PLATFORM
+  RISC-V: configs: enable I2C_DESIGNWARE_CORE with
+    I2C_DESIGNWARE_PLATFORM
+  net: txgbe: Fix I2C Kconfig dependencies
+  i2c: designware: Group all DesignWare drivers under a single option
+
+ arch/arc/configs/axs101_defconfig             |  1 +
+ arch/arc/configs/axs103_defconfig             |  1 +
+ arch/arc/configs/axs103_smp_defconfig         |  1 +
+ arch/arc/configs/tb10x_defconfig              |  1 +
+ arch/arm/configs/hisi_defconfig               |  1 +
+ arch/arm/configs/multi_v7_defconfig           |  1 +
+ arch/arm/configs/pxa_defconfig                |  1 +
+ arch/arm/configs/socfpga_defconfig            |  1 +
+ arch/arm/configs/spear13xx_defconfig          |  1 +
+ arch/arm/configs/spear3xx_defconfig           |  1 +
+ arch/arm/configs/spear6xx_defconfig           |  1 +
+ arch/arm64/configs/defconfig                  |  1 +
+ arch/mips/configs/generic/board-ocelot.config |  1 +
+ arch/riscv/configs/defconfig                  |  1 +
+ arch/riscv/configs/nommu_k210_defconfig       |  1 +
+ .../riscv/configs/nommu_k210_sdcard_defconfig |  1 +
+ drivers/i2c/busses/Kconfig                    | 29 ++++++++++++-------
+ drivers/net/ethernet/wangxun/Kconfig          |  3 +-
+ 18 files changed, 35 insertions(+), 13 deletions(-)
+
+-- 
+2.45.2
 
 
