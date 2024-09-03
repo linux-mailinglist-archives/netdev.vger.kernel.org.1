@@ -1,158 +1,92 @@
-Return-Path: <netdev+bounces-124743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5171996AABF
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 23:58:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2010A96AAD3
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 00:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 756D21C22ECD
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 21:58:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5014A1C219B9
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 22:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9555D1CF7DD;
-	Tue,  3 Sep 2024 21:58:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8F9126BF0;
+	Tue,  3 Sep 2024 22:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m2DqgCFA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lrcLPpQJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCA9F1C9DC4
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 21:58:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6500120E3;
+	Tue,  3 Sep 2024 22:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725400709; cv=none; b=IWhr9X702fD2p+8uVzyWuSu4bE+xsGq82Hupl6njL4Nm9bg9XBM3jxswT4VvEFr1hZuDbntLQ+V1pm5KLkOjuDvWwSB/WdXq+GbSpXTqW2a0QN/jIC+yTC10+YHIKroAMfU3Qfqnm6gjSoq7sTxZxNp1BzFtH2j5zxL4OkNPqDI=
+	t=1725400828; cv=none; b=OSm7nAJSWibkND1BdihV8+UrkCGzhjOQe/44f4acI6IWHpS/KvCZWCYeDinnIk2DpjjLyf+RUXu9P7sszMduUvJhO3Q5VExBDj0GPhpM7qxXjIK89YIxdmg+APhU+ZdY3mEKtxjjsl2j39Q6iJz4JHxl84LpHwoDSxQ7ESyoO5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725400709; c=relaxed/simple;
-	bh=4iA1AmHB0W7zOfySiVU9ftZEgYALwbM1FzL5qsZdFk8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qzMBpfk9XZl1vj0C6NxNhRcXoBcDPttCbzos2ce1MeD4zggvVvdBn5Nxlphs+oSy6tmfOkDBTamelmByHVk4QZ0KwZZTGxdBtRCsn7109hm4uT1AndwvRc4hd7/+ZBwYNzlqr7pjE9u4kjrIWo3aMGJLFBplfUZkkVPWOtZv7HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m2DqgCFA; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-429d1a9363aso8235e9.1
-        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 14:58:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725400706; x=1726005506; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h2Br/9enDLn+2E7PseEJHUhdsPjvr9uaRQ0xymOYTOw=;
-        b=m2DqgCFAhxwwg61jkBUgulvviyUG/npBOOHFl1ECwgWyDBWygG2N/B/Xj/czjc4Lwj
-         iJcLg+xzHd9XKDcUwV1+OgHAtymUlHiqrc8M2K3DCBZV8y39Mh8E1gKrVm3qK2aC6NMJ
-         nNDGNOBcLO2hfwWLb02knGb5HXi4R4DDkuRwGrHKBe3J60o1FAFqY0d1wDLrwlJdP3GM
-         t9Sc0wKQ4/d/MipTagjFmfcCX7q0vxchP3iVYNoIZz2w+jBO5w+LK3DZ6yzbUzEo/BTH
-         ykSsNOCTjZjuy+uueuSOQUFrUTB+QY7xIznPVew4O7husZfTpclJ4BF66w8Ursl2HTG2
-         0I8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725400706; x=1726005506;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h2Br/9enDLn+2E7PseEJHUhdsPjvr9uaRQ0xymOYTOw=;
-        b=uUJx2zyJfmsukBvPrII5Qpy9YiP6Il0kndBXaBk7bPC+qddr1k3OP5tPkTSMsuJBYz
-         2I5JkT4zjXW9YDowuUAUqvUsBQovbTyG9msdZatKRVXckRedW9rMrhzPFGO9WwBeuknx
-         Tbr/pBO+IjN8gs7uEUnCFCY/rrBnFa2ScSY8EdesIl1itcO8HcZxxH12jdgBr32UXGsU
-         LlIz3Dhz0jrN8vtcRn048suR5jgHzLsYmgnfgQBf8N86BMk4vkMS7Oyu2/JCf2mTFK6q
-         sRfgehWtZz56K9z5+sYRU/oFxOO//5idhup8NAYBFlC9BXvcOmYU8pQz+3go22u3LKP2
-         HayA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFkJUKPjLxLMBDIDJwIrYN8A4YETm2Q18SJVdi/t9Kmg33XpfBdKb++al/aGfvov3Dg0iA1/g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztwOJUNRGq55km0T84YHY/N9ftIQuc6hwU1aOZmgyC+iVXcGfZ
-	98/rzwEviFut73iSahGWps8DGpOyWr3QgfBenGU8Vtk9OexbSBdKBZ33YZJ38gRbOjfIQd24fXh
-	ELUDgMuik3Qi02n/lYym8B6qFjAZyYTbr/ssn
-X-Google-Smtp-Source: AGHT+IH95j/71dsiuJGgL0CB7827mirEiuevB5e4uUOdo83AQOJv3RtrY2aNvhGhGeln/fywrlniUATmKIn0YOyXjvw=
-X-Received: by 2002:a05:600c:1e87:b0:426:5ef2:cd97 with SMTP id
- 5b1f17b1804b1-42c9473d8a9mr473345e9.2.1725400705889; Tue, 03 Sep 2024
- 14:58:25 -0700 (PDT)
+	s=arc-20240116; t=1725400828; c=relaxed/simple;
+	bh=8XcjVoqFny30F6fk2p96WH/symXBb4KHW8bGKXthHtw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J9wgTLZ4OnXc9Pv0mHV1uRFwAPGPMa2JoT8g6blC9D7/ooxykUxqOjMor2LpVR/a7HHLjVVsu8Sungoi0ss8BYDI38V8G2Rub9OdammolXCkRqKm8294s4hUARKB/cB71CBuI37UiYEjMYzUHbFzuKSuPw+X5zH49DUoSvEFk8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrcLPpQJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66FB2C4CEC5;
+	Tue,  3 Sep 2024 22:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725400827;
+	bh=8XcjVoqFny30F6fk2p96WH/symXBb4KHW8bGKXthHtw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lrcLPpQJyMO6//PpL56rxySEc7mWHPCd1dtRSDVzEvvMBGP2vHL0e5Sa0grUjOic0
+	 gvMtcqExIxt30DB4EKuxyb/G4sgsLtci21YjsmnldMNLHxoS8bC8g3WOn28uX3BXRG
+	 gqvPL5G+4NYMh2vJRLzWm9tPUJrcJ+9NLhaYLOh8r81mYfrWdPK0+mANtS3dTH7IRA
+	 MYE28TdppCAOiFCHHDsAPMeb0QryHRYBI5VquItB3Vo4NLEau1JCMOpWYLSbbKRdw2
+	 eLcFLXv0LxzP/wwxKO/fm5EvVAY4Ks8arWWh1sEGBtYkrioBCtBzLycj6/49GhpPwS
+	 B+hvMsKzkNXTg==
+Date: Tue, 3 Sep 2024 15:00:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, jiri@resnulli.us, jacob.e.keller@intel.com,
+ liuhangbin@gmail.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] tools/net/ynl: fix cli.py --subscribe feature
+Message-ID: <20240903150026.34de5a1d@kernel.org>
+In-Reply-To: <CAD4GDZySRpq97nDG=UQq+C4jBdS-+Km4NjGNob7jrbtBW+SmOg@mail.gmail.com>
+References: <20240830201321.292593-1-arkadiusz.kubalewski@intel.com>
+	<m2mskq2xke.fsf@gmail.com>
+	<20240903130121.5c010161@kernel.org>
+	<CAD4GDZySRpq97nDG=UQq+C4jBdS-+Km4NjGNob7jrbtBW+SmOg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240829131214.169977-1-jdamato@fastly.com> <20240829131214.169977-6-jdamato@fastly.com>
- <20240829153105.6b813c98@kernel.org> <ZtGiNF0wsCRhTtOF@LQ3V64L9R2>
- <20240830142235.352dbad5@kernel.org> <ZtXuJ3TMp9cN5e9h@LQ3V64L9R2.station>
- <20240902180220.312518bc@kernel.org> <CAAywjhTG+2BmoN76kaEmWC=J0BBvnCc7fUhAwjbSX5xzSvtGXw@mail.gmail.com>
- <20240903124008.4793c087@kernel.org>
-In-Reply-To: <20240903124008.4793c087@kernel.org>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Tue, 3 Sep 2024 14:58:14 -0700
-Message-ID: <CAAywjhSSOfO4ivgj+oZVPn0HuWoqdZ0sr6dK10GRq_zuG16q0Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 5/5] netdev-genl: Support setting per-NAPI config values
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org, edumazet@google.com, 
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com, sdf@fomichev.me, 
-	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org, 
-	willemdebruijn.kernel@gmail.com, Martin Karsten <mkarsten@uwaterloo.ca>, 
-	Donald Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Daniel Jurgens <danielj@nvidia.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 3, 2024 at 12:40=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 3 Sep 2024 12:04:52 -0700 Samiullah Khawaja wrote:
-> > Do we need a queue to napi association to set/persist napi
-> > configurations?
->
-> I'm afraid zero-copy schemes will make multiple queues per NAPI more
-> and more common, so pretending the NAPI params (related to polling)
-> are pre queue will soon become highly problematic.
-Agreed.
->
-> > Can a new index param be added to the netif_napi_add
-> > and persist the configurations in napi_storage.
->
-> That'd be my (weak) preference.
->
-> > I guess the problem would be the size of napi_storage.
->
-> I don't think so, we're talking about 16B per NAPI,
-> struct netdev_queue is 320B, struct netdev_rx_queue is 192B.
-> NAPI storage is rounding error next to those :S
-Oh, I am sorry I was actually referring to the problem of figuring out
-the count of the napi_storage array.
->
-> > Also wondering if for some use case persistence would be problematic
-> > when the napis are recreated, since the new napi instances might not
-> > represent the same context? For example If I resize the dev from 16
-> > rx/tx to 8 rx/tx queues and the napi index that was used by TX queue,
-> > now polls RX queue.
->
-> We can clear the config when NAPI is activated (ethtool -L /
-> set-channels). That seems like a good idea.
-That sounds good.
->
-> The distinction between Rx and Tx NAPIs is a bit more tricky, tho.
-> When^w If we can dynamically create Rx queues one day, a NAPI may
-> start out as a Tx NAPI and become a combined one when Rx queue is
-> added to it.
->
-> Maybe it's enough to document how rings are distributed to NAPIs?
->
-> First set of NAPIs should get allocated to the combined channels,
-> then for remaining rx- and tx-only NAPIs they should be interleaved
-> starting with rx?
->
-> Example, asymmetric config: combined + some extra tx:
->
->     combined        tx
->  [0..#combined-1] [#combined..#combined+#tx-1]
->
-> Split rx / tx - interleave:
->
->  [0 rx0] [1 tx0] [2 rx1] [3 tx1] [4 rx2] [5 tx2] ...
->
-> This would limit the churn when changing channel counts.
-I think this is good. The queue-get dump netlink does provide details
-of all the queues in a dev. It also provides a napi-id if the driver
-has set it (only few drivers set this). So basically a busy poll
-application would look at the queue type and apply configurations on
-the relevant napi based on the documentation above (if napi-id is not
-set on the queue)?
+On Tue, 3 Sep 2024 22:08:54 +0100 Donald Hunter wrote:
+> > On Mon, 02 Sep 2024 10:51:13 +0100 Donald Hunter wrote:  
+> > > Reviewed-by: Donald Hunter <donald.hunter@gmail.com>  
+> >
+> > Any preference on passing self.rsp_by_value, vs .decode() accessing
+> > ynl.rsp_by_value on its own?  
+> 
+> .decode() accessing ynl.rsp_by_value would be cleaner, but I am
+> working on some notification fixes that might benefit from the map
+> being passed as a parameter. The netlink-raw families use a msg id
+> scheme that is neither unified nor directional. It's more like a mix
+> of both where req and rsp use different values but notifications reuse
+> the req values. I suspect that to fix that we'd need to introduce a
+> dict for ntf_by_value and then the parameter would be context
+> specific. OVS reuses req/rsp values for notifications as well, but it
+> uses a unified scheme, and that's mostly a problem for ynl-gen-c. 
+
+I was worried you'd say it's ID reuse related. That is tricky business.
+
+> We could choose the cleaner approach just now and revisit it as part of
+> fixing notifications for netlink-raw?
+
+That's my intuition; there's a non-zero chance that priorities will
+change or we'll head in a different direction, and the extra arg will
+stick around confusing readers.
 
