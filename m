@@ -1,197 +1,150 @@
-Return-Path: <netdev+bounces-124352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A479796916D
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 04:28:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3126E969193
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 04:52:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01958B21B3F
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 02:28:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6424A1C229B7
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 02:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105571CDA17;
-	Tue,  3 Sep 2024 02:28:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B7D19F131;
+	Tue,  3 Sep 2024 02:52:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="JXUq93zj"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588501CDA00;
-	Tue,  3 Sep 2024 02:27:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C67C19E998;
+	Tue,  3 Sep 2024 02:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725330480; cv=none; b=mgwkeeUo2yZp5M/EuShxjiIpkcT1zMeiUbrQx41ILxcXuLXPUY4KOmMx6euUXuguxDrWf4ZjW06JqqX9XnMRiJGHvwYhayBbRnV29II5lYtlNoxYmx//pg2jJ6RYxFvhp9qRXVKl4/oMzSd+HefKwWLhSLhRLkftwANGGJ1tFco=
+	t=1725331949; cv=none; b=RxBGTYAKmypLb0has5jOirwXLGP7acLrNfdFXZ9CGG1mPHL9CS7qWMqcaYPtga6il5OmVdnvT9e+4A1RKJjmLoYN8Sd1UgejdLj4BcdyUznDopDSm2xn7zqUVD0OTQqUW38Tnx2sZ3LI5ydEKyvTynJeTCvh40X4tfOqhfClQC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725330480; c=relaxed/simple;
-	bh=d6CeH9FZXCDGHQBf1C3j1Iz7qG85kQbtB7iEZcAR2Ps=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=EkUWPTLDdWaHaMnHPMpTcVt/2M3yXUkX7734poiSLJ+yM4PbtGGSkgigOdSbTYIULXe5B2v+mrepuPtDjSvx1Yh96eZkvfpQWI7Ja0X62y7qBjtf9xEJgjmgQS8mui3NqFXPY3Ntrl+rwhZIBKSU1832V571HY9JgUjF3ayJUz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WyTxl6gknzgYtl;
-	Tue,  3 Sep 2024 10:25:47 +0800 (CST)
-Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7E3E21800FE;
-	Tue,  3 Sep 2024 10:27:54 +0800 (CST)
-Received: from [10.67.111.176] (10.67.111.176) by
- kwepemd500012.china.huawei.com (7.221.188.25) with Microsoft SMTP Server
+	s=arc-20240116; t=1725331949; c=relaxed/simple;
+	bh=GztQwE1gB/QB/4pqe48TGIb07EvhsztMdvOaTHBSn+Y=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=UmP/j/G64wHAx6nlmYFWuD0ap3C/ajmD8/WU8qkz7tkqJbvuDdLGJHDDC3mUdiG1mXDo281KE5R4Bv9H8yAQyKyDP9dDNWE5hAGECWDMAVwY23EfFemfVf9nR2BSx9kg8AbFD48E2cy2kjGttDgVaoiNITwwYonl4YGVdMKVnOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=JXUq93zj; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4832piSgB651417, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1725331904; bh=GztQwE1gB/QB/4pqe48TGIb07EvhsztMdvOaTHBSn+Y=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=JXUq93zjWN4jhvpEvjfiiXClnB3u/M4MYBb/mYU16aP42AQcqA9OA8fp+WW1OdryR
+	 ItOXKcJ6JJAy/RtiPxHni0J375A5eZf+ooNSKUgkYD0QK81j6X9/btkbVTIXxXQnAZ
+	 svYyE6/12CaBawfOFMyTVVdfIqtWp7buNcXtwxRcWjcKNiW1gS7VI5hHxqpFhItScI
+	 sPBWpKHQ1ftDKwGgDZFiXp4ilbwdm1sAm4rehwTi0z+PrIBvUUv5VTYYwP1nSmr6Qy
+	 doKhDQ1ieuTBj1sEXfGJ9SEgIR/S3sj9TOWC6QDwFtzut+geMrJh6VIAMt7wZCs5rO
+	 iBhJd1BDZD2AA==
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 4832piSgB651417
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 3 Sep 2024 10:51:44 +0800
+Received: from RTEXMBS05.realtek.com.tw (172.21.6.98) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Tue, 3 Sep 2024 10:27:53 +0800
-Message-ID: <73e02ee9-6631-4473-8219-d75253aaf0fc@huawei.com>
-Date: Tue, 3 Sep 2024 10:27:52 +0800
+ 15.1.2507.39; Tue, 3 Sep 2024 10:51:44 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXMBS05.realtek.com.tw (172.21.6.98) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 3 Sep 2024 10:51:43 +0800
+Received: from RTEXMBS03.realtek.com.tw ([fe80::80c2:f580:de40:3a4f]) by
+ RTEXMBS03.realtek.com.tw ([fe80::80c2:f580:de40:3a4f%2]) with mapi id
+ 15.01.2507.035; Tue, 3 Sep 2024 10:51:43 +0800
+From: Larry Chiu <larry.chiu@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>, Justin Lai <justinlai0215@realtek.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "andrew@lunn.ch"
+	<andrew@lunn.ch>,
+        "jiri@resnulli.us" <jiri@resnulli.us>,
+        "horms@kernel.org"
+	<horms@kernel.org>,
+        "rkannoth@marvell.com" <rkannoth@marvell.com>,
+        "jdamato@fastly.com" <jdamato@fastly.com>,
+        Ping-Ke Shih <pkshih@realtek.com>
+Subject: RE: [PATCH net-next v29 07/13] rtase: Implement a function to receive packets
+Thread-Topic: [PATCH net-next v29 07/13] rtase: Implement a function to
+ receive packets
+Thread-Index: AQHa+cbRwwh2xyzhbkuIuTt8rA5l2bJE0YmAgACQCqA=
+Date: Tue, 3 Sep 2024 02:51:43 +0000
+Message-ID: <03177710937042bb93dfbf3237394a91@realtek.com>
+References: <20240829034832.139345-1-justinlai0215@realtek.com>
+	<20240829034832.139345-8-justinlai0215@realtek.com>
+ <20240902190425.6eef2ee6@kernel.org>
+In-Reply-To: <20240902190425.6eef2ee6@kernel.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 10/12] net: xilinx: axienet: Convert using
- devm_clk_get_optional_enabled() in axienet_probe()
-To: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
-	"florian.fainelli@broadcom.com" <florian.fainelli@broadcom.com>,
-	"andrew@lunn.ch" <andrew@lunn.ch>, "olteanv@gmail.com" <olteanv@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "wens@csie.org" <wens@csie.org>,
-	"jernej.skrabec@gmail.com" <jernej.skrabec@gmail.com>, "samuel@sholland.org"
-	<samuel@sholland.org>, "heiko@sntech.de" <heiko@sntech.de>,
-	"yisen.zhuang@huawei.com" <yisen.zhuang@huawei.com>, "salil.mehta@huawei.com"
-	<salil.mehta@huawei.com>, "hauke@hauke-m.de" <hauke@hauke-m.de>,
-	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
-	"joabreu@synopsys.com" <joabreu@synopsys.com>, "mcoquelin.stm32@gmail.com"
-	<mcoquelin.stm32@gmail.com>, "wellslutw@gmail.com" <wellslutw@gmail.com>,
-	"Simek, Michal" <michal.simek@amd.com>, "ajay.kathat@microchip.com"
-	<ajay.kathat@microchip.com>, "claudiu.beznea@tuxon.dev"
-	<claudiu.beznea@tuxon.dev>, "kvalo@kernel.org" <kvalo@kernel.org>,
-	"u.kleine-koenig@pengutronix.de" <u.kleine-koenig@pengutronix.de>,
-	"jacky_chou@aspeedtech.com" <jacky_chou@aspeedtech.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-sunxi@lists.linux.dev"
-	<linux-sunxi@lists.linux.dev>, "linux-rockchip@lists.infradead.org"
-	<linux-rockchip@lists.infradead.org>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>, "linux-wireless@vger.kernel.org"
-	<linux-wireless@vger.kernel.org>
-References: <20240831021334.1907921-1-lizetao1@huawei.com>
- <20240831021334.1907921-11-lizetao1@huawei.com>
- <MN0PR12MB595396074210F8390ACE409DB7912@MN0PR12MB5953.namprd12.prod.outlook.com>
-From: Li Zetao <lizetao1@huawei.com>
-In-Reply-To: <MN0PR12MB595396074210F8390ACE409DB7912@MN0PR12MB5953.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggpeml100004.china.huawei.com (7.185.36.247) To
- kwepemd500012.china.huawei.com (7.221.188.25)
 
 
 
-在 2024/9/1 20:28, Pandey, Radhey Shyam 写道:
->> -----Original Message-----
->> From: Li Zetao <lizetao1@huawei.com>
->> Sent: Saturday, August 31, 2024 7:44 AM
->> To: florian.fainelli@broadcom.com; andrew@lunn.ch; olteanv@gmail.com;
->> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
->> pabeni@redhat.com; wens@csie.org; jernej.skrabec@gmail.com;
->> samuel@sholland.org; heiko@sntech.de; yisen.zhuang@huawei.com;
->> salil.mehta@huawei.com; hauke@hauke-m.de;
->> alexandre.torgue@foss.st.com; joabreu@synopsys.com;
->> mcoquelin.stm32@gmail.com; wellslutw@gmail.com; Pandey, Radhey
->> Shyam <radhey.shyam.pandey@amd.com>; Simek, Michal
->> <michal.simek@amd.com>; ajay.kathat@microchip.com;
->> claudiu.beznea@tuxon.dev; kvalo@kernel.org; lizetao1@huawei.com;
->> u.kleine-koenig@pengutronix.de; jacky_chou@aspeedtech.com
->> Cc: netdev@vger.kernel.org; linux-arm-kernel@lists.infradead.org; linux-
->> sunxi@lists.linux.dev; linux-rockchip@lists.infradead.org; linux-stm32@st-
->> md-mailman.stormreply.com; linux-wireless@vger.kernel.org
->> Subject: [PATCH net-next 10/12] net: xilinx: axienet: Convert using
->> devm_clk_get_optional_enabled() in axienet_probe()
->>
->> Use devm_clk_get_optional_enabled() instead of devm_clk_get_optional() +
->> clk_prepare_enable(), which can make the clk consistent with the device life
->> cycle and reduce the risk of unreleased clk resources. Since the device
->> framework has automatically released the clk resource, there is no need to
->> execute clk_disable_unprepare(clk) on the error path.
->>
->> Signed-off-by: Li Zetao <lizetao1@huawei.com>
-> 
-> Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-> Thanks!
-> 
->> ---
->>   drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 15 ++++-----------
->>   1 file changed, 4 insertions(+), 11 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> index fe6a0e2e463f..48b41e95aa74 100644
->> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> @@ -2584,22 +2584,17 @@ static int axienet_probe(struct platform_device
->> *pdev)
->>   	seqcount_mutex_init(&lp->hw_stats_seqcount, &lp->stats_lock);
->>   	INIT_DEFERRABLE_WORK(&lp->stats_work, axienet_refresh_stats);
->>
->> -	lp->axi_clk = devm_clk_get_optional(&pdev->dev, "s_axi_lite_clk");
->> -	if (!lp->axi_clk) {
->> +	lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev,
->> "s_axi_lite_clk");
->> +	if (!lp->axi_clk)
->>   		/* For backward compatibility, if named AXI clock is not
->> present,
->>   		 * treat the first clock specified as the AXI clock.
->>   		 */
->> -		lp->axi_clk = devm_clk_get_optional(&pdev->dev, NULL);
->> -	}
->> +		lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev,
->> NULL);
->> +
->>   	if (IS_ERR(lp->axi_clk)) {
->>   		ret = PTR_ERR(lp->axi_clk);
->>   		goto free_netdev;
->>   	}
->> -	ret = clk_prepare_enable(lp->axi_clk);
->> -	if (ret) {
->> -		dev_err(&pdev->dev, "Unable to enable AXI clock: %d\n",
->> ret);
->> -		goto free_netdev;
->> -	}
->>
->>   	lp->misc_clks[0].id = "axis_clk";
->>   	lp->misc_clks[1].id = "ref_clk";
->> @@ -2915,7 +2910,6 @@ static int axienet_probe(struct platform_device
->> *pdev)
->>   		axienet_mdio_teardown(lp);
->>   cleanup_clk:
-> 
-> I also find that there is goto to cleanup_clk when devm_clk_bulk_get_optional/
-> clk_bulk_prepare_enable fails which is not correct but as it is existing bug it
-> can go a separate patch.
-Thanks for the reminder, I considered solving this problem by using 
-devm_add_action_or_reset
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Tuesday, September 3, 2024 10:04 AM
+> To: Justin Lai <justinlai0215@realtek.com>
+> Cc: davem@davemloft.net; edumazet@google.com; pabeni@redhat.com;
+> linux-kernel@vger.kernel.org; netdev@vger.kernel.org; andrew@lunn.ch;
+> jiri@resnulli.us; horms@kernel.org; rkannoth@marvell.com;
+> jdamato@fastly.com; Ping-Ke Shih <pkshih@realtek.com>; Larry Chiu
+> <larry.chiu@realtek.com>
+> Subject: Re: [PATCH net-next v29 07/13] rtase: Implement a function to
+> receive packets
+>=20
+>=20
+> External mail.
+>=20
+>=20
+>=20
+> On Thu, 29 Aug 2024 11:48:26 +0800 Justin Lai wrote:
+> > +             skb->dev =3D dev;
+>=20
+> no need to assign skb->dev =3D dev; eth_type_trans() will do it for you
 
-Thanks,
-Li Zetao.
-> 
->>   	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp-
->>> misc_clks);
->> -	clk_disable_unprepare(lp->axi_clk);
->>
->>   free_netdev:
->>   	free_netdev(ndev);
->> @@ -2939,7 +2933,6 @@ static void axienet_remove(struct platform_device
->> *pdev)
->>   	axienet_mdio_teardown(lp);
->>
->>   	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp-
->>> misc_clks);
->> -	clk_disable_unprepare(lp->axi_clk);
->>
->>   	free_netdev(ndev);
->>   }
->> --
->> 2.34.1
-> 
+Thanks, we will remove it.
+
+>=20
+> > +             skb_put(skb, pkt_size);
+> > +             skb_mark_for_recycle(skb);
+> > +             skb->protocol =3D eth_type_trans(skb, dev);
+> > +
+> > +             if (skb->pkt_type =3D=3D PACKET_MULTICAST)
+> > +                     tp->stats.multicast++;
+> > +
+> > +             rtase_rx_vlan_skb(desc, skb);
+> > +             rtase_rx_skb(ring, skb);
+> > +
+> > +             dev_sw_netstats_rx_add(dev, pkt_size);
+> > +
+> > +skip_process_pkt:
+> > +             workdone++;
+> > +             cur_rx++;
+> > +             entry =3D cur_rx % RTASE_NUM_DESC;
+> > +             desc =3D ring->desc + sizeof(union rtase_rx_desc) * entry=
+;
+> > +     } while (workdone !=3D budget);
+>=20
+> The check needs to be at the start of the function.
+> NAPI can be called with budget of 0 to limit the processing
+> to just Tx cleanup. In that case no packet should be received.
+
+OK, we will use a for loop instead.
+
 
