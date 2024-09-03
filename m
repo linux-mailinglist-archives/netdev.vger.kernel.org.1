@@ -1,202 +1,94 @@
-Return-Path: <netdev+bounces-124343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E300B96910D
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 03:47:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E8839690A0
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 02:23:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50638B225A4
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 01:47:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0586AB225AF
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 00:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783741581F8;
-	Tue,  3 Sep 2024 01:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B02810FF;
+	Tue,  3 Sep 2024 00:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mYeOqMmw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E181A4E8D
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 01:47:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D3EA32;
+	Tue,  3 Sep 2024 00:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725328026; cv=none; b=cpYXxNe+n1Wn0KqqviqDTzTHcMbj+k8/Zyl7QzLFoVifAXRrXspCmkgrtzxX/yDKeNXL8f/wujNXhTPgtwOkGzIKUdAuQHTIagQtgHJo4tAZeR++uOYOZp3b9IUE+r5+3SdwCqyn3V3GmHkbtbIP0cKviLIH/GXww6D/2tRgpVk=
+	t=1725322989; cv=none; b=DpOytq+15kBu60XYKM4/rsXk389o3pjHeAd4zFi/E0qpekCMAPmJnFQPC+IPAYcpGKTTeaotBJlC5OQudKzjiRHCTe3fl97BjKYtlN7gZpKR1W7+vxRumcl6G2s5pDQYuT/ZUGOqqL65YtvShgdxwDBnB+GZ/R0e0AkapqtDV80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725328026; c=relaxed/simple;
-	bh=V9bTy+WdYbqYnhYznwZp4ooow7LmO6s8wCMsRTrHecA=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=SunOWF8Wss66pv3BHgZ2AJbaCOCeY+s6sksSoJs6545xAcARBYBugpwb7A6qDMpP34C2mzfUMV+GB7XiGXpbVov4g8smXzX0pUEr17+kSYdfaD6ZMQs4MP9xtmEig0OLQ+ufkjRQX9ceFJDvhuGNNHBmFw9GsV+u9Yi98vlaJ9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from owl-home.int.chopps.org.chopps.org (syn-172-222-102-004.res.spectrum.com [172.222.102.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 5D6AE7D08A;
-	Tue,  3 Sep 2024 01:37:03 +0000 (UTC)
-References: <20240824022054.3788149-1-chopps@chopps.org>
- <ZtAmxA_xflBWGlYO@Antony2201.local>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Antony Antony <antony@phenome.org>
-Cc: Christian Hopps <chopps@chopps.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Florian Westphal
- <fw@strlen.de>, Sabrina Dubroca <sd@queasysnail.net>, Simon Horman
- <horms@kernel.org>, devel@linux-ipsec.org
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v10 00/16] Add IP-TFS mode to xfrm
-Date: Mon, 02 Sep 2024 20:10:26 -0400
-In-reply-to: <ZtAmxA_xflBWGlYO@Antony2201.local>
-Message-ID: <m2le09ikle.fsf@owl-home.int.chopps.org>
+	s=arc-20240116; t=1725322989; c=relaxed/simple;
+	bh=wpgxvuvuy6MrMob5LhfNIlA18ZNhaqV3NDIQgc5JzUI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PacjbIKZxS3zwcp0bqQYMSloD5o/NLWoBMOrkrsnrjN4J0U+XQL2C2cxJXXN81CSwxIor8TPNnjxr1lS8hBPmRDPNqU1TcIpIpH8YSSbmPnP0ZMIC2n/4OFnQQdeluOkmdC0/UPF+3TaMD8BsZ5Ow9gMOZnF6rOVWbp65Gt3qSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mYeOqMmw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FWI5RwxkEQ33xNBb8ono2qSimaDGGTfOgwhj4qFOqzk=; b=mYeOqMmwXXd3HhNWPNrFxkc0PB
+	d+LQusAnaTSTHyJcJe6/62w4ATqjmi2XJ+5CaweJTvQ6rutvd06gyDsvMkb2jw0UHZKDxfFr7ZKgG
+	VN5orC4/lwWMMNpDZcEterdpVVbtbT8m8oPvdB22DqmWrackh+qRdODaerh6I5KWzd9A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1slHJn-006LUO-9m; Tue, 03 Sep 2024 02:22:47 +0200
+Date: Tue, 3 Sep 2024 02:22:47 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vasileios Amoiridis <vassilisamir@gmail.com>
+Cc: linux@armlinux.org.uk, maarten.lankhorst@linux.intel.com,
+	mripard@kernel.org, tzimmermann@suse.de, airlied@gmail.com,
+	daniel@ffwll.ch, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
+	f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	nico@fluxnic.net, arend.vanspriel@broadcom.com, kvalo@kernel.org,
+	robh@kernel.org, saravanak@google.com,
+	andriy.shevchenko@linux.intel.com, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH v1 0/7] Use functionality of irq_get_trigger_type()
+Message-ID: <d6784b5c-6eb1-4b31-b870-da926fa00e32@lunn.ch>
+References: <20240902225534.130383-1-vassilisamir@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240902225534.130383-1-vassilisamir@gmail.com>
 
---=-=-=
-Content-Type: text/plain; format=flowed
+On Tue, Sep 03, 2024 at 12:55:27AM +0200, Vasileios Amoiridis wrote:
+> Convert irqd_get_trigger_type(irq_get_irq_data(irq)) cases to the more
+> simple irq_get_trigger_type(irq).
+> 
+> Inspired by: https://lore.kernel.org/linux-iio/20240901135950.797396-1-jic23@kernel.org/
+> 
+> Vasileios Amoiridis (7):
+>   drm/i2c: tda998x: Make use of irq_get_trigger_type()
+>   net: dsa: realtek: rtl8365mb: Make use of irq_get_trigger_type()
+>   net: dsa: realtek: rtl8366rb: Make use of irq_get_trigger_type()
+>   net: smc91x: Make use of irq_get_trigger_type()
+>   wifi: brcmfmac: of: Make use of irq_get_trigger_type()
+>   wifi: wlcore: sdio: Make use of irq_get_trigger_type()
+>   of/irq: Make use of irq_get_trigger_type()
 
+Please spit these by subsystems.
 
-Antony Antony via Devel <devel@linux-ipsec.org> writes:
+For networking, you should read:
 
-> Hi Chris,
->
-> On Fri, Aug 23, 2024 at 10:20:38PM -0400, Christian Hopps wrote:
->> * Summary of Changes:
->>
->> This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
->> (AggFrag encapsulation) has been standardized in RFC9347.
->>
->>   Link: https://www.rfc-editor.org/rfc/rfc9347.txt
->>
->> This feature supports demand driven (i.e., non-constant send rate)
->> IP-TFS to take advantage of the AGGFRAG ESP payload encapsulation. This
->> payload type supports aggregation and fragmentation of the inner IP
->> packet stream which in turn yields higher small-packet bandwidth as well
->> as reducing MTU/PMTU issues. Congestion control is unimplementated as
->> the send rate is demand driven rather than constant.
->>
->> In order to allow loading this fucntionality as a module a set of
->> callbacks xfrm_mode_cbs has been added to xfrm as well.
->>
->> Patchset Structure:
->> -------------------
->
-> I ran few tests. The basic tests passed. I noticed packet loss with ping -f
-> especilly on IPv6.
->
-> ping6 -f  -n -q -c 50 2001:db8:1:2::23
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-[ ... ]
-
-> Occessionally, once every, 3-4 tries, I noticed packet loss and kernel
-> splat.
->
-> $ping6 -f -n -q -c 100 -I  2001:db8:1:2::23
-> PING 2001:db8:1:2::23(2001:db8:1:2::23) from 2001:db8:1:2::45 : 56 data bytes
->
-> --- 2001:db8:1:2::23 ping statistics ---
-> 100 packets transmitted, 38 received, 62% packet loss, time 17843ms
-> rtt min/avg/max/mdev = 7.639/8.652/36.772/4.642 ms, pipe 2, ipg/ewma
-> 180.229/11.165 ms
->
-> Without iptfs, in tunnel mode, I  have never see the kernel splat or packet losss.
->
-> Have you tried ping6 -f? and possibly with "dont-frag"?
-
-I will run some IPv6 flood tests with dont-frag, and see if I can replicate this.
-
-> The setup is a simple one, host-to-host tunnel,
-> 2001:db8:1:2::23 to 2001:db8:1:2::45 wit policy /128
->
-> root@west:/testing/pluto/ikev2-74-iptfs-02-ipv6$ip x p
-> src 2001:db8:1:2::45/128 dst 2001:db8:1:2::23/128
-> 	dir out priority 1703937 ptype main
-> 	tmpl src 2001:db8:1:2::45 dst 2001:db8:1:2::23
-> 		proto esp reqid 16393 mode iptfs
-> src 2001:db8:1:2::23/128 dst 2001:db8:1:2::45/128
-> 	dir fwd priority 1703937 ptype main
-> 	tmpl src 2001:db8:1:2::23 dst 2001:db8:1:2::45
-> 		proto esp reqid 16393 mode iptfs
-> src 2001:db8:1:2::23/128 dst 2001:db8:1:2::45/128
-> 	dir in priority 1703937 ptype main
-> 	tmpl src 2001:db8:1:2::23 dst 2001:db8:1:2::45
-> 		proto esp reqid 16393 mode iptfs
->
-> src 2001:db8:1:2::45 dst 2001:db8:1:2::23
-> 	proto esp spi 0x64b502a7 reqid 16393 mode iptfs
-> 	flag af-unspec esn
-> 	aead rfc4106(gcm(aes)) 0x4bf7846c1418b14213487da785fb4019cfa47396c8c1968fb3a38559e7e39709fa87dfd9 128
-> 	lastused 2024-08-29 09:30:00
-> 	anti-replay esn context:	 oseq-hi 0x0, oseq 0xa
-> 	dir out
-> 	iptfs-opts drop-time 0 reorder-window 0 init-delay 0 dont-frag
-> src 2001:db8:1:2::23 dst 2001:db8:1:2::45
-> 	proto esp spi 0xc5b34ddd reqid 16393 mode iptfs
-> 	replay-window 0 flag af-unspec esn
-> 	aead rfc4106(gcm(aes)) 0x9029a5ad6da74a19086946836152a6a5d1abbdd81b7a8b997785d23b271413e522da9a11 128
-> 	lastused 2024-08-29 09:30:00
-> 	anti-replay esn context:
-> 	 seq-hi 0x0, seq 0xa
-> 	 replay_window 128, bitmap-length 4
-> 	 00000000 00000000 00000000 000003ff
-> 	dir in
-> 	iptfs-opts pkt-size 3 max-queue-size 3
->
-> Did I misconfigure "reorder-window 0" even then it should not drop packets?
-
-Is this a custom version? The output is suspicious. The reorder window is for handling the receipt of out-of-order tunnel packets, it's a `dir-in` attribute. The above output shows reorder-window under the `dir out` SA and is missing from the `dir in` SA. FWIW `drop-time` is also a receiving parameter, and `pkt-size` is a sending parameter, these both appear to be in the wrong spot.
-
-Here's example output from the iptfs-dev project iproute2:
-
-    src fc00:0:0:1::3 dst fc00:0:0:1::2
-            proto esp spi 0x80000bbb reqid 11 mode iptfs
-            replay-window 0 flag af-unspec
-            aead rfc4106(gcm(aes)) 0x4a506a794f574265564551694d6537681a2b1a2b 128
-            lastused 2024-09-03 01:35:57
-            anti-replay context: seq 0x0, oseq 0x0, bitmap 0x00000000
-            if_id 0x37
-            dir in
-            iptfs-opts drop-time 1000000 reorder-window 3
-    src fc00:0:0:1::2 dst fc00:0:0:1::3
-            proto esp spi 0x80000aaa reqid 10 mode iptfs
-            replay-window 0 flag af-unspec
-            aead rfc4106(gcm(aes)) 0x4a506a794f574265564551694d6537681a2b1a2b 128
-            lastused 2024-09-03 01:35:57
-            anti-replay context: seq 0x0, oseq 0x8, bitmap 0x00000000
-            if_id 0x37
-            dir out
-            iptfs-opts init-delay 0 max-queue-size 10485760 pkt-size 0
-
-Thanks,
-Chris.
-
-
->
-> -antony
-
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmbWaD0SHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAl4fIP/j2vUsGzN3hbwx/b/ZJvBzTY3mKp/5VL
-kkj8kRZenyeF2FE+veIASyLfF+kfmrdcb55r0AS/ZiV78YfCPPcs3ynTJXNxBo18
-/4DR0W2sD0xV7+Op1g/wDtpHjIhEapAOqqLnWFXkX2r9YmlUiVfyMedoAO+BE87Y
-iP83iYKNrtZ2pF6/b/lte6kS3Xzd92k0NKEBv/Q5B93pDxLUDDgdYYbtimOonttL
-fF6x7JKSN9HxH79VdeuQzjUipyKmWpFNjMuuF0rSW7EwjiHa2gtYlKMsba2LC686
-RdD8rozaX3PNouIdVVxGElXEktPt59e61rR3FiRla/2V4O0RAR/Hu9EjpLTX1S3w
-otXaRhqIpsFcssqY8D9qCtXrpFJoi4xAEg/yGqWoBiYbE5JisJWDPbEAT1l8UZCR
-KXzRbMNB/VPQM2rvptDhf7745iZgbeD6P4w9q8IkYoU+dIqOkW0N4oha4ihCQ1kX
-bxpNavkJwNJp22C0MnR5twZf96RBpKsylOM5JHJIKEuTGhqOfGEUbGvSrj77pajX
-quprJWsh2kthPsNKj/efe+W9A/kNIdc1B6aZIvcVN+IFnD0XSWgGzESrlOfRMdIX
-E0ziIHALzy4hagyCRYZk1ZSbPv/OP+NbfJcTGvtO4GxvEfCEeN6TfHxKP654wSMX
-8SF6/fTeXnSE
-=JhFr
------END PGP SIGNATURE-----
---=-=-=--
+	Andrew
 
