@@ -1,162 +1,184 @@
-Return-Path: <netdev+bounces-124388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F5429692AC
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 06:07:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28C399692E6
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 06:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 419781C20FAD
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 04:07:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D40C3282FEF
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 04:29:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5D51CDFAC;
-	Tue,  3 Sep 2024 04:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB411CB535;
+	Tue,  3 Sep 2024 04:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JqVi/DYe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066061A3026
-	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 04:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3121CDFAC
+	for <netdev@vger.kernel.org>; Tue,  3 Sep 2024 04:29:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725336204; cv=none; b=D+fk3jr/UUIWCUwqEy6duY6ZBeaXAExS2LGwUfxZWq+EWs41lA2RRiP0pVtJl+0Pj1ha2KTytwrwNgM/adLHNlySM8Ewx10upGjz3XqinRiKIT4uQvNkUSbz0vfxbXAjalo5pHmJAFI7aeHXXE3WLgai5X8fNr0C5g21AC2x0iM=
+	t=1725337763; cv=none; b=QdunEyxF/wpYc/LhTP9wXPIo6pzDi/5p2vepyylgyysQcmV8lOGpo6J5CowebjCf4f/6BWXTD7Bxox20nJDIdnnlwXypPNGY1KgZwoPWlwvQptXZ1ObEezrWOdHP0rEVv/aMcdmRQThm04IhWkLxwXRS8TUMPxszFQATITr5COE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725336204; c=relaxed/simple;
-	bh=3DVyBQQSxw+DaF0Tvku13o9jnSR2iRYfV6GGKEvuAhY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=o2kyjrf79VEaBlbI/9qwu5DxxxLm5hRHn9V0v37UYifc9lmRjUFtsT/c0UF+1jqAA6HbVUlyn5aY1H+ci6fRe+MsxgtVOeoxumrOLPhpqzFqva1jcqvPtMehhacqmy2zXmVweaVB1bQ3i76yccQ0+CnyKSNt/TJqG/jCmLmqK1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39f510b3f81so20976285ab.0
-        for <netdev@vger.kernel.org>; Mon, 02 Sep 2024 21:03:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725336202; x=1725941002;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PRu/ehkcfoxHuabFtsJ4qkhHQn3xPQjo9rYWKQxBFPg=;
-        b=Zr4inDd95RqU8modJy6eLe4qaTBD6t/vndhT+64qm3B3RTzB3Db96/Qa9oUzFJABaR
-         mDCbeSup2A7SEx02yLFEHwnVZGEaW0oB7ej0aXUjsWratMgsgAVkvt+2G6Rw4uog3YM/
-         1RFK+HnSjsksVz591ibdvxAWyMx5pBUJy9xo+sCiqn+DQNPHvW49cMza2XfoVMsZ/spy
-         tKJBwzB4sn93ESRtI6rMxXof9Tn+ksK2me6jlxnfd8YwPaVIODQ9JCey1kk5kgywM+8E
-         8ZyWJt8yLeMVT7cS4QY2+k0KYC1m2DDLOFmhRKcwqF1EXcT1psYlPUEBLgGEiMfAQsm8
-         s6mw==
-X-Forwarded-Encrypted: i=1; AJvYcCWiiPW7hq6nT0JTwxE8oRvPOVHJ8jJ/Wrf6YIf3GM3Qq0v/Zv2EF1JiESBPBvmhPEL6+HF6ThM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtvEVJSyJHr2h92xZ/d++TTIbUlVqvP6iBuOHfOpYZ/QOl0vgB
-	2JoEAAF43qo1WCfyXqzAMzd0/3cXxBq8+P29zGbc4/GNu44/gYuWhU/N2UFQbKkGC4zxj/WOris
-	j5BQzDk+P4jJcirJa0iGtM8Qyp7GFcuyhH7keLPD77HW2OvMo++qFZIE=
-X-Google-Smtp-Source: AGHT+IFmd2CzI3jFIENT6kfyko0tux6vbzdEg6trD/WMvcO8cAfFSkHxcnH4zllEdGlSPNnJzcCy1OiNV5jI1oviTjo2nmjHC08V
+	s=arc-20240116; t=1725337763; c=relaxed/simple;
+	bh=uH7Gn3d41cpuwRq799H0mwL8fYyKUrYGCCV035KdmTo=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XmdfcDYalQ42baKgN0EvUPYy9JnnSe5rk8ympruXyTxd95CaUCPJtIDyCInJlol98a4L5gQ7pyvESItANvJCJe0rKlb4E+SCESGpn1np5rRwfInHBvF/hxmhTI8oet6icGLvOUEYKs9hk8rVYIT0U9fTvCv7/eX8Rvv1gPLAquc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JqVi/DYe; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1725337763; x=1756873763;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=uH7Gn3d41cpuwRq799H0mwL8fYyKUrYGCCV035KdmTo=;
+  b=JqVi/DYeTMT529l4E1HqyHUyCxxkpvMN7FfsjlYFxWvfidIYABvUvGXG
+   0HqYsJK/AsL8mgq4u6DMo7Fcq8//+EVrJIVn3e4DYuZOU/K5Y+T5AZtyG
+   g7wVMxDrhdSHFKG6voPZcQri5bD1XlQjRxg2fOSYvBQSiBiLfI/zYZX13
+   k=;
+X-IronPort-AV: E=Sophos;i="6.10,197,1719878400"; 
+   d="scan'208";a="430785666"
+Subject: RE: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics reporting
+ support
+Thread-Topic: [PATCH v1 net-next 2/2] net: ena: Extend customer metrics reporting support
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 04:29:20 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.43.254:31765]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.4.97:2525] with esmtp (Farcaster)
+ id bfbc5d68-0272-4b25-abd5-8fdf8f634ccc; Tue, 3 Sep 2024 04:29:18 +0000 (UTC)
+X-Farcaster-Flow-ID: bfbc5d68-0272-4b25-abd5-8fdf8f634ccc
+Received: from EX19D022EUA004.ant.amazon.com (10.252.50.82) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 3 Sep 2024 04:29:18 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D022EUA004.ant.amazon.com (10.252.50.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 3 Sep 2024 04:29:18 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1258.035; Tue, 3 Sep 2024 04:29:18 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: Parav Pandit <parav@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, "Xuan
+ Zhuo" <xuanzhuo@linux.alibaba.com>, "Michael S. Tsirkin" <mst@redhat.com>
+CC: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, "Woodhouse, David" <dwmw@amazon.co.uk>, "Machulsky,
+ Zorik" <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>,
+	"Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
+	"Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>,
+	"Belgazal, Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
+	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Agroskin, Shay"
+	<shayagr@amazon.com>, "Itzko, Shahar" <itzko@amazon.com>, "Abboud, Osama"
+	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
+ Ofir" <ofirt@amazon.com>, "Beider, Ron" <rbeider@amazon.com>, "Chauskin,
+ Igor" <igorch@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>, "Cornelia
+ Huck" <cohuck@redhat.com>
+Thread-Index: AQHa7SRj5VISt7WkiEq52al7KaOO2rIkcQQAgACfhwCAAD2PAIABmGGAgAA9c4CAFP5L8IAJdm9g
+Date: Tue, 3 Sep 2024 04:29:18 +0000
+Message-ID: <686a380af2774aa9ade5a9baa1f9e49a@amazon.com>
+References: <20240811100711.12921-1-darinzon@amazon.com>
+	<20240811100711.12921-3-darinzon@amazon.com>
+	<20240812185852.46940666@kernel.org>
+	<9ea916b482fb4eb3ace2ca2fe62abd64@amazon.com>
+	<20240813081010.02742f87@kernel.org>
+	<8aea0fda1e48485291312a4451aa5d7c@amazon.com>
+ <20240814121145.37202722@kernel.org>
+ <IA0PR12MB87130D5D31AEFDBEDBF690ADDC952@IA0PR12MB8713.namprd12.prod.outlook.com>
+In-Reply-To: <IA0PR12MB87130D5D31AEFDBEDBF690ADDC952@IA0PR12MB8713.namprd12.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:152d:b0:376:3fad:bb7c with SMTP id
- e9e14a558f8ab-39f38add4b3mr9096585ab.1.1725336202191; Mon, 02 Sep 2024
- 21:03:22 -0700 (PDT)
-Date: Mon, 02 Sep 2024 21:03:22 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000073383906212f236a@google.com>
-Subject: [syzbot] [usb?] WARNING in rtl8150_open/usb_submit_urb
-From: syzbot <syzbot+d7e968426f644b567e31@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, petkan@nucleusys.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+> > > I've looked into the definition of the metrics under question
+> > >
+> > > Based on AWS documentation
+> > > (https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-
+> > networ
+> > > k-performance-ena.html)
+> > >
+> > > bw_in_allowance_exceeded: The number of packets queued or dropped
+> > because the inbound aggregate bandwidth exceeded the maximum for the
+> > instance.
+> > > bw_out_allowance_exceeded: The number of packets queued or
+> dropped
+> > because the outbound aggregate bandwidth exceeded the maximum for
+> the
+> > instance.
+> > >
+> > > Based on the netlink spec
+> > > (https://docs.kernel.org/next/networking/netlink_spec/netdev.html)
+> > >
+> > > rx-hw-drop-ratelimits (uint)
+> > > doc: Number of the packets dropped by the device due to the received
+> > packets bitrate exceeding the device rate limit.
+> > > tx-hw-drop-ratelimits (uint)
+> > > doc: Number of the packets dropped by the device due to the transmit
+> > packets bitrate exceeding the device rate limit.
+> > >
+> > > The AWS metrics are counting for packets dropped or queued (delayed,
+> > > but
+> > are sent/received with a delay), a change in these metrics is an
+> > indication to customers to check their applications and workloads due
+> > to risk of exceeding limits.
+> > > There's no distinction between dropped and queued in these metrics,
+> > therefore, they do not match the ratelimits in the netlink spec.
+> > > In case there will be a separation of these metrics in the future to
+> > > dropped
+> > and queued, we'll be able to add the support for hw-drop-ratelimits.
+> >
+> > Xuan, Michael, the virtio spec calls out drops due to b/w limit being
+> > exceeded, but AWS people say their NICs also count packets buffered
+> > but not dropped towards a similar metric.
+> >
+> > I presume the virtio spec is supposed to cover the same use cases.
+> On tx side, number of packets may not be queued, but may not be even
+> DMAed if the rate has exceeded.
+> This is hw nic implementation detail and a choice with trade-offs.
+>=20
+> Similarly on rx, one may implement drop or queue or both (queue upto some
+> limit, and drop beyond it).
+>=20
+> > Have the stats been approved?
+> Yes. it is approved last year; I have also reviewed it; It is part of the=
+ spec
+> nearly 10 months ago at [1].
+> GH PR is merged but GH is not updated yet.
+>=20
+> [1] https://github.com/oasis-tcs/virtio-
+> spec/commit/42f389989823039724f95bbbd243291ab0064f82
+>=20
+> > Is it reasonable to extend the definition of the "exceeded" stats in
+> > the virtio spec to cover what AWS specifies?
+> Virtio may add new stats for exceeded stats in future.
+> But I do not understand how AWS ENA nic is related to virtio PCI HW nic.
+>=20
+> Should virtio implement it? may be yes. Looks useful to me.
+> Should it be now in virtio spec, not sure, this depends on virtio communi=
+ty
+> and actual hw/sw supporting it.
+>=20
+> > Looks like PR is still open:
+> > https://github.com/oasis-tcs/virtio-spec/issues/180
+> Spec already has it at [1] for drops. GH PR is not upto date.
 
-syzbot found the following issue on:
+Thank you for the reply, Parav.
+I've raised the query and the summary of this discussion in the above menti=
+oned github ticket.
 
-HEAD commit:    fc88bb116179 usb: roles: add lockdep class key to struct u..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=17b89e97980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f470942baada45b1
-dashboard link: https://syzkaller.appspot.com/bug?extid=d7e968426f644b567e31
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16bb5463980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=150ca88f980000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/5b06342088f5/disk-fc88bb11.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e881a8c2cb53/vmlinux-fc88bb11.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4bf14d7b61d4/bzImage-fc88bb11.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d7e968426f644b567e31@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-usb 1-1: BOGUS urb xfer, pipe 3 != type 1
-WARNING: CPU: 1 PID: 2586 at drivers/usb/core/urb.c:503 usb_submit_urb+0xe4b/0x1730 drivers/usb/core/urb.c:503
-Modules linked in:
-CPU: 1 UID: 0 PID: 2586 Comm: dhcpcd Not tainted 6.11.0-rc4-syzkaller-00069-gfc88bb116179 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-RIP: 0010:usb_submit_urb+0xe4b/0x1730 drivers/usb/core/urb.c:503
-Code: 84 3c 02 00 00 e8 05 e4 fc fc 4c 89 ef e8 fd 25 d7 fe 45 89 e0 89 e9 4c 89 f2 48 89 c6 48 c7 c7 20 5d a0 87 e8 46 e6 c2 fc 90 <0f> 0b 90 90 e9 e9 f8 ff ff e8 d7 e3 fc fc 49 81 c4 c0 05 00 00 e9
-RSP: 0018:ffffc9000441f740 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff888112487a00 RCX: ffffffff811a99a9
-RDX: ffff88810df6ba80 RSI: ffffffff811a99b6 RDI: 0000000000000001
-RBP: 0000000000000003 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000001
-R13: ffff8881023bf0a8 R14: ffff888112452a20 R15: ffff888112487a7c
-FS:  00007fc04eea5740(0000) GS:ffff8881f6300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0a1de9f870 CR3: 000000010dbd0000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- rtl8150_open+0x300/0xe30 drivers/net/usb/rtl8150.c:733
- __dev_open+0x2d4/0x4e0 net/core/dev.c:1474
- __dev_change_flags+0x561/0x720 net/core/dev.c:8838
- dev_change_flags+0x8f/0x160 net/core/dev.c:8910
- devinet_ioctl+0x127a/0x1f10 net/ipv4/devinet.c:1177
- inet_ioctl+0x3aa/0x3f0 net/ipv4/af_inet.c:1003
- sock_do_ioctl+0x116/0x280 net/socket.c:1222
- sock_ioctl+0x22e/0x6c0 net/socket.c:1341
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl fs/ioctl.c:893 [inline]
- __x64_sys_ioctl+0x193/0x220 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fc04ef73d49
-Code: 5c c3 48 8d 44 24 08 48 89 54 24 e0 48 89 44 24 c0 48 8d 44 24 d0 48 89 44 24 c8 b8 10 00 00 00 c7 44 24 b8 10 00 00 00 0f 05 <41> 89 c0 3d 00 f0 ff ff 76 10 48 8b 15 ae 60 0d 00 f7 d8 41 83 c8
-RSP: 002b:00007ffdc6648808 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fc04eea56c0 RCX: 00007fc04ef73d49
-RDX: 00007ffdc66589f8 RSI: 0000000000008914 RDI: 0000000000000005
-RBP: 00007ffdc6668bb8 R08: 00007ffdc66589b8 R09: 00007ffdc6658968
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffdc66589f8 R14: 0000000000000028 R15: 0000000000008914
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
