@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-124575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B4AE96A05B
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:25:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D82296A06B
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 16:26:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 666671C20F2B
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:25:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A05B41C23A5E
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 14:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4678213CF86;
-	Tue,  3 Sep 2024 14:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDD113D28C;
+	Tue,  3 Sep 2024 14:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CleTK0i1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mW2a3S4J"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7B57581A;
-	Tue,  3 Sep 2024 14:25:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3083618734F;
+	Tue,  3 Sep 2024 14:25:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725373517; cv=none; b=CZ/HeLu91iutTiu1Bvl1bYbo3+LVI0W5s+WfNj4MXcoeYC0rj6iH08PqWcaZnttbi3zzSPjf4LH/krgl6xILlFQTPS7axEdO3j1uVjgCJARq9CwMG0otuEo47Lx4iDR2E5s+crJj2GAyAgsqBPZ25rHcDRF9E/vp5AMInuXc6dg=
+	t=1725373536; cv=none; b=dtlGD+IxiXCyBi3xKY2/bgyN21f+9+cnoAU+pT4TDSDpy7Jb+mfHTbK9lYfP7HhP50Ec+kJjl7W2Nwd9aYqgZFTUmqY1TKlxDiK+5zfOiyxuRrKD2zd4rtnSsYHa9qq0gYgU1F3BVc6CxZl9d36HrdOZ0AAXR/lOckzRDuZTYxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725373517; c=relaxed/simple;
-	bh=8oF38+wcTyCFFLJNltFe9UX5N5NexPR+hPC1BNLasBQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SfDfIgHte1kDPJyjutcng91fhjtLjPDDBdd6A5T6f7mCZmeB44yk5DzTvlGErOJN26JiLYLT+DLxKpu4iMVu3SRY3w4343k3NW8YIRM4rQUdGn57vCgCtEueVCFVvH+wFkRI4yVFSbnPS5b86wkX0kwhe3l/59dHYkVVJ7YSIKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CleTK0i1; arc=none smtp.client-ip=192.198.163.19
+	s=arc-20240116; t=1725373536; c=relaxed/simple;
+	bh=KG72mTIMDmwKrMVTpaSWmAQDsmU/2k7lYdXrKMY1wm0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=aFYRaRS2Op+bJFBdf/3yQ7D1e9DdTPqbKEL5TiC9JNR4pyRaT8jFQz6UZPVAPBBCX4cTAi7m/VGc7XrfV+T13eAX7f7fHAIHDJ6gEfSURu+py93fpVXVN3bNJn58+rcBdTyV3atWG4N8jFxdQgGq1Xv67l1DIcCowSjBi3GChlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mW2a3S4J; arc=none smtp.client-ip=192.198.163.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725373515; x=1756909515;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=8oF38+wcTyCFFLJNltFe9UX5N5NexPR+hPC1BNLasBQ=;
-  b=CleTK0i1pwGISF7KsbHEH/bGdmO51AvQNELxQ5AL0XaJFJd1GTIbIByn
-   CtFhQzWUpmUG43tGhulsoAjEcOjEV+Jrc8fE9kenpnuV/VSciYMTV/HNI
-   c5NnNyPig5iORBFc/KirsxhIkzvmur/6m6Ce2AiRgveoEly6U90ftLiod
-   v+1BuLCZv8kjdcG/n3GOyeObOIdd2/zZzD0U8LCbHmP9fL0HIawg5TXGo
-   sUz58gvBj7rvFhcVA7X0Q44sn3W9Tz/Bf691NNoBKJHR+cpJG7Ze7UCaa
-   lEzfvMgyLQXPg5O4VVvGY/1rnz/xel8d5yX7OrgayXJw/l5nTbS2S1lSp
-   g==;
-X-CSE-ConnectionGUID: O5lyGBRKQMCfAxlmyXSdwQ==
-X-CSE-MsgGUID: 9pW7PLqHRCyvZnkmhAwMNg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23541263"
+  t=1725373534; x=1756909534;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=KG72mTIMDmwKrMVTpaSWmAQDsmU/2k7lYdXrKMY1wm0=;
+  b=mW2a3S4J7XHD4qprk10d6lVRjQM+dsCb1IZHphObJUv8kEDcMhbdNKNh
+   FipO7gsjptnAhnXLjHK1FSsG/TyUjazEf02GwJJYQbnZKaJmpVzNPawMo
+   ajqvxZdmPdJJEZvnzxcZHHhBcBoZsCRnTp4PyFtnPDUH/5NKsNXN6yQmg
+   XEvn3jK0BFyeRh9RYVPTYPSBKmEvaygQ2sTFiCweGNhd8/P9Dx9TP52IC
+   1N24SzLfAk/PmhevZiHK2mkasgnXHXgVJSw2iVUI2wv1mUJCpI46k5n5H
+   D6Rjn4k2eBHGhCxtzG/rwx4oRAHhm758ct/h0XOIP1bdciXU3TIoYHRF1
+   A==;
+X-CSE-ConnectionGUID: qd9bJBDvRi+kSNrJvej5jg==
+X-CSE-MsgGUID: Gv7qjKLNQWqqSQ6ntSh0NQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23541377"
 X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
-   d="scan'208";a="23541263"
+   d="scan'208";a="23541377"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 07:25:14 -0700
-X-CSE-ConnectionGUID: rb+5gYZhQFG9CNAs2BREDQ==
-X-CSE-MsgGUID: 3n4/huujQW21hYevl0+/+A==
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2024 07:25:34 -0700
+X-CSE-ConnectionGUID: onglsi2NTkeRhPKGwfNH5A==
+X-CSE-MsgGUID: dudb/VWgR3CPWwla7T6YDw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,199,1719903600"; 
-   d="scan'208";a="65658762"
+   d="scan'208";a="65658882"
 Received: from black.fi.intel.com (HELO black.fi.intel.com.) ([10.237.72.28])
-  by orviesa008.jf.intel.com with ESMTP; 03 Sep 2024 07:25:07 -0700
+  by orviesa008.jf.intel.com with ESMTP; 03 Sep 2024 07:25:30 -0700
 From: Heikki Krogerus <heikki.krogerus@linux.intel.com>
 To: Andi Shyti <andi.shyti@kernel.org>,
 	Jarkko Nikula <jarkko.nikula@linux.intel.com>
@@ -65,32 +66,19 @@ Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Jan Dabros <jsd@semihalf.com>,
 	linux-i2c@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Vineet Gupta <vgupta@kernel.org>,
-	Russell King <linux@armlinux.org.uk>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
 	Jiawen Wu <jiawenwu@trustnetic.com>,
 	Mengyuan Lou <mengyuanlou@net-swift.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	UNGLinuxDriver@microchip.com,
-	linux-mips@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-snps-arc@lists.infradead.org
-Subject: [PATCH v2 0/7] i2c: designware: Group all DesignWare drivers under a single option
-Date: Tue,  3 Sep 2024 17:24:59 +0300
-Message-ID: <20240903142506.3444628-1-heikki.krogerus@linux.intel.com>
+	netdev@vger.kernel.org
+Subject: [PATCH v2 6/7] net: txgbe: Fix I2C Kconfig dependencies
+Date: Tue,  3 Sep 2024 17:25:05 +0300
+Message-ID: <20240903142506.3444628-7-heikki.krogerus@linux.intel.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240903142506.3444628-1-heikki.krogerus@linux.intel.com>
+References: <20240903142506.3444628-1-heikki.krogerus@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,57 +87,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi guys,
+The dependency handling of the Synopsys DesignWare I2C
+adapter drivers is going to be changed so that the glue
+drivers for the platform and PCI buses depend on
+I2C_DESIGNWARE_CORE. Right now this driver prevents that
+update because it selects I2C_DESIGNWARE_PLATFORM.
 
-This is a proposal for Kconfig improvement regarding the Synopsys
-DesignWare I2C adapter driver.
+To make the dependency on I2C_DESIGNWARE_PLATFORM consistent
+with the other drivers in kernel that depend on it, and
+allow the dependency handling of the Synopsys DesignWare I2C
+drivers to be updated, change the "select" into "depends on".
 
-Changes since v1:
+Cc: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Heikki Krogerus <heikki.krogerus@linux.intel.com>
+---
+ drivers/net/ethernet/wangxun/Kconfig | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-There was one driver that selects I2C_DESIGNWARE_PLATFORM in its
-Kconfig which causes an error because I2C_DESIGNWARE_CORE is not
-selected.
-
-The drivers Kconfig I'm proposing that we fix by using "depends on"
-instead of "select". There are also a number of defconfigs that enable
-I2C_DESIGNWARE_PLATFORM that now need to enable I2C_DESIGNWARE_CORE.
-
-The original patch:
-https://lore.kernel.org/linux-i2c/20240830111222.2131172-1-heikki.krogerus@linux.intel.com/
-
-thanks,
-
-Heikki Krogerus (7):
-  ARC: configs: enable I2C_DESIGNWARE_CORE with I2C_DESIGNWARE_PLATFORM
-  ARM: configs: enable I2C_DESIGNWARE_CORE with I2C_DESIGNWARE_PLATFORM
-  arm64: defconfig: enable I2C_DESIGNWARE_CORE with
-    I2C_DESIGNWARE_PLATFORM
-  mips: configs: enable I2C_DESIGNWARE_CORE with I2C_DESIGNWARE_PLATFORM
-  RISC-V: configs: enable I2C_DESIGNWARE_CORE with
-    I2C_DESIGNWARE_PLATFORM
-  net: txgbe: Fix I2C Kconfig dependencies
-  i2c: designware: Group all DesignWare drivers under a single option
-
- arch/arc/configs/axs101_defconfig             |  1 +
- arch/arc/configs/axs103_defconfig             |  1 +
- arch/arc/configs/axs103_smp_defconfig         |  1 +
- arch/arc/configs/tb10x_defconfig              |  1 +
- arch/arm/configs/hisi_defconfig               |  1 +
- arch/arm/configs/multi_v7_defconfig           |  1 +
- arch/arm/configs/pxa_defconfig                |  1 +
- arch/arm/configs/socfpga_defconfig            |  1 +
- arch/arm/configs/spear13xx_defconfig          |  1 +
- arch/arm/configs/spear3xx_defconfig           |  1 +
- arch/arm/configs/spear6xx_defconfig           |  1 +
- arch/arm64/configs/defconfig                  |  1 +
- arch/mips/configs/generic/board-ocelot.config |  1 +
- arch/riscv/configs/defconfig                  |  1 +
- arch/riscv/configs/nommu_k210_defconfig       |  1 +
- .../riscv/configs/nommu_k210_sdcard_defconfig |  1 +
- drivers/i2c/busses/Kconfig                    | 29 ++++++++++++-------
- drivers/net/ethernet/wangxun/Kconfig          |  3 +-
- 18 files changed, 35 insertions(+), 13 deletions(-)
-
+diff --git a/drivers/net/ethernet/wangxun/Kconfig b/drivers/net/ethernet/wangxun/Kconfig
+index 85cdbdd44fec..e46ccebcfd22 100644
+--- a/drivers/net/ethernet/wangxun/Kconfig
++++ b/drivers/net/ethernet/wangxun/Kconfig
+@@ -41,10 +41,9 @@ config TXGBE
+ 	tristate "Wangxun(R) 10GbE PCI Express adapters support"
+ 	depends on PCI
+ 	depends on COMMON_CLK
++	depends on I2C_DESIGNWARE_PLATFORM
+ 	select MARVELL_10G_PHY
+ 	select REGMAP
+-	select I2C
+-	select I2C_DESIGNWARE_PLATFORM
+ 	select PHYLINK
+ 	select HWMON if TXGBE=y
+ 	select SFP
 -- 
 2.45.2
 
