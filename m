@@ -1,112 +1,78 @@
-Return-Path: <netdev+bounces-124417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DED4096958D
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:32:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB7B9695E7
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 09:46:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DF9F1C23298
-	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 07:32:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B767281DA9
+	for <lists+netdev@lfdr.de>; Tue,  3 Sep 2024 07:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4971DAC56;
-	Tue,  3 Sep 2024 07:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F22AE1CEAC5;
+	Tue,  3 Sep 2024 07:45:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hhitfezH"
+	dkim=pass (1024-bit key) header.d=theune.cc header.i=@theune.cc header.b="9RS35FQe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.theune.cc (mail.theune.cc [212.122.41.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26441CE6F0;
-	Tue,  3 Sep 2024 07:30:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2580649654;
+	Tue,  3 Sep 2024 07:45:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.122.41.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725348659; cv=none; b=jHRTLef+J3LKc9HDPxPO6ICitwE0y7s8n1vSpNy5AASW/lg3/mRiWrsqZqHQeR+J3adgwrTz8JOfINIzJ+XWeThP8sZEqwe0xlArNI8JxRPLPMa3B/j6EBbHABiRHVWKlYfw3lKCpZjMXbspPG7Ov+WbLxvQcHOG1ZHXhM2NIMw=
+	t=1725349559; cv=none; b=eTudpX2gqGg/c1w8tubzhkWxy9TjVVQFBU9FUPxJiJCZvsRG4fE5sx/Q6Dv//3pwKZsZges5x0HzJ2WULI61eNmgEJWzurH6LWYe4/K6d4igvcGBX6Y/NrYSxSUCnDu4dY6FzAC1Jrgkn9VbSOJHT0DUxj64yx8aKimLyXRfkeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725348659; c=relaxed/simple;
-	bh=/RR2jr1KMQXxUfxuXcD3zaZtecL2ksrKcjhHyOpf0fM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dWJzMjAh148xUuL7KZ0NPSlZxH9+UDEhEYNnBNnNAGaYsC3BWKp6yKxtA5k6+dz8/0viDxFmd2gmLc9q1wTA5GWFGFomNSQc9SZ/kt1mAkm+1PeqUxvFe+MifKfqAdmJlx2YonKSzQwv9o0vDJRIt9I+ov7EcVoR/43b6WM68tQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hhitfezH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC2E7C4CEC8;
-	Tue,  3 Sep 2024 07:30:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725348659;
-	bh=/RR2jr1KMQXxUfxuXcD3zaZtecL2ksrKcjhHyOpf0fM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hhitfezHixV6WCukmGc4VnWzssY6DFst2DXsNBsGTdpx4eNrt1Hc/l62iauhtZnUJ
-	 RlSnAQS+gM7jLnrsqnQd/eki088//7fF7Gs6miYJsIpf74ck5y4z/1flAatH/UVQME
-	 NZo1KQjDRqOudNyMicarVanmPZPimX2a1AkxDBFREWtqlZATxOjRStSKn5Hni+2Jkr
-	 jZeNgLwbicrxiVts5qL2vSCS46810QKURTwCe8xUQTpofg938Xi6D97zTaJTgN4Pdo
-	 sMiLaT4TJpuIr1zjaoBpA5wpucWGVD9AOhYRn6dglnMS6U2IAF67jVWhbGME6BAfCz
-	 Xc+oIlzh86awA==
-Date: Tue, 3 Sep 2024 08:30:54 +0100
-From: Simon Horman <horms@kernel.org>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ramon.nordin.rodriguez@ferroamp.se,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Thorsten.Kummermehr@microchip.com
-Subject: Re: [PATCH net-next v2 5/7] net: phy: microchip_t1s: add support for
- Microchip's LAN867X Rev.C1
-Message-ID: <20240903073054.GO23170@kernel.org>
-References: <20240902143458.601578-1-Parthiban.Veerasooran@microchip.com>
- <20240902143458.601578-6-Parthiban.Veerasooran@microchip.com>
+	s=arc-20240116; t=1725349559; c=relaxed/simple;
+	bh=UQbVf6OKRCtWOwlejkZMkhRvD/SZFgavXNfB/+1B94g=;
+	h=From:Content-Type:Mime-Version:Subject:Message-Id:Date:Cc:To; b=JgkobMFxmq4kw0qw0PFdLE64t7btvvMFGqh8+MrC46D3A84dnR7Q1P7Z4U24luIEEjd/IsEthhFMbtgU9JIZrQk9i8wpIhvcFj4Yoja7mm2yJjyrCSuEBQMScfyH9UQlkDUgRviZ2co5WjNsvyLShWya4/h2+3VJXiv8dLjim8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=theune.cc; spf=pass smtp.mailfrom=theune.cc; dkim=pass (1024-bit key) header.d=theune.cc header.i=@theune.cc header.b=9RS35FQe; arc=none smtp.client-ip=212.122.41.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=theune.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theune.cc
+From: Christian Theune <christian@theune.cc>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=theune.cc; s=mail;
+	t=1725349071; bh=UQbVf6OKRCtWOwlejkZMkhRvD/SZFgavXNfB/+1B94g=;
+	h=From:Subject:Date:Cc:To;
+	b=9RS35FQe8yhCh1MeaHbIsWvYfhvtJjJYdy1rH5cMMCnCd4B6eizhnx12ko82U37ro
+	 SJsuea6OoSCMypFk+dV+NZ3uCu9bpNmLWTL5Zmh91SeXSWC30DGy+RGATA6GC4+OpG
+	 7W7nKOZB2arrpm0UVCpzqBYGrTwtBL4PiGfic28c=
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240902143458.601578-6-Parthiban.Veerasooran@microchip.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
+Subject: Follow-up to "net: drop bad gso csum_start and offset in
+ virtio_net_hdr" - backport for 5.15 needed
+Message-Id: <89503333-86C5-4E1E-8CD8-3B882864334A@theune.cc>
+Date: Tue, 3 Sep 2024 09:37:30 +0200
+Cc: stable@vger.kernel.org,
+ netdev@vger.kernel.org
+To: regressions@lists.linux.dev
 
-On Mon, Sep 02, 2024 at 08:04:56PM +0530, Parthiban Veerasooran wrote:
-> This patch adds support for LAN8670/1/2 Rev.C1 as per the latest
-> configuration note AN1699 released (Revision E (DS60001699F - June 2024))
-> https://www.microchip.com/en-us/application-notes/an1699
-> 
-> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Hi,
 
-...
+the issue was so far handled in =
+https://lore.kernel.org/regressions/ZsyMzW-4ee_U8NoX@eldamar.lan/T/#m390d6=
+ef7b733149949fb329ae1abffec5cefb99b and =
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219129
 
-> diff --git a/drivers/net/phy/microchip_t1s.c b/drivers/net/phy/microchip_t1s.c
+I haven=E2=80=99t seen any communication whether a backport for 5.15 is =
+already in progress, so I thought I=E2=80=99d follow up here.=20
 
-...
+Today we rolled out 5.15.165 and immediately ran into the same issue. =
+There=E2=80=99s at least one other person asking for a 5.15 backport in =
+Bugzilla.
 
-> @@ -290,6 +291,58 @@ static int lan867x_check_reset_complete(struct phy_device *phydev)
->  	return 0;
->  }
->  
-> +static int lan867x_revc1_config_init(struct phy_device *phydev)
-> +{
-> +	s8 offsets[2];
-> +	int ret;
-> +
-> +	ret = lan867x_check_reset_complete(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = lan865x_generate_cfg_offsets(phydev, offsets);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* LAN867x Rev.C1 configuration settings are equal to the first 9
-> +	 * configuration settings and all the sqi fixup settings from LAN865x
-> +	 * Rev.B0/B1. So the same fixup registers and values from LAN865x
-> +	 * Rev.B0/B1 are used for LAN867x Rev.C1 to avoid duplication.
-> +	 * Refer the below links for the comparision.
+Hugs,
+Christian
 
-nit: comparison
+-- =20
+Christian Theune - A97C62CE - 0179 7808366
+@theuni - christian@theune.cc
 
-     Flagged by checkpatch.pl --codespell
-
-> +	 * https://www.microchip.com/en-us/application-notes/an1760
-> +	 * Revision F (DS60001760G - June 2024)
-> +	 * https://www.microchip.com/en-us/application-notes/an1699
-> +	 * Revision E (DS60001699F - June 2024)
-> +	 */
 
