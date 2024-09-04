@@ -1,108 +1,121 @@
-Return-Path: <netdev+bounces-125251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 797B196C7AE
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 21:40:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED2396C7BB
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 21:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E88D8B20ECA
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B9632873D6
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67A11E6DC0;
-	Wed,  4 Sep 2024 19:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13D61E6DC0;
+	Wed,  4 Sep 2024 19:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uigwwhzu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbgTmhu1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89B3A84A27;
-	Wed,  4 Sep 2024 19:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B014D1E6321;
+	Wed,  4 Sep 2024 19:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725478827; cv=none; b=GrPcr9Ml3YDPuZs8LXyisgYUqfSdCiDwKbAJLW7bk0Jr7sVmI0KP2ndagGsJ+sNxqqUiCo6aY8oilfkYll433U5FmOy3y7SUB0SiHqxRYyBSrFvKmKAmqNPDGJzrT4KUXffs1Om+MWRu5vNDT1O34edT4c9d41Vv8mF6QU0osnY=
+	t=1725478854; cv=none; b=m7bYS+n9SOyU86Oz4qyqB+yGNxmpOyqlMyceUbbQUn2vrcUlVJOsmI2Hor4paEPMRBzYpO0dnL+buJBiqLKoL72Y/C7STye7rDjfGh/Jj2QhmfjPX6fqrFesRT8AfA2OJk/LATxGbaqxyLBzudAMfutW0+LREoDYZshcaT0sVus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725478827; c=relaxed/simple;
-	bh=SNWThRPwlDfNqRuJUF0l0Cucyp1v3Y0fdsPK5rvXCb8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NCJgchbYN1OEV2E9mNalQN1sqlnivdG/6jOXPWUDgA1CHceH72ZEVqyPQWnkrKA1cs0GQaIZVI4vNDa9iXxCEd4XOhOOQGiZQsLTVjOerUoxHc0ZE2wVMq6drRwqdb+lxc6VMAx8FvLLKN9vVNmvrmFpGvHJByvgcNdH0CNL1Pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uigwwhzu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB6A2C4CEC2;
-	Wed,  4 Sep 2024 19:40:26 +0000 (UTC)
+	s=arc-20240116; t=1725478854; c=relaxed/simple;
+	bh=bQK+yFu5fRg8+syHRGxnt1pzKtg69U9NOvqBoa1Brlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=Q5AbebltciRKsY7/5AZzdAUH9bvQAx9+iX1Ci3MNPLgiYAm6eyZwSwtAIv+Z+3Hjdeko1/0to2m8jATEmq0yn509D9xvzhl4h/+De5I7c0s9j1IzHZCvN/0J44wZY8/BFyTGc6YlFq3Uboagjso29vx+t9Hn97i9L4pzb+ySGu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbgTmhu1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02476C4CEC2;
+	Wed,  4 Sep 2024 19:40:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725478827;
-	bh=SNWThRPwlDfNqRuJUF0l0Cucyp1v3Y0fdsPK5rvXCb8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uigwwhzukT8ghyuZIfZuEvFg0TKDrnJ1D503QzCWBc+wnnqydbeAuCfzaxgcn/5np
-	 kQdMFkniC8RpGC0GMFsyJ2nME55IwBl9jyjxmkqhLjzldenfuuQHlHNoO1sVNWqXKL
-	 Xt06MplJSNzlfViqRt3WoDJLT447IKLdY3zKrEPpRC1lcShRNSzHIZ4SC1afd6hf3S
-	 e8WRHzhCRAgxcUrgpFSesK1ifvsRQWAV9Wxn+gjVHzo1z8+RS3rL6tCe7R7xhmZfiR
-	 UtGZwrWceeqBJPweXpHEWtGq1vff2Pw2CGGHMGYHVDo6EaU71ogahMSGWFrSQGni+q
-	 iVUJG7HdwlYMA==
-Date: Wed, 4 Sep 2024 12:40:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, Geliang
- Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/3] selftests: mptcp: add time per subtests in
- TAP output
-Message-ID: <20240904124025.3ec84142@kernel.org>
-In-Reply-To: <559e1458-b593-44c7-92b1-6946c57496c5@kernel.org>
-References: <20240902-net-next-mptcp-ksft-subtest-time-v1-0-f1ed499a11b1@kernel.org>
-	<20240903162217.07c366c9@kernel.org>
-	<559e1458-b593-44c7-92b1-6946c57496c5@kernel.org>
+	s=k20201202; t=1725478854;
+	bh=bQK+yFu5fRg8+syHRGxnt1pzKtg69U9NOvqBoa1Brlw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=RbgTmhu1X/pELnHTv8/3BSXPVlW1Mq6ZP4H+iGofs9wvYFpFLQPeKENdYGzXzA0gz
+	 FhjkQhIMTsR4JO6gkoCwLTXR+h/ibWGe4RLo1/m1V2jUeEkGltGuD9fOadX3uTi+pX
+	 F+9Pz39X6HMpcuaVlG43LylLf8oERXJuTui1xxklGZfPyXM3jJeGjv7fX+mYFgDV0I
+	 YExTlRyDuLkQcX12XzIzj/2JAOSywyjj7A+JveVoDBIKiqHGs5ZW3rE1HQseqymFdk
+	 oCVaYTJ/tou7bkpNyjk2jlrDeMuQ6Yg4kvwZxZpxsGX7+r0Jhqa05DInN2FFC2aWt2
+	 6b2NQFZOfKDIQ==
+Date: Wed, 4 Sep 2024 14:40:52 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
+	jing2.liu@intel.com
+Subject: Re: [PATCH V4 03/12] PCI/TPH: Add pcie_tph_modes() to query TPH modes
+Message-ID: <20240904194052.GA344429@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240822204120.3634-4-wei.huang2@amd.com>
 
-On Wed, 4 Sep 2024 18:15:09 +0200 Matthieu Baerts wrote:
-> > Best I could come up with is:
-> >=20
-> > diff --git a/contest/remote/vmksft-p.py b/contest/remote/vmksft-p.py
-> > index fe9e87abdb5c..a37245bd5b30 100755
-> > --- a/contest/remote/vmksft-p.py
-> > +++ b/contest/remote/vmksft-p.py
-> > @@ -73,7 +73,7 @@ group3 testV skip
-> >      tests =3D []
-> >      nested_tests =3D False
-> > =20
-> > -    result_re =3D re.compile(r"(not )?ok (\d+)( -)? ([^#]*[^ ])( # )?(=
-[^ ].*)?$")
-> > +    result_re =3D re.compile(r"(not )?ok (\d+)( -)? ([^#]*[^ ])( +# )?=
-([^ ].*)?$") =20
->=20
-> Looks good to me. While at it, we can add a '+' for the spaces after the
-> '#':
->=20
->   ( +# +)
+On Thu, Aug 22, 2024 at 03:41:11PM -0500, Wei Huang wrote:
+> Add pcie_tph_modes() to allow drivers to query the TPH modes supported
+> by an endpoint device, as reported in the TPH Requester Capability
+> register. The modes are reported as a bitmask and current supported
+> modes include:
+> 
+>  - PCI_TPH_CAP_NO_ST: NO ST Mode Supported
+>  - PCI_TPH_CAP_INT_VEC: Interrupt Vector Mode Supported
+>  - PCI_TPH_CAP_DEV_SPEC: Device Specific Mode Supported
 
-=F0=9F=91=8D=EF=B8=8F
+> + * pcie_tph_modes - Get the ST modes supported by device
+> + * @pdev: PCI device
+> + *
+> + * Returns a bitmask with all TPH modes supported by a device as shown in the
+> + * TPH capability register. Current supported modes include:
+> + *   PCI_TPH_CAP_NO_ST - NO ST Mode Supported
+> + *   PCI_TPH_CAP_INT_VEC - Interrupt Vector Mode Supported
+> + *   PCI_TPH_CAP_DEV_SPEC - Device Specific Mode Supported
+> + *
+> + * Return: 0 when TPH is not supported, otherwise bitmask of supported modes
+> + */
+> +int pcie_tph_modes(struct pci_dev *pdev)
+> +{
+> +	if (!pdev->tph_cap)
+> +		return 0;
+> +
+> +	return get_st_modes(pdev);
+> +}
+> +EXPORT_SYMBOL(pcie_tph_modes);
 
-> I see you didn't commit the previous modification. I can open a PR if it
-> helps.
+I'm not sure I see the need for pcie_tph_modes().  The new bnxt code
+looks like this:
 
-I was just playing with the regexps in the interpreter. If you could
-send a PR that'd perfect.
+  bnxt_request_irq
+    if (pcie_tph_modes(bp->pdev) & PCI_TPH_CAP_INT_VEC)
+      rc = pcie_enable_tph(bp->pdev, PCI_TPH_CAP_INT_VEC);
 
-> >      time_re =3D re.compile(r"time=3D(\d+)ms")
-> > =20
-> >      for line in full_run.split('\n'):
-> >=20
-> > Thoughts? =20
->=20
-> In my v2, I will also strip these trailing whitespaces in the selftests,
-> they don't need to be there.
+What is the advantage of this over just this?
 
-Up to you - it doesn't violate the KTAP format and the visual alignment
-is nice. But it may trip up more regexps..
+  bnxt_request_irq
+    rc = pcie_enable_tph(bp->pdev, PCI_TPH_CAP_INT_VEC);
+
+It seems like drivers could just ask for what they want since
+pcie_enable_tph() has to verify support for it anyway.  If that fails,
+the driver can fall back to another mode.
+
+Returning a bitmask of supported modes might be useful if the driver
+could combine them, but IIUC the modes are all mutually exclusive, so
+the driver can't request a combination of them.
+
+Bjorn
 
