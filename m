@@ -1,261 +1,154 @@
-Return-Path: <netdev+bounces-125035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD76896BACB
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:33:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAD9D96BAE9
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:37:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 864DC2842C8
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:33:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED6071C20D07
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F1E1D1722;
-	Wed,  4 Sep 2024 11:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09AE21D0149;
+	Wed,  4 Sep 2024 11:36:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="DiwbllZG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OxJ+mTob"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB641D0DEA
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 11:32:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666561CF5E0
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 11:36:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725449561; cv=none; b=InbLdKGhzPHKBIhXPT/K82HEDlSQd5MmeXxzn9zh30Uokpa8bpABPgCclqoxu9DkW/+wucs9ZYp6GLQzwPN1St8kwWQENWmtzw/deECCSiNzkLHruY231oROke7NPjvZVq7Yl5SKMG1DnXnwSf/IhrTWLeKvjYk7yJyHTXzlC48=
+	t=1725449815; cv=none; b=cGpYLY2jIlV2yytR1xpuwafJsjlzhdrdsmiQiSDohce8S9vcSikF7F8iTVMIISUmCeXK6rI+YKfHvPkUCW1qPAqIhkQv04T6ZnlUcqM5M3kSCXkW0WUpgwfM0vOi9Cmw3GK2MXOgASPzKACV3sdXNImGJGLUEF1gN2qDyZclGhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725449561; c=relaxed/simple;
-	bh=qHT1CYW77waDzkMuLYy47XLjwC5BKMCaKympN2Vppmw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eHBfZons3V94b+9u+sZXYisYYTuQTBTDVRyAOLn3jGnVke2rZuhB9Mv+0m8LU947P+rn68S4xpuA30xyLrmDC1hUI1rurBOpw1IQsfoiE9zsaYucaRF+w+sOI7mQZOonIvXNzol8BoVSFmkr0/KcYzp66vLveQXZgDbY1A3sj4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=DiwbllZG; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4842CqRE018262;
-	Wed, 4 Sep 2024 04:32:30 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=qg2KZS0DK1jerP/CvIEvatRrzUXToya9N71cNhMABwQ=; b=
-	DiwbllZGFj9WhgHwfYVcQBoLzy+PtuY6zH7YnhO9GzxRr+TuB+T0hHaTWGI3QcXn
-	O2I/mSBbmOtF3VbmHX/oyTud2Djh+PPJYVRb7bSGHSp39qMJtMJ0HWC22czT3Q5y
-	sG7lSWD5CwF/mJIlblzCx1Qf6kgzn1QbTKunF1KWwJaBJ7bb287nuqRmaZR5u1Ir
-	M8jFmZIKzrJpVoIMD2adSFAvWM3aBMWraH3Rrf26SehNVuLKOXAy12P+2E+vxOHp
-	JAG+9yK/IgOYpAbiEyP0By5Om1OGd8tmkDopnQS4HpJYXBX3heXpqsXV3SGfb9HD
-	W8xSr/hqpcy6lJzUGYSt+Q==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41eejbj489-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 04 Sep 2024 04:32:29 -0700 (PDT)
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:208::7cb7) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server id
- 15.2.1544.11; Wed, 4 Sep 2024 11:32:27 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Willem de Bruijn
-	<willemb@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        David Ahern <dsahern@kernel.org>,
-        Jason Xing
-	<kerneljasonxing@gmail.com>,
-        Simon Horman <horms@kernel.org>
-CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next v3 4/4] selftests: txtimestamp: add SCM_TS_OPT_ID test
-Date: Wed, 4 Sep 2024 04:31:53 -0700
-Message-ID: <20240904113153.2196238-7-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240904113153.2196238-1-vadfed@meta.com>
-References: <20240904113153.2196238-1-vadfed@meta.com>
+	s=arc-20240116; t=1725449815; c=relaxed/simple;
+	bh=F8uV22TQSGpCc+W1GVrPnUmh4KZebMl7bCz67+vAeVU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D2AK9RzHvuBHVVbBs/R9OgaB9Q1OTM4+81JX/9sPFdvG36eA4xAwKx1aM4uX0z3b5X0ETo9o65If2GGIOK95CxjlJeG4MbZq2e0Vr6ToLjCVnGnwZaLOfGScEFRb73w8ZuxeeWx7RR3jkVcxYhY1mQ7S3hgtzCdNiIBcy08zRuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OxJ+mTob; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8a50a1f2-3b99-4030-9a96-6aecdd2841b7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725449811;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AWcmzEngmLiVH3Ykyh3RHxn5Zb8TLlLZBEcSvnipohI=;
+	b=OxJ+mTobiY9r2vcWxmLDDcTyOsYiJi4bYhFw9YVSZo8DMhd9cNPVtttH4Xp0R4XqaoP2Of
+	JZsnqmzJRCeg9muLb4fcYBLZnnCVGw8oZgjvZeGMa7umBr1005TRBAraClzzU7tklMtIn7
+	cqwiRpVl+pLQ1E9HGxU74rrzF1PGKzY=
+Date: Wed, 4 Sep 2024 12:36:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: b3LpDXnRAluvCAeU77YkyvS7-t8pQbIF
-X-Proofpoint-GUID: b3LpDXnRAluvCAeU77YkyvS7-t8pQbIF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-04_09,2024-09-04_01,2024-09-02_01
+Subject: Re: [PATCH net-next v3 0/4] Add option to provide OPT_ID value via
+ cmsg
+To: Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Jason Xing <kerneljasonxing@gmail.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org
+References: <20240904113153.2196238-1-vadfed@meta.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240904113153.2196238-1-vadfed@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Extend txtimestamp udp test to run with fixed tskey using
-SCM_TS_OPT_ID control message.
+On 04/09/2024 12:31, Vadim Fedorenko wrote:
+> SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
+> timestamps and packets sent via socket. Unfortunately, there is no way
+> to reliably predict socket timestamp ID value in case of error returned
+> by sendmsg. For UDP sockets it's impossible because of lockless
+> nature of UDP transmit, several threads may send packets in parallel. In
+> case of RAW sockets MSG_MORE option makes things complicated. More
+> details are in the conversation [1].
+> This patch adds new control message type to give user-space
+> software an opportunity to control the mapping between packets and
+> values by providing ID with each sendmsg.
+> 
+> The first patch in the series adds all needed definitions and implements
+> the function for UDP sockets. The explicit check of socket's type is not
+> added because subsequent patches in the series will add support for other
+> types of sockets. The documentation is also included into the first
+> patch.
+> 
+> Patch 2/4 adds support for TCP sockets. This part is simple and straight
+> forward.
+> 
+> Patch 3/4 adds support for RAW sockets. It's a bit tricky because
+> sock_tx_timestamp functions has to be refactored to receive full socket
+> cookie information to fill in ID. The commit b534dc46c8ae ("net_tstamp:
+> add SOF_TIMESTAMPING_OPT_ID_TCP") did the conversion of sk_tsflags to
+> u32 but sock_tx_timestamp functions were not converted and still receive
+> 16b flags. It wasn't a problem because SOF_TIMESTAMPING_OPT_ID_TCP was
+> not checked in these functions, that's why no backporting is needed.
+> 
+> Patch 4/4 adds selftests for new feature.
+> 
+> Changelog:
+> v2 -> v3:
+> - remove SOF_TIMESTAMPING_OPT_ID_CMSG UAPI value and use kernel-internal
+>    SOCKCM_FLAG_TS_OPT_ID which uses the highest bit of tsflags.
+> - add support for TCP and RAW sockets
+> v1 -> v2:
+> - add more selftests
+> - add documentation for the feature
+> - refactor UDP send function
+> RFC -> v1:
+> - add selftests
+> - add SOF_TIMESTAMPING_OPT_ID_CMSG to signal of custom ID provided by
+> 	user-space instead of reserving value of 0 for this.
+> 
+> [1] https://lore.kernel.org/netdev/CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9Eaa9aDPfgHdtA@mail.gmail.com/
+> 
+> Vadim Fedorenko (4):
+>    net_tstamp: add SCM_TS_OPT_ID to provide OPT_ID in control message
+>    net_tstamp: add SCM_TS_OPT_ID for TCP sockets
+>    net_tstamp: add SCM_TS_OPT_ID for RAW sockets
+>    selftests: txtimestamp: add SCM_TS_OPT_ID test
+> 
+>   Documentation/networking/timestamping.rst  | 13 ++++++
+>   arch/alpha/include/uapi/asm/socket.h       |  2 +
+>   arch/mips/include/uapi/asm/socket.h        |  2 +
+>   arch/parisc/include/uapi/asm/socket.h      |  2 +
+>   arch/sparc/include/uapi/asm/socket.h       |  2 +
+>   include/net/inet_sock.h                    |  4 +-
+>   include/net/sock.h                         | 29 +++++++++----
+>   include/uapi/asm-generic/socket.h          |  2 +
+>   include/uapi/linux/net_tstamp.h            |  7 ++++
+>   net/can/raw.c                              |  2 +-
+>   net/core/sock.c                            |  9 ++++
+>   net/ipv4/ip_output.c                       | 20 ++++++---
+>   net/ipv4/raw.c                             |  2 +-
+>   net/ipv4/tcp.c                             | 15 ++++---
+>   net/ipv6/ip6_output.c                      | 20 ++++++---
+>   net/ipv6/raw.c                             |  2 +-
+>   net/packet/af_packet.c                     |  6 +--
+>   net/socket.c                               |  2 +-
+>   tools/include/uapi/asm-generic/socket.h    |  2 +
+>   tools/testing/selftests/net/txtimestamp.c  | 48 +++++++++++++++++-----
+>   tools/testing/selftests/net/txtimestamp.sh | 12 +++---
+>   21 files changed, 154 insertions(+), 49 deletions(-)
+> 
+Oh, sorry for the mess, patches:
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- tools/include/uapi/asm-generic/socket.h    |  2 +
- tools/testing/selftests/net/txtimestamp.c  | 48 +++++++++++++++++-----
- tools/testing/selftests/net/txtimestamp.sh | 12 +++---
- 3 files changed, 47 insertions(+), 15 deletions(-)
+[PATCH v3 2/3] selftests: txtimestamp: add SCM_TS_OPT_ID test
+[PATCH v3 3/3] net_tstamp: add SCM_TS_OPT_ID for TCP sockets
 
-diff --git a/tools/include/uapi/asm-generic/socket.h b/tools/include/uapi/asm-generic/socket.h
-index 54d9c8bf7c55..281df9139d2b 100644
---- a/tools/include/uapi/asm-generic/socket.h
-+++ b/tools/include/uapi/asm-generic/socket.h
-@@ -124,6 +124,8 @@
- #define SO_PASSPIDFD		76
- #define SO_PEERPIDFD		77
- 
-+#define SCM_TS_OPT_ID		78
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
-diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
-index ec60a16c9307..3a8f716e72ae 100644
---- a/tools/testing/selftests/net/txtimestamp.c
-+++ b/tools/testing/selftests/net/txtimestamp.c
-@@ -54,6 +54,10 @@
- #define USEC_PER_SEC	1000000L
- #define NSEC_PER_SEC	1000000000LL
- 
-+#ifndef SCM_TS_OPT_ID
-+# define SCM_TS_OPT_ID 78
-+#endif
-+
- /* command line parameters */
- static int cfg_proto = SOCK_STREAM;
- static int cfg_ipproto = IPPROTO_TCP;
-@@ -77,6 +81,8 @@ static bool cfg_epollet;
- static bool cfg_do_listen;
- static uint16_t dest_port = 9000;
- static bool cfg_print_nsec;
-+static uint32_t ts_opt_id;
-+static bool cfg_use_cmsg_opt_id;
- 
- static struct sockaddr_in daddr;
- static struct sockaddr_in6 daddr6;
-@@ -136,12 +142,13 @@ static void validate_key(int tskey, int tstype)
- 	/* compare key for each subsequent request
- 	 * must only test for one type, the first one requested
- 	 */
--	if (saved_tskey == -1)
-+	if (saved_tskey == -1 || cfg_use_cmsg_opt_id)
- 		saved_tskey_type = tstype;
- 	else if (saved_tskey_type != tstype)
- 		return;
- 
- 	stepsize = cfg_proto == SOCK_STREAM ? cfg_payload_len : 1;
-+	stepsize = cfg_use_cmsg_opt_id ? 0 : stepsize;
- 	if (tskey != saved_tskey + stepsize) {
- 		fprintf(stderr, "ERROR: key %d, expected %d\n",
- 				tskey, saved_tskey + stepsize);
-@@ -480,7 +487,7 @@ static void fill_header_udp(void *p, bool is_ipv4)
- 
- static void do_test(int family, unsigned int report_opt)
- {
--	char control[CMSG_SPACE(sizeof(uint32_t))];
-+	char control[2 * CMSG_SPACE(sizeof(uint32_t))];
- 	struct sockaddr_ll laddr;
- 	unsigned int sock_opt;
- 	struct cmsghdr *cmsg;
-@@ -620,18 +627,32 @@ static void do_test(int family, unsigned int report_opt)
- 		msg.msg_iov = &iov;
- 		msg.msg_iovlen = 1;
- 
--		if (cfg_use_cmsg) {
-+		if (cfg_use_cmsg || cfg_use_cmsg_opt_id) {
- 			memset(control, 0, sizeof(control));
- 
- 			msg.msg_control = control;
--			msg.msg_controllen = sizeof(control);
-+			msg.msg_controllen = cfg_use_cmsg * CMSG_SPACE(sizeof(uint32_t));
-+			msg.msg_controllen += cfg_use_cmsg_opt_id * CMSG_SPACE(sizeof(uint32_t));
- 
--			cmsg = CMSG_FIRSTHDR(&msg);
--			cmsg->cmsg_level = SOL_SOCKET;
--			cmsg->cmsg_type = SO_TIMESTAMPING;
--			cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+			cmsg = NULL;
-+			if (cfg_use_cmsg) {
-+				cmsg = CMSG_FIRSTHDR(&msg);
-+				cmsg->cmsg_level = SOL_SOCKET;
-+				cmsg->cmsg_type = SO_TIMESTAMPING;
-+				cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+
-+				*((uint32_t *)CMSG_DATA(cmsg)) = report_opt;
-+			}
-+			if (cfg_use_cmsg_opt_id) {
-+				cmsg = cmsg ? CMSG_NXTHDR(&msg, cmsg) : CMSG_FIRSTHDR(&msg);
-+				cmsg->cmsg_level = SOL_SOCKET;
-+				cmsg->cmsg_type = SCM_TS_OPT_ID;
-+				cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+
-+				*((uint32_t *)CMSG_DATA(cmsg)) = ts_opt_id;
-+				saved_tskey = ts_opt_id;
-+			}
- 
--			*((uint32_t *) CMSG_DATA(cmsg)) = report_opt;
- 		}
- 
- 		val = sendmsg(fd, &msg, 0);
-@@ -681,6 +702,7 @@ static void __attribute__((noreturn)) usage(const char *filepath)
- 			"  -L    listen on hostname and port\n"
- 			"  -n:   set no-payload option\n"
- 			"  -N:   print timestamps and durations in nsec (instead of usec)\n"
-+			"  -o N: use SCM_TS_OPT_ID control message to provide N as tskey\n"
- 			"  -p N: connect to port N\n"
- 			"  -P:   use PF_PACKET\n"
- 			"  -r:   use raw\n"
-@@ -701,7 +723,7 @@ static void parse_opt(int argc, char **argv)
- 	int c;
- 
- 	while ((c = getopt(argc, argv,
--				"46bc:CeEFhIl:LnNp:PrRS:t:uv:V:x")) != -1) {
-+				"46bc:CeEFhIl:LnNo:p:PrRS:t:uv:V:x")) != -1) {
- 		switch (c) {
- 		case '4':
- 			do_ipv6 = 0;
-@@ -742,6 +764,10 @@ static void parse_opt(int argc, char **argv)
- 		case 'N':
- 			cfg_print_nsec = true;
- 			break;
-+		case 'o':
-+			ts_opt_id = strtoul(optarg, NULL, 10);
-+			cfg_use_cmsg_opt_id = true;
-+			break;
- 		case 'p':
- 			dest_port = strtoul(optarg, NULL, 10);
- 			break;
-@@ -799,6 +825,8 @@ static void parse_opt(int argc, char **argv)
- 		error(1, 0, "cannot ask for pktinfo over pf_packet");
- 	if (cfg_busy_poll && cfg_use_epoll)
- 		error(1, 0, "pass epoll or busy_poll, not both");
-+	if (cfg_proto != SOCK_DGRAM && cfg_use_cmsg_opt_id)
-+		error(1, 0, "control message TS_OPT_ID can only be used with udp socket");
- 
- 	if (optind != argc - 1)
- 		error(1, 0, "missing required hostname argument");
-diff --git a/tools/testing/selftests/net/txtimestamp.sh b/tools/testing/selftests/net/txtimestamp.sh
-index 25baca4b148e..6cc2b1b480e0 100755
---- a/tools/testing/selftests/net/txtimestamp.sh
-+++ b/tools/testing/selftests/net/txtimestamp.sh
-@@ -37,11 +37,13 @@ run_test_v4v6() {
- run_test_tcpudpraw() {
- 	local -r args=$@
- 
--	run_test_v4v6 ${args}		# tcp
--	run_test_v4v6 ${args} -u	# udp
--	run_test_v4v6 ${args} -r	# raw
--	run_test_v4v6 ${args} -R	# raw (IPPROTO_RAW)
--	run_test_v4v6 ${args} -P	# pf_packet
-+	run_test_v4v6 ${args}		 # tcp
-+	run_test_v4v6 ${args} -u	 # udp
-+	run_test_v4v6 ${args} -u -o 5	 # udp with fixed tskey
-+	run_test_v4v6 ${args} -u -o 5 -C # udp with fixed tskey and cmsg control
-+	run_test_v4v6 ${args} -r	 # raw
-+	run_test_v4v6 ${args} -R	 # raw (IPPROTO_RAW)
-+	run_test_v4v6 ${args} -P	 # pf_packet
- }
- 
- run_test_all() {
--- 
-2.43.5
+should be ignored.
 
+If it too messy I can resend the series.
+
+Sorry again,
+Vadim
 
