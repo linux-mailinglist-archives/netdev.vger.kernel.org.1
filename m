@@ -1,201 +1,144 @@
-Return-Path: <netdev+bounces-125274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 212C596C974
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 23:16:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1017396C983
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 23:26:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D9E91C21D46
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 21:16:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B64221F2656B
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 21:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E7E155730;
-	Wed,  4 Sep 2024 21:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3667C154BE0;
+	Wed,  4 Sep 2024 21:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BCQJLvn0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cTrvo4pQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4747616EC0E;
-	Wed,  4 Sep 2024 21:16:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF041514F8
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 21:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725484569; cv=none; b=o2O3GL7kfns15rU0Tz75LRG/IMXQ0y2ix8APzmK/FL74/VdH05lApp0KMYGlZiUWHhX5ItC+lqMSvxcMPc5yTJ+QKFYatDZpGf8XF5O1vbON1YvaLz/VFV5l7uEQSEaSG1cWD3XES/+79FzvmkVMQH8FsCmIP4zlMZYTefwNvtw=
+	t=1725485179; cv=none; b=XB2IJLMyWMMywalfABF7v2pin+/ANKFUZhrV+EuS+b707v/7SkC79fJpcUmSj6Ev34yw7+t5EDWQdYi4t8fpw8hEl+CVXwgip5u8bWAb1hUxyQceoJjvezLMGvS56JX06fp1V6xC+5BSC+o3A8v9/SqlzgiwZHFPuaVK+Kl/Rxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725484569; c=relaxed/simple;
-	bh=XIOhPWNCZD8THUM03rXIiWUsk22pZIjsz1jB60svhHA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=q+Q3vB7hk3wPWeSA/7JTtkpoi6jVThWga4OIUTZ5k8meBHZb3PspxrcSQ9ZJLoUKvUKdCDzDbvR/gf4JtLBpSqKdGxGxesfqsxsAo5h2FeeTdUqc9d8HM+4ZgdgYvj3UYBO48TTFxne4kf13gimEOz1a/wUx0A52QWfSYWhStF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BCQJLvn0; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4567587224eso523071cf.0;
-        Wed, 04 Sep 2024 14:16:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725484566; x=1726089366; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uR5HwwybxGpjog3v5EIhBzghqmw085R7LmQx7RMB1bg=;
-        b=BCQJLvn0l8mIFcxdpNRVFN4TL/yytzLBT0zwmakaLzokVTZfkmk2CXfL0LgbakBMcS
-         XEvgOFTlB3vyBuzGDKsDyELoZHmBKZH6O+V9+9yWhUnI+xzmB9wMD1t/AMf6z4CrVofn
-         xUwZMiv4/RUUEXxWoX5s3Lc5y2dJ7Ebw69I3Rp73mYhDgHlI2Aj/ScwXKto4M+iFzgc8
-         6wPL505HgcF9P5ObK2K3eXaxIjbXugIQP7JSDTN0bKpnay52w6CRiX5FDUehwWedo5Py
-         pgUNT23yvX2FGWc5kfNS9IzkwxKy37z/nJO/+amtn2uGlfnJSKsUgh1D7yjBwjVSWxl9
-         sF9Q==
+	s=arc-20240116; t=1725485179; c=relaxed/simple;
+	bh=JB9sxrQ5Evc1MwG22sDSfy9dec6DBfJI4WK/wjJvJeI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qv+nVVi2yBy1f8yx9iKQdH+qmttWC6ECIAG1NtZh9iFDeBmJBTvkHXr4VCk5wygzVG50aWh5d1+lWumBByy5UmRx0koYZhTlndiXXDioi2qWxwgyFaaMN33uqpNsOvGFwC8D/QpW+x1WcXN0ms2CLUxeJvWbeEUWP/pOH+F+u3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cTrvo4pQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725485176;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aHg8j7v3tAkrGbKIx0peuwn2yfQMcilA5Qy8cOHgpzE=;
+	b=cTrvo4pQKe7WBJVW4EIJI+8v+iGazMH/u0Z/fTx9ks2fReNuCFODXIFQrr7HL600riPW3P
+	tHVTRIPUdiKJRbn5XdbRi5HqG6uGt2yhRqZ4RnZ5vTF+MRHal4sw+dL0ebbgjVIr5pszPt
+	fySSL4n4MtjRusRsf1lajJJ+siIcwWo=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-527-eAiiQ0YDMsKUN81ZD1BHzw-1; Wed, 04 Sep 2024 17:26:15 -0400
+X-MC-Unique: eAiiQ0YDMsKUN81ZD1BHzw-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82a3fa4edbdso2162239f.1
+        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 14:26:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725484566; x=1726089366;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uR5HwwybxGpjog3v5EIhBzghqmw085R7LmQx7RMB1bg=;
-        b=WMcbn5Y5y5SuHslCm40+WNcHMGXzTvte99LbIj7NEro7jbJBAYm3dBtIDVzUqDnfdV
-         vaBTENP6kHiP1BY9uBd70iDFEmo9P0pPXOLXPHltnSCSmf0IqYQRQeY++bKsu/w1ny8Y
-         CjjHqoxJuRR/NGbMkew5jW2F/4TvPr7KgfUCkl8Q0x7Xu0C1B1CqQqdCgexZzTAwgxB4
-         QNPfQyMYB2KFGgv20qZflgggiCUj/pzQO7kEHwvSKIdCKf+i8Rhiyub2QYr4J725k70S
-         LYuS23CHiR4eTXSD8CO4i1tKm8p8fVmRk9kBoh+j/79IOi8jAkYW4bx7RXq68R2p39R5
-         Q4Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCVn4ZQ/NowBrmup5AaMBC+EpGf4/WJ4tC4E+PdCDe/c834bi94UmpHJPFeNydN+dq/ttARkt5U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZA43lVqX1GmWDb8t0emelNnSSQWrvNYn5F3K77b7u9abjYIRp
-	Ho5db1uwkZIT4E2eP8G0hujf1HUR63zqRvy2qZkusPOVsp7S+Fr2
-X-Google-Smtp-Source: AGHT+IGR/Sp3g4z7ERDR2SEXAHfLWR7r6GYqgbL8KilaQEurX7TcnmOMvKNcxxgkZsWVOi8X5mRgww==
-X-Received: by 2002:a05:622a:4cc6:b0:453:1afe:c711 with SMTP id d75a77b69052e-4567f55e9acmr226561101cf.28.1725484566018;
-        Wed, 04 Sep 2024 14:16:06 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45801a1539esm1885851cf.11.2024.09.04.14.16.05
+        d=1e100.net; s=20230601; t=1725485175; x=1726089975;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aHg8j7v3tAkrGbKIx0peuwn2yfQMcilA5Qy8cOHgpzE=;
+        b=CdJ343fOgGAzhLPYnsexBDD8uXoy5lFVxHgTKY1HLO5jz6oqDCVBI2wldAN49m+jB4
+         CN7dBihPU4chOlbDioVS2HM9ycqcrkxygGmDmGUHrkpG6/eTx1pSEMN0b+yeCscpbmd6
+         /tZ0raH3yhWhWzBA8m81e4M9XczDYsgJSzWv+FvW2CtbAx5VqQoGRcdmMFm8IVBKLPjN
+         MCuGMtvdnP4giI5hTqWabEai/mCsWvaULoPvqrVjT4tiWJaVd8JBuUyk5mIJwvA0jdR0
+         gfX7bpDKluqrKvkug0jh8L/5AUomtdNnrY8mgO9RgZONgqzvyBx8jxXpCZ0w10xtt5pa
+         OI2g==
+X-Forwarded-Encrypted: i=1; AJvYcCXQnCzpybhIKEJROyI6rLYDvsSfoOpmOyHpODF37QTyl1Kv24d/RZetfhN9nw1CytnbRgXqnUw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxozG0/Xy7u35iSe3vv395UAj1nS6/J45GfqVyq3Kg9gfesWzq
+	rCzjswi+FUqOhE42ypUn6AyYSXaLsL6BRD6tuRio0uPmXSVwcHs77zyrrpjnCGNNN3WuTQnaYZp
+	clzgDy/tpqp+RX5irb/cuv1KyuivMz+LUxz9SDNfAOgZqp4SPl7OkFg==
+X-Received: by 2002:a05:6602:6307:b0:82a:4419:6156 with SMTP id ca18e2360f4ac-82a44196334mr1412310639f.14.1725485174776;
+        Wed, 04 Sep 2024 14:26:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFS6tEkpDev46DvGWy32ljDhFfJQqROmsOKpChFn5k1kOh3E+WhWO8dKQaAJANfqBFpAGf7bQ==
+X-Received: by 2002:a05:6602:6307:b0:82a:4419:6156 with SMTP id ca18e2360f4ac-82a44196334mr1412307439f.14.1725485174374;
+        Wed, 04 Sep 2024 14:26:14 -0700 (PDT)
+Received: from x1gen2nano ([2600:1700:1ff0:d0e0::40])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-82a1a2f0d9fsm379507539f.7.2024.09.04.14.26.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 14:16:05 -0700 (PDT)
-Date: Wed, 04 Sep 2024 17:16:05 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- shuah@kernel.org, 
- willemdebruijn.kernel@gmail.com
-Cc: linux-kselftest@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>
-Message-ID: <66d8ce15415ec_163d93294a2@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240904144446.41274-1-kerneljasonxing@gmail.com>
-References: <20240904144446.41274-1-kerneljasonxing@gmail.com>
-Subject: Re: [PATCH net-next] selftests: return failure when timestamps can't
- be parsed
+        Wed, 04 Sep 2024 14:26:14 -0700 (PDT)
+Date: Wed, 4 Sep 2024 16:26:11 -0500
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Jose Abreu <joabreu@synopsys.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+	Sneh Shah <quic_snehshah@quicinc.com>, Vinod Koul <vkoul@kernel.org>
+Subject: Re: [PATCH RFC net-next v4 00/14] net: stmmac: convert stmmac "pcs"
+ to phylink
+Message-ID: <ce42fknbcp2jxzzcx2fdjs72d3kgw2psbbasgz5zvwcvu26usi@4m4wpvo5sa77>
+References: <ZrCoQZKo74zvKMhT@shell.armlinux.org.uk>
+ <rq2wbrm2q3bizgxcnl6kmdiycpldjl6rllsqqgpzfhsfodnd3o@ymdfbxq2gj5j>
+ <ZrM8g5KoaBi5L00b@shell.armlinux.org.uk>
+ <d3yg5ammwevvcgs3zsy2fdvc45pce5ma2yujz7z2wp3vvpaim6@wgh6bb27c5tb>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d3yg5ammwevvcgs3zsy2fdvc45pce5ma2yujz7z2wp3vvpaim6@wgh6bb27c5tb>
 
-Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On Thu, Aug 08, 2024 at 11:42:53PM GMT, Serge Semin wrote:
+> On Wed, Aug 07, 2024 at 10:21:07AM +0100, Russell King (Oracle) wrote:
+> > On Tue, Aug 06, 2024 at 09:56:04PM +0300, Serge Semin wrote:
+> > > Hi Russell
+> > > 
+
+...
+
 > 
-> When I was trying to modify the tx timestamping feature, I found that
-> running "./txtimestamp -4 -C -L 127.0.0.1" didn't reflect the fact
-> properly.
-
-Did not reflect what fact? Sorry, I don't entirely follow the issue
-you raise.
-
-> In this selftest file, we respectively test three tx generation flags.
-> With the generation and report flag enabled, we expect that the timestamp
-> must be returned to the userspace unless 1) generating the timestamp
-> fails, 2) reporting the timestamp fails. So we should test if the
-> timestamps can be read and parsed succuessfuly in txtimestamp.c, or
-
-typo: successfully
-
-> else there is a bug in the kernel.
+> > I guessed that you would dig your heals in over this, and want to do
+> > it your own way despite all the points I raised against your patch
+> > series on my previous posting arguing against much of this.
+> > 
+> > So, at this point I give up with this patch series - clearly there is
+> > no room for discussion about the way forward, and you want to do it
+> > your way no matter what.
 > 
-> After adding the check so that running ./txtimestamp will reflect the
-> result correctly like this if there is an error in kernel:
-> protocol:     TCP
-> payload:      10
-> server port:  9000
+> I actually thought that in general the approach implemented in my
+> patches didn't meet much dislikes from your side. Just several notes
+> which could be easily fixed in the next revisions.
 > 
-> family:       INET
-> test SND
->     USR: 1725458477 s 667997 us (seq=0, len=0)
-> Failed to parse timestamps
->     USR: 1725458477 s 718128 us (seq=0, len=0)
-> Failed to parse timestamps
->     USR: 1725458477 s 768273 us (seq=0, len=0)
-> Failed to parse timestamps
->     USR: 1725458477 s 818416 us (seq=0, len=0)
-> Failed to parse timestamps
-> ...
-> 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
-> I'm not sure if I should also check if the cur->tv_sec or cur->tv_nsec
-> is zero in __print_timestamp(). Could it be valid when either of
-> them is zero?
-
-tv_nsec can be zero. tv_sec cannot.
-
-> ---
->  tools/testing/selftests/net/txtimestamp.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
-> index ec60a16c9307..b69aae840a67 100644
-> --- a/tools/testing/selftests/net/txtimestamp.c
-> +++ b/tools/testing/selftests/net/txtimestamp.c
-> @@ -358,6 +358,10 @@ static void __recv_errmsg_cmsg(struct msghdr *msg, int payload_len)
->  
->  	if (batch > 1)
->  		fprintf(stderr, "batched %d timestamps\n", batch);
-> +	else if (!batch) {
-> +		fprintf(stderr, "Failed to parse timestamps\n");
-> +		test_failed = true;
-> +	}
-
-nit: if adding braces around one side of a branch, then add to both (all).
-
-This is not so much a parsing failure as that no timestamps arrived.
-
-More importantly, this function gets called also if
-recvmsg(fd, .., MSG_ERRQUEUE) returned 0:
-
-        if (ret >= 0) {
-                __recv_errmsg_cmsg(&msg, ret);
-
-That seems counterintuitive, as there is no data. But this was
-introduced with cfg_loop_nodata (SOF_TIMESTAMPING_OPT_TSONLY). When
-there may be packets looped, just 0B packets. In those cases we also
-expect timestamps.
-
-But, can __recv_errmsg_cmsg now also be called when there truly is
-nothing on the error queue? It is a non-blocking read, after all.
-
-Judging from
-
-                while (!recv_errmsg(fd)) {}
-
-The caller can. But if there is nothing waiting it returns -1 with
-EAGAIN:
-
-        ret = recvmsg(fd, &msg, MSG_ERRQUEUE);
-        if (ret == -1 && errno != EAGAIN)
-                error(1, errno, "recvmsg");
-
-So long story short, subject to a few nits your patch sounds okay to
-me (but it's not entirely trivial that that is so: sharing so that you
-also double check, thanks).
-
->  }
->  
->  static int recv_errmsg(int fd)
-> -- 
-> 2.37.3
+> Anyway thanks for understanding. I'll wait for your series to be
+> merged in. Then I'll submit my patch set based on top of it (of course
+> taking into account all the notes raised by you back then).
 > 
 
+Hmmm, I'll poke the bears :)
+
+Any chance this series will be rebased and sent out again? I
+really liked the direction of this and it seems a waste to end it at a
+stalemate here despite some differing opinions on the design and
+possible future changes.
+
+I think we're all in agreement that stmmac's current PCS usage behind
+phylink's back is not good, and this is a massive improvement.
+
+Thanks,
+Andrew
 
 
