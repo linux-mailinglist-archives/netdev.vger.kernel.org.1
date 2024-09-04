@@ -1,131 +1,176 @@
-Return-Path: <netdev+bounces-125155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6F596C18B
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:59:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0600096C1C8
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:09:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B83C1F29F35
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:59:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2ED37B2D0C3
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:02:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55811DC733;
-	Wed,  4 Sep 2024 14:58:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SACRSE7R"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C0411DC184;
+	Wed,  4 Sep 2024 15:02:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB1A1DC05F;
-	Wed,  4 Sep 2024 14:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4EA1DA2FE
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 15:02:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725461924; cv=none; b=V32oowyOB9DbUggtMOyuRLoui4vDdfF/uv511oDrfKmHazpBhzUsNFWUEDcAxEqYwXX0+4ipFKPp/YMctpq7rR5314urQlq3DjjO5JXkJJwLkZGMtu+7vHBDf/k4rx99ILRu2GJOB0bXM3hwmq1zkM300GUBcK/y8TnG43/iYGw=
+	t=1725462150; cv=none; b=OIOi7aY2ih7NSRez5Y7rbXdiWeiSHh3W6oPW1f125Rq2JPYseua9+GWDBIo2OWQIx97klyyChErxSGuZ9Qt2T+P1cO/xcb/zT0wyjY2e/y0zPKwoqpuW9bJV1rQhg7n9nb6gZtuWlasAylkWCQ0HoWmnkTlmqSbWubjSY8dJblY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725461924; c=relaxed/simple;
-	bh=ul6VV4JjxH0XxP4Hhv6qq03d2y4Xr1eVllPyVW6Vt2k=;
+	s=arc-20240116; t=1725462150; c=relaxed/simple;
+	bh=iTJV5McgusjA6ShqfvVXH9/5WnfRq7gapkxISn4dHb8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JNM5gsXc1KQjBF0SxwoAbC0FXhtuqdq9F2J7SG11tjKFX8EJcPLWgbBqYf0+lS4VTCcqid+Fl4sdckVqZnCNATLsn3G4bYV5QAJaAdyz6jMr9aEGzKszJrb0N+DqzTzF+OETs9WaCHCB3GPn6WLbOaWCEYEBGb9z7LLVl0LiM1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SACRSE7R; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a86753ac89bso31661066b.0;
-        Wed, 04 Sep 2024 07:58:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725461921; x=1726066721; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nyHRUbS96LQJMnxC77/pMoO0AXemk+GGLf2OYY2VbUE=;
-        b=SACRSE7ReCgTFpa1yOZue9YSUKkh8mH5Oukf6EPx4p8sGfjaFUjrg3Z21h40K6yQai
-         0ubFRbPKz6IWR1Fe1DKOm9xzgD8Wcsic9hZ6Ltm0+UKj7318zigG1aiCl2Y9c2xyXfuL
-         O9ug1AVVbFFMIS7B/t4QwvLqCBfyURKxc5BSKp2AKGF7tDUjIYq5e2jjLYF9zUNqVUBu
-         i93qLAcMOAS34ElJfZ6PPYB6CqEsiwTxSmELKS81Zh2QuuJTCnL+0NypXgb02AnatToo
-         jrJEVWWLBQKMKQZ8o8zs+bGhBz1aFSbnbpFIaDgd5ysDYs5E1Ax3q/YhXMuZzaQwY++x
-         8PcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725461921; x=1726066721;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nyHRUbS96LQJMnxC77/pMoO0AXemk+GGLf2OYY2VbUE=;
-        b=pQ2j7c2u/pW1Gc0U0dQtB6tLUztmfeD1RFvvBnKSgZD41ESsPxI57pYt8RvyO6EgsL
-         2KS3rTPbiKym+JjeeqdnLm4+MXbszLYqWdNRWD96kUgceWP4ymlKPgql+9nueRbdUec4
-         gR+9SToALHrmb6rpYVGlg86suqhLt+tuENTgUIJcNbyaJ7hO0OWIpg0iU760IhgkEILj
-         kwoy1iHAmjfuAVq9DZ0oOFDv+h46ASfTQ5inEvPHxxmauXy2wzSHc3jWq04OlpfXBwbK
-         rUMUyeAH76084+49m5alLv5AiuqwpCnTwlSkIENvONy6Y2O/+m/W6AwYkYcANNqdsz32
-         z2ig==
-X-Forwarded-Encrypted: i=1; AJvYcCXB2AK26ectVKjvBZxYIWtYsAywsURiYlJyLRPEiiBmHmiHhzzJ1eTpEywXyEXOmWDMuoOBd5bRn7JGxSc=@vger.kernel.org, AJvYcCXfD7QaCWqmIU8N9G72cdJZqzAsBXDegOjO9R0NmqXK0Y4oGR8QHkDKk4R/n6DotsYLv4OdBCFc@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5AYiSOchIxv69ws4Tz/gJlhHVkjWBuOt9zvzaQbntFDsZKeDU
-	ykNxkCStX8Q1WGoOVoCePdDK3DRNYrs8kZizIkut4Ue+w08Fhh6R
-X-Google-Smtp-Source: AGHT+IF9fNPAMV3rkGRPbruFXWJ88SAxEy28gAk+8MFg+kx8FVMQrf0q3A1TSlP9jRdQelWzVhiB+g==
-X-Received: by 2002:a17:907:3e92:b0:a80:a37f:c303 with SMTP id a640c23a62f3a-a89a357825bmr653597266b.4.1725461921263;
-        Wed, 04 Sep 2024 07:58:41 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8a6236d041sm1984566b.132.2024.09.04.07.58.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 07:58:40 -0700 (PDT)
-Date: Wed, 4 Sep 2024 17:58:37 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	rmk+kernel@armlinux.org.uk, linux@armlinux.org.uk, xfr@outlook.com,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v7 3/7] net: stmmac: refactor FPE verification
- process
-Message-ID: <20240904145837.wh7tdrffsiqpot22@skbuf>
-References: <cover.1725441317.git.0x1207@gmail.com>
- <cover.1725441317.git.0x1207@gmail.com>
- <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
- <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
+	 In-Reply-To:Content-Type:Content-Disposition; b=TiC30Ovtees6zBwdaTn5xcTRBYG27Q7bPGCURbmoJ0wnjPPy4HJWbFQ8/TMxQ0ogqzp18dAgZ/tihHh7Yc7H53GqU0eV+WvMypxBNn3hNAcvHyIRuK0qWlotFj7k/qkcaN/AZ1kqPcBjdAlGXKMnsvKcmNPjY21tLL+JRzeibb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-166-qQkQWiZtNt-KaEHgUGKf_A-1; Wed,
+ 04 Sep 2024 11:02:18 -0400
+X-MC-Unique: qQkQWiZtNt-KaEHgUGKf_A-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 03D9319776A6;
+	Wed,  4 Sep 2024 15:02:06 +0000 (UTC)
+Received: from hog (unknown [10.39.192.5])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 092D319560BD;
+	Wed,  4 Sep 2024 15:01:36 +0000 (UTC)
+Date: Wed, 4 Sep 2024 17:01:34 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	ryazanov.s.a@gmail.com, edumazet@google.com, andrew@lunn.ch
+Subject: Re: [PATCH net-next v6 12/25] ovpn: implement packet processing
+Message-ID: <Zth2Trqbn73QDnLn@hog>
+References: <20240827120805.13681-1-antonio@openvpn.net>
+ <20240827120805.13681-13-antonio@openvpn.net>
+ <ZtXOw-NcL9lvwWa8@hog>
+ <ae23ac0f-2ff9-4396-9033-617dc60221eb@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <ae23ac0f-2ff9-4396-9033-617dc60221eb@openvpn.net>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
- <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 04, 2024 at 05:21:18PM +0800, Furong Xu wrote:
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 3072ad33b105..e2f933353f40 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -969,17 +969,30 @@ static void stmmac_mac_config(struct phylink_config *config, unsigned int mode,
->  static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
->  {
->  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
-> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
-> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
-> -	bool *hs_enable = &fpe_cfg->hs_enable;
-> +	unsigned long flags;
->  
-> -	if (is_up && *hs_enable) {
-> -		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
-> -					MPACKET_VERIFY);
-> +	del_timer_sync(&fpe_cfg->verify_timer);
+2024-09-04, 14:07:23 +0200, Antonio Quartulli wrote:
+> Hi,
+>=20
+> On 02/09/2024 16:42, Sabrina Dubroca wrote:
+> > 2024-08-27, 14:07:52 +0200, Antonio Quartulli wrote:
+> > > +/* this swap is not atomic, but there will be a very short time fram=
+e where the
+> >=20
+> > Since we're under a mutex, I think we might get put to sleep for a
+> > not-so-short time frame.
+> >=20
+> > > + * old_secondary key won't be available. This should not be a big de=
+al as most
+> >=20
+> > I could be misreading the code, but isn't it old_primary that's
+> > unavailable during the swap? rcu_replace_pointer overwrites
+> > cs->primary, so before the final assign, both slots contain
+> > old_secondary?
+>=20
+> Right. The comment is not correct.
+>=20
+> cs->secondary (old_secondary, that is the newest key) is what is probably
+> being used by the other peer for sending traffic.
 
-Interesting comments in include/linux/timer.h:
- * Do not use in new code. Use timer_delete_sync() instead.
+Right, thanks. I was getting confused about the key slots and which
+key was the newest.
 
-Also, interesting comment in the timer_delete_sync() kernel-doc:
- Callers must prevent restarting of the timer, otherwise this function is meaningless.
+If the peer has already started sending with the newest key, no
+problem. If we're swapping keys before our peer (or we're on a slow
+network and the peer's packets get delayed), we'll still be receiving
+packets encrypted with the old key.
 
-I don't think you have any restart prevention mechanism. So between the
-timer deletion and the spin_lock_irqsave(), another thread has enough
-time to acquire fpe_cfg->lock first, and run stmmac_fpe_verify_timer_arm().
+
+> Therefore old_secondary is what is likely to be needed.
+>=20
+> However, this is pure speculation and may not be accurate.
+
+I can think of a few possibilities if this causes too many unwanted
+drops:
+
+ - use a linked list of keys, set the primary instead of swapping, and
+   let delete remove the unused key(s) by ID instead of slot
+
+ - decouple the TX and RX keys, which also means you don't really need
+   to swap keys (swap for the TX key becomes "set primary", swap on RX
+   can become a noop since you check both slots for the correct keyid)
+   -- and here too delete becomes based on key ID
+
+ - if cs->mutex becomes a spinlock, take it in the datapath when
+   looking up keys. this will make sure we get a consistent view of
+   the keys state.
+
+ - come up with a scheme to let the datapath retry the key lookup if
+   it didn't find the key it wanted (maybe something like a seqcount,
+   or maybe taking the lock and retrying if the lookup failed)
+
+I don't know if options 1 and 2 are possible based on how openvpn (the
+protocol and the userspace application) models keys, but they seem a
+bit "cleaner" on the datapath side (no locking, no retry). But they
+require a different API.
+
+Do you have the same problem in the current userspace implementation?
+
+
+> The fact that we could sleep before having completed the swap sounds like
+> something we want to avoid.
+> Maybe I should convert this mutex to a spinlock. Its usage is fairly
+> contained anyway.
+
+I think it would make sense. It's only being held for very short
+periods, just to set/swap a few pointers.
+
+
+> FTR: this restructuring is the result of having tested encryption/decrypt=
+ion
+> with pcrypt: sg, that is passed to the crypto code, was initially allocat=
+ed
+> on the stack, which was obviously not working for async crypto.
+> The solution was to make it part of the skb CB area, so that it can be
+> carried around until crypto is done.
+
+I see. I thought this patch looked less familiar than the others :)
+
+An alternative to using the CB is what IPsec does: allocate a chunk of
+memory for all its temporary needs (crypto req, sg, iv, anything else
+it needs during async crypto) and carve the pointers/small chunks out
+of it. See esp_alloc_tmp in net/ipv4/esp4.c.  (I'm just mentioning
+that for reference/curiosity, not asking that you change ovpn)
+
+
+> This patch was basically re-written after realizing that the async crypto
+> path was not working as expected, therefore sorry if there were some "kin=
+da
+> obvious" mistakes.
+
+And I completely missed some of those issues in previous reviews.
+
+> Thanks a lot for your review.
+
+Cheers, and thanks for your patience.
+
+--=20
+Sabrina
+
 
