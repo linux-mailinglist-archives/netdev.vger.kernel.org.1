@@ -1,141 +1,115 @@
-Return-Path: <netdev+bounces-124888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42C0F96B478
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:27:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60A5D96B542
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:44:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDAFA28AA89
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:27:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D2B228AA3A
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED0517D8A6;
-	Wed,  4 Sep 2024 08:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8511CB313;
+	Wed,  4 Sep 2024 08:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Hc25Tg2C"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cf/+eqqw"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FCEC54BD4;
-	Wed,  4 Sep 2024 08:27:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49561CCB59;
+	Wed,  4 Sep 2024 08:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725438449; cv=none; b=oRrkdNzIKlb6jqz879EF9MFd5aE9nCLU/8Tg8/Ky1IHHaRzVit4dYkMNcb/t9ECesK+z7wTWNxRV+kl3a6Fcy8zKDmr5cnwoUpdy9ydj/Wo1pHUpKNUDwMmBxwOSlP/sbnbvROTf1h3r64Ui/nftb1ZeosAk/piipwKafV1k+ak=
+	t=1725439209; cv=none; b=Dn9y7LfhLqcjLiB1XKHPrCtgW5D3Bl+n8BwqMk/YJqHAwDjVTwmU0rx3HwRPBtmeB81mz5Q7BNevvlT3xwnbxhIA4dACfwBOn4SKn4gPd9qxhvFqrFtAeYXBA+/6s6ktAi2BDbQPAkO7OrWcxzxk8/mcVwUpByb4EELxbS4WiP8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725438449; c=relaxed/simple;
-	bh=9aJPh46VMXkJTed+G/eVk69OFJRp8qInSHfOJXkKIfo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e5GMy4MAXqjvnqzBJvDnSDSrNqD//eU0lefJS1lQxIz76VqzDbncBET1JjJs7UQmvwKM6WmpUW5wB8hORYMDqV57gaaKo1yKu4Zcpf+j6bHVg4sxb8HHomb0FhLnghof7oHzHaoCUntjVSmhjbsX1iCCac9E5kCpfut5VK/GFFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Hc25Tg2C; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1725438447; x=1756974447;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9aJPh46VMXkJTed+G/eVk69OFJRp8qInSHfOJXkKIfo=;
-  b=Hc25Tg2C9pWTKBjOpFc/SL8KxoL5kN/1mQfP7Slh4MZLYwan2Vcz6Rqk
-   WvN/3b6FXaEIfVVhVOxJXxAugvLaxPpQ5io7ZJfETCuJW259y6mkmXpMi
-   0Dd1y1VGpxc2RO78ie+dIElOATNvgoUZM53A3YdCxdIDa4y/N1//Dpjdr
-   f7r8D6/sexX2JdljZTd/hye9h3ChCJOxU6/xENFRd+vNSuFBtvTR4xY+2
-   Mg/PibaTOx1qBs6RRxmiKqr+8eMK71a913A+iZSL0KOrS6Fq84bfjk06J
-   5X9nke+hnRo21eMiwYGW884Lbhw5XKTnv+vqivKo+Gzn1hOSPUxslOQdr
-   A==;
-X-CSE-ConnectionGUID: AyNB24evRQG4cyxIdjyx8A==
-X-CSE-MsgGUID: 2O/126pDQNGEiK3UbDjT1g==
-X-IronPort-AV: E=Sophos;i="6.10,201,1719903600"; 
-   d="scan'208";a="31939568"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Sep 2024 01:27:26 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 4 Sep 2024 01:26:45 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 4 Sep 2024 01:26:45 -0700
-Date: Wed, 4 Sep 2024 13:53:02 +0530
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+	s=arc-20240116; t=1725439209; c=relaxed/simple;
+	bh=v00CV/Izqm2vDJnjz1L9tutf+pvkFbjaJhWGfY682nY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h7P50NhIjIr39BFyRP0krrjEK9lREp6xrQKzt9++bFstdsJEXaz2b/NnEIlZHu1ZAATWmq/QfUiqs4jmIgVv8qVGBwML3JyBIe9MIdAA3ppu+cEn3Wf1U6VgPLpld+MKKWWdkaTEg3BOpv5vB/8Clh1ORo3XTTuUWfMQEMc2404=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cf/+eqqw; arc=none smtp.client-ip=217.70.178.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay1-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::221])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id 0AE92C0542;
+	Wed,  4 Sep 2024 08:27:16 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 841AC240007;
+	Wed,  4 Sep 2024 08:27:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1725438434;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=06yNZMAas3qa1wzVuxc7+kvtibUzV5sjLz3xzS89tAQ=;
+	b=cf/+eqqweQOsre9lGOCoZlwQB82NF5KgHhFDxEBJ3kea7y34PrJG2YOJ8EcobMrFLr2VtP
+	PduHnq68WowKQv/152sHG1bFevwnhehvSy+prbdWCMgvutCVdHy6hQwqymN53Ly4ReT3ci
+	Xcg6OLN+ofMHeZMOiiaJm9bpIcnJ/DfrtNKktx+PmV97fK8zPgvUESZ/c5jtRVPK81gWig
+	Ek2BhzUzPCPPxBIRAxCtXPCcjioKU0i93L1tNkykdVwX8sYRqAU6crvov4Ut1Prsd8bxmm
+	BYi9PlhKUHygMWuQP5kQjUDu9udhOX87jyNXpoKNl/OupRx+dU7PponFQ9axLA==
+Date: Wed, 4 Sep 2024 10:27:11 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>
-CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <linux@armlinux.org.uk>, <kuba@kernel.org>,
-	<hkallweit1@gmail.com>, <richardcochran@gmail.com>, <rdunlap@infradead.org>,
-	<Bryan.Whitehead@microchip.com>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>, <horms@kernel.org>,
-	<UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net-next V4 5/5] net: lan743x: Add support to ethtool
- phylink get and set settings
-Message-ID: <ZtgY5jYk4C4z3v2R@HYD-DK-UNGSW21.microchip.com>
-References: <20240829055132.79638-1-Raju.Lakkaraju@microchip.com>
- <20240829055132.79638-6-Raju.Lakkaraju@microchip.com>
- <9f74455e-45ec-495a-bc8e-1c61caab747c@lunn.ch>
+Cc: davem@davemloft.net, Pantelis Antoniou <pantelis.antoniou@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Florian Fainelli
+ <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Herve Codina <herve.codina@bootlin.com>,
+ Simon Horman <horms@kernel.org>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH net-next v2 3/7] net: ethernet: fs_enet: drop the
+ .adjust_link custom fs_ops
+Message-ID: <20240904102711.1accc8ce@fedora.home>
+In-Reply-To: <480a16fd-a1eb-4ea0-b859-5d874ecc3b15@lunn.ch>
+References: <20240829161531.610874-1-maxime.chevallier@bootlin.com>
+	<20240829161531.610874-4-maxime.chevallier@bootlin.com>
+	<480a16fd-a1eb-4ea0-b859-5d874ecc3b15@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <9f74455e-45ec-495a-bc8e-1c61caab747c@lunn.ch>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
 Hi Andrew,
 
-Thank you for review the patches.
+On Fri, 30 Aug 2024 23:06:08 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-The 08/30/2024 22:55, Andrew Lunn wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> > --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> > +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> > @@ -649,12 +649,7 @@ static void fs_adjust_link(struct net_device *dev)
+> >  	unsigned long flags;
+> >  
+> >  	spin_lock_irqsave(&fep->lock, flags);
+> > -
+> > -	if (fep->ops->adjust_link)
+> > -		fep->ops->adjust_link(dev);
+> > -	else
+> > -		generic_adjust_link(dev);
+> > -
+> > +	generic_adjust_link(dev);
+> >  	spin_unlock_irqrestore(&fep->lock, flags);  
 > 
-> > @@ -3055,6 +3071,10 @@ static void lan743x_phylink_mac_link_up(struct phylink_config *config,
-> >                                         cap & FLOW_CTRL_TX,
-> >                                         cap & FLOW_CTRL_RX);
-> >
-> > +     if (phydev)
-> > +             lan743x_mac_eee_enable(adapter, phydev->enable_tx_lpi &&
-> > +                                    phydev->eee_enabled);
-> 
-> This is wrong. The documentation says:
-> 
-> /**
->  * phy_support_eee - Set initial EEE policy configuration
->  * @phydev: Target phy_device struct
->  *
->  * This function configures the initial policy for Energy Efficient Ethernet
->  * (EEE) on the specified PHY device, influencing that EEE capabilities are
->  * advertised before the link is established. It should be called during PHY
->  * registration by the MAC driver and/or the PHY driver (for SmartEEE PHYs)
->  * if MAC supports LPI or PHY is capable to compensate missing LPI functionality
->  * of the MAC.
->  *
->  * The function sets default EEE policy parameters, including preparing the PHY
->  * to advertise EEE capabilities based on hardware support.
->  *
->  * It also sets the expected configuration for Low Power Idle (LPI) in the MAC
->  * driver. If the PHY framework determines that both local and remote
->  * advertisements support EEE, and the negotiated link mode is compatible with
->  * EEE, it will set enable_tx_lpi = true. The MAC driver is expected to act on
->  * this setting by enabling the LPI timer if enable_tx_lpi is set.
->  */
-> 
-> So you should only be looking at enable_tx_lpi.
+> Holding a spinlock is pretty unusual. We are in thread context, and
+> the phydev mutex is held. Looking at generic_adjust_link, do any of
+> the fep->foo variables actually need protecting, particularly from
+> changes in interrupts context?
 
-Ok. I will fix.
+Yes there are, the interrupt mask/event registers are being accessed
+from the interrupt handler and the ->restart() hook. I can try to
+rework this a bit for a cleaner interrupt handling, but I don't have
+means to test this on all mac flavors (fec/fcc/scc) :(
 
-> 
-> Also, do you actually call phy_support_eee() anywhere? I don't see it
-> in this patch, but maybe it was already there?
+Thanks for reviewing this,
 
-We never call phy_support_eee() anywhere.
-I will fix
+Maxime
 
-> 
->         Adrew
-
--- 
-Thanks,                                                                         
-Raju
 
