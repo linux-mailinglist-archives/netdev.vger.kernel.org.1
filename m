@@ -1,144 +1,211 @@
-Return-Path: <netdev+bounces-125275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1017396C983
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 23:26:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8923096C99A
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 23:39:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B64221F2656B
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 21:26:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 175501F265A0
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 21:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3667C154BE0;
-	Wed,  4 Sep 2024 21:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3FA14E2CC;
+	Wed,  4 Sep 2024 21:39:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cTrvo4pQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FD6LI1Cz"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF041514F8
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 21:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1CB14F118
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 21:39:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725485179; cv=none; b=XB2IJLMyWMMywalfABF7v2pin+/ANKFUZhrV+EuS+b707v/7SkC79fJpcUmSj6Ev34yw7+t5EDWQdYi4t8fpw8hEl+CVXwgip5u8bWAb1hUxyQceoJjvezLMGvS56JX06fp1V6xC+5BSC+o3A8v9/SqlzgiwZHFPuaVK+Kl/Rxg=
+	t=1725485955; cv=none; b=TDJWzuyDU++hCvUkLrwis64ZYVwWrYhUfKuXPsiDW9IRsK9ir7bvweXurVpnhEoLLYvZkn6ZYatL+MlAUnaabxYhI4z0LXw9rQng2IquttJqGK8jYCTc5mSSNe37h5TXHnDaAyrEKdKgb/2tcTvIXiee516jmsyD0ftCDP27SuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725485179; c=relaxed/simple;
-	bh=JB9sxrQ5Evc1MwG22sDSfy9dec6DBfJI4WK/wjJvJeI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qv+nVVi2yBy1f8yx9iKQdH+qmttWC6ECIAG1NtZh9iFDeBmJBTvkHXr4VCk5wygzVG50aWh5d1+lWumBByy5UmRx0koYZhTlndiXXDioi2qWxwgyFaaMN33uqpNsOvGFwC8D/QpW+x1WcXN0ms2CLUxeJvWbeEUWP/pOH+F+u3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cTrvo4pQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725485176;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=aHg8j7v3tAkrGbKIx0peuwn2yfQMcilA5Qy8cOHgpzE=;
-	b=cTrvo4pQKe7WBJVW4EIJI+8v+iGazMH/u0Z/fTx9ks2fReNuCFODXIFQrr7HL600riPW3P
-	tHVTRIPUdiKJRbn5XdbRi5HqG6uGt2yhRqZ4RnZ5vTF+MRHal4sw+dL0ebbgjVIr5pszPt
-	fySSL4n4MtjRusRsf1lajJJ+siIcwWo=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-527-eAiiQ0YDMsKUN81ZD1BHzw-1; Wed, 04 Sep 2024 17:26:15 -0400
-X-MC-Unique: eAiiQ0YDMsKUN81ZD1BHzw-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82a3fa4edbdso2162239f.1
-        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 14:26:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725485175; x=1726089975;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1725485955; c=relaxed/simple;
+	bh=7/0S2WULOU7MpI99LlH3AJqAPzoUCWBLE9vK43p5xi8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QgecgWOY/YzNSAe27XkAPTgGpgDrE1doxIbJrOjgbhDyuqPMT1tC1W4e9FZgxR8fyMRrThufW9xeyOSB0HSEppuAdPS7/bF9QCjwvl2xcShpYRH2SnlQ741t9fqJd2HTI1+RbVOgJ8OZ1hbF1fD+Y4k56pUbVlVj/OT3jZNKOaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FD6LI1Cz; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-82a316f8ae1so1076539f.1
+        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 14:39:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725485953; x=1726090753; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aHg8j7v3tAkrGbKIx0peuwn2yfQMcilA5Qy8cOHgpzE=;
-        b=CdJ343fOgGAzhLPYnsexBDD8uXoy5lFVxHgTKY1HLO5jz6oqDCVBI2wldAN49m+jB4
-         CN7dBihPU4chOlbDioVS2HM9ycqcrkxygGmDmGUHrkpG6/eTx1pSEMN0b+yeCscpbmd6
-         /tZ0raH3yhWhWzBA8m81e4M9XczDYsgJSzWv+FvW2CtbAx5VqQoGRcdmMFm8IVBKLPjN
-         MCuGMtvdnP4giI5hTqWabEai/mCsWvaULoPvqrVjT4tiWJaVd8JBuUyk5mIJwvA0jdR0
-         gfX7bpDKluqrKvkug0jh8L/5AUomtdNnrY8mgO9RgZONgqzvyBx8jxXpCZ0w10xtt5pa
-         OI2g==
-X-Forwarded-Encrypted: i=1; AJvYcCXQnCzpybhIKEJROyI6rLYDvsSfoOpmOyHpODF37QTyl1Kv24d/RZetfhN9nw1CytnbRgXqnUw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxozG0/Xy7u35iSe3vv395UAj1nS6/J45GfqVyq3Kg9gfesWzq
-	rCzjswi+FUqOhE42ypUn6AyYSXaLsL6BRD6tuRio0uPmXSVwcHs77zyrrpjnCGNNN3WuTQnaYZp
-	clzgDy/tpqp+RX5irb/cuv1KyuivMz+LUxz9SDNfAOgZqp4SPl7OkFg==
-X-Received: by 2002:a05:6602:6307:b0:82a:4419:6156 with SMTP id ca18e2360f4ac-82a44196334mr1412310639f.14.1725485174776;
-        Wed, 04 Sep 2024 14:26:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFS6tEkpDev46DvGWy32ljDhFfJQqROmsOKpChFn5k1kOh3E+WhWO8dKQaAJANfqBFpAGf7bQ==
-X-Received: by 2002:a05:6602:6307:b0:82a:4419:6156 with SMTP id ca18e2360f4ac-82a44196334mr1412307439f.14.1725485174374;
-        Wed, 04 Sep 2024 14:26:14 -0700 (PDT)
-Received: from x1gen2nano ([2600:1700:1ff0:d0e0::40])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-82a1a2f0d9fsm379507539f.7.2024.09.04.14.26.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 14:26:14 -0700 (PDT)
-Date: Wed, 4 Sep 2024 16:26:11 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Alexei Starovoitov <ast@kernel.org>, bpf@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Jose Abreu <joabreu@synopsys.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
-	Sneh Shah <quic_snehshah@quicinc.com>, Vinod Koul <vkoul@kernel.org>
-Subject: Re: [PATCH RFC net-next v4 00/14] net: stmmac: convert stmmac "pcs"
- to phylink
-Message-ID: <ce42fknbcp2jxzzcx2fdjs72d3kgw2psbbasgz5zvwcvu26usi@4m4wpvo5sa77>
-References: <ZrCoQZKo74zvKMhT@shell.armlinux.org.uk>
- <rq2wbrm2q3bizgxcnl6kmdiycpldjl6rllsqqgpzfhsfodnd3o@ymdfbxq2gj5j>
- <ZrM8g5KoaBi5L00b@shell.armlinux.org.uk>
- <d3yg5ammwevvcgs3zsy2fdvc45pce5ma2yujz7z2wp3vvpaim6@wgh6bb27c5tb>
+        bh=gH1dmyUqpO2w55L+ZEnnTz3U3EKIx86RX+jTQobURGw=;
+        b=FD6LI1CzUSVFE66VA3BQRdPAHit8b49a2fzC2iq73yfidiO+W2ILmgmH1I8WKpf06A
+         N3MheWDnOm/Qj+fohGeQr3u5bHz5EIfmoCaV5a2DbDWM1cMaRcpEAODQMI6WKgGbaYpr
+         T9OEZ+lH/UI0X35wvMuk+/Qo8LDbNJ4Tq84I2X47S8GQWHU1Dd7/GptuRIRMVOz+lr6Q
+         UR/aAcyyXaxw5lfrZGzLsNxIgCyMUAV5Tb6qbEzQXMGQcWspYU9XrIUTKgkT3nRPQW/O
+         xdzhML/eOz/d6BzgJob76wOiVNQP7XvCrFA2sEYWdwH1h16uvYpnn7kVX80Z7tbGy6O0
+         hPlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725485953; x=1726090753;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gH1dmyUqpO2w55L+ZEnnTz3U3EKIx86RX+jTQobURGw=;
+        b=MCW43iuARhKk8jd5lhFPy0llfFmnJw2gtdmRFiklpJQO6kv0FN7f3+ZJ7qZGBJGEHq
+         fnrJ3BEDMv0qxK/NHa+aQU6C9JvLZmwzlj5WdvselgdriAS8RhQ3KKh4oifzpX9D1TMH
+         2V5obgZLnWfponXqiORIau6RvNAWhw6FbyZ+CpqUAgK8A9T4OP9kmJEbFDDfp9czjQo9
+         FALYpuMRNNMU5C8xa6Y+df/Wr+XzUT4qwVFn55STMGOKLTicyaWdmUkxdqVlvFwzSaxc
+         f1FRrg6krqoKNcxNG33h2OLLiwDrWVrouNLy2XbNzZcByJHQMKrMa5T76sFSR/1I8Pix
+         J4hg==
+X-Forwarded-Encrypted: i=1; AJvYcCXnHRVOVDDox8uNMbCS2J1JXbStcLnBuFWQfIY8Mt53BBo8/jdqLQLk+u9dLVWvlK02xtSndkI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywyns9R0oLSIzxJ3HgLQb+eHtTD7zE6yv4QNcx5UwHZQ+TrZm2S
+	zvLLp9uoqxyVvgd+pdUy7QYBLEU6BXbMFHaEdGEBTxBUn3Jith4m4PGHKtvS/GpTLfNTD71Bzgr
+	bbRui5WK1Pb99iwPCKYuVyG3VjGo=
+X-Google-Smtp-Source: AGHT+IEwEXCGvGKTh/hps7hyiHsfwiDwx0JuJCi2qK+vxlxAc4UTkJiL+KBYdSX2rWrogB7NMsfBzA4s9Vi9vJ7B+Hg=
+X-Received: by 2002:a05:6e02:1a02:b0:36c:4688:85aa with SMTP id
+ e9e14a558f8ab-39f6a99105emr108569565ab.10.1725485952941; Wed, 04 Sep 2024
+ 14:39:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d3yg5ammwevvcgs3zsy2fdvc45pce5ma2yujz7z2wp3vvpaim6@wgh6bb27c5tb>
+References: <20240830153751.86895-1-kerneljasonxing@gmail.com>
+ <20240830153751.86895-2-kerneljasonxing@gmail.com> <20240903121940.6390b958@kernel.org>
+ <66d78a1e5e6ad_cefcf294f1@willemb.c.googlers.com.notmuch> <CAL+tcoASfb-EPtdpmunbo2zxpQx19Kv+b8Bzs91diVFYYqQz7Q@mail.gmail.com>
+ <66d8c21d3042a_163d93294cb@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66d8c21d3042a_163d93294cb@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 5 Sep 2024 05:38:36 +0800
+Message-ID: <CAL+tcoD1eq-Gj1Du5U1X=pw97yT0fNvkwFb5iQeeTis4ekGbOQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/2] net-timestamp: filter out report when
+ setting SOF_TIMESTAMPING_SOFTWARE
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, willemb@google.com, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, dsahern@kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 08, 2024 at 11:42:53PM GMT, Serge Semin wrote:
-> On Wed, Aug 07, 2024 at 10:21:07AM +0100, Russell King (Oracle) wrote:
-> > On Tue, Aug 06, 2024 at 09:56:04PM +0300, Serge Semin wrote:
-> > > Hi Russell
-> > > 
+On Thu, Sep 5, 2024 at 4:25=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Wed, Sep 4, 2024 at 6:13=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Jakub Kicinski wrote:
+> > > > On Fri, 30 Aug 2024 23:37:50 +0800 Jason Xing wrote:
+> > > > > +   if (val & SOF_TIMESTAMPING_RX_SOFTWARE &&
+> > > > > +       val & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
+> > > > > +           return -EINVAL;
+> > > >
+> > > >
+> > > > > -           if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_SOFT=
+WARE)
+> > > > > +           if (tsflags & SOF_TIMESTAMPING_SOFTWARE &&
+> > > > > +               (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+> > > > > +                !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FIL=
+TER)))
+> > > > >                     has_timestamping =3D true;
+> > > > >             else
+> > > > >                     tss->ts[0] =3D (struct timespec64) {0};
+> > > > >     }
+> > > >
+> > > > >     memset(&tss, 0, sizeof(tss));
+> > > > >     tsflags =3D READ_ONCE(sk->sk_tsflags);
+> > > > > -   if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
+> > > > > +   if ((tsflags & SOF_TIMESTAMPING_SOFTWARE &&
+> > > > > +        (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+> > > > > +        skb_is_err_queue(skb) ||
+> > > > > +        !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER))) &=
+&
+> > > >
+> > > > Willem, do you prefer to keep the:
+> > > >
+> > > >       tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+> > > >       !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
+> > > >
+> > > > conditions?IIUC we prevent both from being set at once. So
+> > > >
+> > > >       !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
+> > > >
+> > > > is sufficient (and, subjectively, more intuitive).
+> > >
+> > > Good point. Yes, let's definitely simplify.
+> > >
+> > > > Question #2 -- why are we only doing this for SW stamps?
+> > > > HW stamps for TCP are also all or nothing.
+> > >
+> > > Fair. Else we'll inevitably add a
+> > > SOF_TIMESTAMPING_OPT_RX_HARDWARE_FILTER at some point.
+> > >
+> > > There probably is no real use to filter one, but not the other.
+> > >
+> > > So SOF_TIMESTAMPING_OPT_RX_FILTER then, and also apply
+> > > to the branch below:
+> > >
+> > >         if (shhwtstamps &&
+> > >             (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE) &&
+> > >             !skb_is_swtx_tstamp(skb, false_tstamp)) {
+> > >
+> > > and same for tcp_recv_timestamp.
+> >
+> > When I'm looking at this part, I noticed that RAW_HARDWARE is actually
+> > a tx report flag instead of rx, please also see the kdoc you wrote a
+> > long time ago:
+> >
+> > SOF_TIMESTAMPING_RAW_HARDWARE:
+> >   Report hardware timestamps as generated by
+> >   SOF_TIMESTAMPING_TX_HARDWARE when available.
+>
+> Right, this is analogous to the software part that you modify:
+>
+>         if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
+>             ktime_to_timespec64_cond(skb->tstamp, tss.ts + 0))
+>                 empty =3D 0;
+>
+> The idea is to also add for hardware timestamps your suggested
+> condition that the socket also sets the timestamp generation flag
+> SOF_TIMESTAMPING_RX_HARDWARE or that the new OPT_RX_FILTER flag
+> is not set.
+>
+>
+> > If so, OPT_RX_FILTER doesn't fit for the name of tx timestamp.
+> >
+> > I wonder if I can only revise the series with the code simplified as
+> > Jakub suggested and then repost it? I think we need to choose a new
+> > name for this tx hardware report case, like
+> > SOF_TIMESTAMPING_OPT_TX_HARDWARE_FILTER?
+> >
+> > Since it belongs to the tx path, can I put it into another series or a
+> > new patch in the current series where I will explicitly explain why we
+> > also need to introduce this new flag?
+>
+> I think the confusion here comes from that comment that
+> SOF_TIMESTAMPING_RAW_HARDWARE only reports
+> SOF_TIMESTAMPING_TX_HARDWARE generated timestamps. This statement is
+> incorrect and should be revised. It also reports
+> SOF_TIMESTAMPING_RX_HARDWARE.
+>
+> Unless I'm missing something. But I think the author of that statement
+> is the one who made the mistake. Who is.. also me.
 
-...
+That's all right :)
 
-> 
-> > I guessed that you would dig your heals in over this, and want to do
-> > it your own way despite all the points I raised against your patch
-> > series on my previous posting arguing against much of this.
-> > 
-> > So, at this point I give up with this patch series - clearly there is
-> > no room for discussion about the way forward, and you want to do it
-> > your way no matter what.
-> 
-> I actually thought that in general the approach implemented in my
-> patches didn't meet much dislikes from your side. Just several notes
-> which could be easily fixed in the next revisions.
-> 
-> Anyway thanks for understanding. I'll wait for your series to be
-> merged in. Then I'll submit my patch set based on top of it (of course
-> taking into account all the notes raised by you back then).
-> 
+Then, the OPT_RX_FILTER is fine under this circumstance.
 
-Hmmm, I'll poke the bears :)
+Let me also revise the documentation first in the series and put it
+into a separate patch because the rule of writing the patch is to keep
+one patch doing only one thing at one time.
 
-Any chance this series will be rebased and sent out again? I
-really liked the direction of this and it seems a waste to end it at a
-stalemate here despite some differing opinions on the design and
-possible future changes.
+Similar action will be done to the "rx hardware" part because I think
+mixing the long description for both of them (software & hardware) can
+be a little bit messy to readers.
 
-I think we're all in agreement that stmmac's current PCS usage behind
-phylink's back is not good, and this is a massive improvement.
+Let me try a better organization of the series: keep each patch clear,
+small, atomic and easy to review.
 
-Thanks,
-Andrew
-
+Thanks for your help!
 
