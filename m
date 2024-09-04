@@ -1,101 +1,89 @@
-Return-Path: <netdev+bounces-125207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4306396C423
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 18:31:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85BC696C42D
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 18:35:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF410284C7B
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:31:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F8961F24408
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A32DE1DC07B;
-	Wed,  4 Sep 2024 16:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49EB1DFE14;
+	Wed,  4 Sep 2024 16:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2xOdbMBA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oloAsxZ3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC961DA319
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 16:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCB24205D;
+	Wed,  4 Sep 2024 16:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725467469; cv=none; b=AQb0dfFNeJDwbfcawLjDfgO4Pzk5YHytVJSEn/oBMXCBZ8muNNfbvWg6Da0xYHxbb1GOSnTvdob+Onrq1WRSace7a9MaVW34EymdpftzKlZ0EuDl0YfDEEzUpajSF2T80gXI03TipWHa0sYo6jEuKABkpr61xz/9wYQWnir29BU=
+	t=1725467707; cv=none; b=C8h0zv9Ldk3nhdIK1ur1+k75pghB9Nb+PuHQxpll8e2kFXveY8AoYiIqmJGD94TShS3OwM/MF7uV2dI/RRYaQCJceCT0dBYM0RcBrgHcvntmwxT5JyL6cAFbDh4BfLubklDKXb7Ct1zOWBnxidJawbYRO9kAAZSeDeoGa2BIap8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725467469; c=relaxed/simple;
-	bh=xbNSgcdt23Q7rokBKs0uIKGlDc6DJJ/JldN4DLaNghM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vAz1UsS+HsaS9q2NxwCovdFG6XNiD+dZzOSLHMDzApKBSBDpaanil7qIZXVFcaPa8GJueZIb2GGpQfaoNgAnkn6XPQLsh5ir9kehVtsxTQ2ksngW3qMj92DkMKgJw7/mxgH7X4GYt0Jf318/eFOSW0MfCvy1rbZtqM3vfi3ReKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2xOdbMBA; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c275491c61so1994914a12.0
-        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 09:31:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725467466; x=1726072266; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xbNSgcdt23Q7rokBKs0uIKGlDc6DJJ/JldN4DLaNghM=;
-        b=2xOdbMBAQTGo+KtqMgR5Q84qR8QaCy+lZZ77X+o4B0/YoHWTjjFbNvq0A94QGhZrG+
-         uUOzLWBM0c/HdQlpOvkPHvRGSdR5mrId1wpC5G+QvcemV6N0PDyPA03nHJwKmGhqcPZk
-         qDM7oiKatUsHoQvU04WA0ABoOXLe/rUww+k1tdqyVIrGO96q8fkYf9bEQwUT4aGm5Zo7
-         M39SWMatMF32oSVm2ZOS8oM2W6bmSYl3QiLpX0hL0TJ6n0SxDrQlCjJU/wMKspQvC7PZ
-         oNlDUI5p4ILkunwlx769nX5p1TJBdOYT7IeFYff+6kGlC5IRhTYDWMy6ZWhEC1/donzN
-         FIgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725467466; x=1726072266;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xbNSgcdt23Q7rokBKs0uIKGlDc6DJJ/JldN4DLaNghM=;
-        b=i9hN6EVE8gojluAEXqeOVno2lzAGH38PBU3OrT563ZL11dmqGFdDgyIE82+NsxTdfV
-         KhOPsWZB+u9yniP0GYSlm8wb5O0oj6tPG3VTjrHH6l+C4egj8bgywyQzi7bM+wgOoBHe
-         8H3fxMzg3EaxgpEhOI0pw/7ukHI1i8A2Nm5Jrhwr737Zf3vppunBLQQ7jfv4edYVnvDw
-         f8HPMiUxzZ3O4rCQKeg4O5/rqA6sgsbU1ia3SB1ocC7uMHYBQkt7LOCCDIRLppirLCvg
-         GmsCr8WCTG4ik7MUt8mrzaOfh5MN1xCppAYn1sgqSm6JA/H7n+Duqh/ycDoB9EudWcuB
-         yBGw==
-X-Forwarded-Encrypted: i=1; AJvYcCVrqIMOxzZ/zNAEoLcBGh+CSQMDreMNjwr6K3gQAWeEWyWsExgc8mw+MOBsUO0JK2VEohY+7f0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWxsvD45Fxxe070j0gzcKM6MUPOZtwFVK7OyoFpJ9FEE9V1/Ib
-	xRGCaz78x7hWLEIhIzt5zP8tta2Kad1mA+y7fOL+4XmHVvj6jj90x4qc1uiwiKx7PUdRhsW/ZJK
-	IKwEVROi+nKHJp/mtu5cKZin0gzAaagLCGlhG
-X-Google-Smtp-Source: AGHT+IF62n2pBXCDxyXxkgckfOehREKGzP3yBwNSv6m+Is52LgdpPKWra4hUhuMQlWJrolmrZOd2fpYLEdlvpcFXArQ=
-X-Received: by 2002:a05:6402:234a:b0:5c3:c530:e98d with SMTP id
- 4fb4d7f45d1cf-5c3c530ea76mr1178119a12.30.1725467465494; Wed, 04 Sep 2024
- 09:31:05 -0700 (PDT)
+	s=arc-20240116; t=1725467707; c=relaxed/simple;
+	bh=+XpmBufS4Qg2AxW/ellAV9Ef4sdz+dYiyI0u6X+EPRk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T1r8HJdr1ndPpTc2Q+6heOA82Cj6R1112RbyEsYx9RsZPTfFqgtt+S8rX5fgkfPQboyd5nP+BcDGFjwpBl6zpmEhs+rhujdPHw1r1z/L0n+pBnhbdH7J+ETU0U6ctipFfO/kfm9Sa9V3LfK0WazLl7csCwlS8pV4zNA/5t+uhpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oloAsxZ3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BE3CC4CEC2;
+	Wed,  4 Sep 2024 16:35:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725467707;
+	bh=+XpmBufS4Qg2AxW/ellAV9Ef4sdz+dYiyI0u6X+EPRk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oloAsxZ3IWRPBByz9255WXPOb4W/lObd1foG47n47g3Jl9dnF03D0CkBnjx1zJrlk
+	 wFVtOGFH1ejRBg1hitT0fujgsHk8u2bTCgLvk+BB//ZeTfEI2jjhsFswGSdwtokgIR
+	 110fH1tZ1ihg2TtWj1sF7QyPSwVIAroTgcAc7yVF53R8kqXoFKVtnOLqFzOIq69vYy
+	 5jQULZ7yURAP4hxFbnJNFnjebNJraS/t8e+0hDqJ2p5yEe7J+KU1rilkn6XhbTbcYy
+	 RCL1fy8B838hXTZsZhAhMNslqstAHcLR5qVhxKeiMZgZjTo/Id99+r58r3u2M5auOD
+	 4fXQfvspHEg+g==
+Date: Wed, 4 Sep 2024 17:35:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
+	Heng Qi <hengqi@linux.alibaba.com>
+Subject: Re: [PATCH net-next 0/2] net: xilinx: axienet: Enable adaptive IRQ
+ coalescing with DIM
+Message-ID: <20240904163503.GA1722938@kernel.org>
+References: <20240903192524.4158713-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240903184334.4150843-1-sean.anderson@linux.dev> <20240903184334.4150843-4-sean.anderson@linux.dev>
-In-Reply-To: <20240903184334.4150843-4-sean.anderson@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 4 Sep 2024 18:30:52 +0200
-Message-ID: <CANn89iKJiU0DirRbpnMTPe0w_PZn9rf1_5=mAxhi3zbcoJR49A@mail.gmail.com>
-Subject: Re: [PATCH 3/3] net: xilinx: axienet: Relax partial rx checksum checks
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Michal Simek <michal.simek@amd.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240903192524.4158713-1-sean.anderson@linux.dev>
 
-On Tue, Sep 3, 2024 at 8:43=E2=80=AFPM Sean Anderson <sean.anderson@linux.d=
-ev> wrote:
->
-> The partial rx checksum feature computes a checksum over the entire
-> packet, regardless of the L3 protocol. Remove the check for IPv4.
-> Additionally, packets under 64 bytes should have been dropped by the
-> MAC, so we can remove the length check as well.
+On Tue, Sep 03, 2024 at 03:25:22PM -0400, Sean Anderson wrote:
+> To improve performance without sacrificing latency under low load,
+> enable DIM. While I appreciate not having to write the library myself, I
+> do think there are many unusual aspects to DIM, as detailed in the last
+> patch.
+> 
+> This series depends on [1].
+> 
+> [1] https://lore.kernel.org/netdev/20240903180059.4134461-1-sean.anderson@linux.dev/
 
-Some packets have a smaller len (than 64).
+Hi Sean,
 
-For instance, TCP pure ACK and no options over IPv4 would be 54 bytes long.
+Unfortunately the CI doesn't understand dependencies,
+and so it is unable to apply this patchset :(
 
-Presumably they are not dropped by the MAC ?
+I would suggest bundling patches for the same driver for net-next
+in a single patchset. And in any case, only having one active
+at any given time.
+
+-- 
+pw-bot: cr
 
