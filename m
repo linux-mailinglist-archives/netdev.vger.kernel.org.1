@@ -1,66 +1,89 @@
-Return-Path: <netdev+bounces-124822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C93D96B138
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:12:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C171C96B108
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:10:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F4481C20F86
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 06:12:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F48AB213F7
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 06:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDAD2137776;
-	Wed,  4 Sep 2024 06:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E852484E0A;
+	Wed,  4 Sep 2024 06:10:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="U67pEJQN"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="ke9mNOLq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D694812C522;
-	Wed,  4 Sep 2024 06:11:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F9282C7E
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 06:10:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725430301; cv=none; b=NiVvlzS4uwMWuoRuA2vQN0v7eVku/J00ya6ak2e7ixhZ/FxrTvljG0cGvciHBQMvJOAoHAsnNWlTT1j6QU6yCOto9XkdS48YIeaBXrbhGnZdLgVzNTf9k0/3heyqb419a6oWXDb8NY1mYpA1vx47tuDdCXfSk7ESre3VAwHV+cc=
+	t=1725430223; cv=none; b=hK5RX/rEnCWITzXrfWPPk/ygiv4STVy15BFD4Npi0Q3re88bFA2BNeDBQNSSY3sYc0rPxjgGxETyGEmPRMkWTIWYdomz9xcgDvQ/tzE/d/ZYBVjnmroWf+k7fKZnsuO9abnAw3HKj91Pa5vrNpYqGjSy/dEY4VjsnreBecvVT5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725430301; c=relaxed/simple;
-	bh=BVk75/I/bV+9ETgvytWFVFN4T4zzvPL3GWZtJtnYk5A=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=A2uA7omPm2B5qrqnhc2I58bb2U8I7scJWL6LfXRNaCV5f3F32/JkoLyYBDBSotMXqtH/+qNJfkXGJMGoJAh5RDIe0za9dJ1bAVq94r4eJTjeG91sOO7sSwizV18u2yy9rVziTc/B6bY9U0MT49f/DCuFxuVvESzJDQiBP1ldmYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=U67pEJQN; arc=none smtp.client-ip=109.73.34.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
-Received: from mx1.t-argos.ru (localhost [127.0.0.1])
-	by mx1.t-argos.ru (Postfix) with ESMTP id CBF8F100002;
-	Wed,  4 Sep 2024 09:11:10 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
-	t=1725430270; bh=FBERuqxsp0arGHoZa1OelsEJhh/5TEmMpEu1RfzOCCM=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-	b=U67pEJQNqyt0l7qEW0QzrDOqaP4lw7EeaLW2pXSBk7v4peAlLoSI8OB6tlwMv595c
-	 2srqvWZdJ1MxROVAIIsJG7MeXxcTSeZ82yuitKppp3Q5Gv2D8xlMMUQGUreEanTvjy
-	 ZaO4zIJQxjLMbM3FweRO1iSXx90DHWxrCn4WHa32TfJbGHvtoCwznMyIESKUxyJX6s
-	 PYVY8IHaIbD8Eg5pVEKI42qnnAPOCS1P9PKwN4x+v4Q09Di82kxbMgniAvNnC41rGc
-	 cn2BC0/uwOL0ZN4/c1UY2FugNXSTcUTYSlm6FuFx4GGOIEklv+Tkg6Xuqip8QgfNoV
-	 osH6jmVJ9WwMg==
-Received: from mx1.t-argos.ru.ru (mail.t-argos.ru [172.17.13.212])
-	by mx1.t-argos.ru (Postfix) with ESMTP;
-	Wed,  4 Sep 2024 09:10:04 +0300 (MSK)
-Received: from Comp.ta.t-argos.ru (172.17.44.124) by ta-mail-02
- (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 4 Sep
- 2024 09:09:44 +0300
-From: Aleksandr Mishin <amishin@t-argos.ru>
-To: Igal Liberman <igal.liberman@freescale.com>
-CC: Aleksandr Mishin <amishin@t-argos.ru>, Madalin Bucur
-	<madalin.bucur@nxp.com>, Sean Anderson <sean.anderson@seco.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH net v3] fsl/fman: Validate cell-index value obtained from Device Tree
-Date: Wed, 4 Sep 2024 09:09:20 +0300
-Message-ID: <20240904060920.9645-1-amishin@t-argos.ru>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1725430223; c=relaxed/simple;
+	bh=014gXkD8ygbNVGMJO+0Zp0ga5DirG6KNtyYbEwIUiCU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qk2a5+FjSdEjgg7/qVznNupBkbb7sWyXiRQtMvOHZ9+pYkqMcSNiVvdMsbWQAT1FeoakLKSgvnWLhC+7KCsKC5T6sUF0G6vd3BsASrQzxeN+ENY3ELCZ1hBH5py5uBcpIcX9J3CdktS+SPzc9ehOfPIVgMWmyIG0PDkbZR9QMHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=ke9mNOLq; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7b0c9bbddb4so344255a12.3
+        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 23:10:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1725430220; x=1726035020; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=V36tSWxAHLAIOwnkr8bXXchZBGFhkcs/NfyGu0nHDJw=;
+        b=ke9mNOLqSBayh2F08yupz1d86VGCKQMD5YVzwom1GDULdcM8IHz5evIBuNJPTS8Ki1
+         wzUnOReGrUkxbHv99ETqrCyPU9olFZMgUQd5MjwT4lTWTYrXBgei+/RQRcIPpAGiuUPb
+         cp0betABczsUDRPDsM5USlkqa3G5Yc2fihMpJH7MNh6Re088Fz3bvwdIKczNTzQhYZpa
+         UtIwfEvMWbApKLC2/4zbqwZrcdomgucMmypV2924arjmmsPlWuUvoY5p05EvlLg1KYCo
+         KF7cCmfjPtTivB5jGzMN4jIdYVkiegqMTTF2BbvkhnRrSKwqs6Yn3wMa4CuWjcB6vz0S
+         MdYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725430220; x=1726035020;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V36tSWxAHLAIOwnkr8bXXchZBGFhkcs/NfyGu0nHDJw=;
+        b=DP7M32w00P0cjAh943FmcJEYvIkkPEoCjpQ8iA4BjG7NA0GR0USyoqD5Rz4HFSzbAA
+         oGESWHN2kywEBLn8SYcb8yx+k9VqwAarprgbvyM6WOaTWrWMK8RKQPJ82DTeuCOQVrqV
+         yFGOL9bh1M8PSLn6c1S8+5jZYvKd7hVWd/Yygb9ihXlKLCrjxzcK5kx+VIk5lsPbwOX6
+         vmdQRTzHYr534rWWoe7awM3K4LsHevx7kDaIH3ZpWpBdFYRiMTXLwyIuXyInqWvNt2iz
+         ZrX+SPiZwno3BTvqoMxFWiO9VD/QDBmm6Q56sNWwXe3jY7ORK0OBiyoVLbQwoz3DpL4M
+         qwyg==
+X-Forwarded-Encrypted: i=1; AJvYcCVzGcpGAuuXMLRvHln2YdBZZz/k+7V/9Y9ySzws9QXPX7VPLywviJGnutKIQ2S5LLWco6mbtEc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhEfugrnFptiYuZMeAOelbsHKyBpTThPA4ZFvWZFUIaGaGIaHi
+	WsFVoLBiF5/yeHm3sQm+ZEDb2TFMHijQZLoGii5CwoZR3XUW1qCQdhqO5m8Odkg=
+X-Google-Smtp-Source: AGHT+IHMau4o8Ew3FW+eey6qgIUz41XJZGyUqCz0/A7x+A6o0sgpiBWZX5EMygQKk21MSGSMGAcELQ==
+X-Received: by 2002:a17:903:18d:b0:206:b5b8:25ef with SMTP id d9443c01a7336-206b5b82940mr13284525ad.15.1725430220327;
+        Tue, 03 Sep 2024 23:10:20 -0700 (PDT)
+Received: from LRW1FYT73J.bytedance.net ([139.177.225.239])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206ae912357sm6989385ad.14.2024.09.03.23.10.15
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Tue, 03 Sep 2024 23:10:19 -0700 (PDT)
+From: Wenbo Li <liwenbo.martin@bytedance.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wenbo Li <liwenbo.martin@bytedance.com>,
+	Jiahui Cen <cenjiahui@bytedance.com>,
+	Ying Fang <fangying.tommy@bytedance.com>
+Subject: [PATCH v2] virtio_net: Fix mismatched buf address when unmapping for small packets
+Date: Wed,  4 Sep 2024 14:10:09 +0800
+Message-Id: <20240904061009.90785-1-liwenbo.martin@bytedance.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,93 +91,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
- (172.17.13.212)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 187517 [Sep 04 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 32 0.3.32 766319f57b3d5e49f2c79a76e7d7087b621090df, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, t-argos.ru:7.1.1;lore.kernel.org:7.1.1;mx1.t-argos.ru.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/09/03 23:54:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/09/04 01:19:00 #26517203
-X-KSMG-AntiVirus-Status: Clean, skipped
 
-Cell-index value is obtained from Device Tree and then used to calculate
-the index for accessing arrays port_mfl[], mac_mfl[] and intr_mng[].
-In case of broken DT due to any error cell-index can contain any value
-and it is possible to go beyond the array boundaries which can lead
-at least to memory corruption.
+Currently, the virtio-net driver will perform a pre-dma-mapping for
+small or mergeable RX buffer. But for small packets, a mismatched address
+without VIRTNET_RX_PAD and xdp_headroom is used for unmapping.
 
-Validate cell-index value obtained from Device Tree.
+That will result in unsynchronized buffers when SWIOTLB is enabled, for
+example, when running as a TDX guest.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+This patch handles small and mergeable packets separately and fixes
+the mismatched buffer address.
 
-Fixes: 414fd46e7762 ("fsl/fman: Add FMan support")
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
-Reviewed-by: Sean Anderson <sean.anderson@seco.com>
+Changes from v1: Use ctx to get xdp_headroom.
+
+Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
+Signed-off-by: Wenbo Li <liwenbo.martin@bytedance.com>
+Signed-off-by: Jiahui Cen <cenjiahui@bytedance.com>
+Signed-off-by: Ying Fang <fangying.tommy@bytedance.com>
 ---
-v3:
-  - Add Reviewed-by: Sean Anderson <sean.anderson@seco.com>
-    (https://lore.kernel.org/all/e0b8c69a-3cc0-4034-b3f7-d8bdcc480c4d@seco.com/)
-v2: https://lore.kernel.org/all/20240702140124.19096-1-amishin@t-argos.ru/
-  - Move check to mac.c to avoid allmodconfig build errors and reference leaks
-v1: https://lore.kernel.org/all/20240702095034.12371-1-amishin@t-argos.ru/
+ drivers/net/virtio_net.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
- drivers/net/ethernet/freescale/fman/fman.c | 1 -
- drivers/net/ethernet/freescale/fman/fman.h | 3 +++
- drivers/net/ethernet/freescale/fman/mac.c  | 4 ++++
- 3 files changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/freescale/fman/fman.c b/drivers/net/ethernet/freescale/fman/fman.c
-index d96028f01770..fb416d60dcd7 100644
---- a/drivers/net/ethernet/freescale/fman/fman.c
-+++ b/drivers/net/ethernet/freescale/fman/fman.c
-@@ -24,7 +24,6 @@
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index c6af18948..cbc3c0ae4 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -891,6 +891,23 @@ static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
+ 	return buf;
+ }
  
- /* General defines */
- #define FMAN_LIODN_TBL			64	/* size of LIODN table */
--#define MAX_NUM_OF_MACS			10
- #define FM_NUM_OF_FMAN_CTRL_EVENT_REGS	4
- #define BASE_RX_PORTID			0x08
- #define BASE_TX_PORTID			0x28
-diff --git a/drivers/net/ethernet/freescale/fman/fman.h b/drivers/net/ethernet/freescale/fman/fman.h
-index 2ea575a46675..74eb62eba0d7 100644
---- a/drivers/net/ethernet/freescale/fman/fman.h
-+++ b/drivers/net/ethernet/freescale/fman/fman.h
-@@ -74,6 +74,9 @@
- #define BM_MAX_NUM_OF_POOLS		64 /* Buffers pools */
- #define FMAN_PORT_MAX_EXT_POOLS_NUM	8  /* External BM pools per Rx port */
- 
-+/* General defines */
-+#define MAX_NUM_OF_MACS			10
++static void *virtnet_rq_get_buf_small(struct receive_queue *rq,
++				      u32 *len,
++				      void **ctx,
++				      unsigned int header_offset)
++{
++	void *buf;
++	unsigned int xdp_headroom;
 +
- struct fman; /* FMan data */
- 
- /* Enum for defining port types */
-diff --git a/drivers/net/ethernet/freescale/fman/mac.c b/drivers/net/ethernet/freescale/fman/mac.c
-index 9767586b4eb3..ac9ad5e67b44 100644
---- a/drivers/net/ethernet/freescale/fman/mac.c
-+++ b/drivers/net/ethernet/freescale/fman/mac.c
-@@ -247,6 +247,10 @@ static int mac_probe(struct platform_device *_of_dev)
- 		dev_err(dev, "failed to read cell-index for %pOF\n", mac_node);
- 		return -EINVAL;
- 	}
-+	if (val >= MAX_NUM_OF_MACS) {
-+		dev_err(dev, "cell-index value is too big for %pOF\n", mac_node);
-+		return -EINVAL;
++	buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
++	if (buf) {
++		xdp_headroom = (unsigned long)*ctx;
++		virtnet_rq_unmap(rq, buf + VIRTNET_RX_PAD + xdp_headroom, *len);
 +	}
- 	priv->cell_index = (u8)val;
++
++	return buf;
++}
++
+ static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
+ {
+ 	struct virtnet_rq_dma *dma;
+@@ -2692,13 +2709,23 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
+ 	int packets = 0;
+ 	void *buf;
  
- 	/* Get the MAC address */
+-	if (!vi->big_packets || vi->mergeable_rx_bufs) {
++	if (vi->mergeable_rx_bufs) {
+ 		void *ctx;
+ 		while (packets < budget &&
+ 		       (buf = virtnet_rq_get_buf(rq, &len, &ctx))) {
+ 			receive_buf(vi, rq, buf, len, ctx, xdp_xmit, stats);
+ 			packets++;
+ 		}
++	} else if (!vi->big_packets) {
++		void *ctx;
++		unsigned int xdp_headroom = virtnet_get_headroom(vi);
++		unsigned int header_offset = VIRTNET_RX_PAD + xdp_headroom;
++
++		while (packets < budget &&
++		       (buf = virtnet_rq_get_buf_small(rq, &len, &ctx, header_offset))) {
++			receive_buf(vi, rq, buf, len, ctx, xdp_xmit, stats);
++			packets++;
++		}
+ 	} else {
+ 		while (packets < budget &&
+ 		       (buf = virtqueue_get_buf(rq->vq, &len)) != NULL) {
 -- 
-2.30.2
+2.20.1
 
 
