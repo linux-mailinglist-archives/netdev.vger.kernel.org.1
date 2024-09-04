@@ -1,126 +1,109 @@
-Return-Path: <netdev+bounces-124824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F55C96B151
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:13:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78B0496B154
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:14:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C079B286E74
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 06:13:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAFC21C20E0C
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 06:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE63212C473;
-	Wed,  4 Sep 2024 06:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F6812DD8A;
+	Wed,  4 Sep 2024 06:14:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yuh3ECRk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JRQfv+69"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+Received: from mail-oa1-f47.google.com (mail-oa1-f47.google.com [209.85.160.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34F3F839E3;
-	Wed,  4 Sep 2024 06:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B1712D74F;
+	Wed,  4 Sep 2024 06:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725430380; cv=none; b=bcYYLiDREjF+RH+lHB7eXiSoep6/y/TPsrM+Pk00dEQfRVzjUhlzyQvc5Bamyef9sE7Bij0BxqKDkIaOhQP+l+z1iZ+Xb+wbWpyqPEk6teJ7iqlm8nRS03YbpJWIUjChnUB8TWe3DPa7Zaxc1xFvBBcI04r5xbjHUG919i6lYGc=
+	t=1725430469; cv=none; b=BmV2NQ00gB2bVsVAh9GefERlCIUOAnJyvWFLogxVwFFcT4rVv0w1DO6lZ8WgFILs6M1snFiM9eXVJNjsQUXH3j0OVgNKKsmOls+NGNfBCqbZ0PIdPxyPlIl1P0xorNDR3SnqCWNJutomp/VvxgCfOrdhH4XoYxWsDKTsgI+BhZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725430380; c=relaxed/simple;
-	bh=jDJ+5lOcDBfCwuW8cMcZIyq7m07Wc97Syr+O3fna8dU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uHabjAeeEBV3GDLA4P9thBLw6Ik46Zq1Z3XFasMf72UAOMn2Nuobxi9KHMi+OjtDmesNdFE6QaaR2WZQfXkoAp7KgO7ktnIHZgM2UQBYANcqoU1iKiK6JpMVDMv0mvKPe2EwkveY/OqBMDkX0/xS+pqkPuIulQGLNXI3qQY6xWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yuh3ECRk; arc=none smtp.client-ip=209.85.161.42
+	s=arc-20240116; t=1725430469; c=relaxed/simple;
+	bh=A7Ol20CGaKQZ9UeOqfoYctWw4BO/w3Dq8e8ia0OEW9w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PiTF6UbIP/4fpOsduZZF2okoGwiJ3iuNR7zbptFUn2bu8vCGkiqmJGNhi7ZbWllTq+A/kWF3w4CEKClr9/5tED4bgrji0ijsvszjKfMm4AwXg9+m207PfZiKRwJOzwwlT4iHAyVG+SCTWqhzVBwgt5x9dxRd7KTUmlI1Y2mcWv8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JRQfv+69; arc=none smtp.client-ip=209.85.160.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-5e174925b7bso1467185eaf.0;
-        Tue, 03 Sep 2024 23:12:58 -0700 (PDT)
+Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-277fdd7d468so1337710fac.1;
+        Tue, 03 Sep 2024 23:14:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725430378; x=1726035178; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VDIP2Ws7uBqyQ2sSVJAPk82Jzg9nMpj1VtHM7eiwTCI=;
-        b=Yuh3ECRkT9EUGCQQOh7OHWFo0/UPxm7Ub9W7kTmtrNEK4vIcqZ8BLA0P8AE+vonYye
-         WElh7gii/w7emmivSLGBVNBMR1b4qsGxoUMTY59KRWabdaHIplAZQTpdZjYuHf9fFDKQ
-         EDMtw51vAcAPeveKaCOQJZ0G3NRKV3iguqsveWAP6Ipjnbu+g2UvaFIOOTAeuy9rrtsS
-         cVZwlEGuvkyQ+Q7DDZ6VRA7/zAl/gZcgzonrIMurfCYiGV9z0+ijL4At+AOte7qR70oF
-         EGbjP3Q5z5FL5EL5HPjI6S+ZoaRKlBoS57IYubkiN5C/qFv77dAuEajErDfdYaTkFKyu
-         S/Zw==
+        d=gmail.com; s=20230601; t=1725430467; x=1726035267; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ntGNQX8ooCG660UEQhJ2p32C+ITOVnSqhmpySBca4sI=;
+        b=JRQfv+69gQoqy7DrYnC3zMRGHpWHO1/R1LZk65sXK1y+0OCcuJa+6DpQdwE6XRo8yB
+         1mzVqbnim56oUIGDGbVn3tcmprbJ6vHT+3QiB+kRk6SgLdsLFU5TzFOOTlRxZDyNfSWp
+         wJ9xfRSHJZ8cx31lIEgu4hZgDNR2MI2bkClmz/MkKXwtRDBxk2YdxzFSL2IKadD7Var9
+         BkJmhmHXzrirSp9FNKkfeDvTDRkEyZuEvmCVWcVJCPAPo1tiLujZJqmh71+xxxT8DgNC
+         9TEnit53zelaap2yUfEGQnmGX6Fes2hVvNaInWzuyronvvO3hxB/XT0pLq4jS3UnQgGt
+         sDQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725430378; x=1726035178;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1725430467; x=1726035267;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VDIP2Ws7uBqyQ2sSVJAPk82Jzg9nMpj1VtHM7eiwTCI=;
-        b=f59W8rpeCiireMy6aLUtLJBbk0cyrF0HObZY+VpJdjFES8xWxHtmCi2uIwT9LVIz1l
-         p+Jei1yfYG1578Su6S3lgeyQu1lQ4udaXh1nY/R5ouQ6B63ynpEQotsk+IlMH7a3Qfx3
-         jS+HsyUw1pGutxaEtCLEecyF+2xhb7JzijTspE+OAMuvuh5rM4VxSKRq/d97+pUa+9+D
-         uChXRd623hsQjVgkRUVdQoCDNy13bfB+XzNOZv8h6DaODc7HzYj7tS1g1gxKUejS8IWl
-         uWPhBGM8PQnFvpo+oW4mK8lLPy01jQJa0wP1ywAO/3/JQ5necxhKnFRL2OWxcWbe1oWQ
-         BNBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0DEXuCBB4SqFL+gJ/L/171Q0Vk6gLcCuw6bLLj+jDmVnL+fGyl9MMXj0vO9HvQUA/k5Ay81tQkdsU1Q1LprDb@vger.kernel.org, AJvYcCWI7DuYxUDj6OFz3SFg3oz+v0lpUkMUh920KvC9M6SazvirAPqVZpJVL5+LOr7bDp9fEE9UAd0sFpUgfwI=@vger.kernel.org, AJvYcCXZydRcmJRPc/0JHxnt5n6gehQMJC49Jt4Ntn5BzRzMHx/dG6tdu+/sxg9hFChiwWksBPnUJNH0@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwLKdkrpdDF+3oCuujs8OigmlI7dc3eJK8XxHAtba1nBc27X72
-	nDD0HWoNkaZDTBf3fYxeQmSF2tVOgoJ+1ZCzW6L60uZ3kVlVWqYy
-X-Google-Smtp-Source: AGHT+IHkY6HLIk0SWtABuEyvwmr935J0nVDpJ21fois+8YT+U7ENcDDXZ4luXGchIvGADP1/I7/oCA==
-X-Received: by 2002:a05:6870:390a:b0:25d:e3d:b441 with SMTP id 586e51a60fabf-277c81ed3a6mr14354173fac.40.1725430378104;
-        Tue, 03 Sep 2024 23:12:58 -0700 (PDT)
-Received: from localhost.localdomain ([159.196.197.79])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7177859a3f5sm888049b3a.176.2024.09.03.23.12.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 23:12:57 -0700 (PDT)
-From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Joanne Koong <joannelkoong@gmail.com>
-Cc: Jamie Bainbridge <jamie.bainbridge@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] selftests: net: enable bind tests
-Date: Wed,  4 Sep 2024 16:12:26 +1000
-Message-Id: <5a009b26cf5fb1ad1512d89c61b37e2fac702323.1725430322.git.jamie.bainbridge@gmail.com>
-X-Mailer: git-send-email 2.39.2
+        bh=ntGNQX8ooCG660UEQhJ2p32C+ITOVnSqhmpySBca4sI=;
+        b=CnJKlFWhfXY7azToXk39Uoo+QkTcF1/U1jvtBODLL11uRokDbDYtwjJphdlrh/MJ4O
+         lSTEndTp2SybyuhsYDN/sxmxJAmlToC7xW5PrLc9GyyP2JJqv0LNr9n7Osrg42j2+nAs
+         rvK5np+wdvooHQqjiDzbqe6tecUe7a+1QF8XrTOIbJFernVlp8AjEjK2wfoaBXGx8769
+         u8QTKsG9q/afvAhfGRc6kGA6Q+DCXTcd7JiFPAT0UPMsICpmmC6LhCEjJk1fmZzUN/Fj
+         Ewz7Xw/Dy2ifUdAWAj9xW7pc17jlIklUu4AVGa0QTS2RCRYrwLs5grQiQO81INZQNRMd
+         cnoA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFrPPkQr6xiNOfAfPW8i5amWUO5aG5xvVUXwvCE4hC5U5p7WmZgNuLCozoVpv+o3RXYtdeXqj7+vSnOgg=@vger.kernel.org, AJvYcCX7Tl0jA8YkqgvUzxVvDGiGCobsSrkFHnaciiidZ2EJ1wCdEftBDFO3YpGoIwgYqHpz+RehszOi@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8goBkq1n+N/VvMtJic+M86rirEBW0eMeQ1V5qcy3VpH8bDkkF
+	ItXGbvChYMyVgUCRhdEcxQr1PaDqTURiVYkgyMyaRPhln/Zy1BJjmJPwYokiSgTDSIFWmp19yKz
+	NkITYuFlHtkobKBJhjKGQNDU2S/w=
+X-Google-Smtp-Source: AGHT+IGhmFyBEvCjap7NOLKy271m7LWln0enLzxRQbw6tBNtIQkHhfFqU5zMy6+Lo1l2WFma3cZszynDRTpjFCYznxk=
+X-Received: by 2002:a05:6871:5cd:b0:260:e58d:5bb6 with SMTP id
+ 586e51a60fabf-278002ec341mr7975821fac.19.1725430467227; Tue, 03 Sep 2024
+ 23:14:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240903072946.344507-1-vtpieter@gmail.com> <20240903072946.344507-2-vtpieter@gmail.com>
+ <23ae38b92f44b1cbdd703b2785ad7e50e82e7c1b.camel@microchip.com>
+In-Reply-To: <23ae38b92f44b1cbdd703b2785ad7e50e82e7c1b.camel@microchip.com>
+From: Pieter <vtpieter@gmail.com>
+Date: Wed, 4 Sep 2024 08:14:15 +0200
+Message-ID: <CAHvy4ArvDazCeMX=AbKi67iJOUUy63djFDr6rr9Z-PWqABA9UQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] net: dsa: microchip: rename ksz8 series files
+To: Arun.Ramadoss@microchip.com
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net, 
+	linux@armlinux.org.uk, Woojung.Huh@microchip.com, f.fainelli@gmail.com, 
+	kuba@kernel.org, UNGLinuxDriver@microchip.com, edumazet@google.com, 
+	pabeni@redhat.com, o.rempel@pengutronix.de, pieter.van.trappen@cern.ch, 
+	Tristram.Ha@microchip.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-bind_wildcard is compiled but not run, bind_timewait is not compiled.
+Hi Arun,
 
-These two tests complete in a very short time, use the test harness
-properly, and seem reasonable to enable.
+> > -         This driver adds support for Microchip KSZ9477 series
+> > switch and
+> > -         KSZ8795/KSZ88x3 switch chips.
+> > +         This driver adds support for Microchip KSZ8, KSZ9 and
+> > +         LAN937X series switch chips, being KSZ8863/8873,
+> > +         KSZ8895/8864, KSZ8794/8795/8765,
+> > +         KSZ9477/9896/9897/9893/9563/9567, KSZ9893/9563/8563 and
+>
+> This line misses KSZ8567 and 9893 & 9563 is mentioned twice.
+>
+> It should be like
+>
+> -  KSZ9477/9897/9896/9567/8567
+> -  KSZ9893/9563/8563
 
-The author of the tests confirmed via email that these were
-intended to be run.
+Indeed I messed this up again somehow! Fixing now..
 
-Enable these two tests.
-
-Fixes: 13715acf8ab5 ("selftest: Add test for bind() conflicts.")
-Fixes: 2c042e8e54ef ("tcp: Add selftest for bind() and TIME_WAIT.")
-Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
----
- tools/testing/selftests/net/Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 8eaffd7a641c5d6bb5c63e3015fdd9f32c114550..9d5aa817411b653ac130a1a581d933180a597ce5 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -85,7 +85,8 @@ TEST_GEN_PROGS += so_incoming_cpu
- TEST_PROGS += sctp_vrf.sh
- TEST_GEN_FILES += sctp_hello
- TEST_GEN_FILES += ip_local_port_range
--TEST_GEN_FILES += bind_wildcard
-+TEST_GEN_PROGS += bind_wildcard
-+TEST_GEN_PROGS += bind_timewait
- TEST_PROGS += test_vxlan_mdb.sh
- TEST_PROGS += test_bridge_neigh_suppress.sh
- TEST_PROGS += test_vxlan_nolocalbypass.sh
--- 
-2.39.2
-
+Thanks, Pieter
 
