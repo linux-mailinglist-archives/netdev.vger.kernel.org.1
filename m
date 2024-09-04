@@ -1,257 +1,112 @@
-Return-Path: <netdev+bounces-124894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 263A696B496
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:33:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE0E596B552
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:47:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AE121C21365
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:33:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 848C028D5FB
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCE731CBEB9;
-	Wed,  4 Sep 2024 08:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="AEbkVfIg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BA01D0483;
+	Wed,  4 Sep 2024 08:42:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f66.google.com (mail-ej1-f66.google.com [209.85.218.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2751474A5
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 08:32:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE39A1CCEDE;
+	Wed,  4 Sep 2024 08:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725438778; cv=none; b=J3HIef41QP73NmLM532JOJvxBeFcUygjS2bd0xyzHSzXSErvNPAE6WtIokeSMGVtTD6gagIHPgB8QWBlqPsiAODdbfXnTRFjYeOzdop9GL5pJTB1nyCNu9Q+V7DkspqLWI2PvuHwXiv3pi3EjSph9SENx7qdy+4YfaK9GJFK2Wg=
+	t=1725439326; cv=none; b=HuHZ1DUbRzLoGVa65P0dikI8x1PtvsOoL2dTbS0TqhL+JW9bu+GOQ/TnGkJPdWHrsMv3BL1pM7XdQ4hW1ilE7hrVmWDYo+nJDxMRN08U3ZAh0OWfWKAaDxpfY+bxVGc85fyNUdvMJoc+8HcsLxQEtHv8J7rQNl7CT24YS7bs+C0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725438778; c=relaxed/simple;
-	bh=Xv0p+AJofBlCcpb3u4bgKBZYMhgzStHTHgFTPhmw1pE=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JqTFmQSN/CEQ0pKbm3UJTSkoiHlIv5gAuEF8Eoc0JzfKE/A1CBpqfF82Z4Pg2G6T0TLjzUgvvrYPXOiLQSeZYiRjiUHIrcWqhYNdB45qcR71mLqVlO0C9HC0MJNvjxkvlWkpYYTQqpPbUDtVJ1KNcaY16NhovgZv0C8OvmE2vWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=AEbkVfIg; arc=none smtp.client-ip=209.85.218.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f66.google.com with SMTP id a640c23a62f3a-a86984e035aso770924366b.2
-        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 01:32:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1725438775; x=1726043575; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=czuWwJfvtYwCI1yRbL1xXo5MWTUEx5+lgQqq8jdG4Bg=;
-        b=AEbkVfIgg41Etbmw1+4g5J0R5NmCwhfHwx23LU+LzIEk7m0E4mAqRG6jgZUsJFamgn
-         L+mOk9hNx0oQ8wypBYKuu6KvJCMQGWXUKkxULYzmg6o+0VJn5HTHqJRjekkFYxaLKCM1
-         hLG3RbpQ8/4y82I5tH9ONW8PpzQBn7JJW29XPtChfemnXe+ahNuXwfis2VOB7/rcd88v
-         gqNZXb93EJtHOyCG1yq4LzDFuRyfnmvZ86A9xDX+0TVqOXBU+g2NO5L6cpgwclT3eLmr
-         63KsmC6AVXKiuwwyi6gSHvZ7Rr9UV4fzYskeuZRaHhHpKlmeZ9yd2LgRDp1ZxKFCjV49
-         tt5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725438775; x=1726043575;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=czuWwJfvtYwCI1yRbL1xXo5MWTUEx5+lgQqq8jdG4Bg=;
-        b=bisjCV7rdwHYjO2lH8pepLCdQhUzaCXxOZXKzamafP7RNHu7CdSO4bfM1qc3jxQb8p
-         JmnTzzUw+g++PIXnsYO/InkKyAlrF6d4IYSKhhxnlW29shXbw7aHo0XlNUdxte+SriZN
-         Yef2d1EC20ggb1+Om9fUER9IV8akb1lVIhbvnjJiao1igHh+mhAfr9IoSZt7Ea6a9CPw
-         Outhkhe59Bt6hfF8SSUjn9MYVtJeIqQcCc7jDRyp528f+QmAqhho2sSJSzNHFzSKzgg+
-         vERa0Stf+aMgjQQ9ktSK9bSPiL/5VNzWb0Boaxd92WtpKcMW4b+s6cEC/HzJncXAXpWm
-         K96Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWq+Zbd/06vdmrwwQKOg1T3SaEGGPuKDLzGxcNiP6Esl2NGgwzXVayW4ycCsAHeIhathwflOnY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx3ai2obI8fYxbeRdlz7W4M9OOT9AAzVlpflkn424CuktWw7xnM
-	KPMUJCgTaS8flIw86XKa0g4kkODasJWWb2HNxacB0A68+tzXlZy711OCGNuafSg=
-X-Google-Smtp-Source: AGHT+IFsYrIc/8V6Dd0Wb4ac4K3yCfFqAZyqP0j4It4wu1Ti01Hf/Xj9KyshDVwvjUwn7G7BVIArrg==
-X-Received: by 2002:a17:907:1c94:b0:a7a:b643:654f with SMTP id a640c23a62f3a-a89a358274emr1229334866b.15.1725438774327;
-        Wed, 04 Sep 2024 01:32:54 -0700 (PDT)
-Received: from localhost (host-80-182-198-72.retail.telecomitalia.it. [80.182.198.72])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8a3d3177basm69728966b.64.2024.09.04.01.32.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 01:32:53 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Wed, 4 Sep 2024 10:33:02 +0200
-To: Rob Herring <robh@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH 04/11] of: address: Preserve the flags portion on 1:1
- dma-ranges mapping
-Message-ID: <ZtgbPtYXu0yOieou@apocalypse>
-References: <5ca13a5b01c6c737f07416be53eb05b32811da21.1724159867.git.andrea.porta@suse.com>
- <20240821001618.GA2309328-robh@kernel.org>
- <ZsWi86I1KG91fteb@apocalypse>
- <CAL_JsqKN0ZNMtq+_dhurwLR+FL2MBOmWujp7uy+5HzXxUb_qDQ@mail.gmail.com>
- <ZtBJ0jIq-QrTVs1m@apocalypse>
- <CAL_Jsq+_-m3cjTRsFZ0RwVpot3Pdcr1GWt-qiiFC8kQvsmV7VQ@mail.gmail.com>
- <ZtChPt4cD8PzfEkF@apocalypse>
- <CAL_JsqJNcZx-HH-TJhsNai2fqwPJ+dtcWTdPagRjgqM31wsJkA@mail.gmail.com>
- <Ztc2DadAnxLIYFj-@apocalypse>
- <CAL_Jsq+mpVEDthuViQZ6T7tDQ_krgxYSQ0Qg1pBMNW8Kpr+Qcw@mail.gmail.com>
+	s=arc-20240116; t=1725439326; c=relaxed/simple;
+	bh=hbucqT7xCHO0ItaLmkrTPjZfpqSkgjRw0JD7uTbqBqU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pUo6YpZcs8Lqj55KmohlU6oWHL8hiKXaLEyxucJyxf7+/UkE82MajvnPreOK5wkFfeWyRRrugFkHNFyjcUfN3lct2oOdbYYDkDfd7K+ZrGnEzfcVyeIz4U6zQtlf4qxwcMLYF0SZwDHmZj/NSVKzHnRaqh0502Y33K2HYeGahIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-05 (Coremail) with SMTP id zQCowACHaupIHdhmYuUoAQ--.4628S2;
+	Wed, 04 Sep 2024 16:41:44 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: ecree.xilinx@gmail.com,
+	habetsm.xilinx@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	vladimir.oltean@nxp.com,
+	shannon.nelson@amd.com,
+	wintera@linux.ibm.com,
+	kory.maincent@bootlin.com,
+	alex.austin@amd.com
+Cc: netdev@vger.kernel.org,
+	linux-net-drivers@amd.com,
+	linux-kernel@vger.kernel.org,
+	Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH net-next] sfc/siena: Convert comma to semicolon
+Date: Wed,  4 Sep 2024 16:40:34 +0800
+Message-Id: <20240904084034.1353404-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL_Jsq+mpVEDthuViQZ6T7tDQ_krgxYSQ0Qg1pBMNW8Kpr+Qcw@mail.gmail.com>
+X-CM-TRANSID:zQCowACHaupIHdhmYuUoAQ--.4628S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Gr4rCw4kuw4kuw1xGrW3ZFb_yoW8Jry3p3
+	y5Aryv9FWxJa97J3WfXan5uF9Iva1YgF9xCF1Sy34rZas5trn2q3yvgay5Zrn0yr40ya15
+	Ar1FvrWSgF98CaUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUBF14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxV
+	W0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv
+	7VC0I7IYx2IY67AKxVWUAVWUtwAv7VC2z280aVAFwI0_Gr1j6F4UJwAm72CE4IkC6x0Yz7
+	v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF
+	7I0E8cxan2IY04v7MxkF7I0En4kS14v26r4a6rW5MxkIecxEwVAFwVW8ZwCF04k20xvY0x
+	0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E
+	7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_WrylIxkGc2Ij64vIr41lIxAIcV
+	C0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF
+	04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7
+	CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0pRTE_NUUUUU=
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-Hi Rob,
+Replace comma between expressions with semicolons.
 
-On 13:46 Tue 03 Sep     , Rob Herring wrote:
-> On Tue, Sep 3, 2024 at 11:15 AM Andrea della Porta
-> <andrea.porta@suse.com> wrote:
-> >
-> > Hi Rob,
-> >
-> > On 14:37 Fri 30 Aug     , Rob Herring wrote:
-> > > On Thu, Aug 29, 2024 at 11:26 AM Andrea della Porta
-> > > <andrea.porta@suse.com> wrote:
-> > > >
-> > > > Hi Rob,
-> > > >
-> >
-> > ...
-> >
-> > >
-> > > I think simple-bus where you have it is fine. It is really 1 level up
-> > > that needs to be specified. Basically something that's referenced from
-> > > the specific PCI device's schema (e.g. the RP1 schema (which you are
-> > > missing)).
-> > >
-> > > That schema needs to roughly look like this:
-> > >
-> > > properties:
-> > >   "#address-cells":
-> > >     const: 3
-> > >   "#size-cells":
-> > >     const: 2
-> > >   ranges:
-> > >     minItems: 1
-> > >     maxItems: 6
-> > >     items:
-> > >       additionalItems: true
-> > >       items:
-> > >         - maximum: 5  # The BAR number
-> > >         - const: 0
-> > >         - const: 0
-> > >         - # TODO: valid PCI memory flags
-> > >
-> > > patternProperties:
-> > >   "^bar-bus@[0-5]$":
-> > >     type: object
-> > >     additionalProperties: true
-> > >     properties:
-> > >       compatible:
-> > >         const: simple-bus
-> > >       ranges: true
-> > >
-> >
-> > Hmmm.. not sure how this is going to work. The PCI device (RP1) will
-> > havei, at runtime, a compatible like this:
-> >
-> > compatible = "pci1de4,1\0pciclass,0200000\0pciclass,0200";
-> >
-> > that is basically generated automatically by the OF framework. So, in the
-> > schema you proposed above, I can put something like:
-> >
-> > properties:
-> >   compatible:
-> >     contains:
-> >       pattern: '^pci1de4,1'
-> 
-> No, it should be like this:
-> 
-> compatible:
->   items:
->     - const: pci1de4,1
->     - const: pciclass,0200000
->     - const: pciclass,0200
-> 
-> or
-> 
-> compatible:
->   addtionalItems: true
->   maxItems: 3
->   items:
->     - const: pci1de4,1
->
+Using a ',' in place of a ';' can have unintended side effects.
+Although that is not the case here, it is seems best to use ';'
+unless ',' is intended.
 
-Ack.
+Found by inspection.
+No functional change intended.
+Compile tested only.
+
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+---
+ drivers/net/ethernet/sfc/siena/ptp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/sfc/siena/ptp.c b/drivers/net/ethernet/sfc/siena/ptp.c
+index c473a4b6dd44..85005196b4c5 100644
+--- a/drivers/net/ethernet/sfc/siena/ptp.c
++++ b/drivers/net/ethernet/sfc/siena/ptp.c
+@@ -897,7 +897,7 @@ static void efx_ptp_read_timeset(MCDI_DECLARE_STRUCT_PTR(data),
+ 	timeset->host_start = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTSTART);
+ 	timeset->major = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_MAJOR);
+ 	timeset->minor = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_MINOR);
+-	timeset->host_end = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTEND),
++	timeset->host_end = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTEND);
+ 	timeset->wait = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_WAITNS);
  
-> 
-> Alternatively, we could instead only generate 'pciclass' compatibles
-> for bridge nodes. The reason being that being an ethernet controller
-> doesn't really tell us anything. There's no standard interface
-> associated with that class.
+ 	/* Ignore seconds */
+-- 
+2.25.1
 
-I'd avoid this one, since the class is not representative in this case. RP1
-is an MFD and not an Ethernet controller. Also, it would prevent other similar
-PCI devices with differnt class from using this schema.
-
-> 
-> > or maybe I could omit the compatible entirely, like in:
-> 
-> No.
-> 
-> > https://github.com/devicetree-org/dt-schema/blob/main/dtschema/schemas/pci/pci-iommu.yaml
-> 
-> That's not a device node, but just part of pci-host-bridge.yaml.
-> 
-> > that seems to refer to generic compatible values.
-> > In both cases though, I don't see how these binding could work with
-> > make dt_binding_check, since there's no compatible known at compile
-> > time (for the first approach), or no compatible at all (the second
-> > approach).
-> > Is it intended only as a loose documentation?
-> 
-> No, schemas define exactly what a binding can and can't contain. But
-> they are divided into device schemas and common schemas. The latter
-> are incomplete and are included by the former. Generally, "compatible"
-> goes in device schemas.
-
-Ack.
-
-> 
-> > Or are you proposing that for a future new bus (hence with a new, specific,
-> > compatible) that could be described by the schema above?
-> 
-> The above schema would be the common schema included by a RP1 schema,
-> LAN966x schema, or any other device doing the same thing.
-
-Many thanks, I believe I've got it now :)
-
-Cheers,
-Andrea
-
-> Rob
 
