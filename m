@@ -1,55 +1,57 @@
-Return-Path: <netdev+bounces-125291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 684B296CAD3
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:36:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6617A96CADB
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:39:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0ED51B24757
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 23:36:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1CC231F2855A
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 23:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2ACA16EC19;
-	Wed,  4 Sep 2024 23:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DD97179958;
+	Wed,  4 Sep 2024 23:39:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AfcNiSUl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qxNcmQI/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD62A14D2A7
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 23:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1716149C52;
+	Wed,  4 Sep 2024 23:39:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725492956; cv=none; b=a33Fas7dIr9/nqS/aCdqPMVGafjTEJCVXDj+tYEuhh1rClktmd+kBkh30zFTQrOyYjk3OkAr7qVJWrfsa6HR0y71rmv8FuIJYsk0kKIu0z8dsnVZTzDVkiH3PxzZyCgO0nMrDywF/dfi8+ZsfJ7HXElvUGfYmm/mYdTSmt33f1k=
+	t=1725493156; cv=none; b=KvnP0rInXtxTbPfIYD62og7Uhpx47I2EofAe4NUmnASakFLW7gvDZZu6PgoRcwZxP28kWAlXArgdFvO8jv7nka6XVyHhOFd/MRdl+GQ7JaOxTMYfg+y7uySIz3b1D4XzZlwhZ37D54gdrxYJ+j/1z4hRx3dMv70SGFHuLZIP1Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725492956; c=relaxed/simple;
-	bh=MSG5HZkPsg7WjUGAJwN10gVMCaWuUs47JL8O3h+tiuI=;
+	s=arc-20240116; t=1725493156; c=relaxed/simple;
+	bh=MtEMk5uvVtx9ERgczCIyD0KhqFCc8a2Mb5QAblSugNI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ya1l4O93BoVTQjhHKScY10k0cIyQyYpeVe7dSk4fckzzpe6u8XG+5uTM+RClyP3992GmtcffdoXczSMRHm8hERLX6IScE3xMHeJANQZ5ZDlyjIJMHL6PcPxFCLrlQH6LvQllgiQvuLQW08M3mnadJ/7jp/R/9QXCFJ+KJC1qGK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AfcNiSUl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26C8AC4CEC2;
-	Wed,  4 Sep 2024 23:35:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=A/s0x6QTyDxuRpc1J2+oTfUoT85F5+Yogg0KEq/CUSljiwaolMIBCgP1h/05ZlY6VVJvw8cRV1zG+SZyD0TAiaa3QHemjXUHV8J5etFObV6p06tsIg9XpslfQRY3nObSAZtY9yaYa+OLvKCfEIY9bFcvHDh5al4/kLysY9F266I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qxNcmQI/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BE60C4CEC2;
+	Wed,  4 Sep 2024 23:39:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725492956;
-	bh=MSG5HZkPsg7WjUGAJwN10gVMCaWuUs47JL8O3h+tiuI=;
+	s=k20201202; t=1725493155;
+	bh=MtEMk5uvVtx9ERgczCIyD0KhqFCc8a2Mb5QAblSugNI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AfcNiSUlJ+LuqSV1x7azpun5BHIB/oOOvlOn1KGHY2LpoTcDpPvfdJLLDXJJ+9hRn
-	 D/g5ZU562gCEXhvjPIKOsSPVDLGd202h5rDPyPRVLkTw91JF3M0PhszSmYsSL4br1g
-	 ZnHAO1y+z5C9nqbBr3e+T46+gS/slxScjrvzuJjRLAP9PdpD86RF+P9gvZQDbnuMcC
-	 DvH/rjsUOjAIXPp69VeDraAMoMMOqVCIZWXhUF2qBzObR31LNYZUZcT0y6i2B9tSc2
-	 N+me8Xz8uWj4t9DzyfKXvexvS7Xo1X5sUq8r1nGOM+2ZWwnTYpcCn5V8vlJ5RiEIMG
-	 GSZVw0+ifq59Q==
-Date: Wed, 4 Sep 2024 16:35:55 -0700
+	b=qxNcmQI/5ZNsU2LU44CMZEdweiaq2/i53Jo9DU7zvpA896pkVlff1I99CtRTZ9kvN
+	 upr8FfT3CGUdx/gTfVzFZiGg6Kqar/1TvdvkGLSv25V11Ujf1yh59F5VuKMhR/38z0
+	 nhyDq9ngIVfQLNnS+a2Rt2ScrmfyZ7cZ0hR7sYiiBU1Knmwn6c6pNtSyLx3LMfGd+a
+	 bZQ5Yu+0PYGtQUsCvgjWJxAqb250n0Q98XlLQMPQC2BzPHRgnlrQO6hAuuk82YXzKW
+	 k+QmxEnfo2pP9iqQ2aN9NpVTD4Xg2B+RKFkIyJ7o2X9eH9ULqVo/mnZkxJd1OT4tj7
+	 HXZIlMX3h35YQ==
+Date: Wed, 4 Sep 2024 16:39:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Zhang Zekun <zhangzekun11@huawei.com>
-Cc: <jiawenwu@trustnetic.com>, <mengyuanlou@net-swift.com>,
- <avem@davemloft.net>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: txgbe: Simplify code with pci_dev_id()
-Message-ID: <20240904163555.7a8812e9@kernel.org>
-In-Reply-To: <20240903072301.117767-1-zhangzekun11@huawei.com>
-References: <20240903072301.117767-1-zhangzekun11@huawei.com>
+To: Liu Jing <liujing@cmss.chinamobile.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftests/net: do_setcpu function not need to have a
+ return value
+Message-ID: <20240904163914.5279569f@kernel.org>
+In-Reply-To: <20240903095111.7204-1-liujing@cmss.chinamobile.com>
+References: <20240903095111.7204-1-liujing@cmss.chinamobile.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,29 +61,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 3 Sep 2024 15:23:01 +0800 Zhang Zekun wrote:
-> Use pci_dev_id() to get the BDF number of a pci device, and we don't
-> calculate it manually. This can simplify the code a bit.
-> 
-> Signed-off-by: Zhang Zekun <zhangzekun11@huawei.com>
-> ---
->  drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> index 5f502265f0a6..e8e293b1dd61 100644
-> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> @@ -689,7 +689,7 @@ static int txgbe_ext_phy_init(struct txgbe *txgbe)
->  	mii_bus->phy_mask = GENMASK(31, 1);
->  	mii_bus->priv = wx;
->  	snprintf(mii_bus->id, MII_BUS_ID_SIZE, "txgbe-%x",
-> -		 (pdev->bus->number << 8) | pdev->devfn);
-> +		 pci_dev_id(pdev));
->  
->  	ret = devm_mdiobus_register(&pdev->dev, mii_bus);
->  	if (ret) {
+On Tue,  3 Sep 2024 17:51:11 +0800 Liu Jing wrote:
+> in the do_setcpu, this function does not need to have a return value,
+> which is meaningless
 
-Already done and slightly more cleanly in d76867efebcb20752345
-by who I presume is your coworker.
+This test is flaky:
+https://netdev.bots.linux.dev/contest.html?executor=vmksft-net-dbg&test=msg-zerocopy-sh
+Could you please try to figure out what the problem is and fix it
+instead of sending "cleanups"?
+-- 
+pw-bot: reject
 
