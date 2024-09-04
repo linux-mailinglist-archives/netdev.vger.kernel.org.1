@@ -1,123 +1,105 @@
-Return-Path: <netdev+bounces-124834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D429596B1C9
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:35:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90C1496B1FE
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:41:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F1881F26A00
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 06:35:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C43AD1C20A04
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 06:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33A313BC11;
-	Wed,  4 Sep 2024 06:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E6C13A25F;
+	Wed,  4 Sep 2024 06:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nnOHXpH/"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57ADF13AD13
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 06:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3082B126BE6
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 06:41:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725431612; cv=none; b=AL82Km649CMss8L5eL8l6lKubcG9QbTWJit6Hj7uI1nIXR4J2wEFOSeZek56CdDCZ00icdl9O3IvSeeEDNq8Ax7aBkADsZ9l3CH3xs+ddLOaLIATQgSCngDozHKVVIH9ScPpzghULOmz0slNfDc6gFH7jadk02ApUpqmKe6wIlQ=
+	t=1725432080; cv=none; b=mpWZEV1cz3auA22Hsm7nncJr6cqakANTc640A8mC5U6JzHRWY8HTOufuU/GfJ2ZgzBz4bG+QNoRqw+dAGs73923IsEV5OjJdbs/ezYkMqfZD+b2ewW6AtndvV+b5yYj/xqmgYHN1fQEN3rqc4cGWlHsgOSxI17DjavJBVjUBDyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725431612; c=relaxed/simple;
-	bh=RHMvkXT1VPoT7Ef+ACJJOFyxKdRggxjXDXqpIqxft9s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=thYBWZJs8qnqNh/hO+FXuRnqK13djkFlpZg6Z+ek+qyXlZYb7kqYdlRxxv+yzRSAC5SXFHghiinrxYoYYQ+RG7uRQMk6eQEIt5ypcq/WHLYhmgHfhCabCyvirEN8BcI8oCxrw8Airg5Os99Sq9PsJDmhrGKetgNQxtJHWrgW3gI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WzCMy2VqGz1BGv0;
-	Wed,  4 Sep 2024 14:32:30 +0800 (CST)
-Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7F2EF1400CA;
-	Wed,  4 Sep 2024 14:33:27 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 4 Sep 2024 14:33:23 +0800
-Message-ID: <5cfbde6c-0e6e-6c1f-c872-23fd00494b77@huawei.com>
-Date: Wed, 4 Sep 2024 14:33:23 +0800
+	s=arc-20240116; t=1725432080; c=relaxed/simple;
+	bh=INeGw5maKhB1p7IuRwGauxcaasPw1eFB87oVd60jFD4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NxWcdMxCDa/9n0xV93x4W6gBsyxxbnziyzenGDu4WhqCPygzPLRnwbbVCoXkJ0tza9ALgwJoomdKX22okyhf6hQFYfiHPlxWDsBJzPrvQP0EyGitrYYsJCKjKuzfX83yjVNgdXD/9kq295aHazT6oFOwAsP4+OTyCicG4DvOFbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=nnOHXpH/; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1725432079; x=1756968079;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=668GR7K85eKGutSjk9hdhyby0WaauuFbm4jSRy4Js+Q=;
+  b=nnOHXpH/mnVoxAuFUe3r96BQ1Uf7mGBYaAYjvKZ5mGdz9GuVMSyTYagF
+   FEwtX3fw7IOup4ddRkWHAnDD0A5dOKEEoqgYtSvO5IQkz3d7NMH0BZjfJ
+   yXIuYblyhliNovEQHPbV+dHIbg+QNpf04FvbIY80TIZwjrImVOxM5Br3U
+   M=;
+X-IronPort-AV: E=Sophos;i="6.10,201,1719878400"; 
+   d="scan'208";a="327404631"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2024 06:41:17 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:45773]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.128:2525] with esmtp (Farcaster)
+ id fa2646ae-c483-4dd3-a0cc-92f2c91c3a0d; Wed, 4 Sep 2024 06:41:16 +0000 (UTC)
+X-Farcaster-Flow-ID: fa2646ae-c483-4dd3-a0cc-92f2c91c3a0d
+Received: from EX19D003ANC003.ant.amazon.com (10.37.240.197) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 4 Sep 2024 06:41:14 +0000
+Received: from b0be8375a521.amazon.com (10.143.69.20) by
+ EX19D003ANC003.ant.amazon.com (10.37.240.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 4 Sep 2024 06:41:11 +0000
+From: Kohei Enju <enjuk@amazon.com>
+To: <takamitz@amazon.co.jp>
+CC: <andrew@lunn.ch>, <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <intel-wired-lan@lists.osuosl.org>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<przemyslaw.kitszel@intel.com>, Kohei Enju <enjuk@amazon.com>
+Subject: Re: [PATCH v1 net-next] e1000e: Remove duplicated writel() in e1000_configure_tx/rx()
+Date: Wed, 4 Sep 2024 15:41:01 +0900
+Message-ID: <20240904064101.8548-1-enjuk@amazon.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <20240904055646.58588-1-takamitz@amazon.co.jp>
+References: <20240904055646.58588-1-takamitz@amazon.co.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH net-next] net: lan743x: Use NSEC_PER_SEC macro
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <bryan.whitehead@microchip.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <UNGLinuxDriver@microchip.com>,
-	<netdev@vger.kernel.org>
-References: <20240902071841.3519866-1-ruanjinjie@huawei.com>
- <aa679b67-6580-4426-9edb-d0f5365ae3e9@lunn.ch>
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-In-Reply-To: <aa679b67-6580-4426-9edb-d0f5365ae3e9@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemh500013.china.huawei.com (7.202.181.146)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWA003.ant.amazon.com (10.13.139.18) To
+ EX19D003ANC003.ant.amazon.com (10.37.240.197)
 
+> My colleague, Kohei, tested the patch with a real hardware and will provide his
+> Tested-by shortly.
 
+I have tested the patch using my physical hardware, an Intel Ethernet controller I219-V. The device was properly attached by the e1000e driver and functioned correctly. The test was performed on a custom kernel based on kernel-core-6.10.6-200.fc40.x86_64.
 
-On 2024/9/3 0:26, Andrew Lunn wrote:
-> On Mon, Sep 02, 2024 at 03:18:41PM +0800, Jinjie Ruan wrote:
->> 1000000000L is number of ns per second, use NSEC_PER_SEC macro to replace
->> it to make it more readable.
->>
->> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
->> ---
->>  drivers/net/ethernet/microchip/lan743x_ptp.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/net/ethernet/microchip/lan743x_ptp.c b/drivers/net/ethernet/microchip/lan743x_ptp.c
->> index dcea6652d56d..9c2ec293c163 100644
->> --- a/drivers/net/ethernet/microchip/lan743x_ptp.c
->> +++ b/drivers/net/ethernet/microchip/lan743x_ptp.c
->> @@ -409,7 +409,7 @@ static int lan743x_ptpci_settime64(struct ptp_clock_info *ptpci,
->>  				   ts->tv_sec);
->>  			return -ERANGE;
->>  		}
->> -		if (ts->tv_nsec >= 1000000000L ||
->> +		if (ts->tv_nsec >= NSEC_PER_SEC ||
->>  		    ts->tv_nsec < 0) {
->>  			netif_warn(adapter, drv, adapter->netdev,
->>  				   "ts->tv_nsec out of range, %ld\n",
-> 
-> https://elixir.bootlin.com/linux/v6.10.7/source/include/linux/time64.h#L92
-> 
-> /*
->  * Returns true if the timespec64 is norm, false if denorm:
->  */
-> static inline bool timespec64_valid(const struct timespec64 *ts)
-> {
->         /* Dates before 1970 are bogus */
->         if (ts->tv_sec < 0)
->                 return false;
->         /* Can't have more nanoseconds then a second */
->         if ((unsigned long)ts->tv_nsec >= NSEC_PER_SEC)
->                 return false;
->         return true;
-> }
-> 
-> And the next question is, why is the driver checking this? It would
-> make more sense that the PTP core checked this before calling
-> ptp->info->settime64()
+The PCI device is identified as an Intel Corporation Ethernet Connection (17) I219-V (rev 11), with vendor ID 0x8086 and device ID 0x1a1d. This device ID matches the E1000_DEV_ID_PCH_ADP_I219_V17 definition in the e1000e driver code.
+```
+$ lspci | grep -i ethernet
+00:1f.6 Ethernet controller: Intel Corporation Ethernet Connection (17) I219-V (rev 11)
 
-There are 2 places call ptp->info->settime64(), it may make more sense
-to check timespec64_valid() here and remove these check internal like
-lan743x_ptp.c?
+$ cat /sys/bus/pci/devices/0000:00:1f.6/{vendor,device}
+0x8086
+0x1a1d
 
-drivers/net/phy/micrel.c:4721:          ptp->settime64(ptp, &ts);
-drivers/ptp/ptp_clock.c:103:    return  ptp->info->settime64(ptp->info, tp);
+$ grep -ri 0x1a1d ~/ghq/github.com/torvalds/linux/drivers/net/ethernet/intel/e1000e
+/home/kohei/ghq/github.com/torvalds/linux/drivers/net/ethernet/intel/e1000e/hw.h:#define E1000_DEV_ID_PCH_ADP_I219_V17          0x1A1D
+```
 
-> 
-> 	Andrew
+So this testing confirms that the patch does not introduce any regressions for this specific hardware configuration.
+
+Tested-by: Kohei Enju <enjuk@amazon.com>
+Thanks!
 
