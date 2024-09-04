@@ -1,120 +1,113 @@
-Return-Path: <netdev+bounces-125073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F16096BD8D
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:02:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D1B96BDC7
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:06:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF4B21F24409
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:02:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F359D1C21FBE
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A213D1DA112;
-	Wed,  4 Sep 2024 13:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HLUCszH3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3935B1DA315;
+	Wed,  4 Sep 2024 13:04:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F11211DA0F9;
-	Wed,  4 Sep 2024 13:02:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5ACF1DA112
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 13:04:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725454952; cv=none; b=bdO9CJQoxBsO2BqgndAwyL+LgRwJOfiLT574QH/wwSo8ICA+cKQqoBkZlpfnVQPoJ/Rjz+8iFEi7UrSgbzcH0+HY7/AwZ6bWMKr1+GvjoJIznTxF54Xz3O5P1Cl5Do4lSeHQ5Sidb4JEMjH8QqUrePm7AOINIJZaADVge7RBwyo=
+	t=1725455082; cv=none; b=OcW9cV2l2SaBHiSii6icJxb3/UB7qw8M6jLupMyGDSKGyiBQrIoe0jpXSNc5rikJ6J8AXZ1YsW08XMmnYYm5vnIxC0SuEYjqsVDuQx3PFRiY8WS5+pOkOSxr3ALYH0DvjWUE2XUxuhEZEFez+YMA03qz+00HMJZAjaUdC9kEUdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725454952; c=relaxed/simple;
-	bh=Izkuc8DVQwG9JPQ7jaLjluJviagM7i+wKUc96A1/MYs=;
+	s=arc-20240116; t=1725455082; c=relaxed/simple;
+	bh=iUvkWqxZWOqh9qs9Z4qY7apUDk7RXeOCuIbeU/k45lo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DkDACBq0kHW2Svb6YzXMoOszhBtIhYndj0+tLAIypfHHNDCDO8O3ro9TaOJB0VOrXhuFGwvm0ZAiBMCwiJlZYPtRk+fE6kL+0bYb8nICJJ5ureGx2boVAR47i5guWsd61qx9KLo595BYR99+S0GVu6FiAuOGhVQYdCmjNrSkE5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HLUCszH3; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42c88128315so3140565e9.0;
-        Wed, 04 Sep 2024 06:02:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725454949; x=1726059749; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EcbQbaIVPohzYKpW0NAJ6739Zodc4w16fXaT/0eJq+0=;
-        b=HLUCszH3sR/55ATBcI/1O0siT8SytVklsVOxTk3qPAQhiP13G95cwRarSDkRyNZM20
-         AUf+n7lQeWPMIZa7ihqZgSg0Q4nsiaa5T6+xZ4hX3OQEtoQw9VbUKfuZvKQ/bUZqbMeV
-         833ES71A/i3+OKnNstaLdX+iPsb5RLLlrHrI1dlC/Hc+fx5LsKw1adkULyQsWVUwX9Z1
-         2UNXdZmfpe4hpur9ofUpO8lWAnv6Pc3a9HXEiSWSKxTRPdwenxP9zZWE0A/Edj3C3/mo
-         HFtLPUbWkgIggJmr8OvRcznGIrNLKvTRi+SmRXt0Ip2QlCFDsWHPDbjbEBYD6J/E5TXT
-         ievA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725454949; x=1726059749;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EcbQbaIVPohzYKpW0NAJ6739Zodc4w16fXaT/0eJq+0=;
-        b=Go/NrnciiDLtClrQlGzqYo2F0tbvOBNGGSFnY5faXJt3+VbUC+ugZkbbuhPpshpKi8
-         ueJ/McC36m/Fe8W9hHH2lWFSFnjQuBQzOqeCJZXSYSHfJI8y889N3FUjYWNoVZ4x58Qq
-         AOpCQ/rNWiVD0HclXB+C7BGXZfl2OGsVaS7v4N8R/CDHwwc/yRxXcXzLew9DP/GnVHPx
-         nQxfH6feHluDvIi3DpLOGSkDY7glTEBfpiYN8VKS+0pHUMU/j73citV2TXe1J1lXJN74
-         +e6TE3LUmpzls1vRjg6RWsrYUb8+tbcWdPhI7E6VNU+TnXSz8Ub1aLsJHa2EyngmUNSb
-         vEwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVw63LTZatNJpJailPGd+atmnwKEt56mcepK9KH8i0eNyTBYCHMjkF6dzsXiyBGeszNTbsf2fMN@vger.kernel.org, AJvYcCXppNXFcRWbcyOUR6l6HgipVgdR3l9aSvFnMRp/UBuO9pW2H2JSgJCzFBbdCq6y35/cE87+MrX2e48zFGI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVVdIQl/X1l63+LEWvbphcnexv9hKJHqDm3CFNs9LXyHULxXIC
-	8En7QEqfMhONcRhFf8imQ3yQrF3ww1yN6q9TbSZ6kVfjNJxhVeUH
-X-Google-Smtp-Source: AGHT+IH7hReguc+nH4lTt0jjKw5fmY4WB2guwukGV6szfSaPGtYeUcThT/DU2IKUCSeJ3RODNpc+Zw==
-X-Received: by 2002:a05:600c:4fd6:b0:425:6dfa:c005 with SMTP id 5b1f17b1804b1-42bbb204f9dmr68776885e9.2.1725454946828;
-        Wed, 04 Sep 2024 06:02:26 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6df9705sm202738055e9.27.2024.09.04.06.02.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 06:02:25 -0700 (PDT)
-Date: Wed, 4 Sep 2024 16:02:23 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	rmk+kernel@armlinux.org.uk, linux@armlinux.org.uk, xfr@outlook.com,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v7 3/7] net: stmmac: refactor FPE verification
- process
-Message-ID: <20240904130223.py2yxmwo5kp6yvnu@skbuf>
-References: <cover.1725441317.git.0x1207@gmail.com>
- <cover.1725441317.git.0x1207@gmail.com>
- <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
- <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mgtE6Zbuxi53T2yfWvNl92MejMokWaV/TT/958G+PGplQC2qQmDInNb9yxcsha9YGXvBC5L48Vy0BTc4zaj9Rvw4pVaNhbHLalo5JAo8cffLR5SDZDDIO5eVqC4uy4mvIBZZaLVNCG6QpALMYbzOgPp+o3xBeeeo/i/BNUvblsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1slpga-0000Pm-Lk; Wed, 04 Sep 2024 15:04:36 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1slpga-005Scb-6e; Wed, 04 Sep 2024 15:04:36 +0200
+Received: from pengutronix.de (pd9e5994e.dip0.t-ipconnect.de [217.229.153.78])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id EC81C332878;
+	Wed, 04 Sep 2024 13:04:35 +0000 (UTC)
+Date: Wed, 4 Sep 2024 15:04:35 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, linux-can@vger.kernel.org, 
+	kernel@pengutronix.de
+Subject: Re: [PATCH net-next 0/20] pull-request: can-next 2024-09-04
+Message-ID: <20240904-valiant-camouflaged-dove-171b7d-mkl@pengutronix.de>
+References: <20240904094218.1925386-1-mkl@pengutronix.de>
+ <20240904-stirring-meteoric-cobra-831697-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="564yis4mvy6qojrj"
 Content-Disposition: inline
-In-Reply-To: <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
- <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
+In-Reply-To: <20240904-stirring-meteoric-cobra-831697-mkl@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, Sep 04, 2024 at 05:21:18PM +0800, Furong Xu wrote:
-> +static void stmmac_fpe_verify_timer_arm(struct stmmac_fpe_cfg *fpe_cfg)
-> +{
-> +	struct ethtool_mm_state *state = &fpe_cfg->state;
-> +
-> +	if (state->pmac_enabled && state->tx_enabled &&
-> +	    state->verify_enabled &&
-> +	    state->verify_status != ETHTOOL_MM_VERIFY_STATUS_FAILED &&
-> +	    state->verify_status != ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED) {
-> +		/* give caller a chance to release the spinlock */
-> +		mod_timer(&fpe_cfg->verify_timer, jiffies + 1);
-> +	}
-> +}
 
-Why do you need to give the caller a chance to release the spinlock?
-Isn't the timer code blocked anyway, as stmmac_fpe_verify_timer_arm()
-runs under irqsoff?
+--564yis4mvy6qojrj
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 04.09.2024 14:56:49, Marc Kleine-Budde wrote:
+> Please don't pull.
+>=20
+> DTS changes should not be included in this PR. I'll send an updated
+> one.
+
+The updated PR: https://lore.kernel.org/all/20240904130256.1965582-1-mkl@pe=
+ngutronix.de/
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--564yis4mvy6qojrj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbYWuAACgkQKDiiPnot
+vG9q3Qf/YxMQ2/a8YA53kYe/8TLk1ncL6fZUqNcQLe5H2x5uGvUU/4YqQdQ61nHG
+lJbW/PjTnAAVTd6o1JncOwdHXo/y3PR6MdC2QP4hB2excONeTzStibTMtQdifVAN
+NVWT4PTZNe92pCj4Rbqn+GBtw7tLt2sY3FtHYGjpfeuxSssGq8gqatNFS4Aesj9z
+NCb28WPgeh3LPohi1TlUL9nfuDvetpf+RTQKwgd4MyIkd1wZ1wsqHrundM7HxDqb
+SMlQXYSLuc32tZrbZVEaGtPBrTgDy8i8kunBev6/2ULgyiyf6MOLGesqJ3nTbxLT
+yIF7ZdBukCZTvhXYVh5tZkjOemxfRQ==
+=iau/
+-----END PGP SIGNATURE-----
+
+--564yis4mvy6qojrj--
 
