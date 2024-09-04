@@ -1,206 +1,199 @@
-Return-Path: <netdev+bounces-125170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E1DB96C28F
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:34:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3924996C2A8
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:41:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA9871F26497
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:34:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E33612817DB
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:41:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1611A1DA620;
-	Wed,  4 Sep 2024 15:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF891DFE0B;
+	Wed,  4 Sep 2024 15:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="kDZ1p/+j"
+	dkim=pass (1024-bit key) header.d=bang-olufsen.dk header.i=@bang-olufsen.dk header.b="dbcXF9m3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2096.outbound.protection.outlook.com [40.107.21.96])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A22C1DCB34
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 15:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725464082; cv=none; b=GhJ2Hsv7I91pmXPLblvO16+adT/4HxLCx8JZBCNCIsZJJPRwjIMP0ncvUO6f7bCcFxAWq1AOiDfvCpIUsoWl/JC++2ZxmC70tQ8YW341jEBRNlI5gWIS7AzTH5BG6cmXG4AOuC/vg39Wakq3nEVxK2fwmA/bTsMbjTBoqkLW3/k=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725464082; c=relaxed/simple;
-	bh=ZU9vZwT89o1iKio4bN3J8NlZEc9NScXwgl8b1nfNZec=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jOPqlKCc514jbU/c2HfCgeJyRFh7MRaBD2OqiS0Lf4HsgQG7GkDdEWJ3KOkIxcKiQRh7Sqd+RtvW5VaYEfQ/JvR37hHkrr/p5sww35/hL/2flZK7HVzmxVtkJERnPps9OnvY02hlZ0EgpBEArvCYeWpbfER4LVc30zWVCNsxt+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=kDZ1p/+j; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-7143ae1b48fso4018584b3a.1
-        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 08:34:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1725464079; x=1726068879; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aH+KdHQTY7QVJ226D5GvmxgS7Q6HRq/bVnsBLH7x4nk=;
-        b=kDZ1p/+jndsutOn+DyPpHfX93BJqpUbTc5fvhERCmQZmZqER6UgoNYjOpGUeB1CgRc
-         NuoR+UNCBM8TFeLT7Z8V12WtfnZtuYEU2SSgKO//sX93kpdTNymh4vop+Cfsx0XjdIC6
-         WyJFQtEg4UtvHPWL3rUZawpA3xIOfd1NDN3aI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725464079; x=1726068879;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aH+KdHQTY7QVJ226D5GvmxgS7Q6HRq/bVnsBLH7x4nk=;
-        b=lB7qw8IzztGOmAhD7G/rSQe2x44uT7NSMfvEczfkkIn8C0ymASFviVgcdwVsH39YtJ
-         HCcG9jwH4Ha7UpP1qskaNhtkD0qHRk+iI9W1NEYgIaXIhKZD0U/2FuUVklGtGbsKX06L
-         AOz7Sc5dwi0ZZaqCI7gY+JSS4cUcbhwjMhFLcfDCfsyaAMCsM7hrFWxSahB9i8mCQ9vS
-         inhdUXaJPckOX48qtPmgXHUUj0Tic0AlzLqe8x+CIFYbGmqyMpxYZqJDOC0gXw4Xbw5f
-         OpInaf2Lp4hvVBIVjhsFN1tu0+aF6Sep+RAtGgZ0Ks3n/6dYkUqo50ktxEz17pBoAG1s
-         Wjzw==
-X-Gm-Message-State: AOJu0Yy8zUCnSN82kqplGhtxAgEC4r7myE00RXD5D2+NFU5JWZVnCi+j
-	hEBch260EtOp6amZz02otA7zPVBQ19gBEtQt3PrcwDKi5E3+1BczLcy/f1oCRbkwBq23MXM2Cyj
-	2/R4vkqx2rilsPvoNSQcHotHzMHMcz2QgY+WWKWMZEEX4twh8dQ20ykdCWGDAy9LMgGK5tZgijt
-	Kms/U7BlQBi0BIRRuuHGD7bguDZhGHBpgylZo=
-X-Google-Smtp-Source: AGHT+IEL2LW4TA+CxU0CaYqbUrt/kpk0xSA3do08Wcc3MJwhwvpPcxzBoLhGzc/ghR+S5yCYdwHzwg==
-X-Received: by 2002:a05:6a00:3a1a:b0:702:3e36:b7c4 with SMTP id d2e1a72fcca58-7173fa0aae2mr14542401b3a.5.1725464078961;
-        Wed, 04 Sep 2024 08:34:38 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71778533261sm1748028b3a.71.2024.09.04.08.34.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 08:34:38 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: mkarsten@uwaterloo.ca,
-	Joe Damato <jdamato@fastly.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Breno Leitao <leitao@debian.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Jamie Bainbridge <jamie.bainbridge@gmail.com>,
-	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v2] net: napi: Prevent overflow of napi_defer_hard_irqs
-Date: Wed,  4 Sep 2024 15:34:30 +0000
-Message-Id: <20240904153431.307932-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3537A1DEFEA;
+	Wed,  4 Sep 2024 15:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.96
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725464462; cv=fail; b=F5Ekj2e0+BFv16NtshXmPz1VkbT4L8khIxZtdML5KWDYzVmj7UzIkBq9LR/mlnC4TIe6ztCrybcRB57vOUFZivPNGHzWpO5liYfjjDd98uc2Xwb2UgsrIyWvPvBGt7rvId3PbSlX8Vqej+TRG5PfNj/mOVxFuBU8dWsSlWEjTcU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725464462; c=relaxed/simple;
+	bh=Z3i7TDnwJve81J7ASp6DSvJcPTG5pCIuAL3z6VQjBH4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=iprKkYSNkM7IY6QEthqlHFRYetsgSc7KEm2T7pPjQz6YgBzH3Pa2/T/R0GqOMaYdKFbwhudo9mtS/ofINNLw7iema9zIwv2gQL5nmkkcC6qdF8g50chYzSCW7hJektceZPC+YrX811kvAfzAWrBApyWSlssuuEPk64mGNVM/VPI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bang-olufsen.dk; spf=pass smtp.mailfrom=bang-olufsen.dk; dkim=pass (1024-bit key) header.d=bang-olufsen.dk header.i=@bang-olufsen.dk header.b=dbcXF9m3; arc=fail smtp.client-ip=40.107.21.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bang-olufsen.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bang-olufsen.dk
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Bg1WUD5CaqR5NzCVLfZS370Ws17RX5yOOr5HoDiy3YcEVpG/w5yEfT6g5g014pG/RaJiMLHXHgcpINd5FYLDJTwDo3SJ+Lbye6d2poOpZJFdOJASmZNfrt6uHOrGqlyG7VdHZDR7kFuN8ROVOeqN+ASPcdm+hQMbNoDljUySpd4nDRgVYcclfzHS3iVgBSnkOFvxd2ap+ye9dfMEZPELhZS7L/83LkIQLiQGdIiwCkIHtDu14fUkP+MB1rrWyuWJJQNBDT5/ImaxT4PtKWM0Uk0+PkWUgjKfvVx1OyzMJ4u4SU/DU0Bz/JsKOO37fXYkybyAbLeH3oEs1bX/UfDJlA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z3i7TDnwJve81J7ASp6DSvJcPTG5pCIuAL3z6VQjBH4=;
+ b=hlJSYJbgegoF6OoUgFKgCI50YDt0uvafGop/u8hlYScyByH1iMf2Hr+pUfbqnMmklQNh6pqGCY/AHk37BfsWCmyqinp3qpPaUp27TTkPftgbE9TKpu2lhcczcjI2BWHsk8Cnd6Szw5BpIkyueR6fnXRvyVpkJbNswHtlXazXxtvpWeRGcQ+FVzE+daz1MZPoPCWwKJc8t9a+fumJp7G/pMRaocg4JauykYHw5gHAec1pOSEgXBR7mOtgMdCu6Y2G8+3imqt/5rBvOFPz6E6RJ/aZTAWH3GGCGm7eG5C0OkU6JmuoLbsVeklZL5/Ehm33aSKZb0Waro5EdkVs7ctIqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bang-olufsen.dk; dmarc=pass action=none
+ header.from=bang-olufsen.dk; dkim=pass header.d=bang-olufsen.dk; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bang-olufsen.dk;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z3i7TDnwJve81J7ASp6DSvJcPTG5pCIuAL3z6VQjBH4=;
+ b=dbcXF9m3tRYfF9qb8ksqNrP6t5dQpj7vqv/vV7/ClDdkZjkryLzdWrAeLdsV0yXJrZ+UImguVATZH4IzvgHMfsGAGAth5L45igWa/oKKbX8isrFGTzSYE06dplL3eTc1fxAX2VLfg1syEmi6c3aWtLfvZO6057xN1+joGrgdCCA=
+Received: from AS8PR03MB8805.eurprd03.prod.outlook.com (2603:10a6:20b:53e::20)
+ by AS8PR03MB7415.eurprd03.prod.outlook.com (2603:10a6:20b:2ee::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Wed, 4 Sep
+ 2024 15:40:57 +0000
+Received: from AS8PR03MB8805.eurprd03.prod.outlook.com
+ ([fe80::6ac3:b09a:9885:d014]) by AS8PR03MB8805.eurprd03.prod.outlook.com
+ ([fe80::6ac3:b09a:9885:d014%6]) with mapi id 15.20.7918.024; Wed, 4 Sep 2024
+ 15:40:56 +0000
+From: =?utf-8?B?QWx2aW4gxaBpcHJhZ2E=?= <ALSI@bang-olufsen.dk>
+To: Vasileios Amoiridis <vassilisamir@gmail.com>
+CC: "linus.walleij@linaro.org" <linus.walleij@linaro.org>, "andrew@lunn.ch"
+	<andrew@lunn.ch>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+	"olteanv@gmail.com" <olteanv@gmail.com>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"nico@fluxnic.net" <nico@fluxnic.net>, "leitao@debian.org"
+	<leitao@debian.org>, "u.kleine-koenig@pengutronix.de"
+	<u.kleine-koenig@pengutronix.de>, "thorsten.blum@toblux.com"
+	<thorsten.blum@toblux.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 1/3] net: dsa: realtek: rtl8365mb: Make use of
+ irq_get_trigger_type()
+Thread-Topic: [PATCH net-next v2 1/3] net: dsa: realtek: rtl8365mb: Make use
+ of irq_get_trigger_type()
+Thread-Index: AQHa/tyZejjjMWtuSUyWPRg0Irb5ObJHw/AA
+Date: Wed, 4 Sep 2024 15:40:56 +0000
+Message-ID: <guos3naz2r7ur5pxjbyvqkulg6e3a7xzlst374g4guv4qg2r2h@2ctrjlbw75v6>
+References: <20240904151018.71967-1-vassilisamir@gmail.com>
+ <20240904151018.71967-2-vassilisamir@gmail.com>
+In-Reply-To: <20240904151018.71967-2-vassilisamir@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=bang-olufsen.dk;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS8PR03MB8805:EE_|AS8PR03MB7415:EE_
+x-ms-office365-filtering-correlation-id: f4eea697-cb03-4a15-763c-08dcccf7f7f9
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?THZoZTkrajNDV0s0a0lhMWIwRFZtNkNoYVZPdWVZRHNaanpSbVVyMk8xVTJU?=
+ =?utf-8?B?eFlVWHBUN0NGZEk4b21zdys5UExWTkdzbVhkY1NFZDRKVzUyeGdBdzF3TDFU?=
+ =?utf-8?B?TldJbWRtV2N3bDEwTkplTFJncW9PanhiVHZOeFN2SVlBeXVGbk55SEZTVjNH?=
+ =?utf-8?B?bmwxMnJCb3ZmTStrR0pDWmNwTUlyZnJGOEF2a1NIUzN4bzBrRXJ0NGNKVXF5?=
+ =?utf-8?B?Nk9JZDJuWWZleW1lbXNwa29IREg3Mm1QWVdRdEs1ZC9wQUJRa2ZqQzJFU1ZQ?=
+ =?utf-8?B?c1pRME1LTENsTnI3ZzlTQ1dKblMzWVp5MU1rbHdUTy9KWCtYa0ZWaHVvUHRt?=
+ =?utf-8?B?dFhuZ0NZSWVzekRRNDczYWNaQTBoTjlETGtvNEdEUW9JMlYyQnAwMVdWTk50?=
+ =?utf-8?B?V3YzSzZUVW5VYm1vbTZSWk1aeWJBcTBSb3N5VERTVUYvaHhORW9oSC80Q2I1?=
+ =?utf-8?B?TnNFa1dDMVRRdEVPR0dIdC9oNGRjcm1ZQTJpcTVIUi93bHFJcDNxaVJyVXZN?=
+ =?utf-8?B?Z2RlczZaU3hqb2w4bW41REFCc0VHajFNSmZsWVNpR0xLMms3T3ZicFBnSC9S?=
+ =?utf-8?B?WHRWRkNyUG95VnRJWXdncFE0OVFzOUFpQkV4NEpFb1dqOEoxWlJDa0s5ZlR0?=
+ =?utf-8?B?bVJka0E5ckFnU3ZWQTFZczdVSU5GVkptSFhnWjR1KzZ1Z0FkekNQWkQ3YUFt?=
+ =?utf-8?B?V0pxeG92TEFXTlNOSUdPMmZuaHFwdGpVTTRTakhCR3JoZ0FEZEZJa3JHUm55?=
+ =?utf-8?B?bk52dFhFY2lyeFpQUFVYd3RieXk4akprUjV6SktsWWd1bGZ2bTlaZnFRdjNZ?=
+ =?utf-8?B?UGJnZUMvL0tOaXFMRUswcVpBYlVhMmlWdUxhMDRqQTJoSzZ2Z013QTNQenpG?=
+ =?utf-8?B?aGZIQUlOODlyQTFtR09Uc2ptK21hemJBdVlZeGs4ekhxUVVkc2g4T3lyUlNp?=
+ =?utf-8?B?MWxVS0lFQTFxTW1LaXVpZlgwWWdVZ3BjRkl6OVd5WjUwS1hCY1F6M0I0NUhu?=
+ =?utf-8?B?TC9nMUlYclJCK3c1emphcHJrREpERm5WZ0RwQ05pRlUwejBCaUlFQUlVQm9E?=
+ =?utf-8?B?alpRQ2tjenBpNW43YTJBWGxBclA0aTdRN1JTamxKNUJQOVlnQVJpTFo1M01Q?=
+ =?utf-8?B?RXdmTXNJZ21zeUVHTnZiY1NxNFQwWHUxdzdsME04enM4b2ZiVzhwaWppMG5K?=
+ =?utf-8?B?UEJoUDl1VjFJU3JpazFtT2hSa3lvV2ZVU1pLQXZTQU1PWCtveWZnaDFKVGpw?=
+ =?utf-8?B?c0F6S2JJclZiVVFJQW45VlUvSDFnREpxd09OalNQMlIyRjJ4OWlMU0pVNEJz?=
+ =?utf-8?B?NU1vSEtOMnVzTVROeEhmRnB5cVZGWnZLajhxemtLcFFqMk5kbmUyWEF4aU9T?=
+ =?utf-8?B?UEJGMnNMVGNlV2dxQ0M4RStMR21yUHpUbDZPcTFpYnBjWkNSQ3FQem5sM2VJ?=
+ =?utf-8?B?NjFRa1h4QmRwcmd0TnQyVERmdmpOcDhnTkFZVmVEYU91WmdZcW8yYUR1Tm5Q?=
+ =?utf-8?B?ZGFTaDExK3ordndyWmZ6RiticzZ2a1lGdkVVNC9xOVJkZ3BWNjRTbkxZdFFC?=
+ =?utf-8?B?Mld3Tnh0aDhyK0pmeDEyMU04cDJTaEc1Tk5FcU05d0xEcjQ3VmF5RHNFMW04?=
+ =?utf-8?B?ejdEOGJZUWRsVXZMdlFha1pFSkdvSHNaSStzV2gxMlZBejBOSGRIUzMxM1A3?=
+ =?utf-8?B?a21EamxFKzZOODN1VnViaEM1NTZGOWVlQTl4bGc0aWJwUW9YQTAwblE4NjND?=
+ =?utf-8?B?aUd1UVFhNDFJVWtjV3NQZ3oyN1NIRFc5M0ZzZVVTN0M4NEIwQytaRmJzOXVq?=
+ =?utf-8?B?d3pjc0ZKbGZsZVA0Yk1ZUTM5SEdYOTBObnYxU3lRUnNlc3kvU0R0NzBkamJT?=
+ =?utf-8?B?RFM2Z1FWWWE0Rm5VS3pibFMvOXMvS2xpZVRvVmVuSUFQNGc9PQ==?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR03MB8805.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?Z0tMM3JRRVJWZTNzUDRxYkpNTW9SRlZxaExvTmlUNzRyR1RIOFVBUDVLVUNY?=
+ =?utf-8?B?UEF5b3dJZDNydmw1Mi80a2l0WHI5VzBJVkl6cE5NZDYwVHdMcy8wVHZHQ0dF?=
+ =?utf-8?B?NHhHKzNKeVlmV05nbmNzVndRZDJLUVJNd20vRGFQNVhqb04zR3VISmlpWmI3?=
+ =?utf-8?B?Z2o0b0J4b0lndDlEcVQ3M3lmeGVlYlU4UGpnNzdxaXJZcHZKb0kxNnBha1N2?=
+ =?utf-8?B?M3NOQkQydXl4YmdWQ1VaaVRhSnBZTW91Z25mNyt1L21uZVVTNnptWnNMV0Qr?=
+ =?utf-8?B?OFQ0SU5UQ20yOHlaT3FHd3V0MlFWQUVTc3BCQ2VFbll4dFE1V21La1FjcDJM?=
+ =?utf-8?B?dzA1QkFER2RVMkpQdFJtYnd4Mmx4cWRaRHFkMnQzTGJtQWhWS2tuaTZYK0dL?=
+ =?utf-8?B?Mm1oZ2N6SDVjQjRVNE1tVjBBdGU3bXFuWS9jRmJ0RHJPNjVXQU4vVkZiV0Z4?=
+ =?utf-8?B?QWllM2wydHppejdqRHg3S1NFdkVsazBvWmdlaUpiQ01VY0hTc0gvUUVtRUx5?=
+ =?utf-8?B?U3plTlJhTWkwV3pkcWZjQXJXZVJoaThBWDZ6YWNIekVMVElBWEQ1K0hUSlNu?=
+ =?utf-8?B?UVNTZGJtUlhpSjUwb0c4WFFpVGN3aDRiUnQ4NThnbUFYMTFHUStBQXRnbDF4?=
+ =?utf-8?B?cmN0SU5ESVpxb2ZLc3VjNlhTcjN3U3Fha3RGTkFEajNSUWEwYmZWMUZKK1pI?=
+ =?utf-8?B?WWw5K2ovTjh3UTRtNWYzMktyTzlNd3dJWUJMS2t3VDBuN0pqeVdEUURTY2JR?=
+ =?utf-8?B?Y25Xb09aQlk4VmIzZGY5SjFDRnVXWnVRUWxySXAzRHY5T3pwYk5Kc0ZvbStT?=
+ =?utf-8?B?S3Mrdjl3RU93Yzdxang5c0dJV2s0Q1hCYSs0ZFVzb1pJM3FmTjVpQmxERStM?=
+ =?utf-8?B?N3pCVVMzbmZ4WGNPd3lmUTFCbjFDYldIR2Z0SFZqcHZOUDVYSkNPbGRUM2dr?=
+ =?utf-8?B?MTRTWlhLZUNsQ0hKandqdkUvTXEyNlRqbUxUUzdOdkVjTnpiTC9xTFdxRkE5?=
+ =?utf-8?B?UzRpaWNyTDlaa3BFT2xGbEQvQXhFeVVaQU15aUVoOXVseFBKUllUY2RuZmpm?=
+ =?utf-8?B?YlFCMTBwS2IrYkxXZ05XRExWcFlTQ3ZZRGpzaWZLYjZsc2xDODdVTjFLd2g3?=
+ =?utf-8?B?ek9wbUNST2pyeUpXWThiYTE5RGx4VVZhWXhHOTlMQUlaWUxGM1BaTDBNVXJ0?=
+ =?utf-8?B?NjlpalI1dUVBYi85T2JleHF1VGV0UXAramJJYloxV0FPQ2dSQ0xlWUxJeGQx?=
+ =?utf-8?B?VW9kdCtSdEdNZnJyUUo1bzIxVGZJalVDanRpN1VUdGV2MWdnTjR3bzY4OWVn?=
+ =?utf-8?B?aHUzTk91aHZKSUFuZTFvTmxLbnlvNkVQdDdURmNhNDA2UEF4L2U2bVBUeG1x?=
+ =?utf-8?B?Z21HU2Rhc2R2ZFhleFlWR3kzdkNmL2JDNCt3akZ2NzluTXhWVkxWTHJ6QW9q?=
+ =?utf-8?B?UlFxTlRaR3hJMWlTajY3ZSt6c1V4Q054Qjk5Wmp6OE85eXVUaUozZG82VUtQ?=
+ =?utf-8?B?YkNiSTZsM3pkcml6QWoxSUtLVnkzUjBYb2hheVdaRVg0YWdhaDJtOWx4K0d0?=
+ =?utf-8?B?aDdMUUgwSGhuNkJhS0o4ZHRZVjlFQUhpNEU1UjRXZXUxSndiQmZnTXBwUGxU?=
+ =?utf-8?B?T25SK1BUajI3TUFJTzluMFRKd1FWTzgxTWpDOXNSRGZ6VXNxcXJxaklxZE1n?=
+ =?utf-8?B?eWs3T0ljc3J0YzcyYjlOSTZlNVE5SG1hMWpiL3U3K3hBblVPK2lQNzk0WWFz?=
+ =?utf-8?B?RE9hNW52bXZpbU9BMHQzUis3cTBuRWVNbkV4SDdFYTMwKzZIUjdHRXZEcWl5?=
+ =?utf-8?B?ZHdwdFhEUEpUczJaazQxNGRjUUcwVVQ5TTdFWklwYlFTY0hhSzJ0YkNLS2lo?=
+ =?utf-8?B?Y3pHdVA1b1g3emtXUkgvVGhxcW1aaVFHcUN4SFJaSlZXNnV1OFIzYlAwQWFH?=
+ =?utf-8?B?cnhjclcrUCsrQ21DV2RrS2F6OENpWlZGcWZUZVhrNGk2elZHTlVNSi9aNGdn?=
+ =?utf-8?B?UHZFeFJmcTNWa2NCUTQ3M0FnNHdNbCtwWUlpVUVrZFUyWDNEV3ZURHFhdXJ3?=
+ =?utf-8?B?TkxTYkkrNzlReWhxamdjTEtiL2p5VE1jSEtRMFdUTU5xS0wrRGJjbU0zYkMw?=
+ =?utf-8?B?dVRlQ1dhdkp6SkduL3JralhzZUFpVC9seS9RakhNbWV5aTNrVlVHSVl0MnZa?=
+ =?utf-8?B?OEE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <AF3DDD3219503047BC87A9F9AAEBC81A@eurprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: bang-olufsen.dk
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR03MB8805.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f4eea697-cb03-4a15-763c-08dcccf7f7f9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Sep 2024 15:40:56.8551
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 210d08b8-83f7-470a-bc96-381193ca14a1
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: qDKAsBC7KETjPnKS38PPKPDntPbTFULZDfC8JVx9OPq4wiXCF/E7w8p1urO5KlSNi8pz6rZANLTn6xs8P1jC+A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR03MB7415
 
-In commit 6f8b12d661d0 ("net: napi: add hard irqs deferral feature")
-napi_defer_irqs was added to net_device and napi_defer_irqs_count was
-added to napi_struct, both as type int.
-
-This value never goes below zero, so there is not reason for it to be a
-signed int. Change the type for both from int to u32, and add an
-overflow check to sysfs to limit the value to S32_MAX.
-
-The limit of S32_MAX was chosen because the practical limit before this
-patch was S32_MAX (anything larger was an overflow) and thus there are
-no behavioral changes introduced. If the extra bit is needed in the
-future, the limit can be raised.
-
-Before this patch:
-
-$ sudo bash -c 'echo 2147483649 > /sys/class/net/eth4/napi_defer_hard_irqs'
-$ cat /sys/class/net/eth4/napi_defer_hard_irqs
--2147483647
-
-After this patch:
-
-$ sudo bash -c 'echo 2147483649 > /sys/class/net/eth4/napi_defer_hard_irqs'
-bash: line 0: echo: write error: Numerical result out of range
-
-Similarly, /sys/class/net/XXXXX/tx_queue_len is defined as unsigned:
-
-include/linux/netdevice.h:      unsigned int            tx_queue_len;
-
-And has an overflow check:
-
-dev_change_tx_queue_len(..., unsigned long new_len):
-
-  if (new_len != (unsigned int)new_len)
-          return -ERANGE;
-
-Cc: Eric Dumazet <edumazet@google.com>
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- Documentation/networking/net_cachelines/net_device.rst | 2 +-
- include/linux/netdevice.h                              | 4 ++--
- net/core/net-sysfs.c                                   | 6 +++++-
- 3 files changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
-index a0e0fab8161a..615baddb398c 100644
---- a/Documentation/networking/net_cachelines/net_device.rst
-+++ b/Documentation/networking/net_cachelines/net_device.rst
-@@ -98,7 +98,7 @@ unsigned_int                        num_rx_queues
- unsigned_int                        real_num_rx_queues      -                   read_mostly         get_rps_cpu
- struct_bpf_prog*                    xdp_prog                -                   read_mostly         netif_elide_gro()
- unsigned_long                       gro_flush_timeout       -                   read_mostly         napi_complete_done
--int                                 napi_defer_hard_irqs    -                   read_mostly         napi_complete_done
-+u32                                 napi_defer_hard_irqs    -                   read_mostly         napi_complete_done
- unsigned_int                        gro_max_size            -                   read_mostly         skb_gro_receive
- unsigned_int                        gro_ipv4_max_size       -                   read_mostly         skb_gro_receive
- rx_handler_func_t*                  rx_handler              read_mostly         -                   __netif_receive_skb_core
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index fce70990b209..971a24a2d117 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -356,7 +356,7 @@ struct napi_struct {
- 
- 	unsigned long		state;
- 	int			weight;
--	int			defer_hard_irqs_count;
-+	u32			defer_hard_irqs_count;
- 	unsigned long		gro_bitmask;
- 	int			(*poll)(struct napi_struct *, int);
- #ifdef CONFIG_NETPOLL
-@@ -2065,7 +2065,7 @@ struct net_device {
- 	unsigned int		real_num_rx_queues;
- 	struct netdev_rx_queue	*_rx;
- 	unsigned long		gro_flush_timeout;
--	int			napi_defer_hard_irqs;
-+	u32			napi_defer_hard_irqs;
- 	unsigned int		gro_max_size;
- 	unsigned int		gro_ipv4_max_size;
- 	rx_handler_func_t __rcu	*rx_handler;
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 444f23e74f8e..b34d731524d5 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -32,6 +32,7 @@
- #ifdef CONFIG_SYSFS
- static const char fmt_hex[] = "%#x\n";
- static const char fmt_dec[] = "%d\n";
-+static const char fmt_uint[] = "%u\n";
- static const char fmt_ulong[] = "%lu\n";
- static const char fmt_u64[] = "%llu\n";
- 
-@@ -425,6 +426,9 @@ NETDEVICE_SHOW_RW(gro_flush_timeout, fmt_ulong);
- 
- static int change_napi_defer_hard_irqs(struct net_device *dev, unsigned long val)
- {
-+	if (val > S32_MAX)
-+		return -ERANGE;
-+
- 	WRITE_ONCE(dev->napi_defer_hard_irqs, val);
- 	return 0;
- }
-@@ -438,7 +442,7 @@ static ssize_t napi_defer_hard_irqs_store(struct device *dev,
- 
- 	return netdev_store(dev, attr, buf, len, change_napi_defer_hard_irqs);
- }
--NETDEVICE_SHOW_RW(napi_defer_hard_irqs, fmt_dec);
-+NETDEVICE_SHOW_RW(napi_defer_hard_irqs, fmt_uint);
- 
- static ssize_t ifalias_store(struct device *dev, struct device_attribute *attr,
- 			     const char *buf, size_t len)
--- 
-2.25.1
-
+T24gV2VkLCBTZXAgMDQsIDIwMjQgYXQgMDU6MTA6MTZQTSBHTVQsIFZhc2lsZWlvcyBBbW9pcmlk
+aXMgd3JvdGU6DQo+IENvbnZlcnQgaXJxZF9nZXRfdHJpZ2dlcl90eXBlKGlycV9nZXRfaXJxX2Rh
+dGEoaXJxKSkgY2FzZXMgdG8gdGhlIG1vcmUNCj4gc2ltcGxlIGlycV9nZXRfdHJpZ2dlcl90eXBl
+KGlycSkuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBWYXNpbGVpb3MgQW1vaXJpZGlzIDx2YXNzaWxp
+c2FtaXJAZ21haWwuY29tPg0KPiAtLS0NCj4gIGRyaXZlcnMvbmV0L2RzYS9yZWFsdGVrL3J0bDgz
+NjVtYi5jIHwgMiArLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0
+aW9uKC0pDQoNCkxvb2tzIGxpa2UgeW91IG1pc3NlZCBteSByZXZpZXcgaGVyZSwgeW91IGNhbiBh
+ZGQgaXQgOikNCg0KUmV2aWV3ZWQtYnk6IEFsdmluIMWgaXByYWdhIDxhbHNpQGJhbmctb2x1ZnNl
+bi5kaz4=
 
