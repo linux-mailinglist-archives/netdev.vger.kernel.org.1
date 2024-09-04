@@ -1,175 +1,147 @@
-Return-Path: <netdev+bounces-124893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D448B96B491
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:31:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AD3596B48B
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8983C1F29171
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:31:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 137891F28FAC
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB801C7B93;
-	Wed,  4 Sep 2024 08:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="l1R87CEE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED80C18E032;
+	Wed,  4 Sep 2024 08:30:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0988A1C766A
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 08:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF9618D62A
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 08:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725438681; cv=none; b=bXi0TL+nHN4X6v1YeB0fP4DOArS2Coa+JO11V3jry1Ye5/hByMPigKNPUhzVuToEdtGfzVPouhasrWp8RGVbbGMEUzUSs9cMUmuigQmWUpH9/J8RzHCa3EafCULYdii9sXpiyTdm53r4Lh7yELNk5/SRRqW4sn4hkEczc3ivlbk=
+	t=1725438626; cv=none; b=q9CQRN69AcGnZMFJDUfYWYEiy+0UXBgh0GpNpK4/Kq78LesAdu5YO7djUYFtKP2nxyRWH5kQKw9zRhmYWwKm2DKoTJcUG4WOVapXa5j9IjL/TDgSY7m96WxiL2eg0mwe5RjRxkmnSKICpnOB+I/iAZ27ughAzGIQyIs5nfmMSrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725438681; c=relaxed/simple;
-	bh=5pgjtpjUtnZoOwptDjPJigWHbMdNWv0GlE6gtoZvEbA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=WYlOYrGh1tfFWeuWbXBBK7zZkJmhKBCE7TFglm2RXT5HIZfDbL9SbSTwwEPZNI+a2F95zYJSHyOSXr0utNCF2J+O+FxDbGQsoiorLyPr8nJBKnT1+NREDC8N4SdJggWJ6ueDvOxIDXRdoypSZBd3dkGv0R5z1mmCJ5Rb4PntUeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=l1R87CEE; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4848U4f2069537;
-	Wed, 4 Sep 2024 03:30:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1725438604;
-	bh=G29POPG0UZlJhsuL6jpWjf2R42HdJqLCC+bXbslOwLE=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=l1R87CEEMM9O486HHSXHUMRqAkdTNnXCAsY0+vd2eK1FFhF41kTo5KjYu0mL+wZrW
-	 8ck1FE5DCI/qzDCHwDUUR0zv4nvgnuhcGAdCnse4hHQco9eoNgWmukXHaVdKxahI7o
-	 b8nf+J9YrQ4NVOCxxE4qDkPP77Ja2SlUlqtnjbY4=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4848U2fG017286
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 4 Sep 2024 03:30:03 -0500
-Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 4
- Sep 2024 03:30:02 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE109.ent.ti.com
- (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 4 Sep 2024 03:30:02 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4848TknC097916;
-	Wed, 4 Sep 2024 03:29:47 -0500
-Message-ID: <01ed7b16-4ba8-470f-bdab-75e1b83b1525@ti.com>
-Date: Wed, 4 Sep 2024 13:59:43 +0530
+	s=arc-20240116; t=1725438626; c=relaxed/simple;
+	bh=qcSXkF2eeVbXnz/TGB7tvcwJtXcMcs1eddCFuoy6vt0=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=UMWKbr8vS9hoUiUdVp/mrWxbBdhddn8Ac0FR2zR7JEYg+GoJm9jmMlehvlqEN9iy9CCtmWAGa/LrLUQX95bg/YN2AkdXSx/JMhg3Ckdx7zsHjuqkXR58PkgTSAOZN+LNDPpdQ+r2gSNEIPZWGHS771qUdcM8hmR5BFhbucCJdOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82a21f28d87so71625739f.3
+        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 01:30:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725438624; x=1726043424;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=riEJj9yptEntwWm8uC4noCWANnp3aNiR1XVqLGvV3To=;
+        b=FyAAjwk1r9+8GnnH6FZVQe/Fy4bVIDtc25+zZ+GZoO9IiZnv0zG2pxiCt1gDRk7uiz
+         IkXT2Q+pTmtzY3YeteL4P5DuFMq4aNmgODMIdDCG/nwfe9ImAzCrfZ9V7mJJHL6rOq6/
+         ifgrIhxwhK3wKQ43liTp6iZwAm1NV/R5nM6OII+AVVxph7JEUS3lgTMMH95ift0blsi/
+         cUOEkUZgiB2jlxlf9uDnQ3VqFWZiDfdEKfYTJG/RDUG+uK/LU7Gh99CYrAG0u52Gl36g
+         qceJp8dkvX47cdbZf2W7t+Zk/2IRHAyILjvcMRT0ey5lKM55pfUsMSkVcYKDeHScO42U
+         UIZw==
+X-Forwarded-Encrypted: i=1; AJvYcCVfvurI/LMJ7fNkUnPk8RVSiUsWsC4i4tGD/184zIN9ujyJqsgIWwd+gd30BqUG4rlJzLq+zCQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzukbYQcRjGvI5/fyWVOHZQqdrjqeiOXS0qGisRB4DoAguJFlqH
+	OAxUhB8vAz/u7iCP+roHr40K4GnduGAFPknp9TVr9c3+owkBON7bZTpC604l7RfkA6nBQE262Go
+	ro3N08iM54sGcwrNKslc4jy3FDo10NbNlb6neV6/RURziWziW5fprPe8=
+X-Google-Smtp-Source: AGHT+IFf1N79VFCXobIPXbsA0DCA/+/jvIHiGNZkPocqGC8SqI64i4RB4lO0DtdwLR1uojTxi3MkPM7uX1EFYS4pE5neID6NzICK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 07/15] net: ti: icssg-prueth: Remove setting of
- RX software timestamp
-To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, Jay Vosburgh <jv@jvosburgh.net>,
-        Andy Gospodarek
-	<andy@greyhouse.net>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Vincent Mailhol
-	<mailhol.vincent@wanadoo.fr>,
-        Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-        Sudarsana Kalluru <skalluru@marvell.com>,
-        Manish Chopra
-	<manishc@marvell.com>,
-        Michael Chan <michael.chan@broadcom.com>,
-        Pavan Chebbi
-	<pavan.chebbi@broadcom.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-        Sunil Goutham
-	<sgoutham@marvell.com>,
-        Potnuri Bharat Teja <bharat@chelsio.com>,
-        Christian
- Benvenuti <benve@cisco.com>,
-        Satish Kharat <satishkh@cisco.com>,
-        Claudiu
- Manoil <claudiu.manoil@nxp.com>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
-        Shenwei Wang <shenwei.wang@nxp.com>,
-        Clark Wang
-	<xiaoning.wang@nxp.com>,
-        Dimitris Michailidis <dmichail@fungible.com>,
-        Yisen
- Zhuang <yisen.zhuang@huawei.com>,
-        Salil Mehta <salil.mehta@huawei.com>,
-        Jijie
- Shao <shaojijie@huawei.com>,
-        Tony Nguyen <anthony.l.nguyen@intel.com>,
-        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        Marcin Wojtas
-	<marcin.s.wojtas@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Geetha
- sowjanya <gakula@marvell.com>,
-        Subbaraya Sundeep <sbhatta@marvell.com>,
-        hariprasad <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
-        Petr
- Machata <petrm@nvidia.com>,
-        Bryan Whitehead <bryan.whitehead@microchip.com>,
-        <UNGLinuxDriver@microchip.com>,
-        Horatiu Vultur
-	<horatiu.vultur@microchip.com>,
-        Lars Povlsen <lars.povlsen@microchip.com>,
-        Steen Hegelund <Steen.Hegelund@microchip.com>,
-        Daniel Machon
-	<daniel.machon@microchip.com>,
-        Alexandre Belloni
-	<alexandre.belloni@bootlin.com>,
-        Shannon Nelson <shannon.nelson@amd.com>,
-        Brett Creeley <brett.creeley@amd.com>,
-        Sergey Shtylyov <s.shtylyov@omp.ru>,
-        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-        =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
-        Edward
- Cree <ecree.xilinx@gmail.com>,
-        Martin Habets <habetsm.xilinx@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Siddharth Vadapalli <s-vadapalli@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, Linus Walleij <linusw@kernel.org>,
-        Imre Kaloz <kaloz@openwrt.org>,
-        Richard
- Cochran <richardcochran@gmail.com>,
-        Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>,
-        Carolina Jubran <cjubran@nvidia.com>,
-        Rahul Rameshbabu <rrameshbabu@nvidia.com>
-References: <20240904074922.256275-1-gal@nvidia.com>
- <20240904074922.256275-8-gal@nvidia.com>
-Content-Language: en-US
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20240904074922.256275-8-gal@nvidia.com>
+X-Received: by 2002:a05:6638:860d:b0:4c2:7945:5a32 with SMTP id
+ 8926c6da1cb9f-4d05e776145mr84665173.5.1725438624417; Wed, 04 Sep 2024
+ 01:30:24 -0700 (PDT)
+Date: Wed, 04 Sep 2024 01:30:24 -0700
+In-Reply-To: <000000000000a45a92061ce6cc7d@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004a5da1062146fc27@google.com>
+Subject: Re: [syzbot] [wpan?] WARNING in __dev_change_net_namespace (2)
+From: syzbot <syzbot+1df6ffa7a6274ae264db@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, 
+	miquel.raynal@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    88fac17500f4 Merge tag 'fuse-fixes-6.11-rc7' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1547d653980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=660f6eb11f9c7dc5
+dashboard link: https://syzkaller.appspot.com/bug?extid=1df6ffa7a6274ae264db
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13bf3fdb980000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-88fac175.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/de92cf928379/vmlinux-88fac175.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/253b0e12054b/bzImage-88fac175.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1df6ffa7a6274ae264db@syzkaller.appspotmail.com
+
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
+R13: 0000000000000000 R14: 00007f95c6735f80 R15: 00007ffd0db2c528
+ </TASK>
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5268 at net/core/dev.c:11568 __dev_change_net_namespace+0x171a/0x1830 net/core/dev.c:11568
+Modules linked in:
+CPU: 0 UID: 0 PID: 5268 Comm: syz.0.15 Not tainted 6.11.0-rc6-syzkaller-00026-g88fac17500f4 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:__dev_change_net_namespace+0x171a/0x1830 net/core/dev.c:11568
+Code: 01 90 48 c7 c7 40 dc 0c 8d 48 c7 c6 20 dc 0c 8d ba c5 2c 00 00 e8 e6 d8 cb f7 90 0f 0b 90 90 e9 54 ea ff ff e8 a7 b4 09 f8 90 <0f> 0b 90 e9 4a fb ff ff e8 99 b4 09 f8 90 0f 0b 90 e9 d5 fe ff ff
+RSP: 0018:ffffc90002456fc0 EFLAGS: 00010293
+RAX: ffffffff8989d809 RBX: dffffc0000000000 RCX: ffff88801cbe2440
+RDX: 0000000000000000 RSI: 00000000fffffff4 RDI: 0000000000000000
+RBP: ffffc900024573f8 R08: ffffffff8989d349 R09: 1ffffffff283c909
+R10: dffffc0000000000 R11: fffffbfff283c90a R12: ffff88803362c1b8
+R13: ffff88803362cbf0 R14: ffff88803362c734 R15: 00000000fffffff4
+FS:  00007f95c734f6c0(0000) GS:ffff88801fe00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fd5dd5ec6d6 CR3: 0000000011730000 CR4: 0000000000350ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ dev_change_net_namespace include/linux/netdevice.h:3932 [inline]
+ cfg802154_switch_netns+0xc8/0x390 net/ieee802154/core.c:230
+ nl802154_wpan_phy_netns+0x13d/0x210 net/ieee802154/nl802154.c:1292
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2597
+ ___sys_sendmsg net/socket.c:2651 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2680
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f95c657cef9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f95c734f038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f95c6735f80 RCX: 00007f95c657cef9
+RDX: 0000000000000000 RSI: 0000000020000280 RDI: 0000000000000006
+RBP: 00007f95c734f090 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000002
+R13: 0000000000000000 R14: 00007f95c6735f80 R15: 00007ffd0db2c528
+ </TASK>
 
 
-
-On 04/09/24 1:19 pm, Gal Pressman wrote:
-> The responsibility for reporting of RX software timestamp has moved to
-> the core layer (see __ethtool_get_ts_info()), remove usage from the
-> device drivers.
-> 
-> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> Reviewed-by: Roger Quadros <rogerq@kernel.org>
-
-For TI ICSSG driver
-
-Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
-
--- 
-Thanks and Regards,
-Danish
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
