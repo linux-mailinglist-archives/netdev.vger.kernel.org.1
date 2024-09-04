@@ -1,107 +1,98 @@
-Return-Path: <netdev+bounces-124901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CF1096B579
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:51:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE9A796B575
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A9E8B2A284
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:51:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1F4DB280E7
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B33A61CB31D;
-	Wed,  4 Sep 2024 08:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7571CC881;
+	Wed,  4 Sep 2024 08:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="XI+3BHKk"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22FF8289A;
-	Wed,  4 Sep 2024 08:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC4116F824;
+	Wed,  4 Sep 2024 08:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725439849; cv=none; b=NwuRL5+ljtgILnmdckHn+kNDVdd4Qj1WcWT+nH7QjtWCfp6lqdZ50YrCzaubhHBfuVKv7YRkPaHT/n9P9p+dWLVjbfXtVX0a0SW5MR7rIUwAZJsTHlWUtq73WqyWS2GldOS+jecVOIjWL4+SsG2CHpRbAqFBhWiWOqSVmP1Q950=
+	t=1725439764; cv=none; b=VD9UeXSnPvh6Kj75HdLUJgEgRq2QU6QiqIQYiNsB7BTnnpfHiNxC4MVeV0KFDiS0quU/f9yqTJHWdqdVVRVe+zmBpz0DiDoMRtYCEzwf2g1lu3h6JDuyxAEocAwm7xc0WvE+WVDtFhf0PcDxXIMtG5ShVcTdvzpgN5NtySxdcD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725439849; c=relaxed/simple;
-	bh=Hu7Cv+/P68Gjv6uR7It+OBWQarruRe49jBw2+3DS2eE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Hai3QfWXKjKVjWGi8E9Ohwz1qtwk6eEuIU78JChFJtdS+lmod0mlHXk66re0h8bvxUJlKK7Pce2ZFLYKEHUrHpXUKiKMIEgB8dRxi1PYtgwgGVFgsttiO1O+UoSMOF+lsRm8/5AjDC/Ciqx9whjWLIYMUJce6faPiDZwCHhjKcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost (unknown [124.16.138.129])
-	by APP-05 (Coremail) with SMTP id zQCowABHK+tcH9hmqlkpAQ--.6207S2;
-	Wed, 04 Sep 2024 16:50:36 +0800 (CST)
-From: Chen Ni <nichen@iscas.ac.cn>
-To: ecree.xilinx@gmail.com,
-	habetsm.xilinx@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-net-drivers@amd.com,
-	linux-kernel@vger.kernel.org,
-	Chen Ni <nichen@iscas.ac.cn>
-Subject: [PATCH net-next] sfc: convert comma to semicolon
-Date: Wed,  4 Sep 2024 16:49:51 +0800
-Message-Id: <20240904084951.1353518-1-nichen@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1725439764; c=relaxed/simple;
+	bh=Nc1emj1+sVtZbo4IHO9UaqkbgItQAQDWG19sR8DLfgw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UBGRl2sB3dIG4oeRBZaV4aGW16Di7cZfNV6ync/5TBSCCGJeIQdpoir7Up83vExSkkUWmLjiHOyaQlfwONedS6nAyB2B6e8R650xACdzOcYhp/ptwN8GxRTrB/lJqPcD5F2Zebo6a+5onk/be+LKXJT8qD8SIEx7KQW6EpCenMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=XI+3BHKk; arc=none smtp.client-ip=185.11.138.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
+	s=gloria202408; h=Content-Type:Content-Transfer-Encoding:MIME-Version:
+	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=64Jy7Anr49mmXZNGV3iO4Xkyk9gN0bNX/x2F4h/amIA=; b=XI+3BHKkmeSYSxudJttkjn+QY6
+	0lgJBVa1nlNtFNhR+YTCrDl8ZAI+5S3SdHjveyAcb6bYLic7L2rQjEs0w7ZiCJEECh3IB2i4h1et/
+	Oy9dGhztMKznM9Xu8t6vmjxZBvO9vuL7ZL3sh0uvKAYHnIJK+YsxkHpnYlcFB2ABh36nQNkXg8DVC
+	+Wh1SMHzCVZcJzjrZ31V3E073ho0JuSs3Ok1Dsj4vkSkgJePSe5izJQrKlyv3YQyLiNa9JEhpxM9X
+	K76Sdl+OhPnw5STBApwkKNzT385Vt96fb6CBdlxVI5v4g+8fsob2CpSBN7k5neckjtwvUpWQphIyc
+	GqW+39iA==;
+Received: from i5e860d0f.versanet.de ([94.134.13.15] helo=diego.localnet)
+	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <heiko@sntech.de>)
+	id 1sllhQ-0006YS-QX; Wed, 04 Sep 2024 10:49:12 +0200
+From: Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To: kernel@pengutronix.de, Alibek Omarov <a1ba.omarov@gmail.com>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>,
+ Elaine Zhang <zhangqing@rock-chips.com>,
+ David Jander <david.jander@protonic.nl>,
+ Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Simon Horman <horms@kernel.org>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>,
+ David Jander <david@protonic.nl>
+Subject:
+ Re: [PATCH can-next v5 02/20] arm64: dts: rockchip: add CAN-FD controller
+ nodes to rk3568
+Date: Wed, 04 Sep 2024 10:50:57 +0200
+Message-ID: <3673727.WbyNdk4fJJ@diego>
+In-Reply-To: <20240904-rockchip-canfd-v5-2-8ae22bcb27cc@pengutronix.de>
+References:
+ <20240904-rockchip-canfd-v5-0-8ae22bcb27cc@pengutronix.de>
+ <20240904-rockchip-canfd-v5-2-8ae22bcb27cc@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowABHK+tcH9hmqlkpAQ--.6207S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7Gr4rCw4kuw4kuw1xGrW3ZFb_yoWkKFgEgr
-	y2qws3uF4q9ayjyF15Cr4fZasIkFykZa4xAF9Fqry3trWDJa1UGwnY9r13A3srGrsFkr17
-	ArsrWFWrZa4IkjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbfkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Cr0_
-	Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jw0_WrylYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r
-	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02
-	628vn2kIc2xKxwCY1x0262kKe7AKxVWUtVW8ZwCY02Avz4vE14v_GFyl42xK82IYc2Ij64
-	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
-	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2I
-	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK
-	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I
-	0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfU518BUUUUU
-X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 
-Replace comma between expressions with semicolons.
+Am Mittwoch, 4. September 2024, 10:12:46 CEST schrieb Marc Kleine-Budde:
+> From: David Jander <david@protonic.nl>
+> 
+> Add nodes to the rk3568 devicetree to support the CAN-FD controllers.
+> 
+> Signed-off-by: David Jander <david@protonic.nl>
+> Tested-by: Alibek Omarov <a1ba.omarov@gmail.com>
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-Using a ',' in place of a ';' can have unintended side effects.
-Although that is not the case here, it is seems best to use ';'
-unless ',' is intended.
+Reviewed-by: Heiko Stuebner <heiko@sntech.de>
 
-Found by inspection.
-No functional change intended.
-Compile tested only.
 
-Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
----
- drivers/net/ethernet/sfc/ptp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/sfc/ptp.c b/drivers/net/ethernet/sfc/ptp.c
-index 6fd2fdbaa418..aaacdcfa54ae 100644
---- a/drivers/net/ethernet/sfc/ptp.c
-+++ b/drivers/net/ethernet/sfc/ptp.c
-@@ -884,7 +884,7 @@ static void efx_ptp_read_timeset(MCDI_DECLARE_STRUCT_PTR(data),
- 	timeset->host_start = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTSTART);
- 	timeset->major = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_MAJOR);
- 	timeset->minor = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_MINOR);
--	timeset->host_end = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTEND),
-+	timeset->host_end = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTEND);
- 	timeset->wait = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_WAITNS);
- 
- 	/* Ignore seconds */
--- 
-2.25.1
 
 
