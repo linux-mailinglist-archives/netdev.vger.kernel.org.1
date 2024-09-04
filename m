@@ -1,135 +1,134 @@
-Return-Path: <netdev+bounces-125048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB7596BBDA
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:18:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D152096BBE7
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB6781C20D24
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:18:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C7D6288368
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253F81D88C6;
-	Wed,  4 Sep 2024 12:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2001D86DF;
+	Wed,  4 Sep 2024 12:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="fapWj3os"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out203-205-221-235.mail.qq.com (out203-205-221-235.mail.qq.com [203.205.221.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265241D79B9
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 12:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41031D4175;
+	Wed,  4 Sep 2024 12:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725452282; cv=none; b=Tc0BC2gMMsi4YqIWPGWA/nxyXhPuLX8HTKk0Lo0vKG4c2yx2fyh9jwEVC6rEkFpP6GLyxaNYo7iZC4Li1hI0lyl9s/vbq70Cro8ASsMA1mclngl71MwihlBFG/vYQ0qubk4wOHZFII/3J+LxHuSAD5+CU77bu6RNvLjEbhsMI/A=
+	t=1725452408; cv=none; b=prekScTBgCkhn8KQOZzGM84sJKI+XCbgUvzfboAtjMU0L5sb3GwfZ8nBjubaAI6og2uHkA85WM/r1FlG4tD00dtlh2vBHeaYxV/c7dQnuT0dTjTLei5maa9vhzlMRDNKcKpQHBfZxQ8OdmXgRYstouppi3pUsKDLJRBDJ2WLnqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725452282; c=relaxed/simple;
-	bh=Yzd7UcsDmj5BomshsbXtZwnblwWOH7/ztgZSj4rzjko=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=n8ql03ShNQ0P8AvmCrZi7/npR5GSEuxbmNS7IEovvNfgfXUmrhd1sj7zXPfcpESJyedkMWJZkcVC2s24+pnGLpdH0/uctl9nBdYeC5vOq+pW9ro56MdrKN3VGHI6qkkgE6L498EUekv/QGFcRhj9Bd0GQdWQMqStpEkFH72jrCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <s.hauer@pengutronix.de>)
-	id 1sloxJ-00074z-S0; Wed, 04 Sep 2024 14:17:49 +0200
-Received: from [2a0a:edc0:0:1101:1d::28] (helo=dude02.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <s.hauer@pengutronix.de>)
-	id 1sloxI-005RvM-7E; Wed, 04 Sep 2024 14:17:48 +0200
-Received: from localhost ([::1] helo=dude02.red.stw.pengutronix.de)
-	by dude02.red.stw.pengutronix.de with esmtp (Exim 4.96)
-	(envelope-from <s.hauer@pengutronix.de>)
-	id 1sloxI-002c07-0Q;
-	Wed, 04 Sep 2024 14:17:48 +0200
-From: Sascha Hauer <s.hauer@pengutronix.de>
-Date: Wed, 04 Sep 2024 14:17:41 +0200
-Subject: [PATCH] net: tls: wait for async completion on last message
+	s=arc-20240116; t=1725452408; c=relaxed/simple;
+	bh=BzSR+iF80WBX+uueKwT7tQdRcX9cS6wGP+R5wlC6WBI=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=oWFrtncrGCpQHkNrWvnJYQTd1HzOGawXo/1R5ofImvax2k6T4qCTURFsj7x8JBZQd25E4FUwSaKgTLplN5uB1Ypjx/MfpU/0NzuaC+7Z186Hr9W4B8urbh6L1QZqaJ+SaWQj/Gkc2w9w3ND5Uf4aFR1co8vJqK92Aq7C3Q1sFc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=fapWj3os; arc=none smtp.client-ip=203.205.221.235
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1725452396;
+	bh=mD6Sm4uUq8ujV/RDO5ndOtiCjedlBdoHLSnc4vE9J64=;
+	h=From:To:Cc:Subject:Date;
+	b=fapWj3osGaeAAuxVZqzmosZWl9pZ6YWpzDoTFV829xnvynRIJvW0y9DrrnZCfWu7P
+	 SYU18D+XMhV9oCErPrGKyJu95B1s5f9kKyb5qxguOBjq2tYvDBGMCKK6nC6dAX1MIz
+	 eM9mSpnM3qUNUdPK/NBIvPNoVgEgKHG1SGIS9e8w=
+Received: from localhost.localdomain ([114.246.200.160])
+	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
+	id 4AB12AD4; Wed, 04 Sep 2024 20:18:43 +0800
+X-QQ-mid: xmsmtpt1725452323t1inlzbgz
+Message-ID: <tencent_DE4D2D0FE82F3CA9294AEEB3A949A44F6008@qq.com>
+X-QQ-XMAILINFO: MmpliBmRb3iCZG+tszeXk1rzRTEAY7Bed4qo4m+KlRYfIVoyBGpwOVX4mO77ZY
+	 b+Xqy7SLZGWfrwnRHtOZNdCwN0OniQ7xIFUh/h7DIjjwpabvomfISJlDDVQNTPZMEgs5X9jDXHVt
+	 EI6aJ0+4YZKMbbgGdZLsivYIdrX6Ntu+8P/CvzP+jBaUBDvJXQ6RbfvFbQuSFD5K5vztokPsFVvP
+	 rJx/qdevWPaI1vUP+yng0vTrlBElocp2DV3z/X3ur7ydURKBzJ2kyPsTX07Fn4Y6UmMi2Bo3scwg
+	 qoz/FupAX3gyrTLU7nfmAO+aqaZotXR8XUH0s3hv0dhPwm0vfvxMbDrEVPqZTsp9+NFSN5pDCJnR
+	 3fFSkfTi3nOaz3ovfcIrnFxXkEqsx0FQkgO4wCNSf48uT9Lel2SfYoo+3QYtnYBewEbzesiQxOVN
+	 VtY2RuwN4zCB/IqS7m5FFsWGTi7gC0OFydSJYTtxFuB2r0nC0ak9tVTG0TcEAzHI9vE9I2MIoG4k
+	 7jylnykNoETtb3+CTTCoQ6oeMkdb0WuqXpDefxtGJVbl6fCn915yRD1qYi52rsJYLRMNSr15L3/2
+	 /qS4sZ5a8X4HdrN0YhSCLrFakVTx9PkZp0Z/+i32jcy2p4eOMHKbCITYZaFg3b0ZL3SUXSJszdl9
+	 yJtMYM1jzGtNr2hnYTgvOFNbZc4AvB/IANS21jaYztmeeCizsRnel5+qSDayX/2HAHCFdSzZ/Wq4
+	 w3YCvqoEgYv1tc1vIaS+GAScGfAtixgoAToaMdNassMj3OBVNWq9h8IDspXkO/279ix7+zdDL443
+	 M4X2oCQvv35/uBifzzqsw3GadbkipXnQISvF+3fN1Iz3I6A8NvvNlDHN+2MGfSMrZbtbxAcce4dd
+	 WmNz9LbIGPB+rIbG02VImw0wrspwCZ7wuYbw+LU7ZTdk3n4KWjgTuKgN/R9QZ4gZFN2yF1XijfMK
+	 iDKB+CW4LYhfKP1VsnoDgJmhLJr45tN4wEm/Pc2lm7/+DdIbdmfmcU0HKwHOYcGQvGoNEDEWyKme
+	 Rs4Y83ST+9oJMc2RwDahIs3S/buMKkJXxGUTYMEalA8PGxdi27g9gagYQ6PS8=
+X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
+From: Jiawei Ye <jiawei.ye@foxmail.com>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	fw@strlen.de
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] netfilter: tproxy: Add RCU protection in nf_tproxy_laddr4
+Date: Wed,  4 Sep 2024 12:18:42 +0000
+X-OQ-MSGID: <20240904121842.981264-1-jiawei.ye@foxmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240904-ktls-wait-async-v1-1-a62892833110@pengutronix.de>
-X-B4-Tracking: v=1; b=H4sIAORP2GYC/x3M3QpAQBBA4VfRXJtaLMWryMXELBMt7chP8u42l
- 9/FOQ8oB2GFJnkg8CEqq4/I0gT6ifzIKEM05Ca3pjYW531RPEl2JL19j4Ys11RmhascxGoL7OT
- 6j233vh921m7eYQAAAA==
-To: Boris Pismenny <borisp@nvidia.com>, 
- John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
- kernel@pengutronix.de, Sascha Hauer <s.hauer@pengutronix.de>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1725452268; l=1916;
- i=s.hauer@pengutronix.de; s=20230412; h=from:subject:message-id;
- bh=Yzd7UcsDmj5BomshsbXtZwnblwWOH7/ztgZSj4rzjko=;
- b=cOvHuO/TzZbOz5d+f3OFQgHU03gt8IXPB85njXsOGBKqXyi9128TjqlDt9GevSRF8nrQ/NJYz
- iWbn2iW7ZlQCdHb+/gh5hQEk/nTH1b5qSZVOkN9VNoHLv+tXQPZgNPA
-X-Developer-Key: i=s.hauer@pengutronix.de; a=ed25519;
- pk=4kuc9ocmECiBJKWxYgqyhtZOHj5AWi7+d0n/UjhkwTg=
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: s.hauer@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-When asynchronous encryption is used KTLS sends out the final data at
-proto->close time. This becomes problematic when the task calling
-close() receives a signal. In this case it can happen that
-tcp_sendmsg_locked() called at close time returns -ERESTARTSYS and the
-final data is not sent.
+In the `nf_tproxy_laddr4` function, both the `__in_dev_get_rcu()` call
+and the `in_dev_for_each_ifa_rcu()` macro are used to access
+RCU-protected data structures. Previously, these accesses were not
+enclosed within an RCU read-side critical section, which violates RCU
+usage rules and can lead to race conditions, data inconsistencies, and
+memory corruption issues.
 
-The described situation happens when KTLS is used in conjunction with
-io_uring, as io_uring uses task_work_add() to add work to the current
-userspace task. A discussion of the problem along with a reproducer can
-be found in [1] and [2]
+This possible bug was identified using a static analysis tool developed
+by myself, specifically designed to detect RCU-related issues.
 
-Fix this by waiting for the asynchronous encryption to be completed on
-the final message. With this there is no data left to be sent at close
-time.
+To address this, `rcu_read_lock()` and `rcu_read_unlock()` are added
+around the RCU-protected operations in the `nf_tproxy_laddr4` function by
+acquiring the RCU read lock before calling `__in_dev_get_rcu()` and
+iterating with `in_dev_for_each_ifa_rcu()`. This change prevents
+potential RCU issues and adheres to proper RCU usage patterns.
 
-[1] https://lore.kernel.org/all/20231010141932.GD3114228@pengutronix.de/
-[2] https://lore.kernel.org/all/20240315100159.3898944-1-s.hauer@pengutronix.de/
-
-Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+Fixes: b8d19572367b ("netfilter: use in_dev_for_each_ifa_rcu")
+Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
 ---
+ net/ipv4/netfilter/nf_tproxy_ipv4.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-A previous attempt to solve this problem can be found here:
-
-https://lore.kernel.org/all/20240410-ktls-defer-close-v1-1-b59e6626b8e4@pengutronix.de/
-
-This patch had KASAN issues when running the tls selftests. This is
-a new approach, solving the issue at send time, not at close time. This
-patch can now run the tls selftests successfully.
----
- net/tls/tls_sw.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 305a412785f50..bbf26cc4f6ee2 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -1201,7 +1201,7 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+diff --git a/net/ipv4/netfilter/nf_tproxy_ipv4.c b/net/ipv4/netfilter/nf_tproxy_ipv4.c
+index 73e66a088e25..51ff9c337e71 100644
+--- a/net/ipv4/netfilter/nf_tproxy_ipv4.c
++++ b/net/ipv4/netfilter/nf_tproxy_ipv4.c
+@@ -57,8 +57,10 @@ __be32 nf_tproxy_laddr4(struct sk_buff *skb, __be32 user_laddr, __be32 daddr)
+ 		return user_laddr;
  
- 	if (!num_async) {
- 		goto send_end;
--	} else if (num_zc) {
-+	} else if (num_zc || eor) {
- 		int err;
+ 	laddr = 0;
++	rcu_read_lock();
+ 	indev = __in_dev_get_rcu(skb->dev);
+ 	if (!indev)
++		rcu_read_unlock();
+ 		return daddr;
  
- 		/* Wait for pending encryptions to get completed */
-
----
-base-commit: 431c1646e1f86b949fa3685efc50b660a364c2b6
-change-id: 20240904-ktls-wait-async-0a4e9a513f6f
-
-Best regards,
+ 	in_dev_for_each_ifa_rcu(ifa, indev) {
+@@ -68,6 +70,7 @@ __be32 nf_tproxy_laddr4(struct sk_buff *skb, __be32 user_laddr, __be32 daddr)
+ 		laddr = ifa->ifa_local;
+ 		break;
+ 	}
++	rcu_read_unlock();
+ 
+ 	return laddr ? laddr : daddr;
+ }
 -- 
-Sascha Hauer <s.hauer@pengutronix.de>
+2.34.1
 
 
