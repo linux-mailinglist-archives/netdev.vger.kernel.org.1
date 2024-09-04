@@ -1,110 +1,195 @@
-Return-Path: <netdev+bounces-124800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7455496AF4A
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 05:27:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3D5396AF78
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 05:33:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FCAA1C23B98
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 03:27:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B7AF2853CA
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 03:33:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB40450A80;
-	Wed,  4 Sep 2024 03:26:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0312482D8;
+	Wed,  4 Sep 2024 03:33:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="MMylalTG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DjKICXcq"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBD04AEE6;
-	Wed,  4 Sep 2024 03:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36293211
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 03:33:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725420391; cv=none; b=BqLfw/fFLwMtB5LHZ9GOp3km6xcAYDuxEOiu1h2Mx4BpvreosbMcc7khiMSh7NIyEFiNEb+Fd0/7pzckiW/aBNVyLZBGZOfP6Xnbf9uMlhnCtGnCnveyxtalhETRtThvfcAgQfmux2cfiFbclRDfAwz8szDQnU1mtBHRHnio2OQ=
+	t=1725420830; cv=none; b=KoVBFr5yjnatAwJS+Y/PBDZcD/n97T9r/RVYlQviDTkLzKmXNsdppUA8/nF34YRmwjjcGRBzJfiWT9rCYIe/JM038P8s9vBjcxRsRCyHPfPc1NjT7W9OjDDcEGwBXGb3TGIUgvx9CEA7KM0D7oFUnufdNpltoILQNrUztE+008k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725420391; c=relaxed/simple;
-	bh=s3iYt5e2TmkyeeA8g783ZeoXYGtRUq9Wb2fY2EzMyz4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SOiL4J+VkMs6qqszjdMr0dGXuaAUZws6ALdahpW6lw3YNoLqOYpedYan3vTdmExXvnTSAn6X/k3JYA6ekwuByXfY7L7EZy8xY2A1zNmjJGBTqAvFuyUzHOI2x3X6raGxif1tBuJcpHr4JcM2x94v7CImnlRV5N5yH8cg2ao7gSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=MMylalTG; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4843Q4WZ02043187, This message is accepted by code: ctloc85258
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1725420364; bh=s3iYt5e2TmkyeeA8g783ZeoXYGtRUq9Wb2fY2EzMyz4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=MMylalTGH2CfWE/2Zb0HpU52dpgH09jZLQ2KiaPyieHxBh9hRFoJQ6yzUYBnED53e
-	 5fLYi4sNDpqBwWTnxlWN73lSmdSTm3ynDFnz8iXy5RLe4dOkX1N0drA1SXUIrqkbBF
-	 Gp1pgScvwVIV4cmkv8KKqDLLNqfCRernZW9PMdkswHXGCy0bShmhwcxmb+dcOH1NzR
-	 YRk2jAGRDOeLRjlJlBNdSp2BoSXWt9oLSNa/HbGTH/t9qrEV87tgZD0S5nK6PPAp+2
-	 KM65Eix2yTu4ugoFZbm0kjce+pWqWhTzcr5caJlQmJvjia/b7VBixEMked5eLGmMh3
-	 h0gv6Wjrg1KNQ==
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 4843Q4WZ02043187
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 4 Sep 2024 11:26:04 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 4 Sep 2024 11:26:05 +0800
-Received: from RTDOMAIN (172.21.210.74) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 4 Sep
- 2024 11:26:04 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <andrew@lunn.ch>, <jiri@resnulli.us>, <horms@kernel.org>,
-        <rkannoth@marvell.com>, <jdamato@fastly.com>, <pkshih@realtek.com>,
-        <larry.chiu@realtek.com>, "Justin
- Lai" <justinlai0215@realtek.com>
-Subject: [PATCH net-next v30 13/13] MAINTAINERS: Add the rtase ethernet driver entry
-Date: Wed, 4 Sep 2024 11:21:14 +0800
-Message-ID: <20240904032114.247117-14-justinlai0215@realtek.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240904032114.247117-1-justinlai0215@realtek.com>
-References: <20240904032114.247117-1-justinlai0215@realtek.com>
+	s=arc-20240116; t=1725420830; c=relaxed/simple;
+	bh=hgAJ0G+zWRgAsGuwuikNrsCbsktLUkO9C80k/m7wAwg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H+XwXCvlMz8eBrInWDBstx1U6ZthGsZaz72UNyHejbPULJt3XZHz9eGzJA/uvhNwSJvZvYSOLsnpfxaQz0Vfxo3DXPtIwr+HK85b9227fuzVmHSfFskjMp4tKE0OI2bSGUlq4p7umDwsNUfm4fpCO3u3KXBddCMZqBlTOBiBcZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DjKICXcq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725420827;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UPH/NDUA6JCfNpeXnclr1Ul7poQshF471VRZNTn0m0A=;
+	b=DjKICXcq53Q3uTbAVFkM92hi1pIEAqLgu5gnyNyUWOE7Ilf5hnM+wAspRwXKL5aEJ/rAOy
+	4U3pVWLFkBq/0iw1uQXy5Sk2yUrJhM1OwANfhicT8za0RjzforQZPQ7WJ+cRKU8WqdkFti
+	OjX1gXPtsnBkoW1tcysh2V1rls0DupM=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-679-iR8xSThzPy-sULfr_k3iiQ-1; Tue, 03 Sep 2024 23:33:45 -0400
+X-MC-Unique: iR8xSThzPy-sULfr_k3iiQ-1
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-7cd98f27becso6338681a12.3
+        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 20:33:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725420824; x=1726025624;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UPH/NDUA6JCfNpeXnclr1Ul7poQshF471VRZNTn0m0A=;
+        b=Kt8nZ9YEx8rlUf7A6onNayyFm8FsE7rGOA+xKBzUO72DtPT8f/I1gU+Mxk8gUq4pME
+         KRzToibreAR9MlOMBUBHRYCqCjUJm7o4vCAGIP5cIOaRY4gtL4ELRKBkjeD6HAtY3kt9
+         zcKmcxAG66+uMCMXvg5GwJJzRTz22bywT1tkn1OWcoH4W6ScmBKvtDSQiW/HxHDKnunJ
+         x9+A+xbA6MPcnDxdRDozQpN7wtwzKxhs0g97c3MJVbkOY1WuaeXY8RfUz5XxU8qZaxbv
+         foaLTX/BlpsaL0SfTvMekWlHXPEsw1KOoNPzeYB5e8KOG3nsJrI4SAgjKaTQ+I0dhvem
+         ytfg==
+X-Forwarded-Encrypted: i=1; AJvYcCWMhcx9rjybPia3PehhedLM6ClwemSR77YMunuDDo0BhcRWCfwL5JX2kMY+y94xFFOskMFAEpE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyleVaOnwDMa2OhUWgs4X6v+LYlxJuyql8VoynrDzZhznEK1HDW
+	9QJzBatHGl4jBLa9nFdK+kkJprYIp/g0Odt3S07/DUEPFoIeTr3zqM1rq8M0oajrRJa2BZKZgxJ
+	RP/ncuHE91eulHr4Hfa9Eek1BR9xzwZ1uSeE4/WT+lkDBkfYC6S00ZHpva06hlkTKJKQUf58QUE
+	rQEl7PdxMA5F+gLQe459h9qGip2KgB
+X-Received: by 2002:a05:6a20:b40a:b0:1ce:f77a:67e5 with SMTP id adf61e73a8af0-1cef77a69f1mr6272674637.47.1725420824272;
+        Tue, 03 Sep 2024 20:33:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHHynsWjnc8t9TYg6z41C4ZK79KT9vx1+7WyBbowaBWG6oiBmeW9D+MnJkJXz5si8RSgMEcmX6LwYH2QcayKr4=
+X-Received: by 2002:a05:6a20:b40a:b0:1ce:f77a:67e5 with SMTP id
+ adf61e73a8af0-1cef77a69f1mr6272655637.47.1725420823770; Tue, 03 Sep 2024
+ 20:33:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
+References: <20240904023339.77456-1-liwenbo.martin@bytedance.com>
+In-Reply-To: <20240904023339.77456-1-liwenbo.martin@bytedance.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 4 Sep 2024 11:33:32 +0800
+Message-ID: <CACGkMEuH4ERuvGPPzBvmAT0B51ccbeBvE=PiQxn2s-J_wXugOg@mail.gmail.com>
+Subject: Re: [PATCH] virtio_net: Fix mismatched buf address when unmapping for
+ small packets
+To: Wenbo Li <liwenbo.martin@bytedance.com>
+Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jiahui Cen <cenjiahui@bytedance.com>, 
+	Ying Fang <fangying.tommy@bytedance.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add myself and Larry Chiu as the maintainer for the rtase ethernet driver.
+On Wed, Sep 4, 2024 at 10:51=E2=80=AFAM Wenbo Li <liwenbo.martin@bytedance.=
+com> wrote:
+>
+> Currently, the virtio-net driver will perform a pre-dma-mapping for
+> small or mergeable RX buffer. But for small packets, a mismatched address
+> without VIRTNET_RX_PAD and xdp_headroom is used for unmapping.
+>
+> That will result in unsynchronized buffers when SWIOTLB is enabled, for
+> example, when running as a TDX guest.
+>
+> This patch handles small and mergeable packets separately and fixes
+> the mismatched buffer address.
+>
 
-Signed-off-by: Justin Lai <justinlai0215@realtek.com>
----
- MAINTAINERS | 7 +++++++
- 1 file changed, 7 insertions(+)
+Missing fixes tag.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index baf88e74c907..791ed432d024 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -19878,6 +19878,13 @@ L:	linux-remoteproc@vger.kernel.org
- S:	Maintained
- F:	drivers/tty/rpmsg_tty.c
- 
-+RTASE ETHERNET DRIVER
-+M:	Justin Lai <justinlai0215@realtek.com>
-+M:	Larry Chiu <larry.chiu@realtek.com>
-+L:	netdev@vger.kernel.org
-+S:	Maintained
-+F:	drivers/net/ethernet/realtek/rtase/
-+
- RTL2830 MEDIA DRIVER
- L:	linux-media@vger.kernel.org
- S:	Orphan
--- 
-2.34.1
+> Signed-off-by: Wenbo Li <liwenbo.martin@bytedance.com>
+> Signed-off-by: Jiahui Cen <cenjiahui@bytedance.com>
+> Signed-off-by: Ying Fang <fangying.tommy@bytedance.com>
+> ---
+>  drivers/net/virtio_net.c | 26 +++++++++++++++++++++++++-
+>  1 file changed, 25 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index c6af18948..6215b66d8 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -891,6 +891,20 @@ static void *virtnet_rq_get_buf(struct receive_queue=
+ *rq, u32 *len, void **ctx)
+>         return buf;
+>  }
+>
+> +static void *virtnet_rq_get_buf_small(struct receive_queue *rq,
+> +                                     u32 *len,
+> +                                     void **ctx,
+> +                                     unsigned int header_offset)
+> +{
+> +       void *buf;
+> +
+> +       buf =3D virtqueue_get_buf_ctx(rq->vq, len, ctx);
+> +       if (buf)
+> +               virtnet_rq_unmap(rq, buf + header_offset, *len);
+> +
+> +       return buf;
+> +}
+> +
+>  static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, =
+u32 len)
+>  {
+>         struct virtnet_rq_dma *dma;
+> @@ -2692,13 +2706,23 @@ static int virtnet_receive_packets(struct virtnet=
+_info *vi,
+>         int packets =3D 0;
+>         void *buf;
+>
+> -       if (!vi->big_packets || vi->mergeable_rx_bufs) {
+> +       if (vi->mergeable_rx_bufs) {
+>                 void *ctx;
+>                 while (packets < budget &&
+>                        (buf =3D virtnet_rq_get_buf(rq, &len, &ctx))) {
+>                         receive_buf(vi, rq, buf, len, ctx, xdp_xmit, stat=
+s);
+>                         packets++;
+>                 }
+> +       } else if (!vi->big_packets) {
+> +               void *ctx;
+> +               unsigned int xdp_headroom =3D virtnet_get_headroom(vi);
+
+I wonder if this is safe. The headroom is stored as the context, it
+looks to me we should fetch the headroom there.
+
+The rx buffer could be allocated before XDP is disabled. For example we had=
+ this
+
+        unsigned int xdp_headroom =3D (unsigned long)ctx;
+
+at the beginning of receive_small().
+
+
+> +               unsigned int header_offset =3D VIRTNET_RX_PAD + xdp_headr=
+oom;
+> +
+> +               while (packets < budget &&
+> +                      (buf =3D virtnet_rq_get_buf_small(rq, &len, &ctx, =
+header_offset))) {
+> +                       receive_buf(vi, rq, buf, len, ctx, xdp_xmit, stat=
+s);
+> +                       packets++;
+> +               }
+>         } else {
+>                 while (packets < budget &&
+>                        (buf =3D virtqueue_get_buf(rq->vq, &len)) !=3D NUL=
+L) {
+> --
+> 2.20.1
+>
+
+Thanks
 
 
