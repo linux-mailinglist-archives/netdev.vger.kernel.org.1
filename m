@@ -1,171 +1,104 @@
-Return-Path: <netdev+bounces-125039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABF3896BB4C
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:53:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD5696BB6E
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:02:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 333611F21B6C
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:53:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BFE2B26B85
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF85C1D2F69;
-	Wed,  4 Sep 2024 11:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DCE31D47D8;
+	Wed,  4 Sep 2024 12:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ULANAis+"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Je2jbdNW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+Received: from forward205a.mail.yandex.net (forward205a.mail.yandex.net [178.154.239.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB868170A0E
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 11:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D431CCEE3
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 12:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725450804; cv=none; b=N3yw/sNTYK0SykxrrdDQFljhiEsXlttdXeSnFvBD1QG6mU47sC8RSKn7MxJqxt1289VCqpGfFzP+n4vkafxyzwer3zyUJZPI+9hfjFvXNw+FOFnci1m/XAn8mzI10QnvGeEU88TQOw/H9xCejkZjVRQh9GGudlhsGzOn0A1g8vA=
+	t=1725451237; cv=none; b=kI0Hb8Do2O54NFmGJadMuwWANBs4n7uvM9z3vjsJEEjZdCuI1PNa6g3efMVqQhV1ZWo6rhX7wzS1yMUUNpiaw3bYgUclsV8TiAfD/J71+EMp0HXJWJO8U8cirepqSvFCMdPk2JkKzymQ/heGKL8W7AovsUMYHRtC8hbbdQ5413k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725450804; c=relaxed/simple;
-	bh=23yD5+8tZ8DaU8E05WC/5m4SyJAaPulKcopDR2rc6aw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z70+nBZzDPD5w8BUGj2eTMJMCRQA+01W6oW/uLU2bLPLAPkgN4YcxhsKhK+1Ba3smYYvreZBR2p1CRxtudcSzfqgr9wpxrVPvgcIXeIUTukY8aT9xxYLc01TyugdZUSwdiVc9S/wx3kZzMNyi8b/fCFvNjFZYuLqI0ehoRVetA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ULANAis+; arc=none smtp.client-ip=95.215.58.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <aaf9263b-931e-4b1d-8aea-1218faec2802@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725450801;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QFiH4KOZRANCzSNai8Ri8tlxbgvrk+fsfchgGWYrvXw=;
-	b=ULANAis+a2/1UYoZjNydgOOsdo6FYcZWnd9FBSfqr2BPHPtM8GHWNoVz7Ysg1W0zTSVumx
-	FMjzpWVS8/gXuB2a4wnrWn3EJBWv/1kMdqi4y45tfNADcc999CN1zUodcFRTiP6w/dzJXg
-	i92i6u/A5uR5IBsk0frQdivctUH7pL8=
-Date: Wed, 4 Sep 2024 19:53:12 +0800
+	s=arc-20240116; t=1725451237; c=relaxed/simple;
+	bh=NK3HEwyhysXJUEAEB2V8uNRVrXlRS+XEw1TYa8NZkog=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LvsOOaTSqhfXA7BGCkVj8Z/QNdG6wDzahMfjgYitYIQZ9cuOVQ1QPOz4JEb1B2I5VVrL8RsqFsAwZY0EqZunLQr5LA7LgJK3JPf/Lhs44eZYgo9CHVT9pZHRb54+4h05ruoM+Ua76a/vUkypuS8NojrYTkY34C0dgNncBxTQ/GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Je2jbdNW; arc=none smtp.client-ip=178.154.239.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d102])
+	by forward205a.mail.yandex.net (Yandex) with ESMTPS id 26E2768F32
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 14:54:43 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0f:604:0:640:5e0e:0])
+	by forward102a.mail.yandex.net (Yandex) with ESMTPS id B6E5D60906;
+	Wed,  4 Sep 2024 14:54:34 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id Xsa5duAq8W20-95BQWSfC;
+	Wed, 04 Sep 2024 14:54:34 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1725450874; bh=0ze7FoxYSM03CXs6xb5yf0w55g6FTLWwSRuud5KXuQg=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=Je2jbdNWhjbZn/tHlqXyoz4svnvwg8mdGbRaltQDZSe3VpNVsqM+xQM160xDBPgUY
+	 Js6BGZ2xkXqI+xbZR2M0ZIQEtMw9EE3AmhChf7/eERLgoB+6ajBnByuBCTREsZEJPU
+	 +P7kW8gMcAGBVA0K9F5ooYRLOO//Z8T5qb40XoEk=
+Authentication-Results: mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH net-next v5] net: sched: consistently use rcu_replace_pointer() in taprio_change()
+Date: Wed,  4 Sep 2024 14:54:01 +0300
+Message-ID: <20240904115401.3425674-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH rdma-next 0/2] Introduce mlx5 data direct placement (DDP)
-To: Edward Srouji <edwards@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Yishai Hadas <yishaih@nvidia.com>
-References: <cover.1725362773.git.leon@kernel.org>
- <829ac3ed-a338-4589-a76d-77bb165f0608@linux.dev>
- <f0e05a6d-6f9c-4351-af7a-7227fb3998be@nvidia.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <f0e05a6d-6f9c-4351-af7a-7227fb3998be@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
+According to Vinicius (and carefully looking through the whole
+https://syzkaller.appspot.com/bug?extid=b65e0af58423fc8a73aa
+once again), txtime branch of 'taprio_change()' is not going to
+race against 'advance_sched()'. But using 'rcu_replace_pointer()'
+in the former may be a good idea as well.
 
-在 2024/9/4 16:27, Edward Srouji 写道:
->
-> On 9/4/2024 9:02 AM, Zhu Yanjun wrote:
->> External email: Use caution opening links or attachments
->>
->>
->> 在 2024/9/3 19:37, Leon Romanovsky 写道:
->>> From: Leon Romanovsky <leonro@nvidia.com>
->>>
->>> Hi,
->>>
->>> This series from Edward introduces mlx5 data direct placement (DDP)
->>> feature.
->>>
->>> This feature allows WRs on the receiver side of the QP to be consumed
->>> out of order, permitting the sender side to transmit messages without
->>> guaranteeing arrival order on the receiver side.
->>>
->>> When enabled, the completion ordering of WRs remains in-order,
->>> regardless of the Receive WRs consumption order.
->>>
->>> RDMA Read and RDMA Atomic operations on the responder side continue to
->>> be executed in-order, while the ordering of data placement for RDMA
->>> Write and Send operations is not guaranteed.
->>
->> It is an interesting feature. If I got this feature correctly, this
->> feature permits the user consumes the data out of order when RDMA Write
->> and Send operations. But its completiong ordering is still in order.
->>
-> Correct.
->> Any scenario that this feature can be applied and what benefits will be
->> got from this feature?
->>
->> I am just curious about this. Normally the users will consume the data
->> in order. In what scenario, the user will consume the data out of order?
->>
-> One of the main benefits of this feature is achieving higher bandwidth 
-> (BW) by allowing
-> responders to receive packets out of order (OOO).
->
-> For example, this can be utilized in devices that support multi-plane 
-> functionality,
-> as introduced in the "Multi-plane support for mlx5" series [1]. When 
-> mlx5 multi-plane
-> is supported, a single logical mlx5 port aggregates multiple physical 
-> plane ports.
-> In this scenario, the requester can "spray" packets across the 
-> multiple physical
-> plane ports without guaranteeing packet order, either on the wire or 
-> on the receiver
-> (responder) side.
->
-> With this approach, no barriers or fences are required to ensure 
-> in-order packet
-> reception, which optimizes the data path for performance. This can 
-> result in better
-> BW, theoretically achieving line-rate performance equivalent to the 
-> sum of
-> the maximum BW of all physical plane ports, with only one QP.
+Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+---
+v5: cut from the series, add syzbot link an re-target to net-next
+v4: adjust subject to target net tree
+v3: unchanged since v2
+v2: added to the series
+---
+ net/sched/sch_taprio.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thanks a lot for your quick reply. Without ensuring in-order packet 
-reception, this does optimize the data path for performance.
-
-I agree with you.
-
-But how does the receiver get the correct packets from the out-of-order 
-packets efficiently?
-
-The method is implemented in Software or Hardware?
-
-I am just interested in this feature and want to know more about this.
-
-Thanks,
-
-Zhu Yanjun
-
->
-> [1] https://lore.kernel.org/lkml/cover.1718553901.git.leon@kernel.org/
->> Thanks,
->> Zhu Yanjun
->>
->>>
->>> Thanks
->>>
->>> Edward Srouji (2):
->>>    net/mlx5: Introduce data placement ordering bits
->>>    RDMA/mlx5: Support OOO RX WQE consumption
->>>
->>>   drivers/infiniband/hw/mlx5/main.c    |  8 +++++
->>>   drivers/infiniband/hw/mlx5/mlx5_ib.h |  1 +
->>>   drivers/infiniband/hw/mlx5/qp.c      | 51 
->>> +++++++++++++++++++++++++---
->>>   include/linux/mlx5/mlx5_ifc.h        | 24 +++++++++----
->>>   include/uapi/rdma/mlx5-abi.h         |  5 +++
->>>   5 files changed, 78 insertions(+), 11 deletions(-)
->>>
->>
+diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
+index cc2df9f8c14a..8498d0606b24 100644
+--- a/net/sched/sch_taprio.c
++++ b/net/sched/sch_taprio.c
+@@ -1952,7 +1952,9 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
+ 			goto unlock;
+ 		}
+ 
+-		rcu_assign_pointer(q->admin_sched, new_admin);
++		/* Not going to race against advance_sched(), but still */
++		admin = rcu_replace_pointer(q->admin_sched, new_admin,
++					    lockdep_rtnl_is_held());
+ 		if (admin)
+ 			call_rcu(&admin->rcu, taprio_free_sched_cb);
+ 	} else {
 -- 
-Best Regards,
-Yanjun.Zhu
+2.46.0
 
 
