@@ -1,92 +1,74 @@
-Return-Path: <netdev+bounces-124911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2645D96B5FA
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:06:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBD3D96B630
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:12:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A61591F24B8C
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:06:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 655AC1F25D16
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD1D1CC16F;
-	Wed,  4 Sep 2024 09:06:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315E11CCB35;
+	Wed,  4 Sep 2024 09:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Qr6Ybpzl"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="T93nZzG4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2EA9195FEA
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 09:06:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CFE31CC8A2;
+	Wed,  4 Sep 2024 09:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725440765; cv=none; b=dgZhtbGth6PtgqetTk/sofx7YhikbOm181kZ93kPlHvSq2hOHKEWUMnFavSRRmdWIe7EjdwxcIlSpX1ijYW0roWWXFRG+7JEdDyusBBzIUFILB8+/5qCk7XsXLnQWghyEJw9/d0N6ecsbsXGEXrz5WLdf9kGPjTLCFPOMCkVMGw=
+	t=1725441070; cv=none; b=pfH9lpd7Ker2jieawkwQEqObMykk29gAZjqwHDU+B3Wa9m4JofF3lGswcaAjFh1VT14JQ7L4R/7zxcz5ZiqW2zwQx0PEdynlInh3EzzIBPPs5097aaP976dLp1oOo5b6MVtSjvrH6YAi+ObOHauGGt7akVQPkJogbV5IhSiIqOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725440765; c=relaxed/simple;
-	bh=jDBq4Ng87U5vWLCtGk/fTMd743FQxW3hZo2L1hthBoE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QEgG1m3O2Z2AdKjRPf3Lcfm8AnFK/k6+jRX74u7uIfDTLWAxRkC6L+/VrNMRo6jf+5mmU+rimrnVC11FKORxZotg/2jdwmtKCWCGgVye/JZ4eWIXq1cWQ7cUV2oVKMpmT4Rm7+jcY2ebMHv65Gi+e3Ut9SPc+WKGyNkdzN5w56U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Qr6Ybpzl; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2068a7c9286so19240505ad.1
-        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 02:06:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1725440762; x=1726045562; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s2WW0Uh5MFwXmQymV6WF9+7CjegjBeXRtTOVI/P2KHw=;
-        b=Qr6YbpzlxeEIyLeLCA+SVeoRtFEYXxM0RirkVD9YcGfPck5FEvduwNo3Tj5OXKsQLH
-         ymXqY+DG1JiAGEHJPj9W/ZJldBlDvIYJConhm8pZ5i0xcFKJ4ebDGTgSb1S6BqC8vdv5
-         ii7/vrFRWaLy6VX7nLz3h+phRCPRt462aNnCA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725440762; x=1726045562;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=s2WW0Uh5MFwXmQymV6WF9+7CjegjBeXRtTOVI/P2KHw=;
-        b=qrvvU6ZOweu4kM08GR3NmtbKMLQOLIYCYMYNjHBjc4OXCALL6FXBYA44xrotdciPbb
-         QhrwpDp/weXMG11OkOJfWKVtxwBMxaYUBot40G+nLQeU9Dx/Z+G9dnkdJrINz7ePL+XL
-         PwJ8XXOiVV17zHBkPSxw2M/aMTBrKYQkc35/EyIKj50dd9D+2WFAyw/VEGgGIeavV/lA
-         fpw9ikwjMP/Gxu4x+mA1ywRiDzltEinpdhpJoH9pKEqlLftvVkB0R+ogpmA+5UBhSH0j
-         Nxdh94gYhXE76PrP5qcepDSU9XIH4WqbmF08CJIA0DBlIZIjXuRe1SVZzA4aSKUnay2v
-         7Uqw==
-X-Forwarded-Encrypted: i=1; AJvYcCUAggQJkXoVCIiOehyeoahD49T1LM498/aBWOdbtn3HSgP7UcJnQqcBDojDr1b4xp+ZTJxYvTQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8G9cGbaEB0MmaUa2B95LI9DnFyyl/nGjpKASO/eCMSJ9nkn15
-	hu0++TfMtgnkqbH2zuDRLS2aVesGtHKO6NOmrN+J9wZAhctidTvQei5Y1tjnAQ==
-X-Google-Smtp-Source: AGHT+IEBsx5mNF1aMY3Pulj+ByK6nJUa4wjeFTWqbIBmNujyGWU5qrkO+va3WqSnQ1IWgwTrsH7VXw==
-X-Received: by 2002:a17:902:ce10:b0:205:8456:df0c with SMTP id d9443c01a7336-2058456df32mr82458875ad.26.1725440761785;
-        Wed, 04 Sep 2024 02:06:01 -0700 (PDT)
-Received: from shivania.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea52a8asm9670135ad.182.2024.09.04.02.05.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 02:06:01 -0700 (PDT)
-From: Shivani Agarwal <shivani.agarwal@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vasavi.sirnapalli@broadcom.com,
-	Breno Leitao <leitao@debian.org>,
-	Heng Qi <hengqi@linux.alibaba.com>,
-	Sasha Levin <sashal@kernel.org>,
-	Shivani Agarwal <shivani.agarwal@broadcom.com>
-Subject: [PATCH v5.15] virtio_net: Fix napi_skb_cache_put warning
-Date: Wed,  4 Sep 2024 02:05:53 -0700
-Message-Id: <20240904090553.15076-1-shivani.agarwal@broadcom.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1725441070; c=relaxed/simple;
+	bh=fWTfPILzAetLL/U2fZPTkSMXsvjy+9i1q5L7nB9rYS0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TLotKcw7LekcljFgvmKjvbr4NaN1MUU+0LCPIdOI3J+LMz1kksYlPm2CFN1f4dGRLccC0lUFw+9+dbbmZF+7nxDZm8eY/hG0vnV08w/qsQC0R8Vm6jjS5kRr9dU/4lMyAr+Vdo/6jOu8MRChkqKJAIVrwrEhFe4JwYqAh3dnTc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=T93nZzG4; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1725441068; x=1756977068;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fWTfPILzAetLL/U2fZPTkSMXsvjy+9i1q5L7nB9rYS0=;
+  b=T93nZzG4MGxc3iKRpe3+j+zpClP8QoMuR+SnMT4vo+iXHGiz7mbDkq9L
+   IXPyyLuERh+BziweI65d6g/QsTCWuGTAqqznrul916IaZmS4A/GExjptg
+   XPqpOMX3CYAcwzXb2QMinGCVYtl1vEQR/erx3n8cAkw8alMmP7SYgJYWc
+   P8/iR+/KkdNJiR4TkQhRemUwllARnn1v0PmktHYrQ5/Z7cc5zO3Ed31r8
+   8Iuq2htKYC/SvoNCa4jyiNREhX+5UdIYqZaCYlg9fyxYlS471g0LLvvc1
+   2FGqMLnZzGdAajevn2zY4DM6cv8iAs6UoDc0cTzzkIiNQYjfX+FvhrFZA
+   Q==;
+X-CSE-ConnectionGUID: 7PtRIbY4RQKJyDxiveGaEQ==
+X-CSE-MsgGUID: YjJR6EY/T9OIVt2StvdP/A==
+X-IronPort-AV: E=Sophos;i="6.10,201,1719903600"; 
+   d="scan'208";a="31941447"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Sep 2024 02:11:07 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 4 Sep 2024 02:10:36 -0700
+Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 4 Sep 2024 02:10:32 -0700
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <linux@armlinux.org.uk>, <kuba@kernel.org>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <richardcochran@gmail.com>,
+	<rdunlap@infradead.org>, <bryan.whitehead@microchip.com>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <maxime.chevallier@bootlin.com>,
+	<linux-kernel@vger.kernel.org>, <horms@kernel.org>,
+	<UNGLinuxDriver@microchip.com>
+Subject: [PATCH net-next V5 0/5] Add support to PHYLINK for LAN743x/PCI11x1x chips
+Date: Wed, 4 Sep 2024 14:36:40 +0530
+Message-ID: <20240904090645.8742-1-Raju.Lakkaraju@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,93 +76,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Breno Leitao <leitao@debian.org>
+This is the follow-up patch series of
+https://lkml.iu.edu/hypermail/linux/kernel/2310.2/02078.html
 
-[ Upstream commit f8321fa75102246d7415a6af441872f6637c93ab ]
+Divide the PHYLINK adaptation and SFP modifications into two separate patch
+series.
 
-After the commit bdacf3e34945 ("net: Use nested-BH locking for
-napi_alloc_cache.") was merged, the following warning began to appear:
+The current patch series focuses on transitioning the LAN743x driver's PHY
+support from phylib to phylink.
 
-	 WARNING: CPU: 5 PID: 1 at net/core/skbuff.c:1451 napi_skb_cache_put+0x82/0x4b0
+Tested on PCI11010 Rev-1 Evaluation board
 
-	  __warn+0x12f/0x340
-	  napi_skb_cache_put+0x82/0x4b0
-	  napi_skb_cache_put+0x82/0x4b0
-	  report_bug+0x165/0x370
-	  handle_bug+0x3d/0x80
-	  exc_invalid_op+0x1a/0x50
-	  asm_exc_invalid_op+0x1a/0x20
-	  __free_old_xmit+0x1c8/0x510
-	  napi_skb_cache_put+0x82/0x4b0
-	  __free_old_xmit+0x1c8/0x510
-	  __free_old_xmit+0x1c8/0x510
-	  __pfx___free_old_xmit+0x10/0x10
+Change List:
+============
+V4 -> V5:
+  - Remove the fixed_phy_unregister( ) function. Not require 
+  - Remove the "phydev->eee_enabled" check to update the MAC EEE
+    enable/disable
+  - Call lan743x_mac_eee_enable() with true after update tx_lpi_timer.
+  - Add phy_support_eee() to initialize the EEE flags 
+V3 -> V4:
+  - Add fixed-link patch along with this series. 
+    Note: Note: This code was developed by Mr.Russell King
+    Ref: 
+    https://lore.kernel.org/netdev/LV8PR11MB8700C786F5F1C274C73036CC9F8E2@LV8PR11MB8700.namprd11.prod.outlook.com/T/#me943adf54f1ea082edf294aba448fa003a116815
+  - Change phylink fixed-link function header's string from "Returns" to
+    "Returns:" 
+  - Remove the EEE private variable from LAN743x adapter strcture and fix the
+    EEE's set/get functions
+  - set the individual caps (i.e. _RGMII, _RGMII_ID, _RGMII_RXID and
+    __RGMII_TXID) replace with phy_interface_set_rgmii( ) function
+  - Change lan743x_set_eee( ) to lan743x_mac_eee_enable( )
 
-The issue arises because virtio is assuming it's running in NAPI context
-even when it's not, such as in the netpoll case.
+V2 -> V3:
+  - Remove the unwanted parens in each of these if() sub-blocks 
+  - Replace "to_net_dev(config->dev)" with "netdev".
+  - Add GMII_ID/RGMII_TXID/RGMII_RXID in supported_interfaces
+  - Fix the lan743x_phy_handle_exists( ) return type
 
-To resolve this, modify virtnet_poll_tx() to only set NAPI when budget
-is available. Same for virtnet_poll_cleantx(), which always assumed that
-it was in a NAPI context.
+V1 -> V2:
+  - Fix the Russell King's comments i.e. remove the speed, duplex update in 
+    lan743x_phylink_mac_config( )
+  - pre-March 2020 legacy support has been removed
 
-Fixes: df133f3f9625 ("virtio_net: bulk free tx skbs")
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
-Link: https://patch.msgid.link/20240712115325.54175-1-leitao@debian.org
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Shivani: Modified to apply on v5.15.y]
-Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
----
- drivers/net/virtio_net.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+V0 -> V1:
+  - Integrate with Synopsys DesignWare XPCS drivers
+  - Based on external review comments,
+  - Changes made to SGMII interface support only 1G/100M/10M bps speed
+  - Changes made to 2500Base-X interface support only 2.5Gbps speed
+  - Add check for not is_sgmii_en with is_sfp_support_en support
+  - Change the "pci11x1x_strap_get_status" function return type from void to
+    int
+  - Add ethtool phylink wol, eee, pause get/set functions
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index bd0cb3a03b7b..d8138ad4f865 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -1548,7 +1548,7 @@ static bool is_xdp_raw_buffer_queue(struct virtnet_info *vi, int q)
- 		return false;
- }
- 
--static void virtnet_poll_cleantx(struct receive_queue *rq)
-+static void virtnet_poll_cleantx(struct receive_queue *rq, int budget)
- {
- 	struct virtnet_info *vi = rq->vq->vdev->priv;
- 	unsigned int index = vq2rxq(rq->vq);
-@@ -1561,7 +1561,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
- 	if (__netif_tx_trylock(txq)) {
- 		do {
- 			virtqueue_disable_cb(sq->vq);
--			free_old_xmit_skbs(sq, true);
-+			free_old_xmit_skbs(sq, !!budget);
- 		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
- 
- 		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
-@@ -1580,7 +1580,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
- 	unsigned int received;
- 	unsigned int xdp_xmit = 0;
- 
--	virtnet_poll_cleantx(rq);
-+	virtnet_poll_cleantx(rq, budget);
- 
- 	received = virtnet_receive(rq, budget, &xdp_xmit);
- 
-@@ -1683,7 +1683,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
- 	txq = netdev_get_tx_queue(vi->dev, index);
- 	__netif_tx_lock(txq, raw_smp_processor_id());
- 	virtqueue_disable_cb(sq->vq);
--	free_old_xmit_skbs(sq, true);
-+	free_old_xmit_skbs(sq, !!budget);
- 
- 	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
- 		netif_tx_wake_queue(txq);
+Raju Lakkaraju (5):
+  net: phylink: Add phylink_set_fixed_link() to configure fixed link
+    state in phylink
+  net: lan743x: Create separate PCS power reset function
+  net: lan743x: Create separate Link Speed Duplex state function
+  net: lan743x: Migrate phylib to phylink
+  net: lan743x: Add support to ethtool phylink get and set settings
+
+ drivers/net/ethernet/microchip/Kconfig        |   5 +-
+ .../net/ethernet/microchip/lan743x_ethtool.c  | 119 ++--
+ drivers/net/ethernet/microchip/lan743x_main.c | 672 +++++++++++-------
+ drivers/net/ethernet/microchip/lan743x_main.h |   4 +
+ drivers/net/phy/phylink.c                     |  42 ++
+ include/linux/phylink.h                       |   2 +
+ 6 files changed, 520 insertions(+), 324 deletions(-)
+
 -- 
-2.39.4
+2.34.1
 
 
