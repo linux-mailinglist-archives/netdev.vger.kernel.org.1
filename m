@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-124982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9272696B7D1
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:07:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1415696B7CE
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:07:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDEC8B25C52
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:07:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17E90B25A3E
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:06:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FFD1D04AA;
-	Wed,  4 Sep 2024 10:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 705C01D0164;
+	Wed,  4 Sep 2024 10:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="eJBpLqyI"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="RDaIuZk0"
 X-Original-To: netdev@vger.kernel.org
 Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B291D016C;
-	Wed,  4 Sep 2024 10:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36F41D0148;
+	Wed,  4 Sep 2024 10:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725444349; cv=none; b=qdPMLgN4WB1hm3LTYXHP0lyiKCbHdmcYcOxAD3VEmvpfk6aLslQag04E9kJZLD/JH6bCNqWYUilspevse+kch3YZbIn9QtKtMSjxY/oWt9cxnlfNvrsWAUoKxwKKi/gQfvY6QMV4wkLXHLvqQmYsCotw1ZTQj49o2LmHlhcM3s0=
+	t=1725444347; cv=none; b=EUzw5TaUl5MMMBlhz6nEoEjhZe16p90JpXvXISqewGJaZvAsnKfNF5aJSUJ+NvFcbSl/FhfrI9Eg9fvjipC06B3zMI5A5C8k839j8iLrXNEEhh1cyVEK8RMge8uQUXFQmJQ0Zn4L2e+Un55LsHwI1+Ox+Yb6BH/mKq5FcIiPn10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725444349; c=relaxed/simple;
-	bh=Rs6W3y0RdUoCvLZsh469cQPvGCurFp0g2GrEXIu+Af8=;
+	s=arc-20240116; t=1725444347; c=relaxed/simple;
+	bh=tr5e5PtP7qsxD5kCFOheL+VA55HsD6EksiPhYw4urdc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hZdn/WE+8hMSXsBdcvmhyiO4g1B+Y7RgAqjLhSJayFlto0G+TbonsWny4QIxFzRY4oaHHf9h/AQh7UgeEmifemsQf3W6WTppjmpEXvJjIBkfKBYO7NTFqc1AGcmL5yDLW+bD4fjS44yVpRbtDzwt8zurou8W4iIJzSo5JFY+1TY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=eJBpLqyI; arc=none smtp.client-ip=198.47.19.141
+	 MIME-Version:Content-Type; b=eZ5waSVrPnbCnH0LWrmVpRXzJeawpLVSxC3Uza5Yh515mWKos/OJNk5sVUux28bbYxEI8xuD8EgJ0/7ud9wA3E7hbaY+PrGf+Upo7M7aebIgahzE59gK04UP+OV5xBY4ZFjel/LJuwDca3foGX5d0ULtHtyQBiAZ8f6PBJ8fVdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=RDaIuZk0; arc=none smtp.client-ip=198.47.19.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 484A5GqF092750;
-	Wed, 4 Sep 2024 05:05:16 -0500
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 484A5ICo092784;
+	Wed, 4 Sep 2024 05:05:18 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1725444316;
-	bh=EGMOR5c12ymFAmYWBmiB4nwKPFzniK04wHjtPhLw50c=;
+	s=ti-com-17Q1; t=1725444318;
+	bh=SLGSSWdm0/NpuMM7l2G8hjHi9lfVBKZfDv2c9sdtF3E=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=eJBpLqyIfNXZme2DTLixxzyhcRMuU3TWM7/Nqxpw9RfotLvR+brHWfo/3jAcR7EHs
-	 lGgUMkePsOvT0c65DFpqCH+BpN5pASnc1m8pWy8LyW2hcjhKMnte9F/Fg+haKJweJx
-	 t+F14ZdUP2eKddBi0lXwqZRGlOWS1lPCHRPM3rpc=
-Received: from DFLE111.ent.ti.com (dfle111.ent.ti.com [10.64.6.32])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 484A5GA6007402
+	b=RDaIuZk0kkHpilOj7e8QsjKFJdEIuQSnpdJf4G7l+OR2aSsRClN/1x3pdHn+ydE9N
+	 CwsfuSsHmb6gZRqraNKWLaltSFLRLh5OFxeUnztPLUcimdKT5Aca7T1rk7gUcAObfl
+	 5Wb5oKj/BO6U9zfbUwGZGmy3UJ1aOrgMwycI4nZk=
+Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 484A5ImM059692
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 4 Sep 2024 05:05:16 -0500
-Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
+	Wed, 4 Sep 2024 05:05:18 -0500
+Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 4
- Sep 2024 05:05:15 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ Sep 2024 05:05:17 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 4 Sep 2024 05:05:15 -0500
+ Frontend Transport; Wed, 4 Sep 2024 05:05:17 -0500
 Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 484A5F88074518;
-	Wed, 4 Sep 2024 05:05:15 -0500
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 484A5HpM029548;
+	Wed, 4 Sep 2024 05:05:17 -0500
 Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 484A5F2q015382;
-	Wed, 4 Sep 2024 05:05:15 -0500
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 484A5GdW015390;
+	Wed, 4 Sep 2024 05:05:17 -0500
 From: MD Danish Anwar <danishanwar@ti.com>
 To: Jan Kiszka <jan.kiszka@siemens.com>, Andrew Lunn <andrew@lunn.ch>,
         Dan
@@ -81,9 +81,9 @@ CC: Alexander Lobakin <aleksander.lobakin@intel.com>,
         Vignesh Raghavendra
 	<vigneshr@ti.com>,
         Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next v4 4/5] net: ti: icssg-prueth: Enable HSR Tx duplication, Tx Tag and Rx Tag offload
-Date: Wed, 4 Sep 2024 15:35:05 +0530
-Message-ID: <20240904100506.3665892-5-danishanwar@ti.com>
+Subject: [PATCH net-next v4 5/5] net: ti: icssg-prueth: Add multicast filtering support in HSR mode
+Date: Wed, 4 Sep 2024 15:35:06 +0530
+Message-ID: <20240904100506.3665892-6-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240904100506.3665892-1-danishanwar@ti.com>
 References: <20240904100506.3665892-1-danishanwar@ti.com>
@@ -97,176 +97,81 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
+Add support for multicast filtering in HSR mode
 
-The HSR stack allows to offload its Tx packet duplication functionality to
-the hardware. Enable this offloading feature for ICSSG driver. Add support
-to offload HSR Tx Tag Insertion and Rx Tag Removal and duplicate discard.
-
-Inorder to enable hsr-tag-ins-offload, hsr-dup-offload must also be enabled
-as these are tightly coupled in the firmware implementation.
-
-Duplicate discard is done as part of RX tag removal and it is
-done by the firmware. When driver sends the r30 command
-ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE, firmware does RX tag removal as well as
-duplicate discard.
-
-Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
 Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
 ---
- drivers/net/ethernet/ti/icssg/icssg_common.c | 18 ++++++++++---
- drivers/net/ethernet/ti/icssg/icssg_config.c |  4 ++-
- drivers/net/ethernet/ti/icssg/icssg_config.h |  2 ++
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 28 +++++++++++++++++++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.h |  3 +++
- 5 files changed, 50 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 42 +++++++++++++++++++-
+ 1 file changed, 40 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
-index b9d8a93d1680..fdebeb2f84e0 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_common.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
-@@ -660,14 +660,15 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
- {
- 	struct cppi5_host_desc_t *first_desc, *next_desc, *cur_desc;
- 	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
- 	struct netdev_queue *netif_txq;
- 	struct prueth_tx_chn *tx_chn;
- 	dma_addr_t desc_dma, buf_dma;
-+	u32 pkt_len, dst_tag_id;
- 	int i, ret = 0, q_idx;
- 	bool in_tx_ts = 0;
- 	int tx_ts_cookie;
- 	void **swdata;
--	u32 pkt_len;
- 	u32 *epib;
- 
- 	pkt_len = skb_headlen(skb);
-@@ -712,9 +713,20 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
- 
- 	/* set dst tag to indicate internal qid at the firmware which is at
- 	 * bit8..bit15. bit0..bit7 indicates port num for directed
--	 * packets in case of switch mode operation
-+	 * packets in case of switch mode operation and port num 0
-+	 * for undirected packets in case of HSR offload mode
- 	 */
--	cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
-+	dst_tag_id = emac->port_id | (q_idx << 8);
-+
-+	if (prueth->is_hsr_offload_mode &&
-+	    (ndev->features & NETIF_F_HW_HSR_DUP))
-+		dst_tag_id = PRUETH_UNDIRECTED_PKT_DST_TAG;
-+
-+	if (prueth->is_hsr_offload_mode &&
-+	    (ndev->features & NETIF_F_HW_HSR_TAG_INS))
-+		epib[1] |= PRUETH_UNDIRECTED_PKT_TAG_INS;
-+
-+	cppi5_desc_set_tags_ids(&first_desc->hdr, 0, dst_tag_id);
- 	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
- 	cppi5_hdesc_attach_buf(first_desc, buf_dma, pkt_len, buf_dma, pkt_len);
- 	swdata = cppi5_hdesc_get_swdata(first_desc);
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index 7b2e6c192ff3..72ace151d8e9 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -531,7 +531,9 @@ static const struct icssg_r30_cmd emac_r32_bitmask[] = {
- 	{{EMAC_NONE,  0xffff4000, EMAC_NONE, EMAC_NONE}},	/* Preemption on Tx ENABLE*/
- 	{{EMAC_NONE,  0xbfff0000, EMAC_NONE, EMAC_NONE}},	/* Preemption on Tx DISABLE*/
- 	{{0xffff0010,  EMAC_NONE, 0xffff0010, EMAC_NONE}},	/* VLAN AWARE*/
--	{{0xffef0000,  EMAC_NONE, 0xffef0000, EMAC_NONE}}	/* VLAN UNWARE*/
-+	{{0xffef0000,  EMAC_NONE, 0xffef0000, EMAC_NONE}},	/* VLAN UNWARE*/
-+	{{0xffff2000, EMAC_NONE, EMAC_NONE, EMAC_NONE}},	/* HSR_RX_OFFLOAD_ENABLE */
-+	{{0xdfff0000, EMAC_NONE, EMAC_NONE, EMAC_NONE}}		/* HSR_RX_OFFLOAD_DISABLE */
- };
- 
- int icssg_set_port_state(struct prueth_emac *emac,
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
-index 1ac60283923b..92c2deaa3068 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_config.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
-@@ -80,6 +80,8 @@ enum icssg_port_state_cmd {
- 	ICSSG_EMAC_PORT_PREMPT_TX_DISABLE,
- 	ICSSG_EMAC_PORT_VLAN_AWARE_ENABLE,
- 	ICSSG_EMAC_PORT_VLAN_AWARE_DISABLE,
-+	ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE,
-+	ICSSG_EMAC_HSR_RX_OFFLOAD_DISABLE,
- 	ICSSG_EMAC_PORT_MAX_COMMANDS
- };
- 
 diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 4e9a148352c7..49b855ae62a4 100644
+index 49b855ae62a4..76ccfd79f45f 100644
 --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
 +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -41,7 +41,10 @@
- #define DEFAULT_PORT_MASK	1
- #define DEFAULT_UNTAG_MASK	1
- 
--#define NETIF_PRUETH_HSR_OFFLOAD_FEATURES	NETIF_F_HW_HSR_FWD
-+#define NETIF_PRUETH_HSR_OFFLOAD_FEATURES	(NETIF_F_HW_HSR_FWD | \
-+						 NETIF_F_HW_HSR_DUP | \
-+						 NETIF_F_HW_HSR_TAG_INS | \
-+						 NETIF_F_HW_HSR_TAG_RM)
- 
- /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
- #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
-@@ -758,6 +761,21 @@ static void emac_change_hsr_feature(struct net_device *ndev,
- 	}
+@@ -492,6 +492,36 @@ static int icssg_prueth_del_mcast(struct net_device *ndev, const u8 *addr)
+ 	return 0;
  }
  
-+static netdev_features_t emac_ndo_fix_features(struct net_device *ndev,
-+					       netdev_features_t features)
++static int icssg_prueth_hsr_add_mcast(struct net_device *ndev, const u8 *addr)
 +{
-+	/* In order to enable hsr tag insertion offload, hsr dup offload must
-+	 * also be enabled as these two are tightly coupled in firmware
-+	 * implementation.
-+	 */
-+	if (features & NETIF_F_HW_HSR_TAG_INS)
-+		features |= NETIF_F_HW_HSR_DUP;
-+	else
-+		features &= ~NETIF_F_HW_HSR_DUP;
++	struct prueth_emac *emac = netdev_priv(ndev);
++	struct prueth *prueth = emac->prueth;
 +
-+	return features;
++	icssg_fdb_add_del(emac, addr, prueth->default_vlan,
++			  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
++			  ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
++			  ICSSG_FDB_ENTRY_P2_MEMBERSHIP |
++			  ICSSG_FDB_ENTRY_BLOCK, true);
++
++	icssg_vtbl_modify(emac, emac->port_vlan, BIT(emac->port_id),
++			  BIT(emac->port_id), true);
++	return 0;
 +}
 +
- static int emac_ndo_set_features(struct net_device *ndev,
- 				 netdev_features_t features)
- {
-@@ -783,6 +801,7 @@ static const struct net_device_ops emac_netdev_ops = {
- 	.ndo_eth_ioctl = icssg_ndo_ioctl,
- 	.ndo_get_stats64 = icssg_ndo_get_stats64,
- 	.ndo_get_phys_port_name = icssg_ndo_get_phys_port_name,
-+	.ndo_fix_features = emac_ndo_fix_features,
- 	.ndo_set_features = emac_ndo_set_features,
- };
- 
-@@ -1010,6 +1029,13 @@ static void icssg_change_mode(struct prueth *prueth)
- 
- 	for (mac = PRUETH_MAC0; mac < PRUETH_NUM_MACS; mac++) {
- 		emac = prueth->emac[mac];
-+		if (prueth->is_hsr_offload_mode) {
-+			if (emac->ndev->features & NETIF_F_HW_HSR_TAG_RM)
-+				icssg_set_port_state(emac, ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE);
-+			else
-+				icssg_set_port_state(emac, ICSSG_EMAC_HSR_RX_OFFLOAD_DISABLE);
-+		}
++static int icssg_prueth_hsr_del_mcast(struct net_device *ndev, const u8 *addr)
++{
++	struct prueth_emac *emac = netdev_priv(ndev);
++	struct prueth *prueth = emac->prueth;
 +
- 		if (netif_running(emac->ndev)) {
- 			icssg_fdb_add_del(emac, eth_stp_addr, prueth->default_vlan,
- 					  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index a4b025fae797..bba6da2e6bd8 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -59,6 +59,9 @@
- 
- #define IEP_DEFAULT_CYCLE_TIME_NS	1000000	/* 1 ms */
- 
-+#define PRUETH_UNDIRECTED_PKT_DST_TAG	0
-+#define PRUETH_UNDIRECTED_PKT_TAG_INS	BIT(30)
++	icssg_fdb_add_del(emac, addr, prueth->default_vlan,
++			  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
++			  ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
++			  ICSSG_FDB_ENTRY_P2_MEMBERSHIP |
++			  ICSSG_FDB_ENTRY_BLOCK, false);
 +
- /* Firmware status codes */
- #define ICSS_HS_FW_READY 0x55555555
- #define ICSS_HS_FW_DEAD 0xDEAD0000	/* lower 16 bits contain error code */
++	return 0;
++}
++
+ /**
+  * emac_ndo_open - EMAC device open
+  * @ndev: network adapter device
+@@ -652,7 +682,10 @@ static int emac_ndo_stop(struct net_device *ndev)
+ 
+ 	icssg_class_disable(prueth->miig_rt, prueth_emac_slice(emac));
+ 
+-	__dev_mc_unsync(ndev, icssg_prueth_del_mcast);
++	if (emac->prueth->is_hsr_offload_mode)
++		__dev_mc_unsync(ndev, icssg_prueth_hsr_del_mcast);
++	else
++		__dev_mc_unsync(ndev, icssg_prueth_del_mcast);
+ 
+ 	atomic_set(&emac->tdown_cnt, emac->tx_ch_num);
+ 	/* ensure new tdown_cnt value is visible */
+@@ -730,7 +763,12 @@ static void emac_ndo_set_rx_mode_work(struct work_struct *work)
+ 		return;
+ 	}
+ 
+-	__dev_mc_sync(ndev, icssg_prueth_add_mcast, icssg_prueth_del_mcast);
++	if (emac->prueth->is_hsr_offload_mode)
++		__dev_mc_sync(ndev, icssg_prueth_hsr_add_mcast,
++			      icssg_prueth_hsr_del_mcast);
++	else
++		__dev_mc_sync(ndev, icssg_prueth_add_mcast,
++			      icssg_prueth_del_mcast);
+ }
+ 
+ /**
 -- 
 2.34.1
 
