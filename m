@@ -1,94 +1,97 @@
-Return-Path: <netdev+bounces-124811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B3D896B0AE
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 07:52:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC96396B0B1
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 07:52:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E83D1C204F8
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 05:52:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA1051C20D56
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 05:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FD982C60;
-	Wed,  4 Sep 2024 05:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F29084E14;
+	Wed,  4 Sep 2024 05:52:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2R9mypVt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qJAHLwch"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D804439B
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 05:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7CC84FAD
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 05:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725429154; cv=none; b=KzRCGViUE5bVU1J8HfdEmFy/llEWdBRLyEdSilhBurQu5qKH8qz0Y7on/zWcAu0cMs6LsqtLeZ81BK5rd6DO7mrdDifIyKbmbuB7q7NpnJrsaEgRD8w5ir/guPk43Ca/VQBt9wOMABB0yI2/KA5O0IgyCU010LQakwzzVYu9ey8=
+	t=1725429160; cv=none; b=T+cLYotOwhIQsztrdiSpBEKUIAFqfHEUU99PnoG3dbFgpqYqSi9PB3P0gIrOLvxSVUNdVi5ctxqQL8xVTNn7t4WIbSFOJnWp58M9UQXjoE0MR96Miegeu+SyOL6Y7HsnPtb054OPgz0gdA3R0jzIrZaNFi1WEv+W46gnfoZw68I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725429154; c=relaxed/simple;
-	bh=yNRTOUzKkRJGhqlw5ivru1d9393vB7lDkAch0+shEfI=;
+	s=arc-20240116; t=1725429160; c=relaxed/simple;
+	bh=FHAHq5En2ytSrx9wAQ+3HWUZ4QEOTrFIzGXIHEZ9U0Q=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OJYI/spVDGA74NCbuowSD8qW2Jv5GeSeQSdYfRIojWA/jSQ8jH5L537luqYMUyPZewC7DYIlLLB8gNVAkEsIz1KUR/WztQDLQ/E8BZLtxqEo8Fj5Ae50BCzKRKojGViQ4vvFMKHAwycmJNfHtg69oqY+HHtu4/qf2cXO+bJ2ZiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2R9mypVt; arc=none smtp.client-ip=209.85.167.47
+	 To:Content-Type; b=THMKuVU/mAKxhVORK0jBe9n3kO44E3tu4J0xBxbjyuDdcvnja5EXqgRD6ZoF/mmX5JYIcSKE6glpsNPYrLyFQjhq3oydkILi1jfAa1BsFTOUrlL0nLFztB4KKC4KEHvKRe140qsmzMVF6ju9SEnSCaQKKxMqCZTgZbeaWhdMnsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qJAHLwch; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-53348589540so2390e87.1
-        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 22:52:32 -0700 (PDT)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5334491702cso2149e87.0
+        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 22:52:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725429151; x=1726033951; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+        d=google.com; s=20230601; t=1725429157; x=1726033957; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tfI0/f+BGYzXSB/YInZDUJCx543XTNWba09slmlv2JI=;
-        b=2R9mypVtGIJzsTAu0gK4Y5QQ+tYBNDjRARAsLUFWYlMyOkAC6kTvULq388PpE8rDHR
-         3AryoaaW+F/eBIdZJlm5wec47N5anNnudXKlZaN9Q6jrptz3EpBDkpwAZ2sgyJPWSum9
-         6UTLv63UOIhig3NskBo3J7QQseO8rUyXa7NkKDIM2j0HQEUOKzv7R4fDEt1qTqJPDl/n
-         +OWoWbSz5ZUe/EMNbcA1aqxF6rJfpvVuYNLTp6/YA6kJkKEHAGCk7L+w0MB1+VCLSLGh
-         O9Qd1c/832q4thQTdzll/AFueHvIT+lCZX5SPY9VOLFbIsRe1Gf1/hbWoeNj00v+ij6o
-         qcBg==
+        bh=IpIJEb+RbBNCQx9hDO51spdk1MhZBEgZyMyfLVhshic=;
+        b=qJAHLwchRUQtycPtkD38KoOzOqVKtZCIU6Le4Bln3eAc1Zr7YGQx4plN/nUWuFL6tH
+         EUls7AGOKd8nqGzx/3qg2m/qbG1/323TA8QoRnVV26JSvDxrfWzSHy2cmGTaksAjJjZ+
+         ewRf855uL+KP7G0IqUEtLThc+6daNJ/ne/69aTy2Qd6ejx6j7mUIxSgiA1/4XBFBIYUH
+         wJJL6sRAcMGMUAFqPDpUh2/EojphLDieOXx8tJDo9CB94iikE1PLiWlPfmdwknsVcUTU
+         CR+RGeMWvMD+L9fkWvy0+s/PDZsCRX4AHIjEa5h2OvM05CC+j78a7nLKLbNezum0aJAM
+         Ed+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725429151; x=1726033951;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+        d=1e100.net; s=20230601; t=1725429157; x=1726033957;
+        h=content-transfer-encoding:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tfI0/f+BGYzXSB/YInZDUJCx543XTNWba09slmlv2JI=;
-        b=peJ75pj6McCBhhJpRhLjOyelpWjNYeM4bcjJQOxpusQJYIe9bZpMFwgAlbz1A3LPkv
-         HKzMEv1vRTslD6hvABK7zep+EImyGeSnNcm32eMvc58O+Jwgky8nyDr2GrkKf7C2r2LH
-         QRGV14iSoHptdVUOLdwEVUPhCuQh2f52MB8c8jDs2bmzONM5tgWqUYahMCpnEyFoD2zU
-         ni54eoUHCSyCF1HxOKNawpoLV8SZIJtncfG3aOUqJEYhX9WZcqLBrAvx23zdBDqxsVlt
-         adX7nUsvFb5VEQHDGyMCb1lRIy+pJEmSgOmLYyXq7Hje+lC7mNPtFnzduzsDGWTSiJpk
-         QA9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUCtrCaW86vbzYGu4Yg2r7FWInv5dNyyMH08PNrUC02jkbrE7iEuiTxzAeUk3nBIvBeMt7n9M0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvtRFDtjqOMpj5L8vhr11I5GXlud//bi03MxKt94J9WakmfQsi
-	UnuCm/atGIYAcwsT0Slu5CbuBYnP0Uo7upClCrF3FnoUq5jgaIi2T57IhZvPFcSGn2l6gr2DrMB
-	U1o4gx9t0C/6kagJrg19nyMuGU+vZlncaW30H
-X-Google-Smtp-Source: AGHT+IGPJoL2SsMm5N55o3sDX+rl5plbUQ7rMhlvj1/wjC/IbbW3VQg7/xpeR5lFR7gW6Po/n/AhP8LwsU2ZTwIqHC4=
-X-Received: by 2002:a05:6512:2389:b0:533:4322:23b7 with SMTP id
- 2adb3069b0e04-535655b376dmr88376e87.6.1725429150661; Tue, 03 Sep 2024
- 22:52:30 -0700 (PDT)
+        bh=IpIJEb+RbBNCQx9hDO51spdk1MhZBEgZyMyfLVhshic=;
+        b=gF3rNTjfb7xJu1/kOl3EnsJzy+6hB+y852hKnCYgrELRbCNksIAb2Lqqsawfnt1mlM
+         WLTqV4sDNxkt4iR81UmvqSTCBIUi+W7cW/zQbtOne3DkL2+bIUskd2tMEsROKCkAANR7
+         aBcAOdL4lVXshd/FfszKdNBFi8SYsL7/PFyevePQlQvOndZU+fsG5SunSiyS5Bcia3SK
+         BO5GlJzR2qQbP4zMBiCoQist51j7ayb6ICtNchxQxj7167/x9Na/iCNusZo+vOiDRwYI
+         e3RGo3kjffg2TXpeOYR1zBZYaPw6EMhG/YRqoeOp6Im0cOjIY302j3gbhDTNyc8seQPn
+         s3rA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDite8GgQeCum3Q9y1bmWHblAIGPX0ocdcTybRIMH+FKcrHErQxIqKHNs06u5sA6xCuTNHyls=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5UxlE0IT0sXGWJ83a+FKCD+MxEm2ShnEVqKon8J7IpQMmEjt7
+	bswRRLZf53BOlOTsSKXWr/VbnJIW/1zViY/xKI2OBPNPih7Dubtyw7GIud0rdEX0Sku+RFCV6Rt
+	RHYG7NhPo+RGSIjlJYgq1w6gfx4dLWJckfbTY
+X-Google-Smtp-Source: AGHT+IH62oGoBKuW4iEeNyAKqt0Puk7uw2vbSjLqVfa5GmkN69wBFkG5LIwqaSXoemGgsERtkEOnxJQq73DNowryoL4=
+X-Received: by 2002:a19:f611:0:b0:535:68b2:9589 with SMTP id
+ 2adb3069b0e04-53568b29744mr12733e87.2.1725429156307; Tue, 03 Sep 2024
+ 22:52:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240828181011.1591242-1-namangulati@google.com> <939877af-d726-421e-af71-ccf4b2ec33ea@linux.dev>
-In-Reply-To: <939877af-d726-421e-af71-ccf4b2ec33ea@linux.dev>
+References: <20240828181011.1591242-1-namangulati@google.com> <ZtBQLqqMrpCLBMw1@LQ3V64L9R2>
+In-Reply-To: <ZtBQLqqMrpCLBMw1@LQ3V64L9R2>
 From: Naman Gulati <namangulati@google.com>
-Date: Tue, 3 Sep 2024 22:52:18 -0700
-Message-ID: <CAMP57yXkxGYXSn+bsCObFNViTYC9LbToJ6C4mJUSSEaHjnnACQ@mail.gmail.com>
+Date: Tue, 3 Sep 2024 22:52:25 -0700
+Message-ID: <CAMP57yW99Y+CS+h_bayj_hBfoGQE+bdfVHuwfHZ3q+KueTS+iw@mail.gmail.com>
 Subject: Re: [PATCH] Add provision to busyloop for events in ep_poll.
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+To: Joe Damato <jdamato@fastly.com>, Naman Gulati <namangulati@google.com>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
 	Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org, skhawaja@google.com, 
-	Joe Damato <jdamato@fastly.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, mkarsten@uwaterloo.ca
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 29, 2024 at 2:16=E2=80=AFAM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
+Thanks all for the comments and apologies for the delay in replying.
+Stan and Joe I=E2=80=99ve addressed some of the common concerns below.
+
+On Thu, Aug 29, 2024 at 3:40=E2=80=AFAM Joe Damato <jdamato@fastly.com> wro=
+te:
 >
-> On 28/08/2024 19:10, Naman Gulati wrote:
+> On Wed, Aug 28, 2024 at 06:10:11PM +0000, Naman Gulati wrote:
 > > NAPI busypolling in ep_busy_loop loops on napi_poll and checks for new
 > > epoll events after every napi poll. Checking just for epoll events in a
 > > tight loop in the kernel context delivers latency gains to applications
@@ -98,7 +101,10 @@ On Thu, Aug 29, 2024 at 2:16=E2=80=AFAM Vadim Fedorenko
 > > ep_busy_loop, guarded by the EPIOCSPARAMS ioctl that controls epoll nap=
 i
 > > busypolling.
-> >
+>
+> This makes an API change, so I think that linux-api@vger.kernel.org
+> needs to be CC'd ?
+>
 > > A comparison with neper tcp_rr shows that busylooping for events in
 > > epoll_wait boosted throughput by ~3-7% and reduced median latency by
 > > ~10%.
@@ -106,19 +112,59 @@ i
 > > To demonstrate the latency and throughput improvements, a comparison wa=
 s
 > > made of neper tcp_rr running with:
-> >      1. (baseline) No busylooping
-> >      2. (epoll busylooping) enabling the epoll busy looping on all epol=
-l
-> >      fd's
-> >      3. (userspace busylooping) looping on epoll_wait in userspace
-> >      with timeout=3D0
+> >     1. (baseline) No busylooping
+>
+> Is there NAPI-based steering to threads via SO_INCOMING_NAPI_ID in
+> this case? More details, please, on locality. If there is no
+> NAPI-based flow steering in this case, perhaps the improvements you
+> are seeing are a result of both syscall overhead avoidance and data
+> locality?
+>
+
+The benchmarks were run with no NAPI steering.
+
+Regarding syscall overhead, I reproduced the above experiment with
+mitigations=3Doff
+and found similar results as above. Pointing to the fact that the
+above gains are
+materialized from more than just avoiding syscall overhead.
+
+By locality are you referring to numa locality?
+
+> >     2. (epoll busylooping) enabling the epoll busy looping on all epoll
+> >     fd's
+>
+> This is the case you've added, event_poll_only ? It seems like in
+> this case you aren't busy looping exactly, you are essentially
+> allowing IRQ/softIRQ to drive processing and checking on wakeup that
+> events are available.
+>
+> IMHO, I'm not sure if "epoll busylooping" is an appropriate
+> description.
+>
+
+I see your point, perhaps "spinning" or just =E2=80=9Clooping=E2=80=9D coul=
+d be a closer word?
+
+> >     3. (userspace busylooping) looping on epoll_wait in userspace
+> >     with timeout=3D0
+>
+> Same question as Stanislav; timeout=3D0 should get ep_loop to transfer
+> events immediately (if there are any) and return without actually
+> invoking busy poll. So, it would seem that your ioctl change
+> shouldn't be necessary since the equivalent behavior is already
+> possible with timeout=3D0.
+>
+> I'd probably investigate both syscall overhead and data locality
+> before approving this patch because it seems a bit suspicious to me.
+>
 > >
 > > Stats for two machines with 100Gbps NICs running tcp_rr with 5 threads
 > > and varying flows:
 > >
 > > Type                Flows   Throughput             Latency (=CE=BCs)
-> >                               (B/s)      P50   P90    P99   P99.9   P99=
-.99
+> >                              (B/s)      P50   P90    P99   P99.9   P99.=
+99
 > > baseline            15            272145      57.2  71.9   91.4  100.6 =
   111.6
 > > baseline            30            464952      66.8  78.8   98.1  113.4 =
@@ -146,10 +192,9 @@ l
 > >
 > > Signed-off-by: Naman Gulati <namangulati@google.com>
 > > ---
-> >   fs/eventpoll.c                 | 53 ++++++++++++++++++++++++++-------=
--
-> >   include/uapi/linux/eventpoll.h |  3 +-
-> >   2 files changed, 43 insertions(+), 13 deletions(-)
+> >  fs/eventpoll.c                 | 53 ++++++++++++++++++++++++++--------
+> >  include/uapi/linux/eventpoll.h |  3 +-
+> >  2 files changed, 43 insertions(+), 13 deletions(-)
 > >
 > > diff --git a/fs/eventpoll.c b/fs/eventpoll.c
 > > index f53ca4f7fcedd..6cba79261817a 100644
@@ -162,16 +207,36 @@ l
 > > -     bool prefer_busy_poll;
 > > +     /* prefer to busypoll in napi poll */
 > > +     bool napi_prefer_busy_poll;
+>
+> Adding napi seems slightly redundant to me but I could be convinced eithe=
+r
+> way, I suppose.
+>
+
+With the two different polling booleans in the struct, I felt it's
+better to be explicit
+about the scope of each.
+
 > > +     /* avoid napi poll when busy looping and poll only for events */
 > > +     bool event_poll_only;
-> >   #endif
+>
+> I'm not sure about this overall; this isn't exactly what I think of
+> when I think about the word "polling" but maybe I'm being too
+> nit-picky.
+>
+
+I'm not sure how else to categorize the operation, is there some other phra=
+sing
+you'd recommend?
+
+> >  #endif
 > >
-> >   #ifdef CONFIG_DEBUG_LOCK_ALLOC
+> >  #ifdef CONFIG_DEBUG_LOCK_ALLOC
 > > @@ -430,6 +433,24 @@ static bool ep_busy_loop_end(void *p, unsigned lon=
 g start_time)
 > >       return ep_events_available(ep) || busy_loop_ep_timeout(start_time=
 , ep);
-> >   }
+> >  }
 > >
 > > +/**
 > > + * ep_event_busy_loop - loop until events available or busy poll
@@ -191,13 +256,12 @@ g start_time)
 > > +     return ep_events_available(ep);
 > > +}
 > > +
-> >   /*
-> >    * Busy poll if globally on and supporting sockets found && no events=
-,
-> >    * busy loop will return if need_resched or ep_events_available.
+> >  /*
+> >   * Busy poll if globally on and supporting sockets found && no events,
+> >   * busy loop will return if need_resched or ep_events_available.
 > > @@ -440,23 +461,29 @@ static bool ep_busy_loop(struct eventpoll *ep, in=
 t nonblock)
-> >   {
+> >  {
 > >       unsigned int napi_id =3D READ_ONCE(ep->napi_id);
 > >       u16 budget =3D READ_ONCE(ep->busy_poll_budget);
 > > -     bool prefer_busy_poll =3D READ_ONCE(ep->prefer_busy_poll);
@@ -213,13 +277,6 @@ t nonblock)
 > > +     if (event_poll_only) {
 > > +             return ep_event_busy_loop(ep);
 > > +     } else if (napi_id >=3D MIN_NAPI_ID) {
->
-> There is no need to use 'else if' in this place, in case of
-> event_poll_only =3D=3D true the program flow will not reach this part.
->
-
-Right, I'll change that.
-
 > > +             bool napi_prefer_busy_poll =3D READ_ONCE(ep->napi_prefer_=
 busy_poll);
 > > +
@@ -240,18 +297,94 @@ PI
 I
 > > +             * ID onto the ready list.
 > > +             */
->
-> I believe this change is accidental, right?
->
-
-Yes, thanks for catching, I'll fix that.
-
 > >               ep->napi_id =3D 0;
 > > -             return false;
 > >       }
 > >       return false;
-> >   }
+> >  }
+> > @@ -523,13 +550,15 @@ static long ep_eventpoll_bp_ioctl(struct file *fi=
+le, unsigned int cmd,
+> >
+> >               WRITE_ONCE(ep->busy_poll_usecs, epoll_params.busy_poll_us=
+ecs);
+> >               WRITE_ONCE(ep->busy_poll_budget, epoll_params.busy_poll_b=
+udget);
+> > -             WRITE_ONCE(ep->prefer_busy_poll, epoll_params.prefer_busy=
+_poll);
+> > +             WRITE_ONCE(ep->napi_prefer_busy_poll, epoll_params.prefer=
+_busy_poll);
+> > +             WRITE_ONCE(ep->event_poll_only, epoll_params.event_poll_o=
+nly);
+> >               return 0;
+> >       case EPIOCGPARAMS:
+> >               memset(&epoll_params, 0, sizeof(epoll_params));
+> >               epoll_params.busy_poll_usecs =3D READ_ONCE(ep->busy_poll_=
+usecs);
+> >               epoll_params.busy_poll_budget =3D READ_ONCE(ep->busy_poll=
+_budget);
+> > -             epoll_params.prefer_busy_poll =3D READ_ONCE(ep->prefer_bu=
+sy_poll);
+> > +             epoll_params.prefer_busy_poll =3D READ_ONCE(ep->napi_pref=
+er_busy_poll);
+> > +             epoll_params.event_poll_only =3D READ_ONCE(ep->event_poll=
+_only);
+> >               if (copy_to_user(uarg, &epoll_params, sizeof(epoll_params=
+)))
+> >                       return -EFAULT;
+> >               return 0;
+> > @@ -2203,7 +2232,7 @@ static int do_epoll_create(int flags)
+> >  #ifdef CONFIG_NET_RX_BUSY_POLL
+> >       ep->busy_poll_usecs =3D 0;
+> >       ep->busy_poll_budget =3D 0;
+> > -     ep->prefer_busy_poll =3D false;
+> > +     ep->napi_prefer_busy_poll =3D false;
+> >  #endif
 >
-> [...]
+> Just FYI: This is going to conflict with a patch I've sent to VFS
+> that hasn't quite made its way back to net-next just yet.
 >
+> https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git/commit/?h=3Dv=
+fs.misc&id=3D4eb76c5d9a8851735fd3ec5833ecf412e8921655
+>
+
+Acknowledged.
+
+> >       ep->file =3D file;
+> >       fd_install(fd, file);
+> > diff --git a/include/uapi/linux/eventpoll.h b/include/uapi/linux/eventp=
+oll.h
+> > index 4f4b948ef3811..3bc0f4eed976c 100644
+> > --- a/include/uapi/linux/eventpoll.h
+> > +++ b/include/uapi/linux/eventpoll.h
+> > @@ -89,9 +89,10 @@ struct epoll_params {
+> >       __u32 busy_poll_usecs;
+> >       __u16 busy_poll_budget;
+> >       __u8 prefer_busy_poll;
+> > +     __u8 event_poll_only:1;
+> >
+> >       /* pad the struct to a multiple of 64bits */
+> > -     __u8 __pad;
+> > +     __u8 __pad:7;
+> >  };
+>
+> If the above is accepted then a similar change should make its way
+> into glibc, uclibc-ng, and musl. It might be easier to add an
+> entirely new ioctl.
+
+Adding a new ioctl seems preferable, I can look into reworking the
+code accordingly.
+
+>
+> All the above said: I'm not sure I'm convinced yet and having more
+> clear data, descriptions, and answers on locality/syscall overhead
+> would be very helpful.
+>
+> In the future, add 'net-next' to the subject line so that this
+> targets the right tree:
+>    [PATCH net-next] subject-line
+>
+
+Will do, thank you for the pointer.
+
+> - Joe
 
