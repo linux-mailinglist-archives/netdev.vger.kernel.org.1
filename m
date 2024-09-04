@@ -1,85 +1,131 @@
-Return-Path: <netdev+bounces-125154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3526A96C17B
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:58:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC6F596C18B
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:59:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 677C11C21612
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:58:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B83C1F29F35
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D751DCB01;
-	Wed,  4 Sep 2024 14:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D55811DC733;
+	Wed,  4 Sep 2024 14:58:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gb2yYMba"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SACRSE7R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F82F1DC1AA
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 14:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AB1A1DC05F;
+	Wed,  4 Sep 2024 14:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725461853; cv=none; b=plImD+43mEIs+XnRCezoMOJz28Dc/dteNPC07JHH3zTrepvrLXDPxiWjGwmINIUpyibX9t5RCDAUwS5Jv45+sCjMsaw58XExsb78ok4BcPb/zDQ/ICg6T4GWS2MufyZmxP5wf2p++H+b5rmVdzMw3u0a+ReI/bNNFzbskZu2uDk=
+	t=1725461924; cv=none; b=V32oowyOB9DbUggtMOyuRLoui4vDdfF/uv511oDrfKmHazpBhzUsNFWUEDcAxEqYwXX0+4ipFKPp/YMctpq7rR5314urQlq3DjjO5JXkJJwLkZGMtu+7vHBDf/k4rx99ILRu2GJOB0bXM3hwmq1zkM300GUBcK/y8TnG43/iYGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725461853; c=relaxed/simple;
-	bh=TmJeBV2A4RUwPbT/GT6ByP/f/Jm/ZWEHOrqd7evJ51o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FlAFLQNLprUP4x+GtyIQXRgefQCyiG2QhsvwgORckRCaNdDttASDeH1byjKbRJOcctpz6voefCr4TwA43ck6dtq06O7qbFPVN5LhSPWikwAdf8VvVUKbbjSYxhpf5UZtEo5Mzv2922DW/ZiOl/R0R8xnp66toANhRyclGTtaxmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gb2yYMba; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA12DC4CEC2;
-	Wed,  4 Sep 2024 14:57:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725461853;
-	bh=TmJeBV2A4RUwPbT/GT6ByP/f/Jm/ZWEHOrqd7evJ51o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gb2yYMbaLOO4DSPLO3s2ed68AGBqf1+5rH+eIaibtsmuHaGOE4PfGVkRiwCK2lPPn
-	 On9zhzOxssm+J7onTEkAWopuwySZC5l/fVOeYnA2zy3TDokccY3TN39hEmyfa9Neq9
-	 PHJCBqiw3vHrk0aDP0nkg1Qm+Iz9fdzZbcP7bAk/kjddCEnY4Z/JxS2Qw9su/yEr+Y
-	 200akMMeOUWthI55hZshJVQmIzNh1Wq4WbuA4qmUrNii3JHJQ04oH8TfjVEBV3uqjl
-	 mtDHX7u++L1ARp4XZmI7ceK2/v8/UG3jvgn5UTvEo5Mjc4gpmNyCRvMeeA2FlzzYlf
-	 vkO33D8097jTg==
-Date: Wed, 4 Sep 2024 07:57:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Martin Varghese
- <martin.varghese@nokia.com>, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net] bareudp: Fix device stats updates.
-Message-ID: <20240904075732.697226a0@kernel.org>
-In-Reply-To: <ZthSuJWkCn+7na9k@debian>
-References: <04b7b9d0b480158eb3ab4366ec80aa2ab7e41fcb.1725031794.git.gnault@redhat.com>
-	<20240903113402.41d19129@kernel.org>
-	<ZthSuJWkCn+7na9k@debian>
+	s=arc-20240116; t=1725461924; c=relaxed/simple;
+	bh=ul6VV4JjxH0XxP4Hhv6qq03d2y4Xr1eVllPyVW6Vt2k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JNM5gsXc1KQjBF0SxwoAbC0FXhtuqdq9F2J7SG11tjKFX8EJcPLWgbBqYf0+lS4VTCcqid+Fl4sdckVqZnCNATLsn3G4bYV5QAJaAdyz6jMr9aEGzKszJrb0N+DqzTzF+OETs9WaCHCB3GPn6WLbOaWCEYEBGb9z7LLVl0LiM1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SACRSE7R; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a86753ac89bso31661066b.0;
+        Wed, 04 Sep 2024 07:58:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725461921; x=1726066721; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=nyHRUbS96LQJMnxC77/pMoO0AXemk+GGLf2OYY2VbUE=;
+        b=SACRSE7ReCgTFpa1yOZue9YSUKkh8mH5Oukf6EPx4p8sGfjaFUjrg3Z21h40K6yQai
+         0ubFRbPKz6IWR1Fe1DKOm9xzgD8Wcsic9hZ6Ltm0+UKj7318zigG1aiCl2Y9c2xyXfuL
+         O9ug1AVVbFFMIS7B/t4QwvLqCBfyURKxc5BSKp2AKGF7tDUjIYq5e2jjLYF9zUNqVUBu
+         i93qLAcMOAS34ElJfZ6PPYB6CqEsiwTxSmELKS81Zh2QuuJTCnL+0NypXgb02AnatToo
+         jrJEVWWLBQKMKQZ8o8zs+bGhBz1aFSbnbpFIaDgd5ysDYs5E1Ax3q/YhXMuZzaQwY++x
+         8PcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725461921; x=1726066721;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nyHRUbS96LQJMnxC77/pMoO0AXemk+GGLf2OYY2VbUE=;
+        b=pQ2j7c2u/pW1Gc0U0dQtB6tLUztmfeD1RFvvBnKSgZD41ESsPxI57pYt8RvyO6EgsL
+         2KS3rTPbiKym+JjeeqdnLm4+MXbszLYqWdNRWD96kUgceWP4ymlKPgql+9nueRbdUec4
+         gR+9SToALHrmb6rpYVGlg86suqhLt+tuENTgUIJcNbyaJ7hO0OWIpg0iU760IhgkEILj
+         kwoy1iHAmjfuAVq9DZ0oOFDv+h46ASfTQ5inEvPHxxmauXy2wzSHc3jWq04OlpfXBwbK
+         rUMUyeAH76084+49m5alLv5AiuqwpCnTwlSkIENvONy6Y2O/+m/W6AwYkYcANNqdsz32
+         z2ig==
+X-Forwarded-Encrypted: i=1; AJvYcCXB2AK26ectVKjvBZxYIWtYsAywsURiYlJyLRPEiiBmHmiHhzzJ1eTpEywXyEXOmWDMuoOBd5bRn7JGxSc=@vger.kernel.org, AJvYcCXfD7QaCWqmIU8N9G72cdJZqzAsBXDegOjO9R0NmqXK0Y4oGR8QHkDKk4R/n6DotsYLv4OdBCFc@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5AYiSOchIxv69ws4Tz/gJlhHVkjWBuOt9zvzaQbntFDsZKeDU
+	ykNxkCStX8Q1WGoOVoCePdDK3DRNYrs8kZizIkut4Ue+w08Fhh6R
+X-Google-Smtp-Source: AGHT+IF9fNPAMV3rkGRPbruFXWJ88SAxEy28gAk+8MFg+kx8FVMQrf0q3A1TSlP9jRdQelWzVhiB+g==
+X-Received: by 2002:a17:907:3e92:b0:a80:a37f:c303 with SMTP id a640c23a62f3a-a89a357825bmr653597266b.4.1725461921263;
+        Wed, 04 Sep 2024 07:58:41 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8a6236d041sm1984566b.132.2024.09.04.07.58.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Sep 2024 07:58:40 -0700 (PDT)
+Date: Wed, 4 Sep 2024 17:58:37 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk, linux@armlinux.org.uk, xfr@outlook.com,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v7 3/7] net: stmmac: refactor FPE verification
+ process
+Message-ID: <20240904145837.wh7tdrffsiqpot22@skbuf>
+References: <cover.1725441317.git.0x1207@gmail.com>
+ <cover.1725441317.git.0x1207@gmail.com>
+ <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
+ <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
+ <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
 
-On Wed, 4 Sep 2024 14:29:44 +0200 Guillaume Nault wrote:
-> > The driver already uses struct pcpu_sw_netstats, would it make sense to
-> > bump it up to struct pcpu_dstats and have per CPU rx drops as well?  
-> 
-> Long term, I was considering moving bareudp to use dev->tstats for
-> packets/bytes and dev->core_stats for drops. It looks like dev->dstats
-> is only used for VRF, so I didn't consider it.
+On Wed, Sep 04, 2024 at 05:21:18PM +0800, Furong Xu wrote:
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 3072ad33b105..e2f933353f40 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -969,17 +969,30 @@ static void stmmac_mac_config(struct phylink_config *config, unsigned int mode,
+>  static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
+>  {
+>  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
+> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
+> -	bool *hs_enable = &fpe_cfg->hs_enable;
+> +	unsigned long flags;
+>  
+> -	if (is_up && *hs_enable) {
+> -		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
+> -					MPACKET_VERIFY);
+> +	del_timer_sync(&fpe_cfg->verify_timer);
 
-Right, d stands for dummy so I guess they also were used by dummy 
-at some stage? Mostly I think it's a matter of the other stats being
-less recent.
+Interesting comments in include/linux/timer.h:
+ * Do not use in new code. Use timer_delete_sync() instead.
 
-> Should we favour dev->dstats for tunnels instead of combining ->tstats
-> and ->core_stats? (vxlan uses the later for example).
+Also, interesting comment in the timer_delete_sync() kernel-doc:
+ Callers must prevent restarting of the timer, otherwise this function is meaningless.
 
-Seems reasonable to me. Not important enough to convert existing
-drivers, maybe, unless someone sees contention. But in new code,
-or if we're touching the relevant lines I reckon we should consider it?
-No strong feelings tho, LMK if you want to send v2 or keep this patch
-as is.
+I don't think you have any restart prevention mechanism. So between the
+timer deletion and the spin_lock_irqsave(), another thread has enough
+time to acquire fpe_cfg->lock first, and run stmmac_fpe_verify_timer_arm().
 
