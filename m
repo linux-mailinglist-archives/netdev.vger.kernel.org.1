@@ -1,80 +1,50 @@
-Return-Path: <netdev+bounces-125049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D152096BBE7
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:20:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9B8096BC05
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:25:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C7D6288368
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:20:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEE7AB25B87
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:20:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2001D86DF;
-	Wed,  4 Sep 2024 12:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74A2A1D4175;
+	Wed,  4 Sep 2024 12:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="fapWj3os"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cP19CWjl"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-235.mail.qq.com (out203-205-221-235.mail.qq.com [203.205.221.235])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41031D4175;
-	Wed,  4 Sep 2024 12:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.235
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8CB1D0144
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 12:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725452408; cv=none; b=prekScTBgCkhn8KQOZzGM84sJKI+XCbgUvzfboAtjMU0L5sb3GwfZ8nBjubaAI6og2uHkA85WM/r1FlG4tD00dtlh2vBHeaYxV/c7dQnuT0dTjTLei5maa9vhzlMRDNKcKpQHBfZxQ8OdmXgRYstouppi3pUsKDLJRBDJ2WLnqM=
+	t=1725452431; cv=none; b=oWxVegzCm617M5LVXKqUqmXXf+Tg8XQUyi/3GGxeb9gf21eZyR2SCrHJyqoYHgGMrhm8aopQwRiz2rTLn6gxsT4RgwKBkkcQQYXjK1t2I9yqA9+oBKfNLqFgxPtY2lQnbiL7f4BviouiAsAYVqsEdn3JX0jY5zTq3BnXm/2arxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725452408; c=relaxed/simple;
-	bh=BzSR+iF80WBX+uueKwT7tQdRcX9cS6wGP+R5wlC6WBI=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=oWFrtncrGCpQHkNrWvnJYQTd1HzOGawXo/1R5ofImvax2k6T4qCTURFsj7x8JBZQd25E4FUwSaKgTLplN5uB1Ypjx/MfpU/0NzuaC+7Z186Hr9W4B8urbh6L1QZqaJ+SaWQj/Gkc2w9w3ND5Uf4aFR1co8vJqK92Aq7C3Q1sFc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=fapWj3os; arc=none smtp.client-ip=203.205.221.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1725452396;
-	bh=mD6Sm4uUq8ujV/RDO5ndOtiCjedlBdoHLSnc4vE9J64=;
-	h=From:To:Cc:Subject:Date;
-	b=fapWj3osGaeAAuxVZqzmosZWl9pZ6YWpzDoTFV829xnvynRIJvW0y9DrrnZCfWu7P
-	 SYU18D+XMhV9oCErPrGKyJu95B1s5f9kKyb5qxguOBjq2tYvDBGMCKK6nC6dAX1MIz
-	 eM9mSpnM3qUNUdPK/NBIvPNoVgEgKHG1SGIS9e8w=
-Received: from localhost.localdomain ([114.246.200.160])
-	by newxmesmtplogicsvrszb16-1.qq.com (NewEsmtp) with SMTP
-	id 4AB12AD4; Wed, 04 Sep 2024 20:18:43 +0800
-X-QQ-mid: xmsmtpt1725452323t1inlzbgz
-Message-ID: <tencent_DE4D2D0FE82F3CA9294AEEB3A949A44F6008@qq.com>
-X-QQ-XMAILINFO: MmpliBmRb3iCZG+tszeXk1rzRTEAY7Bed4qo4m+KlRYfIVoyBGpwOVX4mO77ZY
-	 b+Xqy7SLZGWfrwnRHtOZNdCwN0OniQ7xIFUh/h7DIjjwpabvomfISJlDDVQNTPZMEgs5X9jDXHVt
-	 EI6aJ0+4YZKMbbgGdZLsivYIdrX6Ntu+8P/CvzP+jBaUBDvJXQ6RbfvFbQuSFD5K5vztokPsFVvP
-	 rJx/qdevWPaI1vUP+yng0vTrlBElocp2DV3z/X3ur7ydURKBzJ2kyPsTX07Fn4Y6UmMi2Bo3scwg
-	 qoz/FupAX3gyrTLU7nfmAO+aqaZotXR8XUH0s3hv0dhPwm0vfvxMbDrEVPqZTsp9+NFSN5pDCJnR
-	 3fFSkfTi3nOaz3ovfcIrnFxXkEqsx0FQkgO4wCNSf48uT9Lel2SfYoo+3QYtnYBewEbzesiQxOVN
-	 VtY2RuwN4zCB/IqS7m5FFsWGTi7gC0OFydSJYTtxFuB2r0nC0ak9tVTG0TcEAzHI9vE9I2MIoG4k
-	 7jylnykNoETtb3+CTTCoQ6oeMkdb0WuqXpDefxtGJVbl6fCn915yRD1qYi52rsJYLRMNSr15L3/2
-	 /qS4sZ5a8X4HdrN0YhSCLrFakVTx9PkZp0Z/+i32jcy2p4eOMHKbCITYZaFg3b0ZL3SUXSJszdl9
-	 yJtMYM1jzGtNr2hnYTgvOFNbZc4AvB/IANS21jaYztmeeCizsRnel5+qSDayX/2HAHCFdSzZ/Wq4
-	 w3YCvqoEgYv1tc1vIaS+GAScGfAtixgoAToaMdNassMj3OBVNWq9h8IDspXkO/279ix7+zdDL443
-	 M4X2oCQvv35/uBifzzqsw3GadbkipXnQISvF+3fN1Iz3I6A8NvvNlDHN+2MGfSMrZbtbxAcce4dd
-	 WmNz9LbIGPB+rIbG02VImw0wrspwCZ7wuYbw+LU7ZTdk3n4KWjgTuKgN/R9QZ4gZFN2yF1XijfMK
-	 iDKB+CW4LYhfKP1VsnoDgJmhLJr45tN4wEm/Pc2lm7/+DdIbdmfmcU0HKwHOYcGQvGoNEDEWyKme
-	 Rs4Y83ST+9oJMc2RwDahIs3S/buMKkJXxGUTYMEalA8PGxdi27g9gagYQ6PS8=
-X-QQ-XMRINFO: NI4Ajvh11aEj8Xl/2s1/T8w=
-From: Jiawei Ye <jiawei.ye@foxmail.com>
-To: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	fw@strlen.de
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] netfilter: tproxy: Add RCU protection in nf_tproxy_laddr4
-Date: Wed,  4 Sep 2024 12:18:42 +0000
-X-OQ-MSGID: <20240904121842.981264-1-jiawei.ye@foxmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1725452431; c=relaxed/simple;
+	bh=o64GG+5u6XIHijZKyVeJlVspplZhN5O6GF7DP2hLvE0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=NQ+N7MeaIJSAL1OBUF4TXDmfY8kjw4D8m5TghC0cHTMCZWU1VUVhSddccZhOCfghEKYYk9LLTt0tHQgx6o/aRnvZeW7Q760I/5jg/c0ilG/3TWSb01ouPHqthwo3OgS4XlsGi2VEcURUwbe44pYmiegu4O7FZO3iq8z9TxcisPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cP19CWjl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8712C4CEC2;
+	Wed,  4 Sep 2024 12:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725452429;
+	bh=o64GG+5u6XIHijZKyVeJlVspplZhN5O6GF7DP2hLvE0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cP19CWjlpnJmRUeYrZPtNho9PzIxpfybLzteQl931Isn2rYECLrh/JyxQ0mjHhrGO
+	 sniH/azH/qERXdmTs4NnPRFzTm/jKdEuDmwa5DelSFWeadgsawfA+G+wppc3cNEinS
+	 hrU/avqhVSysPXm+Wk7KAmb6eE3iqPtDB/K0XlxS5Zu83IVVrLCzvtAOBtOGECxXNE
+	 76+vMuxv0/2lItq/CBVPC0MFgFd5KklEHmhTV8+1NFVbMQmb9SqoCjV2UXQd4boioD
+	 Bk54v+uX4+5eSJcpF5VSGkfmA247Mr4sWSPQzrTQo8GgRSEmyur8MbFx/6ThFzWHIc
+	 M5nRsouPYAV8Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDB13806651;
+	Wed,  4 Sep 2024 12:20:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,53 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/2] eth: Add basic ethtool support for fbnic
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172545243051.991376.8496396240105346508.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Sep 2024 12:20:30 +0000
+References: <20240902173907.925023-1-mohsin.bashr@gmail.com>
+In-Reply-To: <20240902173907.925023-1-mohsin.bashr@gmail.com>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
+ andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ kernel-team@meta.com, sanmanpradhan@meta.com, sdf@fomichev.me,
+ jdamato@fastly.com
 
-In the `nf_tproxy_laddr4` function, both the `__in_dev_get_rcu()` call
-and the `in_dev_for_each_ifa_rcu()` macro are used to access
-RCU-protected data structures. Previously, these accesses were not
-enclosed within an RCU read-side critical section, which violates RCU
-usage rules and can lead to race conditions, data inconsistencies, and
-memory corruption issues.
+Hello:
 
-This possible bug was identified using a static analysis tool developed
-by myself, specifically designed to detect RCU-related issues.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-To address this, `rcu_read_lock()` and `rcu_read_unlock()` are added
-around the RCU-protected operations in the `nf_tproxy_laddr4` function by
-acquiring the RCU read lock before calling `__in_dev_get_rcu()` and
-iterating with `in_dev_for_each_ifa_rcu()`. This change prevents
-potential RCU issues and adheres to proper RCU usage patterns.
+On Mon,  2 Sep 2024 10:39:05 -0700 you wrote:
+> This patch series adds basic ethtool support for fbnic. Specifically,
+> the two patches focus on the following two features respectively:
+> 
+> 1: Enable 'ethtool -i <dev>' to provide driver, firmware and bus information.
+> 2: Provide mac group stats.
+> 
+> Changes since v2:
+> - Fix v1 reference link
+> - Fix nit
+> 
+> [...]
 
-Fixes: b8d19572367b ("netfilter: use in_dev_for_each_ifa_rcu")
-Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
----
- net/ipv4/netfilter/nf_tproxy_ipv4.c | 3 +++
- 1 file changed, 3 insertions(+)
+Here is the summary with links:
+  - [net-next,v3,1/2] eth: fbnic: Add ethtool support for fbnic
+    https://git.kernel.org/netdev/net-next/c/bd2557a554a0
+  - [net-next,v3,2/2] eth: fbnic: Add support to fetch group stats
+    https://git.kernel.org/netdev/net-next/c/4eb7f20bcf06
 
-diff --git a/net/ipv4/netfilter/nf_tproxy_ipv4.c b/net/ipv4/netfilter/nf_tproxy_ipv4.c
-index 73e66a088e25..51ff9c337e71 100644
---- a/net/ipv4/netfilter/nf_tproxy_ipv4.c
-+++ b/net/ipv4/netfilter/nf_tproxy_ipv4.c
-@@ -57,8 +57,10 @@ __be32 nf_tproxy_laddr4(struct sk_buff *skb, __be32 user_laddr, __be32 daddr)
- 		return user_laddr;
- 
- 	laddr = 0;
-+	rcu_read_lock();
- 	indev = __in_dev_get_rcu(skb->dev);
- 	if (!indev)
-+		rcu_read_unlock();
- 		return daddr;
- 
- 	in_dev_for_each_ifa_rcu(ifa, indev) {
-@@ -68,6 +70,7 @@ __be32 nf_tproxy_laddr4(struct sk_buff *skb, __be32 user_laddr, __be32 daddr)
- 		laddr = ifa->ifa_local;
- 		break;
- 	}
-+	rcu_read_unlock();
- 
- 	return laddr ? laddr : daddr;
- }
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
