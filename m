@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-125296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8374A96CAE1
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:41:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4FEC96CAE5
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:41:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EB6BB2102D
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 23:40:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E77251C24C59
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 23:41:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEC4187348;
-	Wed,  4 Sep 2024 23:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE5718893E;
+	Wed,  4 Sep 2024 23:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K4JI9oHv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NgmRDTcG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B428D186E47;
-	Wed,  4 Sep 2024 23:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8EB17ADFF;
+	Wed,  4 Sep 2024 23:40:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725493235; cv=none; b=a+x/eFSXZTCPn4B5r2QAJ6Jl5R7vTpOz5L1H7cS4n/+vu8CxBMG4IWzEKwpx6sZhCQldtASL9VMoVh40cRfadg9pbAD5CSDH6hb0dmnpbPqz3mWV8bf2Jqswzr7m81KKjB0G+f5GTW5jpj+Z7c7U7QLXqZY4n9TBcWS3ifoGYjY=
+	t=1725493239; cv=none; b=a+38UIJrctzJDjUhjmfO6UbW2bbJZc4zgFC2d9zQ3GBjMTfIW10s3h90x3fpyRXcgtFBdtYIofxIiCQh93q8r7mTRv6mUeTRGVovDV2GLCY+htmvHChJrpy6aC1t5fiBLzYldelHtfG+KaIvgsRFihIwskM3RiUAbi1CvxNIMVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725493235; c=relaxed/simple;
-	bh=uaCBz6i3GYPZoyY4C17RwCb2cncHSDSWe40lw1vCbPw=;
+	s=arc-20240116; t=1725493239; c=relaxed/simple;
+	bh=mKjD8xk0OPeXnIPaePzDkxOuIVCyQqxsKu1AG2UDAkM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bEfBSVblwPTwDi+urJ2/M68FngR9w3vPIea/0BayyQwCMaq7SfBr2FI+3VI7OCSZWQCskfkdoctNda5/y8AmY3J7WdA8GTq44YMkeLgJWR8NcaagrMMv35d2mYC8JyliD3O6+3GTENiDF89XZ7BIoJuX4bsnrwNcp+79zt0JuU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K4JI9oHv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F79CC4CEC2;
-	Wed,  4 Sep 2024 23:40:35 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=UjU36RmQyN/IX4nSEOH6mM/Elfb1cYFZVi3nfUtmXq28bOystxAIwAafr7uVcLYFD9QXUafiXcR4g2KX8ZDGxqmCFy4j66XiXw2skdwt7E4cO7EgPf4Xtv0tSatHWqbxn0JYFW8K1luwO4eGbMtLNSzR8vzle4DlA5UoSDOqq2U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NgmRDTcG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D324C4CEC9;
+	Wed,  4 Sep 2024 23:40:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725493235;
-	bh=uaCBz6i3GYPZoyY4C17RwCb2cncHSDSWe40lw1vCbPw=;
+	s=k20201202; t=1725493238;
+	bh=mKjD8xk0OPeXnIPaePzDkxOuIVCyQqxsKu1AG2UDAkM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=K4JI9oHvJ9w/fpKcMkZ244lEDD/JubO28lNNSGSicfU5qd31612HTxwRoNiI8kOv2
-	 xs6YZsg8wINKYYpIbW5iwMtFvK4Z7g2VU+WM4U62dmYakPEyko2VN8oPNN6EtAZlgf
-	 LF4595W6zbpNS0eJru7T50itzVwvVMDseD9EaAgV4vWfzoyuM9SGhxIuVzUVks57M4
-	 ujPzD2FePC2q/sf3b127vXyjPXu7MF7oGfajdy/Ih8khIkiHKY8iMLMd4IOlXELrYG
-	 VyK1m8VFqfvU+bhvxqnxomqG1K+aTRkrEmZlko4Zrezc3qSXIgmxw18A2dhpYjj03W
-	 HT360nls7H3vw==
+	b=NgmRDTcGKp3Cz5PjQLlYScpPJBdeXZdsJTp3DDep9k3I/ptIzruj80g17njHG8tm9
+	 mEr34zrxcIJuv4ZjpJqFOOSWJ3gh5nk6s5WwMul1xA7r6A9C3SD6gZoFdaTubnMJ+7
+	 rt88jkFTMbHJx91NYe2qh+SxlDjqpIgc0xZjAfGvoivqXatHvyj21BzJS3Kydjn48B
+	 RKb2rytk+pJ95d6neXfn2IJ5HUvOpeILd8sR6TAfcUCwBRIkGX+ixNftEaXg92A451
+	 YnYgjDML4LMYwvzYhuXjVkiAt4/fRBOPf621WG7ie4tTl8xaNtid35rT6hih6tvUE6
+	 KKKPW6Kxn+nBw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 342733822D30;
-	Wed,  4 Sep 2024 23:40:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 715A93822D30;
+	Wed,  4 Sep 2024 23:40:40 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V2] net: bridge: br_fdb_external_learn_add(): always set
- EXT_LEARN
+Subject: Re: [PATCH net-next v2] net: mana: Improve mana_set_channels() in low mem
+ conditions
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172549323574.1198891.6356740352236763022.git-patchwork-notify@kernel.org>
-Date: Wed, 04 Sep 2024 23:40:35 +0000
-References: <20240903081958.29951-1-jonas.gorski@bisdn.de>
-In-Reply-To: <20240903081958.29951-1-jonas.gorski@bisdn.de>
-To: Jonas Gorski <jonas.gorski@bisdn.de>
-Cc: roopa@nvidia.com, razor@blackwall.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, idosch@mellanox.com,
- petrm@mellanox.com, bridge@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ <172549323899.1198891.6547340343364681759.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Sep 2024 23:40:38 +0000
+References: <1725248734-21760-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To: <1725248734-21760-1-git-send-email-shradhagupta@linux.microsoft.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, kys@microsoft.com,
+ haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ longli@microsoft.com, horms@kernel.org, kotaranov@microsoft.com,
+ schakrabarti@linux.microsoft.com, erick.archer@outlook.com,
+ pavan.chebbi@broadcom.com, ahmed.zaki@intel.com, colin.i.king@gmail.com,
+ shradhagupta@microsoft.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  3 Sep 2024 10:19:57 +0200 you wrote:
-> When userspace wants to take over a fdb entry by setting it as
-> EXTERN_LEARNED, we set both flags BR_FDB_ADDED_BY_EXT_LEARN and
-> BR_FDB_ADDED_BY_USER in br_fdb_external_learn_add().
-> 
-> If the bridge updates the entry later because its port changed, we clear
-> the BR_FDB_ADDED_BY_EXT_LEARN flag, but leave the BR_FDB_ADDED_BY_USER
-> flag set.
+On Sun,  1 Sep 2024 20:45:34 -0700 you wrote:
+> The mana_set_channels() function requires detaching the mana
+> driver and reattaching it with changed channel values.
+> During this operation if the system is low on memory, the reattach
+> might fail, causing the network device being down.
+> To avoid this we pre-allocate buffers at the beginning of set operation,
+> to prevent complete network loss
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,V2] net: bridge: br_fdb_external_learn_add(): always set EXT_LEARN
-    https://git.kernel.org/netdev/net/c/bee2ef946d31
+  - [net-next,v2] net: mana: Improve mana_set_channels() in low mem conditions
+    https://git.kernel.org/netdev/net-next/c/1705341485ff
 
 You are awesome, thank you!
 -- 
