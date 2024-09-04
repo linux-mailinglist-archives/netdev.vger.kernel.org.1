@@ -1,384 +1,176 @@
-Return-Path: <netdev+bounces-125124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E27D96BF6F
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:01:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2D2896BF33
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:56:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EEE9B2B299
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:00:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12D261C2439F
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:56:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DFCF1D9D6A;
-	Wed,  4 Sep 2024 13:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RfkjIeqQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D201DA609;
+	Wed,  4 Sep 2024 13:56:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC651386C9
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 13:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406961D88BF
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 13:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725458316; cv=none; b=ocv9rtEzG58lSrAEiWd3V5v+hX9fEgefQuDgbV28XJ+g2RJ1Y9pYhlMb6/Vn70DSID7Ngsy+msfOj4qgme1r5lR+JTS+gpaVtUcytluqm0TYG7TNB7IOjhtsbqgG5PkLvV9UmCyWUkJQjOCYgw5bTtf3HbAAU+1TXZlKOLbX4RA=
+	t=1725458185; cv=none; b=t9lYJ5Qz2aZKTVtvXKM9cpwwdaBY9vGP7CpVVUfy/swXEiUtSg06vA0i1h56BrlIa2fFK5l/7BFODdBm1BURXpLRI+bJku2z7iqFEs0R+fUUcuLHIhS1Nc62xaPtAPxJUuuY0OgBevkDZQq1prigI8hPeuKiyb8dx8iazZpwguY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725458316; c=relaxed/simple;
-	bh=SbFVj6nfDjowz7jWP5+SajvgykjHeh71kqWqvmu9xhY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LmTUPvTMCSG3S5DzxSaf0zFLvoWAUYpgZtJjNcwoulgAYEXnSE1sxIT4WMA6lFn0ZKGDhthA+JbqzjxzUyHePN00gSrRaJ/hLhyCOAoToz+6UWYr7nz7A4eaP4ML4EYzNpqui52g1S+L9OTSYrDVwFXKLCDbG6oVBOBqYfr5MSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RfkjIeqQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725458314;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3DMoA8OS//Y8tcc6HAk0WEZeYIbSYdfME8CeTxdSTSI=;
-	b=RfkjIeqQ76HP/brpgGkK4wV/RPnRnDxBhjDSuTtEzsvbPFzySMA7ZysvCEfuAUxz2LVUMB
-	GwoERke+stucLZ2o8AkfjIqJCyNwXzdVc1fLcF9g/BG0Bv67ZkeiVhwLn+42FlwCQ9/Mit
-	7qiWOR8Byr5tc3YO083NBNaPp7WNjCk=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-562-_O0Mo041ORO6a_eSf3ZDyA-1; Wed,
- 04 Sep 2024 09:58:29 -0400
-X-MC-Unique: _O0Mo041ORO6a_eSf3ZDyA-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2A2E91955D42;
-	Wed,  4 Sep 2024 13:58:21 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.58])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BD027195609E;
-	Wed,  4 Sep 2024 13:58:11 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	edumazet@google.com
-Subject: [PATCH v6 net-next 15/15] iavf: add support to exchange qos capabilities
-Date: Wed,  4 Sep 2024 15:53:47 +0200
-Message-ID: <f0e1cc54f6288b33d80c8c0033a67ce4c74081b1.1725457317.git.pabeni@redhat.com>
-In-Reply-To: <cover.1725457317.git.pabeni@redhat.com>
-References: <cover.1725457317.git.pabeni@redhat.com>
+	s=arc-20240116; t=1725458185; c=relaxed/simple;
+	bh=GnJ3J4LB9h3i3mrMXvLyRaIBcF3AkHF0QK2TBpFXWbU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=raL7LuZ0rtkoB4wRnZItte/UczOLrVvW/dgzd1kj08UmpLXDP3Lla+ejWSvX1vXRqGIsoovODD2VlfJN8zHlTBmJIRUi17k3vBjWOjnVw1rBGpvZ0lY+qgQOMkXf5itMBG2eCac6+E3Phpxe2fbPRJF/2hH7CZc4nodA/Z6E3KA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-82a4f65fa5aso102443339f.1
+        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 06:56:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725458183; x=1726062983;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SrzSFGTCyr4+MMyyh7GqVNUCiLJr5fc0UW/sfiKd6Ek=;
+        b=fKrLDhjRDKAOaUAvVfH2eDkZ2xw7KnvysGXoK+G/Esr/iqxkC2va5G5cdkjsnROcGx
+         UYyo8DLyQMv76S9uWP5wLp8dhBsWw9tIpYBDfi+3Fb84oi7/AO9UxTesS1g78zWT2rW+
+         SEkDjTxctDFe5Fo79xSbg0OXn9MxGCa4lzYMab6vrxjp+YKEs8mP61WXCOeAPyRC1Bv8
+         JtIiONPzKFOBx51fIVKFp0DinImt1lj1KdwowufhXr54k32ENxEnuwdqoDYt2xQmpZ+L
+         PqyUB6LWRlC8X/I2a+6bkxTOjVbxnZCEdsZdjRD5Byipyw3rYPGbcg0Qm4q8EwPzCSPQ
+         kZ3A==
+X-Forwarded-Encrypted: i=1; AJvYcCUPgqVm6L8z+nApcr44Smp9kAaLB7ke7ow0KrV7BdeFScNWMhetw2vTJVSgYQ7xma2pFiXz/Q8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwckSYBDnDof87srnONrKGOnLSYvJ6BaGFY5QSf3ZtonHd0t4fQ
+	mnTc96DrwuHdlqT2u1d0+BFCTmMR/DKQvGe1GzPb2b1h4wSpMEZMSwewgKS0pYHEOqtuPRUGDgl
+	MeEliKpz/M7UmtMTbAbNBdrlE1+pWUWkRfDjRDNCKNPN+oMjMKhwBDlA=
+X-Google-Smtp-Source: AGHT+IGSyNQ8Rtx94SawzEyABtvJRvCxW1pAg//QKH+j9QjhQO9b+/yGXAYCwPX22wqil4YEJFRC6aAefEOcIxCBRrMlZdBKD1Gi
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-Received: by 2002:a05:6638:1491:b0:4ce:928f:ad9a with SMTP id
+ 8926c6da1cb9f-4d0600aa00dmr109910173.1.1725458183431; Wed, 04 Sep 2024
+ 06:56:23 -0700 (PDT)
+Date: Wed, 04 Sep 2024 06:56:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001934d306214b8aa9@google.com>
+Subject: [syzbot] [can?] WARNING in remove_proc_entry (6)
+From: syzbot <syzbot+0532ac7a06fb1a03187e@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, kuniyu@amazon.com, linux-can@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mkl@pengutronix.de, netdev@vger.kernel.org, 
+	pabeni@redhat.com, socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+Hello,
 
-During driver initialization VF determines QOS capability is allowed
-by PF and receives QOS parameters. After which quanta size for queues
-is configured which is not configurable and is set to 1KB currently.
+syzbot found the following issue on:
 
-Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+HEAD commit:    5517ae241919 Merge tag 'for-net-2024-08-30' of git://git.k..
+git tree:       net
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=111adcfb980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=996585887acdadb3
+dashboard link: https://syzkaller.appspot.com/bug?extid=0532ac7a06fb1a03187e
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=138d43db980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11fe3d43980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ddded5c54678/disk-5517ae24.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ce0dfe9dbb55/vmlinux-5517ae24.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ca81d6e3361d/bzImage-5517ae24.xz
+
+The issue was bisected to:
+
+commit 76fe372ccb81b0c89b6cd2fec26e2f38c958be85
+Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date:   Mon Jul 22 19:28:42 2024 +0000
+
+    can: bcm: Remove proc entry when dev is unregistered.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=116f8e8f980000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=136f8e8f980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=156f8e8f980000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0532ac7a06fb1a03187e@syzkaller.appspotmail.com
+Fixes: 76fe372ccb81 ("can: bcm: Remove proc entry when dev is unregistered.")
+
+------------[ cut here ]------------
+name '4986'
+WARNING: CPU: 0 PID: 5234 at fs/proc/generic.c:711 remove_proc_entry+0x2e7/0x5d0 fs/proc/generic.c:711
+Modules linked in:
+CPU: 0 UID: 0 PID: 5234 Comm: syz-executor606 Not tainted 6.11.0-rc5-syzkaller-00178-g5517ae241919 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+RIP: 0010:remove_proc_entry+0x2e7/0x5d0 fs/proc/generic.c:711
+Code: ff eb 05 e8 cb 1e 5e ff 48 8b 5c 24 10 48 c7 c7 e0 f7 aa 8e e8 2a 38 8e 09 90 48 c7 c7 60 3a 1b 8c 48 89 de e8 da 42 20 ff 90 <0f> 0b 90 90 48 8b 44 24 18 48 c7 44 24 40 0e 36 e0 45 49 c7 04 07
+RSP: 0018:ffffc9000345fa20 EFLAGS: 00010246
+RAX: 2a2d0aee2eb64600 RBX: ffff888032f1f548 RCX: ffff888029431e00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc9000345fb08 R08: ffffffff8155b2f2 R09: 1ffff1101710519a
+R10: dffffc0000000000 R11: ffffed101710519b R12: ffff888011d38640
+R13: 0000000000000004 R14: 0000000000000000 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8880b8800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fcfb52722f0 CR3: 000000000e734000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ bcm_release+0x250/0x880 net/can/bcm.c:1578
+ __sock_release net/socket.c:659 [inline]
+ sock_close+0xbc/0x240 net/socket.c:1421
+ __fput+0x24a/0x8a0 fs/file_table.c:422
+ task_work_run+0x24f/0x310 kernel/task_work.c:228
+ exit_task_work include/linux/task_work.h:40 [inline]
+ do_exit+0xa2f/0x27f0 kernel/exit.c:882
+ do_group_exit+0x207/0x2c0 kernel/exit.c:1031
+ __do_sys_exit_group kernel/exit.c:1042 [inline]
+ __se_sys_exit_group kernel/exit.c:1040 [inline]
+ __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1040
+ x64_sys_call+0x2634/0x2640 arch/x86/include/generated/asm/syscalls_64.h:232
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fcfb51ee969
+Code: Unable to access opcode bytes at 0x7fcfb51ee93f.
+RSP: 002b:00007ffce0109ca8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fcfb51ee969
+RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000001
+RBP: 00007fcfb526f3b0 R08: ffffffffffffffb8 R09: 0000555500000000
+R10: 0000555500000000 R11: 0000000000000246 R12: 00007fcfb526f3b0
+R13: 0000000000000000 R14: 00007fcfb5271ee0 R15: 00007fcfb51bf160
+ </TASK>
+
+
 ---
-v5 -> v6:
- - error out on bad rate
----
- drivers/net/ethernet/intel/iavf/iavf.h        | 10 ++
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 51 +++++++++-
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 92 ++++++++++++++++++-
- 3 files changed, 150 insertions(+), 3 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index a84bdbfbb0f7..75ac69670789 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -251,6 +251,9 @@ struct iavf_cloud_filter {
- #define IAVF_RESET_WAIT_DETECTED_COUNT 500
- #define IAVF_RESET_WAIT_COMPLETE_COUNT 2000
- 
-+#define IAVF_MAX_QOS_TC_NUM		8
-+#define IAVF_DEFAULT_QUANTA_SIZE	1024
-+
- /* board specific private data structure */
- struct iavf_adapter {
- 	struct workqueue_struct *wq;
-@@ -338,6 +341,8 @@ struct iavf_adapter {
- #define IAVF_FLAG_AQ_ENABLE_STAG_VLAN_INSERTION		BIT_ULL(37)
- #define IAVF_FLAG_AQ_DISABLE_STAG_VLAN_INSERTION	BIT_ULL(38)
- #define IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW		BIT_ULL(39)
-+#define IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE		BIT_ULL(40)
-+#define IAVF_FLAG_AQ_GET_QOS_CAPS			BIT_ULL(41)
- 
- 	/* flags for processing extended capability messages during
- 	 * __IAVF_INIT_EXTENDED_CAPS. Each capability exchange requires
-@@ -410,6 +415,8 @@ struct iavf_adapter {
- 			       VIRTCHNL_VF_OFFLOAD_FDIR_PF)
- #define ADV_RSS_SUPPORT(_a) ((_a)->vf_res->vf_cap_flags & \
- 			     VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF)
-+#define QOS_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
-+			 VIRTCHNL_VF_OFFLOAD_QOS)
- 	struct virtchnl_vf_resource *vf_res; /* incl. all VSIs */
- 	struct virtchnl_vsi_resource *vsi_res; /* our LAN VSI */
- 	struct virtchnl_version_info pf_version;
-@@ -418,6 +425,7 @@ struct iavf_adapter {
- 	struct virtchnl_vlan_caps vlan_v2_caps;
- 	u16 msg_enable;
- 	struct iavf_eth_stats current_stats;
-+	struct virtchnl_qos_cap_list *qos_caps;
- 	struct iavf_vsi vsi;
- 	u32 aq_wait_count;
- 	/* RSS stuff */
-@@ -584,6 +592,8 @@ int iavf_config_rss(struct iavf_adapter *adapter);
- int iavf_lan_add_device(struct iavf_adapter *adapter);
- int iavf_lan_del_device(struct iavf_adapter *adapter);
- void iavf_cfg_queues_bw(struct iavf_adapter *adapter);
-+void iavf_cfg_queues_quanta_size(struct iavf_adapter *adapter);
-+void iavf_get_qos_caps(struct iavf_adapter *adapter);
- void iavf_enable_channels(struct iavf_adapter *adapter);
- void iavf_disable_channels(struct iavf_adapter *adapter);
- void iavf_add_cloud_filter(struct iavf_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 532c4b8f3fa0..27509e418e98 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -2090,6 +2090,16 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
- 		return 0;
- 	}
- 
-+	if (adapter->aq_required & IAVF_FLAG_AQ_GET_QOS_CAPS) {
-+		iavf_get_qos_caps(adapter);
-+		return 0;
-+	}
-+
-+	if (adapter->aq_required & IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE) {
-+		iavf_cfg_queues_quanta_size(adapter);
-+		return 0;
-+	}
-+
- 	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES) {
- 		iavf_configure_queues(adapter);
- 		return 0;
-@@ -2675,6 +2685,9 @@ static void iavf_init_config_adapter(struct iavf_adapter *adapter)
- 		/* request initial VLAN offload settings */
- 		iavf_set_vlan_offload_features(adapter, 0, netdev->features);
- 
-+	if (QOS_ALLOWED(adapter))
-+		adapter->aq_required |= IAVF_FLAG_AQ_GET_QOS_CAPS;
-+
- 	iavf_schedule_finish_config(adapter);
- 	return;
- 
-@@ -4939,6 +4952,31 @@ static int iavf_verify_handle(struct net_shaper_binding *binding,
- 	return 0;
- }
- 
-+static int
-+iavf_verify_shaper(struct net_shaper_binding *binding,
-+		   const struct net_shaper *shaper,
-+		   struct netlink_ext_ack *extack)
-+{
-+	struct iavf_adapter *adapter = netdev_priv(binding->netdev);
-+	u64 vf_max;
-+	int ret;
-+
-+	ret = iavf_verify_handle(binding, &shaper->handle, extack);
-+	if (ret)
-+		return ret;
-+
-+	if (shaper->handle.scope == NET_SHAPER_SCOPE_QUEUE) {
-+		vf_max = adapter->qos_caps->cap[0].shaper.peak;
-+		if (vf_max && shaper->bw_max > vf_max) {
-+			NL_SET_ERR_MSG_FMT(extack, "Max rate (%llu) of queue %d can't exceed max TX rate of VF (%llu kbps)",
-+					   shaper->bw_max, shaper->handle.id,
-+					   vf_max);
-+			return -EINVAL;
-+		}
-+	}
-+	return 0;
-+}
-+
- static int
- iavf_shaper_set(struct net_shaper_binding *binding,
- 		const struct net_shaper *shaper,
-@@ -4949,7 +4987,7 @@ iavf_shaper_set(struct net_shaper_binding *binding,
- 	struct iavf_ring *tx_ring;
- 	int ret = 0;
- 
--	ret = iavf_verify_handle(binding, &shaper->handle, extack);
-+	ret = iavf_verify_shaper(binding, shaper, extack);
- 	if (ret)
- 		return ret;
- 
-@@ -5164,7 +5202,7 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	struct net_device *netdev;
- 	struct iavf_adapter *adapter = NULL;
- 	struct iavf_hw *hw = NULL;
--	int err;
-+	int err, len;
- 
- 	err = pci_enable_device(pdev);
- 	if (err)
-@@ -5232,6 +5270,13 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	hw->bus.func = PCI_FUNC(pdev->devfn);
- 	hw->bus.bus_id = pdev->bus->number;
- 
-+	len = struct_size(adapter->qos_caps, cap, IAVF_MAX_QOS_TC_NUM);
-+	adapter->qos_caps = kzalloc(len, GFP_KERNEL);
-+	if (!adapter->qos_caps) {
-+		err = -ENOMEM;
-+		goto err_alloc_qos_cap;
-+	}
-+
- 	/* set up the locks for the AQ, do this only once in probe
- 	 * and destroy them only once in remove
- 	 */
-@@ -5270,6 +5315,8 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	/* Initialization goes on in the work. Do not add more of it below. */
- 	return 0;
- 
-+err_alloc_qos_cap:
-+	iounmap(hw->hw_addr);
- err_ioremap:
- 	destroy_workqueue(adapter->wq);
- err_alloc_wq:
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 64ddd0e66c0d..15d388b431c5 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -151,7 +151,8 @@ int iavf_send_vf_config_msg(struct iavf_adapter *adapter)
- 	       VIRTCHNL_VF_OFFLOAD_USO |
- 	       VIRTCHNL_VF_OFFLOAD_FDIR_PF |
- 	       VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF |
--	       VIRTCHNL_VF_CAP_ADV_LINK_SPEED;
-+	       VIRTCHNL_VF_CAP_ADV_LINK_SPEED |
-+	       VIRTCHNL_VF_OFFLOAD_QOS;
- 
- 	adapter->current_op = VIRTCHNL_OP_GET_VF_RESOURCES;
- 	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_CONFIG;
-@@ -1507,6 +1508,76 @@ iavf_set_adapter_link_speed_from_vpe(struct iavf_adapter *adapter,
- 		adapter->link_speed = vpe->event_data.link_event.link_speed;
- }
- 
-+/**
-+ * iavf_get_qos_caps - get qos caps support
-+ * @adapter: iavf adapter struct instance
-+ *
-+ * This function requests PF for Supported QoS Caps.
-+ */
-+void iavf_get_qos_caps(struct iavf_adapter *adapter)
-+{
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot get qos caps, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_GET_QOS_CAPS;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_QOS_CAPS;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_GET_QOS_CAPS, NULL, 0);
-+}
-+
-+/**
-+ * iavf_set_quanta_size - set quanta size of queue chunk
-+ * @adapter: iavf adapter struct instance
-+ * @quanta_size: quanta size in bytes
-+ * @queue_index: starting index of queue chunk
-+ * @num_queues: number of queues in the queue chunk
-+ *
-+ * This function requests PF to set quanta size of queue chunk
-+ * starting at queue_index.
-+ */
-+static void
-+iavf_set_quanta_size(struct iavf_adapter *adapter, u16 quanta_size,
-+		     u16 queue_index, u16 num_queues)
-+{
-+	struct virtchnl_quanta_cfg quanta_cfg;
-+
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot set queue quanta size, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_CONFIG_QUANTA;
-+	quanta_cfg.quanta_size = quanta_size;
-+	quanta_cfg.queue_select.type = VIRTCHNL_QUEUE_TYPE_TX;
-+	quanta_cfg.queue_select.start_queue_id = queue_index;
-+	quanta_cfg.queue_select.num_queues = num_queues;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_CONFIG_QUANTA,
-+			 (u8 *)&quanta_cfg, sizeof(quanta_cfg));
-+}
-+
-+/**
-+ * iavf_cfg_queues_quanta_size - configure quanta size of queues
-+ * @adapter: adapter structure
-+ *
-+ * Request that the PF configure quanta size of allocated queues.
-+ **/
-+void iavf_cfg_queues_quanta_size(struct iavf_adapter *adapter)
-+{
-+	int quanta_size = IAVF_DEFAULT_QUANTA_SIZE;
-+
-+	/* Set Queue Quanta Size to default */
-+	iavf_set_quanta_size(adapter, quanta_size, 0,
-+			     adapter->num_active_queues);
-+}
-+
- /**
-  * iavf_cfg_queues_bw - configure bandwidth of allocated queues
-  * @adapter: iavf adapter structure instance
-@@ -2281,6 +2352,14 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 					VIRTCHNL_RSS_ALG_TOEPLITZ_SYMMETRIC;
- 
- 			break;
-+		case VIRTCHNL_OP_GET_QOS_CAPS:
-+			dev_warn(&adapter->pdev->dev, "Failed to Get Qos CAPs, error %s\n",
-+				 iavf_stat_str(&adapter->hw, v_retval));
-+			break;
-+		case VIRTCHNL_OP_CONFIG_QUANTA:
-+			dev_warn(&adapter->pdev->dev, "Failed to Config Quanta, error %s\n",
-+				 iavf_stat_str(&adapter->hw, v_retval));
-+			break;
- 		case VIRTCHNL_OP_CONFIG_QUEUE_BW:
- 			dev_warn(&adapter->pdev->dev, "Failed to Config Queue BW, error %s\n",
- 				 iavf_stat_str(&adapter->hw, v_retval));
-@@ -2627,6 +2706,17 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 		if (!v_retval)
- 			iavf_netdev_features_vlan_strip_set(netdev, false);
- 		break;
-+	case VIRTCHNL_OP_GET_QOS_CAPS: {
-+		u16 len = struct_size(adapter->qos_caps, cap,
-+				      IAVF_MAX_QOS_TC_NUM);
-+
-+		memcpy(adapter->qos_caps, msg, min(msglen, len));
-+
-+		adapter->aq_required |= IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE;
-+		}
-+		break;
-+	case VIRTCHNL_OP_CONFIG_QUANTA:
-+		break;
- 	case VIRTCHNL_OP_CONFIG_QUEUE_BW: {
- 		int i;
- 		/* shaper configuration is successful for all queues */
--- 
-2.45.2
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
