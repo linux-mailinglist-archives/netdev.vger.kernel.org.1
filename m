@@ -1,186 +1,237 @@
-Return-Path: <netdev+bounces-124912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A53C296B609
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:09:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CFAD96B613
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35B401F22247
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:09:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF7981F228B3
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD5A1A727F;
-	Wed,  4 Sep 2024 09:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A57871CC16F;
+	Wed,  4 Sep 2024 09:09:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QyoyVeJZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W1GefJ6o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2AA9146A71
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 09:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725440944; cv=none; b=aRAE+L8Z9bhVKfWDjEtv2XLYOxVTKsjNJTHL51DmKxMprWrsJQ6hPoE149kuv1yHgt+Dh88d7oL1MSjGOKBKvcmSdTnCICTgVhpchrCZR2yeJlF3yKEJ2t4lGHfRIHOyYxg1Bu2ixvoyrFGzlFAAPdkVEXHjHgCljExCjhHHFPY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725440944; c=relaxed/simple;
-	bh=PlJdXfCl7z5GITdFrA3sDKLcDG9iFjX/X4c3rw7NHVs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sCR9EmddUPctDJXUze4izfQHyWTo8HtdjGKb9z8jseIKcVhItjU56yC8XqLWBpzskbrpaySSAGIid6j0fxGsqzjQrZZf55n+9zJnxYSnb/ND7JI2CdkEMg/FM6BpD5jG3JvyCcXWBgpSonqjiHMSXRzBaWlf6Rzbkou8pyZKzpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QyoyVeJZ; arc=none smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5de8647f0d5so4025228eaf.3
-        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 02:09:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1725440942; x=1726045742; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7eCTU1AOHaUUwMtmGS3dOCXqi4sZOm3TtWxsQHb+32g=;
-        b=QyoyVeJZFgvY+jHHdyS35CNBePkg/4Sn2h3v65Oo2k3SCDhqK4UKyQQcUTwWHGUVTj
-         684MojfaEAZwIIly91Y30o9lnn5Mtyy80fHAG7rDysEJ5I/2NjbumxBfix3E0A7vRlIy
-         Et9jHNlBqldprvj8ZGJ4hO0VCrRLkxtgyyKJ8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725440942; x=1726045742;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7eCTU1AOHaUUwMtmGS3dOCXqi4sZOm3TtWxsQHb+32g=;
-        b=e+mkD7AWOzk0fikc7zMuX/prjsIx6i5vc1/ia2EFmE1Xjh1uFItoPGNFvplG+vRV8u
-         5w8Atp2aqV0OOR5b9KNi+vbwymsvzgkHQEqa/3AA6DfUMmVWP/gU2xsYELbRTG2e9JuZ
-         9t2DdqGzimw7TJA5Xoq9p3RZQr0WCCJUODaBhZgis6MK5lxZaRfuyuHLuavD7Y9DEODq
-         dkswvKrwmuP22LS/T/0/sauuBv/RKWhI/W4BXpYIjrlauw1yG3KZKaNZ92K0KyusCK10
-         4HAAs3agYFpWcfMWrjx4+3FuJyIGAYi/pTulefc2nReTTyyGANMyvnkjzhs88VI0fjIH
-         +l3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXdT59XDoS9DOnS+k0D+bvMvClhKUQXJxK9+1aOhiEsULGcgqHNxvIJdS798Gk0KczCiCCXbFc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/vFAY/UEs8Vd86rBnRvJwC2moEZB0Z3xvsbnpdSsn7PgsA2iv
-	sZHtzBppondT6ACv9WwhPjb08sqYeMMenWbkwBGhDBABTUbjgw7MSY8L4Izbug==
-X-Google-Smtp-Source: AGHT+IEuKwdsL6Brf++PqlqKCm8Wb2D1A/dk6x7le3ZX0A36iHJ+V6NVDFzn0XXFrxLbntFKkyBZKQ==
-X-Received: by 2002:a05:6870:390a:b0:25d:e3d:b441 with SMTP id 586e51a60fabf-277c81ed3a6mr14723563fac.40.1725440941752;
-        Wed, 04 Sep 2024 02:09:01 -0700 (PDT)
-Received: from shivania.eng.vmware.com ([66.170.99.1])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7177859aa50sm1206994b3a.175.2024.09.04.02.08.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 02:09:01 -0700 (PDT)
-From: Shivani Agarwal <shivani.agarwal@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	ajay.kaher@broadcom.com,
-	alexey.makhalov@broadcom.com,
-	vasavi.sirnapalli@broadcom.com,
-	Breno Leitao <leitao@debian.org>,
-	Heng Qi <hengqi@linux.alibaba.com>,
-	Sasha Levin <sashal@kernel.org>,
-	Shivani Agarwal <shivani.agarwal@broadcom.com>
-Subject: [PATCH v4.19-v5.10] virtio_net: Fix napi_skb_cache_put warning
-Date: Wed,  4 Sep 2024 02:08:53 -0700
-Message-Id: <20240904090853.15187-1-shivani.agarwal@broadcom.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40521CCED5
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 09:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725440956; cv=fail; b=IHNP2EDV56K6GnRfKSLcG9ZDEAqPHzEfHFanWtWeRnmX6ucNtvluVxi6r44P5X3ZVkQG1xPZEhXqRRopaA+lr8mScstmy3yjpM+mbqAljKPPlwzUP9BIbdPMsS50uB1sXJlR9LWo0mL3FL9Aa40m51789d8ZDRuLHd5+gEpM+To=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725440956; c=relaxed/simple;
+	bh=bkqhXfHE2mobc757XDkOtQIsF7qQb9R9NPMaQS0fXMY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=KKP7rwdcWZhRh87uBZficv919ymZHdMFVo9cJE8dZ4/AgDFjsb/FU/evPmsfHfJxWBHsrF+0p49DrU9YVqa+D6XVA7ygU39kPzl9s9ssXcS1BvUU5fcLcsgtynb9YLtUjOsu+d/4XYfxxUigHle0opbXFOPUMriRHfAGz7GpPEQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W1GefJ6o; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725440955; x=1756976955;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bkqhXfHE2mobc757XDkOtQIsF7qQb9R9NPMaQS0fXMY=;
+  b=W1GefJ6oddnAY3bBhEXj1ay56u5KkLjI9d/cnJO+Qd3+Acn+5vWdrXiH
+   YIjoz/gs6LxS2w3HcHNqtNX5PAanVmuWR90TaJ+OUqm3uC0mMxVhhRCvB
+   Oy17yelOIGyl1P8pQuVs4hZfhgkOJsWeF+hB5cIBI1B1K+BHNxsJDLZbF
+   cnUO1VPMA5O+HZ3rTcE3ZtVPIIRFDdCc1hw4SYWSeYuDpkS2c6F4l2Wyh
+   BbycShyUFgG7hEyBh5PTBv0oavutQnZAa/v7Xj1Pe1g1sIOJcdLMk6E+x
+   K2YaNRi/shVvtQkfu+8EBD9euMnhjnV9bMG8GAXt5+j2Y70xpMldpnW4C
+   g==;
+X-CSE-ConnectionGUID: c+ZQYhXDSqeWFSRhVlK4hA==
+X-CSE-MsgGUID: rVWxZn6ITCOsSv4DKdKTQQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="23965061"
+X-IronPort-AV: E=Sophos;i="6.10,201,1719903600"; 
+   d="scan'208";a="23965061"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2024 02:09:14 -0700
+X-CSE-ConnectionGUID: gzzVtFLmS5GY5FqYZJDUHw==
+X-CSE-MsgGUID: 61a+enuLRQ6z8MhOFuzHfg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,201,1719903600"; 
+   d="scan'208";a="88447822"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Sep 2024 02:09:14 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 4 Sep 2024 02:09:13 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 4 Sep 2024 02:09:13 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.172)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 4 Sep 2024 02:09:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Mxg9DZkw2a3u0i8DyMAu8lQlFXVZ+GXbuJH1u+ubrDTAky5fA81jO/YQxVTIHJBdUqV6UDzoi4nOqOKzFPlrtfSli7OMCNMNnCzc+mupqC/d062hr6i4/VZ/VQAYGDHiTbavvDV6UFU5bpjBHZCnGukwpqijsxCYqJBfeJdrwcFeIwVBOV+4u1iQvbu5nvzAgqIGVB5Cd2dKi+582KsJNNSPQ0mnEzEC+qtG1Y1dGCWdTtGmfe4S/6JjoyG8wYfXTwfP2KuzseH476slvMC+8b/r3LrCcqOvuRxcjynNK1sS+TpvAtWPydKfNqpkmG104bzc2TlI2EbpeQjKgy9sWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9EFpreMLM+kWXL5MbjZf2rv6raDzxzw8jIoRVnPBHRk=;
+ b=DpsMo4DJZeKhI+PWLD5noe4nZCMsrQhOvV8R/ymES9sqd7+WV9TZlZ0G20b4IXL807frjJkN53i9K0dfLbFsN0YqIVlLybd13YdyxaaI/vYJ++J+kQrxIoKq8NfsIAFkhFffucwJbgBzDEsDOjRJjzhvxvdG0t9hMvaFK3lo58FwVzURUFqnc8KbK6zRy5ItaZJUJv33GyfZA+EJrAOylpel0YiY15qvaQtFu/LKZ2+dbYPjaPc3Vf/LpvUEkftfzkog4V1Vz5Bs/eTfOR3ORQ23ibJkaouPZV2JdiLBRFz9u3EbBLZhCvph8VyZdyRXJNEQV2p8DfrEuYcVAXgEYA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
+ by PH0PR11MB5830.namprd11.prod.outlook.com (2603:10b6:510:129::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27; Wed, 4 Sep
+ 2024 09:09:11 +0000
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4f97:ad9d:79a9:899f%4]) with mapi id 15.20.7918.024; Wed, 4 Sep 2024
+ 09:09:10 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: "Kolacinski, Karol" <karol.kolacinski@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Kubalewski, Arkadiusz"
+	<arkadiusz.kubalewski@intel.com>, "Kolacinski, Karol"
+	<karol.kolacinski@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Hagvi, Yochai" <yochai.hagvi@intel.com>, Simon
+ Horman <horms@kernel.org>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH v4 iwl-next 6/7] ice: Read SDP section
+ from NVM for pin definitions
+Thread-Topic: [Intel-wired-lan] [PATCH v4 iwl-next 6/7] ice: Read SDP section
+ from NVM for pin definitions
+Thread-Index: AQHa+s1gFqf/NeG0OUeQITFn167VYbJHO9OA
+Date: Wed, 4 Sep 2024 09:09:10 +0000
+Message-ID: <CYYPR11MB84292EBEE3B0C4EE7BDC3160BD9C2@CYYPR11MB8429.namprd11.prod.outlook.com>
+References: <20240830111028.1112040-9-karol.kolacinski@intel.com>
+ <20240830111028.1112040-15-karol.kolacinski@intel.com>
+In-Reply-To: <20240830111028.1112040-15-karol.kolacinski@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|PH0PR11MB5830:EE_
+x-ms-office365-filtering-correlation-id: 6c22b1b4-325b-480a-9864-08dcccc13d4a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?sQarHf/sEZVDMBz8mHYJM2gzFwx8g8j5EgvUM/hA321w2Hg+l5ZqoRAtWPde?=
+ =?us-ascii?Q?/GBNncXVW+7TcMeth4MVJbHq3tmyrL/mizxPVozayzGy5VO4T/eVirlRacmu?=
+ =?us-ascii?Q?6229eI3EDjZf4BrtaWSOWe2CD4v4yejmgvt88HLAvEgavauBv0/X5rs+a0Os?=
+ =?us-ascii?Q?EWGY/olHOWAHhqA9yXs6DVPBSPBueMp5Ma3g+jQsHW8SHZwHJa2VzeOW4qf/?=
+ =?us-ascii?Q?wdls6x65iqpeIqCtj4AkUp3K5gXDBogVzIFNK4dKDvgPdn3vXNCCrx+PAlxn?=
+ =?us-ascii?Q?j/7fgiNQToosABNtsIW8Nv6CqBujY+rOoQKoQaX5SVNOe8HAH2ICx8N9jniq?=
+ =?us-ascii?Q?4BPQX8lsIcgeCG2p/eBSqppVX24qe4JyGxgknyx4GzNTjM9TLDmk2wGsfeau?=
+ =?us-ascii?Q?6RcnmVb5TV27ZTh2l43hPNy0ePhe6ToAn4bZhnvgJg7BEZs9CS69003ch4El?=
+ =?us-ascii?Q?1iiVcDAcDvCi3RKqHLUZC8nPBIypNZTsrGpUxvI5hGfkzwqMtwAkJlRuWCBz?=
+ =?us-ascii?Q?R4b26/mzpK9eaQ4BFDP32oCxj04RTagh2qdGdK/ouQgJ1gtydRdZuVi6yRB1?=
+ =?us-ascii?Q?b0lxm4gn0WJfynDi0WS8GXuHTlrM82acs9UjJUk0FFsodZgDcPiM1ZH+PiMF?=
+ =?us-ascii?Q?i353bpJNfKh3ICpTkSFxcLCTUP8vAwV6+xvXfC5r9PcIZxA1dOZnx9hGvArN?=
+ =?us-ascii?Q?rqaxhAKZCwlk+o6psvMI/7QA0deq85uvOXZzHlPqL6dJVV2Q2lxV5ijXpFDK?=
+ =?us-ascii?Q?LlZogsj3u2oojtRxYANM8mtTj5EJz/TV1B6TCkyLjjpwjffbk/DjF5EX245w?=
+ =?us-ascii?Q?coyhlaAYoIDbYnKGY4S9kqSzYOk6Vb9c8H8jSd6xYlS6SKUrnFJdjNtf1FSK?=
+ =?us-ascii?Q?Uf8qBCfbYxUgTTJFiFzY8IzM1P9mUr32BKoYxBJSW1E23pptie4LkYLOLr3e?=
+ =?us-ascii?Q?qbSYAB5vO10Ik7CKCbMVJ4CRyqg1H3NzrLkKb77vZpU1MT9sG/xlR3VF0NAy?=
+ =?us-ascii?Q?6zrnYwOURgqCkEGnOn8kJoRIqtm3RQnY3FJp39IS5iIKiq8OK9b0tOZia7Au?=
+ =?us-ascii?Q?kDgVpj43KYH7DtZP9CAyR0IYFmKuvdXSUxdnn/5v6LmLL8j84M9xU6sDR+4K?=
+ =?us-ascii?Q?YgOog+8cYPKhwZoweR3pbgwBjQlxu0nc8H9GBqeLeMFhK4y6AAt+wOv7z0lq?=
+ =?us-ascii?Q?07Oy5l4H/w2Zc1qNcwER6esXaILOuTdhzRyyA/rQ/OPnuk+0hPbgprSfKKlK?=
+ =?us-ascii?Q?88g6bqBdn3rRP4PR4EVgcpfqGXWHYq0KbJ88B9jQfeCnwd55TzIUKnV5Aj8F?=
+ =?us-ascii?Q?nfhpUCi3orQk+vHTsw4l4ijX/uSSQF/PMMKgcVRyLyV+Nu4vhW1anr+kW/54?=
+ =?us-ascii?Q?MDdyn5b4ILkyS3OxntCBph21U/QLryG1ok8T3ICkGU7F9HFFyw=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?rTeKTo55oPuJzZa5CjQZllgln8odPI17SZ/hwI4WKveChYIMUEMNO9rmYKep?=
+ =?us-ascii?Q?i+shJ/QzqSrOJWOROQ3oCqALiXRoA5r8a9kBaUQZ62P2AlfHsaDuCdy9qiMW?=
+ =?us-ascii?Q?zwP7zYJjPgfRD6NGZ0IUGW2wPPpls8c5rEuLBQEb641N4yhDo0ECfEPojwtQ?=
+ =?us-ascii?Q?sT/FkYLB+9ED8ltrGcKElkD1XvMwzxwhqJDq4RUnfKbK8vqv/8elcb0MprwU?=
+ =?us-ascii?Q?5B7BmjxPfL8Q+Scxhp3wUjBM4ZbbjSq2/OXaJYKGPwwmjcgyK0ZlNP6alR64?=
+ =?us-ascii?Q?h3Dk2t+IBFJdkiKsJuriLENyAeuk9bPOYZoMDGZmS2Kfm4Czps54MBdCiFK/?=
+ =?us-ascii?Q?k7sPrtRWH221x2c8IIU8Q8hcMJlDkwHwP+BJpo25XOkOQyTtQNUmxjKe+Xr1?=
+ =?us-ascii?Q?s5o45DKLpGY7tENtgxz8yI25OX7HpU7AU/0yW7QwnwFyZ72vULX2AzW946Oj?=
+ =?us-ascii?Q?B2OvBL6Elat+ac6/30WbOEf0on/nMMq8DRvDfrVoBTX2xUYnbYnxQ0T254sQ?=
+ =?us-ascii?Q?liwOUlO15gy5wYh8gdcYn/gsu/zbeoXkeJDOsW9KR3DabHXpmi3Mwi6nmIvg?=
+ =?us-ascii?Q?zhum0W64FyRth5g59AL/3S/Tzex4R6hYV+T/8Q1D8o6fHYCSTqml6u77cwah?=
+ =?us-ascii?Q?qbsDVUTiGmwlglNrzjFzy9fCcYXok6nbM/OtDicvBsbBBbyY5H9+11aIWgTA?=
+ =?us-ascii?Q?AUodW/irlVJeNeMH0GcDbYArqQwqcUx48Oop2iuMW+bt0TOm7QpZwzNNAeZ6?=
+ =?us-ascii?Q?+8jYvHjoj54y7lykn9a1vyyKNHbi0Ne43d8spKjA+XyQ499zXsdWrx8lt0T6?=
+ =?us-ascii?Q?pRwBsc1UhRMFfpWUNzUZPqJuCbqbwywHQeykTUMN/NiMSkxSeAUB8I9/A0Nv?=
+ =?us-ascii?Q?UYNW3qpe8vwaMd+NzVSk4E3+N2Xm0HGP/Htc+t17ZhiIXhd2k63UNuXjBpoT?=
+ =?us-ascii?Q?Oo9RUd8g87NmRoP6H8M+RLID//UlCNd7jT4TxjOCBasxth12Ak2EqW+ivPH7?=
+ =?us-ascii?Q?rpqNfghjIWy8XTZ9JrNoc9M4fcU82pKaKlON8FSP1NWe2tBghwAfxRjO33a4?=
+ =?us-ascii?Q?MlyHgGBDI0H5zPZKZttGQvkVFWBGoajCoSx+OkTGrqaYHXQ5Mhej0Ga7SGh+?=
+ =?us-ascii?Q?RO2RVoMHC84eIDsytBDfu5kywdyLxMnD5bsk1e3nfu53+sQdIsbsGp42NxYG?=
+ =?us-ascii?Q?N4Ot6aX+iW6AhdDY75/n6jdvc0boo79fxLLWQGT6ayb+0+q/SZcWRA2xvfNo?=
+ =?us-ascii?Q?YelUTfqZWLI7VXOykZttDlEwenfzBBgTiKEQYJS5WkWpSRtR+dX8kQLWN8xH?=
+ =?us-ascii?Q?ZJTZ9nYKzCPFuvRcAuodDDUpr3VnrMKSQlzoGc2xaqiaG1ZUMtnG4qMtrXnm?=
+ =?us-ascii?Q?Gk8gV50e2cAJn4g4RLTfdsN7wG4pfTmBl65wRtkDfxUP50AokpElvefolizw?=
+ =?us-ascii?Q?JnNXfVcE/6oWOCIM9NPCzLAeVubrlpuaMwD7An08nco8SbmkfDuZyIh7oYak?=
+ =?us-ascii?Q?VG70IKuBPohIuHWiQBE//hh8S2Rx1wWnz4iSg/4BsP+Z7C3UGY4b+AObbhgr?=
+ =?us-ascii?Q?XIgHAOckysDfnFA/h9iNvRvPV77ni0a9pkk1IyyGtaHE1eU6AtQVvpWwuNd8?=
+ =?us-ascii?Q?hg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c22b1b4-325b-480a-9864-08dcccc13d4a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Sep 2024 09:09:10.8269
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KrjHI1ColDv5AsnCvzV6DNxQXiRvi/GSbltSISDgpSY0LWguWN/lqDOEOtnzfbi9I+P1ol09viH1S7eq7Dy2dKYYPWzxGv+/FjYDuGseI1zs+C6po31828eXiE0nd1zA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5830
+X-OriginatorOrg: intel.com
 
-From: Breno Leitao <leitao@debian.org>
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
+arol Kolacinski
+> Sent: Friday, August 30, 2024 4:37 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Kubalewski, Arkadiusz <arkadiusz.kubalewski@i=
+ntel.com>; Kolacinski, Karol <karol.kolacinski@intel.com>; Nguyen, Anthony =
+L <anthony.l.nguyen@intel.com>; Hagvi, Yochai <yochai.hagvi@intel.com>; Sim=
+on Horman <horms@kernel.org>; Kitszel, Przemyslaw <przemyslaw.kitszel@intel=
+.com>
+> Subject: [Intel-wired-lan] [PATCH v4 iwl-next 6/7] ice: Read SDP section =
+from NVM for pin definitions
+>
+> From: Yochai Hagvi <yochai.hagvi@intel.com>
+>
+> PTP pins assignment and their related SDPs (Software Definable Pins) are =
+currently hardcoded.
+> Fix that by reading NVM section instead on products supporting this, whic=
+h are E810 products.
+> If SDP section is not defined in NVM, the driver continues to use the har=
+dcoded table.
+>
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Signed-off-by: Yochai Hagvi <yochai.hagvi@intel.com>
+> Co-developed-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> ---
+>  .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   9 ++
+>  drivers/net/ethernet/intel/ice/ice_ptp.c      | 138 ++++++++++++++----
+>  drivers/net/ethernet/intel/ice/ice_ptp.h      |   6 +-
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  60 ++++++++
+>  drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |   1 +
+>  5 files changed, 186 insertions(+), 28 deletions(-)
+>
 
-[ Upstream commit f8321fa75102246d7415a6af441872f6637c93ab ]
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
-After the commit bdacf3e34945 ("net: Use nested-BH locking for
-napi_alloc_cache.") was merged, the following warning began to appear:
-
-	 WARNING: CPU: 5 PID: 1 at net/core/skbuff.c:1451 napi_skb_cache_put+0x82/0x4b0
-
-	  __warn+0x12f/0x340
-	  napi_skb_cache_put+0x82/0x4b0
-	  napi_skb_cache_put+0x82/0x4b0
-	  report_bug+0x165/0x370
-	  handle_bug+0x3d/0x80
-	  exc_invalid_op+0x1a/0x50
-	  asm_exc_invalid_op+0x1a/0x20
-	  __free_old_xmit+0x1c8/0x510
-	  napi_skb_cache_put+0x82/0x4b0
-	  __free_old_xmit+0x1c8/0x510
-	  __free_old_xmit+0x1c8/0x510
-	  __pfx___free_old_xmit+0x10/0x10
-
-The issue arises because virtio is assuming it's running in NAPI context
-even when it's not, such as in the netpoll case.
-
-To resolve this, modify virtnet_poll_tx() to only set NAPI when budget
-is available. Same for virtnet_poll_cleantx(), which always assumed that
-it was in a NAPI context.
-
-Fixes: df133f3f9625 ("virtio_net: bulk free tx skbs")
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
-Link: https://patch.msgid.link/20240712115325.54175-1-leitao@debian.org
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Shivani: Modified to apply on v4.19.y-v5.10.y]
-Signed-off-by: Shivani Agarwal <shivani.agarwal@broadcom.com>
----
- drivers/net/virtio_net.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index f7ed99561..99dea89b2 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -1497,7 +1497,7 @@ static bool is_xdp_raw_buffer_queue(struct virtnet_info *vi, int q)
- 		return false;
- }
- 
--static void virtnet_poll_cleantx(struct receive_queue *rq)
-+static void virtnet_poll_cleantx(struct receive_queue *rq, int budget)
- {
- 	struct virtnet_info *vi = rq->vq->vdev->priv;
- 	unsigned int index = vq2rxq(rq->vq);
-@@ -1508,7 +1508,7 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
- 		return;
- 
- 	if (__netif_tx_trylock(txq)) {
--		free_old_xmit_skbs(sq, true);
-+		free_old_xmit_skbs(sq, !!budget);
- 		__netif_tx_unlock(txq);
- 	}
- 
-@@ -1525,7 +1525,7 @@ static int virtnet_poll(struct napi_struct *napi, int budget)
- 	unsigned int received;
- 	unsigned int xdp_xmit = 0;
- 
--	virtnet_poll_cleantx(rq);
-+	virtnet_poll_cleantx(rq, budget);
- 
- 	received = virtnet_receive(rq, budget, &xdp_xmit);
- 
-@@ -1598,7 +1598,7 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
- 	txq = netdev_get_tx_queue(vi->dev, index);
- 	__netif_tx_lock(txq, raw_smp_processor_id());
- 	virtqueue_disable_cb(sq->vq);
--	free_old_xmit_skbs(sq, true);
-+	free_old_xmit_skbs(sq, !!budget);
- 
- 	opaque = virtqueue_enable_cb_prepare(sq->vq);
- 
--- 
-2.39.4
 
 
