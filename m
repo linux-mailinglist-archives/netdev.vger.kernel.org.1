@@ -1,580 +1,332 @@
-Return-Path: <netdev+bounces-125168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3330896C27E
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:32:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89F2F96C289
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:33:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E095528CAB8
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:32:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADB0B1C21AC0
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:33:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA8BF1DA608;
-	Wed,  4 Sep 2024 15:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D43C1DCB09;
+	Wed,  4 Sep 2024 15:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mwCxXkwi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CpwMVFfB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83DF7323D;
-	Wed,  4 Sep 2024 15:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D1A1DA620
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 15:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725463926; cv=none; b=G/kYIYFjX+CyW/pL+qLxvfYthvw/8Tus8SJ/evQ8pLHwd9+bV3mm4G2122SiU3KaCY9nR+/csT5sV//MnFOaAG50fI+a8JIsbUaWwzRrliL6ZPhcDLA2OvBO9YU/QT1qLHw1nncQL4RzL4grfxiY0nIZQ1sez2v//ohDKvCae9w=
+	t=1725463976; cv=none; b=kVDqtrMKRno02FaxP1HG8G4F++hyB2AIYGL6SC8vo5uF5Mvrhc+zyHM4EsmDQfls7XURrAN1RAbOzyZe1PdBCwZdXbCQpyuJm7EHifd05zinbByJSa/xWzcnUXxvMrfRJSJTdAYsUJUD8m4HuhDABuZSKxDKJ33eHk1+nUOim84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725463926; c=relaxed/simple;
-	bh=L5P3uyUxIfxZ7uaCavLKxbPabfoB6uLjbYLjPl/hZOQ=;
-	h=Content-Type:MIME-Version:From:Subject:To:Cc:Message-Id:Date; b=iWF42Jrr0AEmxMxdL+PqqJ/uWeuRSPf3D/jrGExcSg0Jwi+sjTncmuWMt9j645z3bM8oZqtM8TL3FoCpBMywXG09ode8gxjWMsplGa9gcZePu5Xnws936FQBW8vEuPvgRze5UzorDFuW53E561RxM4yKNOgcsTVQiT5L+aYnHh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mwCxXkwi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64C11C4CEC2;
-	Wed,  4 Sep 2024 15:32:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725463926;
-	bh=L5P3uyUxIfxZ7uaCavLKxbPabfoB6uLjbYLjPl/hZOQ=;
-	h=From:Subject:To:Cc:Date:From;
-	b=mwCxXkwifFY+yUSOYF1x3FgRmRTbLZFXg0NekgQM5QRkMs5lKrxASiDS0bAJdDFUU
-	 LFB1kCpctEawbbD8bgvZk6em0+7ryYBDlcp9hfxLpBVuu2cqYEF5Pw4zkUcS413pjm
-	 hBsRBw7sPZ+ww19h7TZCErtiwznhtqZi66DwMoR6og2NAfLA3FkncaRkf9/XUc82ey
-	 X8u0oirA8wZd1T9qwqX02VGSWjc2GCiLZtDrlUZvK8J5vgmrkix1VE+X1kjXiRFflt
-	 rxRaMCWXL0FgmT3DJOVnLhVE8d7hVto9yCLKyAN1J/SmIRiucj5ZU/ENQ3tBs4UL1K
-	 /EoHrWOzySy+Q==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725463976; c=relaxed/simple;
+	bh=L2CxG4uSXLFjPz6ojyIYyKdahKnRcDqOBb2XNahmM5E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bEmiRKMtW4QfHBamuD8mNRcf60xL50pTQqLTKard8ZP1IJiFyG09tCQssfboWrhZNOp5bVsusra9d1kmoBW2G4lPtbKjuc+g+Tinyr+5n8n36uQVLB2J80fZjf1+2mhhBYXHRFUuRNTIM3SMOo9Cih3cLt3Oh9J4vv+IKRwFvL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CpwMVFfB; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5356ab89665so442863e87.1
+        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 08:32:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1725463971; x=1726068771; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1b3Ig2Hog+Y/V6WlZWEgPgpsrW3qHKomzY9wB6HePvc=;
+        b=CpwMVFfBX9vl1G60JD7BiZtIYFqsBEPvYCY/L0kXoGA/hpMOX2moETUWwypwg5ifwV
+         /MLjp7kvwq/UPYZXpYCUYVWlifJKE+I5NfrzESnobe2rkQRv+6CODPtdZ9fT5qQ3xOEv
+         1BrREzA+Ras9snYIq735Bx2z6Qou2PZAaSQ3yOXVdEJll6MBpSdZjE49WVxmthJ50TB8
+         bz9qx4BiKEzKuqdYkApnL1KT9vWUlfGIepOuhOcUkbbYGvupirswMMlIQhZLbs0Z+rPJ
+         tqC4kRzlMsxkx5sF9n6+Y5Da8X8x8sTVcPuz1ksFA3wZIZSxSKCt9n6VfZNaENe+Y4AO
+         I8lA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725463971; x=1726068771;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1b3Ig2Hog+Y/V6WlZWEgPgpsrW3qHKomzY9wB6HePvc=;
+        b=AJzk9E4HUjmcJ3y6c5oFbfquAql/eUg7Sz/HFR24tZciC/f055loiLsLhakV/Dgk4J
+         dkbPvxad5EBRJ53f1lAAapyvbq1Qw8vIcdrf5PbYRB7iWw2EiLjngzmC0NkMkofOuWcC
+         4DHJGTre2F5CMmV7ubHm5kw28iUOieUQJbR9V8dF8M7grt1yxIY1EIANfQLRhdmzhXHE
+         hReIDxjskPCQMuTh3Xa8wkbbQ8nxVNV78H9kXp4Ii0K433zua6lXx/jZqigbvl6AJ8RQ
+         3vZHvr/GEh1tNGDal+nADUd1/XgntpmTyXwiioOlL1773NKLtPrm0DE6PjjCSPUJvOzo
+         Hlpw==
+X-Forwarded-Encrypted: i=1; AJvYcCWzCtHsejVp2vXwZdBK0tmMjmCsenbwh0dIZ01CLm3DSskbiJWBBNJEvN9wS+Qva42d6NDbATY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCe7GU2mB1kaghWnKerRiNPl0/ixmY5svCZ1pFXGSlHb31P12E
+	W8BliK6Z1GSBX6qdDLasDnki4O+x1PHGR8qinJhX+EKH/3gQNkFYKWc2foApSwfyKSQLF7+aVOg
+	H+V4s/BYc300XLaqj+i6Vqwp/Vgo11f8IMRYB
+X-Google-Smtp-Source: AGHT+IE2X9ISx84xTY816bRxYCEkZj0kJKXRG56mLLLtdoDhYXq9GLpG5LVugUSQzfhxqYrypcSMfZkhhoSrIkut8Tw=
+X-Received: by 2002:a05:6512:2387:b0:533:4656:d503 with SMTP id
+ 2adb3069b0e04-53546b92e32mr12626396e87.37.1725463970387; Wed, 04 Sep 2024
+ 08:32:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-From: Kalle Valo <kvalo@kernel.org>
-Subject: pull-request: wireless-next-2024-09-04
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Message-Id: <20240904153205.64C11C4CEC2@smtp.kernel.org>
-Date: Wed,  4 Sep 2024 15:32:05 +0000 (UTC)
-
-Hi,
-
-here's a pull request to net-next tree, more info below. Please let me know if
-there are any problems.
-
-Kalle
-
-The following changes since commit 8400291e289ee6b2bf9779ff1c83a291501f017b:
-
-  Linux 6.11-rc1 (2024-07-28 14:19:55 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2024-09-04
-
-for you to fetch changes up to 97b766f989bcd06e5a7651b1080001d7327012f5:
-
-  wifi: mwifiex: Convert to use jiffies macro (2024-09-03 21:31:24 +0300)
-
-----------------------------------------------------------------
-wireless-next patches for v6.12
-
-mwifiex has recently started to see active development which is good
-news. rtw89 is also under active development and got several new
-features. Otherwise not really anything out of ordinary.
-
-We have one conflict in ath12k but that's easy to fix:
-
-https://lore.kernel.org/all/20240808104348.6846e064@canb.auug.org.au/
-
-Major changes:
-
-mwifiex
-
-* support for up to ten Authentication and Key Management (AKM) suites
-
-* host MAC Sublayer Management Entity (MLME) client and AP mode support
-
-* WPA-PSK-SHA256 AKM suite support
-
-rtw88
-
-* improve USB performance by aggregation
-
-rtw89
-
-* Wi-Fi 6 chip RTL8852BE-VT support
-
-* WoWLAN net-detect support
-
-* hardware encryption in unicast management frames support
-
-* hardware rfkill support
-
-ath12k
-
-* DebugFS support for transmit DE stats
-
-* Make ASPM support hardware-dependent
-
-iwlwifi
-
-* channel puncturing for US/CAN from UEFI
-
-* bump FW API to 93 for BZ/SC devices
-
-----------------------------------------------------------------
-Aditya Kumar Singh (1):
-      wifi: ath12k: restore ASPM for supported hardwares only
-
-Anjaneyulu (1):
-      wifi: iwlwifi: allow only CN mcc from WRDD
-
-Arend van Spriel (1):
-      wifi: brcmfmac: introducing fwil query functions
-
-Avraham Stern (3):
-      wifi: iwlwifi: mei: add support for SAP version 4
-      wifi: iwlwifi: mvm: set the cipher for secured NDP ranging
-      wifi: iwlwifi: mvm: increase the time between ranging measurements
-
-Baochen Qiang (1):
-      wifi: ath12k: fix invalid AMPDU factor calculation in ath12k_peer_assoc_h_he()
-
-Bitterblue Smith (8):
-      wifi: rtw88: Set efuse->ext_lna_5g - fix typo
-      wifi: rtw88: usb: Support USB 3 with RTL8822CU/RTL8822BU
-      wifi: rtw88: 8822c: Fix reported RX band width
-      wifi: rtw88: 8703b: Fix reported RX band width
-      wifi: rtw88: usb: Init RX burst length according to USB speed
-      wifi: rtw88: usb: Update the RX stats after every frame
-      wifi: rtw88: usb: Support RX aggregation
-      wifi: rtw88: Enable USB RX aggregation for 8822c/8822b/8821c
-
-Chen Yufan (1):
-      wifi: mwifiex: Convert to use jiffies macro
-
-Chih-Kang Chang (1):
-      wifi: rtw89: avoid to add interface to list twice when SER
-
-Chin-Yen Lee (4):
-      wifi: rtw89: wow: implement PS mode for net-detect
-      wifi: rtw89: wow: add WoWLAN net-detect support
-      wifi: rtw89: wow: add delay option for net-detect
-      wifi: rtw89: wow: add net-detect support for 8852c
-
-Christophe JAILLET (5):
-      wifi: brcmfmac: fwsignal: Use struct_size() to simplify brcmf_fws_rxreorder()
-      wifi: b43: Constify struct lpphy_tx_gain_table_entry
-      wifi: lib80211: Handle const struct lib80211_crypto_ops in lib80211
-      wifi: lib80211: Constify struct lib80211_crypto_ops
-      staging: rtl8192e: Constify struct lib80211_crypto_ops
-
-Colin Ian King (1):
-      wifi: rtw89: 8852bt: rfk: Fix spelling mistake "KIP_RESOTRE" -> "KIP_RESTORE"
-
-Dan Carpenter (1):
-      wifi: mwifiex: Fix uninitialized variable in mwifiex_cfg80211_authenticate()
-
-Daniel Gabay (2):
-      wifi: iwlwifi: mvm: Offload RLC/SMPS functionality to firmware
-      wifi: iwlwifi: mvm: Remove unused last_sub_index from reorder buffer
-
-David Lin (2):
-      wifi: mwifiex: add host mlme for client mode
-      wifi: mwifiex: add host mlme for AP mode
-
-Dian-Syuan Yang (1):
-      wifi: rtw89: correct VHT TX rate on 20MHz connection
-
-Dinesh Karthikeyan (1):
-      wifi: ath12k: Support Transmit DE stats
-
-Dmitry Antipov (2):
-      wifi: rtw88: always wait for both firmware loading attempts
-      wifi: mac80211: refactor block ack management code
-
-Dmitry Kandybka (2):
-      wifi: ath9k: fix possible integer overflow in ath9k_get_et_stats()
-      wifi: brcmsmac: clean up unnecessary current_ampdu_cnt and related checks
-
-Emmanuel Grumbach (16):
-      wifi: iwlwifi: mvm: prepare the introduction of V9 of REDUCED_TX_POWER
-      wifi: iwlwifi: mvm: add support for new REDUCE_TXPOWER_CMD versions
-      wifi: iwlwifi: mvm: set ul_mu_data_disable when needed
-      wifi: iwlwifi: mvm: s/iwl_bt_coex_profile_notif/iwl_bt_coex_prof_old_notif
-      wifi: iwlwifi: mvm: start to support the new BT profile notification
-      wifi: iwlwiif: mvm: handle the new BT notif
-      wifi: iwlwifi: mvm: add firmware debug points for EMLSR entry / exit
-      wifi: mac80211: fix the comeback long retry times
-      wifi: iwlwifi: mvm: rename iwl_missed_beacons_notif
-      wifi: iwlwifi: mvm: add the new API for the missed beacons notification
-      wifi: iwlwifi: mvm: handle the new missed beacons notification
-      wifi: iwlwifi: mvm: exit EMLSR if both links are missing beacons
-      wifi: iwlwifi: mvm: add API for EML OMN frame failure
-      wifi: iwlwifi: mvm: handle the new EML OMN failure notification
-      wifi: iwlwifi: mvm: allow ESR when we the ROC expires
-      wifi: iwlwifi: mvm: tell the firmware about CSA with mode=1
-
-Frank Li (1):
-      dt-bindings: net: wireless: convert marvel-8xxx.txt to yaml format
-
-Gustavo A. R. Silva (3):
-      wifi: ipw2x00: libipw: Avoid -Wflex-array-member-not-at-end warnings
-      wifi: mwl8k: Use static_assert() to check struct sizes
-      wifi: iwlegacy: Avoid multiple -Wflex-array-member-not-at-end warnings
-
-Hans de Goede (1):
-      net: rfkill: gpio: Do not load on Lenovo Yoga Tab 3 Pro YT3-X90
-
-Heiner Kallweit (1):
-      wifi: ath9k: use unmanaged PCI functions in ath9k_pci_owl_loader
-
-Ilan Peer (3):
-      wifi: iwlwifi: mvm: Fix a race in scan abort flow
-      wifi: iwlwifi: mvm: Stop processing MCC update if there was no change
-      wifi: mac80211: Check for missing VHT elements only for 5 GHz
-
-Issam Hamdi (1):
-      wifi: cfg80211: Set correct chandef when starting CAC
-
-Jinjie Ruan (1):
-      wifi: brcmsmac: Use kvmemdup to simplify the code
-
-Johannes Berg (6):
-      wifi: iwlwifi: mvm: use correct key iteration
-      wifi: iwlwifi: pcie: print function scratch before writing
-      wifi: iwlwifi: config: label 'gl' devices as discrete
-      wifi: iwlwifi: mvm: drop wrong STA selection in TX
-      wifi: mac80211: fix RCU list iterations
-      wifi: iwlwifi: mvm: refactor scan channel description a bit
-
-Kalle Valo (2):
-      Merge tag 'rtw-next-2024-08-09' of https://github.com/pkshih/rtw
-      Merge tag 'ath-next-20240812' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-
-Kang Yang (1):
-      wifi: ath11k: use work queue to process beacon tx event
-
-Karthikeyan Periyasamy (2):
-      wifi: ath12k: fix array out-of-bound access in SoC stats
-      wifi: ath11k: fix array out-of-bound access in SoC stats
-
-Kuan-Chung Chen (4):
-      wifi: rtw89: add EVM statistics for 1SS rate
-      wifi: rtw89: add support for hardware rfkill
-      wifi: rtw89: 8922a: new implementation for RFK pre-notify H2C
-      wifi: rtw89: add support for HW encryption in unicast management frames
-
-Marek Vasut (2):
-      wifi: wilc1000: Do not operate uninitialized hardware during suspend/resume
-      wifi: wilc1000: Re-enable RTC clock on resume
-
-Miri Korenblit (11):
-      wifi: iwlwifi: remove MVM prefix from FW macros
-      wifi: iwlwifi: mvm: add and improve EMLSR debug info
-      wifi: iwlwifi: use default command queue watchdog timeout
-      wifi: iwlwifi: mvm: cleanup iwl_mvm_get_wd_timeout
-      wifi: iwlwifi: bump FW API to 93 for BZ/SC devices
-      wifi: iwlwifi: mvm: avoid NULL pointer dereference
-      wifi: iwlwifi: s/IWL_MVM_STATION_COUNT_MAX/IWL_STATION_COUNT_MAX
-      wifi: iwlwifi: STA command structure shouldn't be mvm specific
-      wifi: iwlwifi: s/iwl_mvm_remove_sta_cmd/iwl_remove_sta_cmd
-      wifi: iwlwifi: mvm: remove mvm prefix from iwl_mvm_tx_resp*
-      wifi: iwlwifi: mvm: properly set the rates in link cmd
-
-Nick Morrow (1):
-      wifi: rtw88: 8821cu: Remove VID/PID 0bda:c82c
-
-P Praneesh (2):
-      wifi: ath12k: fix BSS chan info request WMI command
-      wifi: ath12k: match WMI BSS chan info structure with firmware definition
-
-Peter Robinson (2):
-      wifi: rtl8xxxu: drop reference to staging drivers
-      wifi: rtl8xxxu: add missing rtl8192cu USB IDs
-
-Ping-Ke Shih (12):
-      wifi: rtw88: debugfs: support multiple adapters debugging
-      wifi: rtw89: 8852bt: add set_channel_rf
-      wifi: rtw89: 8852bt: rfk: use predefined string choice for DPK enable/disable
-      wifi: rtw89: 8852bt: add chip_info of RTL8852BT
-      wifi: rtw89: 8852bt: add chip_ops of RTL8852BT
-      wifi: rtw89: 8852bt: declare firmware features of RTL8852BT
-      wifi: rtw89: 8852bte: add PCI entry of 8852BE-VT
-      wifi: rtw89: 8852bt: add 8852BE-VT to Makefile and Kconfig
-      wifi: rtw89: 885xb: reset IDMEM mode to prevent download firmware failure
-      wifi: rtw89: 8852c: support firmware format up to v1
-      wifi: mac80211: don't use rate mask for offchannel TX either
-      wifi: mac80211: export ieee80211_purge_tx_queue() for drivers
-
-Po-Hao Huang (2):
-      wifi: rtw88: 8822c: Parse channel from IE to correct invalid hardware reports
-      wifi: rtw89: 8922a: Add new fields for scan offload H2C command
-
-Rory Little (1):
-      wifi: mac80211: Add non-atomic station iterator
-
-Rosen Penev (2):
-      wifi: ath9k: use devm for request_irq()
-      wifi: ath9k: use devm for gpio_request_one()
-
-Sascha Hauer (6):
-      wifi: mwifiex: increase max_num_akm_suites
-      wifi: mwifiex: simplify WPA flags setting
-      wifi: mwifiex: fix key_mgmt setting
-      wifi: mwifiex: add support for WPA-PSK-SHA256
-      wifi: mwifiex: keep mwifiex_cfg80211_ops constant
-      wifi: mwifiex: remove unnecessary checks for valid priv
-
-Shen Lichuan (1):
-      wifi: mac80211: use kmemdup_array instead of kmemdup for multiple allocation
-
-Simon Horman (1):
-      wifi: cfg80211: wext: Update spelling and grammar
-
-Somashekhar(Som) (1):
-      wifi: iwlwifi: Enable channel puncturing for US/CAN from bios
-
-Thorsten Blum (1):
-      wifi: ath9k: Use swap() to improve ath9k_hw_get_nf_hist_mid()
-
-Toke Høiland-Jørgensen (2):
-      wifi: ath9k: Remove error checks when creating debugfs entries
-      Revert "wifi: ath9k: use devm for request_irq()"
-
-Yan Zhen (1):
-      wifi: mac80211: scan: Use max macro
-
-Yu Jiaoliang (1):
-      wifi: cfg80211: Use kmemdup_array instead of kmemdup for multiple allocation
-
-Zhang Changzhong (1):
-      wifi: mac80211: remove redundant unlikely() around IS_ERR()
-
-Zijun Hu (1):
-      wifi: rfkill: Correct parameter type for rfkill_set_hw_state_reason()
-
-Zong-Zhe Yang (11):
-      wifi: rtw88: select WANT_DEV_COREDUMP
-      wifi: rtw89: select WANT_DEV_COREDUMP
-      wifi: rtw89: fix typo of rtw89_phy_ra_updata_XXX
-      wifi: rtw89: chan: refine MCC re-plan flow when unassign chanctx
-      wifi: rtw89: mcc: stop at a role holding chanctx
-      wifi: rtw89: rename sub_entity to chanctx
-      wifi: rtw89: pass rtwvif to RFK channel
-      wifi: rtw89: pass rtwvif to RFK scan
-      wifi: rtw89: fw: correct chan access in assoc_cmac_tbl_g7 and update_beacon_be
-      wifi: rtw89: pass chanctx_idx to rtw89_btc_{path_}phymap()
-      wifi: mac80211_hwsim: correct MODULE_PARM_DESC of multi_radio
-
-hhorace (1):
-      wifi: cfg80211: fix bug of mapping AF3x to incorrect User Priority
-
- .../bindings/net/wireless/marvell,sd8787.yaml      |  93 +++
- .../bindings/net/wireless/marvell-8xxx.txt         |  70 --
- drivers/net/wireless/ath/ath11k/core.h             |   1 +
- drivers/net/wireless/ath/ath11k/dp_rx.c            |   2 +-
- drivers/net/wireless/ath/ath11k/mac.c              |  12 +
- drivers/net/wireless/ath/ath11k/wmi.c              |   4 +-
- .../net/wireless/ath/ath12k/debugfs_htt_stats.c    | 354 +++++++++
- .../net/wireless/ath/ath12k/debugfs_htt_stats.h    | 126 +++
- drivers/net/wireless/ath/ath12k/dp_rx.c            |   2 +-
- drivers/net/wireless/ath/ath12k/hw.c               |   6 +
- drivers/net/wireless/ath/ath12k/hw.h               |   1 +
- drivers/net/wireless/ath/ath12k/mac.c              |   5 +-
- drivers/net/wireless/ath/ath12k/pci.c              |   3 +-
- drivers/net/wireless/ath/ath12k/wmi.c              |   1 +
- drivers/net/wireless/ath/ath12k/wmi.h              |   3 +-
- .../net/wireless/ath/ath9k/ath9k_pci_owl_loader.c  |   8 +-
- drivers/net/wireless/ath/ath9k/calib.c             |   7 +-
- drivers/net/wireless/ath/ath9k/debug.c             |   6 +-
- drivers/net/wireless/ath/ath9k/htc_drv_debug.c     |   2 -
- drivers/net/wireless/ath/ath9k/hw.c                |   6 +-
- drivers/net/wireless/broadcom/b43/tables_lpphy.c   |  20 +-
- drivers/net/wireless/broadcom/b43/tables_lpphy.h   |   2 +-
- .../wireless/broadcom/brcm80211/brcmfmac/btcoex.c  |   2 +-
- .../broadcom/brcm80211/brcmfmac/cfg80211.c         |  30 +-
- .../wireless/broadcom/brcm80211/brcmfmac/core.c    |   2 +-
- .../wireless/broadcom/brcm80211/brcmfmac/core.h    |   4 +-
- .../wireless/broadcom/brcm80211/brcmfmac/feature.c |   2 +-
- .../wireless/broadcom/brcm80211/brcmfmac/fwil.h    |  40 +-
- .../broadcom/brcm80211/brcmfmac/fwsignal.c         |   8 +-
- .../wireless/broadcom/brcm80211/brcmsmac/ampdu.c   |  22 +-
- .../broadcom/brcm80211/brcmsmac/mac80211_if.c      |   6 +-
- drivers/net/wireless/intel/ipw2x00/libipw.h        |  46 +-
- drivers/net/wireless/intel/ipw2x00/libipw_wx.c     |   2 +-
- drivers/net/wireless/intel/iwlegacy/3945.c         |   2 +-
- drivers/net/wireless/intel/iwlegacy/3945.h         |   6 +-
- drivers/net/wireless/intel/iwlegacy/4965-mac.c     |   2 +-
- drivers/net/wireless/intel/iwlegacy/commands.h     | 273 +++----
- drivers/net/wireless/intel/iwlegacy/common.h       |   2 +-
- drivers/net/wireless/intel/iwlwifi/cfg/bz.c        |  13 +-
- drivers/net/wireless/intel/iwlwifi/cfg/sc.c        |   2 +-
- drivers/net/wireless/intel/iwlwifi/dvm/main.c      |   2 -
- drivers/net/wireless/intel/iwlwifi/fw/acpi.c       |   5 +
- drivers/net/wireless/intel/iwlwifi/fw/api/coex.h   |  29 +-
- .../net/wireless/intel/iwlwifi/fw/api/commands.h   |  13 +-
- .../net/wireless/intel/iwlwifi/fw/api/dbg-tlv.h    |   4 +
- .../net/wireless/intel/iwlwifi/fw/api/mac-cfg.h    |  87 ++-
- drivers/net/wireless/intel/iwlwifi/fw/api/mac.h    |   6 +-
- drivers/net/wireless/intel/iwlwifi/fw/api/power.h  |  79 +-
- drivers/net/wireless/intel/iwlwifi/fw/api/scan.h   |  46 +-
- drivers/net/wireless/intel/iwlwifi/fw/api/stats.h  |  14 +-
- drivers/net/wireless/intel/iwlwifi/fw/api/tx.h     |  12 +-
- drivers/net/wireless/intel/iwlwifi/fw/regulatory.c |  16 +
- drivers/net/wireless/intel/iwlwifi/fw/regulatory.h |   4 +
- drivers/net/wireless/intel/iwlwifi/fw/uefi.c       |  31 +-
- drivers/net/wireless/intel/iwlwifi/fw/uefi.h       |  30 +-
- drivers/net/wireless/intel/iwlwifi/iwl-config.h    |   1 +
- drivers/net/wireless/intel/iwlwifi/iwl-drv.c       |   4 +-
- drivers/net/wireless/intel/iwlwifi/iwl-trans.h     |   2 -
- drivers/net/wireless/intel/iwlwifi/mei/iwl-mei.h   |  10 +
- drivers/net/wireless/intel/iwlwifi/mei/main.c      |  58 +-
- drivers/net/wireless/intel/iwlwifi/mvm/coex.c      |  83 +-
- drivers/net/wireless/intel/iwlwifi/mvm/constants.h |   5 +-
- .../net/wireless/intel/iwlwifi/mvm/ftm-initiator.c |   1 +
- drivers/net/wireless/intel/iwlwifi/mvm/fw.c        |  29 +-
- drivers/net/wireless/intel/iwlwifi/mvm/link.c      |  25 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c  |  93 ++-
- drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  |  69 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mld-key.c   |  12 +-
- .../net/wireless/intel/iwlwifi/mvm/mld-mac80211.c  |  24 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mld-sta.c   |  12 +-
- drivers/net/wireless/intel/iwlwifi/mvm/mvm.h       |  42 +-
- drivers/net/wireless/intel/iwlwifi/mvm/nvm.c       |  10 +-
- drivers/net/wireless/intel/iwlwifi/mvm/ops.c       |  83 +-
- drivers/net/wireless/intel/iwlwifi/mvm/phy-ctxt.c  |   6 +-
- drivers/net/wireless/intel/iwlwifi/mvm/rx.c        |  17 +-
- drivers/net/wireless/intel/iwlwifi/mvm/rxmq.c      |   8 +-
- drivers/net/wireless/intel/iwlwifi/mvm/scan.c      |  54 +-
- drivers/net/wireless/intel/iwlwifi/mvm/sta.c       |  22 +-
- drivers/net/wireless/intel/iwlwifi/mvm/sta.h       |   4 +-
- .../net/wireless/intel/iwlwifi/mvm/time-event.c    |  14 +-
- drivers/net/wireless/intel/iwlwifi/mvm/tx.c        |  24 +-
- drivers/net/wireless/intel/iwlwifi/mvm/utils.c     |  64 +-
- drivers/net/wireless/intel/iwlwifi/pcie/drv.c      |   4 +-
- .../net/wireless/intel/iwlwifi/pcie/trans-gen2.c   |   2 +
- drivers/net/wireless/intel/iwlwifi/pcie/trans.c    |   4 +-
- drivers/net/wireless/marvell/mwifiex/11n.c         |   2 -
- drivers/net/wireless/marvell/mwifiex/11n.h         |   4 +-
- .../net/wireless/marvell/mwifiex/11n_rxreorder.c   |  23 +-
- drivers/net/wireless/marvell/mwifiex/cfg80211.c    | 420 +++++++++-
- drivers/net/wireless/marvell/mwifiex/cmdevt.c      |  29 +-
- drivers/net/wireless/marvell/mwifiex/decl.h        |  23 +
- drivers/net/wireless/marvell/mwifiex/fw.h          |  55 ++
- drivers/net/wireless/marvell/mwifiex/init.c        |  73 +-
- drivers/net/wireless/marvell/mwifiex/ioctl.h       |   5 +
- drivers/net/wireless/marvell/mwifiex/join.c        |  69 +-
- drivers/net/wireless/marvell/mwifiex/main.c        |  76 +-
- drivers/net/wireless/marvell/mwifiex/main.h        |  49 +-
- drivers/net/wireless/marvell/mwifiex/scan.c        |   8 +-
- drivers/net/wireless/marvell/mwifiex/sdio.c        |  13 +
- drivers/net/wireless/marvell/mwifiex/sdio.h        |   2 +
- drivers/net/wireless/marvell/mwifiex/sta_cmdresp.c |   2 +
- drivers/net/wireless/marvell/mwifiex/sta_event.c   |  36 +-
- drivers/net/wireless/marvell/mwifiex/sta_ioctl.c   |   5 +-
- drivers/net/wireless/marvell/mwifiex/sta_tx.c      |   9 +-
- drivers/net/wireless/marvell/mwifiex/tdls.c        |   4 +-
- drivers/net/wireless/marvell/mwifiex/uap_cmd.c     | 202 ++++-
- drivers/net/wireless/marvell/mwifiex/usb.c         |   7 +-
- drivers/net/wireless/marvell/mwifiex/util.c        | 104 +++
- drivers/net/wireless/marvell/mwifiex/wmm.c         |   7 -
- drivers/net/wireless/marvell/mwl8k.c               |   3 +
- drivers/net/wireless/microchip/wilc1000/sdio.c     |  10 +
- drivers/net/wireless/realtek/rtl8xxxu/Kconfig      |   5 +-
- drivers/net/wireless/realtek/rtl8xxxu/core.c       |   6 +
- drivers/net/wireless/realtek/rtw88/Kconfig         |   1 +
- drivers/net/wireless/realtek/rtw88/debug.c         | 303 ++++----
- drivers/net/wireless/realtek/rtw88/debug.h         |   3 +
- drivers/net/wireless/realtek/rtw88/hci.h           |   7 +
- drivers/net/wireless/realtek/rtw88/main.c          |  23 +-
- drivers/net/wireless/realtek/rtw88/main.h          |   6 +-
- drivers/net/wireless/realtek/rtw88/pci.c           |   2 +
- drivers/net/wireless/realtek/rtw88/reg.h           |  17 +
- drivers/net/wireless/realtek/rtw88/rtw8821cu.c     |   2 -
- drivers/net/wireless/realtek/rtw88/rtw8822b.c      |   1 +
- drivers/net/wireless/realtek/rtw88/rtw8822b.h      |   4 +-
- drivers/net/wireless/realtek/rtw88/rtw8822c.c      |  20 +-
- drivers/net/wireless/realtek/rtw88/rtw8822c.h      |  24 +-
- drivers/net/wireless/realtek/rtw88/rx.c            |  41 +
- drivers/net/wireless/realtek/rtw88/rx.h            |  15 +-
- drivers/net/wireless/realtek/rtw88/sdio.c          |   2 +
- drivers/net/wireless/realtek/rtw88/usb.c           | 209 ++++-
- drivers/net/wireless/realtek/rtw89/Kconfig         |  16 +
- drivers/net/wireless/realtek/rtw89/Makefile        |   8 +
- drivers/net/wireless/realtek/rtw89/cam.c           |  12 +-
- drivers/net/wireless/realtek/rtw89/chan.c          | 186 +++--
- drivers/net/wireless/realtek/rtw89/chan.h          |   6 +-
- drivers/net/wireless/realtek/rtw89/coex.c          |   2 +-
- drivers/net/wireless/realtek/rtw89/coex.h          |  12 +-
- drivers/net/wireless/realtek/rtw89/core.c          | 207 +++--
- drivers/net/wireless/realtek/rtw89/core.h          |  75 +-
- drivers/net/wireless/realtek/rtw89/debug.c         |   7 +-
- drivers/net/wireless/realtek/rtw89/fw.c            | 446 +++++++++--
- drivers/net/wireless/realtek/rtw89/fw.h            |  94 ++-
- drivers/net/wireless/realtek/rtw89/mac.c           |  25 +-
- drivers/net/wireless/realtek/rtw89/mac.h           |  11 +-
- drivers/net/wireless/realtek/rtw89/mac80211.c      |  35 +-
- drivers/net/wireless/realtek/rtw89/mac_be.c        |   1 +
- drivers/net/wireless/realtek/rtw89/phy.c           |  25 +-
- drivers/net/wireless/realtek/rtw89/phy.h           |   2 +-
- drivers/net/wireless/realtek/rtw89/reg.h           |  82 +-
- drivers/net/wireless/realtek/rtw89/regd.c          |   4 +-
- drivers/net/wireless/realtek/rtw89/rtw8851b.c      |  27 +-
- drivers/net/wireless/realtek/rtw89/rtw8851b_rfk.c  |  36 +-
- drivers/net/wireless/realtek/rtw89/rtw8852a.c      |  23 +-
- drivers/net/wireless/realtek/rtw89/rtw8852a_rfk.c  |  50 +-
- drivers/net/wireless/realtek/rtw89/rtw8852b.c      |  21 +-
- .../net/wireless/realtek/rtw89/rtw8852b_common.c   |   4 +-
- drivers/net/wireless/realtek/rtw89/rtw8852b_rfk.c  |  50 +-
- drivers/net/wireless/realtek/rtw89/rtw8852bt.c     | 843 +++++++++++++++++++++
- drivers/net/wireless/realtek/rtw89/rtw8852bt.h     |   2 +
- drivers/net/wireless/realtek/rtw89/rtw8852bt_rfk.c | 274 ++++++-
- drivers/net/wireless/realtek/rtw89/rtw8852bt_rfk.h |   3 +
- drivers/net/wireless/realtek/rtw89/rtw8852bte.c    |  93 +++
- drivers/net/wireless/realtek/rtw89/rtw8852c.c      |  31 +-
- drivers/net/wireless/realtek/rtw89/rtw8852c_rfk.c  |  42 +-
- drivers/net/wireless/realtek/rtw89/rtw8922a.c      |  29 +-
- drivers/net/wireless/realtek/rtw89/rtw8922a_rfk.c  |   8 +-
- drivers/net/wireless/realtek/rtw89/sar.c           |   2 +-
- drivers/net/wireless/realtek/rtw89/txrx.h          |   8 +-
- drivers/net/wireless/realtek/rtw89/util.h          |  18 +
- drivers/net/wireless/realtek/rtw89/wow.c           | 349 +++++++--
- drivers/net/wireless/realtek/rtw89/wow.h           |  23 +
- drivers/net/wireless/virtual/mac80211_hwsim.c      |   2 +-
- drivers/staging/rtl8192e/rtllib_crypt_ccmp.c       |   2 +-
- drivers/staging/rtl8192e/rtllib_crypt_tkip.c       |   2 +-
- drivers/staging/rtl8192e/rtllib_crypt_wep.c        |   2 +-
- drivers/staging/rtl8192e/rtllib_wx.c               |   2 +-
- include/linux/rfkill.h                             |   5 +-
- include/net/iw_handler.h                           |  12 +-
- include/net/lib80211.h                             |   8 +-
- include/net/mac80211.h                             |  40 +-
- net/mac80211/agg-rx.c                              |  15 +-
- net/mac80211/agg-tx.c                              |  15 +-
- net/mac80211/chan.c                                |   4 +-
- net/mac80211/ht.c                                  |  15 +-
- net/mac80211/ieee80211_i.h                         |  25 +-
- net/mac80211/main.c                                |   6 +-
- net/mac80211/mesh_pathtbl.c                        |   2 +-
- net/mac80211/mlme.c                                |  32 +-
- net/mac80211/offchannel.c                          |   1 +
- net/mac80211/rate.c                                |   2 +-
- net/mac80211/scan.c                                |  10 +-
- net/mac80211/status.c                              |   1 +
- net/mac80211/tx.c                                  |   2 +-
- net/mac80211/util.c                                |  20 +-
- net/rfkill/core.c                                  |   8 +-
- net/rfkill/rfkill-gpio.c                           |  18 +
- net/wireless/lib80211.c                            |  10 +-
- net/wireless/lib80211_crypt_ccmp.c                 |   2 +-
- net/wireless/lib80211_crypt_tkip.c                 |   2 +-
- net/wireless/lib80211_crypt_wep.c                  |   2 +-
- net/wireless/nl80211.c                             |  15 +-
- net/wireless/util.c                                |  14 +-
- 202 files changed, 6213 insertions(+), 1568 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/wireless/marvell,sd8787.yaml
- delete mode 100644 Documentation/devicetree/bindings/net/wireless/marvell-8xxx.txt
- create mode 100644 drivers/net/wireless/realtek/rtw89/rtw8852bt.c
- create mode 100644 drivers/net/wireless/realtek/rtw89/rtw8852bte.c
-
+References: <00000000000083b05a06214c9ddc@google.com>
+In-Reply-To: <00000000000083b05a06214c9ddc@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 4 Sep 2024 17:32:39 +0200
+Message-ID: <CANn89iKt9Z7rOecB_6SgcqHOMOqhAen6_+eE0=Sc9873rrqXzg@mail.gmail.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in
+ unix_stream_read_actor (2)
+To: syzbot <syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com>, 
+	Rao Shoaib <rao.shoaib@oracle.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Sep 4, 2024 at 5:13=E2=80=AFPM syzbot
+<syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    fbdaffe41adc Merge branch 'am-qt2025-phy-rust'
+> git tree:       net-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D13d7c44d98000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D996585887acda=
+db3
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3D8811381d455e3e9=
+ec788
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
+ian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D14b395db980=
+000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D16d3fc5398000=
+0
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/feaa1b13b490/dis=
+k-fbdaffe4.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/8e5dccd0377a/vmlinu=
+x-fbdaffe4.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/75151f74f4c9/b=
+zImage-fbdaffe4.xz
+>
+> Bisection is inconclusive: the first bad commit could be any of:
+>
+> 06ab21c3cb6e dt-bindings: net: mediatek,net: add top-level constraints
+> 70d16e13368c dt-bindings: net: renesas,etheravb: add top-level constraint=
+s
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D11d42e6398=
+0000
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> BUG: KASAN: slab-use-after-free in unix_stream_read_actor+0xa6/0xb0 net/u=
+nix/af_unix.c:2959
+> Read of size 4 at addr ffff8880326abcc4 by task syz-executor178/5235
+>
+> CPU: 0 UID: 0 PID: 5235 Comm: syz-executor178 Not tainted 6.11.0-rc5-syzk=
+aller-00742-gfbdaffe41adc #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 08/06/2024
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:93 [inline]
+>  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
+>  print_address_description mm/kasan/report.c:377 [inline]
+>  print_report+0x169/0x550 mm/kasan/report.c:488
+>  kasan_report+0x143/0x180 mm/kasan/report.c:601
+>  unix_stream_read_actor+0xa6/0xb0 net/unix/af_unix.c:2959
+>  unix_stream_recv_urg+0x1df/0x320 net/unix/af_unix.c:2640
+>  unix_stream_read_generic+0x2456/0x2520 net/unix/af_unix.c:2778
+>  unix_stream_recvmsg+0x22b/0x2c0 net/unix/af_unix.c:2996
+>  sock_recvmsg_nosec net/socket.c:1046 [inline]
+>  sock_recvmsg+0x22f/0x280 net/socket.c:1068
+>  ____sys_recvmsg+0x1db/0x470 net/socket.c:2816
+>  ___sys_recvmsg net/socket.c:2858 [inline]
+>  __sys_recvmsg+0x2f0/0x3e0 net/socket.c:2888
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f5360d6b4e9
+> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f=
+7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
+ ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fff29b3a458 EFLAGS: 00000246 ORIG_RAX: 000000000000002f
+> RAX: ffffffffffffffda RBX: 00007fff29b3a638 RCX: 00007f5360d6b4e9
+> RDX: 0000000000002001 RSI: 0000000020000640 RDI: 0000000000000003
+> RBP: 00007f5360dde610 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> R13: 00007fff29b3a628 R14: 0000000000000001 R15: 0000000000000001
+>  </TASK>
+>
+> Allocated by task 5235:
+>  kasan_save_stack mm/kasan/common.c:47 [inline]
+>  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+>  unpoison_slab_object mm/kasan/common.c:312 [inline]
+>  __kasan_slab_alloc+0x66/0x80 mm/kasan/common.c:338
+>  kasan_slab_alloc include/linux/kasan.h:201 [inline]
+>  slab_post_alloc_hook mm/slub.c:3988 [inline]
+>  slab_alloc_node mm/slub.c:4037 [inline]
+>  kmem_cache_alloc_node_noprof+0x16b/0x320 mm/slub.c:4080
+>  __alloc_skb+0x1c3/0x440 net/core/skbuff.c:667
+>  alloc_skb include/linux/skbuff.h:1320 [inline]
+>  alloc_skb_with_frags+0xc3/0x770 net/core/skbuff.c:6528
+>  sock_alloc_send_pskb+0x91a/0xa60 net/core/sock.c:2815
+>  sock_alloc_send_skb include/net/sock.h:1778 [inline]
+>  queue_oob+0x108/0x680 net/unix/af_unix.c:2198
+>  unix_stream_sendmsg+0xd24/0xf80 net/unix/af_unix.c:2351
+>  sock_sendmsg_nosec net/socket.c:730 [inline]
+>  __sock_sendmsg+0x221/0x270 net/socket.c:745
+>  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2597
+>  ___sys_sendmsg net/socket.c:2651 [inline]
+>  __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2680
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> Freed by task 5235:
+>  kasan_save_stack mm/kasan/common.c:47 [inline]
+>  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+>  kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+>  poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
+>  __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+>  kasan_slab_free include/linux/kasan.h:184 [inline]
+>  slab_free_hook mm/slub.c:2252 [inline]
+>  slab_free mm/slub.c:4473 [inline]
+>  kmem_cache_free+0x145/0x350 mm/slub.c:4548
+>  unix_stream_read_generic+0x1ef6/0x2520 net/unix/af_unix.c:2917
+>  unix_stream_recvmsg+0x22b/0x2c0 net/unix/af_unix.c:2996
+>  sock_recvmsg_nosec net/socket.c:1046 [inline]
+>  sock_recvmsg+0x22f/0x280 net/socket.c:1068
+>  __sys_recvfrom+0x256/0x3e0 net/socket.c:2255
+>  __do_sys_recvfrom net/socket.c:2273 [inline]
+>  __se_sys_recvfrom net/socket.c:2269 [inline]
+>  __x64_sys_recvfrom+0xde/0x100 net/socket.c:2269
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+>
+> The buggy address belongs to the object at ffff8880326abc80
+>  which belongs to the cache skbuff_head_cache of size 240
+> The buggy address is located 68 bytes inside of
+>  freed 240-byte region [ffff8880326abc80, ffff8880326abd70)
+>
+> The buggy address belongs to the physical page:
+> page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x326a=
+b
+> ksm flags: 0xfff00000000000(node=3D0|zone=3D1|lastcpupid=3D0x7ff)
+> page_type: 0xfdffffff(slab)
+> raw: 00fff00000000000 ffff88801eaee780 ffffea0000b7dc80 dead000000000003
+> raw: 0000000000000000 00000000800c000c 00000001fdffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+> page_owner tracks the page as allocated
+> page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(=
+GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 4686, tgid 4686 (ude=
+vadm), ts 32357469485, free_ts 28829011109
+>  set_page_owner include/linux/page_owner.h:32 [inline]
+>  post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1493
+>  prep_new_page mm/page_alloc.c:1501 [inline]
+>  get_page_from_freelist+0x2e4c/0x2f10 mm/page_alloc.c:3439
+>  __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4695
+>  __alloc_pages_node_noprof include/linux/gfp.h:269 [inline]
+>  alloc_pages_node_noprof include/linux/gfp.h:296 [inline]
+>  alloc_slab_page+0x5f/0x120 mm/slub.c:2321
+>  allocate_slab+0x5a/0x2f0 mm/slub.c:2484
+>  new_slab mm/slub.c:2537 [inline]
+>  ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3723
+>  __slab_alloc+0x58/0xa0 mm/slub.c:3813
+>  __slab_alloc_node mm/slub.c:3866 [inline]
+>  slab_alloc_node mm/slub.c:4025 [inline]
+>  kmem_cache_alloc_node_noprof+0x1fe/0x320 mm/slub.c:4080
+>  __alloc_skb+0x1c3/0x440 net/core/skbuff.c:667
+>  alloc_skb include/linux/skbuff.h:1320 [inline]
+>  alloc_uevent_skb+0x74/0x230 lib/kobject_uevent.c:289
+>  uevent_net_broadcast_untagged lib/kobject_uevent.c:326 [inline]
+>  kobject_uevent_net_broadcast+0x2fd/0x580 lib/kobject_uevent.c:410
+>  kobject_uevent_env+0x57d/0x8e0 lib/kobject_uevent.c:608
+>  kobject_synth_uevent+0x4ef/0xae0 lib/kobject_uevent.c:207
+>  uevent_store+0x4b/0x70 drivers/base/bus.c:633
+>  kernfs_fop_write_iter+0x3a1/0x500 fs/kernfs/file.c:334
+>  new_sync_write fs/read_write.c:497 [inline]
+>  vfs_write+0xa72/0xc90 fs/read_write.c:590
+> page last free pid 1 tgid 1 stack trace:
+>  reset_page_owner include/linux/page_owner.h:25 [inline]
+>  free_pages_prepare mm/page_alloc.c:1094 [inline]
+>  free_unref_page+0xd22/0xea0 mm/page_alloc.c:2612
+>  kasan_depopulate_vmalloc_pte+0x74/0x90 mm/kasan/shadow.c:408
+>  apply_to_pte_range mm/memory.c:2797 [inline]
+>  apply_to_pmd_range mm/memory.c:2841 [inline]
+>  apply_to_pud_range mm/memory.c:2877 [inline]
+>  apply_to_p4d_range mm/memory.c:2913 [inline]
+>  __apply_to_page_range+0x8a8/0xe50 mm/memory.c:2947
+>  kasan_release_vmalloc+0x9a/0xb0 mm/kasan/shadow.c:525
+>  purge_vmap_node+0x3e3/0x770 mm/vmalloc.c:2208
+>  __purge_vmap_area_lazy+0x708/0xae0 mm/vmalloc.c:2290
+>  _vm_unmap_aliases+0x79d/0x840 mm/vmalloc.c:2885
+>  change_page_attr_set_clr+0x2fe/0xdb0 arch/x86/mm/pat/set_memory.c:1881
+>  change_page_attr_set arch/x86/mm/pat/set_memory.c:1922 [inline]
+>  set_memory_nx+0xf2/0x130 arch/x86/mm/pat/set_memory.c:2110
+>  free_init_pages arch/x86/mm/init.c:924 [inline]
+>  free_kernel_image_pages arch/x86/mm/init.c:943 [inline]
+>  free_initmem+0x79/0x110 arch/x86/mm/init.c:970
+>  kernel_init+0x31/0x2b0 init/main.c:1476
+>  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+>
+> Memory state around the buggy address:
+>  ffff8880326abb80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>  ffff8880326abc00: fb fb fb fb fb fb fc fc fc fc fc fc fc fc fc fc
+> >ffff8880326abc80: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                                            ^
+>  ffff8880326abd00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc
+>  ffff8880326abd80: fc fc fc fc fc fc fc fc fa fb fb fb fb fb fb fb
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisect=
+ion
+>
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+>
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+>
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+>
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+>
+> If you want to undo deduplication, reply with:
+> #syz undup
+
+
+Another af_unix OOB issue.
+
+Rao can you take a look ?
+
+Thanks.
 
