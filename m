@@ -1,89 +1,109 @@
-Return-Path: <netdev+bounces-125208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85BC696C42D
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 18:35:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A418596C4A8
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:02:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F8961F24408
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:35:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F3321F261A5
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:02:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49EB1DFE14;
-	Wed,  4 Sep 2024 16:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB725464E;
+	Wed,  4 Sep 2024 17:02:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oloAsxZ3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="GurltbUt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCB24205D;
-	Wed,  4 Sep 2024 16:35:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D635C208B0;
+	Wed,  4 Sep 2024 17:02:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725467707; cv=none; b=C8h0zv9Ldk3nhdIK1ur1+k75pghB9Nb+PuHQxpll8e2kFXveY8AoYiIqmJGD94TShS3OwM/MF7uV2dI/RRYaQCJceCT0dBYM0RcBrgHcvntmwxT5JyL6cAFbDh4BfLubklDKXb7Ct1zOWBnxidJawbYRO9kAAZSeDeoGa2BIap8=
+	t=1725469355; cv=none; b=b78oXZcZM5JbMduA6uMMws7BXobVoQkJcb+rCU8T2KGRTKo8L7lf/N1taNoHDQGT2B13/a71tQAjuErcFulcLNzKXgb18HzJpwfdG+izn6oI7WThwZ+3cGgfx2+foDBwUKxwTjltS5m9j11GWLuH3pZD5v6LYjedecaSh4sg7m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725467707; c=relaxed/simple;
-	bh=+XpmBufS4Qg2AxW/ellAV9Ef4sdz+dYiyI0u6X+EPRk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T1r8HJdr1ndPpTc2Q+6heOA82Cj6R1112RbyEsYx9RsZPTfFqgtt+S8rX5fgkfPQboyd5nP+BcDGFjwpBl6zpmEhs+rhujdPHw1r1z/L0n+pBnhbdH7J+ETU0U6ctipFfO/kfm9Sa9V3LfK0WazLl7csCwlS8pV4zNA/5t+uhpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oloAsxZ3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BE3CC4CEC2;
-	Wed,  4 Sep 2024 16:35:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725467707;
-	bh=+XpmBufS4Qg2AxW/ellAV9Ef4sdz+dYiyI0u6X+EPRk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oloAsxZ3IWRPBByz9255WXPOb4W/lObd1foG47n47g3Jl9dnF03D0CkBnjx1zJrlk
-	 wFVtOGFH1ejRBg1hitT0fujgsHk8u2bTCgLvk+BB//ZeTfEI2jjhsFswGSdwtokgIR
-	 110fH1tZ1ihg2TtWj1sF7QyPSwVIAroTgcAc7yVF53R8kqXoFKVtnOLqFzOIq69vYy
-	 5jQULZ7yURAP4hxFbnJNFnjebNJraS/t8e+0hDqJ2p5yEe7J+KU1rilkn6XhbTbcYy
-	 RCL1fy8B838hXTZsZhAhMNslqstAHcLR5qVhxKeiMZgZjTo/Id99+r58r3u2M5auOD
-	 4fXQfvspHEg+g==
-Date: Wed, 4 Sep 2024 17:35:03 +0100
-From: Simon Horman <horms@kernel.org>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
-	Heng Qi <hengqi@linux.alibaba.com>
-Subject: Re: [PATCH net-next 0/2] net: xilinx: axienet: Enable adaptive IRQ
- coalescing with DIM
-Message-ID: <20240904163503.GA1722938@kernel.org>
-References: <20240903192524.4158713-1-sean.anderson@linux.dev>
+	s=arc-20240116; t=1725469355; c=relaxed/simple;
+	bh=sORX5VEgoe509ZQr0SKamAFfSHB60pe6cyvvjB5IGZs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PR8Eb9v9YC2M0Bu+ZpPnd5LFqaS8OIWwszpKAeCXvRCW51TrFiqSG40ti/GsIsHvGA70hXr0k0UtxYzCqq8s4n8kvv8qzGXyK9+6UUm+9cb71mnT3peq9TsD43ASXroxGrJNF+SQzR52oJuTO6BbY9dBIO1wtAhHcL/AcWsuaow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=GurltbUt; arc=none smtp.client-ip=185.11.138.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
+	s=gloria202408; h=Content-Type:Content-Transfer-Encoding:MIME-Version:
+	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=sORX5VEgoe509ZQr0SKamAFfSHB60pe6cyvvjB5IGZs=; b=GurltbUt/g0trnYK49OGBqD1RI
+	STz36H4cL4V5IouRnNPrCGcVHJHwewfTFwcX+EVl/4fOFJ5SlxOR8/sX5eC5bYaauRQGRHglFo9Op
+	4ShSM5z4ku0O7FzwpYrBqXN9st0mk5yGJf3sT5YvJVpYoIvI04UUETbPnNnkR5DV9imQNtVoJ3m3h
+	xUx6V9hWgtzaR0O1wirONGoxagQa3RdXhAZm43FQu1reRp3ZtJNLH8GxnGtv9RhF01gnDDMY2ndZa
+	iQpm79kW5XUoJdi8adciOrPWrn8PMtXuERXqPOY0Rpwfjs1gwc8drkm/HWqEA3CFlB0MvCAQ8Vjm8
+	mUjTGtZg==;
+Received: from i5e860d0f.versanet.de ([94.134.13.15] helo=diego.localnet)
+	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <heiko@sntech.de>)
+	id 1slt52-0001UH-Nt; Wed, 04 Sep 2024 18:42:04 +0200
+From: Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: kernel@pengutronix.de, Alibek Omarov <a1ba.omarov@gmail.com>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>,
+ Elaine Zhang <zhangqing@rock-chips.com>,
+ David Jander <david.jander@protonic.nl>, Simon Horman <horms@kernel.org>,
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
+ David Jander <david@protonic.nl>
+Subject:
+ Re: [PATCH can-next v5 00/20] can: rockchip_canfd: add support for CAN-FD IP
+ core found on Rockchip RK3568
+Date: Wed, 04 Sep 2024 18:43:52 +0200
+Message-ID: <4091366.iTQEcLzFEP@diego>
+In-Reply-To: <20240904-imposing-determined-mayfly-ba6402-mkl@pengutronix.de>
+References:
+ <20240904-rockchip-canfd-v5-0-8ae22bcb27cc@pengutronix.de>
+ <86274585.BzKH3j3Lxt@diego>
+ <20240904-imposing-determined-mayfly-ba6402-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240903192524.4158713-1-sean.anderson@linux.dev>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 
-On Tue, Sep 03, 2024 at 03:25:22PM -0400, Sean Anderson wrote:
-> To improve performance without sacrificing latency under low load,
-> enable DIM. While I appreciate not having to write the library myself, I
-> do think there are many unusual aspects to DIM, as detailed in the last
-> patch.
-> 
-> This series depends on [1].
-> 
-> [1] https://lore.kernel.org/netdev/20240903180059.4134461-1-sean.anderson@linux.dev/
+Am Mittwoch, 4. September 2024, 17:10:08 CEST schrieb Marc Kleine-Budde:
+> On 04.09.2024 10:55:21, Heiko St=FCbner wrote:
+> [...]
+> > How/when are you planning on applying stuff?
+> >=20
+> > I.e. if you're going to apply things still for 6.12, you could simply t=
+ake
+> > the whole series if the dts patches still apply to your tree ;-)
+>=20
+> The DTS changes should not go via any driver subsystem upstream, so
+> here's a dedicated PR:
+>=20
+> https://patch.msgid.link/20240904-rk3568-canfd-v1-0-73bda5fb4e03@pengutro=
+nix.de
 
-Hi Sean,
+I wasn't on Cc for the pull-request so I'll probably not get a notification
+when it gets merged?
 
-Unfortunately the CI doesn't understand dependencies,
-and so it is unable to apply this patchset :(
+So if you see your PR with the binding and driver getting merged to
+next-next, can you provide a ping please?
 
-I would suggest bundling patches for the same driver for net-next
-in a single patchset. And in any case, only having one active
-at any given time.
+Thanks a lot
+Heiko
 
--- 
-pw-bot: cr
+
 
