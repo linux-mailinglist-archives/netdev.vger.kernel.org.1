@@ -1,190 +1,175 @@
-Return-Path: <netdev+bounces-124890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD22196B484
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:29:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D448B96B491
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:31:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1FD21C2105B
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:29:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8983C1F29171
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6E2185B41;
-	Wed,  4 Sep 2024 08:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB801C7B93;
+	Wed,  4 Sep 2024 08:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sqfjs3n5"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="l1R87CEE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E21217279E;
-	Wed,  4 Sep 2024 08:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0988A1C766A
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 08:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725438563; cv=none; b=sKPc5U9GDri5s/Z5d34QhRDjpI4cstPJHh0vY5bUknyjMTyHHI7fMsn6eO7OkvF3puELSNjIgcQ0zF6kJVjQXdNC3gJCGEJDbpzEz/Qlrq2zkBRVjSzs5qLGDiiXs2WYoZUtWLcAWwyMNquejOuwml8eiAGecwrbjwmeOiBp/10=
+	t=1725438681; cv=none; b=bXi0TL+nHN4X6v1YeB0fP4DOArS2Coa+JO11V3jry1Ye5/hByMPigKNPUhzVuToEdtGfzVPouhasrWp8RGVbbGMEUzUSs9cMUmuigQmWUpH9/J8RzHCa3EafCULYdii9sXpiyTdm53r4Lh7yELNk5/SRRqW4sn4hkEczc3ivlbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725438563; c=relaxed/simple;
-	bh=DItLMDxS2TW6o/6g12CJyEVIDQxxNg16Gtc7lgv7AAY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sFrzI9hYiJ2oEwr6xJZprZDgt6GGVpmBoNXBD8FrfcqqMdjf0eFJhWf2QpAsWGEF0ie4qG7SK5BzGYhVpAhHqJbbU/07kzHcNX4arWgp6ONxnztC/9VUXL8kiQwoqzy21mjpOSkQGHzYfK60OYtsCN6W5y3yJViERtT8vzrmqnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sqfjs3n5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B922C4CEC2;
-	Wed,  4 Sep 2024 08:29:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725438562;
-	bh=DItLMDxS2TW6o/6g12CJyEVIDQxxNg16Gtc7lgv7AAY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Sqfjs3n5NWQI9vjApwFd/XLyL25PYhhk1NJKeswVqXvRnWRAgNgynUMN2s5KDbhLp
-	 XMpHOWt3GawNpByUlT5TwfjzusBULb5gR8oHxXA6OPHIPZJ7fVUxJrBxE9dHLZQIA7
-	 DLnMrTbQ/h24k3D7VBCjJ3FxSlDWGCcHvLmjJuQjRCCGiSlzSFzil/xZTmpKHz8cRp
-	 UcocHgNDIvqT6nARG2SZvLi8Gljq1N1OcvuqYgmToOVHhkArdHWQWuNb4tFRD6MnLW
-	 wt5a9IYFubShOGvLW5NylL5T0lgwwWOTVI14M/bYHUHhbRwG7Imaj1Lkhs4mBEioDZ
-	 Pqf1oJJ5B9IaA==
-Date: Wed, 4 Sep 2024 11:29:18 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: syzbot <syzbot+b8b7a6774bf40cf8296b@syzkaller.appspotmail.com>
-Cc: jgg@ziepe.ca, linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [rdma?] WARNING in gid_table_release_one (2)
-Message-ID: <20240904082918.GL4026@unreal>
-References: <000000000000d70eed06211ac86b@google.com>
+	s=arc-20240116; t=1725438681; c=relaxed/simple;
+	bh=5pgjtpjUtnZoOwptDjPJigWHbMdNWv0GlE6gtoZvEbA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=WYlOYrGh1tfFWeuWbXBBK7zZkJmhKBCE7TFglm2RXT5HIZfDbL9SbSTwwEPZNI+a2F95zYJSHyOSXr0utNCF2J+O+FxDbGQsoiorLyPr8nJBKnT1+NREDC8N4SdJggWJ6ueDvOxIDXRdoypSZBd3dkGv0R5z1mmCJ5Rb4PntUeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=l1R87CEE; arc=none smtp.client-ip=198.47.23.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4848U4f2069537;
+	Wed, 4 Sep 2024 03:30:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1725438604;
+	bh=G29POPG0UZlJhsuL6jpWjf2R42HdJqLCC+bXbslOwLE=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=l1R87CEEMM9O486HHSXHUMRqAkdTNnXCAsY0+vd2eK1FFhF41kTo5KjYu0mL+wZrW
+	 8ck1FE5DCI/qzDCHwDUUR0zv4nvgnuhcGAdCnse4hHQco9eoNgWmukXHaVdKxahI7o
+	 b8nf+J9YrQ4NVOCxxE4qDkPP77Ja2SlUlqtnjbY4=
+Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4848U2fG017286
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 4 Sep 2024 03:30:03 -0500
+Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 4
+ Sep 2024 03:30:02 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE109.ent.ti.com
+ (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 4 Sep 2024 03:30:02 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4848TknC097916;
+	Wed, 4 Sep 2024 03:29:47 -0500
+Message-ID: <01ed7b16-4ba8-470f-bdab-75e1b83b1525@ti.com>
+Date: Wed, 4 Sep 2024 13:59:43 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000d70eed06211ac86b@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 07/15] net: ti: icssg-prueth: Remove setting of
+ RX software timestamp
+To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, Jay Vosburgh <jv@jvosburgh.net>,
+        Andy Gospodarek
+	<andy@greyhouse.net>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Vincent Mailhol
+	<mailhol.vincent@wanadoo.fr>,
+        Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
+        Sudarsana Kalluru <skalluru@marvell.com>,
+        Manish Chopra
+	<manishc@marvell.com>,
+        Michael Chan <michael.chan@broadcom.com>,
+        Pavan Chebbi
+	<pavan.chebbi@broadcom.com>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+        Sunil Goutham
+	<sgoutham@marvell.com>,
+        Potnuri Bharat Teja <bharat@chelsio.com>,
+        Christian
+ Benvenuti <benve@cisco.com>,
+        Satish Kharat <satishkh@cisco.com>,
+        Claudiu
+ Manoil <claudiu.manoil@nxp.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>,
+        Shenwei Wang <shenwei.wang@nxp.com>,
+        Clark Wang
+	<xiaoning.wang@nxp.com>,
+        Dimitris Michailidis <dmichail@fungible.com>,
+        Yisen
+ Zhuang <yisen.zhuang@huawei.com>,
+        Salil Mehta <salil.mehta@huawei.com>,
+        Jijie
+ Shao <shaojijie@huawei.com>,
+        Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+        Marcin Wojtas
+	<marcin.s.wojtas@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Geetha
+ sowjanya <gakula@marvell.com>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        hariprasad <hkelam@marvell.com>, Ido Schimmel <idosch@nvidia.com>,
+        Petr
+ Machata <petrm@nvidia.com>,
+        Bryan Whitehead <bryan.whitehead@microchip.com>,
+        <UNGLinuxDriver@microchip.com>,
+        Horatiu Vultur
+	<horatiu.vultur@microchip.com>,
+        Lars Povlsen <lars.povlsen@microchip.com>,
+        Steen Hegelund <Steen.Hegelund@microchip.com>,
+        Daniel Machon
+	<daniel.machon@microchip.com>,
+        Alexandre Belloni
+	<alexandre.belloni@bootlin.com>,
+        Shannon Nelson <shannon.nelson@amd.com>,
+        Brett Creeley <brett.creeley@amd.com>,
+        Sergey Shtylyov <s.shtylyov@omp.ru>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>,
+        Edward
+ Cree <ecree.xilinx@gmail.com>,
+        Martin Habets <habetsm.xilinx@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Jose Abreu
+	<joabreu@synopsys.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Siddharth Vadapalli <s-vadapalli@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, Linus Walleij <linusw@kernel.org>,
+        Imre Kaloz <kaloz@openwrt.org>,
+        Richard
+ Cochran <richardcochran@gmail.com>,
+        Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>,
+        Carolina Jubran <cjubran@nvidia.com>,
+        Rahul Rameshbabu <rrameshbabu@nvidia.com>
+References: <20240904074922.256275-1-gal@nvidia.com>
+ <20240904074922.256275-8-gal@nvidia.com>
+Content-Language: en-US
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <20240904074922.256275-8-gal@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-#syz fix: "IB/core: Fix ib_cache_setup_one error flow cleanup"
 
-On Sun, Sep 01, 2024 at 08:46:22PM -0700, syzbot wrote:
-> Hello,
+
+On 04/09/24 1:19 pm, Gal Pressman wrote:
+> The responsibility for reporting of RX software timestamp has moved to
+> the core layer (see __ethtool_get_ts_info()), remove usage from the
+> device drivers.
 > 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    928f79a188aa Merge tag 'loongarch-fixes-6.11-2' of git://g..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=14089643980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=9e8c6a00ef394bcf
-> dashboard link: https://syzkaller.appspot.com/bug?extid=b8b7a6774bf40cf8296b
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> userspace arch: i386
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-928f79a1.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/5bf719d3bbf5/vmlinux-928f79a1.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/88527595ba7c/bzImage-928f79a1.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+b8b7a6774bf40cf8296b@syzkaller.appspotmail.com
-> 
-> infiniband syz1: ib_query_port failed (-19)
-> infiniband syz1: Couldn't set up InfiniBand P_Key/GID cache
-> ------------[ cut here ]------------
-> GID entry ref leak for dev syz1 index 0 ref=1
-> WARNING: CPU: 0 PID: 19837 at drivers/infiniband/core/cache.c:806 release_gid_table drivers/infiniband/core/cache.c:806 [inline]
-> WARNING: CPU: 0 PID: 19837 at drivers/infiniband/core/cache.c:806 gid_table_release_one+0x387/0x4b0 drivers/infiniband/core/cache.c:886
-> Modules linked in:
-> CPU: 0 UID: 0 PID: 19837 Comm: syz.1.3934 Not tainted 6.11.0-rc5-syzkaller-00079-g928f79a188aa #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> RIP: 0010:release_gid_table drivers/infiniband/core/cache.c:806 [inline]
-> RIP: 0010:gid_table_release_one+0x387/0x4b0 drivers/infiniband/core/cache.c:886
-> Code: 78 07 00 00 48 85 f6 74 2a 48 89 74 24 38 e8 b0 0a 76 f9 48 8b 74 24 38 44 89 f9 89 da 48 c7 c7 c0 69 51 8c e8 5a c3 38 f9 90 <0f> 0b 90 90 e9 6f fe ff ff e8 8b 0a 76 f9 49 8d bc 24 28 07 00 00
-> RSP: 0018:ffffc900042b7080 EFLAGS: 00010286
-> RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffc9002811e000
-> RDX: 0000000000040000 RSI: ffffffff814dd406 RDI: 0000000000000001
-> RBP: ffff88807ebaaf00 R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000001 R11: 0000000000000000 R12: ffff888051860000
-> R13: dffffc0000000000 R14: ffffed100fd755fb R15: 0000000000000001
-> FS:  0000000000000000(0000) GS:ffff88802c000000(0063) knlGS:00000000f56c6b40
-> CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-> CR2: 000000002effcff8 CR3: 0000000060c5e000 CR4: 0000000000350ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  ib_device_release+0xef/0x1e0 drivers/infiniband/core/device.c:498
->  device_release+0xa1/0x240 drivers/base/core.c:2582
->  kobject_cleanup lib/kobject.c:689 [inline]
->  kobject_release lib/kobject.c:720 [inline]
->  kref_put include/linux/kref.h:65 [inline]
->  kobject_put+0x1e4/0x5a0 lib/kobject.c:737
->  put_device+0x1f/0x30 drivers/base/core.c:3790
->  rxe_net_add+0xe0/0x110 drivers/infiniband/sw/rxe/rxe_net.c:544
->  rxe_newlink+0x70/0x190 drivers/infiniband/sw/rxe/rxe.c:197
->  nldev_newlink+0x373/0x5e0 drivers/infiniband/core/nldev.c:1794
->  rdma_nl_rcv_msg+0x388/0x6e0 drivers/infiniband/core/netlink.c:195
->  rdma_nl_rcv_skb.constprop.0.isra.0+0x2e6/0x450 drivers/infiniband/core/netlink.c:239
->  netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
->  netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1357
->  netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1901
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg net/socket.c:745 [inline]
->  ____sys_sendmsg+0x9b4/0xb50 net/socket.c:2597
->  ___sys_sendmsg+0x135/0x1e0 net/socket.c:2651
->  __sys_sendmsg+0x117/0x1f0 net/socket.c:2680
->  do_syscall_32_irqs_on arch/x86/entry/common.c:165 [inline]
->  __do_fast_syscall_32+0x73/0x120 arch/x86/entry/common.c:386
->  do_fast_syscall_32+0x32/0x80 arch/x86/entry/common.c:411
->  entry_SYSENTER_compat_after_hwframe+0x84/0x8e
-> RIP: 0023:0xf7f20579
-> Code: b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 00 00 00 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
-> RSP: 002b:00000000f56c656c EFLAGS: 00000296 ORIG_RAX: 0000000000000172
-> RAX: ffffffffffffffda RBX: 0000000000000008 RCX: 00000000200003c0
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000296 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
->  </TASK>
-> ----------------
-> Code disassembly (best guess), 2 bytes skipped:
->    0:	10 06                	adc    %al,(%rsi)
->    2:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
->    6:	10 07                	adc    %al,(%rdi)
->    8:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
->    c:	10 08                	adc    %cl,(%rax)
->    e:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
->   1e:	00 51 52             	add    %dl,0x52(%rcx)
->   21:	55                   	push   %rbp
->   22:	89 e5                	mov    %esp,%ebp
->   24:	0f 34                	sysenter
->   26:	cd 80                	int    $0x80
-> * 28:	5d                   	pop    %rbp <-- trapping instruction
->   29:	5a                   	pop    %rdx
->   2a:	59                   	pop    %rcx
->   2b:	c3                   	ret
->   2c:	90                   	nop
->   2d:	90                   	nop
->   2e:	90                   	nop
->   2f:	90                   	nop
->   30:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
->   37:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> Reviewed-by: Roger Quadros <rogerq@kernel.org>
+
+For TI ICSSG driver
+
+Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
+
+-- 
+Thanks and Regards,
+Danish
 
