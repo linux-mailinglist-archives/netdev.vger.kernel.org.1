@@ -1,109 +1,274 @@
-Return-Path: <netdev+bounces-125125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 566E696BF80
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:02:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71FAB96BF7D
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:02:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 049A7B2BF30
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:00:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29F3728ACFB
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:02:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8255A1DC726;
-	Wed,  4 Sep 2024 13:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9B21DB53B;
+	Wed,  4 Sep 2024 14:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O3G9HKJ8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SO0xPeDI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AB01DC1BB;
-	Wed,  4 Sep 2024 13:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A4531DA61A
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 14:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725458347; cv=none; b=KdBt8ww6rm4UYUGh4gIeEUSqKBOfZIHeFiPbwlWJHFyT4kbMjtcALr5PFGTc3UJ00X3aDNQpYQdjL9ZVlpRYUnvZrxaY+eNUwNe4OeT3oh4GnxitpNvwl5jzvBEv80wQ6QefpSJLUT2741zyAyKuJ5lm1PDUHle6MOBbLJ42thQ=
+	t=1725458530; cv=none; b=lU94BTSgnKwmAOE+h8eU/42+yffBJD3/3HdPWKQj4kw3LhAl4lqiYpo1p3pLOMMNtoMFabi0Pg197xNuCHT5YRHcVZS614gXbC/PF4FmPULMC38RUj/ae0ssU6qSNh4yxxU3xTjmodELAPbzKcrYOX9H7tS0qR0aOA79DBf4l6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725458347; c=relaxed/simple;
-	bh=uomU0VPvLEPWplvUsbYf35vO9aPTjwAOa5ED93ihjlc=;
-	h=Content-Type:MIME-Version:From:Subject:To:Cc:Message-Id:Date; b=QLJtbQE8lYrOYgq0Ub5OPLdk3dL82gPmCm6e0oewnUrfbQ7wpk6iTmmkO8WVgfqyK1YKdzR6kJHu6+ha8z2AEzTkiORLtN3GyVDnttrPh4uXzb+NiV98lf+Nm1lApDMtn6mUZQjevrWKhiWPiFBKFPs0foxrU1+j5LKfJBy3q3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O3G9HKJ8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5986EC4CECA;
-	Wed,  4 Sep 2024 13:59:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725458346;
-	bh=uomU0VPvLEPWplvUsbYf35vO9aPTjwAOa5ED93ihjlc=;
-	h=From:Subject:To:Cc:Date:From;
-	b=O3G9HKJ8p2FXH4rX3ouGGlWOIaF0qt0j3ekIt69doD/v8dugqgEfKKY+kFZEnZiWv
-	 LPR+Or38Sy4FU8/cn3NZSoypW6ImWyt8SNGkfT4LANktKsIwXhTvMVq+Z7+N0L43+1
-	 BeUmPxUtv6iWxbVeLZrFgwRSirkOv5KluiJVMk8IkBM40iuhPDM4sBgOEWsBhAosEH
-	 e8PpBX+HmNx/G6is4aG9YQNDvgSybRZaU8tIpwwnNIiDOm0mjJucPwzSYY1Qh+IlUk
-	 5k6O79qUYzsxvy/D4ShPFNoqjucH4BwFYHheoE28BkptJxZZ7JO8MPy5AIFC67ztI9
-	 UXMETcl2tdN1w==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725458530; c=relaxed/simple;
+	bh=nZ1JhRKZYppIHwzXTxXLaZEWHe53BZJTkznCdgncZRg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z1VrEzAQRXC5DkrQRF5k6/ChTR5sCKfaKruzXF0VtZvt8BC9H2hVfBMhY6nViRXbFhSVh7w7FsU4ZnLZPs8FdWI2GDfE169cgjZnssK5Vkb8SzSGRZ6lz+ph3KUvESWdYBHKqL94qJMHGq4bK62O1lgBId+WfgM2ezBJgCGEwiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SO0xPeDI; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <422daa04-5bf6-4538-81d6-0c140cfd0f91@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725458524;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E/oyNIkPDz08jk7iOx123fRz4cvS6ZK8Kwavn+KezKM=;
+	b=SO0xPeDI8fBrbPEKSKBlkoS/n6wqiAHjRA4HvTr84UhsBuoyRgMxC+pYYCpfdlICRCsaLE
+	bI0UmFY6DwyhDdJH1FTc/j3wCKDsKLUUaLMn709ZST3mGIckRc6qPd4o+RRbRRrv+BbgWE
+	dTv5kilTUg8rJRBfizLrxaPJD+zRYls=
+Date: Wed, 4 Sep 2024 15:01:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-From: Kalle Valo <kvalo@kernel.org>
-Subject: pull-request: wireless-2024-09-04
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Message-Id: <20240904135906.5986EC4CECA@smtp.kernel.org>
-Date: Wed,  4 Sep 2024 13:59:06 +0000 (UTC)
+Subject: Re: [PATCH net-next v3 1/4] net_tstamp: add SCM_TS_OPT_ID to provide
+ OPT_ID in control message
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Willem de Bruijn <willemb@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+References: <20240904113153.2196238-1-vadfed@meta.com>
+ <20240904113153.2196238-2-vadfed@meta.com>
+ <CAL+tcoDp5F57cZNsHrTAHE=Uqth89MsTyRC35CabTGJWY+vS_w@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CAL+tcoDp5F57cZNsHrTAHE=Uqth89MsTyRC35CabTGJWY+vS_w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+On 04/09/2024 14:56, Jason Xing wrote:
+> Hello Vadim,
+> 
+> On Wed, Sep 4, 2024 at 7:32 PM Vadim Fedorenko <vadfed@meta.com> wrote:
+>>
+>> SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
+>> timestamps and packets sent via socket. Unfortunately, there is no way
+>> to reliably predict socket timestamp ID value in case of error returned
+>> by sendmsg. For UDP sockets it's impossible because of lockless
+>> nature of UDP transmit, several threads may send packets in parallel. In
+>> case of RAW sockets MSG_MORE option makes things complicated. More
+>> details are in the conversation [1].
+>> This patch adds new control message type to give user-space
+>> software an opportunity to control the mapping between packets and
+>> values by providing ID with each sendmsg for UDP sockets.
+>> The documentation is also added in this patch.
+>>
+>> [1] https://lore.kernel.org/netdev/CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9Eaa9aDPfgHdtA@mail.gmail.com/
+>>
+>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>> ---
+>>   Documentation/networking/timestamping.rst | 13 +++++++++++++
+>>   arch/alpha/include/uapi/asm/socket.h      |  2 ++
+>>   arch/mips/include/uapi/asm/socket.h       |  2 ++
+>>   arch/parisc/include/uapi/asm/socket.h     |  2 ++
+>>   arch/sparc/include/uapi/asm/socket.h      |  2 ++
+>>   include/net/inet_sock.h                   |  4 +++-
+>>   include/net/sock.h                        |  2 ++
+>>   include/uapi/asm-generic/socket.h         |  2 ++
+>>   include/uapi/linux/net_tstamp.h           |  7 +++++++
+>>   net/core/sock.c                           |  9 +++++++++
+>>   net/ipv4/ip_output.c                      | 18 +++++++++++++-----
+>>   net/ipv6/ip6_output.c                     | 18 +++++++++++++-----
+>>   12 files changed, 70 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
+>> index 5e93cd71f99f..e365526d6bf9 100644
+>> --- a/Documentation/networking/timestamping.rst
+>> +++ b/Documentation/networking/timestamping.rst
+>> @@ -193,6 +193,19 @@ SOF_TIMESTAMPING_OPT_ID:
+>>     among all possibly concurrently outstanding timestamp requests for
+>>     that socket.
+>>
+>> +  The process can optionally override the default generated ID, by
+>> +  passing a specific ID with control message SCM_TS_OPT_ID::
+>> +
+>> +    struct msghdr *msg;
+>> +    ...
+>> +    cmsg                        = CMSG_FIRSTHDR(msg);
+>> +    cmsg->cmsg_level            = SOL_SOCKET;
+>> +    cmsg->cmsg_type             = SCM_TS_OPT_ID;
+>> +    cmsg->cmsg_len              = CMSG_LEN(sizeof(__u32));
+>> +    *((__u32 *) CMSG_DATA(cmsg)) = opt_id;
+>> +    err = sendmsg(fd, msg, 0);
+>> +
+>> +
+>>   SOF_TIMESTAMPING_OPT_ID_TCP:
+>>     Pass this modifier along with SOF_TIMESTAMPING_OPT_ID for new TCP
+>>     timestamping applications. SOF_TIMESTAMPING_OPT_ID defines how the
+>> diff --git a/arch/alpha/include/uapi/asm/socket.h b/arch/alpha/include/uapi/asm/socket.h
+>> index e94f621903fe..99dec81e7c84 100644
+>> --- a/arch/alpha/include/uapi/asm/socket.h
+>> +++ b/arch/alpha/include/uapi/asm/socket.h
+>> @@ -140,6 +140,8 @@
+>>   #define SO_PASSPIDFD           76
+>>   #define SO_PEERPIDFD           77
+>>
+>> +#define SCM_TS_OPT_ID          78
+>> +
+>>   #if !defined(__KERNEL__)
+>>
+>>   #if __BITS_PER_LONG == 64
+>> diff --git a/arch/mips/include/uapi/asm/socket.h b/arch/mips/include/uapi/asm/socket.h
+>> index 60ebaed28a4c..bb3dc8feb205 100644
+>> --- a/arch/mips/include/uapi/asm/socket.h
+>> +++ b/arch/mips/include/uapi/asm/socket.h
+>> @@ -151,6 +151,8 @@
+>>   #define SO_PASSPIDFD           76
+>>   #define SO_PEERPIDFD           77
+>>
+>> +#define SCM_TS_OPT_ID          78
+>> +
+>>   #if !defined(__KERNEL__)
+>>
+>>   #if __BITS_PER_LONG == 64
+>> diff --git a/arch/parisc/include/uapi/asm/socket.h b/arch/parisc/include/uapi/asm/socket.h
+>> index be264c2b1a11..c3ab3b3289eb 100644
+>> --- a/arch/parisc/include/uapi/asm/socket.h
+>> +++ b/arch/parisc/include/uapi/asm/socket.h
+>> @@ -132,6 +132,8 @@
+>>   #define SO_PASSPIDFD           0x404A
+>>   #define SO_PEERPIDFD           0x404B
+>>
+>> +#define SCM_TS_OPT_ID          0x404C
+>> +
+>>   #if !defined(__KERNEL__)
+>>
+>>   #if __BITS_PER_LONG == 64
+>> diff --git a/arch/sparc/include/uapi/asm/socket.h b/arch/sparc/include/uapi/asm/socket.h
+>> index 682da3714686..9b40f0a57fbc 100644
+>> --- a/arch/sparc/include/uapi/asm/socket.h
+>> +++ b/arch/sparc/include/uapi/asm/socket.h
+>> @@ -133,6 +133,8 @@
+>>   #define SO_PASSPIDFD             0x0055
+>>   #define SO_PEERPIDFD             0x0056
+>>
+>> +#define SCM_TS_OPT_ID            0x0057
+>> +
+>>   #if !defined(__KERNEL__)
+>>
+>>
+>> diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+>> index 394c3b66065e..f01dd273bea6 100644
+>> --- a/include/net/inet_sock.h
+>> +++ b/include/net/inet_sock.h
+>> @@ -174,6 +174,7 @@ struct inet_cork {
+>>          __s16                   tos;
+>>          char                    priority;
+>>          __u16                   gso_size;
+>> +       u32                     ts_opt_id;
+>>          u64                     transmit_time;
+>>          u32                     mark;
+>>   };
+>> @@ -241,7 +242,8 @@ struct inet_sock {
+>>          struct inet_cork_full   cork;
+>>   };
+>>
+>> -#define IPCORK_OPT     1       /* ip-options has been held in ipcork.opt */
+>> +#define IPCORK_OPT             1       /* ip-options has been held in ipcork.opt */
+>> +#define IPCORK_TS_OPT_ID       2       /* ts_opt_id field is valid, overriding sk_tskey */
+>>
+>>   enum {
+>>          INET_FLAGS_PKTINFO      = 0,
+>> diff --git a/include/net/sock.h b/include/net/sock.h
+>> index f51d61fab059..c6554ad82961 100644
+>> --- a/include/net/sock.h
+>> +++ b/include/net/sock.h
+>> @@ -952,6 +952,7 @@ enum sock_flags {
+>>   };
+>>
+>>   #define SK_FLAGS_TIMESTAMP ((1UL << SOCK_TIMESTAMP) | (1UL << SOCK_TIMESTAMPING_RX_SOFTWARE))
+>> +#define SOCKCM_FLAG_TS_OPT_ID  BIT(31)
+>>
+>>   static inline void sock_copy_flags(struct sock *nsk, const struct sock *osk)
+>>   {
+>> @@ -1794,6 +1795,7 @@ struct sockcm_cookie {
+>>          u64 transmit_time;
+>>          u32 mark;
+>>          u32 tsflags;
+>> +       u32 ts_opt_id;
+>>   };
+>>
+>>   static inline void sockcm_init(struct sockcm_cookie *sockc,
+>> diff --git a/include/uapi/asm-generic/socket.h b/include/uapi/asm-generic/socket.h
+>> index 8ce8a39a1e5f..db3df3e74b01 100644
+>> --- a/include/uapi/asm-generic/socket.h
+>> +++ b/include/uapi/asm-generic/socket.h
+>> @@ -135,6 +135,8 @@
+>>   #define SO_PASSPIDFD           76
+>>   #define SO_PEERPIDFD           77
+>>
+>> +#define SCM_TS_OPT_ID          78
+>> +
+>>   #if !defined(__KERNEL__)
+>>
+>>   #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
+>> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tstamp.h
+>> index a2c66b3d7f0f..1c38536350e7 100644
+>> --- a/include/uapi/linux/net_tstamp.h
+>> +++ b/include/uapi/linux/net_tstamp.h
+>> @@ -38,6 +38,13 @@ enum {
+>>                                   SOF_TIMESTAMPING_LAST
+>>   };
+>>
+>> +/*
+>> + * The highest bit of sk_tsflags is reserved for kernel-internal
+>> + * SOCKCM_FLAG_TS_OPT_ID. This check is to control that SOF_TIMESTAMPING*
+>> + * values do not reach this reserved area
+>> + */
+>> +static_assert(SOF_TIMESTAMPING_LAST != (1 << 31));
+> 
+> I saw some error occur in the patchwork:
+> 
+> ./usr/include/linux/net_tstamp.h:46:36: error: expected ‘)’ before ‘!=’ token
+>     46 | static_assert(SOF_TIMESTAMPING_LAST != (1 << 31));
+>        |                                    ^~~
+>        |                                    )
+> make[5]: *** [../usr/include/Makefile:85:
+> usr/include/linux/net_tstamp.hdrtest] Error 1
+> make[4]: *** [../scripts/Makefile.build:485: usr/include] Error 2
+> make[3]: *** [../scripts/Makefile.build:485: usr] Error 2
+> make[3]: *** Waiting for unfinished jobs....
+> make[2]: *** [/home/nipa/net-next/wt-1/Makefile:1925: .] Error 2
+> make[1]: *** [/home/nipa/net-next/wt-1/Makefile:224: __sub-make] Error 2
+> make: *** [Makefile:224: __sub-make] Error 2
+> 
+> Please see the link:
+> https://netdev.bots.linux.dev/static/nipa/886766/13790642/build_32bit/stderr
+> https://netdev.bots.linux.dev/static/nipa/886766/13790640/build_32bit/stderr
+> 
+> Thanks,
+> Jason
 
-here's a pull request to net tree, more info below. Please let me know if there
-are any problems.
-
-Kalle
-
-The following changes since commit 094513f8a2fbddee51b055d8035f995551f98fce:
-
-  wifi: iwlwifi: clear trans->state earlier upon error (2024-08-27 09:54:24 +0200)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2024-09-04
-
-for you to fetch changes up to 5872b47ce18efad5862b74ad334cbdfffa7f8a0c:
-
-  MAINTAINERS: wifi: cw1200: add net-cw1200.h (2024-09-03 21:36:02 +0300)
-
-----------------------------------------------------------------
-wireless fixes for v6.11
-
-Hopefully final fixes for v6.11 and this time only fixes to ath11k
-driver. We need to revert hibernation support due to reported
-regressions and we have a fix for kernel crash introduced in
-v6.11-rc1.
-
-----------------------------------------------------------------
-Baochen Qiang (3):
-      wifi: ath11k: fix NULL pointer dereference in ath11k_mac_get_eirp_power()
-      Revert "wifi: ath11k: restore country code during resume"
-      Revert "wifi: ath11k: support hibernation"
-
-Kalle Valo (1):
-      Merge tag 'ath-current-20240903' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-
-Simon Horman (1):
-      MAINTAINERS: wifi: cw1200: add net-cw1200.h
-
- MAINTAINERS                            |   1 +
- drivers/net/wireless/ath/ath11k/ahb.c  |   4 +-
- drivers/net/wireless/ath/ath11k/core.c | 119 +++++++++------------------------
- drivers/net/wireless/ath/ath11k/core.h |   4 --
- drivers/net/wireless/ath/ath11k/hif.h  |  12 +---
- drivers/net/wireless/ath/ath11k/mac.c  |   1 +
- drivers/net/wireless/ath/ath11k/mhi.c  |  12 +---
- drivers/net/wireless/ath/ath11k/mhi.h  |   3 +-
- drivers/net/wireless/ath/ath11k/pci.c  |  44 ++----------
- drivers/net/wireless/ath/ath11k/qmi.c  |   2 +-
- 10 files changed, 52 insertions(+), 150 deletions(-)
-
+Hmm, that's interesting.. Looks like some inconsistency in compilers.
+I'll re-check it, thanks Jason.
 
