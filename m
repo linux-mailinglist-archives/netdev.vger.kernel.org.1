@@ -1,122 +1,261 @@
-Return-Path: <netdev+bounces-124785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 265A696AE8F
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 04:28:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 130F796AEB0
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 04:36:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF83F1F24F3B
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 02:28:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44FFF1C20F51
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 02:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E96B38F91;
-	Wed,  4 Sep 2024 02:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FE4439FFE;
+	Wed,  4 Sep 2024 02:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="UUp49BvW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IgUcTTeu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 886C7443D;
-	Wed,  4 Sep 2024 02:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094A61EB21
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 02:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725416924; cv=none; b=aRxVdIDTAcvZpb9dnuqqHuEAA11z/5+wya/WqgJpt7qWKklP595uXdeYYKTmSRCHcUAmgsOdZ4nJHQlSdlMSrKckSMeTgF3oowXgvc5rQL6weFzKbC79f8ONfw6gcwOl0xi353bVwN0Xa2Fq85FbkpapiOThbk3mNqacVly302o=
+	t=1725417409; cv=none; b=DNzG3UfdItGQoH0kWpJuXYjBOu4oONCtPq3Ylv6yXjGyR7qTY7E6MiZpkgC81lKgMU3sI5ob3TAXn0wi0v7X5o6BcHGYmPPpLIyDA0Qv/6a9D5zcyoxs7nvXV/pL5zzsc5d4qXNS838u5lEgxw4OY5dbc26ibpaw+AVRFZ5Ir3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725416924; c=relaxed/simple;
-	bh=B+wiAafhN1/NEkju++rMTy5n7TvrXrWko3cpU8nfabw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=DXLc+Jmbgjlw9UtN59A+EsX/rG3wrFjz44Vr3nwCou3bPAKiAx2nWm/p3BbnS6KUXdleU1Xqv3BT2gz7ofXqRtdR9cAvnYH2w1fOnOHH/pwRmwwIijPVyaxoTd4pQy5fZc05FleVigf9G/lKl0xxLi1u8/YZ0t5Ycjf57vVwP0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=UUp49BvW; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1725416919;
-	bh=IY+G1gOfJT1Qk2FQx74kbsyqWHJN/d34Kpgbt7r1wdM=;
-	h=Date:From:To:Cc:Subject:From;
-	b=UUp49BvWTk7KM8rMkhr4CSPbvU64T7sZW7CsfnoGSYZneeITSlASfLxjfMefgPA86
-	 El/GZPTorEqJfNqLtERgbVLr3XoFSAZmHmB4jcDHTypUPsjxVBJBgML7Hs3fo4O8dP
-	 qWKYQ27txuPxQttr8Okht3KIetvUGvRjh7+1gjknY2r9XsUgFI/kKNKrh1G9Lbwc0V
-	 OXN+pb1/FnCr50dOHOv28GpyTchSplorbBbSZ2F2KwDiXDaZBRVxHVzedLqO9W8hce
-	 U3Hdw5RCy48C54I3+8JovXbVj2kQqEb53PDkjP4QxCyqsjrJtwioUxAVyHl1K+SUEg
-	 Hq3ySYo8wU7Jw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Wz5yZ4hhzz4wxx;
-	Wed,  4 Sep 2024 12:28:38 +1000 (AEST)
-Date: Wed, 4 Sep 2024 12:28:37 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Marcel Holtmann <marcel@holtmann.org>, Johan Hedberg
- <johan.hedberg@gmail.com>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patches in the bluetooth tree
-Message-ID: <20240904122837.41d1cf36@canb.auug.org.au>
+	s=arc-20240116; t=1725417409; c=relaxed/simple;
+	bh=afbstY9/BfWq72zyo0PM2bS1H6E6BP5yrDcPxIDP6uw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hlWqNMvPi2nR2QLJhU2Czzs6g3QtfzvZvX4Dv5cFjtKfHclg+bBJRcnIxP3X/CITYUDk6HX+dyXSe0cq4sjYvs+RCWVfl1U+PYIC04mrMGZrqAmrLW/J2O83sQvEgco0cP7pyQoZljaSmRC6VCG9th/iGCjGaH/a1U3bnTbwdhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IgUcTTeu; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725417405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eeBvrDYmE2uJeWqEXDQe+9yDTondtgA1onuCHQ/iUnY=;
+	b=IgUcTTeufGuF5iB87wy+LLRPMQD+wDGDvQ5Ld7ml1NSxb7Rc+Xq2Mk1AzYNN5MTd7Xwdxb
+	PRbBkms2kbPRDqEncMPN8WksuUoGJMPvmN7B0QD66yH24ym1nRGH+BlHGZ0QwDfwP/puZm
+	IWBUrSnuTHOb16qkHvhG+wPguoIzKG4=
+Received: from mail-vk1-f198.google.com (mail-vk1-f198.google.com
+ [209.85.221.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-477-FmS9cdtLMUKNvIBrJrq2Ew-1; Tue, 03 Sep 2024 22:36:44 -0400
+X-MC-Unique: FmS9cdtLMUKNvIBrJrq2Ew-1
+Received: by mail-vk1-f198.google.com with SMTP id 71dfb90a1353d-4fd1ba60c1cso1777865e0c.0
+        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 19:36:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725417404; x=1726022204;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eeBvrDYmE2uJeWqEXDQe+9yDTondtgA1onuCHQ/iUnY=;
+        b=OxviBeTsakivRrwicAwa/Cc4ek3gZ4Gg6XBE3sLfRGXu+S5QJ21RBMqgX03nxB2f3Y
+         YTUX5JBkZK9YuefDyrzmOIVY3p+kCDeP3GnVQSGLFBX6W+D9GFZva3Vq+ZdMqUKE5OPt
+         Au0KmCrGQgpZvTS9aysJAo/dklOSWmScBdaOc1zjIDix4Ww9XjRdYcIkIb7aK3yO1qH7
+         l4wnAin0M28WV7ZYRp25jMrYn8nq+RWynWkPq7vPRGukXp/irz6v4UHZoIDAPm4Q594B
+         6lUVEmBoBF+Oq+vlLq3Ks2Nd7iZBy1qCVU3lYe1FTGm35fWIYqT5th9L4XGpBMrAabRE
+         61hg==
+X-Forwarded-Encrypted: i=1; AJvYcCVYRZCvGd67ZL/GD0XekB3JzLIrDajqLZzWnIWEkvRB1EVUY/mN/z5DHOhRLNUbQlOT21bHkfg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWp53drSR48kHyENypNZc/KkgMegIu5MKOL27EQ6hdQ9N5ZzP+
+	sxJbVETnxmA1mttaKx2buIoGeaaStt3qKzmtWZ0ellMTomrMD3vqE7fc48d/6hIpoezyziWb6Wk
+	HoYFX0oyVOTwsB+lLCRhsvLEFZbDEdHvLXDnrZMRiba9SEEZYb1ZhxMriZAr6MPKQcQ4HO4waeP
+	o7XaLM7XEfU0tLWs2v9QW/0WXGBaZ0
+X-Received: by 2002:a05:6122:3c8a:b0:4f5:1a43:de4f with SMTP id 71dfb90a1353d-4fff16bf26dmr18429665e0c.13.1725417404065;
+        Tue, 03 Sep 2024 19:36:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFyl1XxEeSYARv69W9/sEdN1wU+kJTQdggRRGcttj5aDMvQTAShTs7AkPJ0x4+YDdzogEx1Uo+orcw+GWy39DM=
+X-Received: by 2002:a05:6122:3c8a:b0:4f5:1a43:de4f with SMTP id
+ 71dfb90a1353d-4fff16bf26dmr18429649e0c.13.1725417403642; Tue, 03 Sep 2024
+ 19:36:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/SeW=mwjGc+vlTXbhLd5yzjk";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/SeW=mwjGc+vlTXbhLd5yzjk
-Content-Type: text/plain; charset=US-ASCII
+References: <20240903182555.1253466-1-kheib@redhat.com>
+In-Reply-To: <20240903182555.1253466-1-kheib@redhat.com>
+From: YangHang Liu <yanghliu@redhat.com>
+Date: Wed, 4 Sep 2024 10:36:32 +0800
+Message-ID: <CAGYh1E_tbTY5U1Uwpszw7KeUTaKXV0+Lw4AUgBFdsTbx=Gb73A@mail.gmail.com>
+Subject: Re: [PATCH iwl-net] i40e: Fix trying to free already-freed IRQ
+To: Kamal Heib <kheib@redhat.com>, Chao Yang <chayang@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	Ivan Vecera <ivecera@redhat.com>, Michal Schmidt <mschmidt@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+This issue can be reproduced by hot-unplugging the INTx i40e PF.
 
-The following commits are also in the net tree as different commits
-(but the same patches):
+The Call Trace will disappear after using Kamal's fix.
 
-  80d2d2dbcce7 ("Bluetooth: MGMT: Ignore keys being loaded with invalid typ=
-e")
-  4e76e85acacd ("Revert "Bluetooth: MGMT/SMP: Fix address type when using S=
-MP over BREDR/LE"")
-  5785ffa39009 ("Bluetooth: MGMT: Fix not generating command complete for M=
-GMT_OP_DISCONNECT")
-  4dd2c5007a2b ("Bluetooth: hci_sync: Introduce hci_cmd_sync_run/hci_cmd_sy=
-nc_run_once")
-  61bea6923172 ("Bluetooth: qca: If memdump doesn't work, re-enable IBS")
+Tested-by: Yanghang Liu<yanghliu@redhat.com>
 
-These are commits
 
-  1e9683c9b6ca ("Bluetooth: MGMT: Ignore keys being loaded with invalid typ=
-e")
-  532f8bcd1c2c ("Revert "Bluetooth: MGMT/SMP: Fix address type when using S=
-MP over BREDR/LE"")
-  227a0cdf4a02 ("Bluetooth: MGMT: Fix not generating command complete for M=
-GMT_OP_DISCONNECT")
-  c898f6d7b093 ("Bluetooth: hci_sync: Introduce hci_cmd_sync_run/hci_cmd_sy=
-nc_run_once")
-  8ae22de9d2ea ("Bluetooth: qca: If memdump doesn't work, re-enable IBS")
 
-in the net tree.
+On Wed, Sep 4, 2024 at 2:26=E2=80=AFAM Kamal Heib <kheib@redhat.com> wrote:
+>
+> Avoid the following warning when trying to free an already freed IRQ,
+> The issue happens when trying to call i40e_remove() twice from two
+> different contexts which will lead to calling i40e_vsi_free_irq() twice,
+> Fix the issue by using a flag to mark that the IRQ has already been freed=
+.
+>
+> i40e 0000:07:00.0: i40e_ptp_stop: removed PHC on enp7s0
+> ------------[ cut here ]------------
+> Trying to free already-free IRQ 0
+> WARNING: CPU: 2 PID: 12 at kernel/irq/manage.c:1868 __free_irq+0x1e3/0x35=
+0
+> Modules linked in: nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_rej=
+ect_inet nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_n=
+at nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 rfkill ip_set nf_tables nfnet=
+link vfat fat intel_rapl_msr intel_rapl_common kvm_amd ccp iTCO_wdt iTCO_ve=
+ndor_support kvm i2c_i801 pcspkr i40e lpc_ich virtio_gpu i2c_smbus virtio_d=
+ma_buf drm_shmem_helper drm_kms_helper virtio_balloon joydev drm fuse xfs l=
+ibcrc32c ahci crct10dif_pclmul libahci crc32_pclmul crc32c_intel virtio_net=
+ libata virtio_blk ghash_clmulni_intel net_failover virtio_console failover=
+ serio_raw dm_mirror dm_region_hash dm_log dm_mod
+> CPU: 2 PID: 12 Comm: kworker/u16:1 Kdump: loaded Not tainted 5.14.0-478.e=
+l9.x86_64 #1
+> Hardware name: Red Hat KVM/RHEL, BIOS edk2-20240524-1.el9 05/24/2024
+> Workqueue: kacpi_hotplug acpi_hotplug_work_fn
+> RIP: 0010:__free_irq+0x1e3/0x350
+> Code: 00 00 48 8b bb a8 01 00 00 e8 09 74 02 00 49 8b 7c 24 30 e8 8f 7c 1=
+d 00 eb 35 8b 74 24 04 48 c7 c7 50 a3 61 92 e8 cd 99 f6 ff <0f> 0b 4c 89 fe=
+ 48 89 ef e8 30 aa b3 00 48 8b 43 40 48 8b 40 78 48
+> RSP: 0018:ffffb971c0077ac8 EFLAGS: 00010086
+> RAX: 0000000000000000 RBX: ffff8b594193ee00 RCX: 0000000000000027
+> RDX: 0000000000000027 RSI: 00000000ffff7fff RDI: ffff8b59bcf208c8
+> RBP: ffff8b594193eec4 R08: 0000000000000000 R09: ffffb971c0077970
+> R10: ffffb971c0077968 R11: ffffffff931e7c28 R12: ffff8b5944946000
+> R13: ffff8b594193ef80 R14: ffff8b5944946000 R15: 0000000000000246
+> FS:  0000000000000000(0000) GS:ffff8b59bcf00000(0000) knlGS:0000000000000=
+000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f11eb064000 CR3: 000000000ad40004 CR4: 0000000000770ef0
+> PKRU: 55555554
+> Call Trace:
+>  <TASK>
+>  ? srso_alias_return_thunk+0x5/0xfbef5
+>  ? show_trace_log_lvl+0x26e/0x2df
+>  ? show_trace_log_lvl+0x26e/0x2df
+>  ? free_irq+0x33/0x70
+>  ? __free_irq+0x1e3/0x350
+>  ? __warn+0x7e/0xd0
+>  ? __free_irq+0x1e3/0x350
+>  ? report_bug+0x100/0x140
+>  ? srso_alias_return_thunk+0x5/0xfbef5
+>  ? handle_bug+0x3c/0x70
+>  ? exc_invalid_op+0x14/0x70
+>  ? asm_exc_invalid_op+0x16/0x20
+>  ? __free_irq+0x1e3/0x350
+>  ? __free_irq+0x1e3/0x350
+>  free_irq+0x33/0x70
+>  i40e_vsi_free_irq+0x19e/0x220 [i40e]
+>  i40e_vsi_close+0x2b/0xc0 [i40e]
+>  i40e_close+0x11/0x20 [i40e]
+>  __dev_close_many+0x9e/0x110
+>  dev_close_many+0x8b/0x140
+>  ? srso_alias_return_thunk+0x5/0xfbef5
+>  ? free_pcppages_bulk+0xee/0x290
+>  unregister_netdevice_many_notify+0x162/0x690
+>  ? srso_alias_return_thunk+0x5/0xfbef5
+>  ? free_unref_page_commit+0x19a/0x310
+>  unregister_netdevice_queue+0xd3/0x110
+>  unregister_netdev+0x18/0x20
+>  i40e_vsi_release+0x84/0x2e0 [i40e]
+>  ? srso_alias_return_thunk+0x5/0xfbef5
+>  i40e_remove+0x15c/0x430 [i40e]
+>  pci_device_remove+0x3e/0xb0
+>  device_release_driver_internal+0x193/0x200
+>  pci_stop_bus_device+0x6c/0x90
+>  pci_stop_and_remove_bus_device+0xe/0x20
+>  disable_slot+0x49/0x90
+>  acpiphp_disable_and_eject_slot+0x15/0x90
+>  hotplug_event+0xea/0x210
+>  ? __pfx_acpiphp_hotplug_notify+0x10/0x10
+>  acpiphp_hotplug_notify+0x22/0x80
+>  ? __pfx_acpiphp_hotplug_notify+0x10/0x10
+>  acpi_device_hotplug+0xb8/0x210
+>  acpi_hotplug_work_fn+0x1a/0x30
+>  process_one_work+0x197/0x380
+>  worker_thread+0x2fe/0x410
+>  ? __pfx_worker_thread+0x10/0x10
+>  kthread+0xe0/0x100
+>  ? __pfx_kthread+0x10/0x10
+>  ret_from_fork+0x2c/0x50
+>  </TASK>
+> ---[ end trace 0000000000000000 ]---
+>
+> Fixes: 41c445ff0f48 ("i40e: main driver core")
+> Tested-by: YangHang Liu <yanghliu@redhat.com>
+> Signed-off-by: Kamal Heib <kheib@redhat.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e.h      | 1 +
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 8 ++++++++
+>  2 files changed, 9 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/etherne=
+t/intel/i40e/i40e.h
+> index d546567e0286..910415116995 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
+> @@ -865,6 +865,7 @@ struct i40e_vsi {
+>         int num_q_vectors;
+>         int base_vector;
+>         bool irqs_ready;
+> +       bool legacy_msi_irq_ready;
+>
+>         u16 seid;               /* HW index of this VSI (absolute index) =
+*/
+>         u16 id;                 /* VSI number */
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/et=
+hernet/intel/i40e/i40e_main.c
+> index cbcfada7b357..b39004a42df2 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -4630,6 +4630,9 @@ static int i40e_vsi_request_irq(struct i40e_vsi *vs=
+i, char *basename)
+>         if (err)
+>                 dev_info(&pf->pdev->dev, "request_irq failed, Error %d\n"=
+, err);
+>
+> +       if (!test_bit(I40E_FLAG_MSIX_ENA, pf->flags) && !err)
+> +               vsi->legacy_msi_irq_ready =3D true;
+> +
+>         return err;
+>  }
+>
+> @@ -5061,6 +5064,10 @@ static void i40e_vsi_free_irq(struct i40e_vsi *vsi=
+)
+>                         }
+>                 }
+>         } else {
+> +               if (!vsi->legacy_msi_irq_ready)
+> +                       return;
+> +
+> +               vsi->legacy_msi_irq_ready =3D false;
+>                 free_irq(pf->pdev->irq, pf);
+>
+>                 val =3D rd32(hw, I40E_PFINT_LNKLST0);
+> @@ -11519,6 +11526,7 @@ static int i40e_vsi_mem_alloc(struct i40e_pf *pf,=
+ enum i40e_vsi_type type)
+>         vsi->work_limit =3D I40E_DEFAULT_IRQ_WORK;
+>         hash_init(vsi->mac_filter_hash);
+>         vsi->irqs_ready =3D false;
+> +       vsi->legacy_msi_irq_ready =3D false;
+>
+>         if (type =3D=3D I40E_VSI_MAIN) {
+>                 vsi->af_xdp_zc_qps =3D bitmap_zalloc(pf->num_lan_qps, GFP=
+_KERNEL);
+> --
+> 2.46.0
+>
 
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/SeW=mwjGc+vlTXbhLd5yzjk
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbXxdUACgkQAVBC80lX
-0Gy9Egf9FeZwA1se09hWcAQlqMYbuaqkmFrucP93s+UrUY+K8/wXHk5FC7xk9Qa0
-DqrwllNxEhsNCMqwQJQXeENDvgDBK0Jl0eG9Yr35SQ+E36Lnx2j3SKzlXdVrKjMP
-F6GTTKxSIRUb+wOm0NWNOdgoKOjxlVJO3aT0wRvqhvE1Pj4mmf354pr4GaRCsKul
-rhtqeo31YZR1GI+SoypU5W1axQv4tnitzXkwfDr5bXXeO7xASZE1xHlXfDPoitWs
-7yD0uDFkIovXxkWEG7uWv9vjuL8/xiFqX+OwdwSr0jGqD9VBeOBaFMQaLKjGX+jD
-HnbFw8vSy3/UeuXcf6ONu+N9oT/YvQ==
-=RXIc
------END PGP SIGNATURE-----
-
---Sig_/SeW=mwjGc+vlTXbhLd5yzjk--
 
