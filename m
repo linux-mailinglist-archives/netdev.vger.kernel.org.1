@@ -1,129 +1,167 @@
-Return-Path: <netdev+bounces-125232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E89496C5B2
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:47:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44B6896C5CE
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:54:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D146A1C20324
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:47:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B943E1F21E83
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B45E1E1A23;
-	Wed,  4 Sep 2024 17:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BAAA1D6790;
+	Wed,  4 Sep 2024 17:54:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZxuJeXDH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QmaVFiFF"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9361E132C;
-	Wed,  4 Sep 2024 17:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E3E2AE9F
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 17:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725472051; cv=none; b=Lpj7nnTx3cXapowFbIkQyt8UnSlVp0KkM0NfGq6ukP5dz7HjjlOq8zuROmLAZGLXfMSsU34ey8wV8+dLP0x2cqRaAJ69EJb9x/W/mofrTJ/ZOAocexaMkW0cEnjOPunz5fqH/HF70W0hrlApUttFcAPxi0bXzE2Cw3qzxUI9xNw=
+	t=1725472489; cv=none; b=pqLnIX32e+8vIDwcaKlLP2EvKQblVaEFI/N6mZ0N9UdOotSUSE7xwXOvwbPHYTMxjf1ClZHirq5Qc9pFvRI0xOopHuJllQDGAMqQ93Se7sIHE4z0NgsmfySM4P1V/nEpMvCFO1PVjun/Gez3HuClGS4qP5LiakGw7TUii4RI6xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725472051; c=relaxed/simple;
-	bh=psNQgG7k6QzVycEcqOGul+y9Q1/orlCLyOVGi7JufEU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xc9UvY23EnBfA6prtFdHqmM3GpDPc+C5ya0bmgzzNhrEQX3P3ta2XIL8V1avAt+I3T/Mk1UHS7o8Laj4w29sMXIgq+BHQKW8sDgx+gvTpZXgbgy21qlbuB3rdwDbXQhTRL4fBr5A52COfLCa4wv7PO6EHC+4Vt3gogAnmr/aoUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZxuJeXDH; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 399DBFF803;
-	Wed,  4 Sep 2024 17:47:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1725472041;
+	s=arc-20240116; t=1725472489; c=relaxed/simple;
+	bh=Z6HiyX93ykcjunBqVHUERr9afewumJr9FbixGfAFfmA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bgO27STUWbn5awFDoLAc3DCxWSzwmlEXBS0fJi5ST7HQj08cu1lwhC3nw3Rw6OlwpHM3p+J5QAkp5RLsmRo5ytsgcD1yaz8hixRVjLxKeWtL2XGaIw9GlwpOulWMGBxchPSnCV5iU+W9s2L5r08G11DDqUHqkhLOXkmG6tzY+98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QmaVFiFF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725472486;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5lrAIY666kuXUBCi+wo5/zYldvxY9h3q7HZm7kbftVA=;
-	b=ZxuJeXDHi359wklqIU/J/WmVpxaFuHD6eG7XzZrdZDJOXnAwfp8uHoXsFSauy2mWdqFZrC
-	+V3fF83Qo1UkmljlOLa5HGSTG1uSPZHv0LZASkIyTQ1t8ZCQ5gF2s3T9ATKfO1ji+zUcG0
-	wT4NOK9YJrh7hPsKcZsceuXZQYYm/zWFcQqHNAwkmn1G6agd5626GLhLkivPHvoJPFR6U7
-	B34NeuWmvCX5MHANfGxrbT5sZvbWMDP4aLsUoPuUaZRN2F3FH4vsb1hFs8f3p3pW61hq7J
-	d/wSdpKVTNiaU2UxLvRT0EkaCfzzKpVp/CW034Q4G+ClmLUyDnSPprUjEtcNOQ==
-Date: Wed, 4 Sep 2024 19:47:17 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jonathan Corbet
- <corbet@lwn.net>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
- Piergiorgio Beruto <piergiorgio.beruto@gmail.com>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH ethtool-next v2 3/3] ethtool: Introduce a command to
- list PHYs
-Message-ID: <20240904194717.60ba4df6@fedora.home>
-In-Reply-To: <7fpbxztptolcuz4ppppkmpmblel7mv4nh4jgkjqbdedo4hrcjc@6oo6acqfejas>
-References: <20240828152511.194453-1-maxime.chevallier@bootlin.com>
-	<20240828152511.194453-4-maxime.chevallier@bootlin.com>
-	<7fpbxztptolcuz4ppppkmpmblel7mv4nh4jgkjqbdedo4hrcjc@6oo6acqfejas>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	bh=SzbU6ouPAuxG+alhKrMt3VN81Hbe8no9a/WKkemkhDk=;
+	b=QmaVFiFF8h41gmzsR2DVq0oKO4AfItwfHlcknXOjxB5GfnDBmRk/oiylk6wYlbe/WmKt6z
+	07NGaL2o38ZZPtWhhOLREB0wkBCY3bz02A5/xP3mFVa+I1NwBD9Chpuj74qA3IMWXYU86p
+	MBV22tbGZ6bceyqOAZxOxuE2XFysrV4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-440-5p1Q7fD4Nca4Ls4c5oyXHw-1; Wed, 04 Sep 2024 13:54:44 -0400
+X-MC-Unique: 5p1Q7fD4Nca4Ls4c5oyXHw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42c827c4d3aso10120255e9.2
+        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 10:54:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725472483; x=1726077283;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SzbU6ouPAuxG+alhKrMt3VN81Hbe8no9a/WKkemkhDk=;
+        b=F/AszJQB6kr2RgYCw7QWlBqOfj57jFls3Of2xUGClFFMCpSs5zcMI3v7tWZQbNO1vQ
+         6jMs32tmxVGVI6XRnGGM+0a87bMT18Y3sils1/DlsaeogHiDM0xpMrg60d+F1tzoC2Gu
+         EoSlSVdKO6re7ilCXHe8HSi/Chr4xOjgBzcfXctZl/5oIGvDV43MAateUSA61veOXFs8
+         /OqJ+YMQgzXuijnT1qQSSWS//Or91uTMRDlmrlQFoCVIVInEXhj3wbncgrrhD9vYplwW
+         uP7ljwXdamiCz+IzZvGVqm29TfmPL3R7xbNc+Q3roFHWGivX/fj3+HR+DcnA63z3w6NG
+         TwEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV5JED0ebP+WyK8kq4x167fzOvOI02CMy927kzXie8i31FULoXgdFZdizCXJ5mll25ImmoIhNY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzojlgcdNVDnrOFIlKvEI4oYmpP06u0NH4cSwiBDNb7BXwt2N00
+	0QaoQEc2d56Vm2IyXsvuTXYY2UlKmgv8oAjB/5oL6+sbX0o9hDEcbIwBFMb+50FVf8pFzFsYIQj
+	FdpUVY6WX7YjOfs2q8Q7dMcrnE+y6V5SujPE+OYuM4aPNGAU0al/yEQ==
+X-Received: by 2002:a05:600c:4691:b0:426:4978:65f0 with SMTP id 5b1f17b1804b1-42c9545e5bbmr26273235e9.18.1725472483339;
+        Wed, 04 Sep 2024 10:54:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFcfBdpwRRXyT2Ul558JoI1Xh/UvCw4u7+UsWz9zu9bvEopMdUZL21bMwuVXU0/7rsWLP2zKg==
+X-Received: by 2002:a05:600c:4691:b0:426:4978:65f0 with SMTP id 5b1f17b1804b1-42c9545e5bbmr26272915e9.18.1725472482381;
+        Wed, 04 Sep 2024 10:54:42 -0700 (PDT)
+Received: from debian (2a01cb058d23d6001cb9a91b9d4fedb5.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:1cb9:a91b:9d4f:edb5])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ba6425a77sm249361855e9.45.2024.09.04.10.54.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Sep 2024 10:54:42 -0700 (PDT)
+Date: Wed, 4 Sep 2024 19:54:40 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	Martin Varghese <martin.varghese@nokia.com>,
+	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH net] bareudp: Fix device stats updates.
+Message-ID: <Ztie4AoXc9PhLi5w@debian>
+References: <04b7b9d0b480158eb3ab4366ec80aa2ab7e41fcb.1725031794.git.gnault@redhat.com>
+ <20240903113402.41d19129@kernel.org>
+ <ZthSuJWkCn+7na9k@debian>
+ <20240904075732.697226a0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240904075732.697226a0@kernel.org>
 
-Hello Michal,
+[Adding David Ahern for the vrf/dstats discussion]
 
-On Mon, 2 Sep 2024 00:07:56 +0200
-Michal Kubecek <mkubecek@suse.cz> wrote:
-
-> On Wed, Aug 28, 2024 at 05:25:10PM +0200, Maxime Chevallier wrote:
-> > It is now possible to list all Ethernet PHYs that are present behind a
-> > given interface, since the following linux commit :
-> > 63d5eaf35ac3 ("net: ethtool: Introduce a command to list PHYs on an interface")
+On Wed, Sep 04, 2024 at 07:57:32AM -0700, Jakub Kicinski wrote:
+> On Wed, 4 Sep 2024 14:29:44 +0200 Guillaume Nault wrote:
+> > > The driver already uses struct pcpu_sw_netstats, would it make sense to
+> > > bump it up to struct pcpu_dstats and have per CPU rx drops as well?
 > > 
-> > This command relies on the netlink DUMP command to list them, by allowing to
-> > pass an interface name/id as a parameter in the DUMP request to only
-> > list PHYs on one interface.
-> > 
-> > Therefore, we introduce a new helper function to prepare a interface-filtered
-> > dump request (the filter can be empty, to perform an unfiltered dump),
-> > and then uses it to implement PHY enumeration through the --show-phys
-> > command.
-> > 
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > ---  
-> [...]
-> > diff --git a/netlink/extapi.h b/netlink/extapi.h
-> > index c882295..fd99610 100644
-> > --- a/netlink/extapi.h
-> > +++ b/netlink/extapi.h
-> > @@ -56,6 +56,7 @@ int nl_set_mm(struct cmd_context *ctx);
-> >  int nl_gpse(struct cmd_context *ctx);
-> >  int nl_spse(struct cmd_context *ctx);
-> >  int nl_flash_module_fw(struct cmd_context *ctx);
-> > +int nl_get_phy(struct cmd_context *ctx);
-> >  
-> >  void nl_monitor_usage(void);
-> >    
+> > Long term, I was considering moving bareudp to use dev->tstats for
+> > packets/bytes and dev->core_stats for drops. It looks like dev->dstats
+> > is only used for VRF, so I didn't consider it.
 > 
-> Please add also a fallback to !ETHTOOL_ENABLE_NETLINK branch, similar
-> to other netlink handlers, so that a build with --disable-netlink does
-> not fail.
+> Right, d stands for dummy so I guess they also were used by dummy
+> at some stage? Mostly I think it's a matter of the other stats being
+> less recent.
 
-You're right, I'll add a fallback for that. I actually just faced that
-exact issue trying to build this patchset using a fresh buildroot
-setup, having forgotten to add netlink libraries.
+Looks like dummy had its own dstats, yes. But those dstats were really
+like the current lstats (packets and bytes counters, nothing for
+drops). Dummy was later converted to lstats by commit 4a43b1f96b1d
+("net: dummy: use standard dev_lstats_add() and dev_lstats_read()").
 
-Thanks for the reviews,
+The dstats we have now really come from vrf (different counters for tx
+and rx and counters for packet drops), which had its own implementation
+at that time.
 
-Maxime
+My understanding is that vrf implemented its own dstats in order to
+have per-cpu counters for regular bytes/packets counters and also for
+packet drops.
+
+But when vrf's dstats got moved to the core (commits
+79e0c5be8c73 ("net, vrf: Move dstats structure to core") and
+34d21de99cea ("net: Move {l,t,d}stats allocation to core and convert
+veth & vrf")), the networking core had caught up and had also gained
+support for pcpu drop counters (commit 625788b58445 ("net: add per-cpu
+storage and net->core_stats")).
+
+In this context, I feel that dstats is now just a mix of tstats and
+core_stats.
+
+> > Should we favour dev->dstats for tunnels instead of combining ->tstats
+> > and ->core_stats? (vxlan uses the later for example).
+> 
+> Seems reasonable to me. Not important enough to convert existing
+> drivers, maybe, unless someone sees contention. But in new code,
+> or if we're touching the relevant lines I reckon we should consider it?
+
+Given that we now have pcpu stats for packet drops anyway, what does
+dstats bring compared to tstats?
+
+Shouldn't we go the other way around and convert vrf to tstats and
+core_stats? Then we could drop dstats entirely.
+
+Back to bareudp, for the moment, I'd prefer to convert it to tstats
+rather than dstats. The reason is that vxlan (and geneve to a lesser
+extent) use tstats and I'd like to ease potential future code
+consolidation between those three modules.
+
+> No strong feelings tho, LMK if you want to send v2 or keep this patch
+> as is.
+
+I'd prefer to have this patch merged as is in -net. I have other
+patches pending that have to update stats and I'd like to do that
+correctly (that is, in a non-racy way) and consistently with existing
+code. I feel that converting bareudp to either tstats or dstats is
+something for net-next.
+
+After -net will merge into net-next, I'll can convert bareudp to either
+dstats or tstats, depending on the outcome of this conversation.
+
 
