@@ -1,151 +1,133 @@
-Return-Path: <netdev+bounces-124838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C20C96B216
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:46:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7C1E96B2B0
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E8F22894DF
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 06:46:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46E9B1F28736
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 07:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73632145B0B;
-	Wed,  4 Sep 2024 06:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8368E130ADA;
+	Wed,  4 Sep 2024 07:20:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="WHUSG3RD"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="TsML5KZM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626C8145A09;
-	Wed,  4 Sep 2024 06:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C560B83CDB
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 07:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725432385; cv=none; b=VsaMEJRBoYyyg4OIkUwbIU3eJXJJAGEdNSWiroQrVrjBgLnbHnSS8uekCF00PSgHlzrbqM/GfDj4KAcoo+plSnAgcukfu6TCH0seTNtV4ADL0wfZtfWixgS0wGX2G2mXFKoNJ9Mt7FTW9l3Qr4vi5CiHGVQYc7uuRtBaTP6c/lo=
+	t=1725434436; cv=none; b=RGzCLsqe4lzpu3i8friCaU4/yA6WHmXTzIRLyAOTwip5CSvgBj4bOgQ/kdSurhQ3bhS7apZhokz320mJQ+aSiySdxO2dc29O4l7Bm+J/Edpq/k7gm3KPu9O5pJc7jlCE3hKU6KXFpqqe/02d/jUDxbAdQrABsGM3P0nLDMKbYfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725432385; c=relaxed/simple;
-	bh=5f/PYhXt0RMma+L76lP1Tn8q8D2Khez0KEbRlwxSaFA=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=U4ozU6QO1HblHse1ckpoM1xi43WNrDFrpMUs//haYXPr/7RdqlTx3z9M82cUpmWcybxZHT0g7cIhZbyGGsHmxZ99Cs8I/RHCJ5uGwgtropdBWNNoNBkUcQPaOgHEytnrL0oaf3g5HadFajqtUeWQydLT/0RQ+H9iwvui9IxqLps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=WHUSG3RD; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1725432373; h=Message-ID:Subject:Date:From:To;
-	bh=Y22uid/xR/mynPf9pRoIZffXD1FEymenAoEvZ++51sg=;
-	b=WHUSG3RD0J3fmM69H75As0Sa4Wbbb+Lza4m4Jtq2AIjx8wH/zAXvY1t845g/GD/bzk0zMCJl6CBHtywmCWtaAEZsuEuI5XnSY5qB+APozpRjSpUddok9xcifoTINx7vpwRujS27QYjpH/zfOQK8E7bzKE6ZT3/HIvWyP/3g/2ac=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WEGR9Ak_1725432372)
-          by smtp.aliyun-inc.com;
-          Wed, 04 Sep 2024 14:46:13 +0800
-Message-ID: <1725432304.274084-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH v2] virtio_net: Fix mismatched buf address when unmapping for small packets
-Date: Wed, 4 Sep 2024 14:45:04 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Wenbo Li <liwenbo.martin@bytedance.com>
-Cc: virtualization@lists.linux.dev,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Wenbo Li <liwenbo.martin@bytedance.com>,
- Jiahui Cen <cenjiahui@bytedance.com>,
- Ying Fang <fangying.tommy@bytedance.com>,
- mst@redhat.com,
- jasowang@redhat.com,
- eperezma@redhat.com,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- pabeni@redhat.com
-References: <20240904061009.90785-1-liwenbo.martin@bytedance.com>
-In-Reply-To: <20240904061009.90785-1-liwenbo.martin@bytedance.com>
+	s=arc-20240116; t=1725434436; c=relaxed/simple;
+	bh=UlnIXAtuDdzdwryGxZDI+oYa780rDwfbRyyt+jn+UYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m5U/GOez2f0UsgemsTfEia6NdFBgxTj+/M4cyelwfG/0GgVc39ePUnNeYANS6JLBC2t/bKeiZs9lG6HR2vqi/TE0AJBQDSEjvRr2fFckuCobZTjHmz+aBxy/2ZXIHyCo2zh03SnjfzaeCgjjKnWwQ/857UQVARjxwjQWWju7Xc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=TsML5KZM; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 40527240005;
+	Wed,  4 Sep 2024 07:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1725434426;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AL8g0kvVWs9hZaXw+t+uBi6VLDjjO03wPgkiircqXnI=;
+	b=TsML5KZMe/GVP0/Ydhm487BI2MWZ3q8xEtx0BjFnbIp8x3q+h+pL1skRp2gcjtCar2nUYU
+	qh1W4wa8Tk+fSP08i27O/lYV97MD2mkJSIyNCRgHjsUUdkduMxTwenH3he/dAXrHbvLLFl
+	9dGXibHJuUlj7MQ6uNcp1/nx6//RlIOSIt7napdpfgcXiepPxdilhqwR+kNzNPc2Put/a0
+	Aa0OmFC5bu5Z4rw79jx/p9SWG/sJDqKNvZfRiFT6dEw7puY0//GBuUlxeIK5Or3nZUZexB
+	o7+9vC4SRzTIxEt08U+R3I4wG4zTicyW3q2PJti5OAIKzKlzdG8oyfVx+hoB5A==
+Date: Wed, 4 Sep 2024 09:20:24 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, Vladimir Oltean <olteanv@gmail.com>, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, woojung.huh@microchip.com,
+ o.rempel@pengutronix.de
+Subject: Re: [RFC net-next 1/2] net: ethtool: plumb PHY stats to PHY drivers
+Message-ID: <20240904092024.530c54c3@fedora.home>
+In-Reply-To: <20240830113047.10dcee79@kernel.org>
+References: <20240829174342.3255168-1-kuba@kernel.org>
+	<20240829174342.3255168-2-kuba@kernel.org>
+	<20240830101630.52032f20@device-28.home>
+	<20240830113047.10dcee79@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Wed,  4 Sep 2024 14:10:09 +0800, Wenbo Li <liwenbo.martin@bytedance.com> wrote:
-> Currently, the virtio-net driver will perform a pre-dma-mapping for
-> small or mergeable RX buffer. But for small packets, a mismatched address
-> without VIRTNET_RX_PAD and xdp_headroom is used for unmapping.
+Hi Jakub,
 
-Will used virt_to_head_page(), so could you say more about it?
+On Fri, 30 Aug 2024 11:30:47 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-	struct page *page = virt_to_head_page(buf);
+> On Fri, 30 Aug 2024 10:16:30 +0200 Maxime Chevallier wrote:
+> > > +static void
+> > > +ethtool_get_phydev_stats(struct net_device *dev,
+> > > +			 struct linkstate_reply_data *data)
+> > > +{
+> > > +	struct phy_device *phydev = dev->phydev;    
+> > 
+> > This would be a very nice spot to use the new
+> > ethnl_req_get_phydev(), if there are multiple PHYs on that device.
+> > Being able to access the stats individually can help
+> > troubleshoot HW issues.
+> >   
+> > > +static void
+> > > +ethtool_get_phydev_stats(struct net_device *dev, struct stats_reply_data *data)
+> > > +{
+> > > +	struct phy_device *phydev = dev->phydev;    
+> > 
+> > Here as well, but that's trickier, as the MAC can override the PHY
+> > stats, but it doesn't know which PHY were getting the stats from.
+> > 
+> > Maybe we could make so that when we pass a phy_index in the netlink
+> > command, we don't allow the mac to override the phy stats ? Or better,
+> > don't allow the mac to override these stats and report the MAC-reported
+> > PHY stats alongside the PHY-reported stats ?  
+> 
+> Maybe we can flip the order of querying regardless of the PHY that's
+> targeted? Always query the MAC first and then the PHY, so that the
+> PHY can override. Presumably the PHY can always provide more detailed
+> stats than the MAC (IOW if it does provide stats they will be more
+> accurate).
 
-Thanks.
+I think that could work indeed, good point.
 
->
-> That will result in unsynchronized buffers when SWIOTLB is enabled, for
-> example, when running as a TDX guest.
->
-> This patch handles small and mergeable packets separately and fixes
-> the mismatched buffer address.
->
-> Changes from v1: Use ctx to get xdp_headroom.
->
-> Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
-> Signed-off-by: Wenbo Li <liwenbo.martin@bytedance.com>
-> Signed-off-by: Jiahui Cen <cenjiahui@bytedance.com>
-> Signed-off-by: Ying Fang <fangying.tommy@bytedance.com>
-> ---
->  drivers/net/virtio_net.c | 29 ++++++++++++++++++++++++++++-
->  1 file changed, 28 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index c6af18948..cbc3c0ae4 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -891,6 +891,23 @@ static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
->  	return buf;
->  }
->
-> +static void *virtnet_rq_get_buf_small(struct receive_queue *rq,
-> +				      u32 *len,
-> +				      void **ctx,
-> +				      unsigned int header_offset)
-> +{
-> +	void *buf;
-> +	unsigned int xdp_headroom;
-> +
-> +	buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
-> +	if (buf) {
-> +		xdp_headroom = (unsigned long)*ctx;
-> +		virtnet_rq_unmap(rq, buf + VIRTNET_RX_PAD + xdp_headroom, *len);
-> +	}
-> +
-> +	return buf;
-> +}
-> +
->  static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
->  {
->  	struct virtnet_rq_dma *dma;
-> @@ -2692,13 +2709,23 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
->  	int packets = 0;
->  	void *buf;
->
-> -	if (!vi->big_packets || vi->mergeable_rx_bufs) {
-> +	if (vi->mergeable_rx_bufs) {
->  		void *ctx;
->  		while (packets < budget &&
->  		       (buf = virtnet_rq_get_buf(rq, &len, &ctx))) {
->  			receive_buf(vi, rq, buf, len, ctx, xdp_xmit, stats);
->  			packets++;
->  		}
-> +	} else if (!vi->big_packets) {
-> +		void *ctx;
-> +		unsigned int xdp_headroom = virtnet_get_headroom(vi);
-> +		unsigned int header_offset = VIRTNET_RX_PAD + xdp_headroom;
-> +
-> +		while (packets < budget &&
-> +		       (buf = virtnet_rq_get_buf_small(rq, &len, &ctx, header_offset))) {
-> +			receive_buf(vi, rq, buf, len, ctx, xdp_xmit, stats);
-> +			packets++;
-> +		}
->  	} else {
->  		while (packets < budget &&
->  		       (buf = virtqueue_get_buf(rq->vq, &len)) != NULL) {
-> --
-> 2.20.1
->
+[...]
+
+> > I'm all in for getting the PHY stats from netlink though :)  
+> 
+> Great! FWIW I'm not sure what the status of these patches is.
+> I don't know much about PHYs.
+> I wrote them to help Oleksij out with the "netlink parts".
+> I'm not sure how much I convinced Andrew about the applicability.
+> And I don't know if this is enough for Oleksij to take it forward.
+> So in the unlikely even that you have spare cycles and a PHY you can
+> test with, do not hesitate to take these, rework, reset the author 
+> and repost... :)
+
+I do have some hardware I can test this on, and I'm starting to get
+familiar with netlink :) I can give it a try, however I can't guarantee
+as of right now that I'll be able to send anything before net-next
+closes. I'll ping here if I start moving forward with this :)
+
+Thanks,
+
+Maxime
 
