@@ -1,85 +1,111 @@
-Return-Path: <netdev+bounces-125017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15FED96B984
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:59:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68F6796B988
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:00:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48F731C2120F
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:59:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1A62B219E2
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D4311865F0;
-	Wed,  4 Sep 2024 10:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D8551CEE87;
+	Wed,  4 Sep 2024 11:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iQ5TR0kN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UkpuDtZf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88D5126C01;
-	Wed,  4 Sep 2024 10:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE62148314;
+	Wed,  4 Sep 2024 11:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725447565; cv=none; b=sJjTai0EiI+qzQXGnp/02r761LtOYojWlN4iEL8JpRX8e1aAG3d3fYKOxpskH30JxlHiWXXMk6HThpl6CLv5ntj15VBCJ1TB5wzy+nP0UB58nVIEosZmAlZOyzEaq9kI/GHhkd9+0j8vqBk29Lzs/Zd04IQ8A8VNx2h7kzI8MVY=
+	t=1725447628; cv=none; b=ja1B1knO8d6QMU2CxFAMZoZ5sNbPrJ1T+ddKTRQws7j7FgBlSNiFoHvE8yrPk7/6jHdGVZ0C7LrnCO1/wnJhxiW4RZQO6GugjBlNMr8ylpq7tUReuzwfgq+nmAkAwmc7HTE6quWUomrJkav37WzBhWUMgUR1r//So0LgifNbZWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725447565; c=relaxed/simple;
-	bh=lTxFiJg70RiOGvJCTBWPygBgjRZ/GyIOa86pkD+fyKE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sy8nraie65D1mwKMy94Dj6/ZM6+NoWR45neLrjSbqrKP0BWfYEV9WvCyYqaa3/VFEuyPfXHm9wfWNZ3wdsbMZzPOlTNG3mVq6qzpH2U6S+jI0fcXxY08TgrwAvSc5ASM4ARfoZ9Jo0cJV+iL2bXrKEEIHFGKuuhVg+fMSDVs5YE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iQ5TR0kN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DEB1C4CEC2;
-	Wed,  4 Sep 2024 10:59:23 +0000 (UTC)
+	s=arc-20240116; t=1725447628; c=relaxed/simple;
+	bh=dWIWAa4AHuQnBM6xR0K9/gqAZobICygIJEwT+Qz/vYw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lgTLl+WjdRwKkwsGUNi2nnpAp4mgKyDYNxPjBVARkwkjhppOSIiMnsdniwUFHc/hGKWIIyYPUtCvv3oXesQ4NWy/yrY6c9CtjchJgLmkeB4fbtQ5OepN3sHVaoVJ9QYd1IPTzbo7SzsjfOi/YZr2VZp5PbwMjxFwz+zgRPOPaSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UkpuDtZf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDF2DC4CEC2;
+	Wed,  4 Sep 2024 11:00:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725447565;
-	bh=lTxFiJg70RiOGvJCTBWPygBgjRZ/GyIOa86pkD+fyKE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iQ5TR0kNPf9bMpnKj8AexZb63BIaqsSFPLVlCMCtQTZS6r6QaDS4/asXkHOuB37pA
-	 a4cslMNnRuM4Py2TUyvM6iOLfhNpVdGor4t/S0egYXwMHma08DUkebb407gSLH+yTX
-	 ypW0erT4GAF7iZBZKGY1EDD1WeIu24Bj5uB1AY2xv0u81e+4vOQjYOadbjwpSltzNP
-	 uipKtiPYS+7P0Kj7CngrCgNHl7GaAUT8sUUfnFyAK5FesJJDg7kpYx0y4svb/kD7HR
-	 tmVcljYDDyCRwfGrOkVSemyT5cuThaLNKNO/+3QSpqX1MLHk8SM49KTC4Yl5jvEIF/
-	 VjQF3heUU18Hw==
-Date: Wed, 4 Sep 2024 11:59:20 +0100
-From: Simon Horman <horms@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, davej@codemonkey.org.uk,
-	thevlad@meta.com, max@kutsevol.com
-Subject: Re: [PATCH net-next 3/9] net: netconsole: separate fragmented
- message handling in send_ext_msg
-Message-ID: <20240904105920.GQ4792@kernel.org>
-References: <20240903140757.2802765-1-leitao@debian.org>
- <20240903140757.2802765-4-leitao@debian.org>
+	s=k20201202; t=1725447628;
+	bh=dWIWAa4AHuQnBM6xR0K9/gqAZobICygIJEwT+Qz/vYw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UkpuDtZfkWSuqYsDI1LcQEhppzekBXIQwdWoaSQ3NDYepE+G/lNHjTPlV/CzVE8AD
+	 Gq1auhT+9ZH4pZ0FSLhwG2izdpPMvKhpHLvOsH2KPNrG9mxvwq7phyIgQaXo+8aqeQ
+	 IpDTnr22oEiaDQZ5zjBTo4df93JwevBnsT8xSh3zTYkaPwM/MuU27ngvsZfa/8EEGc
+	 APzQ7gh0NjA9mLweSY9tMMYbU5ZHKqweJ7biZwdnunsIY5XzTORue5ghUx/zPAuZ1E
+	 gdcR29Kxabthj8kv4x0Pz40Gf0soXpKKUQXFZOey0u69O/gms6Hxb+XtTLud2ziPuD
+	 ARjm1ZXBS6njA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB13C3806651;
+	Wed,  4 Sep 2024 11:00:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240903140757.2802765-4-leitao@debian.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V4 net] net: mana: Fix error handling in mana_create_txq/rxq's
+ NAPI cleanup
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172544762877.964331.4773742631498321794.git-patchwork-notify@kernel.org>
+Date: Wed, 04 Sep 2024 11:00:28 +0000
+References: <1725281027-29331-1-git-send-email-schakrabarti@linux.microsoft.com>
+In-Reply-To: <1725281027-29331-1-git-send-email-schakrabarti@linux.microsoft.com>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, davem@davemloft.net, longli@microsoft.com,
+ ssengar@linux.microsoft.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, schakrabarti@microsoft.com,
+ stable@vger.kernel.org
 
-On Tue, Sep 03, 2024 at 07:07:46AM -0700, Breno Leitao wrote:
-> Following the previous change, where the non-fragmented case was moved
-> to its own function, this update introduces a new function called
-> send_msg_fragmented to specifically manage scenarios where message
-> fragmentation is required.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Mon,  2 Sep 2024 05:43:47 -0700 you wrote:
+> Currently napi_disable() gets called during rxq and txq cleanup,
+> even before napi is enabled and hrtimer is initialized. It causes
+> kernel panic.
 > 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ? page_fault_oops+0x136/0x2b0
+>   ? page_counter_cancel+0x2e/0x80
+>   ? do_user_addr_fault+0x2f2/0x640
+>   ? refill_obj_stock+0xc4/0x110
+>   ? exc_page_fault+0x71/0x160
+>   ? asm_exc_page_fault+0x27/0x30
+>   ? __mmdrop+0x10/0x180
+>   ? __mmdrop+0xec/0x180
+>   ? hrtimer_active+0xd/0x50
+>   hrtimer_try_to_cancel+0x2c/0xf0
+>   hrtimer_cancel+0x15/0x30
+>   napi_disable+0x65/0x90
+>   mana_destroy_rxq+0x4c/0x2f0
+>   mana_create_rxq.isra.0+0x56c/0x6d0
+>   ? mana_uncfg_vport+0x50/0x50
+>   mana_alloc_queues+0x21b/0x320
+>   ? skb_dequeue+0x5f/0x80
+> 
+> [...]
 
-Due to tooling the diff below seems to more verbose than the change
-warrants. Perhaps some diff flags would alleviate this, but anyone viewing
-the patch using git with default flags, would see what is below anyway.
+Here is the summary with links:
+  - [V4,net] net: mana: Fix error handling in mana_create_txq/rxq's NAPI cleanup
+    https://git.kernel.org/netdev/net/c/b6ecc6620376
 
-So I wonder if you could consider moving send_msg_fragmented()
-to above send_msg_no_fragmentation(). Locally this lead to an entirely
-more reasonable diff to review.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I did review this change using that technique, and it looks good to me.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
 
