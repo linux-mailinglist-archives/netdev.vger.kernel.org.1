@@ -1,125 +1,169 @@
-Return-Path: <netdev+bounces-125161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE83496C1D5
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:11:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2CDA96C1E3
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:13:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A872288247
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:11:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 303781C22B96
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC47E1DCB06;
-	Wed,  4 Sep 2024 15:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC621DCB26;
+	Wed,  4 Sep 2024 15:12:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WT1gr4R2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PabtsFi/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EFC71DFE17;
-	Wed,  4 Sep 2024 15:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3FC1DB94D;
+	Wed,  4 Sep 2024 15:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725462642; cv=none; b=r1YkIEnB0c9dDtxDko0LeDyff+XouHtjZdcNghuNBCBINHpfVmHEu9KCX8pDukub04oE0QtQ+QXNPEPLIR/ChJQmKdvReMQCoHvtcGyBD2LLmoxxyssE+bwRYZM7oeSx0btDnyVs9HC6qof6DEOaUALw3HoaZHHU5Kd5EjK0d5I=
+	t=1725462778; cv=none; b=r7w711SPJQx+2a02OvU+V8deLPzUmgeQ5dxsKXxG8mUgg74/b+qkqHG0SSXeWn4gQQKouJ1I7BuOblOdmBkTmYACBoYrIO7Ipk/eGz/EYPiMWhBvrO0ex6YTcdz91eqI4/Ibgi2wX3rWIbJKG10Y+ev0MizpLJYcmYTFJVLsyus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725462642; c=relaxed/simple;
-	bh=PdsMdAs4i+1KnGUSIyj6Cvkto8ku+RF2Yz6vhnepAIY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JZJr2I+X/EZ45vDYRn3ar8b9etAamonOfn+wgq/Sj5cIe2FBqCRy+WmQ+CDHy/RZNnDsmeW6+rJYfIThB+7nSZ6ixiseg0lnTfIJyEWplPBJ6tsNmhbPlMmEmkR9xmBqA4GOfDMA8XwbdEODErCod0I3YdP+Fy9NC6b4a34YRek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WT1gr4R2; arc=none smtp.client-ip=209.85.167.42
+	s=arc-20240116; t=1725462778; c=relaxed/simple;
+	bh=kh8RTaRVZ/bzPiXFHU1eSBiytlZ/8/MrWF9+zRKngEI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XH9e+dWb6gCQ7XVUVxqq4LxVNrbFxgZnsbHEnF0GyBLoiOr8lY61B2Q0rFrkJxMZ5B9DsnltpXgEa7+rsNQWE8NgKcY9jSDO5+f0/WFhNmsMkeg8kTPa5I4zMAvzqJcKVJe/qRTO0tKKyZDEhNW6/R/J/2bgZKSfWymHMbMGydU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PabtsFi/; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5334c4d6829so8455684e87.2;
-        Wed, 04 Sep 2024 08:10:39 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-42bb81e795bso54831025e9.1;
+        Wed, 04 Sep 2024 08:12:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725462638; x=1726067438; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1725462775; x=1726067575; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UQ3BMP71Ks39+pq7NwGF6/mq64FhkUT40nnjV/3W63M=;
-        b=WT1gr4R2XHB6dYDN2CvueI87nz9PAvAVqw8E1RThBAbu0Phioqqqvt9LTmxjSsBXUj
-         l4GXxG5PogmM7HWnfc6xNIGrQIC50oQ2SLFGNOgNdHKLg3yxwYuWXVQ5KscEtlFPzlcv
-         RPRy501ox0+yrfqGRkO+EmBkzNCe/lMijakc7hPsWgNnk2na/LT8+hH4l14rr4p9xILf
-         LZN2MAxexT5Vz/NxHqO9E978sPov6KuiTU2ot8PQadBl890cD9NCzhl014SKA6EM1He3
-         62FBkbPhLAhqLTFyGRv06ma0Yp90ZLsk3TuKHZ6Y5o0qgoKSjujICW+943eTo2NW8ntq
-         tVMQ==
+        bh=txNXksKNnr5CcQmhvZpAfXPbym/UdfLQWjik9aFGQpg=;
+        b=PabtsFi/3LGU0NL/SphGpMdVDmlo9Su3RumXGMj7WEWNlYmtzjyNOYZzls7T/6LjFl
+         rL/Yn+14KYdKp600z2IxCV6Bpj7epwhNrXBKwmWm+xTOjUXMec1a1YdfEZDLaxQ90wIL
+         iVaR5iXybVPIt4zOS5DhKP4RBZb2ziu06K6Ow9qrsw+xX8Th2UdNuQvqcPfVkT4oiXer
+         IkE3VLjovvR1eBEqVDjz3U3rGJEcmo3nEokeeF3nxjQFeVqb+Rgm6wL+Cn2G3EJxrRNV
+         IJ0bt9kYpPgwAcBBMzCFaqADRtza2IQZtoR5OxY+UYz6bQ2Ik2EQUGbMTXo9oTGTq29L
+         ZMbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725462638; x=1726067438;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1725462775; x=1726067575;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UQ3BMP71Ks39+pq7NwGF6/mq64FhkUT40nnjV/3W63M=;
-        b=eRcEJg2VyN4QITrcDIe0mORJJdcOXyridqfh9V3RPtcaTAb573xnIsbV0aFny2Pqka
-         /d1sUMpDn1j6FAYKkLr4rBPOcUR2in2KlmfawEfKPtkUPZn6/LEFCfWxTSL3Dh36jHJC
-         osmATpOmACldVXtKFr/MVvA6UWcCQ76+ZQdY5fQGP1WX0FMp/7Ya9lb+TqYiGuO+4AWW
-         ptG2jC1bJu/i4rtCJohY0u8BAZLURK4gSUkCzzh1bXbUVr6dv9AcfXPgp4ynESiEH+eT
-         CZf+Ki48ix+W2ivJQ6gNWW7KG2XA2VtgIGNNtrwkYGwk1VvB8Gx5otN/6cb7bH/VIJno
-         Cyrg==
-X-Forwarded-Encrypted: i=1; AJvYcCVEEnqgJNcA+73un8k6vVJmIvm98JgfK0oFgJ5E8ujrlumydgWs+GDmRwfZy+slZTh400P0G2Br@vger.kernel.org, AJvYcCXrMdZfIM+aVQBFSdh3Z2dUf+dVm1WMw0HYwOLkxQ0SY0RQ3OEqXExatT1CdMdaVJ2j/n2C0HntYFeMQb4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YylaU4E+3wlbpOAp4wI8mVOn45amawvhOHgvrhZI2n0aSujueYI
-	8A/rkxE39FNa11G3QIbsc3Ke5oBV6M6zfn7wOjQ81idNVkTleW8I
-X-Google-Smtp-Source: AGHT+IGNbW180uwGRjrbU2cwkIfvp3Xml70BLlM3v3jsxHuHU+QXCpcu1vP2QyNeNvepeSwLUxLUGQ==
-X-Received: by 2002:a05:6512:b0b:b0:52e:fd84:cec0 with SMTP id 2adb3069b0e04-53546bc38cdmr13542649e87.52.1725462637915;
-        Wed, 04 Sep 2024 08:10:37 -0700 (PDT)
-Received: from localhost.localdomain ([2a04:ee41:82:7577:2f85:317:e13:c18])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8a623a6c8bsm2956666b.146.2024.09.04.08.10.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 08:10:37 -0700 (PDT)
-From: Vasileios Amoiridis <vassilisamir@gmail.com>
-To: linus.walleij@linaro.org,
-	alsi@bang-olufsen.dk,
-	andrew@lunn.ch,
-	f.fainelli@gmail.com,
-	olteanv@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	nico@fluxnic.net
-Cc: leitao@debian.org,
-	u.kleine-koenig@pengutronix.de,
-	thorsten.blum@toblux.com,
-	vassilisamir@gmail.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 3/3] net: smc91x: Make use of irq_get_trigger_type()
-Date: Wed,  4 Sep 2024 17:10:18 +0200
-Message-Id: <20240904151018.71967-4-vassilisamir@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240904151018.71967-1-vassilisamir@gmail.com>
-References: <20240904151018.71967-1-vassilisamir@gmail.com>
+        bh=txNXksKNnr5CcQmhvZpAfXPbym/UdfLQWjik9aFGQpg=;
+        b=AUgAgcIfklw0djgls5FBPaoKhCr2YJ4Le0vBaU3t1SNRfXqtNYvgI4395SPVm8NUl1
+         sVVo9tlBiXv53RLBE6zKxDNS/AbKfVSmfVpqx2zVQ7kdGOe0HfGZwcbCofL8p/luDs4z
+         wTwP3Ce4FoweT10Fdd4Z2NRhkBZxrd6/4bfFbEf6CTWgTgS7C9zEOgfgUnVDQy5Jfrmz
+         0s9ZQphFdb3TKuf5bjHlEHBbIshoU94OTp/0EtjqiWd4xrjJjnTSs5gg7Ng7LUVvek14
+         KRQ8/MDN7cij17QOevaH12Es33U0UZfOtUF54lf/teE8d7PyOXuxZmOKI2z6oJgWLi5v
+         4N6g==
+X-Forwarded-Encrypted: i=1; AJvYcCV2XErtyuWj7rOTytBmNQX72sgUVFOTJn94RETe02JPr8JxgpyHakrAa8CrR7Wo37nqGBH9q+HEmlCCMEZXERnk@vger.kernel.org, AJvYcCXTOqyYPvDbKiVawZ1s8My/p6KaiP37Fzqeq0qb0LMy8LXTIMHzQ/YM1Ax/zTAk/tI8tJq0gJpnGhJOE+Q=@vger.kernel.org, AJvYcCXpVjjE977e8XqnB1KIllrXWIcAP5M+p6RLVrBQeGh362fftOtMUVkkDWkAPMPqRlF2Mqwp2u7D@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeK6SYJrECbD4ShNySPquCj/smmkwfET4ReRZaNtfq92EICi3q
+	Ea6JjMS+xsJa5ch8LKKes3I9lmcKe8biqnDJbI92ZMVuwDLbRca5mEeUeTFSYNSprgIKfEnZA6m
+	aT4PmdsiOBADdw6X/tBYkxINfCi7eVsXj
+X-Google-Smtp-Source: AGHT+IFgy1TZEAQFZHztxlV15qG5NfTjA0UR0zIDatCD8i3rg2377HVbpyopn1HUD2u1Kv2zYWf5Z5LZrhRvSK8H1GU=
+X-Received: by 2002:a5d:5ccc:0:b0:374:cd3e:7d98 with SMTP id
+ ffacd0b85a97d-374cd3e8008mr5730376f8f.19.1725462775162; Wed, 04 Sep 2024
+ 08:12:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240902120314.508180-1-linyunsheng@huawei.com> <20240902120314.508180-2-linyunsheng@huawei.com>
+In-Reply-To: <20240902120314.508180-2-linyunsheng@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 4 Sep 2024 08:12:17 -0700
+Message-ID: <CAKgT0UfvFT=qznn_CAM1fN5AqrcOUjfTTu4qHzXioXfNG_ViFg@mail.gmail.com>
+Subject: Re: [PATCH net-next v17 01/14] mm: page_frag: add a test module for page_frag
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>, linux-mm@kvack.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Convert irqd_get_trigger_type(irq_get_irq_data(irq)) cases to the more
-simple irq_get_trigger_type(irq).
+On Mon, Sep 2, 2024 at 5:09=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
+> wrote:
+>
+> The testing is done by ensuring that the fragment allocated
+> from a frag_frag_cache instance is pushed into a ptr_ring
+> instance in a kthread binded to a specified cpu, and a kthread
+> binded to a specified cpu will pop the fragment from the
+> ptr_ring and free the fragment.
+>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  tools/testing/selftests/mm/Makefile           |   3 +
+>  tools/testing/selftests/mm/page_frag/Makefile |  18 ++
+>  .../selftests/mm/page_frag/page_frag_test.c   | 170 +++++++++++++++++
+>  tools/testing/selftests/mm/run_vmtests.sh     |   8 +
+>  tools/testing/selftests/mm/test_page_frag.sh  | 171 ++++++++++++++++++
+>  5 files changed, 370 insertions(+)
+>  create mode 100644 tools/testing/selftests/mm/page_frag/Makefile
+>  create mode 100644 tools/testing/selftests/mm/page_frag/page_frag_test.c
+>  create mode 100755 tools/testing/selftests/mm/test_page_frag.sh
+>
 
-Signed-off-by: Vasileios Amoiridis <vassilisamir@gmail.com>
----
- drivers/net/ethernet/smsc/smc91x.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+...
 
-diff --git a/drivers/net/ethernet/smsc/smc91x.c b/drivers/net/ethernet/smsc/smc91x.c
-index 907498848028..a5e23e2da90f 100644
---- a/drivers/net/ethernet/smsc/smc91x.c
-+++ b/drivers/net/ethernet/smsc/smc91x.c
-@@ -2355,7 +2355,7 @@ static int smc_drv_probe(struct platform_device *pdev)
- 	 * the resource supplies a trigger, override the irqflags with
- 	 * the trigger flags from the resource.
- 	 */
--	irq_resflags = irqd_get_trigger_type(irq_get_irq_data(ndev->irq));
-+	irq_resflags = irq_get_trigger_type(ndev->irq);
- 	if (irq_flags == -1 || irq_resflags & IRQF_TRIGGER_MASK)
- 		irq_flags = irq_resflags & IRQF_TRIGGER_MASK;
- 
--- 
-2.25.1
+> diff --git a/tools/testing/selftests/mm/test_page_frag.sh b/tools/testing=
+/selftests/mm/test_page_frag.sh
+> new file mode 100755
+> index 000000000000..d2b0734a90b5
+> --- /dev/null
+> +++ b/tools/testing/selftests/mm/test_page_frag.sh
+> @@ -0,0 +1,171 @@
 
+...
+
+> +check_test_requirements()
+> +{
+> +       uid=3D$(id -u)
+> +       if [ $uid -ne 0 ]; then
+> +               echo "$0: Must be run as root"
+> +               exit $ksft_skip
+> +       fi
+> +
+> +       if ! which insmod > /dev/null 2>&1; then
+> +               echo "$0: You need insmod installed"
+> +               exit $ksft_skip
+> +       fi
+> +
+> +       if [ ! -f $DRIVER ]; then
+> +               echo "$0: You need to compile page_frag_test module"
+> +               exit $ksft_skip
+> +       fi
+> +}
+> +
+> +run_nonaligned_check()
+> +{
+> +       echo "Run performance tests to evaluate how fast nonaligned alloc=
+ API is."
+> +
+> +       insmod $DRIVER $NONALIGNED_PARAM > /dev/null 2>&1
+> +       echo "Done."
+> +       echo "Ccheck the kernel ring buffer to see the summary."
+
+Typo, should be "Check".
+
+> +}
+> +
+> +run_aligned_check()
+> +{
+> +       echo "Run performance tests to evaluate how fast aligned alloc AP=
+I is."
+> +
+> +       insmod $DRIVER $ALIGNED_PARAM > /dev/null 2>&1
+> +       echo "Done."
+> +       echo "Check the kernel ring buffer to see the summary."
+> +}
+> +
+
+Other than the one typo it looks fine to me.
+
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
 
