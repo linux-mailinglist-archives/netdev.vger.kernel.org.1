@@ -1,129 +1,118 @@
-Return-Path: <netdev+bounces-125175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78A996C2BE
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:44:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1742296C2CD
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:47:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65F16280613
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:44:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A5C11C226CA
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B681E1DFE11;
-	Wed,  4 Sep 2024 15:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3467D1DEFC0;
+	Wed,  4 Sep 2024 15:47:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QrJZssG8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WfQeABnH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5471DEFE2;
-	Wed,  4 Sep 2024 15:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720B71DCB1A;
+	Wed,  4 Sep 2024 15:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725464675; cv=none; b=GcwVP7ACA06nKcAtgsrraGh4NwKLB3VJtMSVRTAU+BVeB93mJP0WyfucoyCjSS/1WSp7T/0rFdQtpvFU0/szqbFW/dCoxVS9QG+6IFGvzj6W5vh7XcwOxVQBwwKTQu7zlh9JdR0XqHRT9oZrJtdtWpiDswAdNX8UOcXYTBqours=
+	t=1725464863; cv=none; b=BPNAsvD5vsNy6OHmMya77BVCRD7mixuRlfjhHRrCrHhOJ4GNIH1xrpHWeO+R4dDEEOudpucGVMVnwY44eMKVcZopG3ny7/EqKHnH5+rMC8OGjIWcAUtQHC4tHFrDhV+rLAp7N1ovYcVW2DA8VaA+VRskB3JC3V+x6aDbGwWqd/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725464675; c=relaxed/simple;
-	bh=jOcvn77ohC8xGMN8aQb1AhIHzP4gmcO8doQ5MvJKx5A=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=s3QV/DD5SzcDP5TO30fGQppHwMT6sphrJRTChxjv3H3o2X3gK1usm75t0U2zjeLGvCjk5X3FwphjVT0K6u4J1iHquhkFx6XN0uQZSjeU35mSKy8897h6pdYiWWOzO+Da2KZ5Yf2HBX9nK0jC6LfZ3BQpepTR+OJdZhWSpMNGMw8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QrJZssG8; arc=none smtp.client-ip=209.85.208.48
+	s=arc-20240116; t=1725464863; c=relaxed/simple;
+	bh=KvCmabY7LcUOGdQP/mJM8EbCz3VbQhnVpMtDBQq4W3E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B1+F1acbST/VDCnDjlyp7KyU9TsE4enlZm0SyeKnOJcGQRmSTHOtL62HeixWJYqKA9jWjHm6A1vd5wgZeDFRxDUAhSjA+ges6DG6G4wwmko4p/5U+bEd6q7DdxbxlmhDAZsueIZjqYAMaJwZqGA+h7JaFuuTdsIC50vF6UoRkkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WfQeABnH; arc=none smtp.client-ip=209.85.221.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c251ba0d1cso3766188a12.3;
-        Wed, 04 Sep 2024 08:44:33 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-374b5f27cf2so3342219f8f.1;
+        Wed, 04 Sep 2024 08:47:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725464672; x=1726069472; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W0LUnO6o66/A4O/lYj8KkZXclnfgrRQhoEfs8tLO9/I=;
-        b=QrJZssG8dkCKSGhY/XDu1Kj1HPWhHKs1QB5WXois65lxxvvijH5U9qE2+Q6onbaWvh
-         jSFdwEaQl1EVhb5FEw6FrTgjI5/i17TAQVr8OnamqrHYwx/LIn1yCkdI+JfHnryQ4ZWd
-         +iwMGL47Fz5PCiormElggYZFnkh4aEfk/vJVGBH228nJRdVkUIkerNMPHd+05+puLrNo
-         DFcT1pjZMV3PhaUXfhXz/A6CyqXb+Q7IiJXgdewMi6mifMc9ZUCl+a+ip6YjQxmsbMOA
-         /HUzvBhpPbpSg2v5SrMrHcYGUm0qXOwh6ODpsvayynmAi3FFPCpyMyHgYPjS2HGk3DU7
-         /NZQ==
+        d=gmail.com; s=20230601; t=1725464860; x=1726069660; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UI3ncFFHcdlnELuJGp3NCftA6/xROBK9Lrqnz+qYtJw=;
+        b=WfQeABnHEVegBp8+hSgO3U+i3P4qZEGkyIoxhvVLUPnStYNn0Md1Iimzgy4IyZ0wd5
+         /WFRes0CQHn2jAKy3GWWBmqw4dbZGh9J8MVnzBy4o6BNH7LzGLFp4FTVRi4VbcFFLl7z
+         DMojdIwdHhMqIJInZfCbIySdO2yOxv0ooBrAarasmMqnpsDoItqAZ6m7SKQj/L833BGy
+         v0uafSmH8OjTedmDoV2GPcgq6iMg02vQWnI/z7+Fpx+fhAtI2WFsOWmw4dTiX/dXQNXm
+         DNwj3AlQpRMZ9EE4wh+1ks+A0jZrVYEwQQafebNDWU3RAhlc9PWHUG/Rs7mr7HvEjwnJ
+         LDHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725464672; x=1726069472;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W0LUnO6o66/A4O/lYj8KkZXclnfgrRQhoEfs8tLO9/I=;
-        b=hA2Pei/iXTqHolw182SXdYog5kgyUDwZAK0+Oh202SUf4pEDdukYScOEXVP1E4X1hx
-         a+ojZz+EQ8PlxKm79BmRQyniVtryqBdplQiL12ZxwR8W5JWHzJF1rkebP9Awts3SvtQj
-         9Z2bo/yeHKlzOAx2HrEI4fB87h8efUacDJ7NyhjNV6VtNHI6EpHnwhGvvC1lZmfuFq4e
-         GWL75Dews6IO6i3oUntm4zGRzf8nKHG8nWAoNBrO3AAJgJpGc1eNNlRmgGdlSg/6Qg50
-         UfMLp8S0O90/oik1HJUwHCQUjQgI2LrHpaQ8JpXfEVIITs5aVuEmTOY/cpliif05PGu0
-         1AtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX63s3SeO+iwcrS5+7uMIUswADUGF2X1kkTbp/gHvZYIOMihnKGrwt1Z+jBQsig/i9tQ3x0iKc+Psncnuc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHfEru4JdLvMuJCzYBVoXflpiBziYmEsOkGlE03ygazSqWxLYz
-	oF/YAbaeQJhznxk6LMhILh2nR9Mdbs8kugnu6DTm5RqKk4796bZAL6L30g==
-X-Google-Smtp-Source: AGHT+IHD5HhUzs5neFHNdUUz8WtPLr3mxGQnKjsgCqssF4gzsiHMBp8p0ruL4oR9SJ48Xjmxbp7uyA==
-X-Received: by 2002:a05:6402:3906:b0:5c0:a8d0:8be6 with SMTP id 4fb4d7f45d1cf-5c25f244e40mr6021157a12.19.1725464671887;
-        Wed, 04 Sep 2024 08:44:31 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3cc52ebfcsm66052a12.20.2024.09.04.08.44.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Sep 2024 08:44:31 -0700 (PDT)
-Subject: Re: [PATCH net-next] sfc/siena: Convert comma to semicolon
-To: Chen Ni <nichen@iscas.ac.cn>, habetsm.xilinx@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, richardcochran@gmail.com, vladimir.oltean@nxp.com,
- shannon.nelson@amd.com, wintera@linux.ibm.com, kory.maincent@bootlin.com,
- alex.austin@amd.com
-Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com,
- linux-kernel@vger.kernel.org
-References: <20240904084034.1353404-1-nichen@iscas.ac.cn>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <bc5a84c3-c14f-aa0e-1b89-00eab1565aa8@gmail.com>
-Date: Wed, 4 Sep 2024 16:44:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=1e100.net; s=20230601; t=1725464860; x=1726069660;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=UI3ncFFHcdlnELuJGp3NCftA6/xROBK9Lrqnz+qYtJw=;
+        b=d1VeOJsQWCHylpNTjKJSrPAYJdv7EmURkvJNr9l9Gs3h+kRJpXDl613K0NyIjt3YQ5
+         0Kk0l8HV4cKfczUvmeDuqPfgZvIg7RyUAgARoI+PUT9GyV+sgrIBXnVFdUqLXAmUs1xY
+         v+qqvtxpS5V6eSodN3FytHm7ZxiY8jLZVRo1aRjfhzPQzmV1+YlB7XxCWypTeZPnwsFF
+         8Uwvnz6PKmTPZBWvEjcyIfBQphIeKgondbDFLoLxN1F4NKouc44SFOAv6fcrkaCmjhQf
+         A8JLYB24UvlObni/usw9m4YdAAl+EhWFkbC6NNHU8lkKXr9yH1OxDzvFyzIJdA1Uod9r
+         UK5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUAlsY78jqBdNpBEUdS/SJ4fDWuuSAeHfA5x9Ah0VcW4ABrP4FiLxdVlWO21EQ1Hhf/6HBPq7hl6LGx68g=@vger.kernel.org, AJvYcCVti3WQmEBY01HjWo7SSwX4Ary+gSWRxI+RwLXyVqp5aP3aTYRd14TfupdklgvhL7AMQIbrfhXB@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKlBsGRZ+1K0+qBqBuaHdIfV7HmOTsh64VBqL4O96NlUXhIT8u
+	5Xklqj8E4oIKjnHkonDtFYEX7KP7HHLGRvhBK5cV+QNaRiPb2a6fHfOZWJo28GT7/UvEF8qeTeE
+	QYAWc2HXtkXLFBDv2bTEfM+ReoPw=
+X-Google-Smtp-Source: AGHT+IGmP7hsWCrfK/n6gsjKnTU2NzzTQotXfiQVbbRNqQTQ2XYB5CMxF/h3wMW8waQyayCh7zivtQmWdmrOcZTGzSE=
+X-Received: by 2002:adf:b512:0:b0:368:4910:8f49 with SMTP id
+ ffacd0b85a97d-3749b531311mr13794461f8f.12.1725464859273; Wed, 04 Sep 2024
+ 08:47:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240904084034.1353404-1-nichen@iscas.ac.cn>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+References: <20240902120314.508180-1-linyunsheng@huawei.com> <20240902120314.508180-4-linyunsheng@huawei.com>
+In-Reply-To: <20240902120314.508180-4-linyunsheng@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 4 Sep 2024 08:47:03 -0700
+Message-ID: <CAKgT0UfqH0tyB0tWavkx2cE+1YhW1ZGhqg271=s8_hvSCzQkpw@mail.gmail.com>
+Subject: Re: [PATCH net-next v17 03/14] mm: page_frag: use initial zero offset
+ for page_frag_alloc_align()
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 04/09/2024 09:40, Chen Ni wrote:
-> Replace comma between expressions with semicolons.
-> 
-> Using a ',' in place of a ';' can have unintended side effects.
-> Although that is not the case here, it is seems best to use ';'
-> unless ',' is intended.
-> 
-> Found by inspection.
-> No functional change intended.
-> Compile tested only.
-> 
-> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
-
-Acked-by: Edward Cree <ecree.xilinx@gmail.com>
-
+On Mon, Sep 2, 2024 at 5:09=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
+> wrote:
+>
+> We are about to use page_frag_alloc_*() API to not just
+> allocate memory for skb->data, but also use them to do
+> the memory allocation for skb frag too. Currently the
+> implementation of page_frag in mm subsystem is running
+> the offset as a countdown rather than count-up value,
+> there may have several advantages to that as mentioned
+> in [1], but it may have some disadvantages, for example,
+> it may disable skb frag coalescing and more correct cache
+> prefetching
+>
+> We have a trade-off to make in order to have a unified
+> implementation and API for page_frag, so use a initial zero
+> offset in this patch, and the following patch will try to
+> make some optimization to avoid the disadvantages as much
+> as possible.
+>
+> 1. https://lore.kernel.org/all/f4abe71b3439b39d17a6fb2d410180f367cadf5c.c=
+amel@gmail.com/
+>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
 > ---
->  drivers/net/ethernet/sfc/siena/ptp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/sfc/siena/ptp.c b/drivers/net/ethernet/sfc/siena/ptp.c
-> index c473a4b6dd44..85005196b4c5 100644
-> --- a/drivers/net/ethernet/sfc/siena/ptp.c
-> +++ b/drivers/net/ethernet/sfc/siena/ptp.c
-> @@ -897,7 +897,7 @@ static void efx_ptp_read_timeset(MCDI_DECLARE_STRUCT_PTR(data),
->  	timeset->host_start = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTSTART);
->  	timeset->major = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_MAJOR);
->  	timeset->minor = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_MINOR);
-> -	timeset->host_end = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTEND),
-> +	timeset->host_end = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTEND);
->  	timeset->wait = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_WAITNS);
->  
->  	/* Ignore seconds */
-> 
+>  mm/page_frag_cache.c | 46 ++++++++++++++++++++++----------------------
+>  1 file changed, 23 insertions(+), 23 deletions(-)
+>
 
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
 
