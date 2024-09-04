@@ -1,165 +1,107 @@
-Return-Path: <netdev+bounces-124881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF69096B433
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:18:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 162ED96B466
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:23:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E29EB2414D
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:18:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85149B25949
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:23:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B747D194125;
-	Wed,  4 Sep 2024 08:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5796D18D64B;
+	Wed,  4 Sep 2024 08:19:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7641925B8
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 08:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0746E3F9D5;
+	Wed,  4 Sep 2024 08:19:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725437630; cv=none; b=EUK+KHco8qM7kf9REZvwt6X3FfIAv4te9GeHuNw6OtcE0pMWncJ5JwG/7nLC1nwm2OES0++6cLAOGb87HM8XrRoNjjf4oi9T8fCe+Jb7YFnqehMeMRgKXjoFeDjAR8Cw+HoNphUQMSv177FyiisuAZ6tm+V14SJBaQWgh8c9rDc=
+	t=1725437948; cv=none; b=alwPC+hUyhuKtykeX5tajfnZW3yZFao8nYeBK9bmQqDJIoBUHu8JXXLv9dN7mTdscxHwRLQyMzbTZlE5zaVyhSQRe6wW8HIu8xrrAU59YjDb72ztkZcILroOpiItNML8opnW5W/KvyTOOngZEUEDxWVihzhYc49guamoQJjr7Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725437630; c=relaxed/simple;
-	bh=xBf38Ut6AgnO7QgvTyCBnMcJKvzVlajQK72PcBHWEdY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=R2n5VQktTnRKZIx1hlr7KvkhTGtnO+ogh9K3qPgnry2WBsUdUpurypU4z/OdUhlU4qy4IQL/UmUonPzOJqKWDccsS4H0OWFBS7slxYzO1rWzuVxuiT78qv4C3I+c1vY/ZzZO5TOidqWoT8WPV6dMs0Uf43x7Mf7gYrW8arY0+kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sll96-0007wc-RM
-	for netdev@vger.kernel.org; Wed, 04 Sep 2024 10:13:44 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1sll90-005P6e-U3
-	for netdev@vger.kernel.org; Wed, 04 Sep 2024 10:13:38 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 96B80332122
-	for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 08:13:38 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 169DC331F8C;
-	Wed, 04 Sep 2024 08:13:24 +0000 (UTC)
-Received: from [172.20.34.65] (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 22c7e15c;
-	Wed, 4 Sep 2024 08:13:20 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Wed, 04 Sep 2024 10:13:04 +0200
-Subject: [PATCH can-next v5 20/20] can: rockchip_canfd: add support for
- CAN_CTRLMODE_BERR_REPORTING
+	s=arc-20240116; t=1725437948; c=relaxed/simple;
+	bh=jVtS6nvwU8vVVn+pBIWHXO9OZg+fZnTF+s7TWc2HnWw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XpBWDuZZXg8EdBqsCHxul2ORFUw1dHOAxRkLpMjvtV9YXSmw1jxupCTEw8Yaz8Tqqdexi//ocMaTw9Z9Jl/IxvUmB46MqnIEErnjwgNRb8XYCedTRWlv4mivRdIdyQC5muvpSCrqGbh+rF6wpMtXiv/b31wJCCeiyA/BbKHQ4mY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-05 (Coremail) with SMTP id zQCowABXOuruF9hmZ9knAQ--.4818S2;
+	Wed, 04 Sep 2024 16:18:54 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: shannon.nelson@amd.com,
+	brett.creeley@amd.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH net-next] ionic: Convert comma to semicolon
+Date: Wed,  4 Sep 2024 16:17:28 +0800
+Message-Id: <20240904081728.1353260-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240904-rockchip-canfd-v5-20-8ae22bcb27cc@pengutronix.de>
-References: <20240904-rockchip-canfd-v5-0-8ae22bcb27cc@pengutronix.de>
-In-Reply-To: <20240904-rockchip-canfd-v5-0-8ae22bcb27cc@pengutronix.de>
-To: kernel@pengutronix.de, Alibek Omarov <a1ba.omarov@gmail.com>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>, 
- Philipp Zabel <p.zabel@pengutronix.de>, 
- Elaine Zhang <zhangqing@rock-chips.com>, 
- David Jander <david.jander@protonic.nl>
-Cc: Simon Horman <horms@kernel.org>, linux-can@vger.kernel.org, 
- netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org, 
- linux-kernel@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.15-dev-99b12
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2401; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=xBf38Ut6AgnO7QgvTyCBnMcJKvzVlajQK72PcBHWEdY=;
- b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBm2BafrLAzuXgHOioZ3Mmb696oK9t5SonNrQ9m+
- NKXlBGHS2SJATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZtgWnwAKCRAoOKI+ei28
- bysRB/0ThDndzsZQabu4VQlBp82sDn8MKeEPqx/IEbzyBqwX8WifbaV+VA/wUkmxTXueaJi3n/T
- OUOucEI0lQI3CuQUKhrKseqEKpXWSHw1RTtiWXQCb5m5fXymySAE4LRL6APx7NraaULfLuyODV7
- 6Vs1IzQT5DzfkorceYkYUo0K8u06cGOpb87EnTZ6I+pLW1z1WIxa9ptfzRyVpFRDbKxj9wR98JA
- SMPggVWW4oj7fFcWJLPoZdg6mpNsaK1HBqhfZXPLj1IwEGJMLnmAFB7MafATP6tevX9K77KEWii
- jZVw113ULNG5QXXfc8olFPA2XTK0Ikl9PeyB+npNbLf77UuW
-X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
- fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowABXOuruF9hmZ9knAQ--.4818S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7KF17ur4DKrWUZF4ktF1xGrg_yoW8JFy5pw
+	43G34qqF17Xa4UW3WkJF18ur95X398uryDur4DC3yrua4kAFyxCa1Iqa4fJa4kXr4UAr40
+	qr42ywn8XFn5A3DanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jw0_WrylYx0Ex4A2jsIE14v26r4UJVWxJr1lOx8S6xCaFVCjc4AY6r
+	1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY1x0262kKe7AK
+	xVWUtVW8ZwCY02Avz4vE14v_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
+	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
+	17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
+	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
+	6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
+	73UjIFyTuYvjfU518BUUUUU
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-Add support for Bus Error Reporting.
+Replace comma between expressions with semicolons.
 
-Tested-by: Alibek Omarov <a1ba.omarov@gmail.com>
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Using a ',' in place of a ';' can have unintended side effects.
+Although that is not the case here, it is seems best to use ';'
+unless ',' is intended.
+
+Found by inspection.
+No functional change intended.
+Compile tested only.
+
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
 ---
- drivers/net/can/rockchip/rockchip_canfd-core.c | 25 +++++++++++++++++--------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/can/rockchip/rockchip_canfd-core.c b/drivers/net/can/rockchip/rockchip_canfd-core.c
-index 8853f6a135da..6883153e8fc1 100644
---- a/drivers/net/can/rockchip/rockchip_canfd-core.c
-+++ b/drivers/net/can/rockchip/rockchip_canfd-core.c
-@@ -293,6 +293,12 @@ static void rkcanfd_chip_start(struct rkcanfd_priv *priv)
- 		RKCANFD_REG_INT_OVERLOAD_INT |
- 		RKCANFD_REG_INT_TX_FINISH_INT;
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c b/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c
+index 1ee2f285cb42..528114877677 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_rx_filter.c
+@@ -312,8 +312,8 @@ static int ionic_lif_filter_add(struct ionic_lif *lif,
+ 	int err = 0;
  
-+	/* Do not mask the bus error interrupt if the bus error
-+	 * reporting is requested.
-+	 */
-+	if (!(priv->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING))
-+		priv->reg_int_mask_default |= RKCANFD_REG_INT_ERROR_INT;
-+
- 	memset(&priv->bec, 0x0, sizeof(priv->bec));
+ 	ctx.cmd.rx_filter_add = *ac;
+-	ctx.cmd.rx_filter_add.opcode = IONIC_CMD_RX_FILTER_ADD,
+-	ctx.cmd.rx_filter_add.lif_index = cpu_to_le16(lif->index),
++	ctx.cmd.rx_filter_add.opcode = IONIC_CMD_RX_FILTER_ADD;
++	ctx.cmd.rx_filter_add.lif_index = cpu_to_le16(lif->index);
  
- 	rkcanfd_chip_fifo_setup(priv);
-@@ -533,14 +539,16 @@ static int rkcanfd_handle_error_int(struct rkcanfd_priv *priv)
- 	if (!reg_ec)
- 		return 0;
- 
--	skb = rkcanfd_alloc_can_err_skb(priv, &cf, &timestamp);
--	if (cf) {
--		struct can_berr_counter bec;
-+	if (priv->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING) {
-+		skb = rkcanfd_alloc_can_err_skb(priv, &cf, &timestamp);
-+		if (cf) {
-+			struct can_berr_counter bec;
- 
--		rkcanfd_get_berr_counter_corrected(priv, &bec);
--		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR | CAN_ERR_CNT;
--		cf->data[6] = bec.txerr;
--		cf->data[7] = bec.rxerr;
-+			rkcanfd_get_berr_counter_corrected(priv, &bec);
-+			cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR | CAN_ERR_CNT;
-+			cf->data[6] = bec.txerr;
-+			cf->data[7] = bec.rxerr;
-+		}
- 	}
- 
- 	rkcanfd_handle_error_int_reg_ec(priv, cf, reg_ec);
-@@ -899,7 +907,8 @@ static int rkcanfd_probe(struct platform_device *pdev)
- 	priv->can.clock.freq = clk_get_rate(priv->clks[0].clk);
- 	priv->can.bittiming_const = &rkcanfd_bittiming_const;
- 	priv->can.data_bittiming_const = &rkcanfd_data_bittiming_const;
--	priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK;
-+	priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK |
-+		CAN_CTRLMODE_BERR_REPORTING;
- 	if (!(priv->devtype_data.quirks & RKCANFD_QUIRK_CANFD_BROKEN))
- 		priv->can.ctrlmode_supported |= CAN_CTRLMODE_FD;
- 	priv->can.do_set_mode = rkcanfd_set_mode;
-
+ 	spin_lock_bh(&lif->rx_filters.lock);
+ 	f = ionic_rx_filter_find(lif, &ctx.cmd.rx_filter_add);
 -- 
-2.45.2
-
+2.25.1
 
 
