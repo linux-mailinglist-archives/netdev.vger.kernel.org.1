@@ -1,120 +1,149 @@
-Return-Path: <netdev+bounces-125262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F368A96C847
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 22:20:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42F9A96C849
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 22:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31EF01C22752
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:20:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0102128330D
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A59146A79;
-	Wed,  4 Sep 2024 20:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A705A146A86;
+	Wed,  4 Sep 2024 20:21:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="beAnG/KO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VEWBDVF4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 546AB1386A7
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 20:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D6461EBFEC;
+	Wed,  4 Sep 2024 20:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725481239; cv=none; b=fZGAMCOqIfExBuaz+h287xE5ygpio4a44yAVRhtTdXY8SsyrJ51o+lwCZx5NTusPIy7IKPRjM7W6GoVifd/YbkluW7mKcdNhIa1C4tvzel0hrT14Qv/qJL+CjAlEUN+4xws6CaToxi2U8yEOu3bB5E14HkZwEvYMC3JsvMgX2OI=
+	t=1725481296; cv=none; b=f6uGZkPxf35gs2n1L1AqmsJ9X5ev+Dkn07DxsAoo95yEsniQ1FXvc1/Nr6rpnJEFut/+T2MIFKFk5jJllm/InaFapRp3fttna136TNwJCKO/PwzrzQ/mEpsyQedXVM7HEfoxYdYxvP4rFKdv4LP20FP2KQOVbbH5vlFRXH1LzMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725481239; c=relaxed/simple;
-	bh=Sg43O1ePYPQ9Cq/7OpArLSkv1jO6W47q7rmWSH/67LE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uCgusk8I+O+KFbcGEsO0VmUxlK2qiO3bKxFxiGtnUXs9tUHT2i6q1CgK1m1JuCQhDoqcM9p7oLQwO5Rc8yCxVYPfjeqQMeFb7Ha0J6HyHc286EAwkX6IIbTkw/2idMVBM0rNzxEeNNv3yptc9UbthrGr6QZRA8I8iCq6shwx/BM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=beAnG/KO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 732B3C4CEC2;
-	Wed,  4 Sep 2024 20:20:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725481238;
-	bh=Sg43O1ePYPQ9Cq/7OpArLSkv1jO6W47q7rmWSH/67LE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=beAnG/KOvH+K8qbo9uuB7urjvtKApfKwcEzey/pfb9OT+duyVH8o4X+UqNehaBjvq
-	 kYiuwUTyp4Jw1ZQBDV5KCzzamj38NQAhPotZEi51YBixWpIqEbM1R01xSnE9GUrl/B
-	 WF0xjkF/5c2VA3Xs90Pr1p19RchLOMVi7ciT6LX3yJN8fOuM9XnrbvgSyO4BZyudoS
-	 GuwSDWHKJy85fNA3py2HrOVw0HqtemATIPKnYNSr+xshChN4H8jaX9AWAuPgYdr6yc
-	 OHV+TiFCRFvh89pXZBef19N8rIlf7A8J4LMPybNgs7EkQdTx/johzXWQNdQeBVC2IG
-	 m6V4NdaWeWorQ==
-Date: Wed, 4 Sep 2024 21:20:35 +0100
-From: Simon Horman <horms@kernel.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] ptp: ocp: Improve PCIe delay estimation
-Message-ID: <20240904202035.GF1722938@kernel.org>
-References: <20240904132842.559217-1-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1725481296; c=relaxed/simple;
+	bh=UysNCBZGl0zzPiEWPP6/BDsK4g8q6dDpCM+mbE5v3EE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dKEAfbIMVomEigiCm4kU4bfJh7kRhBQ1SIk3OSbWB3NdmCdcWy+RuBGE+Dpsz4NVGJVssklWvHTo0k3ABUnufpO5QgltUF1gYNMKX+/tqvTtF47N0jbGlW8/rAbkhI+CLokGr0hm4Ykx/nCfxI0vmgLMOTb27depmtCYrdA0E2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VEWBDVF4; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2d87f34a650so18207a91.1;
+        Wed, 04 Sep 2024 13:21:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725481294; x=1726086094; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OAMoPk7C0DH2NXF8P5L8PAlBeNNIJDV5ksHuFpUK2Zw=;
+        b=VEWBDVF4237FlXH2GgM48WY1NC0bkE3kWLGOeeqOPXOgrvkLB1qb6bdUH5/3rzaGaM
+         dakce1K/ykBtGKMmrnYogGpTghqsc4LxyCxIR1cRoU5AZLBdoAmfWunLRmkPiAVgDUNw
+         Qd6GtOnO+va8NQWzKnt4slEto/EM30Bfsap+qiq+gaQVpx4KkpSAwdaEk5e+uWawcjPE
+         5VtTpo/FFk8Q3ITb01LeNumvB4Kdg/kveXcXOEBtQBMncm+kh13HNtteWUf33qsfw5YZ
+         WvULNV/ptkP09l+92Cb6xlSwKvhVu/ZVWa7aZteay9XJ8MX1OsNsPuaLO61vfSRbPxPh
+         SUlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725481294; x=1726086094;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OAMoPk7C0DH2NXF8P5L8PAlBeNNIJDV5ksHuFpUK2Zw=;
+        b=o2S+/j8Uz8rfyjSViSNQc2048TwaW0YaFz7KPm8B+jeih6FDFzS888KJZ8Tl2BGWqT
+         np1s6EYq+jM2CQ4w9cWs4ddxG7rRZyyWP2LVvmYz1xKVwF682gn2fJSG1eb0sRXc1Mh/
+         oIabA90UUefTCSg1G8NNTWX73D0duCTeK9C4oIepR2ZRQwhAWWI7XNTFRuPB6DR6qtun
+         4QgBKhWIT6JatCsN53BrGZj8m5hDEuASTDrd/WhMD7SpxSAkLzAAX3RgEzZTRFq52GAv
+         83UmnAkcmX0EfcQVTP7UGwK5cLrliwbFmgpgUsAoq9K2gsTpN3JnxLDN5M+XpMEljl9h
+         PX1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWkUXBiF4hOPfZsoU5j4j+IP/s1mxJPlrRUmix+OgSJyyeHTU2cWPynuTpaUN8OEgVl2qjZjNY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjSZenE7e0Egs/aXPou22Z1b1wnS35hALRTfrOTn/Ws0VpthBD
+	bSVMoGCMPnM2e7P9kds543N3kDtNUAew7GTofQvNohOVoTgk/Gh51ef7J+rLt2PtHo5aXUlb4o8
+	8XGvEteRMSMDz7s1UM5ntuSXL9Qs=
+X-Google-Smtp-Source: AGHT+IFGWtqUAtuDasPjB0tcP05uQa2rp9boXM1aqKCzVoM5wST6zCNZ+dkBQcG/iUCkve7kSACiWtJlfihV64zuSgQ=
+X-Received: by 2002:a17:90b:30cb:b0:2c9:36bf:ba6f with SMTP id
+ 98e67ed59e1d1-2da8e9d7788mr5387259a91.3.1725481294230; Wed, 04 Sep 2024
+ 13:21:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240904132842.559217-1-vadim.fedorenko@linux.dev>
+References: <20240831041934.1629216-1-pulehui@huaweicloud.com> <20240831041934.1629216-3-pulehui@huaweicloud.com>
+In-Reply-To: <20240831041934.1629216-3-pulehui@huaweicloud.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 4 Sep 2024 13:21:21 -0700
+Message-ID: <CAEf4BzYQx95PzRyivNgGWwL_ytB1=Z8eVGe_ejYHvdiCyjMJzA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 2/4] libbpf: Access first syscall argument
+ with CO-RE direct read on arm64
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	netdev@vger.kernel.org, Andrii Nakryiko <andrii@kernel.org>, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Puranjay Mohan <puranjay@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Pu Lehui <pulehui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 04, 2024 at 01:28:42PM +0000, Vadim Fedorenko wrote:
-> The PCIe bus can be pretty busy during boot and probe function can
-> see excessive delays. Let's find the minimal value out of several
-> tests and use it as estimated value.
-> 
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+On Fri, Aug 30, 2024 at 9:17=E2=80=AFPM Pu Lehui <pulehui@huaweicloud.com> =
+wrote:
+>
+> From: Pu Lehui <pulehui@huawei.com>
+>
+> Currently PT_REGS_PARM1 SYSCALL(x) is consistent with PT_REGS_PARM1_CORE
+> SYSCALL(x), which will introduce the overhead of BPF_CORE_READ(), taking
+> into account the read pt_regs comes directly from the context, let's use
+> CO-RE direct read to access the first system call argument.
+>
+> Suggested-by: Andrii Nakryiko <andrii@kernel.org>
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
 > ---
->  drivers/ptp/ptp_ocp.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-> index e7479b9b90cb..22b22e605781 100644
-> --- a/drivers/ptp/ptp_ocp.c
-> +++ b/drivers/ptp/ptp_ocp.c
-> @@ -1561,19 +1561,22 @@ ptp_ocp_estimate_pci_timing(struct ptp_ocp *bp)
->  	ktime_t start, end;
->  	ktime_t delay;
->  	u32 ctrl;
-> +	int i;
->  
-> -	ctrl = ioread32(&bp->reg->ctrl);
-> -	ctrl = OCP_CTRL_READ_TIME_REQ | OCP_CTRL_ENABLE;
-> +	for (i = 0; i < 3; i++) {
-> +		ctrl = ioread32(&bp->reg->ctrl);
-> +		ctrl = OCP_CTRL_READ_TIME_REQ | OCP_CTRL_ENABLE;
->  
-> -	iowrite32(ctrl, &bp->reg->ctrl);
-> +		iowrite32(ctrl, &bp->reg->ctrl);
->  
-> -	start = ktime_get_ns();
-> +		start = ktime_get_ns();
->  
-> -	ctrl = ioread32(&bp->reg->ctrl);
-> +		ctrl = ioread32(&bp->reg->ctrl);
->  
-> -	end = ktime_get_ns();
-> +		end = ktime_get_ns();
->  
-> -	delay = end - start;
-> +		delay = min(delay, end - start);
+>  tools/lib/bpf/bpf_tracing.h | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/tools/lib/bpf/bpf_tracing.h b/tools/lib/bpf/bpf_tracing.h
+> index e7d9382efeb3..051c408e6aed 100644
+> --- a/tools/lib/bpf/bpf_tracing.h
+> +++ b/tools/lib/bpf/bpf_tracing.h
+> @@ -222,7 +222,7 @@ struct pt_regs___s390 {
+>
+>  struct pt_regs___arm64 {
+>         unsigned long orig_x0;
+> -};
+> +} __attribute__((preserve_access_index));
+>
+>  /* arm64 provides struct user_pt_regs instead of struct pt_regs to users=
+pace */
+>  #define __PT_REGS_CAST(x) ((const struct user_pt_regs *)(x))
+> @@ -241,7 +241,7 @@ struct pt_regs___arm64 {
+>  #define __PT_PARM4_SYSCALL_REG __PT_PARM4_REG
+>  #define __PT_PARM5_SYSCALL_REG __PT_PARM5_REG
+>  #define __PT_PARM6_SYSCALL_REG __PT_PARM6_REG
+> -#define PT_REGS_PARM1_SYSCALL(x) PT_REGS_PARM1_CORE_SYSCALL(x)
+> +#define PT_REGS_PARM1_SYSCALL(x) (((const struct pt_regs___arm64 *)(x))-=
+>orig_x0)
 
-Hi Vadim,
+It would probably be best (for consistency) to stick to using
+__PTR_PARM1_SYSCALL_REG instead of hard-coding orig_x0 here, no? I'll
+fix it up while applying. Same for patch #1 and #4.
 
-It looks like delay is used uninitialised here
-in the first iteration of this loop.
+It would be great if you can double-check that final patches in
+bpf-next/master compile and work well for arm64, s390x, and RV64 (as I
+can't really test that much locally).
 
-Flagged by Smatch.
 
-> +	}
->  	bp->ts_window_adjust = (delay >> 5) * 3;
->  }
->  
-> -- 
-> 2.43.0
-> 
-> 
+
+>  #define PT_REGS_PARM1_CORE_SYSCALL(x) \
+>         BPF_CORE_READ((const struct pt_regs___arm64 *)(x), __PT_PARM1_SYS=
+CALL_REG)
+>
+> --
+> 2.34.1
+>
 
