@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-124928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3115496B632
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:12:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE5A96B634
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:12:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC7EA28A6EE
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:12:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924851C214DE
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 763541CF2AB;
-	Wed,  4 Sep 2024 09:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D0CC1CF5D6;
+	Wed,  4 Sep 2024 09:11:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="1K7UV+fI"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="B+br5T+0"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 406271CCB43;
-	Wed,  4 Sep 2024 09:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3139619AD89;
+	Wed,  4 Sep 2024 09:11:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725441072; cv=none; b=Zco19rUj5G95hE2KVq5E3uemKS80/jteiYUSyqyntKW8gBA18YaULfS44VHxZynO308EQkSm1PsqxTq5JvHBmLkgetASrYStGMi4UaSqO52/XNpsqxzZ5SPt53Q2c6qZiQOb2+E0GrksCdjIjFLVEA8Z7bWW1gcenAaEcpE5MvE=
+	t=1725441080; cv=none; b=DQohU3emka0TyfdyL5EPGbpmHDcYnoO16XLXLW1vtl3p0XWgd2bRUPZjuoRYhywBJk9Mcfsy9LdvzzabUlyO2AzuKlf0QdBS9sob1dYT1P7fNEHwv38+Y6DuNWU/8hTlog2FHQwX2nKhF3pBp0LdJ9aNgtHW68SClt+Y1jFLgmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725441072; c=relaxed/simple;
-	bh=Z2DL/9tPSO5ax7SSUV4tqTa92mFNpNQVebcc7uj3SdA=;
+	s=arc-20240116; t=1725441080; c=relaxed/simple;
+	bh=PUkcYl/seWgseM60RLAmotsm2QswUHcF/Bj2xdQP2hE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b0XarJJRwALrHDDQMzVhAlJJ5rBMWTLEaujP9JBABT2HjfMBk1pLS9g8kQY6wwkC8vwnyCeV7tzvjmvBiwOAtkf1M/s4xm1Ug0xmfH5vajChrm0CTU4JiG5NvGQyQQTt1EWZxPVT3bGEoboUzBiRnvxd87xqIscLpCMbZ2kDoB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=1K7UV+fI; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=D9ukzt7J2vnJ7h1Gt/4u+GsFUEgdRyGTI1bnMdqt1rSfDKL1oPi9Eh4xzXL3j4IbM++b9CDyydNG/cxwvtYnSjezqXu145PMiVvq+yUIuXo+k76gizhQSSaVmYdo7//iWnDIbw/u0YSHCUFPsM4oJ06sbdlq8/q6NTEsDNlIbfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=B+br5T+0; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1725441070; x=1756977070;
+  t=1725441078; x=1756977078;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Z2DL/9tPSO5ax7SSUV4tqTa92mFNpNQVebcc7uj3SdA=;
-  b=1K7UV+fIMt3OsrtYpMktBzGrPquckQs+Xzbz3P7ztpRLgmZ3+zALDg2o
-   8lNb+qN2yD3WPad4xIWdQeAGbWY2AyFMNeCxxnjlsFpmIDfu+Cpkj9Kum
-   gKQ5qVAFFEGQwcyBouY8G4DoYvm1i1Z7/rr7IOuYoHkIEIrH+UxX/b9lh
-   BQbj5Co2IxBWwFBXCNEQV3Yq2OWVxLTnqE/rUKL+/h55WvYUSp/bozeQU
-   JzgWgsQiZa5L56SvkE5Z7YzOOq6OGfzU4mln2DyQLU7T59Sl/pSezkJfS
-   HLBleynXjDMjBsieai5DcnHwON4/XbjGaI1Z2ebFEygRtLxzVdWH5H0dy
+  bh=PUkcYl/seWgseM60RLAmotsm2QswUHcF/Bj2xdQP2hE=;
+  b=B+br5T+00UIAi+BAhggzGBP0WYLtsRe2GOp43wNclcnzilZKPugT8m7U
+   62oE1DisjoG2tbwrjc/ib60KXFM+T/8HFo77ywSf/hQ/YfZ3SjOwkgmFJ
+   sizh/1QfFTLwLb2vWqVTnCbkccuiyzTsG+Oow44qUgplJ+4AcPGQ/okXe
+   I0/D3UfjMXl/ZMWU3ZMPiJ7sFJXfmY0PYh0fUn7FnoOw1zGJNR89bPZXq
+   vZ1LmfWgLCkeM1x6IHE2h+2L8KjqnAWnMcOdx/NvSPxPgQco6qiLiY7Ro
+   in7tbL6eq+SHImOdFF/Zv3u+10vzg+n9l2Xv1zYRZun7Q2LQNpnbyEkau
    A==;
-X-CSE-ConnectionGUID: 7PtRIbY4RQKJyDxiveGaEQ==
-X-CSE-MsgGUID: 8qKVuU+qTcCpSMTLTFbXVQ==
+X-CSE-ConnectionGUID: Zssh7PajQKmY7BC0+cjNqg==
+X-CSE-MsgGUID: t/Kmb7n6TXOGd6aZGBC5gQ==
 X-IronPort-AV: E=Sophos;i="6.10,201,1719903600"; 
-   d="scan'208";a="31941449"
+   d="scan'208";a="31212950"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Sep 2024 02:11:07 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Sep 2024 02:11:17 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 4 Sep 2024 02:10:57 -0700
+ 15.1.2507.35; Wed, 4 Sep 2024 02:11:02 -0700
 Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 4 Sep 2024 02:10:52 -0700
+ 15.1.2507.35 via Frontend Transport; Wed, 4 Sep 2024 02:10:57 -0700
 From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <linux@armlinux.org.uk>, <kuba@kernel.org>,
@@ -66,9 +66,9 @@ CC: <davem@davemloft.net>, <linux@armlinux.org.uk>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>, <maxime.chevallier@bootlin.com>,
 	<linux-kernel@vger.kernel.org>, <horms@kernel.org>,
 	<UNGLinuxDriver@microchip.com>
-Subject: [PATCH net-next V5 4/5] net: lan743x: Migrate phylib to phylink
-Date: Wed, 4 Sep 2024 14:36:44 +0530
-Message-ID: <20240904090645.8742-5-Raju.Lakkaraju@microchip.com>
+Subject: [PATCH net-next V5 5/5] net: lan743x: Add support to ethtool phylink get and set settings
+Date: Wed, 4 Sep 2024 14:36:45 +0530
+Message-ID: <20240904090645.8742-6-Raju.Lakkaraju@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240904090645.8742-1-Raju.Lakkaraju@microchip.com>
 References: <20240904090645.8742-1-Raju.Lakkaraju@microchip.com>
@@ -81,789 +81,279 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Migrate phy support from phylib to phylink.
+Add support to ethtool phylink functions:
+  - get/set settings like speed, duplex etc
+  - get/set the wake-on-lan (WOL)
+  - get/set the energy-efficient ethernet (EEE)
+  - get/set the pause
 
 Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 ---
 Change List:                                                                    
 ============                                                                    
-V4 -> V5:                                                                       
-  - Remove the fixed_phy_unregister( ) function. Not require                    
-V3 -> V4:                                                                       
-  - Add the Fixed-link by include the Russell King patch
-  - Change lan743x_phylink_create( ) argument from netdev to adapter
-V2 -> V3:                                                                       
-  - Remove the unwanted parens in each of these if() sub-blocks                 
-  - Replace "to_net_dev(config->dev)" with "netdev".                            
-  - Add GMII_ID/RGMII_TXID/RGMII_RXID in supported_interfaces                   
-  - Fix the lan743x_phy_handle_exists( ) return type
+V4 -> V5:
+  - Remove the "phydev->eee_enabled" check to update the MAC EEE                
+    enable/disable
+  - Call lan743x_mac_eee_enable() with true after update tx_lpi_timer.
+  - Add phy_support_eee() to initialize the EEE flags
+V3 -> V4:
+  - Remove the EEE private variables from LAN743x adapter strcture and fix the   
+    EEE's set/get functions
+  - Change lan743x_set_eee( ) to lan743x_mac_eee_enable( )
+  - Fix the EEE's tx lpi counter update
+V2 -> V3:
+  - No change
 V1 -> V2:                                                                       
-  - Split the PHYLINK and SFP changes in 2 different patch series                                                                  
+  - Fix the phylink changes                                                                  
 
- drivers/net/ethernet/microchip/Kconfig        |   5 +-
- drivers/net/ethernet/microchip/lan743x_main.c | 592 +++++++++++-------
- drivers/net/ethernet/microchip/lan743x_main.h |   3 +
- 3 files changed, 375 insertions(+), 225 deletions(-)
+ .../net/ethernet/microchip/lan743x_ethtool.c  | 119 ++++++------------
+ drivers/net/ethernet/microchip/lan743x_main.c |  22 ++++
+ drivers/net/ethernet/microchip/lan743x_main.h |   1 +
+ 3 files changed, 63 insertions(+), 79 deletions(-)
 
-diff --git a/drivers/net/ethernet/microchip/Kconfig b/drivers/net/ethernet/microchip/Kconfig
-index 43ba71e82260..4b7a0433b7e5 100644
---- a/drivers/net/ethernet/microchip/Kconfig
-+++ b/drivers/net/ethernet/microchip/Kconfig
-@@ -46,12 +46,13 @@ config LAN743X
- 	tristate "LAN743x support"
- 	depends on PCI
- 	depends on PTP_1588_CLOCK_OPTIONAL
--	select PHYLIB
- 	select FIXED_PHY
- 	select CRC16
- 	select CRC32
-+	select PHYLINK
- 	help
--	  Support for the Microchip LAN743x PCI Express Gigabit Ethernet chip
-+	  Support for the Microchip LAN743x and PCI11x1x families of PCI
-+	  Express Ethernet devices
- 
- 	  To compile this driver as a module, choose M here. The module will be
- 	  called lan743x.
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index b4a4c2840a83..2da05c50fe53 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -15,6 +15,7 @@
- #include <linux/rtnetlink.h>
- #include <linux/iopoll.h>
- #include <linux/crc16.h>
-+#include <linux/phylink.h>
- #include "lan743x_main.h"
- #include "lan743x_ethtool.h"
- 
-@@ -1077,26 +1078,7 @@ static int lan743x_sgmii_2_5G_mode_set(struct lan743x_adapter *adapter,
- 					      VR_MII_BAUD_RATE_1P25GBPS);
- }
- 
--static int lan743x_is_sgmii_2_5G_mode(struct lan743x_adapter *adapter,
--				      bool *status)
--{
--	int ret;
--
--	ret = lan743x_sgmii_read(adapter, MDIO_MMD_VEND2,
--				 VR_MII_GEN2_4_MPLL_CTRL1);
--	if (ret < 0)
--		return ret;
--
--	if (ret == VR_MII_MPLL_MULTIPLIER_125 ||
--	    ret == VR_MII_MPLL_MULTIPLIER_50)
--		*status = true;
--	else
--		*status = false;
--
--	return 0;
--}
--
--static int lan743x_sgmii_aneg_update(struct lan743x_adapter *adapter)
-+static int lan743x_serdes_clock_and_aneg_update(struct lan743x_adapter *adapter)
- {
- 	enum lan743x_sgmii_lsd lsd = adapter->sgmii_lsd;
- 	int mii_ctrl;
-@@ -1211,49 +1193,6 @@ static int lan743x_pcs_power_reset(struct lan743x_adapter *adapter)
- 	return lan743x_pcs_seq_state(adapter, PCS_POWER_STATE_UP);
- }
- 
--static int lan743x_sgmii_config(struct lan743x_adapter *adapter)
--{
--	struct net_device *netdev = adapter->netdev;
--	struct phy_device *phydev = netdev->phydev;
--	bool status;
--	int ret;
--
--	ret = lan743x_get_lsd(phydev->speed, phydev->duplex,
--			      phydev->master_slave_state);
--	if (ret < 0) {
--		netif_err(adapter, drv, adapter->netdev,
--			  "error %d link-speed-duplex(LSD) invalid\n", ret);
--		return ret;
--	}
--
--	adapter->sgmii_lsd = ret;
--	netif_dbg(adapter, drv, adapter->netdev,
--		  "Link Speed Duplex (lsd) : 0x%X\n", adapter->sgmii_lsd);
--
--	ret = lan743x_sgmii_aneg_update(adapter);
--	if (ret < 0) {
--		netif_err(adapter, drv, adapter->netdev,
--			  "error %d SGMII cfg failed\n", ret);
--		return ret;
--	}
--
--	ret = lan743x_is_sgmii_2_5G_mode(adapter, &status);
--	if (ret < 0) {
--		netif_err(adapter, drv, adapter->netdev,
--			  "error %d SGMII get mode failed\n", ret);
--		return ret;
--	}
--
--	if (status)
--		netif_dbg(adapter, drv, adapter->netdev,
--			  "SGMII 2.5G mode enable\n");
--	else
--		netif_dbg(adapter, drv, adapter->netdev,
--			  "SGMII 1G mode enable\n");
--
--	return lan743x_pcs_power_reset(adapter);
--}
--
- static void lan743x_mac_set_address(struct lan743x_adapter *adapter,
- 				    u8 *addr)
- {
-@@ -1407,103 +1346,11 @@ static int lan743x_phy_reset(struct lan743x_adapter *adapter)
- 				  50000, 1000000);
- }
- 
--static void lan743x_phy_update_flowcontrol(struct lan743x_adapter *adapter,
--					   u16 local_adv, u16 remote_adv)
--{
--	struct lan743x_phy *phy = &adapter->phy;
--	u8 cap;
--
--	if (phy->fc_autoneg)
--		cap = mii_resolve_flowctrl_fdx(local_adv, remote_adv);
--	else
--		cap = phy->fc_request_control;
--
--	lan743x_mac_flow_ctrl_set_enables(adapter,
--					  cap & FLOW_CTRL_TX,
--					  cap & FLOW_CTRL_RX);
--}
--
- static int lan743x_phy_init(struct lan743x_adapter *adapter)
- {
- 	return lan743x_phy_reset(adapter);
- }
- 
--static void lan743x_phy_link_status_change(struct net_device *netdev)
--{
--	struct lan743x_adapter *adapter = netdev_priv(netdev);
--	struct phy_device *phydev = netdev->phydev;
--	u32 data;
--
--	phy_print_status(phydev);
--	if (phydev->state == PHY_RUNNING) {
--		int remote_advertisement = 0;
--		int local_advertisement = 0;
--
--		data = lan743x_csr_read(adapter, MAC_CR);
--
--		/* set duplex mode */
--		if (phydev->duplex)
--			data |= MAC_CR_DPX_;
--		else
--			data &= ~MAC_CR_DPX_;
--
--		/* set bus speed */
--		switch (phydev->speed) {
--		case SPEED_10:
--			data &= ~MAC_CR_CFG_H_;
--			data &= ~MAC_CR_CFG_L_;
--		break;
--		case SPEED_100:
--			data &= ~MAC_CR_CFG_H_;
--			data |= MAC_CR_CFG_L_;
--		break;
--		case SPEED_1000:
--			data |= MAC_CR_CFG_H_;
--			data &= ~MAC_CR_CFG_L_;
--		break;
--		case SPEED_2500:
--			data |= MAC_CR_CFG_H_;
--			data |= MAC_CR_CFG_L_;
--		break;
--		}
--		lan743x_csr_write(adapter, MAC_CR, data);
--
--		local_advertisement =
--			linkmode_adv_to_mii_adv_t(phydev->advertising);
--		remote_advertisement =
--			linkmode_adv_to_mii_adv_t(phydev->lp_advertising);
--
--		lan743x_phy_update_flowcontrol(adapter, local_advertisement,
--					       remote_advertisement);
--		lan743x_ptp_update_latency(adapter, phydev->speed);
--		if (phydev->interface == PHY_INTERFACE_MODE_SGMII ||
--		    phydev->interface == PHY_INTERFACE_MODE_1000BASEX ||
--		    phydev->interface == PHY_INTERFACE_MODE_2500BASEX)
--			lan743x_sgmii_config(adapter);
--
--		data = lan743x_csr_read(adapter, MAC_CR);
--		if (phydev->enable_tx_lpi)
--			data |=  MAC_CR_EEE_EN_;
--		else
--			data &= ~MAC_CR_EEE_EN_;
--		lan743x_csr_write(adapter, MAC_CR, data);
--	}
--}
--
--static void lan743x_phy_close(struct lan743x_adapter *adapter)
--{
--	struct net_device *netdev = adapter->netdev;
--	struct phy_device *phydev = netdev->phydev;
--
--	phy_stop(netdev->phydev);
--	phy_disconnect(netdev->phydev);
--
--	/* using phydev here as phy_disconnect NULLs netdev->phydev */
--	if (phy_is_pseudo_fixed_link(phydev))
--		fixed_phy_unregister(phydev);
--
--}
--
- static void lan743x_phy_interface_select(struct lan743x_adapter *adapter)
- {
- 	u32 id_rev;
-@@ -1520,65 +1367,9 @@ static void lan743x_phy_interface_select(struct lan743x_adapter *adapter)
- 		adapter->phy_interface = PHY_INTERFACE_MODE_MII;
- 	else
- 		adapter->phy_interface = PHY_INTERFACE_MODE_RGMII;
--}
--
--static int lan743x_phy_open(struct lan743x_adapter *adapter)
--{
--	struct net_device *netdev = adapter->netdev;
--	struct lan743x_phy *phy = &adapter->phy;
--	struct fixed_phy_status fphy_status = {
--		.link = 1,
--		.speed = SPEED_1000,
--		.duplex = DUPLEX_FULL,
--	};
--	struct phy_device *phydev;
--	int ret = -EIO;
--
--	/* try devicetree phy, or fixed link */
--	phydev = of_phy_get_and_connect(netdev, adapter->pdev->dev.of_node,
--					lan743x_phy_link_status_change);
--
--	if (!phydev) {
--		/* try internal phy */
--		phydev = phy_find_first(adapter->mdiobus);
--		if (!phydev)	{
--			if ((adapter->csr.id_rev & ID_REV_ID_MASK_) ==
--					ID_REV_ID_LAN7431_) {
--				phydev = fixed_phy_register(PHY_POLL,
--							    &fphy_status, NULL);
--				if (IS_ERR(phydev)) {
--					netdev_err(netdev, "No PHY/fixed_PHY found\n");
--					return PTR_ERR(phydev);
--				}
--			} else {
--				goto return_error;
--				}
--		}
--
--		lan743x_phy_interface_select(adapter);
- 
--		ret = phy_connect_direct(netdev, phydev,
--					 lan743x_phy_link_status_change,
--					 adapter->phy_interface);
--		if (ret)
--			goto return_error;
--	}
--
--	/* MAC doesn't support 1000T Half */
--	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
--
--	/* support both flow controls */
--	phy_support_asym_pause(phydev);
--	phy->fc_request_control = (FLOW_CTRL_RX | FLOW_CTRL_TX);
--	phy->fc_autoneg = phydev->autoneg;
--
--	phy_start(phydev);
--	phy_start_aneg(phydev);
--	phy_attached_info(phydev);
--	return 0;
--
--return_error:
--	return ret;
-+	netif_dbg(adapter, drv, adapter->netdev,
-+		  "selected phy interface: 0x%X\n", adapter->phy_interface);
- }
- 
- static void lan743x_rfe_open(struct lan743x_adapter *adapter)
-@@ -3079,6 +2870,343 @@ static int lan743x_rx_open(struct lan743x_rx *rx)
- 	return ret;
- }
- 
-+static int lan743x_phylink_sgmii_config(struct lan743x_adapter *adapter)
-+{
-+	u32 sgmii_ctl;
-+	int ret;
-+
-+	ret = lan743x_get_lsd(SPEED_1000, DUPLEX_FULL,
-+			      MASTER_SLAVE_STATE_MASTER);
-+	if (ret < 0) {
-+		netif_err(adapter, drv, adapter->netdev,
-+			  "error %d link-speed-duplex(LSD) invalid\n", ret);
-+		return ret;
-+	}
-+
-+	adapter->sgmii_lsd = ret;
-+	netif_dbg(adapter, drv, adapter->netdev,
-+		  "Link Speed Duplex (lsd) : 0x%X\n", adapter->sgmii_lsd);
-+
-+	/* LINK_STATUS_SOURCE from the External PHY via SGMII */
-+	sgmii_ctl = lan743x_csr_read(adapter, SGMII_CTL);
-+	sgmii_ctl &= ~SGMII_CTL_LINK_STATUS_SOURCE_;
-+	lan743x_csr_write(adapter, SGMII_CTL, sgmii_ctl);
-+
-+	ret = lan743x_serdes_clock_and_aneg_update(adapter);
-+	if (ret < 0) {
-+		netif_err(adapter, drv, adapter->netdev,
-+			  "error %d sgmii aneg update failed\n", ret);
-+		return ret;
-+	}
-+
-+	return lan743x_pcs_power_reset(adapter);
-+}
-+
-+static int lan743x_phylink_1000basex_config(struct lan743x_adapter *adapter)
-+{
-+	u32 sgmii_ctl;
-+	int ret;
-+
-+	ret = lan743x_get_lsd(SPEED_1000, DUPLEX_FULL,
-+			      MASTER_SLAVE_STATE_MASTER);
-+	if (ret < 0) {
-+		netif_err(adapter, drv, adapter->netdev,
-+			  "error %d link-speed-duplex(LSD) invalid\n", ret);
-+		return ret;
-+	}
-+
-+	adapter->sgmii_lsd = ret;
-+	netif_dbg(adapter, drv, adapter->netdev,
-+		  "Link Speed Duplex (lsd) : 0x%X\n", adapter->sgmii_lsd);
-+
-+	/* LINK_STATUS_SOURCE from 1000BASE-X PCS link status */
-+	sgmii_ctl = lan743x_csr_read(adapter, SGMII_CTL);
-+	sgmii_ctl |= SGMII_CTL_LINK_STATUS_SOURCE_;
-+	lan743x_csr_write(adapter, SGMII_CTL, sgmii_ctl);
-+
-+	ret = lan743x_serdes_clock_and_aneg_update(adapter);
-+	if (ret < 0) {
-+		netif_err(adapter, drv, adapter->netdev,
-+			  "error %d 1000basex aneg update failed\n", ret);
-+		return ret;
-+	}
-+
-+	return lan743x_pcs_power_reset(adapter);
-+}
-+
-+static int lan743x_phylink_2500basex_config(struct lan743x_adapter *adapter)
-+{
-+	u32 sgmii_ctl;
-+	int ret;
-+
-+	ret = lan743x_get_lsd(SPEED_2500, DUPLEX_FULL,
-+			      MASTER_SLAVE_STATE_MASTER);
-+	if (ret < 0) {
-+		netif_err(adapter, drv, adapter->netdev,
-+			  "error %d link-speed-duplex(LSD) invalid\n", ret);
-+		return ret;
-+	}
-+
-+	adapter->sgmii_lsd = ret;
-+	netif_dbg(adapter, drv, adapter->netdev,
-+		  "Link Speed Duplex (lsd) : 0x%X\n", adapter->sgmii_lsd);
-+
-+	/* LINK_STATUS_SOURCE from 2500BASE-X PCS link status */
-+	sgmii_ctl = lan743x_csr_read(adapter, SGMII_CTL);
-+	sgmii_ctl |= SGMII_CTL_LINK_STATUS_SOURCE_;
-+	lan743x_csr_write(adapter, SGMII_CTL, sgmii_ctl);
-+
-+	ret = lan743x_serdes_clock_and_aneg_update(adapter);
-+	if (ret < 0) {
-+		netif_err(adapter, drv, adapter->netdev,
-+			  "error %d 2500basex aneg update failed\n", ret);
-+		return ret;
-+	}
-+
-+	return lan743x_pcs_power_reset(adapter);
-+}
-+
-+static void lan743x_phylink_mac_config(struct phylink_config *config,
-+				       unsigned int link_an_mode,
-+				       const struct phylink_link_state *state)
-+{
-+	struct net_device *netdev = to_net_dev(config->dev);
-+	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+	int ret;
-+
-+	switch (state->interface) {
-+	case PHY_INTERFACE_MODE_2500BASEX:
-+		ret = lan743x_phylink_2500basex_config(adapter);
-+		if (ret < 0)
-+			netif_err(adapter, drv, adapter->netdev,
-+				  "2500BASEX config failed. Error %d\n", ret);
-+		else
-+			netif_dbg(adapter, drv, adapter->netdev,
-+				  "2500BASEX mode selected and configured\n");
-+		break;
-+	case PHY_INTERFACE_MODE_1000BASEX:
-+		ret = lan743x_phylink_1000basex_config(adapter);
-+		if (ret < 0)
-+			netif_err(adapter, drv, adapter->netdev,
-+				  "1000BASEX config failed. Error %d\n", ret);
-+		else
-+			netif_dbg(adapter, drv, adapter->netdev,
-+				  "1000BASEX mode selected and configured\n");
-+		break;
-+	case PHY_INTERFACE_MODE_SGMII:
-+		ret = lan743x_phylink_sgmii_config(adapter);
-+		if (ret < 0)
-+			netif_err(adapter, drv, adapter->netdev,
-+				  "SGMII config failed. Error %d\n", ret);
-+		else
-+			netif_dbg(adapter, drv, adapter->netdev,
-+				  "SGMII mode selected and configured\n");
-+		break;
-+	default:
-+		netif_dbg(adapter, drv, adapter->netdev,
-+			  "RGMII/GMII/MII(0x%X) mode enable\n",
-+			  state->interface);
-+		break;
-+	}
-+}
-+
-+static void lan743x_phylink_mac_link_down(struct phylink_config *config,
-+					  unsigned int link_an_mode,
-+					  phy_interface_t interface)
-+{
-+	netif_tx_stop_all_queues(to_net_dev(config->dev));
-+}
-+
-+static void lan743x_phylink_mac_link_up(struct phylink_config *config,
-+					struct phy_device *phydev,
-+					unsigned int link_an_mode,
-+					phy_interface_t interface,
-+					int speed, int duplex,
-+					bool tx_pause, bool rx_pause)
-+{
-+	struct net_device *netdev = to_net_dev(config->dev);
-+	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+	int mac_cr;
-+	u8 cap;
-+
-+	mac_cr = lan743x_csr_read(adapter, MAC_CR);
-+	/* Pre-initialize register bits.
-+	 * Resulting value corresponds to SPEED_10
-+	 */
-+	mac_cr &= ~(MAC_CR_CFG_H_ | MAC_CR_CFG_L_);
-+	if (speed == SPEED_2500)
-+		mac_cr |= MAC_CR_CFG_H_ | MAC_CR_CFG_L_;
-+	else if (speed == SPEED_1000)
-+		mac_cr |= MAC_CR_CFG_H_;
-+	else if (speed == SPEED_100)
-+		mac_cr |= MAC_CR_CFG_L_;
-+
-+	lan743x_csr_write(adapter, MAC_CR, mac_cr);
-+
-+	lan743x_ptp_update_latency(adapter, speed);
-+
-+	/* Flow Control operation */
-+	cap = 0;
-+	if (tx_pause)
-+		cap |= FLOW_CTRL_TX;
-+	if (rx_pause)
-+		cap |= FLOW_CTRL_RX;
-+
-+	lan743x_mac_flow_ctrl_set_enables(adapter,
-+					  cap & FLOW_CTRL_TX,
-+					  cap & FLOW_CTRL_RX);
-+
-+	netif_tx_wake_all_queues(netdev);
-+}
-+
-+static const struct phylink_mac_ops lan743x_phylink_mac_ops = {
-+	.mac_config = lan743x_phylink_mac_config,
-+	.mac_link_down = lan743x_phylink_mac_link_down,
-+	.mac_link_up = lan743x_phylink_mac_link_up,
-+};
-+
-+static struct {
-+	unsigned long mask;
-+	int speed;
-+	int duplex;
-+} lan743x_mac_caps_params[] = {
-+	{ MAC_2500FD,	SPEED_2500,   DUPLEX_FULL },
-+	{ MAC_1000FD,	SPEED_1000,   DUPLEX_FULL },
-+	{ MAC_100FD,	SPEED_100,    DUPLEX_FULL },
-+	{ MAC_10FD,	SPEED_10,     DUPLEX_FULL },
-+	{ MAC_100HD,	SPEED_100,    DUPLEX_HALF },
-+	{ MAC_10HD,	SPEED_10,     DUPLEX_HALF },
-+};
-+
-+static int lan743x_find_max_speed(unsigned long caps, int *speed, int *duplex)
-+{
-+	int i;
-+
-+	*speed = SPEED_UNKNOWN;
-+	*duplex = DUPLEX_UNKNOWN;
-+	for (i = 0; i < ARRAY_SIZE(lan743x_mac_caps_params); i++) {
-+		if (caps & lan743x_mac_caps_params[i].mask) {
-+			*speed = lan743x_mac_caps_params[i].speed;
-+			*duplex = lan743x_mac_caps_params[i].duplex;
-+			break;
-+		}
-+	}
-+
-+	return *speed == SPEED_UNKNOWN ? -EINVAL : 0;
-+}
-+
-+static int lan743x_phylink_create(struct lan743x_adapter *adapter)
-+{
-+	struct net_device *netdev = adapter->netdev;
-+	struct phylink *pl;
-+
-+	adapter->phylink_config.dev = &netdev->dev;
-+	adapter->phylink_config.type = PHYLINK_NETDEV;
-+	adapter->phylink_config.mac_managed_pm = false;
-+
-+	adapter->phylink_config.mac_capabilities = MAC_ASYM_PAUSE |
-+		MAC_SYM_PAUSE | MAC_10 | MAC_100 | MAC_1000FD;
-+
-+	lan743x_phy_interface_select(adapter);
-+
-+	switch (adapter->phy_interface) {
-+	case PHY_INTERFACE_MODE_SGMII:
-+		__set_bit(PHY_INTERFACE_MODE_SGMII,
-+			  adapter->phylink_config.supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-+			  adapter->phylink_config.supported_interfaces);
-+		__set_bit(PHY_INTERFACE_MODE_2500BASEX,
-+			  adapter->phylink_config.supported_interfaces);
-+		adapter->phylink_config.mac_capabilities |= MAC_2500FD;
-+		break;
-+	case PHY_INTERFACE_MODE_GMII:
-+		__set_bit(PHY_INTERFACE_MODE_GMII,
-+			  adapter->phylink_config.supported_interfaces);
-+		break;
-+	case PHY_INTERFACE_MODE_MII:
-+		__set_bit(PHY_INTERFACE_MODE_MII,
-+			  adapter->phylink_config.supported_interfaces);
-+		break;
-+	default:
-+		phy_interface_set_rgmii(adapter->phylink_config.supported_interfaces);
-+	}
-+
-+	pl = phylink_create(&adapter->phylink_config, NULL,
-+			    adapter->phy_interface, &lan743x_phylink_mac_ops);
-+
-+	if (IS_ERR(pl)) {
-+		netdev_err(netdev, "Could not create phylink (%pe)\n", pl);
-+		return PTR_ERR(pl);
-+	}
-+
-+	adapter->phylink = pl;
-+	netdev_dbg(netdev, "lan743x phylink created");
-+
-+	return 0;
-+}
-+
-+static bool lan743x_phy_handle_exists(struct device_node *dn)
-+{
-+	dn = of_parse_phandle(dn, "phy-handle", 0);
-+	of_node_put(dn);
-+	return dn != NULL;
-+}
-+
-+static int lan743x_phylink_connect(struct lan743x_adapter *adapter)
-+{
-+	struct device_node *dn = adapter->pdev->dev.of_node;
-+	struct net_device *dev = adapter->netdev;
-+	struct phy_device *phydev;
-+	int ret;
-+
-+	if (dn)
-+		ret = phylink_of_phy_connect(adapter->phylink, dn, 0);
-+
-+	if (!dn || (ret && !lan743x_phy_handle_exists(dn))) {
-+		phydev = phy_find_first(adapter->mdiobus);
-+		if (phydev) {
-+			/* attach the mac to the phy */
-+			ret = phylink_connect_phy(adapter->phylink, phydev);
-+		} else if (((adapter->csr.id_rev & ID_REV_ID_MASK_) ==
-+			      ID_REV_ID_LAN7431_) || adapter->is_pci11x1x) {
-+			struct phylink_link_state state;
-+			unsigned long caps;
-+
-+			caps = adapter->phylink_config.mac_capabilities;
-+			ret = lan743x_find_max_speed(caps, &state.speed,
-+						     &state.duplex);
-+			if (ret) {
-+				netdev_err(dev, "could not find supported speed\n");
-+				return ret;
-+			}
-+
-+			ret = phylink_set_fixed_link(adapter->phylink, &state);
-+			if (ret) {
-+				netdev_err(dev, "Could not set fixed link\n");
-+				return ret;
-+			}
-+		} else {
-+			netdev_err(dev, "no PHY found\n");
-+			return -ENXIO;
-+		}
-+	}
-+
-+	if (ret) {
-+		netdev_err(dev, "Could not attach PHY (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	phylink_start(adapter->phylink);
-+
-+	return 0;
-+}
-+
-+static void lan743x_phylink_disconnect(struct lan743x_adapter *adapter)
-+{
-+	phylink_stop(adapter->phylink);
-+	phylink_disconnect_phy(adapter->phylink);
-+}
-+
- static int lan743x_netdev_close(struct net_device *netdev)
+diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+index 3a63ec091413..574b492b25c3 100644
+--- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
++++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+@@ -1058,61 +1058,51 @@ static int lan743x_ethtool_get_eee(struct net_device *netdev,
+ 				   struct ethtool_keee *eee)
  {
  	struct lan743x_adapter *adapter = netdev_priv(netdev);
-@@ -3092,7 +3220,7 @@ static int lan743x_netdev_close(struct net_device *netdev)
+-	struct phy_device *phydev = netdev->phydev;
+-	u32 buf;
+-	int ret;
  
- 	lan743x_ptp_close(adapter);
+-	if (!phydev)
+-		return -EIO;
+-	if (!phydev->drv) {
+-		netif_err(adapter, drv, adapter->netdev,
+-			  "Missing PHY Driver\n");
+-		return -EIO;
+-	}
++	eee->tx_lpi_timer = lan743x_csr_read(adapter,
++					     MAC_EEE_TX_LPI_REQ_DLY_CNT);
  
--	lan743x_phy_close(adapter);
-+	lan743x_phylink_disconnect(adapter);
+-	ret = phy_ethtool_get_eee(phydev, eee);
+-	if (ret < 0)
+-		return ret;
++	return phylink_ethtool_get_eee(adapter->phylink, eee);
++}
  
- 	lan743x_mac_close(adapter);
- 
-@@ -3115,13 +3243,13 @@ static int lan743x_netdev_open(struct net_device *netdev)
- 	if (ret)
- 		goto close_intr;
- 
--	ret = lan743x_phy_open(adapter);
-+	ret = lan743x_phylink_connect(adapter);
- 	if (ret)
- 		goto close_mac;
- 
- 	ret = lan743x_ptp_open(adapter);
- 	if (ret)
--		goto close_phy;
-+		goto close_mac;
- 
- 	lan743x_rfe_open(adapter);
- 
-@@ -3161,9 +3289,8 @@ static int lan743x_netdev_open(struct net_device *netdev)
- 			lan743x_rx_close(&adapter->rx[index]);
- 	}
- 	lan743x_ptp_close(adapter);
--
--close_phy:
--	lan743x_phy_close(adapter);
-+	if (adapter->phylink)
-+		lan743x_phylink_disconnect(adapter);
- 
- close_mac:
- 	lan743x_mac_close(adapter);
-@@ -3192,11 +3319,14 @@ static netdev_tx_t lan743x_netdev_xmit_frame(struct sk_buff *skb,
- static int lan743x_netdev_ioctl(struct net_device *netdev,
- 				struct ifreq *ifr, int cmd)
- {
-+	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+
- 	if (!netif_running(netdev))
- 		return -EINVAL;
- 	if (cmd == SIOCSHWTSTAMP)
- 		return lan743x_ptp_ioctl(netdev, ifr, cmd);
--	return phy_mii_ioctl(netdev->phydev, ifr, cmd);
-+
-+	return phylink_mii_ioctl(adapter->phylink, ifr, cmd);
- }
- 
- static void lan743x_netdev_set_multicast(struct net_device *netdev)
-@@ -3301,10 +3431,17 @@ static void lan743x_mdiobus_cleanup(struct lan743x_adapter *adapter)
- 	mdiobus_unregister(adapter->mdiobus);
- }
- 
-+static void lan743x_destroy_phylink(struct lan743x_adapter *adapter)
+-	buf = lan743x_csr_read(adapter, MAC_CR);
+-	if (buf & MAC_CR_EEE_EN_) {
+-		/* EEE_TX_LPI_REQ_DLY & tx_lpi_timer are same uSec unit */
+-		buf = lan743x_csr_read(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT);
+-		eee->tx_lpi_timer = buf;
+-	} else {
+-		eee->tx_lpi_timer = 0;
++static int lan743x_ethtool_set_eee(struct net_device *netdev,
++				   struct ethtool_keee *eee)
 +{
-+	phylink_destroy(adapter->phylink);
-+	adapter->phylink = NULL;
++	struct lan743x_adapter *adapter = netdev_priv(netdev);
++	u32 tx_lpi_timer;
++
++	tx_lpi_timer = lan743x_csr_read(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT);
++	if (tx_lpi_timer != eee->tx_lpi_timer) {
++		/* Software should only change this field when Energy Efficient
++		 * Ethernet Enable (EEEEN) is cleared.
++		 * This function will trigger an autonegotiation restart and
++		 * eee will be reenabled during link up if eee was negotiated.
++		 */
++		lan743x_mac_eee_enable(adapter, false);
++		lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT,
++				  eee->tx_lpi_timer);
++		lan743x_mac_eee_enable(adapter, true);
+ 	}
+ 
+-	return 0;
++	return phylink_ethtool_set_eee(adapter->phylink, eee);
+ }
+ 
+-static int lan743x_ethtool_set_eee(struct net_device *netdev,
+-				   struct ethtool_keee *eee)
++static int
++lan743x_ethtool_set_link_ksettings(struct net_device *netdev,
++				   const struct ethtool_link_ksettings *cmd)
+ {
+-	struct lan743x_adapter *adapter;
+-	struct phy_device *phydev;
+-	u32 buf = 0;
++	struct lan743x_adapter *adapter = netdev_priv(netdev);
+ 
+-	if (!netdev)
+-		return -EINVAL;
+-	adapter = netdev_priv(netdev);
+-	if (!adapter)
+-		return -EINVAL;
+-	phydev = netdev->phydev;
+-	if (!phydev)
+-		return -EIO;
+-	if (!phydev->drv) {
+-		netif_err(adapter, drv, adapter->netdev,
+-			  "Missing PHY Driver\n");
+-		return -EIO;
+-	}
++	return phylink_ethtool_ksettings_set(adapter->phylink, cmd);
++}
+ 
+-	if (eee->eee_enabled) {
+-		buf = (u32)eee->tx_lpi_timer;
+-		lan743x_csr_write(adapter, MAC_EEE_TX_LPI_REQ_DLY_CNT, buf);
+-	}
++static int
++lan743x_ethtool_get_link_ksettings(struct net_device *netdev,
++				   struct ethtool_link_ksettings *cmd)
++{
++	struct lan743x_adapter *adapter = netdev_priv(netdev);
+ 
+-	return phy_ethtool_set_eee(phydev, eee);
++	return phylink_ethtool_ksettings_get(adapter->phylink, cmd);
+ }
+ 
+ #ifdef CONFIG_PM
+@@ -1124,8 +1114,7 @@ static void lan743x_ethtool_get_wol(struct net_device *netdev,
+ 	wol->supported = 0;
+ 	wol->wolopts = 0;
+ 
+-	if (netdev->phydev)
+-		phy_ethtool_get_wol(netdev->phydev, wol);
++	phylink_ethtool_get_wol(adapter->phylink, wol);
+ 
+ 	if (wol->supported != adapter->phy_wol_supported)
+ 		netif_warn(adapter, drv, adapter->netdev,
+@@ -1166,7 +1155,7 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
+ 		    !(adapter->phy_wol_supported & WAKE_MAGICSECURE))
+ 			phy_wol.wolopts &= ~WAKE_MAGIC;
+ 
+-		ret = phy_ethtool_set_wol(netdev->phydev, &phy_wol);
++		ret = phylink_ethtool_set_wol(adapter->phylink, wol);
+ 		if (ret && (ret != -EOPNOTSUPP))
+ 			return ret;
+ 
+@@ -1355,44 +1344,16 @@ static void lan743x_get_pauseparam(struct net_device *dev,
+ 				   struct ethtool_pauseparam *pause)
+ {
+ 	struct lan743x_adapter *adapter = netdev_priv(dev);
+-	struct lan743x_phy *phy = &adapter->phy;
+ 
+-	if (phy->fc_request_control & FLOW_CTRL_TX)
+-		pause->tx_pause = 1;
+-	if (phy->fc_request_control & FLOW_CTRL_RX)
+-		pause->rx_pause = 1;
+-	pause->autoneg = phy->fc_autoneg;
++	phylink_ethtool_get_pauseparam(adapter->phylink, pause);
+ }
+ 
+ static int lan743x_set_pauseparam(struct net_device *dev,
+ 				  struct ethtool_pauseparam *pause)
+ {
+ 	struct lan743x_adapter *adapter = netdev_priv(dev);
+-	struct phy_device *phydev = dev->phydev;
+-	struct lan743x_phy *phy = &adapter->phy;
+ 
+-	if (!phydev)
+-		return -ENODEV;
+-
+-	if (!phy_validate_pause(phydev, pause))
+-		return -EINVAL;
+-
+-	phy->fc_request_control = 0;
+-	if (pause->rx_pause)
+-		phy->fc_request_control |= FLOW_CTRL_RX;
+-
+-	if (pause->tx_pause)
+-		phy->fc_request_control |= FLOW_CTRL_TX;
+-
+-	phy->fc_autoneg = pause->autoneg;
+-
+-	if (pause->autoneg == AUTONEG_DISABLE)
+-		lan743x_mac_flow_ctrl_set_enables(adapter, pause->tx_pause,
+-						  pause->rx_pause);
+-	else
+-		phy_set_asym_pause(phydev, pause->rx_pause,  pause->tx_pause);
+-
+-	return 0;
++	return phylink_ethtool_set_pauseparam(adapter->phylink, pause);
+ }
+ 
+ const struct ethtool_ops lan743x_ethtool_ops = {
+@@ -1417,8 +1378,8 @@ const struct ethtool_ops lan743x_ethtool_ops = {
+ 	.get_ts_info = lan743x_ethtool_get_ts_info,
+ 	.get_eee = lan743x_ethtool_get_eee,
+ 	.set_eee = lan743x_ethtool_set_eee,
+-	.get_link_ksettings = phy_ethtool_get_link_ksettings,
+-	.set_link_ksettings = phy_ethtool_set_link_ksettings,
++	.get_link_ksettings = lan743x_ethtool_get_link_ksettings,
++	.set_link_ksettings = lan743x_ethtool_set_link_ksettings,
+ 	.get_regs_len = lan743x_get_regs_len,
+ 	.get_regs = lan743x_get_regs,
+ 	.get_pauseparam = lan743x_get_pauseparam,
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index 2da05c50fe53..ff78239eb121 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -2966,6 +2966,18 @@ static int lan743x_phylink_2500basex_config(struct lan743x_adapter *adapter)
+ 	return lan743x_pcs_power_reset(adapter);
+ }
+ 
++void lan743x_mac_eee_enable(struct lan743x_adapter *adapter, bool enable)
++{
++	u32 mac_cr;
++
++	mac_cr = lan743x_csr_read(adapter, MAC_CR);
++	if (enable)
++		mac_cr |= MAC_CR_EEE_EN_;
++	else
++		mac_cr &= ~MAC_CR_EEE_EN_;
++	lan743x_csr_write(adapter, MAC_CR, mac_cr);
 +}
 +
- static void lan743x_full_cleanup(struct lan743x_adapter *adapter)
+ static void lan743x_phylink_mac_config(struct phylink_config *config,
+ 				       unsigned int link_an_mode,
+ 				       const struct phylink_link_state *state)
+@@ -3014,7 +3026,11 @@ static void lan743x_phylink_mac_link_down(struct phylink_config *config,
+ 					  unsigned int link_an_mode,
+ 					  phy_interface_t interface)
  {
- 	unregister_netdev(adapter->netdev);
- 
-+	lan743x_destroy_phylink(adapter);
- 	lan743x_mdiobus_cleanup(adapter);
- 	lan743x_hardware_cleanup(adapter);
- 	lan743x_pci_cleanup(adapter);
-@@ -3518,14 +3655,21 @@ static int lan743x_pcidev_probe(struct pci_dev *pdev,
- 				    NETIF_F_HW_CSUM | NETIF_F_RXCSUM;
- 	adapter->netdev->hw_features = adapter->netdev->features;
- 
--	/* carrier off reporting is important to ethtool even BEFORE open */
--	netif_carrier_off(netdev);
-+	ret = lan743x_phylink_create(adapter);
-+	if (ret < 0) {
-+		netif_err(adapter, probe, netdev,
-+			  "failed to setup phylink (%d)\n", ret);
-+		goto cleanup_mdiobus;
-+	}
- 
- 	ret = register_netdev(adapter->netdev);
- 	if (ret < 0)
--		goto cleanup_mdiobus;
-+		goto cleanup_phylink;
- 	return 0;
- 
-+cleanup_phylink:
-+	lan743x_destroy_phylink(adapter);
++	struct net_device *netdev = to_net_dev(config->dev);
++	struct lan743x_adapter *adapter = netdev_priv(netdev);
 +
- cleanup_mdiobus:
- 	lan743x_mdiobus_cleanup(adapter);
- 
-@@ -3781,6 +3925,7 @@ static int lan743x_pm_resume(struct device *dev)
- 	       MAC_WK_SRC_WK_FR_SAVED_;
- 	lan743x_csr_write(adapter, MAC_WK_SRC, data);
- 
-+	rtnl_lock();
- 	/* open netdev when netdev is at running state while resume.
- 	 * For instance, it is true when system wakesup after pm-suspend
- 	 * However, it is false when system wakes up after suspend GUI menu
-@@ -3789,6 +3934,7 @@ static int lan743x_pm_resume(struct device *dev)
- 		lan743x_netdev_open(netdev);
- 
- 	netif_device_attach(netdev);
-+	rtnl_unlock();
- 
- 	return 0;
+ 	netif_tx_stop_all_queues(to_net_dev(config->dev));
++	lan743x_mac_eee_enable(adapter, false);
  }
+ 
+ static void lan743x_phylink_mac_link_up(struct phylink_config *config,
+@@ -3056,6 +3072,9 @@ static void lan743x_phylink_mac_link_up(struct phylink_config *config,
+ 					  cap & FLOW_CTRL_TX,
+ 					  cap & FLOW_CTRL_RX);
+ 
++	if (phydev)
++		lan743x_mac_eee_enable(adapter, phydev->enable_tx_lpi);
++
+ 	netif_tx_wake_all_queues(netdev);
+ }
+ 
+@@ -3265,6 +3284,9 @@ static int lan743x_netdev_open(struct net_device *netdev)
+ 			goto close_tx;
+ 	}
+ 
++	if (netdev->phydev)
++		phy_support_eee(netdev->phydev);
++
+ #ifdef CONFIG_PM
+ 	if (adapter->netdev->phydev) {
+ 		struct ethtool_wolinfo wol = { .cmd = ETHTOOL_GWOL };
 diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-index 3b2585a384e2..7f73d66854be 100644
+index 7f73d66854be..8ef897c114d3 100644
 --- a/drivers/net/ethernet/microchip/lan743x_main.h
 +++ b/drivers/net/ethernet/microchip/lan743x_main.h
-@@ -5,6 +5,7 @@
- #define _LAN743X_H
+@@ -1206,5 +1206,6 @@ void lan743x_hs_syslock_release(struct lan743x_adapter *adapter);
+ void lan743x_mac_flow_ctrl_set_enables(struct lan743x_adapter *adapter,
+ 				       bool tx_enable, bool rx_enable);
+ int lan743x_sgmii_read(struct lan743x_adapter *adapter, u8 mmd, u16 addr);
++void lan743x_mac_eee_enable(struct lan743x_adapter *adapter, bool enable);
  
- #include <linux/phy.h>
-+#include <linux/phylink.h>
- #include "lan743x_ptp.h"
- 
- #define DRIVER_AUTHOR   "Bryan Whitehead <Bryan.Whitehead@microchip.com>"
-@@ -1083,6 +1084,8 @@ struct lan743x_adapter {
- 	u32			flags;
- 	u32			hw_cfg;
- 	phy_interface_t		phy_interface;
-+	struct phylink		*phylink;
-+	struct phylink_config	phylink_config;
- };
- 
- #define LAN743X_COMPONENT_FLAG_RX(channel)  BIT(20 + (channel))
+ #endif /* _LAN743X_H */
 -- 
 2.34.1
 
