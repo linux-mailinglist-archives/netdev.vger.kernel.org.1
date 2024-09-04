@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-124796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2291296AF3E
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 05:25:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16ADD96AF40
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 05:26:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5562E1C24A9D
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 03:25:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D7D1B24465
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 03:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9CA44376;
-	Wed,  4 Sep 2024 03:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB83642A92;
+	Wed,  4 Sep 2024 03:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="Tr8x5Cob"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="C9xol3kV"
 X-Original-To: netdev@vger.kernel.org
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329B842A92;
-	Wed,  4 Sep 2024 03:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0950545026;
+	Wed,  4 Sep 2024 03:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725420293; cv=none; b=hWBxPS+MI4HRhkcCuPa+y7z1PYRADog9xDSrTz4X1rg0Nf+k4LTUU5QqKN1HxsjNmUwcsl247ulCnU4yRJhijQ9vW8DCKWt2eaemQMIR6rMyo5itI/FoXvYINqlRhpbvSUd1ctr++sjKwqqn7aRglInJa5wGBcMEMS/23XWKcXQ=
+	t=1725420323; cv=none; b=PZovWUvGJyw4k0Ud9XCcJlVF/uy7lqsxLf4Suhg6YD/uTG2kDEOhoMa9zXi+alu0v7Dc1dfQV5negJ73aPVUibXjbNTWTfspTjZPtatzPmGHKrIerqVgzDR5/AHel2aUPu2XawDfs0SzzXpqq0ZboxRf/r9mkC4rWZ5GJ5F0LUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725420293; c=relaxed/simple;
-	bh=j9Ewh3BXZp8v8EOZ/8ToAZeZl09nfFkigGhXGCppxz0=;
+	s=arc-20240116; t=1725420323; c=relaxed/simple;
+	bh=MuPuHsFQG9JLjGP15YRzsxLCk+z8S2UeLEaYflHLdFo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SMgtrCITH+fLEL7iqFyuoH3tB8GF8dMZr/iANjmE+waywhjIxBWvbMyZ9xkNzjYN7A4AKP7FeDZrwe0m45/8795YAKJ0gYyNih61Bqa6MfsN/0y0KpqTz3oLWqbCXLTm3fqwc1qUsOriPO3xt7bqbYrVB8kmfgTJn0kjnD1B45o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=Tr8x5Cob; arc=none smtp.client-ip=211.75.126.72
+	 MIME-Version:Content-Type; b=S37BhtGP/sXmwJQuxo64Zn5XoBsfwdZY+HVxtjCE2Igs2EY9xsVa7bSs/rNeDN7ZxfD7DxakxVKZh37cyNdouj7zxsJ8SP6EralMM0/VB3IySK9mQA7An+cZEisG1Sp7z/o4cSDt7WLxOLsTosc1RDahfNw3LWoQOm3+Nxt98w8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=C9xol3kV; arc=none smtp.client-ip=211.75.126.72
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4843OOVG02041262, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4843OrAqA2041656, This message is accepted by code: ctloc85258
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
-	t=1725420264; bh=j9Ewh3BXZp8v8EOZ/8ToAZeZl09nfFkigGhXGCppxz0=;
+	t=1725420293; bh=MuPuHsFQG9JLjGP15YRzsxLCk+z8S2UeLEaYflHLdFo=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
 	 MIME-Version:Content-Transfer-Encoding:Content-Type;
-	b=Tr8x5CobTlx9O/b4HhhYB15gvZbigWdJ8l6lU9dvfr/v2kXOxdW3f4hhYs/8TsoGy
-	 +xwrYn12RBqzTcEQfrmHnarszncKBKtJd4yXhOjSB6B95EhKQCMzbHOj7Ijc+VbmzM
-	 qLmHLRQ5gmJSVlYn7om00AZvsVIq23ZVsb9vu7WfmYktFwiDMyX6y2K44QF57icpWn
-	 dTu55Lv84hoIJJbt3U5UzzJTfUYloGEwK/xGK0X42GniX46XO0LVbHDyOkt358p32Q
-	 N56e6On1WzMvo6gNvrRrBnhup0Dxvm16sJKHfcMidAh3GjSt9JW8tt66O7bCPZ+O4/
-	 NI6UZCWQP1z4g==
+	b=C9xol3kVIKQeQyiz7a3DTdra0jLwkSKMco9SYMwljngg6ybQCKFSm91lrov2vnt48
+	 Z/P4HY8mtEeNZOi5VBtIdMYMoae4exSX/HdfL13IoLv+l0Uo5TT54jzbZFYlUBAWMb
+	 annADHrG53Gxt+DmvF1nPSxy2lqUoH4urDf5QSBndXXcnsUSNl5V+/gp1KAPsrIi+7
+	 A9NY1lK9lYxZzp4rd+/ynppokV9+eWqRRJNGZ7sVXLy/n4R01xjEtfW4YrT/u4W7wS
+	 nOm+xMFBM9P5qhCEzt+c2VvHX0Bf4RibA1lme0v/Eoava4TF8YWnucu25LxkGL9yTE
+	 04U5eFWOXGugw==
 Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 4843OOVG02041262
+	by rtits2.realtek.com.tw (8.15.2/3.02/5.92) with ESMTPS id 4843OrAqA2041656
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 4 Sep 2024 11:24:24 +0800
+	Wed, 4 Sep 2024 11:24:53 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
  RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 4 Sep 2024 11:24:25 +0800
+ 15.1.2507.39; Wed, 4 Sep 2024 11:24:54 +0800
 Received: from RTDOMAIN (172.21.210.74) by RTEXMBS04.realtek.com.tw
  (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 4 Sep
- 2024 11:24:24 +0800
+ 2024 11:24:53 +0800
 From: Justin Lai <justinlai0215@realtek.com>
 To: <kuba@kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
@@ -62,9 +62,9 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
         <rkannoth@marvell.com>, <jdamato@fastly.com>, <pkshih@realtek.com>,
         <larry.chiu@realtek.com>, "Justin
  Lai" <justinlai0215@realtek.com>
-Subject: [PATCH net-next v30 09/13] rtase: Implement pci_driver suspend and resume function
-Date: Wed, 4 Sep 2024 11:21:10 +0800
-Message-ID: <20240904032114.247117-10-justinlai0215@realtek.com>
+Subject: [PATCH net-next v30 10/13] rtase: Implement ethtool function
+Date: Wed, 4 Sep 2024 11:21:11 +0800
+Message-ID: <20240904032114.247117-11-justinlai0215@realtek.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240904032114.247117-1-justinlai0215@realtek.com>
 References: <20240904032114.247117-1-justinlai0215@realtek.com>
@@ -76,86 +76,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
  RTEXMBS04.realtek.com.tw (172.21.6.97)
 
-Implement the pci_driver suspend function to enable the device
-to sleep, and implement the resume function to enable the device
-to resume operation.
+Implement the ethtool function to support users to obtain network card
+information, including obtaining various device settings, Report whether
+physical link is up, Report pause parameters, Set pause parameters,
+Return extended statistics about the device.
 
 Signed-off-by: Justin Lai <justinlai0215@realtek.com>
 ---
- .../net/ethernet/realtek/rtase/rtase_main.c   | 51 +++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ .../net/ethernet/realtek/rtase/rtase_main.c   | 74 +++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
 diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-index ea569a2d8b8b..7a31bef0576a 100644
+index 7a31bef0576a..7882f2c0e1a4 100644
 --- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
 +++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
-@@ -2151,12 +2151,63 @@ static void rtase_shutdown(struct pci_dev *pdev)
- 	rtase_reset_interrupt(pdev, tp);
+@@ -1710,9 +1710,83 @@ static void rtase_get_mac_address(struct net_device *dev)
+ 	rtase_rar_set(tp, dev->dev_addr);
  }
  
-+static int rtase_suspend(struct device *device)
++static int rtase_get_settings(struct net_device *dev,
++			      struct ethtool_link_ksettings *cmd)
 +{
-+	struct net_device *dev = dev_get_drvdata(device);
++	u32 supported = SUPPORTED_MII | SUPPORTED_Pause | SUPPORTED_Asym_Pause;
 +
-+	if (netif_running(dev)) {
-+		netif_device_detach(dev);
-+		rtase_hw_reset(dev);
-+	}
++	ethtool_convert_legacy_u32_to_link_mode(cmd->link_modes.supported,
++						supported);
++	cmd->base.speed = SPEED_5000;
++	cmd->base.duplex = DUPLEX_FULL;
++	cmd->base.port = PORT_MII;
++	cmd->base.autoneg = AUTONEG_DISABLE;
 +
 +	return 0;
 +}
 +
-+static int rtase_resume(struct device *device)
++static void rtase_get_pauseparam(struct net_device *dev,
++				 struct ethtool_pauseparam *pause)
 +{
-+	struct net_device *dev = dev_get_drvdata(device);
++	const struct rtase_private *tp = netdev_priv(dev);
++	u16 value = rtase_r16(tp, RTASE_CPLUS_CMD);
++
++	pause->autoneg = AUTONEG_DISABLE;
++	pause->tx_pause = !!(value & RTASE_FORCE_TXFLOW_EN);
++	pause->rx_pause = !!(value & RTASE_FORCE_RXFLOW_EN);
++}
++
++static int rtase_set_pauseparam(struct net_device *dev,
++				struct ethtool_pauseparam *pause)
++{
++	const struct rtase_private *tp = netdev_priv(dev);
++	u16 value = rtase_r16(tp, RTASE_CPLUS_CMD);
++
++	if (pause->autoneg)
++		return -EOPNOTSUPP;
++
++	value &= ~(RTASE_FORCE_TXFLOW_EN | RTASE_FORCE_RXFLOW_EN);
++
++	if (pause->tx_pause)
++		value |= RTASE_FORCE_TXFLOW_EN;
++
++	if (pause->rx_pause)
++		value |= RTASE_FORCE_RXFLOW_EN;
++
++	rtase_w16(tp, RTASE_CPLUS_CMD, value);
++	return 0;
++}
++
++static void rtase_get_eth_mac_stats(struct net_device *dev,
++				    struct ethtool_eth_mac_stats *stats)
++{
 +	struct rtase_private *tp = netdev_priv(dev);
-+	int ret;
++	const struct rtase_counters *counters;
 +
-+	/* restore last modified mac address */
-+	rtase_rar_set(tp, dev->dev_addr);
++	counters = tp->tally_vaddr;
 +
-+	if (!netif_running(dev))
-+		goto out;
++	rtase_dump_tally_counter(tp);
 +
-+	rtase_wait_for_quiescence(dev);
-+
-+	rtase_tx_clear(tp);
-+	rtase_rx_clear(tp);
-+
-+	ret = rtase_init_ring(dev);
-+	if (ret) {
-+		netdev_err(dev, "unable to init ring\n");
-+		rtase_free_desc(tp);
-+		return -ENOMEM;
-+	}
-+
-+	rtase_hw_config(dev);
-+	/* always link, so start to transmit & receive */
-+	rtase_hw_start(dev);
-+
-+	netif_device_attach(dev);
-+out:
-+
-+	return 0;
++	stats->FramesTransmittedOK = le64_to_cpu(counters->tx_packets);
++	stats->FramesReceivedOK = le64_to_cpu(counters->rx_packets);
++	stats->FramesLostDueToIntMACXmitError =
++		le64_to_cpu(counters->tx_errors);
++	stats->BroadcastFramesReceivedOK = le64_to_cpu(counters->rx_broadcast);
 +}
 +
-+static const struct dev_pm_ops rtase_pm_ops = {
-+	SYSTEM_SLEEP_PM_OPS(rtase_suspend, rtase_resume)
++static const struct ethtool_ops rtase_ethtool_ops = {
++	.get_link = ethtool_op_get_link,
++	.get_link_ksettings = rtase_get_settings,
++	.get_pauseparam = rtase_get_pauseparam,
++	.set_pauseparam = rtase_set_pauseparam,
++	.get_eth_mac_stats = rtase_get_eth_mac_stats,
++	.get_ts_info = ethtool_op_get_ts_info,
 +};
 +
- static struct pci_driver rtase_pci_driver = {
- 	.name = KBUILD_MODNAME,
- 	.id_table = rtase_pci_tbl,
- 	.probe = rtase_init_one,
- 	.remove = rtase_remove_one,
- 	.shutdown = rtase_shutdown,
-+	.driver.pm = pm_ptr(&rtase_pm_ops),
- };
+ static void rtase_init_netdev_ops(struct net_device *dev)
+ {
+ 	dev->netdev_ops = &rtase_netdev_ops;
++	dev->ethtool_ops = &rtase_ethtool_ops;
+ }
  
- module_pci_driver(rtase_pci_driver);
+ static void rtase_reset_interrupt(struct pci_dev *pdev,
 -- 
 2.34.1
 
