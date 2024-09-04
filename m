@@ -1,109 +1,87 @@
-Return-Path: <netdev+bounces-125211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A418596C4A8
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:02:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F1196C457
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 18:46:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F3321F261A5
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:02:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36BC128371B
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:46:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB725464E;
-	Wed,  4 Sep 2024 17:02:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FE611E0082;
+	Wed,  4 Sep 2024 16:46:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="GurltbUt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hQoezaqW"
 X-Original-To: netdev@vger.kernel.org
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D635C208B0;
-	Wed,  4 Sep 2024 17:02:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3481484A21;
+	Wed,  4 Sep 2024 16:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725469355; cv=none; b=b78oXZcZM5JbMduA6uMMws7BXobVoQkJcb+rCU8T2KGRTKo8L7lf/N1taNoHDQGT2B13/a71tQAjuErcFulcLNzKXgb18HzJpwfdG+izn6oI7WThwZ+3cGgfx2+foDBwUKxwTjltS5m9j11GWLuH3pZD5v6LYjedecaSh4sg7m4=
+	t=1725468360; cv=none; b=UFE75WlIHXorxYPY3tgntia5fg+jTnIWwRcDGIHIel60lqtrU1soNB5Gz5kaTLqODvqFY/HxTw9QRb1yJ+/rnyb/jR9oljAa6Mk0G2WQDvrZeUvdmt1iY3Vf6l7NFvYiNLTiid+pKyfgyoKj0bRLU2jULl4mG77HDb5K2TY8zUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725469355; c=relaxed/simple;
-	bh=sORX5VEgoe509ZQr0SKamAFfSHB60pe6cyvvjB5IGZs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PR8Eb9v9YC2M0Bu+ZpPnd5LFqaS8OIWwszpKAeCXvRCW51TrFiqSG40ti/GsIsHvGA70hXr0k0UtxYzCqq8s4n8kvv8qzGXyK9+6UUm+9cb71mnT3peq9TsD43ASXroxGrJNF+SQzR52oJuTO6BbY9dBIO1wtAhHcL/AcWsuaow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=GurltbUt; arc=none smtp.client-ip=185.11.138.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
-	s=gloria202408; h=Content-Type:Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=sORX5VEgoe509ZQr0SKamAFfSHB60pe6cyvvjB5IGZs=; b=GurltbUt/g0trnYK49OGBqD1RI
-	STz36H4cL4V5IouRnNPrCGcVHJHwewfTFwcX+EVl/4fOFJ5SlxOR8/sX5eC5bYaauRQGRHglFo9Op
-	4ShSM5z4ku0O7FzwpYrBqXN9st0mk5yGJf3sT5YvJVpYoIvI04UUETbPnNnkR5DV9imQNtVoJ3m3h
-	xUx6V9hWgtzaR0O1wirONGoxagQa3RdXhAZm43FQu1reRp3ZtJNLH8GxnGtv9RhF01gnDDMY2ndZa
-	iQpm79kW5XUoJdi8adciOrPWrn8PMtXuERXqPOY0Rpwfjs1gwc8drkm/HWqEA3CFlB0MvCAQ8Vjm8
-	mUjTGtZg==;
-Received: from i5e860d0f.versanet.de ([94.134.13.15] helo=diego.localnet)
-	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <heiko@sntech.de>)
-	id 1slt52-0001UH-Nt; Wed, 04 Sep 2024 18:42:04 +0200
-From: Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: kernel@pengutronix.de, Alibek Omarov <a1ba.omarov@gmail.com>,
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Philipp Zabel <p.zabel@pengutronix.de>,
- Elaine Zhang <zhangqing@rock-chips.com>,
- David Jander <david.jander@protonic.nl>, Simon Horman <horms@kernel.org>,
- linux-can@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
- David Jander <david@protonic.nl>
-Subject:
- Re: [PATCH can-next v5 00/20] can: rockchip_canfd: add support for CAN-FD IP
- core found on Rockchip RK3568
-Date: Wed, 04 Sep 2024 18:43:52 +0200
-Message-ID: <4091366.iTQEcLzFEP@diego>
-In-Reply-To: <20240904-imposing-determined-mayfly-ba6402-mkl@pengutronix.de>
-References:
- <20240904-rockchip-canfd-v5-0-8ae22bcb27cc@pengutronix.de>
- <86274585.BzKH3j3Lxt@diego>
- <20240904-imposing-determined-mayfly-ba6402-mkl@pengutronix.de>
+	s=arc-20240116; t=1725468360; c=relaxed/simple;
+	bh=QE1dAfuJjh23uOwz2cziMmYmNkROlFpfLarHflaYQIY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YW72sal8TKkxeQgGPotuEQpr56fvV7uBZIsPfYcmFpcIniyPjUWDFMcujnDPclKshLtQhbGAR1uiY6Ptn9I1BdmBeLwSoUgppMM5Z9wPrkRf1kj0VWr/esqYoZ3n0C7LAqud/f0OHBTv/lqBxt9pats+j0PwNJd8fQ7l7SOqXsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hQoezaqW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D85A7C4CEC2;
+	Wed,  4 Sep 2024 16:45:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725468359;
+	bh=QE1dAfuJjh23uOwz2cziMmYmNkROlFpfLarHflaYQIY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hQoezaqWmCuNcOljGAP7UPbPJVagKScXJEpbZV/Crm8Mju2wHDgeil92vxmgXKmXe
+	 pFgZmw1GoKysf/vT6locO6FqgoAy86vgQgYKqBpKdWNbVwEMMIg26qJRYWZq1P5sSF
+	 pBoFpYCkn5MHSkwX5RWR+rMbApCdmqANyrSKKK7cDX6zZX6gntHVLN20S+FNH/cVyO
+	 JLXr6DU9Z+7IIfRqFaXeyweRhFyJqGACEDA/Fz8u97qg5HQrjlKL0vLruPtcyxO7gk
+	 iiNDq/A4iC7aSGHyqMgDkQiKpoTISEYTaSZBD07SjCWASuTjPUXWRs85GqeVeB4g3e
+	 TNz3d/c+4L1Zg==
+Date: Wed, 4 Sep 2024 17:45:55 +0100
+From: Simon Horman <horms@kernel.org>
+To: Chen Ni <nichen@iscas.ac.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] selftests: net: convert comma to semicolon
+Message-ID: <20240904164555.GB1722938@kernel.org>
+References: <20240904014441.1065753-1-nichen@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240904014441.1065753-1-nichen@iscas.ac.cn>
 
-Am Mittwoch, 4. September 2024, 17:10:08 CEST schrieb Marc Kleine-Budde:
-> On 04.09.2024 10:55:21, Heiko St=FCbner wrote:
-> [...]
-> > How/when are you planning on applying stuff?
-> >=20
-> > I.e. if you're going to apply things still for 6.12, you could simply t=
-ake
-> > the whole series if the dts patches still apply to your tree ;-)
->=20
-> The DTS changes should not go via any driver subsystem upstream, so
-> here's a dedicated PR:
->=20
-> https://patch.msgid.link/20240904-rk3568-canfd-v1-0-73bda5fb4e03@pengutro=
-nix.de
+On Wed, Sep 04, 2024 at 09:44:41AM +0800, Chen Ni wrote:
+> Replace comma between expressions with semicolons.
+> 
+> Using a ',' in place of a ';' can have unintended side effects.
+> Although that is not the case here, it is seems best to use ';'
+> unless ',' is intended.
+> 
+> Found by inspection.
+> No functional change intended.
+> Compile tested only.
+> 
+> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+> ---
+> Changelog:
+> 
+> v1 -> v2:
+> 
+> 1. Update commit message.
 
-I wasn't on Cc for the pull-request so I'll probably not get a notification
-when it gets merged?
+Thanks for the update.
 
-So if you see your PR with the binding and driver getting merged to
-next-next, can you provide a ping please?
+I checked and I was not able to find any other instances in this file.
 
-Thanks a lot
-Heiko
-
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
