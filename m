@@ -1,123 +1,119 @@
-Return-Path: <netdev+bounces-124967-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E895D96B734
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:45:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BEA196B747
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:47:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 944641F21D68
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:45:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3797D1F25F8B
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8A051CDFDC;
-	Wed,  4 Sep 2024 09:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88091CEAA4;
+	Wed,  4 Sep 2024 09:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UIsXgIZ7"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="i3uf3rRD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB2541925B1
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 09:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 773F31CCECB;
+	Wed,  4 Sep 2024 09:47:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725443004; cv=none; b=PuI3pPJTPOz2mvQClk6lUJqUP4GHvsSm5GPfVEKblB9ZTQp6vXiaIhGnzIVlzUlZgl1eelEU+WqeQdUbmnqByS/X+R56AZLoZtzWrKz3gbOHpz2ypMW27GAb/wDh2CFdBvCBSOrtj9P6rpX+OvDbuW1/ADnQc9e21Rgn1vjHJ4M=
+	t=1725443243; cv=none; b=X6fsmqdEBOZl8+ywSKJkepiO+KOEOLrHzxRZUjwiuoDiEiPGZrvmZvg9LqPQLHMl3KcRiL84/lOSK6An74s52VSSfFDacYSroSO/dU4RD+ms9BqTucLROLY4MtjSSO7yi60zentbyi3fEbeqMR+VdtRkZNfX7RwTP/V3S8gj0tM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725443004; c=relaxed/simple;
-	bh=kl1VpBp0hN2mGM+lhSKLvBfxDKtkWSfiDDLjjHLOzOE=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=AnvJcZDLzWcpCyOx2KlM/6oLlSWCGTSzX6xgs/nhpaJnqZKGmGZjmnwmDg7y2Z5Wv+OVza53KuoFTpdEtQkoFEU0cyn8/AiWwXtDe1S+Kttbfu/1wFXYimj2np+dSHtOoKdIjgRkcvVancrM2Q34hmOBCeTefs47y8u3kpUFdVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UIsXgIZ7; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2f4f5dbd93bso5398381fa.2
-        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 02:43:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1725443001; x=1726047801; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sWZolsXsCTYach8lH36h3ott3yh0cTGFzhMl58gyIUQ=;
-        b=UIsXgIZ7iSFUd6eAWnAi5KmH0T4qhLmMPzqqycMyMlD78IbECSNmHi30J8Muzrqkqd
-         ATUUO+Vz2V8CyQp9il1jGg32xd20CNj/p8FZL8SLz3ypomleh9uKxaCxAQ8Dh/LCFLgm
-         xchfVy15NhMtPjvK+6AnbcymnbZk4d3NWGVCrU6Xb3GRoFj2I1qqf3pciFvvUWrV7oUv
-         1Yb2AmUuJq+c7/wyTaKZlfjPoGc5LIo7Il8aK5QeZK55fMUejYcTXwMtL8NjB+mCtiEW
-         PkKy4Ls1sIB/fGqVnh32lEe9W4Is497eMDIKIqrItnktrE/Si8WNWkyvjSmGwIL5yMBg
-         KdsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725443001; x=1726047801;
-        h=content-transfer-encoding:mime-version:date:message-id:subject
-         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sWZolsXsCTYach8lH36h3ott3yh0cTGFzhMl58gyIUQ=;
-        b=Bhf5ZzVvJVhiLzn30KJjCbOZVSSquns0JMoVoPm3b/zdQswjqJIjO+s74/JFmYlfYo
-         zqjQh3AFGAKn7nxVqdFhHIqifCJnEnu892kCESRpbWaLF2lXsAYKVm2HRZ8/siJrv60z
-         3Z23inQSvhFmuRs+zKSFQEGs9VyO4PpcQlQ5gNjyyL/5qX1iRQ5pnjvJefXx8xlyMiYQ
-         vIQWiqf5vkZvhhmREFLQm0bwUwbyMXkzMHAM/Lm9pOBxjVs+iZIdDWmXjsaRINpirlBB
-         wTYjqXIYa2BLbxVJMcdLVrJ+M02OaanDToE3cJXFk4T5L7xklCVNpxpfQmtiaKXyjHhW
-         1uBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXtdlwWLO7whRB3gWMmr4FV6tFHM19DrnzbQqoZGoITcB0VHZebWzV9rkzvkOr0fbEJcswRANw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxti9/eMsbWOhGbxF4wMxKMQQqzOz+3kz6uv5CDiO3KxnDS/7lZ
-	bBVJ+RWufyKVn5wRjDglFnQDn5VvOSfqZUd5AQ32VFh4Ah7iKKm+SKUw0x7oKCA=
-X-Google-Smtp-Source: AGHT+IHQzzEaWIdg5FQFeuNQ9jdB9UOFp8iR16R1FSzfKc0rt/an2lTY0zgJAfLv9/Z5bc7o2LfPBQ==
-X-Received: by 2002:a05:6512:304b:b0:52e:9b4f:dd8c with SMTP id 2adb3069b0e04-53565f22b01mr1327352e87.35.1725443000659;
-        Wed, 04 Sep 2024 02:43:20 -0700 (PDT)
-Received: from [127.0.1.1] ([84.232.173.69])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8988fefb60sm788159666b.43.2024.09.04.02.43.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 02:43:20 -0700 (PDT)
-From: Abel Vesa <abel.vesa@linaro.org>
-To: robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, 
- Shawn Guo <shawnguo@kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, 
- Abel Vesa <abelvesa@kernel.org>, 
- Michael Turquette <mturquette@baylibre.com>, 
- Stephen Boyd <sboyd@kernel.org>, richardcochran@gmail.com, 
- Michel Alex <Alex.Michel@wiedemann-group.com>
-Cc: o.rempel@pengutronix.de, lee@kernel.org, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, 
- linux@armlinux.org.uk, linux-kernel@vger.kernel.org, 
- linux-clk@vger.kernel.org, netdev@vger.kernel.org, 
- Waibel Georg <Georg.Waibel@wiedemann-group.com>, 
- Appelt Andreas <Andreas.Appelt@wiedemann-group.com>
-In-Reply-To: <AS1P250MB0608F9CE4009DCE65C61EEDEA9922@AS1P250MB0608.EURP250.PROD.OUTLOOK.COM>
-References: <AS1P250MB0608F9CE4009DCE65C61EEDEA9922@AS1P250MB0608.EURP250.PROD.OUTLOOK.COM>
-Subject: Re: [PATCH 1/1] clk: imx6ul: fix clock parent for
- IMX6UL_CLK_ENETx_REF_SEL
-Message-Id: <172544299910.2790271.1284838688580694607.b4-ty@linaro.org>
-Date: Wed, 04 Sep 2024 12:43:19 +0300
+	s=arc-20240116; t=1725443243; c=relaxed/simple;
+	bh=NJJlypCq1LVHV4kyZNF2O/nW1CPY7AkFuVbyQeuM/+E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=eGClNfK6+kx/bsuQdxFQoopAraoUxy/P2Pwb4zRLqHZBiUHs+ftSSeCSwK3wKBFLIdMC5gE1lE1OZEuWEBuQ0p5T/pFZePz5zzu7muXav8rLKMijVdFsTujrfkc0JPAWp46GPaBSQEeZZckLoxvvVlFitxUmCp1/dX1b794QhqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=i3uf3rRD; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id EA863A06B4;
+	Wed,  4 Sep 2024 11:47:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=RkK3vo5zWN5RQH6TthlM
+	e0arEoVY5UTrRohbXOD6Lbs=; b=i3uf3rRDs7r/xLGMYq/RAl4dWIIQbgaYWzzb
+	Lq+OsXwnk3Rk8xmaLi3dsm/B8tOB62DBPMUeHD2hE96NQfA+kejLqr637cIOCjwU
+	FFy6/7Pctfy0DSaJqG25rsvvHINPar+gsAAWjuMaJBYOgXEWDWhfyv8TTod0R+lr
+	EdPlUrE/hGxqx4NpsKEd7KfjKgzx5pPVNGW6U/STjq86dLsClIeMcOusq6gSNw7z
+	/DdfjuwbaUwSHNfzY52KD3jenDpGw7cfKPrwviXQFgEPEKabtPjqDVzZYAPmZRMr
+	y3g2XiifDfzSEL7vWcdHl3ENytLL5myMQURGvVYmV12Y37dgWrZKYTYAeEL88IQa
+	BHXi0X8f2J/2UP2lHekgJx1rRS+93818OB2rNGNQ5PihCiv1XUmAcleypVnJfT/d
+	4hillteqVdEcSd2u0+5iA6pVGfgkIcuYGYEQKLTQMQpvcBJGI8es0k63pLEenYZV
+	ygZY5HhvV1HPX48yUAKodmSuVnvIcLeaZDlQqBfI6nFwG7YsSAeIpNEIthyxvd+V
+	ZQMFi60n0J4hazbWL18VUF9JelcnSj42ACFmO9qcbn0gQPPEAW7EcagH1Ci/k15O
+	kCfA4lM/gXsldW+3Uocf/gBHfvE2DMNCKxAvUJpozoEJLFVqExuUexNTtZ3Bzj/p
+	5C1bnOE=
+Message-ID: <c39614d2-2bac-4b05-8e50-3cefbfd8ed0c@prolan.hu>
+Date: Wed, 4 Sep 2024 11:47:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 0/3] net: fec: add PPS channel configuration
+To: Marc Kleine-Budde <mkl@pengutronix.de>, Francesco Dolcini
+	<francesco@dolcini.it>
+CC: <imx@lists.linux.dev>, Eric Dumazet <edumazet@google.com>, Fabio Estevam
+	<festevam@gmail.com>, Rob Herring <robh@kernel.org>, Shenwei Wang
+	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Linux Team
+	<linux-imx@nxp.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Sascha Hauer <s.hauer@pengutronix.de>,
+	<devicetree@vger.kernel.org>, Conor Dooley <conor+dt@kernel.org>, "Richard
+ Cochran" <richardcochran@gmail.com>, Wei Fang <wei.fang@nxp.com>, "Francesco
+ Dolcini" <francesco.dolcini@toradex.com>,
+	<linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Pengutronix Kernel Team
+	<kernel@pengutronix.de>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Shawn Guo
+	<shawnguo@kernel.org>, "David S. Miller" <davem@davemloft.net>
+References: <20240809094804.391441-1-francesco@dolcini.it>
+ <311a8d91-8fa8-4f46-8950-74d5fcfa7d15@prolan.hu>
+ <20240903160700.GB20205@francesco-nb>
+ <20240903-keen-feathered-nyala-1f91cd-mkl@pengutronix.de>
+Content-Language: en-US
+From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
+In-Reply-To: <20240903-keen-feathered-nyala-1f91cd-mkl@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
+ ATLAS.intranet.prolan.hu (10.254.0.229)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2980D94854627461
 
+Hi!
 
-On Mon, 02 Sep 2024 09:05:53 +0000, Michel Alex wrote:
-> Commit 4e197ee880c24ecb63f7fe17449b3653bc64b03c ("clk: imx6ul: add
-> ethernet refclock mux support") sets the internal clock as default
-> ethernet clock.
+On 9/3/24 18:57, Marc Kleine-Budde wrote:
+> On 03.09.2024 18:07:00, Francesco Dolcini wrote:
+>> On Tue, Sep 03, 2024 at 04:10:28PM +0200, Csókás Bence wrote:
+>>> What's the status of this? Also, please Cc: me in further
+>>> conversations/revisions as well.
+>>
+>> I am going to send a v4 in the next few days to address the comments
+>> on the dt-bindings change and apart of that I hope is good to go.
 > 
-> Since IMX6UL_CLK_ENET_REF cannot be parent for IMX6UL_CLK_ENET1_REF_SEL,
-> the call to clk_set_parent() fails. IMX6UL_CLK_ENET1_REF_125M is the correct
-> parent and shall be used instead.
-> Same applies for IMX6UL_CLK_ENET2_REF_SEL, for which IMX6UL_CLK_ENET2_REF_125M
-> is the correct parent.
+> Have you read Richard's feedback on this?
 > 
-> [...]
+> | https://lore.kernel.org/all/YvLJJkV2GRJWl7tA@hoboy.vegasvil.org
+> 
+> There seems to be a standard interface for what you're trying to do,
+> right?
 
-Applied, thanks!
+Yes, he was opposing the sysfs knobs I added, which is not in this patch 
+series. Back then, I got moved to another project so I didn't have the 
+time to address it. But once this series is merged, we can work on 
+run-time output switching using the API.
 
-[1/1] clk: imx6ul: fix clock parent for IMX6UL_CLK_ENETx_REF_SEL
-      commit: 32c055ef563c3a4a73a477839f591b1b170bde8e
+> regards,
+> Marc
 
-Best regards,
--- 
-Abel Vesa <abel.vesa@linaro.org>
+Bence
 
 
