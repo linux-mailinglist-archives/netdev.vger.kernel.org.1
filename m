@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-125114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E07296BF52
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:58:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B56396BF56
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:58:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD2072823DD
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:58:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D34291F22E36
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC29E1DA314;
-	Wed,  4 Sep 2024 13:57:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D026E1DAC46;
+	Wed,  4 Sep 2024 13:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J66VZFsU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BFUDVyEw"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 361611D9357
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 13:57:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8361DA31E
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 13:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725458242; cv=none; b=LnNHwfDM/d9NLiAAtUQmG+2FBZvWG8AHcMRfyiLxTbs7kSNYiYAqEakqNIuW65kpAYkgb47O7WgdzrAFxXn612OhmFXAGzzr0SHYywzocQwWuD/pCp2YlfSZ9cSi43jbmlAUG9IiVgzns03RZfaOsP5D8RS78sYmxAdvQNuUUu0=
+	t=1725458247; cv=none; b=ht2nxqx9eSnj2HTHD3EVozNKTHzHJZjv0gC8nBhLrpu7DMR9MxRs3v+MxE9wegidgzRUEPSGCfjK8pQJSyeosG0SiHCkfC/jkjanUr/o+8qI3Y6xQye1r3t1PhGn61pC0ABYv+OZHbfMoWGfyz/XAc8Lxj6B6IJerX5VDivOycU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725458242; c=relaxed/simple;
-	bh=atP9sngMqIF0w9U/fw6al8gA6pzyDa2I5hpWK3tcufY=;
+	s=arc-20240116; t=1725458247; c=relaxed/simple;
+	bh=BfFFUz95pnSk0uQIqlt2Y4dDPCdL6uN7ijzUgxVtm8k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DYH5F8Yfr8dd7CbPaxbjmwc/XwhpIfnD+GaVduAhCpDKOOZVPejDyM9oKiyDB8ABujQfZvyTdRq9r6lLOH0xJl4DUIpEtr5RByzaQhm8q5OVCeO9IcsaUn+DSJIMiylSh5008nuakMdKBsVT/0kWJ0Nyx1klJBdsgv+oP5BL3BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J66VZFsU; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=m/p94ZBV0tzBUg7mvPLFez1uEs9feS8wxKFSqELS3MeAryjI0ElOPsU17zUA+Bdp7i2PfcBiIJJmqS0OtM3nX3zSbMg63CWoU3mLEl9mdx1AXwnq0frdrZ4qV+GiUYrRxG9jTSXqnTyrBaZwdZPinJaQ014w/p5nUP8sZqRZB5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BFUDVyEw; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725458240;
+	s=mimecast20190719; t=1725458245;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/rDzmx9qvAFTo5DWPajpgBxxGC3BMj+Ow3FbdsiEZOE=;
-	b=J66VZFsUSPmSIvC26JF01Get4a38fePZkQmUWSyg0NBqdG/ji8Ygp2adRtQ6e+zS5pkuz7
-	dQKWdye7VKQJPwSF4AtBjCbyVoqovBrxU1zV6mEaifE4kufckkYEchpRFhY5Rju9xUi5vI
-	oBShpYyQau9z7byjfadNaOZ/vS4mCgc=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=XdTmUgJ2ULGvYG1rp4S3sHXg6KhU2KXc8KSoC3XxhBc=;
+	b=BFUDVyEwX8DJW/12BXeDALYg0Vwx30wpoJq6RWEf0OKgnzk78JBqbRnxqNtzEM2V3tZSdK
+	4qQ58sWZ7JFjPGK8Ig5iElHBwal8pBNhX0gzJ4biHd22P4NFAfeC8dRg4c+fODGhr+yFvs
+	SXkZZJFLpZ6eo2+VG1fR23CQ/SGOch4=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-237-5iUOcPQ7P-iAxqGK2wZ5Gw-1; Wed,
- 04 Sep 2024 09:57:14 -0400
-X-MC-Unique: 5iUOcPQ7P-iAxqGK2wZ5Gw-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-63-eyzxUEdpMze0i-2U8BpzOQ-1; Wed,
+ 04 Sep 2024 09:57:21 -0400
+X-MC-Unique: eyzxUEdpMze0i-2U8BpzOQ-1
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 84E2E19560B5;
-	Wed,  4 Sep 2024 13:57:11 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2A89F19560B7;
+	Wed,  4 Sep 2024 13:57:19 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.225.58])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CE3901956086;
-	Wed,  4 Sep 2024 13:57:06 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 1B8A71956088;
+	Wed,  4 Sep 2024 13:57:11 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -71,9 +71,9 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	przemyslaw.kitszel@intel.com,
 	intel-wired-lan@lists.osuosl.org,
 	edumazet@google.com
-Subject: [PATCH v6 net-next 06/15] net-shapers: implement delete support for NODE scope shaper
-Date: Wed,  4 Sep 2024 15:53:38 +0200
-Message-ID: <6ce5659240b0f0eb24c8afff4a0611659b089bed.1725457317.git.pabeni@redhat.com>
+Subject: [PATCH v6 net-next 07/15] net-shapers: implement shaper cleanup on queue deletion
+Date: Wed,  4 Sep 2024 15:53:39 +0200
+Message-ID: <160421ccd6deedfd4d531f0239e80077f19db1d0.1725457317.git.pabeni@redhat.com>
 In-Reply-To: <cover.1725457317.git.pabeni@redhat.com>
 References: <cover.1725457317.git.pabeni@redhat.com>
 Precedence: bulk
@@ -85,152 +85,88 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Leverage the previously introduced group operation to implement
-the removal of NODE scope shaper, re-linking its leaves under the
-the parent node before actually deleting the specified NODE scope
-shaper.
+hook into netif_set_real_num_tx_queues() to cleanup any shaper
+configured on top of the to-be-destroyed TX queues.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
-v4 -> v5:
- - replace net_device* with binding* in most helpers
----
- net/shaper/shaper.c | 87 ++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 75 insertions(+), 12 deletions(-)
+ net/core/dev.c      |  2 ++
+ net/core/dev.h      |  4 ++++
+ net/shaper/shaper.c | 31 +++++++++++++++++++++++++++++++
+ 3 files changed, 37 insertions(+)
 
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 8615f16e8456..33629a9d0661 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -2948,6 +2948,8 @@ int netif_set_real_num_tx_queues(struct net_device *dev, unsigned int txq)
+ 		if (dev->num_tc)
+ 			netif_setup_tc(dev, txq);
+ 
++		net_shaper_set_real_num_tx_queues(dev, txq);
++
+ 		dev_qdisc_change_real_num_tx(dev, txq);
+ 
+ 		dev->real_num_tx_queues = txq;
+diff --git a/net/core/dev.h b/net/core/dev.h
+index 13c558874af3..d3ea92949ff3 100644
+--- a/net/core/dev.h
++++ b/net/core/dev.h
+@@ -37,8 +37,12 @@ void dev_addr_check(struct net_device *dev);
+ 
+ #if IS_ENABLED(CONFIG_NET_SHAPER)
+ void net_shaper_flush_netdev(struct net_device *dev);
++void net_shaper_set_real_num_tx_queues(struct net_device *dev,
++				       unsigned int txq);
+ #else
+ static inline void net_shaper_flush_netdev(struct net_device *dev) {}
++static inline void net_shaper_set_real_num_tx_queues(struct net_device *dev,
++						     unsigned int txq) {}
+ #endif
+ 
+ /* sysctls not referred to from outside net/core/ */
 diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
-index c409acbe768c..1255d532b36a 100644
+index 1255d532b36a..f6f5712d7b3c 100644
 --- a/net/shaper/shaper.c
 +++ b/net/shaper/shaper.c
-@@ -804,7 +804,8 @@ static int net_shaper_parent_from_leaves(int leaves_count,
+@@ -1201,6 +1201,37 @@ void net_shaper_flush_netdev(struct net_device *dev)
+ 	net_shaper_flush(&binding);
  }
  
- static int __net_shaper_group(struct net_shaper_binding *binding,
--			      int leaves_count, struct net_shaper *leaves,
-+			      bool update_node, int leaves_count,
-+			      struct net_shaper *leaves,
- 			      struct net_shaper *node,
- 			      struct netlink_ext_ack *extack)
- {
-@@ -848,12 +849,14 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
- 		}
- 	}
- 
--	/* For newly created node scope shaper, the following will update
--	 * the handle, due to id allocation.
--	 */
--	ret = net_shaper_pre_insert(binding, &node->handle, extack);
--	if (ret)
--		return ret;
-+	if (update_node) {
-+		/* For newly created node scope shaper, the following will
-+		 * update the handle, due to id allocation.
-+		 */
-+		ret = net_shaper_pre_insert(binding, &node->handle, extack);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	for (i = 0; i < leaves_count; ++i) {
- 		leaf_handle = leaves[i].handle;
-@@ -878,7 +881,8 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
- 
- 	if (parent)
- 		parent->leaves++;
--	net_shaper_commit(binding, 1, node);
-+	if (update_node)
-+		net_shaper_commit(binding, 1, node);
- 	net_shaper_commit(binding, leaves_count, leaves);
- 	return 0;
- 
-@@ -887,6 +891,64 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
- 	return ret;
- }
- 
-+static int net_shaper_pre_del_node(struct net_shaper_binding *binding,
-+				   const struct net_shaper *shaper,
-+				   struct netlink_ext_ack *extack)
++void net_shaper_set_real_num_tx_queues(struct net_device *dev,
++				       unsigned int txq)
 +{
-+	struct net_shaper_hierarchy *hierarchy = net_shaper_hierarchy(binding);
-+	struct net_shaper *cur, *leaves, node = {};
-+	int ret, leaves_count = 0;
-+	unsigned long index;
-+	bool update_node;
++	struct net_shaper_hierarchy *hierarchy;
++	struct net_shaper_binding binding;
++	int i;
 +
-+	if (!shaper->leaves)
-+		return 0;
++	binding.type = NET_SHAPER_BINDING_TYPE_NETDEV;
++	binding.netdev = dev;
++	hierarchy = net_shaper_hierarchy(&binding);
++	if (!hierarchy)
++		return;
 +
-+	/* Fetch the new node information. */
-+	node.handle = shaper->parent;
-+	cur = net_shaper_lookup(binding, &node.handle);
-+	if (cur) {
-+		node = *cur;
-+	} else {
-+		/* A scope NODE shaper can be nested only to the NETDEV scope
-+		 * shaper without creating the latter, this check may fail only
-+		 * if the data is in inconsistent status.
-+		 */
-+		if (WARN_ON_ONCE(node.handle.scope != NET_SHAPER_SCOPE_NETDEV))
-+			return -EINVAL;
-+	}
++	net_shaper_lock(&binding);
 +
-+	leaves = kcalloc(shaper->leaves, sizeof(struct net_shaper),
-+			 GFP_KERNEL);
-+	if (!leaves)
-+		return -ENOMEM;
++	/* Take action only when decreasing the tx queue number. */
++	for (i = txq; i < dev->real_num_tx_queues; ++i) {
++		struct net_shaper_handle handle;
++		struct net_shaper *shaper;
 +
-+	/* Build the leaves arrays. */
-+	xa_for_each(&hierarchy->shapers, index, cur) {
-+		if (net_shaper_handle_cmp(&cur->parent, &shaper->handle))
++		handle.scope = NET_SHAPER_SCOPE_QUEUE;
++		handle.id = i;
++		shaper = net_shaper_lookup(&binding, &handle);
++		if (!shaper)
 +			continue;
 +
-+		if (WARN_ON_ONCE(leaves_count == shaper->leaves)) {
-+			ret = -EINVAL;
-+			goto free;
-+		}
-+
-+		leaves[leaves_count++] = *cur;
++		__net_shaper_delete(&binding, shaper, NULL);
 +	}
-+
-+	/* When re-linking to the netdev shaper, avoid the eventual, implicit,
-+	 * creation of the new node, would be surprising since the user is
-+	 * doing a delete operation.
-+	 */
-+	update_node = node.handle.scope != NET_SHAPER_SCOPE_NETDEV;
-+	ret = __net_shaper_group(binding, update_node, leaves_count,
-+				 leaves, &node, extack);
-+
-+free:
-+	kfree(leaves);
-+	return ret;
++	net_shaper_unlock(&binding);
 +}
 +
- static int net_shaper_delete(struct net_shaper_binding *binding,
- 			     const struct net_shaper_handle *handle,
- 			     struct netlink_ext_ack *extack)
-@@ -910,9 +972,9 @@ static int net_shaper_delete(struct net_shaper_binding *binding,
- 	}
- 
- 	if (handle->scope == NET_SHAPER_SCOPE_NODE) {
--		/* TODO: implement support for scope NODE delete. */
--		ret = -EINVAL;
--		goto unlock;
-+		ret = net_shaper_pre_del_node(binding, shaper, extack);
-+		if (ret)
-+			goto unlock;
- 	}
- 
- 	ret = __net_shaper_delete(binding, shaper, extack);
-@@ -977,7 +1039,8 @@ static int net_shaper_group(struct net_shaper_binding *binding,
- 		}
- 	}
- 
--	ret = __net_shaper_group(binding, leaves_count, leaves, node, extack);
-+	ret = __net_shaper_group(binding, true, leaves_count, leaves, node,
-+				 extack);
- 
- 	/* Check if we need to delete any nde left alone by the new leaves
- 	 * linkage.
+ static int __init shaper_init(void)
+ {
+ 	return genl_register_family(&net_shaper_nl_family);
 -- 
 2.45.2
 
