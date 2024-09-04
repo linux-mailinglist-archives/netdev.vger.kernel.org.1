@@ -1,217 +1,96 @@
-Return-Path: <netdev+bounces-125045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 221AB96BBB9
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:12:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC9B396BBC4
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:13:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D170728B1C7
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:12:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BCCA1C20B03
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E6A1D88DB;
-	Wed,  4 Sep 2024 12:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F021B1D0167;
+	Wed,  4 Sep 2024 12:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Ge6JTrj4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mlM2Nzoo"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward103b.mail.yandex.net (forward103b.mail.yandex.net [178.154.239.150])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0C31D9324
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 12:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A271D4175
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 12:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725451735; cv=none; b=feNf9X9W9turvXFTXq8bWN1YBxg4A3vj+jdQV/B8RqZJKrDr3cWun2D4U+ZN8UgcSBWv0iBRVAKTlYtWiaOIR+IH6VD7T6KAWuLnnfpt5esui/DKVcAA9odn7QvdSaBxxExQhYink3Y83kDAYhZwEAADHTLlMj9C7OJ96ryhn7k=
+	t=1725452033; cv=none; b=r6VoSq+xv/O3R33WNWXMcCq3SVT569SvgBaMEAh6i3Zew7hUIcx22VPIyv2ex9W4uPgB0eS5s3bZR/VdKpjbIGqvcAHIbhmZYHY90/K68fKwT6qju5o1Prz3VQEKFle7daDlmZrNByfCjNCLBLQDVlTxG/tbGVNUblQq7G//oJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725451735; c=relaxed/simple;
-	bh=KBIKzSJ2y950AawPCuuqBxxswx//LhgPkuSFy7P+ohs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z//B7JNRvxccV1qC8UbvK55ZfYeqzKq6sMZcxM5Jsf3MPo22ollJVtU54eEaCIoZOc0UyS1uc5O6WfaeSVz8KcPWtEF3YAd2YE6mHTGftsqsYt5wiujgw6t3yXG+sU4JpitBm0xeV1cqv4/li1o/lZPqjACovhwvC2jspRRumPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Ge6JTrj4; arc=none smtp.client-ip=178.154.239.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-39.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-39.sas.yp-c.yandex.net [IPv6:2a02:6b8:c08:f220:0:640:b85:0])
-	by forward103b.mail.yandex.net (Yandex) with ESMTPS id 0E254608EF;
-	Wed,  4 Sep 2024 15:08:46 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-39.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id h8b9pL7j6Os0-ery1ZJs3;
-	Wed, 04 Sep 2024 15:08:45 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1725451725; bh=ivikaq4vTByAJ8AvPVY5WYjs5UD/23MKHsornkD7C8A=;
-	h=Message-ID:Date:In-Reply-To:Cc:Subject:References:To:From;
-	b=Ge6JTrj4XwrodQ7UTw/t4SuEpOHO11kbAOTSDavkg7+E6su6+oZjuz/kSf9HFYXF3
-	 9zXzaEv18J2SrkhmuC4SNC4ykCkmStwqvgpbERo+kINqWKf72oWnZ09Rt2ytbNRjMK
-	 Keti2IhY+j8+liEeouSgQX/gwML8nHRdxGAbP6eE=
-Authentication-Results: mail-nwsmtp-smtp-production-main-39.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH net v5 2/2] net: sched: use RCU read-side critical section in taprio_dump()
-Date: Wed,  4 Sep 2024 15:08:42 +0300
-Message-ID: <20240904120842.3426084-2-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240904120842.3426084-1-dmantipov@yandex.ru>
-References: <20240904120842.3426084-1-dmantipov@yandex.ru>
+	s=arc-20240116; t=1725452033; c=relaxed/simple;
+	bh=yzDJBItoY7P4Oa0onc63fgdZDI/hQiOkDASAHjJabvU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WlmZA/kPLLfRnls0/UOH/ExnaJwoS6W7+7oBcEO7EY91jsSiPM7f1g/pvzHnBqPBGZdavm9sRamLswgUmJiF8TTF0IQPRjBBDSqHM4vvK6Q24h0wx1hTTNdsnkun8iEYHp+NA1/vTw+QMaUpIZcfCtM9NG3L+9vekEGuiL40+n8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mlM2Nzoo; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=uh3zwQosGacku7wCYITExnVZrD8nWKDofzBx6XEt7T8=; b=mlM2NzootN0hH8Q8aa21fcpw5o
+	2tCCGYTQ4pbiWGRmnkd7EoU81eNdhxGlbCh+XSoXBUm6oWfq95vQoll/fTCSlhwSm0uCk5+/Bj9Pc
+	RZC/Y49CGWRamPWAiYaXiKbss5yg40DzPjMgqMaYfruv0WHbKM5D6cIjMdS4WbaObeN8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1slotG-006YDY-SV; Wed, 04 Sep 2024 14:13:38 +0200
+Date: Wed, 4 Sep 2024 14:13:38 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Takamitsu Iwai <takamitz@amazon.co.jp>
+Cc: anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
+	intel-wired-lan@lists.osuosl.org, kuba@kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH v1 net-next] e1000e: Remove duplicated writel() in
+ e1000_configure_tx/rx()
+Message-ID: <b6b56dd0-b6ff-47d1-a678-d2fde5184723@lunn.ch>
+References: <3ef52bb5-3289-416a-81b6-4064c49960c8@lunn.ch>
+ <20240904055646.58588-1-takamitz@amazon.co.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240904055646.58588-1-takamitz@amazon.co.jp>
 
-Fix possible use-after-free in 'taprio_dump()' by adding RCU
-read-side critical section there. Never seen on x86 but
-found on a KASAN-enabled arm64 system when investigating
-https://syzkaller.appspot.com/bug?extid=b65e0af58423fc8a73aa:
+On Wed, Sep 04, 2024 at 02:56:46PM +0900, Takamitsu Iwai wrote:
+> > So you have confirmed with the datsheet that the write is not needed?
+> >
+> > As i said, this is a hardware register, not memory. Writes are not
+> > always idempotent. It might be necessary to write it twice.
+> 
+> I have checked following datasheets and I can not find that we need to write
+> RDH, RDT, TDH, TDT registers twice at initialization.
+> 
+> https://www.intel.com/content/dam/www/public/us/en/documents/datasheets/82577-gbe-phy-datasheet.pdf
+> https://www.intel.com/content/www/us/en/content-details/613460/intel-82583v-gbe-controller-datasheet.html
+> 
+> Write happened once before commit 0845d45e900c, so just out of curiosity,
+> have you seen such a device?
 
-[T15862] BUG: KASAN: slab-use-after-free in taprio_dump+0xa0c/0xbb0
-[T15862] Read of size 4 at addr ffff0000d4bb88f8 by task repro/15862
-[T15862]
-[T15862] CPU: 0 UID: 0 PID: 15862 Comm: repro Not tainted 6.11.0-rc1-00293-gdefaf1a2113a-dirty #2
-[T15862] Hardware name: QEMU QEMU Virtual Machine, BIOS edk2-20240524-5.fc40 05/24/2024
-[T15862] Call trace:
-[T15862]  dump_backtrace+0x20c/0x220
-[T15862]  show_stack+0x2c/0x40
-[T15862]  dump_stack_lvl+0xf8/0x174
-[T15862]  print_report+0x170/0x4d8
-[T15862]  kasan_report+0xb8/0x1d4
-[T15862]  __asan_report_load4_noabort+0x20/0x2c
-[T15862]  taprio_dump+0xa0c/0xbb0
-[T15862]  tc_fill_qdisc+0x540/0x1020
-[T15862]  qdisc_notify.isra.0+0x330/0x3a0
-[T15862]  tc_modify_qdisc+0x7b8/0x1838
-[T15862]  rtnetlink_rcv_msg+0x3c8/0xc20
-[T15862]  netlink_rcv_skb+0x1f8/0x3d4
-[T15862]  rtnetlink_rcv+0x28/0x40
-[T15862]  netlink_unicast+0x51c/0x790
-[T15862]  netlink_sendmsg+0x79c/0xc20
-[T15862]  __sock_sendmsg+0xe0/0x1a0
-[T15862]  ____sys_sendmsg+0x6c0/0x840
-[T15862]  ___sys_sendmsg+0x1ac/0x1f0
-[T15862]  __sys_sendmsg+0x110/0x1d0
-[T15862]  __arm64_sys_sendmsg+0x74/0xb0
-[T15862]  invoke_syscall+0x88/0x2e0
-[T15862]  el0_svc_common.constprop.0+0xe4/0x2a0
-[T15862]  do_el0_svc+0x44/0x60
-[T15862]  el0_svc+0x50/0x184
-[T15862]  el0t_64_sync_handler+0x120/0x12c
-[T15862]  el0t_64_sync+0x190/0x194
-[T15862]
-[T15862] Allocated by task 15857:
-[T15862]  kasan_save_stack+0x3c/0x70
-[T15862]  kasan_save_track+0x20/0x3c
-[T15862]  kasan_save_alloc_info+0x40/0x60
-[T15862]  __kasan_kmalloc+0xd4/0xe0
-[T15862]  __kmalloc_cache_noprof+0x194/0x334
-[T15862]  taprio_change+0x45c/0x2fe0
-[T15862]  tc_modify_qdisc+0x6a8/0x1838
-[T15862]  rtnetlink_rcv_msg+0x3c8/0xc20
-[T15862]  netlink_rcv_skb+0x1f8/0x3d4
-[T15862]  rtnetlink_rcv+0x28/0x40
-[T15862]  netlink_unicast+0x51c/0x790
-[T15862]  netlink_sendmsg+0x79c/0xc20
-[T15862]  __sock_sendmsg+0xe0/0x1a0
-[T15862]  ____sys_sendmsg+0x6c0/0x840
-[T15862]  ___sys_sendmsg+0x1ac/0x1f0
-[T15862]  __sys_sendmsg+0x110/0x1d0
-[T15862]  __arm64_sys_sendmsg+0x74/0xb0
-[T15862]  invoke_syscall+0x88/0x2e0
-[T15862]  el0_svc_common.constprop.0+0xe4/0x2a0
-[T15862]  do_el0_svc+0x44/0x60
-[T15862]  el0_svc+0x50/0x184
-[T15862]  el0t_64_sync_handler+0x120/0x12c
-[T15862]  el0t_64_sync+0x190/0x194
-[T15862]
-[T15862] Freed by task 6192:
-[T15862]  kasan_save_stack+0x3c/0x70
-[T15862]  kasan_save_track+0x20/0x3c
-[T15862]  kasan_save_free_info+0x4c/0x80
-[T15862]  poison_slab_object+0x110/0x160
-[T15862]  __kasan_slab_free+0x3c/0x74
-[T15862]  kfree+0x134/0x3c0
-[T15862]  taprio_free_sched_cb+0x18c/0x220
-[T15862]  rcu_core+0x920/0x1b7c
-[T15862]  rcu_core_si+0x10/0x1c
-[T15862]  handle_softirqs+0x2e8/0xd64
-[T15862]  __do_softirq+0x14/0x20
+This is just risk minimisation. I don't want e1000e to be broken
+because you removed a write. I'm trying to ensure you fully understand
+what you are changing, and have verified it is a safe change. I don't
+have this hardware, so i cannot test it.
 
-Fixes: 18cdd2f0998a ("net/sched: taprio: taprio_dump and taprio_change are protected by rtnl_mutex")
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
-v5: add Fixes: and resend due to series change
-v4: redesign to preserve original code as much as possible,
-    adjust commit message and subject to target net tree
-v3: tweak commit message as suggested by Vinicius
-v2: added to the series
----
- net/sched/sch_taprio.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+> My colleague, Kohei, tested the patch with a real hardware and will provide his
+> Tested-by shortly.
 
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index 59fad74d5ff9..522eec6f92d1 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -2372,9 +2372,6 @@ static int taprio_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	struct tc_mqprio_qopt opt = { 0 };
- 	struct nlattr *nest, *sched_nest;
- 
--	oper = rtnl_dereference(q->oper_sched);
--	admin = rtnl_dereference(q->admin_sched);
--
- 	mqprio_qopt_reconstruct(dev, &opt);
- 
- 	nest = nla_nest_start_noflag(skb, TCA_OPTIONS);
-@@ -2395,18 +2392,23 @@ static int taprio_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	    nla_put_u32(skb, TCA_TAPRIO_ATTR_TXTIME_DELAY, q->txtime_delay))
- 		goto options_error;
- 
-+	rcu_read_lock();
-+
-+	oper = rtnl_dereference(q->oper_sched);
-+	admin = rtnl_dereference(q->admin_sched);
-+
- 	if (oper && taprio_dump_tc_entries(skb, q, oper))
--		goto options_error;
-+		goto options_error_rcu;
- 
- 	if (oper && dump_schedule(skb, oper))
--		goto options_error;
-+		goto options_error_rcu;
- 
- 	if (!admin)
- 		goto done;
- 
- 	sched_nest = nla_nest_start_noflag(skb, TCA_TAPRIO_ATTR_ADMIN_SCHED);
- 	if (!sched_nest)
--		goto options_error;
-+		goto options_error_rcu;
- 
- 	if (dump_schedule(skb, admin))
- 		goto admin_error;
-@@ -2414,11 +2416,15 @@ static int taprio_dump(struct Qdisc *sch, struct sk_buff *skb)
- 	nla_nest_end(skb, sched_nest);
- 
- done:
-+	rcu_read_unlock();
- 	return nla_nest_end(skb, nest);
- 
- admin_error:
- 	nla_nest_cancel(skb, sched_nest);
- 
-+options_error_rcu:
-+	rcu_read_unlock();
-+
- options_error:
- 	nla_nest_cancel(skb, nest);
- 
--- 
-2.46.0
+Please resend the patch, adding his Tested-by: and update the commit
+message to summarise this discussion. Explain how you determined this
+is safe.
 
+Thanks
+	Andrew
 
