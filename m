@@ -1,236 +1,202 @@
-Return-Path: <netdev+bounces-125259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07DF696C835
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 22:14:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01F4396C82A
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 22:07:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 192F51C22430
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:14:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81AC6B21B57
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4331E4924;
-	Wed,  4 Sep 2024 20:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB9EA1E765C;
+	Wed,  4 Sep 2024 20:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="esiHTpoQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from trager.us (trager.us [52.5.81.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6975140C03
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 20:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258651E6DFE;
+	Wed,  4 Sep 2024 20:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725480875; cv=none; b=aZK9wggpHEmAHMPeRcaaIuzujcELmwiwa90ycnmZUVQilnxuhko9MmljSPDWKcElM5OqPZuQ6j8Z3dcegrwmsUWU9j32F06zzMUauErGlHzqcsn3uRHjA09hh+Fw59Kagp17/hOU0Mat3sKCrQDeyIvnQl4k18l9cWuwiIRoqmg=
+	t=1725480426; cv=none; b=iSeAFsNaiL9PqWnk0X5xhHgVSoGoZC3MEy3IXV55wRhhP5Hx3nIhjwXkdVmeEIJv2shZioTAh8XwLUX5zjEJiwQXWUpZYr+zLpM/HIjPSVSCFM+wWbG4qVybqxmn0gj/QVSUP+WqDAnp2Fgbz36u8aCApFvMaynGJI1KgHjLuys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725480875; c=relaxed/simple;
-	bh=cQQmJ5AgekB3x6oTYMEqlDF58JG5FJt2/c46w/qfVsE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bgkTKe4irmPcs2KqwEC1UPSr+PfDjD3RlQluW2tXMQ1N7RJliVwCPYXltGLfT7KccM6ak5O3PrsnVypF0cyaQGn0aNtlSyFqHhV9O4WFXN4l37vXru7yz8Dq4J1VGN+Bsaj3hrO4dmd6EQFZkJx6lTIXlZXJLuNhy6LftNPaxTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
-Received: from c-76-104-255-50.hsd1.wa.comcast.net ([76.104.255.50] helo=localhost)
-	by trager.us with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92.3)
-	(envelope-from <lee@trager.us>)
-	id 1slw06-0008N5-OB; Wed, 04 Sep 2024 19:49:10 +0000
-From: Lee Trager <lee@trager.us>
-To: netdev@vger.kernel.org
-Cc: Lee Trager <lee@trager.us>
-Subject: [PATCH net-next] eth: fbnic: Add devlink firmware version info
-Date: Wed,  4 Sep 2024 12:48:43 -0700
-Message-ID: <20240904194858.2326245-1-lee@trager.us>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1725480426; c=relaxed/simple;
+	bh=mSJMIPpxf/aZZjXfGdWtxZJ8a+BvEArfhwscDhs6+0g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kthIEChcCye6loEPjomjIda5+EVak74SHQLefJMNY2D64VPSY/M1RNOTvTu/0XSl1y6I7CLijDARIb3HXhTSZI4osHKta9PleCDpqS5LPSZHsOWJm5hzEeTeH988Cu6KCjO47DCratk9jpALSuwvh0AGFNwzgck7IIqmZV9vios=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=esiHTpoQ; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2daaa9706a9so473634a91.1;
+        Wed, 04 Sep 2024 13:07:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725480424; x=1726085224; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PL5zY783QL6X5SPFrBarOo4DnXUeqnKK/ReHZ/2FTPE=;
+        b=esiHTpoQW5fbVwa1+8igY2eB2jZVcESmEvlP6i2ui9oLi+nRHCuluurj/1AlgNeMVy
+         54OgxcjQUboVaFmLNRLDLMHFL2foifwmXyVxnJ/7lUYdNj3YjgKvzsP04BS6fUDFp4xB
+         poT4/8ZjihdFszYLRXM3JmoGEv//bqOIDv+eKhv1gcMtGBs4ZtyKHzCrYhkOxqN49q/j
+         ATNu6U7WCbnH+nFkVt3Gad44KP36W6WEETj02UReip5hGFI/kMvZ9OlMVRBtmmU3Hoic
+         wP435rfFeIhjl4OiedcXKk9FCWRffF3xgVJGe4RmUHveLsToXaWw+NiSP0S+I2orRZ1N
+         bKjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725480424; x=1726085224;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PL5zY783QL6X5SPFrBarOo4DnXUeqnKK/ReHZ/2FTPE=;
+        b=Ln+aaBev3S+p/ErGJ9pJsl4/HzAscXBNHpui696JEWJOk2pXRqkRrintOyAzJXy6Tm
+         NnD0jHxi4eu0ftPlgw4cLIg1wR5nvDdrHy6j8q+zOBJb0W5584qrFnwfOXbupeHR9bsX
+         bUh/NzaOSeNFR6tb7oQtZeFtIciUVK8Cz9Mus8hlAk5zwA3l1ACjox5668OzndkFhSQ3
+         9BL96rPnpHZebcjRA+mF4+KgjjRjPr6QLFZbGXKGBtqbHpmTacvnPtknzFSQ4sojTqv7
+         qfuJnfVWPPajv01dOl2MiRrUDIYGW2SRcuo6/uIVNiPcETvOGhfcFgfmloRWYeD+rpZs
+         Ygbg==
+X-Forwarded-Encrypted: i=1; AJvYcCWN+UVrmjjenRtEiKe8+eLnxND0QDCNU1K8HDtuTmA69qQ48EKa/SiN5i/9DrzP2G166ZA=@vger.kernel.org, AJvYcCXa7PAAqwApxz9YPVa6UHWIGTXHy8jXTn7y3a01QPCvqPGvN9thDpPyATCTVlFdOOvI0oF6Yy3Y@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXvyqPe26QRRbocbLn02hDzM2lqsiHH7G9hcdbiNd8uYKYMLl5
+	3FyvJkV5VCWMqtnXPbeig6pL4BFg6VP0Ez70EuQyijJAbcVhh4Ulwinoag75NUUotw2HEnqF4S+
+	Pqa479BehiIFLGGpEb1b/PukGk9XSTo0h
+X-Google-Smtp-Source: AGHT+IHtKAjwXpinnH/tZqcUVI5V2F9+JpSGQtocw+PFEoWrofm1Hdvs5NukodR/4HCKVW1RwKcnqKJY07uQSatTYXY=
+X-Received: by 2002:a17:90a:df0f:b0:2d8:8681:44ba with SMTP id
+ 98e67ed59e1d1-2da62fdd953mr7557029a91.15.1725480424326; Wed, 04 Sep 2024
+ 13:07:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240831041934.1629216-1-pulehui@huaweicloud.com>
+ <20240831041934.1629216-3-pulehui@huaweicloud.com> <2379c139-6457-49dc-84fa-0d60ce226f2a@huaweicloud.com>
+ <79b30c83-ee5e-453d-981e-61f826cf82d7@huaweicloud.com>
+In-Reply-To: <79b30c83-ee5e-453d-981e-61f826cf82d7@huaweicloud.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Wed, 4 Sep 2024 13:06:51 -0700
+Message-ID: <CAEf4BzZ4M5GK6_hopdL-8k+=-g975LoY71r6_YKdj-PxXthaMg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 2/4] libbpf: Access first syscall argument
+ with CO-RE direct read on arm64
+To: Xu Kuohai <xukuohai@huaweicloud.com>
+Cc: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, netdev@vger.kernel.org, 
+	Andrii Nakryiko <andrii@kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Puranjay Mohan <puranjay@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Pu Lehui <pulehui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This adds support to show firmware version information for both stored and
-running firmware versions. The version and commit is displayed separately
-to aid monitoring tools which only care about the version.
+On Sat, Aug 31, 2024 at 12:57=E2=80=AFAM Xu Kuohai <xukuohai@huaweicloud.co=
+m> wrote:
+>
+> On 8/31/2024 3:26 PM, Xu Kuohai wrote:
+> > On 8/31/2024 12:19 PM, Pu Lehui wrote:
+> >> From: Pu Lehui <pulehui@huawei.com>
+> >>
+> >> Currently PT_REGS_PARM1 SYSCALL(x) is consistent with PT_REGS_PARM1_CO=
+RE
+> >> SYSCALL(x), which will introduce the overhead of BPF_CORE_READ(), taki=
+ng
+> >> into account the read pt_regs comes directly from the context, let's u=
+se
+> >> CO-RE direct read to access the first system call argument.
+> >>
+> >> Suggested-by: Andrii Nakryiko <andrii@kernel.org>
+> >> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+> >> ---
+> >>   tools/lib/bpf/bpf_tracing.h | 4 ++--
+> >>   1 file changed, 2 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/tools/lib/bpf/bpf_tracing.h b/tools/lib/bpf/bpf_tracing.h
+> >> index e7d9382efeb3..051c408e6aed 100644
+> >> --- a/tools/lib/bpf/bpf_tracing.h
+> >> +++ b/tools/lib/bpf/bpf_tracing.h
+> >> @@ -222,7 +222,7 @@ struct pt_regs___s390 {
+> >>   struct pt_regs___arm64 {
+> >>       unsigned long orig_x0;
+> >> -};
+> >> +} __attribute__((preserve_access_index));
+> >>   /* arm64 provides struct user_pt_regs instead of struct pt_regs to u=
+serspace */
+> >>   #define __PT_REGS_CAST(x) ((const struct user_pt_regs *)(x))
+> >> @@ -241,7 +241,7 @@ struct pt_regs___arm64 {
+> >>   #define __PT_PARM4_SYSCALL_REG __PT_PARM4_REG
+> >>   #define __PT_PARM5_SYSCALL_REG __PT_PARM5_REG
+> >>   #define __PT_PARM6_SYSCALL_REG __PT_PARM6_REG
+> >> -#define PT_REGS_PARM1_SYSCALL(x) PT_REGS_PARM1_CORE_SYSCALL(x)
+> >> +#define PT_REGS_PARM1_SYSCALL(x) (((const struct pt_regs___arm64 *)(x=
+))->orig_x0)
+> >>   #define PT_REGS_PARM1_CORE_SYSCALL(x) \
+> >>       BPF_CORE_READ((const struct pt_regs___arm64 *)(x), __PT_PARM1_SY=
+SCALL_REG)
+> >
+> > Cool!
+> >
+> > Acked-by: Xu Kuohai <xukuohai@huawei.com>
+> >
+> >
+>
+> Wait, it breaks the following test:
+>
 
-Example output:
-  # devlink dev info
-  pci/0000:01:00.0:
-    driver fbnic
-    serial_number 88-25-08-ff-ff-01-50-92
-    versions:
-        running:
-          fw 24.07.15-017
-          fw.commit h999784ae9df0
-          fw.bootloader 24.07.10-000
-          fw.bootloader.commit hfef3ac835ce7
-        stored:
-          fw 24.07.24-002
-          fw.commit hc9d14a68b3f2
-          fw.bootloader 24.07.22-000
-          fw.bootloader.commit h922f8493eb96
-          fw.undi 01.00.03-000
+You mean, *if you change the existing test like below*, it will break,
+right? And that's expected, because arm64 has
+ARCH_HAS_SYSCALL_WRAPPER, which means syscall pt_regs are actually not
+the kprobe's ctx, so you can't directly access it. Which is why we
+have PT_REGS_PARM1_CORE_SYSCALL() variants.
 
-Signed-off-by: Lee Trager <lee@trager.us>
----
- .../device_drivers/ethernet/index.rst         |  1 +
- .../device_drivers/ethernet/meta/fbnic.rst    | 29 +++++++
- MAINTAINERS                                   |  1 +
- .../net/ethernet/meta/fbnic/fbnic_devlink.c   | 75 +++++++++++++++++++
- 4 files changed, 106 insertions(+)
- create mode 100644 Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+See how BPF_KSYSCALL macro is implemented, there are two cases:
+___bpf_syswap_args(), which uses BPF_CORE_READ()-based macros to fetch
+arguments, and ___bpf_syscall_args() which uses direct ctx reads.
 
-diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
-index 6932d8c043c2..6fc1961492b7 100644
---- a/Documentation/networking/device_drivers/ethernet/index.rst
-+++ b/Documentation/networking/device_drivers/ethernet/index.rst
-@@ -44,6 +44,7 @@ Contents:
-    marvell/octeon_ep
-    marvell/octeon_ep_vf
-    mellanox/mlx5/index
-+   meta/fbnic
-    microsoft/netvsc
-    neterion/s2io
-    netronome/nfp
-diff --git a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
-new file mode 100644
-index 000000000000..32ff114f5c26
---- /dev/null
-+++ b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
-@@ -0,0 +1,29 @@
-+.. SPDX-License-Identifier: GPL-2.0+
-+
-+=====================================
-+Meta Platforms Host Network Interface
-+=====================================
-+
-+Firmware Versions
-+-----------------
-+
-+fbnic has three components stored on the flash which are provided in one PLDM
-+image:
-+
-+1. fw - The control firmware used to view and modify firmware settings, request
-+   firmware actions, and retrieve firmware counters outside of the data path.
-+   This is the firmware which fbnic_fw.c interacts with.
-+2. bootloader - The firmware which validate firmware security and control basic
-+   operations including loading and updating the firmware. This is also known
-+   as the cmrt firmware.
-+3. undi - This is the UEFI driver which is based on the Linux driver.
-+
-+fbnic stores two copies of these three components on flash. This allows fbnic
-+to fall back to an older version of firmware automatically in case firmware
-+fails to boot. Version information for both is provided as running and stored.
-+The undi is only provided in stored as it is not actively running once the Linux
-+driver takes over.
-+
-+devlink dev info provides version information for all three components. In
-+addition to the version the hg commit hash of the build is included as a
-+separate entry.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index baf88e74c907..fae13f784226 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14819,6 +14819,7 @@ M:	Alexander Duyck <alexanderduyck@fb.com>
- M:	Jakub Kicinski <kuba@kernel.org>
- R:	kernel-team@meta.com
- S:	Supported
-+F:	Documentation/networking/device_drivers/ethernet/meta/
- F:	drivers/net/ethernet/meta/
 
- METHODE UDPU SUPPORT
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-index e87049dfd223..ef05ae8f5039 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-@@ -10,6 +10,56 @@
-
- #define FBNIC_SN_STR_LEN	24
-
-+static int fbnic_version_running_put(struct devlink_info_req *req,
-+				     struct fbnic_fw_ver *fw_ver,
-+				     char *ver_name)
-+{
-+	char running_ver[FBNIC_FW_VER_MAX_SIZE];
-+	int err;
-+
-+	fbnic_mk_fw_ver_str(fw_ver->version, running_ver);
-+	err = devlink_info_version_running_put(req, ver_name, running_ver);
-+	if (err)
-+		return err;
-+
-+	if (strlen(fw_ver->commit) > 0) {
-+		char commit_name[FBNIC_SN_STR_LEN];
-+
-+		snprintf(commit_name, FBNIC_SN_STR_LEN, "%s.commit", ver_name);
-+		err = devlink_info_version_running_put(req, commit_name,
-+						       fw_ver->commit);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int fbnic_version_stored_put(struct devlink_info_req *req,
-+				    struct fbnic_fw_ver *fw_ver,
-+				    char *ver_name)
-+{
-+	char stored_ver[FBNIC_FW_VER_MAX_SIZE];
-+	int err;
-+
-+	fbnic_mk_fw_ver_str(fw_ver->version, stored_ver);
-+	err = devlink_info_version_stored_put(req, ver_name, stored_ver);
-+	if (err)
-+		return err;
-+
-+	if (strlen(fw_ver->commit) > 0) {
-+		char commit_name[FBNIC_SN_STR_LEN];
-+
-+		snprintf(commit_name, FBNIC_SN_STR_LEN, "%s.commit", ver_name);
-+		err = devlink_info_version_stored_put(req, commit_name,
-+						      fw_ver->commit);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
- static int fbnic_devlink_info_get(struct devlink *devlink,
- 				  struct devlink_info_req *req,
- 				  struct netlink_ext_ack *extack)
-@@ -17,6 +67,31 @@ static int fbnic_devlink_info_get(struct devlink *devlink,
- 	struct fbnic_dev *fbd = devlink_priv(devlink);
- 	int err;
-
-+	err = fbnic_version_running_put(req, &fbd->fw_cap.running.mgmt,
-+					DEVLINK_INFO_VERSION_GENERIC_FW);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_version_running_put(req, &fbd->fw_cap.running.bootloader,
-+					DEVLINK_INFO_VERSION_GENERIC_FW_BOOTLOADER);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_version_stored_put(req, &fbd->fw_cap.stored.mgmt,
-+				       DEVLINK_INFO_VERSION_GENERIC_FW);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_version_stored_put(req, &fbd->fw_cap.stored.bootloader,
-+				       DEVLINK_INFO_VERSION_GENERIC_FW_BOOTLOADER);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_version_stored_put(req, &fbd->fw_cap.stored.undi,
-+				       DEVLINK_INFO_VERSION_GENERIC_FW_UNDI);
-+	if (err)
-+		return err;
-+
- 	if (fbd->dsn) {
- 		unsigned char serial[FBNIC_SN_STR_LEN];
- 		u8 dsn[8];
---
-2.43.5
+> --- a/tools/testing/selftests/bpf/progs/bpf_syscall_macro.c
+> +++ b/tools/testing/selftests/bpf/progs/bpf_syscall_macro.c
+> @@ -43,7 +43,7 @@ int BPF_KPROBE(handle_sys_prctl)
+>
+>          /* test for PT_REGS_PARM */
+>
+> -       bpf_probe_read_kernel(&tmp, sizeof(tmp), &PT_REGS_PARM1_SYSCALL(r=
+eal_regs));
+> +       tmp =3D PT_REGS_PARM1_SYSCALL(real_regs);
+>          arg1 =3D tmp;
+>          bpf_probe_read_kernel(&arg2, sizeof(arg2), &PT_REGS_PARM2_SYSCAL=
+L(real_regs));
+>          bpf_probe_read_kernel(&arg3, sizeof(arg3), &PT_REGS_PARM3_SYSCAL=
+L(real_regs));
+>
+> Failed with verifier rejection:
+>
+> 0: R1=3Dctx() R10=3Dfp0
+> ; int BPF_KPROBE(handle_sys_prctl) @ bpf_syscall_macro.c:33
+> 0: (bf) r6 =3D r1                       ; R1=3Dctx() R6_w=3Dctx()
+> ; pid_t pid =3D bpf_get_current_pid_tgid() >> 32; @ bpf_syscall_macro.c:3=
+6
+> 1: (85) call bpf_get_current_pid_tgid#14      ; R0_w=3Dscalar()
+> ; if (pid !=3D filter_pid) @ bpf_syscall_macro.c:39
+> 2: (18) r1 =3D 0xffff800082e0e000       ; R1_w=3Dmap_value(map=3Dbpf_sysc=
+.rodata,ks=3D4,vs=3D4)
+> 4: (61) r1 =3D *(u32 *)(r1 +0)          ; R1_w=3D607
+> ; pid_t pid =3D bpf_get_current_pid_tgid() >> 32; @ bpf_syscall_macro.c:3=
+6
+> 5: (77) r0 >>=3D 32                     ; R0_w=3Dscalar(smin=3D0,smax=3Du=
+max=3D0xffffffff,var_off=3D(0x0; 0xffffffff))
+> ; if (pid !=3D filter_pid) @ bpf_syscall_macro.c:39
+> 6: (5e) if w1 !=3D w0 goto pc+98        ; R0_w=3D607 R1_w=3D607
+> ; real_regs =3D PT_REGS_SYSCALL_REGS(ctx); @ bpf_syscall_macro.c:42
+> 7: (79) r8 =3D *(u64 *)(r6 +0)          ; R6_w=3Dctx() R8_w=3Dscalar()
+> ; tmp =3D PT_REGS_PARM1_SYSCALL(real_regs); @ bpf_syscall_macro.c:46
+> 8: (79) r1 =3D *(u64 *)(r8 +272)
+> R8 invalid mem access 'scalar'
+> processed 8 insns (limit 1000000) max_states_per_insn 0 total_states 0 pe=
+ak_states 0 mark_read 0
+>
 
