@@ -1,148 +1,129 @@
-Return-Path: <netdev+bounces-125092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F259496BDBC
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:05:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCA2F96BD53
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:57:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE333281B36
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:05:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A78E281CAB
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 901E71DC19F;
-	Wed,  4 Sep 2024 13:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D75E1DA626;
+	Wed,  4 Sep 2024 12:56:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45781DAC5D
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 13:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ABAF1DA105;
+	Wed,  4 Sep 2024 12:56:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725454995; cv=none; b=kmYrwqP09Xbs+0ELzjJg99Zgrqi0S14Er74dywVilbrVWg/VGxoI5+yi20u3hOwq9WEyQ50YJFbT0tG5IG2r/HIt7VU1QIwwJPlDsDQ55rt7Zo+dLqV0FP0WPBcVYl/W/R76BzgIl0ucIHA5bFwDSL+7IXK4J72CAFw2Jh2PrjI=
+	t=1725454603; cv=none; b=DuS80Yqu/e7oGeC+kYjlSpR/gtzeNiM6gw3azEihN/FgAhvTxfs0/gfsrFuHb13BJIR+Ud/nNzALUUOxJ5IRMjpwSaV5fuC78vFt3EHU616ANF38gOYm2CpDyc9G5I/Uhqy147UsGC2mQfYNakjknPtfI5iYJelp5Ei3DuWS/BE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725454995; c=relaxed/simple;
-	bh=ELOsZ/AQIFrsBD5OKeVFRVp2sSQOp7Xb7nFSiqKgfbE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hOWG78VM3KCpmX+shqsuoCZRhEwuSrlpvN52UkHEBzJH9N8u8Og/dVtcsYLv0J2FnAp2NicSzSquSdrWx+t5p28G4yYjAYCb0EoBPdV5iz9fzVvqnn8ip17nwhyKVDStmEwgD+3C7XWXs0sSwxZdNzlO1roXBzygd0hAJfsx0Pk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1slpfB-00073W-Np
-	for netdev@vger.kernel.org; Wed, 04 Sep 2024 15:03:09 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1slpf7-005SXz-5Z
-	for netdev@vger.kernel.org; Wed, 04 Sep 2024 15:03:05 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id D28D23327FE
-	for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 13:03:04 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 349A9332787;
-	Wed, 04 Sep 2024 13:03:01 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 936bf592;
-	Wed, 4 Sep 2024 13:03:00 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Alibek Omarov <a1ba.omarov@gmail.com>,
-	Heiko Stuebner <heiko@sntech.de>
-Subject: [PATCH net-next 18/18] can: rockchip_canfd: add support for CAN_CTRLMODE_BERR_REPORTING
-Date: Wed,  4 Sep 2024 14:55:34 +0200
-Message-ID: <20240904130256.1965582-19-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240904130256.1965582-1-mkl@pengutronix.de>
-References: <20240904130256.1965582-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1725454603; c=relaxed/simple;
+	bh=AEqqzoAnneoSB02PHYheeGp6M47QuXiRUOgCai4++r4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=d1Pn21ne6LbrxzLCb//sgBlsYcsPv55xGZarTMJMBkcv8ws9LG4tm6NBrpAvgQTLNYJ8ghtthiLHCLv7/ZNGrG57FP8TI61wUTMIHzB+xhhxwoF9FchLs8/nAv5wKLNMzH6tnG1425uwz7WNOq2/3W2Le2C+p0j9naGHUZVBuM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WzMt30fpPzyR5c;
+	Wed,  4 Sep 2024 20:55:39 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id D9AB218024B;
+	Wed,  4 Sep 2024 20:56:36 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 4 Sep 2024 20:56:33 +0800
+Message-ID: <655fca48-1d87-5ee2-4e8a-a94f34323c73@huawei-partners.com>
+Date: Wed, 4 Sep 2024 15:56:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 2/4] selftests/landlock: Implement per-syscall
+ microbenchmarks
+Content-Language: ru
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+To: <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+References: <20240816005943.1832694-1-ivanov.mikhail1@huawei-partners.com>
+ <20240816005943.1832694-3-ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20240816005943.1832694-3-ivanov.mikhail1@huawei-partners.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-Add support for Bus Error Reporting.
+8/16/2024 3:59 AM, Mikhail Ivanov wrote:> diff --git 
+a/tools/testing/selftests/landlock/bench/run.sh 
+b/tools/testing/selftests/landlock/bench/run.sh
+> index afbcbb2ba6aa..582313f689ad 100755
+> --- a/tools/testing/selftests/landlock/bench/run.sh
+> +++ b/tools/testing/selftests/landlock/bench/run.sh
+> @@ -237,14 +242,48 @@ print_overhead()
+>   	done < $BASE_TRACE_DUMP
+>   }
+>   
+> +print_overhead_workload()
+> +{
+> +	print "\nTracing results\n"
+> +	print "===============\n"
+> +	print "cmd: "
+> +	print "%s " $WORKLOAD
+> +	print "\n"
+> +	print "syscalls: %s\n" $TRACED_SYSCALLS
+> +	print "access: %s\n" $ACCESS
+> +
+> +	print_overhead
+> +}
+> +
+> +print_overhead_microbench()
+> +{
+> +	print "\nTracing results\n"
+> +	print "===============\n"
+> +	print "cmd: Microbenchmarks\n"
+> +	print "syscalls: %s\n" $TRACED_SYSCALLS
+> +
+> +	print_overhead
+> +}
+> +
+> +form_trace_cmd()
+> +{
+> +	trace_cmd=$TRACE_CMD
+> +	trace_cmd+=" -e $1 -D $SANDBOX_DELAY -o $TMP_BUF"
+> +	trace_cmd+=" $TASKSET -c $CPU_AFFINITY"
+> +	trace_cmd+=" $NICE -n -19"
+> +
+> +	echo $trace_cmd
+> +}
+> +
+>   run_traced_workload()
+>   {
+> +	trace_cmd=$(form_trace_cmd $TRACED_SYSCALLS)
+> +
+>   	if [ $1 == 0 ]; then
+>   		output=$BASE_TRACE_DUMP
+> -		sandbox_cmd=
+>   	else
+>   		output=$LL_TRACE_DUMP
+> -		sandbox_cmd="$SANDBOXER_BIN $SANDBOXER_ARGS"
+> +		trace_cmd+="$SANDBOXER_BIN $SANDBOXER_ARGS"
 
-Tested-by: Alibek Omarov <a1ba.omarov@gmail.com>
-Acked-by: Heiko Stuebner <heiko@sntech.de>
-Link: https://patch.msgid.link/20240904-rockchip-canfd-v5-20-8ae22bcb27cc@pengutronix.de
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- .../net/can/rockchip/rockchip_canfd-core.c    | 25 +++++++++++++------
- 1 file changed, 17 insertions(+), 8 deletions(-)
+Missing space:
+	trace_cmd+=" $SANDBOXER_BIN $SANDBOXER_ARGS"
 
-diff --git a/drivers/net/can/rockchip/rockchip_canfd-core.c b/drivers/net/can/rockchip/rockchip_canfd-core.c
-index 8853f6a135da..6883153e8fc1 100644
---- a/drivers/net/can/rockchip/rockchip_canfd-core.c
-+++ b/drivers/net/can/rockchip/rockchip_canfd-core.c
-@@ -293,6 +293,12 @@ static void rkcanfd_chip_start(struct rkcanfd_priv *priv)
- 		RKCANFD_REG_INT_OVERLOAD_INT |
- 		RKCANFD_REG_INT_TX_FINISH_INT;
- 
-+	/* Do not mask the bus error interrupt if the bus error
-+	 * reporting is requested.
-+	 */
-+	if (!(priv->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING))
-+		priv->reg_int_mask_default |= RKCANFD_REG_INT_ERROR_INT;
-+
- 	memset(&priv->bec, 0x0, sizeof(priv->bec));
- 
- 	rkcanfd_chip_fifo_setup(priv);
-@@ -533,14 +539,16 @@ static int rkcanfd_handle_error_int(struct rkcanfd_priv *priv)
- 	if (!reg_ec)
- 		return 0;
- 
--	skb = rkcanfd_alloc_can_err_skb(priv, &cf, &timestamp);
--	if (cf) {
--		struct can_berr_counter bec;
-+	if (priv->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING) {
-+		skb = rkcanfd_alloc_can_err_skb(priv, &cf, &timestamp);
-+		if (cf) {
-+			struct can_berr_counter bec;
- 
--		rkcanfd_get_berr_counter_corrected(priv, &bec);
--		cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR | CAN_ERR_CNT;
--		cf->data[6] = bec.txerr;
--		cf->data[7] = bec.rxerr;
-+			rkcanfd_get_berr_counter_corrected(priv, &bec);
-+			cf->can_id |= CAN_ERR_PROT | CAN_ERR_BUSERROR | CAN_ERR_CNT;
-+			cf->data[6] = bec.txerr;
-+			cf->data[7] = bec.rxerr;
-+		}
- 	}
- 
- 	rkcanfd_handle_error_int_reg_ec(priv, cf, reg_ec);
-@@ -899,7 +907,8 @@ static int rkcanfd_probe(struct platform_device *pdev)
- 	priv->can.clock.freq = clk_get_rate(priv->clks[0].clk);
- 	priv->can.bittiming_const = &rkcanfd_bittiming_const;
- 	priv->can.data_bittiming_const = &rkcanfd_data_bittiming_const;
--	priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK;
-+	priv->can.ctrlmode_supported = CAN_CTRLMODE_LOOPBACK |
-+		CAN_CTRLMODE_BERR_REPORTING;
- 	if (!(priv->devtype_data.quirks & RKCANFD_QUIRK_CANFD_BROKEN))
- 		priv->can.ctrlmode_supported |= CAN_CTRLMODE_FD;
- 	priv->can.do_set_mode = rkcanfd_set_mode;
--- 
-2.45.2
-
-
+>   	fi
+>   
+>   	echo '' > $output
 
