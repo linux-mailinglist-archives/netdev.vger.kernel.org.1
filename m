@@ -1,104 +1,138 @@
-Return-Path: <netdev+bounces-125041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD5696BB6E
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:02:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B580696BB5B
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 13:58:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BFE2B26B85
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:01:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F504B2349D
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DCE31D47D8;
-	Wed,  4 Sep 2024 12:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Je2jbdNW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852171CF280;
+	Wed,  4 Sep 2024 11:57:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from forward205a.mail.yandex.net (forward205a.mail.yandex.net [178.154.239.88])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D431CCEE3
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 12:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 501721CF5D9
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 11:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725451237; cv=none; b=kI0Hb8Do2O54NFmGJadMuwWANBs4n7uvM9z3vjsJEEjZdCuI1PNa6g3efMVqQhV1ZWo6rhX7wzS1yMUUNpiaw3bYgUclsV8TiAfD/J71+EMp0HXJWJO8U8cirepqSvFCMdPk2JkKzymQ/heGKL8W7AovsUMYHRtC8hbbdQ5413k=
+	t=1725451076; cv=none; b=Y8mxdAqX4ru7nkdMOkCt7PhfPtCpTvBtgdroAOvlJljZZyHpwYrGKrbVf/fqWM14yiZQ5JgGYwb+wjNCSqZdQ4sFZnYWJOvURsNXyAGrVDq5g8qzELAJBEBXcKgsyEUw1XfLh3YE1Xm0GRp+NiYIHBF5m6LPoDsyMn99fjtEUq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725451237; c=relaxed/simple;
-	bh=NK3HEwyhysXJUEAEB2V8uNRVrXlRS+XEw1TYa8NZkog=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LvsOOaTSqhfXA7BGCkVj8Z/QNdG6wDzahMfjgYitYIQZ9cuOVQ1QPOz4JEb1B2I5VVrL8RsqFsAwZY0EqZunLQr5LA7LgJK3JPf/Lhs44eZYgo9CHVT9pZHRb54+4h05ruoM+Ua76a/vUkypuS8NojrYTkY34C0dgNncBxTQ/GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Je2jbdNW; arc=none smtp.client-ip=178.154.239.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d102])
-	by forward205a.mail.yandex.net (Yandex) with ESMTPS id 26E2768F32
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 14:54:43 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0f:604:0:640:5e0e:0])
-	by forward102a.mail.yandex.net (Yandex) with ESMTPS id B6E5D60906;
-	Wed,  4 Sep 2024 14:54:34 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id Xsa5duAq8W20-95BQWSfC;
-	Wed, 04 Sep 2024 14:54:34 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1725450874; bh=0ze7FoxYSM03CXs6xb5yf0w55g6FTLWwSRuud5KXuQg=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=Je2jbdNWhjbZn/tHlqXyoz4svnvwg8mdGbRaltQDZSe3VpNVsqM+xQM160xDBPgUY
-	 Js6BGZ2xkXqI+xbZR2M0ZIQEtMw9EE3AmhChf7/eERLgoB+6ajBnByuBCTREsZEJPU
-	 +P7kW8gMcAGBVA0K9F5ooYRLOO//Z8T5qb40XoEk=
-Authentication-Results: mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH net-next v5] net: sched: consistently use rcu_replace_pointer() in taprio_change()
-Date: Wed,  4 Sep 2024 14:54:01 +0300
-Message-ID: <20240904115401.3425674-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1725451076; c=relaxed/simple;
+	bh=hXM9kDUzyzcchOF10V4Nqns7SR1oeoeAq3LjeHrlGoA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EpKVJnOGL9Nkcm/EUoA6toq8rOiVcAwPpsaxW65R4ZJu3CicVOf3ZPOoHCDfoKrrE14Gx0g6cEnz8kgMTmNv7PnreCY9sgGndPjfZWyaEBl+o4bafRgki8p9pqWTKgm1Kjn7nzESdMlcezk4h4de+zfS1tx0RU0CfvTSf8kBb/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1slodt-00043Y-17; Wed, 04 Sep 2024 13:57:45 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1slodr-005Rbu-H0; Wed, 04 Sep 2024 13:57:43 +0200
+Received: from pengutronix.de (pd9e5994e.dip0.t-ipconnect.de [217.229.153.78])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 2A342332677;
+	Wed, 04 Sep 2024 11:57:43 +0000 (UTC)
+Date: Wed, 4 Sep 2024 13:57:42 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	linux-can@vger.kernel.org, kernel@pengutronix.de, David Jander <david@protonic.nl>, 
+	Alibek Omarov <a1ba.omarov@gmail.com>, Heiko Stuebner <heiko@sntech.de>
+Subject: Re: [PATCH net-next 03/20] arm64: dts: rockchip: mecsbc: add CAN0
+ and CAN1 interfaces
+Message-ID: <20240904-resolute-mutant-bull-8000b7-mkl@pengutronix.de>
+References: <20240904094218.1925386-1-mkl@pengutronix.de>
+ <20240904094218.1925386-4-mkl@pengutronix.de>
+ <00a04ead-e262-4b13-b6c0-4f814b26b221@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="75u5brmjkmdwmt47"
+Content-Disposition: inline
+In-Reply-To: <00a04ead-e262-4b13-b6c0-4f814b26b221@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-According to Vinicius (and carefully looking through the whole
-https://syzkaller.appspot.com/bug?extid=b65e0af58423fc8a73aa
-once again), txtime branch of 'taprio_change()' is not going to
-race against 'advance_sched()'. But using 'rcu_replace_pointer()'
-in the former may be a good idea as well.
 
-Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
-v5: cut from the series, add syzbot link an re-target to net-next
-v4: adjust subject to target net tree
-v3: unchanged since v2
-v2: added to the series
----
- net/sched/sch_taprio.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+--75u5brmjkmdwmt47
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/net/sched/sch_taprio.c b/net/sched/sch_taprio.c
-index cc2df9f8c14a..8498d0606b24 100644
---- a/net/sched/sch_taprio.c
-+++ b/net/sched/sch_taprio.c
-@@ -1952,7 +1952,9 @@ static int taprio_change(struct Qdisc *sch, struct nlattr *opt,
- 			goto unlock;
- 		}
- 
--		rcu_assign_pointer(q->admin_sched, new_admin);
-+		/* Not going to race against advance_sched(), but still */
-+		admin = rcu_replace_pointer(q->admin_sched, new_admin,
-+					    lockdep_rtnl_is_held());
- 		if (admin)
- 			call_rcu(&admin->rcu, taprio_free_sched_cb);
- 	} else {
--- 
-2.46.0
+On 04.09.2024 13:51:52, Krzysztof Kozlowski wrote:
+> On 04/09/2024 11:38, Marc Kleine-Budde wrote:
+> > From: David Jander <david@protonic.nl>
+> >=20
+> > This patch adds support for the CAN0 and CAN1 interfaces to the board.
+> >=20
+> > Signed-off-by: David Jander <david@protonic.nl>
+> > Tested-by: Alibek Omarov <a1ba.omarov@gmail.com>
+> > Link: https://patch.msgid.link/20240904-rockchip-canfd-v5-3-8ae22bcb27c=
+c@pengutronix.de
+> > [mkl: fixed order of phandles]
+> > Reviewed-by: Heiko Stuebner <heiko@sntech.de>
+> > Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> > ---
+> >  arch/arm64/boot/dts/rockchip/rk3568-mecsbc.dts | 14 ++++++++++++++
+>=20
+> DTS patches should never be taken via net/can or or any other driver
+> subsystem.
 
+Ok.
+
+> DTS is independent hardware description. Embedding it here suggests
+> there is dependency thus ABI break.
+
+It might suggest, but it isn't.
+
+> Please drop all DTS patches and never apply them via net.
+
+Ok, will send an updated PR to net-next and an independent PR to
+upstream the DTS changes.
+
+regards
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--75u5brmjkmdwmt47
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbYSzQACgkQKDiiPnot
+vG+orAf+N9mzsTECnapO0VF9JRHqjFmo7KkV2G+nCzZZwi1jotFVdNjNTXoPPTb1
+uU4WikoRy3cGUmkatijPtCzwX7cU2DcyIWBFj/56HeUzkLjUZwwmBfy8hdjt4Y9M
+LAjUGITLSpFCZQ42PDwqVHM9RxWBT226z1yc0FTwFR0B3Zy/Npazoyrefq4nWtLX
+SVLC4fEcF31dBsGWpmz74qCCg4OqYObVJDoFYUQmiDjSGQeM/XM7IR8NBwcbU/fx
+53p4aVKJaUpy762dFviOm3winZNnK8pf3YMC7EpPBYIdqpLrsVkLkwtPw9BHs7+M
+7jWFoAVjsmFwsK+c6ZuouLYue9Rc1w==
+=h2ob
+-----END PGP SIGNATURE-----
+
+--75u5brmjkmdwmt47--
 
