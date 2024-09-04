@@ -1,93 +1,138 @@
-Return-Path: <netdev+bounces-125290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3643996CACB
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:28:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3744F96CAD4
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:36:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70CAC1C24AC4
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 23:28:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C298B24B32
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 23:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D023B179958;
-	Wed,  4 Sep 2024 23:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B171779A5;
+	Wed,  4 Sep 2024 23:36:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="IbFn0LTk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pv50p00im-tydg10011801.me.com (pv50p00im-tydg10011801.me.com [17.58.6.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FCA1172760;
-	Wed,  4 Sep 2024 23:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91ECD14D2A7
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 23:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725492466; cv=none; b=TjQLYFSu4D3ocWs5r1CjVvg2F72U5WXegLsaeV/i+CJyJSZgnrSEUEDJcPiWH2OvZs78elkCUBaRjfo0zV2W0BAHd9ZDu++po50sd0MPjWko05CLcEQjXAFKnzhVhVrwk/H8sjW3LF10ElVQi0WL+u/WPtDRG/pmiOEX1+DA5n8=
+	t=1725492980; cv=none; b=WVBR3EBqBHUwJx00Sl4rupuegvgXyAwpsylLlGdyKN10qKK3/a6+1/P97g58cBOlO8zRgkjRjsIjMUlA9yhxYUWrjQiBCB00XztnPrwb6WIrlNTWvk7vXrydriUuqzl0c9CSnbycvky+5PBu3VN/oMS/GYWPfGawR0YTfjYllUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725492466; c=relaxed/simple;
-	bh=xnqrdElsRqVveTFKGGQ2DYoVeTa9JnaT0qEfim4KzbI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cD59C7pv/F40GO70TSxBl+Ov7lih9O4lgPoNNotwGFbUG5m61IPfkA2J6vjo81nC58juOsJE8wJGQIebDMj29OjyNLjijdD3m8WCsVJWTa2TA3+jMKEm6QcQ0c/2lQG6CsTaBapqJVCun3/5m+Nw7MITBHSzCYnDXOBTyvDIuTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7c3ebba7fbbso174426a12.1;
-        Wed, 04 Sep 2024 16:27:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725492464; x=1726097264;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xnqrdElsRqVveTFKGGQ2DYoVeTa9JnaT0qEfim4KzbI=;
-        b=MHLUh6pWz1itQuwjqpEjtt+NxjYPCtvmddRMO6GJ7kc43KykAOytLbpl6OIlCtmbxE
-         JAgYmUyXIFNAij5if+q38EXKpzvzFibQfY3h1Tr00WVXeI9OXNru5AtJ7EmhpKPX9Z9i
-         K0U7BebZJVsoUVGEsgDbuGmrFn9h2HcUvR/REUzK/1Atu7MKHSSFt3IDp2k7ZVKRoXma
-         +7/W5my6RWeGXb2TklDPCPUHHfbvjdkFoYyiHw5PvkCD0DcMViZPofPZz+dszHJi1Vd3
-         44At8W4UQrV4Wpe2/diDEvLs81fZ521xLQFInpunjWAUF1N4e1yNEKk+BRC5foyw6yZM
-         uTQg==
-X-Forwarded-Encrypted: i=1; AJvYcCUth3PUqtbmqD7WzPkvkIFPElRA7amYgjlAPDnfScezja+ntGtLeBQu34XYfH931qPCpDE4LyN+F3U=@vger.kernel.org, AJvYcCV37fWZLG3Hmp549kOL0YBD+fOIGxHcfM2EvVxAU7y7HBDcHK11ZE0+DSnLhvkvDfxs4z/tXasJ@vger.kernel.org, AJvYcCXFd0HgQCC2BpWD40joomKl1gqLin1K+LjT8f5nWqS2knQJ148MIsSJwbMZtIOYilUZRZJtTtI+@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnmdcpgijCI6iR3JBWytI/M6sZdqXvk57IzlcTJ8RRUEtEDSih
-	7RUh//VBGtnztEBPx7e4rOSDtdQ0kdLWVlC0rA65uab2I8rfC4VcsYxaTvv9l/GjvXwx4slStTe
-	2V8Yh6BU5VRM1pSbOOW0kWP0XYTA=
-X-Google-Smtp-Source: AGHT+IHsuLP5v+T/Exu24ZloORU9KnSyFncxYZCSSj31Y/Uyl9Y2UmkVWrMbsVuwOSOQE7OlwIZP1vFaemJpw/RJfx4=
-X-Received: by 2002:a17:902:ccc2:b0:202:508c:b598 with SMTP id
- d9443c01a7336-20546b55432mr209414275ad.59.1725492464436; Wed, 04 Sep 2024
- 16:27:44 -0700 (PDT)
+	s=arc-20240116; t=1725492980; c=relaxed/simple;
+	bh=gGKTS5e69eGwsuCxPYviwNkaaS50fkXjlI55u9zXG/A=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=lBs47gwiC5likLwOijuPSFOIn+CmGV2GJbYYkmRee6A/1+0da/EZhGZOS5hgkhOMpDMGabUItDWrGvVryDwm7eqQrCqdKmYeXef8S2Pb4A+js0dsvYCIeb/LPcwSqIpBnEPVJvR1hviLAQ/IQk2R7pDrL5RsVWYiOYB+8ake+b0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=IbFn0LTk; arc=none smtp.client-ip=17.58.6.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1725492979;
+	bh=9rDPKSc7WMZoY4WpNOd2VKz4Iu3eG9WY3g92yxKTVKw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To;
+	b=IbFn0LTk0cC1B27JOHB1R1BEnvJd+wa8mFOoYdXmu5yJWsDetqbbE3FUiwtN3jFTN
+	 4en5DNJy/tB2XAcXHw6ZkEOD8bgW8/qxh6+stssXlZP4sqi4qt541aAxTB6uBe6xS5
+	 Rh292rXOYoxKF9fkPhpxtlJ+tHn2uJ82xPhGKxAb8lGb1e4MvVCacK9Nteb5WB5qtz
+	 S37kRpHecrIgwPbSxky5DO+pXHkIeor1CUSnuCqlgA9z8D5A+uHhc7g3GTcBNxKC1a
+	 xE7Zs7JFqGHiV6FFGwYfK8ORa7ETqA4mojgNwpuwd2Bdu24GUtmj6fGmgmBTmpnDaE
+	 s9B0N+mCKfeIQ==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-tydg10011801.me.com (Postfix) with ESMTPSA id 5B64D800063;
+	Wed,  4 Sep 2024 23:36:11 +0000 (UTC)
+From: Zijun Hu <zijun_hu@icloud.com>
+Date: Thu, 05 Sep 2024 07:35:38 +0800
+Subject: [PATCH] net: sysfs: Fix weird usage of class's namespace relevant
+ fields
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240904222740.2985864-1-stefan.maetje@esd.eu> <20240904222740.2985864-2-stefan.maetje@esd.eu>
-In-Reply-To: <20240904222740.2985864-2-stefan.maetje@esd.eu>
-From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Date: Thu, 5 Sep 2024 08:27:33 +0900
-Message-ID: <CAMZ6Rq+Ns3ta2TS+y8fVBqBKxtYpRciRAtuPXUmFFHzM1qj2pg@mail.gmail.com>
-Subject: Re: [PATCH 1/1] can: esd_usb: Remove CAN_CTRLMODE_3_SAMPLES for CAN-USB/3-FD
-To: =?UTF-8?Q?Stefan_M=C3=A4tje?= <stefan.maetje@esd.eu>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Frank Jungclaus <frank.jungclaus@esd.eu>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240905-fix_class_ns-v1-1-88ecccc3517c@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAMnu2GYC/x2MQQqAIBAAvyJ7TlCxoL4SIaZrLYSFCxFIf086D
+ sNMBcZCyDCJCgVvYjpzA90JCLvPG0qKjcEoY9WorEz0uHB4ZpdZ+pi0D6pfhxSgJVfB5v/dvLz
+ vBx9d2WNeAAAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Zijun Hu <zijun_hu@icloud.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
+X-Mailer: b4 0.14.1
+X-Proofpoint-ORIG-GUID: nYYn2LZ9ZsL0_a6pdNzhYxjTe8JmaiRJ
+X-Proofpoint-GUID: nYYn2LZ9ZsL0_a6pdNzhYxjTe8JmaiRJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-04_21,2024-09-04_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=999
+ malwarescore=0 bulkscore=0 phishscore=0 clxscore=1015 suspectscore=0
+ adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2409040178
+X-Apple-Remote-Links: v=1;h=KCk=;charset=UTF-8
 
-Hi Stefan,
+From: Zijun Hu <quic_zijuhu@quicinc.com>
 
-Thanks for the patch.
+Device class has two namespace relevant fields which are associated by
+the following usage:
 
-On Thu. 5 Sep. 2024 at 07:29, Stefan M=C3=A4tje <stefan.maetje@esd.eu> wrot=
-e:
-> Remove the CAN_CTRLMODE_3_SAMPLES announcement for CAN-USB/3-FD devices
-> because these devices don't support it.
->
-> The hardware has a Microchip SAM E70 microcontroller that uses a Bosch
-> MCAN IP core as CAN FD controller. But this MCAN core doesn't support
-> triple sampling.
->
-> Fixes: 80662d943075 ("can: esd_usb: Add support for esd CAN-USB/3")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Stefan M=C3=A4tje <stefan.maetje@esd.eu>
+struct class {
+	...
+	const struct kobj_ns_type_operations *ns_type;
+	const void *(*namespace)(const struct device *dev);
+	...
+}
+if (dev->class && dev->class->ns_type)
+	dev->class->namespace(dev);
 
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+The usage looks weird since it checks @ns_type but calls namespace()
+it is found for all existing class definitions that the other filed is
+also assigned once one is assigned in current kernel tree, so fix this
+weird usage by checking @namespace to call namespace().
+
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+driver-core tree has similar fix as shown below:
+https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/driver-core.git/commit/?h=driver-core-next&id=a169a663bfa8198f33a5c1002634cc89e5128025
+---
+ net/core/net-sysfs.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 444f23e74f8e..d10c88f569b0 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -1056,7 +1056,7 @@ static const void *rx_queue_namespace(const struct kobject *kobj)
+ 	struct device *dev = &queue->dev->dev;
+ 	const void *ns = NULL;
+ 
+-	if (dev->class && dev->class->ns_type)
++	if (dev->class && dev->class->namespace)
+ 		ns = dev->class->namespace(dev);
+ 
+ 	return ns;
+@@ -1740,7 +1740,7 @@ static const void *netdev_queue_namespace(const struct kobject *kobj)
+ 	struct device *dev = &queue->dev->dev;
+ 	const void *ns = NULL;
+ 
+-	if (dev->class && dev->class->ns_type)
++	if (dev->class && dev->class->namespace)
+ 		ns = dev->class->namespace(dev);
+ 
+ 	return ns;
+
+---
+base-commit: 88fac17500f4ea49c7bac136cf1b27e7b9980075
+change-id: 20240904-fix_class_ns-adf1ac05b6fc
+
+Best regards,
+-- 
+Zijun Hu <quic_zijuhu@quicinc.com>
+
 
