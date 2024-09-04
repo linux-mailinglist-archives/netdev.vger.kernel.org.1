@@ -1,125 +1,129 @@
-Return-Path: <netdev+bounces-125231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4242A96C5A2
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:46:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E89496C5B2
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:47:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F311E286BE9
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:46:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D146A1C20324
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426921E1A1B;
-	Wed,  4 Sep 2024 17:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B45E1E1A23;
+	Wed,  4 Sep 2024 17:47:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cBNOiJ+A"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZxuJeXDH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191031E1A1F;
-	Wed,  4 Sep 2024 17:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9361E132C;
+	Wed,  4 Sep 2024 17:47:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725471952; cv=none; b=LmqosLGwlo/YS8ceObCkK2Y1VNF59SIeEFnBPIiBN5SJEwxi9sLcEAw8xfBCjUtTMKE6PiLDYSgGRxhxTU6rQVN7N3IXS4X9p3qJ9EUYD4IvZHpzgjz/hFGozah+oYZa2nQrkOdgGt7Fs1RUlS+pwnV0ZYQbpv/5wQzQNJi6sZY=
+	t=1725472051; cv=none; b=Lpj7nnTx3cXapowFbIkQyt8UnSlVp0KkM0NfGq6ukP5dz7HjjlOq8zuROmLAZGLXfMSsU34ey8wV8+dLP0x2cqRaAJ69EJb9x/W/mofrTJ/ZOAocexaMkW0cEnjOPunz5fqH/HF70W0hrlApUttFcAPxi0bXzE2Cw3qzxUI9xNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725471952; c=relaxed/simple;
-	bh=3ms+jmuZkq1vsb7bH0gsZ6GDHGRGTlXNsNd5RcimIQQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f/abD6tHoIlYMjhTkWXoBj5SBrjs69aspdgDWYQbCeJFlh/mPwQPmkYRzJWue9KujMWJAoJhSPX83uPc/8TxcFi7pq+rDTvzbN9RzWXwRuZauqSTA120rd8ov3FD1RJz5uhq1Sqem89VF0uJMiJbGLCrAjGzk3k0/AZdXhtH7M0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=cBNOiJ+A; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1725471950; x=1757007950;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gCznZJcAGWMZfA5ynzwOCCLPb1jqxTZUYJFGAHQI7Mk=;
-  b=cBNOiJ+ALWO7rZJlpRgJQN/UxJbvj960dCU2JfSyPISoHzXMLZfly/KH
-   7+FaCs6wdzcMUh5Rty+PI27N+ezGSUek7gTHqlCsEa7IfJxVx62vadhR4
-   pmXxDv7FFEMidbwjHxMRwEaVXhMsI2sVUlxFcwVfBXKGbEQp9KKIBB4ZU
-   w=;
-X-IronPort-AV: E=Sophos;i="6.10,202,1719878400"; 
-   d="scan'208";a="122216293"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2024 17:45:47 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:33566]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.63.127:2525] with esmtp (Farcaster)
- id fde1a5a7-7b36-447f-b1ca-fad1670c5454; Wed, 4 Sep 2024 17:45:47 +0000 (UTC)
-X-Farcaster-Flow-ID: fde1a5a7-7b36-447f-b1ca-fad1670c5454
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 4 Sep 2024 17:45:46 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 4 Sep 2024 17:45:43 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <jamie.bainbridge@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <joannelkoong@gmail.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <shuah@kernel.org>
-Subject: Re: [PATCH net] selftests: net: enable bind tests
-Date: Wed, 4 Sep 2024 10:45:33 -0700
-Message-ID: <20240904174533.8070-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <5a009b26cf5fb1ad1512d89c61b37e2fac702323.1725430322.git.jamie.bainbridge@gmail.com>
-References: <5a009b26cf5fb1ad1512d89c61b37e2fac702323.1725430322.git.jamie.bainbridge@gmail.com>
+	s=arc-20240116; t=1725472051; c=relaxed/simple;
+	bh=psNQgG7k6QzVycEcqOGul+y9Q1/orlCLyOVGi7JufEU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Xc9UvY23EnBfA6prtFdHqmM3GpDPc+C5ya0bmgzzNhrEQX3P3ta2XIL8V1avAt+I3T/Mk1UHS7o8Laj4w29sMXIgq+BHQKW8sDgx+gvTpZXgbgy21qlbuB3rdwDbXQhTRL4fBr5A52COfLCa4wv7PO6EHC+4Vt3gogAnmr/aoUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZxuJeXDH; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 399DBFF803;
+	Wed,  4 Sep 2024 17:47:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1725472041;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5lrAIY666kuXUBCi+wo5/zYldvxY9h3q7HZm7kbftVA=;
+	b=ZxuJeXDHi359wklqIU/J/WmVpxaFuHD6eG7XzZrdZDJOXnAwfp8uHoXsFSauy2mWdqFZrC
+	+V3fF83Qo1UkmljlOLa5HGSTG1uSPZHv0LZASkIyTQ1t8ZCQ5gF2s3T9ATKfO1ji+zUcG0
+	wT4NOK9YJrh7hPsKcZsceuXZQYYm/zWFcQqHNAwkmn1G6agd5626GLhLkivPHvoJPFR6U7
+	B34NeuWmvCX5MHANfGxrbT5sZvbWMDP4aLsUoPuUaZRN2F3FH4vsb1hFs8f3p3pW61hq7J
+	d/wSdpKVTNiaU2UxLvRT0EkaCfzzKpVp/CW034Q4G+ClmLUyDnSPprUjEtcNOQ==
+Date: Wed, 4 Sep 2024 19:47:17 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jonathan Corbet
+ <corbet@lwn.net>, Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>,
+ Piergiorgio Beruto <piergiorgio.beruto@gmail.com>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH ethtool-next v2 3/3] ethtool: Introduce a command to
+ list PHYs
+Message-ID: <20240904194717.60ba4df6@fedora.home>
+In-Reply-To: <7fpbxztptolcuz4ppppkmpmblel7mv4nh4jgkjqbdedo4hrcjc@6oo6acqfejas>
+References: <20240828152511.194453-1-maxime.chevallier@bootlin.com>
+	<20240828152511.194453-4-maxime.chevallier@bootlin.com>
+	<7fpbxztptolcuz4ppppkmpmblel7mv4nh4jgkjqbdedo4hrcjc@6oo6acqfejas>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-Date: Wed,  4 Sep 2024 16:12:26 +1000
-> bind_wildcard is compiled but not run, bind_timewait is not compiled.
-> 
-> These two tests complete in a very short time, use the test harness
-> properly, and seem reasonable to enable.
-> 
-> The author of the tests confirmed via email that these were
-> intended to be run.
-> 
-> Enable these two tests.
-> 
-> Fixes: 13715acf8ab5 ("selftest: Add test for bind() conflicts.")
-> Fixes: 2c042e8e54ef ("tcp: Add selftest for bind() and TIME_WAIT.")
-> Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Hello Michal,
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+On Mon, 2 Sep 2024 00:07:56 +0200
+Michal Kubecek <mkubecek@suse.cz> wrote:
 
-Thanks!
-
-
-> ---
->  tools/testing/selftests/net/Makefile | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> On Wed, Aug 28, 2024 at 05:25:10PM +0200, Maxime Chevallier wrote:
+> > It is now possible to list all Ethernet PHYs that are present behind a
+> > given interface, since the following linux commit :
+> > 63d5eaf35ac3 ("net: ethtool: Introduce a command to list PHYs on an interface")
+> > 
+> > This command relies on the netlink DUMP command to list them, by allowing to
+> > pass an interface name/id as a parameter in the DUMP request to only
+> > list PHYs on one interface.
+> > 
+> > Therefore, we introduce a new helper function to prepare a interface-filtered
+> > dump request (the filter can be empty, to perform an unfiltered dump),
+> > and then uses it to implement PHY enumeration through the --show-phys
+> > command.
+> > 
+> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > ---  
+> [...]
+> > diff --git a/netlink/extapi.h b/netlink/extapi.h
+> > index c882295..fd99610 100644
+> > --- a/netlink/extapi.h
+> > +++ b/netlink/extapi.h
+> > @@ -56,6 +56,7 @@ int nl_set_mm(struct cmd_context *ctx);
+> >  int nl_gpse(struct cmd_context *ctx);
+> >  int nl_spse(struct cmd_context *ctx);
+> >  int nl_flash_module_fw(struct cmd_context *ctx);
+> > +int nl_get_phy(struct cmd_context *ctx);
+> >  
+> >  void nl_monitor_usage(void);
+> >    
 > 
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> index 8eaffd7a641c5d6bb5c63e3015fdd9f32c114550..9d5aa817411b653ac130a1a581d933180a597ce5 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -85,7 +85,8 @@ TEST_GEN_PROGS += so_incoming_cpu
->  TEST_PROGS += sctp_vrf.sh
->  TEST_GEN_FILES += sctp_hello
->  TEST_GEN_FILES += ip_local_port_range
-> -TEST_GEN_FILES += bind_wildcard
-> +TEST_GEN_PROGS += bind_wildcard
-> +TEST_GEN_PROGS += bind_timewait
->  TEST_PROGS += test_vxlan_mdb.sh
->  TEST_PROGS += test_bridge_neigh_suppress.sh
->  TEST_PROGS += test_vxlan_nolocalbypass.sh
-> -- 
-> 2.39.2
-> 
+> Please add also a fallback to !ETHTOOL_ENABLE_NETLINK branch, similar
+> to other netlink handlers, so that a build with --disable-netlink does
+> not fail.
+
+You're right, I'll add a fallback for that. I actually just faced that
+exact issue trying to build this patchset using a fresh buildroot
+setup, having forgotten to add netlink libraries.
+
+Thanks for the reviews,
+
+Maxime
 
