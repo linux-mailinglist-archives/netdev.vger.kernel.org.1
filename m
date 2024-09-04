@@ -1,171 +1,159 @@
-Return-Path: <netdev+bounces-124821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C171C96B108
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:10:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CB8E96B14A
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 08:12:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F48AB213F7
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 06:10:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF9F61C20F66
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 06:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E852484E0A;
-	Wed,  4 Sep 2024 06:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="ke9mNOLq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0926C12F5B3;
+	Wed,  4 Sep 2024 06:12:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F9282C7E
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 06:10:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5760284A5B
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 06:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725430223; cv=none; b=hK5RX/rEnCWITzXrfWPPk/ygiv4STVy15BFD4Npi0Q3re88bFA2BNeDBQNSSY3sYc0rPxjgGxETyGEmPRMkWTIWYdomz9xcgDvQ/tzE/d/ZYBVjnmroWf+k7fKZnsuO9abnAw3HKj91Pa5vrNpYqGjSy/dEY4VjsnreBecvVT5Y=
+	t=1725430338; cv=none; b=VBBtqJv4sxY5ZT06vw0L9RsKA2T8vW9uwn+/7Tj0A4AliI5LLKxH4dLV7JWqxluoteeJRH/SfaNABC0et0YMQvzU5AHjJbX5INGiQT1LhTQyWMLhCQG6PmnAm5ai+eSVV3yvd8hxBsG9g5mLVu88dFyzVO3CNamS+ATNCBZ33b4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725430223; c=relaxed/simple;
-	bh=014gXkD8ygbNVGMJO+0Zp0ga5DirG6KNtyYbEwIUiCU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qk2a5+FjSdEjgg7/qVznNupBkbb7sWyXiRQtMvOHZ9+pYkqMcSNiVvdMsbWQAT1FeoakLKSgvnWLhC+7KCsKC5T6sUF0G6vd3BsASrQzxeN+ENY3ELCZ1hBH5py5uBcpIcX9J3CdktS+SPzc9ehOfPIVgMWmyIG0PDkbZR9QMHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=ke9mNOLq; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7b0c9bbddb4so344255a12.3
-        for <netdev@vger.kernel.org>; Tue, 03 Sep 2024 23:10:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1725430220; x=1726035020; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=V36tSWxAHLAIOwnkr8bXXchZBGFhkcs/NfyGu0nHDJw=;
-        b=ke9mNOLqSBayh2F08yupz1d86VGCKQMD5YVzwom1GDULdcM8IHz5evIBuNJPTS8Ki1
-         wzUnOReGrUkxbHv99ETqrCyPU9olFZMgUQd5MjwT4lTWTYrXBgei+/RQRcIPpAGiuUPb
-         cp0betABczsUDRPDsM5USlkqa3G5Yc2fihMpJH7MNh6Re088Fz3bvwdIKczNTzQhYZpa
-         UtIwfEvMWbApKLC2/4zbqwZrcdomgucMmypV2924arjmmsPlWuUvoY5p05EvlLg1KYCo
-         KF7cCmfjPtTivB5jGzMN4jIdYVkiegqMTTF2BbvkhnRrSKwqs6Yn3wMa4CuWjcB6vz0S
-         MdYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725430220; x=1726035020;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=V36tSWxAHLAIOwnkr8bXXchZBGFhkcs/NfyGu0nHDJw=;
-        b=DP7M32w00P0cjAh943FmcJEYvIkkPEoCjpQ8iA4BjG7NA0GR0USyoqD5Rz4HFSzbAA
-         oGESWHN2kywEBLn8SYcb8yx+k9VqwAarprgbvyM6WOaTWrWMK8RKQPJ82DTeuCOQVrqV
-         yFGOL9bh1M8PSLn6c1S8+5jZYvKd7hVWd/Yygb9ihXlKLCrjxzcK5kx+VIk5lsPbwOX6
-         vmdQRTzHYr534rWWoe7awM3K4LsHevx7kDaIH3ZpWpBdFYRiMTXLwyIuXyInqWvNt2iz
-         ZrX+SPiZwno3BTvqoMxFWiO9VD/QDBmm6Q56sNWwXe3jY7ORK0OBiyoVLbQwoz3DpL4M
-         qwyg==
-X-Forwarded-Encrypted: i=1; AJvYcCVzGcpGAuuXMLRvHln2YdBZZz/k+7V/9Y9ySzws9QXPX7VPLywviJGnutKIQ2S5LLWco6mbtEc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhEfugrnFptiYuZMeAOelbsHKyBpTThPA4ZFvWZFUIaGaGIaHi
-	WsFVoLBiF5/yeHm3sQm+ZEDb2TFMHijQZLoGii5CwoZR3XUW1qCQdhqO5m8Odkg=
-X-Google-Smtp-Source: AGHT+IHMau4o8Ew3FW+eey6qgIUz41XJZGyUqCz0/A7x+A6o0sgpiBWZX5EMygQKk21MSGSMGAcELQ==
-X-Received: by 2002:a17:903:18d:b0:206:b5b8:25ef with SMTP id d9443c01a7336-206b5b82940mr13284525ad.15.1725430220327;
-        Tue, 03 Sep 2024 23:10:20 -0700 (PDT)
-Received: from LRW1FYT73J.bytedance.net ([139.177.225.239])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206ae912357sm6989385ad.14.2024.09.03.23.10.15
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 03 Sep 2024 23:10:19 -0700 (PDT)
-From: Wenbo Li <liwenbo.martin@bytedance.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Wenbo Li <liwenbo.martin@bytedance.com>,
-	Jiahui Cen <cenjiahui@bytedance.com>,
-	Ying Fang <fangying.tommy@bytedance.com>
-Subject: [PATCH v2] virtio_net: Fix mismatched buf address when unmapping for small packets
-Date: Wed,  4 Sep 2024 14:10:09 +0800
-Message-Id: <20240904061009.90785-1-liwenbo.martin@bytedance.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1725430338; c=relaxed/simple;
+	bh=uFqKU2u26RsMVaHxZCgg4NS943JlrwihnRUqYYObpxA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YOuOpRJ1lRO9ggfqUu6AcunkMV5KrOfMIS+7yUwT+l9JIAuHXX17KsqJTfWnzZx9YQk3K2xH6dKApvZUB86DzyI3m/jiJJL26QtHL3lN2O0Wz9kRaU3qNQh57QTlnF1UTdd/Ol6TCjws5dm4wQ/Zy9J6Z3gBkhpVk5gTJ57X37g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sljEw-0000oC-JK; Wed, 04 Sep 2024 08:11:38 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1sljEt-005NS9-6K; Wed, 04 Sep 2024 08:11:35 +0200
+Received: from pengutronix.de (pd9e5994e.dip0.t-ipconnect.de [217.229.153.78])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id BA7E7331CC9;
+	Wed, 04 Sep 2024 06:11:34 +0000 (UTC)
+Date: Wed, 4 Sep 2024 08:11:33 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: kernel test robot <lkp@intel.com>
+Cc: kernel@pengutronix.de, Alibek Omarov <a1ba.omarov@gmail.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Heiko Stuebner <heiko@sntech.de>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Elaine Zhang <zhangqing@rock-chips.com>, David Jander <david.jander@protonic.nl>, 
+	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	linux-can@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH can-next v4 01/20] dt-bindings: can: rockchip_canfd: add
+ rockchip CAN-FD controller
+Message-ID: <20240904-impressive-centipede-of-science-ae5cbd-mkl@pengutronix.de>
+References: <20240903-rockchip-canfd-v4-1-1dc3f3f32856@pengutronix.de>
+ <202409040039.TNDhtsSe-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="lg5lfpbtzitx4wuf"
+Content-Disposition: inline
+In-Reply-To: <202409040039.TNDhtsSe-lkp@intel.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Currently, the virtio-net driver will perform a pre-dma-mapping for
-small or mergeable RX buffer. But for small packets, a mismatched address
-without VIRTNET_RX_PAD and xdp_headroom is used for unmapping.
 
-That will result in unsynchronized buffers when SWIOTLB is enabled, for
-example, when running as a TDX guest.
+--lg5lfpbtzitx4wuf
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This patch handles small and mergeable packets separately and fixes
-the mismatched buffer address.
+On 04.09.2024 01:09:26, kernel test robot wrote:
+> kernel test robot noticed the following build warnings:
+>=20
+> [auto build test WARNING on da4f3b72c8831975a06eca7e1c27392726f54d20]
+>=20
+> url:    https://github.com/intel-lab-lkp/linux/commits/Marc-Kleine-Budde/=
+dt-bindings-can-rockchip_canfd-add-rockchip-CAN-FD-controller/20240903-1732=
+43
+> base:   da4f3b72c8831975a06eca7e1c27392726f54d20
+> patch link:    https://lore.kernel.org/r/20240903-rockchip-canfd-v4-1-1dc=
+3f3f32856%40pengutronix.de
+> patch subject: [PATCH can-next v4 01/20] dt-bindings: can: rockchip_canfd=
+: add rockchip CAN-FD controller
+> reproduce: (https://download.01.org/0day-ci/archive/20240904/202409040039=
+=2ETNDhtsSe-lkp@intel.com/reproduce)
+>=20
+> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
+ion of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202409040039.TNDhtsSe-lkp=
+@intel.com/
+>=20
+> All warnings (new ones prefixed by >>):
 
-Changes from v1: Use ctx to get xdp_headroom.
+Good bot!
 
-Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
-Signed-off-by: Wenbo Li <liwenbo.martin@bytedance.com>
-Signed-off-by: Jiahui Cen <cenjiahui@bytedance.com>
-Signed-off-by: Ying Fang <fangying.tommy@bytedance.com>
----
- drivers/net/virtio_net.c | 29 ++++++++++++++++++++++++++++-
- 1 file changed, 28 insertions(+), 1 deletion(-)
+I had already found the issue myself and fixed it in my tree. Will send
+a new series today.
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index c6af18948..cbc3c0ae4 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -891,6 +891,23 @@ static void *virtnet_rq_get_buf(struct receive_queue *rq, u32 *len, void **ctx)
- 	return buf;
- }
- 
-+static void *virtnet_rq_get_buf_small(struct receive_queue *rq,
-+				      u32 *len,
-+				      void **ctx,
-+				      unsigned int header_offset)
-+{
-+	void *buf;
-+	unsigned int xdp_headroom;
-+
-+	buf = virtqueue_get_buf_ctx(rq->vq, len, ctx);
-+	if (buf) {
-+		xdp_headroom = (unsigned long)*ctx;
-+		virtnet_rq_unmap(rq, buf + VIRTNET_RX_PAD + xdp_headroom, *len);
-+	}
-+
-+	return buf;
-+}
-+
- static void virtnet_rq_init_one_sg(struct receive_queue *rq, void *buf, u32 len)
- {
- 	struct virtnet_rq_dma *dma;
-@@ -2692,13 +2709,23 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
- 	int packets = 0;
- 	void *buf;
- 
--	if (!vi->big_packets || vi->mergeable_rx_bufs) {
-+	if (vi->mergeable_rx_bufs) {
- 		void *ctx;
- 		while (packets < budget &&
- 		       (buf = virtnet_rq_get_buf(rq, &len, &ctx))) {
- 			receive_buf(vi, rq, buf, len, ctx, xdp_xmit, stats);
- 			packets++;
- 		}
-+	} else if (!vi->big_packets) {
-+		void *ctx;
-+		unsigned int xdp_headroom = virtnet_get_headroom(vi);
-+		unsigned int header_offset = VIRTNET_RX_PAD + xdp_headroom;
-+
-+		while (packets < budget &&
-+		       (buf = virtnet_rq_get_buf_small(rq, &len, &ctx, header_offset))) {
-+			receive_buf(vi, rq, buf, len, ctx, xdp_xmit, stats);
-+			packets++;
-+		}
- 	} else {
- 		while (packets < budget &&
- 		       (buf = virtqueue_get_buf(rq->vq, &len)) != NULL) {
--- 
-2.20.1
+>=20
+>    Warning: Documentation/devicetree/bindings/regulator/siliconmitus,sm57=
+03-regulator.yaml references a file that doesn't exist: Documentation/devic=
+etree/bindings/mfd/siliconmitus,sm5703.yaml
+>    Warning: Documentation/hwmon/g762.rst references a file that doesn't e=
+xist: Documentation/devicetree/bindings/hwmon/g762.txt
+>    Warning: MAINTAINERS references a file that doesn't exist: Documentati=
+on/devicetree/bindings/reserved-memory/qcom
+>    Warning: MAINTAINERS references a file that doesn't exist: Documentati=
+on/devicetree/bindings/display/exynos/
+>    Warning: MAINTAINERS references a file that doesn't exist: Documentati=
+on/devicetree/bindings/misc/fsl,qoriq-mc.txt
+> >> Warning: MAINTAINERS references a file that doesn't exist: Documentati=
+on/devicetree/bindings/net/can/rockchip,rk3568-canfd.yaml
+>    Using alabaster theme
 
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--lg5lfpbtzitx4wuf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbX+hEACgkQKDiiPnot
+vG/ddAf6AqyRDaYjUbvLjXaEMxYi3esfREOpspdABp9dMmJ/OImBDH2FzAgBhH42
+YIBrbQ2XL2zOIqiZrM9+jyAAbUbSrEjUnyN/S4ZNK69ige8y6arn1hgXSO1NkuQy
+fyw/3NvCn2/5zKrsMjDrb3xFrD/12qI95HFA9UV7bTNDMBEECkmNHb8U39kJI7YJ
+RZKh16KH2FDDFoMt9tkrArYFIR2YGmRaNtI3kJX8w8Ea2p3Do6boM9C56arzazNm
+K1Zzo4xQM7Cf6hvdJ3E+hu5xmVLcAWvf6mfchWU/k3N4uOr3HoXexMSKq5TLC66I
+gQVIbs0EF04Byp3Q+W0smKV2CLeJug==
+=M+8x
+-----END PGP SIGNATURE-----
+
+--lg5lfpbtzitx4wuf--
 
