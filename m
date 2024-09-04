@@ -1,171 +1,173 @@
-Return-Path: <netdev+bounces-125268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2857896C8B5
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 22:41:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEBD96C8E2
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 22:49:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A09791F26A4F
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:41:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B120286EC0
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:49:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A462E148FEC;
-	Wed,  4 Sep 2024 20:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBE2E13B7A3;
+	Wed,  4 Sep 2024 20:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EYW0FbDq"
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="B1Tu7C0o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-4027.protonmail.ch (mail-4027.protonmail.ch [185.70.40.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637B7146A79;
-	Wed,  4 Sep 2024 20:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C4414F9CF
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 20:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725482482; cv=none; b=TQ6ZWe4iNdWjyApAINT05/LLKs/0uafmXdtXtKokDHrjqdfrHff60V8pCTVvm1ZqLKkNOEL4yCmOV082Q/zUkhnWKmXv7VwrPu3j30tEDkWbeHnOjLk/U4HYTIBB/4CoAMD/uffPM1XHc6vaTT4MIq60i/bbRrJG5kYJQjzWk3I=
+	t=1725482766; cv=none; b=LQGsF2AS0HSiiZfjMUUAIYlEi5TcOlEMCWOPBczcmmovM66dqU4JatUOyJR/EYpCl4LQYNSRchhrjC0xCF50qGtCbxkefghmrnLt78M2tkpciYtwpaIKPFGv5o0Hj7cbg06bp+ju3W24hwoOCO+zcvSCfFidoQXeFwYN2lgW4r4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725482482; c=relaxed/simple;
-	bh=VhUtjS8+mpi7iOTGy7OvWlejugJXOLwG6Ki4fLIjVd0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cmTne7uD/OmYgR5uLcRRU6HKu/HryR/V6SaaNjkAGZ5tKWfSRyvvhvHVe4wQIc4RwwG5JiWeHo+/tOcFC9vQbUbFFdQnbxJtNjgLQ/8XhIMN28vlZk99QAk7zoI1zjYxkjf6Y8P+7xQAG5OpZ3kqeZHVnoO2SdD+Ga1z7ObBNUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EYW0FbDq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A0E8C4CEC2;
-	Wed,  4 Sep 2024 20:41:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725482482;
-	bh=VhUtjS8+mpi7iOTGy7OvWlejugJXOLwG6Ki4fLIjVd0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=EYW0FbDqC5NG9iE9ugWUKIi8S3Qh1GeSgJjhvaK6ERlo+LxRA+NH3keU21VxNojbH
-	 Q4dVHejI0HKOVS878IDsfLpipKST4m1PIpjdBzqhhiXsKAKfjYbSKBOkMnfdYhXV4T
-	 g0iu02e3wJRnHcbkTM+FBRF+Vlj78mGJHnLxR3vj/dbIO4CsjO0GR+dTphv5xpq8MI
-	 5EmoFWkAITv+6aTpY3HYjrsP/2Mzo4s5RoMgsHMynYICsk0slIJDA6sPh0heXErkD7
-	 wMlQ82eZcCbh0y3E3WVGfwzY56zleowz1ZOgznlq4gG4wDvf9+Kb7vaxA7tbJwCE+g
-	 vBhEgjf+4SgGw==
-Message-ID: <d91e6446-bdb1-4c22-a5c3-4c3f3dccebdb@kernel.org>
-Date: Wed, 4 Sep 2024 22:41:15 +0200
+	s=arc-20240116; t=1725482766; c=relaxed/simple;
+	bh=pHKsfEey7k+Kut2kFq2Fse32WE02kFkgk5ihNfV18aI=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CXKxfVgp2+IZDIQf4VIKDtSWtZgPokxIeHUGzbOc/lD9Gqn64kx+74RsNMtfsFlaItYVZiAUcPJC53k7AfMXUt4ENhi90Rk4igm/vuuqrhQMYw2MrZXIxjYzYIlc7LK+BV5lOijgApySvhIZanz4zVAIqr3epdOi/T77SK0zeQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=B1Tu7C0o; arc=none smtp.client-ip=185.70.40.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1725482753; x=1725741953;
+	bh=7dpimP15520NeL54t8R2z7oW/gXYIFdOGf+8XOb1730=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=B1Tu7C0o6+ZZ5C7eE92YubtQWSq3LG0U+WPUDYjC0+74pmfYCUb4XfBZ9AqDBdW/k
+	 d8fuf9d9fbKaQynPx2Pn3Wrv+VE9OIDvYICxB+j4N7fzi3PI1KSmtNguf09sNa6L8z
+	 Q9SJsSx1OgvRV01onguG6VgjHndp5c2ksAuWF6g50PoPacjnJsml7hKwCK1NUh38p+
+	 +90JZthXc7BzMg42gVfq07ktrCAqiidXWpJUqH136XhOHlQXIG4zuxiy8Srsu+AkAl
+	 leWqxXCbWIEo1mQMDXvXRmXVSBbaRIlGdjjmxMH6a/1/M78cnsc3n/Gl5NL+CvfT8S
+	 3B9GPYBuv6YrQ==
+Date: Wed, 04 Sep 2024 20:45:51 +0000
+To: o-takashi@sakamocchi.jp
+From: Edmund Raile <edmund.raile@protonmail.com>
+Cc: apais@linux.microsoft.com, edmund.raile@protonmail.com, linux-kernel@vger.kernel.org, linux-media@vger.kernel.org, linux-sound@vger.kernel.org, linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org
+Subject: firewire: use sleepable workqueue to handle 1394 OHCI IT/IR context events: test 1
+Message-ID: <20240904204531.154290-1-edmund.raile@protonmail.com>
+In-Reply-To: <20240901110642.154523-1-o-takashi@sakamocchi.jp>
+References: <20240901110642.154523-1-o-takashi@sakamocchi.jp>
+Feedback-ID: 43016623:user:proton
+X-Pm-Message-ID: 4ed8ea6d8f4fdb7d65623a1afb01f1502d3fca6f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next 0/3] selftests: mptcp: add time per subtests in
- TAP output
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240902-net-next-mptcp-ksft-subtest-time-v1-0-f1ed499a11b1@kernel.org>
- <20240903162217.07c366c9@kernel.org>
- <559e1458-b593-44c7-92b1-6946c57496c5@kernel.org>
- <20240904124025.3ec84142@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240904124025.3ec84142@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jakub,
+Hello Sakamoto-San, I very much appreciate the idea and effort to take on t=
+he tasklet conversion in small steps instead of all-at-once!
 
-Thank you for your reply!
+I also thank you for the CC, I'd like to be the testing canary for the coal=
+ mine of firewire ALSA with RME FireFace!
+The ALSA mailing list is a bit overwhelming and I'll likely unsubscribe so =
+a direct CC for anything I can test is a good idea.
 
-On 04/09/2024 21:40, Jakub Kicinski wrote:
-> On Wed, 4 Sep 2024 18:15:09 +0200 Matthieu Baerts wrote:
->>> Best I could come up with is:
->>>
->>> diff --git a/contest/remote/vmksft-p.py b/contest/remote/vmksft-p.py
->>> index fe9e87abdb5c..a37245bd5b30 100755
->>> --- a/contest/remote/vmksft-p.py
->>> +++ b/contest/remote/vmksft-p.py
->>> @@ -73,7 +73,7 @@ group3 testV skip
->>>      tests = []
->>>      nested_tests = False
->>>  
->>> -    result_re = re.compile(r"(not )?ok (\d+)( -)? ([^#]*[^ ])( # )?([^ ].*)?$")
->>> +    result_re = re.compile(r"(not )?ok (\d+)( -)? ([^#]*[^ ])( +# )?([^ ].*)?$")  
->>
->> Looks good to me. While at it, we can add a '+' for the spaces after the
->> '#':
->>
->>   ( +# +)
-> 
-> 👍️
-> 
->> I see you didn't commit the previous modification. I can open a PR if it
->> helps.
-> 
-> I was just playing with the regexps in the interpreter. If you could
-> send a PR that'd perfect.
+Trying to apply patch 1 of 5 to mainline, your kernel tree appears to be ou=
+t of sync with mainline!
+It was missing b171e20 from 2009 and a7ecbe9 from 2022!
+I hope nothing else important is missing!
 
-Sure, done:
+Since in fw_card_initialize, ret is tested to be 0 we'd need an else instea=
+d, is this correct?
 
-  https://github.com/linux-netdev/nipa/pull/38
+I edited these functions of patch 1, now everything applies just fine:
 
->>>      time_re = re.compile(r"time=(\d+)ms")
->>>  
->>>      for line in full_run.split('\n'):
->>>
->>> Thoughts?  
->>
->> In my v2, I will also strip these trailing whitespaces in the selftests,
->> they don't need to be there.
-> 
-> Up to you - it doesn't violate the KTAP format and the visual alignment
-> is nice. But it may trip up more regexps..
+@@ -571,11 +571,28 @@ void fw_card_initialize(struct fw_card *card,
+ }
+ EXPORT_SYMBOL(fw_card_initialize);
+=20
+-int fw_card_add(struct fw_card *card,
+-=09=09u32 max_receive, u32 link_speed, u64 guid)
++int fw_card_add(struct fw_card *card, u32 max_receive, u32 link_speed, u64=
+ guid,
++=09=09unsigned int supported_isoc_contexts)
+ {
++=09struct workqueue_struct *isoc_wq;
+ =09int ret;
+=20
++=09// This workqueue should be:
++=09//  * !=3D WQ_BH=09=09=09Sleepable.
++=09//  * =3D=3D WQ_UNBOUND=09=09Any core can process data for isoc context=
+. The
++=09//=09=09=09=09implementation of unit protocol could consumes the core
++=09//=09=09=09=09longer somehow.
++=09//  * !=3D WQ_MEM_RECLAIM=09=09Not used for any backend of block device=
+.
++=09//  * =3D=3D WQ_HIGHPRI=09=09High priority to process semi-realtime tim=
+estamped data.
++=09//  * =3D=3D WQ_SYSFS=09=09Parameters are available via sysfs.
++=09//  * max_active =3D=3D n_it + n_ir=09A hardIRQ could notify events for=
+ multiple isochronous
++=09//=09=09=09=09contexts if they are scheduled to the same cycle.
++=09isoc_wq =3D alloc_workqueue("firewire-isoc-card%u",
++=09=09=09=09  WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS,
++=09=09=09=09  supported_isoc_contexts, card->index);
++=09if (!isoc_wq)
++=09=09return -ENOMEM;
++
+ =09card->max_receive =3D max_receive;
+ =09card->link_speed =3D link_speed;
+ =09card->guid =3D guid;
+@@ -584,9 +601,13 @@ int fw_card_add(struct fw_card *card,
+=20
+ =09generate_config_rom(card, tmp_config_rom);
+ =09ret =3D card->driver->enable(card, tmp_config_rom, config_rom_length);
+ =09if (ret =3D=3D 0)
+ =09=09list_add_tail(&card->link, &card_list);
++=09else
++=09=09destroy_workqueue(isoc_wq);
++
++=09card->isoc_wq =3D isoc_wq;
 
-Yes, better be safe... I will keep the visual alignment for the non-TAP
-output.
+ =09mutex_unlock(&card_mutex);
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+ =09return ret;
+@@ -709,7 +729,9 @@ void fw_core_remove_card(struct fw_card *card)
+ {
+ =09struct fw_card_driver dummy_driver =3D dummy_driver_template;
+ =09unsigned long flags;
+=20
++=09might_sleep();
++
+ =09card->driver->update_phy_reg(card, 4,
+ =09=09=09=09     PHY_LINK_ACTIVE | PHY_CONTENDER, 0);
+ =09fw_schedule_bus_reset(card, false, true);
+@@ -719,6 +741,7 @@ void fw_core_remove_card(struct fw_card *card)
+ =09dummy_driver.free_iso_context=09=3D card->driver->free_iso_context;
+ =09dummy_driver.stop_iso=09=09=3D card->driver->stop_iso;
+ =09card->driver =3D &dummy_driver;
++=09drain_workqueue(card->isoc_wq);
+=20
+ =09spin_lock_irqsave(&card->lock, flags);
+ =09fw_destroy_nodes(card);
+
+Building a kernel with the patch produced 6.11.0-rc6-1-mainline-00019-g6778=
+4a74e258-dirty.
+Testing it with TI XIO2213B and RME Fireface 800 so far > 1 hour reveals no=
+ issues at all.
+ALSA streaming works fine:
+  mpv --audio-device=3Dalsa/sysdefault:CARD=3DFireface800 Spor-Ignition.fla=
+c
+
+Though I haven't the faintest clue how to measure CPU usage impact of the p=
+atch, it looks like it would be neglible.
+
+As of finishing this, I noticed you released [2] https://lore.kernel.org/lk=
+ml/20240904125155.461886-1-o-takashi@sakamocchi.jp/T/
+I'll get around to testing that one too, but tomorrow at the earliest.
+
+Kind regards,
+Edmund Raile.
+
+Signed-off-by: Edmund Raile <edmund.raile@protonmail.com>
+Tested-by: Edmund Raile <edmund.raile@protonmail.com>
 
 
