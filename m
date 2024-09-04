@@ -1,153 +1,165 @@
-Return-Path: <netdev+bounces-124932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60F0096B65C
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:20:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6838B96B668
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:22:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CCA8288C3F
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:20:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90C781C217E6
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BA01CCEFC;
-	Wed,  4 Sep 2024 09:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB721CCEC9;
+	Wed,  4 Sep 2024 09:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lxnen0D5"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7988B17C9AA
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 09:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA651CCEC4;
+	Wed,  4 Sep 2024 09:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725441616; cv=none; b=UmXmrBORfIDt7vzRPmWYoBvo5MPgkusruE4B2XbzjaCafkSML0Gyrk/3pSXWvm85KSrSuYSTyJ/6VXY29bONsAE/8CQygB9ZO2UEc3kwhrOBPNFkbWRDVTmoWmG0SHQqBC9T9aqKJlvBvbLf7yduK8z3fpHBZ4JRYrn71xOSgRQ=
+	t=1725441731; cv=none; b=qPmdKeEzgGvw6m+E9xrc+PW30ResyZkJkS0A5qCnQ16yKvyIWB53LFKzJLJDm7F3tTzPKoKFEVBVd/JSdL85N/Is4RDoFnD7av4T5BMrH5DWThC0Da69Pbh3rMokI+NZMc5jOk3SNyFxsfEeE5P3/Be4l+qq6u9qmKIHcurZJT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725441616; c=relaxed/simple;
-	bh=WuRMqP+opsdPUvNSiW70+emfjDzD9Qgliwa3GLm0GmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EI8purSq5fZht1g5e6AInas4Qjj1UW8BNi8y3sWdabXpx+92v/GvLkNc0UGFzlBf+ojxi5+z+7isyLb/R+0rl3TRztpui9BLJWcGdY4kxocMLID5+haOYXSoJAyXcGHUHcRfh8UMhH+MxjGN8B1kw7tbutoqo1+tT0Si8v7FP7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1slmAz-0002tc-Pd; Wed, 04 Sep 2024 11:19:45 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1slmAx-005PrZ-1z; Wed, 04 Sep 2024 11:19:43 +0200
-Received: from pengutronix.de (pd9e5994e.dip0.t-ipconnect.de [217.229.153.78])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id A4329332301;
-	Wed, 04 Sep 2024 09:19:42 +0000 (UTC)
-Date: Wed, 4 Sep 2024 11:19:42 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Heiko =?utf-8?Q?St=C3=BCbner?= <heiko@sntech.de>
-Cc: kernel@pengutronix.de, Alibek Omarov <a1ba.omarov@gmail.com>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Elaine Zhang <zhangqing@rock-chips.com>, 
-	David Jander <david.jander@protonic.nl>, Simon Horman <horms@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org, David Jander <david@protonic.nl>
-Subject: Re: [PATCH can-next v5 00/20] can: rockchip_canfd: add support for
- CAN-FD IP core found on Rockchip RK3568
-Message-ID: <20240904-meticulous-original-sturgeon-ad2db3-mkl@pengutronix.de>
-References: <20240904-rockchip-canfd-v5-0-8ae22bcb27cc@pengutronix.de>
- <86274585.BzKH3j3Lxt@diego>
+	s=arc-20240116; t=1725441731; c=relaxed/simple;
+	bh=M/YMBXSKsJJnQYD9L+NPHiOgp4jVmpfZWlI+u6bgPpw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RA34y4puE03Amg4MLvOQJQjR6eeAekcFYcSfdlRM+o1YI+Ds/ClR9zZRbh6A8/jOLHd7X28IACTWc9A5pHfBNKDjqnPAzxJh9t091+gCGkQhJAr6iq6PgD6GYdYdszgL4i7kcMgn8KK4uvVfZacfR9i1306a8u0jNUQEJ3lYCdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lxnen0D5; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7177a85d092so436831b3a.3;
+        Wed, 04 Sep 2024 02:22:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725441729; x=1726046529; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xdbrukLjPRrEeDE2KtUX1s95Lzj5JQAy01g2Kp/GPkM=;
+        b=Lxnen0D5BjiEdM8apdSkBOwWeBXzBV61cDHtsVk+/TCyxRo7VS4l7UogbSntqk5Q92
+         m0wR3TnwZT16m/G5ZB69HwJyBXsUFiVRqrlvHyZygn6eAiPImTDkPuxGqGDChSTGvjiC
+         ZEWFlJubb9FV0iKrrRTfuV1F9o5BfMAec2Sl1UJhyXHPaF+g0ndkTfze23kWdgKMk33g
+         /pdPM2xo1qdaVQ7KWzQ0pPs0hDTkdKZDdHynf9QrMsCf7pZ9hYh8aIWdFb00j8Drumof
+         CVBUOcfTNARo/uA+75HP31hg4GSPd5Ny37tSCqkZhB23zgPLsErr9i4c8yOdD2tCacti
+         Eatw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725441729; x=1726046529;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xdbrukLjPRrEeDE2KtUX1s95Lzj5JQAy01g2Kp/GPkM=;
+        b=hZkS6SvI+taTIU2wBfGtM+9ZDpZKlCHjdtJ8rM8wVC/97MP08yoha/fZXJwOJU5gK5
+         wmBDEi3FdulSdO/Y1m46nhu7twQx6HFrzPFzrsv88wKHlSt2JccTAxMTYa4IDmVSStEr
+         5SECpeaMa6ErIdMzi8xhVZBUuaV40yxUcxC6FyMpbpNteqBwTpcRlRB5eGE9udpX/5I5
+         g4JWGfdR07qGMjLzh35w4FKGh42SRq7LSiz7GC08RA63o1gnBzk7c0PK175Ume5HGBXh
+         c2PmeeAXPCKQrYFbrbJYa02s6zIvl3eZLakJTprMbD7W+3XVwZWlooCpdLkKkimquWns
+         GNig==
+X-Forwarded-Encrypted: i=1; AJvYcCW5MO0HU6BI+KOhpTemc6ijNpINfW6hvUe1z5GDK6GW8kGmaBw0hTBScA9yboZDSmmD6U42U9HI4UaarnM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtoGLoF1HEbkDQKDIV/843KFhD3knOsmz4tPJ7FVchBpBxEu0m
+	MfpNfIDuEQyqC05ctLRo2geljFPKICre21QTDnfweb7yPRKvp2KJ
+X-Google-Smtp-Source: AGHT+IHZoPSnLfOD0195kXHp8FwhTb/QlnwaX/dwZNMNqywXzjijSFZLEA80Dx6SgU0+jMbZWZ9AEQ==
+X-Received: by 2002:a05:6a00:2789:b0:70a:f576:beeb with SMTP id d2e1a72fcca58-715dfc3a15emr24155318b3a.15.1725441729432;
+        Wed, 04 Sep 2024 02:22:09 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7177859968csm1232048b3a.146.2024.09.04.02.22.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Sep 2024 02:22:08 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk,
+	linux@armlinux.org.uk,
+	xfr@outlook.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v7 0/7] net: stmmac: FPE via ethtool + tc
+Date: Wed,  4 Sep 2024 17:21:15 +0800
+Message-Id: <cover.1725441317.git.0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="2ss46ydut665ggdf"
-Content-Disposition: inline
-In-Reply-To: <86274585.BzKH3j3Lxt@diego>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
+Move the Frame Preemption(FPE) over to the new standard API which uses
+ethtool-mm/tc-mqprio/tc-taprio.
 
---2ss46ydut665ggdf
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Changes in v7:
+  1. code style fixes and clean up warnings reported by
+  patchwork netdev checks, no functional change intended
 
-On 04.09.2024 10:55:21, Heiko St=C3=BCbner wrote:
-> Hi Marc,
->=20
-> Am Mittwoch, 4. September 2024, 10:12:44 CEST schrieb Marc Kleine-Budde:
-> > This series adds support for the CAN-FD IP core found on the Rockchip
-> > RK3568.
-> >=20
-> > The IP core is a bit complicated and has several documented errata.
-> > The driver is added in several stages, first the base driver including
-> > the RX-path. Then several workarounds for errata and the TX-path, and
-> > finally features like hardware time stamping, loop-back mode and
-> > bus error reporting.
-> >=20
-> > regards,
-> > Marc
-> >=20
-> > Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
->=20
-> I have neither CAN knowledge, nor hardware to test, but the integration
-> itself looks pretty easy and straight-forward.
->=20
-> Not sure how much it helps, but at this moment I assume you know what
-> you're doing with respect to the CAN controller ;-)
+Changes in v6:
+  1. new FPE verification process based on Vladimir Oltean's proposal
+  2. embed ethtool_mm_state into stmmac_fpe_cfg
+  3. convert some bit ops to u32_replace_bits
+  4. register name and function name update to be more descriptive
+  5. split up stmmac_tc_ops of dwmac4+ and dwxgmac, they have different
+  implementations about mqprio
+  6. some code style fixes
 
-I hope so :) The controller has some flaws :/
+Changes in v5:
+  1. fix typo in commit message
+  2. drop FPE capability check in tc-mqprio/tc-taprio
 
-> Rest of the series (that hasn't got a Rb):
->=20
-> Acked-by: Heiko Stuebner <heiko@sntech.de>
+Changes in v4:
+  1. reorder FPE-related declarations and definitions into clean groups
+  2. move mm_lock to stmmac_fpe_cfg.lock
+  3. protect user configurations across NIC up/down
+  4. block stmmac_set_mm() when fpe_task is in progress to finish
+  5. convert to ethtool_dev_mm_supported() to check FPE capability in
+  tc-mqprio/tc-taprio
+  6. silence FPE workqueue start/stop logs
 
-Thanks.
+Changes in v3:
+  1. avoid races among ISR, workqueue, link update and
+  register configuration.
+  2. update FPE verification retry logic, so it retries
+  and fails as expected.
 
-> How/when are you planning on applying stuff?
->=20
-> I.e. if you're going to apply things still for 6.12, you could simply take
-> the whole series if the dts patches still apply to your tree ;-)
+Changes in v2:
+  1. refactor FPE verification process
+  2. suspend/resume and kselftest-ethtool_mm, all test cases passed
+  3. handle TC:TXQ remapping for DWMAC CORE4+
 
-Actually I've already started my PR workflow, but I'll address your
-review feedback, add your tags and send a new PR today. This will go via
-net-next into v6.12.
+Furong Xu (7):
+  net: stmmac: move stmmac_fpe_cfg to stmmac_priv data
+  net: stmmac: drop stmmac_fpe_handshake
+  net: stmmac: refactor FPE verification process
+  net: stmmac: configure FPE via ethtool-mm
+  net: stmmac: support fp parameter of tc-mqprio
+  net: stmmac: support fp parameter of tc-taprio
+  net: stmmac: silence FPE kernel logs
 
-regards,
-Marc
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  10 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.c  |  96 +++++-
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  12 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |   9 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |   4 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  21 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  30 +-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  91 ++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 275 ++++++++----------
+ .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 130 ++++++---
+ include/linux/stmmac.h                        |  28 --
+ 11 files changed, 467 insertions(+), 239 deletions(-)
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+-- 
+2.34.1
 
---2ss46ydut665ggdf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbYJioACgkQKDiiPnot
-vG8qKwf/e6qNy9jnMMR4a2ZA/TwN7Gvr9EtSz4YN78xGfPErfDaPjMMw11WRNBA0
-foCcQRuNrOh/JoM+LcOO+bFM35p+M5GoPnXZreAuHolU7OZzSrCC6CVIFwuQKVDm
-qVnmgnt5AU3YjFvU79RyPUHCtxsFQQPqDUKusLRgevAkXDtc2GwNDNumKrOaQGe2
-8A+NSKRHYzpd1NYm2K/RV6VmbxrjWe8Zd3TlaFAQTjIaDadCmjbo2qA+3HjIwenm
-CKYMxixTvEjEffTEBRy0AX2Cnp6j5xX7VmYdCDYrPzfvhWZx1vm2KFQ+pDWk+mNa
-18dciG/5BLFa6hiFAx+agcVetZGWiA==
-=Wdm5
------END PGP SIGNATURE-----
-
---2ss46ydut665ggdf--
 
