@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-125267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69BCA96C8AE
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 22:39:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2857896C8B5
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 22:41:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 138E71F26863
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:39:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A09791F26A4F
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A581A148317;
-	Wed,  4 Sep 2024 20:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A462E148FEC;
+	Wed,  4 Sep 2024 20:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SwxrzMYX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EYW0FbDq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776F11EBFEC;
-	Wed,  4 Sep 2024 20:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 637B7146A79;
+	Wed,  4 Sep 2024 20:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725482362; cv=none; b=f1enfi9pemGtvORcdAChkuHPL9wJsTqXUW/oOkZh67vvGDFuARMGpdY8/7wK42HyTCFxQFqKdJGDIGws7/D9SmmsOn1Ow8MvPA90bReLTQkYHnMm9FHTnPjyM5viGPCeCwKc2UnBN/1u/Oh+0ws5+JBZmyLuPx52WKLS5tzEOso=
+	t=1725482482; cv=none; b=TQ6ZWe4iNdWjyApAINT05/LLKs/0uafmXdtXtKokDHrjqdfrHff60V8pCTVvm1ZqLKkNOEL4yCmOV082Q/zUkhnWKmXv7VwrPu3j30tEDkWbeHnOjLk/U4HYTIBB/4CoAMD/uffPM1XHc6vaTT4MIq60i/bbRrJG5kYJQjzWk3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725482362; c=relaxed/simple;
-	bh=uPiQ61OOR0hZ57gQNFysNnyl3ZeWchlxMMXCZIsLWcU=;
+	s=arc-20240116; t=1725482482; c=relaxed/simple;
+	bh=VhUtjS8+mpi7iOTGy7OvWlejugJXOLwG6Ki4fLIjVd0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=U1pI1QspOcfMmlEYSKxhrtVIW0onVZFw7GnC5axduVrHu80L7iIMQHVOh9AIyTQAVWh/0fkWn9MCI6JKCVpmG6sbgR3NfoOvD3eJjriok87eRUcErYnEK1Tj8AHFDFDX9+s6KtmER8OY0z6IHejZuxhxcACIZKLxnvo5c3ZaOok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SwxrzMYX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4DEFC4CEC2;
-	Wed,  4 Sep 2024 20:39:18 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=cmTne7uD/OmYgR5uLcRRU6HKu/HryR/V6SaaNjkAGZ5tKWfSRyvvhvHVe4wQIc4RwwG5JiWeHo+/tOcFC9vQbUbFFdQnbxJtNjgLQ/8XhIMN28vlZk99QAk7zoI1zjYxkjf6Y8P+7xQAG5OpZ3kqeZHVnoO2SdD+Ga1z7ObBNUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EYW0FbDq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A0E8C4CEC2;
+	Wed,  4 Sep 2024 20:41:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725482362;
-	bh=uPiQ61OOR0hZ57gQNFysNnyl3ZeWchlxMMXCZIsLWcU=;
+	s=k20201202; t=1725482482;
+	bh=VhUtjS8+mpi7iOTGy7OvWlejugJXOLwG6Ki4fLIjVd0=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SwxrzMYXf3fGfmWvsNafCG0TUa1xDjoxu7pZeKFl1u1kq+SkrvdPl4UjXOx15mk/Q
-	 t6a7odt4dUW8gassDj6WhhOzS3rAVZejOl0P2cN/DXFy1PkITzyRne/NMs5igfKhL7
-	 jaA3O8XSd2Lpeu2cBYUwDlo0B/D1owWFF4mHjrRKJ7Qqq85mBScRV0IL/SjAOjp6Xy
-	 xGy1a85OfzqnUHAFmPcgdbf1mgG/y0VTzcJbF9dc2gnKQGarqKLRtsSLnlMwIvI4Zm
-	 DTL4MyqCYeeIIr6/zJPIaoCgpdCKRcwbzIbZrY1j24gkUjOqaggDRo4QjGVJX2+OaC
-	 bQbAS2mnUL+2w==
-Message-ID: <e4a13002-f471-4951-9180-14f0f8b30bd2@kernel.org>
-Date: Wed, 4 Sep 2024 22:39:10 +0200
+	b=EYW0FbDqC5NG9iE9ugWUKIi8S3Qh1GeSgJjhvaK6ERlo+LxRA+NH3keU21VxNojbH
+	 Q4dVHejI0HKOVS878IDsfLpipKST4m1PIpjdBzqhhiXsKAKfjYbSKBOkMnfdYhXV4T
+	 g0iu02e3wJRnHcbkTM+FBRF+Vlj78mGJHnLxR3vj/dbIO4CsjO0GR+dTphv5xpq8MI
+	 5EmoFWkAITv+6aTpY3HYjrsP/2Mzo4s5RoMgsHMynYICsk0slIJDA6sPh0heXErkD7
+	 wMlQ82eZcCbh0y3E3WVGfwzY56zleowz1ZOgznlq4gG4wDvf9+Kb7vaxA7tbJwCE+g
+	 vBhEgjf+4SgGw==
+Message-ID: <d91e6446-bdb1-4c22-a5c3-4c3f3dccebdb@kernel.org>
+Date: Wed, 4 Sep 2024 22:41:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,16 +50,19 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH V2] mptcp: pm: Fix uaf in __timer_delete_sync
+Subject: Re: [PATCH net-next 0/3] selftests: mptcp: add time per subtests in
+ TAP output
 Content-Language: en-GB
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: davem@davemloft.net, edumazet@google.com, geliang@kernel.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org, martineau@kernel.org,
- mptcp@lists.linux.dev, netdev@vger.kernel.org, pabeni@redhat.com,
- syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com
-References: <tencent_EECBD37DC379497A63A1C455B773377AC605@qq.com>
- <tencent_472581BA11BB2533E79EA21B964B2A1BC408@qq.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240902-net-next-mptcp-ksft-subtest-time-v1-0-f1ed499a11b1@kernel.org>
+ <20240903162217.07c366c9@kernel.org>
+ <559e1458-b593-44c7-92b1-6946c57496c5@kernel.org>
+ <20240904124025.3ec84142@kernel.org>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -105,86 +108,60 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <tencent_472581BA11BB2533E79EA21B964B2A1BC408@qq.com>
+In-Reply-To: <20240904124025.3ec84142@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hello,
+Hi Jakub,
 
-Thank you for this patch!
+Thank you for your reply!
 
-On 04/09/2024 03:01, Edward Adam Davis wrote:
-> There are two paths to access mptcp_pm_del_add_timer, result in a race
-> condition:
+On 04/09/2024 21:40, Jakub Kicinski wrote:
+> On Wed, 4 Sep 2024 18:15:09 +0200 Matthieu Baerts wrote:
+>>> Best I could come up with is:
+>>>
+>>> diff --git a/contest/remote/vmksft-p.py b/contest/remote/vmksft-p.py
+>>> index fe9e87abdb5c..a37245bd5b30 100755
+>>> --- a/contest/remote/vmksft-p.py
+>>> +++ b/contest/remote/vmksft-p.py
+>>> @@ -73,7 +73,7 @@ group3 testV skip
+>>>      tests = []
+>>>      nested_tests = False
+>>>  
+>>> -    result_re = re.compile(r"(not )?ok (\d+)( -)? ([^#]*[^ ])( # )?([^ ].*)?$")
+>>> +    result_re = re.compile(r"(not )?ok (\d+)( -)? ([^#]*[^ ])( +# )?([^ ].*)?$")  
+>>
+>> Looks good to me. While at it, we can add a '+' for the spaces after the
+>> '#':
+>>
+>>   ( +# +)
 > 
->      CPU1				CPU2
->      ====                               ====
->      net_rx_action
->      napi_poll                          netlink_sendmsg
->      __napi_poll                        netlink_unicast
->      process_backlog                    netlink_unicast_kernel
->      __netif_receive_skb                genl_rcv
->      __netif_receive_skb_one_core       netlink_rcv_skb
->      NF_HOOK                            genl_rcv_msg
->      ip_local_deliver_finish            genl_family_rcv_msg
->      ip_protocol_deliver_rcu            genl_family_rcv_msg_doit
->      tcp_v4_rcv                         mptcp_pm_nl_flush_addrs_doit
->      tcp_v4_do_rcv                      mptcp_nl_remove_addrs_list
->      tcp_rcv_established                mptcp_pm_remove_addrs_and_subflows
->      tcp_data_queue                     remove_anno_list_by_saddr
->      mptcp_incoming_options             mptcp_pm_del_add_timer
->      mptcp_pm_del_add_timer             kfree(entry)
+> 👍️
 > 
-> In remove_anno_list_by_saddr(running on CPU2), after leaving the critical
-> zone protected by "pm.lock", the entry will be released, which leads to the
-> occurrence of uaf in the mptcp_pm_del_add_timer(running on CPU1).
+>> I see you didn't commit the previous modification. I can open a PR if it
+>> helps.
 > 
-> Reported-and-tested-by: syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=f3a31fb909db9b2a5c4d
+> I was just playing with the regexps in the interpreter. If you could
+> send a PR that'd perfect.
 
-Please add a Fixes tag and Cc stable.
+Sure, done:
 
-And add 'net' after PATCH in the subject:
+  https://github.com/linux-netdev/nipa/pull/38
 
-  [PATCH net v3]
-
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> ---
->  net/mptcp/pm_netlink.c | 2 ++
->  1 file changed, 2 insertions(+)
+>>>      time_re = re.compile(r"time=(\d+)ms")
+>>>  
+>>>      for line in full_run.split('\n'):
+>>>
+>>> Thoughts?  
+>>
+>> In my v2, I will also strip these trailing whitespaces in the selftests,
+>> they don't need to be there.
 > 
-> diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-> index 3e4ad801786f..d4cbf7dcf983 100644
-> --- a/net/mptcp/pm_netlink.c
-> +++ b/net/mptcp/pm_netlink.c
-> @@ -1430,8 +1430,10 @@ static bool remove_anno_list_by_saddr(struct mptcp_sock *msk,
->  
->  	entry = mptcp_pm_del_add_timer(msk, addr, false);
->  	if (entry) {
-> +		spin_lock_bh(&msk->pm.lock);
->  		list_del(&entry->list);
->  		kfree(entry);
-> +		spin_unlock_bh(&msk->pm.lock);
+> Up to you - it doesn't violate the KTAP format and the visual alignment
+> is nice. But it may trip up more regexps..
 
-Mmh, I can understand it would help to reduce issues here, but I don't
-think that's enough: in mptcp_pm_del_add_timer(), CPU1 can get the entry
-from the list under the lock, then immediately after, the free can
-happen on CPU2, while CPU1 is trying to access entry->add_timer outside
-the lock, no? Something like this:
-
-  CPU1              CPU2
-  ====              ====
-  entry = (...)
-                    kfree(entry)
-  entry->add_timer
-
-
-What about keeping a reference to add_timer inside the lock, and calling
-sk_stop_timer_sync() with this reference, instead of "entry->add_timer"?
-I'm thinking about something like that to be applied *on top* of your
-patch, WDYT?
-
-  https://lore.kernel.org/20240904170517.237863-2-matttbe@kernel.org
+Yes, better be safe... I will keep the visual alignment for the non-TAP
+output.
 
 Cheers,
 Matt
