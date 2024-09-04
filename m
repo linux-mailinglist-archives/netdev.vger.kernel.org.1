@@ -1,170 +1,153 @@
-Return-Path: <netdev+bounces-124931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD81B96B641
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:14:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60F0096B65C
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F26E81C20CFA
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:14:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CCA8288C3F
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AE1A185935;
-	Wed,  4 Sep 2024 09:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gv0ZDEaK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BA01CCEFC;
+	Wed,  4 Sep 2024 09:20:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FDF2C181
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 09:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7988B17C9AA
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 09:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725441286; cv=none; b=nxQeTU+Xhsm4BCZw0WjVpSpr4CACkMl5fjIHavP/hjL5xLPV6nhAFVb24fbH39Sy+uWAcW0UBQs3aQf/S/IKudYflf2KFBPSjN2vrENHuOxhqlJf6WcN1Yp3ZTkCsSBobMde6WBaTGqMZIEHlckHH4P4+nObY2zB4VQZk9wfYR4=
+	t=1725441616; cv=none; b=UmXmrBORfIDt7vzRPmWYoBvo5MPgkusruE4B2XbzjaCafkSML0Gyrk/3pSXWvm85KSrSuYSTyJ/6VXY29bONsAE/8CQygB9ZO2UEc3kwhrOBPNFkbWRDVTmoWmG0SHQqBC9T9aqKJlvBvbLf7yduK8z3fpHBZ4JRYrn71xOSgRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725441286; c=relaxed/simple;
-	bh=x+AvTO1pXOr3mRNnfh+oRWVQCo5ni5lIhFtj/WUoYJk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mLASITMQMzl5OoAF0prulU1LXrPEtCzLDVyhi8Z8JdtwDdRvep03kFYUwizW5Re3dNzEgjZyxylYb231FgsMnEAbTRbntEXOHNU3MeftHCUOh5mtch1QztcQzoVRlt7I3j1TXnqL5l0oq5CJOE6ikat3V3n9PCZDG3tFZWuH5/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gv0ZDEaK; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-39f51934f61so14183355ab.2
-        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 02:14:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725441284; x=1726046084; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SlT8pDE0AS+PtnT6Ru+cuG5A+CmSlzNKFYV+D9bEAAk=;
-        b=gv0ZDEaK/YhWDBu/77u9sxFUdtax+3exNLeaFSVe7Fna117lv2iOwjR6ucjJVpxknG
-         Eu+xxnfCVaIY3/wS1ezKwpJjaxQgxQkhNjtNZwEECoKNgWwk9yiybVu6Y6GkwPuv/NCy
-         EcyItuR17WiJcIBR2kM/CVXiEEek5IQlnxE54W84xlvWxE1y7dya4pxMIOB1R1x+ICb/
-         xkdyq67cgLBIFLyhv8akXCd9wEABr2JEVCfA27MpAnofMmbUprzmWLPL6+vEX0jIy5FG
-         BX9uRN/0W6BMzyoCtDBufs94rx8e+pRnqQtjspRu7YjHtF1gdH8zNP8lkzmJPfwLvQfI
-         lELA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725441284; x=1726046084;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SlT8pDE0AS+PtnT6Ru+cuG5A+CmSlzNKFYV+D9bEAAk=;
-        b=gP/r/kFbDnWu6L8e2jjRJmS1BSonBpr5Wc2e1cazAegVR8MnnAmte/RGXAWDv5vkoI
-         dSo2/roeGDsznosw3EHPKZWYdWHqxL+tkI+bZSuozWqE0FiN0xvKqKSwJmXOfwpAqnr3
-         Yz635dLGGuNtPx02tiheui2MkR2ANaF7VXi7b+MHlZeps3tCdzOBCB71maqlCrcDQcSi
-         4bpPFTIsNzsB4LIxK9kmTK8lMNSkZyOurZePzs1JqfvFXx0rwYfp+uuSXZxDcr4hFMQi
-         ERAoEocjVVkr+ulOcSHeoq5FP+pJ+OyRp33v/hKrDscyKHLXzrngaTNbripvHi4Tabmc
-         IMzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUf2bH66qgqbNlanoXyT1kvfyYk/Zqlbt/qVFlsWb5rHbkbcsBcAHz/WdIa3DbEzpAYU0Krplw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMwO+ZupaqmSr8Z8a+EpQdTrnyuudHd/gsuGjwJjBSgFjpp/qC
-	NbT3GGNjnmGm8CmjADUdCymqzLH1jSbz8ARLFDcShwR/VpiujzY/ENTestQaV58Ylsg4wxglvLc
-	aYpT4NozOfzb/2bt9avkngfmrZ88=
-X-Google-Smtp-Source: AGHT+IE181qZIWC7GK2ttyHE3P92DfzlMhYXNbL4TRjNzuTkqrB4QGobcjg9Idf9rNTRlqTJD6rmeypKFGSc3m9TQs0=
-X-Received: by 2002:a05:6e02:13aa:b0:39b:34dd:43d1 with SMTP id
- e9e14a558f8ab-39f6a9f54bfmr67693595ab.22.1725441283640; Wed, 04 Sep 2024
- 02:14:43 -0700 (PDT)
+	s=arc-20240116; t=1725441616; c=relaxed/simple;
+	bh=WuRMqP+opsdPUvNSiW70+emfjDzD9Qgliwa3GLm0GmI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EI8purSq5fZht1g5e6AInas4Qjj1UW8BNi8y3sWdabXpx+92v/GvLkNc0UGFzlBf+ojxi5+z+7isyLb/R+0rl3TRztpui9BLJWcGdY4kxocMLID5+haOYXSoJAyXcGHUHcRfh8UMhH+MxjGN8B1kw7tbutoqo1+tT0Si8v7FP7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1slmAz-0002tc-Pd; Wed, 04 Sep 2024 11:19:45 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1slmAx-005PrZ-1z; Wed, 04 Sep 2024 11:19:43 +0200
+Received: from pengutronix.de (pd9e5994e.dip0.t-ipconnect.de [217.229.153.78])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id A4329332301;
+	Wed, 04 Sep 2024 09:19:42 +0000 (UTC)
+Date: Wed, 4 Sep 2024 11:19:42 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Heiko =?utf-8?Q?St=C3=BCbner?= <heiko@sntech.de>
+Cc: kernel@pengutronix.de, Alibek Omarov <a1ba.omarov@gmail.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Philipp Zabel <p.zabel@pengutronix.de>, Elaine Zhang <zhangqing@rock-chips.com>, 
+	David Jander <david.jander@protonic.nl>, Simon Horman <horms@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org, David Jander <david@protonic.nl>
+Subject: Re: [PATCH can-next v5 00/20] can: rockchip_canfd: add support for
+ CAN-FD IP core found on Rockchip RK3568
+Message-ID: <20240904-meticulous-original-sturgeon-ad2db3-mkl@pengutronix.de>
+References: <20240904-rockchip-canfd-v5-0-8ae22bcb27cc@pengutronix.de>
+ <86274585.BzKH3j3Lxt@diego>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240830153751.86895-1-kerneljasonxing@gmail.com>
- <20240830153751.86895-2-kerneljasonxing@gmail.com> <20240903121940.6390b958@kernel.org>
- <66d78a1e5e6ad_cefcf294f1@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66d78a1e5e6ad_cefcf294f1@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 4 Sep 2024 17:14:07 +0800
-Message-ID: <CAL+tcoASfb-EPtdpmunbo2zxpQx19Kv+b8Bzs91diVFYYqQz7Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/2] net-timestamp: filter out report when
- setting SOF_TIMESTAMPING_SOFTWARE
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, willemb@google.com, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, dsahern@kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2ss46ydut665ggdf"
+Content-Disposition: inline
+In-Reply-To: <86274585.BzKH3j3Lxt@diego>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+
+--2ss46ydut665ggdf
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 4, 2024 at 6:13=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jakub Kicinski wrote:
-> > On Fri, 30 Aug 2024 23:37:50 +0800 Jason Xing wrote:
-> > > +   if (val & SOF_TIMESTAMPING_RX_SOFTWARE &&
-> > > +       val & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
-> > > +           return -EINVAL;
-> >
-> >
-> > > -           if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_SOFTWARE=
-)
-> > > +           if (tsflags & SOF_TIMESTAMPING_SOFTWARE &&
-> > > +               (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
-> > > +                !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)=
-))
-> > >                     has_timestamping =3D true;
-> > >             else
-> > >                     tss->ts[0] =3D (struct timespec64) {0};
-> > >     }
-> >
-> > >     memset(&tss, 0, sizeof(tss));
-> > >     tsflags =3D READ_ONCE(sk->sk_tsflags);
-> > > -   if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
-> > > +   if ((tsflags & SOF_TIMESTAMPING_SOFTWARE &&
-> > > +        (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
-> > > +        skb_is_err_queue(skb) ||
-> > > +        !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER))) &&
-> >
-> > Willem, do you prefer to keep the:
-> >
-> >       tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
-> >       !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
-> >
-> > conditions?IIUC we prevent both from being set at once. So
-> >
-> >       !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
-> >
-> > is sufficient (and, subjectively, more intuitive).
->
-> Good point. Yes, let's definitely simplify.
->
-> > Question #2 -- why are we only doing this for SW stamps?
-> > HW stamps for TCP are also all or nothing.
->
-> Fair. Else we'll inevitably add a
-> SOF_TIMESTAMPING_OPT_RX_HARDWARE_FILTER at some point.
->
-> There probably is no real use to filter one, but not the other.
->
-> So SOF_TIMESTAMPING_OPT_RX_FILTER then, and also apply
-> to the branch below:
->
->         if (shhwtstamps &&
->             (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE) &&
->             !skb_is_swtx_tstamp(skb, false_tstamp)) {
->
-> and same for tcp_recv_timestamp.
+On 04.09.2024 10:55:21, Heiko St=C3=BCbner wrote:
+> Hi Marc,
+>=20
+> Am Mittwoch, 4. September 2024, 10:12:44 CEST schrieb Marc Kleine-Budde:
+> > This series adds support for the CAN-FD IP core found on the Rockchip
+> > RK3568.
+> >=20
+> > The IP core is a bit complicated and has several documented errata.
+> > The driver is added in several stages, first the base driver including
+> > the RX-path. Then several workarounds for errata and the TX-path, and
+> > finally features like hardware time stamping, loop-back mode and
+> > bus error reporting.
+> >=20
+> > regards,
+> > Marc
+> >=20
+> > Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+>=20
+> I have neither CAN knowledge, nor hardware to test, but the integration
+> itself looks pretty easy and straight-forward.
+>=20
+> Not sure how much it helps, but at this moment I assume you know what
+> you're doing with respect to the CAN controller ;-)
 
-When I'm looking at this part, I noticed that RAW_HARDWARE is actually
-a tx report flag instead of rx, please also see the kdoc you wrote a
-long time ago:
+I hope so :) The controller has some flaws :/
 
-SOF_TIMESTAMPING_RAW_HARDWARE:
-  Report hardware timestamps as generated by
-  SOF_TIMESTAMPING_TX_HARDWARE when available.
+> Rest of the series (that hasn't got a Rb):
+>=20
+> Acked-by: Heiko Stuebner <heiko@sntech.de>
 
-If so, OPT_RX_FILTER doesn't fit for the name of tx timestamp.
+Thanks.
 
-I wonder if I can only revise the series with the code simplified as
-Jakub suggested and then repost it? I think we need to choose a new
-name for this tx hardware report case, like
-SOF_TIMESTAMPING_OPT_TX_HARDWARE_FILTER?
+> How/when are you planning on applying stuff?
+>=20
+> I.e. if you're going to apply things still for 6.12, you could simply take
+> the whole series if the dts patches still apply to your tree ;-)
 
-Since it belongs to the tx path, can I put it into another series or a
-new patch in the current series where I will explicitly explain why we
-also need to introduce this new flag?
+Actually I've already started my PR workflow, but I'll address your
+review feedback, add your tags and send a new PR today. This will go via
+net-next into v6.12.
 
-Thanks,
-Jason
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--2ss46ydut665ggdf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbYJioACgkQKDiiPnot
+vG8qKwf/e6qNy9jnMMR4a2ZA/TwN7Gvr9EtSz4YN78xGfPErfDaPjMMw11WRNBA0
+foCcQRuNrOh/JoM+LcOO+bFM35p+M5GoPnXZreAuHolU7OZzSrCC6CVIFwuQKVDm
+qVnmgnt5AU3YjFvU79RyPUHCtxsFQQPqDUKusLRgevAkXDtc2GwNDNumKrOaQGe2
+8A+NSKRHYzpd1NYm2K/RV6VmbxrjWe8Zd3TlaFAQTjIaDadCmjbo2qA+3HjIwenm
+CKYMxixTvEjEffTEBRy0AX2Cnp6j5xX7VmYdCDYrPzfvhWZx1vm2KFQ+pDWk+mNa
+18dciG/5BLFa6hiFAx+agcVetZGWiA==
+=Wdm5
+-----END PGP SIGNATURE-----
+
+--2ss46ydut665ggdf--
 
