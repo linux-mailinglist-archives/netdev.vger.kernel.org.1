@@ -1,322 +1,269 @@
-Return-Path: <netdev+bounces-124988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5647296B82B
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:21:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7776096B88E
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:31:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE4BA1F213BD
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:21:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA9DFB25783
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:31:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE22C1CCB24;
-	Wed,  4 Sep 2024 10:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D349E1CC887;
+	Wed,  4 Sep 2024 10:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TKYVF7qj"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="frG8bexu"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2070.outbound.protection.outlook.com [40.107.94.70])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556C31EBFEB;
-	Wed,  4 Sep 2024 10:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725445262; cv=fail; b=VQ45nTPOXRm0yz9IElOMWBtdHT+ApTAYjYqvaJVEewELmp15ZZB4r1hodBY0TMzEHju6WjZ23OiGb6on+hMRI/WXjKpB6fDjWR3+KNcTebpc5sfQkwzY3TRj3Td2hfxJ4gWhrh3GEkVi5nVGb1/z81UJysDYdJrH+OU6URnuh+w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725445262; c=relaxed/simple;
-	bh=b1n/rwQGxWtJPRVvRmXQ70cgqX5nbd3RoP/+PT0Rzi4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KVqjNfwBoCbwNizDO+iIwBgkt/anPpJPUIuj4IvQDj1yosysPSorWz90q1py4y/MhklIlrGoyIZ/mjLs3TsIWXr3tSORsmhBdhwDhBp7S4Fr8zaSPjp+wNQ1yJw4DfbmtPynCssNP0fjNaVQa26sf2wy0MZeLAoKQC5/EnCHNLg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TKYVF7qj; arc=fail smtp.client-ip=40.107.94.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA34126C01;
+	Wed,  4 Sep 2024 10:30:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725445846; cv=none; b=l87l+Kh3XpkH81OsEd7DXLrVB5tGpjrlX3goa9rzzn4ozGL+OL/Dgl+vF0UizBZa0jyXqO87RafN4ym/5ReBXrlFJGVvvTEAzZg9eDDFtV679zk5wdHeR3w6T6qV7gFcsyYuLfgAWguH08Nssrf+fqe6VOlNhmG4f6G1nSFBYoU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725445846; c=relaxed/simple;
+	bh=Kqs/rtR/ZYEIbehKp6eU3zceRyY4RAprXn7yHk1aXCs=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iVRAyhI9CIq1y6HfzQRY09OLBvG56F8AxUBqCUQRtRv2TOx9P0TBHxc+CfFztA9AgnLRYuM1x7RHcJvT/h5OTSnzxBHMKhxidp80YrrdXkhXjH0fFj8lQ9bDX7HbUxrWrvr/fGGw8eJdmbbidU9TGen0EGVcKG4CAPtEyXVkX0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=frG8bexu; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hx2jhDE+1rbtFZ1GGq5srf7/+9m8FRUBhbM65WykEqZNTPaUZbpTQF6Y9eFPPbLS5qAkYQXMADfDLjIimmLJTG7DOmdOJXlKvzMey0kGc8+g51pfZC7vf9WQxnP++c4okMgH/HSnRsNcGDILqykcYzJEnmG8e0yNVEgjBe1xeUXlTW7zX9IPVpsVyjbXRx86UXBCCnxohxKvd7ucyvqgi0qP9dUgjgFydXTTpKM1Ur5gyhzdWaiCB/p627rYn239WYrIQomdtGjNIhzEJwlNne8q72ROOVhF532IlzxHqRGyqRnzp+1BCIo8TPr/lYzWtgoWpGcpnIOjtN/rQaiXCA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b1n/rwQGxWtJPRVvRmXQ70cgqX5nbd3RoP/+PT0Rzi4=;
- b=M5k/YijOXHAL1wfRejhEECFWZJqNLw9bSpu2y99XfkYTuvSiiV2DxtBpUmS1QVgyTL9hFhY84mNnVdUSb2oJFtLwc6HSGFZdpZx3a1oUfOZ/TIpHNKbxvJ9WzkYnmFd2KZ7vhz93yTkMxTA08IfeRBxxb3+fq86+ANAz0GCBUVtgaz55HHLxTsGScIAZ5mMOXLlaVlCFrBW84Dc8oResAAFFaq5lFKhPbRlR0oMPFvpEbj5+FG3dVjycQYynjuAnT25V0p535O5UhVjj0Jku72XfJGCagtwVNJS021FjCRfWd4Nfwr4oFZJgQ/0SPgixPLeOVGB99Yb/VDG/A/QmBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b1n/rwQGxWtJPRVvRmXQ70cgqX5nbd3RoP/+PT0Rzi4=;
- b=TKYVF7qjoeIqASGPO9O3FRwELquQNvUom9CdvaKBxyDSl/dH72UelMYWYVW5nhOtgvvCm0Am02tkzye+CxkWpNyQsWW7W/+VTkkwbxigLk4mPnB5Au0h+180SfV9rThqNttV25bzdgawW55LkscUtXx+2xgSb3PPvJMKOzEdXP9eOJFIh9gkkBspD2w9UEzs10EADTa9CudAPHYDwppsCUQyZTVKs0V4G1wfwPKQcLZQDrdRcH0VFWWQHwqiaGRIqISGA6njDyRqTvGXYif26Ah1KxMA82b3pfYcpK7I9JwvBEMhzOtEJda354Ymc5AsLkCimtPZbvRUut5FC6VqYA==
-Received: from SA1PR11MB8278.namprd11.prod.outlook.com (2603:10b6:806:25b::19)
- by IA0PR11MB8303.namprd11.prod.outlook.com (2603:10b6:208:487::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27; Wed, 4 Sep
- 2024 10:20:55 +0000
-Received: from SA1PR11MB8278.namprd11.prod.outlook.com
- ([fe80::84fa:e267:e389:fa9]) by SA1PR11MB8278.namprd11.prod.outlook.com
- ([fe80::84fa:e267:e389:fa9%5]) with mapi id 15.20.7918.024; Wed, 4 Sep 2024
- 10:20:55 +0000
-From: <Parthiban.Veerasooran@microchip.com>
-To: <Horatiu.Vultur@microchip.com>
-CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1725445844; x=1756981844;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Kqs/rtR/ZYEIbehKp6eU3zceRyY4RAprXn7yHk1aXCs=;
+  b=frG8bexuQEuHZ8Um+h04AO/tZ8BwS0k6E0IzEgtPjLIgec05BpwBu1Om
+   1DK/Kbh+1k4Hdf+uUJi9hfI8ETvOAVY6gAd4J3nqS65dxm+ksoh/oUMLq
+   bJsIrsZCo1UYSEjiEIeHyfxx8Ymu+3k8BddL87mBWORPf+OAscobeu8Hw
+   4+yrA9tFv9NTPwOixB3gKxyKDvE/IRZRV9n0eFD1KsP+fzhu8AUwh4fMl
+   3UoaymCAR2Li0DvcDU4Ycqjcew2xATz9OJiSbokt6pPx0F5hlhSbPfADE
+   I5T8hhZedt2awQtHyXvhFNIW4xGIuoZgn71Zl+gOUgEJA1jnHHjDXnpak
+   g==;
+X-CSE-ConnectionGUID: V6nEgGxzRtOcs172XO07mQ==
+X-CSE-MsgGUID: x+HcQ5fCR0614IlIxO/wHg==
+X-IronPort-AV: E=Sophos;i="6.10,201,1719903600"; 
+   d="scan'208";a="31216194"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Sep 2024 03:30:43 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 4 Sep 2024 03:30:42 -0700
+Received: from HYD-DK-UNGSW20.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 4 Sep 2024 03:30:38 -0700
+From: Tarun Alle <tarun.alle@microchip.com>
+To: <arun.ramadoss@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
 	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <ramon.nordin.rodriguez@ferroamp.se>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>
-Subject: Re: [PATCH net-next v2 2/7] net: phy: microchip_t1s: update new
- initial settings for LAN865X Rev.B0
-Thread-Topic: [PATCH net-next v2 2/7] net: phy: microchip_t1s: update new
- initial settings for LAN865X Rev.B0
-Thread-Index: AQHa/UVbp/hPuA6lVE2CmXZ+gBdKGrJFm8CAgAHR9YA=
-Date: Wed, 4 Sep 2024 10:20:55 +0000
-Message-ID: <ceaf5895-edfa-4af1-9ab1-b228eb8f956d@microchip.com>
-References: <20240902143458.601578-1-Parthiban.Veerasooran@microchip.com>
- <20240902143458.601578-3-Parthiban.Veerasooran@microchip.com>
- <20240903063311.4uyadgqxx5x7z5e7@DEN-DL-M31836.microchip.com>
-In-Reply-To: <20240903063311.4uyadgqxx5x7z5e7@DEN-DL-M31836.microchip.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR11MB8278:EE_|IA0PR11MB8303:EE_
-x-ms-office365-filtering-correlation-id: 98498dfe-8436-4362-3dc0-08dccccb4308
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB8278.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?Mkg1VEJBczVKekFGNDlkcThXTUpCdGFrSy9KRU5MK21lZlFFTGp6a0xQQUVx?=
- =?utf-8?B?QUJzaS8wNHVidjhGb2tOdkhyczZYS2hFK1lGb3BsZi9udUwwOWJCU0tVL29a?=
- =?utf-8?B?VHc5aEZ6UUNEOWRqV2V3c3d2cVNubzF3TFV4R2NQcFJtUUZsTEJyRktwR28z?=
- =?utf-8?B?b0JPdjdVSkNpZ1czSURCSlc4VjdCQ3k1Mks4dFRHdnB0N3dITWNjMGw1Y3dU?=
- =?utf-8?B?RGFtRXQyWUNVK2NjcS8zTUZBWE1LR2Q0dFlJbHl2ei83WTVlMyt4R0xEeGFz?=
- =?utf-8?B?MDRZYVJuOWxBcGhadCszSUxLdk5NbHdmeFNRbnJBbS8xWTFoRDYrelN4RXI5?=
- =?utf-8?B?U3RrZVdoU2tqdWZrZmQzT2JOQ1A0dXc5MmtaUjlVL0dBVG9UdE1RTlhySURy?=
- =?utf-8?B?L2JlWXNmYUZZZXFpQlkrUDhaOE1LT3B3OEhSZ3crWUFRQlJBU1RNMndkSjVr?=
- =?utf-8?B?QzMzUmt2T0xDT0htcm5yVG1vZERXWGIzNU81eit3cVhpSENrczd2cmVRRXh2?=
- =?utf-8?B?T2NldTMyR3IrUVRsZkZLT1hyU2RrVHJFc05RY1A4ZWxvdzZZb2lGc0IzRFZQ?=
- =?utf-8?B?ajBJbjUzeE9hSnU4SnYzZUo0NkxMQ1JOck41MmRqbU1WczFueVBKY1hvUm5F?=
- =?utf-8?B?YzlyUzBRYW9sVUFkTk1FbndEcndxRkl1ZnZIeGx2SDFqbVJhWHJwVEZmVXVV?=
- =?utf-8?B?dVF4cGhNMDEvZXc3VDFHVFRvS0JLYWVVS3d6SDBkOXNhVll0NVZidzNmdTNX?=
- =?utf-8?B?a3Y2NTEycjJlWlVaaXBOSFFrS25TSEhmNE92NXp5akp5bk1VSmNkZkRzejF6?=
- =?utf-8?B?WUJQaWcwL3FVSS9Ma25pSmZWd0pNamxqZ3loajU0QkU1c3l6S0xBSVJFMnZw?=
- =?utf-8?B?c01YWEkzRzNJWEh1S3IrN2dJc3l1NWY2TTJpWEhrVmE1TEY5aW05b3ljOGFT?=
- =?utf-8?B?NXRQbU02b2prUElQWElncmpNRmt1OS9obW1JdnhEODFqNTQ0VzNxbkdwc1pV?=
- =?utf-8?B?VzMxTzhzNFhpd0JpU2RPZ2Q5d3NrRVNJRzRXRVQrMzJjQWxEZGE2blA1NWZH?=
- =?utf-8?B?QjFhdHhScWRqR3JrK3JNMXVMTnNobmJnYkN4dWRkZ3kxOU0yOHh4b2tmd2s0?=
- =?utf-8?B?U3NPOW5jQTdrcW9ETFlOWVNCUUhZcUFzRGdEeURSdzl2am5vMmxDWU8vWjhk?=
- =?utf-8?B?NWluOWJEREp5TjV5QUZldXAvYUF3ckZGRS9FWXRRSkd4ekZrS1JpN1ltSmFD?=
- =?utf-8?B?Z2J5aTliL1h2dnIwZDZoTU1TN0dCWm5DeElRd1doMUk4MzZMUlNGZ3N1Zzdz?=
- =?utf-8?B?RUd5UlVES3BLNmJqT2t5STgwZ052RGxjRmloTmwzU3lEb0g5QmdJMFpSeGVP?=
- =?utf-8?B?MCtwOFkxNFpyMFRvUURocW1vbEdEUisvUVYvbHhGNWppUGVhL2R2TWhzR0xT?=
- =?utf-8?B?c0ROSW90dzZQK3VrOHRXa2M5ZmpBdk9XMndmUWtQejc0M25NNlRkWGFSbm9n?=
- =?utf-8?B?YjNPTkpzUVFEOUxLU3dvYi9uZkZVZzNjaHZjZ2tiT1JoUjlqR3lhRDJMUFdY?=
- =?utf-8?B?a3VHSHZmMGpBN2M4VURQdUc1SmhEN29WZGZ1SEgvK0NvTWdSNm1URDE2RjVz?=
- =?utf-8?B?YlM5UzBlM3Y4N0VRQzJLUVBGL1lwVTMxSUJOK3owK1dKZTBWMkl1VnRaVW4y?=
- =?utf-8?B?S0o5cDJxaTB1cEI5R3FpVEl4c2hHdDY2aWs3a21kem1zZXhOZFdsQzl3VGto?=
- =?utf-8?B?STZYdEYrYWpuOG5OeEs3ZXg1RXlPM1huUTZVVTJDR2dzYTZTYnJsN01SaHoz?=
- =?utf-8?B?UjNMUlVKNGhYMHIvZlE2aHQxNk05NURhaktMa1RWaVRtNHhuZmJIb2F4Nm5G?=
- =?utf-8?B?eThBazhWOTFDcnl3UGQ4WWdkSjRpYVU0aHg1SWhjbmd4MkdUTms0SnlkRU1v?=
- =?utf-8?Q?J5UNsFBDo0Y=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?QXNNQWJ0SmlFckZiclBBNlZ5RTVQWjVwQmlyVVFGOEttVDR2UFFlTDBNQnUr?=
- =?utf-8?B?dE9DWUtVMEVOZGpzaXdwZzNXdGxWTzhwa3c5S0RXY25BYkwwN3lpTFV3dTlJ?=
- =?utf-8?B?VlRnVTBzNGs1TlRZTDZDdnBzVUNnQzFZTHMwMXNHdDZncXhMTDZuVDhwV3VV?=
- =?utf-8?B?cnkrT0F2ejhKMGQ0VTY1cU9KRmwvdEFyUmR5VnJMTUlNMXBUTkxUcjVkdkFS?=
- =?utf-8?B?SkpKVWFaTmJhQXUydXBHa0luZmJ5WGs0S0Vrbm90ME5sK25wWVg5a3ZuRWFD?=
- =?utf-8?B?ckFjd2NCSXNoRTE2MEhXSHhSYzRCbjNJTkJsSFdJUkFwWFdJb2Q4cDFGV1VT?=
- =?utf-8?B?YVlVUGppNDZwL0VmWkxNN2c4M0JhNkpWSEFFNjB3TVN5anZ2RVRST3hWa0d3?=
- =?utf-8?B?d2FCeFppSXQwVWFLbmJiRlpSdWl0ZFFORlo0em9wSzRlTHpydmJUYktXRExN?=
- =?utf-8?B?ZEpqaVhMUkRsRXJzSFJGR2tZYmV0ZXdXaTVrdUpUS1E0Y0p5MVZyKzFVMHdh?=
- =?utf-8?B?d1Fwa1VkRXJjVXJzTlBBbjBFSFhGVjh4MjhFeG5ML1F0dGJUYlBhQXNRRW5G?=
- =?utf-8?B?UndobTVidmJDNDJIcG4rbnBQelZBdnNOMUMwR3V1TndPWS8rb0RPZ21VTWh6?=
- =?utf-8?B?RFZuVENvMG9ZcTJsOFNuZDB4ckloN3YvSU9sbFlubk5HQm5PR2xCYTFMVWJi?=
- =?utf-8?B?WUNCOVorYitxWnE5WXNRN3RwbkZud0dOYTh3QkIyVUdQclF3WlNyL2pMQUY2?=
- =?utf-8?B?RGgxcHB1bGswdzNoWDY2d1l2eEhHZnNtUi93VElpVkhFdFZ6NVIyOWFFOVpO?=
- =?utf-8?B?R28xVnY3aEdXZndLd09BdkdNbEJMK1lxNi9CU1d5QnB0bTlLTFpvSWNhSXJU?=
- =?utf-8?B?RWlkclhyRTJKQ0g1TUdNK3BEQzJuNS9sU3c5TDRReHZEUlptOVZNZ055OFFJ?=
- =?utf-8?B?VGlMdWdpRytacy9Fbmp6Q2xGekowQWlPek9SNEh0MkpLVW5xZmViR3pLcnZM?=
- =?utf-8?B?djZXYVdlaWgxbnU1ZVhIbmVKcStOUkpyUkR0Qm9XUHNwYTFhYjg1R3NaeG4z?=
- =?utf-8?B?cjhUR2ZIOWI5RjdpdkVpcmtwWU1CdFVRT2dTcndFamwxVWhROFpjNlhSbk5q?=
- =?utf-8?B?MTFZc3NDaDVmclQrY1QwMGFpL25VWjRCd09oL3MxZkczR2pGN1NLNkFrWkNP?=
- =?utf-8?B?ZEFJN3ZXWE9ZMjVCWW5rbGllTVBmWUtpeFY2REYwc3phMDYwRFJPN3pldGRt?=
- =?utf-8?B?Q3dhTU1SM01mcW5iT2pTdlRkM2FuZFU5OVcxRHBNNEF6dUNZSEJvczE2ZTVm?=
- =?utf-8?B?U3phWHhyZXVYbWJVK0lDNzJ0YUlnUm5qVGM0RGhCQ2p0MnNqSVMxbDBNN2Fo?=
- =?utf-8?B?amwwQ3N4VW9rM05mNFZYbkk3Y1N2NlVLdXMybURQdGNLQzR3ZjY4MFpOM2dY?=
- =?utf-8?B?R3RFMHNNRURZaU11bTRkVElseU5YRjdQZDlNMWQyeStSOWJVY1RwYjVHbmJS?=
- =?utf-8?B?ZFVHY1BVV2xITk9MTU1oWENTOE1TL3NkVVhHN256VDQwK3dXYTFmVVU1clpB?=
- =?utf-8?B?OFhKNzArTXFGTkJCRm1tOUpkQ2RxZktqTGtpY0hsNCtwREp0bDducEZuN2ky?=
- =?utf-8?B?QzF6RFR0NXl5RXc1eVdOVGVSRXJaLy96dVZJeG1WaklrSnhKWXpvUTBlejdu?=
- =?utf-8?B?Vnd4MUl4TWVnZkJGZ2JZVmNpdEpoZWM0czdUVWNPYm1FVCtCQmI1QmpSYU1F?=
- =?utf-8?B?TmI1d0EyMzhsZTdSY0NYNVBlNm9qUEo2anJ6dWpnTkduWlJhK1VoZjF2U01r?=
- =?utf-8?B?bmcrbm4xeTdnK25aSFh5bExCZHZraGh5ZTFhYWljTWZvT3J4NHBIUnU5cStN?=
- =?utf-8?B?TG5WVHAzdlZJOEtHV0tzbTJIRzZqNS96cWJqSisvTHE0b2xCVldsT0FjOTh3?=
- =?utf-8?B?NGQvMlVkbDd0emlNNFJxQ2E3OHZZWURBWUt0YTdodmU1UXN6S0Z1TCtydmJC?=
- =?utf-8?B?OE1pVmpiYjRoQ1ZBMEl1YVVQa2JBZXdSVzU3Sy9WZllnWHBQd3c5b1pLTzF5?=
- =?utf-8?B?cW1KclFyVTlNbzhyN1l0bnlEQ0FCc3JjZDNsYVhzNlM5RUcwSmN6cU9nMHJ1?=
- =?utf-8?B?S1hXK0lEOVpoNWlLK2NZaURyWDR0TGNqSWRRNzU1ZkRCOGQ4dThyWXpZd1Fq?=
- =?utf-8?B?R1E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C2EE42DFB6996A4C92F65860F4D346C8@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] net: phy: microchip_t1: SQI support for LAN887x
+Date: Wed, 4 Sep 2024 15:56:06 +0530
+Message-ID: <20240904102606.136874-1-tarun.alle@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB8278.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 98498dfe-8436-4362-3dc0-08dccccb4308
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Sep 2024 10:20:55.4209
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Rjuc+VijzRs7MdCXlMVeLfK3FUrvDhMtvF8eI8RVYVkNNC3Osxlobuxq6lKvjr7YxqJvpiUWFHzTL4eYGIHsN/d591N99AugSRLh4H0r7R9aujghh/r0RG6k0TO9Ot/M
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8303
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-SGkgSG9yYXRpdSwNCg0KVGhhbmtzIGZvciByZXZpZXdpbmcgdGhlIHBhdGNoZXMuDQoNCk9uIDAz
-LzA5LzI0IDEyOjAzIHBtLCBIb3JhdGl1IFZ1bHR1ciB3cm90ZToNCj4gVGhlIDA5LzAyLzIwMjQg
-MjA6MDQsIFBhcnRoaWJhbiBWZWVyYXNvb3JhbiB3cm90ZToNCj4+IFRoaXMgcGF0Y2ggY29uZmln
-dXJlcyB0aGUgbmV3L2ltcHJvdmVkIGluaXRpYWwgc2V0dGluZ3MgZnJvbSB0aGUgbGF0ZXN0DQo+
-PiBjb25maWd1cmF0aW9uIGFwcGxpY2F0aW9uIG5vdGUgQU4xNzYwIHJlbGVhc2VkIGZvciBMQU44
-NjUwLzEgUmV2LkIwDQo+PiBSZXZpc2lvbiBGIChEUzYwMDAxNzYwRyAtIEp1bmUgMjAyNCkuDQo+
-PiBodHRwczovL3d3dy5taWNyb2NoaXAuY29tL2VuLXVzL2FwcGxpY2F0aW9uLW5vdGVzL2FuMTc2
-MA0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFBhcnRoaWJhbiBWZWVyYXNvb3JhbiA8UGFydGhpYmFu
-LlZlZXJhc29vcmFuQG1pY3JvY2hpcC5jb20+DQo+PiAtLS0NCj4+ICAgZHJpdmVycy9uZXQvcGh5
-L21pY3JvY2hpcF90MXMuYyB8IDExOSArKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLQ0K
-Pj4gICAxIGZpbGUgY2hhbmdlZCwgODMgaW5zZXJ0aW9ucygrKSwgMzYgZGVsZXRpb25zKC0pDQo+
-Pg0KPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3BoeS9taWNyb2NoaXBfdDFzLmMgYi9kcml2
-ZXJzL25ldC9waHkvbWljcm9jaGlwX3Qxcy5jDQo+PiBpbmRleCAwMTEwZjMzNTc0ODkuLmZiNjUx
-Y2ZhM2VlMCAxMDA2NDQNCj4+IC0tLSBhL2RyaXZlcnMvbmV0L3BoeS9taWNyb2NoaXBfdDFzLmMN
-Cj4+ICsrKyBiL2RyaXZlcnMvbmV0L3BoeS9taWNyb2NoaXBfdDFzLmMNCj4+IEBAIC01OSwyOSAr
-NTksNDUgQEAgc3RhdGljIGNvbnN0IHUxNiBsYW44Njd4X3JldmIxX2ZpeHVwX21hc2tzWzEyXSA9
-IHsNCj4+ICAgCTB4MDYwMCwgMHg3RjAwLCAweDIwMDAsIDB4RkZGRiwNCj4+ICAgfTsNCj4+ICAg
-DQo+PiAtLyogTEFOODY1eCBSZXYuQjAgY29uZmlndXJhdGlvbiBwYXJhbWV0ZXJzIGZyb20gQU4x
-NzYwICovDQo+PiAtc3RhdGljIGNvbnN0IHUzMiBsYW44NjV4X3JldmIwX2ZpeHVwX3JlZ2lzdGVy
-c1syOF0gPSB7DQo+PiAtCTB4MDA5MSwgMHgwMDgxLCAweDAwNDMsIDB4MDA0NCwNCj4+IC0JMHgw
-MDQ1LCAweDAwNTMsIDB4MDA1NCwgMHgwMDU1LA0KPj4gLQkweDAwNDAsIDB4MDA1MCwgMHgwMEQw
-LCAweDAwRTksDQo+PiAtCTB4MDBGNSwgMHgwMEY0LCAweDAwRjgsIDB4MDBGOSwNCj4+ICsvKiBM
-QU44NjV4IFJldi5CMCBjb25maWd1cmF0aW9uIHBhcmFtZXRlcnMgZnJvbSBBTjE3NjANCj4+ICsg
-KiBBcyBwZXIgdGhlIENvbmZpZ3VyYXRpb24gQXBwbGljYXRpb24gTm90ZSBBTjE3NjAgcHVibGlz
-aGVkIGluIHRoZSBiZWxvdyBsaW5rLA0KPj4gKyAqIGh0dHBzOi8vd3d3Lm1pY3JvY2hpcC5jb20v
-ZW4tdXMvYXBwbGljYXRpb24tbm90ZXMvYW4xNzYwDQo+PiArICogUmV2aXNpb24gRiAoRFM2MDAw
-MTc2MEcgLSBKdW5lIDIwMjQpDQo+PiArICovDQo+PiArc3RhdGljIGNvbnN0IHUzMiBsYW44NjV4
-X3JldmIwX2ZpeHVwX3JlZ2lzdGVyc1sxN10gPSB7DQo+PiArCTB4MDBEMCwgMHgwMEUwLCAweDAw
-RTksIDB4MDBGNSwNCj4+ICsJMHgwMEY0LCAweDAwRjgsIDB4MDBGOSwgMHgwMDgxLA0KPj4gKwkw
-eDAwOTEsIDB4MDA0MywgMHgwMDQ0LCAweDAwNDUsDQo+PiArCTB4MDA1MywgMHgwMDU0LCAweDAw
-NTUsIDB4MDA0MCwNCj4+ICsJMHgwMDUwLA0KPj4gK307DQo+PiArDQo+PiArc3RhdGljIGNvbnN0
-IHUxNiBsYW44NjV4X3JldmIwX2ZpeHVwX3ZhbHVlc1sxN10gPSB7DQo+PiArCTB4M0YzMSwgMHhD
-MDAwLCAweDlFNTAsIDB4MUNGOCwNCj4+ICsJMHhDMDIwLCAweEI5MDAsIDB4NEU1MywgMHgwMDgw
-LA0KPj4gKwkweDk2NjAsIDB4MDBGRiwgMHhGRkZGLCAweDAwMDAsDQo+PiArCTB4MDBGRiwgMHhG
-RkZGLCAweDAwMDAsIDB4MDAwMiwNCj4+ICsJMHgwMDAyLA0KPj4gK307DQo+PiArDQo+PiArc3Rh
-dGljIGNvbnN0IHUxNiBsYW44NjV4X3JldmIwX2ZpeHVwX2NmZ19yZWdzWzJdID0gew0KPj4gKwkw
-eDAwODQsIDB4MDA4QSwNCj4+ICt9Ow0KPj4gKw0KPj4gK3N0YXRpYyBjb25zdCB1MzIgbGFuODY1
-eF9yZXZiMF9zcWlfZml4dXBfcmVnc1sxMl0gPSB7DQo+PiAgIAkweDAwQjAsIDB4MDBCMSwgMHgw
-MEIyLCAweDAwQjMsDQo+PiAgIAkweDAwQjQsIDB4MDBCNSwgMHgwMEI2LCAweDAwQjcsDQo+PiAg
-IAkweDAwQjgsIDB4MDBCOSwgMHgwMEJBLCAweDAwQkIsDQo+PiAgIH07DQo+PiAgIA0KPj4gLXN0
-YXRpYyBjb25zdCB1MTYgbGFuODY1eF9yZXZiMF9maXh1cF92YWx1ZXNbMjhdID0gew0KPj4gLQkw
-eDk2NjAsIDB4MDBDMCwgMHgwMEZGLCAweEZGRkYsDQo+PiAtCTB4MDAwMCwgMHgwMEZGLCAweEZG
-RkYsIDB4MDAwMCwNCj4+IC0JMHgwMDAyLCAweDAwMDIsIDB4NUYyMSwgMHg5RTUwLA0KPj4gLQkw
-eDFDRjgsIDB4QzAyMCwgMHg5QjAwLCAweDRFNTMsDQo+PiArc3RhdGljIGNvbnN0IHUxNiBsYW44
-NjV4X3JldmIwX3NxaV9maXh1cF92YWx1ZXNbMTJdID0gew0KPj4gICAJMHgwMTAzLCAweDA5MTAs
-IDB4MUQyNiwgMHgwMDJBLA0KPj4gICAJMHgwMTAzLCAweDA3MEQsIDB4MTcyMCwgMHgwMDI3LA0K
-Pj4gICAJMHgwNTA5LCAweDBFMTMsIDB4MUMyNSwgMHgwMDJCLA0KPj4gICB9Ow0KPj4gICANCj4+
-IC1zdGF0aWMgY29uc3QgdTE2IGxhbjg2NXhfcmV2YjBfZml4dXBfY2ZnX3JlZ3NbNV0gPSB7DQo+
-PiAtCTB4MDA4NCwgMHgwMDhBLCAweDAwQUQsIDB4MDBBRSwgMHgwMEFGDQo+PiArc3RhdGljIGNv
-bnN0IHUxNiBsYW44NjV4X3JldmIwX3NxaV9maXh1cF9jZmdfcmVnc1szXSA9IHsNCj4+ICsJMHgw
-MEFELCAweDAwQUUsIDB4MDBBRiwNCj4+ICAgfTsNCj4+ICAgDQo+PiAgIC8qIFB1bGxlZCBmcm9t
-IEFOMTc2MCBkZXNjcmliaW5nICdpbmRpcmVjdCByZWFkJw0KPj4gQEAgLTEyMSw2ICsxMzcsOCBA
-QCBzdGF0aWMgaW50IGxhbjg2NXhfZ2VuZXJhdGVfY2ZnX29mZnNldHMoc3RydWN0IHBoeV9kZXZp
-Y2UgKnBoeWRldiwgczggb2Zmc2V0c1tdKQ0KPj4gICAJCXJldCA9IGxhbjg2NXhfcmV2YjBfaW5k
-aXJlY3RfcmVhZChwaHlkZXYsIGZpeHVwX3JlZ3NbaV0pOw0KPj4gICAJCWlmIChyZXQgPCAwKQ0K
-Pj4gICAJCQlyZXR1cm4gcmV0Ow0KPj4gKw0KPj4gKwkJcmV0ICY9IDB4MUY7DQo+IA0KPiBJcyB0
-aGlzIGRpZmYgc3VwcG9zZWQgdG8gYmUgcGFydCBvZiB0aGlzIHBhdGNoPw0KWWVzLg0KPiBBbHNv
-IHlvdSBjYW4gdXNlIEdFTk1BU0sgaGVyZS4NCkFoIG9rLCBpdCBpcyBHRU5NQVNLKDQsIDApIHRo
-ZW4uDQoNCkJlc3QgcmVnYXJkcywNClBhcnRoaWJhbiBWDQo+IA0KPj4gICAJCWlmIChyZXQgJiBC
-SVQoNCkpDQo+PiAgIAkJCW9mZnNldHNbaV0gPSByZXQgfCAweEUwOw0KPj4gICAJCWVsc2UNCj4+
-IEBAIC0xNjMsNTkgKzE4MSw4OCBAQCBzdGF0aWMgaW50IGxhbjg2NXhfd3JpdGVfY2ZnX3BhcmFt
-cyhzdHJ1Y3QgcGh5X2RldmljZSAqcGh5ZGV2LA0KPj4gICAJcmV0dXJuIDA7DQo+PiAgIH0NCj4+
-ICAgDQo+PiAtc3RhdGljIGludCBsYW44NjV4X3NldHVwX2NmZ3BhcmFtKHN0cnVjdCBwaHlfZGV2
-aWNlICpwaHlkZXYpDQo+PiArc3RhdGljIGludCBsYW44NjV4X3NldHVwX2NmZ3BhcmFtKHN0cnVj
-dCBwaHlfZGV2aWNlICpwaHlkZXYsIHM4IG9mZnNldHNbXSkNCj4+ICAgew0KPj4gICAJdTE2IGNm
-Z19yZXN1bHRzW0FSUkFZX1NJWkUobGFuODY1eF9yZXZiMF9maXh1cF9jZmdfcmVncyldOw0KPj4g
-ICAJdTE2IGNmZ19wYXJhbXNbQVJSQVlfU0laRShsYW44NjV4X3JldmIwX2ZpeHVwX2NmZ19yZWdz
-KV07DQo+PiAtCXM4IG9mZnNldHNbMl07DQo+PiAgIAlpbnQgcmV0Ow0KPj4gICANCj4+IC0JcmV0
-ID0gbGFuODY1eF9nZW5lcmF0ZV9jZmdfb2Zmc2V0cyhwaHlkZXYsIG9mZnNldHMpOw0KPj4gKwly
-ZXQgPSBsYW44NjV4X3JlYWRfY2ZnX3BhcmFtcyhwaHlkZXYsIGxhbjg2NXhfcmV2YjBfZml4dXBf
-Y2ZnX3JlZ3MsDQo+PiArCQkJCSAgICAgIGNmZ19wYXJhbXMsIEFSUkFZX1NJWkUoY2ZnX3BhcmFt
-cykpOw0KPj4gICAJaWYgKHJldCkNCj4+ICAgCQlyZXR1cm4gcmV0Ow0KPj4gICANCj4+IC0JcmV0
-ID0gbGFuODY1eF9yZWFkX2NmZ19wYXJhbXMocGh5ZGV2LCBsYW44NjV4X3JldmIwX2ZpeHVwX2Nm
-Z19yZWdzLA0KPj4gKwljZmdfcmVzdWx0c1swXSA9IEZJRUxEX1BSRVAoR0VOTUFTSygxNSwgMTAp
-LCAoOSArIG9mZnNldHNbMF0pICYgMHgzRikgfA0KPj4gKwkJCSBGSUVMRF9QUkVQKEdFTk1BU0so
-MTUsIDQpLCAoMTQgKyBvZmZzZXRzWzBdKSAmIDB4M0YpIHwNCj4+ICsJCQkgMHgwMzsNCj4+ICsJ
-Y2ZnX3Jlc3VsdHNbMV0gPSBGSUVMRF9QUkVQKEdFTk1BU0soMTUsIDEwKSwgKDQwICsgb2Zmc2V0
-c1sxXSkgJiAweDNGKTsNCj4+ICsNCj4+ICsJcmV0dXJuIGxhbjg2NXhfd3JpdGVfY2ZnX3BhcmFt
-cyhwaHlkZXYsIGxhbjg2NXhfcmV2YjBfZml4dXBfY2ZnX3JlZ3MsDQo+PiArCQkJCQljZmdfcmVz
-dWx0cywgQVJSQVlfU0laRShjZmdfcmVzdWx0cykpOw0KPj4gK30NCj4+ICsNCj4+ICtzdGF0aWMg
-aW50IGxhbjg2NXhfc2V0dXBfc3FpX2NmZ3BhcmFtKHN0cnVjdCBwaHlfZGV2aWNlICpwaHlkZXYs
-IHM4IG9mZnNldHNbXSkNCj4+ICt7DQo+PiArCXUxNiBjZmdfcmVzdWx0c1tBUlJBWV9TSVpFKGxh
-bjg2NXhfcmV2YjBfc3FpX2ZpeHVwX2NmZ19yZWdzKV07DQo+PiArCXUxNiBjZmdfcGFyYW1zW0FS
-UkFZX1NJWkUobGFuODY1eF9yZXZiMF9zcWlfZml4dXBfY2ZnX3JlZ3MpXTsNCj4+ICsJaW50IHJl
-dDsNCj4+ICsNCj4+ICsJcmV0ID0gbGFuODY1eF9yZWFkX2NmZ19wYXJhbXMocGh5ZGV2LCBsYW44
-NjV4X3JldmIwX3NxaV9maXh1cF9jZmdfcmVncywNCj4+ICAgCQkJCSAgICAgIGNmZ19wYXJhbXMs
-IEFSUkFZX1NJWkUoY2ZnX3BhcmFtcykpOw0KPj4gICAJaWYgKHJldCkNCj4+ICAgCQlyZXR1cm4g
-cmV0Ow0KPj4gICANCj4+IC0JY2ZnX3Jlc3VsdHNbMF0gPSAoY2ZnX3BhcmFtc1swXSAmIDB4MDAw
-RikgfA0KPj4gLQkJCSAgRklFTERfUFJFUChHRU5NQVNLKDE1LCAxMCksIDkgKyBvZmZzZXRzWzBd
-KSB8DQo+PiAtCQkJICBGSUVMRF9QUkVQKEdFTk1BU0soMTUsIDQpLCAxNCArIG9mZnNldHNbMF0p
-Ow0KPj4gLQljZmdfcmVzdWx0c1sxXSA9IChjZmdfcGFyYW1zWzFdICYgMHgwM0ZGKSB8DQo+PiAt
-CQkJICBGSUVMRF9QUkVQKEdFTk1BU0soMTUsIDEwKSwgNDAgKyBvZmZzZXRzWzFdKTsNCj4+IC0J
-Y2ZnX3Jlc3VsdHNbMl0gPSAoY2ZnX3BhcmFtc1syXSAmIDB4QzBDMCkgfA0KPj4gLQkJCSAgRklF
-TERfUFJFUChHRU5NQVNLKDE1LCA4KSwgNSArIG9mZnNldHNbMF0pIHwNCj4+IC0JCQkgICg5ICsg
-b2Zmc2V0c1swXSk7DQo+PiAtCWNmZ19yZXN1bHRzWzNdID0gKGNmZ19wYXJhbXNbM10gJiAweEMw
-QzApIHwNCj4+IC0JCQkgIEZJRUxEX1BSRVAoR0VOTUFTSygxNSwgOCksIDkgKyBvZmZzZXRzWzBd
-KSB8DQo+PiAtCQkJICAoMTQgKyBvZmZzZXRzWzBdKTsNCj4+IC0JY2ZnX3Jlc3VsdHNbNF0gPSAo
-Y2ZnX3BhcmFtc1s0XSAmIDB4QzBDMCkgfA0KPj4gLQkJCSAgRklFTERfUFJFUChHRU5NQVNLKDE1
-LCA4KSwgMTcgKyBvZmZzZXRzWzBdKSB8DQo+PiAtCQkJICAoMjIgKyBvZmZzZXRzWzBdKTsNCj4+
-ICsJY2ZnX3Jlc3VsdHNbMF0gPSBGSUVMRF9QUkVQKEdFTk1BU0soMTUsIDgpLCAoNSArIG9mZnNl
-dHNbMF0pICYgMHgzRikgfA0KPj4gKwkJCSAoKDkgKyBvZmZzZXRzWzBdKSAmIDB4M0YpOw0KPj4g
-KwljZmdfcmVzdWx0c1sxXSA9IEZJRUxEX1BSRVAoR0VOTUFTSygxNSwgOCksICg5ICsgb2Zmc2V0
-c1swXSkgJiAweDNGKSB8DQo+PiArCQkJICgoMTQgKyBvZmZzZXRzWzBdKSAmIDB4M0YpOw0KPj4g
-KwljZmdfcmVzdWx0c1syXSA9IEZJRUxEX1BSRVAoR0VOTUFTSygxNSwgOCksICgxNyArIG9mZnNl
-dHNbMF0pICYgMHgzRikgfA0KPj4gKwkJCSAoKDIyICsgb2Zmc2V0c1swXSkgJiAweDNGKTsNCj4+
-ICAgDQo+PiAtCXJldHVybiBsYW44NjV4X3dyaXRlX2NmZ19wYXJhbXMocGh5ZGV2LCBsYW44NjV4
-X3JldmIwX2ZpeHVwX2NmZ19yZWdzLA0KPj4gKwlyZXR1cm4gbGFuODY1eF93cml0ZV9jZmdfcGFy
-YW1zKHBoeWRldiwNCj4+ICsJCQkJCWxhbjg2NXhfcmV2YjBfc3FpX2ZpeHVwX2NmZ19yZWdzLA0K
-Pj4gICAJCQkJCWNmZ19yZXN1bHRzLCBBUlJBWV9TSVpFKGNmZ19yZXN1bHRzKSk7DQo+PiAgIH0N
-Cj4+ICAgDQo+PiAgIHN0YXRpYyBpbnQgbGFuODY1eF9yZXZiMF9jb25maWdfaW5pdChzdHJ1Y3Qg
-cGh5X2RldmljZSAqcGh5ZGV2KQ0KPj4gICB7DQo+PiArCXM4IG9mZnNldHNbMl07DQo+PiAgIAlp
-bnQgcmV0Ow0KPj4gICANCj4+ICAgCS8qIFJlZmVyZW5jZSB0byBBTjE3NjANCj4+ICAgCSAqIGh0
-dHBzOi8vd3cxLm1pY3JvY2hpcC5jb20vZG93bmxvYWRzL2FlbURvY3VtZW50cy9kb2N1bWVudHMv
-QUlTL1Byb2R1Y3REb2N1bWVudHMvU3VwcG9ydGluZ0NvbGxhdGVyYWwvQU4tTEFOODY1MC0xLUNv
-bmZpZ3VyYXRpb24tNjAwMDE3NjAucGRmDQo+PiAgIAkgKi8NCj4+ICsJcmV0ID0gbGFuODY1eF9n
-ZW5lcmF0ZV9jZmdfb2Zmc2V0cyhwaHlkZXYsIG9mZnNldHMpOw0KPj4gKwlpZiAocmV0KQ0KPj4g
-KwkJcmV0dXJuIHJldDsNCj4+ICsNCj4+ICAgCWZvciAoaW50IGkgPSAwOyBpIDwgQVJSQVlfU0la
-RShsYW44NjV4X3JldmIwX2ZpeHVwX3JlZ2lzdGVycyk7IGkrKykgew0KPj4gICAJCXJldCA9IHBo
-eV93cml0ZV9tbWQocGh5ZGV2LCBNRElPX01NRF9WRU5EMiwNCj4+ICAgCQkJCSAgICBsYW44NjV4
-X3JldmIwX2ZpeHVwX3JlZ2lzdGVyc1tpXSwNCj4+ICAgCQkJCSAgICBsYW44NjV4X3JldmIwX2Zp
-eHVwX3ZhbHVlc1tpXSk7DQo+PiAgIAkJaWYgKHJldCkNCj4+ICAgCQkJcmV0dXJuIHJldDsNCj4+
-ICsNCj4+ICsJCWlmIChpID09IDEpIHsNCj4+ICsJCQlyZXQgPSBsYW44NjV4X3NldHVwX2NmZ3Bh
-cmFtKHBoeWRldiwgb2Zmc2V0cyk7DQo+PiArCQkJaWYgKHJldCkNCj4+ICsJCQkJcmV0dXJuIHJl
-dDsNCj4+ICsJCX0NCj4+ICAgCX0NCj4+IC0JLyogRnVuY3Rpb24gdG8gY2FsY3VsYXRlIGFuZCB3
-cml0ZSB0aGUgY29uZmlndXJhdGlvbiBwYXJhbWV0ZXJzIGluIHRoZQ0KPj4gLQkgKiAweDAwODQs
-IDB4MDA4QSwgMHgwMEFELCAweDAwQUUgYW5kIDB4MDBBRiByZWdpc3RlcnMgKGZyb20gQU4xNzYw
-KQ0KPj4gLQkgKi8NCj4+IC0JcmV0dXJuIGxhbjg2NXhfc2V0dXBfY2ZncGFyYW0ocGh5ZGV2KTsN
-Cj4+ICsNCj4+ICsJcmV0ID0gbGFuODY1eF9zZXR1cF9zcWlfY2ZncGFyYW0ocGh5ZGV2LCBvZmZz
-ZXRzKTsNCj4+ICsJaWYgKHJldCkNCj4+ICsJCXJldHVybiByZXQ7DQo+PiArDQo+PiArCWZvciAo
-aW50IGkgPSAwOyBpIDwgQVJSQVlfU0laRShsYW44NjV4X3JldmIwX3NxaV9maXh1cF9yZWdzKTsg
-aSsrKSB7DQo+PiArCQlyZXQgPSBwaHlfd3JpdGVfbW1kKHBoeWRldiwgTURJT19NTURfVkVORDIs
-DQo+PiArCQkJCSAgICBsYW44NjV4X3JldmIwX3NxaV9maXh1cF9yZWdzW2ldLA0KPj4gKwkJCQkg
-ICAgbGFuODY1eF9yZXZiMF9zcWlfZml4dXBfdmFsdWVzW2ldKTsNCj4+ICsJCWlmIChyZXQpDQo+
-PiArCQkJcmV0dXJuIHJldDsNCj4+ICsJfQ0KPj4gKw0KPj4gKwlyZXR1cm4gMDsNCj4+ICAgfQ0K
-Pj4gICANCj4+ICAgc3RhdGljIGludCBsYW44Njd4X3JldmIxX2NvbmZpZ19pbml0KHN0cnVjdCBw
-aHlfZGV2aWNlICpwaHlkZXYpDQo+PiAtLSANCj4+IDIuMzQuMQ0KPj4NCj4gDQoNCg==
+From: Tarun Alle <Tarun.Alle@microchip.com>
+
+Add support for measuring Signal Quality Index for LAN887x T1 PHY.
+Signal Quality Index (SQI) is measure of Link Channel Quality from
+0 to 7, with 7 as the best. By default, a link loss event shall
+indicate an SQI of 0.
+
+Signed-off-by: Tarun Alle <Tarun.Alle@microchip.com>
+---
+ drivers/net/phy/microchip_t1.c | 144 +++++++++++++++++++++++++++++++++
+ 1 file changed, 144 insertions(+)
+
+diff --git a/drivers/net/phy/microchip_t1.c b/drivers/net/phy/microchip_t1.c
+index 5732ad65e7f9..01e0e71fca48 100644
+--- a/drivers/net/phy/microchip_t1.c
++++ b/drivers/net/phy/microchip_t1.c
+@@ -2,6 +2,7 @@
+ // Copyright (C) 2018 Microchip Technology
+ 
+ #include <linux/kernel.h>
++#include <linux/sort.h>
+ #include <linux/module.h>
+ #include <linux/delay.h>
+ #include <linux/mii.h>
+@@ -188,6 +189,20 @@
+ #define LAN887X_EFUSE_READ_DAT9_SGMII_DIS	BIT(9)
+ #define LAN887X_EFUSE_READ_DAT9_MAC_MODE	GENMASK(1, 0)
+ 
++#define LAN887X_COEFF_PWR_DN_CONFIG_100		0x0404
++#define LAN887X_COEFF_PWR_DN_CONFIG_100_V	0x16d6
++#define LAN887X_SQI_CONFIG_100			0x042e
++#define LAN887X_SQI_CONFIG_100_V		0x9572
++#define LAN887X_SQI_MSE_100			0x483
++
++#define LAN887X_POKE_PEEK_100			0x040d
++#define LAN887X_POKE_PEEK_100_EN		BIT(0)
++
++#define LAN887X_COEFF_MOD_CONFIG		0x080d
++#define LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN	BIT(8)
++
++#define LAN887X_DCQ_SQI_STATUS			0x08b2
++
+ #define DRIVER_AUTHOR	"Nisar Sayed <nisar.sayed@microchip.com>"
+ #define DRIVER_DESC	"Microchip LAN87XX/LAN937x/LAN887x T1 PHY driver"
+ 
+@@ -1420,6 +1435,133 @@ static void lan887x_get_strings(struct phy_device *phydev, u8 *data)
+ 		ethtool_puts(&data, lan887x_hw_stats[i].string);
+ }
+ 
++/* Compare block to sort in ascending order */
++static int data_compare(const void *a, const void *b)
++{
++	return  *(u16 *)a - *(u16 *)b;
++}
++
++static int lan887x_get_sqi_100M(struct phy_device *phydev)
++{
++	u16 rawtable[200];
++	u32 sqiavg = 0;
++	u8 sqinum;
++	int rc;
++
++	/* Configuration of SQI 100M */
++	rc = phy_write_mmd(phydev, MDIO_MMD_VEND1,
++			   LAN887X_COEFF_PWR_DN_CONFIG_100,
++			   LAN887X_COEFF_PWR_DN_CONFIG_100_V);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, MDIO_MMD_VEND1, LAN887X_SQI_CONFIG_100,
++			   LAN887X_SQI_CONFIG_100_V);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_SQI_CONFIG_100);
++	if (rc != LAN887X_SQI_CONFIG_100_V)
++		return -EINVAL;
++
++	rc = phy_modify_mmd(phydev, MDIO_MMD_VEND1, LAN887X_POKE_PEEK_100,
++			    LAN887X_POKE_PEEK_100_EN,
++			    LAN887X_POKE_PEEK_100_EN);
++	if (rc < 0)
++		return rc;
++
++	/* Required before reading register
++	 * otherwise it will return high value
++	 */
++	msleep(50);
++
++	/* Get 200 SQI raw readings */
++	for (int i = 0; i < 200; i++) {
++		rc = phy_write_mmd(phydev, MDIO_MMD_VEND1,
++				   LAN887X_POKE_PEEK_100,
++				   LAN887X_POKE_PEEK_100_EN);
++		if (rc < 0)
++			return rc;
++
++		rc = phy_read_mmd(phydev, MDIO_MMD_VEND1,
++				  LAN887X_SQI_MSE_100);
++		if (rc < 0)
++			return rc;
++
++		rawtable[i] = rc;
++		rc = genphy_c45_read_link(phydev);
++		if (rc < 0)
++			return rc;
++
++		if (!phydev->link)
++			return -ENETDOWN;
++	}
++
++	/* Sort SQI raw readings in ascending order */
++	sort(rawtable, 200, sizeof(u16), data_compare, NULL);
++
++	/* Keep inliers and discard outliers */
++	for (int i = 40; i < 160; i++)
++		sqiavg += rawtable[i];
++
++	/* Get SQI average */
++	sqiavg /= 120;
++
++	if (sqiavg < 75)
++		sqinum = 7;
++	else if (sqiavg < 94)
++		sqinum = 6;
++	else if (sqiavg < 119)
++		sqinum = 5;
++	else if (sqiavg < 150)
++		sqinum = 4;
++	else if (sqiavg < 189)
++		sqinum = 3;
++	else if (sqiavg < 237)
++		sqinum = 2;
++	else if (sqiavg < 299)
++		sqinum = 1;
++	else
++		sqinum = 0;
++
++	return sqinum;
++}
++
++static int lan887x_get_sqi(struct phy_device *phydev)
++{
++	int rc, val;
++
++	if (phydev->speed != SPEED_1000 &&
++	    phydev->speed != SPEED_100) {
++		return -EINVAL;
++	}
++
++	if (phydev->speed == SPEED_100)
++		return lan887x_get_sqi_100M(phydev);
++
++	/* Writing DCQ_COEFF_EN to trigger a SQI read */
++	rc = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
++			      LAN887X_COEFF_MOD_CONFIG,
++			      LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN);
++	if (rc < 0)
++		return rc;
++
++	/* Wait for DCQ done */
++	rc = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
++				       LAN887X_COEFF_MOD_CONFIG, val, ((val &
++				       LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN) !=
++				       LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN),
++				       10, 200, true);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_DCQ_SQI_STATUS);
++	if (rc < 0)
++		return rc;
++
++	return FIELD_GET(T1_DCQ_SQI_MSK, rc);
++}
++
+ static struct phy_driver microchip_t1_phy_driver[] = {
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_LAN87XX),
+@@ -1468,6 +1610,8 @@ static struct phy_driver microchip_t1_phy_driver[] = {
+ 		.suspend	= genphy_suspend,
+ 		.resume		= genphy_resume,
+ 		.read_status	= genphy_c45_read_status,
++		.get_sqi	= lan887x_get_sqi,
++		.get_sqi_max	= lan87xx_get_sqi_max,
+ 	}
+ };
+ 
+-- 
+2.34.1
+
 
