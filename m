@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-124980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C795696B7CD
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:06:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9272696B7D1
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:07:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81AEF285618
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:06:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDEC8B25C52
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:07:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB171D0157;
-	Wed,  4 Sep 2024 10:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FFD1D04AA;
+	Wed,  4 Sep 2024 10:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="gxVGO5c0"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="eJBpLqyI"
 X-Original-To: netdev@vger.kernel.org
 Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B316D1CFEAC;
-	Wed,  4 Sep 2024 10:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B291D016C;
+	Wed,  4 Sep 2024 10:05:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725444346; cv=none; b=Wwjxh9E72PsFwV1gf8W5fC/GQC5AcpJs+ZeyKGV8nE5232P7ImIJmndfQx9726IB0B+26k6xi74LPwgCdXdLVxQv+TWNlKkmmI9YvZ20y7kZ+amyI1cLWIOTe+Mqi89dfNKFYQCJo47gBhKqro+9gJLIvcr23pKcdgXFv7vMopg=
+	t=1725444349; cv=none; b=qdPMLgN4WB1hm3LTYXHP0lyiKCbHdmcYcOxAD3VEmvpfk6aLslQag04E9kJZLD/JH6bCNqWYUilspevse+kch3YZbIn9QtKtMSjxY/oWt9cxnlfNvrsWAUoKxwKKi/gQfvY6QMV4wkLXHLvqQmYsCotw1ZTQj49o2LmHlhcM3s0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725444346; c=relaxed/simple;
-	bh=7Wb7Kc1un3P49t5ulDAJJNSh4mT1DCCzpTnurfGQ4lE=;
+	s=arc-20240116; t=1725444349; c=relaxed/simple;
+	bh=Rs6W3y0RdUoCvLZsh469cQPvGCurFp0g2GrEXIu+Af8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S1XQ9olPqiIZPWwWnMrWfI6IDtmhmJ+tosMsvRBDDy4pB1HEzJZ7QHMWBiUeL4alB+LkZ1CU8MjeGKtwQhA45Ox8WFDCRVdzjip+E7bLyNDsDpXmg19EnhJzzOpBCKeS0+8mXl3qXEinsAUEOo/dgFDxvrn5vxTY/6perwOfe8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=gxVGO5c0; arc=none smtp.client-ip=198.47.19.141
+	 MIME-Version:Content-Type; b=hZdn/WE+8hMSXsBdcvmhyiO4g1B+Y7RgAqjLhSJayFlto0G+TbonsWny4QIxFzRY4oaHHf9h/AQh7UgeEmifemsQf3W6WTppjmpEXvJjIBkfKBYO7NTFqc1AGcmL5yDLW+bD4fjS44yVpRbtDzwt8zurou8W4iIJzSo5JFY+1TY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=eJBpLqyI; arc=none smtp.client-ip=198.47.19.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 484A5EZ2092745;
-	Wed, 4 Sep 2024 05:05:14 -0500
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 484A5GqF092750;
+	Wed, 4 Sep 2024 05:05:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1725444314;
-	bh=q1CMJFXSyM3Q3QasIO1XqioT6iT+mUvgxBR9lYpWp2o=;
+	s=ti-com-17Q1; t=1725444316;
+	bh=EGMOR5c12ymFAmYWBmiB4nwKPFzniK04wHjtPhLw50c=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=gxVGO5c0FejAKDnvoluR5R+FMpk59pyhwAnnWPzcT4TzF7EuCOknZUHCkHbz7su5a
-	 qkR9kVCHaG7wbawsbvN4NuN9ZHoYhyXuP/usskAXG6Q8sUPP++A2SldbZ9xT1HjPSV
-	 2jiZel+M+LEB5FgYtfzzuSJS4Zmr4eCKFb3J7jrw=
-Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 484A5EiX059668
+	b=eJBpLqyIfNXZme2DTLixxzyhcRMuU3TWM7/Nqxpw9RfotLvR+brHWfo/3jAcR7EHs
+	 lGgUMkePsOvT0c65DFpqCH+BpN5pASnc1m8pWy8LyW2hcjhKMnte9F/Fg+haKJweJx
+	 t+F14ZdUP2eKddBi0lXwqZRGlOWS1lPCHRPM3rpc=
+Received: from DFLE111.ent.ti.com (dfle111.ent.ti.com [10.64.6.32])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 484A5GA6007402
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 4 Sep 2024 05:05:14 -0500
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+	Wed, 4 Sep 2024 05:05:16 -0500
+Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 4
- Sep 2024 05:05:13 -0500
-Received: from fllvsmtp8.itg.ti.com (10.64.41.158) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ Sep 2024 05:05:15 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 4 Sep 2024 05:05:13 -0500
+ Frontend Transport; Wed, 4 Sep 2024 05:05:15 -0500
 Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by fllvsmtp8.itg.ti.com (8.15.2/8.15.2) with ESMTP id 484A5DCi111719;
-	Wed, 4 Sep 2024 05:05:13 -0500
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 484A5F88074518;
+	Wed, 4 Sep 2024 05:05:15 -0500
 Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 484A5DGT015378;
-	Wed, 4 Sep 2024 05:05:13 -0500
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 484A5F2q015382;
+	Wed, 4 Sep 2024 05:05:15 -0500
 From: MD Danish Anwar <danishanwar@ti.com>
 To: Jan Kiszka <jan.kiszka@siemens.com>, Andrew Lunn <andrew@lunn.ch>,
         Dan
@@ -81,9 +81,9 @@ CC: Alexander Lobakin <aleksander.lobakin@intel.com>,
         Vignesh Raghavendra
 	<vigneshr@ti.com>,
         Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next v4 3/5] net: ti: icssg-prueth: Add support for HSR frame forward offload
-Date: Wed, 4 Sep 2024 15:35:04 +0530
-Message-ID: <20240904100506.3665892-4-danishanwar@ti.com>
+Subject: [PATCH net-next v4 4/5] net: ti: icssg-prueth: Enable HSR Tx duplication, Tx Tag and Rx Tag offload
+Date: Wed, 4 Sep 2024 15:35:05 +0530
+Message-ID: <20240904100506.3665892-5-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240904100506.3665892-1-danishanwar@ti.com>
 References: <20240904100506.3665892-1-danishanwar@ti.com>
@@ -97,366 +97,176 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Add support for offloading HSR port-to-port frame forward to hardware.
-When the slave interfaces are added to the HSR interface, the PRU cores
-will be stopped and ICSSG HSR firmwares will be loaded to them.
+From: Ravi Gunasekaran <r-gunasekaran@ti.com>
 
-Similarly, when HSR interface is deleted, the PRU cores will be
-restarted and the last used firmwares will be reloaded. PRUeth
-interfaces will be back to the last used mode.
+The HSR stack allows to offload its Tx packet duplication functionality to
+the hardware. Enable this offloading feature for ICSSG driver. Add support
+to offload HSR Tx Tag Insertion and Rx Tag Removal and duplicate discard.
 
-This commit also renames some APIs that are common between switch and
-hsr mode with '_fw_offload' suffix.
+Inorder to enable hsr-tag-ins-offload, hsr-dup-offload must also be enabled
+as these are tightly coupled in the firmware implementation.
 
+Duplicate discard is done as part of RX tag removal and it is
+done by the firmware. When driver sends the r30 command
+ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE, firmware does RX tag removal as well as
+duplicate discard.
+
+Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
 Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
 ---
- .../net/ethernet/ti/icssg/icssg_classifier.c  |   1 +
- drivers/net/ethernet/ti/icssg/icssg_config.c  |  18 +--
- drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 135 +++++++++++++++++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   6 +
- 4 files changed, 148 insertions(+), 12 deletions(-)
+ drivers/net/ethernet/ti/icssg/icssg_common.c | 18 ++++++++++---
+ drivers/net/ethernet/ti/icssg/icssg_config.c |  4 ++-
+ drivers/net/ethernet/ti/icssg/icssg_config.h |  2 ++
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 28 +++++++++++++++++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |  3 +++
+ 5 files changed, 50 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_classifier.c b/drivers/net/ethernet/ti/icssg/icssg_classifier.c
-index 9ec504d976d6..833ca86d0b71 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_classifier.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_classifier.c
-@@ -290,6 +290,7 @@ void icssg_class_set_host_mac_addr(struct regmap *miig_rt, const u8 *mac)
- 		     mac[2] << 16 | mac[3] << 24));
- 	regmap_write(miig_rt, MAC_INTERFACE_1, (u32)(mac[4] | mac[5] << 8));
- }
-+EXPORT_SYMBOL_GPL(icssg_class_set_host_mac_addr);
- 
- void icssg_class_set_mac_addr(struct regmap *miig_rt, int slice, u8 *mac)
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+index b9d8a93d1680..fdebeb2f84e0 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_common.c
++++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+@@ -660,14 +660,15 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
  {
+ 	struct cppi5_host_desc_t *first_desc, *next_desc, *cur_desc;
+ 	struct prueth_emac *emac = netdev_priv(ndev);
++	struct prueth *prueth = emac->prueth;
+ 	struct netdev_queue *netif_txq;
+ 	struct prueth_tx_chn *tx_chn;
+ 	dma_addr_t desc_dma, buf_dma;
++	u32 pkt_len, dst_tag_id;
+ 	int i, ret = 0, q_idx;
+ 	bool in_tx_ts = 0;
+ 	int tx_ts_cookie;
+ 	void **swdata;
+-	u32 pkt_len;
+ 	u32 *epib;
+ 
+ 	pkt_len = skb_headlen(skb);
+@@ -712,9 +713,20 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
+ 
+ 	/* set dst tag to indicate internal qid at the firmware which is at
+ 	 * bit8..bit15. bit0..bit7 indicates port num for directed
+-	 * packets in case of switch mode operation
++	 * packets in case of switch mode operation and port num 0
++	 * for undirected packets in case of HSR offload mode
+ 	 */
+-	cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
++	dst_tag_id = emac->port_id | (q_idx << 8);
++
++	if (prueth->is_hsr_offload_mode &&
++	    (ndev->features & NETIF_F_HW_HSR_DUP))
++		dst_tag_id = PRUETH_UNDIRECTED_PKT_DST_TAG;
++
++	if (prueth->is_hsr_offload_mode &&
++	    (ndev->features & NETIF_F_HW_HSR_TAG_INS))
++		epib[1] |= PRUETH_UNDIRECTED_PKT_TAG_INS;
++
++	cppi5_desc_set_tags_ids(&first_desc->hdr, 0, dst_tag_id);
+ 	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+ 	cppi5_hdesc_attach_buf(first_desc, buf_dma, pkt_len, buf_dma, pkt_len);
+ 	swdata = cppi5_hdesc_get_swdata(first_desc);
 diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-index dae52a83a378..7b2e6c192ff3 100644
+index 7b2e6c192ff3..72ace151d8e9 100644
 --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
 +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-@@ -107,7 +107,7 @@ static const struct map hwq_map[2][ICSSG_NUM_OTHER_QUEUES] = {
- 	},
+@@ -531,7 +531,9 @@ static const struct icssg_r30_cmd emac_r32_bitmask[] = {
+ 	{{EMAC_NONE,  0xffff4000, EMAC_NONE, EMAC_NONE}},	/* Preemption on Tx ENABLE*/
+ 	{{EMAC_NONE,  0xbfff0000, EMAC_NONE, EMAC_NONE}},	/* Preemption on Tx DISABLE*/
+ 	{{0xffff0010,  EMAC_NONE, 0xffff0010, EMAC_NONE}},	/* VLAN AWARE*/
+-	{{0xffef0000,  EMAC_NONE, 0xffef0000, EMAC_NONE}}	/* VLAN UNWARE*/
++	{{0xffef0000,  EMAC_NONE, 0xffef0000, EMAC_NONE}},	/* VLAN UNWARE*/
++	{{0xffff2000, EMAC_NONE, EMAC_NONE, EMAC_NONE}},	/* HSR_RX_OFFLOAD_ENABLE */
++	{{0xdfff0000, EMAC_NONE, EMAC_NONE, EMAC_NONE}}		/* HSR_RX_OFFLOAD_DISABLE */
  };
  
--static void icssg_config_mii_init_switch(struct prueth_emac *emac)
-+static void icssg_config_mii_init_fw_offload(struct prueth_emac *emac)
- {
- 	struct prueth *prueth = emac->prueth;
- 	int mii = prueth_emac_slice(emac);
-@@ -278,7 +278,7 @@ static int emac_r30_is_done(struct prueth_emac *emac)
- 	return 1;
- }
+ int icssg_set_port_state(struct prueth_emac *emac,
+diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
+index 1ac60283923b..92c2deaa3068 100644
+--- a/drivers/net/ethernet/ti/icssg/icssg_config.h
++++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
+@@ -80,6 +80,8 @@ enum icssg_port_state_cmd {
+ 	ICSSG_EMAC_PORT_PREMPT_TX_DISABLE,
+ 	ICSSG_EMAC_PORT_VLAN_AWARE_ENABLE,
+ 	ICSSG_EMAC_PORT_VLAN_AWARE_DISABLE,
++	ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE,
++	ICSSG_EMAC_HSR_RX_OFFLOAD_DISABLE,
+ 	ICSSG_EMAC_PORT_MAX_COMMANDS
+ };
  
--static int prueth_switch_buffer_setup(struct prueth_emac *emac)
-+static int prueth_fw_offload_buffer_setup(struct prueth_emac *emac)
- {
- 	struct icssg_buffer_pool_cfg __iomem *bpool_cfg;
- 	struct icssg_rxq_ctx __iomem *rxq_ctx;
-@@ -424,7 +424,7 @@ static void icssg_init_emac_mode(struct prueth *prueth)
- 	icssg_class_set_host_mac_addr(prueth->miig_rt, mac);
- }
- 
--static void icssg_init_switch_mode(struct prueth *prueth)
-+static void icssg_init_fw_offload_mode(struct prueth *prueth)
- {
- 	u32 addr = prueth->shram.pa + EMAC_ICSSG_SWITCH_DEFAULT_VLAN_TABLE_OFFSET;
- 	int i;
-@@ -455,8 +455,8 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
- 	struct icssg_flow_cfg __iomem *flow_cfg;
- 	int ret;
- 
--	if (prueth->is_switch_mode)
--		icssg_init_switch_mode(prueth);
-+	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode)
-+		icssg_init_fw_offload_mode(prueth);
- 	else
- 		icssg_init_emac_mode(prueth);
- 
-@@ -472,8 +472,8 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
- 	regmap_update_bits(prueth->miig_rt, ICSSG_CFG_OFFSET,
- 			   ICSSG_CFG_DEFAULT, ICSSG_CFG_DEFAULT);
- 	icssg_miig_set_interface_mode(prueth->miig_rt, slice, emac->phy_if);
--	if (prueth->is_switch_mode)
--		icssg_config_mii_init_switch(emac);
-+	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode)
-+		icssg_config_mii_init_fw_offload(emac);
- 	else
- 		icssg_config_mii_init(emac);
- 	icssg_config_ipg(emac);
-@@ -498,8 +498,8 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
- 	writeb(0, config + SPL_PKT_DEFAULT_PRIORITY);
- 	writeb(0, config + QUEUE_NUM_UNTAGGED);
- 
--	if (prueth->is_switch_mode)
--		ret = prueth_switch_buffer_setup(emac);
-+	if (prueth->is_switch_mode || prueth->is_hsr_offload_mode)
-+		ret = prueth_fw_offload_buffer_setup(emac);
- 	else
- 		ret = prueth_emac_buffer_setup(emac);
- 	if (ret)
 diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 1dcd68eefdc3..4e9a148352c7 100644
+index 4e9a148352c7..49b855ae62a4 100644
 --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
 +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -13,6 +13,7 @@
- #include <linux/dma/ti-cppi5.h>
- #include <linux/etherdevice.h>
- #include <linux/genalloc.h>
-+#include <linux/if_hsr.h>
- #include <linux/if_vlan.h>
- #include <linux/interrupt.h>
- #include <linux/kernel.h>
-@@ -40,6 +41,8 @@
+@@ -41,7 +41,10 @@
  #define DEFAULT_PORT_MASK	1
  #define DEFAULT_UNTAG_MASK	1
  
-+#define NETIF_PRUETH_HSR_OFFLOAD_FEATURES	NETIF_F_HW_HSR_FWD
-+
+-#define NETIF_PRUETH_HSR_OFFLOAD_FEATURES	NETIF_F_HW_HSR_FWD
++#define NETIF_PRUETH_HSR_OFFLOAD_FEATURES	(NETIF_F_HW_HSR_FWD | \
++						 NETIF_F_HW_HSR_DUP | \
++						 NETIF_F_HW_HSR_TAG_INS | \
++						 NETIF_F_HW_HSR_TAG_RM)
+ 
  /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
  #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
- 
-@@ -118,6 +121,19 @@ static irqreturn_t prueth_tx_ts_irq(int irq, void *dev_id)
- 	return IRQ_HANDLED;
+@@ -758,6 +761,21 @@ static void emac_change_hsr_feature(struct net_device *ndev,
+ 	}
  }
  
-+static struct icssg_firmwares icssg_hsr_firmwares[] = {
-+	{
-+		.pru = "ti-pruss/am65x-sr2-pru0-pruhsr-fw.elf",
-+		.rtu = "ti-pruss/am65x-sr2-rtu0-pruhsr-fw.elf",
-+		.txpru = "ti-pruss/am65x-sr2-txpru0-pruhsr-fw.elf",
-+	},
-+	{
-+		.pru = "ti-pruss/am65x-sr2-pru1-pruhsr-fw.elf",
-+		.rtu = "ti-pruss/am65x-sr2-rtu1-pruhsr-fw.elf",
-+		.txpru = "ti-pruss/am65x-sr2-txpru1-pruhsr-fw.elf",
-+	}
-+};
-+
- static struct icssg_firmwares icssg_switch_firmwares[] = {
- 	{
- 		.pru = "ti-pruss/am65x-sr2-pru0-prusw-fw.elf",
-@@ -152,6 +168,8 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
- 
- 	if (prueth->is_switch_mode)
- 		firmwares = icssg_switch_firmwares;
-+	else if (prueth->is_hsr_offload_mode)
-+		firmwares = icssg_hsr_firmwares;
- 	else
- 		firmwares = icssg_emac_firmwares;
- 
-@@ -726,6 +744,34 @@ static void emac_ndo_set_rx_mode(struct net_device *ndev)
- 	queue_work(emac->cmd_wq, &emac->rx_mode_work);
- }
- 
-+static void emac_change_hsr_feature(struct net_device *ndev,
-+				    netdev_features_t features,
-+				    u64 hsr_feature)
++static netdev_features_t emac_ndo_fix_features(struct net_device *ndev,
++					       netdev_features_t features)
 +{
-+	netdev_features_t changed = ndev->features ^ features;
++	/* In order to enable hsr tag insertion offload, hsr dup offload must
++	 * also be enabled as these two are tightly coupled in firmware
++	 * implementation.
++	 */
++	if (features & NETIF_F_HW_HSR_TAG_INS)
++		features |= NETIF_F_HW_HSR_DUP;
++	else
++		features &= ~NETIF_F_HW_HSR_DUP;
 +
-+	if (changed & hsr_feature) {
-+		if (features & hsr_feature)
-+			ndev->features |= hsr_feature;
-+		else
-+			ndev->features &= ~hsr_feature;
-+	}
++	return features;
 +}
 +
-+static int emac_ndo_set_features(struct net_device *ndev,
-+				 netdev_features_t features)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
-+
-+	emac_change_hsr_feature(ndev, features, NETIF_F_HW_HSR_FWD);
-+	emac_change_hsr_feature(ndev, features, NETIF_F_HW_HSR_DUP);
-+	emac_change_hsr_feature(ndev, features, NETIF_F_HW_HSR_TAG_INS);
-+	emac_change_hsr_feature(ndev, features, NETIF_F_HW_HSR_TAG_RM);
-+
-+	return 0;
-+}
-+
- static const struct net_device_ops emac_netdev_ops = {
- 	.ndo_open = emac_ndo_open,
- 	.ndo_stop = emac_ndo_stop,
-@@ -737,6 +783,7 @@ static const struct net_device_ops emac_netdev_ops = {
+ static int emac_ndo_set_features(struct net_device *ndev,
+ 				 netdev_features_t features)
+ {
+@@ -783,6 +801,7 @@ static const struct net_device_ops emac_netdev_ops = {
  	.ndo_eth_ioctl = icssg_ndo_ioctl,
  	.ndo_get_stats64 = icssg_ndo_get_stats64,
  	.ndo_get_phys_port_name = icssg_ndo_get_phys_port_name,
-+	.ndo_set_features = emac_ndo_set_features,
++	.ndo_fix_features = emac_ndo_fix_features,
+ 	.ndo_set_features = emac_ndo_set_features,
  };
  
- static int prueth_netdev_init(struct prueth *prueth,
-@@ -865,6 +912,7 @@ static int prueth_netdev_init(struct prueth *prueth,
- 	ndev->ethtool_ops = &icssg_ethtool_ops;
- 	ndev->hw_features = NETIF_F_SG;
- 	ndev->features = ndev->hw_features;
-+	ndev->hw_features |= NETIF_PRUETH_HSR_OFFLOAD_FEATURES;
+@@ -1010,6 +1029,13 @@ static void icssg_change_mode(struct prueth *prueth)
  
- 	netif_napi_add(ndev, &emac->napi_rx, icssg_napi_rx_poll);
- 	hrtimer_init(&emac->rx_hrtimer, CLOCK_MONOTONIC,
-@@ -953,7 +1001,7 @@ static void prueth_emac_restart(struct prueth *prueth)
- 	netif_device_attach(emac1->ndev);
- }
- 
--static void icssg_enable_switch_mode(struct prueth *prueth)
-+static void icssg_change_mode(struct prueth *prueth)
- {
- 	struct prueth_emac *emac;
- 	int mac;
-@@ -973,8 +1021,13 @@ static void icssg_enable_switch_mode(struct prueth *prueth)
- 					  BIT(emac->port_id) | DEFAULT_PORT_MASK,
- 					  BIT(emac->port_id) | DEFAULT_UNTAG_MASK,
- 					  true);
-+			if (prueth->is_hsr_offload_mode)
-+				icssg_vtbl_modify(emac, DEFAULT_VID,
-+						  DEFAULT_PORT_MASK,
-+						  DEFAULT_UNTAG_MASK, true);
- 			icssg_set_pvid(prueth, emac->port_vlan, emac->port_id);
--			icssg_set_port_state(emac, ICSSG_EMAC_PORT_VLAN_AWARE_ENABLE);
-+			if (prueth->is_switch_mode)
-+				icssg_set_port_state(emac, ICSSG_EMAC_PORT_VLAN_AWARE_ENABLE);
- 		}
- 	}
- }
-@@ -1012,7 +1065,7 @@ static int prueth_netdevice_port_link(struct net_device *ndev,
- 			prueth->is_switch_mode = true;
- 			prueth->default_vlan = 1;
- 			emac->port_vlan = prueth->default_vlan;
--			icssg_enable_switch_mode(prueth);
-+			icssg_change_mode(prueth);
- 		}
- 	}
- 
-@@ -1040,6 +1093,61 @@ static void prueth_netdevice_port_unlink(struct net_device *ndev)
- 		prueth->hw_bridge_dev = NULL;
- }
- 
-+static int prueth_hsr_port_link(struct net_device *ndev)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
-+	struct prueth_emac *emac0;
-+	struct prueth_emac *emac1;
-+
-+	emac0 = prueth->emac[PRUETH_MAC0];
-+	emac1 = prueth->emac[PRUETH_MAC1];
-+
-+	if (prueth->is_switch_mode)
-+		return -EOPNOTSUPP;
-+
-+	prueth->hsr_members |= BIT(emac->port_id);
-+	if (!prueth->is_hsr_offload_mode) {
-+		if (prueth->hsr_members & BIT(PRUETH_PORT_MII0) &&
-+		    prueth->hsr_members & BIT(PRUETH_PORT_MII1)) {
-+			if (!(emac0->ndev->features &
-+			      NETIF_PRUETH_HSR_OFFLOAD_FEATURES) &&
-+			    !(emac1->ndev->features &
-+			      NETIF_PRUETH_HSR_OFFLOAD_FEATURES))
-+				return -EOPNOTSUPP;
-+			prueth->is_hsr_offload_mode = true;
-+			prueth->default_vlan = 1;
-+			emac0->port_vlan = prueth->default_vlan;
-+			emac1->port_vlan = prueth->default_vlan;
-+			icssg_change_mode(prueth);
-+			netdev_dbg(ndev, "Enabling HSR offload mode\n");
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static void prueth_hsr_port_unlink(struct net_device *ndev)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
-+	struct prueth_emac *emac0;
-+	struct prueth_emac *emac1;
-+
-+	emac0 = prueth->emac[PRUETH_MAC0];
-+	emac1 = prueth->emac[PRUETH_MAC1];
-+
-+	prueth->hsr_members &= ~BIT(emac->port_id);
-+	if (prueth->is_hsr_offload_mode) {
-+		prueth->is_hsr_offload_mode = false;
-+		emac0->port_vlan = 0;
-+		emac1->port_vlan = 0;
-+		prueth->hsr_dev = NULL;
-+		prueth_emac_restart(prueth);
-+		netdev_dbg(ndev, "Disabling HSR Offload mode\n");
-+	}
-+}
-+
- /* netdev notifier */
- static int prueth_netdevice_event(struct notifier_block *unused,
- 				  unsigned long event, void *ptr)
-@@ -1047,6 +1155,8 @@ static int prueth_netdevice_event(struct notifier_block *unused,
- 	struct netlink_ext_ack *extack = netdev_notifier_info_to_extack(ptr);
- 	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
- 	struct netdev_notifier_changeupper_info *info;
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
- 	int ret = NOTIFY_DONE;
- 
- 	if (ndev->netdev_ops != &emac_netdev_ops)
-@@ -1056,6 +1166,25 @@ static int prueth_netdevice_event(struct notifier_block *unused,
- 	case NETDEV_CHANGEUPPER:
- 		info = ptr;
- 
-+		if ((ndev->features & NETIF_PRUETH_HSR_OFFLOAD_FEATURES) &&
-+		    is_hsr_master(info->upper_dev)) {
-+			if (info->linking) {
-+				if (!prueth->hsr_dev) {
-+					prueth->hsr_dev = info->upper_dev;
-+					icssg_class_set_host_mac_addr(prueth->miig_rt,
-+								      prueth->hsr_dev->dev_addr);
-+				} else {
-+					if (prueth->hsr_dev != info->upper_dev) {
-+						netdev_dbg(ndev, "Both interfaces must be linked to same upper device\n");
-+						return -EOPNOTSUPP;
-+					}
-+				}
-+				prueth_hsr_port_link(ndev);
-+			} else {
-+				prueth_hsr_port_unlink(ndev);
-+			}
+ 	for (mac = PRUETH_MAC0; mac < PRUETH_NUM_MACS; mac++) {
+ 		emac = prueth->emac[mac];
++		if (prueth->is_hsr_offload_mode) {
++			if (emac->ndev->features & NETIF_F_HW_HSR_TAG_RM)
++				icssg_set_port_state(emac, ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE);
++			else
++				icssg_set_port_state(emac, ICSSG_EMAC_HSR_RX_OFFLOAD_DISABLE);
 +		}
 +
- 		if (netif_is_bridge_master(info->upper_dev)) {
- 			if (info->linking)
- 				ret = prueth_netdevice_port_link(ndev, info->upper_dev, extack);
+ 		if (netif_running(emac->ndev)) {
+ 			icssg_fdb_add_del(emac, eth_stp_addr, prueth->default_vlan,
+ 					  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
 diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-index 786bd1ba34ab..a4b025fae797 100644
+index a4b025fae797..bba6da2e6bd8 100644
 --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
 +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
-@@ -243,11 +243,14 @@ struct icssg_firmwares {
-  * @iep1: pointer to IEP1 device
-  * @vlan_tbl: VLAN-FID table pointer
-  * @hw_bridge_dev: pointer to HW bridge net device
-+ * @hsr_dev: pointer to the HSR net device
-  * @br_members: bitmask of bridge member ports
-+ * @hsr_members: bitmask of hsr member ports
-  * @prueth_netdevice_nb: netdevice notifier block
-  * @prueth_switchdev_nb: switchdev notifier block
-  * @prueth_switchdev_bl_nb: switchdev blocking notifier block
-  * @is_switch_mode: flag to indicate if device is in Switch mode
-+ * @is_hsr_offload_mode: flag to indicate if device is in hsr offload mode
-  * @is_switchmode_supported: indicates platform support for switch mode
-  * @switch_id: ID for mapping switch ports to bridge
-  * @default_vlan: Default VLAN for host
-@@ -279,11 +282,14 @@ struct prueth {
- 	struct prueth_vlan_tbl *vlan_tbl;
+@@ -59,6 +59,9 @@
  
- 	struct net_device *hw_bridge_dev;
-+	struct net_device *hsr_dev;
- 	u8 br_members;
-+	u8 hsr_members;
- 	struct notifier_block prueth_netdevice_nb;
- 	struct notifier_block prueth_switchdev_nb;
- 	struct notifier_block prueth_switchdev_bl_nb;
- 	bool is_switch_mode;
-+	bool is_hsr_offload_mode;
- 	bool is_switchmode_supported;
- 	unsigned char switch_id[MAX_PHYS_ITEM_ID_LEN];
- 	int default_vlan;
+ #define IEP_DEFAULT_CYCLE_TIME_NS	1000000	/* 1 ms */
+ 
++#define PRUETH_UNDIRECTED_PKT_DST_TAG	0
++#define PRUETH_UNDIRECTED_PKT_TAG_INS	BIT(30)
++
+ /* Firmware status codes */
+ #define ICSS_HS_FW_READY 0x55555555
+ #define ICSS_HS_FW_DEAD 0xDEAD0000	/* lower 16 bits contain error code */
 -- 
 2.34.1
 
