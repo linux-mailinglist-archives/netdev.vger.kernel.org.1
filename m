@@ -1,374 +1,238 @@
-Return-Path: <netdev+bounces-125223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A38D996C540
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:22:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F03896C548
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:22:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 971041C21BB4
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:22:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A396C1F290F5
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905081E0B8A;
-	Wed,  4 Sep 2024 17:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4949D3D0AD;
+	Wed,  4 Sep 2024 17:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="rVvr6+oK"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="IS3KhL0S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2067.outbound.protection.outlook.com [40.107.220.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED691E6310
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 17:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725470324; cv=none; b=lxaZKUcTESy8aIwrSx2rEmdjdf0iWXr/SERmMGo7oE0yIMXga48eHF/fwkbQdAIyjMsx1NWg4nF9ucqdmH7Ut9zR5Y93DS6Z8PU11P8oN93mzdoQ7J6Wq18IufoX4dZ33XnpNx7pn19p0Lfv0gtLTuFph1Q/HNH6iq0R0N4h/lM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725470324; c=relaxed/simple;
-	bh=ahswB8hUbUlmpGTcIQh1XAV5qMRekOAulhC5yyJgcQQ=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=J8ZSThUaqTQMlddF4NzctQR5ZIqz6QHeEfhleaKQEHqwaIycrYc0DZ2oipipr0LwVEGm0MG7hXxnXxK6X2w8m6p37T85d2HjV6+CR8UcfHyPt0bAc3INCovi0UkHBZlkbFV8zPDq2oPABKoUVfLGgqIVoRqa5umzvlD1jTLD4wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=rVvr6+oK; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1fc47abc040so9735105ad.0
-        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 10:18:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1725470321; x=1726075121; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dSC2jveJ0jsYz0cGADBL5DJEPo+Pj20pwZgZvQBpJWQ=;
-        b=rVvr6+oKZDgyureSdf1b8/QxeWAT6w9xd/PqCns3XQ8jBmRi4hsJuExl4UT32Nwq4R
-         uJxWPIdwoKXIzVawoQW1a4HVGV2iw+n6Fp0JPK7wd82jaFpC+i8i5udNcXHMgjQeyUDe
-         bYPLHBI83+ceJdE5tgTQHtLPLCyMk7ZubP3l11xskZS6ERaMlH5Ra8n2Fp8PvXOUpd3y
-         ugw4vWnqhQxajgYbT/+Ue48MBj3XJlqBU5AOzJmnbfR/2ZDEnIm0f2uFMxnCvncIvwCy
-         O+8ePRcvnrBk3Vg8r3pjIrMOWyBaInFwcH2iYyTYSO2osGAljxr6WSDutDDXLS3K4z3v
-         Gj1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725470321; x=1726075121;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dSC2jveJ0jsYz0cGADBL5DJEPo+Pj20pwZgZvQBpJWQ=;
-        b=SEDw2XfZp9syNybGkiRYjVUOY7g1S1zdYnL3xCFp+9ViiXoCdj00n71J/5zTWss4eU
-         HCGAcDQY0uj2hatYY02YmJ/XfBQIKb/yImCLOZ6qVeQZA16wmDENdPnZwwtGTe9oCDxf
-         tpjybZyGyYt/ud+hDUCwg/CyBXuxf48ky3rFvxDJEeM68tbKip1SE2ZyFlALFR/AeLKI
-         H1AGup01GeewC4DHphNF4ickkx1OwyTIxRtg329+zQsFXTBg4VfBAkYrTBfK/ftqEg42
-         nGyS4X5sEMBZtGHvfL03+XVQQs1Yp9aSk7NKyBcUSo7JYmHKxMZnWpA27su/OyjgZIG/
-         VVRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUHCwp2cT5AtJfc+0A/gifDvAyiSXwqKoBTEYQzd9dyjPkCzeyq9qV4HN/r8XWsCh+MrWK+Ieo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb5DRLj2wo6dWmAnFelqfsQ7LmNnJB3ydbGtQpz+/hRilM+YAL
-	3mN61h3T4IgCj5B5VVAtfzHD8fFyRoXebzV2WE6K0LU89nlxuEjLQ0ncSCRdddY=
-X-Google-Smtp-Source: AGHT+IFRLkGrt4fH2qZpZ+U/B9NxgbLzIkv6MFc47LFnBdljduT0oakx5s0XFJih/PreH0Ussud68w==
-X-Received: by 2002:a17:902:e54f:b0:205:83a3:b08 with SMTP id d9443c01a7336-20583a30bf0mr91591015ad.32.1725470321392;
-        Wed, 04 Sep 2024 10:18:41 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206ae913df2sm15899555ad.41.2024.09.04.10.18.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 10:18:40 -0700 (PDT)
-Date: Wed, 4 Sep 2024 10:18:37 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: linux-nfs@vger.kernel.org, netdev@vger.kernel.org
-Subject: Fw: [Bug 219228] New: KVM guest boot up with call trace with
- mounted image due to NFS server connection is not stable
-Message-ID: <20240904101837.1d825463@hermes.local>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A1D41E1A27;
+	Wed,  4 Sep 2024 17:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725470394; cv=fail; b=ptIzUuuNLa7ZjfeCRfRYTWu4HFMxZWoN2DKk8Z1GvCvXRemdk80Y94d5QLoagpI/pnUN88MHsQBbak/gmFW0cWZeQ5z+zBuLEDfmec3Di3Fnfs55PKQXYCu18iZ22vmVlPO8uL+HbBYS6vfnA5CLcIa6yZYug8JTodPtljkoN7s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725470394; c=relaxed/simple;
+	bh=lzNlb/MCur5TW2RTBVuhjpQbOQIvezxEPO56Ea7MKLc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nkU3R7KOxkAgR8G2RCXJZaikTDGsiG4OL5Bi0QMjECeIZINn3asX6JdTOpD3ktD2/xFOQ4IcOyJqTvJal4JMoQ4GZYgf7s/Aqk470b/X8iLItIG8alQl+mtjGjX7AUT0lrc7Q9kvpFoV0GYnbCEknzoIfoDv8J9lPDPbVP/AHDU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=IS3KhL0S; arc=fail smtp.client-ip=40.107.220.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=fNn+4pY2UKoUO4pqTT66MJFF6rgZgnJyGa0qEzcJk2UvjyQf1etClhrUhdhvMGYhpLlJZ2x1IkxedaycD4qJcov7DNJu63zBMTugBxfXLx1riq8a10S1RY5ui33q7QqshXOnP6DR6dmX9iYv485X+UollLB/jYD+wys60isY7TQspjuRdJscOafsBh0B5wZfjaEJYmAO86q1rBbzfPA/nLnH+QhULF5O2NTdPPp8Jd14vr5Q9Dka9c276/yNWr+gFWoWacY1NpgqFhaACRlTOT3O76qQ5AtcbOA5n2LAbzoc4pyhWBqOZP1wQiO5LYpYi+02Iuscwkvm1Rfle8k/nA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QaKsQimKARFSNcQe7p/zF6EHFyqBhkOK8IgAaTIoXzA=;
+ b=bUF+soYlH1ecjMoAlXHIl7H0q/CT/8i19BR33iJgdvM8yX9jrWAebgKlJFz4/PaFyTKx6fppzRBEDbGX84r7TMC4pOtQ9JUPDCWGoqoZAuyfznZolpbpdL4epkExF8PIiCSp+ET+0B/G8gtNNVKjvwBt7s0mARurpgoqJF0RJtQt6NpGBWiDf33TdwT0MG0WFXOW4U1XnR7t/uRBxHekj5tLZkqS4UVBU3jRl++LY3y5/8l6/Eo6fX+Uds0QDXUElja9ydKQ3d240ozyIyZZHoPTxBQs/Ao0PZxC/QSvSB43nubDCnwNnQ5NkNohaX/Ybu0PEwrYmCvSONLAwpeDxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QaKsQimKARFSNcQe7p/zF6EHFyqBhkOK8IgAaTIoXzA=;
+ b=IS3KhL0S/y0zzpVNPBSL/dG5L5KmhXzu+mtV8pfrqvaWTNixrCLTolvXlxAp46p7jWkmgrRF2p4SUbED7ty0ymhNkpcF1MOmMv5Ek8YU9eJmDw45pw+5HCCEQt3lwCUuIOZ7YUHZjpLoxWXhb3XQJwCdUojiAQb77Ul8gChtMig=
+Received: from MN0PR12MB5953.namprd12.prod.outlook.com (2603:10b6:208:37c::15)
+ by CY5PR12MB6456.namprd12.prod.outlook.com (2603:10b6:930:34::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.28; Wed, 4 Sep
+ 2024 17:19:49 +0000
+Received: from MN0PR12MB5953.namprd12.prod.outlook.com
+ ([fe80::6798:13c6:d7ba:e01c]) by MN0PR12MB5953.namprd12.prod.outlook.com
+ ([fe80::6798:13c6:d7ba:e01c%5]) with mapi id 15.20.7918.024; Wed, 4 Sep 2024
+ 17:19:48 +0000
+From: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>
+To: Sean Anderson <sean.anderson@linux.dev>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Simek, Michal" <michal.simek@amd.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, Ariane Keller
+	<ariane.keller@tik.ee.ethz.ch>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andy
+ Chiu <andy.chiu@sifive.com>
+Subject: RE: [PATCH net] net: xilinx: axienet: Fix IRQ coalescing packet count
+ overflow
+Thread-Topic: [PATCH net] net: xilinx: axienet: Fix IRQ coalescing packet
+ count overflow
+Thread-Index: AQHa/itD5/rKF0Kmhkyj3WY/NO0ji7JH4Aeg
+Date: Wed, 4 Sep 2024 17:19:48 +0000
+Message-ID:
+ <MN0PR12MB595374F39CB6F68958004A9DB79C2@MN0PR12MB5953.namprd12.prod.outlook.com>
+References: <20240903180059.4134461-1-sean.anderson@linux.dev>
+In-Reply-To: <20240903180059.4134461-1-sean.anderson@linux.dev>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MN0PR12MB5953:EE_|CY5PR12MB6456:EE_
+x-ms-office365-filtering-correlation-id: 07044735-9af6-4441-19b7-08dccd05c7bf
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?by7CbQF/jk2KftCbevzQ1vrPMdmBc+m95jrTQRapdnZtIJ3sozaLPUb93gVl?=
+ =?us-ascii?Q?YL0LvddWOzvP6rKI6H4o9DycmsMINUYJxtpeLAiqRuM8ytvw5TQZGO6G1K6P?=
+ =?us-ascii?Q?Ci/LYNvbI2HOfFTLb8IvoOqke2ly87AFjhgTrFFUAUw3DGR/as/Uygf4ATjE?=
+ =?us-ascii?Q?HIqWX/bJKFq/vvhgRBdfhwL63i8kqkK7ZbzTdFqK6+3OaMrXzHAqDu0TLPxf?=
+ =?us-ascii?Q?FwojKfvkgINMn1jokOf+yx0jStEAqRuaPWldEO8NtD3Y/IrJElNhRAgKkTK3?=
+ =?us-ascii?Q?r7ewwmR/tqnS9eaDsATz7z5Y+HQJE2TeNrifdqLJF4bLj6PSOfgFIE8glPIH?=
+ =?us-ascii?Q?Wxa8GQG1wSVPVWGEkiJx2lhfrX4rnf731fDGouhm8LcyqCT45epHDd6XZADf?=
+ =?us-ascii?Q?ZD3/gtooteWzplX4eVXyet1xIzufVD9ZXXrM4KPbGiLdSqdTKurYG1xtLGKn?=
+ =?us-ascii?Q?/09H2zYKXK0OfYsHPcao+AB0GvKMqqbRXKVxFfHEV5ujq574kUAOVrRMdGzA?=
+ =?us-ascii?Q?hXWFm5XuJHtwIlZWnKAwyo3YLDvcEOS3OC5Hone+cRPf+vcr1Fc+1LYc2uvd?=
+ =?us-ascii?Q?4s+DddCG0jwj/VSJ+UTV8hyEdZx1YDc1I3upGIBDWI+3G3UQl0LlA8Oe3D3I?=
+ =?us-ascii?Q?zBgJiQRVJkTXA0feXqVbvph27DyFDoJuI7Ad2/s6tHZWdaWGciIJjxoO3+bP?=
+ =?us-ascii?Q?OVNqUcfNAWIhVJGxv6/j5xSpp2n/suFwA8Htz3Wnnf6vOzBq2qLN3QRB9AQJ?=
+ =?us-ascii?Q?CX0m7p49HvmBi9rkbMBuoE6Tle070QHJO0Q4wuUV70CjAfo8gDasWrV11EF0?=
+ =?us-ascii?Q?5AcNcURY02OHdx6LPCnDqX/mHPybdmaLxH1uZkj6rfsXWvtuJbjL76qkvkij?=
+ =?us-ascii?Q?3TQpTvw8N4zgKLrOHcw2YmOFxp9DsBSR89FEgWNzqUlnnsQUEmwTNpQgpCZo?=
+ =?us-ascii?Q?HBWuYlhheMapFPRgWPIuKiOLxp6d6ebkmwH91k8JQBV+cRpZkykKTxAq8T7F?=
+ =?us-ascii?Q?JieB1nB/7IPZJykJ+LM1apmKWrDLdOl1xcLnQYFserUMwkxdTVNE0Ge4dbfJ?=
+ =?us-ascii?Q?uiXkpChXjpc2LwIsPCBXis6P2606XwIKsOlsN7JGZHGDVIxDpTcdO1QDY/xV?=
+ =?us-ascii?Q?FjHmAmEMpGvWfs51P/mulKNWWQZF6hkQZ2uJNgXZriYpz2WtwvzNzg+XsfPE?=
+ =?us-ascii?Q?/ztVoGVUl3+zWOTdKrAjTNpUOGN1OudxoAtBQGB5foWTFHeHlnwLBQ9Nntz7?=
+ =?us-ascii?Q?m23b+il7cH+NjtEz6r2wjPVu5DjZtmSjp0oR1ez0SFQWKGHBz+N4C/D31Zhs?=
+ =?us-ascii?Q?yINmrjWCo2LEQLcipTzJzujedXQJ/ZIPhrAK+uZ3r+bBq1siaxH+VCyXIUoq?=
+ =?us-ascii?Q?6x1gXpa8UfBK+0Cpo54gHffmhBgDK0qeFTlI77c9DbsJLFWQdw=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB5953.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?KOCg8OC+Zu+V+rSDP3OfhRaA5SPbXqffEiNOhTZIy681o4JAKs2NPelW6lLQ?=
+ =?us-ascii?Q?42TTn6LodXcDHZdaSE/R/yl4EoHsXT4v946ttJ4bjCYVZuE9L7EAZIPH6/BL?=
+ =?us-ascii?Q?jH7MQbTzAmY8zi+KPD7m2tJRnrMwj01AXwJTNhjTJywmc++wYCdNP0stKIdo?=
+ =?us-ascii?Q?IwyM41WLyGgGZOa1KdNEcpsymIt/7P1gutOM0UMo1b1Rt+ypz1y+kmaP2Op3?=
+ =?us-ascii?Q?nidhLN+ZMUE44na/9m4t8VmQHJkf5twL6U9uAPqRTux3mFmLePHC49AyXpwR?=
+ =?us-ascii?Q?de/KIP89adZ6BYxGoLl3zf8+hL6ArMargFTUQFaXIfbl99gRh1DiRTOT27pe?=
+ =?us-ascii?Q?BlbKYbYShv5NCRblHDdD6m77hBGoQtD4Rl6w7ZGEo+By7nf/EGtlmS71NpQb?=
+ =?us-ascii?Q?pqv5msHyMkGvuQIkhpS5q7PIzq8zKU0B66jDD2KuzQt27xQ/DkPgQ3PmR5zt?=
+ =?us-ascii?Q?NdKUGy/EtbFrcuuWeaE/vXfbsZmWMn4ZJ5hp1oboEhFlMlJBcPcySaSW2lrI?=
+ =?us-ascii?Q?GSEfr/m5ob0O5aoMMRwRsUoiS2lKzdse8f1jDVD8Wrv2L84IvVG8NBMIzU+v?=
+ =?us-ascii?Q?CKzmtnv8TbePPV6TNCirOdf/Tn7iNni06EYGL5PUClcdmcohX0bshQ+unsUF?=
+ =?us-ascii?Q?zrKGJgAxLgpv0ejyZ7+c9mherkgqzJLAxXKJ/fYn+W6fD5zPJsBtvz2lH88/?=
+ =?us-ascii?Q?0hN7NqNHe4OmFHN7BkHEHMf9lJMcDvKmvV2pYV1vZW4mr9QjQVHs9CiHFHGW?=
+ =?us-ascii?Q?tnu+LL7Lxe7hbH6qxEeEpPdHuqlTTshysRZD4RDhOwVpgFAPE8GUAuR77vUz?=
+ =?us-ascii?Q?0kiSgX6N6R8b4DYbeqMpW/LcTa/sZYeeJ5uirIa/+0QV6roAhT8DLN4eABc8?=
+ =?us-ascii?Q?fnv7BdqomaufjqrjjeY8B8k45nIqbIy6CHOPwpkltxfY04f00JfU7sPF2KCW?=
+ =?us-ascii?Q?zf3EUkU9EsvdNbOBHUTCK3VIezo1vlkk/+/C/+niaUMA5QrUDImUdJXb8b3u?=
+ =?us-ascii?Q?ziDR7inPy84KC5QY4E2vKi1k0iiFW/HvCz6B5HP0hhID9JFcwaA0Uz9/Wl0B?=
+ =?us-ascii?Q?XBl1QkZ7xX5JZXPBXrmSNLn4OrWagkAHt2oL8SRbwp5IV1wh8CaONQIOvyGo?=
+ =?us-ascii?Q?XpLBTFAln6bQzgiRKJzlWD1H9iTNsePIcszD6n588kQUDZTUKX30j7sBtKK6?=
+ =?us-ascii?Q?Y4rbPPu+pUjtw1bd38/5hFOLEvg90eRKz5O8jOHa1b3tdGly98yB+KtTKnFo?=
+ =?us-ascii?Q?NTZN1sXy6DqqTo9fMYSIWK4kH7PlvcFac6bMFfbOSEifVfpnnCyCo2mx0eFk?=
+ =?us-ascii?Q?rigB0GWpwHr3B3XcNFJWFmq0IC88RdlI0KOZfb8IYxWYXdJ+YGYHH6R1Ft2X?=
+ =?us-ascii?Q?5eZhp6xpOaCqDKsZ6TUEqlwf8VWJkTvgnsjK0ixcogg4kw26TyFnqZEGN0RN?=
+ =?us-ascii?Q?6R92k15GEoEXDFvBPlvYLV9WZirK6MBiPAKcOXthi/beGQGQPT/75gcy2AcF?=
+ =?us-ascii?Q?WrJCUtHENbH4p/hbCbhpuBYtqQiK3BoT5xKerxzQFzhkbhxVW7WvdhtcoU7F?=
+ =?us-ascii?Q?KhKt3/oCwCFix9g7L2I=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB5953.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 07044735-9af6-4441-19b7-08dccd05c7bf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Sep 2024 17:19:48.9030
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: n1t+bdeADbAQ7eZ7Xd5Q0mtlJNQ/fFTzlB38peXOGw/A737rxmdDs2zhPcZRRQeH
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6456
 
-Looks more like NFS bug than a networking bug per se.
+> -----Original Message-----
+> From: Sean Anderson <sean.anderson@linux.dev>
+> Sent: Tuesday, September 3, 2024 11:31 PM
+> To: Pandey, Radhey Shyam <radhey.shyam.pandey@amd.com>; David S .
+> Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>;
+> Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
+> netdev@vger.kernel.org
+> Cc: Simek, Michal <michal.simek@amd.com>; linux-arm-
+> kernel@lists.infradead.org; Ariane Keller <ariane.keller@tik.ee.ethz.ch>;
+> linux-kernel@vger.kernel.org; Daniel Borkmann <daniel@iogearbox.net>;
+> Andy Chiu <andy.chiu@sifive.com>; Sean Anderson
+> <sean.anderson@linux.dev>
+> Subject: [PATCH net] net: xilinx: axienet: Fix IRQ coalescing packet coun=
+t
+> overflow
+>=20
+> If coalesce_count is greater than 255 it will not fit in the register and
+> will overflow. Clamp it to 255 for more-predictable results.
+>=20
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ether=
+net
+> driver")
+> ---
+>=20
+>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> index 9aeb7b9f3ae4..5f27fc1c4375 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+> @@ -252,7 +252,8 @@ static u32 axienet_usec_to_timer(struct axienet_local
+> *lp, u32 coalesce_usec)
+>  static void axienet_dma_start(struct axienet_local *lp)
+>  {
+>  	/* Start updating the Rx channel control register */
+> -	lp->rx_dma_cr =3D (lp->coalesce_count_rx <<
+> XAXIDMA_COALESCE_SHIFT) |
+> +	lp->rx_dma_cr =3D (min(lp->coalesce_count_rx, 255) <<
+> +			 XAXIDMA_COALESCE_SHIFT) |
+>  			XAXIDMA_IRQ_IOC_MASK |
 
-Begin forwarded message:
-
-Date: Wed, 04 Sep 2024 02:32:26 +0000
-From: bugzilla-daemon@kernel.org
-To: stephen@networkplumber.org
-Subject: [Bug 219228] New: KVM guest boot up with call trace with mounted i=
-mage due to NFS server connection is not stable
+Instead of every time clamping coalesce_count_rx on read I think better=20
+to do it place where it set in axienet_ethtools_set_coalesce()? It would
+also represent the coalesce count state that is reported by get_coalesce()
+and same is being used in programming.
 
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219228
+> XAXIDMA_IRQ_ERROR_MASK;
+>  	/* Only set interrupt delay timer if not generating an interrupt on
+>  	 * the first RX packet. Otherwise leave at 0 to disable delay interrupt=
+.
+> @@ -264,7 +265,8 @@ static void axienet_dma_start(struct axienet_local
+> *lp)
+>  	axienet_dma_out32(lp, XAXIDMA_RX_CR_OFFSET, lp->rx_dma_cr);
+>=20
+>  	/* Start updating the Tx channel control register */
+> -	lp->tx_dma_cr =3D (lp->coalesce_count_tx <<
+> XAXIDMA_COALESCE_SHIFT) |
+> +	lp->tx_dma_cr =3D (min(lp->coalesce_count_tx, 255) <<
+> +			 XAXIDMA_COALESCE_SHIFT) |
+>  			XAXIDMA_IRQ_IOC_MASK |
+> XAXIDMA_IRQ_ERROR_MASK;
+>  	/* Only set interrupt delay timer if not generating an interrupt on
+>  	 * the first TX packet. Otherwise leave at 0 to disable delay interrupt=
+.
+> --
+> 2.35.1.1320.gc452695387.dirty
 
-            Bug ID: 219228
-           Summary: KVM guest boot up with call trace with mounted image
-                    due to NFS server connection is not stable
-           Product: Networking
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: IPV4
-          Assignee: stephen@networkplumber.org
-          Reporter: xuelian.guo@intel.com
-        Regression: No
-
-Environment:
-host kernel :=C2=A06.11.0-rc3=20
-guest kernel :6.11.0-rc5
-qemu version : QEMU emulator version 9.0.92 (v9.1.0-rc2-28-g2eefd4fcec)
-
-
-Bug detail description:=C2=A0
-try to boot KVM guest , there is call trace during kernel loading
-
-Reproduce steps:=C2=A0
-1. set up nfs-server, and put guest image "centos9.img" into NFS-server's
-/images folder.
-
-2. mount NFS-server folder to local:
-   <NfS-server>:/images /share/guest_imgs nfs defaults,tcp,nolock 0 0
-
-3. create qcow2 image based on remote NFS-server
-    qemu-img created -b /share/guest_imgs/centos9.img -f qcow2 centos9.qcow=
-2 -F
-raw
-
-4. boot KVM guest with :
-qemu-system-x86_64 -accel kvm \
--m 4096 \
--smp 4 \
--cpu host \
--drive file=3Dcentos9.qcow2,if=3Dnone,id=3Dvirtio-disk0 \
--device virtio-blk-pci,drive=3Dvirtio-disk0,bootindex=3D0 \
--device virtio-net-pci,netdev=3Dnic0 \
--netdev user,id=3Dnic0,hostfwd=3Dtcp::10022-:22 \
--nographic
-
-Error log:=C2=A0
-During KVM guest booting, there are call trace and Guest could boot up in t=
-he
-end, but boot time is long.
- INFO: task kworker/u8:1:29 blocked for more than 122 seconds.
-[  246.987403]       Not tainted 6.11.0-rc5 #2
-[  246.989674] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
-this
-message.
-[  246.992986] task:kworker/u8:1    state:D stack:0     pid:29    tgid:29  =
-=20
-ppid:2      flags:0x00004000
-[  246.996842] Workqueue: xfs-cil/dm-0 xlog_cil_push_work [xfs]
-[  247.000029] Call Trace:
-[  247.001707]  <TASK>
-[  247.003263]  __schedule+0x276/0x710
-[  247.005381]  schedule+0x27/0xa0
-[  247.007300]  xlog_state_get_iclog_space+0x102/0x2a0 [xfs]
-[  247.010298]  ? __pfx_default_wake_function+0x10/0x10
-[  247.012800]  xlog_write+0x7b/0x260 [xfs]
-[  247.015379]  ? _raw_spin_unlock+0xe/0x30
-[  *** ] (5 of 5) A start job is running for=E2=80=A6ernel arming (3min 39s=
- / no limit)
-[  247.023496]  xlog_cil_push_work+0x50e/0x6f0 [xfs]
-[  247.026329]  process_one_work+0x158/0x360
-[  247.028584]  worker_thread+0x235/0x340
-[  247.030710]  ? __pfx_worker_thread+0x10/0x10
-[  247.032997]  kthread+0xd0/0x100
-[  247.034937]  ? __pfx_kthread+0x10/0x10
-[  247.037063]  ret_from_fork+0x31/0x50
-[  247.039161]  ? __pfx_kthread+0x10/0x10
-[  247.041302]  ret_from_fork_asm+0x1a/0x30
-[  247.043479]  </TASK>
-[  247.045019] INFO: task kworker/0:3:255 blocked for more than 122 seconds.
-[  247.047775]       Not tainted 6.11.0-rc5 #2
-[  247.049802] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
-this
-message.
-[  247.052903] task:kworker/0:3     state:D stack:0     pid:255   tgid:255 =
-=20
-ppid:2      flags:0x00004000
-[  247.056403] Workqueue: xfs-sync/dm-0 xfs_log_worker [xfs]
-[  247.058880] Call Trace:
-[  247.060293]  <TASK>
-[  247.061638]  __schedule+0x276/0x710
-[  247.063332]  schedule+0x27/0xa0
-[  247.064964]  schedule_timeout+0x14e/0x160
-[  247.066778]  __wait_for_common+0x8f/0x1d0
-[  247.068569]  ? __pfx_schedule_timeout+0x10/0x10
-[  247.070332]  __flush_workqueue+0x13e/0x3f0
-[  247.072011]  xlog_cil_push_now.isra.0+0x25/0x90 [xfs]
-[  247.074185]  xlog_cil_force_seq+0x79/0x240 [xfs]
-[  247.076253]  ? rpm_suspend+0x1ad/0x5e0
-[  247.077831]  ? _raw_spin_unlock+0xe/0x30
-[  247.079442]  ? rpm_suspend+0x5b6/0x5e0
-[  247.080987]  xfs_log_force+0x7a/0x230 [xfs]
-[  247.082764]  xfs_log_worker+0x3d/0xc0 [xfs]
-[  247.084564]  process_one_work+0x158/0x360
-[  247.086075]  worker_thread+0x235/0x340
-[  247.087462]  ? __pfx_worker_thread+0x10/0x10
-[  247.088895]  kthread+0xd0/0x100
-[  247.090108]  ? __pfx_kthread+0x10/0x10
-[  247.091410]  ret_from_fork+0x31/0x50
-[  247.092665]  ? __pfx_kthread+0x10/0x10
-[  247.093932]  ret_from_fork_asm+0x1a/0x30
-[  247.095251]  </TASK>
-[  247.096232] INFO: task xfsaild/dm-0:543 blocked for more than 122 second=
-s.
-[  247.099379]       Not tainted 6.11.0-rc5 #2
-[  247.101574] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
-this
-message.
-[  247.104908] task:xfsaild/dm-0    state:D stack:0     pid:543   tgid:543 =
-=20
-ppid:2      flags:0x00004000
-[  247.108707] Call Trace:
-[  247.110363]  <TASK>
-[  247.111914]  __schedule+0x276/0x710
-[  247.113892]  schedule+0x27/0xa0
-[  247.115756]  schedule_timeout+0x14e/0x160
-[  247.117899]  __wait_for_common+0x8f/0x1d0
-[  247.119998]  ? __pfx_schedule_timeout+0x10/0x10
-[  247.122276]  __flush_workqueue+0x13e/0x3f0
-[  247.124457]  ? ttwu_queue_wakelist+0xd0/0xf0
-[  247.126684]  xlog_cil_push_now.isra.0+0x25/0x90 [xfs]
-[  247.129559]  xlog_cil_force_seq+0x79/0x240 [xfs]
-[  247.132238]  ? _raw_spin_unlock+0xe/0x30
-[  247.134300]  ? finish_task_switch.isra.0+0x97/0x2a0
-[  247.136675]  xfs_log_force+0x7a/0x230 [xfs]
-[  247.139251]  xfsaild_push+0x2d7/0x850 [xfs]
-[  247.141753]  ? __timer_delete_sync+0x2b/0x40
-[  247.143931]  ? schedule_timeout+0x99/0x160
-[  247.146023]  ? __pfx_process_timeout+0x10/0x10
-[  247.148238]  xfsaild+0xaf/0x140 [xfs]
-[  247.150566]  ? __pfx_xfsaild+0x10/0x10 [xfs]
-[  247.153062]  kthread+0xd0/0x100
-[  247.154785]  ? __pfx_kthread+0x10/0x10
-[  247.156715]  ret_from_fork+0x31/0x50
-[  247.158404]  ? __pfx_kthread+0x10/0x10
-[  247.160147]  ret_from_fork_asm+0x1a/0x30
-[  247.161914]  </TASK>
-[  247.163238] INFO: task in:imjournal:787 blocked for more than 123 second=
-s.
-[  247.165818]       Not tainted 6.11.0-rc5 #2
-[  247.167697] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
-this
-message.
-[  247.170408] task:in:imjournal    state:D stack:0     pid:787   tgid:745 =
-=20
-ppid:1      flags:0x00000002
-[  247.173404] Call Trace:
-[  247.174673]  <TASK>
-[  247.175844]  __schedule+0x276/0x710
-[  247.177441]  schedule+0x27/0xa0
-[  247.178888]  schedule_timeout+0x14e/0x160
-[  247.180562]  ? update_sd_lb_stats.constprop.0+0x66/0x270
-[  247.182469]  ___down_common+0x110/0x170
-[  247.183983]  __down_common+0x1e/0xc0
-[  247.185435]  down+0x47/0x60
-[  247.186684]  xfs_buf_lock+0x31/0xe0 [xfs]
-[  247.188553]  xfs_buf_find_lock+0x59/0x110 [xfs]
-[  247.190532]  xfs_buf_lookup.constprop.0+0xb9/0x180 [xfs]
-[  247.192666]  xfs_buf_get_map+0xea/0x5f0 [xfs]
-[  247.194510]  xfs_buf_read_map+0x58/0x2a0 [xfs]
-[  247.196315]  ? xfs_btree_read_buf_block+0xa2/0x120 [xfs]
-[  247.198282]  ? xfs_trans_add_item+0x37/0xb0 [xfs]
-[  247.200066]  xfs_trans_read_buf_map+0x119/0x300 [xfs]
-[  247.201813]  ? xfs_btree_read_buf_block+0xa2/0x120 [xfs]
-[  247.203618]  xfs_btree_read_buf_block+0xa2/0x120 [xfs]
-[  247.205404]  xfs_btree_lookup_get_block.part.0+0x81/0x1b0 [xfs]
-[  247.207331]  xfs_btree_lookup+0x102/0x550 [xfs]
-[  247.208969]  ? kmem_cache_alloc_noprof+0xdc/0x2b0
-[  247.210404]  xfs_dialloc_ag_update_inobt+0x47/0x170 [xfs]
-[  247.212187]  ? xfs_inobt_init_cursor+0x67/0xa0 [xfs]
-[  247.213808]  xfs_dialloc_ag+0x1ad/0x2e0 [xfs]
-[  247.215343]  xfs_dialloc+0x24b/0x3b0 [xfs]
-[  247.216798]  xfs_create+0x167/0x490 [xfs]
-[  247.218193]  ? xfs_dir2_format+0x4a/0x130 [xfs]
-[  247.219644]  xfs_generic_create+0x30d/0x360 [xfs]
-[  247.221129]  lookup_open.isra.0+0x4e1/0x600
-[  247.222312]  open_last_lookups+0x139/0x440
-[  247.223461]  path_openat+0x88/0x290
-[  247.224451]  do_filp_open+0xae/0x150
-[  247.225454]  do_sys_openat2+0x96/0xd0
-[  247.226472]  __x64_sys_openat+0x57/0xa0
-[  247.227515]  do_syscall_64+0x64/0x170
-[  247.228524]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  247.229778] RIP: 0033:0x7fbcacb3e8d4
-[  247.230763] RSP: 002b:00007fbcab7fea40 EFLAGS: 00000293 ORIG_RAX:
-0000000000000101
-[  247.232427] RAX: ffffffffffffffda RBX: 00007fbc9c000c10 RCX:
-00007fbcacb3e8d4
-[  247.234030] RDX: 0000000000000241 RSI: 00007fbcab7feb80 RDI:
-00000000ffffff9c
-[  247.235626] RBP: 00007fbcab7feb80 R08: 0000000000000000 R09:
-0000000000000001
-[  247.237174] R10: 00000000000001b6 R11: 0000000000000293 R12:
-0000000000000241
-[  247.238682] R13: 00007fbc9c000c10 R14: 0000000000000001 R15:
-00007fbc9c015c40
-[  247.240204]  </TASK>
-[  247.242323] INFO: task updatedb:769 blocked for more than 123 seconds.
-[  247.243697]       Not tainted 6.11.0-rc5 #2
-[  247.244694] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
-this
-message.
-[  247.246246] task:updatedb        state:D stack:0     pid:769   tgid:769 =
-=20
-ppid:756    flags:0x00000002
-[  247.247995] Call Trace:
-[  247.248689]  <TASK>
-[  247.249342]  __schedule+0x276/0x710
-[  247.250192]  ? vp_notify+0x16/0x20 [virtio_pci]
-[  247.251208]  schedule+0x27/0xa0
-[  247.252006]  schedule_timeout+0x14e/0x160
-[  247.252926]  ? __blk_flush_plug+0xf5/0x150
-[  247.253854]  __wait_for_common+0x8f/0x1d0
-[  247.254726]  ? __pfx_schedule_timeout+0x10/0x10
-[  247.255678]  xfs_buf_iowait+0x1c/0xc0 [xfs]
-[  247.256797]  __xfs_buf_submit+0x131/0x1e0 [xfs]
-[  247.257933]  xfs_buf_read_map+0x11e/0x2a0 [xfs]
-[  247.259044]  ? xfs_da_read_buf+0xee/0x170 [xfs]
-[  247.260178]  xfs_trans_read_buf_map+0x119/0x300 [xfs]
-[  247.261306]  ? xfs_da_read_buf+0xee/0x170 [xfs]
-[  247.262375]  xfs_da_read_buf+0xee/0x170 [xfs]
-[  247.263430]  xfs_dir3_block_read+0x3c/0xf0 [xfs]
-[  247.264506]  xfs_dir2_block_lookup_int+0x4c/0x1d0 [xfs]
-[  247.265658]  ? xfs_bmap_last_offset+0x6b/0x110 [xfs]
-[  247.266737]  xfs_dir2_block_lookup+0x3b/0x130 [xfs]
-[  247.267795]  xfs_dir_lookup_args+0x3e/0x90 [xfs]
-[  247.268810]  xfs_dir_lookup+0x139/0x160 [xfs]
-[  247.269798]  xfs_lookup+0x94/0x160 [xfs]
-[  247.270722]  ? avc_has_perm_noaudit+0x6b/0xf0
-[  247.271570]  xfs_vn_lookup+0x78/0xb0 [xfs]
-[  247.272504]  __lookup_slow+0x81/0x130
-[  247.273242]  walk_component+0xe5/0x160
-[  247.273969]  path_lookupat+0x6e/0x1c0
-[  247.274685]  filename_lookup+0xcd/0x1c0
-[  247.275428]  ? selinux_inode_getattr+0x9a/0xc0
-[  247.276249]  ? terminate_walk+0x21/0x100
-[  247.277002]  ? xfs_vn_getattr+0x66/0x340 [xfs]
-[  247.277968]  ? cp_new_stat+0x14f/0x180
-[  247.278682]  vfs_statx+0x75/0xe0
-[  247.279332]  vfs_fstatat+0x6c/0xb0
-[  247.279989]  __do_sys_newfstatat+0x26/0x60
-[  247.280722]  ? __seccomp_filter+0x3d8/0x5b0
-[  247.281473]  ? syscall_trace_enter+0xff/0x190
-[  247.282270]  do_syscall_64+0x64/0x170
-[  247.282958]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[  247.283805] RIP: 0033:0x7f57f593e13e
-[  247.284479] RSP: 002b:00007ffccb8f2bc8 EFLAGS: 00000246 ORIG_RAX:
-0000000000000106
-[  247.285541] RAX: ffffffffffffffda RBX: 0000564a28d7a9f0 RCX:
-00007f57f593e13e
-[  247.286569] RDX: 00007ffccb8f2c30 RSI: 0000564a28d88fb9 RDI:
-00000000ffffff9c
-[  247.287595] RBP: 0000564a28d88fb9 R08: 0000000000000000 R09:
-00005649ecdb34e0
-[  247.288601] R10: 0000000000000100 R11: 0000000000000246 R12:
-0000000000000006
-[  247.289599] R13: 00007ffccb8f2e00 R14: 0000000000000006 R15:
-0000000000000006
-
-Note :
-it was verified this issue was not reproduced if host kernel returned to
-6.10.0-rc7.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.
 
