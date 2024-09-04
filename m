@@ -1,151 +1,205 @@
-Return-Path: <netdev+bounces-125264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DE2296C84B
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 22:21:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6D4796C857
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 22:25:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84A6E1C22E06
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:21:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3730D1F25C23
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1A8D147C71;
-	Wed,  4 Sep 2024 20:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205A1147C71;
+	Wed,  4 Sep 2024 20:25:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CfiU0VC7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pg/AYOrp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1501EBFEC;
-	Wed,  4 Sep 2024 20:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF2F1EBFEC
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 20:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725481305; cv=none; b=RLlK89JgZIUO126eCOwxyZPa6CY0PkPt7xVGMB6DP+yWAd9h6s6q8DBTOeF5YpkUc8GE5BMBcmnnmmYs4q/cVlBcHNW2ZX6nvXB3egCRbbQ5Mbclplm7JHfRixBc8ysdyB/d+9WBaSCunAhAFIgF2VmZoAd82TeI7DiRsY+BUAs=
+	t=1725481505; cv=none; b=TaGzCwoEcwG4UgEcjVkh6l5d7yhO3Gc08gm/bs7aWZhjHmkYJx1/Rd8Hs2Y+LAljnb8cVZAkbZKuUSPVuNR6qKX9CbZTggVO6Pb3iQUoy/0Xx6cXZa7Gm6pRwXJs/KQ/GuDHpjMev9ke1aGtCwiQQXoTWANqxTsdaqvt3EiK9js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725481305; c=relaxed/simple;
-	bh=/V5r08nqviGI0xJ8/lmKZlxR7GTf4bTmTDPu9w/QN6Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sl0Qy+RQeepcond9H8c2NvkCuEei01mA4xeMW12a/za4RRMpWLVP7YR9cqxxskm4LLqmSQZqD6dJLkzCruQxB8o1Ql+n8Kw1Qb+ZZPVJ1def8cPVZuHY6zvM9ovmM3bCjoq4I9EV7ujJvOvLL8k8J39TedWgmfyDpmqRRLqYl6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CfiU0VC7; arc=none smtp.client-ip=209.85.216.51
+	s=arc-20240116; t=1725481505; c=relaxed/simple;
+	bh=ev8cARq732lQQ2rFu9z31aMfsgXO1YavmhtGzPXUDAs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=NpFQccpivNEM1ssSX4jaYXomLzfudvMZbd1w+VAS+GfvFi0rUQRPpHLsnTGXDq/Gw0NfZ/2kVJEavFviCc94ikizHVEctwVwpOEs8v5i0hoGdk4N8mcvoVEagL6RlylzdgahznaUIk2lj9xB4dq/WUIOdCysDBnVTITaD9i85ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pg/AYOrp; arc=none smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2d88690837eso3922102a91.2;
-        Wed, 04 Sep 2024 13:21:43 -0700 (PDT)
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7a80fe481a9so2054985a.0
+        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 13:25:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725481303; x=1726086103; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1725481502; x=1726086302; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=khaawNAlNApfnuUFLuoc0b0TKkCbytkfrIkubZTVCdU=;
-        b=CfiU0VC7gvEeTyyRf/NoxReYzCJ/uFuBK7rvijst8tNYWzfoyE+CQtWKq1ZXq+sAS0
-         VSJHp6pZZkZ5EOwI0sY287IBSo+OCPKZppUa1ZUcx62/OXm7SFhk86qI9ELFYu3a12c3
-         n/l5ZckuAkX9BE6rrWcXcrNe6eY7+r1OK2kAelOb4we7JFUYuyayJjrR+m+WbG7EARh4
-         o0hLW39CERwgCZvNubSOyWUSjn7lj0OaX68cBdiU9T/vgmUzSpwN02yJCNfbtwUhn64e
-         39xJXhmX0FRE+ND+am5TOawzK/N8/GYnolhNG0BjbCGOKxua67uCqpfgw9qanslXdEo1
-         5PCw==
+        bh=kvTvxMIm37M8HriHRSqcnPJUoouGekd+3L65geilqOo=;
+        b=Pg/AYOrpanymLypMQ/DmbIIXvarelahUbIeATMrtPznXNpN8LfSR+53heAaahb7vz/
+         vSU8Rmpmom5EQcGpkXXreeq4XjsLuvnxneAnpgqte4R+PbnyINlziVdNX7IDYQdnoepa
+         rg0QBbtS+xpfbcnvuPrqEww8ahiKNveiftIHMxt8ckBAKyBbSVFlyx0ndPDtR7RxSs7t
+         CWSqPeeA7uKBu18wsZ2xgOq81HFisvnCGWv44KVKBlFAgc74h7atpUIdCWGbOrBDSvUI
+         f39ejmo3yL2RESOg4tde1SAtSBkHrihXiuYigi2e3YOkMi0e+qEqdGe2EsvX1HmWkAau
+         j4WA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725481303; x=1726086103;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=khaawNAlNApfnuUFLuoc0b0TKkCbytkfrIkubZTVCdU=;
-        b=biKoJEibsR5wOhoFii27tQbUYTamMmMc/w2rpMFMxoHySfKd2RuXdFX4k8kfhJei1m
-         5VL1sMI7VwZhwQeEOUZEe8ooe204qJPVo2uh35eqOtsou93esnT3zSGs4l0uuzrI6l4X
-         UgUxyE0HYy/t+L/XtftEO43+htSEE5AxUPvVe5LAOCiKmDCrT3HxyROmqmtp0uuLwmN5
-         fz2Z6Gqj6z7iu4XgzwsGMbx6D5o4gnBFqXOCABpUawbus5X4jvyyto1a6WiSb1mX6GCm
-         AlC42LEN0j301ViWRtBOntQWscn3tLc6oDuMQhHSGhzajX3BisUR78x12OY9ED3z2PHk
-         VMdg==
-X-Forwarded-Encrypted: i=1; AJvYcCVC+UMyFtESm5wDIJyAqHQ9pYfKcy+3fIER5B/quyvHR8cOOIKNHAln/O0L2rHEIY1IQ+ejzxM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwzAdEVQx1yxgcxjf+LqtdS+Q0Ty2YQZNO5B1kVXPQvtUbF3zXr
-	6WvoliouHi4u3YBOhLxfX4h2A70jL3JqbImgW8yAIJjNEzJIUofqikwukZ6R81dRbF2SIFEoJ/h
-	rUE8QtRKfS1PJZ2lqoayFDf3dI1w=
-X-Google-Smtp-Source: AGHT+IF9SbM3MOIJjbovhN7aSna5YGP1BzRSyOgc8SIrN2g92tsPxLrKWU2/j+vTpIf1Dn92253znctT3vuuLYUUxhA=
-X-Received: by 2002:a17:90a:eb0f:b0:2d8:8138:fa11 with SMTP id
- 98e67ed59e1d1-2da6344d3d4mr7316870a91.37.1725481303365; Wed, 04 Sep 2024
- 13:21:43 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725481502; x=1726086302;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=kvTvxMIm37M8HriHRSqcnPJUoouGekd+3L65geilqOo=;
+        b=R/hNGLTaZkrN5FOFnU0RuheBcqtbH3DChhPSgVBUn0xcnIZdbDH6GRKF8opAXgska9
+         F+b7Wpww4aNJIP/lwbjKjBhihfNSH97YUaUSl1AOZWOQ44jAamarG3fzd2TYMVvPq7Oq
+         99hMSCGPJxwbEMBp28kJjHVf2fH+bBA9kTTeLgJgQNR297VrSYuC1CYjnNNT6W6zrO2q
+         uinuOzimp4oNO9jK7lCMfGu3r+JWTh+njrr2KC94CrdUi3wz6tSJldUlosvR8WHhSsEW
+         BeWViwFXT1hewOOmb0yl7WtnHWXqdFHUhn928TSVxUMq12MzBOhzNLeoabeOEwVUm6nC
+         7ZHg==
+X-Forwarded-Encrypted: i=1; AJvYcCWbHc6ZBuj5y4nQfyfhzxJ0I7iJf4PJmZH+TCgozDJqE8H/2Pc7wwLcYSafgdx4267zSdGAt4I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoB6Ct1O1Q+s5pSIgAgvbGKe2wjMkCC5+BhZR0mLizxDuB9HPN
+	85BhNQ7r489EMRlgeO1KXTUse00LS4dq0BSTXd8IoKi694AYQiP1
+X-Google-Smtp-Source: AGHT+IEYpuErfOKRAcoMfVoyWCncPlFujxFTQBglZb2KziesM6kPKbfEHVL30m2OISgMRZcsoA4v0Q==
+X-Received: by 2002:a05:620a:458e:b0:7a7:fab6:62e7 with SMTP id af79cd13be357-7a81d67f927mr1998650785a.15.1725481502002;
+        Wed, 04 Sep 2024 13:25:02 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a98ef1df33sm15466785a.3.2024.09.04.13.25.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Sep 2024 13:25:01 -0700 (PDT)
+Date: Wed, 04 Sep 2024 16:25:01 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+ willemb@google.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <66d8c21d3042a_163d93294cb@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoASfb-EPtdpmunbo2zxpQx19Kv+b8Bzs91diVFYYqQz7Q@mail.gmail.com>
+References: <20240830153751.86895-1-kerneljasonxing@gmail.com>
+ <20240830153751.86895-2-kerneljasonxing@gmail.com>
+ <20240903121940.6390b958@kernel.org>
+ <66d78a1e5e6ad_cefcf294f1@willemb.c.googlers.com.notmuch>
+ <CAL+tcoASfb-EPtdpmunbo2zxpQx19Kv+b8Bzs91diVFYYqQz7Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/2] net-timestamp: filter out report when
+ setting SOF_TIMESTAMPING_SOFTWARE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240831041934.1629216-1-pulehui@huaweicloud.com> <20240831041934.1629216-4-pulehui@huaweicloud.com>
-In-Reply-To: <20240831041934.1629216-4-pulehui@huaweicloud.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Wed, 4 Sep 2024 13:21:31 -0700
-Message-ID: <CAEf4BzZ3Sya=OoLhSzoYFif_cPr7sqOchjM7enoLeV4=2PXdGw@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 3/4] selftests/bpf: Enable test_bpf_syscall_macro:syscall_arg1
- on s390 and arm64
-To: Pu Lehui <pulehui@huaweicloud.com>
-Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	netdev@vger.kernel.org, Andrii Nakryiko <andrii@kernel.org>, 
-	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Ilya Leoshkevich <iii@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Puranjay Mohan <puranjay@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Pu Lehui <pulehui@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 30, 2024 at 9:17=E2=80=AFPM Pu Lehui <pulehui@huaweicloud.com> =
-wrote:
->
-> From: Pu Lehui <pulehui@huawei.com>
->
-> Considering that CO-RE direct read access to the first system call
-> argument is already available on s390 and arm64, let's enable
-> test_bpf_syscall_macro:syscall_arg1 on these architectures.
->
-> Signed-off-by: Pu Lehui <pulehui@huawei.com>
-> ---
->  .../testing/selftests/bpf/prog_tests/test_bpf_syscall_macro.c | 4 ----
->  tools/testing/selftests/bpf/progs/bpf_syscall_macro.c         | 2 --
->  2 files changed, 6 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/prog_tests/test_bpf_syscall_macr=
-o.c b/tools/testing/selftests/bpf/prog_tests/test_bpf_syscall_macro.c
-> index 2900c5e9a016..1750c29b94f8 100644
-> --- a/tools/testing/selftests/bpf/prog_tests/test_bpf_syscall_macro.c
-> +++ b/tools/testing/selftests/bpf/prog_tests/test_bpf_syscall_macro.c
-> @@ -38,11 +38,7 @@ void test_bpf_syscall_macro(void)
->         /* check whether args of syscall are copied correctly */
->         prctl(exp_arg1, exp_arg2, exp_arg3, exp_arg4, exp_arg5);
->
-> -#if defined(__aarch64__) || defined(__s390__)
-> -       ASSERT_NEQ(skel->bss->arg1, exp_arg1, "syscall_arg1");
-> -#else
->         ASSERT_EQ(skel->bss->arg1, exp_arg1, "syscall_arg1");
-> -#endif
->         ASSERT_EQ(skel->bss->arg2, exp_arg2, "syscall_arg2");
->         ASSERT_EQ(skel->bss->arg3, exp_arg3, "syscall_arg3");
->         /* it cannot copy arg4 when uses PT_REGS_PARM4 on x86_64 */
-> diff --git a/tools/testing/selftests/bpf/progs/bpf_syscall_macro.c b/tool=
-s/testing/selftests/bpf/progs/bpf_syscall_macro.c
-> index 1a476d8ed354..9e7d9674ce2a 100644
-> --- a/tools/testing/selftests/bpf/progs/bpf_syscall_macro.c
-> +++ b/tools/testing/selftests/bpf/progs/bpf_syscall_macro.c
-> @@ -43,9 +43,7 @@ int BPF_KPROBE(handle_sys_prctl)
->
->         /* test for PT_REGS_PARM */
->
-> -#if !defined(bpf_target_arm64) && !defined(bpf_target_s390)
->         bpf_probe_read_kernel(&tmp, sizeof(tmp), &PT_REGS_PARM1_SYSCALL(r=
-eal_regs));
-> -#endif
->         arg1 =3D tmp;
+Jason Xing wrote:
+> On Wed, Sep 4, 2024 at 6:13=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Jakub Kicinski wrote:
+> > > On Fri, 30 Aug 2024 23:37:50 +0800 Jason Xing wrote:
+> > > > +   if (val & SOF_TIMESTAMPING_RX_SOFTWARE &&
+> > > > +       val & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
+> > > > +           return -EINVAL;
+> > >
+> > >
+> > > > -           if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_SOFT=
+WARE)
+> > > > +           if (tsflags & SOF_TIMESTAMPING_SOFTWARE &&
+> > > > +               (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+> > > > +                !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FIL=
+TER)))
+> > > >                     has_timestamping =3D true;
+> > > >             else
+> > > >                     tss->ts[0] =3D (struct timespec64) {0};
+> > > >     }
+> > >
+> > > >     memset(&tss, 0, sizeof(tss));
+> > > >     tsflags =3D READ_ONCE(sk->sk_tsflags);
+> > > > -   if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
+> > > > +   if ((tsflags & SOF_TIMESTAMPING_SOFTWARE &&
+> > > > +        (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+> > > > +        skb_is_err_queue(skb) ||
+> > > > +        !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER))) &=
+&
+> > >
+> > > Willem, do you prefer to keep the:
+> > >
+> > >       tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+> > >       !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
+> > >
+> > > conditions?IIUC we prevent both from being set at once. So
+> > >
+> > >       !(tsflags & SOF_TIMESTAMPING_OPT_RX_SOFTWARE_FILTER)
+> > >
+> > > is sufficient (and, subjectively, more intuitive).
+> >
+> > Good point. Yes, let's definitely simplify.
+> >
+> > > Question #2 -- why are we only doing this for SW stamps?
+> > > HW stamps for TCP are also all or nothing.
+> >
+> > Fair. Else we'll inevitably add a
+> > SOF_TIMESTAMPING_OPT_RX_HARDWARE_FILTER at some point.
+> >
+> > There probably is no real use to filter one, but not the other.
+> >
+> > So SOF_TIMESTAMPING_OPT_RX_FILTER then, and also apply
+> > to the branch below:
+> >
+> >         if (shhwtstamps &&
+> >             (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE) &&
+> >             !skb_is_swtx_tstamp(skb, false_tstamp)) {
+> >
+> > and same for tcp_recv_timestamp.
+> =
 
-There is no point in having tmp variable now, I cleaned that up as well
+> When I'm looking at this part, I noticed that RAW_HARDWARE is actually
+> a tx report flag instead of rx, please also see the kdoc you wrote a
+> long time ago:
+> =
+
+> SOF_TIMESTAMPING_RAW_HARDWARE:
+>   Report hardware timestamps as generated by
+>   SOF_TIMESTAMPING_TX_HARDWARE when available.
+
+Right, this is analogous to the software part that you modify:
+
+        if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
+            ktime_to_timespec64_cond(skb->tstamp, tss.ts + 0))
+                empty =3D 0;
+
+The idea is to also add for hardware timestamps your suggested
+condition that the socket also sets the timestamp generation flag
+SOF_TIMESTAMPING_RX_HARDWARE or that the new OPT_RX_FILTER flag
+is not set.
 
 
->         bpf_probe_read_kernel(&arg2, sizeof(arg2), &PT_REGS_PARM2_SYSCALL=
-(real_regs));
->         bpf_probe_read_kernel(&arg3, sizeof(arg3), &PT_REGS_PARM3_SYSCALL=
-(real_regs));
-> --
-> 2.34.1
->
+> If so, OPT_RX_FILTER doesn't fit for the name of tx timestamp.
+> =
+
+> I wonder if I can only revise the series with the code simplified as
+> Jakub suggested and then repost it? I think we need to choose a new
+> name for this tx hardware report case, like
+> SOF_TIMESTAMPING_OPT_TX_HARDWARE_FILTER?
+> =
+
+> Since it belongs to the tx path, can I put it into another series or a
+> new patch in the current series where I will explicitly explain why we
+> also need to introduce this new flag?
+
+I think the confusion here comes from that comment that
+SOF_TIMESTAMPING_RAW_HARDWARE only reports
+SOF_TIMESTAMPING_TX_HARDWARE generated timestamps. This statement is
+incorrect and should be revised. It also reports
+SOF_TIMESTAMPING_RX_HARDWARE.
+
+Unless I'm missing something. But I think the author of that statement
+is the one who made the mistake. Who is.. also me.=
 
