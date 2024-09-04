@@ -1,48 +1,53 @@
-Return-Path: <netdev+bounces-124991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A2A96B89B
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:32:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B65B496B8F4
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 12:48:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AABA1C248C7
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:31:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E089286DE2
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 10:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EC81CF5F2;
-	Wed,  4 Sep 2024 10:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95771CC175;
+	Wed,  4 Sep 2024 10:48:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACE31CC897;
-	Wed,  4 Sep 2024 10:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9096635;
+	Wed,  4 Sep 2024 10:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725445888; cv=none; b=U/1/6Wtt1fXS2XcrLc4FWcFVxk2VHPmU89AzwQC/3bpUAtjau2o+MChw//ajy+ZQKlqKv6iaUHOcouKQMMmh+O7JyGcFXZdz1NlCVEVmz9En3EuRlAKHlX0r/V4mzN+7a4S4TZ2l5f/EgbNMO2rvoYx5MoTkTjubYU1472AH7ng=
+	t=1725446920; cv=none; b=alr5gaDybUdN3IVVuLor4IerXwjCHIIEMf4XWMhQbC4ugJpIaAkdffsotwmSE1seLg2mdI3AIZ9Jr9/44EeQFbdylOEGOc7WsYveyzUXXjzkE4BKyRe8Ht5Q9on1KrQznpm0WDNih0J61uCAke8tCrdSeNMDpVnOQv1zVmQNwVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725445888; c=relaxed/simple;
-	bh=AW1x/byXYHkVLUtUSK2TTP/WfOwnMLDu56foWZFkXyQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=C5g2m6rvTnqaH38wuynOsoUJ+J9AoYX9JNALFwqRiQs/8DoYEgfPa9sgk+aBpA3J1JEzYUH7QhPEKx5cyePZCBZpTOob7cHeHXYCPMhDzVn74aVnKf5kq7icl6lkVU+2NzovzcOUwrdWfU8ol6nlN8agnAGAhcqCBOC0DLByUKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
-Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Wed, 4 Sep
- 2024 18:31:16 +0800
-Received: from mail.aspeedtech.com (192.168.10.10) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Wed, 4 Sep 2024 18:31:16 +0800
-From: Jacky Chou <jacky_chou@aspeedtech.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <jacky_chou@aspeedtech.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH] net: ftgmac100: Enable TX interrupt to avoid TX timeout
-Date: Wed, 4 Sep 2024 18:31:16 +0800
-Message-ID: <20240904103116.4022152-1-jacky_chou@aspeedtech.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1725446920; c=relaxed/simple;
+	bh=bD1gjTJwkoIJ1+f8/mQjm9aUSh7Yn0IwmnrR4QIWjho=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B0LS5opXtKBT50MaB9Hj9ue79+sEqMkBeL5IRD97RQ9Y4IgNmxePsF3EaZurC0RXUhQgKz7JeOi5A+k3ZIY3PQM+dUYOloYnSrcRiAPOaepeH3O9OVdoQSLYIRY6mYf7EVFn8ZTNZe6HBpKrCISQXBJ4QT9TBqJnCK2VW/IwzXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4WzK2J474Jz1BN4W;
+	Wed,  4 Sep 2024 18:47:36 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id EF4411400CA;
+	Wed,  4 Sep 2024 18:48:33 +0800 (CST)
+Received: from mscphis02103.huawei.com (10.123.65.215) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 4 Sep 2024 18:48:32 +0800
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+To: <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+Subject: [RFC PATCH v3 00/19] Support socket access-control
+Date: Wed, 4 Sep 2024 18:48:05 +0800
+Message-ID: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,33 +56,159 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-ClientProxiedBy: mscpeml500004.china.huawei.com (7.188.26.250) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-Currently, the driver only enables RX interrupt to handle RX
-packets and TX resources. Sometimes there is not RX traffic,
-so the TX resource needs to wait for RX interrupt to free.
-This situation will toggle the TX timeout watchdog when the MAC
-TX ring has no more resources to transmit packets.
-Therefore, enable TX interrupt to release TX resources at any time.
+Hello! This is v3 RFC patch dedicated to socket protocols restriction.
 
-Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
----
- drivers/net/ethernet/faraday/ftgmac100.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It is based on the landlock's mic-next branch on top of v6.11-rc1 kernel
+version.
 
-diff --git a/drivers/net/ethernet/faraday/ftgmac100.h b/drivers/net/ethernet/faraday/ftgmac100.h
-index 63b3e02fab16..4968f6f0bdbc 100644
---- a/drivers/net/ethernet/faraday/ftgmac100.h
-+++ b/drivers/net/ethernet/faraday/ftgmac100.h
-@@ -84,7 +84,7 @@
- 			    FTGMAC100_INT_RPKT_BUF)
- 
- /* All the interrupts we care about */
--#define FTGMAC100_INT_ALL (FTGMAC100_INT_RPKT_BUF  |  \
-+#define FTGMAC100_INT_ALL (FTGMAC100_INT_RXTX  |  \
- 			   FTGMAC100_INT_BAD)
- 
- /*
+Objective
+=========
+Extend Landlock with a mechanism to restrict any set of protocols in
+a sandboxed process.
+
+Closes: https://github.com/landlock-lsm/linux/issues/6
+
+Motivation
+==========
+Landlock implements the `LANDLOCK_RULE_NET_PORT` rule type, which provides
+fine-grained control of actions for a specific protocol. Any action or
+protocol that is not supported by this rule can not be controlled. As a
+result, protocols for which fine-grained control is not supported can be
+used in a sandboxed system and lead to vulnerabilities or unexpected
+behavior.
+
+Controlling the protocols used will allow to use only those that are
+necessary for the system and/or which have fine-grained Landlock control
+through others types of rules (e.g. TCP bind/connect control with
+`LANDLOCK_RULE_NET_PORT`, UNIX bind control with
+`LANDLOCK_RULE_PATH_BENEATH`).
+
+Consider following examples:
+* Server may want to use only TCP sockets for which there is fine-grained
+  control of bind(2) and connect(2) actions [1].
+* System that does not need a network or that may want to disable network
+  for security reasons (e.g. [2]) can achieve this by restricting the use
+  of all possible protocols.
+
+[1] https://lore.kernel.org/all/ZJvy2SViorgc+cZI@google.com/
+[2] https://cr.yp.to/unix/disablenetwork.html
+
+Implementation
+==============
+This patchset adds control over the protocols used by implementing a
+restriction of socket creation. This is possible thanks to the new type
+of rule - `LANDLOCK_RULE_SOCKET`, that allows to restrict actions on
+sockets, and a new access right - `LANDLOCK_ACCESS_SOCKET_CREATE`, that
+corresponds to creating user space sockets. The key in this rule is a pair
+of address family and socket type (Cf. socket(2)).
+
+The right to create a socket is checked in the LSM hook, which is called
+in the __sock_create method. The following user space operations are
+subject to this check: socket(2), socketpair(2), io_uring(7).
+
+In the case of connection-based socket types,
+`LANDLOCK_ACCESS_SOCKET_CREATE` does not restrict the actions that result
+in creation of sockets used for messaging between already existing
+endpoints (e.g. accept(2), setsockopt(2) with option
+`SCTP_SOCKOPT_PEELOFF`).
+
+Current limitations
+===================
+`SCTP_SOCKOPT_PEELOFF` should not be restricted (see test
+socket_creation.sctp_peeloff).
+
+SCTP socket can be connected to a multiple endpoints (one-to-many
+relation). Calling setsockopt(2) on such socket with option
+`SCTP_SOCKOPT_PEELOFF` detaches one of existing connections to a separate
+UDP socket. This detach is currently restrictable.
+
+Code coverage
+=============
+Code coverage(gcov) report with the launch of all the landlock selftests:
+* security/landlock:
+lines......: 93.5% (794 of 849 lines)
+functions..: 95.5% (106 of 111 functions)
+
+* security/landlock/socket.c:
+lines......: 100.0% (33 of 33 lines)
+functions..: 100.0% (4 of 4 functions)
+
+General changes v2->v3
+======================
+* Implementation
+  * Accepts (AF_INET, SOCK_PACKET) as an alias for (AF_PACKET, SOCK_PACKET).
+  * Adds check to not restrict kernel sockets.
+  * Fixes UB in pack_socket_key().
+  * Refactors documentation.
+* Tests
+  * Extends variants of `protocol` fixture with every protocol that can be
+    used to create user space sockets.
+  * Adds 5 new tests:
+    * 3 tests to check socketpair(2), accept(2) and sctp_peeloff
+      restriction.
+    * 1 test to check restriction of kernel sockets.
+    * 1 test to check AF_PACKET aliases.
+* Documentation
+  * Updates Documentation/userspace-api/landlock.rst.
+* Commits
+  * Rebases on mic-next.
+  * Refactors commits.
+
+Previous versions
+=================
+v2: https://lore.kernel.org/all/20240524093015.2402952-1-ivanov.mikhail1@huawei-partners.com/
+v1: https://lore.kernel.org/all/20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com/
+
+Mikhail Ivanov (19):
+  landlock: Support socket access-control
+  landlock: Add hook on socket creation
+  selftests/landlock: Test basic socket restriction
+  selftests/landlock: Test adding a rule with each supported access
+  selftests/landlock: Test adding a rule for each unknown access
+  selftests/landlock: Test adding a rule for unhandled access
+  selftests/landlock: Test adding a rule for empty access
+  selftests/landlock: Test overlapped restriction
+  selftests/landlock: Test creating a ruleset with unknown access
+  selftests/landlock: Test adding a rule with family and type outside
+    the range
+  selftests/landlock: Test unsupported protocol restriction
+  selftests/landlock: Test that kernel space sockets are not restricted
+  selftests/landlock: Test packet protocol alias
+  selftests/landlock: Test socketpair(2) restriction
+  selftests/landlock: Test SCTP peeloff restriction
+  selftests/landlock: Test that accept(2) is not restricted
+  samples/landlock: Replace atoi() with strtoull() in
+    populate_ruleset_net()
+  samples/landlock: Support socket protocol restrictions
+  landlock: Document socket rule type support
+
+ Documentation/userspace-api/landlock.rst      |   46 +-
+ include/uapi/linux/landlock.h                 |   61 +-
+ samples/landlock/sandboxer.c                  |  135 ++-
+ security/landlock/Makefile                    |    2 +-
+ security/landlock/limits.h                    |    4 +
+ security/landlock/ruleset.c                   |   33 +-
+ security/landlock/ruleset.h                   |   45 +-
+ security/landlock/setup.c                     |    2 +
+ security/landlock/socket.c                    |  137 +++
+ security/landlock/socket.h                    |   19 +
+ security/landlock/syscalls.c                  |   66 +-
+ tools/testing/selftests/landlock/base_test.c  |    2 +-
+ tools/testing/selftests/landlock/common.h     |   13 +
+ tools/testing/selftests/landlock/config       |   47 +
+ tools/testing/selftests/landlock/net_test.c   |   11 -
+ .../testing/selftests/landlock/socket_test.c  | 1013 +++++++++++++++++
+ 16 files changed, 1593 insertions(+), 43 deletions(-)
+ create mode 100644 security/landlock/socket.c
+ create mode 100644 security/landlock/socket.h
+ create mode 100644 tools/testing/selftests/landlock/socket_test.c
+
+
+base-commit: 8400291e289ee6b2bf9779ff1c83a291501f017b
 -- 
-2.25.1
+2.34.1
 
 
