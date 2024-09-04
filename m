@@ -1,91 +1,126 @@
-Return-Path: <netdev+bounces-125241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3201D96C671
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:30:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3385996C6BB
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 20:49:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBE091F2267D
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 18:30:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95A51B20D3E
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 18:49:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5E61E4101;
-	Wed,  4 Sep 2024 18:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6741E4125;
+	Wed,  4 Sep 2024 18:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ih7DV+zp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MK0Z2LM2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B091E203D;
-	Wed,  4 Sep 2024 18:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACE41E4114;
+	Wed,  4 Sep 2024 18:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725474599; cv=none; b=G9FQFlILrL2CY/5qEuv7Yt/ICC0zpKWEU6eauYfvmT4Ry2DiwnterMad/kp6Oh4+QLIM8joOeV6KmWSq1yMqfZg4cHpsErgEQb88rzQkTkYSqaSakG83ZSBL3gm/6bpH0ntz5uChOpt1qIFDT0CD/WyeGoP/ImvfPbN4DwzRC+E=
+	t=1725475753; cv=none; b=i7d2Au7xkE2PGMhTOfEkDZVtrngBdMMfTxrkGxPP82lXODzmEO5AZmTvFqsL1XdmEvwNsIanvJjnLXk8VJwq58jiT8xej4jiM6LLKz3NcgrGntUxpRhguH2aK/QMrNhhBK8GIJRK8yhKEDauWRArFdX1GgAcrjDLevZrfi5FVm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725474599; c=relaxed/simple;
-	bh=3osTPUwTmGcKwPH//xm+7vmLa4zw4IUoIj5wosRXRz8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fHf0xXbLd4PFm8GHCIpv3L2EUslArZdhMOI7y8jku+DKpqYOmrd01yxlHEPi07nMuBaYC/+D4EEpGiUeImC2SJADlItjQL0jNQ65THWA++gExFMQizp2/P6UjnyuDRAYzEFGUN6Mu2KHrAxzS/gAVdFGp1l1zWOMLKQsMmIjp14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ih7DV+zp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DCACC4CEC6;
-	Wed,  4 Sep 2024 18:29:59 +0000 (UTC)
+	s=arc-20240116; t=1725475753; c=relaxed/simple;
+	bh=NVJy7a9hzOZfICfnRGCKRFnKJQ0Sx2x47tJN20jKhus=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=AqqzVrdqioJlw8kriynTgKAlKRhfjFkJtK1zQ9wjDQ9/gbw5cW2C5wB+MP6hjfgdo0An0Cluk/0w8R1/sM7O1qVCCnwMM493n1EAAModyldhzlmPkjAyzSAiqRK22RmZCsUwWxo4MGOJ5+mCprWLTPWYV7fPdM2UUVrLlor895k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MK0Z2LM2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F56EC4CEC2;
+	Wed,  4 Sep 2024 18:49:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725474599;
-	bh=3osTPUwTmGcKwPH//xm+7vmLa4zw4IUoIj5wosRXRz8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ih7DV+zpB9TOtau5uTgvSF3mLuNm286RYOZhYn8xv0aC59XfUJMNiHPNE7a5OSTfC
-	 +c7sugu3Gp4ProSoUZmnzAZ2wSvT89khm8HKvsdfRedjlpwrlG7QEd5zNOkYwCyOpL
-	 zWcSTJaCtSk4EmnJvF0HVEfAFxwR/qcqGDTJCYCXWpSCWzioQ0qw7c1S0PcnLnsFen
-	 eej7v5viNV5x2dm5diii+e+PHrLoUPesbwU+zBOVE00K0M/DUNJ8+oGIzaQaX+Lltm
-	 nivJFQ0yV8CptgeVIko+jJHy9itRq2d+Tq7zVgq2zwPg5nLMDWu1NajMJTouQDAJBp
-	 9BW8ud+/G311g==
-Date: Wed, 4 Sep 2024 11:29:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, John Fastabend
- <john.fastabend@gmail.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- "Martin KaFai Lau" <martin.lau@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH bpf-next 0/9] bpf: cpumap: enable GRO for XDP_PASS
- frames
-Message-ID: <20240904112957.3aaaa734@kernel.org>
-In-Reply-To: <03634fe4-8c2f-432e-ae6e-08928d167b1f@intel.com>
-References: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
-	<20240903135158.7031a3ab@kernel.org>
-	<f23131c1-aae2-4c04-a60e-801ed1970be8@intel.com>
-	<20240904075041.2467995c@kernel.org>
-	<03634fe4-8c2f-432e-ae6e-08928d167b1f@intel.com>
+	s=k20201202; t=1725475753;
+	bh=NVJy7a9hzOZfICfnRGCKRFnKJQ0Sx2x47tJN20jKhus=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=MK0Z2LM2sEoLcQactCH04EZbfL3YQrPNmkMnQfRli1kjLn19utVIF5SsnOIfLLdD9
+	 YuV6PtJudoDvx/I3pUM3R/c1xlDZDEmRpSifttS4E0xURO48r05aPPdhzOaK6RkD9B
+	 auJRS4e0+nQ4mqmac2i9k0v1XRyxq0//h6KwvM5VXVVuBatIwODFTJkSm3Y/TbkIWq
+	 dxZ4H/vuJt1/5YdH7JXlDLWmGmjWr1PZ8LizWsOD3cRruvZy4H7Uxwzt3wL5YdhhUk
+	 Dd98E9B8UkavLodhAvshLgKygAu488ry8gDMUzDHmibWbqqYMkerAlXVuHDxemmaMt
+	 2DruypS2JYrwA==
+Date: Wed, 4 Sep 2024 13:49:11 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
+	jing2.liu@intel.com
+Subject: Re: [PATCH V4 00/12] PCIe TPH and cache direct injection support
+Message-ID: <20240904184911.GA340610@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240822204120.3634-1-wei.huang2@amd.com>
 
-On Wed, 4 Sep 2024 17:13:59 +0200 Alexander Lobakin wrote:
-> >> I could say that gro_cells also "abuses" NAPI the same way, don't you
-> >> think?  
-> > 
-> > "same way"? :] Does it allocate a fake netdev, use NAPI as a threading
-> > abstraction or add extra fields to napi_struct ?   
+On Thu, Aug 22, 2024 at 03:41:08PM -0500, Wei Huang wrote:
+> Hi All,
 > 
-> Wait wait wait, you said "NAPI IRQ related logics doesn't fit here". I
-> could say the same for gro_cells -- IRQ related NAPI logics doesn't fit
-> there. gro_cells is an SW abstraction.
+> TPH (TLP Processing Hints) is a PCIe feature that allows endpoint
+> devices to provide optimization hints for requests that target memory
+> space. These hints, in a format called steering tag (ST), are provided
+> in the requester's TLP headers and allow the system hardware, including
+> the Root Complex, to optimize the utilization of platform resources
+> for the requests.
+> 
+> Upcoming AMD hardware implement a new Cache Injection feature that
+> leverages TPH. Cache Injection allows PCIe endpoints to inject I/O
+> Coherent DMA writes directly into an L2 within the CCX (core complex)
+> closest to the CPU core that will consume it. This technology is aimed
+> at applications requiring high performance and low latency, such as
+> networking and storage applications.
 
-Yes, that 1/4th of my complaint does indeed apply :)
+Thanks for this example, it's a great intro.  Suggest adding something
+similar to a patch commit log, since the cover letter is harder to
+find after this appears in git.
 
-> A fake netdev is used by multiple drivers to use GRO, you know that
-> (popular for wireless drivers). They also conflict with the queue config
-> effort.
+> This series introduces generic TPH support in Linux, allowing STs to be
+> retrieved and used by PCIe endpoint drivers as needed. As a
+> demonstration, it includes an example usage in the Broadcom BNXT driver.
+> When running on Broadcom NICs with the appropriate firmware, it shows
+> substantial memory bandwidth savings and better network bandwidth using
+> real-world benchmarks. This solution is vendor-neutral and implemented
+> based on industry standards (PCIe Spec and PCI FW Spec).
+> 
+> V3->V4:
+>  * Rebase on top of the latest pci/next tree (tag: 6.11-rc1)
 
-And it did cause us some issues when changing netdev_priv() already.
+No need to rebase to pci/next; pci/main is where it will be applied.
+But it currently applies cleanly to either, so no problem.
+
+>  * Add new API functioins to query/enable/disable TPH support
+>  * Make pcie_tph_set_st() completely independent from pcie_tph_get_cpu_st()
+>  * Rewrite bnxt.c based on new APIs
+>  * Remove documentation for now due to constantly changing API
+
+I'd like to see this documentation included.  And updated if the API
+changes, of course.
+
+>  * Remove pci=notph, but keep pci=nostmode with better flow (Bjorn)
+
+This seems backward to me.  I think "pci=notph" makes sense as a way
+to completely disable the TPH feature in case a user trips over a
+hardware or driver defect.
+
+But "pci=nostmode" is advertised as a way to quantify the benefit of
+Steering Tags, and that seems like it's of interest to developers but
+not users.
+
+So my advice would be to keep "pci=notph" and drop "pci=nostmode".
+
+Bjorn
 
