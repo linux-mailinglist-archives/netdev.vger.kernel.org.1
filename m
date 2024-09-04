@@ -1,120 +1,131 @@
-Return-Path: <netdev+bounces-124972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CB2C96B76D
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:52:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E64F96B780
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 11:56:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F1F41C23E2A
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:52:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 523BEB21586
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 09:54:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9850C1CCEE9;
-	Wed,  4 Sep 2024 09:52:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B631A42D2;
+	Wed,  4 Sep 2024 09:54:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T4pfLUo3"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EEB51CCEE3
-	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 09:52:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487D91CCEE9;
+	Wed,  4 Sep 2024 09:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725443569; cv=none; b=hvpN1gT1kkDv1j9u5SHzAHH2yMnCScCcbTsNIqjSk7yH4KLDba2VxDuMGAKyqnmSNPTlJwD9ivVV+rHXmQ5TDL56GpE6/6ScWYED+TB7WI0xILN1yXOCgqRoQsYD+CYKV6k3cswv4jIonv60w1DDtAjCkMx0hkgd6LWHJDL/kZ8=
+	t=1725443687; cv=none; b=PMceOPdj1t8kpMhA2r4bN3y8SwT/gpocqCPV4JJwusoYEJK36GUXAoRR8Whvjc6aQfdIoVLTkyQgX6zoDRvIdBGg6pNo/jbTdsq0/c+QQXZ8+GnvSGAb7Td6d7mMe3E7nF+t6TpG6+SQoWw7nj9YUVN7Pbo5D8NaeUkxSl3uOms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725443569; c=relaxed/simple;
-	bh=G2gSgXAkWV8CXgpO/BiDwZliPz4H8EJfiHjcOwAJ5jo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rSaBsBXJix1xwz5V74I5ABXYaw17112FAiALMyzsktO+rNYJ8rFQlRaQUaxP1k62qTQZwh5EEoPp7gm3u2kPCWSlBr7Hz9d9D7KEQK6i5BFEENxnlbM/YRe2AL3dbUJsgSA4pgB+a1kqjitSberilDVmli75DtQK/J59FySKzsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1slmgm-0001n1-US; Wed, 04 Sep 2024 11:52:36 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1slmgm-005QGx-CB; Wed, 04 Sep 2024 11:52:36 +0200
-Received: from pengutronix.de (pd9e5994e.dip0.t-ipconnect.de [217.229.153.78])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 0A3DD3324C9;
-	Wed, 04 Sep 2024 09:52:36 +0000 (UTC)
-Date: Wed, 4 Sep 2024 11:52:35 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	s=arc-20240116; t=1725443687; c=relaxed/simple;
+	bh=A8jBBEU4JmlCS2iIUWpGULpUfjnILI4ZQFsy022HtJM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f/Ebavk3h5hxJD9f2tWDK2nlOI9Kqafc+SWqeu5uBeBNiL4wyxLFaBnz+sW3TpWDA5x2fVrAQksxqaoO+UqCSd6gTSOHBfW17V9e62ovaMP3ZUcnddKOYgIMF0A1ed4R5dl4SEsC2YjnHRK8BKpWQjEs/Pm+c51zqqAdqAN4v2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T4pfLUo3; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725443685; x=1756979685;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=A8jBBEU4JmlCS2iIUWpGULpUfjnILI4ZQFsy022HtJM=;
+  b=T4pfLUo3lEc3LqO4/rgnpu43xjvyO+zaLIvWh/pPD2GXBJepWHv38HMw
+   xlJl8uzwkUFNRol7CnxPkm0f+NKnuMw1beE7A/svPdhuzZFCGVVWcFcpk
+   ao5MLxcQ6v8uoK+hf6bIB1FApK1eMYS5jY1u9HPKkhYptZe6QjQtkfDDM
+   W6No0af0v1UVZeCMcURNbFtoXiKYKyzHpTAtgtP0CaZ26tyuBrKc0gRdV
+   wqJRGXKIv0yz9mBThOvaPvjId/Z7DjjzfH0KavsdzrRSKhkyZF7RwXJyU
+   cGnDH2eL/tJhyi3H6HV9f/23+3gI+q5NlKpr8tUOHJTux+y+B+aElHHZY
+   g==;
+X-CSE-ConnectionGUID: FnigzqCTRQyBcWxzZ2a11Q==
+X-CSE-MsgGUID: W07t5m9oR0eP2QgC0BzPPg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11184"; a="34664469"
+X-IronPort-AV: E=Sophos;i="6.10,201,1719903600"; 
+   d="scan'208";a="34664469"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2024 02:54:44 -0700
+X-CSE-ConnectionGUID: YwwdvXlxSQu8VWPsqwJ44Q==
+X-CSE-MsgGUID: 2cjHcJE3RoOhPTSsDAyR3w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,201,1719903600"; 
+   d="scan'208";a="69618113"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa005.fm.intel.com with ESMTP; 04 Sep 2024 02:54:41 -0700
+Received: from mglak.igk.intel.com (mglak.igk.intel.com [10.237.112.146])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id D6B0427BD9;
+	Wed,  4 Sep 2024 10:54:39 +0100 (IST)
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Joshua Hay <joshua.a.hay@intel.com>,
+	Igor Bagnucki <igor.bagnucki@intel.com>,
+	Alan Brady <alan.brady@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	"Tantilov, Emil S" <emil.s.tantilov@intel.com>,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: can: cc770: Simplify parsing DT properties
-Message-ID: <20240904-gorgeous-peculiar-newt-067532-mkl@pengutronix.de>
-References: <20240903135731.405635-1-robh@kernel.org>
+Subject: [PATCH iwl-net] idpf: deinit virtchnl transaction manager after vport and vectors
+Date: Wed,  4 Sep 2024 11:54:17 +0200
+Message-ID: <20240904095418.6426-1-larysa.zaremba@intel.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="wfrzeulhkfopbkjv"
-Content-Disposition: inline
-In-Reply-To: <20240903135731.405635-1-robh@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
+When the device is removed, idpf is supposed to make certain virtchnl
+requests e.g. VIRTCHNL2_OP_DEALLOC_VECTORS and VIRTCHNL2_OP_DESTROY_VPORT.
 
---wfrzeulhkfopbkjv
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+However, this does not happen due to the referenced commit introducing
+virtchnl transaction manager and placing its deinitialization before those
+messages are sent. Then the sending is impossible due to no transactions
+being available.
 
-On 03.09.2024 08:57:30, Rob Herring (Arm) wrote:
-> Use of the typed property accessors is preferred over of_get_property().
-> The existing code doesn't work on little endian systems either. Replace
-> the of_get_property() calls with of_property_read_bool() and
-> of_property_read_u32().
->=20
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-> ---
-> v2:
-> - Use reverse xmas tree order
-> - Fix slew unsigned comparison
+Lack of cleanup can lead to the FW becoming unresponsive from e.g.
+unloading-loading the driver and creating-destroying VFs afterwards.
 
-Added to linux-can-next.
+Move transaction manager deinitialization to after other virtchnl-related
+cleanup is done.
 
-Thanks,
-Marc
+Fixes: 34c21fa894a1 ("idpf: implement virtchnl transaction manager")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+---
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+index a5f9b7a5effe..f18f490dafd8 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+@@ -3040,9 +3040,9 @@ void idpf_vc_core_deinit(struct idpf_adapter *adapter)
+ 	if (!test_bit(IDPF_VC_CORE_INIT, adapter->flags))
+ 		return;
+ 
+-	idpf_vc_xn_shutdown(adapter->vcxn_mngr);
+ 	idpf_deinit_task(adapter);
+ 	idpf_intr_rel(adapter);
++	idpf_vc_xn_shutdown(adapter->vcxn_mngr);
+ 
+ 	cancel_delayed_work_sync(&adapter->serv_task);
+ 	cancel_delayed_work_sync(&adapter->mbx_task);
+-- 
+2.45.0
 
---wfrzeulhkfopbkjv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbYLeAACgkQKDiiPnot
-vG9EVwf+M/MpT+nMGdkIp1dv1myWb6N6DFUuGPOMbXFizmWl1BuO6PQQV5Z1TD4W
-lVFvt/vhkDloG6x73nD9U2Jf5n8mp3HwVQJF3hfCLUFsQ3uGWI/4VTjksSRZ4L1H
-whvUWgNyn4MSQ5hNHRyMEKdy+rw8lGPlwCVjxjqrd0izeJNKobQsoRlJSiEETcRj
-hGGhNc+JRgbZIYcRO1ERKgA0hvWVroHyf5o/iN7d5eOJXmlVh+qpBK5i/Kq97Kxg
-WDNcLogphNiJgssLhu8mAm9chrNZ6a/jiHgqa/c+MeTnbdQ4Th35VdSe85s8Jpe3
-KdyKjJWkE0eYK5dj6VTLaGCmMqqIsg==
-=GVdl
------END PGP SIGNATURE-----
-
---wfrzeulhkfopbkjv--
 
