@@ -1,199 +1,263 @@
-Return-Path: <netdev+bounces-125128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ABD996BF95
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:05:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B95B696BFC5
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 16:13:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0BC128572D
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:04:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F7F728275D
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 14:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505CE1D47D1;
-	Wed,  4 Sep 2024 14:04:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBFBE1DA610;
+	Wed,  4 Sep 2024 14:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hvnH/b12"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="CQBGNABx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7CF1EBFF7;
-	Wed,  4 Sep 2024 14:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B60E1CCEFC
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 14:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725458696; cv=none; b=UA0zTdsCx+eDEUkm03hrCUEXyTAJKWp2Wk7liHSpBGbrcAkmofy4+o3OVCLubINu56oEDqwAn9qhHfkEFsF6SvvJyt9mUTAz3JZel+06mDFla2EUAAqE0O4jL/grvzb4HAcnzBpNJyikdJuTwCg0O/ZOLF8soGLVp7/zPhEA5Co=
+	t=1725459223; cv=none; b=lyqlgPkDfToyOokfjFH+8gEApTtlPAkEx3QA0JfoqdNiFoNwKjPtYVuI15CcSol76bpZxUHuAhZz1DlFshudN7ZOa5Dykb4sYZi4o8IKwoq2lxVcF+Z/qxUDXvsBgRBSXmcN1NDbOk/0/GALiEXfE9ccJ/ZRAz2Xrn6XVH5XE50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725458696; c=relaxed/simple;
-	bh=YcVLd4CgfFwDGY2+lBjpAE7Fj7gBEkaN1HE3M1S0UAE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pki+cSdEPVEK9A9VS6XmHmzoDkcVkFZeBFo1HWNmjG/bqrP19Ak7h/f5+MaFFvhPwneDb8x5cR3zhZaPP+rhJ/z5pPsa0HAAYsdVwcSLyi9QrY6RwHoREORiHkFkduvHAJnTIXCwBBJonZ/NPADW07YpLEUOHipsxVHTqgUaA/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hvnH/b12; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-42bbd3bed1bso7370155e9.1;
-        Wed, 04 Sep 2024 07:04:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725458693; x=1726063493; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pcSQHDuFZNW8f8jn2HlyrNAfmNzNkeFSHZv2Ikhhg8I=;
-        b=hvnH/b12DOyFv4FxlzgA5wXHp2J7rc0cbd8X61l3rR5DeeB8d8cuetknOS6i0/mD91
-         pc4V3TrHLhuEl9woFFpSZwOJ1Wp/hYUFtZuj6Et9DE1IiGQal049kctoi9VO/Fv3iN1g
-         qavmBldgcsc34F2Hfu1lpfBQolu6cj03xcOd8hrbLJVwdKE9LE8mL6uYYFpts9IPyD6W
-         Ei/A/k4xDna5bPdzKFc74oRAoakrWWjAozyI4Ww+QqoaCaDOM5to3qmBe4AEIwP96XXB
-         g2374iLxOuEwS7PtCSjcm9vAvYSjoCJpHvl5yiwza8aoXtGDLLP1A8VqVdTmAceIhj5R
-         Nidw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725458693; x=1726063493;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pcSQHDuFZNW8f8jn2HlyrNAfmNzNkeFSHZv2Ikhhg8I=;
-        b=ol+E2fV7V8D4rC9XBCFfTEglXk0J8qzJu1rGHlp8AEmXBgH6bDOxu2J/8TsbbPXYsE
-         HKMCimWzDERhblSyTuBmUk60xgARNeT03cIIhTXCWnmR5/OpmLBDi9tThvmDCjNe55wu
-         jSslQPb5xtcRBgWp88Ek9z4mZjmfRNyTlP/6zu70c2P54CFH5XI6Sb/kwNOTuIEcDjcS
-         Jlscwqh60ELtWFVzhPMXYMbAgO7nmmvqqYFHnPHVkUqsr8w3XADD/NchKVBnA/IrGj/F
-         YyC0h6TEia9muYscoopJFskt0ECPub9rbk9c6ws50sXErYTnAIQm6QeeGiVmQM1WneVm
-         8BvA==
-X-Forwarded-Encrypted: i=1; AJvYcCVUofzrAYP371U5GydiWmiOanTVjBf8ZUO9tV9/GRgq026TCBwQbwhDWrAIknqKKq64BC92xsVCB540O4Y=@vger.kernel.org, AJvYcCVjMBLPPoBW6MuT9ZWMMTFgl80ZXIxRAI87D+kUktAbpich+nVsZs8w50twrmqpqHPq9QBPHc/i@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyzh6O2UKKyJd6baBrbDo9ecTZJe77Oh+DwuaECGvtYGeqkINuz
-	y884ABSR2T1tPmKiShsaItS6eSoAKfSpQcUYENy1RWyC0uCEUGLL
-X-Google-Smtp-Source: AGHT+IFwd43mImwMibDfu+DajpXj0lE+8R58B0kaRqv52bm6izGdfKSggdaX92YjEflO0z3LrM32tw==
-X-Received: by 2002:a05:600c:1554:b0:425:6962:4253 with SMTP id 5b1f17b1804b1-42bbb43d5e4mr71495425e9.4.1725458691917;
-        Wed, 04 Sep 2024 07:04:51 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-374cf7e2dbfsm7060858f8f.37.2024.09.04.07.04.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Sep 2024 07:04:51 -0700 (PDT)
-Date: Wed, 4 Sep 2024 17:04:48 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	rmk+kernel@armlinux.org.uk, linux@armlinux.org.uk, xfr@outlook.com,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v7 3/7] net: stmmac: refactor FPE verification
- process
-Message-ID: <20240904140448.6hvjzj3ei2k7jdbe@skbuf>
-References: <cover.1725441317.git.0x1207@gmail.com>
- <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
+	s=arc-20240116; t=1725459223; c=relaxed/simple;
+	bh=tCVW13UPtGXMnpc7N2fKYDYF7fU7lE8QuTiP3brNcnQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KuR9d4r2kp/sOKqz7BTeCM4pWxXhzsTHb0zWaZckm8lxZNyP1ntQ+vSZp0dObHXf5P0JykjybzNqbVh77+aGGXR2V4a59GzHLhDDkbPfPW0/JQfuyLqB+tmiedSuIoofObLUaQjiyRU00bpcg06f1l+iyPqbR5MMvShZxLxqF4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=CQBGNABx; arc=none smtp.client-ip=67.231.145.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4849UN5r022625;
+	Wed, 4 Sep 2024 07:13:15 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=s2048-2021-q4; bh=FlG
+	uNesJ+Fc9fcZttk3ylx4pR5JWMkdVAW2Up8l7ces=; b=CQBGNABxRD4kzHpbthA
+	nMDUaj1Netk5la1iZ3y1SuAMdcNaJuNZcbUqKXYmNSNhpRgLcEdMfwsl5bXWyMsZ
+	laNFY/HR1J6IWcN6HCrALMsyYI+m2PPuUAsBiqxihs6WLWOWCTvewqCk6lFN93oy
+	fciSpq0ldAoSYkqS3Llqp999R5PxPWn70oGBtsc9vgQ1vADiN9QpLghTf/aN4mBK
+	zyMDRddirh1c0XXRLYErTId5XrTeVTxutDLhrSoX3h/q1QjAORCy7gnS1azqL8PL
+	PBMNmvGK3twJBtQ/dpJXG+Y+oBUoIpbDQ5omOVk1bdSraG9FbqN2uIenSQVFsBdl
+	+rA==
+Received: from maileast.thefacebook.com ([163.114.130.16])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41emyp1d68-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 04 Sep 2024 07:13:14 -0700 (PDT)
+Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:1b::30) by
+ mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server id
+ 15.2.1544.11; Wed, 4 Sep 2024 14:13:12 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Thomas Gleixner
+	<tglx@linutronix.de>,
+        Richard Cochran <richardcochran@gmail.com>
+CC: Mahesh Bandewar <maheshb@google.com>, <netdev@vger.kernel.org>,
+        "Vadim
+ Fedorenko" <vadfed@meta.com>
+Subject: [PATCH net-next v5] ptp/ioctl: support MONOTONIC{,_RAW} timestamps for PTP_SYS_OFFSET_EXTENDED
+Date: Wed, 4 Sep 2024 07:13:05 -0700
+Message-ID: <20240904141305.2856789-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1e452525e496b28c0b1ea43afbdc3533c92930c6.1725441317.git.0x1207@gmail.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: Dal_yOWFkTRiX0SSBBTU-tZ9aLWPaji4
+X-Proofpoint-ORIG-GUID: Dal_yOWFkTRiX0SSBBTU-tZ9aLWPaji4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-04_11,2024-09-04_01,2024-09-02_01
 
-On Wed, Sep 04, 2024 at 05:21:18PM +0800, Furong Xu wrote:
-> +/**
-> + * stmmac_fpe_verify_timer - Timer for MAC Merge verification
-> + * @t:  timer_list struct containing private info
-> + *
-> + * Verify the MAC Merge capability in the local TX direction, by
-> + * transmitting Verify mPackets up to 3 times. Wait until link
-> + * partner responds with a Response mPacket, otherwise fail.
-> + */
-> +static void stmmac_fpe_verify_timer(struct timer_list *t)
->  {
-> -	struct stmmac_priv *priv = container_of(work, struct stmmac_priv,
-> -						fpe_task);
-> -	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
-> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
-> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
-> -	bool *hs_enable = &fpe_cfg->hs_enable;
-> -	bool *enable = &fpe_cfg->enable;
-> -	int retries = 20;
-> -
-> -	while (retries-- > 0) {
-> -		/* Bail out immediately if FPE handshake is OFF */
-> -		if (*lo_state == FPE_STATE_OFF || !*hs_enable)
-> -			break;
-> -
-> -		if (*lo_state == FPE_STATE_ENTERING_ON &&
-> -		    *lp_state == FPE_STATE_ENTERING_ON) {
-> -			stmmac_fpe_configure(priv, priv->ioaddr,
-> -					     fpe_cfg,
-> -					     priv->plat->tx_queues_to_use,
-> -					     priv->plat->rx_queues_to_use,
-> -					     *enable);
-> -
-> -			netdev_info(priv->dev, "configured FPE\n");
-> +	struct stmmac_fpe_cfg *fpe_cfg = from_timer(fpe_cfg, t, verify_timer);
-> +	struct stmmac_priv *priv = container_of(fpe_cfg, struct stmmac_priv,
-> +						fpe_cfg);
-> +	struct ethtool_mm_state *state = &fpe_cfg->state;
-> +	unsigned long flags;
-> +	bool rearm = false;
->  
-> -			*lo_state = FPE_STATE_ON;
-> -			*lp_state = FPE_STATE_ON;
-> -			netdev_info(priv->dev, "!!! BOTH FPE stations ON\n");
-> -			break;
-> -		}
-> +	spin_lock_irqsave(&fpe_cfg->lock, flags);
->  
-> -		if ((*lo_state == FPE_STATE_CAPABLE ||
-> -		     *lo_state == FPE_STATE_ENTERING_ON) &&
-> -		     *lp_state != FPE_STATE_ON) {
-> -			netdev_info(priv->dev, SEND_VERIFY_MPAKCET_FMT,
-> -				    *lo_state, *lp_state);
-> +	switch (state->verify_status) {
-> +	case ETHTOOL_MM_VERIFY_STATUS_INITIAL:
-> +	case ETHTOOL_MM_VERIFY_STATUS_VERIFYING:
-> +		if (fpe_cfg->verify_retries != 0) {
->  			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
-> -						fpe_cfg,
-> -						MPACKET_VERIFY);
-> +						fpe_cfg, MPACKET_VERIFY);
-> +			rearm = true;
-> +		} else {
-> +			state->verify_status = ETHTOOL_MM_VERIFY_STATUS_FAILED;
->  		}
-> -		/* Sleep then retry */
-> -		msleep(500);
-> +
-> +		fpe_cfg->verify_retries--;
-> +	break;
+From: Mahesh Bandewar <maheshb@google.com>
 
-Odd indentation... "break;" should be on the same level with the code,
-not with the "case" statements. Not sure which editor you use, but even
-if you hit "==" in vim on this line, it will shift it by one tab to the
-right.
+The ability to read the PHC (Physical Hardware Clock) alongside
+multiple system clocks is currently dependent on the specific
+hardware architecture. This limitation restricts the use of
+PTP_SYS_OFFSET_PRECISE to certain hardware configurations.
 
-> +
-> +	case ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED:
-> +		stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
-> +				     priv->plat->tx_queues_to_use,
-> +				     priv->plat->rx_queues_to_use,
-> +				     true, true);
-> +	break;
+The generic soultion which would work across all architectures
+is to read the PHC along with the latency to perform PHC-read as
+offered by PTP_SYS_OFFSET_EXTENDED which provides pre and post
+timestamps.  However, these timestamps are currently limited
+to the CLOCK_REALTIME timebase. Since CLOCK_REALTIME is affected
+by NTP (or similar time synchronization services), it can
+experience significant jumps forward or backward. This hinders
+the precise latency measurements that PTP_SYS_OFFSET_EXTENDED
+is designed to provide.
 
-Same comment here and below.
+This problem could be addressed by supporting MONOTONIC_RAW
+timestamps within PTP_SYS_OFFSET_EXTENDED. Unlike CLOCK_REALTIME
+or CLOCK_MONOTONIC, the MONOTONIC_RAW timebase is unaffected
+by NTP adjustments.
 
-> +
-> +	default:
-> +	break;
-> +	}
-> +
-> +	if (rearm) {
-> +		mod_timer(&fpe_cfg->verify_timer,
-> +			  jiffies + msecs_to_jiffies(state->verify_time));
->  	}
->  
-> -	clear_bit(__FPE_TASK_SCHED, &priv->fpe_task_state);
-> +	spin_unlock_irqrestore(&fpe_cfg->lock, flags);
-> +}
+This enhancement can be implemented by utilizing one of the three
+reserved words within the PTP_SYS_OFFSET_EXTENDED struct to pass
+the clock-id for timestamps.  The current behavior aligns with
+clock-id for CLOCK_REALTIME timebase (value of 0), ensuring
+backward compatibility of the UAPI.
+
+Signed-off-by: Mahesh Bandewar <maheshb@google.com>
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+---
+As Mahesh is not responding for more then a week, and there were no
+new versions from May 2024, I decided to continue the work as we
+found this feature useful in our case too. I'll keep previous change
+log as is, but put the latest on top:
+
+v4 -> v5:
+- rebase on top of current net-next
+- add CLOCK_MONOTONIC as another option (suggest by Richard)
+- adjusted comment about changes in the ptp_sys_offset_extended
+- reasoning explanation is done by Yuliang Li, link:
+https://lore.kernel.org/netdev/CADj8K+M9qjLGAKcsV_9YoPQ5SGXe3vmi69Y65m1RUyLOMrJeHg@mail.gmail.com/
+
+Original changelog:
+
+v1 -> v2
+   * Code-style fixes.
+v2 -> v3
+   * Reword commit log
+   * Fix the compilation issue by using __kernel_clockid instead of clockid_t
+     which has kernel only scope.
+v3 -> v4
+   * Typo/comment fixes.
+
+ drivers/ptp/ptp_chardev.c        |  8 +++++--
+ include/linux/ptp_clock_kernel.h | 36 ++++++++++++++++++++++++++++----
+ include/uapi/linux/ptp_clock.h   | 24 +++++++++++++++------
+ 3 files changed, 56 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+index 2067b0120d08..ea96a14d72d1 100644
+--- a/drivers/ptp/ptp_chardev.c
++++ b/drivers/ptp/ptp_chardev.c
+@@ -359,11 +359,15 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+ 			extoff = NULL;
+ 			break;
+ 		}
+-		if (extoff->n_samples > PTP_MAX_SAMPLES
+-		    || extoff->rsv[0] || extoff->rsv[1] || extoff->rsv[2]) {
++		if (extoff->n_samples > PTP_MAX_SAMPLES ||
++		    extoff->rsv[0] || extoff->rsv[1] ||
++		    (extoff->clockid != CLOCK_REALTIME &&
++		     extoff->clockid != CLOCK_MONOTONIC &&
++		     extoff->clockid != CLOCK_MONOTONIC_RAW)) {
+ 			err = -EINVAL;
+ 			break;
+ 		}
++		sts.clockid = extoff->clockid;
+ 		for (i = 0; i < extoff->n_samples; i++) {
+ 			err = ptp->info->gettimex64(ptp->info, &ts, &sts);
+ 			if (err)
+diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
+index 6e4b8206c7d0..c892d22ce0a7 100644
+--- a/include/linux/ptp_clock_kernel.h
++++ b/include/linux/ptp_clock_kernel.h
+@@ -47,10 +47,12 @@ struct system_device_crosststamp;
+  * struct ptp_system_timestamp - system time corresponding to a PHC timestamp
+  * @pre_ts: system timestamp before capturing PHC
+  * @post_ts: system timestamp after capturing PHC
++ * @clockid: clock-base used for capturing the system timestamps
+  */
+ struct ptp_system_timestamp {
+ 	struct timespec64 pre_ts;
+ 	struct timespec64 post_ts;
++	clockid_t clockid;
+ };
+ 
+ /**
+@@ -457,14 +459,40 @@ static inline ktime_t ptp_convert_timestamp(const ktime_t *hwtstamp,
+ 
+ static inline void ptp_read_system_prets(struct ptp_system_timestamp *sts)
+ {
+-	if (sts)
+-		ktime_get_real_ts64(&sts->pre_ts);
++	if (sts) {
++		switch (sts->clockid) {
++		case CLOCK_REALTIME:
++			ktime_get_real_ts64(&sts->pre_ts);
++			break;
++		case CLOCK_MONOTONIC:
++			ktime_get_ts64(&sts->pre_ts);
++			break;
++		case CLOCK_MONOTONIC_RAW:
++			ktime_get_raw_ts64(&sts->pre_ts);
++			break;
++		default:
++			break;
++		}
++	}
+ }
+ 
+ static inline void ptp_read_system_postts(struct ptp_system_timestamp *sts)
+ {
+-	if (sts)
+-		ktime_get_real_ts64(&sts->post_ts);
++	if (sts) {
++		switch (sts->clockid) {
++		case CLOCK_REALTIME:
++			ktime_get_real_ts64(&sts->post_ts);
++			break;
++		case CLOCK_MONOTONIC:
++			ktime_get_ts64(&sts->post_ts);
++			break;
++		case CLOCK_MONOTONIC_RAW:
++			ktime_get_raw_ts64(&sts->post_ts);
++			break;
++		default:
++			break;
++		}
++	}
+ }
+ 
+ #endif
+diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
+index 053b40d642de..18eefa6d93d6 100644
+--- a/include/uapi/linux/ptp_clock.h
++++ b/include/uapi/linux/ptp_clock.h
+@@ -155,13 +155,25 @@ struct ptp_sys_offset {
+ 	struct ptp_clock_time ts[2 * PTP_MAX_SAMPLES + 1];
+ };
+ 
++/*
++ * ptp_sys_offset_extended - data structure for IOCTL operation
++ *			     PTP_SYS_OFFSET_EXTENDED
++ *
++ * @n_samples:	Desired number of measurements.
++ * @clockid:	clockid of a clock-base used for pre/post timestamps.
++ * @rsv:	Reserved for future use.
++ * @ts:		Array of samples in the form [pre-TS, PHC, post-TS]. The
++ *		kernel provides @n_samples.
++ *
++ * Starting from kernel 6.12 and onwards, the first word of the reserved-field
++ * is used for @clockid. That's backward compatible since previous kernel
++ * expect all three reserved words (@rsv[3]) to be 0 while the clockid (first
++ * word in the new structure) for CLOCK_REALTIME is '0'.
++ */
+ struct ptp_sys_offset_extended {
+-	unsigned int n_samples; /* Desired number of measurements. */
+-	unsigned int rsv[3];    /* Reserved for future use. */
+-	/*
+-	 * Array of [system, phc, system] time stamps. The kernel will provide
+-	 * 3*n_samples time stamps.
+-	 */
++	unsigned int n_samples;
++	__kernel_clockid_t clockid;
++	unsigned int rsv[2];
+ 	struct ptp_clock_time ts[PTP_MAX_SAMPLES][3];
+ };
+ 
+-- 
+2.43.5
+
 
