@@ -1,172 +1,133 @@
-Return-Path: <netdev+bounces-124782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-124783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D894C96AE28
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 03:59:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE4A796AE2F
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 04:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68761283CFF
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 01:59:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DC9DB20B9F
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 02:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1F9FBF0;
-	Wed,  4 Sep 2024 01:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D8310A0D;
+	Wed,  4 Sep 2024 02:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ui1Soong"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="mVzkO+nE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f193.google.com (mail-yb1-f193.google.com [209.85.219.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82093C17;
-	Wed,  4 Sep 2024 01:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6699D529;
+	Wed,  4 Sep 2024 02:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725415161; cv=none; b=Xl021fOXbjgxav3Vkh/S3JZHH4YTC4ydKr5kxJsZ9iwJVm9XtGWNl42VhxnjRcD+hRrQ4VZwnLeIqeT5a1v7uuVTJN7gG+kAeNYjihLyr/mhSdNzqL5q0bLcO6b/74OkcE/vdX+OWC+Z9s9ZG+kkmPOkEyC/BYCC0n3FEm9yERg=
+	t=1725415347; cv=none; b=mK6HzH5F9an4yCZKDj7VGemdgH5KQuz3aR8f+5WVqfv1hxRpqYeThS3uQ7k29D/PENyc6yu/St1hgT7WH1Ctc95/8tC/FKUDci6T8IBFXR8amIE/9J5CY7agYKVolXKvPWm5q309QfJ2X1yAnrh38fnUYGGRSF0EttTGUFMyHv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725415161; c=relaxed/simple;
-	bh=SHBBMj+kcNZa4ko/RtLnwxdJwc+D2I5cUK8KVSfR8Rk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B1jBeEMwVcNpOwxZe6vz5JpHor7Zvxfbott/Zji4rELEbuft4PSmiwt4b1NmAkSfJxwrViPLVrPKuSS9afgnPDH6NyRbeEsUnBk05hBaZH61EeRHksbW+6GdYw3ifYUSkia9bO/TojYt/z9rfo8Qmgn7t56/+YeZYBVjLW1UEps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ui1Soong; arc=none smtp.client-ip=209.85.219.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f193.google.com with SMTP id 3f1490d57ef6-e116a5c3922so5742381276.1;
-        Tue, 03 Sep 2024 18:59:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725415159; x=1726019959; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ySY+JqVL2bcg8x2diCk20FCdTyllIvauVkwMxwotWS4=;
-        b=Ui1SoonggVKkHTYcGO5E3ZTIjE3Hz23eviSgqE/5/NM4IdSNkvXrRoyYxV5t/aUNqv
-         KzlVTG0BK63AoOtdULDpmlZCyQwbR6eku/Z2c0mTPIPKazxxUuqNVbAM4AohAgHYNAg6
-         wwvU6C3piYdKY/ZaBMr7dnxLYs3DW0xfk3iRB6i1UOwggEQHXZAbqc0ZI4M0rkaf9+rT
-         mTGoWgTQNvPHS3lZWZqwbukt/mGLFgiPkdWyEuFefvDps4i5LXkoQpRviiERs3YBGhBH
-         KgrUOYPsFL4bNOBkrycmLvv9oJ90Rp347epHi/KUTFS/MF14V9Z+GHj4T5E7CKbIzXyJ
-         Dosg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725415159; x=1726019959;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ySY+JqVL2bcg8x2diCk20FCdTyllIvauVkwMxwotWS4=;
-        b=bbEfWusSIcreUXWLnL+UsS82n2NMxtvVXBS/W6XqG7ipe0tz0e9z6hW2/T7bSDq8a0
-         0GugXWTj1YvRJ61Gq8YG+CQpKSxYRoq8IBh9/z08huYJNQkQpli3ULpCRKJvm2Qh+k3u
-         ShtDVWKpCLDG8Bc1HAjZ8/3o45ZCvaaG/zYNUwb6trUWGMREgLMVGc/TD4zv+mrCUHJp
-         UDpUfdoj9fveMPB4acgHicXNyXBlIubs8Kfmy3qwp8mo1Ms/3cKL6XgVrQHB/5xV6O5f
-         U0OYEze9aNlw5qCv0bG1+9SWZKo3Qia7NVjl67MRm6gkXVOTqsO0AcFLJ0fHw8i6slY7
-         cGjw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5k9EH8xsl1A00WDK71uPZbuNB9mpseXFvc5VGqlKx9Ne0D/DkLgZKCUJ6BADbCKQhb3XH6u5sbz8XqoU=@vger.kernel.org, AJvYcCUeviO0RRdavMc3sFxcEVITDM9D8BOyHS+Wv4zbxcLdeoEOCa4zK8OEFfMSQl2MLGC7rP0DEwC6@vger.kernel.org
-X-Gm-Message-State: AOJu0Yys3XNbKPB8UCU26DZ0KBi5GuzASIN5lqmig/BVTscc30HXCuIZ
-	RH/fYyH+SZjdiSbvVKigKCge9N7+0oDfw+pzQgQ8yJl5n6n9VlL9WV5PgrLDwE/N12eXZN6gHUJ
-	j26Uu05++8fp6pp22qwgCs4nhXV8=
-X-Google-Smtp-Source: AGHT+IGKCu11O1Jfjlj8c7VOd7RU9KnonePXHCWMKLEzBVLyTko/XhgLPt55/hjnqeVHevyODbO6v6jCX7rI/9RS9Ww=
-X-Received: by 2002:a05:6902:e8e:b0:e0b:e2de:a64a with SMTP id
- 3f1490d57ef6-e1a7a1a37c9mr16230052276.36.1725415158704; Tue, 03 Sep 2024
- 18:59:18 -0700 (PDT)
+	s=arc-20240116; t=1725415347; c=relaxed/simple;
+	bh=B28oxwYLmJ4+vU0YbnjwVo6lSTp4OAB5sdR/64EZ3RY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=l/rOpp+fkDBI6UNOu9vHy8e8MmcKK5dT2gr2ldQhBSHIuSaBcT+6oihUfGS4aRtYRhYdARCJHeLcu3yr6lo7tYP3ClfP9EoQWRp65HLklCfzDuQkRUpmCgMRNGG4ij+XHaqmfyYqdi+82A4jk3YCtPdAvXJj+B0yohvNQ6CFSBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=mVzkO+nE; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1725415343;
+	bh=vv/ANfe5ReI4atsmhoigATXPp5eYYn2euiExp9SZns0=;
+	h=Date:From:To:Cc:Subject:From;
+	b=mVzkO+nEsVJcWO1MJq6xFyTgcqhCc8MboIbqzn0htVZvXgnSe7rMYdaN/SpEqYe4H
+	 UWJeh9YY1wubx3vuOyQt+wn4drfDzpX/2PlRZLUJIyUk60TsEexX5YbzUAWJMa1ing
+	 +ngTqbwqzBVQM3y++cN6Mx1Vbcif/U4eQGgeVed8xO7nsVwMkconbkxPUQDU+0OveT
+	 2yhWvWbwZ7aamznOhP0UO653PLdtT07htmV/zvHOs1gpNr4AUxLMHS432AOfRmxToT
+	 9gBDr63KdlwV7N5D0kmIsnEftEu0mvJOU7KW5kAD5/at3By9Ka0GlhhKQMl0ueIzvy
+	 DZVsc+4tFWFOA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Wz5NG2v6xz4wnt;
+	Wed,  4 Sep 2024 12:02:22 +1000 (AEST)
+Date: Wed, 4 Sep 2024 12:02:21 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, David Miller
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Martin KaFai Lau <martin.lau@kernel.org>
+Subject: linux-next: manual merge of the bpf-next tree with the net-next
+ tree
+Message-ID: <20240904120221.54e6cfcb@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240830020001.79377-1-dongml2@chinatelecom.cn>
- <20240830020001.79377-7-dongml2@chinatelecom.cn> <20240830162627.4ba37aa3@kernel.org>
- <CADxym3bkVFApps1wJpSQME=WcN_Xy1_biL94TZyhQucBHaRc5w@mail.gmail.com> <20240902181211.7ca407f1@kernel.org>
-In-Reply-To: <20240902181211.7ca407f1@kernel.org>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Wed, 4 Sep 2024 09:59:20 +0800
-Message-ID: <CADxym3aH_tH7Kq2jXqKt+4owp85nfELdPBJMapG2mwHWN8k98Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 06/12] net: vxlan: make vxlan_set_mac() return
- drop reasons
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: idosch@nvidia.com, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, dsahern@kernel.org, dongml2@chinatelecom.cn, 
-	amcohen@nvidia.com, gnault@redhat.com, bpoirier@nvidia.com, 
-	b.galvani@gmail.com, razor@blackwall.org, petrm@nvidia.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/ymGS12FCuyBKBHULoaPTR+s";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/ymGS12FCuyBKBHULoaPTR+s
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 3, 2024 at 9:12=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Sun, 1 Sep 2024 20:47:27 +0800 Menglong Dong wrote:
-> > > > @@ -1620,7 +1620,7 @@ static bool vxlan_set_mac(struct vxlan_dev *v=
-xlan,
-> > > >
-> > > >       /* Ignore packet loops (and multicast echo) */
-> > > >       if (ether_addr_equal(eth_hdr(skb)->h_source, vxlan->dev->dev_=
-addr))
-> > > > -             return false;
-> > > > +             return (u32)VXLAN_DROP_INVALID_SMAC;
-> > >
-> > > It's the MAC address of the local interface, not just invalid...
-> > >
-> >
-> > Yeah, my mistake. It seems that we need to add a
-> > VXLAN_DROP_LOOP_SMAC here? I'm not sure if it is worth here,
-> > or can we reuse VXLAN_DROP_INVALID_SMAC here too?
->
-> Could you take a look at the bridge code and see if it has similar
-> checks? Learning the addresses and dropping frames which don't match
-> static FDB entries seem like fairly normal L2 switching drop reasons.
-> Perhaps we could add these as non-VXLAN specific?
->
+Hi all,
 
-Yeah, I'll have a look at that part.
+Today's linux-next merge of the bpf-next tree got a conflict in:
 
-> The subsystem reason API was added for wireless, because wireless
-> folks had their own encoding, and they have their own development
-> tree (we don't merge their patches directly into net-next).
-> I keep thinking that we should add the VXLAN reason to the "core"
-> group rather than creating a subsystem..
->
+  drivers/net/netkit.c
 
-I'm hesitant about this in the beginning too, as VXLAN is a standard
-tunnel protocol. And I'm still hesitant now, should I add them to the "core=
-"?
-which will make things simpler.
+between commit:
 
-Enn......I'll add them to the "core" in the next version, and let's see
-if it is better.
+  00d066a4d4ed ("netdev_features: convert NETIF_F_LLTX to dev->lltx")
 
-> > > >       /* Get address from the outer IP header */
-> > > >       if (vxlan_get_sk_family(vs) =3D=3D AF_INET) {
-> > > > @@ -1635,9 +1635,9 @@ static bool vxlan_set_mac(struct vxlan_dev *v=
-xlan,
-> > > >
-> > > >       if ((vxlan->cfg.flags & VXLAN_F_LEARN) &&
-> > > >           vxlan_snoop(skb->dev, &saddr, eth_hdr(skb)->h_source, ifi=
-ndex, vni))
-> > > > -             return false;
-> > > > +             return (u32)VXLAN_DROP_ENTRY_EXISTS;
-> > >
-> > > ... because it's vxlan_snoop() that checks:
-> > >
-> > >         if (!is_valid_ether_addr(src_mac))
-> >
-> > It seems that we need to make vxlan_snoop() return skb drop reasons
-> > too, and we need to add a new patch, which makes this series too many
-> > patches. Any  advice?
->
-> You could save some indentation by inverting the condition:
->
->         if (!(vxlan->cfg.flags & VXLAN_F_LEARN))
->                 return (u32)SKB_NOT_DROPPED_YET;
->
->         return vxlan_snoop(skb->dev, &saddr, eth_hdr(skb)->h_source, ifin=
-dex, vni);
->
-> But yes, I don't see a better way than having vxlan_snoop() return a
-> reason code :(
->
-> The patch limit count is 15, 12 is our preferred number but you can go
-> higher if it helps the clarity of the series.
+from the net-next tree and commit:
 
-Okay! I feel much better with your words :/
+  d96608794889 ("netkit: Disable netpoll support")
 
-Thanks!
-Menglong Dong
+from the bpf-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/net/netkit.c
+index 79232f5cc088,0681cf86284d..000000000000
+--- a/drivers/net/netkit.c
++++ b/drivers/net/netkit.c
+@@@ -255,7 -255,7 +255,8 @@@ static void netkit_setup(struct net_dev
+  	dev->priv_flags |=3D IFF_LIVE_ADDR_CHANGE;
+  	dev->priv_flags |=3D IFF_PHONY_HEADROOM;
+  	dev->priv_flags |=3D IFF_NO_QUEUE;
+ +	dev->lltx =3D true;
++ 	dev->priv_flags |=3D IFF_DISABLE_NETPOLL;
+ =20
+  	dev->ethtool_ops =3D &netkit_ethtool_ops;
+  	dev->netdev_ops  =3D &netkit_netdev_ops;
+
+--Sig_/ymGS12FCuyBKBHULoaPTR+s
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbXv60ACgkQAVBC80lX
+0Gzw1QgAoAFlve1pnH2uAHlsjPUgltj4nXeJuQqELB77BPM6kUjTJkryOsLnm8Np
+mvTwdUfa2yjZOPcLWU3Hw/soitYW87J7B3u1K6cRb0LHG52s6A59mQGLJY2egh9t
+I2jCgnsiG1GTOUbKRJQHn8QSm5iQ8pk1tg1/075cE9cQDf8TZZjN8472seVrSVI9
+JjUla3MlqQB+Q/zf2kR3KjlhHmpDouMcLXsYUxKCibBzcgs132wZu0cK2NbT6p2i
+JNhNrgcznITr0X58of4Nxb7oeKtf58tyilDDAKYcP94kRHp5UCu2QcAEpgUNVUno
+Z8O1n//E/Pt4wg4Ss9jXO7Yfcaxihw==
+=0BeO
+-----END PGP SIGNATURE-----
+
+--Sig_/ymGS12FCuyBKBHULoaPTR+s--
 
