@@ -1,133 +1,127 @@
-Return-Path: <netdev+bounces-125176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16AA696C2C1
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:45:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8FBE96C2BC
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:44:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91354B27E6E
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:45:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A636B2819BC
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 15:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0841DEFDD;
-	Wed,  4 Sep 2024 15:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9761DEFDA;
+	Wed,  4 Sep 2024 15:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YgDzxzMt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GO/SZRhc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39FDA1DEFC7;
-	Wed,  4 Sep 2024 15:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A571DB55A;
+	Wed,  4 Sep 2024 15:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725464683; cv=none; b=mmxHCfi60cyRRh7mqL+VZ3PIgFKqltqbanHP3WrwNl0vwS2lCI4GsUsq8Rm+vVwamC5r1rEc4cfgZ5k1Rdmmgwou3zxXa4Pk9evQGL4viZJhMWnoyLo4faKE/v89p1CFr/YIVvE6LBqRRjpVwcZ4B9eUXtqQZCmPuisk8ngDcTg=
+	t=1725464673; cv=none; b=leQDNMUMWDXVgNMGD9VBWU1LXZKxY28O4QKYw7eWf/9v2H88aCXItY4mh3AdXJue5XwBwoOxsLyH4++OOlR7pXoMuMaQ7xKe9yuSaU/ns0KB5jO6h8epaBAT9fVENQL8Hncd32lf7JGEbOH6CgeToxgkAsauY+Bvv/Fb3claZRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725464683; c=relaxed/simple;
-	bh=M5kDyk3KDJrwNFQ/gMQLuv75Z5Xu3qZfJ8KRs3eNRhI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EwTFImudYBte0kziPFhRzKVJXIKhIFJISq5+UnpBEfx76n7fL9ZlWEz1fVHMnQeq6M859kAkz3rsBmp3Dc7XV3eN23M3ZdXogTtNfSLzgQOuHaVJP4bydbtbCGhJrFyJDqVR7HGOL04CW1v/++RygOscuQRb26T1qXYpC0f6pZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YgDzxzMt; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1725464673; c=relaxed/simple;
+	bh=OnxPN/+AbrFrxcLgrBGr7w5CtUTVTvAlqoV+BjHQDZg=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Gx5qkFC8DZ9nvrMZZnPpucR+co+Dxy0ibt0XU6RGLbwlb0oqib0QIHS7dX2dlL8DSny2obuvpPCA4kuLddynwiSWvVqzeGuWHna8BMbXFapYqTt8MaWNo1imMQUu3yreGxd46dAKL7msxN5HuBG0ZS2pHJLsP6Je8l+YLaK9dSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GO/SZRhc; arc=none smtp.client-ip=209.85.221.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-42bfb50e4e6so39007175e9.2;
-        Wed, 04 Sep 2024 08:44:41 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-374c3400367so3054838f8f.2;
+        Wed, 04 Sep 2024 08:44:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725464680; x=1726069480; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=umDL6mMF2LGIC/gv7mZ3udOWUJnQiCok84gUZNiT1Zg=;
-        b=YgDzxzMtMr/zAoWxRdZOiKGF4xEY/5V8B5Kg+pUTuAhn83qmAuDnmXz5qXsxZInL9M
-         XRy8eudNWi10ZRxEecvucFQqnzG3hLPiCF5OX1pUDAbtNgCi/AN4kxSoXa0HlhdTLgY8
-         UNt/KIvRjAS7rVDZklCabDL1RUiyvG76l2cZO5rZldQfaB2b4IUWJE8OcZvglRWBdEzG
-         rmf5QNAseJHFvCMPGax0EzicqIbVHpCRE1HmLh3FHjrzu8uZeGp6ELo+P3Uowx9aY77p
-         FnJQFVANaF297DndnRi+dXBI53UhE0F84L7eWgbSdHMvIuH56M5/xjfMBJQD2mTrsk2H
-         5UAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725464680; x=1726069480;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1725464670; x=1726069470; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=umDL6mMF2LGIC/gv7mZ3udOWUJnQiCok84gUZNiT1Zg=;
-        b=SJMHEpC+CKyMW9xOk6hEccJj1McQ4fcWhJqzr9waWz/zcc8sr+hSnyIUA2QdvfYlCQ
-         2Lqg2B72CQlH0bsdRk//1NXvVv4T2J/mxTSXavnRFrsB821/f5Ls8VOVvlOcBaoKm8Dz
-         /H+OKBDtt9GJwwDzjPyqPneZ9q50LYRDRV/XWz8PR6pXJAPl97nOcf0txLq8vWT03ya4
-         O65SgyeWgNdVZHZm9wU7iNvkQgC2ThTHDN9x/+2cCrZ/lG4LV5Cq5rxEzfs3O9hsKIok
-         6tDLRiHJIvSgIC1F9p+1MoqbOnzkFQ4Y+FqYbC8CJKF86yS0q1WW5t4yZgMGO+pi79m9
-         Sezg==
-X-Forwarded-Encrypted: i=1; AJvYcCUUagofSYhIoZif73Sjo94LSIcKDT95O3yvJ0GtkmCyhRKUVXTIMvTAiphnqYSyThbB4ePPl9gQ@vger.kernel.org, AJvYcCWzaeC44eJuroV1dwgZKeA99mR17Vjbe9DTdvgv7JNBjDoXAzptaWlFWQNfB4EGqQ6Tpcvk3jiWgNNphnz/tOs/@vger.kernel.org, AJvYcCXnrDlOK4hBaSbZfH2HfBN5pQVCh29dQuy+3/NInZGPRi+xkDlG/yqUu01axyXx6BYPR2oE9rVFWpGcMvE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy85OkQQUrDtEzrQh4gU762WJ57lx4Q7wn8lqiOOmtmuWvauomy
-	FypRlYCa5MWA5OpZ77I7cE7CjXkL6S4jdxUYJ5y9PJIewAtGM/q0iUddT4x3YJYwlrqy1y3ajqX
-	Sbdvb900ArhK76sj5UOKmEPM9djg=
-X-Google-Smtp-Source: AGHT+IG/BmSVshTuSzwHzg4qPrMOTOCDcwQIxT7cdW1azDwNVPeYpby/rAXvfjK9JwzNmGKJtZBXoDCTRKBu22h8oBE=
-X-Received: by 2002:a05:600c:1914:b0:426:5e91:3920 with SMTP id
- 5b1f17b1804b1-42bb27a9eedmr160835315e9.29.1725464680483; Wed, 04 Sep 2024
- 08:44:40 -0700 (PDT)
+        bh=q0/m9gfxAidcZmmSBa07F5tUNXyuTt8w6eXaConl8Dg=;
+        b=GO/SZRhcla9tWe25LJkM7IPBfXPmkbR2AyQu9WJKlEUMcMrBYOk86No+kYEWS8pSp7
+         LuCsswxR/QZAWDcRt+M4EzR9+23iHi2qhQEH8zCVn+jtrs2JCczfkQUYOli1mFUjqACb
+         FJZd3ErUio7Aj6ksvpkTELF/RMkJoA1Oo3gCRr0Kweuk4+Z0tJslHgxM5zJTlWRspnwj
+         0pDZOHC4dtQCHbbQjHQnxiTmI91UEBv7RrZDK2/YbY8yQ9YGdR+6738LItHlrq7c+40U
+         L3ZNLiz7eXuZHP248xkHgDWgCdTuxiYntc9EdG1VAFG1iS8jliTLiVxKP++KccsM2RG5
+         AXng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725464670; x=1726069470;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q0/m9gfxAidcZmmSBa07F5tUNXyuTt8w6eXaConl8Dg=;
+        b=r0zj6Tqz/YuGcDfA4JEmRx86jms8fH59E9HmEIesALsoI+mXSr8ut8MmYh3m2mHt3q
+         B7z1WZ1NX9Jo4+NxeXGTBCZzxa6AAsPwXGsSUQNOe0K0OuB62TzlngzowoCTIyXK1JvM
+         k58IGd192v7pufwuS16rV1QQIynIMR/10C2CWeWrPCJ3cVHXGvSyb4xBuXt3WPqHe5ft
+         eMXQcjcjU9X+64KAWAAnF9UO0OttuGmz3aH+YXU/3lf9A4ltKSUyBoRGVHAuEdWUl45w
+         pQct0JvcBMXQCvU4vxfNK1X7eB5o3WsQSr5yraokCGB1kJjnfb3YfevUoxpu5BTu7sYK
+         g8yg==
+X-Forwarded-Encrypted: i=1; AJvYcCVswFEzH4aq+eXpS3uncHDafle7pCBXLHOEHZf/kyxpewRc/ZiBF8st2QTl/oUEt0HbAoKZtepFxSjcYdA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw38k4D8jhy+0BrWEldZrNZ9FzeM4v6cgYNqog3pFGsJcSGkf8m
+	yHN15V0JnC1u1jiXJPsy9FHwzXsbQktubTs2NWU6jpiPGIrBnV2xIXGC4A==
+X-Google-Smtp-Source: AGHT+IGpJCjpT1qfXUmSb9iCWFqq6pK5v6aS6Z1hND2gE1k864IMDMT3VSxYAyMgJhm4Ujs7aJcrHg==
+X-Received: by 2002:adf:e6c8:0:b0:374:c3cd:73de with SMTP id ffacd0b85a97d-374c3cd74d5mr10796637f8f.35.1725464670068;
+        Wed, 04 Sep 2024 08:44:30 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8a623a45b0sm6743666b.143.2024.09.04.08.44.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 04 Sep 2024 08:44:29 -0700 (PDT)
+Subject: Re: [PATCH net-next] sfc: convert comma to semicolon
+To: Chen Ni <nichen@iscas.ac.cn>, habetsm.xilinx@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, richardcochran@gmail.com
+Cc: netdev@vger.kernel.org, linux-net-drivers@amd.com,
+ linux-kernel@vger.kernel.org
+References: <20240904084951.1353518-1-nichen@iscas.ac.cn>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <f1007430-0c62-310f-8de1-362096bf2b1e@gmail.com>
+Date: Wed, 4 Sep 2024 16:44:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240902120314.508180-1-linyunsheng@huawei.com> <20240902120314.508180-3-linyunsheng@huawei.com>
-In-Reply-To: <20240902120314.508180-3-linyunsheng@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Wed, 4 Sep 2024 08:44:03 -0700
-Message-ID: <CAKgT0UeHFm9Oy_TwHgtsWpr6EMRAxsKn+H-p8dUTgAtBJwbzpQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v17 02/14] mm: move the page fragment allocator
- from page_alloc into its own file
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Howells <dhowells@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, linux-mm@kvack.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240904084951.1353518-1-nichen@iscas.ac.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 2, 2024 at 5:09=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
-> Inspired by [1], move the page fragment allocator from page_alloc
-> into its own c file and header file, as we are about to make more
-> change for it to replace another page_frag implementation in
-> sock.c
->
-> As this patchset is going to replace 'struct page_frag' with
-> 'struct page_frag_cache' in sched.h, including page_frag_cache.h
-> in sched.h has a compiler error caused by interdependence between
-> mm_types.h and mm.h for asm-offsets.c, see [2]. So avoid the compiler
-> error by moving 'struct page_frag_cache' to mm_types_task.h as
-> suggested by Alexander, see [3].
->
-> 1. https://lore.kernel.org/all/20230411160902.4134381-3-dhowells@redhat.c=
-om/
-> 2. https://lore.kernel.org/all/15623dac-9358-4597-b3ee-3694a5956920@gmail=
-.com/
-> 3. https://lore.kernel.org/all/CAKgT0UdH1yD=3DLSCXFJ=3DYM_aiA4OomD-2wXykO=
-42bizaWMt_HOA@mail.gmail.com/
-> CC: David Howells <dhowells@redhat.com>
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> Acked-by: Andrew Morton <akpm@linux-foundation.org>
+On 04/09/2024 09:49, Chen Ni wrote:
+> Replace comma between expressions with semicolons.
+> 
+> Using a ',' in place of a ';' can have unintended side effects.
+> Although that is not the case here, it is seems best to use ';'
+> unless ',' is intended.
+> 
+> Found by inspection.
+> No functional change intended.
+> Compile tested only.
+> 
+> Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+
+Acked-by: Edward Cree <ecree.xilinx@gmail.com>
+
 > ---
->  include/linux/gfp.h                           |  22 ---
->  include/linux/mm_types.h                      |  18 ---
->  include/linux/mm_types_task.h                 |  18 +++
->  include/linux/page_frag_cache.h               |  31 ++++
->  include/linux/skbuff.h                        |   1 +
->  mm/Makefile                                   |   1 +
->  mm/page_alloc.c                               | 136 ----------------
->  mm/page_frag_cache.c                          | 145 ++++++++++++++++++
->  .../selftests/mm/page_frag/page_frag_test.c   |   2 +-
->  9 files changed, 197 insertions(+), 177 deletions(-)
->  create mode 100644 include/linux/page_frag_cache.h
->  create mode 100644 mm/page_frag_cache.c
->
+>  drivers/net/ethernet/sfc/ptp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/sfc/ptp.c b/drivers/net/ethernet/sfc/ptp.c
+> index 6fd2fdbaa418..aaacdcfa54ae 100644
+> --- a/drivers/net/ethernet/sfc/ptp.c
+> +++ b/drivers/net/ethernet/sfc/ptp.c
+> @@ -884,7 +884,7 @@ static void efx_ptp_read_timeset(MCDI_DECLARE_STRUCT_PTR(data),
+>  	timeset->host_start = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTSTART);
+>  	timeset->major = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_MAJOR);
+>  	timeset->minor = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_MINOR);
+> -	timeset->host_end = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTEND),
+> +	timeset->host_end = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_HOSTEND);
+>  	timeset->wait = MCDI_DWORD(data, PTP_OUT_SYNCHRONIZE_WAITNS);
+>  
+>  	/* Ignore seconds */
+> 
 
-Looks good to me.
-
-Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
 
