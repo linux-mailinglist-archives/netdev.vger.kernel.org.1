@@ -1,121 +1,117 @@
-Return-Path: <netdev+bounces-125252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ED2396C7BB
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 21:41:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D31896C7D7
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 21:46:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B9632873D6
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:41:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 464D71C25328
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13D61E6DC0;
-	Wed,  4 Sep 2024 19:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A2E13D51B;
+	Wed,  4 Sep 2024 19:46:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RbgTmhu1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fWdF2DP7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B014D1E6321;
-	Wed,  4 Sep 2024 19:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6A4F8286A;
+	Wed,  4 Sep 2024 19:46:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725478854; cv=none; b=m7bYS+n9SOyU86Oz4qyqB+yGNxmpOyqlMyceUbbQUn2vrcUlVJOsmI2Hor4paEPMRBzYpO0dnL+buJBiqLKoL72Y/C7STye7rDjfGh/Jj2QhmfjPX6fqrFesRT8AfA2OJk/LATxGbaqxyLBzudAMfutW0+LREoDYZshcaT0sVus=
+	t=1725479167; cv=none; b=O4vvtOKLubAqedmbPeVkGQFplzL/dckNx/6VSRGVrnZ1VTs+tib/5q+w3dhJtnphxR+eyp4JDkV6NhccTi7q7TRPWGd93B9OngQGONYogLigdOlU9If6gpDP+w3d/JqfmmAnoxjg0P/HfpVfppsLPItZV6U50d3IiZtH6z9xglM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725478854; c=relaxed/simple;
-	bh=bQK+yFu5fRg8+syHRGxnt1pzKtg69U9NOvqBoa1Brlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=Q5AbebltciRKsY7/5AZzdAUH9bvQAx9+iX1Ci3MNPLgiYAm6eyZwSwtAIv+Z+3Hjdeko1/0to2m8jATEmq0yn509D9xvzhl4h/+De5I7c0s9j1IzHZCvN/0J44wZY8/BFyTGc6YlFq3Uboagjso29vx+t9Hn97i9L4pzb+ySGu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RbgTmhu1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02476C4CEC2;
-	Wed,  4 Sep 2024 19:40:54 +0000 (UTC)
+	s=arc-20240116; t=1725479167; c=relaxed/simple;
+	bh=QQsVnSzMJu9Xy6LVYw1rcBARePRY6Cy6vZiFgsTr2ig=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qAZ1YyfUShMppZprvl/zzbmKLWut93j/vczrX/2PHdrkiIu0nC8quTTanK28c/rRade8dox3osmK/Yh5z/Nu4itBMOAZYUJvQPlAKIkk/XXgLCEwgrWCy1hx4hb8VOPTmlMAK5Dcu/2vgQwIIqFYTCCU4gaAFxEAfgRrDEeDjus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fWdF2DP7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88F7FC4CEC2;
+	Wed,  4 Sep 2024 19:46:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725478854;
-	bh=bQK+yFu5fRg8+syHRGxnt1pzKtg69U9NOvqBoa1Brlw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=RbgTmhu1X/pELnHTv8/3BSXPVlW1Mq6ZP4H+iGofs9wvYFpFLQPeKENdYGzXzA0gz
-	 FhjkQhIMTsR4JO6gkoCwLTXR+h/ibWGe4RLo1/m1V2jUeEkGltGuD9fOadX3uTi+pX
-	 F+9Pz39X6HMpcuaVlG43LylLf8oERXJuTui1xxklGZfPyXM3jJeGjv7fX+mYFgDV0I
-	 YExTlRyDuLkQcX12XzIzj/2JAOSywyjj7A+JveVoDBIKiqHGs5ZW3rE1HQseqymFdk
-	 oCVaYTJ/tou7bkpNyjk2jlrDeMuQ6Yg4kvwZxZpxsGX7+r0Jhqa05DInN2FFC2aWt2
-	 6b2NQFZOfKDIQ==
-Date: Wed, 4 Sep 2024 14:40:52 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
-	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
-	jing2.liu@intel.com
-Subject: Re: [PATCH V4 03/12] PCI/TPH: Add pcie_tph_modes() to query TPH modes
-Message-ID: <20240904194052.GA344429@bhelgaas>
+	s=k20201202; t=1725479167;
+	bh=QQsVnSzMJu9Xy6LVYw1rcBARePRY6Cy6vZiFgsTr2ig=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=fWdF2DP79Oz1wDdOdNmJmEFF+B692AQZ4875Bq6z1hg1xwLqlTNY1H+XTrfXMbVpS
+	 j9sAxC7eMnwXTd3wNHvjRWj8E5hmjvAylk5hK4Gv4aeWmNf1meqTnsLuu09jxp5IQ6
+	 7M3ybSubPsXBmhx6wBiBOKJX/1fjvuOvzRpBPtiDQ+i7+l/luSJZ9/Di6SjL1Zxn8C
+	 EUvdYE0SCcmrKuzUMlV6Ukep+/CcDy//Ys7BNiUYeFzQ/QG4XV9j+jFT7/KBZiQtIZ
+	 2KtRy5wbsaVhOufckq7FbWVUG9JdrwzD3kd6eZPTewykaW7TfO2EVgPzqOO3iubl79
+	 1KjRL3qAlm8dg==
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7a812b64d1cso399018385a.0;
+        Wed, 04 Sep 2024 12:46:07 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVB3UGXSEhMSqT2DWBxb1qhZMCyzxfw8d69McAP/6k1yeqm2SgMjBrFk0ygbeQa57Bi01oZ4+1MM3MZ@vger.kernel.org, AJvYcCVYA8bBIX/b8aM0C5JXt1OQUkhV7ek2IBNJJHiURLfxFkOxAtbmZRATEGpPNmhBuXNty5Uf8O0Lz8w=@vger.kernel.org, AJvYcCVrwtas2p0XQycjpkX02h3698vZNYUBbc8nF0D/qTMA54gR7YIX21allI0OwMT3vE6fkpO3abFywrijGJbjNhDQo++kfuCY@vger.kernel.org, AJvYcCXF+uZJHzSsg1v8nb2cxKXz6JxIrPb0a7ZUxek+Ll6EhVA5B74ogDMqOX/KkK+bH5/4QVFk233DNmpDV6fL@vger.kernel.org, AJvYcCXKEQ+E168x9AC2ZeD5b+CaFPY6PJL+M+4tqKpi6vpdCxNVbKtUE6q/vZyVV+wy94/4r099ZRuA2cetp+zn@vger.kernel.org, AJvYcCXs8fhs92FHrLWj6e5iehsAIinKM1h82+Er6ZUJRRI/iVH2GYLztpkR5qi/b3CgD5gADW8GiCKE@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL3/S4AXjy+rQ/98UuvpwDDGL92HGRDQ9TTq4GS24F8m4GCSyx
+	bFJscrisnKMEpc2aQA8wVlonTF9ngiA16ihmYXvnr3XQIz91WYb2q1qLuSFAVdCLscXX890nMbS
+	og+IKDo+iQtUpgDgIElt1yb9eUIU=
+X-Google-Smtp-Source: AGHT+IEvCs/22u/q3u8HbVezM75pgSYQ+mtXLN/XwyBj7AvVgPLsxLtOdjUjVijcfKiU4aElyUiOX8rriF8t5qXs5jg=
+X-Received: by 2002:a05:622a:2610:b0:44f:d986:fe4c with SMTP id
+ d75a77b69052e-4567f505b0bmr362111191cf.20.1725479166868; Wed, 04 Sep 2024
+ 12:46:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240822204120.3634-4-wei.huang2@amd.com>
+References: <20240903033011.2870608-1-yukaixiong@huawei.com> <20240903033011.2870608-12-yukaixiong@huawei.com>
+In-Reply-To: <20240903033011.2870608-12-yukaixiong@huawei.com>
+From: Anna Schumaker <anna@kernel.org>
+Date: Wed, 4 Sep 2024 15:45:49 -0400
+X-Gmail-Original-Message-ID: <CAFX2Jf=8cDNmjUBCRE-n6N9khkRRrq0ABtsX4V=j830Mi1spwQ@mail.gmail.com>
+Message-ID: <CAFX2Jf=8cDNmjUBCRE-n6N9khkRRrq0ABtsX4V=j830Mi1spwQ@mail.gmail.com>
+Subject: Re: [PATCH v2 -next 11/15] sunrpc: use vfs_pressure_ratio() helper
+To: Kaixiong Yu <yukaixiong@huawei.com>
+Cc: akpm@linux-foundation.org, mcgrof@kernel.org, ysato@users.sourceforge.jp, 
+	dalias@libc.org, glaubitz@physik.fu-berlin.de, luto@kernel.org, 
+	tglx@linutronix.de, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz, kees@kernel.org, 
+	j.granados@samsung.com, willy@infradead.org, Liam.Howlett@oracle.com, 
+	vbabka@suse.cz, lorenzo.stoakes@oracle.com, trondmy@kernel.org, 
+	chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de, 
+	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, paul@paul-moore.com, 
+	jmorris@namei.org, linux-sh@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-nfs@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	wangkefeng.wang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 22, 2024 at 03:41:11PM -0500, Wei Huang wrote:
-> Add pcie_tph_modes() to allow drivers to query the TPH modes supported
-> by an endpoint device, as reported in the TPH Requester Capability
-> register. The modes are reported as a bitmask and current supported
-> modes include:
-> 
->  - PCI_TPH_CAP_NO_ST: NO ST Mode Supported
->  - PCI_TPH_CAP_INT_VEC: Interrupt Vector Mode Supported
->  - PCI_TPH_CAP_DEV_SPEC: Device Specific Mode Supported
+On Mon, Sep 2, 2024 at 11:31=E2=80=AFPM Kaixiong Yu <yukaixiong@huawei.com>=
+ wrote:
+>
+> Use vfs_pressure_ratio() to simplify code.
+>
+> Signed-off-by: Kaixiong Yu <yukaixiong@huawei.com>
+> Reviewed-by: Kees Cook <kees@kernel.org>
+> ---
+>  net/sunrpc/auth.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/sunrpc/auth.c b/net/sunrpc/auth.c
+> index 04534ea537c8..3d2b51d7e934 100644
+> --- a/net/sunrpc/auth.c
+> +++ b/net/sunrpc/auth.c
+> @@ -489,7 +489,7 @@ static unsigned long
+>  rpcauth_cache_shrink_count(struct shrinker *shrink, struct shrink_contro=
+l *sc)
+>
+>  {
+> -       return number_cred_unused * sysctl_vfs_cache_pressure / 100;
+> +       return vfs_pressure_ratio(number_cred_unused);
 
-> + * pcie_tph_modes - Get the ST modes supported by device
-> + * @pdev: PCI device
-> + *
-> + * Returns a bitmask with all TPH modes supported by a device as shown in the
-> + * TPH capability register. Current supported modes include:
-> + *   PCI_TPH_CAP_NO_ST - NO ST Mode Supported
-> + *   PCI_TPH_CAP_INT_VEC - Interrupt Vector Mode Supported
-> + *   PCI_TPH_CAP_DEV_SPEC - Device Specific Mode Supported
-> + *
-> + * Return: 0 when TPH is not supported, otherwise bitmask of supported modes
-> + */
-> +int pcie_tph_modes(struct pci_dev *pdev)
-> +{
-> +	if (!pdev->tph_cap)
-> +		return 0;
-> +
-> +	return get_st_modes(pdev);
-> +}
-> +EXPORT_SYMBOL(pcie_tph_modes);
+Looks fairly straightforward to me.
 
-I'm not sure I see the need for pcie_tph_modes().  The new bnxt code
-looks like this:
+Acked-by: Anna Schumaker <anna.schumaker@oracle.com>
 
-  bnxt_request_irq
-    if (pcie_tph_modes(bp->pdev) & PCI_TPH_CAP_INT_VEC)
-      rc = pcie_enable_tph(bp->pdev, PCI_TPH_CAP_INT_VEC);
-
-What is the advantage of this over just this?
-
-  bnxt_request_irq
-    rc = pcie_enable_tph(bp->pdev, PCI_TPH_CAP_INT_VEC);
-
-It seems like drivers could just ask for what they want since
-pcie_enable_tph() has to verify support for it anyway.  If that fails,
-the driver can fall back to another mode.
-
-Returning a bitmask of supported modes might be useful if the driver
-could combine them, but IIUC the modes are all mutually exclusive, so
-the driver can't request a combination of them.
-
-Bjorn
+>  }
+>
+>  static void
+> --
+> 2.25.1
+>
 
