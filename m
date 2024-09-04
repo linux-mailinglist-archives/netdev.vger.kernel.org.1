@@ -1,639 +1,374 @@
-Return-Path: <netdev+bounces-125222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B972696C53C
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:20:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A38D996C540
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 19:22:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD1621C25308
-	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:20:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 971041C21BB4
+	for <lists+netdev@lfdr.de>; Wed,  4 Sep 2024 17:22:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C7DC1E4933;
-	Wed,  4 Sep 2024 17:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905081E0B8A;
+	Wed,  4 Sep 2024 17:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="aEqUixAz"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="rVvr6+oK"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAFD1E2021;
-	Wed,  4 Sep 2024 17:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED691E6310
+	for <netdev@vger.kernel.org>; Wed,  4 Sep 2024 17:18:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725470316; cv=none; b=CqtVDV1ghEhuLvNKHcCYwMqFgv6YhWnyyvp7qxhZ93zItba1i6bfq7kzSHifgt8DK6jncmVbC9ayOEb0SolHe/TNREbmlfNm0FZgHqowjZKG8OWdgTX2il8Vb3tidzQ/jWITzhokaU/FEu08iJnm/Rvgf3I4dOjNp8EFOo+j0IQ=
+	t=1725470324; cv=none; b=lxaZKUcTESy8aIwrSx2rEmdjdf0iWXr/SERmMGo7oE0yIMXga48eHF/fwkbQdAIyjMsx1NWg4nF9ucqdmH7Ut9zR5Y93DS6Z8PU11P8oN93mzdoQ7J6Wq18IufoX4dZ33XnpNx7pn19p0Lfv0gtLTuFph1Q/HNH6iq0R0N4h/lM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725470316; c=relaxed/simple;
-	bh=8+6qX6qK6w83uAj2rGp3ok/VtBoA8vlkVBAX48imnTw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AtBnRS0P6DF8sWYHDL7OkG2MBRrXyJkzyqvUIGvDAP+C50+xZ9tyxA1oeLrM1FMnCjpojXjX58Ttce6edsfYeUbQxIUSsBwsl8QvsTg6tzz58sHGwZG0YGs6rAB4jYcCDZwsGnV90Pdjp09fyEubJXcDOWnQxnTpBKrzKeJDT+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=aEqUixAz; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 486241BF20A;
-	Wed,  4 Sep 2024 17:18:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1725470312;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f/EiYosKGb5+eECLJXEKS5woXUtS93FVCAzSRCIBrQI=;
-	b=aEqUixAzvNeO8VMJTbKYnJg4dlfVGT3bVXJ+F5DEcAHXyQo0t3T5qDFVe2Uqxwmw8hztxb
-	aOXYDhz46JLqgeMeFnHFu2bv1uhEm3tBrG0IJKt07rj5cpZZnJHKNCc9qep8zFV1cVjvgi
-	LbFjjk3VFeRsB8CveLhVYiFBlwLxzj3Lm0HAlo7BHafezcl5uNxFbHYAgUN2QG797Zwwoz
-	5Bqg913hP0zmFaBp5rH7ut/G8TAPXAT+xKMHkP2HEx6mnArEjsV57ZAziOlc/B1a5D2/bM
-	NsXD2HQ2f3InUEMXt5Myo3qj+NFMkbnGCRDg45yFfsDq32iUFONueSN1CiO87Q==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net,
-	Pantelis Antoniou <pantelis.antoniou@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Herve Codina <herve.codina@bootlin.com>,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH net-next v3 8/8] net: ethernet: fs_enet: phylink conversion
-Date: Wed,  4 Sep 2024 19:18:21 +0200
-Message-ID: <20240904171822.64652-9-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240904171822.64652-1-maxime.chevallier@bootlin.com>
-References: <20240904171822.64652-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1725470324; c=relaxed/simple;
+	bh=ahswB8hUbUlmpGTcIQh1XAV5qMRekOAulhC5yyJgcQQ=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=J8ZSThUaqTQMlddF4NzctQR5ZIqz6QHeEfhleaKQEHqwaIycrYc0DZ2oipipr0LwVEGm0MG7hXxnXxK6X2w8m6p37T85d2HjV6+CR8UcfHyPt0bAc3INCovi0UkHBZlkbFV8zPDq2oPABKoUVfLGgqIVoRqa5umzvlD1jTLD4wQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=rVvr6+oK; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1fc47abc040so9735105ad.0
+        for <netdev@vger.kernel.org>; Wed, 04 Sep 2024 10:18:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1725470321; x=1726075121; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dSC2jveJ0jsYz0cGADBL5DJEPo+Pj20pwZgZvQBpJWQ=;
+        b=rVvr6+oKZDgyureSdf1b8/QxeWAT6w9xd/PqCns3XQ8jBmRi4hsJuExl4UT32Nwq4R
+         uJxWPIdwoKXIzVawoQW1a4HVGV2iw+n6Fp0JPK7wd82jaFpC+i8i5udNcXHMgjQeyUDe
+         bYPLHBI83+ceJdE5tgTQHtLPLCyMk7ZubP3l11xskZS6ERaMlH5Ra8n2Fp8PvXOUpd3y
+         ugw4vWnqhQxajgYbT/+Ue48MBj3XJlqBU5AOzJmnbfR/2ZDEnIm0f2uFMxnCvncIvwCy
+         O+8ePRcvnrBk3Vg8r3pjIrMOWyBaInFwcH2iYyTYSO2osGAljxr6WSDutDDXLS3K4z3v
+         Gj1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725470321; x=1726075121;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dSC2jveJ0jsYz0cGADBL5DJEPo+Pj20pwZgZvQBpJWQ=;
+        b=SEDw2XfZp9syNybGkiRYjVUOY7g1S1zdYnL3xCFp+9ViiXoCdj00n71J/5zTWss4eU
+         HCGAcDQY0uj2hatYY02YmJ/XfBQIKb/yImCLOZ6qVeQZA16wmDENdPnZwwtGTe9oCDxf
+         tpjybZyGyYt/ud+hDUCwg/CyBXuxf48ky3rFvxDJEeM68tbKip1SE2ZyFlALFR/AeLKI
+         H1AGup01GeewC4DHphNF4ickkx1OwyTIxRtg329+zQsFXTBg4VfBAkYrTBfK/ftqEg42
+         nGyS4X5sEMBZtGHvfL03+XVQQs1Yp9aSk7NKyBcUSo7JYmHKxMZnWpA27su/OyjgZIG/
+         VVRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUHCwp2cT5AtJfc+0A/gifDvAyiSXwqKoBTEYQzd9dyjPkCzeyq9qV4HN/r8XWsCh+MrWK+Ieo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyb5DRLj2wo6dWmAnFelqfsQ7LmNnJB3ydbGtQpz+/hRilM+YAL
+	3mN61h3T4IgCj5B5VVAtfzHD8fFyRoXebzV2WE6K0LU89nlxuEjLQ0ncSCRdddY=
+X-Google-Smtp-Source: AGHT+IFRLkGrt4fH2qZpZ+U/B9NxgbLzIkv6MFc47LFnBdljduT0oakx5s0XFJih/PreH0Ussud68w==
+X-Received: by 2002:a17:902:e54f:b0:205:83a3:b08 with SMTP id d9443c01a7336-20583a30bf0mr91591015ad.32.1725470321392;
+        Wed, 04 Sep 2024 10:18:41 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206ae913df2sm15899555ad.41.2024.09.04.10.18.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Sep 2024 10:18:40 -0700 (PDT)
+Date: Wed, 4 Sep 2024 10:18:37 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: linux-nfs@vger.kernel.org, netdev@vger.kernel.org
+Subject: Fw: [Bug 219228] New: KVM guest boot up with call trace with
+ mounted image due to NFS server connection is not stable
+Message-ID: <20240904101837.1d825463@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-fs_enet is a quite old but still used Ethernet driver found on some NXP
-devices. It has support for 10/100 Mbps ethernet, with half and full
-duplex. Some variants of it can use RMII, while other integrations are
-MII-only.
+Looks more like NFS bug than a networking bug per se.
 
-Add phylink support, thus removing custom fixed-link hanldling.
+Begin forwarded message:
 
-This also allows removing some internal flags such as the use_rmii flag.
+Date: Wed, 04 Sep 2024 02:32:26 +0000
+From: bugzilla-daemon@kernel.org
+To: stephen@networkplumber.org
+Subject: [Bug 219228] New: KVM guest boot up with call trace with mounted i=
+mage due to NFS server connection is not stable
 
-Acked-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- .../net/ethernet/freescale/fs_enet/Kconfig    |   2 +-
- .../ethernet/freescale/fs_enet/fs_enet-main.c | 215 +++++++++---------
- .../net/ethernet/freescale/fs_enet/fs_enet.h  |  12 +-
- .../net/ethernet/freescale/fs_enet/mac-fcc.c  |  11 +-
- .../net/ethernet/freescale/fs_enet/mac-fec.c  |   9 +-
- .../net/ethernet/freescale/fs_enet/mac-scc.c  |   5 +-
- 6 files changed, 132 insertions(+), 122 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/fs_enet/Kconfig b/drivers/net/ethernet/freescale/fs_enet/Kconfig
-index 7f20840fde07..57013bf14d7c 100644
---- a/drivers/net/ethernet/freescale/fs_enet/Kconfig
-+++ b/drivers/net/ethernet/freescale/fs_enet/Kconfig
-@@ -3,7 +3,7 @@ config FS_ENET
- 	tristate "Freescale Ethernet Driver"
- 	depends on NET_VENDOR_FREESCALE && (CPM1 || CPM2 || PPC_MPC512x)
- 	select MII
--	select PHYLIB
-+	select PHYLINK
- 
- config FS_ENET_MPC5121_FEC
- 	def_bool y if (FS_ENET && PPC_MPC512x)
-diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-index ec43b71c0eba..d300b01859a1 100644
---- a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-+++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-@@ -31,11 +31,13 @@
- #include <linux/fs.h>
- #include <linux/platform_device.h>
- #include <linux/phy.h>
-+#include <linux/phylink.h>
- #include <linux/property.h>
- #include <linux/of.h>
- #include <linux/of_mdio.h>
- #include <linux/of_net.h>
- #include <linux/pgtable.h>
-+#include <linux/rtnetlink.h>
- 
- #include <linux/vmalloc.h>
- #include <asm/irq.h>
-@@ -68,6 +70,13 @@ static void fs_set_multicast_list(struct net_device *dev)
- 	(*fep->ops->set_multicast_list)(dev);
- }
- 
-+static int fs_eth_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
-+{
-+	struct fs_enet_private *fep = netdev_priv(dev);
-+
-+	return phylink_mii_ioctl(fep->phylink, ifr, cmd);
-+}
-+
- static void skb_align(struct sk_buff *skb, int align)
- {
- 	int off = ((unsigned long)skb->data) & (align - 1);
-@@ -581,15 +590,21 @@ static void fs_timeout_work(struct work_struct *work)
- 
- 	dev->stats.tx_errors++;
- 
--	spin_lock_irqsave(&fep->lock, flags);
-+	/* In the event a timeout was detected, but the netdev is brought down
-+	 * shortly after, it no longer makes sense to try to recover from the
-+	 * timeout. netif_running() will return false when called from the
-+	 * .ndo_close() callback. Calling the following recovery code while
-+	 * called from .ndo_close() could deadlock on rtnl.
-+	 */
-+	if (!netif_running(dev))
-+		return;
- 
--	if (dev->flags & IFF_UP) {
--		phy_stop(dev->phydev);
--		(*fep->ops->stop)(dev);
--		(*fep->ops->restart)(dev);
--	}
-+	rtnl_lock();
-+	phylink_stop(fep->phylink);
-+	phylink_start(fep->phylink);
-+	rtnl_unlock();
- 
--	phy_start(dev->phydev);
-+	spin_lock_irqsave(&fep->lock, flags);
- 	wake = fep->tx_free >= MAX_SKB_FRAGS &&
- 	       !(CBDR_SC(fep->cur_tx) & BD_ENET_TX_READY);
- 	spin_unlock_irqrestore(&fep->lock, flags);
-@@ -605,68 +620,37 @@ static void fs_timeout(struct net_device *dev, unsigned int txqueue)
- 	schedule_work(&fep->timeout_work);
- }
- 
--/* generic link-change handler - should be sufficient for most cases */
--static void fs_adjust_link(struct  net_device *dev)
-+static void fs_mac_link_up(struct phylink_config *config,
-+			   struct phy_device *phy,
-+			   unsigned int mode, phy_interface_t interface,
-+			   int speed, int duplex,
-+			   bool tx_pause, bool rx_pause)
- {
--	struct fs_enet_private *fep = netdev_priv(dev);
--	struct phy_device *phydev = dev->phydev;
-+	struct net_device *ndev = to_net_dev(config->dev);
-+	struct fs_enet_private *fep = netdev_priv(ndev);
- 	unsigned long flags;
--	int new_state = 0;
--
--	if (phydev->link) {
--		/* adjust to duplex mode */
--		if (phydev->duplex != fep->oldduplex) {
--			new_state = 1;
--			fep->oldduplex = phydev->duplex;
--		}
--
--		if (phydev->speed != fep->oldspeed) {
--			new_state = 1;
--			fep->oldspeed = phydev->speed;
--		}
--
--		if (!fep->oldlink) {
--			new_state = 1;
--			fep->oldlink = 1;
--		}
--
--		if (new_state) {
--			spin_lock_irqsave(&fep->lock, flags);
--			fep->ops->restart(dev);
--			spin_unlock_irqrestore(&fep->lock, flags);
--		}
--	} else if (fep->oldlink) {
--		new_state = 1;
--		fep->oldlink = 0;
--		fep->oldspeed = 0;
--		fep->oldduplex = -1;
--	}
- 
--	if (new_state && netif_msg_link(fep))
--		phy_print_status(phydev);
-+	spin_lock_irqsave(&fep->lock, flags);
-+	fep->ops->restart(ndev, interface, speed, duplex);
-+	spin_unlock_irqrestore(&fep->lock, flags);
- }
- 
--static int fs_init_phy(struct net_device *dev)
-+static void fs_mac_link_down(struct phylink_config *config,
-+			     unsigned int mode, phy_interface_t interface)
- {
--	struct fs_enet_private *fep = netdev_priv(dev);
--	struct phy_device *phydev;
--	phy_interface_t iface;
--
--	fep->oldlink = 0;
--	fep->oldspeed = 0;
--	fep->oldduplex = -1;
--
--	iface = fep->fpi->use_rmii ?
--		PHY_INTERFACE_MODE_RMII : PHY_INTERFACE_MODE_MII;
-+	struct net_device *ndev = to_net_dev(config->dev);
-+	struct fs_enet_private *fep = netdev_priv(ndev);
-+	unsigned long flags;
- 
--	phydev = of_phy_connect(dev, fep->fpi->phy_node, &fs_adjust_link, 0,
--				iface);
--	if (!phydev) {
--		dev_err(&dev->dev, "Could not attach to PHY\n");
--		return -ENODEV;
--	}
-+	spin_lock_irqsave(&fep->lock, flags);
-+	fep->ops->stop(ndev);
-+	spin_unlock_irqrestore(&fep->lock, flags);
-+}
- 
--	return 0;
-+static void fs_mac_config(struct phylink_config *config, unsigned int mode,
-+			  const struct phylink_link_state *state)
-+{
-+	/* Nothing to do */
- }
- 
- static int fs_enet_open(struct net_device *dev)
-@@ -691,13 +675,13 @@ static int fs_enet_open(struct net_device *dev)
- 		return -EINVAL;
- 	}
- 
--	err = fs_init_phy(dev);
-+	err = phylink_of_phy_connect(fep->phylink, fep->dev->of_node, 0);
- 	if (err) {
- 		free_irq(fep->interrupt, dev);
- 		napi_disable(&fep->napi);
- 		return err;
- 	}
--	phy_start(dev->phydev);
-+	phylink_start(fep->phylink);
- 
- 	netif_start_queue(dev);
- 
-@@ -710,19 +694,18 @@ static int fs_enet_close(struct net_device *dev)
- 	unsigned long flags;
- 
- 	netif_stop_queue(dev);
--	netif_carrier_off(dev);
- 	napi_disable(&fep->napi);
--	cancel_work_sync(&fep->timeout_work);
--	phy_stop(dev->phydev);
-+	cancel_work(&fep->timeout_work);
-+	phylink_stop(fep->phylink);
- 
- 	spin_lock_irqsave(&fep->lock, flags);
- 	spin_lock(&fep->tx_lock);
- 	(*fep->ops->stop)(dev);
- 	spin_unlock(&fep->tx_lock);
- 	spin_unlock_irqrestore(&fep->lock, flags);
-+	phylink_disconnect_phy(fep->phylink);
- 
- 	/* release any irqs */
--	phy_disconnect(dev->phydev);
- 	free_irq(fep->interrupt, dev);
- 
- 	return 0;
-@@ -810,6 +793,22 @@ static int fs_set_tunable(struct net_device *dev,
- 	return ret;
- }
- 
-+static int fs_ethtool_set_link_ksettings(struct net_device *dev,
-+					 const struct ethtool_link_ksettings *cmd)
-+{
-+	struct fs_enet_private *fep = netdev_priv(dev);
-+
-+	return phylink_ethtool_ksettings_set(fep->phylink, cmd);
-+}
-+
-+static int fs_ethtool_get_link_ksettings(struct net_device *dev,
-+					 struct ethtool_link_ksettings *cmd)
-+{
-+	struct fs_enet_private *fep = netdev_priv(dev);
-+
-+	return phylink_ethtool_ksettings_get(fep->phylink, cmd);
-+}
-+
- static const struct ethtool_ops fs_ethtool_ops = {
- 	.get_drvinfo = fs_get_drvinfo,
- 	.get_regs_len = fs_get_regs_len,
-@@ -819,8 +818,8 @@ static const struct ethtool_ops fs_ethtool_ops = {
- 	.set_msglevel = fs_set_msglevel,
- 	.get_regs = fs_get_regs,
- 	.get_ts_info = ethtool_op_get_ts_info,
--	.get_link_ksettings = phy_ethtool_get_link_ksettings,
--	.set_link_ksettings = phy_ethtool_set_link_ksettings,
-+	.get_link_ksettings = fs_ethtool_get_link_ksettings,
-+	.set_link_ksettings = fs_ethtool_set_link_ksettings,
- 	.get_tunable = fs_get_tunable,
- 	.set_tunable = fs_set_tunable,
- };
-@@ -837,7 +836,7 @@ static const struct net_device_ops fs_enet_netdev_ops = {
- 	.ndo_start_xmit		= fs_enet_start_xmit,
- 	.ndo_tx_timeout		= fs_timeout,
- 	.ndo_set_rx_mode	= fs_set_multicast_list,
--	.ndo_eth_ioctl		= phy_do_ioctl_running,
-+	.ndo_eth_ioctl		= fs_eth_ioctl,
- 	.ndo_validate_addr	= eth_validate_addr,
- 	.ndo_set_mac_address	= eth_mac_addr,
- #ifdef CONFIG_NET_POLL_CONTROLLER
-@@ -845,14 +844,21 @@ static const struct net_device_ops fs_enet_netdev_ops = {
- #endif
- };
- 
-+static const struct phylink_mac_ops fs_enet_phylink_mac_ops = {
-+	.mac_config = fs_mac_config,
-+	.mac_link_down = fs_mac_link_down,
-+	.mac_link_up = fs_mac_link_up,
-+};
-+
- static int fs_enet_probe(struct platform_device *ofdev)
- {
--	int err, privsize, len, ret = -ENODEV;
--	const char *phy_connection_type;
-+	int privsize, len, ret = -ENODEV;
- 	struct fs_platform_info *fpi;
- 	struct fs_enet_private *fep;
-+	phy_interface_t phy_mode;
- 	const struct fs_ops *ops;
- 	struct net_device *ndev;
-+	struct phylink *phylink;
- 	const u32 *data;
- 	struct clk *clk;
- 
-@@ -872,29 +878,18 @@ static int fs_enet_probe(struct platform_device *ofdev)
- 		fpi->cp_command = *data;
- 	}
- 
-+	ret = of_get_phy_mode(ofdev->dev.of_node, &phy_mode);
-+	if (ret) {
-+		/* For compatibility, if the mode isn't specified in DT,
-+		 * assume MII
-+		 */
-+		phy_mode = PHY_INTERFACE_MODE_MII;
-+	}
-+
- 	fpi->rx_ring = RX_RING_SIZE;
- 	fpi->tx_ring = TX_RING_SIZE;
- 	fpi->rx_copybreak = 240;
- 	fpi->napi_weight = 17;
--	fpi->phy_node = of_parse_phandle(ofdev->dev.of_node, "phy-handle", 0);
--	if (!fpi->phy_node && of_phy_is_fixed_link(ofdev->dev.of_node)) {
--		err = of_phy_register_fixed_link(ofdev->dev.of_node);
--		if (err)
--			goto out_free_fpi;
--
--		/* In the case of a fixed PHY, the DT node associated
--		 * to the PHY is the Ethernet MAC DT node.
--		 */
--		fpi->phy_node = of_node_get(ofdev->dev.of_node);
--	}
--
--	if (of_device_is_compatible(ofdev->dev.of_node, "fsl,mpc5125-fec")) {
--		phy_connection_type = of_get_property(ofdev->dev.of_node,
--						      "phy-connection-type",
--						      NULL);
--		if (phy_connection_type && !strcmp("rmii", phy_connection_type))
--			fpi->use_rmii = 1;
--	}
- 
- 	/* make clock lookup non-fatal (the driver is shared among platforms),
- 	 * but require enable to succeed when a clock was specified/found,
-@@ -902,7 +897,7 @@ static int fs_enet_probe(struct platform_device *ofdev)
- 	 */
- 	clk = devm_clk_get_enabled(&ofdev->dev, "per");
- 	if (IS_ERR(clk))
--		goto out_deregister_fixed_link;
-+		goto out_free_fpi;
- 
- 	privsize = sizeof(*fep) +
- 		   sizeof(struct sk_buff **) *
-@@ -912,7 +907,7 @@ static int fs_enet_probe(struct platform_device *ofdev)
- 	ndev = alloc_etherdev(privsize);
- 	if (!ndev) {
- 		ret = -ENOMEM;
--		goto out_deregister_fixed_link;
-+		goto out_free_fpi;
- 	}
- 
- 	SET_NETDEV_DEV(ndev, &ofdev->dev);
-@@ -924,9 +919,29 @@ static int fs_enet_probe(struct platform_device *ofdev)
- 	fep->fpi = fpi;
- 	fep->ops = ops;
- 
-+	fep->phylink_config.dev = &ndev->dev;
-+	fep->phylink_config.type = PHYLINK_NETDEV;
-+	fep->phylink_config.mac_capabilities = MAC_10 | MAC_100;
-+
-+	__set_bit(PHY_INTERFACE_MODE_MII,
-+		  fep->phylink_config.supported_interfaces);
-+
-+	if (of_device_is_compatible(ofdev->dev.of_node, "fsl,mpc5125-fec"))
-+		__set_bit(PHY_INTERFACE_MODE_RMII,
-+			  fep->phylink_config.supported_interfaces);
-+
-+	phylink = phylink_create(&fep->phylink_config, dev_fwnode(fep->dev),
-+				 phy_mode, &fs_enet_phylink_mac_ops);
-+	if (IS_ERR(phylink)) {
-+		ret = PTR_ERR(phylink);
-+		goto out_free_dev;
-+	}
-+
-+	fep->phylink = phylink;
-+
- 	ret = fep->ops->setup_data(ndev);
- 	if (ret)
--		goto out_free_dev;
-+		goto out_phylink;
- 
- 	fep->rx_skbuff = (struct sk_buff **)&fep[1];
- 	fep->tx_skbuff = fep->rx_skbuff + fpi->rx_ring;
-@@ -956,8 +971,6 @@ static int fs_enet_probe(struct platform_device *ofdev)
- 
- 	ndev->ethtool_ops = &fs_ethtool_ops;
- 
--	netif_carrier_off(ndev);
--
- 	ndev->features |= NETIF_F_SG;
- 
- 	ret = register_netdev(ndev);
-@@ -972,12 +985,10 @@ static int fs_enet_probe(struct platform_device *ofdev)
- 	fep->ops->free_bd(ndev);
- out_cleanup_data:
- 	fep->ops->cleanup_data(ndev);
-+out_phylink:
-+	phylink_destroy(fep->phylink);
- out_free_dev:
- 	free_netdev(ndev);
--out_deregister_fixed_link:
--	of_node_put(fpi->phy_node);
--	if (of_phy_is_fixed_link(ofdev->dev.of_node))
--		of_phy_deregister_fixed_link(ofdev->dev.of_node);
- out_free_fpi:
- 	kfree(fpi);
- 	return ret;
-@@ -993,9 +1004,7 @@ static void fs_enet_remove(struct platform_device *ofdev)
- 	fep->ops->free_bd(ndev);
- 	fep->ops->cleanup_data(ndev);
- 	dev_set_drvdata(fep->dev, NULL);
--	of_node_put(fep->fpi->phy_node);
--	if (of_phy_is_fixed_link(ofdev->dev.of_node))
--		of_phy_deregister_fixed_link(ofdev->dev.of_node);
-+	phylink_destroy(fep->phylink);
- 	free_netdev(ndev);
- }
- 
-diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet.h b/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
-index 6ebb1b4404c7..36e4fcc29e36 100644
---- a/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
-+++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
-@@ -7,6 +7,7 @@
- #include <linux/types.h>
- #include <linux/list.h>
- #include <linux/phy.h>
-+#include <linux/phylink.h>
- #include <linux/dma-mapping.h>
- 
- #ifdef CONFIG_CPM1
-@@ -76,7 +77,8 @@ struct fs_ops {
- 	void (*free_bd)(struct net_device *dev);
- 	void (*cleanup_data)(struct net_device *dev);
- 	void (*set_multicast_list)(struct net_device *dev);
--	void (*restart)(struct net_device *dev);
-+	void (*restart)(struct net_device *dev, phy_interface_t interface,
-+			int speed, int duplex);
- 	void (*stop)(struct net_device *dev);
- 	void (*napi_clear_event)(struct net_device *dev);
- 	void (*napi_enable)(struct net_device *dev);
-@@ -112,13 +114,9 @@ struct fs_platform_info {
- 
- 	u32 dpram_offset;
- 
--	struct device_node *phy_node;
--
- 	int rx_ring, tx_ring;	/* number of buffers on rx	*/
- 	int rx_copybreak;	/* limit we copy small frames	*/
- 	int napi_weight;	/* NAPI weight			*/
--
--	int use_rmii;		/* use RMII mode		*/
- };
- 
- struct fs_enet_private {
-@@ -143,10 +141,10 @@ struct fs_enet_private {
- 	cbd_t __iomem *cur_tx;
- 	int tx_free;
- 	u32 msg_enable;
-+	struct phylink *phylink;
-+	struct phylink_config phylink_config;
- 	int interrupt;
- 
--	int oldduplex, oldspeed, oldlink;	/* current settings */
--
- 	/* event masks */
- 	u32 ev_napi;		/* mask of NAPI events */
- 	u32 ev;			/* event mask          */
-diff --git a/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c b/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c
-index 666a54d6e667..be63293511d9 100644
---- a/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c
-+++ b/drivers/net/ethernet/freescale/fs_enet/mac-fcc.c
-@@ -235,7 +235,8 @@ static void set_multicast_list(struct net_device *dev)
- 		set_promiscuous_mode(dev);
- }
- 
--static void restart(struct net_device *dev)
-+static void restart(struct net_device *dev, phy_interface_t interface,
-+		    int speed, int duplex)
- {
- 	struct fs_enet_private *fep = netdev_priv(dev);
- 	const struct fs_platform_info *fpi = fep->fpi;
-@@ -359,8 +360,8 @@ static void restart(struct net_device *dev)
- 	fs_init_bds(dev);
- 
- 	/* adjust to speed (for RMII mode) */
--	if (fpi->use_rmii) {
--		if (dev->phydev->speed == SPEED_100)
-+	if (interface == PHY_INTERFACE_MODE_RMII) {
-+		if (speed == SPEED_100)
- 			C8(fcccp, fcc_gfemr, 0x20);
- 		else
- 			S8(fcccp, fcc_gfemr, 0x20);
-@@ -382,11 +383,11 @@ static void restart(struct net_device *dev)
- 
- 	W32(fccp, fcc_fpsmr, FCC_PSMR_ENCRC);
- 
--	if (fpi->use_rmii)
-+	if (interface == PHY_INTERFACE_MODE_RMII)
- 		S32(fccp, fcc_fpsmr, FCC_PSMR_RMII);
- 
- 	/* adjust to duplex mode */
--	if (dev->phydev->duplex == DUPLEX_FULL)
-+	if (duplex == DUPLEX_FULL)
- 		S32(fccp, fcc_fpsmr, FCC_PSMR_FDE | FCC_PSMR_LPB);
- 	else
- 		C32(fccp, fcc_fpsmr, FCC_PSMR_FDE | FCC_PSMR_LPB);
-diff --git a/drivers/net/ethernet/freescale/fs_enet/mac-fec.c b/drivers/net/ethernet/freescale/fs_enet/mac-fec.c
-index c1b7877178b9..f2ecd20027cf 100644
---- a/drivers/net/ethernet/freescale/fs_enet/mac-fec.c
-+++ b/drivers/net/ethernet/freescale/fs_enet/mac-fec.c
-@@ -220,7 +220,8 @@ static void set_multicast_list(struct net_device *dev)
- 		set_promiscuous_mode(dev);
- }
- 
--static void restart(struct net_device *dev)
-+static void restart(struct net_device *dev, phy_interface_t interface,
-+		    int speed, int duplex)
- {
- 	struct fs_enet_private *fep = netdev_priv(dev);
- 	struct fec __iomem *fecp = fep->fec.fecp;
-@@ -302,13 +303,13 @@ static void restart(struct net_device *dev)
- 	 * Only set MII/RMII mode - do not touch maximum frame length
- 	 * configured before.
- 	 */
--	FS(fecp, r_cntrl, fpi->use_rmii ?
--			FEC_RCNTRL_RMII_MODE : FEC_RCNTRL_MII_MODE);
-+	FS(fecp, r_cntrl, interface == PHY_INTERFACE_MODE_RMII ?
-+			  FEC_RCNTRL_RMII_MODE : FEC_RCNTRL_MII_MODE);
- #endif
- 	/*
- 	 * adjust to duplex mode
- 	 */
--	if (dev->phydev->duplex == DUPLEX_FULL) {
-+	if (duplex == DUPLEX_FULL) {
- 		FC(fecp, r_cntrl, FEC_RCNTRL_DRT);
- 		FS(fecp, x_cntrl, FEC_TCNTRL_FDEN);	/* FD enable */
- 	} else {
-diff --git a/drivers/net/ethernet/freescale/fs_enet/mac-scc.c b/drivers/net/ethernet/freescale/fs_enet/mac-scc.c
-index d061092ced6c..6c97191649de 100644
---- a/drivers/net/ethernet/freescale/fs_enet/mac-scc.c
-+++ b/drivers/net/ethernet/freescale/fs_enet/mac-scc.c
-@@ -226,7 +226,8 @@ static void set_multicast_list(struct net_device *dev)
-  * change.  This only happens when switching between half and full
-  * duplex.
-  */
--static void restart(struct net_device *dev)
-+static void restart(struct net_device *dev, phy_interface_t interface,
-+		    int speed, int duplex)
- {
- 	struct fs_enet_private *fep = netdev_priv(dev);
- 	scc_t __iomem *sccp = fep->scc.sccp;
-@@ -337,7 +338,7 @@ static void restart(struct net_device *dev)
- 	W16(sccp, scc_psmr, SCC_PSMR_ENCRC | SCC_PSMR_NIB22);
- 
- 	/* Set full duplex mode if needed */
--	if (dev->phydev->duplex == DUPLEX_FULL)
-+	if (duplex == DUPLEX_FULL)
- 		S16(sccp, scc_psmr, SCC_PSMR_LPB | SCC_PSMR_FDE);
- 
- 	/* Restore multicast and promiscuous settings */
--- 
-2.46.0
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219228
 
+            Bug ID: 219228
+           Summary: KVM guest boot up with call trace with mounted image
+                    due to NFS server connection is not stable
+           Product: Networking
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: IPV4
+          Assignee: stephen@networkplumber.org
+          Reporter: xuelian.guo@intel.com
+        Regression: No
+
+Environment:
+host kernel :=C2=A06.11.0-rc3=20
+guest kernel :6.11.0-rc5
+qemu version : QEMU emulator version 9.0.92 (v9.1.0-rc2-28-g2eefd4fcec)
+
+
+Bug detail description:=C2=A0
+try to boot KVM guest , there is call trace during kernel loading
+
+Reproduce steps:=C2=A0
+1. set up nfs-server, and put guest image "centos9.img" into NFS-server's
+/images folder.
+
+2. mount NFS-server folder to local:
+   <NfS-server>:/images /share/guest_imgs nfs defaults,tcp,nolock 0 0
+
+3. create qcow2 image based on remote NFS-server
+    qemu-img created -b /share/guest_imgs/centos9.img -f qcow2 centos9.qcow=
+2 -F
+raw
+
+4. boot KVM guest with :
+qemu-system-x86_64 -accel kvm \
+-m 4096 \
+-smp 4 \
+-cpu host \
+-drive file=3Dcentos9.qcow2,if=3Dnone,id=3Dvirtio-disk0 \
+-device virtio-blk-pci,drive=3Dvirtio-disk0,bootindex=3D0 \
+-device virtio-net-pci,netdev=3Dnic0 \
+-netdev user,id=3Dnic0,hostfwd=3Dtcp::10022-:22 \
+-nographic
+
+Error log:=C2=A0
+During KVM guest booting, there are call trace and Guest could boot up in t=
+he
+end, but boot time is long.
+ INFO: task kworker/u8:1:29 blocked for more than 122 seconds.
+[  246.987403]       Not tainted 6.11.0-rc5 #2
+[  246.989674] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
+this
+message.
+[  246.992986] task:kworker/u8:1    state:D stack:0     pid:29    tgid:29  =
+=20
+ppid:2      flags:0x00004000
+[  246.996842] Workqueue: xfs-cil/dm-0 xlog_cil_push_work [xfs]
+[  247.000029] Call Trace:
+[  247.001707]  <TASK>
+[  247.003263]  __schedule+0x276/0x710
+[  247.005381]  schedule+0x27/0xa0
+[  247.007300]  xlog_state_get_iclog_space+0x102/0x2a0 [xfs]
+[  247.010298]  ? __pfx_default_wake_function+0x10/0x10
+[  247.012800]  xlog_write+0x7b/0x260 [xfs]
+[  247.015379]  ? _raw_spin_unlock+0xe/0x30
+[  *** ] (5 of 5) A start job is running for=E2=80=A6ernel arming (3min 39s=
+ / no limit)
+[  247.023496]  xlog_cil_push_work+0x50e/0x6f0 [xfs]
+[  247.026329]  process_one_work+0x158/0x360
+[  247.028584]  worker_thread+0x235/0x340
+[  247.030710]  ? __pfx_worker_thread+0x10/0x10
+[  247.032997]  kthread+0xd0/0x100
+[  247.034937]  ? __pfx_kthread+0x10/0x10
+[  247.037063]  ret_from_fork+0x31/0x50
+[  247.039161]  ? __pfx_kthread+0x10/0x10
+[  247.041302]  ret_from_fork_asm+0x1a/0x30
+[  247.043479]  </TASK>
+[  247.045019] INFO: task kworker/0:3:255 blocked for more than 122 seconds.
+[  247.047775]       Not tainted 6.11.0-rc5 #2
+[  247.049802] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
+this
+message.
+[  247.052903] task:kworker/0:3     state:D stack:0     pid:255   tgid:255 =
+=20
+ppid:2      flags:0x00004000
+[  247.056403] Workqueue: xfs-sync/dm-0 xfs_log_worker [xfs]
+[  247.058880] Call Trace:
+[  247.060293]  <TASK>
+[  247.061638]  __schedule+0x276/0x710
+[  247.063332]  schedule+0x27/0xa0
+[  247.064964]  schedule_timeout+0x14e/0x160
+[  247.066778]  __wait_for_common+0x8f/0x1d0
+[  247.068569]  ? __pfx_schedule_timeout+0x10/0x10
+[  247.070332]  __flush_workqueue+0x13e/0x3f0
+[  247.072011]  xlog_cil_push_now.isra.0+0x25/0x90 [xfs]
+[  247.074185]  xlog_cil_force_seq+0x79/0x240 [xfs]
+[  247.076253]  ? rpm_suspend+0x1ad/0x5e0
+[  247.077831]  ? _raw_spin_unlock+0xe/0x30
+[  247.079442]  ? rpm_suspend+0x5b6/0x5e0
+[  247.080987]  xfs_log_force+0x7a/0x230 [xfs]
+[  247.082764]  xfs_log_worker+0x3d/0xc0 [xfs]
+[  247.084564]  process_one_work+0x158/0x360
+[  247.086075]  worker_thread+0x235/0x340
+[  247.087462]  ? __pfx_worker_thread+0x10/0x10
+[  247.088895]  kthread+0xd0/0x100
+[  247.090108]  ? __pfx_kthread+0x10/0x10
+[  247.091410]  ret_from_fork+0x31/0x50
+[  247.092665]  ? __pfx_kthread+0x10/0x10
+[  247.093932]  ret_from_fork_asm+0x1a/0x30
+[  247.095251]  </TASK>
+[  247.096232] INFO: task xfsaild/dm-0:543 blocked for more than 122 second=
+s.
+[  247.099379]       Not tainted 6.11.0-rc5 #2
+[  247.101574] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
+this
+message.
+[  247.104908] task:xfsaild/dm-0    state:D stack:0     pid:543   tgid:543 =
+=20
+ppid:2      flags:0x00004000
+[  247.108707] Call Trace:
+[  247.110363]  <TASK>
+[  247.111914]  __schedule+0x276/0x710
+[  247.113892]  schedule+0x27/0xa0
+[  247.115756]  schedule_timeout+0x14e/0x160
+[  247.117899]  __wait_for_common+0x8f/0x1d0
+[  247.119998]  ? __pfx_schedule_timeout+0x10/0x10
+[  247.122276]  __flush_workqueue+0x13e/0x3f0
+[  247.124457]  ? ttwu_queue_wakelist+0xd0/0xf0
+[  247.126684]  xlog_cil_push_now.isra.0+0x25/0x90 [xfs]
+[  247.129559]  xlog_cil_force_seq+0x79/0x240 [xfs]
+[  247.132238]  ? _raw_spin_unlock+0xe/0x30
+[  247.134300]  ? finish_task_switch.isra.0+0x97/0x2a0
+[  247.136675]  xfs_log_force+0x7a/0x230 [xfs]
+[  247.139251]  xfsaild_push+0x2d7/0x850 [xfs]
+[  247.141753]  ? __timer_delete_sync+0x2b/0x40
+[  247.143931]  ? schedule_timeout+0x99/0x160
+[  247.146023]  ? __pfx_process_timeout+0x10/0x10
+[  247.148238]  xfsaild+0xaf/0x140 [xfs]
+[  247.150566]  ? __pfx_xfsaild+0x10/0x10 [xfs]
+[  247.153062]  kthread+0xd0/0x100
+[  247.154785]  ? __pfx_kthread+0x10/0x10
+[  247.156715]  ret_from_fork+0x31/0x50
+[  247.158404]  ? __pfx_kthread+0x10/0x10
+[  247.160147]  ret_from_fork_asm+0x1a/0x30
+[  247.161914]  </TASK>
+[  247.163238] INFO: task in:imjournal:787 blocked for more than 123 second=
+s.
+[  247.165818]       Not tainted 6.11.0-rc5 #2
+[  247.167697] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
+this
+message.
+[  247.170408] task:in:imjournal    state:D stack:0     pid:787   tgid:745 =
+=20
+ppid:1      flags:0x00000002
+[  247.173404] Call Trace:
+[  247.174673]  <TASK>
+[  247.175844]  __schedule+0x276/0x710
+[  247.177441]  schedule+0x27/0xa0
+[  247.178888]  schedule_timeout+0x14e/0x160
+[  247.180562]  ? update_sd_lb_stats.constprop.0+0x66/0x270
+[  247.182469]  ___down_common+0x110/0x170
+[  247.183983]  __down_common+0x1e/0xc0
+[  247.185435]  down+0x47/0x60
+[  247.186684]  xfs_buf_lock+0x31/0xe0 [xfs]
+[  247.188553]  xfs_buf_find_lock+0x59/0x110 [xfs]
+[  247.190532]  xfs_buf_lookup.constprop.0+0xb9/0x180 [xfs]
+[  247.192666]  xfs_buf_get_map+0xea/0x5f0 [xfs]
+[  247.194510]  xfs_buf_read_map+0x58/0x2a0 [xfs]
+[  247.196315]  ? xfs_btree_read_buf_block+0xa2/0x120 [xfs]
+[  247.198282]  ? xfs_trans_add_item+0x37/0xb0 [xfs]
+[  247.200066]  xfs_trans_read_buf_map+0x119/0x300 [xfs]
+[  247.201813]  ? xfs_btree_read_buf_block+0xa2/0x120 [xfs]
+[  247.203618]  xfs_btree_read_buf_block+0xa2/0x120 [xfs]
+[  247.205404]  xfs_btree_lookup_get_block.part.0+0x81/0x1b0 [xfs]
+[  247.207331]  xfs_btree_lookup+0x102/0x550 [xfs]
+[  247.208969]  ? kmem_cache_alloc_noprof+0xdc/0x2b0
+[  247.210404]  xfs_dialloc_ag_update_inobt+0x47/0x170 [xfs]
+[  247.212187]  ? xfs_inobt_init_cursor+0x67/0xa0 [xfs]
+[  247.213808]  xfs_dialloc_ag+0x1ad/0x2e0 [xfs]
+[  247.215343]  xfs_dialloc+0x24b/0x3b0 [xfs]
+[  247.216798]  xfs_create+0x167/0x490 [xfs]
+[  247.218193]  ? xfs_dir2_format+0x4a/0x130 [xfs]
+[  247.219644]  xfs_generic_create+0x30d/0x360 [xfs]
+[  247.221129]  lookup_open.isra.0+0x4e1/0x600
+[  247.222312]  open_last_lookups+0x139/0x440
+[  247.223461]  path_openat+0x88/0x290
+[  247.224451]  do_filp_open+0xae/0x150
+[  247.225454]  do_sys_openat2+0x96/0xd0
+[  247.226472]  __x64_sys_openat+0x57/0xa0
+[  247.227515]  do_syscall_64+0x64/0x170
+[  247.228524]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  247.229778] RIP: 0033:0x7fbcacb3e8d4
+[  247.230763] RSP: 002b:00007fbcab7fea40 EFLAGS: 00000293 ORIG_RAX:
+0000000000000101
+[  247.232427] RAX: ffffffffffffffda RBX: 00007fbc9c000c10 RCX:
+00007fbcacb3e8d4
+[  247.234030] RDX: 0000000000000241 RSI: 00007fbcab7feb80 RDI:
+00000000ffffff9c
+[  247.235626] RBP: 00007fbcab7feb80 R08: 0000000000000000 R09:
+0000000000000001
+[  247.237174] R10: 00000000000001b6 R11: 0000000000000293 R12:
+0000000000000241
+[  247.238682] R13: 00007fbc9c000c10 R14: 0000000000000001 R15:
+00007fbc9c015c40
+[  247.240204]  </TASK>
+[  247.242323] INFO: task updatedb:769 blocked for more than 123 seconds.
+[  247.243697]       Not tainted 6.11.0-rc5 #2
+[  247.244694] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables =
+this
+message.
+[  247.246246] task:updatedb        state:D stack:0     pid:769   tgid:769 =
+=20
+ppid:756    flags:0x00000002
+[  247.247995] Call Trace:
+[  247.248689]  <TASK>
+[  247.249342]  __schedule+0x276/0x710
+[  247.250192]  ? vp_notify+0x16/0x20 [virtio_pci]
+[  247.251208]  schedule+0x27/0xa0
+[  247.252006]  schedule_timeout+0x14e/0x160
+[  247.252926]  ? __blk_flush_plug+0xf5/0x150
+[  247.253854]  __wait_for_common+0x8f/0x1d0
+[  247.254726]  ? __pfx_schedule_timeout+0x10/0x10
+[  247.255678]  xfs_buf_iowait+0x1c/0xc0 [xfs]
+[  247.256797]  __xfs_buf_submit+0x131/0x1e0 [xfs]
+[  247.257933]  xfs_buf_read_map+0x11e/0x2a0 [xfs]
+[  247.259044]  ? xfs_da_read_buf+0xee/0x170 [xfs]
+[  247.260178]  xfs_trans_read_buf_map+0x119/0x300 [xfs]
+[  247.261306]  ? xfs_da_read_buf+0xee/0x170 [xfs]
+[  247.262375]  xfs_da_read_buf+0xee/0x170 [xfs]
+[  247.263430]  xfs_dir3_block_read+0x3c/0xf0 [xfs]
+[  247.264506]  xfs_dir2_block_lookup_int+0x4c/0x1d0 [xfs]
+[  247.265658]  ? xfs_bmap_last_offset+0x6b/0x110 [xfs]
+[  247.266737]  xfs_dir2_block_lookup+0x3b/0x130 [xfs]
+[  247.267795]  xfs_dir_lookup_args+0x3e/0x90 [xfs]
+[  247.268810]  xfs_dir_lookup+0x139/0x160 [xfs]
+[  247.269798]  xfs_lookup+0x94/0x160 [xfs]
+[  247.270722]  ? avc_has_perm_noaudit+0x6b/0xf0
+[  247.271570]  xfs_vn_lookup+0x78/0xb0 [xfs]
+[  247.272504]  __lookup_slow+0x81/0x130
+[  247.273242]  walk_component+0xe5/0x160
+[  247.273969]  path_lookupat+0x6e/0x1c0
+[  247.274685]  filename_lookup+0xcd/0x1c0
+[  247.275428]  ? selinux_inode_getattr+0x9a/0xc0
+[  247.276249]  ? terminate_walk+0x21/0x100
+[  247.277002]  ? xfs_vn_getattr+0x66/0x340 [xfs]
+[  247.277968]  ? cp_new_stat+0x14f/0x180
+[  247.278682]  vfs_statx+0x75/0xe0
+[  247.279332]  vfs_fstatat+0x6c/0xb0
+[  247.279989]  __do_sys_newfstatat+0x26/0x60
+[  247.280722]  ? __seccomp_filter+0x3d8/0x5b0
+[  247.281473]  ? syscall_trace_enter+0xff/0x190
+[  247.282270]  do_syscall_64+0x64/0x170
+[  247.282958]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[  247.283805] RIP: 0033:0x7f57f593e13e
+[  247.284479] RSP: 002b:00007ffccb8f2bc8 EFLAGS: 00000246 ORIG_RAX:
+0000000000000106
+[  247.285541] RAX: ffffffffffffffda RBX: 0000564a28d7a9f0 RCX:
+00007f57f593e13e
+[  247.286569] RDX: 00007ffccb8f2c30 RSI: 0000564a28d88fb9 RDI:
+00000000ffffff9c
+[  247.287595] RBP: 0000564a28d88fb9 R08: 0000000000000000 R09:
+00005649ecdb34e0
+[  247.288601] R10: 0000000000000100 R11: 0000000000000246 R12:
+0000000000000006
+[  247.289599] R13: 00007ffccb8f2e00 R14: 0000000000000006 R15:
+0000000000000006
+
+Note :
+it was verified this issue was not reproduced if host kernel returned to
+6.10.0-rc7.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.
 
