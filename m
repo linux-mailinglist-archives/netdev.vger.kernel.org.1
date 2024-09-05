@@ -1,105 +1,151 @@
-Return-Path: <netdev+bounces-125618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ADDA96DECD
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 17:48:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C78F596DF06
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E29F1C240D2
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:48:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70CD51F2395E
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1FB41A01DE;
-	Thu,  5 Sep 2024 15:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B78119D08A;
+	Thu,  5 Sep 2024 16:00:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOXtCC74"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hri7NS4y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B773D1A01D0;
-	Thu,  5 Sep 2024 15:47:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D912317C9B;
+	Thu,  5 Sep 2024 16:00:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725551234; cv=none; b=BaaGUbHLHpcTRicGWw958VF87tk4yxArG2H59KY2FbRkaujjXS1FLCIrIFYIzcWivox7OkzFjhPwodka8plhrpyADr0BGN/MoF2wRoxDsu0UpCIwzhd/ElyjrO5YqRYGuXM2Lf+F24m4YPIkgH2V1QpGIDGjnvJZu9sggxDydzA=
+	t=1725552044; cv=none; b=q+mLHq+6U/FkmZu9x7NR0mPBA8VbivHG6RzvU0b3COm6gvutk99e86hFIZLDqT33Fxq5ZmAgU8o9ib+y59XLEuKlfHI6ydLf4GHCjcnFCgQUJwWqf5eEHI022yu8xSdOtHyjUuHEwifZYoHHMp4V5spnT9hI9ZpV+u1ts00bhRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725551234; c=relaxed/simple;
-	bh=EAnWPkg+5+GfGadRDWc4j55kZwjPEaiqdZ04TSPhyos=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=jZoyPH1e5WG1/4fCojL2T+j0bcxNEMIrL/+isbC8LHownDWg0Kr9sCUwpWrZfnGRTdG0tjIdOEKu2TWHKyqKC1g1wnl8XsnFYSm0t0pTwgPTHSmv8k6/1CMjtgb0Xg3sAMpjqPMfOld/x0xnW/xuTLWG8h/D5fXvUvZbkA3fmlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOXtCC74; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 165F8C4CEC3;
-	Thu,  5 Sep 2024 15:47:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725551234;
-	bh=EAnWPkg+5+GfGadRDWc4j55kZwjPEaiqdZ04TSPhyos=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=HOXtCC74HGrL730QZmOaBJtnFJEObt0esD22qKWieMiWmCIZv1EIusQv3CuAdLftm
-	 FfM5xsYk7cxqk0TR3X0VVe0JOv63+s3k65JqPegMz0YeBbYesr64f7gNLSH3V+lXVM
-	 ZlXLV3FXD4A/kB2ZP4YhthlwH7MFA3YHqZlbQrMySYOopoaHxFlIRHy32c9Tc9sGoQ
-	 xyuoV0j//LEbTfOtYSFItG247fuA9/Ay2Kvo+fEERs/w/GHRPk/qb68QVM9EjyrPT0
-	 L+sXiWp1PRjS4U7RvUoB43gxKTwDaKzVkJUAir0YbTs9RMQtsFT7T1ulEPtzK1skHL
-	 0Vc1C7ncqcXhQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: "David S . Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
- <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Jeff Johnson
- <jjohnson@kernel.org>,  linux-wireless@vger.kernel.org,
-  netdev@vger.kernel.org,  devicetree@vger.kernel.org,
-  ath11k@lists.infradead.org,  linux-kernel@vger.kernel.org,  Bartosz
- Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the
- inputs of the ath11k on WCN6855
-References: <20240814082301.8091-1-brgl@bgdev.pl> <87a5hcyite.fsf@kernel.org>
-	<CAMRc=Mcr7E0dxG09_gYPxg57gYAS4j2+-3x9GCS3wOcM46O=NQ@mail.gmail.com>
-Date: Thu, 05 Sep 2024 18:47:09 +0300
-In-Reply-To: <CAMRc=Mcr7E0dxG09_gYPxg57gYAS4j2+-3x9GCS3wOcM46O=NQ@mail.gmail.com>
-	(Bartosz Golaszewski's message of "Fri, 16 Aug 2024 11:10:00 +0200")
-Message-ID: <87y146ayrm.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1725552044; c=relaxed/simple;
+	bh=v8YPTsOBBGnFSuSBn5etaBfl3hjtF6fupdDxTqbWZzg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XaMbyj/Nyh50dxOyb7LgDhhizTFmhjI/q+mlW7Y20+W1LGbK1icUiVDv9voNDcIb5nO0zL6pXQGkJN4BrRtEBCum7zsV5OSN3Sb2vv6bDA9ajCukF5KljFd7coRjhFbDTBBDPPyLv95PL10QDsJ4+2wzYBw7LC82KnSM9lOyGOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hri7NS4y; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-717594b4ce7so824223b3a.0;
+        Thu, 05 Sep 2024 09:00:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725552041; x=1726156841; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7vY/7oX7G2QiiXFERpXBLGYNJgBqkc4LH8uPCkR3XQE=;
+        b=hri7NS4yh+6W4lnjjPVGdHqLAEuv/uE7IW0f9c2EDo7n3L3mO+PJZBZskx/j6VjK2J
+         duuogb97yT7WUluRYgbmnUwXMHWD09EL2Nc7NU177a5U9DemaJDvB0osPxfDgFeFYTbt
+         Tyu9fr36b1k1uyVAp054qjGWs7eRDCOk78/tDjFzYuLtolnnUsNc7HE0QvSENOmTfFVK
+         EibCSYbM2iIdIA5wd/VXieorsz8YBj33D4543dOTFLGC0pRj29jAc+x1FTcwUkvPNXFI
+         h0d3AesyB+dRdmOvxKKxC7WF3c374M0/JutImL9qd6EodoDZwFc4C8PkyGtFef6mOMwd
+         AuTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725552041; x=1726156841;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7vY/7oX7G2QiiXFERpXBLGYNJgBqkc4LH8uPCkR3XQE=;
+        b=CE8h5cWLquEe50CRRAUtsd+dQKOJf7QB5lKhjqiiKqsBAHAeAFjfs+giDtiQ2sTZ3O
+         qJtUwzYpPFxCGHyb7e83Au9vdEOj3sM7hMbhYi37lBIDOETASi0+ijZICR59zVahKQ0E
+         U1RfOe2WQ0xX52wxPvKh4ZHtdqwIUZ9pANEDuWeyjdHrrtb+GPzlgmkim3sDdiM7y62y
+         vo88eHgbiVghW7PGmPHh7J8cBFGUzOj7H+0BVIlwCCLxUzsF6uO9yleCiZtc1+nv0xWJ
+         K5X2nVbJ9sgTt1pZ2PQLu8RRzGXhqytSv7YIQ2QhDw6kJSYtnyZM3Yg3tQBX7mT9YYpc
+         bvdw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8ubzGIGb/Wt8R832NyMbr2p+NckejMPHFUJf3e6rDuEGKaavdLw8ASQREPZrRMdIKoebTzuY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzo8+PsQW6ctf5XFRrcQGr61EqjHG/tDSxNU3lntEsLZuUerIhr
+	HY6mwhdoyjrrVyowoaNrWic8NSu/wU1gSujvnyPphldqFY6idTgo
+X-Google-Smtp-Source: AGHT+IEuoMyK2/xj0UlSDgmuFlLtvlAOdsD7DmKCM6/IjvYDVcZ2HL5YwfOPXxovAuZLjZFoGsEfGw==
+X-Received: by 2002:a05:6a20:cf8e:b0:1c4:8650:d6db with SMTP id adf61e73a8af0-1cce10aa93emr26535428637.40.1725552040919;
+        Thu, 05 Sep 2024 09:00:40 -0700 (PDT)
+Received: from KERNELXING-MC1.tencent.com ([114.253.36.103])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7177859a369sm3490521b3a.148.2024.09.05.09.00.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 09:00:40 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	willemb@google.com
+Cc: linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v2] selftests: return failure when timestamps can't be reported
+Date: Fri,  6 Sep 2024 00:00:35 +0800
+Message-Id: <20240905160035.62407-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Bartosz Golaszewski <brgl@bgdev.pl> writes:
+From: Jason Xing <kernelxing@tencent.com>
 
->> > +  - if:
->> > +      properties:
->> > +        compatible:
->> > +          contains:
->> > +            const: pci17cb,1103
->> > +    then:
->> > +      required:
->> > +        - vddrfacmn-supply
->> > +        - vddaon-supply
->> > +        - vddwlcx-supply
->> > +        - vddwlmx-supply
->> > +        - vddrfa0p8-supply
->> > +        - vddrfa1p2-supply
->> > +        - vddrfa1p8-supply
->> > +        - vddpcie0p9-supply
->> > +        - vddpcie1p8-supply
->>
->> Like we discussed before, shouldn't these supplies be optional as not
->> all modules need them?
->>
->
-> The answer is still the same: the ATH11K inside a WCN6855 does - in
-> fact - always need them. The fact that the X13s doesn't define them is
-> bad representation of HW and I'm fixing it in a subsequent DTS patch.
+When I was trying to modify the tx timestamping feature, I found that
+running "./txtimestamp -4 -C -L 127.0.0.1" didn't reflect the error:
+I succeeded to generate timestamp stored in the skb but later failed
+to report it to the userspace (which means failed to put css into cmsg).
+It can happen when someone writes buggy codes in __sock_recv_timestamp(),
+for example.
 
-But, like we discussed earlier, M.2 boards don't need these so I think
-this should be optional.
+After adding the check so that running ./txtimestamp will reflect the
+result correctly like this if there is a bug in the reporting phase:
+protocol:     TCP
+payload:      10
+server port:  9000
 
+family:       INET
+test SND
+    USR: 1725458477 s 667997 us (seq=0, len=0)
+Failed to report timestamps
+    USR: 1725458477 s 718128 us (seq=0, len=0)
+Failed to report timestamps
+    USR: 1725458477 s 768273 us (seq=0, len=0)
+Failed to report timestamps
+    USR: 1725458477 s 818416 us (seq=0, len=0)
+Failed to report timestamps
+...
+
+In the future, it will help us detect whether the new coming patch has
+bugs or not.
+
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+v2
+Link: https://lore.kernel.org/all/20240904144446.41274-1-kerneljasonxing@gmail.com/
+1. mainly change from "parse" to "report", update the commit message.
+---
+ tools/testing/selftests/net/txtimestamp.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
+index ec60a16c9307..d626f22f9550 100644
+--- a/tools/testing/selftests/net/txtimestamp.c
++++ b/tools/testing/selftests/net/txtimestamp.c
+@@ -356,8 +356,12 @@ static void __recv_errmsg_cmsg(struct msghdr *msg, int payload_len)
+ 		}
+ 	}
+ 
+-	if (batch > 1)
++	if (batch > 1) {
+ 		fprintf(stderr, "batched %d timestamps\n", batch);
++	} else if (!batch) {
++		fprintf(stderr, "Failed to report timestamps\n");
++		test_failed = true;
++	}
+ }
+ 
+ static int recv_errmsg(int fd)
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+2.37.3
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
