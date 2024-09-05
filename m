@@ -1,181 +1,251 @@
-Return-Path: <netdev+bounces-125552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB20196DA9F
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:45:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A65A96DAB8
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:48:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8D231C20C16
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:45:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE2B3B2304E
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9680199FC1;
-	Thu,  5 Sep 2024 13:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FAC019D8B5;
+	Thu,  5 Sep 2024 13:48:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FjiCD+eJ"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ef//wvJd";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="ef//wvJd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F53D47796;
-	Thu,  5 Sep 2024 13:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFCA17C9AE;
+	Thu,  5 Sep 2024 13:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725543954; cv=none; b=lUPBfSQtl+zl1b3J5zaFEmFXpuAbVIlIhkBfuzWRfvmZVMJvL78l5O2OZS3sDfOiCpHOR7FpMkMYpepaotk8o6rHzvgFlE+Z6Rvqb5fWDKrO5VAUnSc4fVAptyalxPtsFLC1PCrNwjHEdnkTFCytWR1dw+ZwuF5IAjHhpHSa/bc=
+	t=1725544103; cv=none; b=kKPENhNYnsXah5gA2g7qkxKuv3sRThtkQRjUwr2zTNIa5lmkshPkVoG+bK92O+Td7a/9mXXOajmDyQAGOiV83oCx485A+d1jd8Aw11Uh04+EgHYRhitSGIuXzRohxsa7wAAJ1y/AHPlhWtS2Q0h1ZhdkARH1uPc1G076QFjbgLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725543954; c=relaxed/simple;
-	bh=RFuEVp5ebo3g50E2xfpWCD0hDN4ut2/GtUnlb/JbUEc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BzRYF1NR6MBKUYbzZpBx5FjtiVFJrmflb6kmntgniI1k6h3m7FGEIt4BEddw710g55PNp9o2c5y3vWfiOy3CeoFUWh7e3HQ0Bn19swpWmEhxvKnRsOpedutCbVKAFIkNJdV47nr3qLqI8CBrKwuMEKyfabcxI8ULFvCSadOjrCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FjiCD+eJ; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-39f4f62a303so2616005ab.1;
-        Thu, 05 Sep 2024 06:45:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725543952; x=1726148752; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dcxIvkRZU1SqPEsBoyBEtfb+O+7powXbfi0GRTT8Stg=;
-        b=FjiCD+eJjTiLjHNtgjNEqHfEJED7EPdPd/aHIW2Qz6nuuK/Bp90uCWknz17d1k1EaP
-         VoC1RsEBKJivPGqKP407jZXnYfWWvT4HbUFr3D5Jks2U2zSA9w2bo2K0pLNo31GlLRBL
-         6TU53zJpneDZsFoBbhT51oVZgRSh2McPrvvRyNHkp+vYBSagTXNorP9p59UbgGAMP/gL
-         ZSAtOd9hFd+gQD/4SBamVciGAXT88rX9QdDDCNBaE70IWl71WYHM6Thnlq2rJlfoq/2b
-         GBvSgLxhuYaXaXD5WkSywZkmvJnyLshUmuXPCU8/TTjehUSt02Gv1ekHD8UtIipLGR6z
-         o1ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725543952; x=1726148752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dcxIvkRZU1SqPEsBoyBEtfb+O+7powXbfi0GRTT8Stg=;
-        b=wtZ7DQIVww0Mu4CsGYQTT1+02mokZ4k7aU7Si+03L9z6zV2npL7bhQUinTvd3FDiAx
-         Uyve3NimOA6b5plxB6kVokNUXoDIDPHFnI2QWnoKzVDFFJBUfeMnDejWOJB4Pvhh96UL
-         1lN8/0g7/wSyT4cXPEOZm1oFH0IU6EWwbkMTMatC69cI81hTpsghts0WewQLYcGFUw5H
-         CmREGgSvczjbHOHaYm1zc5SiqYpWo+u2C9+FufJvn/oWvLXoIIW4fLFzWGRI+5AaGwgL
-         Z/ICu/x+kVUoqOk3XggdRD9i0pVwVo/Kqjacliv34LomyuuVEPIPZl5dnlPoHt1GU4yu
-         weag==
-X-Forwarded-Encrypted: i=1; AJvYcCVXOnZ0ampnwGM13K6VXzbkVOq4dr7fu2n0GhaQmOphpjr9Q4JZ1MH3Rvd0M7qWaCrrZERV4cvR@vger.kernel.org, AJvYcCWPgx02X088KJhywuYlka3PbOu9rQ7UkMa931Re0MnOjyeCTLAeG1TPG7Jo1Bho68IHUj56h34Gp6ty9sudjms=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJ5d3RGHTderb2qyOU2+AiZx4XPvj1Hbf7yos9oh5OJzgeDWlh
-	Mt4OKL92uqOfUY909ppv8fL1HRNa27xNloULQHQEAKMacvGz5GK/npJkTsJ3AiNs/UYfugI8PA3
-	nWmFJoJYKwnfXAcxkDkUbkSaGaxjBh/4s340=
-X-Google-Smtp-Source: AGHT+IHYMleovLYWsOmzsSPJCWjryeJ9LwIknhwvV7f7hhexuDzYX6uZS1XXOjNtVIzKN88tmXmB2hw9mz30fuiGWak=
-X-Received: by 2002:a05:6e02:1fc2:b0:39d:323d:89b2 with SMTP id
- e9e14a558f8ab-39f6d797daamr118321655ab.26.1725543952369; Thu, 05 Sep 2024
- 06:45:52 -0700 (PDT)
+	s=arc-20240116; t=1725544103; c=relaxed/simple;
+	bh=ceYyMxy8NQZ6ViFSn5P6C9rj44uxDxWa/PsSdTfWqIU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JOOkAVRmOMzQ4zspZ/0QNrrFiBqIBkzM+iXQcj6xfjjCo7xZ1QV13fMXiQkJ8ZrMvBErIp/4Qi1++pbxrK9GCn0cryhzHgU5k0gjNgvW7pkF+TSeKXHCJGAWpBTn7HkPi6IWfNH+NGVJ2O+TVUpr1PytUenXKsRKOx/SX5zKbfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ef//wvJd; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=ef//wvJd; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id CCC971F828;
+	Thu,  5 Sep 2024 13:48:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1725544099; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=2hZs6WSe5dDZCdS3EGNfWyTY3mgEpn84/kVDrJ/Vltg=;
+	b=ef//wvJdaw+dPCVfBcu7atsEVGfy0+ZGAjfSBywPkseVDkdSk0XSbItY1dsLcQr8ygRW7c
+	W/3yo/kmITpdenMb8w/FwpwA+MUWH87iubT2i4JjAHCgiZpY1uzT0vYa26FgNXJfSyvlx4
+	21NWPHM5TbXm3MNCJGqeq70jzL8ukPs=
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1725544099; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=2hZs6WSe5dDZCdS3EGNfWyTY3mgEpn84/kVDrJ/Vltg=;
+	b=ef//wvJdaw+dPCVfBcu7atsEVGfy0+ZGAjfSBywPkseVDkdSk0XSbItY1dsLcQr8ygRW7c
+	W/3yo/kmITpdenMb8w/FwpwA+MUWH87iubT2i4JjAHCgiZpY1uzT0vYa26FgNXJfSyvlx4
+	21NWPHM5TbXm3MNCJGqeq70jzL8ukPs=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9333913419;
+	Thu,  5 Sep 2024 13:48:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id TVnCIqO22WbkDAAAD6G6ig
+	(envelope-from <oneukum@suse.com>); Thu, 05 Sep 2024 13:48:19 +0000
+From: Oliver Neukum <oneukum@suse.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Oliver Neukum <oneukum@suse.com>,
+	stable@vger.kernel.org
+Subject: [PATCHv2 net] usbnet: fix cyclical race on disconnect with work queue
+Date: Thu,  5 Sep 2024 15:46:50 +0200
+Message-ID: <20240905134811.35963-1-oneukum@suse.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240905071738.3725-1-kerneljasonxing@gmail.com>
- <20240905071738.3725-2-kerneljasonxing@gmail.com> <66d9b40ecd086_18ac212943@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66d9b40ecd086_18ac212943@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 5 Sep 2024 21:45:16 +0800
-Message-ID: <CAL+tcoD=hF3OE0e2e2O8BLVyFtQe_XOttJY_8NKnyX+uEh0EQw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/4] net-timestamp: filter out report when
- setting SOF_TIMESTAMPING_SOFTWARE
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, shuah@kernel.org, willemb@google.com, 
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	MIME_GOOD(-0.10)[text/plain];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email,suse.com:mid];
+	RCVD_TLS_ALL(0.00)[]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
-On Thu, Sep 5, 2024 at 9:37=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > introduce a new flag SOF_TIMESTAMPING_OPT_RX_FILTER in the receive
-> > path. User can set it with SOF_TIMESTAMPING_SOFTWARE to filter
-> > out rx software timestamp report, especially after a process turns on
-> > netstamp_needed_key which can time stamp every incoming skb.
-> >
-> > Previously, we found out if an application starts first which turns on
-> > netstamp_needed_key, then another one only passing SOF_TIMESTAMPING_SOF=
-TWARE
-> > could also get rx timestamp. Now we handle this case by introducing thi=
-s
-> > new flag without breaking users.
-> >
-> > Quoting Willem to explain why we need the flag:
-> > "why a process would want to request software timestamp reporting, but
-> > not receive software timestamp generation. The only use I see is when
-> > the application does request
-> > SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_TX_SOFTWARE."
-> >
-> > In this way, we have two kinds of combination:
-> > 1. setting SOF_TIMESTAMPING_SOFTWARE|SOF_TIMESTAMPING_RX_SOFTWARE, it
-> > will surely allow users to get the rx software timestamp report.
-> > 2. setting SOF_TIMESTAMPING_SOFTWARE|SOF_TIMESTAMPING_OPT_RX_FILTER
-> > while the skb is timestamped, it will stop reporting the rx software
-> > timestamp.
-> >
-> > Another thing about errqueue in this patch I have a few words to say:
-> > In this case, we need to handle the egress path carefully, or else
-> > reporting the tx timestamp will fail. Egress path and ingress path will
-> > finally call sock_recv_timestamp(). We have to distinguish them.
-> > Errqueue is a good indicator to reflect the flow direction.
-> >
-> > Suggested-by: Willem de Bruijn <willemb@google.com>
-> > Reviewed-by: Willem de Bruijn <willemb@google.com>
->
-> nit: Reviewed-by tags are only sticky if no changes are made.
+The work can submit URBs and the URBs can schedule the work.
+This cycle needs to be broken, when a device is to be stopped.
+Use a flag to do so.
+This is a design issue as old as the driver.
 
-I got it. I will remove it.
+Signed-off-by: Oliver Neukum <oneukum@suse.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+CC: stable@vger.kernel.org
+---
 
->
-> > diff --git a/Documentation/networking/timestamping.rst b/Documentation/=
-networking/timestamping.rst
-> > index 5e93cd71f99f..37ead02be3b1 100644
-> > --- a/Documentation/networking/timestamping.rst
-> > +++ b/Documentation/networking/timestamping.rst
-> > @@ -266,6 +266,18 @@ SOF_TIMESTAMPING_OPT_TX_SWHW:
-> >    two separate messages will be looped to the socket's error queue,
-> >    each containing just one timestamp.
-> >
-> > +SOF_TIMESTAMPING_OPT_RX_FILTER:
-> > +  Used in the receive software timestamp. Enabling the flag along with
-> > +  SOF_TIMESTAMPING_SOFTWARE will not report the rx timestamp to the
-> > +  userspace so that it can filter out the case where one process start=
-s
-> > +  first which turns on netstamp_needed_key through setting generation
-> > +  flags like SOF_TIMESTAMPING_RX_SOFTWARE, then another one only passi=
-ng
-> > +  SOF_TIMESTAMPING_SOFTWARE report flag could also get the rx timestam=
-p.
->
-> This raises the question: why would a process request
-> report flag SOF_TIMESTAMPING_SOFTWARE without generate flag
-> SOF_TIMESTAMPING_RX_SOFTWARE? The only sensible use case I see is when
-> it sets SOF_TIMSETAMPING_TX_SOFTWARE. Probably good to mention that.
->
-> May also be good to mention that existing applications sometimes set
-> SOF_TIMESTAMPING_SOFTWARE only, because they implicitly came to depend
-> on another (usually daemon) process to enable rx timestamps systemwide.
+v2: fix PM reference issue
 
-Much better. Thanks. I will add them too.
+ drivers/net/usb/usbnet.c   | 37 ++++++++++++++++++++++++++++---------
+ include/linux/usb/usbnet.h | 17 +++++++++++++++++
+ 2 files changed, 45 insertions(+), 9 deletions(-)
 
->
-> > +
-> > +  SOF_TIMESTAMPING_OPT_RX_FILTER prevents the application from being
-> > +  influenced by others and let the application choose whether to repor=
-t
-> > +  the timestamp in the receive path or not.
-> > +
->
-> I'd drop this paragraph. It's more of a value statement.
->
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index 18eb5ba436df..2506aa8c603e 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -464,10 +464,15 @@ static enum skb_state defer_bh(struct usbnet *dev, struct sk_buff *skb,
+ void usbnet_defer_kevent (struct usbnet *dev, int work)
+ {
+ 	set_bit (work, &dev->flags);
+-	if (!schedule_work (&dev->kevent))
+-		netdev_dbg(dev->net, "kevent %s may have been dropped\n", usbnet_event_names[work]);
+-	else
+-		netdev_dbg(dev->net, "kevent %s scheduled\n", usbnet_event_names[work]);
++	if (!usbnet_going_away(dev)) {
++		if (!schedule_work(&dev->kevent))
++			netdev_dbg(dev->net,
++				   "kevent %s may have been dropped\n",
++				   usbnet_event_names[work]);
++		else
++			netdev_dbg(dev->net,
++				   "kevent %s scheduled\n", usbnet_event_names[work]);
++	}
+ }
+ EXPORT_SYMBOL_GPL(usbnet_defer_kevent);
+ 
+@@ -535,7 +540,8 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
+ 			tasklet_schedule (&dev->bh);
+ 			break;
+ 		case 0:
+-			__usbnet_queue_skb(&dev->rxq, skb, rx_start);
++			if (!usbnet_going_away(dev))
++				__usbnet_queue_skb(&dev->rxq, skb, rx_start);
+ 		}
+ 	} else {
+ 		netif_dbg(dev, ifdown, dev->net, "rx: stopped\n");
+@@ -843,9 +849,18 @@ int usbnet_stop (struct net_device *net)
+ 
+ 	/* deferred work (timer, softirq, task) must also stop */
+ 	dev->flags = 0;
+-	del_timer_sync (&dev->delay);
+-	tasklet_kill (&dev->bh);
++	del_timer_sync(&dev->delay);
++	tasklet_kill(&dev->bh);
+ 	cancel_work_sync(&dev->kevent);
++
++	/* We have cyclic dependencies. Those calls are needed
++	 * to break a cycle. We cannot fall into the gaps because
++	 * we have a flag
++	 */
++	tasklet_kill(&dev->bh);
++	del_timer_sync(&dev->delay);
++	cancel_work_sync(&dev->kevent);
++
+ 	if (!pm)
+ 		usb_autopm_put_interface(dev->intf);
+ 
+@@ -1171,7 +1186,8 @@ usbnet_deferred_kevent (struct work_struct *work)
+ 					   status);
+ 		} else {
+ 			clear_bit (EVENT_RX_HALT, &dev->flags);
+-			tasklet_schedule (&dev->bh);
++			if (!usbnet_going_away(dev))
++				tasklet_schedule(&dev->bh);
+ 		}
+ 	}
+ 
+@@ -1196,7 +1212,8 @@ usbnet_deferred_kevent (struct work_struct *work)
+ 			usb_autopm_put_interface(dev->intf);
+ fail_lowmem:
+ 			if (resched)
+-				tasklet_schedule (&dev->bh);
++				if (!usbnet_going_away(dev))
++					tasklet_schedule(&dev->bh);
+ 		}
+ 	}
+ 
+@@ -1559,6 +1576,7 @@ static void usbnet_bh (struct timer_list *t)
+ 	} else if (netif_running (dev->net) &&
+ 		   netif_device_present (dev->net) &&
+ 		   netif_carrier_ok(dev->net) &&
++		   !usbnet_going_away(dev) &&
+ 		   !timer_pending(&dev->delay) &&
+ 		   !test_bit(EVENT_RX_PAUSED, &dev->flags) &&
+ 		   !test_bit(EVENT_RX_HALT, &dev->flags)) {
+@@ -1606,6 +1624,7 @@ void usbnet_disconnect (struct usb_interface *intf)
+ 	usb_set_intfdata(intf, NULL);
+ 	if (!dev)
+ 		return;
++	usbnet_mark_going_away(dev);
+ 
+ 	xdev = interface_to_usbdev (intf);
+ 
+diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
+index 9f08a584d707..d02d6f16da46 100644
+--- a/include/linux/usb/usbnet.h
++++ b/include/linux/usb/usbnet.h
+@@ -76,8 +76,25 @@ struct usbnet {
+ #		define EVENT_LINK_CHANGE	11
+ #		define EVENT_SET_RX_MODE	12
+ #		define EVENT_NO_IP_ALIGN	13
++/* This one is special, as it indicates that the device is going away
++ * there are cyclic dependencies between tasklet, timer and bh
++ * that must be broken
++ */
++#		define EVENT_UNPLUG		31
+ };
+ 
++static inline bool usbnet_going_away(struct usbnet *ubn)
++{
++	smp_mb__before_atomic(); /* against usbnet_mark_going_away() */
++	return test_bit(EVENT_UNPLUG, &ubn->flags);
++}
++
++static inline void usbnet_mark_going_away(struct usbnet *ubn)
++{
++	set_bit(EVENT_UNPLUG, &ubn->flags);
++	smp_mb__after_atomic(); /* against usbnet_going_away() */
++}
++
+ static inline struct usb_driver *driver_of(struct usb_interface *intf)
+ {
+ 	return to_usb_driver(intf->dev.driver);
+-- 
+2.45.2
 
-I see. Will drop it.
-
-Thanks,
-Jason
 
