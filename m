@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-125343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ACA996CC6B
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 03:56:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5640396CC6F
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 03:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1B0C1F25335
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:56:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A6F91C22607
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A74E8BFF;
-	Thu,  5 Sep 2024 01:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E645C2ED;
+	Thu,  5 Sep 2024 01:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qFvMl4kd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VSSIk2UN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4686211185
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 01:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79E838F66
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 01:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725501368; cv=none; b=fHr8lgciIeZxPERZkHr0y35VdpDIAnU6NL5i6KW8I8eSzObWmHleOgnCMFkJYD0U8F67OSRm/axjcx99v4bRJOM6BW6phCMon0yTXhIGLxVWnC1EEx6KQ/u/YISUv07t3n/KqdvPgTu/f4EXoJ90+51gXpCzy9jucKfdofc+y/U=
+	t=1725501530; cv=none; b=aObxW3upDX6iB3oU68lU7hMvTfmPDjZmRoaFpihpic5pg/BcspyeVImgJ7NgoPEfEPFkmJzyFSI/L0wiOjbzrxUxwq9B7m+ds5+Gan+9HRw88syGOFWWFb+kMOjl1tSwFR1Qina8Mjqk8zQVXYiM2ZFs4v2ewS81jLtz/QMU6LU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725501368; c=relaxed/simple;
-	bh=ER/YQRenfgFAaIh9sSTZF2sy46HPM/+nUbIjFGXd7kA=;
+	s=arc-20240116; t=1725501530; c=relaxed/simple;
+	bh=Dp0uIt19uV8jfyz1blroxyh65yMot6gtYdnqFbeY5Wo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IT2sm3sau+sOKKwkOOMvyvgti4ws/SmYKP++03H5u0X0LrQyC/RRyFFFDQw8j1TzpEjZVUMXkHf10MKIBzVTg5EiivLn9OMTnHjzY13L1xGCrtz183FFO/mHvWv9VThkc5N8nCmMEYOnRjp8JmIAyVuQdLCpg83cor6Ii7xlGM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qFvMl4kd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DA3FC4CEC2;
-	Thu,  5 Sep 2024 01:56:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=QEEUgZRQIXtBZkEX5ttAXdfKofuGsUGzvljjEoayWPZPh1vb+whkjoyl7ARA3nVmEMoF2oL6qH3s3Gm3dyeGf/io862aBmBuS83Z9+UdxuArsbYbgw9TjTqnAdKv7ex6nDBKoI7fW0xgZSo67qRsiYw0Q82o1fOdNE7B4FmSVEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VSSIk2UN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57238C4CEC2;
+	Thu,  5 Sep 2024 01:58:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725501367;
-	bh=ER/YQRenfgFAaIh9sSTZF2sy46HPM/+nUbIjFGXd7kA=;
+	s=k20201202; t=1725501529;
+	bh=Dp0uIt19uV8jfyz1blroxyh65yMot6gtYdnqFbeY5Wo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qFvMl4kd53tHu5iZPHxZB9LAADztpL/NyZPPpRKE2EDAJ6kE/i1TNhAbHoYeSYCvQ
-	 uF0a28+LEgRTOH4LRE2ke3yBcYL00dvHbamZ3i9N788K1onKMP9cwPRizDWPhM1mVn
-	 hykWggKdjg9lGDCziSyLAG/MHckczx81rah8d2l9lzEJg19JSXMtF9rLhFB7QLqGYJ
-	 poMk99Njyi2pYvAGWmZQP5biW8sm/V2XmjKX7Cnn1mP8aL5x1ttOvA4XMu7AX65CNo
-	 xTg6vMV5OhdURkHq7YSswja6ZlZIpgj1VREf9o3LXxwwVQ6fnizXrqWBkAxFpDdu5R
-	 93Ew5fUtCPwrg==
-Date: Wed, 4 Sep 2024 18:56:06 -0700
+	b=VSSIk2UNCV0ui1IywpeOjyXPH0o6sqeolm49JPArO+VfXLeexPCQSWqoo09RYEF7V
+	 rilv4BfCu3N7hL1bEI0Rkhq9Ruo/1RXmGMRDu5RnM4V7JM1tvoaBciXHqedGJL/wah
+	 uWZ0zKw51cCv0BsnD3+16sfRNIoPDvhIu5xm7yKAUIHbclj7+47pFY/EMcvCppY+Xu
+	 9O4Tf98ShoyQRGaZEQGPURH6B7sA4+Sszx4zZUEc6Mp3UBJmSWecHiIkh4GgfgP+EJ
+	 kvowgyUCeYdkJvVRGcqZ79BVRzAimdjPndcEhYHjDi1u7chQcrgGBVFzen3o32LvMu
+	 djDONxxm4dDNw==
+Date: Wed, 4 Sep 2024 18:58:48 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
@@ -51,12 +51,11 @@ Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
  <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
  anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
  intel-wired-lan@lists.osuosl.org, edumazet@google.com
-Subject: Re: [PATCH v6 net-next 10/15] net-shapers: implement cap validation
- in the core
-Message-ID: <20240904185606.366ef437@kernel.org>
-In-Reply-To: <70576ddc8b7323192c452ee1c66e7a228f7d8b68.1725457317.git.pabeni@redhat.com>
+Subject: Re: [PATCH v6 net-next 14/15] iavf: Add net_shaper_ops support
+Message-ID: <20240904185848.19a7f588@kernel.org>
+In-Reply-To: <f95f1e851e8e40bbd9cd382e42f72e12998a122c.1725457317.git.pabeni@redhat.com>
 References: <cover.1725457317.git.pabeni@redhat.com>
-	<70576ddc8b7323192c452ee1c66e7a228f7d8b68.1725457317.git.pabeni@redhat.com>
+	<f95f1e851e8e40bbd9cd382e42f72e12998a122c.1725457317.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,23 +65,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed,  4 Sep 2024 15:53:42 +0200 Paolo Abeni wrote:
-> Use the device capabilities to reject invalid attribute values before
-> pushing them to the H/W.
-> 
-> Note that validating the metric explicitly avoids NL_SET_BAD_ATTR()
-> usage, to provide unambiguous error messages to the user.
-> 
-> Validating the nesting requires the knowledge of the new parent for
-> the given shaper; as such is a chicken-egg problem: to validate the
-> leaf nesting we need to know the node scope, to validate the node
-> nesting we need to know the leafs parent scope.
-> 
-> To break the circular dependency, place the leafs nesting validation
-> after the parsing.
-> 
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+On Wed,  4 Sep 2024 15:53:46 +0200 Paolo Abeni wrote:
+> +static int iavf_verify_handle(struct net_shaper_binding *binding,
+> +			      const struct net_shaper_handle *handle,
+> +			      struct netlink_ext_ack *extack)
+> +{
+> +	struct iavf_adapter *adapter = netdev_priv(binding->netdev);
+> +	int qid = handle->id;
+> +
+> +	if (qid >= adapter->num_active_queues) {
+> +		NL_SET_ERR_MSG_FMT(extack, "Invalid shaper handle, queued id %d max %d",
+> +				   qid, adapter->num_active_queues);
+> +		return -EINVAL;
+> +	}
+> +	return 0;
+> +}
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+This can go once we have the real_num validation in the core?
+Otherwise LGTM!
 
