@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-125529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 795B196D899
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:32:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A6C296D8B4
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:35:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22EB51F27614
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:32:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0458EB24171
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:35:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC8B19885F;
-	Thu,  5 Sep 2024 12:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3454919B3C1;
+	Thu,  5 Sep 2024 12:35:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="WxoLhdEv"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="swrOoSqv"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
+Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EB6483CC1;
-	Thu,  5 Sep 2024 12:32:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E43176AD7;
+	Thu,  5 Sep 2024 12:35:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725539561; cv=none; b=ArFd1EcI0Lak6RblzNWInpNkh/cH1ywqUjEKIAkjyS/zSQglHes+lthfvkGa9EFvQ8TBCOPVM8Z3kElVDFpupupwFDqlyWKbiQl2mRPfw8i/o+dqql05uBKLncJHKkYjBLJIaO4y0YLJCKx4Fl0Clp/IIxnozwUOQKiT7srZT2k=
+	t=1725539730; cv=none; b=FMTKYpJLQmqBqhHKLHV+hLrVEWOMUdpE9txqZ5Hhh7ard7Hz8Vc0oUDu3gMzOmGvXxl6JAwRbL6EVj2h5GrZ0NRWrmqUjpv8AaHR2A9vsfJB9ss2WpjZ5zPk0UcfCnPSrfDnvhVipPq1LhYypW/g5+WEFul5yfZPQ2Mm4W0Z83w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725539561; c=relaxed/simple;
-	bh=HVh93pepYoAKfpPEaWrHxeaPoymB5ommkntQdUOkBjU=;
+	s=arc-20240116; t=1725539730; c=relaxed/simple;
+	bh=eWXnFcXSlzMYQpZW8Hy8qFqCdpL0PX9kvItTRaNmrFg=;
 	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=RYLmtqGLPAdm+QG1Tirl3ppJfgVurGCMuqhbuo7nt8BhbePHkRqH4DGhxgCqFNJtJsbBOH/xhx8jOOMZ7MJPoy5u/2iRdMQc2o+8gg+VGVm9R/MiABapZKay8U0BT4nlmcc75+psnwYJ0joUBF6eqyfardxry77ZEFEmFX0eRlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=WxoLhdEv; arc=none smtp.client-ip=162.62.58.216
+	 MIME-Version; b=lsVW9mLAVd8sIo9E7X+rc6r7A2ICQArbJJ/96Q3uIZqwm8RZRuggWTUqrWwfLWJbb1lCTvBKHOtA9alYrdkaDWMaPfgOYLRBUg2fZOfIeGz5j9Jh1Hzl/tls3kaVeky4qOsIXk2WfMnlVI6F1xxnEZ72UzwgMj3lGSTai40PTX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=swrOoSqv; arc=none smtp.client-ip=162.62.58.211
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1725539247; bh=qodMNKlPXyc76Cao7+xhzyFv6t1EQEjqqQcbA2Td10U=;
+	t=1725539723; bh=FYqDZVG9wIGuqWD1evRlumoDPPlBGI6xaAt0w2ApOKI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=WxoLhdEvCUPogxOGrapY6FhY61qtFUV0Y58STaSZCZM0+qWAs7IEQk8Wkb/cyuA3s
-	 6xGdL744mz4FVAShEvlrzHHvLeSzAU8b20vb8X+dAa4cl5OjyT8hmJ+KOhOoxpjmvf
-	 M9oXZ8XDzsFD+MWoW2uDe9bSjt5OKa+jaF5n4Dn8=
+	b=swrOoSqvVYYpveRg3nka4qO3brIdY+TbrR7AiG6ozWQv2E08f34fIaPCbzzJL7Hol
+	 CIXMM9IYm9VlcSLfABEZPHnBmOMX/bdMY0hTmjqIA5hMmhQoZ0L0aODfUmmRwN14VA
+	 1VMJ+ZxfBOawcBI/w7kiIkuL7HQ6neXlQe9oTCfQ=
 Received: from pek-lxu-l1.wrs.com ([111.198.224.50])
-	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
-	id 6D6A0665; Thu, 05 Sep 2024 20:27:22 +0800
-X-QQ-mid: xmsmtpt1725539242t5go7kv95
-Message-ID: <tencent_F85DEC5DED99554FB28DEF258F8DB8120D07@qq.com>
-X-QQ-XMAILINFO: MmPNY57tR1XnHqK/65UZE20SWfbTYSAz5PhmdlyMBE9kProXUj5Wsi8IeF41NV
-	 IXBR7BQaFlDZEHX+/MEOqeVAcnN6QbSg+QeX+euQsaTaAxenwcNVIMAPem0+MARsed/wHB3FEY8J
-	 3skTo5vNGS5ZyzHbJ6Gx2YfAndwBEGH/aMT47AsSD2ObR2vFcw51zpX7IaWyu9imqObHWKp8VNrb
-	 Js4pjbgyIPf5/GhCgg9rRkclTo7z9uEheGppYyU9TVycR9h5R7YQEW+ekBil6nyqcywaEoWS+dT2
-	 OQKqSvS+kgIHJ7mSEHsVOIv0I6W4sWpsgYHR2jfjOI2/Nla+R7FxwRMplcH81dAKHPhW+NUdCsro
-	 35Nb6ShYVB2dgBh0MO57n4zRhlxb4BxnxglZ0DNcZzlZy/dUF2/I1YYwiqmzTPsZCNfhZn25r7lT
-	 i4/fCdT/BKyxUd+G2gZyI4gsWJR3tfwp7EkVqz9op2RmaO9HKp2wSW0Sn7GiT+cLRxnsdr76hT6g
-	 OxanBUyAwT9chPMeT03HnDWYTN1zfPo6XXJhZcUXqk4Gc8OaCCfh3WlxeVHCHe2WUiX12qA11/rh
-	 WShjZ4m13b8qhJmgVrg5grTeo0aGUugqaLM4yswgrr2I9IyRBI/8CWiVojxTtMRRP4OxXAP4cpfO
-	 /7iOlG49XiZeBnFsOGivpfoUcbZorK7sI0zJh2LwcoIw+0DfIjQUbuBOX0YO/oXimAJUAAt40f+6
-	 PiRd2Ix3UgfUGKqhGUYFnq1J4LAfIu7sFXXoQd4/0j/TQMdEtnhz4yEFVjqdA0PrUAtrqL7XW0PM
-	 1uE0tNxjJzIWaZDkp/gv8ZS9ohWWY+d96HrDz/D//dsUVFXZqJaOVRY/xAIiT258zFRs8JRYHdsa
-	 O6BdJIe6OVSBmURo4XVKVsQiB+WspKZfH+3biNsWCo+iUShH0fqY4nAtndac9iNxbd/+44Euiwii
-	 Uw6X7S1lrhobO4saw+pyV9U8dEE88YkrPx8qhfKIY=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+	by newxmesmtplogicsvrsza29-0.qq.com (NewEsmtp) with SMTP
+	id 8D2B8AF4; Thu, 05 Sep 2024 20:35:18 +0800
+X-QQ-mid: xmsmtpt1725539718tebrv7rw3
+Message-ID: <tencent_3FBF36AE969036864BB0748977C9669E3D09@qq.com>
+X-QQ-XMAILINFO: NDgMZBR9sMmaj0aSd45lpCIQQB/+lGDZ2eDgjriY7MWap0RDnHx+QehVevXjl0
+	 Of8aphvnf6o3YDhbDoc3p4yEsgL0Z2fDmlexQYXrx7gLLdpTLHK52vn/uFiKsphh59ce7iD4b2ws
+	 O7XxZXV1Jho2F9pteCXHH8+vHog5l0ioy7tk7QXSPiIIYU5bE9BKYDXUVS1a5RFZKCBCyc4OZbJK
+	 dnNX7mLstjyuVyxNP5qI3POAXUbkYO7knr4BUeJRWbFY65lPloWqFGH7M7w6fFrwvBRCE/oLxUqX
+	 Lulo0fR4DiGbU5R0cQBdvVqGvzPuyDC8smoUBn4gAQEitZbFCtXIJF7h7iQYnASXJHBTTXPmUY+8
+	 wDhfQjNc1TzQh5N4RwXfOdtDxvj7lwGNlAnpRHLvjMlN2uGTDMzK0mxElsjcr5wWEKA5PP/0j3rw
+	 VzIUn52zfBWZdxY3POeaymJ55M+KW/QAOHCoR+bDwo030/gbv3MHYkjBYREA8pyy9Udy4tA1HJA7
+	 wnZMtQKcY4SdjFs7mNlxnN8p7uz+2lhh5VO+dLkzgoWLFY83WEuxL4hUyUEOrQCstnKz+4y3ZDCG
+	 7S0mCNaHPG68pFZp3a6p3D3PzOhJVenaJteANLLSgId7uoqqeKxtPhR40izo1L7xWljQMZ9mMtXs
+	 mCI5T++YYroviruLcH8sz9tCtqz1Tvn7b1sFRGOmZHnaTzvOvDdqoIOGVz7GMjmvM7yTKm/yE1GG
+	 X94gRs2O0f8uDoEKxZ+2voMTYAib9j6nAAiYAp0J3PLKmCRlFlX1a8SDIjMdDLixMV1jxhTAt8Pk
+	 Mwj4lUuM3aSeJ+amOEiQDYLcofNKrPJhVH+3QKsUHRHTv1yFGklVXGL2zJyUYf4DNZTUemcqzc24
+	 dAShELWjMHpQKON/+zChxkrCV1G1kctvoiIN6m4Se7b9+DhrNmOf9Zg3UZ5FPBDWwKFeMR3rIzvF
+	 mHn6FrkFBFI3pYiro21+LAD3o7vhmjtO7kuVghG4k=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
 From: Edward Adam Davis <eadavis@qq.com>
 To: matttbe@kernel.org
 Cc: davem@davemloft.net,
@@ -71,9 +71,9 @@ Cc: davem@davemloft.net,
 	pabeni@redhat.com,
 	syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com,
 	syzkaller-bugs@googlegroups.com
-Subject: [PATCH net v3] mptcp: pm: Fix uaf in __timer_delete_sync
-Date: Thu,  5 Sep 2024 20:27:23 +0800
-X-OQ-MSGID: <20240905122722.93763-2-eadavis@qq.com>
+Subject: Re: [PATCH V2] mptcp: pm: Fix uaf in __timer_delete_sync
+Date: Thu,  5 Sep 2024 20:35:19 +0800
+X-OQ-MSGID: <20240905123518.101921-2-eadavis@qq.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <e4a13002-f471-4951-9180-14f0f8b30bd2@kernel.org>
 References: <e4a13002-f471-4951-9180-14f0f8b30bd2@kernel.org>
@@ -85,86 +85,82 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There are two paths to access mptcp_pm_del_add_timer, result in a race
-condition:
+On Wed, 4 Sep 2024 22:39:10 +0200, Matthieu Baerts wrote:
+>On 04/09/2024 03:01, Edward Adam Davis wrote:
+>> There are two paths to access mptcp_pm_del_add_timer, result in a race
+>> condition:
+>>
+>>      CPU1				CPU2
+>>      ====                               ====
+>>      net_rx_action
+>>      napi_poll                          netlink_sendmsg
+>>      __napi_poll                        netlink_unicast
+>>      process_backlog                    netlink_unicast_kernel
+>>      __netif_receive_skb                genl_rcv
+>>      __netif_receive_skb_one_core       netlink_rcv_skb
+>>      NF_HOOK                            genl_rcv_msg
+>>      ip_local_deliver_finish            genl_family_rcv_msg
+>>      ip_protocol_deliver_rcu            genl_family_rcv_msg_doit
+>>      tcp_v4_rcv                         mptcp_pm_nl_flush_addrs_doit
+>>      tcp_v4_do_rcv                      mptcp_nl_remove_addrs_list
+>>      tcp_rcv_established                mptcp_pm_remove_addrs_and_subflows
+>>      tcp_data_queue                     remove_anno_list_by_saddr
+>>      mptcp_incoming_options             mptcp_pm_del_add_timer
+>>      mptcp_pm_del_add_timer             kfree(entry)
+>>
+>> In remove_anno_list_by_saddr(running on CPU2), after leaving the critical
+>> zone protected by "pm.lock", the entry will be released, which leads to the
+>> occurrence of uaf in the mptcp_pm_del_add_timer(running on CPU1).
+>>
+>> Reported-and-tested-by: syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com
+>> Closes: https://syzkaller.appspot.com/bug?extid=f3a31fb909db9b2a5c4d
+>
+>Please add a Fixes tag and Cc stable.
+>
+>And add 'net' after PATCH in the subject:
+Got it, I have added them in V3 patch.
+>
+>  [PATCH net v3]
+>
+>> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+>> ---
+>>  net/mptcp/pm_netlink.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
+>> index 3e4ad801786f..d4cbf7dcf983 100644
+>> --- a/net/mptcp/pm_netlink.c
+>> +++ b/net/mptcp/pm_netlink.c
+>> @@ -1430,8 +1430,10 @@ static bool remove_anno_list_by_saddr(struct mptcp_sock *msk,
+>>
+>>  	entry = mptcp_pm_del_add_timer(msk, addr, false);
+>>  	if (entry) {
+>> +		spin_lock_bh(&msk->pm.lock);
+>>  		list_del(&entry->list);
+>>  		kfree(entry);
+>> +		spin_unlock_bh(&msk->pm.lock);
+>
+>Mmh, I can understand it would help to reduce issues here, but I don't
+>think that's enough: in mptcp_pm_del_add_timer(), CPU1 can get the entry
+>from the list under the lock, then immediately after, the free can
+>happen on CPU2, while CPU1 is trying to access entry->add_timer outside
+>the lock, no? Something like this:
+>
+>  CPU1              CPU2
+>  ====              ====
+>  entry = (...)
+>                    kfree(entry)
+>  entry->add_timer
+>
+>
+>What about keeping a reference to add_timer inside the lock, and calling
+>sk_stop_timer_sync() with this reference, instead of "entry->add_timer"?
+>I'm thinking about something like that to be applied *on top* of your
+>patch, WDYT?
+I strongly agree. This can avoid accessing the entry outside the lock.
+I have integrated your code to my patch.
 
-     CPU1				CPU2
-     ====                               ====
-     net_rx_action
-     napi_poll                          netlink_sendmsg
-     __napi_poll                        netlink_unicast
-     process_backlog                    netlink_unicast_kernel
-     __netif_receive_skb                genl_rcv
-     __netif_receive_skb_one_core       netlink_rcv_skb
-     NF_HOOK                            genl_rcv_msg
-     ip_local_deliver_finish            genl_family_rcv_msg
-     ip_protocol_deliver_rcu            genl_family_rcv_msg_doit
-     tcp_v4_rcv                         mptcp_pm_nl_flush_addrs_doit
-     tcp_v4_do_rcv                      mptcp_nl_remove_addrs_list
-     tcp_rcv_established                mptcp_pm_remove_addrs_and_subflows
-     tcp_data_queue                     remove_anno_list_by_saddr
-     mptcp_incoming_options             mptcp_pm_del_add_timer
-     mptcp_pm_del_add_timer             kfree(entry)
-
-In remove_anno_list_by_saddr(running on CPU2), after leaving the critical
-zone protected by "pm.lock", the entry will be released, which leads to the
-occurrence of uaf in the mptcp_pm_del_add_timer(running on CPU1).
-
-Keeping a reference to add_timer inside the lock, and calling
-sk_stop_timer_sync() with this reference, instead of "entry->add_timer".
-
-Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
-Cc: stable@vger.kernel.org
-Reported-and-tested-by: syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=f3a31fb909db9b2a5c4d
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- net/mptcp/pm_netlink.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index 3e4ad801786f..7ddb373cc6ad 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -329,17 +329,21 @@ struct mptcp_pm_add_entry *
- mptcp_pm_del_add_timer(struct mptcp_sock *msk,
- 		       const struct mptcp_addr_info *addr, bool check_id)
- {
--	struct mptcp_pm_add_entry *entry;
- 	struct sock *sk = (struct sock *)msk;
-+	struct timer_list *add_timer = NULL;
-+	struct mptcp_pm_add_entry *entry;
- 
- 	spin_lock_bh(&msk->pm.lock);
- 	entry = mptcp_lookup_anno_list_by_saddr(msk, addr);
--	if (entry && (!check_id || entry->addr.id == addr->id))
-+	if (entry && (!check_id || entry->addr.id == addr->id)) {
- 		entry->retrans_times = ADD_ADDR_RETRANS_MAX;
-+		add_timer = &entry->add_timer;
-+	}
- 	spin_unlock_bh(&msk->pm.lock);
- 
--	if (entry && (!check_id || entry->addr.id == addr->id))
--		sk_stop_timer_sync(sk, &entry->add_timer);
-+	/* no lock, because sk_stop_timer_sync() is calling del_timer_sync() */
-+	if (add_timer)
-+		sk_stop_timer_sync(sk, add_timer);
- 
- 	return entry;
- }
-@@ -1430,8 +1434,10 @@ static bool remove_anno_list_by_saddr(struct mptcp_sock *msk,
- 
- 	entry = mptcp_pm_del_add_timer(msk, addr, false);
- 	if (entry) {
-+		spin_lock_bh(&msk->pm.lock);
- 		list_del(&entry->list);
- 		kfree(entry);
-+		spin_unlock_bh(&msk->pm.lock);
- 		return true;
- 	}
- 
--- 
-2.43.0
+BR,
+Edward
 
 
