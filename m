@@ -1,125 +1,110 @@
-Return-Path: <netdev+bounces-125477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B04496D3AB
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:44:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89BF296D43E
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:50:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FB211C222E4
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:44:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8BD61C235B7
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710D319884A;
-	Thu,  5 Sep 2024 09:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E719C198A22;
+	Thu,  5 Sep 2024 09:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CpjR9Ma6";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DXuSTmD7"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="kl1P7WPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12A819538A;
-	Thu,  5 Sep 2024 09:44:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76624154BFF;
+	Thu,  5 Sep 2024 09:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725529466; cv=none; b=pYrGyk/+j6XxXb8r9/MoNMmKm35RObqYCRJMHsZZhcuavWmOYTfY/RPRlqevt8D5SJJ+y9Q2rj5Z+A0GsxiGG/Rvfap/6bd5ySNdAMEVB86vMVTLgVJ2LQrb3/djvEwBM9uLpMNrlwD+6A298jkZI+yzafiaPWhAXrE9lFp8wF4=
+	t=1725529796; cv=none; b=H+Nve023fUomFROJkUa5s7yvmQ3iTxr86g+qtYUrIEGVCmCTnbY+oFWIHQteeuaRaNGyx73eQe/zCSvExJe2H07P+IO2vnnKjyGSIF1kzmj8IVLb2vwksVlgCe/i/cfOLT9pEZV50h5a37XkhVKU80AbTcXIpYR0UJoX+5wGQMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725529466; c=relaxed/simple;
-	bh=gGXv2tnI6Kmy/fRpA12pfvXh3zAcEJ16hhyiGQtJuuQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=TnaQMVCo14FVnsn5XuMEKCbq46EMPYVYyl2izUR/xkHhuV8CiVRX5Z317YO6OJhaqFWrdt9x5TXif0KFuf6TJF2Kr51ee7mAosiZHtEIDEG6ISTjoOh/k135vPG8Ju+5kdBEDevjvdKBq/YDVfaMVuyRhyvOf8AQrbk5O12Qzz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CpjR9Ma6; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DXuSTmD7; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1725529463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gGXv2tnI6Kmy/fRpA12pfvXh3zAcEJ16hhyiGQtJuuQ=;
-	b=CpjR9Ma61exW7ol3UmrSxBVZ3HgZSNHq6VurgZkDkqRT3+qAwrol5qU/31/K9CszDQLYCz
-	pBN9OLhLrsRPgoOAF0rxP7/bs5aAA6LfW0dsZ96eTsjOH5MsoFn8tQmk5AfDaMfHEfYWhY
-	KA4hiNEbEzs0ow4fS9wEPuz6De0b0jEK7yanHLz1Cyn21R5R/vzX/ZQuyIEvCr3sqVlhwI
-	Ysm7ip1QS4+f8DIlxDys11NXnDhs5kZ6T4Y+Qbk4b4IwYV3Ryj1yymUoD1h9XxLR3G1bgI
-	vIv+x4FLWlH9+DO/bj338t4X/NlKc8rQkfQP09eEmavLdciMumU0UjQ3J5ZK1A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1725529463;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gGXv2tnI6Kmy/fRpA12pfvXh3zAcEJ16hhyiGQtJuuQ=;
-	b=DXuSTmD79xdrAwAAK2+Ih6jQ8eBF2b/l68XFagpc8QLc/Ba9bufw3B/j6DmNHY5nct76pl
-	f5u8BOWnQ7AtdHCA==
-To: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org
-Cc: sasha.neftin@intel.com, vitaly.lifshits@intel.com,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- bpf@vger.kernel.org, bigeasy@linutronix.de, Vinicius Costa Gomes
- <vinicius.gomes@intel.com>, Simon Horman <horms@kernel.org>, Mor Bar-Gabay
- <morx.bar.gabay@intel.com>
-Subject: Re: [PATCH net-next 2/6] igc: Get rid of spurious interrupts
-In-Reply-To: <b5120c1e-4312-40da-8c11-c0af035dbbb5@intel.com>
-References: <20240830210451.2375215-1-anthony.l.nguyen@intel.com>
- <20240830210451.2375215-3-anthony.l.nguyen@intel.com>
- <b5120c1e-4312-40da-8c11-c0af035dbbb5@intel.com>
-Date: Thu, 05 Sep 2024 11:44:20 +0200
-Message-ID: <87bk12sadn.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1725529796; c=relaxed/simple;
+	bh=0S0H83l6fC4Gq4loy2ushvxa4ICJQSblhpAJmXE+U64=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RQiOUVRlVNVmNd84PfWUxjyCIQIvWluwya0+gy8r0924TjXje/9ra5rM3uQlGoVYDoTuQmxTcYSLkv0UDNUs+kWryYLjXf1HBPpLOiGajBjB3mRZ+OYD6Ng4qkqP2GAZW4zO7WPDtNXj50V5Myvafrmw0yZ/twDql2h78G4rt7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=kl1P7WPa; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4856JncO009304;
+	Thu, 5 Sep 2024 02:49:41 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-type:date:from:message-id:mime-version:subject:to; s=
+	pfpt0220; bh=pw0O+nS6TwgD0Ch/iHXkW2k7R0FZpS0DWYRqNKU7pzQ=; b=kl1
+	P7WPaemzkzx1uNb7r2qUJh2BBxe54naJwgjkEM8+gUc/LtSsKsqIoLTMpvXypHRc
+	eyh5pbfwB/2yj1EeIqhr6VSnzjGdgNd5bVORdcsCa/E+/LDzsTpgIO7isC+n25kn
+	5deDvJiLC3TrWpGqVUlx9laZxLFq/MsvQiKkp5KwXD7+D6Vl+li2mL2FTITMr8Mu
+	OT/e7HCetfH26ee82mUha6i6NLRRxoPQJ8cbllMdPGnYIzZ0MbjjuxpOlG1P9Qf1
+	OLVof2fDZu80pvF4cePGhdHg+06qm2NQYXWJgipEFSfnvtF6vTfj994CY1BxQw/5
+	MU/SOpZPHL8VZM0UMug==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 41f79drrwm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Sep 2024 02:49:41 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 5 Sep 2024 02:49:40 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 5 Sep 2024 02:49:40 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 939CB5B6928;
+	Thu,  5 Sep 2024 02:49:36 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <jiri@resnulli.us>, <edumazet@google.com>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net-next PATCH v2 0/4] Refactoring RVU NIC driver
+Date: Thu, 5 Sep 2024 15:19:31 +0530
+Message-ID: <20240905094935.26271-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
-
---=-=-=
 Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-ORIG-GUID: _Ns2sRkNmOPaXYS9rwbg0OlBi9RlKRMH
+X-Proofpoint-GUID: _Ns2sRkNmOPaXYS9rwbg0OlBi9RlKRMH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-05_05,2024-09-04_01,2024-09-02_01
 
-On Thu Sep 05 2024, Dima Ruinskiy wrote:
-> On 31/08/2024 0:04, Tony Nguyen wrote:
->> - wr32(IGC_ICS, IGC_ICS_RXDMT0);
->> + struct igc_ring *rx_ring =3D adapter->rx_ring[0];
->> +
->> + if (test_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags)) {
->> + clear_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
->> + wr32(IGC_ICS, IGC_ICS_RXDMT0);
->> + }
-> I have some concerns specifically about this code (Legacy/MSI interrupt=20
-> case). The code only checks the IGC_RING_FLAG_RX_ALLOC_FAILED flag of=20
-> ring 0. What if the failure was on another ring? It seems proper to=20
-> iterate over all Rx rings in the adapter (I believe igc can have up to 4).
+This is a preparation pathset for follow-up "Introducing RVU representors driver"
+patches. The RVU representor driver creates representor netdev of each rvu device
+when switch dev mode is enabled.
+ 
+RVU representor and NIC have a similar set of HW resources(NIX_LF,RQ/SQ/CQ)
+and implements a subset of NIC functionality.
+This patch set groups hw resources and queue configuration code into single API 
+and export the existing functions so, that code can be shared between NIC and
+representor drivers.
 
-In case of Legacy/MSI only one vector, one rx queue and one tx queue is
-utilized. The MSI-X code has to check for all rings, which it does.
+v1-v2:
+- Removed unwanted variable.
+- Dropped unrelated changes from patch4.
 
-Thanks,
-Kurt
+Geetha sowjanya (4):
+  octeontx2-pf: Define common API for HW resources configuration
+  octeontx2-pf: Add new APIs for queue memory alloc/free.
+  octeontx2-pf: Reuse PF max mtu value
+  octeontx2-pf: Export common APIs
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+ .../marvell/octeontx2/nic/otx2_common.c       |   6 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |  15 ++
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 238 +++++++++++-------
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |   5 +-
+ 4 files changed, 169 insertions(+), 95 deletions(-)
 
------BEGIN PGP SIGNATURE-----
+-- 
+2.25.1
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmbZfXUTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgiKeD/42QTepFNA6epyU/zNqzqU0qCA25hTH
-lC6C/GnsMXI1s+5SgOGDHqYlcf20vKatKaUk/qAfHQhzzetqwSU79e22KGJFEcJC
-dzIoLB1t2PWw9c1ehjRaCNQTqUrmS7INoJOFPlg0te9rk7EqtnRrO6cmCPGgd9Ur
-gldScf+9FuH0ya9oOFP6nF4okyddRdUSlKDCAKksVDB4WGpSAJzEkTg1Nxg1lgNs
-SAJqom/JGlAv6ZcF33pPlU0tQtMvjX0/s865/QaF+S5rbiyvGBZKN5t6AIXB1u+1
-f+UmRomSp+GqoX0Fg9uxb1R9MrD9mNAB50oA4gV4DXdrFpOWRkduNZ+1TorvU0vP
-xeqpR1yXrr7un8+KnzF664fIA7tmg8XSoys3TG/mt8Fo+3i+gXwI09Ca1YPcDGei
-3Lbpc5D9mgtMSVt9bEULUgbwLjTjPQe8KSWB+xku7lUEFrXXA+b/DRIAZtkIHAky
-uii3Ra2M1484XvdzjzE7rNU9W7OriSJyopg1FLJt0vVPfkTUKaiYS+UJtJIGb1KM
-KU2FY6rJC4yIi1IttsYNUQ8KL3nc/Y4ku0K/uHS5B+4WFC+GyghS8RQFVCTQOWg3
-fNJtDR0w+p+fFyBdIyCwNDN3b/l+YJEE16jSWTDnBuG047XIlfDFK89WbSNPDfVv
-vfRy4KKEGvi4Kw==
-=hG9B
------END PGP SIGNATURE-----
---=-=-=--
 
