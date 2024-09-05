@@ -1,112 +1,113 @@
-Return-Path: <netdev+bounces-125539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A07D796D9E5
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:12:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A4A496D9FF
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 232AA1F230C1
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:12:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA68F1F2201E
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 242F819C561;
-	Thu,  5 Sep 2024 13:12:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7652319CD19;
+	Thu,  5 Sep 2024 13:17:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lIlJGI4I"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ed3/0FsR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51F61CFBC;
-	Thu,  5 Sep 2024 13:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7EA198852;
+	Thu,  5 Sep 2024 13:17:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725541971; cv=none; b=cTn8HVq8ykQMFYkTq2B56FJZOVLclZqGzQr4LKHW/zerrCmdk7rQH7ZUJFEOgwi91d3TSdVzGsue34XaWNkohVFfCMGQQ4vOVgRi61pMLRqWn4Cne4XgabRLFdqDIOfO6eCDah/sLUFaP0+2UoeLQkPqv63mMbHtOd0VYT1v7vE=
+	t=1725542264; cv=none; b=Atf8MQx9pJ738ooO3X8MAk6Y7aFl/UxSjWl46Wqjzw2+Ed4+MglWQ+/NpGEuKKRXQVm/CXlEumVNFs14LXlpXs9KYKFJ5aZ7g7VaNMTm1hu5jiOzJY1A3o1DTf83WpqhISLrdOlBco0GU2PFBdc34izy37TxR3WpuwOvHA3SlWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725541971; c=relaxed/simple;
-	bh=I02uF2EzqpWyIfum1tsxP20QjcYiXAczbcVcgpUb0jE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=W917tintCbKyDkfWvDARrnQ0dUT+HINVcXTG/Glin4yWNFoydLx01gBeoSRuW/fSDmLeHZVYzeAkR5gTST4huFHB88lQ1FeD4xl8D55nPJAixtHnJloBOMBKM3NdKnog8Vim9upfSjKUQXyKCdurMEZxhBMihnG1lb9l9mk3888=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lIlJGI4I; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-7179802b91fso120977b3a.3;
-        Thu, 05 Sep 2024 06:12:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725541969; x=1726146769; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mf1hn6rFJNXfTXIyUkUoh/2ZaZwDqRlw4GMc6mm/SWo=;
-        b=lIlJGI4IwdxdqZnVmqbZeKVCpeK+CP9EW4BiG8xA64V2jcK176wXSzjuhic/4tX0jE
-         D6qJlEnKuPiHrJ6WQ6JItxAJoBrUPG0C6CEyW50Enqh9ZQVj1Vk9lv6/pCA4MAQriiZ4
-         t2N66pc08eC4mnLOkQEq+ySCJqGzOviqUfwgZ1/owPdG0gBOaVTwgcYdr/X9saNCq8B3
-         j9cFHjwgYsAvADDQtxGUfHwPI1L12SrHMAf6EDnev60Mt8mC5MVbquDk3CZYQhzPzkQS
-         kj9DbO+hkdAslVjedMq5Nigo6IFfbcjuSxCDQ+CbMA+kV0RF+TyY89x1hEN0neKJ8suI
-         Ugwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725541969; x=1726146769;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mf1hn6rFJNXfTXIyUkUoh/2ZaZwDqRlw4GMc6mm/SWo=;
-        b=FoTL+Lsb8R6G5GfLPnuex4LkrpZ0WqBPpcXbt1iiBcYsdoQEcNSbTsrnERP0aEJ7Vp
-         OfLD17d9rUHnm4xi+QBq53Vf5ysu1dmaPBZ2pFVb3iiJmSI3GuzzDFm9z2jFgkws9cjR
-         ES1Plenz85sZtLUS2+56RzPxG/gDor/n3S7YUaiCuZj4SBDQm6kH2tPmGt7m/bct4wyH
-         KZnrRC5ZeJEC6P/FSJio/I/zGO0AEwXKsNnwUyz7uw7cMHeLSAu7PkoD8S9lK6/8GPUB
-         mEmufS3rKSiknTtHjn6KSGCZpF8GKN2httuS0KmYTpNanmoQqyRnk5JRTS/z3LnvDnpT
-         Sl5w==
-X-Forwarded-Encrypted: i=1; AJvYcCUZgKUYqJnHWLkE2reBcuKX/21LlR/55wgKB+cTIoPfwrf2P6Qq74wrXplhhn3hklV2eoxIy4PR@vger.kernel.org, AJvYcCVvvNVwUr+2cvyy+TISpnVwneZ1ToT/G4gNHZhaojFs86pFVGWXD1hSv6nsgM7AVzJrC9I3dGDNriWx/M4=@vger.kernel.org, AJvYcCXssFYsXJStu5uG0EgoIMr9uQDWimIf73fuROBSvf9XBw+fl6IIYBMAqPm4sgqE5aMW4qYvQrwJL64D@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNZDMZ/MNZ+df21YsuoWkjoQaETBO/1tsFwo7BgHvzi1WBS+2f
-	eOeb4NAIHwl6fNh6xGnZkXDNRRCvAsi+b9FxFyGxUaPPjAGmMnP9
-X-Google-Smtp-Source: AGHT+IGI2z/Ccf1knMniW6K77uvNMqimo5zis8Ibm3akGlG52VO3uqRa+VPrVB4nVjc7WTbayCRWfg==
-X-Received: by 2002:a05:6a20:c6ce:b0:1cf:12ab:320c with SMTP id adf61e73a8af0-1cf12ab346bmr2729200637.37.1725541968828;
-        Thu, 05 Sep 2024 06:12:48 -0700 (PDT)
-Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d4fbda7b5csm3313782a12.70.2024.09.05.06.12.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 06:12:48 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: ms@dev.tdt.de
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-x25@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH net-next] x25: specifying bcast_addr array size using macro
-Date: Thu,  5 Sep 2024 22:12:41 +0900
-Message-Id: <20240905131241.327300-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1725542264; c=relaxed/simple;
+	bh=mtsb392WNG6b6DuTJvS0+Do9RHM8v8Le1vrjRjP9gpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SQC+L1lKbNytjM0IZOSgQlvPSgHXpsC45rdk1smjG8QLQbq3bseREIaOUiKPLfLJhqqiWKWJyQDrCBjAjhAqti5VhvFBEBOMkD5mfmOjpNHr5FyYN4gDYIdf3KmBmCA/t01jUsMUlNB48bruMuG6KS7DCEZ3LbfaTgY3bO3/UpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ed3/0FsR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=uSLA4QzqeKoxXIsDyYl7MU0S/K45h0h7fl/gv0XNWRw=; b=Ed3/0FsRR177NyjmXNhyo3INPI
+	4yLjOWczASWhQV6rNqfMbNV5iB/brlmO7uzxEZEAx8QTuda8Eb8WgN947gwis0rXhgJAUY6xherwG
+	+6ZloCVTpNVE98ytrnt8iD9yq9A1cyFEZ+cexnc8L+skiPEurC37CwaljDUx72BwAC3c=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1smCMb-006gCV-F3; Thu, 05 Sep 2024 15:17:29 +0200
+Date: Thu, 5 Sep 2024 15:17:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: MD Danish Anwar <danishanwar@ti.com>
+Cc: saikrishnag@marvell.com, robh@kernel.org, jan.kiszka@siemens.com,
+	dan.carpenter@linaro.org, hkallweit1@gmail.com,
+	diogo.ivo@siemens.com, kory.maincent@bootlin.com, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Roger Quadros <rogerq@kernel.org>
+Subject: Re: [PATCH net-next] net: ti: icssg-prueth: Make pa_stats optional
+Message-ID: <48c2a26c-b7ad-4449-921c-7dd65fd2909a@lunn.ch>
+References: <20240905101739.44563-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240905101739.44563-1-danishanwar@ti.com>
 
-It is more appropriate to specify the size of the bcast_addr array using 
-ETH_ALEN macro.
+On Thu, Sep 05, 2024 at 03:47:39PM +0530, MD Danish Anwar wrote:
+> pa_stats is optional in dt bindings, make it optional in driver as well.
+> Currently if pa_stats syscon regmap is not found driver returns -ENODEV.
+> Fix this by not returning an error in case pa_stats is not found and
+> continue generating ethtool stats without pa_stats.
+> 
+> Fixes: 550ee90ac61c ("net: ti: icssg-prueth: Add support for PA Stats")
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> ---
+> Cc: Jan Kiszka <jan.kiszka@siemens.com>
+> NOTE: This fix is targetted to net-next because the concerned commit is not
+> yet synced to net. So the issue isn't present in net.
+> 
+>  drivers/net/ethernet/ti/icssg/icssg_ethtool.c | 17 ++++++++++-----
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.c  |  4 +---
+>  drivers/net/ethernet/ti/icssg/icssg_stats.c   | 21 ++++++++++++-------
+>  3 files changed, 26 insertions(+), 16 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
+> index 5073ec195854..b85c03172f68 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_ethtool.c
+> @@ -68,9 +68,13 @@ static int emac_nway_reset(struct net_device *ndev)
+>  
+>  static int emac_get_sset_count(struct net_device *ndev, int stringset)
+>  {
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+>  	switch (stringset) {
+>  	case ETH_SS_STATS:
+> -		return ICSSG_NUM_ETHTOOL_STATS;
+> +		if (IS_ERR(emac->prueth->pa_stats))
 
-Signed-off-by: Jeongjun Park <aha310510@gmail.com>
----
- drivers/net/wan/lapbether.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+All these IS_ERR() are not so nice. What you often see is during
+probe, if getting an optional resource returns an error, you replace
+the error code with NULL. The code then becomes
 
-diff --git a/drivers/net/wan/lapbether.c b/drivers/net/wan/lapbether.c
-index 56326f38fe8a..15e4ca43e88b 100644
---- a/drivers/net/wan/lapbether.c
-+++ b/drivers/net/wan/lapbether.c
-@@ -41,7 +41,7 @@
- 
- #include <net/x25device.h>
- 
--static const u8 bcast_addr[6] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-+static const u8 bcast_addr[ETH_ALEN] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
- 
- /* If this number is made larger, check that the temporary string buffer
-  * in lapbeth_new_device is large enough to store the probe device name.
---
+> +		if (emac->prueth->pa_stats)
+> +			return ICSSG_NUM_ETHTOOL_STATS;
+> +		else
+> +			return ICSSG_NUM_ETHTOOL_STATS - ICSSG_NUM_PA_STATS;
+
+which looks nicer.
+
+	Andrew
 
