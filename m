@@ -1,152 +1,113 @@
-Return-Path: <netdev+bounces-125597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C4D696DD10
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 17:03:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10D5396DD44
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 17:08:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41F00B22F0C
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:03:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B13DB1F234F4
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 496C417993;
-	Thu,  5 Sep 2024 15:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E3F1990BA;
+	Thu,  5 Sep 2024 15:05:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z2JxaSBy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bxbGl6Yi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC8E19EEA7
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 15:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222D6197A9B
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 15:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725548405; cv=none; b=C8Jh2eIjxGErDpO2X5dvTOYbmbxL2pIB242kvcu2SBaZuuEhT5xdKR+mzO2EZIA7WvtTdQ4Si5DGkjzN6jN2EBFd8ZxBs7RuYRlDk01x1rJqGyGIeXEBDu3yxCc3T6PM5uJq7oS36RPf6he/jBypiuZbZCfBSt+RX00bn92PmyI=
+	t=1725548704; cv=none; b=RFfe7CUPXoIPnQ2/QfuskOHe651oQ6SYdzvY/cVSSe+FzTG4YW4P+F8GVUV+heal9b36rFtM9CMKMb+2MWOZuioQ6Wn2sqfJjWzykt/j4rB0VGRwF/zm5RHkJ9MHwwM9z1/6hkpQowzYUo/67koq94QdWXlzyNhuzLeHeFqOTcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725548405; c=relaxed/simple;
-	bh=1hB/LXrPgvAtTN9GXfwyJtxetvNDTX6pfIxTjqyczAI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jnIBUKs6+cOz3HkYBvTMruLuKEQkHaaCPjJQ9qr7hn9BdQ9dlUDVaTJMlHEoJTRwFXfQKCfUXv+uj4shXWRdV2MwZi3xxxvHR5ZwyGQzIkxD6LkeJEe7l3t5j/lBnkc8RG00pgaH9b8ZzpK9ohRDpS0nXlvbYOMU0biSUurM1y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z2JxaSBy; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c0aa376e15so456081a12.1
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 08:00:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725548402; x=1726153202; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b/vwaaOM7QgzJOv5+FIRA5/127R3JaMBCh3y7Puc158=;
-        b=Z2JxaSBysVis3+ffUqMoIlqbVKTfa+brz4OuJ2wMs3aIAXygDeXP0RoftTKJr3WnOw
-         dlfeMVuRDcL983YioBjZJ4TIWyW3C3Eq29pROhKs5wyHj/XPx//Mi+swqvIskLB8P9m2
-         MaUvH5pwS2ThkZcKl/ZCmQMX8/8lvXg4fTSf/ypi5jkXf4TFcygA+B/ADcBK+XwNh+95
-         1GhJH7xJHWHTVV6rVz9CkMWqIIlxoXOBI+0k1yRb835KecdG4OhErUU6/LGQjrG+CzqG
-         XWjBLgLMUz4GMDhD8Rmbp+hJZFa53VQrziQDxGB7ncvYd7wbhcj9o3Pdmc8MN9oQ3BBP
-         WDeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725548402; x=1726153202;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b/vwaaOM7QgzJOv5+FIRA5/127R3JaMBCh3y7Puc158=;
-        b=mTkjoi6jz4hDW5uLPQS5FrVBxOf6gfNIndzlQN/keOZIrAEL4xpxr8RduKourDCCOe
-         knP1U2gck6B6ObATKQG+mzE0VwdkBfcG0SirM+wartiD4kc/SfUk8LJZ9UpJHb3hbd6O
-         VLbDrZCVVVVt6NaTUnj5QdoF5qi9UhCyxn5Zq7hWWiKMMtbQ2pn6VkpcquLrA7ng46U9
-         SMFyAvypUKR2/FAK9hWQkyosKjPpLwr3uDV5Wzct5DIHR8UWxG7A+x3X6HEqOuqGkySk
-         SEXroW/5almcUE/Yd1jxQOD7E0JamtNjawdoQUnLXl9Tz67czxAL41Vrx8r4Lg3epg63
-         StSg==
-X-Forwarded-Encrypted: i=1; AJvYcCXSfxe2qTQUca66vxEKTyf731BBrc2aWcMFhX+FX+5AeAh3YG3ZRZiq+fszVfsGKBLjzedDqrE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWZ/CRstc+L0vmRT49Oiclq5GudbdVwODtV4E8VnW+wgZT6DIj
-	2fXvHsYSHfpUMI6yEXWz5cpIRoVyNj+awjbRQL4mO9257rLrkBR7EW6BxT3DGhny+NQRNXgbXNA
-	onj1kDbjjIaeHZucndww1k73hbkfuR9KAZTM7
-X-Google-Smtp-Source: AGHT+IHphqMnzPf1o9hHPytHh4YLrNaMKd8hVcLv5Sr+340Jfy4m7laRRKRGW534lvPcXgloqGZBr5GIP9lZYGTISW8=
-X-Received: by 2002:a05:6402:5205:b0:5c0:8eb1:2800 with SMTP id
- 4fb4d7f45d1cf-5c3cd77e61bmr2793811a12.11.1725548400987; Thu, 05 Sep 2024
- 08:00:00 -0700 (PDT)
+	s=arc-20240116; t=1725548704; c=relaxed/simple;
+	bh=Ld8KTi3QDI3VDWXO6dPONOX6HZLHeHYM7DMRcCRDWfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=i9e/Yxu0b2dOv4WwRQr9PTqCyBpaVLJIUnNEXlESTVYKPJ6Oedt9oF9i8448UAuLIo+y4CMWFb6HCUs3jAHKpP6HGI4qmBWAN4y2dQqZM7A+m8YlGQIn9apmumVmaEGq8z35RaBRbLmBeYg3w+IkvKZGUbtO1l276WgLeyQ3hak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bxbGl6Yi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B540C4CEC3;
+	Thu,  5 Sep 2024 15:05:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725548703;
+	bh=Ld8KTi3QDI3VDWXO6dPONOX6HZLHeHYM7DMRcCRDWfQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bxbGl6YiK5528f0iedkMc3CPab1WUFRuvkqkHVX96+Zgh5LxTYJAeda1dHTja1IYX
+	 Gm/euAa4fXmj0fJLGdu/e4Qt/L+MuVqG8q5yXMs5ohEpu+P039EeXwrrluWiIuZPqW
+	 Fn9SmZdx3Q0NJMkAPlsLr0PfgmN11LYsJK4RdptjDIVssru1zNI8lXDM+YliuVmcYt
+	 lM4tLHEWDzKbK+N7YX+WO/pMLPUCZhDKOjGYr64YyiCTM7gj6M86e6AnSPHDS4vks+
+	 DAw6Hu8sO9SQW5XhlmiYqK4RrtEXgdl7PD9md7Zu1yVhODbJcD6UDzIdxaYUQI6Bh/
+	 DHXIehKSrOgVQ==
+Date: Thu, 5 Sep 2024 08:05:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
+ <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ intel-wired-lan@lists.osuosl.org, edumazet@google.com
+Subject: Re: [PATCH v6 net-next 02/15] netlink: spec: add shaper YAML spec
+Message-ID: <20240905080502.3246e040@kernel.org>
+In-Reply-To: <d4a8d497-7ec8-4e8b-835e-65cc8b8066b6@redhat.com>
+References: <cover.1725457317.git.pabeni@redhat.com>
+	<a0585e78f2da45b79e2220c98e4e478a5640798b.1725457317.git.pabeni@redhat.com>
+	<20240904180330.522b07c5@kernel.org>
+	<d4a8d497-7ec8-4e8b-835e-65cc8b8066b6@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240903184334.4150843-1-sean.anderson@linux.dev>
- <20240903184334.4150843-4-sean.anderson@linux.dev> <CANn89iKJiU0DirRbpnMTPe0w_PZn9rf1_5=mAxhi3zbcoJR49A@mail.gmail.com>
- <156719f8-7ee8-4c81-97ba-5f87afb44fcf@linux.dev>
-In-Reply-To: <156719f8-7ee8-4c81-97ba-5f87afb44fcf@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 5 Sep 2024 16:59:47 +0200
-Message-ID: <CANn89i+3kwiF0NESY7ReK=ZrNbhc7-q7QU2sZhsR9gtwVje2jA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] net: xilinx: axienet: Relax partial rx checksum checks
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Michal Simek <michal.simek@amd.com>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 5, 2024 at 4:24=E2=80=AFPM Sean Anderson <sean.anderson@linux.d=
-ev> wrote:
->
-> On 9/4/24 12:30, Eric Dumazet wrote:
-> > On Tue, Sep 3, 2024 at 8:43=E2=80=AFPM Sean Anderson <sean.anderson@lin=
-ux.dev> wrote:
-> >>
-> >> The partial rx checksum feature computes a checksum over the entire
-> >> packet, regardless of the L3 protocol. Remove the check for IPv4.
-> >> Additionally, packets under 64 bytes should have been dropped by the
-> >> MAC, so we can remove the length check as well.
-> >
-> > Some packets have a smaller len (than 64).
-> >
-> > For instance, TCP pure ACK and no options over IPv4 would be 54 bytes l=
-ong.
-> >
-> > Presumably they are not dropped by the MAC ?
->
-> Ethernet frames have a minimum size on the wire of 64 bytes. From 802.3
-> section 4.2.4.2.2:
->
-> | The shortest valid transmission in full duplex mode must be at least
-> | minFrameSize in length. While collisions do not occur in full duplex
-> | mode MACs, a full duplex MAC nevertheless discards received frames
-> | containing less than minFrameSize bits. The discarding of such a frame
-> | by a MAC is not reported as an error.
->
-> where minFrameSize is 512 bits (64 bytes).
->
-> On the transmit side, undersize frames are padded. From 802.3 section
-> 4.2.3.3:
->
-> | The CSMA/CD Media Access mechanism requires that a minimum frame
-> | length of minFrameSize bits be transmitted. If frameSize is less than
-> | minFrameSize, then the CSMA/CD MAC sublayer shall append extra bits in
-> | units of octets (Pad), after the end of the MAC Client Data field but
-> | prior to calculating and appending the FCS (if not provided by the MAC
-> | client).
->
-> That said, I could not find any mention of a minimum frame size
-> limitation for partial checksums in the AXI Ethernet documentation.
-> RX_CSRAW is calculated over the whole packet, so it's possible that this
-> check is trying to avoid passing it to the net subsystem when the frame
-> has been padded. However, skb->len is the length of the Ethernet packet,
-> so we can't tell how long the original packet was at this point. That
-> can only be determined from the L3 header, which isn't parsed yet. I
-> assume this is handled by the net subsystem.
->
+On Thu, 5 Sep 2024 16:51:00 +0200 Paolo Abeni wrote:
+> On 9/5/24 03:03, Jakub Kicinski wrote:
+> > On Wed,  4 Sep 2024 15:53:34 +0200 Paolo Abeni wrote:  
+> >> +      -
+> >> +        name: node
+> >> +        type: nest
+> >> +        nested-attributes: node-info
+> >> +        doc: |
+> >> +           Describes the node shaper for a @group operation.
+> >> +           Differently from @leaves and @shaper allow specifying
+> >> +           the shaper parent handle, too.  
+> > 
+> > Parent handle is inside node scope? Why are leaves outside and parent
+> > inside? Both should be at the same scope, preferably main scope.  
+> 
+> The group() op receives as arguments, in the main scope:
+> 
+> ifindex
+> node
+> leaves
+> 
+> 'parent' is a nested attribute for 'node', exactly as 'handle'. We need 
+> to specify both to identify the 'node' itself (via the 'handle') and to 
+> specify where in the hierarchy the 'node' will be located (via the 
+> 'parent'). Do I read correctly that you would prefer:
+> 
+> ifindex
+> node_handle
+> node_parent
+> leaves
 
-The fact there was a check in the driver hints about something.
+I don't see example uses in the cover letter or the test so there's 
+a good chance I'm missing something, but... why node_parent?
+The only thing you need to know about the parent is its handle,
+so just "parent", right?
 
-It is possible the csum is incorrect if a 'padding' is added at the
-receiver, if the padding has non zero bytes, and is not included in
-the csum.
+Also why node_handle? Just "handle", and other attrs of the node can
+live in the main scope.
 
-Look at this relevant patch :
-
-Author: Saeed Mahameed <saeedm@mellanox.com>
-Date:   Mon Feb 11 18:04:17 2019 +0200
-
-    net/mlx4_en: Force CHECKSUM_NONE for short ethernet frames
+Unless you have a strong reason to do this to simplify the code -
+"from netlink perspective" it looks like unnecessary nesting.
+The operation arguments describe the node, there's no need to nest
+things in another layer.
 
