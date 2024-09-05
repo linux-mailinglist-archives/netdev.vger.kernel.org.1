@@ -1,215 +1,176 @@
-Return-Path: <netdev+bounces-125621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 321E096DF77
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:23:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 009BC96DFCF
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:33:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6239B282A4A
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:23:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 424B0B217B8
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0001A01C4;
-	Thu,  5 Sep 2024 16:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895F31A01B6;
+	Thu,  5 Sep 2024 16:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ElbxNreG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="r9RmLBap"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2087.outbound.protection.outlook.com [40.107.95.87])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC61619FA8E
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 16:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725553409; cv=fail; b=FBwPczgm5BfUQAycxeniEAtMzHTFzkJjq5UwA7lCAZPtgFe/iQNnUcYQ7nKipa6grLMMX/sz4HEQjeig40zD2eBrhsMLywxq5dNaRdDxfhp3H0oCa9Pv9kclTBE558ORlSHazCie2UlCC4RAJ1Z/1j8ErBPS9jnvHeymk2TxaEM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725553409; c=relaxed/simple;
-	bh=5FKReP5WShI47vyyYrqJb11wJCR45nk9ctgTuNHd9Lo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=dLz6l0KqogrGj/ciFRJHp7GscZ8I6HSTXLckGtCGWia64A5MljMdbWi2WskscYUZ8VRMl0Q1JYXMmO+n2+JcuOX3a0sqYobKyb73EaVbQzKJNu8+9oMEtTZhNfECWw3NbYYZdyP/St+9VzX0J0ipC/I/C2xfj5yKVRGa2rfn7zY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ElbxNreG; arc=fail smtp.client-ip=40.107.95.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZZWOE2DhHp1sWuxhywKVIbmn0OkNLiDRgXNecyltfnB2i9E2ZXDOi8e4Hj/bsI3hoflzbpY4j0BadsvOAT8uY6nlHKQgANu7vB6AMpHuXrcPs1bUB2mviqHi6a06oexzhGY9WYmcpT8PeH95k35LLKon3BpVs0ADXtRpLhKDbpQiFpvo6CH2ERs4cUGofAhb9XEjJYoFcrQ5vzkiuMEp0Uo2QEtRJZerEcwTgxaypo+tDOqdFHNoiQnx+v9jOQDDKNB37TjI4wpVZHODWxxJS4/IugstvLhkLfoDAhpJmyiAuFsPGH7rHqwKxbWom8LhG/2sMW0IRRsDFgn1SosHtg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BTukjGSH6BH7kFbV73FVmqImy/QxUayHgBHBTuTSgS0=;
- b=MyUrq9EPy6OtfXzUqtHhxOMjEIGqPeoJZcBkAUKB70qIo2UDS3PyJ2kZozvMM62tft0znEMW7Mf8hxX4u3DuMDmRZ0w+TSdcPSIx6Nk8zmH7vgtD3ea6rDG4rn6gASVqU5kX2IWOswItKbewKlet4Mw/gJpPvZVHg7C9VrAUh1oEcfEsk8WLj5gMKO5WQDoaYPus5eGIL2vIhMWSf/rEXSmImpq4Oq4lYy6+Qsd1tImmYXmP5vDFji6zdK6FdHr4QMGT4rTd3duYMY2OWbcCxZaDU3EoLev1WpJ0Wf/Z/e9hHlpEci7FMdwYbfDwl5DAN2v3DGgItZTbok0QfxqXkg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BTukjGSH6BH7kFbV73FVmqImy/QxUayHgBHBTuTSgS0=;
- b=ElbxNreGBcf+mE780Z1vZUsIa3n1DsywZzdz9CLMvAUDZetpMkOeJyXXZ1aRBV4MwN/83JJ90z2feRheKi13W5Lj8epZ+aBYZ1Kdxla9XIaS4MmtIC1yikdOwj6j1MuVD4lzFf8QwAbTj/sleeEPtMjUQY3HqBoT7ZQ68XssxKUZxw+CQk4NZJb6ffwiNhGM39R3j4tJYZ6Kn4sJ3ofkwFpvNa8ZqpbNCgHtlGQItyVMUG51RZS6wvFycIQW7T13gbvSOcvCo2dv0eQD8R48cLNyKL2h0v/WFv99fNMTu515Y+IDyEB7d3cvkq3p5mdS4VX7fTxiTg6zZDxch+iM9A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SN6PR12MB2719.namprd12.prod.outlook.com (2603:10b6:805:6c::12)
- by CY8PR12MB7123.namprd12.prod.outlook.com (2603:10b6:930:60::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.23; Thu, 5 Sep
- 2024 16:23:24 +0000
-Received: from SN6PR12MB2719.namprd12.prod.outlook.com
- ([fe80::1ab4:107a:ae30:2f95]) by SN6PR12MB2719.namprd12.prod.outlook.com
- ([fe80::1ab4:107a:ae30:2f95%7]) with mapi id 15.20.7918.024; Thu, 5 Sep 2024
- 16:23:24 +0000
-Date: Thu, 5 Sep 2024 19:23:12 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Krzysztof =?utf-8?Q?Ol=C4=99dzki?= <ole@ans.pl>
-Cc: gal@nvidia.com, Tariq Toukan <tariqt@nvidia.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Michal Kubecek <mkubecek@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [mlx4] Mellanox ConnectX2 (MHQH29C aka 26428) and module
- diagnostic support (ethtool -m) issues
-Message-ID: <Ztna8O1ZGUc4kvKJ@shredder.mtl.com>
-References: <a7904c43-01c7-4f9c-a1f9-e0a7ce2db532@ans.pl>
- <ZthZ-GJkLVQZNdA3@shredder.mtl.com>
- <b0ec22eb-2ae8-409d-9ed3-e96b1b041069@ans.pl>
- <7ba77c1e-9146-4a58-8f21-5ff5e1445a87@ans.pl>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7ba77c1e-9146-4a58-8f21-5ff5e1445a87@ans.pl>
-X-ClientProxiedBy: LO2P123CA0107.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:139::22) To SN6PR12MB2719.namprd12.prod.outlook.com
- (2603:10b6:805:6c::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42D077F10
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 16:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725553940; cv=none; b=rfJ724byiOeLXAqqRbWd0eYZ56J5bMkSTBAjiLIhfxvn2cK1LudkhExZdU7uNAiBH90W4JArtypG704WHNkvPTnkTrEC/xACGlARB04D2wTLViPi4qT9JvSEpg35x0AuArCzhZdYElwqfbVeZ3FGlpKQ88sZsmVrLO68V3lgKUc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725553940; c=relaxed/simple;
+	bh=PhMfHsxsuV4e0GfUnbMSJQRxLiO8JgQ98/CnCKiEpV8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qD8xSYa7JA6Xa0fHY+g5wGTGBN9IOe8Q+G74HvuRtUrcczPVh7mQuf6433AiHHB5b2VJAZynPKkVmnq9Jqn69zvusg2NYuCXHW9UTNRUbg+xbiRPMp+IKdTyjcjmgpcSvvB9JcwYaubNJoYou1+zqhZa3eGn89oXu317z/kEXGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=r9RmLBap; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <ef1697a9-5f1b-459b-b3a1-32926fe2193f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725553935;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bquw+gzeKG/uEvh1zvhW7asFOKanvNU5I6V4zRN6qGk=;
+	b=r9RmLBap1kqM9iSxRGsgxjl8dbkNLAVmVMvJ7DLz0sd6fbuKC18y93+G/qDfnYc+Q4QrA4
+	tJLpl30JteGssjePFxkxVaZmxrtVdt87Tz8H1PCCWsAP44csKoexg/PsjcQksObC6CLLIv
+	Omw3jhM6BR1BVFv072GG6YINJ7rUAFA=
+Date: Thu, 5 Sep 2024 12:32:04 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2719:EE_|CY8PR12MB7123:EE_
-X-MS-Office365-Filtering-Correlation-Id: de48b8b2-eb02-47e2-c44c-08dccdc710cf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?N2lWTnZWYVpiMlJ2cjl2VGlDczN4VTQxS3hCeDNaWE1ld0E5NDRrditOcHhj?=
- =?utf-8?B?eDRRNTJYMUdLRmVXUFA2VTdJNWQ0ZEQ5WkdFb0RZdnkxL0c0WDRTd01yUHA5?=
- =?utf-8?B?ZUlraDVWNWlrNVhJd2RwMURmOTUvMVM5YjE5Y3drbC9TL0h3TDVXZGZ6Ym82?=
- =?utf-8?B?c2NFUVhpMVNrdDY2aklaVWFXWmVBNnlVV3puQ3p6Mkd6Y0w0dUoyOWJYUnRT?=
- =?utf-8?B?ZW5FRDl6ckNBSC9TQTRWVVFaT0pUQkpMazJuVW1SOG5IM2dqTmlMY214ekoz?=
- =?utf-8?B?OU9yL0c3SWhjaTBzam5qbGhoUkhiSlBQRFFhalFrK0RjUnpZSWJCTFBjNkt1?=
- =?utf-8?B?VlZmU3R6Ni9rNWZpdGlmK2NUczhLcE1ZTXR1ODBLUG43NERLRGlPV1czVERx?=
- =?utf-8?B?ZlV5L2gvS0FzTFN3Q0cweFJHc3YvNTdTTzhEU0lyMmxqVmQrVHdzSUNuMkc1?=
- =?utf-8?B?TldIbVN0TFdaRHZxamhqaGJTcVAvLys3ZllyOHZFRzM1ZTNSanlsK3V4c1JC?=
- =?utf-8?B?enJzWUZSZjhTSzljZ05kdjIxUkcrRVR5WTZ2S0IrVGROUTBDWEhpKzhQYjdH?=
- =?utf-8?B?dnZhNDRYUTVWSHE1WTNKK0FJc2ZGQlBzWVZ6M21FMXVKclltQmZETFZ5RHRo?=
- =?utf-8?B?Zzk3Sjd1ZXRsZ1JyZ3JOeXkyOWNINTBBM1puazBBUkdCdEVsNHhkZmhrWEZu?=
- =?utf-8?B?Vk1lWWlMcnhWVHBCKzFqSzJQM3lmNEhIQlZWcng3UVBSak9zNTZ0R09qUU1F?=
- =?utf-8?B?S2tndytQQWovUW5nYStKQjFwT0lXNWdVYzc3M2E3L2c1Nnk0Ykt2OFJqQlpl?=
- =?utf-8?B?cHFkZERIQmlNa1BBN2c1TTg5THB6RG5wcGpmNnREaHdNeTRGRzVDTmN0L0J0?=
- =?utf-8?B?alo3UkMyekxHbEJtQlpQL3FiY1JMMC9yVGxDU09xcW1yY09URGMyK3ZsWkdh?=
- =?utf-8?B?Qy9EZUdsL2N6cjFWc280b2x6Qk9mZFNTazVOVWlOOVdSMDd2R0toNWtXOXl3?=
- =?utf-8?B?TWdqNG9mYmVUaWtVZU1Xckx5aytJMThBbmlkUWZhb2JxSFZoTGNNVkttVnhO?=
- =?utf-8?B?OG5wV2cwK3dRbXJBMzNkTXZOaUI4Y0oxaGNadmVlN3VWLzlEdjlTaXAyVXZQ?=
- =?utf-8?B?ODhwVFduMCsvaktwMkJRaFI0VEpobnJlWDg0dlVnNFBXNE44L3F0bEhtNW5l?=
- =?utf-8?B?citETTZRQmVqR3h2b2pqcnIwTEVhWit5NS90T01FaWgzVmlPUFpUcjl2ay9U?=
- =?utf-8?B?TnJadGw0d3hQREhqckFueDRZMzRKM3A0RmRLMjBVM3J2OU81L28raHR2TEpl?=
- =?utf-8?B?Vlp5R3hsbnFhOGs0ajIwdVNZamdLaDNxTFp6ZUcwOGJQSWhCbktjYzdOUjM3?=
- =?utf-8?B?c0xEWkJhenJrVGJocldqcEJzMy9uTmxmYjJ0aW96NS9SUGNnZWJTSzJEN1lT?=
- =?utf-8?B?NVVJTGpWYUlHL1dCREN5SUdkY1dTVHdnUTZYS3h1RXAwa1AyM2J4MWY0SEI5?=
- =?utf-8?B?STdDM1VEaGtFTUw5eFFpWGxzc2VMT212WEhvbkRBNjgzRTZhZUxTNklIeFFw?=
- =?utf-8?B?RTBvd0NRV1R0TWJUeGtlU1RVcDhwTzczWjdSUTNMMEpaaG1hK2ptdy8xbkZW?=
- =?utf-8?B?RkV5aDBmOURQeVQ2VGJ5bkVlSnVKNUhwby85T0FhYytCKzhUa0t5RVBKOExP?=
- =?utf-8?B?dzhwWTBENGl0aDRYUzJZdlJ3VUtTQVpCcTN0Mk04bDBkOXh5ZnM4TENqbW5V?=
- =?utf-8?B?ZEFpN3ZYOWxBbDUrcHFEaXE3WjhwT1hJdUhsUzNrQ0FFOWgvVFdDZ2E5ei9J?=
- =?utf-8?Q?y6knI1VsJQxQf3BY7nPAuUA0ESQV6M9qarne4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2719.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MVdWdUhCL1dYcjBDeVpWWElwY2FUb2Zpd1lpTzVzTDVHN0FpOFZ3dG1HOHNy?=
- =?utf-8?B?aEVFTzNVVWFlVUZSeEJwa0IrdnJRSUNydVAxSG9jSzJoVGJpcnRyWVY5eWlF?=
- =?utf-8?B?VHc0ZGVibFZGNGd6Zk92Q3lLVjJiUFhWQlVlU0R5UElQVGNTUDNhQkpzUzkv?=
- =?utf-8?B?dmZnQmlRanpXSThwRVh2dGZDS3BMNmYxcm1zSTRjdEQ2WlBja0Fxa2p2TEFw?=
- =?utf-8?B?cnpIUDlMV1QrVDB4QXU2M1h4S1JjZlB6MkRLSkN1VHRoMWdUZkJCODErTjIy?=
- =?utf-8?B?TkpRdDEzYjAxNmp5VXlqWEFid0MyVDV0c1BOVHRSVk85cFFTYkxpYStqN21r?=
- =?utf-8?B?a0lta1BZbkQrckpVMWFaUktqb240V2I2bHc0Tk1qaUdwQ3ZKNDRQeFZBamVw?=
- =?utf-8?B?QldWOTZSRHUwYXVMWmk1dlBSRGJ5NUVXYlR1OC9EUFk4b0pJOFhKUm54K3B1?=
- =?utf-8?B?UWxmdVNYdlB5eEVGdExWUjI0WGRkU1FSdWxsYkFoSUsvTVJySklCdGV6ajNP?=
- =?utf-8?B?V2pnWE9CNHpmRUpGTmdqdHdrU0hJQXBSeGRTUnNBY0tmZDVFdWRib1pMU3Vx?=
- =?utf-8?B?V2pVZVBwVDVBc3dqYzdpU2laTTVnamdrRnRDL3M5UjhDRC9USS9YUDdZcUpm?=
- =?utf-8?B?cGo4eWU2VGdpb2JLTFNUK1krZnE2QmM4LytPODhhcFVXTngzbXNJWFlGbmo1?=
- =?utf-8?B?QjlmaXArQ0RaVDViQk0vTW1nMEViME96V1pZdWppQUFIQ0NYVW5YNktqejVt?=
- =?utf-8?B?aVZ3M2s1WUFTWEVNNi8yN2grK1lvSmpsbmxhYjJCTkRSSU5XWVlXcmVGN0Yy?=
- =?utf-8?B?Z1hFanYvaDRzMG5IRnk3WGZrTmtuQlFXSmxWNFU0OCs5a2p0UVM0RkorUTM1?=
- =?utf-8?B?T3hYL3M4SkxHeTV1UE5Sc1BFM0RyWU4rb05iT0NhcnVuYmtLalc3ZkExSVhS?=
- =?utf-8?B?aWZNQ0tkUnF4NzdvMERZRnh3OERzVmpSaGFsUUZLSExjU1pTeGZQQU14RGc0?=
- =?utf-8?B?Z1p6QUwwNmJCb3hBQ2RvV1J3d3ZDYUxudDZWazI3a1ZtOGVlSlRPRVpBMWRi?=
- =?utf-8?B?MWQ4OVp1bHZXa1NjNVUwVFB0SWpnbTVWL3NnNk9GTGxER3dUblJya1BsL1No?=
- =?utf-8?B?U1pnU0pkWVpKQTFhb2NHdHBSMzJGajJCcXFkeGJGelc3SitlMHA0cnN0YjNw?=
- =?utf-8?B?OG5ZeEc0eGN0cFJRTlhnRnEzYXZsQWxFZDJlRXdKOHI4WG1Oa3NIU05FSlMy?=
- =?utf-8?B?S3ZORDdHYVJQVjFPdTFVeVZHWC91QXhGUmRFeFJPVFNyL05UV0RtczdNb04y?=
- =?utf-8?B?Q1Q1RGhyaTZxQXJzdDBtbk5TbEFScUZaZTlRcGpkaVUxUUlueHU4empqck1I?=
- =?utf-8?B?MDdGMS96RDRGS2s1NHhwRytHRmM0UGRXN1RQZ3pUdVhUWTVhQUNOV1JpamRP?=
- =?utf-8?B?alF0cXpKUEkySlJIcnZibUFHU09oWHByUzVaWWRKRlFPT3d3eUhramNvSHQr?=
- =?utf-8?B?cko5K1BUaDJ6RThXQy9LbEhpWGdNd0xqRW1xZmRjZWpUdzk0SEl1Mm9oOGRn?=
- =?utf-8?B?VEMrVEhwUHFpL2VvckFiekZsMC9WdzZXeFNVeVBxOUIvcUN4Q0hYOW1EbTl4?=
- =?utf-8?B?dEFZY2Z4TVh4bnRsbHcrNjlWTTJUaEdna1o3TDlyYXo5elFQNERuQWw4WExS?=
- =?utf-8?B?eWdQc2FPZkgwK054SVZqVjhjRCsvc2F0VmNlWnVBbGlUdTlGaDd5RFYwRGMz?=
- =?utf-8?B?aGdLdmtSY1pSV0JSODVmbVhtQnh6eWw1Zk11cU5qYm9mTXlOQUd1cG5NRmoz?=
- =?utf-8?B?c0tKQnVUaDV2NmZIdTJEcnl4dSttcE1YN2FXaGx3dWc3RUVNck14RW1RT05G?=
- =?utf-8?B?aXo2RHh2S0psS2MrdExWd1NZUlZPdEN3VVJRNjBtWGEwQk8wYkNvRTV2T1VY?=
- =?utf-8?B?U1gwM2x6VENRejJzZjJwNE02M29vMi9DQzZuQS82Z0JnOEtzd0NWeHdrV3NU?=
- =?utf-8?B?cUlPb29yVXN1OHNrUmsrcmFmYVQyaHpvK2NUaURZZWZWM1ZMTVEwRFFXT1N1?=
- =?utf-8?B?eFdGVUkxY2hqOTFvaEtqQWN5V2RpTkh5OE44RnBEelE1NUlSV1dtMHJGenlO?=
- =?utf-8?Q?Os7fgaC8WUS5WdQauyfw9gvPX?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: de48b8b2-eb02-47e2-c44c-08dccdc710cf
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2719.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2024 16:23:24.5214
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ABRzwI8Wq6ORywXQIGwPpd9OcWgVwNORjvoDDz92s50IV/FUwJ6f7OzARI4A6+7bsliQK8OqeQPLCBygZFuOUw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7123
+Subject: Re: [PATCH 3/3] net: xilinx: axienet: Relax partial rx checksum
+ checks
+To: Eric Dumazet <edumazet@google.com>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Michal Simek <michal.simek@amd.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+References: <20240903184334.4150843-1-sean.anderson@linux.dev>
+ <20240903184334.4150843-4-sean.anderson@linux.dev>
+ <CANn89iKJiU0DirRbpnMTPe0w_PZn9rf1_5=mAxhi3zbcoJR49A@mail.gmail.com>
+ <156719f8-7ee8-4c81-97ba-5f87afb44fcf@linux.dev>
+ <CANn89i+3kwiF0NESY7ReK=ZrNbhc7-q7QU2sZhsR9gtwVje2jA@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <CANn89i+3kwiF0NESY7ReK=ZrNbhc7-q7QU2sZhsR9gtwVje2jA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Sep 04, 2024 at 09:47:04PM -0700, Krzysztof Olędzki wrote:
-> This BTW looks like another problem:
+On 9/5/24 10:59, Eric Dumazet wrote:
+> On Thu, Sep 5, 2024 at 4:24 PM Sean Anderson <sean.anderson@linux.dev> wrote:
+>>
+>> On 9/4/24 12:30, Eric Dumazet wrote:
+>> > On Tue, Sep 3, 2024 at 8:43 PM Sean Anderson <sean.anderson@linux.dev> wrote:
+>> >>
+>> >> The partial rx checksum feature computes a checksum over the entire
+>> >> packet, regardless of the L3 protocol. Remove the check for IPv4.
+>> >> Additionally, packets under 64 bytes should have been dropped by the
+>> >> MAC, so we can remove the length check as well.
+>> >
+>> > Some packets have a smaller len (than 64).
+>> >
+>> > For instance, TCP pure ACK and no options over IPv4 would be 54 bytes long.
+>> >
+>> > Presumably they are not dropped by the MAC ?
+>>
+>> Ethernet frames have a minimum size on the wire of 64 bytes. From 802.3
+>> section 4.2.4.2.2:
+>>
+>> | The shortest valid transmission in full duplex mode must be at least
+>> | minFrameSize in length. While collisions do not occur in full duplex
+>> | mode MACs, a full duplex MAC nevertheless discards received frames
+>> | containing less than minFrameSize bits. The discarding of such a frame
+>> | by a MAC is not reported as an error.
+>>
+>> where minFrameSize is 512 bits (64 bytes).
+>>
+>> On the transmit side, undersize frames are padded. From 802.3 section
+>> 4.2.3.3:
+>>
+>> | The CSMA/CD Media Access mechanism requires that a minimum frame
+>> | length of minFrameSize bits be transmitted. If frameSize is less than
+>> | minFrameSize, then the CSMA/CD MAC sublayer shall append extra bits in
+>> | units of octets (Pad), after the end of the MAC Client Data field but
+>> | prior to calculating and appending the FCS (if not provided by the MAC
+>> | client).
+>>
+>> That said, I could not find any mention of a minimum frame size
+>> limitation for partial checksums in the AXI Ethernet documentation.
+>> RX_CSRAW is calculated over the whole packet, so it's possible that this
+>> check is trying to avoid passing it to the net subsystem when the frame
+>> has been padded. However, skb->len is the length of the Ethernet packet,
+>> so we can't tell how long the original packet was at this point. That
+>> can only be determined from the L3 header, which isn't parsed yet. I
+>> assume this is handled by the net subsystem.
+>>
 > 
-> # ethtool -m eth1 hex on offset 254 length 1
-> Offset          Values
-> ------          ------
-> 0x00fe:         00
+> The fact there was a check in the driver hints about something.
 > 
-> # ethtool -m eth1 hex on offset 255 length 1
-> Cannot get Module EEPROM data: Unknown error 1564
+> It is possible the csum is incorrect if a 'padding' is added at the
+> receiver, if the padding has non zero bytes, and is not included in
+> the csum.
 > 
-> mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(1) i2c_addr(50) offset(255) size(1): Response Mad Status(61c) - invalid device_address or size (that is, size equals 0 or address+size is greater than 256)
-> mlx4_en: eth1: mlx4_get_module_info i(0) offset(255) bytes_to_read(1) - FAILED (0xfffff9e4)
+> Look at this relevant patch :
 > 
-> With the netlink interface, ethtool seems to be only asking for for the first 128 bytes, which works:
+> Author: Saeed Mahameed <saeedm@mellanox.com>
+> Date:   Mon Feb 11 18:04:17 2019 +0200
+> 
+>     net/mlx4_en: Force CHECKSUM_NONE for short ethernet frames
 
-Yes. The upper 128 bytes are reserved so sff8079_show_all_nl() doesn't
-bother querying them. Explains why you don't see this error with
-netlink.
+Well, I tested UDP and it appears to be working fine. First I ran
 
-Regarding the runtime "--disable-netlink" patch, I personally don't mind
-and Andrew seems in favor, so please post a proper patch and lets see
-what Michal says.
+# nc -lu
 
-Regarding the patch that unmasks the I2C address error, I would target
-it at net-next as it doesn't really fix a bug (ethtool already displays
-what it can). Thinking about it, I believe it would be more worthwhile
-to implement the much simpler get_module_eeprom_by_page() ethtool
-operation in mlx4 (I can help with the review). It would've helped
-avoiding the current issue (kernel will return an error) and the
-previous bug [1] you encountered with the legacy operations.
+on the DUT. On the other host I used scapy to send a packet with some
+non-zero padding:
 
-Regarding the fact that these modules work properly with CX3, but not
-with CX2 (which uses the same driver), it really seems like a HW/FW
-problem and unfortunately I can't help with that.
+  >>> port = RandShort()
+  >>> send(IP(dst="10.0.0.2")/UDP(sport=port, dport=4444)/Raw(b'data\r\n')/Padding(load=b'padding'))
 
-[1] https://lore.kernel.org/all/b17c5336-6dc3-41f2-afa6-f9e79231f224@ans.pl/
+I verified that the packet was received correctly, both in netcat and
+with tcpdump:
+
+    # tcpdump -i net4 -xXn 
+    tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+    listening on net4, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+    16:07:45.083795 IP 10.0.0.1.27365 > 10.0.0.2.4444: UDP, length 6
+            0x0000:  4500 0022 0001 0000 4011 66c8 0a00 0001  E.."....@.f.....
+            0x0010:  0a00 0002 6ae5 115c 000e 0005 6461 7461  ....j..\....data
+            0x0020:  0d0a 7061 6464 696e 6700 0000 0000       ..padding.....
+
+and also checked for checksum errors:
+
+  # netstat -s | grep InCsumErrors
+      InCsumErrors: 0
+
+to verify that checksums were being checked properly, I also sent a
+packet with an invalid checksum:
+
+  >>> send(IP(dst="10.0.0.2")/UDP(sport=port, dport=4444, chksum=5)/Raw(b'data\r\n')/Padding(load=b'padding'))
+
+and confirmed that there was no output on netcat, and that I had gotten
+a UDP checksum error:
+
+  # netstat -s | grep InCsumErrors
+      InCsumErrors: 1
+
+I can try to test TCP as well, but it is a bit trickier due to the 3-way
+handshake. From the documentation, partial checksums should be agnostic
+to the L3 protocol, so I don't think there should be any difference.
+
+--Sean
 
