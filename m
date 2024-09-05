@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-125670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E377596E37A
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:50:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AA8F96E37E
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:50:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12DA01C2457B
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:50:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11FD51F270A4
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797871A255F;
-	Thu,  5 Sep 2024 19:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D69EF1A4E91;
+	Thu,  5 Sep 2024 19:49:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpBqYwjC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BZhFA43S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1737D193434;
-	Thu,  5 Sep 2024 19:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B051A0721;
+	Thu,  5 Sep 2024 19:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725565785; cv=none; b=SxxM9WYvlDTa7AqVXIH0zJSxvGEgsv+5Nr8Q08ooqnPYcgrZU0juFRTV+ofd+qGqCfqLGKm1qenW+k4Ka7wuRcEWgoUsLL0PxFHjU0simeL/kls9rYoVt1FycPJWgHTdmaGH+/OLCl6Fg8T4srdvnp/Ko0NSIqyv4ykddmx44Ec=
+	t=1725565786; cv=none; b=Dx++Drzoyx+5uKtG0IpIMM+33WUi//ygyFOAB2zXQcOHWd5iwpvv4zVcX+oLYeeBD36Qgggxe1Gyk12THofhNRCSVALihN8caWlG+fso99oX7LkIq+mlTgcNNtGjSLaHpfglIIjFr0eSTAnGJiVup8ZWgblWLJx/u/dRrOgg2Ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725565785; c=relaxed/simple;
-	bh=2e+zqLJChzoEk17K7RQCNuO6avikar5qyyl/r+8hbIo=;
+	s=arc-20240116; t=1725565786; c=relaxed/simple;
+	bh=oHroWVGxmMxmoFyojOaOYeUj3KBNuZ53lO8tuQLNXrk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EK/eilEy/KxyN/zMUuaFzmUYWkN6FmGr/GAn/JHrWqskw9O6rHuyGmq+dmi8ZCUETav6GyvRNjSV5m0H5JQJYLPEQCjYTElZQkrtDVNu9hwHdTG9x0n8RPJ4ZRzgMYxA2WbNoCct9iJhhUSWjx2cFQfOFwplsKm6rboJhu3acNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IpBqYwjC; arc=none smtp.client-ip=209.85.210.180
+	 MIME-Version; b=DCbXBYcIptGh2ahqnOE5E6yyqSIKtIZQV5S0YfGVxCaHJrTQuJ1o42JBLA+M93f+1WOc/k+5t9ACLDwBl2UPOQbG9AGRvoDI2y6Mcdc7xLOt2UHIBT/6LoDNexi8DT/MI/ZNCltkTFrNgEDUBOMzj+bBHfTgLCi/Gni7lXOV5xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BZhFA43S; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-715cc93694fso1080190b3a.2;
-        Thu, 05 Sep 2024 12:49:43 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-6c5bcb8e8edso923413a12.2;
+        Thu, 05 Sep 2024 12:49:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725565783; x=1726170583; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725565784; x=1726170584; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HDORespKQdD6y18i2/lwUAe4YrBswe868gOWj16POCs=;
-        b=IpBqYwjCQWqLfcLS0SfNT/p2v8qKnE4o42szUlDaoYAucKI4R1l5kO2lxMcS/tTQwn
-         5w/hpK4U+N7cgMxDbvSoDuuGaby6/HK+BrTbsA9Jq1c6jmLpPqnP9Thq9vXtF1IAjaxF
-         GAi8F0iecU7aiEd5kur/NtkAYK7d7b58/tS2P0S3gmvFhBkrgRjToQY14/36FrTZawEt
-         RKN2wa9bcnmR93v+62MufTStAZMDc67MPGgmhbcLrLKcXGMEvT+oyMwU4BZbmypW84Pj
-         0LvhmZspfVw92NlT0jUpf0Y9P5wglKPvjOG2w98RteIW4/NUwV0l1BB5UR7Dq6DclLGR
-         JE1g==
+        bh=SnmxUQqRtH4TCHr6G7et4HHFrfCoGXFp7X7UNG+dva8=;
+        b=BZhFA43SgWWznvzEaU6FHBfS20RTYrq49efnvq3byFCw+eA+5QWNyXmCJt9DFrkJAl
+         rDkiPy25gpBVfCObzZsdDPz+YrJvZhHKNi6EkizJUPlCQMgQh0zFhOuRYFCE+8vabA1d
+         2R1HnKmMUxAnCGCIUMuCK351WuuKkJaK5Qsjy5MbstZ2F5HkmywUMEbbNcqv4jk3GUey
+         rngKXsOOTynaxP6WdD/tH4ZOVjMhm2b9iBcj6LUi5maxvtJ7N2wKYs+2S0bwPvCZ7Vy3
+         SxxG7TBr0LYLqf+m95Jfujb2JE6uplkIGNcmnh6PYokqNRb4TSxoixwHfLHp6l/bugUp
+         u7Cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725565783; x=1726170583;
+        d=1e100.net; s=20230601; t=1725565784; x=1726170584;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HDORespKQdD6y18i2/lwUAe4YrBswe868gOWj16POCs=;
-        b=heBwjeHATjBR5cEAJtJ63ZmoJWHB4kp2GZURinEEkuy8Ddt8HlyUUyj0gvpgoEsfdt
-         9f8nQ21smR4CBo0wfjdMH/PtMei86HY3YRwXs6llzIjNPwfM16B/dZrVgTouSj356j+a
-         AY2BalZ8+sahg4jQn+BWSKNE2K08ygrZzZNRl5SI8SlKjdTOp2Z3Ll/YS71QwWXjSS8T
-         mikdPf9eQcjG0RaEEe6p6Ow6kr2voxPD47Yqm2kG6E9foCYH/1FMiz80Q/OoIiHLA4pS
-         18DK3yLLWs6yGMexiQgGppaVo5hbQdDHFKBZaCS+pHNDxT7PFcC9l0CYog2+EHDaXqJG
-         KBlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV9L6FhDPoD+KdUvGCg0Lpylm8R5An7ShhmD4AkJpmqjNZuhUXNVJZBbjzquwr8dm23SZ81Fm7Zh5ZTcpo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBaRXMQC96b/568OAzjP/5PvsZ1HqmY5ZqRlCh/rH6t27MEvO8
-	t5N8WRwvznlkQcwbFo8SXvzV2H4xAP9zyfkDTxZbrP1nEnZFZ5yJtC+jUgkp
-X-Google-Smtp-Source: AGHT+IHWfs0ZKT4XrRqI/6tXkYn2zDzLsooHJtJMUNXqmuBZpj15Uw7z4zm1C2OyFVp6rEuQNQIBrw==
-X-Received: by 2002:a05:6a00:1a89:b0:714:157a:bfc7 with SMTP id d2e1a72fcca58-718d5e53d08mr284848b3a.15.1725565783055;
-        Thu, 05 Sep 2024 12:49:43 -0700 (PDT)
+        bh=SnmxUQqRtH4TCHr6G7et4HHFrfCoGXFp7X7UNG+dva8=;
+        b=l9BO0A5o6defcYJVvdD75r0ttFTtYdFvJThSNksNxWpXwkz8UxQUkjLWVa51zK3sh9
+         QlIO8FSYF543ZYTu3CL0y4YodoljC4khFA093Yod3jJMYwCjpu+IgnIch551o85GQS7G
+         vyQLJnzCHs24LbY+dJS90iU55GZIXgfHS1JH6zMezURt/8QEkkDmJlhoU0LzNsm5eFCT
+         mtNZU/qSq8YLvaR8H71LkaQs7Acxm8F5xvqMCmBAbWO67B8EdaJbp/VUTbn65bmFXO3/
+         zbmNAlvmbib72uIwb4h00pBTetLvUUlcuvQuMrzSexx4EfbXjM2ENueSmPdsgax8OAzt
+         88Qw==
+X-Forwarded-Encrypted: i=1; AJvYcCXdYo0b0LPpFSNqKyFfPNiTYwBA5mRB/hTKcup2c5ZOmyyZk/m4xUf/Dm2jwWFJUqmLpjcPe+qtb1c52EI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0jji5FLyv8YSCs/MNGk0iBnWV2Thv0TVa68RcX4OkQ0/txu4D
+	XRpNe97MXhx+0ktiJ00cwWBAT9KC0zXnLEq9uXABYmd8wDNw3cB0R3IVsONw
+X-Google-Smtp-Source: AGHT+IEnUI2db9UPKQfKa7ssvFR2egUWf28hTWjaTTYi16U/JYiU/jpXIyAyYlltZGNKLhWGY45Mpg==
+X-Received: by 2002:a05:6a20:43ab:b0:1c4:6be3:f571 with SMTP id adf61e73a8af0-1cf1d1b32b9mr60419637.39.1725565784257;
+        Thu, 05 Sep 2024 12:49:44 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71791e54585sm1248410b3a.182.2024.09.05.12.49.42
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71791e54585sm1248410b3a.182.2024.09.05.12.49.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 12:49:42 -0700 (PDT)
+        Thu, 05 Sep 2024 12:49:43 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -77,9 +77,9 @@ Cc: davem@davemloft.net,
 	linux-kernel@vger.kernel.org,
 	o.rempel@pengutronix.de,
 	p.zabel@pengutronix.de
-Subject: [PATCHv2 net-next 2/7] net: ag71xx: add MODULE_DESCRIPTION
-Date: Thu,  5 Sep 2024 12:49:33 -0700
-Message-ID: <20240905194938.8453-3-rosenp@gmail.com>
+Subject: [PATCHv2 net-next 3/7] net: ag71xx: update FIFO bits and descriptions
+Date: Thu,  5 Sep 2024 12:49:34 -0700
+Message-ID: <20240905194938.8453-4-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240905194938.8453-1-rosenp@gmail.com>
 References: <20240905194938.8453-1-rosenp@gmail.com>
@@ -91,24 +91,83 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that COMPILE_TEST is enabled, it gets flagged when building with
-allmodconfig W=1 builds. Text taken from the beginning of the file.
+Taken from QCA SDK. No functional difference as same bits get applied.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- drivers/net/ethernet/atheros/ag71xx.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/atheros/ag71xx.c | 48 +++++++++++++--------------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
 
 diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index db2a8ade6205..e7da70f14f06 100644
+index e7da70f14f06..74e01ce6161f 100644
 --- a/drivers/net/ethernet/atheros/ag71xx.c
 +++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -2033,4 +2033,5 @@ static struct platform_driver ag71xx_driver = {
- };
+@@ -149,11 +149,11 @@
+ #define FIFO_CFG4_MC		BIT(8)	/* Multicast Packet */
+ #define FIFO_CFG4_BC		BIT(9)	/* Broadcast Packet */
+ #define FIFO_CFG4_DR		BIT(10)	/* Dribble */
+-#define FIFO_CFG4_LE		BIT(11)	/* Long Event */
+-#define FIFO_CFG4_CF		BIT(12)	/* Control Frame */
+-#define FIFO_CFG4_PF		BIT(13)	/* Pause Frame */
+-#define FIFO_CFG4_UO		BIT(14)	/* Unsupported Opcode */
+-#define FIFO_CFG4_VT		BIT(15)	/* VLAN tag detected */
++#define FIFO_CFG4_CF		BIT(11)	/* Control Frame */
++#define FIFO_CFG4_PF		BIT(12)	/* Pause Frame */
++#define FIFO_CFG4_UO		BIT(13)	/* Unsupported Opcode */
++#define FIFO_CFG4_VT		BIT(14)	/* VLAN tag detected */
++#define FIFO_CFG4_LE		BIT(15)	/* Long Event */
+ #define FIFO_CFG4_FT		BIT(16)	/* Frame Truncated */
+ #define FIFO_CFG4_UC		BIT(17)	/* Unicast Packet */
+ #define FIFO_CFG4_INIT	(FIFO_CFG4_DE | FIFO_CFG4_DV | FIFO_CFG4_FC | \
+@@ -168,28 +168,28 @@
+ #define FIFO_CFG5_DV		BIT(1)	/* RX_DV Event */
+ #define FIFO_CFG5_FC		BIT(2)	/* False Carrier */
+ #define FIFO_CFG5_CE		BIT(3)	/* Code Error */
+-#define FIFO_CFG5_LM		BIT(4)	/* Length Mismatch */
+-#define FIFO_CFG5_LO		BIT(5)	/* Length Out of Range */
+-#define FIFO_CFG5_OK		BIT(6)	/* Packet is OK */
+-#define FIFO_CFG5_MC		BIT(7)	/* Multicast Packet */
+-#define FIFO_CFG5_BC		BIT(8)	/* Broadcast Packet */
+-#define FIFO_CFG5_DR		BIT(9)	/* Dribble */
+-#define FIFO_CFG5_CF		BIT(10)	/* Control Frame */
+-#define FIFO_CFG5_PF		BIT(11)	/* Pause Frame */
+-#define FIFO_CFG5_UO		BIT(12)	/* Unsupported Opcode */
+-#define FIFO_CFG5_VT		BIT(13)	/* VLAN tag detected */
+-#define FIFO_CFG5_LE		BIT(14)	/* Long Event */
+-#define FIFO_CFG5_FT		BIT(15)	/* Frame Truncated */
+-#define FIFO_CFG5_16		BIT(16)	/* unknown */
+-#define FIFO_CFG5_17		BIT(17)	/* unknown */
++#define FIFO_CFG5_CR		BIT(4)  /* CRC error */
++#define FIFO_CFG5_LM		BIT(5)	/* Length Mismatch */
++#define FIFO_CFG5_LO		BIT(6)	/* Length Out of Range */
++#define FIFO_CFG5_OK		BIT(7)	/* Packet is OK */
++#define FIFO_CFG5_MC		BIT(8)	/* Multicast Packet */
++#define FIFO_CFG5_BC		BIT(9)	/* Broadcast Packet */
++#define FIFO_CFG5_DR		BIT(10)	/* Dribble */
++#define FIFO_CFG5_CF		BIT(11)	/* Control Frame */
++#define FIFO_CFG5_PF		BIT(12)	/* Pause Frame */
++#define FIFO_CFG5_UO		BIT(13)	/* Unsupported Opcode */
++#define FIFO_CFG5_VT		BIT(14)	/* VLAN tag detected */
++#define FIFO_CFG5_LE		BIT(15)	/* Long Event */
++#define FIFO_CFG5_FT		BIT(16)	/* Frame Truncated */
++#define FIFO_CFG5_UC		BIT(17)	/* Unicast Packet */
+ #define FIFO_CFG5_SF		BIT(18)	/* Short Frame */
+ #define FIFO_CFG5_BM		BIT(19)	/* Byte Mode */
+ #define FIFO_CFG5_INIT	(FIFO_CFG5_DE | FIFO_CFG5_DV | FIFO_CFG5_FC | \
+-			 FIFO_CFG5_CE | FIFO_CFG5_LO | FIFO_CFG5_OK | \
+-			 FIFO_CFG5_MC | FIFO_CFG5_BC | FIFO_CFG5_DR | \
+-			 FIFO_CFG5_CF | FIFO_CFG5_PF | FIFO_CFG5_VT | \
+-			 FIFO_CFG5_LE | FIFO_CFG5_FT | FIFO_CFG5_16 | \
+-			 FIFO_CFG5_17 | FIFO_CFG5_SF)
++			 FIFO_CFG5_CE | FIFO_CFG5_LM | FIFO_CFG5_LO | \
++			 FIFO_CFG5_OK | FIFO_CFG5_MC | FIFO_CFG5_BC | \
++			 FIFO_CFG5_DR | FIFO_CFG5_CF | FIFO_CFG5_UO | \
++			 FIFO_CFG5_VT | FIFO_CFG5_LE | FIFO_CFG5_FT | \
++			 FIFO_CFG5_UC | FIFO_CFG5_SF)
  
- module_platform_driver(ag71xx_driver);
-+MODULE_DESCRIPTION("Atheros AR71xx built-in ethernet mac driver");
- MODULE_LICENSE("GPL v2");
+ #define AG71XX_REG_TX_CTRL	0x0180
+ #define TX_CTRL_TXE		BIT(0)	/* Tx Enable */
 -- 
 2.46.0
 
