@@ -1,94 +1,102 @@
-Return-Path: <netdev+bounces-125483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE20296D4C0
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:55:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D7E796D51E
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E86B281021
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:55:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBCF81F2A30B
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC08198856;
-	Thu,  5 Sep 2024 09:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0C81474CF;
+	Thu,  5 Sep 2024 10:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LNIyWuV9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416BE156225
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 09:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3773B83CDB
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 10:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725530146; cv=none; b=MxpkEwoI+9PVXDWKWQRH6Mew/GmL2VNZjjcF4rKmlx4pjOOVzsN8DMDFcLWy66FMBL6AeQ26bV1hXj5/l7WyPUYkfa5nuN1osOqr/5jphY5uMd0XssP0mBWoz4dywoABeRPM5GcQ9E7Lfej/kuQam9vSVnNQ6/P/0mkvjDn/eEU=
+	t=1725530429; cv=none; b=uDdYxQiRmqyf/Xkhege8b+1JWrX0eaF4T31DMRIa379W79+dX5CJkwBggsvlNKORI9dvKEWng2vnqvZ4ByiT4P1Lhj+sj9XVcuSwRHmZ1/YpAGoNpaVA/IwvBtNELl7qzHqzDmUbDGx6KBtIoJTeWJn7Wa3gbVtTzT6NTBJERbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725530146; c=relaxed/simple;
-	bh=nnIkHrsuCUDMtfo0bBvtiEWlJQEN56Wq3V5reSJXzdY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=m7DtF4Hm7HeKsXXXacRvyVOSxNx+NHYeUutaPyHh22eYw2Agtj+i/Lyp/pXH24AeRxia5GJhrSQFjKPqUAypF3+qfFAmuRIsV/WA+g4uByqdEIVcHMxn8QWUp5ju7Z1u+rt360waDcan9+/Nu+fKEnhMg7TAMbkIyf2Jr32ByhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-467-2WOAPix_N76moWNzCZjUzg-1; Thu,
- 05 Sep 2024 05:55:40 -0400
-X-MC-Unique: 2WOAPix_N76moWNzCZjUzg-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BC4031953953;
-	Thu,  5 Sep 2024 09:55:38 +0000 (UTC)
-Received: from hog (unknown [10.39.192.5])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C93073001D1D;
-	Thu,  5 Sep 2024 09:55:35 +0000 (UTC)
-Date: Thu, 5 Sep 2024 11:55:33 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	ryazanov.s.a@gmail.com, edumazet@google.com, andrew@lunn.ch
-Subject: Re: [PATCH net-next v6 19/25] ovpn: add support for peer floating
-Message-ID: <ZtmAFX2ryse1p5jr@hog>
-References: <20240827120805.13681-1-antonio@openvpn.net>
- <20240827120805.13681-20-antonio@openvpn.net>
+	s=arc-20240116; t=1725530429; c=relaxed/simple;
+	bh=9gCioDgSjBVjN3SziroHvotCnSdJ/pfwWQnuSLnFG14=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hOTW/ovRY0ydd8P9H5P59ZuJrKWZl0dyatISmIRqf2vU6nBW76wGLFFF1x4qQPq1wbBQiJZaICC3IztWnLAdPqQNXNpNWMELXwPl30RXVAqDIEeXTLFwY7xGbYv7XazJr548K6eN+H1Ja/SD3YBJi8cQfw+2rnMPDwwngOR/o5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LNIyWuV9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE59AC4CEC3;
+	Thu,  5 Sep 2024 10:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725530429;
+	bh=9gCioDgSjBVjN3SziroHvotCnSdJ/pfwWQnuSLnFG14=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LNIyWuV9EbRZUq3aI25gIRfbNu84ZeoPygOKdQ65mtTmczb/MUvniinIeW6mtu1yn
+	 5IgR5C7KyRNPkF6dhvDUV1ZIAa/dGyqUI1vMaFZ7aJh9fBw1K0Z/29T0khJUk0VoxQ
+	 WxLUZsJF8I0Cw+FQE72EpUIqnarO1zapEMkXhQWPK0EXeCyW+Ft2kJO2SQbRfaIY+K
+	 R5hICbloQd8r0VsP3QdAXL7zupdhN4W+kPv2+oTAn4jKQXth/3L3HLVmk1aHQPinJz
+	 rZdER4ZpodCMNawVaMHXVR2pOEn//6Zd3eA5P4X10MX+zRp6lLSGYMbW7cKWVaX4/+
+	 Q4rnmQJQOLFdw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ECEB93806644;
+	Thu,  5 Sep 2024 10:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240827120805.13681-20-antonio@openvpn.net>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] sched: sch_cake: fix bulk flow accounting logic for host
+ fairness
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172553042950.1338142.999328518611522439.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Sep 2024 10:00:29 +0000
+References: <20240903160846.20909-1-toke@redhat.com>
+In-Reply-To: <20240903160846.20909-1-toke@redhat.com>
+To: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2VuIDx0b2tlQHJlZGhhdC5jb20+?=@codeaurora.org
+Cc: toke@toke.dk, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, gamanakis@gmail.com, davem@davemloft.net,
+ syzbot+7fe7b81d602cc1e6b94d@syzkaller.appspotmail.com, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, cake@lists.bufferbloat.net,
+ netdev@vger.kernel.org
 
-2024-08-27, 14:07:59 +0200, Antonio Quartulli wrote:
-> +void ovpn_peer_float(struct ovpn_peer *peer, struct sk_buff *skb)
-> +{
-[...]
-> +
-> +=09netdev_dbg(peer->ovpn->dev, "%s: peer %d floated to %pIScp", __func__=
-,
-> +=09=09   peer->id, &ss);
-> +=09ovpn_peer_reset_sockaddr(peer, (struct sockaddr_storage *)&ss,
-> +=09=09=09=09 local_ip);
-> +
-> +=09spin_lock_bh(&peer->ovpn->peers->lock_by_transp_addr);
+Hello:
 
-ovpn->peers in only set in MP mode, is there something preventing us
-getting here in P2P mode? I think we need a mode=3D=3DMP check around the
-rehash.  (I just took a look at other uses of ovpn->peers and there
-are obvious mode =3D=3D MP checks before all of them except this one)
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-I guess this would only happen in P2P mode if the server changes IP,
-so it doesn't really occur in practice?
+On Tue,  3 Sep 2024 18:08:45 +0200 you wrote:
+> In sch_cake, we keep track of the count of active bulk flows per host,
+> when running in dst/src host fairness mode, which is used as the
+> round-robin weight when iterating through flows. The count of active
+> bulk flows is updated whenever a flow changes state.
+> 
+> This has a peculiar interaction with the hash collision handling: when a
+> hash collision occurs (after the set-associative hashing), the state of
+> the hash bucket is simply updated to match the new packet that collided,
+> and if host fairness is enabled, that also means assigning new per-host
+> state to the flow. For this reason, the bulk flow counters of the
+> host(s) assigned to the flow are decremented, before new state is
+> assigned (and the counters, which may not belong to the same host
+> anymore, are incremented again).
+> 
+> [...]
 
---=20
-Sabrina
+Here is the summary with links:
+  - [net] sched: sch_cake: fix bulk flow accounting logic for host fairness
+    https://git.kernel.org/netdev/net/c/546ea84d07e3
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
