@@ -1,253 +1,159 @@
-Return-Path: <netdev+bounces-125657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEF8696E239
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:48:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F16896E24C
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:52:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCC9E1C22EE8
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:48:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0242E1F26454
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08B6F188A02;
-	Thu,  5 Sep 2024 18:48:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6905D188A02;
+	Thu,  5 Sep 2024 18:52:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="lHnrRcFs"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="S21tY5rN"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386EE183CB7;
-	Thu,  5 Sep 2024 18:48:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AEF8288C;
+	Thu,  5 Sep 2024 18:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725562108; cv=none; b=AkW0zktkzKBjUitrUHqnlmRcFsdR+bFdg/KrwoT+rqfd0I1eFaOgeq1eZv/QDMLmfp4pD8X7rbXXGqDoFy43MQGOub6EWnmnyEitl4oGqLKM6moEesfr6lPDcNUL9VSZ1cXWPhcpZPs/Zb6/CQ4+TMHuYDxDaqaUQmNoGhZlxHU=
+	t=1725562346; cv=none; b=Dkjakll3P0H5EGGLEUgp0Qv3DyheFR5hCJ6OWUM/5Z+JA0IWGkyvyiXLN61W3murYh8fzCfyIwmh5sFqfdEq3ngXtt+5F0i0p8Uf09eoyM2VgS4kw14A2wCHoTiW56tCo4IB5jKeOSeZnIf3k7XxwfuKrNt8YYgRzE32AoQW4VM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725562108; c=relaxed/simple;
-	bh=1QmnQHQRfzIATDtjh91SmiBQjutqyby/XWada8DuMfU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iDOVdYNsfhr8aFEy4qRJtgkwU9bTFbPbRq01fAikmuhkdoRHQoHPnGQifVsBnPrkxQjwruVY0WYFupgp+KjRR1i8Uv4T32sxeSzv16jvhvvFY7rXOoXlsgF7rRLQwLbCmNKi1nDiaTL5epJnFUKRVwYT5patv8fKHz53vKmcepM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=lHnrRcFs; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 5 Sep 2024 11:48:10 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725562104;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DPVvvGxX6KnyYMnY+Bb1uv8l52/JsFo3bCWRW8e8nIU=;
-	b=lHnrRcFsdOTKs93Ljwr8n62qkKUbVwQFwQ9rCI9qgw+2lGQY9AtbmVkN0Fc4sCvOfuRVXO
-	5upeiVt2jc84iD+ezeTC8bCjuXwJCiSmuZd+H4s1nLj4P7iBbkCjqCeJMzfvU9Nk2//9j3
-	1HrOVQiH68x5q4JQKb4mmsW8zr7y3dY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, 
-	Vlastimil Babka <vbabka@suse.cz>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Michal Hocko <mhocko@kernel.org>, Roman Gushchin <roman.gushchin@linux.dev>, 
-	Muchun Song <muchun.song@linux.dev>, David Rientjes <rientjes@google.com>, 
-	Hyeonggon Yoo <42.hyeyoo@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	Meta kernel team <kernel-team@meta.com>, cgroups@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v4] memcg: add charging of already allocated slab objects
-Message-ID: <qk3437v2as6pz2zxu4uaniqfhpxqd3qzop52zkbxwbnzgssi5v@br2hglnirrgx>
-References: <20240905173422.1565480-1-shakeel.butt@linux.dev>
- <CAJD7tkbWLYG7-G9G7MNkcA98gmGDHd3DgS38uF6r5o60H293rQ@mail.gmail.com>
+	s=arc-20240116; t=1725562346; c=relaxed/simple;
+	bh=BdopyJOmH9VtRvmZP+9t7/2flw2hxsb3XB0F/xi5yKg=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Hyj73iUaqI2M7B9NiK3ORYpfdSis2t1K8NTtN80oAJj68If+Oxbo4g+hScOFaONzJa0Od8u+wZC0OahgQp0V8D0JkMPbjbbhSYFwPgUyKNNOnWgBSBGgR+6+tH9DFDcEUH+fICmh4yFAMC5kQrQrF+t+w7gjgaqz+YZAouuaBcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=S21tY5rN; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=3JdRgnFAFmyWl8pgpB+J2k4MqOvYT4UaKoiSnuu0LXA=; b=S21tY5rN3er41xJSdwiH8OfzRy
+	Rk7tJQIyqHgyB2yyDwwOGj/edEB1ooqUmWo0LP65DzF8mx8ArPyvStghCtbRcmAWVUQKamjATRV+z
+	lC9fDNcwBwdveB4RGGUA1fSy43X+zGyH3EO51JqfwHmz8GZTPeq7XngHVlTxWvwxTHRbbT7VLmwnD
+	Z68HKHgbUc9l5eCQZaFC0l6+CVa1pev1rd1+6rOJGaGhcfV/RkQTsGb5B3exjqj3k9AC74Oy08uAL
+	13Yr5oY5iFLhJH9UKP3GGvg819BebTAOLdZKPtLxGAKdIMfoLIsqm5TZnRAXpoDIUwXa4OfBfQ95D
+	4gsrhcNg==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1smHaY-000ODB-A9; Thu, 05 Sep 2024 20:52:14 +0200
+Received: from [178.197.248.15] (helo=linux.home)
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1smHaW-000Fzm-1t;
+	Thu, 05 Sep 2024 20:52:13 +0200
+Subject: Re: [PATCH bpf-next v3 00/10] Local vmtest enhancement and RV64
+ enabled
+To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
+ linux-riscv@lists.infradead.org, netdev@vger.kernel.org
+Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
+ <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
+ Puranjay Mohan <puranjay@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Pu Lehui <pulehui@huawei.com>
+References: <20240905081401.1894789-1-pulehui@huaweicloud.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <e9816f7c-a603-c73e-5fcc-71bbcf6c6ca3@iogearbox.net>
+Date: Thu, 5 Sep 2024 20:52:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJD7tkbWLYG7-G9G7MNkcA98gmGDHd3DgS38uF6r5o60H293rQ@mail.gmail.com>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240905081401.1894789-1-pulehui@huaweicloud.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27389/Thu Sep  5 10:33:25 2024)
 
-On Thu, Sep 05, 2024 at 10:48:50AM GMT, Yosry Ahmed wrote:
-> On Thu, Sep 5, 2024 at 10:34 AM Shakeel Butt <shakeel.butt@linux.dev> wrote:
-> >
-> > At the moment, the slab objects are charged to the memcg at the
-> > allocation time. However there are cases where slab objects are
-> > allocated at the time where the right target memcg to charge it to is
-> > not known. One such case is the network sockets for the incoming
-> > connection which are allocated in the softirq context.
-> >
-> > Couple hundred thousand connections are very normal on large loaded
-> > server and almost all of those sockets underlying those connections get
-> > allocated in the softirq context and thus not charged to any memcg.
-> > However later at the accept() time we know the right target memcg to
-> > charge. Let's add new API to charge already allocated objects, so we can
-> > have better accounting of the memory usage.
-> >
-> > To measure the performance impact of this change, tcp_crr is used from
-> > the neper [1] performance suite. Basically it is a network ping pong
-> > test with new connection for each ping pong.
-> >
-> > The server and the client are run inside 3 level of cgroup hierarchy
-> > using the following commands:
-> >
-> > Server:
-> >  $ tcp_crr -6
-> >
-> > Client:
-> >  $ tcp_crr -6 -c -H ${server_ip}
-> >
-> > If the client and server run on different machines with 50 GBPS NIC,
-> > there is no visible impact of the change.
-> >
-> > For the same machine experiment with v6.11-rc5 as base.
-> >
-> >           base (throughput)     with-patch
-> > tcp_crr   14545 (+- 80)         14463 (+- 56)
-> >
-> > It seems like the performance impact is within the noise.
-> >
-> > Link: https://github.com/google/neper [1]
-> > Signed-off-by: Shakeel Butt <shakeel.butt@linux.dev>
-> > Reviewed-by: Roman Gushchin <roman.gushchin@linux.dev>
+On 9/5/24 10:13 AM, Pu Lehui wrote:
+> Patch 1-3 fix some problem about bpf selftests. Patch 4 add local rootfs
+> image support for vmtest. Patch 5 enable cross-platform testing for
+> vmtest. Patch 6-10 enable vmtest on RV64.
 > 
-> LGTM from an MM perspective with a few nits below. FWIW:
-> Reviewed-by: Yosry Ahmed <yosryahmed@google.com>
-
-Thanks.
-
+> We can now perform cross platform testing for riscv64 bpf using the
+> following command:
 > 
-> > ---
-> > v3: https://lore.kernel.org/all/20240829175339.2424521-1-shakeel.butt@linux.dev/
-> > Changes since v3:
-> > - Add kernel doc for kmem_cache_charge.
-> >
-> > v2: https://lore.kernel.org/all/20240827235228.1591842-1-shakeel.butt@linux.dev/
-> > Change since v2:
-> > - Add handling of already charged large kmalloc objects.
-> > - Move the normal kmalloc cache check into a function.
-> >
-> > v1: https://lore.kernel.org/all/20240826232908.4076417-1-shakeel.butt@linux.dev/
-> > Changes since v1:
-> > - Correctly handle large allocations which bypass slab
-> > - Rearrange code to avoid compilation errors for !CONFIG_MEMCG builds
-> >
-> > RFC: https://lore.kernel.org/all/20240824010139.1293051-1-shakeel.butt@linux.dev/
-> > Changes since the RFC:
-> > - Added check for already charged slab objects.
-> > - Added performance results from neper's tcp_crr
-> >
-> >
-> >  include/linux/slab.h            | 20 ++++++++++++++
-> >  mm/slab.h                       |  7 +++++
-> >  mm/slub.c                       | 49 +++++++++++++++++++++++++++++++++
-> >  net/ipv4/inet_connection_sock.c |  5 ++--
-> >  4 files changed, 79 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/include/linux/slab.h b/include/linux/slab.h
-> > index eb2bf4629157..68789c79a530 100644
-> > --- a/include/linux/slab.h
-> > +++ b/include/linux/slab.h
-> > @@ -547,6 +547,26 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
-> >                             gfp_t gfpflags) __assume_slab_alignment __malloc;
-> >  #define kmem_cache_alloc_lru(...)      alloc_hooks(kmem_cache_alloc_lru_noprof(__VA_ARGS__))
-> >
-> > +/**
-> > + * kmem_cache_charge - memcg charge an already allocated slab memory
-> > + * @objp: address of the slab object to memcg charge.
-> > + * @gfpflags: describe the allocation context
-> > + *
-> > + * kmem_cache_charge is the normal method to charge a slab object to the current
-> > + * memcg. The objp should be pointer returned by the slab allocator functions
-> > + * like kmalloc or kmem_cache_alloc. The memcg charge behavior can be controller
+> PLATFORM=riscv64 CROSS_COMPILE=riscv64-linux-gnu- \
+>    tools/testing/selftests/bpf/vmtest.sh \
+>    -l <path of local rootfs image> -- \
+>    ./test_progs -d \
+>        \"$(cat tools/testing/selftests/bpf/DENYLIST.riscv64 \
+>            | cut -d'#' -f1 \
+>            | sed -e 's/^[[:space:]]*//' \
+>                  -e 's/[[:space:]]*$//' \
+>            | tr -s '\n' ',' \
+>        )\"
 > 
-> s/controller/controlled
-
-Thanks. Vlastimil please fix this when you pick this up.
-
+> For better regression, we rely on commit [0]. And since the work of riscv
+> ftrace to remove stop_machine atomic replacement is in progress, we also
+> need to revert commit [1] [2].
 > 
-> > + * through gfpflags parameter.
-> > + *
-> > + * There are several cases where it will return true regardless. More
-> > + * specifically:
-> > + *
-> > + * 1. For !CONFIG_MEMCG or cgroup_disable=memory systems.
-> > + * 2. Already charged slab objects.
-> > + * 3. For slab objects from KMALLOC_NORMAL caches.
-> > + *
-> > + * Return: true if charge was successful otherwise false.
-> > + */
-> > +bool kmem_cache_charge(void *objp, gfp_t gfpflags);
-> >  void kmem_cache_free(struct kmem_cache *s, void *objp);
-> >
-> >  kmem_buckets *kmem_buckets_create(const char *name, slab_flags_t flags,
-> > diff --git a/mm/slab.h b/mm/slab.h
-> > index dcdb56b8e7f5..9f907e930609 100644
-> > --- a/mm/slab.h
-> > +++ b/mm/slab.h
-> > @@ -443,6 +443,13 @@ static inline bool is_kmalloc_cache(struct kmem_cache *s)
-> >         return (s->flags & SLAB_KMALLOC);
-> >  }
-> >
-> > +static inline bool is_kmalloc_normal(struct kmem_cache *s)
-> > +{
-> > +       if (!is_kmalloc_cache(s))
-> > +               return false;
-> > +       return !(s->flags & (SLAB_CACHE_DMA|SLAB_ACCOUNT|SLAB_RECLAIM_ACCOUNT));
-> > +}
-> > +
-> >  /* Legal flag mask for kmem_cache_create(), for various configurations */
-> >  #define SLAB_CORE_FLAGS (SLAB_HWCACHE_ALIGN | SLAB_CACHE_DMA | \
-> >                          SLAB_CACHE_DMA32 | SLAB_PANIC | \
-> > diff --git a/mm/slub.c b/mm/slub.c
-> > index c9d8a2497fd6..3f2a89f7a23a 100644
-> > --- a/mm/slub.c
-> > +++ b/mm/slub.c
-> > @@ -2185,6 +2185,41 @@ void memcg_slab_free_hook(struct kmem_cache *s, struct slab *slab, void **p,
-> >
-> >         __memcg_slab_free_hook(s, slab, p, objects, obj_exts);
-> >  }
-> > +
-> > +static __fastpath_inline
-> > +bool memcg_slab_post_charge(void *p, gfp_t flags)
-> > +{
-> > +       struct slabobj_ext *slab_exts;
-> > +       struct kmem_cache *s;
-> > +       struct folio *folio;
-> > +       struct slab *slab;
-> > +       unsigned long off;
-> > +
-> > +       folio = virt_to_folio(p);
-> > +       if (!folio_test_slab(folio)) {
-> > +               return folio_memcg_kmem(folio) ||
+> The test platform is x86_64 architecture, and the versions of relevant
+> components are as follows:
+>      QEMU: 8.2.0
+>      CLANG: 17.0.6 (align to BPF CI)
+>      ROOTFS: ubuntu noble (generated by [3])
 > 
-> If the folio is charged user memory, we will still double charge here,
-> but that would be a bug. We can put a warning in this case or use
-> folio_memcg() instead to avoid double charges in that case as well.
->
+> Link: https://lore.kernel.org/all/20240831071520.1630360-1-pulehui@huaweicloud.com/ [0]
+> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3308172276db [1]
+> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7caa9765465f [2]
+> Link: https://github.com/libbpf/ci/blob/main/rootfs/mkrootfs_debian.sh [3]
 
-I don't think we need to do anything for such scenarios similar to how
-other kmem function handles them. For example passing user memory to
-kfree() will treat it similar to this and there is no warning as well.
+Nice work! Next step is upstream BPF CI integration? :)
 
-> > +                       (__memcg_kmem_charge_page(folio_page(folio, 0), flags,
-> > +                                                 folio_order(folio)) == 0);
-> > +       }
-> > +
-> > +       slab = folio_slab(folio);
-> > +       s = slab->slab_cache;
-> > +
-> > +       /* Ignore KMALLOC_NORMAL cache to avoid circular dependency. */
-> 
-> Is it possible to point to the commit that has the explanation here?
-> The one you pointed me to before? Otherwise it's not really obvious
-> where the circular dependency comes from (at least to me).
-> 
+Fwiw, all still works for me on x86-64 (*), so:
 
-Not sure about the commit reference. We can add more text here.
-Vlastimil, how much detail do you prefer?
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+Tested-by: Daniel Borkmann <daniel@iogearbox.net>
 
-thanks,
-Shakeel
+(*) fresh Equinix Ubuntu instance still requires this one for vmtest.sh, but
+     that is independent of this series (and for others it seems not required)
+
+diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
+index 04716a5e43f1..02dd161e5185 100644
+--- a/tools/testing/selftests/bpf/Makefile
++++ b/tools/testing/selftests/bpf/Makefile
+@@ -693,7 +693,7 @@ $(OUTPUT)/$(TRUNNER_BINARY): $(TRUNNER_TEST_OBJS)                   \
+                              $(TRUNNER_BPFTOOL)                         \
+                              | $(TRUNNER_BINARY)-extras
+         $$(call msg,BINARY,,$$@)
+-       $(Q)$$(CC) $$(CFLAGS) $$(filter %.a %.o,$$^) $$(LDLIBS) $$(LDFLAGS) -o $$@
++       $(Q)$$(CC) $$(CFLAGS) $(TRUNNER_LDFLAGS) $$(filter %.a %.o,$$^) $$(LDLIBS) $$(LDFLAGS) -o $$@
+         $(Q)$(RESOLVE_BTFIDS) --btf $(TRUNNER_OUTPUT)/btf_data.bpf.o $$@
+         $(Q)ln -sf $(if $2,..,.)/tools/build/bpftool/$(USE_BOOTSTRAP)bpftool \
+                    $(OUTPUT)/$(if $2,$2/)bpftool
+diff --git a/tools/testing/selftests/bpf/vmtest.sh b/tools/testing/selftests/bpf/vmtest.sh
+index 79505d294c44..afbd6b785064 100755
+--- a/tools/testing/selftests/bpf/vmtest.sh
++++ b/tools/testing/selftests/bpf/vmtest.sh
+@@ -189,7 +189,7 @@ update_selftests()
+         local selftests_dir="${kernel_checkout}/tools/testing/selftests/bpf"
+
+         cd "${selftests_dir}"
+-       ${make_command}
++       TRUNNER_LDFLAGS=-static ${make_command}
+
+         # Mount the image and copy the selftests to the image.
+         mount_image
 
