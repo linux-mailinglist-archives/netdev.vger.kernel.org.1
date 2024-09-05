@@ -1,114 +1,128 @@
-Return-Path: <netdev+bounces-125723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FB2F96E604
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 01:02:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB6FB96E61E
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 01:17:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BDD81C20B60
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 23:02:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CFCA2866A2
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 23:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55950198A01;
-	Thu,  5 Sep 2024 23:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D3C1A4E97;
+	Thu,  5 Sep 2024 23:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sdyp6tE/"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DBB4153838;
-	Thu,  5 Sep 2024 23:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEBB6539A;
+	Thu,  5 Sep 2024 23:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725577324; cv=none; b=Kpowg77lxpMm2SKu2Z8gXkA21CsFiN/bv5Qwens7XS/hgpLeMYF2SCU9QAEh9B4Qyv79SkJ5ns0jC05yx4T7QrrS3YKAP3RqRiTfqreoEw+uSxW2f7LNO3ML6oD98rwu06FgUHw+ytcn/TohgfVqtxUrDIK3YcaYwHgkT0lK1mU=
+	t=1725578220; cv=none; b=q3MRbdzvm/X389SyyIm4O4Dcnn7VDnVFsoJWbqz8wlYS6e0FUpvdg8GnvIVkr2U3fpLIMUr6TdN3qEpfd1rhi2w9VQ6Y7Z53HWuZfKI06Qt6/vzbAbXSyOkeAoc0APc3/Ai82jmRjPlPPlCy11kdzJYLRsPlSDPi+Q1jV9OGkm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725577324; c=relaxed/simple;
-	bh=RNL6LHz2DxOzk/csE9S0QFF8BOlAyPNbBvo+l4Mnnmg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t4dLE0brWfDIzqHfHO3F6rlkwkHYupz9BXTwgtxKu40vKvj41tgPMavcVzaOFH7RLt5JTza34qWgJ5RfPdAHW63fOuWc+XugDOEelcpE81MANElttsuQXfFH6CklG2N2VCCnlRHv/VgILvHvYW41P1V9LDcEVYlteSdRg7Tn09I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [31.221.194.34] (port=25764 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1smLU4-00EAIh-88; Fri, 06 Sep 2024 01:01:50 +0200
-Date: Fri, 6 Sep 2024 01:01:46 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Jozsef Kadlecsik <kadlec@netfilter.org>,
-	David Ahern <dsahern@kernel.org>, rbc@meta.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	"open list:NETFILTER" <coreteam@netfilter.org>
-Subject: Re: [PATCH nf-next v4 1/2] netfilter: Make IP6_NF_IPTABLES_LEGACY
- selectable
-Message-ID: <Zto4WmXldf6KzeQO@calendula>
-References: <20240829161656.832208-1-leitao@debian.org>
- <20240829161656.832208-2-leitao@debian.org>
+	s=arc-20240116; t=1725578220; c=relaxed/simple;
+	bh=rQugc0RZNrnAOFUZoUEf4sJt7rouH3wxQ8yP+xWGT9E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dz3q63+GpE7UesHklfpJom+g7+3cj1NZyy4QMlsyaCRw5umPn5dYMDwvgM0ZYOFg/esgUUBKQn7W9Y0apY8jr9xQ1HYTDuNkrvDIyiMdgz/TsJ3jfZA/7SNpCI5UddWaEiy+DiYDdeI2alDkCMKL6i4hxiW6j0zMZ+ovLgV3Nq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sdyp6tE/; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-45680233930so8764831cf.3;
+        Thu, 05 Sep 2024 16:16:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725578218; x=1726183018; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qo8m8li/DItO+PeZ8FBAi9MIkkXQzptGTjicoh08/+4=;
+        b=Sdyp6tE/mCOJ8Qiflqyvb4RKBlQDsB9Ey34fn5oHEokppIhOOwVIYD0h+t3/RP3CVj
+         adxC5xFtGz8aBCp/Nz7DdsIvdsjTHbxlXLlUe+ecp+4QD/xWy+Kyo+0Gp856kPQuD4+Z
+         Gyomyd1LIRrYTl9xCHVxkCGe4JjZJvWOiPIm8WKmTLPZgVQKVyEa0CoUZ013Ndn8EQxy
+         AnZcD9N7rWCgFVAgb4v7BdrpeSaCnurPrrrDQ3YDQc/8dwlBVgyDwCxfRghYfOFO7/G0
+         0Zg4ZrT8F8J7Y+pzIWhrkV/S+CM7sIYZFqtYnzQNNkV2dykTUt0Zg/opTTqR/QL5fzo5
+         dlLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725578218; x=1726183018;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qo8m8li/DItO+PeZ8FBAi9MIkkXQzptGTjicoh08/+4=;
+        b=PmBkZ7Cvx7qkzMg/On8vywr/axv6u1qp4c2WtzFeV+2NvCtdlnqM5wbvR3XrpTnCc/
+         LimFEmlY7jH08R+sswnWrLDhDikexJWsbxzX84WOGro/25Y6FFTxJ191s+bFqO9kNXry
+         VPcFMpZLbFbm/3xqnoPrhqP6Fon/NufPGaluV9OzP3UFdb7LuSOcezUc9OwDJ0Qe8r5t
+         07B1CkoMud3nUUVn4+6j7BlqXO5LYquup4/MkIaxGi3HMaF9LQhjpSq6eRC7V7QGPgRH
+         iOuo2ISV691DUkKCH1sL44187MhDyls16Urm210R/XHl/RptfZ2GZ1NU7pNUEYHSSMfp
+         GyTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWANSUg08+HGKdZ2pLQ0mIIAOqQKlrg9QWQOWVjvrOHcfR/wBXFIh2Yhunc4m9lqakW1zPNfPIEYXGtNW1+kzA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwB3n2K0adaiG82b6uSLGo382dIOUscCknXWwhvQOlzlb4jQzqd
+	3sz0tJIldpHBLHI5sfQhVNI3VH2mGwhZlv0eRBk369ZRYYfi78nkcTO4xg==
+X-Google-Smtp-Source: AGHT+IEZ6jhwkxjx5Rsp4WThikw4c0EQeiU4vYMhG2IsO3ALq0fGBmcdwu9tf65alnXXhE7OHrJNPA==
+X-Received: by 2002:a05:6214:5d0c:b0:6c3:5b3e:d8a4 with SMTP id 6a1803df08f44-6c35b3ed903mr212230926d6.5.1725578217563;
+        Thu, 05 Sep 2024 16:16:57 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c52041877esm11909666d6.123.2024.09.05.16.16.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 16:16:56 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	ncardwell@google.com,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	fw@strlen.de,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net-next v2 0/2] selftests/net: add packetdrill
+Date: Thu,  5 Sep 2024 19:15:50 -0400
+Message-ID: <20240905231653.2427327-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240829161656.832208-2-leitao@debian.org>
-X-Spam-Score: -1.9 (-)
+Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Willem de Bruijn <willemb@google.com>
 
-On Thu, Aug 29, 2024 at 09:16:54AM -0700, Breno Leitao wrote:
-> This option makes IP6_NF_IPTABLES_LEGACY user selectable, giving
-> users the option to configure iptables without enabling any other
-> config.
+Lay the groundwork to import into kselftests the over 150 packetdrill
+TCP/IP conformance tests on github.com/google/packetdrill.
 
-IUC this is to allow to compile iptables core built-in while allowing
-extensions to be compiled as module? What is exactly the combination
-you are trying to achieve which is not possible with the current
-toggle?
+1/2: add kselftest infra for TEST_PROGS that need an interpreter
 
-Florian's motivation to add this knob is to allow to compile kernels
-without iptables-legacy support.
+2/2: add the specific packetdrill tests
 
-One more comment below.
+Both can go through net-next, I imagine. But let me know if the
+core infra should go through linux-kselftest.
 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  net/ipv6/netfilter/Kconfig | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv6/netfilter/Kconfig b/net/ipv6/netfilter/Kconfig
-> index f3c8e2d918e1..cbe88cc5b897 100644
-> --- a/net/ipv6/netfilter/Kconfig
-> +++ b/net/ipv6/netfilter/Kconfig
-> @@ -8,7 +8,13 @@ menu "IPv6: Netfilter Configuration"
->  
->  # old sockopt interface and eval loop
->  config IP6_NF_IPTABLES_LEGACY
-> -	tristate
-> +	tristate "Legacy IP6 tables support"
-> +	depends on INET && IPV6
-> +	select NETFILTER_XTABLES
-> +	default n
-> +	help
-> +	  ip6tables is a general, extensible packet identification legacy framework.
+Willem de Bruijn (2):
+  selftests: support interpreted scripts with ksft_runner.sh
+  selftests/net: integrate packetdrill with ksft
 
-"packet classification" is generally the more appropriate and widely
-used term for firewalls.
+ tools/testing/selftests/Makefile              |  5 +-
+ tools/testing/selftests/kselftest/runner.sh   |  7 ++-
+ .../selftests/net/packetdrill/Makefile        |  9 +++
+ .../testing/selftests/net/packetdrill/config  |  5 ++
+ .../selftests/net/packetdrill/defaults.sh     | 63 +++++++++++++++++++
+ .../selftests/net/packetdrill/ksft_runner.sh  | 41 ++++++++++++
+ .../net/packetdrill/tcp_inq_client.pkt        | 51 +++++++++++++++
+ .../net/packetdrill/tcp_inq_server.pkt        | 51 +++++++++++++++
+ .../tcp_md5_md5-only-on-client-ack.pkt        | 28 +++++++++
+ 9 files changed, 256 insertions(+), 4 deletions(-)
+ create mode 100644 tools/testing/selftests/net/packetdrill/Makefile
+ create mode 100644 tools/testing/selftests/net/packetdrill/config
+ create mode 100755 tools/testing/selftests/net/packetdrill/defaults.sh
+ create mode 100755 tools/testing/selftests/net/packetdrill/ksft_runner.sh
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_inq_client.pkt
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_inq_server.pkt
+ create mode 100644 tools/testing/selftests/net/packetdrill/tcp_md5_md5-only-on-client-ack.pkt
 
-Maybe simply reword this description to ...
+-- 
+2.46.0.469.g59c65b2a67-goog
 
-	  ip6tables is a legacy packet classification.
-
-> +	  This is not needed if you are using iptables over nftables (iptables-nft).
->  
->  config NF_SOCKET_IPV6
->  	tristate "IPv6 socket lookup support"
-> -- 
-> 2.43.5
-> 
 
