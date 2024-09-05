@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-125320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAD9996CBB5
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 02:20:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45A3796CBB7
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 02:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 892D2B22934
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 00:20:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78EB81C22776
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 00:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1817FD;
-	Thu,  5 Sep 2024 00:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF17B666;
+	Thu,  5 Sep 2024 00:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J50iUNCx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dJ6LdzCA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610C5184;
-	Thu,  5 Sep 2024 00:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A299CCA64;
+	Thu,  5 Sep 2024 00:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725495629; cv=none; b=C9xU/wPfLDpr/+dmfVrIpkk0b582F3AcjdxNzbwB/uMriiHqPPR3Jp/Vk8XdRl9XKqjmEMP0uSVPxJVQnUheEmE17TfzhVqA5uwq2KH3yvrC+WtwngfcggQ6c22xGF7psAzIrbEKX7XENfI6Y2xLxeA2wlS5vYGlC8vFOFooiuc=
+	t=1725495632; cv=none; b=YoJOh58rT6O8xGKREmHRGxh8DzuCQ/JZqSDzedmUtpB0hIYViTwE6lK7IyaXlGaKB+yzHEby/V5/jWldVP3vbaf6oJ0y+bIPYAf6CVJ1clTpXXfWWzO8vl3BjRJ/54/wXgN18Jrv1PVOGy/lknNrXm3x50FzBbjHQseyURsm16k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725495629; c=relaxed/simple;
-	bh=BhPxPusIchmaxWsSUetl+q/0fS/XhTFEWH9Q9mNyWKQ=;
+	s=arc-20240116; t=1725495632; c=relaxed/simple;
+	bh=wYVmpyE/1QXYWH0zGA8Q0kGiKXAxLJEbPTA5RnydJC0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YPDsqBxKCv10QIa6anScPVpchEH3dijO7TiqzpkzrL4oifWIihGTGlwOuHbkalPufUjGOJBLdWWKB8qUXvO5oILjcdeCsMz5n+tZSgwwHQ4JPw+L07H4cF9+FUkWAH+ohVzMhImOist++5EEeqYL+aH08UvMMIVmAyzDkrP266Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J50iUNCx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6C47C4CEC2;
-	Thu,  5 Sep 2024 00:20:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=G3KKoV6YK2JdMwI9A8pQels2Eh1dJzVhy/9EUvJ7rXFvAx5KbqYPoGoBAEMI+vfPhV5TrN/JnXIJl1lnWlY1BgeHk/v4vZ7xcbbXwwPlUu4m35+uz3CutyTkNVe+X3xMnNktBSKwZXshxjym+kBJbC6bMbJ/7iTG7J9TI+r4te0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dJ6LdzCA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7301AC4CEC2;
+	Thu,  5 Sep 2024 00:20:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725495628;
-	bh=BhPxPusIchmaxWsSUetl+q/0fS/XhTFEWH9Q9mNyWKQ=;
+	s=k20201202; t=1725495632;
+	bh=wYVmpyE/1QXYWH0zGA8Q0kGiKXAxLJEbPTA5RnydJC0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=J50iUNCxRzEtOB+/Kh4w6HRWjVO0dCYHeW2g4mejRC8l4hZg5Wl98EcYX+ciq4Mn4
-	 jwOSqMI3+gz2LkL9PkLkAWVHk/iwpGvVONzenASe4vcybNxwpjHXyksIoGPGRDulMc
-	 u6iBERtF6kkYBC9f8aAxfSWcejPahwAs5foGDdbsfI0aE+rPzqDEy1y58N2CXH3U2f
-	 3hKBLpOSFrHSimGxbk4i5bmBmyRQaWv9uAZMNu0zD5lFHOYKsfFHVCisiRySQ1qe6d
-	 bZINDj6aAGNOcHOIHbKrSP4vpvgvtU2ovY8emm97cw6HNqmPzto5CMqrjeEMztgwee
-	 qvPbzJOJeL6nA==
+	b=dJ6LdzCA82IH1MQM1F6jqV0c3zgqN5xNz2/5n4s/TYXDNySy8/elJS8OHaIwlgQPT
+	 7HX1MAK4o/mgqWTszYoGCddIAsNKQLZ0PHfqjEVXiSUweJIti68vtbhCK/pYGPl2FF
+	 kFq/Gj5ps0Bbm4+iFEtCy3R+DA4QSclWGoHn3dLp+b7PWvA+nqD4pCT/vWekER2McJ
+	 cqpFUFaNS9oa2EEMTMEblcOmkcfCORuP+/rgP4lvFVZmCmV51VlNRG8q1l2Hp4iogY
+	 Cu9V09meubN92CdbMu7ywZQxpWzs0jZD5tpxnmfdOcO9bnf45dozt4wMn6CCKF2lpH
+	 FwQgczR8Zd8YQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB2373822D30;
-	Thu,  5 Sep 2024 00:20:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E203822D30;
+	Thu,  5 Sep 2024 00:20:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,47 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: xilinx: axienet: Fix race in axienet_stop
+Subject: Re: [net-next] net: phy: Check for read errors in SIOCGMIIREG
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172549562978.1208771.14261588078199879784.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Sep 2024 00:20:29 +0000
-References: <20240903175141.4132898-1-sean.anderson@linux.dev>
-In-Reply-To: <20240903175141.4132898-1-sean.anderson@linux.dev>
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: radhey.shyam.pandey@amd.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, michal.simek@amd.com,
- linux-arm-kernel@lists.infradead.org, daniel@iogearbox.net,
- andy.chiu@sifive.com, ariane.keller@tik.ee.ethz.ch
+ <172549563324.1208771.16266964158237189171.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Sep 2024 00:20:33 +0000
+References: <20240903171536.628930-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20240903171536.628930-1-niklas.soderlund+renesas@ragnatech.se>
+To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
+	=?utf-8?q?se=3E?=@codeaurora.org
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  3 Sep 2024 13:51:41 -0400 you wrote:
-> axienet_dma_err_handler can race with axienet_stop in the following
-> manner:
+On Tue,  3 Sep 2024 19:15:36 +0200 you wrote:
+> When reading registers from the PHY using the SIOCGMIIREG IOCTL any
+> errors returned from either mdiobus_read() or mdiobus_c45_read() are
+> ignored, and parts of the returned error is passed as the register value
+> back to user-space.
 > 
-> CPU 1                       CPU 2
-> ======================      ==================
-> axienet_stop()
->     napi_disable()
->     axienet_dma_stop()
->                             axienet_dma_err_handler()
->                                 napi_disable()
->                                 axienet_dma_stop()
->                                 axienet_dma_start()
->                                 napi_enable()
->     cancel_work_sync()
->     free_irq()
+> For example, if mdiobus_c45_read() is used with a bus that do not
+> implement the read_c45() callback -EOPNOTSUPP is returned. This is
+> however directly stored in mii_data->val_out and returned as the
+> registers content. As val_out is a u16 the error code is truncated and
+> returned as a plausible register value.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: xilinx: axienet: Fix race in axienet_stop
-    https://git.kernel.org/netdev/net/c/858430db28a5
+  - [net-next] net: phy: Check for read errors in SIOCGMIIREG
+    https://git.kernel.org/netdev/net-next/c/569bf6d481b0
 
 You are awesome, thank you!
 -- 
