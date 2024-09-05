@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-125362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3406796CE70
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 07:29:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C02396CE76
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 07:32:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9D331F26D56
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 05:29:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3929B241F9
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 05:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDD6A185941;
-	Thu,  5 Sep 2024 05:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47F8188A26;
+	Thu,  5 Sep 2024 05:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="NS8SsDSX"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="q8f3q5DW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A214879F5;
-	Thu,  5 Sep 2024 05:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91E8985654;
+	Thu,  5 Sep 2024 05:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725514153; cv=none; b=Wtubksavi0xkz+v0l1V1rJNMz4vk/6PLgTPRl0Xnob7qQnIvZp9fajEr/l6yc+p1vvcY/ZSoam8AkYzq7Dd2t+IbCKbbjVEUPxB3k8Jt+MNMjajckete0fih6KustSr8Hd34KZCjABzhfml7i5VnPO1lyCX0bU32EX3+XdTKOhQ=
+	t=1725514366; cv=none; b=XUlxgSlQF5zwpuvSiQMsccAUQly0OaH+zvy/CdOCbtlaYEmhq8PbWV57z5+Q9YNvmKLwI7xE9A46p9HChkkr9kpNpsb3z19J+hzUr8FhyARL6X2GV/BwFKoFigEDRXB3d25ChHtzXCLNwPASvnKdKoln7B21ovwtN3WFLmxXr+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725514153; c=relaxed/simple;
-	bh=t4IL1zURGkLHSSkfDGduy22l1pZL0eKjhf0pnmeRqKw=;
+	s=arc-20240116; t=1725514366; c=relaxed/simple;
+	bh=YzXuS0Wz6pbDi7inJF1uNB7hmxbOrLamUD0i7efbMuw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p71/Tg6Mko3+DQdwHxDZd3Z6snlyxaGlFMi5oDyAm/mwAeEykA/IrnoG9ApGKwXFAaGufggCDF2hoON9+4Hy6dpfYdc6tnepk8MvkbBVwMwRy+Pye9zweY6KV3AdNWSzmD70v2LlnpQSZIhum1NMdPLJxA898NjDTalNItEXKGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=NS8SsDSX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FDD9C4CEC4;
-	Thu,  5 Sep 2024 05:29:12 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=pnerYKTLJsDXphrtVMTXloi65e3fU9iVlncNk87yQFYMDDId9jLOYzifdli2Lr6QHN+4BMiLo73hcPqZGu0WvJhUVWnw+h27IcMJJ9+qaKMnRYuwSA4YHyaEvfTfKFcxopA9/KTvI4lOUDjrOemaVJ7s2Rz002N6SGtKKxNA1uA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=q8f3q5DW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62E3BC4CEC4;
+	Thu,  5 Sep 2024 05:32:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1725514153;
-	bh=t4IL1zURGkLHSSkfDGduy22l1pZL0eKjhf0pnmeRqKw=;
+	s=korg; t=1725514366;
+	bh=YzXuS0Wz6pbDi7inJF1uNB7hmxbOrLamUD0i7efbMuw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NS8SsDSX3TjlfFfgoDpJZnpcGYvFLdOe4npmlaRUKGVunoFYbMJPT3aKi9OsbI7Yd
-	 BtwwOT9OQcUpHSq85rqzq2LOYWhe1eqCnFSqKde2TXNKCkcamt6cvnI0q5S6DrOMMu
-	 LykCO+LVBrMMfgvgd/uSlpNDHQC6QVW5qAGxe/XQ=
-Date: Thu, 5 Sep 2024 07:29:10 +0200
+	b=q8f3q5DWqd/mXGNlgu6mOhiT7g9PT7J+utkKZwIct2yL+T2ohorFmzucNtxq9DCV/
+	 PhKFQDX/wdDyCS0UaKIKPr7JaJRyb3bWgpB0o/xnIWKAEmhDru3jlEmunIB5ktbtAx
+	 z4sRlRKSJT/cZQXNJvKQvLcL/BCdobT8kB3r8TIo=
+Date: Thu, 5 Sep 2024 07:32:43 +0200
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: Zijun Hu <zijun_hu@icloud.com>
 Cc: Davidlohr Bueso <dave@stgolabs.net>,
@@ -54,11 +54,11 @@ Cc: Davidlohr Bueso <dave@stgolabs.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	linux-cxl@vger.kernel.org, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v4 2/2] net: qcom/emac: Find sgmii_ops by
+Subject: Re: [PATCH v4 1/2] cxl/region: Find free cxl decoder by
  device_for_each_child()
-Message-ID: <2024090521-finch-skinny-69bc@gregkh>
+Message-ID: <2024090531-mustang-scheming-3066@gregkh>
 References: <20240905-const_dfc_prepare-v4-0-4180e1d5a244@quicinc.com>
- <20240905-const_dfc_prepare-v4-2-4180e1d5a244@quicinc.com>
+ <20240905-const_dfc_prepare-v4-1-4180e1d5a244@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,9 +67,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240905-const_dfc_prepare-v4-2-4180e1d5a244@quicinc.com>
+In-Reply-To: <20240905-const_dfc_prepare-v4-1-4180e1d5a244@quicinc.com>
 
-On Thu, Sep 05, 2024 at 08:36:10AM +0800, Zijun Hu wrote:
+On Thu, Sep 05, 2024 at 08:36:09AM +0800, Zijun Hu wrote:
 > From: Zijun Hu <quic_zijuhu@quicinc.com>
 > 
 > To prepare for constifying the following old driver core API:
@@ -81,80 +81,99 @@ On Thu, Sep 05, 2024 at 08:36:10AM +0800, Zijun Hu wrote:
 > 		int (*match)(struct device *dev, const void *data));
 > 
 > The new API does not allow its match function (*match)() to modify
-> caller's match data @*data, but emac_sgmii_acpi_match() as the old
-> API's match function indeed modifies relevant match data, so it is not
-> suitable for the new API any more, solved by using device_for_each_child()
-> to implement relevant finding sgmii_ops function.
+> caller's match data @*data, but match_free_decoder() as the old API's
+> match function indeed modifies relevant match data, so it is not suitable
+> for the new API any more, solved by using device_for_each_child() to
+> implement relevant finding free cxl decoder function.
 > 
 > By the way, this commit does not change any existing logic.
 > 
+> Suggested-by: Ira Weiny <ira.weiny@intel.com>
 > Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 > ---
->  drivers/net/ethernet/qualcomm/emac/emac-sgmii.c | 22 +++++++++++++++++-----
->  1 file changed, 17 insertions(+), 5 deletions(-)
+>  drivers/cxl/core/region.c | 30 ++++++++++++++++++++++++------
+>  1 file changed, 24 insertions(+), 6 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-> index e4bc18009d08..29392c63d115 100644
-> --- a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-> +++ b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
-> @@ -293,6 +293,11 @@ static struct sgmii_ops qdf2400_ops = {
->  };
->  #endif
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index 21ad5f242875..c2068e90bf2f 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -794,10 +794,15 @@ static size_t show_targetN(struct cxl_region *cxlr, char *buf, int pos)
+>  	return rc;
+>  }
 >  
-> +struct emac_match_data {
-> +	struct sgmii_ops **sgmii_ops;
+> +struct cxld_match_data {
+> +	int id;
 > +	struct device *target_device;
 > +};
 > +
->  static int emac_sgmii_acpi_match(struct device *dev, void *data)
+>  static int match_free_decoder(struct device *dev, void *data)
 >  {
->  #ifdef CONFIG_ACPI
-> @@ -303,7 +308,7 @@ static int emac_sgmii_acpi_match(struct device *dev, void *data)
->  		{}
->  	};
->  	const struct acpi_device_id *id = acpi_match_device(match_table, dev);
-> -	struct sgmii_ops **ops = data;
-> +	struct emac_match_data *match_data = data;
+> +	struct cxld_match_data *match_data = data;
+>  	struct cxl_decoder *cxld;
+> -	int *id = data;
 >  
->  	if (id) {
->  		acpi_handle handle = ACPI_HANDLE(dev);
-> @@ -324,10 +329,12 @@ static int emac_sgmii_acpi_match(struct device *dev, void *data)
+>  	if (!is_switch_decoder(dev))
+>  		return 0;
+> @@ -805,17 +810,31 @@ static int match_free_decoder(struct device *dev, void *data)
+>  	cxld = to_cxl_decoder(dev);
 >  
->  		switch (hrv) {
->  		case 1:
-> -			*ops = &qdf2432_ops;
-> +			*match_data->sgmii_ops = &qdf2432_ops;
-> +			match_data->target_device = get_device(dev);
->  			return 1;
->  		case 2:
-> -			*ops = &qdf2400_ops;
-> +			*match_data->sgmii_ops = &qdf2400_ops;
-> +			match_data->target_device = get_device(dev);
-
-Where is put_device() now called?
-
->  			return 1;
->  		}
->  	}
-> @@ -356,10 +363,15 @@ int emac_sgmii_config(struct platform_device *pdev, struct emac_adapter *adpt)
->  	int ret;
+>  	/* enforce ordered allocation */
+> -	if (cxld->id != *id)
+> +	if (cxld->id != match_data->id)
+>  		return 0;
 >  
->  	if (has_acpi_companion(&pdev->dev)) {
-> +		struct emac_match_data match_data = {
-> +			.sgmii_ops = &phy->sgmii_ops,
-> +			.target_device = NULL,
-> +		};
->  		struct device *dev;
+> -	if (!cxld->region)
+> +	if (!cxld->region) {
+> +		match_data->target_device = get_device(dev);
+
+Where is put_device() called?
+
+Ah, it's on the drop later on after find_free_decoder(), right?
+
+>  		return 1;
+> +	}
 >  
-> -		dev = device_find_child(&pdev->dev, &phy->sgmii_ops,
-> -					emac_sgmii_acpi_match);
-> +		device_for_each_child(&pdev->dev, &match_data, emac_sgmii_acpi_match);
-> +		/* Need to put_device(@dev) after use */
-> +		dev = match_data.target_device;
+> -	(*id)++;
+> +	match_data->id++;
+>  
+>  	return 0;
+>  }
+>  
+> +/* NOTE: need to drop the reference with put_device() after use. */
+> +static struct device *find_free_decoder(struct device *parent)
+> +{
+> +	struct cxld_match_data match_data = {
+> +		.id = 0,
+> +		.target_device = NULL,
+> +	};
+> +
+> +	device_for_each_child(parent, &match_data, match_free_decoder);
+> +	return match_data.target_device;
+> +}
+> +
+>  static int match_auto_decoder(struct device *dev, void *data)
+>  {
+>  	struct cxl_region_params *p = data;
+> @@ -840,7 +859,6 @@ cxl_region_find_decoder(struct cxl_port *port,
+>  			struct cxl_region *cxlr)
+>  {
+>  	struct device *dev;
+> -	int id = 0;
+>  
+>  	if (port == cxled_to_port(cxled))
+>  		return &cxled->cxld;
+> @@ -849,7 +867,7 @@ cxl_region_find_decoder(struct cxl_port *port,
+>  		dev = device_find_child(&port->dev, &cxlr->params,
+>  					match_auto_decoder);
+>  	else
+> -		dev = device_find_child(&port->dev, &id, match_free_decoder);
+> +		dev = find_free_decoder(&port->dev);
 
-
-Why this new comment?  That's always required and happens down below in
-the function, right?  Otherwise, what changed?
+This still feels more complex that I think it should be.  Why not just
+modify the needed device information after the device is found?  What
+exactly is being changed in the match_free_decoder that needs to keep
+"state"?  This feels odd.
 
 thanks,
 
