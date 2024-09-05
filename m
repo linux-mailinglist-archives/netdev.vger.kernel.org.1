@@ -1,156 +1,114 @@
-Return-Path: <netdev+bounces-125462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B40996D277
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:49:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19DE996D2B4
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:03:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DB391C20C16
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:49:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8FF59B23F41
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7528E1898F4;
-	Thu,  5 Sep 2024 08:49:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PgkHV5nI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0CBE1946A9;
+	Thu,  5 Sep 2024 09:03:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4F4B5256
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 08:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDF6194A48;
+	Thu,  5 Sep 2024 09:03:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725526153; cv=none; b=qW4kejzs+JEEnD3pUiURr4F6XQF0kTPvoK/zG9giy6+4PiA93Levqyv2s8//jDZU04drWlKTXWrm8v6x/SWmoTczGj+mPAs/yhb459utg1nmUqdIjumBOVxj8dhxqCUT5TvVp6JgC5QJIzK6S/9roekrmiaR12EHYtxkvEyWFLI=
+	t=1725527011; cv=none; b=ddaalKyz1nZWiFz/dDJgwSVTzmCj6LJzS2MCVeFH7Y21eH2LZa0Cwi3ktjVj4LETp4cEBA5qILRNvjmrNHUm1ZutJL5JlkqM/3DuWgvTLXuut4N02B9yl03T7R8eZfwBqXvsXwpyHQKFvqGfmUGj7/5slsO71l3/9/KhE3Upwpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725526153; c=relaxed/simple;
-	bh=Y7qGo0VcnCXRUYmEqMuxrBe7puUCbfFeBEXQdH9WR0s=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Do84FBh3tEGJgGBJl43l/Dr8durLpvqSa+5FQvlvRl7MA3LxI9d7wCt60mqjKUxEKMUzYUdFZ47cIGy4tm2HoJlof2gJY4eenTmFXOq43KwRTcHUNpsYViCsNpGj8n5bAaWO1itxZLLgk+UD2hjw2VGnO03onl6Vxpd9K+hFohM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PgkHV5nI; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e1ce191f74fso1345787276.2
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 01:49:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725526151; x=1726130951; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4WQNEuN7hXg+n6b7FCHhgO1I+wbPSIM4i2h2aYso6ZI=;
-        b=PgkHV5nI5zD6f4dwqknezd9dki6CbAONxB/adTv1gCjziAg38vxD2PQmVsVHZ86wb9
-         kvI5hIO91sbsLVY2xJUVCiPEkW8hYZjz9MecsWyrc8J6V5lQMefkADm5iYVIqJUNHKve
-         263QPhHgxKPDnc++xmGAM1gexO25ztGuczlQszzzMiOYUVIprZ83vD3adRvmXp5l29yL
-         XbQ7cDUYWIjLpX7/bXHzoh9bxRleMeW0Znadidtjs9+Joe/oQrRMK/vHYR6ak3Iszedh
-         CQNcXeO7GIE3+5R6yjkTVfrCFH4aca82GQoviolRSBSpuwbvqlDoHoMNfVgDcHK5pv4j
-         VbaA==
+	s=arc-20240116; t=1725527011; c=relaxed/simple;
+	bh=h5agUITKl/cgeeW4DQgsZL5oeRnclrtv/Skmb+M64no=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=odi6kdbVRM5/S6L6DUwSH0LO5aWO34a1g7GEIkGf9y3clhj6T2p5wubxIvOoGAwm9P4H5iIACPcKjxUTqi7dNW4WvSFHrpQUyjA9knZoa64Jtq67/jgIB9+2UDRNCMnefxPS2TJJzctqiEY2EI7N8WgZPUb4OK4qn8XrW1DZmO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c25f01879fso671593a12.1;
+        Thu, 05 Sep 2024 02:03:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725526151; x=1726130951;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4WQNEuN7hXg+n6b7FCHhgO1I+wbPSIM4i2h2aYso6ZI=;
-        b=PoSun2FhnQdPoUDbcoCvbUTeZUBmXnUbi/lOCl9tNLXIpEQWgGTCiYTr+NLxnCLxbV
-         K1io8hLwaVDX5RiaAtzm3NhlJxT+NNVrs3teJirS0V+0gislTv6NJkio9ggm/J6nDqig
-         Emd1qKfMYDIA0WoQFb1+0L2AblDHXQoDvL67M+3pEocFDyJzgiAbtMFYfWDFrbNBEAjY
-         aihqDVxdLS+uQp3gPaL6+IyveTNKDu7FPZGIn0nxYPbzxyFhbhkq86V7zSwwKp5wyaGx
-         B8Moal2zWWZl/W3M7WE8FFcEm+n4itTUZHk7M6+5HN4SvCpv+MeJFlDOKSZ6n8ETVgGF
-         hoCQ==
-X-Gm-Message-State: AOJu0Yyz4zH1n1hRq8sARAFPiXDHV9tuXoAKF971GpRMT+SB+TugUFaO
-	q0R547DlSt87DuXhX+OassM+K385k4LV72sAhPvoD+Q7ROUFcpmRUic2TKNywClF45wySIHsfzJ
-	yeNo8vR0+bw==
-X-Google-Smtp-Source: AGHT+IGEyEOKwX/xpHJ/c14+Ff+rA3HCfeXnAXIOKaomKonI3G8Vmfad5zZAkcsanwf5rGDEKeEKOr7UPg/8gw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:ac4f:0:b0:e11:6a73:b0d with SMTP id
- 3f1490d57ef6-e1d0ea4bbd6mr7446276.6.1725526150478; Thu, 05 Sep 2024 01:49:10
- -0700 (PDT)
-Date: Thu,  5 Sep 2024 08:49:09 +0000
+        d=1e100.net; s=20230601; t=1725527008; x=1726131808;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8aILp+FUNY89ZcVUn5gP5CXyAWZIDPOfD7aHJXZkQOc=;
+        b=iJTxhDXDsJbuTvkiWIsUJCdX258xO3YWAYjATT46+ErQqVTN23xng2sE6atRvsOemP
+         CI89gWqljqNT2StnheMiHv/PCj73e0kAkRdowx/3fNB9KhZ3Fq6SP12YUxl6VHQyLTk0
+         ajL/XeBi/kAStiOZb8ofWOIwhqtg0wKRBtgX3qLDlPdJtMsjUX2t7xanLZGvZvdreZP5
+         n+xlnHdTM6yfRMJ45JULXBCf3lg0nRyC6XYSxtddVFU6zVNlSvxtGZWxxrBOVMZ688wK
+         fEzP1+IKFu6vdoW1ZUXS3Il4T2ZJqLt7OSj8mBMQign5o3nmuh1vPf9SwG0jNqccQoEC
+         CUOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVH4Ns3ldqPP948rsxHURyDieHgDPmr24Ia0CUM0Ub8Y0QHJORmFzV0yfCMOXqNS9JlyfEjTlIWZvzcDB0=@vger.kernel.org, AJvYcCXniA+eDL5MyZL4zohBqA4QclcLhDmrhedMNksZjNQeyezH7jwAZ/X3LweSKNEwc0iCFBeob8xD@vger.kernel.org
+X-Gm-Message-State: AOJu0YyQnD7rk5gCFvyuk5L5issjtcVwuTNbAYK+Vy5tHTzWSASKIx28
+	8II1x+HRvckCwYF2ZV0vsXhZXvc2Tg1kE/RisyEIUkN97kp9Z3nK
+X-Google-Smtp-Source: AGHT+IEtWO6srusMymzDIGFokmJ8brm6cWt1HRzsrksU5NF9IzLD4bD5OMrwEbqRdmyo0ze0Ti7teQ==
+X-Received: by 2002:a05:6402:26d1:b0:5c2:5f0a:4a45 with SMTP id 4fb4d7f45d1cf-5c25f0a4c3emr7211261a12.31.1725527007435;
+        Thu, 05 Sep 2024 02:03:27 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-010.fbsv.net. [2a03:2880:30ff:a::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3cc529241sm960676a12.11.2024.09.05.02.03.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 02:03:26 -0700 (PDT)
+Date: Thu, 5 Sep 2024 02:03:21 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Leonardo Bras <leobras@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	rbc@meta.com, horms@kernel.org,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] virtio_net: Fix napi_skb_cache_put warning
+Message-ID: <20240905-sassy-aboriginal-crocodile-cfadde@devvm32600>
+References: <20240712115325.54175-1-leitao@debian.org>
+ <20240714033803-mutt-send-email-mst@kernel.org>
+ <ZpUHEszCj16rNoGy@gmail.com>
+ <Ztc5QllkqaKZsaoN@LeoBras>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
-Message-ID: <20240905084909.2082486-1-edumazet@google.com>
-Subject: [PATCH net-next] netpoll: remove netpoll_srcu
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Breno Leitao <leitao@debian.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Ztc5QllkqaKZsaoN@LeoBras>
 
-netpoll_srcu is currently used from netpoll_poll_disable() and
-__netpoll_cleanup()
+Hello Leonardo, good to see you here,
 
-Both functions run under RTNL, using netpoll_srcu adds confusion
-and no additional protection.
+On Tue, Sep 03, 2024 at 01:28:50PM -0300, Leonardo Bras wrote:
+> Please help me check if the following is correct:
+> ###
+> Any tree which includes df133f3f9625 ("virtio_net: bulk free tx skbs") 
+> should also include your patch, since it fixes stuff in there.
+> 
+> The fact that the warning was only made visible in 
+> bdacf3e34945 ("net: Use nested-BH locking for napi_alloc_cache.")
+> does not change the fact that it was already present before.
+> 
+> Also, having bdacf3e34945 is not necessary for the backport, since
+> it only made the bug visible.
+> ###
+> 
+> Are above statements right?
 
-Moreover the synchronize_srcu() call in __netpoll_cleanup() is
-performed before clearing np->dev->npinfo, which violates RCU rules.
+That is exactly correct.
 
-After this patch, netpoll_poll_disable() and netpoll_poll_enable()
-simply use rtnl_dereference().
+The bug was introduced by df133f3f9625 ("virtio_net: bulk free tx
+skbs"), but it was not visible until bdacf3e34945 ("net: Use nested-BH
+locking for napi_alloc_cache.") landed.
 
-This saves a big chunk of memory (more than 192KB on platforms
-with 512 cpus)
+You don't need bdacf3e34945 ("net: Use nested-BH locking for
+napi_alloc_cache.") patch backported if you don't want to.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Breno Leitao <leitao@debian.org>
----
- net/core/netpoll.c | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
-
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index e0720ee6fa6206c44f996065f11261012da0fb6f..ca52cbe0f63cf6ae394da3cf1ed4cc7cd8a7254e 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -48,8 +48,6 @@
- 
- static struct sk_buff_head skb_pool;
- 
--DEFINE_STATIC_SRCU(netpoll_srcu);
--
- #define USEC_PER_POLL	50
- 
- #define MAX_SKB_SIZE							\
-@@ -220,23 +218,20 @@ EXPORT_SYMBOL(netpoll_poll_dev);
- void netpoll_poll_disable(struct net_device *dev)
- {
- 	struct netpoll_info *ni;
--	int idx;
-+
- 	might_sleep();
--	idx = srcu_read_lock(&netpoll_srcu);
--	ni = srcu_dereference(dev->npinfo, &netpoll_srcu);
-+	ni = rtnl_dereference(dev->npinfo);
- 	if (ni)
- 		down(&ni->dev_lock);
--	srcu_read_unlock(&netpoll_srcu, idx);
- }
- 
- void netpoll_poll_enable(struct net_device *dev)
- {
- 	struct netpoll_info *ni;
--	rcu_read_lock();
--	ni = rcu_dereference(dev->npinfo);
-+
-+	ni = rtnl_dereference(dev->npinfo);
- 	if (ni)
- 		up(&ni->dev_lock);
--	rcu_read_unlock();
- }
- 
- static void refill_skbs(void)
-@@ -829,8 +824,6 @@ void __netpoll_cleanup(struct netpoll *np)
- 	if (!npinfo)
- 		return;
- 
--	synchronize_srcu(&netpoll_srcu);
--
- 	if (refcount_dec_and_test(&npinfo->refcnt)) {
- 		const struct net_device_ops *ops;
- 
--- 
-2.46.0.469.g59c65b2a67-goog
-
+I hope it helps,
+--breno
 
