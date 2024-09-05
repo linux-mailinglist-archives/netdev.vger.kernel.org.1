@@ -1,56 +1,50 @@
-Return-Path: <netdev+bounces-125560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 415CE96DAFF
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:00:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D474F96DB00
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:00:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72AAD1C241AA
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:00:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 939BF283617
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2504B2AE96;
-	Thu,  5 Sep 2024 14:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9518419AA63;
+	Thu,  5 Sep 2024 14:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ROiI2Cxb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E1qoVU/Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37C9148302
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 14:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2C1188A1F;
+	Thu,  5 Sep 2024 14:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725544818; cv=none; b=bGi50ZJ81VXLdsMX3f2Urnj4QkpD3EMIcDuxFKn8rmmk2z5O6bHtNrmZzA5Q19nCl9T4GqYLIZzcZOW6wqjiPT3OaGh3oibhxJ61NJFIyX6AWyy+BkKYxJN9ueRtBxPgB/rhf2+l3z3kk85e8ZOwjyEMb92qaONiW0mPTmUOzLE=
+	t=1725544830; cv=none; b=NgyuhFxcd+VkEziGFM10fcPagY+/DYBsytfnorylF1LCQoATrMJqD7ZRglpbht0Nwee/HoXNe2u+g1rKw0RRX6ZUIg0VW+LJ+e3V5sUktlgdq58Ji4shCJouF3ERBCIkgKrWYoq+RdPgm64sObZ6/6Y7JEcl9INnXUY5i3AOwMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725544818; c=relaxed/simple;
-	bh=NrlW8iA4xBrKOUhyIN1Ge878omOrMgjb6WtDqqUTexQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A+FEWw1dtPpC2rcjiUjmVw0gtSlL5Ssl3IY4+F4+F16kqKVxVto+wRAcYxVKl79qOoEriNQWJQ9VAliNc3rUNzJS5WGP5fb562JgnqUiio1P2E38rXNah6/jutsqkO+KqVzSWlDUxERqZ2vfNiMxx5xkbZfspIxQHjod8TnyQEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ROiI2Cxb; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725544813;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=FILGQpyhm8HWAqeNA7dG33y1hK6mZ9dIbJZyH5zJC3k=;
-	b=ROiI2CxbBEGKj4bYNi5o5umePKanItYu+NITHFXJKXcrYebvKLWnZaVs3AD5xDbmpyxHQW
-	9+GNU44N8LTR3lZJmMp9/RHiCbnduwd11u7FgMpECM9sx5CNDiWrahlQVogLPYQoeX3WM9
-	/5TFqnlRPv8PFcAHHYALB4ZVdKvQTks=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2] ptp: ocp: Improve PCIe delay estimation
-Date: Thu,  5 Sep 2024 14:00:28 +0000
-Message-ID: <20240905140028.560454-1-vadim.fedorenko@linux.dev>
+	s=arc-20240116; t=1725544830; c=relaxed/simple;
+	bh=A8l4piqTQI8Mrz5dGmHPoPTePsjVSTnytoQfZFIWWjQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VmI+XTV7kY9VYcpJUVqbKZAg2VQGUV+mhfXRtJp+E5rWuRdq86OhXy8LA3hDFGoLoweO2PkV6kNUcC6sM/gC+ZYAkm/1ai6YXMYOhsUBXb+F3TrVu+jAb4hUx+bdU6NWvLLJopEaDI0+ojpiN0x+Mn+NbVknaxJsHxUbp/wRR44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E1qoVU/Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8CD0C4CEC3;
+	Thu,  5 Sep 2024 14:00:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725544829;
+	bh=A8l4piqTQI8Mrz5dGmHPoPTePsjVSTnytoQfZFIWWjQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=E1qoVU/Q3P/OJVGfCVerPdFkUzbPlL+2M8CfOy+uGAQPEnnqH7tylMVK+sCV3uFiO
+	 Na3221RLEmfJpMax5wWk3eHN4pOKC7V+ZUem18gUoGxjp0gWSqIrUMvH11JAOzkK7H
+	 /oeexkLfCkiU9tTn2z9fzew38/vtWdbd56rTAOnfP04SruhbXUJDkplaPmbMb0pu1N
+	 zhTUbypTofAmXNpAkR1/DxDHJ4WiqDENDmXpBGyVgOzPoi7u2EWTp0/G5e6+FtuQ/w
+	 IT4F4K4bjKBUDYtLZwkfQbIya7L54cttc2mL335BlWXwMQYJqUC8tzrOoEnHQLlc+r
+	 D4wyJToOHgrUw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBEC73806651;
+	Thu,  5 Sep 2024 14:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,60 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Subject: Re: [PATCH bpf-next] xsk: bump xsk_queue::queue_empty_descs in
+ xp_can_alloc()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172554483081.1700166.14653164106690090613.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Sep 2024 14:00:30 +0000
+References: <20240904162808.249160-1-maciej.fijalkowski@intel.com>
+In-Reply-To: <20240904162808.249160-1-maciej.fijalkowski@intel.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
+ bjorn@kernel.org
 
-The PCIe bus can be pretty busy during boot and probe function can
-see excessive delays. Let's find the minimal value out of several
-tests and use it as estimated value.
+Hello:
 
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
-v1 -> v2:
-- init delay with the highest possible value
-- use monotonic raw clock to calculate delay
----
- drivers/ptp/ptp_ocp.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+This patch was applied to bpf/bpf-next.git (net)
+by Daniel Borkmann <daniel@iogearbox.net>:
 
-diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-index ee2ced88ab34..6ea44c86f2ec 100644
---- a/drivers/ptp/ptp_ocp.c
-+++ b/drivers/ptp/ptp_ocp.c
-@@ -1552,22 +1552,24 @@ ptp_ocp_watchdog(struct timer_list *t)
- static void
- ptp_ocp_estimate_pci_timing(struct ptp_ocp *bp)
- {
--	ktime_t start, end;
--	ktime_t delay;
-+	ktime_t start, end, delay = U64_MAX;
- 	u32 ctrl;
-+	int i;
- 
--	ctrl = ioread32(&bp->reg->ctrl);
--	ctrl = OCP_CTRL_READ_TIME_REQ | OCP_CTRL_ENABLE;
-+	for (i = 0; i < 3; i++) {
-+		ctrl = ioread32(&bp->reg->ctrl);
-+		ctrl = OCP_CTRL_READ_TIME_REQ | OCP_CTRL_ENABLE;
- 
--	iowrite32(ctrl, &bp->reg->ctrl);
-+		iowrite32(ctrl, &bp->reg->ctrl);
- 
--	start = ktime_get_ns();
-+		start = ktime_get_raw_ns();
- 
--	ctrl = ioread32(&bp->reg->ctrl);
-+		ctrl = ioread32(&bp->reg->ctrl);
- 
--	end = ktime_get_ns();
-+		end = ktime_get_raw_ns();
- 
--	delay = end - start;
-+		delay = min(delay, end - start);
-+	}
- 	bp->ts_window_adjust = (delay >> 5) * 3;
- }
- 
+On Wed,  4 Sep 2024 18:28:08 +0200 you wrote:
+> We have STAT_FILL_EMPTY test case in xskxceiver that tries to process
+> traffic with fill queue being empty which currently fails for zero copy
+> ice driver after it started to use xsk_buff_can_alloc() API. That is
+> because xsk_queue::queue_empty_descs is currently only increased from
+> alloc APIs and right now if driver sees that xsk_buff_pool will be
+> unable to provide the requested count of buffers, it bails out early,
+> skipping calls to xsk_buff_alloc{_batch}().
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf-next] xsk: bump xsk_queue::queue_empty_descs in xp_can_alloc()
+    https://git.kernel.org/bpf/bpf-next/c/6b083650a373
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
