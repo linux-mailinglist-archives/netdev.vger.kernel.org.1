@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-125516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5F6B96D784
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:50:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 283D496D78A
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:50:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 959E3282DD1
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:50:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B2C01C23A83
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCE3199E93;
-	Thu,  5 Sep 2024 11:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334B2199FA5;
+	Thu,  5 Sep 2024 11:50:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZcttmyo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6/yz8Af"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72511192D72;
-	Thu,  5 Sep 2024 11:50:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B5A199EA3;
+	Thu,  5 Sep 2024 11:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725537007; cv=none; b=tzQn175pvhOihpkxy2nP7lD5YEJ72atzf9NfEICbF8Eps/cWDW1EPVYWZ8y0B2uRvDQadJSSZP8HGORopdYUSQcISl/uWoealearEQa2gHnL6B4/rhszKIoRxJ4V6zIdHa2PqqLpEHGMcau6sfe4nutYTXB/mqjyhsUvogfNVSw=
+	t=1725537045; cv=none; b=XVvHDQdPD7IU9Ff5j5qTtttX+I4LVDoAsS0hFS4+VEU4qdYdcO0rfx4stvJGe74oADd1zrUSPgWAIhdMlzFLEicfMiL8Ms6d2p5U/zX+pkPap3MvJOu5djoRkj1yNZ3e7TgCnggFAexbU5cqbRdnrgf5SeWJIBX4nevc8evibSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725537007; c=relaxed/simple;
-	bh=j+E59ehvKxXo4I4jO12qrppSXMcfVff2poOB3lSPhBE=;
+	s=arc-20240116; t=1725537045; c=relaxed/simple;
+	bh=/UF8ih1Lnzmep2djELoXhzw+uWWqswmeaDLipume9TM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=jvV292RPH4hTPjflOpo4OjnkZ8m8XKOhCg4X0m6xzTICOgu3ghXWTmRkJKGgqdFli9wfFhiDSMVOOYCAnEZtH0efk6pDPM7C7liWaFepJ2giIo8mniIDYjJV4/OZGObsHMuCz+tWUUFW2D4vw1ppcvg4Q0RYivWNjiQTZEB9ebo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZcttmyo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 433F2C4CEC3;
-	Thu,  5 Sep 2024 11:49:59 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=uUUtStXCP1Wpsp+hdnCdrcpcf84FNZ4h3z3nwGdWvhrGMFl+StGC4G196Cxtw2ZkT4IocWeTX6RiIrxZLVFgaKUgR+AffvFN2lTZapajRstjDUXVlSphgU8fl1VZTfQ+BWVargkue0Ipdhkidy10s3+htzf6DxDG7Rvk3LDqzes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q6/yz8Af; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B09F3C4CEC4;
+	Thu,  5 Sep 2024 11:50:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725537007;
-	bh=j+E59ehvKxXo4I4jO12qrppSXMcfVff2poOB3lSPhBE=;
+	s=k20201202; t=1725537044;
+	bh=/UF8ih1Lnzmep2djELoXhzw+uWWqswmeaDLipume9TM=;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=HZcttmyoH7TkT40fRuoTOmJmMFsO7zsW8RRIo5atqIN+vJEujeQHumFb0n1iiA8MY
-	 RMxdQMuXRpCGmN7cyC8PLnB08FWr4TK5Jl7eST/CWSSeNP1S4VZfD+3W6jMHktKfsu
-	 I3gb96CHZDLhrNWR8CetzLzAP8Txj/MewRddfgQLFI/ZKEh8HPL977T4WOfKiJdnw2
-	 dXS9wFi2dX+GyJvH11dtnzcW0qWTwvGXk5vdZkRN85grOZ1ybki1MUskX/Wz2VT7FE
-	 /HDsKWpMhKzEsoZHU4pLb6B9SO2FthOzucogMsqAFMQK4u6yjid9wr6DjE0EShkim2
-	 ytYBKtEAPi0+w==
-Message-ID: <f4883736-7c85-44b8-976f-f98b2d270973@kernel.org>
-Date: Thu, 5 Sep 2024 13:49:57 +0200
+	b=q6/yz8Af5jX0ydBRYPdFvDdy4d8Tff1HXRl/PS+4r0kn4L5T8sAPBjCFyadZh8zOG
+	 ePQRRADcIffcHAxYCUCpaL1k5YWRnNS5BeAAWvuT8gKCSiE+pLpz2fBhvgdw7HXo7x
+	 9nuSoHmVYewoDFlYGLiXIyYomss6xFVPXheAtX0rijQaymKnY+0gfCHbfssq+uhFEO
+	 srI/jOwtFS/M7+JPrkPIoNin1E02jpQIA6gLyCP00QBlJK4k1b44Y0hRM31cHYZuhB
+	 0b/cl6jBzWocVg5Kuxgg1JDC+mBhMDyzD14BRhbUfyEjnd2PY9p1YjUf+qzQC13tqw
+	 IJ+FN8gPpRM0g==
+Message-ID: <ce910c90-0655-42d2-8b1b-d912698d4556@kernel.org>
+Date: Thu, 5 Sep 2024 13:50:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] dt-bindings: net: aspeed: Add binding for ASPEED
- AST2700 MDIO
+Subject: Re: [PATCH 2/2] net: mdio: aspeed: Add AST2700 support
 To: Jacky Chou <jacky_chou@aspeedtech.com>, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
  krzk+dt@kernel.org, conor+dt@kernel.org, joel@jms.id.au,
@@ -60,7 +59,7 @@ To: Jacky Chou <jacky_chou@aspeedtech.com>, davem@davemloft.net,
  linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org, andrew@lunn.ch,
  hkallweit1@gmail.com, linux@armlinux.org.uk
 References: <20240905114754.519609-1-jacky_chou@aspeedtech.com>
- <20240905114754.519609-2-jacky_chou@aspeedtech.com>
+ <20240905114754.519609-3-jacky_chou@aspeedtech.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -106,36 +105,30 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240905114754.519609-2-jacky_chou@aspeedtech.com>
+In-Reply-To: <20240905114754.519609-3-jacky_chou@aspeedtech.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 05/09/2024 13:47, Jacky Chou wrote:
-> Add a new compatible for ASPEED AST2700 MDIO.
-
-You have entire commit msg to explain the differences of the hardware,
-including whether they are or are not compatible.
-
+> Add AST2700 compatible for Aspeed MDIO driver.
 > 
 > Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
 > ---
->  .../devicetree/bindings/net/aspeed,ast2600-mdio.yaml          | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  drivers/net/mdio/mdio-aspeed.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml b/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml
-> index d6ef468495c5..6dadca099875 100644
-> --- a/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml
-> +++ b/Documentation/devicetree/bindings/net/aspeed,ast2600-mdio.yaml
-> @@ -19,7 +19,9 @@ allOf:
+> diff --git a/drivers/net/mdio/mdio-aspeed.c b/drivers/net/mdio/mdio-aspeed.c
+> index c2170650415c..607e5c56434f 100644
+> --- a/drivers/net/mdio/mdio-aspeed.c
+> +++ b/drivers/net/mdio/mdio-aspeed.c
+> @@ -188,6 +188,7 @@ static void aspeed_mdio_remove(struct platform_device *pdev)
 >  
->  properties:
->    compatible:
-> -    const: aspeed,ast2600-mdio
-> +    enum:
-> +      - aspeed,ast2600-mdio
-> +      - aspeed,ast2700-mdio
+>  static const struct of_device_id aspeed_mdio_of_match[] = {
+>  	{ .compatible = "aspeed,ast2600-mdio", },
+> +	{ .compatible = "aspeed,ast2700-mdio", },
 
-Your driver says something else...
+Why? They are compatible, aren't they? Write useful commit msgs so you
+won't get simple questions on each review.
 
 Best regards,
 Krzysztof
