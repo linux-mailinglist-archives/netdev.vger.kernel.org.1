@@ -1,109 +1,232 @@
-Return-Path: <netdev+bounces-125549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 950F996DA85
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:40:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3036696DA91
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:41:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FC00287EF4
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:40:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 547331C22D40
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0F019D06A;
-	Thu,  5 Sep 2024 13:40:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8D319D89F;
+	Thu,  5 Sep 2024 13:41:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="B25Swccq";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="NfgLiQgF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEPTlnVV"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D981919CCEC
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 13:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7108219D885;
+	Thu,  5 Sep 2024 13:41:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725543613; cv=none; b=ovBxMwJuc7enVhptxd/cmiswx+TDU3qnzUv4U8n68Pw6TZ4YJDehZkFBo7dlDqdbTo2P+Y+/4z+iHlJ7RLVH6dXLixrlLsbn6glnGEvSf4VowbrBdSa2jdjIVIbPEmP/OT+nNgZqiaKlWjQO9JdQ4epugK2Db6BSGsz/WuEnQRw=
+	t=1725543697; cv=none; b=NdR0v95rCCYC9cwJbIoSzPLtgPZMemrEPJBuc3CAfXqtHe2b4Or5o9twohhxJ+uOBtBibvLASKkxbbfW21DEB37hhO8KKyIQl4a35B6onGuT+Tt8IEk9R+xhJ4WhuU6+sk6WKhAB9rJQTSkwpFeeK7A1o87lA+bUzoNWD4K8UcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725543613; c=relaxed/simple;
-	bh=OmmJ9JFZiqta7WLJpB+r53jvf5wwJAknuwo9ggHK0ao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X31Nwi7hO94JanMd3wGqAzAeSc/LGYUmQfkW5N5i1t3PJ8VKs4yG3MMMol5FEy0r5FeRZX/sjWiccFhDrjpqewrprLSOIpGH8S3UVu+eNGdZ9X47koBIwyekmwQqhMUMd2wq6NSpyaIIPE6/Fmr5OdSQgiV/LbXFT9iUSTn0XVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=B25Swccq; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=NfgLiQgF; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Thu, 5 Sep 2024 15:40:08 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1725543610;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZNGQeWIGBmbvRbhDVFGOBUUnKfrBupC2AvgQtk4aaLo=;
-	b=B25SwccqwcpboeyvZPCVwxMP8XbKavk5MeVCiVNkdP8JlwDbFBEg6fojY466z3bRGJAeum
-	FooZ7W4XSGtYXJXYh+DSEaip0qDejRQC9gtK3eDfnmcX7JTk9VMn38eyDZwM+HAknc0f8e
-	8YMz4bH5UkDdm8ZWr85c/bC4eJXx9eFkoGvP850h2aOzOR5El1UxqItfwdQrawmvCOyyfG
-	FjGqDSlY2JWFROIdL7Fg4qMOQ18TXaPVC9rX3bN3jIxtKpIfvfnKzOlkl/9k1jKYgK4Nub
-	KHzSxZYvTDbuIiwsZYTp5tYmi8u9Nso/wJTej7MwBWZFZXdx2rv+XGtKhRyPUQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1725543610;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZNGQeWIGBmbvRbhDVFGOBUUnKfrBupC2AvgQtk4aaLo=;
-	b=NfgLiQgF1tLY0CLcuLGvhG2rn5rd73LI6scwBsgYjE782mKTgwtO3YfWW6/vP+nN4BYIXg
-	5BVWrf9FFc0JS6DA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	syzbot <syzkaller@googlegroups.com>
-Subject: Re: [PATCH net] net: hsr: remove seqnr_lock
-Message-ID: <20240905134008._e6BGgni@linutronix.de>
-References: <20240904133725.1073963-1-edumazet@google.com>
- <20240905121701.mSxilT-9@linutronix.de>
- <CANn89i+K8SSmsnzVQB8D_cKNk1p_WLwxipUjGT0C6YU+G+5mbw@mail.gmail.com>
- <20240905131831.LI9rTYTd@linutronix.de>
- <CANn89iLQxH0H_cPcZnxO9ni73ncmbbhx3knzRB2swTsx=J-Fmg@mail.gmail.com>
+	s=arc-20240116; t=1725543697; c=relaxed/simple;
+	bh=gIqWsC5lxydje2dzXSHp8pbLdj0xu04lUsa/943sB28=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lSK6KWFKpqkMqgdLMxOsethaIYVu2+marGhELSuqs29q1dW08r/1xXDhstElA7ixo8bRXlex0tU/pdce/me4vmTCqDRfrDc6Gm1mFA1TgBw/7K3S+WwjDmSir6abbpE5QgdXuGVpXsQhvcvgdH003ng4TII9edzxLLGUd3SAggM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GEPTlnVV; arc=none smtp.client-ip=209.85.166.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-39d3cd4fa49so2525855ab.1;
+        Thu, 05 Sep 2024 06:41:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725543694; x=1726148494; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=752IbR2ypUXV31keKCOgDn1D0LRydIL56SC/NZ/9Pb0=;
+        b=GEPTlnVVB1PU9g+VylCcKCVfDUb8V9JSxIWoF2+Hmte+El4mDSzV5Z025TBp5lp7TV
+         SIwBT6swH7j8ddWKO3TBrAtsQQeLrIkqNP8l/chbc+phC3DUzKsZ53ehJOzGTGU5x6n5
+         b4aGIyJuv+iq5mZCYCOIXOq167fZKFeeb8rUtHw6cP0z+c/UmTxWQNLTUCuhNvhAVRww
+         I3A7npT2+3ICz3khLxrEqOOT3bks92Wkp/gJ3PzKsY7NSsYea1lMtSNYkS/0nwyeB2yT
+         Cjz8VqHw4/UxkI0hHAjNTDRiKLRj0Ntbckh8wXOqnZ7tjIoZSPfCfbzZIQur4twWj6rW
+         +56g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725543694; x=1726148494;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=752IbR2ypUXV31keKCOgDn1D0LRydIL56SC/NZ/9Pb0=;
+        b=ArkXZC7B17vku9Eeospy1wXpIe5ev2bzCY9RJjSxYiyT0eRo/kpXc+Co4VmE1qHU6M
+         0rgi5IgNEdBr50cWaAnLGsNqQoz5j56svnKsSOviJetSppNIDmg4OpvJ5+xX3jrtGkj7
+         u/eOyU4HRx94Mgz+uz6Rwxr4B9fBvezkJ87wDFj+XbQ/JAYs+5tR4x5IZrylSar5zZEC
+         mixc+jyjzPKV0t43UcQ7ATpD30+9gFaxHzrgrt71SbeFfNpW8kwzijyHZQuYnItH/2Ic
+         yED8997CeSqKLmutzXhMC1pygO1qxfe3O8Qje8PyNw5Ls0TywPeVUZdYOpj7y6eo9U8Q
+         ch3g==
+X-Forwarded-Encrypted: i=1; AJvYcCVQsJj9tvPCoaPofNjeA7YvomrU6aRCpPIlkcLhaOwcPLlupwq4fCCxeFiRaFnvmZhyJH1wEjmIbKFcpLg/2e8=@vger.kernel.org, AJvYcCVsIdKvnKzqkPLwScgshD+JrpAVGoiO6nZZMaUtcNPUZv4Vy+ZKXvRfREQJ2ubz1wMezrDNXYFN@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYFK+D0v/VpfXtxsiHURcEdQwp7emeugCy8bReQV8DQfS2r70r
+	n17A77+6Iq6+o9VpOJWBmcvdyVtujYpJc4AslCAV23YupcHHcUklTc7jIb08wJxTZSG+ne0560F
+	svq/XxM6JYizUMkzxF7oHbqIIhnI=
+X-Google-Smtp-Source: AGHT+IEpz+X2tWx2xxbGj5Bo7bQhHgwxYztD5yPC/auXGPT9YLlRab1IP8H0+Vk3xBXZHV8hBN++PY2UVLBcmdv205o=
+X-Received: by 2002:a05:6e02:1522:b0:39f:5d96:1fd6 with SMTP id
+ e9e14a558f8ab-39f797a5aacmr49926955ab.9.1725543694394; Thu, 05 Sep 2024
+ 06:41:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CANn89iLQxH0H_cPcZnxO9ni73ncmbbhx3knzRB2swTsx=J-Fmg@mail.gmail.com>
+References: <20240904144446.41274-1-kerneljasonxing@gmail.com>
+ <66d8ce15415ec_163d93294a2@willemb.c.googlers.com.notmuch> <CAL+tcoDko2ijPvnBr1=dy4iBfw9wLEyKX0ye4rFngd_q7Zr7eQ@mail.gmail.com>
+In-Reply-To: <CAL+tcoDko2ijPvnBr1=dy4iBfw9wLEyKX0ye4rFngd_q7Zr7eQ@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 5 Sep 2024 21:40:57 +0800
+Message-ID: <CAL+tcoBhdFS5wjE7v7G_Hf9SsTkqiaGqWTE8Zp-NyJA7F6pspw@mail.gmail.com>
+Subject: Re: [PATCH net-next] selftests: return failure when timestamps can't
+ be parsed
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-09-05 15:26:27 [+0200], Eric Dumazet wrote:
-> diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
-> index af6cf64a00e081c777db5f7786e8a27ea6f62e14..3971dbc0644ab8d32c04c262dbba7b1c950ebea9
-> 100644
-> --- a/net/hsr/hsr_slave.c
-> +++ b/net/hsr/hsr_slave.c
-> @@ -67,7 +67,9 @@ static rx_handler_result_t hsr_handle_frame(struct
-> sk_buff **pskb)
->                 skb_set_network_header(skb, ETH_HLEN + HSR_HLEN);
->         skb_reset_mac_len(skb);
-> 
-> +       spin_lock_bh(&hsr->seqnr_lock);
->         hsr_forward_skb(skb, port);
-> +       spin_unlock_bh(&hsr->seqnr_lock);
-> 
->  finish_consume:
->         return RX_HANDLER_CONSUMED;
-> 
-> 
-> I am surprised we even have a discussion considering HSR has Orphan
-> status in MAINTAINERS...
-> 
-> I do not know how to test HSR, I am not sure the alternative patch is correct.
+On Thu, Sep 5, 2024 at 7:04=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> On Thu, Sep 5, 2024 at 5:16=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Jason Xing wrote:
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > When I was trying to modify the tx timestamping feature, I found that
+> > > running "./txtimestamp -4 -C -L 127.0.0.1" didn't reflect the fact
+> > > properly.
+> >
+> > Did not reflect what fact? Sorry, I don't entirely follow the issue
+> > you raise.
+> >
+> > > In this selftest file, we respectively test three tx generation flags=
+.
+> > > With the generation and report flag enabled, we expect that the times=
+tamp
+> > > must be returned to the userspace unless 1) generating the timestamp
+> > > fails, 2) reporting the timestamp fails. So we should test if the
+> > > timestamps can be read and parsed succuessfuly in txtimestamp.c, or
+> >
+> > typo: successfully
+> >
+> > > else there is a bug in the kernel.
+> > >
+> > > After adding the check so that running ./txtimestamp will reflect the
+> > > result correctly like this if there is an error in kernel:
+> > > protocol:     TCP
+> > > payload:      10
+> > > server port:  9000
+> > >
+> > > family:       INET
+> > > test SND
+> > >     USR: 1725458477 s 667997 us (seq=3D0, len=3D0)
+> > > Failed to parse timestamps
+> > >     USR: 1725458477 s 718128 us (seq=3D0, len=3D0)
+> > > Failed to parse timestamps
+> > >     USR: 1725458477 s 768273 us (seq=3D0, len=3D0)
+> > > Failed to parse timestamps
+> > >     USR: 1725458477 s 818416 us (seq=3D0, len=3D0)
+> > > Failed to parse timestamps
+> > > ...
+> > >
+> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > ---
+> > > I'm not sure if I should also check if the cur->tv_sec or cur->tv_nse=
+c
+> > > is zero in __print_timestamp(). Could it be valid when either of
+> > > them is zero?
+> >
+> > tv_nsec can be zero. tv_sec cannot.
+> >
+> > > ---
+> > >  tools/testing/selftests/net/txtimestamp.c | 4 ++++
+> > >  1 file changed, 4 insertions(+)
+> > >
+> > > diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testin=
+g/selftests/net/txtimestamp.c
+> > > index ec60a16c9307..b69aae840a67 100644
+> > > --- a/tools/testing/selftests/net/txtimestamp.c
+> > > +++ b/tools/testing/selftests/net/txtimestamp.c
+> > > @@ -358,6 +358,10 @@ static void __recv_errmsg_cmsg(struct msghdr *ms=
+g, int payload_len)
+> > >
+> > >       if (batch > 1)
+> > >               fprintf(stderr, "batched %d timestamps\n", batch);
+> > > +     else if (!batch) {
+> > > +             fprintf(stderr, "Failed to parse timestamps\n");
+> > > +             test_failed =3D true;
+> > > +     }
+> >
+> > nit: if adding braces around one side of a branch, then add to both (al=
+l).
+> >
+> > This is not so much a parsing failure as that no timestamps arrived.
+> >
+> > More importantly, this function gets called also if
+> > recvmsg(fd, .., MSG_ERRQUEUE) returned 0:
+> >
+> >         if (ret >=3D 0) {
+> >                 __recv_errmsg_cmsg(&msg, ret);
+> >
+> > That seems counterintuitive, as there is no data. But this was
+> > introduced with cfg_loop_nodata (SOF_TIMESTAMPING_OPT_TSONLY). When
+> > there may be packets looped, just 0B packets. In those cases we also
+> > expect timestamps.
+> >
+> > But, can __recv_errmsg_cmsg now also be called when there truly is
+> > nothing on the error queue? It is a non-blocking read, after all.
+>
+> Today I re-read this paragraph. I think we were just past each other.
+>
+> I would like to check that if the reporting timestamp with someone's
+> patch applied someday wouldn't work, the txtimestamp should return
+> failure to warn the submitter. That is to say, we succeed to generate
+> the skb with timestamp but failed to report it like this:
+>
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 8a5680b4e786..65f7947322cd 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -2274,7 +2274,7 @@ void tcp_recv_timestamp(struct msghdr *msg,
+> const struct sock *sk,
+>                         }
+>                 }
+>
+> -               if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_SOFTWARE=
+)
+> +               if (!(READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_SOFTWA=
+RE))
+>                         has_timestamping =3D true;
+>                 else
+>                         tss->ts[0] =3D (struct timespec64) {0};
 
-I did submit something to tests somewhere. I will try to test this and
-let you know.
+If so, rxtimestamp test will fail. Let me correct myself here.
 
-> Removing the seqnr_lock seems the safest to me.
-Consider this as ack if you don't hear back from me.
+>
+> which I intentionally wrote is used to show one stupid bug as an
+> example. The txtimestamp test should spot it :)
 
-Sebastian
+Sorry, not in tcp_recv_timestamp, but like in __sock_recv_timestamp:
+
+j@@ -946,7 +946,7 @@ void __sock_recv_timestamp(struct msghdr *msg,
+struct sock *sk,
+
+        memset(&tss, 0, sizeof(tss));
+        tsflags =3D READ_ONCE(sk->sk_tsflags);
+-       if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
++       if (!(tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
+            ktime_to_timespec64_cond(skb->tstamp, tss.ts + 0))
+                empty =3D 0;
+        if (shhwtstamps &&
+
+This error/bug cannot be noticed by txtimestamp before this patch.
+
+It's just an example which helps me clarify my thoughts.
+
+>
+> Thanks,
+> Jason
 
