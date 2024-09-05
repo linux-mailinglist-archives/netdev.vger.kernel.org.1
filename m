@@ -1,165 +1,215 @@
-Return-Path: <netdev+bounces-125620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4B0A96DF5D
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:17:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 321E096DF77
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7E6D1C22852
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:17:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6239B282A4A
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9550619C579;
-	Thu,  5 Sep 2024 16:17:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F0001A01C4;
+	Thu,  5 Sep 2024 16:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QankzAG5"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ElbxNreG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2087.outbound.protection.outlook.com [40.107.95.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C274B47F69
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 16:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725553070; cv=none; b=VgYXOjHz9Vgv9ok3h5a0pQZQyuM6L5Zbfe1UbO4BwmT99OT0QaUEYu4ioahstVfDox2TIFcptr9kVuXAeB1IYglIZ81u6ZUZW0euC1pluKd+a88p6rrGIhJJdKGwsok5VWIjIEpuShHEVfUXtJL4+7mSsUIJPP+xKEdQQxmTxk8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725553070; c=relaxed/simple;
-	bh=TtkVEd7odVy9sS0nFNXSGIiJsEOWc6az6pfqn5WX9qE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uU6OnDUNOoKs/KmHAjSgHzSZg45OxAfJsdbnM0B8El2gjIWXwrUOdpqRYzfHonYUuNkmpFrfrMdeKJCLXys6txEBSQzpLgGKIDqcezv2obw1I75jPHr22XAlxr31OMLKH/NMIIlxpMz463+w4raRP16ukCbhVeaa1MY8jWMJnXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QankzAG5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725553067;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=iaE5XqWoFR9AdfJpm9q1/ADqgtzDcMWaCwCzCaQbFu4=;
-	b=QankzAG5YXiX0tAxHM3aCiwo5QvmjnjdVyrH7WlSukHmP4ucTJafjH2A/r+6PnVFeJAkD/
-	dC0DzlCK1+I6yB17rkAdVM7BwRqvZqbmeo0tlucdvEL4VGClPLNB+rQl/s5lMGg6AzqxFW
-	pbbyEWGX1G8SXkvUamNL6YxZm3txat4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-WJzf_4JJPh-rr67nDRmt3g-1; Thu, 05 Sep 2024 12:17:46 -0400
-X-MC-Unique: WJzf_4JJPh-rr67nDRmt3g-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3756212a589so687213f8f.2
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 09:17:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725553065; x=1726157865;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iaE5XqWoFR9AdfJpm9q1/ADqgtzDcMWaCwCzCaQbFu4=;
-        b=etuwBXtDTJb4ewRjc88oBdXxHrWM2h4jUNMG5EvE7ny2/EN5ACl+kuFVeU9eY54xHc
-         w+HXUSqZZgIP7fzURgnA6IRfTxA311IS6FCzB5QJrWXR3fRXafM6pZrzNE3qARAVbwEl
-         kH+btvQY5qkmRbWT9sNQU70FT0to/iYygWLcXYL6KYDVFqHQYCl60LGVJGQ1I4MBQlsR
-         ruJYaZIJGFTk7C0CN4KX7KpccEeBhbz4S0XL1+w2LnurEpKsIHb9c/TbR91X2YHoNYdI
-         lbFpbqxycSZw+cGnwmYFJU8a+gbpA0jRU81xRq97wKgrhottCp+urGln8oH1anRrdpRT
-         HsKw==
-X-Gm-Message-State: AOJu0YzFWFbT5K0TJrv1/kidpg5RamTmrAvNaDf5hrRnMxsAf6aRCypy
-	EeVAQfW05bck/Ttw2W1/ul4eXD5TrlJ5v3Kehbu0NbTQdZmla9WyUdtkFS2p/Z9BTq4W45rbWSk
-	dAe4IL7PUnbKxmk4YMbqXaSFQ0Hc8Ne77+KNEAv1zQn5Poy7Pzghu1Q==
-X-Received: by 2002:adf:f7c8:0:b0:374:c512:87ce with SMTP id ffacd0b85a97d-374c5128a82mr12130910f8f.30.1725553065031;
-        Thu, 05 Sep 2024 09:17:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHvu/apiMAq4RvAl5wSKKN+12JGeZYYbO4xdhF9luYBHaFwsBjDjg3e4qWvyCzXP2gyQw0nog==
-X-Received: by 2002:adf:f7c8:0:b0:374:c512:87ce with SMTP id ffacd0b85a97d-374c5128a82mr12130890f8f.30.1725553064557;
-        Thu, 05 Sep 2024 09:17:44 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-55-250.dyn.eolo.it. [146.241.55.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ef7e109sm19554723f8f.67.2024.09.05.09.17.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Sep 2024 09:17:44 -0700 (PDT)
-Message-ID: <46484afd-7b50-465d-b763-0ac60201bd3d@redhat.com>
-Date: Thu, 5 Sep 2024 18:17:42 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC61619FA8E
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 16:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725553409; cv=fail; b=FBwPczgm5BfUQAycxeniEAtMzHTFzkJjq5UwA7lCAZPtgFe/iQNnUcYQ7nKipa6grLMMX/sz4HEQjeig40zD2eBrhsMLywxq5dNaRdDxfhp3H0oCa9Pv9kclTBE558ORlSHazCie2UlCC4RAJ1Z/1j8ErBPS9jnvHeymk2TxaEM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725553409; c=relaxed/simple;
+	bh=5FKReP5WShI47vyyYrqJb11wJCR45nk9ctgTuNHd9Lo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=dLz6l0KqogrGj/ciFRJHp7GscZ8I6HSTXLckGtCGWia64A5MljMdbWi2WskscYUZ8VRMl0Q1JYXMmO+n2+JcuOX3a0sqYobKyb73EaVbQzKJNu8+9oMEtTZhNfECWw3NbYYZdyP/St+9VzX0J0ipC/I/C2xfj5yKVRGa2rfn7zY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ElbxNreG; arc=fail smtp.client-ip=40.107.95.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZZWOE2DhHp1sWuxhywKVIbmn0OkNLiDRgXNecyltfnB2i9E2ZXDOi8e4Hj/bsI3hoflzbpY4j0BadsvOAT8uY6nlHKQgANu7vB6AMpHuXrcPs1bUB2mviqHi6a06oexzhGY9WYmcpT8PeH95k35LLKon3BpVs0ADXtRpLhKDbpQiFpvo6CH2ERs4cUGofAhb9XEjJYoFcrQ5vzkiuMEp0Uo2QEtRJZerEcwTgxaypo+tDOqdFHNoiQnx+v9jOQDDKNB37TjI4wpVZHODWxxJS4/IugstvLhkLfoDAhpJmyiAuFsPGH7rHqwKxbWom8LhG/2sMW0IRRsDFgn1SosHtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BTukjGSH6BH7kFbV73FVmqImy/QxUayHgBHBTuTSgS0=;
+ b=MyUrq9EPy6OtfXzUqtHhxOMjEIGqPeoJZcBkAUKB70qIo2UDS3PyJ2kZozvMM62tft0znEMW7Mf8hxX4u3DuMDmRZ0w+TSdcPSIx6Nk8zmH7vgtD3ea6rDG4rn6gASVqU5kX2IWOswItKbewKlet4Mw/gJpPvZVHg7C9VrAUh1oEcfEsk8WLj5gMKO5WQDoaYPus5eGIL2vIhMWSf/rEXSmImpq4Oq4lYy6+Qsd1tImmYXmP5vDFji6zdK6FdHr4QMGT4rTd3duYMY2OWbcCxZaDU3EoLev1WpJ0Wf/Z/e9hHlpEci7FMdwYbfDwl5DAN2v3DGgItZTbok0QfxqXkg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BTukjGSH6BH7kFbV73FVmqImy/QxUayHgBHBTuTSgS0=;
+ b=ElbxNreGBcf+mE780Z1vZUsIa3n1DsywZzdz9CLMvAUDZetpMkOeJyXXZ1aRBV4MwN/83JJ90z2feRheKi13W5Lj8epZ+aBYZ1Kdxla9XIaS4MmtIC1yikdOwj6j1MuVD4lzFf8QwAbTj/sleeEPtMjUQY3HqBoT7ZQ68XssxKUZxw+CQk4NZJb6ffwiNhGM39R3j4tJYZ6Kn4sJ3ofkwFpvNa8ZqpbNCgHtlGQItyVMUG51RZS6wvFycIQW7T13gbvSOcvCo2dv0eQD8R48cLNyKL2h0v/WFv99fNMTu515Y+IDyEB7d3cvkq3p5mdS4VX7fTxiTg6zZDxch+iM9A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SN6PR12MB2719.namprd12.prod.outlook.com (2603:10b6:805:6c::12)
+ by CY8PR12MB7123.namprd12.prod.outlook.com (2603:10b6:930:60::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.23; Thu, 5 Sep
+ 2024 16:23:24 +0000
+Received: from SN6PR12MB2719.namprd12.prod.outlook.com
+ ([fe80::1ab4:107a:ae30:2f95]) by SN6PR12MB2719.namprd12.prod.outlook.com
+ ([fe80::1ab4:107a:ae30:2f95%7]) with mapi id 15.20.7918.024; Thu, 5 Sep 2024
+ 16:23:24 +0000
+Date: Thu, 5 Sep 2024 19:23:12 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Krzysztof =?utf-8?Q?Ol=C4=99dzki?= <ole@ans.pl>
+Cc: gal@nvidia.com, Tariq Toukan <tariqt@nvidia.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Michal Kubecek <mkubecek@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [mlx4] Mellanox ConnectX2 (MHQH29C aka 26428) and module
+ diagnostic support (ethtool -m) issues
+Message-ID: <Ztna8O1ZGUc4kvKJ@shredder.mtl.com>
+References: <a7904c43-01c7-4f9c-a1f9-e0a7ce2db532@ans.pl>
+ <ZthZ-GJkLVQZNdA3@shredder.mtl.com>
+ <b0ec22eb-2ae8-409d-9ed3-e96b1b041069@ans.pl>
+ <7ba77c1e-9146-4a58-8f21-5ff5e1445a87@ans.pl>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7ba77c1e-9146-4a58-8f21-5ff5e1445a87@ans.pl>
+X-ClientProxiedBy: LO2P123CA0107.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:139::22) To SN6PR12MB2719.namprd12.prod.outlook.com
+ (2603:10b6:805:6c::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 02/15] netlink: spec: add shaper YAML spec
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
- Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Donald Hunter
- <donald.hunter@gmail.com>, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
- edumazet@google.com
-References: <cover.1725457317.git.pabeni@redhat.com>
- <a0585e78f2da45b79e2220c98e4e478a5640798b.1725457317.git.pabeni@redhat.com>
- <20240904180330.522b07c5@kernel.org>
- <d4a8d497-7ec8-4e8b-835e-65cc8b8066b6@redhat.com>
- <20240905080502.3246e040@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240905080502.3246e040@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2719:EE_|CY8PR12MB7123:EE_
+X-MS-Office365-Filtering-Correlation-Id: de48b8b2-eb02-47e2-c44c-08dccdc710cf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?N2lWTnZWYVpiMlJ2cjl2VGlDczN4VTQxS3hCeDNaWE1ld0E5NDRrditOcHhj?=
+ =?utf-8?B?eDRRNTJYMUdLRmVXUFA2VTdJNWQ0ZEQ5WkdFb0RZdnkxL0c0WDRTd01yUHA5?=
+ =?utf-8?B?ZUlraDVWNWlrNVhJd2RwMURmOTUvMVM5YjE5Y3drbC9TL0h3TDVXZGZ6Ym82?=
+ =?utf-8?B?c2NFUVhpMVNrdDY2aklaVWFXWmVBNnlVV3puQ3p6Mkd6Y0w0dUoyOWJYUnRT?=
+ =?utf-8?B?ZW5FRDl6ckNBSC9TQTRWVVFaT0pUQkpMazJuVW1SOG5IM2dqTmlMY214ekoz?=
+ =?utf-8?B?OU9yL0c3SWhjaTBzam5qbGhoUkhiSlBQRFFhalFrK0RjUnpZSWJCTFBjNkt1?=
+ =?utf-8?B?VlZmU3R6Ni9rNWZpdGlmK2NUczhLcE1ZTXR1ODBLUG43NERLRGlPV1czVERx?=
+ =?utf-8?B?ZlV5L2gvS0FzTFN3Q0cweFJHc3YvNTdTTzhEU0lyMmxqVmQrVHdzSUNuMkc1?=
+ =?utf-8?B?TldIbVN0TFdaRHZxamhqaGJTcVAvLys3ZllyOHZFRzM1ZTNSanlsK3V4c1JC?=
+ =?utf-8?B?enJzWUZSZjhTSzljZ05kdjIxUkcrRVR5WTZ2S0IrVGROUTBDWEhpKzhQYjdH?=
+ =?utf-8?B?dnZhNDRYUTVWSHE1WTNKK0FJc2ZGQlBzWVZ6M21FMXVKclltQmZETFZ5RHRo?=
+ =?utf-8?B?Zzk3Sjd1ZXRsZ1JyZ3JOeXkyOWNINTBBM1puazBBUkdCdEVsNHhkZmhrWEZu?=
+ =?utf-8?B?Vk1lWWlMcnhWVHBCKzFqSzJQM3lmNEhIQlZWcng3UVBSak9zNTZ0R09qUU1F?=
+ =?utf-8?B?S2tndytQQWovUW5nYStKQjFwT0lXNWdVYzc3M2E3L2c1Nnk0Ykt2OFJqQlpl?=
+ =?utf-8?B?cHFkZERIQmlNa1BBN2c1TTg5THB6RG5wcGpmNnREaHdNeTRGRzVDTmN0L0J0?=
+ =?utf-8?B?alo3UkMyekxHbEJtQlpQL3FiY1JMMC9yVGxDU09xcW1yY09URGMyK3ZsWkdh?=
+ =?utf-8?B?Qy9EZUdsL2N6cjFWc280b2x6Qk9mZFNTazVOVWlOOVdSMDd2R0toNWtXOXl3?=
+ =?utf-8?B?TWdqNG9mYmVUaWtVZU1Xckx5aytJMThBbmlkUWZhb2JxSFZoTGNNVkttVnhO?=
+ =?utf-8?B?OG5wV2cwK3dRbXJBMzNkTXZOaUI4Y0oxaGNadmVlN3VWLzlEdjlTaXAyVXZQ?=
+ =?utf-8?B?ODhwVFduMCsvaktwMkJRaFI0VEpobnJlWDg0dlVnNFBXNE44L3F0bEhtNW5l?=
+ =?utf-8?B?citETTZRQmVqR3h2b2pqcnIwTEVhWit5NS90T01FaWgzVmlPUFpUcjl2ay9U?=
+ =?utf-8?B?TnJadGw0d3hQREhqckFueDRZMzRKM3A0RmRLMjBVM3J2OU81L28raHR2TEpl?=
+ =?utf-8?B?Vlp5R3hsbnFhOGs0ajIwdVNZamdLaDNxTFp6ZUcwOGJQSWhCbktjYzdOUjM3?=
+ =?utf-8?B?c0xEWkJhenJrVGJocldqcEJzMy9uTmxmYjJ0aW96NS9SUGNnZWJTSzJEN1lT?=
+ =?utf-8?B?NVVJTGpWYUlHL1dCREN5SUdkY1dTVHdnUTZYS3h1RXAwa1AyM2J4MWY0SEI5?=
+ =?utf-8?B?STdDM1VEaGtFTUw5eFFpWGxzc2VMT212WEhvbkRBNjgzRTZhZUxTNklIeFFw?=
+ =?utf-8?B?RTBvd0NRV1R0TWJUeGtlU1RVcDhwTzczWjdSUTNMMEpaaG1hK2ptdy8xbkZW?=
+ =?utf-8?B?RkV5aDBmOURQeVQ2VGJ5bkVlSnVKNUhwby85T0FhYytCKzhUa0t5RVBKOExP?=
+ =?utf-8?B?dzhwWTBENGl0aDRYUzJZdlJ3VUtTQVpCcTN0Mk04bDBkOXh5ZnM4TENqbW5V?=
+ =?utf-8?B?ZEFpN3ZYOWxBbDUrcHFEaXE3WjhwT1hJdUhsUzNrQ0FFOWgvVFdDZ2E5ei9J?=
+ =?utf-8?Q?y6knI1VsJQxQf3BY7nPAuUA0ESQV6M9qarne4=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2719.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MVdWdUhCL1dYcjBDeVpWWElwY2FUb2Zpd1lpTzVzTDVHN0FpOFZ3dG1HOHNy?=
+ =?utf-8?B?aEVFTzNVVWFlVUZSeEJwa0IrdnJRSUNydVAxSG9jSzJoVGJpcnRyWVY5eWlF?=
+ =?utf-8?B?VHc0ZGVibFZGNGd6Zk92Q3lLVjJiUFhWQlVlU0R5UElQVGNTUDNhQkpzUzkv?=
+ =?utf-8?B?dmZnQmlRanpXSThwRVh2dGZDS3BMNmYxcm1zSTRjdEQ2WlBja0Fxa2p2TEFw?=
+ =?utf-8?B?cnpIUDlMV1QrVDB4QXU2M1h4S1JjZlB6MkRLSkN1VHRoMWdUZkJCODErTjIy?=
+ =?utf-8?B?TkpRdDEzYjAxNmp5VXlqWEFid0MyVDV0c1BOVHRSVk85cFFTYkxpYStqN21r?=
+ =?utf-8?B?a0lta1BZbkQrckpVMWFaUktqb240V2I2bHc0Tk1qaUdwQ3ZKNDRQeFZBamVw?=
+ =?utf-8?B?QldWOTZSRHUwYXVMWmk1dlBSRGJ5NUVXYlR1OC9EUFk4b0pJOFhKUm54K3B1?=
+ =?utf-8?B?UWxmdVNYdlB5eEVGdExWUjI0WGRkU1FSdWxsYkFoSUsvTVJySklCdGV6ajNP?=
+ =?utf-8?B?V2pnWE9CNHpmRUpGTmdqdHdrU0hJQXBSeGRTUnNBY0tmZDVFdWRib1pMU3Vx?=
+ =?utf-8?B?V2pVZVBwVDVBc3dqYzdpU2laTTVnamdrRnRDL3M5UjhDRC9USS9YUDdZcUpm?=
+ =?utf-8?B?cGo4eWU2VGdpb2JLTFNUK1krZnE2QmM4LytPODhhcFVXTngzbXNJWFlGbmo1?=
+ =?utf-8?B?QjlmaXArQ0RaVDViQk0vTW1nMEViME96V1pZdWppQUFIQ0NYVW5YNktqejVt?=
+ =?utf-8?B?aVZ3M2s1WUFTWEVNNi8yN2grK1lvSmpsbmxhYjJCTkRSSU5XWVlXcmVGN0Yy?=
+ =?utf-8?B?Z1hFanYvaDRzMG5IRnk3WGZrTmtuQlFXSmxWNFU0OCs5a2p0UVM0RkorUTM1?=
+ =?utf-8?B?T3hYL3M4SkxHeTV1UE5Sc1BFM0RyWU4rb05iT0NhcnVuYmtLalc3ZkExSVhS?=
+ =?utf-8?B?aWZNQ0tkUnF4NzdvMERZRnh3OERzVmpSaGFsUUZLSExjU1pTeGZQQU14RGc0?=
+ =?utf-8?B?Z1p6QUwwNmJCb3hBQ2RvV1J3d3ZDYUxudDZWazI3a1ZtOGVlSlRPRVpBMWRi?=
+ =?utf-8?B?MWQ4OVp1bHZXa1NjNVUwVFB0SWpnbTVWL3NnNk9GTGxER3dUblJya1BsL1No?=
+ =?utf-8?B?U1pnU0pkWVpKQTFhb2NHdHBSMzJGajJCcXFkeGJGelc3SitlMHA0cnN0YjNw?=
+ =?utf-8?B?OG5ZeEc0eGN0cFJRTlhnRnEzYXZsQWxFZDJlRXdKOHI4WG1Oa3NIU05FSlMy?=
+ =?utf-8?B?S3ZORDdHYVJQVjFPdTFVeVZHWC91QXhGUmRFeFJPVFNyL05UV0RtczdNb04y?=
+ =?utf-8?B?Q1Q1RGhyaTZxQXJzdDBtbk5TbEFScUZaZTlRcGpkaVUxUUlueHU4empqck1I?=
+ =?utf-8?B?MDdGMS96RDRGS2s1NHhwRytHRmM0UGRXN1RQZ3pUdVhUWTVhQUNOV1JpamRP?=
+ =?utf-8?B?alF0cXpKUEkySlJIcnZibUFHU09oWHByUzVaWWRKRlFPT3d3eUhramNvSHQr?=
+ =?utf-8?B?cko5K1BUaDJ6RThXQy9LbEhpWGdNd0xqRW1xZmRjZWpUdzk0SEl1Mm9oOGRn?=
+ =?utf-8?B?VEMrVEhwUHFpL2VvckFiekZsMC9WdzZXeFNVeVBxOUIvcUN4Q0hYOW1EbTl4?=
+ =?utf-8?B?dEFZY2Z4TVh4bnRsbHcrNjlWTTJUaEdna1o3TDlyYXo5elFQNERuQWw4WExS?=
+ =?utf-8?B?eWdQc2FPZkgwK054SVZqVjhjRCsvc2F0VmNlWnVBbGlUdTlGaDd5RFYwRGMz?=
+ =?utf-8?B?aGdLdmtSY1pSV0JSODVmbVhtQnh6eWw1Zk11cU5qYm9mTXlOQUd1cG5NRmoz?=
+ =?utf-8?B?c0tKQnVUaDV2NmZIdTJEcnl4dSttcE1YN2FXaGx3dWc3RUVNck14RW1RT05G?=
+ =?utf-8?B?aXo2RHh2S0psS2MrdExWd1NZUlZPdEN3VVJRNjBtWGEwQk8wYkNvRTV2T1VY?=
+ =?utf-8?B?U1gwM2x6VENRejJzZjJwNE02M29vMi9DQzZuQS82Z0JnOEtzd0NWeHdrV3NU?=
+ =?utf-8?B?cUlPb29yVXN1OHNrUmsrcmFmYVQyaHpvK2NUaURZZWZWM1ZMTVEwRFFXT1N1?=
+ =?utf-8?B?eFdGVUkxY2hqOTFvaEtqQWN5V2RpTkh5OE44RnBEelE1NUlSV1dtMHJGenlO?=
+ =?utf-8?Q?Os7fgaC8WUS5WdQauyfw9gvPX?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: de48b8b2-eb02-47e2-c44c-08dccdc710cf
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2719.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2024 16:23:24.5214
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ABRzwI8Wq6ORywXQIGwPpd9OcWgVwNORjvoDDz92s50IV/FUwJ6f7OzARI4A6+7bsliQK8OqeQPLCBygZFuOUw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7123
 
-On 9/5/24 17:05, Jakub Kicinski wrote:
-> On Thu, 5 Sep 2024 16:51:00 +0200 Paolo Abeni wrote:
->> On 9/5/24 03:03, Jakub Kicinski wrote:
->>> On Wed,  4 Sep 2024 15:53:34 +0200 Paolo Abeni wrote:
->>>> +      -
->>>> +        name: node
->>>> +        type: nest
->>>> +        nested-attributes: node-info
->>>> +        doc: |
->>>> +           Describes the node shaper for a @group operation.
->>>> +           Differently from @leaves and @shaper allow specifying
->>>> +           the shaper parent handle, too.
->>>
->>> Parent handle is inside node scope? Why are leaves outside and parent
->>> inside? Both should be at the same scope, preferably main scope.
->>
->> The group() op receives as arguments, in the main scope:
->>
->> ifindex
->> node
->> leaves
->>
->> 'parent' is a nested attribute for 'node', exactly as 'handle'. We need
->> to specify both to identify the 'node' itself (via the 'handle') and to
->> specify where in the hierarchy the 'node' will be located (via the
->> 'parent'). Do I read correctly that you would prefer:
->>
->> ifindex
->> node_handle
->> node_parent
->> leaves
+On Wed, Sep 04, 2024 at 09:47:04PM -0700, Krzysztof Olędzki wrote:
+> This BTW looks like another problem:
 > 
-> I don't see example uses in the cover letter or the test so there's
-> a good chance I'm missing something, but... why node_parent?
-> The only thing you need to know about the parent is its handle,
-> so just "parent", right?
+> # ethtool -m eth1 hex on offset 254 length 1
+> Offset          Values
+> ------          ------
+> 0x00fe:         00
 > 
-> Also why node_handle? Just "handle", and other attrs of the node can
-> live in the main scope.
+> # ethtool -m eth1 hex on offset 255 length 1
+> Cannot get Module EEPROM data: Unknown error 1564
+> 
+> mlx4_core 0000:01:00.0: MLX4_CMD_MAD_IFC Get Module info attr(ff60) port(1) i2c_addr(50) offset(255) size(1): Response Mad Status(61c) - invalid device_address or size (that is, size equals 0 or address+size is greater than 256)
+> mlx4_en: eth1: mlx4_get_module_info i(0) offset(255) bytes_to_read(1) - FAILED (0xfffff9e4)
+> 
+> With the netlink interface, ethtool seems to be only asking for for the first 128 bytes, which works:
 
-I added the 'node_' prefix in the list to stress that such attributes 
-belong to the node.
+Yes. The upper 128 bytes are reserved so sff8079_show_all_nl() doesn't
+bother querying them. Explains why you don't see this error with
+netlink.
 
-In the yaml/command line will be only 'handle', 'parent'.
+Regarding the runtime "--disable-netlink" patch, I personally don't mind
+and Andrew seems in favor, so please post a proper patch and lets see
+what Michal says.
 
-> Unless you have a strong reason to do this to simplify the code -
-> "from netlink perspective" it looks like unnecessary nesting.
-> The operation arguments describe the node, there's no need to nest
-> things in another layer.
+Regarding the patch that unmasks the I2C address error, I would target
+it at net-next as it doesn't really fix a bug (ethtool already displays
+what it can). Thinking about it, I believe it would be more worthwhile
+to implement the much simpler get_module_eeprom_by_page() ethtool
+operation in mlx4 (I can help with the review). It would've helped
+avoiding the current issue (kernel will return an error) and the
+previous bug [1] you encountered with the legacy operations.
 
-Ok, the code complexity should not change much. Side question: currently 
-the node() operation allows specifying all the b/w related attributes 
-for the 'node' shaper, should I keep them? (and move them in the main 
-yaml scope)
+Regarding the fact that these modules work properly with CX3, but not
+with CX2 (which uses the same driver), it really seems like a HW/FW
+problem and unfortunately I can't help with that.
 
-Thanks,
-
-Paolo
-
+[1] https://lore.kernel.org/all/b17c5336-6dc3-41f2-afa6-f9e79231f224@ans.pl/
 
