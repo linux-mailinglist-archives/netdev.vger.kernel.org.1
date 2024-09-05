@@ -1,94 +1,107 @@
-Return-Path: <netdev+bounces-125719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3524596E5AA
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 00:11:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25C3B96E5BA
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 00:28:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E878C285EB1
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 22:11:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C42CC1F23A9B
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 22:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 129721B3F05;
-	Thu,  5 Sep 2024 22:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3D519EEC8;
+	Thu,  5 Sep 2024 22:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FEtlwGH/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dlXkpPqR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0C019EEC8;
-	Thu,  5 Sep 2024 22:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74E08165F0E;
+	Thu,  5 Sep 2024 22:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725574237; cv=none; b=qG/y6+aCbDFIlodnqBA6zoZ0r0dMgdwaefw4tJaMPrg+yMsN3j3c/BTZdJdz6Wqr2mAr5s8Ody27YpidQhg1jtGmssan6LOuJ9/Mv7y6V+npPY4xxPYRDwKUMB5Mb6wdaBFMeukPEa/EgJeM/OD45xffpWMO5NxneOLLv0xj29M=
+	t=1725575298; cv=none; b=jrWGbCFGn4lB6oM5e/xQqEZCgB+S8VzInLIVhWd3gIrEQARJIsMAZe4ceH+GgwcOa62YwppuNIgSD98sXxQcVx9Iz/fuU3KlQ2jeGHsqDZw75OntysREcCFnG3g01VdaRpkrFPSLFT1Wb4TMPe7Q/j8BgXG8LBlpR/TkW8cGrBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725574237; c=relaxed/simple;
-	bh=p5VMs64NJzqCs9tiHDeAgq9x7XJTzxC7nHOkCZ5q1u8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WO1Jt6yPUlB/grux4Y0YmMTgO+/6yqRFxlPOZo2JX0uo3aNOo3y/Q3yIbyGkLYhg6J7NomOy3lnZbu+8zonmxdEc715lUs/dd2tBEpUcnUNlPNlNSXPVf8gRcTWx0XW1CvIBr9FUGkPwLlBAfuaNFxMxnv09JOyUO8nf7jnIBHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FEtlwGH/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B2F3C4CEC7;
-	Thu,  5 Sep 2024 22:10:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725574236;
-	bh=p5VMs64NJzqCs9tiHDeAgq9x7XJTzxC7nHOkCZ5q1u8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FEtlwGH/ceZt2U4TtpoTHhrd3h/DFtmxG77DkzG00yCOB/R2dAp2cKIqEASw9iNvx
-	 04N6hLJl/mNxQ2Izkfu+BpMPU2OxzyqhSLXWVN3bzKhmBsUWM3XvlLVQQ49A3N4CDt
-	 oY2s37V55jy2x/X4xJf0JlroPtdWYC+gFQFzLHw5KVv1tJeN9n/eVy7jLZWBUD3JaY
-	 BbhlM5D9GVGz8O5byfUH9inkL6ZlHra9DOp6ZQ61VHRlapp31LqtGAcynVG63pXUnQ
-	 2jJXIhylSnvzBJcQ9TpHmU9k/J0kYFN262ORD4fRi1XUP9nA8/ad2D4VczvV9SDZYt
-	 1rV7GnVmYnj/w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E8F3806654;
-	Thu,  5 Sep 2024 22:10:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725575298; c=relaxed/simple;
+	bh=HqJLEPQRqyYc4WZ5Djy3oHmPFt1Y0prsGxm0FnDznNY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gd8i94Orn00Gyucq780sL5nFDZ1xE8PWH9IDHoPWnYOtyBCMCHTPPY6ODK4TbVsxLTDEcv3bBJQ0AeeLiDM6Dnqe/ce1BH2+yJRJK0ZbgToJcMY5U/5mzBW6cMW/ax6y5QdjgOICospxrdqKoyL4AcTrgcdbQoSkBYb30xzIQKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dlXkpPqR; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6b747f2e2b7so12823677b3.3;
+        Thu, 05 Sep 2024 15:28:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725575296; x=1726180096; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FRFy+2t5hJIKK0yUUXSog8G7TqOeTICVU5WXyorcUvA=;
+        b=dlXkpPqRjDlRAhrPwAp/7KzcJegI9CokD4wVUgXWTQwpBgHRsajVFQCAzUz3GX/Wlq
+         eTMClyDj3OUrQk1GU9tIRDhtC47QPtINq8M2d/wlzFxl892i2g51oBeTict6Gb2RxzX3
+         Zrl5VNDg2hljJh2/RZdVVYmepwHy+t7naJzQSWQrOW8CzFJeBiSrFkjWp0D2UofqBgn5
+         2NHSrq+La5qJsAYYl17M+PXcDwbSyhn3m4Tu3l+OPOp2/owaF1VVuCGaxiMRSyLf5bBp
+         T7X0gOsP7r/ew/AcMxhTxqIj+tiA+Qd0Oi2yZBEX3MZXNTIwSc3BxoMYkzwC2JAfWPNg
+         b0Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725575296; x=1726180096;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FRFy+2t5hJIKK0yUUXSog8G7TqOeTICVU5WXyorcUvA=;
+        b=azAfQ1vF86xp5//mK4w5z7HcuwE+ueUk0kxSiN+FqzlnmkDCnXNrhTRHdKgY1ZPFMd
+         jkMTmq9KTb/A5BkQinzwDfxDDzRgqHouIMT+XQC/c5GIJsrToU9MDU+iz+geZRB66uO8
+         u4CFsjnJpXcpe+vsiojnUtLj+soArrSlDqq0poJ1TcCWED0Gy/dwjgcN3xoZMZc+5ntZ
+         B6q3sxRz8cq7iiDSsweBTH9ui1Ck9LNuByoqek8VBghOf6lWNXsJgxM3KBQc8BzEnePR
+         UHfbcbd4bYYr5mlCDTP8FKMSaIWrmjcmN2UzDjTQqXc2Ssmf4Cr0ffTB+RZB9XWBd32x
+         VQ7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVfJRbdc7Eu1UHbmrWRXnghnNwbSM3DA1WxvvszRXJ+S2HLk5CFWkQ9m0ASoE68M8BP2giaGCnpYHIZJ94=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAohyZxqAizK4mO5fCrrJoQFJhXMsBE4JdyDxn+FgV9w0o8bVg
+	GGJHcp6Spc8/VeOpEIc8nUIiGiRy3rbDFgJjzoIonlWF0FKzg/qymPM2I5cDeNA4gGN6srEA8Ie
+	JB8sjsAvrKae8a2OYWjZrB25Ghqc=
+X-Google-Smtp-Source: AGHT+IHsMWdgRwWZEaYT2iUvEZYuvcWuI/oQ7RVrTx5pczgfdpQ1VwQXW2HqkZM6zJLEsA/ny2eLMmudcV7sHxuXxwg=
+X-Received: by 2002:a05:690c:7683:b0:6d9:c367:5486 with SMTP id
+ 00721157ae682-6db45273f5bmr7954917b3.42.1725575296348; Thu, 05 Sep 2024
+ 15:28:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: net: enable bind tests
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172557423699.1859883.10700910912228977828.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Sep 2024 22:10:36 +0000
-References: <5a009b26cf5fb1ad1512d89c61b37e2fac702323.1725430322.git.jamie.bainbridge@gmail.com>
-In-Reply-To: <5a009b26cf5fb1ad1512d89c61b37e2fac702323.1725430322.git.jamie.bainbridge@gmail.com>
-To: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, kuniyu@amazon.com,
- joannelkoong@gmail.com, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240905201506.12679-1-rosenp@gmail.com> <20240905201506.12679-10-rosenp@gmail.com>
+ <15728806-c4cf-4e66-928e-b1dc7b487419@lunn.ch>
+In-Reply-To: <15728806-c4cf-4e66-928e-b1dc7b487419@lunn.ch>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Thu, 5 Sep 2024 15:28:05 -0700
+Message-ID: <CAKxU2N_gu-_aEOZ6U1wVF4D-qw9gCCe8-0VxNvJAu9aOTc0F+g@mail.gmail.com>
+Subject: Re: [PATCHv3 net-next 9/9] net: ibm: emac: get rid of wol_irq
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org, 
+	jacob.e.keller@intel.com, horms@kernel.org, sd@queasysnail.net, 
+	chunkeey@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  4 Sep 2024 16:12:26 +1000 you wrote:
-> bind_wildcard is compiled but not run, bind_timewait is not compiled.
-> 
-> These two tests complete in a very short time, use the test harness
-> properly, and seem reasonable to enable.
-> 
-> The author of the tests confirmed via email that these were
-> intended to be run.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] selftests: net: enable bind tests
-    https://git.kernel.org/netdev/net/c/e4af74a53b7a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+On Thu, Sep 5, 2024 at 2:27=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Thu, Sep 05, 2024 at 01:15:06PM -0700, Rosen Penev wrote:
+> > This is completely unused.
+> >
+> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+>
+> Seems reasonable, since there does not appear to be any WoL
+> support.
+>
+> However, it might be possible to wire it up? You might then need the
+> interrupt? This patch could then be reverted if it is actually needed.
+I have no idea how to do so. Actually the device I have probably
+doesn't support WoL. I'll leave that for someone else to figure out.
+>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>
+>     Andrew
 
