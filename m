@@ -1,151 +1,118 @@
-Return-Path: <netdev+bounces-125450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13CEE96D1A8
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:16:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B401196D1CC
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:18:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45BAA1C219F3
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:16:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57A641F27C37
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:18:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93CC319CD18;
-	Thu,  5 Sep 2024 08:11:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014601990BA;
+	Thu,  5 Sep 2024 08:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RpxZhktJ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gJ+cdTu7"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E05199922;
-	Thu,  5 Sep 2024 08:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A211A198E9F;
+	Thu,  5 Sep 2024 08:15:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725523885; cv=none; b=BP9sS2HR6FTVFxin8qyG9iShvBDE1832vvkg5HqUqZTB5hMPX5C+4BkB2CLxQwEsM0Nx0BrwrONXTWOurN1iY+VpWoReJOymJCImAukwOMbdk/RWe+13SvAFEdxuoZ5EGDUz/6OmyxYCa4/wtiUvqahAJeUXL+lTLioB2GvHHN8=
+	t=1725524147; cv=none; b=qG3neMjfMFXyHfmRbLq5WPuGIdzZoN0lqTOMl8KziBFlwp19PsaOq2163GJSz3Lo4W5OKjOg4OTWwCxn3b8/vzTUysL55vOsZ8deUpobZPEABSaUe8yBX0H8GhNsFnO8JOSWLclIk4h+IQmiwlFFu+JNE1FzplmFgb/mJBBsQWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725523885; c=relaxed/simple;
-	bh=MAMCXxSFk/8QfgNIlep+F4klnQRMMWQm6X2qmcjw/uM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p890ihvffWBg9cV3JobLaWP5ZZl/C5vmCxBN5MyIuP8rKmdUb7SZ8+rYDNTbPsLMj//w2YuHWuG0INNdUcxs8n0E1SC1kuXfmBqSwCvdkv9ZFZUAyPOuA1DpEii+SADLjKgIMXaXVBrL5yqceOAqyQYcJPHQgVDUeW/Y5GmVvbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4WzsWF6BQwz4f3jYR;
-	Thu,  5 Sep 2024 16:11:05 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id E3F0B1A018D;
-	Thu,  5 Sep 2024 16:11:20 +0800 (CST)
-Received: from ultra.huawei.com (unknown [10.90.53.71])
-	by APP1 (Coremail) with SMTP id cCh0CgD3Ii+gZ9lmMQ7AAQ--.26932S12;
-	Thu, 05 Sep 2024 16:11:20 +0800 (CST)
-From: Pu Lehui <pulehui@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org
-Cc: Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Puranjay Mohan <puranjay@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Pu Lehui <pulehui@huawei.com>
-Subject: [PATCH bpf-next v3 10/10] selftests/bpf: Add description for running vmtest on RV64
-Date: Thu,  5 Sep 2024 08:14:01 +0000
-Message-Id: <20240905081401.1894789-11-pulehui@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240905081401.1894789-1-pulehui@huaweicloud.com>
-References: <20240905081401.1894789-1-pulehui@huaweicloud.com>
+	s=arc-20240116; t=1725524147; c=relaxed/simple;
+	bh=IGpqu0AbEfFcQHlaTnL8FB0oZgedhXai5ctdiIf//jQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=NHBUtSz7YM62WWOxrbhTlLB+Sktzv035iJ8mWOM3iYiySqa39lr9MB9MBXXmyyV3Hc5XL3D8PJodcN5fr5p5ViGdGtiobDqGe/MW9boIQu9cFIayjMbyP4uDxlt/CSv/b2CknDTXXn5hLiexz65r53fifOondba4e31naB5xTWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RpxZhktJ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=gJ+cdTu7; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Anna-Maria Behnsen <anna-maria@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1725524142;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zj6M6KVALb8ItmdIZXewANkqyGRtAWppUkT1S7x+yxo=;
+	b=RpxZhktJFaMziweFeqWFY2ODP3AELVAapvPbAS32isz7DMRXQqqnfCnAXIG/vo+VVM5lqz
+	Bk07pz2LTDwxIF+lCqZa2EAvM8gQwSKbpnhs6Yr+pzEpKE1rQIceApTWy2xjZeJXxh13gI
+	tBhSQTp8ddqd3XfBuptTKhV1P8vJuEg+fYF2kMCEBXgbfWK+reBrmECSl8HT+tsfqFSO1j
+	NGAPMTWLEAijIjdIaswglTcpK4wmajtio4YZyJaOumZu1fQVLuYtaniJYrVzt3ifqQZn4W
+	0BBvJXXDdO4+SesppsBktnYamqG7T3a/XJ9sfQpFvP0z0AVensFF9+GeXGGclA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1725524142;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Zj6M6KVALb8ItmdIZXewANkqyGRtAWppUkT1S7x+yxo=;
+	b=gJ+cdTu79Soa0DwW49qt4TU7i4Dk579rmL2O7XO7J6D42aGnObjvdAMzpxjs3nwR2mDmB2
+	F9Xe4RoO0QR2EeDQ==
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner
+ <tglx@linutronix.de>, Jonathan Corbet <corbet@lwn.net>,
+ linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ netdev@vger.kernel.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 12/15] iopoll/regmap/phy/snd: Fix comment referencing
+ outdated timer documentation
+In-Reply-To: <a269cf5e-2ba0-40c3-a7f2-9afa0e8c6926@lunn.ch>
+References: <20240904-devel-anna-maria-b4-timers-flseep-v1-0-e98760256370@linutronix.de>
+ <20240904-devel-anna-maria-b4-timers-flseep-v1-12-e98760256370@linutronix.de>
+ <a269cf5e-2ba0-40c3-a7f2-9afa0e8c6926@lunn.ch>
+Date: Thu, 05 Sep 2024 10:15:42 +0200
+Message-ID: <87y1464itt.fsf@somnus>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgD3Ii+gZ9lmMQ7AAQ--.26932S12
-X-Coremail-Antispam: 1UD129KBjvJXoW7urW7Jr4kAFWUJrWftF47urg_yoW8Cw4Upw
-	s5A34akr1SgF1aqF1fCrW7XF4Fqrs3XrWUGF1xGw15u3W5JFykXrn2yayjvanxuFZYvrsI
-	ya4aqFyY9w18ZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPqb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVWxJr0_GcWl84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAF
-	wI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2
-	WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkE
-	bVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kKe7
-	AKxVW8ZVWrXwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
-	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_Wr
-	ylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVW8JVW5JwCI42IY6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI
-	0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x
-	07jIPfQUUUUU=
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain
 
-From: Pu Lehui <pulehui@huawei.com>
+Andrew Lunn <andrew@lunn.ch> writes:
 
-Add description in tools/testing/selftests/bpf/README.rst
-for running vmtest on RV64.
+>> diff --git a/include/linux/phy.h b/include/linux/phy.h
+>> index 6b7d40d49129..b09490e08365 100644
+>> --- a/include/linux/phy.h
+>> +++ b/include/linux/phy.h
+>> @@ -1374,11 +1374,12 @@ int phy_read_mmd(struct phy_device *phydev, int devad, u32 regnum);
+>>   * @regnum: The register on the MMD to read
+>>   * @val: Variable to read the register into
+>>   * @cond: Break condition (usually involving @val)
+>> - * @sleep_us: Maximum time to sleep between reads in us (0
+>> - *            tight-loops).  Should be less than ~20ms since usleep_range
+>> - *            is used (see Documentation/timers/timers-howto.rst).
+>> + * @sleep_us: Maximum time to sleep between reads in us (0 tight-loops). Please
+>> + *            read usleep_range() function description for details and
+>> + *            limitations.
+>>   * @timeout_us: Timeout in us, 0 means never timeout
+>>   * @sleep_before_read: if it is true, sleep @sleep_us before read.
+>> + *
+>>   * Returns 0 on success and -ETIMEDOUT upon a timeout. In either
+>
+> I know it is not in scope for what you are trying to fix, but there
+> should be a : after Returns
+>
+> * Returns: 0 on success and -ETIMEDOUT upon a timeout. In either
 
-Signed-off-by: Pu Lehui <pulehui@huawei.com>
----
- tools/testing/selftests/bpf/README.rst | 32 ++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+I have to do a v2 of the series anyway. So if it helps, I can add the
+missing colon after "Returns" in all those function descriptions I touch
+and expand the commit message by:
 
-diff --git a/tools/testing/selftests/bpf/README.rst b/tools/testing/selftests/bpf/README.rst
-index 4a1e74b17109..776fbe3cb8f9 100644
---- a/tools/testing/selftests/bpf/README.rst
-+++ b/tools/testing/selftests/bpf/README.rst
-@@ -85,6 +85,38 @@ In case of linker errors when running selftests, try using static linking:
-           If you want to change pahole and llvm, you can change `PATH` environment
-           variable in the beginning of script.
- 
-+Running vmtest on RV64
-+======================
-+To speed up testing and avoid various dependency issues, it is recommended to
-+run vmtest in a Docker container. Before running vmtest, we need to prepare
-+Docker container and local rootfs image. The overall steps are as follows:
-+
-+1. Create Docker container as shown in link [0].
-+
-+2. Use mkrootfs_debian.sh script [1] to build local rootfs image:
-+
-+.. code-block:: console
-+
-+  $ sudo ./mkrootfs_debian.sh --arch riscv64 --distro noble
-+
-+3. Start Docker container [0] and run vmtest in the container:
-+
-+.. code-block:: console
-+
-+  $ PLATFORM=riscv64 CROSS_COMPILE=riscv64-linux-gnu- \
-+    tools/testing/selftests/bpf/vmtest.sh \
-+    -l <path of local rootfs image> -- \
-+    ./test_progs -d \
-+        \"$(cat tools/testing/selftests/bpf/DENYLIST.riscv64 \
-+            | cut -d'#' -f1 \
-+            | sed -e 's/^[[:space:]]*//' \
-+                  -e 's/[[:space:]]*$//' \
-+            | tr -s '\n' ',' \
-+        )\"
-+
-+Link: https://github.com/pulehui/riscv-bpf-vmtest.git [0]
-+Link: https://github.com/libbpf/ci/blob/main/rootfs/mkrootfs_debian.sh [1]
-+
- Additional information about selftest failures are
- documented here.
- 
--- 
-2.34.1
+  While at it fix missing colon after "Returns" in function description
+  as well.
 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>
+>     Andrew
+
+Thanks,
+
+        Anna-Maria
 
