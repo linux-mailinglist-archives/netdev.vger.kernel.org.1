@@ -1,159 +1,262 @@
-Return-Path: <netdev+bounces-125658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F16896E24C
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:52:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF02996E27D
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:55:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0242E1F26454
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:52:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CF871F27D07
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6905D188A02;
-	Thu,  5 Sep 2024 18:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D1CD19DFA5;
+	Thu,  5 Sep 2024 18:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="S21tY5rN"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="bppyafcJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f66.google.com (mail-ed1-f66.google.com [209.85.208.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AEF8288C;
-	Thu,  5 Sep 2024 18:52:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFF818DF81
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 18:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725562346; cv=none; b=Dkjakll3P0H5EGGLEUgp0Qv3DyheFR5hCJ6OWUM/5Z+JA0IWGkyvyiXLN61W3murYh8fzCfyIwmh5sFqfdEq3ngXtt+5F0i0p8Uf09eoyM2VgS4kw14A2wCHoTiW56tCo4IB5jKeOSeZnIf3k7XxwfuKrNt8YYgRzE32AoQW4VM=
+	t=1725562457; cv=none; b=XLnE0q/5jy7BhLhZ3QR7kCfd+tty5eLvvPWrUuVhOVq974HxAJLes/+0JCz7G/Nq52vVQDlF/eN2i396+VheNxouuGT1VjkweJA/xHK0/4q2ZSvBSraDEkKYw+YhrDVkjUODgsBrFUSAFG0HQORwWADaM9Aiay6WbkBzly3oYwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725562346; c=relaxed/simple;
-	bh=BdopyJOmH9VtRvmZP+9t7/2flw2hxsb3XB0F/xi5yKg=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Hyj73iUaqI2M7B9NiK3ORYpfdSis2t1K8NTtN80oAJj68If+Oxbo4g+hScOFaONzJa0Od8u+wZC0OahgQp0V8D0JkMPbjbbhSYFwPgUyKNNOnWgBSBGgR+6+tH9DFDcEUH+fICmh4yFAMC5kQrQrF+t+w7gjgaqz+YZAouuaBcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=S21tY5rN; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=3JdRgnFAFmyWl8pgpB+J2k4MqOvYT4UaKoiSnuu0LXA=; b=S21tY5rN3er41xJSdwiH8OfzRy
-	Rk7tJQIyqHgyB2yyDwwOGj/edEB1ooqUmWo0LP65DzF8mx8ArPyvStghCtbRcmAWVUQKamjATRV+z
-	lC9fDNcwBwdveB4RGGUA1fSy43X+zGyH3EO51JqfwHmz8GZTPeq7XngHVlTxWvwxTHRbbT7VLmwnD
-	Z68HKHgbUc9l5eCQZaFC0l6+CVa1pev1rd1+6rOJGaGhcfV/RkQTsGb5B3exjqj3k9AC74Oy08uAL
-	13Yr5oY5iFLhJH9UKP3GGvg819BebTAOLdZKPtLxGAKdIMfoLIsqm5TZnRAXpoDIUwXa4OfBfQ95D
-	4gsrhcNg==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1smHaY-000ODB-A9; Thu, 05 Sep 2024 20:52:14 +0200
-Received: from [178.197.248.15] (helo=linux.home)
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1smHaW-000Fzm-1t;
-	Thu, 05 Sep 2024 20:52:13 +0200
-Subject: Re: [PATCH bpf-next v3 00/10] Local vmtest enhancement and RV64
- enabled
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
- <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
- =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Puranjay Mohan <puranjay@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Pu Lehui <pulehui@huawei.com>
-References: <20240905081401.1894789-1-pulehui@huaweicloud.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <e9816f7c-a603-c73e-5fcc-71bbcf6c6ca3@iogearbox.net>
-Date: Thu, 5 Sep 2024 20:52:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1725562457; c=relaxed/simple;
+	bh=+X3EGBbsnfThSA6bfkbEMEawCDcd9CImfSQq8Sv6HaI=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PeI9IMe1e7jQISz+0iHB2geYraHihgfq/+2Lx0h4ET8aIuH0leVY76NhEjbVBqq/e9eZgcf1/+w9rmBVWjRA9ilM6KURWPACWCyK7d+TD1aE6xFYmY+4HcGplaFuQKFi1hbhz4akYxZg8pbmICvwu1tv2eNlXiAQo/Ij2gNdmB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=bppyafcJ; arc=none smtp.client-ip=209.85.208.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f66.google.com with SMTP id 4fb4d7f45d1cf-5c3cdbe4728so1242989a12.2
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 11:54:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1725562454; x=1726167254; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RxABoZy7M/TZG8opuKEUGg9PIAepW4IWO/Hnr8c+uSo=;
+        b=bppyafcJoWlFgS8M2UEohwoJYcIWa32E1DW48VgOBaEV/dvI4G0dIdbhmRkujthpK/
+         XivKiGFCzh37sUL3g5wMcIK5RYUNXcSoDxSIYJpbW16wBkOUN9eT+9MDETM8yeZOLzhx
+         7bOL4qh4ZD9+M+XXikQI0pLTZbH3EO8wHRL5f1D5wEq2K3Meh3ZYbOhBMxw2ioIeb/wU
+         aaiAHgns6/6NQockmvPY4ZiaMfpitnOxDjaKsMo0VcghnTsI16h3hXg9FlLmwcwXrJN1
+         debI9J+wlOAeXnn6EaqSRyTvuNzO9zcQBKN3xe9VculiteYxvcIMweeueic6SIVQtlb8
+         h0cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725562454; x=1726167254;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RxABoZy7M/TZG8opuKEUGg9PIAepW4IWO/Hnr8c+uSo=;
+        b=GWFO3S3torLEQBQ85cLbWgv8UZhX4BMnt834Ch5DhiFPGbTyPAYEWRd461JVMMAq9G
+         vANdKyse7nPCZdrIDji5oYLmLT0tjqbBq3ubd9P6OmFqinylrVzQaHU4y400hPA4WZ1H
+         8aSJg1G5sQevEW0xcun4vO9/n2TKnQEZ4SmaU5pzoXXioX/ISsPvkA6tTFCa7IQsY4a8
+         H5o78rV3e4NCtW48ZL/IFpO8nnrckB0yCsjSB3Ld0iEgg9f/fy8Qyz7j7Tf1VfIaOxwe
+         nA5DNNrBMc5w4HE4L4pQpgyBVHkRAO+z0s9ycXqVc80gd0C/UJOwSp/hZJLqjAqHjgBN
+         JBFg==
+X-Forwarded-Encrypted: i=1; AJvYcCXWsXwMZs6TAvvjxwXOEn3EQ77ITWSUDfIhej07mw8tSKr4jkHOHRnu6ym7M0C6WpiFH/cgiho=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrX9eb6kut6y/oXPBp7EvzsFIaunJmQy55/wWN29j8w9KjHCMF
+	J0/l2hsoRpsvMy/V52o+BsGi4NqT1vMw/SSKA/RI/VRPKcTdG8qInVw6gVtz3+8=
+X-Google-Smtp-Source: AGHT+IFjEgRGyH+GaPbngGsdDcuBB5u6KOKaz4oCTouY+y9qZ4ACBcA78wca7rCiKJ55uLq+Ab/vJw==
+X-Received: by 2002:a17:907:9486:b0:a86:b042:585a with SMTP id a640c23a62f3a-a897fad5108mr2030528766b.57.1725562452809;
+        Thu, 05 Sep 2024 11:54:12 -0700 (PDT)
+Received: from localhost (host-80-182-198-72.retail.telecomitalia.it. [80.182.198.72])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8a62038d8bsm168982266b.64.2024.09.05.11.54.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 11:54:12 -0700 (PDT)
+From: Andrea della Porta <andrea.porta@suse.com>
+X-Google-Original-From: Andrea della Porta <aporta@suse.de>
+Date: Thu, 5 Sep 2024 20:54:20 +0200
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
+Message-ID: <Ztn-XOvtk_d3U6XJ@apocalypse>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
+ <lrv7cpbt2n7eidog5ydhrbyo5se5l2j23n7ljxvojclnhykqs2@nfeu4wpi2d76>
+ <ZtHN0B8VEGZFXs95@apocalypse>
+ <b74327b8-43f6-47cf-ba9d-cc9a4559767b@kernel.org>
+ <ZtcoFmK6NPLcIwVt@apocalypse>
+ <39735704-ae94-4ff8-bf4d-d2638b046c8e@kernel.org>
+ <ZtndaYh2Faf6t3fC@apocalypse>
+ <f39edf3d-aa9e-43a0-8997-762d76c9c248@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240905081401.1894789-1-pulehui@huaweicloud.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27389/Thu Sep  5 10:33:25 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f39edf3d-aa9e-43a0-8997-762d76c9c248@kernel.org>
 
-On 9/5/24 10:13 AM, Pu Lehui wrote:
-> Patch 1-3 fix some problem about bpf selftests. Patch 4 add local rootfs
-> image support for vmtest. Patch 5 enable cross-platform testing for
-> vmtest. Patch 6-10 enable vmtest on RV64.
+Hi Krzysztof,
+
+On 18:52 Thu 05 Sep     , Krzysztof Kozlowski wrote:
+> On 05/09/2024 18:33, Andrea della Porta wrote:
+> > Hi Krzysztof,
+> > 
+> > On 20:27 Tue 03 Sep     , Krzysztof Kozlowski wrote:
+> >> On 03/09/2024 17:15, Andrea della Porta wrote:
+> >>>>>>> +
+> >>>>>>> +				rp1_clocks: clocks@c040018000 {
+> >>>>>>
+> >>>>>> Why do you mix MMIO with non-MMIO nodes? This really does not look
+> >>>>>> correct.
+> >>>>>>
+> >>>>>
+> >>>>> Right. This is already under discussion here:
+> >>>>> https://lore.kernel.org/all/ZtBzis5CzQMm8loh@apocalypse/
+> >>>>>
+> >>>>> IIUC you proposed to instantiate the non-MMIO nodes (the three clocks) by
+> >>>>> using CLK_OF_DECLARE.
+> >>>>
+> >>>> Depends. Where are these clocks? Naming suggests they might not be even
+> >>>> part of this device. But if these are part of the device, then why this
+> >>>> is not a clock controller (if they are controllable) or even removed
+> >>>> (because we do not represent internal clock tree in DTS).
+> >>>
+> >>> xosc is a crystal connected to the oscillator input of the RP1, so I would
+> >>> consider it an external fixed-clock. If we were in the entire dts, I would have
+> >>> put it in root under /clocks node, but here we're in the dtbo so I'm not sure
+> >>> where else should I put it.
+> >>
+> >> But physically, on which PCB, where is this clock located?
+> > 
+> > xosc is a crystal, feeding the reference clock oscillator input pins of the RP1,
+> > please see page 12 of the following document:
+> > https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf
 > 
-> We can now perform cross platform testing for riscv64 bpf using the
-> following command:
+> That's not the answer. Where is it physically located?
+
+Please see below.
+
 > 
-> PLATFORM=riscv64 CROSS_COMPILE=riscv64-linux-gnu- \
->    tools/testing/selftests/bpf/vmtest.sh \
->    -l <path of local rootfs image> -- \
->    ./test_progs -d \
->        \"$(cat tools/testing/selftests/bpf/DENYLIST.riscv64 \
->            | cut -d'#' -f1 \
->            | sed -e 's/^[[:space:]]*//' \
->                  -e 's/[[:space:]]*$//' \
->            | tr -s '\n' ',' \
->        )\"
+> > On Rpi5, the PCB is the very same as the one on which the BCM2712 (SoC) and RP1
+> > are soldered. Would you consider it external (since the crystal is outside the RP1)
+> > or internal (since the oscillator feeded by the crystal is inside the RP1)?
 > 
-> For better regression, we rely on commit [0]. And since the work of riscv
-> ftrace to remove stop_machine atomic replacement is in progress, we also
-> need to revert commit [1] [2].
+> So it is on RPi 5 board? Just like every other SoC and every other
+> vendor? Then just like every other SoC and every other vendor it is in
+> board DTS file.
+
+Yes it's on the Rpi5 board. These are two separate thing, though: one is where
+to put it (DTS, DTSO) and another is in what target path relative to root. I
+was trying to understand the latter.
+The clock node should be put in the DTBO since we are loading this driver at
+runtime and we probably don't want to depend on some specific node name to be
+present in the DTS. This is also true because this driver should possibly work
+also on ACPI system and on hypothetical PCI card on which the RP1 could be mounted
+in the future, and in that case a DTS could be not even there. 
+After all, those clocks must be in the immediate proximity to the RP1, and on the
+same board, which may or may not be the main board as the Rpi5 case.
+I think that, since this application is a little bit peculiar, maybe some
+compromises could be legit.
+
 > 
-> The test platform is x86_64 architecture, and the versions of relevant
-> components are as follows:
->      QEMU: 8.2.0
->      CLANG: 17.0.6 (align to BPF CI)
->      ROOTFS: ubuntu noble (generated by [3])
+> > 
+> >>
+> >>>
+> >>> Regarding pclk and hclk, I'm still trying to understand where they come from.
+> >>> If they are external clocks (since they are fixed-clock too), they should be
+> >>> in the same node as xosc. CLK_OF_DECLARE does not seem to fit here because
+> >>
+> >> There is no such node as "/clocks" so do not focus on that. That's just
+> >> placeholder but useless and it is inconsistent with other cases (e.g.
+> >> regulators).
+> > 
+> > Fine, I beleve that the root node would be okay then, or some other carefully named
+> > node in root, if the clock is not internal to any chip.
+> > 
+> >>
+> >> If this is external oscillator then it is not part of RP1 and you cannot
+> >> put it inside just to satisfy your drivers.
+> > 
+> > Ack.
+> > 
+> >>
+> >>> there's no special management of these clocks, so no new clock definition is
+> >>> needed.
+> >>
+> >>> If they are internal tree, I cannot simply get rid of them because rp1_eth node
+> >>> references these two clocks (see clocks property), so they must be decalred 
+> >>> somewhere. Any hint about this?.
+> >>>
+> >>
+> >> Describe the hardware. Show the diagram or schematics where is which device.
+> > 
+> > Unfortunately I don't have the documentation (schematics or other info) about
+> > how these two clocks (pclk and hclk) are arranged, but I'm trying to get
+> > some insight about that from various sources. While we're waiting for some
+> > (hopefully) more certain info, I'd like to speculate a bit. I would say that
+> > they both probably be either external (just like xosc), or generated internally
+> > to the RP1:
+> > 
+> > If externals, I would place them in the same position as xosc, so root node
+> > or some other node under root (eg.: /rp1-clocks)
 > 
-> Link: https://lore.kernel.org/all/20240831071520.1630360-1-pulehui@huaweicloud.com/ [0]
-> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3308172276db [1]
-> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7caa9765465f [2]
-> Link: https://github.com/libbpf/ci/blob/main/rootfs/mkrootfs_debian.sh [3]
+> Just like /clocks, /rp1-clocks is not better. Neither /rp1-foo-clocks.
 
-Nice work! Next step is upstream BPF CI integration? :)
+Right. So in this case, since xosc seems to be on the same level and on the same
+board of the RP1 and the SoC, and it's also external to the RP1, can I assume that
+placing xosc node in root is ok?
 
-Fwiw, all still works for me on x86-64 (*), so:
+> 
+> I think there is some sort of big misunderstanding here. Is this RP1
+> co-processor on the RP board, connected over PCI to Broadcom SoC?
 
-Acked-by: Daniel Borkmann <daniel@iogearbox.net>
-Tested-by: Daniel Borkmann <daniel@iogearbox.net>
+Yes. 
 
-(*) fresh Equinix Ubuntu instance still requires this one for vmtest.sh, but
-     that is independent of this series (and for others it seems not required)
+ ---------------Rpi5 board---------------------
+ |                                            |
+ |    SoC ==pci bus==> RP1 <== xosc crystal   |
+ |                                            |
+ ----------------------------------------------
 
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index 04716a5e43f1..02dd161e5185 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -693,7 +693,7 @@ $(OUTPUT)/$(TRUNNER_BINARY): $(TRUNNER_TEST_OBJS)                   \
-                              $(TRUNNER_BPFTOOL)                         \
-                              | $(TRUNNER_BINARY)-extras
-         $$(call msg,BINARY,,$$@)
--       $(Q)$$(CC) $$(CFLAGS) $$(filter %.a %.o,$$^) $$(LDLIBS) $$(LDFLAGS) -o $$@
-+       $(Q)$$(CC) $$(CFLAGS) $(TRUNNER_LDFLAGS) $$(filter %.a %.o,$$^) $$(LDLIBS) $$(LDFLAGS) -o $$@
-         $(Q)$(RESOLVE_BTFIDS) --btf $(TRUNNER_OUTPUT)/btf_data.bpf.o $$@
-         $(Q)ln -sf $(if $2,..,.)/tools/build/bpftool/$(USE_BOOTSTRAP)bpftool \
-                    $(OUTPUT)/$(if $2,$2/)bpftool
-diff --git a/tools/testing/selftests/bpf/vmtest.sh b/tools/testing/selftests/bpf/vmtest.sh
-index 79505d294c44..afbd6b785064 100755
---- a/tools/testing/selftests/bpf/vmtest.sh
-+++ b/tools/testing/selftests/bpf/vmtest.sh
-@@ -189,7 +189,7 @@ update_selftests()
-         local selftests_dir="${kernel_checkout}/tools/testing/selftests/bpf"
+> 
+> > 
+> > If internals, I would leave them just where they are, i.e. inside the rp1 node
+> > 
+> > Does it make sense?
+> 
+> No, because you do not have xosc there, according to my knowledge.
 
-         cd "${selftests_dir}"
--       ${make_command}
-+       TRUNNER_LDFLAGS=-static ${make_command}
+Hmmm sorry, not sure what this negation was referring to... I was talking about
+hclk and pclk, not xosc here. Could you please add some details?
 
-         # Mount the image and copy the selftests to the image.
-         mount_image
+Many thanks,
+Andrea
+
+> 
+> Best regards,
+> Krzysztof
+> 
 
