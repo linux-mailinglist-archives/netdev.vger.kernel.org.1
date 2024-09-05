@@ -1,45 +1,63 @@
-Return-Path: <netdev+bounces-125461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FCBE96D243
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:36:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8922796D27C
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:51:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADDDAB20A3A
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:36:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B83B61C224D2
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6674194AC7;
-	Thu,  5 Sep 2024 08:36:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB0B5194C62;
+	Thu,  5 Sep 2024 08:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YL9rOZaB"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1EC71898E4;
-	Thu,  5 Sep 2024 08:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFAD8194A42;
+	Thu,  5 Sep 2024 08:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725525376; cv=none; b=rXurbxTrp95e6piuF6TUeMZPl0hcUqnk/XmrhSzSfHfMYae3+cpHAgcuLNVQNDdwOrRReOXtafnB1J8erCCpijglth2tBrEMym+F7oKWJGqCWyISwfVCpBTGXjLlG1g9zfiiUneMWKX4KSEmeE8ysRA8WSgnFiLaqBLlRQ0Zs/A=
+	t=1725526289; cv=none; b=nWl785XZQL2rZtPH6sTf7DxooCsAerv1ZSqlXD9maxwoqnmFqPo1md8cRjQtbwhXHiQcXLlRqnaxQy+0AZkvpifB1GWANF7ZbhauvLJPd/cOrZDFhZVyrmkWVIDW4lMeopJ6P7xwvKRMLJf365PLUpQ/wNyDsBI6f1ZL4y11wwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725525376; c=relaxed/simple;
-	bh=oSfYpChyPUqxzwYIuKsV5+CLXkmDQfOhI4Op599R7Z4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E0yPVgLEHsWU+E7fL+xlGjp71EW7NMhxSWqlDXnoacSBT933+GPbNQY+hFUaLcNsBacMiyAo8/zIhqyLbxx+i9z2dBQDbXuHjhEJo+kR8p0KMKz/DBreUhR8csDmiao/qio7nVnB2K82xm09Dav9v74ZpiFeNbmVs0+G2qS0ElY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Wzt3v3LQhz4f3jMP;
-	Thu,  5 Sep 2024 16:35:55 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 81AAE1A0568;
-	Thu,  5 Sep 2024 16:36:10 +0800 (CST)
-Received: from [10.67.109.184] (unknown [10.67.109.184])
-	by APP4 (Coremail) with SMTP id gCh0CgDXDMl2bdlm2BnOAQ--.51109S2;
-	Thu, 05 Sep 2024 16:36:07 +0800 (CST)
-Message-ID: <cdd31b81-8171-4dd0-b336-5229559ba50f@huaweicloud.com>
-Date: Thu, 5 Sep 2024 16:36:06 +0800
+	s=arc-20240116; t=1725526289; c=relaxed/simple;
+	bh=80/WkKy4+58WhxyVhe0GJYSeVYKLmPwl64dVAgD2T+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bBfCIMbgX9EgRYAKX/FKBZuqIfhzatTMb8K29kgPZ80rjytv6v692L1Xn2hfEgOz1vuXnu6atx/hgkdPsyfm/ganxFDYtvsYRTRkmOMWiWTS7oVE/77kFkfZZyMUD0wLbLC5czcZz8g7ZD6x5qGf34/BUWFolCntlJExfwuCkBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YL9rOZaB; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4850VJva026179;
+	Thu, 5 Sep 2024 08:48:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	OEmwguPbSMR4OI/fouKPP2ZikTsz+zMzR7xDWEb6e2g=; b=YL9rOZaBpRfq8Ye0
+	OM2yGdXE9f3rm8QnlTLEko1oT8qF7E08mDFvgf4gnLu8Vuqtz3y7s8l2b1WERtw7
+	7zIxUnBdYkAvDyL9wH5wgi8ja9waRdY95o3/dIHiIofqudeVa53OGvKaDVxGJS9h
+	htBbP31LU4u1N83RT+eMQL/wusrn1F2xGaiVJOMLkCTvpU6BcOBYsdCXw5vdLU8R
+	ac/7I1I86EYbJCddA6jC/RWIZ2xiroSu9uCiexGMn2go1sSYJxbSgsNcmQaO5fh3
+	+8nXhiiaHN2gHIUQYlCg6zdh+GBPU7o3AxFNoH21nDUWXLOUfBUH3B57LZHezyRY
+	U9/NqQ==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41bt675fcm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Sep 2024 08:48:54 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4858mruc019913
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 5 Sep 2024 08:48:53 GMT
+Received: from [10.253.33.121] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 5 Sep 2024
+ 01:48:50 -0700
+Message-ID: <c95932bf-4d11-4952-8835-b212fdb490a7@quicinc.com>
+Date: Thu, 5 Sep 2024 16:48:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,85 +65,173 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v2 03/10] selftests/bpf: Disable feature-llvm for
- vmtest
-To: Eduard Zingerman <eddyz87@gmail.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: Andrii Nakryiko <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Puranjay Mohan <puranjay@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Pu Lehui <pulehui@huawei.com>
-References: <20240904141951.1139090-1-pulehui@huaweicloud.com>
- <20240904141951.1139090-4-pulehui@huaweicloud.com>
- <fc9a03f1809cfdd80a9a8cb7b513e32302be5a43.camel@gmail.com>
- <1bd4056c2b311aca03b7707b077f7555db4e55d6.camel@gmail.com>
+Subject: Re: [PATCH v4 1/2] cxl/region: Find free cxl decoder by
+ device_for_each_child()
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Zijun Hu
+	<zijun_hu@icloud.com>
+CC: Davidlohr Bueso <dave@stgolabs.net>,
+        Jonathan Cameron
+	<jonathan.cameron@huawei.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Alison
+ Schofield <alison.schofield@intel.com>,
+        Vishal Verma
+	<vishal.l.verma@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Dan Williams
+	<dan.j.williams@intel.com>,
+        Timur Tabi <timur@kernel.org>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <linux-cxl@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <20240905-const_dfc_prepare-v4-0-4180e1d5a244@quicinc.com>
+ <20240905-const_dfc_prepare-v4-1-4180e1d5a244@quicinc.com>
+ <2024090531-mustang-scheming-3066@gregkh>
 Content-Language: en-US
-From: Pu Lehui <pulehui@huaweicloud.com>
-In-Reply-To: <1bd4056c2b311aca03b7707b077f7555db4e55d6.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <2024090531-mustang-scheming-3066@gregkh>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgDXDMl2bdlm2BnOAQ--.51109S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uF4fCw1UGw4UKFW3Gr4xXrb_yoW8Ww48pa
-	yrJ3ZIkF48XFyktFsrKa48W3W5K395t3WUX34Uur1DZFn0kFnYgFZ3Kryj9a4kX39rWF43
-	Zw12gasrXr1UZ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_GFv_Wryl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8
-	JVWxJwCI42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
-	s2-5UUUUU==
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: eFnkto18Mdva7Bh7Q04G4bjkLY1Iz_5P
+X-Proofpoint-GUID: eFnkto18Mdva7Bh7Q04G4bjkLY1Iz_5P
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-05_04,2024-09-04_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ bulkscore=0 mlxscore=0 impostorscore=0 suspectscore=0 phishscore=0
+ mlxlogscore=999 lowpriorityscore=0 spamscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2409050064
 
-
-
-On 2024/9/5 7:08, Eduard Zingerman wrote:
-> On Wed, 2024-09-04 at 12:37 -0700, Eduard Zingerman wrote:
->> On Wed, 2024-09-04 at 14:19 +0000, Pu Lehui wrote:
->>> From: Pu Lehui <pulehui@huawei.com>
->>>
->>> After commit b991fc520700 ("selftests/bpf: utility function to get
->>> program disassembly after jit"), Makefile will link libLLVM* related
->>> libraries to the user binary execution file when detecting that
->>> feature-llvm is enabled, which will cause the local vmtest to appear as
->>> follows mistake:
->>>
->>>    ./test_progs: error while loading shared libraries: libLLVM-17.so.1:
->>>      cannot open shared object file: No such file or directory
->>>
->>> Considering that the get_jited_program_text() function is a useful tool
->>> for user debugging and will not be relied upon by the entire bpf
->>> selftests, let's turn it off in local vmtest.
->>>
->>> Signed-off-by: Pu Lehui <pulehui@huawei.com>
->>> ---
+On 9/5/2024 1:32 PM, Greg Kroah-Hartman wrote:
+> On Thu, Sep 05, 2024 at 08:36:09AM +0800, Zijun Hu wrote:
+>> From: Zijun Hu <quic_zijuhu@quicinc.com>
 >>
->> I actually don't agree.
->> The __jited tag is supposed to be used by selftests
->> (granted, used by a single selftest for now).
->> Maybe add an option to forgo LLVM linkage when test_progs are compiled?
->> Regarding base image lacking libLLVM -- I need to fix this.
+>> To prepare for constifying the following old driver core API:
 >>
+>> struct device *device_find_child(struct device *dev, void *data,
+>> 		int (*match)(struct device *dev, void *data));
+>> to new:
+>> struct device *device_find_child(struct device *dev, const void *data,
+>> 		int (*match)(struct device *dev, const void *data));
+>>
+>> The new API does not allow its match function (*match)() to modify
+>> caller's match data @*data, but match_free_decoder() as the old API's
+>> match function indeed modifies relevant match data, so it is not suitable
+>> for the new API any more, solved by using device_for_each_child() to
+>> implement relevant finding free cxl decoder function.
+>>
+>> By the way, this commit does not change any existing logic.
+>>
+>> Suggested-by: Ira Weiny <ira.weiny@intel.com>
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>> ---
+>>  drivers/cxl/core/region.c | 30 ++++++++++++++++++++++++------
+>>  1 file changed, 24 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+>> index 21ad5f242875..c2068e90bf2f 100644
+>> --- a/drivers/cxl/core/region.c
+>> +++ b/drivers/cxl/core/region.c
+>> @@ -794,10 +794,15 @@ static size_t show_targetN(struct cxl_region *cxlr, char *buf, int pos)
+>>  	return rc;
+>>  }
+>>  
+>> +struct cxld_match_data {
+>> +	int id;
+>> +	struct device *target_device;
+>> +};
+>> +
+>>  static int match_free_decoder(struct device *dev, void *data)
+>>  {
+>> +	struct cxld_match_data *match_data = data;
+>>  	struct cxl_decoder *cxld;
+>> -	int *id = data;
+>>  
+>>  	if (!is_switch_decoder(dev))
+>>  		return 0;
+>> @@ -805,17 +810,31 @@ static int match_free_decoder(struct device *dev, void *data)
+>>  	cxld = to_cxl_decoder(dev);
+>>  
+>>  	/* enforce ordered allocation */
+>> -	if (cxld->id != *id)
+>> +	if (cxld->id != match_data->id)
+>>  		return 0;
+>>  
+>> -	if (!cxld->region)
+>> +	if (!cxld->region) {
+>> +		match_data->target_device = get_device(dev);
 > 
-> Please consider using my commit [1] instead of this patch, it forces
-> static linking form LLVM libraries, thus avoiding issues with rootfs.
-> (This was suggested by Andrii off list).
-> 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/ez/bpf-next.git/commit/?h=selftest-llvm-static-linking&id=263bacf2f20fbc17204fd912609e26bdf6ac5a13
+> Where is put_device() called?
+>
 
-Happy to see this modification only on llvm lib. I test it works good 
-and have picked this in next version. Thanks
+it is called within cxl_region_find_decoder()
+
+> Ah, it's on the drop later on after find_free_decoder(), right?
+
+yes, it shares the same put_device() which is used for original
+device_find_child().
+
+> 
+>>  		return 1;
+>> +	}
+>>  
+>> -	(*id)++;
+>> +	match_data->id++;
+>>  
+>>  	return 0;
+>>  }
+>>  
+>> +/* NOTE: need to drop the reference with put_device() after use. */
+>> +static struct device *find_free_decoder(struct device *parent)
+>> +{
+>> +	struct cxld_match_data match_data = {
+>> +		.id = 0,
+>> +		.target_device = NULL,
+>> +	};
+>> +
+>> +	device_for_each_child(parent, &match_data, match_free_decoder);
+>> +	return match_data.target_device;
+>> +}
+>> +
+>>  static int match_auto_decoder(struct device *dev, void *data)
+>>  {
+>>  	struct cxl_region_params *p = data;
+>> @@ -840,7 +859,6 @@ cxl_region_find_decoder(struct cxl_port *port,
+>>  			struct cxl_region *cxlr)
+>>  {
+>>  	struct device *dev;
+>> -	int id = 0;
+>>  
+>>  	if (port == cxled_to_port(cxled))
+>>  		return &cxled->cxld;
+>> @@ -849,7 +867,7 @@ cxl_region_find_decoder(struct cxl_port *port,
+>>  		dev = device_find_child(&port->dev, &cxlr->params,
+>>  					match_auto_decoder);
+>>  	else
+>> -		dev = device_find_child(&port->dev, &id, match_free_decoder);
+>> +		dev = find_free_decoder(&port->dev);
+> 
+> This still feels more complex that I think it should be.  Why not just
+> modify the needed device information after the device is found?  What
+> exactly is being changed in the match_free_decoder that needs to keep
+> "state"?  This feels odd.
+> 
+
+for match_auto_decoder() original logic, nothing of aim device is
+modified, it just need to modifies state or @id to find the aim device.
+
+
+> thanks,
+> 
+> greg k-h
 
 
