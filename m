@@ -1,132 +1,207 @@
-Return-Path: <netdev+bounces-125466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0B3396D2BE
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:06:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D632196D2CF
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:10:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CA34281BE3
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:06:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 929862833A5
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 901DA194ACB;
-	Thu,  5 Sep 2024 09:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF0D19258A;
+	Thu,  5 Sep 2024 09:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RFGaBO9C"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jPVfYtHX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CFB19258A
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 09:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D058F66;
+	Thu,  5 Sep 2024 09:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725527184; cv=none; b=T4+0jkpdbPMMMXaEymUprwDS5gOz1nmdToe6/3xxpNgqa4EQCH9IalIbrMDVxR4YUuyg/+Q5srzUGccqXLidgdmsHcSvNwcTnpNGrEN1kwVhwhZ8L01QDWxAlg1aKJG8+LWMA3CVeu0zgCKOeDUi35pzoSmMkT9yzJqxO7M5A04=
+	t=1725527410; cv=none; b=CHF95UsS9UrEP/AoWD9Akr4uJhAjHFvGzOE5Hi8CNb8hTuP/Tr1OtUiaKOjzIpBR1OxJsStLFyWuV+qtUUHZ9+Nf16IgE/JDxP3qAANkMJetauCe849Nq0CtTC/z3UoYf23FZiP8o8QntOdjrCBWzOt0wDbe/Dm0uoSPiJL0Hro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725527184; c=relaxed/simple;
-	bh=vVOP1mOoLSS9Isujf+VH28F2S18jITj6Qsni3mfL47c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ChZjTjb+356rW5pCpIbDORPHPWLFa9+fnTA8byikKiNv9XiK7I978zyDqvtH6n9BFcJrDMPrLfq7+IFlWJw5XFFfXz/kimFKkhwXWsg01roOVr/2Nj30SMvhyD81z7rUdKFjZw/+8fOcjDSfL42yLkMU46AvkJAL7ZSIjuyJF1Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RFGaBO9C; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725527183; x=1757063183;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=vVOP1mOoLSS9Isujf+VH28F2S18jITj6Qsni3mfL47c=;
-  b=RFGaBO9CeAqvEQl98BJI2exw2tJdUTjSky2S8+NwVjjqq1UmY9pe02ps
-   oldlSH2N69JAekk0RK4QO53B+x8HZ23m4OSJOSdI8m6RIWDLWOwhjJv1P
-   U4CR5TVnqo8GGj3JPPkiS3lAwyzHAGwB6YyFo78SDHUhUYffHaeaWMOj+
-   q9oOUhnGUBZXJnfCaFqlsAeZZT88Ab65KZYfIARvJ3EFgUqleeyKelqlf
-   XmonRDekl8GelN0AAvTqO2xeRZhIlsYT4uWujSGMFPLlqZ4xvWDc5DT9a
-   o7+auGetYwRuzqV1U5FiKiAVNvt6Lf8U5JrmcxRd+nQwIpqIckio1S7xV
-   g==;
-X-CSE-ConnectionGUID: 0hiQrBSURPmfWD/uagPmsg==
-X-CSE-MsgGUID: XfvKt46STQy/ZTwjtDxOBw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11185"; a="27983982"
-X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
-   d="scan'208";a="27983982"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 02:06:22 -0700
-X-CSE-ConnectionGUID: Q69MFm30TcOPGV6p3jty6A==
-X-CSE-MsgGUID: +jx0jdAISW6uGg0MhVMPtQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
-   d="scan'208";a="70481386"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 02:06:14 -0700
-Date: Thu, 5 Sep 2024 11:04:17 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org, wojciech.drewek@intel.com,
-	intel-wired-lan@lists.osuosl.org
-Subject: Re: [Intel-wired-lan] [iwl-net v1] iavf: allow changing VLAN state
- without calling PF
-Message-ID: <Ztl0ES4k0dyI7Qio@mev-dev.igk.intel.com>
-References: <20240904120052.24561-1-michal.swiatkowski@linux.intel.com>
- <65f17b12-860e-4cd0-a996-459fee71b4f8@intel.com>
+	s=arc-20240116; t=1725527410; c=relaxed/simple;
+	bh=4NtntbVRtNy24ist+ijLY7xWZ3UYBIIHIQU+etJbVTE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=QIRJ1YHc9oEfoBsvshxS943OndEMC1brZoqp3uIijWrntZGuWQ3BNqhOaHzfeDO1pwOPpuFqVtyamPzYzC34HEmLcXiDxAC4EZZhxT7VBMt+TA5QXooh/8Iw3eEQrkUlpUR3jA6I6L2SIc3Eo7lqErRSTaMQ8wM+m0rboPJlRAs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jPVfYtHX; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48596ubs001482;
+	Thu, 5 Sep 2024 09:09:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	wPwJp2fyLqlQ/lBeuaA4xALfiX2USm3cuiazcj0NQwg=; b=jPVfYtHXElTHDrIv
+	TxfVN+mG5xuS4pyfW78BeFh81klBNcroUM2OnSQ2xfY3mc2SOzlFPPnMzrwOSGoa
+	5v2vaxjLQ6Sq/j1ePiqeHVJ283otrNmb+EIJfiZyQBTt50R+eMefFcYqOcwpQyjP
+	es0+GDvd881/lk5HX375+EINJ8AWPMzSWN9ZsvgTXU4wgG0+KPI2fhdE/9MuESdA
+	c7YYttmvtIrgeVHS5qBEiAy9nHtHuXzUJ7wI3RaDvOTI7oEyLU8rNVM8HGATi8Bg
+	81eH5GZ8WXFhpivaGy5RbnvTX/YAFh2m3ztds1d2oD/XSfptfHxC3Yi3XLSf+98J
+	KmiqXQ==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41dxy26tha-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 05 Sep 2024 09:09:49 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48599nHS032594
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 5 Sep 2024 09:09:49 GMT
+Received: from [10.253.33.121] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 5 Sep 2024
+ 02:09:45 -0700
+Message-ID: <58106753-389a-42a1-88df-0cf006b2faac@quicinc.com>
+Date: Thu, 5 Sep 2024 17:09:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65f17b12-860e-4cd0-a996-459fee71b4f8@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 2/2] net: qcom/emac: Find sgmii_ops by
+ device_for_each_child()
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Zijun Hu
+	<zijun_hu@icloud.com>
+CC: Davidlohr Bueso <dave@stgolabs.net>,
+        Jonathan Cameron
+	<jonathan.cameron@huawei.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Alison
+ Schofield <alison.schofield@intel.com>,
+        Vishal Verma
+	<vishal.l.verma@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Dan Williams
+	<dan.j.williams@intel.com>,
+        Timur Tabi <timur@kernel.org>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <linux-cxl@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <20240905-const_dfc_prepare-v4-0-4180e1d5a244@quicinc.com>
+ <20240905-const_dfc_prepare-v4-2-4180e1d5a244@quicinc.com>
+ <2024090521-finch-skinny-69bc@gregkh>
+ <2024090548-riverbank-resemble-6590@gregkh>
+Content-Language: en-US
+From: quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <2024090548-riverbank-resemble-6590@gregkh>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: z2_O7lNyZQX-gDUywCeyy-0K9EPrpBls
+X-Proofpoint-ORIG-GUID: z2_O7lNyZQX-gDUywCeyy-0K9EPrpBls
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-05_04,2024-09-04_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ impostorscore=0 bulkscore=0 priorityscore=1501 phishscore=0 suspectscore=0
+ lowpriorityscore=0 mlxlogscore=999 spamscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2409050067
 
-On Thu, Sep 05, 2024 at 08:19:58AM +0200, Przemek Kitszel wrote:
-> On 9/4/24 14:00, Michal Swiatkowski wrote:
-> > First case:
+On 9/5/2024 1:33 PM, Greg Kroah-Hartman wrote:
+> On Thu, Sep 05, 2024 at 07:29:10AM +0200, Greg Kroah-Hartman wrote:
+>> On Thu, Sep 05, 2024 at 08:36:10AM +0800, Zijun Hu wrote:
+>>> From: Zijun Hu <quic_zijuhu@quicinc.com>
+>>>
+>>> To prepare for constifying the following old driver core API:
+>>>
+>>> struct device *device_find_child(struct device *dev, void *data,
+>>> 		int (*match)(struct device *dev, void *data));
+>>> to new:
+>>> struct device *device_find_child(struct device *dev, const void *data,
+>>> 		int (*match)(struct device *dev, const void *data));
+>>>
+>>> The new API does not allow its match function (*match)() to modify
+>>> caller's match data @*data, but emac_sgmii_acpi_match() as the old
+>>> API's match function indeed modifies relevant match data, so it is not
+>>> suitable for the new API any more, solved by using device_for_each_child()
+>>> to implement relevant finding sgmii_ops function.
+>>>
+>>> By the way, this commit does not change any existing logic.
+>>>
+>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>>> ---
+>>>  drivers/net/ethernet/qualcomm/emac/emac-sgmii.c | 22 +++++++++++++++++-----
+>>>  1 file changed, 17 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
+>>> index e4bc18009d08..29392c63d115 100644
+>>> --- a/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
+>>> +++ b/drivers/net/ethernet/qualcomm/emac/emac-sgmii.c
+>>> @@ -293,6 +293,11 @@ static struct sgmii_ops qdf2400_ops = {
+>>>  };
+>>>  #endif
+>>>  
+>>> +struct emac_match_data {
+>>> +	struct sgmii_ops **sgmii_ops;
+>>> +	struct device *target_device;
+>>> +};
+>>> +
+>>>  static int emac_sgmii_acpi_match(struct device *dev, void *data)
+>>>  {
+>>>  #ifdef CONFIG_ACPI
+>>> @@ -303,7 +308,7 @@ static int emac_sgmii_acpi_match(struct device *dev, void *data)
+>>>  		{}
+>>>  	};
+>>>  	const struct acpi_device_id *id = acpi_match_device(match_table, dev);
+>>> -	struct sgmii_ops **ops = data;
+>>> +	struct emac_match_data *match_data = data;
+>>>  
+>>>  	if (id) {
+>>>  		acpi_handle handle = ACPI_HANDLE(dev);
+>>> @@ -324,10 +329,12 @@ static int emac_sgmii_acpi_match(struct device *dev, void *data)
+>>>  
+>>>  		switch (hrv) {
+>>>  		case 1:
+>>> -			*ops = &qdf2432_ops;
+>>> +			*match_data->sgmii_ops = &qdf2432_ops;
+>>> +			match_data->target_device = get_device(dev);
+>>>  			return 1;
+>>>  		case 2:
+>>> -			*ops = &qdf2400_ops;
+>>> +			*match_data->sgmii_ops = &qdf2400_ops;
+>>> +			match_data->target_device = get_device(dev);
+>>
+>> Where is put_device() now called?
 > 
-> [...]
+> Nevermind, I see it now.
 > 
-> > Second case:
-> 
-> [...]
-> 
-> > With fix for previous case we end up with no VLAN filters in hardware.
-> > We have to remove VLAN filters if the state is IAVF_VLAN_ADD and delete
-> > VLAN was called. It is save as IAVF_VLAN_ADD means that virtchnl message
-> > wasn't sent yet.
-> 
-> I'm fine with combining the two cases into one commit as that is related
-> 
-> > 
-> > Fixes: 0c0da0e95105 ("iavf: refactor VLAN filter states")
-> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > ---
-> >   drivers/net/ethernet/intel/iavf/iavf_main.c | 18 ++++++++++++++++--
-> >   1 file changed, 16 insertions(+), 2 deletions(-)
-> 
-> [...]
-> 
-> > @@ -793,8 +798,17 @@ static void iavf_del_vlan(struct iavf_adapter *adapter, struct iavf_vlan vlan)
-> >   	f = iavf_find_vlan(adapter, vlan);
-> >   	if (f) {
-> > -		f->state = IAVF_VLAN_REMOVE;
-> 
-> you forgot to put this line in else case below
+> That being said, this feels wrong still, why not just do this "set up
+> the ops" logic _after_ you find the device and not here in the match
+> function?
 > 
 
-Oh, sorry, thanks for finding that. Will send v2.
+that will become more complex since
 
-> > -		iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_DEL_VLAN_FILTER);
-> > +		/* IAVF_ADD_VLAN means that VLAN wasn't even added yet.
-> > +		 * Remove it from the list.
-> > +		 */
-> > +		if (f->state == IAVF_VLAN_ADD) {
-> > +			list_del(&f->list);
-> > +			kfree(f);
-> > +			adapter->num_vlan_filters--;
-> > +		} else {
-> > +			iavf_schedule_aq_request(adapter,
-> > +						 IAVF_FLAG_AQ_DEL_VLAN_FILTER);
-> > +		}
-> >   	}
-> >   	spin_unlock_bh(&adapter->mac_vlan_list_lock);
+1) it need to change match_data->sgmii_ops type from struct sgmii_ops **
+to struct sgmii_ops * which is not same as type of original @data
+
+2) it also needs to implement a extra finding function find_xyz()
+similar as cxl/region find_free_decoder()
+
+3) it need to extra condition assignment after find aim device.
+
+
+actually, this scenario is a bit different with cxl/region as shown below:
+for cxl/region, we only need to get aim device
+for this scenario, we need to get both aim device and relevant sgmii_ops
+
+> thanks,
 > 
+> greg k-h
+
 
