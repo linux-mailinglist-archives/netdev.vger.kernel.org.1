@@ -1,143 +1,110 @@
-Return-Path: <netdev+bounces-125345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD32396CC7B
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 04:06:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5886996CC81
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 04:10:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 604701F229EE
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 02:06:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4FFAB23285
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 02:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5C718B09;
-	Thu,  5 Sep 2024 02:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219991A291;
+	Thu,  5 Sep 2024 02:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jwTeoRLo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aQ9Z8RAj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBDFEAF6
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 02:05:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBAB12564;
+	Thu,  5 Sep 2024 02:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725501958; cv=none; b=R36UyOGnd0kfE6+OE43Fc1TBy4+oUtwZwfths759t0Bzzc6NkwjMk673ocx7bkFjPE6BDX2l5xW9KMbcPJwiS5n0aPecR0BNEY6kImW++p6mckAyfaBMwAo1Zpce1rSKvt/7BldmOdVNJFi0qBmy8u8+d2UFjIANP/E057qR8hY=
+	t=1725502232; cv=none; b=l1InQA4ugiHFF4gZb1C6G0Zj0TGgisS/m8NZSE49wxpHgWBTTpmwaEdC5ozvJ0B7kTMMRnyrGFekxzv09izmnhRxiN0EoI5MHJLZL7gZ4v19qrpDTHlnACOnG+AGYcBPktUwyDllrEpIotVv67xhCfdVmYDy5oYfsbfT6Bdo/0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725501958; c=relaxed/simple;
-	bh=Pf1Wrk3NEAFUxLClRr4VrE3W93nf/nbSAF3Fdi9O1OE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ByR2Q//ISiaIrSHDqx56m+ZD3n9bOJmV4bpnXt5RBJRi0JTByMYMFUVABRXKs6k33eqzUkjq+gSCV6Zj9DLUJLhTCtIojQaNRt5uXlQxrK84JQ1Ki/iDE0x4H14xFSs3XgUefOxEQ/AcF7JR6cm+4rFVV+uV3gs5Wgq9QEW0iwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jwTeoRLo; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4850rGsO003593;
-	Thu, 5 Sep 2024 02:05:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	+JI2V/1jxpPZ4pbTR7FaveC1IbFHqMaF/rrhMycRsCA=; b=jwTeoRLoYxO013Ll
-	hNI3ihFu93zwiOgIiPBfMxL3dmze+Q1VBDzJILiKq0o8DBM0OIoivRKLo7wIsBGe
-	923H4JijIExcEQue+Zq36R+LUUXFA57N7+94x9htynrA/LVMBXrdfqcKiVz0dpyR
-	9XcdZ5c2RxoUbPdiY7wBS1PBckuwDuNRDGorlbxCDrNlmedDXRiQeLXEG4AF+zn5
-	U+1N8tcJifehjPQRUh+86Nxddu9MJfTbmoW+AkS51z5RPBCanuhVjo4eRHsRPO9t
-	xwbG/C29L2qvws0Yl5KMsljbBo0V1yTCBM3VbtVXh2oI2620CCpCosnT4YVnnfEO
-	YY1RpQ==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41buxfc9q1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Sep 2024 02:05:35 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48525YVE028438
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 5 Sep 2024 02:05:34 GMT
-Received: from [10.110.105.58] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 4 Sep 2024
- 19:05:30 -0700
-Message-ID: <e9ef3235-8e35-4918-a2a4-76573034ca59@quicinc.com>
-Date: Wed, 4 Sep 2024 19:05:22 -0700
+	s=arc-20240116; t=1725502232; c=relaxed/simple;
+	bh=qhnvU5LS8dpPbJlPDpc2qvEpy/600H1YHQKZhTyjSG0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HxT44SzUHghA7LUvSXNDQzf6HsmAAr6/5haUZOZBjBaE6bxVXXNgPDvfLJ2CufQ+2E3ujotrf1ezzaFdOSis4SGXkyjx8oS8Y0pqY37/N2J/Qe9DA62ubtpa8yC8Z5QWNto1Ov2njiewU+VaVzRrCeYpwMIpW/OYa4Y3KOHs0TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aQ9Z8RAj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75B92C4CEC2;
+	Thu,  5 Sep 2024 02:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725502230;
+	bh=qhnvU5LS8dpPbJlPDpc2qvEpy/600H1YHQKZhTyjSG0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=aQ9Z8RAjlz504faobgVyDfOOB7ZHV3o3rpna500UBcRbwTBAFS7KgbN65jdEH8yJP
+	 pIWAWlNCiNtB+S38eIxWYETPk45IgogfOpicWqwOpE4dGdAJYGs6fwNpjays8c2GM9
+	 tQEeZS1nUpKxzT4VH80BlM7g7+TEhqLssGps7qADlMt9Mnw38oYetxonlzVrf7Ecbd
+	 TapW99wjvVFJhHtxEPizScI1hqKywQbeIcjywzlbCvlon9xJ3sRKmnJuF6qcQuJJHh
+	 T7/qc5swgUh7ryvOME/WUEoGtfIh3bc7jP4Q0x6gHzzWUZbzL0ilCUkkgwbgSfWfB0
+	 KfFHBsF7QkMIw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F6B3822D30;
+	Thu,  5 Sep 2024 02:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] net: stmmac: Programming sequence for VLAN
- packets with split header
-To: Sagar Cheluvegowda <quic_scheluve@quicinc.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Andrew Halaney <ahalaney@redhat.com>
-CC: <kernel@quicinc.com>
-References: <20240904235456.2663335-1-quic_abchauha@quicinc.com>
- <c29ae5b4-fa2f-4dad-b32f-86838d846d35@quicinc.com>
-Content-Language: en-US
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <c29ae5b4-fa2f-4dad-b32f-86838d846d35@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: oSj-lMejUqYyyDRfPINlvdFFLLWhi40c
-X-Proofpoint-ORIG-GUID: oSj-lMejUqYyyDRfPINlvdFFLLWhi40c
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-05_01,2024-09-04_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- adultscore=0 clxscore=1015 mlxlogscore=999 lowpriorityscore=0 phishscore=0
- bulkscore=0 mlxscore=0 impostorscore=0 priorityscore=1501 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2409050015
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/6][pull request] ice: fix synchronization between
+ .ndo_bpf() and reset
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172550223126.1227714.3911146774586738228.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Sep 2024 02:10:31 +0000
+References: <20240903183034.3530411-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240903183034.3530411-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, larysa.zaremba@intel.com,
+ wojciech.drewek@intel.com, michal.kubiak@intel.com, jacob.e.keller@intel.com,
+ amritha.nambiar@intel.com, przemyslaw.kitszel@intel.com,
+ sridhar.samudrala@intel.com, maciej.fijalkowski@intel.com,
+ magnus.karlsson@intel.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, bpf@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On 9/4/2024 6:12 PM, Sagar Cheluvegowda wrote:
+On Tue,  3 Sep 2024 11:30:26 -0700 you wrote:
+> Larysa Zaremba says:
 > 
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
->> index e0165358c4ac..dbd1be4e4a92 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
->> @@ -526,6 +526,17 @@ static void dwmac4_enable_sph(struct stmmac_priv *priv, void __iomem *ioaddr,
->>  	value |= GMAC_CONFIG_HDSMS_256; /* Segment max 256 bytes */
->>  	writel(value, ioaddr + GMAC_EXT_CONFIG);
->>  
->> +	/* Additional configuration to handle VLAN tagged packets */
->> +	value = readl(ioaddr + GMAC_EXT_CFG1);
->> +	value &= ~GMAC_CONFIG1_SPLM;
->> +	/* Enable Split mode for header and payload at L2  */
->> +	value |= GMAC_CONFIG1_SPLM_L2OFST_EN << GMAC_CONFIG1_SPLM_SHIFT;
->> +	value &= ~GMAC_CONFIG1_SAVO;
->> +	/* Enables the MAC to distinguish between tagged vs untagged pkts */
->> +	value |= 4 << GMAC_CONFIG1_SAVO_SHIFT;
-> I checked the data book internally and see SAVO bit is used to indicate the
-> valueof the offset from the beginning of Length/Type field at which the header 
-> should be split, i see the length/type field remains to be 2bytes even in case
-> of tagged packets may be you need to keep the value of this field to 2bytes as
-> it was before but one thing which i am still not able to understand is that even
-> with the value of this field configured to 4 i don't see any packet corruption
-> issue, something which needs to be checked with HW folks. 
+> PF reset can be triggered asynchronously, by tx_timeout or by a user. With some
+> unfortunate timings both ice_vsi_rebuild() and .ndo_bpf will try to access and
+> modify XDP rings at the same time, causing system crash.
+> 
+> The first patch factors out rtnl-locked code from VSI rebuild code to avoid
+> deadlock. The following changes lock rebuild and .ndo_bpf() critical sections
+> with an internal mutex as well and provide complementary fixes.
+> 
+> [...]
 
-Good catch Sagar. Let me check this internally and get back. 
+Here is the summary with links:
+  - [net,1/6] ice: move netif_queue_set_napi to rtnl-protected sections
+    https://git.kernel.org/netdev/net/c/2a5dc090b92c
+  - [net,2/6] ice: protect XDP configuration with a mutex
+    https://git.kernel.org/netdev/net/c/2504b8405768
+  - [net,3/6] ice: check for XDP rings instead of bpf program when unconfiguring
+    https://git.kernel.org/netdev/net/c/f50c68763436
+  - [net,4/6] ice: check ICE_VSI_DOWN under rtnl_lock when preparing for reset
+    https://git.kernel.org/netdev/net/c/d8c40b9d3a6c
+  - [net,5/6] ice: remove ICE_CFG_BUSY locking from AF_XDP code
+    https://git.kernel.org/netdev/net/c/7e3b407ccbea
+  - [net,6/6] ice: do not bring the VSI up, if it was down before the XDP setup
+    https://git.kernel.org/netdev/net/c/04c7e14e5b0b
 
->> +	value |= GMAC_CONFIG1_SAVE_EN;
->> +	writel(value, ioaddr + GMAC_EXT_CFG1);
->> +
->>  	value = readl(ioaddr + DMA_CHAN_CONTROL(dwmac4_addrs, chan));
->>  	if (en)
->>  		value |= DMA_CONTROL_SPH;
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
