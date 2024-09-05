@@ -1,204 +1,106 @@
-Return-Path: <netdev+bounces-125505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A56396D6AF
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:04:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CAAC96D6BF
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:08:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C94771F2670B
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:04:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCFD628497C
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286E919923A;
-	Thu,  5 Sep 2024 11:04:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F2EE199231;
+	Thu,  5 Sep 2024 11:08:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D1ASrBYN"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JxFQI31w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FA19199231;
-	Thu,  5 Sep 2024 11:04:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B2A189913
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 11:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725534283; cv=none; b=P0O0ns8KP9Py+UfqN4puB6NRmm+gPAejyo5IMdLJE3dRSPjt+sEhDkGMqe6kpVq/2CL3Si0zBLWJtpMPQVL1DVx/7kIuKKi8HlaObcHdJpVoRY7OAqbOfrQQEFBFoCiha76KI92VLIlNB38YVeGIMp8Qs0f2GoxaSIAQSIYVRTM=
+	t=1725534502; cv=none; b=f14+moECMC44hJ4YKQJj2oAu/42NogXFyouvS6KEqB1fopjNr6IbodWJCacf8v5U63d9dEngC3KdR+y6KLfFBa2tACiEYRnBo4UGbRAUXDfCQNfbR4OUixMAgVNAcLSIsTCTT0Ve6oeHYhD2bw9ujVFK8Hc7EqYlM7CEZXE45hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725534283; c=relaxed/simple;
-	bh=kOCiF8nsosBKqznyU+eG3n+wt+yb6o2N4Y5rEsqvqWY=;
+	s=arc-20240116; t=1725534502; c=relaxed/simple;
+	bh=LqwjAMWIXfLAiDh3IzhpRtZkBQ4I8ll+8WXMQlVGHJc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I25f+5OFcF/KfreP7BmcrlajQPElxdMLcj7DSZNBsmDeNURk34kV7iWAexukmDgCvJPhgUVxoeIa2uyz5LT+wJrXoVwTv1vLJeW81NiC8L5sgk4QE7SxknutF68wxwMsVK3r90riyXGGFOm6bRyrCfMaHkfAq6Rayp23+I5uJXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D1ASrBYN; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3a043496fdeso2081735ab.3;
-        Thu, 05 Sep 2024 04:04:41 -0700 (PDT)
+	 To:Cc:Content-Type; b=Fyh7Wl0oegXhn3qSs0JgL4KOU4FIJOKInWw2ErtsiGqvcfwfHHCjkHO40QldE0CnqtQll01AhDPz+dzYguQE4D1EZzpjfAEJdlJKDt8WOKhQxKp2bdF9RgVldbhzBz88xL4VjhRuQ5G5MdWO8YnFDBf2OJ69DB0db/zinyvE5NY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JxFQI31w; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c3ca32971cso703874a12.0
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 04:08:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725534280; x=1726139080; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1725534499; x=1726139299; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mizWkFU32/oNF8sGJhFD1hiaSJOb8XN9+QqQonvqlLs=;
-        b=D1ASrBYNZTcfEgQ2zOeE3IieueYdhgx3zsnGRr4d3W1nOybw6qMeJtmeHt7G1C5nHa
-         99ndNrT84kEhaHOmsx92hgO444lgekxsAhJwgeVFF9oNu1CkyrHHemUH7HaPg83HuE0A
-         EIUU1ZV/40ul0/U/dVL5xbJGa67c7eAZmHuczR3LN9Kg7FEs5D2ZGiKKIdgpHUmLbELP
-         +2uLsAZjLFcCYGjOfWSE+4Jfze/T9gYrzGaQJMSNfWZwC1SjtdXSj82Zo31kZJ4hKpis
-         +FX3BjV7eqHoxUINtzynlo2HAJZY8Ts3ylo4AZJ0Y8PRXJcgmfgoji/Mb+b9Frye+E+7
-         yRCw==
+        bh=LqwjAMWIXfLAiDh3IzhpRtZkBQ4I8ll+8WXMQlVGHJc=;
+        b=JxFQI31whJSZUzkWMvjtTdT53GIDOTUKUF4EnUjz35s9SJUfwuMb0YrJzYg8pTC4Wj
+         /mLSjuvyfsUCTBHZH/ZSwL+KfQ2JEsxxjMEFQIR+wOBEo+ac/m2+zJhU+p1ydSeU1JY2
+         H/0r5xG53eMAVWo7AL/Msh5rfsNncY/ZxVei3lkuBJG52szhdWRzFWL7nCJNg58X0b/2
+         UfEDop+8nCbak8MitOgjpBDOIhlqFDMh+foVGAmpZpbC3bkh9TnjpMQ1s6ioCSq2ZcJ/
+         Fv9I8JmYayGIkzbepEhbYLtn2RT/xbdD6vPnouaj2Evml94+Mdqmln+WIHMhytQ28QT+
+         EWQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725534280; x=1726139080;
+        d=1e100.net; s=20230601; t=1725534499; x=1726139299;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mizWkFU32/oNF8sGJhFD1hiaSJOb8XN9+QqQonvqlLs=;
-        b=NpY/QdH2Y48HuyuO2bz04O0aBW0DMxydSD+7DkmkhQ4StPJCJu0tWvqrAzFbAV8h7O
-         iaLR4KxUzcYWHMfol9nffOqOs58XIdeGT+alBSfdYJUbO3axvtRb75kNEkvkP3hfB7kr
-         Ptq28ojwR25KNpwGy8jm2bJUS1h8FuS2UOrDzXsLTmRj+8PH6/XkmAG4R6hVMV4xM5T/
-         SgHEPDwXVGXZHi9X97kFpiWKYvVyBYwnpu9eTgdqLwtieMQS09SY/FokRW2l04bvnfdH
-         OQUn6sy+nfUhCsml2ZmQq3lsInSQJDUI8+lPGh+J3oEqjO7qPmzhCyw2nG3ZJruC5Zje
-         XteQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDznUzoC+8dnqo5lpMqyng9uBjAVKYpZYuduJe+9/u7RbGq2kBRzo4pNeU1xEWTC6UQuxSxr0P@vger.kernel.org, AJvYcCWcLKWjze5E7XxP39WGqqjqYmFPP0zI/EsQT6voaUZJV2+vsSL1mcRTmKvZDZ0OJ1FCyU1XU5o8v++un0OBXzI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCm16eGI3JifAdAugcVnUN04fXtOIIVZe2zN6b4ia3nACuZ9oL
-	sdIabidd6BmXPOAm0xj0rZKMuXpNoip5mKogcM8C+Q9u/NF/Ww5CVunT/XfcTDIiRTjktqanRQE
-	zK+GSYlYrBQKrQZOt260KaoqXRRU=
-X-Google-Smtp-Source: AGHT+IGcychPtnWKEZ7vp+NFPEjIKSRF7cOH85iWFf1X3owut3zhBZ0nYAlt+RQMmvJ32iYHodhff0IThlYFLM7BJpE=
-X-Received: by 2002:a05:6e02:1fc5:b0:39e:6e47:814d with SMTP id
- e9e14a558f8ab-39f378ed22emr261736125ab.2.1725534280587; Thu, 05 Sep 2024
- 04:04:40 -0700 (PDT)
+        bh=LqwjAMWIXfLAiDh3IzhpRtZkBQ4I8ll+8WXMQlVGHJc=;
+        b=LcKIIVSfRZSl7N/vffAyT76wY7PX8XWd4LMN0JKtCcPVUo/buF6fCWkMY1BwLujAFp
+         WkvAcK8oxJX2g5zIQiCnTSHaB2ElYwgBIcQdpUGxW54xZR7PJxBiE24jqySGjzXstawA
+         LHI4PvT4KwafRNmD9u1dxyAaOmwLapx5NKq3nyWna4YUvDmRAOuLSYrD9/dJLM3CFQ7x
+         rP4ukn4G8Uh50x/cNyj+6y+20OU53xDZxnR9Da0qYLwbgNuAn6vDkklEvY+JgQCzLf1c
+         po6OpwwGZ9TBPIvywA3rlVdL5CLAti2kWzZKFI4JsxzXSmmU5XMgimcmJu3LbUnWCA+G
+         IeJA==
+X-Gm-Message-State: AOJu0YyFQB4HwNsy3j5I3KWi3oBS/D4ubXhLZYPKAx8QCUL8VVs5sANe
+	QyWijxGzapxMHIXnnOigflbM0AFRd+krGxPqCUP4TUeXAQVBKnq4Pn+/G2QJeHN6850DTkNSvnq
+	bY5YbhhLl1EzxC40v0+ChXiWeWxvZ2v18B3ZS
+X-Google-Smtp-Source: AGHT+IFFX3kl9UZMNdkzkdtZItwLqtVU50rbw+IBqYKGDGFu+Kv+f8YYap3rC0kXwlqF5GAgbv/+LYO15fn+hBspXo0=
+X-Received: by 2002:a05:6402:2742:b0:5c2:70a2:5e41 with SMTP id
+ 4fb4d7f45d1cf-5c270a25e94mr5743031a12.28.1725534497559; Thu, 05 Sep 2024
+ 04:08:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240904144446.41274-1-kerneljasonxing@gmail.com> <66d8ce15415ec_163d93294a2@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66d8ce15415ec_163d93294a2@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 5 Sep 2024 19:04:04 +0800
-Message-ID: <CAL+tcoDko2ijPvnBr1=dy4iBfw9wLEyKX0ye4rFngd_q7Zr7eQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests: return failure when timestamps can't
- be parsed
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+References: <20240904153431.307932-1-jdamato@fastly.com>
+In-Reply-To: <20240904153431.307932-1-jdamato@fastly.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 5 Sep 2024 13:08:05 +0200
+Message-ID: <CANn89i+=HiffVo9iv2NKMC2LFT15xFLG16h7wN3MCrTiKT3zQQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: napi: Prevent overflow of napi_defer_hard_irqs
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, 
+	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Breno Leitao <leitao@debian.org>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Johannes Berg <johannes.berg@intel.com>, 
+	Jamie Bainbridge <jamie.bainbridge@gmail.com>, 
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 5, 2024 at 5:16=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+On Wed, Sep 4, 2024 at 5:34=E2=80=AFPM Joe Damato <jdamato@fastly.com> wrot=
+e:
 >
-> Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > When I was trying to modify the tx timestamping feature, I found that
-> > running "./txtimestamp -4 -C -L 127.0.0.1" didn't reflect the fact
-> > properly.
+> In commit 6f8b12d661d0 ("net: napi: add hard irqs deferral feature")
+> napi_defer_irqs was added to net_device and napi_defer_irqs_count was
+> added to napi_struct, both as type int.
 >
-> Did not reflect what fact? Sorry, I don't entirely follow the issue
-> you raise.
+> This value never goes below zero, so there is not reason for it to be a
+> signed int. Change the type for both from int to u32, and add an
+> overflow check to sysfs to limit the value to S32_MAX.
 >
-> > In this selftest file, we respectively test three tx generation flags.
-> > With the generation and report flag enabled, we expect that the timesta=
-mp
-> > must be returned to the userspace unless 1) generating the timestamp
-> > fails, 2) reporting the timestamp fails. So we should test if the
-> > timestamps can be read and parsed succuessfuly in txtimestamp.c, or
->
-> typo: successfully
->
-> > else there is a bug in the kernel.
-> >
-> > After adding the check so that running ./txtimestamp will reflect the
-> > result correctly like this if there is an error in kernel:
-> > protocol:     TCP
-> > payload:      10
-> > server port:  9000
-> >
-> > family:       INET
-> > test SND
-> >     USR: 1725458477 s 667997 us (seq=3D0, len=3D0)
-> > Failed to parse timestamps
-> >     USR: 1725458477 s 718128 us (seq=3D0, len=3D0)
-> > Failed to parse timestamps
-> >     USR: 1725458477 s 768273 us (seq=3D0, len=3D0)
-> > Failed to parse timestamps
-> >     USR: 1725458477 s 818416 us (seq=3D0, len=3D0)
-> > Failed to parse timestamps
-> > ...
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> > I'm not sure if I should also check if the cur->tv_sec or cur->tv_nsec
-> > is zero in __print_timestamp(). Could it be valid when either of
-> > them is zero?
->
-> tv_nsec can be zero. tv_sec cannot.
->
-> > ---
-> >  tools/testing/selftests/net/txtimestamp.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/=
-selftests/net/txtimestamp.c
-> > index ec60a16c9307..b69aae840a67 100644
-> > --- a/tools/testing/selftests/net/txtimestamp.c
-> > +++ b/tools/testing/selftests/net/txtimestamp.c
-> > @@ -358,6 +358,10 @@ static void __recv_errmsg_cmsg(struct msghdr *msg,=
- int payload_len)
-> >
-> >       if (batch > 1)
-> >               fprintf(stderr, "batched %d timestamps\n", batch);
-> > +     else if (!batch) {
-> > +             fprintf(stderr, "Failed to parse timestamps\n");
-> > +             test_failed =3D true;
-> > +     }
->
-> nit: if adding braces around one side of a branch, then add to both (all)=
-.
->
-> This is not so much a parsing failure as that no timestamps arrived.
->
-> More importantly, this function gets called also if
-> recvmsg(fd, .., MSG_ERRQUEUE) returned 0:
->
->         if (ret >=3D 0) {
->                 __recv_errmsg_cmsg(&msg, ret);
->
-> That seems counterintuitive, as there is no data. But this was
-> introduced with cfg_loop_nodata (SOF_TIMESTAMPING_OPT_TSONLY). When
-> there may be packets looped, just 0B packets. In those cases we also
-> expect timestamps.
->
-> But, can __recv_errmsg_cmsg now also be called when there truly is
-> nothing on the error queue? It is a non-blocking read, after all.
+> The limit of S32_MAX was chosen because the practical limit before this
+> patch was S32_MAX (anything larger was an overflow) and thus there are
+> no behavioral changes introduced. If the extra bit is needed in the
+> future, the limit can be raised.
 
-Today I re-read this paragraph. I think we were just past each other.
-
-I would like to check that if the reporting timestamp with someone's
-patch applied someday wouldn't work, the txtimestamp should return
-failure to warn the submitter. That is to say, we succeed to generate
-the skb with timestamp but failed to report it like this:
-
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index 8a5680b4e786..65f7947322cd 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -2274,7 +2274,7 @@ void tcp_recv_timestamp(struct msghdr *msg,
-const struct sock *sk,
-                        }
-                }
-
--               if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_SOFTWARE)
-+               if (!(READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_SOFTWARE=
-))
-                        has_timestamping =3D true;
-                else
-                        tss->ts[0] =3D (struct timespec64) {0};
-
-which I intentionally wrote is used to show one stupid bug as an
-example. The txtimestamp test should spot it :)
-
-Thanks,
-Jason
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
