@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-125305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EB2E96CB80
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 02:00:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2F7896CB83
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 02:00:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B19211C220B7
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 00:00:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80E0E281F37
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 00:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19757EADA;
-	Thu,  5 Sep 2024 00:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BF727735;
+	Thu,  5 Sep 2024 00:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WU8snY3g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UA6bIPLX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE67A1C27;
-	Thu,  5 Sep 2024 00:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66B71DFD8
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 00:00:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725494442; cv=none; b=hXibaZXB+fe2G2D5M4SxE2c0OSWh85U0mUjylfdpCeFC3EREGdtO8r7LWdjtOehyd42PFLGH1OJXC430xJ07Xy3MbhQKe8X1EQ3dn/kGEAs94jcKCyhhfvQlbOCQZhsrqcQ+loegiR6bCKDbGooFYyg8Gh5RDpnf/lPEHHIR2F0=
+	t=1725494442; cv=none; b=W0iGGxe83Fb3ldnouXynh/VsRQhSUScJ9EpS9hTGRz1/rOB0NrH+q2BeqcGmWLeq55UhpX2Imj7tS8L5Nywyg9oz2wWNzfzpow1CSAUDcdW1w5a3Y1KxIXQsFylO0aRgpF/7X+Q0zi27Ld7nk27q0lcxUr3RKDLyVrwqIlpquAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725494442; c=relaxed/simple;
-	bh=hzPV3/MHpC/JimHpDFSYV8Yu913JXZWQ1tDa/Sh3TV8=;
+	bh=viL/wCZRUGidZoDbcQrT4vSq+P7nRgHYSyNQ0ZuM1Ck=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DUwcJLwYoJ8MXlYT/DdjShjuBxpW3O9n60imtjYlbTFfebGSA2T/TH4HcYqnB9EsXVGxd0Ht/4VeLDLc1l3ZZ+YsXyQVPRhHoUpoAM4QJ0+GPpt2l24u4dhQgzEw1Nzxd9BDxtX5gV1dTRll0XzvwkwOPUN/v0v3X2sA/3N5Wpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WU8snY3g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75830C4CEC2;
-	Thu,  5 Sep 2024 00:00:41 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=QOn0QcTkcw3a3dOmZdp1rHgMqhPkMN5XBWUeDz56v91N56g+8hwt+pmGRFtMY/Wf0kqewrz15/NjfjAflzQ0iofzKewaeZv9I6QgUpEpCgPhYe9+blPP9lZcWqqekVPF/ePfTPi0LLrlDZc+02j9n2t6eaO7XpP48EywNu3dPNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UA6bIPLX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACBDFC4AF0B;
+	Thu,  5 Sep 2024 00:00:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725494441;
-	bh=hzPV3/MHpC/JimHpDFSYV8Yu913JXZWQ1tDa/Sh3TV8=;
+	s=k20201202; t=1725494442;
+	bh=viL/wCZRUGidZoDbcQrT4vSq+P7nRgHYSyNQ0ZuM1Ck=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WU8snY3gYGCDuqQ6L96+Vqo2eWKs8nc9tHbObKtXI0vM2n7OQluV4ktdCpjBvj+oe
-	 u2tJXtQBqs9HaexyhfBUxFvIla8taqG4rsl4oR31nYRXvfnox96r2wUBMkDbnEZYUU
-	 44Jqx4ljSqhTrl85lYxyaopjcAl1RUUfqVus++YnhLHaeQXwC4k57kX49GE96VcJQp
-	 V5y7SmdG9b737Ri2y5CHoPGnWUfpVc+aaMx2rsYVGSxvfwD5gMX6O2etu3uERX7nWN
-	 +FuGS7HWRwKGNJFoxa2g2Msg18rlTORjbHwbmOss+wvbxwlFYQHu6g7nKEWhPjKcAk
-	 xNhhazDCefCkw==
+	b=UA6bIPLXPLbxyUbIUpD3o0OdWAV1sd9JVK7yQDTlLnIIepfAn9XCRC/pyvEXfOvHf
+	 TiFvwr/7vL43ODK4zrcE8kBVAcu+Q2+GV6dyYOfXy84FETP2lkS5BmGlnTuSEctwm2
+	 4POZZLoLiNjQavFgwN1Pj5KYnXF6MebSMRUrbPmYWiuWkQ2S8Cuue9VTMnhRw5MIAk
+	 bIlKOpaDj7XDEW2b6zImvztPyWbOTpFr4aXp9hyNPGYjy4Aym1B0AEbJKbshFMlJ19
+	 Iqaj3H70K98xglzuortZuvp9iu2EBNVpnQ3+bBQom/g25wkfRZ3nYNJ+RsaJG0+jb3
+	 hwbDJdMa+4TDA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713183822D30;
-	Thu,  5 Sep 2024 00:00:43 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCCE3822D30;
+	Thu,  5 Sep 2024 00:00:44 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] selftests: net: convert comma to semicolon
+Subject: Re: [PATCH net-next] ipv4: Fix user space build failure due to header
+ change
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172549444199.1204284.9957982642293621560.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Sep 2024 00:00:41 +0000
-References: <20240904014441.1065753-1-nichen@iscas.ac.cn>
-In-Reply-To: <20240904014441.1065753-1-nichen@iscas.ac.cn>
-To: Chen Ni <nichen@iscas.ac.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+ <172549444349.1204284.10048717463562007415.git-patchwork-notify@kernel.org>
+Date: Thu, 05 Sep 2024 00:00:43 +0000
+References: <20240903133554.2807343-1-idosch@nvidia.com>
+In-Reply-To: <20240903133554.2807343-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org, gnault@redhat.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  4 Sep 2024 09:44:41 +0800 you wrote:
-> Replace comma between expressions with semicolons.
+On Tue, 3 Sep 2024 16:35:54 +0300 you wrote:
+> RT_TOS() from include/uapi/linux/in_route.h is defined using
+> IPTOS_TOS_MASK from include/uapi/linux/ip.h. This is problematic for
+> files such as include/net/ip_fib.h that want to use RT_TOS() as without
+> including both header files kernel compilation fails:
 > 
-> Using a ',' in place of a ';' can have unintended side effects.
-> Although that is not the case here, it is seems best to use ';'
-> unless ',' is intended.
-> 
-> Found by inspection.
-> No functional change intended.
-> Compile tested only.
+> In file included from ./include/net/ip_fib.h:25,
+>                  from ./include/net/route.h:27,
+>                  from ./include/net/lwtunnel.h:9,
+>                  from net/core/dst.c:24:
+> ./include/net/ip_fib.h: In function ‘fib_dscp_masked_match’:
+> ./include/uapi/linux/in_route.h:31:32: error: ‘IPTOS_TOS_MASK’ undeclared (first use in this function)
+>    31 | #define RT_TOS(tos)     ((tos)&IPTOS_TOS_MASK)
+>       |                                ^~~~~~~~~~~~~~
+> ./include/net/ip_fib.h:440:45: note: in expansion of macro ‘RT_TOS’
+>   440 |         return dscp == inet_dsfield_to_dscp(RT_TOS(fl4->flowi4_tos));
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] selftests: net: convert comma to semicolon
-    https://git.kernel.org/netdev/net-next/c/6ffa72acc9c9
+  - [net-next] ipv4: Fix user space build failure due to header change
+    https://git.kernel.org/netdev/net-next/c/1083d733eb26
 
 You are awesome, thank you!
 -- 
