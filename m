@@ -1,123 +1,103 @@
-Return-Path: <netdev+bounces-125531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7398F96D8CB
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:39:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 785A996D91F
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29A161F28093
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:39:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB6971C22CAE
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480A819995A;
-	Thu,  5 Sep 2024 12:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3329819CD07;
+	Thu,  5 Sep 2024 12:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1a+VgIF1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ToMBkDqW"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909FB19B3E4;
-	Thu,  5 Sep 2024 12:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA1A19AD48
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 12:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725539945; cv=none; b=QiEw6LgLZEINYgv8pgBfxH6DlkMI5jsAKUzuWuAEMAtC2jk1cY3m1QBH6x/itEJFNkpMFfCl876AOD1krv4m6uCiwrFS9334u1GKY8/SrOk5yIaJNsvmy7EeF3mFAlhdh47PyEKFujP6B6wHJ1jYpc68g9GNHTcXCDNR0xstGvw=
+	t=1725540147; cv=none; b=l9ho27RgdKtIl/gqpbKVpGe2kgTzhkPTKBRhaKFYmxclhWAh9CHZcJX1rBI3neNMXb8SB0VUYP89afuAoe5DxyZDVO4d40frntXbnGzWgLDV0SgZyRjb1h9+g2lsD6QIH6zQBXahxC/htv2ab51ZmjtyDctm6vPyoKPXZ3jjj9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725539945; c=relaxed/simple;
-	bh=HIGsIXeugJQTCWAVm8XzbJYQEWiE/wuX3YHavCWJfXs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C5EnaDoTgzVUWnDqsC8ktXwSnSC0+JOSxqfDwZbu0Ri52W1mYwn0dYITC050BAjKybJeEdhtJjvKYlpk6YBLxuKrwuUC7Mj/wrJBVnembncjc49KNdPFmzNR3bl3aZBxU2k0xJWaGUOLYmBtmKaFD/jWbrrAPLdUQTIvvVPVnzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1a+VgIF1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Nbszc8u1ehabZGC5jnFsbhiRNH6rI1/BMSG1Fv5VDc8=; b=1a+VgIF1rva6uLAA0BUgoKxB1V
-	8usNVlYzuZ1eTqiFuG6aMnQx62LA0WjIZv8sSOSV2XtFC6ub3bPPlyC4J54+o2PcTPEp/G3Q0T0Uz
-	5OGj2GGz23FSJoHe1D4ZuKM/PvLvaK6rCH8f36eU8YUmzTp/0aIqsuSBVdmjV+kmJD1U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1smBlE-006fzA-UR; Thu, 05 Sep 2024 14:38:52 +0200
-Date: Thu, 5 Sep 2024 14:38:52 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tarun Alle <tarun.alle@microchip.com>
-Cc: arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy: microchip_t1: SQI support for LAN887x
-Message-ID: <dba796b1-bb59-4d90-b592-1d56e3fba758@lunn.ch>
-References: <20240904102606.136874-1-tarun.alle@microchip.com>
+	s=arc-20240116; t=1725540147; c=relaxed/simple;
+	bh=3Txl3DLy0KLe9eWh2Fp8vSVoXzAHzfgAcLrNQ3eU9Y8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=JW5z/YTNFclya29wQOXz8n2LGtopry14S7m1fIKUljDXuwqKxNtSg7tKhhQNvqcYFTBBFKd91bmSjvnz0ybuNQXHlQO/IXJ6vTKVnqAB/meo/+/BgQRiEUAOkef/nM5gJ4ogLQxSjT4S2q2cuDNLwMZVFjVjNel7i97bx6Xilq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ToMBkDqW; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725540145; x=1757076145;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=3Txl3DLy0KLe9eWh2Fp8vSVoXzAHzfgAcLrNQ3eU9Y8=;
+  b=ToMBkDqW216egQhkSxun4jxgCHO4lFYyIYPbf3DgE2QHnEUmELg/Kyea
+   a51m6IEp2hAtqBYGCahfEwp3JzMDJAwVqoFlBInCUHrnrbK8FZpt4U58r
+   +8rYgeNOXUZTCOoxiCPfMIcVySE8eiz+lw7qy7suhu4k9N3g05u4f/xqh
+   k+ot3meNKA74HL2mGzgJvbA/r2BxBeEGvXqFcSnUeVtwtNEW3rWYyGr4X
+   7FLDD0ag72cM4iM7QN3b1LlVnEzarsYzS7Sk2hP7OORP5sbCmjeV22NfT
+   dlm/2BOsnalsjyjPY1/W8UjDKfRM8NpaWVY9OayDtLjWOuiO9mU1Tmq9u
+   Q==;
+X-CSE-ConnectionGUID: W8r4h78DQ8aVhc2K92nu9A==
+X-CSE-MsgGUID: VzuWjjzQSta3XZnn269oaA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11185"; a="28141163"
+X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
+   d="scan'208";a="28141163"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 05:42:24 -0700
+X-CSE-ConnectionGUID: tI1V3CMZS6WBngplFr3Dpg==
+X-CSE-MsgGUID: E6bq7acDT1OrvWA2ee9r2A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
+   d="scan'208";a="88855307"
+Received: from gargmani-mobl1.amr.corp.intel.com (HELO vcostago-mobl3) ([10.124.222.46])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 05:42:22 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ lvc-project@linuxtesting.org, Dmitry Antipov <dmantipov@yandex.ru>
+Subject: Re: [PATCH net-next v5] net: sched: consistently use
+ rcu_replace_pointer() in taprio_change()
+In-Reply-To: <20240904115401.3425674-1-dmantipov@yandex.ru>
+References: <20240904115401.3425674-1-dmantipov@yandex.ru>
+Date: Thu, 05 Sep 2024 09:42:18 -0300
+Message-ID: <87wmjqnufp.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240904102606.136874-1-tarun.alle@microchip.com>
+Content-Type: text/plain
 
-> +	/* Get 200 SQI raw readings */
-> +	for (int i = 0; i < 200; i++) {
+Dmitry Antipov <dmantipov@yandex.ru> writes:
 
-Please replace all the hard coded 200 with ARRAY_SIZE(rawtable). That
-makes it easier to tune the size of the table without causing buffer
-overrun bugs.
+> According to Vinicius (and carefully looking through the whole
+> https://syzkaller.appspot.com/bug?extid=b65e0af58423fc8a73aa
+> once again), txtime branch of 'taprio_change()' is not going to
+> race against 'advance_sched()'. But using 'rcu_replace_pointer()'
+> in the former may be a good idea as well.
+>
+> Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
+> ---
+> v5: cut from the series, add syzbot link an re-target to net-next
+> v4: adjust subject to target net tree
+> v3: unchanged since v2
+> v2: added to the series
+> ---
 
-> +		rc = phy_write_mmd(phydev, MDIO_MMD_VEND1,
-> +				   LAN887X_POKE_PEEK_100,
-> +				   LAN887X_POKE_PEEK_100_EN);
-> +		if (rc < 0)
-> +			return rc;
-> +
-> +		rc = phy_read_mmd(phydev, MDIO_MMD_VEND1,
-> +				  LAN887X_SQI_MSE_100);
-> +		if (rc < 0)
-> +			return rc;
-> +
-> +		rawtable[i] = rc;
-> +		rc = genphy_c45_read_link(phydev);
-> +		if (rc < 0)
-> +			return rc;
-> +
-> +		if (!phydev->link)
-> +			return -ENETDOWN;
-> +	}
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 
-How long does this take?
 
-genphy_c45_read_link() takes a few MDIO transaction, plus the two you
-see here. So maybe 1000 MDIO bus transactions? Which could be
-3000-4000 if it needs to use C45 over C22.
-
-Do you have any data on the accuracy, with say 10, 20, 40, 80, 160
-samples?
-
-Can the genphy_c45_read_link() be moved out of the loop? If the link
-is lost, is the sample totally random, or does it have a well defined
-value? Looking at the link status every iteration, rather than before
-and after collecting the samples, you are trying to protect against
-the link going down and back up again. If it is taking a couple of
-seconds to collect all the samples, i suppose that is possible, but if
-its 50ms, do you really have to worry?
-
-> +static int lan887x_get_sqi(struct phy_device *phydev)
-> +{
-> +	int rc, val;
-> +
-> +	if (phydev->speed != SPEED_1000 &&
-> +	    phydev->speed != SPEED_100) {
-> +		return -EINVAL;
-> +	}
-
-Can that happen? Does the PHY support SPEED_10? Or are you trying to
-protect against SPEED_UNKOWN because the link is down? ENETDOWN might
-be more appropriate that EINVAL.
-
-	Andrew
+Cheers,
+-- 
+Vinicius
 
