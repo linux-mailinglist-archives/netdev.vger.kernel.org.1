@@ -1,122 +1,110 @@
-Return-Path: <netdev+bounces-125330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7228096CC04
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 03:03:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F19E996CC11
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 03:10:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19EF6B21827
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:03:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A649D1F2783C
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB204A1A;
-	Thu,  5 Sep 2024 01:03:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8457B748D;
+	Thu,  5 Sep 2024 01:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HyjXFFLc"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="A3JUnKqh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from alln-iport-7.cisco.com (alln-iport-7.cisco.com [173.37.142.94])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7947EC8FE
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 01:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B347464
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 01:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.142.94
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725498212; cv=none; b=r5iY76BdycL/dR76MePyG6FPYWc/aeD231KdJSe4e9FPbZZDX+Nnm4pVLCLgqTuthTJOQaG3hguI5Fx1i/jhqE8GgNwTkCz081AnZJ1fTiEEAdwcbq6+cjHkqovB4gjFDYzs9xckAqSrLRnK0VUOy+cyEM/BRBI+gldW6FHKAjs=
+	t=1725498655; cv=none; b=Kp2W1QKqwYCAVu3t0Ie7wCoR5subXrNz4VemyJHlgMQjxdaFzz/KHJV5Q3J9PBYzqkOB6l8RqdoMnXGFMgqvU81vk2/Q9Q8nCeYOlArmKhQ0jnzIRdotP25yWsIm4QkxIC8gBhU/u2WqHcKo18EsJimGqqQBQRp/KCC/D692gb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725498212; c=relaxed/simple;
-	bh=mBo1M+6e6dT1/Ok93GvGsN3bfzsU8Icz47GwhvHuvU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G+DExb+qjfReCbXufW3hw0AqHMq88Y4oOC1F+SfBcjqNmNusqolqYUi3/Brcx9CCgxsZzzMDx0WIdmQJ9+hBxxp7hP9fehxUsXgWW3SiPnxfG+nQDOAklMM05e2fSrvT18WVk1P7lgr0MhahFyBJQTgLnpF5+r25LtsbySiYLsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HyjXFFLc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C2D2C4CEC9;
-	Thu,  5 Sep 2024 01:03:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725498211;
-	bh=mBo1M+6e6dT1/Ok93GvGsN3bfzsU8Icz47GwhvHuvU8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HyjXFFLcxwLxMxQSpWyDJZuCU3rWXCn6VSOZhWX8fuGmKzor/qw7slbuia/oROApn
-	 iOEe2JZ1VM7LJEyKTSyhEVe27jb0nPW/Yyw3vgfmQ8v9qld8Q2W13m2eyEqDdXI8ci
-	 32jM68GNUoM74G2DpA0Tnut20KpocyxedHX8alyNwdbuoNIK8UXdvHeIAKHt55IVQp
-	 qOuAQoGF2WiC5iIGoSVtPVflDgdKCpP1mKgsyPPxeaVewaeZQ7CzggmcoGvzFZKF5B
-	 EQ6Z/6F0bvMCtFb2ylmkKwoO/gv2LfSvcPvpVKyzEKbtiNXOtF9do/WQwpoYNKJVJm
-	 oBnUQYXduV89Q==
-Date: Wed, 4 Sep 2024 18:03:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, edumazet@google.com
-Subject: Re: [PATCH v6 net-next 02/15] netlink: spec: add shaper YAML spec
-Message-ID: <20240904180330.522b07c5@kernel.org>
-In-Reply-To: <a0585e78f2da45b79e2220c98e4e478a5640798b.1725457317.git.pabeni@redhat.com>
-References: <cover.1725457317.git.pabeni@redhat.com>
-	<a0585e78f2da45b79e2220c98e4e478a5640798b.1725457317.git.pabeni@redhat.com>
+	s=arc-20240116; t=1725498655; c=relaxed/simple;
+	bh=4COZQIO2vRuGzCmSL7tDE9xy6ioxi00OB4mSWuK+5dI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mF/Y1hV7CvTlXbu4GeRP7YgoALHySWJTXCmDZ/WOZiNWeZ0yhbmfZP8eancQZKP1Mt01M6ORJYzuBbK620sC5bVVudYVLtclOqVOlgw20Qt5meqX2XIVu4PTM7uMOCtXv4t4TCxaPHJk8yIlFTW+3xkE8skPrxwiZCxrb5uZkrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=A3JUnKqh; arc=none smtp.client-ip=173.37.142.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=cisco.com; i=@cisco.com; l=1270; q=dns/txt; s=iport;
+  t=1725498653; x=1726708253;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ukkBlmrwczL56501QLZWdDUSZiOk1ANr6A0ywAn8gqA=;
+  b=A3JUnKqhJk24jQyLaUiO3awcT3SsfrvJQkOagLK5aVstanbgtMFdD48v
+   DtjkZHvFFKW63tFkSYgtitt9+u42s0UjDFD1YebBzXM+Jiq4jdC1koYb/
+   bFgLWtl73T+2VnsFxoX1bSodBxWBtr3yR5+Tz0wnettxvhc6aNghQK5sA
+   c=;
+X-CSE-ConnectionGUID: 6+UV6YlxTtKgtqQMPbCvBQ==
+X-CSE-MsgGUID: rr9NJ+eTROytaWO4ObaPAw==
+X-IronPort-AV: E=Sophos;i="6.10,203,1719878400"; 
+   d="scan'208";a="339634104"
+Received: from aer-core-3.cisco.com ([173.38.203.20])
+  by alln-iport-7.cisco.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 01:09:44 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by aer-core-3.cisco.com (8.15.2/8.15.2) with ESMTP id 48519hKH029102;
+	Thu, 5 Sep 2024 01:09:43 GMT
+Received: by cisco.com (Postfix, from userid 412739)
+	id AA90820F2003; Wed,  4 Sep 2024 18:09:42 -0700 (PDT)
+From: Nelson Escobar <neescoba@cisco.com>
+To: netdev@vger.kernel.org
+Cc: satishkh@cisco.com, johndale@cisco.com,
+        Nelson Escobar <neescoba@cisco.com>
+Subject: [PATCH net-next v2 0/4] enic: Report per queue stats 
+Date: Wed,  4 Sep 2024 18:08:56 -0700
+Message-Id: <20240905010900.24152-1-neescoba@cisco.com>
+X-Mailer: git-send-email 2.35.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: aer-core-3.cisco.com
 
-On Wed,  4 Sep 2024 15:53:34 +0200 Paolo Abeni wrote:
-> +doc: |
-> +  Networking HW rate limiting configuration.
-> +
-> +  This API allows configuring HW shapers available on the network
-> +  devices at different levels (queues, network device) and allows
-> +  arbitrary manipulation of the scheduling tree of the involved
-> +  shapers.
-> +
-> +  Each @shaper is identified within the given device, by an @handle,
-> +  comprising both a @scope and an @id.
-> +
-> +  Depending on the @scope value, the shapers are attached to specific
-> +  HW objects (queues, devices) or, for @node scope, represent a
-> +  scheduling group, that can be placed in an arbitrary location of
-> +  the scheduling tree.
-> +
-> +  Shapers can be created with two different operations: the @set
-> +  operation, to create and update a single "attached" shaper, and
-> +  the @group operation, to create and update a scheduling
-> +  group. Only the @group operation can create @node scope shapers
-> +
-> +  Existing shapers can be deleted /reset via the @delete operation.
+Hi,
 
-nit: space before the / ?
+This is V2 of a series that adds per queue stats report to enic driver.
+Per Jakub's suggestion, I've added support for reporting the stats in netdev
+qstats.  I've also split out the ethtool reporting into its own patch.
 
-> +        name: bw-min
-> +        type: uint
-> +        doc: Minimum Guaranteed bandwidth for the given shaper.
+Patch #1: Use a macro instead of static const variables for array sizes.  I
+          didn't want to add more static const variables in the next patch
+          so clean up the existing ones first.
 
-I think I asked to remove "Minimum"? Both "guaranteed" and "minimum"
-express the fact that we can't go lower, so it's a bit of a pleonasm.
+Patch #2: Collect per queue statistics
 
-> +      -
-> +        name: node
-> +        type: nest
-> +        nested-attributes: node-info
-> +        doc: |
-> +           Describes the node shaper for a @group operation.
-> +           Differently from @leaves and @shaper allow specifying
-> +           the shaper parent handle, too.
+Patch #3: Report per queue stats in ethtool
 
-Parent handle is inside node scope? Why are leaves outside and parent
-inside? Both should be at the same scope, preferably main scope.
+Patch #4: Report per queue stats in netdev qstats
 
-> +      -
-> +        name: shaper
-> +        type: nest
-> +        nested-attributes: info
-> +        doc: |
-> +           Describes a single shaper for a @set operation.
+---
 
-Why does this level of nesting exist? With the exception of ifindex 
-all attributes for SET are nested inside this..
+v2:
+  - Split the ethtool stats reporting into its own patch
+  - Added a patch for reporting stats with netdev qstats per Jakub's
+    suggestion
+v1: https://lore.kernel.org/all/20240823235401.29996-1-neescoba@cisco.com/
+
+Nelson Escobar (4):
+  enic: Use macro instead of static const variables for array sizes
+  enic: Collect per queue statistics
+  enic: Report per queue statistics in ethtool
+  enic: Report per queue statistics in netdev qstats
+
+ drivers/net/ethernet/cisco/enic/enic.h        |  38 ++++-
+ .../net/ethernet/cisco/enic/enic_ethtool.c    | 114 +++++++++++--
+ drivers/net/ethernet/cisco/enic/enic_main.c   | 157 +++++++++++++++---
+ 3 files changed, 277 insertions(+), 32 deletions(-)
+
+-- 
+2.35.2
+
 
