@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-125532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 785A996D91F
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:46:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 311B296D932
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:48:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB6971C22CAE
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:46:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6077A1C21206
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:48:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3329819CD07;
-	Thu,  5 Sep 2024 12:42:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 144A519DF95;
+	Thu,  5 Sep 2024 12:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ToMBkDqW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HXRU3E+4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA1A19AD48
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 12:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F6F19DF94
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 12:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725540147; cv=none; b=l9ho27RgdKtIl/gqpbKVpGe2kgTzhkPTKBRhaKFYmxclhWAh9CHZcJX1rBI3neNMXb8SB0VUYP89afuAoe5DxyZDVO4d40frntXbnGzWgLDV0SgZyRjb1h9+g2lsD6QIH6zQBXahxC/htv2ab51ZmjtyDctm6vPyoKPXZ3jjj9M=
+	t=1725540238; cv=none; b=LluoxsTAOZkiZdNmK3mNgXEBaEtwdEVeQs1p6ZjBFx6bzueryNxtpBB77cxtR9nDI2RS7wBcvg/oaDarFs3RWb0FlDud2oxtgb3KCBPFkHo7n2m3coiwXT+Va14p18W9t3i0nwOjdMWSjfEaQWGbcjygr16FKVmsqz0zf46HRNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725540147; c=relaxed/simple;
-	bh=3Txl3DLy0KLe9eWh2Fp8vSVoXzAHzfgAcLrNQ3eU9Y8=;
+	s=arc-20240116; t=1725540238; c=relaxed/simple;
+	bh=ZsB4kpfUAg5wSSkLTXGd/WAglrh5CzzkCmXeZba09So=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=JW5z/YTNFclya29wQOXz8n2LGtopry14S7m1fIKUljDXuwqKxNtSg7tKhhQNvqcYFTBBFKd91bmSjvnz0ybuNQXHlQO/IXJ6vTKVnqAB/meo/+/BgQRiEUAOkef/nM5gJ4ogLQxSjT4S2q2cuDNLwMZVFjVjNel7i97bx6Xilq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ToMBkDqW; arc=none smtp.client-ip=192.198.163.12
+	 MIME-Version:Content-Type; b=L3x7fhh1hDcajw3xyWvDWkVRfqQyz4KleD+qOmW2gkrvtp6ExzsH0eooQafgYpN8DGq2vUfDyHcnKYrt7VIY71h+aTq5eiJVzSYCjQ1fH4zPRvDHyHo4jPCyOY0a4IamgAVu83g380RIo71AFJP4P8ulxkvTp6eIjiHcPYtsO9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HXRU3E+4; arc=none smtp.client-ip=192.198.163.9
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725540145; x=1757076145;
+  t=1725540236; x=1757076236;
   h=from:to:cc:subject:in-reply-to:references:date:
    message-id:mime-version;
-  bh=3Txl3DLy0KLe9eWh2Fp8vSVoXzAHzfgAcLrNQ3eU9Y8=;
-  b=ToMBkDqW216egQhkSxun4jxgCHO4lFYyIYPbf3DgE2QHnEUmELg/Kyea
-   a51m6IEp2hAtqBYGCahfEwp3JzMDJAwVqoFlBInCUHrnrbK8FZpt4U58r
-   +8rYgeNOXUZTCOoxiCPfMIcVySE8eiz+lw7qy7suhu4k9N3g05u4f/xqh
-   k+ot3meNKA74HL2mGzgJvbA/r2BxBeEGvXqFcSnUeVtwtNEW3rWYyGr4X
-   7FLDD0ag72cM4iM7QN3b1LlVnEzarsYzS7Sk2hP7OORP5sbCmjeV22NfT
-   dlm/2BOsnalsjyjPY1/W8UjDKfRM8NpaWVY9OayDtLjWOuiO9mU1Tmq9u
-   Q==;
-X-CSE-ConnectionGUID: W8r4h78DQ8aVhc2K92nu9A==
-X-CSE-MsgGUID: VzuWjjzQSta3XZnn269oaA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11185"; a="28141163"
+  bh=ZsB4kpfUAg5wSSkLTXGd/WAglrh5CzzkCmXeZba09So=;
+  b=HXRU3E+4snUSb67mEps2y0ajsi1ktCrphvgPgpToSo9EdWBZPwYUU+4z
+   5ymb3Cn4xGCZcG4JmZybxdEWUVEJyVidwa+KclYqk+kL3t7HpqtSsbuDZ
+   wv08UFeaq5gDgYPZvt/HFyTeNFUKLSwTERscm8DHDxYPu19IFiWstMPLg
+   5ArTU2j7c57evrktvigyFnQS/ZMY9XEhYJ2zB8wh5P9l9Jm5dXRYH3HHr
+   7GxXFUQXWZ63sD4AhJpWGc3OkpDPec7CqDZwclykik6JqAu5A7bsaCyIe
+   IEffqR0NnppoIh5Ok6oSxDMIeQOWW7Zfhnpn/d+uMy9M793UNOeaD+oSm
+   g==;
+X-CSE-ConnectionGUID: z+j2RnY0SYSk/FsEB+649Q==
+X-CSE-MsgGUID: HafEehCqQiCbrMrDtG7c+Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11185"; a="34919572"
 X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
-   d="scan'208";a="28141163"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 05:42:24 -0700
-X-CSE-ConnectionGUID: tI1V3CMZS6WBngplFr3Dpg==
-X-CSE-MsgGUID: E6bq7acDT1OrvWA2ee9r2A==
+   d="scan'208";a="34919572"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 05:43:55 -0700
+X-CSE-ConnectionGUID: 52f1Y7oZTpOYdwFiAchCBA==
+X-CSE-MsgGUID: PrEK0exxQCGHF1NlKgLQoQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
-   d="scan'208";a="88855307"
+   d="scan'208";a="65931783"
 Received: from gargmani-mobl1.amr.corp.intel.com (HELO vcostago-mobl3) ([10.124.222.46])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 05:42:22 -0700
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 05:43:53 -0700
 From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 To: Dmitry Antipov <dmantipov@yandex.ru>
 Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
  Horman <horms@kernel.org>, netdev@vger.kernel.org,
- lvc-project@linuxtesting.org, Dmitry Antipov <dmantipov@yandex.ru>
-Subject: Re: [PATCH net-next v5] net: sched: consistently use
- rcu_replace_pointer() in taprio_change()
-In-Reply-To: <20240904115401.3425674-1-dmantipov@yandex.ru>
-References: <20240904115401.3425674-1-dmantipov@yandex.ru>
-Date: Thu, 05 Sep 2024 09:42:18 -0300
-Message-ID: <87wmjqnufp.fsf@intel.com>
+ lvc-project@linuxtesting.org, Dmitry Antipov <dmantipov@yandex.ru>,
+ syzbot+b65e0af58423fc8a73aa@syzkaller.appspotmail.com
+Subject: Re: [PATCH net v5 1/2] net: sched: fix use-after-free in
+ taprio_change()
+In-Reply-To: <20240904120842.3426084-1-dmantipov@yandex.ru>
+References: <20240904120842.3426084-1-dmantipov@yandex.ru>
+Date: Thu, 05 Sep 2024 09:43:49 -0300
+Message-ID: <87seuenud6.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,19 +80,22 @@ Content-Type: text/plain
 
 Dmitry Antipov <dmantipov@yandex.ru> writes:
 
-> According to Vinicius (and carefully looking through the whole
-> https://syzkaller.appspot.com/bug?extid=b65e0af58423fc8a73aa
-> once again), txtime branch of 'taprio_change()' is not going to
-> race against 'advance_sched()'. But using 'rcu_replace_pointer()'
-> in the former may be a good idea as well.
+> In 'taprio_change()', 'admin' pointer may become dangling due to sched
+> switch / removal caused by 'advance_sched()', and critical section
+> protected by 'q->current_entry_lock' is too small to prevent from such
+> a scenario (which causes use-after-free detected by KASAN). Fix this
+> by prefer 'rcu_replace_pointer()' over 'rcu_assign_pointer()' to update
+> 'admin' immediately before an attempt to schedule freeing.
 >
-> Suggested-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+> Fixes: a3d43c0d56f1 ("taprio: Add support adding an admin schedule")
+> Reported-by: syzbot+b65e0af58423fc8a73aa@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=b65e0af58423fc8a73aa
 > Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 > ---
-> v5: cut from the series, add syzbot link an re-target to net-next
+> v5: unchanged since v4 but resend due to series change
 > v4: adjust subject to target net tree
 > v3: unchanged since v2
-> v2: added to the series
+> v2: unchanged since v1
 > ---
 
 Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
