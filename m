@@ -1,206 +1,173 @@
-Return-Path: <netdev+bounces-125624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F4AC96DFDE
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:34:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16C6796DFF3
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:39:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB30128DF09
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:34:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F7341C23316
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA6C1A2C26;
-	Thu,  5 Sep 2024 16:33:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0266A1428F3;
+	Thu,  5 Sep 2024 16:39:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="CwUDpRHu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wd+GIhf6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1F61A08B5
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 16:33:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A77D17BD6
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 16:39:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725554022; cv=none; b=r9a4rpaAy5l+HCx587QCM1/kR8Wa+o36FfPMnk6jcn0c25VKBshVGzHvLrEEtNC7z7TlaloWDnLe7YdULOHXUD1sNFXWa6dtKIom4xYK7MBDwj4yZ39fZXDDoQN4mRCSj1PURZ03YOS7VmNKKMY5wypiKMjZoVYq21qYPzWejEU=
+	t=1725554366; cv=none; b=Mv5qg4f91p6g/lMlwqkWY6xiDjr4wNj9PnIfer8ZZZlB1c/sQLZ6TTjmlEH4vBIrwkQBYuM/ytRXTxKOgzCl+4v47FUJD5NOC+0aOd/vVEhRvA4aZb9p+jCDbVwCDKSEwksgogmD1ZNE9j2Hgn89pWJi3hBPl1NDh9ZDDM0tkfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725554022; c=relaxed/simple;
-	bh=3NAVcB6qwQxaSWihdV8SEeK1WvVXg/JpPm7/aLNJ3gI=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CFGF5BFeY9s52PmgTTu7+UYIuiBA3pEONfBZj47r0L1HwlartuVMf0Tgj0h98OsrG+VdV69pQq6ehxwkTLKTFuFtlwo2x0bvu/2HmU5E7mVfaThk9FXsKOGtQ5v2nMuidagik/T86Ipx51UVXcrqVIc08Fpfir/now+s4N3YR4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=CwUDpRHu; arc=none smtp.client-ip=209.85.208.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-5c26311c6f0so1255933a12.3
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 09:33:39 -0700 (PDT)
+	s=arc-20240116; t=1725554366; c=relaxed/simple;
+	bh=8RBBkLoM+CcMz6UirzJP9tdj75tg5CxIYm5wWYO69Ic=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=k2smV3gxmSLPl+cmSWSJg44hdKVZjFJu6PldPEslfpSoFawhh0jb0Ywfat1OjcyJu5tMbzPK0z6kh9RJXH7iktTAf/HQzMMmJu+A8tv4O6P6bDALbvIv4CQ44QYbiOlTsSwgz9GSINZjbyvP+oDyKBESYOsbr7emhzeBeFXIpPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wd+GIhf6; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7a81309072dso70525485a.0
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 09:39:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1725554018; x=1726158818; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kJHk6dVcMot+83fqcyHPWmLjMUPxP5z8vxp/ZBkDsTM=;
-        b=CwUDpRHumS+xhjkOkSNcYkerUfHWVG+TzIQhXbhoKRrPX3T8LQnbOri7aQY0Mxr+hH
-         zt9JN5f0NuQEW68wTKFZPMxsN0cTQnN277Bx5updO5jz6Mg0MfitxiCobve9Zgj29Wmj
-         s1eNiGWZl0WErt/F4BipQoxnmWnLzxTNOGHpJu4fH+nCdUrkRfLK3o5126IeBhE5xGNq
-         IbVS0h+UpD15k9HDTFTSEkc2nozDjTu5yhu8fLc+0zFX9uJd2fl+MAiXFdeCcW0xR08i
-         PzGb93V+xzaO149I50uhyz0MgRfiEcgUtOmJ2VXPArnCtjCkEpl9ZuE2WXwJjroq8+z/
-         AWsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725554018; x=1726158818;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1725554364; x=1726159164; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kJHk6dVcMot+83fqcyHPWmLjMUPxP5z8vxp/ZBkDsTM=;
-        b=XXZkBk/AcortXrEfEzukYQGbdScpTW6lct8JrQhOByh7qA1xSCvgfuic8GWPBTjJ8E
-         s/lUIsDzu4wHWwqfj44FFF0/isLY8P6/M8/mwPkYg6+f3fS9cBe0d9Sn1zpCiSUHMzoI
-         07xdpwIv8ntrvedbCfP8mi4ls4F8QZLEi4NZCeQoV8yTxtKbO5Gu5hBSDFcfl7UdCC9M
-         vVoI72b3V+7N9FnxiJBSn0lg04JEwzQs0QdpBb1CkaF8Ty0tEcocOkXe/+BiQtG12gA3
-         10SBJOCT6L3VaB1XCn/6XVelBgh92KMlCSx3Bg4p+SCzpGU8GXOVidXgO2ifrLsKm3Jw
-         9ROA==
-X-Forwarded-Encrypted: i=1; AJvYcCVaY2sYwCehIaZKR4eaCpgbc+c98G+BRLnHRrj7It4VpNfTHMxgf6XIM1oG6amFSpm98K20aF0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznAr0cbbbbFgIDKDpwGlvFoZAJEGvyzNfar1OcG2H9hcbEWQAh
-	wXwibAbznt4or87xbltY/i+7Qwm3MJhHvtU1GsbTyy4EAKVmhasqjf5akcM5pzQ=
-X-Google-Smtp-Source: AGHT+IHU/avyIpf1tRzphlO3ca0BhbKJKByf8ZqboDAgvuiywTcmj9UX7KVZcHdK/Ol0/Wbwf0Mx9g==
-X-Received: by 2002:a05:6402:3226:b0:5c2:6bf7:8531 with SMTP id 4fb4d7f45d1cf-5c2caf33541mr5644250a12.33.1725554018023;
-        Thu, 05 Sep 2024 09:33:38 -0700 (PDT)
-Received: from localhost (host-80-182-198-72.pool80182.interbusiness.it. [80.182.198.72])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3cc528bcfsm1430637a12.16.2024.09.05.09.33.37
+        bh=Igqmm4acymidaqOyMk4EbR+Za/uRj/PTHpqyEoY7jmI=;
+        b=Wd+GIhf6PAvqgYjM84u7MQog7hsfbsHzi/XsOBXDn/J/6XzT7cybKovDFVBx4+SEdy
+         wGK6BwP4koIq2+aEQUHk5jFzFPfjaaBVVnL1n2OkV32xat2MC5V1TSMAus4E65NIaVj4
+         6NqPcEkKMYR0TEEBHEq1Zg3SS3CSqcK8Uu6h9Un1dz50uzz/HleqG+VM/5TyqN7zvgMa
+         2gZA+l6I3jRVbAmq9DCdotA4Tbmxboq0UHfpe8YcmXbyBh0hT0+dQj3CLy4T85fv2FBZ
+         Y+aLqxnsqv+xkDOUIV4BS9OaWf/o1cRnXD3VbdTqptDHXpBvMomzQDDYNtgx7Z/8NKxN
+         HAjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725554364; x=1726159164;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Igqmm4acymidaqOyMk4EbR+Za/uRj/PTHpqyEoY7jmI=;
+        b=iWMjYgbr+ZnlMcby/EP5Qlybqt3uhuloHLDeavXdnoa5pbvIIXWHZoiN45JC7P2QsX
+         NwSiry5vkmF8isRbmowxpGZHS649+BkXjg1lJE0X4+NlltInnSv8N2StP6e6PUDuSgbT
+         PapE3gTgKEouFoTApL4k/QbRthlCP+cM7XG8awjUndWZDqYm+cS2CcYPQtc1VrTd5Wzk
+         NYzeFSrHTQ1J30EQ8/duuqkDJDWvFa48mWu4XyJOiCDVeCd8ksP+jIsDfUftyJm1r60N
+         7zFHoJcvvSQCZxTKo9A8yoq6ch+pecbk953ZWK7DSbmTM5pSyXGzHe89C5S0TzNYtkbo
+         KQ5Q==
+X-Gm-Message-State: AOJu0Yy/3Srr149WGnK8afnNsbU7v3VOCKmz92kfr8XObgTX3a8GssMl
+	WF/wClWdfkiHJegzrFglIs6lwZAVnPFyTqS0mTgR7kzUAYj5+vI1
+X-Google-Smtp-Source: AGHT+IEL6zDzdfnRCgB5U94hiwUqxEiQTkF4ILXBFS57xMsXCMapZhKC5ItIpEecC0VMUA0vgL3bzA==
+X-Received: by 2002:a05:620a:370c:b0:79e:f878:2640 with SMTP id af79cd13be357-7a8f6b75dddmr1959302885a.7.1725554364227;
+        Thu, 05 Sep 2024 09:39:24 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a98ef3a9b5sm88590285a.48.2024.09.05.09.39.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 09:33:37 -0700 (PDT)
-From: Andrea della Porta <andrea.porta@suse.com>
-X-Google-Original-From: Andrea della Porta <aporta@suse.de>
-Date: Thu, 5 Sep 2024 18:33:45 +0200
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Stefan Wahren <wahrenst@gmx.net>
-Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
-Message-ID: <ZtndaYh2Faf6t3fC@apocalypse>
-References: <cover.1724159867.git.andrea.porta@suse.com>
- <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
- <lrv7cpbt2n7eidog5ydhrbyo5se5l2j23n7ljxvojclnhykqs2@nfeu4wpi2d76>
- <ZtHN0B8VEGZFXs95@apocalypse>
- <b74327b8-43f6-47cf-ba9d-cc9a4559767b@kernel.org>
- <ZtcoFmK6NPLcIwVt@apocalypse>
- <39735704-ae94-4ff8-bf4d-d2638b046c8e@kernel.org>
+        Thu, 05 Sep 2024 09:39:23 -0700 (PDT)
+Date: Thu, 05 Sep 2024 12:39:23 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Willem de Bruijn <willemb@google.com>
+Cc: netdev@vger.kernel.org, 
+ David Ahern <dsahern@kernel.org>, 
+ Jason Xing <kerneljasonxing@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Message-ID: <66d9debb2d2ea_1eae1a2943d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <3e4add99-6b57-4fe1-9ee1-519c80cf7cf5@linux.dev>
+References: <20240904113153.2196238-1-vadfed@meta.com>
+ <20240904113153.2196238-3-vadfed@meta.com>
+ <3e4add99-6b57-4fe1-9ee1-519c80cf7cf5@linux.dev>
+Subject: Re: [PATCH net-next v3 2/4] net_tstamp: add SCM_TS_OPT_ID for TCP
+ sockets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <39735704-ae94-4ff8-bf4d-d2638b046c8e@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Krzysztof,
-
-On 20:27 Tue 03 Sep     , Krzysztof Kozlowski wrote:
-> On 03/09/2024 17:15, Andrea della Porta wrote:
-> >>>>> +
-> >>>>> +				rp1_clocks: clocks@c040018000 {
-> >>>>
-> >>>> Why do you mix MMIO with non-MMIO nodes? This really does not look
-> >>>> correct.
-> >>>>
-> >>>
-> >>> Right. This is already under discussion here:
-> >>> https://lore.kernel.org/all/ZtBzis5CzQMm8loh@apocalypse/
-> >>>
-> >>> IIUC you proposed to instantiate the non-MMIO nodes (the three clocks) by
-> >>> using CLK_OF_DECLARE.
-> >>
-> >> Depends. Where are these clocks? Naming suggests they might not be even
-> >> part of this device. But if these are part of the device, then why this
-> >> is not a clock controller (if they are controllable) or even removed
-> >> (because we do not represent internal clock tree in DTS).
+Vadim Fedorenko wrote:
+> On 04/09/2024 12:31, Vadim Fedorenko wrote:
+> > TCP sockets have different flow for providing timestamp OPT_ID value.
+> > Adjust the code to support SCM_TS_OPT_ID option for TCP sockets.
 > > 
-> > xosc is a crystal connected to the oscillator input of the RP1, so I would
-> > consider it an external fixed-clock. If we were in the entire dts, I would have
-> > put it in root under /clocks node, but here we're in the dtbo so I'm not sure
-> > where else should I put it.
-> 
-> But physically, on which PCB, where is this clock located?
-
-xosc is a crystal, feeding the reference clock oscillator input pins of the RP1,
-please see page 12 of the following document:
-https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf
-On Rpi5, the PCB is the very same as the one on which the BCM2712 (SoC) and RP1
-are soldered. Would you consider it external (since the crystal is outside the RP1)
-or internal (since the oscillator feeded by the crystal is inside the RP1)?
-
-> 
+> > Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> > ---
+> >   net/ipv4/tcp.c | 13 +++++++++----
+> >   1 file changed, 9 insertions(+), 4 deletions(-)
 > > 
-> > Regarding pclk and hclk, I'm still trying to understand where they come from.
-> > If they are external clocks (since they are fixed-clock too), they should be
-> > in the same node as xosc. CLK_OF_DECLARE does not seem to fit here because
+> > diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> > index 8a5680b4e786..5553a8aeee80 100644
+> > --- a/net/ipv4/tcp.c
+> > +++ b/net/ipv4/tcp.c
+> > @@ -474,9 +474,10 @@ void tcp_init_sock(struct sock *sk)
+> >   }
+> >   EXPORT_SYMBOL(tcp_init_sock);
+> >   
+> > -static void tcp_tx_timestamp(struct sock *sk, u16 tsflags)
+> > +static void tcp_tx_timestamp(struct sock *sk, struct sockcm_cookie *sockc)
+> >   {
+> >   	struct sk_buff *skb = tcp_write_queue_tail(sk);
+> > +	u32 tsflags = sockc->tsflags;
+> >   
+> >   	if (tsflags && skb) {
+> >   		struct skb_shared_info *shinfo = skb_shinfo(skb);
+> > @@ -485,8 +486,12 @@ static void tcp_tx_timestamp(struct sock *sk, u16 tsflags)
+> >   		sock_tx_timestamp(sk, tsflags, &shinfo->tx_flags);
+> >   		if (tsflags & SOF_TIMESTAMPING_TX_ACK)
+> >   			tcb->txstamp_ack = 1;
+> > -		if (tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK)
+> > -			shinfo->tskey = TCP_SKB_CB(skb)->seq + skb->len - 1;
+> > +		if (tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK) {
+> > +			if (tsflags & SOCKCM_FLAG_TS_OPT_ID)
+> > +				shinfo->tskey = sockc->ts_opt_id;
+> > +			else
+> > +				shinfo->tskey = TCP_SKB_CB(skb)->seq + skb->len - 1;
+> > +		}
+> >   	}
+> >   }
+> >   
+> > @@ -1318,7 +1323,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+> >   
+> >   out:
+> >   	if (copied) {
+> > -		tcp_tx_timestamp(sk, sockc.tsflags);
+> > +		tcp_tx_timestamp(sk, &sockc);
+> >   		tcp_push(sk, flags, mss_now, tp->nonagle, size_goal);
+> >   	}
+> >   out_nopush:
 > 
-> There is no such node as "/clocks" so do not focus on that. That's just
-> placeholder but useless and it is inconsistent with other cases (e.g.
-> regulators).
-
-Fine, I beleve that the root node would be okay then, or some other carefully named
-node in root, if the clock is not internal to any chip.
-
+> Hi Willem,
 > 
-> If this is external oscillator then it is not part of RP1 and you cannot
-> put it inside just to satisfy your drivers.
-
-Ack.
-
+> Unfortunately, these changes are not enough to enable custom OPT_ID for
+> TCP sockets. There are some functions which rewrite shinfo->tskey in TCP
+> flow:
 > 
-> > there's no special management of these clocks, so no new clock definition is
-> > needed.
+> tcp_skb_collapse_tstamp()
+> tcp_fragment_tstamp()
+> tcp_gso_tstamp()
 > 
-> > If they are internal tree, I cannot simply get rid of them because rp1_eth node
-> > references these two clocks (see clocks property), so they must be decalred 
-> > somewhere. Any hint about this?.
-> > 
+> I believe the last one breaks tests, but the problem is that there is no
+> easy way to provide the flag of constant tskey to it. Only
+> shinfo::tx_flags are available at the caller side and we have already
+> discussed that we shouldn't use the last bit of this field.
 > 
-> Describe the hardware. Show the diagram or schematics where is which device.
+> So, how should we deal with the problem? Or is it better to postpone
+> support for TCP sockets in this case?
 
-Unfortunately I don't have the documentation (schematics or other info) about
-how these two clocks (pclk and hclk) are arranged, but I'm trying to get
-some insight about that from various sources. While we're waiting for some
-(hopefully) more certain info, I'd like to speculate a bit. I would say that
-they both probably be either external (just like xosc), or generated internally
-to the RP1:
+Are you sure that this is a problem. These functions pass on the
+skb_shinfo(skb)->ts_key from one skb to another.
 
-If externals, I would place them in the same position as xosc, so root node
-or some other node under root (eg.: /rp1-clocks)
+As long as tcp_tx_timestamp sets the skb_shinfo(skb)->ts_key of the
+original skb correctly, either from the cmsg or sk_tskey, then I don't
+immediate see how this passing on from one skb to another would break
+the intent.
 
-If internals, I would leave them just where they are, i.e. inside the rp1 node
-
-Does it make sense?
-
-Many thnaks,
-Andrea
-
-> 
-> Best regards,
-> Krzysztof
-> 
 
