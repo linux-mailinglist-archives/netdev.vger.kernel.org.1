@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-125492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3FA296D5FD
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:28:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C07A96D5FF
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:28:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53B05B22ECB
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:27:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CA50B2512A
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DDAE199246;
-	Thu,  5 Sep 2024 10:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0D419ADA6;
+	Thu,  5 Sep 2024 10:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="X9bRliLH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XvwENeL+"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB79198A21;
-	Thu,  5 Sep 2024 10:24:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7A1198A3E;
+	Thu,  5 Sep 2024 10:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725531871; cv=none; b=ahO+bCmnEV1hyUHl+OLp6E/HnVMwPw4m9TKGUZVaE8hTu7+otN4TWxDeHlCmV4bgFmqnq2vJ0V17A50VuTjD34gQ6wFTew2emc/Faul9b4orwzq2ryBIHhEu0A3vwxJQe4nov8CLFdEE0iTVYXI4zgtKf4NKDiegIlYkPZQFUR4=
+	t=1725531873; cv=none; b=T5Lo0YqivkyAKDieDQQa+rQThY+G64MwaOuCNCEXemebehJlf83yleCa6p+P90lJONLur/1sIA20ODKSbPHtpccHSVwxK+mnUdOY5pMbkib2kxtt0NEzTsWaxusstS9FfvkkoVrYLj8Xguuna+a6bqhVrpWY/4eTVJ1MCsahw9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725531871; c=relaxed/simple;
-	bh=PpVyvJ+6obkJ5qxezW8mKyk+C0rTLkddD4Srgus//wg=;
+	s=arc-20240116; t=1725531873; c=relaxed/simple;
+	bh=MeKswmkkj03wFqHr2soO/LMeV+s2QIEmJnvmqI0+ZDw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cvp++lWHJT8qbDWTht7chyvKX88T/uZtHZQ8cvHKUlH/pLQg94brJrE0oQgrcb7oTvnw/1lOTpswD80xI/9h6ktAxVVi1HGUxhS7z2FSG/+r/o+zfkxA+r/EAXnTABVLT9hJZT60aoy3o6hYAJAyvYml/fjHT/KFS4SSKvHPGBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=X9bRliLH; arc=none smtp.client-ip=217.70.183.196
+	 MIME-Version; b=RjU5z3H7rQZ7oPkOMIII/0f2i5WYnPfdpYggW7ytCjfILy82n4JWQ5m5uxP6kYzcWWer8c1eIBnu2vulNwLBfD3mTVYCABiBAiR9DIRVTv4z3Ese/Fh3BVqUTXsiBiZZgIrXwTjJdVlGjfq01QkQJ/xFmme+lS2VcFWUsWk8LsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XvwENeL+; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6A6AFE0003;
-	Thu,  5 Sep 2024 10:24:21 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 66633E000A;
+	Thu,  5 Sep 2024 10:24:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1725531862;
+	t=1725531863;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=o3/+RiR2Da19F7SNi6Bb4iuBExsu9lB2F6BMRdI3YPw=;
-	b=X9bRliLHXwaLbAs8za0QvhGo379/504AcIj/HTj14VITNCyCLmeH40ANbJ79s7BmNOMPW4
-	fwuDpd/5isVWkLjWqWrcnzGBELzQqDptw09ySMiwPzITkptCnV69PH2ESl9SXOzAcUvGiz
-	R+UYYacf5xgt+B51l1eroEfOk9ThbTzQpYhePfY/DALnWvYhXFrBpv2gKYJG8rVDLQij3s
-	5vRE21pB/HPF82WnXqZsdo3NxaoCVpUU6gHvD8JG59jro/UAjjg2GYd8TD1rKYNSVF1cEx
-	7vNFbk2Hk7fU9owx29LCtG9kYF3kBwAI+6tTDHmuG3eBsxC+mUGJ6NtwcGxA+Q==
+	bh=TuO8sMyglDpAJsy6yMhFsbqieq/yFMcPnSgFT1DAm9k=;
+	b=XvwENeL+ASL1ikNI6dge2XYWHY3G7mIyhQMSMYzWnS+B49k+AeWtj+KXWt3A7NeW9w+Llw
+	Mh/qE6yv+qlgqCxGW2mkmZnZy8rnKke9U2wKJWUdivhUMy0p3qqotOa4dLYcgix05HWW8r
+	7IS3W65BvKxEh4LBasDFCXMbzeowMxZrI0ug3f2/tu8uVrTv8dlkLAFlSCrBQbYRdT4KUa
+	LxYW53F6z24dqMLR/TPBCZrtX/BvECJU+Fotfz+/aLNxBQxOHjRb+Z0uuwd2duKoC3P7q2
+	RrKwCmSfDGD2IKGfpRdtGRKmocfKdjYLrlhvxbUQaWnBdr/hmECMS/8rLLJ8tg==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net,
 	Michal Kubecek <mkubecek@suse.cz>
@@ -63,9 +63,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH ethtool-next v3 1/3] update UAPI header copies
-Date: Thu,  5 Sep 2024 12:24:14 +0200
-Message-ID: <20240905102417.232890-2-maxime.chevallier@bootlin.com>
+Subject: [PATCH ethtool-next v3 2/3] ethtool: Allow passing a PHY index for phy-targetting commands
+Date: Thu,  5 Sep 2024 12:24:15 +0200
+Message-ID: <20240905102417.232890-3-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240905102417.232890-1-maxime.chevallier@bootlin.com>
 References: <20240905102417.232890-1-maxime.chevallier@bootlin.com>
@@ -78,110 +78,344 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Update to kernel commit 7d3aed652d09.
+With the introduction of PHY topology and the ability to list PHYs, we
+can now target some netlink commands to specific PHYs. This is done by
+passing a PHY index as a request parameter in the netlink GET command.
+
+This is useful for PSE-PD, PLCA and Cable-testing operations when
+multiple PHYs are on the link (e.g. when a PHY is used as an SFP
+upstream controller, and when there's another PHY within the SFP
+module).
+
+Introduce a new, generic, option "--phy N" that can be used in
+conjunction with PHY-targetting commands to pass the PHY index for the
+targetted PHY.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- uapi/linux/ethtool.h         | 16 ++++++++++++++++
- uapi/linux/ethtool_netlink.h | 25 +++++++++++++++++++++++++
- 2 files changed, 41 insertions(+)
 
-diff --git a/uapi/linux/ethtool.h b/uapi/linux/ethtool.h
-index fef07da..7022fcc 100644
---- a/uapi/linux/ethtool.h
-+++ b/uapi/linux/ethtool.h
-@@ -2531,4 +2531,20 @@ struct ethtool_link_settings {
- 	 * __u32 map_lp_advertising[link_mode_masks_nwords];
- 	 */
- };
+V3: - Add meaningful error messages, from Michal's review
+    - Check argc before calling strtoul, to better deal with phy index
+      omission
+    - Better document the phy index value in the manpage
+
+ ethtool.8.in         | 21 ++++++++++++++++++
+ ethtool.c            | 28 +++++++++++++++++++++++-
+ internal.h           |  1 +
+ netlink/cable_test.c |  4 ++--
+ netlink/msgbuff.c    | 52 ++++++++++++++++++++++++++++++++++----------
+ netlink/msgbuff.h    |  3 +++
+ netlink/nlsock.c     |  3 ++-
+ netlink/plca.c       |  4 ++--
+ netlink/pse-pd.c     |  4 ++--
+ 9 files changed, 100 insertions(+), 20 deletions(-)
+
+diff --git a/ethtool.8.in b/ethtool.8.in
+index 11bb0f9..f16cdbd 100644
+--- a/ethtool.8.in
++++ b/ethtool.8.in
+@@ -143,6 +143,10 @@ ethtool \- query or control network driver and hardware settings
+ .B ethtool [-I | --include-statistics]
+ .I args
+ .HP
++.B ethtool
++.BN --phy
++.I args
++.HP
+ .B ethtool \-\-monitor
+ [
+ .I command
+@@ -588,6 +592,23 @@ plain text in the presence of this option.
+ Include command-related statistics in the output. This option allows
+ displaying relevant device statistics for selected get commands.
+ .TP
++.BI \-\-phy \ N
++Target a PHY within the interface. The PHY index can be retrieved with
++.B \-\-show\-phys. PHY index 0 targets the phy device directly attached to
++the ethernet MAC, if any.
++The following commands can accept a PHY index:
++.TS
++nokeep;
++lB	l.
++\-\-cable\-test
++\-\-cable\-test\-tdr
++\-\-get\-plca\-cfg
++\-\-set\-plca\-cfg
++\-\-get\-plca\-status
++\-\-show-pse
++\-\-set-pse
++.TE
++.TP
+ .B \-a \-\-show\-pause
+ Queries the specified Ethernet device for pause parameter information.
+ .RS 4
+diff --git a/ethtool.c b/ethtool.c
+index 7f47407..4dc05c2 100644
+--- a/ethtool.c
++++ b/ethtool.c
+@@ -5739,6 +5739,7 @@ struct option {
+ 	const char	*opts;
+ 	bool		no_dev;
+ 	bool		json;
++	bool		targets_phy;
+ 	int		(*func)(struct cmd_context *);
+ 	nl_chk_t	nlchk;
+ 	nl_func_t	nlfunc;
+@@ -6158,12 +6159,14 @@ static const struct option args[] = {
+ 	},
+ 	{
+ 		.opts	= "--cable-test",
++		.targets_phy	= true,
+ 		.json	= true,
+ 		.nlfunc	= nl_cable_test,
+ 		.help	= "Perform a cable test",
+ 	},
+ 	{
+ 		.opts	= "--cable-test-tdr",
++		.targets_phy	= true,
+ 		.json	= true,
+ 		.nlfunc	= nl_cable_test_tdr,
+ 		.help	= "Print cable test time domain reflectrometery data",
+@@ -6191,11 +6194,13 @@ static const struct option args[] = {
+ 	},
+ 	{
+ 		.opts	= "--get-plca-cfg",
++		.targets_phy	= true,
+ 		.nlfunc	= nl_plca_get_cfg,
+ 		.help	= "Get PLCA configuration",
+ 	},
+ 	{
+ 		.opts	= "--set-plca-cfg",
++		.targets_phy	= true,
+ 		.nlfunc	= nl_plca_set_cfg,
+ 		.help	= "Set PLCA configuration",
+ 		.xhelp  = "		[ enable on|off ]\n"
+@@ -6207,6 +6212,7 @@ static const struct option args[] = {
+ 	},
+ 	{
+ 		.opts	= "--get-plca-status",
++		.targets_phy	= true,
+ 		.nlfunc	= nl_plca_get_status,
+ 		.help	= "Get PLCA status information",
+ 	},
+@@ -6228,12 +6234,14 @@ static const struct option args[] = {
+ 	},
+ 	{
+ 		.opts	= "--show-pse",
++		.targets_phy	= true,
+ 		.json	= true,
+ 		.nlfunc	= nl_gpse,
+ 		.help	= "Show settings for Power Sourcing Equipment",
+ 	},
+ 	{
+ 		.opts	= "--set-pse",
++		.targets_phy	= true,
+ 		.nlfunc	= nl_spse,
+ 		.help	= "Set Power Sourcing Equipment settings",
+ 		.xhelp	= "		[ podl-pse-admin-control enable|disable ]\n"
+@@ -6270,7 +6278,8 @@ static int show_usage(struct cmd_context *ctx __maybe_unused)
+ 	fprintf(stdout,	"Usage:\n");
+ 	for (i = 0; args[i].opts; i++) {
+ 		fputs("        ethtool [ FLAGS ] ", stdout);
+-		fprintf(stdout, "%s %s\t%s\n",
++		fprintf(stdout, "%s%s %s\t%s\n",
++			args[i].targets_phy ? "[ --phy PHY ] " : "",
+ 			args[i].opts,
+ 			args[i].no_dev ? "\t" : "DEVNAME",
+ 			args[i].help);
+@@ -6550,6 +6559,19 @@ int main(int argc, char **argp)
+ 			argc -= 1;
+ 			continue;
+ 		}
++		if (*argp && !strcmp(*argp, "--phy")) {
++			char *eptr;
++
++			if (argc < 2)
++				exit_bad_args_info("--phy parameters expects a phy index");
++
++			ctx.phy_index = strtoul(argp[1], &eptr, 0);
++			if (!argp[1][0] || *eptr)
++				exit_bad_args_info("invalid phy index");
++			argp += 2;
++			argc -= 2;
++			continue;
++		}
+ 		break;
+ 	}
+ 	if (*argp && !strcmp(*argp, "--monitor")) {
+@@ -6585,6 +6607,10 @@ int main(int argc, char **argp)
+ 	}
+ 	if (ctx.json && !args[k].json)
+ 		exit_bad_args_info("JSON output not available for this subcommand");
++
++	if (!args[k].targets_phy && ctx.phy_index)
++		exit_bad_args_info("Unexpected --phy parameter");
++
+ 	ctx.argc = argc;
+ 	ctx.argp = argp;
+ 	netlink_run_handler(&ctx, args[k].nlchk, args[k].nlfunc, !args[k].func);
+diff --git a/internal.h b/internal.h
+index 4b994f5..afb8121 100644
+--- a/internal.h
++++ b/internal.h
+@@ -222,6 +222,7 @@ struct cmd_context {
+ 	unsigned long debug;	/* debugging mask */
+ 	bool json;		/* Output JSON, if supported */
+ 	bool show_stats;	/* include command-specific stats */
++	uint32_t phy_index;	/* the phy index this command targets */
+ #ifdef ETHTOOL_ENABLE_NETLINK
+ 	struct nl_context *nlctx;	/* netlink context (opaque) */
+ #endif
+diff --git a/netlink/cable_test.c b/netlink/cable_test.c
+index 9305a47..ba21c6c 100644
+--- a/netlink/cable_test.c
++++ b/netlink/cable_test.c
+@@ -572,8 +572,8 @@ int nl_cable_test_tdr(struct cmd_context *ctx)
+ 	if (ret < 0)
+ 		return 2;
+ 
+-	if (ethnla_fill_header(msgbuff, ETHTOOL_A_CABLE_TEST_TDR_HEADER,
+-			       ctx->devname, 0))
++	if (ethnla_fill_header_phy(msgbuff, ETHTOOL_A_CABLE_TEST_TDR_HEADER,
++				   ctx->devname, ctx->phy_index, 0))
+ 		return -EMSGSIZE;
+ 
+ 	ret = nl_parser(nlctx, tdr_params, NULL, PARSER_GROUP_NEST, NULL);
+diff --git a/netlink/msgbuff.c b/netlink/msgbuff.c
+index 216f5b9..2275840 100644
+--- a/netlink/msgbuff.c
++++ b/netlink/msgbuff.c
+@@ -138,17 +138,9 @@ struct nlattr *ethnla_nest_start(struct nl_msg_buff *msgbuff, uint16_t type)
+ 	return NULL;
+ }
+ 
+-/**
+- * ethnla_fill_header() - write standard ethtool request header to message
+- * @msgbuff: message buffer
+- * @type:    attribute type for header nest
+- * @devname: device name (NULL to omit)
+- * @flags:   request flags (omitted if 0)
+- *
+- * Return: pointer to the nest attribute or null of error
+- */
+-bool ethnla_fill_header(struct nl_msg_buff *msgbuff, uint16_t type,
+-			const char *devname, uint32_t flags)
++static bool __ethnla_fill_header_phy(struct nl_msg_buff *msgbuff, uint16_t type,
++				     const char *devname, uint32_t phy_index,
++				     uint32_t flags)
+ {
+ 	struct nlattr *nest;
+ 
+@@ -159,7 +151,9 @@ bool ethnla_fill_header(struct nl_msg_buff *msgbuff, uint16_t type,
+ 	if ((devname &&
+ 	     ethnla_put_strz(msgbuff, ETHTOOL_A_HEADER_DEV_NAME, devname)) ||
+ 	    (flags &&
+-	     ethnla_put_u32(msgbuff, ETHTOOL_A_HEADER_FLAGS, flags)))
++	     ethnla_put_u32(msgbuff, ETHTOOL_A_HEADER_FLAGS, flags)) ||
++	    (phy_index &&
++	     ethnla_put_u32(msgbuff, ETHTOOL_A_HEADER_PHY_INDEX, phy_index)))
+ 		goto err;
+ 
+ 	ethnla_nest_end(msgbuff, nest);
+@@ -170,6 +164,40 @@ err:
+ 	return true;
+ }
+ 
++/**
++ * ethnla_fill_header() - write standard ethtool request header to message
++ * @msgbuff: message buffer
++ * @type:    attribute type for header nest
++ * @devname: device name (NULL to omit)
++ * @flags:   request flags (omitted if 0)
++ *
++ * Return: pointer to the nest attribute or null of error
++ */
++bool ethnla_fill_header(struct nl_msg_buff *msgbuff, uint16_t type,
++			const char *devname, uint32_t flags)
++{
++	return __ethnla_fill_header_phy(msgbuff, type, devname, 0, flags);
++}
 +
 +/**
-+ * enum phy_upstream - Represents the upstream component a given PHY device
-+ * is connected to, as in what is on the other end of the MII bus. Most PHYs
-+ * will be attached to an Ethernet MAC controller, but in some cases, there's
-+ * an intermediate PHY used as a media-converter, which will driver another
-+ * MII interface as its output.
-+ * @PHY_UPSTREAM_MAC: Upstream component is a MAC (a switch port,
-+ *		      or ethernet controller)
-+ * @PHY_UPSTREAM_PHY: Upstream component is a PHY (likely a media converter)
++ * ethnla_fill_header_phy() - write standard ethtool request header to message,
++ *			      targetting a device's phy
++ * @msgbuff: message buffer
++ * @type:    attribute type for header nest
++ * @devname: device name (NULL to omit)
++ * @phy_index: phy index to target (0 to omit)
++ * @flags:   request flags (omitted if 0)
++ *
++ * Return: pointer to the nest attribute or null of error
 + */
-+enum phy_upstream {
-+	PHY_UPSTREAM_MAC,
-+	PHY_UPSTREAM_PHY,
-+};
++bool ethnla_fill_header_phy(struct nl_msg_buff *msgbuff, uint16_t type,
++			    const char *devname, uint32_t phy_index,
++			    uint32_t flags)
++{
++	return __ethnla_fill_header_phy(msgbuff, type, devname, phy_index,
++					flags);
++}
 +
- #endif /* _LINUX_ETHTOOL_H */
-diff --git a/uapi/linux/ethtool_netlink.h b/uapi/linux/ethtool_netlink.h
-index dfc25a0..f865c7c 100644
---- a/uapi/linux/ethtool_netlink.h
-+++ b/uapi/linux/ethtool_netlink.h
-@@ -58,6 +58,7 @@ enum {
- 	ETHTOOL_MSG_MM_GET,
- 	ETHTOOL_MSG_MM_SET,
- 	ETHTOOL_MSG_MODULE_FW_FLASH_ACT,
-+	ETHTOOL_MSG_PHY_GET,
+ /**
+  * __msg_init() - init a genetlink message, fill netlink and genetlink header
+  * @msgbuff: message buffer
+diff --git a/netlink/msgbuff.h b/netlink/msgbuff.h
+index 7d6731f..7df19fc 100644
+--- a/netlink/msgbuff.h
++++ b/netlink/msgbuff.h
+@@ -47,6 +47,9 @@ bool ethnla_put(struct nl_msg_buff *msgbuff, uint16_t type, size_t len,
+ struct nlattr *ethnla_nest_start(struct nl_msg_buff *msgbuff, uint16_t type);
+ bool ethnla_fill_header(struct nl_msg_buff *msgbuff, uint16_t type,
+ 			const char *devname, uint32_t flags);
++bool ethnla_fill_header_phy(struct nl_msg_buff *msgbuff, uint16_t type,
++			    const char *devname, uint32_t phy_index,
++			    uint32_t flags);
  
- 	/* add new constants above here */
- 	__ETHTOOL_MSG_USER_CNT,
-@@ -111,6 +112,8 @@ enum {
- 	ETHTOOL_MSG_MM_GET_REPLY,
- 	ETHTOOL_MSG_MM_NTF,
- 	ETHTOOL_MSG_MODULE_FW_FLASH_NTF,
-+	ETHTOOL_MSG_PHY_GET_REPLY,
-+	ETHTOOL_MSG_PHY_NTF,
+ /* length of current message */
+ static inline unsigned int msgbuff_len(const struct nl_msg_buff *msgbuff)
+diff --git a/netlink/nlsock.c b/netlink/nlsock.c
+index 0ec2738..0b873a3 100644
+--- a/netlink/nlsock.c
++++ b/netlink/nlsock.c
+@@ -291,7 +291,8 @@ int nlsock_prep_get_request(struct nl_socket *nlsk, unsigned int nlcmd,
+ 	ret = msg_init(nlctx, &nlsk->msgbuff, nlcmd, nlm_flags);
+ 	if (ret < 0)
+ 		return ret;
+-	if (ethnla_fill_header(&nlsk->msgbuff, hdr_attrtype, devname, flags))
++	if (ethnla_fill_header_phy(&nlsk->msgbuff, hdr_attrtype, devname,
++				   nlctx->ctx->phy_index, flags))
+ 		return -EMSGSIZE;
  
- 	/* add new constants above here */
- 	__ETHTOOL_MSG_KERNEL_CNT,
-@@ -134,6 +137,7 @@ enum {
- 	ETHTOOL_A_HEADER_DEV_INDEX,		/* u32 */
- 	ETHTOOL_A_HEADER_DEV_NAME,		/* string */
- 	ETHTOOL_A_HEADER_FLAGS,			/* u32 - ETHTOOL_FLAG_* */
-+	ETHTOOL_A_HEADER_PHY_INDEX,		/* u32 */
+ 	return 0;
+diff --git a/netlink/plca.c b/netlink/plca.c
+index 7d61e3b..7dc30a3 100644
+--- a/netlink/plca.c
++++ b/netlink/plca.c
+@@ -211,8 +211,8 @@ int nl_plca_set_cfg(struct cmd_context *ctx)
+ 		       NLM_F_REQUEST | NLM_F_ACK);
+ 	if (ret < 0)
+ 		return 2;
+-	if (ethnla_fill_header(msgbuff, ETHTOOL_A_PLCA_HEADER,
+-			       ctx->devname, 0))
++	if (ethnla_fill_header_phy(msgbuff, ETHTOOL_A_PLCA_HEADER,
++				   ctx->devname, ctx->phy_index, 0))
+ 		return -EMSGSIZE;
  
- 	/* add new constants above here */
- 	__ETHTOOL_A_HEADER_CNT,
-@@ -556,6 +560,10 @@ enum {
- 	 * a regular 100 Ohm cable and a part with the abnormal impedance value
- 	 */
- 	ETHTOOL_A_CABLE_RESULT_CODE_IMPEDANCE_MISMATCH,
-+	/* TDR not possible due to high noise level */
-+	ETHTOOL_A_CABLE_RESULT_CODE_NOISE,
-+	/* TDR resolution not possible / out of distance */
-+	ETHTOOL_A_CABLE_RESULT_CODE_RESOLUTION_NOT_POSSIBLE,
- };
+ 	ret = nl_parser(nlctx, set_plca_params, NULL, PARSER_GROUP_NONE, NULL);
+diff --git a/netlink/pse-pd.c b/netlink/pse-pd.c
+index 2c8dd89..3f6b6aa 100644
+--- a/netlink/pse-pd.c
++++ b/netlink/pse-pd.c
+@@ -240,8 +240,8 @@ int nl_spse(struct cmd_context *ctx)
+ 		       NLM_F_REQUEST | NLM_F_ACK);
+ 	if (ret < 0)
+ 		return 2;
+-	if (ethnla_fill_header(msgbuff, ETHTOOL_A_PSE_HEADER,
+-			       ctx->devname, 0))
++	if (ethnla_fill_header_phy(msgbuff, ETHTOOL_A_PSE_HEADER,
++				   ctx->devname, ctx->phy_index, 0))
+ 		return -EMSGSIZE;
  
- enum {
-@@ -965,6 +973,7 @@ enum {
- 	ETHTOOL_A_RSS_INDIR,		/* binary */
- 	ETHTOOL_A_RSS_HKEY,		/* binary */
- 	ETHTOOL_A_RSS_INPUT_XFRM,	/* u32 */
-+	ETHTOOL_A_RSS_START_CONTEXT,	/* u32 */
- 
- 	__ETHTOOL_A_RSS_CNT,
- 	ETHTOOL_A_RSS_MAX = (__ETHTOOL_A_RSS_CNT - 1),
-@@ -1049,6 +1058,22 @@ enum {
- 	ETHTOOL_A_MODULE_FW_FLASH_MAX = (__ETHTOOL_A_MODULE_FW_FLASH_CNT - 1)
- };
- 
-+enum {
-+	ETHTOOL_A_PHY_UNSPEC,
-+	ETHTOOL_A_PHY_HEADER,			/* nest - _A_HEADER_* */
-+	ETHTOOL_A_PHY_INDEX,			/* u32 */
-+	ETHTOOL_A_PHY_DRVNAME,			/* string */
-+	ETHTOOL_A_PHY_NAME,			/* string */
-+	ETHTOOL_A_PHY_UPSTREAM_TYPE,		/* u32 */
-+	ETHTOOL_A_PHY_UPSTREAM_INDEX,		/* u32 */
-+	ETHTOOL_A_PHY_UPSTREAM_SFP_NAME,	/* string */
-+	ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME,	/* string */
-+
-+	/* add new constants above here */
-+	__ETHTOOL_A_PHY_CNT,
-+	ETHTOOL_A_PHY_MAX = (__ETHTOOL_A_PHY_CNT - 1)
-+};
-+
- /* generic netlink info */
- #define ETHTOOL_GENL_NAME "ethtool"
- #define ETHTOOL_GENL_VERSION 1
+ 	ret = nl_parser(nlctx, spse_params, NULL, PARSER_GROUP_NONE, NULL);
 -- 
 2.46.0
 
