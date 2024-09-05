@@ -1,46 +1,61 @@
-Return-Path: <netdev+bounces-125744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F94F96E650
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 01:31:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 350CC96E663
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 01:39:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AAD92875FB
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 23:31:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51CCE1C22F6E
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 23:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182271BE233;
-	Thu,  5 Sep 2024 23:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62EE01B4C56;
+	Thu,  5 Sep 2024 23:39:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F34E1BDAB7;
-	Thu,  5 Sep 2024 23:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from trager.us (trager.us [52.5.81.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720F65381B;
+	Thu,  5 Sep 2024 23:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725578989; cv=none; b=JP0h2iuc/yAuSosMTUTmPEF1gaADd0gJBbVEuIG9QJUQKfqFVizUp3b4dtV2RD3MccVBAmrn9IaQ9duS0cJYpYg/7OEJoRZvN4BlAJMvyCKSWJzSG3LTAz9GwH+9MdiZ32mOrkOmaYYzp9sWpk6XRskkDLrT6rZbrXxHN6Fmi9Y=
+	t=1725579551; cv=none; b=XaxDKm/Byf/W1bCt3B+WgjUq82+kgeNd8t70YtwkduLTGcQu9YegIlhhZGaILDq7kn9HiCRPMtRbpzOwGShTZ43R4SBmrCO4vGtt15J+eqH8LEPXzwZvRnRt20etBoap0hAyISKfNxcR5xUh+oLq/EnsrwjQvNcjf12mgZor/q4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725578989; c=relaxed/simple;
-	bh=qWnQ52ZOFcfUH30yhNr7GdOz1ULbAXa0u6gVutZJ6Zc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Pa5z/ChYmH1KXKIMi/yA9sdHhQeUhCypfVWPxBLuycVU8a6lj8dxpMo/4oR1mQWOIfc05FOU0hzAm0KNlswCISIOr0ZGXG/UwUn3CsSTqiFXKvrpe0EE5K9gUzLBEo3jUCyFDC+zx2bfYQfOQAvAlhT+s1AxYT+5Cegc/U24vlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net-next 16/16] netfilter: nf_tables: set element timeout update support
-Date: Fri,  6 Sep 2024 01:29:20 +0200
-Message-Id: <20240905232920.5481-17-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240905232920.5481-1-pablo@netfilter.org>
-References: <20240905232920.5481-1-pablo@netfilter.org>
+	s=arc-20240116; t=1725579551; c=relaxed/simple;
+	bh=cQQmJ5AgekB3x6oTYMEqlDF58JG5FJt2/c46w/qfVsE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=stSRxcqex+VOUlv1GOIGfXUf4AwUR2twnxf/DLAMlBwTVL44Rogs4vx4sWphupVuOhPmHP4iZMd8an+wmBL4PYYDhJw6AHV+orgrDM1MWbJuLhYZgXSZArpe0q4m7ur6FlZ5tJbJUM6abrx0WNe0wrioL55gFEuo2kMpqMO5kTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
+Received: from c-76-104-255-50.hsd1.wa.comcast.net ([76.104.255.50] helo=localhost)
+	by trager.us with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92.3)
+	(envelope-from <lee@trager.us>)
+	id 1smM44-00024n-O4; Thu, 05 Sep 2024 23:39:01 +0000
+From: Lee Trager <lee@trager.us>
+To: netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	kernel-team@meta.com,
+	Shinas Rasheed <srasheed@marvell.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Phani Burra <phani.r.burra@intel.com>,
+	Lee Trager <lee@trager.us>,
+	Joshua Hay <joshua.a.hay@intel.com>,
+	Sanman Pradhan <sanmanpradhan@meta.com>
+Cc: Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Alan Brady <alan.brady@intel.com>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] eth: fbnic: Add devlink firmware version info
+Date: Thu,  5 Sep 2024 16:37:51 -0700
+Message-ID: <20240905233820.1713043-1-lee@trager.us>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,178 +64,189 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Store new timeout and expiration in transaction object, use them to
-update elements from .commit path. Otherwise, discard update if .abort
-path is exercised.
+This adds support to show firmware version information for both stored and
+running firmware versions. The version and commit is displayed separately
+to aid monitoring tools which only care about the version.
 
-Use update_flags in the transaction to note whether the timeout,
-expiration, or both need to be updated.
+Example output:
+  # devlink dev info
+  pci/0000:01:00.0:
+    driver fbnic
+    serial_number 88-25-08-ff-ff-01-50-92
+    versions:
+        running:
+          fw 24.07.15-017
+          fw.commit h999784ae9df0
+          fw.bootloader 24.07.10-000
+          fw.bootloader.commit hfef3ac835ce7
+        stored:
+          fw 24.07.24-002
+          fw.commit hc9d14a68b3f2
+          fw.bootloader 24.07.22-000
+          fw.bootloader.commit h922f8493eb96
+          fw.undi 01.00.03-000
 
-Annotate access to timeout extension now that it can be updated while
-lockless read access is possible.
-
-Reject timeout updates on elements with no timeout extension.
-
-Element transaction remains in the 96 bytes kmalloc slab on x86_64 after
-this update.
-
-This patch requires ("netfilter: nf_tables: use timestamp to check for
-set element timeout") to make sure an element does not expire while
-transaction is ongoing.
-
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Signed-off-by: Lee Trager <lee@trager.us>
 ---
- include/net/netfilter/nf_tables.h | 16 ++++++++++-
- net/netfilter/nf_tables_api.c     | 47 ++++++++++++++++++++++++++++---
- net/netfilter/nft_dynset.c        |  2 +-
- 3 files changed, 59 insertions(+), 6 deletions(-)
+ .../device_drivers/ethernet/index.rst         |  1 +
+ .../device_drivers/ethernet/meta/fbnic.rst    | 29 +++++++
+ MAINTAINERS                                   |  1 +
+ .../net/ethernet/meta/fbnic/fbnic_devlink.c   | 75 +++++++++++++++++++
+ 4 files changed, 106 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
 
-diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-index 7511918dce6f..49708e7e1339 100644
---- a/include/net/netfilter/nf_tables.h
-+++ b/include/net/netfilter/nf_tables.h
-@@ -833,7 +833,7 @@ static inline bool __nft_set_elem_expired(const struct nft_set_ext *ext,
- 					  u64 tstamp)
- {
- 	if (!nft_set_ext_exists(ext, NFT_SET_EXT_TIMEOUT) ||
--	    nft_set_ext_timeout(ext)->timeout == 0)
-+	    READ_ONCE(nft_set_ext_timeout(ext)->timeout) == 0)
- 		return false;
- 
- 	return time_after_eq64(tstamp, READ_ONCE(nft_set_ext_timeout(ext)->expiration));
-@@ -1749,10 +1749,18 @@ struct nft_trans_table {
- #define nft_trans_table_update(trans)			\
- 	nft_trans_container_table(trans)->update
- 
-+enum nft_trans_elem_flags {
-+	NFT_TRANS_UPD_TIMEOUT		= (1 << 0),
-+	NFT_TRANS_UPD_EXPIRATION	= (1 << 1),
-+};
+diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
+index 6932d8c043c2..6fc1961492b7 100644
+--- a/Documentation/networking/device_drivers/ethernet/index.rst
++++ b/Documentation/networking/device_drivers/ethernet/index.rst
+@@ -44,6 +44,7 @@ Contents:
+    marvell/octeon_ep
+    marvell/octeon_ep_vf
+    mellanox/mlx5/index
++   meta/fbnic
+    microsoft/netvsc
+    neterion/s2io
+    netronome/nfp
+diff --git a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+new file mode 100644
+index 000000000000..32ff114f5c26
+--- /dev/null
++++ b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+@@ -0,0 +1,29 @@
++.. SPDX-License-Identifier: GPL-2.0+
 +
- struct nft_trans_elem {
- 	struct nft_trans		nft_trans;
- 	struct nft_set			*set;
- 	struct nft_elem_priv		*elem_priv;
-+	u64				timeout;
-+	u64				expiration;
-+	u8				update_flags;
- 	bool				bound;
- };
- 
-@@ -1762,6 +1770,12 @@ struct nft_trans_elem {
- 	nft_trans_container_elem(trans)->set
- #define nft_trans_elem_priv(trans)			\
- 	nft_trans_container_elem(trans)->elem_priv
-+#define nft_trans_elem_update_flags(trans)		\
-+	nft_trans_container_elem(trans)->update_flags
-+#define nft_trans_elem_timeout(trans)			\
-+	nft_trans_container_elem(trans)->timeout
-+#define nft_trans_elem_expiration(trans)		\
-+	nft_trans_container_elem(trans)->expiration
- #define nft_trans_elem_set_bound(trans)			\
- 	nft_trans_container_elem(trans)->bound
- 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index ed85b10edb32..57259b5f3ef5 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -5815,7 +5815,7 @@ static int nf_tables_fill_setelem(struct sk_buff *skb,
- 		goto nla_put_failure;
- 
- 	if (nft_set_ext_exists(ext, NFT_SET_EXT_TIMEOUT)) {
--		u64 timeout = nft_set_ext_timeout(ext)->timeout;
-+		u64 timeout = READ_ONCE(nft_set_ext_timeout(ext)->timeout);
- 		u64 set_timeout = READ_ONCE(set->timeout);
- 		__be64 msecs = 0;
- 
-@@ -6852,6 +6852,7 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
- 	struct nft_data_desc desc;
- 	enum nft_registers dreg;
- 	struct nft_trans *trans;
-+	u8 update_flags;
- 	u64 expiration;
- 	u64 timeout;
- 	int err, i;
-@@ -7163,8 +7164,30 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
- 			     nft_set_ext_exists(ext2, NFT_SET_EXT_OBJREF) &&
- 			     *nft_set_ext_obj(ext) != *nft_set_ext_obj(ext2)))
- 				goto err_element_clash;
--			else if (!(nlmsg_flags & NLM_F_EXCL))
-+			else if (!(nlmsg_flags & NLM_F_EXCL)) {
- 				err = 0;
-+				if (nft_set_ext_exists(ext2, NFT_SET_EXT_TIMEOUT)) {
-+					update_flags = 0;
-+					if (timeout != nft_set_ext_timeout(ext2)->timeout) {
-+						nft_trans_elem_timeout(trans) = timeout;
-+						if (expiration == 0)
-+							expiration = timeout;
++=====================================
++Meta Platforms Host Network Interface
++=====================================
 +
-+						update_flags |= NFT_TRANS_UPD_TIMEOUT;
-+					}
-+					if (expiration) {
-+						nft_trans_elem_expiration(trans) = expiration;
-+						update_flags |= NFT_TRANS_UPD_EXPIRATION;
-+					}
++Firmware Versions
++-----------------
 +
-+					if (update_flags) {
-+						nft_trans_elem_priv(trans) = elem_priv;
-+						nft_trans_elem_update_flags(trans) = update_flags;
-+						nft_trans_commit_list_add_tail(ctx->net, trans);
-+						goto err_elem_free;
-+					}
-+				}
-+			}
- 		} else if (err == -ENOTEMPTY) {
- 			/* ENOTEMPTY reports overlapping between this element
- 			 * and an existing one.
-@@ -10489,7 +10512,22 @@ static int nf_tables_commit(struct net *net, struct sk_buff *skb)
- 		case NFT_MSG_NEWSETELEM:
- 			te = nft_trans_container_elem(trans);
- 
--			nft_setelem_activate(net, te->set, te->elem_priv);
-+			if (te->update_flags) {
-+				const struct nft_set_ext *ext =
-+					nft_set_elem_ext(te->set, te->elem_priv);
++fbnic has three components stored on the flash which are provided in one PLDM
++image:
 +
-+				if (te->update_flags & NFT_TRANS_UPD_TIMEOUT) {
-+					WRITE_ONCE(nft_set_ext_timeout(ext)->timeout,
-+						   te->timeout);
-+				}
-+				if (te->update_flags & NFT_TRANS_UPD_EXPIRATION) {
-+					WRITE_ONCE(nft_set_ext_timeout(ext)->expiration,
-+						   get_jiffies_64() + te->expiration);
-+				}
-+			} else {
-+				nft_setelem_activate(net, te->set, te->elem_priv);
-+			}
++1. fw - The control firmware used to view and modify firmware settings, request
++   firmware actions, and retrieve firmware counters outside of the data path.
++   This is the firmware which fbnic_fw.c interacts with.
++2. bootloader - The firmware which validate firmware security and control basic
++   operations including loading and updating the firmware. This is also known
++   as the cmrt firmware.
++3. undi - This is the UEFI driver which is based on the Linux driver.
 +
- 			nf_tables_setelem_notify(&ctx, te->set,
- 						 te->elem_priv,
- 						 NFT_MSG_NEWSETELEM);
-@@ -10789,7 +10827,8 @@ static int __nf_tables_abort(struct net *net, enum nfnl_abort_action action)
- 			nft_trans_destroy(trans);
- 			break;
- 		case NFT_MSG_NEWSETELEM:
--			if (nft_trans_elem_set_bound(trans)) {
-+			if (nft_trans_elem_update_flags(trans) ||
-+			    nft_trans_elem_set_bound(trans)) {
- 				nft_trans_destroy(trans);
- 				break;
- 			}
-diff --git a/net/netfilter/nft_dynset.c b/net/netfilter/nft_dynset.c
-index 6a10305de24b..88922e0e8e83 100644
---- a/net/netfilter/nft_dynset.c
-+++ b/net/netfilter/nft_dynset.c
-@@ -95,7 +95,7 @@ void nft_dynset_eval(const struct nft_expr *expr,
- 			     expr, regs, &ext)) {
- 		if (priv->op == NFT_DYNSET_OP_UPDATE &&
- 		    nft_set_ext_exists(ext, NFT_SET_EXT_TIMEOUT) &&
--		    nft_set_ext_timeout(ext)->timeout != 0) {
-+		    READ_ONCE(nft_set_ext_timeout(ext)->timeout) != 0) {
- 			timeout = priv->timeout ? : READ_ONCE(set->timeout);
- 			WRITE_ONCE(nft_set_ext_timeout(ext)->expiration, get_jiffies_64() + timeout);
- 		}
--- 
-2.30.2
++fbnic stores two copies of these three components on flash. This allows fbnic
++to fall back to an older version of firmware automatically in case firmware
++fails to boot. Version information for both is provided as running and stored.
++The undi is only provided in stored as it is not actively running once the Linux
++driver takes over.
++
++devlink dev info provides version information for all three components. In
++addition to the version the hg commit hash of the build is included as a
++separate entry.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index baf88e74c907..fae13f784226 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14819,6 +14819,7 @@ M:	Alexander Duyck <alexanderduyck@fb.com>
+ M:	Jakub Kicinski <kuba@kernel.org>
+ R:	kernel-team@meta.com
+ S:	Supported
++F:	Documentation/networking/device_drivers/ethernet/meta/
+ F:	drivers/net/ethernet/meta/
 
+ METHODE UDPU SUPPORT
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+index e87049dfd223..ef05ae8f5039 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
+@@ -10,6 +10,56 @@
+
+ #define FBNIC_SN_STR_LEN	24
+
++static int fbnic_version_running_put(struct devlink_info_req *req,
++				     struct fbnic_fw_ver *fw_ver,
++				     char *ver_name)
++{
++	char running_ver[FBNIC_FW_VER_MAX_SIZE];
++	int err;
++
++	fbnic_mk_fw_ver_str(fw_ver->version, running_ver);
++	err = devlink_info_version_running_put(req, ver_name, running_ver);
++	if (err)
++		return err;
++
++	if (strlen(fw_ver->commit) > 0) {
++		char commit_name[FBNIC_SN_STR_LEN];
++
++		snprintf(commit_name, FBNIC_SN_STR_LEN, "%s.commit", ver_name);
++		err = devlink_info_version_running_put(req, commit_name,
++						       fw_ver->commit);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
++static int fbnic_version_stored_put(struct devlink_info_req *req,
++				    struct fbnic_fw_ver *fw_ver,
++				    char *ver_name)
++{
++	char stored_ver[FBNIC_FW_VER_MAX_SIZE];
++	int err;
++
++	fbnic_mk_fw_ver_str(fw_ver->version, stored_ver);
++	err = devlink_info_version_stored_put(req, ver_name, stored_ver);
++	if (err)
++		return err;
++
++	if (strlen(fw_ver->commit) > 0) {
++		char commit_name[FBNIC_SN_STR_LEN];
++
++		snprintf(commit_name, FBNIC_SN_STR_LEN, "%s.commit", ver_name);
++		err = devlink_info_version_stored_put(req, commit_name,
++						      fw_ver->commit);
++		if (err)
++			return err;
++	}
++
++	return 0;
++}
++
+ static int fbnic_devlink_info_get(struct devlink *devlink,
+ 				  struct devlink_info_req *req,
+ 				  struct netlink_ext_ack *extack)
+@@ -17,6 +67,31 @@ static int fbnic_devlink_info_get(struct devlink *devlink,
+ 	struct fbnic_dev *fbd = devlink_priv(devlink);
+ 	int err;
+
++	err = fbnic_version_running_put(req, &fbd->fw_cap.running.mgmt,
++					DEVLINK_INFO_VERSION_GENERIC_FW);
++	if (err)
++		return err;
++
++	err = fbnic_version_running_put(req, &fbd->fw_cap.running.bootloader,
++					DEVLINK_INFO_VERSION_GENERIC_FW_BOOTLOADER);
++	if (err)
++		return err;
++
++	err = fbnic_version_stored_put(req, &fbd->fw_cap.stored.mgmt,
++				       DEVLINK_INFO_VERSION_GENERIC_FW);
++	if (err)
++		return err;
++
++	err = fbnic_version_stored_put(req, &fbd->fw_cap.stored.bootloader,
++				       DEVLINK_INFO_VERSION_GENERIC_FW_BOOTLOADER);
++	if (err)
++		return err;
++
++	err = fbnic_version_stored_put(req, &fbd->fw_cap.stored.undi,
++				       DEVLINK_INFO_VERSION_GENERIC_FW_UNDI);
++	if (err)
++		return err;
++
+ 	if (fbd->dsn) {
+ 		unsigned char serial[FBNIC_SN_STR_LEN];
+ 		u8 dsn[8];
+--
+2.43.5
 
