@@ -1,77 +1,73 @@
-Return-Path: <netdev+bounces-125465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19DE996D2B4
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:03:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0B3396D2BE
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:06:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8FF59B23F41
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:03:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CA34281BE3
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:06:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0CBE1946A9;
-	Thu,  5 Sep 2024 09:03:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 901DA194ACB;
+	Thu,  5 Sep 2024 09:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RFGaBO9C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EDF6194A48;
-	Thu,  5 Sep 2024 09:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CFB19258A
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 09:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725527011; cv=none; b=ddaalKyz1nZWiFz/dDJgwSVTzmCj6LJzS2MCVeFH7Y21eH2LZa0Cwi3ktjVj4LETp4cEBA5qILRNvjmrNHUm1ZutJL5JlkqM/3DuWgvTLXuut4N02B9yl03T7R8eZfwBqXvsXwpyHQKFvqGfmUGj7/5slsO71l3/9/KhE3Upwpo=
+	t=1725527184; cv=none; b=T4+0jkpdbPMMMXaEymUprwDS5gOz1nmdToe6/3xxpNgqa4EQCH9IalIbrMDVxR4YUuyg/+Q5srzUGccqXLidgdmsHcSvNwcTnpNGrEN1kwVhwhZ8L01QDWxAlg1aKJG8+LWMA3CVeu0zgCKOeDUi35pzoSmMkT9yzJqxO7M5A04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725527011; c=relaxed/simple;
-	bh=h5agUITKl/cgeeW4DQgsZL5oeRnclrtv/Skmb+M64no=;
+	s=arc-20240116; t=1725527184; c=relaxed/simple;
+	bh=vVOP1mOoLSS9Isujf+VH28F2S18jITj6Qsni3mfL47c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=odi6kdbVRM5/S6L6DUwSH0LO5aWO34a1g7GEIkGf9y3clhj6T2p5wubxIvOoGAwm9P4H5iIACPcKjxUTqi7dNW4WvSFHrpQUyjA9knZoa64Jtq67/jgIB9+2UDRNCMnefxPS2TJJzctqiEY2EI7N8WgZPUb4OK4qn8XrW1DZmO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c25f01879fso671593a12.1;
-        Thu, 05 Sep 2024 02:03:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725527008; x=1726131808;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8aILp+FUNY89ZcVUn5gP5CXyAWZIDPOfD7aHJXZkQOc=;
-        b=iJTxhDXDsJbuTvkiWIsUJCdX258xO3YWAYjATT46+ErQqVTN23xng2sE6atRvsOemP
-         CI89gWqljqNT2StnheMiHv/PCj73e0kAkRdowx/3fNB9KhZ3Fq6SP12YUxl6VHQyLTk0
-         ajL/XeBi/kAStiOZb8ofWOIwhqtg0wKRBtgX3qLDlPdJtMsjUX2t7xanLZGvZvdreZP5
-         n+xlnHdTM6yfRMJ45JULXBCf3lg0nRyC6XYSxtddVFU6zVNlSvxtGZWxxrBOVMZ688wK
-         fEzP1+IKFu6vdoW1ZUXS3Il4T2ZJqLt7OSj8mBMQign5o3nmuh1vPf9SwG0jNqccQoEC
-         CUOA==
-X-Forwarded-Encrypted: i=1; AJvYcCVH4Ns3ldqPP948rsxHURyDieHgDPmr24Ia0CUM0Ub8Y0QHJORmFzV0yfCMOXqNS9JlyfEjTlIWZvzcDB0=@vger.kernel.org, AJvYcCXniA+eDL5MyZL4zohBqA4QclcLhDmrhedMNksZjNQeyezH7jwAZ/X3LweSKNEwc0iCFBeob8xD@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQnD7rk5gCFvyuk5L5issjtcVwuTNbAYK+Vy5tHTzWSASKIx28
-	8II1x+HRvckCwYF2ZV0vsXhZXvc2Tg1kE/RisyEIUkN97kp9Z3nK
-X-Google-Smtp-Source: AGHT+IEtWO6srusMymzDIGFokmJ8brm6cWt1HRzsrksU5NF9IzLD4bD5OMrwEbqRdmyo0ze0Ti7teQ==
-X-Received: by 2002:a05:6402:26d1:b0:5c2:5f0a:4a45 with SMTP id 4fb4d7f45d1cf-5c25f0a4c3emr7211261a12.31.1725527007435;
-        Thu, 05 Sep 2024 02:03:27 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-010.fbsv.net. [2a03:2880:30ff:a::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3cc529241sm960676a12.11.2024.09.05.02.03.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 02:03:26 -0700 (PDT)
-Date: Thu, 5 Sep 2024 02:03:21 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Leonardo Bras <leobras@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	rbc@meta.com, horms@kernel.org,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] virtio_net: Fix napi_skb_cache_put warning
-Message-ID: <20240905-sassy-aboriginal-crocodile-cfadde@devvm32600>
-References: <20240712115325.54175-1-leitao@debian.org>
- <20240714033803-mutt-send-email-mst@kernel.org>
- <ZpUHEszCj16rNoGy@gmail.com>
- <Ztc5QllkqaKZsaoN@LeoBras>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ChZjTjb+356rW5pCpIbDORPHPWLFa9+fnTA8byikKiNv9XiK7I978zyDqvtH6n9BFcJrDMPrLfq7+IFlWJw5XFFfXz/kimFKkhwXWsg01roOVr/2Nj30SMvhyD81z7rUdKFjZw/+8fOcjDSfL42yLkMU46AvkJAL7ZSIjuyJF1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RFGaBO9C; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725527183; x=1757063183;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vVOP1mOoLSS9Isujf+VH28F2S18jITj6Qsni3mfL47c=;
+  b=RFGaBO9CeAqvEQl98BJI2exw2tJdUTjSky2S8+NwVjjqq1UmY9pe02ps
+   oldlSH2N69JAekk0RK4QO53B+x8HZ23m4OSJOSdI8m6RIWDLWOwhjJv1P
+   U4CR5TVnqo8GGj3JPPkiS3lAwyzHAGwB6YyFo78SDHUhUYffHaeaWMOj+
+   q9oOUhnGUBZXJnfCaFqlsAeZZT88Ab65KZYfIARvJ3EFgUqleeyKelqlf
+   XmonRDekl8GelN0AAvTqO2xeRZhIlsYT4uWujSGMFPLlqZ4xvWDc5DT9a
+   o7+auGetYwRuzqV1U5FiKiAVNvt6Lf8U5JrmcxRd+nQwIpqIckio1S7xV
+   g==;
+X-CSE-ConnectionGUID: 0hiQrBSURPmfWD/uagPmsg==
+X-CSE-MsgGUID: XfvKt46STQy/ZTwjtDxOBw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11185"; a="27983982"
+X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
+   d="scan'208";a="27983982"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 02:06:22 -0700
+X-CSE-ConnectionGUID: Q69MFm30TcOPGV6p3jty6A==
+X-CSE-MsgGUID: +jx0jdAISW6uGg0MhVMPtQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
+   d="scan'208";a="70481386"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 02:06:14 -0700
+Date: Thu, 5 Sep 2024 11:04:17 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: netdev@vger.kernel.org, wojciech.drewek@intel.com,
+	intel-wired-lan@lists.osuosl.org
+Subject: Re: [Intel-wired-lan] [iwl-net v1] iavf: allow changing VLAN state
+ without calling PF
+Message-ID: <Ztl0ES4k0dyI7Qio@mev-dev.igk.intel.com>
+References: <20240904120052.24561-1-michal.swiatkowski@linux.intel.com>
+ <65f17b12-860e-4cd0-a996-459fee71b4f8@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,35 +76,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Ztc5QllkqaKZsaoN@LeoBras>
+In-Reply-To: <65f17b12-860e-4cd0-a996-459fee71b4f8@intel.com>
 
-Hello Leonardo, good to see you here,
-
-On Tue, Sep 03, 2024 at 01:28:50PM -0300, Leonardo Bras wrote:
-> Please help me check if the following is correct:
-> ###
-> Any tree which includes df133f3f9625 ("virtio_net: bulk free tx skbs") 
-> should also include your patch, since it fixes stuff in there.
+On Thu, Sep 05, 2024 at 08:19:58AM +0200, Przemek Kitszel wrote:
+> On 9/4/24 14:00, Michal Swiatkowski wrote:
+> > First case:
 > 
-> The fact that the warning was only made visible in 
-> bdacf3e34945 ("net: Use nested-BH locking for napi_alloc_cache.")
-> does not change the fact that it was already present before.
+> [...]
 > 
-> Also, having bdacf3e34945 is not necessary for the backport, since
-> it only made the bug visible.
-> ###
+> > Second case:
 > 
-> Are above statements right?
+> [...]
+> 
+> > With fix for previous case we end up with no VLAN filters in hardware.
+> > We have to remove VLAN filters if the state is IAVF_VLAN_ADD and delete
+> > VLAN was called. It is save as IAVF_VLAN_ADD means that virtchnl message
+> > wasn't sent yet.
+> 
+> I'm fine with combining the two cases into one commit as that is related
+> 
+> > 
+> > Fixes: 0c0da0e95105 ("iavf: refactor VLAN filter states")
+> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > ---
+> >   drivers/net/ethernet/intel/iavf/iavf_main.c | 18 ++++++++++++++++--
+> >   1 file changed, 16 insertions(+), 2 deletions(-)
+> 
+> [...]
+> 
+> > @@ -793,8 +798,17 @@ static void iavf_del_vlan(struct iavf_adapter *adapter, struct iavf_vlan vlan)
+> >   	f = iavf_find_vlan(adapter, vlan);
+> >   	if (f) {
+> > -		f->state = IAVF_VLAN_REMOVE;
+> 
+> you forgot to put this line in else case below
+> 
 
-That is exactly correct.
+Oh, sorry, thanks for finding that. Will send v2.
 
-The bug was introduced by df133f3f9625 ("virtio_net: bulk free tx
-skbs"), but it was not visible until bdacf3e34945 ("net: Use nested-BH
-locking for napi_alloc_cache.") landed.
-
-You don't need bdacf3e34945 ("net: Use nested-BH locking for
-napi_alloc_cache.") patch backported if you don't want to.
-
-I hope it helps,
---breno
+> > -		iavf_schedule_aq_request(adapter, IAVF_FLAG_AQ_DEL_VLAN_FILTER);
+> > +		/* IAVF_ADD_VLAN means that VLAN wasn't even added yet.
+> > +		 * Remove it from the list.
+> > +		 */
+> > +		if (f->state == IAVF_VLAN_ADD) {
+> > +			list_del(&f->list);
+> > +			kfree(f);
+> > +			adapter->num_vlan_filters--;
+> > +		} else {
+> > +			iavf_schedule_aq_request(adapter,
+> > +						 IAVF_FLAG_AQ_DEL_VLAN_FILTER);
+> > +		}
+> >   	}
+> >   	spin_unlock_bh(&adapter->mac_vlan_list_lock);
+> 
 
