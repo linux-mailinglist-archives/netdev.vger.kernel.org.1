@@ -1,111 +1,103 @@
-Return-Path: <netdev+bounces-125591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C258096DCA5
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:55:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15B1C96DCBE
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:57:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82077280F44
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:55:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C02CC1F21742
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7600180C1C;
-	Thu,  5 Sep 2024 14:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37491A08DF;
+	Thu,  5 Sep 2024 14:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MjfbRAYO"
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="SZ8wiUoc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11697D405;
-	Thu,  5 Sep 2024 14:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5597119AA5D
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 14:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725548016; cv=none; b=Zl9PQ5QtqX2nzSU9/P8s1HEbcNevgqLLgsYsAXbBhpgAAULtbbaNo4jhYqxmbawSHuTHguu81KgUvzVNlSg/1irAtE/fFQ088fYCeqLZkwd1cnXnBSH+GBwHAoFIimA/xq5eBJp2uut5EQeNm2xOvwISUas+uFbgQmUBt1JopUE=
+	t=1725548078; cv=none; b=Iw4wuYlBq6G28H5Qm5XBwd2svWxoFJcrCj8Im7f7rJghw3nyWsHQcDZmrSOD7feP+8pin6u57Omh/R70VrBX3mIqXhdbPjZ4FwfhvlI918pF7dh3bl6G6lMDjUhD0c/Mz7ORJ/qGSCiJ9mEmyL/GzY9Md8fdnoCoMChubVdhLN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725548016; c=relaxed/simple;
-	bh=jqcZny1PU1DcuE8GExy2+KpWKtl29hP9zSYbnzunf1c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RnCSWgetVoEJyPMGi9FrXiDz42RSC12olI9oLMdPpfQRGI7fAqIqouxMdRQJIQYSBBi2Nk6oM5Oa0GSNGXFrZS+EEmcNOG8IPkKZdkK1/xzae1m4ZqXdiuanZhHaRXkoPTmd3+zxd/C26jwpN01gIx2HaoNqJEvZrxfQlxwkTLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MjfbRAYO; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5c26e5d05d3so113261a12.0;
-        Thu, 05 Sep 2024 07:53:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725548013; x=1726152813; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZR0iYi2IfJinEuVM0L8yEAQAxrisPIV++kgfxATokkM=;
-        b=MjfbRAYOQOEkNDdXJWL9He1XEVdK0OQXwiHa/dJ85M8R7a6RL3BTJwVWlfev0k9pL8
-         G7AHyyAchhCX19ds0RAdRoCiwix854PK+idubgvLV1bNZue1ECd/Fz5cDlIvhPMHWc3e
-         N1nVUKLo4BZ6cW2Acf02qOKxgcmsLZ2hX1+UrFp9qhhmTG+Hz9RQDjEBadnvEbdAQFGC
-         ZKFtTJrO/LRrL/Nf6THTff2SCGNC4jSausz6vk180aLnXeeNJ0RYZDav5lhuS3P4meC3
-         Gqn/GYbDXDVkv/bXSd6rbNvywLQ6l/TwuDSjgX6J/OEhsfOad0t0UUtnet1+k+4oN2LY
-         zA1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725548013; x=1726152813;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZR0iYi2IfJinEuVM0L8yEAQAxrisPIV++kgfxATokkM=;
-        b=l0RvzB3KDhldjsztQzUn2IYd6MIaBueTdu/ydnKC0qSlQ9x6IOBT789CWjY6kN+cSv
-         9HvUeazgNzuwIRi1E3Xgh0Th/NihLdaMm3+t2/WzeG4Jj68R3RXo5SF1pf2ojCSkm9Ym
-         assuqzECOBIY7LjEbaUz4JqXtTeXgauZUZA+E7HrnRZSeEYPz8wqtNfOS4m6Sll+DUoe
-         sVewK4ZBtD+5ClMKbtjQdKqT0DcdrH/UgDTxjVtCXU9N8dFyFgOq65/4kJ5GTxpMr+Q1
-         WR8je3QDURwZyqlHmbXaJF8nbb3q14MVjG8oYQ3gg28k8+hAZH0iJ2fMzAXumpF8XcoC
-         tM2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVHWCBPvuEwHa3m4+SRYkUVZ1Xd1c0rsAMGpshe6HA37ASqxzZkTSJeMOUGVJcxxwWxZog8/7EK@vger.kernel.org, AJvYcCWCF77WEnfd0SMUMqApADw+xpVrkDnZ/fOImXPJotF8jp/UcwPneLjBCs9zA+mk+o34R9e+VrdmhKWZZ3w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwA9qlpT8SSNb1936ANHtx0KX45xngRbb595BHfPfnuIdJFQklg
-	4MsMcKYlWak1hPEFrcbs9vpMJIIcZ50qG8Hae6q2Gc1JCp9Rvw6u
-X-Google-Smtp-Source: AGHT+IHSJDF7488/JNd5/mBRKMIt/AGCz8WaJYYqZBzFyEHSWTtvg92OHespTIAyKntNsE/Yr1Q17g==
-X-Received: by 2002:a05:6402:35ca:b0:5c2:4e5b:d0cc with SMTP id 4fb4d7f45d1cf-5c24e5bd937mr6396914a12.1.1725548012976;
-        Thu, 05 Sep 2024 07:53:32 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3cc6a5cfasm1316252a12.92.2024.09.05.07.53.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 07:53:32 -0700 (PDT)
-Date: Thu, 5 Sep 2024 17:53:29 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	rmk+kernel@armlinux.org.uk, linux@armlinux.org.uk, xfr@outlook.com
-Subject: Re: [PATCH net-next v8 7/7] net: stmmac: silence FPE kernel logs
-Message-ID: <20240905145329.bqarpzzaciluwdxi@skbuf>
-References: <cover.1725518135.git.0x1207@gmail.com>
- <cover.1725518135.git.0x1207@gmail.com>
- <508ae4f14cf173c9bd8a630b8f48a59a777f716e.1725518136.git.0x1207@gmail.com>
- <508ae4f14cf173c9bd8a630b8f48a59a777f716e.1725518136.git.0x1207@gmail.com>
+	s=arc-20240116; t=1725548078; c=relaxed/simple;
+	bh=hQXOjtem9QT9NkzuckCjeRjdSYhJcKGqfmHQV5n2Xts=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MKpuklqWh+cIB0AuzfGiBE9IWpHRc2pnDU9T8bw5mhXkfJsDWIqQi9g2ig5qnjtGWCKWf7UsvyJkhtMnvCTKfiejvAOcfd133E9u0fhuq0tLJ5srmLbsmIbgbk4OZSrcG8AjHM3sSH41A0n1ISTPENh8VF7CHCfaYFi0UudiRls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=SZ8wiUoc; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+Received: from cwcc.thunk.org (pool-173-48-102-194.bstnma.fios.verizon.net [173.48.102.194])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 485Ers2g004660
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 5 Sep 2024 10:53:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1725548041; bh=dvurbpJwB8Tw+mYM9BXpV2kEkmbOWYuTyKXwPTQf+K4=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=SZ8wiUoc6OsaYUZaBr/28CTxYn8KmxOhfXr4IFkzlBRtJLylgqf9jT5eMkcGzCpu4
+	 CXBeJUnq+51ihqcat13uTXlwLgsdZdnL6/SpWeaiNmHPt5z+Z0DMJcfV4UfvSsVTRj
+	 2qRaTib2Ct/PJ0oLKHc4m3Ms9Oe0MLC5/TJ5NeYMReSRWm/N0YrzXNdeDe6ABGs4UI
+	 idH2b3LKAIUffn3kQ7kB1ZLYRU5qZE9hpPlKIKycjW3FCDs7rNoEKdejAskxouv3an
+	 Tce+f4219T/JqONTk99mOkXhnqu9VJX3uYkavDo6CXQG/pBRO0hmLj8suI8MKAkQ//
+	 pYe3MvYAoGOCQ==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id DF13615C1942; Thu, 05 Sep 2024 10:53:54 -0400 (EDT)
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Gabriel Krisman Bertazi <krisman@suse.de>
+Cc: "Theodore Ts'o" <tytso@mit.edu>, Lizhi Xu <lizhi.xu@windriver.com>,
+        adilger.kernel@dilger.ca, coreteam@netfilter.org, davem@davemloft.net,
+        ebiggers@kernel.org, fw@strlen.de, jaegeuk@kernel.org,
+        kadlec@netfilter.org, kuba@kernel.org, linux-ext4@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org,
+        lkp@intel.com, llvm@lists.linux.dev, netdev@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, oe-kbuild-all@lists.linux.dev,
+        pablo@netfilter.org,
+        syzbot+340581ba9dceb7e06fb3@syzkaller.appspotmail.com,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] ext4: Fix error message when rejecting the default hash
+Date: Thu,  5 Sep 2024 10:53:42 -0400
+Message-ID: <172554793835.1268668.10009711670793037549.b4-ty@mit.edu>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <87jzg1en6j.fsf_-_@mailhost.krisman.be>
+References: <87le3kle87.fsf@mailhost.krisman.be> <20240605012335.44086-1-lizhi.xu@windriver.com> <172433877724.370733.16770771071139702263.b4-ty@mit.edu> <87jzg1en6j.fsf_-_@mailhost.krisman.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <508ae4f14cf173c9bd8a630b8f48a59a777f716e.1725518136.git.0x1207@gmail.com>
- <508ae4f14cf173c9bd8a630b8f48a59a777f716e.1725518136.git.0x1207@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 05, 2024 at 03:02:28PM +0800, Furong Xu wrote:
-> ethtool --show-mm can get real-time state of FPE.
-> fpe_irq_status logs should keep quiet.
-> 
-> tc-taprio can always query driver state, delete unbalanced logs.
-> 
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> ---
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+On Tue, 27 Aug 2024 16:16:36 -0400, Gabriel Krisman Bertazi wrote:
+> "Theodore Ts'o" <tytso@mit.edu> writes:
+> 
+> > On Wed, 05 Jun 2024 09:23:35 +0800, Lizhi Xu wrote:
+> >> When mounting the ext4 filesystem, if the default hash version is set to
+> >> DX_HASH_SIPHASH but the casefold feature is not set, exit the mounting.
+> >>
+> >>
+> >
+> > Applied, thanks!
+> >
+> > [1/1] fs/ext4: Filesystem without casefold feature cannot be mounted with spihash
+> >       commit: 985b67cd86392310d9e9326de941c22fc9340eec
+> 
+> [...]
+
+Applied, thanks!
+
+[1/1] ext4: Fix error message when rejecting the default hash
+      commit: a2187431c395cdfbf144e3536f25468c64fc7cfa
+
+Best regards,
+-- 
+Theodore Ts'o <tytso@mit.edu>
 
