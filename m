@@ -1,134 +1,90 @@
-Return-Path: <netdev+bounces-125413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D14296D0A7
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:44:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 865C096D0AD
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:46:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A71C287B57
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 07:44:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23FC6B21384
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 07:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88F0F19340D;
-	Thu,  5 Sep 2024 07:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="tDFw401i"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97DBE191F81;
+	Thu,  5 Sep 2024 07:46:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CEDE192D70;
-	Thu,  5 Sep 2024 07:43:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6B78F66
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 07:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725522239; cv=none; b=QY8YcvBrca1Ho5/vaaqh2TvqY9gAn3CUx9uo/uGk2MWIw7cUFnlGyUvTbMmxsD7OJmgAkIpKstSXwICVZ+UHz8LDc2/qSJaNRWRq0as1gREb9AbxDgp5eqR7CJGcMk9Gtc9VEJwN0ZGWTd59h9PUSpowwR5idS87gZA7wc8AC+o=
+	t=1725522363; cv=none; b=D8jEr08WEFN+bP9hMB+AFxwZDpyQoLN6iK0F4//wgM3UDguxL58XFBmJTlDvd1+tkc58K2REwxTGUM/EfsLOtgSxGC8YA39FbF7jw/KBf46rX/hD3XUDf6C2hV4rDLu2lACtkx/KvmoQpzm4zjARIh8LGqLg49XVStoT504pJ3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725522239; c=relaxed/simple;
-	bh=S8/TtXkZj7uHoxHpMVYmtyHnnkcgrFhlb9iCKy4r99Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uKvWnzlqjFndcb1Xez0/wteLciCGKAmAERI+TSS7AACB4BO+ug46E8mZQ60/W79o//GYcsthGrZ5mPPPRqJvmqFfhOfkximJpL21XINFkZurmkpSOFVjPhf5W2B9q3MMfC9E46xs8W8F77Wjll2AjrLoAy92vgzw+4q3t94/8Zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=tDFw401i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97229C4CEC4;
-	Thu,  5 Sep 2024 07:43:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1725522239;
-	bh=S8/TtXkZj7uHoxHpMVYmtyHnnkcgrFhlb9iCKy4r99Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tDFw401iokMtFH2bA5JxkYOmfH1nCuTNu1/4QFFmaScBfbMGEiNimT5yp2hNNzmmx
-	 0UolQCF/sZ+mBWHcafzAKthmfhQ2HCfmQSzoZGWIX+tgj3TakdiWr0ocp1pgRClPCY
-	 nfZHoB8AIgJhG7HLUA1OMbIghKa8aOtwFFH42I2w=
-Date: Thu, 5 Sep 2024 09:43:55 +0200
-From: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-To: Siddh Raman Pant <siddh.raman.pant@oracle.com>
-Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH 5.10, 5.4] net: set SOCK_RCU_FREE before inserting socket
- into hashtable
-Message-ID: <2024090543-itinerary-marina-3814@gregkh>
-References: <2024072924-CVE-2024-41041-ae0c@gregkh>
- <0ab22253fec2b0e65a95a22ceff799f39a2eaa0a.camel@oracle.com>
- <2024090305-starfish-hardship-dadc@gregkh>
- <CANn89iK5UMzkVaw2ed_WrOFZ4c=kSpGkKens2B-_cLhqk41yCg@mail.gmail.com>
- <2024090344-repave-clench-3d61@gregkh>
- <64688590d5cf73d0fd7b536723e399457d23aa8e.camel@oracle.com>
- <2024090401-underuse-resale-3eef@gregkh>
- <004b3dec44fe2fe6433043c509d52e72d8a8ca9d.camel@oracle.com>
+	s=arc-20240116; t=1725522363; c=relaxed/simple;
+	bh=SyxsvJtcJVqaiQHgUJLuRt7j3v/axmlctYI2RnXBQtM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=LV3GOaxJa3hBlwqPp30IUO1IgZvQ7W/xrxMW5bRg+vfGc+yLGhLXsukV/Mul5vpflYBVFn7QUqxwKaDQakLfYjtkTsWrcMr5X+mkf8lPijMEynksRpMR8ztgZNCpQgM9umo2tqFv3slA0MRx73q40Of3dBTbe/7SuC72bNIYEYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-82a319f6520so82367139f.3
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 00:46:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725522361; x=1726127161;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z0F7zeBTWaDC3bvDb+oeW8Ic3uat3Aamdf19hls7iZw=;
+        b=le3fGdpO9ySX2rgKV/ePhZLRHpbwzpdHBQt3IZDSltXFqmFgGCBe/gGkqEY1kRPP5m
+         LpIAR8vyp3Qr7h2O++ukzRToXhfYlpElfcAUSuJuYUqNneLTdo6B+/YkLZiTWsakgxut
+         22wHTfZ4/Jm2Nd6xsXn6AwjJXDRzIdSs5NfM7ZrrQzaMPOdwOFctpHuGe78M2fhShV0v
+         veg2DwQIp2xFXqF50DJn7jimVkVt24rLGCw8BnVZlBQ/1LgFddxtDp4zsmwcHOa+WGJ+
+         UGT56/WC3bSEh6Wlk9iUlOKwSdUmn3nsG4XsQLO69A8ENYXtg2hlLHIshFXp9h306D9I
+         ssLg==
+X-Forwarded-Encrypted: i=1; AJvYcCVjHSvtyIyXQh6tpHaCQbiK1WdiFNEfGlEwMWiGITKPgQgwpxwBfYc2T6LXqzTWPu6iX6IDjcU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwP9i7hS3cEjFx1NVhnQrroY/yd+xmnVObCScZfNDl5nBlrLpSF
+	C2nER4FoaADQvXQ62ihQTLe166FUSQafBmU4L6DYOC6tEFDkqrvcl0BP8GUos2xORKFh56dCiIi
+	2rclk2eltl+CoWCTedltDa6wZ4A0QBwbKpPvmGLP65zMQKFDpA/WS418=
+X-Google-Smtp-Source: AGHT+IFO1js3UnJdsjfFeMrqPiMcPXUxGOhgj6RWXAEOhvugYQxMc8QlA7TiXBcCt6c52xeAwAEA4qdEkGnc3o/tMwhQxJsyEH/3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <004b3dec44fe2fe6433043c509d52e72d8a8ca9d.camel@oracle.com>
+X-Received: by 2002:a05:6638:22c7:b0:4c0:9a3e:c259 with SMTP id
+ 8926c6da1cb9f-4d017eecf15mr966608173.5.1725522361247; Thu, 05 Sep 2024
+ 00:46:01 -0700 (PDT)
+Date: Thu, 05 Sep 2024 00:46:01 -0700
+In-Reply-To: <20240905065955.17065-1-kuniyu@amazon.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000064fbcb06215a7bbc@google.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in
+ unix_stream_read_actor (2)
+From: syzbot <syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	kuniyu@amazon.com, linux-kernel@vger.kernel.org, lizhi.xu@windriver.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Sep 04, 2024 at 01:06:45PM +0000, Siddh Raman Pant wrote:
-> [ Upstream commit 871019b22d1bcc9fab2d1feba1b9a564acbb6e99 ]
-> 
-> We've started to see the following kernel traces:
-> 
->  WARNING: CPU: 83 PID: 0 at net/core/filter.c:6641 sk_lookup+0x1bd/0x1d0
-> 
->  Call Trace:
->   <IRQ>
->   __bpf_skc_lookup+0x10d/0x120
->   bpf_sk_lookup+0x48/0xd0
->   bpf_sk_lookup_tcp+0x19/0x20
->   bpf_prog_<redacted>+0x37c/0x16a3
->   cls_bpf_classify+0x205/0x2e0
->   tcf_classify+0x92/0x160
->   __netif_receive_skb_core+0xe52/0xf10
->   __netif_receive_skb_list_core+0x96/0x2b0
->   napi_complete_done+0x7b5/0xb70
->   <redacted>_poll+0x94/0xb0
->   net_rx_action+0x163/0x1d70
->   __do_softirq+0xdc/0x32e
->   asm_call_irq_on_stack+0x12/0x20
->   </IRQ>
->   do_softirq_own_stack+0x36/0x50
->   do_softirq+0x44/0x70
-> 
-> __inet_hash can race with lockless (rcu) readers on the other cpus:
-> 
->   __inet_hash
->     __sk_nulls_add_node_rcu
->     <- (bpf triggers here)
->     sock_set_flag(SOCK_RCU_FREE)
-> 
-> Let's move the SOCK_RCU_FREE part up a bit, before we are inserting
-> the socket into hashtables. Note, that the race is really harmless;
-> the bpf callers are handling this situation (where listener socket
-> doesn't have SOCK_RCU_FREE set) correctly, so the only
-> annoyance is a WARN_ONCE.
-> 
-> More details from Eric regarding SOCK_RCU_FREE timeline:
-> 
-> Commit 3b24d854cb35 ("tcp/dccp: do not touch listener sk_refcnt under
-> synflood") added SOCK_RCU_FREE. At that time, the precise location of
-> sock_set_flag(sk, SOCK_RCU_FREE) did not matter, because the thread calling
-> __inet_hash() owns a reference on sk. SOCK_RCU_FREE was only tested
-> at dismantle time.
-> 
-> Commit 6acc9b432e67 ("bpf: Add helper to retrieve socket in BPF")
-> started checking SOCK_RCU_FREE _after_ the lookup to infer whether
-> the refcount has been taken care of.
-> 
-> Fixes: 6acc9b432e67 ("bpf: Add helper to retrieve socket in BPF")
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Signed-off-by: David S. Miller <davem@davemloft.net>
-> [Resolved conflict for 5.10 and below.]
-> Signed-off-by: Siddh Raman Pant <siddh.raman.pant@oracle.com>
-> ---
->  net/ipv4/inet_hashtables.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Hello,
 
-Now  queued up, thanks.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-greg k-h
+Reported-by: syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com
+Tested-by: syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com
+
+Tested on:
+
+commit:         43b77244 Merge tag 'wireless-next-2024-09-04' of git:/..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1582bfdb980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=996585887acdadb3
+dashboard link: https://syzkaller.appspot.com/bug?extid=8811381d455e3e9ec788
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=12d22d63980000
+
+Note: testing is done by a robot and is best-effort only.
 
