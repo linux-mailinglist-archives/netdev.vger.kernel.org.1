@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-125397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2B3D96CFF6
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:03:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E99796CFFC
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:03:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13FE61C21B28
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 07:03:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A24A91F243EE
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 07:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21071925BD;
-	Thu,  5 Sep 2024 07:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2985B192B63;
+	Thu,  5 Sep 2024 07:03:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zdtzjgg2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bg0jNrcj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F7291925B2;
-	Thu,  5 Sep 2024 07:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F271925B2;
+	Thu,  5 Sep 2024 07:03:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725519780; cv=none; b=tn3V6vPMbzP3K5VfT3+XTqMj5UO53YEwOKGTJc29j/lRJ4loEy7i9p9PMwOJ/jQdr4ImiWNDuxegHU9yA0Fdzdjaiu/WI0pdbOJw4EVYowusLgmGOC2SBe9AwkkvF+9xCijjERu4tgckfsCANrt4jD+JTg+DOsLhzrCj088r38k=
+	t=1725519786; cv=none; b=LUqKwLbmw3M2I4h3lIwkmvlNMH+xwxOkWnImo0UzizCMM2/PxpDg/Ce4IfNzQHEwdzf9UsYMOlpnSWG236RPTrTlSAMJ6lzh/+joSEzxErZaxrnF7ciqGKtKV6DrOlSoivAk8M5ngNOCl7jJEf4Majmg5SBoCbIEynQm2xnUeMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725519780; c=relaxed/simple;
-	bh=Xc98z3pf9jzk64noew6FjkFzwjrhgpzK9PUf6lhiia4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Xt1T/R+O2F3H9z0NKM34udWbWQHqCEkbjWNU4jT5ZuUz1KSW60uLzxxPayIKGoC/OmNE9xJ7dXRpFcfUAzAc9w2+3MeiLggqftZ1ivuJLkLAOJmqmPzPY7EgD2WD8GGc54AMRsYmIMjMCMdvhVzOZfTHel1gtwjrRxGQtBgUdY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zdtzjgg2; arc=none smtp.client-ip=209.85.161.50
+	s=arc-20240116; t=1725519786; c=relaxed/simple;
+	bh=1HH/WFd0hn0wm0fwMNWgRsVhbBlMe7re2dPWXwHPpGI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=p0zBJ/TEUAoBZlK61EKIKiy1diAF57nkCW6ER5h+HxGMczYo/kXHQbq9D4EMIKS8jBGuvBA7F8nvY+Xj4QVQGh7EWLk4siFXozimL5QqSa1+G9RbfVsnC726mvryYTF8VLQrEtk49zycjuM/6KCQ1jH6aXmgw8C7ZjLvceaghRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bg0jNrcj; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5e174925b7bso298835eaf.0;
-        Thu, 05 Sep 2024 00:02:59 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7179129a13cso131104b3a.3;
+        Thu, 05 Sep 2024 00:03:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725519778; x=1726124578; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gGPyaa+1WDEMchRcuy5C5zdpNT7E1IN97l7V6rYpwAQ=;
-        b=Zdtzjgg2B8cA8fC29sMy3JRWkJVrviRPuYw2N6QdVBKaHZM1PPtRNROT93L7SUuVJ3
-         wjKpuuyxntaiEiCxzYn4XJVqSF/iEpD24hgimJ/jrsoCZ3dLdFDzlyYftmK7/2h4LMYG
-         lcG+2ZVoPT/kMaRs82YSh/O01N0130In8BBhMoqC2xQLkQ2wsBQ+vRdA+LRrRqvdC1Bt
-         g0SXZyNKHwAFBGwzu3ozBBNka4hQhFc0WWoEceHJ2FQDG4reoobvSbinaDPH62Qs18l7
-         ADB8tPrF5F6GKHFR3lrWO50tTYydZFnEhWHeKq6Hud22cyZdyOyPC8saHdQj93Zqu6mZ
-         oqbA==
+        d=gmail.com; s=20230601; t=1725519784; x=1726124584; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ys+dAZUSX7qkSyHoVS9H9w5gJ/q9VoC1vU6YNN+XK4o=;
+        b=Bg0jNrcjQE57wpiT+mgTjwl8nkrpHNL8bLOIpwSmOJq4VX2ayCp2j6ZNMqwdY7U7Ls
+         7hznzw77nfpaFPSwQwHPZ9PGH69gWovrTyynzRQoesZkNhHCT9eUlaq5keopRm4SiDRc
+         oRjkf3KK5hlXCi/e+ZklUIUOnt6LfxSPCvVtBe0lOUbcCSWxfEnzpg/zp8t9CnB0N3G5
+         MvYd2zCaPuIhXPJ3HtRf9skEZ5sKQjhdafs8l/LsSkZCUW3raBluW0iwRurQeHJZZICQ
+         W/uNFFx5m9xIUcqpo3BqAlBGA5ixw46eUW0xe8s/T20em6iwJb55rhCNyRcC9lmBdg/h
+         +yaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725519778; x=1726124578;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gGPyaa+1WDEMchRcuy5C5zdpNT7E1IN97l7V6rYpwAQ=;
-        b=Gp4SNIqJNdargsDtRt3EDICmtF+WmS0LCOjyTjQvii4ZUgFQWyQ9lsJtt1XMdz6DjT
-         nV2jdaYJyfROARlHiZNwT9tWZbxfItYHHUak1f4G9QnAazIWMOr41PiQeSUyWyQ3E313
-         0yhv2B2NwRmVmFP+sXkZxsOZFGP+WR7TUemKf/98zSI1+SaIEswJgt88PvwQUhWLS61z
-         0EacP1t4i2BEh9FPhCsuKE2VQiBTW9QArA76cLXtCA+Bl5I3ccOr0g+xdrZivyvgY4HN
-         GzyCKO5Q8HkGLgKeHBAVRZBRgtgMCaBvjaQ8pC8rh6JRPPz5382AqyNheKDPBJVxTGPN
-         ZKxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUbA2OuQLRWV1fMqLgcaXQ3v/eKXgxec3jTQT1oLdhqt3aPyMYXiLo9vGCR77CvB7p/6J577rfjm/BZB1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKbhPZDFxu0pbBIp9oSXelZ4qcKrPnyqMedu9GF8GV5AgNpr4y
-	3AWiQ0G0ABhiun2zdUteuZ1yk/dcFNTq5oE86vl/ehx/oC/1jOQ3
-X-Google-Smtp-Source: AGHT+IFEQpZl3ZnRXG3Y8a3KH8gtlt/4cKxL4Zrb6w6RD/CEHqKTJ40bzqvmaOsEUf2ErIgac3XQsw==
-X-Received: by 2002:a05:6358:590f:b0:1b7:fc1f:5b95 with SMTP id e5c5f4694b2df-1b81240f229mr926884155d.14.1725519777913;
-        Thu, 05 Sep 2024 00:02:57 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725519784; x=1726124584;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ys+dAZUSX7qkSyHoVS9H9w5gJ/q9VoC1vU6YNN+XK4o=;
+        b=QUColX+JnTwt1mKcH7NVmu4F0tvca9fwl2JICzN4tT0wGPa3GOIdyoWFRGCn79qA9M
+         LROs8eThlDYSm4N6wJHxxaLeptRf6mLw/e0nM6y1nqqJjeXKe78ghFyW1OkQvL3XQjUj
+         a7wjXu2F+3elfF6g32H0/1s2D8xAoe00qKL4hLV5BRfdFcDoBgEtveyu5yvcTZd8RFHf
+         hA2SvRlg5ik2AOfAye3Qkpj3SjDymN+x09BI4TitpCXtpyGMtwiE6rTc5XhnBwfWhT8N
+         8sFtVEtSxdOGbEd+7YhvEvff651nteIbwuC2k1L6ljfa6x2vFY9RCroMFpwus4Wpj3EW
+         1QFg==
+X-Forwarded-Encrypted: i=1; AJvYcCVRhc6YgImTpWKDskue8/iNc9IJJspOgI7HTdycnx8jooeYd5t4i8Myllat/yoRYv9dg2D60xQoCemx5PA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzoj+8CLYjR68k1dh7OthY96FXv/GKEvtqDR/nA4iovoNa1GX7p
+	tst5Yylo+h1pgt010vnLbGRKIUgZG952aOF21vnMI8X5zWdgrD6j7H9S+g==
+X-Google-Smtp-Source: AGHT+IHrI1OXyJz7rVqElrEe2r77t1BIPRrpYxtkxfm9hUA7UUvviXQ4B/DpkweWoWu1vgUPvXWHsw==
+X-Received: by 2002:a05:6a00:3911:b0:710:4d3a:2d92 with SMTP id d2e1a72fcca58-715dfba7c6bmr25734139b3a.4.1725519783581;
+        Thu, 05 Sep 2024 00:03:03 -0700 (PDT)
 Received: from localhost.localdomain ([129.146.253.192])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-71778595107sm2604897b3a.150.2024.09.05.00.02.52
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-71778595107sm2604897b3a.150.2024.09.05.00.02.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 00:02:57 -0700 (PDT)
+        Thu, 05 Sep 2024 00:03:03 -0700 (PDT)
 From: Furong Xu <0x1207@gmail.com>
 To: Vladimir Oltean <olteanv@gmail.com>,
 	Alexander Lobakin <aleksander.lobakin@intel.com>,
@@ -85,10 +87,12 @@ Cc: netdev@vger.kernel.org,
 	linux@armlinux.org.uk,
 	xfr@outlook.com,
 	Furong Xu <0x1207@gmail.com>
-Subject: [PATCH net-next v8 0/7] net: stmmac: FPE via ethtool + tc
-Date: Thu,  5 Sep 2024 15:02:21 +0800
-Message-Id: <cover.1725518135.git.0x1207@gmail.com>
+Subject: [PATCH net-next v8 1/7] net: stmmac: move stmmac_fpe_cfg to stmmac_priv data
+Date: Thu,  5 Sep 2024 15:02:22 +0800
+Message-Id: <474ecb2da4b64ee6e0b52ffa65c856d7c0e2d357.1725518135.git.0x1207@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <cover.1725518135.git.0x1207@gmail.com>
+References: <cover.1725518135.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,77 +101,246 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move the Frame Preemption(FPE) over to the new standard API which uses
-ethtool-mm/tc-mqprio/tc-taprio.
+By moving the fpe_cfg field to the stmmac_priv data, stmmac_fpe_cfg
+becomes platform-data eventually, instead of a run-time config.
 
-Changes in v8:
-  1. use timer_delete_sync() instead of deprecated del_timer_sync()
-  2. check netif_running() to guarantee synchronization rules between
-  mod_timer() and timer_delete_sync()
-  3. split up stmmac_tc_ops of dwmac4, dwmac4+ and dwxgmac to give user
-  more descriptive error message
-  4. fix wrong indentation about switch-case
-  5. delete more unbalanced logs
+Suggested-by: Serge Semin <fancer.lancer@gmail.com>
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  2 ++
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  | 30 ++++++++++++++++++-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 20 ++++++-------
+ .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 16 ++--------
+ include/linux/stmmac.h                        | 28 -----------------
+ 5 files changed, 44 insertions(+), 52 deletions(-)
 
-Changes in v7:
-  1. code style fixes and clean up warnings reported by
-  patchwork netdev checks, no functional change intended
-
-Changes in v6:
-  1. new FPE verification process based on Vladimir Oltean's proposal
-  2. embed ethtool_mm_state into stmmac_fpe_cfg
-  3. convert some bit ops to u32_replace_bits
-  4. register name and function name update to be more descriptive
-  5. split up stmmac_tc_ops of dwmac4+ and dwxgmac, they have different
-  implementations about mqprio
-  6. some code style fixes
-
-Changes in v5:
-  1. fix typo in commit message
-  2. drop FPE capability check in tc-mqprio/tc-taprio
-
-Changes in v4:
-  1. reorder FPE-related declarations and definitions into clean groups
-  2. move mm_lock to stmmac_fpe_cfg.lock
-  3. protect user configurations across NIC up/down
-  4. block stmmac_set_mm() when fpe_task is in progress to finish
-  5. convert to ethtool_dev_mm_supported() to check FPE capability in
-  tc-mqprio/tc-taprio
-  6. silence FPE workqueue start/stop logs
-
-Changes in v3:
-  1. avoid races among ISR, workqueue, link update and
-  register configuration.
-  2. update FPE verification retry logic, so it retries
-  and fails as expected.
-
-Changes in v2:
-  1. refactor FPE verification process
-  2. suspend/resume and kselftest-ethtool_mm, all test cases passed
-  3. handle TC:TXQ remapping for DWMAC CORE4+
-
-Furong Xu (7):
-  net: stmmac: move stmmac_fpe_cfg to stmmac_priv data
-  net: stmmac: drop stmmac_fpe_handshake
-  net: stmmac: refactor FPE verification process
-  net: stmmac: configure FPE via ethtool-mm
-  net: stmmac: support fp parameter of tc-mqprio
-  net: stmmac: support fp parameter of tc-taprio
-  net: stmmac: silence FPE kernel logs
-
- .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  10 +-
- drivers/net/ethernet/stmicro/stmmac/dwmac5.c  |  96 +++++-
- drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  12 +-
- .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |   9 +-
- drivers/net/ethernet/stmicro/stmmac/hwif.c    |   6 +-
- drivers/net/ethernet/stmicro/stmmac/hwif.h    |  22 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  30 +-
- .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  91 ++++++
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 276 ++++++++----------
- .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 153 +++++++---
- include/linux/stmmac.h                        |  28 --
- 11 files changed, 491 insertions(+), 242 deletions(-)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+index 7e90f34b8c88..68574798c03f 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+@@ -28,6 +28,8 @@
+ struct stmmac_extra_stats;
+ struct stmmac_priv;
+ struct stmmac_safety_stats;
++struct stmmac_fpe_cfg;
++enum stmmac_mpacket_type;
+ struct dma_desc;
+ struct dma_extended_desc;
+ struct dma_edesc;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+index b23b920eedb1..458d6b16ce21 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+@@ -146,6 +146,33 @@ struct stmmac_channel {
+ 	u32 index;
+ };
+ 
++/* FPE link state */
++enum stmmac_fpe_state {
++	FPE_STATE_OFF = 0,
++	FPE_STATE_CAPABLE = 1,
++	FPE_STATE_ENTERING_ON = 2,
++	FPE_STATE_ON = 3,
++};
++
++/* FPE link-partner hand-shaking mPacket type */
++enum stmmac_mpacket_type {
++	MPACKET_VERIFY = 0,
++	MPACKET_RESPONSE = 1,
++};
++
++enum stmmac_fpe_task_state_t {
++	__FPE_REMOVING,
++	__FPE_TASK_SCHED,
++};
++
++struct stmmac_fpe_cfg {
++	bool enable;				/* FPE enable */
++	bool hs_enable;				/* FPE handshake enable */
++	enum stmmac_fpe_state lp_fpe_state;	/* Link Partner FPE state */
++	enum stmmac_fpe_state lo_fpe_state;	/* Local station FPE state */
++	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
++};
++
+ struct stmmac_tc_entry {
+ 	bool in_use;
+ 	bool in_hw;
+@@ -339,11 +366,12 @@ struct stmmac_priv {
+ 	struct workqueue_struct *wq;
+ 	struct work_struct service_task;
+ 
+-	/* Workqueue for handling FPE hand-shaking */
++	/* Frame Preemption feature (FPE) */
+ 	unsigned long fpe_task_state;
+ 	struct workqueue_struct *fpe_wq;
+ 	struct work_struct fpe_task;
+ 	char wq_name[IFNAMSIZ + 4];
++	struct stmmac_fpe_cfg fpe_cfg;
+ 
+ 	/* TC Handling */
+ 	unsigned int tc_entries_max;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index d9fca8d1227c..529fe31f8b04 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -968,7 +968,7 @@ static void stmmac_mac_config(struct phylink_config *config, unsigned int mode,
+ 
+ static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
+ {
+-	struct stmmac_fpe_cfg *fpe_cfg = priv->plat->fpe_cfg;
++	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+ 	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
+ 	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
+ 	bool *hs_enable = &fpe_cfg->hs_enable;
+@@ -3536,7 +3536,7 @@ static int stmmac_hw_setup(struct net_device *dev, bool ptp_register)
+ 	if (priv->dma_cap.fpesel) {
+ 		stmmac_fpe_start_wq(priv);
+ 
+-		if (priv->plat->fpe_cfg->enable)
++		if (priv->fpe_cfg.enable)
+ 			stmmac_fpe_handshake(priv, true);
+ 	}
+ 
+@@ -5982,7 +5982,7 @@ static int stmmac_set_features(struct net_device *netdev,
+ 
+ static void stmmac_fpe_event_status(struct stmmac_priv *priv, int status)
+ {
+-	struct stmmac_fpe_cfg *fpe_cfg = priv->plat->fpe_cfg;
++	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+ 	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
+ 	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
+ 	bool *hs_enable = &fpe_cfg->hs_enable;
+@@ -7381,7 +7381,7 @@ static void stmmac_fpe_lp_task(struct work_struct *work)
+ {
+ 	struct stmmac_priv *priv = container_of(work, struct stmmac_priv,
+ 						fpe_task);
+-	struct stmmac_fpe_cfg *fpe_cfg = priv->plat->fpe_cfg;
++	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+ 	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
+ 	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
+ 	bool *hs_enable = &fpe_cfg->hs_enable;
+@@ -7427,17 +7427,17 @@ static void stmmac_fpe_lp_task(struct work_struct *work)
+ 
+ void stmmac_fpe_handshake(struct stmmac_priv *priv, bool enable)
+ {
+-	if (priv->plat->fpe_cfg->hs_enable != enable) {
++	if (priv->fpe_cfg.hs_enable != enable) {
+ 		if (enable) {
+ 			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
+-						priv->plat->fpe_cfg,
++						&priv->fpe_cfg,
+ 						MPACKET_VERIFY);
+ 		} else {
+-			priv->plat->fpe_cfg->lo_fpe_state = FPE_STATE_OFF;
+-			priv->plat->fpe_cfg->lp_fpe_state = FPE_STATE_OFF;
++			priv->fpe_cfg.lo_fpe_state = FPE_STATE_OFF;
++			priv->fpe_cfg.lp_fpe_state = FPE_STATE_OFF;
+ 		}
+ 
+-		priv->plat->fpe_cfg->hs_enable = enable;
++		priv->fpe_cfg.hs_enable = enable;
+ 	}
+ }
+ 
+@@ -7898,7 +7898,7 @@ int stmmac_suspend(struct device *dev)
+ 	if (priv->dma_cap.fpesel) {
+ 		/* Disable FPE */
+ 		stmmac_fpe_configure(priv, priv->ioaddr,
+-				     priv->plat->fpe_cfg,
++				     &priv->fpe_cfg,
+ 				     priv->plat->tx_queues_to_use,
+ 				     priv->plat->rx_queues_to_use, false);
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+index 996f2bcd07a2..9cc41ed01882 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c
+@@ -282,16 +282,6 @@ static int tc_init(struct stmmac_priv *priv)
+ 	if (ret)
+ 		return -ENOMEM;
+ 
+-	if (!priv->plat->fpe_cfg) {
+-		priv->plat->fpe_cfg = devm_kzalloc(priv->device,
+-						   sizeof(*priv->plat->fpe_cfg),
+-						   GFP_KERNEL);
+-		if (!priv->plat->fpe_cfg)
+-			return -ENOMEM;
+-	} else {
+-		memset(priv->plat->fpe_cfg, 0, sizeof(*priv->plat->fpe_cfg));
+-	}
+-
+ 	/* Fail silently as we can still use remaining features, e.g. CBS */
+ 	if (!dma_cap->frpsel)
+ 		return 0;
+@@ -1076,7 +1066,7 @@ static int tc_taprio_configure(struct stmmac_priv *priv,
+ 	/* Actual FPE register configuration will be done after FPE handshake
+ 	 * is success.
+ 	 */
+-	priv->plat->fpe_cfg->enable = fpe;
++	priv->fpe_cfg.enable = fpe;
+ 
+ 	ret = stmmac_est_configure(priv, priv, priv->est,
+ 				   priv->plat->clk_ptp_rate);
+@@ -1109,9 +1099,9 @@ static int tc_taprio_configure(struct stmmac_priv *priv,
+ 		mutex_unlock(&priv->est_lock);
+ 	}
+ 
+-	priv->plat->fpe_cfg->enable = false;
++	priv->fpe_cfg.enable = false;
+ 	stmmac_fpe_configure(priv, priv->ioaddr,
+-			     priv->plat->fpe_cfg,
++			     &priv->fpe_cfg,
+ 			     priv->plat->tx_queues_to_use,
+ 			     priv->plat->rx_queues_to_use,
+ 			     false);
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 338991c08f00..d79ff252cfdc 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -138,33 +138,6 @@ struct stmmac_txq_cfg {
+ 	int tbs_en;
+ };
+ 
+-/* FPE link state */
+-enum stmmac_fpe_state {
+-	FPE_STATE_OFF = 0,
+-	FPE_STATE_CAPABLE = 1,
+-	FPE_STATE_ENTERING_ON = 2,
+-	FPE_STATE_ON = 3,
+-};
+-
+-/* FPE link-partner hand-shaking mPacket type */
+-enum stmmac_mpacket_type {
+-	MPACKET_VERIFY = 0,
+-	MPACKET_RESPONSE = 1,
+-};
+-
+-enum stmmac_fpe_task_state_t {
+-	__FPE_REMOVING,
+-	__FPE_TASK_SCHED,
+-};
+-
+-struct stmmac_fpe_cfg {
+-	bool enable;				/* FPE enable */
+-	bool hs_enable;				/* FPE handshake enable */
+-	enum stmmac_fpe_state lp_fpe_state;	/* Link Partner FPE state */
+-	enum stmmac_fpe_state lo_fpe_state;	/* Local station FPE state */
+-	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
+-};
+-
+ struct stmmac_safety_feature_cfg {
+ 	u32 tsoee;
+ 	u32 mrxpee;
+@@ -232,7 +205,6 @@ struct plat_stmmacenet_data {
+ 	struct fwnode_handle *port_node;
+ 	struct device_node *mdio_node;
+ 	struct stmmac_dma_cfg *dma_cfg;
+-	struct stmmac_fpe_cfg *fpe_cfg;
+ 	struct stmmac_safety_feature_cfg *safety_feat_cfg;
+ 	int clk_csr;
+ 	int has_gmac;
 -- 
 2.34.1
 
