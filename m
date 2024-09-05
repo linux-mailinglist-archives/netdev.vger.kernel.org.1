@@ -1,136 +1,166 @@
-Return-Path: <netdev+bounces-125337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F2696CC1A
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 03:13:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFC4896CC2D
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 03:23:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E8751C21E62
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:13:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BAAF1F27C3D
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 01:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45EE6FDC;
-	Thu,  5 Sep 2024 01:12:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9D82635;
+	Thu,  5 Sep 2024 01:22:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="O4u5z8cp"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gf7EziGq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E890E9450
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 01:12:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D789454;
+	Thu,  5 Sep 2024 01:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725498776; cv=none; b=PwajqML1zT/tvj/1ShTIhSN8kU+ZxTeHh3VNQY0rVwUqq97tMHoodCQG2jVKRgbZt/itURcwStTuCo/zW2bht2sE9CcYTl2DYwoAabuuTOXpXYBUTQOFbwsVo6F+m6C0XGhuRMQotH4OlCXwL2TuMimatmDYzrZ0D6/Og9xQsUQ=
+	t=1725499376; cv=none; b=MD8qbR7+eYGnq8w/yt1swWy3fMqLgYjwBo9IQHJpPHo7n4X0/Yg3E7+05PgKHAkJmUvawNXKed/QR2J0pIPrv5lo9PUsHT7c8kaTsA5d0JzQhwWxComTucJQ+AXsX+ajA2aaG5Nn/anP4DgbFiKGZLxk1UJXgahrvtiLvDYrNd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725498776; c=relaxed/simple;
-	bh=sV+F6zESFECPlMIee649MKaowV9eHpoCdJ0gSFQ/0Bg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=k9mSiJoRQ2BNlpukZrcBWtbSr6XyBp3MxZzYw/piurneDRVjryzn6K0/PH+7SQxJnaWPEbz/9M5oSPOvnnFbtlkUGEZs6GEzQyC9EQHXgQylLkRDFnBY4H8Dzn4/vpcB7LmRBQvKIcNoGoWtw77iAcHwVXDiDpJL1dJyIfgoZqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=O4u5z8cp; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 484N6Qp3026158;
-	Thu, 5 Sep 2024 01:12:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	DaFVzteQcTS91Pzq56hORp/0FM9sIlD3bDOCtoT/f7o=; b=O4u5z8cpHGSKejjg
-	nRjWtHAZVWDom9cnYuorz/bOWbf6/aJSawGbg0Ym1iO+TgduOBFXp5uU2S3BpS+r
-	Mc5gP61OPYjxR3rtY4Wfqt7q9EXGk5t7ZMgGvZffcu5WkpyX35xNho3sqAVdFCji
-	Ek4gzidDoh2FgavW3JVGH2gF6IEYbd9qvGHX9nNuYln8bIhPxC0rb7Jev2EoHyby
-	tkqAXqGm/41yLcqIrNcrKJACXoTJ0zzbAo6Zw2XiFYWd0GxGAq+Ph+lJl3i+vw4e
-	uHAA3N0qrhTROVdC9Nf8/pf2zCM1+3hnOTVuP2aSRGPWN8jcMZshqwOV+5bJ3e2v
-	iNftfw==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41bt674g60-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Sep 2024 01:12:27 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4851CPeb007961
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 5 Sep 2024 01:12:25 GMT
-Received: from [10.110.126.71] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 4 Sep 2024
- 18:12:22 -0700
-Message-ID: <c29ae5b4-fa2f-4dad-b32f-86838d846d35@quicinc.com>
-Date: Wed, 4 Sep 2024 18:12:21 -0700
+	s=arc-20240116; t=1725499376; c=relaxed/simple;
+	bh=NQpMLka8MwKSWw1GOTTQ0uK9ntX6J8Htva9sFQy9L8k=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l+MjZ8gVjYxbACoDjfB/CL13YC72b2BeNnRNJ8TYrUxafJZanmfNgdza6plL8hVNR9y2r4R66m3d9ZNhkAatRttjf0a7BgRfT2KlEDy6zk5oojIUb+9MasHDVbynlrMFDph7O/iVPPb8mVVfElitHslXlmZOtbXyQ7uBwIPgTj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gf7EziGq; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1725499376; x=1757035376;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=EN1q4vsB2/j/bA9nXRUAZOYbQ6gn7foJUcapYKoWOrQ=;
+  b=gf7EziGqNKpA5uE1oqORVnW3dpXAR0xYn0emQDgEVIPpasSX2x3VY2Ov
+   b9WDMwDdsWckntaNexo5YaWK1+qZJ7T4394q7w7GKTybVA28HJkjW308i
+   nAtrU6Zs2k0gMA/Pw4k1ziERU3IQ1Lga8HIPPl16rAQ3zG3vvXZM+Xo8R
+   s=;
+X-IronPort-AV: E=Sophos;i="6.10,203,1719878400"; 
+   d="scan'208";a="656869979"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 01:22:52 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:47493]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.5.128:2525] with esmtp (Farcaster)
+ id 93aac158-b1e6-4a49-be0a-9ba30dc02910; Thu, 5 Sep 2024 01:22:51 +0000 (UTC)
+X-Farcaster-Flow-ID: 93aac158-b1e6-4a49-be0a-9ba30dc02910
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 5 Sep 2024 01:22:50 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.60) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Thu, 5 Sep 2024 01:22:48 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde
+	<mkl@pengutronix.de>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <linux-can@vger.kernel.org>,
+	<syzbot+0532ac7a06fb1a03187e@syzkaller.appspotmail.com>
+Subject: [PATCH v1 can] can: bcm: Clear bo->bcm_proc_read after remove_proc_entry().
+Date: Wed, 4 Sep 2024 18:22:37 -0700
+Message-ID: <20240905012237.79683-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] net: stmmac: Programming sequence for VLAN
- packets with split header
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        Andrew Halaney <ahalaney@redhat.com>
-CC: <kernel@quicinc.com>
-References: <20240904235456.2663335-1-quic_abchauha@quicinc.com>
-Content-Language: en-US
-From: Sagar Cheluvegowda <quic_scheluve@quicinc.com>
-In-Reply-To: <20240904235456.2663335-1-quic_abchauha@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: lDecve-zp8ecw29PMTebNsli8RAxgHIk
-X-Proofpoint-GUID: lDecve-zp8ecw29PMTebNsli8RAxgHIk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-04_22,2024-09-04_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- bulkscore=0 mlxscore=0 impostorscore=0 suspectscore=0 phishscore=0
- mlxlogscore=999 lowpriorityscore=0 spamscore=0 clxscore=1011
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2409050007
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
+syzbot reported a warning in bcm_release(). [0]
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> index e0165358c4ac..dbd1be4e4a92 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> @@ -526,6 +526,17 @@ static void dwmac4_enable_sph(struct stmmac_priv *priv, void __iomem *ioaddr,
->  	value |= GMAC_CONFIG_HDSMS_256; /* Segment max 256 bytes */
->  	writel(value, ioaddr + GMAC_EXT_CONFIG);
->  
-> +	/* Additional configuration to handle VLAN tagged packets */
-> +	value = readl(ioaddr + GMAC_EXT_CFG1);
-> +	value &= ~GMAC_CONFIG1_SPLM;
-> +	/* Enable Split mode for header and payload at L2  */
-> +	value |= GMAC_CONFIG1_SPLM_L2OFST_EN << GMAC_CONFIG1_SPLM_SHIFT;
-> +	value &= ~GMAC_CONFIG1_SAVO;
-> +	/* Enables the MAC to distinguish between tagged vs untagged pkts */
-> +	value |= 4 << GMAC_CONFIG1_SAVO_SHIFT;
-I checked the data book internally and see SAVO bit is used to indicate the
-valueof the offset from the beginning of Length/Type field at which the header 
-should be split, i see the length/type field remains to be 2bytes even in case
-of tagged packets may be you need to keep the value of this field to 2bytes as
-it was before but one thing which i am still not able to understand is that even
-with the value of this field configured to 4 i don't see any packet corruption
-issue, something which needs to be checked with HW folks. 
-> +	value |= GMAC_CONFIG1_SAVE_EN;
-> +	writel(value, ioaddr + GMAC_EXT_CFG1);
-> +
->  	value = readl(ioaddr + DMA_CHAN_CONTROL(dwmac4_addrs, chan));
->  	if (en)
->  		value |= DMA_CONTROL_SPH;
+The blamed change fixed another warning that is triggered when
+connect() is issued again for a socket whose connect()ed device has
+been unregistered.
+
+However, if the socket is just close()d without the 2nd connect(), the
+remaining bo->bcm_proc_read triggers unnecessary remove_proc_entry()
+in bcm_release().
+
+Let's clear bo->bcm_proc_read after remove_proc_entry() in bcm_notify().
+
+[0]
+name '4986'
+WARNING: CPU: 0 PID: 5234 at fs/proc/generic.c:711 remove_proc_entry+0x2e7/0x5d0 fs/proc/generic.c:711
+Modules linked in:
+CPU: 0 UID: 0 PID: 5234 Comm: syz-executor606 Not tainted 6.11.0-rc5-syzkaller-00178-g5517ae241919 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+RIP: 0010:remove_proc_entry+0x2e7/0x5d0 fs/proc/generic.c:711
+Code: ff eb 05 e8 cb 1e 5e ff 48 8b 5c 24 10 48 c7 c7 e0 f7 aa 8e e8 2a 38 8e 09 90 48 c7 c7 60 3a 1b 8c 48 89 de e8 da 42 20 ff 90 <0f> 0b 90 90 48 8b 44 24 18 48 c7 44 24 40 0e 36 e0 45 49 c7 04 07
+RSP: 0018:ffffc9000345fa20 EFLAGS: 00010246
+RAX: 2a2d0aee2eb64600 RBX: ffff888032f1f548 RCX: ffff888029431e00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc9000345fb08 R08: ffffffff8155b2f2 R09: 1ffff1101710519a
+R10: dffffc0000000000 R11: ffffed101710519b R12: ffff888011d38640
+R13: 0000000000000004 R14: 0000000000000000 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8880b8800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fcfb52722f0 CR3: 000000000e734000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ bcm_release+0x250/0x880 net/can/bcm.c:1578
+ __sock_release net/socket.c:659 [inline]
+ sock_close+0xbc/0x240 net/socket.c:1421
+ __fput+0x24a/0x8a0 fs/file_table.c:422
+ task_work_run+0x24f/0x310 kernel/task_work.c:228
+ exit_task_work include/linux/task_work.h:40 [inline]
+ do_exit+0xa2f/0x27f0 kernel/exit.c:882
+ do_group_exit+0x207/0x2c0 kernel/exit.c:1031
+ __do_sys_exit_group kernel/exit.c:1042 [inline]
+ __se_sys_exit_group kernel/exit.c:1040 [inline]
+ __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1040
+ x64_sys_call+0x2634/0x2640 arch/x86/include/generated/asm/syscalls_64.h:232
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fcfb51ee969
+Code: Unable to access opcode bytes at 0x7fcfb51ee93f.
+RSP: 002b:00007ffce0109ca8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fcfb51ee969
+RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000001
+RBP: 00007fcfb526f3b0 R08: ffffffffffffffb8 R09: 0000555500000000
+R10: 0000555500000000 R11: 0000000000000246 R12: 00007fcfb526f3b0
+R13: 0000000000000000 R14: 00007fcfb5271ee0 R15: 00007fcfb51bf160
+ </TASK>
+
+Fixes: 76fe372ccb81 ("can: bcm: Remove proc entry when dev is unregistered.")
+Reported-by: syzbot+0532ac7a06fb1a03187e@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=0532ac7a06fb1a03187e
+Tested-by: syzbot+0532ac7a06fb1a03187e@syzkaller.appspotmail.com
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ net/can/bcm.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/can/bcm.c b/net/can/bcm.c
+index 46d3ec3aa44b..217049fa496e 100644
+--- a/net/can/bcm.c
++++ b/net/can/bcm.c
+@@ -1471,8 +1471,10 @@ static void bcm_notify(struct bcm_sock *bo, unsigned long msg,
+ 		/* remove device reference, if this is our bound device */
+ 		if (bo->bound && bo->ifindex == dev->ifindex) {
+ #if IS_ENABLED(CONFIG_PROC_FS)
+-			if (sock_net(sk)->can.bcmproc_dir && bo->bcm_proc_read)
++			if (sock_net(sk)->can.bcmproc_dir && bo->bcm_proc_read) {
+ 				remove_proc_entry(bo->procname, sock_net(sk)->can.bcmproc_dir);
++				bo->bcm_proc_read = NULL;
++			}
+ #endif
+ 			bo->bound   = 0;
+ 			bo->ifindex = 0;
+-- 
+2.30.2
+
 
