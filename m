@@ -1,124 +1,317 @@
-Return-Path: <netdev+bounces-125655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17C1696E1FA
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:28:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BA3796E201
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:30:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1A841F2710C
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:28:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2936C1F21DEF
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B9417C9AB;
-	Thu,  5 Sep 2024 18:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6196517C9AB;
+	Thu,  5 Sep 2024 18:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RGjxyBNW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ae83WSdk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFCD1803D;
-	Thu,  5 Sep 2024 18:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725560922; cv=none; b=jZDFKACzBp8feSe/tSzU+FipVPOGFFtRSUO36FbuKxYP2lJ2dyQbcYS1H3I1WvEmUdECLcGeS9BoIGcesCamqs6X9jOaFeNIE7bkIG+0gu8vmK2u2q+vZLPMzcbXyPIgygyc9IZm8QZACUHUk6gwEQOeehi15TyLG3u0pme3ONs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725560922; c=relaxed/simple;
-	bh=f7E3AztuRKMZ28p4LyFuIOxzMggsHH+GtAi8Hcdna/o=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=lD1PtZklZfqteyo4ZqOAKwxWWIfNngv+LK6qMYWoFRX6E0nOOu3/m0bsmtmmoK9+l7EaK/4uZ+SLypLiXcVUCd90NnY+BnW3VlCN9BBg39Ae+fZ8Ro/hqzM5x6m6KvD3DKsveLtwNrG7TmVO2EM25g5X1IgnBv9pZPQhPRVKmKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RGjxyBNW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6951FC4CEC3;
-	Thu,  5 Sep 2024 18:28:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725560920;
-	bh=f7E3AztuRKMZ28p4LyFuIOxzMggsHH+GtAi8Hcdna/o=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=RGjxyBNWFIjT0UV3k85KNMQ/C8AmP1eZPymbVkmmAeHO+w9izHOhUHUbt6IdZjUsX
-	 Em7OWJPKgEi0qYauywdcZE5zP1W+HBk0KVfG+kxWfzIu6fQ69oKZryVf0cMduv8MD5
-	 /vaAjz7ThafuSkdFPJ+J/c3RCXax/c9OdNPz1N9cDnMmwRYgy1Ni9y1zp85eJxNVGK
-	 ocORw5/Vj2GSKuXf3ChkJ4YzMCnezms/KgokuHTEV854SPtDaIwoxqPP28g9iEOwe5
-	 h95lzF9t/6XyA65YcxpSX5vVsnyMEHxigBsFVDOzcDkCVQ+226l9MzpcRkXUqtoF2T
-	 lYHR2RzLUVGiw==
-From: Kalle Valo <kvalo@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: "David S . Miller" <davem@davemloft.net>,  Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
- <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof Kozlowski
- <krzk+dt@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Jeff Johnson
- <jjohnson@kernel.org>,  linux-wireless@vger.kernel.org,
-  netdev@vger.kernel.org,  devicetree@vger.kernel.org,
-  ath11k@lists.infradead.org,  linux-kernel@vger.kernel.org,  Bartosz
- Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the
- inputs of the ath11k on WCN6855
-References: <20240814082301.8091-1-brgl@bgdev.pl> <87a5hcyite.fsf@kernel.org>
-	<CAMRc=Mcr7E0dxG09_gYPxg57gYAS4j2+-3x9GCS3wOcM46O=NQ@mail.gmail.com>
-	<87y146ayrm.fsf@kernel.org>
-	<CAMRc=Mfes+=59WP8dcMsiUApqjsFrY9iVFEdKU6FbTKAFP1k_A@mail.gmail.com>
-Date: Thu, 05 Sep 2024 21:28:35 +0300
-In-Reply-To: <CAMRc=Mfes+=59WP8dcMsiUApqjsFrY9iVFEdKU6FbTKAFP1k_A@mail.gmail.com>
-	(Bartosz Golaszewski's message of "Thu, 5 Sep 2024 20:19:34 +0200")
-Message-ID: <878qw6hs4s.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2481516C84B;
+	Thu,  5 Sep 2024 18:29:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725561000; cv=fail; b=SQhDHkRnDkLoq9DOBhAG1rZ4Av6wxvtRRsy89k3+nFhEY8ueRr0ARQ2GeNrRHc39SZXQ7svY8EdKOPQ4GhSE5IcWyke7NnzwANupuXJqF541mPOCWxk2I+IlxdrtLzda3wr6oxj4OyG+Jt8VCfTkLBue2eEOE1wShkgUEAO23Sg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725561000; c=relaxed/simple;
+	bh=bz+xf40vS8RhxF0J8BZZY7eNtfyPxhpxHICiZrjpYcw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=C6xZncz9STD33i8uaRIDpbfGrkey1SbtqghykIPzIIGq20gNlvjGH1DOmsmzmGRyL5MblcmKLPUVDlUY4sahJ2nDOLdqv6yJYsnsyLW/NA/UjNHo6CevFKqTNM1nN5ALmOfgJBTdcNDxnbqhF9IBKJAxWzYz1IFJAaYaitCfIfc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ae83WSdk; arc=fail smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725560999; x=1757096999;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bz+xf40vS8RhxF0J8BZZY7eNtfyPxhpxHICiZrjpYcw=;
+  b=Ae83WSdk8owG4MS2UmMdIFu9fLC62qZXtLCnwukQmuk+30me5gpa3mNK
+   gXWqu8Ed0JCIVRnt5FuHGYlwsXIeifeIOOJc5j87IvotGP+rEiYZC2m35
+   Ux0Awc6bgnwCaP8N0QgJNxVBzlVAXqxaWvNO7bUCW+HYp1nmoxg11ESeC
+   SMlWIXdH1fFAAA9RMwBPLL2kaQWAEhNdBxEHwnM/ryBmemL8rZ9KFv28t
+   SNXg2fHQws2R7LT84GY8g7LCeR9NdpBUT7i0+3o/EYnO+4w3qtKnjb+X5
+   pY/bFOSfPnIYX5fByE2YAHcrAXPOb4APv2czmkrVz7nut5h12pcvjrVXO
+   w==;
+X-CSE-ConnectionGUID: O8NSFv6MRCCuf+b9v7yCyg==
+X-CSE-MsgGUID: laRnAgrkQm2srWL0AKx3xw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11186"; a="41780306"
+X-IronPort-AV: E=Sophos;i="6.10,205,1719903600"; 
+   d="scan'208";a="41780306"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 11:29:58 -0700
+X-CSE-ConnectionGUID: 9gcrGgTkRIa+R9Csi+kfQQ==
+X-CSE-MsgGUID: /q1JclHzRB6K5kHyRECrlw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,205,1719903600"; 
+   d="scan'208";a="65362097"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Sep 2024 11:29:57 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 5 Sep 2024 11:29:56 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 5 Sep 2024 11:29:56 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.176)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 5 Sep 2024 11:29:56 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=wkEpkS0b1iAPmNWh3Q8M44/n9JmOVrPTTCgTAZngKIddW9i8sp8NKXPRAouVHNWmRewSKPwW62RFQIRmXUy6OIyXAEn9FaQXd4udZKiCcVCgF5PgZkKogKyw1zS36qP0bgLdyGV68XgxKkKCk6o9fPSiVOhrPotgsMQ5qRveqmxyybEqxN6wlERIL4AWXWxq5euoxhZPjtESD0ULCiwjSIHlRi/ox3HbquIiCOo5jJbtAL9p2ri/V2h1U3hGOZm2V0HjoAAwaJpXGoaf6AQgoqerVMdPOE8PiDWNs+s4P8/x8AOBlQOPXNLN1T8MdTk5DWCk9zi0zMhGLB7UUnIgvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kLDMXNMMmdoaPVnO4WPC24zhrvO+HhVn8vwqpdhcQFo=;
+ b=HnmDeNLotpOfdCcKma/qLxopSIE+nLTPjxN4iLYXdUydeT9F6+mNLfT/A371NN5pz8tYfrNWoy5FIphrO6o+IWbQK724l15s/UjYQm7N8hegjHEgc0BthEAy1VhZrgZYkw+yo4pKfpiYY1RFzSILyZeeg7B+odqgT5kHvIKZw7eR7AkulMw65HV77qmmdq9vaPpkxGKArtIqcXZsvxpCYbmD8RDEP9Osz+komf6/GxNO1kX7504cYdKfoTNvDcpAOtJ+k3eN35jgIYEbfZu7CZ0/5AMZcj8KBbUONfyOF3r+TFAWUB35SjTOcxczGUj857d+ratfO6XjBoV22DlLbw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA1PR11MB6194.namprd11.prod.outlook.com (2603:10b6:208:3ea::22)
+ by SJ0PR11MB5184.namprd11.prod.outlook.com (2603:10b6:a03:2d5::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.25; Thu, 5 Sep
+ 2024 18:29:48 +0000
+Received: from IA1PR11MB6194.namprd11.prod.outlook.com
+ ([fe80::4fd6:580b:40b9:bd73]) by IA1PR11MB6194.namprd11.prod.outlook.com
+ ([fe80::4fd6:580b:40b9:bd73%7]) with mapi id 15.20.7918.020; Thu, 5 Sep 2024
+ 18:29:48 +0000
+From: "Ertman, David M" <david.m.ertman@intel.com>
+To: mschmidt <mschmidt@redhat.com>, "Drewek, Wojciech"
+	<wojciech.drewek@intel.com>, "Szycik, Marcin" <marcin.szycik@intel.com>,
+	"Miskell, Timothy" <timothy.miskell@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Daniel Machon <daniel.machon@microchip.com>
+CC: poros <poros@redhat.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH iwl-net v2] ice: fix VSI lists confusion when adding VLANs
+Thread-Topic: [PATCH iwl-net v2] ice: fix VSI lists confusion when adding
+ VLANs
+Thread-Index: AQHa/q5wn6mOZl0FEU+lVuy65eBJurJJhSbw
+Date: Thu, 5 Sep 2024 18:29:47 +0000
+Message-ID: <IA1PR11MB6194461AB832D0F17B044AA2DD9D2@IA1PR11MB6194.namprd11.prod.outlook.com>
+References: <20240904093924.24368-1-mschmidt@redhat.com>
+In-Reply-To: <20240904093924.24368-1-mschmidt@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA1PR11MB6194:EE_|SJ0PR11MB5184:EE_
+x-ms-office365-filtering-correlation-id: 991c9228-0056-4461-8ecc-08dccdd8b900
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018|921020;
+x-microsoft-antispam-message-info: =?us-ascii?Q?gXAYqbQxQpDo4p9JnL7EaLX9/aITqamOM1RcZWwDqN8t1mc7FKdi9NPx8qTP?=
+ =?us-ascii?Q?5zNUUjJHxCUkTS6689y+LVW22kzDY8nFIE9GZqdcukbE1Coq7kJTQmvwELsm?=
+ =?us-ascii?Q?+v7PdrvUSXC5J41/upnbBTppKgk5wkyUI5OsGvqfg9m8rCyjXLt/a09JCmgP?=
+ =?us-ascii?Q?8iCtJeKcPMQ25AYWGcb7SQmqoVs0UXKIt9lpcnQt43xaTKUTOp/EJdyKSQ9h?=
+ =?us-ascii?Q?EJ5sR+jk4e6e7E4K+RsU6vVHnfm5tiTikCmCcYxXuJMF+6+pTJJ+ObAb/C+X?=
+ =?us-ascii?Q?Ei+ZLTs35TFstv/pCOCBwHpYqGQuQ0pn97wi3Nb9UdyFha+23n3MTKG5Q9q4?=
+ =?us-ascii?Q?+Ow+q5tSHpKpNji8+937I760EFUUENtzFOIDmNcPwmDEmsE887i2Um8VPtvB?=
+ =?us-ascii?Q?izgbY4XrsXfgrurIaJbbDfkHyaWNtHXbnIKcL4qPBOfCIIKm7RpJdUFEhEln?=
+ =?us-ascii?Q?5QnLxeJNq1dwFyuU0W9PKUBdARNthfHmqwpKh6FJ5vCr6qrPH+czAC5cZqRr?=
+ =?us-ascii?Q?kJutLlo9E/u9qDgZ3ZSOtexgBHdtOUsNINFwkEzOPREjRm9sIJrpSBvU8AGh?=
+ =?us-ascii?Q?BVQrqSzPaZ+1vj/Fap0jr8srw1uz80FGlt5bJLryKYSa0VV0khoe68h+jBaS?=
+ =?us-ascii?Q?TZmlga2Vz8hulPZq1P/KkArzsIGMuGBUQ+CtIOSTq2uuxlchSB9BsmjTzTwE?=
+ =?us-ascii?Q?na92rOAJNtjb5M2JUnZ510Ska6qNu3iexk8udsRk3NV6/xkx+sQzLSqc7F3i?=
+ =?us-ascii?Q?cpnNTlDcpard/23NaCcIa5M7AufHnaKWrVkJT19V+Y3jqDsNgYbeNAWj26yr?=
+ =?us-ascii?Q?GpDjVRs1z/IZNQ3RUuTeqmK781yOU6wgzIb9UrmEIqTua+JrFY2E7SYpnrem?=
+ =?us-ascii?Q?VKjvQQSqd862ZESgEYlw8aPxQGfQXrG6bt+eVzUBIY6cvYq/VRQ8G3WmHOym?=
+ =?us-ascii?Q?7hHkEYsInO4UvP5P8bYPKwjhPH2aZFDdn9OUvNQaUwKc1fL1kZoBOA1quDUi?=
+ =?us-ascii?Q?Qs8W5EufXQvwBAbKpBbrZ+D6J/uzcddT1ORzwCNyD6iaIXPSVsrbBfHf7fZh?=
+ =?us-ascii?Q?/wtVbeJ5Unk0AwTdcTcxq1FgLAVqcaoEggnfTbReBluhYa3Ocd3591rsnieQ?=
+ =?us-ascii?Q?ADNNc/CAa4co85irHpK15e8O11j4qqQjG1Yg0uqSE/W8YlwGcDJjbynAxObk?=
+ =?us-ascii?Q?+9tpSG0xvHaCUVt4ioY1YoCvptwwbSlkjcBQVWH5D6q6tts+swW3QzFDSAiX?=
+ =?us-ascii?Q?38O9+gNnnZ0yNdLHW6Kj01l3xWdhSGgJFAxoDEK+AMJdvUwUxgJxx1y0OR77?=
+ =?us-ascii?Q?LnMmcCiDKRtSNR804aMyMPBjmaU7eaY9mI4fIY38gy+aIZoMaTW7nlp8AtbL?=
+ =?us-ascii?Q?wWo3NRMGqADBXajIYFcf5Is0SSnWnjM8wizj2KZLS5o8huvWIeJ7V/Vj0gat?=
+ =?us-ascii?Q?pz8vcvuy3aYBrJyzWqk9PRkZuAXfhQyj?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6194.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?flEGVxdqfW3NtwQV7fJG1LZ8dUS1ua2copCGomijShHNyfe6Yv2C8BTaPc0q?=
+ =?us-ascii?Q?UoD39zEFRxfsiJ0yZFKWYuVXSRohnFQ0dr28K0vs3jMekkbl+qbIjXzz3kO9?=
+ =?us-ascii?Q?Htm4dZ4HdmOS8TVU4dUngT8av5FphMTiLcYw6cGfdwyog/d2IYPocsbNRm7N?=
+ =?us-ascii?Q?Y/JSlTPg3T5PK2NVfGyE5puoH8O0tIr901I4RJn0erAUU6AKzO5oaXYWwb7s?=
+ =?us-ascii?Q?CnHA5jy8jwusImdobFtzGo8RS/1b7pH40sYXB5vBdmYgBPB+la1wiNiFPYhT?=
+ =?us-ascii?Q?VUVE7fbTRbAJpI+l1PzdCHSLAADdLkbuDHOfYEdq/uzkqbNIVe+nNy172lPN?=
+ =?us-ascii?Q?a/Ys9nJRfMsCeYI/xw7YzsDAmeX5xM2FWH6Cx0QSCXZfPcjWFtl3VRNLCLnT?=
+ =?us-ascii?Q?mfxkP0r1PKrljxiCRA5dUz08F7Y7qLJ/o9GQYlRHxvmXjZoHIfJJs25ms+xY?=
+ =?us-ascii?Q?CNvzCbrIxRH7VpWDEdFkASfKVXpgtAh2rVBg1amB4TfAYUJoSTFBFgeDqMOw?=
+ =?us-ascii?Q?1tliQnNge5YVXuLyClMwDx4rd4ZmSI1/2IEB4hSf1n+NJ8U2Wrd5fbewIguv?=
+ =?us-ascii?Q?t1pWSuu4a2io0UAfihhbIU7lVPSHeUnkKGBYhMQZfLfk8oyclQd6sPPkgLj3?=
+ =?us-ascii?Q?2MnePS9/mglttziKQfzlS7vuAOGhbfaWs9b2zP1vDPK6pnPU84JfdFEApD90?=
+ =?us-ascii?Q?1K6Ny/sMQk4B9d5B2OwvL71QLmdVhl+GDfkHHmUWrMIleMQWpr26ZAdQNPxh?=
+ =?us-ascii?Q?TEAtysgfEbK0ZaMSoy/jtCXkbxczKLVLZIS8uzgpVD6Ra7J9rrEbez1c+ydr?=
+ =?us-ascii?Q?uxQcRqfJT2lPDUdqQDC5Vj90pEgm3uEDMUZktlUGbf5ZpfC+fTH+mjRYPOtO?=
+ =?us-ascii?Q?9pJ0RQ1JDTyWMgwieX8AIrqYfFXwT2jjQJ/6SNayZtOF2Gdy/C0ABSaVdYRO?=
+ =?us-ascii?Q?HQ/1jZa/+XjGua+lGCyvHHghi7+gqagpOfYhcI2TxqkwID5OdZI6V2GcbGK6?=
+ =?us-ascii?Q?jpF7Ah3pCkXqTx4XBLIavBMnsPldX8bOtZFWIj9x7GWObR0q1E7ZozV9nqKW?=
+ =?us-ascii?Q?Omk6L2HNsCD6jAadgTF9AfVOo7kIyBpZf1hI8CD8UGNZDg8Z0mn3k3AQV1y9?=
+ =?us-ascii?Q?RHo0tal8HLuivsjwKAPRegOaf19ctpP6yxul5nQjCLec1yHeLv1lds9/bUta?=
+ =?us-ascii?Q?ov5MOCNiuGmUIU/wQWpTQ/rhTY5uH8SDDx+ZgPu/Uh/FxmHmK1ry2CnjgM/Z?=
+ =?us-ascii?Q?keOKENXGuVDXWdclUYSOqlGm8PaYY49VimwoZsnqSKWrqSEcBi8uVaItiOzU?=
+ =?us-ascii?Q?yhP9mi7OrtMZ2ZcPQUNboFk71ebT4QS3VOJJVBwwE/bPVtsoeJpEXrmhpS13?=
+ =?us-ascii?Q?gfEXy+e2CG0yDOMu7bCg/dopc5gaptyCbu2fqUupMkUUIOYbb3HoT3nmSE0U?=
+ =?us-ascii?Q?eQzctnhJwsGrqivURf62HFVah9znEy2zQ+IwVrJAsfc/L8k3OsndYjK4ctnM?=
+ =?us-ascii?Q?UfMFOiCzAAU3SXQ9ZGLqXx7k8Qby55k41dyfaR2drA3bKnPUdc/G7GCoUUPA?=
+ =?us-ascii?Q?+RWDoZk78Kd+tU0gjeXdnOD09U3eH8GLy+hn1MUW?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6194.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 991c9228-0056-4461-8ecc-08dccdd8b900
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Sep 2024 18:29:47.9633
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 5O3MH+sYdj8c+IxJn7Zpq/7RLYWMWQjx3GgP7B37ezEs5v8B0edMSP8uIwOXqsUauHYYyApda9hh6iKYCGhlihH/whmehmnC+T47ULMRmZU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5184
+X-OriginatorOrg: intel.com
 
-Bartosz Golaszewski <brgl@bgdev.pl> writes:
+> -----Original Message-----
+> From: Michal Schmidt <mschmidt@redhat.com>
+> Sent: Wednesday, September 4, 2024 2:39 AM
+> To: Drewek, Wojciech <wojciech.drewek@intel.com>; Szycik, Marcin
+> <marcin.szycik@intel.com>; Miskell, Timothy <timothy.miskell@intel.com>;
+> Nguyen, Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; David S. Miller <davem@davemloft.net>; Er=
+ic
+> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
+> Abeni <pabeni@redhat.com>; Ertman, David M <david.m.ertman@intel.com>;
+> Daniel Machon <daniel.machon@microchip.com>
+> Cc: poros <poros@redhat.com>; Michal Swiatkowski
+> <michal.swiatkowski@linux.intel.com>; intel-wired-lan@lists.osuosl.org;
+> netdev@vger.kernel.org; linux-kernel@vger.kernel.org
+> Subject: [PATCH iwl-net v2] ice: fix VSI lists confusion when adding VLAN=
+s
+>=20
+> The description of function ice_find_vsi_list_entry says:
+>   Search VSI list map with VSI count 1
+>=20
+> However, since the blamed commit (see Fixes below), the function no
+> longer checks vsi_count. This causes a problem in ice_add_vlan_internal,
+> where the decision to share VSI lists between filter rules relies on the
+> vsi_count of the found existing VSI list being 1.
+>=20
+> The reproducing steps:
+> 1. Have a PF and two VFs.
+>    There will be a filter rule for VLAN 0, referring to a VSI list
+>    containing VSIs: 0 (PF), 2 (VF#0), 3 (VF#1).
+> 2. Add VLAN 1234 to VF#0.
+>    ice will make the wrong decision to share the VSI list with the new
+>    rule. The wrong behavior may not be immediately apparent, but it can
+>    be observed with debug prints.
+> 3. Add VLAN 1234 to VF#1.
+>    ice will unshare the VSI list for the VLAN 1234 rule. Due to the
+>    earlier bad decision, the newly created VSI list will contain
+>    VSIs 0 (PF) and 3 (VF#1), instead of expected 2 (VF#0) and 3 (VF#1).
+> 4. Try pinging a network peer over the VLAN interface on VF#0.
+>    This fails.
+>=20
+> Reproducer script at:
+> https://gitlab.com/mschmidt2/repro/-/blob/master/RHEL-46814/test-vlan-vsi=
+-
+> list-confusion.sh
+> Commented debug trace:
+> https://gitlab.com/mschmidt2/repro/-/blob/master/RHEL-46814/ice-vlan-vsi-
+> lists-debug.txt
+> Patch adding the debug prints:
+> https://gitlab.com/mschmidt2/linux/-
+> /commit/f8a8814623944a45091a77c6094c40bfe726bfdb
+> (Unsafe, by the way. Lacks rule_lock when dumping in ice_remove_vlan.)
+>=20
+> Michal Swiatkowski added to the explanation that the bug is caused by
+> reusing a VSI list created for VLAN 0. All created VFs' VSIs are added
+> to VLAN 0 filter. When a non-zero VLAN is created on a VF which is alread=
+y
+> in VLAN 0 (normal case), the VSI list from VLAN 0 is reused.
+> It leads to a problem because all VFs (VSIs to be specific) that are
+> subscribed to VLAN 0 will now receive a new VLAN tag traffic. This is
+> one bug, another is the bug described above. Removing filters from
+> one VF will remove VLAN filter from the previous VF. It happens a VF is
+> reset. Example:
+> - creation of 3 VFs
+> - we have VSI list (used for VLAN 0) [0 (pf), 2 (vf1), 3 (vf2), 4 (vf3)]
+> - we are adding VLAN 100 on VF1, we are reusing the previous list
+>   because 2 is there
+> - VLAN traffic works fine, but VLAN 100 tagged traffic can be received
+>   on all VSIs from the list (for example broadcast or unicast)
+> - trust is turning on on VF2, VF2 is resetting, all filters from VF2 are
+>   removed; the VLAN 100 filter is also removed because 3 is on the list
+> - VLAN traffic to VF1 isn't working anymore, there is a need to recreate
+>   VLAN interface to readd VLAN filter
+>=20
+> One thing I'm not certain about is the implications for the LAG feature,
+> which is another caller of ice_find_vsi_list_entry. I don't have a
+> LAG-capable card at hand to test.
+>=20
+> Fixes: 23ccae5ce15f ("ice: changes to the interface with the HW and FW fo=
+r
+> SRIOV_VF+LAG")
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Michal Schmidt <mschmidt@redhat.com>
+> ---
+> v2: Corrected the Fixes commit ID (the ID in v1 was of a centos-stream-9
+>     backport accidentally).
+>     Added the extended explanation from Michal Swiatkowski.
+>     Fixed some typos.
+> ---
+>  drivers/net/ethernet/intel/ice/ice_switch.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c
+> b/drivers/net/ethernet/intel/ice/ice_switch.c
+> index fe8847184cb1..4e6e7af962bd 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_switch.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+> @@ -3264,7 +3264,7 @@ ice_find_vsi_list_entry(struct ice_hw *hw, u8
+> recp_id, u16 vsi_handle,
+>=20
+>  	list_head =3D &sw->recp_list[recp_id].filt_rules;
+>  	list_for_each_entry(list_itr, list_head, list_entry) {
+> -		if (list_itr->vsi_list_info) {
+> +		if (list_itr->vsi_count =3D=3D 1 && list_itr->vsi_list_info) {
+>  			map_info =3D list_itr->vsi_list_info;
+>  			if (test_bit(vsi_handle, map_info->vsi_map)) {
+>  				*vsi_list_id =3D map_info->vsi_list_id;
+> --
+> 2.45.2
 
-> On Thu, Sep 5, 2024 at 5:47=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrot=
-e:
->>
->> Bartosz Golaszewski <brgl@bgdev.pl> writes:
->>
->> >> > +  - if:
->> >> > +      properties:
->> >> > +        compatible:
->> >> > +          contains:
->> >> > +            const: pci17cb,1103
->> >> > +    then:
->> >> > +      required:
->> >> > +        - vddrfacmn-supply
->> >> > +        - vddaon-supply
->> >> > +        - vddwlcx-supply
->> >> > +        - vddwlmx-supply
->> >> > +        - vddrfa0p8-supply
->> >> > +        - vddrfa1p2-supply
->> >> > +        - vddrfa1p8-supply
->> >> > +        - vddpcie0p9-supply
->> >> > +        - vddpcie1p8-supply
->> >>
->> >> Like we discussed before, shouldn't these supplies be optional as not
->> >> all modules need them?
->> >>
->> >
->> > The answer is still the same: the ATH11K inside a WCN6855 does - in
->> > fact - always need them. The fact that the X13s doesn't define them is
->> > bad representation of HW and I'm fixing it in a subsequent DTS patch.
->>
->> But, like we discussed earlier, M.2 boards don't need these so I think
->> this should be optional.
->>
->
-> If they are truly dynamic, plug-and-play M.2 boards then they
-> shouldn't need any description in device-tree. If they are M.2 sockets
-> that use custom, vendor-specific pins (like what is the case on
-> sc8280xp-crd and X13s) then the HW they carry needs to be described
-> correctly. We've discussed that before.
+I did a couple of quick tests, and it does not look like this patch interfe=
+res
+with the creation/cleanup of prune lists for the LAG feature.  So, I don't
+see a problem with this patch.  Thanks for catching this!
 
-Sigh. Please reread the previous discussion. In some cases we need to
-set qcom,ath11k-calibration-variant even for M.2 boards.
+DaveE
 
---=20
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatc=
-hes
+Reviewed-by: Dave Ertman <David.m.ertman@intel.com>
 
