@@ -1,126 +1,138 @@
-Return-Path: <netdev+bounces-125595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13A9596DCF5
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 17:00:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EA2D96DD08
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 17:02:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B33371F22ABD
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:00:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BDAFEB21803
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9921A08C5;
-	Thu,  5 Sep 2024 14:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49AE919DFB9;
+	Thu,  5 Sep 2024 14:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DyumjQiv"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bd8QLJc/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAD22F870;
-	Thu,  5 Sep 2024 14:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71074199EA1
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 14:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725548288; cv=none; b=m5OrBDIg332yGTWUtchilV7utl4laIdK/crPpspwSSG0ns1wkuu6Rdwo0tI4veY3bubDcsVOKzBKGwZgqAWT+d9UHjmYTA3shNPEu5IJ6eQvNpeVjIg1JWVJuZRX8tmZyeNnjFpFfcAruY3hSSmWOM3Xr8RVZcgNaQAAhHqsl84=
+	t=1725548322; cv=none; b=CMWiEXLSBwP7hZd0X8OiL+v+CAjjsYpWkl/VmS9Fp6aHxVxc74O0eT6Idneul8vCPsSFA0Tj5t0pcmB/asjPiMa+uR9nuV7JLHUMcfeY/L61+uUce52OsNPe9sQ3HnVUQ77saYjZALH0StQvCJdu8UIh/piSCMHEv+ePXCl2ppQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725548288; c=relaxed/simple;
-	bh=rdT4Nyna1y3UBgynAi/IlvVt+86j0FskLnanS5y+vd0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nFJkIjoXfUaHkS+B2EP3weBvY/5AzuIX+qgUVGz5iWcG5F6mMDBXWsVR3aUgENXO69B7Lgt1SHGJ3++Jgwaa89Ohdhk3tHLakUoe+3rQIG4tzJXI66W5WaSu1WhXixSr11uNwLVyNtnD/9N71gOEkKLKNh2vxMzK7SdvYnFhvk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DyumjQiv; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a8629ddffbaso6728366b.1;
-        Thu, 05 Sep 2024 07:58:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725548285; x=1726153085; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xylf9X58PdeAvnejc6uMarphR5HQ4AIAHZcsnVNJFQk=;
-        b=DyumjQivsQKQrj7ZwIySzzI3td6K3ZyFTi8c0IKAtfjAPK8eN7pAHmRTAeVYqP565n
-         rHqj3NCBOtFCYart5qJu4VAcCClHlZrATMXkvAcXVAxJKUGzURJwJspVjf0LKLv2Q2ME
-         lUq/KJES/vCVAnLYCMF5LxMfzTr9Jg07Soer4oyLZp9geRayi9axQjs2/nPLhOh7Msdd
-         ILJDymADzXpke7/QSDJ5pkZYkyEHakG6i5Cr/OOqi57IWN18WeqLKT1x+6pFeUXi5YeB
-         y52OLl35vcs4lqrbz5sM9nIAFhil+YvV0rCOXLRwQWOJMljW1OODtDSG2D1DdQ0HRI4Z
-         K5Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725548285; x=1726153085;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xylf9X58PdeAvnejc6uMarphR5HQ4AIAHZcsnVNJFQk=;
-        b=ocgfWPSGeBzI356RxGvDwLFp3OepDNSZL3+qHC1Bo6OmYIhjOV3tGf57aZxC+bXbqd
-         urnzMeqF7adneu02W/t4/P8Sh3pQyDlqPVh+2QyH+Ta0YaHtZuMKA1r8q61t8hPG0OKM
-         4JxibhfbCGDj60FYs7GbUUK/oOJq0sXZ/hgBfFLxMttxxks58w/CbYs1GO5RRoNlrDez
-         cr+DZEbE5wInXLXUpWtXcFUMglXYJq2hyS3Q5LHej3vpBMg/D/Ku+EdXzH5kDjgZrBVF
-         Lc/CJM2ieSKbHM8RcN+6cCeQ5EbRTYLNJuc13fXoV06E1r8/emrUGcrIu6C7bC32AKe0
-         5SzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVPgXspgcEAp1GpCY/tdVQ63V/a2KpHCP1h5pt/drsZMyspQAB2sNMY8EPSFZp8x5+JfSEN8pQw@vger.kernel.org, AJvYcCXjKUR6M/fXIiklm9MzYp8NkyAA6IaUDoaalwh/7jJYnqm31sYXDcsereccIjbwqgB2PD9TWAD+gXHfxCU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygOncWrnPoDWClhXqrwqZDTBMaafM0Y5SZ0CA0M5dYShzoXcmb
-	WhrWxmxv10RoAvAjXC7qFI1dvFImtpRnaUwoPPHdLxkRcbhwbUed
-X-Google-Smtp-Source: AGHT+IFWgUHQjpPyF03ycuCrazcYNTIjo4bK7NC3jvKTTABsJhGvL/b4OqvEVAPSV5x1wPS7VF4ZTg==
-X-Received: by 2002:a17:907:c21:b0:a7a:9d1e:3b28 with SMTP id a640c23a62f3a-a89a377d761mr914720066b.5.1725548285025;
-        Thu, 05 Sep 2024 07:58:05 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8a623a464csm145762466b.150.2024.09.05.07.58.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 07:58:04 -0700 (PDT)
-Date: Thu, 5 Sep 2024 17:58:01 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	rmk+kernel@armlinux.org.uk, linux@armlinux.org.uk, xfr@outlook.com,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v8 3/7] net: stmmac: refactor FPE verification
- process
-Message-ID: <20240905145801.hyhjalu3bjfh5gs5@skbuf>
-References: <cover.1725518135.git.0x1207@gmail.com>
- <0b72fd0463b662796fd3eaa996211f1a5d0a4341.1725518135.git.0x1207@gmail.com>
+	s=arc-20240116; t=1725548322; c=relaxed/simple;
+	bh=jpuPs/3VAq9m4kg/QjVQnwwV7wxSnZXVCl3Y5NtoJ7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=isWiI+3T2bVQ8Cl6ZhbYNuM1NVLBl33mI/0FSzp2zWvtjmjAxy1wLxJM9WkoHUTR+6RlrBCauUQNJ6UML2yKnJ/nvSNm64MyAdSJaIa3PhNLukbUtCP+ZIjUApzcfsPlCVNiX7Ofo/bRNPui7UorYOpZLdok0uhrfW03yzXu0+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bd8QLJc/; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3e4add99-6b57-4fe1-9ee1-519c80cf7cf5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725548316;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/fi4RLUHYvTUskh8oYrBV6EbBwLBbgSFmQd7LYsGkcA=;
+	b=bd8QLJc/V3MA2iYRGotQIOeLbCjyqBLgvYlOCICyeKsLFuyYEgtyUFH9ELqIqU5hLEiSNK
+	XFRj/c/xeAxkyVZIeZGnazPdeg4ZNdHJzcnMK74r8Xqv9UHjoNdp93ceS9IqHmxdJB5abk
+	tzsv86vscjGHpiRRrcaLBRAOBNJoWDA=
+Date: Thu, 5 Sep 2024 15:58:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b72fd0463b662796fd3eaa996211f1a5d0a4341.1725518135.git.0x1207@gmail.com>
+Subject: Re: [PATCH net-next v3 2/4] net_tstamp: add SCM_TS_OPT_ID for TCP
+ sockets
+To: Willem de Bruijn <willemb@google.com>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+ Jason Xing <kerneljasonxing@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20240904113153.2196238-1-vadfed@meta.com>
+ <20240904113153.2196238-3-vadfed@meta.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240904113153.2196238-3-vadfed@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Sep 05, 2024 at 03:02:24PM +0800, Furong Xu wrote:
->  struct stmmac_fpe_cfg {
-> -	bool enable;				/* FPE enable */
-> -	bool hs_enable;				/* FPE handshake enable */
-> -	enum stmmac_fpe_state lp_fpe_state;	/* Link Partner FPE state */
-> -	enum stmmac_fpe_state lo_fpe_state;	/* Local station FPE state */
-> +	/* Serialize access to MAC Merge state between ethtool requests
-> +	 * and link state updates.
-> +	 */
-> +	spinlock_t lock;
-> +
->  	u32 fpe_csr;				/* MAC_FPE_CTRL_STS reg cache */
-> +	struct timer_list verify_timer;
-> +	struct ethtool_mm_state state;
+On 04/09/2024 12:31, Vadim Fedorenko wrote:
+> TCP sockets have different flow for providing timestamp OPT_ID value.
+> Adjust the code to support SCM_TS_OPT_ID option for TCP sockets.
+> 
+> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> ---
+>   net/ipv4/tcp.c | 13 +++++++++----
+>   1 file changed, 9 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 8a5680b4e786..5553a8aeee80 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -474,9 +474,10 @@ void tcp_init_sock(struct sock *sk)
+>   }
+>   EXPORT_SYMBOL(tcp_init_sock);
+>   
+> -static void tcp_tx_timestamp(struct sock *sk, u16 tsflags)
+> +static void tcp_tx_timestamp(struct sock *sk, struct sockcm_cookie *sockc)
+>   {
+>   	struct sk_buff *skb = tcp_write_queue_tail(sk);
+> +	u32 tsflags = sockc->tsflags;
+>   
+>   	if (tsflags && skb) {
+>   		struct skb_shared_info *shinfo = skb_shinfo(skb);
+> @@ -485,8 +486,12 @@ static void tcp_tx_timestamp(struct sock *sk, u16 tsflags)
+>   		sock_tx_timestamp(sk, tsflags, &shinfo->tx_flags);
+>   		if (tsflags & SOF_TIMESTAMPING_TX_ACK)
+>   			tcb->txstamp_ack = 1;
+> -		if (tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK)
+> -			shinfo->tskey = TCP_SKB_CB(skb)->seq + skb->len - 1;
+> +		if (tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK) {
+> +			if (tsflags & SOCKCM_FLAG_TS_OPT_ID)
+> +				shinfo->tskey = sockc->ts_opt_id;
+> +			else
+> +				shinfo->tskey = TCP_SKB_CB(skb)->seq + skb->len - 1;
+> +		}
+>   	}
+>   }
+>   
+> @@ -1318,7 +1323,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+>   
+>   out:
+>   	if (copied) {
+> -		tcp_tx_timestamp(sk, sockc.tsflags);
+> +		tcp_tx_timestamp(sk, &sockc);
+>   		tcp_push(sk, flags, mss_now, tp->nonagle, size_goal);
+>   	}
+>   out_nopush:
 
-I don't know what to say about keeping a full-blown struct
-ethtool_mm_state copy in struct stmmac_fpe_cfg.
+Hi Willem,
 
-You don't populate two of its members: tx_active and tx_min_frag_size,
-and thus they would be invalid if anyone tried to access them. And two
-more of its member variables are populated with driver-constant values:
-max_verify_time and rx_min_frag_size.
+Unfortunately, these changes are not enough to enable custom OPT_ID for
+TCP sockets. There are some functions which rewrite shinfo->tskey in TCP
+flow:
 
-This leaves only verify_time, verify_status, pmac_enabled, tx_enabled,
-verify_enabled. Maybe it would be better to just open-code these
-variables directly in struct stmmac_fpe_cfg.
+tcp_skb_collapse_tstamp()
+tcp_fragment_tstamp()
+tcp_gso_tstamp()
+
+I believe the last one breaks tests, but the problem is that there is no
+easy way to provide the flag of constant tskey to it. Only
+shinfo::tx_flags are available at the caller side and we have already
+discussed that we shouldn't use the last bit of this field.
+
+So, how should we deal with the problem? Or is it better to postpone
+support for TCP sockets in this case?
+
+Thanks,
+Vadim
 
