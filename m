@@ -1,147 +1,206 @@
-Return-Path: <netdev+bounces-125623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89B1896DFD7
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:34:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F4AC96DFDE
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:34:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43AFA28D63B
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:34:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB30128DF09
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:34:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 386BB19DF4F;
-	Thu,  5 Sep 2024 16:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA6C1A2C26;
+	Thu,  5 Sep 2024 16:33:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ro2BdDp9"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="CwUDpRHu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DDD1487FF;
-	Thu,  5 Sep 2024 16:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1F61A08B5
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 16:33:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725554007; cv=none; b=IOmuvwldhhhXqlIjzpUfSv19fYOUyQtZWrEG2mbiS9xis6vkpZ9p234QoMoaR4Yt2E7ukBk+z3Eav6tiPBCFkw5gT9TcGTo5s1bODyXqM75JJbrZKWpcpp7bCDXQdBkVH05y3I/XtqpvNZIPZRRV5s3wjB39y4A7gm4a4Pz3Ffo=
+	t=1725554022; cv=none; b=r9a4rpaAy5l+HCx587QCM1/kR8Wa+o36FfPMnk6jcn0c25VKBshVGzHvLrEEtNC7z7TlaloWDnLe7YdULOHXUD1sNFXWa6dtKIom4xYK7MBDwj4yZ39fZXDDoQN4mRCSj1PURZ03YOS7VmNKKMY5wypiKMjZoVYq21qYPzWejEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725554007; c=relaxed/simple;
-	bh=wEMceimxJHNv2zuW5H0hOUsHDPbnyCz3+Fa+k7WGkR4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MNGnD6RkAR7rw/bd2uYBSb2pyIJ55i4wyASwTY79lqjiQoFvNVB05yckiU1ZXTRJZoS0XqK35ZIMcp84ulG3cN7DW06UTlQocfPlsK8hUn0Bdx//QIehz5am+xYnp+zP+jURCh8k3UHhCVp23tczuDVae+K4ZRfAsdFQULmVMW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ro2BdDp9; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e1651f48c31so1219293276.0;
-        Thu, 05 Sep 2024 09:33:25 -0700 (PDT)
+	s=arc-20240116; t=1725554022; c=relaxed/simple;
+	bh=3NAVcB6qwQxaSWihdV8SEeK1WvVXg/JpPm7/aLNJ3gI=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CFGF5BFeY9s52PmgTTu7+UYIuiBA3pEONfBZj47r0L1HwlartuVMf0Tgj0h98OsrG+VdV69pQq6ehxwkTLKTFuFtlwo2x0bvu/2HmU5E7mVfaThk9FXsKOGtQ5v2nMuidagik/T86Ipx51UVXcrqVIc08Fpfir/now+s4N3YR4I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=CwUDpRHu; arc=none smtp.client-ip=209.85.208.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-5c26311c6f0so1255933a12.3
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 09:33:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725554004; x=1726158804; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=LTWgqh5aVPRNhnctzqq6KL5x4HBngQvxkP/ZwnzN2WQ=;
-        b=Ro2BdDp9rDmKDI7RVzCC7IK3XVOOZagg2+JNBhSSrUk8+S25yL1Ax8F6v/Lo6m2oIX
-         X7DOZjka5r9xVGBBjw7kUMIhU6XpHOyJEkmCNsap0HUeHIiKPI2Ip8f+645RfpjK+sGl
-         Q7qkrwlOgmm1UoVyJ988KjBVtALCLTOv/jCbIp6sL2ghhS8Fae5R9Vxhv0gI2Ug1GV5A
-         TxHYu+Mw8OpDgf/LISZHEimcGVAZRNV5cUcbsgVfjDw9HpWMxcFt2Hq9YxMt8WH8I0W3
-         DyZP6MLQseI2u6IDrjzfjMr0DgBWHs2OJHl4DVEemlvHsFVbhqyNzQEJeLpB6hkf9fOS
-         ewww==
+        d=suse.com; s=google; t=1725554018; x=1726158818; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kJHk6dVcMot+83fqcyHPWmLjMUPxP5z8vxp/ZBkDsTM=;
+        b=CwUDpRHumS+xhjkOkSNcYkerUfHWVG+TzIQhXbhoKRrPX3T8LQnbOri7aQY0Mxr+hH
+         zt9JN5f0NuQEW68wTKFZPMxsN0cTQnN277Bx5updO5jz6Mg0MfitxiCobve9Zgj29Wmj
+         s1eNiGWZl0WErt/F4BipQoxnmWnLzxTNOGHpJu4fH+nCdUrkRfLK3o5126IeBhE5xGNq
+         IbVS0h+UpD15k9HDTFTSEkc2nozDjTu5yhu8fLc+0zFX9uJd2fl+MAiXFdeCcW0xR08i
+         PzGb93V+xzaO149I50uhyz0MgRfiEcgUtOmJ2VXPArnCtjCkEpl9ZuE2WXwJjroq8+z/
+         AWsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725554004; x=1726158804;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1725554018; x=1726158818;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LTWgqh5aVPRNhnctzqq6KL5x4HBngQvxkP/ZwnzN2WQ=;
-        b=Vt/QtE3l6+Duscg9N+7D51GUhjXHlqm7gFU7rZz8xsnQMvP6tNRuz8XJyel9jNPW05
-         9UJNoqEXk83It4l2aw2W/ptSDBfv4qhm10JJIBJKC7U7MGVv7Mv01jCB7coo8qn+9EPD
-         rFJxvzjxgAymBHR7yzaIamxij//CLBXbqV6MwCtZkryT6iWSQT9HebFlzcnrWi7yQSX6
-         6hTgwX3FE+rAcIyG5wxUQMSb06fxB4KP+5FHTFpXbJq5zQ2+JMdXfGEphawRKfZJo8Ly
-         12rojLFqN4mDTaPE9K1OnF5xJrq0oFUV9cVnhFbCxrxCTQOFo0RchBVurrR3J7fXP8h0
-         BXSw==
-X-Forwarded-Encrypted: i=1; AJvYcCVgr4+WZ0WgM/+GVtjA7WPSobZMHPLcLmUIsORX+oOil5UPdWJqem1fQ5+aEAEx+MDosDsJm3hM@vger.kernel.org, AJvYcCX2CP+NYL0poXXIEdHPFgxfUji6ccKp0tXxXpGdz/8UwKwgd3xhW564PRwFi0lj3E9sJUKxS4uAjR17Z1w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP3nMNCxclGWcBzeAGJqF5ynMYuazbFWn53A4E2yBCmoGsP8kW
-	nLSIWpF6/1eymAvKCFg37H2wvWb1DJrnt+xGqj6033+h4hDzF9TV
-X-Google-Smtp-Source: AGHT+IEMcxlD77tgrm99u5MsQ4wFzjCZ+6TYVifvNB8FvCWzXjN2F9a9Z0zejzTyIg5z07NQdf4uNA==
-X-Received: by 2002:a05:6902:140f:b0:e11:706a:bdfb with SMTP id 3f1490d57ef6-e1a7a00a2cdmr22184973276.18.1725554004279;
-        Thu, 05 Sep 2024 09:33:24 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45801b5a995sm8511821cf.57.2024.09.05.09.33.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Sep 2024 09:33:22 -0700 (PDT)
-Message-ID: <23d937e5-3aac-4a8f-b7c5-ecde386d36c8@gmail.com>
-Date: Thu, 5 Sep 2024 09:33:19 -0700
+        bh=kJHk6dVcMot+83fqcyHPWmLjMUPxP5z8vxp/ZBkDsTM=;
+        b=XXZkBk/AcortXrEfEzukYQGbdScpTW6lct8JrQhOByh7qA1xSCvgfuic8GWPBTjJ8E
+         s/lUIsDzu4wHWwqfj44FFF0/isLY8P6/M8/mwPkYg6+f3fS9cBe0d9Sn1zpCiSUHMzoI
+         07xdpwIv8ntrvedbCfP8mi4ls4F8QZLEi4NZCeQoV8yTxtKbO5Gu5hBSDFcfl7UdCC9M
+         vVoI72b3V+7N9FnxiJBSn0lg04JEwzQs0QdpBb1CkaF8Ty0tEcocOkXe/+BiQtG12gA3
+         10SBJOCT6L3VaB1XCn/6XVelBgh92KMlCSx3Bg4p+SCzpGU8GXOVidXgO2ifrLsKm3Jw
+         9ROA==
+X-Forwarded-Encrypted: i=1; AJvYcCVaY2sYwCehIaZKR4eaCpgbc+c98G+BRLnHRrj7It4VpNfTHMxgf6XIM1oG6amFSpm98K20aF0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznAr0cbbbbFgIDKDpwGlvFoZAJEGvyzNfar1OcG2H9hcbEWQAh
+	wXwibAbznt4or87xbltY/i+7Qwm3MJhHvtU1GsbTyy4EAKVmhasqjf5akcM5pzQ=
+X-Google-Smtp-Source: AGHT+IHU/avyIpf1tRzphlO3ca0BhbKJKByf8ZqboDAgvuiywTcmj9UX7KVZcHdK/Ol0/Wbwf0Mx9g==
+X-Received: by 2002:a05:6402:3226:b0:5c2:6bf7:8531 with SMTP id 4fb4d7f45d1cf-5c2caf33541mr5644250a12.33.1725554018023;
+        Thu, 05 Sep 2024 09:33:38 -0700 (PDT)
+Received: from localhost (host-80-182-198-72.pool80182.interbusiness.it. [80.182.198.72])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3cc528bcfsm1430637a12.16.2024.09.05.09.33.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 09:33:37 -0700 (PDT)
+From: Andrea della Porta <andrea.porta@suse.com>
+X-Google-Original-From: Andrea della Porta <aporta@suse.de>
+Date: Thu, 5 Sep 2024 18:33:45 +0200
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Andrea della Porta <andrea.porta@suse.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Derek Kiernan <derek.kiernan@amd.com>,
+	Dragan Cvetic <dragan.cvetic@amd.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, linux-clk@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-gpio@vger.kernel.org, netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Lee Jones <lee@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
+Message-ID: <ZtndaYh2Faf6t3fC@apocalypse>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
+ <lrv7cpbt2n7eidog5ydhrbyo5se5l2j23n7ljxvojclnhykqs2@nfeu4wpi2d76>
+ <ZtHN0B8VEGZFXs95@apocalypse>
+ <b74327b8-43f6-47cf-ba9d-cc9a4559767b@kernel.org>
+ <ZtcoFmK6NPLcIwVt@apocalypse>
+ <39735704-ae94-4ff8-bf4d-d2638b046c8e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: mdiobus: Debug print fwnode handle instead of
- raw pointer
-To: Alexander Dahl <ada@thorsis.com>, netdev@vger.kernel.org
-Cc: Calvin Johnson <calvin.johnson@oss.nxp.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- open list <linux-kernel@vger.kernel.org>
-References: <20240905143248.203153-1-ada@thorsis.com>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240905143248.203153-1-ada@thorsis.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <39735704-ae94-4ff8-bf4d-d2638b046c8e@kernel.org>
 
-On 9/5/24 07:32, Alexander Dahl wrote:
-> Was slightly misleading before, because printed is pointer to fwnode,
-> not to phy device, as placement in message suggested.  Include header
-> for dev_dbg() declaration while at it.
-> 
-> Output before:
-> 
->      [  +0.001247] mdio_bus f802c000.ethernet-ffffffff: registered phy 2612f00a fwnode at address 3
-> 
-> Output after:
-> 
->      [  +0.001229] mdio_bus f802c000.ethernet-ffffffff: registered phy fwnode /ahb/apb/ethernet@f802c000/ethernet-phy@3 at address 3
-> 
-> Signed-off-by: Alexander Dahl <ada@thorsis.com>
+Hi Krzysztof,
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+On 20:27 Tue 03 Sep     , Krzysztof Kozlowski wrote:
+> On 03/09/2024 17:15, Andrea della Porta wrote:
+> >>>>> +
+> >>>>> +				rp1_clocks: clocks@c040018000 {
+> >>>>
+> >>>> Why do you mix MMIO with non-MMIO nodes? This really does not look
+> >>>> correct.
+> >>>>
+> >>>
+> >>> Right. This is already under discussion here:
+> >>> https://lore.kernel.org/all/ZtBzis5CzQMm8loh@apocalypse/
+> >>>
+> >>> IIUC you proposed to instantiate the non-MMIO nodes (the three clocks) by
+> >>> using CLK_OF_DECLARE.
+> >>
+> >> Depends. Where are these clocks? Naming suggests they might not be even
+> >> part of this device. But if these are part of the device, then why this
+> >> is not a clock controller (if they are controllable) or even removed
+> >> (because we do not represent internal clock tree in DTS).
+> > 
+> > xosc is a crystal connected to the oscillator input of the RP1, so I would
+> > consider it an external fixed-clock. If we were in the entire dts, I would have
+> > put it in root under /clocks node, but here we're in the dtbo so I'm not sure
+> > where else should I put it.
+> 
+> But physically, on which PCB, where is this clock located?
+
+xosc is a crystal, feeding the reference clock oscillator input pins of the RP1,
+please see page 12 of the following document:
+https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf
+On Rpi5, the PCB is the very same as the one on which the BCM2712 (SoC) and RP1
+are soldered. Would you consider it external (since the crystal is outside the RP1)
+or internal (since the oscillator feeded by the crystal is inside the RP1)?
+
+> 
+> > 
+> > Regarding pclk and hclk, I'm still trying to understand where they come from.
+> > If they are external clocks (since they are fixed-clock too), they should be
+> > in the same node as xosc. CLK_OF_DECLARE does not seem to fit here because
+> 
+> There is no such node as "/clocks" so do not focus on that. That's just
+> placeholder but useless and it is inconsistent with other cases (e.g.
+> regulators).
+
+Fine, I beleve that the root node would be okay then, or some other carefully named
+node in root, if the clock is not internal to any chip.
+
+> 
+> If this is external oscillator then it is not part of RP1 and you cannot
+> put it inside just to satisfy your drivers.
+
+Ack.
+
+> 
+> > there's no special management of these clocks, so no new clock definition is
+> > needed.
+> 
+> > If they are internal tree, I cannot simply get rid of them because rp1_eth node
+> > references these two clocks (see clocks property), so they must be decalred 
+> > somewhere. Any hint about this?.
+> > 
+> 
+> Describe the hardware. Show the diagram or schematics where is which device.
+
+Unfortunately I don't have the documentation (schematics or other info) about
+how these two clocks (pclk and hclk) are arranged, but I'm trying to get
+some insight about that from various sources. While we're waiting for some
+(hopefully) more certain info, I'd like to speculate a bit. I would say that
+they both probably be either external (just like xosc), or generated internally
+to the RP1:
+
+If externals, I would place them in the same position as xosc, so root node
+or some other node under root (eg.: /rp1-clocks)
+
+If internals, I would leave them just where they are, i.e. inside the rp1 node
+
+Does it make sense?
+
+Many thnaks,
+Andrea
+
+> 
+> Best regards,
+> Krzysztof
+> 
 
