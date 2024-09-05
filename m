@@ -1,59 +1,55 @@
-Return-Path: <netdev+bounces-125714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFED096E51D
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 23:31:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F322C96E542
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 23:47:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E9A7B20AC8
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:31:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB9191C22FED
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C8519409A;
-	Thu,  5 Sep 2024 21:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6F41A4E6B;
+	Thu,  5 Sep 2024 21:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SAWla+Jf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TGO+eM4C"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C67115687C;
-	Thu,  5 Sep 2024 21:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47961823DE;
+	Thu,  5 Sep 2024 21:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725571891; cv=none; b=L/ZDiQgrA4EiYYQ4SaduVpcMHx7Ud8jMC4SRBMxWB4qJvYQHGj0dTJSDjSEhtatLRuHQNep0TGOqAhT2MCE4Kb1JvUDpDYw3eVT6jrmZq/vC+GsphUOxPvJvhc768aHiNPuCpLInaW90leobCyIy+RwLP+OE8H+U6JCEx4RZJAA=
+	t=1725572834; cv=none; b=jENodQHECv9DbWEl5g/0tSta5BHz1kPdGMDEQeSyyg7axGzZpjRhDDYEuSH+5kEkt16Ylo74KnoG9K+gABOlxZZzANVWXSPn22CmG5ydGddiT1+hfefRwyU8PAuMgKLPPwoip2TxT9QZHtU/rVkOvjBq4TR9yrfyRS3eDNWZ/lY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725571891; c=relaxed/simple;
-	bh=2AcRCNYQpVDUrd7pyYpEzZZfBbkzxR5Sgp2YPhjiZeg=;
+	s=arc-20240116; t=1725572834; c=relaxed/simple;
+	bh=uhgK5Fgg1EVK3uIYtD9j5KLSTSz7iQLddBiXKhSxejo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QyWNBgsxst8LmhCroh0p6AO/+lmlfGVny7boEFwcjm7IMci8az9Am37Exgrc/WRvZNfvII7CrOM2TEgHCMFbbOStthCI23+51Rh5pY82kiTqnGCx8nTYQD6RwmsZ/P6eLV7dkyYfhoVsRNXKvw6eyGC3qG6PrJdmI7j7+N7rwRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SAWla+Jf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C120C4CEC3;
-	Thu,  5 Sep 2024 21:31:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=hObd/VdY4EwHESWADen7r4CubvO5ZQTKmBBvyNnu2wnAJNlOhSn+SGGmKWL4zxCSn15I1c3q6Kp8VX2eEFsT7TynAxB4zmR0UuSbp8mnnB9bngVInKPJJbXUbg0Vy0nYJ/Sn9Fmp+e5QdTvJlW1JQm/MDDOd6hv3lXZ/rby1cfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TGO+eM4C; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93920C4CEC3;
+	Thu,  5 Sep 2024 21:47:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725571889;
-	bh=2AcRCNYQpVDUrd7pyYpEzZZfBbkzxR5Sgp2YPhjiZeg=;
+	s=k20201202; t=1725572833;
+	bh=uhgK5Fgg1EVK3uIYtD9j5KLSTSz7iQLddBiXKhSxejo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SAWla+JfhpYQNOKA6Ijjxrts6bmkARrpk2+IOco2J3UL0EWg3B8IiEF/QDb7TeR15
-	 azFL8hrjxGsB08gYtxTScO6l/Z1qZivbzyiLrIVoZgqj2gUfTrz+QuLZKD7VCuBvFf
-	 Awz/g5YOGoU8Bk9tX7JkgeDbc7PkGERV46oZP3JIrNaPjcHUrja574RjbFpjXp2kpq
-	 QWzO9uAKlqJ/Oo3SHfl+ph+x3IWVjmxsmaTGVJI713SvuXhFzzbxMpiNFJtd1w3uvv
-	 nbQ2xeM5KV3Ya+vV8+lLCZzJp6s3Aj7shECuB84WPt36KEk74Ap+mRfJBTWQyv3xEJ
-	 NrTGYjr3OCVOQ==
-Date: Thu, 5 Sep 2024 14:31:28 -0700
+	b=TGO+eM4C2yRU3rdIGPnW7bMrhAOMyGVNQcsOeOmaB/s4IAgZM+RL0aUQfuezmIOsF
+	 exqSGiF6a0ExffFottQrBRpNr35TIk2VLt3XP9/kmJCEVHEec4Di8qfTO6w0mEpArE
+	 FGflG6cx3svcMuTRjdY72B3g2tHWypymBxK2PVhsYjKHJ+Nc9F/ZBr4CEFajIvGKV4
+	 c6t+avUGeoBsfzChJzuOOlXCxYteX2hB3R/4AiN4LdAngaV/mUld7rlddb+IYwzP+a
+	 S4cwLvo0isKHBzJXjU5PRYT3/6pfuWEf6Ma4UVKsMuNeCKbvLtBpl2P3yoJX4+Y3RZ
+	 0Q0vWx/b8z0+A==
+Date: Thu, 5 Sep 2024 14:47:12 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, ncardwell@google.com, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, fw@strlen.de, Willem de Bruijn
- <willemb@google.com>
-Subject: Re: [PATCH net-next 2/2] selftests/net: integrate packetdrill with
- ksft
-Message-ID: <20240905143128.0dde754f@kernel.org>
-In-Reply-To: <20240905031233.1528830-3-willemdebruijn.kernel@gmail.com>
-References: <20240905031233.1528830-1-willemdebruijn.kernel@gmail.com>
-	<20240905031233.1528830-3-willemdebruijn.kernel@gmail.com>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: ftgmac100: Enable TX interrupt to avoid TX timeout
+Message-ID: <20240905144712.6492ca9b@kernel.org>
+In-Reply-To: <20240904103116.4022152-1-jacky_chou@aspeedtech.com>
+References: <20240904103116.4022152-1-jacky_chou@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,32 +59,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed,  4 Sep 2024 23:07:03 -0400 Willem de Bruijn wrote:
-> +++ b/tools/testing/selftests/net/packetdrill/config
-> @@ -0,0 +1 @@
-> +CONFIG_TCP_MD5SIG=y
+On Wed, 4 Sep 2024 18:31:16 +0800 Jacky Chou wrote:
+> Currently, the driver only enables RX interrupt to handle RX
+> packets and TX resources. Sometimes there is not RX traffic,
+> so the TX resource needs to wait for RX interrupt to free.
+> This situation will toggle the TX timeout watchdog when the MAC
+> TX ring has no more resources to transmit packets.
+> Therefore, enable TX interrupt to release TX resources at any time.
 
-Looks like this is not enough:
+Please answer Andrew's question (preferably send a v2 with the answer
+as part of the commit message). Add a fixes tag, I think this is where
+the bug was added?
 
-# 1..2
-# open tun device: No such file or directory
-# not ok 1 ipv4
-# open tun device: No such file or directory
+Fixes: 10cbd6407609 ("ftgmac100: Rework NAPI & interrupts handling")
 
-https://netdev-3.bots.linux.dev/vmksft-packetdrill/results/759141/1-tcp-inq-client-pkt/stdout
-
-Resulting config in the build:
-
-# CONFIG_TUN is not set
-
-https://netdev-3.bots.linux.dev/vmksft-packetdrill/results/759141/config
-
-Keep in mind the "Important" note here:
-
-https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style#how-to-build
-
-I recommend using a fresh tree or mrproper for testing vng configs.
-
-Feel free to post v2 without the 24h wait, it's a bit tricky to handle
-new targets in CI, sooner we merge this the less manual work for me..
+And when you send v2, please make sure to CC the author (Benjamin).
+-- 
+pw-bot: cr
 
