@@ -1,135 +1,102 @@
-Return-Path: <netdev+bounces-125569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BD1C96DBE9
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:34:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67AC296DC14
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:41:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E22A1C236D0
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:34:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8DE5B26832
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABD1175A1;
-	Thu,  5 Sep 2024 14:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PXEuWw9S"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5318179BF;
+	Thu,  5 Sep 2024 14:38:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C6E14A8B
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 14:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6604F1C6B8
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 14:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725546871; cv=none; b=UmIOpyrlVNQc1GWLnEiQwAWnkBTbhMIg9vMVDcuHr8JDM2XrijK9ZgHuy84064H6xRxojMy85GOfZoi1vnjok3wDvDFOnvdQGqfrb9zS5pnk7QOmD2jk7fHUcbjDz2Peqbq6558DPVoEDWilgD+cfSCzDSTNKHUoBlTvzcn/fxw=
+	t=1725547106; cv=none; b=XkBGjQFtKdL8QoZn0qtbCq3ksTdR0NK5IxVNZoNb0APo33F/WNXGf9tgbLXRfmmowgWZWGaYaeGskJOCRuIq0MRMkQcO7qcr/tTbUWe0ALlC6H2pr5ey7lLDy6+BSZdy05vcO11TJ4JCtD7QQrU0Qj/FlABYE4dNwlIqeTB8fgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725546871; c=relaxed/simple;
-	bh=djmzTAjDrP0ZKXTynCjeBjflurfkA/511OhGIIyIVDY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QioeI+f13yLRoNcKovn+F5HAIilJmL0Y+LdZDyUJh9PgsLhoMW/ChOsXnEmcxA5djpfLIATaIKC6RrIagSWJD5q7HkIVIFT0X0PsGuRuhjyxprFxIZQXnv44UBt7PMsc5UGEN09rEZISBUzbGXqOEtsM6z802uAMg30k+ry7F7k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PXEuWw9S; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a9ad456d-eeff-4fac-a18d-0219fcc9f5ed@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725546867;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P7rbhxgQHH8FMAXCYEogfAFPlvDv513nAGuaFUXrBNY=;
-	b=PXEuWw9S0BYumid1/jVD3PdysZxv8u1KLegtebjFDKS2p1CXX7ZSeSyO/adNElmfF+I5MK
-	LM6/5OXhNKdvGLltyWfUaXHAQUs6A4CO1ybibDyAgFUejesYumh90dqmMTwbbdKOwIDDfX
-	ZwgfrB3XaJXhkT2gSd4Eie+qSb/l1NY=
-Date: Thu, 5 Sep 2024 10:34:15 -0400
+	s=arc-20240116; t=1725547106; c=relaxed/simple;
+	bh=VShNH51JfLclSp6NZU/tvyrPw5N/uoPMEzeZ9cH21EQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=OduigysIIRxVdm9OyWMwdhtXAVjxZuToRoza28Ge/o5dZdsUs6wHXM6UMlSUagx5c8oPjEK8AHIVUQ8yvD/we3+wNWFk2VXYUdhn57niRS3QS0DILMeu2AFSmCHMhrIIsGYn77OdwMlIhhurc8/E+aPiuP7wCa19AneL2HPk7ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-101-3xOOc6PIOfW_KTAJfSL_Sw-1; Thu,
+ 05 Sep 2024 10:38:17 -0400
+X-MC-Unique: 3xOOc6PIOfW_KTAJfSL_Sw-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9776219560BD;
+	Thu,  5 Sep 2024 14:38:15 +0000 (UTC)
+Received: from hog (unknown [10.39.192.5])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3AA103001D11;
+	Thu,  5 Sep 2024 14:38:10 +0000 (UTC)
+Date: Thu, 5 Sep 2024 16:38:08 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	ryazanov.s.a@gmail.com, edumazet@google.com, andrew@lunn.ch,
+	steffen.klassert@secunet.com, antony.antony@secunet.com
+Subject: Re: [PATCH net-next v6 03/25] net: introduce OpenVPN Data Channel
+ Offload (ovpn)
+Message-ID: <ZtnCUJOTO9d1raQV@hog>
+References: <20240827120805.13681-1-antonio@openvpn.net>
+ <20240827120805.13681-4-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: xilinx: axienet: Fix IRQ coalescing packet count
- overflow
-To: Simon Horman <horms@kernel.org>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
- linux-arm-kernel@lists.infradead.org,
- Ariane Keller <ariane.keller@tik.ee.ethz.ch>, linux-kernel@vger.kernel.org,
- Daniel Borkmann <daniel@iogearbox.net>, Andy Chiu <andy.chiu@sifive.com>
-References: <20240903180059.4134461-1-sean.anderson@linux.dev>
- <20240904160013.GX4792@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20240904160013.GX4792@kernel.org>
+In-Reply-To: <20240827120805.13681-4-antonio@openvpn.net>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 9/4/24 12:00, Simon Horman wrote:
-> On Tue, Sep 03, 2024 at 02:00:59PM -0400, Sean Anderson wrote:
->> If coalesce_count is greater than 255 it will not fit in the register and
->> will overflow. Clamp it to 255 for more-predictable results.
-> 
-> Hi Sean,
-> 
-> Can this occur in practice?
+2024-08-27, 14:07:43 +0200, Antonio Quartulli wrote:
+> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+> index 9920b3a68ed1..c5743288242d 100644
+> --- a/drivers/net/Kconfig
+> +++ b/drivers/net/Kconfig
+> @@ -115,6 +115,19 @@ config WIREGUARD_DEBUG
+> =20
+>  =09  Say N here unless you know what you're doing.
+> =20
+> +config OVPN
+> +=09tristate "OpenVPN data channel offload"
+> +=09depends on NET && INET
+> +=09select NET_UDP_TUNNEL
+> +=09select DST_CACHE
+> +=09select CRYPTO
+> +=09select CRYPTO_AES
+> +=09select CRYPTO_GCM
+> +=09select CRYPTO_CHACHA20POLY1305
 
-Yes. Simply do `ethtool -C ethX rx-frames 300` or something similar and
-you will end up with a limit of 44 instead. I ran into this with DIM and
-was wondering why the highest-throughput setting (256) was behaving so
-poorly...
+and STREAM_PARSER for TCP encap?
 
->> 
->> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
->> Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
-> 
-> nit: I think it is usual for the order of these tags to be reversed.
+> +=09help
+> +=09  This module enhances the performance of the OpenVPN userspace softw=
+are
+> +=09  by offloading the data channel processing to kernelspace.
+> +
 
-OK
+--=20
+Sabrina
 
->> ---
->> 
->>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 6 ++++--
->>  1 file changed, 4 insertions(+), 2 deletions(-)
->> 
->> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> index 9aeb7b9f3ae4..5f27fc1c4375 100644
->> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->> @@ -252,7 +252,8 @@ static u32 axienet_usec_to_timer(struct axienet_local *lp, u32 coalesce_usec)
->>  static void axienet_dma_start(struct axienet_local *lp)
->>  {
->>  	/* Start updating the Rx channel control register */
->> -	lp->rx_dma_cr = (lp->coalesce_count_rx << XAXIDMA_COALESCE_SHIFT) |
->> +	lp->rx_dma_cr = (min(lp->coalesce_count_rx, 255) <<
->> +			 XAXIDMA_COALESCE_SHIFT) |
->>  			XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_ERROR_MASK;
-> 
-> nit: it would be nice to avoid using a naked 255 here.
->      Perhaps: #define XAXIDMA_COALESCE_MAX 0xff
-
-OK, but this is the same as the limit used in axienet_usec_to_timer.
-
---Sean
-
->>  	/* Only set interrupt delay timer if not generating an interrupt on
->>  	 * the first RX packet. Otherwise leave at 0 to disable delay interrupt.
->> @@ -264,7 +265,8 @@ static void axienet_dma_start(struct axienet_local *lp)
->>  	axienet_dma_out32(lp, XAXIDMA_RX_CR_OFFSET, lp->rx_dma_cr);
->>  
->>  	/* Start updating the Tx channel control register */
->> -	lp->tx_dma_cr = (lp->coalesce_count_tx << XAXIDMA_COALESCE_SHIFT) |
->> +	lp->tx_dma_cr = (min(lp->coalesce_count_tx, 255) <<
->> +			 XAXIDMA_COALESCE_SHIFT) |
->>  			XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_ERROR_MASK;
->>  	/* Only set interrupt delay timer if not generating an interrupt on
->>  	 * the first TX packet. Otherwise leave at 0 to disable delay interrupt.
->> -- 
->> 2.35.1.1320.gc452695387.dirty
->> 
->> 
 
