@@ -1,117 +1,125 @@
-Return-Path: <netdev+bounces-125476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD5EA96D37B
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:41:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B04496D3AB
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:44:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77D9F1F212E8
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:41:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FB211C222E4
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:44:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9F2197A92;
-	Thu,  5 Sep 2024 09:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710D319884A;
+	Thu,  5 Sep 2024 09:44:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W8toSrnn"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CpjR9Ma6";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DXuSTmD7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA549194AD9
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 09:40:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F12A819538A;
+	Thu,  5 Sep 2024 09:44:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725529254; cv=none; b=bmZmIFnQ7qmxINE/UrpSo6hHo0RFseq9nQO+YqYr/0lgcLJeFzU4n9MYI3GAz4i8yuuvIm1pAmMhLR+yRmQi5qQEFzJKvCcxhrmpMNbehCGsjJFbukzfIQDN3P/H+BbNt4nYq1Yp5aub7hTot43/S6KFtzYwyRxC5mP7COQf9hg=
+	t=1725529466; cv=none; b=pYrGyk/+j6XxXb8r9/MoNMmKm35RObqYCRJMHsZZhcuavWmOYTfY/RPRlqevt8D5SJJ+y9Q2rj5Z+A0GsxiGG/Rvfap/6bd5ySNdAMEVB86vMVTLgVJ2LQrb3/djvEwBM9uLpMNrlwD+6A298jkZI+yzafiaPWhAXrE9lFp8wF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725529254; c=relaxed/simple;
-	bh=HkMksoJkam39qtRwxGPncit4t3aPPxXN22Lh0dQW1hc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=leBNJHXWiyGaRVvhEkyj7hqQioQpZMP0kBX/h1D8ZhWa7LLdb7c6xSyOVIkycFohNSyK5EhR88Fo+dNBRiIwZx8qmBXR5Zb/A/KEwBLGwXKkOK7fDHRETPI6nvQEfm2JGYDRpII+6BlMUl8CpCB9RxhjuZ6Tuy7QpcLUj5QsNlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W8toSrnn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725529250;
+	s=arc-20240116; t=1725529466; c=relaxed/simple;
+	bh=gGXv2tnI6Kmy/fRpA12pfvXh3zAcEJ16hhyiGQtJuuQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=TnaQMVCo14FVnsn5XuMEKCbq46EMPYVYyl2izUR/xkHhuV8CiVRX5Z317YO6OJhaqFWrdt9x5TXif0KFuf6TJF2Kr51ee7mAosiZHtEIDEG6ISTjoOh/k135vPG8Ju+5kdBEDevjvdKBq/YDVfaMVuyRhyvOf8AQrbk5O12Qzz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CpjR9Ma6; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DXuSTmD7; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1725529463;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/d5hdFRsgesb2Y7IkvZL3YR9p71W/+q8gl8me4oUcJQ=;
-	b=W8toSrnno0cEHBWUM8lMbZNjVUcEc9AHTrDG8Vf/P6P2cEBzv/SraQFIBPm3S6vlbyMvzt
-	A8P+UQ299zHGeo6Mz+f1cWEU3SOh/wMcCcRovDtQ12s6N7JDArrYJtccxm1MNNrKEKq9wR
-	FaAdApJJycoUMmLmtN2bj4bbtPRTKdg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-614-8H7dqGWqMt-u6vetTzk8Cw-1; Thu, 05 Sep 2024 05:40:49 -0400
-X-MC-Unique: 8H7dqGWqMt-u6vetTzk8Cw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-374c434b952so333621f8f.1
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 02:40:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725529248; x=1726134048;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/d5hdFRsgesb2Y7IkvZL3YR9p71W/+q8gl8me4oUcJQ=;
-        b=VCo9hVBYYeApTizgdcFfysJ8EX1TpWHP+13vUv8DF23XY5qrJUktvT6alLHhklzYDJ
-         Yg3YngmpFkQiJmR8snAvapbNPHu9kZF7Lea8OYWL7+YJ54sPwTSpZ/0VLKU0aHTlqY9H
-         BnuERb51d3ad1cJH/rnrXRboluRlvfcuJkMD0EO8b1VTVZZYP/KUOq1UQM87hKgnHI62
-         wvFi75Z4xFnPlvkKbY20lD3Fw1YcItDXBlMnjZzgpY+SnfEYURryL+BgjeQm1U8GiuwV
-         sF/fTBooVKQLx40MRjoBoMEt3o4YMGWP4aq6SMpFrF3aTURbZzavLlwhh2iHNlmI7Apo
-         bu+A==
-X-Gm-Message-State: AOJu0YyYOzsSvls8lUlPpPpV0DqLMLRMIHErfvJKHAolSyfexg1XFsa7
-	d04vkDrBMPgGjuwWDO3xRH7V6/VEFmx4FS5EC83ichVEPdr5bCR5XXHkFvjnK1hX3DH5aOqlvVu
-	8FcERw1bmz36O1+WGBYEXXsyROvYsrWrmGDV69e/bnlcVshxNVCJhFA==
-X-Received: by 2002:adf:b35c:0:b0:374:ba70:5527 with SMTP id ffacd0b85a97d-374bef38a14mr10487176f8f.13.1725529248263;
-        Thu, 05 Sep 2024 02:40:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFc1L2IubIloELAc/ui/TQRrGJJubc4ZHHBYU3N6zCj8tc/ichdm6z4YhezmjVfkXYNgOCQ4A==
-X-Received: by 2002:adf:b35c:0:b0:374:ba70:5527 with SMTP id ffacd0b85a97d-374bef38a14mr10487145f8f.13.1725529247727;
-        Thu, 05 Sep 2024 02:40:47 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-55-250.dyn.eolo.it. [146.241.55.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-374c4059811sm12775152f8f.4.2024.09.05.02.40.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Sep 2024 02:40:47 -0700 (PDT)
-Message-ID: <daae082f-f526-4673-9ab5-43cf1d4d8b59@redhat.com>
-Date: Thu, 5 Sep 2024 11:40:45 +0200
+	bh=gGXv2tnI6Kmy/fRpA12pfvXh3zAcEJ16hhyiGQtJuuQ=;
+	b=CpjR9Ma61exW7ol3UmrSxBVZ3HgZSNHq6VurgZkDkqRT3+qAwrol5qU/31/K9CszDQLYCz
+	pBN9OLhLrsRPgoOAF0rxP7/bs5aAA6LfW0dsZ96eTsjOH5MsoFn8tQmk5AfDaMfHEfYWhY
+	KA4hiNEbEzs0ow4fS9wEPuz6De0b0jEK7yanHLz1Cyn21R5R/vzX/ZQuyIEvCr3sqVlhwI
+	Ysm7ip1QS4+f8DIlxDys11NXnDhs5kZ6T4Y+Qbk4b4IwYV3Ryj1yymUoD1h9XxLR3G1bgI
+	vIv+x4FLWlH9+DO/bj338t4X/NlKc8rQkfQP09eEmavLdciMumU0UjQ3J5ZK1A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1725529463;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gGXv2tnI6Kmy/fRpA12pfvXh3zAcEJ16hhyiGQtJuuQ=;
+	b=DXuSTmD79xdrAwAAK2+Ih6jQ8eBF2b/l68XFagpc8QLc/Ba9bufw3B/j6DmNHY5nct76pl
+	f5u8BOWnQ7AtdHCA==
+To: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org
+Cc: sasha.neftin@intel.com, vitaly.lifshits@intel.com,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ bpf@vger.kernel.org, bigeasy@linutronix.de, Vinicius Costa Gomes
+ <vinicius.gomes@intel.com>, Simon Horman <horms@kernel.org>, Mor Bar-Gabay
+ <morx.bar.gabay@intel.com>
+Subject: Re: [PATCH net-next 2/6] igc: Get rid of spurious interrupts
+In-Reply-To: <b5120c1e-4312-40da-8c11-c0af035dbbb5@intel.com>
+References: <20240830210451.2375215-1-anthony.l.nguyen@intel.com>
+ <20240830210451.2375215-3-anthony.l.nguyen@intel.com>
+ <b5120c1e-4312-40da-8c11-c0af035dbbb5@intel.com>
+Date: Thu, 05 Sep 2024 11:44:20 +0200
+Message-ID: <87bk12sadn.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 2/2] net: phy: Add driver for Motorcomm yt8821
- 2.5G ethernet phy
-To: Frank Sae <Frank.Sae@motor-comm.com>, andrew@lunn.ch,
- hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux@armlinux.org.uk
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- yuanlai.cui@motor-comm.com, hua.sun@motor-comm.com,
- xiaoyong.li@motor-comm.com, suting.hu@motor-comm.com, jie.han@motor-comm.com
-References: <20240901083526.163784-1-Frank.Sae@motor-comm.com>
- <20240901083526.163784-3-Frank.Sae@motor-comm.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240901083526.163784-3-Frank.Sae@motor-comm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On 9/1/24 10:35, Frank Sae wrote:
-> Add a driver for the motorcomm yt8821 2.5G ethernet phy. Verified the
-> driver on BPI-R3(with MediaTek MT7986(Filogic 830) SoC) development board,
-> which is developed by Guangdong Bipai Technology Co., Ltd..
-> 
-> yt8821 2.5G ethernet phy works in AUTO_BX2500_SGMII or FORCE_BX2500
-> interface, supports 2.5G/1000M/100M/10M speeds, and wol(magic package).
-> 
-> Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-The patch LGTM, but waiting a little longer before merging to let Andrew 
-have a proper look.
+On Thu Sep 05 2024, Dima Ruinskiy wrote:
+> On 31/08/2024 0:04, Tony Nguyen wrote:
+>> - wr32(IGC_ICS, IGC_ICS_RXDMT0);
+>> + struct igc_ring *rx_ring =3D adapter->rx_ring[0];
+>> +
+>> + if (test_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags)) {
+>> + clear_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
+>> + wr32(IGC_ICS, IGC_ICS_RXDMT0);
+>> + }
+> I have some concerns specifically about this code (Legacy/MSI interrupt=20
+> case). The code only checks the IGC_RING_FLAG_RX_ALLOC_FAILED flag of=20
+> ring 0. What if the failure was on another ring? It seems proper to=20
+> iterate over all Rx rings in the adapter (I believe igc can have up to 4).
+
+In case of Legacy/MSI only one vector, one rx queue and one tx queue is
+utilized. The MSI-X code has to check for all rings, which it does.
 
 Thanks,
+Kurt
 
-Paolo
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmbZfXUTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgiKeD/42QTepFNA6epyU/zNqzqU0qCA25hTH
+lC6C/GnsMXI1s+5SgOGDHqYlcf20vKatKaUk/qAfHQhzzetqwSU79e22KGJFEcJC
+dzIoLB1t2PWw9c1ehjRaCNQTqUrmS7INoJOFPlg0te9rk7EqtnRrO6cmCPGgd9Ur
+gldScf+9FuH0ya9oOFP6nF4okyddRdUSlKDCAKksVDB4WGpSAJzEkTg1Nxg1lgNs
+SAJqom/JGlAv6ZcF33pPlU0tQtMvjX0/s865/QaF+S5rbiyvGBZKN5t6AIXB1u+1
+f+UmRomSp+GqoX0Fg9uxb1R9MrD9mNAB50oA4gV4DXdrFpOWRkduNZ+1TorvU0vP
+xeqpR1yXrr7un8+KnzF664fIA7tmg8XSoys3TG/mt8Fo+3i+gXwI09Ca1YPcDGei
+3Lbpc5D9mgtMSVt9bEULUgbwLjTjPQe8KSWB+xku7lUEFrXXA+b/DRIAZtkIHAky
+uii3Ra2M1484XvdzjzE7rNU9W7OriSJyopg1FLJt0vVPfkTUKaiYS+UJtJIGb1KM
+KU2FY6rJC4yIi1IttsYNUQ8KL3nc/Y4ku0K/uHS5B+4WFC+GyghS8RQFVCTQOWg3
+fNJtDR0w+p+fFyBdIyCwNDN3b/l+YJEE16jSWTDnBuG047XIlfDFK89WbSNPDfVv
+vfRy4KKEGvi4Kw==
+=hG9B
+-----END PGP SIGNATURE-----
+--=-=-=--
 
