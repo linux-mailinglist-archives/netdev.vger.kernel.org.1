@@ -1,136 +1,195 @@
-Return-Path: <netdev+bounces-125727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB12A96E62B
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 01:24:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D2D396E630
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 01:29:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2C5C1F21887
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 23:24:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CF5D2865D7
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 23:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91E3B1B1D54;
-	Thu,  5 Sep 2024 23:24:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EjEPaZeA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5EB51B3B3C;
+	Thu,  5 Sep 2024 23:29:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF9D18EFF8;
-	Thu,  5 Sep 2024 23:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BAE4539A;
+	Thu,  5 Sep 2024 23:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725578671; cv=none; b=fvxRx9D/NPPUfSLPrTweKS3JeDVSRfxTV/ZCi+BjFCCfxirfJsg/Yg1kGAPoO9L2l6S3POd2opmUOKd39bunVVwz1tsgHAZilipVjz/K9FVDhfR69QIDLuod35cEKgvgY9SzK/VcK47QUFAJdrMzhpgL0N/p5hulEX47Uims6R0=
+	t=1725578976; cv=none; b=F8Uoukv/JGmiHxRIMQ0CsoAH2rB4hWPRSLHUwDjVJROZz6+lwtI3ztrEgP4gTS6bNng0wE50wXyxrG/7DZBEQZwkGdWv9A1/VM0Ul+Rr6uvUnI7Dh8BxAUwYdSiyccgdE3sFvqFrO2nb7RyFloq9gFxmhU9wrMJ3gtFy61hfTx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725578671; c=relaxed/simple;
-	bh=CbDMbtZkU8OadCqEQs2Ep4tUvqs8tO5qvrKfqLEzHaE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=KI6YTPn3+9Z3zTcGXvktMxkRN1cn2X6H9Df733/MdlLqTtT5sHExxXmH9IXUQFkYn8CHh+YsgG74GOpy6li2ktUGBiONiCigRacMJUHSxZo7fFa7KHFMJ3WOY8IsZ2Skp7tlMjcfKB8779vwoVvJfXaysuzWoCrTiuqGWLX7oa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EjEPaZeA; arc=none smtp.client-ip=209.85.222.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7a9782651bdso213589385a.1;
-        Thu, 05 Sep 2024 16:24:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725578669; x=1726183469; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uDBTMwBiTrJflO69iATgrZ7CFhCcctD29TLEPI2euY4=;
-        b=EjEPaZeA4mWKFwiHKGfOx04n0AZGSf53ZBOxZ1HVZFXcyEUVz7GL3vELgOcfvsv3+i
-         4b3wz1dXzoRTTS7dcWnHZ0Ln9mZYOMrhtsiBfL9K+qX9hC0vuBegPw93kajzeuK2PKxc
-         6GsVokiLXRTK5rvdTXG2TW46zQs6HibJeB4TwUxAZImxzJza8zY9s9xzuTztdvxZwokA
-         1PsJXffy1zLULiaDjrzBrLRwf53GMiM9+BatKlwF5BS9xw2QXbsjrWFzMFb/xjjt7ZlH
-         +/1EqCt9jpurh7h/L4t9fjxShwaZsWkxhAm+TqLO3Zg76YFHaGkgE1zzY8Dmy1kiya9I
-         GHNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725578669; x=1726183469;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uDBTMwBiTrJflO69iATgrZ7CFhCcctD29TLEPI2euY4=;
-        b=ttAygtzJD5bU7j7TMhbuy2PbcryYgnIsvdSptnDieLL9yAg5q+jLiH2D7liYsYFmUf
-         y6vD9lucJsQFeWHCSgK2F1u15Yx+K9CQUkHk+70t2bJHedbCY1jNGPhHeTTgQ1g4Cj/+
-         3a3ucqV0Qq55s9+rpzWnK/FMx09OfJbXoQQLR6g9x3CZPOVqCCr8shzxTPHdmj9N202J
-         uqFN6leILXg9U922cQNwp0PxuFm5XnSOM3/j7HbffKp6VV9V1ePq0zZ7UpC/2ZEt+0Vx
-         A68hNXvKJnwWH+1fKheBaz1O0KH5ACycO4njSa/yGIhW64KZqayKwnXumEU5lwRXkNMM
-         mYuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV31tZ2z8RbsSaFGAYvUZD0CM+vYoAVXM06o9zmxTSBX4opC2M7w+kKKX/L1zTuLmWWh9jIlc6rYKHyXV2MKss=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGvYK/XIHMRv2xrW2jD8CdEswKRjTPk2kWkQHFBcBwbNYlJ1K8
-	GjPwBr+ERsFQl7ct17FdMjy1+76anNw5NZKT1QUW+Ux9jJd7nu6D
-X-Google-Smtp-Source: AGHT+IGCCJIkofhBrDrF2kcorUTIIrWsy6x7LIFx2whDPt9i5eA7V7p0yucuD5skcDnbJevOB3gLjg==
-X-Received: by 2002:a05:620a:1a0f:b0:7a6:6d37:9f19 with SMTP id af79cd13be357-7a996cbad1dmr173100085a.15.1725578668689;
-        Thu, 05 Sep 2024 16:24:28 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45801b32272sm11409241cf.22.2024.09.05.16.24.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 16:24:28 -0700 (PDT)
-Date: Thu, 05 Sep 2024 19:24:27 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- davem@davemloft.net, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- ncardwell@google.com, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org, 
- fw@strlen.de, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <66da3dabc3f71_25102d29476@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240905143128.0dde754f@kernel.org>
-References: <20240905031233.1528830-1-willemdebruijn.kernel@gmail.com>
- <20240905031233.1528830-3-willemdebruijn.kernel@gmail.com>
- <20240905143128.0dde754f@kernel.org>
-Subject: Re: [PATCH net-next 2/2] selftests/net: integrate packetdrill with
- ksft
+	s=arc-20240116; t=1725578976; c=relaxed/simple;
+	bh=41NEfH6wtII/P1JwajZXEbPb4txWupZUbbh0ST+9Zo4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uTjlyDkpNwv9h2TT7jDJWC+5KcASJ2bNYO+5ZcaF1DdmyIIjtUgxz+HtTUDz4qfD5XnH3xLY4bjsbElYvlFHen4k73geb7FiFIMv2q6Zz+rLUe6zkuVUc2ck86MGdd6B/bBb2GNrRP3Jwx6wYWOlJFlhAfYFiVUBKqZ7pcQLW3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net-next 00/16] Netfilter updates for net-next
+Date: Fri,  6 Sep 2024 01:29:04 +0200
+Message-Id: <20240905232920.5481-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Jakub Kicinski wrote:
-> On Wed,  4 Sep 2024 23:07:03 -0400 Willem de Bruijn wrote:
-> > +++ b/tools/testing/selftests/net/packetdrill/config
-> > @@ -0,0 +1 @@
-> > +CONFIG_TCP_MD5SIG=y
-> 
-> Looks like this is not enough:
-> 
-> # 1..2
-> # open tun device: No such file or directory
-> # not ok 1 ipv4
-> # open tun device: No such file or directory
-> 
-> https://netdev-3.bots.linux.dev/vmksft-packetdrill/results/759141/1-tcp-inq-client-pkt/stdout
-> 
-> Resulting config in the build:
-> 
-> # CONFIG_TUN is not set
-> 
-> https://netdev-3.bots.linux.dev/vmksft-packetdrill/results/759141/config
-> 
-> Keep in mind the "Important" note here:
-> 
-> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style#how-to-build
-> 
-> I recommend using a fresh tree or mrproper for testing vng configs.
-> 
-> Feel free to post v2 without the 24h wait, it's a bit tricky to handle
-> new targets in CI, sooner we merge this the less manual work for me..
+@netdev maintainers: Please, kindly allow me to exceed in one patch the
+maximum series length, there are a few trivial oneliners in this series.
 
-Oops sorry. Thanks for the pointer.
+-o-
 
-Sent a v2 with CONFIG_TUN and a few other CONFIGS from reviewing
-the existing configs and defaults.sh. The above steps work for me now. 
+Hi,
 
+The following patchset contains Netfilter updates for net-next:
 
+Patch #1 adds ctnetlink support for kernel side filtering for
+	 deletions, from Changliang Wu.
+
+Patch #2 updates nft_counter support to Use u64_stats_t,
+	 from Sebastian Andrzej Siewior.
+
+Patch #3 uses kmemdup_array() in all xtables frontends,
+	 from Yan Zhen.
+
+Patch #4 is a oneliner to use ERR_CAST() in nf_conntrack instead
+	 opencoded casting, from Shen Lichuan.
+
+Patch #5 removes unused argument in nftables .validate interface,
+	 from Florian Westphal.
+
+Patch #6 is a oneliner to correct a typo in nftables kdoc,
+	 from Simon Horman.
+
+Patch #7 fixes missing kdoc in nftables, also from Simon.
+
+Patch #8 updates nftables to handle timeout less than CONFIG_HZ.
+
+Patch #9 rejects element expiration if timeout is zero,
+	 otherwise it is silently ignored.
+
+Patch #10 disallows element expiration larger than timeout.
+
+Patch #11 removes unnecessary READ_ONCE annotation while mutex is held.
+
+Patch #12 adds missing READ_ONCE/WRITE_ONCE annotation in dynset.
+
+Patch #13 annotates data-races around element expiration.
+
+Patch #14 allocates timeout and expiration in one single set element
+	  extension, they are tighly couple, no reason to keep them
+	  separated anymore.
+
+Patch #15 updates nftables to interpret zero timeout element as never
+	  times out. Note that it is already possible to declare sets
+	  with elements that never time out but this generalizes to all
+	  kind of set with timeouts.
+
+Patch #16 supports for element timeout and expiration updates.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-24-09-06
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 55ddb6c5a3aef8d8658fe31b1ddda007693ae797:
+
+  net: stmmac: drop the ethtool begin() callback (2024-09-02 13:44:09 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git tags/nf-next-24-09-06
+
+for you to fetch changes up to 4201f3938914d8df3c761754b9726770c4225d66:
+
+  netfilter: nf_tables: set element timeout update support (2024-09-03 18:19:44 +0200)
+
+----------------------------------------------------------------
+netfilter pull request 24-09-06
+
+----------------------------------------------------------------
+Changliang Wu (1):
+      netfilter: ctnetlink: support CTA_FILTER for flush
+
+Florian Westphal (1):
+      netfilter: nf_tables: drop unused 3rd argument from validate callback ops
+
+Pablo Neira Ayuso (9):
+      netfilter: nf_tables: elements with timeout below CONFIG_HZ never expire
+      netfilter: nf_tables: reject element expiration with no timeout
+      netfilter: nf_tables: reject expiration higher than timeout
+      netfilter: nf_tables: remove annotation to access set timeout while holding lock
+      netfilter: nft_dynset: annotate data-races around set timeout
+      netfilter: nf_tables: annotate data-races around element expiration
+      netfilter: nf_tables: consolidate timeout extension for elements
+      netfilter: nf_tables: zero timeout means element never times out
+      netfilter: nf_tables: set element timeout update support
+
+Sebastian Andrzej Siewior (1):
+      netfilter: nft_counter: Use u64_stats_t for statistic.
+
+Shen Lichuan (1):
+      netfilter: conntrack: Convert to use ERR_CAST()
+
+Simon Horman (2):
+      netfilter: nf_tables: Correct spelling in nf_tables.h
+      netfilter: nf_tables: Add missing Kernel doc
+
+Yan Zhen (1):
+      netfilter: Use kmemdup_array instead of kmemdup for multiple allocation
+
+ include/net/netfilter/nf_tables.h        |  42 +++++++----
+ include/net/netfilter/nf_tproxy.h        |   1 +
+ include/net/netfilter/nft_fib.h          |   4 +-
+ include/net/netfilter/nft_meta.h         |   3 +-
+ include/net/netfilter/nft_reject.h       |   3 +-
+ include/uapi/linux/netfilter/nf_tables.h |   2 +-
+ net/bridge/netfilter/ebtables.c          |   2 +-
+ net/bridge/netfilter/nft_meta_bridge.c   |   5 +-
+ net/bridge/netfilter/nft_reject_bridge.c |   3 +-
+ net/ipv4/netfilter/arp_tables.c          |   2 +-
+ net/ipv4/netfilter/ip_tables.c           |   2 +-
+ net/ipv6/netfilter/ip6_tables.c          |   2 +-
+ net/netfilter/nf_conntrack_core.c        |   2 +-
+ net/netfilter/nf_conntrack_netlink.c     |   9 +--
+ net/netfilter/nf_nat_core.c              |   2 +-
+ net/netfilter/nf_tables_api.c            | 126 ++++++++++++++++++++-----------
+ net/netfilter/nft_compat.c               |   6 +-
+ net/netfilter/nft_counter.c              |  90 +++++++++++-----------
+ net/netfilter/nft_dynset.c               |  18 ++---
+ net/netfilter/nft_fib.c                  |   3 +-
+ net/netfilter/nft_flow_offload.c         |   3 +-
+ net/netfilter/nft_fwd_netdev.c           |   3 +-
+ net/netfilter/nft_immediate.c            |   3 +-
+ net/netfilter/nft_lookup.c               |   3 +-
+ net/netfilter/nft_masq.c                 |   3 +-
+ net/netfilter/nft_meta.c                 |   6 +-
+ net/netfilter/nft_nat.c                  |   3 +-
+ net/netfilter/nft_osf.c                  |   3 +-
+ net/netfilter/nft_queue.c                |   3 +-
+ net/netfilter/nft_redir.c                |   3 +-
+ net/netfilter/nft_reject.c               |   3 +-
+ net/netfilter/nft_reject_inet.c          |   3 +-
+ net/netfilter/nft_reject_netdev.c        |   3 +-
+ net/netfilter/nft_rt.c                   |   3 +-
+ net/netfilter/nft_socket.c               |   3 +-
+ net/netfilter/nft_synproxy.c             |   3 +-
+ net/netfilter/nft_tproxy.c               |   3 +-
+ net/netfilter/nft_xfrm.c                 |   3 +-
+ 38 files changed, 206 insertions(+), 178 deletions(-)
 
