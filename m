@@ -1,113 +1,80 @@
-Return-Path: <netdev+bounces-125598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10D5396DD44
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 17:08:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA1A796DD47
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 17:08:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B13DB1F234F4
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:07:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5787AB2466B
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47E3F1990BA;
-	Thu,  5 Sep 2024 15:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C76D12D744;
+	Thu,  5 Sep 2024 15:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bxbGl6Yi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eZ7RVCKh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 222D6197A9B
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 15:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E438443169;
+	Thu,  5 Sep 2024 15:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725548704; cv=none; b=RFfe7CUPXoIPnQ2/QfuskOHe651oQ6SYdzvY/cVSSe+FzTG4YW4P+F8GVUV+heal9b36rFtM9CMKMb+2MWOZuioQ6Wn2sqfJjWzykt/j4rB0VGRwF/zm5RHkJ9MHwwM9z1/6hkpQowzYUo/67koq94QdWXlzyNhuzLeHeFqOTcQ=
+	t=1725548767; cv=none; b=UM3bR+D3fNeJXj2L1pO7/P1niwxFKTmLov7HAWoEflcpBWTjpP5TReCY2gqf82GXMCQ1kDFN9r1rE+y+mQ0BGfUCuwcO2triaXj1PEolDAtohzcF+VvCu9m3fZ4zZFk5bs3TGR3WKvEwEAaTSkvGV0OA9wQ15Sc7MnYMtQkavho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725548704; c=relaxed/simple;
-	bh=Ld8KTi3QDI3VDWXO6dPONOX6HZLHeHYM7DMRcCRDWfQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i9e/Yxu0b2dOv4WwRQr9PTqCyBpaVLJIUnNEXlESTVYKPJ6Oedt9oF9i8448UAuLIo+y4CMWFb6HCUs3jAHKpP6HGI4qmBWAN4y2dQqZM7A+m8YlGQIn9apmumVmaEGq8z35RaBRbLmBeYg3w+IkvKZGUbtO1l276WgLeyQ3hak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bxbGl6Yi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B540C4CEC3;
-	Thu,  5 Sep 2024 15:05:03 +0000 (UTC)
+	s=arc-20240116; t=1725548767; c=relaxed/simple;
+	bh=wKMrcMC+PizjREdK8NWSLgrBh6C8Cak5TkypWtYvC1M=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=tLhdOLdHayg1GTJPJbtydLWqTNpM8rf7Kye3xkPgapDn46pJsNJAFOIcUkeCf7GOOqZxPf+B1tlJc9cVISAHad+O69LFEim1FgFx38efOqEtM97CoXYnOzliiOl9f440Zia7ysyaXCyFdyqVUlEhBN7Zgy/68fgPwVXzimsjc80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eZ7RVCKh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70837C4CEC3;
+	Thu,  5 Sep 2024 15:06:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725548703;
-	bh=Ld8KTi3QDI3VDWXO6dPONOX6HZLHeHYM7DMRcCRDWfQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bxbGl6YiK5528f0iedkMc3CPab1WUFRuvkqkHVX96+Zgh5LxTYJAeda1dHTja1IYX
-	 Gm/euAa4fXmj0fJLGdu/e4Qt/L+MuVqG8q5yXMs5ohEpu+P039EeXwrrluWiIuZPqW
-	 Fn9SmZdx3Q0NJMkAPlsLr0PfgmN11LYsJK4RdptjDIVssru1zNI8lXDM+YliuVmcYt
-	 lM4tLHEWDzKbK+N7YX+WO/pMLPUCZhDKOjGYr64YyiCTM7gj6M86e6AnSPHDS4vks+
-	 DAw6Hu8sO9SQW5XhlmiYqK4RrtEXgdl7PD9md7Zu1yVhODbJcD6UDzIdxaYUQI6Bh/
-	 DHXIehKSrOgVQ==
-Date: Thu, 5 Sep 2024 08:05:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, edumazet@google.com
-Subject: Re: [PATCH v6 net-next 02/15] netlink: spec: add shaper YAML spec
-Message-ID: <20240905080502.3246e040@kernel.org>
-In-Reply-To: <d4a8d497-7ec8-4e8b-835e-65cc8b8066b6@redhat.com>
-References: <cover.1725457317.git.pabeni@redhat.com>
-	<a0585e78f2da45b79e2220c98e4e478a5640798b.1725457317.git.pabeni@redhat.com>
-	<20240904180330.522b07c5@kernel.org>
-	<d4a8d497-7ec8-4e8b-835e-65cc8b8066b6@redhat.com>
+	s=k20201202; t=1725548766;
+	bh=wKMrcMC+PizjREdK8NWSLgrBh6C8Cak5TkypWtYvC1M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=eZ7RVCKh6TicVGC73Kha7CA5VSvBAEbtxH1eGCsoexkmCtBlNAnfVWBcP16bLZX3u
+	 iqdG9h1Or6J2oTIf32AZNjJe21mRc4Hgrlt6J/1/WzoWcc0tRzRiNm6ffDhFGB2JMg
+	 K9HSn6lLt76WyvyEg+2YcWSJgXgdBYn9XdKQFPIe6Jqi5cUNW8XNXa2Tsrq7pWSlWF
+	 zYXCZWN6e3VKyHMwXhNZCGLgpVHGwcNYQpkVWLAV3o+r+D/PyG+/w+w5/bJtoOgwi4
+	 yMNWnSDhKYyXe2RosSmAh41itKL2CtaAu0Fq1OcSxa/nTaJktmGX8ub88P59gvgqz/
+	 yb1xlWEg7VTEw==
+Date: Thu, 5 Sep 2024 10:06:04 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
+	jing2.liu@intel.com
+Subject: Re: [PATCH V4 11/12] bnxt_en: Add TPH support in BNXT driver
+Message-ID: <20240905150604.GA387441@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240822204120.3634-12-wei.huang2@amd.com>
 
-On Thu, 5 Sep 2024 16:51:00 +0200 Paolo Abeni wrote:
-> On 9/5/24 03:03, Jakub Kicinski wrote:
-> > On Wed,  4 Sep 2024 15:53:34 +0200 Paolo Abeni wrote:  
-> >> +      -
-> >> +        name: node
-> >> +        type: nest
-> >> +        nested-attributes: node-info
-> >> +        doc: |
-> >> +           Describes the node shaper for a @group operation.
-> >> +           Differently from @leaves and @shaper allow specifying
-> >> +           the shaper parent handle, too.  
-> > 
-> > Parent handle is inside node scope? Why are leaves outside and parent
-> > inside? Both should be at the same scope, preferably main scope.  
+On Thu, Aug 22, 2024 at 03:41:19PM -0500, Wei Huang wrote:
+> From: Manoj Panicker <manoj.panicker2@amd.com>
 > 
-> The group() op receives as arguments, in the main scope:
-> 
-> ifindex
-> node
-> leaves
-> 
-> 'parent' is a nested attribute for 'node', exactly as 'handle'. We need 
-> to specify both to identify the 'node' itself (via the 'handle') and to 
-> specify where in the hierarchy the 'node' will be located (via the 
-> 'parent'). Do I read correctly that you would prefer:
-> 
-> ifindex
-> node_handle
-> node_parent
-> leaves
+> Implement TPH support in Broadcom BNXT device driver. The driver uses
+> TPH functions to retrieve and configure the device's Steering Tags when
+> its interrupt affinity is being changed.
 
-I don't see example uses in the cover letter or the test so there's 
-a good chance I'm missing something, but... why node_parent?
-The only thing you need to know about the parent is its handle,
-so just "parent", right?
+> +	/* Register IRQ affinility notifier */
 
-Also why node_handle? Just "handle", and other attrs of the node can
-live in the main scope.
-
-Unless you have a strong reason to do this to simplify the code -
-"from netlink perspective" it looks like unnecessary nesting.
-The operation arguments describe the node, there's no need to nest
-things in another layer.
+s/affinility/affinity/
 
