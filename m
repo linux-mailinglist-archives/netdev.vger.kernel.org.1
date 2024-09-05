@@ -1,63 +1,74 @@
-Return-Path: <netdev+bounces-125395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E6796CF93
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:43:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 572E896CFE1
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:00:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 680B21F25650
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 06:43:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BA2F1C22892
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 07:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C76818BC04;
-	Thu,  5 Sep 2024 06:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B9BB188A37;
+	Thu,  5 Sep 2024 07:00:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="XCNbL2fg"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dKM2clBz"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward204d.mail.yandex.net (forward204d.mail.yandex.net [178.154.239.217])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DF6188CA5
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 06:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.217
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F5E156883;
+	Thu,  5 Sep 2024 07:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725518603; cv=none; b=BTWXUIlYr6vhIxKooClKnzwygZe2lnWNPPbAyheAXtzwFZwrqWgcD4rLG/g1pedlXgNwhLXOEEjuLzQp+xK9GnLjLK+tOMv89TgMtso9Tvwli9pm/yX3kIiuZfjukIbu1nJgu78Dv12RlZLM4ostyQueOVPDPFNVtj0BK7iatqE=
+	t=1725519616; cv=none; b=qto+owkYSLGGTqLRKzTqbWmYy1fNlPvYMFqNtO5moA/j52HkixJjLwdgChxQHVWW3x4uRdPGjmi3z8/w5ILh6dz+Sv5LvR/HAiJlwjTP3Lov69ejQn5f+q/XehsoS4Bb09L0c1zS48Mt0T/8SKLcGvH8pKUxfY30PTii72GUltI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725518603; c=relaxed/simple;
-	bh=L0l/Sbqu8Y5VD+Vpn1VVG6EY+J8Fh4V0w8CWh6nAeJw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eOQ9p4ZIu85FKDRL86NfXZPJN55q+uIF4yQO5JGeSETPkqXMsBTDo4zgICFtTUI4Jt2kW/tXYCSHsfrE0Xpg4yEX64LTW3GBqlZzAf6yx/9TGCKsVRiJeHkM7CkMGJJshR8kxO+s8cxoq2hKW437gIBKg4rZHp1qzGf4ogqj3Dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=XCNbL2fg; arc=none smtp.client-ip=178.154.239.217
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward102d.mail.yandex.net (forward102d.mail.yandex.net [IPv6:2a02:6b8:c41:1300:1:45:d181:d102])
-	by forward204d.mail.yandex.net (Yandex) with ESMTPS id B4F8B63EB3
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 09:43:10 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:2d4c:0:640:de18:0])
-	by forward102d.mail.yandex.net (Yandex) with ESMTPS id E3C1B608ED;
-	Thu,  5 Sep 2024 09:43:02 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 1hWjdGDRriE0-UtcftXEL;
-	Thu, 05 Sep 2024 09:43:02 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1725518582; bh=z4beoG7aOZCsI8FqZcYGPJSsfxruSTx4TiLHrR6AZX4=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=XCNbL2fgsx0Rb0ICnTG6T8fPdVmFLrhXouW60bq1U/feFJJ/qVjHaAgmELwbkudYu
-	 hiFsiGJ57fxDm6UBfZschxKnJxQZK2cSVPOotlmRQ+CFmbvJVuiPT2EKdz8nQOY3i2
-	 9ko/C+eT8LpdQxo1tuxJDo0KFnkrWPdARks9/DX0=
-Authentication-Results: mail-nwsmtp-smtp-production-main-24.klg.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Dmitry Antipov <dmantipov@yandex.ru>
-Subject: [PATCH RFC net] net: sockmap: avoid race between sock_map_destroy() and sk_psock_put()
-Date: Thu,  5 Sep 2024 09:42:57 +0300
-Message-ID: <20240905064257.3870271-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1725519616; c=relaxed/simple;
+	bh=IvoGT47CSOcRI53r+F1uXaKUyLMUgGspaXXR2zcX36w=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=j8fwlQ5mF1bkD1+Mh6AFBNdolKMfcY8khB8NhbQUcA6aW/XxtcQC2mEspBsJqX8GM6CerPqdw5s4RnYZox6wJkjgyhmKDwQOs98jZ4rYDaZjgA69E6dTxi6uNlfdFYFqKYvC78XDkkfXAZ9AGYShteGVrHwsyqtkhfWRd/wzJ+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=dKM2clBz; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1725519614; x=1757055614;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=4iqwrQDG5eM85faw8/CTnn+E6kdH/nn6dSuER7474ZM=;
+  b=dKM2clBzdsQxw57MOGhWVcY0iiOSIY5pw7Tc1sphwdiRtFQGYmBownnz
+   /PFBvauYZWRIbzZJCChx4liocppLBNAlPaTjxP5DwlZERYctN9BF8pq3R
+   w3vbQ436iS9qRIN8LWFNARefKFxwXyPfvSjhKvMSBuqo9siRQXOmOxnn2
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.10,204,1719878400"; 
+   d="scan'208";a="450804037"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 07:00:09 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:62662]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.12.90:2525] with esmtp (Farcaster)
+ id c2c91d75-b580-4f96-9904-f4e33928f9d1; Thu, 5 Sep 2024 07:00:08 +0000 (UTC)
+X-Farcaster-Flow-ID: c2c91d75-b580-4f96-9904-f4e33928f9d1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 5 Sep 2024 07:00:06 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.171.60) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Thu, 5 Sep 2024 07:00:04 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <lizhi.xu@windriver.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com>,
+	<syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in unix_stream_read_actor (2)
+Date: Wed, 4 Sep 2024 23:59:55 -0700
+Message-ID: <20240905065955.17065-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240905052532.533159-1-lizhi.xu@windriver.com>
+References: <20240905052532.533159-1-lizhi.xu@windriver.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,88 +76,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-At https://syzkaller.appspot.com/bug?extid=f363afac6b0ace576f45, syzbot
-has triggered the following race condition:
+From: Lizhi Xu <lizhi.xu@windriver.com>
+Date: Thu, 5 Sep 2024 13:25:32 +0800
+> The sock queue oob twice, the first manage_oob (in unix_stream_read_generic) peek next skb only,
+> and the next skb is the oob skb, so if skb is oob skb we need use manage_oob dealwith it.
 
-On CPU0, 'sk_psock_drop()' is running at [1]:
+I think the correct fix should be like this.
 
-void sk_psock_drop(struct sock *sk, struct sk_psock *psock)
-{
-        write_lock_bh(&sk->sk_callback_lock);
-        sk_psock_restore_proto(sk, psock);                                  [1]
-        rcu_assign_sk_user_data(sk, NULL);
-        if (psock->progs.stream_parser)
-                sk_psock_stop_strp(sk, psock);
-        else if (psock->progs.stream_verdict || psock->progs.skb_verdict)
-                sk_psock_stop_verdict(sk, psock);
-        write_unlock_bh(&sk->sk_callback_lock);
+The issue happens only when the head oob is consumed (!unix_skb_len(skb))
+and the next skb is peeked.  Then, we can fallback to the else branch in
+manage_oob().
 
-        sk_psock_stop(psock);
+#syz test
 
-        INIT_RCU_WORK(&psock->rwork, sk_psock_destroy);
-        queue_rcu_work(system_wq, &psock->rwork);
-}
-
-If 'sock_map_destroy()' is scheduled on CPU1 at the same time, psock is
-always NULL at [2]. But, since [1] may be is in progress during [3], the
-value of 'saved_destroy' at this point is undefined:
-
-void sock_map_destroy(struct sock *sk)
-{
-        void (*saved_destroy)(struct sock *sk);
-        struct sk_psock *psock;
-
-        rcu_read_lock();
-        psock = sk_psock_get(sk);                                           [2]
-        if (unlikely(!psock)) {
-                rcu_read_unlock();
-                saved_destroy = READ_ONCE(sk->sk_prot)->destroy;            [3]
-        } else {
-                saved_destroy = psock->saved_destroy;
-                sock_map_remove_links(sk, psock);
-                rcu_read_unlock();
-                sk_psock_stop(psock);
-                sk_psock_put(sk, psock);
-        }
-        if (WARN_ON_ONCE(saved_destroy == sock_map_destroy))
-                return;
-        if (saved_destroy)
-                saved_destroy(sk);
-}
-
-The following fix is helpful to avoid the race and does not introduce
-psock leak (when running the syzbot reproducer from the above), but
-I'm not sure whether the latter is always true in some other scenario.
-So comments are highly appreciated.
-
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
- net/core/sock_map.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index d3dbb92153f2..fef4231fc872 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -1649,7 +1649,7 @@ void sock_map_destroy(struct sock *sk)
- 	struct sk_psock *psock;
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index a1894019ebd5..9913a447b758 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2654,51 +2654,49 @@ static int unix_stream_recv_urg(struct unix_stream_read_state *state)
+ static struct sk_buff *manage_oob(struct sk_buff *skb, struct sock *sk,
+ 				  int flags, int copied)
+ {
++	struct sk_buff *consumed_skb = NULL;
++	struct sk_buff *unread_skb = NULL;
+ 	struct unix_sock *u = unix_sk(sk);
  
- 	rcu_read_lock();
--	psock = sk_psock_get(sk);
-+	psock = sk_psock(sk);
- 	if (unlikely(!psock)) {
- 		rcu_read_unlock();
- 		saved_destroy = READ_ONCE(sk->sk_prot)->destroy;
-@@ -1658,7 +1658,6 @@ void sock_map_destroy(struct sock *sk)
- 		sock_map_remove_links(sk, psock);
- 		rcu_read_unlock();
- 		sk_psock_stop(psock);
--		sk_psock_put(sk, psock);
- 	}
- 	if (WARN_ON_ONCE(saved_destroy == sock_map_destroy))
- 		return;
--- 
-2.46.0
-
+-	if (!unix_skb_len(skb)) {
+-		struct sk_buff *unlinked_skb = NULL;
+-
+-		spin_lock(&sk->sk_receive_queue.lock);
++	spin_lock(&sk->sk_receive_queue.lock);
+ 
++	if (!unix_skb_len(skb)) {
+ 		if (copied && (!u->oob_skb || skb == u->oob_skb)) {
+ 			skb = NULL;
+ 		} else if (flags & MSG_PEEK) {
+ 			skb = skb_peek_next(skb, &sk->sk_receive_queue);
+ 		} else {
+-			unlinked_skb = skb;
++			consumed_skb = skb;
+ 			skb = skb_peek_next(skb, &sk->sk_receive_queue);
+-			__skb_unlink(unlinked_skb, &sk->sk_receive_queue);
++			__skb_unlink(consumed_skb, &sk->sk_receive_queue);
+ 		}
+ 
+-		spin_unlock(&sk->sk_receive_queue.lock);
+-
+-		consume_skb(unlinked_skb);
+-	} else {
+-		struct sk_buff *unlinked_skb = NULL;
++		if (!u->oob_skb || skb != u->oob_skb)
++			goto unlock;
++	}
+ 
+-		spin_lock(&sk->sk_receive_queue.lock);
++	if (skb == u->oob_skb) {
++		if (copied) {
++			skb = NULL;
++		} else if (!(flags & MSG_PEEK)) {
++			WRITE_ONCE(u->oob_skb, NULL);
+ 
+-		if (skb == u->oob_skb) {
+-			if (copied) {
+-				skb = NULL;
+-			} else if (!(flags & MSG_PEEK)) {
+-				WRITE_ONCE(u->oob_skb, NULL);
+-
+-				if (!sock_flag(sk, SOCK_URGINLINE)) {
+-					__skb_unlink(skb, &sk->sk_receive_queue);
+-					unlinked_skb = skb;
+-					skb = skb_peek(&sk->sk_receive_queue);
+-				}
+-			} else if (!sock_flag(sk, SOCK_URGINLINE)) {
+-				skb = skb_peek_next(skb, &sk->sk_receive_queue);
++			if (!sock_flag(sk, SOCK_URGINLINE)) {
++				__skb_unlink(skb, &sk->sk_receive_queue);
++				unread_skb = skb;
++				skb = skb_peek(&sk->sk_receive_queue);
+ 			}
++		} else if (!sock_flag(sk, SOCK_URGINLINE)) {
++			skb = skb_peek_next(skb, &sk->sk_receive_queue);
+ 		}
++	}
+ 
+-		spin_unlock(&sk->sk_receive_queue.lock);
++unlock:
++	spin_unlock(&sk->sk_receive_queue.lock);
++
++	consume_skb(consumed_skb);
++	kfree_skb(unread_skb);
+ 
+-		kfree_skb(unlinked_skb);
+-	}
+ 	return skb;
+ }
+ #endif
 
