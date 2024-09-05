@@ -1,138 +1,141 @@
-Return-Path: <netdev+bounces-125495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA50B96D610
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:29:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC3F796D625
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:32:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 091951C254D5
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:29:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A4A0B20987
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8B491990DD;
-	Thu,  5 Sep 2024 10:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FD51898F4;
+	Thu,  5 Sep 2024 10:32:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PZaBWKp1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lxugF+tI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2518D19882C
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 10:27:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CA91EBFEC;
+	Thu,  5 Sep 2024 10:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725532071; cv=none; b=R29rMlpNrqeWOFuQekvLh9JK6v/lVidXX+6LYyeyQsaRUcN6XLovolab7Afh3uaZ8VCpp033Y1INMP4kaaqTrSkpkejo6otmBtpQZUi3WtcZjpNeC30VEI2ZQ4KLlmAaSPDiW7GWbn3vcPJ/6PloKO6Dhl+IV28wdsQjPCKieeQ=
+	t=1725532349; cv=none; b=K9fBZwNS+MJo5x7hsoSjo5v4MOw2EdLc6s3VMfTMvVYt/44QjvOcI3BJF5oejcjPwhFCGrQrT9RBlFQSPMQg/bxJb6j7OaASl8UFE/mNXuOA4IPoyCFXPpDERoER5MnP5a0zazQuMj+ywZ3puOUhfBJJdJiT4gyIyI8oTbKVguk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725532071; c=relaxed/simple;
-	bh=fLnaSEMwTToqbULVT0rbA5FWXK2jDlM8vTXItsk0pPs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d7zSsiGzQZppsiOOyvE8dmWuCaaYPE5y/Ib+/EVmCRzib4o43g0iyHfarc2RyXQ0zv/nzgNWcd5u+YZWkPxsuHRvrVZaOJn+UsthhnCwLtJf1dfOxGE7Xvo0pQd4nJU6bL7EbfwTh5fvHPnIOvTkzPjUudjF0/HmgTftveQBCtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PZaBWKp1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725532069;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HPZY07hdzZVf0G40Y7mAQP+lGDT6ud+TjaZvwKM2DVk=;
-	b=PZaBWKp16+fLU7nyaaOc46GUgQrZ8Dch+zHGjDu8Yn4RxiqgQodDtrtXrj9njMujD2Uz2U
-	doJ4r4fafnxpj8VMVwk3P7wRW4cA91LdPWD/gR1oZWXsmLeHjjf7ki+CFkdu/fWqPsAd1O
-	xfPsCmlJAW0zt+TDab/sjDkPV3y/FBw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-424-rGFcjGHhPJqjSJci0j469Q-1; Thu, 05 Sep 2024 06:27:47 -0400
-X-MC-Unique: rGFcjGHhPJqjSJci0j469Q-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-374c32158d0so402009f8f.1
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 03:27:47 -0700 (PDT)
+	s=arc-20240116; t=1725532349; c=relaxed/simple;
+	bh=xlNr4tLgdjuXyQS+F30A95mPCNRvaUl7/UIv5aWlG2c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NZF9yd4k0XBCStH1QpZFfd731cAIcLHh3y2jxotMUGO/vvA6yALWtUYM9Q81MHTgRP5YQwADSthbJ4OSo31RJVTrGmjdWDIsDXKlpxDdmDNl2L+//ipQ9MHBkG+llR44VWrs7KnAlLczFP7v2iW61iRFRCw95TM41dt18lg5DAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lxugF+tI; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-39fd6a9acb6so1944585ab.0;
+        Thu, 05 Sep 2024 03:32:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725532347; x=1726137147; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TroQIzNqEjxBCseUHru6LValsIoM+uwDabvjlwAU0aU=;
+        b=lxugF+tIQmFNjQddEmi+zg3mwXX00f4soJcXtTXGuxnbrCnq6a5H8VIY7GTCo29D9G
+         9j6Yck6+9Oh1OIHevn0VT7eBAXk3jhhiIXo/MK64sMsLebG7+gZV7S/leumyS89BSHiN
+         jBLl1X3sDMeGWmitMOYsSPWdzPNLUqxfWvI5kWCxxbMNEwOFcIllxLV3H1tFqltFO/67
+         AI66CgDmBCMsN4WupsnEarFUIexCSN5HW06DrPqvMCYd70T7zYlwZGCxBDlu3o89h8G7
+         XvqTsxCsskxqSn0GzLw9j+OemIP/xT8FkbzK+bBmD7nFkJCIRDHEa5KQV9iQpCTFsF7J
+         eibw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725532066; x=1726136866;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HPZY07hdzZVf0G40Y7mAQP+lGDT6ud+TjaZvwKM2DVk=;
-        b=k6YKhmTMTVteuWTd5x/6nlDtsNSyVBl847ccODn038Vqc7zF+SQcwafAb/dq4uWKeW
-         ScqtP4u1lK4s1NvldgWHhwU/4MsKwGOwaPtYuLR8fvI0auvNrvhn+pZyFc8ZRjIzxI4k
-         5ldnerva/bhwEIW9ygnAreBsg7f/U3XpOQNlBOrttURPt/Y/EMUXsU7LX0OARyawplCo
-         BZCb8rdRdnLAwQh+/X2uPyRW+MINmNq6xbpjs0j9/V/542HdnC1IX6A6PkucgDc0VxYw
-         tfFdTuwTNlhqJU1wukS0pXfqT8RlpYZ8p4cqd/zLhJGBg7WFfo/CxWQDIEyj3x1TlTob
-         bkFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUKDSGFpC6yn9WvzGb/BrLcwUjJrUh22H+9bHYrXSb6v+JZZs+Buskrg6/zqTIjS27/gV3TqwU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoZla2sDzojTnXRcX8rqjsk1Z8yJAGx05Ndb89eNQ2Z1P+9fIw
-	f8cNwUnJuD5SM5g1E2eG8PFZkMmz4kezKm3EysTzsbhiYUv6XxG7mduVtZZ4msX+Y1gFv+7UVfV
-	PVN7afsI9B2rNVcMW5QPiTLdpLZ7DC6JNkWuZ0YbHWGrUx7Q4QDaoMw==
-X-Received: by 2002:adf:db4b:0:b0:371:9149:dc54 with SMTP id ffacd0b85a97d-374bce97a6emr11563791f8f.3.1725532066630;
-        Thu, 05 Sep 2024 03:27:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IELrkDTki7RK2Sj/ftb+YWjMBHGRyt5865Zm3SuZ0YuC1n53erV/zIV711siGKvaK8a5Qowxg==
-X-Received: by 2002:adf:db4b:0:b0:371:9149:dc54 with SMTP id ffacd0b85a97d-374bce97a6emr11563768f8f.3.1725532066073;
-        Thu, 05 Sep 2024 03:27:46 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-55-250.dyn.eolo.it. [146.241.55.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-374ba593876sm15319716f8f.5.2024.09.05.03.27.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 05 Sep 2024 03:27:45 -0700 (PDT)
-Message-ID: <8fe1d9da-40cc-4537-80ce-6a2855c2dec4@redhat.com>
-Date: Thu, 5 Sep 2024 12:27:43 +0200
+        d=1e100.net; s=20230601; t=1725532347; x=1726137147;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TroQIzNqEjxBCseUHru6LValsIoM+uwDabvjlwAU0aU=;
+        b=ITpLLeCyWHeziUbNXjd+hp/R/IDprb8/Nbxs7VYu0mNGOuhnXY9nE9LkD5yTFxWBFy
+         JLveqmKJ2b9bxvdYZgeOUO7RiuPPwL3GQOh85ydTrJv4MRT+3lL9FPvj6IJretaE3Swd
+         79TpF1aqpzPNfRIQQ13Htiqcrrgzcu+Qv1l+1AVG1IMH3sAEt4ZHNYulARhL255XiPZU
+         FVLYZq8snmQojGmNorVzYKRtyTV076kZ+tkIqDa22kuZ3lM8594O3CuMtDMNpxVoh30m
+         4RfMidmirRVSyM3HA3m9luBbRo+mSf8dj+uKbkNcnbZW/1dhVc827nY2ufjELzRiOF/5
+         hVnA==
+X-Forwarded-Encrypted: i=1; AJvYcCWCcLwvF84oJdTT+NTi+ylmJNvrjUNAeogcE6KfdX0wigUKVoRGSRVXMtgT3I0czCyowmwJwF0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyojIu0mPEh6o6vYZxpvMzX8Baqz6e7XWUTWC5BP6of4iBaje9H
+	KrCVwcU2quRBF52RjPbJ1kf2hOJET6ihtXdS1b2kdP7wP5lEBNaTht50Olg+piR4JSwW2vloOCp
+	SwJDY+0Lb9wVm0E5KIdH+I16BUDY=
+X-Google-Smtp-Source: AGHT+IGsw50fSVhSbmOZK+hG7nhnE6/A/2RRUbvmSjqarB5F8eiBODLZQLQD/odeGv29NKwS3w5U3Bbwzedfk9DBj+k=
+X-Received: by 2002:a05:6e02:1fc2:b0:39d:25d8:43a9 with SMTP id
+ e9e14a558f8ab-39f6a892175mr130716495ab.0.1725532347223; Thu, 05 Sep 2024
+ 03:32:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net-next 8/8] net: ibm: emac: remove all waiting code
-To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- linux-kernel@vger.kernel.org, jacob.e.keller@intel.com, horms@kernel.org,
- sd@queasysnail.net, chunkeey@gmail.com
-References: <20240903194312.12718-1-rosenp@gmail.com>
- <20240903194312.12718-9-rosenp@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240903194312.12718-9-rosenp@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240905071738.3725-1-kerneljasonxing@gmail.com> <20240905071738.3725-5-kerneljasonxing@gmail.com>
+In-Reply-To: <20240905071738.3725-5-kerneljasonxing@gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 5 Sep 2024 18:31:51 +0800
+Message-ID: <CAL+tcoBQLSeYfK-5F3wFDPNHOkLOGfn=fZiqgCmTLH37frd2aQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 4/4] rxtimestamp.c: add the test for SOF_TIMESTAMPING_OPT_RX_FILTER
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	shuah@kernel.org, willemb@google.com
+Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/3/24 21:42, Rosen Penev wrote:
-[...]
->   static int emac_wait_deps(struct emac_instance *dev)
+On Thu, Sep 5, 2024 at 3:18=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> From: Jason Xing <kernelxing@tencent.com>
+>
+> Test when we use SOF_TIMESTAMPING_OPT_RX_FILTER with software
+> or hardware report flag. The expected result is no rx timestamp
+> report.
+>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  tools/testing/selftests/net/rxtimestamp.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+>
+> diff --git a/tools/testing/selftests/net/rxtimestamp.c b/tools/testing/se=
+lftests/net/rxtimestamp.c
+> index 9eb42570294d..9760abdb6e05 100644
+> --- a/tools/testing/selftests/net/rxtimestamp.c
+> +++ b/tools/testing/selftests/net/rxtimestamp.c
+> @@ -57,6 +57,7 @@ static struct sof_flag sof_flags[] =3D {
+>         SOF_FLAG(SOF_TIMESTAMPING_SOFTWARE),
+>         SOF_FLAG(SOF_TIMESTAMPING_RX_SOFTWARE),
+>         SOF_FLAG(SOF_TIMESTAMPING_RX_HARDWARE),
+> +       SOF_FLAG(SOF_TIMESTAMPING_OPT_RX_FILTER),
 
-Possibly rename the function to something else, as it does not wait anymore?
+Ah.. I missed adding SOF_TIMESTAMPING_RAW_HARDWARE :S
 
-> @@ -2419,26 +2397,25 @@ static int emac_wait_deps(struct emac_instance *dev)
->   		deps[EMAC_DEP_MDIO_IDX].phandle = dev->mdio_ph;
->   	if (dev->blist && dev->blist > emac_boot_list)
->   		deps[EMAC_DEP_PREV_IDX].phandle = 0xffffffffu;
-> -	bus_register_notifier(&platform_bus_type, &emac_of_bus_notifier);
-> -	wait_event_timeout(emac_probe_wait,
-> -			   emac_check_deps(dev, deps),
-> -			   EMAC_PROBE_DEP_TIMEOUT);
-> -	bus_unregister_notifier(&platform_bus_type, &emac_of_bus_notifier);
-> -	err = emac_check_deps(dev, deps) ? 0 : -ENODEV;
-> +
-> +	err = emac_check_deps(dev, deps);
-> +	if (err)
-> +		return err;
-> +
->   	for (i = 0; i < EMAC_DEP_COUNT; i++) {
->   		of_node_put(deps[i].node);
-> -		if (err)
-> -			platform_device_put(deps[i].ofdev);
-> -	}
-> -	if (err == 0) {
-> -		dev->mal_dev = deps[EMAC_DEP_MAL_IDX].ofdev;
-> -		dev->zmii_dev = deps[EMAC_DEP_ZMII_IDX].ofdev;
-> -		dev->rgmii_dev = deps[EMAC_DEP_RGMII_IDX].ofdev;
-> -		dev->tah_dev = deps[EMAC_DEP_TAH_IDX].ofdev;
-> -		dev->mdio_dev = deps[EMAC_DEP_MDIO_IDX].ofdev;
-> +		platform_device_put(deps[i].ofdev);
+I'll repost it in 24 hour.
 
-I'm likely lost, but AFAICS after the patch, on success 
-platform_device_put() is invoked unconditionally on each deps[] entry, 
-while before it was called only on failure?!?
-
-/P
-
+>  };
+>
+>  static struct socket_type socket_types[] =3D {
+> @@ -97,6 +98,16 @@ static struct test_case test_cases[] =3D {
+>                         | SOF_TIMESTAMPING_RX_HARDWARE },
+>                 {}
+>         },
+> +       {
+> +               { .so_timestamping =3D SOF_TIMESTAMPING_RAW_HARDWARE
+> +                       | SOF_TIMESTAMPING_OPT_RX_FILTER },
+> +               {}
+> +       },
+> +       {
+> +               { .so_timestamping =3D SOF_TIMESTAMPING_SOFTWARE
+> +                       | SOF_TIMESTAMPING_OPT_RX_FILTER },
+> +               {}
+> +       },
+>         {
+>                 { .so_timestamping =3D SOF_TIMESTAMPING_SOFTWARE
+>                         | SOF_TIMESTAMPING_RX_SOFTWARE },
+> --
+> 2.37.3
+>
 
