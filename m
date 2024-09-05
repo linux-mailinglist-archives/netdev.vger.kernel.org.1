@@ -1,110 +1,135 @@
-Return-Path: <netdev+bounces-125568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8376E96DBE3
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:33:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BD1C96DBE9
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:34:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE54AB26F07
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:33:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E22A1C236D0
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A4417BA5;
-	Thu,  5 Sep 2024 14:33:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABD1175A1;
+	Thu,  5 Sep 2024 14:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b="PbBXYSwU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PXEuWw9S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.thorsis.com (mail.thorsis.com [217.92.40.78])
+Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7806DDF59;
-	Thu,  5 Sep 2024 14:33:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.92.40.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C6E14A8B
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 14:34:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725546783; cv=none; b=HH9FncR0mErrUairAFeC9SiLlWXF0aU0DTUTDqaNOFuGHE4es5JN5q7fWzF3e6zFXJuWH4AOvoRskpeQU9Pdm3UTXqxwVRzhGcqVEuTOSZLDNzo1sRRix4Ena5ZognaIa+9xZXB1EUuGHgu8P8KffNEdWfdkNE1k8YL8KwCrl6U=
+	t=1725546871; cv=none; b=UmIOpyrlVNQc1GWLnEiQwAWnkBTbhMIg9vMVDcuHr8JDM2XrijK9ZgHuy84064H6xRxojMy85GOfZoi1vnjok3wDvDFOnvdQGqfrb9zS5pnk7QOmD2jk7fHUcbjDz2Peqbq6558DPVoEDWilgD+cfSCzDSTNKHUoBlTvzcn/fxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725546783; c=relaxed/simple;
-	bh=8k2tjLOucmlfkLINnLYVJ1Qqpatm+DYm269vwL1aKZk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RQyhNdodD7npGrspdUbvWrnYliq9URqpMeNuruE6HSuACX6yZZt7/h7+vQLAWvTcJkAU68Qj5ocEXz7Sl8VHOOpg03KkMqFe64WsFSIhTeiaYS31nwfu7rmtY394fn7U+L025Slpv7Z3Rix/3xe4euXJFbkGCtH9nGZcS7ILrfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com; spf=pass smtp.mailfrom=thorsis.com; dkim=pass (2048-bit key) header.d=thorsis.com header.i=@thorsis.com header.b=PbBXYSwU; arc=none smtp.client-ip=217.92.40.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=thorsis.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=thorsis.com
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B12711485482;
-	Thu,  5 Sep 2024 16:32:52 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=thorsis.com; s=dkim;
-	t=1725546777; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding; bh=jQ5BTKSH11AkcnH09P1IugQWexJUyWmtNnz5aJsjaCI=;
-	b=PbBXYSwU9oZuGh3qpEER1dm4dPvitbTljU4UFpBEvg9xmDO5oo9CC+48VkkDePkjnIhTvG
-	d+gD1JjVslLOHqMgrUBQ7gLVkP9gvx24J15Sp+d6haeu+Z7l7fsvy2KLCdF27NrT7ye6Ef
-	NT+P3RDS5nVLace2WztDjnuMcIrJjfWHE934YaGIqvHhKigh/dJ5RiRp5ij6ecDLnuCUMz
-	d+xJFNmbJk1eGUk8udemW92Y5u7Qxtqp7AeQ7Q9ksKfMnbrXp1iDlO0t9EfA5Ot9Qps6M7
-	q4RrqrHIDqKaMJjf1yr/8+9D8r+BG+jms2f0wyHzyVHaPyohMw8UunxfCBSQjQ==
-From: Alexander Dahl <ada@thorsis.com>
-To: netdev@vger.kernel.org
-Cc: Calvin Johnson <calvin.johnson@oss.nxp.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] net: mdiobus: Debug print fwnode handle instead of raw pointer
-Date: Thu,  5 Sep 2024 16:32:47 +0200
-Message-Id: <20240905143248.203153-1-ada@thorsis.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1725546871; c=relaxed/simple;
+	bh=djmzTAjDrP0ZKXTynCjeBjflurfkA/511OhGIIyIVDY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QioeI+f13yLRoNcKovn+F5HAIilJmL0Y+LdZDyUJh9PgsLhoMW/ChOsXnEmcxA5djpfLIATaIKC6RrIagSWJD5q7HkIVIFT0X0PsGuRuhjyxprFxIZQXnv44UBt7PMsc5UGEN09rEZISBUzbGXqOEtsM6z802uAMg30k+ry7F7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PXEuWw9S; arc=none smtp.client-ip=95.215.58.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <a9ad456d-eeff-4fac-a18d-0219fcc9f5ed@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725546867;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P7rbhxgQHH8FMAXCYEogfAFPlvDv513nAGuaFUXrBNY=;
+	b=PXEuWw9S0BYumid1/jVD3PdysZxv8u1KLegtebjFDKS2p1CXX7ZSeSyO/adNElmfF+I5MK
+	LM6/5OXhNKdvGLltyWfUaXHAQUs6A4CO1ybibDyAgFUejesYumh90dqmMTwbbdKOwIDDfX
+	ZwgfrB3XaJXhkT2gSd4Eie+qSb/l1NY=
+Date: Thu, 5 Sep 2024 10:34:15 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Subject: Re: [PATCH net] net: xilinx: axienet: Fix IRQ coalescing packet count
+ overflow
+To: Simon Horman <horms@kernel.org>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
+ linux-arm-kernel@lists.infradead.org,
+ Ariane Keller <ariane.keller@tik.ee.ethz.ch>, linux-kernel@vger.kernel.org,
+ Daniel Borkmann <daniel@iogearbox.net>, Andy Chiu <andy.chiu@sifive.com>
+References: <20240903180059.4134461-1-sean.anderson@linux.dev>
+ <20240904160013.GX4792@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20240904160013.GX4792@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Was slightly misleading before, because printed is pointer to fwnode,
-not to phy device, as placement in message suggested.  Include header
-for dev_dbg() declaration while at it.
+On 9/4/24 12:00, Simon Horman wrote:
+> On Tue, Sep 03, 2024 at 02:00:59PM -0400, Sean Anderson wrote:
+>> If coalesce_count is greater than 255 it will not fit in the register and
+>> will overflow. Clamp it to 255 for more-predictable results.
+> 
+> Hi Sean,
+> 
+> Can this occur in practice?
 
-Output before:
+Yes. Simply do `ethtool -C ethX rx-frames 300` or something similar and
+you will end up with a limit of 44 instead. I ran into this with DIM and
+was wondering why the highest-throughput setting (256) was behaving so
+poorly...
 
-    [  +0.001247] mdio_bus f802c000.ethernet-ffffffff: registered phy 2612f00a fwnode at address 3
+>> 
+>> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+>> Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
+> 
+> nit: I think it is usual for the order of these tags to be reversed.
 
-Output after:
+OK
 
-    [  +0.001229] mdio_bus f802c000.ethernet-ffffffff: registered phy fwnode /ahb/apb/ethernet@f802c000/ethernet-phy@3 at address 3
+>> ---
+>> 
+>>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> index 9aeb7b9f3ae4..5f27fc1c4375 100644
+>> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> @@ -252,7 +252,8 @@ static u32 axienet_usec_to_timer(struct axienet_local *lp, u32 coalesce_usec)
+>>  static void axienet_dma_start(struct axienet_local *lp)
+>>  {
+>>  	/* Start updating the Rx channel control register */
+>> -	lp->rx_dma_cr = (lp->coalesce_count_rx << XAXIDMA_COALESCE_SHIFT) |
+>> +	lp->rx_dma_cr = (min(lp->coalesce_count_rx, 255) <<
+>> +			 XAXIDMA_COALESCE_SHIFT) |
+>>  			XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_ERROR_MASK;
+> 
+> nit: it would be nice to avoid using a naked 255 here.
+>      Perhaps: #define XAXIDMA_COALESCE_MAX 0xff
 
-Signed-off-by: Alexander Dahl <ada@thorsis.com>
----
- drivers/net/mdio/fwnode_mdio.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+OK, but this is the same as the limit used in axienet_usec_to_timer.
 
-diff --git a/drivers/net/mdio/fwnode_mdio.c b/drivers/net/mdio/fwnode_mdio.c
-index fd02f5cbc853..b156493d7084 100644
---- a/drivers/net/mdio/fwnode_mdio.c
-+++ b/drivers/net/mdio/fwnode_mdio.c
-@@ -7,6 +7,7 @@
-  */
- 
- #include <linux/acpi.h>
-+#include <linux/dev_printk.h>
- #include <linux/fwnode_mdio.h>
- #include <linux/of.h>
- #include <linux/phy.h>
-@@ -104,7 +105,7 @@ int fwnode_mdiobus_phy_device_register(struct mii_bus *mdio,
- 		return rc;
- 	}
- 
--	dev_dbg(&mdio->dev, "registered phy %p fwnode at address %i\n",
-+	dev_dbg(&mdio->dev, "registered phy fwnode %pfw at address %i\n",
- 		child, addr);
- 	return 0;
- }
+--Sean
 
-base-commit: 8e69c96df771ab469cec278edb47009351de4da6
--- 
-2.39.2
-
+>>  	/* Only set interrupt delay timer if not generating an interrupt on
+>>  	 * the first RX packet. Otherwise leave at 0 to disable delay interrupt.
+>> @@ -264,7 +265,8 @@ static void axienet_dma_start(struct axienet_local *lp)
+>>  	axienet_dma_out32(lp, XAXIDMA_RX_CR_OFFSET, lp->rx_dma_cr);
+>>  
+>>  	/* Start updating the Tx channel control register */
+>> -	lp->tx_dma_cr = (lp->coalesce_count_tx << XAXIDMA_COALESCE_SHIFT) |
+>> +	lp->tx_dma_cr = (min(lp->coalesce_count_tx, 255) <<
+>> +			 XAXIDMA_COALESCE_SHIFT) |
+>>  			XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_ERROR_MASK;
+>>  	/* Only set interrupt delay timer if not generating an interrupt on
+>>  	 * the first TX packet. Otherwise leave at 0 to disable delay interrupt.
+>> -- 
+>> 2.35.1.1320.gc452695387.dirty
+>> 
+>> 
 
