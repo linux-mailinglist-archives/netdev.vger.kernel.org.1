@@ -1,186 +1,234 @@
-Return-Path: <netdev+bounces-125643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8146896E078
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:55:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C639296E035
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 18:52:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A112283FD0
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:55:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80F1E28B845
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 16:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E790F1A2C27;
-	Thu,  5 Sep 2024 16:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4281A0705;
+	Thu,  5 Sep 2024 16:52:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HdlfeyLm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aJiK/RmV"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2059.outbound.protection.outlook.com [40.107.94.59])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 701671A0BC4;
-	Thu,  5 Sep 2024 16:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725555271; cv=fail; b=kdUWySl0m3ZWYTMVab9bGmyXkYzVDKWGmDVEeakeJOgHevdxwlgy7wwMd5uboc+p6QGhTupCWn4CenSfRotDF3yy5pxK6zP+HwNugLlP3ud/+vkLbDRQr60ID7FoyutLh1o12LWzf3LoblQZPFuaRaIIeq+XCFMIXHROypSxMcc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725555271; c=relaxed/simple;
-	bh=QBXTvurjCgE0OVMvar9CMynCY/AONwcSr7kICORKzuo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o/2U955SyoPREOZyiuT6+z8SlICaetB+dhA6jqjZ7LcMd3KJOmIhk4SNJpLxGT3rk37FygQTAIDYVbvWFsYEtUbdfgJC2OkTczBg2xgFG6uWUEA8mdoW5MxMxAGVEndFbtPIJI1Pq1XfqAeRSsSTWsXm87fkJpX0d23nwcH88UA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HdlfeyLm; arc=fail smtp.client-ip=40.107.94.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=P7NncgJeLDWcF54q/7gZcaE37VSnccKHK9LRPFovI+qXLnPd2UBvC+uXXcN/Y6xU3Eok5o/CbStO3CMXCTYed/rTcxM7GjPkrGC4iK/f0ffRerCcL3UN9rUJ84PwKv7SVK8m3DNZ/oSmXtT6T+47BIDePwAnDfTxqAguTdrY2/oBVDBEiYMSQ3gIB+BWfShwCr8aY0o5V8/Oy794OC71BOsL//1gJ7WOVmU7KBglJsxDDjlpjTfed9rNY6tio9XGySZbzaUzSajwJ/rxqHVzZNpYJ6PSoCax8cm7qk2W/HfljFUt/GIX3g7z1YPZ1F7ftGk3MS5VEhFpo33lUaLpLg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nlW6D5jbBGzf9gtdxA6b93Ji9LzG1FR8AAebl2Ncboc=;
- b=fzxrSZnfzwJ4Ch7QPma63oOv8Zu/t8J2KCH45wxENyjDdYUf2i3aVBKQE9biTGqS0zZKvCGd6x765hPxqSDlFMCsk4gsj+WnBipUD1Sq3snNrn/UKuB0zMr2ff99xEgj0bnjAf6wdihVGhMal0QHnI2wNf2XeECQYPYOZcsxAarpJW249ngiiXFOSQdTwIfcOYzm2p7oRNo/B0xcAczNYqGSEx7XH92Nwnp2F/bpkUNYjqswYRwUuz4jOGtx2mx1JwgqjEdZv0xJ+Y++aXv4KKeO8xGMlDX/OMG3ug4wWNzyN0HXfbehZNZPLzfIocq44VkY7shGmaleEJdNCC2Xdg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nlW6D5jbBGzf9gtdxA6b93Ji9LzG1FR8AAebl2Ncboc=;
- b=HdlfeyLmFptWi37ZPhoj8sh4vOVieU1PomdwubJnNty/SctICgOkbobgCFarwmT6cdSG+yDB3JHOGD7m9ciVO3OWG9bnXp/vS18MFbh2a6NFNLWZgajFbitha7smQ80/3sd0kokn7HfHtAicDpU6rMQYYJXKmETwjqYQ7Z7kDTQXMv7i7PajyRfV7L+D1oRaoevn9THASvN0nrmBXnO3lXxp7IvRCCHhqlHiqBkk1zmMOiAadYPMCnERZjRgfTILa+T18uU/7GF+O18omPgIGHbiydHXNt4dIdyypKYrhBywzsbx8K1yofytJEh2aUulT+00/wzD/2qwBeJ8mgEbrw==
-Received: from MN0PR02CA0017.namprd02.prod.outlook.com (2603:10b6:208:530::35)
- by CH3PR12MB8482.namprd12.prod.outlook.com (2603:10b6:610:15b::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.25; Thu, 5 Sep
- 2024 16:54:26 +0000
-Received: from BL6PEPF00020E64.namprd04.prod.outlook.com
- (2603:10b6:208:530:cafe::53) by MN0PR02CA0017.outlook.office365.com
- (2603:10b6:208:530::35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27 via Frontend
- Transport; Thu, 5 Sep 2024 16:54:26 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL6PEPF00020E64.mail.protection.outlook.com (10.167.249.25) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.13 via Frontend Transport; Thu, 5 Sep 2024 16:54:25 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 5 Sep 2024
- 09:54:10 -0700
-Received: from shredder.lan (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 5 Sep 2024
- 09:54:03 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dsahern@kernel.org>, <gnault@redhat.com>,
-	<razor@blackwall.org>, <pablo@netfilter.org>, <kadlec@netfilter.org>,
-	<marcelo.leitner@gmail.com>, <lucien.xin@gmail.com>,
-	<bridge@lists.linux.dev>, <netfilter-devel@vger.kernel.org>,
-	<coreteam@netfilter.org>, <linux-sctp@vger.kernel.org>,
-	<bpf@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next 12/12] sctp: Unmask upper DSCP bits in sctp_v4_get_dst()
-Date: Thu, 5 Sep 2024 19:51:40 +0300
-Message-ID: <20240905165140.3105140-13-idosch@nvidia.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240905165140.3105140-1-idosch@nvidia.com>
-References: <20240905165140.3105140-1-idosch@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED713C2FD;
+	Thu,  5 Sep 2024 16:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725555146; cv=none; b=Y/TXixOVQNMENEIN01qMUGpMIDy2BSvHnB8mEMTUGcyYHMk2+EXC5kjxTxf5VmnxlavMHiXbwBgSCwOsydT3+7uZlPSooclPE0yAPGJtPjs56jGnA0YkM+fvAE8bJM3CuY+H80kqrNUsVi9eiZcRDA5ZNHEOCn9fMeRTwTgqBps=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725555146; c=relaxed/simple;
+	bh=LxreSBk46ePe4SK89Oq0or2qu57zLm/XmRM6LSpM+D4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KBnAwZUyUt2uDOwBJHEjgXt8h509ES0hzYy0D8lPw0C17K2QptsSm7/0vNBzhHv/beTAjmoNPXcvmI5D96+a6GJxhahxgSFcBk7QTm24c1h9BjNGSQMQILl4ucgnQjgiW8Z9ovHUAxjD8YBc7xMoIt7L67LhmEisDRK9IdNbUsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aJiK/RmV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AB2FC4CEC3;
+	Thu,  5 Sep 2024 16:52:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725555143;
+	bh=LxreSBk46ePe4SK89Oq0or2qu57zLm/XmRM6LSpM+D4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aJiK/RmVZU+4QKnS20PevtZxI9Ao5l8kyPyrEFRfP5OJUiANjObzveTqFVMZvBfaq
+	 WvBZ+sESik2xeJo7HJwHV0YtQmU/k+E9sevdItiN3gY+oLQvNT6DIzErhTFmAtRfvW
+	 Z3Th9wsbWepCEbJIn8XbaTM2jgGsDsmD8igQpy4bYxlw1YLVMkgk1IHrAZ5ESpS4oO
+	 bGLgGWuO0oL57SU0Ub3Ntu7DwZK3eT0dYB3UuIjeRCvdcJ/zI6p6vNbBkpIANesZa+
+	 otXUzG3BSdj36YMneV4hn7uLwaEtsfN2PluWHfEebPoVRWvofMfzhvbjttQkItfin6
+	 Z02VSAPBtn/eA==
+Message-ID: <f39edf3d-aa9e-43a0-8997-762d76c9c248@kernel.org>
+Date: Thu, 5 Sep 2024 18:52:10 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00020E64:EE_|CH3PR12MB8482:EE_
-X-MS-Office365-Filtering-Correlation-Id: 55f86aa5-fcf6-4ffe-d4a6-08dccdcb6681
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|1800799024|82310400026|36860700013|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?cw6XHcrnZRbE3TMYzot8moeE3Dm3skmwarZgxBmAyeDnTpDsdQzaoU838c+J?=
- =?us-ascii?Q?CAMKV3QIu25AiwE2xHj+lK3dHU4ilmGuATfYIggikTvRzcMYRbbVBR0FHOxU?=
- =?us-ascii?Q?fZ+dwxEtGkZVIUPsgJXn/jlmBIhR8Pn9LpKw0Ggoe6QxgQXBCZh465qQoPSq?=
- =?us-ascii?Q?ATYddjEQkleNzbqgk49Xs0tzpPRQQlyEWQdnPU5Kli+4qV0z4YGyg8NxG4wO?=
- =?us-ascii?Q?+dUyR4hBOfKKTy33a1SFWdtd8qLyHTT9tNMrh1YNNkkDG3YsJNY1/Z15AkeK?=
- =?us-ascii?Q?WB0rEDgUfDfO4EOkIvR2VvHhUgPon/hPuzBpilBjb5poSFVp5ynoJGGeFnD/?=
- =?us-ascii?Q?yDH5p2+TihCPvfkTtRQZxHwNuM5jd0AmjdM8iqNSEAQmwqev8vieG7iAw0Ok?=
- =?us-ascii?Q?sOXPqt/S50xT23E4ddQsy3VePWv+eOH8JLhG+NlNy4sr27soqI5zbgQyCa9R?=
- =?us-ascii?Q?0xsFmDfHKXwlJcuSTx6dB5eRJUhIFRvfu9zYbEvKkAvJmptw7UZ7uEbajqx5?=
- =?us-ascii?Q?aPqqjeL7Q9UWAq98slPRdhRSponEtHipJeptQNkrlkAoLx8QUBrO9pslLMIN?=
- =?us-ascii?Q?FgWqIOdMnOZs2I+VZh5u7noy3HDaU6gRM+fxUNvy/56nVbWxGh6vFAEikANY?=
- =?us-ascii?Q?Y0GYfjSjiY8pSih3zdR9BgAYuUTUZH0/ZVzJ15tAKI6bQVP4loTBtbzIbF8r?=
- =?us-ascii?Q?5A//4khZU9S+BXTiUdBBeIhxt5UGn3UxP6c62e0bS0TnJH6J+G9+0zDnZ/2Y?=
- =?us-ascii?Q?xCELXGlLmmhQsKDBNms1FWHNYl7Mrm4JiVXAyGWjeD10mit1N+2iZAD6W0jM?=
- =?us-ascii?Q?24L3LZRLBgyMfLOp8otmvKQaWccKPWNiCNDISS1loulBotxQGVIeURfEhf68?=
- =?us-ascii?Q?qBtR5ts4jJOJ+FEypBqR5Pb30Qb92GjJ4meA321IQl0NpkuKCyEAE0AQhH7V?=
- =?us-ascii?Q?91pohJorAbiN7TxS+5efbaRASejjuvbi4MhahYfH7VHaDxngv0NDFqjAVqvI?=
- =?us-ascii?Q?lrFhp0IZUmXs0eSoXb/ZnA7EhYWjOtlhqP6fxOvg1YUDbwmfwVIKAKgRSrDb?=
- =?us-ascii?Q?rIndQtGn2PO/SpzvnAkNVYDLCfrJV/U1FA1bmQ+oIWsven+0oPy1jz3/ycqw?=
- =?us-ascii?Q?m1m7IciLcVUqD+6Z7Mjr1Lyi2xIERSMqKUFR5Y2xSUmAPq+pVQsXNWVmQ5tc?=
- =?us-ascii?Q?JmSfBWEblMhqZVZGTLyyK0Ls81wBTWaUnJ37zlFu0RIpqZF9G/8japVA5hx4?=
- =?us-ascii?Q?9syDmIADEz1bJw552D+kg1IMA7+YwZX/0x3ArsI1M0ReBWoZQFOkEb3aYy56?=
- =?us-ascii?Q?7zGzB1Z1V1ay+UG4zmQi4GbfZVneo+5qNVKXUZu/KIuFbSf4dfbSf8Ga/+LV?=
- =?us-ascii?Q?o48Rfizd84YM6FCAGoE9OZzySDTocGAVLWLmpApnKXUGMwtH+mpIIaquSujd?=
- =?us-ascii?Q?6y6hGJbko4U=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(1800799024)(82310400026)(36860700013)(7416014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2024 16:54:25.9732
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 55f86aa5-fcf6-4ffe-d4a6-08dccdcb6681
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00020E64.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8482
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 08/11] misc: rp1: RaspberryPi RP1 misc driver
+To: Andrea della Porta <andrea.porta@suse.com>
+Cc: Michael Turquette <mturquette@baylibre.com>,
+ Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+ <dragan.cvetic@amd.com>, Arnd Bergmann <arnd@arndb.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Saravana Kannan <saravanak@google.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ linux-clk@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-rpi-kernel@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ netdev@vger.kernel.org, linux-pci@vger.kernel.org,
+ linux-arch@vger.kernel.org, Lee Jones <lee@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Stefan Wahren <wahrenst@gmx.net>
+References: <cover.1724159867.git.andrea.porta@suse.com>
+ <5954e4dccc0e158cf434d2c281ad57120538409b.1724159867.git.andrea.porta@suse.com>
+ <lrv7cpbt2n7eidog5ydhrbyo5se5l2j23n7ljxvojclnhykqs2@nfeu4wpi2d76>
+ <ZtHN0B8VEGZFXs95@apocalypse>
+ <b74327b8-43f6-47cf-ba9d-cc9a4559767b@kernel.org>
+ <ZtcoFmK6NPLcIwVt@apocalypse>
+ <39735704-ae94-4ff8-bf4d-d2638b046c8e@kernel.org>
+ <ZtndaYh2Faf6t3fC@apocalypse>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <ZtndaYh2Faf6t3fC@apocalypse>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Unmask the upper DSCP bits when calling ip_route_output_key() so that in
-the future it could perform the FIB lookup according to the full DSCP
-value.
+On 05/09/2024 18:33, Andrea della Porta wrote:
+> Hi Krzysztof,
+> 
+> On 20:27 Tue 03 Sep     , Krzysztof Kozlowski wrote:
+>> On 03/09/2024 17:15, Andrea della Porta wrote:
+>>>>>>> +
+>>>>>>> +				rp1_clocks: clocks@c040018000 {
+>>>>>>
+>>>>>> Why do you mix MMIO with non-MMIO nodes? This really does not look
+>>>>>> correct.
+>>>>>>
+>>>>>
+>>>>> Right. This is already under discussion here:
+>>>>> https://lore.kernel.org/all/ZtBzis5CzQMm8loh@apocalypse/
+>>>>>
+>>>>> IIUC you proposed to instantiate the non-MMIO nodes (the three clocks) by
+>>>>> using CLK_OF_DECLARE.
+>>>>
+>>>> Depends. Where are these clocks? Naming suggests they might not be even
+>>>> part of this device. But if these are part of the device, then why this
+>>>> is not a clock controller (if they are controllable) or even removed
+>>>> (because we do not represent internal clock tree in DTS).
+>>>
+>>> xosc is a crystal connected to the oscillator input of the RP1, so I would
+>>> consider it an external fixed-clock. If we were in the entire dts, I would have
+>>> put it in root under /clocks node, but here we're in the dtbo so I'm not sure
+>>> where else should I put it.
+>>
+>> But physically, on which PCB, where is this clock located?
+> 
+> xosc is a crystal, feeding the reference clock oscillator input pins of the RP1,
+> please see page 12 of the following document:
+> https://datasheets.raspberrypi.com/rp1/rp1-peripherals.pdf
 
-Note that the 'tos' variable holds the full DS field.
+That's not the answer. Where is it physically located?
 
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
----
- net/sctp/protocol.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> On Rpi5, the PCB is the very same as the one on which the BCM2712 (SoC) and RP1
+> are soldered. Would you consider it external (since the crystal is outside the RP1)
+> or internal (since the oscillator feeded by the crystal is inside the RP1)?
 
-diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
-index 5a7436a13b74..39ca5403d4d7 100644
---- a/net/sctp/protocol.c
-+++ b/net/sctp/protocol.c
-@@ -44,6 +44,7 @@
- #include <net/inet_common.h>
- #include <net/inet_ecn.h>
- #include <net/udp_tunnel.h>
-+#include <net/inet_dscp.h>
- 
- #define MAX_SCTP_PORT_HASH_ENTRIES (64 * 1024)
- 
-@@ -435,7 +436,7 @@ static void sctp_v4_get_dst(struct sctp_transport *t, union sctp_addr *saddr,
- 	fl4->fl4_dport = daddr->v4.sin_port;
- 	fl4->flowi4_proto = IPPROTO_SCTP;
- 	if (asoc) {
--		fl4->flowi4_tos = RT_TOS(tos);
-+		fl4->flowi4_tos = tos & INET_DSCP_MASK;
- 		fl4->flowi4_scope = ip_sock_rt_scope(asoc->base.sk);
- 		fl4->flowi4_oif = asoc->base.sk->sk_bound_dev_if;
- 		fl4->fl4_sport = htons(asoc->base.bind_addr.port);
--- 
-2.46.0
+So it is on RPi 5 board? Just like every other SoC and every other
+vendor? Then just like every other SoC and every other vendor it is in
+board DTS file.
+
+> 
+>>
+>>>
+>>> Regarding pclk and hclk, I'm still trying to understand where they come from.
+>>> If they are external clocks (since they are fixed-clock too), they should be
+>>> in the same node as xosc. CLK_OF_DECLARE does not seem to fit here because
+>>
+>> There is no such node as "/clocks" so do not focus on that. That's just
+>> placeholder but useless and it is inconsistent with other cases (e.g.
+>> regulators).
+> 
+> Fine, I beleve that the root node would be okay then, or some other carefully named
+> node in root, if the clock is not internal to any chip.
+> 
+>>
+>> If this is external oscillator then it is not part of RP1 and you cannot
+>> put it inside just to satisfy your drivers.
+> 
+> Ack.
+> 
+>>
+>>> there's no special management of these clocks, so no new clock definition is
+>>> needed.
+>>
+>>> If they are internal tree, I cannot simply get rid of them because rp1_eth node
+>>> references these two clocks (see clocks property), so they must be decalred 
+>>> somewhere. Any hint about this?.
+>>>
+>>
+>> Describe the hardware. Show the diagram or schematics where is which device.
+> 
+> Unfortunately I don't have the documentation (schematics or other info) about
+> how these two clocks (pclk and hclk) are arranged, but I'm trying to get
+> some insight about that from various sources. While we're waiting for some
+> (hopefully) more certain info, I'd like to speculate a bit. I would say that
+> they both probably be either external (just like xosc), or generated internally
+> to the RP1:
+> 
+> If externals, I would place them in the same position as xosc, so root node
+> or some other node under root (eg.: /rp1-clocks)
+
+Just like /clocks, /rp1-clocks is not better. Neither /rp1-foo-clocks.
+
+I think there is some sort of big misunderstanding here. Is this RP1
+co-processor on the RP board, connected over PCI to Broadcom SoC?
+
+> 
+> If internals, I would leave them just where they are, i.e. inside the rp1 node
+> 
+> Does it make sense?
+
+No, because you do not have xosc there, according to my knowledge.
+
+Best regards,
+Krzysztof
 
 
