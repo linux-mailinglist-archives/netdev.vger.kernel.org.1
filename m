@@ -1,118 +1,121 @@
-Return-Path: <netdev+bounces-125453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B401196D1CC
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:18:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DDC096D1DB
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57A641F27C37
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:18:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BFAD2839AC
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014601990BA;
-	Thu,  5 Sep 2024 08:15:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC2D197A7C;
+	Thu,  5 Sep 2024 08:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RpxZhktJ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="gJ+cdTu7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RbWOCf0z"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A211A198E9F;
-	Thu,  5 Sep 2024 08:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1A01925A6;
+	Thu,  5 Sep 2024 08:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725524147; cv=none; b=qG3neMjfMFXyHfmRbLq5WPuGIdzZoN0lqTOMl8KziBFlwp19PsaOq2163GJSz3Lo4W5OKjOg4OTWwCxn3b8/vzTUysL55vOsZ8deUpobZPEABSaUe8yBX0H8GhNsFnO8JOSWLclIk4h+IQmiwlFFu+JNE1FzplmFgb/mJBBsQWY=
+	t=1725524306; cv=none; b=s8ul5FRrQyKm2eLJ5LGfXOQ6FUPvgcc9bk6FV2YwRXXBWVNw4aVRoye34oe3sd6pRm5t6ycNk5Lo1Ib5EGzfZRH2anwn/043bqQnQKRsg8ZUxvWeyh/z/CuCXeqeibreJfjzJI5Lwq/YIyNcDt9sZ115gCk4tn5mJHg6m3PCAc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725524147; c=relaxed/simple;
-	bh=IGpqu0AbEfFcQHlaTnL8FB0oZgedhXai5ctdiIf//jQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=NHBUtSz7YM62WWOxrbhTlLB+Sktzv035iJ8mWOM3iYiySqa39lr9MB9MBXXmyyV3Hc5XL3D8PJodcN5fr5p5ViGdGtiobDqGe/MW9boIQu9cFIayjMbyP4uDxlt/CSv/b2CknDTXXn5hLiexz65r53fifOondba4e31naB5xTWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RpxZhktJ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=gJ+cdTu7; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Anna-Maria Behnsen <anna-maria@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1725524142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zj6M6KVALb8ItmdIZXewANkqyGRtAWppUkT1S7x+yxo=;
-	b=RpxZhktJFaMziweFeqWFY2ODP3AELVAapvPbAS32isz7DMRXQqqnfCnAXIG/vo+VVM5lqz
-	Bk07pz2LTDwxIF+lCqZa2EAvM8gQwSKbpnhs6Yr+pzEpKE1rQIceApTWy2xjZeJXxh13gI
-	tBhSQTp8ddqd3XfBuptTKhV1P8vJuEg+fYF2kMCEBXgbfWK+reBrmECSl8HT+tsfqFSO1j
-	NGAPMTWLEAijIjdIaswglTcpK4wmajtio4YZyJaOumZu1fQVLuYtaniJYrVzt3ifqQZn4W
-	0BBvJXXDdO4+SesppsBktnYamqG7T3a/XJ9sfQpFvP0z0AVensFF9+GeXGGclA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1725524142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Zj6M6KVALb8ItmdIZXewANkqyGRtAWppUkT1S7x+yxo=;
-	b=gJ+cdTu79Soa0DwW49qt4TU7i4Dk579rmL2O7XO7J6D42aGnObjvdAMzpxjs3nwR2mDmB2
-	F9Xe4RoO0QR2EeDQ==
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner
- <tglx@linutronix.de>, Jonathan Corbet <corbet@lwn.net>,
- linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>, "Rafael J.
- Wysocki" <rafael@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- netdev@vger.kernel.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 12/15] iopoll/regmap/phy/snd: Fix comment referencing
- outdated timer documentation
-In-Reply-To: <a269cf5e-2ba0-40c3-a7f2-9afa0e8c6926@lunn.ch>
-References: <20240904-devel-anna-maria-b4-timers-flseep-v1-0-e98760256370@linutronix.de>
- <20240904-devel-anna-maria-b4-timers-flseep-v1-12-e98760256370@linutronix.de>
- <a269cf5e-2ba0-40c3-a7f2-9afa0e8c6926@lunn.ch>
-Date: Thu, 05 Sep 2024 10:15:42 +0200
-Message-ID: <87y1464itt.fsf@somnus>
+	s=arc-20240116; t=1725524306; c=relaxed/simple;
+	bh=MxbG1NFAO2hA0Y81lnNJT1+jSGtQoe5Vz9VbrJuDz5M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=klfIVnh783b8Getoq+PeutTX7+3z7AxTbAtvqcrWZjsXwIpeycZvA89xDKJ4Mp5pOm962dFDrtfHFIGgMTvi69h27g5/LJN/DEn7QIg7V52QqbeMWxHBMuad/jStWxBTgnGm/8sK35hUSl4DYdKLOnaeYeVBMUpZfe2oFcCLE8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RbWOCf0z; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725524306; x=1757060306;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=MxbG1NFAO2hA0Y81lnNJT1+jSGtQoe5Vz9VbrJuDz5M=;
+  b=RbWOCf0zlHu9mzAfpffAKif9gEAVyE6l/sahEeqTtkWhXoad6SKvotzM
+   B1ay6NWX0uzkbqNwTYMsHzGdVSXRwRZ8183CLqVhqGMJU6ErMGwhhTke/
+   dq6XVzq4D1FR08hxywpqUEyV/P/F4vtsfMlj0V7FoVE8V4co2HNOvRM85
+   Ky1rRSyVEGXq0UV7PFC/gJ6bQjBks0J/6gFAGZ/4OdMX2iLDzYqHdGCqL
+   slpJUHtif6VdjDQyS5E5v9AQ+UXUPLEavW1PXCNcWaQMItecaWN1eocsl
+   K8mysfHbVAmUniJL4W9WOz8v+Bi/97JOUZjsO0gd7ZicW1/lGa0DfF0O5
+   g==;
+X-CSE-ConnectionGUID: yCpuFiYVRciI4kcF83NInA==
+X-CSE-MsgGUID: 2wY6n/g5QfeFcwBnOeUDxg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11185"; a="24383584"
+X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
+   d="scan'208";a="24383584"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 01:18:24 -0700
+X-CSE-ConnectionGUID: zUECY1JsTCytv0zNGU91zg==
+X-CSE-MsgGUID: 3BzHH7e7Syqb+WqtcOa6iA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,204,1719903600"; 
+   d="scan'208";a="65242627"
+Received: from mylly.fi.intel.com (HELO [10.237.72.58]) ([10.237.72.58])
+  by fmviesa007.fm.intel.com with ESMTP; 05 Sep 2024 01:18:16 -0700
+Message-ID: <6cbdf44e-7346-4463-a622-7810706d5419@linux.intel.com>
+Date: Thu, 5 Sep 2024 11:18:14 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/7] i2c: designware: Group all DesignWare drivers
+ under a single option
+To: Andi Shyti <andi.shyti@kernel.org>,
+ Heikki Krogerus <heikki.krogerus@linux.intel.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Mika Westerberg <mika.westerberg@linux.intel.com>,
+ Jan Dabros <jsd@semihalf.com>, linux-i2c@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Vineet Gupta <vgupta@kernel.org>,
+ Russell King <linux@armlinux.org.uk>, Dinh Nguyen <dinguyen@kernel.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Jiawen Wu <jiawenwu@trustnetic.com>, Mengyuan Lou
+ <mengyuanlou@net-swift.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-riscv@lists.infradead.org, UNGLinuxDriver@microchip.com,
+ linux-mips@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-snps-arc@lists.infradead.org
+References: <20240903142506.3444628-1-heikki.krogerus@linux.intel.com>
+ <3phynd24wmymhqugikbdwdzoa6vlzxwv5a6n6bk4446atbf7nu@c2kb766j3pcc>
+Content-Language: en-US
+From: Jarkko Nikula <jarkko.nikula@linux.intel.com>
+In-Reply-To: <3phynd24wmymhqugikbdwdzoa6vlzxwv5a6n6bk4446atbf7nu@c2kb766j3pcc>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Andrew Lunn <andrew@lunn.ch> writes:
+On 9/4/24 12:01 AM, Andi Shyti wrote:
+> Hi Jarkko, Andy,
+> 
+> ...
+> 
+>> Heikki Krogerus (7):
+>>    ARC: configs: enable I2C_DESIGNWARE_CORE with I2C_DESIGNWARE_PLATFORM
+>>    ARM: configs: enable I2C_DESIGNWARE_CORE with I2C_DESIGNWARE_PLATFORM
+>>    arm64: defconfig: enable I2C_DESIGNWARE_CORE with
+>>      I2C_DESIGNWARE_PLATFORM
+>>    mips: configs: enable I2C_DESIGNWARE_CORE with I2C_DESIGNWARE_PLATFORM
+>>    RISC-V: configs: enable I2C_DESIGNWARE_CORE with
+>>      I2C_DESIGNWARE_PLATFORM
+>>    net: txgbe: Fix I2C Kconfig dependencies
+>>    i2c: designware: Group all DesignWare drivers under a single option
+> 
+> I believe you know this code already, do you mind giving it an
+> ack?
+> 
+To the patches 1-7/7 in this set:
 
->> diff --git a/include/linux/phy.h b/include/linux/phy.h
->> index 6b7d40d49129..b09490e08365 100644
->> --- a/include/linux/phy.h
->> +++ b/include/linux/phy.h
->> @@ -1374,11 +1374,12 @@ int phy_read_mmd(struct phy_device *phydev, int devad, u32 regnum);
->>   * @regnum: The register on the MMD to read
->>   * @val: Variable to read the register into
->>   * @cond: Break condition (usually involving @val)
->> - * @sleep_us: Maximum time to sleep between reads in us (0
->> - *            tight-loops).  Should be less than ~20ms since usleep_range
->> - *            is used (see Documentation/timers/timers-howto.rst).
->> + * @sleep_us: Maximum time to sleep between reads in us (0 tight-loops). Please
->> + *            read usleep_range() function description for details and
->> + *            limitations.
->>   * @timeout_us: Timeout in us, 0 means never timeout
->>   * @sleep_before_read: if it is true, sleep @sleep_us before read.
->> + *
->>   * Returns 0 on success and -ETIMEDOUT upon a timeout. In either
->
-> I know it is not in scope for what you are trying to fix, but there
-> should be a : after Returns
->
-> * Returns: 0 on success and -ETIMEDOUT upon a timeout. In either
-
-I have to do a v2 of the series anyway. So if it helps, I can add the
-missing colon after "Returns" in all those function descriptions I touch
-and expand the commit message by:
-
-  While at it fix missing colon after "Returns" in function description
-  as well.
-
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->
->     Andrew
-
-Thanks,
-
-        Anna-Maria
+Acked-by: Jarkko Nikula <jarkko.nikula@linux.intel.com>
 
