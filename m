@@ -1,232 +1,313 @@
-Return-Path: <netdev+bounces-125648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D59396E0BC
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:03:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507EC96E0C8
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:05:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A4441F2509E
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 17:03:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 73DE51C23E71
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 17:05:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA47C1A0AF4;
-	Thu,  5 Sep 2024 17:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C95E1A0AF3;
+	Thu,  5 Sep 2024 17:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ns4JRVdx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204341A0707
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 17:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA841A0737
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 17:05:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725555815; cv=none; b=FdWuG0IwZsrFYCnRwOxV2MtcB55+4ASwo3B5SG4ayNainFWkToN1X/ClBezqIoSUYXfVSlhAEt0NMyeDtZhvJx+udrAgsjjmoH0wa7YIm8Wv0neElej3k3TzlaZ1DaQJnLPCkOHAupbiSqDl/b4ooMstmoKE/Q7cODbo3TGk6Og=
+	t=1725555908; cv=none; b=ui1+9QJUT55TF789C9Xdt7Ugfr2FGtSeuTKtHSZXYzWGYIHvDFlWsTXyP6KpF8/s0cC/evUa1qijZ/EYxqpp7/hzA2Uxm7emi7Qf2VQ7zOZHwi2sWZC42UTpkv9RvXoAlmT5E5V/++fSo3KhQCuzTwZrraf7yhmi7pEz7Mzq4aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725555815; c=relaxed/simple;
-	bh=fsdtgHQu5S+sGmX4XjmiO1zwvwOLPtFBcLTtq8gnQpo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YtBwNUQ15idHbf/XyslvzBFQRzpktibZ1PuIMcNesCnRKhPMfXEn5kqCRLkgYCgEPxT4OGM5+JONRPFMNfPNQaVE9wNybz6/xk2XS8mvSrzBAc6aIt+W7uLgUzFpSDgLYvUgc8w4uj0PbsairIsimAEgyNE5ooLsuAm7qJlGI70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-39d55a00bd7so28489975ab.1
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 10:03:33 -0700 (PDT)
+	s=arc-20240116; t=1725555908; c=relaxed/simple;
+	bh=jHDgMHr03VVzHhUG+OiLt/Kh1d1XiMSt/x5DRTggc1E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FH8uqxhBlFceVE43GaJx0qudGjLpNrHvqLh/73lxlDdlIYL4ebjvcmVJqJfAPF7ws6gxw1Rb7bIrrCA9m32sBJCR6KqA90xNc/kRluVtf2RDWewZy4LZt90RZVAI4pFVergoq446HJtT/1zwb2Y5kuCVhnVoHngXwjr0KKj/8qg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ns4JRVdx; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-374ba74e9b6so785410f8f.0
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 10:05:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1725555904; x=1726160704; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rIKUfIudnC68dpnre//nTRJxjNKVnEXJEwPgKoRrffU=;
+        b=ns4JRVdxwXTLmq7pqL4FxHU+FIKQ//R+NAq/X1N29HOPqqdYDQ518GkTdyXM8yCYDA
+         DMip4xr7oDFl5vYlXdqmznS2rT9Qd8tQmxNncXtS7ygF0igVGy/mY3oaHCxIV5+FiATq
+         /OWUpO8oRvD2ngfBPKhsfABWoXo3INPX/2td8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725555813; x=1726160613;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ICQ0YqUAuBCDVOBEFVxSd7r2rupOA9lJI8jrGUESHbY=;
-        b=UnhDCm5X+U2uoJIURuzh82/tXpqxe4LvLPdT/Bhc+/2X8mRe5KIZkGImDFriRylqPU
-         O+YZTBLMmhwHzhv0HxJp6OBgvEgQwOLFgUWNz5nXzV0MAG12ANEPOo51XEr2cN+MGFcw
-         7NnoUYXBv8ocipKN8K/klZ67HmK730XDEJq1K/0xqk0NrTputw0wMtXRA/l4Zvbo18wT
-         MK61jlZF6d/xJwhTXZArViAEA0LRKvY3igLifXQBivqKcuFgJkh1Xw9VwbjgIcV3DOKw
-         /dIlBCW84c6Zv+nl2D+JeL0/I9UKsIlaXuonHUM6wd88j99n+802EPZRIcxs771Bq0It
-         SbLw==
-X-Forwarded-Encrypted: i=1; AJvYcCXTYJLXhXGIPnLoxFobxGin3J27la8OPV2Fny85xNgat78fbH1s1r1/ljtL9fPYI7DUU08jzt0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4vrc+OX4lY/SLg/b25n/0eYyuvjuDNRC6GLehT2D47sBaxcO2
-	Gk0+3flc+eeb+iorZneIRjuiqGZ7SVLW1xnKEiVGw8JeSLtdqrV5SOr7eL4MiNLKZRfeta57TCH
-	OYdZhcoGedDrCDQ9VRTOvWd3NA6nQTJleuFx7jeQnMqG0DkW20yiKJLc=
-X-Google-Smtp-Source: AGHT+IFYRWYkcvChLrkvOANUiRcQCLrZIdD+dFvMb+kbcd5lkJ6kfExWmqX1DHM/95PiKmt9yMf0EBmeawpU8sKWE8nNizjizfkz
+        d=1e100.net; s=20230601; t=1725555904; x=1726160704;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rIKUfIudnC68dpnre//nTRJxjNKVnEXJEwPgKoRrffU=;
+        b=Nf1sPQ4P92wPUMQtubnUI1RmKROyZassmoRd+QqnoFQTRqTA7wIb6hG5/xvCLUyE4A
+         chdvgl81TYSYufR97/jS5SKQQMjdTmtACrR6oK+w3ks7u61shegDFTvhiqWDORmsUy8d
+         s1jQ9+VxlJqCb/FdWkpNbd1QeFn/QhqmUph8hVVm1lymExlc976RAXz1aR32mnxmzRAK
+         F2PJTcq3516+UyzgB6PKWMv3y7fLBossOzzZK+JhH2/Fy4VoXGrUytt5bpO5XU/a/l9p
+         zHSuoR+v5J0JLB6iOZ7LGDc5HxMliDh9YFLP088CfxmyNg67kQqhCNeIQln+l1kGUHAW
+         5CGw==
+X-Forwarded-Encrypted: i=1; AJvYcCVulIwdpJvix/bM1A0UULIdyFsYKJPK6iJ8Hc3jWmjP6XRQchIgTlKYXaJkeUdbfe0WY5X0thU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxnJ6ncZVf0BK9hCVEv1iADeE7N9gqPTP/FK9EeL79FjhsV7kir
+	iifuHdk6BvXTGOlapoOefsQFq2tZtI1rTfqOQr+AQ6aF6cr1ppuiibo49lmhlqs=
+X-Google-Smtp-Source: AGHT+IHYidanxyBEjM0ZNE63RtTsWntOoSNW5LAz9Suq28Jzmb1y3o8MA/42TcvXxX0SR1jd6CU6gg==
+X-Received: by 2002:adf:f1c8:0:b0:374:c948:f4db with SMTP id ffacd0b85a97d-374c948f50amr12319780f8f.26.1725555903829;
+        Thu, 05 Sep 2024 10:05:03 -0700 (PDT)
+Received: from LQ3V64L9R2 (net-2-42-195-208.cust.vodafonedsl.it. [2.42.195.208])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-374c11eeea6sm14421116f8f.52.2024.09.05.10.05.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 10:05:03 -0700 (PDT)
+Date: Thu, 5 Sep 2024 19:05:01 +0200
+From: Joe Damato <jdamato@fastly.com>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com, Martin Karsten <mkarsten@uwaterloo.ca>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Daniel Jurgens <danielj@nvidia.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 5/5] netdev-genl: Support setting per-NAPI
+ config values
+Message-ID: <ZtnkvTA2_eE0po9N@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com, Martin Karsten <mkarsten@uwaterloo.ca>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Daniel Jurgens <danielj@nvidia.com>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20240829131214.169977-1-jdamato@fastly.com>
+ <20240829131214.169977-6-jdamato@fastly.com>
+ <20240829153105.6b813c98@kernel.org>
+ <ZtGiNF0wsCRhTtOF@LQ3V64L9R2>
+ <20240830142235.352dbad5@kernel.org>
+ <ZtXuJ3TMp9cN5e9h@LQ3V64L9R2.station>
+ <Ztjv-dgNFwFBnXwd@mini-arch>
+ <Ztl6HvkMzu9-7CQJ@LQ3V64L9R2>
+ <Ztniy_Yo_u_nXMLT@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20c2:b0:377:1625:5fca with SMTP id
- e9e14a558f8ab-39f40ee300emr6574465ab.1.1725555813052; Thu, 05 Sep 2024
- 10:03:33 -0700 (PDT)
-Date: Thu, 05 Sep 2024 10:03:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000047043b0621624565@google.com>
-Subject: [syzbot] [mptcp?] possible deadlock in sk_clone_lock (3)
-From: syzbot <syzbot+f4aacdfef2c6a6529c3e@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, martineau@kernel.org, 
-	matttbe@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Ztniy_Yo_u_nXMLT@mini-arch>
 
-Hello,
+On Thu, Sep 05, 2024 at 09:56:43AM -0700, Stanislav Fomichev wrote:
+> On 09/05, Joe Damato wrote:
+> > On Wed, Sep 04, 2024 at 04:40:41PM -0700, Stanislav Fomichev wrote:
+> > > On 09/02, Joe Damato wrote:
+> > > > On Fri, Aug 30, 2024 at 02:22:35PM -0700, Jakub Kicinski wrote:
+> > > > > On Fri, 30 Aug 2024 11:43:00 +0100 Joe Damato wrote:
+> > > > > > On Thu, Aug 29, 2024 at 03:31:05PM -0700, Jakub Kicinski wrote:
+> > > > > > > On Thu, 29 Aug 2024 13:12:01 +0000 Joe Damato wrote:  
+> > > > > > > > +      doc: Set configurable NAPI instance settings.  
+> > > > > > > 
+> > > > > > > We should pause and think here how configuring NAPI params should
+> > > > > > > behave. NAPI instances are ephemeral, if you close and open the
+> > > > > > > device (or for some drivers change any BPF or ethtool setting)
+> > > > > > > the NAPIs may get wiped and recreated, discarding all configuration.
+> > > > > > > 
+> > > > > > > This is not how the sysfs API behaves, the sysfs settings on the device
+> > > > > > > survive close. It's (weirdly?) also not how queues behave, because we
+> > > > > > > have struct netdev{_rx,}_queue to store stuff persistently. Even tho
+> > > > > > > you'd think queues are as ephemeral as NAPIs if not more.
+> > > > > > > 
+> > > > > > > I guess we can either document this, and move on (which may be fine,
+> > > > > > > you have more practical experience than me). Or we can add an internal
+> > > > > > > concept of a "channel" (which perhaps maybe if you squint is what
+> > > > > > > ethtool -l calls NAPIs?) or just "napi_storage" as an array inside
+> > > > > > > net_device and store such config there. For simplicity of matching
+> > > > > > > config to NAPIs we can assume drivers add NAPI instances in order. 
+> > > > > > > If driver wants to do something more fancy we can add a variant of
+> > > > > > > netif_napi_add() which specifies the channel/storage to use.
+> > > > > > > 
+> > > > > > > Thoughts? I may be overly sensitive to the ephemeral thing, maybe
+> > > > > > > I work with unfortunate drivers...  
+> > > > > > 
+> > > > > > Thanks for pointing this out. I think this is an important case to
+> > > > > > consider. Here's how I'm thinking about it.
+> > > > > > 
+> > > > > > There are two cases:
+> > > > > > 
+> > > > > > 1) sysfs setting is used by existing/legacy apps: If the NAPIs are
+> > > > > > discarded and recreated, the code I added to netif_napi_add_weight
+> > > > > > in patch 1 and 3 should take care of that case preserving how sysfs
+> > > > > > works today, I believe. I think we are good on this case ?
+> > > > > 
+> > > > > Agreed.
+> > > > > 
+> > > > > > 2) apps using netlink to set various custom settings. This seems
+> > > > > > like a case where a future extension can be made to add a notifier
+> > > > > > for NAPI changes (like the netdevice notifier?).
+> > > > > 
+> > > > > Yes, the notifier may help, but it's a bit of a stop gap / fallback.
+> > > > > 
+> > > > > > If you think this is a good idea, then we'd do something like:
+> > > > > >   1. Document that the NAPI settings are wiped when NAPIs are wiped
+> > > > > >   2. In the future (not part of this series) a NAPI notifier is
+> > > > > >      added
+> > > > > >   3. User apps can then listen for NAPI create/delete events
+> > > > > >      and update settings when a NAPI is created. It would be
+> > > > > >      helpful, I think, for user apps to know about NAPI
+> > > > > >      create/delete events in general because it means NAPI IDs are
+> > > > > >      changing.
+> > > > > > 
+> > > > > > One could argue:
+> > > > > > 
+> > > > > >   When wiping/recreating a NAPI for an existing HW queue, that HW
+> > > > > >   queue gets a new NAPI ID associated with it. User apps operating
+> > > > > >   at this level probably care about NAPI IDs changing (as it affects
+> > > > > >   epoll busy poll). Since the settings in this series are per-NAPI
+> > > > > >   (and not per HW queue), the argument could be that user apps need
+> > > > > >   to setup NAPIs when they are created and settings do not persist
+> > > > > >   between NAPIs with different IDs even if associated with the same
+> > > > > >   HW queue.
+> > > > > 
+> > > > > IDK if the fact that NAPI ID gets replaced was intentional in the first
+> > > > > place. I would venture a guess that the person who added the IDs was
+> > > > > working with NICs which have stable NAPI instances once the device is
+> > > > > opened. This is, unfortunately, not universally the case.
+> > > > > 
+> > > > > I just poked at bnxt, mlx5 and fbnic and all of them reallocate NAPIs
+> > > > > on an open device. Closer we get to queue API the more dynamic the whole
+> > > > > setup will become (read: the more often reconfigurations will happen).
+> > > > >
+> > > > 
+> > > > [...]
+> > > > 
+> > > > > > I think you have much more practical experience when it comes to
+> > > > > > dealing with drivers, so I am happy to follow your lead on this one,
+> > > > > > but assuming drivers will "do a thing" seems mildly scary to me with
+> > > > > > limited driver experience.
+> > > > > > 
+> > > > > > My two goals with this series are:
+> > > > > >   1. Make it possible to set these values per NAPI
+> > > > > >   2. Unblock the IRQ suspension series by threading the suspend
+> > > > > >      parameter through the code path carved in this series
+> > > > > > 
+> > > > > > So, I'm happy to proceed with this series as you prefer whether
+> > > > > > that's documentation or "napi_storage"; I think you are probably the
+> > > > > > best person to answer this question :)
+> > > > > 
+> > > > > How do you feel about making this configuration opt-in / require driver
+> > > > > changes? What I'm thinking is that having the new "netif_napi_add()"
+> > > > > variant (or perhaps extending netif_napi_set_irq()) to take an extra
+> > > > > "index" parameter would make the whole thing much simpler.
+> > > > 
+> > > > What about extending netif_queue_set_napi instead? That function
+> > > > takes a napi and a queue index.
+> > > > 
+> > > > Locally I kinda of hacked up something simple that:
+> > > >   - Allocates napi_storage in net_device in alloc_netdev_mqs
+> > > >   - Modifies netif_queue_set_napi to:
+> > > >      if (napi)
+> > > >        napi->storage = dev->napi_storage[queue_index];
+> > > > 
+> > > > I think I'm still missing the bit about the
+> > > > max(rx_queues,tx_queues), though :(
+> > > > 
+> > > > > Index would basically be an integer 0..n, where n is the number of
+> > > > > IRQs configured for the driver. The index of a NAPI instance would
+> > > > > likely match the queue ID of the queue the NAPI serves.
+> > > > 
+> > > > Hmmm. I'm hesitant about the "number of IRQs" part. What if there
+> > > > are NAPIs for which no IRQ is allocated ~someday~ ?
+> > > > 
+> > > > It seems like (I could totally be wrong) that netif_queue_set_napi
+> > > > can be called and work and create the association even without an
+> > > > IRQ allocated.
+> > > > 
+> > > > I guess the issue is mostly the queue index question above: combined
+> > > > rx/tx vs drivers having different numbers of rx and tx queues.
+> > > > 
+> > > > > We can then allocate an array of "napi_configs" in net_device -
+> > > > > like we allocate queues, the array size would be max(num_rx_queue,
+> > > > > num_tx_queues). We just need to store a couple of ints so it will
+> > > > > be tiny compared to queue structs, anyway.
+> > > > > 
+> > > > > The NAPI_SET netlink op can then work based on NAPI index rather 
+> > > > > than the ephemeral NAPI ID. It can apply the config to all live
+> > > > > NAPI instances with that index (of which there really should only 
+> > > > > be one, unless driver is mid-reconfiguration somehow but even that
+> > > > > won't cause issues, we can give multiple instances the same settings)
+> > > > > and also store the user config in the array in net_device.
+> > > > > 
+> > > > > When new NAPI instance is associate with a NAPI index it should get
+> > > > > all the config associated with that index applied.
+> > > > > 
+> > > > > Thoughts? Does that makes sense, and if so do you think it's an
+> > > > > over-complication?
+> > > > 
+> > > > I think what you are proposing seems fine; I'm just working out the
+> > > > implementation details and making sure I understand before sending
+> > > > another revision.
+> > > 
+> > > What if instead of an extra storage index in UAPI, we make napi_id persistent?
+> > > Then we can keep using napi_id as a user-facing number for the configuration.
+> > > 
+> > > Having a stable napi_id would also be super useful for the epoll setup so you
+> > > don't have to match old/invalid ids to the new ones on device reset.
+> > 
+> > Up to now for prototyping purposes: the way I've been dealing with this is
+> > using a SO_ATTACH_REUSEPORT_CBPF program like this:
+> > 
+> > struct sock_filter code[] = {
+> >     /* A = skb->queue_mapping */
+> >     { BPF_LD | BPF_W | BPF_ABS, 0, 0, SKF_AD_OFF + SKF_AD_QUEUE },
+> >     /* A = A % n */
+> >     { BPF_ALU | BPF_MOD, 0, 0, n },
+> >     /* return A */
+> >     { BPF_RET | BPF_A, 0, 0, 0 },
+> > };
+> > 
+> > with SO_BINDTODEVICE. Note that the above uses queue_mapping (not NAPI ID) so
+> > even if the NAPI IDs change the filter still distributes connections from the
+> > same "queue_mapping" to the same thread.
+> > 
+> > Since epoll busy poll is based on NAPI ID (and not queue_mapping), this will
+> > probably cause some issue if the NAPI ID changes because the NAPI ID associated
+> > with the epoll context will suddenly change meaning the "old" NAPI won't be
+> > busy polled. This might be fine because if that happens the old NAPI is being
+> > disabled anyway?
+> > 
+> > At any rate the user program doesn't "need" to do anything when the NAPI ID
+> > changes... unless it has a more complicated ebpf program that relies on NAPI ID
+> > ;)
+> 
+> Ah, you went a more creative route. We were doing SO_INCOMING_NAPI_ID on
+> a single listener and manually adding fds to the appropriate epoll.
+> But regardless of the method, having a stable napi_id is still good
+> to have and hopefully it's not a lot of work compared to exposing
+> extra napi storage id to the userspace.
 
-syzbot found the following issue on:
+Yes, your approach makes sense, as well. With a single acceptor
+thread I'd also do what you are doing.
 
-HEAD commit:    67784a74e258 Merge tag 'ata-6.11-rc7' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1631e529980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=660f6eb11f9c7dc5
-dashboard link: https://syzkaller.appspot.com/bug?extid=f4aacdfef2c6a6529c3e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12e6cf2b980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=171c1f2b980000
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-67784a74.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e2f2583cf0b1/vmlinux-67784a74.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0fedd864addd/bzImage-67784a74.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f4aacdfef2c6a6529c3e@syzkaller.appspotmail.com
-
-============================================
-WARNING: possible recursive locking detected
-6.11.0-rc6-syzkaller-00019-g67784a74e258 #0 Not tainted
---------------------------------------------
-syz-executor364/5113 is trying to acquire lock:
-ffff8880449f1958 (k-slock-AF_INET){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
-ffff8880449f1958 (k-slock-AF_INET){+.-.}-{2:2}, at: sk_clone_lock+0x2cd/0xf40 net/core/sock.c:2328
-
-but task is already holding lock:
-ffff88803fe3cb58 (k-slock-AF_INET){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
-ffff88803fe3cb58 (k-slock-AF_INET){+.-.}-{2:2}, at: sk_clone_lock+0x2cd/0xf40 net/core/sock.c:2328
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(k-slock-AF_INET);
-  lock(k-slock-AF_INET);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-7 locks held by syz-executor364/5113:
- #0: ffff8880449f0e18 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1607 [inline]
- #0: ffff8880449f0e18 (sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_sendmsg+0x153/0x1b10 net/mptcp/protocol.c:1806
- #1: ffff88803fe39ad8 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1607 [inline]
- #1: ffff88803fe39ad8 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_sendmsg_fastopen+0x11f/0x530 net/mptcp/protocol.c:1727
- #2: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:326 [inline]
- #2: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
- #2: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: __ip_queue_xmit+0x5f/0x1b80 net/ipv4/ip_output.c:470
- #3: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:326 [inline]
- #3: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
- #3: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: ip_finish_output2+0x45f/0x1390 net/ipv4/ip_output.c:228
- #4: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: local_lock_acquire include/linux/local_lock_internal.h:29 [inline]
- #4: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: process_backlog+0x33b/0x15b0 net/core/dev.c:6104
- #5: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:326 [inline]
- #5: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:838 [inline]
- #5: ffffffff8e938320 (rcu_read_lock){....}-{1:2}, at: ip_local_deliver_finish+0x230/0x5f0 net/ipv4/ip_input.c:232
- #6: ffff88803fe3cb58 (k-slock-AF_INET){+.-.}-{2:2}, at: spin_lock include/linux/spinlock.h:351 [inline]
- #6: ffff88803fe3cb58 (k-slock-AF_INET){+.-.}-{2:2}, at: sk_clone_lock+0x2cd/0xf40 net/core/sock.c:2328
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 5113 Comm: syz-executor364 Not tainted 6.11.0-rc6-syzkaller-00019-g67784a74e258 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
- check_deadlock kernel/locking/lockdep.c:3061 [inline]
- validate_chain+0x15d3/0x5900 kernel/locking/lockdep.c:3855
- __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
- __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
- _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
- spin_lock include/linux/spinlock.h:351 [inline]
- sk_clone_lock+0x2cd/0xf40 net/core/sock.c:2328
- mptcp_sk_clone_init+0x32/0x13c0 net/mptcp/protocol.c:3279
- subflow_syn_recv_sock+0x931/0x1920 net/mptcp/subflow.c:874
- tcp_check_req+0xfe4/0x1a20 net/ipv4/tcp_minisocks.c:853
- tcp_v4_rcv+0x1c3e/0x37f0 net/ipv4/tcp_ipv4.c:2267
- ip_protocol_deliver_rcu+0x22e/0x440 net/ipv4/ip_input.c:205
- ip_local_deliver_finish+0x341/0x5f0 net/ipv4/ip_input.c:233
- NF_HOOK+0x3a4/0x450 include/linux/netfilter.h:314
- NF_HOOK+0x3a4/0x450 include/linux/netfilter.h:314
- __netif_receive_skb_one_core net/core/dev.c:5661 [inline]
- __netif_receive_skb+0x2bf/0x650 net/core/dev.c:5775
- process_backlog+0x662/0x15b0 net/core/dev.c:6108
- __napi_poll+0xcb/0x490 net/core/dev.c:6772
- napi_poll net/core/dev.c:6841 [inline]
- net_rx_action+0x89b/0x1240 net/core/dev.c:6963
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- do_softirq+0x11b/0x1e0 kernel/softirq.c:455
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0x1bb/0x200 kernel/softirq.c:382
- local_bh_enable include/linux/bottom_half.h:33 [inline]
- rcu_read_unlock_bh include/linux/rcupdate.h:908 [inline]
- __dev_queue_xmit+0x1763/0x3e90 net/core/dev.c:4450
- dev_queue_xmit include/linux/netdevice.h:3105 [inline]
- neigh_hh_output include/net/neighbour.h:526 [inline]
- neigh_output include/net/neighbour.h:540 [inline]
- ip_finish_output2+0xd41/0x1390 net/ipv4/ip_output.c:235
- ip_local_out net/ipv4/ip_output.c:129 [inline]
- __ip_queue_xmit+0x118c/0x1b80 net/ipv4/ip_output.c:535
- __tcp_transmit_skb+0x2544/0x3b30 net/ipv4/tcp_output.c:1466
- tcp_rcv_synsent_state_process net/ipv4/tcp_input.c:6542 [inline]
- tcp_rcv_state_process+0x2c32/0x4570 net/ipv4/tcp_input.c:6729
- tcp_v4_do_rcv+0x77d/0xc70 net/ipv4/tcp_ipv4.c:1934
- sk_backlog_rcv include/net/sock.h:1111 [inline]
- __release_sock+0x214/0x350 net/core/sock.c:3004
- release_sock+0x61/0x1f0 net/core/sock.c:3558
- mptcp_sendmsg_fastopen+0x1ad/0x530 net/mptcp/protocol.c:1733
- mptcp_sendmsg+0x1884/0x1b10 net/mptcp/protocol.c:1812
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x1a6/0x270 net/socket.c:745
- ____sys_sendmsg+0x525/0x7d0 net/socket.c:2597
- ___sys_sendmsg net/socket.c:2651 [inline]
- __sys_sendmmsg+0x3b2/0x740 net/socket.c:2737
- __do_sys_sendmmsg net/socket.c:2766 [inline]
- __se_sys_sendmmsg net/socket.c:2763 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2763
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f04fb13a6b9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 01 1a 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffd651f42d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f04fb13a6b9
-RDX: 0000000000000001 RSI: 0000000020000d00 RDI: 0000000000000004
-RBP: 00007ffd651f4310 R08: 0000000000000001 R09: 0000000000000001
-R10: 0000000020000080 R11: 0000000000000246 R12: 00000000000f4240
-R13: 00007f04fb187449 R14: 00007ffd651f42f4 R15: 00007ffd651f4300
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+I was essentially modifying an existing REUSEPORT user app that one
+app listens on all interfaces, so BINDTODEVICE + queue_mapping bpf
+filter was the only way (that I could find) to make the NAPI ID
+based polling work.
 
