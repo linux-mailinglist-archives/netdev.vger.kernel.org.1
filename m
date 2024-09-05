@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-125674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F06D96E384
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:51:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE06E96E386
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:52:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9CEFB217A4
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:51:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58C071F26A5E
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B18431B1D58;
-	Thu,  5 Sep 2024 19:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 413681B4C31;
+	Thu,  5 Sep 2024 19:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JyoGwzVH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PnUud2d9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C401AE846;
-	Thu,  5 Sep 2024 19:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA0C1B1D56;
+	Thu,  5 Sep 2024 19:49:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725565790; cv=none; b=K3gh2Zz+P2Kd52qqXZqi9PqP/bEiLYa6eY22wTycHri4EhNg62VkF0ndwXv7BF9RXFxk9AMaSuEOvIy3zFlKk6qsfyL2uDHP7CYwnv/CODRS8yGt3vSNqiHdzm5xHQrq/yifJfowTlz6BSf3T0OmajC9B9AmggUnAr2mv6ScHI4=
+	t=1725565792; cv=none; b=C1k5TULDvVe2F8NtMYyiwtbSU3bTmIybRC1cYEu2xYwzaM8ylIdKq23Oi+Q02/Mdky2gdD0fnTuEVBLcku3Gs0N3C6fmb9Ve9V0KprVn0I77fPeA34GvUWRnyJTC/pc7Xi11Xio4nIExe5QL8RacSxmlWLQpE43CL5pV/Klds0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725565790; c=relaxed/simple;
-	bh=1MXbig0Gfe11O9LAOpeyyY7fZHq5G8pcekT9BHoBb0M=;
+	s=arc-20240116; t=1725565792; c=relaxed/simple;
+	bh=2GOpH4dUCx/6xWlhBaz7YrfPlaGzpswMvi5hNvCJby8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=et+FIqYriEdOi4g1kQaeY9v9Mud1qsmZ4Nmg1V0LadGFgA5xkyBBftHiFmpiJLpL5ehxVEusAwMZGQDXZyD81FmEV0qt1ECGOs3kYDMXGD6qPvbBOs7ydFNw369EQ39B0jnSSznoHoT44O5zg0PkLC/BEGKz5YwADiaKqW4kXas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JyoGwzVH; arc=none smtp.client-ip=209.85.210.173
+	 MIME-Version; b=HTCjM64/XvKYLBnAalLb0jyHxQGJuTf2xQq1LujQd0p5cO0evHa+RZWed71TNSVAJtyztWdXslKdLSYtYBZQQ7Ef0jOjCsZTehf+E4/a2slAThKAzbm9bK3Y2H+AGr6OeRBYlJErrms7bHsmX1lou9EpgYD8k01Gj7mqfwBxK5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PnUud2d9; arc=none smtp.client-ip=209.85.215.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71798a15ce5so468810b3a.0;
-        Thu, 05 Sep 2024 12:49:49 -0700 (PDT)
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-7d4ed6158bcso975916a12.1;
+        Thu, 05 Sep 2024 12:49:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725565788; x=1726170588; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725565789; x=1726170589; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2qpO2KwJrMxcAODh5GIPUFfJla71GHWnB9AbZMPCT2w=;
-        b=JyoGwzVHShWnsqrYbffgpXbYGTDXPmAsCD+TxwwB7RcuJd9orQ8jAYVrlh9l7+qmV/
-         WY+CiR3VwhbfOzYpps73+koVPBHbsrJXOZVXzPhKDPRuHHKlL/ZyJIFBNeS1KR1tUeGX
-         D6Q7PZAvue5jf0Ss5UQQSMh1oD2agfAwg2ZXfxxQxeiOyer9aTqPXnsPOHCpYlD6ZIkF
-         3acDYJPiXKXTr/85cla4ZZ0Qz+YPhtlJaQVJrMfMuUYuiG2Gg/WylHrt9vQbBUdDtROi
-         ZTaBjXU/VyhcTMEfXBAvQcbKd9Jz1hGx+qT5swpyNHmXw7HaWqmXK7t3hjtjXMNNQxNO
-         jqjg==
+        bh=zNs22ZVDs5twPg/KlrxF0LCZVcyK0csurONNSh5++RQ=;
+        b=PnUud2d9oJLGyWSxjVi8plNAmKHEzNVgEoNPJw79dnSNjCBgd597Y96V/2FOlDAkNd
+         XM66vWt0lKAAzGjCGN6uceu/6xiv9lBUCR2FocV566TVN5yhDBbu1kdCc1nZJxwkKJOr
+         ce5AnZb7mj+AgqigAabMtgxqb6BQLmDl5grHGxkoZnwD/yu/vYfjMq9/intNUaVbxFlH
+         Iec0j9Y8F47zIL3jkE0MVvaMf3R+jEKQwzdfos1uNf+ggRvFv0+oazXl3DSzBpA4Tocz
+         hlD+cZk3wk5vO4oX2yPjn3Sco/QKp9X0CVpBI7I0GHa2b/5rMy50o6QEA0KPUIGGPzrI
+         N/oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725565788; x=1726170588;
+        d=1e100.net; s=20230601; t=1725565789; x=1726170589;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2qpO2KwJrMxcAODh5GIPUFfJla71GHWnB9AbZMPCT2w=;
-        b=w+PVXipGKmwjgP0ZAe/ZhM/tOnE2+GVfVWXUfyEgUEXa1e9DpGhKCQ+qeg1zoUBJay
-         GiZc7dDk1WZ9F/XXkCTNsagfkVHGM6v+fU9Vf5/yxUFG4Zj3DaIPAgQEJQU7i1B2bbK4
-         Jl2Z52Yj02BXu3TxsQAkXArKXsVxANSmECRC5XEYo/OmuJC9m4rC6/EW/t9yVQ+WVM+x
-         1Q6twIOUosLziXczePbr8A/qh+a+QtIpmOYC2HJQT/03NpI68QQdhG92DGQmoUXusGKj
-         zZgnUCS2gUsOHq3Wi9ZytUM4+t6FPYkty2q7AljqaT4TRLbWhrz8hqe8yVIOh0ukFDVG
-         uTGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW8Ff8QD4m6XCsQjvZ24bThe/LNCn42d7Iq48LqyYYiOY6RTRC/aSW1R04nNZWG8NdQYm/XzH/yA3iIW90=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWxyUnbJijAiuCnEpaGhsljNkOUKnBsom1jRmhNoJnY8VjFWnH
-	lbV33vmOK81cCtBcxmf3OtY2WjN2vhysLfH0wOkFKPFSQNdvn+QLR/9uFYja
-X-Google-Smtp-Source: AGHT+IGd3iBb2hSC2lC2rLH6iy2MhdshYaZK9aSgm80rWUG4phhr4LZYWKDj/Sg8z0tTeoMOVUkCNg==
-X-Received: by 2002:a05:6a20:ce48:b0:1cc:d5d1:fe64 with SMTP id adf61e73a8af0-1cf1c0b9498mr606154637.14.1725565788282;
-        Thu, 05 Sep 2024 12:49:48 -0700 (PDT)
+        bh=zNs22ZVDs5twPg/KlrxF0LCZVcyK0csurONNSh5++RQ=;
+        b=LK6li6kA21wghs6CP6M8RHvL0rHLVWKV+8wBs3c7391AhnmFiM+1fKjv9S4/8erw9J
+         rx82SbzehY9avSwpDH8+9BJF4L60s7x2C0ZopnCERGIFYsZ0/kWQgpnSNE7EaymsKoFn
+         yHonUhiqQCwhT9UPD59A6Eut/9EcvUuX7GZnPyA/LPG3fmKeC/8Qo6QlLgy5rFx5s1nj
+         jd43FcY6WtsCPbs2l8CeA4BiTJznEZgI3t5ClpEWTueyRPbl2DhFCr9ckXGxPbxzd5Xw
+         1W0f5XDKCAsXjeb46gnWrjSfTCn0nXzQXADN95THqL81uebXYim9Tq3QEPvhxVYgrHDH
+         cITg==
+X-Forwarded-Encrypted: i=1; AJvYcCUDhXMopTgWz+M0a5BH7Fwfjsi8hlBUzyovQmlM/DNd2OTkQeLckTONpJisT8nbJ2sli4krdXXV+TPNpf8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVJNVj45mke0ytL9v4rJSG6PmKkdCNrE1QDzRq1StR/gN5MWK0
+	WRKfEsk6rSELh4rdBKqMnt1p9lM2W3iygzorwiARU5mtimHprmhOFe5ugbX6
+X-Google-Smtp-Source: AGHT+IF7Fjja6lcHracGAiX78aEJBVbbb5iBkbfsZCeCi1ty1jlysw2uk26qAYLHVE9ySf9nmO8wmg==
+X-Received: by 2002:a05:6a20:d50b:b0:1ca:db51:85df with SMTP id adf61e73a8af0-1cf1d05cc9dmr88446637.8.1725565789594;
+        Thu, 05 Sep 2024 12:49:49 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71791e54585sm1248410b3a.182.2024.09.05.12.49.47
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71791e54585sm1248410b3a.182.2024.09.05.12.49.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 12:49:48 -0700 (PDT)
+        Thu, 05 Sep 2024 12:49:49 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -77,9 +77,9 @@ Cc: davem@davemloft.net,
 	linux-kernel@vger.kernel.org,
 	o.rempel@pengutronix.de,
 	p.zabel@pengutronix.de
-Subject: [PATCHv2 net-next 6/7] net: ag71xx: remove always true branch
-Date: Thu,  5 Sep 2024 12:49:37 -0700
-Message-ID: <20240905194938.8453-7-rosenp@gmail.com>
+Subject: [PATCHv2 net-next 7/7] net: ag71xx: disable napi interrupts during probe
+Date: Thu,  5 Sep 2024 12:49:38 -0700
+Message-ID: <20240905194938.8453-8-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240905194938.8453-1-rosenp@gmail.com>
 References: <20240905194938.8453-1-rosenp@gmail.com>
@@ -91,36 +91,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The opposite of this condition is checked above and if true, function
-returns. Which means this can never be false.
+From: Sven Eckelmann <sven@narfation.org>
 
+ag71xx_probe is registering ag71xx_interrupt as handler for gmac0/gmac1
+interrupts. The handler is trying to use napi_schedule to handle the
+processing of packets. But the netif_napi_add for this device is
+called a lot later in ag71xx_probe.
+
+It can therefore happen that a still running gmac0/gmac1 is triggering the
+interrupt handler with a bit from AG71XX_INT_POLL set in
+AG71XX_REG_INT_STATUS. The handler will then call napi_schedule and the
+napi code will crash the system because the ag->napi is not yet
+initialized.
+
+The gmcc0/gmac1 must be brought in a state in which it doesn't signal a
+AG71XX_INT_POLL related status bits as interrupt before registering the
+interrupt handler. ag71xx_hw_start will take care of re-initializing the
+AG71XX_REG_INT_ENABLE.
+
+This will become relevant when dual GMAC devices get added here.
+
+Signed-off-by: Sven Eckelmann <sven@narfation.org>
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- drivers/net/ethernet/atheros/ag71xx.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/atheros/ag71xx.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index a32a72fa4179..e28a4b018b11 100644
+index e28a4b018b11..96a6189cc31e 100644
 --- a/drivers/net/ethernet/atheros/ag71xx.c
 +++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -719,12 +719,10 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
- 	mii_bus->parent = dev;
- 	snprintf(mii_bus->id, MII_BUS_ID_SIZE, "%s.%d", np->name, ag->mac_idx);
+@@ -1850,6 +1850,12 @@ static int ag71xx_probe(struct platform_device *pdev)
+ 	if (!ag->mac_base)
+ 		return -ENOMEM;
  
--	if (!IS_ERR(mdio_reset)) {
--		reset_control_assert(mdio_reset);
--		msleep(100);
--		reset_control_deassert(mdio_reset);
--		msleep(200);
--	}
-+	reset_control_assert(mdio_reset);
-+	msleep(100);
-+	reset_control_deassert(mdio_reset);
-+	msleep(200);
- 
- 	mnp = of_get_child_by_name(np, "mdio");
- 	err = devm_of_mdiobus_register(dev, mii_bus, mnp);
++	/* ensure that HW is in manual polling mode before interrupts are
++	 * activated. Otherwise ag71xx_interrupt might call napi_schedule
++	 * before it is initialized by netif_napi_add.
++	 */
++	ag71xx_int_disable(ag, AG71XX_INT_POLL);
++
+ 	ndev->irq = platform_get_irq(pdev, 0);
+ 	err = devm_request_irq(&pdev->dev, ndev->irq, ag71xx_interrupt,
+ 			       0x0, dev_name(&pdev->dev), ndev);
 -- 
 2.46.0
 
